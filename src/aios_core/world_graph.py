@@ -14,7 +14,7 @@ from typing import Any, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from aios_core.contracts.enums import ObjectType, SourceClass
+from aios_core.contracts.enums import ErrorCode, ObjectType, SourceClass
 from aios_core.contracts.models import (
     Dependency,
     Entity,
@@ -27,7 +27,7 @@ from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import KnowledgeWindow, TemporalExtent, as_utc
 from aios_core.query.search import WorldSearchIndex
 from aios_core.storage.idempotency import canonical_json_dumps
-from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
 ENTITY_DIMENSION = "dim:entities"
 RELATION_DIMENSION = "dim:relations"
@@ -510,11 +510,8 @@ class EntityRelationService:
         current: Relation | None = None
         try:
             latest = self.store.get_payload(relation_id)
-        except Exception as exc:
-            from aios_core.contracts.enums import ErrorCode
-            from aios_core.storage.sqlite_store import StoreError
-
-            if not isinstance(exc, StoreError) or exc.code is not ErrorCode.NOT_FOUND:
+        except StoreError as exc:
+            if exc.code is not ErrorCode.NOT_FOUND:
                 raise
         else:
             current = Relation.model_validate(latest)
