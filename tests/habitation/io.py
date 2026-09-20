@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict
 from datetime import datetime
 import hashlib
 import json
@@ -19,24 +18,59 @@ def _parse_datetime(value: str) -> datetime:
     return parsed
 
 
+def _required_string(raw: Mapping[str, Any], field_name: str) -> str:
+    value = raw.get(field_name)
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{field_name} must be a non-empty string")
+    return value
+
+
+def _optional_mapping(raw: Mapping[str, Any], field_name: str) -> dict[str, Any]:
+    value = raw.get(field_name)
+    if value is None:
+        return {}
+    if not isinstance(value, Mapping):
+        raise ValueError(f"{field_name} must be an object")
+    return dict(value)
+
+
+def _optional_bool(
+    raw: Mapping[str, Any],
+    field_name: str,
+    *,
+    default: bool,
+) -> bool:
+    value = raw.get(field_name, default)
+    if not isinstance(value, bool):
+        raise ValueError(f"{field_name} must be a boolean")
+    return value
+
+
 def _event_from_mapping(raw: Mapping[str, Any]) -> LifeEvent:
+    if not isinstance(raw, Mapping):
+        raise ValueError("event must be an object")
+
+    occurred_raw = raw.get("occurred_at")
+    if not isinstance(occurred_raw, str):
+        raise ValueError("occurred_at must be an ISO-8601 string")
+
     return LifeEvent(
-        event_id=str(raw["event_id"]),
-        occurred_at=_parse_datetime(str(raw["occurred_at"])),
-        channel=str(raw["channel"]),
+        event_id=_required_string(raw, "event_id"),
+        occurred_at=_parse_datetime(occurred_raw),
+        channel=_required_string(raw, "channel"),
         payload=raw.get("payload"),
-        metadata=dict(raw.get("metadata") or {}),
-        hidden_oracle=dict(raw.get("hidden_oracle") or {}),
-        deliver_to_resident=bool(raw.get("deliver_to_resident", True)),
+        metadata=_optional_mapping(raw, "metadata"),
+        hidden_oracle=_optional_mapping(raw, "hidden_oracle"),
+        deliver_to_resident=_optional_bool(
+            raw,
+            "deliver_to_resident",
+            default=True,
+        ),
     )
 
 
 def load_scenario_json(text: str) -> HabitationScenario:
-    """Load one sealed scenario from JSON.
-
-    hidden_oracle is accepted for evaluator-side fixtures but is never emitted by
-    resident artifact serializers.
-    """
+    """Load one sealed evaluator-side scenario from JSON."""
 
     raw = json.loads(text)
     if not isinstance(raw, dict):
@@ -46,33 +80,61 @@ def load_scenario_json(text: str) -> HabitationScenario:
     if not isinstance(events_raw, list):
         raise ValueError("scenario events must be a list")
 
+    tags_raw = raw.get("tags", ())
+    if not isinstance(tags_raw, (list, tuple)):
+        raise ValueError("tags must be an array")
+    if not all(isinstance(tag, str) and tag.strip() for tag in tags_raw):
+        raise ValueError("tags must contain non-empty strings")
+
+    seed_raw = raw.get("seed", 0)
+    if not isinstance(seed_raw, int) or isinstance(seed_raw, bool):
+        raise ValueError("seed must be an integer")
+
+    version_raw = raw.get("scenario_version", "1")
+    if not isinstance(version_raw, str) or not version_raw.strip():
+        raise ValueError("scenario_version must be a non-empty string")
+
     return HabitationScenario(
-        scenario_id=str(raw["scenario_id"]),
-        subject_id=str(raw["subject_id"]),
+        scenario_id=_required_string(raw, "scenario_id"),
+        subject_id=_required_string(raw, "subject_id"),
         events=tuple(_event_from_mapping(item) for item in events_raw),
-        hidden_oracle=dict(raw.get("hidden_oracle") or {}),
-        tags=tuple(str(tag) for tag in raw.get("tags") or ()),
-        scenario_version=str(raw.get("scenario_version", "1")),
-        seed=int(raw.get("seed", 0)),
+        hidden_oracle=_optional_mapping(raw, "hidden_oracle"),
+        tags=tuple(tags_raw),
+        scenario_version=version_raw,
+        seed=seed_raw,
     )
 
 
 def load_events_jsonl(text: str) -> tuple[LifeEvent, ...]:
-    """Load chronological event records from JSONL.
-
-    This helper does not create a scenario by itself. Scenario identity, version,
-    seed and hidden evaluator metadata stay in a separate manifest.
-    """
+    """Load and validate a chronological resident/evaluator event stream."""
 
     events: list[LifeEvent] = []
+    seen_ids: set[str] = set()
+    previous: datetime | None = None
+
     for line_number, line in enumerate(text.splitlines(), start=1):
         stripped = line.strip()
         if not stripped or stripped.startswith("#"):
             continue
+
         raw = json.loads(stripped)
         if not isinstance(raw, dict):
             raise ValueError(f"JSONL line {line_number} must contain an object")
-        events.append(_event_from_mapping(raw))
+
+        event = _event_from_mapping(raw)
+        if event.event_id in seen_ids:
+            raise ValueError(
+                f"duplicate event_id at JSONL line {line_number}: {event.event_id}"
+            )
+        if previous is not None and event.occurred_at < previous:
+            raise ValueError(
+                f"events must be chronological at JSONL line {line_number}"
+            )
+
+        seen_ids.add(event.event_id)
+        previous = event.occurred_at
+        events.append(event)
+
     return tuple(events)
 
 
@@ -89,9 +151,9 @@ def _resident_event_dict(event: ResidentEvent) -> dict[str, Any]:
 def scenario_public_fingerprint(scenario: HabitationScenario) -> str:
     """Hash exactly the life data visible to resident models.
 
-    Hidden oracle fields and evaluator-only events are intentionally excluded.
-    Matching fingerprints therefore prove candidates received the same visible
-    life without publishing evaluator truth.
+    Hidden oracle fields and evaluator-only events are excluded. Visible payloads
+    must be JSON serializable; silently stringifying arbitrary Python objects would
+    make cross-machine reproducibility unreliable.
     """
 
     payload = {
@@ -110,7 +172,6 @@ def scenario_public_fingerprint(scenario: HabitationScenario) -> str:
         sort_keys=True,
         separators=(",", ":"),
         ensure_ascii=False,
-        default=str,
     ).encode("utf-8")
     return hashlib.sha256(canonical).hexdigest()
 
@@ -120,7 +181,7 @@ def run_artifact(
     scenario: HabitationScenario,
     run: HabitationRun,
 ) -> dict[str, Any]:
-    """Create a persistable per-model artifact with no hidden-oracle fields."""
+    """Create a persistable per-model artifact with no scenario oracle fields."""
 
     if run.scenario_id != scenario.scenario_id:
         raise ValueError("run and scenario do not match")
