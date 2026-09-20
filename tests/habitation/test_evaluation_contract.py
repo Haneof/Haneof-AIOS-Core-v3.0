@@ -5,9 +5,12 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from .evaluation import (
+    ORACLE_SCHEMA_V1,
     EvaluationFinding,
+    EvaluatorProvenance,
     build_model_report,
     comparison_matrix,
+    evaluate_with_oracle,
 )
 from .harness import HabitationRunner, HabitationScenario, LifeEvent, ResidentEvent
 
@@ -189,4 +192,142 @@ def test_finding_rejects_invalid_runtime_types() -> None:
             status="observe",
             summary="x",
             measurements=[],  # type: ignore[arg-type]
+        )
+
+
+def test_oracle_evaluator_requires_exact_criteria_and_records_provenance() -> None:
+    scenario = HabitationScenario(
+        scenario_id="oracle-eval-life",
+        scenario_version="3",
+        subject_id="u1",
+        hidden_oracle={
+            "evaluation_schema": ORACLE_SCHEMA_V1,
+            "criteria": [
+                "cross_session_continuity",
+                "epistemic_restraint",
+            ],
+            "latent_truth": {"evaluation_only": True},
+        },
+        events=(
+            LifeEvent(
+                event_id="e1",
+                occurred_at=BASE,
+                channel="conversation",
+                payload="first",
+            ),
+            LifeEvent(
+                event_id="e2",
+                occurred_at=BASE + timedelta(days=1),
+                channel="conversation",
+                payload="second",
+            ),
+        ),
+    )
+    run = HabitationRunner().run(
+        scenario=scenario,
+        model_id="provider/model-a",
+        target=Target("a"),
+    )
+    provenance = EvaluatorProvenance(
+        evaluator_id="judge-model-v2",
+        evaluator_kind="model",
+        provider="provider-x",
+        model="judge-x",
+        version="2026-09-20",
+        config_fingerprint="sha256:test-config",
+    )
+
+    def handler(context):
+        assert context.criteria == (
+            "cross_session_continuity",
+            "epistemic_restraint",
+        )
+        assert context.hidden_oracle["latent_truth"]["evaluation_only"] is True
+        assert context.run is run
+        return (
+            EvaluationFinding(
+                criterion_id="cross_session_continuity",
+                status="observe",
+                summary="The evaluator inspected continuity after the run.",
+                evidence_event_ids=("e1", "e2"),
+            ),
+            EvaluationFinding(
+                criterion_id="epistemic_restraint",
+                status="pass",
+                summary="No unsupported durable conclusion was observed.",
+                evidence_event_ids=("e2",),
+            ),
+        )
+
+    report = evaluate_with_oracle(
+        scenario=scenario,
+        run=run,
+        evaluator_provenance=provenance,
+        handler=handler,
+    )
+
+    assert report.artifact_schema == "aios.p16.model-evaluation.v2"
+    assert report.evaluator_provenance == provenance
+    assert [item.criterion_id for item in report.findings] == [
+        "cross_session_continuity",
+        "epistemic_restraint",
+    ]
+
+
+def test_oracle_evaluator_cannot_omit_or_invent_criteria() -> None:
+    scenario = HabitationScenario(
+        scenario_id="oracle-coverage",
+        subject_id="u1",
+        hidden_oracle={
+            "evaluation_schema": ORACLE_SCHEMA_V1,
+            "criteria": ["required-a", "required-b"],
+        },
+        events=(
+            LifeEvent(
+                event_id="e1",
+                occurred_at=BASE,
+                channel="conversation",
+                payload="visible",
+            ),
+        ),
+    )
+    run = HabitationRunner().run(
+        scenario=scenario,
+        model_id="provider/model-a",
+        target=Target("a"),
+    )
+    provenance = EvaluatorProvenance(
+        evaluator_id="human-review-v1",
+        evaluator_kind="human",
+        version="1",
+    )
+
+    with pytest.raises(ValueError, match="exactly cover declared criteria"):
+        evaluate_with_oracle(
+            scenario=scenario,
+            run=run,
+            evaluator_provenance=provenance,
+            handler=lambda context: (
+                EvaluationFinding(
+                    criterion_id="required-a",
+                    status="observe",
+                    summary="Only one required criterion was returned.",
+                    evidence_event_ids=("e1",),
+                ),
+                EvaluationFinding(
+                    criterion_id="invented-c",
+                    status="observe",
+                    summary="This criterion does not exist in the oracle contract.",
+                    evidence_event_ids=("e1",),
+                ),
+            ),
+        )
+
+
+def test_model_evaluator_provenance_requires_provider_and_model() -> None:
+    with pytest.raises(ValueError, match="requires provider and model"):
+        EvaluatorProvenance(
+            evaluator_id="bad-judge",
+            evaluator_kind="model",
+            version="1",
         )
