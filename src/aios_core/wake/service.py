@@ -223,6 +223,21 @@ class WakeBus:
         refs = tuple(request.evidence_refs)
         self._validate_refs(refs)
 
+        signal_id = _stable_id(
+            "wake_signal",
+            self.subject_id,
+            request.wake_source.value,
+            request.rule_id,
+            request.dedupe_key,
+            moment.isoformat(),
+            [
+                {"object_id": ref.object_id, "revision": ref.revision}
+                for ref in refs
+            ],
+            request.priority,
+            dict(request.metadata),
+        )
+
         same_key = [
             wake
             for wake in self._current_wakes()
@@ -230,6 +245,19 @@ class WakeBus:
         ]
         same_key.sort(key=lambda wake: as_utc(wake.last_hit_at, "last_hit_at"))
         latest = same_key[-1] if same_key else None
+
+        if latest is not None:
+            prior_signal_ids = tuple(
+                str(item)
+                for item in (latest.metadata.get("signal_ids") or ())
+            )
+            if signal_id in prior_signal_ids:
+                return WakeSignalReceipt(
+                    wake_id=latest.object_id,
+                    revision=latest.revision,
+                    state=latest.wake_state.value,
+                    world_revision=int(self.store.current_world_revision()),
+                )
 
         # A queued/new Wake represents the same continuous pending situation. Merge
         # hits into that one durable object rather than flooding the resident model.
@@ -251,6 +279,10 @@ class WakeBus:
             metadata.update(dict(request.metadata))
             metadata["last_merge_at"] = moment.isoformat()
             metadata["merged_hit_count"] = latest.hit_count + 1
+            metadata["signal_ids"] = [
+                *tuple(str(item) for item in (latest.metadata.get("signal_ids") or ())),
+                signal_id,
+            ]
 
             merged = Wake.model_validate(
                 {
@@ -340,6 +372,7 @@ class WakeBus:
                     status=WakeState.SUPPRESSED.value,
                     metadata={
                         **dict(request.metadata),
+                        "signal_ids": [signal_id],
                         "suppression_reason": "cooldown",
                         "cooldown_seconds": request.cooldown_seconds,
                         "previous_wake_ref": {
@@ -401,7 +434,10 @@ class WakeBus:
             priority=request.priority,
             dedupe_key=request.dedupe_key.strip(),
             status=WakeState.NEW.value,
-            metadata=dict(request.metadata),
+            metadata={
+                **dict(request.metadata),
+                "signal_ids": [signal_id],
+            },
         )
         result = self.store.commit(
             [wake],
@@ -479,6 +515,68 @@ class WakeBus:
             wake_id=running.object_id,
             revision=revision,
             state=WakeState.RUNNING.value,
+            world_revision=result.world_revision,
+        )
+
+    def defer(
+        self,
+        wake_id: str,
+        *,
+        deferred_at: datetime,
+        step0: Step0GateResult,
+    ) -> WakeStateReceipt:
+        """Keep a Wake pending when Step-0 cannot safely invoke the model yet."""
+
+        moment = as_utc(deferred_at, "deferred_at")
+        wake = self.current_wake(wake_id)
+        if wake.wake_state is WakeState.QUEUED:
+            return WakeStateReceipt(
+                wake_id=wake.object_id,
+                revision=wake.revision,
+                state=wake.wake_state.value,
+                world_revision=int(self.store.current_world_revision()),
+            )
+        if wake.wake_state is not WakeState.NEW:
+            raise ValueError("only NEW Wake may be deferred")
+
+        revision = wake.revision + 1
+        metadata = dict(wake.metadata)
+        metadata.update(
+            {
+                "deferred_at": moment.isoformat(),
+                "step0_state": step0.state,
+                "step0_reasons": list(step0.reasons),
+            }
+        )
+        queued = Wake.model_validate(
+            {
+                **wake.model_dump(mode="python", round_trip=True),
+                "revision": revision,
+                "occurred": TemporalExtent.point(moment),
+                "learned_at": moment,
+                "recorded_at": moment,
+                "wake_state": WakeState.QUEUED,
+                "status": WakeState.QUEUED.value,
+                "metadata": metadata,
+            }
+        )
+        result = self.store.commit(
+            [queued],
+            OperationRequest(
+                operation_name="wake.dispatch.defer",
+                arguments={"wake_id": wake.object_id, "revision": revision},
+                expected_world_revision=int(self.store.current_world_revision()),
+                reason="Step-0 deferred Resident model invocation",
+                idempotency_key=f"wake-defer:{wake.object_id}:{revision}",
+                source_class=SourceClass.MAINTENANCE,
+                maintenance_class=MaintenanceClass.WAKE_SCHEDULER,
+            ),
+        )
+        self._catch_up()
+        return WakeStateReceipt(
+            wake_id=queued.object_id,
+            revision=revision,
+            state=WakeState.QUEUED.value,
             world_revision=result.world_revision,
         )
 
