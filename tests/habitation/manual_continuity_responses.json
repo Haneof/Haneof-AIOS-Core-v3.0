@@ -42,5 +42,18 @@
     "snapshot_signature": "0982c543650c6498ba3a3df0058fb3f56def00c0982d7279f1ddb94c1fae4770",
     "type": "response",
     "text": "我记得那天是下周三早上 8 点飞西雅图。要算几点出门，还缺你从哪里去机场、路上大概多久，以及你想提前多久到机场；有这几个信息我就能倒推出发时间。"
+  },
+  {
+    "snapshot_signature": "a20e445b3a78a36f5dc15c4ab8b1aa889e4a1b3077ff62f94ef0fd8a7a386ae0",
+    "type": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 10
+        }
+      }
+    ]
   }
 ]
