@@ -306,3 +306,109 @@ def test_distinct_target_wrappers_cannot_share_one_world_store_identity() -> Non
                 "provider/model-b": second,
             },
         )
+
+
+def test_one_models_payload_mutation_cannot_change_later_models_life() -> None:
+    scenario = HabitationScenario(
+        scenario_id="mutation-isolation",
+        subject_id="u",
+        events=(
+            LifeEvent(
+                event_id="e1",
+                occurred_at=BASE,
+                channel="app",
+                payload={"items": ["original"]},
+                metadata={"nested": {"value": 1}},
+            ),
+        ),
+    )
+
+    class MutatingTarget(RecordingTarget):
+        def handle_event(self, event: ResidentEvent):
+            event.payload["items"].append("mutated")
+            event.metadata["nested"]["value"] = 999
+            return {"seen": event.payload}
+
+    first = MutatingTarget("mutator")
+    second = RecordingTarget("observer")
+
+    result = HabitationRunner().run_models(
+        scenario=scenario,
+        targets={"model-a": first, "model-b": second},
+    )
+
+    assert result.runs["model-a"].steps[0].response["seen"]["items"] == [
+        "original",
+        "mutated",
+    ]
+    assert second.events[0].payload == {"items": ["original"]}
+    assert second.events[0].metadata == {"nested": {"value": 1}}
+    assert scenario.events[0].payload == {"items": ["original"]}
+    assert scenario.events[0].metadata == {"nested": {"value": 1}}
+
+
+def test_run_snapshots_mutable_target_response() -> None:
+    scenario = _scenario()
+
+    class ReusingResponseTarget(RecordingTarget):
+        def __init__(self):
+            super().__init__("snapshot")
+            self.shared_response = {"values": []}
+
+        def handle_event(self, event: ResidentEvent):
+            self.shared_response["values"].append(event.event_id)
+            return self.shared_response
+
+    target = ReusingResponseTarget()
+    run = HabitationRunner().run(
+        scenario=scenario,
+        model_id="snapshot-model",
+        target=target,
+    )
+
+    assert run.steps[0].response["values"] == ["day-01-conversation"]
+    assert run.steps[1].response["values"] == [
+        "day-01-conversation",
+        "day-07-calendar",
+    ]
+
+
+def test_direct_contracts_reject_type_coercion() -> None:
+    with pytest.raises(ValueError, match="deliver_to_resident must be a boolean"):
+        LifeEvent(
+            event_id="e",
+            occurred_at=BASE,
+            channel="x",
+            payload="x",
+            deliver_to_resident="false",  # type: ignore[arg-type]
+        )
+
+    with pytest.raises(ValueError, match="seed must be an integer"):
+        HabitationScenario(
+            scenario_id="s",
+            subject_id="u",
+            events=(
+                LifeEvent(
+                    event_id="e",
+                    occurred_at=BASE,
+                    channel="x",
+                    payload="x",
+                ),
+            ),
+            seed=True,  # type: ignore[arg-type]
+        )
+
+
+def test_target_isolation_key_must_be_explicit_string() -> None:
+    scenario = _scenario()
+
+    class BadTarget(RecordingTarget):
+        @property
+        def isolation_key(self):
+            return None
+
+    with pytest.raises(ValueError, match="isolation_key must be a non-empty string"):
+        HabitationRunner().run_models(
+            scenario=scenario,
+            targets={"model": BadTarget("bad")},
+        )
