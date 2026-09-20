@@ -44,6 +44,14 @@ from aios_core.recommendation.proactive import (
     RecommendationBundle,
 )
 from aios_core.revision.service import ClaimRevisionRequest, CognitionRevisionService
+from aios_core.review import (
+    OperationExperienceRequest,
+    OperationExperienceService,
+    PeriodicReviewInput,
+    PeriodicReviewPolicy,
+    PeriodicReviewService,
+    ReviewCheckpointCommit,
+)
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 from aios_core.contracts.refs import ObjectRef
@@ -60,6 +68,13 @@ class FusedTurnResult:
     conversation_commit: ConversationCommit
     continuity_summary_commits: tuple[RoundSummaryCommit, ...] = ()
     continuity_summary_error: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class PeriodicReviewRunResult:
+    prepared: PeriodicReviewInput
+    runtime: RuntimeTurnResult
+    checkpoint: ReviewCheckpointCommit
 
 
 class FusedTurnRuntime:
@@ -135,8 +150,19 @@ class FusedTurnRuntime:
             index=index,
             subject_id=subject_id,
         )
+        self.periodic_review = PeriodicReviewService(
+            store=store,
+            index=index,
+            subject_id=self.subject_id,
+        )
+        self.operation_experience = OperationExperienceService(
+            store=store,
+            index=index,
+            subject_id=self.subject_id,
+        )
         self._active_turn_time: datetime | None = None
         self._active_session_id: str | None = None
+        self._active_review_input: PeriodicReviewInput | None = None
 
         registry = CapabilityRegistry()
         registry.register(
@@ -288,6 +314,29 @@ class FusedTurnRuntime:
                 },
             ),
             self._commit_ai_world_claim,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="commit_operation_experience",
+                description=(
+                    "During a periodic review, persist a candidate operational lesson "
+                    "grounded in pinned real-result evidence. Experience never becomes "
+                    "Strategy automatically."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "problem_type": "string",
+                    "method_path": "array[string]",
+                    "result_summary": "string",
+                    "applicability": "object?",
+                    "cost": "object[string,number]?",
+                    "misses": "array[string]?",
+                    "positive_case_refs": "array[{object_id:string,revision:integer}]?",
+                    "negative_case_refs": "array[{object_id:string,revision:integer}]?",
+                },
+            ),
+            self._commit_operation_experience,
         )
         registry.register(
             CapabilitySpec(
@@ -847,6 +896,7 @@ class FusedTurnRuntime:
         return spec.name in {
             "commit_claim",
             "commit_ai_world_claim",
+            "commit_operation_experience",
             "propose_dimension",
             "transition_dimension",
             "propose_goal",
@@ -891,6 +941,41 @@ class FusedTurnRuntime:
             "dimension": receipt.dimension,
             "subject_id": receipt.subject_id,
             "claim": asdict(receipt.claim),
+        }
+
+    def _commit_operation_experience(
+        self,
+        problem_type: str,
+        method_path: Sequence[str],
+        result_summary: str,
+        applicability: Mapping[str, Any] | None = None,
+        cost: Mapping[str, float] | None = None,
+        misses: Sequence[str] = (),
+        positive_case_refs: Sequence[Mapping[str, Any]] = (),
+        negative_case_refs: Sequence[Mapping[str, Any]] = (),
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None or self._active_review_input is None:
+            raise RuntimeError(
+                "commit_operation_experience is only available during periodic review"
+            )
+        receipt = self.operation_experience.commit(
+            OperationExperienceRequest(
+                problem_type=problem_type,
+                method_path=tuple(method_path),
+                result_summary=result_summary,
+                applicability=dict(applicability or {}),
+                cost={str(k): float(v) for k, v in dict(cost or {}).items()},
+                misses=tuple(misses),
+                positive_case_refs=self._coerce_refs(positive_case_refs),
+                negative_case_refs=self._coerce_refs(negative_case_refs),
+            ),
+            learned_at=self._active_turn_time,
+        )
+        return {
+            **asdict(receipt),
+            "object_ref": {"object_id": receipt.object_id, "revision": 1},
+            "experience_state": "candidate",
+            "auto_promoted_to_strategy": False,
         }
 
     def _commit_claim(
@@ -1143,5 +1228,70 @@ class FusedTurnRuntime:
             conversation_commit=commit,
             continuity_summary_commits=tuple(summary_commits),
             continuity_summary_error=summary_error,
+        )
+
+
+    def run_periodic_review(
+        self,
+        *,
+        reviewed_at: datetime,
+        policy: PeriodicReviewPolicy | None = None,
+    ) -> PeriodicReviewRunResult | None:
+        """Run one due periodic review through the existing resident model runtime."""
+
+        prepared = self.periodic_review.prepare_if_due(
+            reviewed_at=reviewed_at,
+            policy=policy,
+        )
+        if prepared is None:
+            return None
+
+        cockpit = {
+            "periodic_review": prepared.as_cockpit(),
+            "ai_world_snapshot": self.ai_world.snapshot(per_domain=10),
+            "execution_world": self._read_execution_world(),
+            "review_boundaries": {
+                "experience_is_not_strategy": True,
+                "claims_require_pinned_evidence": True,
+                "revision_is_forward_only": True,
+                "no_durable_change_is_allowed": True,
+                "checkpoint_is_process_audit_not_cognition": True,
+            },
+            "capability_catalog": self.registry.catalog(),
+        }
+
+        self._active_turn_time = reviewed_at
+        self._active_review_input = prepared
+        try:
+            runtime_result = self.cognitive_runtime.run_turn(
+                "Perform the due AIOS periodic review over the pinned world changes.",
+                wake_reason="periodic_review",
+                cockpit=cockpit,
+            )
+        finally:
+            self._active_turn_time = None
+            self._active_review_input = None
+
+        if runtime_result.response is None and not runtime_result.silenced:
+            raise RuntimeError(
+                "periodic review did not reach a terminal model decision; "
+                "checkpoint was not advanced"
+            )
+
+        review_note = (
+            runtime_result.response.strip()
+            if runtime_result.response is not None
+            else "resident model completed periodic review with an explicit silence decision"
+        )
+        checkpoint = self.periodic_review.commit_checkpoint(
+            prepared,
+            review_note=review_note,
+            completed_at=reviewed_at,
+            model_silenced=runtime_result.silenced,
+        )
+        return PeriodicReviewRunResult(
+            prepared=prepared,
+            runtime=runtime_result,
+            checkpoint=checkpoint,
         )
 
