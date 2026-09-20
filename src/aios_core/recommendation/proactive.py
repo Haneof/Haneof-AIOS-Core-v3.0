@@ -58,6 +58,7 @@ class ProactiveMemoryRecommender:
         subject_id: str | None = None,
         exclude_session_id: str | None = None,
         limit: int | None = None,
+        history_needed: bool | None = None,
     ) -> RecommendationBundle:
         topic = (current_topic or "").strip()
         current_world_revision = int(self.store.current_world_revision())
@@ -71,6 +72,16 @@ class ProactiveMemoryRecommender:
                 cards=(),
                 reason="no_current_topic",
             )
+        if history_needed is False:
+            return RecommendationBundle(
+                current_topic=topic,
+                topic_gate_open=True,
+                world_revision=current_world_revision,
+                index_watermark=self.index.watermark(),
+                cards=(),
+                reason="current_topic_does_not_need_history",
+            )
+
 
         take = self.default_limit if limit is None else max(1, int(limit))
         page = self.index.recall_candidates(
