@@ -135,6 +135,7 @@ def test_registered_numeric_change_marker_can_mechanically_create_wake(tmp_path)
     wake = bus.current_wake(wakes[0].wake_id)
     assert wake.wake_source is WakeSource.MECHANICAL_CHANGE
     assert wake.evidence_refs == [change_ref]
+    assert wake.first_hit_at == NOW + timedelta(minutes=2)
     assert wake.metadata["trigger_kind"] == "registered_observation_rule"
 
     # The trigger layer produces no semantic cognition.
