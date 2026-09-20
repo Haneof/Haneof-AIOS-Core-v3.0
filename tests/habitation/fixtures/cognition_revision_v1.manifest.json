@@ -5,5 +5,6 @@
   "subject_id": "synthetic-user-003",
   "resident_stream": "resident/cognition_revision_v1.jsonl",
   "evaluator_oracle": "oracle/cognition_revision_v1.json",
-  "purpose": "Forward-only cognition revision and stale-belief suppression"
+  "purpose": "Forward-only cognition revision and stale-belief suppression",
+  "end_at": "2026-04-27T20:00:00+00:00"
 }
