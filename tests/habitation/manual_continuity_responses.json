@@ -3,5 +3,39 @@
     "snapshot_signature": "27a569dd0a4b8a6cc4808c51a118968f6cfca615eb61d6a5b6964957bfc00e86",
     "type": "response",
     "text": "记下了：下周三早上 8 点飞西雅图出差。"
+  },
+  {
+    "snapshot_signature": "e5a4a34faf7395f25a04b1d4f16ecc936ba3624e8fccd405957d23509951f15f",
+    "type": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 10
+        }
+      }
+    ]
+  },
+  {
+    "snapshot_signature": "a1ecd294c3a8c40826b5dcde83651c00a349d5f2b6665683c86a20230a259979",
+    "type": "silence"
+  },
+  {
+    "snapshot_signature": "2239953ba53dc8181ff58ade142269c7a3ea37cc7a6ae3c7cae26eeae8ca82b1",
+    "type": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 10
+        }
+      }
+    ]
+  },
+  {
+    "snapshot_signature": "7e60a4712d1b83e7e555fb7bdc08e07c2126b03bbeb7f88c9dd27e6fdee45410",
+    "type": "silence"
   }
 ]
