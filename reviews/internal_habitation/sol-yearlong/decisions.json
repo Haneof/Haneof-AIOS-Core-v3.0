@@ -1382,5 +1382,47 @@
   "1c63047a858f5e77342673c795a2273b64f0acd6e091ababf0c3a8a8f8685d73": {
     "kind": "response",
     "response": "记着：凌晨 04:30 是面粉首批到货，需要你或店员开后门收货。你妹妹现在只知道“周五晚上可能到”，航班时间还没最终确认，所以目前没有依据说这两件事一定冲突。我不会替你决定；等航班时间确认后，再把两个时间和实际冲突依据摆给你。"
+  },
+  "e6895e8cf6582fa7812d4494c5425881f8be8be9dbfcfd7273f2ed8807e011fb": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_task",
+        "call_id": "sol-summaryrun-jan08-resolve-time-uncertainty",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_41571ce5cbcc6c736bb22f73",
+            "revision": 1
+          },
+          "new_state": "ready",
+          "reason": "The user has now confirmed the sister's arrival at 22:40 and the flour delivery remains 04:30. These times do not overlap, and the user explicitly assigned airport pickup to self and flour receiving to Xiao Zhao.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_ad04153c39dba332be3f72aa",
+              "revision": 1
+            }
+          ],
+          "next_step": "Confirmed schedule: sister arrives 22:40 and flour delivery is 04:30; do not characterize them as a time conflict. Preserve the user's chosen delegation."
+        }
+      },
+      {
+        "name": "create_task",
+        "call_id": "sol-summaryrun-jan08-create-xiaozhao-message-task",
+        "arguments": {
+          "title": "通知小赵明早4:15到店开后门收货",
+          "task_type": "immediate",
+          "reason_refs": [
+            {
+              "object_id": "obs_conv_user_ad04153c39dba332be3f72aa",
+              "revision": 1
+            }
+          ],
+          "initial_state": "ready",
+          "priority": 90,
+          "deadline": "2027-01-09T04:15:00+00:00",
+          "next_step": "用户已明确授权发送：明早4:15到店开后门收货，到了回我。先进入执行准备；任何外部发送仍需通过受信授权/平台执行路径。"
+        }
+      }
+    ]
   }
 }
