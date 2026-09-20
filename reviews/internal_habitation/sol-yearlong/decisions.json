@@ -624,5 +624,18 @@
   "4c6fc1c78148e9cd17bc3109ea2539796e150af884d24ab04bb37bb7f2b7e0e3": {
     "kind": "response",
     "response": "记下了：现在的主目标先放在“稳定早高峰出品”，扩菜单和一批新品暂时降级，不抢当前优先级。我先不替你拆一堆任务；等后面有真实经营数据或你给出具体卡点，再围绕这个目标往下做。"
+  },
+  "8b1a2ec593adaf511051fcc1e25a2b6ae715016c4ab29284a0e28b893c24ad08": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan11-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
   }
 }
