@@ -1188,6 +1188,326 @@ class FusedTurnRuntime:
         )
         return projection.model_dump(mode="json")
 
+    @staticmethod
+    def _search_hit_payload(hit) -> dict[str, Any]:
+        return {
+            "object_id": hit.object_id,
+            "revision": hit.revision,
+            "object_type": hit.object_type,
+            "dimension": hit.dimension,
+            "excerpt": hit.excerpt,
+            "retrieval_score": hit.score,
+        }
+
+    def _focus_entity(
+        self,
+        entity_id: str,
+        query: str | None = None,
+        limit: int = 12,
+    ) -> list[dict[str, Any]]:
+        page = self.index.search_by_entity(
+            str(entity_id),
+            keywords=(() if query is None or not str(query).strip() else (str(query),)),
+            limit=max(1, min(int(limit), 50)),
+        )
+        return [self._search_hit_payload(hit) for hit in page.hits]
+
+    def _search_timeline(
+        self,
+        window_start: str,
+        window_end: str,
+        dimension: str | None = None,
+        object_types: Sequence[str] | None = None,
+        query: str | None = None,
+        limit: int = 20,
+    ) -> list[dict[str, Any]]:
+        start = datetime.fromisoformat(str(window_start).replace("Z", "+00:00"))
+        end = datetime.fromisoformat(str(window_end).replace("Z", "+00:00"))
+        page = self.index.search_mind(
+            keywords=(() if query is None or not str(query).strip() else (str(query),)),
+            dimension=(None if dimension is None else str(dimension)),
+            object_types=(None if object_types is None else tuple(str(x) for x in object_types)),
+            time_range=(start, end),
+            limit=max(1, min(int(limit), 100)),
+        )
+        return [self._search_hit_payload(hit) for hit in page.hits]
+
+    def _follow_relation(
+        self,
+        object_id: str,
+        limit: int = 20,
+    ) -> list[dict[str, Any]]:
+        target = str(object_id)
+        matched: list[dict[str, Any]] = []
+        for payload in self.store.list_payloads(
+            object_type=ObjectType.RELATION,
+            subject_id=self.subject_id,
+        ):
+            left = payload.get("left") or {}
+            right = payload.get("right") or {}
+            if str(left.get("object_id") or "") != target and str(right.get("object_id") or "") != target:
+                continue
+            matched.append(payload)
+            if len(matched) >= max(1, min(int(limit), 100)):
+                break
+        return matched
+
+    def _compare_claims(
+        self,
+        claim_refs: Sequence[Mapping[str, Any]],
+    ) -> list[dict[str, Any]]:
+        result: list[dict[str, Any]] = []
+        for ref in self._coerce_refs(claim_refs):
+            payload = self.store.get_payload(ref.object_id, revision=ref.revision)
+            if payload.get("object_type") != ObjectType.CLAIM.value:
+                raise ValueError("compare_claims accepts only Claim references")
+            result.append(
+                {
+                    "claim": payload,
+                    "support_evidence_sets": [
+                        self.store.get_payload(
+                            str(item["object_id"]),
+                            revision=int(item["revision"]),
+                        )
+                        for item in payload.get("support_evidence_set_refs") or []
+                    ],
+                    "counter_evidence_sets": [
+                        self.store.get_payload(
+                            str(item["object_id"]),
+                            revision=int(item["revision"]),
+                        )
+                        for item in payload.get("counter_evidence_set_refs") or []
+                    ],
+                }
+            )
+        return result
+
+    def _retrieve_original_observation(
+        self,
+        object_id: str,
+        revision: int | None = None,
+    ) -> dict[str, Any]:
+        payload = self.store.get_payload(str(object_id), revision=revision)
+        if payload.get("object_type") != ObjectType.OBSERVATION.value:
+            raise ValueError("requested object is not an Observation")
+        return payload
+
+    def _expand_recall(
+        self,
+        query: str,
+        dimension: str | None = None,
+        limit: int = 20,
+    ) -> list[dict[str, Any]]:
+        page = self.index.recall_candidates(
+            str(query),
+            subject=self.subject_id,
+            dimension=(None if dimension is None else str(dimension)),
+            limit=max(1, min(int(limit), 100)),
+        )
+        return [self._search_hit_payload(hit) for hit in page.hits]
+
+    def _inspect_outcome(
+        self,
+        outcome_ref: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        ref = ObjectRef(
+            object_id=str(outcome_ref["object_id"]),
+            revision=int(outcome_ref["revision"]),
+        )
+        payload = self.store.get_payload(ref.object_id, revision=ref.revision)
+        if payload.get("object_type") != ObjectType.OUTCOME.value:
+            raise ValueError("outcome_ref must point to an Outcome")
+        action_ref = payload.get("action_ref") or {}
+        action = self.store.get_payload(
+            str(action_ref["object_id"]),
+            revision=int(action_ref["revision"]),
+        )
+        return {"outcome": payload, "action": action}
+
+    def _read_cognitive_policies(
+        self,
+        policy_id: str | None = None,
+    ) -> list[dict[str, Any]]:
+        if policy_id is not None and str(policy_id).strip():
+            item = self.policies.latest(str(policy_id))
+            return [] if item is None else [item.model_dump(mode="json")]
+        return [
+            item.model_dump(mode="json")
+            for item in self.policies.list_current()
+        ]
+
+    def _form_event(
+        self,
+        title: str,
+        interpretation: str,
+        event_time: Mapping[str, Any],
+        evidence_refs: Sequence[Mapping[str, Any]],
+        confidence: float,
+        participant_refs: Sequence[Mapping[str, Any]] = (),
+        primary_claim_refs: Sequence[Mapping[str, Any]] = (),
+        dimension: str = "dim:events",
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("form_event is only available during an active AIOS turn")
+        receipt = self.events.form_event(
+            EventWriteRequest(
+                title=title,
+                interpretation=interpretation,
+                event_time=dict(event_time),
+                evidence_refs=self._coerce_refs(evidence_refs),
+                participant_refs=self._coerce_refs(participant_refs),
+                primary_claim_refs=self._coerce_refs(primary_claim_refs),
+                confidence=float(confidence),
+                dimension=dimension,
+            ),
+            learned_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
+    def _transition_event(
+        self,
+        event_ref: Mapping[str, Any],
+        new_status: str,
+        reason: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        replacement_title: str | None = None,
+        replacement_interpretation: str | None = None,
+        confidence: float | None = None,
+        related_event_refs: Sequence[Mapping[str, Any]] = (),
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("transition_event is only available during an active AIOS turn")
+        receipt = self.events.transition(
+            EventTransitionRequest(
+                event_ref=ObjectRef(
+                    object_id=str(event_ref["object_id"]),
+                    revision=int(event_ref["revision"]),
+                ),
+                new_status=new_status,
+                reason=reason,
+                evidence_refs=self._coerce_refs(evidence_refs),
+                replacement_title=replacement_title,
+                replacement_interpretation=replacement_interpretation,
+                confidence=confidence,
+                related_event_refs=self._coerce_refs(related_event_refs),
+            ),
+            changed_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
+    def _record_communication_experience(
+        self,
+        scenario: str,
+        style: str,
+        user_reaction: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        tone: str | None = None,
+        action_ref: Mapping[str, Any] | None = None,
+        applicable_conditions: Mapping[str, Any] | None = None,
+        counterexample_refs: Sequence[Mapping[str, Any]] = (),
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError(
+                "record_communication_experience is only available during an active AIOS turn"
+            )
+        parsed_action = (
+            None
+            if action_ref is None
+            else ObjectRef(
+                object_id=str(action_ref["object_id"]),
+                revision=int(action_ref["revision"]),
+            )
+        )
+        receipt = self.communication_experience.record(
+            CommunicationExperienceRequest(
+                scenario=scenario,
+                style=style,
+                tone=tone,
+                user_reaction=user_reaction,
+                evidence_refs=self._coerce_refs(evidence_refs),
+                action_ref=parsed_action,
+                applicable_conditions=dict(applicable_conditions or {}),
+                counterexample_refs=self._coerce_refs(counterexample_refs),
+            ),
+            recorded_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
+    def _update_cognitive_policy(
+        self,
+        policy_id: str,
+        current_value: Any,
+        reason: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        evaluation_window: str | None = None,
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError(
+                "update_cognitive_policy is only available during an active AIOS turn"
+            )
+        receipt = self.policies.update(
+            CognitivePolicyUpdateRequest(
+                policy_id=policy_id,
+                current_value=current_value,
+                reason=reason,
+                evidence_refs=self._coerce_refs(evidence_refs),
+                changed_by="resident_ai",
+                evaluation_window=evaluation_window,
+            ),
+            changed_at=self._active_turn_time,
+            actor_is_ai=True,
+        )
+        return asdict(receipt)
+
+    def _rollback_cognitive_policy(
+        self,
+        policy_id: str,
+        target_version: int,
+        reason: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError(
+                "rollback_cognitive_policy is only available during an active AIOS turn"
+            )
+        receipt = self.policies.rollback(
+            policy_id,
+            int(target_version),
+            reason=reason,
+            evidence_refs=self._coerce_refs(evidence_refs),
+            changed_by="resident_ai",
+            changed_at=self._active_turn_time,
+            actor_is_ai=True,
+        )
+        return asdict(receipt)
+
+    def _execution_context_for_topic(
+        self,
+        topic: str | None,
+        *,
+        limit: int = 6,
+    ) -> dict[str, Any]:
+        clean = "" if topic is None else str(topic).strip()
+        if not clean:
+            return {"related_execution_anchors": []}
+        page = self.index.recall_candidates(
+            clean,
+            subject=self.subject_id,
+            object_types=(
+                ObjectType.GOAL.value,
+                ObjectType.TASK.value,
+                ObjectType.ACTION.value,
+                ObjectType.OUTCOME.value,
+            ),
+            limit=max(1, min(int(limit), 20)),
+        )
+        return {
+            "related_execution_anchors": [
+                self._search_hit_payload(hit)
+                for hit in page.hits
+            ]
+        }
+
     def _authorize_side_effect(self, spec, call, snapshot) -> bool:
         # Internal cognition writeback is allowed because the handler itself enforces
         # pinned evidence and writes only revisable cognition. External actions stay
