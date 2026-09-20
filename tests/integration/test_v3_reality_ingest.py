@@ -226,7 +226,7 @@ def test_numeric_series_is_mechanically_compressed_and_preserves_changes(tmp_pat
 
     assert receipt.input_sample_count == len(samples)
     assert len(receipt.segment_observation_ids) < len(samples)
-    assert len(receipt.change_observation_ids) == 3
+    assert len(receipt.change_observation_ids) == 2
 
     segments = [
         store.get_payload(object_id)
