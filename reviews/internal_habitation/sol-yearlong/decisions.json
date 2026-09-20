@@ -216,5 +216,48 @@
   "d2a69f6ad25654f04b2fff41fa44eec3b17e5f82480ccde741449274109e7f52": {
     "kind": "response",
     "response": "记着。凌晨的安排是面粉首批到货：明早 04:30，需要你或店员开后门收货。妹妹这边目前只有“周五晚上可能到机场”，航班时间还没确认。按现在的两条原始记录，还没有足够依据判断它们真的时间冲突；我不会替你决定。等航班时间确认后，我再把两边具体时间和冲突依据直接告诉你。"
+  },
+  "c5a632856f3c1561cf986209802fc269df67d9c7335b5dbfe7dcd90e160a4778": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_task",
+        "call_id": "sol-jan08-confirm-receiver",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_57a01b42b3d5f384db661bda",
+            "revision": 3
+          },
+          "new_state": "ready",
+          "reason": "The user explicitly selected Xiao Zhao to receive the 04:30 flour delivery.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_ad04153c39dba332be3f72aa",
+              "revision": 1
+            }
+          ],
+          "next_step": "执行用户已确认的通知请求，但外部消息仍需走独立授权/执行边界。"
+        }
+      },
+      {
+        "name": "transition_task",
+        "call_id": "sol-jan08-flight-confirmed",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_40f75225e1031721889e7500",
+            "revision": 1
+          },
+          "new_state": "ready",
+          "reason": "The previously missing flight time is now supplied by the user: 22:40 tonight, and the user has separately assigned the overnight delivery to Xiao Zhao.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_ad04153c39dba332be3f72aa",
+              "revision": 1
+            }
+          ],
+          "next_step": "核对已确认的22:40接机与04:30收货安排；不要把非重叠任务夸大成冲突。"
+        }
+      }
+    ]
   }
 }
