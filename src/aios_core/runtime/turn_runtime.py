@@ -159,6 +159,21 @@ class FusedTurnRuntime:
         )
         registry.register(
             CapabilitySpec(
+                name="list_conversation_summaries",
+                description=(
+                    "List same-session continuity summary windows on demand. Use this "
+                    "when token budgeting omitted summary content from the cockpit."
+                ),
+                kind=CapabilityKind.READ,
+                input_schema={
+                    "session_id": "string?",
+                    "limit": "integer?",
+                },
+            ),
+            self._list_conversation_summaries,
+        )
+        registry.register(
+            CapabilitySpec(
                 name="drill_down_conversation",
                 description=(
                     "Read exact pinned raw dialogue behind a same-session round summary, "
@@ -488,6 +503,26 @@ class FusedTurnRuntime:
         revision: int | None = None,
     ) -> dict[str, Any]:
         return self.store.get_payload(str(object_id), revision=revision)
+
+    def _list_conversation_summaries(
+        self,
+        session_id: str | None = None,
+        limit: int = 50,
+    ) -> list[dict[str, Any]]:
+        active_session = (
+            str(session_id).strip()
+            if session_id is not None and str(session_id).strip()
+            else self._active_session_id
+        )
+        if active_session is None:
+            raise ValueError(
+                "session_id is required outside an active turn"
+            )
+        bounded = max(1, min(int(limit), 200))
+        summaries = self.continuity.round_summaries(
+            session_id=active_session,
+        )
+        return [dict(item) for item in summaries[-bounded:]]
 
     def _drill_down_conversation(
         self,
@@ -1010,6 +1045,7 @@ class FusedTurnRuntime:
             "session_id": session,
             "recent_turn_count": len(continuity_snapshot.recent_turns),
             "round_summary_count": len(continuity_snapshot.round_summaries),
+            "summary_index_capability": "list_conversation_summaries",
             "raw_drill_down_capability": "drill_down_conversation",
             "pending_round_summary": (
                 None
