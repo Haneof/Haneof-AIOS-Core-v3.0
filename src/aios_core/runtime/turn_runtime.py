@@ -1998,6 +1998,43 @@ class FusedTurnRuntime:
             dimensions=dimensions,
         )
 
+    def _structured_topic_history_signal(
+        self,
+        user_input: str,
+    ) -> tuple[bool, str | None]:
+        """Return exact durable-world anchor signals without semantic guessing."""
+
+        current = " ".join(str(user_input).strip().split()).casefold()
+        if not current:
+            return False, None
+
+        def mentioned(value: object) -> bool:
+            text = " ".join(str(value or "").strip().split())
+            # Single-character labels are too ambiguous for proactive injection.
+            return len(text) >= 2 and text.casefold() in current
+
+        for entity in self.world_graph.current_entities():
+            labels = [entity.canonical_name, *entity.aliases]
+            if any(mentioned(label) for label in labels if label):
+                return True, "explicit_entity_anchor"
+
+        for payload in self.store.list_payloads(
+            object_type=ObjectType.EVENT,
+            subject_id=self.subject_id,
+        ):
+            if mentioned(payload.get("title")):
+                return True, "explicit_event_anchor"
+
+        for goal in self.execution_world.current_goals():
+            if mentioned(goal.title):
+                return True, "explicit_goal_anchor"
+
+        for task in self.execution_world.current_tasks():
+            if mentioned(task.title):
+                return True, "explicit_task_anchor"
+
+        return False, None
+
     def run_turn(
         self,
         *,
@@ -2048,11 +2085,17 @@ class FusedTurnRuntime:
             summary_trigger_tokens=summary_trigger_tokens,
         )
 
+        structured_history_signal, structured_signal_reason = (
+            self._structured_topic_history_signal(user_input)
+        )
+
         if current_topic is _AUTO_TOPIC:
             topic_state = self.topic_state.resolve(
                 user_input=user_input,
                 recent_turns=continuity_snapshot.recent_turns,
                 explicit_topic=None,
+                structured_history_signal=structured_history_signal,
+                structured_signal_reason=structured_signal_reason,
             )
         elif current_topic is None:
             # Compatibility and explicit control: callers that deliberately pass
@@ -2069,6 +2112,8 @@ class FusedTurnRuntime:
                 user_input=user_input,
                 recent_turns=continuity_snapshot.recent_turns,
                 explicit_topic=str(current_topic),
+                structured_history_signal=structured_history_signal,
+                structured_signal_reason=structured_signal_reason,
             )
         raw_recommendation_limit = self.policies.effective_value(
             "memory.recommendation_limit",
