@@ -308,3 +308,13 @@ Periodic Review
 ## 恢复现场规则
 
 接手时先获取 GitHub `main` 实时 HEAD，并审查本文件功能锚点之后的 commits / CI。纯地图/checkpoint文档提交可越过；功能代码必须先确认 Gate 与边界再继续。
+
+
+## P16 收口控制（2026-09-20）
+
+- 收口控制文件：`governance/P16_CONVERGENCE_CONTROL_2026-09-20.md`
+- 当前唯一允许继续施工的目标：**provider-backed real-model habitation**。
+- 当前 GitHub open PR：**0**；历史 merge/superseded/experiment 分支全部冻结为证据，不得恢复后直接合入。
+- 隔离审查分支：`p15/periodic-review-growth-20260920`、`p16/habitation-integration-20260920`、`hardening/p15-review-growth-redteam-20260920`。这些分支只允许读取以恢复“当前 main 确实缺失”的测试/缺陷证据，禁止整分支 merge/rebase 后继续开发。
+- P17 暂停启动，直到 P16 完成真实 provider 入住、可审计 artifacts 与 evaluator-only 红队评估。
+- 新施工必须从最新 `main` 创建单一 P16 provider 分支，不得重造 World / Index / CognitiveRuntime / Review。
