@@ -17,6 +17,7 @@ from aios_core.runtime.capabilities import CapabilityCall
 from aios_core.runtime.cognitive_runtime import ModelDirective
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 
 
 NOW = datetime(2026, 9, 20, 16, 30, tzinfo=timezone.utc)
@@ -325,3 +326,120 @@ def test_operation_experience_requires_pinned_real_case_refs():
                 ObjectRef(object_id="outcome-x"),
             ),
         )
+
+
+def test_periodic_review_can_revise_old_cognition_from_new_world_evidence(tmp_path):
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    old_fact = Observation(
+        object_id="obs_old_drink_p15",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW - timedelta(hours=4)),
+        learned_at=NOW - timedelta(hours=4),
+        recorded_at=NOW - timedelta(hours=4),
+        created_by="p15-revision-test",
+        source_kind="conversation",
+        modality="text",
+        value="我现在每天喝茶。",
+        metadata={"dimension": "dim:user_ai_interaction"},
+    )
+    correction = Observation(
+        object_id="obs_new_drink_p15",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW - timedelta(minutes=30)),
+        learned_at=NOW - timedelta(minutes=30),
+        recorded_at=NOW - timedelta(minutes=30),
+        created_by="p15-revision-test",
+        source_kind="conversation",
+        modality="text",
+        value="我已经不每天喝茶了，现在每天喝咖啡。",
+        metadata={"dimension": "dim:user_ai_interaction"},
+    )
+    store.commit(
+        [old_fact, correction],
+        OperationRequest(
+            operation_name="test.seed.p15.revision",
+            expected_world_revision=0,
+            reason="seed old cognition and new correcting evidence",
+            idempotency_key="seed-p15-revision",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+    writeback = CognitionWritebackService(store=store, index=index)
+    old_claim = writeback.commit_claim(
+        ClaimWriteRequest(
+            content="用户当前每天喝茶。",
+            evidence_refs=(
+                ObjectRef(object_id=old_fact.object_id, revision=1),
+            ),
+            confidence=0.8,
+            dimension="dim:ai_user_understanding",
+        ),
+        learned_at=NOW - timedelta(hours=3),
+    )
+
+    def model(snapshot):
+        history = snapshot.capability_history
+        if not history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="read_periodic_review_anchors",
+                        arguments={"offset": 0, "limit": 20},
+                    ),
+                )
+            )
+        if len(history) == 1:
+            anchors = history[-1].data
+            claim_anchor = next(
+                item
+                for item in anchors
+                if item["object_ref"]["object_id"] == old_claim.claim_id
+            )
+            correction_anchor = next(
+                item
+                for item in anchors
+                if item["object_ref"]["object_id"] == correction.object_id
+            )
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="revise_claim",
+                        arguments={
+                            "target_ref": claim_anchor["object_ref"],
+                            "reason": "用户提供了更新后的当前饮品事实。",
+                            "evidence_refs": [correction_anchor["object_ref"]],
+                            "replacement_content": "用户当前每天喝咖啡。",
+                            "confidence": 0.95,
+                        },
+                    ),
+                )
+            )
+        assert history[-1].ok is True
+        return ModelDirective(response="已根据新证据修正旧认知。")
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+        max_tool_rounds=4,
+    )
+    result = runtime.run_periodic_review(
+        now=NOW,
+        policy=ReviewSchedulePolicy(
+            lookback_hours=12,
+            interval_hours=24,
+        ),
+    )
+
+    assert result is not None
+    assert [
+        item.name for item in result.runtime.capability_history
+    ] == ["read_periodic_review_anchors", "revise_claim"]
+    assert store.get_payload(old_claim.claim_id, revision=1)["content"] == "用户当前每天喝茶。"
+    latest = store.get_payload(old_claim.claim_id)
+    assert latest["revision"] == 2
+    assert latest["content"] == "用户当前每天喝咖啡。"
+    assert latest["status"] == "active"
