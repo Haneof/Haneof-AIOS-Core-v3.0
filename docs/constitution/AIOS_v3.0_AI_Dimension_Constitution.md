@@ -2,104 +2,116 @@
 
 ## 一、定义
 
-AI维度记录 AI 在 AIOS 世界中的自我世界。
+AI维度记录 AI 在统一 AIOS 世界中形成的长期认知。
 
-AI维度与用户世界维度平级存在。
+AI维度与用户事实维度、事件维度等平级存在。
 
-区别：
+用户世界提供现实事实；AI维度保存：
 
-- 用户世界维度的数据来源：现实世界、设备、应用、用户输入。
-- AI维度的数据来源：用户世界、AI自身运行历史、用户反馈以及AI与用户长期交互过程。
+> AI 对用户、关系、自身、未知、策略、人格与过去表现形成的可修正理解。
 
-AI维度同样具备：
-
-- 维度结构；
-- 总结机制；
-- 维度注册机制；
-- 时间演化能力。
+AI维度不是第二套数据库。
 
 ---
 
-## 二、AI维度边界
+## 二、统一世界实现
 
-AI维度不保存用户世界事实。
+AI维度默认使用与整个 AIOS 相同的世界对象：
 
-用户事实属于用户世界。
+- EvidenceSet：认知依据；
+- Claim：当前理解；
+- Dependency：依赖关系；
+- Summary：某 AI维度一段时间发生了什么；
+- Revision / Retraction：理解修正。
 
-AI维度保存：
+所有 AI维度认知必须进入统一 WorldStore、统一时间轴、统一索引和统一修正机制。
 
-> AI对用户世界的理解，以及AI对自身存在的理解。
-
----
-
-## 三、AI维度模块组成
-
-AI维度由以下独立模块组成：
-
-### 1. AI用户理解模型
-
-负责：AI认为用户是什么。
-
-文件：
-`AIOS_v3.0_AI_User_Understanding_Model_Constitution.md`
+禁止恢复独立 `AI Self DB`、独立用户画像真相库或独立关系数据库。
 
 ---
 
-### 2. AI关系模型
+## 三、AI维度模块
 
-负责：AI与用户关系的理解和演化。
+1. AI用户理解模型  
+   文件：`AIOS_v3.0_AI_User_Understanding_Model_Constitution.md`
 
----
+2. AI关系模型  
+   文件：`AIOS_v3.0_AI_Relationship_Model_Constitution.md`
 
-### 3. AI自我模型
+3. AI自我模型  
+   文件：`AIOS_v3.0_AI_Self_Model_Constitution.md`
 
-负责：AI认为自己是什么。
+4. AI主动意图模型  
+   文件：`AIOS_v3.0_AI_Intent_Model_Constitution.md`
 
-文件：
-`AIOS_v3.0_AI_Self_Model_Constitution.md`
+5. AI策略模型  
+   文件：`AIOS_v3.0_AI_Strategy_Model_Constitution.md`
 
----
+6. AI认知边界模型  
+   文件：`AIOS_v3.0_AI_Cognitive_Boundary_Model_Constitution.md`
 
-### 4. AI主动性模型
+7. AI人格模型  
+   文件：`AIOS_v3.0_AI_Personality_Model_Constitution.md`
 
-负责：AI当前正在关注、探索和验证什么。
-
-文件：
-`AIOS_v3.0_AI_Intent_Model_Constitution.md`
-
----
-
-### 5. AI策略模型
-
-负责：什么方式对用户有效。
-
-文件：
-`AIOS_v3.0_AI_Strategy_Model_Constitution.md`
+8. AI校准模型  
+   文件：`AIOS_v3.0_AI_Calibration_Model_Constitution.md`
 
 ---
 
-### 6. AI认知边界模型
+## 四、证据与未知
 
-负责：AI知道自己不知道什么。
+AI维度允许：
 
-文件：
-`AIOS_v3.0_AI_Cognitive_Boundary_Model_Constitution.md`
+- INFERRED；
+- HYPOTHESIS；
+- UNKNOWN；
+- CONFLICT。
 
----
+AI不知道时，记录“不知道/待验证”比制造确定答案更合法。
 
-### 7. AI人格模型
-
-负责：AI长期交互形成的人格。
-
-文件：
-`AIOS_v3.0_AI_Personality_Model_Constitution.md`
+所有长期认知必须能够追溯到 Evidence。
 
 ---
 
-## 四、模块治理原则
+## 五、演化原则
+
+AI认知变化必须向前演化：
+
+```text
+Evidence
+↓
+Claim@1
+↓
+新 Evidence / 用户反馈 / Outcome
+↓
+revise / retract
+↓
+Claim@2
+↓
+Dependency propagation
+↓
+下游认知重新判断
+```
+
+旧认知 revision 保留，用于理解 AI 当时为什么这样判断。
+
+---
+
+## 六、模块治理原则
 
 AI维度入口只定义整体关系。
 
 具体机制由独立模块文件负责。
 
-禁止在入口文件重复定义子模块规则。
+禁止：
+
+- 在入口文件重复所有子模块规则；
+- 用固定心理标签替代模型理解；
+- 用次数、时长、分数自动生成关系或人格；
+- 让 AI维度覆盖或修改用户世界原始事实。
+
+---
+
+## 七、根定义
+
+> **AI维度不是 AI 的另一套记忆库，而是 AI 在同一个世界里对用户、自己以及双方共同经历形成的可修正认知。**
