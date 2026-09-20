@@ -7,13 +7,13 @@
 
 ## 当前快照
 
-- 时间：2026-09-20 17:00 +08:00
-- 最后已验证功能代码锚点：`02b3f006d77c6396e3f8575e8547a5363582738f`
-- 验证 Gate：C09 初始闭环合并后复核 `c09-wake-dispatch` / run `35501126516` / **success**；去重身份加固 Gate run `35501301595` / **success**
+- 时间：2026-09-20 17:40 +08:00
+- 最后已验证功能代码锚点：`6b68cb2953d7747a784c1a5a737c66f9de101f29`
+- 验证 Gate：`p16-habitation-harness` / run `35503409815` / **success**；C09 去重加固 Gate run `35501301595` / **success**
 - 当前项目阶段：**P16 多模型独立长期入住测试**
-- 当前主干状态：**P0-P15 已闭环；P16 盲测暴露的 C09 Wake 总线/通用调度缺口已修复并合入 main。Observation 仍默认只入世界；只有注册机械条件/Task/Review 等形成 Wake 后才调度 Resident AI。**
-- 当前 blocker：**P16 benchmark PR #1 仍需基于当前 main 重新对齐并审查；随后才能进入真实 GPT / Claude / Gemini 等独立 habitation runs。**
-- 下一主任务：**对齐并审查 P16 PR #1，然后用真实模型执行隐藏人生长期入住；不再重做 P12/P15/C09。**
+- 当前主干状态：**P0-P15 已闭环；P16 benchmark foundation 已对齐当前 main 并通过 PR #1 合入。当前已有真实 Current-Core habitation target，可为不同模型建立独立 WorldStore/Index/FusedTurnRuntime，隐藏 oracle 与 resident stream 已做严格物理/身份隔离。**
+- 当前 blocker：**还没有真正调用 GPT / Claude / Gemini 等外部真实模型完成独立隐藏人生 habitation runs；下一缺口是 provider-backed ModelHandler / RoundSummaryHandler 与实际 blind run artifacts。**
+- 下一主任务：**接入真实模型 handler，分别创建独立 AIOS world，执行同一 resident-visible life；每个模型单独产出 run artifact，最后才由 evaluator 读取 hidden oracle。不得再用 stub/固定答案宣称 P16 认知通过。**
 
 ## P13 已完成并通过 Gate
 
@@ -225,10 +225,13 @@ summary 作为快速 continuity index
 
 > AIOS 中的模型是否真的依靠世界、索引、Summary、认知修正、Goal/Action/Outcome 与周期 Review 逐渐形成连续理解，而不是靠测试脚本偷做认知。
 
-当前已有并行施工线：
+P16 benchmark foundation 已合入 main：
 
-- PR #1：`parallel/p16-habitation-harness-20260920`
-- PR #5：`experiment/p16-self-resident-blind-replay-20260920`（实验证据已关闭，不合并）
+- PR #1：已 squash merge，主线合并 SHA `3e8c9a1ac5da5d342966807cbc3602a48888443d`
+- Current-Core adapter：`tests/habitation/current_core.py`
+- Harness / fixture / evaluator：`tests/habitation/**`
+- 主线 P16 Gate：run `35503409815` / **success**
+- PR #5：历史实验证据已关闭，不合并
 
 P16 必须重点验证：
 
@@ -271,12 +274,13 @@ Periodic Review
 
 ## 当前工程断点
 
-- 时间：2026-09-20 16:32 +08:00
-- 最后已验证功能代码锚点：`3261eae4967632ea4ef72669ef53ef3dfe5199a7`
-- 最近 Green Gate：`p15-periodic-review` run `35499766871` / **success**
-- 当前阶段：**P16 多 Agent 长期入住测试**
-- 当前 blocker：**PR #1 仍基于旧主线，需要重新对齐当前 main；对齐后继续审 blind / hidden-life / world isolation，避免测试脚本代替模型认知。**
-- 下一动作：**只处理 PR #1 的最新主线对齐与 P16 benchmark 审计；之后执行真实模型 habitation runs。PR #5 已关闭，C09 已进入 main，不再作为待开发项。**
+- 时间：2026-09-20 17:40 +08:00
+- 最后已验证功能代码锚点：`6b68cb2953d7747a784c1a5a737c66f9de101f29`
+- 最近 Green Gate：`p16-habitation-harness` run `35503409815` / **success**
+- 当前阶段：**P16 多模型独立长期入住测试**
+- 已完成：**PR #1 对齐/审计/合并；Current-Core target；private world isolation；strict resident/oracle bundle identity validation；main 分支 P16 CI**
+- 当前 blocker：**真实 provider model 尚未接入 benchmark runner，因此目前只能证明 harness/隔离/AIOS 接线正确，不能声称长期认知能力已通过。**
+- 下一动作：**实现/接入 provider-backed ModelHandler 与 RoundSummaryHandler，运行多个真实模型各自独立入住同一隐藏人生，并保存可审计 artifacts；随后做 evaluator-only 评估。**
 
 ## 当前不可推翻的已决事项
 
