@@ -241,8 +241,9 @@ AI自身认知、经验和成长必须作为 AI维度写入统一 AIOS 世界。
 - `src/aios_core/runtime/turn_runtime.py::run_wake()`：durable Wake → 同一 Resident CognitiveRuntime；
 - P12 `wake_due_tasks()`：Task schedule → `TASK_DUE` Wake；
 - P15 `run_periodic_review()`：`PERIODIC_REVIEW` Wake → 同一 Resident Runtime；
-- 功能闭环 SHA：`6f1e20307cd1ce47aefff281f652da16af635992`；
-- 合并后验证：`c09-wake-dispatch` run `35501126516` / success。
+- 初始功能闭环 SHA：`6f1e20307cd1ce47aefff281f652da16af635992`；
+- Wake dedupe identity 加固 SHA：`02b3f006d77c6396e3f8575e8547a5363582738f`；
+- 验证：`c09-wake-dispatch` run `35501126516` / success；dedupe hardening run `35501301595` / success。
 
 ### 2.17 Core 平台无关
 
