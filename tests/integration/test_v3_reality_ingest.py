@@ -834,3 +834,26 @@ def test_large_numeric_segment_keeps_compact_source_provenance(tmp_path):
     assert "source_record_ids" not in metadata
     assert "source_locators" not in metadata
     assert metadata["source_record_ids_digest"]
+
+
+# Experimental proxy: ensures the already-registered P13 PR gate executes the
+# frozen self-resident blind replay in this non-production validation branch.
+def test_experimental_self_resident_blind_replay_proxy(tmp_path):
+    import importlib.util
+    from pathlib import Path
+
+    module_path = (
+        Path(__file__).resolve().parents[1]
+        / "experimental"
+        / "test_p16_self_resident_blind_replay.py"
+    )
+    spec = importlib.util.spec_from_file_location(
+        "p16_self_resident_blind_replay_exp",
+        module_path,
+    )
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.test_frozen_self_resident_blind_replay_reaches_real_world_and_exposes_wake_gap(
+        tmp_path
+    )
