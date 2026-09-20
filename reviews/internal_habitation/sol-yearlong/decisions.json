@@ -820,5 +820,42 @@
         }
       }
     ]
+  },
+  "f21fd3552163284890db973485b305ef040b60a501f4734945d46be4668a93ce": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "commit_operation_experience",
+        "call_id": "sol-review-jan13-provisional-judgment-experience",
+        "arguments": {
+          "problem_type": "provisional_qualitative_judgment_with_pending_evidence",
+          "method_path": [
+            "separate confirmed numeric/source facts from the user's provisional qualitative wording",
+            "avoid promoting the provisional wording into durable settled cognition",
+            "wait for the missing source evidence",
+            "forward-revise the existing Claim when correcting evidence arrives"
+          ],
+          "result_summary": "In this case, keeping the 1.42 quote while marking the historical comparison unresolved allowed the later 1.38 invoice/user correction to revise the same Claim cleanly without preserving '贵不少' as current cognition.",
+          "positive_case_refs": [
+            {
+              "object_id": "obs_conv_user_de098676ee4d9413b5d782fc",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_3be97316c269123df4d36569",
+              "revision": 1
+            }
+          ],
+          "applicability": {
+            "condition": "user explicitly marks a qualitative comparison as provisional pending source evidence"
+          },
+          "cost": {
+            "additional_verification_rounds": 1
+          },
+          "misses": [],
+          "experience_state": "candidate"
+        }
+      }
+    ]
   }
 }
