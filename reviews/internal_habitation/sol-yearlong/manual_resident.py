@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import asdict
+from dataclasses import asdict, is_dataclass
 import hashlib
 import json
 from pathlib import Path
@@ -39,6 +39,29 @@ def decision_key(payload: dict[str, Any]) -> str:
     return hashlib.sha256(canonical(payload).encode("utf-8")).hexdigest()
 
 
+def portable_payload(value: Any) -> Any:
+    if hasattr(value, "model_dump"):
+        try:
+            return value.model_dump(mode="json")
+        except TypeError:
+            return value.model_dump()
+    if is_dataclass(value):
+        return asdict(value)
+    if isinstance(value, dict):
+        return {str(k): portable_payload(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [portable_payload(v) for v in value]
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    if hasattr(value, "__dict__"):
+        return {
+            str(k): portable_payload(v)
+            for k, v in vars(value).items()
+            if not str(k).startswith("_")
+        }
+    return str(value)
+
+
 def directive_from_json(raw: dict[str, Any]) -> ModelDirective:
     kind = raw.get("kind")
     if kind == "response":
@@ -57,6 +80,51 @@ def directive_from_json(raw: dict[str, Any]) -> ModelDirective:
             )
         return ModelDirective(capability_calls=tuple(calls))
     raise ValueError(f"unknown manual directive kind: {kind!r}")
+
+
+class ManualSummaryResident:
+    """Interactive GPT-5.6 Sol handler for both conversation and dimension summaries."""
+
+    model_id = "gpt-5.6-sol-interactive-resident"
+
+    def __init__(self, decisions: dict[str, Any]) -> None:
+        self.decisions = decisions
+        self.live_calls = 0
+        self.replayed_calls = 0
+
+    def __call__(self, request: Any) -> str:
+        payload = {
+            "summary_request_type": type(request).__name__,
+            "request": portable_payload(request),
+        }
+        key = decision_key(payload)
+        raw = self.decisions.get(key)
+        if raw is not None:
+            if not isinstance(raw, dict) or raw.get("kind") != "summary":
+                raise ValueError(
+                    f"decision {key} exists but is not a summary directive"
+                )
+            summary = str(raw.get("summary") or "").strip()
+            if not summary:
+                raise ValueError(f"summary decision {key} is blank")
+            self.replayed_calls += 1
+            return summary
+
+        self.live_calls += 1
+        envelope = {
+            "schema": "aios.manual-summary.pending.v1",
+            "decision_key": key,
+            "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
+            "rule": (
+                "This Summary is not precomputed. The same resident model must inspect "
+                "this exact Summary request and author the semantic compression."
+            ),
+            "summary_request": payload,
+        }
+        print("MANUAL_SUMMARY_PENDING_BEGIN")
+        print(json.dumps(envelope, ensure_ascii=False, sort_keys=True, indent=2, default=str))
+        print("MANUAL_SUMMARY_PENDING_END")
+        raise ManualDecisionRequired(key)
 
 
 class ManualResident:
@@ -105,11 +173,14 @@ def main() -> int:
 
     loaded = load_resident_fixture(fixture_root, args.manifest)
     resident = ManualResident(decisions)
+    summarizer = ManualSummaryResident(decisions)
     target = CurrentCoreHabitationTarget(
         model_id="gpt-5.6-sol-interactive-resident",
         subject_id=loaded.scenario.subject_id,
         db_path=output_dir / "world.sqlite",
         model_handler=resident,
+        round_summary_handler=summarizer,
+        dimension_summary_handler=summarizer,
         require_fresh=True,
     )
 
@@ -122,6 +193,7 @@ def main() -> int:
     except ManualDecisionRequired as exc:
         print(f"MANUAL_RESIDENT_STATUS=pending decision_key={exc}")
         print(f"MANUAL_RESIDENT_REPLAYED_CALLS={resident.replayed_calls}")
+        print(f"MANUAL_SUMMARY_REPLAYED_CALLS={summarizer.replayed_calls}")
         return 42
 
     artifact = run_artifact(scenario=loaded.scenario, run=run)
@@ -131,6 +203,7 @@ def main() -> int:
     )
     print("MANUAL_RESIDENT_STATUS=completed")
     print(f"MANUAL_RESIDENT_REPLAYED_CALLS={resident.replayed_calls}")
+    print(f"MANUAL_SUMMARY_REPLAYED_CALLS={summarizer.replayed_calls}")
     return 0
 
 
