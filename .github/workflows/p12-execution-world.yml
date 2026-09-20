@@ -1,0 +1,26 @@
+name: p12-execution-world
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/aios_core/execution/**"
+      - "src/aios_core/contracts/models.py"
+      - "tests/integration/test_v3_execution_world.py"
+      - ".github/workflows/p12-execution-world.yml"
+  pull_request:
+    paths:
+      - "src/aios_core/execution/**"
+      - "tests/integration/test_v3_execution_world.py"
+
+jobs:
+  p12:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - run: pytest tests/integration/test_v3_execution_world.py
