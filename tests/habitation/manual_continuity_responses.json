@@ -55,5 +55,9 @@
         }
       }
     ]
+  },
+  {
+    "snapshot_signature": "6ec4c1f00453ab47e19c919ef57df1c8e7e550703d4c5dd3266f7bfd9955a8b2",
+    "type": "silence"
   }
 ]
