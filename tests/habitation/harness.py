@@ -89,6 +89,8 @@ class HabitationScenario:
     events: tuple[LifeEvent, ...]
     hidden_oracle: Mapping[str, Any] = field(default_factory=dict)
     tags: tuple[str, ...] = ()
+    scenario_version: str = "1"
+    seed: int = 0
 
     def __post_init__(self) -> None:
         if not self.scenario_id.strip():
@@ -97,6 +99,10 @@ class HabitationScenario:
             raise ValueError("subject_id must be non-empty")
         if not self.events:
             raise ValueError("scenario must contain at least one event")
+        if not self.scenario_version.strip():
+            raise ValueError("scenario_version must be non-empty")
+        if self.seed < 0:
+            raise ValueError("seed must be >= 0")
 
         seen: set[str] = set()
         previous: datetime | None = None
