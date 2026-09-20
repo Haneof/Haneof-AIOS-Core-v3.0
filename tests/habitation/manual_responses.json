@@ -149,5 +149,18 @@
     "snapshot_signature": "3043958138d81c9c20cbd85bb6a2a0c303a865efe2da15e83b0a74ab0145a562",
     "type": "response",
     "text": "按你现在的安排，这两个月周六上午固定有项目会，所以这周的两小时学习不要放在周六上午。现有信息看，你周末通常不工作，可以优先考虑周六下午或周日找一段连续两小时；如果要精确到具体几点，我还需要再结合你这周其他日程。"
+  },
+  {
+    "snapshot_signature": "46e3e17d7cc7603bb6609be23ea29a36b4cfb0bf7f9dfa87e8a23c4edc9e458c",
+    "type": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 10
+        }
+      }
+    ]
   }
 ]
