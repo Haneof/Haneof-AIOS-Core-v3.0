@@ -3,5 +3,18 @@
     "snapshot_signature": "7b4286f0ddc0802f27d4054218d0c6a864fdfd393146d69b97b2c4f85c367e90",
     "type": "response",
     "text": "记下了：下周三早上 8 点飞西雅图出差。"
+  },
+  {
+    "snapshot_signature": "e5a4a34faf7395f25a04b1d4f16ecc936ba3624e8fccd405957d23509951f15f",
+    "type": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 10
+        }
+      }
+    ]
   }
 ]
