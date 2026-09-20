@@ -1,0 +1,30 @@
+name: p15-periodic-review
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/aios_core/review/**"
+      - "src/aios_core/runtime/**"
+      - "src/aios_core/query/**"
+      - "src/aios_core/contracts/enums.py"
+      - "tests/integration/test_v3_periodic_review.py"
+      - ".github/workflows/p15-periodic-review.yml"
+  pull_request:
+    paths:
+      - "src/aios_core/review/**"
+      - "src/aios_core/runtime/**"
+      - "tests/integration/test_v3_periodic_review.py"
+
+jobs:
+  p15:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - run: |
+          pytest             tests/integration/test_v3_periodic_review.py             tests/integration/test_v3_fused_turn_runtime.py             tests/integration/test_v3_ai_world.py             tests/integration/test_v3_cognition_revision.py             tests/integration/test_v3_execution_world.py             tests/integration/test_v3_long_context_continuity.py             tests/runtime/test_cognitive_runtime.py
