@@ -82,8 +82,8 @@ def test_model_can_ignore_empty_prefetch_and_deep_search(tmp_path):
     result = runtime.run_turn(
         session_id="current",
         turn_index=1,
-        user_input="那个预算是多少？",
-        current_topic="预算",
+        user_input="妈妈生日那个保温杯预算是多少？",
+        current_topic=None,
         occurred_at=NOW,
     )
 
