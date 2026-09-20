@@ -97,5 +97,18 @@
     "snapshot_signature": "23eec29d0c901b9ed4d0cca321980774fac078534ed48f6ddd485b1fc147af37",
     "type": "response",
     "text": "收到。接下来两个月每周六上午按新的项目会安排处理，之前的学习时段安排暂不适用。"
+  },
+  {
+    "snapshot_signature": "3ab3631e9b2d05b55916ac97e17acc917b19eef5838d08870fa11fe75c656cfc",
+    "type": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 10
+        }
+      }
+    ]
   }
 ]
