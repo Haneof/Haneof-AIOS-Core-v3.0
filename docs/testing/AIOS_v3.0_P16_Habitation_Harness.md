@@ -430,3 +430,23 @@ provider/model/config provenance and request metadata.
 
 This separation means the resident provider never needs access to `oracle/**`, while
 the post-run evaluator never re-runs or mutates the resident World.
+
+
+## 19. Offline multi-model comparison
+
+After two or more resident candidates have been evaluated with the same evaluator
+configuration, align their findings offline:
+
+```bash
+python -m tests.habitation.compare_provider_evaluations \
+  --output artifacts/p16-comparison/comparison.json \
+  /path/to/model-a/evaluation.json \
+  /path/to/model-b/evaluation.json
+```
+
+The comparison tool fails closed unless all evaluation reports share the same
+resident-visible life fingerprint and identical evaluator provenance. It also rejects
+artifact/model identity tampering.
+
+The output is a criterion-by-model matrix only. It contains no aggregate score,
+ranking, winner or model recommendation.
