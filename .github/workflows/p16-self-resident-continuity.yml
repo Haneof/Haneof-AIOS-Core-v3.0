@@ -1,0 +1,42 @@
+name: p16-self-resident-continuity
+
+on:
+  push:
+    branches:
+      - p16/self-resident-continuity-20260920
+
+jobs:
+  self-resident:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      P16_OUTPUT_DIR: artifacts/p16/manual-continuity-resident
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - name: Replay current ChatGPT resident decisions until next live prompt
+        shell: bash
+        run: |
+          set +e
+          python -m tests.habitation.run_manual_resident_probe \
+            --fixture-root tests/habitation/fixtures \
+            --manifest cross_session_continuity_v1.manifest.json \
+            --responses tests/habitation/manual_continuity_responses.json \
+            --output-dir "$P16_OUTPUT_DIR"
+          code=$?
+          echo "manual_probe_exit=$code"
+          if [ "$code" -ne 0 ] && [ "$code" -ne 3 ]; then
+            exit "$code"
+          fi
+      - name: Upload auditable manual-resident artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p16-manual-continuity-resident-${{ github.run_id }}
+          path: artifacts/p16/
+          if-no-files-found: error
