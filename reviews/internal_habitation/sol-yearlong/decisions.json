@@ -1475,5 +1475,23 @@
         }
       }
     ]
+  },
+  "bfeaeb9b39a81167f94f175843b4b3f6a1bfdc039162f7fecb4885f0361fa82b": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "call_id": "sol-summaryrun-jan08-inspect-proposed-message",
+        "arguments": {
+          "object_id": "action_96c74ab2565b5052458a66cd",
+          "revision": 1
+        }
+      },
+      {
+        "name": "read_execution_world",
+        "call_id": "sol-summaryrun-jan08-read-execution-after-proposal",
+        "arguments": {}
+      }
+    ]
   }
 }
