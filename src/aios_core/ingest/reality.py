@@ -293,6 +293,43 @@ class RealityIngestService:
         self.index = index
         self.subject_id = subject_id.strip()
 
+    @staticmethod
+    def _validated_spec(spec: SourceAdapterSpec) -> SourceAdapterSpec:
+        # Pydantic model_copy(update=...) does not validate updates. Public ingest
+        # boundaries therefore revalidate frozen model snapshots before trusting
+        # adapter identity or source-class semantics.
+        return SourceAdapterSpec.model_validate(
+            spec.model_dump(mode="python", round_trip=True)
+        )
+
+    @staticmethod
+    def _validated_record(record: RealityRecord) -> RealityRecord:
+        return RealityRecord.model_validate(
+            record.model_dump(mode="python", round_trip=True)
+        )
+
+    @staticmethod
+    def _validated_media_record(
+        record: MediaDescriptorRecord,
+    ) -> MediaDescriptorRecord:
+        return MediaDescriptorRecord.model_validate(
+            record.model_dump(mode="python", round_trip=True)
+        )
+
+    @staticmethod
+    def _validated_sample(sample: NumericSample) -> NumericSample:
+        return NumericSample.model_validate(
+            sample.model_dump(mode="python", round_trip=True)
+        )
+
+    @staticmethod
+    def _validated_policy(
+        policy: MechanicalSeriesPolicy,
+    ) -> MechanicalSeriesPolicy:
+        return MechanicalSeriesPolicy.model_validate(
+            policy.model_dump(mode="python", round_trip=True)
+        )
+
     def _catch_up(self) -> None:
         if self.index is not None:
             self.index.catch_up()
@@ -437,6 +474,8 @@ class RealityIngestService:
         spec: SourceAdapterSpec,
         record: RealityRecord,
     ) -> IngestReceipt:
+        spec = self._validated_spec(spec)
+        record = self._validated_record(record)
         observation = self._observation_from_record(spec, record)
         existing = self._get_payload_if_exists(observation.object_id)
         if existing is not None:
@@ -512,17 +551,27 @@ class RealityIngestService:
                     )
             else:
                 errors.append({"location": "", "type": type(exc).__name__})
-            external_id = str(
-                payload.get("external_record_id")
-                or _stable_id(
+            raw_external_id = payload.get("external_record_id")
+            external_id = (
+                raw_external_id.strip()
+                if isinstance(raw_external_id, str) and raw_external_id.strip()
+                else _stable_id(
                     "unknown",
                     spec.adapter_id,
                     tuple(sorted(str(key) for key in payload.keys())),
                 )
             )
+            raw_external_revision = payload.get("external_revision", "1")
+            external_revision = (
+                raw_external_revision.strip()
+                if isinstance(raw_external_revision, str)
+                and raw_external_revision.strip()
+                else "<invalid>"
+            )
             return self.record_failure(
                 spec,
                 external_record_id=external_id,
+                external_revision=external_revision,
                 occurred_at=failure_time or datetime.now(timezone.utc),
                 source_locator=(
                     str(payload.get("source_locator"))
@@ -541,22 +590,58 @@ class RealityIngestService:
         occurred_at: datetime,
         source_locator: str | None,
         error_type: str,
+        external_revision: str = "1",
         field_errors: Sequence[Mapping[str, str]] = (),
     ) -> IngestFailureReceipt:
+        spec = self._validated_spec(spec)
         occurred = as_utc(occurred_at, "occurred_at")
+        external_record_id = str(external_record_id).strip()
+        external_revision = str(external_revision).strip()
+        if not external_record_id:
+            raise ValueError("external_record_id must not be blank")
+        if not external_revision:
+            raise ValueError("external_revision must not be blank")
+        locator = self._locator(
+            spec,
+            external_record_id=external_record_id,
+            source_locator=source_locator,
+        )
+        adapter_identity = self._adapter_identity(spec)
+        normalized_errors = tuple(
+            (str(item.get("location", "")), str(item.get("type", "")))
+            for item in field_errors
+        )
+        failure_digest = _digest_payload(
+            {
+                "subject_id": self.subject_id,
+                "adapter": adapter_identity,
+                "external_record_id": external_record_id,
+                "external_revision": external_revision,
+                "source_locator": locator,
+                "error_type": error_type,
+                "field_errors": normalized_errors,
+            }
+        )
         audit_id = _stable_id(
             "obs_ingest_failure",
             self.subject_id,
-            spec.adapter_id,
+            adapter_identity,
             external_record_id,
+            external_revision,
+            locator,
             error_type,
-            tuple(
-                (item.get("location", ""), item.get("type", ""))
-                for item in field_errors
-            ),
+            normalized_errors,
         )
         existing = self._get_payload_if_exists(audit_id)
         if existing is not None:
+            existing_digest = (
+                existing.get("metadata") or {}
+            ).get("failure_digest")
+            if existing_digest != failure_digest:
+                raise ValueError(
+                    "ingest failure identity conflict: same audit identity "
+                    "arrived with different adapter/source semantics"
+                )
             self._catch_up()
             return IngestFailureReceipt(
                 audit_observation_id=audit_id,
@@ -577,18 +662,21 @@ class RealityIngestService:
                 "adapter_id": spec.adapter_id,
                 "source_kind": spec.source_kind,
                 "external_record_id": external_record_id,
+                "external_revision": external_revision,
                 "error_type": error_type,
-                "field_errors": [dict(item) for item in field_errors],
+                "field_errors": [
+                    {"location": location, "type": error_kind}
+                    for location, error_kind in normalized_errors
+                ],
             },
-            raw_locator=self._locator(
-                spec,
-                external_record_id=external_record_id,
-                source_locator=source_locator,
-            ),
+            raw_locator=locator,
             metadata={
                 "dimension": AUDIT_DIMENSION,
                 "adapter_id": spec.adapter_id,
                 "source_dimension": spec.dimension,
+                "source_class": spec.source_class.value,
+                "source_schema_version": spec.schema_version,
+                "failure_digest": failure_digest,
                 "mechanical_ingest_failure": True,
             },
         )
@@ -601,6 +689,7 @@ class RealityIngestService:
                 arguments={
                     "adapter_id": spec.adapter_id,
                     "external_record_id": external_record_id,
+                    "external_revision": external_revision,
                     "error_type": error_type,
                 },
                 expected_world_revision=self._expected_revision_for_retry(operation_id),
@@ -621,6 +710,8 @@ class RealityIngestService:
         spec: SourceAdapterSpec,
         record: MediaDescriptorRecord,
     ) -> IngestReceipt:
+        spec = self._validated_spec(spec)
+        record = self._validated_media_record(record)
         value = record.descriptor.strip()
         if record.object_facts:
             value = value + "\n" + "\n".join(
@@ -663,6 +754,9 @@ class RealityIngestService:
         unit, adapter semantics, or source locators change, callers must use a
         new series_id; reusing the old identity fails closed.
         """
+        spec = self._validated_spec(spec)
+        policy = self._validated_policy(policy)
+        samples = tuple(self._validated_sample(sample) for sample in samples)
         if spec.source_class is not SourceClass.SENSOR:
             raise ValueError("numeric stream compression requires SENSOR source_class")
         if not isinstance(series_id, str) or not series_id.strip():
@@ -698,9 +792,15 @@ class RealityIngestService:
             at = as_utc(sample.occurred_at, "occurred_at")
             if previous is not None:
                 prev_at = as_utc(previous.occurred_at, "occurred_at")
-                if abs(sample.value - previous.value) >= policy.change_threshold:
-                    changes.append((previous, sample))
                 gap = (at - prev_at).total_seconds()
+                # A large observation gap means we did not observe the transition.
+                # Preserve two segments, but do not fabricate a point-in-time
+                # numeric_change across an unobserved interval.
+                if (
+                    gap <= policy.max_gap_seconds
+                    and abs(sample.value - previous.value) >= policy.change_threshold
+                ):
+                    changes.append((previous, sample))
             else:
                 gap = 0.0
 
@@ -807,6 +907,11 @@ class RealityIngestService:
                         "mechanical_ingest": True,
                         "mechanical_compression": True,
                         "source_record_ids": record_ids,
+                        "source_locators": [
+                            item.source_locator
+                            for item in segment
+                            if item.source_locator is not None
+                        ],
                         "raw_sample_values_retained": False,
                     },
                 )
@@ -872,6 +977,14 @@ class RealityIngestService:
                         "source_record_ids": [
                             before.external_record_id,
                             after.external_record_id,
+                        ],
+                        "source_locators": [
+                            locator
+                            for locator in (
+                                before.source_locator,
+                                after.source_locator,
+                            )
+                            if locator is not None
                         ],
                     },
                 )
