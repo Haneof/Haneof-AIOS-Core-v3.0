@@ -1,0 +1,24 @@
+name: sol-review-structured-search-repro
+
+on:
+  push:
+    branches:
+      - "arena/sol-yearlong-resident-20260921"
+    paths:
+      - "reviews/internal_habitation/sol-yearlong/repros/structured_observation_search_repro.py"
+      - ".github/workflows/sol-review-structured-search-repro.yml"
+
+jobs:
+  structured-observation-search:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - name: Reproduce structured Observation search invisibility
+        run: python reviews/internal_habitation/sol-yearlong/repros/structured_observation_search_repro.py
