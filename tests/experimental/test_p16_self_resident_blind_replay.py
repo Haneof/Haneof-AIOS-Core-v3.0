@@ -30,7 +30,7 @@ def _dt(value: str) -> datetime:
     return datetime.fromisoformat(value)
 
 
-def test_frozen_self_resident_blind_replay_reaches_real_world_and_exposes_wake_gap(tmp_path):
+# Frozen resident semantic commit: 958a343bbdf585f1247049efdbcca579a7072777672a49b4c6cb0b56159bf264\ndef test_frozen_self_resident_blind_replay_reaches_real_world_and_exposes_wake_gap(tmp_path):
     """Replay the already-frozen blind resident decisions through current Core.
 
     The semantic decisions in this test were fixed before the hidden oracle was
