@@ -541,9 +541,7 @@ class GPT56LongSelfResident:
                                     "separate facts, model judgments, and uncertainty; "
                                     "avoid unsupported causal claims"
                                 ),
-                                "user_reaction": (
-                                    "用户明确表示这种复盘很好，并希望以后复杂复盘继续使用。"
-                                ),
+                                "user_reaction": "accepted",
                                 "evidence_refs": [now_ref],
                                 "applicable_conditions": {
                                     "task_type": "complex_review",
@@ -697,7 +695,8 @@ def test_gpt56_long_self_resident_cognition_system_closure(tmp_path):
     ]
     assert any(
         item.get("scenario") == "complex_multi_month_review"
-        and "明确表示这种复盘很好" in str(item.get("user_reaction", ""))
+        and item.get("user_reaction") == "accepted"
+        and item.get("applicable_conditions", {}).get("task_type") == "complex_review"
         for item in communication_experiences
     )
 
