@@ -25,6 +25,16 @@ class ConversationCommit:
     user_observation_id: str
     assistant_observation_id: str
     idempotent_replay: bool
+    user_world_revision: int | None = None
+    assistant_world_revision: int | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class ConversationMessageCommit:
+    world_revision: int
+    observation_id: str
+    role: str
+    idempotent_replay: bool
 
 
 def _stable_suffix(*parts: object) -> str:
@@ -33,11 +43,164 @@ def _stable_suffix(*parts: object) -> str:
 
 
 class ConversationIngestor:
-    """Atomically commit one user/assistant turn into the unified world ledger."""
+    """Persist raw user/assistant interaction facts into the unified world ledger."""
 
     def __init__(self, store: SQLiteWorldStore, *, subject_id: str = "user_1") -> None:
         self.store = store
         self.subject_id = subject_id
+
+    @staticmethod
+    def _turn_identity(session_id: str, turn_index: int) -> tuple[str, str, str]:
+        turn_key = _stable_suffix(session_id, turn_index)
+        user_id = f"obs_conv_user_{_stable_suffix(session_id, turn_index, 'user')}"
+        assistant_id = f"obs_conv_ai_{_stable_suffix(session_id, turn_index, 'assistant')}"
+        return turn_key, user_id, assistant_id
+
+    @staticmethod
+    def _expected_revision_for_retry(
+        store: SQLiteWorldStore,
+        operation_id: str,
+    ) -> int:
+        expected = int(store.current_world_revision())
+        try:
+            previous = store.operation_record(operation_id)
+        except Exception:
+            previous = None
+        if previous is not None:
+            expected = int(previous["expected_world_revision"])
+        return expected
+
+    def commit_user_input(
+        self,
+        *,
+        session_id: str,
+        turn_index: int,
+        user_text: str,
+        occurred_at: datetime,
+        recorded_at: datetime | None = None,
+    ) -> ConversationMessageCommit:
+        if not session_id.strip():
+            raise ValueError("session_id must not be blank")
+        if turn_index < 1:
+            raise ValueError("turn_index must be >= 1")
+        occurred = as_utc(occurred_at, "occurred_at")
+        recorded = as_utc(recorded_at or occurred_at, "recorded_at")
+        if recorded < occurred:
+            raise ValueError("recorded_at must be >= occurred_at")
+
+        turn_key, user_id, _assistant_id = self._turn_identity(
+            session_id,
+            turn_index,
+        )
+        metadata = {
+            "dimension": INTERACTION_DIMENSION,
+            "session_id": session_id,
+            "turn_index": turn_index,
+            "turn_key": turn_key,
+            "role": "user",
+        }
+        user_obs = Observation(
+            object_id=user_id,
+            subject_id=self.subject_id,
+            occurred=TemporalExtent.point(occurred),
+            learned_at=recorded,
+            recorded_at=recorded,
+            created_by="conversation_ingest:user",
+            source_kind="user_ai_interaction",
+            modality="text",
+            value=user_text,
+            raw_locator=f"conversation://{session_id}/{turn_index}/user",
+            metadata=metadata,
+        )
+        operation_id = f"op_conv_user_{turn_key}"
+        result = self.store.commit(
+            [user_obs],
+            OperationRequest(
+                operation_id=operation_id,
+                session_id=session_id,
+                operation_name="conversation.commit_user_input",
+                arguments={"turn_index": turn_index},
+                expected_world_revision=self._expected_revision_for_retry(
+                    self.store,
+                    operation_id,
+                ),
+                reason="persist current user input before model inference",
+                idempotency_key=f"conversation-user:{session_id}:{turn_index}",
+                source_class=SourceClass.USER,
+            ),
+        )
+        return ConversationMessageCommit(
+            world_revision=result.world_revision,
+            observation_id=user_id,
+            role="user",
+            idempotent_replay=result.idempotent_replay,
+        )
+
+    def commit_assistant_output(
+        self,
+        *,
+        session_id: str,
+        turn_index: int,
+        assistant_text: str,
+        occurred_at: datetime,
+        recorded_at: datetime | None = None,
+    ) -> ConversationMessageCommit:
+        if not session_id.strip():
+            raise ValueError("session_id must not be blank")
+        if turn_index < 1:
+            raise ValueError("turn_index must be >= 1")
+        occurred = as_utc(occurred_at, "occurred_at")
+        recorded = as_utc(recorded_at or occurred_at, "recorded_at")
+        if recorded < occurred:
+            raise ValueError("recorded_at must be >= occurred_at")
+
+        turn_key, _user_id, assistant_id = self._turn_identity(
+            session_id,
+            turn_index,
+        )
+        metadata = {
+            "dimension": INTERACTION_DIMENSION,
+            "session_id": session_id,
+            "turn_index": turn_index,
+            "turn_key": turn_key,
+            "role": "assistant",
+        }
+        assistant_obs = Observation(
+            object_id=assistant_id,
+            subject_id=self.subject_id,
+            occurred=TemporalExtent.point(occurred),
+            learned_at=recorded,
+            recorded_at=recorded,
+            created_by="conversation_ingest:assistant",
+            source_kind="user_ai_interaction",
+            modality="text",
+            value=assistant_text,
+            raw_locator=f"conversation://{session_id}/{turn_index}/assistant",
+            metadata=metadata,
+        )
+        operation_id = f"op_conv_ai_{turn_key}"
+        result = self.store.commit(
+            [assistant_obs],
+            OperationRequest(
+                operation_id=operation_id,
+                session_id=session_id,
+                operation_name="conversation.commit_assistant_output",
+                arguments={"turn_index": turn_index},
+                expected_world_revision=self._expected_revision_for_retry(
+                    self.store,
+                    operation_id,
+                ),
+                reason="persist raw assistant output after model inference",
+                idempotency_key=f"conversation-assistant:{session_id}:{turn_index}",
+                source_class=SourceClass.AI_COGNITION,
+            ),
+        )
+        return ConversationMessageCommit(
+            world_revision=result.world_revision,
+            observation_id=assistant_id,
+            role="assistant",
+            idempotent_replay=result.idempotent_replay,
+        )
 
     def commit_turn(
         self,
@@ -125,4 +288,6 @@ class ConversationIngestor:
             user_observation_id=user_id,
             assistant_observation_id=assistant_id,
             idempotent_replay=result.idempotent_replay,
+            user_world_revision=result.world_revision,
+            assistant_world_revision=result.world_revision,
         )
