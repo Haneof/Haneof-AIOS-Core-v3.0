@@ -159,6 +159,88 @@ def load_resident_events_jsonl(text: str) -> tuple[LifeEvent, ...]:
     return events
 
 
+def _resolve_fixture_child(root: Path, relative: str, field_name: str) -> Path:
+    if not isinstance(relative, str) or not relative.strip():
+        raise ValueError(f"{field_name} must be a non-empty relative path")
+    candidate = (root / relative).resolve()
+    resolved_root = root.resolve()
+    try:
+        candidate.relative_to(resolved_root)
+    except ValueError as exc:
+        raise ValueError(f"{field_name} must stay inside the fixture directory") from exc
+    return candidate
+
+
+def load_evaluator_fixture_scenario(
+    manifest_path: str | Path,
+) -> HabitationScenario:
+    """Load one sealed benchmark fixture on the evaluator side.
+
+    This helper intentionally loads the oracle and therefore must not run inside a
+    resident-model sandbox. HabitationTargetFactory still receives only the opaque
+    ResidentScenarioDescriptor.
+    """
+
+    manifest_file = Path(manifest_path).resolve()
+    raw = json.loads(manifest_file.read_text(encoding="utf-8"))
+    if not isinstance(raw, dict):
+        raise ValueError("fixture manifest must contain one object")
+
+    root = manifest_file.parent
+    resident_path = _resolve_fixture_child(
+        root,
+        _required_string(raw, "resident_stream"),
+        "resident_stream",
+    )
+    oracle_path = _resolve_fixture_child(
+        root,
+        _required_string(raw, "evaluator_oracle"),
+        "evaluator_oracle",
+    )
+    if resident_path == oracle_path:
+        raise ValueError("resident_stream and evaluator_oracle must be separate files")
+
+    events = load_resident_events_jsonl(
+        resident_path.read_text(encoding="utf-8")
+    )
+    oracle_raw = json.loads(oracle_path.read_text(encoding="utf-8"))
+    if not isinstance(oracle_raw, Mapping):
+        raise ValueError("evaluator oracle must contain one object")
+
+    scenario_id = _required_string(raw, "scenario_id")
+    oracle_scenario_id = oracle_raw.get("scenario_id")
+    if oracle_scenario_id is not None and oracle_scenario_id != scenario_id:
+        raise ValueError("oracle scenario_id does not match manifest")
+
+    seed_raw = raw.get("seed", 0)
+    if not isinstance(seed_raw, int) or isinstance(seed_raw, bool):
+        raise ValueError("seed must be an integer")
+    version_raw = raw.get("scenario_version", "1")
+    if not isinstance(version_raw, str) or not version_raw.strip():
+        raise ValueError("scenario_version must be a non-empty string")
+
+    end_at_raw = raw.get("end_at")
+    if end_at_raw is not None and not isinstance(end_at_raw, str):
+        raise ValueError("end_at must be an ISO-8601 string when provided")
+
+    tags_raw = raw.get("tags", ())
+    if not isinstance(tags_raw, (list, tuple)):
+        raise ValueError("tags must be an array")
+    if not all(isinstance(tag, str) and tag.strip() for tag in tags_raw):
+        raise ValueError("tags must contain non-empty strings")
+
+    return HabitationScenario(
+        scenario_id=scenario_id,
+        subject_id=_required_string(raw, "subject_id"),
+        events=events,
+        hidden_oracle=dict(oracle_raw),
+        tags=tuple(tags_raw),
+        scenario_version=version_raw,
+        seed=seed_raw,
+        end_at=(None if end_at_raw is None else _parse_datetime(end_at_raw)),
+    )
+
+
 def _resident_event_dict(event: ResidentEvent) -> dict[str, Any]:
     return {
         "event_id": event.event_id,
