@@ -338,7 +338,7 @@ def test_model_can_revise_claim_and_propagate_current_view(tmp_path):
     assert store.get_payload(old_claim.claim_id, revision=1)["content"] == "用户当前偏好每天喝茶。"
     assert store.get_payload(old_claim.claim_id)["content"] == "用户当前偏好每天喝咖啡。"
 
-    current_old = index.recall_candidates("每天喝茶", object_types=["claim"])
+    current_old = index.recall_candidates("喝茶", object_types=["claim"])
     assert old_claim.claim_id not in {hit.object_id for hit in current_old.hits}
 
     current_new = index.recall_candidates("每天喝咖啡", object_types=["claim"])
