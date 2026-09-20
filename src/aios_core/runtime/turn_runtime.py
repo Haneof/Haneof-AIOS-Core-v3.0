@@ -444,12 +444,18 @@ class FusedTurnRuntime:
             exclude_session_id=session_id,
         )
 
+        continuity_context = (
+            dict(ai_identity)
+            if ai_identity is not None
+            else self.ai_world.core_context(per_domain=3)
+        )
+
         context = self.context_controller.assemble(
             user_input=user_input,
             current_topic=current_topic,
             recommendation=recommendation,
             recent_turns=recent_turns,
-            ai_identity=ai_identity,
+            ai_identity=continuity_context,
             task_context=task_context,
             capability_catalog=self.registry.catalog(),
             token_budget=token_budget,
