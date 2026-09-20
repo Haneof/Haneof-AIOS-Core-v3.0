@@ -379,5 +379,56 @@
   "67318051c7025793de6558f77c36fe17fd5f904148526301535ea99508c764dd": {
     "kind": "response",
     "response": "明白。你已经自己和小赵确认了4:15到店，我不会继续这条发送请求。系统里的旧发送提案还没有执行结果，但我刚发现它在父任务取消后仍保持“待授权”状态，所以我不会把它说成已经安全撤销；这条执行生命周期缺口我会单独记录。"
+  },
+  "5d26432e3cf5172518399c7d26851c39c04389f93a34f1e5e7306ba223a59f4b": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "record_communication_experience",
+        "call_id": "sol-jan09-record-uncertainty-positive-feedback",
+        "arguments": {
+          "scenario": "time-dependent arrangement conflict with incomplete timing evidence",
+          "style": "state confirmed facts and evidence gap; do not assert conflict until timing is confirmed",
+          "tone": "calm and non-alarmist",
+          "user_reaction": "accepted",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_ai_acc5b0fdc866a3637fcdb347",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_37068ea8651565e088f2d785",
+              "revision": 1
+            }
+          ],
+          "applicable_conditions": {
+            "kind": "schedule_or_arrangement_conflict",
+            "missing_evidence": "one_or_more_required_times_unconfirmed"
+          }
+        }
+      },
+      {
+        "name": "propose_cognitive_policy",
+        "call_id": "sol-jan09-policy-uncertain-time-conflict",
+        "arguments": {
+          "policy_id": "communication.uncertain_time_conflict_reporting",
+          "scope": "per-user:sol-resident-20260921-001",
+          "default_value": "normal_uncertainty_language",
+          "current_value": "state_evidence_gap_and_avoid_conflict_claim_until_required_times_are_confirmed",
+          "allowed_range_or_choices": [
+            "normal_uncertainty_language",
+            "state_evidence_gap_and_avoid_conflict_claim_until_required_times_are_confirmed"
+          ],
+          "reason": "The user explicitly confirmed that withholding an unsupported conflict claim was correct and asked not to be alarmed when timing is still unconfirmed.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_37068ea8651565e088f2d785",
+              "revision": 1
+            }
+          ],
+          "evaluation_window": "30d"
+        }
+      }
+    ]
   }
 }
