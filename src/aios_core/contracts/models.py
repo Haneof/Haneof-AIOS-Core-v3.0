@@ -306,6 +306,7 @@ class Summary(WorldObject):
     dimension_ref: ObjectRef | None = None
     summary_time: TemporalExtent
     granularity: str
+    content: str = ""
     source_world_revision: int = Field(ge=0)
     evidence_set_ref: ObjectRef | None = None
     coverage: dict[str, Any] = Field(default_factory=dict)
