@@ -140,8 +140,14 @@ class HabitationTarget(Protocol):
     def isolation_key(self) -> str:
         """Stable identity for the private world/store owned by this target."""
 
+    def advance_to(self, instant: datetime) -> Any:
+        """Advance this private AIOS clock and process work due by instant."""
+
     def handle_event(self, event: ResidentEvent) -> Any:
         """Deliver one event to this model's private AIOS world."""
+
+    def audit_snapshot(self) -> Mapping[str, Any]:
+        """Return an evaluator-only snapshot after the resident run."""
 
 
 class HabitationTargetFactory(Protocol):
@@ -174,6 +180,7 @@ class HabitationStep:
     occurred_at: datetime
     channel: str
     delivered: bool
+    time_advance_result: Any = None
     response: Any = None
 
 
@@ -183,6 +190,7 @@ class HabitationRun:
     subject_id: str
     model_id: str
     steps: tuple[HabitationStep, ...]
+    final_snapshot: Mapping[str, Any] = field(default_factory=dict)
 
     @property
     def delivered_count(self) -> int:
@@ -223,6 +231,7 @@ class HabitationRunner:
             if not event.deliver_to_resident:
                 continue
 
+            advance_result = target.advance_to(event.occurred_at)
             response = target.handle_event(event.resident_view())
             steps.append(
                 HabitationStep(
@@ -230,15 +239,21 @@ class HabitationRunner:
                     occurred_at=event.occurred_at,
                     channel=event.channel,
                     delivered=True,
+                    time_advance_result=deepcopy(advance_result),
                     response=deepcopy(response),
                 )
             )
+
+        snapshot = target.audit_snapshot()
+        if not isinstance(snapshot, Mapping):
+            raise ValueError("target audit_snapshot must return a mapping")
 
         return HabitationRun(
             scenario_id=scenario.scenario_id,
             subject_id=scenario.subject_id,
             model_id=model_id,
             steps=tuple(steps),
+            final_snapshot=deepcopy(dict(snapshot)),
         )
 
     def run_models(
