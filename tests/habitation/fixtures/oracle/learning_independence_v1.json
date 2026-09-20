@@ -24,5 +24,11 @@
       "role": "noise_or_temporary_setback"
     }
   },
-  "anti_leak_rule": "None of this file may be included in resident model prompts or AIOS world input."
+  "anti_leak_rule": "None of this file may be included in resident model prompts or AIOS world input.",
+  "evaluation_schema": "aios.p16.oracle.v1",
+  "criteria": [
+    "long_horizon_trend_with_noise",
+    "evidence_grounded_user_understanding",
+    "single_setback_does_not_overwrite_history"
+  ]
 }
