@@ -25,6 +25,37 @@ from aios_core.storage.sqlite_store import SQLiteWorldStore
 
 EVENT_DIMENSION = "dim:events"
 
+_EVENT_TRANSITIONS: dict[EventStatus, frozenset[EventStatus]] = {
+    EventStatus.CANDIDATE: frozenset({
+        EventStatus.ACTIVE,
+        EventStatus.REVISED,
+        EventStatus.REJECTED,
+        EventStatus.MERGED,
+        EventStatus.SPLIT,
+    }),
+    EventStatus.ACTIVE: frozenset({
+        EventStatus.RESOLVED,
+        EventStatus.REVISED,
+        EventStatus.REJECTED,
+        EventStatus.MERGED,
+        EventStatus.SPLIT,
+    }),
+    EventStatus.REVISED: frozenset({
+        EventStatus.ACTIVE,
+        EventStatus.RESOLVED,
+        EventStatus.REVISED,
+        EventStatus.REJECTED,
+        EventStatus.MERGED,
+        EventStatus.SPLIT,
+    }),
+    # A resolved/rejected interpretation may be reopened only through an explicit
+    # REVISED revision carrying new evidence; terminal structural operations stay terminal.
+    EventStatus.RESOLVED: frozenset({EventStatus.REVISED}),
+    EventStatus.REJECTED: frozenset({EventStatus.REVISED}),
+    EventStatus.MERGED: frozenset(),
+    EventStatus.SPLIT: frozenset(),
+}
+
 
 def _stable_id(prefix: str, *parts: object) -> str:
     raw = canonical_json_dumps(list(parts))
@@ -124,7 +155,13 @@ class EventDimensionService:
     def _validate_refs(self, refs: Sequence[ObjectRef]) -> None:
         _require_pinned(refs, "event refs")
         for ref in refs:
-            self.store.get_payload(ref.object_id, revision=ref.revision)
+            payload = self.store.get_payload(ref.object_id, revision=ref.revision)
+            ref_subject = str(payload.get("subject_id") or "")
+            if ref_subject != self.subject_id:
+                raise ValueError(
+                    "event reference crosses the runtime subject scope: "
+                    f"{ref.object_id}@{ref.revision} belongs to {ref_subject!r}"
+                )
 
     def _evidence(
         self,
@@ -262,6 +299,14 @@ class EventDimensionService:
         if int(latest["revision"]) != int(request.event_ref.revision or 0):
             raise ValueError("only the current Event revision may transition")
         current = EventAnchor.model_validate(payload)
+        if current.subject_id != self.subject_id:
+            raise ValueError("event transition target crosses the runtime subject scope")
+        allowed = _EVENT_TRANSITIONS.get(current.event_status, frozenset())
+        if request.new_status not in allowed:
+            raise ValueError(
+                "illegal Event transition: "
+                f"{current.event_status.value}->{request.new_status.value}"
+            )
         self._validate_refs((*request.evidence_refs, *request.related_event_refs))
         new_revision = current.revision + 1
         dimension = str(current.metadata.get("dimension") or EVENT_DIMENSION)
