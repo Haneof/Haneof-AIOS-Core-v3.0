@@ -47,5 +47,18 @@
     "snapshot_signature": "744462647f3d1843d75ab9c91166fc4498abff0fe9b99080d28fb8d2479364d1",
     "type": "response",
     "text": "明白。涉及周末安排时，我会先把这作为你的常规习惯来理解；如果某个周末有临时变化，就以当次情况为准。"
+  },
+  {
+    "snapshot_signature": "55be78e287898aedd46b420a9d93ed356096a78e6f640ae3ffb6d7f69afa515f",
+    "type": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 10
+        }
+      }
+    ]
   }
 ]
