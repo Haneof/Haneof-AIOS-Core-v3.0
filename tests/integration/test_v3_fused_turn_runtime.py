@@ -169,3 +169,74 @@ def test_model_can_request_all_dimensions_projection(tmp_path):
 
     assert result.runtime.response.startswith("两个维度都出现了变化")
     assert result.runtime.capability_history[0].name == "request_all_dimensions_projection"
+
+
+def test_model_can_search_then_write_evidence_grounded_claim(tmp_path):
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    seed = ConversationIngestor(store)
+    seed_result = seed.commit_turn(
+        session_id="history",
+        turn_index=1,
+        user_text="我希望你以后先给我结论，再展开细节。",
+        assistant_text="明白，这种反馈我会作为后续沟通依据。",
+        occurred_at=NOW - timedelta(days=3),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    def model(snapshot):
+        if not snapshot.capability_history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="search_world",
+                        arguments={"query": "先给结论 展开细节", "limit": 5},
+                    ),
+                )
+            )
+        if len(snapshot.capability_history) == 1:
+            search = snapshot.capability_history[-1]
+            assert search.ok is True
+            evidence = next(item for item in search.data if item["object_id"] == seed_result.user_observation_id)
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="commit_claim",
+                        arguments={
+                            "content": "用户偏好先看到结论，再按需展开细节。",
+                            "evidence_refs": [
+                                {
+                                    "object_id": evidence["object_id"],
+                                    "revision": evidence["revision"],
+                                }
+                            ],
+                            "confidence": 0.86,
+                            "dimension": "dim:ai_user_understanding",
+                        },
+                    ),
+                )
+            )
+
+        written = snapshot.capability_history[-1]
+        assert written.ok is True
+        assert written.data["claim_id"].startswith("clm_")
+        return ModelDirective(response="我会按这个偏好来组织后续回答。")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    result = runtime.run_turn(
+        session_id="current",
+        turn_index=1,
+        user_input="继续。",
+        current_topic=None,
+        occurred_at=NOW,
+    )
+
+    assert result.runtime.response == "我会按这个偏好来组织后续回答。"
+    assert [item.name for item in result.runtime.capability_history] == ["search_world", "commit_claim"]
+
+    claim_result = result.runtime.capability_history[-1].data
+    claim = store.get_payload(claim_result["claim_id"])
+    assert claim["object_type"] == "claim"
+    assert claim["content"] == "用户偏好先看到结论，再按需展开细节。"
+    assert claim["metadata"]["dimension"] == "dim:ai_user_understanding"
