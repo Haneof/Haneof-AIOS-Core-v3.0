@@ -431,6 +431,15 @@ class ConversationContinuityService:
 
         if len(eligible) < summary_chunk_turns and not pressure_triggered:
             return None
+        # Under token pressure we may summarize before the normal chunk is full,
+        # but avoid churning one-turn summaries unless the configured chunk itself
+        # explicitly requests one-turn windows.
+        if (
+            pressure_triggered
+            and summary_chunk_turns > 1
+            and len(eligible) < 2
+        ):
+            return None
 
         target_turns = min(summary_chunk_turns, len(eligible))
         selected: list[Mapping[str, Any]] = []
