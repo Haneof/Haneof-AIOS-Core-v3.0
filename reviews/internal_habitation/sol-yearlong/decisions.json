@@ -1038,5 +1038,29 @@
         }
       }
     ]
+  },
+  "fb863d371c8d6254a9ae5829f01e0099d38748d12807ca55f0a5acdfea99650a": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_task",
+        "call_id": "sol-jan17-start-fire-prep-reminder",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_cda791cdeea8798f457386f9",
+            "revision": 2
+          },
+          "new_state": "running",
+          "reason": "At the user-specified Sunday check point, the latest relevant preparation note still states that the extinguisher area has not been cleared and the passage record has not been printed, with no later completion evidence before the wake.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_src_b5bd2f96dac8066bb4c24333",
+              "revision": 1
+            }
+          ],
+          "next_step": "提醒用户消防检查准备仍未完成；不要声称检查一定有问题或一定不能通过。"
+        }
+      }
+    ]
   }
 }
