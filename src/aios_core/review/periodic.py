@@ -35,6 +35,12 @@ from aios_core.storage.sqlite_store import SQLiteWorldStore
 
 REVIEW_KIND = "periodic_ai_growth_review"
 
+_REAL_OPERATION_CASE_TYPES: frozenset[ObjectType] = frozenset({
+    ObjectType.OBSERVATION,
+    ObjectType.OUTCOME,
+    ObjectType.COMMUNICATION_EXPERIENCE,
+})
+
 _REVIEWABLE_TYPES: tuple[ObjectType, ...] = (
     ObjectType.OBSERVATION,
     ObjectType.SUMMARY,
@@ -191,6 +197,16 @@ class OperationExperienceRequest(BaseModel):
             raise ValueError("operation experience requires at least one real case ref")
         if any(ref.revision is None for ref in refs):
             raise ValueError("operation experience case refs must pin exact revisions")
+        positive_keys = {
+            (ref.object_id, ref.revision) for ref in self.positive_case_refs
+        }
+        negative_keys = {
+            (ref.object_id, ref.revision) for ref in self.negative_case_refs
+        }
+        if positive_keys.intersection(negative_keys):
+            raise ValueError(
+                "the same case ref cannot be both positive and negative"
+            )
         return self
 
 
@@ -241,12 +257,42 @@ class PeriodicReviewService:
             if metadata.get("review_kind") != REVIEW_KIND:
                 continue
             wakes.append(Wake.model_validate(payload))
-        wakes.sort(key=lambda item: as_utc(item.last_hit_at, "last_hit_at"))
+        wakes.sort(
+            key=lambda item: (
+                as_utc(item.last_hit_at, "last_hit_at"),
+                item.object_id,
+                item.revision,
+            )
+        )
         return tuple(wakes)
 
     def _latest_marker(self) -> Wake | None:
         wakes = self._review_wakes()
         return wakes[-1] if wakes else None
+
+    def _reviewed_refs_for_window(
+        self,
+        *,
+        window_start: datetime,
+        window_end: datetime,
+    ) -> set[tuple[str, int]]:
+        start = as_utc(window_start, "window_start").isoformat()
+        end = as_utc(window_end, "window_end").isoformat()
+        reviewed: set[tuple[str, int]] = set()
+        for wake in self._review_wakes():
+            if wake.wake_state is not WakeState.COMPLETED:
+                continue
+            metadata = wake.metadata
+            if (
+                metadata.get("window_start") != start
+                or metadata.get("window_end") != end
+            ):
+                continue
+            reviewed.update(
+                (ref.object_id, int(ref.revision or 0))
+                for ref in wake.evidence_refs
+            )
+        return reviewed
 
     def _collect_candidates(
         self,
@@ -254,9 +300,11 @@ class PeriodicReviewService:
         window_start: datetime,
         window_end: datetime,
         policy: ReviewSchedulePolicy,
-    ) -> tuple[ReviewAnchor, ...]:
+        excluded_refs: set[tuple[str, int]] | None = None,
+    ) -> tuple[tuple[ReviewAnchor, ...], bool]:
         start = as_utc(window_start, "window_start")
         end = as_utc(window_end, "window_end")
+        excluded = excluded_refs or set()
         per_type: dict[str, list[ReviewAnchor]] = {}
 
         for object_type in _REVIEWABLE_TYPES:
@@ -275,12 +323,19 @@ class PeriodicReviewService:
                 if recorded <= start or recorded > end:
                     continue
 
+                ref_key = (
+                    str(payload["object_id"]),
+                    int(payload["revision"]),
+                )
+                if ref_key in excluded:
+                    continue
+
                 # Review summaries may be useful as compressed evidence, but the
                 # scheduler itself never treats their text as a semantic verdict.
                 anchor = ReviewAnchor(
                     object_ref=ObjectRef(
-                        object_id=str(payload["object_id"]),
-                        revision=int(payload["revision"]),
+                        object_id=ref_key[0],
+                        revision=ref_key[1],
                     ),
                     object_type=str(payload["object_type"]),
                     recorded_at=recorded,
@@ -289,10 +344,17 @@ class PeriodicReviewService:
                 bucket = per_type.setdefault(anchor.object_type, [])
                 bucket.append(anchor)
 
+        eligible_count = sum(len(bucket) for bucket in per_type.values())
         selected: list[ReviewAnchor] = []
         for object_type in sorted(per_type):
             bucket = per_type[object_type]
-            bucket.sort(key=lambda item: (item.recorded_at, item.object_ref.object_id))
+            bucket.sort(
+                key=lambda item: (
+                    item.recorded_at,
+                    item.object_ref.object_id,
+                    int(item.object_ref.revision or 0),
+                )
+            )
             selected.extend(bucket[-policy.max_per_object_type :])
 
         selected.sort(
@@ -300,25 +362,31 @@ class PeriodicReviewService:
                 item.recorded_at,
                 item.object_type,
                 item.object_ref.object_id,
+                int(item.object_ref.revision or 0),
             )
         )
-        return tuple(selected[-policy.max_candidates :])
+        page = tuple(selected[-policy.max_candidates :])
+        return page, len(page) < eligible_count
 
     def _create_wake(
         self,
         *,
         now: datetime,
         window_start: datetime,
+        window_end: datetime,
         anchors: Sequence[ReviewAnchor],
         state: WakeState,
         reason: str,
+        truncated: bool = False,
     ) -> ReviewWakeReceipt:
         moment = as_utc(now, "now")
         start = as_utc(window_start, "window_start")
+        end = as_utc(window_end, "window_end")
         wake_id = _stable_id(
             "wake_review",
             self.subject_id,
             start.isoformat(),
+            end.isoformat(),
             moment.isoformat(),
         )
         refs = [anchor.object_ref for anchor in anchors]
@@ -345,9 +413,10 @@ class PeriodicReviewService:
             metadata={
                 "review_kind": REVIEW_KIND,
                 "window_start": start.isoformat(),
-                "window_end": moment.isoformat(),
+                "window_end": end.isoformat(),
                 "reason": reason,
                 "candidate_count": len(refs),
+                "truncated": bool(truncated),
             },
         )
         result = self.store.commit(
@@ -357,9 +426,10 @@ class PeriodicReviewService:
                 arguments={
                     "wake_id": wake_id,
                     "window_start": start.isoformat(),
-                    "window_end": moment.isoformat(),
+                    "window_end": end.isoformat(),
                     "state": state.value,
                     "candidate_count": len(refs),
+                    "truncated": bool(truncated),
                 },
                 expected_world_revision=int(self.store.current_world_revision()),
                 reason=reason,
@@ -416,46 +486,89 @@ class PeriodicReviewService:
                     revision=latest.revision,
                 ),
                 window_start=start,
-                window_end=latest.last_hit_at,
+                window_end=_parse_time(
+                    metadata.get("window_end"),
+                    "window_end",
+                ),
                 anchors=tuple(anchors),
             )
 
+        backlog = False
         if latest is not None:
-            since = moment - as_utc(latest.last_hit_at, "last_hit_at")
-            if since < timedelta(hours=float(policy.interval_hours)):
-                return None
-            window_start = as_utc(latest.last_hit_at, "last_hit_at")
+            metadata = latest.metadata
+            if (
+                latest.wake_state is WakeState.COMPLETED
+                and bool(metadata.get("truncated"))
+            ):
+                backlog = True
+                window_start = _parse_time(
+                    metadata.get("window_start"),
+                    "window_start",
+                )
+                window_end = _parse_time(
+                    metadata.get("window_end"),
+                    "window_end",
+                )
+            else:
+                since = moment - as_utc(latest.last_hit_at, "last_hit_at")
+                if since < timedelta(hours=float(policy.interval_hours)):
+                    return None
+                raw_cursor = metadata.get("window_end")
+                window_start = (
+                    _parse_time(raw_cursor, "window_end")
+                    if raw_cursor is not None
+                    else as_utc(latest.last_hit_at, "last_hit_at")
+                )
+                window_end = moment
         else:
             window_start = moment - timedelta(hours=float(policy.lookback_hours))
+            window_end = moment
 
-        anchors = self._collect_candidates(
+        excluded = self._reviewed_refs_for_window(
             window_start=window_start,
-            window_end=moment,
+            window_end=window_end,
+        )
+        anchors, truncated = self._collect_candidates(
+            window_start=window_start,
+            window_end=window_end,
             policy=policy,
+            excluded_refs=excluded,
         )
         if not anchors:
             self._create_wake(
                 now=moment,
                 window_start=window_start,
+                window_end=window_end,
                 anchors=(),
                 state=WakeState.SUPPRESSED,
-                reason="periodic review checked; no eligible world changes",
+                reason=(
+                    "periodic review backlog drained"
+                    if backlog
+                    else "periodic review checked; no eligible world changes"
+                ),
+                truncated=False,
             )
             return None
 
         wake = self._create_wake(
             now=moment,
             window_start=window_start,
+            window_end=window_end,
             anchors=anchors,
             state=WakeState.NEW,
-            reason="periodic review due with eligible world changes",
+            reason=(
+                "periodic review backlog page due"
+                if backlog
+                else "periodic review due with eligible world changes"
+            ),
+            truncated=truncated,
         )
         return PeriodicReviewRequest(
             review_id=wake.wake_id,
             subject_id=self.subject_id,
             wake_ref=ObjectRef(object_id=wake.wake_id, revision=1),
             window_start=window_start,
-            window_end=moment,
+            window_end=window_end,
             anchors=anchors,
         )
 
@@ -631,7 +744,25 @@ class PeriodicReviewService:
         learned = as_utc(learned_at, "learned_at")
         refs = (*request.positive_case_refs, *request.negative_case_refs)
         for ref in refs:
-            self.store.get_payload(ref.object_id, revision=ref.revision)
+            payload = self.store.get_payload(
+                ref.object_id,
+                revision=ref.revision,
+            )
+            if payload.get("subject_id") != self.subject_id:
+                raise ValueError(
+                    "operation experience case ref belongs to another subject"
+                )
+            try:
+                object_type = ObjectType(str(payload["object_type"]))
+            except (KeyError, ValueError) as exc:
+                raise ValueError(
+                    "operation experience case ref has invalid object type"
+                ) from exc
+            if object_type not in _REAL_OPERATION_CASE_TYPES:
+                raise ValueError(
+                    "operation experience requires real result evidence: "
+                    "Observation, Outcome or CommunicationExperience"
+                )
 
         experience_id = _stable_id(
             "opexp",
