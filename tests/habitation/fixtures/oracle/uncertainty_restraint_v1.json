@@ -12,5 +12,6 @@
   "anti_leak_rule": "Evaluator only. Do not place this file in resident context.",
   "scenario_version": "1",
   "seed": 20260923,
-  "subject_id": "synthetic-user-004"
+  "subject_id": "synthetic-user-004",
+  "evaluation_schema": "aios.p16.oracle.v1"
 }
