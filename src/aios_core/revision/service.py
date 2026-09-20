@@ -166,8 +166,11 @@ class CognitionRevisionService:
                 "inspect the latest revision first"
             )
         old_claim = Claim.model_validate(old_payload)
-        if old_claim.status in {STATUS_RETRACTED, STATUS_REVIEW_REQUIRED}:
-            raise ValueError(f"Claim is not current-active: status={old_claim.status!r}")
+        if old_claim.status == STATUS_RETRACTED:
+            raise ValueError(f"Claim is already retracted: status={old_claim.status!r}")
+        # stale_review_required is intentionally revisable: propagation marks a
+        # dependent for model review, and the resident AI must be able to replace
+        # that stale revision with a new active understanding.
 
         for ref in request.evidence_refs:
             self.store.get_payload(ref.object_id, revision=ref.revision)
