@@ -24,7 +24,7 @@ from aios_core.contracts.enums import (
     WakeSource,
     WakeState,
 )
-from aios_core.contracts.models import Wake
+from aios_core.contracts.models import Observation, Wake
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import TemporalExtent, as_utc
@@ -71,6 +71,49 @@ class WakeSignalRequest(BaseModel):
         return self
 
 
+_OBSERVATION_WAKE_SOURCES = frozenset(
+    {
+        WakeSource.MECHANICAL_CHANGE,
+        WakeSource.KEYWORD_ENTITY,
+        WakeSource.WATCH_MATCH,
+        WakeSource.RECOVERY,
+    }
+)
+
+
+class ObservationWakeRule(BaseModel):
+    """Registered deterministic mapping from an Observation marker to a Wake signal."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    rule_id: str = Field(min_length=1)
+    wake_source: WakeSource
+    source_kind: str | None = None
+    modality: str | None = None
+    metadata_equals: Mapping[str, Any] = Field(default_factory=dict)
+    dedupe_metadata_keys: tuple[str, ...] = ()
+    priority: int = Field(default=50, ge=0, le=100)
+    cooldown_seconds: int = Field(default=0, ge=0)
+    enabled: bool = True
+
+    @model_validator(mode="after")
+    def validate_rule(self) -> "ObservationWakeRule":
+        if not self.rule_id.strip():
+            raise ValueError("rule_id must not be blank")
+        if self.wake_source not in _OBSERVATION_WAKE_SOURCES:
+            raise ValueError(
+                "ObservationWakeRule supports only registered indirect observation wake sources"
+            )
+        if self.source_kind is not None and not self.source_kind.strip():
+            raise ValueError("source_kind must not be blank")
+        if self.modality is not None and not self.modality.strip():
+            raise ValueError("modality must not be blank")
+        for key in (*self.metadata_equals.keys(), *self.dedupe_metadata_keys):
+            if not isinstance(key, str) or not key.strip():
+                raise ValueError("metadata rule keys must be non-blank strings")
+        return self
+
+
 class Step0GateInput(BaseModel):
     """Deterministic pre-cognition gate inputs.
 
@@ -114,6 +157,99 @@ class WakeStateReceipt:
     revision: int
     state: str
     world_revision: int
+
+
+class ObservationTriggerService:
+    """Evaluate registered mechanical Observation rules without semantic inference."""
+
+    def __init__(
+        self,
+        *,
+        store: SQLiteWorldStore,
+        wake_bus: "WakeBus",
+        subject_id: str = "user_1",
+    ) -> None:
+        if not isinstance(subject_id, str) or not subject_id.strip():
+            raise ValueError("subject_id must not be blank")
+        self.store = store
+        self.wake_bus = wake_bus
+        self.subject_id = subject_id.strip()
+
+    @staticmethod
+    def _matches(observation: Observation, rule: ObservationWakeRule) -> bool:
+        if not rule.enabled:
+            return False
+        if rule.source_kind is not None and observation.source_kind != rule.source_kind:
+            return False
+        if rule.modality is not None and observation.modality != rule.modality:
+            return False
+        for key, expected in rule.metadata_equals.items():
+            if observation.metadata.get(key) != expected:
+                return False
+        return True
+
+    def evaluate_observation(
+        self,
+        observation_ref: ObjectRef,
+        *,
+        rules: tuple[ObservationWakeRule, ...],
+    ) -> tuple[WakeSignalReceipt, ...]:
+        """Turn only explicitly matched deterministic markers into Wake signals."""
+
+        if observation_ref.revision is None:
+            raise ValueError("observation_ref must pin an exact revision")
+        payload = self.store.get_payload(
+            observation_ref.object_id,
+            revision=observation_ref.revision,
+        )
+        if payload.get("object_type") != ObjectType.OBSERVATION.value:
+            raise ValueError("observation_ref must point to an Observation")
+        observation = Observation.model_validate(payload)
+        if observation.subject_id != self.subject_id:
+            raise ValueError("Observation belongs to another subject")
+
+        receipts: list[WakeSignalReceipt] = []
+        for rule in rules:
+            if not self._matches(observation, rule):
+                continue
+
+            dedupe_values: dict[str, Any] = {}
+            for key in rule.dedupe_metadata_keys:
+                if key not in observation.metadata:
+                    raise ValueError(
+                        f"dedupe metadata key missing from Observation: {key}"
+                    )
+                dedupe_values[key] = observation.metadata[key]
+
+            observed_at = observation.occurred.start or observation.recorded_at
+            dedupe_key = _stable_id(
+                "observation_wake_scope",
+                self.subject_id,
+                rule.rule_id,
+                observation.source_kind,
+                dedupe_values,
+            )
+            receipts.append(
+                self.wake_bus.emit(
+                    WakeSignalRequest(
+                        wake_source=rule.wake_source,
+                        rule_id=rule.rule_id,
+                        observed_at=observed_at,
+                        evidence_refs=(observation_ref,),
+                        priority=rule.priority,
+                        dedupe_key=dedupe_key,
+                        cooldown_seconds=rule.cooldown_seconds,
+                        metadata={
+                            "trigger_kind": "registered_observation_rule",
+                            "trigger_rule_id": rule.rule_id,
+                            "trigger_observation_ref": observation_ref.model_dump(
+                                mode="json"
+                            ),
+                        },
+                    )
+                )
+            )
+        return tuple(receipts)
 
 
 class WakeBus:
