@@ -19,9 +19,17 @@ class Target:
     def __init__(self, model: str) -> None:
         self.model = model
         self.isolation_key = f"world:{model}:{id(self)}"
+        self.clock: list[datetime] = []
+
+    def advance_to(self, instant: datetime):
+        self.clock.append(instant)
+        return None
 
     def handle_event(self, event: ResidentEvent):
         return {"model": self.model, "event_id": event.event_id}
+
+    def audit_snapshot(self):
+        return {"clock_count": len(self.clock)}
 
 
 def _scenario() -> HabitationScenario:
