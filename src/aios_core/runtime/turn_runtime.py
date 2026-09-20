@@ -1758,6 +1758,28 @@ class FusedTurnRuntime:
         )
         return asdict(receipt)
 
+    def _cognitive_policy_context(self, *, limit: int = 32) -> dict[str, Any]:
+        """Compact current policy view for every resident semantic entry point.
+
+        Policies learned from direct evidence must become available to later cognition
+        without requiring the model to guess a policy id first. The full ledger remains
+        available through read_cognitive_policies when the bounded context is truncated.
+        """
+
+        if limit < 1:
+            raise ValueError("policy context limit must be >= 1")
+        items = list(self.policies.list_current())
+        values: dict[str, Any] = {}
+        for item in items[:limit]:
+            values[item.policy_id] = item.current_value
+        values["_meta"] = {
+            "total": len(items),
+            "included": min(len(items), limit),
+            "truncated": len(items) > limit,
+            "reader": "read_cognitive_policies",
+        }
+        return values
+
     def _execution_context_for_topic(
         self,
         topic: str | None,
@@ -2143,13 +2165,19 @@ class FusedTurnRuntime:
 
         current_task_context = dict(task_context or {})
         current_task_context["topic_state"] = topic_state.model_dump(mode="json")
-        current_task_context["cognitive_policy_context"] = {
-            "memory.recommendation_limit": effective_recommendation_limit,
-            "communication.detail_level": self.policies.effective_value(
+        current_task_context["cognitive_policy_context"] = (
+            self._cognitive_policy_context()
+        )
+        current_task_context["cognitive_policy_context"][
+            "memory.recommendation_limit"
+        ] = effective_recommendation_limit
+        current_task_context["cognitive_policy_context"].setdefault(
+            "communication.detail_level",
+            self.policies.effective_value(
                 "communication.detail_level",
                 None,
             ),
-        }
+        )
         automatic_execution_context = self._execution_context_for_topic(topic_state.topic)
         current_task_context.setdefault(
             "related_execution_anchors",
@@ -2378,7 +2406,10 @@ class FusedTurnRuntime:
             recent_turns=(),
             conversation_summaries=(),
             ai_identity=continuity_context,
-            task_context={"wake": wake_context},
+            task_context={
+                "wake": wake_context,
+                "cognitive_policy_context": self._cognitive_policy_context(),
+            },
             capability_catalog=self.registry.catalog(),
             token_budget=token_budget,
         )
@@ -2485,7 +2516,10 @@ class FusedTurnRuntime:
             recent_turns=(),
             conversation_summaries=(),
             ai_identity=continuity_context,
-            task_context={"periodic_review": review_context},
+            task_context={
+                "periodic_review": review_context,
+                "cognitive_policy_context": self._cognitive_policy_context(),
+            },
             capability_catalog=self.registry.catalog(),
             token_budget=token_budget,
         )
