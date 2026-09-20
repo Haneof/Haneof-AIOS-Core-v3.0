@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 from aios_core.contracts.enums import SourceClass
 from aios_core.contracts.models import Observation
 from aios_core.contracts.operations import OperationRequest
+from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import TemporalExtent
 from aios_core.ingest.conversation import ConversationIngestor
 from aios_core.query.search import WorldSearchIndex
@@ -10,6 +11,7 @@ from aios_core.runtime.capabilities import CapabilityCall
 from aios_core.runtime.cognitive_runtime import ModelDirective
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 
 
 NOW = datetime(2026, 9, 20, 12, 0, tzinfo=timezone.utc)
@@ -240,3 +242,104 @@ def test_model_can_search_then_write_evidence_grounded_claim(tmp_path):
     assert claim["object_type"] == "claim"
     assert claim["content"] == "用户偏好先看到结论，再按需展开细节。"
     assert claim["metadata"]["dimension"] == "dim:ai_user_understanding"
+
+
+def test_model_can_revise_claim_and_propagate_current_view(tmp_path):
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+
+    old_obs = Observation(
+        object_id="obs_old_preference_runtime",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW - timedelta(days=20)),
+        learned_at=NOW - timedelta(days=20),
+        recorded_at=NOW - timedelta(days=20),
+        created_by="runtime-revision-test",
+        source_kind="conversation",
+        modality="text",
+        value="我最近每天都喝茶。",
+        metadata={"dimension": "dim:user_ai_interaction"},
+    )
+    correction = Observation(
+        object_id="obs_new_preference_runtime",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW),
+        learned_at=NOW,
+        recorded_at=NOW,
+        created_by="runtime-revision-test",
+        source_kind="conversation",
+        modality="text",
+        value="现在已经改成每天喝咖啡了。",
+        metadata={"dimension": "dim:user_ai_interaction"},
+    )
+    store.commit(
+        [old_obs, correction],
+        OperationRequest(
+            operation_name="test.seed.revision.runtime",
+            expected_world_revision=0,
+            reason="seed revision runtime",
+            idempotency_key="seed-revision-runtime",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    writeback = CognitionWritebackService(store=store, index=index)
+    old_claim = writeback.commit_claim(
+        ClaimWriteRequest(
+            content="用户当前偏好每天喝茶。",
+            evidence_refs=(ObjectRef(object_id=old_obs.object_id, revision=1),),
+            confidence=0.8,
+            dimension="dim:ai_user_understanding",
+        ),
+        learned_at=NOW - timedelta(days=19),
+    )
+
+    def model(snapshot):
+        if not snapshot.capability_history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="revise_claim",
+                        arguments={
+                            "target_ref": {
+                                "object_id": old_claim.claim_id,
+                                "revision": 1,
+                            },
+                            "reason": "用户明确更新了当前饮品习惯",
+                            "evidence_refs": [
+                                {
+                                    "object_id": correction.object_id,
+                                    "revision": 1,
+                                }
+                            ],
+                            "replacement_content": "用户当前偏好每天喝咖啡。",
+                            "confidence": 0.92,
+                        },
+                    ),
+                )
+            )
+        revised = snapshot.capability_history[-1]
+        assert revised.ok is True
+        assert revised.data["new_revision"] == 2
+        return ModelDirective(response="我已按你现在的习惯更新理解。")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    result = runtime.run_turn(
+        session_id="current",
+        turn_index=1,
+        user_input="对，之前喝茶，现在改喝咖啡了。",
+        current_topic=None,
+        occurred_at=NOW,
+    )
+
+    assert result.runtime.capability_history[0].name == "revise_claim"
+    assert store.get_payload(old_claim.claim_id, revision=1)["content"] == "用户当前偏好每天喝茶。"
+    assert store.get_payload(old_claim.claim_id)["content"] == "用户当前偏好每天喝咖啡。"
+
+    current_old = index.recall_candidates("每天喝茶", object_types=["claim"])
+    assert old_claim.claim_id not in {hit.object_id for hit in current_old.hits}
+
+    current_new = index.recall_candidates("每天喝咖啡", object_types=["claim"])
+    assert old_claim.claim_id in {hit.object_id for hit in current_new.hits}
