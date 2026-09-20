@@ -1,0 +1,4 @@
+{"event_id":"d01-chat","occurred_at":"2026-04-01T10:00:00+00:00","channel":"conversation","payload":"我一般周末不工作，周六上午通常留给学习。","metadata":{"session":"s1"}}
+{"event_id":"d12-chat","occurred_at":"2026-04-12T18:00:00+00:00","channel":"conversation","payload":"计划变了，接下来两个月每周六上午都要固定开项目会，之前周六上午学习的安排不再适用了。","metadata":{"session":"s2"}}
+{"event_id":"d20-calendar","occurred_at":"2026-04-20T16:00:00+00:00","channel":"calendar","payload":{"title":"项目周会","recurrence":"weekly Saturday morning"},"metadata":{"source":"calendar"}}
+{"event_id":"d25-chat","occurred_at":"2026-04-25T20:00:00+00:00","channel":"conversation","payload":"如果这周想安排一次两小时的学习，什么时候更合适？","metadata":{"session":"s3"}}
