@@ -565,3 +565,175 @@ def test_numeric_contract_rejects_non_finite_values():
             change_threshold=1.0,
             max_gap_seconds=60.0,
         )
+
+
+def test_public_ingest_boundary_revalidates_model_copy_mutations(tmp_path):
+    _, _, service = _world(tmp_path)
+    spec = SourceAdapterSpec(
+        adapter_id="notes.v1",
+        source_kind="note",
+        dimension="dim:notes",
+        source_class=SourceClass.USER,
+        default_modality="text",
+    )
+    record = RealityRecord(
+        external_record_id="note-1",
+        occurred_at=NOW,
+        received_at=NOW,
+        value="合法文本",
+    )
+
+    dirty_spec = spec.model_copy(
+        update={"source_class": SourceClass.AI_COGNITION}
+    )
+    with pytest.raises(ValueError, match="USER or SENSOR"):
+        service.ingest_record(dirty_spec, record)
+
+    dirty_record = record.model_copy(update={"value": b"raw-bytes"})
+    with pytest.raises(ValueError, match="raw binary payloads"):
+        service.ingest_record(spec, dirty_record)
+
+    sensor = SourceAdapterSpec(
+        adapter_id="sensor.hr.v1",
+        source_kind="heart_rate",
+        dimension="dim:heart_rate",
+        source_class=SourceClass.SENSOR,
+        default_modality="numeric",
+    )
+    samples = (
+        NumericSample(
+            external_record_id="hr-1",
+            occurred_at=NOW,
+            value=70.0,
+        ),
+        NumericSample(
+            external_record_id="hr-2",
+            occurred_at=NOW + timedelta(seconds=10),
+            value=71.0,
+        ),
+    )
+    dirty_policy = MechanicalSeriesPolicy(
+        tolerance=2.0,
+        change_threshold=10.0,
+        max_gap_seconds=60.0,
+    ).model_copy(update={"change_threshold": 0.0})
+    with pytest.raises(ValueError):
+        service.ingest_numeric_series(
+            sensor,
+            series_id="dirty-policy-window",
+            samples=samples,
+            policy=dirty_policy,
+            unit="bpm",
+            received_at=NOW + timedelta(minutes=1),
+        )
+
+
+def test_numeric_change_is_not_fabricated_across_unobserved_gap(tmp_path):
+    store, _, service = _world(tmp_path)
+    spec = SourceAdapterSpec(
+        adapter_id="sensor.temperature.v1",
+        source_kind="temperature",
+        dimension="dim:temperature",
+        source_class=SourceClass.SENSOR,
+        default_modality="numeric",
+    )
+    samples = (
+        NumericSample(
+            external_record_id="temp-1",
+            occurred_at=NOW,
+            value=20.0,
+            source_locator="sensor://temperature/temp-1",
+        ),
+        NumericSample(
+            external_record_id="temp-2",
+            occurred_at=NOW + timedelta(minutes=30),
+            value=35.0,
+            source_locator="sensor://temperature/temp-2",
+        ),
+    )
+
+    receipt = service.ingest_numeric_series(
+        spec,
+        series_id="gap-window",
+        samples=samples,
+        policy=MechanicalSeriesPolicy(
+            tolerance=1.0,
+            change_threshold=5.0,
+            max_gap_seconds=60.0,
+        ),
+        unit="C",
+        received_at=NOW + timedelta(minutes=31),
+    )
+
+    assert len(receipt.segment_observation_ids) == 2
+    assert receipt.change_observation_ids == ()
+
+    first_segment = store.get_payload(receipt.segment_observation_ids[0])
+    second_segment = store.get_payload(receipt.segment_observation_ids[1])
+    assert first_segment["metadata"]["source_locators"] == [
+        "sensor://temperature/temp-1"
+    ]
+    assert second_segment["metadata"]["source_locators"] == [
+        "sensor://temperature/temp-2"
+    ]
+
+
+def test_failure_audit_identity_preserves_external_revision_and_adapter_semantics(tmp_path):
+    store, _, service = _world(tmp_path)
+    spec_v1 = SourceAdapterSpec(
+        adapter_id="calendar.v1",
+        source_kind="calendar_event",
+        dimension="dim:calendar",
+        source_class=SourceClass.USER,
+        schema_version="1",
+        default_modality="structured_record",
+    )
+    spec_v2 = spec_v1.model_copy(update={"schema_version": "2"})
+
+    first = service.ingest_mapping(
+        spec_v1,
+        {
+            "external_record_id": "event-1",
+            "external_revision": "1",
+            "occurred_at": NOW,
+            "value": b"invalid-binary",
+            "source_locator": "content://calendar/event-1",
+        },
+        failure_time=NOW,
+    )
+    second = service.ingest_mapping(
+        spec_v1,
+        {
+            "external_record_id": "event-1",
+            "external_revision": "2",
+            "occurred_at": NOW,
+            "value": b"invalid-binary",
+            "source_locator": "content://calendar/event-1",
+        },
+        failure_time=NOW + timedelta(seconds=1),
+    )
+    third = service.ingest_mapping(
+        spec_v2,
+        {
+            "external_record_id": "event-1",
+            "external_revision": "2",
+            "occurred_at": NOW,
+            "value": b"invalid-binary",
+            "source_locator": "content://calendar/event-1",
+        },
+        failure_time=NOW + timedelta(seconds=2),
+    )
+
+    assert len({
+        first.audit_observation_id,
+        second.audit_observation_id,
+        third.audit_observation_id,
+    }) == 3
+
+    p1 = store.get_payload(first.audit_observation_id)
+    p2 = store.get_payload(second.audit_observation_id)
+    p3 = store.get_payload(third.audit_observation_id)
+    assert p1["value"]["external_revision"] == "1"
+    assert p2["value"]["external_revision"] == "2"
+    assert p3["metadata"]["source_schema_version"] == "2"
+    assert p3["metadata"]["failure_digest"]
