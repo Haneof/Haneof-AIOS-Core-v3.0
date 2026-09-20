@@ -22,7 +22,7 @@ from aios_core.runtime.capabilities import CapabilityCall
 from aios_core.runtime.cognitive_runtime import ModelDirective
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
-from aios_core.summaries import MultiScaleSummaryScheduler, SummaryScale
+from aios_core.summaries import MultiScaleSummaryScheduler, SummaryScale, window_bounds
 
 
 UTC = timezone.utc
@@ -240,6 +240,49 @@ def test_multiscale_summary_scheduler_requires_model_text_and_skips_unchanged(tm
     assert len(second.commits) == 0
     assert len(second.skipped_unchanged) == 1
     assert len(calls) == 1
+
+
+def test_all_constitutional_summary_scales_have_stable_utc_windows():
+    cases = {
+        SummaryScale.DAY: (
+            datetime(2026, 9, 20, 0, 0, tzinfo=UTC),
+            datetime(2026, 9, 20, 23, 59, 59, 999999, tzinfo=UTC),
+        ),
+        SummaryScale.WEEK: (
+            datetime(2026, 9, 14, 0, 0, tzinfo=UTC),
+            datetime(2026, 9, 20, 23, 59, 59, 999999, tzinfo=UTC),
+        ),
+        SummaryScale.MONTH: (
+            datetime(2026, 9, 1, 0, 0, tzinfo=UTC),
+            datetime(2026, 9, 30, 23, 59, 59, 999999, tzinfo=UTC),
+        ),
+        SummaryScale.QUARTER: (
+            datetime(2026, 7, 1, 0, 0, tzinfo=UTC),
+            datetime(2026, 9, 30, 23, 59, 59, 999999, tzinfo=UTC),
+        ),
+        SummaryScale.HALF_YEAR: (
+            datetime(2026, 7, 1, 0, 0, tzinfo=UTC),
+            datetime(2026, 12, 31, 23, 59, 59, 999999, tzinfo=UTC),
+        ),
+        SummaryScale.YEAR: (
+            datetime(2026, 1, 1, 0, 0, tzinfo=UTC),
+            datetime(2026, 12, 31, 23, 59, 59, 999999, tzinfo=UTC),
+        ),
+        SummaryScale.MULTI_YEAR_3Y: (
+            datetime(2025, 1, 1, 0, 0, tzinfo=UTC),
+            datetime(2027, 12, 31, 23, 59, 59, 999999, tzinfo=UTC),
+        ),
+        SummaryScale.MULTI_YEAR_5Y: (
+            datetime(2025, 1, 1, 0, 0, tzinfo=UTC),
+            datetime(2029, 12, 31, 23, 59, 59, 999999, tzinfo=UTC),
+        ),
+        SummaryScale.DECADE: (
+            datetime(2020, 1, 1, 0, 0, tzinfo=UTC),
+            datetime(2029, 12, 31, 23, 59, 59, 999999, tzinfo=UTC),
+        ),
+    }
+    for scale, expected in cases.items():
+        assert window_bounds(NOW, scale) == expected
 
 
 def test_fused_runtime_exposes_and_executes_new_constitutional_capabilities(tmp_path):
