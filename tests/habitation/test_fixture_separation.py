@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from .io import load_events_jsonl
+from .io import load_resident_events_jsonl
 
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -14,7 +14,7 @@ MANIFEST = FIXTURES / "learning_independence_v1.manifest.json"
 
 def test_resident_fixture_contains_only_deliverable_life_events() -> None:
     resident_text = RESIDENT.read_text(encoding="utf-8")
-    events = load_events_jsonl(resident_text)
+    events = load_resident_events_jsonl(resident_text)
 
     assert len(events) == 5
     assert all(event.deliver_to_resident for event in events)
@@ -68,7 +68,7 @@ def test_catalog_scenarios_have_separate_resident_and_oracle_files() -> None:
         assert oracle_path.exists()
         assert resident_path != oracle_path
 
-        events = load_events_jsonl(resident_path.read_text(encoding="utf-8"))
+        events = load_resident_events_jsonl(resident_path.read_text(encoding="utf-8"))
         assert events
         assert all(event.deliver_to_resident for event in events)
         assert all(not event.hidden_oracle for event in events)
