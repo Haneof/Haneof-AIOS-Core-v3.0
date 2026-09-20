@@ -25,4 +25,4 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: pip install -e ".[dev]"
       - name: Run P16 harness contract tests
-        run: pytest tests/habitation/test_harness_contract.py
+        run: pytest tests/habitation
