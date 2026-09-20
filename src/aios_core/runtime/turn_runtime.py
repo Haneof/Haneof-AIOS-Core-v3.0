@@ -12,6 +12,11 @@ from dataclasses import asdict, dataclass
 from datetime import datetime
 from typing import Any, Mapping, Sequence
 
+from aios_core.ai_world import (
+    AIWorldClaimRequest,
+    AIWorldCognitionService,
+    AIWorldDomain,
+)
 from aios_core.context.controller import ContextController, ModelContextBundle
 from aios_core.ingest.conversation import ConversationCommit, ConversationIngestor
 from aios_core.projections.all_dimensions import AllDimensionsProjectionService
@@ -71,6 +76,11 @@ class FusedTurnRuntime:
             index=index,
             subject_id=subject_id,
         )
+        self.ai_world = AIWorldCognitionService(
+            store=store,
+            index=index,
+            user_id=subject_id,
+        )
         self.revision = CognitionRevisionService(
             store=store,
             index=index,
@@ -96,6 +106,22 @@ class FusedTurnRuntime:
                 input_schema={"object_id": "string", "revision": "integer?"},
             ),
             self._inspect_world_object,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="read_ai_world",
+                description=(
+                    "Read current evidence-grounded AI cognition across user understanding, "
+                    "relationship, self, intent, strategy, boundary, personality and calibration."
+                ),
+                kind=CapabilityKind.READ,
+                input_schema={
+                    "domains": "array[string]?",
+                    "scope_key": "string?",
+                    "limit": "integer?",
+                },
+            ),
+            self._read_ai_world,
         )
         registry.register(
             CapabilitySpec(
@@ -133,6 +159,28 @@ class FusedTurnRuntime:
                 },
             ),
             self._commit_claim,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="commit_ai_world_claim",
+                description=(
+                    "Persist a typed AI-world cognition using the unified "
+                    "EvidenceSet + Claim + Dependency path."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "domain": "user_understanding|relationship|self|intent|strategy|cognitive_boundary|personality|calibration",
+                    "statement": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "confidence": "number[0,1]",
+                    "knowledge_state": "string?",
+                    "claim_type": "string?",
+                    "scope_key": "string?",
+                    "tags": "array[string]?",
+                },
+            ),
+            self._commit_ai_world_claim,
         )
         registry.register(
             CapabilitySpec(
@@ -203,6 +251,26 @@ class FusedTurnRuntime:
     ) -> dict[str, Any]:
         return self.store.get_payload(str(object_id), revision=revision)
 
+    def _read_ai_world(
+        self,
+        domains: Sequence[str] | None = None,
+        scope_key: str | None = None,
+        limit: int = 50,
+    ) -> list[dict[str, Any]]:
+        parsed = (
+            None
+            if domains is None
+            else [AIWorldDomain(str(domain)) for domain in domains]
+        )
+        return [
+            item.model_dump(mode="json")
+            for item in self.ai_world.current(
+                domains=parsed,
+                scope_key=scope_key,
+                limit=max(1, min(int(limit), 200)),
+            )
+        ]
+
     def _request_all_dimensions_projection(
         self,
         dimensions: Sequence[str],
@@ -224,7 +292,47 @@ class FusedTurnRuntime:
         # Internal cognition writeback is allowed because the handler itself enforces
         # pinned evidence and writes only revisable cognition. External actions stay
         # denied until a separate capability-specific authorization layer exists.
-        return spec.name in {"commit_claim", "revise_claim", "retract_claim"}
+        return spec.name in {
+            "commit_claim",
+            "commit_ai_world_claim",
+            "revise_claim",
+            "retract_claim",
+        }
+
+    def _commit_ai_world_claim(
+        self,
+        domain: str,
+        statement: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        confidence: float,
+        knowledge_state: str = "inferred",
+        claim_type: str = "inference",
+        scope_key: str | None = None,
+        tags: Sequence[str] = (),
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError(
+                "commit_ai_world_claim is only available during an active AIOS turn"
+            )
+        receipt = self.ai_world.commit(
+            AIWorldClaimRequest(
+                domain=AIWorldDomain(domain),
+                statement=statement,
+                evidence_refs=self._coerce_refs(evidence_refs),
+                confidence=float(confidence),
+                knowledge_state=knowledge_state,
+                claim_type=claim_type,
+                scope_key=scope_key,
+                tags=tuple(tags),
+            ),
+            learned_at=self._active_turn_time,
+        )
+        return {
+            "domain": receipt.domain.value,
+            "dimension": receipt.dimension,
+            "subject_id": receipt.subject_id,
+            "claim": asdict(receipt.claim),
+        }
 
     def _commit_claim(
         self,
