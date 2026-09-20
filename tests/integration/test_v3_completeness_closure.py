@@ -375,6 +375,56 @@ def test_summary_source_cap_fails_closed_instead_of_publishing_partial_current(t
     assert result.commits == ()
 
 
+def test_late_overflow_marks_existing_summary_stale(tmp_path):
+    store, index = _world(tmp_path)
+    ingest = ConversationIngestor(store)
+    old_day = NOW - timedelta(days=1)
+    ingest.commit_turn(
+        session_id="dense-first",
+        turn_index=1,
+        user_text="first user fact",
+        assistant_text="first assistant fact",
+        occurred_at=old_day,
+    )
+    index.rebuild()
+
+    scheduler = MultiScaleSummaryScheduler(
+        store=store,
+        index=index,
+        summary_handler=lambda prepared: f"complete {len(prepared.sources)}",
+        max_source_objects=2,
+    )
+    first = scheduler.run_due(
+        now=NOW,
+        scales=(SummaryScale.DAY,),
+        dimensions=(INTERACTION_DIMENSION,),
+    )
+    assert len(first.commits) == 1
+    first_summary = store.get_payload(first.commits[0].object_id)
+    assert first_summary["summary_status"] == "current"
+
+    ingest.commit_turn(
+        session_id="dense-late",
+        turn_index=1,
+        user_text="late user fact",
+        assistant_text="late assistant fact",
+        occurred_at=old_day + timedelta(hours=1),
+        recorded_at=NOW + timedelta(minutes=1),
+    )
+    index.catch_up()
+
+    second = scheduler.run_due(
+        now=NOW + timedelta(minutes=2),
+        scales=(SummaryScale.DAY,),
+        dimensions=(INTERACTION_DIMENSION,),
+    )
+    assert second.truncated is True
+    latest = store.get_payload(first.commits[0].object_id)
+    assert latest["revision"] == 2
+    assert latest["summary_status"] == "stale"
+    assert latest["metadata"]["stale_due_to_incomplete_source_window"] is True
+
+
 def test_event_transition_matrix_blocks_terminal_backjump(tmp_path):
     store, index = _world(tmp_path)
     user_ref, _ = _user_fact(store)
