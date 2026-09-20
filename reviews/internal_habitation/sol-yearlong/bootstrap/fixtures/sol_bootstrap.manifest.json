@@ -5,6 +5,6 @@
   "subject_id": "sol-resident-20260921-001",
   "resident_stream": "resident/sol_bootstrap.jsonl",
   "evaluator_oracle": "oracle/sol_bootstrap.json",
-  "purpose": "Bootstrap the GPT-5.6 Sol reviewer as a real Resident before the full year-long unique-life run",
-  "end_at": "2027-01-08T23:00:00+00:00"
+  "purpose": "Continue the same unique GPT-5.6 Sol Resident life through Jan 15 with action-boundary, correction, sensor, task and evidence-discipline opportunities",
+  "end_at": "2027-01-15T23:00:00+00:00"
 }
