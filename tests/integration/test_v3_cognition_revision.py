@@ -238,7 +238,7 @@ def test_stale_dependent_can_be_re_evaluated_into_new_active_revision(tmp_path):
     assert second.previous_revision == 2
     assert second.new_revision == 3
 
-    current_tea = index.recall_candidates("以茶为主", object_types=["claim"])
+    current_tea = index.recall_candidates("以茶", object_types=["claim"])
     assert b.claim_id not in {hit.object_id for hit in current_tea.hits}
 
     current_coffee = index.recall_candidates("以咖啡为主", object_types=["claim"])
