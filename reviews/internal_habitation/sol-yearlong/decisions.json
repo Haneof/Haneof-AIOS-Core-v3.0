@@ -597,5 +597,28 @@
         }
       }
     ]
+  },
+  "c7b746f0a63fd19db7633aea116ed0f362a3c07197bd6a19855bb324d6a13c69": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_goal",
+        "call_id": "sol-jan10-activate-morning-rush-goal",
+        "arguments": {
+          "goal_ref": {
+            "object_id": "goal_8b8054b3dde98cb765ed8cb2",
+            "revision": 1
+          },
+          "new_status": "active",
+          "reason": "The user explicitly said this is the current highest-priority operating objective and explicitly deferred menu expansion.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_abc43111f1a6bae550d02ee1",
+              "revision": 1
+            }
+          ]
+        }
+      }
+    ]
   }
 }
