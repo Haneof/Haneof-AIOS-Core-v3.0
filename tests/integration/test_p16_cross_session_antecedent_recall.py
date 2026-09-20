@@ -95,7 +95,7 @@ def test_cross_session_deictic_followup_gets_bounded_antecedent_candidates(tmp_p
         occurred_at=NOW,
     )
 
-    assert result.recommendation.reason == "cross_session_antecedent_candidates"
+    assert result.recommendation.reason == "topic_matched_history_with_antecedent_candidates"
     assert result.runtime.capability_history == ()
 
 
