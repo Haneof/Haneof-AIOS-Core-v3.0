@@ -210,6 +210,22 @@ class FusedTurnRuntime:
         )
         registry.register(
             CapabilitySpec(
+                name="search_conversation_summaries",
+                description=(
+                    "Search same-session round-summary indexes by topic/text, then "
+                    "drill down to exact pinned raw dialogue when precision is needed."
+                ),
+                kind=CapabilityKind.READ,
+                input_schema={
+                    "query": "string",
+                    "session_id": "string?",
+                    "limit": "integer?",
+                },
+            ),
+            self._search_conversation_summaries,
+        )
+        registry.register(
+            CapabilitySpec(
                 name="drill_down_conversation",
                 description=(
                     "Read exact pinned raw dialogue behind a same-session round summary, "
@@ -599,6 +615,30 @@ class FusedTurnRuntime:
             session_id=active_session,
         )
         return [dict(item) for item in summaries[-bounded:]]
+
+    def _search_conversation_summaries(
+        self,
+        query: str,
+        session_id: str | None = None,
+        limit: int = 8,
+    ) -> list[dict[str, Any]]:
+        active_session = (
+            str(session_id).strip()
+            if session_id is not None and str(session_id).strip()
+            else self._active_session_id
+        )
+        if active_session is None:
+            raise ValueError(
+                "session_id is required outside an active turn"
+            )
+        return [
+            dict(item)
+            for item in self.continuity.search_round_summaries(
+                session_id=active_session,
+                query=str(query),
+                limit=max(1, min(int(limit), 20)),
+            )
+        ]
 
     def _drill_down_conversation(
         self,
@@ -1126,11 +1166,21 @@ class FusedTurnRuntime:
         )
         self.index.catch_up()
 
+        effective_token_budget = (
+            self.context_controller.default_token_budget
+            if token_budget is None
+            else int(token_budget)
+        )
+        summary_trigger_tokens = max(
+            128,
+            int(effective_token_budget * 0.65),
+        )
         continuity_snapshot = self.continuity.snapshot(
             session_id=session,
             before_turn=turn_index,
             recent_turn_limit=self.recent_turn_limit,
             summary_chunk_turns=self.summary_chunk_turns,
+            summary_trigger_tokens=summary_trigger_tokens,
         )
 
         recommendation = self.recommender.recommend(
@@ -1155,6 +1205,7 @@ class FusedTurnRuntime:
             "recent_turn_count": len(continuity_snapshot.recent_turns),
             "round_summary_count": len(continuity_snapshot.round_summaries),
             "summary_index_capability": "list_conversation_summaries",
+            "summary_search_capability": "search_conversation_summaries",
             "raw_drill_down_capability": "drill_down_conversation",
             "pending_round_summary": (
                 None
@@ -1230,6 +1281,7 @@ class FusedTurnRuntime:
                         before_turn=turn_index + 1,
                         recent_turn_limit=self.recent_turn_limit,
                         summary_chunk_turns=self.summary_chunk_turns,
+                        summary_trigger_tokens=summary_trigger_tokens,
                     )
                     if request is None:
                         break
