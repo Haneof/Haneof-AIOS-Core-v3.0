@@ -48,7 +48,8 @@ def _dt(value: str) -> datetime:
     store = SQLiteWorldStore(db)
     index = WorldSearchIndex(db, store=store)
     index.rebuild()
-    reality = RealityIngestService(store=store, index=index)
+    subject_id = "synthetic-user-001"
+    reality = RealityIngestService(store=store, index=index, subject_id=subject_id)
 
     adapters = {
         "calendar": SourceAdapterSpec(
@@ -195,7 +196,7 @@ def _dt(value: str) -> datetime:
 
         if event_id == "e07":
             if not history:
-                dim_ref = state["dimension_ref"]
+                # All world facts in this experiment must belong to one resident subject.\n    assert {item.get("subject_id") for item in store.list_payloads() if item.get("subject_id")} == {subject_id}\n\n    dim_ref = state["dimension_ref"]
                 return ModelDirective(
                     capability_calls=(
                         CapabilityCall(
@@ -265,7 +266,7 @@ def _dt(value: str) -> datetime:
         store=store,
         index=index,
         model_handler=model,
-        subject_id="synthetic-user-001",
+        subject_id=subject_id,
         max_tool_rounds=6,
     )
 
