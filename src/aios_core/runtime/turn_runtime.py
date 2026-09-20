@@ -38,7 +38,11 @@ from aios_core.execution import (
     TaskCreateRequest,
     TaskTransitionRequest,
 )
-from aios_core.ingest.conversation import ConversationCommit, ConversationIngestor
+from aios_core.ingest.conversation import (
+    INTERACTION_DIMENSION,
+    ConversationCommit,
+    ConversationIngestor,
+)
 from aios_core.policy import (
     CognitivePolicyCreateRequest,
     CognitivePolicyRegistry,
@@ -2002,7 +2006,18 @@ class FusedTurnRuntime:
         self,
         user_input: str,
     ) -> tuple[bool, str | None]:
-        """Return exact durable-world anchor signals without semantic guessing."""
+        """Return mechanical current-world anchor signals without semantic guessing.
+
+        Exact named anchors remain the strongest signal. When the user does not repeat
+        an object's full title/name, Core may still open the history gate if the
+        current utterance has at least two lexical-token overlaps with a *current*
+        durable world anchor. This is candidate retrieval only: it decides whether
+        historical context may help; it does not decide what the evidence means.
+
+        Conversation Observations are deliberately excluded from this fallback so a
+        long chat history cannot silently reopen proactive recall. Non-conversation
+        Observations (calendar/sensor/platform/etc.) may act as factual world anchors.
+        """
 
         current = " ".join(str(user_input).strip().split()).casefold()
         if not current:
@@ -2032,6 +2047,56 @@ class FusedTurnRuntime:
         for task in self.execution_world.current_tasks():
             if mentioned(task.title):
                 return True, "explicit_task_anchor"
+
+        # P16 habitation exposed a false negative where a planning question depended
+        # on a revised current Claim but did not repeat the later schedule/event title.
+        # Use the same public lexical index as recommendation, restricted to current
+        # visible structured anchors. A score >= 2 means at least two independent
+        # index tokens overlap; Core still does not infer relevance or causality.
+        structured_types = (
+            ObjectType.CLAIM.value,
+            ObjectType.EVENT.value,
+            ObjectType.GOAL.value,
+            ObjectType.TASK.value,
+            ObjectType.ENTITY.value,
+            ObjectType.RELATION.value,
+        )
+        structured_page = self.index.recall_candidates(
+            current,
+            subject=self.subject_id,
+            object_types=structured_types,
+            limit=8,
+        )
+        if any(hit.score >= 2 for hit in structured_page.hits):
+            return True, "indexed_current_world_anchor"
+
+        # External factual observations may also carry current state (for example a
+        # calendar entry). Old conversation turns are intentionally not eligible here;
+        # those remain available through explicit history cues or model deep search.
+        observation_page = self.index.recall_candidates(
+            current,
+            subject=self.subject_id,
+            object_types=(ObjectType.OBSERVATION.value,),
+            limit=16,
+        )
+        for hit in observation_page.hits:
+            if hit.score < 2:
+                continue
+            payload = self.store.get_payload(hit.object_id, revision=hit.revision)
+            source_kind = str(payload.get("source_kind") or "").strip().casefold()
+            metadata = payload.get("metadata")
+            if not isinstance(metadata, Mapping):
+                metadata = {}
+            dimension = str(metadata.get("dimension") or "").strip()
+            # ConversationIngestor uses source_kind="user_ai_interaction"; the
+            # canonical interaction dimension is the stronger guard because it
+            # survives compatible ingestors that choose a different source label.
+            if (
+                source_kind in {"conversation", "user_ai_interaction"}
+                or dimension == INTERACTION_DIMENSION
+            ):
+                continue
+            return True, "indexed_external_observation_anchor"
 
         return False, None
 
