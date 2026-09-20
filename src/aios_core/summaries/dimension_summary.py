@@ -117,6 +117,19 @@ def _occurred_start(payload: dict[str, Any]) -> datetime | None:
     return None
 
 
+_SUMMARY_SCALE_RANK = {
+    "day": 0,
+    "week": 1,
+    "month": 2,
+    "quarter": 3,
+    "half_year": 4,
+    "year": 5,
+    "multi_year": 6,
+    "multi_year_3y": 6,
+    "multi_year_5y": 7,
+    "decade": 8,
+}
+
 _PRECISION = {
     "day": TimePrecision.DAY,
     "week": TimePrecision.WEEK,
@@ -164,19 +177,51 @@ class DimensionSummaryService:
             raise ValueError("window_end must not be before window_start")
 
         source_world_revision = int(self.store.current_world_revision())
+        target_summary_id = "sum_" + _stable_id(
+            dimension,
+            granularity,
+            start.isoformat(),
+            end.isoformat(),
+        )
+        target_rank = _SUMMARY_SCALE_RANK.get(granularity)
+
+        # Fetch a bounded superset because same/higher-level Summary objects are
+        # intentionally excluded below. Computing truncation before this filter can
+        # both publish self-dependencies and hide valid lower-level sources.
+        scan_limit = max(
+            self.max_source_objects + 1,
+            min(10_000, self.max_source_objects * 8 + 64),
+        )
         page = self.index.search_mind(
             subject=self.subject_id,
             dimension=dimension,
             time_range=(start, end),
-            limit=self.max_source_objects + 1,
+            limit=scan_limit,
         )
 
-        truncated = len(page.hits) > self.max_source_objects
-        sources: list[DimensionSummarySource] = []
-        for hit in page.hits[: self.max_source_objects]:
-            if hit.object_type == "summary" and not include_summary_sources:
+        eligible: list[tuple[Any, dict[str, Any]]] = []
+        for hit in page.hits:
+            if hit.object_id == target_summary_id:
                 continue
             payload = self.store.get_payload(hit.object_id, revision=hit.revision)
+            if hit.object_type == "summary":
+                if not include_summary_sources:
+                    continue
+                source_granularity = str(payload.get("granularity") or "")
+                source_rank = _SUMMARY_SCALE_RANK.get(source_granularity)
+                # Summary aggregation is strictly bottom-up. Equal/higher scale
+                # summaries can create direct self-dependency or inter-scale cycles.
+                if (
+                    target_rank is None
+                    or source_rank is None
+                    or source_rank >= target_rank
+                ):
+                    continue
+            eligible.append((hit, payload))
+
+        truncated = len(eligible) > self.max_source_objects
+        sources: list[DimensionSummarySource] = []
+        for hit, payload in eligible[: self.max_source_objects]:
             metadata = payload.get("metadata")
             sources.append(
                 DimensionSummarySource(
