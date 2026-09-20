@@ -243,6 +243,38 @@ class AIWorldCognitionService:
         )
         return tuple(views[: max(0, int(limit))])
 
+    def core_context(
+        self,
+        *,
+        per_domain: int = 3,
+    ) -> dict[str, list[dict[str, Any]]]:
+        """Return only explicitly tagged identity/relationship continuity cognition.
+
+        New sessions must not preload the user's entire AI-world profile. Claims enter
+        this compact continuity view only when their durable tags contain
+        the core_context marker.
+        """
+        if per_domain < 1:
+            raise ValueError("per_domain must be >= 1")
+
+        result: dict[str, list[dict[str, Any]]] = {}
+        for domain in (
+            AIWorldDomain.USER_UNDERSTANDING,
+            AIWorldDomain.RELATIONSHIP,
+            AIWorldDomain.SELF,
+        ):
+            selected = [
+                item
+                for item in self.current(domains=[domain], limit=200)
+                if "core_context" in item.tags
+            ][:per_domain]
+            if selected:
+                result[domain.value] = [
+                    item.model_dump(mode="json")
+                    for item in selected
+                ]
+        return result
+
     def snapshot(
         self,
         *,
