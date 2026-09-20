@@ -956,10 +956,15 @@ class ProviderRoundSummaryHandler:
             else _safe_json_value(request)
         )
         prompt = _canonical_json(model_input)
+        purpose = (
+            "dimension_summary"
+            if hasattr(request, "granularity") and hasattr(request, "sources")
+            else "round_summary"
+        )
         return self.client.complete_text(
             system_instruction=_summary_system_instruction(),
             input_text=prompt,
-            purpose="round_summary",
+            purpose=purpose,
         )
 
 
