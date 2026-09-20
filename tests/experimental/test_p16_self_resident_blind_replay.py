@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from aios_core.contracts.enums import SourceClass
 from aios_core.ingest import RealityIngestService, RealityRecord, SourceAdapterSpec
 from aios_core.query.search import WorldSearchIndex
+from aios_core.review import ReviewSchedulePolicy
 from aios_core.runtime.capabilities import CapabilityCall
 from aios_core.runtime.cognitive_runtime import ModelDirective
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
@@ -40,10 +41,11 @@ def test_frozen_self_resident_blind_replay_reaches_real_world_and_exposes_wake_g
     AIOS Core can carry those frozen decisions through real WorldStore/Runtime
     mechanics.
 
-    Expected architectural finding: non-conversation reality facts are persisted,
-    but they do not independently wake the Resident Runtime yet. Therefore the
-    final e11 note is present in WorldStore but cannot create the frozen task
-    candidate until a later user turn or future periodic/event review stage.
+    Constitutional wake semantics are tested explicitly: the final non-conversation
+    Note must enter WorldStore without directly waking the model; a later periodic
+    review Wake may bring that new evidence back to the same Resident Runtime, which
+    may then create a follow-up Task. The remaining question is whether a due
+    TASK_DUE Wake has a generic dispatcher back into Resident cognition.
     """
 
     db = tmp_path / "world.db"
@@ -93,8 +95,52 @@ def test_frozen_self_resident_blind_replay_reaches_real_world_and_exposes_wake_g
         return dict(snapshot.cockpit["task_context"]["current_user_observation_ref"])
 
     def model(snapshot):
-        event_id = plan["event_id"]
         history = snapshot.capability_history
+
+        if snapshot.wake_reason == "periodic_review":
+            if not history:
+                return ModelDirective(
+                    capability_calls=(
+                        CapabilityCall(
+                            name="read_periodic_review_anchors",
+                            arguments={"offset": 0, "limit": 50},
+                        ),
+                    )
+                )
+            if len(history) == 1:
+                anchors = history[-1].data
+                note_anchor = next(
+                    item
+                    for item in anchors
+                    if item["object_ref"]["object_id"]
+                    == reality_refs["e11"]["object_id"]
+                )
+                goal_ref = state["goal_ref"]
+                return ModelDirective(
+                    capability_calls=(
+                        CapabilityCall(
+                            name="create_task",
+                            arguments={
+                                "title": "下月复核并恢复周三晚固定活动",
+                                "task_type": "follow_up",
+                                "reason_refs": [note_anchor["object_ref"]],
+                                "goal_ref": goal_ref,
+                                "initial_state": "waiting_time",
+                                "priority": 60,
+                                "next_wake_at": "2026-12-03T10:30:00+00:00",
+                                "next_step": (
+                                    "确认家庭恢复情况是否继续稳定；"
+                                    "若稳定，再决定恢复周三晚固定活动。"
+                                ),
+                            },
+                        ),
+                    )
+                )
+            return ModelDirective(
+                response="周期复盘已把这条条件性未来事项转成待唤醒跟进任务。"
+            )
+
+        event_id = plan["event_id"]
         now_ref = current_ref(snapshot)
 
         if event_id == "e02":
@@ -393,12 +439,54 @@ def test_frozen_self_resident_blind_replay_reaches_real_world_and_exposes_wake_g
         reality_refs["e11"]["object_id"]
     )["value"]
 
+    # Constitution: ordinary Observation ingestion does not directly Wake the model.
+    # At this exact point e11 is stored, but no Task exists yet.
+    objects_before_review = store.list_payloads()
+    assert not any(item.get("object_type") == "task" for item in objects_before_review)
+
+    # P15 supplies the constitutional background Wake path. The same resident
+    # Runtime now sees the new Note during periodic review and may form future work.
+    review = runtime.run_periodic_review(
+        now=_dt("2026-11-27T10:30:00+00:00"),
+        policy=ReviewSchedulePolicy(
+            interval_hours=24,
+            lookback_hours=24 * 90,
+            max_candidates=80,
+            max_per_object_type=20,
+        ),
+    )
+    assert review is not None
+    assert review.runtime.wake_reason == "periodic_review"
+    assert [
+        item.name for item in review.runtime.capability_history
+    ] == ["read_periodic_review_anchors", "create_task"]
+
+    task_receipt = review.runtime.capability_history[1].data
+    state["follow_up_task_ref"] = {
+        "object_id": task_receipt["task_id"],
+        "revision": task_receipt["revision"],
+    }
+    task_v1 = store.get_payload(task_receipt["task_id"], revision=1)
+    assert task_v1["task_state"] == "waiting_time"
+    assert task_v1["task_type"] == "follow_up"
+    assert "恢复周三晚固定活动" in task_v1["title"]
+
+    # P12 scheduler correctly turns the due Task into a durable TASK_DUE Wake.
+    due = runtime.execution_world.wake_due_tasks(
+        now=_dt("2026-12-03T10:31:00+00:00")
+    )
+    assert len(due) == 1
+    assert due[0].task_id == task_receipt["task_id"]
+    assert due[0].new_state == "ready"
+    wake_payload = store.get_payload(due[0].wake_id)
+    assert wake_payload["object_type"] == "wake"
+    assert wake_payload["wake_source"] == "task_due"
+    assert wake_payload["wake_state"] == "new"
+
+    # Current Core has special entry points for user interaction and periodic
+    # review, but no generic dispatcher that consumes an arbitrary durable Wake.
+    # This is the precise remaining C09 integration gap exposed by the experiment.
+    assert not hasattr(runtime, "run_wake")
+
     objects = store.list_payloads()
     assert not any(item.get("object_type") == "action" for item in objects)
-
-    # Architectural finding from this self-test:
-    # e11 is a non-conversation reality fact and no later user turn occurs.
-    # Current Core persists it, but does not autonomously wake resident cognition
-    # to create the frozen conditional task candidate. P15 periodic/event review
-    # (or an equivalent resident wake path) is still required for that closure.
-    assert not any(item.get("object_type") == "task" for item in objects)
