@@ -1652,5 +1652,26 @@
   "9aecce0022bacc8d446004a001f05acce16c1d450b2d0b5a70789b0b53f9be85": {
     "kind": "summary",
     "summary": "2027-01-09，用户报告面粉已顺利收到、妹妹已于前一晚接到，并明确认可 AIOS 在时间未确认时没有先断言两个安排冲突；用户要求以后类似未确认时间的事情不要先用冲突或吓人的方式表达。AIOS回应将区分已确认与未确认信息，并在缺少具体时间依据时不先描述为冲突。"
+  },
+  "7ff90b6206817f02c199376c04dc1d7480aadf56aeb132a300ea04809d92baeb": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "propose_goal",
+        "call_id": "sol-jan10-goal-stabilize-morning-rush",
+        "arguments": {
+          "title": "先稳定早高峰出品",
+          "description": "用户明确表示开店比预期更忙，当前优先把早高峰出品稳定住；此前考虑的菜单新品扩张暂时放后。",
+          "source_type": "user_explicit",
+          "confidence": 0.99,
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_abc43111f1a6bae550d02ee1",
+              "revision": 1
+            }
+          ]
+        }
+      }
+    ]
   }
 }
