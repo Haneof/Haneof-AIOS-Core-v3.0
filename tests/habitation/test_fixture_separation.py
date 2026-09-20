@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from .evaluation import ORACLE_SCHEMA_V1, oracle_criteria
 from .io import load_fixture_bundle, load_resident_events_jsonl
 
 
@@ -77,6 +78,10 @@ def test_catalog_scenarios_have_separate_resident_and_oracle_files() -> None:
         oracle = json.loads(oracle_path.read_text(encoding="utf-8"))
         assert oracle["scenario_id"] == entry["scenario_id"]
         assert oracle["latent_truth"]["evaluation_only"] is True
+        assert oracle["evaluation_schema"] == ORACLE_SCHEMA_V1
+        assert isinstance(oracle["criteria"], list)
+        assert oracle["criteria"]
+        assert len(oracle["criteria"]) == len(set(oracle["criteria"]))
 
 
 def test_catalog_focuses_on_behavior_not_expected_response_strings() -> None:
@@ -131,6 +136,7 @@ def test_every_catalog_fixture_bundle_has_matching_resident_and_oracle_identity(
         assert scenario.hidden_oracle["scenario_version"] == manifest.scenario_version
         assert scenario.hidden_oracle["seed"] == manifest.seed
         assert scenario.hidden_oracle["subject_id"] == manifest.subject_id
+        assert oracle_criteria(scenario)
         assert all(not event.hidden_oracle for event in scenario.events)
 
 
