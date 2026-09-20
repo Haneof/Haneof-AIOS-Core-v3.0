@@ -412,3 +412,22 @@ def test_target_isolation_key_must_be_explicit_string() -> None:
             scenario=scenario,
             targets={"model": BadTarget("bad")},
         )
+
+
+def test_factory_does_not_receive_invalid_model_id() -> None:
+    scenario = _scenario()
+    called = False
+
+    class Factory:
+        def __call__(self, *, model_id: str, scenario):
+            nonlocal called
+            called = True
+            return RecordingTarget("should-not-run")
+
+    with pytest.raises(ValueError, match="model_id must be a non-empty string"):
+        HabitationRunner().run_model_factories(
+            scenario=scenario,
+            factories={"": Factory()},
+        )
+
+    assert called is False
