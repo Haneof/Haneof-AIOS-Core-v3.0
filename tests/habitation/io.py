@@ -138,6 +138,22 @@ def load_events_jsonl(text: str) -> tuple[LifeEvent, ...]:
     return tuple(events)
 
 
+def load_resident_events_jsonl(text: str) -> tuple[LifeEvent, ...]:
+    """Load a model-side event stream and reject any evaluator-only content."""
+
+    events = load_events_jsonl(text)
+    for event in events:
+        if event.hidden_oracle:
+            raise ValueError(
+                f"resident event {event.event_id} must not contain hidden_oracle"
+            )
+        if not event.deliver_to_resident:
+            raise ValueError(
+                f"resident event {event.event_id} must be deliverable"
+            )
+    return events
+
+
 def _resident_event_dict(event: ResidentEvent) -> dict[str, Any]:
     return {
         "event_id": event.event_id,
