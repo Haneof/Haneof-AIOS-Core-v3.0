@@ -23,10 +23,15 @@ class RecordingTarget:
         self.label = label
         self._isolation_key = isolation_key or f"world:{label}:{id(self)}"
         self.events: list[ResidentEvent] = []
+        self.clock: list[datetime] = []
 
     @property
     def isolation_key(self) -> str:
         return self._isolation_key
+
+    def advance_to(self, instant: datetime):
+        self.clock.append(instant)
+        return {"advanced_to": instant.isoformat()}
 
     def handle_event(self, event: ResidentEvent):
         self.events.append(event)
@@ -34,6 +39,12 @@ class RecordingTarget:
             "model": self.label,
             "event_id": event.event_id,
             "free_form_response": f"{self.label} observed {event.channel}",
+        }
+
+    def audit_snapshot(self):
+        return {
+            "events_seen": [event.event_id for event in self.events],
+            "last_clock": self.clock[-1].isoformat() if self.clock else None,
         }
 
 
@@ -109,10 +120,16 @@ def test_runner_does_not_require_a_fixed_expected_answer() -> None:
     class FreeFormTarget:
         isolation_key = "world:free-form"
 
+        def advance_to(self, instant: datetime):
+            return {"advanced_to": instant.isoformat()}
+
         def handle_event(self, event: ResidentEvent):
             if event.channel == "conversation":
                 return "I may need more evidence before changing my understanding."
             return {"tool_calls": [], "notes": ["calendar event stored"]}
+
+        def audit_snapshot(self):
+            return {"status": "ok"}
 
     run = HabitationRunner().run(
         scenario=scenario,
