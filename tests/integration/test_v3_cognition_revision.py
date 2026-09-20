@@ -13,6 +13,7 @@ from aios_core.revision.service import (
     STATUS_REVIEW_REQUIRED,
 )
 from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.summaries.dimension_summary import DimensionSummaryService
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 
 
@@ -243,3 +244,67 @@ def test_stale_dependent_can_be_re_evaluated_into_new_active_revision(tmp_path):
 
     current_coffee = index.recall_candidates("以咖啡为主", object_types=["claim"])
     assert b.claim_id in {hit.object_id for hit in current_coffee.hits}
+
+
+def test_claim_revision_stales_dependent_summary_then_summary_can_rebuild(tmp_path):
+    store, index, _, correction, a, _ = _seed_world(tmp_path)
+
+    summaries = DimensionSummaryService(store=store, index=index)
+    window_start = NOW - timedelta(days=10)
+    window_end = NOW - timedelta(days=7)
+
+    prepared = summaries.prepare(
+        dimension="dim:ai_user_understanding",
+        granularity="week",
+        window_start=window_start,
+        window_end=window_end,
+    )
+    assert any(item.object_id == a.claim_id for item in prepared.sources)
+
+    first_summary = summaries.commit(
+        prepared,
+        content="这一阶段AI理解为：用户当前饮品偏好以茶为主。",
+        generated_at=NOW - timedelta(days=7),
+    )
+    assert store.get_payload(first_summary.object_id)["summary_status"] == "current"
+
+    revision = CognitionRevisionService(store=store, index=index)
+    revision.apply(
+        ClaimRevisionRequest(
+            target_ref=ObjectRef(object_id=a.claim_id, revision=1),
+            mode="revise",
+            reason="用户明确更新当前饮品习惯",
+            evidence_refs=(ObjectRef(object_id=correction.object_id, revision=1),),
+            replacement_content="用户当前偏好每天喝咖啡。",
+            confidence=0.9,
+        ),
+        changed_at=NOW,
+    )
+
+    stale_summary = store.get_payload(first_summary.object_id)
+    assert stale_summary["revision"] == 2
+    assert stale_summary["summary_status"] == "stale"
+    assert stale_summary["status"] == STATUS_REVIEW_REQUIRED
+
+    current_old_summary = index.recall_candidates(
+        "饮品偏好以茶",
+        object_types=["summary"],
+    )
+    assert first_summary.object_id not in {hit.object_id for hit in current_old_summary.hits}
+
+    rebuilt_input = summaries.prepare(
+        dimension="dim:ai_user_understanding",
+        granularity="week",
+        window_start=window_start,
+        window_end=window_end,
+    )
+    rebuilt = summaries.commit(
+        rebuilt_input,
+        content="这一阶段AI更新理解为：用户当前饮品偏好已经改为咖啡。",
+        generated_at=NOW + timedelta(seconds=2),
+    )
+    latest = store.get_payload(first_summary.object_id)
+    assert rebuilt.revision == 3
+    assert latest["summary_status"] == "current"
+    assert latest["status"] == "active"
+    assert "咖啡" in latest["content"]
