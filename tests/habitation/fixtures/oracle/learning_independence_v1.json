@@ -2,17 +2,27 @@
   "scenario_id": "learning-independence-v1",
   "scenario_version": "1",
   "seed": 20260920,
-  "subject_id": "synthetic-user-learning-001",
+  "subject_id": "synthetic-user-001",
   "latent_truth": {
     "description": "The user's learning independence generally improves over the period, with one later noisy setback that should not erase the longer trend.",
     "evaluation_only": true
   },
   "event_annotations": {
-    "d01-chat": {"role": "baseline_low_independence"},
-    "d07-calendar": {"role": "supporting_behavior"},
-    "d14-chat": {"role": "stronger_independence_signal"},
-    "d21-note": {"role": "self_directed_followup"},
-    "d35-chat": {"role": "noise_or_temporary_setback"}
+    "d01-chat": {
+      "role": "baseline_low_independence"
+    },
+    "d07-calendar": {
+      "role": "supporting_behavior"
+    },
+    "d14-chat": {
+      "role": "stronger_independence_signal"
+    },
+    "d21-note": {
+      "role": "self_directed_followup"
+    },
+    "d35-chat": {
+      "role": "noise_or_temporary_setback"
+    }
   },
   "anti_leak_rule": "None of this file may be included in resident model prompts or AIOS world input."
 }
