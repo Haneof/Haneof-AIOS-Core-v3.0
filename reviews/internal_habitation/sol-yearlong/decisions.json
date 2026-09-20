@@ -1133,5 +1133,75 @@
         }
       }
     ]
+  },
+  "be80a73fc409220cc5687cc763f0b0614943a4b2baf29736d67fb22f407ea8a3": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "record_communication_experience",
+        "call_id": "sol-review-jan18-record-conditional-reminder-reaction",
+        "arguments": {
+          "scenario": "user-requested conditional reminder before a real-world deadline",
+          "style": "wait until the user-specified check point; verify current world state first; remind only if the unmet condition is supported; keep outcome uncertainty explicit",
+          "tone": "brief and evidence-bounded",
+          "user_reaction": "accepted",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_b582fb369dc158dff41c4339",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_5f75187e7ffa7229364793bd",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_src_39b11064c77baafc7bb2c8b3",
+              "revision": 1
+            }
+          ],
+          "applicable_conditions": {
+            "condition": "user explicitly requests a later conditional reminder rather than repeated prompting"
+          }
+        }
+      },
+      {
+        "name": "commit_operation_experience",
+        "call_id": "sol-review-jan18-conditional-reminder-experience",
+        "arguments": {
+          "problem_type": "conditional_reminder_with_user_specified_timing",
+          "method_path": [
+            "encode one future verification wake rather than recurring reminders",
+            "at wake time inspect current world evidence before deciding to interrupt",
+            "do not treat missing search hits as proof; use bounded timeline/source checks when needed",
+            "remind only when the unmet condition is supported",
+            "separate preparation completion from the later external inspection outcome"
+          ],
+          "result_summary": "The user explicitly said the reminder arrived at the right time. Later user and photo evidence confirmed the requested preparation items were completed. No claim is made that the reminder caused completion or that preparation implied inspection passage.",
+          "positive_case_refs": [
+            {
+              "object_id": "obs_conv_user_b582fb369dc158dff41c4339",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_5f75187e7ffa7229364793bd",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_src_39b11064c77baafc7bb2c8b3",
+              "revision": 1
+            }
+          ],
+          "applicability": {
+            "condition": "one-shot reminder whose delivery depends on whether a world condition remains unmet at a user-specified time"
+          },
+          "cost": {
+            "verification_reads": 2,
+            "user_interruptions": 1
+          },
+          "misses": [],
+          "experience_state": "candidate"
+        }
+      }
+    ]
   }
 }
