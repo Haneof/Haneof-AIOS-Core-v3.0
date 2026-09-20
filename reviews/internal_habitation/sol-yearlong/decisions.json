@@ -1604,5 +1604,18 @@
   "c4ffc41c69a810e46f61235ce0a75d8b7be9c09c6bd7a565cba41bf4c0a21574": {
     "kind": "response",
     "response": "收到。面粉已经收妥，妹妹也已经接到。以后遇到时间还没确认的安排，我会先把“已确认”和“未确认”分开，不会在没有具体时间依据时先把它说成冲突或用吓人的方式提醒你。"
+  },
+  "f235233c957d7dbabaccc3dbe917aa5adaa1c3a38cb9e13f53419fe726949ca6": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-jan09-review-read-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
   }
 }
