@@ -14,6 +14,7 @@ from typing import Any, Mapping, Sequence
 
 from aios_core.context.controller import ContextController, ModelContextBundle
 from aios_core.ingest.conversation import ConversationCommit, ConversationIngestor
+from aios_core.projections.all_dimensions import AllDimensionsProjectionService
 from aios_core.query.search import WorldSearchIndex
 from aios_core.recommendation.proactive import (
     ProactiveMemoryRecommender,
@@ -57,6 +58,11 @@ class FusedTurnRuntime:
             default_limit=recommendation_limit,
         )
         self.context_controller = context_controller or ContextController()
+        self.all_dimensions = AllDimensionsProjectionService(
+            store=store,
+            index=index,
+            subject_id=subject_id,
+        )
 
         registry = CapabilityRegistry()
         registry.register(
@@ -76,6 +82,23 @@ class FusedTurnRuntime:
                 input_schema={"object_id": "string", "revision": "integer?"},
             ),
             self._inspect_world_object,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="request_all_dimensions_projection",
+                description=(
+                    "Observe several parallel dimensions in one time window without "
+                    "turning co-occurrence into a causal conclusion."
+                ),
+                kind=CapabilityKind.READ,
+                input_schema={
+                    "dimensions": "array[string]",
+                    "window_start": "ISO-8601 datetime",
+                    "window_end": "ISO-8601 datetime",
+                    "query": "string?",
+                },
+            ),
+            self._request_all_dimensions_projection,
         )
         self.registry = registry
         self.cognitive_runtime = CognitiveRuntime(
@@ -108,6 +131,23 @@ class FusedTurnRuntime:
         revision: int | None = None,
     ) -> dict[str, Any]:
         return self.store.get_payload(str(object_id), revision=revision)
+
+    def _request_all_dimensions_projection(
+        self,
+        dimensions: Sequence[str],
+        window_start: str,
+        window_end: str,
+        query: str | None = None,
+    ) -> dict[str, Any]:
+        start = datetime.fromisoformat(str(window_start).replace("Z", "+00:00"))
+        end = datetime.fromisoformat(str(window_end).replace("Z", "+00:00"))
+        projection = self.all_dimensions.project(
+            dimensions=dimensions,
+            window_start=start,
+            window_end=end,
+            query=query,
+        )
+        return projection.model_dump(mode="json")
 
     def run_turn(
         self,
