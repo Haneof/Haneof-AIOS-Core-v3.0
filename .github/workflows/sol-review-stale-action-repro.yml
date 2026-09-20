@@ -1,0 +1,24 @@
+name: sol-review-stale-action-repro
+
+on:
+  push:
+    branches:
+      - "arena/sol-yearlong-resident-20260921"
+    paths:
+      - "reviews/internal_habitation/sol-yearlong/repros/stale_action_after_cancel.py"
+      - ".github/workflows/sol-review-stale-action-repro.yml"
+
+jobs:
+  stale-action-after-cancel:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - name: Reproduce stale Action authorization after Task cancellation
+        run: python reviews/internal_habitation/sol-yearlong/repros/stale_action_after_cancel.py
