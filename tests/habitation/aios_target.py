@@ -156,12 +156,21 @@ class AIOSHabitationTarget:
             )
         return dispatched
 
-    def _process_tick(self, now: datetime) -> dict[str, Any]:
+    def _process_tick(
+        self,
+        now: datetime,
+        *,
+        allow_review: bool = True,
+    ) -> dict[str, Any]:
         now = as_utc(now, "virtual_clock")
         before = self._dispatch_due_tasks(now)
-        review = self.runtime.run_periodic_review(
-            now=now,
-            policy=self.review_policy,
+        review = (
+            self.runtime.run_periodic_review(
+                now=now,
+                policy=self.review_policy,
+            )
+            if allow_review
+            else None
         )
         # A review may itself create an immediately-due Task. Give that Task the
         # same clock tick rather than delaying it until the next visible life event.
@@ -206,7 +215,9 @@ class AIOSHabitationTarget:
 
         ticks: list[dict[str, Any]] = []
         if self._clock is None:
-            ticks.append(self._process_tick(target))
+            # Before the very first resident-visible fact there is nothing to
+            # review. Writing an empty P15 marker here would place the first event
+            # exactly on the next review window's exclusive lower boundary.
             self._clock = target
             return {"from": None, "to": target.isoformat(), "ticks": ticks}
 
@@ -215,7 +226,9 @@ class AIOSHabitationTarget:
 
         # Catch same-instant work created by the previous visible event.
         if target > cursor:
-            ticks.append(self._process_tick(cursor))
+            # Catch Tasks created at the previous event timestamp, but do not run a
+            # zero-age Review. The first review tick is one full interval later.
+            ticks.append(self._process_tick(cursor, allow_review=False))
 
         review_interval = timedelta(hours=float(self.review_policy.interval_hours))
         next_review = cursor + review_interval
