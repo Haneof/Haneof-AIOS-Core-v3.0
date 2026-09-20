@@ -20,5 +20,27 @@
         }
       }
     ]
+  },
+  {
+    "snapshot_signature": "e7fee2b7b3730d65a4571fafc43e66051eeb789b72fc18b7d09dc3c28bf36d5e",
+    "type": "capability_calls",
+    "calls": [
+      {
+        "name": "commit_ai_world_claim",
+        "arguments": {
+          "domain": "user_understanding",
+          "statement": "用户通常周末不工作，并通常将周六上午留给学习。",
+          "confidence": 0.9,
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_3b6f238c052de914d1654bd2",
+              "revision": 1
+            }
+          ],
+          "claim_type": "preference",
+          "scope_key": "weekly_routine"
+        }
+      }
+    ]
   }
 ]
