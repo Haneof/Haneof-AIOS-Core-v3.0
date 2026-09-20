@@ -222,14 +222,6 @@ class HabitationRunner:
         steps: list[HabitationStep] = []
         for event in scenario.events:
             if not event.deliver_to_resident:
-                steps.append(
-                    HabitationStep(
-                        event_id=event.event_id,
-                        occurred_at=event.occurred_at,
-                        channel=event.channel,
-                        delivered=False,
-                    )
-                )
                 continue
 
             response = target.handle_event(event.resident_view())
@@ -331,9 +323,15 @@ def evaluate_run(
 
 
 def scenario_channels(scenario: HabitationScenario) -> tuple[str, ...]:
-    """Return unique channels in first-seen order for reporting and sharding."""
+    """Return resident-visible channels in first-seen order."""
 
-    return tuple(dict.fromkeys(event.channel for event in scenario.events))
+    return tuple(
+        dict.fromkeys(
+            event.channel
+            for event in scenario.events
+            if event.deliver_to_resident
+        )
+    )
 
 
 def visible_events(scenario: HabitationScenario) -> Sequence[ResidentEvent]:
