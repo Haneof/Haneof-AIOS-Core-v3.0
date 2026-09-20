@@ -783,5 +783,25 @@
         }
       }
     ]
+  },
+  "dfe7524c9de2520341a0392af807a51e65acb4b9fd523f28edc5058266289f86": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "call_id": "sol-jan12-inspect-revised-price-claim",
+        "arguments": {
+          "object_id": "clm_6f44455fcf528469d2a9cc26"
+        }
+      },
+      {
+        "name": "search_world",
+        "call_id": "sol-jan12-search-withdrawn-price-wording",
+        "arguments": {
+          "query": "North Mill 贵不少",
+          "limit": 12
+        }
+      }
+    ]
   }
 }
