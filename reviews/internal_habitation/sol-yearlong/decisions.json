@@ -59,5 +59,30 @@
         }
       }
     ]
+  },
+  "fc6fc815d9c9c9eb6319f74c7b14839a323c30aa04716e707f8e86d1cb5a3737": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "create_task",
+        "call_id": "sol-task-flour-delivery",
+        "arguments": {
+          "title": "确认面粉首批到货收货安排",
+          "task_type": "scheduled",
+          "reason_refs": [
+            {
+              "object_id": "obs_src_095e2b7aa400f61d87d0575f",
+              "revision": 1
+            }
+          ],
+          "initial_state": "waiting_time",
+          "priority": 85,
+          "next_wake_at": "2027-01-08T18:00:00+00:00",
+          "deadline": "2027-01-09T04:30:00+00:00",
+          "timezone_name": "UTC",
+          "next_step": "在到货前确认由本人还是店员开后门收货；只在可能影响进货时主动打断用户。"
+        }
+      }
+    ]
   }
 }
