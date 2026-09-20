@@ -197,6 +197,20 @@ class ConversationTimelineStore:
             conn.commit()
         return turn
 
+    def reset_session(
+        self,
+        session_id: str,
+        *,
+        subject_id: str = "user_1",
+    ) -> None:
+        """Delete only the rebuildable projection for one subject/session."""
+        with self._connect() as conn:
+            conn.execute(
+                "DELETE FROM runtime_conversation_turns_v2 WHERE subject_id=? AND session_id=?",
+                (subject_id, session_id),
+            )
+            conn.commit()
+
     def get(
         self,
         session_id: str,
