@@ -418,7 +418,7 @@ def test_photo_description_uses_media_descriptor_boundary(tmp_path):
         revision=ref["revision"],
     )
     assert payload["modality"] == "image_caption"
-    assert payload["metadata"]["raw_media_retained"] is False
+    assert payload["metadata"]["provenance"]["raw_media_retained"] is False
 
 
 def test_current_core_factory_creates_fresh_private_worlds(tmp_path):
