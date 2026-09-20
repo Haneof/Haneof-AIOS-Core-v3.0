@@ -265,6 +265,8 @@ def test_factory_path_creates_fresh_world_per_model_candidate() -> None:
 
     assert len(created) == 3
     assert all(not hasattr(item, "hidden_oracle") for item in descriptors)
+    assert all(not hasattr(item, "scenario_id") for item in descriptors)
+    assert all(not hasattr(item, "scenario_version") for item in descriptors)
     assert all(item.visible_event_count == 2 for item in descriptors)
     assert len({id(target) for target in created}) == 3
     assert set(result.runs) == {
