@@ -527,3 +527,117 @@ def test_new_session_loads_only_explicit_core_ai_world_context(tmp_path):
     )
 
     assert result.runtime.response == "继续当前项目主线。"
+
+
+def test_resident_model_can_check_existing_dimensions_then_propose_candidate(tmp_path):
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    evidence = Observation(
+        object_id="obs_dimension_runtime",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW - timedelta(days=1)),
+        learned_at=NOW - timedelta(days=1),
+        recorded_at=NOW - timedelta(days=1),
+        created_by="dimension-runtime-test",
+        source_kind="virtual_life",
+        modality="text",
+        value="最近多次学习任务中，用户独立解决复杂问题的能力在变化。",
+        metadata={"dimension": "dim:user_ai_interaction"},
+    )
+    store.commit(
+        [evidence],
+        OperationRequest(
+            operation_name="test.seed.dimension.runtime",
+            expected_world_revision=0,
+            reason="seed dimension proposal evidence",
+            idempotency_key="seed-dimension-runtime",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    def model(snapshot):
+        history = snapshot.capability_history
+        if not history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="list_dimensions",
+                        arguments={"include_terminal": False},
+                    ),
+                )
+            )
+        if len(history) == 1:
+            assert history[-1].ok is True
+            assert history[-1].data == []
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="search_world",
+                        arguments={"query": "学习任务 独立解决 复杂问题", "limit": 5},
+                    ),
+                )
+            )
+        if len(history) == 2:
+            search = history[-1]
+            assert search.ok is True
+            source = next(
+                item for item in search.data
+                if item["object_id"] == evidence.object_id
+            )
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="propose_dimension",
+                        arguments={
+                            "dimension_key": "dim:learning_ability",
+                            "name": "学习能力",
+                            "description": "长期观察用户独立解决学习任务的能力变化。",
+                            "data_shape": "evidence_grounded_cognition_over_time",
+                            "evidence_refs": [
+                                {
+                                    "object_id": source["object_id"],
+                                    "revision": source["revision"],
+                                }
+                            ],
+                            "why_existing_dimensions_are_insufficient": "现有事实维度记录单次学习事件，但没有持续能力观察轴。",
+                            "continuity_rationale": "后续学习事件和结果可持续更新该观察轴。",
+                            "user_value_rationale": "有助于调整教学难度和帮助方式。",
+                            "maintenance_cost_rationale": "只记录有证据的变化和总结，不复制原始学习事实。",
+                            "confidence": 0.72,
+                        },
+                    ),
+                )
+            )
+
+        proposed = history[-1]
+        assert proposed.ok is True
+        assert proposed.data["lifecycle"] == "candidate"
+        return ModelDirective(response="我已把它作为候选观察轴登记，先通过真实运行继续验证。")
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+        max_tool_rounds=4,
+    )
+    result = runtime.run_turn(
+        session_id="current",
+        turn_index=1,
+        user_input="你觉得长期学习能力值得单独观察吗？",
+        current_topic=None,
+        occurred_at=NOW,
+    )
+
+    assert [
+        item.name for item in result.runtime.capability_history
+    ] == ["list_dimensions", "search_world", "propose_dimension"]
+    definitions = store.list_payloads()
+    dynamic = [
+        item for item in definitions
+        if item.get("object_type") == "dimension_definition"
+        and (item.get("metadata") or {}).get("dimension_key") == "dim:learning_ability"
+    ]
+    assert len(dynamic) == 1
+    assert dynamic[0]["lifecycle"] == "candidate"
