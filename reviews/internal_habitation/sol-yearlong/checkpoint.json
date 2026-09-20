@@ -1,0 +1,78 @@
+{
+  "schema": "aios.p16.segment-checkpoint.v1",
+  "habitation_run_id": "sol-resident-20260921-001",
+  "reviewer_id": "arena/sol-yearlong-resident-20260921",
+  "logical_resident_id": "gpt-5.6-sol-interactive-resident-001",
+  "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
+  "segment_id": "segment-001",
+  "segment_status": "completed_at_running_review_boundary",
+  "segment_reason": "First checkpoint under segmented protocol; intentionally closes at a RUNNING Periodic Review to test fresh-session resume and preserve a confirmed Action/Task lifecycle finding.",
+  "tested_main_sha": "7966e2ce227a41dc4d1e2c53d6f3dbb745311570",
+  "review_branch_artifact_head_sha": "78a13f01f0008cfad1dd3894462c2436fbbc3930",
+  "simulated_start": "2027-01-05T08:15:00+00:00",
+  "simulated_end_cursor": "2027-01-11T08:15:00+00:00",
+  "cumulative_simulated_days": 6,
+  "last_consumed_external_event_id": "d008-chat-6",
+  "next_external_event": {
+    "event_id": "d009-order",
+    "occurred_at": "2027-01-11T11:05:00+00:00"
+  },
+  "cumulative_resident_cognition_calls": 28,
+  "cumulative_summary_calls": 9,
+  "subject_id": "sol-resident-20260921-001",
+  "world": {
+    "workflow_run_id": 35532023447,
+    "artifact_id": 10611930713,
+    "artifact_name": "sol-interactive-resident-35532023447",
+    "artifact_digest": "sha256:0461537d9f817fdb0a228e3689f05fe896df65c2a8a2839d4586f224f14b0748",
+    "artifact_size_bytes": 106159,
+    "world_path_in_artifact": "sol-manual/world.sqlite",
+    "world_sha256": "c44931ab1bab7e9525572c7a32d52057852a81ac0b44e07c0b958aad272b956c",
+    "world_size_bytes": 638976,
+    "world_revision": 52,
+    "index_watermark": 52
+  },
+  "pending_running_wakes": [
+    {
+      "object_id": "wake_review_1d10a410a2d3c62d0421882e",
+      "revision": 2,
+      "wake_state": "running",
+      "wake_source": "periodic_review",
+      "window_start": "2027-01-10T08:15:00+00:00",
+      "window_end": "2027-01-11T08:15:00+00:00"
+    }
+  ],
+  "active_goal_refs": [
+    {
+      "object_id": "goal_c909920b70a6835d5a42833e",
+      "revision": 1,
+      "goal_status": "proposed",
+      "title": "先稳定早高峰出品"
+    }
+  ],
+  "active_task_refs": [
+    {
+      "object_id": "task_4ab2a4531967655198502158",
+      "revision": 1,
+      "task_state": "ready",
+      "title": "观察早高峰出品卡点"
+    }
+  ],
+  "known_lifecycle_finding_refs": {
+    "cancelled_task": {
+      "object_id": "task_fa7f780c46e2004d9d0100c2",
+      "revision": 3
+    },
+    "stale_proposed_action": {
+      "object_id": "action_96c74ab2565b5052458a66cd",
+      "revision": 1
+    }
+  },
+  "previous_segment_checkpoint_digest": null,
+  "legacy_pre_segment_evidence": {
+    "workflow_run_id": 35529119167,
+    "artifact_digest": "sha256:28ba7d90b1290f6f52a8574ba633d7a0ab5b436bbd5a80a58aa432c48d7f733f"
+  },
+  "resume_rule": "Start a fresh Resident model context, reopen this exact World, verify world revision/hash, resume the RUNNING Periodic Review, then consume d009-order. Do not inject prior hidden chat context.",
+  "manifest_body_sha256": "0d7b2472275d331a475b0ea4aa3116b82f35a05ad2846d1c8017c56987646fd7"
+}
