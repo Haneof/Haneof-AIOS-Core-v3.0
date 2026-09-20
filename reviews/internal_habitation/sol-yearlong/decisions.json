@@ -356,5 +356,24 @@
         }
       }
     ]
+  },
+  "ccef7541678100bdf2407ee3881a43b80996b8b59e63210786ab5e9d831fc91b": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "call_id": "sol-jan08-inspect-action-after-cancel",
+        "arguments": {
+          "object_id": "action_b07c55d3dd6b17731296d988"
+        }
+      },
+      {
+        "name": "inspect_world_object",
+        "call_id": "sol-jan08-inspect-task-after-cancel",
+        "arguments": {
+          "object_id": "task_57a01b42b3d5f384db661bda"
+        }
+      }
+    ]
   }
 }
