@@ -7,28 +7,27 @@
 
 ## 当前快照
 
-- 时间：2026-09-20 13:12 +08:00
-- 最后已验证功能代码锚点：`d84c956e25a28a067e652282975d27711685229b`
-- 验证 Gate：`p10-ai-world-gate` / run `35491030461` / **success**
-- 当前项目阶段：**P10 已完成，进入 P11 动态维度生命周期与注册**
-- 当前主干状态：**统一世界、索引、推荐、上下文、Runtime、Summary、ALL_DIMENSIONS、认知写回、翻案传播、AI用户理解/关系/自我/边界/策略/人格/校准已共用同一世界机制**
-- 当前 blocker：**动态维度仍只有宪法与旧实验实现；需要重新实现“AI提出候选 + 系统验证契约/生命周期”，不能恢复固定心理阈值**
-- 下一主任务：**P11 Dimension Proposal / Registration / Lifecycle**
+- 时间：2026-09-20 14:35 +08:00
+- 最后已验证功能代码锚点：`e677de516a2e2b3d785455db36013a74aebf01d4`
+- 验证 Gate：`p11-dimension-gate` / run `35491309407` / **success**
+- 当前项目阶段：**P11 已完成，进入 P12 Goal / Task / Action / Outcome**
+- 当前主干状态：**统一世界、索引、推荐、上下文、认知写回、翻案传播、AI世界、动态维度注册已经闭环**
+- 当前 blocker：**未来目标、任务、现实行动与结果仍未接入统一 Resident Runtime；现有 Goal/Task/Action/Outcome 契约需要重新收口**
+- 下一主任务：**P12 Goal / Task / Action / Outcome / Scheduler**
 
-## P10 已完成并通过 Gate
+## P11 已完成并通过 Gate
 
-- AI User Understanding 使用统一 Claim/Evidence/Dependency：GREEN
-- AI Relationship 使用统一世界，不建关系数据库：GREEN
-- AI Self 使用统一世界，不恢复 `runtime_ai_self_memory`：GREEN
-- AI Intent / Strategy / Cognitive Boundary / Personality / Calibration 共用同一 Claim engine：GREEN
-- UNKNOWN / HYPOTHESIS 是合法认知状态：GREEN
-- AI-world Claim 复用 P9 revise/retract/propagation：GREEN
-- Runtime 提供 `read_ai_world`：GREEN
-- Runtime 提供 `commit_ai_world_claim`：GREEN
-- 新会话只自动加载显式标记 `core_context` 的最小身份/关系连续信息：GREEN
-- 未标记的完整用户画像不会每轮自动灌入：GREEN
-- Relationship / Calibration 独立宪法文件已补齐：GREEN
-- 所有 AI认知模块均无第二真相库：GREEN
+- Resident AI 可先 `list_dimensions` 再判断是否需要新观察轴：GREEN
+- Resident AI 可 `propose_dimension`：GREEN
+- Proposal 必须有 pinned Evidence：GREEN
+- 系统仅做 schema / identity / lifecycle / transaction 校验：GREEN
+- 无固定 2-domain / 3-day / 30-day / 70% 认知门槛：GREEN
+- Candidate / Trial / Active / Dormant / Reactivated / Revised / Rejected / Merged / Split / Archived 状态机：GREEN
+- Resident AI 可 `transition_dimension`：GREEN
+- 维度 lifecycle 保留 revision 历史：GREEN
+- Archived / Rejected / Merged / Split 不进入默认 current retrieval：GREEN
+- DimensionDefinition / Derivation 已进入统一世界索引：GREEN
+- 动态维度不建立第二 Registry 真相库：GREEN
 
 ## 当前可运行主链
 
@@ -42,102 +41,100 @@ WorldSearchIndex / Recommendation
 ContextController
 ↓
 Resident Model
-├─ read_ai_world
 ├─ search_world
+├─ inspect_world_object
+├─ read_ai_world
+├─ list_dimensions
 ├─ request_all_dimensions_projection
-├─ commit_ai_world_claim
 ├─ commit_claim
-├─ revise_claim
-└─ retract_claim
+├─ commit_ai_world_claim
+├─ revise_claim / retract_claim
+├─ propose_dimension
+└─ transition_dimension
 ↓
-EvidenceSet + Claim + Dependency
+Unified WorldStore
 ↓
-AI User / Relationship / Self / Boundary / Strategy / Personality / Calibration
+Evidence / Dependency / Revision / Lifecycle
 ↓
-Revision propagation
+Index catch-up
 ↓
-Current Index + minimal core continuity
-↓
-next session
+next turn
 ```
 
-## P11 当前目标
+## P12 当前目标
 
-维度注册不是固定分类表，也不是程序通过阈值自动发明心理标签。
+P12 要让 AI 从“理解世界”进入“持续帮助用户”。
 
 目标闭环：
 
 ```text
-AI观察世界
+World / User Intent / AI Cognition
 ↓
-AI认为出现新的长期观察需求
+Goal
 ↓
-AI提出 Dimension Proposal
+Task
 ↓
-附 Evidence + 说明：
-- 为什么现有维度不够
-- 为什么具有持续观察价值
-- 对用户有什么帮助
-- 维护成本是否值得
+Condition / Schedule / Authorization
 ↓
-系统只验证：
-- Schema
-- Evidence refs 存在
-- 名称/ID不冲突
-- 生命周期状态合法
-- 权限与资源边界
+Action proposal
 ↓
-进入 Candidate / Trial
+授权后执行
 ↓
-真实运行一段时间
+Outcome
 ↓
-AI依据新的 Evidence / Outcome 决定：
-activate / revise / merge / dormant / archive / reject
+World writeback
 ↓
-统一世界中留下完整演化历史
+AI根据 Outcome 学习 / 修正 Goal、Task、Strategy
 ```
 
-## P11 禁止事项
+## P12 关键边界
 
-- 不恢复旧 `2 domains / 3 days / 30 days / 70%` 为认知真理。
-- 不用固定心理维度白名单。
-- 不用关键词直接生成维度。
-- 系统不得替 AI 判断“这个维度有意义”。
-- 一次性事件不能被程序自动升级成长期维度。
-- 维度之间继续平级。
-- merge / dormant / archive 不允许删除历史来源。
-- 维度 proposal 必须有 Evidence。
-- 维度状态机可以确定性校验，但“为什么升级/合并/退休”必须来自 AI 判断与 Evidence。
+1. Goal = 长期方向；Task = 可执行工作；Action = 一次现实副作用；Outcome = 真实结果。
+2. Goal / Task / Action / Outcome 全部进入统一世界，不建第二任务数据库。
+3. AI可以主动提出 Goal / Task，但不得伪造用户授权。
+4. 外部副作用默认需要 capability-specific authorization。
+5. 内部纯世界读写与现实外部动作必须分开。
+6. Action 必须引用 Goal / Task / Evidence / 当前世界状态。
+7. 执行失败也要形成 Outcome，不能静默消失。
+8. Outcome 可作为 AI Strategy / Calibration / User Understanding 的 Evidence。
+9. Scheduler 只负责确定性时机和条件，不替 AI 决定“为什么要做”。
+10. 不允许为了测试直接给模型固定 expected action 文本。
 
-## P11 首批必读
+## P12 首批必读
 
 新仓：
-1. `docs/constitution/AIOS_v3.0_Dimension_Registration_Constitution.md`
-2. `docs/constitution/AIOS_v3.0_Base_Dimension_Constitution.md`
-3. `docs/constitution/AIOS_v3.0_High_Level_Cognition_Dimension_Constitution.md`
+1. `docs/constitution/AIOS_v3.0_Goal_Task_Constitution.md`
+2. `docs/constitution/AIOS_v3.0_Action_System_Constitution.md`
+3. `src/aios_core/contracts/models.py`
+4. `src/aios_core/contracts/enums.py`
+5. `src/aios_core/runtime/turn_runtime.py`
+6. `src/aios_core/storage/sqlite_store.py`
 
 旧仓择优来源：
-4. `src/aios_core/dimensions/evolution_guard.py`
-5. `src/aios_core/tools/proposal_pipeline.py`
-6. `src/aios_core/tools/proposed_operators.py`
+7. Goal / Task / Action / Outcome state machines
+8. scheduler / conditional engine
+9. world operator / operation receipts
+10. external side-effect authorization code
 
-当前世界底座：
-7. `src/aios_core/contracts/models.py`
-8. `src/aios_core/storage/sqlite_store.py`
-9. `src/aios_core/writeback/cognition.py`
-10. `src/aios_core/revision/service.py`
-11. `src/aios_core/runtime/turn_runtime.py`
+## P12 禁止事项
+
+- 不把 Task 当聊天 TODO 文本。
+- 不把 Action 执行权默认交给任意模型输出。
+- 不因任务完成就删除历史 Goal/Task。
+- 不让 Scheduler 自动生成高阶目标。
+- 不把 Outcome 只写日志而不进入世界。
+- 不用固定 demo 工具证明“行动能力”。
+- 不绕过用户授权去执行外部副作用。
 
 ## 当前不可推翻的已决事项
 
-- 所有维度平级存在于同一世界。
-- 维度是观察轴，不是数据库父子分类。
-- AI负责判断新维度的意义；系统只提供注册和状态机制。
-- 不建第二套 AI Self / User Profile 数据库。
-- 不让 Summary 自动写跨维因果。
-- 无主题时推荐允许 0。
-- stale 只表示需要重新判断。
-- PseudoLLM / 固定题库不得作为认知 Gate。
+- 世界唯一；所有模块都写同一个 WorldStore。
+- 索引唯一公共能力。
+- AI认知可修正；Observation 不倒写。
+- 维度平级。
+- AI负责意义，程序负责确定性机制。
+- 用户授权与外部副作用必须有独立边界。
+- PseudoLLM / 固定题库不得作为认知或行动 Gate。
 
 ## 恢复现场规则
 
