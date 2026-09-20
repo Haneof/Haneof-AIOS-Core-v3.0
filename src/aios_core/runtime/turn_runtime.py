@@ -38,7 +38,11 @@ from aios_core.execution import (
     TaskCreateRequest,
     TaskTransitionRequest,
 )
-from aios_core.ingest.conversation import ConversationCommit, ConversationIngestor
+from aios_core.ingest.conversation import (
+    INTERACTION_DIMENSION,
+    ConversationCommit,
+    ConversationIngestor,
+)
 from aios_core.policy import (
     CognitivePolicyCreateRequest,
     CognitivePolicyRegistry,
@@ -2080,7 +2084,17 @@ class FusedTurnRuntime:
                 continue
             payload = self.store.get_payload(hit.object_id, revision=hit.revision)
             source_kind = str(payload.get("source_kind") or "").strip().casefold()
-            if source_kind == "conversation":
+            metadata = payload.get("metadata")
+            if not isinstance(metadata, Mapping):
+                metadata = {}
+            dimension = str(metadata.get("dimension") or "").strip()
+            # ConversationIngestor uses source_kind="user_ai_interaction"; the
+            # canonical interaction dimension is the stronger guard because it
+            # survives compatible ingestors that choose a different source label.
+            if (
+                source_kind in {"conversation", "user_ai_interaction"}
+                or dimension == INTERACTION_DIMENSION
+            ):
                 continue
             return True, "indexed_external_observation_anchor"
 
