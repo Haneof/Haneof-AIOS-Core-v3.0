@@ -140,7 +140,31 @@ class GPT56SelfResident:
                         ),
                     )
                 )
-            self.search_results = list(history[-1].data)
+
+            # A real resident should not stop at a broad recall if the direct
+            # calendar fact is absent. Narrow the second query before answering.
+            first_results = list(history[0].data)
+            first_has_calendar = any(
+                item.get("object_type") == "observation"
+                and "项目周会" in str(item.get("excerpt", ""))
+                for item in first_results
+            )
+            if len(history) == 1 and not first_has_calendar:
+                return ModelDirective(
+                    capability_calls=(
+                        CapabilityCall(
+                            name="search_world",
+                            arguments={
+                                "query": "项目周会 weekly Saturday morning",
+                                "limit": 20,
+                            },
+                        ),
+                    )
+                )
+
+            self.search_results = []
+            for result in history:
+                self.search_results.extend(list(result.data))
             excerpts = "\n".join(
                 str(item.get("excerpt", "")) for item in self.search_results
             )
