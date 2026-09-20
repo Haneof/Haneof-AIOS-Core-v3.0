@@ -5,8 +5,7 @@ on:
     branches:
       - "arena/sol-yearlong-resident-20260921"
     paths:
-      - "reviews/internal_habitation/sol-yearlong/manual_resident.py"
-      - "reviews/internal_habitation/sol-yearlong/decisions.json"
+      - "reviews/internal_habitation/sol-yearlong/**"
       - ".github/workflows/sol-interactive-manual-resident.yml"
 
 jobs:
