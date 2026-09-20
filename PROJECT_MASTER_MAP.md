@@ -78,8 +78,8 @@ Evidence + Dependency + Revision
 | P11 维度生命周期与注册 | AI 可提出、维护、合并、退休长期有价值维度 | Dimension proposal / registration / lifecycle | 禁止固定心理维度白名单替 AI 做认知 | ✅ 已通过 P11 Gate |
 | P12 Goal / Task / Action / Outcome | AI 从理解走向持续目标与行动 | Goal、Task、Action、Outcome、Scheduler | 行动可授权、可回滚、Outcome 可学习 | ✅ 已通过 P12 Gate |
 | P13 数据接入与机械清洗 | 对话外现实持续进入世界 | 手机/App/传感器/相册/麦克风/日历等 adapter | 数据接入不得越权产生高阶认知 | ✅ 已通过 P13 Gate |
-| P14 长会话连续性完整接线 | 超长单会话不因 context limit 失忆 | rolling state、轮总结、summary drill-down | raw dialogue 永久保留；summary 只是索引 | 🔵 当前主阶段 |
-| P15 周期 Review / AI 成长 | AI 定期回看世界、修正理解、沉淀经验 | periodic review、operation experience、strategy learning | 不以固定模板替代模型判断 | ⏳ 待做 |
+| P14 长会话连续性完整接线 | 超长单会话不因 context limit 失忆 | rolling state、轮总结、summary drill-down | raw dialogue 永久保留；summary 只是索引 | ✅ 已通过 P14 Gate |
+| P15 周期 Review / AI 成长 | AI 定期回看世界、修正理解、沉淀经验 | periodic review、operation experience、strategy learning | 不以固定模板替代模型判断 | 🔵 当前主阶段 |
 | P16 多 Agent 长期入住测试 | 用真实模型和隐藏人生测试是否真的“活在世界中” | habitation simulator / hidden-life scenarios | 不以关键词题库证明认知能力 | ⏳ 待做 |
 | P17 Core Release Gate | 形成第一个稳定可运行 AIOS Core | reproducible build、full CI、migration report | 世界闭环、认知闭环、任务闭环均稳定 | ⏳ 待做 |
 | P18 平台适配 | 把同一套 Core 放到真实运行环境 | Android/Linux service、device adapters | Core 语义不因平台重写 | ⏳ 后置 |
@@ -141,7 +141,9 @@ P12 Goal / Task / Action / Outcome  ✅
                     ↓
 P13 Reality Data Ingest / Mechanical Cleaning  ✅
                     ↓
-P14 Long Conversation Continuity  ← 当前下一主任务
+P14 Long Conversation Continuity  ✅
+                    ↓
+P15 Periodic Review / AI Growth  ← 当前主任务
 ```
 
 P9 要解决的核心场景：
@@ -180,8 +182,8 @@ P9 认知翻案传播 ✅
 → P11 动态维度生命周期 ✅
 → P12 Goal / Task / Action / Outcome ✅
 → P13 多源现实数据接入 ✅
-→ P14 长会话连续完整接线 ← 当前
-→ P15 周期Review与AI经验成长
+→ P14 长会话连续完整接线 ✅
+→ P15 周期Review与AI经验成长 ← 当前
 → P16 多Agent长期入住测试
 → P17 Core Release Gate
 → P18 Android/Linux平台适配
