@@ -85,3 +85,27 @@ def test_catalog_focuses_on_behavior_not_expected_response_strings() -> None:
     assert "expected_response" not in catalog_text
     assert "expected_answer" not in catalog_text
     assert all(entry["focus"] for entry in catalog["scenarios"])
+
+
+def test_resident_subject_ids_are_opaque_and_non_semantic() -> None:
+    catalog = json.loads((FIXTURES / "catalog.json").read_text(encoding="utf-8"))
+    expected = {
+        "synthetic-user-001",
+        "synthetic-user-002",
+        "synthetic-user-003",
+        "synthetic-user-004",
+    }
+
+    subject_ids = set()
+    for entry in catalog["scenarios"]:
+        manifest = json.loads(
+            (FIXTURES / entry["manifest"]).read_text(encoding="utf-8")
+        )
+        subject_ids.add(manifest["subject_id"])
+
+    assert subject_ids == expected
+    assert all(
+        token not in subject_id
+        for subject_id in subject_ids
+        for token in ("learning", "continuity", "revision", "uncertainty")
+    )
