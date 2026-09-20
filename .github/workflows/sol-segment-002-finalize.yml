@@ -1,0 +1,107 @@
+name: sol-segment-002-finalize
+
+on:
+  push:
+    branches:
+      - "arena/sol-yearlong-resident-20260921"
+    paths:
+      - ".github/workflows/sol-segment-002-finalize.yml"
+
+jobs:
+  finalize-segment-002:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+
+      - name: Download frozen Segment 001 World
+        uses: actions/download-artifact@v4
+        with:
+          name: sol-interactive-resident-35532023447
+          path: artifacts/segment-001
+          github-token: ${{ github.token }}
+          repository: Haneof/Haneof-AIOS-Core-v3.0
+          run-id: 35532023447
+
+      - name: Merge frozen Resident decisions
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("reviews/internal_habitation/sol-yearlong")
+          merged = json.loads((root / "decisions.json").read_text(encoding="utf-8"))
+          for path in sorted((root / "segments/segment-002/decisions").glob("part-*.json")):
+              fragment = json.loads(path.read_text(encoding="utf-8"))
+              overlap = set(merged).intersection(fragment)
+              if overlap:
+                  raise SystemExit(f"duplicate decision keys in {path}: {sorted(overlap)}")
+              merged.update(fragment)
+
+          out = Path("artifacts/segment-002/merged-decisions.json")
+          out.parent.mkdir(parents=True, exist_ok=True)
+          out.write_text(
+              json.dumps(merged, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          print(f"merged_decisions={len(merged)}")
+          PY
+
+      - name: Resume exact frozen World through Segment 002
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p artifacts/segment-002
+          PYTHONPATH="$PWD/src:$PWD/tests:$PWD" python             reviews/internal_habitation/sol-yearlong/segments/segment-002/resume_bridge.py             --fixture-root reviews/internal_habitation/sol-yearlong/bootstrap/fixtures             --manifest sol_bootstrap.manifest.json             --source-world artifacts/segment-001/sol-manual/world.sqlite             --working-world artifacts/segment-002/world.sqlite             --after-event-id d008-chat-6             --segment-end 2027-01-19T08:15:00Z             --expected-world-sha256 c44931ab1bab7e9525572c7a32d52057852a81ac0b44e07c0b958aad272b956c             --expected-revision 52             --expected-subject sol-resident-20260921-001             --decisions artifacts/segment-002/merged-decisions.json             --state-out artifacts/segment-002/state.json             --snapshot-out artifacts/segment-002/snapshot.json             --event-trace-out artifacts/segment-002/event-trace.json             | tee artifacts/segment-002/stdout.txt
+
+      - name: Freeze hashes and restore attestation
+        shell: bash
+        run: |
+          sha256sum artifacts/segment-001/sol-manual/world.sqlite             > artifacts/segment-002/source-world.sha256
+          sha256sum artifacts/segment-002/world.sqlite             > artifacts/segment-002/world.sha256
+          sha256sum artifacts/segment-002/merged-decisions.json             > artifacts/segment-002/merged-decisions.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          state = json.loads(Path("artifacts/segment-002/state.json").read_text())
+          if state["status"] != "segment_complete":
+              raise SystemExit(f"Segment 002 not complete: {state}")
+          if state["world_revision"] != 145 or state["index_watermark"] != 145:
+              raise SystemExit(f"Unexpected final revision/watermark: {state}")
+          meta = {
+              "schema": "aios.p16.segment-artifact-attestation.v1",
+              "habitation_run_id": "sol-resident-20260921-001",
+              "logical_resident_id": "gpt-5.6-sol-interactive-resident-001",
+              "segment_id": "segment-002",
+              "tested_main_sha": "7966e2ce227a41dc4d1e2c53d6f3dbb745311570",
+              "source_artifact_id": 10611930713,
+              "source_world_sha256": "c44931ab1bab7e9525572c7a32d52057852a81ac0b44e07c0b958aad272b956c",
+              "expected_source_revision": 52,
+              "expected_subject": "sol-resident-20260921-001",
+              "require_fresh": False,
+              "final_state": state,
+              "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
+              "attestation": "Segment 002 resumed from the frozen Segment 001 World. Semantic directives and summaries were model-authored at exact RuntimeSnapshot/SummaryInput checkpoints; the harness only replayed frozen decisions and mechanically advanced the external world."
+          }
+          Path("artifacts/segment-002/attestation.json").write_text(
+              json.dumps(meta, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
+          )
+          PY
+
+      - name: Upload frozen Segment 002 World
+        uses: actions/upload-artifact@v4
+        with:
+          name: sol-segment-002-${{ github.run_id }}
+          path: artifacts/segment-002/
+          if-no-files-found: error
