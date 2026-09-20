@@ -898,5 +898,18 @@
         }
       }
     ]
+  },
+  "debc66474b5007e77a4b95ec781e5e68e161984cb0a038ae5661da5c86b3d9ac": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "retrieve_original_observation",
+        "call_id": "sol-jan14-read-fire-inspection-calendar",
+        "arguments": {
+          "object_id": "obs_src_468f0037669660d6336bd905",
+          "revision": 1
+        }
+      }
+    ]
   }
 }
