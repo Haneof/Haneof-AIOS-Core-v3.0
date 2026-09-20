@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 import sys
 
@@ -40,6 +40,8 @@ class GPT56SelfResident:
         self.claim_ref: dict[str, object] | None = None
         self.revised_claim_ref: dict[str, object] | None = None
         self.search_results: list[dict[str, object]] = []
+        self.timeline_results: list[dict[str, object]] = []
+        self.calendar_fact: dict[str, object] | None = None
         self.wake_reasons: list[str] = []
         self.final_response: str | None = None
 
@@ -141,37 +143,104 @@ class GPT56SelfResident:
                     )
                 )
 
-            # A real resident should not stop at a broad recall if the direct
-            # calendar fact is absent. Narrow the second query before answering.
-            first_results = list(history[0].data)
-            first_has_calendar = any(
-                item.get("object_type") == "observation"
-                and "项目周会" in str(item.get("excerpt", ""))
-                for item in first_results
-            )
-            if len(history) == 1 and not first_has_calendar:
+            # Structured source facts are intentionally not flattened into semantic
+            # full-text search. Once broad cognition recall is insufficient, derive
+            # the user's current world-time from the current Observation itself.
+            if len(history) == 1:
                 return ModelDirective(
                     capability_calls=(
                         CapabilityCall(
-                            name="search_world",
+                            name="inspect_world_object",
                             arguments={
-                                "query": "项目周会 weekly Saturday morning",
+                                "object_id": now_ref["object_id"],
+                                "revision": now_ref["revision"],
+                            },
+                        ),
+                    )
+                )
+
+            if len(history) == 2:
+                current_observation = dict(history[1].data)
+                occurred = current_observation.get("occurred") or {}
+                start_raw = occurred.get("start")
+                if not isinstance(start_raw, str):
+                    raise AssertionError(
+                        "current user Observation did not expose its occurred time"
+                    )
+                current_time = datetime.fromisoformat(
+                    start_raw.replace("Z", "+00:00")
+                )
+                week_start = (
+                    current_time
+                    - timedelta(
+                        days=current_time.weekday(),
+                        hours=current_time.hour,
+                        minutes=current_time.minute,
+                        seconds=current_time.second,
+                        microseconds=current_time.microsecond,
+                    )
+                )
+                week_end = week_start + timedelta(days=7) - timedelta(microseconds=1)
+                return ModelDirective(
+                    capability_calls=(
+                        CapabilityCall(
+                            name="search_timeline",
+                            arguments={
+                                "window_start": week_start.isoformat(),
+                                "window_end": week_end.isoformat(),
+                                "dimension": "dim:calendar",
+                                "object_types": ["observation"],
                                 "limit": 20,
                             },
                         ),
                     )
                 )
 
-            self.search_results = []
-            for result in history:
-                self.search_results.extend(list(result.data))
-            excerpts = "\n".join(
-                str(item.get("excerpt", "")) for item in self.search_results
+            if len(history) == 3:
+                self.timeline_results = list(history[2].data)
+                if not self.timeline_results:
+                    self.search_results = list(history[0].data)
+                    self.final_response = (
+                        "我确认了此前关于周六上午项目会的认知，但这次按本周日历"
+                        "时间线没有取回可核验的日历事实，所以不能可靠指定两小时"
+                        "学习时段。"
+                    )
+                    return ModelDirective(response=self.final_response)
+                calendar_ref = self.timeline_results[0]
+                return ModelDirective(
+                    capability_calls=(
+                        CapabilityCall(
+                            name="retrieve_original_observation",
+                            arguments={
+                                "object_id": calendar_ref["object_id"],
+                                "revision": calendar_ref["revision"],
+                            },
+                        ),
+                    )
+                )
+
+            self.search_results = list(history[0].data)
+            self.calendar_fact = dict(history[3].data)
+            calendar_value = self.calendar_fact.get("value")
+            title = (
+                str(calendar_value.get("title", ""))
+                if isinstance(calendar_value, dict)
+                else ""
             )
-            if "项目" not in excerpts:
+            recurrence = (
+                str(calendar_value.get("recurrence", ""))
+                if isinstance(calendar_value, dict)
+                else ""
+            )
+            has_revised_cognition = any(
+                item.get("object_type") == "claim"
+                and item.get("revision") == 2
+                and "项目" in str(item.get("excerpt", ""))
+                for item in self.search_results
+            )
+            if not has_revised_cognition or title != "项目周会":
                 self.final_response = (
-                    "我需要先确认你这周已经记录的安排；当前检索没有找回"
-                    "周六项目会的依据，所以不能可靠地给出具体时段。"
+                    "我没有拿到足够一致的认知与日历事实，暂时不能可靠给出安排。"
                 )
             else:
                 self.final_response = (
@@ -180,6 +249,11 @@ class GPT56SelfResident:
                     "所以我不能凭空指定一个准确时间；如果没有别的安排，"
                     "可以优先从周日找连续两小时，再结合你的实际日历确定。"
                 )
+                if "Saturday morning" not in recurrence:
+                    self.final_response = (
+                        "我确认本周有项目周会，但当前日历事实没有提供足够的"
+                        "时段细节，所以不能可靠指定学习时间。"
+                    )
             return ModelDirective(response=self.final_response)
 
         raise AssertionError(f"unexpected resident input: {text!r}")
@@ -280,11 +354,22 @@ def test_gpt56_self_resident_revision_smoke_through_current_core(tmp_path):
         and "项目" in str(item.get("excerpt", ""))
         for item in resident.search_results
     ), resident.search_results
+    # Structured calendar payloads stay outside semantic full-text search by
+    # design. The resident must recover them through bounded timeline recall and
+    # exact raw-observation drill-down instead of relying on flattened text.
+    assert resident.timeline_results
     assert any(
         item.get("object_type") == "observation"
-        and "项目周会" in str(item.get("excerpt", ""))
-        for item in resident.search_results
-    ), resident.search_results
+        and item.get("dimension") == "dim:calendar"
+        for item in resident.timeline_results
+    ), resident.timeline_results
+    assert resident.calendar_fact is not None
+    assert resident.calendar_fact.get("object_type") == "observation"
+    assert resident.calendar_fact.get("metadata", {}).get("dimension") == "dim:calendar"
+    assert resident.calendar_fact.get("value") == {
+        "title": "项目周会",
+        "recurrence": "weekly Saturday morning",
+    }
 
     assert resident.final_response is not None
     assert "周六上午已经固定给项目会" in resident.final_response
