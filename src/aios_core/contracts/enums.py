@@ -164,6 +164,7 @@ class DimensionLifecycle(StrEnum):
     REVISED = "revised"
     REJECTED = "rejected"
     REACTIVATED = "reactivated"
+    ARCHIVED = "archived"
 
 
 class GoalStatus(StrEnum):
