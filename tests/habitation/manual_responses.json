@@ -127,5 +127,9 @@
         }
       }
     ]
+  },
+  {
+    "snapshot_signature": "d858de8428cb16d56534e67a0df36bcf14bc2d3f88c9e64da615d83f94b342f3",
+    "type": "silence"
   }
 ]
