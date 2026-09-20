@@ -168,9 +168,24 @@ class MultiScaleSummaryScheduler:
             extent = payload.get("summary_time")
             if not isinstance(extent, dict):
                 continue
-            if str(extent.get("start") or "") != prepared.window_start.isoformat():
+            raw_start = extent.get("start")
+            raw_end = extent.get("end")
+            if not isinstance(raw_start, str) or not isinstance(raw_end, str):
                 continue
-            if str(extent.get("end") or "") != prepared.window_end.isoformat():
+            try:
+                stored_start = as_utc(
+                    datetime.fromisoformat(raw_start.replace("Z", "+00:00")),
+                    "summary_time.start",
+                )
+                stored_end = as_utc(
+                    datetime.fromisoformat(raw_end.replace("Z", "+00:00")),
+                    "summary_time.end",
+                )
+            except ValueError:
+                continue
+            if stored_start != prepared.window_start:
+                continue
+            if stored_end != prepared.window_end:
                 continue
             return payload
         return None
