@@ -596,6 +596,188 @@ class FusedTurnRuntime:
             ),
             self._retract_claim,
         )
+        registry.register(
+            CapabilitySpec(
+                name="focus_entity",
+                description="Focus retrieval on one known Entity id without semantic reinterpretation.",
+                kind=CapabilityKind.READ,
+                input_schema={"entity_id": "string", "query": "string?", "limit": "integer?"},
+            ),
+            self._focus_entity,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="search_timeline",
+                description="Search the world inside an explicit time window, optionally bounded by dimension/type/query.",
+                kind=CapabilityKind.READ,
+                input_schema={
+                    "window_start": "ISO-8601 datetime",
+                    "window_end": "ISO-8601 datetime",
+                    "dimension": "string?",
+                    "object_types": "array[string]?",
+                    "query": "string?",
+                    "limit": "integer?",
+                },
+            ),
+            self._search_timeline,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="follow_relation",
+                description="Follow one-hop explicit Relation objects connected to a world object.",
+                kind=CapabilityKind.READ,
+                input_schema={"object_id": "string", "limit": "integer?"},
+            ),
+            self._follow_relation,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="compare_claims",
+                description="Inspect multiple pinned Claims side by side with their evidence/status; the model decides meaning.",
+                kind=CapabilityKind.READ,
+                input_schema={"claim_refs": "array[{object_id:string,revision:integer}]"},
+            ),
+            self._compare_claims,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="retrieve_original_observation",
+                description="Retrieve an exact Observation fact by id/revision for evidence drill-down.",
+                kind=CapabilityKind.READ,
+                input_schema={"object_id": "string", "revision": "integer?"},
+            ),
+            self._retrieve_original_observation,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="expand_recall",
+                description="Request a broader bounded world recall after the initial recommendation/search was insufficient.",
+                kind=CapabilityKind.READ,
+                input_schema={
+                    "query": "string",
+                    "dimension": "string?",
+                    "limit": "integer?",
+                },
+            ),
+            self._expand_recall,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="inspect_outcome",
+                description="Inspect a pinned real Action Outcome and its Action reference.",
+                kind=CapabilityKind.READ,
+                input_schema={"outcome_ref": "{object_id:string,revision:integer}"},
+            ),
+            self._inspect_outcome,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="read_cognitive_policies",
+                description="Read current versioned R6 policy records from the unified world.",
+                kind=CapabilityKind.READ,
+                input_schema={"policy_id": "string?"},
+            ),
+            self._read_cognitive_policies,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="form_event",
+                description=(
+                    "Form a revisable Event candidate from pinned world evidence. "
+                    "The model supplies the event meaning; code only validates provenance."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "title": "string",
+                    "interpretation": "string",
+                    "event_time": "TemporalExtent object",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "participant_refs": "array[{object_id:string,revision:integer}]?",
+                    "primary_claim_refs": "array[{object_id:string,revision:integer}]?",
+                    "confidence": "number[0,1]",
+                    "dimension": "string?",
+                },
+            ),
+            self._form_event,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="transition_event",
+                description="Forward-revise/resolve/reject/merge/split the current Event using pinned evidence.",
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "event_ref": "{object_id:string,revision:integer}",
+                    "new_status": "candidate|active|resolved|revised|rejected|merged|split",
+                    "reason": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "replacement_title": "string?",
+                    "replacement_interpretation": "string?",
+                    "confidence": "number[0,1]?",
+                    "related_event_refs": "array[{object_id:string,revision:integer}]?",
+                },
+            ),
+            self._transition_event,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="record_communication_experience",
+                description=(
+                    "Record what communication style was used and the real user/world reaction. "
+                    "This records evidence only and does not choose a future style."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "scenario": "string",
+                    "style": "string",
+                    "tone": "string?",
+                    "user_reaction": "accepted|resisted|ignored|unknown",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "action_ref": "{object_id:string,revision:integer}?",
+                    "applicable_conditions": "object?",
+                    "counterexample_refs": "array[{object_id:string,revision:integer}]?",
+                },
+            ),
+            self._record_communication_experience,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="update_cognitive_policy",
+                description=(
+                    "Append an evidence-grounded value revision to an already-registered "
+                    "AI-mutable cognitive policy. Cannot create or loosen hard boundaries."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "policy_id": "string",
+                    "current_value": "json value",
+                    "reason": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "evaluation_window": "string?",
+                },
+            ),
+            self._update_cognitive_policy,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="rollback_cognitive_policy",
+                description=(
+                    "Forward-append a rollback to an earlier policy version using pinned evidence."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "policy_id": "string",
+                    "target_version": "integer",
+                    "reason": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                },
+            ),
+            self._rollback_cognitive_policy,
+        )
         self.registry = registry
         self.cognitive_runtime = CognitiveRuntime(
             registry=registry,
