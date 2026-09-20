@@ -19,6 +19,7 @@ class SolResidentReplay:
 
     def __init__(self) -> None:
         self.aug01_policy_context = None
+        self.background_policy_seen = False
 
     def __call__(self, snapshot):
         text = snapshot.user_input
@@ -167,6 +168,15 @@ class SolResidentReplay:
         # Background periodic reviews and all other resident-visible events are not
         # scripted cognition in this probe. Keep them observable but semantically idle.
         if snapshot.wake_reason != "user_interaction":
+            policy_context = snapshot.cockpit["task_context"].get(
+                "cognitive_policy_context",
+                {},
+            )
+            if (
+                policy_context.get("communication.progress_reporting_mode")
+                == "result_or_blocker_only"
+            ):
+                self.background_policy_seen = True
             return ModelDirective(silence=True)
         return ModelDirective(response="收到，我会把这条事实保留在当前世界里。")
 
@@ -204,6 +214,7 @@ def test_sol_manual_resident_replay_exposes_learned_custom_policies(tmp_path):
 
     assert run.delivered_count == 20
     assert handler.aug01_policy_context is not None
+    assert handler.background_policy_seen is True
 
     policies = {
         item["policy_id"]: item
