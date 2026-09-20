@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
+from aios_core.ai_world import AIWorldClaimRequest, AIWorldCognitionService, AIWorldDomain
 from aios_core.contracts.enums import SourceClass
 from aios_core.contracts.models import Observation
 from aios_core.contracts.operations import OperationRequest
@@ -442,3 +443,87 @@ def test_resident_model_can_build_and_read_user_understanding_in_unified_ai_worl
     ]
     assert len(ai_claims) == 1
     assert ai_claims[0]["metadata"]["scope_key"] == "collaboration.engineering_autonomy"
+
+
+def test_new_session_loads_only_explicit_core_ai_world_context(tmp_path):
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    facts = [
+        Observation(
+            object_id="obs_core_context_role",
+            subject_id="user_1",
+            occurred=TemporalExtent.point(NOW - timedelta(days=4)),
+            learned_at=NOW - timedelta(days=4),
+            recorded_at=NOW - timedelta(days=4),
+            created_by="core-context-test",
+            source_kind="conversation",
+            modality="text",
+            value="这个项目你要持续执行，不只是给建议。",
+            metadata={"dimension": "dim:user_ai_interaction"},
+        ),
+        Observation(
+            object_id="obs_non_core_preference",
+            subject_id="user_1",
+            occurred=TemporalExtent.point(NOW - timedelta(days=3)),
+            learned_at=NOW - timedelta(days=3),
+            recorded_at=NOW - timedelta(days=3),
+            created_by="core-context-test",
+            source_kind="conversation",
+            modality="text",
+            value="我今天比较喜欢短一点的回复。",
+            metadata={"dimension": "dim:user_ai_interaction"},
+        ),
+    ]
+    store.commit(
+        facts,
+        OperationRequest(
+            operation_name="test.seed.core_context",
+            expected_world_revision=0,
+            reason="seed core continuity context",
+            idempotency_key="seed-core-context",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+    ai_world = AIWorldCognitionService(store=store, index=index)
+
+    ai_world.commit(
+        AIWorldClaimRequest(
+            domain=AIWorldDomain.SELF,
+            statement="我在这个长期项目中的角色包含持续执行、核验和断点续传。",
+            evidence_refs=(ObjectRef(object_id=facts[0].object_id, revision=1),),
+            confidence=0.95,
+            scope_key="project_role",
+            tags=("core_context",),
+        ),
+        learned_at=NOW - timedelta(days=2),
+    )
+    ai_world.commit(
+        AIWorldClaimRequest(
+            domain=AIWorldDomain.USER_UNDERSTANDING,
+            statement="用户今天偏好较短回复。",
+            evidence_refs=(ObjectRef(object_id=facts[1].object_id, revision=1),),
+            confidence=0.7,
+            scope_key="communication.detail_level",
+        ),
+        learned_at=NOW - timedelta(days=1),
+    )
+
+    def model(snapshot):
+        continuity = snapshot.cockpit["ai_identity"]
+        assert "self" in continuity
+        assert continuity["self"][0]["scope_key"] == "project_role"
+        assert "user_understanding" not in continuity
+        return ModelDirective(response="继续当前项目主线。")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    result = runtime.run_turn(
+        session_id="brand-new-session",
+        turn_index=1,
+        user_input="继续。",
+        current_topic=None,
+        occurred_at=NOW,
+    )
+
+    assert result.runtime.response == "继续当前项目主线。"
