@@ -943,5 +943,18 @@
   "9305f71c8dee73a1cc961a2d137fcbfca0965d9c81dda7d11cef6a6ba4481d31": {
     "kind": "response",
     "response": "记住了。周一 16:00 的消防检查需要准备灭火器和通道记录；我不会每天提醒。只安排周日、检查前 24 小时做一次准备状态核验——如果到时已经准备好就不打扰，只有还没准备才提醒你。"
+  },
+  "08b24dfd2ffc6824ef6500034b8d23e5aaef563630f9fa5bf28fc0a0ab744dcf": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan15-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
   }
 }
