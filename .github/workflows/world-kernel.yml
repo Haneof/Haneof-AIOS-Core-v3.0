@@ -1,0 +1,37 @@
+name: world-kernel
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/aios_core/contracts/**"
+      - "src/aios_core/dependency/**"
+      - "src/aios_core/storage/**"
+      - "src/aios_core/errors.py"
+      - "tests/unit/test_store.py"
+      - "tests/unit/test_world_revision_atomicity.py"
+      - "tests/unit/test_observation.py"
+      - "pyproject.toml"
+      - ".github/workflows/world-kernel.yml"
+  pull_request:
+    paths:
+      - "src/aios_core/contracts/**"
+      - "src/aios_core/dependency/**"
+      - "src/aios_core/storage/**"
+      - "src/aios_core/errors.py"
+      - "tests/unit/test_store.py"
+      - "tests/unit/test_world_revision_atomicity.py"
+      - "tests/unit/test_observation.py"
+      - "pyproject.toml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - run: pytest tests/unit/test_store.py tests/unit/test_world_revision_atomicity.py tests/unit/test_observation.py
