@@ -21,4 +21,4 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: pip install -e ".[dev]"
       - name: Run GPT-5.6 Sol self-resident Current-Core smoke
-        run: pytest -q tests/experimental/test_p16_gpt56_self_resident_smoke_20260920.py
+        run: pytest -q tests/experimental/test_p16_gpt56_self_resident_smoke_20260920.py tests/experimental/test_p16_gpt56_long_self_resident_smoke_20260920.py
