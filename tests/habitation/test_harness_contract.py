@@ -537,3 +537,20 @@ def test_audit_snapshot_must_be_mapping() -> None:
             model_id="bad-snapshot",
             target=BadSnapshotTarget("bad-snapshot"),
         )
+
+
+def test_bound_target_model_identity_cannot_be_mislabeled() -> None:
+    scenario = _scenario()
+
+    class BoundTarget(RecordingTarget):
+        model_id = "provider/actual-model"
+
+    with pytest.raises(
+        ValueError,
+        match="target model_id does not match candidate model_id",
+    ):
+        HabitationRunner().run(
+            scenario=scenario,
+            model_id="provider/falsely-labeled-model",
+            target=BoundTarget("actual"),
+        )
