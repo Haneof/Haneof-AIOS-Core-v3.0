@@ -231,3 +231,50 @@ def test_visible_projection_and_channel_report_cannot_leak_oracle() -> None:
     ]
     assert scenario_channels(scenario) == ("conversation", "calendar", "oracle")
     assert all(not hasattr(event, "hidden_oracle") for event in projected)
+
+
+def test_factory_path_creates_fresh_world_per_model_candidate() -> None:
+    scenario = _scenario()
+    created: list[RecordingTarget] = []
+
+    class Factory:
+        def __call__(self, *, model_id: str, scenario: HabitationScenario):
+            target = RecordingTarget(model_id)
+            created.append(target)
+            return target
+
+    result = HabitationRunner().run_model_factories(
+        scenario=scenario,
+        factories={
+            "provider/model-a": Factory(),
+            "provider/model-b": Factory(),
+            "provider/model-c": Factory(),
+        },
+    )
+
+    assert len(created) == 3
+    assert len({id(target) for target in created}) == 3
+    assert set(result.runs) == {
+        "provider/model-a",
+        "provider/model-b",
+        "provider/model-c",
+    }
+    assert all(run.delivered_count == 2 for run in result.runs.values())
+
+
+def test_factory_path_rejects_factory_that_reuses_one_world() -> None:
+    scenario = _scenario()
+    shared = RecordingTarget("shared")
+
+    class BadFactory:
+        def __call__(self, *, model_id: str, scenario: HabitationScenario):
+            return shared
+
+    with pytest.raises(ValueError, match="independent AIOS target instance"):
+        HabitationRunner().run_model_factories(
+            scenario=scenario,
+            factories={
+                "provider/model-a": BadFactory(),
+                "provider/model-b": BadFactory(),
+            },
+        )
