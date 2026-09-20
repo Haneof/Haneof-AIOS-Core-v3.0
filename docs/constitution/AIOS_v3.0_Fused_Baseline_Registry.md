@@ -213,7 +213,38 @@ AI自身认知、经验和成长必须作为 AI维度写入统一 AIOS 世界。
 
 错误 Claim、关系判断、用户理解、AI自我判断应通过新版本、撤回、反证、Retrospective Annotation 等机制向前修正，并传播到当前有效认知、总结入口和索引状态。
 
-### 2.16 Core 平台无关
+### 2.16 触发、Wake 与 Resident 调度
+
+本机制**继承旧仓 v3.0 正式法统语义，不构成新的第二套宪法**。当前融合解释以以下旧仓规范内容为来源：
+
+- `Haneof/fantonghui@aios-2.0:docs/constitution/AIOS核心系统宪法v3.0.md`：第 34 条、第 77～83 条；
+- `docs/constitution/v3.0.1_规范裁决集_ADJ-001-012.md`：ADJ-001 / ADJ-002 / ADJ-003；
+- `docs/constitution/AIOS宪法v3.0修改案_R5_AI认知执行运行时与驾驶权.md`：WAKE → Resident Cognitive Runtime 运行闭环；
+- `docs/constitution/AIOS宪法v3.0修改案_R6_自适应认知策略与阈值主权.md`：主动介入、复盘、反思等触发策略属于可审计 Cognitive Policy。
+
+融合后的法定解释：
+
+1. **Observation 默认只写入统一世界，不直接唤醒 AI。**
+2. 机械 Trigger 只判断“是否值得叫 Resident AI 看一眼”，不得写入情绪、关系、人生事件、用户意图等高阶语义结论。
+3. 用户交互、Task 到期、周期 Review、已登记 Watch/验证条件、安全与恢复工作等可以形成 Wake；基础 Observation 只能经明确登记的机械规则间接形成 Wake。
+4. 重复命中必须经过 Wake 去重、合并、冷却或抑制；不得用连续传感器输入制造 Wake 风暴。
+5. Step-0 在模型认知之前执行确定性的安全、方便度、投放信道和预算门禁；其结果只控制能否调用模型/能否对外投放，不替 AI 判断世界含义。
+6. Wake Reason 是 Resident 本次运行的第一任务指针，不是最终认知结论。Resident 可继续 Search / Inspect / Compare，并自主选择 Respond / Act / Silence / Writeback。
+7. 所有非用户后台 Wake 必须复用同一个 Resident Cognitive Runtime 和统一 World；不得创建第二套“后台 AI 大脑”或第二数据库。
+8. `PERIODIC_REVIEW` 保留 P15 专用 anchor/window 入口；`USER_INTERACTION` 保留 Conversation ingest 入口；其他 durable Wake 可走通用 C09 Resident dispatch。
+9. 调度频率、冷却、预算和资源水位属于 Engineering Parameter；主动介入、复盘和重新检索的认知策略属于可版本化 Cognitive Policy，不得把默认数字写成永久语义真理。
+10. 安全硬件的物理先行动作和最终对外通知/设备投放属于平台/安全承载层；Core C09 只负责世界内 Wake 生命周期与 Resident 认知调度边界。
+
+当前实现落点：
+
+- `src/aios_core/wake/service.py`：机械 Wake Bus、注册 Observation 规则、去重/合并/冷却、Step-0；
+- `src/aios_core/runtime/turn_runtime.py::run_wake()`：durable Wake → 同一 Resident CognitiveRuntime；
+- P12 `wake_due_tasks()`：Task schedule → `TASK_DUE` Wake；
+- P15 `run_periodic_review()`：`PERIODIC_REVIEW` Wake → 同一 Resident Runtime；
+- 功能闭环 SHA：`6f1e20307cd1ce47aefff281f652da16af635992`；
+- 合并后验证：`c09-wake-dispatch` run `35501126516` / success。
+
+### 2.17 Core 平台无关
 
 AIOS Core 不绑定某一款手环、手机、Linux发行版或 Android ROM。
 
@@ -245,6 +276,7 @@ Core 首先在可重复的软件环境中跑通，再逐步接入真实设备。
 | 策略学习 | 旧仓 R6 + 新仓 Strategy | 结果驱动、版本化、可回滚 |
 | 认知修正 | 旧仓 Retrospective/Dependency + 新闭环 | 扩展为传播闭环 |
 | 目标/任务/行动 | 旧仓对象体系 | 补 Outcome Evaluation 后继续使用 |
+| Trigger / Wake / Resident 调度 | 旧仓 v3 第34、77～83条 + ADJ-001/003 + R5/R6，新仓 P12/P15/P16 实测 | Observation 默认不直唤醒；机械 Trigger → durable Wake → Step-0 → 同一 Resident Runtime；语义仍由 AI 判断 |
 | 多Agent认知测试 | 新融合测试方案 | 真实模型入住长期虚拟人生，不再以固定题库证明认知成立 |
 
 ---
