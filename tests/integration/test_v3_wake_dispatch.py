@@ -236,6 +236,145 @@ def test_wake_bus_retry_merge_and_cooldown_are_mechanical(tmp_path) -> None:
     assert bus.current_wake(suppressed.wake_id).wake_state.value == "suppressed"
 
 
+def test_wake_dedupe_scope_includes_source_and_rule_identity(tmp_path) -> None:
+    store, index = _world(tmp_path)
+    ref = _seed_observation(
+        store,
+        object_id="obs_c09_scope_identity",
+        value={"marker": True},
+        occurred_at=NOW,
+    )
+    bus = WakeBus(store=store, index=index)
+    shared_key = "shared-caller-key"
+
+    mechanical = bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.MECHANICAL_CHANGE,
+            rule_id="rule.mechanical",
+            observed_at=NOW,
+            evidence_refs=(ref,),
+            dedupe_key=shared_key,
+        )
+    )
+    watch = bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.WATCH_MATCH,
+            rule_id="rule.watch",
+            observed_at=NOW,
+            evidence_refs=(ref,),
+            dedupe_key=shared_key,
+        )
+    )
+    other_rule = bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.MECHANICAL_CHANGE,
+            rule_id="rule.mechanical.other",
+            observed_at=NOW,
+            evidence_refs=(ref,),
+            dedupe_key=shared_key,
+        )
+    )
+
+    assert len({mechanical.wake_id, watch.wake_id, other_rule.wake_id}) == 3
+    assert bus.current_wake(mechanical.wake_id).hit_count == 1
+    assert bus.current_wake(watch.wake_id).hit_count == 1
+    assert bus.current_wake(other_rule.wake_id).hit_count == 1
+
+
+def test_old_exact_signal_retry_stays_idempotent_after_later_wake(tmp_path) -> None:
+    store, index = _world(tmp_path)
+    ref1 = _seed_observation(
+        store,
+        object_id="obs_c09_retry_old_1",
+        value={"delta": 10},
+        occurred_at=NOW,
+    )
+    ref2 = _seed_observation(
+        store,
+        object_id="obs_c09_retry_old_2",
+        value={"delta": 20},
+        occurred_at=NOW + timedelta(minutes=1),
+    )
+    bus = WakeBus(store=store, index=index)
+
+    first_request = WakeSignalRequest(
+        wake_source=WakeSource.MECHANICAL_CHANGE,
+        rule_id="rule.retry-history",
+        observed_at=NOW,
+        evidence_refs=(ref1,),
+        dedupe_key="retry-history",
+        cooldown_seconds=60,
+    )
+    first = bus.emit(first_request)
+    bus.claim(first.wake_id, started_at=NOW + timedelta(seconds=5))
+    completed = bus.complete(
+        first.wake_id,
+        completed_at=NOW + timedelta(seconds=5),
+        termination_reason="silence",
+        model_rounds=1,
+        delivery_allowed=False,
+        step0_state="quiet",
+    )
+
+    later = bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.MECHANICAL_CHANGE,
+            rule_id="rule.retry-history",
+            observed_at=NOW + timedelta(minutes=2),
+            evidence_refs=(ref2,),
+            dedupe_key="retry-history",
+            cooldown_seconds=60,
+        )
+    )
+    assert later.wake_id != first.wake_id
+
+    wakes_before_retry = store.list_payloads(
+        object_type=ObjectType.WAKE,
+        subject_id="user_1",
+    )
+    retried = bus.emit(first_request)
+    wakes_after_retry = store.list_payloads(
+        object_type=ObjectType.WAKE,
+        subject_id="user_1",
+    )
+
+    assert retried.wake_id == first.wake_id
+    assert retried.revision == completed.revision
+    assert len(wakes_after_retry) == len(wakes_before_retry)
+
+
+def test_new_out_of_order_signal_is_rejected_within_same_scope(tmp_path) -> None:
+    store, index = _world(tmp_path)
+    ref = _seed_observation(
+        store,
+        object_id="obs_c09_out_of_order",
+        value={"marker": True},
+        occurred_at=NOW,
+    )
+    bus = WakeBus(store=store, index=index)
+    bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.WATCH_MATCH,
+            rule_id="rule.order",
+            observed_at=NOW + timedelta(minutes=2),
+            evidence_refs=(ref,),
+            dedupe_key="ordered-scope",
+        )
+    )
+
+    with pytest.raises(ValueError, match="out-of-order Wake hit"):
+        bus.emit(
+            WakeSignalRequest(
+                wake_source=WakeSource.WATCH_MATCH,
+                rule_id="rule.order",
+                observed_at=NOW + timedelta(minutes=1),
+                evidence_refs=(ref,),
+                dedupe_key="ordered-scope",
+                metadata={"distinct": True},
+            )
+        )
+
+
 def test_step0_budget_block_queues_wake_then_resumes(tmp_path) -> None:
     store, index = _world(tmp_path)
     ref = _seed_observation(
