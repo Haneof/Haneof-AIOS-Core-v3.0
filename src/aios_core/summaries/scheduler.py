@@ -1,0 +1,255 @@
+"""Deterministic scheduling for model-generated summaries across every dimension.
+
+The scheduler owns time windows, dimension discovery, source selection, idempotent
+skip logic and budgets. It never writes semantic summary text itself. A supplied
+model handler receives a DimensionSummaryInput and returns descriptive content.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
+from enum import StrEnum
+from typing import Callable, Sequence
+
+from aios_core.contracts.enums import ObjectType
+from aios_core.contracts.time import as_utc
+from aios_core.query.search import derive_dimension, WorldSearchIndex
+from aios_core.storage.sqlite_store import SQLiteWorldStore
+
+from .dimension_summary import DimensionSummaryInput, DimensionSummaryService, SummaryCommit
+
+UTC = timezone.utc
+
+
+class SummaryScale(StrEnum):
+    DAY = "day"
+    WEEK = "week"
+    MONTH = "month"
+    QUARTER = "quarter"
+    HALF_YEAR = "half_year"
+    YEAR = "year"
+    MULTI_YEAR_3Y = "multi_year_3y"
+    MULTI_YEAR_5Y = "multi_year_5y"
+    DECADE = "decade"
+
+
+SCALE_LADDER: tuple[SummaryScale, ...] = (
+    SummaryScale.DAY,
+    SummaryScale.WEEK,
+    SummaryScale.MONTH,
+    SummaryScale.QUARTER,
+    SummaryScale.HALF_YEAR,
+    SummaryScale.YEAR,
+    SummaryScale.MULTI_YEAR_3Y,
+    SummaryScale.MULTI_YEAR_5Y,
+    SummaryScale.DECADE,
+)
+
+
+@dataclass(frozen=True, slots=True)
+class ScheduledSummaryJob:
+    dimension: str
+    scale: SummaryScale
+    window_start: datetime
+    window_end: datetime
+    source_count: int
+
+
+@dataclass(frozen=True, slots=True)
+class SummaryScheduleResult:
+    attempted_jobs: tuple[ScheduledSummaryJob, ...]
+    commits: tuple[SummaryCommit, ...]
+    skipped_unchanged: tuple[ScheduledSummaryJob, ...]
+    skipped_empty: tuple[ScheduledSummaryJob, ...]
+    truncated: bool
+
+
+def window_bounds(moment: datetime, scale: SummaryScale) -> tuple[datetime, datetime]:
+    dt = as_utc(moment, "moment")
+    if scale is SummaryScale.DAY:
+        start = datetime(dt.year, dt.month, dt.day, tzinfo=UTC)
+        return start, start + timedelta(days=1) - timedelta(microseconds=1)
+    if scale is SummaryScale.WEEK:
+        day = datetime(dt.year, dt.month, dt.day, tzinfo=UTC)
+        start = day - timedelta(days=dt.isoweekday() - 1)
+        return start, start + timedelta(days=7) - timedelta(microseconds=1)
+    if scale is SummaryScale.MONTH:
+        start = datetime(dt.year, dt.month, 1, tzinfo=UTC)
+        month = dt.month % 12 + 1
+        year = dt.year + (dt.month // 12)
+        return start, datetime(year, month, 1, tzinfo=UTC) - timedelta(microseconds=1)
+    if scale is SummaryScale.QUARTER:
+        month = ((dt.month - 1) // 3) * 3 + 1
+        start = datetime(dt.year, month, 1, tzinfo=UTC)
+        end_month = month + 3
+        year = dt.year + (end_month - 1) // 12
+        normalized = (end_month - 1) % 12 + 1
+        return start, datetime(year, normalized, 1, tzinfo=UTC) - timedelta(microseconds=1)
+    if scale is SummaryScale.HALF_YEAR:
+        month = 1 if dt.month <= 6 else 7
+        start = datetime(dt.year, month, 1, tzinfo=UTC)
+        end_month = month + 6
+        year = dt.year + (end_month - 1) // 12
+        normalized = (end_month - 1) % 12 + 1
+        return start, datetime(year, normalized, 1, tzinfo=UTC) - timedelta(microseconds=1)
+    if scale is SummaryScale.YEAR:
+        start = datetime(dt.year, 1, 1, tzinfo=UTC)
+        return start, datetime(dt.year + 1, 1, 1, tzinfo=UTC) - timedelta(microseconds=1)
+    if scale is SummaryScale.MULTI_YEAR_3Y:
+        start_year = (dt.year // 3) * 3
+        start = datetime(start_year, 1, 1, tzinfo=UTC)
+        return start, datetime(start_year + 3, 1, 1, tzinfo=UTC) - timedelta(microseconds=1)
+    if scale is SummaryScale.MULTI_YEAR_5Y:
+        start_year = (dt.year // 5) * 5
+        start = datetime(start_year, 1, 1, tzinfo=UTC)
+        return start, datetime(start_year + 5, 1, 1, tzinfo=UTC) - timedelta(microseconds=1)
+    if scale is SummaryScale.DECADE:
+        start_year = (dt.year // 10) * 10
+        start = datetime(start_year, 1, 1, tzinfo=UTC)
+        return start, datetime(start_year + 10, 1, 1, tzinfo=UTC) - timedelta(microseconds=1)
+    raise ValueError(f"unsupported summary scale: {scale}")
+
+
+def previous_closed_window(now: datetime, scale: SummaryScale) -> tuple[datetime, datetime]:
+    current_start, _ = window_bounds(now, scale)
+    return window_bounds(current_start - timedelta(microseconds=1), scale)
+
+
+class MultiScaleSummaryScheduler:
+    def __init__(
+        self,
+        *,
+        store: SQLiteWorldStore,
+        index: WorldSearchIndex,
+        summary_handler: Callable[[DimensionSummaryInput], str],
+        subject_id: str = "user_1",
+        max_source_objects: int = 500,
+    ) -> None:
+        self.store = store
+        self.index = index
+        self.summary_handler = summary_handler
+        self.subject_id = subject_id
+        self.service = DimensionSummaryService(
+            store=store,
+            index=index,
+            subject_id=subject_id,
+            max_source_objects=max_source_objects,
+        )
+
+    def active_dimensions(self) -> tuple[str, ...]:
+        dimensions: set[str] = set()
+        for payload in self.store.list_payloads(subject_id=self.subject_id):
+            object_type = str(payload.get("object_type") or "")
+            dimension = derive_dimension(payload, object_type)
+            if dimension and dimension != "dim_unclassified":
+                dimensions.add(dimension)
+            if object_type == ObjectType.DIMENSION_DEFINITION.value:
+                metadata = payload.get("metadata")
+                key = metadata.get("dimension_key") if isinstance(metadata, dict) else None
+                if isinstance(key, str) and key.strip():
+                    dimensions.add(key.strip())
+        return tuple(sorted(dimensions))
+
+    @staticmethod
+    def _source_identity(prepared: DimensionSummaryInput) -> tuple[tuple[str, int], ...]:
+        return tuple((item.object_id, item.revision) for item in prepared.sources)
+
+    def _matching_current_summary(self, prepared: DimensionSummaryInput) -> dict | None:
+        for payload in self.store.list_payloads(
+            object_type=ObjectType.SUMMARY,
+            subject_id=self.subject_id,
+        ):
+            metadata = payload.get("metadata")
+            if not isinstance(metadata, dict) or metadata.get("dimension") != prepared.dimension:
+                continue
+            if str(payload.get("granularity") or "") != prepared.granularity:
+                continue
+            extent = payload.get("summary_time")
+            if not isinstance(extent, dict):
+                continue
+            if str(extent.get("start") or "") != prepared.window_start.isoformat():
+                continue
+            if str(extent.get("end") or "") != prepared.window_end.isoformat():
+                continue
+            return payload
+        return None
+
+    def _unchanged(self, prepared: DimensionSummaryInput) -> bool:
+        latest = self._matching_current_summary(prepared)
+        if latest is None:
+            return False
+        existing = tuple(
+            (str(item.get("object_id")), int(item.get("revision") or 0))
+            for item in (latest.get("source_refs") or [])
+        )
+        return existing == self._source_identity(prepared)
+
+    def run_due(
+        self,
+        *,
+        now: datetime,
+        scales: Sequence[SummaryScale] = SCALE_LADDER,
+        max_jobs: int = 64,
+        dimensions: Sequence[str] | None = None,
+    ) -> SummaryScheduleResult:
+        if max_jobs < 1:
+            raise ValueError("max_jobs must be >= 1")
+        current = as_utc(now, "now")
+        dims = tuple(dict.fromkeys(
+            str(item).strip() for item in (dimensions or self.active_dimensions()) if str(item).strip()
+        ))
+        jobs: list[ScheduledSummaryJob] = []
+        commits: list[SummaryCommit] = []
+        skipped_unchanged: list[ScheduledSummaryJob] = []
+        skipped_empty: list[ScheduledSummaryJob] = []
+        truncated = False
+
+        for scale_value in scales:
+            scale = SummaryScale(scale_value)
+            start, end = previous_closed_window(current, scale)
+            for dimension in dims:
+                if len(jobs) >= max_jobs:
+                    truncated = True
+                    break
+                prepared = self.service.prepare(
+                    dimension=dimension,
+                    granularity=scale.value,
+                    window_start=start,
+                    window_end=end,
+                    include_summary_sources=(scale is not SummaryScale.DAY),
+                )
+                job = ScheduledSummaryJob(
+                    dimension=dimension,
+                    scale=scale,
+                    window_start=start,
+                    window_end=end,
+                    source_count=len(prepared.sources),
+                )
+                jobs.append(job)
+                if not prepared.sources:
+                    skipped_empty.append(job)
+                    continue
+                if self._unchanged(prepared):
+                    skipped_unchanged.append(job)
+                    continue
+                content = self.summary_handler(prepared)
+                if not isinstance(content, str) or not content.strip():
+                    raise ValueError("dimension summary handler must return non-blank text")
+                commits.append(
+                    self.service.commit(
+                        prepared,
+                        content=content,
+                        generated_at=current,
+                    )
+                )
+            if truncated:
+                break
+
+        return SummaryScheduleResult(
+            attempted_jobs=tuple(jobs),
+            commits=tuple(commits),
+            skipped_unchanged=tuple(skipped_unchanged),
+            skipped_empty=tuple(skipped_empty),
+            truncated=truncated,
+        )
