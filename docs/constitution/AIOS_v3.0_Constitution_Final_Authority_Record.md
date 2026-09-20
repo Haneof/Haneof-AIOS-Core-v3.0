@@ -1,24 +1,28 @@
 # AIOS v3.0 Constitution Final Authority Record
 
-## Purpose
+> 状态：HISTORICAL SNAPSHOT  
+> 说明：本文件记录新仓在双仓融合开始前的历史法统状态，不再作为当前唯一开发权威。
 
-Define the final authority relationship of the AIOS v3.0 constitution system.
+## Current Note
 
-## Authority Rules
+AIOS v3.0 已进入双仓择优融合阶段。
 
-1. Version Entry defines the official constitution entry point.
-2. Structure Index defines module organization.
-3. Each independent mechanism file is the sole authority for that mechanism.
-4. Inventory and maps describe structure only and do not replace mechanism documents.
-5. Historical documents remain references and do not create competing authority.
+当前开发解释入口为：
 
-## World Model Rules
+`AIOS_v3.0_Fused_Baseline_Registry.md`
 
-- All dimensions exist in one shared multi-dimensional world.
-- Dimensions are parallel observation axes, not hierarchical database layers.
-- Summary mechanisms serve all dimensions.
-- Registration mechanisms allow AIOS to create new observation axes under constraints.
+参与融合来源：
 
-## Maintenance Rule
+- `Haneof/fantonghui@aios-2.0`
+- `Haneof/Haneof-AIOS-Core-v3.0@main`
 
-Future changes must update the responsible mechanism document first, then update indexes if required.
+本文件原先关于“每个机制文件为最终唯一权威”的表述，自双仓融合开始后仅保留历史追溯意义。
+
+最终 authority 关系将在：
+
+- 机制级融合完成；
+- 最小完整运行链跑通；
+- 多Agent长期虚拟人生入住测试完成；
+
+之后重新签发。
+
