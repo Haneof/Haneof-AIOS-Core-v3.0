@@ -184,3 +184,54 @@ def test_load_events_jsonl_accepts_comments_and_requires_aware_time() -> None:
         load_events_jsonl(
             '{"event_id":"bad","occurred_at":"2026-09-20T08:00:00","channel":"x","payload":"x"}'
         )
+
+
+def test_jsonl_rejects_string_boolean_and_non_chronological_events() -> None:
+    with pytest.raises(ValueError, match="deliver_to_resident must be a boolean"):
+        load_events_jsonl(
+            '{"event_id":"a","occurred_at":"2026-09-20T08:00:00Z","channel":"x","payload":"x","deliver_to_resident":"false"}'
+        )
+
+    with pytest.raises(ValueError, match="events must be chronological"):
+        load_events_jsonl(
+            """{"event_id":"later","occurred_at":"2026-09-21T08:00:00Z","channel":"x","payload":"later"}
+{"event_id":"earlier","occurred_at":"2026-09-20T08:00:00Z","channel":"x","payload":"earlier"}"""
+        )
+
+
+def test_jsonl_rejects_duplicate_ids() -> None:
+    with pytest.raises(ValueError, match="duplicate event_id"):
+        load_events_jsonl(
+            """{"event_id":"same","occurred_at":"2026-09-20T08:00:00Z","channel":"x","payload":"a"}
+{"event_id":"same","occurred_at":"2026-09-21T08:00:00Z","channel":"x","payload":"b"}"""
+        )
+
+
+def test_scenario_json_rejects_type_coercion_for_identity_and_seed() -> None:
+    with pytest.raises(ValueError, match="scenario_id must be a non-empty string"):
+        load_scenario_json(
+            '{"scenario_id":null,"subject_id":"u","events":[{"event_id":"e","occurred_at":"2026-09-20T08:00:00Z","channel":"x"}]}'
+        )
+
+    with pytest.raises(ValueError, match="seed must be an integer"):
+        load_scenario_json(
+            '{"scenario_id":"s","subject_id":"u","seed":"42","events":[{"event_id":"e","occurred_at":"2026-09-20T08:00:00Z","channel":"x"}]}'
+        )
+
+
+def test_public_fingerprint_rejects_non_json_visible_payload() -> None:
+    scenario = HabitationScenario(
+        scenario_id="non-json",
+        subject_id="u",
+        events=(
+            LifeEvent(
+                event_id="e1",
+                occurred_at=BASE,
+                channel="conversation",
+                payload={"bad": {1, 2, 3}},
+            ),
+        ),
+    )
+
+    with pytest.raises(TypeError):
+        scenario_public_fingerprint(scenario)
