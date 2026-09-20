@@ -107,6 +107,7 @@ class CognitionWritebackService:
             request.dimension,
             request.content.strip(),
             request.confidence,
+            request.metadata,
             evidence_set_id,
             learned.isoformat(),
         )
