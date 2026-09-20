@@ -116,6 +116,29 @@ def _schema_from_expr(raw: str) -> tuple[dict[str, Any], bool]:
         return {"type": "boolean"}, optional
     if expr == "object":
         return {"type": "object", "additionalProperties": True}, optional
+    if expr == "TemporalExtent object":
+        return {
+            "type": "object",
+            "properties": {
+                "start": {"type": "string", "format": "date-time"},
+                "end": {"type": "string", "format": "date-time"},
+                "precision": {"type": "string"},
+                "timezone_name": {"type": "string"},
+                "unknown": {"type": "boolean"},
+            },
+            "additionalProperties": False,
+        }, optional
+    if expr == "json value":
+        return {
+            "anyOf": [
+                {"type": "string"},
+                {"type": "number"},
+                {"type": "boolean"},
+                {"type": "object", "additionalProperties": True},
+                {"type": "array"},
+                {"type": "null"},
+            ]
+        }, optional
     if expr == "object[number]":
         return {
             "type": "object",
