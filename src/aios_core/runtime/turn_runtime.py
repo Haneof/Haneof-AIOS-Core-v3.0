@@ -878,6 +878,17 @@ class FusedTurnRuntime:
         task_context: Mapping[str, Any] | None = None,
         token_budget: int | None = None,
     ) -> FusedTurnResult:
+        # The current user utterance is a world fact before model inference.
+        # This gives the resident model a pinned evidence ref for same-turn
+        # cognition, Goal/Task creation and other evidence-grounded decisions.
+        user_commit = self.ingestor.commit_user_input(
+            session_id=session_id,
+            turn_index=turn_index,
+            user_text=user_input,
+            occurred_at=occurred_at,
+        )
+        self.index.catch_up()
+
         recommendation = self.recommender.recommend(
             current_topic=current_topic,
             subject_id=self.subject_id,
@@ -890,13 +901,19 @@ class FusedTurnRuntime:
             else self.ai_world.core_context(per_domain=3)
         )
 
+        current_task_context = dict(task_context or {})
+        current_task_context["current_user_observation_ref"] = {
+            "object_id": user_commit.observation_id,
+            "revision": 1,
+        }
+
         context = self.context_controller.assemble(
             user_input=user_input,
             current_topic=current_topic,
             recommendation=recommendation,
             recent_turns=recent_turns,
             ai_identity=continuity_context,
-            task_context=task_context,
+            task_context=current_task_context,
             capability_catalog=self.registry.catalog(),
             token_budget=token_budget,
         )
@@ -912,12 +929,22 @@ class FusedTurnRuntime:
             self._active_turn_time = None
 
         assistant_text = runtime_result.response or ""
-        commit = self.ingestor.commit_turn(
+        assistant_commit = self.ingestor.commit_assistant_output(
             session_id=session_id,
             turn_index=turn_index,
-            user_text=user_input,
             assistant_text=assistant_text,
             occurred_at=occurred_at,
+        )
+        commit = ConversationCommit(
+            world_revision=assistant_commit.world_revision,
+            user_observation_id=user_commit.observation_id,
+            assistant_observation_id=assistant_commit.observation_id,
+            idempotent_replay=(
+                user_commit.idempotent_replay
+                and assistant_commit.idempotent_replay
+            ),
+            user_world_revision=user_commit.world_revision,
+            assistant_world_revision=assistant_commit.world_revision,
         )
         # Keep the public search projection current for the next turn.
         self.index.catch_up()
