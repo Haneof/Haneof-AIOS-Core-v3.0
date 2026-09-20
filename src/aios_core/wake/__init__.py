@@ -1,6 +1,8 @@
 """Constitutional C09 wake scheduling and dispatch primitives."""
 
 from .service import (
+    ObservationTriggerService,
+    ObservationWakeRule,
     Step0GateInput,
     Step0GateResult,
     WakeBus,
@@ -10,6 +12,8 @@ from .service import (
 )
 
 __all__ = [
+    "ObservationTriggerService",
+    "ObservationWakeRule",
     "Step0GateInput",
     "Step0GateResult",
     "WakeBus",
