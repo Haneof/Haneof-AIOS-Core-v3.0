@@ -122,6 +122,18 @@ class HabitationTarget(Protocol):
         """Deliver one event to this model's private AIOS world."""
 
 
+class HabitationTargetFactory(Protocol):
+    """Factory that must create a fresh AIOS target/world for one model candidate."""
+
+    def __call__(
+        self,
+        *,
+        model_id: str,
+        scenario: HabitationScenario,
+    ) -> HabitationTarget:
+        """Return a new isolated target for this model and scenario."""
+
+
 class HabitationEvaluator(Protocol):
     """Post-run evaluation may inspect hidden truth; the resident may not."""
 
@@ -242,6 +254,23 @@ class HabitationRunner:
             scenario_id=scenario.scenario_id,
             runs=runs,
         )
+
+    def run_model_factories(
+        self,
+        *,
+        scenario: HabitationScenario,
+        factories: Mapping[str, HabitationTargetFactory],
+    ) -> MultiModelHabitationResult:
+        """Create a fresh target/world per model and then run the same sealed life."""
+
+        if not factories:
+            raise ValueError("factories must contain at least one model candidate")
+
+        targets: dict[str, HabitationTarget] = {}
+        for model_id, factory in factories.items():
+            targets[model_id] = factory(model_id=model_id, scenario=scenario)
+
+        return self.run_models(scenario=scenario, targets=targets)
 
 
 def evaluate_run(
