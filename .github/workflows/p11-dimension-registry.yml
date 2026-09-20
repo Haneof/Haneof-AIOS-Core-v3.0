@@ -1,0 +1,26 @@
+name: p11-dimension-registry
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/aios_core/dimensions/**"
+      - "src/aios_core/contracts/enums.py"
+      - "tests/integration/test_v3_dimension_registry.py"
+      - ".github/workflows/p11-dimension-registry.yml"
+  pull_request:
+    paths:
+      - "src/aios_core/dimensions/**"
+      - "tests/integration/test_v3_dimension_registry.py"
+
+jobs:
+  p11:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - run: pytest tests/integration/test_v3_dimension_registry.py
