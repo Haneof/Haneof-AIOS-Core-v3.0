@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from aios_core.contracts.enums import ObjectType, SourceClass
+from aios_core.contracts.enums import ErrorCode, ObjectType, SourceClass
 from aios_core.ingest import (
     AUDIT_DIMENSION,
     MechanicalSeriesPolicy,
@@ -13,7 +13,7 @@ from aios_core.ingest import (
     SourceAdapterSpec,
 )
 from aios_core.query.search import WorldSearchIndex
-from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
 
 NOW = datetime(2026, 9, 20, 15, 0, tzinfo=timezone.utc)
@@ -285,4 +285,283 @@ def test_adapter_requires_explicit_source_dimension_and_nonsemantic_source_class
             dimension="dim:payment",
             source_class=SourceClass.AI_COGNITION,
             default_modality="structured",
+        )
+
+
+
+def test_structured_identity_hash_prevents_delimiter_boundary_collision(tmp_path):
+    store, _, service = _world(tmp_path)
+    first_spec = SourceAdapterSpec(
+        adapter_id="a|b",
+        source_kind="note",
+        dimension="dim:notes",
+        source_class=SourceClass.USER,
+        default_modality="text",
+    )
+    second_spec = SourceAdapterSpec(
+        adapter_id="a",
+        source_kind="note",
+        dimension="dim:notes",
+        source_class=SourceClass.USER,
+        default_modality="text",
+    )
+
+    first = service.ingest_record(
+        first_spec,
+        RealityRecord(
+            external_record_id="c",
+            occurred_at=NOW,
+            received_at=NOW,
+            value="first",
+        ),
+    )
+    second = service.ingest_record(
+        second_spec,
+        RealityRecord(
+            external_record_id="b|c",
+            occurred_at=NOW,
+            received_at=NOW,
+            value="second",
+        ),
+    )
+
+    assert first.observation_id != second.observation_id
+    assert len(store.list_payloads(object_type=ObjectType.OBSERVATION)) == 2
+
+
+def test_identity_text_is_canonicalized_and_subjects_are_isolated(tmp_path):
+    store = SQLiteWorldStore(tmp_path / "world.db")
+    spec = SourceAdapterSpec(
+        adapter_id="  notes.v1  ",
+        source_kind="  note  ",
+        dimension="  dim:notes  ",
+        source_class=SourceClass.USER,
+        schema_version="  1  ",
+        default_modality="  text  ",
+    )
+    record = RealityRecord(
+        external_record_id="  note-1  ",
+        external_revision="  7  ",
+        occurred_at=NOW,
+        received_at=NOW,
+        value="买牛奶",
+    )
+
+    assert spec.adapter_id == "notes.v1"
+    assert spec.dimension == "dim:notes"
+    assert record.external_record_id == "note-1"
+    assert record.external_revision == "7"
+
+    user_one = RealityIngestService(store=store, subject_id=" user_1 ")
+    user_two = RealityIngestService(store=store, subject_id="user_2")
+
+    one = user_one.ingest_record(spec, record)
+    one_retry = user_one.ingest_record(
+        spec,
+        record.model_copy(
+            update={
+                "external_record_id": "note-1",
+                "external_revision": "7",
+            }
+        ),
+    )
+    two = user_two.ingest_record(spec, record)
+
+    assert one_retry.observation_id == one.observation_id
+    assert one_retry.reused_existing is True
+    assert two.observation_id != one.observation_id
+    assert store.get_payload(one.observation_id)["subject_id"] == "user_1"
+    assert store.get_payload(two.observation_id)["subject_id"] == "user_2"
+
+
+def test_same_source_revision_cannot_silently_change_adapter_semantics(tmp_path):
+    store, _, service = _world(tmp_path)
+    base = SourceAdapterSpec(
+        adapter_id="notes.v1",
+        source_kind="note",
+        dimension="dim:notes",
+        source_class=SourceClass.USER,
+        default_modality="text",
+    )
+    record = RealityRecord(
+        external_record_id="note-1",
+        external_revision="3",
+        occurred_at=NOW,
+        received_at=NOW,
+        value="same source payload",
+        source_locator="content://notes/note-1",
+    )
+    service.ingest_record(base, record)
+
+    rerouted = base.model_copy(update={"dimension": "dim:relationship"})
+    with pytest.raises(ValueError, match="adapter semantics"):
+        service.ingest_record(rerouted, record)
+
+    reclassified = base.model_copy(update={"source_class": SourceClass.SENSOR})
+    with pytest.raises(ValueError, match="adapter semantics"):
+        service.ingest_record(reclassified, record)
+
+
+def test_generic_reality_record_preserves_time_interval(tmp_path):
+    store, _, service = _world(tmp_path)
+    calendar = SourceAdapterSpec(
+        adapter_id="calendar.v1",
+        source_kind="calendar_event",
+        dimension="dim:calendar",
+        source_class=SourceClass.USER,
+        default_modality="structured_record",
+    )
+    end = NOW + timedelta(hours=2)
+
+    receipt = service.ingest_record(
+        calendar,
+        RealityRecord(
+            external_record_id="meeting-1",
+            occurred_at=NOW,
+            occurred_end_at=end,
+            received_at=NOW - timedelta(minutes=1),
+            value={"title": "project review"},
+        ),
+    )
+    payload = store.get_payload(receipt.observation_id)
+
+    assert payload["occurred"]["start"].startswith(NOW.isoformat().replace("+00:00", ""))
+    assert payload["occurred"]["end"].startswith(end.isoformat().replace("+00:00", ""))
+    assert payload["metadata"]["occurred_end_at_original"] == end.isoformat()
+
+
+def test_non_not_found_storage_failure_is_not_misclassified_as_missing(
+    tmp_path,
+    monkeypatch,
+):
+    store, _, service = _world(tmp_path)
+    spec = SourceAdapterSpec(
+        adapter_id="notes.v1",
+        source_kind="note",
+        dimension="dim:notes",
+        source_class=SourceClass.USER,
+        default_modality="text",
+    )
+    record = RealityRecord(
+        external_record_id="note-1",
+        occurred_at=NOW,
+        received_at=NOW,
+        value="x",
+    )
+
+    def broken_get_payload(*args, **kwargs):
+        raise StoreError(
+            ErrorCode.STORAGE_FAILURE,
+            "simulated corrupt payload",
+            context={"reason": "test_corruption"},
+        )
+
+    monkeypatch.setattr(store, "get_payload", broken_get_payload)
+    with pytest.raises(StoreError) as exc_info:
+        service.ingest_record(spec, record)
+    assert exc_info.value.code == ErrorCode.STORAGE_FAILURE
+
+
+def test_retry_through_commit_path_is_idempotent_under_race_window(
+    tmp_path,
+    monkeypatch,
+):
+    store, _, service = _world(tmp_path)
+    spec = SourceAdapterSpec(
+        adapter_id="notes.v1",
+        source_kind="note",
+        dimension="dim:notes",
+        source_class=SourceClass.USER,
+        default_modality="text",
+    )
+    record = RealityRecord(
+        external_record_id="note-race",
+        occurred_at=NOW,
+        received_at=NOW,
+        value="same logical request",
+    )
+
+    first = service.ingest_record(spec, record)
+    first_revision = store.current_world_revision()
+
+    monkeypatch.setattr(service, "_get_payload_if_exists", lambda object_id: None)
+    replay = service.ingest_record(spec, record)
+
+    assert replay.observation_id == first.observation_id
+    assert replay.reused_existing is True
+    assert store.current_world_revision() == first_revision
+
+
+def test_numeric_series_rejects_mutated_content_under_same_series_identity(tmp_path):
+    store, _, service = _world(tmp_path)
+    spec = SourceAdapterSpec(
+        adapter_id="sensor.hr.v1",
+        source_kind="heart_rate",
+        dimension="dim:heart_rate",
+        source_class=SourceClass.SENSOR,
+        default_modality="numeric",
+    )
+    samples = [
+        NumericSample(
+            external_record_id="hr-1",
+            occurred_at=NOW,
+            value=70.0,
+        ),
+        NumericSample(
+            external_record_id="hr-2",
+            occurred_at=NOW + timedelta(seconds=30),
+            value=71.0,
+        ),
+    ]
+    policy = MechanicalSeriesPolicy(
+        tolerance=10.0,
+        change_threshold=20.0,
+        max_gap_seconds=60.0,
+    )
+    service.ingest_numeric_series(
+        spec,
+        series_id="window-1",
+        samples=samples,
+        policy=policy,
+        unit="bpm",
+        received_at=NOW + timedelta(minutes=1),
+    )
+
+    mutated = [
+        samples[0],
+        samples[1].model_copy(update={"value": 72.0}),
+    ]
+    with pytest.raises(ValueError, match="numeric series identity conflict"):
+        service.ingest_numeric_series(
+            spec,
+            series_id="window-1",
+            samples=mutated,
+            policy=policy,
+            unit="bpm",
+            received_at=NOW + timedelta(minutes=2),
+        )
+
+    with pytest.raises(ValueError, match="numeric series identity conflict"):
+        service.ingest_numeric_series(
+            spec,
+            series_id="window-1",
+            samples=samples,
+            policy=policy.model_copy(update={"tolerance": 11.0}),
+            unit="bpm",
+            received_at=NOW + timedelta(minutes=2),
+        )
+
+
+def test_numeric_contract_rejects_non_finite_values():
+    with pytest.raises(ValueError):
+        NumericSample(
+            external_record_id="bad",
+            occurred_at=NOW,
+            value=float("nan"),
+        )
+    with pytest.raises(ValueError):
+        MechanicalSeriesPolicy(
+            tolerance=float("inf"),
+            change_threshold=1.0,
+            max_gap_seconds=60.0,
         )
