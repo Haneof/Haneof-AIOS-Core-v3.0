@@ -653,5 +653,31 @@
         }
       }
     ]
+  },
+  "4b4e9ef70ca373929c53b2cef75305f771ec2c37aa42557a0a7fd8b99eb633f2": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "commit_claim",
+        "call_id": "sol-jan11-provisional-northmill-price-claim",
+        "arguments": {
+          "content": "North Mill 本次面包粉报价为 1.42 USD/kg；旧价格尚未由发票核实，因此当前不能把“贵不少”作为长期结论，涨幅大小仍待证据确认。",
+          "evidence_refs": [
+            {
+              "object_id": "obs_src_728cbdc5f928fc29488476c9",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_de098676ee4d9413b5d782fc",
+              "revision": 1
+            }
+          ],
+          "confidence": 0.98,
+          "dimension": "dim:ai_calibration",
+          "claim_type": "provisional_comparison",
+          "knowledge_state": "uncertain"
+        }
+      }
+    ]
   }
 }
