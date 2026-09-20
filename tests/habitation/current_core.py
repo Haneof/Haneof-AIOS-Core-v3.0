@@ -477,9 +477,9 @@ class CurrentCoreHabitationTarget(HabitationTarget):
             session_id=session_id,
             turn_index=turn_index,
             user_input=event.payload,
-            # Use only the current resident-visible utterance as the topic gate seed.
-            # The benchmark must not inject evaluator semantic labels.
-            current_topic=event.payload,
+            # Topic state is derived inside Core from the resident-visible current
+            # utterance + canonical same-session continuity. The habitation adapter
+            # must not inject evaluator semantic labels or pre-decide memory relevance.
             occurred_at=event.occurred_at,
             token_budget=self._token_budget,
         )
