@@ -14,13 +14,14 @@ from typing import Any, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from aios_core.contracts.enums import ClaimType, KnowledgeState, ObjectType, SourceClass
+from aios_core.contracts.enums import ClaimType, ErrorCode, KnowledgeState, ObjectType, SourceClass
 from aios_core.contracts.models import Claim, Dependency, EvidenceCoverage, EvidenceSet
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import KnowledgeWindow, TemporalExtent, as_utc
 from aios_core.query.search import WorldSearchIndex
-from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.storage.idempotency import canonical_json_dumps
+from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
 
 class ClaimWriteRequest(BaseModel):
@@ -55,7 +56,7 @@ class ClaimWriteReceipt:
 
 
 def _stable_id(prefix: str, *parts: object) -> str:
-    raw = "|".join(str(part) for part in parts)
+    raw = canonical_json_dumps(list(parts))
     return f"{prefix}_{hashlib.sha256(raw.encode('utf-8')).hexdigest()[:24]}"
 
 
@@ -68,10 +69,17 @@ class CognitionWritebackService:
         store: SQLiteWorldStore,
         index: WorldSearchIndex | None = None,
         subject_id: str = "user_1",
+        evidence_subject_ids: Sequence[str] | None = None,
     ) -> None:
         self.store = store
         self.index = index
         self.subject_id = subject_id
+        allowed = tuple(evidence_subject_ids or (subject_id,))
+        self.evidence_subject_ids = frozenset(
+            str(item).strip() for item in allowed if str(item).strip()
+        )
+        if not self.evidence_subject_ids:
+            raise ValueError("evidence_subject_ids must contain at least one subject")
 
     def commit_claim(
         self,
@@ -87,9 +95,17 @@ class CognitionWritebackService:
             )
         )
 
-        # Evidence must already exist in the world at exactly the pinned revision.
+        # Evidence must already exist in the same private-world subject scope at
+        # exactly the pinned revision. AI-self cognition may explicitly opt into
+        # both the user subject and AI-self subject; unrelated user subjects may not.
         for ref in pinned:
-            self.store.get_payload(ref.object_id, revision=ref.revision)
+            payload = self.store.get_payload(ref.object_id, revision=ref.revision)
+            evidence_subject = str(payload.get("subject_id") or "")
+            if evidence_subject not in self.evidence_subject_ids:
+                raise ValueError(
+                    "cognitive writeback evidence crosses the allowed subject scope: "
+                    f"{ref.object_id}@{ref.revision} belongs to {evidence_subject!r}"
+                )
 
         evidence_key = tuple((ref.object_id, ref.revision) for ref in pinned)
         evidence_set_id = _stable_id(
@@ -124,7 +140,9 @@ class CognitionWritebackService:
         # evidence/dependency bundle exists too.
         try:
             existing = self.store.get_payload(claim_id, revision=1)
-        except Exception:
+        except StoreError as exc:
+            if exc.code is not ErrorCode.NOT_FOUND:
+                raise
             existing = None
         if existing is not None:
             return ClaimWriteReceipt(
