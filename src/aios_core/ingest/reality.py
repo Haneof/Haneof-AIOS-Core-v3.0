@@ -175,7 +175,6 @@ class MechanicalSeriesPolicy(BaseModel):
     tolerance: float = Field(ge=0.0)
     change_threshold: float = Field(gt=0.0)
     max_gap_seconds: float = Field(default=300.0, gt=0.0)
-    minimum_segment_samples: int = Field(default=1, ge=1)
 
 
 @dataclass(frozen=True, slots=True)
