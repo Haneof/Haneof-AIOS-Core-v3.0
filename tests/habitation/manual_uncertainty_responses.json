@@ -11,5 +11,9 @@
         }
       }
     ]
+  },
+  {
+    "snapshot_signature": "f729422ba2b0b29cfce9b2243d34ffc1f1c92108e875e5f6e1ac546a56b7fc6b",
+    "type": "silence"
   }
 ]
