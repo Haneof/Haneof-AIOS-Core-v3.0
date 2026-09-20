@@ -9,6 +9,7 @@ from .harness import HabitationRunner, HabitationScenario, LifeEvent, ResidentEv
 from .io import (
     comparison_manifest,
     load_events_jsonl,
+    load_resident_events_jsonl,
     load_scenario_json,
     run_artifact,
     run_artifact_json,
@@ -272,3 +273,24 @@ def test_run_artifact_json_rejects_non_json_response_instead_of_stringifying() -
 def test_comparison_manifest_requires_at_least_one_run() -> None:
     with pytest.raises(ValueError, match="at least one run is required"):
         comparison_manifest(scenario=_scenario(), runs=())
+
+
+def test_resident_loader_rejects_embedded_oracle_and_hidden_events() -> None:
+    with pytest.raises(ValueError, match="must not contain hidden_oracle"):
+        load_resident_events_jsonl(
+            '{"event_id":"e1","occurred_at":"2026-09-20T08:00:00Z","channel":"x","payload":"x","hidden_oracle":{"answer":"secret"}}'
+        )
+
+    with pytest.raises(ValueError, match="must be deliverable"):
+        load_resident_events_jsonl(
+            '{"event_id":"e1","occurred_at":"2026-09-20T08:00:00Z","channel":"x","payload":"x","deliver_to_resident":false}'
+        )
+
+
+def test_resident_loader_accepts_clean_stream() -> None:
+    events = load_resident_events_jsonl(
+        '{"event_id":"e1","occurred_at":"2026-09-20T08:00:00Z","channel":"conversation","payload":"hello"}'
+    )
+
+    assert len(events) == 1
+    assert events[0].event_id == "e1"
