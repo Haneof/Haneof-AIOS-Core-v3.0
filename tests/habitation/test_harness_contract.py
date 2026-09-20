@@ -26,7 +26,7 @@ class RecordingTarget:
     def handle_event(self, event: ResidentEvent):
         self.events.append(event)
         return {
-            "agent": self.label,
+            "model": self.label,
             "event_id": event.event_id,
             "free_form_response": f"{self.label} observed {event.channel}",
         }
@@ -35,7 +35,7 @@ class RecordingTarget:
 class OracleAwareEvaluator:
     def evaluate(self, *, scenario, run):
         return {
-            "agent_id": run.agent_id,
+            "model_id": run.model_id,
             "latent_change": scenario.hidden_oracle["latent_change"],
             "event_truth": scenario.events[0].hidden_oracle["truth"],
             "delivered_count": run.delivered_count,
@@ -80,11 +80,11 @@ def _scenario() -> HabitationScenario:
 
 def test_hidden_oracle_never_enters_resident_event() -> None:
     scenario = _scenario()
-    target = RecordingTarget("resident-a")
+    target = RecordingTarget("model-a")
 
     run = HabitationRunner().run(
         scenario=scenario,
-        agent_id="resident-a",
+        model_id="vendor/model-a",
         target=target,
     )
 
@@ -108,7 +108,7 @@ def test_runner_does_not_require_a_fixed_expected_answer() -> None:
 
     run = HabitationRunner().run(
         scenario=scenario,
-        agent_id="free-form",
+        model_id="vendor/free-form-model",
         target=FreeFormTarget(),
     )
 
@@ -117,37 +117,60 @@ def test_runner_does_not_require_a_fixed_expected_answer() -> None:
     assert isinstance(run.steps[1].response, dict)
 
 
-def test_multi_agent_execution_requires_independent_target_instances() -> None:
+def test_different_models_run_independently_without_shared_state() -> None:
     scenario = _scenario()
     runner = HabitationRunner()
-    target_a = RecordingTarget("a")
-    target_b = RecordingTarget("b")
+    target_a = RecordingTarget("model-a")
+    target_b = RecordingTarget("model-b")
 
-    result = runner.run_many(
+    result = runner.run_models(
         scenario=scenario,
-        targets={"agent-a": target_a, "agent-b": target_b},
+        targets={
+            "vendor/model-a": target_a,
+            "other/model-b": target_b,
+        },
     )
 
-    assert set(result.runs) == {"agent-a", "agent-b"}
-    assert result.runs["agent-a"].steps[0].response["agent"] == "a"
-    assert result.runs["agent-b"].steps[0].response["agent"] == "b"
+    assert set(result.runs) == {"vendor/model-a", "other/model-b"}
+    assert result.runs["vendor/model-a"].steps[0].response["model"] == "model-a"
+    assert result.runs["other/model-b"].steps[0].response["model"] == "model-b"
     assert target_a.events is not target_b.events
 
     shared = RecordingTarget("shared")
-    with pytest.raises(ValueError, match="independent target instance"):
-        runner.run_many(
+    with pytest.raises(ValueError, match="independent AIOS target instance"):
+        runner.run_models(
             scenario=scenario,
-            targets={"agent-a": shared, "agent-b": shared},
+            targets={
+                "vendor/model-a": shared,
+                "other/model-b": shared,
+            },
         )
 
 
-def test_evaluator_gets_oracle_only_after_resident_run() -> None:
+def test_no_inter_model_communication_channel_exists_in_runner() -> None:
     scenario = _scenario()
-    target = RecordingTarget("resident")
+    target_a = RecordingTarget("a")
+    target_b = RecordingTarget("b")
+
+    result = HabitationRunner().run_models(
+        scenario=scenario,
+        targets={"a": target_a, "b": target_b},
+    )
+
+    assert result.runs["a"].model_id == "a"
+    assert result.runs["b"].model_id == "b"
+    assert target_a.events == target_b.events
+    assert all(step.response["model"] == "a" for step in result.runs["a"].steps if step.delivered)
+    assert all(step.response["model"] == "b" for step in result.runs["b"].steps if step.delivered)
+
+
+def test_evaluator_gets_oracle_only_after_model_run() -> None:
+    scenario = _scenario()
+    target = RecordingTarget("resident-model")
 
     run = HabitationRunner().run(
         scenario=scenario,
-        agent_id="resident",
+        model_id="vendor/resident-model",
         target=target,
     )
     report = evaluate_run(
@@ -156,6 +179,7 @@ def test_evaluator_gets_oracle_only_after_resident_run() -> None:
         run=run,
     )
 
+    assert report["model_id"] == "vendor/resident-model"
     assert report["latent_change"].startswith("the user's study confidence")
     assert report["event_truth"] == "low_initial_independence"
     assert report["delivered_count"] == 2
