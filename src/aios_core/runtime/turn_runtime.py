@@ -39,7 +39,11 @@ from aios_core.execution import (
     TaskTransitionRequest,
 )
 from aios_core.ingest.conversation import ConversationCommit, ConversationIngestor
-from aios_core.policy import CognitivePolicyRegistry, CognitivePolicyUpdateRequest
+from aios_core.policy import (
+    CognitivePolicyCreateRequest,
+    CognitivePolicyRegistry,
+    CognitivePolicyUpdateRequest,
+)
 from aios_core.projections.all_dimensions import AllDimensionsProjectionService
 from aios_core.query.search import WorldSearchIndex
 from aios_core.recommendation.proactive import (
@@ -59,7 +63,7 @@ from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.summaries import DimensionSummaryInput, MultiScaleSummaryScheduler, SummaryScale, SummaryScheduleResult
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 from aios_core.contracts.refs import ObjectRef
-from aios_core.contracts.enums import ObjectType, WakeSource
+from aios_core.contracts.enums import ObjectType, PolicyClass, WakeSource
 from aios_core.wake import Step0GateInput, Step0GateResult, WakeBus, WakeStateReceipt
 
 from .capabilities import CapabilityKind, CapabilityRegistry, CapabilitySpec
@@ -681,6 +685,29 @@ class FusedTurnRuntime:
                 input_schema={"policy_id": "string?"},
             ),
             self._read_cognitive_policies,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="propose_cognitive_policy",
+                description=(
+                    "Register a new evidence-grounded AI-mutable cognitive policy. "
+                    "Only real user/world result evidence is accepted; hard boundaries "
+                    "cannot be created by the resident AI."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "policy_id": "string",
+                    "scope": "string",
+                    "default_value": "json value",
+                    "current_value": "json value",
+                    "allowed_range_or_choices": "json value?",
+                    "reason": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "evaluation_window": "string",
+                },
+            ),
+            self._propose_cognitive_policy,
         )
         registry.register(
             CapabilitySpec(
@@ -1359,6 +1386,41 @@ class FusedTurnRuntime:
             for item in self.policies.list_current()
         ]
 
+    def _propose_cognitive_policy(
+        self,
+        policy_id: str,
+        scope: str,
+        default_value: Any,
+        current_value: Any,
+        reason: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        evaluation_window: str,
+        allowed_range_or_choices: Any = None,
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError(
+                "propose_cognitive_policy is only available during an active AIOS turn"
+            )
+        receipt = self.policies.register(
+            CognitivePolicyCreateRequest(
+                policy_id=str(policy_id),
+                scope=str(scope),
+                policy_class=PolicyClass.COGNITIVE_POLICY,
+                default_value=default_value,
+                current_value=current_value,
+                allowed_range_or_choices=allowed_range_or_choices,
+                mutable_by_ai=True,
+                reason=str(reason),
+                evidence_refs=self._coerce_refs(evidence_refs),
+                changed_by="resident_ai",
+                evaluation_window=str(evaluation_window),
+            ),
+            changed_at=self._active_turn_time,
+            actor_is_ai=True,
+        )
+        return asdict(receipt)
+
+
     def _form_event(
         self,
         title: str,
@@ -1812,10 +1874,23 @@ class FusedTurnRuntime:
                 recent_turns=continuity_snapshot.recent_turns,
                 explicit_topic=str(current_topic),
             )
+        raw_recommendation_limit = self.policies.effective_value(
+            "memory.recommendation_limit",
+            self.recommender.default_limit,
+        )
+        try:
+            effective_recommendation_limit = max(
+                1,
+                min(int(raw_recommendation_limit), 20),
+            )
+        except (TypeError, ValueError):
+            effective_recommendation_limit = self.recommender.default_limit
+
         recommendation = self.recommender.recommend(
             current_topic=topic_state.topic,
             subject_id=self.subject_id,
             exclude_session_id=session,
+            limit=effective_recommendation_limit,
             history_needed=topic_state.history_may_help,
         )
 
@@ -1827,6 +1902,13 @@ class FusedTurnRuntime:
 
         current_task_context = dict(task_context or {})
         current_task_context["topic_state"] = topic_state.model_dump(mode="json")
+        current_task_context["cognitive_policy_context"] = {
+            "memory.recommendation_limit": effective_recommendation_limit,
+            "communication.detail_level": self.policies.effective_value(
+                "communication.detail_level",
+                None,
+            ),
+        }
         automatic_execution_context = self._execution_context_for_topic(topic_state.topic)
         current_task_context.setdefault(
             "related_execution_anchors",
