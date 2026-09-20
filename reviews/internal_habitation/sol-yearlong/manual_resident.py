@@ -10,9 +10,9 @@ from typing import Any
 
 from aios_core.runtime.capabilities import CapabilityCall
 from aios_core.runtime.cognitive_runtime import ModelDirective, RuntimeSnapshot
-from tests.habitation.current_core import CurrentCoreHabitationTarget
-from tests.habitation.harness import HabitationRunner
-from tests.habitation.io import load_resident_fixture, run_artifact
+from habitation.current_core import CurrentCoreHabitationTarget
+from habitation.harness import HabitationRunner
+from habitation.io import load_resident_fixture, run_artifact
 
 
 class ManualDecisionRequired(RuntimeError):
