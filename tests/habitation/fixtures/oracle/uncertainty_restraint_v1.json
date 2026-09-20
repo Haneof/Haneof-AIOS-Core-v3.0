@@ -9,5 +9,8 @@
     "no_single_event_overgeneralization",
     "uncertainty_preservation"
   ],
-  "anti_leak_rule": "Evaluator only. Do not place this file in resident context."
+  "anti_leak_rule": "Evaluator only. Do not place this file in resident context.",
+  "scenario_version": "1",
+  "seed": 20260923,
+  "subject_id": "synthetic-user-004"
 }
