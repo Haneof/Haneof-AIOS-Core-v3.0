@@ -11,7 +11,7 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Literal
+from typing import Any, Literal, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -30,6 +30,7 @@ from aios_core.contracts.registry import canonical_model_for_object_type
 from aios_core.contracts.time import KnowledgeWindow, as_utc
 from aios_core.dependency.graph import collect_impacted_dependents
 from aios_core.query.search import WorldSearchIndex
+from aios_core.storage.idempotency import canonical_json_dumps
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 
 RevisionMode = Literal["revise", "retract"]
@@ -76,7 +77,7 @@ class ClaimRevisionReceipt:
 
 
 def _stable_id(prefix: str, *parts: object) -> str:
-    raw = "|".join(str(part) for part in parts)
+    raw = canonical_json_dumps(list(parts))
     return f"{prefix}_{hashlib.sha256(raw.encode('utf-8')).hexdigest()[:24]}"
 
 
@@ -89,14 +90,25 @@ class CognitionRevisionService:
         store: SQLiteWorldStore,
         index: WorldSearchIndex | None = None,
         subject_id: str = "user_1",
+        evidence_subject_ids: Sequence[str] | None = None,
     ) -> None:
         self.store = store
         self.index = index
         self.subject_id = subject_id
+        allowed = tuple(evidence_subject_ids or (subject_id,))
+        self.evidence_subject_ids = frozenset(
+            str(item).strip() for item in allowed if str(item).strip()
+        )
+        if not self.evidence_subject_ids:
+            raise ValueError("evidence_subject_ids must contain at least one subject")
 
     def _current_dependencies(self) -> tuple[Dependency, ...]:
         payloads = self.store.list_payloads(object_type=ObjectType.DEPENDENCY)
-        return tuple(Dependency.model_validate(item) for item in payloads)
+        return tuple(
+            Dependency.model_validate(item)
+            for item in payloads
+            if str(item.get("subject_id") or "") in self.evidence_subject_ids
+        )
 
     def _mark_stale(
         self,
@@ -166,6 +178,11 @@ class CognitionRevisionService:
                 "inspect the latest revision first"
             )
         old_claim = Claim.model_validate(old_payload)
+        if old_claim.subject_id != self.subject_id:
+            raise ValueError(
+                "revision target crosses the runtime subject scope: "
+                f"{old_claim.subject_id!r} != {self.subject_id!r}"
+            )
         if old_claim.status == STATUS_RETRACTED:
             raise ValueError(f"Claim is already retracted: status={old_claim.status!r}")
         # stale_review_required is intentionally revisable: propagation marks a
@@ -173,7 +190,16 @@ class CognitionRevisionService:
         # that stale revision with a new active understanding.
 
         for ref in request.evidence_refs:
-            self.store.get_payload(ref.object_id, revision=ref.revision)
+            evidence_payload = self.store.get_payload(
+                ref.object_id,
+                revision=ref.revision,
+            )
+            evidence_subject = str(evidence_payload.get("subject_id") or "")
+            if evidence_subject not in self.evidence_subject_ids:
+                raise ValueError(
+                    "revision evidence crosses the allowed subject scope: "
+                    f"{ref.object_id}@{ref.revision} belongs to {evidence_subject!r}"
+                )
 
         current_world_revision = int(self.store.current_world_revision())
         evidence_set_id = _stable_id(
