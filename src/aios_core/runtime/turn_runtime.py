@@ -63,8 +63,15 @@ from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.summaries import DimensionSummaryInput, MultiScaleSummaryScheduler, SummaryScale, SummaryScheduleResult
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 from aios_core.contracts.refs import ObjectRef
+from aios_core.contracts.time import TemporalExtent
 from aios_core.contracts.enums import ObjectType, PolicyClass, WakeSource
 from aios_core.wake import Step0GateInput, Step0GateResult, WakeBus, WakeStateReceipt
+from aios_core.world_graph import (
+    EntityProposalRequest,
+    EntityRelationService,
+    EntityRevisionRequest,
+    RelationUpsertRequest,
+)
 
 from .capabilities import CapabilityKind, CapabilityRegistry, CapabilitySpec
 from .cognitive_runtime import CognitiveRuntime, ModelHandler, RuntimeTurnResult
@@ -163,6 +170,11 @@ class FusedTurnRuntime:
             user_id=subject_id,
         )
         self.revision = CognitionRevisionService(
+            store=store,
+            index=index,
+            subject_id=subject_id,
+        )
+        self.world_graph = EntityRelationService(
             store=store,
             index=index,
             subject_id=subject_id,
@@ -398,6 +410,66 @@ class FusedTurnRuntime:
             ),
             self._commit_ai_world_claim,
         )
+        registry.register(
+            CapabilitySpec(
+                name="propose_entity",
+                description=(
+                    "Create a durable Entity anchor from pinned same-world evidence. "
+                    "The resident supplies identity meaning; Core enforces explicit entity_key and provenance."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "entity_key": "string",
+                    "entity_kind": "string",
+                    "canonical_name": "string?",
+                    "aliases": "array[string]?",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "identity_claim_refs": "array[{object_id:string,revision:integer}]?",
+                },
+            ),
+            self._propose_entity,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="revise_entity",
+                description=(
+                    "Append a new revision of the current Entity identity anchor using pinned evidence."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "entity_ref": "{object_id:string,revision:integer}",
+                    "reason": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "canonical_name": "string?",
+                    "aliases": "array[string]?",
+                    "identity_claim_refs": "array[{object_id:string,revision:integer}]?",
+                },
+            ),
+            self._revise_entity,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="upsert_relation",
+                description=(
+                    "Create or forward-revise an evidence-grounded Relation between current Entity revisions."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "left_ref": "{object_id:string,revision:integer}",
+                    "relation_type": "string",
+                    "right_ref": "{object_id:string,revision:integer}",
+                    "valid_time": "TemporalExtent object?",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "confidence": "number[0,1]",
+                    "reason": "string",
+                },
+            ),
+            self._upsert_relation,
+        )
+
         registry.register(
             CapabilitySpec(
                 name="propose_dimension",
@@ -1155,6 +1227,101 @@ class FusedTurnRuntime:
         return asdict(receipt)
 
 
+    def _propose_entity(
+        self,
+        entity_key: str,
+        entity_kind: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        canonical_name: str | None = None,
+        aliases: Sequence[str] = (),
+        identity_claim_refs: Sequence[Mapping[str, Any]] = (),
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("propose_entity is only available during an active AIOS turn")
+        receipt = self.world_graph.propose_entity(
+            EntityProposalRequest(
+                entity_key=str(entity_key),
+                entity_kind=str(entity_kind),
+                canonical_name=canonical_name,
+                aliases=tuple(str(item) for item in aliases),
+                evidence_refs=self._coerce_refs(evidence_refs),
+                identity_claim_refs=self._coerce_refs(identity_claim_refs),
+            ),
+            proposed_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
+    def _revise_entity(
+        self,
+        entity_ref: Mapping[str, Any],
+        reason: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        canonical_name: str | None = None,
+        aliases: Sequence[str] | None = None,
+        identity_claim_refs: Sequence[Mapping[str, Any]] | None = None,
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("revise_entity is only available during an active AIOS turn")
+        receipt = self.world_graph.revise_entity(
+            EntityRevisionRequest(
+                entity_ref=ObjectRef(
+                    object_id=str(entity_ref["object_id"]),
+                    revision=int(entity_ref["revision"]),
+                ),
+                reason=str(reason),
+                evidence_refs=self._coerce_refs(evidence_refs),
+                canonical_name=canonical_name,
+                aliases=(
+                    None
+                    if aliases is None
+                    else tuple(str(item) for item in aliases)
+                ),
+                identity_claim_refs=(
+                    None
+                    if identity_claim_refs is None
+                    else self._coerce_refs(identity_claim_refs)
+                ),
+            ),
+            changed_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
+    def _upsert_relation(
+        self,
+        left_ref: Mapping[str, Any],
+        relation_type: str,
+        right_ref: Mapping[str, Any],
+        evidence_refs: Sequence[Mapping[str, Any]],
+        confidence: float,
+        reason: str,
+        valid_time: Mapping[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("upsert_relation is only available during an active AIOS turn")
+        receipt = self.world_graph.upsert_relation(
+            RelationUpsertRequest(
+                left_ref=ObjectRef(
+                    object_id=str(left_ref["object_id"]),
+                    revision=int(left_ref["revision"]),
+                ),
+                relation_type=str(relation_type),
+                right_ref=ObjectRef(
+                    object_id=str(right_ref["object_id"]),
+                    revision=int(right_ref["revision"]),
+                ),
+                valid_time=(
+                    TemporalExtent.unknown_time()
+                    if valid_time is None
+                    else TemporalExtent.model_validate(valid_time)
+                ),
+                evidence_refs=self._coerce_refs(evidence_refs),
+                confidence=float(confidence),
+                reason=str(reason),
+            ),
+            changed_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
     def _propose_dimension(
         self,
         dimension_key: str,
@@ -1600,6 +1767,9 @@ class FusedTurnRuntime:
         return spec.name in {
             "commit_claim",
             "commit_ai_world_claim",
+            "propose_entity",
+            "revise_entity",
+            "upsert_relation",
             "propose_dimension",
             "transition_dimension",
             "propose_goal",
@@ -1613,6 +1783,7 @@ class FusedTurnRuntime:
             "form_event",
             "transition_event",
             "record_communication_experience",
+            "propose_cognitive_policy",
             "update_cognitive_policy",
             "rollback_cognitive_policy",
         }
