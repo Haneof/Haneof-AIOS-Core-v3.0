@@ -25,7 +25,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          python reviews/internal_habitation/sol-yearlong/manual_resident.py \
+          PYTHONPATH="$PWD/tests:$PWD" python reviews/internal_habitation/sol-yearlong/manual_resident.py \
             --fixture-root reviews/internal_habitation/sol-yearlong/bootstrap/fixtures \
             --manifest sol_bootstrap.manifest.json \
             --decisions reviews/internal_habitation/sol-yearlong/decisions.json \
