@@ -1301,5 +1301,18 @@
   "5d68138cc9866af74a502cfb8465fe0cf75ebb036872b98ed0e19e5ec0f89165": {
     "kind": "summary",
     "summary": "2027-01-05，用户说明自己刚接手一家小型烘焙店、近期事务繁多，并明确要求减少主动打扰：仅当事项可能影响开店、进货或重要家人安排时才主动提醒。AI 当场确认会按这一边界执行。"
+  },
+  "faed3c6157db222a727c0ae8788ed916b75b820a21feed0bc62bcf8a78263f05": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-summaryrun-review-jan07-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
   }
 }
