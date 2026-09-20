@@ -314,3 +314,48 @@ def test_task_cannot_claim_completion_without_outcome(tmp_path):
             reason="不能只靠模型口头宣布完成。",
             evidence_refs=(ObjectRef(object_id=intent.object_id, revision=1),),
         )
+
+
+def test_action_and_outcome_are_retrievable_world_anchors(tmp_path):
+    store, index, intent, authorization = _seed(tmp_path)
+    service, _, task = _active_goal_and_running_task(store, index, intent)
+
+    action = service.propose_action(
+        ActionProposalRequest(
+            task_ref=ObjectRef(object_id=task.task_id, revision=task.revision),
+            action_type="send_team_message",
+            payload={"channel": "team"},
+            expected_outcome="团队频道收到确认周报",
+            evidence_refs=(ObjectRef(object_id=intent.object_id, revision=1),),
+        ),
+        proposed_at=NOW + timedelta(seconds=4),
+    )
+    service.authorize_action(
+        action_ref=ObjectRef(object_id=action.action_id, revision=1),
+        authorization_refs=(
+            ObjectRef(object_id=authorization.object_id, revision=1),
+        ),
+        authorized_by="platform_permission_gate",
+        authorized_at=NOW + timedelta(seconds=5),
+        authorizer=lambda _action, _refs: True,
+    )
+    outcome = service.record_outcome(
+        ActionOutcomeRequest(
+            action_ref=ObjectRef(object_id=action.action_id, revision=2),
+            outcome_state="completed",
+            payload={"delivery": "accepted"},
+        ),
+        recorded_at=NOW + timedelta(seconds=6),
+    )
+
+    action_hits = index.recall_candidates(
+        "团队频道收到确认周报",
+        object_types=["action"],
+    )
+    assert action.action_id in {hit.object_id for hit in action_hits.hits}
+
+    outcome_hits = index.recall_candidates(
+        "completed",
+        object_types=["outcome"],
+    )
+    assert outcome.outcome_id in {hit.object_id for hit in outcome_hits.hits}
