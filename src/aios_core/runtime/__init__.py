@@ -21,4 +21,4 @@ from .cognitive_runtime import (
     RuntimeTurnResult,
 )
 
-from .turn_runtime import FusedTurnResult, FusedTurnRuntime
+from .turn_runtime import FusedTurnResult, FusedTurnRuntime, WakeDispatchRunResult
