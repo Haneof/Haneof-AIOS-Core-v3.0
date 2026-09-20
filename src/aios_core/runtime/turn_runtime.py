@@ -20,6 +20,7 @@ from aios_core.recommendation.proactive import (
     ProactiveMemoryRecommender,
     RecommendationBundle,
 )
+from aios_core.revision.service import ClaimRevisionRequest, CognitionRevisionService
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 from aios_core.contracts.refs import ObjectRef
@@ -66,6 +67,11 @@ class FusedTurnRuntime:
             subject_id=subject_id,
         )
         self.writeback = CognitionWritebackService(
+            store=store,
+            index=index,
+            subject_id=subject_id,
+        )
+        self.revision = CognitionRevisionService(
             store=store,
             index=index,
             subject_id=subject_id,
@@ -128,6 +134,42 @@ class FusedTurnRuntime:
             ),
             self._commit_claim,
         )
+        registry.register(
+            CapabilitySpec(
+                name="revise_claim",
+                description=(
+                    "Create a forward-only new revision of the current Claim and mark "
+                    "dependent cognition review-required."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "target_ref": "{object_id:string,revision:integer}",
+                    "reason": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "replacement_content": "string",
+                    "confidence": "number[0,1]?",
+                },
+            ),
+            self._revise_claim,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="retract_claim",
+                description=(
+                    "Retract the current Claim using pinned contrary/correcting evidence "
+                    "and propagate review-required state to dependents."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "target_ref": "{object_id:string,revision:integer}",
+                    "reason": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                },
+            ),
+            self._retract_claim,
+        )
         self.registry = registry
         self.cognitive_runtime = CognitiveRuntime(
             registry=registry,
@@ -182,7 +224,7 @@ class FusedTurnRuntime:
         # Internal cognition writeback is allowed because the handler itself enforces
         # pinned evidence and writes only revisable cognition. External actions stay
         # denied until a separate capability-specific authorization layer exists.
-        return spec.name == "commit_claim"
+        return spec.name in {"commit_claim", "revise_claim", "retract_claim"}
 
     def _commit_claim(
         self,
@@ -212,6 +254,66 @@ class FusedTurnRuntime:
                 knowledge_state=knowledge_state,
             ),
             learned_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
+    def _coerce_refs(
+        self,
+        refs: Sequence[Mapping[str, Any]],
+    ) -> tuple[ObjectRef, ...]:
+        return tuple(
+            ObjectRef(
+                object_id=str(item["object_id"]),
+                revision=int(item["revision"]),
+            )
+            for item in refs
+        )
+
+    def _revise_claim(
+        self,
+        target_ref: Mapping[str, Any],
+        reason: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        replacement_content: str,
+        confidence: float | None = None,
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("revise_claim is only available during an active AIOS turn")
+        receipt = self.revision.apply(
+            ClaimRevisionRequest(
+                target_ref=ObjectRef(
+                    object_id=str(target_ref["object_id"]),
+                    revision=int(target_ref["revision"]),
+                ),
+                mode="revise",
+                reason=reason,
+                evidence_refs=self._coerce_refs(evidence_refs),
+                replacement_content=replacement_content,
+                confidence=confidence,
+            ),
+            changed_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
+    def _retract_claim(
+        self,
+        target_ref: Mapping[str, Any],
+        reason: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("retract_claim is only available during an active AIOS turn")
+        receipt = self.revision.apply(
+            ClaimRevisionRequest(
+                target_ref=ObjectRef(
+                    object_id=str(target_ref["object_id"]),
+                    revision=int(target_ref["revision"]),
+                ),
+                mode="retract",
+                reason=reason,
+                evidence_refs=self._coerce_refs(evidence_refs),
+            ),
+            changed_at=self._active_turn_time,
         )
         return asdict(receipt)
 
