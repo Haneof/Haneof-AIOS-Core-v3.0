@@ -1448,5 +1448,32 @@
         }
       }
     ]
+  },
+  "e5760e8187f752aabd80dab884980ef81ac647df460c593538ce583546fad748": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "propose_action",
+        "call_id": "sol-summaryrun-jan08-propose-xiaozhao-message",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_fa7f780c46e2004d9d0100c2",
+            "revision": 2
+          },
+          "action_type": "send_message",
+          "payload": {
+            "recipient": "小赵",
+            "message": "明早4:15到店开后门收货，到了回我。"
+          },
+          "expected_outcome": "小赵收到通知；平台返回真实发送/失败结果。",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_ad04153c39dba332be3f72aa",
+              "revision": 1
+            }
+          ]
+        }
+      }
+    ]
   }
 }
