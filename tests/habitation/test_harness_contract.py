@@ -94,12 +94,13 @@ def test_hidden_oracle_never_enters_resident_event() -> None:
     )
 
     assert run.delivered_count == 2
+    assert len(run.steps) == 2
     assert len(target.events) == 2
+    assert all(step.delivered for step in run.steps)
     assert all(not hasattr(event, "hidden_oracle") for event in target.events)
     assert target.events[0].metadata == {"session": "s1"}
     assert "truth" not in target.events[0].metadata
-    assert run.steps[-1].delivered is False
-    assert run.steps[-1].response is None
+    assert "day-21-private-oracle-only" not in {step.event_id for step in run.steps}
 
 
 def test_runner_does_not_require_a_fixed_expected_answer() -> None:
@@ -236,7 +237,7 @@ def test_visible_projection_and_channel_report_cannot_leak_oracle() -> None:
         "day-01-conversation",
         "day-07-calendar",
     ]
-    assert scenario_channels(scenario) == ("conversation", "calendar", "oracle")
+    assert scenario_channels(scenario) == ("conversation", "calendar")
     assert all(not hasattr(event, "hidden_oracle") for event in projected)
 
 
