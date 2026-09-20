@@ -383,14 +383,17 @@ class PeriodicReviewService:
         moment = as_utc(now, "now")
         start = as_utc(window_start, "window_start")
         end = as_utc(window_end, "window_end")
+        refs = [anchor.object_ref for anchor in anchors]
         wake_id = _stable_id(
             "wake_review",
             self.subject_id,
             start.isoformat(),
             end.isoformat(),
             moment.isoformat(),
+            [(ref.object_id, ref.revision) for ref in refs],
+            state.value,
+            bool(truncated),
         )
-        refs = [anchor.object_ref for anchor in anchors]
         wake = Wake(
             object_id=wake_id,
             subject_id=self.subject_id,
