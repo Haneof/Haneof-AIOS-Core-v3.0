@@ -7,132 +7,138 @@
 
 ## 当前快照
 
-- 时间：2026-09-20 13:03 +08:00
-- 最后已验证功能代码锚点：`1c2b1cbb858210b6b1da4d3b855c9374c3985c23`
-- 验证 Gate：`p9-revision-gate` / run `35490673406` / **success**
-- 说明：实时 `main` HEAD 必须接手时从 GitHub 获取；checkpoint 文件自身更新也会产生新 commit，因此这里记录的是**最后完成并通过聚合 Gate 的功能树锚点**。
-- 当前项目阶段：**P9 已完成，进入 P10 AI 用户理解 / 关系 / 自我 / 认知边界 / 校准**
-- 当前主干状态：**World → Recall → Model → Claim Writeback → Revise/Retract → Dependency Propagation → Summary Rebuild → Current Index 已闭环**
-- 当前 blocker：**P10 现有宪法模块有定义但实现仍分散；Relationship / Calibration 还缺统一独立实现**
-- 下一主任务：**把 AI 长期认知模块全部落在同一 EvidenceSet + Claim + Dependency + Revision 世界机制上，禁止另建 AI Self 数据库**
+- 时间：2026-09-20 13:12 +08:00
+- 最后已验证功能代码锚点：`d84c956e25a28a067e652282975d27711685229b`
+- 验证 Gate：`p10-ai-world-gate` / run `35491030461` / **success**
+- 当前项目阶段：**P10 已完成，进入 P11 动态维度生命周期与注册**
+- 当前主干状态：**统一世界、索引、推荐、上下文、Runtime、Summary、ALL_DIMENSIONS、认知写回、翻案传播、AI用户理解/关系/自我/边界/策略/人格/校准已共用同一世界机制**
+- 当前 blocker：**动态维度仍只有宪法与旧实验实现；需要重新实现“AI提出候选 + 系统验证契约/生命周期”，不能恢复固定心理阈值**
+- 下一主任务：**P11 Dimension Proposal / Registration / Lifecycle**
 
-## P9 已完成并通过 Gate
+## P10 已完成并通过 Gate
 
-- Claim revise：保留旧 revision，产生同 object_id 新 revision：GREEN
-- Claim retract：历史保留，当前 status=retracted：GREEN
-- reverse Dependency propagation：GREEN
-- stale_review_required：GREEN
-- 已经前进的 dependent 不被旧依赖倒退覆盖：GREEN
-- stale dependent 可由 Resident AI 重新评估并恢复 active：GREEN
-- stale / retracted cognition 默认不进入 current retrieval：GREEN
-- historical pinned revision 仍可读取：GREEN
-- Summary source Dependency：GREEN
-- 上游 Claim 修正 → Summary stale → rebuild：GREEN
-- AI cognition Claim 进入全局时间轴：GREEN
-- Runtime 已提供 revise_claim / retract_claim：GREEN
+- AI User Understanding 使用统一 Claim/Evidence/Dependency：GREEN
+- AI Relationship 使用统一世界，不建关系数据库：GREEN
+- AI Self 使用统一世界，不恢复 `runtime_ai_self_memory`：GREEN
+- AI Intent / Strategy / Cognitive Boundary / Personality / Calibration 共用同一 Claim engine：GREEN
+- UNKNOWN / HYPOTHESIS 是合法认知状态：GREEN
+- AI-world Claim 复用 P9 revise/retract/propagation：GREEN
+- Runtime 提供 `read_ai_world`：GREEN
+- Runtime 提供 `commit_ai_world_claim`：GREEN
+- 新会话只自动加载显式标记 `core_context` 的最小身份/关系连续信息：GREEN
+- 未标记的完整用户画像不会每轮自动灌入：GREEN
+- Relationship / Calibration 独立宪法文件已补齐：GREEN
+- 所有 AI认知模块均无第二真相库：GREEN
 
 ## 当前可运行主链
 
 ```text
-WorldStore
-→ WorldSearchIndex
-→ ProactiveMemoryRecommender
-→ ContextController
-→ CognitiveRuntime
-→ Resident Model
-   ├─ search_world
-   ├─ inspect_world_object
-   ├─ request_all_dimensions_projection
-   ├─ commit_claim
-   ├─ revise_claim
-   └─ retract_claim
-→ EvidenceSet + Claim + Dependency
-→ CognitionRevisionService
-→ reverse Dependency propagation
-→ stale_review_required / stale Summary
-→ model re-evaluation
-→ new active revisions
-→ Summary rebuild
-→ index.catch_up
-→ next turn
+Reality / Conversation
+↓
+Observation / Event / Summary
+↓
+WorldSearchIndex / Recommendation
+↓
+ContextController
+↓
+Resident Model
+├─ read_ai_world
+├─ search_world
+├─ request_all_dimensions_projection
+├─ commit_ai_world_claim
+├─ commit_claim
+├─ revise_claim
+└─ retract_claim
+↓
+EvidenceSet + Claim + Dependency
+↓
+AI User / Relationship / Self / Boundary / Strategy / Personality / Calibration
+↓
+Revision propagation
+↓
+Current Index + minimal core continuity
+↓
+next session
 ```
 
-## P10 当前目标
+## P11 当前目标
 
-P10 不再建立新的“认知数据库”。
+维度注册不是固定分类表，也不是程序通过阈值自动发明心理标签。
 
-所有长期 AI 认知都使用同一世界机制：
+目标闭环：
 
 ```text
-User World / Conversation / Event / Summary
+AI观察世界
 ↓
-Resident AI observes/searches
+AI认为出现新的长期观察需求
 ↓
-EvidenceSet
+AI提出 Dimension Proposal
 ↓
-Claim in one AI dimension
+附 Evidence + 说明：
+- 为什么现有维度不够
+- 为什么具有持续观察价值
+- 对用户有什么帮助
+- 维护成本是否值得
 ↓
-Dependency
+系统只验证：
+- Schema
+- Evidence refs 存在
+- 名称/ID不冲突
+- 生命周期状态合法
+- 权限与资源边界
 ↓
-Revision / Calibration
+进入 Candidate / Trial
+↓
+真实运行一段时间
+↓
+AI依据新的 Evidence / Outcome 决定：
+activate / revise / merge / dormant / archive / reject
+↓
+统一世界中留下完整演化历史
 ```
 
-P10 需要收口的维度模块：
+## P11 禁止事项
 
-- AI User Understanding：用户是什么
-- AI Relationship：AI与用户当前是什么关系、关系如何演化
-- AI Self：AI如何理解自己、自己的经历与能力边界
-- AI Cognitive Boundary：已知 / 未知 / 假设 / 待验证
-- AI Calibration：过去判断对错、用户纠正、预测/策略命中情况
-- AI Strategy / Communication Experience：什么方式对这个用户有效
-- AI Personality：长期交互中形成的稳定行为倾向，但不得成为静态 system prompt 假人格
+- 不恢复旧 `2 domains / 3 days / 30 days / 70%` 为认知真理。
+- 不用固定心理维度白名单。
+- 不用关键词直接生成维度。
+- 系统不得替 AI 判断“这个维度有意义”。
+- 一次性事件不能被程序自动升级成长期维度。
+- 维度之间继续平级。
+- merge / dormant / archive 不允许删除历史来源。
+- 维度 proposal 必须有 Evidence。
+- 维度状态机可以确定性校验，但“为什么升级/合并/退休”必须来自 AI 判断与 Evidence。
 
-## P10 实施纪律
-
-1. 优先使用已有 `Claim / EvidenceSet / Dependency / Revision`，不得给每个模型造新真相表。
-2. 允许薄的 typed service / view / query helper，但真相仍只在 WorldStore。
-3. Relationship / Self / User Understanding 必须能引用具体 Evidence。
-4. 用户明确纠正后必须走 P9 修正链，不允许“新加一条相反记忆”后两条同时作为当前真相。
-5. AI认知边界里的 UNKNOWN / HYPOTHESIS 是合法状态，不强迫模型总给结论。
-6. Calibration 必须来自真实 Outcome / 用户反馈 / 后续 Evidence，不得用固定题库命中率冒充长期学习。
-7. Personality 是长期行为结果，不做预设人格滑块。
-8. AI Self 不得恢复旧 `runtime_ai_self_memory` 第二数据库。
-
-## P10 首批必读与迁移来源
+## P11 首批必读
 
 新仓：
-1. `docs/constitution/AIOS_v3.0_AI_Dimension_Constitution.md`
-2. `docs/constitution/AIOS_v3.0_AI_User_Understanding_Model_Constitution.md`
-3. `docs/constitution/AIOS_v3.0_AI_Self_Model_Constitution.md`
-4. `docs/constitution/AIOS_v3.0_AI_Strategy_Model_Constitution.md`
-5. `docs/constitution/AIOS_v3.0_AI_Cognitive_Boundary_Model_Constitution.md`
-6. `docs/constitution/AIOS_v3.0_AI_Personality_Model_Constitution.md`
-7. `docs/constitution/AIOS_v3.0_AI_Dimension_Module_Index.md`
+1. `docs/constitution/AIOS_v3.0_Dimension_Registration_Constitution.md`
+2. `docs/constitution/AIOS_v3.0_Base_Dimension_Constitution.md`
+3. `docs/constitution/AIOS_v3.0_High_Level_Cognition_Dimension_Constitution.md`
 
 旧仓择优来源：
-8. `src/aios_core/runtime/ai_self_world.py`
-9. `src/aios_core/communication/experience_tracker.py`
-10. `src/aios_core/cognition/operation_experience.py`
-11. `src/aios_core/runtime/policy_registry.py`
+4. `src/aios_core/dimensions/evolution_guard.py`
+5. `src/aios_core/tools/proposal_pipeline.py`
+6. `src/aios_core/tools/proposed_operators.py`
 
-当前主干：
-12. `src/aios_core/writeback/cognition.py`
-13. `src/aios_core/revision/service.py`
-14. `src/aios_core/runtime/turn_runtime.py`
+当前世界底座：
+7. `src/aios_core/contracts/models.py`
+8. `src/aios_core/storage/sqlite_store.py`
+9. `src/aios_core/writeback/cognition.py`
+10. `src/aios_core/revision/service.py`
+11. `src/aios_core/runtime/turn_runtime.py`
 
 ## 当前不可推翻的已决事项
 
-- 不建第二套 AI Self 数据库。
-- 不把 ALL_DIMENSIONS 做成父维度。
+- 所有维度平级存在于同一世界。
+- 维度是观察轴，不是数据库父子分类。
+- AI负责判断新维度的意义；系统只提供注册和状态机制。
+- 不建第二套 AI Self / User Profile 数据库。
 - 不让 Summary 自动写跨维因果。
-- 不让固定关键词/固定阈值替 AI 形成心理、人格、关系结论。
-- 无主题时历史推荐允许 0。
-- 模型仍拥有主动世界搜索权。
-- Claim 可修正，Observation 原文不可倒写。
-- stale 只表示“需要重新判断”，不是程序自动判真伪。
-- 旧仓代码只按迁移矩阵择优融合，不整仓复制。
-- PseudoLLM / 固定关键词题库不得作为最终认知能力 Gate。
+- 无主题时推荐允许 0。
+- stale 只表示需要重新判断。
+- PseudoLLM / 固定题库不得作为认知 Gate。
 
 ## 恢复现场规则
 
-读取本文件后首先获取 GitHub `main` 实时 HEAD，并审查本文件功能锚点之后的 commits / CI。纯 Master Map / Checkpoint 文档提交可直接越过；若包含功能代码，先确认 Gate 和 CI，再续开发。
+接手时先获取 GitHub `main` 实时 HEAD，并审查本文件功能锚点之后的 commits / CI。纯地图/checkpoint文档提交可越过；功能代码必须先确认 Gate 与边界再继续。
