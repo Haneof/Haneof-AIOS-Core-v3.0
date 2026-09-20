@@ -6,6 +6,7 @@ on:
       - "experiment/p16-gpt56-self-resident-smoke-*"
     paths:
       - "tests/experimental/test_p16_gpt56_self_resident_smoke_20260920.py"
+      - "tests/experimental/test_p16_gpt56_long_self_resident_smoke_20260920.py"
       - ".github/workflows/p16-gpt56-self-resident-smoke.yml"
       - "tests/habitation/**"
       - "src/aios_core/**"
