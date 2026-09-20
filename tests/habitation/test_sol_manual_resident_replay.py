@@ -215,6 +215,22 @@ def test_sol_manual_resident_replay_exposes_learned_custom_policies(tmp_path):
     assert run.delivered_count == 20
     assert handler.aug01_policy_context is not None
     assert handler.background_policy_seen is True
+    policy_records = {
+        item["policy_id"]: item
+        for item in handler.aug01_policy_context["_policy_records"]
+    }
+    assert (
+        policy_records["communication.progress_reporting_mode"]["scope"]
+        == "per-user:synthetic-user-005"
+    )
+    assert (
+        policy_records["communication.proactive_interruption_threshold"]["scope"]
+        == "per-user:synthetic-user-005"
+    )
+    assert (
+        policy_records["communication.progress_reporting_mode"]["policy_class"]
+        == "cognitive_policy"
+    )
 
     policies = {
         item["policy_id"]: item
