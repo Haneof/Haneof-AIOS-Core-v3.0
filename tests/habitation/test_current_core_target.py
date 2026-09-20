@@ -479,3 +479,75 @@ def test_current_core_factory_creates_fresh_private_worlds(tmp_path):
     assert first.isolation_key != second.isolation_key
     assert first.store.current_world_revision() == 0
     assert second.store.current_world_revision() == 0
+
+
+def test_current_core_can_resume_same_world_with_replacement_model(tmp_path):
+    db_path = tmp_path / "resume-world.sqlite"
+
+    first = CurrentCoreHabitationTarget(
+        model_id="provider/model-a",
+        subject_id="synthetic-user-resume",
+        db_path=db_path,
+        model_handler=lambda snapshot: ModelDirective(response="model-a response"),
+    )
+    first.advance_to(NOW)
+    first_result = first.handle_event(
+        LifeEvent(
+            event_id="resume-chat-1",
+            occurred_at=NOW,
+            channel="conversation",
+            payload="第一天先记录这个安排。",
+            metadata={"session": "same-session"},
+        ).resident_view()
+    )
+    assert first_result["turn_index"] == 1
+    assert first_result["response"] == "model-a response"
+
+    wake_reasons: list[str] = []
+
+    def replacement_model(snapshot):
+        wake_reasons.append(snapshot.wake_reason)
+        if snapshot.wake_reason == "periodic_review":
+            return ModelDirective(silence=True)
+        return ModelDirective(response="model-b continued from world")
+
+    resumed = CurrentCoreHabitationTarget(
+        model_id="provider/model-b",
+        subject_id="synthetic-user-resume",
+        db_path=db_path,
+        model_handler=replacement_model,
+        require_fresh=False,
+    )
+
+    restored = resumed.audit_snapshot()
+    assert restored["resumed_from_world"] is True
+    assert restored["session_turns"] == {"same-session": 1}
+    assert restored["clock"] == NOW.isoformat()
+
+    advanced = resumed.advance_to(NOW + timedelta(hours=25))
+    assert len(advanced["periodic_reviews"]) == 1
+    assert advanced["periodic_reviews"][0]["invoked"] is True
+    assert "periodic_review" in wake_reasons
+
+    second_result = resumed.handle_event(
+        LifeEvent(
+            event_id="resume-chat-2",
+            occurred_at=NOW + timedelta(hours=25),
+            channel="conversation",
+            payload="继续昨天的安排。",
+            metadata={"session": "same-session"},
+        ).resident_view()
+    )
+    assert second_result["turn_index"] == 2
+    assert second_result["response"] == "model-b continued from world"
+
+    final = resumed.audit_snapshot()
+    assert final["model_id"] == "provider/model-b"
+    assert final["session_turns"] == {"same-session": 2}
+    conversation_observations = [
+        item
+        for item in final["objects"]
+        if item.get("object_type") == ObjectType.OBSERVATION.value
+        and item.get("source_kind") == "user_ai_interaction"
+    ]
+    assert len(conversation_observations) == 4
