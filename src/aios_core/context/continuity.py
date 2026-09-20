@@ -40,6 +40,12 @@ def _stable_id(prefix: str, *parts: object) -> str:
     return f"{prefix}_{hashlib.sha256(raw.encode('utf-8')).hexdigest()[:24]}"
 
 
+def _estimate_message_tokens(messages: Sequence[ConversationMessage]) -> int:
+    """Cheap deterministic pressure estimate; only schedules maintenance."""
+    chars = sum(len(item.text) for item in messages)
+    return max(1, (chars + 3) // 4)
+
+
 def _parse_datetime(value: Any, field_name: str) -> datetime:
     if isinstance(value, datetime):
         return as_utc(value, field_name)
@@ -375,11 +381,14 @@ class ConversationContinuityService:
         before_turn: int,
         recent_turn_limit: int,
         summary_chunk_turns: int,
+        summary_trigger_tokens: int | None = None,
     ) -> RoundSummaryRequest | None:
         if recent_turn_limit < 0:
             raise ValueError("recent_turn_limit must be >= 0")
         if summary_chunk_turns < 1:
             raise ValueError("summary_chunk_turns must be >= 1")
+        if summary_trigger_tokens is not None and summary_trigger_tokens < 128:
+            raise ValueError("summary_trigger_tokens must be >= 128")
 
         turns = list(
             self._complete_turns(
@@ -403,9 +412,27 @@ class ConversationContinuityService:
             for item in turns[:-recent_turn_limit or None]
             if int(item["turn_index"]) > covered_until
         ]
-        if len(eligible) < summary_chunk_turns:
+        if not eligible:
             return None
 
+        pressure_triggered = False
+        if summary_trigger_tokens is not None:
+            first_turn = int(eligible[0]["turn_index"])
+            last_turn = int(eligible[-1]["turn_index"])
+            pressure_messages = self._messages(
+                session_id=session_id,
+                turn_start=first_turn,
+                turn_end=last_turn,
+            )
+            pressure_triggered = (
+                _estimate_message_tokens(pressure_messages)
+                >= summary_trigger_tokens
+            )
+
+        if len(eligible) < summary_chunk_turns and not pressure_triggered:
+            return None
+
+        target_turns = min(summary_chunk_turns, len(eligible))
         selected: list[Mapping[str, Any]] = []
         expected_turn: int | None = None
         for item in eligible:
@@ -416,9 +443,9 @@ class ConversationContinuityService:
                 break
             selected.append(item)
             expected_turn += 1
-            if len(selected) == summary_chunk_turns:
+            if len(selected) == target_turns:
                 break
-        if len(selected) < summary_chunk_turns:
+        if len(selected) < target_turns:
             return None
 
         start = int(selected[0]["turn_index"])
@@ -607,6 +634,68 @@ class ConversationContinuityService:
             reused_existing=result.idempotent_replay,
         )
 
+    def search_round_summaries(
+        self,
+        *,
+        session_id: str,
+        query: str,
+        limit: int = 8,
+    ) -> tuple[Mapping[str, Any], ...]:
+        """Search summary indexes for one active session, then allow raw drill-down."""
+        session = session_id.strip()
+        clean = query.strip()
+        if not session:
+            raise ValueError("session_id must not be blank")
+        if not clean:
+            raise ValueError("query must not be blank")
+        bounded = max(1, min(int(limit), 20))
+
+        if self.index is None:
+            candidates = [
+                item
+                for item in self.round_summaries(session_id=session)
+                if clean.casefold() in str(item.get("content") or "").casefold()
+            ]
+            return tuple(candidates[-bounded:])
+
+        page = self.index.recall_candidates(
+            clean,
+            subject=self.subject_id,
+            dimension=INTERACTION_DIMENSION,
+            object_types=[ObjectType.SUMMARY.value],
+            limit=min(100, bounded * 6),
+        )
+        result: list[Mapping[str, Any]] = []
+        for hit in page.hits:
+            payload = self.store.get_payload(
+                hit.object_id,
+                revision=hit.revision,
+            )
+            metadata = payload.get("metadata") or {}
+            if metadata.get("summary_kind") != ROUND_SUMMARY_KIND:
+                continue
+            if str(metadata.get("session_id") or "") != session:
+                continue
+            if str(payload.get("summary_status") or "") == SummaryStatus.STALE.value:
+                continue
+            result.append(
+                {
+                    "object_ref": {
+                        "object_id": hit.object_id,
+                        "revision": hit.revision,
+                    },
+                    "session_id": session,
+                    "turn_start": int(metadata["turn_start"]),
+                    "turn_end": int(metadata["turn_end"]),
+                    "content": str(payload.get("content") or ""),
+                    "retrieval_score": hit.score,
+                    "raw_drill_down_available": True,
+                }
+            )
+            if len(result) >= bounded:
+                break
+        return tuple(result)
+
     def drill_down_summary(
         self,
         summary_id: str,
@@ -692,6 +781,7 @@ class ConversationContinuityService:
         before_turn: int,
         recent_turn_limit: int,
         summary_chunk_turns: int,
+        summary_trigger_tokens: int | None = None,
     ) -> ContinuitySnapshot:
         return ContinuitySnapshot(
             session_id=session_id.strip(),
@@ -709,5 +799,6 @@ class ConversationContinuityService:
                 before_turn=before_turn,
                 recent_turn_limit=recent_turn_limit,
                 summary_chunk_turns=summary_chunk_turns,
+                summary_trigger_tokens=summary_trigger_tokens,
             ),
         )
