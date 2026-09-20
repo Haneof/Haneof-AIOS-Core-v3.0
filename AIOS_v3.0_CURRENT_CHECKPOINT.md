@@ -7,13 +7,13 @@
 
 ## 当前快照
 
-- 时间：2026-09-20 16:01 +08:00
-- 最后已验证功能代码锚点：`02c5ddb079f32f7dfabbb0615ba454ff6c2332bd`
-- 验证 Gate：`p13-ingest-gate` / run `35498948003` / **success**；`p13-reality-ingest` / run `35498948010` / **success**
-- 当前项目阶段：**P13 已完成，进入 P14 长会话连续性完整接线**
-- 当前主干状态：**现实数据可通过 cognition-free adapters 进入统一世界；数值流可机械压缩；媒体长期事实只保留 descriptor/transcript；失败可审计**
-- 当前 blocker：**长单会话仍主要依赖调用方传入 recent_turns；token 超限后还缺系统内生的轮总结状态与按需 raw drill-down**
-- 下一主任务：**P14 rolling conversation state + round summaries + raw dialogue drill-down**
+- 时间：2026-09-20 16:19 +08:00
+- 最后已验证功能代码锚点：`76d179d48d1bb222c3d18eb5c435dd6f0c9ba212`
+- 验证 Gate：`p14-long-context` / run `35499189697` / **success**；`fused-turn-runtime` / run `35499189641` / **success**；P9-P13 相关合并后回归全部 **success**
+- 当前项目阶段：**P14 已完成，进入 P15 周期 Review / AI 成长**
+- 当前主干状态：**长单会话 continuity 已由 WorldStore 内生维护；旧轮次可 round summary；summary 可精确 drill-down 到 pinned raw dialogue；重启后无需调用方维护 recent_turns**
+- 当前 blocker：**P15 尚缺周期 Review 调度、模型回看输入包、OperationExperience/Strategy 学习写回与 Review 后修正闭环**
+- 下一主任务：**P15 periodic review + AI experience / strategy learning + revision-aware growth loop**
 
 ## P13 已完成并通过 Gate
 
@@ -59,6 +59,26 @@ P13 完成后又做了一轮独立正确性审计，并通过 PR #3 合入主线
 
 以上是 P13 的 post-gate hardening，不改变当前主阶段 **P14**。
 
+## P14 已完成并通过 Gate
+
+- `recent_turns` 不再依赖调用方维护，非空外部注入会被拒绝：GREEN
+- 当前 session 的最近完整轮次从统一 WorldStore 重建：GREEN
+- Conversation identity 纳入 subject，跨用户同 session/turn 不再碰撞：GREEN
+- deterministic scheduler 负责选择需要总结的闭合 turn range：GREEN
+- summary 内容由注入的真实模型 handler 生成，系统不写固定“认知总结”：GREEN
+- round summary 以 Summary 世界对象持久化，并 pin 每条 raw user/assistant Observation：GREEN
+- raw dialogue 永久保留，summary 仅作为 continuity index：GREEN
+- `drill_down_conversation` 可由 summary source refs 回捞 exact raw dialogue：GREEN
+- token budget 裁掉 summary 内容时仍可通过 `list_conversation_summaries` → raw drill-down 恢复：GREEN
+- summary 模型失败不阻断当前用户回复，raw facts 保留；重启后待总结区间可重新发现：GREEN
+- 新 session 不自动灌入旧 session summaries；跨 session 仍走 recommendation/index：GREEN
+- 18 轮长会话回归：1-4 / 5-8 / 9-12 / 13-16 形成顺序 summary windows，17-18 保留 recent raw，36 条原始对话零删除：GREEN
+- P14 合并 PR：#4
+- P14 功能合并 SHA：`76d179d48d1bb222c3d18eb5c435dd6f0c9ba212`
+- 合并后 P14 Gate：run `35499189697` **success**
+- 合并后 fused runtime：run `35499189641` **success**
+- P9 / P10 / P11 / P12 / P13 / conversation-world 合并后回归：**all success**
+
 ## 当前可运行数据链
 
 ```text
@@ -81,7 +101,7 @@ WorldSearchIndex / Summary
 Resident AI later forms cognition
 ```
 
-## P14 当前目标
+## P14 机制说明（已完成）
 
 解决一个真实模型在单个长会话中超过上下文窗口后“前面聊过什么不知道”的问题。
 
@@ -142,6 +162,40 @@ summary 作为快速 continuity index
 - 不把 long-context continuity 与智能推荐重新混成一个机制。
 - 不把 summary 当 source of truth。
 - 不因 context budget 截断而静默丢失可回捞路径。
+
+## P15 当前目标
+
+让 Resident AI 不只在用户说话时被动运行，而能在明确调度边界内周期性回看已经发生的世界，并把“我之前判断得怎么样、行动效果怎么样、策略需不需要修正”写回同一个世界。
+
+目标闭环：
+
+```text
+World facts / Claims / Goals / Tasks / Actions / Outcomes
+↓
+deterministic Review scheduler 只决定何时需要 review
+↓
+构建 evidence-grounded review input
+↓
+真实模型回看、比较、判断
+↓
+可选择：
+- revise / retract 旧 Claim
+- 形成新的 evidence-grounded Claim
+- 记录 OperationExperience
+- 更新 Strategy / AI self understanding
+↓
+Dependency + Revision
+↓
+统一世界继续增长
+```
+
+P15 禁止：
+- 用程序规则直接判断“用户成长了/AI成长了”；
+- 用固定答案 benchmark 代替模型真实 review；
+- 建第二套经验数据库；
+- maintenance 自己触发无限 review 循环；
+- Outcome 未发生时伪造行动经验；
+- 把 Review 文本直接当高阶真相，所有认知仍需 Evidence / Claim / Revision 边界。
 
 ## 当前不可推翻的已决事项
 
