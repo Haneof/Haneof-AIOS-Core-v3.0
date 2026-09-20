@@ -10,11 +10,12 @@ import hashlib
 from dataclasses import dataclass
 from datetime import datetime
 
-from aios_core.contracts.enums import SourceClass
+from aios_core.contracts.enums import ErrorCode, SourceClass
 from aios_core.contracts.models import Observation
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.time import TemporalExtent, as_utc
-from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.storage.idempotency import canonical_json_dumps
+from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
 INTERACTION_DIMENSION = "dim:user_ai_interaction"
 
@@ -38,7 +39,7 @@ class ConversationMessageCommit:
 
 
 def _stable_suffix(*parts: object) -> str:
-    payload = "|".join(str(part) for part in parts)
+    payload = canonical_json_dumps(list(parts))
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:24]
 
 
@@ -46,14 +47,21 @@ class ConversationIngestor:
     """Persist raw user/assistant interaction facts into the unified world ledger."""
 
     def __init__(self, store: SQLiteWorldStore, *, subject_id: str = "user_1") -> None:
+        if not isinstance(subject_id, str) or not subject_id.strip():
+            raise ValueError("subject_id must not be blank")
         self.store = store
-        self.subject_id = subject_id
+        self.subject_id = subject_id.strip()
 
-    @staticmethod
-    def _turn_identity(session_id: str, turn_index: int) -> tuple[str, str, str]:
-        turn_key = _stable_suffix(session_id, turn_index)
-        user_id = f"obs_conv_user_{_stable_suffix(session_id, turn_index, 'user')}"
-        assistant_id = f"obs_conv_ai_{_stable_suffix(session_id, turn_index, 'assistant')}"
+    def _turn_identity(self, session_id: str, turn_index: int) -> tuple[str, str, str]:
+        turn_key = _stable_suffix(self.subject_id, session_id, turn_index)
+        user_id = (
+            f"obs_conv_user_"
+            f"{_stable_suffix(self.subject_id, session_id, turn_index, 'user')}"
+        )
+        assistant_id = (
+            f"obs_conv_ai_"
+            f"{_stable_suffix(self.subject_id, session_id, turn_index, 'assistant')}"
+        )
         return turn_key, user_id, assistant_id
 
     @staticmethod
@@ -64,8 +72,11 @@ class ConversationIngestor:
         expected = int(store.current_world_revision())
         try:
             previous = store.operation_record(operation_id)
-        except Exception:
-            previous = None
+        except StoreError as exc:
+            if exc.code == ErrorCode.NOT_FOUND:
+                previous = None
+            else:
+                raise
         if previous is not None:
             expected = int(previous["expected_world_revision"])
         return expected
@@ -81,6 +92,7 @@ class ConversationIngestor:
     ) -> ConversationMessageCommit:
         if not session_id.strip():
             raise ValueError("session_id must not be blank")
+        session_id = session_id.strip()
         if turn_index < 1:
             raise ValueError("turn_index must be >= 1")
         occurred = as_utc(occurred_at, "occurred_at")
@@ -125,7 +137,9 @@ class ConversationIngestor:
                     operation_id,
                 ),
                 reason="persist current user input before model inference",
-                idempotency_key=f"conversation-user:{session_id}:{turn_index}",
+                idempotency_key=(
+                    f"conversation-user:{self.subject_id}:{session_id}:{turn_index}"
+                ),
                 source_class=SourceClass.USER,
             ),
         )
@@ -147,6 +161,7 @@ class ConversationIngestor:
     ) -> ConversationMessageCommit:
         if not session_id.strip():
             raise ValueError("session_id must not be blank")
+        session_id = session_id.strip()
         if turn_index < 1:
             raise ValueError("turn_index must be >= 1")
         occurred = as_utc(occurred_at, "occurred_at")
@@ -191,7 +206,9 @@ class ConversationIngestor:
                     operation_id,
                 ),
                 reason="persist raw assistant output after model inference",
-                idempotency_key=f"conversation-assistant:{session_id}:{turn_index}",
+                idempotency_key=(
+                    f"conversation-assistant:{self.subject_id}:{session_id}:{turn_index}"
+                ),
                 source_class=SourceClass.AI_COGNITION,
             ),
         )
@@ -214,6 +231,7 @@ class ConversationIngestor:
     ) -> ConversationCommit:
         if not session_id.strip():
             raise ValueError("session_id must not be blank")
+        session_id = session_id.strip()
         if turn_index < 1:
             raise ValueError("turn_index must be >= 1")
 
@@ -222,9 +240,10 @@ class ConversationIngestor:
         if recorded < occurred:
             raise ValueError("recorded_at must be >= occurred_at")
 
-        turn_key = _stable_suffix(session_id, turn_index)
-        user_id = f"obs_conv_user_{_stable_suffix(session_id, turn_index, 'user')}"
-        assistant_id = f"obs_conv_ai_{_stable_suffix(session_id, turn_index, 'assistant')}"
+        turn_key, user_id, assistant_id = self._turn_identity(
+            session_id,
+            turn_index,
+        )
 
         common_metadata = {
             "dimension": INTERACTION_DIMENSION,
@@ -264,8 +283,11 @@ class ConversationIngestor:
         expected_world_revision = self.store.current_world_revision()
         try:
             previous = self.store.operation_record(operation_id)
-        except Exception:
-            previous = None
+        except StoreError as exc:
+            if exc.code == ErrorCode.NOT_FOUND:
+                previous = None
+            else:
+                raise
         if previous is not None:
             # Exact retries must replay the original request identity. Reusing the
             # original expected revision lets the store's idempotency fingerprint
@@ -279,7 +301,9 @@ class ConversationIngestor:
             arguments={"turn_index": turn_index},
             expected_world_revision=expected_world_revision,
             reason="persist raw user/AI interaction as unified-world fact",
-            idempotency_key=f"conversation:{session_id}:{turn_index}",
+            idempotency_key=(
+                f"conversation:{self.subject_id}:{session_id}:{turn_index}"
+            ),
             source_class=SourceClass.USER,
         )
         result = self.store.commit([user_obs, assistant_obs], op)

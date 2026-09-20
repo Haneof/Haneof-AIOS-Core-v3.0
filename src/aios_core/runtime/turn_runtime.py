@@ -10,12 +10,17 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from datetime import datetime
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 from aios_core.ai_world import (
     AIWorldClaimRequest,
     AIWorldCognitionService,
     AIWorldDomain,
+)
+from aios_core.context.continuity import (
+    ConversationContinuityService,
+    RoundSummaryCommit,
+    RoundSummaryRequest,
 )
 from aios_core.context.controller import ContextController, ModelContextBundle
 from aios_core.dimensions import (
@@ -53,6 +58,8 @@ class FusedTurnResult:
     recommendation: RecommendationBundle
     context: ModelContextBundle
     conversation_commit: ConversationCommit
+    continuity_summary_commits: tuple[RoundSummaryCommit, ...] = ()
+    continuity_summary_error: str | None = None
 
 
 class FusedTurnRuntime:
@@ -68,11 +75,30 @@ class FusedTurnRuntime:
         context_controller: ContextController | None = None,
         recommendation_limit: int = 5,
         max_tool_rounds: int = 4,
+        round_summary_handler: Callable[[RoundSummaryRequest], str] | None = None,
+        recent_turn_limit: int = 8,
+        summary_chunk_turns: int = 12,
+        max_round_summaries_per_turn: int = 1,
     ) -> None:
+        if recent_turn_limit < 0:
+            raise ValueError("recent_turn_limit must be >= 0")
+        if summary_chunk_turns < 1:
+            raise ValueError("summary_chunk_turns must be >= 1")
+        if max_round_summaries_per_turn < 0:
+            raise ValueError("max_round_summaries_per_turn must be >= 0")
         self.store = store
         self.index = index
-        self.subject_id = subject_id
-        self.ingestor = ConversationIngestor(store, subject_id=subject_id)
+        self.subject_id = subject_id.strip()
+        self.ingestor = ConversationIngestor(store, subject_id=self.subject_id)
+        self.continuity = ConversationContinuityService(
+            store=store,
+            index=index,
+            subject_id=self.subject_id,
+        )
+        self.round_summary_handler = round_summary_handler
+        self.recent_turn_limit = int(recent_turn_limit)
+        self.summary_chunk_turns = int(summary_chunk_turns)
+        self.max_round_summaries_per_turn = int(max_round_summaries_per_turn)
         self.recommender = ProactiveMemoryRecommender(
             index=index,
             store=store,
@@ -110,6 +136,7 @@ class FusedTurnRuntime:
             subject_id=subject_id,
         )
         self._active_turn_time: datetime | None = None
+        self._active_session_id: str | None = None
 
         registry = CapabilityRegistry()
         registry.register(
@@ -129,6 +156,39 @@ class FusedTurnRuntime:
                 input_schema={"object_id": "string", "revision": "integer?"},
             ),
             self._inspect_world_object,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="list_conversation_summaries",
+                description=(
+                    "List same-session continuity summary windows on demand. Use this "
+                    "when token budgeting omitted summary content from the cockpit."
+                ),
+                kind=CapabilityKind.READ,
+                input_schema={
+                    "session_id": "string?",
+                    "limit": "integer?",
+                },
+            ),
+            self._list_conversation_summaries,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="drill_down_conversation",
+                description=(
+                    "Read exact pinned raw dialogue behind a same-session round summary, "
+                    "or an explicit turn range. Round summaries are indexes, not truth."
+                ),
+                kind=CapabilityKind.READ,
+                input_schema={
+                    "summary_id": "string?",
+                    "revision": "integer?",
+                    "session_id": "string?",
+                    "turn_start": "integer?",
+                    "turn_end": "integer?",
+                },
+            ),
+            self._drill_down_conversation,
         )
         registry.register(
             CapabilitySpec(
@@ -443,6 +503,65 @@ class FusedTurnRuntime:
         revision: int | None = None,
     ) -> dict[str, Any]:
         return self.store.get_payload(str(object_id), revision=revision)
+
+    def _list_conversation_summaries(
+        self,
+        session_id: str | None = None,
+        limit: int = 50,
+    ) -> list[dict[str, Any]]:
+        active_session = (
+            str(session_id).strip()
+            if session_id is not None and str(session_id).strip()
+            else self._active_session_id
+        )
+        if active_session is None:
+            raise ValueError(
+                "session_id is required outside an active turn"
+            )
+        bounded = max(1, min(int(limit), 200))
+        summaries = self.continuity.round_summaries(
+            session_id=active_session,
+        )
+        return [dict(item) for item in summaries[-bounded:]]
+
+    def _drill_down_conversation(
+        self,
+        summary_id: str | None = None,
+        revision: int | None = None,
+        session_id: str | None = None,
+        turn_start: int | None = None,
+        turn_end: int | None = None,
+    ) -> list[dict[str, Any]]:
+        if summary_id is not None:
+            return [
+                dict(item)
+                for item in self.continuity.drill_down_summary(
+                    str(summary_id),
+                    revision=(None if revision is None else int(revision)),
+                )
+            ]
+
+        active_session = (
+            str(session_id).strip()
+            if session_id is not None and str(session_id).strip()
+            else self._active_session_id
+        )
+        if active_session is None:
+            raise ValueError(
+                "session_id is required outside an active turn when summary_id is absent"
+            )
+        if turn_start is None or turn_end is None:
+            raise ValueError(
+                "turn_start and turn_end are required when summary_id is absent"
+            )
+        return [
+            dict(item)
+            for item in self.continuity.drill_down_range(
+                session_id=active_session,
+                turn_start=int(turn_start),
+                turn_end=int(turn_end),
+            )
+        ]
 
     def _read_ai_world(
         self,
@@ -878,21 +997,37 @@ class FusedTurnRuntime:
         task_context: Mapping[str, Any] | None = None,
         token_budget: int | None = None,
     ) -> FusedTurnResult:
-        # The current user utterance is a world fact before model inference.
-        # This gives the resident model a pinned evidence ref for same-turn
-        # cognition, Goal/Task creation and other evidence-grounded decisions.
+        session = session_id.strip()
+        if not session:
+            raise ValueError("session_id must not be blank")
+        if recent_turns:
+            raise ValueError(
+                "P14 derives recent_turns from WorldStore; callers must not inject "
+                "an externally maintained conversation history"
+            )
+
+        # The current user utterance enters the world before model inference. The
+        # continuity view deliberately excludes this incomplete current turn and
+        # rebuilds prior dialogue from canonical observations.
         user_commit = self.ingestor.commit_user_input(
-            session_id=session_id,
+            session_id=session,
             turn_index=turn_index,
             user_text=user_input,
             occurred_at=occurred_at,
         )
         self.index.catch_up()
 
+        continuity_snapshot = self.continuity.snapshot(
+            session_id=session,
+            before_turn=turn_index,
+            recent_turn_limit=self.recent_turn_limit,
+            summary_chunk_turns=self.summary_chunk_turns,
+        )
+
         recommendation = self.recommender.recommend(
             current_topic=current_topic,
             subject_id=self.subject_id,
-            exclude_session_id=session_id,
+            exclude_session_id=session,
         )
 
         continuity_context = (
@@ -906,12 +1041,31 @@ class FusedTurnRuntime:
             "object_id": user_commit.observation_id,
             "revision": 1,
         }
+        current_task_context["conversation_continuity"] = {
+            "session_id": session,
+            "recent_turn_count": len(continuity_snapshot.recent_turns),
+            "round_summary_count": len(continuity_snapshot.round_summaries),
+            "summary_index_capability": "list_conversation_summaries",
+            "raw_drill_down_capability": "drill_down_conversation",
+            "pending_round_summary": (
+                None
+                if continuity_snapshot.pending_summary is None
+                else {
+                    "turn_start": continuity_snapshot.pending_summary.turn_start,
+                    "turn_end": continuity_snapshot.pending_summary.turn_end,
+                    "source_count": len(
+                        continuity_snapshot.pending_summary.sources
+                    ),
+                }
+            ),
+        }
 
         context = self.context_controller.assemble(
             user_input=user_input,
             current_topic=current_topic,
             recommendation=recommendation,
-            recent_turns=recent_turns,
+            recent_turns=continuity_snapshot.recent_turns,
+            conversation_summaries=continuity_snapshot.round_summaries,
             ai_identity=continuity_context,
             task_context=current_task_context,
             capability_catalog=self.registry.catalog(),
@@ -919,6 +1073,7 @@ class FusedTurnRuntime:
         )
 
         self._active_turn_time = occurred_at
+        self._active_session_id = session
         try:
             runtime_result = self.cognitive_runtime.run_turn(
                 user_input,
@@ -927,10 +1082,11 @@ class FusedTurnRuntime:
             )
         finally:
             self._active_turn_time = None
+            self._active_session_id = None
 
         assistant_text = runtime_result.response or ""
         assistant_commit = self.ingestor.commit_assistant_output(
-            session_id=session_id,
+            session_id=session,
             turn_index=turn_index,
             assistant_text=assistant_text,
             occurred_at=occurred_at,
@@ -946,12 +1102,46 @@ class FusedTurnRuntime:
             user_world_revision=user_commit.world_revision,
             assistant_world_revision=assistant_commit.world_revision,
         )
-        # Keep the public search projection current for the next turn.
         self.index.catch_up()
 
+        # Summarization is maintenance after the user-visible turn. Deterministic
+        # code decides when a closed range needs summarization; an injected real
+        # model handler supplies only the descriptive text. Failure never rewrites
+        # or deletes raw dialogue, and is surfaced to the caller for audit/repair.
+        summary_commits: list[RoundSummaryCommit] = []
+        summary_error: str | None = None
+        if (
+            self.round_summary_handler is not None
+            and self.max_round_summaries_per_turn > 0
+        ):
+            try:
+                for _ in range(self.max_round_summaries_per_turn):
+                    request = self.continuity.prepare_next_round_summary(
+                        session_id=session,
+                        before_turn=turn_index + 1,
+                        recent_turn_limit=self.recent_turn_limit,
+                        summary_chunk_turns=self.summary_chunk_turns,
+                    )
+                    if request is None:
+                        break
+                    content = self.round_summary_handler(request)
+                    summary_commits.append(
+                        self.continuity.commit_round_summary(
+                            request,
+                            content=content,
+                            generated_at=occurred_at,
+                        )
+                    )
+            except Exception as exc:
+                summary_error = f"{type(exc).__name__}: {exc}"
+
+        self.index.catch_up()
         return FusedTurnResult(
             runtime=runtime_result,
             recommendation=recommendation,
             context=context,
             conversation_commit=commit,
+            continuity_summary_commits=tuple(summary_commits),
+            continuity_summary_error=summary_error,
         )
+
