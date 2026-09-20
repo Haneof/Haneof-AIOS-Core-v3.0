@@ -220,3 +220,55 @@ def test_snapshot_contains_only_current_active_ai_world_claims(tmp_path):
     assert len(relation) == 1
     assert relation[0]["revision"] == 2
     assert relation[0]["statement"] == "当前关系是长期项目协作关系。"
+
+
+def test_all_p10_domains_are_typed_views_over_the_same_claim_engine(tmp_path):
+    store, index, facts = _seed(tmp_path)
+    service = AIWorldCognitionService(store=store, index=index)
+
+    domains = [
+        AIWorldDomain.USER_UNDERSTANDING,
+        AIWorldDomain.RELATIONSHIP,
+        AIWorldDomain.SELF,
+        AIWorldDomain.INTENT,
+        AIWorldDomain.STRATEGY,
+        AIWorldDomain.COGNITIVE_BOUNDARY,
+        AIWorldDomain.PERSONALITY,
+        AIWorldDomain.CALIBRATION,
+    ]
+    for offset, domain in enumerate(domains):
+        service.commit(
+            AIWorldClaimRequest(
+                domain=domain,
+                statement=f"{domain.value} 的测试认知。",
+                evidence_refs=(ObjectRef(object_id=facts[0].object_id, revision=1),),
+                confidence=0.6 + offset * 0.01,
+                scope_key=f"test.{domain.value}",
+            ),
+            learned_at=NOW + timedelta(seconds=offset),
+        )
+
+    snapshot = service.snapshot(per_domain=3)
+    assert set(snapshot) == {domain.value for domain in AIWorldDomain}
+    assert all(len(snapshot[domain.value]) == 1 for domain in domains)
+
+    payloads = store.list_payloads()
+    ai_claims = [
+        item for item in payloads
+        if item.get("object_type") == "claim"
+        and (item.get("metadata") or {}).get("ai_world")
+    ]
+    assert len(ai_claims) == len(domains)
+    assert {
+        (item.get("metadata") or {}).get("dimension")
+        for item in ai_claims
+    } == {
+        "dim:ai_user_understanding",
+        "dim:ai_relationship",
+        "dim:ai_self",
+        "dim:ai_intent",
+        "dim:ai_strategy",
+        "dim:ai_cognitive_boundary",
+        "dim:ai_personality",
+        "dim:ai_calibration",
+    }
