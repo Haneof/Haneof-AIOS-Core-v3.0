@@ -30,5 +30,18 @@
   "f0704ee4499c54f900eb6d11d449a1d756a532d907a65e4bbc18d5df9d1e6bb9": {
     "kind": "response",
     "response": "记住了。以后只有可能影响开店、进货或重要家人安排时，我才会主动打断你；其他情况我不会频繁提醒。"
+  },
+  "a326a80f1284b8967c0a7dfed8d4ab40ba32a4f730b0e8c15590452fd9835e08": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan06-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
   }
 }
