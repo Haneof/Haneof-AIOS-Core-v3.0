@@ -249,3 +249,33 @@ artifacts later consumed by another model.
 Hidden evaluator-only events are absent from the resident run entirely: their IDs,
 timestamps and channels are not emitted in `HabitationRun` or its serialized
 artifact.
+
+
+## 14. Current-Core habitation adapter
+
+The rebased P16 integration line now includes `tests/habitation/aios_target.py`.
+It is benchmark plumbing only: it does not contain resident cognition or expected
+answers.
+
+Each model receives a private SQLite WorldStore and the same current AIOS Core
+surfaces:
+
+- conversation events enter `FusedTurnRuntime.run_turn()`, so P14 continuity is
+  reconstructed from the canonical world rather than an external chat buffer;
+- calendar/note/order/photo and other resident-visible facts enter P13
+  `RealityIngestService`;
+- virtual-clock advancement runs P12 due-task scheduling and dispatches ordinary
+  durable Wakes through the same resident `CognitiveRuntime`;
+- 24-hour background ticks invoke P15 periodic review even when the synthetic life
+  has no visible event on that day;
+- the virtual benchmark has no physical playback channel, so generic background
+  Wakes record Step-0 as `QUIET` rather than pretending notification delivery is
+  authorized.
+
+This adapter intentionally does **not** manufacture C09 semantic triggers. P13
+Observation ingestion remains cognition-free. The separate generalized trigger /
+dedupe / cooldown bus remains a Core concern and must be implemented independently
+rather than hidden inside the benchmark.
+
+A scripted handler may be used only for wiring regression tests. It is not valid
+P16 cognition evidence. The P16 Gate still requires real resident model providers.

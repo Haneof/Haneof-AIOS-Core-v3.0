@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "parallel/p16-habitation-harness-*"
+      - "p16/**"
     paths:
       - "tests/habitation/**"
       - "docs/testing/AIOS_v3.0_P16_Habitation_Harness.md"
