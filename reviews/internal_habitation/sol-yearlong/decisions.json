@@ -1264,5 +1264,30 @@
         }
       }
     ]
+  },
+  "9aca9af58812e4d9334a0a72898544ae9368f886c0b7b0c6c062b757efee2cc5": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_event",
+        "call_id": "sol-jan18-resolve-fire-inspection-result-event",
+        "arguments": {
+          "event_ref": {
+            "object_id": "event_809fdc8d28c2a1be6aa12cfd",
+            "revision": 2
+          },
+          "new_status": "resolved",
+          "reason": "The reported inspection has already concluded, and the current Event meaning is fully supported by the user's direct result report.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_0238ab2e202146a7625eb120",
+              "revision": 1
+            }
+          ],
+          "related_event_refs": [],
+          "confidence": 0.99
+        }
+      }
+    ]
   }
 }
