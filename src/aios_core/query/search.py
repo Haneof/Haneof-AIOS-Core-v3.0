@@ -1172,6 +1172,109 @@ class WorldSearchIndex:
                 query_intent=query,
             )
 
+    def recent_candidates(
+        self,
+        *,
+        subject: str | None = None,
+        object_types: Sequence[str] | None = None,
+        include_inactive: bool = False,
+        limit: int = 20,
+    ) -> MindSearchPage:
+        """Return a bounded recent-current candidate set without semantic ranking.
+
+        This exists for ellipsis/deictic recovery where the current utterance may have
+        no lexical overlap with its antecedent. Ordering is mechanical recency only;
+        callers must preserve ambiguity and let the resident model decide relevance.
+        """
+
+        current = int(self._store.current_world_revision())
+        wm_before = self.watermark()
+        if wm_before < current:
+            self.catch_up()
+        wm = self.watermark()
+
+        params: list[Any] = []
+        clauses = ["1=1"]
+        if subject is not None:
+            clauses.append("o.subject_id = ?")
+            params.append(str(subject))
+        if object_types:
+            placeholders = ",".join("?" for _ in object_types)
+            clauses.append(f"o.object_type IN ({placeholders})")
+            params.extend(object_types)
+
+        where_sql = " AND ".join(clauses)
+        with self._connect() as conn:
+            tombstones = {
+                str(row[0])
+                for row in conn.execute(
+                    "SELECT object_id FROM search_tombstones"
+                ).fetchall()
+            }
+            rows = conn.execute(
+                f"""
+                SELECT o.object_id, o.revision, o.object_type, o.subject_id,
+                       o.dimension, o.occurred_start_us, d.excerpt
+                FROM search_occurred o
+                JOIN (
+                    SELECT object_id, MAX(revision) AS max_revision
+                    FROM search_occurred
+                    GROUP BY object_id
+                ) latest
+                  ON latest.object_id=o.object_id
+                 AND latest.max_revision=o.revision
+                JOIN search_doc d
+                  ON d.object_id=o.object_id AND d.revision=o.revision
+                WHERE {where_sql}
+                ORDER BY
+                    CASE WHEN o.occurred_start_us IS NULL THEN 1 ELSE 0 END,
+                    o.occurred_start_us DESC,
+                    o.object_id ASC
+                """,
+                params,
+            ).fetchall()
+
+            hits: list[MindSearchHit] = []
+            total_tokens = 0
+            for row in rows:
+                object_id = str(row["object_id"])
+                revision = int(row["revision"])
+                if object_id in tombstones:
+                    continue
+                if not include_inactive and not self._visible_in_current_view(
+                    object_id,
+                    revision,
+                    str(row["object_type"]),
+                ):
+                    continue
+                excerpt = str(row["excerpt"] or "")
+                estimated = max(10, len(excerpt) // 3)
+                total_tokens += estimated
+                hits.append(
+                    MindSearchHit(
+                        object_id=object_id,
+                        revision=revision,
+                        object_type=str(row["object_type"]),
+                        subject_id=str(row["subject_id"]),
+                        score=0,
+                        dimension=str(row["dimension"] or "dim_unclassified"),
+                        excerpt=excerpt,
+                        estimated_tokens=estimated,
+                    )
+                )
+                if len(hits) >= max(0, int(limit)):
+                    break
+
+        return MindSearchPage(
+            status="ok",
+            lag=current - wm,
+            world_revision=current,
+            index_watermark=wm,
+            hits=hits,
+            total_estimated_tokens=total_tokens,
+            query_intent="recent_current_candidates",
+        )
+
     # ---------------- 快捷多维原语接口 ----------------
 
     def search_by_dimension(self, dimension: str, keywords: Sequence[str] = (), limit: int = 20) -> MindSearchPage:

@@ -2198,6 +2198,7 @@ class FusedTurnRuntime:
             exclude_session_id=session,
             limit=effective_recommendation_limit,
             history_needed=topic_state.history_may_help,
+            antecedent_fallback=topic_state.antecedent_recall_needed,
         )
 
         continuity_context = (
