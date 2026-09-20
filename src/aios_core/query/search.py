@@ -733,6 +733,10 @@ class WorldSearchIndex:
         "superseded",
         "stale_review_required",
         "stale",
+        "archived",
+        "rejected",
+        "merged",
+        "split",
     }
 
     def _visible_in_current_view(
