@@ -1,9 +1,13 @@
-"""Model-agnostic long-horizon habitation harness for AIOS v3.0.
+"""Model-agnostic long-horizon habitation benchmark for AIOS v3.0.
 
-The harness deliberately does not contain semantic "correct answers". A scenario
-contains resident-visible life events plus a separate hidden oracle that is only
-available to evaluators. This prevents the runtime under test from receiving the
-answer key and keeps P16 focused on emergent long-term behavior rather than
+P16 compares different resident models by letting each model independently inhabit
+its own AIOS instance while receiving the same sealed synthetic life. Models never
+communicate, share state, or cooperate.
+
+The benchmark deliberately does not contain resident-visible semantic "correct
+answers". A scenario contains visible life events plus a separate hidden oracle
+available only to evaluators. This prevents the system under test from receiving
+the answer key and keeps P16 focused on emergent long-term behavior rather than
 string-matching tests.
 """
 
@@ -21,7 +25,7 @@ def _require_aware(value: datetime, field_name: str) -> None:
 
 @dataclass(frozen=True, slots=True)
 class ResidentEvent:
-    """The only event view that may be delivered to the resident system."""
+    """The only event view that may be delivered to one resident model."""
 
     event_id: str
     occurred_at: datetime
@@ -42,7 +46,7 @@ class LifeEvent:
     """One chronological event in a synthetic life.
 
     hidden_oracle is evaluation-only ground truth. It must never be passed to the
-    resident model or included in the resident-visible metadata.
+    resident model or included in resident-visible metadata.
     """
 
     event_id: str
@@ -78,7 +82,7 @@ class LifeEvent:
 
 @dataclass(frozen=True, slots=True)
 class HabitationScenario:
-    """A sealed, chronological virtual-life scenario."""
+    """A sealed, chronological virtual life reused across model candidates."""
 
     scenario_id: str
     subject_id: str
@@ -106,14 +110,14 @@ class HabitationScenario:
 
 
 class HabitationTarget(Protocol):
-    """Adapter implemented by the system-under-test for one resident agent."""
+    """One isolated AIOS instance backed by exactly one resident model."""
 
     def handle_event(self, event: ResidentEvent) -> Any:
-        """Deliver one resident-visible event and return the system response."""
+        """Deliver one event to this model's private AIOS world."""
 
 
 class HabitationEvaluator(Protocol):
-    """Evaluation is separate from execution and may inspect hidden truth."""
+    """Post-run evaluation may inspect hidden truth; the resident may not."""
 
     def evaluate(
         self,
@@ -121,7 +125,7 @@ class HabitationEvaluator(Protocol):
         scenario: HabitationScenario,
         run: "HabitationRun",
     ) -> Mapping[str, Any]:
-        """Return metrics/findings without exposing oracle data to the resident."""
+        """Return findings without exposing oracle data to the resident model."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -137,7 +141,7 @@ class HabitationStep:
 class HabitationRun:
     scenario_id: str
     subject_id: str
-    agent_id: str
+    model_id: str
     steps: tuple[HabitationStep, ...]
 
     @property
@@ -146,23 +150,25 @@ class HabitationRun:
 
 
 @dataclass(frozen=True, slots=True)
-class MultiAgentHabitationResult:
+class MultiModelHabitationResult:
+    """Independent runs of multiple model candidates over the same sealed life."""
+
     scenario_id: str
     runs: Mapping[str, HabitationRun]
 
 
 class HabitationRunner:
-    """Execute the same sealed life against one or many independent residents."""
+    """Execute one sealed life independently against one or more model candidates."""
 
     def run(
         self,
         *,
         scenario: HabitationScenario,
-        agent_id: str,
+        model_id: str,
         target: HabitationTarget,
     ) -> HabitationRun:
-        if not agent_id.strip():
-            raise ValueError("agent_id must be non-empty")
+        if not model_id.strip():
+            raise ValueError("model_id must be non-empty")
 
         steps: list[HabitationStep] = []
         for event in scenario.events:
@@ -191,35 +197,42 @@ class HabitationRunner:
         return HabitationRun(
             scenario_id=scenario.scenario_id,
             subject_id=scenario.subject_id,
-            agent_id=agent_id,
+            model_id=model_id,
             steps=tuple(steps),
         )
 
-    def run_many(
+    def run_models(
         self,
         *,
         scenario: HabitationScenario,
         targets: Mapping[str, HabitationTarget],
-    ) -> MultiAgentHabitationResult:
+    ) -> MultiModelHabitationResult:
+        """Run each model candidate in a separate target/world.
+
+        The mapping key identifies the model candidate. Reusing the same target
+        instance is rejected so models cannot accidentally share WorldStore,
+        conversation state, caches, or any other resident state.
+        """
+
         if not targets:
-            raise ValueError("targets must contain at least one resident agent")
+            raise ValueError("targets must contain at least one model candidate")
 
         runs: dict[str, HabitationRun] = {}
         seen_target_ids: set[int] = set()
-        for agent_id, target in targets.items():
+        for model_id, target in targets.items():
             identity = id(target)
             if identity in seen_target_ids:
                 raise ValueError(
-                    "each agent_id must receive an independent target instance"
+                    "each model_id must receive an independent AIOS target instance"
                 )
             seen_target_ids.add(identity)
-            runs[agent_id] = self.run(
+            runs[model_id] = self.run(
                 scenario=scenario,
-                agent_id=agent_id,
+                model_id=model_id,
                 target=target,
             )
 
-        return MultiAgentHabitationResult(
+        return MultiModelHabitationResult(
             scenario_id=scenario.scenario_id,
             runs=runs,
         )
@@ -231,7 +244,7 @@ def evaluate_run(
     scenario: HabitationScenario,
     run: HabitationRun,
 ) -> Mapping[str, Any]:
-    """Run an evaluator after habitation without feeding its oracle to the agent."""
+    """Evaluate one model only after its independent habitation run has finished."""
 
     if run.scenario_id != scenario.scenario_id:
         raise ValueError("run and scenario do not match")
@@ -247,7 +260,7 @@ def scenario_channels(scenario: HabitationScenario) -> tuple[str, ...]:
 
 
 def visible_events(scenario: HabitationScenario) -> Sequence[ResidentEvent]:
-    """Return resident-visible event projections only; hidden oracle stays sealed."""
+    """Return resident-visible projections only; hidden oracle stays sealed."""
 
     return tuple(
         event.resident_view()
