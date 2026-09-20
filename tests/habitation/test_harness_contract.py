@@ -112,6 +112,11 @@ def test_hidden_oracle_never_enters_resident_event() -> None:
     assert target.events[0].metadata == {"session": "s1"}
     assert "truth" not in target.events[0].metadata
     assert "day-21-private-oracle-only" not in {step.event_id for step in run.steps}
+    assert target.clock == [BASE, BASE + timedelta(days=7)]
+    assert run.final_snapshot["events_seen"] == [
+        "day-01-conversation",
+        "day-07-calendar",
+    ]
 
 
 def test_runner_does_not_require_a_fixed_expected_answer() -> None:
@@ -494,4 +499,41 @@ def test_event_time_must_be_datetime_not_string() -> None:
             occurred_at="2026-09-20T08:00:00Z",  # type: ignore[arg-type]
             channel="x",
             payload="x",
+        )
+
+
+def test_virtual_clock_advances_before_each_visible_event() -> None:
+    scenario = _scenario()
+
+    class OrderCheckingTarget(RecordingTarget):
+        def handle_event(self, event: ResidentEvent):
+            assert self.clock
+            assert self.clock[-1] == event.occurred_at
+            return super().handle_event(event)
+
+    target = OrderCheckingTarget("clock-order")
+    run = HabitationRunner().run(
+        scenario=scenario,
+        model_id="clock-order-model",
+        target=target,
+    )
+
+    assert [step.time_advance_result["advanced_to"] for step in run.steps] == [
+        BASE.isoformat(),
+        (BASE + timedelta(days=7)).isoformat(),
+    ]
+
+
+def test_audit_snapshot_must_be_mapping() -> None:
+    scenario = _scenario()
+
+    class BadSnapshotTarget(RecordingTarget):
+        def audit_snapshot(self):
+            return ["not", "a", "mapping"]
+
+    with pytest.raises(ValueError, match="audit_snapshot must return a mapping"):
+        HabitationRunner().run(
+            scenario=scenario,
+            model_id="bad-snapshot",
+            target=BadSnapshotTarget("bad-snapshot"),
         )
