@@ -323,8 +323,14 @@ class MultiScaleSummaryScheduler:
                         skipped_empty.append(job)
                         continue
                     if prepared.truncated:
-                        # Never publish an incomplete Summary as CURRENT. This is a
-                        # visible resource/backlog condition, not semantic completion.
+                        # Never publish an incomplete Summary as CURRENT. If this
+                        # window had an older CURRENT summary, forward-mark it STALE
+                        # because the durable source set is now known to be incomplete.
+                        self.service.mark_stale_if_present(
+                            prepared,
+                            changed_at=current,
+                            reason="summary source window exceeds completeness cap",
+                        )
                         truncated = True
                         continue
                     if self._unchanged(prepared):
