@@ -104,6 +104,8 @@ def test_per_model_artifact_never_serializes_hidden_oracle() -> None:
     assert artifact["scenario_version"] == "3"
     assert artifact["scenario_seed"] == 20260920
     assert artifact["delivered_count"] == 2
+    assert artifact["steps"][0]["time_advance_result"]["advanced_to"] == BASE.isoformat()
+    assert artifact["final_snapshot"]["seen"] == ["e1", "e2"]
     assert "hidden_oracle" not in encoded
     assert "NEVER_LEAK_THIS" not in encoded
     assert "evaluator-only" not in encoded
