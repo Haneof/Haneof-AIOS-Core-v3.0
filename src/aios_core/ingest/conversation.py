@@ -10,7 +10,7 @@ import hashlib
 from dataclasses import dataclass
 from datetime import datetime
 
-from aios_core.contracts.enums import ObjectType, SourceClass
+from aios_core.contracts.enums import SourceClass
 from aios_core.contracts.models import Observation
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.time import TemporalExtent, as_utc
@@ -97,12 +97,24 @@ class ConversationIngestor:
             metadata={**common_metadata, "role": "assistant"},
         )
 
+        operation_id = f"op_conv_{turn_key}"
+        expected_world_revision = self.store.current_world_revision()
+        try:
+            previous = self.store.operation_record(operation_id)
+        except Exception:
+            previous = None
+        if previous is not None:
+            # Exact retries must replay the original request identity. Reusing the
+            # original expected revision lets the store's idempotency fingerprint
+            # distinguish a true retry from mutated content in the same turn slot.
+            expected_world_revision = int(previous["expected_world_revision"])
+
         op = OperationRequest(
-            operation_id=f"op_conv_{turn_key}",
+            operation_id=operation_id,
             session_id=session_id,
             operation_name="conversation.commit_turn",
             arguments={"turn_index": turn_index},
-            expected_world_revision=self.store.current_world_revision(),
+            expected_world_revision=expected_world_revision,
             reason="persist raw user/AI interaction as unified-world fact",
             idempotency_key=f"conversation:{session_id}:{turn_index}",
             source_class=SourceClass.USER,
