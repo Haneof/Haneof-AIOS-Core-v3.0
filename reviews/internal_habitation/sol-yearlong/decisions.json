@@ -911,5 +911,33 @@
         }
       }
     ]
+  },
+  "7fcd5c1f73e56d2e119ee15c1baea4d89cbdb0d8d0385211b13d0600d0ee457c": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "create_task",
+        "call_id": "sol-jan14-create-fire-inspection-sunday-check",
+        "arguments": {
+          "title": "周日核验消防检查准备状态",
+          "task_type": "verification",
+          "reason_refs": [
+            {
+              "object_id": "obs_conv_user_8fa54d11e0014eb7f22ff285",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_src_468f0037669660d6336bd905",
+              "revision": 1
+            }
+          ],
+          "initial_state": "waiting_time",
+          "priority": 70,
+          "next_wake_at": "2027-01-17T16:00:00+00:00",
+          "deadline": "2027-01-18T16:00:00+00:00",
+          "next_step": "周日唤醒后先检查是否已有消防检查准备完成的世界证据；只有仍未准备时才提醒用户。不要每天提醒。"
+        }
+      }
+    ]
   }
 }
