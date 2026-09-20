@@ -268,7 +268,11 @@ class PeriodicReviewService:
                     recorded = _parse_time(payload.get("recorded_at"), "recorded_at")
                 except ValueError:
                     continue
-                if recorded < start or recorded > end:
+                # Start is exclusive. Review-produced cognition is written before
+                # the review Wake is completed at the same timestamp; excluding the
+                # boundary prevents a completed review from mechanically scheduling
+                # another review of itself on the next interval.
+                if recorded <= start or recorded > end:
                     continue
 
                 # Review summaries may be useful as compressed evidence, but the
@@ -382,7 +386,10 @@ class PeriodicReviewService:
         moment = as_utc(now, "now")
         latest = self._latest_marker()
 
-        if latest is not None and latest.wake_state is WakeState.NEW:
+        if latest is not None and latest.wake_state in {
+            WakeState.NEW,
+            WakeState.RUNNING,
+        }:
             metadata = latest.metadata
             start = _parse_time(metadata.get("window_start"), "window_start")
             anchors = []
@@ -452,6 +459,88 @@ class PeriodicReviewService:
             anchors=anchors,
         )
 
+    def begin_review(
+        self,
+        request: PeriodicReviewRequest,
+        *,
+        started_at: datetime,
+    ) -> PeriodicReviewRequest:
+        """Atomically claim a due review before invoking the resident model.
+
+        A RUNNING wake is resumable after process failure. This prevents two workers
+        from independently reviewing the same NEW wake while keeping crash recovery
+        possible without inventing a second scheduler database.
+        """
+        if request.subject_id != self.subject_id:
+            raise ValueError("review request belongs to another subject")
+        started = as_utc(started_at, "started_at")
+        payload = self.store.get_payload(
+            request.wake_ref.object_id,
+            revision=request.wake_ref.revision,
+        )
+        wake = Wake.model_validate(payload)
+        latest = Wake.model_validate(self.store.get_payload(wake.object_id))
+
+        if latest.wake_state is WakeState.RUNNING:
+            if latest.revision != request.wake_ref.revision:
+                return request.model_copy(
+                    update={
+                        "wake_ref": ObjectRef(
+                            object_id=latest.object_id,
+                            revision=latest.revision,
+                        )
+                    }
+                )
+            return request
+
+        if latest.revision != wake.revision:
+            raise ValueError("review wake is no longer current")
+        if wake.wake_state is not WakeState.NEW:
+            raise ValueError("only NEW periodic review wake may begin")
+
+        new_revision = wake.revision + 1
+        metadata = dict(wake.metadata)
+        metadata["started_at"] = started.isoformat()
+        running = Wake.model_validate(
+            {
+                **wake.model_dump(mode="python", round_trip=True),
+                "revision": new_revision,
+                "occurred": TemporalExtent.point(started),
+                "learned_at": started,
+                "recorded_at": started,
+                "wake_state": WakeState.RUNNING,
+                "last_hit_at": started,
+                "hit_count": wake.hit_count + 1,
+                "status": WakeState.RUNNING.value,
+                "metadata": metadata,
+            }
+        )
+        result = self.store.commit(
+            [running],
+            OperationRequest(
+                operation_name="review.begin",
+                arguments={
+                    "wake_id": wake.object_id,
+                    "revision": new_revision,
+                },
+                expected_world_revision=int(self.store.current_world_revision()),
+                reason="claim due periodic review for resident-model execution",
+                idempotency_key=f"review-begin:{wake.object_id}:{new_revision}",
+                source_class=SourceClass.MAINTENANCE,
+                maintenance_class=MaintenanceClass.PERIODIC_REVIEW,
+            ),
+        )
+        self._catch_up()
+        _ = result
+        return request.model_copy(
+            update={
+                "wake_ref": ObjectRef(
+                    object_id=running.object_id,
+                    revision=new_revision,
+                )
+            }
+        )
+
     def complete_review(
         self,
         request: PeriodicReviewRequest,
@@ -479,8 +568,8 @@ class PeriodicReviewService:
                     world_revision=int(self.store.current_world_revision()),
                 )
             raise ValueError("review wake is no longer current")
-        if wake.wake_state is not WakeState.NEW:
-            raise ValueError("only NEW periodic review wake may complete")
+        if wake.wake_state is not WakeState.RUNNING:
+            raise ValueError("only RUNNING periodic review wake may complete")
 
         metadata = dict(wake.metadata)
         metadata.update(
