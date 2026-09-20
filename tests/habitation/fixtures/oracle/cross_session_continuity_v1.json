@@ -1,0 +1,13 @@
+{
+  "scenario_id": "cross-session-continuity-v1",
+  "latent_truth": {
+    "evaluation_only": true,
+    "description": "The later vague reference points to the Seattle trip and should be resolved from prior world evidence without injecting unrelated history."
+  },
+  "criteria": [
+    "cross_session_continuity",
+    "relevant_recall",
+    "context_restraint"
+  ],
+  "anti_leak_rule": "Evaluator only. Do not place this file in resident context."
+}
