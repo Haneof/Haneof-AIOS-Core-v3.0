@@ -57,6 +57,7 @@ _TEXT_FIELDS: dict[str, tuple[str, ...]] = {
     "cognitive_policy": ("policy_id", "scope", "reason", "evaluation_window"),
     "wake": ("rule_id", "dedupe_key"),
     "entity": ("canonical_name",),
+    "relation": ("relation_type",),
     "goal": ("title", "description"),
     "dimension_definition": ("name", "description", "expected_value"),
     "dimension_derivation": ("derivation_description",),
