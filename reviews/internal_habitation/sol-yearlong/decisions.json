@@ -1293,5 +1293,9 @@
   "ccaf791301f75d2cb84cc819dd20dd68f627af9db299ae20e8f7cad5cc3b9312": {
     "kind": "response",
     "response": "记下来了：这次消防检查已经结束，检查员给出的实际结果是“通过、没有要求整改”。我把它作为已结束的检查事件保存；只记录这个实际结果，不把它解释成某个准备动作或提醒必然导致了通过。"
+  },
+  "ff715ca7a0484253925cf25ec20c09f135ffd0c28581fb898a9e877372f3f55a": {
+    "kind": "summary",
+    "summary": "2027-01-05，用户明确要求降低主动打扰频率，只在事项实质影响开店、采购或重要家庭安排时主动提醒。AI 据此建立可由 AI 修订的 communication.proactive_interruption_threshold 认知策略，当前值为 only_when_opening_procurement_or_important_family_arrangement_is_materially_affected，默认值为 normal，评估窗口为 30 天；该策略由当日用户原话直接支撑。"
   }
 }
