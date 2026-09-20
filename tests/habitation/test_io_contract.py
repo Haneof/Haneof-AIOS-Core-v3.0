@@ -46,13 +46,22 @@ class EchoTarget:
         }
 
 
-def _scenario(*, hidden_label: str = "secret-a", visible_text: str = "今天开始复习") -> HabitationScenario:
+def _scenario(
+    *,
+    hidden_label: str = "secret-a",
+    visible_text: str = "今天开始复习",
+    scenario_id: str = "life-io-001",
+    scenario_version: str = "3",
+    seed: int = 20260920,
+    end_at: datetime | None = None,
+) -> HabitationScenario:
     return HabitationScenario(
-        scenario_id="life-io-001",
-        scenario_version="3",
-        seed=20260920,
+        scenario_id=scenario_id,
+        scenario_version=scenario_version,
+        seed=seed,
         subject_id="user_1",
         hidden_oracle={"latent_truth": hidden_label},
+        end_at=end_at,
         events=(
             LifeEvent(
                 event_id="e1",
@@ -88,6 +97,24 @@ def test_public_fingerprint_is_stable_and_ignores_hidden_oracle() -> None:
 
     changed_visible = _scenario(hidden_label="secret-a", visible_text="今天不复习")
     assert scenario_public_fingerprint(first) != scenario_public_fingerprint(changed_visible)
+
+
+def test_public_fingerprint_ignores_evaluator_identity_metadata() -> None:
+    baseline = _scenario()
+    renamed = _scenario(
+        scenario_id="different-evaluator-label",
+        scenario_version="99",
+        seed=999999,
+    )
+
+    assert scenario_public_fingerprint(baseline) == scenario_public_fingerprint(renamed)
+
+
+def test_public_fingerprint_includes_final_execution_horizon() -> None:
+    baseline = _scenario()
+    extended = _scenario(end_at=BASE + timedelta(days=5))
+
+    assert scenario_public_fingerprint(baseline) != scenario_public_fingerprint(extended)
 
 
 def test_per_model_artifact_never_serializes_hidden_oracle() -> None:
@@ -159,6 +186,7 @@ def test_load_scenario_json_preserves_version_seed_and_sealed_truth() -> None:
             "scenario_version": "7",
             "seed": 42,
             "subject_id": "user-x",
+            "end_at": "2026-09-22T08:00:00+00:00",
             "hidden_oracle": {"latent": "judge-only"},
             "events": [
                 {
@@ -179,6 +207,7 @@ def test_load_scenario_json_preserves_version_seed_and_sealed_truth() -> None:
     assert scenario.scenario_id == "json-life"
     assert scenario.scenario_version == "7"
     assert scenario.seed == 42
+    assert scenario.end_at == datetime(2026, 9, 22, 8, 0, tzinfo=timezone.utc)
     assert scenario.hidden_oracle["latent"] == "judge-only"
     assert scenario.events[0].hidden_oracle["meaning"] == "judge-only"
     assert not hasattr(scenario.events[0].resident_view(), "hidden_oracle")

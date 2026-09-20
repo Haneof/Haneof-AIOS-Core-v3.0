@@ -5,5 +5,6 @@
   "subject_id": "synthetic-user-002",
   "resident_stream": "resident/cross_session_continuity_v1.jsonl",
   "evaluator_oracle": "oracle/cross_session_continuity_v1.json",
-  "purpose": "Cross-session reference resolution and relevant-memory recall"
+  "purpose": "Cross-session reference resolution and relevant-memory recall",
+  "end_at": "2026-03-12T18:00:00+00:00"
 }
