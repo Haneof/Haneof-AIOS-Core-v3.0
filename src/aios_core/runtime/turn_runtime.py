@@ -23,6 +23,14 @@ from aios_core.dimensions import (
     DimensionRegistryService,
     DimensionTransitionRequest,
 )
+from aios_core.execution import (
+    ActionProposalRequest,
+    GoalCreateRequest,
+    GoalTaskActionService,
+    GoalTransitionRequest,
+    TaskCreateRequest,
+    TaskTransitionRequest,
+)
 from aios_core.ingest.conversation import ConversationCommit, ConversationIngestor
 from aios_core.projections.all_dimensions import AllDimensionsProjectionService
 from aios_core.query.search import WorldSearchIndex
@@ -96,6 +104,11 @@ class FusedTurnRuntime:
             index=index,
             subject_id=subject_id,
         )
+        self.execution_world = GoalTaskActionService(
+            store=store,
+            index=index,
+            subject_id=subject_id,
+        )
         self._active_turn_time: datetime | None = None
 
         registry = CapabilityRegistry()
@@ -144,6 +157,18 @@ class FusedTurnRuntime:
                 input_schema={"include_terminal": "boolean?"},
             ),
             self._list_dimensions,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="read_execution_world",
+                description=(
+                    "Read current Goals, Tasks and proposed/executed Actions from the "
+                    "unified world. This is a read-only planning view."
+                ),
+                kind=CapabilityKind.READ,
+                input_schema={},
+            ),
+            self._read_execution_world,
         )
         registry.register(
             CapabilitySpec(
@@ -251,6 +276,107 @@ class FusedTurnRuntime:
         )
         registry.register(
             CapabilitySpec(
+                name="propose_goal",
+                description=(
+                    "Create an evidence-grounded Goal proposal in the unified world. "
+                    "A proposal does not grant external-action authorization."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "source_type": "user_explicit|user_inferred|ai_self|app|external",
+                    "title": "string",
+                    "description": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "confidence": "number[0,1]",
+                    "success_criteria": "array[string]?",
+                },
+            ),
+            self._propose_goal,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="transition_goal",
+                description=(
+                    "Move the current Goal revision through a legal evidence-backed state transition."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "goal_ref": "{object_id:string,revision:integer}",
+                    "new_status": "proposed|active|paused|achieved|abandoned|unknown",
+                    "reason": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                },
+            ),
+            self._transition_goal,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="create_task",
+                description=(
+                    "Create a concrete evidence-grounded Task, optionally under a current Goal."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "title": "string",
+                    "task_type": "string",
+                    "reason_refs": "array[{object_id:string,revision:integer}]",
+                    "goal_ref": "{object_id:string,revision:integer}?",
+                    "initial_state": "string?",
+                    "priority": "integer?",
+                    "next_wake_at": "ISO-8601 datetime?",
+                    "deadline": "ISO-8601 datetime?",
+                    "timezone_name": "string?",
+                    "next_step": "string?",
+                },
+            ),
+            self._create_task,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="transition_task",
+                description=(
+                    "Move the current Task revision through a legal state transition. "
+                    "COMPLETED/FAILED requires real Outcome refs."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "task_ref": "{object_id:string,revision:integer}",
+                    "new_state": "string",
+                    "reason": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "execution_refs": "array[{object_id:string,revision:integer}]?",
+                    "outcome_refs": "array[{object_id:string,revision:integer}]?",
+                    "next_wake_at": "ISO-8601 datetime?",
+                    "next_step": "string?",
+                },
+            ),
+            self._transition_task,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="propose_action",
+                description=(
+                    "Create a PROPOSED external Action for a RUNNING Task. "
+                    "This capability never executes the side effect and cannot authorize itself."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "task_ref": "{object_id:string,revision:integer}",
+                    "action_type": "string",
+                    "payload": "object",
+                    "expected_outcome": "string?",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                },
+            ),
+            self._propose_action,
+        )
+        registry.register(
+            CapabilitySpec(
                 name="revise_claim",
                 description=(
                     "Create a forward-only new revision of the current Claim and mark "
@@ -348,6 +474,172 @@ class FusedTurnRuntime:
             )
         ]
 
+    def _read_execution_world(self) -> dict[str, Any]:
+        return {
+            "goals": [
+                item.model_dump(mode="json")
+                for item in self.execution_world.current_goals()
+            ],
+            "tasks": [
+                item.model_dump(mode="json")
+                for item in self.execution_world.current_tasks()
+            ],
+            "actions": [
+                item.model_dump(mode="json")
+                for item in self.execution_world.current_actions()
+            ],
+        }
+
+    @staticmethod
+    def _optional_datetime(value: str | None) -> datetime | None:
+        if value is None:
+            return None
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+
+    def _propose_goal(
+        self,
+        source_type: str,
+        title: str,
+        description: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        confidence: float,
+        success_criteria: Sequence[str] = (),
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("propose_goal is only available during an active AIOS turn")
+        receipt = self.execution_world.create_goal(
+            GoalCreateRequest(
+                source_type=source_type,
+                title=title,
+                description=description,
+                evidence_refs=self._coerce_refs(evidence_refs),
+                confidence=float(confidence),
+                success_criteria=tuple(success_criteria),
+            ),
+            created_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
+    def _transition_goal(
+        self,
+        goal_ref: Mapping[str, Any],
+        new_status: str,
+        reason: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("transition_goal is only available during an active AIOS turn")
+        receipt = self.execution_world.transition_goal(
+            GoalTransitionRequest(
+                goal_ref=ObjectRef(
+                    object_id=str(goal_ref["object_id"]),
+                    revision=int(goal_ref["revision"]),
+                ),
+                new_status=new_status,
+                reason=reason,
+                evidence_refs=self._coerce_refs(evidence_refs),
+            ),
+            changed_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
+    def _create_task(
+        self,
+        title: str,
+        task_type: str,
+        reason_refs: Sequence[Mapping[str, Any]],
+        goal_ref: Mapping[str, Any] | None = None,
+        initial_state: str = "draft",
+        priority: int = 50,
+        next_wake_at: str | None = None,
+        deadline: str | None = None,
+        timezone_name: str | None = None,
+        next_step: str | None = None,
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("create_task is only available during an active AIOS turn")
+        parsed_goal = (
+            None
+            if goal_ref is None
+            else ObjectRef(
+                object_id=str(goal_ref["object_id"]),
+                revision=int(goal_ref["revision"]),
+            )
+        )
+        receipt = self.execution_world.create_task(
+            TaskCreateRequest(
+                title=title,
+                task_type=task_type,
+                reason_refs=self._coerce_refs(reason_refs),
+                goal_ref=parsed_goal,
+                initial_state=initial_state,
+                priority=int(priority),
+                next_wake_at=self._optional_datetime(next_wake_at),
+                deadline=self._optional_datetime(deadline),
+                timezone_name=timezone_name,
+                next_step=next_step,
+            ),
+            created_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
+    def _transition_task(
+        self,
+        task_ref: Mapping[str, Any],
+        new_state: str,
+        reason: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        execution_refs: Sequence[Mapping[str, Any]] = (),
+        outcome_refs: Sequence[Mapping[str, Any]] = (),
+        next_wake_at: str | None = None,
+        next_step: str | None = None,
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("transition_task is only available during an active AIOS turn")
+        receipt = self.execution_world.transition_task(
+            TaskTransitionRequest(
+                task_ref=ObjectRef(
+                    object_id=str(task_ref["object_id"]),
+                    revision=int(task_ref["revision"]),
+                ),
+                new_state=new_state,
+                reason=reason,
+                evidence_refs=self._coerce_refs(evidence_refs),
+                execution_refs=self._coerce_refs(execution_refs),
+                outcome_refs=self._coerce_refs(outcome_refs),
+                next_wake_at=self._optional_datetime(next_wake_at),
+                next_step=next_step,
+            ),
+            changed_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
+    def _propose_action(
+        self,
+        task_ref: Mapping[str, Any],
+        action_type: str,
+        payload: Mapping[str, Any],
+        evidence_refs: Sequence[Mapping[str, Any]],
+        expected_outcome: str | None = None,
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("propose_action is only available during an active AIOS turn")
+        receipt = self.execution_world.propose_action(
+            ActionProposalRequest(
+                task_ref=ObjectRef(
+                    object_id=str(task_ref["object_id"]),
+                    revision=int(task_ref["revision"]),
+                ),
+                action_type=action_type,
+                payload=dict(payload),
+                expected_outcome=expected_outcome,
+                evidence_refs=self._coerce_refs(evidence_refs),
+            ),
+            proposed_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
+
     def _propose_dimension(
         self,
         dimension_key: str,
@@ -438,6 +730,11 @@ class FusedTurnRuntime:
             "commit_ai_world_claim",
             "propose_dimension",
             "transition_dimension",
+            "propose_goal",
+            "transition_goal",
+            "create_task",
+            "transition_task",
+            "propose_action",
             "revise_claim",
             "retract_claim",
         }
