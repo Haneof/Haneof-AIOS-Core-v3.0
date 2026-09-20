@@ -15,14 +15,14 @@ from typing import Any, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from aios_core.contracts.enums import MaintenanceClass, ObjectType, PolicyClass, SourceClass
+from aios_core.contracts.enums import ErrorCode, MaintenanceClass, ObjectType, PolicyClass, SourceClass
 from aios_core.contracts.models import CognitivePolicy, Dependency, EvidenceCoverage, EvidenceSet
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import KnowledgeWindow, TemporalExtent, as_utc
 from aios_core.query.search import WorldSearchIndex
 from aios_core.storage.idempotency import canonical_json_dumps
-from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
 POLICY_DIMENSION = "dim:ai_cognitive_policy"
 
@@ -223,8 +223,9 @@ class CognitivePolicyRegistry:
         object_id = self._object_id(policy_id)
         try:
             self.store.get_payload(object_id)
-        except Exception:
-            pass
+        except StoreError as exc:
+            if exc.code is not ErrorCode.NOT_FOUND:
+                raise
         else:
             raise ValueError(f"policy already registered: {policy_id}")
         self._validate_refs(request.evidence_refs)
@@ -272,16 +273,20 @@ class CognitivePolicyRegistry:
         object_id = self._object_id(policy_id)
         try:
             payload = self.store.get_payload(object_id)
-        except Exception:
-            return None
+        except StoreError as exc:
+            if exc.code is ErrorCode.NOT_FOUND:
+                return None
+            raise
         return CognitivePolicy.model_validate(payload)
 
     def get(self, policy_id: str, version: int) -> CognitivePolicy | None:
         object_id = self._object_id(policy_id)
         try:
             payload = self.store.get_payload(object_id, revision=int(version))
-        except Exception:
-            return None
+        except StoreError as exc:
+            if exc.code is ErrorCode.NOT_FOUND:
+                return None
+            raise
         return CognitivePolicy.model_validate(payload)
 
     def history(self, policy_id: str) -> tuple[CognitivePolicy, ...]:
