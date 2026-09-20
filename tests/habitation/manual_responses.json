@@ -131,5 +131,18 @@
   {
     "snapshot_signature": "d858de8428cb16d56534e67a0df36bcf14bc2d3f88c9e64da615d83f94b342f3",
     "type": "silence"
+  },
+  {
+    "snapshot_signature": "39761cf4a3b5a4d5c03b9624cb077b466a89202e823ef07c91de9f6625ccae89",
+    "type": "capability_calls",
+    "calls": [
+      {
+        "name": "search_world",
+        "arguments": {
+          "query": "本周 学习 时间 周六 上午 项目会 日程 安排",
+          "limit": 10
+        }
+      }
+    ]
   }
 ]
