@@ -1740,10 +1740,16 @@ class FusedTurnRuntime:
             summary_trigger_tokens=summary_trigger_tokens,
         )
 
+        topic_state = self.topic_state.resolve(
+            user_input=user_input,
+            recent_turns=continuity_snapshot.recent_turns,
+            explicit_topic=current_topic,
+        )
         recommendation = self.recommender.recommend(
-            current_topic=current_topic,
+            current_topic=topic_state.topic,
             subject_id=self.subject_id,
             exclude_session_id=session,
+            history_needed=topic_state.history_may_help,
         )
 
         continuity_context = (
@@ -1753,6 +1759,12 @@ class FusedTurnRuntime:
         )
 
         current_task_context = dict(task_context or {})
+        current_task_context["topic_state"] = topic_state.model_dump(mode="json")
+        automatic_execution_context = self._execution_context_for_topic(topic_state.topic)
+        current_task_context.setdefault(
+            "related_execution_anchors",
+            automatic_execution_context["related_execution_anchors"],
+        )
         current_task_context["current_user_observation_ref"] = {
             "object_id": user_commit.observation_id,
             "revision": 1,
@@ -1779,7 +1791,7 @@ class FusedTurnRuntime:
 
         context = self.context_controller.assemble(
             user_input=user_input,
-            current_topic=current_topic,
+            current_topic=topic_state.topic,
             recommendation=recommendation,
             recent_turns=continuity_snapshot.recent_turns,
             conversation_summaries=continuity_snapshot.round_summaries,
