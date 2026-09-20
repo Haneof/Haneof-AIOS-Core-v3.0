@@ -6,6 +6,7 @@ from aios_core.contracts.models import Observation
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import TemporalExtent
+from aios_core.dimensions import DimensionProposalRequest, DimensionRegistryService
 from aios_core.ingest.conversation import ConversationIngestor
 from aios_core.query.search import WorldSearchIndex
 from aios_core.runtime.capabilities import CapabilityCall
@@ -641,3 +642,106 @@ def test_resident_model_can_check_existing_dimensions_then_propose_candidate(tmp
     ]
     assert len(dynamic) == 1
     assert dynamic[0]["lifecycle"] == "candidate"
+
+
+def test_resident_model_can_move_candidate_dimension_into_trial(tmp_path):
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    evidence = Observation(
+        object_id="obs_dimension_transition_runtime",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW - timedelta(days=5)),
+        learned_at=NOW - timedelta(days=5),
+        recorded_at=NOW - timedelta(days=5),
+        created_by="dimension-transition-runtime-test",
+        source_kind="virtual_life",
+        modality="text",
+        value="连续学习记录显示值得继续观察能力变化。",
+        metadata={"dimension": "dim:user_ai_interaction"},
+    )
+    store.commit(
+        [evidence],
+        OperationRequest(
+            operation_name="test.seed.dimension.transition.runtime",
+            expected_world_revision=0,
+            reason="seed transition evidence",
+            idempotency_key="seed-dimension-transition-runtime",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+    registry = DimensionRegistryService(store=store, index=index)
+    candidate = registry.propose(
+        DimensionProposalRequest(
+            dimension_key="dim:learning_ability",
+            name="学习能力",
+            description="持续观察学习能力变化。",
+            data_shape="evidence_grounded_cognition_over_time",
+            evidence_refs=(ObjectRef(object_id=evidence.object_id, revision=1),),
+            why_existing_dimensions_are_insufficient="现有事实轴不足以连续表达能力变化。",
+            continuity_rationale="后续学习结果可以持续更新。",
+            user_value_rationale="可用于调整教学支持。",
+            maintenance_cost_rationale="只保留能力变化Claim和Summary。",
+            confidence=0.7,
+        ),
+        proposed_at=NOW - timedelta(days=4),
+    )
+
+    def model(snapshot):
+        history = snapshot.capability_history
+        if not history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="list_dimensions",
+                        arguments={"include_terminal": False},
+                    ),
+                )
+            )
+        if len(history) == 1:
+            dimensions = history[-1].data
+            current = next(
+                item for item in dimensions
+                if item["object_id"] == candidate.dimension_id
+            )
+            assert current["lifecycle"] == "candidate"
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="transition_dimension",
+                        arguments={
+                            "dimension_ref": {
+                                "object_id": candidate.dimension_id,
+                                "revision": 1,
+                            },
+                            "new_lifecycle": "trial",
+                            "reason": "AI决定让该观察轴进入真实运行试用，而不是直接判定为有效。",
+                            "evidence_refs": [
+                                {
+                                    "object_id": evidence.object_id,
+                                    "revision": 1,
+                                }
+                            ],
+                        },
+                    ),
+                )
+            )
+        transitioned = history[-1]
+        assert transitioned.ok is True
+        assert transitioned.data["new_lifecycle"] == "trial"
+        return ModelDirective(response="先进入试用，继续通过后续真实生活数据验证。")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    result = runtime.run_turn(
+        session_id="current",
+        turn_index=1,
+        user_input="这个新维度现在应该怎么办？",
+        current_topic=None,
+        occurred_at=NOW,
+    )
+
+    assert [
+        item.name for item in result.runtime.capability_history
+    ] == ["list_dimensions", "transition_dimension"]
+    assert store.get_payload(candidate.dimension_id)["lifecycle"] == "trial"
