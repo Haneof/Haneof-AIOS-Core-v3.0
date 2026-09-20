@@ -1766,16 +1766,35 @@ class FusedTurnRuntime:
         """Compact current policy view for every resident semantic entry point.
 
         Policies learned from direct evidence must become available to later cognition
-        without requiring the model to guess a policy id first. The full ledger remains
-        available through read_cognitive_policies when the bounded context is truncated.
+        without requiring the model to guess a policy id first. Scope/class metadata is
+        kept beside the convenience value map so a local policy is not silently treated
+        as global. The full ledger remains available through read_cognitive_policies when
+        this bounded context is truncated.
         """
 
         if limit < 1:
             raise ValueError("policy context limit must be >= 1")
         items = list(self.policies.list_current())
         values: dict[str, Any] = {}
+        records: list[dict[str, Any]] = []
         for item in items[:limit]:
             values[item.policy_id] = item.current_value
+            records.append(
+                {
+                    "policy_id": item.policy_id,
+                    "scope": item.scope,
+                    "policy_class": item.policy_class.value,
+                    "default_value": item.default_value,
+                    "current_value": item.current_value,
+                    "allowed_range_or_choices": item.allowed_range_or_choices,
+                    "mutable_by_ai": item.mutable_by_ai,
+                    "evaluation_window": item.evaluation_window,
+                    "version": item.revision,
+                    "previous_version": item.previous_version,
+                    "rollback_pointer": item.rollback_pointer,
+                }
+            )
+        values["_policy_records"] = records
         values["_meta"] = {
             "total": len(items),
             "included": min(len(items), limit),
