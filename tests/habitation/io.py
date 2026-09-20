@@ -94,6 +94,10 @@ def load_scenario_json(text: str) -> HabitationScenario:
     if not isinstance(version_raw, str) or not version_raw.strip():
         raise ValueError("scenario_version must be a non-empty string")
 
+    end_at_raw = raw.get("end_at")
+    if end_at_raw is not None and not isinstance(end_at_raw, str):
+        raise ValueError("end_at must be an ISO-8601 string when provided")
+
     return HabitationScenario(
         scenario_id=_required_string(raw, "scenario_id"),
         subject_id=_required_string(raw, "subject_id"),
@@ -102,6 +106,7 @@ def load_scenario_json(text: str) -> HabitationScenario:
         tags=tuple(tags_raw),
         scenario_version=version_raw,
         seed=seed_raw,
+        end_at=(None if end_at_raw is None else _parse_datetime(end_at_raw)),
     )
 
 
@@ -173,10 +178,11 @@ def scenario_public_fingerprint(scenario: HabitationScenario) -> str:
     """
 
     payload = {
-        "scenario_id": scenario.scenario_id,
+        "resident_input_schema": "aios.p16.resident-visible-input.v1",
         "subject_id": scenario.subject_id,
-        "scenario_version": scenario.scenario_version,
-        "seed": scenario.seed,
+        "end_at": (
+            None if scenario.end_at is None else scenario.end_at.isoformat()
+        ),
         "events": [
             _resident_event_dict(event.resident_view())
             for event in scenario.events
@@ -213,6 +219,7 @@ def run_artifact(
         "subject_id": run.subject_id,
         "model_id": run.model_id,
         "delivered_count": run.delivered_count,
+        "final_time_advance_result": run.final_time_advance_result,
         "steps": [
             {
                 "event_id": step.event_id,
