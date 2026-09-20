@@ -1206,5 +1206,38 @@
   },
   "12bc4bdb740b3ba9437689159226be9f1fcbe56a0757b15b3afb519f8dc53d38": {
     "kind": "silence"
+  },
+  "cdaa1bd966000442faa6616420e08048710a295205f94073a70df97d44556474": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "form_event",
+        "call_id": "sol-jan18-form-fire-inspection-result-event",
+        "arguments": {
+          "title": "消防检查通过且无整改要求",
+          "interpretation": "2027-01-18 的店内消防检查已经结束；根据用户对检查员实际结果的直接报告，检查通过且没有要求整改。这只记录实际检查结果，不推断通过原因。",
+          "event_time": {
+            "start": "2027-01-18T16:00:00+00:00",
+            "end": "2027-01-18T17:00:00+00:00",
+            "precision": "minute",
+            "unknown": false
+          },
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_0238ab2e202146a7625eb120",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_src_468f0037669660d6336bd905",
+              "revision": 1
+            }
+          ],
+          "participant_refs": [],
+          "primary_claim_refs": [],
+          "confidence": 0.99,
+          "dimension": "dim:events"
+        }
+      }
+    ]
   }
 }
