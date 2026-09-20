@@ -9,5 +9,8 @@
     "relevant_recall",
     "context_restraint"
   ],
-  "anti_leak_rule": "Evaluator only. Do not place this file in resident context."
+  "anti_leak_rule": "Evaluator only. Do not place this file in resident context.",
+  "scenario_version": "1",
+  "seed": 20260921,
+  "subject_id": "synthetic-user-002"
 }
