@@ -1,4 +1,4 @@
-name: p16-self-resident-gpt56-sol
+name: p16-self-resident-manual-gpt56-sol
 
 on:
   push:
@@ -11,8 +11,7 @@ jobs:
     permissions:
       contents: read
     env:
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      P16_OUTPUT_DIR: artifacts/p16/self-resident-gpt56-sol
+      P16_OUTPUT_DIR: artifacts/p16/manual-self-resident
     steps:
       - uses: actions/checkout@v4
 
@@ -23,26 +22,25 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: pip install -e ".[dev]"
 
-      - name: Verify OpenAI secret exists
+      - name: Replay current ChatGPT resident decisions until next live prompt
         shell: bash
         run: |
-          test -n "$OPENAI_API_KEY" || { echo "OPENAI_API_KEY is not configured"; exit 2; }
-
-      - name: Run GPT-5.6 Sol sealed resident life
-        shell: bash
-        run: |
-          python -m tests.habitation.run_provider_benchmark \
+          set +e
+          python -m tests.habitation.run_manual_resident_probe \
             --fixture-root tests/habitation/fixtures \
-            --manifest cognition_system_closure_v1.manifest.json \
-            --provider openai \
-            --model gpt-5.6-sol \
-            --max-output-tokens 4096 \
+            --manifest cognition_revision_v1.manifest.json \
+            --responses tests/habitation/manual_responses.json \
             --output-dir "$P16_OUTPUT_DIR"
+          code=$?
+          echo "manual_probe_exit=$code"
+          if [ "$code" -ne 0 ] && [ "$code" -ne 3 ]; then
+            exit "$code"
+          fi
 
-      - name: Upload auditable resident artifacts
+      - name: Upload auditable manual-resident artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: p16-self-resident-gpt56-sol-${{ github.run_id }}
+          name: p16-manual-self-resident-${{ github.run_id }}
           path: artifacts/p16/
           if-no-files-found: error
