@@ -121,7 +121,7 @@ class ConversationIngestor:
             source_kind="user_ai_interaction",
             modality="text",
             value=user_text,
-            raw_locator=f"conversation://{session_id}/{turn_index}/user",
+            raw_locator=f"conversation://{self.subject_id}/{session_id}/{turn_index}/user",
             metadata=metadata,
         )
         operation_id = f"op_conv_user_{turn_key}"
@@ -190,7 +190,7 @@ class ConversationIngestor:
             source_kind="user_ai_interaction",
             modality="text",
             value=assistant_text,
-            raw_locator=f"conversation://{session_id}/{turn_index}/assistant",
+            raw_locator=f"conversation://{self.subject_id}/{session_id}/{turn_index}/assistant",
             metadata=metadata,
         )
         operation_id = f"op_conv_ai_{turn_key}"
@@ -262,7 +262,7 @@ class ConversationIngestor:
             source_kind="user_ai_interaction",
             modality="text",
             value=user_text,
-            raw_locator=f"conversation://{session_id}/{turn_index}/user",
+            raw_locator=f"conversation://{self.subject_id}/{session_id}/{turn_index}/user",
             metadata={**common_metadata, "role": "user"},
         )
         assistant_obs = Observation(
@@ -275,7 +275,7 @@ class ConversationIngestor:
             source_kind="user_ai_interaction",
             modality="text",
             value=assistant_text,
-            raw_locator=f"conversation://{session_id}/{turn_index}/assistant",
+            raw_locator=f"conversation://{self.subject_id}/{session_id}/{turn_index}/assistant",
             metadata={**common_metadata, "role": "assistant"},
         )
 
