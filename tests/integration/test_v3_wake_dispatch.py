@@ -10,6 +10,7 @@ from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import TemporalExtent
 from aios_core.execution import TaskCreateRequest
 from aios_core.query.search import WorldSearchIndex
+from aios_core.review import ReviewSchedulePolicy
 from aios_core.runtime.capabilities import CapabilityCall
 from aios_core.runtime.cognitive_runtime import ModelDirective
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
@@ -358,3 +359,148 @@ def test_due_task_wake_dispatches_into_same_resident_runtime(tmp_path) -> None:
         ]
     )
     assert after_conversation_count == before_conversation_count
+
+
+
+def test_periodic_review_task_due_and_generic_wake_dispatch_form_one_loop(tmp_path) -> None:
+    store, index = _world(tmp_path)
+    note_ref = _seed_observation(
+        store,
+        object_id="obs_c09_cross_stage_note",
+        value="如果情况继续稳定，下周再确认是否恢复周三固定活动。",
+        occurred_at=NOW,
+    )
+    created_task = {"object_id": None}
+
+    def model(snapshot):
+        history = snapshot.capability_history
+
+        if snapshot.wake_reason == "periodic_review":
+            if not history:
+                return ModelDirective(
+                    capability_calls=(
+                        CapabilityCall(
+                            name="read_periodic_review_anchors",
+                            arguments={"offset": 0, "limit": 20},
+                        ),
+                    )
+                )
+            if len(history) == 1:
+                anchors = history[-1].data
+                anchor = next(
+                    item
+                    for item in anchors
+                    if item["object_ref"]["object_id"] == note_ref.object_id
+                )
+                return ModelDirective(
+                    capability_calls=(
+                        CapabilityCall(
+                            name="create_task",
+                            arguments={
+                                "title": "复核周三固定活动恢复条件",
+                                "task_type": "follow_up",
+                                "reason_refs": [anchor["object_ref"]],
+                                "initial_state": "waiting_time",
+                                "priority": 60,
+                                "next_wake_at": (
+                                    NOW + timedelta(days=7)
+                                ).isoformat(),
+                                "next_step": "到期后检查新世界证据，再决定是否询问用户。",
+                            },
+                        ),
+                    )
+                )
+            created_task["object_id"] = history[-1].data["task_id"]
+            return ModelDirective(response="已形成条件性后续复核任务。")
+
+        if snapshot.wake_reason == "task_due":
+            if not history:
+                task_ref = snapshot.cockpit["task_context"]["wake"]["evidence_refs"][0]
+                return ModelDirective(
+                    capability_calls=(
+                        CapabilityCall(
+                            name="inspect_world_object",
+                            arguments={"object_id": task_ref["object_id"]},
+                        ),
+                    )
+                )
+            if len(history) == 1:
+                current_task = history[-1].data
+                return ModelDirective(
+                    capability_calls=(
+                        CapabilityCall(
+                            name="transition_task",
+                            arguments={
+                                "task_ref": {
+                                    "object_id": current_task["object_id"],
+                                    "revision": current_task["revision"],
+                                },
+                                "new_state": "waiting_user",
+                                "reason": "到期后需要确认现实条件是否仍然稳定。",
+                                "evidence_refs": [
+                                    {
+                                        "object_id": note_ref.object_id,
+                                        "revision": note_ref.revision,
+                                    }
+                                ],
+                                "next_step": "在合适时机询问用户当前情况。",
+                            },
+                        ),
+                    )
+                )
+            return ModelDirective(response="条件性任务已到期，需要确认当前情况。")
+
+        raise AssertionError(f"unexpected wake reason: {snapshot.wake_reason}")
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+        max_tool_rounds=4,
+    )
+
+    review = runtime.run_periodic_review(
+        now=NOW + timedelta(hours=1),
+        policy=ReviewSchedulePolicy(
+            interval_hours=24,
+            lookback_hours=24,
+            max_candidates=20,
+            max_per_object_type=20,
+        ),
+    )
+    assert review is not None
+    assert review.wake.state == "completed"
+    assert [item.name for item in review.runtime.capability_history] == [
+        "read_periodic_review_anchors",
+        "create_task",
+    ]
+
+    task_id = created_task["object_id"]
+    assert isinstance(task_id, str)
+    task_before_due = store.get_payload(task_id)
+    assert task_before_due["task_state"] == "waiting_time"
+
+    due = runtime.execution_world.wake_due_tasks(
+        now=NOW + timedelta(days=7, minutes=1)
+    )
+    assert len(due) == 1
+    assert due[0].task_id == task_id
+    assert store.get_payload(task_id)["task_state"] == "ready"
+
+    dispatched = runtime.run_wake(
+        wake_ref=ObjectRef(object_id=due[0].wake_id, revision=1),
+        now=NOW + timedelta(days=7, minutes=2),
+    )
+    assert [item.name for item in dispatched.runtime.capability_history] == [
+        "inspect_world_object",
+        "transition_task",
+    ]
+    assert dispatched.wake.state == "completed"
+    assert store.get_payload(task_id)["task_state"] == "waiting_user"
+
+    conversation_observations = [
+        item
+        for item in store.list_payloads(object_type=ObjectType.OBSERVATION)
+        if item.get("source_kind") == "conversation"
+    ]
+    assert conversation_observations == []
