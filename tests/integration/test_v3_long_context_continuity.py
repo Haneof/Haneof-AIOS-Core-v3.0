@@ -369,3 +369,157 @@ def test_new_session_does_not_auto_load_other_session_round_summaries(tmp_path):
     assert new_snapshot.recent_turns == ()
     assert new_snapshot.round_summaries == ()
     assert new_snapshot.pending_summary is None
+
+
+
+def test_summary_model_failure_does_not_delete_raw_or_lose_pending_work(tmp_path):
+    store, index = _world(tmp_path)
+
+    def model(snapshot):
+        return ModelDirective(response="user-visible reply")
+
+    def broken_summary(request):
+        raise RuntimeError("summary provider unavailable")
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+        round_summary_handler=broken_summary,
+        recent_turn_limit=1,
+        summary_chunk_turns=2,
+    )
+    for turn in range(1, 4):
+        result = runtime.run_turn(
+            session_id="summary-failure",
+            turn_index=turn,
+            user_input=f"failure-question-{turn}",
+            current_topic=None,
+            occurred_at=NOW + timedelta(minutes=turn),
+        )
+
+    assert result.runtime.response == "user-visible reply"
+    assert result.continuity_summary_commits == ()
+    assert "summary provider unavailable" in result.continuity_summary_error
+    assert len(store.list_payloads(object_type=ObjectType.OBSERVATION)) == 6
+    assert store.list_payloads(object_type=ObjectType.SUMMARY) == []
+
+    # The missing summary is derived again from raw world facts after restart.
+    seen = []
+
+    def restarted_model(snapshot):
+        seen.append(snapshot.cockpit)
+        return ModelDirective(response="continued")
+
+    restarted = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=restarted_model,
+        recent_turn_limit=1,
+        summary_chunk_turns=2,
+    )
+    restarted.run_turn(
+        session_id="summary-failure",
+        turn_index=4,
+        user_input="continue",
+        current_topic=None,
+        occurred_at=NOW + timedelta(minutes=4),
+    )
+    pending = seen[-1]["task_context"]["conversation_continuity"][
+        "pending_round_summary"
+    ]
+    assert pending == {
+        "turn_start": 1,
+        "turn_end": 2,
+        "source_count": 4,
+    }
+
+
+def test_token_truncation_keeps_on_demand_summary_to_raw_recovery_path(tmp_path):
+    store, index = _world(tmp_path)
+
+    def seed_model(snapshot):
+        return ModelDirective(response="seed-reply")
+
+    def summarize(request):
+        return "VERY-LONG-SUMMARY-" + ("history " * 2000)
+
+    seed = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=seed_model,
+        round_summary_handler=summarize,
+        recent_turn_limit=1,
+        summary_chunk_turns=2,
+    )
+    for turn in range(1, 4):
+        seed.run_turn(
+            session_id="budget",
+            turn_index=turn,
+            user_input=f"budget-detail-{turn}",
+            current_topic=None,
+            occurred_at=NOW + timedelta(minutes=turn),
+        )
+
+    def recovery_model(snapshot):
+        history = snapshot.capability_history
+        cockpit = snapshot.cockpit
+        assert cockpit["truncated"] is True
+        assert cockpit["conversation_summaries"] == ()
+        continuity = cockpit["task_context"]["conversation_continuity"]
+        assert continuity["round_summary_count"] == 1
+        assert continuity["summary_index_capability"] == "list_conversation_summaries"
+        assert continuity["raw_drill_down_capability"] == "drill_down_conversation"
+
+        if not history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="list_conversation_summaries",
+                        arguments={},
+                    ),
+                )
+            )
+        if len(history) == 1:
+            summaries = history[-1].data
+            assert len(summaries) == 1
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="drill_down_conversation",
+                        arguments={
+                            "summary_id": summaries[0]["object_ref"]["object_id"],
+                            "revision": summaries[0]["object_ref"]["revision"],
+                        },
+                    ),
+                )
+            )
+
+        raw = history[-1].data
+        assert raw[0]["text"] == "budget-detail-1"
+        assert raw[2]["text"] == "budget-detail-2"
+        return ModelDirective(response="recovered from raw after truncation")
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=recovery_model,
+        round_summary_handler=summarize,
+        recent_turn_limit=1,
+        summary_chunk_turns=2,
+        max_tool_rounds=4,
+    )
+    result = runtime.run_turn(
+        session_id="budget",
+        turn_index=4,
+        user_input="recover old exact detail",
+        current_topic=None,
+        occurred_at=NOW + timedelta(minutes=4),
+        token_budget=128,
+    )
+
+    assert [item.name for item in result.runtime.capability_history] == [
+        "list_conversation_summaries",
+        "drill_down_conversation",
+    ]
+    assert result.runtime.response == "recovered from raw after truncation"
