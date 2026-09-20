@@ -1,0 +1,130 @@
+name: p16-provider-evaluation-manual
+
+on:
+  workflow_dispatch:
+    inputs:
+      resident_run_id:
+        description: "Workflow run ID that produced the resident artifact"
+        required: true
+        type: string
+      resident_provider:
+        description: "Provider used by the resident run (artifact name component)"
+        required: true
+        type: choice
+        options:
+          - openai
+          - anthropic
+          - gemini
+      manifest:
+        description: "Evaluator-side sealed fixture manifest"
+        required: true
+        type: choice
+        options:
+          - learning_independence_v1.manifest.json
+          - cross_session_continuity_v1.manifest.json
+          - cognition_revision_v1.manifest.json
+          - uncertainty_restraint_v1.manifest.json
+      evaluator_provider:
+        description: "Independent evaluator provider"
+        required: true
+        type: choice
+        options:
+          - openai
+          - anthropic
+          - gemini
+      evaluator_model:
+        description: "Exact evaluator model ID"
+        required: true
+        type: string
+      evaluator_id:
+        description: "Stable evaluator configuration ID"
+        required: true
+        type: string
+      max_output_tokens:
+        description: "Evaluator response token ceiling"
+        required: true
+        default: "4096"
+        type: string
+
+jobs:
+  post-run-evaluator:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      RESIDENT_RUN_ID: ${{ inputs.resident_run_id }}
+      RESIDENT_PROVIDER: ${{ inputs.resident_provider }}
+      P16_MANIFEST: ${{ inputs.manifest }}
+      EVALUATOR_PROVIDER: ${{ inputs.evaluator_provider }}
+      EVALUATOR_MODEL: ${{ inputs.evaluator_model }}
+      EVALUATOR_ID: ${{ inputs.evaluator_id }}
+      EVALUATOR_MAX_OUTPUT_TOKENS: ${{ inputs.max_output_tokens }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+
+      - name: Verify evaluator provider secret exists
+        shell: bash
+        run: |
+          case "$EVALUATOR_PROVIDER" in
+            openai)
+              test -n "$OPENAI_API_KEY" || { echo "OPENAI_API_KEY is not configured"; exit 2; }
+              ;;
+            anthropic)
+              test -n "$ANTHROPIC_API_KEY" || { echo "ANTHROPIC_API_KEY is not configured"; exit 2; }
+              ;;
+            gemini)
+              test -n "$GEMINI_API_KEY" || { echo "GEMINI_API_KEY is not configured"; exit 2; }
+              ;;
+            *)
+              echo "Unsupported evaluator provider"
+              exit 2
+              ;;
+          esac
+
+      - name: Download immutable resident artifact from prior run
+        uses: actions/download-artifact@v5
+        with:
+          name: p16-${{ inputs.resident_provider }}-${{ inputs.resident_run_id }}
+          path: downloaded-resident
+          run-id: ${{ inputs.resident_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Locate resident run artifact
+        shell: bash
+        run: |
+          RUN_ARTIFACT="$(find downloaded-resident -type f -name run.json -print -quit)"
+          test -n "$RUN_ARTIFACT" || { echo "run.json not found in resident artifact"; exit 3; }
+          echo "P16_RUN_ARTIFACT=$RUN_ARTIFACT" >> "$GITHUB_ENV"
+
+      - name: Evaluate only after resident run is complete
+        shell: bash
+        run: |
+          python -m tests.habitation.run_provider_evaluator \
+            --fixture-root tests/habitation/fixtures \
+            --manifest "$P16_MANIFEST" \
+            --run-artifact "$P16_RUN_ARTIFACT" \
+            --provider "$EVALUATOR_PROVIDER" \
+            --model "$EVALUATOR_MODEL" \
+            --evaluator-id "$EVALUATOR_ID" \
+            --max-output-tokens "$EVALUATOR_MAX_OUTPUT_TOKENS" \
+            --output-dir "artifacts/p16-evaluation/$GITHUB_RUN_ID"
+
+      - name: Upload evaluator artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p16-evaluation-${{ github.run_id }}
+          path: artifacts/p16-evaluation/
+          if-no-files-found: error
