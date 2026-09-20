@@ -431,3 +431,43 @@ def test_factory_does_not_receive_invalid_model_id() -> None:
         )
 
     assert called is False
+
+
+def test_scenario_requires_tuple_and_at_least_one_visible_event() -> None:
+    visible = LifeEvent(
+        event_id="visible",
+        occurred_at=BASE,
+        channel="conversation",
+        payload="x",
+    )
+    hidden = LifeEvent(
+        event_id="hidden",
+        occurred_at=BASE,
+        channel="oracle",
+        payload="secret",
+        deliver_to_resident=False,
+    )
+
+    with pytest.raises(ValueError, match="events must be a non-empty tuple"):
+        HabitationScenario(
+            scenario_id="list-events",
+            subject_id="u",
+            events=[visible],  # type: ignore[arg-type]
+        )
+
+    with pytest.raises(ValueError, match="at least one resident-visible event"):
+        HabitationScenario(
+            scenario_id="hidden-only",
+            subject_id="u",
+            events=(hidden,),
+        )
+
+
+def test_event_time_must_be_datetime_not_string() -> None:
+    with pytest.raises(ValueError, match="occurred_at must be a datetime"):
+        LifeEvent(
+            event_id="e",
+            occurred_at="2026-09-20T08:00:00Z",  # type: ignore[arg-type]
+            channel="x",
+            payload="x",
+        )
