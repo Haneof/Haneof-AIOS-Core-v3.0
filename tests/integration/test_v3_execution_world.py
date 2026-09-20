@@ -247,6 +247,8 @@ def test_authorized_action_dispatch_and_real_outcome_close_task_loop(tmp_path):
     assert store.get_payload(action.action_id, revision=1)["action_status"] == "proposed"
     assert store.get_payload(action.action_id, revision=2)["action_status"] == "submitted"
     assert store.get_payload(action.action_id, revision=3)["action_status"] == "completed"
+    assert store.commit_source_class(envelope.world_revision) == SourceClass.PLATFORM.value
+    assert store.commit_source_class(outcome.world_revision) == SourceClass.PLATFORM.value
     assert store.get_payload(outcome.outcome_id)["outcome_state"] == "completed"
 
     completed = service.transition_task(
