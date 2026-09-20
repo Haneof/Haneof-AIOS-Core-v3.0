@@ -151,5 +151,17 @@
         }
       }
     ]
+  },
+  "20db530ffc1725eadc1a43a9586dafcb840ae130a145b8c93fda514fb54f8608": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "call_id": "sol-wake-inspect-latest-flour-task",
+        "arguments": {
+          "object_id": "task_57a01b42b3d5f384db661bda"
+        }
+      }
+    ]
   }
 }
