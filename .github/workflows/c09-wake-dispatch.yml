@@ -1,3 +1,4 @@
+# Post-merge verification branch; this comment is intentionally non-semantic.
 name: c09-wake-dispatch
 
 on:
