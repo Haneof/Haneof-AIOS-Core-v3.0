@@ -1331,5 +1331,18 @@
   "050134c3d197596ffead586ba359e6baf9940b13badc0b6c8bac868cfd0c94cc": {
     "kind": "summary",
     "summary": "2027-01-06 的日历记录显示：面粉供应商首批到货安排在 2027-01-09 04:30 UTC；收货需要本人或店员到店开后门。该记录只说明到货时间与收货条件，尚未确定具体由谁负责。"
+  },
+  "79fc7d3c810118345886f6c90821718ee2d928dc77e903bc881b0a6946b1efc5": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-summaryrun-review-jan08-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
   }
 }
