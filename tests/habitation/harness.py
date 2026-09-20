@@ -79,11 +79,9 @@ class LifeEvent:
 
 @dataclass(frozen=True, slots=True)
 class ResidentScenarioDescriptor:
-    """Oracle-free structural metadata safe to expose to model-side factories."""
+    """Oracle-free, semantics-minimized metadata safe for model-side factories."""
 
-    scenario_id: str
     subject_id: str
-    scenario_version: str
     seed: int
     visible_event_count: int
     first_visible_at: datetime | None
@@ -213,9 +211,7 @@ def resident_scenario_descriptor(
         event for event in scenario.events if event.deliver_to_resident
     )
     return ResidentScenarioDescriptor(
-        scenario_id=scenario.scenario_id,
         subject_id=scenario.subject_id,
-        scenario_version=scenario.scenario_version,
         seed=scenario.seed,
         visible_event_count=len(visible),
         first_visible_at=visible[0].occurred_at if visible else None,
