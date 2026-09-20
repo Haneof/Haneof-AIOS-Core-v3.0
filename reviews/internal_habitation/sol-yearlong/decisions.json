@@ -1297,5 +1297,9 @@
   "ff715ca7a0484253925cf25ec20c09f135ffd0c28581fb898a9e877372f3f55a": {
     "kind": "summary",
     "summary": "2027-01-05，用户明确要求降低主动打扰频率，只在事项实质影响开店、采购或重要家庭安排时主动提醒。AI 据此建立可由 AI 修订的 communication.proactive_interruption_threshold 认知策略，当前值为 only_when_opening_procurement_or_important_family_arrangement_is_materially_affected，默认值为 normal，评估窗口为 30 天；该策略由当日用户原话直接支撑。"
+  },
+  "5d68138cc9866af74a502cfb8465fe0cf75ebb036872b98ed0e19e5ec0f89165": {
+    "kind": "summary",
+    "summary": "2027-01-05，用户说明自己刚接手一家小型烘焙店、近期事务繁多，并明确要求减少主动打扰：仅当事项可能影响开店、进货或重要家人安排时才主动提醒。AI 当场确认会按这一边界执行。"
   }
 }
