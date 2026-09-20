@@ -111,6 +111,20 @@ class ProactiveMemoryRecommender:
             if exclude_session_id is not None and metadata.get("session_id") == exclude_session_id:
                 continue
 
+            if antecedent_fallback and hit.object_type == ObjectType.OBSERVATION.value:
+                dimension = str(metadata.get("dimension") or "")
+                source_kind = str(
+                    payload.get("source_kind") or ""
+                ).strip().casefold()
+                is_dialogue = (
+                    dimension == INTERACTION_DIMENSION
+                    or source_kind in {"conversation", "user_ai_interaction"}
+                )
+                if is_dialogue and str(metadata.get("role") or "") == "assistant":
+                    # In antecedent recovery, an assistant echo must not outrank the
+                    # user's own fact merely because it repeats the same words.
+                    continue
+
             cards.append(
                 MemoryCard(
                     object_id=hit.object_id,
