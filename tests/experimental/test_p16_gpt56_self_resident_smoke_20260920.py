@@ -1,11 +1,19 @@
 from __future__ import annotations
 
 from datetime import datetime
+from pathlib import Path
+import sys
 
 from aios_core.runtime.capabilities import CapabilityCall
 from aios_core.runtime.cognitive_runtime import ModelDirective
-from tests.habitation.current_core import CurrentCoreHabitationTarget
-from tests.habitation.harness import HabitationRunner, HabitationScenario, LifeEvent
+
+# The repository intentionally does not make tests/ a top-level Python package.
+# Add that test root only for this isolated experimental bridge.
+_TESTS_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(_TESTS_ROOT))
+
+from habitation.current_core import CurrentCoreHabitationTarget
+from habitation.harness import HabitationRunner, HabitationScenario, LifeEvent
 
 
 MODEL_ID = "chatgpt/gpt-5.6-sol-self-resident-20260920"
