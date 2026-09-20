@@ -44,6 +44,7 @@ class SourceClass(StrEnum):
 
     USER = "user"
     SENSOR = "sensor"
+    PLATFORM = "platform"
     AI_COGNITION = "ai_cognition"
     MAINTENANCE = "maintenance"
     SAFETY = "safety"
