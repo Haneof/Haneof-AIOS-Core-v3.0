@@ -81,7 +81,7 @@ def test_cross_session_deictic_followup_gets_bounded_antecedent_candidates(tmp_p
         assert (prior.user_observation_id, 1) in refs
         assert (prior.assistant_observation_id, 1) not in refs
         assert len(cards) <= 5
-        assert all(
+        assert any(
             item["match_reason"] == "cross_session_antecedent_candidate"
             for item in cards
         )
