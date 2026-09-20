@@ -100,5 +100,27 @@
         }
       }
     ]
+  },
+  "a2018a4674ad256fee021a68df141f6bef53b635cfad69d43ab542181e63e04f": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "create_task",
+        "call_id": "sol-task-sister-flight-evidence",
+        "arguments": {
+          "title": "等待妹妹航班时间确认并检查安排冲突",
+          "task_type": "verification",
+          "reason_refs": [
+            {
+              "object_id": "obs_src_100a0cc21a84d80627c61305",
+              "revision": 1
+            }
+          ],
+          "initial_state": "waiting_evidence",
+          "priority": 70,
+          "next_step": "只有在航班时间被确认后，才与现有重要安排比较；在证据不足时不要宣称冲突，也不要主动打断用户。"
+        }
+      }
+    ]
   }
 }
