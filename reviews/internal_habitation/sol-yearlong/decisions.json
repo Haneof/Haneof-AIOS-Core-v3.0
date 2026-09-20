@@ -1020,5 +1020,23 @@
         }
       }
     ]
+  },
+  "747fede89bfa846c327c8bda88f7274dca503043c90a98bc809d82fd727232de": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "search_timeline",
+        "call_id": "sol-jan17-read-note-dimension-before-reminder",
+        "arguments": {
+          "window_start": "2027-01-16T08:15:00+00:00",
+          "window_end": "2027-01-17T16:00:00+00:00",
+          "dimension": "dim:note",
+          "object_types": [
+            "observation"
+          ],
+          "limit": 20
+        }
+      }
+    ]
   }
 }
