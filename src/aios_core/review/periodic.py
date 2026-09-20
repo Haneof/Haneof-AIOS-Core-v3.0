@@ -18,6 +18,7 @@ from typing import Any, Mapping, Sequence
 from pydantic import BaseModel, ConfigDict, Field, FiniteFloat, model_validator
 
 from aios_core.contracts.enums import (
+    ErrorCode,
     MaintenanceClass,
     ObjectType,
     SourceClass,
@@ -30,7 +31,7 @@ from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import TemporalExtent, as_utc
 from aios_core.query.search import WorldSearchIndex
 from aios_core.storage.idempotency import canonical_json_dumps
-from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
 
 REVIEW_KIND = "periodic_ai_growth_review"
@@ -767,10 +768,37 @@ class PeriodicReviewService:
         experience_id = _stable_id(
             "opexp",
             self.subject_id,
-            request.problem_type,
-            request.method_path,
-            [(ref.object_id, ref.revision) for ref in refs],
+            request.problem_type.strip(),
+            tuple(step.strip() for step in request.method_path),
+            request.result_summary.strip(),
+            request.applicability,
+            {key: float(value) for key, value in request.cost.items()},
+            tuple(item.strip() for item in request.misses),
+            request.experience_state.strip(),
+            [
+                (ref.object_id, ref.revision)
+                for ref in request.positive_case_refs
+            ],
+            [
+                (ref.object_id, ref.revision)
+                for ref in request.negative_case_refs
+            ],
         )
+        try:
+            existing = self.store.get_payload(experience_id, revision=1)
+        except StoreError as exc:
+            if exc.code == ErrorCode.NOT_FOUND:
+                existing = None
+            else:
+                raise
+        if existing is not None:
+            self._catch_up()
+            return OperationExperienceReceipt(
+                experience_id=experience_id,
+                revision=1,
+                world_revision=int(self.store.current_world_revision()),
+            )
+
         experience = OperationExperience(
             object_id=experience_id,
             subject_id=self.subject_id,
