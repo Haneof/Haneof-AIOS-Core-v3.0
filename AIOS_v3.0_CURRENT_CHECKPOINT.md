@@ -553,3 +553,96 @@ P16 仍然是 **CONTINUE / NOT PASS**，因为机械/协议/隔离测试通过�
 - P16 paid provider execution：**应等待上述 blocker 收口后再作为 release evidence**
 - P17：**BLOCKED**
 
+
+
+## 2026-09-20 第二轮代码完整性收口 — CLOSED
+
+第二轮复审：
+
+- `reviews/AIOS_V3_CODE_COMPLETENESS_REAUDIT_2026-09-20.md`
+- audit commit：`5a2f569040ab0160923cbd805b2ebcdeaeb3b65b`
+
+正式收口：
+
+- `reviews/AIOS_V3_CODE_COMPLETENESS_CLOSURE_2026-09-20.md`
+- PR #21：`core: close second-pass code completeness blockers`
+- accepted head：`029d8f6849cdb08e2c784cd3bded0b025d1e03e6`
+- squash merge / 当前功能代码锚点：`9d9fb9d82ef42b631d032c488617316c5a2a244c`
+
+PR #21 accepted head 触发的 **20 个 workflow 全部 SUCCESS**，包括：
+
+- constitutional-cognition-closure
+- p16-convergence-gate / full-core-regression
+- p16-habitation-harness
+- p15-periodic-review
+- c09-wake-dispatch
+- fused-turn-runtime
+- world-index
+- memory-recommendation
+- dimension-summary
+- all-dimensions-projection
+- cognition-writeback / cognition-revision
+- P9 / P10 / P11 / P12
+- P14 long-context
+
+本轮关闭：
+
+1. **private-world subject isolation**
+   - search / timeline / entity / ALL_DIMENSIONS / Summary 均 subject scoped；
+   - direct object-id Runtime 读取也受私有世界边界约束；
+   - Claim / Revision / Event / Dimension / Execution / Policy / Communication / Entity / Relation refs 受 scope 校验；
+   - AI-self 只通过显式 user + AI-self 例外读取同一私有世界证据，不允许跨其他用户。
+
+2. **CognitivePolicy 真实运行闭环**
+   - Resident 可 propose policy；
+   - AI policy create/update/rollback 必须是真实结果证据；
+   - AI Claim / assistant 自己输出不能递归训练 policy；
+   - evaluation_window 变成真实 due time；
+   - 到期 policy 进入 Periodic Review；
+   - Runtime 已有真实 consumer，不再只是 ledger。
+
+3. **P6 MultiScale Summary 长期调度**
+   - P16 Current-Core 已接 dimension summary handler；
+   - habitation clock 实际运行多尺度 Summary；
+   - durable World 反推已关闭窗口，停机不永久漏窗；
+   - late data 重开旧窗口；
+   - terminal Dimension 不继续维护；
+   - source truncation 不提交 CURRENT；
+   - 旧 CURRENT Summary 在后来发现窗口不完整时会 forward-mark STALE。
+
+4. **第二轮 HIGH 项**
+   - TopicState 移除 `len(topic)>=4`；
+   - Entity / Relation Resident 生产闭环；
+   - stable ID 使用 canonical structured hashing；
+   - durable truth path fail-closed；
+   - Event lifecycle transition matrix；
+   - P16 新增 cognition-system-closure 长人生 fixture，覆盖 Policy / CommunicationExperience / Entity-Relation / Event / Summary / 多线程长期变化。
+
+### 当前正式项目状态
+
+- Architecture direction：**PASS**
+- Core spine：**STRONG**
+- PR #20 first-order closure：**PASS**
+- PR #21 second-order code completeness closure：**PASS**
+- 当前已知 audited Core code blockers：**0**
+- P16：**CONTINUE / NOT PASS**
+- P17：**BLOCKED**
+
+### 当前唯一项目级 blocker
+
+再次恢复为：
+
+**缺少真实 provider/model 的长期入住认知证据。**
+
+下一动作：
+
+1. 至少两个真实 provider/model 分别入住同一 sealed life；
+2. fresh private World；
+3. resident-visible fingerprint 必须一致；
+4. 保存 provider / run / World provenance；
+5. 用同一 evaluator configuration 做 separate hidden-oracle evaluation；
+6. offline criterion-by-model comparison；
+7. 独立红队审查错误记忆、自我强化、revision、summary misuse、dimension spam、无 Outcome 伪经验；
+8. 证据成立后才允许 P16 PASS / P17。
+
+> 注意：确定性 Gate 只证明机制、隔离、持久化、状态机和接线正确，不能替代真实模型长期认知质量证明。
