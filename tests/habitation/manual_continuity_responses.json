@@ -59,5 +59,18 @@
   {
     "snapshot_signature": "6ec4c1f00453ab47e19c919ef57df1c8e7e550703d4c5dd3266f7bfd9955a8b2",
     "type": "silence"
+  },
+  {
+    "snapshot_signature": "0a2974c3185ef222390da9ef05806457da952404e2470b502143445a159f820b",
+    "type": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 10
+        }
+      }
+    ]
   }
 ]
