@@ -83,10 +83,13 @@ class TopicStateService:
             continued = False
 
         history_cue = any(cue in lower for cue in _HISTORY_CUES)
-        # Non-trivial content may benefit from historical world context. The important
-        # constitutional distinction is that phatic/no-topic turns stay closed and
-        # explicit continuation/history references are definitely history-bearing.
-        history_may_help = history_cue or continued or len(topic) >= 4
+        # A topic is not itself permission to inject history. Deterministic Core
+        # opens proactive recall only on explicit historical/continuation signals
+        # (or an explicit topic hint supplied by a trusted caller). The resident
+        # model retains search_world for all other cases.
+        history_may_help = history_cue or continued or (
+            bool(explicit) and explicit != current
+        )
         return TopicState(
             topic=topic,
             gate_open=True,
