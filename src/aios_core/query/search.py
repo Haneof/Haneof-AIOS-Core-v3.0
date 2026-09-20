@@ -1,0 +1,972 @@
+"""M1-017/M1-018 预开工内核：世界检索的投影面（宪法第 89/36/95/96/27/86.4 条）。
+
+治理声明
+--------
+本模块是 **M1 的预开工件**：M0-022R 签核、M1 Gate 开启之前，不得接入任何
+运行路径（唤醒/会话/工作台）。它只依赖 `SQLiteWorldStore` 的公共读面
+（``revisions_after`` / ``current_world_revision``），保持"唯一写入服务"
+边界：索引是可重建投影，坏了删表重建，永不与真相争辩。
+
+为什么自研倒排而第一版不用 FTS5
+--------------------------------
+本构建的 FTS5 `unicode61` 不做 CJK 分词、`trigram` 拒绝两个字符的查询
+（"妈妈"这类双字中文词必然失配）。宪法第 89 条的入口是中文关键词共现，
+因此 v1 直接实现设计书 §3.4-T2 的物理计划：
+
+    posting-AND 交集 ∩ occurred 时间过滤 ∩ 实体消歧前置 ∩ 双视图截止
+
+FTS5 仍是可替换适配器（第 18 条反教条）：对外只暴露 ``co_search``。
+
+三条硬纪律
+----------
+1. **白名单抽取**：只索引契约文本字段，禁止把 payload 整包拷进索引（第 18 条
+   反冗余；haystack 是检索辅助位，可整体重建）；
+2. **消歧先于交集**（第 36 条）：别名解析出的实体编号参与匹配；歧义别名不
+   自动二选一，标记 ``ambiguous`` 交还调用方；
+3. **水位即诚实**（第 86.4 条）：任何返回都携带 ``lag``；strict 模式下落后
+   直接 STALE_INDEX，禁止把旧索引装成新世界。
+"""
+
+from __future__ import annotations
+
+import json
+import re
+import sqlite3
+from collections.abc import Iterator
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+from aios_core.contracts.time import as_utc
+
+_WORD_RE = re.compile(r"[a-z0-9_]+")
+_CJK_RUN_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]+")
+_ID_STRIP_RE = re.compile(r"[^a-z0-9]")
+
+# 白名单：object_type -> 可索引文本字段（契约内声明，绝不整包拷贝）。
+_TEXT_FIELDS: dict[str, tuple[str, ...]] = {
+    "claim": ("content",),
+    "observation": ("value",),
+    "event": ("title", "interpretation"),
+    "task": ("title", "next_step"),
+    "entity": ("canonical_name",),
+    "goal": ("title", "description"),
+    "prediction": ("expected_change", "reasoning"),
+    "reinterpretation": ("statement",),
+    "life_chapter": ("chapter_title",),
+    "communication_experience": ("scenario", "style", "tone"),
+}
+_TIME_FIELDS: dict[str, tuple[str, ...]] = {
+    "event": ("event_time",),
+    "prediction": ("time_window",),
+    "relation": ("valid_time",),
+    "reinterpretation": ("valid_time",),
+}
+_EXCERPT_LIMIT = 200
+_WATERMARK_KEY = "search_watermark_world_revision"
+_CATCHUP_MAX_ROWS = 50_000
+
+
+
+def derive_dimension(payload: dict, object_type: str) -> str:
+    """Return an explicit projection dimension only.
+
+    R5/R6 boundary: Search may project an already-declared dimension, but it
+    must not infer a user semantic dimension from source_kind or natural-language
+    keywords. If no explicit dimension is present, the projection remains
+    unclassified and the cognitive runtime may interpret it later.
+    """
+
+    _ = object_type
+    dim = payload.get("dimension")
+    if isinstance(dim, str) and dim.strip():
+        return dim.strip()
+
+    dims = payload.get("dimensions")
+    if isinstance(dims, list):
+        for candidate in dims:
+            if isinstance(candidate, str) and candidate.strip():
+                return candidate.strip()
+
+    metadata = payload.get("metadata")
+    if isinstance(metadata, dict):
+        meta_dim = metadata.get("dimension")
+        if isinstance(meta_dim, str) and meta_dim.strip():
+            return meta_dim.strip()
+        meta_dims = metadata.get("dimensions")
+        if isinstance(meta_dims, list):
+            for candidate in meta_dims:
+                if isinstance(candidate, str) and candidate.strip():
+                    return candidate.strip()
+
+    return "dim_unclassified"
+
+def tokens_for(text: str) -> set[str]:
+    """ASCII 词元 + CJK 二元组（bi-gram）。
+
+    双字中文词（"妈妈""生日"）在 bi-gram 下即完整词元；长句命中为"所有
+    bigram 共现"的近似召回，由 ``co_search`` 的 haystack 子串复核保证精确。
+    """
+
+    lowered = text.lower()
+    tokens = set(_WORD_RE.findall(lowered))
+    for run in _CJK_RUN_RE.findall(lowered):
+        if len(run) == 1:
+            tokens.add(run)
+        tokens.update(a + b for a, b in zip(run, run[1:]))
+    return tokens
+
+
+def normalize_alias(text: str) -> str:
+    return " ".join(text.strip().lower().split())
+
+
+def _id_token(kind: str, object_id: str) -> str:
+    return kind + _ID_STRIP_RE.sub("", object_id.lower())
+
+
+def _iter_ref_ids(node: Any) -> Iterator[str]:
+    if isinstance(node, dict):
+        object_id = node.get("object_id")
+        if isinstance(object_id, str) and "revision" in node:
+            yield object_id
+        for value in node.values():
+            yield from _iter_ref_ids(value)
+    elif isinstance(node, list):
+        for item in node:
+            yield from _iter_ref_ids(item)
+
+
+def _extent_us(payload: dict, object_type: str) -> tuple[int | None, int | None]:
+    extent = None
+    for name in _TIME_FIELDS.get(object_type, ()) + ("occurred",):
+        candidate = payload.get(name)
+        if isinstance(candidate, dict) and not candidate.get("unknown", False):
+            extent = candidate
+            break
+    if extent is None:
+        for fallback_key in ("learned_at", "recorded_at"):
+            val = payload.get(fallback_key)
+            if isinstance(val, str):
+                try:
+                    us = int(as_utc(datetime.fromisoformat(val), "extent").timestamp() * 1_000_000)
+                    return us, us
+                except (ValueError, TypeError):
+                    pass
+        return None, None
+
+    def _us(value: Any) -> int | None:
+        if not isinstance(value, str):
+            return None
+        try:
+            return int(as_utc(datetime.fromisoformat(value), "extent").timestamp() * 1_000_000)
+        except ValueError:
+            return None
+
+    return _us(extent.get("start")), _us(extent.get("end"))
+
+
+@dataclass(frozen=True)
+class SearchHit:
+    object_id: str
+    revision: int
+    object_type: str
+    subject_id: str
+    score: int
+    excerpt: str
+
+
+@dataclass
+class SearchPage:
+    status: str  # "ok" | "stale_index"
+    lag: int
+    world_revision: int
+    index_watermark: int
+    hits: list[SearchHit] = field(default_factory=list)
+    ambiguous_keywords: dict[str, list[str]] = field(default_factory=dict)
+
+
+
+@dataclass(frozen=True)
+class MindSearchHit:
+    object_id: str
+    revision: int
+    object_type: str
+    subject_id: str
+    score: int
+    dimension: str
+    excerpt: str
+    is_annotation: bool = False
+    related_entity_ids: list[str] = field(default_factory=list)
+    estimated_tokens: int = 0
+
+
+@dataclass
+class MindSearchPage:
+    status: str  # "ok" | "stale_index"
+    lag: int
+    world_revision: int
+    index_watermark: int
+    hits: list[MindSearchHit] = field(default_factory=list)
+    total_estimated_tokens: int = 0
+    query_intent: str = ""
+
+
+class WorldSearchIndex:
+    """Rebuildable projection index over one AIOS world database."""
+
+    def __init__(self, db_path: str | Path, *, store: Any) -> None:
+        self.db_path = str(db_path)
+        self._store = store
+        self._ensure_schema()
+
+    # ---------------- schema / lifecycle ----------------
+
+    def _connect(self) -> sqlite3.Connection:
+        conn = sqlite3.connect(self.db_path, timeout=30.0)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA busy_timeout = 30000")
+        return conn
+
+    def _ensure_schema(self) -> None:
+        with self._connect() as conn:
+            conn.executescript(
+                """
+                CREATE TABLE IF NOT EXISTS search_postings(
+                    token TEXT NOT NULL,
+                    object_id TEXT NOT NULL,
+                    revision INTEGER NOT NULL,
+                    PRIMARY KEY(token, object_id, revision)
+                );
+                CREATE TABLE IF NOT EXISTS search_occurred(
+                    object_id TEXT NOT NULL,
+                    revision INTEGER NOT NULL,
+                    subject_id TEXT NOT NULL,
+                    object_type TEXT NOT NULL,
+                    occurred_start_us INTEGER,
+                    occurred_end_us INTEGER,
+                    dimension TEXT DEFAULT '',
+                    PRIMARY KEY(object_id, revision)
+                );
+                CREATE TABLE IF NOT EXISTS search_annotations(
+                    annotation_id TEXT PRIMARY KEY,
+                    target_object_id TEXT NOT NULL,
+                    target_object_type TEXT NOT NULL,
+                    reinterpretation_claim TEXT NOT NULL,
+                    is_invalidating INTEGER NOT NULL,
+                    created_at TEXT NOT NULL,
+                    created_by TEXT NOT NULL,
+                    dimension TEXT DEFAULT ''
+                );
+                CREATE TABLE IF NOT EXISTS search_doc(
+                    object_id TEXT NOT NULL,
+                    revision INTEGER NOT NULL,
+                    haystack TEXT NOT NULL,
+                    excerpt TEXT NOT NULL,
+                    PRIMARY KEY(object_id, revision)
+                );
+                CREATE TABLE IF NOT EXISTS search_alias(
+                    alias_norm TEXT NOT NULL,
+                    entity_object_id TEXT NOT NULL,
+                    PRIMARY KEY(alias_norm, entity_object_id)
+                );
+                CREATE TABLE IF NOT EXISTS search_tombstones(
+                    object_id TEXT PRIMARY KEY
+                );
+                CREATE TABLE IF NOT EXISTS search_meta(
+                    key TEXT PRIMARY KEY,
+                    value TEXT NOT NULL
+                );
+                """
+            )
+            try:
+                conn.execute("ALTER TABLE search_occurred ADD COLUMN dimension TEXT DEFAULT ''")
+            except Exception:
+                pass
+
+    def drop_projection(self) -> None:
+        """索引可弃（第 86.4 条：投影坏了删掉重建，不许与真相谈判）。"""
+
+        with self._connect() as conn:
+            conn.executescript(
+                """
+                DROP TABLE IF EXISTS search_postings;
+                DROP TABLE IF EXISTS search_occurred;
+                DROP TABLE IF EXISTS search_doc;
+                DROP TABLE IF EXISTS search_alias;
+                DROP TABLE IF EXISTS search_tombstones;
+                DROP TABLE IF EXISTS search_meta;
+                DROP TABLE IF EXISTS search_annotations;
+                """
+            )
+        self._ensure_schema()
+
+    # ---------------- watermarks ----------------
+
+    def watermark(self) -> int:
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT value FROM search_meta WHERE key=?", (_WATERMARK_KEY,)
+            ).fetchone()
+        return int(row["value"]) if row else 0
+
+    def lag(self) -> int:
+        return max(0, int(self._store.current_world_revision()) - self.watermark())
+
+    # ---------------- incremental build ----------------
+
+    def catch_up(self, *, max_rows: int = _CATCHUP_MAX_ROWS) -> int:
+        """Apply commit-order deltas. Returns number of rows indexed.
+
+        Truncation is cut at a world-revision boundary so a partial batch can
+        never leave a watermark that skips objects of one logical commit.
+        """
+
+        target = int(self._store.current_world_revision())
+        start = self.watermark()
+        if start >= target:
+            return 0
+        rows = self._store.revisions_after(start, limit=max_rows)
+        if not rows:
+            return 0
+        cut = int(rows[-1]["world_revision"])
+        if len(rows) >= max_rows and int(rows[0]["world_revision"]) != cut:
+            # 截断必须落在逻辑提交边界：丢掉可能残缺的尾组，
+            # 水位绝不越过未完整索引的 world_revision（已知限制：单提交
+            # 行数超过 max_rows 时需要流式重建，属 M1 Gate 后扩展）
+            while rows and int(rows[-1]["world_revision"]) == cut:
+                rows.pop()
+            if not rows:
+                return 0
+            cut = int(rows[-1]["world_revision"])
+        with self._connect() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            for row in rows:
+                self._index_row(conn, row)
+            conn.execute(
+                "INSERT OR REPLACE INTO search_meta(key, value) VALUES(?, ?)",
+                (_WATERMARK_KEY, str(cut)),
+            )
+            self._catch_up_annotations(conn)
+            conn.commit()
+        return len(rows)
+
+    def rebuild(self) -> int:
+        self.drop_projection()
+        applied = 0
+        while True:
+            n = self.catch_up()
+            applied += n
+            if n == 0:
+                return applied
+
+    def _index_row(self, conn: sqlite3.Connection, row: dict) -> None:
+        object_id = str(row["object_id"])
+        revision = int(row["revision"])
+        object_type = str(row["object_type"])
+        subject_id = str(row["subject_id"])
+        try:
+            payload = json.loads(row["payload_json"])
+        except (TypeError, ValueError):
+            return  # 损坏行：跳过并留给水位审计，索引绝不反向污染世界
+        if not isinstance(payload, dict):
+            return
+
+        texts: list[str] = []
+        for name in _TEXT_FIELDS.get(object_type, ()):
+            value = payload.get(name)
+            if isinstance(value, str) and value.strip():
+                texts.append(value.strip())
+        tokens: set[str] = set()
+        for text in texts:
+            tokens |= tokens_for(text)
+
+        revision_kind = row.get("revision_kind", "content")
+        if revision_kind == "tombstone":
+            conn.execute("INSERT OR REPLACE INTO search_tombstones(object_id) VALUES(?)", (object_id,))
+            return
+
+        tokens.add(_id_token("sub", subject_id))
+        for ref_id in _iter_ref_ids(payload):
+            tokens.add(_id_token("ref", ref_id))
+
+        if object_type == "entity":
+            tokens.add(_id_token("ent", object_id))
+            names = [payload.get("canonical_name"), *(payload.get("aliases") or [])]
+            for name in names:
+                if isinstance(name, str) and name.strip():
+                    tokens |= tokens_for(name)
+                    conn.execute(
+                        "INSERT OR IGNORE INTO search_alias(alias_norm, entity_object_id) VALUES(?, ?)",
+                        (normalize_alias(name), object_id),
+                    )
+
+        haystack = "\n".join(texts)
+        joined = haystack.lower()
+        dim = derive_dimension(payload, object_type)
+        tokens.add(_id_token("dim", dim))
+        if tokens:
+            conn.executemany(
+                "INSERT OR IGNORE INTO search_postings(token, object_id, revision) VALUES(?,?,?)",
+                [(token, object_id, revision) for token in tokens],
+            )
+
+        start_us, end_us = _extent_us(payload, object_type)
+        conn.execute(
+            """
+            INSERT OR REPLACE INTO search_occurred(
+                object_id, revision, subject_id, object_type, occurred_start_us, occurred_end_us, dimension
+            ) VALUES(?,?,?,?,?,?,?)
+            """,
+            (object_id, revision, subject_id, object_type, start_us, end_us, dim),
+        )
+        conn.execute(
+            "INSERT OR REPLACE INTO search_doc(object_id, revision, haystack, excerpt) VALUES(?,?,?,?)",
+            (object_id, revision, joined, haystack[:_EXCERPT_LIMIT]),
+        )
+
+    # ---------------- query ----------------
+
+    def _postings_for(self, conn: sqlite3.Connection, tokens: set[str]) -> dict[tuple[str, int], int]:
+        if not tokens:
+            return {}
+        ordered = sorted(tokens)
+        placeholders = ",".join("?" for _ in ordered)
+        rows = conn.execute(
+            f"""
+            SELECT object_id, revision, COUNT(*) AS hit_tokens
+            FROM search_postings
+            WHERE token IN ({placeholders})
+            GROUP BY object_id, revision
+            """,
+            ordered,
+        ).fetchall()
+        return {(r["object_id"], int(r["revision"])): int(r["hit_tokens"]) for r in rows}
+
+    def co_search(
+        self,
+        keywords: list[str],
+        *,
+        subject: str | None = None,
+        time_range: tuple[datetime, datetime] | None = None,
+        limit: int = 50,
+        strict_freshness: bool = False,
+        view: str = "ANNOTATED",
+        as_of: datetime | None = None,
+        include_tombstones: bool = True,
+    ) -> SearchPage:
+        if not keywords or any(not kw.strip() for kw in keywords):
+            raise ValueError("co_search requires non-blank keywords (第 89 条共现,不是单点通配)")
+        current = int(self._store.current_world_revision())
+        wm_before = self.watermark()
+        if strict_freshness and wm_before < current:
+            return SearchPage(status="stale_index", lag=current - wm_before,
+                              world_revision=current, index_watermark=wm_before)
+        if wm_before < current:
+            self.catch_up()
+        wm = self.watermark()
+
+        per_kw: list[dict[tuple[str, int], int]] = []
+        ambiguous: dict[str, list[str]] = {}
+        with self._connect() as conn:
+            for kw in keywords:
+                tokens = set(tokens_for(kw))
+                ent_rows = conn.execute(
+                    "SELECT entity_object_id FROM search_alias WHERE alias_norm=?",
+                    (normalize_alias(kw),),
+                ).fetchall()
+                ent_ids = sorted({r["entity_object_id"] for r in ent_rows})
+                if len(ent_ids) > 1:
+                    ambiguous[kw] = ent_ids  # 第 36 条：不自动合并身份
+                elif len(ent_ids) == 1:
+                    eid = ent_ids[0]
+                    tokens.add(_id_token("ent", eid))
+                    tokens.add(_id_token("ref", eid))
+                    # 唯一解析到单实体→按别名全集展开召回（"母亲"→"妈妈"文本命中；
+                    # 身份仍锚定实体编号，不改写任何对象）
+                    for (alias,) in conn.execute(
+                        "SELECT alias_norm FROM search_alias WHERE entity_object_id = ?", (eid,)
+                    ):
+                        tokens |= tokens_for(alias)
+                hits = self._postings_for(conn, tokens)
+                if not hits:
+                    return SearchPage(status="ok", lag=current - wm, world_revision=current,
+                                      index_watermark=wm, ambiguous_keywords=ambiguous)
+                _ = tokens  # per-keyword token 集已折叠进 postings 命中
+                per_kw.append(hits)
+            candidates = set.intersection(*(set(h) for h in per_kw))
+            if not candidates:
+                return SearchPage(status="ok", lag=current - wm, world_revision=current,
+                                  index_watermark=wm, ambiguous_keywords=ambiguous)
+            page = self._finalize(conn, candidates, keywords, per_kw,
+                                  subject=subject, time_range=time_range, limit=limit,
+                                  lag=current - wm, current=current, wm=wm, ambiguous=ambiguous,
+                                  view=view, as_of=as_of, include_tombstones=include_tombstones)
+        return page
+
+    def _finalize(
+        self, conn: sqlite3.Connection, candidates: set[tuple[str, int]], keywords: list[str],
+        per_kw: list[dict[tuple[str, int], int]], *, subject: str | None, time_range, limit: int,
+        lag: int, current: int, wm: int, ambiguous: dict[str, list[str]],
+        view: str = "ANNOTATED", as_of: datetime | None = None, include_tombstones: bool = True,
+    ) -> SearchPage:
+        if not include_tombstones:
+            tombstones = {
+                r[0] for r in conn.execute("SELECT object_id FROM search_tombstones").fetchall()
+            }
+            if hasattr(self._store, "is_latest_pruned"):
+                def _is_pruned_or_refs_pruned(oid: str, rev: int) -> bool:
+                    if oid in tombstones or self._store.is_latest_pruned(oid):
+                        return True
+                    try:
+                        p = self._store.get_payload(oid, revision=rev)
+                        for ref_id in _iter_ref_ids(p):
+                            if ref_id in tombstones or self._store.is_latest_pruned(ref_id):
+                                return True
+                            if ref_id.startswith("evidence_"):
+                                try:
+                                    ev_p = self._store.get_payload(ref_id)
+                                    for m in ev_p.get("member_refs", []):
+                                        if isinstance(m, dict):
+                                            mid = m.get("object_id")
+                                            if mid and (mid in tombstones or self._store.is_latest_pruned(mid)):
+                                                return True
+                                except Exception:
+                                    pass
+                    except Exception:
+                        pass
+                    return False
+                candidates = {c for c in candidates if not _is_pruned_or_refs_pruned(c[0], c[1])}
+            else:
+                candidates = {c for c in candidates if c[0] not in tombstones}
+
+        if view == "AS_KNOWN" and as_of is not None:
+            # 双时态铁律：AS_KNOWN 回答“当时系统已经知道什么”，因此知识可见性
+            # 必须由 learned_at 截止。occurred_at 只描述世界何时发生，不能证明
+            # AIOS 当时已经知道该事件。缺失/损坏 learned_at 时 fail closed，避免
+            # 把后来获知的过去事件泄漏进历史视图。
+            cutoff = as_utc(as_of, "as_of")
+            valid_candidates: set[tuple[str, int]] = set()
+            for oid, rev in candidates:
+                learned_at: datetime | None = None
+                try:
+                    payload = self._store.get_payload(oid, revision=rev)
+                    raw_learned = payload.get("learned_at")
+                    if isinstance(raw_learned, str):
+                        learned_at = as_utc(datetime.fromisoformat(raw_learned), "learned_at")
+                except Exception:
+                    # Retrospective annotations live in the projection-side annotation
+                    # registry rather than object_revisions. Their created_at is the
+                    # knowledge time of the overlay and is therefore the legal cutoff.
+                    annotation = conn.execute(
+                        "SELECT created_at FROM search_annotations WHERE annotation_id=?",
+                        (oid,),
+                    ).fetchone()
+                    if annotation is not None:
+                        try:
+                            learned_at = as_utc(
+                                datetime.fromisoformat(str(annotation["created_at"])),
+                                "annotation_created_at",
+                            )
+                        except (TypeError, ValueError):
+                            learned_at = None
+                if learned_at is not None and learned_at <= cutoff:
+                    valid_candidates.add((oid, rev))
+            candidates = valid_candidates
+
+        pairs = sorted(candidates)
+        # 50 万修订下的物理计划纪律（G-M1P/T2-I 禁扫描）：候选对经临时表
+        # WITHOUT ROWID 主键 join，杜绝行值 IN 退化为 SCAN search_occurred。
+        conn.execute(
+            "CREATE TEMP TABLE IF NOT EXISTS search_candidates("
+            "object_id TEXT NOT NULL, revision INTEGER NOT NULL,"
+            "PRIMARY KEY(object_id, revision)) WITHOUT ROWID"
+        )
+        conn.execute("DELETE FROM search_candidates")
+        conn.executemany("INSERT INTO search_candidates VALUES (?,?)", pairs)
+        params: list[Any] = []
+        sql = """
+            SELECT o.object_id, o.revision, o.object_type, o.subject_id,
+                   o.occurred_start_us, o.occurred_end_us,
+                   d.haystack, d.excerpt
+            FROM search_candidates c
+            JOIN search_occurred o ON o.object_id = c.object_id AND o.revision = c.revision
+            JOIN search_doc d ON d.object_id = o.object_id AND d.revision = o.revision
+            WHERE 1=1
+        """
+        if subject is not None:
+            sql += " AND o.subject_id = ?"
+            params.append(subject)
+        if time_range is not None:
+            t0 = int(time_range[0].astimezone(timezone.utc).timestamp() * 1_000_000)
+            t1 = int(time_range[1].astimezone(timezone.utc).timestamp() * 1_000_000)
+            sql += (
+                " AND o.occurred_start_us IS NOT NULL"
+                " AND NOT (COALESCE(o.occurred_end_us, o.occurred_start_us) < ? OR o.occurred_start_us > ?)"
+            )
+            params.extend([t0, t1])
+        rows = conn.execute(sql + " ORDER BY o.occurred_start_us DESC, o.object_id", params).fetchall()
+
+        best: dict[str, sqlite3.Row] = {}
+        for row in rows:  # 同对象取最新可见 revision（pinned 语义由调用方在展开层处理）
+            best.setdefault(row["object_id"], row)
+
+        hits: list[SearchHit] = []
+        for row in best.values():
+            haystack = row["haystack"] or ""
+            ok = True
+            for kw in keywords:
+                kwl = kw.strip().lower()
+                if kwl in haystack:
+                    continue
+                # 文本不命中时，仅当该关键词已被实体编号解析（引用命中）才放行
+                resolved = sorted({r["entity_object_id"] for r in conn.execute(
+                    "SELECT entity_object_id FROM search_alias WHERE alias_norm=?", (normalize_alias(kw),))})
+                if len(resolved) == 1:
+                    alias_variants = [r[0] for r in conn.execute(
+                        "SELECT alias_norm FROM search_alias WHERE entity_object_id = ?", (resolved[0],))]
+                    if any(v in haystack for v in alias_variants):
+                        continue
+                    token = _id_token("ent", resolved[0])
+                    has_link = conn.execute(
+                        "SELECT 1 FROM search_postings WHERE token=? AND object_id=? AND revision=? LIMIT 1",
+                        (token, row["object_id"], row["revision"]),
+                    ).fetchone()
+                    token2 = _id_token("ref", resolved[0])
+                    has_link = has_link or conn.execute(
+                        "SELECT 1 FROM search_postings WHERE token=? AND object_id=? AND revision=? LIMIT 1",
+                        (token2, row["object_id"], row["revision"]),
+                    ).fetchone()
+                    if has_link:
+                        continue
+                ok = False
+                break
+            if not ok:
+                continue
+            pair = (row["object_id"], int(row["revision"]))
+            # Retrieval score is matched-token evidence only. Object type never
+            # receives semantic priority here; the cognitive runtime judges
+            # importance after retrieval.
+            score = sum(hits.get(pair, 0) for hits in per_kw)
+            hits.append(SearchHit(
+                object_id=row["object_id"], revision=int(row["revision"]),
+                object_type=row["object_type"], subject_id=row["subject_id"],
+                score=score, excerpt=row["excerpt"] or "",
+            ))
+        hits.sort(key=lambda h: (-h.score, h.object_id))
+        return SearchPage(status="ok", lag=lag, world_revision=current, index_watermark=wm,
+                          hits=hits[:limit], ambiguous_keywords=ambiguous)
+
+
+    def _catch_up_annotations(self, conn: sqlite3.Connection) -> None:
+        """同步外挂注记表（retrospective_annotations）进入多维搜索投影。"""
+        try:
+            # 检查底层 store 是否有 retrospective_annotations 表
+            cur = conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='retrospective_annotations'")
+            if not cur.fetchone():
+                return
+            rows = conn.execute(
+                "SELECT annotation_id, target_object_id, target_object_type, "
+                "reinterpretation_claim, is_invalidating, created_at, created_by "
+                "FROM retrospective_annotations"
+            ).fetchall()
+            for r in rows:
+                anno_id = str(r[0])
+                target_id = str(r[1])
+                target_type = str(r[2])
+                claim_text = str(r[3])
+                is_inv = int(r[4])
+                created_at = str(r[5])
+                created_by = str(r[6])
+                target_dim_row = conn.execute(
+                    "SELECT dimension FROM search_occurred "
+                    "WHERE object_id=? ORDER BY revision DESC LIMIT 1",
+                    (target_id,),
+                ).fetchone()
+                dim = (
+                    str(target_dim_row[0]).strip()
+                    if target_dim_row and str(target_dim_row[0]).strip()
+                    else "dim_unclassified"
+                )
+
+                tokens = set(tokens_for(claim_text))
+                tokens.add(_id_token("sub", "user_1"))
+                tokens.add(_id_token("ref", target_id))
+                tokens.add(_id_token("ent", target_id))
+                tokens.add(_id_token("anno", anno_id))
+                tokens.add(_id_token("dim", dim))
+
+                conn.execute(
+                    "INSERT OR REPLACE INTO search_annotations(annotation_id, target_object_id, target_object_type, "
+                    "reinterpretation_claim, is_invalidating, created_at, created_by, dimension) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    (anno_id, target_id, target_type, claim_text, is_inv, created_at, created_by, dim),
+                )
+                if tokens:
+                    conn.executemany(
+                        "INSERT OR IGNORE INTO search_postings(token, object_id, revision) VALUES(?,?,?)",
+                        [(t, anno_id, 1) for t in tokens],
+                    )
+                conn.execute(
+                    "INSERT OR REPLACE INTO search_doc(object_id, revision, haystack, excerpt) VALUES(?,?,?,?)",
+                    (anno_id, 1, claim_text.lower(), claim_text[:_EXCERPT_LIMIT]),
+                )
+                us = 0
+                try:
+                    us = int(datetime.fromisoformat(created_at).astimezone(timezone.utc).timestamp() * 1_000_000)
+                except Exception:
+                    pass
+                conn.execute(
+                    "INSERT OR REPLACE INTO search_occurred(object_id, revision, subject_id, object_type, "
+                    "occurred_start_us, occurred_end_us, dimension) VALUES(?,?,?,?,?,?,?)",
+                    (anno_id, 1, "user_1", "reinterpretation", us, us, dim),
+                )
+        except Exception:
+            pass
+
+    def search_mind(
+        self,
+        keywords: Sequence[str] = (),
+        *,
+        dimension: Optional[str] = None,
+        claim_id: Optional[str] = None,
+        entity_id: Optional[str] = None,
+        annotation_id: Optional[str] = None,
+        object_types: Optional[Sequence[str]] = None,
+        time_range: Optional[Tuple[datetime, datetime]] = None,
+        include_annotations: bool = True,
+        limit: int = 20,
+    ) -> MindSearchPage:
+        """宪法第二十章：多维心智联合感知检索入口。
+
+        原生支持按**维度（Dimension）、主张（Claim）、实体（Entity）、注记（Annotation）**
+        的多维正交联合精准检索，兼具时空窗剪裁与极简 Token 输出。
+        """
+        current = int(self._store.current_world_revision())
+        wm_before = self.watermark()
+        if wm_before < current:
+            self.catch_up()
+        wm = self.watermark()
+
+        search_tokens: set[str] = set()
+        for kw in keywords:
+            search_tokens |= tokens_for(kw)
+        if entity_id:
+            search_tokens.add(_id_token("ent", entity_id))
+            search_tokens.add(_id_token("ref", entity_id))
+        if claim_id:
+            search_tokens.add(_id_token("ref", claim_id))
+        if annotation_id:
+            search_tokens.add(_id_token("anno", annotation_id))
+
+        with self._connect() as conn:
+            # 如果提供了 search_tokens，根据 postings 交集加速
+            if search_tokens:
+                expanded_tokens = set(search_tokens)
+                for kw in keywords:
+                    ent_rows = conn.execute(
+                        "SELECT entity_object_id FROM search_alias WHERE alias_norm=?",
+                        (normalize_alias(kw),),
+                    ).fetchall()
+                    for (eid,) in ent_rows:
+                        expanded_tokens.add(_id_token("ent", eid))
+                        expanded_tokens.add(_id_token("ref", eid))
+                        for (anorm,) in conn.execute(
+                            "SELECT alias_norm FROM search_alias WHERE entity_object_id=?", (eid,)
+                        ):
+                            expanded_tokens |= tokens_for(anorm)
+
+                hits_map = self._postings_for(conn, expanded_tokens)
+                candidate_pairs = set(hits_map.keys())
+            else:
+                candidate_pairs = None
+
+            params: list[Any] = []
+            clauses = ["1=1"]
+            if dimension:
+                clauses.append("o.dimension = ?")
+                params.append(dimension)
+            if claim_id:
+                clauses.append("(o.object_id = ? OR o.object_id IN (SELECT object_id FROM search_postings WHERE token = ?))")
+                params.extend([claim_id, _id_token("ref", claim_id)])
+            if annotation_id:
+                clauses.append("(o.object_id = ? OR o.object_id IN (SELECT target_object_id FROM search_annotations WHERE annotation_id = ?))")
+                params.extend([annotation_id, annotation_id])
+            if object_types:
+                placeholders = ",".join("?" for _ in object_types)
+                clauses.append(f"o.object_type IN ({placeholders})")
+                params.extend(object_types)
+            if time_range:
+                t0 = int(time_range[0].astimezone(timezone.utc).timestamp() * 1_000_000)
+                t1 = int(time_range[1].astimezone(timezone.utc).timestamp() * 1_000_000)
+                clauses.append(
+                    "o.occurred_start_us IS NOT NULL AND NOT (COALESCE(o.occurred_end_us, o.occurred_start_us) < ? OR o.occurred_start_us > ?)"
+                )
+                params.extend([t0, t1])
+
+            # 排除墓碑
+            tombstones = {r[0] for r in conn.execute("SELECT object_id FROM search_tombstones").fetchall()}
+
+            where_sql = " AND ".join(clauses)
+            sql = f"""
+                SELECT o.object_id, o.revision, o.object_type, o.subject_id, o.dimension,
+                       d.haystack, d.excerpt
+                FROM search_occurred o
+                JOIN search_doc d ON d.object_id = o.object_id AND d.revision = o.revision
+                WHERE {where_sql}
+                ORDER BY o.occurred_start_us DESC
+            """
+            rows = conn.execute(sql, params).fetchall()
+
+            mind_hits: list[MindSearchHit] = []
+            total_toks = 0
+            retrieved_object_ids: set[str] = set()
+            retrieved_scores: dict[str, int] = {}
+
+            for r in rows:
+                oid = r["object_id"]
+                rev = int(r["revision"])
+                if oid in tombstones:
+                    continue
+                if candidate_pairs is not None and (oid, rev) not in candidate_pairs:
+                    continue
+
+                haystack = r["haystack"] or ""
+                matched_all = True
+                for kw in keywords:
+                    if kw.lower() in haystack:
+                        continue
+                    resolved = sorted({
+                        row[0] for row in conn.execute(
+                            "SELECT entity_object_id FROM search_alias WHERE alias_norm=?", (normalize_alias(kw),)
+                        ).fetchall()
+                    })
+                    if resolved:
+                        alias_variants = [row[0] for row in conn.execute(
+                            "SELECT alias_norm FROM search_alias WHERE entity_object_id = ?", (resolved[0],)
+                        ).fetchall()]
+                        if any(v in haystack for v in alias_variants):
+                            continue
+                        tok1 = _id_token("ent", resolved[0])
+                        tok2 = _id_token("ref", resolved[0])
+                        has_link = conn.execute(
+                            "SELECT 1 FROM search_postings WHERE token IN (?,?) AND object_id=? LIMIT 1",
+                            (tok1, tok2, oid),
+                        ).fetchone()
+                        if has_link:
+                            continue
+
+                    matched_all = False
+                    break
+
+                if not matched_all:
+                    continue
+
+                is_anno = (r["object_type"] == "reinterpretation")
+                excerpt = r["excerpt"] or ""
+                est_tok = max(10, len(excerpt) // 3)
+                total_toks += est_tok
+                retrieved_object_ids.add(oid)
+                retrieval_score = (
+                    int(hits_map.get((oid, rev), 0))
+                    if search_tokens
+                    else 0
+                )
+                retrieved_scores[oid] = retrieval_score
+
+                mind_hits.append(
+                    MindSearchHit(
+                        object_id=oid,
+                        revision=rev,
+                        object_type=r["object_type"],
+                        subject_id=r["subject_id"],
+                        score=retrieval_score,
+                        dimension=r["dimension"] or "dim_unclassified",
+                        excerpt=excerpt,
+                        is_annotation=is_anno,
+                        estimated_tokens=est_tok,
+                    )
+                )
+                if len(mind_hits) >= limit:
+                    break
+
+            # 伴随外挂注记联动（如果包含注记且命中列表中有被注记的目标）
+            if include_annotations and retrieved_object_ids:
+                placeholders = ",".join("?" for _ in retrieved_object_ids)
+                anno_rows = conn.execute(
+                    f"""
+                    SELECT annotation_id, target_object_id, target_object_type,
+                           reinterpretation_claim, dimension
+                    FROM search_annotations
+                    WHERE target_object_id IN ({placeholders})
+                    """,
+                    list(retrieved_object_ids),
+                ).fetchall()
+                for ar in anno_rows:
+                    aid = str(ar[0])
+                    if aid not in retrieved_object_ids:
+                        claim_txt = str(ar[3])
+                        est_a_tok = max(10, len(claim_txt) // 3)
+                        total_toks += est_a_tok
+                        mind_hits.append(
+                            MindSearchHit(
+                                object_id=aid,
+                                revision=1,
+                                object_type="reinterpretation",
+                                subject_id="user_1",
+                                # Companion annotations inherit only the target
+                                # retrieval score; Search does not grant semantic
+                                # supremacy by object type.
+                                score=retrieved_scores.get(str(ar[1]), 0),
+                                dimension=str(ar[4]) or "dim_unclassified",
+                                excerpt=f"[伴随注记] 指向 {ar[1]}: {claim_txt}",
+                                is_annotation=True,
+                                estimated_tokens=est_a_tok,
+                            )
+                        )
+
+            # Stable retrieval ordering only; no object type is semantically privileged.
+            mind_hits.sort(key=lambda h: (-h.score, -h.revision, h.object_id))
+
+            intent_parts = list(keywords)
+            if dimension:
+                intent_parts.append(f"dim:{dimension}")
+            if claim_id:
+                intent_parts.append(f"claim:{claim_id}")
+            if entity_id:
+                intent_parts.append(f"entity:{entity_id}")
+            if annotation_id:
+                intent_parts.append(f"anno:{annotation_id}")
+
+            return MindSearchPage(
+                status="ok",
+                lag=current - wm,
+                world_revision=current,
+                index_watermark=wm,
+                hits=mind_hits[:limit],
+                total_estimated_tokens=total_toks,
+                query_intent=" ".join(intent_parts) or "all",
+            )
+
+    # ---------------- 快捷多维原语接口 ----------------
+
+    def search_by_dimension(self, dimension: str, keywords: Sequence[str] = (), limit: int = 20) -> MindSearchPage:
+        """按特定维度聚焦检索（如 dim_health, dim_finance, dim_social, dim_work）。"""
+        return self.search_mind(keywords=keywords, dimension=dimension, limit=limit)
+
+    def search_by_claim(self, claim_id: str, keywords: Sequence[str] = (), limit: int = 20) -> MindSearchPage:
+        """按主张与证据链因果检索。"""
+        return self.search_mind(keywords=keywords, claim_id=claim_id, limit=limit)
+
+    def search_by_entity(self, entity_id: str, keywords: Sequence[str] = (), limit: int = 20) -> MindSearchPage:
+        """按实体关系网络检索。"""
+        return self.search_mind(keywords=keywords, entity_id=entity_id, limit=limit)
+
+    def search_by_annotation(self, annotation_id: str, limit: int = 20) -> MindSearchPage:
+        """按外挂解释图层检索。"""
+        return self.search_mind(annotation_id=annotation_id, limit=limit)
+
+
+# 别名导出与类型对齐（最高法统命名规范）
+MultidimensionalSearchEngine = WorldSearchIndex
