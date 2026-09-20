@@ -3,12 +3,17 @@ from __future__ import annotations
 from argparse import Namespace
 from datetime import datetime, timedelta, timezone
 import json
+from pathlib import Path
 
 import pytest
 
 from .evaluation import ORACLE_SCHEMA_V1, evaluate_with_oracle
 from .harness import HabitationRunner, HabitationScenario, LifeEvent, ResidentEvent
-from .io import load_run_artifact_json, run_artifact_json
+from .io import (
+    load_resident_fixture,
+    load_run_artifact_json,
+    run_artifact_json,
+)
 from .provider_evaluator import ProviderOracleEvaluator
 from .provider_runtime import ProviderClient, ProviderConfig, ProviderProtocolError
 from . import run_provider_evaluator
@@ -299,3 +304,92 @@ def test_evaluator_cli_rejects_wrong_visible_life_before_provider_call(
             )
         )
     assert called is False
+
+
+def test_evaluator_cli_writes_report_for_matching_completed_run(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    fixture_root = Path(__file__).parent / "fixtures"
+    manifest_name = "uncertainty_restraint_v1.manifest.json"
+    resident = load_resident_fixture(fixture_root, manifest_name)
+    scenario = resident.scenario
+    run = HabitationRunner().run(
+        scenario=scenario,
+        model_id="resident/model",
+        target=Target("resident/model"),
+    )
+    run_path = tmp_path / "run.json"
+    run_path.write_text(
+        run_artifact_json(scenario=scenario, run=run),
+        encoding="utf-8",
+    )
+
+    class FakeClient:
+        def __init__(self, config):
+            self.config = config
+            self.requests = 0
+
+        def complete_text(self, *, system_instruction, input_text, purpose):
+            self.requests += 1
+            payload = json.loads(input_text)
+            event_id = payload["resident_run"]["steps"][0]["event_id"]
+            return json.dumps(
+                {
+                    "findings": [
+                        {
+                            "criterion_id": criterion,
+                            "status": "observe",
+                            "summary": "independent evaluator observation",
+                            "evidence_event_ids": [event_id],
+                            "measurements": {},
+                        }
+                        for criterion in payload["criteria"]
+                    ]
+                }
+            )
+
+        def provenance_snapshot(self):
+            return {
+                "artifact_schema": "aios.p16.provider-provenance.v1",
+                **self.config.public_config(),
+                "config_fingerprint": self.config.config_fingerprint,
+                "requests": [
+                    {
+                        "sequence": 1,
+                        "purpose": "oracle_evaluation",
+                    }
+                ],
+            }
+
+    monkeypatch.setattr(run_provider_evaluator, "ProviderClient", FakeClient)
+
+    output_dir = tmp_path / "evaluation"
+    result_path = run_provider_evaluator.run(
+        Namespace(
+            fixture_root=str(fixture_root),
+            manifest=manifest_name,
+            run_artifact=str(run_path),
+            provider="openai",
+            model="judge-model",
+            evaluator_id="judge-v1",
+            output_dir=str(output_dir),
+            max_output_tokens=1024,
+            timeout_seconds=10.0,
+            temperature=None,
+            endpoint=None,
+            api_key_env=None,
+            api_version=None,
+        )
+    )
+
+    payload = json.loads(result_path.read_text(encoding="utf-8"))
+    assert payload["oracle_loaded"] is True
+    assert payload["resident_model_id"] == "resident/model"
+    assert payload["report"]["evaluator_id"] == "judge-v1"
+    assert len(payload["report"]["findings"]) == len(
+        scenario.hidden_oracle["criteria"]
+    )
+    assert payload["provider_request_provenance"]["requests"][0][
+        "purpose"
+    ] == "oracle_evaluation"
