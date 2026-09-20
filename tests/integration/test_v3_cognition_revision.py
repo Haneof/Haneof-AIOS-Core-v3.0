@@ -116,6 +116,22 @@ def test_revise_claim_preserves_history_and_marks_dependents_review_required(tmp
     assert store.get_payload(first.object_id)["value"] == "我每天都喝茶。"
     assert store.get_payload(correction.object_id)["value"].endswith("每天喝咖啡了。")
 
+    current_tea = index.recall_candidates(
+        "喝茶",
+        object_types=["claim"],
+    )
+    assert a.claim_id not in {hit.object_id for hit in current_tea.hits}
+    assert b.claim_id not in {hit.object_id for hit in current_tea.hits}
+
+    current_coffee = index.recall_candidates(
+        "喝咖啡",
+        object_types=["claim"],
+    )
+    assert a.claim_id in {hit.object_id for hit in current_coffee.hits}
+
+    historical = store.get_payload(a.claim_id, revision=1)
+    assert historical["content"] == "用户当前偏好每天喝茶。"
+
 
 def test_retract_claim_creates_forward_tombstone_semantics_without_deleting_history(tmp_path):
     store, index, _, correction, a, b = _seed_world(tmp_path)
