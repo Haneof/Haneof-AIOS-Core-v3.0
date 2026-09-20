@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from .io import load_resident_events_jsonl
+from .io import load_fixture_bundle, load_resident_events_jsonl
 
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -109,3 +109,29 @@ def test_resident_subject_ids_are_opaque_and_non_semantic() -> None:
         for subject_id in subject_ids
         for token in ("learning", "continuity", "revision", "uncertainty")
     )
+
+
+def test_every_catalog_fixture_bundle_has_matching_resident_and_oracle_identity() -> None:
+    catalog = json.loads((FIXTURES / "catalog.json").read_text(encoding="utf-8"))
+
+    for entry in catalog["scenarios"]:
+        loaded = load_fixture_bundle(FIXTURES, entry["manifest"])
+        manifest = loaded.manifest
+        scenario = loaded.scenario
+
+        assert scenario.scenario_id == manifest.scenario_id
+        assert scenario.scenario_version == manifest.scenario_version
+        assert scenario.seed == manifest.seed
+        assert scenario.subject_id == manifest.subject_id
+        assert scenario.hidden_oracle["scenario_id"] == manifest.scenario_id
+        assert scenario.hidden_oracle["scenario_version"] == manifest.scenario_version
+        assert scenario.hidden_oracle["seed"] == manifest.seed
+        assert scenario.hidden_oracle["subject_id"] == manifest.subject_id
+        assert all(not event.hidden_oracle for event in scenario.events)
+
+
+def test_fixture_bundle_rejects_manifest_path_traversal(tmp_path) -> None:
+    import pytest
+
+    with pytest.raises(ValueError, match="stay under fixture root"):
+        load_fixture_bundle(tmp_path, "../outside.manifest.json")
