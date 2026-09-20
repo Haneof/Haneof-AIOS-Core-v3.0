@@ -759,5 +759,29 @@
         }
       }
     ]
+  },
+  "7c43cf1e2d6cbc8a8e42a71db2568d729629684068ac6e5bda0db94ae164c104": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "revise_claim",
+        "call_id": "sol-jan12-revise-northmill-price-claim",
+        "arguments": {
+          "target_ref": {
+            "object_id": "clm_6f44455fcf528469d2a9cc26",
+            "revision": 1
+          },
+          "reason": "The user supplied the previously missing old-invoice figure (1.38 USD/kg) and explicitly withdrew the characterization '贵不少'.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_3be97316c269123df4d36569",
+              "revision": 1
+            }
+          ],
+          "replacement_content": "North Mill 上次面包粉发票单价为 1.38 USD/kg，本次报价为 1.42 USD/kg。应按这两个实际数字比较，不再沿用“贵不少”的定性说法。",
+          "confidence": 0.99
+        }
+      }
+    ]
   }
 }
