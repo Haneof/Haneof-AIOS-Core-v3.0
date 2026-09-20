@@ -1,0 +1,94 @@
+name: p16-provider-habitation-manual
+
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: "Provider to run"
+        required: true
+        type: choice
+        options:
+          - openai
+          - anthropic
+          - gemini
+      model:
+        description: "Exact provider model ID"
+        required: true
+        type: string
+      manifest:
+        description: "Sealed resident-life manifest"
+        required: true
+        type: choice
+        options:
+          - learning_independence_v1.manifest.json
+          - cross_session_continuity_v1.manifest.json
+          - cognition_revision_v1.manifest.json
+          - uncertainty_restraint_v1.manifest.json
+      max_output_tokens:
+        description: "Per provider response token ceiling"
+        required: true
+        default: "2048"
+        type: string
+
+jobs:
+  real-provider-resident:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      P16_PROVIDER: ${{ inputs.provider }}
+      P16_MODEL: ${{ inputs.model }}
+      P16_MANIFEST: ${{ inputs.manifest }}
+      P16_MAX_OUTPUT_TOKENS: ${{ inputs.max_output_tokens }}
+      P16_OUTPUT_DIR: artifacts/p16/${{ github.run_id }}-${{ inputs.provider }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+
+      - name: Verify selected provider secret exists
+        shell: bash
+        run: |
+          case "$P16_PROVIDER" in
+            openai)
+              test -n "$OPENAI_API_KEY" || { echo "OPENAI_API_KEY is not configured"; exit 2; }
+              ;;
+            anthropic)
+              test -n "$ANTHROPIC_API_KEY" || { echo "ANTHROPIC_API_KEY is not configured"; exit 2; }
+              ;;
+            gemini)
+              test -n "$GEMINI_API_KEY" || { echo "GEMINI_API_KEY is not configured"; exit 2; }
+              ;;
+            *)
+              echo "Unsupported provider"
+              exit 2
+              ;;
+          esac
+
+      - name: Run sealed resident life
+        shell: bash
+        run: |
+          python -m tests.habitation.run_provider_benchmark \
+            --fixture-root tests/habitation/fixtures \
+            --manifest "$P16_MANIFEST" \
+            --provider "$P16_PROVIDER" \
+            --model "$P16_MODEL" \
+            --max-output-tokens "$P16_MAX_OUTPUT_TOKENS" \
+            --output-dir "$P16_OUTPUT_DIR"
+
+      - name: Upload auditable P16 run artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p16-${{ inputs.provider }}-${{ github.run_id }}
+          path: artifacts/p16/
+          if-no-files-found: error
