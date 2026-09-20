@@ -499,5 +499,60 @@
         "arguments": {}
       }
     ]
+  },
+  "180564d17c413066038659fe458fd7e557af974a4f937e7a512dbfc00c946869": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "commit_operation_experience",
+        "call_id": "sol-review-jan09-action-revocation-experience-v2",
+        "arguments": {
+          "problem_type": "external_action_revocation_lifecycle",
+          "method_path": [
+            "accept explicit user send request",
+            "propose external action through the authorized Core path",
+            "observe a later explicit user withdrawal before platform result",
+            "cancel the parent task",
+            "reinspect the pending action before making any success/cancellation claim"
+          ],
+          "result_summary": "When the user withdraws a pending external-action request, do not infer that cancelling the parent Task also revoked the Action. Reinspect the current Action and disclose unresolved execution state rather than claiming it was cancelled or executed.",
+          "negative_case_refs": [
+            {
+              "object_id": "obs_conv_user_d025779ec9ad6598e950810a",
+              "revision": 1
+            }
+          ],
+          "applicability": {
+            "condition": "user withdraws an external-action request before a trusted platform outcome"
+          },
+          "cost": {
+            "extra_world_inspection": 1
+          },
+          "misses": [
+            "The first plan had no explicit Resident-visible Action revocation step."
+          ],
+          "experience_state": "active"
+        }
+      },
+      {
+        "name": "transition_task",
+        "call_id": "sol-review-jan09-complete-family-verification",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_40f75225e1031721889e7500",
+            "revision": 2
+          },
+          "new_state": "completed",
+          "reason": "The user directly reported that the sister was picked up successfully and the flour was also received; the verification question is resolved by real user-world evidence.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_37068ea8651565e088f2d785",
+              "revision": 1
+            }
+          ],
+          "next_step": "No further conflict verification is needed."
+        }
+      }
+    ]
   }
 }
