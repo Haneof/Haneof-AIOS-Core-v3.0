@@ -1,0 +1,11 @@
+{
+  "scenario_id": "cognition-system-closure-v1",
+  "scenario_version": "1",
+  "seed": 20260924,
+  "subject_id": "synthetic-user-005",
+  "resident_stream": "resident/cognition_system_closure_v1.jsonl",
+  "evaluator_oracle": "oracle/cognition_system_closure_v1.json",
+  "purpose": "Whole-cognition closure benchmark for entities, relations, events, adaptive policy, communication experience, dynamic dimensions, multi-scale summaries and cross-dimensional review",
+  "rule": "Each model receives the same resident stream in a fresh AIOS world. Semantic mechanisms must emerge from the resident model; the oracle remains evaluator-only.",
+  "end_at": "2026-08-05T21:00:00+00:00"
+}
