@@ -1,0 +1,25 @@
+{
+  "catalog_schema": "aios.p16.scenario-catalog.v1",
+  "scenarios": [
+    {
+      "scenario_id": "learning-independence-v1",
+      "manifest": "learning_independence_v1.manifest.json",
+      "focus": ["longitudinal_pattern", "dynamic_dimension_candidate", "noise_resilience"]
+    },
+    {
+      "scenario_id": "cross-session-continuity-v1",
+      "manifest": "cross_session_continuity_v1.manifest.json",
+      "focus": ["cross_session_continuity", "relevant_recall", "context_restraint"]
+    },
+    {
+      "scenario_id": "cognition-revision-v1",
+      "manifest": "cognition_revision_v1.manifest.json",
+      "focus": ["cognition_revision", "historical_preservation", "stale_suppression"]
+    },
+    {
+      "scenario_id": "uncertainty-restraint-v1",
+      "manifest": "uncertainty_restraint_v1.manifest.json",
+      "focus": ["epistemic_restraint", "ambiguity", "no_overgeneralization"]
+    }
+  ]
+}
