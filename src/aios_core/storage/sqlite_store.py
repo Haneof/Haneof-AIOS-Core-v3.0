@@ -426,6 +426,26 @@ class SQLiteWorldStore:
                     ),
                 ),
             )
+            if not has_source_class:
+                conn.execute(
+                    """
+                    INSERT OR REPLACE INTO world_meta(key, value)
+                    VALUES ('schema_migration_m0_023', ?)
+                    """,
+                    (
+                        json.dumps(
+                            {
+                                "migrated_at": canonical_utc_iso(
+                                    utc_now(), "migrated_at"
+                                ),
+                                "backfilled_rows": migrated,
+                                "backfilled_as": "ai_cognition",
+                                "policy": "explicit update; no silent DEFAULT",
+                            },
+                            sort_keys=True,
+                        ),
+                    ),
+                )
             conn.commit()
         finally:
             if fk_enabled:
