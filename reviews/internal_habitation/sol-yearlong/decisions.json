@@ -447,5 +447,57 @@
         }
       }
     ]
+  },
+  "43171f72c6c90d7630d0e8b99698079ab777411b03a50fa9a79c48ff01fd3f49": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "commit_operation_experience",
+        "call_id": "sol-review-jan09-action-revocation-experience",
+        "arguments": {
+          "problem_type": "external_action_revocation_lifecycle",
+          "method_path": [
+            "accept explicit user send request",
+            "move task to running",
+            "propose external action",
+            "observe later explicit user withdrawal",
+            "cancel parent task",
+            "reinspect proposed action"
+          ],
+          "result_summary": "Cancelling the parent Task after user withdrawal did not invalidate the already-PROPOSED external Action. Do not treat parent-task cancellation as proof that the external proposal is safely revoked; until Core has an explicit revocation/invalidation path, re-check Action state and do not claim cancellation or delivery.",
+          "negative_case_refs": [
+            {
+              "object_id": "obs_conv_user_d025779ec9ad6598e950810a",
+              "revision": 1
+            },
+            {
+              "object_id": "task_57a01b42b3d5f384db661bda",
+              "revision": 6
+            },
+            {
+              "object_id": "action_b07c55d3dd6b17731296d988",
+              "revision": 1
+            }
+          ],
+          "applicability": {
+            "action_state": "proposed",
+            "condition": "user withdraws request before platform authorization/outcome"
+          },
+          "cost": {
+            "extra_world_inspection": 1
+          },
+          "misses": [
+            "No Resident-visible Action cancellation capability existed.",
+            "Parent Task cancellation did not make the proposed Action terminal."
+          ],
+          "experience_state": "active"
+        }
+      },
+      {
+        "name": "read_execution_world",
+        "call_id": "sol-review-jan09-execution-world",
+        "arguments": {}
+      }
+    ]
   }
 }
