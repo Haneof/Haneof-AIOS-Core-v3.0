@@ -253,7 +253,7 @@ class SQLiteWorldStore:
                     session_id TEXT,
                     reason TEXT NOT NULL,
                     source_class TEXT NOT NULL
-                        CHECK(source_class IN ('user','sensor','ai_cognition','maintenance','safety'))
+                        CHECK(source_class IN ('user','sensor','platform','ai_cognition','maintenance','safety'))
                 );
                 CREATE INDEX IF NOT EXISTS idx_commits_triggerable
                     ON world_commits(world_revision) WHERE source_class <> 'maintenance';
@@ -305,76 +305,131 @@ class SQLiteWorldStore:
             conn.commit()
 
     def _ensure_source_class_schema(self, conn: sqlite3.Connection) -> None:
-        """M0-023 runtime layer (R4-02): migrate pre-source_class databases.
+        """Keep the frozen commit-authority taxonomy forward compatible.
 
-        Explicit backfill only: rows written before the R4 delta were all
-        produced by AI-session semantics or v2.0 test fixtures, so they are
-        classified as ``ai_cognition`` and the decision is audited in
-        ``world_meta``. A DEFAULT clause would silently impersonate history
-        and is forbidden by the amendment.
+        Earlier AIOS databases allowed USER/SENSOR/AI_COGNITION/MAINTENANCE/SAFETY.
+        P12 constitutional closure adds PLATFORM so trusted platform authorization
+        and real external Action outcomes are not mislabeled as AI cognition.
+
+        SQLite CHECK constraints cannot be altered in place, so existing databases
+        are rebuilt losslessly when their world_commits DDL does not yet admit the
+        platform source class. Object/history rows are untouched and foreign keys are
+        restored immediately after the table swap.
         """
 
-        columns = {row[1] for row in conn.execute("PRAGMA table_info(world_commits)")}
-        if "source_class" in columns:
-            return
-        table_exists = conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='world_commits'"
+        table_row = conn.execute(
+            "SELECT sql FROM sqlite_master WHERE type='table' AND name='world_commits'"
         ).fetchone()
-        if table_exists is None:
-            return  # 全新库：DDL 直接带列，无需迁移
-        conn.execute("ALTER TABLE world_commits ADD COLUMN source_class TEXT")
-        conn.execute(
-            "UPDATE world_commits SET source_class='ai_cognition' WHERE source_class IS NULL"
-        )
-        conn.execute(
-            """
-            CREATE TABLE world_commits_m023 (
-                world_revision INTEGER PRIMARY KEY,
-                committed_at TEXT NOT NULL,
-                operation_id TEXT NOT NULL UNIQUE,
-                session_id TEXT,
-                reason TEXT NOT NULL,
-                source_class TEXT NOT NULL
-                    CHECK(source_class IN ('user','sensor','ai_cognition','maintenance','safety'))
+        if table_row is None:
+            return
+
+        create_sql = str(table_row["sql"] or "")
+        columns = {row[1] for row in conn.execute("PRAGMA table_info(world_commits)")}
+        has_source_class = "source_class" in columns
+        admits_platform = "'platform'" in create_sql
+
+        if has_source_class and admits_platform:
+            return
+
+        fk_enabled_row = conn.execute("PRAGMA foreign_keys").fetchone()
+        fk_enabled = bool(fk_enabled_row[0]) if fk_enabled_row is not None else True
+        if fk_enabled:
+            conn.execute("PRAGMA foreign_keys = OFF")
+
+        try:
+            if not has_source_class:
+                conn.execute("ALTER TABLE world_commits ADD COLUMN source_class TEXT")
+                conn.execute(
+                    "UPDATE world_commits "
+                    "SET source_class='ai_cognition' WHERE source_class IS NULL"
+                )
+
+            conn.execute("DROP INDEX IF EXISTS idx_commits_triggerable")
+            conn.execute("DROP TABLE IF EXISTS world_commits_sourceclass_next")
+            conn.execute(
+                """
+                CREATE TABLE world_commits_sourceclass_next (
+                    world_revision INTEGER PRIMARY KEY,
+                    committed_at TEXT NOT NULL,
+                    operation_id TEXT NOT NULL UNIQUE,
+                    session_id TEXT,
+                    reason TEXT NOT NULL,
+                    source_class TEXT NOT NULL
+                        CHECK(source_class IN (
+                            'user','sensor','platform','ai_cognition','maintenance','safety'
+                        ))
+                )
+                """
             )
-            """
-        )
-        conn.execute(
-            """
-            INSERT INTO world_commits_m023(
-                world_revision, committed_at, operation_id, session_id, reason, source_class
+            conn.execute(
+                """
+                INSERT INTO world_commits_sourceclass_next(
+                    world_revision, committed_at, operation_id, session_id, reason,
+                    source_class
+                )
+                SELECT world_revision, committed_at, operation_id, session_id, reason,
+                       source_class
+                FROM world_commits
+                """
             )
-            SELECT world_revision, committed_at, operation_id, session_id, reason, source_class
-            FROM world_commits
-            """
-        )
-        migrated = conn.execute("SELECT COUNT(*) FROM world_commits_m023").fetchone()[0]
-        # 数据已完整复制进 world_commits_m023，DROP 的是待替换旧壳——非物理删除。
-        conn.execute("DROP TABLE world_commits")  # r4-07-exempt rename-rebuild
-        conn.execute("ALTER TABLE world_commits_m023 RENAME TO world_commits")
-        conn.execute(
-            """
-            CREATE INDEX IF NOT EXISTS idx_commits_triggerable
-                ON world_commits(world_revision) WHERE source_class <> 'maintenance'
-            """
-        )
-        conn.execute(
-            """
-            INSERT OR REPLACE INTO world_meta(key, value)
-            VALUES ('schema_migration_m0_023', ?)
-            """,
-            (
-                json.dumps(
-                    {
-                        "migrated_at": canonical_utc_iso(utc_now(), "migrated_at"),
-                        "backfilled_rows": int(migrated),
-                        "backfilled_as": "ai_cognition",
-                        "policy": "explicit update; no silent DEFAULT",
-                    },
-                    sort_keys=True,
+            migrated = int(
+                conn.execute(
+                    "SELECT COUNT(*) FROM world_commits_sourceclass_next"
+                ).fetchone()[0]
+            )
+            original = int(
+                conn.execute("SELECT COUNT(*) FROM world_commits").fetchone()[0]
+            )
+            if migrated != original:
+                raise sqlite3.IntegrityError(
+                    "world_commits source-class migration row-count mismatch"
+                )
+
+            conn.execute("DROP TABLE world_commits")
+            conn.execute(
+                "ALTER TABLE world_commits_sourceclass_next RENAME TO world_commits"
+            )
+            conn.execute(
+                """
+                CREATE INDEX IF NOT EXISTS idx_commits_triggerable
+                    ON world_commits(world_revision)
+                    WHERE source_class <> 'maintenance'
+                """
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS world_meta (
+                    key TEXT PRIMARY KEY,
+                    value TEXT NOT NULL
+                )
+                """
+            )
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO world_meta(key, value)
+                VALUES ('schema_migration_sourceclass_platform', ?)
+                """,
+                (
+                    json.dumps(
+                        {
+                            "migrated_at": canonical_utc_iso(
+                                utc_now(), "migrated_at"
+                            ),
+                            "preserved_rows": migrated,
+                            "added_source_class": "platform",
+                            "legacy_missing_source_backfill": (
+                                None if has_source_class else "ai_cognition"
+                            ),
+                            "policy": "lossless CHECK-constraint table rebuild",
+                        },
+                        sort_keys=True,
+                    ),
                 ),
-            ),
-        )
+            )
+            conn.commit()
+        finally:
+            if fk_enabled:
+                conn.execute("PRAGMA foreign_keys = ON")
 
 
     def _ensure_revision_kind_schema(self, conn: sqlite3.Connection) -> None:
