@@ -54,6 +54,7 @@ _TEXT_FIELDS: dict[str, tuple[str, ...]] = {
     "outcome": ("outcome_state",),
     "operation_experience": ("problem_type", "result_summary"),
     "communication_experience": ("scenario", "style", "tone"),
+    "cognitive_policy": ("policy_id", "scope", "reason", "evaluation_window"),
     "wake": ("rule_id", "dedupe_key"),
     "entity": ("canonical_name",),
     "goal": ("title", "description"),
