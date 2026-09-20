@@ -124,7 +124,7 @@ ConversationIngestor
 
 ## 5. 当前工程断点
 
-当前主线 HEAD 必须以 `AIOS_v3.0_CURRENT_CHECKPOINT.md` 为准。
+当前可恢复的**功能代码锚点**必须以 `AIOS_v3.0_CURRENT_CHECKPOINT.md` 为准。GitHub `main` 的实时 HEAD 必须现场获取；因为更新 checkpoint 文件本身也会产生新 commit，所以不得要求“文件内 SHA 永远等于实时 HEAD”。
 
 当前阶段：
 
@@ -192,10 +192,11 @@ P9 认知翻案传播
 2. 读取 `AIOS_v3.0_CURRENT_CHECKPOINT.md`。
 3. 读取 `docs/constitution/AIOS_v3.0_Fused_Baseline_Registry.md`。
 4. 若涉及旧代码迁移，再读取 `docs/architecture/AIOS_v3.0_Legacy_Code_Migration_Matrix.md`。
-5. 获取 GitHub `main` 当前 HEAD。
-6. 对比 HEAD 与 checkpoint 记录 SHA：
-   - 相同：直接从“当前任务 / 下一动作”继续；
-   - 不同：先审查 checkpoint 之后的 commits 和 CI，再更新 checkpoint。
+5. 获取 GitHub `main` 当前实时 HEAD。
+6. 对比实时 HEAD 与 checkpoint 的“最后已验证功能代码锚点”：
+   - 若没有后续功能代码：直接从“当前任务 / 下一动作”继续；
+   - 若有后续 commits：先审查锚点之后的 commits 和 CI；纯地图/checkpoint 文档提交不视为功能漂移；
+   - 审查完成后更新 checkpoint 的功能代码锚点。
 7. 读取当前阶段相关源码与测试，不从旧 conversation 记忆猜实现。
 8. 只有在当前阶段 Gate 通过后，才把 Master Map 状态推进到下一阶段。
 9. 每次完成一个可验证工程节点，都更新 `AIOS_v3.0_CURRENT_CHECKPOINT.md`。
@@ -208,7 +209,7 @@ P9 认知翻案传播
 `AIOS_v3.0_CURRENT_CHECKPOINT.md` 每次至少记录：
 
 - 当前时间；
-- 当前 main HEAD；
+- 最后已验证功能代码锚点（不是要求与实时 HEAD 自指相等）；
 - 当前项目阶段；
 - 最后一个完成的能力；
 - 当前正在做的能力；
