@@ -79,14 +79,9 @@ class LifeEvent:
 
 @dataclass(frozen=True, slots=True)
 class ResidentScenarioDescriptor:
-    """Oracle-free, semantics-minimized metadata safe for model-side factories."""
+    """Minimal opaque identity safe for model-side target construction."""
 
     subject_id: str
-    seed: int
-    visible_event_count: int
-    first_visible_at: datetime | None
-    last_visible_at: datetime | None
-    channels: tuple[str, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -207,17 +202,7 @@ def resident_scenario_descriptor(
 ) -> ResidentScenarioDescriptor:
     """Project a sealed scenario into metadata that cannot contain hidden oracle."""
 
-    visible = tuple(
-        event for event in scenario.events if event.deliver_to_resident
-    )
-    return ResidentScenarioDescriptor(
-        subject_id=scenario.subject_id,
-        seed=scenario.seed,
-        visible_event_count=len(visible),
-        first_visible_at=visible[0].occurred_at if visible else None,
-        last_visible_at=visible[-1].occurred_at if visible else None,
-        channels=tuple(dict.fromkeys(event.channel for event in visible)),
-    )
+    return ResidentScenarioDescriptor(subject_id=scenario.subject_id)
 
 
 class HabitationRunner:
