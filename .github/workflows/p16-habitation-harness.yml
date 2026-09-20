@@ -1,0 +1,28 @@
+name: p16-habitation-harness
+
+on:
+  push:
+    branches:
+      - "parallel/p16-habitation-harness-*"
+    paths:
+      - "tests/habitation/**"
+      - "docs/testing/AIOS_v3.0_P16_Habitation_Harness.md"
+      - ".github/workflows/p16-habitation-harness.yml"
+  pull_request:
+    paths:
+      - "tests/habitation/**"
+      - "docs/testing/AIOS_v3.0_P16_Habitation_Harness.md"
+      - ".github/workflows/p16-habitation-harness.yml"
+
+jobs:
+  habitation-harness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - name: Run P16 harness contract tests
+        run: pytest tests/habitation/test_harness_contract.py
