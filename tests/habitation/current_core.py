@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
 from aios_core.contracts.enums import (
+    ObjectType,
     SourceClass,
     TaskState,
     WakeSource,
@@ -131,10 +132,12 @@ class CurrentCoreHabitationTarget(HabitationTarget):
         self.model_id = model_id.strip()
         self.subject_id = subject_id.strip()
         self.db_path = Path(db_path).expanduser().resolve()
-        if require_fresh and self.db_path.exists():
+        existing_world = self.db_path.exists()
+        if require_fresh and existing_world:
             raise ValueError("P16 target requires a fresh private world database")
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._isolation_key = f"sqlite:{self.db_path}"
+        self._resumed_from_world = bool(existing_world and not require_fresh)
         self._clock: datetime | None = None
         self._next_review_at: datetime | None = None
         self._session_turns: dict[str, int] = {}
@@ -171,6 +174,8 @@ class CurrentCoreHabitationTarget(HabitationTarget):
             wake_bus=self.runtime.wake_bus,
             subject_id=self.subject_id,
         )
+        if self._resumed_from_world:
+            self._restore_runtime_state_from_world()
 
     @property
     def isolation_key(self) -> str:
@@ -179,6 +184,95 @@ class CurrentCoreHabitationTarget(HabitationTarget):
     @property
     def clock(self) -> datetime | None:
         return self._clock
+
+    @staticmethod
+    def _payload_time(payload: Mapping[str, Any], field_name: str) -> datetime | None:
+        raw = payload.get(field_name)
+        if not isinstance(raw, str) or not raw.strip():
+            return None
+        try:
+            parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+            return as_utc(parsed, field_name)
+        except (TypeError, ValueError):
+            return None
+
+    def _restore_runtime_state_from_world(self) -> None:
+        """Reconstruct scheduler/session cursors from the durable World only.
+
+        This deliberately does not restore model-private memory. A replacement model
+        must continue from world facts, summaries, cognition, tasks and Wakes.
+        """
+
+        payloads = self.store.list_payloads(subject_id=self.subject_id)
+        if not payloads:
+            return
+
+        recorded_times: list[datetime] = []
+        session_turns: dict[str, int] = {}
+        review_markers: list[tuple[datetime, str, int, Mapping[str, Any]]] = []
+
+        for payload in payloads:
+            recorded = self._payload_time(payload, "recorded_at")
+            if recorded is not None:
+                recorded_times.append(recorded)
+
+            if (
+                payload.get("object_type") == ObjectType.OBSERVATION.value
+                and payload.get("source_kind") == "user_ai_interaction"
+            ):
+                metadata = payload.get("metadata")
+                if isinstance(metadata, Mapping) and metadata.get("role") == "user":
+                    session_id = metadata.get("session_id")
+                    turn_index = metadata.get("turn_index")
+                    if (
+                        isinstance(session_id, str)
+                        and session_id.strip()
+                        and isinstance(turn_index, int)
+                        and not isinstance(turn_index, bool)
+                        and turn_index > 0
+                    ):
+                        session = session_id.strip()
+                        session_turns[session] = max(
+                            session_turns.get(session, 0),
+                            turn_index,
+                        )
+
+            if (
+                payload.get("object_type") == ObjectType.WAKE.value
+                and payload.get("wake_source") == WakeSource.PERIODIC_REVIEW.value
+            ):
+                last_hit = self._payload_time(payload, "last_hit_at")
+                if last_hit is None:
+                    continue
+                review_markers.append(
+                    (
+                        last_hit,
+                        str(payload.get("object_id") or ""),
+                        int(payload.get("revision") or 0),
+                        payload,
+                    )
+                )
+
+        self._session_turns = session_turns
+        if recorded_times:
+            # This is a conservative replay cursor. It never jumps beyond durable
+            # evidence; work between this point and the next requested instant is
+            # replayed through idempotent Core scheduling.
+            self._clock = max(recorded_times)
+
+        if self._clock is None:
+            return
+
+        if review_markers:
+            review_markers.sort(key=lambda item: (item[0], item[1], item[2]))
+            last_hit, _object_id, _revision, latest = review_markers[-1]
+            wake_state = str(latest.get("wake_state") or "")
+            if wake_state in {WakeState.NEW.value, WakeState.RUNNING.value}:
+                self._next_review_at = self._clock
+            else:
+                self._next_review_at = last_hit + self._review_interval()
+        else:
+            self._next_review_at = min(recorded_times) + self._review_interval()
 
     def _spec_for(self, channel: str) -> SourceAdapterSpec:
         clean = _clean_channel(channel)
@@ -645,6 +739,7 @@ class CurrentCoreHabitationTarget(HabitationTarget):
         return {
             "subject_id": self.subject_id,
             "model_id": self.model_id,
+            "resumed_from_world": self._resumed_from_world,
             "clock": None if self._clock is None else self._clock.isoformat(),
             "world_revision": int(self.store.current_world_revision()),
             "index_watermark": int(self.index.watermark()),
