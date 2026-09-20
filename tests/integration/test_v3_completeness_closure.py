@@ -281,6 +281,39 @@ def test_topic_presence_alone_does_not_authorize_history_injection():
     assert historical.history_may_help is True
 
 
+def test_exact_entity_anchor_can_open_history_without_keyword_guessing(tmp_path):
+    store, index = _world(tmp_path)
+    user_ref, _ = _user_fact(store, text="小王的生日是十月三日。")
+    index.rebuild()
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda _snapshot: ModelDirective(response="ok"),
+    )
+    runtime.world_graph.propose_entity(
+        EntityProposalRequest(
+            entity_key="entity:person:xiao_wang_topic",
+            entity_kind="person",
+            canonical_name="小王",
+            evidence_refs=(user_ref,),
+        ),
+        proposed_at=NOW + timedelta(minutes=1),
+    )
+
+    signal, reason = runtime._structured_topic_history_signal("小王生日是哪天？")
+    assert signal is True
+    assert reason == "explicit_entity_anchor"
+
+    state = runtime.topic_state.resolve(
+        user_input="小王生日是哪天？",
+        structured_history_signal=signal,
+        structured_signal_reason=reason,
+    )
+    assert state.history_may_help is True
+    assert "explicit_entity_anchor" in state.reason
+
+
 def test_summary_scheduler_drains_missed_windows_and_reopens_late_data(tmp_path):
     store, index = _world(tmp_path)
     ingest = ConversationIngestor(store)
