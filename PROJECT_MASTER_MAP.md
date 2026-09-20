@@ -22,13 +22,15 @@ AIOS v3.0 不是一个“聊天机器人外壳”，而是一个可长期运行�
         ↓
 快速索引 / 时间总结 / 事件与实体锚点
         ↓
+AIOS Core 维护当前 Topic State / Need-History
+        ↓
 AIOS 根据当前会话主动推荐相关历史
         ↓
-上下文中控组装本轮模型上下文
+上下文中控组装本轮模型上下文 + bounded relevant Goal/Task anchors
         ↓
-真实模型进行理解 / 搜索 / 比较 / 判断
+真实模型进行理解 / 搜索 / 比较 / 判断 / Event 形成
         ↓
-可修正认知 Claim / 关系 / AI经验 / 目标 / 任务 / 行动
+可修正 Claim / Event / 关系 / CommunicationExperience / CognitivePolicy / 目标 / 任务 / 行动
         ↓
 Evidence + Dependency + Revision
         ↓
@@ -68,9 +70,9 @@ Evidence + Dependency + Revision
 | P1 统一世界内核 | 恢复可靠 WorldObject / revision / transaction / idempotency | contracts、SQLiteWorldStore、Dependency | 重启后历史可读；写入原子；版本可追踪 | ✅ 已通过 |
 | P2 会话事实入世界 | 用户/AI对话作为事实进入统一世界 | ConversationIngestor、conversation continuity | 对话原文可永久追溯；retry 幂等 | ✅ 已通过 |
 | P3 智能世界索引底座 | 世界对象可重建快速检索 | WorldSearchIndex、watermark、candidate recall | Index 可重建；stale 可检测；不成为真相库 | ✅ 已通过 |
-| P4 会话主题记忆推荐 | 模型调用前由 AIOS 主动带出相关记忆 | ProactiveMemoryRecommender | 无主题=0；有主题才召回；模型仍可主动搜 | ✅ 已通过 |
+| P4 会话主题记忆推荐 | Core 维护当前 Topic State 并判断本轮是否需要历史，再由推荐器主动带出相关记忆 | TopicStateService、ProactiveMemoryRecommender | 无主题/无历史需要=0；代词/继续类主题可继承；模型仍可主动深搜 | ✅ 已通过并收口 |
 | P5 上下文中控 + Cognitive Runtime | 把当前输入、推荐、能力装配给模型 | ContextController、CapabilityRegistry、CognitiveRuntime | 程序不规定固定思维顺序；能力调用可审计 | ✅ 已通过 |
-| P6 单维度时间总结 | 日/周/月/年等总结成为世界快速入口 | DimensionSummaryService、Summary.content | 总结由模型生成；来源 pinned；不做跨维因果 | ✅ 已通过 |
+| P6 单维度时间总结 | 所有活跃维度按日/周/月/季/半年/年/3年/5年/10年形成可追溯快速入口 | DimensionSummaryService、MultiScaleSummaryScheduler、Summary.content | 系统只调度窗口/来源；语义文本由模型生成；来源 pinned；不做跨维因果 | ✅ 已通过并收口 |
 | P7 ALL_DIMENSIONS 全维投影 | 同一时间窗观察多个平级维度 | AllDimensionsProjectionService | 保留来源与类型；不产生父维度/自动因果 | ✅ 已通过 |
 | P8 认知写回闭环 | AI 将有证据认知写回世界 | EvidenceSet + Claim + Dependency | 无 pinned Evidence 不得写 Claim；原事实不改 | ✅ 已通过 |
 | P9 认知翻案与传播 | 新证据出现后让旧认知失效/修正并传播 | Revision / Retraction / Propagation | 依赖旧 Claim 的当前认知不能继续假装有效 | ✅ 已通过 P9 Gate |
@@ -79,11 +81,49 @@ Evidence + Dependency + Revision
 | P12 Goal / Task / Action / Outcome | AI 从理解走向持续目标与行动 | Goal、Task、Action、Outcome、Scheduler | 行动可授权、可回滚、Outcome 可学习 | ✅ 已通过 P12 Gate |
 | P13 数据接入与机械清洗 | 对话外现实持续进入世界 | 手机/App/传感器/相册/麦克风/日历等 adapter | 数据接入不得越权产生高阶认知 | ✅ 已通过 P13 Gate |
 | P14 长会话连续性完整接线 | 超长单会话不因 context limit 失忆 | rolling state、轮总结、summary drill-down | raw dialogue 永久保留；summary 只是索引 | ✅ 已通过 P14 Gate |
-| P15 周期 Review / AI 成长 | AI 定期回看世界、修正理解、沉淀经验 | periodic review、operation experience、strategy learning | 不以固定模板替代模型判断 | ✅ 已通过 P15 Gate |
+| P15 周期 Review / AI 成长 | AI 定期回看世界、修正理解、沉淀 Operation/Communication Experience，并可基于真实反馈调整 Cognitive Policy | periodic review、OperationExperience、CommunicationExperience、CognitivePolicy | 不以固定模板替代模型判断；经验/策略必须有真实证据且可回滚 | ✅ 已通过并收口 |
 | P16 多 Agent 长期入住测试 | 用真实模型和隐藏人生测试是否真的“活在世界中” | habitation harness / hidden-life / Current-Core target / run artifacts | harness 已合入；下一步是真实模型独立入住，不以关键词题库证明认知能力 | 🔵 当前主阶段 |
 | P17 Core Release Gate | 形成第一个稳定可运行 AIOS Core | reproducible build、full CI、migration report | 世界闭环、认知闭环、任务闭环均稳定 | ⏳ 待做 |
 | P18 平台适配 | 把同一套 Core 放到真实运行环境 | Android/Linux service、device adapters | Core 语义不因平台重写 | ⏳ 后置 |
 | P19 产品层 | AIOS UI、数字人、系统入口、设备体验 | Launcher/UI/Voice/Digital Human | 产品层不得反向污染 Core 世界语义 | ⏳ 后置 |
+
+---
+
+## 3.1 2026-09-20 宪法认知代码收口
+
+历史审查 `reviews/AIOS_V3_CONSTITUTION_CODE_ALIGNMENT_AUDIT_2026-09-20.md` 发现的代码缺口，已通过 PR #20 全部关闭并 squash merge 到：
+
+`8ddb7a606fda375aad98a0b2545a992c2497d828`
+
+正式进入主线的机制：
+
+- Adaptive Cognitive Policy：统一 WorldStore、版本、证据、AI 可变权限、evaluation window、forward rollback；
+- Event Dimension：resident form / revise / resolve / reject / merge / split；
+- CommunicationExperience：真实 user/world feedback 驱动的 communication experience writeback；
+- TopicStateService：Core 内部维护当前主题与 history-need gate；
+- MultiScaleSummaryScheduler：日/周/月/季/半年/年/3年/5年/10年；
+- 世界导航：entity focus / timeline / relation / Claim compare / raw observation drill-down / expand recall / Outcome inspect；
+- 普通用户轮次自动加入 bounded relevant Goal / Task / Action / Outcome anchors；
+- `SourceClass.PLATFORM` 与旧 WorldStore lossless migration；
+- capability schema 与 cockpit token-budget 去重，避免工具增多挤掉长会话/记忆上下文。
+
+验收 accepted head：`b8fa56df92fdb928e2168da2054364f6a91161fd`。
+
+16 个相关 workflow **全部 SUCCESS**，包括：
+
+- world-kernel / world-index / memory-recommendation / dimension-summary / fused-turn-runtime；
+- P9 / P10 / P11 / P12；
+- P14 long context / P15 periodic review / C09 wake；
+- P16 habitation / P16 convergence；
+- constitutional-cognition-closure。
+
+因此，**旧审查中的“缺 Event / Policy / CommunicationExperience / generic multi-scale Summary / topic-state orchestration”已不再是 P17 blocker。**
+
+当前唯一项目级阻塞仍然是 P16：
+
+> 尚未产生至少两个真实 provider/model 独立长期入住的可审计 cognition artifacts 与独立 oracle evaluator 证据。
+
+机械 Gate 不能替代真实模型认知证明，所以 P16 仍是 CONTINUE / NOT PASS，P17 仍不得启动。
 
 ---
 
