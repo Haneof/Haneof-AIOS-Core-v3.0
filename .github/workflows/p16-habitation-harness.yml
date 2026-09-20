@@ -3,6 +3,7 @@ name: p16-habitation-harness
 on:
   push:
     branches:
+      - "main"
       - "parallel/p16-habitation-harness-*"
     paths:
       - "tests/habitation/**"
