@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import datetime
 import hashlib
 import json
@@ -9,6 +10,113 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from .harness import HabitationRun, HabitationScenario, LifeEvent, ResidentEvent
+
+
+@dataclass(frozen=True, slots=True)
+class FixtureManifest:
+    scenario_id: str
+    scenario_version: str
+    seed: int
+    subject_id: str
+    resident_stream: str
+    evaluator_oracle: str
+
+
+@dataclass(frozen=True, slots=True)
+class LoadedFixture:
+    manifest: FixtureManifest
+    scenario: HabitationScenario
+
+
+def _safe_fixture_child(root: Path, relative: str, *, expected_dir: str) -> Path:
+    if not isinstance(relative, str) or not relative.strip():
+        raise ValueError("fixture path must be a non-empty string")
+    rel = Path(relative)
+    if rel.is_absolute() or ".." in rel.parts:
+        raise ValueError("fixture path must stay under the fixture root")
+    if not rel.parts or rel.parts[0] != expected_dir:
+        raise ValueError(
+            f"fixture path must live under {expected_dir}/"
+        )
+    root_resolved = root.resolve()
+    target = (root_resolved / rel).resolve()
+    if root_resolved not in target.parents:
+        raise ValueError("fixture path escaped fixture root")
+    return target
+
+
+def load_fixture_manifest(text: str) -> FixtureManifest:
+    raw = json.loads(text)
+    if not isinstance(raw, dict):
+        raise ValueError("fixture manifest must contain one object")
+    seed = raw.get("seed")
+    if not isinstance(seed, int) or isinstance(seed, bool) or seed < 0:
+        raise ValueError("manifest seed must be a non-negative integer")
+    return FixtureManifest(
+        scenario_id=_required_string(raw, "scenario_id"),
+        scenario_version=_required_string(raw, "scenario_version"),
+        seed=seed,
+        subject_id=_required_string(raw, "subject_id"),
+        resident_stream=_required_string(raw, "resident_stream"),
+        evaluator_oracle=_required_string(raw, "evaluator_oracle"),
+    )
+
+
+def load_fixture_bundle(
+    root: str | Path,
+    manifest_name: str,
+) -> LoadedFixture:
+    """Load one evaluator-side fixture while keeping resident/oracle files separate."""
+
+    root_path = Path(root).resolve()
+    if not isinstance(manifest_name, str) or not manifest_name.strip():
+        raise ValueError("manifest_name must be a non-empty string")
+    rel_manifest = Path(manifest_name)
+    if rel_manifest.is_absolute() or ".." in rel_manifest.parts:
+        raise ValueError("manifest path must stay under fixture root")
+    manifest_path = (root_path / rel_manifest).resolve()
+    if manifest_path.parent != root_path:
+        raise ValueError("manifest must live directly under fixture root")
+
+    manifest = load_fixture_manifest(manifest_path.read_text(encoding="utf-8"))
+    resident_path = _safe_fixture_child(
+        root_path,
+        manifest.resident_stream,
+        expected_dir="resident",
+    )
+    oracle_path = _safe_fixture_child(
+        root_path,
+        manifest.evaluator_oracle,
+        expected_dir="oracle",
+    )
+
+    events = load_resident_events_jsonl(
+        resident_path.read_text(encoding="utf-8")
+    )
+    oracle_raw = json.loads(oracle_path.read_text(encoding="utf-8"))
+    if not isinstance(oracle_raw, dict):
+        raise ValueError("oracle fixture must contain one object")
+    if oracle_raw.get("scenario_id") != manifest.scenario_id:
+        raise ValueError("oracle scenario_id does not match manifest")
+    for key, expected in (
+        ("scenario_version", manifest.scenario_version),
+        ("seed", manifest.seed),
+        ("subject_id", manifest.subject_id),
+    ):
+        if key not in oracle_raw:
+            raise ValueError(f"oracle missing {key}")
+        if oracle_raw[key] != expected:
+            raise ValueError(f"oracle {key} does not match manifest")
+
+    scenario = HabitationScenario(
+        scenario_id=manifest.scenario_id,
+        scenario_version=manifest.scenario_version,
+        seed=manifest.seed,
+        subject_id=manifest.subject_id,
+        events=events,
+        hidden_oracle=oracle_raw,
+    )
+    return LoadedFixture(manifest=manifest, scenario=scenario)
 
 
 def _parse_datetime(value: str) -> datetime:
