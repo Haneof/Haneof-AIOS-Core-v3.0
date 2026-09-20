@@ -279,7 +279,13 @@ class WakeBus:
         for ref in refs:
             if ref.revision is None:
                 raise ValueError("Wake evidence refs must pin exact revisions")
-            self.store.get_payload(ref.object_id, revision=ref.revision)
+            payload = self.store.get_payload(ref.object_id, revision=ref.revision)
+            ref_subject = str(payload.get("subject_id") or "")
+            if ref_subject != self.subject_id:
+                raise ValueError(
+                    "Wake evidence crosses the runtime subject scope: "
+                    f"{ref.object_id}@{ref.revision} belongs to {ref_subject!r}"
+                )
 
     def _current_wakes(self) -> tuple[Wake, ...]:
         return tuple(
