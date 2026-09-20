@@ -17,3 +17,11 @@
 {"event_id":"d016-chat-10","occurred_at":"2027-01-14T19:20:00+00:00","channel":"conversation","payload":"周一消防检查那个事先帮我记着。不要每天提醒，周日如果我还没准备好再叫我。","metadata":{"session":"jan14-evening"}}
 {"event_id":"d017-photo","occurred_at":"2027-01-15T08:10:00+00:00","channel":"photo_description","payload":"烘焙店后场工作台，灭火器旁堆着两个面粉袋，安全通道仍可通行，但空间变窄。","metadata":{"source":"wearable_camera"}}
 {"event_id":"d018-chat-11","occurred_at":"2027-01-15T20:45:00+00:00","channel":"conversation","payload":"今天先这样，消防检查的准备周日再看。还有，别因为看到两袋面粉就断定通道不合格，有问题要按证据说。","metadata":{"session":"jan15-night"}}
+{"event_id":"d019-pos","occurred_at":"2027-01-16T14:30:00+00:00","channel":"pos_daily","payload":{"store":"bakery","gross_sales":1342.2,"orders":101,"refunds":1,"currency":"USD"},"metadata":{"source":"pos"}}
+{"event_id":"d020-note","occurred_at":"2027-01-16T19:00:00+00:00","channel":"note","payload":"消防检查准备：还没整理灭火器周围，也没打印通道记录。计划周日处理。","metadata":{"source":"notes_app"}}
+{"event_id":"d021-pos","occurred_at":"2027-01-17T16:05:00+00:00","channel":"pos_daily","payload":{"store":"bakery","gross_sales":1198.9,"orders":87,"refunds":0,"currency":"USD"},"metadata":{"source":"pos"}}
+{"event_id":"d022-chat-12","occurred_at":"2027-01-17T16:30:00+00:00","channel":"conversation","payload":"你提醒得正好，我确实还没准备。现在去把灭火器周围清开，把通道记录打印出来。","metadata":{"session":"jan17-afternoon"}}
+{"event_id":"d023-photo","occurred_at":"2027-01-17T19:10:00+00:00","channel":"photo_description","payload":"烘焙店后场：灭火器周围已清空，通道无面粉袋堆放；工作台上放着一份标题为“通道记录”的打印纸。","metadata":{"source":"wearable_camera"}}
+{"event_id":"d024-chat-13","occurred_at":"2027-01-17T20:00:00+00:00","channel":"conversation","payload":"我已经把灭火器周围清开，通道记录也打印好了。照片能看到这些，但别因为这样就说消防检查一定能过，等明天实际结果。","metadata":{"session":"jan17-evening"}}
+{"event_id":"d025-chat-14","occurred_at":"2027-01-18T17:00:00+00:00","channel":"conversation","payload":"消防检查结束了，检查员说通过，没有要求整改。这个结果可以记下来。","metadata":{"session":"jan18-after-inspection"}}
+{"event_id":"d026-pos","occurred_at":"2027-01-18T20:00:00+00:00","channel":"pos_daily","payload":{"store":"bakery","gross_sales":1261.4,"orders":93,"refunds":1,"currency":"USD"},"metadata":{"source":"pos"}}
