@@ -1,0 +1,4 @@
+{"event_id":"d01-chat","occurred_at":"2026-03-01T09:00:00+00:00","channel":"conversation","payload":"下周三我要去西雅图出差，早上8点的航班。","metadata":{"session":"s1"}}
+{"event_id":"d02-calendar","occurred_at":"2026-03-02T12:00:00+00:00","channel":"calendar","payload":{"title":"Seattle trip","start":"2026-03-11T08:00:00-08:00"},"metadata":{"source":"calendar"}}
+{"event_id":"d08-chat","occurred_at":"2026-03-08T21:00:00+00:00","channel":"conversation","payload":"那天早上我大概几点出门比较合适？","metadata":{"session":"s2"}}
+{"event_id":"d09-note","occurred_at":"2026-03-09T18:00:00+00:00","channel":"note","payload":"机场停车改成预约网约车。","metadata":{"source":"notes"}}

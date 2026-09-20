@@ -1,0 +1,4 @@
+{"event_id":"d01-order","occurred_at":"2026-05-01T12:00:00+00:00","channel":"order","payload":{"item":"攀岩鞋","quantity":1},"metadata":{"source":"shopping"}}
+{"event_id":"d03-chat","occurred_at":"2026-05-03T19:00:00+00:00","channel":"conversation","payload":"朋友约我去了一次攀岩馆，鞋是临时买的。","metadata":{"session":"s1"}}
+{"event_id":"d10-photo-note","occurred_at":"2026-05-10T17:00:00+00:00","channel":"photo_description","payload":"周末在公园散步，和朋友喝咖啡。","metadata":{"source":"gallery_summary"}}
+{"event_id":"d21-chat","occurred_at":"2026-05-21T21:00:00+00:00","channel":"conversation","payload":"最近周末有什么轻松一点的活动建议？","metadata":{"session":"s2"}}

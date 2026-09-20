@@ -1,0 +1,9 @@
+{
+  "scenario_id": "cross-session-continuity-v1",
+  "scenario_version": "1",
+  "seed": 20260921,
+  "subject_id": "synthetic-user-002",
+  "resident_stream": "resident/cross_session_continuity_v1.jsonl",
+  "evaluator_oracle": "oracle/cross_session_continuity_v1.json",
+  "purpose": "Cross-session reference resolution and relevant-memory recall"
+}

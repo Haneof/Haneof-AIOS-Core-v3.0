@@ -1,0 +1,5 @@
+{"event_id":"d01-chat","occurred_at":"2026-01-01T09:00:00+00:00","channel":"conversation","payload":"这道题我不会，你带我一步一步做。","metadata":{"session":"week-1"}}
+{"event_id":"d07-calendar","occurred_at":"2026-01-07T18:00:00+00:00","channel":"calendar","payload":{"title":"独立复习","duration_minutes":45},"metadata":{"source":"calendar"}}
+{"event_id":"d14-chat","occurred_at":"2026-01-14T20:00:00+00:00","channel":"conversation","payload":"这次我先自己做完了，只想让你检查思路。","metadata":{"session":"week-2"}}
+{"event_id":"d21-note","occurred_at":"2026-01-21T19:30:00+00:00","channel":"note","payload":"把今天做错的两道题重新整理了一遍。","metadata":{"source":"notes"}}
+{"event_id":"d35-chat","occurred_at":"2026-02-04T21:00:00+00:00","channel":"conversation","payload":"今天状态很差，简单题也卡住了。","metadata":{"session":"week-5"}}
