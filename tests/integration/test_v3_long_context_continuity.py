@@ -523,3 +523,58 @@ def test_token_truncation_keeps_on_demand_summary_to_raw_recovery_path(tmp_path)
         "drill_down_conversation",
     ]
     assert result.runtime.response == "recovered from raw after truncation"
+
+
+
+def test_long_session_rolls_forward_in_order_without_replacing_raw_dialogue(tmp_path):
+    store, index = _world(tmp_path)
+
+    def model(snapshot):
+        return ModelDirective(response=f"reply:{snapshot.user_input}")
+
+    def summarize(request):
+        return (
+            f"session window {request.turn_start}-{request.turn_end}; "
+            f"sources={len(request.sources)}"
+        )
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+        round_summary_handler=summarize,
+        recent_turn_limit=2,
+        summary_chunk_turns=4,
+        max_round_summaries_per_turn=1,
+    )
+    for turn in range(1, 19):
+        runtime.run_turn(
+            session_id="long-running",
+            turn_index=turn,
+            user_input=f"long-question-{turn}",
+            current_topic=None,
+            occurred_at=NOW + timedelta(minutes=turn),
+        )
+
+    rebuilt = ConversationContinuityService(
+        store=store,
+        index=index,
+    ).snapshot(
+        session_id="long-running",
+        before_turn=19,
+        recent_turn_limit=2,
+        summary_chunk_turns=4,
+    )
+
+    assert [
+        (item["turn_start"], item["turn_end"])
+        for item in rebuilt.round_summaries
+    ] == [(1, 4), (5, 8), (9, 12), (13, 16)]
+    assert [item["turn_index"] for item in rebuilt.recent_turns] == [17, 18]
+    assert rebuilt.pending_summary is None
+
+    raw = store.list_payloads(object_type=ObjectType.OBSERVATION)
+    assert len(raw) == 36
+    summaries = store.list_payloads(object_type=ObjectType.SUMMARY)
+    assert len(summaries) == 4
+    assert sum(len(item["source_refs"]) for item in summaries) == 32
