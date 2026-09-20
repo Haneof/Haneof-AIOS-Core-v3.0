@@ -1690,14 +1690,41 @@ class FusedTurnRuntime:
         )
         return asdict(receipt)
 
+    def run_due_dimension_summaries(
+        self,
+        *,
+        now: datetime,
+        scales: Sequence[str | SummaryScale] = tuple(SummaryScale),
+        max_jobs: int = 64,
+        dimensions: Sequence[str] | None = None,
+    ) -> SummaryScheduleResult:
+        """Run deterministic summary scheduling with model-generated content.
+
+        This is maintenance, not resident cognition. The scheduler chooses only
+        dimensions/windows/sources; the injected dimension_summary_handler writes the
+        descriptive text and cannot alter raw facts.
+        """
+
+        if self.dimension_summary_scheduler is None:
+            raise RuntimeError(
+                "dimension_summary_handler is required for semantic dimension summaries"
+            )
+        parsed = tuple(SummaryScale(item) for item in scales)
+        return self.dimension_summary_scheduler.run_due(
+            now=now,
+            scales=parsed,
+            max_jobs=max_jobs,
+            dimensions=dimensions,
+        )
+
     def run_turn(
         self,
         *,
         session_id: str,
         turn_index: int,
         user_input: str,
-        current_topic: str | None,
         occurred_at: datetime,
+        current_topic: str | None = None,
         recent_turns: Sequence[Mapping[str, Any]] = (),
         ai_identity: Mapping[str, Any] | None = None,
         task_context: Mapping[str, Any] | None = None,
