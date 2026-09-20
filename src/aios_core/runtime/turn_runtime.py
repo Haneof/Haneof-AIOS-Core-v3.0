@@ -789,6 +789,24 @@ class FusedTurnRuntime:
             side_effect_authorizer=self._authorize_side_effect,
         )
 
+    def _cockpit_capability_catalog(self) -> tuple[dict[str, Any], ...]:
+        """Compact capability awareness for context budgeting.
+
+        CognitiveRuntime already supplies the full schemas/descriptions separately in
+        RuntimeSnapshot.capability_catalog. Repeating the full tool schema inside the
+        cockpit wastes context budget and can evict memory/continuity. The cockpit only
+        needs enough information to tell the model which named abilities exist.
+        """
+
+        return tuple(
+            {
+                "name": item["name"],
+                "kind": item["kind"],
+                "side_effecting": bool(item.get("side_effecting", False)),
+            }
+            for item in self.registry.catalog()
+        )
+
     def _search_world(self, query: str, limit: int = 8) -> list[dict[str, Any]]:
         page = self.index.recall_candidates(
             str(query),
@@ -1844,7 +1862,7 @@ class FusedTurnRuntime:
             conversation_summaries=continuity_snapshot.round_summaries,
             ai_identity=continuity_context,
             task_context=current_task_context,
-            capability_catalog=self.registry.catalog(),
+            capability_catalog=self._cockpit_capability_catalog(),
             token_budget=token_budget,
         )
 
