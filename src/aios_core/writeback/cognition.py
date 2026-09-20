@@ -10,7 +10,7 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Sequence
+from typing import Any, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -33,6 +33,7 @@ class ClaimWriteRequest(BaseModel):
     claim_type: ClaimType = ClaimType.INFERENCE
     knowledge_state: KnowledgeState = KnowledgeState.INFERRED
     claimant_id: str = "resident_ai"
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def validate_refs(self) -> "ClaimWriteRequest":
@@ -154,6 +155,7 @@ class CognitionWritebackService:
                 coverage_ratio=1.0,
             ),
             metadata={
+                **request.metadata,
                 "dimension": request.dimension,
                 "writeback_kind": "cognition_evidence",
             },
@@ -175,6 +177,7 @@ class CognitionWritebackService:
             confidence=request.confidence,
             support_evidence_set_refs=[evidence_ref],
             metadata={
+                **request.metadata,
                 "dimension": request.dimension,
                 "writeback_kind": "revisable_cognition",
             },
