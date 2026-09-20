@@ -9,13 +9,25 @@ from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import TemporalExtent
 from aios_core.execution import TaskCreateRequest
+from aios_core.ingest import (
+    MechanicalSeriesPolicy,
+    NumericSample,
+    RealityIngestService,
+    SourceAdapterSpec,
+)
 from aios_core.query.search import WorldSearchIndex
 from aios_core.review import ReviewSchedulePolicy
 from aios_core.runtime.capabilities import CapabilityCall
 from aios_core.runtime.cognitive_runtime import ModelDirective
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
-from aios_core.wake import Step0GateInput, WakeBus, WakeSignalRequest
+from aios_core.wake import (
+    ObservationTriggerService,
+    ObservationWakeRule,
+    Step0GateInput,
+    WakeBus,
+    WakeSignalRequest,
+)
 
 
 NOW = datetime(2026, 9, 20, 18, 0, tzinfo=timezone.utc)
@@ -59,6 +71,74 @@ def _world(tmp_path):
     index = WorldSearchIndex(db, store=store)
     index.rebuild()
     return store, index
+
+
+def test_registered_numeric_change_marker_can_mechanically_create_wake(tmp_path) -> None:
+    store, index = _world(tmp_path)
+    ingest = RealityIngestService(store=store, index=index)
+    heart_rate = SourceAdapterSpec(
+        adapter_id="sensor.heart_rate.c09",
+        source_kind="heart_rate",
+        dimension="dim:heart_rate",
+        source_class=SourceClass.SENSOR,
+        default_modality="numeric",
+    )
+    receipt = ingest.ingest_numeric_series(
+        heart_rate,
+        series_id="c09-hr-window",
+        samples=(
+            NumericSample(
+                external_record_id="hr-a",
+                occurred_at=NOW,
+                value=80.0,
+            ),
+            NumericSample(
+                external_record_id="hr-b",
+                occurred_at=NOW + timedelta(minutes=1),
+                value=105.0,
+            ),
+        ),
+        policy=MechanicalSeriesPolicy(
+            tolerance=3.0,
+            change_threshold=15.0,
+            max_gap_seconds=120.0,
+        ),
+        unit="bpm",
+        received_at=NOW + timedelta(minutes=2),
+    )
+    assert len(receipt.change_observation_ids) == 1
+    change_ref = ObjectRef(
+        object_id=receipt.change_observation_ids[0],
+        revision=1,
+    )
+
+    bus = WakeBus(store=store, index=index)
+    trigger = ObservationTriggerService(
+        store=store,
+        wake_bus=bus,
+    )
+    rules = (
+        ObservationWakeRule(
+            rule_id="heart-rate.numeric-change.registered",
+            wake_source=WakeSource.MECHANICAL_CHANGE,
+            source_kind="heart_rate",
+            modality="numeric_change",
+            metadata_equals={"mechanical_threshold_event": True},
+            dedupe_metadata_keys=("adapter_id", "series_id"),
+            priority=70,
+            cooldown_seconds=300,
+        ),
+    )
+    wakes = trigger.evaluate_observation(change_ref, rules=rules)
+
+    assert len(wakes) == 1
+    wake = bus.current_wake(wakes[0].wake_id)
+    assert wake.wake_source is WakeSource.MECHANICAL_CHANGE
+    assert wake.evidence_refs == [change_ref]
+    assert wake.metadata["trigger_kind"] == "registered_observation_rule"
+
+    # The trigger layer produces no semantic cognition.
+    assert not store.list_payloads(object_type=ObjectType.CLAIM)
 
 
 def test_wake_signal_contract_has_no_semantic_conclusion_field() -> None:
