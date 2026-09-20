@@ -259,5 +259,29 @@
         }
       }
     ]
+  },
+  "8ba4cbeda7b555d030b097c25dd1330b58579eb0e0042238dd0d5d48e2cbcaf8": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_task",
+        "call_id": "sol-jan08-start-message-task",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_57a01b42b3d5f384db661bda",
+            "revision": 4
+          },
+          "new_state": "running",
+          "reason": "The user selected the receiver and explicitly requested a message be sent to Xiao Zhao.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_ad04153c39dba332be3f72aa",
+              "revision": 1
+            }
+          ],
+          "next_step": "提出外部消息 Action；不把用户同意等同于平台授权或执行成功。"
+        }
+      }
+    ]
   }
 }
