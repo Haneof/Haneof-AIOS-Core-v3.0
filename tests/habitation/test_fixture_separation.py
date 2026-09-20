@@ -61,6 +61,7 @@ def test_catalog_scenarios_have_separate_resident_and_oracle_files() -> None:
         assert manifest["scenario_id"] == entry["scenario_id"]
         assert manifest["resident_stream"].startswith("resident/")
         assert manifest["evaluator_oracle"].startswith("oracle/")
+        assert isinstance(manifest.get("end_at"), str)
 
         resident_path = FIXTURES / manifest["resident_stream"]
         oracle_path = FIXTURES / manifest["evaluator_oracle"]
@@ -123,6 +124,9 @@ def test_every_catalog_fixture_bundle_has_matching_resident_and_oracle_identity(
         assert scenario.scenario_version == manifest.scenario_version
         assert scenario.seed == manifest.seed
         assert scenario.subject_id == manifest.subject_id
+        assert scenario.end_at == manifest.end_at
+        assert scenario.end_at is not None
+        assert scenario.end_at >= max(event.occurred_at for event in scenario.events)
         assert scenario.hidden_oracle["scenario_id"] == manifest.scenario_id
         assert scenario.hidden_oracle["scenario_version"] == manifest.scenario_version
         assert scenario.hidden_oracle["seed"] == manifest.seed
