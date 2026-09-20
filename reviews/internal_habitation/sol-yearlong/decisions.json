@@ -1521,5 +1521,22 @@
         }
       }
     ]
+  },
+  "ae4e12ca9ad784f41be9541c8426f68f29ca4be4fc710f3a0761d87b3a687023": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "call_id": "sol-jan08-inspect-action-after-task-cancel",
+        "arguments": {
+          "object_id": "action_96c74ab2565b5052458a66cd"
+        }
+      },
+      {
+        "name": "read_execution_world",
+        "call_id": "sol-jan08-read-execution-after-task-cancel",
+        "arguments": {}
+      }
+    ]
   }
 }
