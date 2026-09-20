@@ -725,5 +725,18 @@
   },
   "205e3e7413fa5be3f7510a8382a2357ece84170d9f7204f05dfad81942c95c6f": {
     "kind": "silence"
+  },
+  "718f8a1fab2e00da76015b77a6cb7e465b42e730389578dd8e793e3670eea819": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "search_world",
+        "call_id": "sol-jan12-find-old-northmill-invoice",
+        "arguments": {
+          "query": "North Mill bread flour 1.38 old invoice 旧发票",
+          "limit": 12
+        }
+      }
+    ]
   }
 }
