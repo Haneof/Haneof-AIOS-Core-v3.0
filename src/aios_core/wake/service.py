@@ -377,26 +377,37 @@ class WakeBus:
             dict(request.metadata),
         )
 
-        same_key = [
+        same_scope = [
             wake
             for wake in self._current_wakes()
             if wake.dedupe_key == request.dedupe_key
+            and wake.wake_source is request.wake_source
+            and wake.rule_id == request.rule_id
         ]
-        same_key.sort(key=lambda wake: as_utc(wake.last_hit_at, "last_hit_at"))
-        latest = same_key[-1] if same_key else None
+        same_scope.sort(key=lambda wake: as_utc(wake.last_hit_at, "last_hit_at"))
+        latest = same_scope[-1] if same_scope else None
 
-        if latest is not None:
+        # Exact signal retry is idempotent even if later Wakes in the same scope
+        # already exist. Search the full scope history rather than only the newest
+        # Wake so a delayed retry cannot become a fresh hit.
+        for prior in reversed(same_scope):
             prior_signal_ids = tuple(
                 str(item)
-                for item in (latest.metadata.get("signal_ids") or ())
+                for item in (prior.metadata.get("signal_ids") or ())
             )
             if signal_id in prior_signal_ids:
                 return WakeSignalReceipt(
-                    wake_id=latest.object_id,
-                    revision=latest.revision,
-                    state=latest.wake_state.value,
+                    wake_id=prior.object_id,
+                    revision=prior.revision,
+                    state=prior.wake_state.value,
                     world_revision=int(self.store.current_world_revision()),
                 )
+
+        if latest is not None and moment < as_utc(
+            latest.last_hit_at,
+            "last_hit_at",
+        ):
+            raise ValueError("out-of-order Wake hit for existing trigger scope")
 
         # A queued/new Wake represents the same continuous pending situation. Merge
         # hits into that one durable object rather than flooding the resident model.
@@ -405,8 +416,6 @@ class WakeBus:
             WakeState.QUEUED,
         }:
             last = as_utc(latest.last_hit_at, "last_hit_at")
-            if moment < last:
-                raise ValueError("out-of-order Wake hit for existing dedupe_key")
 
             merged_refs = list(latest.evidence_refs)
             for ref in refs:
