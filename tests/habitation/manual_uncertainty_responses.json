@@ -59,5 +59,18 @@
     "snapshot_signature": "a4ad3ff8629f7f409e443e5ba724a8b7506bf85b26307b87ba0299dab5b86623",
     "type": "response",
     "text": "如果周末想轻松一点，可以选低门槛的：公园散步、和朋友喝咖啡、逛书店或小展览、看电影，或者在家慢慢做顿饭。你最近确实有过公园散步和喝咖啡这样的安排，我把它们只当作近期可参考的选项，不代表这是你的长期偏好。之前那次攀岩是朋友约的一次性活动，我也不会因为买过攀岩鞋就把它当成你的固定兴趣。"
+  },
+  {
+    "snapshot_signature": "681220edeca05a93779d9ac36807e0c4dedee8a7dc6d570579502451d664c80e",
+    "type": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 10
+        }
+      }
+    ]
   }
 ]
