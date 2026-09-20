@@ -221,7 +221,10 @@ class ObservationTriggerService:
                     )
                 dedupe_values[key] = observation.metadata[key]
 
-            observed_at = observation.occurred.start or observation.recorded_at
+            # Wake time is when AIOS evaluated/recorded the fact, not when the
+            # underlying real-world event originally occurred. Historical imports
+            # must not fabricate Wakes in the past.
+            observed_at = observation.recorded_at
             dedupe_key = _stable_id(
                 "observation_wake_scope",
                 self.subject_id,
