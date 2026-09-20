@@ -44,6 +44,13 @@ from aios_core.recommendation.proactive import (
     RecommendationBundle,
 )
 from aios_core.revision.service import ClaimRevisionRequest, CognitionRevisionService
+from aios_core.review import (
+    OperationExperienceRequest,
+    PeriodicReviewRequest,
+    PeriodicReviewService,
+    ReviewSchedulePolicy,
+    ReviewWakeReceipt,
+)
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 from aios_core.contracts.refs import ObjectRef
@@ -60,6 +67,14 @@ class FusedTurnResult:
     conversation_commit: ConversationCommit
     continuity_summary_commits: tuple[RoundSummaryCommit, ...] = ()
     continuity_summary_error: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class PeriodicReviewRunResult:
+    request: PeriodicReviewRequest
+    runtime: RuntimeTurnResult
+    context: ModelContextBundle
+    wake: ReviewWakeReceipt
 
 
 class FusedTurnRuntime:
@@ -135,8 +150,14 @@ class FusedTurnRuntime:
             index=index,
             subject_id=subject_id,
         )
+        self.periodic_review = PeriodicReviewService(
+            store=store,
+            index=index,
+            subject_id=self.subject_id,
+        )
         self._active_turn_time: datetime | None = None
         self._active_session_id: str | None = None
+        self._active_review_request: PeriodicReviewRequest | None = None
 
         registry = CapabilityRegistry()
         registry.register(
@@ -156,6 +177,21 @@ class FusedTurnRuntime:
                 input_schema={"object_id": "string", "revision": "integer?"},
             ),
             self._inspect_world_object,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="read_periodic_review_anchors",
+                description=(
+                    "Read a bounded page of the evidence anchors selected for the "
+                    "currently active periodic review. Available only during review."
+                ),
+                kind=CapabilityKind.READ,
+                input_schema={
+                    "offset": "integer?",
+                    "limit": "integer?",
+                },
+            ),
+            self._read_periodic_review_anchors,
         )
         registry.register(
             CapabilitySpec(
@@ -437,6 +473,29 @@ class FusedTurnRuntime:
         )
         registry.register(
             CapabilitySpec(
+                name="commit_operation_experience",
+                description=(
+                    "During an active periodic review, persist a model-authored "
+                    "operation experience grounded in pinned real case refs."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "problem_type": "string",
+                    "method_path": "array[string]",
+                    "result_summary": "string",
+                    "positive_case_refs": "array[{object_id:string,revision:integer}]?",
+                    "negative_case_refs": "array[{object_id:string,revision:integer}]?",
+                    "applicability": "object?",
+                    "cost": "object[number]?",
+                    "misses": "array[string]?",
+                    "experience_state": "string?",
+                },
+            ),
+            self._commit_operation_experience,
+        )
+        registry.register(
+            CapabilitySpec(
                 name="revise_claim",
                 description=(
                     "Create a forward-only new revision of the current Claim and mark "
@@ -503,6 +562,23 @@ class FusedTurnRuntime:
         revision: int | None = None,
     ) -> dict[str, Any]:
         return self.store.get_payload(str(object_id), revision=revision)
+
+    def _read_periodic_review_anchors(
+        self,
+        offset: int = 0,
+        limit: int = 20,
+    ) -> list[dict[str, Any]]:
+        request = self._active_review_request
+        if request is None:
+            raise RuntimeError(
+                "read_periodic_review_anchors is only available during periodic review"
+            )
+        start = max(0, int(offset))
+        take = max(1, min(int(limit), 50))
+        return [
+            anchor.model_dump(mode="json")
+            for anchor in request.anchors[start : start + take]
+        ]
 
     def _list_conversation_summaries(
         self,
@@ -854,9 +930,42 @@ class FusedTurnRuntime:
             "create_task",
             "transition_task",
             "propose_action",
+            "commit_operation_experience",
             "revise_claim",
             "retract_claim",
         }
+
+    def _commit_operation_experience(
+        self,
+        problem_type: str,
+        method_path: Sequence[str],
+        result_summary: str,
+        positive_case_refs: Sequence[Mapping[str, Any]] = (),
+        negative_case_refs: Sequence[Mapping[str, Any]] = (),
+        applicability: Mapping[str, Any] | None = None,
+        cost: Mapping[str, float] | None = None,
+        misses: Sequence[str] = (),
+        experience_state: str = "candidate",
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None or self._active_review_request is None:
+            raise RuntimeError(
+                "commit_operation_experience is only available during active periodic review"
+            )
+        receipt = self.periodic_review.commit_operation_experience(
+            OperationExperienceRequest(
+                problem_type=problem_type,
+                method_path=tuple(method_path),
+                result_summary=result_summary,
+                positive_case_refs=self._coerce_refs(positive_case_refs),
+                negative_case_refs=self._coerce_refs(negative_case_refs),
+                applicability=dict(applicability or {}),
+                cost=dict(cost or {}),
+                misses=tuple(misses),
+                experience_state=experience_state,
+            ),
+            learned_at=self._active_turn_time,
+        )
+        return asdict(receipt)
 
     def _commit_ai_world_claim(
         self,
@@ -1145,3 +1254,95 @@ class FusedTurnRuntime:
             continuity_summary_error=summary_error,
         )
 
+
+
+    def run_periodic_review(
+        self,
+        *,
+        now: datetime,
+        policy: ReviewSchedulePolicy | None = None,
+        token_budget: int | None = None,
+    ) -> PeriodicReviewRunResult | None:
+        """Run one due evidence-grounded background review through the resident model.
+
+        This path does not create a synthetic Conversation Observation. The Wake and
+        any cognition/experience written by model capabilities are the durable audit.
+        """
+        request = self.periodic_review.prepare_due_review(
+            now=now,
+            policy=policy,
+        )
+        if request is None:
+            return None
+
+        request = self.periodic_review.begin_review(
+            request,
+            started_at=now,
+        )
+        self.index.catch_up()
+
+        empty_recommendation = RecommendationBundle(
+            current_topic=None,
+            topic_gate_open=False,
+            world_revision=int(self.store.current_world_revision()),
+            index_watermark=self.index.watermark(),
+            cards=(),
+            reason="periodic_review_does_not_use_proactive_memory_injection",
+        )
+        continuity_context = self.ai_world.core_context(per_domain=3)
+        review_context = {
+            "review_id": request.review_id,
+            "wake_ref": request.wake_ref.model_dump(mode="json"),
+            "window_start": request.window_start.isoformat(),
+            "window_end": request.window_end.isoformat(),
+            "anchor_count": len(request.anchors),
+            "anchor_reader": "read_periodic_review_anchors",
+            "instruction": request.instruction,
+        }
+        review_input = (
+            "Periodic review wake. Inspect the selected world anchors, then decide "
+            "whether any evidence-grounded cognition or operation experience should "
+            "be revised, created, or left unchanged."
+        )
+        context = self.context_controller.assemble(
+            user_input=review_input,
+            current_topic=None,
+            recommendation=empty_recommendation,
+            recent_turns=(),
+            conversation_summaries=(),
+            ai_identity=continuity_context,
+            task_context={"periodic_review": review_context},
+            capability_catalog=self.registry.catalog(),
+            token_budget=token_budget,
+        )
+
+        self._active_turn_time = now
+        self._active_session_id = None
+        self._active_review_request = request
+        try:
+            runtime_result = self.cognitive_runtime.run_turn(
+                review_input,
+                wake_reason="periodic_review",
+                cockpit=context.as_cockpit(),
+            )
+        finally:
+            self._active_review_request = None
+            self._active_turn_time = None
+            self._active_session_id = None
+
+        wake = self.periodic_review.complete_review(
+            request,
+            completed_at=now,
+            termination_reason=runtime_result.termination_reason,
+            model_rounds=runtime_result.model_rounds,
+            capability_names=[
+                result.name for result in runtime_result.capability_history
+            ],
+        )
+        self.index.catch_up()
+        return PeriodicReviewRunResult(
+            request=request,
+            runtime=runtime_result,
+            context=context,
+            wake=wake,
+        )
