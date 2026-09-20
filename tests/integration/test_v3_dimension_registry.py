@@ -196,3 +196,9 @@ def test_archive_preserves_all_previous_dimension_revisions(tmp_path):
     assert store.get_payload(proposed.dimension_id, revision=1)["lifecycle"] == "candidate"
     assert store.get_payload(proposed.dimension_id, revision=3)["lifecycle"] == "active"
     assert store.get_payload(proposed.dimension_id, revision=4)["lifecycle"] == "archived"
+
+    current = index.recall_candidates(
+        "学习能力",
+        object_types=["dimension_definition"],
+    )
+    assert proposed.dimension_id not in {hit.object_id for hit in current.hits}
