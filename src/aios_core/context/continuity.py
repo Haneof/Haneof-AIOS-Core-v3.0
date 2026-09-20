@@ -726,6 +726,10 @@ class ConversationContinuityService:
                 str(ref["object_id"]),
                 revision=int(ref["revision"]),
             )
+            if str(raw.get("subject_id") or "") != self.subject_id:
+                raise ValueError(
+                    "conversation summary source crosses the continuity subject scope"
+                )
             raw_meta = raw.get("metadata") or {}
             messages.append(
                 ConversationMessage(
