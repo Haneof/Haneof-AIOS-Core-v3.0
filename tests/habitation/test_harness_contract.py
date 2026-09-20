@@ -19,9 +19,14 @@ BASE = datetime(2026, 9, 20, 8, 0, tzinfo=timezone.utc)
 
 
 class RecordingTarget:
-    def __init__(self, label: str) -> None:
+    def __init__(self, label: str, *, isolation_key: str | None = None) -> None:
         self.label = label
+        self._isolation_key = isolation_key or f"world:{label}:{id(self)}"
         self.events: list[ResidentEvent] = []
+
+    @property
+    def isolation_key(self) -> str:
+        return self._isolation_key
 
     def handle_event(self, event: ResidentEvent):
         self.events.append(event)
@@ -101,6 +106,8 @@ def test_runner_does_not_require_a_fixed_expected_answer() -> None:
     scenario = _scenario()
 
     class FreeFormTarget:
+        isolation_key = "world:free-form"
+
         def handle_event(self, event: ResidentEvent):
             if event.channel == "conversation":
                 return "I may need more evidence before changing my understanding."
@@ -237,8 +244,11 @@ def test_factory_path_creates_fresh_world_per_model_candidate() -> None:
     scenario = _scenario()
     created: list[RecordingTarget] = []
 
+    descriptors = []
+
     class Factory:
-        def __call__(self, *, model_id: str, scenario: HabitationScenario):
+        def __call__(self, *, model_id: str, scenario):
+            descriptors.append(scenario)
             target = RecordingTarget(model_id)
             created.append(target)
             return target
@@ -253,6 +263,8 @@ def test_factory_path_creates_fresh_world_per_model_candidate() -> None:
     )
 
     assert len(created) == 3
+    assert all(not hasattr(item, "hidden_oracle") for item in descriptors)
+    assert all(item.visible_event_count == 2 for item in descriptors)
     assert len({id(target) for target in created}) == 3
     assert set(result.runs) == {
         "provider/model-a",
@@ -267,7 +279,7 @@ def test_factory_path_rejects_factory_that_reuses_one_world() -> None:
     shared = RecordingTarget("shared")
 
     class BadFactory:
-        def __call__(self, *, model_id: str, scenario: HabitationScenario):
+        def __call__(self, *, model_id: str, scenario):
             return shared
 
     with pytest.raises(ValueError, match="independent AIOS target instance"):
@@ -276,5 +288,20 @@ def test_factory_path_rejects_factory_that_reuses_one_world() -> None:
             factories={
                 "provider/model-a": BadFactory(),
                 "provider/model-b": BadFactory(),
+            },
+        )
+
+
+def test_distinct_target_wrappers_cannot_share_one_world_store_identity() -> None:
+    scenario = _scenario()
+    first = RecordingTarget("a", isolation_key="sqlite:/tmp/shared-world.db")
+    second = RecordingTarget("b", isolation_key="sqlite:/tmp/shared-world.db")
+
+    with pytest.raises(ValueError, match="independent AIOS world/store"):
+        HabitationRunner().run_models(
+            scenario=scenario,
+            targets={
+                "provider/model-a": first,
+                "provider/model-b": second,
             },
         )
