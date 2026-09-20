@@ -3,3 +3,7 @@
 from .proactive import MemoryCard, ProactiveMemoryRecommender, RecommendationBundle
 
 __all__ = ["MemoryCard", "ProactiveMemoryRecommender", "RecommendationBundle"]
+
+from .topic_state import TopicState, TopicStateService
+
+__all__ += ["TopicState", "TopicStateService"]

@@ -23,11 +23,13 @@ from aios_core.context.continuity import (
     RoundSummaryRequest,
 )
 from aios_core.context.controller import ContextController, ModelContextBundle
+from aios_core.communication import CommunicationExperienceRequest, CommunicationExperienceService
 from aios_core.dimensions import (
     DimensionProposalRequest,
     DimensionRegistryService,
     DimensionTransitionRequest,
 )
+from aios_core.events import EventDimensionService, EventTransitionRequest, EventWriteRequest
 from aios_core.execution import (
     ActionProposalRequest,
     GoalCreateRequest,
@@ -37,12 +39,14 @@ from aios_core.execution import (
     TaskTransitionRequest,
 )
 from aios_core.ingest.conversation import ConversationCommit, ConversationIngestor
+from aios_core.policy import CognitivePolicyRegistry, CognitivePolicyUpdateRequest
 from aios_core.projections.all_dimensions import AllDimensionsProjectionService
 from aios_core.query.search import WorldSearchIndex
 from aios_core.recommendation.proactive import (
     ProactiveMemoryRecommender,
     RecommendationBundle,
 )
+from aios_core.recommendation.topic_state import TopicState, TopicStateService
 from aios_core.revision.service import ClaimRevisionRequest, CognitionRevisionService
 from aios_core.review import (
     OperationExperienceRequest,
@@ -52,13 +56,17 @@ from aios_core.review import (
     ReviewWakeReceipt,
 )
 from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.summaries import DimensionSummaryInput, MultiScaleSummaryScheduler, SummaryScale, SummaryScheduleResult
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 from aios_core.contracts.refs import ObjectRef
-from aios_core.contracts.enums import WakeSource
+from aios_core.contracts.enums import ObjectType, WakeSource
 from aios_core.wake import Step0GateInput, Step0GateResult, WakeBus, WakeStateReceipt
 
 from .capabilities import CapabilityKind, CapabilityRegistry, CapabilitySpec
 from .cognitive_runtime import CognitiveRuntime, ModelHandler, RuntimeTurnResult
+
+
+_AUTO_TOPIC = object()
 
 
 @dataclass(frozen=True, slots=True)
@@ -104,6 +112,7 @@ class FusedTurnRuntime:
         recommendation_limit: int = 5,
         max_tool_rounds: int = 4,
         round_summary_handler: Callable[[RoundSummaryRequest], str] | None = None,
+        dimension_summary_handler: Callable[[DimensionSummaryInput], str] | None = None,
         recent_turn_limit: int = 8,
         summary_chunk_turns: int = 12,
         max_round_summaries_per_turn: int = 1,
@@ -132,6 +141,7 @@ class FusedTurnRuntime:
             store=store,
             default_limit=recommendation_limit,
         )
+        self.topic_state = TopicStateService()
         self.context_controller = context_controller or ContextController()
         self.all_dimensions = AllDimensionsProjectionService(
             store=store,
@@ -162,6 +172,31 @@ class FusedTurnRuntime:
             store=store,
             index=index,
             subject_id=subject_id,
+        )
+        self.events = EventDimensionService(
+            store=store,
+            index=index,
+            subject_id=subject_id,
+        )
+        self.communication_experience = CommunicationExperienceService(
+            store=store,
+            index=index,
+            subject_id=subject_id,
+        )
+        self.policies = CognitivePolicyRegistry(
+            store=store,
+            index=index,
+            subject_id=subject_id,
+        )
+        self.dimension_summary_scheduler = (
+            None
+            if dimension_summary_handler is None
+            else MultiScaleSummaryScheduler(
+                store=store,
+                index=index,
+                summary_handler=dimension_summary_handler,
+                subject_id=subject_id,
+            )
         )
         self.periodic_review = PeriodicReviewService(
             store=store,
@@ -564,12 +599,212 @@ class FusedTurnRuntime:
             ),
             self._retract_claim,
         )
+        registry.register(
+            CapabilitySpec(
+                name="focus_entity",
+                description="Focus retrieval on one known Entity id without semantic reinterpretation.",
+                kind=CapabilityKind.READ,
+                input_schema={"entity_id": "string", "query": "string?", "limit": "integer?"},
+            ),
+            self._focus_entity,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="search_timeline",
+                description="Search the world inside an explicit time window, optionally bounded by dimension/type/query.",
+                kind=CapabilityKind.READ,
+                input_schema={
+                    "window_start": "ISO-8601 datetime",
+                    "window_end": "ISO-8601 datetime",
+                    "dimension": "string?",
+                    "object_types": "array[string]?",
+                    "query": "string?",
+                    "limit": "integer?",
+                },
+            ),
+            self._search_timeline,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="follow_relation",
+                description="Follow one-hop explicit Relation objects connected to a world object.",
+                kind=CapabilityKind.READ,
+                input_schema={"object_id": "string", "limit": "integer?"},
+            ),
+            self._follow_relation,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="compare_claims",
+                description="Inspect multiple pinned Claims side by side with their evidence/status; the model decides meaning.",
+                kind=CapabilityKind.READ,
+                input_schema={"claim_refs": "array[{object_id:string,revision:integer}]"},
+            ),
+            self._compare_claims,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="retrieve_original_observation",
+                description="Retrieve an exact Observation fact by id/revision for evidence drill-down.",
+                kind=CapabilityKind.READ,
+                input_schema={"object_id": "string", "revision": "integer?"},
+            ),
+            self._retrieve_original_observation,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="expand_recall",
+                description="Request a broader bounded world recall after the initial recommendation/search was insufficient.",
+                kind=CapabilityKind.READ,
+                input_schema={
+                    "query": "string",
+                    "dimension": "string?",
+                    "limit": "integer?",
+                },
+            ),
+            self._expand_recall,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="inspect_outcome",
+                description="Inspect a pinned real Action Outcome and its Action reference.",
+                kind=CapabilityKind.READ,
+                input_schema={"outcome_ref": "{object_id:string,revision:integer}"},
+            ),
+            self._inspect_outcome,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="read_cognitive_policies",
+                description="Read current versioned R6 policy records from the unified world.",
+                kind=CapabilityKind.READ,
+                input_schema={"policy_id": "string?"},
+            ),
+            self._read_cognitive_policies,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="form_event",
+                description=(
+                    "Form a revisable Event candidate from pinned world evidence. "
+                    "The model supplies the event meaning; code only validates provenance."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "title": "string",
+                    "interpretation": "string",
+                    "event_time": "TemporalExtent object",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "participant_refs": "array[{object_id:string,revision:integer}]?",
+                    "primary_claim_refs": "array[{object_id:string,revision:integer}]?",
+                    "confidence": "number[0,1]",
+                    "dimension": "string?",
+                },
+            ),
+            self._form_event,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="transition_event",
+                description="Forward-revise/resolve/reject/merge/split the current Event using pinned evidence.",
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "event_ref": "{object_id:string,revision:integer}",
+                    "new_status": "candidate|active|resolved|revised|rejected|merged|split",
+                    "reason": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "replacement_title": "string?",
+                    "replacement_interpretation": "string?",
+                    "confidence": "number[0,1]?",
+                    "related_event_refs": "array[{object_id:string,revision:integer}]?",
+                },
+            ),
+            self._transition_event,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="record_communication_experience",
+                description=(
+                    "Record what communication style was used and the real user/world reaction. "
+                    "This records evidence only and does not choose a future style."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "scenario": "string",
+                    "style": "string",
+                    "tone": "string?",
+                    "user_reaction": "accepted|resisted|ignored|unknown",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "action_ref": "{object_id:string,revision:integer}?",
+                    "applicable_conditions": "object?",
+                    "counterexample_refs": "array[{object_id:string,revision:integer}]?",
+                },
+            ),
+            self._record_communication_experience,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="update_cognitive_policy",
+                description=(
+                    "Append an evidence-grounded value revision to an already-registered "
+                    "AI-mutable cognitive policy. Cannot create or loosen hard boundaries."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "policy_id": "string",
+                    "current_value": "json value",
+                    "reason": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "evaluation_window": "string?",
+                },
+            ),
+            self._update_cognitive_policy,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="rollback_cognitive_policy",
+                description=(
+                    "Forward-append a rollback to an earlier policy version using pinned evidence."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "policy_id": "string",
+                    "target_version": "integer",
+                    "reason": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                },
+            ),
+            self._rollback_cognitive_policy,
+        )
         self.registry = registry
         self.cognitive_runtime = CognitiveRuntime(
             registry=registry,
             model_handler=model_handler,
             max_tool_rounds=max_tool_rounds,
             side_effect_authorizer=self._authorize_side_effect,
+        )
+
+    def _cockpit_capability_catalog(self) -> tuple[dict[str, Any], ...]:
+        """Compact capability awareness for context budgeting.
+
+        CognitiveRuntime already supplies the full schemas/descriptions separately in
+        RuntimeSnapshot.capability_catalog. Repeating the full tool schema inside the
+        cockpit wastes context budget and can evict memory/continuity. The cockpit only
+        needs enough information to tell the model which named abilities exist.
+        """
+
+        return tuple(
+            {
+                "name": item["name"],
+                "kind": item["kind"],
+                "side_effecting": bool(item.get("side_effecting", False)),
+            }
+            for item in self.registry.catalog()
         )
 
     def _search_world(self, query: str, limit: int = 8) -> list[dict[str, Any]]:
@@ -974,6 +1209,326 @@ class FusedTurnRuntime:
         )
         return projection.model_dump(mode="json")
 
+    @staticmethod
+    def _search_hit_payload(hit) -> dict[str, Any]:
+        return {
+            "object_id": hit.object_id,
+            "revision": hit.revision,
+            "object_type": hit.object_type,
+            "dimension": hit.dimension,
+            "excerpt": hit.excerpt,
+            "retrieval_score": hit.score,
+        }
+
+    def _focus_entity(
+        self,
+        entity_id: str,
+        query: str | None = None,
+        limit: int = 12,
+    ) -> list[dict[str, Any]]:
+        page = self.index.search_by_entity(
+            str(entity_id),
+            keywords=(() if query is None or not str(query).strip() else (str(query),)),
+            limit=max(1, min(int(limit), 50)),
+        )
+        return [self._search_hit_payload(hit) for hit in page.hits]
+
+    def _search_timeline(
+        self,
+        window_start: str,
+        window_end: str,
+        dimension: str | None = None,
+        object_types: Sequence[str] | None = None,
+        query: str | None = None,
+        limit: int = 20,
+    ) -> list[dict[str, Any]]:
+        start = datetime.fromisoformat(str(window_start).replace("Z", "+00:00"))
+        end = datetime.fromisoformat(str(window_end).replace("Z", "+00:00"))
+        page = self.index.search_mind(
+            keywords=(() if query is None or not str(query).strip() else (str(query),)),
+            dimension=(None if dimension is None else str(dimension)),
+            object_types=(None if object_types is None else tuple(str(x) for x in object_types)),
+            time_range=(start, end),
+            limit=max(1, min(int(limit), 100)),
+        )
+        return [self._search_hit_payload(hit) for hit in page.hits]
+
+    def _follow_relation(
+        self,
+        object_id: str,
+        limit: int = 20,
+    ) -> list[dict[str, Any]]:
+        target = str(object_id)
+        matched: list[dict[str, Any]] = []
+        for payload in self.store.list_payloads(
+            object_type=ObjectType.RELATION,
+            subject_id=self.subject_id,
+        ):
+            left = payload.get("left") or {}
+            right = payload.get("right") or {}
+            if str(left.get("object_id") or "") != target and str(right.get("object_id") or "") != target:
+                continue
+            matched.append(payload)
+            if len(matched) >= max(1, min(int(limit), 100)):
+                break
+        return matched
+
+    def _compare_claims(
+        self,
+        claim_refs: Sequence[Mapping[str, Any]],
+    ) -> list[dict[str, Any]]:
+        result: list[dict[str, Any]] = []
+        for ref in self._coerce_refs(claim_refs):
+            payload = self.store.get_payload(ref.object_id, revision=ref.revision)
+            if payload.get("object_type") != ObjectType.CLAIM.value:
+                raise ValueError("compare_claims accepts only Claim references")
+            result.append(
+                {
+                    "claim": payload,
+                    "support_evidence_sets": [
+                        self.store.get_payload(
+                            str(item["object_id"]),
+                            revision=int(item["revision"]),
+                        )
+                        for item in payload.get("support_evidence_set_refs") or []
+                    ],
+                    "counter_evidence_sets": [
+                        self.store.get_payload(
+                            str(item["object_id"]),
+                            revision=int(item["revision"]),
+                        )
+                        for item in payload.get("counter_evidence_set_refs") or []
+                    ],
+                }
+            )
+        return result
+
+    def _retrieve_original_observation(
+        self,
+        object_id: str,
+        revision: int | None = None,
+    ) -> dict[str, Any]:
+        payload = self.store.get_payload(str(object_id), revision=revision)
+        if payload.get("object_type") != ObjectType.OBSERVATION.value:
+            raise ValueError("requested object is not an Observation")
+        return payload
+
+    def _expand_recall(
+        self,
+        query: str,
+        dimension: str | None = None,
+        limit: int = 20,
+    ) -> list[dict[str, Any]]:
+        page = self.index.recall_candidates(
+            str(query),
+            subject=self.subject_id,
+            dimension=(None if dimension is None else str(dimension)),
+            limit=max(1, min(int(limit), 100)),
+        )
+        return [self._search_hit_payload(hit) for hit in page.hits]
+
+    def _inspect_outcome(
+        self,
+        outcome_ref: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        ref = ObjectRef(
+            object_id=str(outcome_ref["object_id"]),
+            revision=int(outcome_ref["revision"]),
+        )
+        payload = self.store.get_payload(ref.object_id, revision=ref.revision)
+        if payload.get("object_type") != ObjectType.OUTCOME.value:
+            raise ValueError("outcome_ref must point to an Outcome")
+        action_ref = payload.get("action_ref") or {}
+        action = self.store.get_payload(
+            str(action_ref["object_id"]),
+            revision=int(action_ref["revision"]),
+        )
+        return {"outcome": payload, "action": action}
+
+    def _read_cognitive_policies(
+        self,
+        policy_id: str | None = None,
+    ) -> list[dict[str, Any]]:
+        if policy_id is not None and str(policy_id).strip():
+            item = self.policies.latest(str(policy_id))
+            return [] if item is None else [item.model_dump(mode="json")]
+        return [
+            item.model_dump(mode="json")
+            for item in self.policies.list_current()
+        ]
+
+    def _form_event(
+        self,
+        title: str,
+        interpretation: str,
+        event_time: Mapping[str, Any],
+        evidence_refs: Sequence[Mapping[str, Any]],
+        confidence: float,
+        participant_refs: Sequence[Mapping[str, Any]] = (),
+        primary_claim_refs: Sequence[Mapping[str, Any]] = (),
+        dimension: str = "dim:events",
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("form_event is only available during an active AIOS turn")
+        receipt = self.events.form_event(
+            EventWriteRequest(
+                title=title,
+                interpretation=interpretation,
+                event_time=dict(event_time),
+                evidence_refs=self._coerce_refs(evidence_refs),
+                participant_refs=self._coerce_refs(participant_refs),
+                primary_claim_refs=self._coerce_refs(primary_claim_refs),
+                confidence=float(confidence),
+                dimension=dimension,
+            ),
+            learned_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
+    def _transition_event(
+        self,
+        event_ref: Mapping[str, Any],
+        new_status: str,
+        reason: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        replacement_title: str | None = None,
+        replacement_interpretation: str | None = None,
+        confidence: float | None = None,
+        related_event_refs: Sequence[Mapping[str, Any]] = (),
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("transition_event is only available during an active AIOS turn")
+        receipt = self.events.transition(
+            EventTransitionRequest(
+                event_ref=ObjectRef(
+                    object_id=str(event_ref["object_id"]),
+                    revision=int(event_ref["revision"]),
+                ),
+                new_status=new_status,
+                reason=reason,
+                evidence_refs=self._coerce_refs(evidence_refs),
+                replacement_title=replacement_title,
+                replacement_interpretation=replacement_interpretation,
+                confidence=confidence,
+                related_event_refs=self._coerce_refs(related_event_refs),
+            ),
+            changed_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
+    def _record_communication_experience(
+        self,
+        scenario: str,
+        style: str,
+        user_reaction: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        tone: str | None = None,
+        action_ref: Mapping[str, Any] | None = None,
+        applicable_conditions: Mapping[str, Any] | None = None,
+        counterexample_refs: Sequence[Mapping[str, Any]] = (),
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError(
+                "record_communication_experience is only available during an active AIOS turn"
+            )
+        parsed_action = (
+            None
+            if action_ref is None
+            else ObjectRef(
+                object_id=str(action_ref["object_id"]),
+                revision=int(action_ref["revision"]),
+            )
+        )
+        receipt = self.communication_experience.record(
+            CommunicationExperienceRequest(
+                scenario=scenario,
+                style=style,
+                tone=tone,
+                user_reaction=user_reaction,
+                evidence_refs=self._coerce_refs(evidence_refs),
+                action_ref=parsed_action,
+                applicable_conditions=dict(applicable_conditions or {}),
+                counterexample_refs=self._coerce_refs(counterexample_refs),
+            ),
+            recorded_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
+    def _update_cognitive_policy(
+        self,
+        policy_id: str,
+        current_value: Any,
+        reason: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        evaluation_window: str | None = None,
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError(
+                "update_cognitive_policy is only available during an active AIOS turn"
+            )
+        receipt = self.policies.update(
+            CognitivePolicyUpdateRequest(
+                policy_id=policy_id,
+                current_value=current_value,
+                reason=reason,
+                evidence_refs=self._coerce_refs(evidence_refs),
+                changed_by="resident_ai",
+                evaluation_window=evaluation_window,
+            ),
+            changed_at=self._active_turn_time,
+            actor_is_ai=True,
+        )
+        return asdict(receipt)
+
+    def _rollback_cognitive_policy(
+        self,
+        policy_id: str,
+        target_version: int,
+        reason: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError(
+                "rollback_cognitive_policy is only available during an active AIOS turn"
+            )
+        receipt = self.policies.rollback(
+            policy_id,
+            int(target_version),
+            reason=reason,
+            evidence_refs=self._coerce_refs(evidence_refs),
+            changed_by="resident_ai",
+            changed_at=self._active_turn_time,
+            actor_is_ai=True,
+        )
+        return asdict(receipt)
+
+    def _execution_context_for_topic(
+        self,
+        topic: str | None,
+        *,
+        limit: int = 6,
+    ) -> dict[str, Any]:
+        clean = "" if topic is None else str(topic).strip()
+        if not clean:
+            return {"related_execution_anchors": []}
+        page = self.index.recall_candidates(
+            clean,
+            subject=self.subject_id,
+            object_types=(
+                ObjectType.GOAL.value,
+                ObjectType.TASK.value,
+                ObjectType.ACTION.value,
+                ObjectType.OUTCOME.value,
+            ),
+            limit=max(1, min(int(limit), 20)),
+        )
+        return {
+            "related_execution_anchors": [
+                self._search_hit_payload(hit)
+                for hit in page.hits
+            ]
+        }
+
     def _authorize_side_effect(self, spec, call, snapshot) -> bool:
         # Internal cognition writeback is allowed because the handler itself enforces
         # pinned evidence and writes only revisable cognition. External actions stay
@@ -991,6 +1546,11 @@ class FusedTurnRuntime:
             "commit_operation_experience",
             "revise_claim",
             "retract_claim",
+            "form_event",
+            "transition_event",
+            "record_communication_experience",
+            "update_cognitive_policy",
+            "rollback_cognitive_policy",
         }
 
     def _commit_operation_experience(
@@ -1151,14 +1711,41 @@ class FusedTurnRuntime:
         )
         return asdict(receipt)
 
+    def run_due_dimension_summaries(
+        self,
+        *,
+        now: datetime,
+        scales: Sequence[str | SummaryScale] = tuple(SummaryScale),
+        max_jobs: int = 64,
+        dimensions: Sequence[str] | None = None,
+    ) -> SummaryScheduleResult:
+        """Run deterministic summary scheduling with model-generated content.
+
+        This is maintenance, not resident cognition. The scheduler chooses only
+        dimensions/windows/sources; the injected dimension_summary_handler writes the
+        descriptive text and cannot alter raw facts.
+        """
+
+        if self.dimension_summary_scheduler is None:
+            raise RuntimeError(
+                "dimension_summary_handler is required for semantic dimension summaries"
+            )
+        parsed = tuple(SummaryScale(item) for item in scales)
+        return self.dimension_summary_scheduler.run_due(
+            now=now,
+            scales=parsed,
+            max_jobs=max_jobs,
+            dimensions=dimensions,
+        )
+
     def run_turn(
         self,
         *,
         session_id: str,
         turn_index: int,
         user_input: str,
-        current_topic: str | None,
         occurred_at: datetime,
+        current_topic: str | None | object = _AUTO_TOPIC,
         recent_turns: Sequence[Mapping[str, Any]] = (),
         ai_identity: Mapping[str, Any] | None = None,
         task_context: Mapping[str, Any] | None = None,
@@ -1201,10 +1788,33 @@ class FusedTurnRuntime:
             summary_trigger_tokens=summary_trigger_tokens,
         )
 
+        if current_topic is _AUTO_TOPIC:
+            topic_state = self.topic_state.resolve(
+                user_input=user_input,
+                recent_turns=continuity_snapshot.recent_turns,
+                explicit_topic=None,
+            )
+        elif current_topic is None:
+            # Compatibility and explicit control: callers that deliberately pass
+            # current_topic=None are closing the proactive-memory topic gate for
+            # this turn. Callers that omit current_topic get Core-owned topic state.
+            topic_state = TopicState(
+                topic=None,
+                gate_open=False,
+                history_may_help=False,
+                reason="explicit_no_topic_override",
+            )
+        else:
+            topic_state = self.topic_state.resolve(
+                user_input=user_input,
+                recent_turns=continuity_snapshot.recent_turns,
+                explicit_topic=str(current_topic),
+            )
         recommendation = self.recommender.recommend(
-            current_topic=current_topic,
+            current_topic=topic_state.topic,
             subject_id=self.subject_id,
             exclude_session_id=session,
+            history_needed=topic_state.history_may_help,
         )
 
         continuity_context = (
@@ -1214,6 +1824,12 @@ class FusedTurnRuntime:
         )
 
         current_task_context = dict(task_context or {})
+        current_task_context["topic_state"] = topic_state.model_dump(mode="json")
+        automatic_execution_context = self._execution_context_for_topic(topic_state.topic)
+        current_task_context.setdefault(
+            "related_execution_anchors",
+            automatic_execution_context["related_execution_anchors"],
+        )
         current_task_context["current_user_observation_ref"] = {
             "object_id": user_commit.observation_id,
             "revision": 1,
@@ -1240,13 +1856,13 @@ class FusedTurnRuntime:
 
         context = self.context_controller.assemble(
             user_input=user_input,
-            current_topic=current_topic,
+            current_topic=topic_state.topic,
             recommendation=recommendation,
             recent_turns=continuity_snapshot.recent_turns,
             conversation_summaries=continuity_snapshot.round_summaries,
             ai_identity=continuity_context,
             task_context=current_task_context,
-            capability_catalog=self.registry.catalog(),
+            capability_catalog=self._cockpit_capability_catalog(),
             token_budget=token_budget,
         )
 

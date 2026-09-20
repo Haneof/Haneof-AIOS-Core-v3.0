@@ -1333,7 +1333,7 @@ class GoalTaskActionService:
                 idempotency_key=(
                     f"action-authorize:{submitted.object_id}:{new_revision}"
                 ),
-                source_class=SourceClass.AI_COGNITION,
+                source_class=SourceClass.PLATFORM,
             ),
         )
         self._catch_up()
@@ -1475,7 +1475,7 @@ class GoalTaskActionService:
                     f"action-outcome:{final_action.object_id}:"
                     f"{new_revision}:{request.outcome_state}"
                 ),
-                source_class=SourceClass.AI_COGNITION,
+                source_class=SourceClass.PLATFORM,
             ),
         )
         self._catch_up()

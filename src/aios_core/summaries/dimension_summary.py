@@ -124,6 +124,9 @@ _PRECISION = {
     "half_year": TimePrecision.HALF_YEAR,
     "year": TimePrecision.YEAR,
     "multi_year": TimePrecision.MULTI_YEAR,
+    "multi_year_3y": TimePrecision.MULTI_YEAR,
+    "multi_year_5y": TimePrecision.MULTI_YEAR,
+    "decade": TimePrecision.MULTI_YEAR,
 }
 
 

@@ -109,6 +109,85 @@ def test_pre_r4_database_migrates_with_explicit_backfill_and_audit(tmp_path):
     assert store.triggerable_commits_after(3)[0]["source_class"] == "sensor"
 
 
+def test_existing_source_class_check_migrates_to_platform_without_losing_rows(tmp_path):
+    db = tmp_path / "world.db"
+    conn = sqlite3.connect(db)
+    conn.execute("PRAGMA foreign_keys = ON")
+    conn.executescript(
+        """
+        CREATE TABLE world_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+        INSERT INTO world_meta(key, value) VALUES ('world_revision', '1');
+
+        CREATE TABLE world_commits (
+            world_revision INTEGER PRIMARY KEY,
+            committed_at TEXT NOT NULL,
+            operation_id TEXT NOT NULL UNIQUE,
+            session_id TEXT,
+            reason TEXT NOT NULL,
+            source_class TEXT NOT NULL
+                CHECK(source_class IN ('user','sensor','ai_cognition','maintenance','safety'))
+        );
+        INSERT INTO world_commits VALUES (
+            1,
+            '2026-09-19T00:00:00+00:00',
+            'op_old_check',
+            NULL,
+            'old check constraint',
+            'user'
+        );
+
+        CREATE TABLE object_revisions (
+            object_id TEXT NOT NULL,
+            revision INTEGER NOT NULL,
+            object_type TEXT NOT NULL,
+            subject_id TEXT NOT NULL,
+            world_revision INTEGER NOT NULL,
+            learned_at TEXT NOT NULL,
+            recorded_at TEXT NOT NULL,
+            payload_json TEXT NOT NULL,
+            revision_kind TEXT NOT NULL DEFAULT 'content',
+            PRIMARY KEY(object_id, revision),
+            FOREIGN KEY(world_revision) REFERENCES world_commits(world_revision)
+        );
+        INSERT INTO object_revisions(
+            object_id, revision, object_type, subject_id, world_revision,
+            learned_at, recorded_at, payload_json, revision_kind
+        ) VALUES (
+            'legacy_obj', 1, 'observation', 'user_1', 1,
+            '2026-09-19T00:00:00+00:00',
+            '2026-09-19T00:00:00+00:00',
+            '{}',
+            'content'
+        );
+        """
+    )
+    conn.commit()
+    conn.close()
+
+    store = SQLiteWorldStore(db)
+
+    assert store.commit_source_class(1) == "user"
+    with sqlite3.connect(db) as audit_conn:
+        ddl = audit_conn.execute(
+            "SELECT sql FROM sqlite_master "
+            "WHERE type='table' AND name='world_commits'"
+        ).fetchone()[0]
+        preserved = audit_conn.execute(
+            "SELECT COUNT(*) FROM object_revisions WHERE object_id='legacy_obj'"
+        ).fetchone()[0]
+        audit_raw = audit_conn.execute(
+            "SELECT value FROM world_meta "
+            "WHERE key='schema_migration_sourceclass_platform'"
+        ).fetchone()[0]
+
+    assert "'platform'" in ddl
+    assert preserved == 1
+    audit = json.loads(audit_raw)
+    assert audit["preserved_rows"] == 1
+    assert audit["added_source_class"] == "platform"
+
+
+
 # ---------------------------------------------------------------- search side
 
 

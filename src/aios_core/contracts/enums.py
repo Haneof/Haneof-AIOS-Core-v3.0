@@ -30,6 +30,7 @@ class ObjectType(StrEnum):
     COMMUNICATION_EXPERIENCE = "communication_experience"
     BUDGET_POLICY = "budget_policy"
     ASSEMBLY_POLICY = "assembly_policy"
+    COGNITIVE_POLICY = "cognitive_policy"
     NARRATIVE_SEGMENT = "narrative_segment"
     DIMENSION_CURVE_POINT = "dimension_curve_point"
 
@@ -43,6 +44,7 @@ class SourceClass(StrEnum):
 
     USER = "user"
     SENSOR = "sensor"
+    PLATFORM = "platform"
     AI_COGNITION = "ai_cognition"
     MAINTENANCE = "maintenance"
     SAFETY = "safety"
@@ -95,6 +97,14 @@ class UserReaction(StrEnum):
     RESISTED = "resisted"
     IGNORED = "ignored"
     UNKNOWN = "unknown"
+
+
+class PolicyClass(StrEnum):
+    """R6 policy taxonomy. Only cognitive policies may be AI-mutable."""
+
+    HARD_BOUNDARY = "hard_boundary"
+    ENGINEERING_PARAMETER = "engineering_parameter"
+    COGNITIVE_POLICY = "cognitive_policy"
 
 
 class BudgetScope(StrEnum):

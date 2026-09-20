@@ -18,6 +18,7 @@ from .enums import (
     GoalStatus,
     KnowledgeState,
     ObjectType,
+    PolicyClass,
     ProfileName,
     PredictionVerificationState,
     SummaryStatus,
@@ -734,6 +735,67 @@ class AssemblyPolicy(WorldObject):
         unknown = [k for k in self.section_token_caps if k not in set(self.section_order)]
         if unknown:
             raise ValueError(f"section_token_caps references sections outside section_order: {unknown}")
+        return self
+
+
+class CognitivePolicy(WorldObject):
+    """R6 adaptive cognitive-policy record stored in the unified WorldStore.
+
+    Policy history is append-only through ordinary world-object revisions. Hard
+    boundaries and engineering parameters may be represented for audit, but only
+    COGNITIVE_POLICY entries may be mutable_by_ai.
+    """
+
+    object_type: Literal[ObjectType.COGNITIVE_POLICY] = ObjectType.COGNITIVE_POLICY
+    policy_id: str = Field(min_length=1)
+    scope: str = Field(min_length=1)
+    policy_class: PolicyClass
+    default_value: Any
+    current_value: Any
+    allowed_range_or_choices: Any = None
+    mutable_by_ai: bool = False
+    reason: str = Field(min_length=1)
+    evidence_refs: list[ObjectRef] = Field(default_factory=list)
+    changed_by: str = Field(min_length=1)
+    changed_at: datetime
+    version: int = Field(ge=1)
+    previous_version: int | None = Field(default=None, ge=1)
+    rollback_pointer: int | None = Field(default=None, ge=1)
+    evaluation_window: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def validate_cognitive_policy(self) -> "CognitivePolicy":
+        require_aware(self.changed_at, "changed_at")
+        for name in ("policy_id", "scope", "reason", "changed_by", "evaluation_window"):
+            if not str(getattr(self, name)).strip():
+                raise ValueError(f"{name} must not be blank")
+        for ref in self.evidence_refs:
+            if ref.revision is None:
+                raise ValueError("policy evidence_refs require pinned revisions")
+        if self.version != self.revision:
+            raise ValueError("policy version must equal world-object revision")
+        if self.version == 1 and self.previous_version is not None:
+            raise ValueError("policy version 1 cannot have previous_version")
+        if self.version > 1 and self.previous_version != self.version - 1:
+            raise ValueError("policy previous_version must form a contiguous chain")
+        if self.rollback_pointer is not None and self.rollback_pointer >= self.version:
+            raise ValueError("rollback_pointer must point to an earlier version")
+        if self.policy_class is PolicyClass.HARD_BOUNDARY and self.mutable_by_ai:
+            raise ValueError("hard boundaries cannot be mutable_by_ai")
+        if self.mutable_by_ai and self.policy_class is not PolicyClass.COGNITIVE_POLICY:
+            raise ValueError("only cognitive_policy entries may be mutable_by_ai")
+
+        allowed = self.allowed_range_or_choices
+        if isinstance(allowed, dict) and ("min" in allowed or "max" in allowed):
+            if not isinstance(self.current_value, (int, float)) or isinstance(self.current_value, bool):
+                raise ValueError("numeric policy range requires numeric current_value")
+            if "min" in allowed and self.current_value < allowed["min"]:
+                raise ValueError("current_value is below allowed policy range")
+            if "max" in allowed and self.current_value > allowed["max"]:
+                raise ValueError("current_value is above allowed policy range")
+        elif isinstance(allowed, (list, tuple, set)) and allowed:
+            if self.current_value not in allowed:
+                raise ValueError("current_value is not one of allowed policy choices")
         return self
 
 
