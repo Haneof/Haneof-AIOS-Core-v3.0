@@ -249,3 +249,30 @@ artifacts later consumed by another model.
 Hidden evaluator-only events are absent from the resident run entirely: their IDs,
 timestamps and channels are not emitted in `HabitationRun` or its serialized
 artifact.
+
+## 14. Current-Core adapter
+
+After P12-P15 and C09 stabilized on `main`, P16 now includes a thin adapter:
+
+`tests/habitation/current_core.py`
+
+It does **not** implement cognition. It creates a private `SQLiteWorldStore`,
+`WorldSearchIndex`, `RealityIngestService` and the real `FusedTurnRuntime` for one
+model candidate, then feeds resident-visible events through those existing public
+Core surfaces.
+
+Important boundaries:
+
+- conversation events go through the real fused turn loop;
+- non-conversation events go through P13 reality ingest;
+- virtual-clock advancement processes P12 due tasks, C09 pending Wakes and P15
+  periodic review;
+- the current utterance itself is used as the topic-gate seed, never evaluator labels;
+- hidden oracle data is never accepted by the target constructor;
+- evaluator snapshots are read only after the life run;
+- deterministic contract tests use a silent stub **only to verify plumbing and
+  isolation**. They are not evidence that AI cognition passed P16.
+
+Real habitation runs must inject a real provider-backed `ModelHandler` (and a real
+round-summary handler where long-session P14 behavior is under test). Each provider
+must use a fresh private target/database.
