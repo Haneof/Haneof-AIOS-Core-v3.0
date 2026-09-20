@@ -1,0 +1,9 @@
+{
+  "scenario_id": "uncertainty-restraint-v1",
+  "scenario_version": "1",
+  "seed": 20260923,
+  "subject_id": "synthetic-user-004",
+  "resident_stream": "resident/uncertainty_restraint_v1.jsonl",
+  "evaluator_oracle": "oracle/uncertainty_restraint_v1.json",
+  "purpose": "Epistemic restraint under sparse and ambiguous evidence"
+}

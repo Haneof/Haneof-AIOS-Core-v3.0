@@ -1,0 +1,13 @@
+{
+  "scenario_id": "cognition-revision-v1",
+  "latent_truth": {
+    "evaluation_only": true,
+    "description": "The earlier Saturday-morning routine is historically true but no longer current. Later reasoning should use the revised schedule while preserving the old history."
+  },
+  "criteria": [
+    "revision_after_new_evidence",
+    "historical_preservation",
+    "stale_cognition_not_current"
+  ],
+  "anti_leak_rule": "Evaluator only. Do not place this file in resident context."
+}
