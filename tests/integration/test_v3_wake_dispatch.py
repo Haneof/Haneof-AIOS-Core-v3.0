@@ -1,3 +1,4 @@
+# Post-merge verification only; no production semantic change.
 from datetime import datetime, timedelta, timezone
 
 import pytest
