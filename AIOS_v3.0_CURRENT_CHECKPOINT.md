@@ -8,12 +8,12 @@
 ## 当前快照
 
 - 时间：2026-09-20 17:40 +08:00
-- 最后已验证功能代码锚点：`6b68cb2953d7747a784c1a5a737c66f9de101f29`
-- 验证 Gate：`p16-habitation-harness` / run `35503409815` / **success**；C09 去重加固 Gate run `35501301595` / **success**
+- 最后已验证功能代码锚点：`1fc7b9f5c69b01f01dac8097efd29973bc4dbf4c`
+- 验证 Gate：`p16-habitation-harness` merge-result run `35503797730` / **success**（58项，含 long-horizon Task/Review/C09/media/numeric/future-leak Gate）；C09 去重加固 Gate run `35501301595` / **success**
 - 当前项目阶段：**P16 多模型独立长期入住测试**
-- 当前主干状态：**P0-P15 已闭环；P16 benchmark foundation 已对齐当前 main 并通过 PR #1 合入。当前已有真实 Current-Core habitation target，可为不同模型建立独立 WorldStore/Index/FusedTurnRuntime，隐藏 oracle 与 resident stream 已做严格物理/身份隔离。**
-- 当前 blocker：**还没有真正调用 GPT / Claude / Gemini 等外部真实模型完成独立隐藏人生 habitation runs；下一缺口是 provider-backed ModelHandler / RoundSummaryHandler 与实际 blind run artifacts。**
-- 下一主任务：**接入真实模型 handler，分别创建独立 AIOS world，执行同一 resident-visible life；每个模型单独产出 run artifact，最后才由 evaluator 读取 hidden oracle。不得再用 stub/固定答案宣称 P16 认知通过。**
+- 当前主干状态：**P0-P15 已闭环；P16 benchmark 已具备真实 Current-Core target、独立 World、严格 oracle 隔离、跨事件中间时钟、P12 Task due→C09 Wake、P15 周期 Review、P13 media/numeric 路径、final horizon 与 future-sample 防泄漏。**
+- 当前 blocker：**尚未接入并实际调用 GPT / Claude / Gemini 等真实 provider model；当前确定性 Gate 只能证明 AIOS/harness 机械链正确，不能证明长期认知质量。**
+- 下一主任务：**实现 provider-backed ModelHandler / RoundSummaryHandler 与可审计 run provenance，然后执行多个真实模型各自独立入住同一 sealed life；最后才由 evaluator 读取 hidden oracle。**
 
 ## P13 已完成并通过 Gate
 
@@ -218,6 +218,20 @@ summary 作为快速 continuity index
 - Wake dedupe identity hardening：`wake_source + rule_id + dedupe_key` 共同定义合并作用域；延迟 exact retry 仍幂等；新 out-of-order hit fail closed：Gate run `35501301595` / **success**
 
 实验 PR #5 与旧基线 PR #6 已关闭，仅保留历史证据；不得合入。
+
+## P16 Long-Horizon Habitation Hardening 已完成
+
+- PR #10：squash merge
+- 合并 SHA：`1fc7b9f5c69b01f01dac8097efd29973bc4dbf4c`
+- merge-result Gate：`p16-habitation-harness` run `35503797730` / **success**
+- 虚拟时钟按真实中间时间点执行 Task due / C09 Wake / Periodic Review：GREEN
+- `end_at` 最终 horizon：GREEN
+- P13 `MediaDescriptorRecord` / `NumericSample` 路径：GREEN
+- 注册 mechanical marker → C09 Wake：GREEN
+- 每个模型 fresh private SQLite World：GREEN
+- visible-life fingerprint 不受 evaluator scenario id/version/seed 污染：GREEN
+- sensor numeric future sample leak fail closed：GREEN
+- 现有 fixture bundle 身份与路径隔离规则保留：GREEN
 
 ## P16 当前目标
 
