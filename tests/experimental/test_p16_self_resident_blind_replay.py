@@ -456,7 +456,9 @@ def test_frozen_self_resident_blind_replay_reaches_real_world_and_exposes_wake_g
         ),
     )
     assert review is not None
-    assert review.runtime.wake_reason == "periodic_review"
+    review_wake_payload = store.get_payload(review.request.wake_ref.object_id)
+    assert review_wake_payload["wake_source"] == "periodic_review"
+    assert review_wake_payload["wake_state"] == "completed"
     assert [
         item.name for item in review.runtime.capability_history
     ] == ["read_periodic_review_anchors", "create_task"]
