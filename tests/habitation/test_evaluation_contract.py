@@ -123,3 +123,62 @@ def test_comparison_rejects_duplicate_model_reports() -> None:
 
     with pytest.raises(ValueError, match="model_id values must be unique"):
         comparison_matrix((a, duplicate))
+
+
+def test_comparison_requires_same_evaluator_version() -> None:
+    scenario = _scenario()
+    runner = HabitationRunner()
+    run_a = runner.run(
+        scenario=scenario,
+        model_id="provider/model-a",
+        target=Target("a"),
+    )
+    run_b = runner.run(
+        scenario=scenario,
+        model_id="provider/model-b",
+        target=Target("b"),
+    )
+    finding = EvaluationFinding(
+        criterion_id="continuity",
+        status="observe",
+        summary="same criterion",
+    )
+    report_a = build_model_report(
+        scenario=scenario,
+        run=run_a,
+        evaluator_id="judge-v1",
+        findings=(finding,),
+    )
+    report_b = build_model_report(
+        scenario=scenario,
+        run=run_b,
+        evaluator_id="judge-v2",
+        findings=(finding,),
+    )
+
+    with pytest.raises(ValueError, match="same evaluator_id"):
+        comparison_matrix((report_a, report_b))
+
+
+def test_finding_rejects_invalid_runtime_types() -> None:
+    with pytest.raises(ValueError, match="criterion_id must be a non-empty string"):
+        EvaluationFinding(
+            criterion_id=123,  # type: ignore[arg-type]
+            status="pass",
+            summary="x",
+        )
+
+    with pytest.raises(ValueError, match="unsupported finding status"):
+        EvaluationFinding(
+            criterion_id="x",
+            status=["pass"],  # type: ignore[arg-type]
+            summary="x",
+        )
+
+    with pytest.raises(ValueError, match="measurements must be a mapping"):
+        EvaluationFinding(
+            criterion_id="x",
+            status="observe",
+            summary="x",
+            measurements=[],  # type: ignore[arg-type]
+        )
