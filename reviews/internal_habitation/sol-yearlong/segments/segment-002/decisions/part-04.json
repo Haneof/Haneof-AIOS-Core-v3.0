@@ -1,0 +1,109 @@
+{
+  "84498b636cce687b814071450edbd525c9ed766bd642778e688f457c243b0630": {
+    "calls": [
+      {
+        "arguments": {
+          "limit": 20,
+          "offset": 0
+        },
+        "call_id": "sol-seg002-review-jan16-anchors",
+        "name": "read_periodic_review_anchors"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "906b18886d19a6cf394668c6283709d7aeb640a0b473e5f035d91c21d9544338": {
+    "calls": [
+      {
+        "arguments": {
+          "limit": 20,
+          "offset": 0
+        },
+        "call_id": "sol-seg002-resume-review-jan11-anchors",
+        "name": "read_periodic_review_anchors"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "954135e3deb5de7e7eb6c962d611a59ac5ec43c1e6b1ab94c6fa7d5d1d3e6768": {
+    "calls": [
+      {
+        "arguments": {
+          "applicability": {
+            "avoid_when": "completion is already evidenced or the user has not authorized the proactive interruption timing",
+            "when": "user explicitly requests a single future reminder conditioned on whether preparation remains incomplete"
+          },
+          "method_path": [
+            "Represent the user-requested future check as a waiting-time Task instead of sending repeated reminders.",
+            "At the due Wake, inspect the latest durable world evidence before deciding whether interruption is still needed.",
+            "If the latest evidence still shows incomplete preparation and no newer completion evidence exists, send one evidence-bounded reminder that distinguishes known state from uncertainty.",
+            "After delivery, stop repeated prompting and wait for new user/world evidence; terminalize the reminder Task once completion evidence arrives."
+          ],
+          "misses": [],
+          "negative_case_refs": [],
+          "positive_case_refs": [
+            {
+              "object_id": "obs_conv_user_b582fb369dc158dff41c4339",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_src_39b11064c77baafc7bb2c8b3",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_5f75187e7ffa7229364793bd",
+              "revision": 1
+            }
+          ],
+          "problem_type": "user_requested_conditional_deadline_reminder_without_repetition",
+          "result_summary": "The one Sunday reminder matched the user’s requested timing and latest incomplete preparation evidence. The user explicitly said the reminder came at the right time, then stated they would act; later photo and user evidence confirmed the two preparation actions were completed. This experience does not claim the next-day fire inspection passed; that outcome is still unknown."
+        },
+        "call_id": "sol-seg002-jan18-opx-conditional-reminder-retry",
+        "name": "commit_operation_experience"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "9e8a47410e73ecf1b5b5a1567d53c5b665ef989384a64e3e5ca70a6dd6d4507b": {
+    "calls": [
+      {
+        "arguments": {
+          "limit": 20,
+          "offset": 0
+        },
+        "call_id": "sol-seg002-review-jan12-anchors",
+        "name": "read_periodic_review_anchors"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "9eea04b3ecaff0b1b990a0b39a98bbbdfcb49484ffb8787b82b53351aeec55f5": {
+    "kind": "summary",
+    "summary": "2027-01-16，AIOS 基于两条固定用户 Observation 注册了可修订认知策略 `communication.evidence_before_adverse_conclusion`：在把事实描述为问题、违规或稳定特征前，要求有具体证据支持；默认值为 normal，当前值为 `require_specific_evidence_before_problem_or_trait_label`，30 天评估窗口，下一次评估时间为 2027-02-15T08:15:00Z。"
+  },
+  "a25cb054225a95b4afb0a537ccbc88c3d04863550e2ca4bca9a55d201e796505": {
+    "calls": [
+      {
+        "arguments": {
+          "limit": 20,
+          "offset": 0
+        },
+        "call_id": "sol-seg002-review-jan13-anchors",
+        "name": "read_periodic_review_anchors"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "a3bebf02279f12d4dc56dd2e54d7b93f2ac9019cc93e9c2d16c98d178209dcaf": {
+    "kind": "response",
+    "response": "记着了。周一 16:00 是店内消防检查，需要准备灭火器和通道记录。我不会每天提醒；周日再检查准备状态，只有到时还没准备好才提醒你。"
+  },
+  "a685e67a35de6306fa60b2b19430bb84017a95c001ea5b2530ad7d3e3225a6bc": {
+    "kind": "response",
+    "response": "好。现有证据只支持两件准备事实：灭火器周围已经清开，通道记录已经打印；我已经停止这次准备提醒。它们不等于消防检查一定通过，检查结果继续保持未知，等明天实际结果再更新。"
+  },
+  "a8e1587149647ccb2da23261c8a3a14b7c14966126d11cc432179a0fce7addf5": {
+    "kind": "summary",
+    "summary": "2027-01-17 的后场照片显示：灭火器周围已清空，通道内没有面粉袋堆放；工作台上放着一份标题为“通道记录”的打印纸。该照片只支持这些可见准备事实，不证明 2027-01-18 的消防检查一定通过。"
+  }
+}
