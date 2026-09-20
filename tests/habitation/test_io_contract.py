@@ -23,12 +23,25 @@ class EchoTarget:
     def __init__(self, model: str) -> None:
         self.model = model
         self.isolation_key = f"world:{model}:{id(self)}"
+        self.clock: list[datetime] = []
+        self.seen: list[str] = []
+
+    def advance_to(self, instant: datetime):
+        self.clock.append(instant)
+        return {"advanced_to": instant.isoformat()}
 
     def handle_event(self, event: ResidentEvent):
+        self.seen.append(event.event_id)
         return {
             "model": self.model,
             "observed_event": event.event_id,
             "channel": event.channel,
+        }
+
+    def audit_snapshot(self):
+        return {
+            "seen": list(self.seen),
+            "clock": [instant.isoformat() for instant in self.clock],
         }
 
 
