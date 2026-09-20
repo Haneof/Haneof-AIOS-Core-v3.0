@@ -49,7 +49,7 @@ def _resident_scenario() -> HabitationScenario:
 
 
 class GPT56LongSelfResident:
-    """Frozen GPT-5.6 Sol decisions from a sequential 19-event resident reading.
+    """Frozen GPT-5.6 Sol decisions from a sequential 20-event resident reading.
 
     This is exploratory self-resident evidence. The resident fixture was read one
     event at a time in the ChatGPT session and no oracle file is loaded here.
@@ -508,12 +508,74 @@ class GPT56LongSelfResident:
             )
             return ModelDirective(response=self.final_response)
 
+        if text == (
+            "这次复盘如果能把事实、你的判断和不确定的地方分开，我会觉得很好。"
+            "以后复杂复盘可以继续用这种方式。"
+        ):
+            if not history:
+                current_policy = {
+                    "progress_updates": "results_or_blockers_only",
+                    "proactive_interruptions": "major_change_or_risk_only",
+                    "approval_required_for": [
+                        "project_direction_change",
+                        "spend_money",
+                        "external_user_impact",
+                    ],
+                    "direct_allowed_for": [
+                        "self_contained_work",
+                        "ordinary_small_fix",
+                        "ordinary_code_fix",
+                        "internal_cleanup",
+                    ],
+                    "complex_review_format": (
+                        "separate_facts_judgments_and_uncertainties"
+                    ),
+                }
+                return ModelDirective(
+                    capability_calls=(
+                        CapabilityCall(
+                            name="record_communication_experience",
+                            arguments={
+                                "scenario": "complex_multi_month_review",
+                                "style": (
+                                    "separate facts, model judgments, and uncertainty; "
+                                    "avoid unsupported causal claims"
+                                ),
+                                "user_reaction": (
+                                    "用户明确表示这种复盘很好，并希望以后复杂复盘继续使用。"
+                                ),
+                                "evidence_refs": [now_ref],
+                                "applicable_conditions": {
+                                    "task_type": "complex_review",
+                                    "evidence_sensitivity": "high",
+                                },
+                            },
+                        ),
+                        CapabilityCall(
+                            name="update_cognitive_policy",
+                            arguments={
+                                "policy_id": "communication.detail_level",
+                                "current_value": current_policy,
+                                "reason": (
+                                    "用户对刚完成的复杂复盘给出明确正反馈，并要求今后"
+                                    "继续区分事实、模型判断和不确定部分。"
+                                ),
+                                "evidence_refs": [now_ref],
+                                "evaluation_window": "4w",
+                            },
+                        ),
+                    )
+                )
+            return ModelDirective(
+                response="会继续这样做：复杂复盘明确分开事实、我的判断和不确定项。"
+            )
+
         raise AssertionError(f"unexpected resident input: {text!r}")
 
 
 def test_gpt56_long_self_resident_cognition_system_closure(tmp_path):
     scenario = _resident_scenario()
-    assert len(scenario.events) == 19
+    assert len(scenario.events) == 20
 
     resident = GPT56LongSelfResident()
     target = CurrentCoreHabitationTarget(
@@ -528,7 +590,7 @@ def test_gpt56_long_self_resident_cognition_system_closure(tmp_path):
         target=target,
     )
 
-    assert run.delivered_count == 19
+    assert run.delivered_count == 20
     assert set(resident.wake_reasons).issubset(
         {"user_interaction", "periodic_review"}
     )
@@ -578,10 +640,11 @@ def test_gpt56_long_self_resident_cognition_system_closure(tmp_path):
     # CognitivePolicy is a real versioned runtime input, not a note. Subsequent
     # turns must see the previous version through the cockpit.
     policies = target.runtime.policies.history("communication.detail_level")
-    assert len(policies) == 3
+    assert len(policies) == 4
     assert policies[0].revision == 1
     assert policies[1].revision == 2
     assert policies[2].revision == 3
+    assert policies[3].revision == 4
     assert (
         resident.policy_context_seen[
             "这两天提醒有点太频繁了。普通的小修复不用主动打断我，重大变更或者有风险的时候再提醒。"
@@ -615,7 +678,27 @@ def test_gpt56_long_self_resident_cognition_system_closure(tmp_path):
             "ordinary_code_fix",
             "internal_cleanup",
         ],
+        "complex_review_format": "separate_facts_judgments_and_uncertainties",
     }
+    assert (
+        resident.policy_context_seen[
+            "这次复盘如果能把事实、你的判断和不确定的地方分开，我会觉得很好。以后复杂复盘可以继续用这种方式。"
+        ]["approval_required_for"]
+        == [
+            "project_direction_change",
+            "spend_money",
+            "external_user_impact",
+        ]
+    )
+    communication_experiences = target.store.list_payloads(
+        object_type="communication_experience",
+        subject_id=SUBJECT_ID,
+    )
+    assert any(
+        item.get("scenario") == "complex_multi_month_review"
+        and "明确表示这种复盘很好" in str(item.get("user_reaction", ""))
+        for item in communication_experiences
+    )
 
     # The final multi-month review must come from live World retrieval.
     assert resident.final_evidence
