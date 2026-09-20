@@ -1525,6 +1525,11 @@ class FusedTurnRuntime:
             "commit_operation_experience",
             "revise_claim",
             "retract_claim",
+            "form_event",
+            "transition_event",
+            "record_communication_experience",
+            "update_cognitive_policy",
+            "rollback_cognitive_policy",
         }
 
     def _commit_operation_experience(
