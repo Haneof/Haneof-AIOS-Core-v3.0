@@ -64,6 +64,7 @@ class MaintenanceClass(StrEnum):
     INDEX_META = "index_meta"
     POLICY_SYNC = "policy_sync"
     PERIODIC_REVIEW = "periodic_review"
+    WAKE_SCHEDULER = "wake_scheduler"
 
 
 class PredictionVerificationState(StrEnum):
