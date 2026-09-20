@@ -573,5 +573,29 @@
   },
   "c2a4dd9b3a8e025598abdddd8092a9e22d90586013c98b86177bb64361d22a2c": {
     "kind": "silence"
+  },
+  "03aa2ca38b441df337e7cb319db6f37e4adf209256a22bf49f9ce6d10ba28584": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "propose_goal",
+        "call_id": "sol-jan10-goal-morning-rush-stability",
+        "arguments": {
+          "source_type": "user_explicit",
+          "title": "稳定早高峰出品",
+          "description": "用户明确把当前经营优先级放在先稳定早高峰出品，而不是扩菜单；此前考虑的多新品计划暂时放下。",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_abc43111f1a6bae550d02ee1",
+              "revision": 1
+            }
+          ],
+          "confidence": 0.99,
+          "success_criteria": [
+            "后续真实经营数据或用户反馈表明早高峰出品达到用户认可的稳定程度"
+          ]
+        }
+      }
+    ]
   }
 }
