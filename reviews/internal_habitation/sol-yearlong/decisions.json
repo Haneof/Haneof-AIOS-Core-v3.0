@@ -1088,5 +1088,33 @@
         }
       }
     ]
+  },
+  "228bd55f5e91abd9968839061a3b613224e989d36817a8102c54863f42795ebd": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_task",
+        "call_id": "sol-jan17-complete-fire-prep-verification",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_cda791cdeea8798f457386f9",
+            "revision": 3
+          },
+          "new_state": "completed",
+          "reason": "The user reports both requested preparation items completed, and the contemporaneous photo independently shows the extinguisher area cleared and a printed passage record.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_5f75187e7ffa7229364793bd",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_src_39b11064c77baafc7bb2c8b3",
+              "revision": 1
+            }
+          ],
+          "next_step": "Wait for the actual inspection result; preparation completion does not imply inspection passage."
+        }
+      }
+    ]
   }
 }
