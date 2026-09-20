@@ -690,10 +690,11 @@ def test_gpt56_long_self_resident_cognition_system_closure(tmp_path):
             "external_user_impact",
         ]
     )
-    communication_experiences = target.store.list_payloads(
-        object_type="communication_experience",
-        subject_id=SUBJECT_ID,
-    )
+    communication_experiences = [
+        item
+        for item in target.store.list_payloads(subject_id=SUBJECT_ID)
+        if item.get("object_type") == "communication_experience"
+    ]
     assert any(
         item.get("scenario") == "complex_multi_month_review"
         and "明确表示这种复盘很好" in str(item.get("user_reaction", ""))
