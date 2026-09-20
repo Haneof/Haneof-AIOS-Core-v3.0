@@ -252,27 +252,94 @@ artifact.
 
 ## 14. Current-Core adapter
 
-After P12-P15 and C09 stabilized on `main`, P16 now includes a thin adapter:
+P16 now has exactly one current-Core adapter:
 
 `tests/habitation/current_core.py`
 
 It does **not** implement cognition. It creates a private `SQLiteWorldStore`,
 `WorldSearchIndex`, `RealityIngestService` and the real `FusedTurnRuntime` for one
-model candidate, then feeds resident-visible events through those existing public
-Core surfaces.
+model candidate, then feeds resident-visible events through existing public Core
+surfaces.
 
-Important boundaries:
+The adapter is intentionally mechanical:
 
-- conversation events go through the real fused turn loop;
-- non-conversation events go through P13 reality ingest;
-- virtual-clock advancement processes P12 due tasks, C09 pending Wakes and P15
-  periodic review;
-- the current utterance itself is used as the topic-gate seed, never evaluator labels;
-- hidden oracle data is never accepted by the target constructor;
-- evaluator snapshots are read only after the life run;
-- deterministic contract tests use a silent stub **only to verify plumbing and
-  isolation**. They are not evidence that AI cognition passed P16.
+- conversation → P14/FusedTurnRuntime;
+- calendar/note/order/other source facts → P13 RealityIngestService;
+- photo descriptions → P13 MediaDescriptorRecord boundary, never raw image bytes;
+- numeric sensor batches → P13 mechanical compression;
+- registered numeric/mechanical markers → C09 ObservationTriggerService;
+- Task `next_wake_at` → P12 `TASK_DUE` Wake → C09 generic Resident dispatch;
+- 24h/default review ticks → P15 periodic review through the same Resident Runtime;
+- model-created Tasks that become due between visible life events run at their real
+  virtual due time, not merely at the next conversation;
+- evaluator `end_at` advances time after the last visible event so final Review/Wake
+  work is not silently skipped.
 
-Real habitation runs must inject a real provider-backed `ModelHandler` (and a real
-round-summary handler where long-session P14 behavior is under test). Each provider
-must use a fresh private target/database.
+The scheduler advances through intermediate Task and Review timestamps in
+chronological order. It has an explicit cycle guard so a pathological model cannot
+create an infinite same-timestamp background loop.
+
+## 15. Fresh-world factory
+
+`CurrentCoreHabitationTargetFactory` creates a new database for every candidate.
+The model-side factory still receives only:
+
+`ResidentScenarioDescriptor(subject_id=<opaque id>)`
+
+It does **not** receive scenario ID, oracle, seed, manifest purpose, evaluator focus,
+future event count, future channels, or final hidden truth.
+
+The Core target defaults to `require_fresh=True`; an existing database path is
+rejected rather than silently reusing another candidate's world.
+
+## 16. Final horizon and public fingerprint
+
+A scenario may define evaluator-side `end_at`.
+
+`end_at` is not supplied to the target factory in advance. The runner only advances
+the resident's virtual clock to that timestamp after all visible life events have
+finished. This allows the resident system to experience legitimate due Tasks and
+Periodic Review after the final external event without future-information leakage.
+
+`scenario_public_fingerprint()` now hashes only the actual resident execution input:
+
+- opaque subject ID;
+- resident-visible event stream;
+- final execution horizon.
+
+It deliberately excludes semantic scenario ID, scenario version, benchmark seed and
+oracle metadata. Those evaluator identifiers remain in artifacts for provenance but
+cannot alter the "same visible life" fingerprint.
+
+## 17. Fixture execution
+
+Evaluator-side fixture loading is provided by
+`load_evaluator_fixture_scenario()`.
+
+It loads the manifest, physically separate resident JSONL and sealed oracle, validates
+their identities and path boundaries, and produces one `HabitationScenario`.
+This helper must stay outside a resident-model sandbox.
+
+All shipped P16 fixture manifests define `end_at` beyond the final visible event so
+at least one post-event scheduling horizon exists.
+
+## 18. What deterministic P16 tests prove — and do not prove
+
+Deterministic contract tests may prove:
+
+- no oracle/future metadata enters target construction;
+- separate databases and isolation keys;
+- chronological virtual-time execution;
+- P13/P14/P12/P15/C09 wiring;
+- Task/Wake/Review lifecycle mechanics;
+- summary/raw-fact boundaries;
+- artifact and fingerprint reproducibility;
+- no synthetic Conversation Observation for background wakes.
+
+They do **not** prove that an AI formed good cognition.
+
+Cognition quality is P16 evidence only when a real provider-backed resident model
+lives through a sealed scenario without access to the oracle. Real runs should also
+use a real provider-backed round-summary handler where P14 long-context summarization
+is under test.
+
