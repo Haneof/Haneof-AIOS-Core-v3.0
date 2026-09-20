@@ -235,3 +235,25 @@ def test_public_fingerprint_rejects_non_json_visible_payload() -> None:
 
     with pytest.raises(TypeError):
         scenario_public_fingerprint(scenario)
+
+
+def test_run_artifact_json_rejects_non_json_response_instead_of_stringifying() -> None:
+    scenario = _scenario()
+
+    class NonJsonTarget(EchoTarget):
+        def handle_event(self, event: ResidentEvent):
+            return {"bad": {1, 2, 3}}
+
+    run = HabitationRunner().run(
+        scenario=scenario,
+        model_id="provider/non-json",
+        target=NonJsonTarget("non-json"),
+    )
+
+    with pytest.raises(TypeError):
+        run_artifact_json(scenario=scenario, run=run)
+
+
+def test_comparison_manifest_requires_at_least_one_run() -> None:
+    with pytest.raises(ValueError, match="at least one run is required"):
+        comparison_manifest(scenario=_scenario(), runs=())
