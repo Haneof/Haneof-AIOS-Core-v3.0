@@ -57,6 +57,8 @@ class TopicStateService:
         user_input: str,
         recent_turns: Sequence[Mapping[str, Any]] = (),
         explicit_topic: str | None = None,
+        structured_history_signal: bool = False,
+        structured_signal_reason: str | None = None,
     ) -> TopicState:
         current = _clean(user_input)
         if not current:
@@ -87,9 +89,14 @@ class TopicStateService:
         # opens proactive recall only on explicit historical/continuation signals
         # (or an explicit topic hint supplied by a trusted caller). The resident
         # model retains search_world for all other cases.
-        history_may_help = history_cue or continued or (
-            bool(explicit) and explicit != current
+        history_may_help = (
+            history_cue
+            or continued
+            or (bool(explicit) and explicit != current)
+            or bool(structured_history_signal)
         )
+        if structured_history_signal and structured_signal_reason:
+            reason = f"{reason}:{structured_signal_reason.strip()}"
         return TopicState(
             topic=topic,
             gate_open=True,
