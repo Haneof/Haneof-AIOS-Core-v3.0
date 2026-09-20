@@ -7,13 +7,13 @@
 
 ## 当前快照
 
-- 时间：2026-09-20 17:40 +08:00
-- 最后已验证功能代码锚点：`1fc7b9f5c69b01f01dac8097efd29973bc4dbf4c`
-- 验证 Gate：`p16-habitation-harness` merge-result run `35503797730` / **success**（58项，含 long-horizon Task/Review/C09/media/numeric/future-leak Gate）；C09 去重加固 Gate run `35501301595` / **success**
-- 当前项目阶段：**P16 多模型独立长期入住测试**
-- 当前主干状态：**P0-P15 已闭环；P16 benchmark 已具备真实 Current-Core target、独立 World、严格 oracle 隔离、跨事件中间时钟、P12 Task due→C09 Wake、P15 周期 Review、P13 media/numeric 路径、final horizon 与 future-sample 防泄漏。**
-- 当前 blocker：**尚未接入并实际调用 GPT / Claude / Gemini 等真实 provider model；当前确定性 Gate 只能证明 AIOS/harness 机械链正确，不能证明长期认知质量。**
-- 下一主任务：**实现 provider-backed ModelHandler / RoundSummaryHandler 与可审计 run provenance，然后执行多个真实模型各自独立入住同一 sealed life；最后才由 evaluator 读取 hidden oracle。**
+- 时间：2026-09-20
+- 最后已验证功能代码锚点：`8ddb7a606fda375aad98a0b2545a992c2497d828`
+- 验证 Gate：PR #20 accepted head `b8fa56df92fdb928e2168da2054364f6a91161fd` 的 **16 个 workflow 全部 success**；其中 `constitutional-cognition-closure` run `35508439330`、`p16-habitation-harness` run `35508439464`、`p16-convergence-gate` run `35508439468`。
+- 当前项目阶段：**P16 多模型独立长期入住测试 / 真实 provider 证据阶段**
+- 当前主干状态：**P0-P15 主链 + 2026-09-20 宪法认知代码收口已闭环。Adaptive Cognitive Policy、Event Dimension、CommunicationExperience、Core-owned Topic State、九档模型生成 Summary 调度、深层世界导航、Goal/Task 相关上下文和 PLATFORM provenance 已进入 main。**
+- 当前 blocker：**真实 provider resident 基础设施已经具备，但仍未产生至少两个真实 provider/model 的独立入住 artifacts 与独立 oracle evaluator 证据。确定性 Gate 只能证明机制/隔离/接线正确，不能证明长期认知质量。**
+- 下一主任务：**不再扩 Core 机制；直接运行至少两个真实 provider/model 对同一 sealed life 的独立入住 → 保存 World/run provenance → 同一 evaluator 配置做 hidden-oracle 评估 → 离线 comparison → 独立红队。通过后才允许 P16 PASS / P17。**
 
 ## P13 已完成并通过 Gate
 
@@ -412,3 +412,89 @@ P16 仍然是 **CONTINUE / NOT PASS**，因为机械/协议/隔离测试通过�
 6. 离线 comparison；
 7. 独立红队审查实际 cognition：错误记忆、自我强化、revision、summary misuse、dimension spam、无 Outcome 伪经验；
 8. 证据成立后才允许宣布 P16 PASS 并进入 P17。
+
+
+## 2026-09-20 宪法认知代码收口 — 已合入 main
+
+历史审查：
+
+- `reviews/AIOS_V3_CONSTITUTION_CODE_ALIGNMENT_AUDIT_2026-09-20.md`
+
+收口报告：
+
+- `reviews/AIOS_V3_CONSTITUTION_CODE_ALIGNMENT_CLOSURE_2026-09-20.md`
+
+合并：
+
+- PR #20：`core: close remaining constitutional cognition gaps`
+- accepted head：`b8fa56df92fdb928e2168da2054364f6a91161fd`
+- squash merge：`8ddb7a606fda375aad98a0b2545a992c2497d828`
+
+本轮正式关闭旧审查中确认的代码缺口：
+
+1. **Adaptive Cognitive Policy**
+   - 进入统一 WorldStore；
+   - 版本 / evidence / mutable_by_ai / evaluation_window / rollback_pointer；
+   - hard boundary / engineering parameter 不可由普通 AI 更新放宽；
+   - rollback 为 forward revision，不改写历史。
+
+2. **Event Dimension**
+   - Resident 可 `form_event`；
+   - pinned evidence；
+   - revise / resolve / reject / merge / split；
+   - EvidenceSet / Dependency 同世界持久化。
+
+3. **Generic Multi-Scale Summary**
+   - 日 / 周 / 月 / 季 / 半年 / 年 / 3年 / 5年 / 10年九档；
+   - deterministic code 只调度窗口/来源；
+   - semantic summary 必须由注入模型生成；
+   - raw facts 不改写，Summary 仍是 index。
+
+4. **Topic State / Need-History**
+   - TopicStateService 进入 Core；
+   - 当前输入 + canonical recent turns 可维持“这个/那个/继续”类主题；
+   - topic existence 与 history_may_help 分离；
+   - P16 adapter 不再替 Core 注入 topic label。
+
+5. **CommunicationExperience**
+   - Resident runtime 正式 writeback；
+   - 必须有真实 user/world feedback；
+   - assistant 自己输出不能单独充当反馈；
+   - 只记录 experience，不由 deterministic code 选择未来话术。
+
+6. **World Navigation**
+   - `focus_entity`
+   - `search_timeline`
+   - `follow_relation`
+   - `compare_claims`
+   - `retrieve_original_observation`
+   - `expand_recall`
+   - `inspect_outcome`
+
+7. **Execution context**
+   - 普通用户轮次自动带入 bounded relevant Goal / Task / Action / Outcome anchors；
+   - 不再要求调用方把整个 execution world 手工塞给模型。
+
+8. **Platform provenance**
+   - 新增 `SourceClass.PLATFORM`；
+   - trusted platform authorization / real Outcome 不再误标为 `AI_COGNITION`；
+   - 旧 SQLite World 通过 lossless CHECK-constraint migration 前向兼容。
+
+9. **Context-budget regression hardening**
+   - full provider tool schema 不再在 cockpit 内重复占 token；
+   - cockpit 只保留 capability name/kind/side-effecting awareness；
+   - P14 long context / P16 habitation 回归保持 GREEN。
+
+最终 accepted head 的 16 个 Gate：**全部 SUCCESS**。
+
+### 当前唯一项目级 blocker
+
+现在不再是“缺 Core 认知机制代码”，而是：
+
+**P16 尚无真实模型长期入住证据。**
+
+因此：
+
+- 宪法代码对齐：**PASS for audited findings**
+- P16：**CONTINUE / NOT PASS**
+- P17：**仍禁止启动**
