@@ -163,5 +163,29 @@
         }
       }
     ]
+  },
+  "22ca30536cd07a902a8af4352497b06ec0f387b6c96d8e0c41bec219c56dc807": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_task",
+        "call_id": "sol-wake-wait-user-for-receiver",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_57a01b42b3d5f384db661bda",
+            "revision": 2
+          },
+          "new_state": "waiting_user",
+          "reason": "The delivery is due at 04:30 and the world still does not identify whether the user or a staff member will open the rear door. A user choice is now needed before the procurement deadline.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_src_095e2b7aa400f61d87d0575f",
+              "revision": 1
+            }
+          ],
+          "next_step": "等待用户确认由本人还是店员负责凌晨收货；妹妹航班时间仍未确认，暂不声称存在冲突。"
+        }
+      }
+    ]
   }
 }
