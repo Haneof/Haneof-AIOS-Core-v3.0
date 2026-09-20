@@ -162,6 +162,7 @@ class AllDimensionsProjectionService:
                 )
             else:
                 page = self.index.search_mind(
+                    subject=self.subject_id,
                     dimension=dimension,
                     object_types=object_types,
                     time_range=(start, end),
