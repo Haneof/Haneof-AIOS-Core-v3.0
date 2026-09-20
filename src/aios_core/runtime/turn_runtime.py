@@ -54,6 +54,8 @@ from aios_core.review import (
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 from aios_core.contracts.refs import ObjectRef
+from aios_core.contracts.enums import WakeSource
+from aios_core.wake import Step0GateInput, Step0GateResult, WakeBus, WakeStateReceipt
 
 from .capabilities import CapabilityKind, CapabilityRegistry, CapabilitySpec
 from .cognitive_runtime import CognitiveRuntime, ModelHandler, RuntimeTurnResult
@@ -75,6 +77,17 @@ class PeriodicReviewRunResult:
     runtime: RuntimeTurnResult
     context: ModelContextBundle
     wake: ReviewWakeReceipt
+
+
+@dataclass(frozen=True, slots=True)
+class WakeDispatchRunResult:
+    wake_ref: ObjectRef
+    runtime: RuntimeTurnResult | None
+    context: ModelContextBundle | None
+    step0: Step0GateResult
+    wake: WakeStateReceipt
+    delivery_response: str | None
+    delivery_suppressed: bool
 
 
 class FusedTurnRuntime:
@@ -151,6 +164,11 @@ class FusedTurnRuntime:
             subject_id=subject_id,
         )
         self.periodic_review = PeriodicReviewService(
+            store=store,
+            index=index,
+            subject_id=self.subject_id,
+        )
+        self.wake_bus = WakeBus(
             store=store,
             index=index,
             subject_id=self.subject_id,
@@ -1306,6 +1324,169 @@ class FusedTurnRuntime:
             continuity_summary_error=summary_error,
         )
 
+
+
+    def run_wake(
+        self,
+        *,
+        wake_ref: ObjectRef | Mapping[str, Any],
+        now: datetime,
+        step0: Step0GateInput | None = None,
+        token_budget: int | None = None,
+    ) -> WakeDispatchRunResult:
+        """Dispatch one durable non-conversation Wake through the resident runtime.
+
+        This is the constitutional C09 bridge between deterministic Wake creation
+        and semantic model judgment. It does not create a synthetic user
+        Conversation Observation and it never interprets the trigger in code.
+        """
+
+        ref = (
+            wake_ref
+            if isinstance(wake_ref, ObjectRef)
+            else ObjectRef(
+                object_id=str(wake_ref["object_id"]),
+                revision=int(wake_ref["revision"]),
+            )
+        )
+        if ref.revision is None:
+            raise ValueError("wake_ref must pin an exact revision")
+
+        exact_payload = self.store.get_payload(
+            ref.object_id,
+            revision=ref.revision,
+        )
+        if exact_payload.get("object_type") != "wake":
+            raise ValueError("wake_ref must point to a Wake object")
+
+        wake = self.wake_bus.current_wake(ref.object_id)
+        if wake.wake_source is WakeSource.PERIODIC_REVIEW:
+            raise ValueError(
+                "PERIODIC_REVIEW Wake must use run_periodic_review so review anchors remain intact"
+            )
+        if wake.wake_source is WakeSource.USER_INTERACTION:
+            raise ValueError(
+                "USER_INTERACTION must use run_turn so the user utterance enters the world"
+            )
+
+        gate_result = self.wake_bus.evaluate_step0(wake, step0)
+        if not gate_result.model_allowed:
+            queued = self.wake_bus.defer(
+                wake.object_id,
+                deferred_at=now,
+                step0=gate_result,
+            )
+            return WakeDispatchRunResult(
+                wake_ref=ObjectRef(
+                    object_id=queued.wake_id,
+                    revision=queued.revision,
+                ),
+                runtime=None,
+                context=None,
+                step0=gate_result,
+                wake=queued,
+                delivery_response=None,
+                delivery_suppressed=True,
+            )
+
+        claimed = self.wake_bus.claim(
+            wake.object_id,
+            started_at=now,
+        )
+        running = self.wake_bus.current_wake(claimed.wake_id)
+        running_ref = ObjectRef(
+            object_id=running.object_id,
+            revision=running.revision,
+        )
+
+        empty_recommendation = RecommendationBundle(
+            current_topic=None,
+            topic_gate_open=False,
+            world_revision=int(self.store.current_world_revision()),
+            index_watermark=self.index.watermark(),
+            cards=(),
+            reason="wake_dispatch_uses_wake_reason_as_first_pointer",
+        )
+        continuity_context = self.ai_world.core_context(per_domain=3)
+        wake_context = {
+            "wake_ref": running_ref.model_dump(mode="json"),
+            "wake_source": running.wake_source.value,
+            "rule_id": running.rule_id,
+            "priority": running.priority,
+            "dedupe_key": running.dedupe_key,
+            "first_hit_at": running.first_hit_at.isoformat(),
+            "last_hit_at": running.last_hit_at.isoformat(),
+            "hit_count": running.hit_count,
+            "evidence_refs": [
+                item.model_dump(mode="json")
+                for item in running.evidence_refs
+            ],
+            "step0": gate_result.model_dump(mode="json"),
+            "evidence_reader": "inspect_world_object",
+        }
+        wake_input = (
+            "System Wake. Start from the supplied Wake Reason and pinned evidence. "
+            "Decide what, if anything, it means now. Search or inspect more world "
+            "state when needed. You may respond, act through authorized capabilities, "
+            "or remain silent. The trigger itself is not a semantic conclusion."
+        )
+        context = self.context_controller.assemble(
+            user_input=wake_input,
+            current_topic=None,
+            recommendation=empty_recommendation,
+            recent_turns=(),
+            conversation_summaries=(),
+            ai_identity=continuity_context,
+            task_context={"wake": wake_context},
+            capability_catalog=self.registry.catalog(),
+            token_budget=token_budget,
+        )
+
+        self._active_turn_time = now
+        self._active_session_id = None
+        self._active_review_request = None
+        try:
+            runtime_result = self.cognitive_runtime.run_turn(
+                wake_input,
+                wake_reason=running.wake_source.value,
+                cockpit=context.as_cockpit(),
+            )
+        finally:
+            self._active_turn_time = None
+            self._active_session_id = None
+            self._active_review_request = None
+
+        completed = self.wake_bus.complete(
+            running.object_id,
+            completed_at=now,
+            termination_reason=runtime_result.termination_reason,
+            model_rounds=runtime_result.model_rounds,
+            capability_names=tuple(
+                item.name for item in runtime_result.capability_history
+            ),
+            delivery_allowed=gate_result.delivery_allowed,
+            step0_state=gate_result.state,
+        )
+        delivery_response = (
+            runtime_result.response
+            if gate_result.delivery_allowed
+            else None
+        )
+        return WakeDispatchRunResult(
+            wake_ref=ObjectRef(
+                object_id=completed.wake_id,
+                revision=completed.revision,
+            ),
+            runtime=runtime_result,
+            context=context,
+            step0=gate_result,
+            wake=completed,
+            delivery_response=delivery_response,
+            delivery_suppressed=(
+                runtime_result.response is not None
+                and not gate_result.delivery_allowed
+            ),
+        )
 
 
     def run_periodic_review(
