@@ -508,12 +508,18 @@ class CurrentCoreHabitationTarget(HabitationTarget):
             record_id = raw.get("external_record_id", f"{event.event_id}:{index}")
             if not isinstance(record_id, str) or not record_id.strip():
                 raise ValueError("numeric sample external_record_id must be non-blank")
+            sample_time = self._parse_sample_time(
+                raw.get("occurred_at", event.occurred_at)
+            )
+            if sample_time > as_utc(event.occurred_at, "event.occurred_at"):
+                raise ValueError(
+                    "sensor_numeric sample cannot occur after its resident-visible "
+                    "delivery event; future samples would leak future information"
+                )
             samples.append(
                 NumericSample(
                     external_record_id=record_id,
-                    occurred_at=self._parse_sample_time(
-                        raw.get("occurred_at", event.occurred_at)
-                    ),
+                    occurred_at=sample_time,
                     value=raw.get("value"),
                     source_locator=raw.get("source_locator"),
                 )
