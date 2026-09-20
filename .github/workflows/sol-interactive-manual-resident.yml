@@ -1,0 +1,45 @@
+name: sol-interactive-manual-resident
+
+on:
+  push:
+    branches:
+      - "arena/sol-yearlong-resident-20260921"
+    paths:
+      - "reviews/internal_habitation/sol-yearlong/manual_resident.py"
+      - "reviews/internal_habitation/sol-yearlong/decisions.json"
+      - ".github/workflows/sol-interactive-manual-resident.yml"
+
+jobs:
+  interactive-resident:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - name: Run until next live Resident decision
+        shell: bash
+        run: |
+          set +e
+          python reviews/internal_habitation/sol-yearlong/manual_resident.py \
+            --fixture-root reviews/internal_habitation/sol-yearlong/bootstrap/fixtures \
+            --manifest sol_bootstrap.manifest.json \
+            --decisions reviews/internal_habitation/sol-yearlong/decisions.json \
+            --output-dir artifacts/internal-habitation/sol-manual
+          code=$?
+          if [ "$code" -eq 42 ]; then
+            echo "Manual Resident paused correctly for a live GPT-5.6 Sol decision."
+            exit 0
+          fi
+          exit "$code"
+      - name: Upload manual Resident evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sol-interactive-resident-${{ github.run_id }}
+          path: artifacts/internal-habitation/
+          if-no-files-found: warn
