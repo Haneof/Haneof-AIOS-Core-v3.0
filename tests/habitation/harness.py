@@ -10,6 +10,7 @@ projections and oracle-free structural metadata may cross into model-side adapte
 
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Mapping, Protocol, Sequence
@@ -31,10 +32,12 @@ class ResidentEvent:
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        if not self.event_id.strip():
-            raise ValueError("event_id must be non-empty")
-        if not self.channel.strip():
-            raise ValueError("channel must be non-empty")
+        if not isinstance(self.event_id, str) or not self.event_id.strip():
+            raise ValueError("event_id must be a non-empty string")
+        if not isinstance(self.channel, str) or not self.channel.strip():
+            raise ValueError("channel must be a non-empty string")
+        if not isinstance(self.metadata, Mapping):
+            raise ValueError("metadata must be a mapping")
         _require_aware(self.occurred_at, "occurred_at")
 
 
@@ -51,10 +54,16 @@ class LifeEvent:
     deliver_to_resident: bool = True
 
     def __post_init__(self) -> None:
-        if not self.event_id.strip():
-            raise ValueError("event_id must be non-empty")
-        if not self.channel.strip():
-            raise ValueError("channel must be non-empty")
+        if not isinstance(self.event_id, str) or not self.event_id.strip():
+            raise ValueError("event_id must be a non-empty string")
+        if not isinstance(self.channel, str) or not self.channel.strip():
+            raise ValueError("channel must be a non-empty string")
+        if not isinstance(self.metadata, Mapping):
+            raise ValueError("metadata must be a mapping")
+        if not isinstance(self.hidden_oracle, Mapping):
+            raise ValueError("hidden_oracle must be a mapping")
+        if not isinstance(self.deliver_to_resident, bool):
+            raise ValueError("deliver_to_resident must be a boolean")
         _require_aware(self.occurred_at, "occurred_at")
         overlap = set(self.metadata).intersection(self.hidden_oracle)
         if overlap:
@@ -68,8 +77,8 @@ class LifeEvent:
             event_id=self.event_id,
             occurred_at=self.occurred_at,
             channel=self.channel,
-            payload=self.payload,
-            metadata=dict(self.metadata),
+            payload=deepcopy(self.payload),
+            metadata=deepcopy(dict(self.metadata)),
         )
 
 
@@ -100,16 +109,24 @@ class HabitationScenario:
     seed: int = 0
 
     def __post_init__(self) -> None:
-        if not self.scenario_id.strip():
-            raise ValueError("scenario_id must be non-empty")
-        if not self.subject_id.strip():
-            raise ValueError("subject_id must be non-empty")
+        if not isinstance(self.scenario_id, str) or not self.scenario_id.strip():
+            raise ValueError("scenario_id must be a non-empty string")
+        if not isinstance(self.subject_id, str) or not self.subject_id.strip():
+            raise ValueError("subject_id must be a non-empty string")
         if not self.events:
             raise ValueError("scenario must contain at least one event")
-        if not self.scenario_version.strip():
-            raise ValueError("scenario_version must be non-empty")
+        if not isinstance(self.scenario_version, str) or not self.scenario_version.strip():
+            raise ValueError("scenario_version must be a non-empty string")
+        if not isinstance(self.seed, int) or isinstance(self.seed, bool):
+            raise ValueError("seed must be an integer")
         if self.seed < 0:
             raise ValueError("seed must be >= 0")
+        if not isinstance(self.hidden_oracle, Mapping):
+            raise ValueError("hidden_oracle must be a mapping")
+        if not isinstance(self.tags, tuple) or not all(
+            isinstance(tag, str) and tag.strip() for tag in self.tags
+        ):
+            raise ValueError("tags must be a tuple of non-empty strings")
 
         seen: set[str] = set()
         previous: datetime | None = None
@@ -216,8 +233,8 @@ class HabitationRunner:
         model_id: str,
         target: HabitationTarget,
     ) -> HabitationRun:
-        if not model_id.strip():
-            raise ValueError("model_id must be non-empty")
+        if not isinstance(model_id, str) or not model_id.strip():
+            raise ValueError("model_id must be a non-empty string")
 
         steps: list[HabitationStep] = []
         for event in scenario.events:
@@ -231,7 +248,7 @@ class HabitationRunner:
                     occurred_at=event.occurred_at,
                     channel=event.channel,
                     delivered=True,
-                    response=response,
+                    response=deepcopy(response),
                 )
             )
 
@@ -265,9 +282,10 @@ class HabitationRunner:
                 )
             seen_target_ids.add(target_identity)
 
-            isolation_key = str(target.isolation_key).strip()
-            if not isolation_key:
-                raise ValueError("target isolation_key must be non-empty")
+            isolation_value = target.isolation_key
+            if not isinstance(isolation_value, str) or not isolation_value.strip():
+                raise ValueError("target isolation_key must be a non-empty string")
+            isolation_key = isolation_value.strip()
             if isolation_key in seen_isolation_keys:
                 raise ValueError(
                     "each model_id must receive an independent AIOS world/store"
