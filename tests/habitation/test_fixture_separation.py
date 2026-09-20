@@ -3,7 +3,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from .io import load_resident_events_jsonl
+from .io import (
+    load_evaluator_fixture_scenario,
+    load_resident_events_jsonl,
+)
 
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -61,6 +64,7 @@ def test_catalog_scenarios_have_separate_resident_and_oracle_files() -> None:
         assert manifest["scenario_id"] == entry["scenario_id"]
         assert manifest["resident_stream"].startswith("resident/")
         assert manifest["evaluator_oracle"].startswith("oracle/")
+        assert isinstance(manifest.get("end_at"), str)
 
         resident_path = FIXTURES / manifest["resident_stream"]
         oracle_path = FIXTURES / manifest["evaluator_oracle"]
@@ -109,3 +113,30 @@ def test_resident_subject_ids_are_opaque_and_non_semantic() -> None:
         for subject_id in subject_ids
         for token in ("learning", "continuity", "revision", "uncertainty")
     )
+
+
+
+def test_evaluator_fixture_loader_preserves_oracle_separation_and_final_horizon() -> None:
+    catalog = json.loads((FIXTURES / "catalog.json").read_text(encoding="utf-8"))
+
+    for entry in catalog["scenarios"]:
+        scenario = load_evaluator_fixture_scenario(
+            FIXTURES / entry["manifest"]
+        )
+        assert scenario.hidden_oracle["latent_truth"]["evaluation_only"] is True
+        assert scenario.end_at is not None
+        assert scenario.end_at >= max(
+            event.occurred_at
+            for event in scenario.events
+            if event.deliver_to_resident
+        )
+        resident_views = [
+            event.resident_view()
+            for event in scenario.events
+            if event.deliver_to_resident
+        ]
+        assert resident_views
+        assert all(
+            not hasattr(event, "hidden_oracle")
+            for event in resident_views
+        )
