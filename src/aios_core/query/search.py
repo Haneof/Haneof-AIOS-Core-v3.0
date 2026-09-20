@@ -52,6 +52,8 @@ _TEXT_FIELDS: dict[str, tuple[str, ...]] = {
     "task": ("title", "next_step"),
     "entity": ("canonical_name",),
     "goal": ("title", "description"),
+    "dimension_definition": ("name", "description", "expected_value"),
+    "dimension_derivation": ("derivation_description",),
     "summary": ("content",),
     "prediction": ("expected_change", "reasoning"),
     "reinterpretation": ("statement",),
