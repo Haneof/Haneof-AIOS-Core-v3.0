@@ -43,3 +43,45 @@ def test_manifest_requires_fresh_world_and_evaluator_only_oracle() -> None:
     assert manifest["evaluator_oracle"].startswith("oracle/")
     assert "fresh AIOS world" in manifest["rule"]
     assert "evaluator-only" in manifest["rule"]
+
+
+def test_catalog_scenarios_have_separate_resident_and_oracle_files() -> None:
+    catalog = json.loads((FIXTURES / "catalog.json").read_text(encoding="utf-8"))
+    entries = catalog["scenarios"]
+
+    scenario_ids = [entry["scenario_id"] for entry in entries]
+    assert len(scenario_ids) == len(set(scenario_ids))
+    assert len(entries) >= 4
+
+    for entry in entries:
+        manifest_path = FIXTURES / entry["manifest"]
+        assert manifest_path.exists()
+
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        assert manifest["scenario_id"] == entry["scenario_id"]
+        assert manifest["resident_stream"].startswith("resident/")
+        assert manifest["evaluator_oracle"].startswith("oracle/")
+
+        resident_path = FIXTURES / manifest["resident_stream"]
+        oracle_path = FIXTURES / manifest["evaluator_oracle"]
+        assert resident_path.exists()
+        assert oracle_path.exists()
+        assert resident_path != oracle_path
+
+        events = load_events_jsonl(resident_path.read_text(encoding="utf-8"))
+        assert events
+        assert all(event.deliver_to_resident for event in events)
+        assert all(not event.hidden_oracle for event in events)
+
+        oracle = json.loads(oracle_path.read_text(encoding="utf-8"))
+        assert oracle["scenario_id"] == entry["scenario_id"]
+        assert oracle["latent_truth"]["evaluation_only"] is True
+
+
+def test_catalog_focuses_on_behavior_not_expected_response_strings() -> None:
+    catalog_text = (FIXTURES / "catalog.json").read_text(encoding="utf-8")
+    catalog = json.loads(catalog_text)
+
+    assert "expected_response" not in catalog_text
+    assert "expected_answer" not in catalog_text
+    assert all(entry["focus"] for entry in catalog["scenarios"])
