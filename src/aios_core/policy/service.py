@@ -381,41 +381,51 @@ class CognitivePolicyRegistry:
             raise KeyError(f"unknown policy/version: {policy_id}@{target_version}")
         if target.version >= current.version:
             raise ValueError("rollback target must be older than current policy")
+        if actor_is_ai and (
+            current.policy_class is not PolicyClass.COGNITIVE_POLICY
+            or not current.mutable_by_ai
+        ):
+            raise PermissionError(f"policy is not AI-mutable: {policy_id}")
         refs = tuple(evidence_refs)
-        request = CognitivePolicyUpdateRequest(
-            policy_id=policy_id,
-            current_value=target.current_value,
-            reason=reason,
-            evidence_refs=refs,
-            changed_by=changed_by,
-            evaluation_window=current.evaluation_window,
-        )
-        receipt = self.update(request, changed_at=changed_at, actor_is_ai=actor_is_ai)
-        newest = self.latest(policy_id)
-        assert newest is not None
-        # update() points rollback_pointer at the immediately previous version. For an
-        # explicit rollback, record the actual target in a final forward revision only
-        # if it differs. This preserves append-only history and makes rollback auditable.
-        if newest.rollback_pointer == target_version:
-            return receipt
+        if actor_is_ai and not refs:
+            raise PermissionError("AI policy rollback requires pinned evidence")
+        self._validate_refs(refs)
         changed = as_utc(changed_at, "changed_at")
-        next_version = newest.revision + 1
+        version = current.revision + 1
+        evidence = self._evidence_set(
+            policy_id=current.policy_id,
+            version=version,
+            refs=refs,
+            changed_at=changed,
+            purpose=f"support rollback {current.policy_id}@{current.version}->{target.version}",
+        )
         policy = CognitivePolicy.model_validate(
             {
-                **newest.model_dump(mode="python", round_trip=True),
-                "revision": next_version,
+                **current.model_dump(mode="python", round_trip=True),
+                "revision": version,
+                "occurred": TemporalExtent.point(changed),
                 "learned_at": changed,
                 "recorded_at": changed,
+                "source_refs": [
+                    SourceRef(object_id=r.object_id, revision=r.revision)
+                    for r in refs
+                ],
+                "created_by": f"cognitive_policy:{changed_by.strip()}",
+                "current_value": target.current_value,
+                "reason": reason.strip(),
+                "evidence_refs": list(refs),
+                "changed_by": changed_by.strip(),
                 "changed_at": changed,
-                "version": next_version,
-                "previous_version": newest.version,
-                "rollback_pointer": int(target_version),
-                "reason": f"record explicit rollback target: {reason.strip()}",
+                "version": version,
+                "previous_version": current.version,
+                "rollback_pointer": target.version,
+                "evaluation_window": current.evaluation_window,
+                "status": "active",
             }
         )
         return self._commit(
             policy,
-            evidence=None,
+            evidence=evidence,
             actor_is_ai=actor_is_ai,
             operation_name="policy.rollback",
         )
