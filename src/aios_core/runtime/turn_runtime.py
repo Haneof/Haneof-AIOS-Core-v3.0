@@ -8,7 +8,7 @@ vertical slice stays green.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from typing import Any, Mapping, Sequence
 
@@ -21,6 +21,8 @@ from aios_core.recommendation.proactive import (
     RecommendationBundle,
 )
 from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
+from aios_core.contracts.refs import ObjectRef
 
 from .capabilities import CapabilityKind, CapabilityRegistry, CapabilitySpec
 from .cognitive_runtime import CognitiveRuntime, ModelHandler, RuntimeTurnResult
@@ -63,6 +65,12 @@ class FusedTurnRuntime:
             index=index,
             subject_id=subject_id,
         )
+        self.writeback = CognitionWritebackService(
+            store=store,
+            index=index,
+            subject_id=subject_id,
+        )
+        self._active_turn_time: datetime | None = None
 
         registry = CapabilityRegistry()
         registry.register(
@@ -100,11 +108,32 @@ class FusedTurnRuntime:
             ),
             self._request_all_dimensions_projection,
         )
+        registry.register(
+            CapabilitySpec(
+                name="commit_claim",
+                description=(
+                    "Persist a revisable AI cognition Claim grounded in pinned world evidence. "
+                    "This capability cannot create Observation facts."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "content": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "confidence": "number[0,1]",
+                    "dimension": "string",
+                    "claim_type": "string?",
+                    "knowledge_state": "string?",
+                },
+            ),
+            self._commit_claim,
+        )
         self.registry = registry
         self.cognitive_runtime = CognitiveRuntime(
             registry=registry,
             model_handler=model_handler,
             max_tool_rounds=max_tool_rounds,
+            side_effect_authorizer=self._authorize_side_effect,
         )
 
     def _search_world(self, query: str, limit: int = 8) -> list[dict[str, Any]]:
@@ -149,6 +178,43 @@ class FusedTurnRuntime:
         )
         return projection.model_dump(mode="json")
 
+    def _authorize_side_effect(self, spec, call, snapshot) -> bool:
+        # Internal cognition writeback is allowed because the handler itself enforces
+        # pinned evidence and writes only revisable cognition. External actions stay
+        # denied until a separate capability-specific authorization layer exists.
+        return spec.name == "commit_claim"
+
+    def _commit_claim(
+        self,
+        content: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        confidence: float,
+        dimension: str,
+        claim_type: str = "inference",
+        knowledge_state: str = "inferred",
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("commit_claim is only available during an active AIOS turn")
+        refs = tuple(
+            ObjectRef(
+                object_id=str(item["object_id"]),
+                revision=int(item["revision"]),
+            )
+            for item in evidence_refs
+        )
+        receipt = self.writeback.commit_claim(
+            ClaimWriteRequest(
+                content=content,
+                evidence_refs=refs,
+                confidence=float(confidence),
+                dimension=dimension,
+                claim_type=claim_type,
+                knowledge_state=knowledge_state,
+            ),
+            learned_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
     def run_turn(
         self,
         *,
@@ -179,11 +245,15 @@ class FusedTurnRuntime:
             token_budget=token_budget,
         )
 
-        runtime_result = self.cognitive_runtime.run_turn(
-            user_input,
-            wake_reason="user_interaction",
-            cockpit=context.as_cockpit(),
-        )
+        self._active_turn_time = occurred_at
+        try:
+            runtime_result = self.cognitive_runtime.run_turn(
+                user_input,
+                wake_reason="user_interaction",
+                cockpit=context.as_cockpit(),
+            )
+        finally:
+            self._active_turn_time = None
 
         assistant_text = runtime_result.response or ""
         commit = self.ingestor.commit_turn(
