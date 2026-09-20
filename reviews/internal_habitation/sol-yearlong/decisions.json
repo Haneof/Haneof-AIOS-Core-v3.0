@@ -1314,5 +1314,15 @@
         }
       }
     ]
+  },
+  "237802d520417988194c522139fd987c7f3c7bdef0d45c13717d02ab38a63059": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_execution_world",
+        "call_id": "sol-summaryrun-jan07-read-execution-world",
+        "arguments": {}
+      }
+    ]
   }
 }
