@@ -1,0 +1,209 @@
+from __future__ import annotations
+
+from datetime import datetime, timedelta, timezone
+
+import pytest
+
+from tests.habitation.harness import (
+    HabitationRunner,
+    HabitationScenario,
+    LifeEvent,
+    ResidentEvent,
+    evaluate_run,
+    scenario_channels,
+    visible_events,
+)
+
+
+BASE = datetime(2026, 9, 20, 8, 0, tzinfo=timezone.utc)
+
+
+class RecordingTarget:
+    def __init__(self, label: str) -> None:
+        self.label = label
+        self.events: list[ResidentEvent] = []
+
+    def handle_event(self, event: ResidentEvent):
+        self.events.append(event)
+        return {
+            "agent": self.label,
+            "event_id": event.event_id,
+            "free_form_response": f"{self.label} observed {event.channel}",
+        }
+
+
+class OracleAwareEvaluator:
+    def evaluate(self, *, scenario, run):
+        return {
+            "agent_id": run.agent_id,
+            "latent_change": scenario.hidden_oracle["latent_change"],
+            "event_truth": scenario.events[0].hidden_oracle["truth"],
+            "delivered_count": run.delivered_count,
+        }
+
+
+def _scenario() -> HabitationScenario:
+    return HabitationScenario(
+        scenario_id="hidden-life-001",
+        subject_id="user_1",
+        hidden_oracle={
+            "latent_change": "the user's study confidence improves over several weeks"
+        },
+        events=(
+            LifeEvent(
+                event_id="day-01-conversation",
+                occurred_at=BASE,
+                channel="conversation",
+                payload="今天这道题我还是需要你带着我做。",
+                metadata={"session": "s1"},
+                hidden_oracle={"truth": "low_initial_independence"},
+            ),
+            LifeEvent(
+                event_id="day-07-calendar",
+                occurred_at=BASE + timedelta(days=7),
+                channel="calendar",
+                payload={"title": "独立复习", "duration_minutes": 90},
+                metadata={"source": "calendar"},
+                hidden_oracle={"importance": "supports longitudinal pattern"},
+            ),
+            LifeEvent(
+                event_id="day-21-private-oracle-only",
+                occurred_at=BASE + timedelta(days=21),
+                channel="oracle",
+                payload="not delivered",
+                hidden_oracle={"truth": "external evaluator-only evidence"},
+                deliver_to_resident=False,
+            ),
+        ),
+    )
+
+
+def test_hidden_oracle_never_enters_resident_event() -> None:
+    scenario = _scenario()
+    target = RecordingTarget("resident-a")
+
+    run = HabitationRunner().run(
+        scenario=scenario,
+        agent_id="resident-a",
+        target=target,
+    )
+
+    assert run.delivered_count == 2
+    assert len(target.events) == 2
+    assert all(not hasattr(event, "hidden_oracle") for event in target.events)
+    assert target.events[0].metadata == {"session": "s1"}
+    assert "truth" not in target.events[0].metadata
+    assert run.steps[-1].delivered is False
+    assert run.steps[-1].response is None
+
+
+def test_runner_does_not_require_a_fixed_expected_answer() -> None:
+    scenario = _scenario()
+
+    class FreeFormTarget:
+        def handle_event(self, event: ResidentEvent):
+            if event.channel == "conversation":
+                return "I may need more evidence before changing my understanding."
+            return {"tool_calls": [], "notes": ["calendar event stored"]}
+
+    run = HabitationRunner().run(
+        scenario=scenario,
+        agent_id="free-form",
+        target=FreeFormTarget(),
+    )
+
+    assert run.delivered_count == 2
+    assert run.steps[0].response.startswith("I may need more evidence")
+    assert isinstance(run.steps[1].response, dict)
+
+
+def test_multi_agent_execution_requires_independent_target_instances() -> None:
+    scenario = _scenario()
+    runner = HabitationRunner()
+    target_a = RecordingTarget("a")
+    target_b = RecordingTarget("b")
+
+    result = runner.run_many(
+        scenario=scenario,
+        targets={"agent-a": target_a, "agent-b": target_b},
+    )
+
+    assert set(result.runs) == {"agent-a", "agent-b"}
+    assert result.runs["agent-a"].steps[0].response["agent"] == "a"
+    assert result.runs["agent-b"].steps[0].response["agent"] == "b"
+    assert target_a.events is not target_b.events
+
+    shared = RecordingTarget("shared")
+    with pytest.raises(ValueError, match="independent target instance"):
+        runner.run_many(
+            scenario=scenario,
+            targets={"agent-a": shared, "agent-b": shared},
+        )
+
+
+def test_evaluator_gets_oracle_only_after_resident_run() -> None:
+    scenario = _scenario()
+    target = RecordingTarget("resident")
+
+    run = HabitationRunner().run(
+        scenario=scenario,
+        agent_id="resident",
+        target=target,
+    )
+    report = evaluate_run(
+        evaluator=OracleAwareEvaluator(),
+        scenario=scenario,
+        run=run,
+    )
+
+    assert report["latent_change"].startswith("the user's study confidence")
+    assert report["event_truth"] == "low_initial_independence"
+    assert report["delivered_count"] == 2
+
+
+def test_scenario_rejects_time_travel_and_duplicate_event_ids() -> None:
+    later = LifeEvent(
+        event_id="same",
+        occurred_at=BASE + timedelta(days=2),
+        channel="conversation",
+        payload="later",
+    )
+    earlier = LifeEvent(
+        event_id="earlier",
+        occurred_at=BASE,
+        channel="conversation",
+        payload="earlier",
+    )
+    duplicate = LifeEvent(
+        event_id="same",
+        occurred_at=BASE + timedelta(days=3),
+        channel="conversation",
+        payload="duplicate",
+    )
+
+    with pytest.raises(ValueError, match="chronological"):
+        HabitationScenario(
+            scenario_id="bad-time",
+            subject_id="u",
+            events=(later, earlier),
+        )
+
+    with pytest.raises(ValueError, match="duplicate event_id"):
+        HabitationScenario(
+            scenario_id="bad-id",
+            subject_id="u",
+            events=(later, duplicate),
+        )
+
+
+def test_visible_projection_and_channel_report_cannot_leak_oracle() -> None:
+    scenario = _scenario()
+
+    projected = visible_events(scenario)
+
+    assert [event.event_id for event in projected] == [
+        "day-01-conversation",
+        "day-07-calendar",
+    ]
+    assert scenario_channels(scenario) == ("conversation", "calendar", "oracle")
+    assert all(not hasattr(event, "hidden_oracle") for event in projected)
