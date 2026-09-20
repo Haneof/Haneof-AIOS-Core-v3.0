@@ -79,7 +79,9 @@ class GPT56SelfResident:
             receipt = history[-1].data
             self.claim_ref = {
                 "object_id": receipt["claim_id"],
-                "revision": receipt["revision"],
+                # CognitionWritebackService creates the initial Claim at revision 1;
+                # ClaimWriteReceipt deliberately does not duplicate that constant.
+                "revision": 1,
             }
             return ModelDirective(
                 response="记住了：你通常周末不工作，周六上午一般留给学习。"
