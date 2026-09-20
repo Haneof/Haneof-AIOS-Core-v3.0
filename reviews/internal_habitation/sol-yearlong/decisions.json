@@ -1546,5 +1546,59 @@
   "691814d95b9ceab25c05d83fb805a04414f3498258c24966377b2d28506e7bd0": {
     "kind": "summary",
     "summary": "2027-01-08，用户先要求记住凌晨 04:30 的面粉到货安排，并说明妹妹周五晚上可能到机场但时间尚未确认，要求在证据不足时不要替其判断冲突。随后用户确认妹妹 22:40 到达、自己接机，并安排小赵负责凌晨收货，曾明确要求 AIOS 发送“明早4:15到店开后门收货，到了回我”的消息。AIOS 当时说明发送仅形成请求、尚无真实执行结果。20 分钟后用户说明已经亲自电话联系小赵、对方确认 4:15 到店，并明确要求 AIOS 不再发送；AIOS确认不再发送，也未声称此前提案已执行。"
+  },
+  "807a4eb84b0da5ebb620aefd02a27f9cd3796591657a1a624482c44f0869eed6": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "record_communication_experience",
+        "call_id": "sol-jan09-record-uncertainty-feedback",
+        "arguments": {
+          "scenario": "potential schedule conflict with incomplete timing evidence",
+          "style": "preserve uncertainty; do not characterize two arrangements as conflicting until concrete timing evidence supports overlap; state what is known and what remains unknown",
+          "tone": "calm and evidence-bounded",
+          "user_reaction": "accepted",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_37068ea8651565e088f2d785",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_7f7c45c618b5d87bb51e4eb4",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_ai_acc5b0fdc866a3637fcdb347",
+              "revision": 1
+            }
+          ],
+          "applicable_conditions": {
+            "condition": "important arrangements may conflict but one or more relevant times remain unconfirmed"
+          }
+        }
+      },
+      {
+        "name": "propose_cognitive_policy",
+        "call_id": "sol-jan09-policy-uncertain-schedule-conflict",
+        "arguments": {
+          "policy_id": "communication.uncertain_schedule_conflict_escalation",
+          "scope": "per-user:sol-resident-20260921-001",
+          "default_value": "normal",
+          "current_value": "require_concrete_timing_evidence_before_framing_as_conflict",
+          "allowed_range_or_choices": [
+            "normal",
+            "require_concrete_timing_evidence_before_framing_as_conflict"
+          ],
+          "reason": "The user explicitly approved the prior uncertainty-preserving handling and directly asked that future unconfirmed timing not be framed alarmingly as a conflict.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_37068ea8651565e088f2d785",
+              "revision": 1
+            }
+          ],
+          "evaluation_window": "30d"
+        }
+      }
+    ]
   }
 }
