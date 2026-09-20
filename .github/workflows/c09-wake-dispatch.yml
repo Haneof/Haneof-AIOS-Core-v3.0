@@ -1,4 +1,5 @@
 # Post-merge verification branch; this comment is intentionally non-semantic.
+# Ready-for-review synchronize triggers the gate on current main.
 name: c09-wake-dispatch
 
 on:
