@@ -114,6 +114,7 @@ class CurrentCoreHabitationTarget(HabitationTarget):
         db_path: str | Path,
         model_handler: ModelHandler,
         round_summary_handler: RoundSummaryHandler | None = None,
+        dimension_summary_handler: RoundSummaryHandler | None = None,
         source_specs: Mapping[str, SourceAdapterSpec] | None = None,
         observation_wake_rules: Sequence[ObservationWakeRule] = (),
         review_policy: ReviewSchedulePolicy | None = None,
@@ -149,8 +150,28 @@ class CurrentCoreHabitationTarget(HabitationTarget):
                 raise ValueError(
                     "round_summary_handler model_id does not match target model_id"
                 )
+        effective_dimension_summary_handler = (
+            dimension_summary_handler
+            if dimension_summary_handler is not None
+            else round_summary_handler
+        )
+        if effective_dimension_summary_handler is not None:
+            dimension_model_id = getattr(
+                effective_dimension_summary_handler,
+                "model_id",
+                None,
+            )
+            if dimension_model_id is not None and (
+                not isinstance(dimension_model_id, str)
+                or not dimension_model_id.strip()
+                or dimension_model_id.strip() != self.model_id
+            ):
+                raise ValueError(
+                    "dimension_summary_handler model_id does not match target model_id"
+                )
         self._model_handler = model_handler
         self._round_summary_handler = round_summary_handler
+        self._dimension_summary_handler = effective_dimension_summary_handler
         self.db_path = Path(db_path).expanduser().resolve()
         existing_world = self.db_path.exists()
         if require_fresh and existing_world:
@@ -187,6 +208,7 @@ class CurrentCoreHabitationTarget(HabitationTarget):
             model_handler=model_handler,
             subject_id=self.subject_id,
             round_summary_handler=round_summary_handler,
+            dimension_summary_handler=effective_dimension_summary_handler,
             max_tool_rounds=8,
         )
         self.observation_triggers = ObservationTriggerService(
@@ -389,6 +411,28 @@ class CurrentCoreHabitationTarget(HabitationTarget):
             "runtime": _runtime_view(review.runtime),
         }
 
+    def _run_dimension_summaries(self, now: datetime) -> dict[str, Any]:
+        if self.runtime.dimension_summary_scheduler is None:
+            return {
+                "at": now.isoformat(),
+                "invoked": False,
+                "reason": "dimension_summary_handler_not_configured",
+            }
+        result = self.runtime.run_due_dimension_summaries(
+            now=now,
+            max_jobs=64,
+        )
+        return {
+            "at": now.isoformat(),
+            "invoked": True,
+            "attempted_jobs": len(result.attempted_jobs),
+            "commits": [asdict(item) for item in result.commits],
+            "skipped_unchanged": len(result.skipped_unchanged),
+            "skipped_empty": len(result.skipped_empty),
+            "truncated": result.truncated,
+        }
+
+
     def advance_to(self, instant: datetime) -> Mapping[str, Any]:
         target = as_utc(instant, "instant")
         start = self._clock
@@ -448,12 +492,14 @@ class CurrentCoreHabitationTarget(HabitationTarget):
             if follow_up["task_wakes"] or follow_up["wake_runs"]:
                 task_cycles.append(follow_up)
 
+        dimension_summaries = self._run_dimension_summaries(target)
         self._clock = target
         result = {
             "from": None if start is None else start.isoformat(),
             "to": target.isoformat(),
             "task_cycles": task_cycles,
             "periodic_reviews": review_runs,
+            "dimension_summaries": dimension_summaries,
             "background_cycles": cycles,
             "world_revision": int(self.store.current_world_revision()),
         }
