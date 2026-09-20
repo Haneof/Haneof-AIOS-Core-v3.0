@@ -221,6 +221,7 @@ class WakeSource(StrEnum):
     USER_INTERACTION = "user_interaction"
     SAFETY = "safety"
     RECOVERY = "recovery"
+    PERIODIC_REVIEW = "periodic_review"
 
 
 class WakeState(StrEnum):
