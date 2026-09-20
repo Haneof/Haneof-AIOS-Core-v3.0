@@ -131,6 +131,26 @@ class CurrentCoreHabitationTarget(HabitationTarget):
 
         self.model_id = model_id.strip()
         self.subject_id = subject_id.strip()
+        bound_model_id = getattr(model_handler, "model_id", None)
+        if bound_model_id is not None:
+            if not isinstance(bound_model_id, str) or not bound_model_id.strip():
+                raise ValueError("model_handler model_id must be non-blank when exposed")
+            if bound_model_id.strip() != self.model_id:
+                raise ValueError(
+                    "model_handler model_id does not match target model_id"
+                )
+        if round_summary_handler is not None:
+            summary_model_id = getattr(round_summary_handler, "model_id", None)
+            if summary_model_id is not None and (
+                not isinstance(summary_model_id, str)
+                or not summary_model_id.strip()
+                or summary_model_id.strip() != self.model_id
+            ):
+                raise ValueError(
+                    "round_summary_handler model_id does not match target model_id"
+                )
+        self._model_handler = model_handler
+        self._round_summary_handler = round_summary_handler
         self.db_path = Path(db_path).expanduser().resolve()
         existing_world = self.db_path.exists()
         if require_fresh and existing_world:
@@ -736,9 +756,19 @@ class CurrentCoreHabitationTarget(HabitationTarget):
         )
         counts = Counter(str(item.get("object_type") or "") for item in payloads)
 
+        provider_provenance = None
+        for handler in (self._model_handler, self._round_summary_handler):
+            if handler is None:
+                continue
+            snapshotter = getattr(handler, "provenance_snapshot", None)
+            if callable(snapshotter):
+                provider_provenance = snapshotter()
+                break
+
         return {
             "subject_id": self.subject_id,
             "model_id": self.model_id,
+            "provider_provenance": provider_provenance,
             "resumed_from_world": self._resumed_from_world,
             "clock": None if self._clock is None else self._clock.isoformat(),
             "world_revision": int(self.store.current_world_revision()),
