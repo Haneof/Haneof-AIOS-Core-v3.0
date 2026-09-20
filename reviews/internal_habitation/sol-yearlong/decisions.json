@@ -995,5 +995,30 @@
   },
   "bf4fabdfa54532cc4317ce91734002177e15cc9d433a0281eda1ea8242ec599d": {
     "kind": "silence"
+  },
+  "af781a511b054eb127a45c33fb9f5ee9079fd50912b02ee726f6598d26fe2258": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "call_id": "sol-jan17-inspect-fire-check-task-due",
+        "arguments": {
+          "object_id": "task_cda791cdeea8798f457386f9"
+        }
+      },
+      {
+        "name": "search_timeline",
+        "call_id": "sol-jan17-check-recent-fire-prep-evidence",
+        "arguments": {
+          "window_start": "2027-01-16T08:15:00+00:00",
+          "window_end": "2027-01-17T16:00:00+00:00",
+          "object_types": [
+            "observation"
+          ],
+          "query": "消防 准备 灭火器 通道",
+          "limit": 20
+        }
+      }
+    ]
   }
 }
