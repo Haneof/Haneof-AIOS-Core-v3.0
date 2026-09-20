@@ -1,0 +1,26 @@
+name: sol-review-source-pack
+
+on:
+  push:
+    branches:
+      - "arena/sol-yearlong-resident-20260921"
+    paths:
+      - ".github/workflows/sol-review-source-pack.yml"
+
+jobs:
+  pack-source:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pack exact review checkout for local Resident continuation
+        shell: bash
+        run: |
+          tar --exclude=.git -czf /tmp/aios-review-source.tgz .
+      - name: Upload source package
+        uses: actions/upload-artifact@v4
+        with:
+          name: sol-review-source-${{ github.run_id }}
+          path: /tmp/aios-review-source.tgz
+          if-no-files-found: error
