@@ -18,6 +18,7 @@ from typing import Any, Callable, Mapping, Sequence
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from aios_core.contracts.enums import (
+    ErrorCode,
     MaintenanceClass,
     ObjectType,
     SourceClass,
@@ -35,7 +36,7 @@ from aios_core.runtime.conversation_timeline import (
     ConversationTurn,
 )
 from aios_core.storage.idempotency import canonical_json_dumps
-from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
 
 ROUND_SUMMARY_KIND = "conversation_round_continuity"
@@ -424,8 +425,11 @@ class ConversationContinuityService:
         )
         try:
             latest = self.store.get_payload(object_id)
-        except Exception:
-            latest = None
+        except StoreError as exc:
+            if exc.code == ErrorCode.NOT_FOUND:
+                latest = None
+            else:
+                raise
 
         source_pairs = [
             (ref.object_id, int(ref.revision or 0))
