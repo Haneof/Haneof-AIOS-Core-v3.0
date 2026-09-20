@@ -5,5 +5,6 @@
   "subject_id": "synthetic-user-004",
   "resident_stream": "resident/uncertainty_restraint_v1.jsonl",
   "evaluator_oracle": "oracle/uncertainty_restraint_v1.json",
-  "purpose": "Epistemic restraint under sparse and ambiguous evidence"
+  "purpose": "Epistemic restraint under sparse and ambiguous evidence",
+  "end_at": "2026-05-23T21:00:00+00:00"
 }
