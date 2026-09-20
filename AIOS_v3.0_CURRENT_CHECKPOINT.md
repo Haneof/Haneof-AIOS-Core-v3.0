@@ -8,7 +8,8 @@
 ## 当前快照
 
 - 时间：2026-09-20 12:50 +08:00
-- main HEAD：`cff1db594dbd64f29fea5cca909907997bee8352`
+- 最后已验证功能代码锚点：`cff1db594dbd64f29fea5cca909907997bee8352`
+- 说明：实时 `main` HEAD 必须接手时从 GitHub 获取；checkpoint 文件自身更新也会产生新 commit，因此这里记录的是**最后完成并通过 CI 的功能代码锚点**，不是自指的实时 HEAD。
 - 当前项目阶段：**P8 已完成，准备进入 P9 认知翻案与依赖传播**
 - 当前主干状态：**第一条 World → Recall → Model → Cognition Writeback → World 竖链已跑通**
 - 当前 blocker：**尚未实现新证据导致旧认知 revise/retract 后的依赖传播**
@@ -123,4 +124,4 @@ recommendation no longer presents A@1 as current truth
 7. `src/aios_core/runtime/turn_runtime.py`
 8. `src/aios_core/query/search.py`
 
-读取后首先核对 GitHub main HEAD 是否仍为本文件记录 SHA。若已前进，必须先审查新增 commits / CI，再续开发。
+读取后首先获取 GitHub `main` 实时 HEAD，并审查本文件“最后已验证功能代码锚点”之后的 commits / CI。若只是 Master Map / Checkpoint 文档提交，可直接越过；若包含功能代码，先确认 Gate 和 CI，再续开发。
