@@ -1,29 +1,67 @@
-# AIOS v3.0 P16 Multi-Agent Habitation Harness
+# AIOS v3.0 P16 Multi-Model Independent Habitation Benchmark
 
-> Status: parallel infrastructure foundation  
+> Status: parallel test-infrastructure foundation  
 > Branch: `parallel/p16-habitation-harness-20260920`  
-> Scope: test infrastructure only; no Core runtime semantics are changed.
+> Scope: benchmark infrastructure only; no Core runtime semantics are changed.
 
-## 1. Purpose
+## 1. Definition
 
-P16 must answer a different question from ordinary unit/integration tests:
+P16 here does **not** mean a group of AI agents cooperating inside one world.
 
-> After living inside a long-running synthetic life, does a real resident model
-> actually build, revise and use a coherent world over time?
+It means:
 
-It must not prove capability by giving the model a known expected answer and then
-checking a string.
+> Different model candidates each enter their own isolated AIOS instance, live
+> through the same synthetic life independently, and are evaluated afterward.
 
-The harness therefore separates three things:
+For example:
+
+```text
+same hidden life dataset
+        │
+        ├── GPT model    -> private AIOS world A
+        ├── Claude model -> private AIOS world B
+        ├── Gemini model -> private AIOS world C
+        └── other model  -> private AIOS world D
+
+No communication.
+No shared WorldStore.
+No shared memory.
+No cooperation.
+No answer exchange.
+
+After all independent runs finish:
+        ↓
+compare long-term cognition / continuity / correction / action behavior
+```
+
+The purpose is to test **AIOS + resident-model compatibility and emergent behavior**,
+not multi-agent collaboration.
+
+## 2. Core question
+
+P16 must answer a different question from normal unit tests:
+
+> After independently living inside the same long-running synthetic life, how do
+> different real models use AIOS to build, revise and apply a coherent world model?
+
+It must not prove capability by supplying a known expected answer and checking a
+string.
+
+## 3. Hidden-life separation
+
+Each benchmark scenario contains:
 
 1. **Resident-visible life**: conversations, calendar entries, purchases, sensor
-   events, outcomes and other facts that the AIOS instance may legitimately see.
-2. **Hidden oracle**: latent truths and evaluation annotations that the resident
-   model must never receive.
-3. **Evaluator**: a post-run judge that may compare the world/run against the
+   events, outcomes and other facts that AIOS may legitimately receive.
+2. **Hidden oracle**: latent truths and evaluation annotations that no resident
+   model may receive.
+3. **Post-run evaluator**: inspects a finished run and may compare it with the
    hidden oracle.
 
-## 2. Parallel-development boundary
+A scenario may be replayed identically to several model candidates, but every
+candidate receives a **fresh isolated AIOS instance**.
+
+## 4. Parallel-development boundary
 
 This foundation intentionally does **not** modify:
 
@@ -37,90 +75,72 @@ This foundation intentionally does **not** modify:
 That makes it safe to build while P12 is being implemented.
 
 Future P16 adapters may consume P12-P15 public APIs after those stages stabilize,
-but the harness must not define those APIs for them.
+but this benchmark must not invent those APIs.
 
-## 3. Test topology
+## 5. Benchmark topology
 
 ```text
-Hidden-life scenario
-├─ resident-visible events
-│  ├─ conversation
-│  ├─ calendar
-│  ├─ transaction
-│  ├─ sensor
-│  ├─ app/device event
-│  └─ later outcome
-└─ hidden oracle
-   ├─ latent user change
-   ├─ causal truth used only for evaluation
-   ├─ important facts the model should eventually discover
-   └─ traps / ambiguous evidence
-
-                       same sealed life
-                            │
-             ┌──────────────┼──────────────┐
-             ↓              ↓              ↓
-         Resident A     Resident B     Resident C
-         real model     real model     real model
-             │              │              │
-             └──── independent AIOS worlds ┘
-                            │
-                            ↓
-                    post-run evaluators
-                            │
-                            ↓
-                findings / metrics / failures
+                    sealed virtual life
+                 ┌─────────┴─────────┐
+                 │ resident events   │ hidden oracle
+                 │                   │ evaluator only
+                 ↓                   │
+       ┌─────────┼─────────┬─────────┘
+       ↓         ↓         ↓
+    Model A    Model B    Model C
+       │         │         │
+       ↓         ↓         ↓
+    AIOS A     AIOS B     AIOS C
+  private DB  private DB  private DB
+       │         │         │
+       └─────────┼─────────┘
+                 ↓
+          post-run evaluation
+                 ↓
+       per-model findings + comparison
 ```
 
-No resident receives the hidden oracle.
+There is intentionally no Model A -> Model B channel.
 
-## 4. Current harness contract
+## 6. Current harness contract
 
 `tests/habitation/harness.py` provides:
 
 - `LifeEvent`: one chronological synthetic-life event.
-- `ResidentEvent`: the sanitized view delivered to the system under test.
-- `HabitationScenario`: a sealed ordered life with scenario-level hidden truth.
-- `HabitationTarget`: adapter protocol for a resident AIOS instance.
-- `HabitationRunner.run`: execute one resident against one life.
-- `HabitationRunner.run_many`: execute several independent residents against the
-  same life.
+- `ResidentEvent`: the sanitized event delivered to one model.
+- `HabitationScenario`: one sealed life reused across candidates.
+- `HabitationTarget`: one isolated AIOS instance backed by one model.
+- `HabitationRunner.run`: run one model independently.
+- `HabitationRunner.run_models`: replay the same life across multiple independent
+  model/AIOS pairs.
+- `MultiModelHabitationResult`: holds independent per-model runs.
 - `HabitationEvaluator`: post-run evaluator protocol.
-- `evaluate_run`: evaluation boundary that runs only after habitation.
+- `evaluate_run`: evaluation boundary invoked only after one run completes.
 
-The runner validates deterministic mechanics only: timeline order, identity,
-resident isolation and oracle separation.
+The runner rejects reuse of the same target instance for two model IDs, preventing
+accidental shared state.
 
-It does **not** decide whether the AI's interpretation was semantically correct.
+## 7. What the full P16 Gate should compare
 
-## 5. What a real P16 Gate must eventually measure
-
-The full P16 Gate should use real resident models and hidden lives spanning days,
-weeks or months. Candidate measurements include:
+With real models and hidden lives spanning days, weeks or months, compare:
 
 - cross-session factual continuity;
-- recovery of relevant history without flooding every turn;
-- distinction between raw fact, summary and cognition;
-- willingness to leave uncertain states unresolved;
+- relevant-memory recovery without context flooding;
+- raw fact vs summary vs cognition separation;
+- ability to remain uncertain when evidence is insufficient;
 - correction after contradictory evidence;
 - propagation of revised cognition;
-- long-term user/relationship understanding;
+- long-term user and relationship understanding;
 - useful dynamic-dimension creation without dimension spam;
 - Goal/Task/Action behavior after P12;
 - outcome-based strategy/calibration changes after P12/P15;
-- robustness when irrelevant or misleading events are injected;
-- model replacement continuity: a new model should inherit the world without
-  receiving an answer key.
+- robustness to irrelevant/noisy/misleading events;
+- continuity after replacing one resident model with another on a copied world.
 
-These measurements may use model judges, human review and deterministic invariants,
-but no single fixed keyword/expected-response string may constitute the cognition
-Gate.
+The comparison may use deterministic invariants, model judges and human review.
+No fixed expected-response string may serve as the cognition Gate.
 
-## 6. Scenario authoring rule
-
-A scenario author may know the latent truth. The resident may not.
-
-Example:
+## 8. Example hidden life
 
 ```text
 Week 1: user repeatedly asks for guided help
@@ -128,22 +148,23 @@ Week 2: user schedules independent practice
 Week 3: user solves harder tasks with less assistance
 Week 5: one noisy failure occurs
 
-Hidden oracle:
+Hidden evaluator oracle:
   learning independence is generally improving, with normal variance
 ```
 
-The hidden statement above is for the evaluator. It must never appear in
-resident-visible event metadata, prompts or context.
+GPT, Claude, Gemini, or any other candidate receive only the visible events.
+None receives the hidden sentence above.
 
-## 7. Next isolated steps
+## 9. Next isolated steps
 
-Still safe to do in parallel with Core work:
+Still safe to build in parallel with Core:
 
-1. add reusable hidden-life scenario fixtures;
-2. add event-stream loaders (JSONL/YAML -> `LifeEvent`);
-3. add run artifact serialization;
-4. add evaluator result schema;
-5. add sharding/reproducibility metadata.
+1. reusable hidden-life fixtures;
+2. JSONL/YAML event-stream loaders;
+3. per-model run artifact serialization;
+4. evaluator result schema;
+5. deterministic scenario seed/version metadata;
+6. model-adapter interface that creates a fresh AIOS world per candidate.
 
-Wait for stable P12-P15 public APIs before writing adapters that call Goal/Task,
-Scheduler, periodic review or external-action capabilities.
+Wait for stable P12-P15 public APIs before wiring Goal/Task, Scheduler, periodic
+review, or external-action evaluation into the benchmark.
