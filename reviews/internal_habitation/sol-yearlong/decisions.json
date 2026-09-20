@@ -640,5 +640,18 @@
   },
   "b59f7103e309bee5ab51d74ac7674d2bf7c46534623a9c88f203c8291096eac9": {
     "kind": "silence"
+  },
+  "a637f84c63d80e614e346892a43458427c90e7bf1fd5e007e51a0327514d7108": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "retrieve_original_observation",
+        "call_id": "sol-jan11-drill-northmill-quote",
+        "arguments": {
+          "object_id": "obs_src_728cbdc5f928fc29488476c9",
+          "revision": 1
+        }
+      }
+    ]
   }
 }
