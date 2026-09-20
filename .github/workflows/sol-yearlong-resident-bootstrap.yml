@@ -1,0 +1,50 @@
+name: sol-yearlong-resident-bootstrap
+
+on:
+  push:
+    branches:
+      - "arena/sol-yearlong-resident-20260921"
+    paths:
+      - "reviews/internal_habitation/sol-yearlong/bootstrap/**"
+      - ".github/workflows/sol-yearlong-resident-bootstrap.yml"
+
+jobs:
+  real-sol-resident-bootstrap:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OUTPUT_DIR: artifacts/internal-habitation/sol-bootstrap
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+
+      - name: Require OpenAI provider credential
+        shell: bash
+        run: |
+          test -n "$OPENAI_API_KEY" || { echo "OPENAI_API_KEY is not configured"; exit 2; }
+
+      - name: Run GPT-5.6 Sol as the actual Resident
+        shell: bash
+        run: |
+          python -m tests.habitation.run_provider_benchmark \
+            --fixture-root reviews/internal_habitation/sol-yearlong/bootstrap/fixtures \
+            --manifest sol_bootstrap.manifest.json \
+            --provider openai \
+            --model gpt-5.6-sol \
+            --max-output-tokens 1024 \
+            --output-dir "$OUTPUT_DIR"
+
+      - name: Upload bootstrap evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sol-yearlong-resident-bootstrap-${{ github.run_id }}
+          path: artifacts/internal-habitation/
+          if-no-files-found: warn
