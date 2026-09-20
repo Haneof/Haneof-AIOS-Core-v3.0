@@ -163,39 +163,84 @@ summary 作为快速 continuity index
 - 不把 summary 当 source of truth。
 - 不因 context budget 截断而静默丢失可回捞路径。
 
-## P15 当前目标
+## P15 已完成并通过 Gate
 
-让 Resident AI 不只在用户说话时被动运行，而能在明确调度边界内周期性回看已经发生的世界，并把“我之前判断得怎么样、行动效果怎么样、策略需不需要修正”写回同一个世界。
+- deterministic scheduler 只决定 review 时间与 bounded candidate window：GREEN
+- review anchor 全部使用 pinned world refs：GREEN
+- Review Wake 生命周期 NEW → RUNNING → COMPLETED：GREEN
+- crash 后 RUNNING review 可在重启后恢复：GREEN
+- 无新 world changes 时写 SUPPRESSED marker，不调用模型：GREEN
+- 完成边界使用 exclusive-start，review 自己的同刻 writeback 不机械触发下一轮：GREEN
+- Periodic Review 复用同一个 Resident Cognitive Runtime 与 CapabilityRegistry：GREEN
+- review instruction 不伪造成用户 Conversation Observation：GREEN
+- review anchors 通过分页能力按需读取，不把完整世界塞进固定 cockpit：GREEN
+- Resident AI 可在 review 中 revise / retract 旧 Claim：GREEN
+- Resident AI 可形成 Calibration / Strategy / Self 等 evidence-grounded cognition：GREEN
+- OperationExperience 必须引用至少一个 pinned real case：GREEN
+- OperationExperience 与 CommunicationExperience 进入统一世界索引：GREEN
+- scheduler 本身不生成“用户成长/AI成长/策略更好”等语义结论：GREEN
+- P15 宪法：`docs/constitution/AIOS_v3.0_Periodic_Review_Growth_Constitution.md`
+- P15 功能锚点：`3261eae4967632ea4ef72669ef53ef3dfe5199a7`
+- P15 Gate：run `35499766871` / **success**
 
-目标闭环：
+## P16 当前目标
+
+用多个真实模型、隐藏虚拟人生和长时间跨度数据测试：
+
+> AIOS 中的模型是否真的依靠世界、索引、Summary、认知修正、Goal/Action/Outcome 与周期 Review 逐渐形成连续理解，而不是靠测试脚本偷做认知。
+
+当前已有并行施工线：
+
+- PR #1：`parallel/p16-habitation-harness-20260920`
+- PR #5：`experiment/p16-self-resident-blind-replay-20260920`
+
+P16 必须重点验证：
 
 ```text
-World facts / Claims / Goals / Tasks / Actions / Outcomes
+隐藏人生事件流
 ↓
-deterministic Review scheduler 只决定何时需要 review
+Reality / Conversation 进入 World
 ↓
-构建 evidence-grounded review input
+真实 Resident Model 多轮入住
 ↓
-真实模型回看、比较、判断
+模型自主形成 / 修正 cognition
 ↓
-可选择：
-- revise / retract 旧 Claim
-- 形成新的 evidence-grounded Claim
-- 记录 OperationExperience
-- 更新 Strategy / AI self understanding
+Goal / Task / Action / Outcome
 ↓
-Dependency + Revision
+Periodic Review
 ↓
-统一世界继续增长
+跨天 / 跨阶段继续运行
+↓
+评价：
+- 是否记住真正相关历史
+- 是否会找错记忆
+- 是否会形成错误高阶理解
+- 是否会自我强化错误
+- 是否会根据新证据翻案
+- 是否会创建无意义维度
+- 是否会把 summary 当事实
+- 是否会在没有 Outcome 时伪造经验
+- 是否能在重启/换模型后继续生活在同一个 World
 ```
 
-P15 禁止：
-- 用程序规则直接判断“用户成长了/AI成长了”；
-- 用固定答案 benchmark 代替模型真实 review；
-- 建第二套经验数据库；
-- maintenance 自己触发无限 review 循环；
-- Outcome 未发生时伪造行动经验；
-- 把 Review 文本直接当高阶真相，所有认知仍需 Evidence / Claim / Revision 边界。
+## P16 禁止事项
+
+- 不把 expected answer 写进模型可见输入。
+- 不用数万道固定题让程序几秒钟字符串匹配“通过”。
+- 不写小程序替 Resident AI 做总结、认知、因果或人格判断。
+- 测试 harness 可以机械计分事实可追溯性、引用正确性、状态机与泄漏，但不能替模型完成认知任务。
+- 隐藏 ground truth 只能用于 reviewer 评分，Resident Model 不得看到。
+- 多 Agent 是多个模型分别入住/测试同一套 AIOS 机制，不是让一堆 Agent 在世界里互相协作完成固定答案。
+- P16 分支不得重新造第二套 World、Index、Recommendation、Runtime 或 Review 系统。
+
+## 当前工程断点
+
+- 时间：2026-09-20 16:32 +08:00
+- 最后已验证功能代码锚点：`3261eae4967632ea4ef72669ef53ef3dfe5199a7`
+- 最近 Green Gate：`p15-periodic-review` run `35499766871` / **success**
+- 当前阶段：**P16 多 Agent 长期入住测试**
+- 当前 blocker：**需要审查并行 P16 PR 的 harness 是否真正 blind / hidden-life，避免测试脚本代替模型认知**
+- 下一动作：**审查 PR #1 与 PR #5，择优融合；然后执行真实模型 habitation runs，不以固定答案作为认知 Gate。**
 
 ## 当前不可推翻的已决事项
 
