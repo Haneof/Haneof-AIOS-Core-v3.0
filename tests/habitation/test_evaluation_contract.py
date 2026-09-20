@@ -18,6 +18,7 @@ BASE = datetime(2026, 9, 20, 8, 0, tzinfo=timezone.utc)
 class Target:
     def __init__(self, model: str) -> None:
         self.model = model
+        self.isolation_key = f"world:{model}:{id(self)}"
 
     def handle_event(self, event: ResidentEvent):
         return {"model": self.model, "event_id": event.event_id}
