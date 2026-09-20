@@ -1,0 +1,28 @@
+name: p16-self-resident-blind-replay
+
+on:
+  push:
+    branches:
+      - "experiment/p16-self-resident-blind-replay-*"
+    paths:
+      - "tests/experimental/test_p16_self_resident_blind_replay.py"
+      - ".github/workflows/p16-self-resident-blind-replay.yml"
+      - "src/aios_core/**"
+  pull_request:
+    paths:
+      - "tests/experimental/test_p16_self_resident_blind_replay.py"
+      - ".github/workflows/p16-self-resident-blind-replay.yml"
+      - "src/aios_core/**"
+
+jobs:
+  self-resident-blind-replay:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - name: Replay frozen blind resident decisions through current Core
+        run: pytest -q tests/experimental/test_p16_self_resident_blind_replay.py
