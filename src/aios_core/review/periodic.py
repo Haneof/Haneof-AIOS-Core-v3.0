@@ -267,6 +267,16 @@ class OperationExperienceRequest(BaseModel):
             raise ValueError(
                 "operation experience requires at least one real result evidence ref"
             )
+        positive_keys = {
+            (ref.object_id, ref.revision) for ref in self.positive_case_refs
+        }
+        negative_keys = {
+            (ref.object_id, ref.revision) for ref in self.negative_case_refs
+        }
+        if positive_keys.intersection(negative_keys):
+            raise ValueError(
+                "the same evidence ref cannot be both a positive and negative case"
+            )
         for ref in refs:
             if ref.revision is None:
                 raise ValueError("operation experience requires pinned evidence revisions")
@@ -348,7 +358,6 @@ class OperationExperienceService:
             "negative_case_refs": [
                 [ref.object_id, ref.revision] for ref in negative
             ],
-            "learned_at": learned.isoformat(),
         }
         object_id = _stable_id("opx", identity)
         try:
