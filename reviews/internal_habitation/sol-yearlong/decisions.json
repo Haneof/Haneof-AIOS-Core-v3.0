@@ -125,5 +125,18 @@
   },
   "058a623e97214f443adcc5536515c4d78f5a2f51245cb18eb4789a89d051aa15": {
     "kind": "silence"
+  },
+  "72715c4688593024de8fa3e0472a1d8b0a3748d0b633f9a1a66f9222582cc871": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "call_id": "sol-wake-inspect-flour-task",
+        "arguments": {
+          "object_id": "task_57a01b42b3d5f384db661bda",
+          "revision": 1
+        }
+      }
+    ]
   }
 }
