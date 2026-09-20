@@ -1,0 +1,20 @@
+{"event_id":"apr01-chat","occurred_at":"2026-04-01T19:00:00+00:00","channel":"conversation","payload":"妈妈下个月要做一个小手术，这段时间我打算每周日尽量陪她去医院和处理家里的事。","metadata":{"session":"family-apr"}}
+{"event_id":"apr03-calendar","occurred_at":"2026-04-03T12:00:00+00:00","channel":"calendar","payload":{"title":"妈妈术前检查","start":"2026-04-12T09:00:00-07:00"},"metadata":{"source":"calendar"}}
+{"event_id":"apr10-chat","occurred_at":"2026-04-10T18:30:00+00:00","channel":"conversation","payload":"Alpha 项目现在主要是我和小王一起负责，我做整体方案，他盯接口和联调。","metadata":{"session":"alpha-apr"}}
+{"event_id":"apr15-note","occurred_at":"2026-04-15T21:00:00+00:00","channel":"note","payload":"今天小王帮我把接口联调的问题找出来了，合作效率挺高。","metadata":{"source":"notes"}}
+{"event_id":"apr20-chat","occurred_at":"2026-04-20T20:00:00+00:00","channel":"conversation","payload":"项目推进时你不用每一步都给我汇报，能自己处理的就连续做，真正有结果或者有阻塞再告诉我。","metadata":{"session":"feedback-apr"}}
+{"event_id":"apr25-chat","occurred_at":"2026-04-25T20:10:00+00:00","channel":"conversation","payload":"这两天提醒有点太频繁了。普通的小修复不用主动打断我，重大变更或者有风险的时候再提醒。","metadata":{"session":"feedback-apr"}}
+{"event_id":"may01-calendar","occurred_at":"2026-05-01T09:00:00+00:00","channel":"calendar","payload":{"title":"Alpha 每周复盘","recurrence":"weekly Friday 16:00"},"metadata":{"source":"calendar"}}
+{"event_id":"may05-chat","occurred_at":"2026-05-05T22:00:00+00:00","channel":"conversation","payload":"Alpha 这周延期了，主要是外部接口临时改了，不是小王那边的问题。","metadata":{"session":"alpha-may"}}
+{"event_id":"may10-note","occurred_at":"2026-05-10T21:00:00+00:00","channel":"note","payload":"今天和小王因为上线顺序争了半天，最后把依赖拆开以后问题解决了。","metadata":{"source":"notes"}}
+{"event_id":"may15-chat","occurred_at":"2026-05-15T19:00:00+00:00","channel":"conversation","payload":"以后涉及会改变项目方向、会花钱或者会影响外部用户的动作先让我确认；普通代码修复和内部整理你可以直接做。","metadata":{"session":"feedback-may"}}
+{"event_id":"jun01-calendar","occurred_at":"2026-06-01T16:00:00+00:00","channel":"calendar","payload":{"title":"Alpha 正式上线","status":"completed"},"metadata":{"source":"calendar"}}
+{"event_id":"jun02-chat","occurred_at":"2026-06-02T20:00:00+00:00","channel":"conversation","payload":"Alpha 昨天上线了，整体很顺，小王负责的联调也没有出问题。","metadata":{"session":"alpha-jun"}}
+{"event_id":"jun10-order","occurred_at":"2026-06-10T12:00:00+00:00","channel":"order","payload":{"item":"嵌入式 Linux 入门课程","quantity":1},"metadata":{"source":"shopping"}}
+{"event_id":"jun12-chat","occurred_at":"2026-06-12T21:00:00+00:00","channel":"conversation","payload":"最近我开始系统学硬件和嵌入式，每天晚上大概会拿四十分钟看资料或者做实验。","metadata":{"session":"learning-jun"}}
+{"event_id":"jun25-note","occurred_at":"2026-06-25T22:00:00+00:00","channel":"note","payload":"硬件学习连续两周基本没断，今天把 GPIO 和 I2C 的实验又做了一遍。","metadata":{"source":"notes"}}
+{"event_id":"jul01-chat","occurred_at":"2026-07-01T20:00:00+00:00","channel":"conversation","payload":"硬件这块我想继续学，但先别把我定义成什么硬件工程师，我现在只是稳定投入了一段时间。","metadata":{"session":"learning-jul"}}
+{"event_id":"jul15-chat","occurred_at":"2026-07-15T19:00:00+00:00","channel":"conversation","payload":"妈妈恢复得挺好了，现在周日不用再固定陪诊，四月份那段安排已经结束了。","metadata":{"session":"family-jul"}}
+{"event_id":"jul25-calendar","occurred_at":"2026-07-25T10:00:00+00:00","channel":"calendar","payload":{"title":"周日陪诊","status":"cancelled"},"metadata":{"source":"calendar"}}
+{"event_id":"aug01-chat","occurred_at":"2026-08-01T20:00:00+00:00","channel":"conversation","payload":"回头看这几个月，我和小王的合作、Alpha 项目、我学硬件、还有你和我沟通方式，分别发生了什么变化？有证据就说，没有证据的不要硬猜因果。","metadata":{"session":"review-aug"}}
+{"event_id":"aug03-chat","occurred_at":"2026-08-03T20:30:00+00:00","channel":"conversation","payload":"这次复盘如果能把事实、你的判断和不确定的地方分开，我会觉得很好。以后复杂复盘可以继续用这种方式。","metadata":{"session":"review-aug"}}
