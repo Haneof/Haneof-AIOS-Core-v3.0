@@ -397,6 +397,47 @@ def test_sensor_numeric_path_generates_registered_mechanical_wake(tmp_path):
     ) == []
 
 
+def test_sensor_numeric_rejects_future_sample_leak(tmp_path):
+    target = CurrentCoreHabitationTarget(
+        model_id="model-future-sensor",
+        subject_id="synthetic-user-future-sensor",
+        db_path=tmp_path / "future-sensor.sqlite",
+        model_handler=_silent_model,
+    )
+    event_time = NOW + timedelta(minutes=2)
+    target.advance_to(event_time)
+
+    import pytest
+
+    with pytest.raises(ValueError, match="future samples would leak future information"):
+        target.handle_event(
+            LifeEvent(
+                event_id="future-sensor-batch",
+                occurred_at=event_time,
+                channel="sensor_numeric",
+                payload={
+                    "source_kind": "heart_rate",
+                    "dimension": "dim:heart_rate",
+                    "series_id": "future-window",
+                    "samples": [
+                        {
+                            "external_record_id": "future",
+                            "occurred_at": (
+                                event_time + timedelta(minutes=1)
+                            ).isoformat(),
+                            "value": 100.0,
+                        }
+                    ],
+                    "policy": {
+                        "tolerance": 3.0,
+                        "change_threshold": 15.0,
+                        "max_gap_seconds": 120.0,
+                    },
+                },
+            ).resident_view()
+        )
+
+
 def test_photo_description_uses_media_descriptor_boundary(tmp_path):
     target = _target(tmp_path, "model-photo")
     at = NOW + timedelta(minutes=5)
