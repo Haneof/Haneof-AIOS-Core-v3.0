@@ -50,7 +50,9 @@ def test_vertical_slice_proactively_remembers_then_writes_new_turn(tmp_path):
 
     assert result.runtime.termination_reason == "responded"
     assert result.recommendation.cards
-    assert result.conversation_commit.world_revision == 2
+    assert result.conversation_commit.user_world_revision == 2
+    assert result.conversation_commit.assistant_world_revision == 3
+    assert result.conversation_commit.world_revision == 3
 
     page = index.recall_candidates("继续这个方案")
     assert any(hit.object_id == result.conversation_commit.user_observation_id for hit in page.hits)
@@ -745,3 +747,168 @@ def test_resident_model_can_move_candidate_dimension_into_trial(tmp_path):
         item.name for item in result.runtime.capability_history
     ] == ["list_dimensions", "transition_dimension"]
     assert store.get_payload(candidate.dimension_id)["lifecycle"] == "trial"
+
+
+def test_current_user_input_can_ground_same_turn_goal_task_and_action_proposal(tmp_path):
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    def model(snapshot):
+        catalog_names = {item["name"] for item in snapshot.cockpit["capability_catalog"]}
+        assert "propose_action" in catalog_names
+        assert "authorize_action" not in catalog_names
+        assert "record_outcome" not in catalog_names
+
+        current_ref = snapshot.cockpit["task_context"]["current_user_observation_ref"]
+        history = snapshot.capability_history
+
+        if not history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="propose_goal",
+                        arguments={
+                            "source_type": "user_explicit",
+                            "title": "发送项目周报",
+                            "description": "按用户本轮要求把确认后的项目周报发送给团队。",
+                            "evidence_refs": [current_ref],
+                            "confidence": 0.99,
+                            "success_criteria": ["团队收到确认后的项目周报"],
+                        },
+                    ),
+                )
+            )
+
+        if len(history) == 1:
+            goal = history[-1].data
+            assert goal["status"] == "proposed"
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="transition_goal",
+                        arguments={
+                            "goal_ref": {
+                                "object_id": goal["goal_id"],
+                                "revision": goal["revision"],
+                            },
+                            "new_status": "active",
+                            "reason": "用户在当前会话明确提出该目标。",
+                            "evidence_refs": [current_ref],
+                        },
+                    ),
+                )
+            )
+
+        if len(history) == 2:
+            goal = history[-1].data
+            assert goal["status"] == "active"
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="create_task",
+                        arguments={
+                            "title": "发送确认后的项目周报",
+                            "task_type": "immediate",
+                            "reason_refs": [current_ref],
+                            "goal_ref": {
+                                "object_id": goal["goal_id"],
+                                "revision": goal["revision"],
+                            },
+                            "initial_state": "ready",
+                            "priority": 80,
+                        },
+                    ),
+                )
+            )
+
+        if len(history) == 3:
+            task = history[-1].data
+            assert task["state"] == "ready"
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="transition_task",
+                        arguments={
+                            "task_ref": {
+                                "object_id": task["task_id"],
+                                "revision": task["revision"],
+                            },
+                            "new_state": "running",
+                            "reason": "开始准备执行用户明确要求的发送任务。",
+                            "evidence_refs": [current_ref],
+                        },
+                    ),
+                )
+            )
+
+        if len(history) == 4:
+            task = history[-1].data
+            assert task["state"] == "running"
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="propose_action",
+                        arguments={
+                            "task_ref": {
+                                "object_id": task["task_id"],
+                                "revision": task["revision"],
+                            },
+                            "action_type": "send_team_message",
+                            "payload": {
+                                "channel": "team",
+                                "document": "weekly-report",
+                            },
+                            "expected_outcome": "团队收到确认后的项目周报",
+                            "evidence_refs": [current_ref],
+                        },
+                    ),
+                )
+            )
+
+        action = history[-1].data
+        assert action["revision"] == 1
+        assert store.get_payload(action["action_id"])["action_status"] == "proposed"
+        return ModelDirective(
+            response="发送动作已经形成提案，等待独立授权层批准后才能真正执行。"
+        )
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+        max_tool_rounds=8,
+    )
+    result = runtime.run_turn(
+        session_id="same-turn-p12",
+        turn_index=1,
+        user_input="把我确认后的项目周报发给团队。",
+        current_topic="项目周报",
+        occurred_at=NOW,
+    )
+
+    assert [
+        item.name for item in result.runtime.capability_history
+    ] == [
+        "propose_goal",
+        "transition_goal",
+        "create_task",
+        "transition_task",
+        "propose_action",
+    ]
+    current_user_ref = result.context.task_context["current_user_observation_ref"]
+    user_payload = store.get_payload(
+        current_user_ref["object_id"],
+        revision=current_user_ref["revision"],
+    )
+    assert user_payload["value"] == "把我确认后的项目周报发给团队。"
+
+    actions = [
+        item
+        for item in store.list_payloads()
+        if item.get("object_type") == "action"
+    ]
+    assert len(actions) == 1
+    assert actions[0]["action_status"] == "proposed"
+    assert actions[0]["metadata"]["authorization_required"] is True
