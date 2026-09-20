@@ -15,13 +15,14 @@ from typing import Any, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from aios_core.contracts.enums import MaintenanceClass, SourceClass, SummaryStatus
+from aios_core.contracts.enums import ErrorCode, MaintenanceClass, SourceClass, SummaryStatus
 from aios_core.contracts.models import Dependency, Summary
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import TemporalExtent, TimePrecision, as_utc
 from aios_core.query.search import WorldSearchIndex
-from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.storage.idempotency import canonical_json_dumps
+from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
 
 class DimensionSummarySource(BaseModel):
@@ -70,7 +71,7 @@ class SummaryCommit:
 
 
 def _stable_id(*parts: object) -> str:
-    raw = "|".join(str(part) for part in parts)
+    raw = canonical_json_dumps(list(parts))
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]
 
 
@@ -164,6 +165,7 @@ class DimensionSummaryService:
 
         source_world_revision = int(self.store.current_world_revision())
         page = self.index.search_mind(
+            subject=self.subject_id,
             dimension=dimension,
             time_range=(start, end),
             limit=self.max_source_objects + 1,
@@ -225,7 +227,9 @@ class DimensionSummaryService:
         latest: dict[str, Any] | None
         try:
             latest = self.store.get_payload(object_id)
-        except Exception:
+        except StoreError as exc:
+            if exc.code is not ErrorCode.NOT_FOUND:
+                raise
             latest = None
 
         if latest is not None and int(latest.get("source_world_revision", -1)) == prepared.source_world_revision:
