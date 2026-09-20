@@ -168,6 +168,7 @@ class CognitionWritebackService:
             claimant_id=request.claimant_id,
             claim_type=request.claim_type,
             content=request.content.strip(),
+            occurred=TemporalExtent.point(learned),
             valid_time=TemporalExtent.unknown_time(),
             asserted_at=learned,
             knowledge_state=request.knowledge_state,
