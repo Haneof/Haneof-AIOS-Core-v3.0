@@ -16,5 +16,9 @@
         }
       }
     ]
+  },
+  {
+    "snapshot_signature": "a1ecd294c3a8c40826b5dcde83651c00a349d5f2b6665683c86a20230a259979",
+    "type": "silence"
   }
 ]
