@@ -125,6 +125,39 @@ Evidence + Dependency + Revision
 
 机械 Gate 不能替代真实模型认知证明，所以 P16 仍是 CONTINUE / NOT PASS，P17 仍不得启动。
 
+
+## 3.2 2026-09-20 第二轮代码完整性收口
+
+第二轮复审 `reviews/AIOS_V3_CODE_COMPLETENESS_REAUDIT_2026-09-20.md` 重新发现的代码级 blocker，已通过 PR #21 全部关闭。
+
+- accepted head：`029d8f6849cdb08e2c784cd3bded0b025d1e03e6`
+- squash merge：`9d9fb9d82ef42b631d032c488617316c5a2a244c`
+- closure report：`reviews/AIOS_V3_CODE_COMPLETENESS_CLOSURE_2026-09-20.md`
+
+新增/加固：
+
+- private-world subject isolation 覆盖索引、直接读取和主要 writeback ref 路径；
+- AI-self 保留显式同私有世界例外，不把 subject_id 粗暴当租户边界；
+- CognitivePolicy 进入真实 propose → real-result evidence → evaluation due → Periodic Review → Runtime consumer 闭环；
+- P6 MultiScale Summary 真正进入 P16 habitation virtual clock；
+- durable World 驱动 Summary missed-window catch-up、late-data rebuild、terminal-dimension 过滤；
+- incomplete Summary fail closed，既有 CURRENT 在后续发现 source window 不完整时 forward-mark STALE；
+- Entity / Relation 正式 Resident 创建 / 修订 / 关系写回闭环；
+- Event 明确 previous→next 状态迁移矩阵；
+- Topic/Need-History 去除 `len(topic)>=4`，改为明确历史/continuation/可信 topic hint/持久 World anchor 开门；
+- stable ID 统一 canonical structured hashing；
+- durable truth path 清理 broad exception swallowing；
+- P16 增加 `cognition_system_closure_v1` 长人生 fixture，覆盖 Policy / CommunicationExperience / Entity-Relation / Event / Summary / 多线程长期变化。
+
+accepted head 触发的 20 个相关 workflow **全部 SUCCESS**，包含 `p16-convergence-gate` full-core regression 与 `constitutional-cognition-closure`。
+
+因此当前项目重新回到：
+
+> **已知 audited Core code blocker = 0；P16 唯一项目级 blocker = 尚无真实 provider/model 长期入住 cognition evidence。**
+
+这不是宣称 AIOS 已经证明“长期认知正确”。代码完整性和真实模型认知质量仍是两个 Gate。
+
+
 ---
 
 ## 4. 当前已经形成的可运行竖链
