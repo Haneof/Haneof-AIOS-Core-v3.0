@@ -155,16 +155,41 @@ Hidden evaluator oracle:
 GPT, Claude, Gemini, or any other candidate receive only the visible events.
 None receives the hidden sentence above.
 
-## 9. Next isolated steps
+## 9. Parallel foundation now implemented
 
-Still safe to build in parallel with Core:
+The isolated P16 foundation currently includes:
 
-1. reusable hidden-life fixtures;
-2. JSONL/YAML event-stream loaders;
-3. per-model run artifact serialization;
-4. evaluator result schema;
-5. deterministic scenario seed/version metadata;
-6. model-adapter interface that creates a fresh AIOS world per candidate.
+1. reusable hidden-life event contract;
+2. JSON and JSONL scenario/event loaders;
+3. scenario version + deterministic seed;
+4. public visible-life SHA-256 fingerprint;
+5. per-model run artifact serialization;
+6. evaluator finding/report schema;
+7. cross-model comparison matrix with no built-in winner or aggregate score;
+8. fresh-target factory path that creates one isolated AIOS target/world per model;
+9. physically separate resident event streams and evaluator-only oracle fixtures;
+10. CI checks that guard oracle non-leakage and shared-target rejection.
 
-Wait for stable P12-P15 public APIs before wiring Goal/Task, Scheduler, periodic
-review, or external-action evaluation into the benchmark.
+Example fixture layout:
+
+```text
+tests/habitation/fixtures/
+├── learning_independence_v1.manifest.json
+├── resident/
+│   └── learning_independence_v1.jsonl   <- delivered to each model
+└── oracle/
+    └── learning_independence_v1.json    <- evaluator only
+```
+
+## 10. Deliberately deferred until Core APIs stabilize
+
+Do not wire these into the benchmark yet:
+
+- P12 Goal / Task / Action / Outcome internals;
+- Scheduler implementation details;
+- P13 device/data adapters;
+- P15 periodic review implementation;
+- real provider-specific model adapters and credentials.
+
+Those integrations should consume stabilized public interfaces later rather than
+forcing P12-P15 to conform to an early test harness.
