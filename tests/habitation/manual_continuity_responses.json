@@ -37,5 +37,18 @@
   {
     "snapshot_signature": "7e60a4712d1b83e7e555fb7bdc08e07c2126b03bbeb7f88c9dd27e6fdee45410",
     "type": "silence"
+  },
+  {
+    "snapshot_signature": "678682631f19b2ef61be1873fe9cbe519649a9715f8d01273ca9a929d2f33302",
+    "type": "capability_calls",
+    "calls": [
+      {
+        "name": "search_world",
+        "arguments": {
+          "query": "西雅图 出差 航班 早上 8点 下周三",
+          "limit": 10
+        }
+      }
+    ]
   }
 ]
