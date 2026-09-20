@@ -312,6 +312,38 @@ def scenario_public_fingerprint(scenario: HabitationScenario) -> str:
     return hashlib.sha256(canonical).hexdigest()
 
 
+def _safe_provider_provenance(
+    snapshot: Mapping[str, Any],
+) -> Mapping[str, Any] | None:
+    provenance = snapshot.get("provider_provenance")
+    if provenance is None:
+        return None
+    if not isinstance(provenance, Mapping):
+        raise ValueError("provider_provenance must be a mapping when present")
+    serialized = json.loads(
+        json.dumps(
+            dict(provenance),
+            ensure_ascii=False,
+            sort_keys=True,
+            default=str,
+        )
+    )
+    forbidden = {"api_key", "authorization", "x-api-key", "x-goog-api-key"}
+    stack = [serialized]
+    while stack:
+        value = stack.pop()
+        if isinstance(value, dict):
+            for key, child in value.items():
+                if str(key).lower() in forbidden:
+                    raise ValueError(
+                        "provider provenance must never contain API credentials"
+                    )
+                stack.append(child)
+        elif isinstance(value, list):
+            stack.extend(value)
+    return serialized
+
+
 def run_artifact(
     *,
     scenario: HabitationScenario,
@@ -332,6 +364,7 @@ def run_artifact(
         "scenario_public_fingerprint": scenario_public_fingerprint(scenario),
         "subject_id": run.subject_id,
         "model_id": run.model_id,
+        "provider_provenance": _safe_provider_provenance(run.final_snapshot),
         "delivered_count": run.delivered_count,
         "final_time_advance_result": run.final_time_advance_result,
         "steps": [
