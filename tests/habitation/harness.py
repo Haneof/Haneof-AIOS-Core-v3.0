@@ -4,11 +4,8 @@ P16 compares different resident models by letting each model independently inhab
 its own AIOS instance while receiving the same sealed synthetic life. Models never
 communicate, share state, or cooperate.
 
-The benchmark deliberately does not contain resident-visible semantic "correct
-answers". A scenario contains visible life events plus a separate hidden oracle
-available only to evaluators. This prevents the system under test from receiving
-the answer key and keeps P16 focused on emergent long-term behavior rather than
-string-matching tests.
+A scenario may contain evaluator-only hidden oracle data. Only resident-visible
+projections and oracle-free structural metadata may cross into model-side adapters.
 """
 
 from __future__ import annotations
@@ -25,7 +22,7 @@ def _require_aware(value: datetime, field_name: str) -> None:
 
 @dataclass(frozen=True, slots=True)
 class ResidentEvent:
-    """The only event view that may be delivered to one resident model."""
+    """The only life-event view that may be delivered to a resident model."""
 
     event_id: str
     occurred_at: datetime
@@ -43,11 +40,7 @@ class ResidentEvent:
 
 @dataclass(frozen=True, slots=True)
 class LifeEvent:
-    """One chronological event in a synthetic life.
-
-    hidden_oracle is evaluation-only ground truth. It must never be passed to the
-    resident model or included in resident-visible metadata.
-    """
+    """One chronological event in a sealed synthetic life."""
 
     event_id: str
     occurred_at: datetime
@@ -81,8 +74,22 @@ class LifeEvent:
 
 
 @dataclass(frozen=True, slots=True)
+class ResidentScenarioDescriptor:
+    """Oracle-free structural metadata safe to expose to model-side factories."""
+
+    scenario_id: str
+    subject_id: str
+    scenario_version: str
+    seed: int
+    visible_event_count: int
+    first_visible_at: datetime | None
+    last_visible_at: datetime | None
+    channels: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class HabitationScenario:
-    """A sealed, chronological virtual life reused across model candidates."""
+    """A sealed chronological virtual life reused across model candidates."""
 
     scenario_id: str
     subject_id: str
@@ -118,20 +125,24 @@ class HabitationScenario:
 class HabitationTarget(Protocol):
     """One isolated AIOS instance backed by exactly one resident model."""
 
+    @property
+    def isolation_key(self) -> str:
+        """Stable identity for the private world/store owned by this target."""
+
     def handle_event(self, event: ResidentEvent) -> Any:
         """Deliver one event to this model's private AIOS world."""
 
 
 class HabitationTargetFactory(Protocol):
-    """Factory that must create a fresh AIOS target/world for one model candidate."""
+    """Create one fresh target using only oracle-free scenario metadata."""
 
     def __call__(
         self,
         *,
         model_id: str,
-        scenario: HabitationScenario,
+        scenario: ResidentScenarioDescriptor,
     ) -> HabitationTarget:
-        """Return a new isolated target for this model and scenario."""
+        """Return a fresh isolated target for one model candidate."""
 
 
 class HabitationEvaluator(Protocol):
@@ -143,7 +154,7 @@ class HabitationEvaluator(Protocol):
         scenario: HabitationScenario,
         run: "HabitationRun",
     ) -> Mapping[str, Any]:
-        """Return findings without exposing oracle data to the resident model."""
+        """Return findings after a completed independent resident run."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -173,6 +184,26 @@ class MultiModelHabitationResult:
 
     scenario_id: str
     runs: Mapping[str, HabitationRun]
+
+
+def resident_scenario_descriptor(
+    scenario: HabitationScenario,
+) -> ResidentScenarioDescriptor:
+    """Project a sealed scenario into metadata that cannot contain hidden oracle."""
+
+    visible = tuple(
+        event for event in scenario.events if event.deliver_to_resident
+    )
+    return ResidentScenarioDescriptor(
+        scenario_id=scenario.scenario_id,
+        subject_id=scenario.subject_id,
+        scenario_version=scenario.scenario_version,
+        seed=scenario.seed,
+        visible_event_count=len(visible),
+        first_visible_at=visible[0].occurred_at if visible else None,
+        last_visible_at=visible[-1].occurred_at if visible else None,
+        channels=tuple(dict.fromkeys(event.channel for event in visible)),
+    )
 
 
 class HabitationRunner:
@@ -225,25 +256,32 @@ class HabitationRunner:
         scenario: HabitationScenario,
         targets: Mapping[str, HabitationTarget],
     ) -> MultiModelHabitationResult:
-        """Run each model candidate in a separate target/world.
-
-        The mapping key identifies the model candidate. Reusing the same target
-        instance is rejected so models cannot accidentally share WorldStore,
-        conversation state, caches, or any other resident state.
-        """
+        """Run each model candidate in an independently identified AIOS world."""
 
         if not targets:
             raise ValueError("targets must contain at least one model candidate")
 
         runs: dict[str, HabitationRun] = {}
         seen_target_ids: set[int] = set()
+        seen_isolation_keys: set[str] = set()
+
         for model_id, target in targets.items():
-            identity = id(target)
-            if identity in seen_target_ids:
+            target_identity = id(target)
+            if target_identity in seen_target_ids:
                 raise ValueError(
                     "each model_id must receive an independent AIOS target instance"
                 )
-            seen_target_ids.add(identity)
+            seen_target_ids.add(target_identity)
+
+            isolation_key = str(target.isolation_key).strip()
+            if not isolation_key:
+                raise ValueError("target isolation_key must be non-empty")
+            if isolation_key in seen_isolation_keys:
+                raise ValueError(
+                    "each model_id must receive an independent AIOS world/store"
+                )
+            seen_isolation_keys.add(isolation_key)
+
             runs[model_id] = self.run(
                 scenario=scenario,
                 model_id=model_id,
@@ -261,14 +299,18 @@ class HabitationRunner:
         scenario: HabitationScenario,
         factories: Mapping[str, HabitationTargetFactory],
     ) -> MultiModelHabitationResult:
-        """Create a fresh target/world per model and then run the same sealed life."""
+        """Create a fresh oracle-isolated target/world for each model candidate."""
 
         if not factories:
             raise ValueError("factories must contain at least one model candidate")
 
+        descriptor = resident_scenario_descriptor(scenario)
         targets: dict[str, HabitationTarget] = {}
         for model_id, factory in factories.items():
-            targets[model_id] = factory(model_id=model_id, scenario=scenario)
+            targets[model_id] = factory(
+                model_id=model_id,
+                scenario=descriptor,
+            )
 
         return self.run_models(scenario=scenario, targets=targets)
 
@@ -295,7 +337,7 @@ def scenario_channels(scenario: HabitationScenario) -> tuple[str, ...]:
 
 
 def visible_events(scenario: HabitationScenario) -> Sequence[ResidentEvent]:
-    """Return resident-visible projections only; hidden oracle stays sealed."""
+    """Return resident-visible event projections only; hidden oracle stays sealed."""
 
     return tuple(
         event.resident_view()
