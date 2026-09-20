@@ -27,6 +27,7 @@ class ModelContextBundle(BaseModel):
     current_topic: str | None = None
     ai_identity: Mapping[str, Any] = Field(default_factory=dict)
     recent_turns: tuple[Mapping[str, Any], ...] = ()
+    conversation_summaries: tuple[Mapping[str, Any], ...] = ()
     memory_cards: tuple[MemoryCard, ...] = ()
     task_context: Mapping[str, Any] = Field(default_factory=dict)
     capability_catalog: tuple[Mapping[str, Any], ...] = ()
@@ -53,6 +54,7 @@ class ContextController:
         current_topic: str | None,
         recommendation: RecommendationBundle,
         recent_turns: Sequence[Mapping[str, Any]] = (),
+        conversation_summaries: Sequence[Mapping[str, Any]] = (),
         ai_identity: Mapping[str, Any] | None = None,
         task_context: Mapping[str, Any] | None = None,
         capability_catalog: Sequence[Mapping[str, Any]] = (),
@@ -90,6 +92,18 @@ class ContextController:
             used += cost
         selected_turns.reverse()
 
+        selected_summaries: list[Mapping[str, Any]] = []
+        # Same-session summaries are continuity indexes. Keep recent raw dialogue
+        # higher priority, then admit the newest summary windows that still fit.
+        for summary in reversed(list(conversation_summaries)):
+            cost = estimate_tokens(summary)
+            if used + cost > budget:
+                truncated = True
+                continue
+            selected_summaries.append(dict(summary))
+            used += cost
+        selected_summaries.reverse()
+
         selected_cards: list[MemoryCard] = []
         for card in recommendation.cards:
             cost = estimate_tokens(card.model_dump(mode="python"))
@@ -104,6 +118,7 @@ class ContextController:
             current_topic=(current_topic or "").strip() or None,
             ai_identity=identity,
             recent_turns=tuple(selected_turns),
+            conversation_summaries=tuple(selected_summaries),
             memory_cards=tuple(selected_cards),
             task_context=tasks,
             capability_catalog=capabilities,
