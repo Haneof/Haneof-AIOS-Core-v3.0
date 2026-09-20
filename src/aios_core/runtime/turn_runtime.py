@@ -53,6 +53,13 @@ from aios_core.review import (
 )
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
+from aios_core.wake import (
+    GENERIC_RESIDENT_WAKE_SOURCES,
+    WakeDispatchReceipt,
+    WakeDispatchRequest,
+    WakeDispatchService,
+    WakeStep0Gate,
+)
 from aios_core.contracts.refs import ObjectRef
 
 from .capabilities import CapabilityKind, CapabilityRegistry, CapabilitySpec
@@ -75,6 +82,15 @@ class PeriodicReviewRunResult:
     runtime: RuntimeTurnResult
     context: ModelContextBundle
     wake: ReviewWakeReceipt
+
+
+@dataclass(frozen=True, slots=True)
+class WakeRunResult:
+    request: WakeDispatchRequest
+    runtime: RuntimeTurnResult
+    context: ModelContextBundle
+    wake: WakeDispatchReceipt
+    delivery_allowed: bool
 
 
 class FusedTurnRuntime:
@@ -151,6 +167,11 @@ class FusedTurnRuntime:
             subject_id=subject_id,
         )
         self.periodic_review = PeriodicReviewService(
+            store=store,
+            index=index,
+            subject_id=self.subject_id,
+        )
+        self.wake_dispatch = WakeDispatchService(
             store=store,
             index=index,
             subject_id=self.subject_id,
@@ -1254,6 +1275,145 @@ class FusedTurnRuntime:
             continuity_summary_error=summary_error,
         )
 
+
+
+    def run_wake(
+        self,
+        *,
+        wake_ref: ObjectRef,
+        now: datetime,
+        step0_gate: WakeStep0Gate,
+        token_budget: int | None = None,
+    ) -> WakeRunResult:
+        """Dispatch one ordinary durable Wake through the same resident runtime.
+
+        This is the C09/R5 bridge from a durable Wake to the resident model. It does
+        not create a synthetic Conversation Observation and it does not encode a
+        cognitive conclusion. Specialized USER_INTERACTION, PERIODIC_REVIEW and
+        SAFETY paths are intentionally rejected here.
+        """
+        pinned = self.wake_dispatch.resolve(wake_ref)
+        if pinned.wake_source not in GENERIC_RESIDENT_WAKE_SOURCES:
+            raise ValueError(
+                f"wake source {pinned.wake_source.value!r} requires its specialized "
+                "runtime path"
+            )
+
+        request = self.wake_dispatch.claim(
+            wake_ref,
+            started_at=now,
+            step0_gate=step0_gate,
+        )
+        self.index.catch_up()
+
+        trigger_hints: list[dict[str, Any]] = []
+        for ref in request.evidence_refs:
+            pinned_payload = self.store.get_payload(
+                ref.object_id,
+                revision=ref.revision,
+            )
+            latest_payload = self.store.get_payload(ref.object_id)
+            hint_keys = (
+                "object_id",
+                "revision",
+                "object_type",
+                "status",
+                "title",
+                "task_state",
+                "goal_status",
+                "action_status",
+                "next_step",
+            )
+            trigger_hints.append(
+                {
+                    "trigger_ref": ref.model_dump(mode="json"),
+                    "trigger_revision": {
+                        key: pinned_payload.get(key)
+                        for key in hint_keys
+                        if key in pinned_payload
+                    },
+                    "current_ref": {
+                        "object_id": str(latest_payload["object_id"]),
+                        "revision": int(latest_payload["revision"]),
+                    },
+                    "current_state": {
+                        key: latest_payload.get(key)
+                        for key in hint_keys
+                        if key in latest_payload
+                    },
+                }
+            )
+
+        empty_recommendation = RecommendationBundle(
+            current_topic=None,
+            topic_gate_open=False,
+            world_revision=int(self.store.current_world_revision()),
+            index_watermark=self.index.watermark(),
+            cards=(),
+            reason="durable_wake_uses_trigger_refs_not_proactive_topic_injection",
+        )
+        wake_context = {
+            "wake_ref": request.wake_ref.model_dump(mode="json"),
+            "wake_source": request.wake_source.value,
+            "rule_id": request.rule_id,
+            "priority": request.priority,
+            "evidence_refs": [
+                ref.model_dump(mode="json") for ref in request.evidence_refs
+            ],
+            "trigger_hints": trigger_hints,
+            "step0": request.step0.as_dict(),
+            "instruction": (
+                "Orient around this Wake Reason first. Inspect or search the world "
+                "when needed, then independently decide whether to act, respond, "
+                "write cognition, reschedule work, or remain silent. Trigger data "
+                "is evidence, not a semantic conclusion."
+            ),
+        }
+        wake_input = (
+            f"Durable wake: {request.wake_source.value}. "
+            "Inspect the trigger and decide what, if anything, should happen now."
+        )
+        context = self.context_controller.assemble(
+            user_input=wake_input,
+            current_topic=None,
+            recommendation=empty_recommendation,
+            recent_turns=(),
+            conversation_summaries=(),
+            ai_identity=self.ai_world.core_context(per_domain=3),
+            task_context={"wake": wake_context},
+            capability_catalog=self.registry.catalog(),
+            token_budget=token_budget,
+        )
+
+        self._active_turn_time = now
+        self._active_session_id = None
+        try:
+            runtime_result = self.cognitive_runtime.run_turn(
+                wake_input,
+                wake_reason=request.wake_source.value,
+                cockpit=context.as_cockpit(),
+            )
+        finally:
+            self._active_turn_time = None
+            self._active_session_id = None
+
+        wake = self.wake_dispatch.complete(
+            request,
+            completed_at=now,
+            termination_reason=runtime_result.termination_reason,
+            model_rounds=runtime_result.model_rounds,
+            capability_names=tuple(
+                result.name for result in runtime_result.capability_history
+            ),
+        )
+        self.index.catch_up()
+        return WakeRunResult(
+            request=request,
+            runtime=runtime_result,
+            context=context,
+            wake=wake,
+            delivery_allowed=request.step0.delivery_allowed,
+        )
 
 
     def run_periodic_review(
