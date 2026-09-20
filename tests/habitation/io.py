@@ -220,7 +220,6 @@ def run_artifact_json(
         ensure_ascii=False,
         sort_keys=True,
         indent=2,
-        default=str,
     )
 
 
@@ -245,6 +244,9 @@ def comparison_manifest(
     runs: Sequence[HabitationRun],
 ) -> dict[str, Any]:
     """Build a model-comparison manifest without ranking or evaluator truth."""
+
+    if not runs:
+        raise ValueError("at least one run is required")
 
     model_ids = [run.model_id for run in runs]
     if len(model_ids) != len(set(model_ids)):
