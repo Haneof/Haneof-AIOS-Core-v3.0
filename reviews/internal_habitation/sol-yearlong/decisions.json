@@ -1,2 +1,30 @@
 {
+  "badd4b1a8ec2453c6d580af21a42725f71b53fdc4d610ab0666e4767ef4dbed4": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "propose_cognitive_policy",
+        "call_id": "sol-d001-policy-1",
+        "arguments": {
+          "policy_id": "communication.proactive_interruption_threshold",
+          "scope": "per-user:sol-resident-20260921-001",
+          "default_value": "normal",
+          "current_value": "only_when_opening_procurement_or_important_family_arrangement_is_materially_affected",
+          "allowed_range_or_choices": [
+            "normal",
+            "important_only",
+            "only_when_opening_procurement_or_important_family_arrangement_is_materially_affected"
+          ],
+          "reason": "The user explicitly asked not to be interrupted frequently and limited proactive interruption to issues that materially affect store opening, procurement, or important family arrangements.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_f6da0a49440f24af69d8849e",
+              "revision": 1
+            }
+          ],
+          "evaluation_window": "30d"
+        }
+      }
+    ]
+  }
 }
