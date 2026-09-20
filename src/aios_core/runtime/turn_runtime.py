@@ -39,7 +39,11 @@ from aios_core.execution import (
     TaskTransitionRequest,
 )
 from aios_core.ingest.conversation import ConversationCommit, ConversationIngestor
-from aios_core.policy import CognitivePolicyRegistry, CognitivePolicyUpdateRequest
+from aios_core.policy import (
+    CognitivePolicyCreateRequest,
+    CognitivePolicyRegistry,
+    CognitivePolicyUpdateRequest,
+)
 from aios_core.projections.all_dimensions import AllDimensionsProjectionService
 from aios_core.query.search import WorldSearchIndex
 from aios_core.recommendation.proactive import (
@@ -59,8 +63,15 @@ from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.summaries import DimensionSummaryInput, MultiScaleSummaryScheduler, SummaryScale, SummaryScheduleResult
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 from aios_core.contracts.refs import ObjectRef
-from aios_core.contracts.enums import ObjectType, WakeSource
+from aios_core.contracts.time import TemporalExtent
+from aios_core.contracts.enums import ObjectType, PolicyClass, WakeSource
 from aios_core.wake import Step0GateInput, Step0GateResult, WakeBus, WakeStateReceipt
+from aios_core.world_graph import (
+    EntityProposalRequest,
+    EntityRelationService,
+    EntityRevisionRequest,
+    RelationUpsertRequest,
+)
 
 from .capabilities import CapabilityKind, CapabilityRegistry, CapabilitySpec
 from .cognitive_runtime import CognitiveRuntime, ModelHandler, RuntimeTurnResult
@@ -159,6 +170,11 @@ class FusedTurnRuntime:
             user_id=subject_id,
         )
         self.revision = CognitionRevisionService(
+            store=store,
+            index=index,
+            subject_id=subject_id,
+        )
+        self.world_graph = EntityRelationService(
             store=store,
             index=index,
             subject_id=subject_id,
@@ -394,6 +410,66 @@ class FusedTurnRuntime:
             ),
             self._commit_ai_world_claim,
         )
+        registry.register(
+            CapabilitySpec(
+                name="propose_entity",
+                description=(
+                    "Create a durable Entity anchor from pinned same-world evidence. "
+                    "The resident supplies identity meaning; Core enforces explicit entity_key and provenance."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "entity_key": "string",
+                    "entity_kind": "string",
+                    "canonical_name": "string?",
+                    "aliases": "array[string]?",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "identity_claim_refs": "array[{object_id:string,revision:integer}]?",
+                },
+            ),
+            self._propose_entity,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="revise_entity",
+                description=(
+                    "Append a new revision of the current Entity identity anchor using pinned evidence."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "entity_ref": "{object_id:string,revision:integer}",
+                    "reason": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "canonical_name": "string?",
+                    "aliases": "array[string]?",
+                    "identity_claim_refs": "array[{object_id:string,revision:integer}]?",
+                },
+            ),
+            self._revise_entity,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="upsert_relation",
+                description=(
+                    "Create or forward-revise an evidence-grounded Relation between current Entity revisions."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "left_ref": "{object_id:string,revision:integer}",
+                    "relation_type": "string",
+                    "right_ref": "{object_id:string,revision:integer}",
+                    "valid_time": "TemporalExtent object?",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "confidence": "number[0,1]",
+                    "reason": "string",
+                },
+            ),
+            self._upsert_relation,
+        )
+
         registry.register(
             CapabilitySpec(
                 name="propose_dimension",
@@ -684,6 +760,29 @@ class FusedTurnRuntime:
         )
         registry.register(
             CapabilitySpec(
+                name="propose_cognitive_policy",
+                description=(
+                    "Register a new evidence-grounded AI-mutable cognitive policy. "
+                    "Only real user/world result evidence is accepted; hard boundaries "
+                    "cannot be created by the resident AI."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "policy_id": "string",
+                    "scope": "string",
+                    "default_value": "json value",
+                    "current_value": "json value",
+                    "allowed_range_or_choices": "json value?",
+                    "reason": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "evaluation_window": "string",
+                },
+            ),
+            self._propose_cognitive_policy,
+        )
+        registry.register(
+            CapabilitySpec(
                 name="form_event",
                 description=(
                     "Form a revisable Event candidate from pinned world evidence. "
@@ -825,12 +924,31 @@ class FusedTurnRuntime:
             for hit in page.hits
         ]
 
+    def _runtime_subject_scope(self) -> frozenset[str]:
+        """Subjects that belong to this resident private user/AI world."""
+
+        return frozenset({self.subject_id, self.ai_world.ai_subject_id})
+
+    def _scoped_payload(
+        self,
+        object_id: str,
+        revision: int | None = None,
+    ) -> dict[str, Any]:
+        payload = self.store.get_payload(str(object_id), revision=revision)
+        payload_subject = str(payload.get("subject_id") or "")
+        if payload_subject not in self._runtime_subject_scope():
+            raise ValueError(
+                "world object crosses the runtime private-world subject scope: "
+                f"{payload_subject!r}"
+            )
+        return payload
+
     def _inspect_world_object(
         self,
         object_id: str,
         revision: int | None = None,
     ) -> dict[str, Any]:
-        return self.store.get_payload(str(object_id), revision=revision)
+        return self._scoped_payload(str(object_id), revision=revision)
 
     def _read_periodic_review_anchors(
         self,
@@ -1128,6 +1246,101 @@ class FusedTurnRuntime:
         return asdict(receipt)
 
 
+    def _propose_entity(
+        self,
+        entity_key: str,
+        entity_kind: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        canonical_name: str | None = None,
+        aliases: Sequence[str] = (),
+        identity_claim_refs: Sequence[Mapping[str, Any]] = (),
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("propose_entity is only available during an active AIOS turn")
+        receipt = self.world_graph.propose_entity(
+            EntityProposalRequest(
+                entity_key=str(entity_key),
+                entity_kind=str(entity_kind),
+                canonical_name=canonical_name,
+                aliases=tuple(str(item) for item in aliases),
+                evidence_refs=self._coerce_refs(evidence_refs),
+                identity_claim_refs=self._coerce_refs(identity_claim_refs),
+            ),
+            proposed_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
+    def _revise_entity(
+        self,
+        entity_ref: Mapping[str, Any],
+        reason: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        canonical_name: str | None = None,
+        aliases: Sequence[str] | None = None,
+        identity_claim_refs: Sequence[Mapping[str, Any]] | None = None,
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("revise_entity is only available during an active AIOS turn")
+        receipt = self.world_graph.revise_entity(
+            EntityRevisionRequest(
+                entity_ref=ObjectRef(
+                    object_id=str(entity_ref["object_id"]),
+                    revision=int(entity_ref["revision"]),
+                ),
+                reason=str(reason),
+                evidence_refs=self._coerce_refs(evidence_refs),
+                canonical_name=canonical_name,
+                aliases=(
+                    None
+                    if aliases is None
+                    else tuple(str(item) for item in aliases)
+                ),
+                identity_claim_refs=(
+                    None
+                    if identity_claim_refs is None
+                    else self._coerce_refs(identity_claim_refs)
+                ),
+            ),
+            changed_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
+    def _upsert_relation(
+        self,
+        left_ref: Mapping[str, Any],
+        relation_type: str,
+        right_ref: Mapping[str, Any],
+        evidence_refs: Sequence[Mapping[str, Any]],
+        confidence: float,
+        reason: str,
+        valid_time: Mapping[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("upsert_relation is only available during an active AIOS turn")
+        receipt = self.world_graph.upsert_relation(
+            RelationUpsertRequest(
+                left_ref=ObjectRef(
+                    object_id=str(left_ref["object_id"]),
+                    revision=int(left_ref["revision"]),
+                ),
+                relation_type=str(relation_type),
+                right_ref=ObjectRef(
+                    object_id=str(right_ref["object_id"]),
+                    revision=int(right_ref["revision"]),
+                ),
+                valid_time=(
+                    TemporalExtent.unknown_time()
+                    if valid_time is None
+                    else TemporalExtent.model_validate(valid_time)
+                ),
+                evidence_refs=self._coerce_refs(evidence_refs),
+                confidence=float(confidence),
+                reason=str(reason),
+            ),
+            changed_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
     def _propose_dimension(
         self,
         dimension_key: str,
@@ -1229,6 +1442,7 @@ class FusedTurnRuntime:
         page = self.index.search_by_entity(
             str(entity_id),
             keywords=(() if query is None or not str(query).strip() else (str(query),)),
+            subject=self.subject_id,
             limit=max(1, min(int(limit), 50)),
         )
         return [self._search_hit_payload(hit) for hit in page.hits]
@@ -1246,6 +1460,7 @@ class FusedTurnRuntime:
         end = datetime.fromisoformat(str(window_end).replace("Z", "+00:00"))
         page = self.index.search_mind(
             keywords=(() if query is None or not str(query).strip() else (str(query),)),
+            subject=self.subject_id,
             dimension=(None if dimension is None else str(dimension)),
             object_types=(None if object_types is None else tuple(str(x) for x in object_types)),
             time_range=(start, end),
@@ -1279,21 +1494,24 @@ class FusedTurnRuntime:
     ) -> list[dict[str, Any]]:
         result: list[dict[str, Any]] = []
         for ref in self._coerce_refs(claim_refs):
-            payload = self.store.get_payload(ref.object_id, revision=ref.revision)
+            payload = self._scoped_payload(
+                ref.object_id,
+                revision=ref.revision,
+            )
             if payload.get("object_type") != ObjectType.CLAIM.value:
                 raise ValueError("compare_claims accepts only Claim references")
             result.append(
                 {
                     "claim": payload,
                     "support_evidence_sets": [
-                        self.store.get_payload(
+                        self._scoped_payload(
                             str(item["object_id"]),
                             revision=int(item["revision"]),
                         )
                         for item in payload.get("support_evidence_set_refs") or []
                     ],
                     "counter_evidence_sets": [
-                        self.store.get_payload(
+                        self._scoped_payload(
                             str(item["object_id"]),
                             revision=int(item["revision"]),
                         )
@@ -1308,7 +1526,7 @@ class FusedTurnRuntime:
         object_id: str,
         revision: int | None = None,
     ) -> dict[str, Any]:
-        payload = self.store.get_payload(str(object_id), revision=revision)
+        payload = self._scoped_payload(str(object_id), revision=revision)
         if payload.get("object_type") != ObjectType.OBSERVATION.value:
             raise ValueError("requested object is not an Observation")
         return payload
@@ -1335,11 +1553,14 @@ class FusedTurnRuntime:
             object_id=str(outcome_ref["object_id"]),
             revision=int(outcome_ref["revision"]),
         )
-        payload = self.store.get_payload(ref.object_id, revision=ref.revision)
+        payload = self._scoped_payload(
+            ref.object_id,
+            revision=ref.revision,
+        )
         if payload.get("object_type") != ObjectType.OUTCOME.value:
             raise ValueError("outcome_ref must point to an Outcome")
         action_ref = payload.get("action_ref") or {}
-        action = self.store.get_payload(
+        action = self._scoped_payload(
             str(action_ref["object_id"]),
             revision=int(action_ref["revision"]),
         )
@@ -1356,6 +1577,41 @@ class FusedTurnRuntime:
             item.model_dump(mode="json")
             for item in self.policies.list_current()
         ]
+
+    def _propose_cognitive_policy(
+        self,
+        policy_id: str,
+        scope: str,
+        default_value: Any,
+        current_value: Any,
+        reason: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        evaluation_window: str,
+        allowed_range_or_choices: Any = None,
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError(
+                "propose_cognitive_policy is only available during an active AIOS turn"
+            )
+        receipt = self.policies.register(
+            CognitivePolicyCreateRequest(
+                policy_id=str(policy_id),
+                scope=str(scope),
+                policy_class=PolicyClass.COGNITIVE_POLICY,
+                default_value=default_value,
+                current_value=current_value,
+                allowed_range_or_choices=allowed_range_or_choices,
+                mutable_by_ai=True,
+                reason=str(reason),
+                evidence_refs=self._coerce_refs(evidence_refs),
+                changed_by="resident_ai",
+                evaluation_window=str(evaluation_window),
+            ),
+            changed_at=self._active_turn_time,
+            actor_is_ai=True,
+        )
+        return asdict(receipt)
+
 
     def _form_event(
         self,
@@ -1536,6 +1792,9 @@ class FusedTurnRuntime:
         return spec.name in {
             "commit_claim",
             "commit_ai_world_claim",
+            "propose_entity",
+            "revise_entity",
+            "upsert_relation",
             "propose_dimension",
             "transition_dimension",
             "propose_goal",
@@ -1549,6 +1808,7 @@ class FusedTurnRuntime:
             "form_event",
             "transition_event",
             "record_communication_experience",
+            "propose_cognitive_policy",
             "update_cognitive_policy",
             "rollback_cognitive_policy",
         }
@@ -1738,6 +1998,43 @@ class FusedTurnRuntime:
             dimensions=dimensions,
         )
 
+    def _structured_topic_history_signal(
+        self,
+        user_input: str,
+    ) -> tuple[bool, str | None]:
+        """Return exact durable-world anchor signals without semantic guessing."""
+
+        current = " ".join(str(user_input).strip().split()).casefold()
+        if not current:
+            return False, None
+
+        def mentioned(value: object) -> bool:
+            text = " ".join(str(value or "").strip().split())
+            # Single-character labels are too ambiguous for proactive injection.
+            return len(text) >= 2 and text.casefold() in current
+
+        for entity in self.world_graph.current_entities():
+            labels = [entity.canonical_name, *entity.aliases]
+            if any(mentioned(label) for label in labels if label):
+                return True, "explicit_entity_anchor"
+
+        for payload in self.store.list_payloads(
+            object_type=ObjectType.EVENT,
+            subject_id=self.subject_id,
+        ):
+            if mentioned(payload.get("title")):
+                return True, "explicit_event_anchor"
+
+        for goal in self.execution_world.current_goals():
+            if mentioned(goal.title):
+                return True, "explicit_goal_anchor"
+
+        for task in self.execution_world.current_tasks():
+            if mentioned(task.title):
+                return True, "explicit_task_anchor"
+
+        return False, None
+
     def run_turn(
         self,
         *,
@@ -1788,11 +2085,17 @@ class FusedTurnRuntime:
             summary_trigger_tokens=summary_trigger_tokens,
         )
 
+        structured_history_signal, structured_signal_reason = (
+            self._structured_topic_history_signal(user_input)
+        )
+
         if current_topic is _AUTO_TOPIC:
             topic_state = self.topic_state.resolve(
                 user_input=user_input,
                 recent_turns=continuity_snapshot.recent_turns,
                 explicit_topic=None,
+                structured_history_signal=structured_history_signal,
+                structured_signal_reason=structured_signal_reason,
             )
         elif current_topic is None:
             # Compatibility and explicit control: callers that deliberately pass
@@ -1809,11 +2112,26 @@ class FusedTurnRuntime:
                 user_input=user_input,
                 recent_turns=continuity_snapshot.recent_turns,
                 explicit_topic=str(current_topic),
+                structured_history_signal=structured_history_signal,
+                structured_signal_reason=structured_signal_reason,
             )
+        raw_recommendation_limit = self.policies.effective_value(
+            "memory.recommendation_limit",
+            self.recommender.default_limit,
+        )
+        try:
+            effective_recommendation_limit = max(
+                1,
+                min(int(raw_recommendation_limit), 20),
+            )
+        except (TypeError, ValueError):
+            effective_recommendation_limit = self.recommender.default_limit
+
         recommendation = self.recommender.recommend(
             current_topic=topic_state.topic,
             subject_id=self.subject_id,
             exclude_session_id=session,
+            limit=effective_recommendation_limit,
             history_needed=topic_state.history_may_help,
         )
 
@@ -1825,6 +2143,13 @@ class FusedTurnRuntime:
 
         current_task_context = dict(task_context or {})
         current_task_context["topic_state"] = topic_state.model_dump(mode="json")
+        current_task_context["cognitive_policy_context"] = {
+            "memory.recommendation_limit": effective_recommendation_limit,
+            "communication.detail_level": self.policies.effective_value(
+                "communication.detail_level",
+                None,
+            ),
+        }
         automatic_execution_context = self._execution_context_for_topic(topic_state.topic)
         current_task_context.setdefault(
             "related_execution_anchors",

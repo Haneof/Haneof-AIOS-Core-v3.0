@@ -43,6 +43,7 @@ from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import KnowledgeWindow, TemporalExtent, as_utc
 from aios_core.query.search import WorldSearchIndex
+from aios_core.storage.idempotency import canonical_json_dumps
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 
 
@@ -360,7 +361,7 @@ class TaskWakeReceipt:
 
 
 def _stable_id(prefix: str, *parts: object) -> str:
-    raw = "|".join(str(part) for part in parts)
+    raw = canonical_json_dumps(list(parts))
     return f"{prefix}_{hashlib.sha256(raw.encode('utf-8')).hexdigest()[:24]}"
 
 
@@ -393,7 +394,13 @@ class GoalTaskActionService:
 
     def _validate_refs_exist(self, refs: Sequence[ObjectRef]) -> None:
         for ref in refs:
-            self.store.get_payload(ref.object_id, revision=ref.revision)
+            payload = self.store.get_payload(ref.object_id, revision=ref.revision)
+            ref_subject = str(payload.get("subject_id") or "")
+            if ref_subject != self.subject_id:
+                raise ValueError(
+                    "execution-world reference crosses the runtime subject scope: "
+                    f"{ref.object_id}@{ref.revision} belongs to {ref_subject!r}"
+                )
 
     def _current_exact(
         self,
@@ -405,6 +412,10 @@ class GoalTaskActionService:
         if payload.get("object_type") != object_type.value:
             raise ValueError(
                 f"{ref.object_id}@{ref.revision} is not {object_type.value}"
+            )
+        if str(payload.get("subject_id") or "") != self.subject_id:
+            raise ValueError(
+                f"{object_type.value} reference crosses the runtime subject scope"
             )
         latest = self.store.get_payload(ref.object_id)
         if int(latest["revision"]) != int(ref.revision or 0):

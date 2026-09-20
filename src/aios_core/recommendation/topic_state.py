@@ -57,6 +57,8 @@ class TopicStateService:
         user_input: str,
         recent_turns: Sequence[Mapping[str, Any]] = (),
         explicit_topic: str | None = None,
+        structured_history_signal: bool = False,
+        structured_signal_reason: str | None = None,
     ) -> TopicState:
         current = _clean(user_input)
         if not current:
@@ -83,10 +85,18 @@ class TopicStateService:
             continued = False
 
         history_cue = any(cue in lower for cue in _HISTORY_CUES)
-        # Non-trivial content may benefit from historical world context. The important
-        # constitutional distinction is that phatic/no-topic turns stay closed and
-        # explicit continuation/history references are definitely history-bearing.
-        history_may_help = history_cue or continued or len(topic) >= 4
+        # A topic is not itself permission to inject history. Deterministic Core
+        # opens proactive recall only on explicit historical/continuation signals
+        # (or an explicit topic hint supplied by a trusted caller). The resident
+        # model retains search_world for all other cases.
+        history_may_help = (
+            history_cue
+            or continued
+            or (bool(explicit) and explicit != current)
+            or bool(structured_history_signal)
+        )
+        if structured_history_signal and structured_signal_reason:
+            reason = f"{reason}:{structured_signal_reason.strip()}"
         return TopicState(
             topic=topic,
             gate_open=True,

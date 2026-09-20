@@ -36,7 +36,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional, Sequence, Tuple
 
 from aios_core.contracts.time import as_utc
 
@@ -57,6 +57,7 @@ _TEXT_FIELDS: dict[str, tuple[str, ...]] = {
     "cognitive_policy": ("policy_id", "scope", "reason", "evaluation_window"),
     "wake": ("rule_id", "dedupe_key"),
     "entity": ("canonical_name",),
+    "relation": ("relation_type",),
     "goal": ("title", "description"),
     "dimension_definition": ("name", "description", "expected_value"),
     "dimension_derivation": ("derivation_description",),
@@ -528,23 +529,20 @@ class WorldSearchIndex:
                 def _is_pruned_or_refs_pruned(oid: str, rev: int) -> bool:
                     if oid in tombstones or self._store.is_latest_pruned(oid):
                         return True
-                    try:
-                        p = self._store.get_payload(oid, revision=rev)
-                        for ref_id in _iter_ref_ids(p):
-                            if ref_id in tombstones or self._store.is_latest_pruned(ref_id):
-                                return True
-                            if ref_id.startswith("evidence_"):
-                                try:
-                                    ev_p = self._store.get_payload(ref_id)
-                                    for m in ev_p.get("member_refs", []):
-                                        if isinstance(m, dict):
-                                            mid = m.get("object_id")
-                                            if mid and (mid in tombstones or self._store.is_latest_pruned(mid)):
-                                                return True
-                                except Exception:
-                                    pass
-                    except Exception:
-                        pass
+                    p = self._store.get_payload(oid, revision=rev)
+                    for ref_id in _iter_ref_ids(p):
+                        if ref_id in tombstones or self._store.is_latest_pruned(ref_id):
+                            return True
+                        if ref_id.startswith("evidence_"):
+                            ev_p = self._store.get_payload(ref_id)
+                            for m in ev_p.get("member_refs", []):
+                                if isinstance(m, dict):
+                                    mid = m.get("object_id")
+                                    if mid and (
+                                        mid in tombstones
+                                        or self._store.is_latest_pruned(mid)
+                                    ):
+                                        return True
                     return False
                 candidates = {c for c in candidates if not _is_pruned_or_refs_pruned(c[0], c[1])}
             else:
@@ -559,27 +557,26 @@ class WorldSearchIndex:
             valid_candidates: set[tuple[str, int]] = set()
             for oid, rev in candidates:
                 learned_at: datetime | None = None
-                try:
+                annotation = conn.execute(
+                    "SELECT created_at FROM search_annotations WHERE annotation_id=?",
+                    (oid,),
+                ).fetchone()
+                if annotation is not None:
+                    try:
+                        learned_at = as_utc(
+                            datetime.fromisoformat(str(annotation["created_at"])),
+                            "annotation_created_at",
+                        )
+                    except (TypeError, ValueError):
+                        learned_at = None
+                else:
                     payload = self._store.get_payload(oid, revision=rev)
                     raw_learned = payload.get("learned_at")
                     if isinstance(raw_learned, str):
-                        learned_at = as_utc(datetime.fromisoformat(raw_learned), "learned_at")
-                except Exception:
-                    # Retrospective annotations live in the projection-side annotation
-                    # registry rather than object_revisions. Their created_at is the
-                    # knowledge time of the overlay and is therefore the legal cutoff.
-                    annotation = conn.execute(
-                        "SELECT created_at FROM search_annotations WHERE annotation_id=?",
-                        (oid,),
-                    ).fetchone()
-                    if annotation is not None:
-                        try:
-                            learned_at = as_utc(
-                                datetime.fromisoformat(str(annotation["created_at"])),
-                                "annotation_created_at",
-                            )
-                        except (TypeError, ValueError):
-                            learned_at = None
+                        learned_at = as_utc(
+                            datetime.fromisoformat(raw_learned),
+                            "learned_at",
+                        )
                 if learned_at is not None and learned_at <= cutoff:
                     valid_candidates.add((oid, rev))
             candidates = valid_candidates
@@ -689,18 +686,23 @@ class WorldSearchIndex:
                 created_at = str(r[5])
                 created_by = str(r[6])
                 target_dim_row = conn.execute(
-                    "SELECT dimension FROM search_occurred "
+                    "SELECT dimension, subject_id FROM search_occurred "
                     "WHERE object_id=? ORDER BY revision DESC LIMIT 1",
                     (target_id,),
                 ).fetchone()
+                if target_dim_row is None:
+                    continue
                 dim = (
                     str(target_dim_row[0]).strip()
-                    if target_dim_row and str(target_dim_row[0]).strip()
+                    if str(target_dim_row[0]).strip()
                     else "dim_unclassified"
                 )
+                annotation_subject = str(target_dim_row[1]).strip()
+                if not annotation_subject:
+                    continue
 
                 tokens = set(tokens_for(claim_text))
-                tokens.add(_id_token("sub", "user_1"))
+                tokens.add(_id_token("sub", annotation_subject))
                 tokens.add(_id_token("ref", target_id))
                 tokens.add(_id_token("ent", target_id))
                 tokens.add(_id_token("anno", anno_id))
@@ -723,16 +725,23 @@ class WorldSearchIndex:
                 )
                 us = 0
                 try:
-                    us = int(datetime.fromisoformat(created_at).astimezone(timezone.utc).timestamp() * 1_000_000)
-                except Exception:
-                    pass
+                    us = int(
+                        datetime.fromisoformat(created_at)
+                        .astimezone(timezone.utc)
+                        .timestamp()
+                        * 1_000_000
+                    )
+                except (TypeError, ValueError, OverflowError, OSError):
+                    us = 0
                 conn.execute(
                     "INSERT OR REPLACE INTO search_occurred(object_id, revision, subject_id, object_type, "
                     "occurred_start_us, occurred_end_us, dimension) VALUES(?,?,?,?,?,?,?)",
-                    (anno_id, 1, "user_1", "reinterpretation", us, us, dim),
+                    (anno_id, 1, annotation_subject, "reinterpretation", us, us, dim),
                 )
-        except Exception:
-            pass
+        except sqlite3.OperationalError as exc:
+            # Absence is checked explicitly above. Schema/query failures in an existing
+            # annotation table are index corruption and must not be hidden.
+            raise RuntimeError("retrospective annotation projection failed") from exc
 
     _INACTIVE_CURRENT_STATUSES = {
         "retracted",
@@ -758,16 +767,10 @@ class WorldSearchIndex:
         still exist in the rebuildable index.
         """
         if object_type == "reinterpretation":
-            # Projection-side annotations may not exist in object_revisions.
-            try:
-                payload = self._store.get_payload(object_id)
-            except Exception:
-                return True
-        else:
-            try:
-                payload = self._store.get_payload(object_id)
-            except Exception:
-                return False
+            # Projection-side retrospective annotations are authoritative only inside
+            # the rebuildable index and intentionally have no WorldStore payload.
+            return True
+        payload = self._store.get_payload(object_id)
 
         if int(payload.get("revision", 0)) != int(revision):
             return False
@@ -790,6 +793,7 @@ class WorldSearchIndex:
         self,
         keywords: Sequence[str] = (),
         *,
+        subject: Optional[str] = None,
         dimension: Optional[str] = None,
         claim_id: Optional[str] = None,
         entity_id: Optional[str] = None,
@@ -846,6 +850,9 @@ class WorldSearchIndex:
 
             params: list[Any] = []
             clauses = ["1=1"]
+            if subject is not None:
+                clauses.append("o.subject_id = ?")
+                params.append(str(subject))
             if dimension:
                 clauses.append("o.dimension = ?")
                 params.append(dimension)
@@ -885,6 +892,7 @@ class WorldSearchIndex:
             total_toks = 0
             retrieved_object_ids: set[str] = set()
             retrieved_scores: dict[str, int] = {}
+            retrieved_subjects: dict[str, str] = {}
 
             for r in rows:
                 oid = r["object_id"]
@@ -936,6 +944,7 @@ class WorldSearchIndex:
                 est_tok = max(10, len(excerpt) // 3)
                 total_toks += est_tok
                 retrieved_object_ids.add(oid)
+                retrieved_subjects[oid] = str(r["subject_id"])
                 retrieval_score = (
                     int(hits_map.get((oid, rev), 0))
                     if search_tokens
@@ -982,7 +991,7 @@ class WorldSearchIndex:
                                 object_id=aid,
                                 revision=1,
                                 object_type="reinterpretation",
-                                subject_id="user_1",
+                                subject_id=retrieved_subjects.get(str(ar[1]), ""),
                                 # Companion annotations inherit only the target
                                 # retrieval score; Search does not grant semantic
                                 # supremacy by object type.
@@ -1173,9 +1182,21 @@ class WorldSearchIndex:
         """按主张与证据链因果检索。"""
         return self.search_mind(keywords=keywords, claim_id=claim_id, limit=limit)
 
-    def search_by_entity(self, entity_id: str, keywords: Sequence[str] = (), limit: int = 20) -> MindSearchPage:
-        """按实体关系网络检索。"""
-        return self.search_mind(keywords=keywords, entity_id=entity_id, limit=limit)
+    def search_by_entity(
+        self,
+        entity_id: str,
+        keywords: Sequence[str] = (),
+        limit: int = 20,
+        *,
+        subject: str | None = None,
+    ) -> MindSearchPage:
+        """按实体关系网络检索，并可限定私有世界主体。"""
+        return self.search_mind(
+            keywords=keywords,
+            subject=subject,
+            entity_id=entity_id,
+            limit=limit,
+        )
 
     def search_by_annotation(self, annotation_id: str, limit: int = 20) -> MindSearchPage:
         """按外挂解释图层检索。"""

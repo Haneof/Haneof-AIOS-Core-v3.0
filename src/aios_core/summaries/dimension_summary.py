@@ -15,13 +15,14 @@ from typing import Any, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from aios_core.contracts.enums import MaintenanceClass, SourceClass, SummaryStatus
+from aios_core.contracts.enums import ErrorCode, MaintenanceClass, SourceClass, SummaryStatus
 from aios_core.contracts.models import Dependency, Summary
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import TemporalExtent, TimePrecision, as_utc
 from aios_core.query.search import WorldSearchIndex
-from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.storage.idempotency import canonical_json_dumps
+from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
 
 class DimensionSummarySource(BaseModel):
@@ -70,7 +71,7 @@ class SummaryCommit:
 
 
 def _stable_id(*parts: object) -> str:
-    raw = "|".join(str(part) for part in parts)
+    raw = canonical_json_dumps(list(parts))
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:24]
 
 
@@ -164,6 +165,7 @@ class DimensionSummaryService:
 
         source_world_revision = int(self.store.current_world_revision())
         page = self.index.search_mind(
+            subject=self.subject_id,
             dimension=dimension,
             time_range=(start, end),
             limit=self.max_source_objects + 1,
@@ -203,6 +205,126 @@ class DimensionSummaryService:
             truncated=truncated,
         )
 
+    def mark_stale_if_present(
+        self,
+        prepared: DimensionSummaryInput,
+        *,
+        changed_at: datetime,
+        reason: str,
+    ) -> SummaryCommit | None:
+        """Forward-mark an existing window Summary stale when completeness is lost."""
+
+        changed = as_utc(changed_at, "changed_at")
+        object_id = "sum_" + _stable_id(
+            prepared.dimension,
+            prepared.granularity,
+            prepared.window_start.isoformat(),
+            prepared.window_end.isoformat(),
+        )
+        try:
+            latest_payload = self.store.get_payload(object_id)
+        except StoreError as exc:
+            if exc.code is ErrorCode.NOT_FOUND:
+                return None
+            raise
+
+        latest = Summary.model_validate(latest_payload)
+        if latest.summary_status is SummaryStatus.STALE:
+            return SummaryCommit(
+                object_id=latest.object_id,
+                revision=latest.revision,
+                world_revision=int(self.store.current_world_revision()),
+                reused_existing=True,
+            )
+
+        revision = latest.revision + 1
+        metadata = dict(latest.metadata)
+        metadata.update(
+            {
+                "dimension": prepared.dimension,
+                "summary_kind": "single_dimension_temporal",
+                "stale_reason": reason.strip(),
+                "stale_at": changed.isoformat(),
+                "stale_due_to_incomplete_source_window": True,
+            }
+        )
+        stale = Summary.model_validate(
+            {
+                **latest.model_dump(mode="python", round_trip=True),
+                "revision": revision,
+                "learned_at": changed,
+                "recorded_at": changed,
+                "source_world_revision": int(self.store.current_world_revision()),
+                "summary_status": SummaryStatus.STALE,
+                "coverage": {
+                    **dict(latest.coverage),
+                    "truncated": True,
+                    "stale_reason": reason.strip(),
+                },
+                "metadata": metadata,
+            }
+        )
+
+        dependencies: list[Dependency] = []
+        for ref in stale.source_refs:
+            dependencies.append(
+                Dependency(
+                    object_id="dep_" + _stable_id(
+                        stale.object_id,
+                        revision,
+                        ref.object_id,
+                        ref.revision,
+                        "stale_source",
+                    ),
+                    subject_id=self.subject_id,
+                    learned_at=changed,
+                    recorded_at=changed,
+                    created_by="dimension_summary:dependency",
+                    dependent_ref=ObjectRef(
+                        object_id=stale.object_id,
+                        revision=revision,
+                    ),
+                    dependency_ref=ObjectRef(
+                        object_id=ref.object_id,
+                        revision=ref.revision,
+                    ),
+                    dependency_type="stale_summary_preserves_source",
+                )
+            )
+
+        op_key = _stable_id(
+            "stale",
+            object_id,
+            revision,
+            int(self.store.current_world_revision()),
+            reason.strip(),
+        )
+        result = self.store.commit(
+            [stale, *dependencies],
+            OperationRequest(
+                operation_id=f"op_summary_stale_{op_key}",
+                operation_name="summary.mark_stale",
+                arguments={
+                    "summary_id": object_id,
+                    "revision": revision,
+                    "dimension": prepared.dimension,
+                    "granularity": prepared.granularity,
+                },
+                expected_world_revision=int(self.store.current_world_revision()),
+                reason=reason.strip(),
+                idempotency_key=f"summary-stale:{op_key}",
+                source_class=SourceClass.MAINTENANCE,
+                maintenance_class=MaintenanceClass.SUMMARY_REBUILD,
+            ),
+        )
+        self.index.catch_up()
+        return SummaryCommit(
+            object_id=object_id,
+            revision=revision,
+            world_revision=result.world_revision,
+            reused_existing=result.idempotent_replay,
+        )
+
     def commit(
         self,
         prepared: DimensionSummaryInput,
@@ -225,7 +347,9 @@ class DimensionSummaryService:
         latest: dict[str, Any] | None
         try:
             latest = self.store.get_payload(object_id)
-        except Exception:
+        except StoreError as exc:
+            if exc.code is not ErrorCode.NOT_FOUND:
+                raise
             latest = None
 
         if latest is not None and int(latest.get("source_world_revision", -1)) == prepared.source_world_revision:

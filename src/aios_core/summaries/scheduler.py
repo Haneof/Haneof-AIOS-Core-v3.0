@@ -138,18 +138,82 @@ class MultiScaleSummaryScheduler:
         )
 
     def active_dimensions(self) -> tuple[str, ...]:
-        dimensions: set[str] = set()
+        payloads = self.store.list_payloads(subject_id=self.subject_id)
+        terminal = {"merged", "split", "rejected", "archived"}
+        terminal_keys: set[str] = set()
+        active_definition_keys: set[str] = set()
+
+        for payload in payloads:
+            if str(payload.get("object_type") or "") != ObjectType.DIMENSION_DEFINITION.value:
+                continue
+            metadata = payload.get("metadata")
+            key = metadata.get("dimension_key") if isinstance(metadata, dict) else None
+            if not isinstance(key, str) or not key.strip():
+                continue
+            lifecycle = str(payload.get("lifecycle") or "").strip().lower()
+            if lifecycle in terminal:
+                terminal_keys.add(key.strip())
+            else:
+                active_definition_keys.add(key.strip())
+
+        dimensions: set[str] = set(active_definition_keys)
+        for payload in payloads:
+            object_type = str(payload.get("object_type") or "")
+            if object_type == ObjectType.DIMENSION_DEFINITION.value:
+                continue
+            dimension = derive_dimension(payload, object_type)
+            if (
+                dimension
+                and dimension != "dim_unclassified"
+                and dimension not in terminal_keys
+            ):
+                dimensions.add(dimension)
+        return tuple(sorted(dimensions))
+
+    @staticmethod
+    def _payload_time(payload: dict) -> datetime | None:
+        occurred = payload.get("occurred")
+        if isinstance(occurred, dict):
+            raw = occurred.get("start")
+            if isinstance(raw, str):
+                try:
+                    return as_utc(
+                        datetime.fromisoformat(raw.replace("Z", "+00:00")),
+                        "occurred.start",
+                    )
+                except ValueError:
+                    pass
+        raw = payload.get("recorded_at")
+        if isinstance(raw, str):
+            try:
+                return as_utc(
+                    datetime.fromisoformat(raw.replace("Z", "+00:00")),
+                    "recorded_at",
+                )
+            except ValueError:
+                pass
+        return None
+
+    def _candidate_windows(
+        self,
+        *,
+        now: datetime,
+        scale: SummaryScale,
+        dimension: str,
+    ) -> tuple[tuple[datetime, datetime], ...]:
+        current_start, _ = window_bounds(now, scale)
+        windows: set[tuple[datetime, datetime]] = set()
         for payload in self.store.list_payloads(subject_id=self.subject_id):
             object_type = str(payload.get("object_type") or "")
-            dimension = derive_dimension(payload, object_type)
-            if dimension and dimension != "dim_unclassified":
-                dimensions.add(dimension)
-            if object_type == ObjectType.DIMENSION_DEFINITION.value:
-                metadata = payload.get("metadata")
-                key = metadata.get("dimension_key") if isinstance(metadata, dict) else None
-                if isinstance(key, str) and key.strip():
-                    dimensions.add(key.strip())
-        return tuple(sorted(dimensions))
+            if derive_dimension(payload, object_type) != dimension:
+                continue
+            at = self._payload_time(payload)
+            if at is None:
+                continue
+            start, end = window_bounds(at, scale)
+            if end < current_start:
+                windows.add((start, end))
+        return tuple(sorted(windows, key=lambda item: item[0]))
 
     @staticmethod
     def _source_identity(prepared: DimensionSummaryInput) -> tuple[tuple[str, int], ...]:
@@ -208,58 +272,87 @@ class MultiScaleSummaryScheduler:
         max_jobs: int = 64,
         dimensions: Sequence[str] | None = None,
     ) -> SummaryScheduleResult:
+        """Drain all closed windows that actually contain world material.
+
+        Unlike a single previous-window tick, this derives candidate windows from the
+        durable world. Process downtime therefore cannot permanently skip old windows,
+        and late-arriving facts automatically reopen their historical window because
+        the prepared source identity changes.
+        """
+
         if max_jobs < 1:
             raise ValueError("max_jobs must be >= 1")
         current = as_utc(now, "now")
         dims = tuple(dict.fromkeys(
-            str(item).strip() for item in (dimensions or self.active_dimensions()) if str(item).strip()
+            str(item).strip()
+            for item in (dimensions or self.active_dimensions())
+            if str(item).strip()
         ))
         jobs: list[ScheduledSummaryJob] = []
         commits: list[SummaryCommit] = []
         skipped_unchanged: list[ScheduledSummaryJob] = []
         skipped_empty: list[ScheduledSummaryJob] = []
         truncated = False
+        semantic_jobs = 0
 
         for scale_value in scales:
             scale = SummaryScale(scale_value)
-            start, end = previous_closed_window(current, scale)
             for dimension in dims:
-                if len(jobs) >= max_jobs:
-                    truncated = True
-                    break
-                prepared = self.service.prepare(
-                    dimension=dimension,
-                    granularity=scale.value,
-                    window_start=start,
-                    window_end=end,
-                    include_summary_sources=(scale is not SummaryScale.DAY),
-                )
-                job = ScheduledSummaryJob(
-                    dimension=dimension,
+                for start, end in self._candidate_windows(
+                    now=current,
                     scale=scale,
-                    window_start=start,
-                    window_end=end,
-                    source_count=len(prepared.sources),
-                )
-                jobs.append(job)
-                if not prepared.sources:
-                    skipped_empty.append(job)
-                    continue
-                if self._unchanged(prepared):
-                    skipped_unchanged.append(job)
-                    continue
-                content = self.summary_handler(prepared)
-                if not isinstance(content, str) or not content.strip():
-                    raise ValueError("dimension summary handler must return non-blank text")
-                commits.append(
-                    self.service.commit(
-                        prepared,
-                        content=content,
-                        generated_at=current,
+                    dimension=dimension,
+                ):
+                    prepared = self.service.prepare(
+                        dimension=dimension,
+                        granularity=scale.value,
+                        window_start=start,
+                        window_end=end,
+                        include_summary_sources=(scale is not SummaryScale.DAY),
                     )
-                )
-            if truncated:
-                break
+                    job = ScheduledSummaryJob(
+                        dimension=dimension,
+                        scale=scale,
+                        window_start=start,
+                        window_end=end,
+                        source_count=len(prepared.sources),
+                    )
+                    jobs.append(job)
+
+                    if not prepared.sources:
+                        skipped_empty.append(job)
+                        continue
+                    if prepared.truncated:
+                        # Never publish an incomplete Summary as CURRENT. If this
+                        # window had an older CURRENT summary, forward-mark it STALE
+                        # because the durable source set is now known to be incomplete.
+                        self.service.mark_stale_if_present(
+                            prepared,
+                            changed_at=current,
+                            reason="summary source window exceeds completeness cap",
+                        )
+                        truncated = True
+                        continue
+                    if self._unchanged(prepared):
+                        skipped_unchanged.append(job)
+                        continue
+                    if semantic_jobs >= max_jobs:
+                        truncated = True
+                        continue
+
+                    content = self.summary_handler(prepared)
+                    if not isinstance(content, str) or not content.strip():
+                        raise ValueError(
+                            "dimension summary handler must return non-blank text"
+                        )
+                    commits.append(
+                        self.service.commit(
+                            prepared,
+                            content=content,
+                            generated_at=current,
+                        )
+                    )
+                    semantic_jobs += 1
 
         return SummaryScheduleResult(
             attempted_jobs=tuple(jobs),

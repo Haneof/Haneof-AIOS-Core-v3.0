@@ -151,6 +151,7 @@ class AIWorldCognitionService:
             store=self.store,
             index=self.index,
             subject_id=subject_id,
+            evidence_subject_ids=(self.user_id, self.ai_subject_id),
         )
         metadata: dict[str, Any] = {
             "ai_domain": domain.value,
@@ -312,6 +313,7 @@ class AIWorldCognitionService:
             store=self.store,
             index=self.index,
             subject_id=str(payload["subject_id"]),
+            evidence_subject_ids=(self.user_id, self.ai_subject_id),
         )
         return service.apply(
             ClaimRevisionRequest(
@@ -344,6 +346,7 @@ class AIWorldCognitionService:
             store=self.store,
             index=self.index,
             subject_id=str(payload["subject_id"]),
+            evidence_subject_ids=(self.user_id, self.ai_subject_id),
         )
         return service.apply(
             ClaimRevisionRequest(

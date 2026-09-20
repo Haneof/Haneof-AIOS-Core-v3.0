@@ -557,6 +557,16 @@ def _summary_system_instruction() -> str:
     )
 
 
+def _dimension_summary_system_instruction() -> str:
+    return (
+        "Generate only the requested single-dimension temporal summary from the "
+        "provided pinned sources. Describe what happened in that dimension and time "
+        "window; preserve uncertainty and source boundaries. Do not infer cross-"
+        "dimension causality, personality, relationships, or facts absent from the "
+        "sources. Return summary text only."
+    )
+
+
 def _snapshot_prompt(snapshot: RuntimeSnapshot) -> str:
     return _canonical_json(
         {
@@ -956,10 +966,19 @@ class ProviderRoundSummaryHandler:
             else _safe_json_value(request)
         )
         prompt = _canonical_json(model_input)
+        purpose = (
+            "dimension_summary"
+            if hasattr(request, "granularity") and hasattr(request, "sources")
+            else "round_summary"
+        )
         return self.client.complete_text(
-            system_instruction=_summary_system_instruction(),
+            system_instruction=(
+                _dimension_summary_system_instruction()
+                if purpose == "dimension_summary"
+                else _summary_system_instruction()
+            ),
             input_text=prompt,
-            purpose="round_summary",
+            purpose=purpose,
         )
 
 

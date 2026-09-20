@@ -77,6 +77,11 @@ class CommunicationExperienceService:
         saw_real_feedback = False
         for ref in refs:
             payload = self.store.get_payload(ref.object_id, revision=ref.revision)
+            ref_subject = str(payload.get("subject_id") or "")
+            if ref_subject != self.subject_id:
+                raise ValueError(
+                    "communication feedback crosses the runtime subject scope"
+                )
             object_type = str(payload.get("object_type") or "")
             if object_type not in {ObjectType.OBSERVATION.value, ObjectType.OUTCOME.value}:
                 continue
@@ -103,9 +108,20 @@ class CommunicationExperienceService:
         all_refs = tuple(dict.fromkeys((*request.evidence_refs, *request.counterexample_refs)))
         self._validate_real_feedback(request.evidence_refs)
         if request.action_ref is not None:
-            self.store.get_payload(request.action_ref.object_id, revision=request.action_ref.revision)
+            action_payload = self.store.get_payload(
+                request.action_ref.object_id,
+                revision=request.action_ref.revision,
+            )
+            if str(action_payload.get("subject_id") or "") != self.subject_id:
+                raise ValueError(
+                    "communication action_ref crosses the runtime subject scope"
+                )
         for ref in all_refs:
-            self.store.get_payload(ref.object_id, revision=ref.revision)
+            payload = self.store.get_payload(ref.object_id, revision=ref.revision)
+            if str(payload.get("subject_id") or "") != self.subject_id:
+                raise ValueError(
+                    "communication reference crosses the runtime subject scope"
+                )
 
         experience_id = _stable_id(
             "commexp", self.subject_id, request.scenario.strip(), request.style.strip(),

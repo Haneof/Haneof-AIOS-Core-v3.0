@@ -29,6 +29,7 @@ from aios_core.contracts.models import Dependency, OperationExperience, Wake
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import TemporalExtent, as_utc
+from aios_core.policy.service import evaluation_due_at
 from aios_core.query.search import WorldSearchIndex
 from aios_core.storage.idempotency import canonical_json_dumps
 from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
@@ -110,6 +111,11 @@ def _excerpt(payload: Mapping[str, Any]) -> str:
             f"{payload.get('verification_state')}: "
             f"{payload.get('expected_change')}"
         )[:600]
+    if object_type == ObjectType.COGNITIVE_POLICY.value:
+        return (
+            f"{payload.get('policy_id')}={payload.get('current_value')} | "
+            f"scope={payload.get('scope')} | evaluate={payload.get('evaluation_window')}"
+        )[:600]
     return str(payload)[:600]
 
 
@@ -154,7 +160,8 @@ class PeriodicReviewRequest(BaseModel):
     instruction: str = (
         "Review the supplied world anchors and decide whether any previous AI "
         "understanding, strategy, calibration, self-understanding, goal handling, "
-        "or operation method should be revised. Use existing search/inspect tools "
+        "operation method, or due CognitivePolicy should be revised, confirmed, or "
+        "rolled back. Use existing search/inspect tools "
         "when needed. Do not invent user growth, causal meaning, success, failure, "
         "or policy changes that are not supported by world evidence."
     )
@@ -344,6 +351,50 @@ class PeriodicReviewService:
                 )
                 bucket = per_type.setdefault(anchor.object_type, [])
                 bucket.append(anchor)
+
+        # R6 policies are reviewed when their own evaluation window becomes due,
+        # not merely because the policy object happened to be written in this review
+        # window. A policy that remains unevaluated may reappear in a later review;
+        # keeping/revising/rolling it forward creates a new revision and a new due time.
+        for payload in self.store.list_payloads(
+            object_type=ObjectType.COGNITIVE_POLICY,
+            subject_id=self.subject_id,
+        ):
+            ref_key = (
+                str(payload["object_id"]),
+                int(payload["revision"]),
+            )
+            if ref_key in excluded:
+                continue
+            metadata = payload.get("metadata")
+            if not isinstance(metadata, Mapping):
+                metadata = {}
+            raw_due = metadata.get("next_evaluation_at")
+            try:
+                due_at = (
+                    _parse_time(raw_due, "next_evaluation_at")
+                    if raw_due is not None
+                    else evaluation_due_at(
+                        _parse_time(payload.get("changed_at"), "changed_at"),
+                        str(payload.get("evaluation_window") or ""),
+                    )
+                )
+            except ValueError:
+                # Invalid policy schedule is a durable contract error, not a reason
+                # to silently invent a review time.
+                raise
+            if due_at > end:
+                continue
+            anchor = ReviewAnchor(
+                object_ref=ObjectRef(
+                    object_id=ref_key[0],
+                    revision=ref_key[1],
+                ),
+                object_type=ObjectType.COGNITIVE_POLICY.value,
+                recorded_at=due_at,
+                excerpt=_excerpt(payload),
+            )
+            per_type.setdefault(anchor.object_type, []).append(anchor)
 
         eligible_count = sum(len(bucket) for bucket in per_type.values())
         selected: list[ReviewAnchor] = []

@@ -24,6 +24,7 @@ on:
           - cross_session_continuity_v1.manifest.json
           - cognition_revision_v1.manifest.json
           - uncertainty_restraint_v1.manifest.json
+          - cognition_system_closure_v1.manifest.json
       evaluator_provider:
         description: "Independent evaluator provider"
         required: true

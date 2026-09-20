@@ -8,8 +8,9 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from aios_core.contracts.enums import ErrorCode
 from aios_core.query.search import WorldSearchIndex
-from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
 
 class MemoryCard(BaseModel):
@@ -94,7 +95,11 @@ class ProactiveMemoryRecommender:
         for hit in page.hits:
             try:
                 payload = self.store.get_payload(hit.object_id, revision=hit.revision)
-            except Exception:
+            except StoreError as exc:
+                if exc.code is not ErrorCode.NOT_FOUND:
+                    raise
+                # A rebuildable projection can briefly retain a stale locator. Missing
+                # projected objects are skipped; durable storage failures are not hidden.
                 continue
 
             metadata = payload.get("metadata")
