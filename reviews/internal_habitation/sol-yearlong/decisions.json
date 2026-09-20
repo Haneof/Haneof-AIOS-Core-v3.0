@@ -963,5 +963,18 @@
   "811f38234081838774207ba2010a2ee8e662824ace9997d1c602907a63bd84af": {
     "kind": "response",
     "response": "对，当前证据只支持：灭火器旁有两袋面粉、通道空间变窄，但仍可通行。仅凭这张现场描述不能推出“通道不合格”或“消防检查一定有问题”。周日我仍按约定先核验准备状态，有结论就按实际证据说。"
+  },
+  "0001c868b75489f23d822d6de8ac8c9a251458df8c9027100f8cb2ee9451a0df": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan16-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
   }
 }
