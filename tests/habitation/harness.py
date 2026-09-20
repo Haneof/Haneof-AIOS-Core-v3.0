@@ -17,6 +17,8 @@ from typing import Any, Mapping, Protocol, Sequence
 
 
 def _require_aware(value: datetime, field_name: str) -> None:
+    if not isinstance(value, datetime):
+        raise ValueError(f"{field_name} must be a datetime")
     if value.tzinfo is None or value.utcoffset() is None:
         raise ValueError(f"{field_name} must be timezone-aware")
 
@@ -106,8 +108,14 @@ class HabitationScenario:
             raise ValueError("scenario_id must be a non-empty string")
         if not isinstance(self.subject_id, str) or not self.subject_id.strip():
             raise ValueError("subject_id must be a non-empty string")
-        if not self.events:
-            raise ValueError("scenario must contain at least one event")
+        if not isinstance(self.events, tuple) or not self.events:
+            raise ValueError("events must be a non-empty tuple")
+        if not all(isinstance(event, LifeEvent) for event in self.events):
+            raise ValueError("events must contain only LifeEvent values")
+        if not any(event.deliver_to_resident for event in self.events):
+            raise ValueError(
+                "scenario must contain at least one resident-visible event"
+            )
         if not isinstance(self.scenario_version, str) or not self.scenario_version.strip():
             raise ValueError("scenario_version must be a non-empty string")
         if not isinstance(self.seed, int) or isinstance(self.seed, bool):
