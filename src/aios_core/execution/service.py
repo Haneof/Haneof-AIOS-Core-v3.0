@@ -848,10 +848,15 @@ class GoalTaskActionService:
             raise ValueError(
                 f"illegal task transition: {current.task_state.value} -> {target.value}"
             )
-        refs = (
-            *request.evidence_refs,
-            *request.execution_refs,
-            *request.outcome_refs,
+        refs = tuple(
+            {
+                (ref.object_id, int(ref.revision or 0)): ref
+                for ref in (
+                    *request.evidence_refs,
+                    *request.execution_refs,
+                    *request.outcome_refs,
+                )
+            }.values()
         )
         self._validate_refs_exist(refs)
         for ref in request.execution_refs:
