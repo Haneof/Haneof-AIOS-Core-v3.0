@@ -1,0 +1,4 @@
+{"event_id":"d001-chat-1","occurred_at":"2027-01-05T08:15:00+00:00","channel":"conversation","payload":"我刚接手一家小型烘焙店，最近每天事情很多。我不喜欢你频繁提醒，只有可能影响开店、进货或者重要家人安排的事情才主动打断我。先帮我记住这个偏好。","metadata":{"session":"jan05-morning"}}
+{"event_id":"d002-calendar","occurred_at":"2027-01-06T13:00:00+00:00","channel":"calendar","payload":{"title":"面粉供应商首批到货","start":"2027-01-09T04:30:00+00:00","note":"需要本人或店员开后门收货"},"metadata":{"source":"calendar"}}
+{"event_id":"d003-note","occurred_at":"2027-01-07T16:20:00+00:00","channel":"note","payload":"妹妹周五晚上可能到机场，航班时间还没最终确认。","metadata":{"source":"notes"}}
+{"event_id":"d004-chat-2","occurred_at":"2027-01-08T21:10:00+00:00","channel":"conversation","payload":"那个凌晨的安排别忘了。另外我周五晚上可能要去机场接我妹妹。先别替我决定；如果两个事情真有冲突，再把冲突和依据告诉我。","metadata":{"session":"jan08-evening"}}
