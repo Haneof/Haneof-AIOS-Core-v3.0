@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "snapshot_signature": "178515f70f66e27752744ee55a59eb69a35d788cac38b05d3c22effbe8ed3bef",
+    "type": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 10
+        }
+      }
+    ]
+  }
+]
