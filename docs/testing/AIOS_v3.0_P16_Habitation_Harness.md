@@ -344,3 +344,54 @@ change whether two candidates received the same visible life.
 Deterministic tests prove plumbing, isolation, lifecycle and leak resistance only.
 They do **not** prove cognition quality. P16 cognition evidence requires a real
 provider-backed resident model living through the sealed scenario.
+
+
+## 17. Real-provider execution entrypoint
+
+Real resident runs are deliberately separated from deterministic CI.
+
+Use:
+
+```bash
+python -m tests.habitation.run_provider_benchmark \
+  --fixture-root tests/habitation/fixtures \
+  --manifest cognition_revision_v1.manifest.json \
+  --provider openai \
+  --model <exact-provider-model-id> \
+  --output-dir artifacts/p16/openai-cognition-revision
+```
+
+Supported provider protocols:
+
+- OpenAI Responses API;
+- Anthropic Messages client-tool use;
+- Gemini Interactions function calling.
+
+The runner reads only the manifest and `resident/**` stream. It never opens
+`oracle/**`. Provider credentials are read from environment variables
+(`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`) and are never written
+to run provenance.
+
+A manual GitHub Actions entrypoint is available at
+`.github/workflows/p16-provider-habitation-manual.yml`. It is intentionally
+`workflow_dispatch` only: deterministic CI must not create provider spend.
+
+Each successful run writes at least:
+
+```text
+output-dir/
+├── launch.json
+├── world.sqlite
+└── run.json
+```
+
+A failed provider run writes `failure.json` with secret-safe provider provenance.
+
+Provider model ID, endpoint/API family, configuration fingerprint, provider response
+IDs, usage metadata, error metadata and request timing are audit data. The API key is
+not audit data and must never be serialized.
+
+A provider-backed run is evidence only after the exact same
+`scenario_public_fingerprint` has been confirmed across candidates. Hidden oracle
+evaluation occurs in a separate post-run boundary.
+

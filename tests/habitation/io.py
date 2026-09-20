@@ -29,6 +29,14 @@ class LoadedFixture:
     scenario: HabitationScenario
 
 
+@dataclass(frozen=True, slots=True)
+class LoadedResidentFixture:
+    """Resident-run bundle that never reads evaluator oracle bytes."""
+
+    manifest: FixtureManifest
+    scenario: HabitationScenario
+
+
 def _safe_fixture_child(root: Path, relative: str, *, expected_dir: str) -> Path:
     if not isinstance(relative, str) or not relative.strip():
         raise ValueError("fixture path must be a non-empty string")
@@ -65,6 +73,48 @@ def load_fixture_manifest(text: str) -> FixtureManifest:
         evaluator_oracle=_required_string(raw, "evaluator_oracle"),
         end_at=(None if end_at_raw is None else _parse_datetime(end_at_raw)),
     )
+
+
+def load_resident_fixture(
+    root: str | Path,
+    manifest_name: str,
+) -> LoadedResidentFixture:
+    """Load manifest + resident stream only; never open evaluator oracle.
+
+    Evaluator metadata may remain in the manifest for artifact identity, but the
+    returned HabitationScenario contains no hidden oracle and target factories still
+    receive only ResidentScenarioDescriptor(subject_id).
+    """
+
+    root_path = Path(root).resolve()
+    if not isinstance(manifest_name, str) or not manifest_name.strip():
+        raise ValueError("manifest_name must be a non-empty string")
+    rel_manifest = Path(manifest_name)
+    if rel_manifest.is_absolute() or ".." in rel_manifest.parts:
+        raise ValueError("manifest path must stay under fixture root")
+    manifest_path = (root_path / rel_manifest).resolve()
+    if manifest_path.parent != root_path:
+        raise ValueError("manifest must live directly under fixture root")
+
+    manifest = load_fixture_manifest(manifest_path.read_text(encoding="utf-8"))
+    resident_path = _safe_fixture_child(
+        root_path,
+        manifest.resident_stream,
+        expected_dir="resident",
+    )
+    events = load_resident_events_jsonl(
+        resident_path.read_text(encoding="utf-8")
+    )
+    scenario = HabitationScenario(
+        scenario_id=manifest.scenario_id,
+        scenario_version=manifest.scenario_version,
+        seed=manifest.seed,
+        subject_id=manifest.subject_id,
+        events=events,
+        hidden_oracle={},
+        end_at=manifest.end_at,
+    )
+    return LoadedResidentFixture(manifest=manifest, scenario=scenario)
 
 
 def load_fixture_bundle(
