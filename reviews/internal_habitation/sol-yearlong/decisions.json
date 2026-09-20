@@ -1497,5 +1497,29 @@
   "265ce3b1f6e80b3e631e3cc1597f8fdacf2914e8a1a8d5c1b4739783bec37d58": {
     "kind": "response",
     "response": "给小赵的发送请求已经形成，但现在状态仍是“待授权/待平台执行”，没有真实发送结果，所以我不会说已经发出。内容是：明早4:15到店开后门收货，到了回我。"
+  },
+  "26e95d2a759879af634d0dc9b03c57e10a186d98ab87af93cd59c5c952a828fa": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_task",
+        "call_id": "sol-jan08-user-cancelled-message-task",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_fa7f780c46e2004d9d0100c2",
+            "revision": 2
+          },
+          "new_state": "cancelled",
+          "reason": "The user explicitly says they already called Xiao Zhao themselves and no longer want AIOS to send the proposed message. The AIOS external Action has no execution Outcome and must not be represented as sent.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_d025779ec9ad6598e950810a",
+              "revision": 1
+            }
+          ],
+          "next_step": "Do not execute the previously proposed send_message Action; preserve that it never produced a real Outcome."
+        }
+      }
+    ]
   }
 }
