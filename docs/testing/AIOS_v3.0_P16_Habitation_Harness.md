@@ -198,13 +198,14 @@ The foundation now ships with four resident/oracle-separated scenario families:
 These fixtures do not contain expected model response strings. The resident stream
 contains only life events. Evaluator truth lives in separate oracle files.
 
-## 11. Deliberately deferred until Core APIs stabilize
+## 11. Core integration boundary
 
-Keep this foundation independent from stage-specific implementation internals.
-Follow-on adapter work may consume stabilized public interfaces for execution,
-reality ingestion, long-session continuity, periodic review, and provider models,
-but those integrations belong in separate changes so the benchmark foundation
-cannot silently redefine Core behavior.
+The benchmark consumes stabilized public Core interfaces for execution, reality
+ingestion, long-session continuity, periodic review and Wake dispatch. It still must
+not redefine Core semantics from the test side.
+
+Provider adapters remain external to cognition logic: they translate one resident
+model API into the existing `ModelHandler` / round-summary surfaces only.
 
 
 ## 12. Anti-contamination execution rules
@@ -276,3 +277,70 @@ Important boundaries:
 Real habitation runs must inject a real provider-backed `ModelHandler` (and a real
 round-summary handler where long-session P14 behavior is under test). Each provider
 must use a fresh private target/database.
+
+
+## 15. Long-horizon scheduler hardening
+
+The Current-Core target advances through **intermediate deterministic timestamps**,
+not only visible event timestamps.
+
+Between two resident-visible events it processes, in chronological order:
+
+- P12 Task `next_wake_at`;
+- resulting C09 durable Wake dispatch;
+- P15 periodic-review ticks;
+- Tasks created by Review/Wake that are already due at that same tick.
+
+This matters because a synthetic life may have days between visible events. A Task
+due on Tuesday must not sleep until Friday merely because Friday is the next fixture
+event.
+
+A cycle guard fails closed if model behavior creates a pathological same-time
+background loop.
+
+## 16. Final horizon
+
+A scenario may define evaluator-side `end_at`.
+
+The target factory does **not** receive this future timestamp. Only after all
+resident-visible events have been delivered does the runner advance the private
+virtual clock to `end_at`.
+
+This ensures legitimate post-event Task/Review/Wake work can occur after the last
+external life event without leaking the future schedule during target construction.
+
+All shipped fixture manifests define a final horizon beyond their final visible
+event.
+
+## 17. Reality-source paths used by habitation
+
+The current Core adapter preserves P13 source boundaries:
+
+- ordinary note/calendar/order/etc. records use `RealityRecord`;
+- `photo_description` uses `MediaDescriptorRecord`, never raw image bytes;
+- `sensor_numeric` uses `NumericSample + MechanicalSeriesPolicy`;
+- resulting registered mechanical markers may enter C09
+  `ObservationTriggerService`;
+- mechanical trigger code still cannot manufacture Claim semantics.
+
+The benchmark therefore tests the same reality ingestion and Wake path intended for
+the runnable Core instead of a test-only shortcut.
+
+## 18. Fresh worlds and visible-life fingerprint
+
+`CurrentCoreHabitationTargetFactory` creates a new SQLite database for every model
+candidate. Existing database paths are rejected by default.
+
+The public scenario fingerprint hashes only actual resident execution input:
+
+- opaque subject identity;
+- resident-visible event stream;
+- final execution horizon.
+
+Semantic scenario ID, benchmark version, seed, evaluator focus and oracle truth are
+excluded from that fingerprint. They remain evaluator-side provenance and must never
+change whether two candidates received the same visible life.
+
+Deterministic tests prove plumbing, isolation, lifecycle and leak resistance only.
+They do **not** prove cognition quality. P16 cognition evidence requires a real
+provider-backed resident model living through the sealed scenario.
