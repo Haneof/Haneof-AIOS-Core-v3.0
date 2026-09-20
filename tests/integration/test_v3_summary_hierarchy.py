@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
+from aios_core.contracts.enums import ObjectType
 from aios_core.ingest.conversation import ConversationIngestor, INTERACTION_DIMENSION
 from aios_core.query.search import WorldSearchIndex
 from aios_core.storage.sqlite_store import SQLiteWorldStore
@@ -72,7 +73,7 @@ def test_multiscale_summary_is_bottom_up_and_never_depends_on_itself(tmp_path):
         for item in summaries
     }
     for dep in store.list_payloads(
-        object_type="dependency",
+        object_type=ObjectType.DEPENDENCY,
         subject_id="user_1",
     ):
         if dep.get("dependency_type") != "summary_uses_source":
