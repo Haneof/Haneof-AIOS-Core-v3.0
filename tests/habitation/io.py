@@ -203,10 +203,12 @@ def run_artifact(
                 "occurred_at": step.occurred_at.isoformat(),
                 "channel": step.channel,
                 "delivered": step.delivered,
+                "time_advance_result": step.time_advance_result,
                 "response": step.response,
             }
             for step in run.steps
         ],
+        "final_snapshot": dict(run.final_snapshot),
     }
 
 
