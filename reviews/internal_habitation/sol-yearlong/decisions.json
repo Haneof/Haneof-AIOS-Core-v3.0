@@ -1239,5 +1239,30 @@
         }
       }
     ]
+  },
+  "ada02551adfb89c8fc9c9b3254a2dfab5d997788bbf8cbddeb8fe7ebb337c276": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_event",
+        "call_id": "sol-jan18-activate-fire-inspection-result-event",
+        "arguments": {
+          "event_ref": {
+            "object_id": "event_809fdc8d28c2a1be6aa12cfd",
+            "revision": 1
+          },
+          "new_status": "active",
+          "reason": "The event interpretation is directly grounded in the user's explicit report of the inspector's actual result; no causal explanation is being added.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_0238ab2e202146a7625eb120",
+              "revision": 1
+            }
+          ],
+          "related_event_refs": [],
+          "confidence": 0.99
+        }
+      }
+    ]
   }
 }
