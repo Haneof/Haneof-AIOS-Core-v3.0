@@ -578,3 +578,145 @@ def test_long_session_rolls_forward_in_order_without_replacing_raw_dialogue(tmp_
     summaries = store.list_payloads(object_type=ObjectType.SUMMARY)
     assert len(summaries) == 4
     assert sum(len(item["source_refs"]) for item in summaries) == 32
+
+
+def test_token_pressure_can_summarize_before_fixed_turn_chunk(tmp_path):
+    store, index = _world(tmp_path)
+    requests = []
+
+    def model(snapshot):
+        return ModelDirective(response="ok")
+
+    def summarize(request):
+        requests.append(request)
+        return f"pressure summary {request.turn_start}-{request.turn_end}"
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+        round_summary_handler=summarize,
+        recent_turn_limit=1,
+        summary_chunk_turns=12,
+        max_round_summaries_per_turn=1,
+    )
+
+    long_text = "很长的历史细节-" + ("上下文压力 " * 180)
+    runtime.run_turn(
+        session_id="token-pressure",
+        turn_index=1,
+        user_input=long_text + "第一轮",
+        current_topic=None,
+        occurred_at=NOW + timedelta(minutes=1),
+        token_budget=256,
+    )
+    runtime.run_turn(
+        session_id="token-pressure",
+        turn_index=2,
+        user_input=long_text + "第二轮",
+        current_topic=None,
+        occurred_at=NOW + timedelta(minutes=2),
+        token_budget=256,
+    )
+    result = runtime.run_turn(
+        session_id="token-pressure",
+        turn_index=3,
+        user_input="第三轮继续",
+        current_topic=None,
+        occurred_at=NOW + timedelta(minutes=3),
+        token_budget=256,
+    )
+
+    assert len(result.continuity_summary_commits) == 1
+    assert len(requests) == 1
+    assert requests[0].turn_start == 1
+    assert requests[0].turn_end == 2
+    assert len(requests[0].sources) == 4
+
+
+def test_model_can_search_same_session_summary_before_raw_drilldown(tmp_path):
+    store, index = _world(tmp_path)
+
+    def seed_model(snapshot):
+        return ModelDirective(response="seed")
+
+    def summarize(request):
+        if request.turn_start == 1:
+            return "第一阶段讨论了独特词：蓝色火箭，以及早期项目方向。"
+        return f"later summary {request.turn_start}-{request.turn_end}"
+
+    seed = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=seed_model,
+        round_summary_handler=summarize,
+        recent_turn_limit=1,
+        summary_chunk_turns=2,
+        max_round_summaries_per_turn=1,
+    )
+    for turn in range(1, 6):
+        seed.run_turn(
+            session_id="summary-search",
+            turn_index=turn,
+            user_input=f"seed-{turn}",
+            current_topic=None,
+            occurred_at=NOW + timedelta(minutes=turn),
+        )
+
+    def search_model(snapshot):
+        history = snapshot.capability_history
+        continuity = snapshot.cockpit["task_context"]["conversation_continuity"]
+        assert continuity["summary_search_capability"] == "search_conversation_summaries"
+        if not history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="search_conversation_summaries",
+                        arguments={"query": "蓝色火箭", "limit": 5},
+                    ),
+                )
+            )
+        if len(history) == 1:
+            hits = history[-1].data
+            assert len(hits) >= 1
+            hit = hits[0]
+            assert hit["turn_start"] == 1
+            assert hit["turn_end"] == 2
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="drill_down_conversation",
+                        arguments={
+                            "summary_id": hit["object_ref"]["object_id"],
+                            "revision": hit["object_ref"]["revision"],
+                        },
+                    ),
+                )
+            )
+        raw = history[-1].data
+        assert raw[0]["text"] == "seed-1"
+        assert raw[2]["text"] == "seed-2"
+        return ModelDirective(response="found exact old dialogue")
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=search_model,
+        round_summary_handler=summarize,
+        recent_turn_limit=1,
+        summary_chunk_turns=2,
+        max_tool_rounds=4,
+    )
+    result = runtime.run_turn(
+        session_id="summary-search",
+        turn_index=6,
+        user_input="我们前面提过蓝色火箭吗？",
+        current_topic=None,
+        occurred_at=NOW + timedelta(minutes=6),
+    )
+
+    assert [item.name for item in result.runtime.capability_history] == [
+        "search_conversation_summaries",
+        "drill_down_conversation",
+    ]
+    assert result.runtime.response == "found exact old dialogue"
