@@ -1620,5 +1620,18 @@
   },
   "fe1c6b1837c45119029bb0bc6556ab99b41b543fc2a8ed1846754d42bc7f9ee4": {
     "kind": "silence"
+  },
+  "8f22ef4c9fd4dd7e103a3d2e21c99b82f08a269eb8b894a21ccab48db3fb6c6c": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-jan10-review-read-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
   }
 }
