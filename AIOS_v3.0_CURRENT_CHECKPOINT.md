@@ -318,3 +318,97 @@ Periodic Review
 - 隔离审查分支：`p15/periodic-review-growth-20260920`、`p16/habitation-integration-20260920`、`hardening/p15-review-growth-redteam-20260920`。这些分支只允许读取以恢复“当前 main 确实缺失”的测试/缺陷证据，禁止整分支 merge/rebase 后继续开发。
 - P17 暂停启动，直到 P16 完成真实 provider 入住、可审计 artifacts 与 evaluator-only 红队评估。
 - 新施工必须从最新 `main` 创建单一 P16 provider 分支，不得重造 World / Index / CognitiveRuntime / Review。
+
+
+## P16 Provider / Evaluator 基础设施闭环（2026-09-20）
+
+- 当前 main 功能锚点：`d4e467620fe67e2af681a641176c3773a701e42f`
+- 当前 GitHub open PR：**0**
+- 唯一 P16 施工分支：`p16/provider-backed-habitation-20260920`；已同步到 main，**ahead=0**。
+
+本轮已完成并进入 main：
+
+1. **P15 correctness hardening**
+   - PR #12 / merge `a9a84670a18972e70f0e14f1d09d1a1e685e4bb4`
+   - OperationExperience 真实结果/subject 边界；
+   - assistant 自己的 Observation 不得作为真实结果；
+   - Review backlog 分页，禁止 truncation 永久漏证据；
+   - budget exhaustion 保持 RUNNING / resumable；
+   - OperationExperience 完整 canonical identity。
+
+2. **restart / model handoff**
+   - PR #13 / merge `ffa7fd8f6a46189e8fb38eb908924e2826674cc2`
+   - 可重新打开同一个 SQLite World；
+   - session turn cursor 从 World 恢复；
+   - 周期 Review 调度从 durable Wake / World 恢复；
+   - replacement resident model 可继续同一 World；
+   - run model identity 与 target model identity 强绑定。
+
+3. **versioned oracle / evaluator contract**
+   - PR #14 / merge `63a078521125ca8e011337b83495e6e629e47b7f`
+   - `aios.p16.oracle.v1`；
+   - evaluator 必须精确覆盖全部 criteria；
+   - evaluator provider/model/version/config provenance 进入报告；
+   - comparison 不允许混用不同 evaluator provenance。
+
+4. **provider-backed resident protocol adapters**
+   - PR #15 / merge `ad77187b8c98c3d29b910889b0c9adcbf1ae2813`
+   - OpenAI Responses；
+   - Anthropic Messages tool use；
+   - Gemini Interactions function calling；
+   - AIOS capability shorthand 单向翻译为 JSON Schema；
+   - provider-backed RoundSummaryHandler；
+   - provider/model/config/request/usage/error provenance；
+   - API key 不得进入 artifact。
+
+5. **oracle-free real-provider resident runner**
+   - PR #16 / merge `9e6d4979749c8b9316317cfdd621300cbc4cb469`
+   - resident runner 只加载 manifest + resident stream；
+   - resident 进程不打开 oracle；
+   - 输出 `launch.json` / `world.sqlite` / `run.json`；
+   - 失败输出 `failure.json`；
+   - manual-only Actions workflow，确定性 CI 不自动产生 provider 费用。
+
+6. **separate post-run provider evaluator**
+   - PR #17 / merge `7676ad51b2b335178b2f98911775709240dbc979`
+   - 独立 evaluator CLI / workflow；
+   - 先核对 scenario id / version / resident-visible fingerprint；
+   - 只有核对通过后才加载 hidden oracle；
+   - evaluator 不重新运行、不修改 resident World。
+
+7. **offline multi-model evidence comparison**
+   - PR #19 / merge `d4e467620fe67e2af681a641176c3773a701e42f`
+   - 严格加载 provider evaluation artifacts；
+   - 拒绝不同 visible-life fingerprint；
+   - 拒绝 resident model identity 篡改；
+   - 要求相同 evaluator provenance；
+   - 只输出 criterion-by-model matrix；
+   - 禁止 aggregate score / ranking / winner。
+
+最新 comparison head 的 Gate：
+
+- `p16-habitation-harness` run `35506311307` / **success**
+- `p16-convergence-gate` run `35506311297` / **success**
+
+### 当前唯一剩余 P16 blocker
+
+**尚未产生真实付费 provider 的入住 artifacts。**
+
+代码基础设施已经具备从：
+
+`resident-only sealed life -> real provider resident -> private World -> run artifact -> separate oracle evaluator -> offline multi-model comparison`
+
+的完整链路。
+
+P16 仍然是 **CONTINUE / NOT PASS**，因为机械/协议/隔离测试通过不能替代真实 resident cognition 证据。
+
+下一动作不再是写新的 Core 或 benchmark 框架，而是：
+
+1. 为至少两个真实 provider/model 配置 API secret；
+2. 对同一 sealed life 分别手动运行 resident workflow；
+3. 核对所有候选的 `scenario_public_fingerprint` 完全一致；
+4. 保存 provider/run provenance 和 World artifacts；
+5. 用同一个 evaluator configuration 分别做 post-run oracle evaluation；
+6. 离线 comparison；
+7. 独立红队审查实际 cognition：错误记忆、自我强化、revision、summary misuse、dimension spam、无 Outcome 伪经验；
+8. 证据成立后才允许宣布 P16 PASS 并进入 P17。
