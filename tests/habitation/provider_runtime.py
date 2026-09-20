@@ -434,6 +434,66 @@ class ProviderClient:
         )
         return response
 
+    def complete_text(
+        self,
+        *,
+        system_instruction: str,
+        input_text: str,
+        purpose: str,
+    ) -> str:
+        """One provider request that must terminate with plain text and no tools."""
+
+        if not isinstance(system_instruction, str) or not system_instruction.strip():
+            raise ValueError("system_instruction must be non-blank")
+        if not isinstance(input_text, str) or not input_text.strip():
+            raise ValueError("input_text must be non-blank")
+
+        config = self.config
+        if config.provider == "openai":
+            body: dict[str, Any] = {
+                "model": config.model,
+                "instructions": system_instruction,
+                "input": input_text,
+                "max_output_tokens": config.max_output_tokens,
+                "store": config.store,
+            }
+            if config.temperature is not None:
+                body["temperature"] = config.temperature
+            response = self.request(body, purpose=purpose)
+            text = _openai_text(response)
+        elif config.provider == "anthropic":
+            body = {
+                "model": config.model,
+                "max_tokens": config.max_output_tokens,
+                "system": system_instruction,
+                "messages": [{"role": "user", "content": input_text}],
+            }
+            if config.temperature is not None:
+                body["temperature"] = config.temperature
+            response = self.request(body, purpose=purpose)
+            text = _anthropic_text(response)
+        else:
+            body = {
+                "model": config.model,
+                "system_instruction": system_instruction,
+                "input": input_text,
+                "store": config.store,
+                "generation_config": {
+                    "max_output_tokens": config.max_output_tokens,
+                },
+            }
+            if config.temperature is not None:
+                body["generation_config"]["temperature"] = config.temperature
+            response = self.request(body, purpose=purpose)
+            text = _gemini_text(response)
+
+        clean = text.strip()
+        if not clean or clean == SILENCE_TOKEN:
+            raise ProviderProtocolError(
+                f"{purpose} provider returned no usable terminal text"
+            )
+        return clean
+
     def provenance_snapshot(self) -> dict[str, Any]:
         return {
             "artifact_schema": "aios.p16.provider-provenance.v1",
@@ -873,50 +933,11 @@ class ProviderRoundSummaryHandler:
             else _safe_json_value(request)
         )
         prompt = _canonical_json(model_input)
-        config = self.client.config
-
-        if config.provider == "openai":
-            body: dict[str, Any] = {
-                "model": config.model,
-                "instructions": _summary_system_instruction(),
-                "input": prompt,
-                "max_output_tokens": config.max_output_tokens,
-                "store": config.store,
-            }
-            if config.temperature is not None:
-                body["temperature"] = config.temperature
-            response = self.client.request(body, purpose="round_summary")
-            text = _openai_text(response)
-        elif config.provider == "anthropic":
-            body = {
-                "model": config.model,
-                "max_tokens": config.max_output_tokens,
-                "system": _summary_system_instruction(),
-                "messages": [{"role": "user", "content": prompt}],
-            }
-            if config.temperature is not None:
-                body["temperature"] = config.temperature
-            response = self.client.request(body, purpose="round_summary")
-            text = _anthropic_text(response)
-        else:
-            body = {
-                "model": config.model,
-                "system_instruction": _summary_system_instruction(),
-                "input": prompt,
-                "store": config.store,
-                "generation_config": {
-                    "max_output_tokens": config.max_output_tokens,
-                },
-            }
-            if config.temperature is not None:
-                body["generation_config"]["temperature"] = config.temperature
-            response = self.client.request(body, purpose="round_summary")
-            text = _gemini_text(response)
-
-        clean = text.strip()
-        if not clean or clean == SILENCE_TOKEN:
-            raise ProviderProtocolError("round summary provider returned no summary text")
-        return clean
+        return self.client.complete_text(
+            system_instruction=_summary_system_instruction(),
+            input_text=prompt,
+            purpose="round_summary",
+        )
 
 
 def make_provider_handlers(
