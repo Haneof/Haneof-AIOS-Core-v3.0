@@ -18,6 +18,11 @@ from aios_core.ai_world import (
     AIWorldDomain,
 )
 from aios_core.context.controller import ContextController, ModelContextBundle
+from aios_core.dimensions import (
+    DimensionProposalRequest,
+    DimensionRegistryService,
+    DimensionTransitionRequest,
+)
 from aios_core.ingest.conversation import ConversationCommit, ConversationIngestor
 from aios_core.projections.all_dimensions import AllDimensionsProjectionService
 from aios_core.query.search import WorldSearchIndex
@@ -86,6 +91,11 @@ class FusedTurnRuntime:
             index=index,
             subject_id=subject_id,
         )
+        self.dimensions = DimensionRegistryService(
+            store=store,
+            index=index,
+            subject_id=subject_id,
+        )
         self._active_turn_time: datetime | None = None
 
         registry = CapabilityRegistry()
@@ -122,6 +132,18 @@ class FusedTurnRuntime:
                 },
             ),
             self._read_ai_world,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="list_dimensions",
+                description=(
+                    "List current registered dimension definitions so the resident AI "
+                    "can check whether an existing observation axis already serves the need."
+                ),
+                kind=CapabilityKind.READ,
+                input_schema={"include_terminal": "boolean?"},
+            ),
+            self._list_dimensions,
         )
         registry.register(
             CapabilitySpec(
@@ -181,6 +203,51 @@ class FusedTurnRuntime:
                 },
             ),
             self._commit_ai_world_claim,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="propose_dimension",
+                description=(
+                    "Submit an evidence-grounded candidate observation axis. "
+                    "The system validates structure; the model supplies semantic rationale."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "dimension_key": "string starting dim:",
+                    "name": "string",
+                    "description": "string",
+                    "data_shape": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "why_existing_dimensions_are_insufficient": "string",
+                    "continuity_rationale": "string",
+                    "user_value_rationale": "string",
+                    "maintenance_cost_rationale": "string",
+                    "confidence": "number[0,1]",
+                    "update_method": "string?",
+                    "expected_value": "string?",
+                },
+            ),
+            self._propose_dimension,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="transition_dimension",
+                description=(
+                    "Move the current dimension revision through a legal lifecycle "
+                    "transition using pinned evidence and an AI-supplied reason."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "dimension_ref": "{object_id:string,revision:integer}",
+                    "new_lifecycle": "candidate|trial|active|low_activity|dormant|merged|split|revised|rejected|reactivated|archived",
+                    "reason": "string",
+                    "evidence_refs": "array[{object_id:string,revision:integer}]",
+                    "related_dimension_refs": "array[{object_id:string,revision:integer}]?",
+                },
+            ),
+            self._transition_dimension,
         )
         registry.register(
             CapabilitySpec(
@@ -270,6 +337,80 @@ class FusedTurnRuntime:
                 limit=max(1, min(int(limit), 200)),
             )
         ]
+    def _list_dimensions(
+        self,
+        include_terminal: bool = False,
+    ) -> list[dict[str, Any]]:
+        return [
+            item.model_dump(mode="json")
+            for item in self.dimensions.current_dimensions(
+                include_terminal=bool(include_terminal)
+            )
+        ]
+
+    def _propose_dimension(
+        self,
+        dimension_key: str,
+        name: str,
+        description: str,
+        data_shape: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        why_existing_dimensions_are_insufficient: str,
+        continuity_rationale: str,
+        user_value_rationale: str,
+        maintenance_cost_rationale: str,
+        confidence: float,
+        update_method: str | None = None,
+        expected_value: str | None = None,
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("propose_dimension is only available during an active AIOS turn")
+        receipt = self.dimensions.propose(
+            DimensionProposalRequest(
+                dimension_key=dimension_key,
+                name=name,
+                description=description,
+                data_shape=data_shape,
+                evidence_refs=self._coerce_refs(evidence_refs),
+                why_existing_dimensions_are_insufficient=why_existing_dimensions_are_insufficient,
+                continuity_rationale=continuity_rationale,
+                user_value_rationale=user_value_rationale,
+                maintenance_cost_rationale=maintenance_cost_rationale,
+                confidence=float(confidence),
+                update_method=update_method,
+                expected_value=expected_value,
+            ),
+            proposed_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
+    def _transition_dimension(
+        self,
+        dimension_ref: Mapping[str, Any],
+        new_lifecycle: str,
+        reason: str,
+        evidence_refs: Sequence[Mapping[str, Any]],
+        related_dimension_refs: Sequence[Mapping[str, Any]] = (),
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError(
+                "transition_dimension is only available during an active AIOS turn"
+            )
+        receipt = self.dimensions.transition(
+            DimensionTransitionRequest(
+                dimension_ref=ObjectRef(
+                    object_id=str(dimension_ref["object_id"]),
+                    revision=int(dimension_ref["revision"]),
+                ),
+                new_lifecycle=new_lifecycle,
+                reason=reason,
+                evidence_refs=self._coerce_refs(evidence_refs),
+                related_dimension_refs=self._coerce_refs(related_dimension_refs),
+            ),
+            changed_at=self._active_turn_time,
+        )
+        return asdict(receipt)
+
 
     def _request_all_dimensions_projection(
         self,
@@ -295,6 +436,8 @@ class FusedTurnRuntime:
         return spec.name in {
             "commit_claim",
             "commit_ai_world_claim",
+            "propose_dimension",
+            "transition_dimension",
             "revise_claim",
             "retract_claim",
         }
