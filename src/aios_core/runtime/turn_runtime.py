@@ -1229,6 +1229,7 @@ class FusedTurnRuntime:
         page = self.index.search_by_entity(
             str(entity_id),
             keywords=(() if query is None or not str(query).strip() else (str(query),)),
+            subject=self.subject_id,
             limit=max(1, min(int(limit), 50)),
         )
         return [self._search_hit_payload(hit) for hit in page.hits]
@@ -1246,6 +1247,7 @@ class FusedTurnRuntime:
         end = datetime.fromisoformat(str(window_end).replace("Z", "+00:00"))
         page = self.index.search_mind(
             keywords=(() if query is None or not str(query).strip() else (str(query),)),
+            subject=self.subject_id,
             dimension=(None if dimension is None else str(dimension)),
             object_types=(None if object_types is None else tuple(str(x) for x in object_types)),
             time_range=(start, end),
