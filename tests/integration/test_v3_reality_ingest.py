@@ -670,12 +670,24 @@ def test_numeric_change_is_not_fabricated_across_unobserved_gap(tmp_path):
 
     first_segment = store.get_payload(receipt.segment_observation_ids[0])
     second_segment = store.get_payload(receipt.segment_observation_ids[1])
-    assert first_segment["metadata"]["source_locators"] == [
-        "sensor://temperature/temp-1"
-    ]
-    assert second_segment["metadata"]["source_locators"] == [
-        "sensor://temperature/temp-2"
-    ]
+    assert first_segment["metadata"]["source_record_range"] == {
+        "first": "temp-1",
+        "last": "temp-1",
+        "count": 1,
+    }
+    assert second_segment["metadata"]["source_record_range"] == {
+        "first": "temp-2",
+        "last": "temp-2",
+        "count": 1,
+    }
+    assert first_segment["metadata"]["source_locator_range"] == {
+        "first": "sensor://temperature/temp-1",
+        "last": "sensor://temperature/temp-1",
+    }
+    assert second_segment["metadata"]["source_locator_range"] == {
+        "first": "sensor://temperature/temp-2",
+        "last": "sensor://temperature/temp-2",
+    }
 
 
 def test_failure_audit_identity_preserves_external_revision_and_adapter_semantics(tmp_path):
@@ -737,3 +749,88 @@ def test_failure_audit_identity_preserves_external_revision_and_adapter_semantic
     assert p2["value"]["external_revision"] == "2"
     assert p3["metadata"]["source_schema_version"] == "2"
     assert p3["metadata"]["failure_digest"]
+
+
+def test_nested_binary_in_model_value_is_rejected_without_recursive_crash(tmp_path):
+    from pydantic import BaseModel
+
+    class WrappedPayload(BaseModel):
+        blob: bytes
+
+    _, _, service = _world(tmp_path)
+    spec = SourceAdapterSpec(
+        adapter_id="wrapped.v1",
+        source_kind="wrapped",
+        dimension="dim:wrapped",
+        source_class=SourceClass.USER,
+        default_modality="structured",
+    )
+
+    with pytest.raises(ValueError, match="raw binary payloads"):
+        service.ingest_record(
+            spec,
+            RealityRecord(
+                external_record_id="wrapped-1",
+                occurred_at=NOW,
+                received_at=NOW,
+                value=WrappedPayload(blob=b"abc"),
+            ),
+        )
+
+    cyclic = []
+    cyclic.append(cyclic)
+    with pytest.raises(ValueError):
+        service.ingest_record(
+            spec,
+            RealityRecord(
+                external_record_id="cycle-1",
+                occurred_at=NOW,
+                received_at=NOW,
+                value=cyclic,
+            ),
+        )
+
+
+def test_large_numeric_segment_keeps_compact_source_provenance(tmp_path):
+    store, _, service = _world(tmp_path)
+    spec = SourceAdapterSpec(
+        adapter_id="sensor.steps.v1",
+        source_kind="step_counter",
+        dimension="dim:steps",
+        source_class=SourceClass.SENSOR,
+        default_modality="numeric",
+    )
+    samples = tuple(
+        NumericSample(
+            external_record_id=f"step-{i:04d}",
+            occurred_at=NOW + timedelta(seconds=i),
+            value=1000.0 + (i % 2),
+            source_locator=f"sensor://steps/{i:04d}",
+        )
+        for i in range(1000)
+    )
+
+    receipt = service.ingest_numeric_series(
+        spec,
+        series_id="steps-window-large",
+        samples=samples,
+        policy=MechanicalSeriesPolicy(
+            tolerance=2.0,
+            change_threshold=100.0,
+            max_gap_seconds=2.0,
+        ),
+        unit="count",
+        received_at=NOW + timedelta(minutes=30),
+    )
+
+    assert len(receipt.segment_observation_ids) == 1
+    payload = store.get_payload(receipt.segment_observation_ids[0])
+    metadata = payload["metadata"]
+    assert metadata["source_record_range"] == {
+        "first": "step-0000",
+        "last": "step-0999",
+        "count": 1000,
+    }
+    assert "source_record_ids" not in metadata
+    assert "source_locators" not in metadata
+    assert metadata["source_record_ids_digest"]
