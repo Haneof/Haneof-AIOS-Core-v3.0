@@ -22,6 +22,7 @@ BASE = datetime(2026, 9, 20, 8, 0, tzinfo=timezone.utc)
 class EchoTarget:
     def __init__(self, model: str) -> None:
         self.model = model
+        self.isolation_key = f"world:{model}:{id(self)}"
 
     def handle_event(self, event: ResidentEvent):
         return {
