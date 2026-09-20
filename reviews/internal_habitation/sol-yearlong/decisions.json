@@ -1644,5 +1644,9 @@
   "f2770c9298a858f5340c11fb26745ea29a6b58de0128515b833c6293a40c46ea": {
     "kind": "summary",
     "summary": "2027-01-09，记录了一条 AI CommunicationExperience：场景为“重要安排可能冲突，但至少一个相关时间仍未确认”；使用的沟通方式是保留不确定性，在具体时间证据支持重叠前不把安排描述为冲突，并区分已知与未知；语气为冷静、证据约束。用户对这一处理明确表示认可。该经验由三条固定对话 Observation 作为证据。"
+  },
+  "24961bedb7a0c20eb951c27aab2196e3d73f6b0e38026414de108c17ee159082": {
+    "kind": "summary",
+    "summary": "2027-01-09，bakery POS 日记录：gross_sales 1286.5 USD，orders 96，refunds 2。该 Summary 仅描述当天 POS 事实，不据此推断趋势、原因或经营策略。"
   }
 }
