@@ -209,3 +209,25 @@ Do not wire these into the benchmark yet:
 
 Those integrations should consume stabilized public interfaces later rather than
 forcing P12-P15 to conform to an early test harness.
+
+
+## 12. Anti-contamination execution rules
+
+The benchmark fixture repository may contain evaluator-only semantic labels and
+oracle files, but a real resident model run must not receive them indirectly.
+
+Required runtime isolation:
+
+- do not mount `tests/habitation/fixtures/oracle/**` into a model-accessible
+  filesystem/tool sandbox;
+- do not include semantic scenario IDs, fixture filenames, manifest `purpose`,
+  catalog `focus`, or evaluator criteria in model prompts/context;
+- model-side target factories receive only `ResidentScenarioDescriptor`, which
+  intentionally omits evaluator scenario ID/version and hidden oracle data;
+- every model target must expose a unique `isolation_key` representing its
+  private AIOS world/store;
+- the resident event payload and metadata are deep-copied for each delivery so one
+  model cannot mutate the life stream seen by another model.
+
+Evaluator labels and oracle content may be loaded only after or outside the
+resident execution boundary.
