@@ -8,8 +8,8 @@
 ## 当前快照
 
 - 时间：2026-09-20 16:01 +08:00
-- 最后已验证功能代码锚点：`f21960967431d8a96e3f37de75bdcd2a3b8e81dc`
-- 验证 Gate：`p13-ingest-gate` / run `35498395468` / **success**；`p13-reality-ingest` / run `35498395508` / **success**
+- 最后已验证功能代码锚点：`02c5ddb079f32f7dfabbb0615ba454ff6c2332bd`
+- 验证 Gate：`p13-ingest-gate` / run `35498948003` / **success**；`p13-reality-ingest` / run `35498948010` / **success**
 - 当前项目阶段：**P13 已完成，进入 P14 长会话连续性完整接线**
 - 当前主干状态：**现实数据可通过 cognition-free adapters 进入统一世界；数值流可机械压缩；媒体长期事实只保留 descriptor/transcript；失败可审计**
 - 当前 blocker：**长单会话仍主要依赖调用方传入 recent_turns；token 超限后还缺系统内生的轮总结状态与按需 raw drill-down**
@@ -48,6 +48,11 @@ P13 完成后又做了一轮独立正确性审计，并通过 PR #3 合入主线
 - 通用 RealityRecord 支持时间区间，不再强制把日历/睡眠等区间压成时间点：GREEN
 - reused existing 路径也执行 index catch-up，可修复前次提交后投影滞后：GREEN
 - 原并行 PR #2 已关闭，禁止形成第二套 reality-ingest 实现：DONE
+- 公共 ingest 边界重新验证 Pydantic frozen models，防止 `model_copy(update=...)` 绕过 SourceAdapter / RealityRecord / Numeric Policy 约束：GREEN
+- Failure Audit 身份加入 external revision、adapter semantics、locator 与 failure digest，避免不同来源修订/Schema 漂移被错误折叠成同一个失败事件：GREEN
+- numeric change 不再跨 `max_gap_seconds` 观测空洞伪造瞬时变化事件：GREEN
+- numeric segment provenance 改为 range + digest，避免高频长区间把全部 source ids / locators 再复制一遍而抵消压缩收益：GREEN
+- nested binary 检测支持 BaseModel/dataclass/cyclic container，防止二进制通过包装对象绕过长期事实边界或造成递归崩溃：GREEN
 - 合并提交：`f21960967431d8a96e3f37de75bdcd2a3b8e81dc`
 - 合并后 P13 聚合 Gate：run `35498395468` **success**
 - 合并后 P13 reality Gate：run `35498395508` **success**
