@@ -1344,5 +1344,32 @@
         }
       }
     ]
+  },
+  "66a402f1f16a50d57c19fc3c4abbe7e524ba594ecb8e728ee86e3f288d03b2c1": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "create_task",
+        "call_id": "sol-summaryrun-jan08-create-wait-flight-time-task",
+        "arguments": {
+          "title": "等待妹妹航班时间确认并检查安排冲突",
+          "task_type": "verification",
+          "reason_refs": [
+            {
+              "object_id": "obs_src_100a0cc21a84d80627c61305",
+              "revision": 1
+            },
+            {
+              "object_id": "sum_50e2b6cb23814d5deec8d3af",
+              "revision": 1
+            }
+          ],
+          "initial_state": "waiting_evidence",
+          "priority": 80,
+          "deadline": "2027-01-09T04:30:00+00:00",
+          "next_step": "等待妹妹航班的确切到达时间；拿到时间后再与 04:30 面粉收货安排比较。时间未确认前不要宣称两件事冲突，也不要替用户决定由谁处理。"
+        }
+      }
+    ]
   }
 }
