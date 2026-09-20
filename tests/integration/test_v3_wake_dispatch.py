@@ -39,10 +39,11 @@ def _seed_observation(
     object_id: str,
     value: object,
     occurred_at: datetime,
+    subject_id: str = "user_1",
 ) -> ObjectRef:
     observation = Observation(
         object_id=object_id,
-        subject_id="user_1",
+        subject_id=subject_id,
         occurred=TemporalExtent.point(occurred_at),
         learned_at=occurred_at,
         recorded_at=occurred_at,
@@ -153,6 +154,31 @@ def test_wake_signal_contract_has_no_semantic_conclusion_field() -> None:
                 "meaning": "用户今天情绪低落",
             }
         )
+
+
+def test_wake_bus_rejects_cross_subject_evidence(tmp_path) -> None:
+    store, index = _world(tmp_path)
+    foreign_ref = _seed_observation(
+        store,
+        object_id="obs_c09_foreign_subject",
+        value={"marker": True},
+        occurred_at=NOW,
+        subject_id="user_2",
+    )
+    bus = WakeBus(store=store, index=index, subject_id="user_1")
+
+    with pytest.raises(ValueError, match="crosses the runtime subject scope"):
+        bus.emit(
+            WakeSignalRequest(
+                wake_source=WakeSource.WATCH_MATCH,
+                rule_id="watch.cross-subject-regression",
+                observed_at=NOW,
+                evidence_refs=(foreign_ref,),
+                dedupe_key="watch:user_1:foreign-evidence",
+            )
+        )
+
+    assert bus.pending_wakes() == ()
 
 
 def test_wake_bus_retry_merge_and_cooldown_are_mechanical(tmp_path) -> None:
