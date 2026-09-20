@@ -880,5 +880,23 @@
   },
   "2cc0748a41f00d33c4e50435083d43320e8f120b76dec5ae08db499e74d94a4b": {
     "kind": "silence"
+  },
+  "9a88f21facbb4365b2ebd9b9f5084747795c96125e58a2a99e85b40f658dd93c": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "search_timeline",
+        "call_id": "sol-jan14-find-fire-inspection-calendar",
+        "arguments": {
+          "window_start": "2027-01-14T00:00:00+00:00",
+          "window_end": "2027-01-14T23:59:59+00:00",
+          "dimension": "dim:calendar",
+          "object_types": [
+            "observation"
+          ],
+          "limit": 20
+        }
+      }
+    ]
   }
 }
