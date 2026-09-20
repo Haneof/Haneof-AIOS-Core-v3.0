@@ -310,5 +310,23 @@
         }
       }
     ]
+  },
+  "bde40f9c7abd0ea6ca8164c9db10d46ab0b1bf21c701ef5479771d61aacec788": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "call_id": "sol-jan08-inspect-proposed-message",
+        "arguments": {
+          "object_id": "action_b07c55d3dd6b17731296d988",
+          "revision": 1
+        }
+      },
+      {
+        "name": "read_execution_world",
+        "call_id": "sol-jan08-read-execution-world",
+        "arguments": {}
+      }
+    ]
   }
 }
