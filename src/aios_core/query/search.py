@@ -726,6 +726,54 @@ class WorldSearchIndex:
         except Exception:
             pass
 
+    _INACTIVE_CURRENT_STATUSES = {
+        "retracted",
+        "superseded",
+        "stale_review_required",
+        "stale",
+    }
+
+    def _visible_in_current_view(
+        self,
+        object_id: str,
+        revision: int,
+        object_type: str,
+    ) -> bool:
+        """Return whether one indexed revision belongs in the default current view.
+
+        Historical truth is still available through pinned revision reads. Current
+        retrieval must not resurrect superseded cognition simply because old tokens
+        still exist in the rebuildable index.
+        """
+        if object_type == "reinterpretation":
+            # Projection-side annotations may not exist in object_revisions.
+            try:
+                payload = self._store.get_payload(object_id)
+            except Exception:
+                return True
+        else:
+            try:
+                payload = self._store.get_payload(object_id)
+            except Exception:
+                return False
+
+        if int(payload.get("revision", 0)) != int(revision):
+            return False
+
+        status = str(payload.get("status") or "active").strip().lower()
+        if status in self._INACTIVE_CURRENT_STATUSES:
+            return False
+
+        if str(payload.get("object_type") or "") == "summary":
+            if str(payload.get("summary_status") or "").strip().lower() == "stale":
+                return False
+
+        if str(payload.get("object_type") or "") == "evidence_set":
+            if bool(payload.get("stale")):
+                return False
+
+        return True
+
     def search_mind(
         self,
         keywords: Sequence[str] = (),
@@ -737,6 +785,7 @@ class WorldSearchIndex:
         object_types: Optional[Sequence[str]] = None,
         time_range: Optional[Tuple[datetime, datetime]] = None,
         include_annotations: bool = True,
+        include_inactive: bool = False,
         limit: int = 20,
     ) -> MindSearchPage:
         """宪法第二十章：多维心智联合感知检索入口。
@@ -831,6 +880,12 @@ class WorldSearchIndex:
                 if oid in tombstones:
                     continue
                 if candidate_pairs is not None and (oid, rev) not in candidate_pairs:
+                    continue
+                if not include_inactive and not self._visible_in_current_view(
+                    str(oid),
+                    rev,
+                    str(r["object_type"]),
+                ):
                     continue
 
                 haystack = r["haystack"] or ""
@@ -958,6 +1013,7 @@ class WorldSearchIndex:
         dimension: str | None = None,
         object_types: Sequence[str] | None = None,
         time_range: Tuple[datetime, datetime] | None = None,
+        include_inactive: bool = False,
         limit: int = 20,
     ) -> MindSearchPage:
         """Broad lexical candidate generation for AI/system callers.
@@ -1031,6 +1087,12 @@ class WorldSearchIndex:
                     (object_id,),
                 ).fetchone()
                 if latest is not None and int(latest[0]) != int(revision):
+                    continue
+                if not include_inactive and not self._visible_in_current_view(
+                    str(object_id),
+                    int(revision),
+                    str(row["object_type"]),
+                ):
                     continue
                 if subject is not None and str(row["subject_id"]) != subject:
                     continue
