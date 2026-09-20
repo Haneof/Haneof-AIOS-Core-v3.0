@@ -7,134 +7,123 @@
 
 ## 当前快照
 
-- 时间：2026-09-20 14:47 +08:00
-- 最后已验证功能代码锚点：`32fe9681842cd060c18bf1cfd3c2c0c2f5314530`
-- 验证 Gate：`p12-execution-gate` / run `35495051476` / **success**
-- 当前项目阶段：**P12 已完成，进入 P13 数据接入与机械清洗**
-- 当前主干状态：**World → Recall → Model → Cognition → Dynamic Dimensions → Goal/Task → Authorized Action Envelope → Outcome 已形成统一世界闭环**
-- 当前 blocker：**对话外现实数据尚未通过统一 adapter 接入；机械清洗规则需要落地且必须严格禁止跨维高阶认知**
-- 下一主任务：**P13 多源现实数据接入 + 机械清洗**
+- 时间：2026-09-20 14:53 +08:00
+- 最后已验证功能代码锚点：`20100f0ddd8774cf53185f0862ff31fcc2c3421e`
+- 验证 Gate：`p13-ingest-gate` / run `35495374031` / **success**
+- 当前项目阶段：**P13 已完成，进入 P14 长会话连续性完整接线**
+- 当前主干状态：**现实数据可通过 cognition-free adapters 进入统一世界；数值流可机械压缩；媒体长期事实只保留 descriptor/transcript；失败可审计**
+- 当前 blocker：**长单会话仍主要依赖调用方传入 recent_turns；token 超限后还缺系统内生的轮总结状态与按需 raw drill-down**
+- 下一主任务：**P14 rolling conversation state + round summaries + raw dialogue drill-down**
 
-## P12 已完成并通过 Gate
+## P13 已完成并通过 Gate
 
-- 当前用户输入在模型推理前先写入世界，可作为同轮 pinned Evidence：GREEN
-- Goal Proposal / revision lifecycle：GREEN
-- Task creation / state machine：GREEN
-- Scheduler 对 WAITING_TIME 任务做确定性 wake：GREEN
-- RUNNING Task 才能提出外部 Action：GREEN
-- Resident Model 可 propose Action，但能力目录不暴露 authorize / record_outcome：GREEN
-- 外部 Action 必须经过独立 authorizer：GREEN
-- Authorization 产生 SUBMITTED revision 与稳定 execution_id：GREEN
-- Core 不直接执行外部副作用，只输出 dispatch envelope：GREEN
-- 平台真实结果通过 Outcome 写回统一世界：GREEN
-- SUBMITTED Action 不允许重复授权/重复 dispatch：GREEN
-- Task Completed / Failed 必须引用真实 Outcome：GREEN
-- Goal / Task / Action / Outcome / Wake 已进入统一 WorldStore 和索引：GREEN
-- P12 聚合 Gate：GREEN
+- 通用 SourceAdapterSpec：GREEN
+- explicit source dimension：GREEN
+- USER / SENSOR reality source boundary：GREEN
+- Canonical Observation：GREEN
+- 时区统一为 UTC，并保留原始时间表示：GREEN
+- adapter_id + external_record_id + external_revision 精确幂等：GREEN
+- source identity 内容冲突 fail closed：GREEN
+- Payment / Order 保持独立来源维度：GREEN
+- 图片/录音长期入口为 descriptor / transcript，不保存 raw binary：GREEN
+- raw binary 输入会被拒绝并留下 ingest failure audit：GREEN
+- 高频数值流按显式 tolerance/change-threshold 机械压缩：GREEN
+- numeric change 只表示数值变化，不生成健康/心理意义：GREEN
+- 旧 semantic purifier / keyword evidence classifier 明确禁止迁回：GREEN
+- P13 聚合 Gate：GREEN
 
-## 当前可运行主链
-
-```text
-Current User Input
-↓
-Observation (same-turn pinned evidence)
-↓
-Resident Model
-├─ search_world / inspect
-├─ read_ai_world
-├─ dimensions
-├─ cognition
-├─ propose_goal / transition_goal
-├─ create_task / transition_task
-└─ propose_action
-↓
-Goal / Task / Action(PROPOSED)
-↓
-Independent Authorization Boundary
-↓
-Action(SUBMITTED) + execution_id
-↓
-Platform Connector
-↓
-Outcome
-↓
-Task completion / Strategy / Calibration / User Understanding
-↓
-Unified World + Index
-```
-
-## P13 当前目标
-
-把对话外现实持续接入统一世界，但只做机械事实接入与机械清洗。
-
-目标链：
+## 当前可运行数据链
 
 ```text
-Phone / App / Sensor / Camera / MIC / Calendar / Notes / Payment / Order
+Phone / App / Sensor / Media
 ↓
-Source Adapter
+SourceAdapterSpec
+↓
+RealityRecord / MediaDescriptor / NumericSample
+↓
+dedupe + UTC normalize + provenance
 ↓
 Canonical Observation
+或
+mechanical numeric segment/change
 ↓
-Dedup / timestamp normalize / source normalize
+WorldStore
 ↓
-机械压缩或阈值事件化（仅适用于明确机制型数据）
+WorldSearchIndex / Summary
 ↓
-统一 WorldStore
-↓
-Index / Summary
-↓
-Resident AI 后续观察与认知
+Resident AI later forms cognition
 ```
 
-## P13 关键边界
+## P14 当前目标
 
-1. Adapter 只能把现实事实标准化成 Observation / Event 等基础对象。
-2. Adapter 不得生成“用户焦虑”“用户喜欢某人”“学习能力提升”等高阶认知。
-3. 全部来源使用同一全局时间基准。
-4. 原始图片/录音的 AIOS 长期事实入口优先为文本/结构化事实，不把媒体复制成长期世界真相。
-5. 相册/社交/App 可作为读取入口；是否形成长期事实由后续合法机制决定。
-6. 机制型高频数据允许确定性压缩，例如长时间稳定值只保留区间摘要和阈值事件。
-7. 阈值必须属于测量/工程规则，不能偷偷变成心理判断。
-8. 去重、时间归一、格式转换都不得改变事实语义。
-9. 每个 Observation 必须保留 source_kind / modality / locator / 时间 / provenance。
-10. 接入失败必须可审计，不得静默丢数据后假装世界完整。
+解决一个真实模型在单个长会话中超过上下文窗口后“前面聊过什么不知道”的问题。
 
-## P13 首批必读
+必须保持：
 
-新仓：
-1. 数据采集/清洗相关宪法文件
-2. `src/aios_core/contracts/models.py`
+```text
+Raw User/AI Dialogue 永久在 World
+↓
+当前会话 rolling state
+↓
+达到 token / turn 阈值
+↓
+模型生成 round summary
+↓
+summary 作为快速 continuity index
+↓
+后续模型默认看：
+- 最近原始轮次
+- 较早 round summaries
+↓
+用户引用旧内容时
+↓
+先命中 summary
+↓
+再按 summary source refs / session range
+   drill-down 到 exact raw dialogue
+```
+
+## P14 关键边界
+
+1. 轮总结只服务同一长会话的 context continuity。
+2. 轮总结不等于 AI对用户的认知。
+3. raw dialogue 永久保留，不因“已经总结”而删除。
+4. 总结由模型生成；系统负责何时要求总结、哪些轮次进入窗口、token预算。
+5. 不允许 summary 用新的意义覆盖原始用户/AI原话。
+6. summary 必须 pin 它覆盖的 raw conversation Observation refs。
+7. 多轮总结可以进一步做 session-level summary，但仍只是 continuity index。
+8. 当前会话回捞优先按 session_id / turn range 精确定位，再用文本语义辅助。
+9. 新会话不自动加载旧会话全部 round summaries；跨会话仍走智能推荐/世界索引。
+10. recent_turns 不应继续依赖外部调用方手工维护。
+
+## P14 首批必读
+
+1. `docs/constitution/AIOS_v3.0_Long_Context_Continuity_Constitution.md`
+2. `docs/constitution/AIOS_v3.0_User_AI_Interaction_Dimension_Constitution.md`
 3. `src/aios_core/ingest/conversation.py`
-4. `src/aios_core/storage/sqlite_store.py`
-5. `src/aios_core/query/search.py`
+4. `src/aios_core/context/controller.py`
+5. `src/aios_core/runtime/turn_runtime.py`
+6. `src/aios_core/summaries/dimension_summary.py`
+7. `src/aios_core/query/search.py`
 
-旧仓择优来源：
-6. Observation ingest / dedupe
-7. sensor compression
-8. app adapter
-9. media-to-text / location / calendar / payment/order adapters
-10. cleaning / normalization / provenance
+## P14 禁止事项
 
-## P13 禁止事项
-
-- 不恢复旧“清洗阶段跨维推理”。
-- 不用关键词把事实自动打成心理标签。
-- 不复制整个相册/录音库到 AIOS 世界。
-- 不把支付事实与订单语义混成一个维度。
-- 不把 App 原始结构直接当高阶 Claim。
-- 不因压缩节省空间就丢失阈值异常事件。
-- 不让平台 adapter 决定用户意义。
+- 不删除 raw dialogue 来解决 token 限制。
+- 不把 round summary 写成 User Understanding Claim。
+- 不让系统用固定模板生成“认知总结”。
+- 不跨 session 默认灌入所有历史。
+- 不把 long-context continuity 与智能推荐重新混成一个机制。
+- 不把 summary 当 source of truth。
+- 不因 context budget 截断而静默丢失可回捞路径。
 
 ## 当前不可推翻的已决事项
 
-- 世界唯一、时间轴唯一。
-- 维度平级。
-- 事实与认知分离。
-- Summary 不做跨维因果。
-- 索引与推荐分离。
-- 外部行动授权独立于模型。
-- AI负责意义，程序负责确定性机制。
+- 世界唯一、索引公共。
+- 推荐负责“当前要不要给哪些历史”；索引负责“到哪里找”。
+- 同一长会话 continuity 是独立机制，不替代跨会话推荐。
+- 原始对话是事实，轮总结只是索引。
+- 模型负责总结内容，系统负责调度。
+- AI认知必须另走 Claim / Evidence / Revision。
 
 ## 恢复现场规则
 
