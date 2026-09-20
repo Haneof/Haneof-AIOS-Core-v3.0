@@ -1186,9 +1186,9 @@ class WorldSearchIndex:
         self,
         entity_id: str,
         keywords: Sequence[str] = (),
+        limit: int = 20,
         *,
         subject: str | None = None,
-        limit: int = 20,
     ) -> MindSearchPage:
         """按实体关系网络检索，并可限定私有世界主体。"""
         return self.search_mind(
