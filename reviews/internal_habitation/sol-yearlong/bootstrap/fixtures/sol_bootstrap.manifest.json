@@ -1,0 +1,10 @@
+{
+  "scenario_id": "sol-yearlong-bootstrap-v1",
+  "scenario_version": "1",
+  "seed": 56092101,
+  "subject_id": "sol-resident-20260921-001",
+  "resident_stream": "resident/sol_bootstrap.jsonl",
+  "evaluator_oracle": "oracle/sol_bootstrap.json",
+  "purpose": "Bootstrap the GPT-5.6 Sol reviewer as a real Resident before the full year-long unique-life run",
+  "end_at": "2027-01-08T23:00:00+00:00"
+}
