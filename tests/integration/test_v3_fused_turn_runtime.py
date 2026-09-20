@@ -343,3 +343,102 @@ def test_model_can_revise_claim_and_propagate_current_view(tmp_path):
 
     current_new = index.recall_candidates("每天喝咖啡", object_types=["claim"])
     assert old_claim.claim_id in {hit.object_id for hit in current_new.hits}
+
+
+def test_resident_model_can_build_and_read_user_understanding_in_unified_ai_world(tmp_path):
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    seed = ConversationIngestor(store)
+    evidence_turn = seed.commit_turn(
+        session_id="history",
+        turn_index=1,
+        user_text="工程细节你自己判断，不要每一步都反过来问我。",
+        assistant_text="收到。",
+        occurred_at=NOW - timedelta(days=2),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    def model(snapshot):
+        history = snapshot.capability_history
+        if not history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="search_world",
+                        arguments={"query": "工程细节 自己判断", "limit": 5},
+                    ),
+                )
+            )
+        if len(history) == 1:
+            search = history[-1]
+            assert search.ok is True
+            evidence = next(
+                item for item in search.data
+                if item["object_id"] == evidence_turn.user_observation_id
+            )
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="commit_ai_world_claim",
+                        arguments={
+                            "domain": "user_understanding",
+                            "statement": "用户希望工程细节由AI自行判断，不要把每个实现选择重新抛回给用户。",
+                            "evidence_refs": [
+                                {
+                                    "object_id": evidence["object_id"],
+                                    "revision": evidence["revision"],
+                                }
+                            ],
+                            "confidence": 0.95,
+                            "scope_key": "collaboration.engineering_autonomy",
+                            "tags": ["direct_feedback"],
+                        },
+                    ),
+                )
+            )
+        if len(history) == 2:
+            written = history[-1]
+            assert written.ok is True
+            assert written.data["domain"] == "user_understanding"
+            assert written.data["dimension"] == "dim:ai_user_understanding"
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="read_ai_world",
+                        arguments={
+                            "domains": ["user_understanding"],
+                            "scope_key": "collaboration.engineering_autonomy",
+                        },
+                    ),
+                )
+            )
+
+        current = history[-1]
+        assert current.ok is True
+        assert len(current.data) == 1
+        assert "工程细节由AI自行判断" in current.data[0]["statement"]
+        return ModelDirective(response="我会直接推进工程实现，只有真正缺少产品目标时才向你确认。")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    result = runtime.run_turn(
+        session_id="current",
+        turn_index=1,
+        user_input="继续AIOS。",
+        current_topic=None,
+        occurred_at=NOW,
+    )
+
+    assert [
+        item.name for item in result.runtime.capability_history
+    ] == ["search_world", "commit_ai_world_claim", "read_ai_world"]
+    assert result.runtime.response.startswith("我会直接推进工程实现")
+
+    claims = store.list_payloads()
+    ai_claims = [
+        item for item in claims
+        if item.get("object_type") == "claim"
+        and (item.get("metadata") or {}).get("ai_domain") == "user_understanding"
+    ]
+    assert len(ai_claims) == 1
+    assert ai_claims[0]["metadata"]["scope_key"] == "collaboration.engineering_autonomy"
