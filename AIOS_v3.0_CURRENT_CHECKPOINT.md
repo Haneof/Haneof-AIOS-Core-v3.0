@@ -7,134 +7,134 @@
 
 ## 当前快照
 
-- 时间：2026-09-20 14:35 +08:00
-- 最后已验证功能代码锚点：`e677de516a2e2b3d785455db36013a74aebf01d4`
-- 验证 Gate：`p11-dimension-gate` / run `35491309407` / **success**
-- 当前项目阶段：**P11 已完成，进入 P12 Goal / Task / Action / Outcome**
-- 当前主干状态：**统一世界、索引、推荐、上下文、认知写回、翻案传播、AI世界、动态维度注册已经闭环**
-- 当前 blocker：**未来目标、任务、现实行动与结果仍未接入统一 Resident Runtime；现有 Goal/Task/Action/Outcome 契约需要重新收口**
-- 下一主任务：**P12 Goal / Task / Action / Outcome / Scheduler**
+- 时间：2026-09-20 14:47 +08:00
+- 最后已验证功能代码锚点：`32fe9681842cd060c18bf1cfd3c2c0c2f5314530`
+- 验证 Gate：`p12-execution-gate` / run `35495051476` / **success**
+- 当前项目阶段：**P12 已完成，进入 P13 数据接入与机械清洗**
+- 当前主干状态：**World → Recall → Model → Cognition → Dynamic Dimensions → Goal/Task → Authorized Action Envelope → Outcome 已形成统一世界闭环**
+- 当前 blocker：**对话外现实数据尚未通过统一 adapter 接入；机械清洗规则需要落地且必须严格禁止跨维高阶认知**
+- 下一主任务：**P13 多源现实数据接入 + 机械清洗**
 
-## P11 已完成并通过 Gate
+## P12 已完成并通过 Gate
 
-- Resident AI 可先 `list_dimensions` 再判断是否需要新观察轴：GREEN
-- Resident AI 可 `propose_dimension`：GREEN
-- Proposal 必须有 pinned Evidence：GREEN
-- 系统仅做 schema / identity / lifecycle / transaction 校验：GREEN
-- 无固定 2-domain / 3-day / 30-day / 70% 认知门槛：GREEN
-- Candidate / Trial / Active / Dormant / Reactivated / Revised / Rejected / Merged / Split / Archived 状态机：GREEN
-- Resident AI 可 `transition_dimension`：GREEN
-- 维度 lifecycle 保留 revision 历史：GREEN
-- Archived / Rejected / Merged / Split 不进入默认 current retrieval：GREEN
-- DimensionDefinition / Derivation 已进入统一世界索引：GREEN
-- 动态维度不建立第二 Registry 真相库：GREEN
+- 当前用户输入在模型推理前先写入世界，可作为同轮 pinned Evidence：GREEN
+- Goal Proposal / revision lifecycle：GREEN
+- Task creation / state machine：GREEN
+- Scheduler 对 WAITING_TIME 任务做确定性 wake：GREEN
+- RUNNING Task 才能提出外部 Action：GREEN
+- Resident Model 可 propose Action，但能力目录不暴露 authorize / record_outcome：GREEN
+- 外部 Action 必须经过独立 authorizer：GREEN
+- Authorization 产生 SUBMITTED revision 与稳定 execution_id：GREEN
+- Core 不直接执行外部副作用，只输出 dispatch envelope：GREEN
+- 平台真实结果通过 Outcome 写回统一世界：GREEN
+- SUBMITTED Action 不允许重复授权/重复 dispatch：GREEN
+- Task Completed / Failed 必须引用真实 Outcome：GREEN
+- Goal / Task / Action / Outcome / Wake 已进入统一 WorldStore 和索引：GREEN
+- P12 聚合 Gate：GREEN
 
 ## 当前可运行主链
 
 ```text
-Reality / Conversation
+Current User Input
 ↓
-Observation / Event / Summary
-↓
-WorldSearchIndex / Recommendation
-↓
-ContextController
+Observation (same-turn pinned evidence)
 ↓
 Resident Model
-├─ search_world
-├─ inspect_world_object
+├─ search_world / inspect
 ├─ read_ai_world
-├─ list_dimensions
-├─ request_all_dimensions_projection
-├─ commit_claim
-├─ commit_ai_world_claim
-├─ revise_claim / retract_claim
-├─ propose_dimension
-└─ transition_dimension
+├─ dimensions
+├─ cognition
+├─ propose_goal / transition_goal
+├─ create_task / transition_task
+└─ propose_action
 ↓
-Unified WorldStore
+Goal / Task / Action(PROPOSED)
 ↓
-Evidence / Dependency / Revision / Lifecycle
+Independent Authorization Boundary
 ↓
-Index catch-up
+Action(SUBMITTED) + execution_id
 ↓
-next turn
-```
-
-## P12 当前目标
-
-P12 要让 AI 从“理解世界”进入“持续帮助用户”。
-
-目标闭环：
-
-```text
-World / User Intent / AI Cognition
-↓
-Goal
-↓
-Task
-↓
-Condition / Schedule / Authorization
-↓
-Action proposal
-↓
-授权后执行
+Platform Connector
 ↓
 Outcome
 ↓
-World writeback
+Task completion / Strategy / Calibration / User Understanding
 ↓
-AI根据 Outcome 学习 / 修正 Goal、Task、Strategy
+Unified World + Index
 ```
 
-## P12 关键边界
+## P13 当前目标
 
-1. Goal = 长期方向；Task = 可执行工作；Action = 一次现实副作用；Outcome = 真实结果。
-2. Goal / Task / Action / Outcome 全部进入统一世界，不建第二任务数据库。
-3. AI可以主动提出 Goal / Task，但不得伪造用户授权。
-4. 外部副作用默认需要 capability-specific authorization。
-5. 内部纯世界读写与现实外部动作必须分开。
-6. Action 必须引用 Goal / Task / Evidence / 当前世界状态。
-7. 执行失败也要形成 Outcome，不能静默消失。
-8. Outcome 可作为 AI Strategy / Calibration / User Understanding 的 Evidence。
-9. Scheduler 只负责确定性时机和条件，不替 AI 决定“为什么要做”。
-10. 不允许为了测试直接给模型固定 expected action 文本。
+把对话外现实持续接入统一世界，但只做机械事实接入与机械清洗。
 
-## P12 首批必读
+目标链：
+
+```text
+Phone / App / Sensor / Camera / MIC / Calendar / Notes / Payment / Order
+↓
+Source Adapter
+↓
+Canonical Observation
+↓
+Dedup / timestamp normalize / source normalize
+↓
+机械压缩或阈值事件化（仅适用于明确机制型数据）
+↓
+统一 WorldStore
+↓
+Index / Summary
+↓
+Resident AI 后续观察与认知
+```
+
+## P13 关键边界
+
+1. Adapter 只能把现实事实标准化成 Observation / Event 等基础对象。
+2. Adapter 不得生成“用户焦虑”“用户喜欢某人”“学习能力提升”等高阶认知。
+3. 全部来源使用同一全局时间基准。
+4. 原始图片/录音的 AIOS 长期事实入口优先为文本/结构化事实，不把媒体复制成长期世界真相。
+5. 相册/社交/App 可作为读取入口；是否形成长期事实由后续合法机制决定。
+6. 机制型高频数据允许确定性压缩，例如长时间稳定值只保留区间摘要和阈值事件。
+7. 阈值必须属于测量/工程规则，不能偷偷变成心理判断。
+8. 去重、时间归一、格式转换都不得改变事实语义。
+9. 每个 Observation 必须保留 source_kind / modality / locator / 时间 / provenance。
+10. 接入失败必须可审计，不得静默丢数据后假装世界完整。
+
+## P13 首批必读
 
 新仓：
-1. `docs/constitution/AIOS_v3.0_Goal_Task_Constitution.md`
-2. `docs/constitution/AIOS_v3.0_Action_System_Constitution.md`
-3. `src/aios_core/contracts/models.py`
-4. `src/aios_core/contracts/enums.py`
-5. `src/aios_core/runtime/turn_runtime.py`
-6. `src/aios_core/storage/sqlite_store.py`
+1. 数据采集/清洗相关宪法文件
+2. `src/aios_core/contracts/models.py`
+3. `src/aios_core/ingest/conversation.py`
+4. `src/aios_core/storage/sqlite_store.py`
+5. `src/aios_core/query/search.py`
 
 旧仓择优来源：
-7. Goal / Task / Action / Outcome state machines
-8. scheduler / conditional engine
-9. world operator / operation receipts
-10. external side-effect authorization code
+6. Observation ingest / dedupe
+7. sensor compression
+8. app adapter
+9. media-to-text / location / calendar / payment/order adapters
+10. cleaning / normalization / provenance
 
-## P12 禁止事项
+## P13 禁止事项
 
-- 不把 Task 当聊天 TODO 文本。
-- 不把 Action 执行权默认交给任意模型输出。
-- 不因任务完成就删除历史 Goal/Task。
-- 不让 Scheduler 自动生成高阶目标。
-- 不把 Outcome 只写日志而不进入世界。
-- 不用固定 demo 工具证明“行动能力”。
-- 不绕过用户授权去执行外部副作用。
+- 不恢复旧“清洗阶段跨维推理”。
+- 不用关键词把事实自动打成心理标签。
+- 不复制整个相册/录音库到 AIOS 世界。
+- 不把支付事实与订单语义混成一个维度。
+- 不把 App 原始结构直接当高阶 Claim。
+- 不因压缩节省空间就丢失阈值异常事件。
+- 不让平台 adapter 决定用户意义。
 
 ## 当前不可推翻的已决事项
 
-- 世界唯一；所有模块都写同一个 WorldStore。
-- 索引唯一公共能力。
-- AI认知可修正；Observation 不倒写。
+- 世界唯一、时间轴唯一。
 - 维度平级。
+- 事实与认知分离。
+- Summary 不做跨维因果。
+- 索引与推荐分离。
+- 外部行动授权独立于模型。
 - AI负责意义，程序负责确定性机制。
-- 用户授权与外部副作用必须有独立边界。
-- PseudoLLM / 固定题库不得作为认知或行动 Gate。
 
 ## 恢复现场规则
 
