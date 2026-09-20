@@ -7,9 +7,9 @@
 
 ## 当前快照
 
-- 时间：2026-09-20 14:53 +08:00
-- 最后已验证功能代码锚点：`20100f0ddd8774cf53185f0862ff31fcc2c3421e`
-- 验证 Gate：`p13-ingest-gate` / run `35495374031` / **success**
+- 时间：2026-09-20 16:01 +08:00
+- 最后已验证功能代码锚点：`f21960967431d8a96e3f37de75bdcd2a3b8e81dc`
+- 验证 Gate：`p13-ingest-gate` / run `35498395468` / **success**；`p13-reality-ingest` / run `35498395508` / **success**
 - 当前项目阶段：**P13 已完成，进入 P14 长会话连续性完整接线**
 - 当前主干状态：**现实数据可通过 cognition-free adapters 进入统一世界；数值流可机械压缩；媒体长期事实只保留 descriptor/transcript；失败可审计**
 - 当前 blocker：**长单会话仍主要依赖调用方传入 recent_turns；token 超限后还缺系统内生的轮总结状态与按需 raw drill-down**
@@ -31,6 +31,28 @@
 - numeric change 只表示数值变化，不生成健康/心理意义：GREEN
 - 旧 semantic purifier / keyword evidence classifier 明确禁止迁回：GREEN
 - P13 聚合 Gate：GREEN
+
+## P13 Post-Gate 红队加固
+
+P13 完成后又做了一轮独立正确性审计，并通过 PR #3 合入主线：
+
+- stable ID 改为结构化 canonical JSON 哈希，消除分隔符边界碰撞：GREEN
+- Reality / failure audit / numeric 对象身份加入 `subject_id`，消除跨用户对象碰撞：GREEN
+- adapter / external_record / revision 身份文本统一规范化：GREEN
+- source digest 覆盖 dimension / source_class / schema / locator / interval，adapter 语义漂移 fail closed：GREEN
+- durable read 只把明确 `NOT_FOUND` 当不存在；存储损坏/不可用不再被吞掉：GREEN
+- Reality commit 使用确定性 operation identity，竞态窗口 exact retry 可走 WorldStore idempotency：GREEN
+- numeric series 对既有对象校验 source digest，偷改 sample / policy / unit / locator 会拒绝：GREEN
+- `series_id` 明确定义为一个不可变 compression batch/window 的身份：GREEN
+- NaN / Infinity 在 numeric contract 边界拒绝：GREEN
+- 通用 RealityRecord 支持时间区间，不再强制把日历/睡眠等区间压成时间点：GREEN
+- reused existing 路径也执行 index catch-up，可修复前次提交后投影滞后：GREEN
+- 原并行 PR #2 已关闭，禁止形成第二套 reality-ingest 实现：DONE
+- 合并提交：`f21960967431d8a96e3f37de75bdcd2a3b8e81dc`
+- 合并后 P13 聚合 Gate：run `35498395468` **success**
+- 合并后 P13 reality Gate：run `35498395508` **success**
+
+以上是 P13 的 post-gate hardening，不改变当前主阶段 **P14**。
 
 ## 当前可运行数据链
 
