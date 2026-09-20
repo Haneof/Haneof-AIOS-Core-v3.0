@@ -1424,5 +1424,29 @@
         }
       }
     ]
+  },
+  "c8db07ce55a75de3215980d809c890d0c0c2b682e9946cc731e848240f6d19ed": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_task",
+        "call_id": "sol-summaryrun-jan08-start-message-task",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_fa7f780c46e2004d9d0100c2",
+            "revision": 1
+          },
+          "new_state": "running",
+          "reason": "The user selected Xiao Zhao to receive the overnight flour delivery and explicitly requested and confirmed sending the specified message.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_ad04153c39dba332be3f72aa",
+              "revision": 1
+            }
+          ],
+          "next_step": "提出外部消息 Action；不把用户同意等同于平台授权或执行成功。"
+        }
+      }
+    ]
   }
 }
