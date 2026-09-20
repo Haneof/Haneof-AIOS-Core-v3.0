@@ -1070,5 +1070,23 @@
   "5dd80e0cae68a0b16ecd2975e666a02e4be065507f876903d2f6c7be517eb6cf": {
     "kind": "response",
     "response": "好，现在只确认两件事：提醒时机合适，你也已经开始去处理。灭火器周围和通道记录还要等完成证据，我先不把任务说成完成；更不会把“开始准备”说成“明天一定能通过”。"
+  },
+  "4871f6264f94b39647df2426d44d0be5497d91c4a0b92efd3f0dc0f1971d04ba": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "search_timeline",
+        "call_id": "sol-jan17-find-preparation-photo",
+        "arguments": {
+          "window_start": "2027-01-17T18:30:00+00:00",
+          "window_end": "2027-01-17T19:30:00+00:00",
+          "dimension": "dim:photo_description",
+          "object_types": [
+            "observation"
+          ],
+          "limit": 10
+        }
+      }
+    ]
   }
 }
