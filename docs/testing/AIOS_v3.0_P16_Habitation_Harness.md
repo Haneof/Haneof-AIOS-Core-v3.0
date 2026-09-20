@@ -395,3 +395,38 @@ A provider-backed run is evidence only after the exact same
 `scenario_public_fingerprint` has been confirmed across candidates. Hidden oracle
 evaluation occurs in a separate post-run boundary.
 
+
+
+## 18. Separate provider evaluator
+
+Oracle-aware evaluation is a second process and must consume an already-completed
+resident `run.json`.
+
+```bash
+python -m tests.habitation.run_provider_evaluator \
+  --fixture-root tests/habitation/fixtures \
+  --manifest cognition_revision_v1.manifest.json \
+  --run-artifact /path/to/run.json \
+  --provider anthropic \
+  --model <exact-evaluator-model-id> \
+  --evaluator-id <stable-evaluator-config-id> \
+  --output-dir artifacts/p16-evaluation/example
+```
+
+Before any evaluator provider call, the CLI verifies:
+
+1. resident run `scenario_id`;
+2. scenario version;
+3. resident-visible life SHA-256 fingerprint.
+
+Only then does it load/use the hidden oracle. The evaluator must return exactly one
+finding per versioned oracle criterion and may not invent additional criteria.
+
+The manual workflow
+`.github/workflows/p16-provider-evaluation-manual.yml` downloads the immutable
+resident artifact from a prior workflow run using Actions read permission and runs
+the evaluator in a separate job/process. The evaluator output contains evaluator
+provider/model/config provenance and request metadata.
+
+This separation means the resident provider never needs access to `oracle/**`, while
+the post-run evaluator never re-runs or mutates the resident World.
