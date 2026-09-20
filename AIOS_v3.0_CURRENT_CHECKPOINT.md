@@ -12,8 +12,8 @@
 - 验证 Gate：PR #20 accepted head `b8fa56df92fdb928e2168da2054364f6a91161fd` 的 **16 个 workflow 全部 success**；其中 `constitutional-cognition-closure` run `35508439330`、`p16-habitation-harness` run `35508439464`、`p16-convergence-gate` run `35508439468`。
 - 当前项目阶段：**P16 多模型独立长期入住测试 / 真实 provider 证据阶段**
 - 当前主干状态：**P0-P15 主链 + 2026-09-20 宪法认知代码收口已闭环。Adaptive Cognitive Policy、Event Dimension、CommunicationExperience、Core-owned Topic State、九档模型生成 Summary 调度、深层世界导航、Goal/Task 相关上下文和 PLATFORM provenance 已进入 main。**
-- 当前 blocker：**真实 provider resident 基础设施已经具备，但仍未产生至少两个真实 provider/model 的独立入住 artifacts 与独立 oracle evaluator 证据。确定性 Gate 只能证明机制/隔离/接线正确，不能证明长期认知质量。**
-- 下一主任务：**不再扩 Core 机制；直接运行至少两个真实 provider/model 对同一 sealed life 的独立入住 → 保存 World/run provenance → 同一 evaluator 配置做 hidden-oracle 评估 → 离线 comparison → 独立红队。通过后才允许 P16 PASS / P17。**
+- 当前 blocker：**2026-09-20 第二轮完整性复审重新发现代码级 blocker：跨 subject 隔离未统一强制、CognitivePolicy 尚未形成真实运行策略闭环、P6 多尺度 Summary 尚未接入真实 Current-Core 长期调度。另有 stable-ID 编码、fail-open broad exception、Entity/Relation 运行闭环、Event 状态机与 P16 fixture 覆盖等 HIGH 问题。真实 provider artifacts 仍缺，但已不再是唯一 blocker。**
+- 下一主任务：**先按 `reviews/AIOS_V3_CODE_COMPLETENESS_REAUDIT_2026-09-20.md` 关闭第二轮代码 blocker，再扩展 P16 sealed-life 覆盖；代码闭环重新通过后才执行付费 provider cognition evidence。P17 继续禁止启动。**
 
 ## P13 已完成并通过 Gate
 
@@ -498,3 +498,58 @@ P16 仍然是 **CONTINUE / NOT PASS**，因为机械/协议/隔离测试通过�
 - 宪法代码对齐：**PASS for audited findings**
 - P16：**CONTINUE / NOT PASS**
 - P17：**仍禁止启动**
+
+
+## 2026-09-20 第二轮代码完整性复审 — REOPENED BLOCKERS
+
+复审报告：
+
+- `reviews/AIOS_V3_CODE_COMPLETENESS_REAUDIT_2026-09-20.md`
+- 报告提交：`5a2f569040ab0160923cbd805b2ebcdeaeb3b65b`
+
+本轮不是否定 PR #20；PR #20 确实关闭了第一轮审查明确列出的机制缺口，16 个 Gate 也是真实 green。
+
+但第二轮从 WorldObject 全表、subject isolation、stable identity、真实 P16 Current-Core 接线、Policy consumer/evaluation、Summary backlog、Entity/Relation 生产路径和 fixture coverage 反向审查，发现更深层问题。
+
+### BLOCKER
+
+1. **跨 subject 隔离未形成统一硬边界**
+   - WorldStore reference validation 不校验 subject；
+   - Claim / Revision / Event / Dimension / Goal / Policy / Communication refs 多数只校验存在；
+   - `search_mind()` 无 subject 参数；
+   - timeline/entity search、query-less ALL_DIMENSIONS、DimensionSummary 可跨 subject 读入数据。
+
+2. **CognitivePolicy 仍是可版本化账本，不是完整自适应运行策略**
+   - Resident 无 propose/register policy；
+   - Current-Core / P16 不预注册 policy；
+   - active policy 没有 resolver/consumer 真正改变 recommendation/search/communication/review 等行为；
+   - evaluation_window 未调度；
+   - Periodic Review 不把 CognitivePolicy 作为 review anchor；
+   - AI policy update evidence 目前只校验存在，可引用 AI 自己 Claim 或其他 subject。
+
+3. **P6 多尺度 Summary 未接入真实长期运行链**
+   - P16 Current-Core 没有 dimension_summary_handler；
+   - advance_to() 不运行 `run_due_dimension_summaries()`；
+   - 无 missed-window durable backlog；
+   - >max_source_objects 时可提交 truncated CURRENT Summary；
+   - late data 不会自动重建旧窗口；
+   - active_dimensions() 未按 dimension lifecycle 过滤。
+
+### HIGH
+
+- P4 TopicState/Need-History 仍使用固定词表 + `len(topic)>=4` 决定历史价值，过度机械；
+- Entity/Relation 没有 Resident 正式创建/维护 capability，图索引主要依赖手工 seed；
+- P6/P8/P9/P11/P12 仍有 delimiter-joined stable ID，和 P13 已修的碰撞问题不一致；
+- Claim/Summary/Recommendation/ALL_DIMENSIONS 等 durable truth path 仍有 broad `except Exception` 吞存储错误；
+- Event service 声称合法 forward lifecycle，但没有 previous->new transition matrix；
+- P16 当前四个 sealed lives 每个仅 4-5 个显式事件，未覆盖 Policy / CommunicationExperience / Event lifecycle / Entity-Relation / P6 Summary / 完整 Dimension lifecycle。
+
+### 当前项目裁决
+
+- Architecture direction：**PASS**
+- Core spine：**STRONG**
+- PR #20 first-order closure：**VALID**
+- Second-order code completeness：**NOT PASS**
+- P16 paid provider execution：**应等待上述 blocker 收口后再作为 release evidence**
+- P17：**BLOCKED**
+
