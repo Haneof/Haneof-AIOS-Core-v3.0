@@ -240,6 +240,21 @@ class HabitationRunner:
     ) -> HabitationRun:
         if not isinstance(model_id, str) or not model_id.strip():
             raise ValueError("model_id must be a non-empty string")
+        candidate_model_id = model_id.strip()
+
+        # Real Current-Core/provider targets expose their bound model identity.
+        # When present, it must match the artifact candidate id exactly; otherwise
+        # a run could be labeled as model A while actually invoking model B.
+        bound_model_id = getattr(target, "model_id", None)
+        if bound_model_id is not None:
+            if not isinstance(bound_model_id, str) or not bound_model_id.strip():
+                raise ValueError(
+                    "target model_id must be a non-empty string when exposed"
+                )
+            if bound_model_id.strip() != candidate_model_id:
+                raise ValueError(
+                    "target model_id does not match candidate model_id"
+                )
 
         steps: list[HabitationStep] = []
         for event in scenario.events:
@@ -272,7 +287,7 @@ class HabitationRunner:
         return HabitationRun(
             scenario_id=scenario.scenario_id,
             subject_id=scenario.subject_id,
-            model_id=model_id,
+            model_id=candidate_model_id,
             steps=tuple(steps),
             final_time_advance_result=final_time_advance_result,
             final_snapshot=deepcopy(dict(snapshot)),
