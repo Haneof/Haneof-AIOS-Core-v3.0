@@ -8,7 +8,7 @@ infers personality, emotion, intent, relationships or higher-level user meaning.
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass
+from dataclasses import dataclass, fields as dataclass_fields, is_dataclass
 from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
@@ -40,16 +40,70 @@ def _stable_id(prefix: str, *parts: object) -> str:
     return f"{prefix}_{hashlib.sha256(raw.encode('utf-8')).hexdigest()[:24]}"
 
 
-def _contains_binary(value: Any) -> bool:
+def _contains_binary(
+    value: Any,
+    *,
+    _active: set[int] | None = None,
+) -> bool:
+    """Detect raw binary recursively without crashing on cyclic containers."""
     if isinstance(value, (bytes, bytearray, memoryview)):
         return True
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return False
+
+    if _active is None:
+        _active = set()
+    marker = id(value)
+    if marker in _active:
+        return False
+
+    if isinstance(value, BaseModel):
+        _active.add(marker)
+        try:
+            return any(
+                _contains_binary(
+                    getattr(value, field_name),
+                    _active=_active,
+                )
+                for field_name in type(value).model_fields
+            )
+        finally:
+            _active.remove(marker)
+
+    if is_dataclass(value) and not isinstance(value, type):
+        _active.add(marker)
+        try:
+            return any(
+                _contains_binary(
+                    getattr(value, field.name),
+                    _active=_active,
+                )
+                for field in dataclass_fields(value)
+            )
+        finally:
+            _active.remove(marker)
+
     if isinstance(value, Mapping):
-        return any(
-            _contains_binary(key) or _contains_binary(item)
-            for key, item in value.items()
-        )
+        _active.add(marker)
+        try:
+            return any(
+                _contains_binary(key, _active=_active)
+                or _contains_binary(item, _active=_active)
+                for key, item in value.items()
+            )
+        finally:
+            _active.remove(marker)
+
     if isinstance(value, (list, tuple, set, frozenset)):
-        return any(_contains_binary(item) for item in value)
+        _active.add(marker)
+        try:
+            return any(
+                _contains_binary(item, _active=_active)
+                for item in value
+            )
+        finally:
+            _active.remove(marker)
+
     return False
 
 
@@ -906,12 +960,16 @@ class RealityIngestService:
                         "source_digest": segment_digest,
                         "mechanical_ingest": True,
                         "mechanical_compression": True,
-                        "source_record_ids": record_ids,
-                        "source_locators": [
-                            item.source_locator
-                            for item in segment
-                            if item.source_locator is not None
-                        ],
+                        "source_record_range": {
+                            "first": record_ids[0],
+                            "last": record_ids[-1],
+                            "count": len(record_ids),
+                        },
+                        "source_record_ids_digest": _digest_payload(record_ids),
+                        "source_locator_range": {
+                            "first": segment[0].source_locator,
+                            "last": segment[-1].source_locator,
+                        },
                         "raw_sample_values_retained": False,
                     },
                 )
