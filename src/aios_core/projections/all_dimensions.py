@@ -15,7 +15,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from aios_core.contracts.time import as_utc
 from aios_core.query.search import WorldSearchIndex
-from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
 
 class ProjectionItem(BaseModel):
@@ -196,8 +196,11 @@ class AllDimensionsProjectionService:
             for hit in candidates[: self.max_items_per_dimension]:
                 try:
                     payload = self.store.get_payload(hit.object_id, revision=hit.revision)
-                except Exception:
-                    # Projection-only annotations may not exist in world storage.
+                except StoreError:
+                    if not hit.is_annotation:
+                        raise
+                    # Projection-only retrospective annotations intentionally live
+                    # outside object_revisions; only that exact case may fall back.
                     payload = {
                         "object_type": hit.object_type,
                         "metadata": {},
