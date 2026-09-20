@@ -64,5 +64,33 @@
   {
     "snapshot_signature": "2e0444bd85ac6fe19b78f8f3f2a86d4209b26872edad5524e814dca6577e2d86",
     "type": "silence"
+  },
+  {
+    "snapshot_signature": "4efe4f09f9a5184bbd647cabcfa28bc22e4de598d7ced60e3f2a022e675757ff",
+    "type": "capability_calls",
+    "calls": [
+      {
+        "name": "revise_claim",
+        "arguments": {
+          "target_ref": {
+            "object_id": "clm_a62b8327dc0ea3f590b76649",
+            "revision": 1
+          },
+          "replacement_content": "用户通常周末不工作；但接下来两个月每周六上午固定开项目会，因此此前“周六上午通常留给学习”的安排在这段期间不再适用。",
+          "reason": "用户明确说明计划已变化，并明确撤销了此前周六上午学习安排在接下来两个月的适用性。",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_3b6f238c052de914d1654bd2",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_4870b719d706331668c57657",
+              "revision": 1
+            }
+          ],
+          "confidence": 0.97
+        }
+      }
+    ]
   }
 ]
