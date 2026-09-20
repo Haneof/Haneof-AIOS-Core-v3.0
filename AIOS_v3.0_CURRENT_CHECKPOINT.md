@@ -8,8 +8,8 @@
 ## 当前快照
 
 - 时间：2026-09-20 17:00 +08:00
-- 最后已验证功能代码锚点：`6f1e20307cd1ce47aefff281f652da16af635992`
-- 验证 Gate：C09 PR 分支全回归全部 **success**；合并后当前 main 复核 `c09-wake-dispatch` / run `35501126516` / **success**
+- 最后已验证功能代码锚点：`02b3f006d77c6396e3f8575e8547a5363582738f`
+- 验证 Gate：C09 初始闭环合并后复核 `c09-wake-dispatch` / run `35501126516` / **success**；去重身份加固 Gate run `35501301595` / **success**
 - 当前项目阶段：**P16 多模型独立长期入住测试**
 - 当前主干状态：**P0-P15 已闭环；P16 盲测暴露的 C09 Wake 总线/通用调度缺口已修复并合入 main。Observation 仍默认只入世界；只有注册机械条件/Task/Review 等形成 Wake 后才调度 Resident AI。**
 - 当前 blocker：**P16 benchmark PR #1 仍需基于当前 main 重新对齐并审查；随后才能进入真实 GPT / Claude / Gemini 等独立 habitation runs。**
@@ -198,7 +198,8 @@ summary 作为快速 continuity index
 
 现已通过 PR #7 合入：
 
-- 功能 SHA：`6f1e20307cd1ce47aefff281f652da16af635992`
+- 初始闭环 SHA：`6f1e20307cd1ce47aefff281f652da16af635992`
+- 当前加固功能 SHA：`02b3f006d77c6396e3f8575e8547a5363582738f`
 - `WakeBus`：GREEN
 - exact trigger retry 幂等：GREEN
 - 连续命中合并：GREEN
@@ -213,7 +214,8 @@ summary 作为快速 continuity index
 - background Wake 不伪造 Conversation Observation：GREEN
 - P15 Review → Task → P12 TASK_DUE → C09 Resident Dispatch 跨阶段闭环：GREEN
 - P12 / P14 / P15 / fused runtime / P9-P11 / world kernel/index 回归：全部 GREEN
-- 合并后当前 main 验证：`c09-wake-dispatch` run `35501126516` / **success**
+- 合并后初始 main 验证：`c09-wake-dispatch` run `35501126516` / **success**
+- Wake dedupe identity hardening：`wake_source + rule_id + dedupe_key` 共同定义合并作用域；延迟 exact retry 仍幂等；新 out-of-order hit fail closed：Gate run `35501301595` / **success**
 
 实验 PR #5 与旧基线 PR #6 已关闭，仅保留历史证据；不得合入。
 
