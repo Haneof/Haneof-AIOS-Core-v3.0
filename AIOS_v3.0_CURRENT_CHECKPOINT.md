@@ -7,13 +7,13 @@
 
 ## 当前快照
 
-- 时间：2026-09-20 16:19 +08:00
-- 最后已验证功能代码锚点：`76d179d48d1bb222c3d18eb5c435dd6f0c9ba212`
-- 验证 Gate：`p14-long-context` / run `35499189697` / **success**；`fused-turn-runtime` / run `35499189641` / **success**；P9-P13 相关合并后回归全部 **success**
-- 当前项目阶段：**P14 已完成，进入 P15 周期 Review / AI 成长**
-- 当前主干状态：**长单会话 continuity 已由 WorldStore 内生维护；旧轮次可 round summary；summary 可精确 drill-down 到 pinned raw dialogue；重启后无需调用方维护 recent_turns**
-- 当前 blocker：**P15 尚缺周期 Review 调度、模型回看输入包、OperationExperience/Strategy 学习写回与 Review 后修正闭环**
-- 下一主任务：**P15 periodic review + AI experience / strategy learning + revision-aware growth loop**
+- 时间：2026-09-20 17:00 +08:00
+- 最后已验证功能代码锚点：`6f1e20307cd1ce47aefff281f652da16af635992`
+- 验证 Gate：C09 PR 分支全回归全部 **success**；合并后当前 main 复核 `c09-wake-dispatch` / run `35501126516` / **success**
+- 当前项目阶段：**P16 多模型独立长期入住测试**
+- 当前主干状态：**P0-P15 已闭环；P16 盲测暴露的 C09 Wake 总线/通用调度缺口已修复并合入 main。Observation 仍默认只入世界；只有注册机械条件/Task/Review 等形成 Wake 后才调度 Resident AI。**
+- 当前 blocker：**P16 benchmark PR #1 仍需基于当前 main 重新对齐并审查；随后才能进入真实 GPT / Claude / Gemini 等独立 habitation runs。**
+- 下一主任务：**对齐并审查 P16 PR #1，然后用真实模型执行隐藏人生长期入住；不再重做 P12/P15/C09。**
 
 ## P13 已完成并通过 Gate
 
@@ -183,6 +183,40 @@ summary 作为快速 continuity index
 - P15 功能锚点：`3261eae4967632ea4ef72669ef53ef3dfe5199a7`
 - P15 Gate：run `35499766871` / **success**
 
+## P16 入住测试发现并关闭：C09 Wake 调度闭环
+
+2026-09-20 的严格顺序 blind self-resident habitation 暴露出一个实现缺口；回查旧仓 `Haneof/fantonghui@aios-2.0` 的 v3.0 正式法统后确认：
+
+- Observation **默认只写入世界，不直接唤醒 AI**；
+- 第 77~83 条要求机械触发只负责“是否值得叫醒 AI”，不得替 AI 形成语义结论；
+- ADJ-003 要求机械命中统一经过 Wake 去重 / 合并 / 冷却；
+- Wake Reason 是任务第一指针，不是认知结论；
+- Task 到期与 periodic review 都是合法 Wake 来源；
+- Step-0 负责确定性安全 / 方便度 / 信道 / 预算门禁。
+
+因此原实验中“RealityIngest 不直接唤醒 AI”不是 bug。真正缺口是 **机械 Trigger → Wake Bus → Step-0 → 通用 Wake Dispatcher → 同一 Resident Runtime** 的中央接线。
+
+现已通过 PR #7 合入：
+
+- 功能 SHA：`6f1e20307cd1ce47aefff281f652da16af635992`
+- `WakeBus`：GREEN
+- exact trigger retry 幂等：GREEN
+- 连续命中合并：GREEN
+- cooldown suppression：GREEN
+- Step-0 `OK / QUIET / HARD_BLOCK`：GREEN
+- model 暂不可调用时 Wake 保留为 `QUEUED`：GREEN
+- 注册 Observation 机械规则：GREEN
+- P13 `numeric_change + mechanical_threshold_event` → 注册规则 → Wake：GREEN
+- 通用 `FusedTurnRuntime.run_wake()`：GREEN
+- `TASK_DUE Wake` → 同一 Resident CognitiveRuntime → Task 后续状态：GREEN
+- QUIET 时允许后台认知但禁止对外投放：GREEN
+- background Wake 不伪造 Conversation Observation：GREEN
+- P15 Review → Task → P12 TASK_DUE → C09 Resident Dispatch 跨阶段闭环：GREEN
+- P12 / P14 / P15 / fused runtime / P9-P11 / world kernel/index 回归：全部 GREEN
+- 合并后当前 main 验证：`c09-wake-dispatch` run `35501126516` / **success**
+
+实验 PR #5 与旧基线 PR #6 已关闭，仅保留历史证据；不得合入。
+
 ## P16 当前目标
 
 用多个真实模型、隐藏虚拟人生和长时间跨度数据测试：
@@ -192,7 +226,7 @@ summary 作为快速 continuity index
 当前已有并行施工线：
 
 - PR #1：`parallel/p16-habitation-harness-20260920`
-- PR #5：`experiment/p16-self-resident-blind-replay-20260920`
+- PR #5：`experiment/p16-self-resident-blind-replay-20260920`（实验证据已关闭，不合并）
 
 P16 必须重点验证：
 
@@ -239,8 +273,8 @@ Periodic Review
 - 最后已验证功能代码锚点：`3261eae4967632ea4ef72669ef53ef3dfe5199a7`
 - 最近 Green Gate：`p15-periodic-review` run `35499766871` / **success**
 - 当前阶段：**P16 多 Agent 长期入住测试**
-- 当前 blocker：**需要审查并行 P16 PR 的 harness 是否真正 blind / hidden-life，避免测试脚本代替模型认知**
-- 下一动作：**审查 PR #1 与 PR #5，择优融合；然后执行真实模型 habitation runs，不以固定答案作为认知 Gate。**
+- 当前 blocker：**PR #1 仍基于旧主线，需要重新对齐当前 main；对齐后继续审 blind / hidden-life / world isolation，避免测试脚本代替模型认知。**
+- 下一动作：**只处理 PR #1 的最新主线对齐与 P16 benchmark 审计；之后执行真实模型 habitation runs。PR #5 已关闭，C09 已进入 main，不再作为待开发项。**
 
 ## 当前不可推翻的已决事项
 
