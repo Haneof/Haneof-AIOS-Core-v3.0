@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from tests.habitation.harness import (
+from .harness import (
     HabitationRunner,
     HabitationScenario,
     LifeEvent,
