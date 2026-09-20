@@ -72,5 +72,9 @@
         }
       }
     ]
+  },
+  {
+    "snapshot_signature": "5e009af9918d2b673f5da31479e6dfb4edf7fcbb63129a4a9189e5d4213ab423",
+    "type": "silence"
   }
 ]
