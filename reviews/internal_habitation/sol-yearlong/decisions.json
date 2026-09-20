@@ -864,5 +864,18 @@
   "b209ae13559388c230b89c1d3b1ff736f4f5c07bda82d6eea6b6d5e43d58336e": {
     "kind": "response",
     "response": "知道了。今天累只算今天这一天的事实，我不会从一天的数据给你贴生活习惯标签；“明天如果不忙想早点回家”我也只当一个有条件的临时打算，不会替你固化成长期偏好或任务。"
+  },
+  "3fa9df1e1e0b682e5bbd53ae660ccf8792c1b5fba0e4db776c8d47847ddef11d": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan14-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
   }
 }
