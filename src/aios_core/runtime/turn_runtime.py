@@ -1549,7 +1549,26 @@ class FusedTurnRuntime:
             token_budget=token_budget,
         )
 
-        self._active_turn_time = now
+        running_payload = self.store.get_payload(
+            request.wake_ref.object_id,
+            revision=request.wake_ref.revision,
+        )
+        running_metadata = running_payload.get("metadata")
+        raw_started_at = (
+            running_metadata.get("started_at")
+            if isinstance(running_metadata, Mapping)
+            else None
+        )
+        review_write_time = (
+            datetime.fromisoformat(str(raw_started_at).replace("Z", "+00:00"))
+            if raw_started_at is not None
+            else now
+        )
+
+        # A resumed RUNNING review keeps its original write time. This makes
+        # model-authored writebacks deterministic across crash/budget retries instead
+        # of creating a second "same lesson" merely because the worker restarted later.
+        self._active_turn_time = review_write_time
         self._active_session_id = None
         self._active_review_request = request
         try:
@@ -1562,6 +1581,22 @@ class FusedTurnRuntime:
             self._active_review_request = None
             self._active_turn_time = None
             self._active_session_id = None
+
+        # Tool/capability budget exhaustion is not a completed semantic review.
+        # Keep the durable Wake RUNNING so a later worker can resume the exact review.
+        if runtime_result.termination_reason not in {"responded", "silence"}:
+            self.index.catch_up()
+            return PeriodicReviewRunResult(
+                request=request,
+                runtime=runtime_result,
+                context=context,
+                wake=ReviewWakeReceipt(
+                    wake_id=request.wake_ref.object_id,
+                    revision=int(request.wake_ref.revision or 0),
+                    state="running",
+                    world_revision=int(self.store.current_world_revision()),
+                ),
+            )
 
         wake = self.periodic_review.complete_review(
             request,
