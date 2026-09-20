@@ -23,11 +23,13 @@ from aios_core.context.continuity import (
     RoundSummaryRequest,
 )
 from aios_core.context.controller import ContextController, ModelContextBundle
+from aios_core.communication import CommunicationExperienceRequest, CommunicationExperienceService
 from aios_core.dimensions import (
     DimensionProposalRequest,
     DimensionRegistryService,
     DimensionTransitionRequest,
 )
+from aios_core.events import EventDimensionService, EventTransitionRequest, EventWriteRequest
 from aios_core.execution import (
     ActionProposalRequest,
     GoalCreateRequest,
@@ -37,12 +39,14 @@ from aios_core.execution import (
     TaskTransitionRequest,
 )
 from aios_core.ingest.conversation import ConversationCommit, ConversationIngestor
+from aios_core.policy import CognitivePolicyRegistry, CognitivePolicyUpdateRequest
 from aios_core.projections.all_dimensions import AllDimensionsProjectionService
 from aios_core.query.search import WorldSearchIndex
 from aios_core.recommendation.proactive import (
     ProactiveMemoryRecommender,
     RecommendationBundle,
 )
+from aios_core.recommendation.topic_state import TopicStateService
 from aios_core.revision.service import ClaimRevisionRequest, CognitionRevisionService
 from aios_core.review import (
     OperationExperienceRequest,
@@ -52,9 +56,10 @@ from aios_core.review import (
     ReviewWakeReceipt,
 )
 from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.summaries import DimensionSummaryInput, MultiScaleSummaryScheduler, SummaryScale, SummaryScheduleResult
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 from aios_core.contracts.refs import ObjectRef
-from aios_core.contracts.enums import WakeSource
+from aios_core.contracts.enums import ObjectType, WakeSource
 from aios_core.wake import Step0GateInput, Step0GateResult, WakeBus, WakeStateReceipt
 
 from .capabilities import CapabilityKind, CapabilityRegistry, CapabilitySpec
@@ -104,6 +109,7 @@ class FusedTurnRuntime:
         recommendation_limit: int = 5,
         max_tool_rounds: int = 4,
         round_summary_handler: Callable[[RoundSummaryRequest], str] | None = None,
+        dimension_summary_handler: Callable[[DimensionSummaryInput], str] | None = None,
         recent_turn_limit: int = 8,
         summary_chunk_turns: int = 12,
         max_round_summaries_per_turn: int = 1,
@@ -132,6 +138,7 @@ class FusedTurnRuntime:
             store=store,
             default_limit=recommendation_limit,
         )
+        self.topic_state = TopicStateService()
         self.context_controller = context_controller or ContextController()
         self.all_dimensions = AllDimensionsProjectionService(
             store=store,
@@ -162,6 +169,31 @@ class FusedTurnRuntime:
             store=store,
             index=index,
             subject_id=subject_id,
+        )
+        self.events = EventDimensionService(
+            store=store,
+            index=index,
+            subject_id=subject_id,
+        )
+        self.communication_experience = CommunicationExperienceService(
+            store=store,
+            index=index,
+            subject_id=subject_id,
+        )
+        self.policies = CognitivePolicyRegistry(
+            store=store,
+            index=index,
+            subject_id=subject_id,
+        )
+        self.dimension_summary_scheduler = (
+            None
+            if dimension_summary_handler is None
+            else MultiScaleSummaryScheduler(
+                store=store,
+                index=index,
+                summary_handler=dimension_summary_handler,
+                subject_id=subject_id,
+            )
         )
         self.periodic_review = PeriodicReviewService(
             store=store,
