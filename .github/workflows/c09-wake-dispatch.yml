@@ -3,6 +3,7 @@ name: c09-wake-dispatch
 on:
   push:
     branches:
+      - main
       - "fix/p16-c09-wake-bus-dispatch-*"
     paths:
       - "src/aios_core/wake/**"
