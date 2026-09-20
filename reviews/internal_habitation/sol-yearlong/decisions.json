@@ -979,5 +979,18 @@
   },
   "d61cd5bbc8db9d6bff996a02b3725e2429282a7c5d6310c1fac9579a5692de85": {
     "kind": "silence"
+  },
+  "7809ebd236e4133255633837665aabc77c18bb0c0997691204e75b731889d83e": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan17-morning-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
   }
 }
