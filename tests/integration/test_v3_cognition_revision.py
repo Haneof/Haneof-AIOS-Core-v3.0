@@ -200,3 +200,46 @@ def test_already_advanced_dependent_is_not_overwritten_by_old_dependency_propaga
     assert store.get_payload(b.claim_id)["revision"] == 2
     assert store.get_payload(b.claim_id)["content"] == "用户饮品习惯正在变化，暂不下定论。"
     assert (b.claim_id, 1) in receipt.skipped_already_advanced_refs
+
+
+def test_stale_dependent_can_be_re_evaluated_into_new_active_revision(tmp_path):
+    store, index, _, correction, a, b = _seed_world(tmp_path)
+    service = CognitionRevisionService(store=store, index=index)
+
+    first = service.apply(
+        ClaimRevisionRequest(
+            target_ref=ObjectRef(object_id=a.claim_id, revision=1),
+            mode="revise",
+            reason="用户更新了当前饮品习惯",
+            evidence_refs=(ObjectRef(object_id=correction.object_id, revision=1),),
+            replacement_content="用户当前偏好每天喝咖啡。",
+            confidence=0.9,
+        ),
+        changed_at=NOW,
+    )
+    assert store.get_payload(b.claim_id)["status"] == STATUS_REVIEW_REQUIRED
+
+    second = service.apply(
+        ClaimRevisionRequest(
+            target_ref=ObjectRef(object_id=b.claim_id, revision=2),
+            mode="revise",
+            reason="上游用户偏好已更新，重新评估饮品习惯结论",
+            evidence_refs=(ObjectRef(object_id=a.claim_id, revision=2),),
+            replacement_content="用户的当前饮品习惯以咖啡为主。",
+            confidence=0.84,
+        ),
+        changed_at=NOW + timedelta(seconds=1),
+    )
+
+    latest_b = store.get_payload(b.claim_id)
+    assert latest_b["revision"] == 3
+    assert latest_b["status"] == "active"
+    assert latest_b["content"] == "用户的当前饮品习惯以咖啡为主。"
+    assert second.previous_revision == 2
+    assert second.new_revision == 3
+
+    current_tea = index.recall_candidates("以茶为主", object_types=["claim"])
+    assert b.claim_id not in {hit.object_id for hit in current_tea.hits}
+
+    current_coffee = index.recall_candidates("以咖啡为主", object_types=["claim"])
+    assert b.claim_id in {hit.object_id for hit in current_coffee.hits}
