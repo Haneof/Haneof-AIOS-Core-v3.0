@@ -434,5 +434,18 @@
   "783f399b9418083ae76c69b8b66fbec7b444c78c3f1628ee41fb02462380b435": {
     "kind": "response",
     "response": "明白，这条反馈我记下了。按你现在确认的事实，面粉顺利收货、妹妹也顺利接到；以后碰到时间还没确认的安排，我会先把已确认事实和缺失证据分开说，不会先把“可能”讲成“已经冲突”。"
+  },
+  "99bcbbe5518823e3517adaa57308aa2375e3783a19901950f902b39006d986f6": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan09-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
   }
 }
