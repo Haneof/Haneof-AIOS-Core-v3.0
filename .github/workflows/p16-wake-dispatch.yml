@@ -11,6 +11,7 @@ on:
       - "src/aios_core/execution/**"
       - "src/aios_core/contracts/enums.py"
       - "tests/integration/test_v3_wake_dispatch.py"
+      - "tests/integration/test_v3_wake_routing.py"
       - ".github/workflows/p16-wake-dispatch.yml"
   pull_request:
     paths:

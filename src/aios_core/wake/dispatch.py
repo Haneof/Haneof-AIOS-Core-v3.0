@@ -221,7 +221,7 @@ class WakeDispatchService:
                 "learned_at": started,
                 "recorded_at": started,
                 "wake_state": WakeState.RUNNING,
-                "last_hit_at": max(latest.last_hit_at, started),
+                "last_hit_at": latest.last_hit_at,
                 "status": WakeState.RUNNING.value,
                 "metadata": metadata,
             }
@@ -299,7 +299,7 @@ class WakeDispatchService:
                 "learned_at": completed_at,
                 "recorded_at": completed_at,
                 "wake_state": WakeState.COMPLETED,
-                "last_hit_at": max(running.last_hit_at, completed_at),
+                "last_hit_at": running.last_hit_at,
                 "status": WakeState.COMPLETED.value,
                 "metadata": metadata,
             }
