@@ -1636,5 +1636,9 @@
   },
   "42223da32968deefbf91ab22419ab8818eced54a4bc6914471139c212fdac76b": {
     "kind": "silence"
+  },
+  "0ecd04b7c9615cdf415c1a47e8f3ba873979f75583b8c06524975c0ad677c825": {
+    "kind": "summary",
+    "summary": "2027-01-09，AIOS 基于用户当日明确反馈注册了可修订认知策略 `communication.uncertain_schedule_conflict_escalation`，当前值为 `require_concrete_timing_evidence_before_framing_as_conflict`，默认值为 `normal`。该策略的固定证据为用户 Observation `obs_conv_user_37068ea8651565e088f2d785@1`；策略版本为 1，30 天评估窗口，下一次评估时间为 2027-02-08T07:35:00Z。"
   }
 }
