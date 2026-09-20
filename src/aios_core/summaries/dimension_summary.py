@@ -16,9 +16,9 @@ from typing import Any, Sequence
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from aios_core.contracts.enums import MaintenanceClass, SourceClass, SummaryStatus
-from aios_core.contracts.models import Summary
+from aios_core.contracts.models import Dependency, Summary
 from aios_core.contracts.operations import OperationRequest
-from aios_core.contracts.refs import SourceRef
+from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import TemporalExtent, TimePrecision, as_utc
 from aios_core.query.search import WorldSearchIndex
 from aios_core.storage.sqlite_store import SQLiteWorldStore
@@ -291,7 +291,31 @@ class DimensionSummaryService:
             source_class=SourceClass.MAINTENANCE,
             maintenance_class=MaintenanceClass.SUMMARY_REBUILD,
         )
-        result = self.store.commit([summary], operation)
+        dependencies: list[Dependency] = []
+        for item in prepared.sources:
+            dep_id = "dep_" + _stable_id(
+                object_id,
+                revision,
+                item.object_id,
+                item.revision,
+            )
+            dependencies.append(
+                Dependency(
+                    object_id=dep_id,
+                    subject_id=self.subject_id,
+                    learned_at=generated,
+                    recorded_at=generated,
+                    created_by="dimension_summary:dependency",
+                    dependent_ref=ObjectRef(object_id=object_id, revision=revision),
+                    dependency_ref=ObjectRef(
+                        object_id=item.object_id,
+                        revision=item.revision,
+                    ),
+                    dependency_type="summary_uses_source",
+                )
+            )
+
+        result = self.store.commit([summary, *dependencies], operation)
         self.index.catch_up()
         return SummaryCommit(
             object_id=object_id,
