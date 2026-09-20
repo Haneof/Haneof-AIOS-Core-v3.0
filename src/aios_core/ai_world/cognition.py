@@ -346,6 +346,7 @@ class AIWorldCognitionService:
             store=self.store,
             index=self.index,
             subject_id=str(payload["subject_id"]),
+            evidence_subject_ids=(self.user_id, self.ai_subject_id),
         )
         return service.apply(
             ClaimRevisionRequest(
