@@ -1,0 +1,29 @@
+name: conversation-world
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/aios_core/ingest/conversation.py"
+      - "src/aios_core/runtime/conversation_timeline.py"
+      - "src/aios_core/query/**"
+      - "src/aios_core/storage/**"
+      - "tests/integration/test_v3_conversation_world_ingest.py"
+      - ".github/workflows/conversation-world.yml"
+  pull_request:
+    paths:
+      - "src/aios_core/ingest/conversation.py"
+      - "src/aios_core/runtime/conversation_timeline.py"
+      - "tests/integration/test_v3_conversation_world_ingest.py"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - run: pytest tests/integration/test_v3_conversation_world_ingest.py

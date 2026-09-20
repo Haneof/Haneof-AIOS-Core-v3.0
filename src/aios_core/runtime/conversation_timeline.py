@@ -1,7 +1,9 @@
-"""Append-only raw conversation timeline.
+"""Runtime conversation timeline projection.
 
-Summaries, working state and long-term cognition may reference these turns, but they
-never replace or rewrite the original user/assistant text.
+The durable source of truth for raw user/assistant text is the unified WorldStore,
+written through :mod:`aios_core.ingest.conversation`. This table is a runtime
+continuity projection/checkpoint only. It may be rebuilt or replaced and must never
+silently outrank the world ledger.
 """
 
 from __future__ import annotations
