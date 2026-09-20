@@ -9,8 +9,9 @@ supplies the evidence-grounded reason for a cognitive-policy change.
 from __future__ import annotations
 
 import hashlib
+import re
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -25,6 +26,35 @@ from aios_core.storage.idempotency import canonical_json_dumps
 from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
 POLICY_DIMENSION = "dim:ai_cognitive_policy"
+
+_REAL_POLICY_CASE_TYPES: frozenset[ObjectType] = frozenset({
+    ObjectType.OBSERVATION,
+    ObjectType.OUTCOME,
+    ObjectType.OPERATION_EXPERIENCE,
+    ObjectType.COMMUNICATION_EXPERIENCE,
+})
+_EVALUATION_WINDOW_RE = re.compile(r"^(?P<value>[1-9][0-9]*)(?P<unit>[mhdw])$")
+
+
+def evaluation_due_at(changed_at: datetime, evaluation_window: str) -> datetime:
+    """Resolve the bounded R6 evaluation window into a deterministic due instant."""
+
+    changed = as_utc(changed_at, "changed_at")
+    raw = evaluation_window.strip().lower()
+    match = _EVALUATION_WINDOW_RE.fullmatch(raw)
+    if match is None:
+        raise ValueError(
+            "evaluation_window must use a bounded duration such as 30m, 24h, 7d, or 4w"
+        )
+    value = int(match.group("value"))
+    unit = match.group("unit")
+    delta = {
+        "m": timedelta(minutes=value),
+        "h": timedelta(hours=value),
+        "d": timedelta(days=value),
+        "w": timedelta(weeks=value),
+    }[unit]
+    return changed + delta
 
 
 def _stable_id(prefix: str, *parts: object) -> str:
@@ -102,10 +132,40 @@ class CognitivePolicyRegistry:
     def _object_id(self, policy_id: str) -> str:
         return _stable_id("policy", self.subject_id, policy_id.strip())
 
-    def _validate_refs(self, refs: Sequence[ObjectRef]) -> None:
+    def _validate_refs(
+        self,
+        refs: Sequence[ObjectRef],
+        *,
+        require_real_result: bool = False,
+    ) -> None:
         _require_pinned(refs)
         for ref in refs:
-            self.store.get_payload(ref.object_id, revision=ref.revision)
+            payload = self.store.get_payload(ref.object_id, revision=ref.revision)
+            ref_subject = str(payload.get("subject_id") or "")
+            if ref_subject != self.subject_id:
+                raise ValueError(
+                    "policy evidence crosses the runtime subject scope: "
+                    f"{ref.object_id}@{ref.revision} belongs to {ref_subject!r}"
+                )
+            if not require_real_result:
+                continue
+            object_type = str(payload.get("object_type") or "")
+            if object_type not in {item.value for item in _REAL_POLICY_CASE_TYPES}:
+                raise ValueError(
+                    "AI policy changes require real-result evidence; "
+                    f"{object_type!r} is not an allowed policy case type"
+                )
+            if object_type == ObjectType.OBSERVATION.value:
+                metadata = payload.get("metadata")
+                if not isinstance(metadata, dict):
+                    metadata = {}
+                role = str(metadata.get("role") or "").strip().lower()
+                created_by = str(payload.get("created_by") or "").strip().lower()
+                if role == "assistant" or created_by == "conversation_ingest:assistant":
+                    raise ValueError(
+                        "assistant-generated conversation output is not real-result "
+                        "evidence for CognitivePolicy learning"
+                    )
 
     def _evidence_set(
         self,
@@ -217,8 +277,21 @@ class CognitivePolicyRegistry:
         request: CognitivePolicyCreateRequest,
         *,
         changed_at: datetime,
+        actor_is_ai: bool = False,
     ) -> PolicyReceipt:
         changed = as_utc(changed_at, "changed_at")
+        if actor_is_ai:
+            if (
+                request.policy_class is not PolicyClass.COGNITIVE_POLICY
+                or not request.mutable_by_ai
+            ):
+                raise PermissionError(
+                    "resident AI may register only AI-mutable cognitive policies"
+                )
+            if not request.evidence_refs:
+                raise PermissionError(
+                    "resident AI policy registration requires real-result evidence"
+                )
         policy_id = request.policy_id.strip()
         object_id = self._object_id(policy_id)
         try:
@@ -228,7 +301,14 @@ class CognitivePolicyRegistry:
                 raise
         else:
             raise ValueError(f"policy already registered: {policy_id}")
-        self._validate_refs(request.evidence_refs)
+        self._validate_refs(
+            request.evidence_refs,
+            require_real_result=actor_is_ai,
+        )
+        next_evaluation_at = evaluation_due_at(
+            changed,
+            request.evaluation_window,
+        )
         evidence = self._evidence_set(
             policy_id=policy_id,
             version=1,
@@ -260,12 +340,15 @@ class CognitivePolicyRegistry:
             previous_version=None,
             rollback_pointer=None,
             evaluation_window=request.evaluation_window.strip(),
-            metadata={"dimension": POLICY_DIMENSION},
+            metadata={
+                "dimension": POLICY_DIMENSION,
+                "next_evaluation_at": next_evaluation_at.isoformat(),
+            },
         )
         return self._commit(
             policy,
             evidence=evidence,
-            actor_is_ai=False,
+            actor_is_ai=actor_is_ai,
             operation_name="policy.register",
         )
 
@@ -311,6 +394,34 @@ class CognitivePolicyRegistry:
         items.sort(key=lambda item: (item.scope, item.policy_id))
         return tuple(items)
 
+    def effective_value(self, policy_id: str, default: Any = None) -> Any:
+        current = self.latest(policy_id)
+        return default if current is None else current.current_value
+
+    def due_for_evaluation(self, *, now: datetime) -> tuple[CognitivePolicy, ...]:
+        moment = as_utc(now, "now")
+        due: list[CognitivePolicy] = []
+        for item in self.list_current():
+            raw_due = item.metadata.get("next_evaluation_at")
+            try:
+                due_at = (
+                    as_utc(
+                        datetime.fromisoformat(str(raw_due).replace("Z", "+00:00")),
+                        "next_evaluation_at",
+                    )
+                    if raw_due is not None
+                    else evaluation_due_at(item.changed_at, item.evaluation_window)
+                )
+            except (TypeError, ValueError):
+                # Invalid policy evaluation metadata is not silently accepted.
+                raise ValueError(
+                    f"invalid evaluation schedule for policy {item.policy_id!r}"
+                )
+            if due_at <= moment:
+                due.append(item)
+        due.sort(key=lambda item: (item.changed_at, item.policy_id))
+        return tuple(due)
+
     def update(
         self,
         request: CognitivePolicyUpdateRequest,
@@ -327,13 +438,17 @@ class CognitivePolicyRegistry:
                 raise PermissionError(f"policy is not AI-mutable: {request.policy_id}")
             if not request.evidence_refs:
                 raise PermissionError("AI policy changes require pinned evidence")
-        self._validate_refs(request.evidence_refs)
+        self._validate_refs(
+            request.evidence_refs,
+            require_real_result=actor_is_ai,
+        )
         version = current.revision + 1
         evaluation_window = (
             request.evaluation_window.strip()
             if request.evaluation_window is not None and request.evaluation_window.strip()
             else current.evaluation_window
         )
+        next_evaluation_at = evaluation_due_at(changed, evaluation_window)
         evidence = self._evidence_set(
             policy_id=current.policy_id,
             version=version,
@@ -360,6 +475,11 @@ class CognitivePolicyRegistry:
                 "rollback_pointer": current.version,
                 "evaluation_window": evaluation_window,
                 "status": "active",
+                "metadata": {
+                    **dict(current.metadata),
+                    "dimension": POLICY_DIMENSION,
+                    "next_evaluation_at": next_evaluation_at.isoformat(),
+                },
             }
         )
         return self._commit(
@@ -394,9 +514,13 @@ class CognitivePolicyRegistry:
         refs = tuple(evidence_refs)
         if actor_is_ai and not refs:
             raise PermissionError("AI policy rollback requires pinned evidence")
-        self._validate_refs(refs)
+        self._validate_refs(refs, require_real_result=actor_is_ai)
         changed = as_utc(changed_at, "changed_at")
         version = current.revision + 1
+        next_evaluation_at = evaluation_due_at(
+            changed,
+            current.evaluation_window,
+        )
         evidence = self._evidence_set(
             policy_id=current.policy_id,
             version=version,
@@ -426,6 +550,11 @@ class CognitivePolicyRegistry:
                 "rollback_pointer": target.version,
                 "evaluation_window": current.evaluation_window,
                 "status": "active",
+                "metadata": {
+                    **dict(current.metadata),
+                    "dimension": POLICY_DIMENSION,
+                    "next_evaluation_at": next_evaluation_at.isoformat(),
+                },
             }
         )
         return self._commit(
