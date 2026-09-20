@@ -198,7 +198,7 @@ def test_frozen_self_resident_blind_replay_reaches_real_world_and_exposes_wake_g
 
         if event_id == "e07":
             if not history:
-                # All world facts in this experiment must belong to one resident subject.\n    assert {item.get("subject_id") for item in store.list_payloads() if item.get("subject_id")} == {subject_id}\n\n    dim_ref = state["dimension_ref"]
+                dim_ref = state["dimension_ref"]
                 return ModelDirective(
                     capability_calls=(
                         CapabilityCall(
@@ -357,6 +357,13 @@ def test_frozen_self_resident_blind_replay_reaches_real_world_and_exposes_wake_g
             }
         else:
             assert names == []
+
+    # All world facts in this experiment must belong to one resident subject.
+    assert {
+        item.get("subject_id")
+        for item in store.list_payloads()
+        if item.get("subject_id")
+    } == {subject_id}
 
     dim_ref = state["dimension_ref"]
     assert store.get_payload(dim_ref["object_id"], revision=1)["lifecycle"] == "candidate"
