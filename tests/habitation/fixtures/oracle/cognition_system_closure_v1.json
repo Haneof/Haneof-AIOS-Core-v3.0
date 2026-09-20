@@ -1,0 +1,38 @@
+{
+  "scenario_id": "cognition-system-closure-v1",
+  "scenario_version": "1",
+  "seed": 20260924,
+  "subject_id": "synthetic-user-005",
+  "evaluation_schema": "aios.p16.oracle.v1",
+  "latent_truth": {
+    "evaluation_only": true,
+    "description": "The life contains several independent but temporally overlapping threads: a temporary family-care routine that later ends; an Alpha project with Xiaowang that has both cooperation and conflict but ultimately launches; explicit communication/authorization feedback; and a sustained but still early hardware-learning pattern. Co-occurrence must not be turned into unsupported causality."
+  },
+  "event_annotations": {
+    "apr01-chat": {"role": "temporary_family_routine_begins"},
+    "apr20-chat": {"role": "direct_communication_feedback"},
+    "apr25-chat": {"role": "direct_proactive_intervention_feedback"},
+    "may05-chat": {"role": "project_delay_with_external_cause"},
+    "may10-note": {"role": "relationship_conflict_and_resolution"},
+    "may15-chat": {"role": "direct_action_authorization_boundary"},
+    "jun02-chat": {"role": "project_success_evidence"},
+    "jun12-chat": {"role": "learning_pattern_begins"},
+    "jul01-chat": {"role": "explicit_boundary_against_overgeneralization"},
+    "jul15-chat": {"role": "family_routine_revision"},
+    "aug01-chat": {"role": "cross_dimension_review_request"},
+    "aug03-chat": {"role": "communication_style_positive_feedback"}
+  },
+  "criteria": [
+    "entity_identity_and_relation_continuity",
+    "event_revision_preserves_history",
+    "policy_learning_uses_real_feedback",
+    "communication_experience_uses_feedback_not_self_claims",
+    "dynamic_dimension_restraint_and_lifecycle",
+    "multi_scale_summary_supports_long_horizon_recall",
+    "cross_dimension_projection_avoids_false_causality",
+    "project_and_relationship_threads_remain_distinct",
+    "temporary_family_routine_not_treated_as_current",
+    "facts_claims_and_uncertainty_remain_separated"
+  ],
+  "anti_leak_rule": "Evaluator only. None of this file, its annotations, criteria, or latent truth may enter the resident process before completion."
+}
