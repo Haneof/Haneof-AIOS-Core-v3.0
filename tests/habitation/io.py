@@ -9,7 +9,13 @@ import json
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from .harness import HabitationRun, HabitationScenario, LifeEvent, ResidentEvent
+from .harness import (
+    HabitationRun,
+    HabitationScenario,
+    HabitationStep,
+    LifeEvent,
+    ResidentEvent,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -35,6 +41,17 @@ class LoadedResidentFixture:
 
     manifest: FixtureManifest
     scenario: HabitationScenario
+
+
+@dataclass(frozen=True, slots=True)
+class LoadedRunArtifact:
+    artifact_schema: str
+    scenario_id: str
+    scenario_version: str
+    scenario_public_fingerprint: str
+    model_id: str
+    run: HabitationRun
+    raw: Mapping[str, Any]
 
 
 def _safe_fixture_child(root: Path, relative: str, *, expected_dir: str) -> Path:
@@ -442,6 +459,80 @@ def run_artifact_json(
         ensure_ascii=False,
         sort_keys=True,
         indent=2,
+    )
+
+
+def load_run_artifact_json(text: str) -> LoadedRunArtifact:
+    """Rehydrate a completed resident artifact for evaluator-only processing."""
+
+    raw = json.loads(text)
+    if not isinstance(raw, Mapping):
+        raise ValueError("run artifact must contain one JSON object")
+    artifact_schema = _required_string(raw, "artifact_schema")
+    if artifact_schema != "aios.p16.habitation-run.v1":
+        raise ValueError("unsupported P16 run artifact schema")
+
+    scenario_id = _required_string(raw, "scenario_id")
+    scenario_version = _required_string(raw, "scenario_version")
+    fingerprint = _required_string(raw, "scenario_public_fingerprint")
+    subject_id = _required_string(raw, "subject_id")
+    model_id = _required_string(raw, "model_id")
+
+    steps_raw = raw.get("steps")
+    if not isinstance(steps_raw, list):
+        raise ValueError("run artifact steps must be an array")
+    steps: list[HabitationStep] = []
+    seen_event_ids: set[str] = set()
+    for index, item in enumerate(steps_raw):
+        if not isinstance(item, Mapping):
+            raise ValueError(f"run artifact step {index} must be an object")
+        event_id = _required_string(item, "event_id")
+        if event_id in seen_event_ids:
+            raise ValueError(f"duplicate run artifact event_id: {event_id}")
+        seen_event_ids.add(event_id)
+        occurred_raw = item.get("occurred_at")
+        if not isinstance(occurred_raw, str):
+            raise ValueError("run artifact occurred_at must be ISO-8601 text")
+        delivered = item.get("delivered")
+        if not isinstance(delivered, bool):
+            raise ValueError("run artifact delivered must be boolean")
+        steps.append(
+            HabitationStep(
+                event_id=event_id,
+                occurred_at=_parse_datetime(occurred_raw),
+                channel=_required_string(item, "channel"),
+                delivered=delivered,
+                time_advance_result=item.get("time_advance_result"),
+                response=item.get("response"),
+            )
+        )
+
+    final_snapshot = raw.get("final_snapshot")
+    if not isinstance(final_snapshot, Mapping):
+        raise ValueError("run artifact final_snapshot must be an object")
+
+    run = HabitationRun(
+        scenario_id=scenario_id,
+        subject_id=subject_id,
+        model_id=model_id,
+        steps=tuple(steps),
+        final_time_advance_result=raw.get("final_time_advance_result"),
+        final_snapshot=dict(final_snapshot),
+    )
+    return LoadedRunArtifact(
+        artifact_schema=artifact_schema,
+        scenario_id=scenario_id,
+        scenario_version=scenario_version,
+        scenario_public_fingerprint=fingerprint,
+        model_id=model_id,
+        run=run,
+        raw=dict(raw),
+    )
+
+
+def load_run_artifact(path: str | Path) -> LoadedRunArtifact:
+    return load_run_artifact_json(
+        Path(path).read_text(encoding="utf-8")
     )
 
 
