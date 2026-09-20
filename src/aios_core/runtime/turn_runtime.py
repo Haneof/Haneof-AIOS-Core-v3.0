@@ -46,7 +46,7 @@ from aios_core.recommendation.proactive import (
     ProactiveMemoryRecommender,
     RecommendationBundle,
 )
-from aios_core.recommendation.topic_state import TopicStateService
+from aios_core.recommendation.topic_state import TopicState, TopicStateService
 from aios_core.revision.service import ClaimRevisionRequest, CognitionRevisionService
 from aios_core.review import (
     OperationExperienceRequest,
@@ -64,6 +64,9 @@ from aios_core.wake import Step0GateInput, Step0GateResult, WakeBus, WakeStateRe
 
 from .capabilities import CapabilityKind, CapabilityRegistry, CapabilitySpec
 from .cognitive_runtime import CognitiveRuntime, ModelHandler, RuntimeTurnResult
+
+
+_AUTO_TOPIC = object()
 
 
 @dataclass(frozen=True, slots=True)
@@ -1724,7 +1727,7 @@ class FusedTurnRuntime:
         turn_index: int,
         user_input: str,
         occurred_at: datetime,
-        current_topic: str | None = None,
+        current_topic: str | None | object = _AUTO_TOPIC,
         recent_turns: Sequence[Mapping[str, Any]] = (),
         ai_identity: Mapping[str, Any] | None = None,
         task_context: Mapping[str, Any] | None = None,
@@ -1767,11 +1770,28 @@ class FusedTurnRuntime:
             summary_trigger_tokens=summary_trigger_tokens,
         )
 
-        topic_state = self.topic_state.resolve(
-            user_input=user_input,
-            recent_turns=continuity_snapshot.recent_turns,
-            explicit_topic=current_topic,
-        )
+        if current_topic is _AUTO_TOPIC:
+            topic_state = self.topic_state.resolve(
+                user_input=user_input,
+                recent_turns=continuity_snapshot.recent_turns,
+                explicit_topic=None,
+            )
+        elif current_topic is None:
+            # Compatibility and explicit control: callers that deliberately pass
+            # current_topic=None are closing the proactive-memory topic gate for
+            # this turn. Callers that omit current_topic get Core-owned topic state.
+            topic_state = TopicState(
+                topic=None,
+                gate_open=False,
+                history_may_help=False,
+                reason="explicit_no_topic_override",
+            )
+        else:
+            topic_state = self.topic_state.resolve(
+                user_input=user_input,
+                recent_turns=continuity_snapshot.recent_turns,
+                explicit_topic=str(current_topic),
+            )
         recommendation = self.recommender.recommend(
             current_topic=topic_state.topic,
             subject_id=self.subject_id,
