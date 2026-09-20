@@ -1120,5 +1120,18 @@
   "20555a14893d65b2a6b0d2cb0ab15219e85acef7d4a36c86aec2b081ef3b743b": {
     "kind": "response",
     "response": "准备这一步已经有两份一致证据：你确认灭火器周围清开、通道记录已打印，照片也能看到这两点。所以我把“准备已完成”和“明天检查能否通过”分开：前者已经确认，后者仍等实际检查结果。当前系统对这种纯核验任务还缺一个合法的内部 Outcome 收口路径，我不会为了关任务而伪造结果。"
+  },
+  "608dff5193f460d30c5a75b4e79497cf7f6a8440dfbeb66b60c133b0e2318d87": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan18-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
   }
 }
