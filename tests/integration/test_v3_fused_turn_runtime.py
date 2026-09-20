@@ -1,5 +1,9 @@
 from datetime import datetime, timedelta, timezone
 
+from aios_core.contracts.enums import SourceClass
+from aios_core.contracts.models import Observation
+from aios_core.contracts.operations import OperationRequest
+from aios_core.contracts.time import TemporalExtent
 from aios_core.ingest.conversation import ConversationIngestor
 from aios_core.query.search import WorldSearchIndex
 from aios_core.runtime.capabilities import CapabilityCall
@@ -90,3 +94,78 @@ def test_model_can_ignore_empty_prefetch_and_deep_search(tmp_path):
     assert result.recommendation.cards == ()
     assert len(result.runtime.capability_history) == 1
     assert result.runtime.response == "之前的记录里预算是三百元。"
+
+
+def test_model_can_request_all_dimensions_projection(tmp_path):
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    objects = [
+        Observation(
+            object_id="obs_work_runtime",
+            subject_id="user_1",
+            occurred=TemporalExtent.point(NOW - timedelta(hours=4)),
+            learned_at=NOW - timedelta(hours=4),
+            recorded_at=NOW - timedelta(hours=4),
+            created_by="runtime-test",
+            source_kind="virtual_life",
+            modality="text",
+            value="项目今天持续加班。",
+            metadata={"dimension": "dim:work"},
+        ),
+        Observation(
+            object_id="obs_sleep_runtime",
+            subject_id="user_1",
+            occurred=TemporalExtent.point(NOW - timedelta(hours=2)),
+            learned_at=NOW - timedelta(hours=2),
+            recorded_at=NOW - timedelta(hours=2),
+            created_by="runtime-test",
+            source_kind="virtual_life",
+            modality="text",
+            value="昨晚入睡明显延后。",
+            metadata={"dimension": "dim:sleep"},
+        ),
+    ]
+    store.commit(
+        objects,
+        OperationRequest(
+            operation_name="test.seed.multidim",
+            expected_world_revision=0,
+            reason="seed runtime projection",
+            idempotency_key="seed-runtime-projection",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    def model(snapshot):
+        if not snapshot.capability_history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="request_all_dimensions_projection",
+                        arguments={
+                            "dimensions": ["dim:work", "dim:sleep"],
+                            "window_start": (NOW - timedelta(days=1)).isoformat(),
+                            "window_end": NOW.isoformat(),
+                        },
+                    ),
+                )
+            )
+        result = snapshot.capability_history[-1]
+        assert result.ok is True
+        assert [item["dimension"] for item in result.data["slices"]] == ["dim:work", "dim:sleep"]
+        assert "causal_conclusion" not in result.data
+        return ModelDirective(response="两个维度都出现了变化，但目前只能确认时间上同时出现，不能直接断言因果。")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    result = runtime.run_turn(
+        session_id="current",
+        turn_index=1,
+        user_input="我今天整体状态有什么变化？",
+        current_topic=None,
+        occurred_at=NOW,
+    )
+
+    assert result.runtime.response.startswith("两个维度都出现了变化")
+    assert result.runtime.capability_history[0].name == "request_all_dimensions_projection"
