@@ -7,134 +7,285 @@
 
 ## 当前快照
 
-- 时间：2026-09-20 14:35 +08:00
-- 最后已验证功能代码锚点：`e677de516a2e2b3d785455db36013a74aebf01d4`
-- 验证 Gate：`p11-dimension-gate` / run `35491309407` / **success**
-- 当前项目阶段：**P11 已完成，进入 P12 Goal / Task / Action / Outcome**
-- 当前主干状态：**统一世界、索引、推荐、上下文、认知写回、翻案传播、AI世界、动态维度注册已经闭环**
-- 当前 blocker：**未来目标、任务、现实行动与结果仍未接入统一 Resident Runtime；现有 Goal/Task/Action/Outcome 契约需要重新收口**
-- 下一主任务：**P12 Goal / Task / Action / Outcome / Scheduler**
+- 时间：2026-09-20 17:00 +08:00
+- 最后已验证功能代码锚点：`02b3f006d77c6396e3f8575e8547a5363582738f`
+- 验证 Gate：C09 初始闭环合并后复核 `c09-wake-dispatch` / run `35501126516` / **success**；去重身份加固 Gate run `35501301595` / **success**
+- 当前项目阶段：**P16 多模型独立长期入住测试**
+- 当前主干状态：**P0-P15 已闭环；P16 盲测暴露的 C09 Wake 总线/通用调度缺口已修复并合入 main。Observation 仍默认只入世界；只有注册机械条件/Task/Review 等形成 Wake 后才调度 Resident AI。**
+- 当前 blocker：**P16 benchmark PR #1 仍需基于当前 main 重新对齐并审查；随后才能进入真实 GPT / Claude / Gemini 等独立 habitation runs。**
+- 下一主任务：**对齐并审查 P16 PR #1，然后用真实模型执行隐藏人生长期入住；不再重做 P12/P15/C09。**
 
-## P11 已完成并通过 Gate
+## P13 已完成并通过 Gate
 
-- Resident AI 可先 `list_dimensions` 再判断是否需要新观察轴：GREEN
-- Resident AI 可 `propose_dimension`：GREEN
-- Proposal 必须有 pinned Evidence：GREEN
-- 系统仅做 schema / identity / lifecycle / transaction 校验：GREEN
-- 无固定 2-domain / 3-day / 30-day / 70% 认知门槛：GREEN
-- Candidate / Trial / Active / Dormant / Reactivated / Revised / Rejected / Merged / Split / Archived 状态机：GREEN
-- Resident AI 可 `transition_dimension`：GREEN
-- 维度 lifecycle 保留 revision 历史：GREEN
-- Archived / Rejected / Merged / Split 不进入默认 current retrieval：GREEN
-- DimensionDefinition / Derivation 已进入统一世界索引：GREEN
-- 动态维度不建立第二 Registry 真相库：GREEN
+- 通用 SourceAdapterSpec：GREEN
+- explicit source dimension：GREEN
+- USER / SENSOR reality source boundary：GREEN
+- Canonical Observation：GREEN
+- 时区统一为 UTC，并保留原始时间表示：GREEN
+- adapter_id + external_record_id + external_revision 精确幂等：GREEN
+- source identity 内容冲突 fail closed：GREEN
+- Payment / Order 保持独立来源维度：GREEN
+- 图片/录音长期入口为 descriptor / transcript，不保存 raw binary：GREEN
+- raw binary 输入会被拒绝并留下 ingest failure audit：GREEN
+- 高频数值流按显式 tolerance/change-threshold 机械压缩：GREEN
+- numeric change 只表示数值变化，不生成健康/心理意义：GREEN
+- 旧 semantic purifier / keyword evidence classifier 明确禁止迁回：GREEN
+- P13 聚合 Gate：GREEN
 
-## 当前可运行主链
+## P13 Post-Gate 红队加固
+
+P13 完成后又做了一轮独立正确性审计，并通过 PR #3 合入主线：
+
+- stable ID 改为结构化 canonical JSON 哈希，消除分隔符边界碰撞：GREEN
+- Reality / failure audit / numeric 对象身份加入 `subject_id`，消除跨用户对象碰撞：GREEN
+- adapter / external_record / revision 身份文本统一规范化：GREEN
+- source digest 覆盖 dimension / source_class / schema / locator / interval，adapter 语义漂移 fail closed：GREEN
+- durable read 只把明确 `NOT_FOUND` 当不存在；存储损坏/不可用不再被吞掉：GREEN
+- Reality commit 使用确定性 operation identity，竞态窗口 exact retry 可走 WorldStore idempotency：GREEN
+- numeric series 对既有对象校验 source digest，偷改 sample / policy / unit / locator 会拒绝：GREEN
+- `series_id` 明确定义为一个不可变 compression batch/window 的身份：GREEN
+- NaN / Infinity 在 numeric contract 边界拒绝：GREEN
+- 通用 RealityRecord 支持时间区间，不再强制把日历/睡眠等区间压成时间点：GREEN
+- reused existing 路径也执行 index catch-up，可修复前次提交后投影滞后：GREEN
+- 原并行 PR #2 已关闭，禁止形成第二套 reality-ingest 实现：DONE
+- 公共 ingest 边界重新验证 Pydantic frozen models，防止 `model_copy(update=...)` 绕过 SourceAdapter / RealityRecord / Numeric Policy 约束：GREEN
+- Failure Audit 身份加入 external revision、adapter semantics、locator 与 failure digest，避免不同来源修订/Schema 漂移被错误折叠成同一个失败事件：GREEN
+- numeric change 不再跨 `max_gap_seconds` 观测空洞伪造瞬时变化事件：GREEN
+- numeric segment provenance 改为 range + digest，避免高频长区间把全部 source ids / locators 再复制一遍而抵消压缩收益：GREEN
+- nested binary 检测支持 BaseModel/dataclass/cyclic container，防止二进制通过包装对象绕过长期事实边界或造成递归崩溃：GREEN
+- 合并提交：`f21960967431d8a96e3f37de75bdcd2a3b8e81dc`
+- 合并后 P13 聚合 Gate：run `35498395468` **success**
+- 合并后 P13 reality Gate：run `35498395508` **success**
+
+以上是 P13 的 post-gate hardening，不改变当前主阶段 **P14**。
+
+## P14 已完成并通过 Gate
+
+- `recent_turns` 不再依赖调用方维护，非空外部注入会被拒绝：GREEN
+- 当前 session 的最近完整轮次从统一 WorldStore 重建：GREEN
+- Conversation identity 纳入 subject，跨用户同 session/turn 不再碰撞：GREEN
+- deterministic scheduler 负责选择需要总结的闭合 turn range：GREEN
+- summary 内容由注入的真实模型 handler 生成，系统不写固定“认知总结”：GREEN
+- round summary 以 Summary 世界对象持久化，并 pin 每条 raw user/assistant Observation：GREEN
+- raw dialogue 永久保留，summary 仅作为 continuity index：GREEN
+- `drill_down_conversation` 可由 summary source refs 回捞 exact raw dialogue：GREEN
+- token budget 裁掉 summary 内容时仍可通过 `list_conversation_summaries` → raw drill-down 恢复：GREEN
+- summary 模型失败不阻断当前用户回复，raw facts 保留；重启后待总结区间可重新发现：GREEN
+- 新 session 不自动灌入旧 session summaries；跨 session 仍走 recommendation/index：GREEN
+- 18 轮长会话回归：1-4 / 5-8 / 9-12 / 13-16 形成顺序 summary windows，17-18 保留 recent raw，36 条原始对话零删除：GREEN
+- P14 合并 PR：#4
+- P14 功能合并 SHA：`76d179d48d1bb222c3d18eb5c435dd6f0c9ba212`
+- 合并后 P14 Gate：run `35499189697` **success**
+- 合并后 fused runtime：run `35499189641` **success**
+- P9 / P10 / P11 / P12 / P13 / conversation-world 合并后回归：**all success**
+
+## 当前可运行数据链
 
 ```text
-Reality / Conversation
+Phone / App / Sensor / Media
 ↓
-Observation / Event / Summary
+SourceAdapterSpec
 ↓
-WorldSearchIndex / Recommendation
+RealityRecord / MediaDescriptor / NumericSample
 ↓
-ContextController
+dedupe + UTC normalize + provenance
 ↓
-Resident Model
-├─ search_world
-├─ inspect_world_object
-├─ read_ai_world
-├─ list_dimensions
-├─ request_all_dimensions_projection
-├─ commit_claim
-├─ commit_ai_world_claim
-├─ revise_claim / retract_claim
-├─ propose_dimension
-└─ transition_dimension
+Canonical Observation
+或
+mechanical numeric segment/change
 ↓
-Unified WorldStore
+WorldStore
 ↓
-Evidence / Dependency / Revision / Lifecycle
+WorldSearchIndex / Summary
 ↓
-Index catch-up
-↓
-next turn
+Resident AI later forms cognition
 ```
 
-## P12 当前目标
+## P14 机制说明（已完成）
 
-P12 要让 AI 从“理解世界”进入“持续帮助用户”。
+解决一个真实模型在单个长会话中超过上下文窗口后“前面聊过什么不知道”的问题。
 
-目标闭环：
+必须保持：
 
 ```text
-World / User Intent / AI Cognition
+Raw User/AI Dialogue 永久在 World
 ↓
-Goal
+当前会话 rolling state
 ↓
-Task
+达到 token / turn 阈值
 ↓
-Condition / Schedule / Authorization
+模型生成 round summary
 ↓
-Action proposal
+summary 作为快速 continuity index
 ↓
-授权后执行
+后续模型默认看：
+- 最近原始轮次
+- 较早 round summaries
 ↓
-Outcome
+用户引用旧内容时
 ↓
-World writeback
+先命中 summary
 ↓
-AI根据 Outcome 学习 / 修正 Goal、Task、Strategy
+再按 summary source refs / session range
+   drill-down 到 exact raw dialogue
 ```
 
-## P12 关键边界
+## P14 关键边界
 
-1. Goal = 长期方向；Task = 可执行工作；Action = 一次现实副作用；Outcome = 真实结果。
-2. Goal / Task / Action / Outcome 全部进入统一世界，不建第二任务数据库。
-3. AI可以主动提出 Goal / Task，但不得伪造用户授权。
-4. 外部副作用默认需要 capability-specific authorization。
-5. 内部纯世界读写与现实外部动作必须分开。
-6. Action 必须引用 Goal / Task / Evidence / 当前世界状态。
-7. 执行失败也要形成 Outcome，不能静默消失。
-8. Outcome 可作为 AI Strategy / Calibration / User Understanding 的 Evidence。
-9. Scheduler 只负责确定性时机和条件，不替 AI 决定“为什么要做”。
-10. 不允许为了测试直接给模型固定 expected action 文本。
+1. 轮总结只服务同一长会话的 context continuity。
+2. 轮总结不等于 AI对用户的认知。
+3. raw dialogue 永久保留，不因“已经总结”而删除。
+4. 总结由模型生成；系统负责何时要求总结、哪些轮次进入窗口、token预算。
+5. 不允许 summary 用新的意义覆盖原始用户/AI原话。
+6. summary 必须 pin 它覆盖的 raw conversation Observation refs。
+7. 多轮总结可以进一步做 session-level summary，但仍只是 continuity index。
+8. 当前会话回捞优先按 session_id / turn range 精确定位，再用文本语义辅助。
+9. 新会话不自动加载旧会话全部 round summaries；跨会话仍走智能推荐/世界索引。
+10. recent_turns 不应继续依赖外部调用方手工维护。
 
-## P12 首批必读
+## P14 首批必读
 
-新仓：
-1. `docs/constitution/AIOS_v3.0_Goal_Task_Constitution.md`
-2. `docs/constitution/AIOS_v3.0_Action_System_Constitution.md`
-3. `src/aios_core/contracts/models.py`
-4. `src/aios_core/contracts/enums.py`
+1. `docs/constitution/AIOS_v3.0_Long_Context_Continuity_Constitution.md`
+2. `docs/constitution/AIOS_v3.0_User_AI_Interaction_Dimension_Constitution.md`
+3. `src/aios_core/ingest/conversation.py`
+4. `src/aios_core/context/controller.py`
 5. `src/aios_core/runtime/turn_runtime.py`
-6. `src/aios_core/storage/sqlite_store.py`
+6. `src/aios_core/summaries/dimension_summary.py`
+7. `src/aios_core/query/search.py`
 
-旧仓择优来源：
-7. Goal / Task / Action / Outcome state machines
-8. scheduler / conditional engine
-9. world operator / operation receipts
-10. external side-effect authorization code
+## P14 禁止事项
 
-## P12 禁止事项
+- 不删除 raw dialogue 来解决 token 限制。
+- 不把 round summary 写成 User Understanding Claim。
+- 不让系统用固定模板生成“认知总结”。
+- 不跨 session 默认灌入所有历史。
+- 不把 long-context continuity 与智能推荐重新混成一个机制。
+- 不把 summary 当 source of truth。
+- 不因 context budget 截断而静默丢失可回捞路径。
 
-- 不把 Task 当聊天 TODO 文本。
-- 不把 Action 执行权默认交给任意模型输出。
-- 不因任务完成就删除历史 Goal/Task。
-- 不让 Scheduler 自动生成高阶目标。
-- 不把 Outcome 只写日志而不进入世界。
-- 不用固定 demo 工具证明“行动能力”。
-- 不绕过用户授权去执行外部副作用。
+## P15 已完成并通过 Gate
+
+- deterministic scheduler 只决定 review 时间与 bounded candidate window：GREEN
+- review anchor 全部使用 pinned world refs：GREEN
+- Review Wake 生命周期 NEW → RUNNING → COMPLETED：GREEN
+- crash 后 RUNNING review 可在重启后恢复：GREEN
+- 无新 world changes 时写 SUPPRESSED marker，不调用模型：GREEN
+- 完成边界使用 exclusive-start，review 自己的同刻 writeback 不机械触发下一轮：GREEN
+- Periodic Review 复用同一个 Resident Cognitive Runtime 与 CapabilityRegistry：GREEN
+- review instruction 不伪造成用户 Conversation Observation：GREEN
+- review anchors 通过分页能力按需读取，不把完整世界塞进固定 cockpit：GREEN
+- Resident AI 可在 review 中 revise / retract 旧 Claim：GREEN
+- Resident AI 可形成 Calibration / Strategy / Self 等 evidence-grounded cognition：GREEN
+- OperationExperience 必须引用至少一个 pinned real case：GREEN
+- OperationExperience 与 CommunicationExperience 进入统一世界索引：GREEN
+- scheduler 本身不生成“用户成长/AI成长/策略更好”等语义结论：GREEN
+- P15 宪法：`docs/constitution/AIOS_v3.0_Periodic_Review_Growth_Constitution.md`
+- P15 功能锚点：`3261eae4967632ea4ef72669ef53ef3dfe5199a7`
+- P15 Gate：run `35499766871` / **success**
+
+## P16 入住测试发现并关闭：C09 Wake 调度闭环
+
+2026-09-20 的严格顺序 blind self-resident habitation 暴露出一个实现缺口；回查旧仓 `Haneof/fantonghui@aios-2.0` 的 v3.0 正式法统后确认：
+
+- Observation **默认只写入世界，不直接唤醒 AI**；
+- 第 77~83 条要求机械触发只负责“是否值得叫醒 AI”，不得替 AI 形成语义结论；
+- ADJ-003 要求机械命中统一经过 Wake 去重 / 合并 / 冷却；
+- Wake Reason 是任务第一指针，不是认知结论；
+- Task 到期与 periodic review 都是合法 Wake 来源；
+- Step-0 负责确定性安全 / 方便度 / 信道 / 预算门禁。
+
+因此原实验中“RealityIngest 不直接唤醒 AI”不是 bug。真正缺口是 **机械 Trigger → Wake Bus → Step-0 → 通用 Wake Dispatcher → 同一 Resident Runtime** 的中央接线。
+
+现已通过 PR #7 合入：
+
+- 初始闭环 SHA：`6f1e20307cd1ce47aefff281f652da16af635992`
+- 当前加固功能 SHA：`02b3f006d77c6396e3f8575e8547a5363582738f`
+- `WakeBus`：GREEN
+- exact trigger retry 幂等：GREEN
+- 连续命中合并：GREEN
+- cooldown suppression：GREEN
+- Step-0 `OK / QUIET / HARD_BLOCK`：GREEN
+- model 暂不可调用时 Wake 保留为 `QUEUED`：GREEN
+- 注册 Observation 机械规则：GREEN
+- P13 `numeric_change + mechanical_threshold_event` → 注册规则 → Wake：GREEN
+- 通用 `FusedTurnRuntime.run_wake()`：GREEN
+- `TASK_DUE Wake` → 同一 Resident CognitiveRuntime → Task 后续状态：GREEN
+- QUIET 时允许后台认知但禁止对外投放：GREEN
+- background Wake 不伪造 Conversation Observation：GREEN
+- P15 Review → Task → P12 TASK_DUE → C09 Resident Dispatch 跨阶段闭环：GREEN
+- P12 / P14 / P15 / fused runtime / P9-P11 / world kernel/index 回归：全部 GREEN
+- 合并后初始 main 验证：`c09-wake-dispatch` run `35501126516` / **success**
+- Wake dedupe identity hardening：`wake_source + rule_id + dedupe_key` 共同定义合并作用域；延迟 exact retry 仍幂等；新 out-of-order hit fail closed：Gate run `35501301595` / **success**
+
+实验 PR #5 与旧基线 PR #6 已关闭，仅保留历史证据；不得合入。
+
+## P16 当前目标
+
+用多个真实模型、隐藏虚拟人生和长时间跨度数据测试：
+
+> AIOS 中的模型是否真的依靠世界、索引、Summary、认知修正、Goal/Action/Outcome 与周期 Review 逐渐形成连续理解，而不是靠测试脚本偷做认知。
+
+当前已有并行施工线：
+
+- PR #1：`parallel/p16-habitation-harness-20260920`
+- PR #5：`experiment/p16-self-resident-blind-replay-20260920`（实验证据已关闭，不合并）
+
+P16 必须重点验证：
+
+```text
+隐藏人生事件流
+↓
+Reality / Conversation 进入 World
+↓
+真实 Resident Model 多轮入住
+↓
+模型自主形成 / 修正 cognition
+↓
+Goal / Task / Action / Outcome
+↓
+Periodic Review
+↓
+跨天 / 跨阶段继续运行
+↓
+评价：
+- 是否记住真正相关历史
+- 是否会找错记忆
+- 是否会形成错误高阶理解
+- 是否会自我强化错误
+- 是否会根据新证据翻案
+- 是否会创建无意义维度
+- 是否会把 summary 当事实
+- 是否会在没有 Outcome 时伪造经验
+- 是否能在重启/换模型后继续生活在同一个 World
+```
+
+## P16 禁止事项
+
+- 不把 expected answer 写进模型可见输入。
+- 不用数万道固定题让程序几秒钟字符串匹配“通过”。
+- 不写小程序替 Resident AI 做总结、认知、因果或人格判断。
+- 测试 harness 可以机械计分事实可追溯性、引用正确性、状态机与泄漏，但不能替模型完成认知任务。
+- 隐藏 ground truth 只能用于 reviewer 评分，Resident Model 不得看到。
+- 多 Agent 是多个模型分别入住/测试同一套 AIOS 机制，不是让一堆 Agent 在世界里互相协作完成固定答案。
+- P16 分支不得重新造第二套 World、Index、Recommendation、Runtime 或 Review 系统。
+
+## 当前工程断点
+
+- 时间：2026-09-20 16:32 +08:00
+- 最后已验证功能代码锚点：`3261eae4967632ea4ef72669ef53ef3dfe5199a7`
+- 最近 Green Gate：`p15-periodic-review` run `35499766871` / **success**
+- 当前阶段：**P16 多 Agent 长期入住测试**
+- 当前 blocker：**PR #1 仍基于旧主线，需要重新对齐当前 main；对齐后继续审 blind / hidden-life / world isolation，避免测试脚本代替模型认知。**
+- 下一动作：**只处理 PR #1 的最新主线对齐与 P16 benchmark 审计；之后执行真实模型 habitation runs。PR #5 已关闭，C09 已进入 main，不再作为待开发项。**
 
 ## 当前不可推翻的已决事项
 
-- 世界唯一；所有模块都写同一个 WorldStore。
-- 索引唯一公共能力。
-- AI认知可修正；Observation 不倒写。
-- 维度平级。
-- AI负责意义，程序负责确定性机制。
-- 用户授权与外部副作用必须有独立边界。
-- PseudoLLM / 固定题库不得作为认知或行动 Gate。
+- 世界唯一、索引公共。
+- 推荐负责“当前要不要给哪些历史”；索引负责“到哪里找”。
+- 同一长会话 continuity 是独立机制，不替代跨会话推荐。
+- 原始对话是事实，轮总结只是索引。
+- 模型负责总结内容，系统负责调度。
+- AI认知必须另走 Claim / Evidence / Revision。
 
 ## 恢复现场规则
 

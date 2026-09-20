@@ -63,6 +63,8 @@ class MaintenanceClass(StrEnum):
     PRUNE = "prune"
     INDEX_META = "index_meta"
     POLICY_SYNC = "policy_sync"
+    PERIODIC_REVIEW = "periodic_review"
+    WAKE_SCHEDULER = "wake_scheduler"
 
 
 class PredictionVerificationState(StrEnum):
@@ -221,6 +223,7 @@ class WakeSource(StrEnum):
     USER_INTERACTION = "user_interaction"
     SAFETY = "safety"
     RECOVERY = "recovery"
+    PERIODIC_REVIEW = "periodic_review"
 
 
 class WakeState(StrEnum):

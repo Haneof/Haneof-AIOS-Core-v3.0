@@ -161,7 +161,7 @@
 | `src/aios_core/tools/resonance_synthesizer.py` | **B-改造迁移** | `core/events/candidate_alignment.py` | 保留工程能力，删除硬编码认知/平行真相库/越权语义并接入统一世界。 |
 | `src/aios_core/wake/__init__.py` | **G-重新生成** | `对应新包入口` | 不复制历史导出列表；按融合后的目录重新生成。 |
 | `src/aios_core/wake/cooldown_queue.py` | **E-移出Core/后置** | `platform/attention/cooldown_queue.py` | 有产品/硬件价值，但不应阻塞Core第一版；安全逻辑后续单独审计适配。 |
-| `src/aios_core/wake/dispatcher.py` | **E-移出Core/后置** | `platform/wake/dispatcher.py` | 有产品/硬件价值，但不应阻塞Core第一版；安全逻辑后续单独审计适配。 |
+| `src/aios_core/wake/dispatcher.py` | **E-移出Core/后置** | `platform/wake/dispatcher.py` | **仍不迁回旧实现。** 该旧文件承担产品/硬件投放与安全承载职责，继续后置到 platform；当前 Core C09 的 `WakeBus` + `FusedTurnRuntime.run_wake()` 是按融合后法统重新生成的“durable Wake → Resident CognitiveRuntime”认知调度桥，不等同于旧产品 dispatcher。 |
 | `src/aios_core/wake/emergency_judge.py` | **E-移出Core/后置** | `platform/safety/emergency_flow.py` | 有产品/硬件价值，但不应阻塞Core第一版；安全逻辑后续单独审计适配。 |
 | `src/aios_core/wake/v22_hardware_first.py` | **E-移出Core/后置** | `platform/safety/hardware_first.py` | 有产品/硬件价值，但不应阻塞Core第一版；安全逻辑后续单独审计适配。 |
 | `src/aios_core/wearable/__init__.py` | **G-重新生成** | `对应新包入口` | 不复制历史导出列表；按融合后的目录重新生成。 |

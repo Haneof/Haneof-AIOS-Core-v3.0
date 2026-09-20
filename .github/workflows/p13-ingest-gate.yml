@@ -1,0 +1,30 @@
+name: p13-ingest-gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/aios_core/ingest/**"
+      - "src/aios_core/query/**"
+      - "src/aios_core/storage/**"
+      - "tests/integration/test_v3_reality_ingest.py"
+      - "tests/integration/test_v3_conversation_world_ingest.py"
+      - ".github/workflows/p13-ingest-gate.yml"
+  pull_request:
+    paths:
+      - "src/aios_core/ingest/**"
+      - "tests/integration/test_v3_reality_ingest.py"
+
+jobs:
+  p13:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - name: Run P13 reality-ingest closure
+        run: |
+          pytest             tests/integration/test_v3_reality_ingest.py             tests/integration/test_v3_conversation_world_ingest.py             tests/integration/test_m0_prime_store_delta_and_search.py             tests/integration/test_v3_dimension_summary.py             tests/integration/test_v3_fused_turn_runtime.py             tests/integration/test_v3_execution_world.py             tests/runtime/test_cognitive_runtime.py

@@ -76,11 +76,11 @@ Evidence + Dependency + Revision
 | P9 认知翻案与传播 | 新证据出现后让旧认知失效/修正并传播 | Revision / Retraction / Propagation | 依赖旧 Claim 的当前认知不能继续假装有效 | ✅ 已通过 P9 Gate |
 | P10 AI 用户理解 / 关系 / 自我世界 | 让 AI 长期理解“用户是什么 / 自己是什么 / 我们是什么关系” | User Understanding、Relationship、Self、Boundary、Calibration、Personality | 全部进入统一世界；可修正；有证据 | ✅ 已通过 P10 Gate |
 | P11 维度生命周期与注册 | AI 可提出、维护、合并、退休长期有价值维度 | Dimension proposal / registration / lifecycle | 禁止固定心理维度白名单替 AI 做认知 | ✅ 已通过 P11 Gate |
-| P12 Goal / Task / Action / Outcome | AI 从理解走向持续目标与行动 | Goal、Task、Action、Outcome、Scheduler | 行动可授权、可回滚、Outcome 可学习 | 🔵 当前主阶段 |
-| P13 数据接入与机械清洗 | 对话外现实持续进入世界 | 手机/App/传感器/相册/麦克风/日历等 adapter | 数据接入不得越权产生高阶认知 | ⏳ 待做 |
-| P14 长会话连续性完整接线 | 超长单会话不因 context limit 失忆 | rolling state、轮总结、summary drill-down | raw dialogue 永久保留；summary 只是索引 | 🟡 已有底座，未完整接线 |
-| P15 周期 Review / AI 成长 | AI 定期回看世界、修正理解、沉淀经验 | periodic review、operation experience、strategy learning | 不以固定模板替代模型判断 | ⏳ 待做 |
-| P16 多 Agent 长期入住测试 | 用真实模型和隐藏人生测试是否真的“活在世界中” | habitation simulator / hidden-life scenarios | 不以关键词题库证明认知能力 | ⏳ 待做 |
+| P12 Goal / Task / Action / Outcome | AI 从理解走向持续目标与行动 | Goal、Task、Action、Outcome、Scheduler | 行动可授权、可回滚、Outcome 可学习 | ✅ 已通过 P12 Gate |
+| P13 数据接入与机械清洗 | 对话外现实持续进入世界 | 手机/App/传感器/相册/麦克风/日历等 adapter | 数据接入不得越权产生高阶认知 | ✅ 已通过 P13 Gate |
+| P14 长会话连续性完整接线 | 超长单会话不因 context limit 失忆 | rolling state、轮总结、summary drill-down | raw dialogue 永久保留；summary 只是索引 | ✅ 已通过 P14 Gate |
+| P15 周期 Review / AI 成长 | AI 定期回看世界、修正理解、沉淀经验 | periodic review、operation experience、strategy learning | 不以固定模板替代模型判断 | ✅ 已通过 P15 Gate |
+| P16 多 Agent 长期入住测试 | 用真实模型和隐藏人生测试是否真的“活在世界中” | habitation simulator / hidden-life scenarios | 不以关键词题库证明认知能力 | 🔵 当前主阶段 |
 | P17 Core Release Gate | 形成第一个稳定可运行 AIOS Core | reproducible build、full CI、migration report | 世界闭环、认知闭环、任务闭环均稳定 | ⏳ 待做 |
 | P18 平台适配 | 把同一套 Core 放到真实运行环境 | Android/Linux service、device adapters | Core 语义不因平台重写 | ⏳ 后置 |
 | P19 产品层 | AIOS UI、数字人、系统入口、设备体验 | Launcher/UI/Voice/Digital Human | 产品层不得反向污染 Core 世界语义 | ⏳ 后置 |
@@ -137,7 +137,15 @@ P10 AI User Understanding / Relationship / Self / Calibration  ✅
                     ↓
 P11 Dynamic Dimension Lifecycle / Registration  ✅
                     ↓
-P12 Goal / Task / Action / Outcome  ← 当前下一主任务
+P12 Goal / Task / Action / Outcome  ✅
+                    ↓
+P13 Reality Data Ingest / Mechanical Cleaning  ✅
+                    ↓
+P14 Long Conversation Continuity  ✅
+                    ↓
+P15 Periodic Review / AI Growth  ✅
+                    ↓
+P16 Multi-Agent Long-Term Habitation Test  ← 当前主任务
 ```
 
 P9 要解决的核心场景：
@@ -174,11 +182,11 @@ Dependency reverse propagation
 P9 认知翻案传播 ✅
 → P10 AI用户理解 / AI自我 / 关系 / 认知边界 / 校准 ✅
 → P11 动态维度生命周期 ✅
-→ P12 Goal / Task / Action / Outcome ← 当前
-→ P13 多源现实数据接入
-→ P14 长会话连续完整接线
-→ P15 周期Review与AI经验成长
-→ P16 多Agent长期入住测试
+→ P12 Goal / Task / Action / Outcome ✅
+→ P13 多源现实数据接入 ✅
+→ P14 长会话连续完整接线 ✅
+→ P15 周期Review与AI经验成长 ✅
+→ P16 多Agent长期入住测试 ← 当前
 → P17 Core Release Gate
 → P18 Android/Linux平台适配
 → P19 产品UI/数字人/硬件

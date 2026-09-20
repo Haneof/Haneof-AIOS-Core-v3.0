@@ -328,6 +328,20 @@ class Goal(WorldObject):
     app_ids: list[str] = Field(default_factory=list)
     confidence: float = Field(ge=0.0, le=1.0)
 
+    @model_validator(mode="after")
+    def validate_goal_refs(self) -> "Goal":
+        for field_name in [
+            "related_dimension_refs",
+            "related_event_refs",
+            "related_task_refs",
+        ]:
+            for ref in getattr(self, field_name):
+                if ref.revision is None:
+                    raise ValueError(
+                        f"{field_name} requires pinned ObjectRef revisions"
+                    )
+        return self
+
 
 class Dependency(WorldObject):
     object_type: Literal[ObjectType.DEPENDENCY] = ObjectType.DEPENDENCY
@@ -378,7 +392,15 @@ class Task(WorldObject):
             self.timezone_name,
             "timezone_name",
         )
-        for field_name in ["reason_refs", "execution_refs", "outcome_refs"]:
+        if self.goal_ref is not None and self.goal_ref.revision is None:
+            raise ValueError("goal_ref requires pinned ObjectRef revision")
+        for field_name in [
+            "reason_refs",
+            "dependency_refs",
+            "related_entity_refs",
+            "execution_refs",
+            "outcome_refs",
+        ]:
             for ref in getattr(self, field_name):
                 if ref.revision is None:
                     raise ValueError(
