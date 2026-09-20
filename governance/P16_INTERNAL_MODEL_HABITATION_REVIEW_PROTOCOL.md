@@ -1,9 +1,11 @@
-# P16 Internal Model Year-Long Resident Habitation Protocol
+# P16 Internal Model Year-Long Segmented Resident Habitation Protocol
 
 > Status: ACTIVE
 > Scope: internal large-model habitation / red-team discovery
 > Authority: `main` is implementation truth; this protocol does not amend constitutional semantics.
 > Intake: GitHub Issue #30 — `P16 Internal Model Habitation Review Queue`
+>
+> Execution model: **one continuous simulated life, accumulated across resumable Resident segments. A single chat/session is NOT required to carry all 365 days.**
 
 ## 0. Core rule: the reviewer model itself must live inside AIOS
 
@@ -108,9 +110,9 @@ A life should vary across many dimensions, such as:
 
 The life may be generated dynamically, but it must remain coherent as one person's evolving life.
 
-## 3. Minimum duration: one complete simulated year
+## 3. Minimum duration: one complete simulated year, accumulated across segments
 
-Each reviewer MUST complete at least:
+Each reviewer MUST complete one coherent life totaling at least:
 
 - **365 consecutive simulated days**;
 - **12 month boundaries**;
@@ -128,6 +130,12 @@ Each reviewer MUST complete at least:
 - at least **4 runtime restart / resume points**;
 - at least **1 secondary decoy subject** used for isolation probes.
 
+**The 365 days are cumulative across resumable segments. They do not have to be completed in one chat window, one provider conversation, one process, or one Arena session.**
+
+Recommended segment size is roughly **7–30 simulated days**. Shorter or longer segments are allowed when justified by the life, model limits, or a failure being investigated.
+
+At every segment boundary, the previous Resident process/session MUST be considered disposable. The next segment must be able to continue from durable AIOS state rather than relying on hidden chat context.
+
 A reviewer may exceed these numbers.
 
 A sparse timeline such as “20 events spread across 365 days” is INVALID.
@@ -135,6 +143,8 @@ A sparse timeline such as “20 events spread across 365 days” is INVALID.
 A run that batch-generates a year of answers first and then replays them is INVALID.
 
 A run that evaluates the whole year only at the end without allowing earlier model decisions to affect later world state is INVALID.
+
+A run that claims continuity only because one giant chat context still remembers the previous months is INVALID as evidence of AIOS long-horizon continuity.
 
 ## 4. Minimum Resident cognition requirement
 
@@ -169,6 +179,136 @@ A pre-generated response list cannot count.
 
 A model output copied from another reviewer cannot count.
 
+## 4A. Segmented continuation is the default long-horizon execution model
+
+A one-year habitation SHOULD be executed as a sequence of resumable segments.
+
+For example:
+
+- Segment 001: day 1–14;
+- Segment 002: day 15–30;
+- Segment 003: day 31–45;
+- ...;
+- final segment: through at least day 365.
+
+The exact boundaries are not fixed.
+
+### 4A.1 Same life, same durable World
+
+All segments for one reviewer life MUST continue the same logical AIOS World and the same subject identity.
+
+The next segment must resume from the prior segment's committed durable state, including where applicable:
+
+- WorldStore / World revision;
+- WorldSearchIndex rebuildable state or watermark;
+- raw Observation history;
+- current Claims / revisions / retractions;
+- Entity / Relation state;
+- Goal / Task / Action / Outcome state;
+- pending or running Wake state;
+- Periodic Review state;
+- Summary objects and raw drill-down refs;
+- learned OperationExperience / CommunicationExperience / CognitivePolicy;
+- conversation turn cursors reconstructable from World;
+- simulated time cursor.
+
+Do not start a fresh World for each segment and later concatenate reports.
+
+### 4A.2 Fresh model context at segment boundaries
+
+A segment boundary SHOULD use a fresh Resident model conversation/process context.
+
+The resumed Resident MUST NOT receive a pasted hidden transcript, private scratchpad, chain-of-thought, manually written memory dump, or evaluator summary that AIOS itself would not expose.
+
+The Resident may receive only:
+
+- the normal Resident system instruction;
+- the current AIOS RuntimeSnapshot / cockpit;
+- capabilities exposed by current Core;
+- data retrieved through legitimate AIOS capabilities;
+- mechanical run metadata that contains no semantic future knowledge.
+
+This requirement turns restart/resume into part of the test rather than a nuisance.
+
+### 4A.3 Resident identity and model swaps
+
+The logical Resident identity must remain continuous across the life.
+
+Use the same model family / candidate identity across segments when available.
+
+If the actual provider/model changes at a segment boundary, record that as an explicit **replacement-model restart probe**. Do not silently claim that two different model identities are one uninterrupted provider session.
+
+A replacement model may continue the same AIOS World, but the report must preserve model provenance per segment.
+
+### 4A.4 Required segment checkpoint
+
+At the end of every segment, persist an auditable checkpoint before ending the session.
+
+The checkpoint MUST include at least:
+
+- habitation run id;
+- reviewer id;
+- logical Resident id;
+- segment id / ordinal;
+- tested main SHA;
+- segment simulated start and end;
+- cumulative simulated day count;
+- next life-event cursor or equivalent monotonic event position;
+- cumulative Resident cognition checkpoint count;
+- subject id;
+- World database/artifact location;
+- current World revision;
+- current index watermark where available;
+- current simulated time cursor;
+- pending/running Wake ids where applicable;
+- active Goal/Task refs where applicable;
+- model/provider identity for the segment;
+- provider provenance summary where available;
+- SHA-256 or equivalent digest for the checkpoint manifest and preserved World artifact where the environment allows it;
+- previous segment checkpoint digest/reference, forming a chain.
+
+Recommended evidence layout:
+
+`reviews/internal_habitation/<reviewer-id>/checkpoint.json`
+
+and immutable per-segment evidence under:
+
+`reviews/internal_habitation/<reviewer-id>/segments/<segment-id>/`
+
+The mutable `checkpoint.json` points to the latest completed segment. Previous segment evidence must remain available.
+
+### 4A.5 Resume rule
+
+Before starting the next segment:
+
+1. load the preserved World from the prior checkpoint;
+2. verify subject id and World continuity;
+3. verify the prior checkpoint digest/reference;
+4. restore the simulated cursor from durable checkpoint state;
+5. rebuild/reopen indexes through normal Core mechanisms;
+6. start a fresh Resident model context;
+7. expose only current-time AIOS state;
+8. continue from the next unconsumed external life event.
+
+If the resumed run moves the simulated clock backwards, silently resets World revision, duplicates already-consumed semantic events, or requires hidden previous-chat memory, the continuity chain is broken and must be reported.
+
+### 4A.6 Why segmentation does not weaken the one-year requirement
+
+Segmentation changes only the transport/session lifetime.
+
+It does **not** reduce:
+
+- 365-day total duration;
+- cognition density;
+- event density;
+- required mechanisms;
+- evidence requirements;
+- uniqueness of the life;
+- need for real Resident semantic decisions.
+
+The purpose is to test whether AIOS itself carries continuity when the model session does not.
+
+
 ## 5. What automation is allowed
 
 Automation is allowed only for **mechanical world operations**.
@@ -188,6 +328,9 @@ A helper program MAY:
 - persist logs;
 - collect metrics;
 - snapshot World state;
+- write/read mechanical segment checkpoint manifests;
+- preserve and verify World/checkpoint hashes;
+- restore a saved World into a fresh Resident process/session;
 - replay exact raw facts for reproduction;
 - check deterministic invariants;
 - measure latency, storage, index lag and token usage.
@@ -383,10 +526,11 @@ If that separation cannot be maintained reliably, use separate passes or separat
 
 ## 10. Required proof that the model really lived the year
 
-Every important Resident semantic step must be auditable.
+Every important Resident semantic step must be auditable, and segmented runs must also prove an unbroken checkpoint chain across sessions.
 
 For Resident cognition checkpoints, record as much as the environment allows:
 
+- habitation run id and segment id;
 - simulated timestamp;
 - model identity;
 - reviewer identity;
@@ -405,7 +549,9 @@ For Resident cognition checkpoints, record as much as the environment allows:
 - retries;
 - later revision or rollback if one occurs.
 
-The final report must include a compact trace index.
+For segmented runs, also preserve per-segment checkpoint manifests, previous/next checkpoint linkage, cumulative counters, World artifact identity/hash where available, and resume evidence showing that the new session reopened the prior durable World rather than starting a fresh one.
+
+The final report must include a compact trace index and segment index.
 
 If the reviewer cannot provide evidence that key semantic decisions came from actual Resident-model invocations, those portions of the run do not count.
 
@@ -522,6 +668,8 @@ The report MUST contain:
 - simulated start date;
 - simulated end date;
 - total simulated days;
+- total segment count;
+- segment boundary list;
 - total observable events;
 - total Resident cognition checkpoints;
 - user-AI interaction count;
@@ -535,6 +683,7 @@ The report MUST contain:
 - Life Director design summary;
 - mechanisms exercised;
 - trace evidence location;
+- segment checkpoint / resume evidence location;
 - exact reproducible findings;
 - evidence object ids / revisions / timestamps where available;
 - expected mechanism vs observed mechanism;
@@ -564,12 +713,14 @@ It may still be submitted as a harness/performance experiment, but it must not b
 
 Commit your report and optional evidence artifacts to your own review branch.
 
-Then add one short comment to Issue #30 containing:
+After the first segment, and again whenever a materially important finding appears or the annual run completes, keep the same review branch updated. The final completion comment to Issue #30 must contain:
 
 - branch name;
 - tested `main` SHA;
 - report path;
 - simulated day count;
+- segment count;
+- latest completed segment id;
 - Resident cognition checkpoint count;
 - BLOCKER / HIGH / MEDIUM / LOW / OPTIMIZATION counts;
 - whether the 365-day requirement was completed;
@@ -603,7 +754,10 @@ One reproducible defect outweighs twenty copied opinions.
 
 Your assignment is complete only if all of the following are true:
 
-- at least 365 consecutive simulated days completed;
+- at least 365 consecutive simulated days completed cumulatively across a single checkpoint-linked life;
+- every segment resumed the same durable AIOS World or explicitly documented a continuity failure;
+- segment checkpoints form an auditable chain;
+- fresh model-context boundaries did not depend on hidden previous-chat memory;
 - density requirements completed;
 - at least 365 real Resident cognition checkpoints completed;
 - the life is materially unique;
