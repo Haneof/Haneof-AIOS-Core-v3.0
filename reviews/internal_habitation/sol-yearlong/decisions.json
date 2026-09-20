@@ -138,5 +138,18 @@
         }
       }
     ]
+  },
+  "414a8052f860e712aa9dd1a98c24e8b829b18bce796f7b34ed1d54fd70c3303d": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "search_world",
+        "call_id": "sol-wake-search-conflicting-arrangements",
+        "arguments": {
+          "query": "妹妹 机场 周五 面粉 到货 收货 安排",
+          "limit": 12
+        }
+      }
+    ]
   }
 }
