@@ -181,7 +181,23 @@ tests/habitation/fixtures/
     └── learning_independence_v1.json    <- evaluator only
 ```
 
-## 10. Deliberately deferred until Core APIs stabilize
+
+
+## 10. Initial hidden-life scenario catalog
+
+The foundation now ships with four resident/oracle-separated scenario families:
+
+| Scenario | What the resident model experiences | Evaluator focus |
+|---|---|---|
+| `learning-independence-v1` | learning behavior evolves across weeks with one setback | longitudinal pattern, useful dimension discovery, noise resilience |
+| `cross-session-continuity-v1` | later conversation uses a vague reference to an earlier trip | cross-session continuity, relevant recall, context restraint |
+| `cognition-revision-v1` | an old routine is explicitly changed by later evidence | forward revision, historical preservation, stale suppression |
+| `uncertainty-restraint-v1` | sparse ambiguous behavior could tempt over-generalization | epistemic restraint, uncertainty preservation |
+
+These fixtures do not contain expected model response strings. The resident stream
+contains only life events. Evaluator truth lives in separate oracle files.
+
+## 11. Deliberately deferred until Core APIs stabilize
 
 Do not wire these into the benchmark yet:
 
