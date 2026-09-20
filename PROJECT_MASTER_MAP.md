@@ -74,8 +74,8 @@ Evidence + Dependency + Revision
 | P7 ALL_DIMENSIONS 全维投影 | 同一时间窗观察多个平级维度 | AllDimensionsProjectionService | 保留来源与类型；不产生父维度/自动因果 | ✅ 已通过 |
 | P8 认知写回闭环 | AI 将有证据认知写回世界 | EvidenceSet + Claim + Dependency | 无 pinned Evidence 不得写 Claim；原事实不改 | ✅ 已通过 |
 | P9 认知翻案与传播 | 新证据出现后让旧认知失效/修正并传播 | Revision / Retraction / Propagation | 依赖旧 Claim 的当前认知不能继续假装有效 | ✅ 已通过 P9 Gate |
-| P10 AI 用户理解 / 关系 / 自我世界 | 让 AI 长期理解“用户是什么 / 自己是什么 / 我们是什么关系” | User Understanding、Relationship、Self、Boundary、Calibration、Personality | 全部进入统一世界；可修正；有证据 | 🔵 当前主阶段 |
-| P11 维度生命周期与注册 | AI 可提出、维护、合并、退休长期有价值维度 | Dimension proposal / registration / lifecycle | 禁止固定心理维度白名单替 AI 做认知 | ⏳ 待做 |
+| P10 AI 用户理解 / 关系 / 自我世界 | 让 AI 长期理解“用户是什么 / 自己是什么 / 我们是什么关系” | User Understanding、Relationship、Self、Boundary、Calibration、Personality | 全部进入统一世界；可修正；有证据 | ✅ 已通过 P10 Gate |
+| P11 维度生命周期与注册 | AI 可提出、维护、合并、退休长期有价值维度 | Dimension proposal / registration / lifecycle | 禁止固定心理维度白名单替 AI 做认知 | 🔵 当前主阶段 |
 | P12 Goal / Task / Action / Outcome | AI 从理解走向持续目标与行动 | Goal、Task、Action、Outcome、Scheduler | 行动可授权、可回滚、Outcome 可学习 | ⏳ 待做 |
 | P13 数据接入与机械清洗 | 对话外现实持续进入世界 | 手机/App/传感器/相册/麦克风/日历等 adapter | 数据接入不得越权产生高阶认知 | ⏳ 待做 |
 | P14 长会话连续性完整接线 | 超长单会话不因 context limit 失忆 | rolling state、轮总结、summary drill-down | raw dialogue 永久保留；summary 只是索引 | 🟡 已有底座，未完整接线 |
@@ -133,7 +133,9 @@ P8 Evidence-grounded Cognition Writeback  ✅
                     ↓
 P9 Revision / Retraction / Dependency Propagation  ✅
                     ↓
-P10 AI User Understanding / Relationship / Self / Calibration  ← 当前下一主任务
+P10 AI User Understanding / Relationship / Self / Calibration  ✅
+                    ↓
+P11 Dynamic Dimension Lifecycle / Registration  ← 当前下一主任务
 ```
 
 P9 要解决的核心场景：
@@ -168,8 +170,8 @@ Dependency reverse propagation
 
 ```text
 P9 认知翻案传播 ✅
-→ P10 AI用户理解 / AI自我 / 关系 / 认知边界 / 校准 ← 当前
-→ P11 动态维度生命周期
+→ P10 AI用户理解 / AI自我 / 关系 / 认知边界 / 校准 ✅
+→ P11 动态维度生命周期 ← 当前
 → P12 Goal / Task / Action / Outcome
 → P13 多源现实数据接入
 → P14 长会话连续完整接线
