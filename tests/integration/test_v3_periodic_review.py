@@ -443,3 +443,294 @@ def test_periodic_review_can_revise_old_cognition_from_new_world_evidence(tmp_pa
     assert latest["revision"] == 2
     assert latest["content"] == "用户当前每天喝咖啡。"
     assert latest["status"] == "active"
+
+
+def test_operation_experience_rejects_non_real_cross_subject_and_assistant_evidence(tmp_path):
+    store, index, observation, _, _ = _seed_real_outcome(tmp_path)
+    service = PeriodicReviewService(store=store, index=index)
+
+    claim = CognitionWritebackService(
+        store=store,
+        index=index,
+    ).commit_claim(
+        ClaimWriteRequest(
+            content="这是 AI 自己形成的判断，不是真实结果。",
+            evidence_refs=(ObjectRef(object_id=observation.object_id, revision=1),),
+            confidence=0.7,
+            dimension="dim:test_self_reinforcement",
+        ),
+        learned_at=NOW,
+    )
+    with pytest.raises(ValueError, match="real result evidence"):
+        service.commit_operation_experience(
+            OperationExperienceRequest(
+                problem_type="self_reinforcement",
+                method_path=("infer",),
+                result_summary="不能把 Claim 当真实结果。",
+                positive_case_refs=(
+                    ObjectRef(object_id=claim.claim_id, revision=1),
+                ),
+            ),
+            learned_at=NOW + timedelta(minutes=1),
+        )
+
+    foreign = Observation(
+        object_id="obs_foreign_result_p15",
+        subject_id="user_2",
+        occurred=TemporalExtent.point(NOW),
+        learned_at=NOW,
+        recorded_at=NOW,
+        created_by="p15-test",
+        source_kind="conversation",
+        modality="text",
+        value="另一个用户的反馈。",
+        metadata={"dimension": "dim:user_ai_interaction", "role": "user"},
+    )
+    store.commit(
+        [foreign],
+        OperationRequest(
+            operation_name="test.seed.p15.foreign_result",
+            expected_world_revision=int(store.current_world_revision()),
+            reason="seed cross-subject evidence",
+            idempotency_key="seed-p15-foreign-result",
+            source_class=SourceClass.USER,
+        ),
+    )
+    with pytest.raises(ValueError, match="another subject"):
+        service.commit_operation_experience(
+            OperationExperienceRequest(
+                problem_type="cross_subject",
+                method_path=("reuse",),
+                result_summary="不能跨用户借结果。",
+                positive_case_refs=(
+                    ObjectRef(object_id=foreign.object_id, revision=1),
+                ),
+            ),
+            learned_at=NOW + timedelta(minutes=2),
+        )
+
+    assistant_observation = Observation(
+        object_id="obs_assistant_output_p15",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW),
+        learned_at=NOW,
+        recorded_at=NOW,
+        created_by="conversation_ingest:assistant",
+        source_kind="user_ai_interaction",
+        modality="text",
+        value="我认为刚才的方法已经成功。",
+        metadata={
+            "dimension": "dim:user_ai_interaction",
+            "role": "assistant",
+        },
+    )
+    store.commit(
+        [assistant_observation],
+        OperationRequest(
+            operation_name="test.seed.p15.assistant_output",
+            expected_world_revision=int(store.current_world_revision()),
+            reason="seed assistant output observation",
+            idempotency_key="seed-p15-assistant-output",
+            source_class=SourceClass.AI_COGNITION,
+        ),
+    )
+    with pytest.raises(ValueError, match="assistant observation"):
+        service.commit_operation_experience(
+            OperationExperienceRequest(
+                problem_type="assistant_echo",
+                method_path=("answer",),
+                result_summary="AI 自己的输出不能证明自己成功。",
+                positive_case_refs=(
+                    ObjectRef(
+                        object_id=assistant_observation.object_id,
+                        revision=1,
+                    ),
+                ),
+            ),
+            learned_at=NOW + timedelta(minutes=3),
+        )
+
+    with pytest.raises(ValueError, match="both positive and negative"):
+        OperationExperienceRequest(
+            problem_type="polarity_collision",
+            method_path=("same_case",),
+            result_summary="同一案例不能同时正负。",
+            positive_case_refs=(
+                ObjectRef(object_id=observation.object_id, revision=1),
+            ),
+            negative_case_refs=(
+                ObjectRef(object_id=observation.object_id, revision=1),
+            ),
+        )
+
+
+def test_operation_experience_identity_covers_semantics_and_case_polarity(tmp_path):
+    store, index, observation, _, _ = _seed_real_outcome(tmp_path)
+    service = PeriodicReviewService(store=store, index=index)
+    ref = ObjectRef(object_id=observation.object_id, revision=1)
+
+    first_request = OperationExperienceRequest(
+        problem_type="message_help",
+        method_path=("check", "send"),
+        result_summary="用户明确确认这条路径有效。",
+        positive_case_refs=(ref,),
+        applicability={"channel": "team"},
+        cost={"tool_rounds": 2.0},
+        misses=("none",),
+        experience_state="candidate",
+    )
+    first = service.commit_operation_experience(
+        first_request,
+        learned_at=NOW,
+    )
+    changed_summary = service.commit_operation_experience(
+        first_request.model_copy(
+            update={"result_summary": "相同案例后来得到不同的结果解释。"}
+        ),
+        learned_at=NOW + timedelta(minutes=1),
+    )
+    negative = service.commit_operation_experience(
+        OperationExperienceRequest(
+            problem_type="message_help",
+            method_path=("check", "send"),
+            result_summary="相同案例在这里作为负例。",
+            negative_case_refs=(ref,),
+            applicability={"channel": "team"},
+            cost={"tool_rounds": 2.0},
+            misses=("delivery_delay",),
+            experience_state="candidate",
+        ),
+        learned_at=NOW + timedelta(minutes=2),
+    )
+
+    assert len(
+        {
+            first.experience_id,
+            changed_summary.experience_id,
+            negative.experience_id,
+        }
+    ) == 3
+
+    before_replay = int(store.current_world_revision())
+    replay = service.commit_operation_experience(
+        first_request,
+        learned_at=NOW + timedelta(days=1),
+    )
+    assert replay.experience_id == first.experience_id
+    assert int(store.current_world_revision()) == before_replay
+
+
+def test_periodic_review_backlog_pages_do_not_permanently_skip_candidates(tmp_path):
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    observations = []
+    for i in range(5):
+        at = NOW - timedelta(hours=5 - i)
+        observations.append(
+            Observation(
+                object_id=f"obs_review_backlog_{i}",
+                subject_id="user_1",
+                occurred=TemporalExtent.point(at),
+                learned_at=at,
+                recorded_at=at,
+                created_by="p15-backlog-test",
+                source_kind="conversation",
+                modality="text",
+                value=f"review backlog fact {i}",
+                metadata={
+                    "dimension": "dim:user_ai_interaction",
+                    "role": "user",
+                },
+            )
+        )
+    store.commit(
+        observations,
+        OperationRequest(
+            operation_name="test.seed.p15.review_backlog",
+            expected_world_revision=0,
+            reason="seed more review candidates than one page can hold",
+            idempotency_key="seed-p15-review-backlog",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+    service = PeriodicReviewService(store=store, index=index)
+    policy = ReviewSchedulePolicy(
+        interval_hours=24,
+        lookback_hours=12,
+        max_candidates=2,
+        max_per_object_type=100,
+    )
+
+    seen = set()
+    page_sizes = []
+    moment = NOW
+    for _ in range(3):
+        request = service.prepare_due_review(now=moment, policy=policy)
+        assert request is not None
+        refs = {
+            anchor.object_ref.object_id
+            for anchor in request.anchors
+            if anchor.object_ref.object_id.startswith("obs_review_backlog_")
+        }
+        assert refs.isdisjoint(seen)
+        seen.update(refs)
+        page_sizes.append(len(refs))
+
+        running = service.begin_review(request, started_at=moment)
+        completed = service.complete_review(
+            running,
+            completed_at=moment,
+            termination_reason="responded",
+            model_rounds=1,
+            capability_names=(),
+        )
+        assert completed.state == "completed"
+        moment += timedelta(seconds=1)
+
+    assert seen == {item.object_id for item in observations}
+    assert page_sizes == [2, 2, 1]
+    assert service.prepare_due_review(now=moment, policy=policy) is None
+
+
+def test_periodic_review_budget_exhaustion_stays_running_and_can_resume(tmp_path):
+    store, index, _, _, _ = _seed_real_outcome(tmp_path)
+
+    def budget_hungry_model(snapshot):
+        return ModelDirective(
+            capability_calls=(
+                CapabilityCall(
+                    name="read_periodic_review_anchors",
+                    arguments={"offset": 0, "limit": 1},
+                ),
+            )
+        )
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=budget_hungry_model,
+        max_tool_rounds=0,
+    )
+    first = runtime.run_periodic_review(now=NOW)
+    assert first is not None
+    assert first.runtime.termination_reason == "tool_round_budget_exhausted"
+    assert first.wake.state == "running"
+    assert store.get_payload(first.wake.wake_id)["wake_state"] == "running"
+
+    restarted = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda snapshot: ModelDirective(
+            response="恢复未完成复盘并正常结束。"
+        ),
+    )
+    second = restarted.run_periodic_review(
+        now=NOW + timedelta(minutes=5),
+    )
+    assert second is not None
+    assert second.request.wake_ref.object_id == first.wake.wake_id
+    assert second.runtime.termination_reason == "responded"
+    assert second.wake.state == "completed"
+    assert second.wake.revision == 3
