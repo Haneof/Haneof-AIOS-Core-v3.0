@@ -924,12 +924,31 @@ class FusedTurnRuntime:
             for hit in page.hits
         ]
 
+    def _runtime_subject_scope(self) -> frozenset[str]:
+        """Subjects that belong to this resident private user/AI world."""
+
+        return frozenset({self.subject_id, self.ai_world.ai_subject_id})
+
+    def _scoped_payload(
+        self,
+        object_id: str,
+        revision: int | None = None,
+    ) -> dict[str, Any]:
+        payload = self.store.get_payload(str(object_id), revision=revision)
+        payload_subject = str(payload.get("subject_id") or "")
+        if payload_subject not in self._runtime_subject_scope():
+            raise ValueError(
+                "world object crosses the runtime private-world subject scope: "
+                f"{payload_subject!r}"
+            )
+        return payload
+
     def _inspect_world_object(
         self,
         object_id: str,
         revision: int | None = None,
     ) -> dict[str, Any]:
-        return self.store.get_payload(str(object_id), revision=revision)
+        return self._scoped_payload(str(object_id), revision=revision)
 
     def _read_periodic_review_anchors(
         self,
@@ -1475,21 +1494,24 @@ class FusedTurnRuntime:
     ) -> list[dict[str, Any]]:
         result: list[dict[str, Any]] = []
         for ref in self._coerce_refs(claim_refs):
-            payload = self.store.get_payload(ref.object_id, revision=ref.revision)
+            payload = self._scoped_payload(
+                ref.object_id,
+                revision=ref.revision,
+            )
             if payload.get("object_type") != ObjectType.CLAIM.value:
                 raise ValueError("compare_claims accepts only Claim references")
             result.append(
                 {
                     "claim": payload,
                     "support_evidence_sets": [
-                        self.store.get_payload(
+                        self._scoped_payload(
                             str(item["object_id"]),
                             revision=int(item["revision"]),
                         )
                         for item in payload.get("support_evidence_set_refs") or []
                     ],
                     "counter_evidence_sets": [
-                        self.store.get_payload(
+                        self._scoped_payload(
                             str(item["object_id"]),
                             revision=int(item["revision"]),
                         )
@@ -1504,7 +1526,7 @@ class FusedTurnRuntime:
         object_id: str,
         revision: int | None = None,
     ) -> dict[str, Any]:
-        payload = self.store.get_payload(str(object_id), revision=revision)
+        payload = self._scoped_payload(str(object_id), revision=revision)
         if payload.get("object_type") != ObjectType.OBSERVATION.value:
             raise ValueError("requested object is not an Observation")
         return payload
@@ -1531,11 +1553,14 @@ class FusedTurnRuntime:
             object_id=str(outcome_ref["object_id"]),
             revision=int(outcome_ref["revision"]),
         )
-        payload = self.store.get_payload(ref.object_id, revision=ref.revision)
+        payload = self._scoped_payload(
+            ref.object_id,
+            revision=ref.revision,
+        )
         if payload.get("object_type") != ObjectType.OUTCOME.value:
             raise ValueError("outcome_ref must point to an Outcome")
         action_ref = payload.get("action_ref") or {}
-        action = self.store.get_payload(
+        action = self._scoped_payload(
             str(action_ref["object_id"]),
             revision=int(action_ref["revision"]),
         )
