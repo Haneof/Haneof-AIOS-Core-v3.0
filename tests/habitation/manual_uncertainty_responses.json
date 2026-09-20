@@ -15,5 +15,10 @@
   {
     "snapshot_signature": "f729422ba2b0b29cfce9b2243d34ffc1f1c92108e875e5f6e1ac546a56b7fc6b",
     "type": "silence"
+  },
+  {
+    "snapshot_signature": "d881d61fa115278803088ec9249702592bc532b61f37717d504ba6bd53e2a1c3",
+    "type": "response",
+    "text": "明白，这次攀岩是朋友约的一次性活动，鞋也是临时买的。"
   }
 ]
