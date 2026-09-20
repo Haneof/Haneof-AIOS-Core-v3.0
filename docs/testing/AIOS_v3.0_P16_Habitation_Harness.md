@@ -72,10 +72,8 @@ This foundation intentionally does **not** modify:
 - WorldStore semantics
 - project checkpoint or current-stage status
 
-That makes it safe to build while P12 is being implemented.
-
-Future P16 adapters may consume P12-P15 public APIs after those stages stabilize,
-but this benchmark must not invent those APIs.
+That keeps this foundation safe to develop and review in parallel with Core work.
+It must consume stabilized public Core APIs later rather than defining Core semantics from the test side.
 
 ## 5. Benchmark topology
 
@@ -167,8 +165,11 @@ The isolated P16 foundation currently includes:
 6. evaluator finding/report schema;
 7. cross-model comparison matrix with no built-in winner or aggregate score;
 8. fresh-target factory path that creates one isolated AIOS target/world per model;
-9. physically separate resident event streams and evaluator-only oracle fixtures;
-10. CI checks that guard oracle non-leakage and shared-target rejection.
+9. mandatory per-target `isolation_key` for private world/store identity;
+10. virtual-clock `advance_to()` before every resident-visible event;
+11. evaluator-only `audit_snapshot()` after each completed life;
+12. physically separate resident event streams and evaluator-only oracle fixtures;
+13. CI checks that guard oracle non-leakage, future-information leakage, mutation isolation, and shared-world rejection.
 
 Example fixture layout:
 
@@ -199,16 +200,11 @@ contains only life events. Evaluator truth lives in separate oracle files.
 
 ## 11. Deliberately deferred until Core APIs stabilize
 
-Do not wire these into the benchmark yet:
-
-- P12 Goal / Task / Action / Outcome internals;
-- Scheduler implementation details;
-- P13 device/data adapters;
-- P15 periodic review implementation;
-- real provider-specific model adapters and credentials.
-
-Those integrations should consume stabilized public interfaces later rather than
-forcing P12-P15 to conform to an early test harness.
+Keep this foundation independent from stage-specific implementation internals.
+Follow-on adapter work may consume stabilized public interfaces for execution,
+reality ingestion, long-session continuity, periodic review, and provider models,
+but those integrations belong in separate changes so the benchmark foundation
+cannot silently redefine Core behavior.
 
 
 ## 12. Anti-contamination execution rules
@@ -223,7 +219,8 @@ Required runtime isolation:
 - do not include semantic scenario IDs, fixture filenames, manifest `purpose`,
   catalog `focus`, or evaluator criteria in model prompts/context;
 - model-side target factories receive only `ResidentScenarioDescriptor`, which
-  intentionally omits evaluator scenario ID/version and hidden oracle data;
+  currently contains only the opaque synthetic `subject_id`; it exposes no scenario
+  label, oracle, seed, future event count, future time range, or future channels;
 - every model target must expose a unique `isolation_key` representing its
   private AIOS world/store;
 - the resident event payload and metadata are deep-copied for each delivery so one
@@ -231,3 +228,24 @@ Required runtime isolation:
 
 Evaluator labels and oracle content may be loaded only after or outside the
 resident execution boundary.
+
+
+## 13. Long-horizon execution contract
+
+A resident target is not just a chat callback. To test AIOS over simulated days or
+months it must implement three independent surfaces:
+
+1. `advance_to(instant)`: advance that target's private virtual clock and process
+   deterministic work due up to the next visible life event.
+2. `handle_event(event)`: ingest exactly one resident-visible event after the
+   clock reaches that event's timestamp.
+3. `audit_snapshot()`: after the life finishes, expose an evaluator-only snapshot
+   of the resulting AIOS world/state.
+
+The runner deep-copies resident payloads, metadata, clock results, model responses,
+and the final audit snapshot. One model therefore cannot mutate the scenario or
+artifacts later consumed by another model.
+
+Hidden evaluator-only events are absent from the resident run entirely: their IDs,
+timestamps and channels are not emitted in `HabitationRun` or its serialized
+artifact.
