@@ -5,6 +5,6 @@
   "subject_id": "sol-resident-20260921-001",
   "resident_stream": "resident/sol_bootstrap.jsonl",
   "evaluator_oracle": "oracle/sol_bootstrap.json",
-  "purpose": "Continue the same unique GPT-5.6 Sol Resident life through Jan 15 with action-boundary, correction, sensor, task and evidence-discipline opportunities",
-  "end_at": "2027-01-15T23:00:00+00:00"
+  "purpose": "Continue the same unique GPT-5.6 Sol Resident life through Jan 18, including conditional reminder, preparation evidence, and real inspection outcome",
+  "end_at": "2027-01-18T23:00:00+00:00"
 }
