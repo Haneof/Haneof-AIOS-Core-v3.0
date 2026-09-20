@@ -83,6 +83,16 @@ def test_subject_scoped_search_and_cognition_block_cross_user_refs(tmp_path):
     assert page.hits
     assert {hit.subject_id for hit in page.hits} == {"user_1"}
 
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda _snapshot: ModelDirective(response="ok"),
+        subject_id="user_1",
+    )
+    with pytest.raises(ValueError, match="subject scope"):
+        runtime._inspect_world_object(user2_ref.object_id, revision=1)
+    assert runtime._inspect_world_object(user1_ref.object_id, revision=1)["subject_id"] == "user_1"
+
     writer = CognitionWritebackService(
         store=store,
         index=index,
