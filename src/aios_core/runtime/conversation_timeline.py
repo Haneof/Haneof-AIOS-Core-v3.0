@@ -16,6 +16,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import as_utc, canonical_utc_iso, utc_now
 from aios_core.storage.idempotency import canonical_json_dumps
 
@@ -23,18 +24,28 @@ from aios_core.storage.idempotency import canonical_json_dumps
 class ConversationTurn(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
+    subject_id: str = Field(default="user_1", min_length=1)
     session_id: str = Field(min_length=1)
     turn_index: int = Field(ge=1)
     turn_id: str = Field(min_length=1)
     user_text: str
     assistant_text: str
+    user_observation_ref: ObjectRef | None = None
+    assistant_observation_ref: ObjectRef | None = None
     occurred_at: datetime = Field(default_factory=utc_now)
     recorded_at: datetime = Field(default_factory=utc_now)
 
     @model_validator(mode="after")
     def validate_turn(self) -> "ConversationTurn":
-        if not self.session_id.strip() or not self.turn_id.strip():
-            raise ValueError("session_id/turn_id must not be blank")
+        if (
+            not self.subject_id.strip()
+            or not self.session_id.strip()
+            or not self.turn_id.strip()
+        ):
+            raise ValueError("subject_id/session_id/turn_id must not be blank")
+        for ref in (self.user_observation_ref, self.assistant_observation_ref):
+            if ref is not None and ref.revision is None:
+                raise ValueError("conversation world refs must pin exact revisions")
         occurred = as_utc(self.occurred_at, "occurred_at")
         recorded = as_utc(self.recorded_at, "recorded_at")
         if recorded < occurred:
@@ -49,6 +60,9 @@ class ConversationTurn(BaseModel):
         turn_index: int,
         user_text: str,
         assistant_text: str,
+        subject_id: str = "user_1",
+        user_observation_ref: ObjectRef | None = None,
+        assistant_observation_ref: ObjectRef | None = None,
         occurred_at: datetime | None = None,
         recorded_at: datetime | None = None,
     ) -> "ConversationTurn":
@@ -56,6 +70,7 @@ class ConversationTurn(BaseModel):
         recorded = recorded_at or utc_now()
         identity = canonical_json_dumps(
             {
+                "subject_id": subject_id,
                 "session_id": session_id,
                 "turn_index": turn_index,
                 "user_text": user_text,
@@ -65,11 +80,14 @@ class ConversationTurn(BaseModel):
         )
         digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:24]
         return cls(
+            subject_id=subject_id,
             session_id=session_id,
             turn_index=turn_index,
             turn_id=f"turn_{digest}",
             user_text=user_text,
             assistant_text=assistant_text,
+            user_observation_ref=user_observation_ref,
+            assistant_observation_ref=assistant_observation_ref,
             occurred_at=occurred,
             recorded_at=recorded,
         )
@@ -95,7 +113,8 @@ class ConversationTimelineStore:
         with self._connect() as conn:
             conn.execute(
                 """
-                CREATE TABLE IF NOT EXISTS runtime_conversation_turns(
+                CREATE TABLE IF NOT EXISTS runtime_conversation_turns_v2(
+                    subject_id TEXT NOT NULL,
                     session_id TEXT NOT NULL,
                     turn_index INTEGER NOT NULL,
                     turn_id TEXT NOT NULL UNIQUE,
@@ -103,14 +122,14 @@ class ConversationTimelineStore:
                     recorded_at TEXT NOT NULL,
                     payload_json TEXT NOT NULL,
                     payload_sha256 TEXT NOT NULL,
-                    PRIMARY KEY(session_id, turn_index)
+                    PRIMARY KEY(subject_id, session_id, turn_index)
                 )
                 """
             )
             conn.execute(
                 """
                 CREATE INDEX IF NOT EXISTS idx_runtime_turns_time
-                ON runtime_conversation_turns(session_id, occurred_at)
+                ON runtime_conversation_turns_v2(subject_id, session_id, occurred_at)
                 """
             )
             conn.commit()
@@ -132,10 +151,10 @@ class ConversationTimelineStore:
             existing = conn.execute(
                 """
                 SELECT payload_sha256, payload_json
-                FROM runtime_conversation_turns
-                WHERE session_id=? AND turn_index=?
+                FROM runtime_conversation_turns_v2
+                WHERE subject_id=? AND session_id=? AND turn_index=?
                 """,
-                (turn.session_id, turn.turn_index),
+                (turn.subject_id, turn.session_id, turn.turn_index),
             ).fetchone()
             if existing is not None:
                 if str(existing["payload_sha256"]) == digest:
@@ -147,8 +166,8 @@ class ConversationTimelineStore:
                 )
 
             previous = conn.execute(
-                "SELECT MAX(turn_index) AS idx FROM runtime_conversation_turns WHERE session_id=?",
-                (turn.session_id,),
+                "SELECT MAX(turn_index) AS idx FROM runtime_conversation_turns_v2 WHERE subject_id=? AND session_id=?",
+                (turn.subject_id, turn.session_id),
             ).fetchone()
             current = int(previous["idx"]) if previous and previous["idx"] is not None else 0
             if turn.turn_index != current + 1:
@@ -159,12 +178,13 @@ class ConversationTimelineStore:
 
             conn.execute(
                 """
-                INSERT INTO runtime_conversation_turns(
-                    session_id, turn_index, turn_id, occurred_at, recorded_at,
+                INSERT INTO runtime_conversation_turns_v2(
+                    subject_id, session_id, turn_index, turn_id, occurred_at, recorded_at,
                     payload_json, payload_sha256
-                ) VALUES(?,?,?,?,?,?,?)
+                ) VALUES(?,?,?,?,?,?,?,?)
                 """,
                 (
+                    turn.subject_id,
                     turn.session_id,
                     turn.turn_index,
                     turn.turn_id,
@@ -177,11 +197,17 @@ class ConversationTimelineStore:
             conn.commit()
         return turn
 
-    def get(self, session_id: str, turn_index: int) -> ConversationTurn | None:
+    def get(
+        self,
+        session_id: str,
+        turn_index: int,
+        *,
+        subject_id: str = "user_1",
+    ) -> ConversationTurn | None:
         with self._connect() as conn:
             row = conn.execute(
-                "SELECT payload_json FROM runtime_conversation_turns WHERE session_id=? AND turn_index=?",
-                (session_id, turn_index),
+                "SELECT payload_json FROM runtime_conversation_turns_v2 WHERE subject_id=? AND session_id=? AND turn_index=?",
+                (subject_id, session_id, turn_index),
             ).fetchone()
         return None if row is None else self._decode(str(row["payload_json"]))
 
@@ -189,16 +215,17 @@ class ConversationTimelineStore:
         self,
         session_id: str,
         *,
+        subject_id: str = "user_1",
         after_turn: int = 0,
         limit: int = 1000,
     ) -> list[ConversationTurn]:
         with self._connect() as conn:
             rows = conn.execute(
                 """
-                SELECT payload_json FROM runtime_conversation_turns
-                WHERE session_id=? AND turn_index>?
+                SELECT payload_json FROM runtime_conversation_turns_v2
+                WHERE subject_id=? AND session_id=? AND turn_index>?
                 ORDER BY turn_index ASC LIMIT ?
                 """,
-                (session_id, after_turn, max(1, int(limit))),
+                (subject_id, session_id, after_turn, max(1, int(limit))),
             ).fetchall()
         return [self._decode(str(row["payload_json"])) for row in rows]
