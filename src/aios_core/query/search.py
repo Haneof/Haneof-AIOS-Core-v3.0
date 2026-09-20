@@ -949,6 +949,145 @@ class WorldSearchIndex:
                 query_intent=" ".join(intent_parts) or "all",
             )
 
+    def recall_candidates(
+        self,
+        query_text: str,
+        *,
+        subject: str | None = None,
+        dimension: str | None = None,
+        object_types: Sequence[str] | None = None,
+        time_range: Tuple[datetime, datetime] | None = None,
+        limit: int = 20,
+    ) -> MindSearchPage:
+        """Broad lexical candidate generation for AI/system callers.
+
+        This is intentionally *candidate recall*, not semantic judgment. Query
+        tokens are OR-recalled and ranked by token overlap so the recommendation
+        system or resident model can decide what is actually relevant.
+        """
+
+        query = query_text.strip()
+        if not query:
+            raise ValueError("recall_candidates requires non-blank query_text")
+
+        current = int(self._store.current_world_revision())
+        wm_before = self.watermark()
+        if wm_before < current:
+            self.catch_up()
+        wm = self.watermark()
+
+        query_tokens = tokens_for(query)
+        if not query_tokens:
+            return MindSearchPage(
+                status="ok",
+                lag=current - wm,
+                world_revision=current,
+                index_watermark=wm,
+                hits=[],
+                total_estimated_tokens=0,
+                query_intent=query,
+            )
+
+        with self._connect() as conn:
+            hits_map = self._postings_for(conn, query_tokens)
+            if not hits_map:
+                return MindSearchPage(
+                    status="ok",
+                    lag=current - wm,
+                    world_revision=current,
+                    index_watermark=wm,
+                    hits=[],
+                    total_estimated_tokens=0,
+                    query_intent=query,
+                )
+
+            tombstones = {
+                str(row[0])
+                for row in conn.execute("SELECT object_id FROM search_tombstones").fetchall()
+            }
+
+            rows: list[tuple[sqlite3.Row, int]] = []
+            for (object_id, revision), score in hits_map.items():
+                if object_id in tombstones:
+                    continue
+                row = conn.execute(
+                    """
+                    SELECT o.object_id, o.revision, o.object_type, o.subject_id,
+                           o.dimension, o.occurred_start_us, o.occurred_end_us,
+                           d.excerpt
+                    FROM search_occurred o
+                    JOIN search_doc d
+                      ON d.object_id=o.object_id AND d.revision=o.revision
+                    WHERE o.object_id=? AND o.revision=?
+                    """,
+                    (object_id, revision),
+                ).fetchone()
+                if row is None:
+                    continue
+
+                latest = conn.execute(
+                    "SELECT MAX(revision) FROM search_occurred WHERE object_id=?",
+                    (object_id,),
+                ).fetchone()
+                if latest is not None and int(latest[0]) != int(revision):
+                    continue
+                if subject is not None and str(row["subject_id"]) != subject:
+                    continue
+                if dimension is not None and str(row["dimension"] or "") != dimension:
+                    continue
+                if object_types and str(row["object_type"]) not in set(object_types):
+                    continue
+
+                if time_range is not None:
+                    start_us = row["occurred_start_us"]
+                    end_us = row["occurred_end_us"]
+                    if start_us is None:
+                        continue
+                    t0 = int(time_range[0].astimezone(timezone.utc).timestamp() * 1_000_000)
+                    t1 = int(time_range[1].astimezone(timezone.utc).timestamp() * 1_000_000)
+                    effective_end = int(end_us if end_us is not None else start_us)
+                    if effective_end < t0 or int(start_us) > t1:
+                        continue
+
+                rows.append((row, int(score)))
+
+            rows.sort(
+                key=lambda item: (
+                    -item[1],
+                    -(int(item[0]["occurred_start_us"]) if item[0]["occurred_start_us"] is not None else -1),
+                    str(item[0]["object_id"]),
+                )
+            )
+
+            hits: list[MindSearchHit] = []
+            total_tokens = 0
+            for row, score in rows[: max(0, int(limit))]:
+                excerpt = str(row["excerpt"] or "")
+                estimated = max(10, len(excerpt) // 3)
+                total_tokens += estimated
+                hits.append(
+                    MindSearchHit(
+                        object_id=str(row["object_id"]),
+                        revision=int(row["revision"]),
+                        object_type=str(row["object_type"]),
+                        subject_id=str(row["subject_id"]),
+                        score=score,
+                        dimension=str(row["dimension"] or "dim_unclassified"),
+                        excerpt=excerpt,
+                        estimated_tokens=estimated,
+                    )
+                )
+
+            return MindSearchPage(
+                status="ok",
+                lag=current - wm,
+                world_revision=current,
+                index_watermark=wm,
+                hits=hits,
+                total_estimated_tokens=total_tokens,
+                query_intent=query,
+            )
+
     # ---------------- 快捷多维原语接口 ----------------
 
     def search_by_dimension(self, dimension: str, keywords: Sequence[str] = (), limit: int = 20) -> MindSearchPage:
