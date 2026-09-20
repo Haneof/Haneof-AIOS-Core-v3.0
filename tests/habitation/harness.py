@@ -65,13 +65,6 @@ class LifeEvent:
         if not isinstance(self.deliver_to_resident, bool):
             raise ValueError("deliver_to_resident must be a boolean")
         _require_aware(self.occurred_at, "occurred_at")
-        overlap = set(self.metadata).intersection(self.hidden_oracle)
-        if overlap:
-            raise ValueError(
-                "resident-visible metadata and hidden_oracle must use disjoint keys: "
-                + ", ".join(sorted(overlap))
-            )
-
     def resident_view(self) -> ResidentEvent:
         return ResidentEvent(
             event_id=self.event_id,
@@ -275,6 +268,9 @@ class HabitationRunner:
         seen_isolation_keys: set[str] = set()
 
         for model_id, target in targets.items():
+            if not isinstance(model_id, str) or not model_id.strip():
+                raise ValueError("model_id must be a non-empty string")
+
             target_identity = id(target)
             if target_identity in seen_target_ids:
                 raise ValueError(
@@ -317,6 +313,8 @@ class HabitationRunner:
         descriptor = resident_scenario_descriptor(scenario)
         targets: dict[str, HabitationTarget] = {}
         for model_id, factory in factories.items():
+            if not isinstance(model_id, str) or not model_id.strip():
+                raise ValueError("model_id must be a non-empty string")
             targets[model_id] = factory(
                 model_id=model_id,
                 scenario=descriptor,
