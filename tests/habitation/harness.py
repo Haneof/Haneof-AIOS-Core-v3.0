@@ -95,6 +95,7 @@ class HabitationScenario:
     tags: tuple[str, ...] = ()
     scenario_version: str = "1"
     seed: int = 0
+    end_at: datetime | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.scenario_id, str) or not self.scenario_id.strip():
@@ -115,6 +116,8 @@ class HabitationScenario:
             raise ValueError("seed must be an integer")
         if self.seed < 0:
             raise ValueError("seed must be >= 0")
+        if self.end_at is not None:
+            _require_aware(self.end_at, "end_at")
         if not isinstance(self.hidden_oracle, Mapping):
             raise ValueError("hidden_oracle must be a mapping")
         if not isinstance(self.tags, tuple) or not all(
@@ -131,6 +134,17 @@ class HabitationScenario:
             if previous is not None and event.occurred_at < previous:
                 raise ValueError("scenario events must already be chronological")
             previous = event.occurred_at
+
+        if self.end_at is not None:
+            last_visible_at = max(
+                event.occurred_at
+                for event in self.events
+                if event.deliver_to_resident
+            )
+            if self.end_at < last_visible_at:
+                raise ValueError(
+                    "end_at must not be before the last resident-visible event"
+                )
 
 
 class HabitationTarget(Protocol):
@@ -190,6 +204,7 @@ class HabitationRun:
     subject_id: str
     model_id: str
     steps: tuple[HabitationStep, ...]
+    final_time_advance_result: Any = None
     final_snapshot: Mapping[str, Any] = field(default_factory=dict)
 
     @property
@@ -244,6 +259,12 @@ class HabitationRunner:
                 )
             )
 
+        final_time_advance_result = None
+        if scenario.end_at is not None:
+            final_time_advance_result = deepcopy(
+                target.advance_to(scenario.end_at)
+            )
+
         snapshot = target.audit_snapshot()
         if not isinstance(snapshot, Mapping):
             raise ValueError("target audit_snapshot must return a mapping")
@@ -253,6 +274,7 @@ class HabitationRunner:
             subject_id=scenario.subject_id,
             model_id=model_id,
             steps=tuple(steps),
+            final_time_advance_result=final_time_advance_result,
             final_snapshot=deepcopy(dict(snapshot)),
         )
 
