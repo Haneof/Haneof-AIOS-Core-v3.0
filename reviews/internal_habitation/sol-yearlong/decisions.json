@@ -738,5 +738,26 @@
         }
       }
     ]
+  },
+  "b463868768b6a21b20dd3c6ef49ecf4508b3eb0476ac0da5238188979e886243": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "search_world",
+        "call_id": "sol-jan12-find-invoice-by-price",
+        "arguments": {
+          "query": "1.38",
+          "limit": 20
+        }
+      },
+      {
+        "name": "search_world",
+        "call_id": "sol-jan12-find-invoice-by-vendor",
+        "arguments": {
+          "query": "North Mill",
+          "limit": 20
+        }
+      }
+    ]
   }
 }
