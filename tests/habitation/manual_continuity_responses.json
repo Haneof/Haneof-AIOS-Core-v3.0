@@ -33,5 +33,9 @@
         }
       }
     ]
+  },
+  {
+    "snapshot_signature": "7e60a4712d1b83e7e555fb7bdc08e07c2126b03bbeb7f88c9dd27e6fdee45410",
+    "type": "silence"
   }
 ]
