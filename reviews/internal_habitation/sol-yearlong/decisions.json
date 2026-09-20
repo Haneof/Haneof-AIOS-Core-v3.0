@@ -1673,5 +1673,31 @@
         }
       }
     ]
+  },
+  "5b015b598c4a71c571f399ef609c954fc50eb94fde4552d901020859512bd37f": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "create_task",
+        "call_id": "sol-jan10-task-observe-morning-rush",
+        "arguments": {
+          "goal_ref": {
+            "object_id": "goal_c909920b70a6835d5a42833e",
+            "revision": 1
+          },
+          "title": "观察早高峰出品卡点",
+          "task_type": "observation",
+          "initial_state": "ready",
+          "priority": 85,
+          "reason_refs": [
+            {
+              "object_id": "obs_conv_user_abc43111f1a6bae550d02ee1",
+              "revision": 1
+            }
+          ],
+          "next_step": "先从实际早高峰记录中识别等待、返工、缺货或其他出品不稳定现象；没有事实依据前不预设原因，也暂不把菜单扩张作为当前优先任务。"
+        }
+      }
+    ]
   }
 }
