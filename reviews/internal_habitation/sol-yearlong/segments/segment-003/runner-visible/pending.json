@@ -1,5 +1,5 @@
 {
-  "decision_key": "fa4a1491a33407e68e122cab0cbc7582c4372d1e47adde6f582cc74d6cfd99b3",
+  "decision_key": "40b69f1276fe082fe88a56fed4357c2a28b4ea073870fb7ff4e905672b3e9a8d",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-resident.pending.v1",
   "simulated_clock": "2027-01-23T20:10:00+00:00",
@@ -540,7 +540,78 @@
         "side_effecting": true
       }
     ],
-    "capability_history": [],
+    "capability_history": [
+      {
+        "call_id": "seg003-family-old-reminder-state",
+        "data": {
+          "app_id": null,
+          "attempts": 0,
+          "cancel_condition": {},
+          "completion_condition": {},
+          "created_by": "execution_world:resident_ai",
+          "deadline": "2027-01-09T04:30:00Z",
+          "dependency_refs": [],
+          "execution_refs": [],
+          "goal_ref": null,
+          "learned_at": "2027-01-08T22:05:00Z",
+          "metadata": {
+            "task_origin": "resident_ai",
+            "task_state_history": [
+              {
+                "changed_at": "2027-01-08T22:05:00+00:00",
+                "from": "waiting_evidence",
+                "reason": "The user has now confirmed the sister's arrival at 22:40 and the flour delivery remains 04:30. These times do not overlap, and the user explicitly assigned airport pickup to self and flour receiving to Xiao Zhao.",
+                "to": "ready"
+              }
+            ]
+          },
+          "next_step": "Confirmed schedule: sister arrives 22:40 and flour delivery is 04:30; do not characterize them as a time conflict. Preserve the user's chosen delegation.",
+          "next_wake_at": null,
+          "object_id": "task_41571ce5cbcc6c736bb22f73",
+          "object_type": "task",
+          "occurred": {
+            "end": "2027-01-08T22:05:00Z",
+            "precision": "second",
+            "start": "2027-01-08T22:05:00Z",
+            "timezone_name": null,
+            "unknown": false
+          },
+          "outcome_refs": [],
+          "priority": 80,
+          "reason_refs": [
+            {
+              "object_id": "obs_src_100a0cc21a84d80627c61305",
+              "revision": 1
+            },
+            {
+              "object_id": "sum_50e2b6cb23814d5deec8d3af",
+              "revision": 1
+            }
+          ],
+          "recorded_at": "2027-01-08T22:05:00Z",
+          "recurrence": null,
+          "related_entity_refs": [],
+          "revision": 2,
+          "source_refs": [
+            {
+              "object_id": "obs_conv_user_ad04153c39dba332be3f72aa",
+              "revision": 1,
+              "source_locator": null
+            }
+          ],
+          "status": "active",
+          "subject_id": "sol-resident-20260921-001",
+          "task_state": "ready",
+          "task_type": "verification",
+          "timezone_name": null,
+          "title": "等待妹妹航班时间确认并检查安排冲突"
+        },
+        "error_code": null,
+        "error_message": null,
+        "name": "inspect_world_object",
+        "ok": true
+      }
+    ],
     "cockpit": {
       "ai_identity": {},
       "capability_catalog": [
@@ -916,8 +987,8 @@
       "truncated": false,
       "user_input": "明晚19点我和妹妹吃饭，小赵已经确认负责晚间收尾。这个安排现在已经定了，不用再提醒我，也别把它说成还在冲突。"
     },
-    "remaining_tool_rounds": 8,
-    "round_index": 0,
+    "remaining_tool_rounds": 7,
+    "round_index": 1,
     "user_input": "明晚19点我和妹妹吃饭，小赵已经确认负责晚间收尾。这个安排现在已经定了，不用再提醒我，也别把它说成还在冲突。",
     "wake_reason": "user_interaction"
   },
