@@ -68,9 +68,9 @@
 | 4 | `T36-SEARCH-001` | 结构化 Observation scalar 派生索引，不改原 typed fact，不做语义推断 | **DONE** | AUDIT-001 | PR #52; squash merge `07965029285cf3dfc0fdb5e506a65add60c76c29`; before-fix repro run `35566751016`; final candidate `afc62009340f4451d15400c4860ee880296d9c7c`; required Gates GREEN | dict/list/number/bool/null 可检索；rebuild=incremental；subject/current/inactive/tombstone/text 语义不退化；原 typed Observation 不改写 |
 | 5 | `T28-REC-001` | 普通推荐与 antecedent 路径统一隔离 assistant raw dialogue，避免把 AI 自己的话当用户事实主动推荐 | **DONE** | AUDIT-001 | PR #49; candidate `2a16d1ffaaec877356f4f281e82d884e6ac97ab5`; squash merge `e159ab30a12b819ca053085d5103460e66ef9f16`; required Gates GREEN | assistant raw dialogue 不再作为普通 proactive user/world memory；raw continuity/search/drill-down 保留；用户/外部 fact 与 evidence-grounded Claim 不退化 |
 | 6 | `T35-RULE-001` | 只做“非 Action Task 的可信完成凭据”语义裁决；不改 execution 代码 | **DONE** | AUDIT-001 | `governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md`; PR #53; semantic candidate `b58bbb31a04a119897890452e76461f14fd46288`; squash merge `6fcb51d6e2ecf6e2ab8ff0fa62013f094b32f21c` | 唯一裁决已形成：所有 Task 终态必须真实证据化；外部执行保持 Action→Outcome；非 Action Task 可用合格 pinned World evidence / validated durable artifact；禁止 AI 自述、伪 Outcome、循环 OperationExperience |
-| 7 | `T35-IMPL-001` | 按 T35-RULE-001 裁决实现 Task 完成闭环 | **READY** | T35-RULE-001, T34-EXEC-001 | T35-RULE-001 DONE; T34-EXEC-001 DONE via PR #54 / `48f5e29ad564ef7c1687b5a0d81cede1452e82e8`; dependencies satisfied; implementation remains a separate new-window task following `governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md` | 单独 PR；正常 Action/Outcome 不退化；非 Action Task 有合法真实凭据；P12/P15/P16 GREEN |
+| 7 | `T35-IMPL-001` | 按 T35-RULE-001 裁决实现 Task 完成闭环 | **DONE** | T35-RULE-001, T34-EXEC-001 | PR #55; candidate `07617df8ab87550289c1498cf3df387626d55e40`; squash merge `141dc177be895f9894a05227cbb132207ebf784d`; required candidate Gates GREEN; merge-result P12/P16 GREEN | 外部 Action/Outcome 保持强制链；WORLD_EVIDENCE / MIXED 按结构化 completion contract 校验；真实凭据、subject/current/provenance、幂等/restart/history 与 T34 回归全部 GREEN |
 | 8 | `T33-RECALL-001` | 用自包含表达/跨会话省略/无前文三类对照重新验证 recall 误触；只有复现才修 | **DONE** | AUDIT-001 | PR #51; candidate `91f1eecc1eb1a5aeb3dd2fa4566f045b6abea796`; squash merge `cb8eab12e9747bece41b14d183840e2cf13bd183`; repro run `35566569236`; required Gates GREEN | Case A/B/C、same-session canonical antecedent、assistant-raw exclusion、P14/Fused/P16 回归 GREEN；Core 只暴露候选，不绑定指代 |
-| 9 | `P16-TRIAGE-001` | 更新 PR #37 / Issue #30 中央证据分流到当前 segmented protocol；历史无效年度、PARTIAL、机械复现、有效缺陷分开登记 | **BLOCKED** | AUDIT-001, all activated T34/T36/T28/T35/T33 tasks resolved | PR #37 仍 open，base 较旧 | 冻结被评 Core SHA；不把旧“几天统计”冒充当前进度；中央报告进入 main |
+| 9 | `P16-TRIAGE-001` | 更新 PR #37 / Issue #30 中央证据分流到当前 segmented protocol；历史无效年度、PARTIAL、机械复现、有效缺陷分开登记 | **READY** | AUDIT-001, all activated T34/T36/T28/T35/T33 tasks resolved | all activated Core blockers resolved; T35 merged via PR #55 / `141dc177be895f9894a05227cbb132207ebf784d`; PR #37 仍 open，base 较旧 | 冻结被评 Core SHA；不把旧“几天统计”冒充当前进度；中央报告进入 main |
 | 10 | `P16-CAMPAIGN-001` | 建立/恢复唯一 P16 分段入住 Campaign Ledger：找出当前 canonical life、最后有效 segment、World/checkpoint digest、累计天数/交互/认知 checkpoint | **BLOCKED** | P16-TRIAGE-001 | `reviews/internal_habitation/ARENA_RESIDENT_YEARLONG_TASK.md` | 创建 `reviews/internal_habitation/P16_SEGMENT_PROGRESS_LEDGER.md`；历史 segment 不重复跑；下一 segment ID 唯一 |
 | 11 | `P16-RES-NEXT` | **一次只执行一个** Resident habitation segment（7–30 simulated days），模型本人逐次作语义判断 | **BLOCKED** | P16-CAMPAIGN-001 or previous P16-RES segment | Campaign Ledger 决定实际 segment number | 每个窗口只做 1 segment；保存 World/checkpoint/digest/时间/交互/认知计数；更新 ledger；未到 365 天则自动追加下一 `P16-RES-NEXT` |
 | 12 | `P16-YEAR-AUDIT-001` | 累计达到协议年度门槛后，对完整 Resident 年度证据做独立有效性审计 | **BLOCKED** | cumulative P16-RES >= protocol thresholds | — | 验证真实模型逐次决定、时间单调、跨窗口仅从 AIOS 恢复、无 future leak / pseudo-LLM；只给 VALID / PARTIAL / INVALID evidence verdict |
@@ -526,3 +526,65 @@ text Observation preservation, and no synthetic semantic inference.
   preserves the T28/T33 main regressions.
 - Next READY task by task-board ordering: **T35-IMPL-001** — new window only.
 - This T36 window stops here after checkpoint writeback.
+
+
+### T35-IMPL-001 completion — 2026-09-21
+
+```text
+Task ID: T35-IMPL-001
+Status: DONE
+Started from main: eeb982162e0e553a34039134bde3595abd2f3607
+Work branch: task/t35-impl-001-completion-evidence-20260921
+Candidate SHA: 07617df8ab87550289c1498cf3df387626d55e40
+PR: #55
+Merge SHA: 141dc177be895f9894a05227cbb132207ebf784d
+Required gates: P12 execution gate; P12 execution-world; P15 periodic review; fused-turn-runtime; C09 wake dispatch; P16 habitation harness; P16 convergence gate
+Gate run IDs / conclusions:
+- candidate p12-execution-gate 35569370381 / SUCCESS (76 passed across the P12 closure suite)
+- candidate p12-execution-world 35569370483 / SUCCESS
+- candidate p15-periodic-review 35569370484 / SUCCESS
+- candidate fused-turn-runtime 35569370409 / SUCCESS
+- candidate c09-wake-dispatch 35569370452 / SUCCESS
+- candidate p16-convergence-gate 35569370331 / SUCCESS (full pytest -q: 330 passed)
+- candidate-derived p16-habitation-harness 35569485261 / SUCCESS (92 passed); gate-only branch commit d52a51279171d10e074e92f396da03fdee49d3ee had candidate 07617df8... as its parent and only a temporary documentation trigger; branch was reset to candidate after the run
+- merge-result p12-execution-world 35569585991 / SUCCESS
+- merge-result p12-execution-gate 35569586060 / SUCCESS
+- merge-result p15-periodic-review 35569585969 / SUCCESS
+- merge-result fused-turn-runtime 35569586033 / SUCCESS
+- merge-result c09-wake-dispatch 35569586006 / SUCCESS
+- merge-result p16-convergence-gate 35569586008 / SUCCESS
+Evidence/report paths:
+- governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md
+- src/aios_core/execution/service.py
+- src/aios_core/runtime/turn_runtime.py
+- tests/integration/test_v3_execution_world.py
+- PR #55
+Implementation evidence:
+- existing Task.completion_condition now carries explicit world_evidence / action_outcome / mixed completion mode; TaskType is not overloaded
+- ambiguous legacy Tasks remain fail-closed to ACTION_OUTCOME; only legacy VERIFICATION / OBSERVATION receive the ruling's narrow mechanical WORLD_EVIDENCE compatibility when no Action lineage exists
+- WORLD_EVIDENCE terminal transitions require pinned current same-subject durable evidence; assistant raw dialogue, stale/retracted evidence, unsupported Claim, Task/Goal/self assertion, synthetic Outcome and Action-lineage bypasses are rejected
+- Claim/Summary work-product evidence is accepted only when explicitly allowed by the Task contract and grounded in current pinned supporting evidence
+- ACTION_OUTCOME requires a current real Outcome created by the execution-world platform-result path, tied to the Task's authorized terminal Action and durable outcome_reports_action dependency
+- MIXED requires both eligible World evidence and real Action-linked Outcome
+- COMPLETED and FAILED share the same evidence-grounded terminal boundary; absence/timeout does not create a FAILED credential
+- terminal evidence relationships are persisted as typed Dependency edges and in forward-only Task state history
+- identical terminal retry is idempotent across same-process and restarted service without advancing world_revision
+- Resident create_task capability now exposes structured completion_condition; transition_task description no longer repeats the invalid universal Outcome rule
+Regression evidence:
+- external Action completion still uses Action -> authorization -> execution -> Outcome -> Task
+- ordinary Observation cannot bypass ACTION_OUTCOME
+- non-Action verification and internal review/Claim paths complete from eligible evidence without fake Outcome
+- assistant self-assertion, synthetic Outcome, unsupported Claim, cross-subject evidence, historical/stale/retracted evidence are rejected
+- non-Action FAILED requires eligible durable evidence
+- retry/restart and historical revision immutability are covered
+- existing T34 cancellation / stale Action / restart / cancel-authorize race tests remain GREEN in P12
+Bugs found:
+- terminal validation lived too early in TaskTransitionRequest and universally required typed Outcome, forcing non-Action work toward fake execution lineage
+- execution service did not distinguish explicit completion evidence modes or validate terminal evidence provenance/currentness
+- Resident create_task capability could not supply the structured completion contract required by T35-RULE-001
+- terminal retries were not service-level idempotent after the Task revision advanced
+Deferred issues:
+- none inside T35-IMPL-001
+- P16-TRIAGE-001 was not executed in this window and is now the next READY task
+Next READY task: P16-TRIAGE-001 — new window only
+```
