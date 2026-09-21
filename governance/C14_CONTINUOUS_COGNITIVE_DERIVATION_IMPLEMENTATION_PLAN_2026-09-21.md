@@ -412,3 +412,67 @@ The acceptance criterion is not "more Claim count".
 The acceptance criterion is:
 
 > **world experience can reliably create an opportunity for evidence-grounded AI-world change, and that change can later affect behavior while remaining revisable.**
+
+
+## 10. PM hardening requirements adopted before C14-RULE-001
+
+The following document is now a mandatory normative input to every C14 task:
+
+- `governance/C14_COGNITIVE_DERIVATION_PM_HARDENING_REQUIREMENTS_2026-09-21.md`
+
+C14-RULE-001 must explicitly freeze the following additional acceptance boundaries before Core implementation starts:
+
+1. **Summary is trigger/navigation/compression, not sufficient terminal proof.** Durable high-level C14 cognition must have support provenance closure that reaches qualifying non-Summary leaf-world evidence. Summary-only / AI-cognition-only recursive support is insufficient.
+2. **Cross-dimensional cognition is mandatory to validate.** C14-RES-001 must include a scenario where no single dimension independently supports the cognition and the Resident must use combined multi-dimensional evidence.
+3. **Cognition must survive context replacement and affect later behavior.** At least one cognition must be consumed in a later new-session/new-runtime decision after only durable AIOS World/Index restoration.
+4. **Positive and negative controls are mandatory.** Similar event counts but different semantic evidence quality must produce cognition in one case and justified silence/UNKNOWN/no unsupported cognition in the other.
+5. **Provenance classification is derived, not a second truth system.** Routing eligibility must be mechanically computed from existing SourceClass plus transitive pinned source/dependency lineage; UNKNOWN fails closed.
+6. **Governance-first interpretation.** Prefer an authoritative C14 ruling over changes to the primary constitution; amend registry/constitution only if an actual unresolved normative gap is proven.
+
+### 10.1 Revised semantic acceptance equation
+
+C14 is not accepted merely because:
+
+```text
+Summary -> Claim
+```
+
+C14 is accepted only when the evidence shows:
+
+```text
+world facts
+  -> Summary creates cognition opportunity
+  -> Resident drills down / crosses dimensions
+  -> leaf-grounded EvidenceSet
+  -> cognition OR justified silence
+  -> new session + new runtime
+  -> cognition is recovered through AIOS
+  -> later decision materially consumes it
+  -> Outcome / new evidence
+  -> cognition can be revised or retained
+```
+
+### 10.2 Additional deterministic regressions required
+
+C14-SCHED/RUNTIME/LOOP implementation must add deterministic coverage for:
+
+- Summary-only evidence cannot satisfy the C14 durable high-level cognition ground rule;
+- nested Summary lineage resolves transitively to leaf source classes;
+- pure AI-cognition-only lineage cannot schedule immediate derivation;
+- mixed lineage never promotes AI-authored material into independent user fact;
+- UNKNOWN/incomplete lineage fails closed for immediate derivation;
+- new-runtime restoration can retrieve the same durable AI-world cognition revision through normal context/search capabilities;
+- no claim-count or wake-to-claim conversion target exists in runtime policy.
+
+### 10.3 C14-RES-001 semantic test matrix
+
+At minimum the real Resident validation must include four distinct checkpoints:
+
+| Checkpoint | Required evidence |
+|---|---|
+| Multi-dimensional positive | cognition is only reasonably supportable after combining multiple dimensions |
+| Negative silence control | comparable repetition exists but evidence remains insufficient/contradictory and no unsupported durable cognition is written |
+| New-session consumption | prior cognition is recovered after model session/runtime replacement and affects a later independent decision |
+| Revision feedback | later Outcome/new evidence can weaken, revise, retract, or confirm the previously consumed cognition |
+
+The evaluator must judge evidence quality and behavior, not object counts.

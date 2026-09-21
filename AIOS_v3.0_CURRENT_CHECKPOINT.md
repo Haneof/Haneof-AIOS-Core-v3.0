@@ -944,3 +944,30 @@ C14-RULE-001
 ```
 
 This planning window changes governance/prioritization only. It does **not** execute C14-RULE-001 or modify Runtime/Core semantics.
+
+
+---
+
+## 2026-09-21 — C14 PM hardening accepted
+
+The C14 implementation plan has been hardened before `C14-RULE-001` starts.
+
+Mandatory requirements are now recorded at:
+
+- `governance/C14_COGNITIVE_DERIVATION_PM_HARDENING_REQUIREMENTS_2026-09-21.md`
+
+The accepted additional blockers are:
+
+1. Summary may trigger/navigate cognition but cannot be the sole terminal proof for durable high-level cognition; evidence closure must reach qualifying non-Summary leaf-world sources.
+2. C14 semantic validation must include a genuinely cross-dimensional case where no single dimension alone is sufficient.
+3. At least one cognition must survive session/runtime replacement and later be recovered through normal AIOS World/Index mechanisms to materially affect a new independent decision.
+4. Real Resident validation must include both a positive cognition case and a matched negative control where similar repetition exists but the correct result is silence/UNKNOWN/no unsupported cognition.
+5. Derivation eligibility/provenance must be mechanically computed from existing SourceClass plus transitive pinned source/dependency lineage, not a second semantic source database.
+
+Governance interpretation:
+
+- prefer an authoritative C14 runtime/semantic ruling;
+- do not rewrite the primary constitution unless C14-RULE-001 proves an actual unresolved normative gap;
+- do not create a second FINAL/amendment/registry authority chain.
+
+C14 completion is now explicitly behavior-based, not Claim-count based.
