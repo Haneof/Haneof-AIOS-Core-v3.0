@@ -21,12 +21,17 @@ from aios_core.contracts.time import TemporalExtent, TimePrecision
 from aios_core.ingest.conversation import ConversationIngestor
 from aios_core.query.search import WorldSearchIndex
 from aios_core.review import OperationExperienceRequest, PeriodicReviewService
-from aios_core.runtime.capabilities import CapabilityCall
+from aios_core.runtime.capabilities import (
+    CapabilityCall,
+    CapabilityKind,
+    CapabilitySpec,
+)
 from aios_core.runtime.cognitive_runtime import (
     CognitiveRuntime,
     ModelCallProvenance,
     ModelDirective,
     ModelUsage,
+    RuntimeSnapshot,
 )
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
@@ -874,3 +879,216 @@ def test_silence_completes_wake_without_semantic_write(tmp_path):
         for object_type in before
     }
     assert after == before
+
+
+C14_ALLOWED_SIDE_EFFECTS = frozenset(
+    {
+        "commit_claim",
+        "commit_ai_world_claim",
+        "revise_claim",
+        "retract_claim",
+    }
+)
+
+C14_DENIED_SIDE_EFFECTS = (
+    "propose_entity",
+    "revise_entity",
+    "upsert_relation",
+    "propose_dimension",
+    "transition_dimension",
+    "propose_goal",
+    "transition_goal",
+    "create_task",
+    "transition_task",
+    "create_attention_watch",
+    "propose_action",
+    "form_event",
+    "transition_event",
+    "commit_operation_experience",
+    "record_communication_experience",
+    "propose_cognitive_policy",
+    "update_cognitive_policy",
+    "rollback_cognitive_policy",
+)
+
+
+def _authorization_snapshot(runtime: FusedTurnRuntime, wake_source: WakeSource) -> RuntimeSnapshot:
+    return RuntimeSnapshot(
+        user_input="authorization probe",
+        wake_reason=wake_source.value,
+        cockpit={},
+        capability_catalog=tuple(runtime.registry.catalog()),
+        capability_history=(),
+        round_index=0,
+        remaining_tool_rounds=1,
+    )
+
+
+def test_derivation_side_effect_authorization_is_explicit_default_deny(tmp_path):
+    store, index = _world(tmp_path)
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda _snapshot: ModelDirective(silence=True),
+    )
+    snapshot = _authorization_snapshot(runtime, WakeSource.COGNITIVE_DERIVATION)
+
+    registered_side_effects = {
+        item["name"]
+        for item in runtime.registry.catalog()
+        if item["side_effecting"]
+    }
+    assert C14_ALLOWED_SIDE_EFFECTS <= registered_side_effects
+
+    for name in registered_side_effects:
+        spec = runtime.registry.get_spec(name)
+        allowed = runtime._authorize_side_effect(
+            spec,
+            CapabilityCall(name=name),
+            snapshot,
+        )
+        assert allowed is (name in C14_ALLOWED_SIDE_EFFECTS)
+
+    future_side_effect = CapabilitySpec(
+        name="future_side_effect_escape_probe",
+        description="Future side-effect capability used to prove C14 default deny.",
+        kind=CapabilityKind.WRITE,
+    )
+    assert future_side_effect.side_effecting is True
+    assert runtime._authorize_side_effect(
+        future_side_effect,
+        CapabilityCall(name=future_side_effect.name),
+        snapshot,
+    ) is False
+
+    for item in runtime.registry.catalog():
+        if item["side_effecting"]:
+            continue
+        spec = runtime.registry.get_spec(item["name"])
+        assert runtime._authorize_side_effect(
+            spec,
+            CapabilityCall(name=spec.name),
+            snapshot,
+        ) is True
+
+
+@pytest.mark.parametrize("capability_name", C14_DENIED_SIDE_EFFECTS)
+def test_derivation_denies_non_cognition_side_effects_before_world_write(
+    tmp_path,
+    capability_name,
+):
+    store, index = _world(tmp_path)
+    leaf = _observation(
+        store,
+        f"obs_c14_deny_{capability_name}",
+        value="用于验证 C14 side-effect 授权边界的真实用户事实。",
+        dimension="dim:c14_authorization",
+    )
+    summary_ref = _summary(
+        store,
+        f"sum_c14_deny_{capability_name}",
+        (leaf,),
+        dimension="dim:c14_authorization",
+    )
+    scheduled = _schedule(store, index, summary_ref)
+    observed = {}
+
+    def model(snapshot):
+        history = snapshot.capability_history
+        if not history:
+            observed["world_revision_before_denied_call"] = int(
+                store.current_world_revision()
+            )
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(name=capability_name, arguments={}),
+                )
+            )
+        denied = history[-1]
+        assert denied.name == capability_name
+        assert denied.ok is False
+        assert denied.error_code == "CAPABILITY_NOT_AUTHORIZED"
+        assert int(store.current_world_revision()) == observed[
+            "world_revision_before_denied_call"
+        ]
+        return ModelDirective(silence=True)
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    result = runtime.run_wake(
+        wake_ref=ObjectRef(
+            object_id=scheduled.wake.wake_id,
+            revision=scheduled.wake.revision,
+        ),
+        now=NOW + timedelta(minutes=30),
+    )
+    assert result.runtime is not None and result.runtime.silenced is True
+    assert result.runtime.capability_history[-1].error_code == "CAPABILITY_NOT_AUTHORIZED"
+
+
+@pytest.mark.parametrize(
+    "capability_name",
+    (
+        "propose_entity",
+        "revise_entity",
+        "upsert_relation",
+        "propose_dimension",
+        "transition_dimension",
+        "propose_goal",
+        "transition_goal",
+        "create_task",
+        "transition_task",
+        "create_attention_watch",
+        "propose_action",
+        "form_event",
+        "transition_event",
+    ),
+)
+def test_user_interaction_keeps_existing_side_effect_authorization(
+    tmp_path,
+    capability_name,
+):
+    store, index = _world(tmp_path)
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda _snapshot: ModelDirective(silence=True),
+    )
+    snapshot = _authorization_snapshot(runtime, WakeSource.USER_INTERACTION)
+    spec = runtime.registry.get_spec(capability_name)
+    assert runtime._authorize_side_effect(
+        spec,
+        CapabilityCall(name=capability_name),
+        snapshot,
+    ) is True
+
+
+@pytest.mark.parametrize(
+    "capability_name",
+    (
+        "commit_operation_experience",
+        "commit_claim",
+        "commit_ai_world_claim",
+        "revise_claim",
+        "retract_claim",
+        "propose_cognitive_policy",
+        "update_cognitive_policy",
+        "rollback_cognitive_policy",
+    ),
+)
+def test_periodic_review_keeps_existing_side_effect_authorization(
+    tmp_path,
+    capability_name,
+):
+    store, index = _world(tmp_path)
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda _snapshot: ModelDirective(silence=True),
+    )
+    snapshot = _authorization_snapshot(runtime, WakeSource.PERIODIC_REVIEW)
+    spec = runtime.registry.get_spec(capability_name)
+    assert runtime._authorize_side_effect(
+        spec,
+        CapabilityCall(name=capability_name),
+        snapshot,
+    ) is True
