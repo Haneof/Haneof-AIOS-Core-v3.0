@@ -82,3 +82,19 @@ writing occurred (this is the mechanical scheduler's own outcome, not a Resident
 Periodic Review interval not reached). No model invocation, no semantic write.
 
 **Resulting state**: world_revision 6, index watermark 6, pending wakes 0, durable cognition unchanged.
+
+---
+
+## Cursor 4 — `c14resv2-004` — 2026-10-01T10:28:00-07:00 (dim:work_outcome)
+
+**Released**
+- dimension `dim:work_outcome`, source_kind `task_tracker`, source_class `PLATFORM`
+- payload: "“架构备忘录”第一版于 10:16 提交；原计划工作块结束时间为 10:20。"
+
+**Mechanical chain**: reveal → ingest `obs_c14_fixture_660bfde404b5e63e3c52db43@1` (world_revision 7)
+→ watch hook (no match) → ack (`next_sequence=5`).
+
+**Due work at T = 2026-10-01T10:28:00-07:00**: none (day window open; no C14 opportunity;
+Review interval not reached). No model invocation, no semantic write.
+
+**Resulting state**: world_revision 7, index watermark 7, pending wakes 0.
