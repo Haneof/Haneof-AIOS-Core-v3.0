@@ -1,5 +1,5 @@
 {
-  "decision_key": "54f28d9989878eb7f20b604c9952a5f2c629edefd880133b545c77d2ab6fd37c",
+  "decision_key": "5ab772b48506f75f521049b5977298405d0f0deaaff14d9cda2feedc106c6664",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-resident.pending.v1",
   "simulated_clock": "2027-01-21T08:15:00+00:00",
@@ -666,6 +666,115 @@
         "error_message": null,
         "name": "read_periodic_review_anchors",
         "ok": true
+      },
+      {
+        "call_id": "seg003-jan21-staff-raw",
+        "data": {
+          "created_by": "reality_ingest:habitation.staff_note.v1",
+          "data_quality": {},
+          "learned_at": "2027-01-21T06:55:00Z",
+          "metadata": {
+            "adapter_id": "habitation.staff_note.v1",
+            "dimension": "dim:staff_note",
+            "external_record_id": "d034-staff-note",
+            "external_revision": "1",
+            "mechanical_ingest": true,
+            "occurred_at_original": "2027-01-21T06:55:00+00:00",
+            "provenance": {
+              "habitation_resident_metadata": {
+                "source": "staff_notes"
+              },
+              "model_id_not_part_of_fact": true
+            },
+            "source_class": "user",
+            "source_digest": "fceb3f69e4af759ba89778ad275f393693825636b7c172b1e2f91b05e6ddb700",
+            "source_schema_version": "1"
+          },
+          "modality": "text",
+          "object_id": "obs_src_facf2b040e0feb3a89b935f2",
+          "object_type": "observation",
+          "occurred": {
+            "end": "2027-01-21T06:55:00Z",
+            "precision": "second",
+            "start": "2027-01-21T06:55:00Z",
+            "timezone_name": null,
+            "unknown": false
+          },
+          "raw_locator": "habitation://sol-resident-20260921-001/staff_note/d034-staff-note",
+          "recorded_at": "2027-01-21T06:55:00Z",
+          "revision": 1,
+          "source_kind": "staff_note",
+          "source_refs": [],
+          "status": "active",
+          "subject_id": "sol-resident-20260921-001",
+          "unit": null,
+          "value": "小赵记录：06:10到06:42醒发架满，两盘面团在推车上等待空位；06:42后恢复周转。"
+        },
+        "error_code": null,
+        "error_message": null,
+        "name": "inspect_world_object",
+        "ok": true
+      },
+      {
+        "call_id": "seg003-morning-observation-task",
+        "data": {
+          "app_id": null,
+          "attempts": 0,
+          "cancel_condition": {},
+          "completion_condition": {},
+          "created_by": "execution_world:resident_ai",
+          "deadline": null,
+          "dependency_refs": [],
+          "execution_refs": [],
+          "goal_ref": {
+            "object_id": "goal_c909920b70a6835d5a42833e",
+            "revision": 1
+          },
+          "learned_at": "2027-01-10T18:40:00Z",
+          "metadata": {
+            "task_origin": "resident_ai"
+          },
+          "next_step": "先从实际早高峰记录中识别等待、返工、缺货或其他出品不稳定现象；没有事实依据前不预设原因，也暂不把菜单扩张作为当前优先任务。",
+          "next_wake_at": null,
+          "object_id": "task_4ab2a4531967655198502158",
+          "object_type": "task",
+          "occurred": {
+            "end": "2027-01-10T18:40:00Z",
+            "precision": "second",
+            "start": "2027-01-10T18:40:00Z",
+            "timezone_name": null,
+            "unknown": false
+          },
+          "outcome_refs": [],
+          "priority": 85,
+          "reason_refs": [
+            {
+              "object_id": "obs_conv_user_abc43111f1a6bae550d02ee1",
+              "revision": 1
+            }
+          ],
+          "recorded_at": "2027-01-10T18:40:00Z",
+          "recurrence": null,
+          "related_entity_refs": [],
+          "revision": 1,
+          "source_refs": [
+            {
+              "object_id": "obs_conv_user_abc43111f1a6bae550d02ee1",
+              "revision": 1,
+              "source_locator": null
+            }
+          ],
+          "status": "active",
+          "subject_id": "sol-resident-20260921-001",
+          "task_state": "ready",
+          "task_type": "observation",
+          "timezone_name": null,
+          "title": "观察早高峰出品卡点"
+        },
+        "error_code": null,
+        "error_message": null,
+        "name": "inspect_world_object",
+        "ok": true
       }
     ],
     "cockpit": {
@@ -1291,8 +1400,8 @@
       "truncated": true,
       "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged."
     },
-    "remaining_tool_rounds": 7,
-    "round_index": 1,
+    "remaining_tool_rounds": 6,
+    "round_index": 2,
     "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged.",
     "wake_reason": "periodic_review"
   },
