@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - "arena/c13-metering-ledger-20260921"
     paths:
       - "src/aios_core/**"
       - "tests/**"

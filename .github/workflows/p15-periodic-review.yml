@@ -2,7 +2,7 @@ name: p15-periodic-review
 
 on:
   push:
-    branches: [main]
+    branches: [main, "arena/c13-metering-ledger-20260921"]
     paths:
       - "src/aios_core/review/**"
       - "src/aios_core/runtime/**"
