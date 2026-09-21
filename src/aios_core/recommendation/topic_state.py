@@ -39,7 +39,7 @@ _BARE_REFERENCE_CUES = ("这个", "那个", "那这个")
 _TRAILING_DISCOURSE_PUNCTUATION = " \t\r\n,.!?;:，。！？；："
 _HISTORY_CUES = (
     "之前", "上次", "昨天", "前天", "最近", "过去", "以前", "去年", "前年", "历史",
-    "还记得", "我们聊过", "继续", "again", "last time", "yesterday", "recently", "before",
+    "还记得", "我们聊过", "again", "last time", "yesterday", "recently", "before",
 )
 
 # Surface deixis/ellipsis only. These cues do not identify an antecedent; they merely
