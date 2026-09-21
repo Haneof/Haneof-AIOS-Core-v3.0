@@ -981,8 +981,10 @@ C14 completion is now explicitly behavior-based, not Claim-count based.
 - Status: **DONE / GOVERNANCE SEMANTICS FROZEN**
 - Started from main: `eae9f6e74f5a51b3869b2151f56ca8875e5c8372`
 - Work branch: `governance/c14-rule-001-20260921-sol`
-- Semantic candidate: `57d8e7f854cbcc8f90263977b3c01599e786cf1f`
+- Candidate: `33effe8a86af3d5a34a6b227618db82caf519c37`
+- Ruling commit: `57d8e7f854cbcc8f90263977b3c01599e786cf1f`
 - PR: #58
+- Squash merge: `f9438cce087a422ad6d2394b8f0c2a22307fe283`
 - Ruling: `governance/C14_CONTINUOUS_COGNITIVE_DERIVATION_RULING_2026-09-21.md`
 - Constitution / registry changes: **NONE**. Existing Fused Baseline, Dimension Summary, AI Dimension, Cognitive Runtime, and Periodic Review rules were sufficient; C14 required an authoritative implementation-level interpretation, not a new law chain.
 - Frozen boundary: Summary is trigger/navigation/compression and may participate in EvidenceSet, but C14 durable high-level cognition cannot terminate support in Summary/AI-cognition/maintenance recursion. Support provenance closure must reach proposition-appropriate non-Summary case evidence.
