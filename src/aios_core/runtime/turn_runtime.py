@@ -2616,6 +2616,38 @@ class FusedTurnRuntime:
 
 
 
+    def dispatch_next_pending_wake(
+        self,
+        *,
+        now: datetime,
+        step0: Step0GateInput | None = None,
+        token_budget: int | None = None,
+    ) -> WakeDispatchRunResult | None:
+        """Advance mechanical timers and dispatch one eligible Resident Wake.
+
+        This is the runtime-facing attention scheduler entrypoint. It expires stale
+        watches, materializes due Task Wakes, then chooses exactly one pending Wake.
+        REVIEW_QUEUE and conversation turns are intentionally excluded.
+        """
+
+        self.attention_watches.expire_due(now=now)
+        self.execution_world.wake_due_tasks(now=now)
+
+        wake = self.attention_router.next_dispatchable()
+        if wake is None:
+            return None
+
+        return self.run_wake(
+            wake_ref=ObjectRef(
+                object_id=wake.object_id,
+                revision=wake.revision,
+            ),
+            now=now,
+            step0=step0,
+            token_budget=token_budget,
+        )
+
+
     def run_wake(
         self,
         *,
