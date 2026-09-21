@@ -341,3 +341,17 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
 - 决策文件：`checkpoints/decisions/wake-cognitive_derivation-wake_0bb994195dc853d0785b73e0-rev1-5cbdb911/round-{0,1}.json`、`checkpoints/decisions/periodic-review-20261014T125801Z-08a0eb1e/round-{0,1}.json`。
 
 **Resulting state**: world_revision 122, index watermark 122, pending wakes 0, Claims 1（rev 2）, 34 条摘要, operation experiences 0。
+
+---
+
+## Cursor 17 — `c14resv2-017` — 2026-10-14T06:01:00-07:00 (dim:environment)
+
+**Released**
+- dimension `dim:environment`（本 run 首次出现）, source_kind `building_service`, source_class `PLATFORM`
+- payload: "物业通知：06:00–06:30 检查厨房供水阀门，要求住户在家配合。"
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-017.json`; ingest → `obs_c14_fixture_fe7df97629543fca38e221c4@1` (world_revision 123); watch hook: no match; ack → `receipts/ack/cursor-017.json`, `next_sequence=18`。
+
+**Due work at T = 2026-10-14T06:01:00-07:00**（`receipts/process-due-20261014T130100Z.json`）: 无摘要窗口闭合（10-14 日窗仍开）、无 C14 唤醒、Periodic Review 未触发。机械跑完即止，无模型决策点。
+
+**Resulting state**: world_revision 123, index watermark 123, pending wakes 0。
