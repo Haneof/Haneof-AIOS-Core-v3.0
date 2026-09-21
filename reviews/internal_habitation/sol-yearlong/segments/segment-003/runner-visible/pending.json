@@ -1,5 +1,5 @@
 {
-  "decision_key": "80e70b3fab604bc8b35217c8725a069d019b1c3b138c2367700a04c01be30696",
+  "decision_key": "71eef8cbfa9332f26222cefa0df1a6d06eff5148aa4f438e63dc61842f5c93fc",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-resident.pending.v1",
   "simulated_clock": "2027-01-24T08:15:00+00:00",
@@ -612,6 +612,14 @@
         "error_message": null,
         "name": "read_periodic_review_anchors",
         "ok": true
+      },
+      {
+        "call_id": "seg003-old-arrangement-operation-experience",
+        "data": null,
+        "error_code": "CAPABILITY_EXECUTION_ERROR",
+        "error_message": "ValueError: operation experience requires real result evidence: Observation, Outcome or CommunicationExperience",
+        "name": "commit_operation_experience",
+        "ok": false
       }
     ],
     "cockpit": {
@@ -1237,8 +1245,8 @@
       "truncated": true,
       "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged."
     },
-    "remaining_tool_rounds": 7,
-    "round_index": 1,
+    "remaining_tool_rounds": 6,
+    "round_index": 2,
     "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged.",
     "wake_reason": "periodic_review"
   },
