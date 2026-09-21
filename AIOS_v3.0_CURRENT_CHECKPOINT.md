@@ -886,3 +886,61 @@ T28/T33 main regressions.
 - T33/T28/T34/T35 semantics were not changed by T36.
 - Next READY task: **T35-IMPL-001**.
 - Per single-window rule, this T36 window stops here and must not execute the next task.
+
+
+---
+
+## 2026-09-21 — C14 Continuous Cognitive Derivation PM Reprioritization
+
+- Planning baseline: `main@96d62819de32b3f45b1e774329e295241e015f6a`
+- Planning branch: `governance/c14-continuous-cognitive-derivation-20260921`
+- Canonical plan: `governance/C14_CONTINUOUS_COGNITIVE_DERIVATION_IMPLEMENTATION_PLAN_2026-09-21.md`
+- New first READY task: **C14-RULE-001**
+- P16-TRIAGE / long campaign continuation: **PAUSED / BLOCKED on C14-CLOSE-001**
+
+### New blocker
+
+Long-habitation evidence now shows a mechanism-level gap that was not visible from deterministic closure alone:
+
+- user/world facts and Dimension Summary are durable and searchable;
+- AI-world Claim/Strategy/Calibration/Experience machinery exists;
+- the shared CognitiveRuntime and Periodic Review exist;
+- but a newly created/revised Summary does not currently guarantee a durable opportunity for the Resident to decide whether that new temporal structure should change AI-world cognition.
+
+This is **not** a Claim-count target and does not invalidate the multi-dimensional world model.
+
+The missing bridge is:
+
+```text
+eligible changed Summary
+  -> durable background cognition opportunity
+  -> same Resident CognitiveRuntime
+  -> inspect/search/compare evidence
+  -> form/revise/retract cognition OR silence
+```
+
+### Frozen implementation constraints
+
+1. Summary remains descriptive and must not become Claim.
+2. Deterministic Core may schedule an opportunity but may not infer semantic meaning.
+3. No keyword-to-Claim logic, fixed psychological labels, fixed semantic importance threshold, or "N occurrences = preference" rule.
+4. No second AI database and no second cognition model/runtime.
+5. Reuse Wake, Background Budget, Attention Bundle, CognitiveRuntime, AIWorldCognitionService, and Periodic Review.
+6. Pure AI-cognition Summary must not recursively create an unbounded self-derivation loop.
+7. Crash/restart must not permanently lose a Summary-derived cognition opportunity.
+8. Silence/no cognition write is a valid Resident outcome.
+9. C14 semantic PASS requires real Resident evidence; deterministic GREEN alone is insufficient.
+
+### Task chain
+
+```text
+C14-RULE-001
+  -> C14-SCHED-001
+  -> C14-RUNTIME-001
+  -> C14-LOOP-001
+  -> C14-RES-001
+  -> C14-CLOSE-001
+  -> resume P16-TRIAGE / Campaign
+```
+
+This planning window changes governance/prioritization only. It does **not** execute C14-RULE-001 or modify Runtime/Core semantics.
