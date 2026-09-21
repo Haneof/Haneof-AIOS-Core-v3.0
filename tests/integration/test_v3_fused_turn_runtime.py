@@ -23,7 +23,7 @@ def test_vertical_slice_proactively_remembers_then_writes_new_turn(tmp_path):
     db = tmp_path / "world.db"
     store = SQLiteWorldStore(db)
     seed = ConversationIngestor(store)
-    seed.commit_turn(
+    seed_result = seed.commit_turn(
         session_id="history",
         turn_index=1,
         user_text="智能索引和智能推荐一定要分开。",
@@ -36,6 +36,9 @@ def test_vertical_slice_proactively_remembers_then_writes_new_turn(tmp_path):
     def model(snapshot):
         cards = snapshot.cockpit["memory_cards"]
         assert cards
+        refs = {card["object_id"] for card in cards}
+        assert seed_result.user_observation_id in refs
+        assert seed_result.assistant_observation_id not in refs
         assert any("索引" in card["excerpt"] for card in cards)
         return ModelDirective(response="接着之前的方案：索引继续作为公共能力。")
 
