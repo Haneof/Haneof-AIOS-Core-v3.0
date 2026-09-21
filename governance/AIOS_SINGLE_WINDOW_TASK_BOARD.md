@@ -73,8 +73,8 @@
 | 9 | `C14-RULE-001` | 冻结持续认知派生语义：Summary 只产生认知机会；高阶认知证据闭包必须落到合格非 Summary 叶子；定义跨维、silence、new-session 消费、provenance 与 Periodic Review 分工 | **DONE** | T35-IMPL-001 | `governance/C14_CONTINUOUS_COGNITIVE_DERIVATION_RULING_2026-09-21.md`; PR #58; candidate `33effe8a86af3d5a34a6b227618db82caf519c37`; squash merge `f9438cce087a422ad6d2394b8f0c2a22307fe283` | Authoritative ruling frozen: Summary may navigate/compress but not terminate proof; support provenance closure, domain-appropriate leaf grounding, derived lineage, cross-dimensional autonomy, valid silence, matched negative control, new-runtime behavior consumption, and Periodic Review split are binding; no Core/constitution/registry change |
 | 10 | `C14-SCHED-001` | 实现 Summary → Cognitive Derivation Wake：递归 leaf provenance、幂等、revision、crash/restart recovery、纯 AI-cognition Summary 防回环 | **DONE** | C14-RULE-001 | PR #59; candidate `5389118b9e37b8f0b33552099e39d5c8a31eaffb`; squash merge `f0b24cda3c76d5170f5f27fb5a94107036e2f2c4`; C14 gate run `35579489466` SUCCESS | Dedicated `COGNITIVE_DERIVATION` BACKGROUND Wake; recursive pinned provenance; REALITY/MIXED eligible; AI_COGNITION_ONLY/MAINTENANCE_ONLY/UNKNOWN fail closed; deterministic per-Summary-revision Wake identity; restart reconciliation; no second provenance/scheduler DB; no Claim/Resident semantic change |
 | 11 | `C14-RUNTIME-001` | 将 derivation Wake 接入同一 Resident CognitiveRuntime，装配 pinned Summary、跨维能力、AI-world context；形成/修正认知前必须满足 leaf-grounded evidence 规则，或 silence | **DONE** | C14-SCHED-001 | PR #61; candidate `75cc62ca13169c6ba8752e0562224705fe6f9ac2`; squash merge `a887ba537e9797d4bf5a7b7fb482fa4a55f47df7`; candidate + merge-result required Gates GREEN | 同一 Resident Runtime 完成 derivation cockpit + leaf-grounded create/revise/retract/silence 闭环；Summary-only/AI recursion/T28 assistant-only fail closed；真实 user/Outcome case grounding保持合法；BACKGROUND 不直接投放用户；完整证据见 C14-RUNTIME-001 completion |
-| 12 | `C14-RUNTIME-HARDEN-001` | 封闭 COGNITIVE_DERIVATION 的 side-effect 逃逸：该 Wake 只允许 leaf-grounded Claim create/revise/retract 写入；Event/Entity/Relation/Dimension/Goal/Task/Action/AttentionWatch/Experience/Policy 等持久副作用不得从此后台认知入口写入 | **READY** | C14-RUNTIME-001 | `governance/C14_RUNTIME_PM_ACCEPTANCE_REVIEW_2026-09-21.md`; PM acceptance found durable-write bypass in `_authorize_side_effect()` | COGNITIVE_DERIVATION 显式 side-effect allowlist 仅含 `commit_claim`, `commit_ai_world_claim`, `revise_claim`, `retract_claim`; 其他 writes 全部 deny；read capabilities 保留；普通 user turn / Periodic Review 不退化；专项+全回归 GREEN |
-| 13 | `C14-LOOP-001` | 持续认知派生加固：防 Summary/AI cognition 自证循环；预算/合并/延迟/恢复；Periodic Review 共存；验证 new-runtime 恢复消费路径；加固长期 provenance reconcile 复杂度 | **BLOCKED** | C14-RUNTIME-HARDEN-001 | C14 Runtime 已闭环并 merge；复用 BackgroundBudgetGate、Attention Bundle、P15 Review、现有 context/search；禁止 claim conversion rate 成为质量策略；PM 验收发现当前 reconcile 存在 per-Summary 重建 support-dependency 视图的长期重复扫描风险 | cognition-write→AI summary 不制造 storm；10+ sibling summary 可机械合并；budget defer/restart 不丢机会；Wake completion 不成为用户偏好/成功证据；新 Runtime 仅恢复 World/Index 后可正常找回 durable cognition；reconcile 不得随着 Summary×Dependency 规模产生不必要的全图重复扫描，需一次构图/缓存/增量等有界方案并有规模回归 |
+| 12 | `C14-RUNTIME-HARDEN-001` | 封闭 COGNITIVE_DERIVATION 的 side-effect 逃逸：该 Wake 只允许 leaf-grounded Claim create/revise/retract 写入；Event/Entity/Relation/Dimension/Goal/Task/Action/AttentionWatch/Experience/Policy 等持久副作用不得从此后台认知入口写入 | **DONE** | C14-RUNTIME-001 | PR #63; candidate `3accaeebe8ee1b3d420d2dfa3528ecb5e7388d86`; squash merge `09002ddf8fd1fd4af08f54ac5b190d4c39c9e25b`; `reviews/C14_RUNTIME_HARDEN_001_COMPLETION_EVIDENCE_2026-09-21.md`; required Gates GREEN | COGNITIVE_DERIVATION 显式 side-effect allowlist 仅含 `commit_claim`, `commit_ai_world_claim`, `revise_claim`, `retract_claim`; 其他 writes 全部 deny；read capabilities 保留；普通 user turn / Periodic Review 不退化；专项+全回归 GREEN |
+| 13 | `C14-LOOP-001` | 持续认知派生加固：防 Summary/AI cognition 自证循环；预算/合并/延迟/恢复；Periodic Review 共存；验证 new-runtime 恢复消费路径；加固长期 provenance reconcile 复杂度 | **READY** | C14-RUNTIME-HARDEN-001 | C14 Runtime 已闭环并 merge；复用 BackgroundBudgetGate、Attention Bundle、P15 Review、现有 context/search；禁止 claim conversion rate 成为质量策略；PM 验收发现当前 reconcile 存在 per-Summary 重建 support-dependency 视图的长期重复扫描风险 | cognition-write→AI summary 不制造 storm；10+ sibling summary 可机械合并；budget defer/restart 不丢机会；Wake completion 不成为用户偏好/成功证据；新 Runtime 仅恢复 World/Index 后可正常找回 durable cognition；reconcile 不得随着 Summary×Dependency 规模产生不必要的全图重复扫描，需一次构图/缓存/增量等有界方案并有规模回归 |
 | 14 | `C14-RES-001` | 真实 Resident 认知形成入住验证：跨维正例 + 同次数低证据负例 silence + 后续反例 revision + 新 session/new runtime 只恢复 AIOS World 后消费旧认知并影响行为 | **BLOCKED** | C14-LOOP-001 | 禁止 pseudo-LLM / Python 关键词答案；fresh/private World；隐藏语义期望；保存 provider/model/checkpoint/digest | 至少验证：真正跨维 cognition、正确 silence、上下文替换后的 cognition retrieval/behavior consumption、Outcome→revision；不以 Claim 数量/转化率 PASS；必须有 observable refs/decision effects 而非 CoT |
 | 15 | `C14-CLOSE-001` | 独立审计 C14 规则、代码、Gate 与真实 Resident 证据；只做收口，不写新 Core 功能 | **BLOCKED** | C14-RES-001 | C14 全链证据 + deterministic gates + Resident evaluator + PM hardening requirements | 任一以下成立即 FAIL：Summary-only 自证 cognition、无跨维正例、无 negative silence、无 new-session/new-runtime 行为消费、provenance 用语义启发式/第二来源库、claim count 成质量目标、存在 wake storm；全部通过才恢复 P16 |
 | 16 | `P16-TRIAGE-001` | 更新 PR #37 / Issue #30 中央证据分流到当前 segmented protocol；历史无效年度、PARTIAL、机械复现、有效缺陷分开登记 | **BLOCKED** | AUDIT-001, all activated T34/T36/T28/T35/T33 tasks resolved, C14-CLOSE-001 | all historical Core blockers resolved; C14 是 77-day Resident 新暴露的架构缺口；P16 暂停避免继续测已知缺陷 | 冻结被评 Core SHA；不把旧“几天统计”冒充当前进度；中央报告进入 main；恢复 campaign 前必须引用 C14 closure |
@@ -819,3 +819,42 @@ Decision:
 - `C14-RUNTIME-HARDEN-001` is the new first READY task;
 - `C14-LOOP-001` is BLOCKED until hardening passes;
 - C14-RES and P16 remain blocked.
+
+
+### C14-RUNTIME-HARDEN-001 completion — 2026-09-21
+
+```text
+Task ID: C14-RUNTIME-HARDEN-001
+Status: DONE
+Started from main: 646c5a3d0cf22cfa99c70667925ad240ea53f663
+Work branch: c14/runtime-hardening-side-effects-20260921
+Candidate SHA: 3accaeebe8ee1b3d420d2dfa3528ecb5e7388d86
+PR: #63
+Merge SHA: 09002ddf8fd1fd4af08f54ac5b190d4c39c9e25b
+Required gates: C14 runtime targeted; C14 scheduler targeted; cognitive-runtime; cognition-writeback; cognition-revision; AI-world; constitutional cognition closure; fused-turn-runtime; C09 wake; P12 execution; P15 periodic review; C13 metering; P14 long context; T28 memory boundary; Dimension Summary; World Index; P16 habitation harness; P16 convergence
+Gate run IDs / conclusions:
+- c14-cognitive-derivation-runtime 35586168903 / SUCCESS (all 7 aggregate jobs SUCCESS)
+- constitutional-cognition-closure 35586168941 / SUCCESS
+- p16-convergence-gate 35586168937 / SUCCESS
+- p15-periodic-review 35586168873 / SUCCESS
+- fused-turn-runtime 35586168861 / SUCCESS
+- c09-wake-dispatch 35586168846 / SUCCESS
+- p11-dimension-gate 35586168851 / SUCCESS
+- p10-ai-world-gate 35586168898 / SUCCESS
+- p9-revision-gate 35586168883 / SUCCESS
+- p12-execution-gate 35586168915 / SUCCESS
+- p14-long-context 35586168872 / SUCCESS
+Evidence/report paths:
+- reviews/C14_RUNTIME_HARDEN_001_COMPLETION_EVIDENCE_2026-09-21.md
+- src/aios_core/runtime/turn_runtime.py
+- tests/integration/test_v3_c14_cognitive_derivation_runtime.py
+Bugs found:
+- COGNITIVE_DERIVATION denied Experience/Policy but fell through to the ordinary durable-write allowlist, leaving Event/Entity/Relation/Dimension/Goal/Task/Action/AttentionWatch escape routes
+Fix:
+- explicit C14 side-effect allowlist = commit_claim, commit_ai_world_claim, revise_claim, retract_claim
+- every other current/future side-effecting capability default-denied
+- read capabilities preserved; user turn / Periodic Review authorization unchanged
+Deferred issues:
+- C14-LOOP-001 keeps the existing loop/budget/coalescing/restart/reconcile-scale scope
+Next READY task: C14-LOOP-001 — new window only
+```
