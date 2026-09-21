@@ -418,6 +418,7 @@ class FusedTurnRuntime:
                     "priority": "integer?",
                     "cooldown_seconds": "integer?",
                     "attention_class": "interrupt|background|review_queue?",
+                    "mode": "recurring|one_shot?",
                     "expires_at": "ISO-8601 datetime?",
                 },
             ),
@@ -1240,6 +1241,8 @@ class FusedTurnRuntime:
         return self._world_map_context(self._active_turn_time)
 
     def _list_attention_watches(self) -> list[dict[str, Any]]:
+        if self._active_turn_time is not None:
+            self.attention_watches.expire_due(now=self._active_turn_time)
         return [
             item.model_dump(mode="json")
             for item in self.attention_watches.current()
@@ -1258,6 +1261,7 @@ class FusedTurnRuntime:
         priority: int = 50,
         cooldown_seconds: int = 0,
         attention_class: str = "background",
+        mode: str = "recurring",
         expires_at: str | None = None,
     ) -> dict[str, Any]:
         if self._active_turn_time is None:
@@ -1290,6 +1294,7 @@ class FusedTurnRuntime:
                 priority=int(priority),
                 cooldown_seconds=int(cooldown_seconds),
                 attention_class=AttentionClass(str(attention_class)),
+                mode=str(mode),
                 expires_at=(
                     None
                     if expires_at is None
@@ -2834,6 +2839,7 @@ class FusedTurnRuntime:
         This path does not create a synthetic Conversation Observation. The Wake and
         any cognition/experience written by model capabilities are the durable audit.
         """
+        self.attention_watches.expire_due(now=now)
         request = self.periodic_review.prepare_due_review(
             now=now,
             policy=policy,
