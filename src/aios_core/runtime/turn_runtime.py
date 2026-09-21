@@ -88,7 +88,7 @@ from aios_core.world_graph import (
     RelationUpsertRequest,
 )
 
-from .budget_gate import BackgroundBudgetGate
+from .budget_gate import BackgroundBudgetDecision, BackgroundBudgetGate
 from .capabilities import CapabilityKind, CapabilityRegistry, CapabilitySpec
 from .cognitive_runtime import CognitiveRuntime, ModelHandler, RuntimeTurnResult
 
@@ -109,9 +109,10 @@ class FusedTurnResult:
 @dataclass(frozen=True, slots=True)
 class PeriodicReviewRunResult:
     request: PeriodicReviewRequest
-    runtime: RuntimeTurnResult
-    context: ModelContextBundle
+    runtime: RuntimeTurnResult | None
+    context: ModelContextBundle | None
     wake: ReviewWakeReceipt
+    budget: BackgroundBudgetDecision | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -2764,19 +2765,27 @@ class FusedTurnRuntime:
 
         gate_result = self.wake_bus.evaluate_step0(wake, effective_step0)
         if not gate_result.model_allowed:
-            terminal = (
-                self.wake_bus.suppress(
-                    wake.object_id,
-                    suppressed_at=now,
-                    step0=gate_result,
+            if wake.wake_state.value == "running" and not budget_decision.hard_deny:
+                terminal = WakeStateReceipt(
+                    wake_id=wake.object_id,
+                    revision=wake.revision,
+                    state=wake.wake_state.value,
+                    world_revision=int(self.store.current_world_revision()),
                 )
-                if budget_decision.hard_deny
-                else self.wake_bus.defer(
-                    wake.object_id,
-                    deferred_at=now,
-                    step0=gate_result,
+            else:
+                terminal = (
+                    self.wake_bus.suppress(
+                        wake.object_id,
+                        suppressed_at=now,
+                        step0=gate_result,
+                    )
+                    if budget_decision.hard_deny
+                    else self.wake_bus.defer(
+                        wake.object_id,
+                        deferred_at=now,
+                        step0=gate_result,
+                    )
                 )
-            )
             return WakeDispatchRunResult(
                 wake_ref=ObjectRef(
                     object_id=terminal.wake_id,
@@ -2796,7 +2805,6 @@ class FusedTurnRuntime:
             expected_world_revision=(
                 budget_decision.world_revision
                 if budget_decision.requires_reservation
-                and wake.wake_state.value in {"new", "queued"}
                 else None
             ),
             metadata_update=budget_decision.reservation_metadata(),
@@ -2931,6 +2939,42 @@ class FusedTurnRuntime:
         if request is None:
             return None
 
+        review_wake = self.wake_bus.current_wake(request.wake_ref.object_id)
+        budget_decision = self.background_budget_gate.evaluate(
+            review_wake,
+            now=now,
+            max_model_rounds=self.cognitive_runtime.max_tool_rounds + 1,
+            require_full_model_round_budget=True,
+        )
+        if not budget_decision.available:
+            if budget_decision.hard_deny:
+                budget_wake = self.periodic_review.suppress_review(
+                    request,
+                    suppressed_at=now,
+                    reasons=budget_decision.reasons,
+                )
+            elif review_wake.wake_state.value == "running":
+                budget_wake = ReviewWakeReceipt(
+                    wake_id=review_wake.object_id,
+                    revision=review_wake.revision,
+                    state=review_wake.wake_state.value,
+                    world_revision=int(self.store.current_world_revision()),
+                )
+            else:
+                budget_wake = self.periodic_review.defer_review(
+                    request,
+                    deferred_at=now,
+                    reasons=budget_decision.reasons,
+                )
+            self.index.catch_up()
+            return PeriodicReviewRunResult(
+                request=request,
+                runtime=None,
+                context=None,
+                wake=budget_wake,
+                budget=budget_decision,
+            )
+
         review_queue_wakes = self.attention_router.pending_review_queue()
         anchor_keys = {
             (
@@ -2952,6 +2996,12 @@ class FusedTurnRuntime:
         request = self.periodic_review.begin_review(
             request,
             started_at=now,
+            expected_world_revision=(
+                budget_decision.world_revision
+                if budget_decision.requires_reservation
+                else None
+            ),
+            metadata_update=budget_decision.reservation_metadata(),
         )
         self.index.catch_up()
 
@@ -2971,6 +3021,7 @@ class FusedTurnRuntime:
             "window_end": request.window_end.isoformat(),
             "anchor_count": len(request.anchors),
             "review_queue_wake_count": len(review_queue_consumed_ids),
+            "budget": budget_decision.context_payload(),
             "anchor_reader": "read_periodic_review_anchors",
             "instruction": request.instruction,
         }
@@ -3022,6 +3073,7 @@ class FusedTurnRuntime:
                 review_input,
                 wake_reason="periodic_review",
                 cockpit=context.as_cockpit(),
+                max_model_rounds=budget_decision.model_round_limit,
             )
         finally:
             self._active_review_request = None
@@ -3042,6 +3094,7 @@ class FusedTurnRuntime:
                     state="running",
                     world_revision=int(self.store.current_world_revision()),
                 ),
+                budget=budget_decision,
             )
 
         wake = self.periodic_review.complete_review(
@@ -3063,4 +3116,5 @@ class FusedTurnRuntime:
             runtime=runtime_result,
             context=context,
             wake=wake,
+            budget=budget_decision,
         )

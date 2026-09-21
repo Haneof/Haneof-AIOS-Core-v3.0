@@ -12,6 +12,7 @@ from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import TemporalExtent
 from aios_core.query.search import WorldSearchIndex
+from aios_core.review import ReviewSchedulePolicy
 from aios_core.runtime.capabilities import CapabilityCall
 from aios_core.runtime.cognitive_runtime import ModelDirective
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
@@ -331,3 +332,261 @@ def test_safety_wake_bypasses_background_day_budget(tmp_path):
     assert result.context is not None
     assert result.context.task_context["wake"]["budget"]["applies"] is False
     assert model_calls == ["safety"]
+
+
+
+def _revise_budget(store, policy, *, changed_at, max_wakes=None, max_model_calls=None):
+    revised = policy.model_copy(
+        update={
+            "revision": policy.revision + 1,
+            "occurred": TemporalExtent.point(changed_at),
+            "learned_at": changed_at,
+            "recorded_at": changed_at,
+            "max_wakes": max_wakes,
+            "max_model_calls": max_model_calls,
+            "max_tokens": None,
+        }
+    )
+    store.commit(
+        [revised],
+        OperationRequest(
+            operation_name="test.revise.background.budget",
+            expected_world_revision=int(store.current_world_revision()),
+            reason="revise C13 background budget for recovery test",
+            idempotency_key=f"revise-{policy.object_id}-{revised.revision}",
+            source_class=SourceClass.PLATFORM,
+        ),
+    )
+    return revised
+
+
+def test_running_budget_reservation_is_not_a_free_same_day_retry(tmp_path):
+    store, index = _world(tmp_path)
+    _commit_budget(store, max_model_calls=5)
+    ref = _commit_evidence(store)
+
+    model_calls = 0
+
+    def model(snapshot):
+        nonlocal model_calls
+        model_calls += 1
+        return ModelDirective(silence=True)
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+    )
+    signal = _emit_background(
+        runtime,
+        ref,
+        key="budget.running-recovery",
+        observed_at=NOW + timedelta(minutes=1),
+    )
+    wake = runtime.wake_bus.current_wake(signal.wake_id)
+    decision = runtime.background_budget_gate.evaluate(
+        wake,
+        now=NOW + timedelta(minutes=2),
+        max_model_rounds=runtime.cognitive_runtime.max_tool_rounds + 1,
+    )
+    assert decision.available is True
+    runtime.wake_bus.claim(
+        wake.object_id,
+        started_at=NOW + timedelta(minutes=2),
+        expected_world_revision=decision.world_revision,
+        metadata_update=decision.reservation_metadata(),
+    )
+
+    same_day = runtime.run_wake(
+        wake_ref=ObjectRef(object_id=wake.object_id, revision=2),
+        now=NOW + timedelta(hours=1),
+    )
+    assert same_day.runtime is None
+    assert same_day.wake.state == "running"
+    assert "background_budget_reservation_already_running" in same_day.step0.reasons
+    assert model_calls == 0
+
+    next_day = runtime.run_wake(
+        wake_ref=ObjectRef(object_id=wake.object_id, revision=2),
+        now=NOW + timedelta(days=1, minutes=5),
+    )
+    assert next_day.runtime is not None
+    assert next_day.runtime.silenced is True
+    assert next_day.wake.state == "completed"
+    assert model_calls == 1
+    latest = runtime.wake_bus.current_wake(wake.object_id)
+    assert latest.metadata["budget_window_start"].startswith("2026-09-22")
+
+
+def test_periodic_review_budget_defers_then_resumes_same_anchors(tmp_path):
+    store, index = _world(tmp_path)
+    policy = _commit_budget(store, max_wakes=0)
+    ref = _commit_evidence(store, object_id="obs_periodic_budget_anchor")
+
+    model_calls = []
+
+    def model(snapshot):
+        model_calls.append(snapshot.wake_reason)
+        review = snapshot.cockpit["task_context"]["periodic_review"]
+        assert review["budget"]["available"] is True
+        return ModelDirective(silence=True)
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+    )
+    schedule = ReviewSchedulePolicy(
+        interval_hours=24,
+        lookback_hours=72,
+        max_candidates=80,
+        max_per_object_type=20,
+    )
+    deferred = runtime.run_periodic_review(
+        now=NOW + timedelta(hours=25),
+        policy=schedule,
+    )
+    assert deferred is not None
+    assert deferred.runtime is None
+    assert deferred.context is None
+    assert deferred.wake.state == "queued"
+    assert deferred.budget is not None
+    assert deferred.budget.available is False
+    assert model_calls == []
+
+    queued_ref = deferred.request.wake_ref
+    queued_anchor_refs = tuple(
+        (item.object_ref.object_id, item.object_ref.revision)
+        for item in deferred.request.anchors
+    )
+    assert (ref.object_id, ref.revision) in queued_anchor_refs
+
+    _revise_budget(
+        store,
+        policy,
+        changed_at=NOW + timedelta(hours=26),
+        max_wakes=1,
+    )
+    resumed = runtime.run_periodic_review(
+        now=NOW + timedelta(hours=27),
+        policy=schedule,
+    )
+    assert resumed is not None
+    assert resumed.runtime is not None
+    assert resumed.runtime.silenced is True
+    assert resumed.wake.state == "completed"
+    assert resumed.request.wake_ref.object_id == queued_ref.object_id
+    resumed_anchor_refs = tuple(
+        (item.object_ref.object_id, item.object_ref.revision)
+        for item in resumed.request.anchors
+    )
+    assert resumed_anchor_refs == queued_anchor_refs
+    assert model_calls == ["periodic_review"]
+
+
+def test_periodic_review_requires_full_model_round_budget(tmp_path):
+    store, index = _world(tmp_path)
+    _commit_budget(store, max_model_calls=1)
+    _commit_evidence(store, object_id="obs_periodic_full_budget_anchor")
+
+    model_calls = 0
+
+    def model(snapshot):
+        nonlocal model_calls
+        model_calls += 1
+        return ModelDirective(silence=True)
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+    )
+    result = runtime.run_periodic_review(
+        now=NOW + timedelta(hours=25),
+        policy=ReviewSchedulePolicy(
+            interval_hours=24,
+            lookback_hours=72,
+            max_candidates=80,
+            max_per_object_type=20,
+        ),
+    )
+    assert result is not None
+    assert result.runtime is None
+    assert result.wake.state == "queued"
+    assert result.budget is not None
+    assert (
+        "background_model_call_budget_insufficient_for_full_run:1/5"
+        in result.budget.reasons
+    )
+    assert model_calls == 0
+
+
+def test_periodic_running_review_does_not_repeat_same_day_and_can_refresh_next_day(tmp_path):
+    store, index = _world(tmp_path)
+    _commit_budget(store, max_model_calls=5)
+    ref = _commit_evidence(store, object_id="obs_periodic_running_budget")
+
+    model_calls = 0
+
+    def model(snapshot):
+        nonlocal model_calls
+        model_calls += 1
+        if model_calls <= 5:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="inspect_world_object",
+                        arguments={
+                            "object_id": ref.object_id,
+                            "revision": ref.revision,
+                        },
+                    ),
+                )
+            )
+        return ModelDirective(silence=True)
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+    )
+    schedule = ReviewSchedulePolicy(
+        interval_hours=24,
+        lookback_hours=72,
+        max_candidates=80,
+        max_per_object_type=20,
+    )
+    first = runtime.run_periodic_review(
+        now=NOW + timedelta(hours=25),
+        policy=schedule,
+    )
+    assert first is not None
+    assert first.runtime is not None
+    assert first.runtime.termination_reason == "tool_round_budget_exhausted"
+    assert first.runtime.model_rounds == 5
+    assert first.wake.state == "running"
+    assert model_calls == 5
+
+    same_day = runtime.run_periodic_review(
+        now=NOW + timedelta(hours=26),
+        policy=schedule,
+    )
+    assert same_day is not None
+    assert same_day.runtime is None
+    assert same_day.wake.state == "running"
+    assert same_day.budget is not None
+    assert (
+        "background_budget_reservation_already_running"
+        in same_day.budget.reasons
+    )
+    assert model_calls == 5
+
+    next_day = runtime.run_periodic_review(
+        now=NOW + timedelta(hours=49),
+        policy=schedule,
+    )
+    assert next_day is not None
+    assert next_day.runtime is not None
+    assert next_day.runtime.silenced is True
+    assert next_day.wake.state == "completed"
+    assert model_calls == 6
