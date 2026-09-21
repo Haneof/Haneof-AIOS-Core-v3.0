@@ -36,7 +36,7 @@ from aios_core.runtime.cognitive_runtime import (
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.summaries import CognitiveDerivationScheduler, DerivedLineageClass
-from aios_core.wake import WakeSignalRequest
+from aios_core.wake import AttentionSchedulingPolicy, WakeSignalRequest
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 
 
@@ -1092,3 +1092,179 @@ def test_periodic_review_keeps_existing_side_effect_authorization(
         CapabilityCall(name=capability_name),
         snapshot,
     ) is True
+
+
+def test_loop_repro_twelve_sibling_derivations_coalesce_without_losing_contract(
+    tmp_path,
+):
+    store, index = _world(tmp_path)
+    scheduled = []
+    summary_refs = []
+    for offset in range(12):
+        leaf = _observation(
+            store,
+            f"obs_c14_loop_burst_{offset}",
+            value=f"mechanical sibling fact {offset}",
+            dimension=f"dim:loop:{offset}",
+            at=NOW + timedelta(seconds=offset),
+        )
+        summary_ref = _summary(
+            store,
+            f"sum_c14_loop_burst_{offset}",
+            (leaf,),
+            dimension=f"dim:loop:{offset}",
+            at=NOW + timedelta(minutes=10, seconds=offset),
+        )
+        summary_refs.append(summary_ref)
+        scheduled.append(_schedule(store, index, summary_ref))
+
+    seen = {"model_calls": 0}
+
+    def model(snapshot):
+        seen["model_calls"] += 1
+        assert snapshot.wake_reason == WakeSource.COGNITIVE_DERIVATION.value
+        bundle = snapshot.cockpit["task_context"]["cognitive_derivation_bundle"]
+        assert bundle["member_count"] == 12
+        assert {
+            (item["summary_ref"]["object_id"], item["summary_ref"]["revision"])
+            for item in bundle["members"]
+        } == {(ref.object_id, ref.revision) for ref in summary_refs}
+        assert {
+            (item["wake_ref"]["object_id"], item["wake_ref"]["revision"])
+            for item in bundle["members"]
+        } == {
+            (item.wake.wake_id, item.wake.revision)
+            for item in scheduled
+        }
+        return ModelDirective(silence=True, **_usage(snapshot))
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+        attention_scheduling_policy=AttentionSchedulingPolicy(
+            background_batch_window_seconds=60,
+            background_bundle_max_wakes=16,
+        ),
+    )
+    result = runtime.run_wake(
+        wake_ref=ObjectRef(
+            object_id=scheduled[0].wake.wake_id,
+            revision=scheduled[0].wake.revision,
+        ),
+        now=NOW + timedelta(minutes=30),
+    )
+
+    assert seen["model_calls"] == 1
+    bundle_payload = store.get_payload(result.wake_ref.object_id)
+    assert bundle_payload["wake_source"] == WakeSource.ATTENTION_BUNDLE.value
+    assert bundle_payload["metadata"]["attention_bundle"]["member_count"] == 12
+    assert result.wake.state == "completed"
+    assert result.delivery_response is None
+    for item in scheduled:
+        assert runtime.wake_bus.current_wake(item.wake.wake_id).wake_state.value == "merged"
+
+    calls = runtime.metering.list_model_calls(
+        subject_id="user_1",
+        wake_id=result.wake_ref.object_id,
+    )
+    assert len(calls) == 1
+    assert calls[0].wake_reason == WakeSource.COGNITIVE_DERIVATION.value
+
+
+def test_loop_repro_direct_c14_attention_bundle_preserves_effective_execution_reason(
+    tmp_path,
+):
+    store, index = _world(tmp_path)
+    scheduled = []
+    for offset in range(2):
+        leaf = _observation(
+            store,
+            f"obs_c14_loop_contract_{offset}",
+            value=f"contract sibling {offset}",
+            dimension=f"dim:contract:{offset}",
+            at=NOW + timedelta(seconds=offset),
+        )
+        summary_ref = _summary(
+            store,
+            f"sum_c14_loop_contract_{offset}",
+            (leaf,),
+            dimension=f"dim:contract:{offset}",
+            at=NOW + timedelta(minutes=10, seconds=offset),
+        )
+        scheduled.append(_schedule(store, index, summary_ref))
+
+    observed = {}
+
+    def model(snapshot):
+        observed["wake_reason"] = snapshot.wake_reason
+        assert snapshot.wake_reason == WakeSource.COGNITIVE_DERIVATION.value
+        assert snapshot.cockpit["task_context"]["cognitive_derivation_bundle"]["member_count"] == 2
+        return ModelDirective(silence=True, **_usage(snapshot))
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    bundled = runtime.attention_router.bundle_pending(
+        now=NOW + timedelta(minutes=30),
+        window_seconds=60,
+        max_wakes=16,
+        anchor_wake_id=scheduled[0].wake.wake_id,
+    )
+    assert bundled is not None and bundled.member_count == 2
+
+    result = runtime.run_wake(
+        wake_ref=ObjectRef(object_id=bundled.wake_id, revision=bundled.revision),
+        now=NOW + timedelta(minutes=30),
+    )
+    assert observed["wake_reason"] == WakeSource.COGNITIVE_DERIVATION.value
+    assert result.wake.state == "completed"
+
+
+def test_loop_repro_tool_round_budget_exhaustion_keeps_c14_wake_resumable(
+    tmp_path,
+):
+    store, index = _world(tmp_path)
+    leaf = _observation(
+        store,
+        "obs_c14_loop_tool_budget",
+        value="budget recovery fact",
+        dimension="dim:budget",
+    )
+    summary_ref = _summary(
+        store,
+        "sum_c14_loop_tool_budget",
+        (leaf,),
+        dimension="dim:budget",
+    )
+    scheduled = _schedule(store, index, summary_ref)
+
+    def model(snapshot):
+        return ModelDirective(
+            capability_calls=(
+                CapabilityCall(
+                    name="search_world",
+                    arguments={"query": "budget recovery fact", "limit": 1},
+                ),
+            ),
+            **_usage(snapshot),
+        )
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+        max_tool_rounds=0,
+    )
+    result = runtime.run_wake(
+        wake_ref=ObjectRef(
+            object_id=scheduled.wake.wake_id,
+            revision=scheduled.wake.revision,
+        ),
+        now=NOW + timedelta(minutes=30),
+    )
+
+    assert result.runtime is not None
+    assert result.runtime.termination_reason == "tool_round_budget_exhausted"
+    assert result.wake.state == "queued"
+    assert runtime.wake_bus.current_wake(
+        scheduled.wake.wake_id
+    ).wake_state.value == "queued"
