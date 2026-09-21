@@ -1,0 +1,15 @@
+{
+  "514b702eac1bc84fc2c21b166b3735f5e9e780fbfe5681f78d6c2b7003b8d4f8": {
+    "calls": [
+      {
+        "arguments": {
+          "object_id": "obs_src_4ca5f23159a0a691650430b5",
+          "revision": 1
+        },
+        "call_id": "seg003-005",
+        "name": "retrieve_original_observation"
+      }
+    ],
+    "kind": "capability_calls"
+  }
+}
