@@ -292,6 +292,58 @@ class CanonicalConversationReleaseTests(unittest.TestCase):
             ok=ok,
         )
 
+    def _manual_generic_fixture_observation(
+        self,
+        event: dict,
+        *,
+        object_id: str = "obs_bfix_generic_fixture_masquerade",
+    ) -> str:
+        when = datetime.fromisoformat(event["occurred_at"])
+        payload_sha = self.generic_module._sha256_text(
+            event["resident_visible_payload"]
+        )
+        projection_sha = self.generic_module._projection_sha256(event)
+        obs = Observation(
+            object_id=object_id,
+            subject_id="user_1",
+            occurred=TemporalExtent.point(when),
+            learned_at=when,
+            recorded_at=when,
+            created_by="c14_fixture_ingest:c14-mechanical-ingest-adapter-v1",
+            source_kind="conversation",
+            modality="text",
+            value=event["resident_visible_payload"],
+            metadata={
+                "dimension": "dim:conversation",
+                "source_class": "user",
+                "fixture_version": "c14-resident-fixture-v2",
+                "fixture_sha256": FROZEN_FIXTURE_SHA256,
+                "fixture_binding_version": "c14-fixture-event-binding-v1",
+                "fixture_event_id": event["event_id"],
+                "fixture_sequence": event["sequence"],
+                "fixture_payload_sha256": payload_sha,
+                "fixture_projection_sha256": projection_sha,
+                "external_record_id": event["event_id"],
+                "external_revision": "1",
+                "occurred_at_original": event["occurred_at"],
+                "mechanical_ingest": True,
+            },
+        )
+        store = SQLiteWorldStore(self.world_db)
+        store.commit(
+            [obs],
+            OperationRequest(
+                operation_id=f"op_{object_id}",
+                operation_name="test.bfix.generic_fixture_masquerade",
+                arguments={"object_id": object_id},
+                expected_world_revision=store.current_world_revision(),
+                reason="C14-RES-B-FIX-001 generic fixture masquerade regression",
+                idempotency_key=f"bfix:{object_id}",
+                source_class=SourceClass.USER,
+            ),
+        )
+        return f"{object_id}@1"
+
     def _manual_conversation_observation(
         self,
         event: dict,
@@ -498,8 +550,15 @@ class CanonicalConversationReleaseTests(unittest.TestCase):
 
     def test_04_generic_fixture_observation_cannot_ack_phase_b_conversation(self) -> None:
         event = self.reveal26()
-        generic = self.generic_ingest(event)
-        proc = self.ack_conversation(event, generic["ingest_ref"], ok=False)
+
+        with self.assertRaisesRegex(
+            Exception,
+            "must use canonical_conversation_ingest.py",
+        ):
+            self.generic_ingest(event)
+
+        generic_ref = self._manual_generic_fixture_observation(event)
+        proc = self.ack_conversation(event, generic_ref, ok=False)
         self.assertEqual(proc.stdout, "")
         self.assertIn("canonical conversation mismatch", proc.stderr)
 
