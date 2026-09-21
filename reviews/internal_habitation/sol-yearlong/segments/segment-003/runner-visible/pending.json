@@ -1,48 +1,275 @@
 {
-  "decision_key": "42a7047fbc2aadb856eb4d4ab6ea2e03e81648bf98778178a47e4b45da6ae0f2",
+  "decision_key": "d23230da7c26c5086313d1e4ac0a8e9c62170adc163420ccb5afb4501833b619",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-summary.pending.v1",
   "simulated_clock": "2027-01-24T20:15:00+00:00",
   "summary_request": {
     "request": {
-      "dimension": "dim:staff_schedule",
+      "dimension": "dim:user_ai_interaction",
       "granularity": "week",
-      "source_world_revision": 206,
+      "source_world_revision": 207,
       "sources": [
         {
           "metadata": {
-            "dimension": "dim:staff_schedule",
+            "dimension": "dim:user_ai_interaction",
             "summary_kind": "single_dimension_temporal"
           },
-          "object_id": "sum_2699cc4606d12dfb79f7e4dd",
+          "object_id": "sum_e2be072de831ed1f545f48bc",
           "object_type": "summary",
-          "occurred_at": "2027-01-23T00:00:00Z",
+          "occurred_at": "2027-01-18T00:00:00Z",
           "revision": 1,
-          "text": "2027-01-23的排班记录显示：小赵2027-01-24班次为12:30—21:00，备注已确认负责晚间收尾。该记录确认职责安排，不代表该班次或收尾工作已实际完成。"
+          "text": "2027-01-18，用户报告店内消防检查已经结束，检查员确认通过且没有提出整改要求，并允许 AIOS 记录该结果。AIOS将“检查通过、无整改要求”作为由实际检查结果支持的已确认事实，同时明确不再把此前的准备状态代替正式检查结果。"
         },
         {
           "metadata": {
-            "adapter_id": "habitation.staff_schedule.v1",
-            "dimension": "dim:staff_schedule",
-            "external_record_id": "d041-staff-schedule",
-            "external_revision": "1",
-            "mechanical_ingest": true,
-            "occurred_at_original": "2027-01-23T12:00:00+00:00",
-            "provenance": {
-              "habitation_resident_metadata": {
-                "source": "staff_schedule_app"
-              },
-              "model_id_not_part_of_fact": true
-            },
-            "source_class": "user",
-            "source_digest": "216721959fdc6bcfc23cbe021472444c914b0dc5574588f0ba44a6fe9c74ca13",
-            "source_schema_version": "1"
+            "dimension": "dim:user_ai_interaction",
+            "role": "assistant",
+            "session_id": "jan18-after-inspection",
+            "turn_index": 1,
+            "turn_key": "c104ed55f6caf08d31019872"
           },
-          "object_id": "obs_src_b06cc41ee7cc41bf8c27a8b4",
+          "object_id": "obs_conv_ai_922f0dd94d11594b2535ceaf",
           "object_type": "observation",
-          "occurred_at": "2027-01-23T12:00:00Z",
+          "occurred_at": "2027-01-18T17:00:00Z",
           "revision": 1,
-          "text": "{\"date\": \"2027-01-24\", \"employee\": \"小赵\", \"note\": \"已确认负责晚间收尾\", \"shift_end\": \"21:00\", \"shift_start\": \"12:30\"}"
+          "text": "记下了：今天的消防检查已经通过，检查员没有提出整改要求。这个结论现在有实际检查结果支撑，可以作为已确认事实；我不会再把之前的准备状态当成检查结果。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "user",
+            "session_id": "jan18-after-inspection",
+            "turn_index": 1,
+            "turn_key": "c104ed55f6caf08d31019872"
+          },
+          "object_id": "obs_conv_user_0238ab2e202146a7625eb120",
+          "object_type": "observation",
+          "occurred_at": "2027-01-18T17:00:00Z",
+          "revision": 1,
+          "text": "消防检查结束了，检查员说通过，没有要求整改。这个结果可以记下来。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "summary_kind": "single_dimension_temporal"
+          },
+          "object_id": "sum_1e2e3dec53ce671b2c0736cb",
+          "object_type": "summary",
+          "occurred_at": "2027-01-19T00:00:00Z",
+          "revision": 1,
+          "text": "2027-01-19，用户要求消防检查事项收口，当前重点仍是早高峰出品，希望连续观察后再调整，不由单日销售数字下结论。AIOS回复已核对原消防提醒任务为取消状态，不重新开启，并沿用早高峰观察安排，关注等待、返工、缺货等实际记录。该交流没有提出新的菜单调整或确认出品已稳定。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "assistant",
+            "session_id": "jan19-morning",
+            "turn_index": 1,
+            "turn_key": "b1f8fe4ec537dabb56c2c3d9"
+          },
+          "object_id": "obs_conv_ai_f3c7c4f07de15608141322d0",
+          "object_type": "observation",
+          "occurred_at": "2027-01-19T08:15:00Z",
+          "revision": 1,
+          "text": "消防这件事先收口。我核对了原提醒任务，它已经取消，不会重新开启。接下来沿用早高峰的观察安排，先看连续记录里的等待、返工、缺货等实际情况；单日销售额只作一条记录，不据此断言出品稳定或直接调整菜单。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "user",
+            "session_id": "jan19-morning",
+            "turn_index": 1,
+            "turn_key": "b1f8fe4ec537dabb56c2c3d9"
+          },
+          "object_id": "obs_conv_user_ebc76d6d091f87202351a7c0",
+          "object_type": "observation",
+          "occurred_at": "2027-01-19T08:15:00Z",
+          "revision": 1,
+          "text": "消防检查已经结束，这件事先收口。早高峰出品还是我现在最关心的，我想先连续观察一阵再调整，不要因为某一天的销售数字就直接下结论。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "summary_kind": "single_dimension_temporal"
+          },
+          "object_id": "sum_cd829a818aa7393666ff7f33",
+          "object_type": "summary",
+          "occurred_at": "2027-01-20T00:00:00Z",
+          "revision": 1,
+          "text": "2027-01-20，用户上午报告牛角包出品晚了，提出烤箱拖慢的第一反应，但明确要求不要当成原因，先查记录。AIOS核对后说明计划7:40、实际8:02，延后22分钟；成型台前等待17分钟而原因未填，暂不能归因于烤箱。晚间用户要求继续记录实际等候点，不给早高峰定永久原因。AIOS结合当日烤箱达温、温度范围与无故障码记录，以及成型台三批12、8、17分钟的等候记录，说明当前不足以定烤箱为原因，也不能改断言成型台是永久瓶颈或排除所有设备因素。交流维持连续观察方向，没有确认根因；AIOS表示暂不据此换设备或扩菜单。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "assistant",
+            "session_id": "jan20-morning",
+            "turn_index": 1,
+            "turn_key": "8637ff572bc77696f208d6db"
+          },
+          "object_id": "obs_conv_ai_a9d579f856f4865db902aae4",
+          "object_type": "observation",
+          "occurred_at": "2027-01-20T09:10:00Z",
+          "revision": 1,
+          "text": "看了今天的原始出品记录：牛角包计划7:40就绪，实际8:02，晚了22分钟；另记有成型台前17分钟等待，但原因栏没有填写。这能确认今天有延后和等待，不能据此认定烤箱拖慢了，也不能把17分钟直接算作全部延误的原因。先保留“烤箱慢”这个待核实的猜测，不写成结论。接下来沿用连续观察，重点对照成型、进炉和出炉时间，看看等待发生在哪里、是否重复出现。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "user",
+            "session_id": "jan20-morning",
+            "turn_index": 1,
+            "turn_key": "8637ff572bc77696f208d6db"
+          },
+          "object_id": "obs_conv_user_0f575c8301820e6a83ab4e38",
+          "object_type": "observation",
+          "occurred_at": "2027-01-20T09:10:00Z",
+          "revision": 1,
+          "text": "今天牛角包确实晚了一些。我第一反应是烤箱拖慢了，但先别把这个当原因，看看今天留下来的记录再说。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "assistant",
+            "session_id": "jan20-evening",
+            "turn_index": 1,
+            "turn_key": "b24a07b5af6224c12e0da22d"
+          },
+          "object_id": "obs_conv_ai_aaf5d28718878a7acfe8ad49",
+          "object_type": "observation",
+          "occurred_at": "2027-01-20T20:30:00Z",
+          "revision": 1,
+          "text": "对，今天的记录还不支持把原因定在烤箱上：烤箱5:47达到205°C，记录的5:47—8:15温度范围是203—207°C，没有故障码；成型台6:00—8:30则记录了三批等待，分别12、8、17分钟，但没有记录成因。可以确认成型台有等待，不能把“成型台是永久瓶颈”当成新结论，也不能凭这些指标排除所有烤箱因素。继续按实际等候点观察，分清发生了什么和为什么发生；暂不据此换设备或扩菜单。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "user",
+            "session_id": "jan20-evening",
+            "turn_index": 1,
+            "turn_key": "b24a07b5af6224c12e0da22d"
+          },
+          "object_id": "obs_conv_user_cc031f2f198bf709cea0cc61",
+          "object_type": "observation",
+          "occurred_at": "2027-01-20T20:30:00Z",
+          "revision": 1,
+          "text": "从今天这些记录看，至少不能只怪烤箱。先继续记实际等候点，别急着给早高峰定一个永久原因。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "summary_kind": "single_dimension_temporal"
+          },
+          "object_id": "sum_b26800d7dbb832fc02e0fcab",
+          "object_type": "summary",
+          "occurred_at": "2027-01-21T00:00:00Z",
+          "revision": 1,
+          "text": "2027-01-21晚间，用户确认醒发架当天挤过一阵，要求只按当日事实记录，不写成长期瓶颈。AIOS回应将小赵所记6:10—6:42架满、两盘等空位及随后恢复周转作为有时间边界的情况；醒发架周转只是继续观察的环节，不用于解释前一天全部延误。是否重复及是否影响最终出品仍待后续记录。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "assistant",
+            "session_id": "jan21-night",
+            "turn_index": 1,
+            "turn_key": "ba96bbec185843c31e5142a3"
+          },
+          "object_id": "obs_conv_ai_18cb3daac965bfcd1b673390",
+          "object_type": "observation",
+          "occurred_at": "2027-01-21T21:10:00Z",
+          "revision": 1,
+          "text": "明白，按今天这次有边界的事实记：小赵记录6:10—6:42醒发架满，两盘面团等空位，6:42后恢复周转。现有判断只是把醒发架周转列为继续观察的环节，不是“长期瓶颈”，也不拿它解释昨天全部延误。是否反复出现、是否影响实际出品时间，还要看后续记录。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "user",
+            "session_id": "jan21-night",
+            "turn_index": 1,
+            "turn_key": "ba96bbec185843c31e5142a3"
+          },
+          "object_id": "obs_conv_user_2906f3bcf7dffcb7612ac88f",
+          "object_type": "observation",
+          "occurred_at": "2027-01-21T21:10:00Z",
+          "revision": 1,
+          "text": "醒发架今天确实挤了一阵，但这只是今天看到的情况。先记事实，不要直接写成“我们的长期瓶颈就是醒发架”。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "summary_kind": "single_dimension_temporal"
+          },
+          "object_id": "sum_1b6cbd575be66c708eb34265",
+          "object_type": "summary",
+          "occurred_at": "2027-01-22T00:00:00Z",
+          "revision": 1,
+          "text": "2027-01-22，用户决定本次面粉按1.41继续选择North Mill，认为与1.42的微小差额不值得反复更换供应商，当前更想稳定出品。AIOS确认两数差额为0.01，不夸大价差、不另起换供应商比较，并维持早高峰实际等候点的观察方向，菜单扩张暂不优先。这是本次采购选择和当前优先级，不等于用户永久不比较供应商或采购已由AIOS执行。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "assistant",
+            "session_id": "jan22-evening",
+            "turn_index": 1,
+            "turn_key": "47529a47cb9fde8377b6c36f"
+          },
+          "object_id": "obs_conv_ai_13a09c952700f6ec77d1b9a4",
+          "object_type": "observation",
+          "occurred_at": "2027-01-22T18:20:00Z",
+          "revision": 1,
+          "text": "好，这次按你的选择继续用North Mill。1.41与1.42的差额是0.01，不把这点价差说成大幅变化，也不为此另起一轮换供应商的比较。当前重点仍是把早高峰出品稳定下来，沿用实际等候点的观察，不分散到菜单扩张上。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "user",
+            "session_id": "jan22-evening",
+            "turn_index": 1,
+            "turn_key": "47529a47cb9fde8377b6c36f"
+          },
+          "object_id": "obs_conv_user_54903466038169effa3b1926",
+          "object_type": "observation",
+          "occurred_at": "2027-01-22T18:20:00Z",
+          "revision": 1,
+          "text": "这次面粉1.41就继续跟North Mill走吧。和1.42差这一点我不想来回折腾供应商，我现在更想把出品稳定下来。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "summary_kind": "single_dimension_temporal"
+          },
+          "object_id": "sum_4f83fd9e72755ce58b734186",
+          "object_type": "summary",
+          "occurred_at": "2027-01-23T00:00:00Z",
+          "revision": 1,
+          "text": "2027-01-23晚间，用户确认1月24日19点和妹妹吃饭，小赵已确认负责晚间收尾；明确要求不再提醒，不要继续描述为冲突。AIOS回应按已定安排处理，不再提醒或称其为未解决冲突。该交流确认计划及分工，不是晚餐或收尾已经完成的报告。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "assistant",
+            "session_id": "jan23-evening",
+            "turn_index": 1,
+            "turn_key": "c08def7e5ba06dbeb0d88d2e"
+          },
+          "object_id": "obs_conv_ai_205b44baf294efb8bbd7b66d",
+          "object_type": "observation",
+          "occurred_at": "2027-01-23T20:10:00Z",
+          "revision": 1,
+          "text": "收到：明晚1月24日19点，你和妹妹吃饭，小赵已确认负责晚间收尾。按已定安排处理，不再提醒，也不把它描述为尚未解决的冲突。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "user",
+            "session_id": "jan23-evening",
+            "turn_index": 1,
+            "turn_key": "c08def7e5ba06dbeb0d88d2e"
+          },
+          "object_id": "obs_conv_user_c7cceef8903fa9d2c58b9daa",
+          "object_type": "observation",
+          "occurred_at": "2027-01-23T20:10:00Z",
+          "revision": 1,
+          "text": "明晚19点我和妹妹吃饭，小赵已经确认负责晚间收尾。这个安排现在已经定了，不用再提醒我，也别把它说成还在冲突。"
         }
       ],
       "truncated": false,
@@ -51,5 +278,5 @@
     },
     "summary_request_type": "DimensionSummaryInput"
   },
-  "world_revision_before": 206
+  "world_revision_before": 207
 }
