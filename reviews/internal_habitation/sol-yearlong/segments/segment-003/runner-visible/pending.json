@@ -1,8 +1,8 @@
 {
-  "decision_key": "dc3078500997703979e131946ad1ac957398521157df3526704200d9037cd24a",
+  "decision_key": "261fa5a6feef720ab13738d4ae8c76d150b4dd33dc0627040c77873063fb9a57",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-resident.pending.v1",
-  "simulated_clock": "2027-01-26T10:00:00+00:00",
+  "simulated_clock": "2027-01-26T18:10:00+00:00",
   "snapshot": {
     "capability_catalog": [
       {
@@ -741,51 +741,51 @@
         }
       ],
       "conversation_summaries": [],
-      "current_topic": "刚收到一个客人说“今天八点左右牛角包还没出齐”。这听起来和我们正在看的早高峰有关，但先别因为一条反馈就认定原因。",
-      "estimated_tokens": 2062,
+      "current_topic": "我刚看见那条反馈附的小票了，是1月24日的订单，不是今天。我之前顺着客人写的“今天”理解错日期了，按小票时间记。",
+      "estimated_tokens": 1965,
       "memory_cards": [
         {
           "dimension": "dim:user_ai_interaction",
-          "excerpt": "今天牛角包确实晚了一些。我第一反应是烤箱拖慢了，但先别把这个当原因，看看今天留下来的记录再说。",
+          "excerpt": "是，先把它保留为1月26日一位顾客关于“8点左右牛角包还没出齐”的反馈，纳入现有早高峰观察。它提示我们核对今天相关批次的计划与实际出品时间，但没有说明具体等候环节；不能直接归到烤箱或醒发架，也不能据此说与1月20日是同一个原因。后续对上当天出品记录再判断。",
           "match_reason": "current_topic_index_overlap",
-          "object_id": "obs_conv_user_0f575c8301820e6a83ab4e38",
+          "object_id": "obs_conv_ai_bcd12dbeb8c1777a6dd48667",
           "object_type": "observation",
           "retrieval_score": 6,
           "revision": 1
         },
         {
-          "dimension": "dim:production_log",
-          "excerpt": "2027-01-20的shop_floor_log有两条出品记录。牛角包计划7:40就绪，实际8:02，延后22分钟；记录成型台前等待17分钟，未填写原因。另一条记录覆盖6:00—8:30，成型台三批排队时间分别为12、8、17分钟，仅记录等候，未记录成因。两条记录未明确批次对应关系，不能将其中两个17分钟视为两次独立等待再相加，也不能由排队时长确认全部延误的因果或早高峰的永久原因。",
+          "dimension": "dim:calendar",
+          "excerpt": "2027-01-18至24日的本次日历来源包含一项安排及其日摘要：1月23日录入1月24日19:00 UTC与妹妹在店附近吃晚饭的计划。两项来源指向同一安排，不是两次晚餐；未提供结束时间、实际履行结果或冲突证据。",
           "match_reason": "current_topic_index_overlap",
-          "object_id": "sum_f86057a5cbb41415185a3689",
+          "object_id": "sum_2385148e9d53f5ea4793ea46",
           "object_type": "summary",
           "retrieval_score": 6,
           "revision": 1
         },
         {
+          "dimension": "dim:equipment_telemetry",
+          "excerpt": "2027-01-18至24日的本次设备遥测来源仅覆盖1月20日一条原始记录及其日摘要：deck_oven_1在5:47达到205°C预热目标，5:47—8:15温度范围203—207°C，无故障码。摘要不是另一份独立测量；该时段数据不足以代表整周设备表现、排除所有设备或操作因素，或确定出品延后的原因。",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "sum_69f85e2877d238e4d6fe4635",
+          "object_type": "summary",
+          "retrieval_score": 5,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:staff_note",
+          "excerpt": "2027-01-18至24日的本次员工笔记来源为1月21日小赵的一条记录及其日摘要：6:10—6:42醒发架满，两盘面团在推车上等空位，6:42后恢复周转。两项来源描述同一情况，未提供各盘等候时长、最终出品受影响程度或其他日期的重复情况，不能将它扩写为整周常态或长期瓶颈。",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "sum_bef90a66ccd7856a0d297e18",
+          "object_type": "summary",
+          "retrieval_score": 5,
+          "revision": 1
+        },
+        {
           "dimension": "dim:production_log",
-          "excerpt": "截至2027-01-21早晨，早高峰观察应同时关注成型台等候和醒发架空位周转，而非先把原因固定为烤箱。1月20日成型台有12、8、17分钟的三批等待但未记成因；当日烤箱在所测时段达温且无故障码，只能限制有关烤箱的推断，不能排除全部设备因素。1月21日小赵记录的06:10—06:42醒发架满、两盘面团等空位、随后恢复周转，提供了一个具体且有时间边界的等待环节。它不证明1月20日延误由同一因素造成，也",
+          "excerpt": "2027-01-18至24日的本次出品来源包含1月20日两条原始日志及日摘要、1月21日AI Claim及其证据集和摘要。20日牛角包计划7:40、实际8:02，延后22分钟，成型台前等待17分钟而原因未填；6:00—8:30成型台三批排队12、8、17分钟，未记录成因，批次对应关系不明，不重复相加。21日可修订认识clm_e53b73a8448b388aeabdc6bf@1建议继续观察成型等候与",
           "match_reason": "current_topic_index_overlap",
-          "object_id": "clm_e53b73a8448b388aeabdc6bf",
-          "object_type": "claim",
-          "retrieval_score": 5,
-          "revision": 1
-        },
-        {
-          "dimension": "dim:user_ai_interaction",
-          "excerpt": "从今天这些记录看，至少不能只怪烤箱。先继续记实际等候点，别急着给早高峰定一个永久原因。",
-          "match_reason": "current_topic_index_overlap",
-          "object_id": "obs_conv_user_cc031f2f198bf709cea0cc61",
-          "object_type": "observation",
-          "retrieval_score": 5,
-          "revision": 1
-        },
-        {
-          "dimension": "dim:user_ai_interaction",
-          "excerpt": "看了今天的原始出品记录：牛角包计划7:40就绪，实际8:02，晚了22分钟；另记有成型台前17分钟等待，但原因栏没有填写。这能确认今天有延后和等待，不能据此认定烤箱拖慢了，也不能把17分钟直接算作全部延误的原因。先保留“烤箱慢”这个待核实的猜测，不写成结论。接下来沿用连续观察，重点对照成型、进炉和出炉时间，看看等待发生在哪里、是否重复出现。",
-          "match_reason": "current_topic_index_overlap",
-          "object_id": "obs_conv_ai_a9d579f856f4865db902aae4",
-          "object_type": "observation",
+          "object_id": "sum_eb87017128f4999339bdffe0",
+          "object_type": "summary",
           "retrieval_score": 5,
           "revision": 1
         }
@@ -861,38 +861,22 @@
           "raw_drill_down_capability": "drill_down_conversation",
           "recent_turn_count": 0,
           "round_summary_count": 0,
-          "session_id": "jan26-morning",
+          "session_id": "jan26-evening",
           "summary_index_capability": "list_conversation_summaries",
           "summary_search_capability": "search_conversation_summaries"
         },
         "current_user_observation_ref": {
-          "object_id": "obs_conv_user_cff02b70d74b67a47d62aeec",
+          "object_id": "obs_conv_user_5b4f93997ce703139c198d76",
           "revision": 1
         },
         "related_execution_anchors": [
           {
             "dimension": "dim_unclassified",
-            "excerpt": "观察早高峰出品卡点\n先从实际早高峰记录中识别等待、返工、缺货或其他出品不稳定现象；没有事实依据前不预设原因，也暂不把菜单扩张作为当前优先任务。",
-            "object_id": "task_4ab2a4531967655198502158",
+            "excerpt": "等待妹妹航班时间确认并检查安排冲突\n旧航班与到货时间核实事项收口，不再提醒或重述为冲突；不为此产生新的发送动作。",
+            "object_id": "task_41571ce5cbcc6c736bb22f73",
             "object_type": "task",
-            "retrieval_score": 3,
-            "revision": 1
-          },
-          {
-            "dimension": "dim_unclassified",
-            "excerpt": "先稳定早高峰出品\n用户明确表示开店比预期更忙，当前优先把早高峰出品稳定住；此前考虑的菜单新品扩张暂时放后。",
-            "object_id": "goal_c909920b70a6835d5a42833e",
-            "object_type": "goal",
-            "retrieval_score": 2,
-            "revision": 1
-          },
-          {
-            "dimension": "dim_unclassified",
-            "excerpt": "send_message\n小赵收到通知；平台返回真实发送/失败结果。",
-            "object_id": "action_96c74ab2565b5052458a66cd",
-            "object_type": "action",
             "retrieval_score": 1,
-            "revision": 1
+            "revision": 3
           }
         ],
         "topic_state": {
@@ -901,17 +885,17 @@
           "gate_open": true,
           "history_may_help": true,
           "reason": "current_utterance_topic:indexed_current_world_anchor",
-          "topic": "刚收到一个客人说“今天八点左右牛角包还没出齐”。这听起来和我们正在看的早高峰有关，但先别因为一条反馈就认定原因。"
+          "topic": "我刚看见那条反馈附的小票了，是1月24日的订单，不是今天。我之前顺着客人写的“今天”理解错日期了，按小票时间记。"
         }
       },
       "token_budget": 3400,
       "truncated": false,
-      "user_input": "刚收到一个客人说“今天八点左右牛角包还没出齐”。这听起来和我们正在看的早高峰有关，但先别因为一条反馈就认定原因。"
+      "user_input": "我刚看见那条反馈附的小票了，是1月24日的订单，不是今天。我之前顺着客人写的“今天”理解错日期了，按小票时间记。"
     },
     "remaining_tool_rounds": 8,
     "round_index": 0,
-    "user_input": "刚收到一个客人说“今天八点左右牛角包还没出齐”。这听起来和我们正在看的早高峰有关，但先别因为一条反馈就认定原因。",
+    "user_input": "我刚看见那条反馈附的小票了，是1月24日的订单，不是今天。我之前顺着客人写的“今天”理解错日期了，按小票时间记。",
     "wake_reason": "user_interaction"
   },
-  "world_revision_before": 220
+  "world_revision_before": 223
 }

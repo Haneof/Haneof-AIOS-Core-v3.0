@@ -1,20 +1,20 @@
 {
   "branch": "arena/01a0bf95-haneof-aios-core-v3-0",
   "export_rule": "Only first missing semantic request; no hidden fixture copied.",
-  "head_sha": "cb63026b1af4deb880e907db5abf9be0f2838dde",
+  "head_sha": "4c6276136a9c274cc791926ae5c7f2d5477f66b3",
   "pending_blocks_printed": 1,
-  "run_id": 35557860870,
+  "run_id": 35557928240,
   "runner_attestation": {
     "current_state": {
-      "delivered_external_events": 20,
-      "index_watermark": 220,
-      "last_consumed_external_event_id": "d046-feedback",
-      "resident_replayed_calls": 31,
-      "simulated_clock": "2027-01-26T10:00:00+00:00",
+      "delivered_external_events": 22,
+      "index_watermark": 223,
+      "last_consumed_external_event_id": "d048-feedback-attachment",
+      "resident_replayed_calls": 32,
+      "simulated_clock": "2027-01-26T18:10:00+00:00",
       "status": "pending",
       "summary_replayed_calls": 25,
-      "world_revision": 220,
-      "world_sha256": "934f185afd0eac755ce50cf9f9ef601a2c9b308426055f1f050ac7579975910a"
+      "world_revision": 223,
+      "world_sha256": "11a7b32ddbbb5a0e153d6bc3b20d96ae4bb8161756a9e69a9ff696482159791b"
     },
     "expected_source_revision": 145,
     "expected_subject": "sol-resident-20260921-001",
@@ -30,14 +30,14 @@
     "source_world_sha256": "ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8"
   },
   "state": {
-    "delivered_external_events": 20,
-    "index_watermark": 220,
-    "last_consumed_external_event_id": "d046-feedback",
-    "resident_replayed_calls": 31,
-    "simulated_clock": "2027-01-26T10:00:00+00:00",
+    "delivered_external_events": 22,
+    "index_watermark": 223,
+    "last_consumed_external_event_id": "d048-feedback-attachment",
+    "resident_replayed_calls": 32,
+    "simulated_clock": "2027-01-26T18:10:00+00:00",
     "status": "pending",
     "summary_replayed_calls": 25,
-    "world_revision": 220,
-    "world_sha256": "934f185afd0eac755ce50cf9f9ef601a2c9b308426055f1f050ac7579975910a"
+    "world_revision": 223,
+    "world_sha256": "11a7b32ddbbb5a0e153d6bc3b20d96ae4bb8161756a9e69a9ff696482159791b"
   }
 }
