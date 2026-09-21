@@ -1607,3 +1607,41 @@ Resident A is released under:
 `reviews/internal_habitation/c14-resident/v2/release/RESIDENT_A_RUN_CONTRACT.md`
 
 Resident A must remain semantically blind to fixture/evaluator/FIX completion/PM review material and personally author every model semantic checkpoint from current RuntimeSnapshot only.
+
+
+---
+
+## 2026-09-21 — C14 Resident A accepted; Resident B conversation preflight required
+
+Independent PM review accepts `C14-RES-A-001`.
+
+Evidence is pinned at PR #75 head:
+
+`cb9b56b7039272d932158f33bfe979eff6749c9b`
+
+Accepted sealed handoff:
+
+- Phase A cursors: 1..24
+- cursor 25 revealed: NO
+- World revision/index watermark: 166 / 166
+- World SHA256: `0ee338aa8f2845bb376610da3c450e09ff9cc8bec5184ca60608b2465d7ba72f`
+- release-state SHA256: `e922d268fbb11364a7bb558aed60b88e7a3c075032f4fa4e1c47a84de3f765f1`
+- durable cognition: one current hypothesis Claim at revision 2
+- future leak / pseudo-LLM / Core modifications: not found.
+
+Non-blocking provenance notes:
+
+- Arena runtime used Python 3.11.2 although repository support declares >=3.12; B should use 3.12+.
+- exact provider/session model identity was not platform-attested, so cross-model claims must not rely only on the declared model string.
+
+Before Resident B, PM found a transport-layer ambiguity: the generic blind fixture adapter already stores a conversation Observation, while ordinary `FusedTurnRuntime.run_turn` must store a canonical `user_ai_interaction` Observation. Running both naively duplicates the same user utterance.
+
+Next READY task:
+
+`C14-RES-B-FIX-001`
+
+Canonical scope:
+
+`governance/C14_RES_B_CONVERSATION_INGEST_PREFLIGHT_2026-09-21.md`
+
+No Core change and no Resident-B semantics are allowed in that preflight.
