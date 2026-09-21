@@ -415,7 +415,7 @@ class FusedTurnRuntime:
                     "modality": "string?",
                     "metadata_equals": "object?",
                     "numeric": "{operator:gt|gte|lt|lte|eq|ne,threshold:number,path:array[string]?}?",
-                    "priority": "integer[0,100]?",
+                    "priority": "integer?",
                     "cooldown_seconds": "integer?",
                     "expires_at": "ISO-8601 datetime?",
                 },
