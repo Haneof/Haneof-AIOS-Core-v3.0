@@ -176,6 +176,9 @@ def test_openai_responses_tool_loop_and_provenance() -> None:
     assert first.capability_calls[0].call_id == "call_1"
     assert first.usage is not None
     assert first.usage.total_tokens == 28
+    assert first.usage.provider == "openai"
+    assert first.usage.model == "test-openai"
+    assert first.usage.request_id == "resp_1"
     assert first.capability_calls[0].arguments["query"] == "Seattle"
 
     result = CapabilityResult(
@@ -240,6 +243,9 @@ def test_anthropic_messages_tool_loop_round_trips_tool_result() -> None:
     assert first.capability_calls[0].call_id == "toolu_1"
     assert first.usage is not None
     assert first.usage.total_tokens == 21
+    assert first.usage.provider == "anthropic"
+    assert first.usage.model == "test-claude"
+    assert first.usage.request_id == "msg_1"
 
     result = CapabilityResult(
         name="search_world",
@@ -303,6 +309,9 @@ def test_gemini_interactions_tool_loop_uses_previous_interaction() -> None:
     assert first.capability_calls[0].call_id == "fc_1"
     assert first.usage is not None
     assert first.usage.total_tokens == 12
+    assert first.usage.provider == "gemini"
+    assert first.usage.model == "test-gemini"
+    assert first.usage.request_id == "interaction_1"
 
     result = CapabilityResult(
         name="search_world",
