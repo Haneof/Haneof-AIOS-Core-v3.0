@@ -26,7 +26,8 @@ _bootstrap_repo_src()
 
 from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
-OPERATOR_VERSION = "c14-blind-release-operator-v3"
+OPERATOR_VERSION = "c14-blind-release-operator-v4"
+LEGACY_HANDOFF_OPERATOR_VERSION = "c14-blind-release-operator-v3"
 STATE_VERSION = "c14-release-state-v3"
 FIXTURE_VERSION = "c14-resident-fixture-v2"
 FIXTURE_SHA256 = "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253"
@@ -34,6 +35,8 @@ SCHEMA_VERSION = "c14-resident-event-v2"
 CONTRACT_VERSION = "c14-sequential-release-v2"
 INGEST_ADAPTER_VERSION = "c14-mechanical-ingest-adapter-v1"
 BINDING_VERSION = "c14-fixture-event-binding-v1"
+CANONICAL_CONVERSATION_ADAPTER_VERSION = "c14-canonical-conversation-adapter-v1"
+CANONICAL_CONVERSATION_BINDING_VERSION = "c14-canonical-conversation-binding-v1"
 PHASE_A_MAX = 24
 PHASE_B_START = 25
 ROOT = V2_ROOT
@@ -132,6 +135,10 @@ def _load_bundle() -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]]
         raise ReleaseError("ingest adapter version mismatch")
     if manifest.get("fixture_binding_version") != BINDING_VERSION:
         raise ReleaseError("fixture binding version mismatch")
+    if manifest.get("canonical_conversation_adapter_version") != CANONICAL_CONVERSATION_ADAPTER_VERSION:
+        raise ReleaseError("canonical conversation adapter version mismatch")
+    if manifest.get("canonical_conversation_binding_version") != CANONICAL_CONVERSATION_BINDING_VERSION:
+        raise ReleaseError("canonical conversation binding version mismatch")
     if manifest.get("subject_id") != fixture.get("subject_id"):
         raise ReleaseError("fixture subject mismatch")
     events = fixture.get("events")
@@ -211,11 +218,26 @@ def _validate_receipt_shape(
     if receipt.get("fixture_projection_sha256") != _projection_sha256(event):
         raise ReleaseError("release receipt projection digest mismatch")
 
+    mode = receipt.get("binding_mode", "fixture_observation")
+    if mode not in {"fixture_observation", "canonical_user_turn"}:
+        raise ReleaseError("release receipt binding mode invalid")
+    if mode == "canonical_user_turn":
+        if receipt.get("binding_version") != CANONICAL_CONVERSATION_BINDING_VERSION:
+            raise ReleaseError("canonical conversation receipt binding version mismatch")
+        session_id = receipt.get("session_id")
+        turn_index = receipt.get("turn_index")
+        if not isinstance(session_id, str) or not session_id.strip():
+            raise ReleaseError("canonical conversation receipt session id invalid")
+        if not isinstance(turn_index, int) or isinstance(turn_index, bool) or turn_index < 1:
+            raise ReleaseError("canonical conversation receipt turn index invalid")
+
 
 def _load_state(
     path: Path,
     manifest: dict[str, Any],
     events: list[dict[str, Any]],
+    *,
+    allow_legacy_handoff: bool = False,
 ) -> dict[str, Any]:
     state = _read_json(path)
     if state.get("state_version") != STATE_VERSION:
@@ -226,8 +248,13 @@ def _load_state(
         raise ReleaseError("state schema version mismatch")
     if state.get("release_contract_version") != CONTRACT_VERSION:
         raise ReleaseError("state contract version mismatch")
-    if state.get("release_operator_version") != OPERATOR_VERSION:
-        raise ReleaseError("state operator version mismatch")
+    state_operator = state.get("release_operator_version")
+    if state_operator != OPERATOR_VERSION:
+        if not (
+            allow_legacy_handoff
+            and state_operator == LEGACY_HANDOFF_OPERATOR_VERSION
+        ):
+            raise ReleaseError("state operator version mismatch")
     if state.get("fixture_sha256") != manifest.get("fixture_sha256"):
         raise ReleaseError("state fixture digest mismatch")
     phase = state.get("active_phase")
@@ -266,6 +293,15 @@ def _load_state(
         raise ReleaseError("Phase A cursor exceeded sealed handoff")
     if phase == "B" and nxt < PHASE_B_START:
         raise ReleaseError("Phase B cannot access Phase A cursor")
+    if state_operator == LEGACY_HANDOFF_OPERATOR_VERSION:
+        if not (
+            allow_legacy_handoff
+            and phase == "A"
+            and last == PHASE_A_MAX
+            and nxt == PHASE_B_START
+            and pending is None
+        ):
+            raise ReleaseError("legacy operator state is allowed only at exact Phase-A handoff")
     return state
 
 
@@ -306,6 +342,20 @@ def _phase_guard(
         if events[nxt - 1]["phase"] != "B":
             raise ReleaseError("Phase B event boundary mismatch")
     return nxt
+
+
+def _is_phase_b_canonical_conversation_event(
+    state: dict[str, Any],
+    event: dict[str, Any],
+) -> bool:
+    return (
+        state.get("active_phase") == "B"
+        and event.get("phase") == "B"
+        and event.get("dimension") == "dim:conversation"
+        and event.get("source_kind") == "conversation"
+        and event.get("source_class") == "USER"
+        and event.get("modality") == "text"
+    )
 
 
 def _verify_durable_world_binding(
@@ -391,6 +441,88 @@ def _verify_durable_world_binding(
     }
 
 
+def _verify_canonical_conversation_binding(
+    *,
+    world_db: str,
+    ingest_ref: str,
+    event: dict[str, Any],
+    fixture: dict[str, Any],
+    session_id: str,
+    turn_index: int,
+) -> dict[str, Any]:
+    world_path = Path(world_db)
+    if not world_path.is_file():
+        raise ReleaseError("private World database does not exist")
+    if not isinstance(session_id, str) or not session_id.strip():
+        raise ReleaseError("canonical conversation ack requires session id")
+    if not isinstance(turn_index, int) or isinstance(turn_index, bool) or turn_index < 1:
+        raise ReleaseError("canonical conversation ack requires positive turn index")
+    session_id = session_id.strip()
+    object_id, revision = _parse_ingest_ref(ingest_ref)
+    try:
+        store = SQLiteWorldStore(world_path)
+        record = store.object_revision_record(object_id, revision=revision)
+        payload = store.get_payload(object_id, revision=revision)
+    except StoreError as exc:
+        raise ReleaseError(
+            "exact canonical conversation revision is missing or unreadable"
+        ) from exc
+
+    expected_subject = str(fixture.get("subject_id") or "")
+    metadata = payload.get("metadata")
+    if not isinstance(metadata, dict):
+        raise ReleaseError("canonical conversation Observation metadata missing")
+    occurred = payload.get("occurred")
+    if not isinstance(occurred, dict):
+        raise ReleaseError("canonical conversation occurred time missing")
+
+    checks = (
+        (record.get("object_type"), "observation", "object type"),
+        (record.get("revision_kind"), "content", "revision kind"),
+        (record.get("subject_id"), expected_subject, "durable subject"),
+        (record.get("source_class"), "user", "durable source authority"),
+        (payload.get("object_type"), "observation", "payload object type"),
+        (payload.get("object_id"), object_id, "payload object id"),
+        (int(payload.get("revision", 0)), revision, "payload revision"),
+        (payload.get("subject_id"), expected_subject, "payload subject"),
+        (payload.get("source_kind"), "user_ai_interaction", "source kind"),
+        (payload.get("modality"), "text", "modality"),
+        (payload.get("value"), event["resident_visible_payload"], "text"),
+        (payload.get("created_by"), "conversation_ingest:user", "created_by"),
+        (metadata.get("dimension"), "dim:interaction", "dimension"),
+        (metadata.get("role"), "user", "role"),
+        (metadata.get("session_id"), session_id, "session id"),
+        (metadata.get("turn_index"), turn_index, "turn index"),
+    )
+    for actual, expected, label in checks:
+        if actual != expected:
+            raise ReleaseError(f"canonical conversation mismatch: {label}")
+
+    start = occurred.get("start")
+    end = occurred.get("end")
+    if not isinstance(start, str) or not isinstance(end, str):
+        raise ReleaseError("canonical conversation point time missing")
+    if not _same_instant(start, event["occurred_at"]) or not _same_instant(
+        end,
+        event["occurred_at"],
+    ):
+        raise ReleaseError("canonical conversation timestamp mismatch")
+
+    return {
+        "binding_mode": "canonical_user_turn",
+        "binding_version": CANONICAL_CONVERSATION_BINDING_VERSION,
+        "session_id": session_id,
+        "turn_index": turn_index,
+        "ingest_ref": ingest_ref,
+        "ingest_object_id": object_id,
+        "ingest_revision": revision,
+        "ingest_world_revision": int(record["world_revision"]),
+        "ingest_source_class": str(record["source_class"]),
+        "fixture_payload_sha256": _sha256_text(event["resident_visible_payload"]),
+        "fixture_projection_sha256": _projection_sha256(event),
+    }
+
+
 def _verify_prior_receipt_chain_in_world(
     *,
     world_db: str,
@@ -402,22 +534,47 @@ def _verify_prior_receipt_chain_in_world(
     for receipt in state["receipts"]:
         sequence = int(receipt["sequence"])
         event = events[sequence - 1]
-        durable = _verify_durable_world_binding(
-            world_db=world_db,
-            ingest_ref=str(receipt["ingest_ref"]),
-            event=event,
-            fixture=fixture,
-            manifest=manifest,
-        )
-        for key in (
-            "ingest_ref",
-            "ingest_object_id",
-            "ingest_revision",
-            "ingest_world_revision",
-            "ingest_source_class",
-            "fixture_payload_sha256",
-            "fixture_projection_sha256",
-        ):
+        mode = receipt.get("binding_mode", "fixture_observation")
+        if mode == "canonical_user_turn":
+            durable = _verify_canonical_conversation_binding(
+                world_db=world_db,
+                ingest_ref=str(receipt["ingest_ref"]),
+                event=event,
+                fixture=fixture,
+                session_id=str(receipt["session_id"]),
+                turn_index=int(receipt["turn_index"]),
+            )
+            keys = (
+                "binding_mode",
+                "binding_version",
+                "session_id",
+                "turn_index",
+                "ingest_ref",
+                "ingest_object_id",
+                "ingest_revision",
+                "ingest_world_revision",
+                "ingest_source_class",
+                "fixture_payload_sha256",
+                "fixture_projection_sha256",
+            )
+        else:
+            durable = _verify_durable_world_binding(
+                world_db=world_db,
+                ingest_ref=str(receipt["ingest_ref"]),
+                event=event,
+                fixture=fixture,
+                manifest=manifest,
+            )
+            keys = (
+                "ingest_ref",
+                "ingest_object_id",
+                "ingest_revision",
+                "ingest_world_revision",
+                "ingest_source_class",
+                "fixture_payload_sha256",
+                "fixture_projection_sha256",
+            )
+        for key in keys:
             if receipt.get(key) != durable.get(key):
                 raise ReleaseError(
                     f"release receipt no longer matches supplied private World: {key}"
@@ -456,7 +613,12 @@ def cmd_init(args: argparse.Namespace) -> None:
         return
     if not state_path.exists():
         raise ReleaseError("Phase B requires existing Phase-A handoff state")
-    state = _load_state(state_path, manifest, events)
+    state = _load_state(
+        state_path,
+        manifest,
+        events,
+        allow_legacy_handoff=True,
+    )
     if state["active_phase"] != "A":
         raise ReleaseError("Phase B initialization requires active Phase A handoff state")
     if state["pending_reveal"] is not None:
@@ -464,6 +626,7 @@ def cmd_init(args: argparse.Namespace) -> None:
     if state["last_acked_sequence"] != PHASE_A_MAX or state["next_sequence"] != PHASE_B_START:
         raise ReleaseError("Phase B must start exactly at cursor 25 after ack 24")
     state["active_phase"] = "B"
+    state["release_operator_version"] = OPERATOR_VERSION
     _atomic_write(state_path, state)
     _emit(
         {
@@ -520,13 +683,34 @@ def cmd_ack(args: argparse.Namespace) -> None:
         manifest=manifest,
     )
     event = events[nxt - 1]
-    durable = _verify_durable_world_binding(
-        world_db=args.world_db,
-        ingest_ref=args.ingest_ref,
-        event=event,
-        fixture=fixture,
-        manifest=manifest,
-    )
+    if _is_phase_b_canonical_conversation_event(state, event):
+        if args.conversation_session_id is None or args.conversation_turn_index is None:
+            raise ReleaseError(
+                "Phase-B USER conversation requires canonical conversation ack fields"
+            )
+        durable = _verify_canonical_conversation_binding(
+            world_db=args.world_db,
+            ingest_ref=args.ingest_ref,
+            event=event,
+            fixture=fixture,
+            session_id=args.conversation_session_id,
+            turn_index=args.conversation_turn_index,
+        )
+    else:
+        if args.conversation_session_id is not None or args.conversation_turn_index is not None:
+            raise ReleaseError(
+                "canonical conversation ack fields are forbidden for non-conversation event"
+            )
+        durable = {
+            "binding_mode": "fixture_observation",
+            **_verify_durable_world_binding(
+                world_db=args.world_db,
+                ingest_ref=args.ingest_ref,
+                event=event,
+                fixture=fixture,
+                manifest=manifest,
+            ),
+        }
     receipt = {
         "fixture_sha256": manifest["fixture_sha256"],
         "sequence": event["sequence"],
@@ -566,6 +750,8 @@ def build_parser() -> argparse.ArgumentParser:
     ack_p.add_argument("--sequence", type=int, required=True)
     ack_p.add_argument("--event-id", required=True)
     ack_p.add_argument("--ingest-ref", required=True)
+    ack_p.add_argument("--conversation-session-id")
+    ack_p.add_argument("--conversation-turn-index", type=int)
     ack_p.set_defaults(func=cmd_ack)
     return parser
 
