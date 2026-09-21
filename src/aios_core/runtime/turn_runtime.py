@@ -270,6 +270,7 @@ class FusedTurnRuntime:
             observation_listener=self.attention_watches.evaluate_observation,
         )
         self._active_turn_time: datetime | None = None
+        self._active_meter_time: datetime | None = None
         self._active_session_id: str | None = None
         self._active_wake_id: str | None = None
         self._active_review_request: PeriodicReviewRequest | None = None
@@ -1011,7 +1012,7 @@ class FusedTurnRuntime:
         snapshot: RuntimeSnapshot,
         usage: ModelUsage | None,
     ) -> None:
-        if self._active_turn_time is None:
+        if self._active_meter_time is None:
             raise RuntimeError(
                 "FusedTurnRuntime model invocation is missing active metering time"
             )
@@ -1031,7 +1032,7 @@ class FusedTurnRuntime:
         self.metering.record_model_call(
             subject_id=self.subject_id,
             world_revision=int(self.store.current_world_revision()),
-            recorded_at=self._active_turn_time,
+            recorded_at=self._active_meter_time,
             execution_class=execution_class,
             wake_id=self._active_wake_id,
             session_id=self._active_session_id,
@@ -2615,6 +2616,7 @@ class FusedTurnRuntime:
         )
 
         self._active_turn_time = occurred_at
+        self._active_meter_time = occurred_at
         self._active_session_id = session
         self._active_wake_id = None
         try:
@@ -2625,6 +2627,7 @@ class FusedTurnRuntime:
             )
         finally:
             self._active_turn_time = None
+            self._active_meter_time = None
             self._active_session_id = None
             self._active_wake_id = None
 
@@ -2937,6 +2940,7 @@ class FusedTurnRuntime:
         )
 
         self._active_turn_time = now
+        self._active_meter_time = now
         self._active_session_id = None
         self._active_wake_id = running.object_id
         self._active_review_request = None
@@ -2949,6 +2953,7 @@ class FusedTurnRuntime:
             )
         finally:
             self._active_turn_time = None
+            self._active_meter_time = None
             self._active_session_id = None
             self._active_wake_id = None
             self._active_review_request = None
@@ -3133,6 +3138,7 @@ class FusedTurnRuntime:
         # model-authored writebacks deterministic across crash/budget retries instead
         # of creating a second "same lesson" merely because the worker restarted later.
         self._active_turn_time = review_write_time
+        self._active_meter_time = now
         self._active_session_id = None
         self._active_wake_id = request.wake_ref.object_id
         self._active_review_request = request
@@ -3146,6 +3152,7 @@ class FusedTurnRuntime:
         finally:
             self._active_review_request = None
             self._active_turn_time = None
+            self._active_meter_time = None
             self._active_session_id = None
             self._active_wake_id = None
 
