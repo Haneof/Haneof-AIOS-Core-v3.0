@@ -1580,3 +1580,30 @@ Requirements:
 - no Core changes and no Resident run.
 
 `C14-RES-A-001` remains blocked until this passes.
+
+
+---
+
+## 2026-09-21 — C14-RES-FIX-003 PM acceptance
+
+Independent PM review confirms `C14-RES-FIX-003 = PASS`.
+
+Formal exact candidate:
+`17bd54ed0b64131ded0b70d853cac205d055bdcb`
+
+Formal exact-candidate Gate:
+`35598216907 = SUCCESS`
+
+The earlier successful run `35598032585` belongs to a pre-final candidate and is retained only as iteration history.
+
+The durable release chain now proves:
+
+`blind reveal -> real SQLiteWorldStore exact Observation revision -> mechanical event binding -> World-verified ack -> cursor advance`.
+
+Fixture v2 content remains frozen.
+
+Resident A is released under:
+
+`reviews/internal_habitation/c14-resident/v2/release/RESIDENT_A_RUN_CONTRACT.md`
+
+Resident A must remain semantically blind to fixture/evaluator/FIX completion/PM review material and personally author every model semantic checkpoint from current RuntimeSnapshot only.
