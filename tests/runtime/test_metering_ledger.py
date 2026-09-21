@@ -1,6 +1,8 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
-from aios_core.runtime.cognitive_runtime import ModelUsage
+import pytest
+
+from aios_core.runtime.cognitive_runtime import ModelCallProvenance, ModelUsage
 from aios_core.runtime.metering import ModelMeteringLedger
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 
@@ -79,8 +81,13 @@ def test_provider_request_id_makes_metering_replay_idempotent(tmp_path):
 def test_missing_provider_usage_records_unknown_call_without_fake_zero_tokens(tmp_path):
     store = SQLiteWorldStore(tmp_path / "world.db")
     ledger = ModelMeteringLedger(store)
+    provenance = ModelCallProvenance(
+        provider="openai",
+        model="test-model",
+        request_id="resp_unknown_usage",
+    )
 
-    record = ledger.record_model_call(
+    first = ledger.record_model_call(
         subject_id="user_1",
         world_revision=0,
         recorded_at=NOW,
@@ -89,9 +96,62 @@ def test_missing_provider_usage_records_unknown_call_without_fake_zero_tokens(tm
         wake_reason="watch_match",
         model_round_index=0,
         usage=None,
+        provenance=provenance,
+    )
+    second = ledger.record_model_call(
+        subject_id="user_1",
+        world_revision=9,
+        recorded_at=NOW + timedelta(minutes=5),
+        execution_class="background",
+        wake_id="wake_unknown_usage",
+        wake_reason="watch_match",
+        model_round_index=0,
+        usage=None,
+        provenance=provenance,
     )
 
-    assert record.usage_complete is False
-    assert record.input_tokens is None
-    assert record.output_tokens is None
-    assert record.total_tokens is None
+    assert first.record_id == second.record_id
+    assert second.recorded_at == NOW
+    assert first.provider == "openai"
+    assert first.model == "test-model"
+    assert first.provider_request_id == "resp_unknown_usage"
+    assert first.usage_complete is False
+    assert first.input_tokens is None
+    assert first.output_tokens is None
+    assert first.total_tokens is None
+    assert len(ledger.list_model_calls(subject_id="user_1")) == 1
+
+
+def test_same_provider_response_id_replay_conflict_fails_closed(tmp_path):
+    store = SQLiteWorldStore(tmp_path / "world.db")
+    ledger = ModelMeteringLedger(store)
+    usage = ModelUsage(
+        input_tokens=7,
+        output_tokens=3,
+        total_tokens=10,
+        provider="anthropic",
+        model="test-claude",
+        request_id="msg_conflict",
+    )
+    ledger.record_model_call(
+        subject_id="user_1",
+        world_revision=0,
+        recorded_at=NOW,
+        execution_class="background",
+        wake_id="wake_1",
+        wake_reason="watch_match",
+        model_round_index=0,
+        usage=usage,
+    )
+
+    with pytest.raises(RuntimeError, match="metering replay conflicts"):
+        ledger.record_model_call(
+            subject_id="user_1",
+            world_revision=1,
+            recorded_at=NOW + timedelta(minutes=1),
+            execution_class="periodic_review",
+            wake_id="wake_other",
+            wake_reason="periodic_review",
+            model_round_index=0,
+            usage=usage,
+        )
