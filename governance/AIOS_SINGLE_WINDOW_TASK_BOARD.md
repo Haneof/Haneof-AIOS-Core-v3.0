@@ -67,8 +67,8 @@
 | 3 | `T34-EXEC-001` | Action 授权前重新验证父 Task/撤销状态，关闭 cancel→authorize 竞态 | **READY** | AUDIT-001 | AUDIT-001=`STILL_OPEN`; Issue #30 / #34 | 修复前复现 + 修复后回归 + execution/P12/P16 Gate GREEN |
 | 4 | `T36-SEARCH-001` | 结构化 Observation scalar 派生索引，不改原 typed fact，不做语义推断 | **READY** | AUDIT-001 | AUDIT-001=`STILL_OPEN`; Issue #30 / #36 | dict/list/number/bool 可检索；rebuild=incremental；subject/current/stale 语义不退化 |
 | 5 | `T28-REC-001` | 普通推荐与 antecedent 路径统一隔离 assistant raw dialogue，避免把 AI 自己的话当用户事实主动推荐 | **READY** | AUDIT-001 | AUDIT-001=`STILL_OPEN`; Issue #30 / #28 | continuity/raw drill-down 仍可访问；用户/外部 fact 与 evidence-grounded Claim 不误删 |
-| 6 | `T35-RULE-001` | 只做“非 Action Task 的可信完成凭据”语义裁决；不改 execution 代码 | **IN_PROGRESS** | AUDIT-001 | `main@f8a2f8e4cf53de579bd0bc69cfd85421d109d65b`; work branch `governance/t35-rule-non-action-completion-20260921`; AUDIT-001=`STILL_OPEN`; Issue #30 / #35 | 形成唯一裁决文档；明确什么可构成完成证据，禁止伪造外部 Outcome、禁止仅凭 AI 自述 |
-| 7 | `T35-IMPL-001` | 按 T35-RULE-001 裁决实现 Task 完成闭环 | **BLOCKED** | T35-RULE-001, T34-EXEC-001 | AUDIT-001 confirms T35 remains open; implementation stays serialized after T34 | 单独 PR；正常 Action/Outcome 不退化；非 Action Task 有合法真实凭据；P12/P15/P16 GREEN |
+| 6 | `T35-RULE-001` | 只做“非 Action Task 的可信完成凭据”语义裁决；不改 execution 代码 | **DONE** | AUDIT-001 | `governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md`; PR #53; semantic candidate `b58bbb31a04a119897890452e76461f14fd46288`; merge metadata pending until PR merge | 唯一裁决已形成：所有 Task 终态必须真实证据化；外部执行保持 Action→Outcome；非 Action Task 可用合格 pinned World evidence / validated durable artifact；禁止 AI 自述、伪 Outcome、循环 OperationExperience |
+| 7 | `T35-IMPL-001` | 按 T35-RULE-001 裁决实现 Task 完成闭环 | **BLOCKED** | T35-RULE-001, T34-EXEC-001 | T35-RULE-001 semantic ruling complete in PR #53; still blocked until T34-EXEC-001 is resolved; implementation must follow `governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md` | 单独 PR；正常 Action/Outcome 不退化；非 Action Task 有合法真实凭据；P12/P15/P16 GREEN |
 | 8 | `T33-RECALL-001` | 用自包含表达/跨会话省略/无前文三类对照重新验证 recall 误触；只有复现才修 | **READY** | AUDIT-001 | AUDIT-001=`STILL_OPEN`; Issue #30 / #33 | 禁止场景短语黑名单；程序只提供候选，不替 Resident 判断指代 |
 | 9 | `P16-TRIAGE-001` | 更新 PR #37 / Issue #30 中央证据分流到当前 segmented protocol；历史无效年度、PARTIAL、机械复现、有效缺陷分开登记 | **BLOCKED** | AUDIT-001, all activated T34/T36/T28/T35/T33 tasks resolved | PR #37 仍 open，base 较旧 | 冻结被评 Core SHA；不把旧“几天统计”冒充当前进度；中央报告进入 main |
 | 10 | `P16-CAMPAIGN-001` | 建立/恢复唯一 P16 分段入住 Campaign Ledger：找出当前 canonical life、最后有效 segment、World/checkpoint digest、累计天数/交互/认知 checkpoint | **BLOCKED** | P16-TRIAGE-001 | `reviews/internal_habitation/ARENA_RESIDENT_YEARLONG_TASK.md` | 创建 `reviews/internal_habitation/P16_SEGMENT_PROGRESS_LEDGER.md`；历史 segment 不重复跑；下一 segment ID 唯一 |
@@ -202,6 +202,44 @@ Deferred issues:
 - no fixes executed in AUDIT-001
 - PR #37 remains historical/open; P16-TRIAGE-001 will reconcile it after activated blockers resolve
 Next READY task: T34-EXEC-001
+```
+
+
+### T35-RULE-001 completion — 2026-09-21
+
+```text
+Task ID: T35-RULE-001
+Status: DONE
+Started from main: f8a2f8e4cf53de579bd0bc69cfd85421d109d65b
+Governance claim commit: f83438729b7ef0a0ba58b0c3302e1deb5f4ca6bd
+Work branch: governance/t35-rule-non-action-completion-20260921
+Candidate SHA: b58bbb31a04a119897890452e76461f14fd46288
+PR: #53
+Merge SHA: PENDING_POST_MERGE_METADATA
+Required gates: governance/contract only; no Runtime/Core gate required by task
+Gate run IDs / conclusions:
+- N/A — source/evidence review and diff-scope verification only
+Evidence/report paths:
+- governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md
+- docs/constitution/AIOS_v3.0_Fused_Baseline_Registry.md
+- docs/constitution/AIOS_v3.0_Goal_Task_Constitution.md
+- reviews/AUDIT-001_ISSUE30_CURRENT_MAIN_EVIDENCE_MATRIX_2026-09-21.md
+- Issue #30 / #35
+Exact ruling:
+- every terminal Task transition must be grounded in pinned durable evidence satisfying an explicit completion contract
+- ACTION_OUTCOME remains mandatory for AIOS-initiated external execution
+- WORLD_EVIDENCE non-Action tasks may terminate from eligible pinned World evidence / validated durable internal artifacts without synthetic Action/Outcome
+- MIXED tasks require both evidence families
+- assistant raw response, unsupported Claim, Task/Goal self-reference, AI self-assertion, synthetic Outcome, circular OperationExperience and world_revision alone are not valid completion credentials
+Affected files:
+- governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md
+- governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md
+- AIOS_v3.0_CURRENT_CHECKPOINT.md
+Runtime/Core/schema changes: none
+Deferred issues:
+- T35-IMPL-001 remains BLOCKED until T34-EXEC-001 is resolved; it must implement this ruling in a separate window/PR
+- T34/T36/T28/T33 were not executed in this window
+Next READY task: T34-EXEC-001 (new window only; not executed here)
 ```
 
 ---
