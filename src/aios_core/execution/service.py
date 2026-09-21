@@ -494,6 +494,24 @@ class GoalTaskActionService:
         if self.index is not None:
             self.index.catch_up()
 
+    def _require_action_parent_eligible(self, action: Action) -> Task:
+        if action.task_ref is None:
+            raise ValueError("external Action requires a parent Task")
+        payload = self.store.get_payload(action.task_ref.object_id)
+        if payload.get("object_type") != ObjectType.TASK.value:
+            raise ValueError("Action parent reference is not a Task")
+        if str(payload.get("subject_id") or "") != self.subject_id:
+            raise ValueError("Action parent Task crosses the runtime subject scope")
+        task = Task.model_validate(payload)
+        if (
+            int(task.revision) != int(action.task_ref.revision or 0)
+            or task.task_state is not TaskState.RUNNING
+        ):
+            raise ValueError(
+                "Action parent Task is no longer the current RUNNING revision"
+            )
+        return task
+
     def current_goals(self) -> tuple[Goal, ...]:
         return tuple(
             Goal.model_validate(payload)
@@ -961,8 +979,67 @@ class GoalTaskActionService:
             for ref in refs
         ]
 
+        invalidated_actions: list[Action] = []
+        if target is TaskState.CANCELLED:
+            for action in self.current_actions():
+                if action.action_status is not ActionStatus.PROPOSED:
+                    continue
+                if (
+                    action.task_ref is None
+                    or action.task_ref.object_id != current.object_id
+                ):
+                    continue
+                action_revision = int(action.revision) + 1
+                action_metadata = dict(action.metadata)
+                action_metadata.update(
+                    {
+                        "invalidated_by_parent_task": {
+                            "object_id": new_task.object_id,
+                            "revision": new_revision,
+                        },
+                        "invalidation_reason": "parent_task_cancelled",
+                        "invalidated_at": changed.isoformat(),
+                    }
+                )
+                invalidated = Action.model_validate(
+                    {
+                        **action.model_dump(mode="python", round_trip=True),
+                        "revision": action_revision,
+                        "occurred": TemporalExtent.point(changed),
+                        "learned_at": changed,
+                        "recorded_at": changed,
+                        "source_refs": _source_refs(request.evidence_refs),
+                        "action_status": ActionStatus.CANCELLED,
+                        "status": ActionStatus.CANCELLED.value,
+                        "metadata": action_metadata,
+                    }
+                )
+                invalidated_ref = ObjectRef(
+                    object_id=invalidated.object_id,
+                    revision=action_revision,
+                )
+                invalidated_actions.append(invalidated)
+                dependencies.append(
+                    Dependency(
+                        object_id=_stable_id(
+                            "dep",
+                            invalidated.object_id,
+                            action_revision,
+                            new_task.object_id,
+                            new_revision,
+                        ),
+                        subject_id=self.subject_id,
+                        learned_at=changed,
+                        recorded_at=changed,
+                        created_by="execution_world:dependency",
+                        dependent_ref=invalidated_ref,
+                        dependency_ref=new_ref,
+                        dependency_type="action_invalidated_by_task_cancellation",
+                    )
+                )
+
         result = self.store.commit(
-            [new_task, *dependencies],
+            [new_task, *invalidated_actions, *dependencies],
             OperationRequest(
                 operation_name="execution.task.transition",
                 arguments={
@@ -1273,11 +1350,25 @@ class GoalTaskActionService:
         action = Action.model_validate(payload)
         if action.action_status is not ActionStatus.PROPOSED:
             raise ValueError("only a PROPOSED Action may be authorized")
+        self._require_action_parent_eligible(action)
         self._validate_refs_exist(authorization_refs)
 
         refs = tuple(authorization_refs)
         if not bool(authorizer(action, refs)):
             raise PermissionError("external Action authorization denied")
+
+        # Freeze the optimistic-concurrency boundary before the final
+        # eligibility revalidation. Any Task/Action/world write that races
+        # after this point makes the commit fail closed with VERSION_CONFLICT.
+        expected_world_revision = int(self.store.current_world_revision())
+        payload = self._current_exact(
+            action_ref,
+            object_type=ObjectType.ACTION,
+        )
+        action = Action.model_validate(payload)
+        if action.action_status is not ActionStatus.PROPOSED:
+            raise ValueError("only a PROPOSED Action may be authorized")
+        self._require_action_parent_eligible(action)
 
         new_revision = int(action.revision) + 1
         metadata = dict(action.metadata)
@@ -1339,7 +1430,7 @@ class GoalTaskActionService:
                     "execution_id": submitted.execution_id,
                     "authorized_by": authorized_by.strip(),
                 },
-                expected_world_revision=int(self.store.current_world_revision()),
+                expected_world_revision=expected_world_revision,
                 reason="trusted platform authorization accepted external Action",
                 idempotency_key=(
                     f"action-authorize:{submitted.object_id}:{new_revision}"
