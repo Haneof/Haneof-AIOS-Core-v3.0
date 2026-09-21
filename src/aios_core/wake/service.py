@@ -336,7 +336,7 @@ class WakeBus:
             return AttentionClass.INTERRUPT
         if wake_source is WakeSource.PERIODIC_REVIEW:
             return AttentionClass.REVIEW_QUEUE
-        if wake_source is WakeSource.TASK_DUE and int(priority) >= 80:
+        if wake_source is WakeSource.TASK_DUE:
             return AttentionClass.INTERRUPT
         return AttentionClass.BACKGROUND
 
@@ -398,7 +398,7 @@ class WakeBus:
         if not value.channel_allowed:
             delivery_allowed = False
             reasons.append("delivery_channel_not_allowed")
-            if state == "ok":
+            if state not in {"hard_block", "review_queue"}:
                 state = "quiet"
 
         if not value.cognition_allowed:
@@ -417,13 +417,13 @@ class WakeBus:
         elif not value.convenience_allowed:
             delivery_allowed = False
             reasons.append("user_context_not_convenient_for_delivery")
-            if state == "ok":
+            if state not in {"hard_block", "review_queue"}:
                 state = "quiet"
 
         if not value.user_delivery_allowed:
             delivery_allowed = False
             reasons.append("user_delivery_not_allowed")
-            if state == "ok":
+            if state not in {"hard_block", "review_queue"}:
                 state = "quiet"
 
         if not value.external_action_allowed:
@@ -457,11 +457,6 @@ class WakeBus:
                 for ref in refs
             ],
             request.priority,
-            (
-                request.attention_class.value
-                if request.attention_class is not None
-                else None
-            ),
             dict(request.metadata),
         )
 
