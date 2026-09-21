@@ -48,7 +48,34 @@ from aios_core.storage.sqlite_store import SQLiteWorldStore
 
 
 OutcomeState = Literal["completed", "failed", "outcome_unknown"]
+CompletionMode = Literal["world_evidence", "action_outcome", "mixed"]
 ActionAuthorizer = Callable[[Action, tuple[ObjectRef, ...]], bool]
+
+_COMPLETION_MODES = frozenset({"world_evidence", "action_outcome", "mixed"})
+_WORLD_EVIDENCE_TYPES = frozenset(
+    {
+        ObjectType.OBSERVATION,
+        ObjectType.EVIDENCE_SET,
+        ObjectType.CLAIM,
+        ObjectType.SUMMARY,
+        ObjectType.COMMUNICATION_EXPERIENCE,
+    }
+)
+_DEFAULT_WORLD_EVIDENCE_TYPES = frozenset(
+    {ObjectType.OBSERVATION, ObjectType.EVIDENCE_SET}
+)
+_INACTIVE_EVIDENCE_STATUSES = frozenset(
+    {
+        "retracted",
+        "superseded",
+        "stale_review_required",
+        "stale",
+        "archived",
+        "rejected",
+        "merged",
+        "split",
+    }
+)
 
 
 _GOAL_TRANSITIONS: Mapping[GoalStatus, frozenset[GoalStatus]] = {
@@ -227,6 +254,8 @@ class TaskCreateRequest(BaseModel):
             raise ValueError("initial task state is not valid for task creation")
         if self.initial_state is TaskState.WAITING_TIME and self.next_wake_at is None:
             raise ValueError("WAITING_TIME task requires next_wake_at")
+        _completion_mode_from_condition(self.completion_condition)
+        _completion_result_object_types(self.completion_condition)
         refs: list[ObjectRef] = [
             *self.reason_refs,
             *self.dependency_refs,
@@ -265,8 +294,6 @@ class TaskTransitionRequest(BaseModel):
             raise ValueError("reason must not be blank")
         if self.new_state is TaskState.WAITING_TIME and self.next_wake_at is None:
             raise ValueError("WAITING_TIME transition requires next_wake_at")
-        if self.new_state in {TaskState.COMPLETED, TaskState.FAILED} and not self.outcome_refs:
-            raise ValueError("COMPLETED/FAILED task transition requires outcome_refs")
         return self
 
 
@@ -376,6 +403,57 @@ def _source_refs(refs: Sequence[ObjectRef]) -> list[SourceRef]:
         SourceRef(object_id=ref.object_id, revision=ref.revision)
         for ref in refs
     ]
+
+
+def _completion_mode_from_condition(
+    condition: Mapping[str, Any],
+) -> CompletionMode | None:
+    raw = condition.get("mode")
+    if raw is None:
+        return None
+    if not isinstance(raw, str) or not raw.strip():
+        raise ValueError("completion_condition.mode must be a non-blank string")
+    mode = raw.strip().lower()
+    if mode not in _COMPLETION_MODES:
+        raise ValueError(
+            "completion_condition.mode must be world_evidence, action_outcome, or mixed"
+        )
+    return mode  # type: ignore[return-value]
+
+
+def _completion_result_object_types(
+    condition: Mapping[str, Any],
+) -> frozenset[ObjectType]:
+    raw = condition.get("result_object_types")
+    if raw is None:
+        return _DEFAULT_WORLD_EVIDENCE_TYPES
+    if isinstance(raw, (str, bytes)) or not isinstance(raw, Sequence):
+        raise ValueError(
+            "completion_condition.result_object_types must be an array of object types"
+        )
+    parsed: set[ObjectType] = set()
+    for value in raw:
+        try:
+            object_type = ObjectType(str(value).strip().lower())
+        except ValueError as exc:
+            raise ValueError(
+                f"unsupported completion result object type: {value!r}"
+            ) from exc
+        if object_type not in _WORLD_EVIDENCE_TYPES:
+            raise ValueError(
+                "completion result object types are limited to durable non-execution "
+                "evidence objects"
+            )
+        parsed.add(object_type)
+    if not parsed:
+        raise ValueError(
+            "completion_condition.result_object_types must not be empty when supplied"
+        )
+    return frozenset(parsed)
+
+
+def _ref_key(ref: ObjectRef) -> tuple[str, int]:
+    return (ref.object_id, int(ref.revision or 0))
 
 
 class GoalTaskActionService:
@@ -493,6 +571,429 @@ class GoalTaskActionService:
     def _catch_up(self) -> None:
         if self.index is not None:
             self.index.catch_up()
+
+    def _current_evidence_payload(self, ref: ObjectRef) -> dict[str, Any]:
+        payload = self.store.get_payload(ref.object_id, revision=ref.revision)
+        if str(payload.get("subject_id") or "") != self.subject_id:
+            raise ValueError(
+                "completion evidence crosses the runtime subject scope: "
+                f"{ref.object_id}@{ref.revision}"
+            )
+        latest = self.store.get_payload(ref.object_id)
+        if int(latest.get("revision") or 0) != int(ref.revision or 0):
+            raise ValueError(
+                "completion evidence is not current: "
+                f"{ref.object_id}@{ref.revision}"
+            )
+        status = str(payload.get("status") or "active").strip().lower()
+        if status in _INACTIVE_EVIDENCE_STATUSES:
+            raise ValueError(
+                f"completion evidence is inactive: {ref.object_id}@{ref.revision}"
+            )
+        return payload
+
+    def _dependency_exists(
+        self,
+        *,
+        dependent_ref: ObjectRef,
+        dependency_ref: ObjectRef,
+        dependency_type: str,
+    ) -> bool:
+        for payload in self.store.list_payloads(
+            object_type=ObjectType.DEPENDENCY,
+            subject_id=self.subject_id,
+        ):
+            if str(payload.get("dependency_type") or "") != dependency_type:
+                continue
+            dependent = payload.get("dependent_ref") or {}
+            dependency = payload.get("dependency_ref") or {}
+            if (
+                str(dependent.get("object_id") or "") == dependent_ref.object_id
+                and int(dependent.get("revision") or 0)
+                == int(dependent_ref.revision or 0)
+                and str(dependency.get("object_id") or "") == dependency_ref.object_id
+                and int(dependency.get("revision") or 0)
+                == int(dependency_ref.revision or 0)
+            ):
+                return True
+        return False
+
+    def _task_has_action_lineage(self, task_id: str) -> bool:
+        return any(
+            action.task_ref is not None and action.task_ref.object_id == task_id
+            for action in self.current_actions()
+        )
+
+    def _effective_completion_mode(self, task: Task) -> CompletionMode:
+        explicit = _completion_mode_from_condition(task.completion_condition)
+        if explicit is not None:
+            return explicit
+        if (
+            task.task_type in {TaskType.VERIFICATION, TaskType.OBSERVATION}
+            and not self._task_has_action_lineage(task.object_id)
+        ):
+            return "world_evidence"
+        return "action_outcome"
+
+    def _validate_world_evidence_ref(
+        self,
+        *,
+        task: Task,
+        ref: ObjectRef,
+        allowed_types: frozenset[ObjectType],
+        seen: set[tuple[str, int]] | None = None,
+    ) -> dict[str, Any]:
+        stack = set() if seen is None else set(seen)
+        key = _ref_key(ref)
+        if key in stack:
+            raise ValueError("completion evidence contains a circular reference")
+        stack.add(key)
+
+        payload = self._current_evidence_payload(ref)
+        try:
+            object_type = ObjectType(str(payload.get("object_type") or ""))
+        except ValueError as exc:
+            raise ValueError("completion evidence has an invalid object type") from exc
+        if object_type not in allowed_types:
+            raise ValueError(
+                f"{object_type.value} is not permitted by this Task completion contract"
+            )
+
+        if object_type is ObjectType.OBSERVATION:
+            metadata = payload.get("metadata")
+            role = (
+                str(metadata.get("role") or "").strip().lower()
+                if isinstance(metadata, Mapping)
+                else ""
+            )
+            created_by = str(payload.get("created_by") or "").strip().lower()
+            source_kind = str(payload.get("source_kind") or "").strip().lower()
+            if (
+                role == "assistant"
+                or source_kind == "assistant"
+                or created_by == "conversation_ingest:assistant"
+            ):
+                raise ValueError(
+                    "assistant raw dialogue cannot be completion evidence"
+                )
+            return payload
+
+        if object_type is ObjectType.EVIDENCE_SET:
+            if bool(payload.get("stale")):
+                raise ValueError("stale EvidenceSet cannot complete a Task")
+            member_refs = tuple(
+                ObjectRef.model_validate(item)
+                for item in (payload.get("member_refs") or ())
+            )
+            if not member_refs:
+                raise ValueError(
+                    "terminal completion requires a pinned EvidenceSet with concrete members"
+                )
+            coverage = payload.get("coverage")
+            if isinstance(coverage, Mapping):
+                expected = coverage.get("expected_count")
+                observed = coverage.get("observed_count")
+                ratio = coverage.get("coverage_ratio")
+                missing = coverage.get("missing_description") or ()
+                if (
+                    expected is not None
+                    and observed is not None
+                    and int(observed) < int(expected)
+                ):
+                    raise ValueError("incomplete EvidenceSet cannot complete a Task")
+                if ratio is not None and float(ratio) < 1.0:
+                    raise ValueError("partial EvidenceSet cannot complete a Task")
+                if missing:
+                    raise ValueError(
+                        "EvidenceSet with missing coverage cannot complete a Task"
+                    )
+            for member_ref in member_refs:
+                self._validate_world_evidence_ref(
+                    task=task,
+                    ref=member_ref,
+                    allowed_types=allowed_types,
+                    seen=stack,
+                )
+            return payload
+
+        if object_type is ObjectType.CLAIM:
+            if object_type not in _completion_result_object_types(
+                task.completion_condition
+            ):
+                raise ValueError(
+                    "Claim completion evidence must be explicitly allowed by the Task contract"
+                )
+            for source in payload.get("source_refs") or ():
+                if str(source.get("object_id") or "") == task.object_id:
+                    raise ValueError(
+                        "Task self-reference cannot ground a completion Claim"
+                    )
+            support_refs = tuple(
+                ObjectRef.model_validate(item)
+                for item in (payload.get("support_evidence_set_refs") or ())
+            )
+            if not support_refs:
+                raise ValueError(
+                    "unsupported Claim cannot be completion evidence"
+                )
+            nested_allowed = frozenset(
+                set(allowed_types)
+                | {ObjectType.OBSERVATION, ObjectType.EVIDENCE_SET}
+            )
+            for support_ref in support_refs:
+                support_payload = self._validate_world_evidence_ref(
+                    task=task,
+                    ref=support_ref,
+                    allowed_types=nested_allowed,
+                    seen=stack,
+                )
+                if support_payload.get("object_type") != ObjectType.EVIDENCE_SET.value:
+                    raise ValueError(
+                        "Claim support must resolve to current EvidenceSet objects"
+                    )
+            return payload
+
+        if object_type is ObjectType.SUMMARY:
+            if object_type not in _completion_result_object_types(
+                task.completion_condition
+            ):
+                raise ValueError(
+                    "Summary completion evidence must be explicitly allowed by the Task contract"
+                )
+            if str(payload.get("summary_status") or "").strip().lower() != "current":
+                raise ValueError("non-current Summary cannot complete a Task")
+            evidence_ref_raw = payload.get("evidence_set_ref")
+            if not isinstance(evidence_ref_raw, Mapping):
+                raise ValueError(
+                    "Summary completion evidence requires a pinned EvidenceSet"
+                )
+            nested_allowed = frozenset(
+                set(allowed_types)
+                | {ObjectType.OBSERVATION, ObjectType.EVIDENCE_SET}
+            )
+            support_payload = self._validate_world_evidence_ref(
+                task=task,
+                ref=ObjectRef.model_validate(evidence_ref_raw),
+                allowed_types=nested_allowed,
+                seen=stack,
+            )
+            if support_payload.get("object_type") != ObjectType.EVIDENCE_SET.value:
+                raise ValueError(
+                    "Summary evidence_set_ref must resolve to an EvidenceSet"
+                )
+            return payload
+
+        if object_type is ObjectType.COMMUNICATION_EXPERIENCE:
+            if object_type not in _completion_result_object_types(
+                task.completion_condition
+            ):
+                raise ValueError(
+                    "CommunicationExperience must be explicitly allowed by the Task contract"
+                )
+            return payload
+
+        raise ValueError(
+            f"{object_type.value} is not eligible completion evidence"
+        )
+
+    def _validate_real_outcome_ref(
+        self,
+        *,
+        task: Task,
+        ref: ObjectRef,
+        target: TaskState,
+    ) -> Outcome:
+        payload = self._current_evidence_payload(ref)
+        if payload.get("object_type") != ObjectType.OUTCOME.value:
+            raise ValueError("outcome_refs must point to Outcome objects")
+        outcome = Outcome.model_validate(payload)
+        expected_state = (
+            "completed" if target is TaskState.COMPLETED else "failed"
+        )
+        if outcome.outcome_state != expected_state:
+            raise ValueError(
+                f"{target.value} Task requires a {expected_state} Outcome"
+            )
+        if str(outcome.created_by).strip() != "execution_world:platform_result":
+            raise ValueError(
+                "synthetic Outcome is not a trusted external execution result"
+            )
+
+        action_payload = self._current_evidence_payload(outcome.action_ref)
+        if action_payload.get("object_type") != ObjectType.ACTION.value:
+            raise ValueError("Outcome action_ref must point to an Action")
+        action = Action.model_validate(action_payload)
+        expected_action_status = (
+            ActionStatus.COMPLETED
+            if target is TaskState.COMPLETED
+            else ActionStatus.FAILED
+        )
+        if action.action_status is not expected_action_status:
+            raise ValueError(
+                "Outcome does not match the terminal Action state"
+            )
+        if (
+            action.task_ref is None
+            or action.task_ref.object_id != task.object_id
+        ):
+            raise ValueError("Outcome Action does not belong to this Task")
+        parent_payload = self.store.get_payload(
+            action.task_ref.object_id,
+            revision=action.task_ref.revision,
+        )
+        if (
+            parent_payload.get("object_type") != ObjectType.TASK.value
+            or parent_payload.get("task_state") != TaskState.RUNNING.value
+        ):
+            raise ValueError(
+                "Outcome Action is not rooted in a RUNNING Task revision"
+            )
+        metadata = action.metadata
+        if (
+            not str(metadata.get("authorized_by") or "").strip()
+            or not str(metadata.get("authorized_at") or "").strip()
+            or not metadata.get("authorization_refs")
+        ):
+            raise ValueError(
+                "Outcome Action lacks trusted authorization provenance"
+            )
+        if str(outcome.metadata.get("execution_id") or "") != action.execution_id:
+            raise ValueError(
+                "Outcome execution provenance does not match its Action"
+            )
+        if not self._dependency_exists(
+            dependent_ref=ObjectRef(
+                object_id=outcome.object_id,
+                revision=outcome.revision,
+            ),
+            dependency_ref=outcome.action_ref,
+            dependency_type="outcome_reports_action",
+        ):
+            raise ValueError(
+                "Outcome lacks the durable Action-result dependency"
+            )
+        return outcome
+
+    def _terminal_transition_key(
+        self,
+        request: TaskTransitionRequest,
+        *,
+        mode: CompletionMode,
+    ) -> str:
+        return _stable_id(
+            "task_terminal",
+            request.task_ref.object_id,
+            request.task_ref.revision,
+            request.new_state.value,
+            request.reason.strip(),
+            mode,
+            tuple(_ref_key(ref) for ref in request.evidence_refs),
+            tuple(_ref_key(ref) for ref in request.execution_refs),
+            tuple(_ref_key(ref) for ref in request.outcome_refs),
+        )
+
+    def _terminal_retry_receipt(
+        self,
+        request: TaskTransitionRequest,
+    ) -> TaskReceipt | None:
+        if request.new_state not in {TaskState.COMPLETED, TaskState.FAILED}:
+            return None
+        exact = self.store.get_payload(
+            request.task_ref.object_id,
+            revision=request.task_ref.revision,
+        )
+        if exact.get("object_type") != ObjectType.TASK.value:
+            return None
+        latest_payload = self.store.get_payload(request.task_ref.object_id)
+        if str(latest_payload.get("subject_id") or "") != self.subject_id:
+            raise ValueError("Task reference crosses the runtime subject scope")
+        if int(latest_payload.get("revision") or 0) == int(
+            request.task_ref.revision or 0
+        ):
+            return None
+        latest = Task.model_validate(latest_payload)
+        if (
+            int(latest.revision) != int(request.task_ref.revision or 0) + 1
+            or latest.task_state is not request.new_state
+        ):
+            return None
+        mode_raw = latest.metadata.get("terminal_completion_mode")
+        key_raw = latest.metadata.get("terminal_transition_key")
+        if not isinstance(mode_raw, str) or not isinstance(key_raw, str):
+            return None
+        mode = mode_raw.strip().lower()
+        if mode not in _COMPLETION_MODES:
+            return None
+        if key_raw != self._terminal_transition_key(
+            request,
+            mode=mode,  # type: ignore[arg-type]
+        ):
+            return None
+        return TaskReceipt(
+            task_id=latest.object_id,
+            revision=latest.revision,
+            state=latest.task_state.value,
+            world_revision=int(self.store.current_world_revision()),
+        )
+
+    def _validate_terminal_transition(
+        self,
+        *,
+        task: Task,
+        request: TaskTransitionRequest,
+        target: TaskState,
+    ) -> CompletionMode:
+        mode = self._effective_completion_mode(task)
+        action_lineage = self._task_has_action_lineage(task.object_id)
+        if mode == "world_evidence":
+            if action_lineage or request.execution_refs or request.outcome_refs:
+                raise ValueError(
+                    "WORLD_EVIDENCE Task cannot bypass or absorb an Action/Outcome lineage; "
+                    "use ACTION_OUTCOME or MIXED"
+                )
+            allowed = _completion_result_object_types(task.completion_condition)
+            if not request.evidence_refs:
+                raise ValueError(
+                    "WORLD_EVIDENCE terminal transition requires evidence_refs"
+                )
+            for ref in request.evidence_refs:
+                self._validate_world_evidence_ref(
+                    task=task,
+                    ref=ref,
+                    allowed_types=allowed,
+                )
+            return mode
+
+        if not request.outcome_refs:
+            raise ValueError(
+                f"{mode.upper()} terminal transition requires real outcome_refs"
+            )
+        for ref in request.outcome_refs:
+            self._validate_real_outcome_ref(
+                task=task,
+                ref=ref,
+                target=target,
+            )
+
+        if mode == "mixed":
+            outcome_keys = {_ref_key(ref) for ref in request.outcome_refs}
+            world_refs = tuple(
+                ref
+                for ref in request.evidence_refs
+                if _ref_key(ref) not in outcome_keys
+            )
+            if not world_refs:
+                raise ValueError(
+                    "MIXED terminal transition requires independent WORLD_EVIDENCE refs"
+                )
+            allowed = _completion_result_object_types(task.completion_condition)
+            for ref in world_refs:
+                self._validate_world_evidence_ref(
+                    task=task,
+                    ref=ref,
+                    allowed_types=allowed,
+                )
+        return mode
 
     def _require_action_parent_eligible(self, action: Action) -> Task:
         if action.task_ref is None:
@@ -808,7 +1309,37 @@ class GoalTaskActionService:
                 if request.next_step is not None and request.next_step.strip()
                 else None
             ),
-            completion_condition=dict(request.completion_condition),
+            completion_condition={
+                **dict(request.completion_condition),
+                **(
+                    {}
+                    if _completion_mode_from_condition(
+                        request.completion_condition
+                    )
+                    is None
+                    else {
+                        "mode": _completion_mode_from_condition(
+                            request.completion_condition
+                        )
+                    }
+                ),
+                **(
+                    {}
+                    if "result_object_types"
+                    not in request.completion_condition
+                    else {
+                        "result_object_types": [
+                            item.value
+                            for item in sorted(
+                                _completion_result_object_types(
+                                    request.completion_condition
+                                ),
+                                key=lambda value: value.value,
+                            )
+                        ]
+                    }
+                ),
+            },
             cancel_condition=dict(request.cancel_condition),
             related_entity_refs=list(request.related_entity_refs),
             app_id=request.app_id,
@@ -867,6 +1398,9 @@ class GoalTaskActionService:
         changed_at: datetime,
     ) -> TaskReceipt:
         changed = as_utc(changed_at, "changed_at")
+        retry_receipt = self._terminal_retry_receipt(request)
+        if retry_receipt is not None:
+            return retry_receipt
         payload = self._current_exact(
             request.task_ref,
             object_type=ObjectType.TASK,
@@ -899,6 +1433,14 @@ class GoalTaskActionService:
             ) != ObjectType.OUTCOME.value:
                 raise ValueError("outcome_refs must point to Outcome objects")
 
+        terminal_mode: CompletionMode | None = None
+        if target in {TaskState.COMPLETED, TaskState.FAILED}:
+            terminal_mode = self._validate_terminal_transition(
+                task=current,
+                request=request,
+                target=target,
+            )
+
         metadata = dict(current.metadata)
         history = list(metadata.get("task_state_history") or [])
         history.append(
@@ -909,6 +1451,40 @@ class GoalTaskActionService:
                 "changed_at": changed.isoformat(),
             }
         )
+        if terminal_mode is not None:
+            transition_key = self._terminal_transition_key(
+                request,
+                mode=terminal_mode,
+            )
+            history[-1].update(
+                {
+                    "completion_mode": terminal_mode,
+                    "evidence_refs": [
+                        {
+                            "object_id": ref.object_id,
+                            "revision": ref.revision,
+                        }
+                        for ref in request.evidence_refs
+                    ],
+                    "execution_refs": [
+                        {
+                            "object_id": ref.object_id,
+                            "revision": ref.revision,
+                        }
+                        for ref in request.execution_refs
+                    ],
+                    "outcome_refs": [
+                        {
+                            "object_id": ref.object_id,
+                            "revision": ref.revision,
+                        }
+                        for ref in request.outcome_refs
+                    ],
+                    "terminal_transition_key": transition_key,
+                }
+            )
+            metadata["terminal_completion_mode"] = terminal_mode
+            metadata["terminal_transition_key"] = transition_key
         metadata["task_state_history"] = history
 
         new_revision = int(current.revision) + 1
@@ -959,25 +1535,38 @@ class GoalTaskActionService:
             }
         )
         new_ref = ObjectRef(object_id=new_task.object_id, revision=new_revision)
-        dependencies = [
-            Dependency(
-                object_id=_stable_id(
-                    "dep",
-                    new_task.object_id,
-                    new_revision,
-                    ref.object_id,
-                    ref.revision,
-                ),
-                subject_id=self.subject_id,
-                learned_at=changed,
-                recorded_at=changed,
-                created_by="execution_world:dependency",
-                dependent_ref=new_ref,
-                dependency_ref=ref,
-                dependency_type="task_transition_uses_evidence",
+        evidence_keys = {_ref_key(ref) for ref in request.evidence_refs}
+        execution_keys = {_ref_key(ref) for ref in request.execution_refs}
+        outcome_keys = {_ref_key(ref) for ref in request.outcome_refs}
+        dependencies = []
+        for ref in refs:
+            ref_key = _ref_key(ref)
+            if terminal_mode is not None and ref_key in outcome_keys:
+                dependency_type = "task_terminal_uses_outcome"
+            elif terminal_mode is not None and ref_key in execution_keys:
+                dependency_type = "task_terminal_uses_execution"
+            elif terminal_mode is not None and ref_key in evidence_keys:
+                dependency_type = "task_terminal_uses_world_evidence"
+            else:
+                dependency_type = "task_transition_uses_evidence"
+            dependencies.append(
+                Dependency(
+                    object_id=_stable_id(
+                        "dep",
+                        new_task.object_id,
+                        new_revision,
+                        ref.object_id,
+                        ref.revision,
+                    ),
+                    subject_id=self.subject_id,
+                    learned_at=changed,
+                    recorded_at=changed,
+                    created_by="execution_world:dependency",
+                    dependent_ref=new_ref,
+                    dependency_ref=ref,
+                    dependency_type=dependency_type,
+                )
             )
-            for ref in refs
-        ]
 
         invalidated_actions: list[Action] = []
         if target is TaskState.CANCELLED:
@@ -1222,6 +1811,11 @@ class GoalTaskActionService:
         task = Task.model_validate(task_payload)
         if task.task_state is not TaskState.RUNNING:
             raise ValueError("external Action may only be proposed for a RUNNING Task")
+        if self._effective_completion_mode(task) == "world_evidence":
+            raise ValueError(
+                "WORLD_EVIDENCE Task cannot propose an external Action; "
+                "use ACTION_OUTCOME or MIXED completion mode"
+            )
         self._validate_refs_exist(request.evidence_refs)
 
         action_id = _stable_id(
