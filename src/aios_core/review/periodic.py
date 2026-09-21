@@ -302,6 +302,64 @@ class PeriodicReviewService:
             )
         return reviewed
 
+    def _attention_review_queue_anchors(
+        self,
+        *,
+        limit: int,
+    ) -> tuple[tuple[ReviewAnchor, ...], bool]:
+        """Resolve durable REVIEW_QUEUE Wake evidence without invoking cognition."""
+
+        if limit < 1:
+            raise ValueError("attention review queue limit must be >= 1")
+
+        anchors: list[ReviewAnchor] = []
+        seen: set[tuple[str, int]] = set()
+        total = 0
+        for payload in self.store.list_payloads(
+            object_type=ObjectType.WAKE,
+            subject_id=self.subject_id,
+        ):
+            wake = Wake.model_validate(payload)
+            if wake.wake_state not in {WakeState.NEW, WakeState.QUEUED}:
+                continue
+            metadata = wake.metadata
+            if str(metadata.get("attention_class") or "") != "review_queue":
+                continue
+            for ref in wake.evidence_refs:
+                key = (ref.object_id, int(ref.revision or 0))
+                if key in seen:
+                    continue
+                evidence = self.store.get_payload(
+                    ref.object_id,
+                    revision=ref.revision,
+                )
+                if str(evidence.get("subject_id") or "") != self.subject_id:
+                    raise ValueError("review-queue evidence belongs to another subject")
+                seen.add(key)
+                total += 1
+                anchors.append(
+                    ReviewAnchor(
+                        object_ref=ref,
+                        object_type=str(evidence["object_type"]),
+                        recorded_at=_parse_time(
+                            evidence.get("recorded_at"),
+                            "recorded_at",
+                        ),
+                        excerpt=_excerpt(evidence),
+                    )
+                )
+
+        anchors.sort(
+            key=lambda item: (
+                item.recorded_at,
+                item.object_type,
+                item.object_ref.object_id,
+                int(item.object_ref.revision or 0),
+            )
+        )
+        selected = tuple(anchors[-limit:])
+        return selected, len(selected) < total
+
     def _collect_candidates(
         self,
         *,
@@ -589,6 +647,49 @@ class PeriodicReviewService:
             policy=policy,
             excluded_refs=excluded,
         )
+        attention_anchors, attention_truncated = self._attention_review_queue_anchors(
+            limit=policy.max_candidates,
+        )
+        if attention_anchors:
+            attention_keys = {
+                (
+                    item.object_ref.object_id,
+                    int(item.object_ref.revision or 0),
+                )
+                for item in attention_anchors
+            }
+            ordinary = [
+                item
+                for item in anchors
+                if (
+                    item.object_ref.object_id,
+                    int(item.object_ref.revision or 0),
+                )
+                not in attention_keys
+            ]
+            remaining = max(0, policy.max_candidates - len(attention_anchors))
+            anchors = tuple(
+                [
+                    *ordinary[-remaining:] if remaining else [],
+                    *attention_anchors,
+                ]
+            )
+            anchors = tuple(
+                sorted(
+                    anchors,
+                    key=lambda item: (
+                        item.recorded_at,
+                        item.object_type,
+                        item.object_ref.object_id,
+                        int(item.object_ref.revision or 0),
+                    ),
+                )
+            )
+            truncated = bool(
+                truncated
+                or attention_truncated
+                or len(ordinary) > remaining
+            )
         if not anchors:
             self._create_wake(
                 now=moment,
