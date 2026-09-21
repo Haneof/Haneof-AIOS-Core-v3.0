@@ -1,0 +1,35 @@
+{
+  "e0143cc03149b2d416a925e498827cef4f171de5192b3e372d93cf793754121b": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "commit_operation_experience",
+        "arguments": {
+          "problem_type": "attributing_an_early_rush_delay_reported_with_a_user_intuition",
+          "method_path": [
+            "接住用户给出的直觉原因，但不把它当作结论写进世界",
+            "先读当天现场的结构化日志（位置、等候分钟、备注，尤其是原因栏是否为空）",
+            "再读同一时间窗口的设备遥测（到温时间、温度带、故障码），确认直觉指向的那台设备当时是否真的异常",
+            "回答时把“出现等待的位置”和“造成等待的原因”分开说，并明确指出记录里缺的是哪一栏",
+            "请现场在下次等候时补记“在等什么”，把定性推迟到出现跨天重复之后"
+          ],
+          "result_summary": "2027-01-20：用户报告牛角包晚出炉并先怀疑烤箱。当天车间日志只写“成型台前 17 分钟”且原因栏为空；同窗口 deck_oven_1 遥测显示 05:47 到 205℃、203-207℃、无故障码。AIOS 据此说明记录不支持“烤箱加热慢”，也不把成型台当原因，并请下次补记等候原因。用户当天晚上确认“至少不能只怪烤箱”，要求继续记等候点、不要急着定永久原因。1/21 早上现场补记了成因：06:10-06:42 醒发架满，两盘面团在推车上等空位。",
+          "positive_case_refs": [
+            {"object_id": "obs_src_972d74f06c87a81231892a69", "revision": 1},
+            {"object_id": "obs_conv_user_cc031f2f198bf709cea0cc61", "revision": 1},
+            {"object_id": "obs_src_facf2b040e0feb3a89b935f2", "revision": 1}
+          ],
+          "applicability": {
+            "situation": "用户带着一个直觉原因来报告出品异常",
+            "condition": "现场存在可读的结构化日志或设备遥测"
+          },
+          "cost": {"extra_reads": 2},
+          "misses": [
+            "第一版回答只说“记录不指向烤箱”，没有立刻追问现场缺的“原因”栏；是当天晚上才把补记要求说清楚"
+          ]
+        },
+        "call_id": "seg003-jan21-attribution-method"
+      }
+    ]
+  }
+}
