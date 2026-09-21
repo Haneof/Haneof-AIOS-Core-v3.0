@@ -617,6 +617,7 @@ def test_periodic_review_budget_defers_then_resumes_same_anchors(tmp_path):
     assert len(review_meter_rows) == 1
     assert review_meter_rows[0].total_tokens == 44
     assert review_meter_rows[0].execution_class == "periodic_review"
+    assert review_meter_rows[0].recorded_at == NOW + timedelta(hours=27)
     status = runtime.background_budget_gate.status(
         now=NOW + timedelta(hours=28),
     )
