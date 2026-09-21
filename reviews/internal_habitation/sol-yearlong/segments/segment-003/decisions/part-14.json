@@ -1,0 +1,17 @@
+{
+  "f340f71a8d91835abc01bb76fbf0e9c3600f1ac99583156fb52b862250fa8295": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "arguments": {"object_id": "obs_src_980c3eaef1a3002ec7d24958", "revision": 1},
+        "call_id": "seg003-jan20-second-production-record"
+      },
+      {
+        "name": "inspect_world_object",
+        "arguments": {"object_id": "obs_src_972d74f06c87a81231892a69", "revision": 1},
+        "call_id": "seg003-jan20-equipment-telemetry"
+      }
+    ]
+  }
+}
