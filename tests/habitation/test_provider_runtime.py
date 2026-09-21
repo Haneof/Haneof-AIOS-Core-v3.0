@@ -274,13 +274,21 @@ def test_gemini_interactions_tool_loop_uses_previous_interaction() -> None:
                         "arguments": {"query": "Seattle"},
                     }
                 ],
-                "usage_metadata": {"prompt_token_count": 12, "total_token_count": 12},
+                "usage": {
+                    "total_input_tokens": 12,
+                    "total_output_tokens": 0,
+                    "total_tokens": 12,
+                },
             },
             {
                 "id": "interaction_2",
                 "steps": [],
                 "output_text": "Gemini continued from the world.",
-                "usage_metadata": {"candidates_token_count": 6, "total_token_count": 6},
+                "usage": {
+                    "total_input_tokens": 0,
+                    "total_output_tokens": 6,
+                    "total_tokens": 6,
+                },
             },
         ]
     )
@@ -472,3 +480,32 @@ def test_gemini_without_total_token_count_does_not_guess_usage() -> None:
     directive = ProviderResidentHandler(client)(_snapshot(0))
     assert directive.response == "done"
     assert directive.usage is None
+
+
+
+def test_gemini_legacy_usage_metadata_remains_readable() -> None:
+    transport = FakeTransport(
+        [
+            {
+                "id": "interaction_legacy_usage",
+                "steps": [],
+                "output_text": "legacy-compatible",
+                "usage_metadata": {
+                    "prompt_token_count": 8,
+                    "candidates_token_count": 2,
+                    "total_token_count": 10,
+                },
+            }
+        ]
+    )
+    client = ProviderClient(
+        ProviderConfig(provider="gemini", model="test-gemini"),
+        transport=transport,
+        api_key="secret-gemini-test-key",
+    )
+    directive = ProviderResidentHandler(client)(_snapshot(0))
+    assert directive.response == "legacy-compatible"
+    assert directive.usage is not None
+    assert directive.usage.input_tokens == 8
+    assert directive.usage.output_tokens == 2
+    assert directive.usage.total_tokens == 10
