@@ -163,7 +163,10 @@ class PeriodicReviewRequest(BaseModel):
         "operation method, or due CognitivePolicy should be revised, confirmed, or "
         "rolled back. Use existing search/inspect tools "
         "when needed. Do not invent user growth, causal meaning, success, failure, "
-        "or policy changes that are not supported by world evidence."
+        "or policy changes that are not supported by world evidence. Mechanical "
+        "Wake outcomes may be used to review Resident-authored attention watches, "
+        "but model silence or suppressed delivery is not itself evidence of user "
+        "preference or real-world success."
     )
 
     @model_validator(mode="after")
@@ -301,6 +304,78 @@ class PeriodicReviewService:
                 for ref in wake.evidence_refs
             )
         return reviewed
+
+    def _attention_outcome_anchors(
+        self,
+        *,
+        window_start: datetime,
+        window_end: datetime,
+        limit: int,
+    ) -> tuple[tuple[ReviewAnchor, ...], bool]:
+        """Expose mechanical Wake outcomes so the Resident can learn attention policy."""
+
+        if limit < 1:
+            raise ValueError("attention outcome limit must be >= 1")
+        start = as_utc(window_start, "window_start")
+        end = as_utc(window_end, "window_end")
+
+        anchors: list[ReviewAnchor] = []
+        for payload in self.store.list_payloads(
+            object_type=ObjectType.WAKE,
+            subject_id=self.subject_id,
+        ):
+            wake = Wake.model_validate(payload)
+            if wake.wake_state not in {
+                WakeState.COMPLETED,
+                WakeState.SUPPRESSED,
+                WakeState.CANCELLED,
+            }:
+                continue
+            metadata = wake.metadata
+            attention_class = str(metadata.get("attention_class") or "")
+            if attention_class not in {
+                "interrupt",
+                "background",
+                "review_queue",
+            }:
+                continue
+            if metadata.get("review_kind") == REVIEW_KIND:
+                continue
+            recorded = _parse_time(payload.get("recorded_at"), "recorded_at")
+            if recorded <= start or recorded > end:
+                continue
+
+            excerpt = (
+                f"attention={attention_class} | source={wake.wake_source.value} | "
+                f"state={wake.wake_state.value} | priority={wake.priority} | "
+                f"hits={wake.hit_count} | "
+                f"termination={metadata.get('termination_reason')} | "
+                f"rounds={metadata.get('model_rounds')} | "
+                f"delivery={metadata.get('delivery_allowed')} | "
+                f"step0={metadata.get('step0_state')} | "
+                f"capabilities={metadata.get('capability_names')}"
+            )[:600]
+            anchors.append(
+                ReviewAnchor(
+                    object_ref=ObjectRef(
+                        object_id=wake.object_id,
+                        revision=wake.revision,
+                    ),
+                    object_type=ObjectType.WAKE.value,
+                    recorded_at=recorded,
+                    excerpt=excerpt,
+                )
+            )
+
+        anchors.sort(
+            key=lambda item: (
+                item.recorded_at,
+                item.object_ref.object_id,
+                int(item.object_ref.revision or 0),
+            )
+        )
+        selected = tuple(anchors[-limit:])
+        return selected, len(selected) < len(anchors)
 
     def _attention_review_queue_anchors(
         self,
@@ -647,6 +722,45 @@ class PeriodicReviewService:
             policy=policy,
             excluded_refs=excluded,
         )
+        outcome_anchors, outcome_truncated = self._attention_outcome_anchors(
+            window_start=window_start,
+            window_end=window_end,
+            limit=policy.max_candidates,
+        )
+        if outcome_anchors:
+            existing_keys = {
+                (
+                    item.object_ref.object_id,
+                    int(item.object_ref.revision or 0),
+                )
+                for item in anchors
+            }
+            combined = [
+                *anchors,
+                *[
+                    item
+                    for item in outcome_anchors
+                    if (
+                        item.object_ref.object_id,
+                        int(item.object_ref.revision or 0),
+                    )
+                    not in existing_keys
+                ],
+            ]
+            combined.sort(
+                key=lambda item: (
+                    item.recorded_at,
+                    item.object_type,
+                    item.object_ref.object_id,
+                    int(item.object_ref.revision or 0),
+                )
+            )
+            if len(combined) > policy.max_candidates:
+                truncated = True
+                combined = combined[-policy.max_candidates :]
+            anchors = tuple(combined)
+            truncated = bool(truncated or outcome_truncated)
+
         attention_anchors, attention_truncated = self._attention_review_queue_anchors(
             limit=policy.max_candidates,
         )
