@@ -155,7 +155,6 @@ jobs:
           mkdir -p reviews/internal_habitation/sol-yearlong/segments/segment-003
           if grep -q "MANUAL_RESIDENT_PENDING_BEGIN" artifacts/segment-003/stdout.txt; then
             echo "Found MANUAL_RESIDENT_PENDING"
-            # Extract JSON block
             awk '/MANUAL_RESIDENT_PENDING_BEGIN/{flag=1;next}/MANUAL_RESIDENT_PENDING_END/{flag=0}flag' artifacts/segment-003/stdout.txt > /tmp/pending.json
             cp /tmp/pending.json reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_snapshot.json
             echo "Pending snapshot saved"
@@ -168,18 +167,27 @@ jobs:
             echo "Pending summary saved"
             cat /tmp/pending_summary.json | head -100
           fi
-          # Always save state.json for visibility
           cp artifacts/segment-003/state.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_state.json || true
           cp artifacts/segment-003/stdout.txt reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_stdout.txt || true
-          # Commit if changed
+          cp artifacts/segment-003/world.sha256 reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_world.sha256 || true
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_snapshot.json reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_summary.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_state.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_stdout.txt || true
+          git add reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_snapshot.json reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_summary.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_state.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_stdout.txt reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_world.sha256 || true
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
             git commit -m "chore(sol-003): expose pending snapshot for local Resident via git (run ${{ github.run_id }})"
-            git push origin HEAD:arena/sol-yearlong-resident-20260921
+            for i in 1 2 3 4 5; do
+              echo "Push attempt $i"
+              if git push origin HEAD:arena/sol-yearlong-resident-20260921; then
+                echo "Push succeeded"
+                break
+              fi
+              echo "Push failed, rebasing"
+              git fetch origin arena/sol-yearlong-resident-20260921
+              git rebase origin/arena/sol-yearlong-resident-20260921 || git rebase --abort && git reset --hard origin/arena/sol-yearlong-resident-20260921 && cp /tmp/pending.json reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_snapshot.json 2>/dev/null || true; cp /tmp/pending_summary.json reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_summary.json 2>/dev/null || true; cp artifacts/segment-003/state.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_state.json 2>/dev/null || true; cp artifacts/segment-003/stdout.txt reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_stdout.txt 2>/dev/null || true; git add reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_snapshot.json reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_summary.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_state.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_stdout.txt reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_world.sha256 2>/dev/null || true; git commit -m "chore(sol-003): expose pending snapshot retry $i (run ${{ github.run_id }})" 2>/dev/null || true
+              sleep 2
+            done
           fi
 
       - name: Upload Resident step artifact
