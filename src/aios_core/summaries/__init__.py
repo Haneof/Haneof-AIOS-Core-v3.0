@@ -33,3 +33,19 @@ __all__ += [
     "previous_closed_window",
     "window_bounds",
 ]
+
+from .cognitive_derivation import (
+    CognitiveDerivationReconcileResult,
+    CognitiveDerivationScheduleReceipt,
+    CognitiveDerivationScheduler,
+    DerivedLineageClass,
+    DerivedLineageView,
+)
+
+__all__ += [
+    "CognitiveDerivationReconcileResult",
+    "CognitiveDerivationScheduleReceipt",
+    "CognitiveDerivationScheduler",
+    "DerivedLineageClass",
+    "DerivedLineageView",
+]
