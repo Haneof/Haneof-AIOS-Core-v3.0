@@ -69,7 +69,7 @@ from aios_core.summaries import DimensionSummaryInput, MultiScaleSummarySchedule
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import TemporalExtent
-from aios_core.contracts.enums import ObjectType, PolicyClass, WakeSource
+from aios_core.contracts.enums import AttentionClass, ObjectType, PolicyClass, WakeSource
 from aios_core.wake import (
     AttentionRouter,
     AttentionWatchRequest,
@@ -417,6 +417,7 @@ class FusedTurnRuntime:
                     "numeric": "{operator:gt|gte|lt|lte|eq|ne,threshold:number,path:array[string]?}?",
                     "priority": "integer?",
                     "cooldown_seconds": "integer?",
+                    "attention_class": "interrupt|background|review_queue?",
                     "expires_at": "ISO-8601 datetime?",
                 },
             ),
@@ -1256,6 +1257,7 @@ class FusedTurnRuntime:
         numeric: Mapping[str, Any] | None = None,
         priority: int = 50,
         cooldown_seconds: int = 0,
+        attention_class: str = "background",
         expires_at: str | None = None,
     ) -> dict[str, Any]:
         if self._active_turn_time is None:
@@ -1287,6 +1289,7 @@ class FusedTurnRuntime:
                 numeric=parsed_numeric,
                 priority=int(priority),
                 cooldown_seconds=int(cooldown_seconds),
+                attention_class=AttentionClass(str(attention_class)),
                 expires_at=(
                     None
                     if expires_at is None
@@ -2642,6 +2645,9 @@ class FusedTurnRuntime:
             raise ValueError("wake_ref must point to a Wake object")
 
         initial_wake = self.wake_bus.current_wake(ref.object_id)
+        initial_attention_class = self.wake_bus.attention_class_for_wake(
+            initial_wake
+        )
         bundle_excluded_sources = {
             WakeSource.SAFETY,
             WakeSource.PERIODIC_REVIEW,
@@ -2657,6 +2663,7 @@ class FusedTurnRuntime:
         if (
             initial_wake.wake_state.value in {"new", "queued"}
             and initial_wake.wake_source not in bundle_excluded_sources
+            and initial_attention_class is AttentionClass.BACKGROUND
             and within_bundle_window
         ):
             bundle = self.attention_router.bundle_pending(
@@ -2727,6 +2734,9 @@ class FusedTurnRuntime:
             "wake_source": running.wake_source.value,
             "rule_id": running.rule_id,
             "priority": running.priority,
+            "attention_class": self.wake_bus.attention_class_for_wake(
+                running
+            ).value,
             "dedupe_key": running.dedupe_key,
             "first_hit_at": running.first_hit_at.isoformat(),
             "last_hit_at": running.last_hit_at.isoformat(),
@@ -2831,6 +2841,24 @@ class FusedTurnRuntime:
         if request is None:
             return None
 
+        review_queue_wakes = self.attention_router.pending_review_queue()
+        anchor_keys = {
+            (
+                item.object_ref.object_id,
+                int(item.object_ref.revision or 0),
+            )
+            for item in request.anchors
+        }
+        review_queue_consumed_ids = tuple(
+            wake.object_id
+            for wake in review_queue_wakes
+            if wake.evidence_refs
+            and all(
+                (ref.object_id, int(ref.revision or 0)) in anchor_keys
+                for ref in wake.evidence_refs
+            )
+        )
+
         request = self.periodic_review.begin_review(
             request,
             started_at=now,
@@ -2852,6 +2880,7 @@ class FusedTurnRuntime:
             "window_start": request.window_start.isoformat(),
             "window_end": request.window_end.isoformat(),
             "anchor_count": len(request.anchors),
+            "review_queue_wake_count": len(review_queue_consumed_ids),
             "anchor_reader": "read_periodic_review_anchors",
             "instruction": request.instruction,
         }
@@ -2933,6 +2962,10 @@ class FusedTurnRuntime:
             capability_names=[
                 result.name for result in runtime_result.capability_history
             ],
+        )
+        self.attention_router.complete_review_queue(
+            review_queue_consumed_ids,
+            completed_at=now,
         )
         self.index.catch_up()
         return PeriodicReviewRunResult(
