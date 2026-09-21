@@ -387,9 +387,18 @@ def _model_usage(provider: str, response: Mapping[str, Any]) -> ModelUsage | Non
         )
 
     if provider == "gemini":
-        input_tokens = _non_negative_int(raw.get("prompt_token_count"))
-        output_tokens = _non_negative_int(raw.get("candidates_token_count"))
-        total_tokens = _non_negative_int(raw.get("total_token_count"))
+        # Interactions API (current): usage.total_* fields.
+        total_tokens = _non_negative_int(raw.get("total_tokens"))
+        input_tokens = _non_negative_int(raw.get("total_input_tokens"))
+        output_tokens = _non_negative_int(raw.get("total_output_tokens"))
+
+        # Keep legacy generateContent usage_metadata readable for archived P16
+        # artifacts, but never combine fields across the two schemas.
+        if total_tokens is None:
+            total_tokens = _non_negative_int(raw.get("total_token_count"))
+            input_tokens = _non_negative_int(raw.get("prompt_token_count"))
+            output_tokens = _non_negative_int(raw.get("candidates_token_count"))
+
         if total_tokens is None:
             return None
         return ModelUsage(
