@@ -1,44 +1,55 @@
 {
-  "decision_key": "2953696af97850181deac06d8f5d57fbee36f77e813d68b38627cdb7bdec02af",
+  "decision_key": "40e918a37a07de34f63ce7c274e5ff980106dc2d003aaa1760cc5d8cae258237",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-summary.pending.v1",
   "simulated_clock": "2027-01-24T20:15:00+00:00",
   "summary_request": {
     "request": {
-      "dimension": "dim:pos_daily",
-      "granularity": "day",
-      "source_world_revision": 199,
+      "dimension": "dim:calendar",
+      "granularity": "week",
+      "source_world_revision": 200,
       "sources": [
         {
           "metadata": {
-            "adapter_id": "habitation.pos_daily.v1",
-            "dimension": "dim:pos_daily",
-            "external_record_id": "d043-pos",
+            "dimension": "dim:calendar",
+            "summary_kind": "single_dimension_temporal"
+          },
+          "object_id": "sum_e0fe6ab03d0526f3a459688a",
+          "object_type": "summary",
+          "occurred_at": "2027-01-23T00:00:00Z",
+          "revision": 1,
+          "text": "2027-01-23录入的日历安排：2027-01-24 19:00 UTC和妹妹晚饭，备注妹妹来店附近一起吃饭。该记录是计划，不是晚餐已发生的确认；来源未列结束时间，也没有说明存在安排冲突。"
+        },
+        {
+          "metadata": {
+            "adapter_id": "habitation.calendar.v1",
+            "dimension": "dim:calendar",
+            "external_record_id": "d040-calendar",
             "external_revision": "1",
             "mechanical_ingest": true,
-            "occurred_at_original": "2027-01-24T20:15:00+00:00",
+            "occurred_at_original": "2027-01-23T09:00:00+00:00",
             "provenance": {
               "habitation_resident_metadata": {
-                "source": "pos"
+                "source": "calendar"
               },
               "model_id_not_part_of_fact": true
             },
             "source_class": "user",
-            "source_digest": "fd0d0de3d2e6c29cf7d1c5c93100db03c5d6a6a499dc598b5b59ade4cae48b49",
+            "source_digest": "3249458ceee53e6b72b8d4f106e593062f10c0408d8a0b1f32564fb2fcddfa2f",
             "source_schema_version": "1"
           },
-          "object_id": "obs_src_1ed1e4dd5570969912d66fcf",
+          "object_id": "obs_src_e44a236a9610c234a1e59e11",
           "object_type": "observation",
-          "occurred_at": "2027-01-24T20:15:00Z",
+          "occurred_at": "2027-01-23T09:00:00Z",
           "revision": 1,
-          "text": "{\"currency\": \"USD\", \"gross_sales\": 1458.8, \"orders\": 111, \"refunds\": 1, \"store\": \"bakery\"}"
+          "text": "{\"note\": \"妹妹来店附近，一起吃晚饭\", \"start\": \"2027-01-24T19:00:00+00:00\", \"title\": \"和妹妹晚饭\"}"
         }
       ],
       "truncated": false,
       "window_end": "2027-01-24T23:59:59.999999Z",
-      "window_start": "2027-01-24T00:00:00Z"
+      "window_start": "2027-01-18T00:00:00Z"
     },
     "summary_request_type": "DimensionSummaryInput"
   },
-  "world_revision_before": 199
+  "world_revision_before": 200
 }
