@@ -1,0 +1,190 @@
+{
+ "checkpoint_id": "segment_002-s0000-advance#cp06",
+ "checkpoint_index": 6,
+ "input_fingerprint": "dcc1fe894fc9ecc2d690ac207ce65589e9a30ffc31a80e1cf27bb2f5c4a21295",
+ "kind": "dimension_summary",
+ "model_id": "arena-agent-mode-resident/unknown-provider-model",
+ "payload": {
+  "dimension": "dim:user_ai_interaction",
+  "granularity": "day",
+  "source_world_revision": 50,
+  "sources": [
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx_studio",
+     "turn_index": 11,
+     "turn_key": "9699e47d537cc4694794942a"
+    },
+    "object_id": "obs_conv_ai_37ae2a05b25ff8451c0c118c",
+    "object_type": "observation",
+    "occurred_at": "2026-10-02T01:58:00Z",
+    "revision": 1,
+    "text": "日历上是十点，周慕青，带《周氏族谱》来做初次评估。要记什么随时发我。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx_studio",
+     "turn_index": 11,
+     "turn_key": "9699e47d537cc4694794942a"
+    },
+    "object_id": "obs_conv_user_8bf8dcb8f59610565e1bc190",
+    "object_type": "observation",
+    "occurred_at": "2026-10-02T01:58:00Z",
+    "revision": 1,
+    "text": "她到了 一个人 拎个铁皮饼干盒"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx_studio",
+     "turn_index": 15,
+     "turn_key": "0d6853f5952d080a409301ca"
+    },
+    "object_id": "obs_conv_ai_b267aa13ef8e9651de8193d4",
+    "object_type": "observation",
+    "occurred_at": "2026-10-02T03:41:00Z",
+    "revision": 1,
+    "text": "记下了：民国十九年无锡刻，后半本水渍、页粘连。别硬揭。现在干透了还是还潮？墨有没有洇？"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx_studio",
+     "turn_index": 15,
+     "turn_key": "0d6853f5952d080a409301ca"
+    },
+    "object_id": "obs_conv_user_2a148004b025e1aca99657f5",
+    "object_type": "observation",
+    "occurred_at": "2026-10-02T03:41:00Z",
+    "revision": 1,
+    "text": "族谱 民国十九年无锡刻的 后半本水渍 页都粘一起了"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx_studio",
+     "turn_index": 16,
+     "turn_key": "96233ce351404699f503e4ec"
+    },
+    "object_id": "obs_conv_ai_8f86438715d0951ed67f4029",
+    "object_type": "observation",
+    "occurred_at": "2026-10-02T03:44:00Z",
+    "revision": 1,
+    "text": "那这本对她不是价钱的事。报价别在她讲她哥的时候插，等看完东西、她坐下来喝口水再说。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx_studio",
+     "turn_index": 16,
+     "turn_key": "96233ce351404699f503e4ec"
+    },
+    "object_id": "obs_conv_user_07459c6e0114e906cd0d0e59",
+    "object_type": "observation",
+    "occurred_at": "2026-10-02T03:44:00Z",
+    "revision": 1,
+    "text": "她一直在说她哥 说这本是她哥留下的 没提钱"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx_studio",
+     "turn_index": 17,
+     "turn_key": "19b3de3dfb7899e3bd1828c3"
+    },
+    "object_id": "obs_conv_ai_12a18225e1e15349ef24828b",
+    "object_type": "observation",
+    "occurred_at": "2026-10-02T06:22:00Z",
+    "revision": 1,
+    "text": "浆糊能重调，一上午的手感调不回来才是真损失。他这会儿在外面，你别追。等他回来让他自己重调一锅，比你再说十句管用。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx_studio",
+     "turn_index": 17,
+     "turn_key": "19b3de3dfb7899e3bd1828c3"
+    },
+    "object_id": "obs_conv_user_4c003684b31c8935755b1df3",
+    "object_type": "observation",
+    "occurred_at": "2026-10-02T06:22:00Z",
+    "revision": 1,
+    "text": "阿桐浆糊调稀了 一上午白干 我说他两句他摔门出去抽烟"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx_studio",
+     "turn_index": 18,
+     "turn_key": "301ac16435e66b2552d8b0d4"
+    },
+    "object_id": "obs_conv_ai_bd755512d55841916a102122",
+    "object_type": "observation",
+    "occurred_at": "2026-10-02T12:14:00Z",
+    "revision": 1,
+    "text": "「看情况」他自己听得懂，就是等你排时间。要去就早点定，假期的票不好买。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx_studio",
+     "turn_index": 18,
+     "turn_key": "301ac16435e66b2552d8b0d4"
+    },
+    "object_id": "obs_conv_user_3a20c58832a94991f354127e",
+    "object_type": "observation",
+    "occurred_at": "2026-10-02T12:14:00Z",
+    "revision": 1,
+    "text": "回过去了 我爸说没事 就是问我十一回不回无锡 我说看情况"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx_studio",
+     "turn_index": 19,
+     "turn_key": "e5412c00d6efb2057e8e273a"
+    },
+    "object_id": "obs_conv_ai_f6c6e513a138d81916d85cfb",
+    "object_type": "observation",
+    "occurred_at": "2026-10-02T14:58:00Z",
+    "revision": 1,
+    "text": "先别干刷，真是活霉一刷孢子就扬开了。取样用镊子加棉签，单独装袋。另外今早工作室湿度冲到 64，霉菌就要这个，送检前把那本单独隔开放。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx_studio",
+     "turn_index": 19,
+     "turn_key": "e5412c00d6efb2057e8e273a"
+    },
+    "object_id": "obs_conv_user_b28d895d1cce164334a06510",
+    "object_type": "observation",
+    "occurred_at": "2026-10-02T14:58:00Z",
+    "revision": 1,
+    "text": "族谱第七页 那些黑斑 我怀疑是霉 明天拍照送检"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-10-02T23:59:59.999999Z",
+  "window_start": "2026-10-02T00:00:00Z"
+ },
+ "run_id": "hab_arena_01a0c1e1_moyin_v1",
+ "segment_id": "segment_002",
+ "simulated_at": "2026-10-03T01:15:00+00:00",
+ "step_key": "segment_002-s0000-advance",
+ "world_revision_before": 50
+}

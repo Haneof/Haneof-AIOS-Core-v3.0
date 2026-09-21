@@ -1,6 +1,5 @@
 {
  "background_cycles": 0,
- "checkpoint_manifest_sha256": "576b5510d8fd4a4a240835a0b24613de8ff1e1e4c88da753a99385cb90727413",
  "cumulative_resident_cognition_checkpoints": 65,
  "cumulative_simulated_days": "3.95",
  "decoy_subject_id": "subj_lintong_apprentice",

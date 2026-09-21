@@ -1,0 +1,66 @@
+{
+ "checkpoint_id": "segment_002-s0015-advance#cp02",
+ "checkpoint_index": 2,
+ "input_fingerprint": "410f8220d0b6833e8bdebf07359ca1e2778164a87ee841cd44a868f8a666246a",
+ "kind": "dimension_summary",
+ "model_id": "arena-agent-mode-resident/unknown-provider-model",
+ "payload": {
+  "dimension": "dim:family",
+  "granularity": "day",
+  "source_world_revision": 80,
+  "sources": [
+   {
+    "metadata": {
+     "dimension": "dim:family",
+     "revision_evidence_set_ref": {
+      "object_id": "evs_revision_9612bd7552a6f476d2f51a82",
+      "revision": 1
+     },
+     "revision_mode": "revise",
+     "revision_reason": "原 Claim 明确记录了「孩子姓名此刻未知」这一缺口，用户 21:50 补上了名字，属实质补充，前向修订",
+     "supersedes_revision": 1,
+     "writeback_kind": "revisable_cognition"
+    },
+    "object_id": "clm_5fd3e92a5ee0cf504c1f15b2",
+    "object_type": "claim",
+    "occurred_at": "2026-10-03T10:20:00Z",
+    "revision": 2,
+    "text": "用户有一个在读书的孩子，名叫知微，称呼用户为「妈」。2026-10-03 18:20 知微通过独立会话告知本周不回家、要参加集训，并转述「老师说这次很重要」；用户 21:50 向我转述同一件事。仍未知：知微的性别、年级、就读学校、集训项目与起止日期。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:family",
+     "writeback_kind": "cognition_evidence"
+    },
+    "object_id": "evs_333f0b1efe7d0791fd5ecb20",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-03T10:20:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-03T10:20:00Z\", \"world_revision\": 65}, \"learned_at\": \"2026-10-03T10:20:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_196195af7257fb1ba792cba6\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:family\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_333f0b1efe7d0791fd5ecb20\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-10-03T10:20:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_conv_user_196195af7257fb1ba792cba6\", \"revision\": 1}]}"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:family",
+     "revision_mode": "revise",
+     "target_ref": {
+      "object_id": "clm_5fd3e92a5ee0cf504c1f15b2",
+      "revision": 1
+     }
+    },
+    "object_id": "evs_revision_9612bd7552a6f476d2f51a82",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-03T13:50:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 2, \"missing_description\": [], \"observed_count\": 2}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-03T13:50:00Z\", \"world_revision\": 73}, \"learned_at\": \"2026-10-03T13:50:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_a3bc033a60afaee82f6f5858\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_196195af7257fb1ba792cba6\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:family\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_5fd3e92a5ee0cf504c1f15b2\", \"revision\": 1}}, \"object_id\": \"evs_revision_9612bd7552a6f476d2f51a82\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_5fd3e92a5ee0cf504c1f15b2@1\", \"recorded_at\": \"2026-10-03T13:50:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_conv_user_a3bc033a60afaee82f6f5858\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_196195af7257fb1ba792cba6\", \"revision\": 1}]}"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-10-03T23:59:59.999999Z",
+  "window_start": "2026-10-03T00:00:00Z"
+ },
+ "run_id": "hab_arena_01a0c1e1_moyin_v1",
+ "segment_id": "segment_002",
+ "simulated_at": "2026-10-04T03:30:00+00:00",
+ "step_key": "segment_002-s0015-advance",
+ "world_revision_before": 80
+}

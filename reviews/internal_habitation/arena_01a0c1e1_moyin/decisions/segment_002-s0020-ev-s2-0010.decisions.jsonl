@@ -1,0 +1,2 @@
+{"kind":"turn_directive","decision":{"capability_calls":[{"name":"commit_claim","arguments":{"content":"2026-10-04 21:35 用户决定十一不回无锡看父亲，改由她的妹妹先照看；她给的理由是自己「走不开」（工作室这边）。这是她在收到我当晚提醒后约 35 分钟作出的决定。附带新事实：用户有一个妹妹，姓名未知。","dimension":"dim:family","claim_type":"intention","knowledge_state":"reported","confidence":0.85,"evidence_refs":[{"object_id":"obs_conv_user_c9c33cd97466e8264d6bfb75","revision":1}]}}]}}
+{"kind":"turn_directive","decision":{"response":"知道了。那就辛苦你妹。你这边有情况随时说。"}}

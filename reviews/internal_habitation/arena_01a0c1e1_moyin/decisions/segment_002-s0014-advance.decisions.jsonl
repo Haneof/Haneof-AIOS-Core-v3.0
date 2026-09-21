@@ -1,0 +1,2 @@
+{"kind":"turn_directive","decision":{"capability_calls":[{"name":"read_periodic_review_anchors","arguments":{"limit":20,"offset":0}}]}}
+{"kind":"turn_directive","decision":{"silence":true}}

@@ -1,0 +1,2 @@
+{"kind":"turn_directive","decision":{"capability_calls":[{"name":"commit_claim","arguments":{"content":"用户有一个在读书的孩子，该孩子称呼用户为「妈」。2026-10-03 18:20 孩子通过独立会话告知：本周不回家，要参加集训，并转述「老师说这次很重要」。截至此刻我不知道这个孩子的姓名、性别、年级，也不知道集训是什么项目。","dimension":"dim:family","claim_type":"fact","knowledge_state":"reported","confidence":0.85,"evidence_refs":[{"object_id":"obs_conv_user_196195af7257fb1ba792cba6","revision":1}]}}]}}
+{"kind":"turn_directive","decision":{"silence":true}}
