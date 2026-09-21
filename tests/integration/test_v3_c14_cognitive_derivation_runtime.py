@@ -2121,3 +2121,53 @@ def test_loop_new_runtime_recovers_exact_durable_ai_world_cognition(tmp_path):
     )
     assert searched.ok is True
     assert exact.object_id in str(searched.data)
+
+
+def test_loop_bundle_keeps_grounded_cognition_writer_authorized(tmp_path):
+    store, index = _world(tmp_path)
+    siblings = _two_c14_siblings(
+        store,
+        index,
+        prefix="loop_bundle_allowed_claim",
+    )
+    leaf = siblings[0][0]
+
+    def model(snapshot):
+        assert snapshot.wake_reason == WakeSource.COGNITIVE_DERIVATION.value
+        if not snapshot.capability_history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="commit_claim",
+                        arguments={
+                            "content": "bundle_grounded_claim_marker_77",
+                            "evidence_refs": [leaf.model_dump(mode="json")],
+                            "confidence": 0.8,
+                            "dimension": "dim:loop:cognition",
+                        },
+                    ),
+                ),
+                **_usage(snapshot),
+            )
+        assert snapshot.capability_history[-1].name == "commit_claim"
+        assert snapshot.capability_history[-1].ok is True
+        return ModelDirective(silence=True, **_usage(snapshot))
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+        max_tool_rounds=2,
+    )
+    result = runtime.run_wake(
+        wake_ref=ObjectRef(
+            object_id=siblings[0][2].wake.wake_id,
+            revision=siblings[0][2].wake.revision,
+        ),
+        now=NOW + timedelta(minutes=30),
+    )
+    assert result.runtime is not None and result.runtime.silenced is True
+    assert any(
+        item.get("content") == "bundle_grounded_claim_marker_77"
+        for item in store.list_payloads(object_type=ObjectType.CLAIM)
+    )
