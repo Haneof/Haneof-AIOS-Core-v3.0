@@ -666,6 +666,7 @@ class AttentionRouter:
             }
             and self.wake_bus.attention_class_for_wake(wake)
             is AttentionClass.BACKGROUND
+            and not bool(wake.metadata.get("runtime_incomplete"))
             and as_utc(wake.first_hit_at, "first_hit_at") <= moment
         ]
         pending_background.sort(
