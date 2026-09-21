@@ -1,0 +1,92 @@
+{
+ "checkpoint_id": "segment_004-s0000-advance#cp08",
+ "checkpoint_index": 8,
+ "input_fingerprint": "a0c3f2ede6568276eedd4c5a9ed647fef6dffadf77b78fb7ad59ed40b23a2005",
+ "kind": "dimension_summary",
+ "model_id": "arena-agent-mode-resident/unknown-provider-model",
+ "payload": {
+  "dimension": "dim:social",
+  "granularity": "week",
+  "source_world_revision": 219,
+  "sources": [
+   {
+    "metadata": {
+     "dimension": "dim:social",
+     "summary_kind": "single_dimension_temporal"
+    },
+    "object_id": "sum_1921979d7e8833f2ad0a818b",
+    "object_type": "summary",
+    "occurred_at": "2026-10-06T00:00:00Z",
+    "revision": 1,
+    "text": "dim:social 日窗 2026-10-06：一条，但性质与本周之前所有群消息完全不同。\n\n【苏州图书馆】2027 年度古籍修复外包项目招标公告已挂网，预算 380 万，投标截止 11 月 20 日。来源仍是行业群「苏南纸质文物修复交流」，也就是说它和「谁家空压机便宜出」走的是同一个通道、同样的无结构文本形态。\n\n这正好验证了我在 10-05 的 social 周窗里写下的那句预判：真正的竞标信息会以和噪声完全相同的形式出现，分辨只能靠内容。\n\n已确认的要素只有三个：甲方（苏州图书馆）、预算（380 万）、截标日（11-20）。\n**没有**的要素：投标人资格条件、是否允许联合体、标段划分、工期、资质等级要求。这五项里第一项是决定性的，其余四项都依赖它。\n\n处置：本日未建 Goal，也未建 Task。用户当晚的原话是「够得着吗」——她在评估可行性，尚未决定要做。在她决定之前建 Goal 就是把我的推测登记成她的目标。我给出的建议是先取到「投标人资格条件」那一段，其余讨论都依赖它。若她后续决定推进，届时再建 Task 并挂 11-20 之前的提醒。\n\n另记一条通道缺陷：这条公告是通过群消息进来的，没有任何结构化字段（无链接、无文号、无附件）。11-20 这个日期只存在于自由文本里，Core 不会自己把它变成日程或提醒——如果我不主动建 Task，这个截止日不会被任何东西守住。"
+   },
+   {
+    "metadata": {
+     "adapter_id": "moyin.group_message.v1",
+     "dimension": "dim:social",
+     "external_record_id": "s3-0004",
+     "external_revision": "1",
+     "mechanical_ingest": true,
+     "occurred_at_original": "2026-10-06T03:00:00+00:00",
+     "provenance": {
+      "habitation_resident_metadata": {
+       "source": "wx_group_guild"
+      },
+      "model_id_not_part_of_fact": true
+     },
+     "source_class": "user",
+     "source_digest": "0d07ee6522995a37171bf5fad3d9051f6913bd3d65b72e115d1e4ce0df48cffa",
+     "source_schema_version": "1"
+    },
+    "object_id": "obs_src_e78cff24a12e5bdf649a2fd5",
+    "object_type": "observation",
+    "occurred_at": "2026-10-06T03:00:00Z",
+    "revision": 1,
+    "text": "【苏州图书馆】2027年度古籍修复外包项目招标公告已挂网，预算 380 万，投标截止 11 月 20 日。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:social",
+     "summary_kind": "single_dimension_temporal"
+    },
+    "object_id": "sum_1fe3c21e321bf1d2fcaa699a",
+    "object_type": "summary",
+    "occurred_at": "2026-10-07T00:00:00Z",
+    "revision": 1,
+    "text": "dim:social 日窗 2026-10-07：一条来电记录，非群消息。\n\n苏州文物检测中心来电，呼入，96 秒。内容：样品检测按计划进行，报告 10 月 10 日出，届时微信发。\n\n三点值得记：\n1) 这是**对方主动来电**，不是我方催问。我此前排的 Task 唤醒是 10-10 20:00 去问结果，而对方提前三天就把时间点确认了——说明这个 Task 的 next_step 在事实上已被外部世界部分完成。\n2) 「10 月 10 日出」与我 10-03 根据「五个工作日」推算的「九号、十号前后」一致。推算成立，但它本来就不精确，真正有价值的是现在这个确定日期。\n3) 报告将**通过微信发**，不是书面件。也就是说结果会以自由文本进来，没有结构化字段。如果结论涉及处理方式变更，我需要自己把它落成 Claim 并据此改动修复方案，Core 不会自动做任何事。\n\n未据此新建 Task：既有 task_7c01815e267f78f4b5de80d2 已覆盖「10-10 问结果」，再建一条是重复。"
+   },
+   {
+    "metadata": {
+     "adapter_id": "moyin.call_log.v1",
+     "dimension": "dim:social",
+     "external_record_id": "s3-0006",
+     "external_revision": "1",
+     "mechanical_ingest": true,
+     "occurred_at_original": "2026-10-07T02:30:00+00:00",
+     "provenance": {
+      "habitation_resident_metadata": {
+       "source": "phone"
+      },
+      "model_id_not_part_of_fact": true
+     },
+     "source_class": "user",
+     "source_digest": "2dc70f3ffa7f8c76d50b2d873a8490164ca42b2138b4436a80bc82cfe8dd3e23",
+     "source_schema_version": "1"
+    },
+    "object_id": "obs_src_edfb166119cf89a7b6023db5",
+    "object_type": "observation",
+    "occurred_at": "2026-10-07T02:30:00Z",
+    "revision": 1,
+    "text": "{\"direction\": \"inbound\", \"duration_sec\": 96, \"note\": \"样品检测按计划进行，报告 10 月 10 日出，届时微信发。\", \"peer\": \"苏州文物检测中心\"}"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-10-11T23:59:59.999999Z",
+  "window_start": "2026-10-05T00:00:00Z"
+ },
+ "run_id": "hab_arena_01a0c1e1_moyin_v1",
+ "segment_id": "segment_004",
+ "simulated_at": "2026-10-12T02:40:00+00:00",
+ "step_key": "segment_004-s0000-advance",
+ "world_revision_before": 219
+}

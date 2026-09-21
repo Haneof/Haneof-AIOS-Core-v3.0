@@ -104,7 +104,51 @@
 
 ---
 
-## 4. 发现（F-001 … F-020）
+### 3.9 环境事件：工作区被重置与解释器降级（segment_004 期间）
+
+**工作区重置**：segment_003 冻结并推送（`fb7b4e3`）之后、segment_004 开始之前，工作区被重置——
+HEAD 回退到 `142533d`，`.venv` 消失，本目录整个消失（仅报告本体作为未跟踪文件幸存）。
+恢复手段（已验证）：`git fetch origin <branch>` 然后 `git reset --hard FETCH_HEAD`；
+该 fetch **不会**创建 `origin/<branch>` 跟踪引用，必须用 `FETCH_HEAD`。
+`run/` 被本目录 `.gitignore` 忽略，故 `world.sqlite` / `state.json` / `pending.json` 不可从 git 恢复。
+
+**实际重建**：`gunzip -c segments/segment_003/world.sqlite.gz > run/world.sqlite`；
+gz 的 sha256 = `673ea9f49dd5a2c3a8e00c850d266bb51bbbf6b5420f9ab987496027000c2de4`，
+与 `checkpoint.json` 及 `segments/segment_003/checkpoint.json` 的 `world_artifact_sha256` 逐字符相符。
+内容抽查：`world_revision = 208`，`object_revisions` 635 行，
+`clm_140906c097ae14dc83f7b10b` rev1（铁质污染 fact）、`clm_e48da537bce9191b895f4f25` rev3（已 retract）、
+`task_7c01815e267f78f4b5de80d2` rev5、两条 OperationExperience 全部在位。
+`state.json` 按已知值手工重建（`segment_003` / `cursor_step=34` / `next_step_key=null` /
+`clock=2026-10-11T09:00:00+00:00` / `world_revision=208` / `index_watermark=208`）。
+重启验证：daemon 以 `segment_004` 启动，日志
+`{"clock": "2026-10-11T09:00:00+00:00", "fresh_world": false, "phase": "start", "steps": 34}`
+——`fresh_world=false` 证明 World 是从磁盘恢复而非新建。这是第 5 次重启。
+
+**解释器降级 3.12 → 3.11（必须声明的环境偏差）**：`pyproject.toml:10` 要求 `>=3.12`，
+重置后系统只剩 `/usr/bin/python3.11`（3.11.2）。
+`find / -maxdepth 4 -name "python3.1[2-9]"` 无结果；无 `uv`/`pipx`/`conda`。
+经 bootstrap venv 装 `uv` 后 `uv python install 3.12` **失败**：
+`github.com/astral-sh/python-build-standalone` 下载被 `invalid peer certificate: UnknownIssuer` 拦截
+（pypi 本身可访问，HTTP 200）。`apt-cache policy python3.12` 无输出。
+
+处置：以 3.11.2 建 `.venv`，`pip install -e ".[dev]" --ignore-requires-python`。
+等价性验证（是判断依据，不是假设）：`python3 -m compileall src tests` 退出 0，
+grep 未发现 PEP 695 语法；`pytest -q` → **252 passed**，与 3.12 基线的 252 passed 完全一致。
+**结论与限制**：全量测试在同一结果上通过，故本次降级对本 run 的行为无可观测影响；
+但这是经验等价而非规范等价——`requires-python = ">=3.12"` 自 segment_004 起**未被满足**，
+此后所有证据产生于 3.11.2。此项如实标注，不宣称与 3.12 环境等同。
+
+**segment_004 进展（进行中，未冻结）**：第 5、6 次重启（第 6 次由 F-022 的 daemon 崩溃触发）；
+`trace/trace.jsonl` 由 157 增至 **167 行**（+10 个真实 Resident 认知 checkpoint）；
+Periodic Review #10（8 anchors，6 个为我自己的 Summary，2 个外部素材均已处理，选择沉默）；
+完成 10-11 三个日窗补齐与 5 个周窗 Summary（craft / family / money / noise / social / user_ai_interaction）。
+`s4-0001`（阿桐主动复盘浆糊）进行中：已执行 `inspect_world_object`
+（确认 `obs_conv_user_caa9f3e49dba2624487447d1` = 用户 10-04 13:35 的无锡决定，F-019 规程已生效）
+与 `commit_operation_experience`（浆糊稠度判据，**第 3 条 OperationExperience**）；
+其后的 `record_communication_experience` 因 `harness.next` 挂起未消费，状态停在 `cp01 round 1`。
+新增发现 F-021（一条关于维度双重计入的假陈述，已在相邻 Summary 就地更正）、F-022（harness 崩溃）。
+
+## 4. 发现（F-001 … F-022）
 
 完整台账含逐条 repro 见 `reviews/internal_habitation/arena_01a0c1e1_moyin/findings/FINDINGS.md`（共 20 条，已用 `grep -c "^## F-"` 核对）。
 

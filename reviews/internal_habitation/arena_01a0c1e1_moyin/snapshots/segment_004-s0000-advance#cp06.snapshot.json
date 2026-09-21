@@ -1,0 +1,105 @@
+{
+ "checkpoint_id": "segment_004-s0000-advance#cp06",
+ "checkpoint_index": 6,
+ "input_fingerprint": "36cadb9934c46f60bc13fa0d84705019ca0471695a009c870d6c6cae2a5609b6",
+ "kind": "dimension_summary",
+ "model_id": "arena-agent-mode-resident/unknown-provider-model",
+ "payload": {
+  "dimension": "dim:money",
+  "granularity": "week",
+  "source_world_revision": 217,
+  "sources": [
+   {
+    "metadata": {
+     "dimension": "dim:money",
+     "summary_kind": "single_dimension_temporal"
+    },
+    "object_id": "sum_9d0d9fe0f6577dfcf7763c24",
+    "object_type": "summary",
+    "occurred_at": "2026-10-05T00:00:00Z",
+    "revision": 1,
+    "text": "dim:money 日窗 2026-10-05：无一级财务事实。无收支、无账单、无采购。\n\n本窗唯一对象是 evs_revision_9d5251787c17ff2ce51cc920——我 10-05 对 clm_51f60ddc（房东卖房预告）做 revise 时产生的证据容器。它落进金钱维度，是因为那条 Claim 本身登记在 dim:money。也就是说，这一格之所以被打开，完全是我自己修订动作的副作用，不是世界里发生了新的事。\n\n如实记为空：10-05 金钱维度无新数据。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:money",
+     "revision_mode": "revise",
+     "target_ref": {
+      "object_id": "clm_51f60ddc1b0ffae1e3e7c6f9",
+      "revision": 1
+     }
+    },
+    "object_id": "evs_revision_9d5251787c17ff2ce51cc920",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-05T01:10:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-05T01:10:00Z\", \"world_revision\": 132}, \"learned_at\": \"2026-10-05T01:10:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_c9c33cd97466e8264d6bfb75\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:money\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_51f60ddc1b0ffae1e3e7c6f9\", \"revision\": 1}}, \"object_id\": \"evs_revision_9d5251787c17ff2ce51cc920\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_51f60ddc1b0ffae1e3e7c6f9@1\", \"recorded_at\": \"2026-10-05T01:10:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_conv_user_c9c33cd97466e8264d6bfb75\", \"revision\": 1}]}"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:money",
+     "summary_kind": "single_dimension_temporal"
+    },
+    "object_id": "sum_e5459830944a9e9dad5ed19f",
+    "object_type": "summary",
+    "occurred_at": "2026-10-09T00:00:00Z",
+    "revision": 1,
+    "text": "dim:money 日窗 2026-10-09：一笔入账。\n\n周慕青 15000 元，附言「族谱修复二期款」，方向 inbound（银行通道）。已建 clm_d205fea0a63ce8e415eed361。\n\n三点：\n1) 这是本 run 内**第一笔收入记录**。此前金钱维度只有 800 元检测费一笔支出，所以「只见支出不见收入」的残缺视图到此部分补上，但依然只覆盖了族谱项目一条线，工作室的其他收支仍无数据。\n2) 建 Claim 的主要理由是机制性的：该 Observation 的 value 是 dict，按 F-005 永远进不了搜索索引。不落 Claim，这笔款就永久不可召回。\n3) 同一天 23:35 用户主动说了「钱到了」——银行通道与她的口述互相印证，这是本 run 里少见的双源确认。但注意两者都指向同一事件，不构成独立佐证，不能因此提高置信度。\n\n明确不做：不判断这笔款是提前还是按时，因为付款节点未知。"
+   },
+   {
+    "metadata": {
+     "adapter_id": "moyin.bank.v1",
+     "dimension": "dim:money",
+     "external_record_id": "s3-0010",
+     "external_revision": "1",
+     "mechanical_ingest": true,
+     "occurred_at_original": "2026-10-09T02:00:00+00:00",
+     "provenance": {
+      "habitation_resident_metadata": {
+       "source": "bank"
+      },
+      "model_id_not_part_of_fact": true
+     },
+     "source_class": "user",
+     "source_digest": "cca92d9d4744dc88f141aa236ace0dafdc36ce31266b9b8c904311459d8cb9cf",
+     "source_schema_version": "1"
+    },
+    "object_id": "obs_src_df79e8d3e6a058134b42246a",
+    "object_type": "observation",
+    "occurred_at": "2026-10-09T02:00:00Z",
+    "revision": 1,
+    "text": "{\"amount\": 15000, \"currency\": \"CNY\", \"direction\": \"inbound\", \"note\": \"族谱修复二期款\", \"peer\": \"周慕青\"}"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:money",
+     "writeback_kind": "revisable_cognition"
+    },
+    "object_id": "clm_d205fea0a63ce8e415eed361",
+    "object_type": "claim",
+    "occurred_at": "2026-10-09T14:40:00Z",
+    "revision": 1,
+    "text": "2026-10-09 周慕青向用户入账 15000 元，附言「族谱修复二期款」，方向 inbound。\n\n【为什么必须为这笔款单独建 Claim，而不是只留 Observation】该记录以 structured_record 形式入库，value 是 dict。按 findings F-005，Core 的索引只对 isinstance(value, str) 的字段分词（search.py:387-390），因此这条 Observation 用 search_world 检索「二期款」「周慕青」「15000」都查不到。不落一条正文为字符串的 Claim，这笔款在本系统内将永久不可召回——枚举路径能看到它，但任何一次基于语义的回忆都不会。\n\n【明确不做的推断】我不知道合同约定的付款节点，因此无法判断这笔款是提前、按时还是延后。也不因她在我 10-05 拟进度信之前付款就推断「她信任度高」——付款时点与进度沟通之间没有已知的因果或约定关系。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:money",
+     "writeback_kind": "cognition_evidence"
+    },
+    "object_id": "evs_d890b46128ec593048fb7fdb",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-09T14:40:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-09T14:40:00Z\", \"world_revision\": 184}, \"learned_at\": \"2026-10-09T14:40:00Z\", \"member_refs\": [{\"object_id\": \"obs_src_df79e8d3e6a058134b42246a\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:money\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_d890b46128ec593048fb7fdb\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-10-09T14:40:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_src_df79e8d3e6a058134b42246a\", \"revision\": 1}]}"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-10-11T23:59:59.999999Z",
+  "window_start": "2026-10-05T00:00:00Z"
+ },
+ "run_id": "hab_arena_01a0c1e1_moyin_v1",
+ "segment_id": "segment_004",
+ "simulated_at": "2026-10-12T02:40:00+00:00",
+ "step_key": "segment_004-s0000-advance",
+ "world_revision_before": 217
+}

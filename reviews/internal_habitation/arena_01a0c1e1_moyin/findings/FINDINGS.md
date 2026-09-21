@@ -488,3 +488,50 @@ F-017 截断挤掉，因此延迟了一个 review 周期」。查 daemon 日志�
   「截断是否造成真实证据丢失」降级为 INSUFFICIENT EVIDENCE。
 - 规程: 任何关于「谁在谁的窗口内 / 谁先于谁」的因果陈述，
   必须先打印两侧的原始时间戳再写，不得凭记忆。
+
+## F-021 MODEL BEHAVIOR：第三次凭印象断言不可肉眼校验的结构事实
+
+- 分类: **MODEL BEHAVIOR**
+- 严重度: MEDIUM（本次污染了一个已提交的 Summary）
+- 事实: 在 `segment_004-s0000-advance` 的 dim:noise 周窗 Summary 中我写道：
+  「10-06 的招标公告同时落在 dim:social 与 dim:noise，同一条群消息被双重计入，
+  而这两个维度的语义是相反的」。
+- 查证: `obs_src_e78cff24a12e5bdf649a2fd5` 的 `metadata.dimension = dim:social`，
+  `adapter_id = moyin.group_message.v1`，**从未归入 dim:noise**。
+  noise 周窗的两个素材是我自己的 noise 日 Summary 与 10-11 的新闻推送。
+  不存在双重计入。
+- 与前两次同源:
+  | 编号 | 我断言的东西 | 实际情况 |
+  |---|---|---|
+  | F-019 | `c9c33cd9` 是「无锡我不去了」那条 | 它是「老许说卖房」 |
+  | F-020 | 招标公告在 review #5 的窗口内 | #5 窗口止于 10-05T14:40Z，公告在 10-06T03:00Z |
+  | F-021 | 招标公告被同时计入 social 与 noise | 它的 dimension 只有 dim:social |
+  三次的共同点：**断言对象是 24 位十六进制 id 所指向的内容、时间戳边界、或 metadata 字段**，
+  全部无法凭肉眼或记忆校验，而我在没有回读的情况下就写成了结论。
+- 与前两次的差别（更严重）: F-019 与 F-020 都在提交前被我自己拦下；
+  **F-021 已经写进了一个已提交的 Summary 对象**，无法原地修改，
+  只能靠相邻的 dim:social 周窗 Summary 就地更正（已在同一 checkpoint 序列内完成）。
+- 规程（升级为硬性）: 任何关于 id 所指内容、时间边界、metadata 字段的陈述，
+  写入 Summary 或 findings 之前必须先执行一次读取
+  （`inspect_world_object` 或直接查 `object_revisions`）。
+  这一条现在有三例支撑，不再是预防性建议。
+
+## F-022 TEST ARTIFACT：harness 未在传入 Core 前校验 directive 互斥约束，一条坏决策会杀死 daemon
+
+- 分类: **TEST ARTIFACT**（我的 harness 缺陷，非 Core 缺陷）
+- 严重度: MEDIUM
+- 事实: 我在 `segment_004-s0001-ev-s4-0001` 同时给出 `capability_calls` 与 `response`，
+  `harness/bridge.py:288 _materialize` 直接构造 `ModelDirective` 交给 Core，
+  Core `cognitive_runtime.py:33 __post_init__` 抛
+  `ValueError: directive cannot request capabilities and terminate simultaneously`，
+  daemon 进程退出（exit_code 1）。
+- 正确协议: `capability_calls` 与 `response`/`silence` **互斥**。
+  工具轮只给 `capability_calls`，回应轮只给 `response`，分两条 decision 行。
+  这是我自己的协议错误——此前 157 个 checkpoint 都遵守了，本次是第 158 个才写错。
+- 暴露的问题: bridge 没有前置校验，也没有把 Core 的 `ValueError` 转成一条错误回执写回 decisions 文件。
+  结果是：**错误没有反馈给决策方，而是杀死了运行时**。
+- 连带影响: 重启后 `crash_recovery` 阶段丢弃未执行决策并**删除整个 decision 文件**
+  （`{"dropped_unexecuted_decisions": 1, "phase": "crash_recovery"}`），
+  决策方必须自己发现文件已不在并重新写。若决策内容较长或不可复现，这部分就永久丢失。
+- 建议: bridge 在 `_materialize` 前校验 XOR，违规时写入一条 `kind=error` 回执到 decisions 文件并保持 daemon 存活；
+  `crash_recovery` 应把被丢弃的决策移动到 `decisions/dropped/` 而不是删除。
