@@ -631,6 +631,15 @@ class AttentionRouter:
             completed.append(wake.object_id)
         return tuple(completed)
 
+    C14_EXECUTION_CONTRACT = "c14_cognitive_derivation"
+    DEFAULT_BACKGROUND_EXECUTION_CONTRACT = "background_default"
+
+    @classmethod
+    def _bundle_execution_contract(cls, wake: Wake) -> str:
+        if wake.wake_source is WakeSource.COGNITIVE_DERIVATION:
+            return cls.C14_EXECUTION_CONTRACT
+        return cls.DEFAULT_BACKGROUND_EXECUTION_CONTRACT
+
     def bundle_pending(
         self,
         *,
@@ -669,10 +678,18 @@ class AttentionRouter:
 
         if anchor_wake_id is None:
             cutoff = moment - timedelta(seconds=window_seconds)
-            eligible = [
+            window_eligible = [
                 wake
                 for wake in pending_background
                 if cutoff <= as_utc(wake.last_hit_at, "last_hit_at") <= moment
+            ]
+            if not window_eligible:
+                return None
+            execution_contract = self._bundle_execution_contract(window_eligible[0])
+            eligible = [
+                wake
+                for wake in window_eligible
+                if self._bundle_execution_contract(wake) == execution_contract
             ][:max_wakes]
         else:
             anchor = next(
@@ -685,6 +702,7 @@ class AttentionRouter:
             )
             if anchor is None:
                 return None
+            execution_contract = self._bundle_execution_contract(anchor)
             window_start = as_utc(anchor.first_hit_at, "first_hit_at")
             window_end = window_start + timedelta(seconds=window_seconds)
             eligible = [
@@ -693,6 +711,7 @@ class AttentionRouter:
                 if window_start
                 <= as_utc(wake.first_hit_at, "first_hit_at")
                 <= window_end
+                and self._bundle_execution_contract(wake) == execution_contract
             ][:max_wakes]
 
         if len(eligible) < 2:
@@ -743,6 +762,7 @@ class AttentionRouter:
             metadata={
                 "attention_bundle": {
                     "member_count": len(eligible),
+                    "execution_contract": execution_contract,
                     "members": [
                         {
                             "wake_ref": {
@@ -753,6 +773,11 @@ class AttentionRouter:
                             "rule_id": item.rule_id,
                             "priority": item.priority,
                             "hit_count": item.hit_count,
+                            "summary_ref": item.metadata.get("summary_ref"),
+                            "summary_dimension": item.metadata.get("summary_dimension"),
+                            "granularity": item.metadata.get("granularity"),
+                            "summary_window": item.metadata.get("summary_window"),
+                            "derived_lineage": item.metadata.get("derived_lineage"),
                         }
                         for item in eligible
                     ],
