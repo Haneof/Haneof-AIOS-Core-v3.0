@@ -2171,3 +2171,139 @@ def test_loop_bundle_keeps_grounded_cognition_writer_authorized(tmp_path):
         item.get("content") == "bundle_grounded_claim_marker_77"
         for item in store.list_payloads(object_type=ObjectType.CLAIM)
     )
+
+
+def test_loop_runtime_incomplete_individual_is_not_rebundled_after_partial_write(
+    tmp_path,
+):
+    store, index = _world(tmp_path)
+    leaf_a = _observation(
+        store,
+        "obs_loop_partial_rebundle_a",
+        value="partial rebundle factual leaf A",
+        dimension="dim:loop:partial_rebundle",
+    )
+    summary_a = _summary(
+        store,
+        "sum_loop_partial_rebundle_a",
+        (leaf_a,),
+        dimension="dim:loop:partial_rebundle",
+        at=NOW + timedelta(minutes=10),
+    )
+    scheduled_a = _schedule(store, index, summary_a)
+    claim_args = {
+        "content": "partial_rebundle_claim_marker_314",
+        "evidence_refs": [leaf_a.model_dump(mode="json")],
+        "confidence": 0.83,
+        "dimension": "dim:loop:cognition",
+    }
+
+    def first_model(snapshot):
+        if not snapshot.capability_history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(name="commit_claim", arguments=claim_args),
+                ),
+                **_usage(snapshot),
+            )
+        return ModelDirective(
+            capability_calls=(
+                CapabilityCall(
+                    name="search_world",
+                    arguments={"query": "partial_rebundle_claim_marker_314", "limit": 5},
+                ),
+            ),
+            **_usage(snapshot),
+        )
+
+    runtime_a = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=first_model,
+        max_tool_rounds=1,
+    )
+    first = runtime_a.run_wake(
+        wake_ref=ObjectRef(
+            object_id=scheduled_a.wake.wake_id,
+            revision=scheduled_a.wake.revision,
+        ),
+        now=NOW + timedelta(minutes=30),
+    )
+    assert first.runtime is not None
+    assert first.runtime.termination_reason == "tool_round_budget_exhausted"
+    assert first.wake.state == "queued"
+    initial_claims = [
+        item
+        for item in store.list_payloads(object_type=ObjectType.CLAIM)
+        if item.get("content") == claim_args["content"]
+    ]
+    assert len(initial_claims) == 1
+    durable_claim_id = initial_claims[0]["object_id"]
+
+    leaf_b = _observation(
+        store,
+        "obs_loop_partial_rebundle_b",
+        value="partial rebundle factual leaf B",
+        dimension="dim:loop:partial_rebundle",
+        at=NOW + timedelta(seconds=1),
+    )
+    summary_b = _summary(
+        store,
+        "sum_loop_partial_rebundle_b",
+        (leaf_b,),
+        dimension="dim:loop:partial_rebundle",
+        at=NOW + timedelta(minutes=10, seconds=1),
+    )
+    scheduled_b = _schedule(store, index, summary_b)
+
+    observed = {}
+
+    def resumed_model(snapshot):
+        observed["has_bundle"] = (
+            "cognitive_derivation_bundle"
+            in snapshot.cockpit["task_context"]
+        )
+        history = snapshot.capability_history
+        if len(history) == 0:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="commit_claim",
+                        arguments=claim_args,
+                    ),
+                )
+            )
+        assert history[-1].ok is True
+        assert durable_claim_id in str(history[-1].data)
+        return ModelDirective(silence=True)
+
+    reopened = SQLiteWorldStore(tmp_path / "world.db")
+    reopened_index = WorldSearchIndex(tmp_path / "world.db", store=reopened)
+    reopened_index.rebuild()
+    runtime_b = FusedTurnRuntime(
+        store=reopened,
+        index=reopened_index,
+        model_handler=resumed_model,
+        max_tool_rounds=2,
+    )
+    resumed = runtime_b.run_wake(
+        wake_ref=ObjectRef(
+            object_id=first.wake.wake_id,
+            revision=first.wake.revision,
+        ),
+        now=NOW + timedelta(minutes=31),
+    )
+
+    assert observed["has_bundle"] is False
+    assert resumed.runtime is not None and resumed.runtime.silenced is True
+    assert resumed.wake.state == "completed"
+    assert runtime_b.wake_bus.current_wake(
+        scheduled_b.wake.wake_id
+    ).wake_state.value in {"new", "queued"}
+    final_claims = [
+        item
+        for item in reopened.list_payloads(object_type=ObjectType.CLAIM)
+        if item.get("content") == claim_args["content"]
+    ]
+    assert len(final_claims) == 1
+    assert final_claims[0]["object_id"] == durable_claim_id
