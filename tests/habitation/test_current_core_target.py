@@ -551,3 +551,52 @@ def test_current_core_can_resume_same_world_with_replacement_model(tmp_path):
         and item.get("source_kind") == "user_ai_interaction"
     ]
     assert len(conversation_observations) == 4
+
+
+def test_habitation_self_contained_demonstrative_does_not_import_old_session(tmp_path):
+    checked = {"current": False}
+
+    def model(snapshot):
+        if "深蓝色" in snapshot.user_input:
+            topic = snapshot.cockpit["task_context"]["topic_state"]
+            assert topic["antecedent_recall_needed"] is False
+            assert topic["history_may_help"] is False
+            assert snapshot.cockpit["memory_cards"] == ()
+            checked["current"] = True
+        return ModelDirective(response="ok")
+
+    scenario = HabitationScenario(
+        scenario_id="t33-self-contained-recall-gate",
+        subject_id="synthetic-user-t33",
+        events=(
+            LifeEvent(
+                event_id="old-chat",
+                occurred_at=NOW,
+                channel="conversation",
+                payload="我以前比较过红色和绿色的包装。",
+                metadata={"session": "old"},
+            ),
+            LifeEvent(
+                event_id="current-chat",
+                occurred_at=NOW + timedelta(hours=1),
+                channel="conversation",
+                payload="我喜欢这个颜色：深蓝色。请把它作为当前偏好记录。",
+                metadata={"session": "new"},
+            ),
+        ),
+    )
+    target = CurrentCoreHabitationTarget(
+        model_id="model-t33",
+        subject_id=scenario.subject_id,
+        db_path=tmp_path / "t33.sqlite",
+        model_handler=model,
+    )
+
+    run = HabitationRunner().run(
+        scenario=scenario,
+        model_id="model-t33",
+        target=target,
+    )
+
+    assert run.delivered_count == 2
+    assert checked["current"] is True

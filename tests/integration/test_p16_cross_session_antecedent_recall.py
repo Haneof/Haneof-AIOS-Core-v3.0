@@ -8,10 +8,12 @@ from aios_core.ingest.conversation import ConversationIngestor
 from aios_core.query.search import WorldSearchIndex
 from aios_core.runtime.cognitive_runtime import ModelDirective
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
+from aios_core.recommendation.topic_state import TopicStateService
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 
 
 NOW = datetime(2026, 3, 8, 21, 0, tzinfo=timezone.utc)
+# T33 regression file intentionally exercises the real FusedTurnRuntime gate.
 
 
 def _observation(
@@ -200,3 +202,153 @@ def test_new_session_bare_continue_exposes_candidates_without_pretending_resolut
     )
 
     assert result.recommendation.cards
+
+
+def test_self_contained_demonstrative_does_not_open_cross_session_recall(tmp_path):
+    """Case A: a locally specified current preference must not pull old history."""
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    ingest = ConversationIngestor(store)
+    ingest.commit_turn(
+        session_id="old-1",
+        turn_index=1,
+        user_text="我以前比较过红色和绿色的包装。",
+        assistant_text="可以以后再比较。",
+        occurred_at=NOW - timedelta(days=30),
+    )
+    ingest.commit_turn(
+        session_id="old-2",
+        turn_index=1,
+        user_text="开店前我还讨论过咖啡机清洁。",
+        assistant_text="记录过这个旧话题。",
+        occurred_at=NOW - timedelta(days=20),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    def model(snapshot):
+        topic = snapshot.cockpit["task_context"]["topic_state"]
+        assert topic["antecedent_recall_needed"] is False
+        assert topic["history_may_help"] is False
+        assert snapshot.cockpit["memory_cards"] == ()
+        return ModelDirective(response="已按你当前明确表达的偏好处理。")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    result = runtime.run_turn(
+        session_id="new",
+        turn_index=1,
+        user_input="我喜欢这个颜色：深蓝色。请把它作为当前偏好记录。",
+        occurred_at=NOW,
+    )
+
+    assert result.recommendation.cards == ()
+    assert result.recommendation.reason == "current_topic_does_not_need_history"
+
+
+def test_true_cross_session_ellipsis_exposes_candidates_without_binding_identity(tmp_path):
+    """Case B: an explicitly historical elliptical follow-up may expose candidates."""
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    ingest = ConversationIngestor(store)
+    prior = ingest.commit_turn(
+        session_id="old",
+        turn_index=1,
+        user_text="上次我们在讨论西雅图出差前一晚要准备什么。",
+        assistant_text="我列了一个准备清单。",
+        occurred_at=NOW - timedelta(days=4),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    def model(snapshot):
+        topic = snapshot.cockpit["task_context"]["topic_state"]
+        assert topic["history_may_help"] is True
+        assert topic["antecedent_recall_needed"] is True
+        refs = {item["object_id"] for item in snapshot.cockpit["memory_cards"]}
+        assert prior.user_observation_id in refs
+        assert prior.assistant_observation_id not in refs
+        return ModelDirective(response="我看到了历史候选，但仍由我判断你具体指哪一项。")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    result = runtime.run_turn(
+        session_id="new",
+        turn_index=1,
+        user_input="上次那个继续。",
+        occurred_at=NOW,
+    )
+
+    assert result.recommendation.cards
+    assert all(
+        card.match_reason in {
+            "current_topic_index_overlap",
+            "cross_session_antecedent_candidate",
+        }
+        for card in result.recommendation.cards
+    )
+
+
+def test_deictic_without_trustworthy_history_exposes_no_fake_antecedent(tmp_path):
+    """Case C: the gate may open, but Core must not fabricate an antecedent."""
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    def model(snapshot):
+        topic = snapshot.cockpit["task_context"]["topic_state"]
+        assert topic["history_may_help"] is True
+        assert topic["antecedent_recall_needed"] is True
+        assert snapshot.cockpit["memory_cards"] == ()
+        return ModelDirective(response="当前没有可信历史候选，我需要继续搜索或向用户确认。")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    result = runtime.run_turn(
+        session_id="fresh",
+        turn_index=1,
+        user_input="那天后来怎么样了？",
+        occurred_at=NOW,
+    )
+
+    assert result.recommendation.cards == ()
+
+
+def test_same_session_continuation_uses_recent_turn_without_cross_session_fallback():
+    """Same-session continuity remains distinct from cross-session antecedent recovery."""
+    state = TopicStateService().resolve(
+        user_input="那个继续。",
+        recent_turns=(
+            {"role": "user", "text": "我们先讨论预算上限。"},
+            {"role": "assistant", "text": "可以。"},
+        ),
+    )
+
+    assert state.continued_from_recent_turn is True
+    assert state.antecedent_recall_needed is False
+    assert state.history_may_help is True
+    assert state.topic == "我们先讨论预算上限。"
+
+
+def test_embedded_continuation_word_in_self_contained_request_does_not_open_history():
+    state = TopicStateService().resolve(
+        user_input="我准备继续学习 Python，请帮我整理今天的计划。",
+        recent_turns=(),
+    )
+
+    assert state.continued_from_recent_turn is False
+    assert state.antecedent_recall_needed is False
+    assert state.history_may_help is False
+
+
+def test_self_contained_current_clause_stays_current_even_with_same_session_history():
+    state = TopicStateService().resolve(
+        user_input="今天我准备继续学习 Python，请帮我整理计划。",
+        recent_turns=(
+            {"role": "user", "text": "上一轮我们讨论的是咖啡机清洁。"},
+            {"role": "assistant", "text": "可以。"},
+        ),
+    )
+
+    assert state.continued_from_recent_turn is False
+    assert state.antecedent_recall_needed is False
+    assert state.history_may_help is False
+    assert state.topic == "今天我准备继续学习 Python，请帮我整理计划。"
