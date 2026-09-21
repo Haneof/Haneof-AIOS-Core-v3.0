@@ -1241,8 +1241,6 @@ class FusedTurnRuntime:
         return self._world_map_context(self._active_turn_time)
 
     def _list_attention_watches(self) -> list[dict[str, Any]]:
-        if self._active_turn_time is not None:
-            self.attention_watches.expire_due(now=self._active_turn_time)
         return [
             item.model_dump(mode="json")
             for item in self.attention_watches.current()
@@ -2397,6 +2395,8 @@ class FusedTurnRuntime:
                 "P14 derives recent_turns from WorldStore; callers must not inject "
                 "an externally maintained conversation history"
             )
+
+        self.attention_watches.expire_due(now=occurred_at)
 
         # The current user utterance enters the world before model inference. The
         # continuity view deliberately excludes this incomplete current turn and
