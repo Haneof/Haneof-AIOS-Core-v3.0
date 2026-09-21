@@ -510,9 +510,13 @@ def test_old_ai_claim_via_summary_cannot_self_ground_new_claim(tmp_path):
         (ObjectRef(object_id=old_claim.claim_id, revision=1),),
         dimension="dim:ai_user_understanding",
     )
-    scheduled = _schedule(store, index, summary_ref)
+    scheduler = CognitiveDerivationScheduler(store=store, index=index)
+    scheduled = scheduler.ensure(summary_ref)
     assert scheduled.lineage.classification is DerivedLineageClass.MIXED
     assert scheduled.lineage.grounding_leaf_refs == ()
+    assert scheduled.eligible is False
+    assert scheduled.wake is None
+    manual = _manual_wake(store, index, summary_ref)
 
     before_claims = len(store.list_payloads(object_type=ObjectType.CLAIM))
 
@@ -540,8 +544,8 @@ def test_old_ai_claim_via_summary_cannot_self_ground_new_claim(tmp_path):
     runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
     result = runtime.run_wake(
         wake_ref=ObjectRef(
-            object_id=scheduled.wake.wake_id,
-            revision=scheduled.wake.revision,
+            object_id=manual.wake_id,
+            revision=manual.revision,
         ),
         now=NOW + timedelta(minutes=30),
     )
