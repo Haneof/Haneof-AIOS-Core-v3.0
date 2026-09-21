@@ -76,8 +76,8 @@
 | 12 | `C14-RUNTIME-HARDEN-001` | 封闭 COGNITIVE_DERIVATION 的 side-effect 逃逸：该 Wake 只允许 leaf-grounded Claim create/revise/retract 写入；Event/Entity/Relation/Dimension/Goal/Task/Action/AttentionWatch/Experience/Policy 等持久副作用不得从此后台认知入口写入 | **DONE** | C14-RUNTIME-001 | PR #63; candidate `3accaeebe8ee1b3d420d2dfa3528ecb5e7388d86`; squash merge `09002ddf8fd1fd4af08f54ac5b190d4c39c9e25b`; `reviews/C14_RUNTIME_HARDEN_001_COMPLETION_EVIDENCE_2026-09-21.md`; required Gates GREEN | COGNITIVE_DERIVATION 显式 side-effect allowlist 仅含 `commit_claim`, `commit_ai_world_claim`, `revise_claim`, `retract_claim`; 其他 writes 全部 deny；read capabilities 保留；普通 user turn / Periodic Review 不退化；专项+全回归 GREEN |
 | 13 | `C14-LOOP-001` | 持续认知派生加固：C14-aware burst bundling、防 contract laundering、自激防护、预算/合并/延迟/恢复、Periodic Review 共存、新 Runtime 检索、长期 provenance reconcile 规模加固 | **DONE** | C14-RUNTIME-HARDEN-001 | PR #65; candidate `f48c3c9cfa8a24fa2e0e0220d7fe20bcda1be34d`; squash merge `a385f7b3fcc71982aae0611a382502c9a37ba71e`; `reviews/C14_LOOP_001_COMPLETION_EVIDENCE_2026-09-21.md`; exact-candidate 14 workflows GREEN | C14-only homogeneous AttentionBundle preserves effective derivation contract/allowlist/no-delivery; model/tool/capability exhaustion durable/resumable; partial-write retry idempotent; unfinished spend remains in C13 budget truth; AI cognition self-excitation blocked; Review coexistence/new-runtime retrieval/reconcile-scale regressions GREEN |
 | 14 | `C14-RES-FIX-001` | Life Director 准备 C14 真实 Resident sealed life fixture / sequential release contract；只做测试输入与未来隔离，不运行 Resident 语义 | **DONE** | C14-LOOP-001 | PR #68; candidate `e174a016c25d34c05ef096129d1c537ca5b19de8`; squash merge `796d9c357bb08f3042f103bc66260fdb3cdcd88c`; fixture SHA256 `a0f9dfd0985560ce80f568b6cd11d46b13f5dc352a664c005fcb165ea5a67485`; `reviews/internal_habitation/c14-resident/C14_RES_FIX_001_COMPLETION_EVIDENCE_2026-09-21.md` | 36 条自然人生事件已冻结；Phase A 24 / Phase B 12；cursor 24/25 sealed handoff；逐项 release contract + evaluator-only notes + digest/顺序/时间/泄漏机械校验 PASS；无 Core 修改、无 Resident 语义运行 |
-| 15 | `C14-RES-FIX-002` | 加固 C14 真实 Resident fixture：消除单维 conversation 泄题、让 Phase-B 决策对当前事实保持真正可选、增加 executable blind release operator | **READY** | C14-RES-FIX-001 | `reviews/C14_RES_FIX_001_PM_REVIEW_2026-09-21.md`; preserve v1 as history; produce sealed fixture v2 + new digest | v2 正例必须真正跨维，handoff 前任何单一 Resident-visible dimension 不得直接给出高阶结论；Phase-B 至少两种当前事实下都合理的方案，旧 cognition 才能 materially participate；机械 release helper 只输出当前 cursor、ack 后推进、A 禁止 25、B 从 25 开始；不改 Core、不跑 Resident |
-| 16 | `C14-RES-A-001` | 第一真实 Resident 窗口逐事件生活与认知：模型本人基于当前 RuntimeSnapshot 作 search/inspect/Claim/revise/retract/silence；在 sealed handoff boundary 停止 | **BLOCKED** | C14-RES-FIX-002 | sealed fixture `reviews/internal_habitation/c14-resident/fixture/sealed_fixture.json`; release contract `reviews/internal_habitation/c14-resident/release/release_contract.md`; fixture SHA256 `a0f9dfd0985560ce80f568b6cd11d46b13f5dc352a664c005fcb165ea5a67485`; real model only; fresh/private World; no future fixture/oracle | 保存 exact main/model/provider、World/checkpoint/index digest、release cursor、cognition refs、capability/writeback trace；只机械获得当前 cursor 事件；不得读未来；不得程序代替语义；到 cursor 24 必须停止，不得释放 25 |
+| 15 | `C14-RES-FIX-002` | 加固 C14 真实 Resident fixture：消除单维 conversation 泄题、让 Phase-B 决策对当前事实保持真正可选、增加 executable blind release operator | **DONE** | C14-RES-FIX-001 | PR #70; candidate `aacee04cfa5390f2a63d0a5606acb909291849b6`; squash merge `510290d3b9578cd9425079a22050eb679ddb528a`; v2 SHA256 `1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253`; `reviews/internal_habitation/c14-resident/v2/C14_RES_FIX_002_COMPLETION_EVIDENCE_2026-09-21.md` | v2 36-event fixture preserves v1 history; single-dimension leakage audit PASS; Phase-B underdetermination PASS; exact-byte blind release audit 19/19 PASS; A/B cursor 24/25 fail-closed; Core diff 0; no Resident run |
+| 16 | `C14-RES-A-001` | 第一真实 Resident 窗口逐事件生活与认知：模型本人基于当前 RuntimeSnapshot 作 search/inspect/Claim/revise/retract/silence；在 sealed handoff boundary 停止 | **READY** | C14-RES-FIX-002 | formal fixture v2 `reviews/internal_habitation/c14-resident/v2/fixture/sealed_fixture.json`; manifest `reviews/internal_habitation/c14-resident/v2/fixture/fixture_manifest.json`; release contract `reviews/internal_habitation/c14-resident/v2/release/release_contract.md`; release operator `reviews/internal_habitation/c14-resident/v2/release/release_operator.py`; SHA256 `1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253`; handoff 24/25; real model only; fresh/private World | 只允许通过 v2 release operator 逐事件获得 cursor 1..24；Resident 禁止直接读取 sealed fixture / manifest / evaluator notes / future events；每条 reveal 后须 durable ingest + ack 才推进；保存 exact main/model/provider、World/checkpoint/index digest、cognition refs、capability/writeback trace；ack 24 后永久停止，绝对不得 reveal 25；不得使用 v1 fixture/digest 作为正式输入 |
 | 17 | `C14-RES-B-001` | 全新模型窗口恢复 Phase-A durable AIOS World 后继续人生；禁止注入 Phase-A 对话/总结，验证旧 cognition 在新情境下被 AIOS 正常检索并实际影响未来行为与 Outcome | **BLOCKED** | C14-RES-A-001 | 新 ChatGPT/agent conversation；只给 World/checkpoint/digest + release contract/current cursor | 新 Runtime/Index/session；普通 AIOS capability 找回 exact cognition；至少一项 prior cognition materially participates in later decision；随后 Outcome/new evidence 可支持 retain/revise/retract；无 prior chat contamination |
 | 18 | `C14-RES-EVAL-001` | 独立 evaluator 审计 C14 Resident A/B 真实语义证据；不修 Core | **BLOCKED** | C14-RES-B-001 | sealed fixture chronology + A/B artifacts + World/checkpoint/digests + protocol | 分别裁决跨维正例、matched negative silence、fresh-window cognition consumption、contradiction/revision、future-leak/pseudo-LLM；每项 VALID/PARTIAL/INVALID；任一关键项非 VALID 则不能进入 C14 closure PASS |
 | 19 | `C14-CLOSE-001` | 独立审计 C14 规则、代码、Gate 与真实 Resident 证据；只做收口，不写新 Core 功能 | **BLOCKED** | C14-RES-EVAL-001 | C14 全链证据 + deterministic gates + Resident evaluator + PM hardening requirements | 任一以下成立即 FAIL：Summary-only 自证 cognition、无跨维正例、无 matched negative silence、无真正 fresh-window/new-runtime 行为消费、provenance 用语义启发式/第二来源库、claim count 成质量目标、存在 wake storm/future leak/pseudo-LLM；全部通过才恢复 P16 |
@@ -1009,3 +1009,48 @@ Decision:
 
 - `C14-RES-FIX-002 = READY`
 - `C14-RES-A-001 = BLOCKED` until v2 fixture passes PM review.
+
+
+### C14-RES-FIX-002 completion — 2026-09-21
+
+```text
+Task ID: C14-RES-FIX-002
+Status: DONE
+Started from main: 075685b5b9b632988baa4e2de61c6d05aa469d32
+Work branch: c14/res-fixture-v2-hardening-20260921-sol
+Candidate SHA: aacee04cfa5390f2a63d0a5606acb909291849b6
+PR: #70
+Merge SHA: 510290d3b9578cd9425079a22050eb679ddb528a
+Required gates: single-dimension leakage audit; Phase-B underdetermination audit; executable blind-release fail-closed tests; fixture digest/shape/chronology; main-to-candidate scope audit; no Resident semantic execution
+Gate conclusions:
+- positive single-dimension leakage audit / PASS: schedule, sleep, work_outcome, device_activity, conversation are each individually insufficient for the hidden high-level longitudinal synthesis
+- Phase-B underdetermination audit / PASS: 09:00 early clarification and 11:00 protected initial drafting are both plausible under current Phase-B facts; no fixture-side expected action
+- exact-byte blind release operator audit / 19 of 19 PASS
+- reveal emits current projection only and does not advance / PASS
+- ack exact pending event + durable object_id@revision required before cursor advance / PASS
+- digest / version / skip / repeat / reorder / wrong-event / missing-ingest-ref failures close / PASS
+- Phase A cursor 24 reveal + ack -> next 25 / PASS
+- Phase A reveal 25 rejected / PASS
+- Phase B requires exact 24->25 handoff and can reveal 25 / PASS
+- hidden phase, evaluator content, and N+1 payload absent from reveal stdout / PASS
+- fixture v2 digest / schema / sequence / unique ids / strict time monotonicity / PASS
+- src/aios_core diff / NONE
+- fixture-v1 mutations / NONE
+GitHub Actions note: a reproducible v2 workflow is committed, but GitHub's workflow/status API emitted no run record for the app-authored PR head during this task; no CI GREEN is claimed or fabricated.
+Evidence/report paths:
+- reviews/internal_habitation/c14-resident/v2/C14_RES_FIX_002_COMPLETION_EVIDENCE_2026-09-21.md
+- reviews/internal_habitation/c14-resident/v2/fixture/sealed_fixture.json
+- reviews/internal_habitation/c14-resident/v2/fixture/fixture_manifest.json
+- reviews/internal_habitation/c14-resident/v2/release/release_contract.md
+- reviews/internal_habitation/c14-resident/v2/release/release_operator.py
+- reviews/internal_habitation/c14-resident/v2/release/event_schema.json
+- reviews/internal_habitation/c14-resident/v2/release/test_release_operator.py
+- reviews/internal_habitation/c14-resident/v2/evaluator/EVALUATOR_ONLY_design_notes.md
+Fixture: c14-resident-fixture-v2; 36 events; Phase A 24; Phase B 12; 2026-10-01T07:12:00-07:00 -> 2026-10-31T12:03:00-07:00; handoff cursor 24/25; SHA256 1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253
+Bugs fixed in test design:
+- v1 dim:conversation could substantially disclose the intended positive synthesis
+- v1 Phase-B current deadline/duration arithmetic strongly selected one plan without needing durable cognition
+- v1 release contract lacked an executable blind release boundary
+Deferred issues: real semantic formation/consumption belongs exclusively to C14-RES-A-001 and C14-RES-B-001; independent semantic verdict belongs to C14-RES-EVAL-001; no Core/runtime repair occurred here.
+Next READY task: C14-RES-A-001 — new window only.
+```
