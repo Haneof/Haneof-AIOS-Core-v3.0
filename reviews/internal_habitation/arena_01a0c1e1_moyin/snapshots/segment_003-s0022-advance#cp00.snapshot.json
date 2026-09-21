@@ -1,0 +1,49 @@
+{
+ "checkpoint_id": "segment_003-s0022-advance#cp00",
+ "checkpoint_index": 0,
+ "input_fingerprint": "52f24b22d6915c205ff40e69ca6327937b8676fb9496a9a1241e335133b50a1c",
+ "kind": "dimension_summary",
+ "model_id": "arena-agent-mode-resident/unknown-provider-model",
+ "payload": {
+  "dimension": "dim:craft",
+  "granularity": "day",
+  "source_world_revision": 179,
+  "sources": [
+   {
+    "metadata": {
+     "adapter_id": "moyin.photo_description.v1",
+     "dimension": "dim:craft",
+     "external_record_id": "s3-0008",
+     "external_revision": "1",
+     "mechanical_ingest": true,
+     "occurred_at_original": "2026-10-08T07:20:00+00:00",
+     "provenance": {
+      "habitation_resident_metadata": {
+       "source": "workbench_camera"
+      },
+      "media_descriptor": true,
+      "model_id_not_part_of_fact": true,
+      "object_facts_count": 0,
+      "raw_media_retained": false
+     },
+     "source_class": "user",
+     "source_digest": "8008b96cff6cde1632c73841eaafc89df63620f152097df1e51ed9779f715411",
+     "source_schema_version": "1"
+    },
+    "object_id": "obs_src_c69a31e13568b6282b04a821",
+    "object_type": "observation",
+    "occurred_at": "2026-10-08T07:20:00Z",
+    "revision": 1,
+    "text": "《周氏族谱》第一册第七页黑斑，侧光 30 度重拍：斑体边缘锐利不发晕，沿纤维走向呈细密条状分布，中心颜色深于边缘，表面无绒毛状隆起。"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-10-08T23:59:59.999999Z",
+  "window_start": "2026-10-08T00:00:00Z"
+ },
+ "run_id": "hab_arena_01a0c1e1_moyin_v1",
+ "segment_id": "segment_003",
+ "simulated_at": "2026-10-09T02:00:00+00:00",
+ "step_key": "segment_003-s0022-advance",
+ "world_revision_before": 179
+}

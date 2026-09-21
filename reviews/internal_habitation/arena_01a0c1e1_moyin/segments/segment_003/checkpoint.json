@@ -1,30 +1,30 @@
 {
  "background_cycles": 0,
- "cumulative_resident_cognition_checkpoints": 132,
- "cumulative_simulated_days": "7.91",
+ "cumulative_resident_cognition_checkpoints": 157,
+ "cumulative_simulated_days": "10.71",
  "decoy_subject_id": "subj_lintong_apprentice",
  "habitation_run_id": "hab_arena_01a0c1e1_moyin_v1",
- "index_watermark": 174,
+ "index_watermark": 208,
  "model_id": "arena-agent-mode-resident/unknown-provider-model",
- "next_event_cursor": 20,
- "next_life_event": "segment_003-s0020-ev-s3-0009 (durable cursor); then s3-0010..s3-0014, incl. s3-0012 lab report on 10-10 = delayed truth #1",
- "notes": "PARTIAL segment_003 second freeze. Restart #3 verified (fresh_world=false, crash_recovery on s0007). First OperationExperience committed (opexp_9fa2d00208fbeedf48976158). Corrected my own evidence mis-pin on clm_8522f237 (rev2) = F-019. F-018: wake-delivered responses never persisted as Observations. F-020: retracted my own unsupported causal claim about F-017 truncation after checking window bounds in the daemon log.",
+ "next_event_cursor": 34,
+ "next_life_event": "segment_004 (2026-10-12 onward); life script NOT yet authored",
+ "notes": "segment_003 COMPLETE (34/34 steps, wr=208). Delayed truth #1 landed: lab report SZWJ-2026-1004 refuted the mould hypothesis -> retract clm_e48da537 + new fact clm_140906c0 (iron staining). 2 OperationExperiences committed. Restart #4 verified via crash_recovery. Days counted from origin 2026-10-01T00:00+08:00.",
  "object_counts": {
-  "claim": 9,
-  "dependency": 331,
+  "claim": 11,
+  "dependency": 384,
   "entity": 6,
   "event": 1,
-  "evidence_set": 23,
-  "observation": 52,
-  "operation_experience": 1,
+  "evidence_set": 26,
+  "observation": 60,
+  "operation_experience": 2,
   "relation": 1,
-  "summary": 53,
+  "summary": 58,
   "task": 2,
-  "wake": 9
+  "wake": 13
  },
  "observable_events_delivered": 0,
  "periodic_reviews_run": 0,
- "previous_checkpoint_sha256": "5585bce1fde5de6e61f930e76511c47f434ea8bcdfe15244cfaea9c86abfec87",
+ "previous_checkpoint_sha256": "bca1dda28a2e1860a2114a0ddcec6fb416b7147161d8727a27022a017020b47e",
  "provider_provenance": {
   "bridge": "file-bridge; no pseudo-model, no keyword table",
   "decision_journal": "reviews/internal_habitation/arena_01a0c1e1_moyin/decisions",
@@ -37,20 +37,20 @@
  "reviewer_id": "arena_01a0c1e1_moyin",
  "segment_id": "segment_003",
  "segment_ordinal": 3,
- "segment_simulated_end": "2026-10-08T21:55:00+08:00",
- "segment_simulated_start": "2026-10-06T04:00:00+08:00",
+ "segment_simulated_end": "2026-10-11T17:00:00+08:00",
+ "segment_simulated_start": "2026-10-05T07:00:00+08:00",
  "session_turns": {
-  "wx_studio": 28,
+  "wx_studio": 31,
   "wx_zhiwei": 1
  },
- "simulated_time_cursor": "2026-10-08T13:55:00+00:00",
+ "simulated_time_cursor": "2026-10-11T09:00:00+00:00",
  "subject_id": "subj_shen_yanqiu",
  "tested_main_sha": "142533df9123d793edde9ec4f07405182d56af0d",
  "trace_checkpoints_by_kind": {
-  "dimension_summary": 63,
-  "turn_directive": 69
+  "dimension_summary": 72,
+  "turn_directive": 85
  },
  "world_artifact": "segments/segment_003/world.sqlite.gz",
- "world_artifact_sha256": "5e7fce6354f8e352648e37216da8da0b357571e327dcd039ac5c6857e79ff08a",
- "world_revision": 174
+ "world_artifact_sha256": "673ea9f49dd5a2c3a8e00c850d266bb51bbbf6b5420f9ab987496027000c2de4",
+ "world_revision": 208
 }

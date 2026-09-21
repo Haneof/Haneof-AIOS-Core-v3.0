@@ -66,19 +66,19 @@
 
 | 维度 | 要求 | 实际 | 达成 |
 |---|---|---|---|
-| 模拟天数 | ≥365 | **7.91** | ❌ |
-| Resident 认知 checkpoint | ≥365 | **132** | ❌ |
-| 事件总数 | 365 | **27 已投喂** (+4 decoy，已入库未建任何 Claim/Relation) | ❌ |
-| 对话轮次 | 240 | **19**（wx_studio 18 + wx_zhiwei 1） | ❌ |
+| 模拟天数 | ≥365 | **10.71** | ❌ |
+| Resident 认知 checkpoint | ≥365 | **157** | ❌ |
+| 事件总数 | 365 | **38 已投喂** (+6 decoy，已入库未建任何 Claim/Relation) | ❌ |
+| 对话轮次 | 240 | **24**（wx_studio 23 + wx_zhiwei 1） | ❌ |
 | 20+ 轮长对话 | 12 | **0**（最长单会话 14 轮跨会话累计，无单场 ≥20） | ❌ |
 | 非对话现实输入 | 60 | **9**（calendar 1, sensor 2, group 3, call_log 1, photo 1, order 1） | ❌ |
 | Goal/Task 生命周期 | 12 | **2**（均未闭环，见 F-014） | ❌ |
 | Action/Outcome | 6 | **0** —— Core 无创建 Outcome 的 capability（F-014） | ❌ |
-| Periodic Review | 12 | **6** | ❌ |
-| 延迟真相修正 | 6 | **1 进行中**（第七页黑斑，10-10 检测回报未达）＋ **1 已发生的部分反转**（房东 10-04 预告卖房、10-05 自我否认，Claim 已 revise 降至 0.55 而非撤销） | ❌ |
+| Periodic Review | 12 | **9** | ❌ |
+| 延迟真相修正 | 6 | **1 已完整落地**（第七页黑斑：霉 → 铁锈，retract 旧假设 + 新建 fact）＋ **1 部分反转**（房东 10-04 预告卖房、10-05 自我否认，revise 降至 0.55 而非撤销） | ❌ |
 | 模糊指代 | 12 | **≥4**（"那个""上次说的""他""这页"） | ❌ |
 | 噪音期 | 6 | **1**（10-03 两条同行群消息，我未建任何 Claim/Goal） | ❌ |
-| 重启 | 4 | **3**（segment_002←001、segment_003←002，均 `fresh_world=false` 且恢复验证通过） | ❌ |
+| 重启 | 4 | **4**（segment_002←001、segment_003←002，均 `fresh_world=false` 且恢复验证通过） | ❌ |
 | decoy subject | 1 | **1** ✅ | ✅ |
 
 ---
@@ -146,9 +146,8 @@ F-012 我先前把它记成"backlog 分页导致 cursor 滞后"，这个描述�
 
 ---
 
-### 3.3 segment_003（**部分完成**，两次冻结，最新 `checkpoint sha256=bca1dda2…`）
-2026-10-05 07:00 → 2026-10-08 21:55 本地（时钟停在 `2026-10-08T13:55Z`），67 个新 checkpoint，world_revision 95 → 174。
-**这是一个部分段：34 步走到第 20 步**，durable cursor 停在 `segment_003-s0020-ev-s3-0009`。
+### 3.3 segment_003（**已完整跑完 34/34 步**，`checkpoint sha256=056b3301…`）
+2026-10-05 07:00 → 2026-10-11 17:00 本地，**34/34 步全部跑完**，92 个新 checkpoint，world_revision 95 → 208。
 
 第二轮（restart #3，含 `crash_recovery`）新增的关键内容：
 
@@ -198,13 +197,25 @@ F-012 我先前把它记成"backlog 分页导致 cursor 滞后"，这个描述�
 | 项 | 值 |
 |---|---|
 | World 位置 | `reviews/internal_habitation/arena_01a0c1e1_moyin/segments/segment_003/world.sqlite.gz` |
-| `world_artifact_sha256` | `5e7fce6354f8e352648e37216da8da0b357571e327dcd039ac5c6857e79ff08a` |
-| checkpoint digest | `bca1dda28a2e1860a2114a0ddcec6fb416b7147161d8727a27022a017020b47e` |
-| 链上前一个 | `5585bce1fde5de6e61f930e76511c47f434ea8bcdfe15244cfaea9c86abfec87` |
-| 模拟时钟 | `2026-10-08T13:55:00+00:00`（本地 10-08 21:55） |
-| world_revision | 174 |
-| **durable cursor** | **step 20 / 34，`next_step_key=segment_003-s0020-ev-s3-0009`**（该事件已投喂，等待我的决策） |
-| 剩余事件 | `s3-0009`（10-08 21:55「看着不太像霉」）**正待处理**；其后 `s3-0010` … `s3-0014`，其中 **`s3-0012`（10-10 检测报告）是延迟真相 #1 的落点** |
+| `world_artifact_sha256` | `673ea9f49dd5a2c3a8e00c850d266bb51bbbf6b5420f9ab987496027000c2de4` |
+| checkpoint digest | `056b3301c1da1bebcfbfc85543d98085a26cb84668a0aafc0859de01f4f6275a` |
+| 链上前一个 | `bca1dda28a2e1860a2114a0ddcec6fb416b7147161d8727a27022a017020b47e` |
+| 模拟时钟 | `2026-10-11T09:00:00+00:00`（本地 10-11 17:00） |
+| world_revision | 208 |
+| **durable cursor** | **step 34 / 34，`next_step_key=null` —— segment_003 已完整结束** |
+| 下一个 segment | `segment_004`，从 2026-10-12 起，**生活脚本尚未编写** |
+
+### 待办（segment_004 必须接手）
+
+1. **`task_7c01815e267f78f4b5de80d2` rev5 `waiting_user` 是僵尸 Task**：它的目的（问检测结果）已达成，
+   但因 F-014 无 Outcome 创建能力而无法标记完成。
+2. **`task_146ace8beb7ea70fb46841db` rev4 `waiting_user` 同样是僵尸**（10-04 已被回答）。
+3. **第七页脱酸评估**：pH 4.6，我从报告数值推出的独立风险，报告未提及，尚未处理。
+4. **图书馆竞标**：11-20 截标，用户尚未取到「投标人资格条件」，Goal/Task 均未建（刻意的，她只在评估可行性）。
+5. **阿桐浆糊配比复盘**：10-02 返工的真实原因始终没被处理。
+6. **老许租约到期日**：仍未问到，她也没翻合同。
+7. **CommunicationExperience 仍为 0**：因 F-018，10-04 那次成功干预在 World 里没有 Observation，
+   拿不到可引用的 case ref。
 
 ⚠️ 一处需说明的 harness 不精确：`checkpoint.json` 的 `simulated_time_cursor` 记为
 `2026-10-05T14:40:00Z`，而 `run/state.json` 的 clock 是 `2026-10-05T20:00:00Z`。
@@ -246,13 +257,13 @@ daemon 的 `clock_regap` 逻辑读的也是 `state.json`。这是我自己 harne
 
 ## 6. Resident 认知真实性声明
 
-> 在本 session 中实际完成的 132 个 Resident 认知 checkpoint 中，**全部 132 个**的语义决策（是否回应、回应什么、检索什么、Summary 写什么、Claim 建/改/撤、Task 状态迁移、是否沉默）都由**我本人当场判断**作出，依据仅为当时可见的 `RuntimeSnapshot`。
+> 在本 session 中实际完成的 157 个 Resident 认知 checkpoint 中，**全部 157 个**的语义决策（是否回应、回应什么、检索什么、Summary 写什么、Claim 建/改/撤、Task 状态迁移、是否沉默）都由**我本人当场判断**作出，依据仅为当时可见的 `RuntimeSnapshot`。
 >
 > **没有任何一部分由确定性替身、脚本、关键词表或预生成答案顶替。**
 >
 > 程序侧仅执行我明确选定的 capability call 并原样回传结果。capability call 逐条记录在 `trace/trace.jsonl`，与 `snapshots/*.snapshot.json` 的 `input_fingerprint` 一一对应。
 >
-> **一年期目标本身：INVALID —— 未完成。** 7.91 / 365 天，132 / 365 checkpoint。我没有伪造剩余部分。
+> **一年期目标本身：INVALID —— 未完成。** 10.71 / 365 天，157 / 365 checkpoint。我没有伪造剩余部分。
 >
 > 需要额外声明一点：108 个 checkpoint 里有 **18 个是被 F-016 的粒度级联强制产出的空窗 Summary**。它们确实是当场的真实判断（判断的内容是「这个窗口没有数据，我不编」），但把它们计入认知密度是有水分的。扣掉这 18 个，实质认知 checkpoint 为 **90 个**。
 
