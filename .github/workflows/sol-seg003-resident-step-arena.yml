@@ -1,0 +1,246 @@
+name: sol-seg003-resident-step-arena
+
+# Mechanical Segment 003 Resident step runner, executed on the Arena session
+# branch so that the session-side Resident can read back only the *current*
+# pending RuntimeSnapshot / Summary request.
+#
+# Continuity guarantees kept identical to the canonical runner:
+#   - same frozen Segment 002 source World artifact (SHA-256 pinned)
+#   - same sealed Segment 003 Life Director package (SHA-256 pinned)
+#   - same canonical harness/runtime code revision (checked out from the
+#     canonical Resident branch, read-only usage)
+#   - same bridge source and same CLI contract
+# The only difference is where the Resident decision fragments are read from
+# and where the sanitized pending envelope is published (the Arena branch).
+#
+# This workflow performs no semantic Resident decision. It merges decision
+# fragments, replays them, advances the World, and prints only the current
+# pending checkpoint.
+
+on:
+  push:
+    branches:
+      - "arena/01a0bfa4-haneof-aios-core-v3-0"
+    paths:
+      - ".github/workflows/sol-seg003-resident-step-arena.yml"
+      - "reviews/internal_habitation/sol-yearlong/segments/segment-003/decisions/**"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  actions: read
+
+env:
+  CANONICAL_REF: arena/sol-yearlong-resident-20260921
+  ARENA_REF: arena/01a0bfa4-haneof-aios-core-v3-0
+  SOURCE_WORLD_SHA: ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8
+  HIDDEN_FIXTURE_SHA: 6a41a0ac1a6421d2ad54bf27c96f11fd2a5ec9822c6109466000f37ea9d00f4d
+  DECISIONS_DIR: reviews/internal_habitation/sol-yearlong/segments/segment-003/decisions
+
+jobs:
+  resident-step:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout canonical Resident harness revision
+        uses: actions/checkout@v4
+        with:
+          ref: arena/sol-yearlong-resident-20260921
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+
+      - name: Overlay Resident decisions authored on the Arena session branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "$ARENA_REF"
+          if git cat-file -e "FETCH_HEAD:${DECISIONS_DIR}" 2>/dev/null; then
+            rm -rf "$DECISIONS_DIR"
+            git checkout FETCH_HEAD -- "$DECISIONS_DIR"
+            echo "arena_side_decision_fragments:"
+            ls -1 "$DECISIONS_DIR"
+          else
+            echo "arena_side_decision_fragments: none yet"
+          fi
+
+      - name: Download frozen Segment 002 World
+        uses: actions/download-artifact@v4
+        with:
+          name: sol-segment-002-35535082511
+          path: artifacts/source-segment-002
+          github-token: ${{ github.token }}
+          repository: Haneof/Haneof-AIOS-Core-v3.0
+          run-id: 35535082511
+
+      - name: Download sealed Segment 003 Life Director package
+        uses: actions/download-artifact@v4
+        with:
+          name: sol-segment-003-hidden-35553766484
+          path: artifacts/hidden-segment-003
+          github-token: ${{ github.token }}
+          repository: Haneof/Haneof-AIOS-Core-v3.0
+          run-id: 35553766484
+
+      - name: Verify opaque inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_WORLD="$(find artifacts/source-segment-002 -type f -name world.sqlite -print -quit)"
+          FIXTURE="$(find artifacts/hidden-segment-003 -type f -name sealed_fixture.json -print -quit)"
+          test -n "$SOURCE_WORLD"
+          test -n "$FIXTURE"
+          SOURCE_SHA="$(sha256sum "$SOURCE_WORLD" | awk '{print $1}')"
+          FIXTURE_SHA="$(sha256sum "$FIXTURE" | awk '{print $1}')"
+          test "$SOURCE_SHA" = "$SOURCE_WORLD_SHA"
+          test "$FIXTURE_SHA" = "$HIDDEN_FIXTURE_SHA"
+          echo "source_world_sha256=$SOURCE_SHA"
+          echo "hidden_fixture_sha256=$FIXTURE_SHA"
+          echo "future_payloads_printed=false"
+
+      - name: Merge Segment 003 Resident decisions
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          decisions_dir = Path("reviews/internal_habitation/sol-yearlong/segments/segment-003/decisions")
+          merged = {}
+          if decisions_dir.exists():
+              for path in sorted(decisions_dir.glob("part-*.json")):
+                  fragment = json.loads(path.read_text(encoding="utf-8"))
+                  if not isinstance(fragment, dict):
+                      raise SystemExit(f"decision fragment is not an object: {path}")
+                  overlap = set(merged).intersection(fragment)
+                  if overlap:
+                      raise SystemExit(f"duplicate decision keys in {path}: {sorted(overlap)}")
+                  merged.update(fragment)
+
+          out = Path("artifacts/segment-003/merged-decisions.json")
+          out.parent.mkdir(parents=True, exist_ok=True)
+          out.write_text(
+              json.dumps(merged, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          print(f"segment003_decisions={len(merged)}")
+          PY
+
+      - name: Run until next Resident semantic checkpoint
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p artifacts/segment-003
+
+          SOURCE_WORLD="$(find artifacts/source-segment-002 -type f -name world.sqlite -print -quit)"
+          FIXTURE="$(find artifacts/hidden-segment-003 -type f -name sealed_fixture.json -print -quit)"
+
+          set +e
+          PYTHONPATH="$PWD/src:$PWD/tests:$PWD" python \
+            reviews/internal_habitation/sol-yearlong/segments/segment-003/resume_bridge.py \
+            --fixture "$FIXTURE" \
+            --source-world "$SOURCE_WORLD" \
+            --working-world artifacts/segment-003/world.sqlite \
+            --after-event-id d026-pos \
+            --segment-end 2027-01-31T08:15:00Z \
+            --expected-world-sha256 "$SOURCE_WORLD_SHA" \
+            --expected-revision 145 \
+            --expected-subject sol-resident-20260921-001 \
+            --decisions artifacts/segment-003/merged-decisions.json \
+            --state-out artifacts/segment-003/state.json \
+            --snapshot-out artifacts/segment-003/snapshot.json \
+            --event-trace-out artifacts/segment-003/event-trace.json \
+            2>&1 | tee artifacts/segment-003/stdout.txt
+          CODE="${PIPESTATUS[0]}"
+          set -e
+
+          echo "$CODE" > artifacts/segment-003/bridge-exit-code.txt
+          if [ "$CODE" -ne 0 ] && [ "$CODE" -ne 42 ]; then
+            exit "$CODE"
+          fi
+
+      - name: Sanitize runner output for the session-side Resident
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/segment-003
+          python - <<'PY'
+          from pathlib import Path
+
+          raw_path = Path("artifacts/segment-003/stdout.txt")
+          raw = raw_path.read_text(encoding="utf-8", errors="replace") if raw_path.exists() else ""
+          lines = raw.splitlines()
+          kept: list[str] = []
+          capturing = False
+          for line in lines:
+              if line.startswith("MANUAL_") and line.endswith("_PENDING_BEGIN"):
+                  capturing = True
+                  kept.append(line)
+                  continue
+              if line.endswith("_PENDING_END"):
+                  capturing = False
+                  kept.append(line)
+                  continue
+              if capturing or line.startswith(("SEG003_", "RESTORE_OK", "segment003_decisions=")):
+                  kept.append(line)
+          if not any(l.endswith("_PENDING_BEGIN") for l in kept):
+              kept.append("### tail of runner stdout ###")
+              kept.extend(lines[-40:])
+          Path("artifacts/segment-003/sanitized.txt").write_text("\n".join(kept) + "\n", encoding="utf-8")
+          print(f"sanitized_lines={len(kept)}")
+          PY
+
+      - name: Publish pending checkpoint to the Arena session branch
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          RUN_DIR="reviews/internal_habitation/sol-yearlong/segments/segment-003/runner/${GITHUB_RUN_ID}"
+          rm -rf /tmp/pub
+          git -c http.extraheader="AUTHORIZATION: bearer ${GITHUB_TOKEN}" \
+            clone --depth 1 --branch "$ARENA_REF" \
+            "https://github.com/${GITHUB_REPOSITORY}.git" /tmp/pub
+          mkdir -p "/tmp/pub/${RUN_DIR}"
+          for f in state.json snapshot.json stdout.txt sanitized.txt bridge-exit-code.txt world.sha256; do
+            if [ -f "artifacts/segment-003/$f" ]; then
+              cp "artifacts/segment-003/$f" "/tmp/pub/${RUN_DIR}/$f"
+            fi
+          done
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          state = json.loads(Path("artifacts/segment-003/state.json").read_text(encoding="utf-8"))
+          meta = {
+              "run_id": __import__("os").environ["GITHUB_RUN_ID"],
+              "run_attempt": __import__("os").environ["GITHUB_RUN_ATTEMPT"],
+              "canonical_ref": __import__("os").environ["CANONICAL_REF"],
+              "arena_ref": __import__("os").environ["ARENA_REF"],
+              "canonical_head_sha": __import__("os").environ["GITHUB_SHA"],
+              "source_world_sha256": __import__("os").environ["SOURCE_WORLD_SHA"],
+              "hidden_fixture_sha256": __import__("os").environ["HIDDEN_FIXTURE_SHA"],
+              "state": state,
+              "runner_boundary": (
+                  "Mechanical runner only: restores the pinned World, replays recorded Resident "
+                  "decisions, advances simulated time over already-released events, and prints only "
+                  "the current pending RuntimeSnapshot/Summary request."
+              ),
+          }
+          Path("/tmp/pub/reviews/internal_habitation/sol-yearlong/segments/segment-003/runner/meta.json").write_text(
+              json.dumps(meta, ensure_ascii=False, sort_keys=True, indent=2) + "\n", encoding="utf-8"
+          )
+          PY
+          cd /tmp/pub
+          git -c user.name="arena-agent" -c user.email="arena-agent@users.noreply.github.com" add -A "reviews/internal_habitation/sol-yearlong/segments/segment-003/runner"
+          if git diff --cached --quiet; then
+            echo "nothing to publish"
+          else
+            git -c user.name="arena-agent" -c user.email="arena-agent@users.noreply.github.com" \
+              commit -m "seg003 resident step ${GITHUB_RUN_ID}: published current pending checkpoint"
+            git push origin "HEAD:${ARENA_REF}"
+          fi
