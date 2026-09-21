@@ -62,8 +62,8 @@
 
 | 顺序 | Task ID | 单窗口任务 | 状态 | Dependencies | 当前现场 / 证据 | 完成定义 |
 |---:|---|---|---|---|---|---|
-| 1 | `C13-MTR-001` | 完成 C13 non-world Metering Ledger：模型返回后立即落 operations-side meter；token 真值不再依赖 Wake World metadata；crash 后计量不丢；Periodic Review 计费时间不倒带 | **FROZEN_WIP** | — | WIP branch `arena/c13-metering-ledger-20260921`; frozen head `b6d90f2c8c7d37d0a17ed080c011e24d9e01c805`; base main `45d6c353...` | 从冻结 head 继续；自审；PR；相关专项 Gate + P16 full regression GREEN；squash merge；本表写 merge SHA |
-| 2 | `AUDIT-001` | 对 Issue #30 的 T34/T36/T28/T35/T33 与 PR #37 在**最新 main**逐项重新复核，只做裁决，不修代码 | **BLOCKED** | C13-MTR-001 | Issue #30 的证据基线早于当前 main | 输出 current-main evidence matrix：每项 = STILL_OPEN / ALREADY_FIXED / NOT_REPRODUCED；写 exact main SHA；不得施工 |
+| 1 | `C13-MTR-001` | 完成 C13 non-world Metering Ledger：模型返回后立即落 operations-side meter；token 真值不再依赖 Wake World metadata；crash 后计量不丢；Periodic Review 计费时间不倒带 | **DONE** | — | PR #47; final candidate `47ed2de25cdcb26c8c552a3db0640a59f9a15817`; squash merge `f9baacd5ac7be1646036a4e878934e77965c6640`; required Gates GREEN | 已从冻结 WIP 完成、自审、专项 Gate + P16 full regression GREEN、squash merge；完整证据见 §5 完成记录 |
+| 2 | `AUDIT-001` | 对 Issue #30 的 T34/T36/T28/T35/T33 与 PR #37 在**最新 main**逐项重新复核，只做裁决，不修代码 | **READY** | C13-MTR-001 | C13-MTR-001 DONE at merge `f9baacd5ac7be1646036a4e878934e77965c6640`; Issue #30 的证据基线早于当前 main | **下一新窗口**输出 current-main evidence matrix：每项 = STILL_OPEN / ALREADY_FIXED / NOT_REPRODUCED；写 exact main SHA；不得施工 |
 | 3 | `T34-EXEC-001` | Action 授权前重新验证父 Task/撤销状态，关闭 cancel→authorize 竞态 | **WAITING_AUDIT** | AUDIT-001 | Issue #30 / #34 | 仅当 AUDIT-001=STILL_OPEN 激活；修复前复现 + 修复后回归 + execution/P12/P16 Gate GREEN |
 | 4 | `T36-SEARCH-001` | 结构化 Observation scalar 派生索引，不改原 typed fact，不做语义推断 | **WAITING_AUDIT** | AUDIT-001 | Issue #30 / #36 | 仅当 STILL_OPEN；dict/list/number/bool 可检索；rebuild=incremental；subject/current/stale 语义不退化 |
 | 5 | `T28-REC-001` | 普通推荐与 antecedent 路径统一隔离 assistant raw dialogue，避免把 AI 自己的话当用户事实主动推荐 | **WAITING_AUDIT** | AUDIT-001 | Issue #30 / #28 | 仅当 STILL_OPEN；continuity/raw drill-down 仍可访问；用户/外部 fact 与 evidence-grounded Claim 不误删 |
@@ -132,6 +132,49 @@ Next READY task:
 - 新增一个紧跟其后的 `<TASK>-FIX-001`，状态 `READY`；
 - 新窗口修复。
 
+### C13-MTR-001 completion — 2026-09-21
+
+```text
+Task ID: C13-MTR-001
+Status: DONE
+Started from main: 12dfff3868f38f5af85e237cd65f2a441793a548
+Frozen WIP: arena/c13-metering-ledger-20260921 @ b6d90f2c8c7d37d0a17ed080c011e24d9e01c805
+Work branch: arena/c13-metering-ledger-20260921
+Candidate SHA: 47ed2de25cdcb26c8c552a3db0640a59f9a15817
+Validated equivalent code tree: 63c3f7b1200028844cd60de6d320996e8e84f361 (candidate 47ed2de2 tree == tested 50f03655 tree)
+PR: #47
+Merge SHA: f9baacd5ac7be1646036a4e878934e77965c6640
+Required gates: cognitive-runtime; fused-turn-runtime; c09-wake-dispatch; p15-periodic-review; p16-habitation-harness; p16-convergence-gate
+Gate run IDs / conclusions:
+- cognitive-runtime 35564798270 / SUCCESS
+- fused-turn-runtime 35564798226 / SUCCESS
+- c09-wake-dispatch 35564798233 / SUCCESS
+- p15-periodic-review 35564798249 / SUCCESS
+- p16-habitation-harness 35564798243 / SUCCESS
+- p16-convergence-gate 35564798235 / SUCCESS
+Evidence/report paths:
+- src/aios_core/runtime/metering.py
+- src/aios_core/runtime/cognitive_runtime.py
+- src/aios_core/runtime/turn_runtime.py
+- src/aios_core/runtime/budget_gate.py
+- src/aios_core/review/periodic.py
+- src/aios_core/wake/service.py
+- tests/runtime/test_metering_ledger.py
+- tests/runtime/test_cognitive_runtime.py
+- tests/integration/test_v3_background_budget_gate.py
+- tests/integration/test_v3_fused_turn_runtime.py
+- tests/habitation/provider_runtime.py
+- tests/habitation/test_provider_runtime.py
+Bugs found:
+- frozen WIP lost provider/model/response identity when provider usage was unknown, so unknown-usage replay was not idempotent
+- INSERT OR IGNORE replay could hide conflicting reuse of one provider response id; now fails closed
+- FusedTurnRuntime frozen WIP referenced ModelMeteringLedger without importing it
+- RUNNING Periodic Review budget-window recovery rewrote started_at and collapsed cognition/write time into billing time; now original cognition time is preserved while metering uses actual execution time
+- frozen OpenAI provider provenance test expected the wrong model id
+Deferred issues: none inside C13-MTR-001; AUDIT-001 and all downstream tasks were intentionally not executed in this window
+Next READY task: AUDIT-001 — new window only
+```
+
 ---
 
 ## 6. Resident 分段进度规则
@@ -195,14 +238,13 @@ Resident 入住窗口在上述基础上再读取：
 
 ---
 
-## 9. 本轮冻结现场
+## 9. 当前交接现场
 
-本窗口在建立任务治理机制时，停止继续扩展 C13 代码施工。
+C13 冻结现场已经由专用单窗口完成并收口：
 
-冻结现场：
-
-- latest verified main before this governance change: `45d6c353b75048197c438ee5384074c5beea94d3`
-- unfinished task: `C13-MTR-001`
-- WIP branch: `arena/c13-metering-ledger-20260921`
-- frozen WIP head: `b6d90f2c8c7d37d0a17ed080c011e24d9e01c805`
-- next dedicated window action: **只完成 C13-MTR-001，不进入 AUDIT-001。**
+- started main: `12dfff3868f38f5af85e237cd65f2a441793a548`
+- original frozen WIP: `arena/c13-metering-ledger-20260921@b6d90f2c8c7d37d0a17ed080c011e24d9e01c805`
+- final candidate: `47ed2de25cdcb26c8c552a3db0640a59f9a15817`
+- PR: **#47**
+- C13 squash merge / verified functional main anchor: `f9baacd5ac7be1646036a4e878934e77965c6640`
+- next dedicated window action: **只执行 AUDIT-001；本 C13 窗口到此停止，不得继续审计。**

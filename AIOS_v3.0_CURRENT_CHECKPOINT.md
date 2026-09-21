@@ -13,15 +13,30 @@
 
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据本文件下方历史“下一动作”直接重复施工。
 
-当前已验证 main 功能锚点：`45d6c353b75048197c438ee5384074c5beea94d3`。
+当前已验证 C13 功能合并锚点：`f9baacd5ac7be1646036a4e878934e77965c6640`。
 
-当前冻结未完成任务：`C13-MTR-001`。
+最近完成任务：`C13-MTR-001` — **DONE**。
 
-- WIP branch: `arena/c13-metering-ledger-20260921`
-- frozen WIP head: `b6d90f2c8c7d37d0a17ed080c011e24d9e01c805`
-- 下一窗口：只完成 `C13-MTR-001`，不得顺手进入后续任务。
+- started main: `12dfff3868f38f5af85e237cd65f2a441793a548`
+- frozen WIP: `arena/c13-metering-ledger-20260921@b6d90f2c8c7d37d0a17ed080c011e24d9e01c805`
+- final candidate: `47ed2de25cdcb26c8c552a3db0640a59f9a15817`
+- PR #47 / squash merge: `f9baacd5ac7be1646036a4e878934e77965c6640`
+- required Gates: cognitive-runtime `35564798270`, fused-turn-runtime `35564798226`, c09-wake-dispatch `35564798233`, p15-periodic-review `35564798249`, p16-habitation-harness `35564798243`, p16-convergence-gate `35564798235` — **all SUCCESS**
+- 下一窗口唯一 READY：`AUDIT-001`。**本窗口不得执行 AUDIT-001；必须由新窗口接手。**
 
 历史段落继续作为工程证据保留；若历史“当前 blocker / 下一动作”与 task board 冲突，以 task board + 最新 main 事实为准。
+
+## 2026-09-21 C13-MTR-001 — non-world Metering Ledger CLOSED
+
+- MeteringRecord / Metering Ledger 位于 operations-side SQLite table，不是 WorldObject；meter write 不推进 `world_revision`、不进入 World Index、不产生 Wake。
+- 模型每轮真实返回后、capability 执行与 Wake/Review completion 前立即持久化 metering。
+- Background Budget 的 token 真值来自 Metering Ledger，不再依赖 Wake World metadata。
+- provider usage 缺失时记录 unknown（NULL），不伪造 0；OpenAI / Anthropic / Gemini 的 provider/model/response id provenance 可审计。
+- 相同 provider response id 重放幂等；冲突重放 fail closed。
+- Periodic Review 恢复时保留原 cognition/write `started_at`，实际 provider 调用按恢复当天 `recorded_at` 计费，两个时间轴明确分离。
+- Safety Wake 继续绕过 BACKGROUND_DAY budget；既有安全预算语义未退化。
+- PR #47 已 squash merge：`f9baacd5ac7be1646036a4e878934e77965c6640`。
+- 下一任务仅为新窗口 `AUDIT-001`；本窗口停止。
 
 ## 当前快照
 
