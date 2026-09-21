@@ -668,9 +668,10 @@ class PeriodicReviewService:
                 not in attention_keys
             ]
             remaining = max(0, policy.max_candidates - len(attention_anchors))
+            selected_ordinary = ordinary[-remaining:] if remaining else []
             anchors = tuple(
                 [
-                    *ordinary[-remaining:] if remaining else [],
+                    *selected_ordinary,
                     *attention_anchors,
                 ]
             )
