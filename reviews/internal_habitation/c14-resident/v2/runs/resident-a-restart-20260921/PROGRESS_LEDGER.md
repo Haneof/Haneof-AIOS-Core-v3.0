@@ -17,7 +17,8 @@ Resident model (as declared): `GPT-5.6 Sol`; platform provider/session id: `unkn
 | S15 | Cursor 15 end-to-end, incl. due work after the 10-09/10-11 closed windows | DONE | `receipts/*/cursor-015.json`, `receipts/process-due-20261011T124800Z.json`, `SEMANTIC_TRACE.md` |
 | S16 | Cursor 16 end-to-end, incl. due work after the 10-11/10-12/10-13 closed windows | DONE | `receipts/*/cursor-016.json`, `receipts/process-due-20261014T125700Z.json`, `SEMANTIC_TRACE.md` |
 | S17 | Cursor 17 end-to-end (dim:environment / building notice; nothing due) | DONE | `receipts/*/cursor-017.json`, `receipts/process-due-20261014T130100Z.json`, `SEMANTIC_TRACE.md` |
-| S18..S24 | Cursor 18..24, one stage each | NOT_STARTED | — |
+| S18 | Cursor 18 end-to-end, incl. due work after the 10-14/10-15/10-16 windows | DONE | `receipts/*/cursor-018.json`, `receipts/process-due-20261017T130600Z.json`, `SEMANTIC_TRACE.md` |
+| S19..S24 | Cursor 19..24, one stage each | NOT_STARTED | — |
 | S25 | Handoff freeze | NOT_STARTED | — |
 
 ### S0 notes
@@ -59,6 +60,7 @@ Resident model (as declared): `GPT-5.6 Sol`; platform provider/session id: `unkn
 | 15 | `c14resv2-015` | 2026-10-11T05:48:00-07:00 | `obs_c14_fixture_979fd7bab5a31f3239b61e0b@1` | yes (`next=16`) | 1 摘要（10-09 work_outcome 因 S14 的 Claim 修订被重算 → rev3，文本沿用我 S14 亲笔）；C14 `wake_7a5808cbfef6321783bf0cb3`（单成员 = 该摘要 rev3，MIXED/has_ai）→ read_ai_world + inspect + 2×search_timeline → **silence** | 99 | dim:schedule 10-11 出行（06:25 航班、05:52 出门）；摘要 rev3 括注仍为 rev1 时期措辞（导航锚点，不作结论） |
 | 16 | `c14resv2-016` | 2026-10-14T05:57:00-07:00 | `obs_c14_fixture_8ae7dbd1147c788bb9a61bac@1` | yes (`next=17`) | 8 摘要（10-11 三条日摘要 + 10-05–10-11 五条周摘要）；C14 8 成员 bundle `wake_0bb994195dc853d0785b73e0` → read_ai_world + 3×search_timeline → **silence**；Periodic Review `wake_review_97aa729687fb559c4534fcb6`（13 anchors）→ **silence** | 122 | 睡眠第 5 样本 ~6h35m（无评分）；睡眠线继续观察，未形成 Claim |
 | 17 | `c14resv2-017` | 2026-10-14T06:01:00-07:00 | `obs_c14_fixture_fe7df97629543fca38e221c4@1` | yes (`next=18`) | none due（日窗未闭合；C14 幂等；review 未到期） | 123 | dim:environment 首次出现（物业供水阀检查通知） |
+| 18 | `c14resv2-018` | 2026-10-17T06:06:00-07:00 | `obs_c14_fixture_c04f6900b7f114622198c7c5@1` | yes (`next=19`) | 2 摘要（10-14 environment + sleep）；C14 2 成员 bundle `wake_b48851c19969249b73e37156` → read_ai_world + 2×search_timeline → **silence**（睡眠窄带仍未闭合）；Periodic Review `wake_review_c279cc2d87f82dc0775beca1`（5 anchors）→ **silence** | 134 | 睡眠第 6 样本 ~6h25m；写下睡眠观察规则（再 1–2 夜无混淆合带即可成文） |
 
 ## Blockers / contamination
 

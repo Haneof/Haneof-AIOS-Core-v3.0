@@ -355,3 +355,23 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
 **Due work at T = 2026-10-14T06:01:00-07:00**（`receipts/process-due-20261014T130100Z.json`）: 无摘要窗口闭合（10-14 日窗仍开）、无 C14 唤醒、Periodic Review 未触发。机械跑完即止，无模型决策点。
 
 **Resulting state**: world_revision 123, index watermark 123, pending wakes 0。
+
+---
+
+## Cursor 18 — `c14resv2-018` — 2026-10-17T06:06:00-07:00 (dim:sleep)
+
+**Released**
+- dimension `dim:sleep`, source_kind `wearable`, source_class `SENSOR`
+- payload: "昨晚 23:37 入睡；06:02 醒来。"（第 6 个睡眠样本；约 6h25m，未给评分）
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-018.json`; ingest → `obs_c14_fixture_c04f6900b7f114622198c7c5@1` (world_revision 124); watch hook: no match; ack → `receipts/ack/cursor-018.json`, `next_sequence=19`。
+
+**Due work at T = 2026-10-17T06:06:00-07:00**（`receipts/process-due-20261017T130600Z.json`；跨过 10-14/10-15/10-16 窗口）:
+- 我撰写并提交 2 条摘要：`sum_59add44872c6ef52ca38dd4b`（dim:environment 10-14，本 run 首条环境维度摘要）与 `sum_82c11dc0bef6a49a1a203a8b`（dim:sleep 10-14）。
+- C14 2 成员 bundle `wake_b48851c19969249b73e37156`（上述两条，均 REALITY）：
+  - round 0：`read_ai_world(50)`（空）+ `search_timeline(dim:sleep, 10-01→10-18)` + `search_timeline(dim:environment, 同窗)`。
+  - round 1：**silence** — 环境通知为一次性事务；睡眠全序列 6 个样本（7h44/84、7h39/82、5h48/60、~6h42、~6h35、~6h25，后四夜无评分），近三夜形成窄带（时长 6h25–6h42、醒来 05:39–06:02、入睡逐夜后移 ~20 分钟），但 10-11 有早班机、10-14 有供水阀检查，仅 10-17 无混淆，未达“≥3 次一致且可排除混淆”的门槛 → 不形成 Claim。我在决策里写下后续观察规则：若再来 1–2 夜仍落在该带内且当天无已知晨间约束，将以跨观测 evidence_refs 形成有界低置信 hypothesis Claim。
+- Periodic Review `wake_review_c279cc2d87f82dc0775beca1`（窗口 10-14T12:58Z→10-17T13:07Z，5 anchors）：round 0 读锚点；round 1 **silence** — 既有 Claim 无新同类观察亦无反例；窗口新增证据与 Claim 机制无关；睡眠线继续观察；无“方法—后果”操作经验可登记（不在无据时调用 commit_operation_experience）。
+- 决策文件：`checkpoints/decisions/wake-cognitive_derivation-wake_b48851c19969249b73e37156-rev1-ae18cfb7/round-{0,1}.json`、`checkpoints/decisions/periodic-review-20261017T130701Z-77132a36/round-{0,1}.json`。
+
+**Resulting state**: world_revision 134, index watermark 134, pending wakes 0, Claims 1（rev 2）, 36 条摘要, operation experiences 0。
