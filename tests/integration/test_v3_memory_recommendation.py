@@ -72,3 +72,15 @@ def test_current_session_can_be_excluded_from_history_recommendation(tmp_path):
     )
 
     assert bundle.cards == ()
+
+def test_assistant_raw_dialogue_is_not_ordinary_proactive_user_memory(tmp_path):
+    store, index = _system(tmp_path)
+    recommender = ProactiveMemoryRecommender(index=index, store=store)
+
+    # "公共能力" exists only in the prior assistant-authored raw dialogue seeded
+    # by _system(). Ordinary proactive memory must not recycle that statement as
+    # an independent user/world fact.
+    bundle = recommender.recommend(current_topic="公共能力")
+
+    assert bundle.cards == ()
+    assert bundle.reason == "topic_has_no_matching_history"
