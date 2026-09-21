@@ -15,7 +15,26 @@
 
 当前审计冻结 main：`e9862103a753be026edf1745c6a5d07fa56c0cf4`。
 
-最近完成任务：`T34-EXEC-001` — **DONE / CORE EXECUTION RACE CLOSED**。
+最近完成任务：`T28-REC-001` — **DONE / ASSISTANT RAW PROACTIVE MEMORY BOUNDARY CLOSED**。
+
+- Started from main：`f8a2f8e4cf53de579bd0bc69cfd85421d109d65b`
+- Final functional-base revalidation：`48f5e29ad564ef7c1687b5a0d81cede1452e82e8`（已包含 T34-EXEC-001 Core 修复；其后至 merge 前主线仅有 T34 governance/checkpoint 文本更新）
+- Work branch：`fix/t28-rec-assistant-dialogue-20260921`
+- Pre-fix test-only SHA：`6f5d6e1b95b16123a936defe9d5c948238430084`
+- Current-main reproduction：memory-recommendation run `35566383722 / FAILURE`；`test_assistant_raw_dialogue_is_not_ordinary_proactive_user_memory` 实际泄漏 assistant MemoryCard excerpt=`索引是公共能力，推荐只是调用方。`
+- Candidate：`2a16d1ffaaec877356f4f281e82d884e6ac97ab5`
+- PR：#49
+- Squash merge：`e159ab30a12b819ca053085d5103460e66ef9f16`
+- Task-board completion metadata commit：`3cd793e3d9325c316d1bcf4beb29a0ab02c195fd`
+- Final required Gates：memory-recommendation `35567154409 / SUCCESS`；fused-turn-runtime `35567154468 / SUCCESS`；p14-long-context `35567154469 / SUCCESS`；world-index `35567154562 / SUCCESS`；p16-habitation-harness `35567154411 / SUCCESS`；p16-convergence-gate `35567154443 / SUCCESS`
+- 修复语义：普通 proactive 与 antecedent recommendation 均在候选来源边界排除 assistant-role raw conversation Observation；AI 自己过去说过的话不再仅凭文本命中被重新包装成用户/世界事实主动注入未来模型。
+- 保留语义：assistant raw dialogue 没有删除、改写或移出 World；same-session continuity、WorldSearchIndex、显式 `search_world`、conversation drill-down 仍可读取原始 assistant 文本。
+- 未退化：用户 raw dialogue、PLATFORM/external reality fact、evidence-grounded Claim 仍可作为合格 proactive candidate；无相关历史时 recommendation 可为 0。
+- Affected files：`src/aios_core/recommendation/proactive.py`；`tests/integration/test_v3_memory_recommendation.py`；`tests/integration/test_v3_fused_turn_runtime.py`；`tests/integration/test_v3_long_context_continuity.py`；`tests/integration/test_m0_prime_store_delta_and_search.py`；`tests/habitation/test_t28_proactive_memory_boundary.py`
+- Deferred：本窗口没有执行或修改 `T33-RECALL-001`、`T36-SEARCH-001`、`T35-IMPL-001`；没有 TopicState 重构、Claim/Summary 语义改造、raw dialogue 删除或第二套 recommendation engine。
+- 当前第一个 READY：`T36-SEARCH-001`；必须由新窗口执行，本 T28 窗口在 checkpoint 写回后停止。
+
+上一完成任务：`T34-EXEC-001` — **DONE / CORE EXECUTION RACE CLOSED**。
 
 - Started from main：`f8a2f8e4cf53de579bd0bc69cfd85421d109d65b`
 - Final clean sync base：`04f3170f5e09c7ab00ffd4233465560c78dc2423`
@@ -37,7 +56,7 @@
 - `T35-IMPL-001` 的 T35-RULE + T34 两个 dependency 现已满足，task board 状态为 READY；必须另开窗口执行，本窗口没有进入 T35 实现。
 - `T28-REC-001`、`T33-RECALL-001` 仍为独立 READY；`P16-TRIAGE-001` 继续等待本轮 activated blockers 全部解决。
 
-上一完成任务：`T35-RULE-001` — **DONE / GOVERNANCE CONTRACT ONLY**。
+再上一完成任务：`T35-RULE-001` — **DONE / GOVERNANCE CONTRACT ONLY**。
 
 - Started from main：`f8a2f8e4cf53de579bd0bc69cfd85421d109d65b`
 - Governance claim commit：`f83438729b7ef0a0ba58b0c3302e1deb5f4ca6bd`
@@ -53,7 +72,7 @@
 - 本任务未修改 Runtime/Core/schema/state machine；因此不伪跑无关 Core Gate，只做法源/源码/审计证据复核与 diff-scope 验证。
 - `T35-IMPL-001` 在 T35-RULE-001 完成当时保持 **BLOCKED**；现 T34-EXEC-001 已完成，实时状态以 task board 的 **READY** 为准，仍必须另开窗口/PR。
 
-再上一完成任务：`AUDIT-001` — **DONE / AUDIT ONLY**。
+更早完成任务：`AUDIT-001` — **DONE / AUDIT ONLY**。
 
 - 证据矩阵：`reviews/AUDIT-001_ISSUE30_CURRENT_MAIN_EVIDENCE_MATRIX_2026-09-21.md`
 - PR #48 / squash merge：`0ecacd8204414fd41e7ebda8e8b4521406154d3f`
