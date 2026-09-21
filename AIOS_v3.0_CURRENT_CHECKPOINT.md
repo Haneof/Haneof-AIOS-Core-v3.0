@@ -971,3 +971,26 @@ Governance interpretation:
 - do not create a second FINAL/amendment/registry authority chain.
 
 C14 completion is now explicitly behavior-based, not Claim-count based.
+
+
+---
+
+## 2026-09-21 — C14-RULE-001 authoritative semantic ruling
+
+- Task: `C14-RULE-001`
+- Status: **DONE / GOVERNANCE SEMANTICS FROZEN**
+- Started from main: `eae9f6e74f5a51b3869b2151f56ca8875e5c8372`
+- Work branch: `governance/c14-rule-001-20260921-sol`
+- Semantic candidate: `57d8e7f854cbcc8f90263977b3c01599e786cf1f`
+- PR: #58
+- Ruling: `governance/C14_CONTINUOUS_COGNITIVE_DERIVATION_RULING_2026-09-21.md`
+- Constitution / registry changes: **NONE**. Existing Fused Baseline, Dimension Summary, AI Dimension, Cognitive Runtime, and Periodic Review rules were sufficient; C14 required an authoritative implementation-level interpretation, not a new law chain.
+- Frozen boundary: Summary is trigger/navigation/compression and may participate in EvidenceSet, but C14 durable high-level cognition cannot terminate support in Summary/AI-cognition/maintenance recursion. Support provenance closure must reach proposition-appropriate non-Summary case evidence.
+- Derived lineage: `REALITY / AI_COGNITION_ONLY / MAINTENANCE_ONLY / MIXED / UNKNOWN`, mechanically recomputed from existing SourceClass plus exact pinned source/dependency lineage. A Summary's own maintenance commit does not determine its content lineage.
+- Cross-dimensional rule: Resident keeps search/inspect/compare/ALL_DIMENSIONS/counter-evidence autonomy; no dimension-count or occurrence-count semantics.
+- Silence: fully valid completion with no fake Claim/Experience/Outcome.
+- Behavioral acceptance: C14 requires later new-session/new-runtime recovery through durable World/Index and observable cognition use, then Outcome/new-evidence revision or grounded retention.
+- Resident validation: matched positive + negative-silence controls are mandatory.
+- Periodic Review remains the longer-window consolidation/backstop and is not replaced by Continuous Derivation.
+- Next READY task after this merge: **C14-SCHED-001**.
+- This window must stop after C14-RULE-001 and must not execute C14-SCHED-001.
