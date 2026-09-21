@@ -1357,3 +1357,25 @@ implementation/test files.
 - `C14-RES-001` remains blocked on LOOP
 - P16 remains blocked on the full C14 chain
 - this window does **not** start `C14-LOOP-001`
+
+
+---
+
+## 2026-09-21 — C14-RUNTIME-HARDEN PM acceptance / C14-LOOP preflight
+
+`C14-RUNTIME-HARDEN-001 = PASS` after independent verification of PR #63, candidate Gates, exact merged blobs, capability side-effect marking, and pre-handler authorization.
+
+Current durable main at review: `c12b9418bf68f3885713819432ac77bb585172ff`.
+
+Before C14-RES, `C14-LOOP-001` must additionally close two concrete runtime gaps identified in preflight:
+
+1. **Contract-preserving C14 coalescing.** Current `run_wake()` excludes `COGNITIVE_DERIVATION` from AttentionBundle. LOOP must permit mechanical sibling C14 coalescing without converting the effective execution contract into ordinary `ATTENTION_BUNDLE` semantics. C14 allowlist, cockpit/evidence semantics, no-delivery, and pinned member refs must survive bundling. Do not mix C14 work into a broader-write background bundle.
+2. **Budget exhaustion is resumable, not complete.** Current ordinary Wake completion path can mark a model/tool/capability-budget exhausted run complete. C14 derivation must retain durable unresolved work and resume/retry safely across restart; only semantic terminal outcomes close the opportunity.
+
+Also retain:
+- AI cognition self-loop prevention;
+- Periodic Review coexistence;
+- new-runtime durable cognition retrieval;
+- bounded provenance reconcile complexity.
+
+Canonical detail: `governance/C14_LOOP_PM_PREFLIGHT_2026-09-21.md`.
