@@ -1,37 +1,41 @@
 {
-  "decision_key": "cf05e862a9b738424be9b2aac053ea14082c774b5e8521640360018797964ca5",
+  "decision_key": "c64987a0f95946ec7704e7cb9f792095f78d0c8976a20481e9d7d3857b55dab7",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-summary.pending.v1",
   "simulated_clock": "2027-01-22T08:15:00+00:00",
   "summary_request": {
     "request": {
-      "dimension": "dim:staff_note",
+      "dimension": "dim:user_ai_interaction",
       "granularity": "day",
-      "source_world_revision": 176,
+      "source_world_revision": 177,
       "sources": [
         {
           "metadata": {
-            "adapter_id": "habitation.staff_note.v1",
-            "dimension": "dim:staff_note",
-            "external_record_id": "d034-staff-note",
-            "external_revision": "1",
-            "mechanical_ingest": true,
-            "occurred_at_original": "2027-01-21T06:55:00+00:00",
-            "provenance": {
-              "habitation_resident_metadata": {
-                "source": "staff_notes"
-              },
-              "model_id_not_part_of_fact": true
-            },
-            "source_class": "user",
-            "source_digest": "fceb3f69e4af759ba89778ad275f393693825636b7c172b1e2f91b05e6ddb700",
-            "source_schema_version": "1"
+            "dimension": "dim:user_ai_interaction",
+            "role": "assistant",
+            "session_id": "jan21-night",
+            "turn_index": 1,
+            "turn_key": "ba96bbec185843c31e5142a3"
           },
-          "object_id": "obs_src_facf2b040e0feb3a89b935f2",
+          "object_id": "obs_conv_ai_18cb3daac965bfcd1b673390",
           "object_type": "observation",
-          "occurred_at": "2027-01-21T06:55:00Z",
+          "occurred_at": "2027-01-21T21:10:00Z",
           "revision": 1,
-          "text": "小赵记录：06:10到06:42醒发架满，两盘面团在推车上等待空位；06:42后恢复周转。"
+          "text": "明白，按今天这次有边界的事实记：小赵记录6:10—6:42醒发架满，两盘面团等空位，6:42后恢复周转。现有判断只是把醒发架周转列为继续观察的环节，不是“长期瓶颈”，也不拿它解释昨天全部延误。是否反复出现、是否影响实际出品时间，还要看后续记录。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "user",
+            "session_id": "jan21-night",
+            "turn_index": 1,
+            "turn_key": "ba96bbec185843c31e5142a3"
+          },
+          "object_id": "obs_conv_user_2906f3bcf7dffcb7612ac88f",
+          "object_type": "observation",
+          "occurred_at": "2027-01-21T21:10:00Z",
+          "revision": 1,
+          "text": "醒发架今天确实挤了一阵，但这只是今天看到的情况。先记事实，不要直接写成“我们的长期瓶颈就是醒发架”。"
         }
       ],
       "truncated": false,
@@ -40,5 +44,5 @@
     },
     "summary_request_type": "DimensionSummaryInput"
   },
-  "world_revision_before": 176
+  "world_revision_before": 177
 }
