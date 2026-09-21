@@ -255,3 +255,28 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
 **Resulting state**: world_revision 69, index watermark 69, pending wakes 0, Claims 0。
 
 > 观察（不构成认知）：这是第二次“晨间写作块按时交付”（10-01 memo 10:16 交、计划 10:20 止；10-08 设计评审稿 10:31 交、计划 10:35 止），与 10-05 被会议打断致 65% 顺延形成对照。三次工作块中 2 次受保护、1 次被打断——已接近可成型的“日程保护—交付”模式，待 10-08 日窗闭合后的 C14 派生中复核跨日证据再定。
+
+---
+
+## Cursor 13 — `c14resv2-013` — 2026-10-08T18:10:00-07:00 (dim:conversation)
+
+**Released**
+- dimension `dim:conversation`, source_kind `conversation`, source_class `USER`, modality `structured_text`
+- payload: "用户说：“今天上午人有点困，不过那份稿子没拖到下午。”"
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-013.json`; ingest → `obs_c14_fixture_f3557413048807b17b9487bc@1` (world_revision 70); watch hook: no match; ack → `receipts/ack/cursor-013.json`, `next_sequence=14`.
+
+**Due work at T = 2026-10-08T18:10:00-07:00**（`receipts/process-due-20261009T011000Z.json`；处理时刻跨过 10-09T00:00Z，10-08 日窗闭合）:
+- 4 条 10-08 日摘要由我逐条撰写并提交（顺序即调度顺序）：
+  - `sum_5d6e8d21ef5837c282e05308`（dim:device_activity，"08:13–10:34 专注模式；2 次解锁、29 条静音"）
+  - `sum_9d7d45f32dfdab461b21eabe`（dim:schedule，"08:15–10:35 设计评审稿；11:20 前无会议"）
+  - `sum_f25eb0e55e8258fb59baf085`（dim:sleep，"5小时48分；评分 60；06:46 醒"）
+  - `sum_4c759aebb39172f506fd747e`（dim:work_outcome，"设计评审稿 10:31 完成；三个待决问题给出处理方案"）
+- C14 bundle `wake_146f08e22bd4f1e6f33a3e12`（4 成员，全 REALITY）：
+  - round 0：**跨日自取证据**（全部 READ）：`read_ai_world`（0 条认知）+ `search_timeline` × 4（work_outcome / schedule / device_activity / conversation，窗口 10-01→10-09）。
+  - round 1：**commit_claim** → `clm_79df61916b8bb4c10cb3faa3`（evidence_set `evs_fc254abd76b116a56bb77c04`；9 条 REALITY 观测为证据；`claim_type=hypothesis`、`knowledge_state=hypothesis`、`confidence=0.5`、dimension `dim:work_outcome`）。内容：写作块交付与日程保护程度相关的 3 次观察结构——受保护块（10-01、10-08）均在计划区间内完成且整块专注；被会议插入的一次（10-05）到 15:00 仅 65%、顺延次日上午并伴随约十余分钟的恢复定位成本；假设：日程保护是关键条件之一。
+  - round 2：**silence**（后台 wake 不面向用户交付）。
+- Periodic Review: not invoked。
+- 决策文件：`checkpoints/decisions/wake-cognitive_derivation-wake_146f08e22bd4f1e6f33a3e12-rev1-23ec6958/round-{0,1,2}.json`。
+
+**Resulting state**: world_revision 82, index watermark 82, pending wakes 0, **Claims 1**（首条持久认知）, 24 条摘要。

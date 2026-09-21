@@ -50,6 +50,7 @@ Resident model (as declared): `GPT-5.6 Sol`; platform provider/session id: `unkn
 | 10 | `c14resv2-010` | 2026-10-08T08:08:00-07:00 | `obs_c14_fixture_6e081d5c46196e1781165d5c@1` | yes (`next=11`) | none due（日窗未闭合；C14 幂等；review 刚跑过） | 67 | dim:schedule 短睡次日的 08:15–10:35 设计评审稿块 |
 | 11 | `c14resv2-011` | 2026-10-08T10:38:00-07:00 | `obs_c14_fixture_522a6cbeb84ced83b62def58@1` | yes (`next=12`) | none due | 68 | 第二次晨间专注块记录（2 次解锁/29 条静音）；bridge 审计日志降噪（stdout 摘要，文件保留全量） |
 | 12 | `c14resv2-012` | 2026-10-08T10:43:00-07:00 | `obs_c14_fixture_96ba14d7f113e478b8a8bae8@1` | yes (`next=13`) | none due；bridge stdout 降噪 bug 修复后重跑 | 69 | 第二次按时交付（设计评审稿 10:31 / 计划止 10:35） |
+| 13 | `c14resv2-013` | 2026-10-08T18:10:00-07:00 | `obs_c14_fixture_f3557413048807b17b9487bc@1` | yes (`next=14`) | 4 条 10-08 日摘要由我撰写；C14 bundle → 跨日 search_timeline 取证 → **commit_claim** `clm_79df61916b8bb4c10cb3faa3`（9 REALITY refs, hypothesis 0.5）→ silence | 82 | **首条 Claim**：写作块交付与日程保护相关（3 次观察的结构）；1 Claim |
 
 ## Blockers / contamination
 
