@@ -1103,3 +1103,151 @@ Current reconciliation rebuilds the support Dependency view during each per-Summ
 C14-LOOP must add a bounded long-horizon reconciliation strategy (for example, one support graph build per reconciliation pass, safe cache, or incremental equivalent) without creating a second provenance truth or semantic importance index.
 
 This does not block `C14-RUNTIME-001`.
+
+---
+
+## 2026-09-21 — C14-RUNTIME-001 DONE
+
+- Status: **DONE / MERGED**
+- Started from main: `461a2289247eeb0cbbc39bbcfbe613022c885311`
+- Work branch: `c14/runtime-cognitive-derivation-20260921`
+- Candidate: `75cc62ca13169c6ba8752e0562224705fe6f9ac2`
+- PR: **#61**
+- Squash merge: `a887ba537e9797d4bf5a7b7fb482fa4a55f47df7`
+
+### Runtime closure
+
+`WakeSource.COGNITIVE_DERIVATION` now enters the **same existing Resident runtime**:
+
+```text
+WakeBus
+  -> FusedTurnRuntime.run_wake()
+  -> existing CognitiveRuntime
+  -> existing model_handler / capability loop / termination semantics
+  -> existing C13 non-world ModelMeteringLedger
+```
+
+No second Resident, second ModelHandler, cognition compiler, hidden semantic engine, second World, second provenance database or CognitionCandidate store was introduced.
+
+For a derivation Wake, the Resident cockpit now receives:
+
+- exact running Wake ref;
+- exact pinned Summary ref/revision;
+- Summary dimension, granularity and time window;
+- scheduler-computed derived lineage audit;
+- runtime-recomputed derived lineage audit, including `leaf_refs`, `grounding_leaf_refs`, unresolved refs and issues;
+- bounded current AI-world context;
+- the normal Resident capability catalog;
+- Step-0 and background-budget context.
+
+The instruction explicitly states that Summary is a **temporal/navigation anchor only**. It is not a Claim, semantic conclusion, or sufficient proof. The Resident retains search/inspect/timeline/compare/recall/ALL_DIMENSIONS/Outcome inspection autonomy and may form, revise, retract, or correctly remain silent.
+
+### Leaf-grounded cognition boundary
+
+C14 Runtime does not create a second provenance algorithm. The existing C14 scheduler walker was minimally extended into a shared exact-pinned resolver used by both scheduling and derivation writeback validation.
+
+During `COGNITIVE_DERIVATION`, the following Resident cognition paths all pass the same closure:
+
+- `commit_claim`
+- `commit_ai_world_claim`
+- `revise_claim`
+- `retract_claim`
+
+The guard requires a mechanically valid REALITY/MIXED closure with no unresolved/corrupt/cross-subject/cyclic branch and at least one qualifying `grounding_leaf_ref`.
+
+Important ruling-preserving distinction:
+
+- a bare Summary or Summary chain with no qualifying non-Summary leaf is rejected;
+- a Summary ref is legal when its **transitive pinned closure** reaches proposition-appropriate reality/case evidence;
+- an old AI semantic assertion cannot certify a new Claim merely because the old assertion was historically grounded;
+- real operation/case lineage such as `OperationExperience -> Outcome -> world/user evidence` remains legal for AI-self / Strategy / Calibration learning.
+
+No Claim prose, keyword, count threshold, confidence threshold, emotion/personality classifier or semantic score participates in this enforcement.
+
+### T28 / assistant-raw regression
+
+A dedicated negative/positive control is now covered:
+
+- assistant raw dialogue -> Conversation Summary -> derivation attempt to assert a user fact: **rejected** when no qualifying user/reality leaf exists;
+- user raw dialogue -> Summary -> drill down exact user Observation -> grounded cognition: **accepted**.
+
+Conversation Summary itself was not globally disabled.
+
+### Silence and user delivery
+
+Silence is a first-class successful Resident result:
+
+- Wake completes normally;
+- no Claim is required;
+- no fake OperationExperience/Outcome/Review is generated;
+- the silence regression proves zero semantic write.
+
+Even if a derivation model returns response text, C14 forces background delivery off. The internal response can participate in runtime termination bookkeeping but is not directly delivered to the user.
+
+### C13 metering
+
+C14 reuses the existing non-world `ModelMeteringLedger`. Provider/model/token usage is recorded through the same model-call recorder and does not become World/Wake economic truth.
+
+### Candidate Gate evidence
+
+- `c14-cognitive-derivation-runtime` — `35582197711` — **SUCCESS**
+- `c14-cognitive-derivation-scheduler` — `35582197425` — **SUCCESS**
+- `constitutional-cognition-closure` — `35582197542` — **SUCCESS**
+- `p16-convergence-gate` — `35582198031` — **SUCCESS**
+- `p15-periodic-review` — `35582197360` — **SUCCESS**
+- `dimension-summary` — `35582197498` — **SUCCESS**
+- `p14-long-context` — `35582197567` — **SUCCESS**
+- `c09-wake-dispatch` — `35582197629` — **SUCCESS**
+- `p10-ai-world-gate` — `35582197450` — **SUCCESS**
+- `p9-revision-gate` — `35582197446` — **SUCCESS**
+- `p12-execution-gate` — `35582197586` — **SUCCESS**
+- `fused-turn-runtime` — `35582197662` — **SUCCESS**
+- `p11-dimension-gate` — `35582197613` — **SUCCESS**
+
+The dedicated C14 Runtime workflow includes all seven required jobs: targeted scheduler/runtime, cognition closure, runtime/Wake/Fused, dimension/index/execution, P15/C13/P14/T28, P16 habitation harness and full P16 convergence.
+
+### Merge-result main Gate evidence
+
+On `main@a887ba537e9797d4bf5a7b7fb482fa4a55f47df7`:
+
+- `c14-cognitive-derivation-runtime` — `35582457482` — **SUCCESS**
+- `c14-cognitive-derivation-scheduler` — `35582457687` — **SUCCESS**
+- `p16-convergence-gate` — `35582457558` — **SUCCESS**
+- `p15-periodic-review` — `35582457662` — **SUCCESS**
+- `p10-ai-world-gate` — `35582457462` — **SUCCESS**
+- `dimension-summary` — `35582457614` — **SUCCESS**
+- `c09-wake-dispatch` — `35582457569` — **SUCCESS**
+- `p11-dimension-gate` — `35582457737` — **SUCCESS**
+- `p9-revision-gate` — `35582457356` — **SUCCESS**
+- `fused-turn-runtime` — `35582457578` — **SUCCESS**
+- `all-dimensions-projection` — `35582457352` — **SUCCESS**
+- `p12-execution-gate` — `35582457490` — **SUCCESS**
+- `p14-long-context` — `35582457564` — **SUCCESS**
+
+### Changed implementation / evidence files
+
+Core:
+
+- `src/aios_core/runtime/turn_runtime.py`
+- `src/aios_core/summaries/cognitive_derivation.py`
+
+Test / Gate:
+
+- `tests/integration/test_v3_c14_cognitive_derivation_runtime.py`
+- `.github/workflows/c14-cognitive-derivation-runtime.yml`
+
+### Bugs closed in this task
+
+1. Derivation Wake previously used only the generic Wake instruction/cockpit and could be folded through generic BACKGROUND bundling rather than retaining the exact dedicated Summary inspection contract.
+2. Summary/AI-cognition support closure was not enforced at Resident durable cognition create/revise/retract boundaries.
+3. Protecting only `commit_claim` would have left `commit_ai_world_claim`, revision and retraction as bypasses; all four are now under the same closure.
+4. Alternate experience/policy cognition writers are not allowed to become C14 derivation bypasses.
+
+### Deferred / handoff
+
+- **C14-LOOP-001 = READY**.
+- Its scope remains burst/budget/coalescing/defer/restart hardening, Periodic Review coexistence, new-runtime World/Index recovery + behavioral consumption, and the previously accepted bounded provenance-reconcile scale improvement.
+- **C14-RES-001 remains BLOCKED** on LOOP.
+- P16 campaign remains blocked until the full C14 chain closes.
+- This window does **not** start C14-LOOP-001.
+
