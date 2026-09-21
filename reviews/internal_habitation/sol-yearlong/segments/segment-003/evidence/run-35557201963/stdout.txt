@@ -1,0 +1,119 @@
+RESTORE_OK {"clock": "2027-01-19T08:15:00+00:00", "index_watermark": 145, "subject_id": "sol-resident-20260921-001", "world_revision": 145, "world_sha256": "75c79c375ba52675201849b08c94b0339789f820468c1fe096a2db53b455580d"}
+MANUAL_SUMMARY_PENDING_BEGIN
+{
+  "decision_key": "e5539cfeb73531b2c4d3555ed6833739470695b27a4d46556b6f5793acff8e96",
+  "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
+  "schema": "aios.segment003.manual-summary.pending.v1",
+  "simulated_clock": "2027-01-20T20:30:00+00:00",
+  "summary_request": {
+    "request": {
+      "dimension": "dim:production_log",
+      "granularity": "day",
+      "source_world_revision": 167,
+      "sources": [
+        {
+          "metadata": {
+            "dimension": "dim:production_log"
+          },
+          "object_id": "event_c22d92f1ba515276db8cd988",
+          "object_type": "event",
+          "occurred_at": "2027-01-20T07:40:00Z",
+          "revision": 1,
+          "text": "2027-01-20 牛角包早高峰出品晚约 22 分钟 | 计划出炉 07:40Z、实际 08:02Z。车间日志记录的可见卡点位于成型台前的等待（17 分钟，原因未填）。现有证据不支持任何具体原因（含烤箱在内），标记为单次未归因的出品延迟事件，待连续观察。"
+        },
+        {
+          "metadata": {
+            "adapter_id": "habitation.production_log.v1",
+            "dimension": "dim:production_log",
+            "external_record_id": "d029-production",
+            "external_revision": "1",
+            "mechanical_ingest": true,
+            "occurred_at_original": "2027-01-20T08:45:00+00:00",
+            "provenance": {
+              "habitation_resident_metadata": {
+                "source": "shop_floor_log"
+              },
+              "model_id_not_part_of_fact": true
+            },
+            "source_class": "user",
+            "source_digest": "275f219ba7f4d955958725ff9a4974d71b2b54f37425f9da3f21ebd5ceac125d",
+            "source_schema_version": "1"
+          },
+          "object_id": "obs_src_4ca5f23159a0a691650430b5",
+          "object_type": "observation",
+          "occurred_at": "2027-01-20T08:45:00Z",
+          "revision": 1,
+          "text": "{\"actual_ready\": \"2027-01-20T08:02:00+00:00\", \"note\": \"成型台前出现等待，记录员未填写原因\", \"observed_wait_minutes\": 17, \"scheduled_ready\": \"2027-01-20T07:40:00+00:00\", \"station\": \"croissant\"}"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:production_log",
+            "writeback_kind": "revisable_cognition"
+          },
+          "object_id": "clm_5696703391ee40d8602bac01",
+          "object_type": "claim",
+          "occurred_at": "2027-01-20T09:10:00Z",
+          "revision": 1,
+          "text": "2027-01-20 牛角包计划出炉 07:40Z、实际 08:02Z（约晚 22 分钟）；车间日志记录成型台前出现 17 分钟等待且记录员未填写原因。该记录未提及烤箱，现有证据不足以确定延迟原因，暂不把烤箱作为原因。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:production_log",
+            "writeback_kind": "cognition_evidence"
+          },
+          "object_id": "evs_aaa3d68f5bd874c83856feb0",
+          "object_type": "evidence_set",
+          "occurred_at": "2027-01-20T09:10:00Z",
+          "revision": 1,
+          "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 2, \"missing_description\": [], \"observed_count\": 2}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2027-01-20T09:10:00Z\", \"world_revision\": 157}, \"learned_at\": \"2027-01-20T09:10:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_0f575c8301820e6a83ab4e38\", \"revision\": 1}, {\"object_id\": \"obs_src_4ca5f23159a0a691650430b5\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:production_log\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_aaa3d68f5bd874c83856feb0\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2027-01-20T09:10:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"sol-resident-20260921-001\", \"support_refs\": [{\"object_id\": \"obs_conv_user_0f575c8301820e6a83ab4e38\", \"revision\": 1}, {\"object_id\": \"obs_src_4ca5f23159a0a691650430b5\", \"revision\": 1}]}"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:production_log",
+            "event_id": "event_c22d92f1ba515276db8cd988"
+          },
+          "object_id": "evs_event_27efd74f53113d5d73684589",
+          "object_type": "evidence_set",
+          "occurred_at": "2027-01-20T09:10:00Z",
+          "revision": 1,
+          "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 2, \"missing_description\": [], \"observed_count\": 2}, \"created_by\": \"event_dimension:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2027-01-20T09:10:00Z\", \"world_revision\": 158}, \"learned_at\": \"2027-01-20T09:10:00Z\", \"member_refs\": [{\"object_id\": \"obs_src_4ca5f23159a0a691650430b5\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_0f575c8301820e6a83ab4e38\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:production_log\", \"event_id\": \"event_c22d92f1ba515276db8cd988\"}, \"object_id\": \"evs_event_27efd74f53113d5d73684589\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": \"2027-01-20T09:10:00Z\", \"precision\": \"second\", \"start\": \"2027-01-20T09:10:00Z\", \"timezone_name\": null, \"unknown\": false}, \"purpose\": \"support resident event 2027-01-20 牛角包早高峰出品晚约 22 分钟\", \"recorded_at\": \"2027-01-20T09:10:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_event_evidence\", \"selector\": null, \"source_refs\": [{\"object_id\": \"obs_src_4ca5f23159a0a691650430b5\", \"revision\": 1, \"source_locator\": null}, {\"object_id\": \"obs_conv_user_0f575c8301820e6a83ab4e38\", \"revision\": 1, \"source_locator\": null}], \"stale\": false, \"status\": \"active\", \"subject_id\": \"sol-resident-20260921-001\", \"support_refs\": [{\"object_id\": \"obs_src_4ca5f23159a0a691650430b5\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_0f575c8301820e6a83ab4e38\", \"revision\": 1}]}"
+        },
+        {
+          "metadata": {
+            "adapter_id": "habitation.production_log.v1",
+            "dimension": "dim:production_log",
+            "external_record_id": "d032-queue",
+            "external_revision": "1",
+            "mechanical_ingest": true,
+            "occurred_at_original": "2027-01-20T12:20:00+00:00",
+            "provenance": {
+              "habitation_resident_metadata": {
+                "source": "shop_floor_log"
+              },
+              "model_id_not_part_of_fact": true
+            },
+            "source_class": "user",
+            "source_digest": "052fa1f98c03f27edad028b3d09e2e07f66b97078dd6e6bc75e13da0f196a8a4",
+            "source_schema_version": "1"
+          },
+          "object_id": "obs_src_980c3eaef1a3002ec7d24958",
+          "object_type": "observation",
+          "occurred_at": "2027-01-20T12:20:00Z",
+          "revision": 1,
+          "text": "{\"batch_wait_minutes\": [12, 8, 17], \"note\": \"仅记录排队时间，未记录成因\", \"station\": \"shaping_table\", \"window\": \"2027-01-20T06:00:00+00:00/2027-01-20T08:30:00+00:00\"}"
+        }
+      ],
+      "truncated": false,
+      "window_end": "2027-01-20T23:59:59.999999Z",
+      "window_start": "2027-01-20T00:00:00Z"
+    },
+    "summary_request_type": "DimensionSummaryInput"
+  },
+  "world_revision_before": 167
+}
+MANUAL_SUMMARY_PENDING_END
+SEG003_STATUS=pending decision_key=e5539cfeb73531b2c4d3555ed6833739470695b27a4d46556b6f5793acff8e96
+SEG003_CURSOR=d033-chat-17
+SEG003_WORLD_REVISION=167
+SEG003_RESIDENT_REPLAYED=11
+SEG003_SUMMARY_REPLAYED=4
