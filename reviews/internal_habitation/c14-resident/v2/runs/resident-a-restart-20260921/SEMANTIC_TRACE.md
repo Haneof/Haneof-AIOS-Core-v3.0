@@ -98,3 +98,33 @@ Periodic Review interval not reached). No model invocation, no semantic write.
 Review interval not reached). No model invocation, no semantic write.
 
 **Resulting state**: world_revision 7, index watermark 7, pending wakes 0.
+
+---
+
+## Cursor 5 — `c14resv2-005` — 2026-10-05T07:06:00-07:00 (dim:sleep)
+
+**Released**
+- dimension `dim:sleep`, source_kind `wearable`, source_class `SENSOR`, modality `structured_text`
+- payload: "昨晚睡眠 7小时39分；睡眠评分 82/100；07:01 醒来。"
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-005.json`; ingest → `obs_c14_fixture_27ab6246ef0865debe1b49af@1` (world_revision 8); watch hook: no match; ack → `receipts/ack/cursor-005.json`, `next_sequence=6`.
+
+**Due work at T = 2026-10-05T07:06:00-07:00** (`receipts/process-due-20261005T140600Z.json`, world_revision 46, index watermark 46).
+
+时间自 10-01 跳到 10-05，所有已闭合窗口到期；16 条摘要全部由我逐条撰写（事实性滚存，不超出源材料做概括），程序仅做提交：
+- day 2026-10-01：`sum_e4577fa411beaabd5bb78300`(sleep)、`sum_eceb678add8634ee26b63e49`(schedule)、`sum_53d509d86786bde8d0e84da3`(device)、`sum_03a94f689d069e0bbb5c1eb4`(work)
+- week 2026-09-28–10-04：`sum_7f9c1dda2a76a9f3e2a5f087`、`sum_468fbdd51f43bbb37ed8a3ad`、`sum_fa279a5040c9a67efcae4f10`、`sum_a5cfe5e5f052c7b9969486ad`
+- month 2026-09：`sum_f222693ff55566369177b6e8`、`sum_c4e7d293d66b59d87731d65d`、`sum_621dbad73aff86b121ff5f4d`、`sum_66e44044c780170d4b893177`
+- quarter 2026-Q3：`sum_739da506a4c4d81ac3de0421`、`sum_97e12742d2d5a6bb6fced32b`、`sum_505a097545911c054e48720a`、`sum_dec542116cba49b459db613c`
+
+C14 认知派生：16 条摘要各自调度 C14 wake，被按 `homogeneous_execution_contract` 机械聚合为 bundle `wake_bundle_b730ca1a7fefcee2ec36e955`（hits=16；成员 lineage 全为 REALITY，leaf = 10-01 的 4 条观测；`has_ai_cognition=false`）。
+- round 0（我的 capability_calls）：`read_ai_world(limit=50)` + `retrieve_original_observation` × 4（四条叶子精确事实）。
+- round 1（我的终端决定 **silence**）：AI-world 认知为空；16 个成员闭合到同一天 4 条观测，其一致性是案例级事实、已作为 Observation/Summary 持久存在；单日、无基线、无反证、无跨日材料 → 不足以支撑持久可修订的一般性认知。**不创建/不修订/不废止 Claim**（Claims 保持 0）。
+- 决策文件：`checkpoints/decisions/wake-cognitive_derivation-wake_1cf110c3441735516a8f1266-rev1-4163d6dc/round-{0,1}.json`；快照同目录。
+
+Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anchors，wake `wake_review_6504931e301a63a3e7f5ef9e`）：
+- round 0：`read_periodic_review_anchors(limit=25)` — 锚点=4 观测 + 16 条我自撰摘要 + 1 条 C14 bundle 完成记录。
+- round 1：**silence** — 无可修订/确认/回滚的既存认知；10-05 第二晚睡眠（7h39m/82，07:01 醒）与 10-01（7h44m/84，07:08 醒）相似但 n=2、相隔 4 天且中间无数据，仍不足；无证据支持的操作经验。
+- 决策文件：`checkpoints/decisions/periodic-review-20261005T140701Z-a23294f7/round-{0,1}.json`。
+
+**Resulting state**: `PROCESS_DUE_DONE status=processed`；bundle wake `completed / termination=silence`；review `completed`；pending_wakes 0；index_lag 0；Claims 0；world_revision 46；release `last_acked_sequence=5`、`next_sequence=6`。
