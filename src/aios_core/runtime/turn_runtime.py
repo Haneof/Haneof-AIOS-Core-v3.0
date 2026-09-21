@@ -118,7 +118,7 @@ _C14_COGNITIVE_SIDE_EFFECT_ALLOWLIST = frozenset(
         "retract_claim",
     }
 )
-
+_C14_SEMANTIC_TERMINATIONS = frozenset({"responded", "silence"})
 
 
 @dataclass(frozen=True, slots=True)
@@ -2879,7 +2879,6 @@ class FusedTurnRuntime:
             WakeSource.PERIODIC_REVIEW,
             WakeSource.USER_INTERACTION,
             WakeSource.ATTENTION_BUNDLE,
-            WakeSource.COGNITIVE_DERIVATION,
         }
         if (
             initial_wake.wake_state.value in {"new", "queued"}
@@ -2989,6 +2988,84 @@ class FusedTurnRuntime:
             revision=running.revision,
         )
 
+        raw_attention_bundle = (
+            running.metadata.get("attention_bundle")
+            if running.wake_source is WakeSource.ATTENTION_BUNDLE
+            else None
+        )
+        c14_bundle = False
+        bundle_member_records: list[tuple[ObjectRef, Mapping[str, Any]]] = []
+        if isinstance(raw_attention_bundle, Mapping):
+            raw_members = raw_attention_bundle.get("members")
+            if not isinstance(raw_members, list) or not raw_members:
+                if (
+                    raw_attention_bundle.get("execution_contract")
+                    == AttentionRouter.C14_EXECUTION_CONTRACT
+                ):
+                    raise ValueError("C14 AttentionBundle requires pinned member Wakes")
+            else:
+                member_sources: set[str] = set()
+                for raw_member in raw_members:
+                    if not isinstance(raw_member, Mapping):
+                        raise ValueError("AttentionBundle member must be a mapping")
+                    raw_member_ref = raw_member.get("wake_ref")
+                    if not isinstance(raw_member_ref, Mapping):
+                        raise ValueError("AttentionBundle member requires exact wake_ref")
+                    member_ref = ObjectRef.model_validate(raw_member_ref)
+                    if member_ref.revision is None:
+                        raise ValueError("AttentionBundle member wake_ref must be pinned")
+                    member_payload = self.store.get_payload(
+                        member_ref.object_id,
+                        revision=member_ref.revision,
+                    )
+                    if member_payload.get("object_type") != ObjectType.WAKE.value:
+                        raise ValueError("AttentionBundle member must point to a Wake")
+                    member_sources.add(str(member_payload.get("wake_source") or ""))
+                    if not any(
+                        item.object_id == member_ref.object_id
+                        and item.revision == member_ref.revision
+                        for item in running.evidence_refs
+                    ):
+                        raise ValueError("AttentionBundle must pin each exact member Wake")
+                    bundle_member_records.append((member_ref, member_payload))
+                contains_c14 = (
+                    WakeSource.COGNITIVE_DERIVATION.value in member_sources
+                )
+                declared_contract = raw_attention_bundle.get("execution_contract")
+                if contains_c14:
+                    if member_sources != {WakeSource.COGNITIVE_DERIVATION.value}:
+                        raise ValueError(
+                            "COGNITIVE_DERIVATION cannot share a broader AttentionBundle"
+                        )
+                    if (
+                        declared_contract
+                        != AttentionRouter.C14_EXECUTION_CONTRACT
+                    ):
+                        raise ValueError(
+                            "C14 AttentionBundle must preserve its execution contract"
+                        )
+                    if raw_attention_bundle.get("member_count") != len(
+                        bundle_member_records
+                    ):
+                        raise ValueError("C14 AttentionBundle member_count mismatch")
+                    c14_bundle = True
+                elif (
+                    declared_contract
+                    == AttentionRouter.C14_EXECUTION_CONTRACT
+                ):
+                    raise ValueError(
+                        "C14 execution contract requires only C14 member Wakes"
+                    )
+
+        effective_wake_source = (
+            WakeSource.COGNITIVE_DERIVATION
+            if (
+                running.wake_source is WakeSource.COGNITIVE_DERIVATION
+                or c14_bundle
+            )
+            else running.wake_source
+        )
+
         empty_recommendation = RecommendationBundle(
             current_topic=None,
             topic_gate_open=False,
@@ -3001,6 +3078,7 @@ class FusedTurnRuntime:
         wake_context = {
             "wake_ref": running_ref.model_dump(mode="json"),
             "wake_source": running.wake_source.value,
+            "effective_wake_source": effective_wake_source.value,
             "rule_id": running.rule_id,
             "priority": running.priority,
             "attention_class": self.wake_bus.attention_class_for_wake(
@@ -3108,6 +3186,97 @@ class FusedTurnRuntime:
                 "insufficient or understanding should not change, silence is a correct "
                 "successful result. The Wake contains no expected Claim."
             )
+        elif c14_bundle:
+            members: list[dict[str, Any]] = []
+            for member_ref, member_payload in bundle_member_records:
+                member_metadata = member_payload.get("metadata")
+                if not isinstance(member_metadata, Mapping):
+                    raise ValueError("C14 member Wake requires metadata")
+                raw_summary_ref = member_metadata.get("summary_ref")
+                if not isinstance(raw_summary_ref, Mapping):
+                    raise ValueError(
+                        "C14 member Wake requires exact summary_ref metadata"
+                    )
+                summary_ref = ObjectRef.model_validate(raw_summary_ref)
+                if summary_ref.revision is None:
+                    raise ValueError("C14 member summary_ref must be pinned")
+                raw_member_evidence = member_payload.get("evidence_refs")
+                if not isinstance(raw_member_evidence, list):
+                    raw_member_evidence = []
+                member_evidence = [
+                    ObjectRef.model_validate(item)
+                    for item in raw_member_evidence
+                    if isinstance(item, Mapping)
+                ]
+                if not any(
+                    item.object_id == summary_ref.object_id
+                    and item.revision == summary_ref.revision
+                    for item in member_evidence
+                ):
+                    raise ValueError("C14 member Wake must pin its Summary")
+                summary_payload = self.store.get_payload(
+                    summary_ref.object_id,
+                    revision=summary_ref.revision,
+                )
+                if summary_payload.get("object_type") != ObjectType.SUMMARY.value:
+                    raise ValueError("C14 member summary_ref must point to a Summary")
+                runtime_lineage = self.cognitive_derivation.derive_lineage(
+                    summary_ref
+                )
+                scheduler_lineage = member_metadata.get("derived_lineage")
+                if not isinstance(scheduler_lineage, Mapping):
+                    scheduler_lineage = {}
+                summary_metadata = summary_payload.get("metadata")
+                if not isinstance(summary_metadata, Mapping):
+                    summary_metadata = {}
+                summary_coverage = summary_payload.get("coverage")
+                if not isinstance(summary_coverage, Mapping):
+                    summary_coverage = {}
+                lineage_payload = runtime_lineage.audit_payload()
+                members.append(
+                    {
+                        "wake_ref": member_ref.model_dump(mode="json"),
+                        "summary_ref": summary_ref.model_dump(mode="json"),
+                        "summary_revision": summary_ref.revision,
+                        "summary_dimension": (
+                            summary_metadata.get("dimension")
+                            or summary_coverage.get("dimension")
+                        ),
+                        "granularity": summary_payload.get("granularity"),
+                        "summary_window": summary_payload.get("summary_time"),
+                        "scheduler_derived_lineage": dict(scheduler_lineage),
+                        "runtime_derived_lineage": lineage_payload,
+                        "grounding_leaf_refs": lineage_payload.get(
+                            "grounding_leaf_refs",
+                            [],
+                        ),
+                    }
+                )
+            task_context["cognitive_derivation_bundle"] = {
+                "bundle_wake_ref": running_ref.model_dump(mode="json"),
+                "member_count": len(members),
+                "members": members,
+                "current_ai_world": self.ai_world.snapshot(per_domain=3),
+                "capability_names": [
+                    item["name"] for item in self.registry.catalog()
+                ],
+                "step0": gate_result.model_dump(mode="json"),
+                "budget": budget_decision.context_payload(),
+                "grouping_policy": "homogeneous_execution_contract",
+                "summary_is_temporal_navigation_anchor": True,
+                "summary_is_semantic_conclusion": False,
+                "summary_is_sufficient_evidence_by_itself": False,
+                "silence_is_valid_success": True,
+            }
+            wake_input = (
+                "Cognitive derivation bundle wake. The listed pinned Summaries are "
+                "independent temporal/navigation anchors, not Claims or conclusions. "
+                "Inspect whichever member leaves, existing cognition, counter-evidence, "
+                "and cross-dimensional world state you judge relevant. Only form, revise, "
+                "or retract durable cognition when pinned support closes to qualifying "
+                "non-Summary reality/case evidence. Silence is a valid successful result. "
+                "Mechanical bundling makes no semantic claim about the members."
+            )
 
         context = self.context_controller.assemble(
             user_input=wake_input,
@@ -3122,16 +3291,26 @@ class FusedTurnRuntime:
             token_budget=token_budget,
         )
 
-        self._active_turn_time = now
+        active_write_time = now
+        if effective_wake_source is WakeSource.COGNITIVE_DERIVATION:
+            raw_first_started_at = (
+                running.metadata.get("runtime_first_started_at")
+                or running.metadata.get("started_at")
+            )
+            if raw_first_started_at is not None:
+                active_write_time = datetime.fromisoformat(
+                    str(raw_first_started_at).replace("Z", "+00:00")
+                )
+        self._active_turn_time = active_write_time
         self._active_meter_time = now
         self._active_session_id = None
         self._active_wake_id = running.object_id
-        self._active_wake_source = running.wake_source
+        self._active_wake_source = effective_wake_source
         self._active_review_request = None
         try:
             runtime_result = self.cognitive_runtime.run_turn(
                 wake_input,
-                wake_reason=running.wake_source.value,
+                wake_reason=effective_wake_source.value,
                 cockpit=context.as_cockpit(),
                 max_model_rounds=budget_decision.model_round_limit,
             )
@@ -3145,19 +3324,34 @@ class FusedTurnRuntime:
 
         delivery_allowed = (
             gate_result.delivery_allowed
-            and running.wake_source is not WakeSource.COGNITIVE_DERIVATION
+            and effective_wake_source is not WakeSource.COGNITIVE_DERIVATION
         )
-        completed = self.wake_bus.complete(
-            running.object_id,
-            completed_at=now,
-            termination_reason=runtime_result.termination_reason,
-            model_rounds=runtime_result.model_rounds,
-            capability_names=tuple(
-                item.name for item in runtime_result.capability_history
-            ),
-            delivery_allowed=delivery_allowed,
-            step0_state=gate_result.state,
-        )
+        if (
+            effective_wake_source is WakeSource.COGNITIVE_DERIVATION
+            and runtime_result.termination_reason not in _C14_SEMANTIC_TERMINATIONS
+        ):
+            completed = self.wake_bus.requeue_runtime_incomplete(
+                running.object_id,
+                requeued_at=now,
+                termination_reason=runtime_result.termination_reason,
+                model_rounds=runtime_result.model_rounds,
+                capability_names=tuple(
+                    item.name for item in runtime_result.capability_history
+                ),
+                step0_state=gate_result.state,
+            )
+        else:
+            completed = self.wake_bus.complete(
+                running.object_id,
+                completed_at=now,
+                termination_reason=runtime_result.termination_reason,
+                model_rounds=runtime_result.model_rounds,
+                capability_names=tuple(
+                    item.name for item in runtime_result.capability_history
+                ),
+                delivery_allowed=delivery_allowed,
+                step0_state=gate_result.state,
+            )
         delivery_response = (
             runtime_result.response
             if delivery_allowed

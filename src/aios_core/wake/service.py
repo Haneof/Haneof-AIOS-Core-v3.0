@@ -856,6 +856,86 @@ class WakeBus:
             world_revision=result.world_revision,
         )
 
+    def requeue_runtime_incomplete(
+        self,
+        wake_id: str,
+        *,
+        requeued_at: datetime,
+        termination_reason: str,
+        model_rounds: int,
+        capability_names: tuple[str, ...] = (),
+        step0_state: Step0State,
+    ) -> WakeStateReceipt:
+        moment = as_utc(requeued_at, "requeued_at")
+        wake = self.current_wake(wake_id)
+        if wake.wake_state is WakeState.QUEUED:
+            return WakeStateReceipt(
+                wake_id=wake.object_id,
+                revision=wake.revision,
+                state=wake.wake_state.value,
+                world_revision=int(self.store.current_world_revision()),
+            )
+        if wake.wake_state is not WakeState.RUNNING:
+            raise ValueError("only RUNNING Wake may be requeued as runtime-incomplete")
+
+        metadata = dict(wake.metadata)
+        first_started_at = (
+            metadata.get("runtime_first_started_at")
+            or metadata.get("started_at")
+            or moment.isoformat()
+        )
+        attempts = metadata.get("runtime_incomplete_attempts", 0)
+        if not isinstance(attempts, int) or isinstance(attempts, bool) or attempts < 0:
+            attempts = 0
+        metadata.update(
+            {
+                "runtime_incomplete": True,
+                "runtime_first_started_at": str(first_started_at),
+                "runtime_incomplete_at": moment.isoformat(),
+                "runtime_incomplete_reason": str(termination_reason),
+                "runtime_incomplete_attempts": attempts + 1,
+                "runtime_incomplete_model_rounds": int(model_rounds),
+                "runtime_incomplete_capability_names": list(capability_names),
+                "runtime_incomplete_step0_state": step0_state,
+            }
+        )
+        revision = wake.revision + 1
+        queued = Wake.model_validate(
+            {
+                **wake.model_dump(mode="python", round_trip=True),
+                "revision": revision,
+                "occurred": TemporalExtent.point(moment),
+                "learned_at": moment,
+                "recorded_at": moment,
+                "wake_state": WakeState.QUEUED,
+                "status": WakeState.QUEUED.value,
+                "metadata": metadata,
+            }
+        )
+        result = self.store.commit(
+            [queued],
+            OperationRequest(
+                operation_name="wake.dispatch.runtime_incomplete",
+                arguments={
+                    "wake_id": wake.object_id,
+                    "revision": revision,
+                    "termination_reason": str(termination_reason),
+                },
+                expected_world_revision=int(self.store.current_world_revision()),
+                reason="keep semantically unfinished Resident wake durable",
+                idempotency_key=f"wake-runtime-incomplete:{wake.object_id}:{revision}",
+                source_class=SourceClass.MAINTENANCE,
+                maintenance_class=MaintenanceClass.WAKE_SCHEDULER,
+            ),
+        )
+        self._catch_up()
+        return WakeStateReceipt(
+            wake_id=queued.object_id,
+            revision=revision,
+            state=WakeState.QUEUED.value,
+            world_revision=result.world_revision,
+        )
+
     def _finish(
         self,
         wake_id: str,

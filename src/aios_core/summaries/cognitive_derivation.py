@@ -586,6 +586,11 @@ class CognitiveDerivationScheduler:
     def derive_lineage_for_refs(
         self,
         refs: Sequence[ObjectRef],
+        *,
+        support_dependencies: Mapping[
+            tuple[str, int],
+            tuple[ObjectRef, ...],
+        ] | None = None,
     ) -> DerivedLineageView:
         """Resolve exact support closure for arbitrary pinned cognition evidence.
 
@@ -601,7 +606,11 @@ class CognitiveDerivationScheduler:
             unresolved={},
             issues=set(),
         )
-        dependencies = self._support_dependencies()
+        dependencies = (
+            self._support_dependencies()
+            if support_dependencies is None
+            else support_dependencies
+        )
         active_stack: set[tuple[str, int]] = set()
         completed: set[tuple[str, int, bool]] = set()
         for ref in refs:
@@ -666,9 +675,17 @@ class CognitiveDerivationScheduler:
     def ensure(
         self,
         summary_ref: ObjectRef,
+        *,
+        support_dependencies: Mapping[
+            tuple[str, int],
+            tuple[ObjectRef, ...],
+        ] | None = None,
     ) -> CognitiveDerivationScheduleReceipt:
         summary, state_reason = self._current_eligible_summary(summary_ref)
-        lineage = self.derive_lineage(summary_ref)
+        lineage = self.derive_lineage_for_refs(
+            (summary_ref,),
+            support_dependencies=support_dependencies,
+        )
         if summary is None:
             return CognitiveDerivationScheduleReceipt(
                 summary_ref=summary_ref,
@@ -684,6 +701,13 @@ class CognitiveDerivationScheduler:
                 summary_ref=summary_ref,
                 eligible=False,
                 reason=f"lineage_{lineage.classification.value.lower()}",
+                lineage=lineage,
+            )
+        if not lineage.grounding_leaf_refs:
+            return CognitiveDerivationScheduleReceipt(
+                summary_ref=summary_ref,
+                eligible=False,
+                reason="lineage_no_direct_reality_grounding",
                 lineage=lineage,
             )
 
@@ -734,6 +758,7 @@ class CognitiveDerivationScheduler:
 
         receipts: list[CognitiveDerivationScheduleReceipt] = []
         examined = 0
+        support_dependencies = self._support_dependencies()
         for payload in self.store.list_payloads(
             object_type=ObjectType.SUMMARY,
             subject_id=self.subject_id,
@@ -744,7 +769,8 @@ class CognitiveDerivationScheduler:
                 continue
             examined += 1
             receipt = self.ensure(
-                ObjectRef(object_id=object_id, revision=revision)
+                ObjectRef(object_id=object_id, revision=revision),
+                support_dependencies=support_dependencies,
             )
             if receipt.eligible:
                 receipts.append(receipt)

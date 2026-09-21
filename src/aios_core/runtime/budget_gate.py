@@ -204,6 +204,41 @@ class BackgroundBudgetGate:
                 continue
 
             metadata: Mapping[str, Any] = wake.metadata
+            if (
+                wake.wake_state is WakeState.QUEUED
+                and bool(metadata.get("runtime_incomplete"))
+            ):
+                attempt_at = self._parse_time(
+                    metadata.get("runtime_incomplete_at")
+                    or metadata.get("runtime_first_started_at")
+                    or wake.recorded_at,
+                    "runtime_incomplete_at",
+                )
+                if attempt_at is None or not (
+                    window_start <= attempt_at < window_end
+                ):
+                    continue
+                wake_records = records_by_wake.get(wake.object_id, ())
+                rounds = len(wake_records)
+                if rounds == 0:
+                    raw_rounds = metadata.get("runtime_incomplete_model_rounds")
+                    if (
+                        isinstance(raw_rounds, int)
+                        and not isinstance(raw_rounds, bool)
+                        and raw_rounds > 0
+                    ):
+                        rounds = raw_rounds
+                    token_usage_available = False
+                elif not all(
+                    record.usage_complete and record.total_tokens is not None
+                    for record in wake_records
+                ):
+                    token_usage_available = False
+                if rounds > 0:
+                    used_wakes += 1
+                    used_model_calls += rounds
+                continue
+
             if wake.wake_state is WakeState.RUNNING:
                 started_at = self._parse_time(
                     metadata.get("started_at"),
@@ -252,16 +287,71 @@ class BackgroundBudgetGate:
             ):
                 continue
             used_wakes += 1
-            used_model_calls += rounds
 
-            # Legacy Wakes completed before MeteringLedger cannot prove token spend.
-            # A complete modern Wake has one metering row per model round.
+            # C13 MeteringLedger is the economic truth. A C14 Wake may span
+            # multiple runtime-incomplete attempts before semantic completion, so
+            # the final Wake metadata only describes the last attempt. Count every
+            # durable provider response for modern Wakes; fall back to lifecycle
+            # metadata only for legacy Wakes that predate the ledger.
             wake_records = records_by_wake.get(wake.object_id, ())
-            if len(wake_records) < rounds:
+            if wake_records:
+                used_model_calls += len(wake_records)
+            else:
+                used_model_calls += rounds
                 token_usage_available = False
 
         return (
             used_wakes,
+            used_model_calls,
+            used_tokens,
+            token_usage_available,
+        )
+
+    def _queued_runtime_incomplete_usage(
+        self,
+        wake: Wake,
+        *,
+        window_start: datetime,
+        window_end: datetime,
+    ) -> tuple[int, int, int, bool]:
+        if (
+            wake.wake_state is not WakeState.QUEUED
+            or not bool(wake.metadata.get("runtime_incomplete"))
+        ):
+            return 0, 0, 0, True
+        raw_at = (
+            wake.metadata.get("runtime_incomplete_at")
+            or wake.metadata.get("runtime_first_started_at")
+            or wake.recorded_at
+        )
+        attempt_at = self._parse_time(raw_at, "runtime_incomplete_at")
+        if attempt_at is None or not (window_start <= attempt_at < window_end):
+            return 0, 0, 0, True
+
+        records = self.metering_ledger.list_model_calls(
+            subject_id=self.subject_id,
+            start_at=window_start,
+            end_at=window_end,
+            execution_classes=("background", "periodic_review"),
+            wake_id=wake.object_id,
+        )
+        used_model_calls = len(records)
+        used_tokens = sum(
+            int(record.total_tokens or 0)
+            for record in records
+            if record.usage_complete and record.total_tokens is not None
+        )
+        token_usage_available = bool(records) and all(
+            record.usage_complete and record.total_tokens is not None
+            for record in records
+        )
+        if not records:
+            raw_rounds = wake.metadata.get("runtime_incomplete_model_rounds")
+            if isinstance(raw_rounds, int) and not isinstance(raw_rounds, bool):
+                used_model_calls = max(0, raw_rounds)
+            token_usage_available = False
+        return (
+            1 if used_model_calls > 0 else 0,
             used_model_calls,
             used_tokens,
             token_usage_available,
@@ -423,6 +513,22 @@ class BackgroundBudgetGate:
             window_start=window_start,
             window_end=window_end,
             exclude_wake_id=wake.object_id,
+        )
+        (
+            resumed_wakes,
+            resumed_model_calls,
+            resumed_tokens,
+            resumed_token_usage_available,
+        ) = self._queued_runtime_incomplete_usage(
+            wake,
+            window_start=window_start,
+            window_end=window_end,
+        )
+        used_wakes += resumed_wakes
+        used_model_calls += resumed_model_calls
+        used_tokens += resumed_tokens
+        token_usage_available = (
+            token_usage_available and resumed_token_usage_available
         )
 
         wake_caps = [item.max_wakes for item in policies if item.max_wakes is not None]

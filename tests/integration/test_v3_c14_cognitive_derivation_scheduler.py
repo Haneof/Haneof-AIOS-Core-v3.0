@@ -25,6 +25,7 @@ from aios_core.summaries import (
     SummaryScale,
 )
 from aios_core.wake import AttentionRouter
+from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 
 
 UTC = timezone.utc
@@ -594,3 +595,98 @@ def test_multiscale_scheduler_auto_schedules_new_summary_and_unchanged_rerun_add
     assert second.commits == ()
     assert second.skipped_unchanged
     assert len(_derivation_wakes(store)) == 1
+
+
+def test_loop_repro_reconcile_builds_support_dependency_graph_once_per_pass(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    _db, store, index = _world(tmp_path)
+    source = _observation(store, "obs_c14_loop_scale")
+    for offset in range(200):
+        _summary(
+            store,
+            f"sum_c14_loop_scale_{offset}",
+            (source,),
+            dimension=f"dim:scale:{offset}",
+            at=NOW + timedelta(minutes=20, seconds=offset),
+        )
+
+    scheduler = CognitiveDerivationScheduler(store=store, index=index)
+    original = scheduler._support_dependencies
+    scans = {"count": 0}
+
+    def counted_support_dependencies():
+        scans["count"] += 1
+        return original()
+
+    monkeypatch.setattr(
+        scheduler,
+        "_support_dependencies",
+        counted_support_dependencies,
+    )
+    result = scheduler.reconcile()
+
+    assert result.examined == 200
+    assert len(result.scheduled) == 200
+    assert scans["count"] == 1
+
+
+def test_loop_ai_claim_only_summary_has_no_immediate_derivation_but_mixed_new_reality_does(
+    tmp_path,
+) -> None:
+    _db, store, index = _world(tmp_path)
+    old_leaf = _observation(
+        store,
+        "obs_loop_old_claim_ground",
+        source_class=SourceClass.USER,
+        dimension="dim:loop:self_excitation",
+    )
+    old_claim = CognitionWritebackService(
+        store=store,
+        index=index,
+    ).commit_claim(
+        ClaimWriteRequest(
+            content="old AI cognition grounded in an earlier user fact",
+            evidence_refs=(old_leaf,),
+            confidence=0.8,
+            dimension="dim:ai_cognition",
+        ),
+        learned_at=NOW + timedelta(minutes=2),
+    )
+    old_claim_ref = ObjectRef(object_id=old_claim.claim_id, revision=1)
+    ai_only_summary = _summary(
+        store,
+        "sum_loop_ai_claim_only",
+        (old_claim_ref,),
+        dimension="dim:ai_cognition",
+        at=NOW + timedelta(minutes=10),
+    )
+    scheduler = CognitiveDerivationScheduler(store=store, index=index)
+
+    ai_only = scheduler.ensure(ai_only_summary)
+    assert ai_only.lineage.classification is DerivedLineageClass.MIXED
+    assert ai_only.lineage.grounding_leaf_refs == ()
+    assert ai_only.eligible is False
+    assert ai_only.wake is None
+    assert _derivation_wakes(store) == []
+
+    new_leaf = _observation(
+        store,
+        "obs_loop_new_reality_for_mixed",
+        source_class=SourceClass.USER,
+        dimension="dim:loop:self_excitation",
+        at=NOW + timedelta(minutes=11),
+    )
+    mixed_summary = _summary(
+        store,
+        "sum_loop_claim_plus_new_reality",
+        (old_claim_ref, new_leaf),
+        dimension="dim:loop:self_excitation",
+        at=NOW + timedelta(minutes=20),
+    )
+    mixed = scheduler.ensure(mixed_summary)
+    assert mixed.lineage.classification is DerivedLineageClass.MIXED
+    assert new_leaf in mixed.lineage.grounding_leaf_refs
+    assert mixed.eligible is True
+    assert mixed.wake is not None
