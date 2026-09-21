@@ -1,10 +1,11 @@
 {
   "task_id": "C14-RES-A-001",
   "evaluated_main_sha": "87e52bceea4ee94b823200388a4f79b1b94eb1f3",
-  "branch": "c14/resident-a-sol-20260921-2036",
+  "branch": "c14/resident-a-sol-run-20260921",
   "subject_id": "user_1",
   "model_identity": "GPT-5.6 Sol",
   "provider_identity": "OpenAI",
   "window_identifier": "unknown/not exposed",
-  "contamination_status": "clean_at_start"
+  "contamination_status": "clean_at_start",
+  "predecessor_setup_branch": "c14/resident-a-sol-20260921-2036"
 }
