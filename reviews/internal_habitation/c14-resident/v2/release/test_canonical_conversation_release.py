@@ -356,6 +356,7 @@ class CanonicalConversationReleaseTests(unittest.TestCase):
         subject_id: str = "user_1",
         text: str | None = None,
         occurred_at: datetime | None = None,
+        created_by: str = "conversation_ingest:user",
     ) -> str:
         when = occurred_at or datetime.fromisoformat(event["occurred_at"])
         obs = Observation(
@@ -364,7 +365,7 @@ class CanonicalConversationReleaseTests(unittest.TestCase):
             occurred=TemporalExtent.point(when),
             learned_at=when,
             recorded_at=when,
-            created_by=f"bfix-test:{role}",
+            created_by=created_by,
             source_kind="user_ai_interaction",
             modality="text",
             value=event["resident_visible_payload"] if text is None else text,
