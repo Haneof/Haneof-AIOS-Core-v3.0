@@ -1,0 +1,6 @@
+{
+  "f02f8ec7276cde1fdf13476b6cc969e134a0b27b0fe023106934fe653b403f24": {
+    "kind": "summary",
+    "summary": "2027-01-22，purchase_order 维度两条记录：11:00 North Mill 对 180 kg bread flour 报价 1.41 USD/kg（status=quoted）；11:20 同规格订单状态变为 confirmed，单价 1.41 USD/kg，预计 2027-01-25 04:30 到货。两条只描述本次报价与本次确认订单的单价、数量与状态，本次记录本身不含历史价格，因此不据此推断价格走势。"
+  }
+}
