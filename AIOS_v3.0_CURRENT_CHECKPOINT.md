@@ -13,9 +13,37 @@
 
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
-当前审计冻结 main：`e9862103a753be026edf1745c6a5d07fa56c0cf4`。
+当前 T35 功能合并锚点：`141dc177be895f9894a05227cbb132207ebf784d`。  
+T35 task-board 收口提交：`4f8d291b00f885542793a0c7f6139da5420ef78b`。
 
-最近完成任务：`T28-REC-001` — **DONE / ASSISTANT RAW PROACTIVE MEMORY BOUNDARY CLOSED**。
+最近完成任务：`T35-IMPL-001` — **DONE / NON-ACTION TASK COMPLETION EVIDENCE CLOSED**。
+
+- Started from main：`eeb982162e0e553a34039134bde3595abd2f3607`
+- Work branch：`task/t35-impl-001-completion-evidence-20260921`
+- Candidate：`07617df8ab87550289c1498cf3df387626d55e40`
+- PR：#55
+- Squash merge：`141dc177be895f9894a05227cbb132207ebf784d`
+- 实现依据：`governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md`
+- Completion contract：复用现有 `Task.completion_condition`，显式支持 `world_evidence / action_outcome / mixed`；不新增第二套 Task/Outcome，不从自然语言标题/原因推断执行类型。
+- Legacy fail-closed：模糊旧 Task 继续按 `ACTION_OUTCOME`；仅 legacy `VERIFICATION / OBSERVATION` 在无 Action lineage 时采用窄机械 `WORLD_EVIDENCE` 兼容。
+- WORLD_EVIDENCE：终态必须由 pinned、current、same-subject、durable evidence 支撑；assistant raw dialogue、Task/Goal 自引用、unsupported Claim、stale/retracted evidence、synthetic Outcome、OperationExperience 原始闭环均不能充当完成真值。
+- ACTION_OUTCOME：外部执行仍保持 `Task -> Action -> authorization -> execution -> Outcome -> Task`；Outcome 必须来自真实 platform-result 路径，绑定该 Task 的已授权终态 Action 与 durable `outcome_reports_action` 依赖。
+- MIXED：World evidence 与 Action-linked Outcome 两侧都必须满足。
+- COMPLETED / FAILED：共享同一真实 evidence 边界；无证据、timeout、模型自述不能把 Task 随意推成 FAILED。
+- Terminal provenance：Task 新 revision 记录 completion mode、精确 evidence/execution/outcome refs，并生成 typed Dependency edges；历史 revision 不改写。
+- Retry/restart：相同 terminal request 在 Task revision 已前进后可幂等返回，不增加 `world_revision`；SQLite restart 后同样成立。
+- Resident runtime：`create_task` capability 已暴露结构化 `completion_condition`；`transition_task` 不再错误宣称所有 COMPLETED/FAILED 都必须有 Outcome。
+- T34 保持：parent Task cancellation、PROPOSED Action forward invalidation、stale Action rejection、restart retry、cancel/authorize race fail-closed 全部仍由原 P12 回归覆盖并 GREEN。
+- Candidate required Gates：p12-execution-gate `35569370381 / SUCCESS`（76 passed）；p12-execution-world `35569370483 / SUCCESS`；p15-periodic-review `35569370484 / SUCCESS`；fused-turn-runtime `35569370409 / SUCCESS`；c09-wake-dispatch `35569370452 / SUCCESS`；p16-convergence-gate `35569370331 / SUCCESS`（330 passed）。
+- P16 habitation：candidate-derived gate-only run `35569485261 / SUCCESS`（92 passed）；运行分支只加临时文档触发标记，代码 parent 为 candidate `07617df8...`，完成后已把 gate 分支 reset 回 candidate，不向 main 带入 P16 语义改动。
+- Merge-result Gates：p12-execution-world `35569585991 / SUCCESS`；p12-execution-gate `35569586060 / SUCCESS`；p15-periodic-review `35569585969 / SUCCESS`；fused-turn-runtime `35569586033 / SUCCESS`；c09-wake-dispatch `35569586006 / SUCCESS`；p16-convergence-gate `35569586008 / SUCCESS`。
+- Affected files：`src/aios_core/execution/service.py`；`src/aios_core/runtime/turn_runtime.py`；`tests/integration/test_v3_execution_world.py`。
+- Deferred：本窗口未执行 `P16-TRIAGE-001`、`P16-CAMPAIGN-001` 或 Resident habitation。
+- 当前第一个 READY：`P16-TRIAGE-001`；必须由新窗口执行，本 T35 窗口在 checkpoint 写回后停止。
+
+以下 T28/T34/T35-RULE/AUDIT 等段落保留为历史完成快照，不再代表当前 READY 状态。
+
+历史完成任务快照：`T28-REC-001` — **DONE / ASSISTANT RAW PROACTIVE MEMORY BOUNDARY CLOSED**。
 
 - Started from main：`f8a2f8e4cf53de579bd0bc69cfd85421d109d65b`
 - Final functional-base revalidation：`48f5e29ad564ef7c1687b5a0d81cede1452e82e8`（已包含 T34-EXEC-001 Core 修复；其后至 merge 前主线仅有 T34 governance/checkpoint 文本更新）
