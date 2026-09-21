@@ -1844,7 +1844,16 @@ def test_loop_background_budget_preflight_defer_then_next_window_recovers(
     assert deferred.wake.state == "queued"
     assert calls == [WakeSource.WATCH_MATCH.value]
 
-    recovered = runtime.run_wake(
+    db = tmp_path / "world.db"
+    reopened = SQLiteWorldStore(db)
+    reopened_index = WorldSearchIndex(db, store=reopened)
+    reopened_index.rebuild()
+    runtime_after_restart = FusedTurnRuntime(
+        store=reopened,
+        index=reopened_index,
+        model_handler=model,
+    )
+    recovered = runtime_after_restart.run_wake(
         wake_ref=ObjectRef(
             object_id=deferred.wake.wake_id,
             revision=deferred.wake.revision,
