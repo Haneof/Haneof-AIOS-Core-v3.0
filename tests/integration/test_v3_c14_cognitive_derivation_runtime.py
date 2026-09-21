@@ -2340,6 +2340,7 @@ def test_loop_runtime_incomplete_usage_counts_against_other_background_wakes(
 
     def model(snapshot):
         model_calls["count"] += 1
+        request_id = f"c14-loop-global-budget-{model_calls['count']}"
         return ModelDirective(
             capability_calls=(
                 CapabilityCall(
@@ -2350,7 +2351,19 @@ def test_loop_runtime_incomplete_usage_counts_against_other_background_wakes(
                     },
                 ),
             ),
-            **_usage(snapshot),
+            usage=ModelUsage(
+                total_tokens=12,
+                input_tokens=8,
+                output_tokens=4,
+                provider="test-provider",
+                model="resident-test-model",
+                request_id=request_id,
+            ),
+            provenance=ModelCallProvenance(
+                provider="test-provider",
+                model="resident-test-model",
+                request_id=request_id,
+            ),
         )
 
     runtime = FusedTurnRuntime(
