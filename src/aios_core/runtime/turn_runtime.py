@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 from typing import Any, Callable, Mapping, Sequence
 
 from aios_core.ai_world import (
+    AI_SELF_SUBJECT_ID,
     AIWorldClaimRequest,
     AIWorldCognitionService,
     AIWorldDomain,
@@ -65,7 +66,14 @@ from aios_core.review import (
     ReviewWakeReceipt,
 )
 from aios_core.storage.sqlite_store import SQLiteWorldStore
-from aios_core.summaries import DimensionSummaryInput, MultiScaleSummaryScheduler, SummaryScale, SummaryScheduleResult
+from aios_core.summaries import (
+    CognitiveDerivationScheduler,
+    DerivedLineageClass,
+    DimensionSummaryInput,
+    MultiScaleSummaryScheduler,
+    SummaryScale,
+    SummaryScheduleResult,
+)
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import TemporalExtent
@@ -252,6 +260,13 @@ class FusedTurnRuntime:
             index=index,
             subject_id=self.subject_id,
         )
+        self.cognitive_derivation = CognitiveDerivationScheduler(
+            store=store,
+            index=index,
+            wake_bus=self.wake_bus,
+            subject_id=self.subject_id,
+            allowed_subject_ids=(self.subject_id, AI_SELF_SUBJECT_ID),
+        )
         self.attention_watches = AttentionWatchService(
             store=store,
             index=index,
@@ -280,6 +295,7 @@ class FusedTurnRuntime:
         self._active_meter_time: datetime | None = None
         self._active_session_id: str | None = None
         self._active_wake_id: str | None = None
+        self._active_wake_source: WakeSource | None = None
         self._active_review_request: PeriodicReviewRequest | None = None
 
         registry = CapabilityRegistry()
@@ -2154,6 +2170,23 @@ class FusedTurnRuntime:
         }
 
     def _authorize_side_effect(self, spec, call, snapshot) -> bool:
+        # C14 derivation may use the normal catalog, but cognition-policy and
+        # experience writers are not alternate Claim channels for this background
+        # inspection. Claim create/revise/retract stay authorized and pass the shared
+        # leaf-grounding closure below.
+        if (
+            snapshot.wake_reason == WakeSource.COGNITIVE_DERIVATION.value
+            and spec.name
+            in {
+                "commit_operation_experience",
+                "record_communication_experience",
+                "propose_cognitive_policy",
+                "update_cognitive_policy",
+                "rollback_cognitive_policy",
+            }
+        ):
+            return False
+
         # Internal cognition writeback is allowed because the handler itself enforces
         # pinned evidence and writes only revisable cognition. External actions stay
         # denied until a separate capability-specific authorization layer exists.
@@ -2214,6 +2247,38 @@ class FusedTurnRuntime:
         )
         return asdict(receipt)
 
+    def _validate_c14_cognition_grounding(
+        self,
+        refs: Sequence[ObjectRef],
+        *,
+        operation: str,
+    ) -> None:
+        """Enforce C14 support closure at the Resident capability boundary.
+
+        Ordinary user turns and Periodic Review keep their existing semantics. During
+        COGNITIVE_DERIVATION, every durable Claim create/revise/retract route passes
+        the same mechanical resolver used by the C14 scheduler. No Claim prose,
+        keywords, occurrence counts, confidence score or expected answer participates.
+        """
+
+        if self._active_wake_source is not WakeSource.COGNITIVE_DERIVATION:
+            return
+        lineage = self.cognitive_derivation.derive_lineage_for_refs(tuple(refs))
+        if (
+            lineage.classification
+            not in {DerivedLineageClass.REALITY, DerivedLineageClass.MIXED}
+            or lineage.unresolved_refs
+            or lineage.issues
+            or not lineage.grounding_leaf_refs
+        ):
+            raise ValueError(
+                "C14 leaf-grounded evidence closure rejected "
+                f"{operation}: classification={lineage.classification.value}; "
+                f"grounding_leaf_count={len(lineage.grounding_leaf_refs)}; "
+                f"unresolved_count={len(lineage.unresolved_refs)}; "
+                f"issues={','.join(lineage.issues) or 'none'}"
+            )
+
     def _commit_ai_world_claim(
         self,
         domain: str,
@@ -2229,11 +2294,16 @@ class FusedTurnRuntime:
             raise RuntimeError(
                 "commit_ai_world_claim is only available during an active AIOS turn"
             )
+        refs = self._coerce_refs(evidence_refs)
+        self._validate_c14_cognition_grounding(
+            refs,
+            operation="commit_ai_world_claim",
+        )
         receipt = self.ai_world.commit(
             AIWorldClaimRequest(
                 domain=AIWorldDomain(domain),
                 statement=statement,
-                evidence_refs=self._coerce_refs(evidence_refs),
+                evidence_refs=refs,
                 confidence=float(confidence),
                 knowledge_state=knowledge_state,
                 claim_type=claim_type,
@@ -2266,6 +2336,10 @@ class FusedTurnRuntime:
                 revision=int(item["revision"]),
             )
             for item in evidence_refs
+        )
+        self._validate_c14_cognition_grounding(
+            refs,
+            operation="commit_claim",
         )
         receipt = self.writeback.commit_claim(
             ClaimWriteRequest(
@@ -2302,6 +2376,11 @@ class FusedTurnRuntime:
     ) -> dict[str, Any]:
         if self._active_turn_time is None:
             raise RuntimeError("revise_claim is only available during an active AIOS turn")
+        refs = self._coerce_refs(evidence_refs)
+        self._validate_c14_cognition_grounding(
+            refs,
+            operation="revise_claim",
+        )
         receipt = self.revision.apply(
             ClaimRevisionRequest(
                 target_ref=ObjectRef(
@@ -2310,7 +2389,7 @@ class FusedTurnRuntime:
                 ),
                 mode="revise",
                 reason=reason,
-                evidence_refs=self._coerce_refs(evidence_refs),
+                evidence_refs=refs,
                 replacement_content=replacement_content,
                 confidence=confidence,
             ),
@@ -2326,6 +2405,11 @@ class FusedTurnRuntime:
     ) -> dict[str, Any]:
         if self._active_turn_time is None:
             raise RuntimeError("retract_claim is only available during an active AIOS turn")
+        refs = self._coerce_refs(evidence_refs)
+        self._validate_c14_cognition_grounding(
+            refs,
+            operation="retract_claim",
+        )
         receipt = self.revision.apply(
             ClaimRevisionRequest(
                 target_ref=ObjectRef(
@@ -2334,7 +2418,7 @@ class FusedTurnRuntime:
                 ),
                 mode="retract",
                 reason=reason,
-                evidence_refs=self._coerce_refs(evidence_refs),
+                evidence_refs=refs,
             ),
             changed_at=self._active_turn_time,
         )
@@ -2790,6 +2874,7 @@ class FusedTurnRuntime:
             WakeSource.PERIODIC_REVIEW,
             WakeSource.USER_INTERACTION,
             WakeSource.ATTENTION_BUNDLE,
+            WakeSource.COGNITIVE_DERIVATION,
         }
         if (
             initial_wake.wake_state.value in {"new", "queued"}
@@ -2933,12 +3018,92 @@ class FusedTurnRuntime:
                 else None
             ),
         }
+        task_context: dict[str, Any] = {
+            "wake": wake_context,
+            "cognitive_policy_context": self._cognitive_policy_context(),
+        }
         wake_input = (
             "System Wake. Start from the supplied Wake Reason and pinned evidence. "
             "Decide what, if anything, it means now. Search or inspect more world "
             "state when needed. You may respond, act through authorized capabilities, "
             "or remain silent. The trigger itself is not a semantic conclusion."
         )
+
+        if running.wake_source is WakeSource.COGNITIVE_DERIVATION:
+            raw_summary_ref = running.metadata.get("summary_ref")
+            if not isinstance(raw_summary_ref, Mapping):
+                raise ValueError(
+                    "COGNITIVE_DERIVATION Wake requires exact summary_ref metadata"
+                )
+            summary_ref = ObjectRef.model_validate(raw_summary_ref)
+            if summary_ref.revision is None:
+                raise ValueError(
+                    "COGNITIVE_DERIVATION summary_ref must pin an exact revision"
+                )
+            if not any(
+                item.object_id == summary_ref.object_id
+                and item.revision == summary_ref.revision
+                for item in running.evidence_refs
+            ):
+                raise ValueError(
+                    "COGNITIVE_DERIVATION summary_ref must be pinned by the Wake"
+                )
+            summary_payload = self.store.get_payload(
+                summary_ref.object_id,
+                revision=summary_ref.revision,
+            )
+            if summary_payload.get("object_type") != ObjectType.SUMMARY.value:
+                raise ValueError(
+                    "COGNITIVE_DERIVATION summary_ref must point to a Summary"
+                )
+            runtime_lineage = self.cognitive_derivation.derive_lineage(summary_ref)
+            scheduler_lineage = running.metadata.get("derived_lineage")
+            if not isinstance(scheduler_lineage, Mapping):
+                scheduler_lineage = {}
+            summary_metadata = summary_payload.get("metadata")
+            if not isinstance(summary_metadata, Mapping):
+                summary_metadata = {}
+            summary_coverage = summary_payload.get("coverage")
+            if not isinstance(summary_coverage, Mapping):
+                summary_coverage = {}
+            summary_dimension = (
+                summary_metadata.get("dimension")
+                or summary_coverage.get("dimension")
+            )
+
+            task_context["cognitive_derivation"] = {
+                "wake_ref": running_ref.model_dump(mode="json"),
+                "summary_ref": summary_ref.model_dump(mode="json"),
+                "summary_revision": summary_ref.revision,
+                "summary_dimension": summary_dimension,
+                "granularity": summary_payload.get("granularity"),
+                "summary_window": summary_payload.get("summary_time"),
+                "scheduler_derived_lineage": dict(scheduler_lineage),
+                "runtime_derived_lineage": runtime_lineage.audit_payload(),
+                "current_ai_world": self.ai_world.snapshot(per_domain=3),
+                "capability_names": [
+                    item["name"] for item in self.registry.catalog()
+                ],
+                "step0": gate_result.model_dump(mode="json"),
+                "budget": budget_decision.context_payload(),
+                "summary_is_temporal_navigation_anchor": True,
+                "summary_is_semantic_conclusion": False,
+                "summary_is_sufficient_evidence_by_itself": False,
+                "silence_is_valid_success": True,
+            }
+            wake_input = (
+                "Cognitive derivation wake. The exact pinned Summary is only a "
+                "temporal/navigation anchor: it is not a Claim, a semantic conclusion, "
+                "or sufficient evidence by itself. Inspect its real leaf evidence, "
+                "existing cognition, counter-evidence, and any cross-dimensional world "
+                "state you judge relevant. Normal search, inspect, timeline, compare, "
+                "recall, ALL_DIMENSIONS and Outcome inspection remain available. Only "
+                "form, revise, or retract durable cognition when pinned support closes "
+                "to qualifying non-Summary reality/case evidence. If evidence is "
+                "insufficient or understanding should not change, silence is a correct "
+                "successful result. The Wake contains no expected Claim."
+            )
+
         context = self.context_controller.assemble(
             user_input=wake_input,
             current_topic=None,
@@ -2947,10 +3112,7 @@ class FusedTurnRuntime:
             conversation_summaries=(),
             ai_identity=continuity_context,
             world_map=self._world_map_context(now),
-            task_context={
-                "wake": wake_context,
-                "cognitive_policy_context": self._cognitive_policy_context(),
-            },
+            task_context=task_context,
             capability_catalog=self.registry.catalog(),
             token_budget=token_budget,
         )
@@ -2959,6 +3121,7 @@ class FusedTurnRuntime:
         self._active_meter_time = now
         self._active_session_id = None
         self._active_wake_id = running.object_id
+        self._active_wake_source = running.wake_source
         self._active_review_request = None
         try:
             runtime_result = self.cognitive_runtime.run_turn(
@@ -2972,8 +3135,13 @@ class FusedTurnRuntime:
             self._active_meter_time = None
             self._active_session_id = None
             self._active_wake_id = None
+            self._active_wake_source = None
             self._active_review_request = None
 
+        delivery_allowed = (
+            gate_result.delivery_allowed
+            and running.wake_source is not WakeSource.COGNITIVE_DERIVATION
+        )
         completed = self.wake_bus.complete(
             running.object_id,
             completed_at=now,
@@ -2982,12 +3150,12 @@ class FusedTurnRuntime:
             capability_names=tuple(
                 item.name for item in runtime_result.capability_history
             ),
-            delivery_allowed=gate_result.delivery_allowed,
+            delivery_allowed=delivery_allowed,
             step0_state=gate_result.state,
         )
         delivery_response = (
             runtime_result.response
-            if gate_result.delivery_allowed
+            if delivery_allowed
             else None
         )
         return WakeDispatchRunResult(
@@ -3002,7 +3170,7 @@ class FusedTurnRuntime:
             delivery_response=delivery_response,
             delivery_suppressed=(
                 runtime_result.response is not None
-                and not gate_result.delivery_allowed
+                and not delivery_allowed
             ),
         )
 
