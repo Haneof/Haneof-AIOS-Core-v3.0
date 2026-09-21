@@ -1402,7 +1402,10 @@ def test_loop_c14_does_not_mix_with_default_background_bundle(tmp_path):
         dimension="dim:loop:homogeneous",
     )
     c14 = _schedule(store, index, summary_ref)
-    ordinary = c14.wake_bus.emit(
+    ordinary = CognitiveDerivationScheduler(
+        store=store,
+        index=index,
+    ).wake_bus.emit(
         WakeSignalRequest(
             wake_source=WakeSource.WATCH_MATCH,
             rule_id="test.loop.ordinary",
@@ -1795,7 +1798,7 @@ def test_loop_background_budget_preflight_defer_then_next_window_recovers(
 
     def model(snapshot):
         calls.append(snapshot.wake_reason)
-        return ModelDirective(silence=True, **_usage(snapshot))
+        return ModelDirective(silence=True)
 
     runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
     generic = runtime.wake_bus.emit(
@@ -1982,7 +1985,7 @@ def test_loop_periodic_review_and_c14_coexist_without_consuming_each_other(
 
     def model(snapshot):
         reasons.append(snapshot.wake_reason)
-        return ModelDirective(silence=True, **_usage(snapshot))
+        return ModelDirective(silence=True)
 
     runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
     review_request = runtime.periodic_review.prepare_due_review(
@@ -2084,14 +2087,17 @@ def test_loop_new_runtime_recovers_exact_durable_ai_world_cognition(tmp_path):
         domains=[AIWorldDomain.USER_UNDERSTANDING]
     )
     exact = next(item for item in current_b if item.statement == marker)
-    assert exact.claim_ref == durable.claim_ref
+    assert (exact.object_id, exact.revision) == (
+        durable.object_id,
+        durable.revision,
+    )
 
     inspected = runtime_b.registry.invoke(
         CapabilityCall(
             name="inspect_world_object",
             arguments={
-                "object_id": exact.claim_ref.object_id,
-                "revision": exact.claim_ref.revision,
+                "object_id": exact.object_id,
+                "revision": exact.revision,
             },
         )
     )
@@ -2105,4 +2111,4 @@ def test_loop_new_runtime_recovers_exact_durable_ai_world_cognition(tmp_path):
         )
     )
     assert searched.ok is True
-    assert exact.claim_ref.object_id in str(searched.data)
+    assert exact.object_id in str(searched.data)
