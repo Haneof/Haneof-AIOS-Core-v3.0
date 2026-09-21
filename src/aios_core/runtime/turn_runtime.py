@@ -2764,19 +2764,27 @@ class FusedTurnRuntime:
 
         gate_result = self.wake_bus.evaluate_step0(wake, effective_step0)
         if not gate_result.model_allowed:
-            terminal = (
-                self.wake_bus.suppress(
-                    wake.object_id,
-                    suppressed_at=now,
-                    step0=gate_result,
+            if wake.wake_state.value == "running" and not budget_decision.hard_deny:
+                terminal = WakeStateReceipt(
+                    wake_id=wake.object_id,
+                    revision=wake.revision,
+                    state=wake.wake_state.value,
+                    world_revision=int(self.store.current_world_revision()),
                 )
-                if budget_decision.hard_deny
-                else self.wake_bus.defer(
-                    wake.object_id,
-                    deferred_at=now,
-                    step0=gate_result,
+            else:
+                terminal = (
+                    self.wake_bus.suppress(
+                        wake.object_id,
+                        suppressed_at=now,
+                        step0=gate_result,
+                    )
+                    if budget_decision.hard_deny
+                    else self.wake_bus.defer(
+                        wake.object_id,
+                        deferred_at=now,
+                        step0=gate_result,
+                    )
                 )
-            )
             return WakeDispatchRunResult(
                 wake_ref=ObjectRef(
                     object_id=terminal.wake_id,
@@ -2796,7 +2804,6 @@ class FusedTurnRuntime:
             expected_world_revision=(
                 budget_decision.world_revision
                 if budget_decision.requires_reservation
-                and wake.wake_state.value in {"new", "queued"}
                 else None
             ),
             metadata_update=budget_decision.reservation_metadata(),
