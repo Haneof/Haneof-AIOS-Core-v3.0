@@ -1,0 +1,33 @@
+{
+ "checkpoint_id": "segment_003-s0000-advance#cp15",
+ "checkpoint_index": 15,
+ "input_fingerprint": "1e2e14779f14a72358e885587be9f1bde7faac8741350a068755462e59ad0e85",
+ "kind": "dimension_summary",
+ "model_id": "arena-agent-mode-resident/unknown-provider-model",
+ "payload": {
+  "dimension": "dim:craft",
+  "granularity": "month",
+  "source_world_revision": 113,
+  "sources": [
+   {
+    "metadata": {
+     "dimension": "dim:craft",
+     "summary_kind": "single_dimension_temporal"
+    },
+    "object_id": "sum_936c2dde4e4d26c4fba3d772",
+    "object_type": "summary",
+    "occurred_at": "2026-09-28T00:00:00Z",
+    "revision": 1,
+    "text": "dim:craft 周窗 2026-09-28→2026-10-04（本地 10-01→10-04）。本周是族谱项目的立项周，实质进展集中在诊断，而非修复动作。\n\n【对象】《周氏族谱》，民国十九年（1930）无锡刻本。委托方周慕青（78），书非其本人原有，系其兄长身后遗物、由她保管；她在初次评估中反复谈及兄长。这一点决定了后续所有取舍的沟通方式：技术判断必须翻译成她能接受的话，不能只讲纸和浆。\n\n【已确认的损伤】1) 后半本水渍、书页粘连；2) 第七页十余处不规则褐黑斑，直径 2-8 毫米，边缘略晕，同页上半部一条横向水渍线，纤维起翘，右下角约 1 厘米缺损；3) 阿桐浆糊调稀导致一次上午托裱返工（Event 已 resolved）。\n\n【本周唯一实质推进：第七页黑斑的性质】\n- 10-02 用户凭肉眼判断为霉，并当场拍照；\n- 我当时的处置是阻止干刷（活霉一刷孢子扬开）、要求镊子加棉签取样单独装袋，并要求把那本单独隔离——依据是当天工作室湿度冲到 64 %RH，正是霉菌活动区间；\n- 10-03 取样送苏州文物检测中心，答复五个工作日，即约 10-09／10-10 出结果；支出 800 元已付。\n- 该判断目前登记为 hypothesis，置信 0.5，不是事实。**在结果回来之前，除霉方案（含双氧水一类漂白处理）一律不落地。**\n\n【本周未做的事，以及为什么】没有开始任何一页的实际修复。原因不是工期，而是第七页的定性未定：霉与铁锈的处理路径相反，先动手可能把不可逆的损伤做进纸里。\n\n【风险登记】1) 房东口头预告明年可能卖房，若搬迁则恒温恒湿改造是沉没成本；2) 阿桐冲突虽自行消退，但用户始终没把话说开，返工的真实原因（浆糊配比）没有被复盘，同类失误缺乏防线；3) 检测若延后，族谱整体 12 个月工期的排程基准要重算。"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-09-30T23:59:59.999999Z",
+  "window_start": "2026-09-01T00:00:00Z"
+ },
+ "run_id": "hab_arena_01a0c1e1_moyin_v1",
+ "segment_id": "segment_003",
+ "simulated_at": "2026-10-05T01:10:00+00:00",
+ "step_key": "segment_003-s0000-advance",
+ "world_revision_before": 113
+}

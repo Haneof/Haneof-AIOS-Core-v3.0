@@ -1,0 +1,14 @@
+{"event_id": "s3-0001", "occurred_at": "2026-10-05T09:10:00+08:00", "channel": "conversation", "payload": "老许回了 说租约的事年底再说 现在急什么 又说卖房是他自己瞎想 让我别听风就是雨", "metadata": {"session": "wx_studio"}}
+{"event_id": "s3-0002", "occurred_at": "2026-10-05T15:00:00+08:00", "channel": "photo_description", "payload": "《周氏族谱》第三册第十七叶：天头处三处虫蛀孔，直径1-3毫米，蛀道斜穿界栏；纸质已脆，边缘轻微掉渣。", "metadata": {"source": "workbench_camera"}}
+{"event_id": "s3-0003", "occurred_at": "2026-10-05T21:45:00+08:00", "channel": "conversation", "payload": "周慕青那边要个进度 你说我怎么写 她那种人 写多了她嫌烦 写少了她睡不着", "metadata": {"session": "wx_studio"}}
+{"event_id": "s3-0004", "occurred_at": "2026-10-06T11:00:00+08:00", "channel": "group_message", "payload": "【苏州图书馆】2027年度古籍修复外包项目招标公告已挂网，预算 380 万，投标截止 11 月 20 日。", "metadata": {"source": "wx_group_guild"}}
+{"event_id": "s3-0005", "occurred_at": "2026-10-06T22:15:00+08:00", "channel": "conversation", "payload": "那个事你帮我想想 我一个工作室 够得着吗 上次那批人我见过 都是有单位盖章的", "metadata": {"session": "wx_studio"}}
+{"event_id": "s3-0006", "occurred_at": "2026-10-07T10:30:00+08:00", "channel": "call_log", "payload": {"peer": "苏州文物检测中心", "direction": "inbound", "duration_sec": 96, "note": "样品检测按计划进行，报告 10 月 10 日出，届时微信发。"}, "metadata": {"source": "phone"}}
+{"event_id": "s3-0007", "occurred_at": "2026-10-07T20:05:00+08:00", "channel": "care_note", "payload": "妹妹说今天下午爸问她「你是谁」，愣了大概半分钟又叫出名字了。晚上吃饭正常，认得出菜。妹妹说可能是没睡好。", "metadata": {"source": "wx_family_note"}}
+{"event_id": "s3-0008", "occurred_at": "2026-10-08T15:20:00+08:00", "channel": "photo_description", "payload": "《周氏族谱》第一册第七页黑斑，侧光 30 度重拍：斑体边缘锐利不发晕，沿纤维走向呈细密条状分布，中心颜色深于边缘，表面无绒毛状隆起。", "metadata": {"source": "workbench_camera"}}
+{"event_id": "s3-0009", "occurred_at": "2026-10-08T21:55:00+08:00", "channel": "conversation", "payload": "今天侧光重拍了那页 看着不太像霉 霉不该这么齐 但我不确定 等结果吧", "metadata": {"session": "wx_studio"}}
+{"event_id": "s3-0010", "occurred_at": "2026-10-09T10:00:00+08:00", "channel": "bank", "payload": {"peer": "周慕青", "direction": "inbound", "amount": 15000, "currency": "CNY", "note": "族谱修复二期款"}, "metadata": {"source": "bank"}}
+{"event_id": "s3-0011", "occurred_at": "2026-10-09T23:35:00+08:00", "channel": "conversation", "payload": "钱到了 那个先放着 明天再说 我头疼", "metadata": {"session": "wx_studio"}}
+{"event_id": "s3-0012", "occurred_at": "2026-10-10T20:40:00+08:00", "channel": "lab_report", "payload": "苏州文物检测中心报告 SZWJ-2026-1004：样品《周氏族谱》第一册第七页斑迹。显微镜检未见菌丝体及孢子；能谱检出 Fe 元素显著富集，与纸张纤维走向一致；pH 局部 4.6。结论：铁质污染（外源性铁接触性锈斑），非微生物霉斑。建议避免含铁工具接触，不宜使用漂白类处理。", "metadata": {"source": "lab"}}
+{"event_id": "s3-0013", "occurred_at": "2026-10-11T12:00:00+08:00", "channel": "conversation", "payload": "结果出来了 不是霉 是铁锈 我原来那套除霉的方案得废 你记着 那页不能用双氧水", "metadata": {"session": "wx_studio"}}
+{"event_id": "s3-0014", "occurred_at": "2026-10-11T17:00:00+08:00", "channel": "news_push", "payload": "【文化】某知名古籍修复纪录片第三季定档，引发行业讨论：修复该修到什么程度？", "metadata": {"source": "news_app"}}

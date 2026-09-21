@@ -332,3 +332,61 @@
   **不能**用来证明两次冻结的 World 等价。要证明等价必须比对逻辑内容。
 - 建议: 摘要改为基于 `object_revisions` 的规范化序列化 dump；
   P16 协议中相应字段也应说明"逻辑摘要"而非"文件摘要"。
+
+## F-016 粒度级联把 Resident 自己的写回造成「世界变化」，进而再触发 Periodic Review
+
+- 分类: MECHANISM GAP
+- 严重度: **HIGH**
+- 模拟时间: 2026-10-05T01:10Z 与 2026-10-05T20:00Z（同一步内）
+- 机制链（每一环都有本次运行的实测数据）:
+  1. `_SUMMARY_SCALE_RANK`（`src/aios_core/summaries/dimension_summary.py:120-131`）定义 8 级粒度：
+     day / week / month / quarter / half_year / year / multi_year / decade。
+  2. Summary 聚合是自下而上的：低粒度 Summary 会成为高粒度 Summary 的 source。
+  3. 生活从 2026-10-01 开始时，周窗 09-28→10-04 跨进九月、跨进 Q3，
+     于是「我刚写的周 Summary」落进了 month 窗和 quarter 窗，成为它们唯一的 source。
+  4. 实测（daemon 日志原始数字）：`segment_003-s0000-advance` 单个 advance 步
+     `checkpoints: 33`、`attempted_jobs: 46`、`commits: 31`、`skipped_empty: 0`。
+     33 = 2（Periodic Review 的 2 个 turn_directive round）+ 31 个 dimension_summary。
+     31 = day 4 + week 9 + month 9 + quarter 9。
+     其中 **18 个（month 9 + quarter 9）是纯空转**——素材只有我自己的写回，
+     窗口内没有任何一级事实；day 与 week 的 13 个有真实内容。
+     `skipped_empty` 在这一步是 **0**，即一个都没跳过。
+     级联在 quarter 停止（half_year 窗 01-01→06-30 不重叠），这点是好的。
+  5. 更严重的是第 6 环：这批自我复述随后被 Periodic Review 当成「世界变化」。
+     `segment_003-s0006-advance` 的 review #4 返回 20 个 anchor，
+     **18 个（90%）是我在 01:10Z–07:00Z 之间自己写的 Summary**，
+     时间跨度完全落在那 6 小时内。
+- 后果: 一条**自持回路**——被级联逼写的 Summary → 制造 eligible world changes →
+  触发新的 Periodic Review → review 的 anchor 90% 是自己 →
+  若 Resident 顺从地「据此形成 Experience」，就是纯自我强化。
+  长期运行下，这会持续消耗 Resident 的认知预算与 Resident 的 tool round 预算，
+  而产出为零。
+- 本次处置: review #4 选择沉默，明确拒绝把自己的输出当作训练信号。
+  27 个空转 Summary 我如实写成「X 月无数据」而非编造内容——
+  这也是为什么本报告里有一批内容极短的 Summary，它们不是偷懒，是唯一诚实的写法。
+- 建议方向:
+  (a) 当某窗口的 source **全部**是同 subject 自己写的 Summary 时，应允许 `skipped_self_only`，
+      不要强制 Resident 产出内容（目前 `skipped_empty` 因为「窗口里有东西」而无法触发，见 F-013）；
+  (b) Periodic Review 的 anchor 选择应把「本 review 周期内由 Resident 自己创建的对象」
+      降权或排除，否则 review 的信息量会随运行时长单调衰减；
+  (c) 生活起点落在某个粒度窗口中段时，应为尚未开始的时段直接生成空窗标记，
+      而不是等 Resident 事后逐个补写。
+
+## F-017 review metadata 的 anchor_count 与实际下发给 Resident 的数量不一致
+
+- 分类: BUG
+- 严重度: MEDIUM
+- 实测（同一次运行，两处对照）:
+  | review | metadata.anchor_count | `read_periodic_review_anchors` 实际返回 |
+  |---|---|---|
+  | `wake_review_bcdfb3b9d72fd283f551adf4`（#3） | **38** | **20** |
+  | `wake_review_253431f21978c09eb91f0cfa`（#4） | **26** | **20** |
+- 两次都恰好返回 20，说明存在一个未在任何 schema/metadata 中披露的 20 条硬上限；
+  而 metadata 报告的是分页前的候选数。
+- 影响: Resident 无法判断自己看到的是全量还是被截断的一页。
+  #4 的窗口是 10-04T14:40Z→10-05T14:40Z，窗内确有 26 个候选，我只拿到 20 个，
+  却没有任何字段告诉我「还有 6 个没给你」。两次 review 的 `truncated` 字段都是 False。
+- 与 F-016 的关系: 这个静默截断恰好掩盖了级联的规模——
+  被丢弃的候选里可能正包含真正的外部新事实。
+- 建议: 在 anchor 返回体中显式给出 `delivered` / `eligible` / `truncated` 三元组，
+  或让 `truncated` 真实反映 `len(page) < eligible_count`。

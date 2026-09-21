@@ -66,19 +66,19 @@
 
 | 维度 | 要求 | 实际 | 达成 |
 |---|---|---|---|
-| 模拟天数 | ≥365 | **3.95** | ❌ |
-| Resident 认知 checkpoint | ≥365 | **65** | ❌ |
-| 事件总数 | 365 | **24** (+2 decoy) | ❌ |
-| 对话轮次 | 240 | **15**（wx_studio 14 + wx_zhiwei 1） | ❌ |
+| 模拟天数 | ≥365 | **5.17** | ❌ |
+| Resident 认知 checkpoint | ≥365 | **108** | ❌ |
+| 事件总数 | 365 | **27 已投喂** (+4 decoy，已入库未建任何 Claim/Relation) | ❌ |
+| 对话轮次 | 240 | **17**（wx_studio 16 + wx_zhiwei 1） | ❌ |
 | 20+ 轮长对话 | 12 | **0**（最长单会话 14 轮跨会话累计，无单场 ≥20） | ❌ |
 | 非对话现实输入 | 60 | **9**（calendar 1, sensor 2, group 3, call_log 1, photo 1, order 1） | ❌ |
 | Goal/Task 生命周期 | 12 | **2**（均未闭环，见 F-014） | ❌ |
 | Action/Outcome | 6 | **0** —— Core 无创建 Outcome 的 capability（F-014） | ❌ |
-| Periodic Review | 12 | **2** | ❌ |
-| 延迟真相修正 | 6 | **1 进行中**（第七页黑斑 hypothesis 已建，等检测回报后 revise/retract） | ❌ |
+| Periodic Review | 12 | **4** | ❌ |
+| 延迟真相修正 | 6 | **1 进行中**（第七页黑斑，10-10 检测回报未达）＋ **1 已发生的部分反转**（房东 10-04 预告卖房、10-05 自我否认，Claim 已 revise 降至 0.55 而非撤销） | ❌ |
 | 模糊指代 | 12 | **≥4**（"那个""上次说的""他""这页"） | ❌ |
 | 噪音期 | 6 | **1**（10-03 两条同行群消息，我未建任何 Claim/Goal） | ❌ |
-| 重启 | 4 | **1**（segment_002 从 segment_001 的 durable World 恢复，`fresh_world=false`） | ❌ |
+| 重启 | 4 | **2**（segment_002←001、segment_003←002，均 `fresh_world=false` 且恢复验证通过） | ❌ |
 | decoy subject | 1 | **1** ✅ | ✅ |
 
 ---
@@ -104,9 +104,9 @@
 
 ---
 
-## 4. 发现（F-001 … F-015）
+## 4. 发现（F-001 … F-017）
 
-完整台账含逐条 repro 见 `reviews/internal_habitation/arena_01a0c1e1_moyin/findings/FINDINGS.md`（共 15 条，已用 `grep -c "^## F-"` 核对）。
+完整台账含逐条 repro 见 `reviews/internal_habitation/arena_01a0c1e1_moyin/findings/FINDINGS.md`（共 17 条，已用 `grep -c "^## F-"` 核对）。
 
 ### HIGH
 
@@ -115,6 +115,8 @@
 | **F-005** | BUG | `value` 为 dict 的 `structured_record` Observation **永不进搜索索引**。`search.py:387-390` 只对 `isinstance(value, str)` 字段分词。repro: `obs_src_717e0b225c89a415a57cf094` 0 hits，对照 string payload 9/7 hits。补正：枚举路径**能**看到它们 —— 缺口是"搜不到"，不是"看不见" |
 | **F-006** | BUG | `create_task` 默认 `initial_state="draft"`（`turn_runtime.py:1162`），而 `execution/service.py:997` 的 `wake_due_tasks` 只处理 `WAITING_TIME` → 静默不响。必须显式传 `waiting_time` |
 | **F-011** | BUG | **Wake 创建会把 Task 从 `waiting_time` 推到 `ready` 并清空 `next_wake_at`** → 提醒只响一次，之后永久静默。且 Wake 的 `evidence_refs` 钉在 bump 前的 revision，到达时必然过期。repro: `wake_920d7a21b9ac4e5f7b5e377e` 之后 `read_execution_world` → rev2 `ready`, `next_wake_at=None` |
+| **F-016** | MECHANISM GAP | **粒度级联 + Periodic Review 构成自我强化回路。** 生活起点落在窗口中段时，我刚写的低粒度 Summary 会落进 month/quarter 窗并成为其唯一素材。实测单个 advance 步 `checkpoints: 33`、`commits: 31`、`skipped_empty: 0`，其中 **18 格（month 9 + quarter 9）纯空转**。这批自我复述随后被 review 当成「世界变化」：review #4 的 20 个 anchor 里 **18 个（90%）是我自己 6 小时内写的 Summary**。我拒绝据此形成 Experience，选择沉默 |
+| **F-017** | BUG | **review 的 `anchor_count` 与实际下发数不符，且截断被静默。** review #3 metadata 报 38、#4 报 26，`read_periodic_review_anchors` 两次都只返回 **20**，`truncated` 均为 `False`。存在未披露的 20 条硬上限，Resident 无法知道自己少看了多少 |
 
 ### MEDIUM
 
@@ -144,6 +146,36 @@ F-012 我先前把它记成"backlog 分页导致 cursor 滞后"，这个描述�
 
 ---
 
+### 3.3 segment_003（本次，**部分完成**，已冻结，`checkpoint sha256=5585bce1…`）
+2026-10-05 07:00 → 2026-10-06 04:00 本地（时钟停在 `2026-10-05T20:00Z`），43 个新 checkpoint，world_revision 95 → 144。
+**这是一个部分段：34 步只走到第 7 步**，durable cursor 停在 `next_step_key=segment_003-s0007-advance`。
+
+关键节点：
+
+1. **恢复验证 #2** — 从 segment_002 的 World 冷启，`fresh_world=false`，时钟回到 `2026-10-04T13:35Z`，decoy 收据落在 wr 96/97，34 步正确重建。
+2. **发现 F-016（本轮最重要的结果）** — 第一个 advance 步就撞上粒度级联：
+   `checkpoints: 33`、`attempted_jobs: 46`、`commits: 31`、`skipped_empty: 0`。
+   31 格 Summary = day 4 + week 9 + month 9 + quarter 9，其中 18 格（month + quarter）
+   的素材**只有我自己刚写的东西**。生活从 10-01 开始，九月与 Q3 本就没有数据，
+   我却被迫逐格写「九月无数据」。我如实写了空窗声明，没有编造内容。
+   级联在 quarter 停止（`half_year` 窗 01-01→06-30 不重叠），这是唯一的好消息。
+3. **自我强化回路闭合** — 那 31 格 Summary 随即被 Periodic Review #4 当成「世界变化」：
+   20 个 anchor 中 18 个（90%）是我自己在 01:10Z–07:00Z 之间写的。
+   我明确拒绝把自己的输出当作训练信号，选择沉默并记录原因。
+4. **发现 F-017** — review #3 metadata `anchor_count=38`、#4 报 26，实际都只下发 20 条，
+   `truncated` 均为 `False`。少看的 6–18 条里可能正包含真正的外部新事实，而我无从得知。
+5. **纠正我自己两处错误说法**（见 §4 末）：F-012 中「review 窗口不推进」是错的；
+   F-016 初稿写「27 个空转」也是错的，实测是 18 个。
+6. **房东反转（延迟真相 #2 的雏形）** — 老许 10-04 说「明年可能卖房，让你有个准备」，
+   10-05 改口「是我瞎想，别听风就是雨」。我**没有撤销** Claim：那句话确实说过且已影响判断。
+   改为 `revise_claim` 把两次表述都留在正文、置信度 0.8 → 0.55。
+   撤销会抹掉一个真实发生过、有后果的表态。
+7. **一次真实的判断活** — s3-0003 她要给 78 岁的周慕青写进度，问「写多了她嫌烦，写少了她睡不着」。
+   我给了可直接发出的三句话，并明确建议**不要**写「可能是霉」——结果没出来，
+   写了就是替她安一个坏答案。同时把「要不要承诺月底再报」这个会给她自己增加义务的决定留给她。
+8. **能力 API 事实** — `revise_claim` 的正确参数是 `target_ref` / `replacement_content`；
+   schema **不接受 `knowledge_state`**，即修订无法改变一条 Claim 的知识状态。我第一次调用因参数名错误被拒。
+
 ## 5. 为什么没跑完一年
 
 不是 Core 崩溃。是**单次 session 的上下文与工具调用预算不够**。
@@ -156,13 +188,19 @@ F-012 我先前把它记成"backlog 分页导致 cursor 滞后"，这个描述�
 
 | 项 | 值 |
 |---|---|
-| World 位置 | `reviews/internal_habitation/arena_01a0c1e1_moyin/segments/segment_002/world.sqlite.gz` |
-| `world_artifact_sha256` | `7d86a96ac002f218eb362145bb2b89b9115e805da0e382d2b3e9b3376f8524eb` |
-| checkpoint digest | `576b5510d8fd4a4a240835a0b24613de8ff1e1e4c88da753a99385cb90727413` |
-| 链上前一个 | `fc70faf5e21cdc9b16760841035f5f56ece81d98014b7258a2034d53665e698e` |
-| 模拟时钟 | `2026-10-04T13:35:00+00:00`（本地 2026-10-04 21:35） |
-| world_revision | 95（`index_watermark=95`，索引 lag = 0） |
-| 下一个 segment | `segment_003`，从 2026-10-05 起，**事件脚本尚未编写** |
+| World 位置 | `reviews/internal_habitation/arena_01a0c1e1_moyin/segments/segment_003/world.sqlite.gz` |
+| `world_artifact_sha256` | `90bffae8dccef12bfd97790f1271c9fbb238e9f8b5cd966fdf3e50bd500843c3` |
+| checkpoint digest | `5585bce1fde5de6e61f930e76511c47f434ea8bcdfe15244cfaea9c86abfec87` |
+| 链上前一个 | `576b5510d8fd4a4a240835a0b24613de8ff1e1e4c88da753a99385cb90727413` |
+| 模拟时钟 | `run/state.json` 记为 `2026-10-05T20:00:00+00:00`（本地 10-06 04:00） |
+| world_revision | 144（`index_watermark=144`，索引 lag = 0） |
+| **durable cursor** | **step 7 / 34，`next_step_key=segment_003-s0007-advance`** |
+| 剩余事件 | `s3-0004` … `s3-0014` 共 11 条已写好但未投喂；**`s3-0012`（10-10 检测报告）是延迟真相 #1 的落点，尚未到达** |
+
+⚠️ 一处需说明的 harness 不精确：`checkpoint.json` 的 `simulated_time_cursor` 记为
+`2026-10-05T14:40:00Z`，而 `run/state.json` 的 clock 是 `2026-10-05T20:00:00Z`。
+前者取的是最后一次 Periodic Review 的时间而非真实时钟。**恢复时以 `state.json` 为准**，
+daemon 的 `clock_regap` 逻辑读的也是 `state.json`。这是我自己 harness 的字段选取问题，不是 Core 缺陷。
 
 ### 待办状态（下一个 segment 必须接手）
 
@@ -199,13 +237,15 @@ F-012 我先前把它记成"backlog 分页导致 cursor 滞后"，这个描述�
 
 ## 6. Resident 认知真实性声明
 
-> 在本 session 中实际完成的 65 个 Resident 认知 checkpoint 中，**全部 65 个**的语义决策（是否回应、回应什么、检索什么、Summary 写什么、Claim 建/改/撤、Task 状态迁移、是否沉默）都由**我本人当场判断**作出，依据仅为当时可见的 `RuntimeSnapshot`。
+> 在本 session 中实际完成的 108 个 Resident 认知 checkpoint 中，**全部 108 个**的语义决策（是否回应、回应什么、检索什么、Summary 写什么、Claim 建/改/撤、Task 状态迁移、是否沉默）都由**我本人当场判断**作出，依据仅为当时可见的 `RuntimeSnapshot`。
 >
 > **没有任何一部分由确定性替身、脚本、关键词表或预生成答案顶替。**
 >
-> 程序侧仅执行我明确选定的 capability call 并原样回传结果。40 次 capability call 逐条记录在 `trace/trace.jsonl`，与 `snapshots/*.snapshot.json` 的 `input_fingerprint` 一一对应。
+> 程序侧仅执行我明确选定的 capability call 并原样回传结果。capability call 逐条记录在 `trace/trace.jsonl`，与 `snapshots/*.snapshot.json` 的 `input_fingerprint` 一一对应。
 >
-> **一年期目标本身：INVALID —— 未完成。** 3.95 / 365 天，65 / 365 checkpoint。我没有伪造剩余部分。
+> **一年期目标本身：INVALID —— 未完成。** 5.17 / 365 天，108 / 365 checkpoint。我没有伪造剩余部分。
+>
+> 需要额外声明一点：108 个 checkpoint 里有 **18 个是被 F-016 的粒度级联强制产出的空窗 Summary**。它们确实是当场的真实判断（判断的内容是「这个窗口没有数据，我不编」），但把它们计入认知密度是有水分的。扣掉这 18 个，实质认知 checkpoint 为 **90 个**。
 
 ---
 
@@ -213,7 +253,7 @@ F-012 我先前把它记成"backlog 分页导致 cursor 滞后"，这个描述�
 
 ```
 reviews/internal_habitation/arena_01a0c1e1_moyin/
-├── findings/FINDINGS.md              # F-001 … F-015，含逐条 repro
+├── findings/FINDINGS.md              # F-001 … F-017，含逐条 repro
 ├── harness/{bridge,daemon,next,peek,driver}.py
 ├── life/segment_001/life.jsonl       # 14 条外部世界事件
 ├── life/segment_002/{life,decoy}.jsonl   # 10 + 2 条

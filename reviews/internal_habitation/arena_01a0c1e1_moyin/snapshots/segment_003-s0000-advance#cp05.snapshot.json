@@ -1,0 +1,78 @@
+{
+ "checkpoint_id": "segment_003-s0000-advance#cp05",
+ "checkpoint_index": 5,
+ "input_fingerprint": "258e3cfb188e8c46ed9248ff88a0f317c9b5e84cd3cd808426857b7c12e0ff70",
+ "kind": "dimension_summary",
+ "model_id": "arena-agent-mode-resident/unknown-provider-model",
+ "payload": {
+  "dimension": "dim:user_ai_interaction",
+  "granularity": "day",
+  "source_world_revision": 103,
+  "sources": [
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx_studio",
+     "turn_index": 23,
+     "turn_key": "c59b07d4b29714a52a6792dc"
+    },
+    "object_id": "obs_conv_ai_85849e2ab600b8c6e2dc0b9b",
+    "object_type": "observation",
+    "occurred_at": "2026-10-04T03:30:00Z",
+    "revision": 1,
+    "text": "「让你有个准备」这话已经放出来了。租约到什么时候？」"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx_studio",
+     "turn_index": 23,
+     "turn_key": "c59b07d4b29714a52a6792dc"
+    },
+    "object_id": "obs_conv_user_c9c33cd97466e8264d6bfb75",
+    "object_type": "observation",
+    "occurred_at": "2026-10-04T03:30:00Z",
+    "revision": 1,
+    "text": "老许来了 说这房子明年可能要卖 让我有个准备 没说要赶我走"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx_studio",
+     "turn_index": 24,
+     "turn_key": "e1b22e45b92fde1d99c88d05"
+    },
+    "object_id": "obs_conv_ai_00873360355eb5c883b52ab4",
+    "object_type": "observation",
+    "occurred_at": "2026-10-04T13:35:00Z",
+    "revision": 1,
+    "text": "知道了。那就辛苦你妹。你这边有情况随时说。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx_studio",
+     "turn_index": 24,
+     "turn_key": "e1b22e45b92fde1d99c88d05"
+    },
+    "object_id": "obs_conv_user_caa9f3e49dba2624487447d1",
+    "object_type": "observation",
+    "occurred_at": "2026-10-04T13:35:00Z",
+    "revision": 1,
+    "text": "无锡我不去了 让我妹先看着 我这边走不开"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-10-04T23:59:59.999999Z",
+  "window_start": "2026-10-04T00:00:00Z"
+ },
+ "run_id": "hab_arena_01a0c1e1_moyin_v1",
+ "segment_id": "segment_003",
+ "simulated_at": "2026-10-05T01:10:00+00:00",
+ "step_key": "segment_003-s0000-advance",
+ "world_revision_before": 103
+}

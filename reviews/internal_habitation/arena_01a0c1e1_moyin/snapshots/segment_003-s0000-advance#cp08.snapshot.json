@@ -1,0 +1,143 @@
+{
+ "checkpoint_id": "segment_003-s0000-advance#cp08",
+ "checkpoint_index": 8,
+ "input_fingerprint": "1146a236be1ac980d90793d932ec84f9a7ed485731daec5c613b0f959c6963d6",
+ "kind": "dimension_summary",
+ "model_id": "arena-agent-mode-resident/unknown-provider-model",
+ "payload": {
+  "dimension": "dim:family",
+  "granularity": "week",
+  "source_world_revision": 106,
+  "sources": [
+   {
+    "metadata": {
+     "dimension": "dim:family",
+     "summary_kind": "single_dimension_temporal"
+    },
+    "object_id": "sum_f9de2d9f8266e4e656b85637",
+    "object_type": "summary",
+    "occurred_at": "2026-10-02T00:00:00Z",
+    "revision": 1,
+    "text": "2026-10-02 家庭条线仅一条：沈守拙 18:02／18:20／18:47 三次来电未接；用户 20:14 回电，对方说没事，只问她十一是否回无锡，她答「看情况」。已就此建立跟进 Task「确认十一是否回无锡看父亲」，提醒时间定在 10-04 21:00。「沈守拙＝用户父亲、人在无锡」目前仍是我的身份归并推断，用户没有直接确认。本日无其他家庭信息，也未出现任何关于父亲健康或照护状况的内容。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:family",
+     "writeback_kind": "revisable_cognition"
+    },
+    "object_id": "clm_d2204682140487db526e714b",
+    "object_type": "claim",
+    "occurred_at": "2026-10-02T14:40:00Z",
+    "revision": 1,
+    "text": "沈守拙是用户的父亲，人在无锡。依据：2026-10-02 18:02/18:20/18:47 三通未接来电的 caller 字段为「沈守拙」，用户 20:14 说「回过去了 我爸说没事 就是问我十一回不回无锡」，时间与内容都对得上。这是我做的身份归并推断，用户没有直接说过「沈守拙是我爸」。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:family",
+     "writeback_kind": "cognition_evidence"
+    },
+    "object_id": "evs_de8b482f01f72ecf89341bde",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-02T14:40:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 2, \"missing_description\": [], \"observed_count\": 2}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-02T14:40:00Z\", \"world_revision\": 34}, \"learned_at\": \"2026-10-02T14:40:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_3a20c58832a94991f354127e\", \"revision\": 1}, {\"object_id\": \"obs_src_717e0b225c89a415a57cf094\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:family\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_de8b482f01f72ecf89341bde\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-10-02T14:40:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_conv_user_3a20c58832a94991f354127e\", \"revision\": 1}, {\"object_id\": \"obs_src_717e0b225c89a415a57cf094\", \"revision\": 1}]}"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:family",
+     "summary_kind": "single_dimension_temporal"
+    },
+    "object_id": "sum_5895802875fc4d07a2266c07",
+    "object_type": "summary",
+    "occurred_at": "2026-10-03T00:00:00Z",
+    "revision": 1,
+    "text": "2026-10-03 家庭条线：知微（用户的孩子）18:20 通过独立会话 wx_zhiwei 告知本周不回家、要参加集训，并转述「老师说这次很重要」；用户 21:50 向我转述同一件事。据此我把原先记有「孩子姓名未知」缺口的那条 Claim 前向修订为具名版本（知微），未删除原判断。\n仍未知：集训的起止日期——我在 21:50 之后问过「集训到几号」，用户尚未回答。\n本日没有任何关于沈守拙（父亲）的新信息；十一是否回无锡仍未定，跟进 Task 排在 10-04 21:00。\n注意：知微那条消息是发给用户的，不是发给我的，我未在该会话作答。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:family",
+     "revision_evidence_set_ref": {
+      "object_id": "evs_revision_9612bd7552a6f476d2f51a82",
+      "revision": 1
+     },
+     "revision_mode": "revise",
+     "revision_reason": "原 Claim 明确记录了「孩子姓名此刻未知」这一缺口，用户 21:50 补上了名字，属实质补充，前向修订",
+     "supersedes_revision": 1,
+     "writeback_kind": "revisable_cognition"
+    },
+    "object_id": "clm_5fd3e92a5ee0cf504c1f15b2",
+    "object_type": "claim",
+    "occurred_at": "2026-10-03T10:20:00Z",
+    "revision": 2,
+    "text": "用户有一个在读书的孩子，名叫知微，称呼用户为「妈」。2026-10-03 18:20 知微通过独立会话告知本周不回家、要参加集训，并转述「老师说这次很重要」；用户 21:50 向我转述同一件事。仍未知：知微的性别、年级、就读学校、集训项目与起止日期。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:family",
+     "writeback_kind": "cognition_evidence"
+    },
+    "object_id": "evs_333f0b1efe7d0791fd5ecb20",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-03T10:20:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-03T10:20:00Z\", \"world_revision\": 65}, \"learned_at\": \"2026-10-03T10:20:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_196195af7257fb1ba792cba6\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:family\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_333f0b1efe7d0791fd5ecb20\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-10-03T10:20:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_conv_user_196195af7257fb1ba792cba6\", \"revision\": 1}]}"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:family",
+     "revision_mode": "revise",
+     "target_ref": {
+      "object_id": "clm_5fd3e92a5ee0cf504c1f15b2",
+      "revision": 1
+     }
+    },
+    "object_id": "evs_revision_9612bd7552a6f476d2f51a82",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-03T13:50:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 2, \"missing_description\": [], \"observed_count\": 2}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-03T13:50:00Z\", \"world_revision\": 73}, \"learned_at\": \"2026-10-03T13:50:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_a3bc033a60afaee82f6f5858\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_196195af7257fb1ba792cba6\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:family\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_5fd3e92a5ee0cf504c1f15b2\", \"revision\": 1}}, \"object_id\": \"evs_revision_9612bd7552a6f476d2f51a82\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_5fd3e92a5ee0cf504c1f15b2@1\", \"recorded_at\": \"2026-10-03T13:50:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_conv_user_a3bc033a60afaee82f6f5858\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_196195af7257fb1ba792cba6\", \"revision\": 1}]}"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:family",
+     "summary_kind": "single_dimension_temporal"
+    },
+    "object_id": "sum_08717b2bbf7a46c51b3f89ca",
+    "object_type": "summary",
+    "occurred_at": "2026-10-04T00:00:00Z",
+    "revision": 1,
+    "text": "2026-10-04（UTC 日窗）家庭条线一个实质决定，一个新增未知成员。\n1) 十一回无锡：用户在 10-02 说「再想想」，悬置两天；10-04 21:00 我按 Task 提醒一次后，她 21:35 明确不去，改由妹妹先照看，理由是工作室走不开。这是她第一次在这件事上给出确定答复，因此该问题在事实层面已关闭，只剩情感层面未处理——她父亲是主动问过她的。\n2) 新增家庭成员：用户有一个妹妹，姓名未知，目前在无锡承担照护。照护责任从「用户」实际转移到「妹妹」，但没有任何证据表明用户对这次转移做过情感确认，她的措辞（「让我妹先看着」）是安排性的，不含歉意或不安。\n3) 沈守拙本日无直接信息输入，其认知状况沿用 10-01 的观察，无更新。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:family",
+     "writeback_kind": "revisable_cognition"
+    },
+    "object_id": "clm_8522f237c4a2aaebb8d9145b",
+    "object_type": "claim",
+    "occurred_at": "2026-10-04T13:35:00Z",
+    "revision": 1,
+    "text": "2026-10-04 21:35 用户决定十一不回无锡看父亲，改由她的妹妹先照看；她给的理由是自己「走不开」（工作室这边）。这是她在收到我当晚提醒后约 35 分钟作出的决定。附带新事实：用户有一个妹妹，姓名未知。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:family",
+     "writeback_kind": "cognition_evidence"
+    },
+    "object_id": "evs_9b3c8a09bdb585136cc40b2a",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-04T13:35:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-04T13:35:00Z\", \"world_revision\": 93}, \"learned_at\": \"2026-10-04T13:35:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_c9c33cd97466e8264d6bfb75\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:family\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_9b3c8a09bdb585136cc40b2a\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-10-04T13:35:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_conv_user_c9c33cd97466e8264d6bfb75\", \"revision\": 1}]}"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-10-04T23:59:59.999999Z",
+  "window_start": "2026-09-28T00:00:00Z"
+ },
+ "run_id": "hab_arena_01a0c1e1_moyin_v1",
+ "segment_id": "segment_003",
+ "simulated_at": "2026-10-05T01:10:00+00:00",
+ "step_key": "segment_003-s0000-advance",
+ "world_revision_before": 106
+}

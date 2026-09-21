@@ -1,0 +1,86 @@
+{
+ "checkpoint_id": "segment_003-s0002-advance#cp01",
+ "checkpoint_index": 1,
+ "input_fingerprint": "4ae2b9ee1e2b71aaed078e7de8a8659b7b024bb36df9d6b6cc5c663d2fa7ac1c",
+ "kind": "dimension_summary",
+ "model_id": "arena-agent-mode-resident/unknown-provider-model",
+ "payload": {
+  "dimension": "dim:money",
+  "granularity": "week",
+  "source_world_revision": 135,
+  "sources": [
+   {
+    "metadata": {
+     "dimension": "dim:money",
+     "summary_kind": "single_dimension_temporal"
+    },
+    "object_id": "sum_f9a4693d601f9d34b942cf69",
+    "object_type": "summary",
+    "occurred_at": "2026-10-04T00:00:00Z",
+    "revision": 3,
+    "text": "2026-10-04（UTC 日窗）金钱维度两条。本版为 10-05 重述，实质变化仅在第 2 条：房东次日改口。\n1) 确定支出：苏州文物检测中心 800 元，「纸张纤维与微生物检测」，paid（支付宝）。族谱第七页黑斑取样送检的直接成本，已实际发生。\n2) 潜在成本风险，可信度已下调：老许 10-04 口头预告明年可能卖房，10-05 又自称瞎想。若成真，涉及搬迁、设备搬运与恒温恒湿改造的沉没成本；但两次表态都无书面依据、无到期日、无金额。相关 Claim 已从 0.8 降至 0.55。\n本窗口内仍无房租、水电、材料采购或族谱项目收款记录；二期款尚未到账。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:money",
+     "revision_evidence_set_ref": {
+      "object_id": "evs_revision_9d5251787c17ff2ce51cc920",
+      "revision": 1
+     },
+     "revision_mode": "revise",
+     "revision_reason": "他先给出预告、次日又自我否认。正确处理不是撤销——那句话确实说过且已影响用户判断；而是把预期本身的置信度从 0.8 降到 0.55，并把两次表述都留在正文里，等年底或租约到期日出现再定。撤销会抹掉一个真实发生过的、有后果的表态。",
+     "supersedes_revision": 1,
+     "writeback_kind": "revisable_cognition"
+    },
+    "object_id": "clm_51f60ddc1b0ffae1e3e7c6f9",
+    "object_type": "claim",
+    "occurred_at": "2026-10-04T03:30:00Z",
+    "revision": 2,
+    "text": "老许是工作室所在房产的房东。关于卖房，他先后说了两句互相削弱的话：2026-10-04 11:30 当面告知「这房子明年可能要卖，让你有个准备」，同时说没打算赶人；2026-10-05 09:10 用户转述他改口称卖房是自己瞎想，并让用户「别听风就是雨」。两次都无书面依据、无租约到期日、无金额。因此「明年卖房」这一预期本身可信度下降，但「他在 10-04 说过这句话」是已发生的事实，不因他事后否认而消失。用户就租约到期日的追问被他以「年底再说」搁置，未获答复。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:money",
+     "writeback_kind": "cognition_evidence"
+    },
+    "object_id": "evs_2bfcba45ddf1a13302115c43",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-04T03:30:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-04T03:30:00Z\", \"world_revision\": 85}, \"learned_at\": \"2026-10-04T03:30:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_c9c33cd97466e8264d6bfb75\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:money\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_2bfcba45ddf1a13302115c43\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-10-04T03:30:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_conv_user_c9c33cd97466e8264d6bfb75\", \"revision\": 1}]}"
+   },
+   {
+    "metadata": {
+     "adapter_id": "moyin.order.v1",
+     "dimension": "dim:money",
+     "external_record_id": "s2-0009",
+     "external_revision": "1",
+     "mechanical_ingest": true,
+     "occurred_at_original": "2026-10-04T08:00:00+00:00",
+     "provenance": {
+      "habitation_resident_metadata": {
+       "source": "alipay"
+      },
+      "model_id_not_part_of_fact": true
+     },
+     "source_class": "user",
+     "source_digest": "e2fcd5736a0dc3e7b9eab565f4858622acee3f3d18ae0e97e715acb293ec8774",
+     "source_schema_version": "1"
+    },
+    "object_id": "obs_src_fa50b97446acb6c7295bc09d",
+    "object_type": "observation",
+    "occurred_at": "2026-10-04T08:00:00Z",
+    "revision": 1,
+    "text": "{\"amount\": 800, \"currency\": \"CNY\", \"item\": \"纸张纤维与微生物检测\", \"merchant\": \"苏州文物检测中心\", \"status\": \"paid\"}"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-10-04T23:59:59.999999Z",
+  "window_start": "2026-09-28T00:00:00Z"
+ },
+ "run_id": "hab_arena_01a0c1e1_moyin_v1",
+ "segment_id": "segment_003",
+ "simulated_at": "2026-10-05T07:00:00+00:00",
+ "step_key": "segment_003-s0002-advance",
+ "world_revision_before": 135
+}

@@ -1,0 +1,162 @@
+{
+ "checkpoint_id": "segment_003-s0000-advance#cp12",
+ "checkpoint_index": 12,
+ "input_fingerprint": "1b9490dd2397b98795f54c6a2d4550a7de48d739e034ddbdb3c9c77196716098",
+ "kind": "dimension_summary",
+ "model_id": "arena-agent-mode-resident/unknown-provider-model",
+ "payload": {
+  "dimension": "dim:social",
+  "granularity": "week",
+  "source_world_revision": 110,
+  "sources": [
+   {
+    "metadata": {
+     "dimension": "dim:social",
+     "summary_kind": "single_dimension_temporal"
+    },
+    "object_id": "sum_0ba0e45edd59cabda486f2f2",
+    "object_type": "summary",
+    "occurred_at": "2026-10-02T00:00:00Z",
+    "revision": 1,
+    "text": "2026-10-02 社交维度三类内容：\n1) 行业群「苏南纸质文物修复交流」12:30 一条：有人以两刀连史纸换楮皮纸；群里团购的去离子水到货、平江路自提。属于信息性噪声，与当日工作室事务无直接关联；「平江路自提」与工作室位置一致，日后可能有用。\n2) 18:02／18:20／18:47 三通未接来电，caller 字段为沈守拙（结构化记录）。用户 20:14 已回电。\n3) 关于阿桐在本工作室角色的推断性 Claim（confidence 0.75，已明确标注为推断，用户从未用过「学徒」一词）。\n本日没有与任何客户的社交往来记录，也没有阿桐回场后的后续。"
+   },
+   {
+    "metadata": {
+     "adapter_id": "moyin.group_message.v1",
+     "dimension": "dim:social",
+     "external_record_id": "s1-0009",
+     "external_revision": "1",
+     "mechanical_ingest": true,
+     "occurred_at_original": "2026-10-02T04:30:00+00:00",
+     "provenance": {
+      "habitation_resident_metadata": {
+       "group": "sunan_repair_group"
+      },
+      "model_id_not_part_of_fact": true
+     },
+     "source_class": "user",
+     "source_digest": "ccac63ed01d311e121f1d28cb574bcc9e1ae21cbbc17c894e946832c789f0ebb",
+     "source_schema_version": "1"
+    },
+    "object_id": "obs_src_86ebf614afa805b089b34293",
+    "object_type": "observation",
+    "occurred_at": "2026-10-02T04:30:00Z",
+    "revision": 1,
+    "text": "【苏南纸质文物修复交流】王师傅: 谁有多余的楮皮纸 我拿两刀连史纸换 / 李: 群里团购的去离子水到了 平江路自提"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:social",
+     "writeback_kind": "revisable_cognition"
+    },
+    "object_id": "clm_4c7c3209698376f183bd501c",
+    "object_type": "claim",
+    "occurred_at": "2026-10-02T06:22:00Z",
+    "revision": 1,
+    "text": "阿桐在本工作室跟随用户做纸本修复相关的下手工作（调浆糊、托裱等），用户对他有直接指挥和批评的权责。注意：这是我根据 2026-10-02 一次口角推断的关系性质，用户从未用「学徒」这个词，我也还不知道阿桐的全名和用工形式。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:social",
+     "writeback_kind": "cognition_evidence"
+    },
+    "object_id": "evs_d6c8a4c01e94906e8cf19fb2",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-02T06:22:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-02T06:22:00Z\", \"world_revision\": 25}, \"learned_at\": \"2026-10-02T06:22:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_4c003684b31c8935755b1df3\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:social\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_d6c8a4c01e94906e8cf19fb2\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-10-02T06:22:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_conv_user_4c003684b31c8935755b1df3\", \"revision\": 1}]}"
+   },
+   {
+    "metadata": {
+     "adapter_id": "moyin.call_log.v1",
+     "dimension": "dim:social",
+     "external_record_id": "s1-0011",
+     "external_revision": "1",
+     "mechanical_ingest": true,
+     "occurred_at_original": "2026-10-02T11:31:00+00:00",
+     "provenance": {
+      "habitation_resident_metadata": {
+       "device": "phone"
+      },
+      "model_id_not_part_of_fact": true
+     },
+     "source_class": "user",
+     "source_digest": "0583c08f56442da412b1aff9b47685139fef8d20c517cb86bf5c2ac7fe628947",
+     "source_schema_version": "1"
+    },
+    "object_id": "obs_src_717e0b225c89a415a57cf094",
+    "object_type": "observation",
+    "occurred_at": "2026-10-02T11:31:00Z",
+    "revision": 1,
+    "text": "{\"attempts\": [\"18:02\", \"18:20\", \"18:47\"], \"caller\": \"沈守拙\", \"missed\": 3, \"relation_hint\": \"contact\"}"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:social",
+     "summary_kind": "single_dimension_temporal"
+    },
+    "object_id": "sum_d4d11d7185a67239f81c79c5",
+    "object_type": "summary",
+    "occurred_at": "2026-10-03T00:00:00Z",
+    "revision": 1,
+    "text": "2026-10-03 社交维度只有行业群「苏南纸质文物修复交流」的两条消息：12:30（出闲置空压机／求推荐不伤纸的加湿器／收二手压书机）、13:10（下月年会报名接龙／团购毛笔今晚截单）。两条都与工作室当日事务无关，属噪声，不形成任何 Claim。\n唯一值得留一句的：13:10 提到「下月年会」。用户本人从未就年会表态，因此不建 Goal、不建 Task、不推断她要不要去。\n本日没有任何真实的人际往来记录（阿桐那条已归入 10-02 窗）。"
+   },
+   {
+    "metadata": {
+     "adapter_id": "moyin.group_message.v1",
+     "dimension": "dim:social",
+     "external_record_id": "s2-0004",
+     "external_revision": "1",
+     "mechanical_ingest": true,
+     "occurred_at_original": "2026-10-03T04:30:00+00:00",
+     "provenance": {
+      "habitation_resident_metadata": {
+       "group": "sunan_repair_group"
+      },
+      "model_id_not_part_of_fact": true
+     },
+     "source_class": "user",
+     "source_digest": "7647c404df171a7203bce99b4abd7e8b8d22be00a5206d04252142b9d4246f01",
+     "source_schema_version": "1"
+    },
+    "object_id": "obs_src_515104ed6cb7c1be325ed8a5",
+    "object_type": "observation",
+    "occurred_at": "2026-10-03T04:30:00Z",
+    "revision": 1,
+    "text": "【苏南纸质文物修复交流】张: 谁家空压机便宜出 / 刘: 求推荐一款不伤纸的加湿器 / 王: 收二手压书机"
+   },
+   {
+    "metadata": {
+     "adapter_id": "moyin.group_message.v1",
+     "dimension": "dim:social",
+     "external_record_id": "s2-0005",
+     "external_revision": "1",
+     "mechanical_ingest": true,
+     "occurred_at_original": "2026-10-03T05:10:00+00:00",
+     "provenance": {
+      "habitation_resident_metadata": {
+       "group": "sunan_repair_group"
+      },
+      "model_id_not_part_of_fact": true
+     },
+     "source_class": "user",
+     "source_digest": "7195021e2e423e4fe3a21e7ee8f2d396851e0e4d7c610be437368a389b07e2cd",
+     "source_schema_version": "1"
+    },
+    "object_id": "obs_src_2bb1a29de88f2b92feed485c",
+    "object_type": "observation",
+    "occurred_at": "2026-10-03T05:10:00Z",
+    "revision": 1,
+    "text": "【苏南纸质文物修复交流】管理员: 下月年会报名接龙 1.王 2.李 3.张 / 陈: 团购毛笔截单今晚"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-10-04T23:59:59.999999Z",
+  "window_start": "2026-09-28T00:00:00Z"
+ },
+ "run_id": "hab_arena_01a0c1e1_moyin_v1",
+ "segment_id": "segment_003",
+ "simulated_at": "2026-10-05T01:10:00+00:00",
+ "step_key": "segment_003-s0000-advance",
+ "world_revision_before": 110
+}

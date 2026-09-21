@@ -1,0 +1,125 @@
+{
+ "checkpoint_id": "segment_003-s0000-advance#cp13",
+ "checkpoint_index": 13,
+ "input_fingerprint": "613b3d5b90faef093e10e63160f89712da5d235a85769d5a6c84e85b38cb02f1",
+ "kind": "dimension_summary",
+ "model_id": "arena-agent-mode-resident/unknown-provider-model",
+ "payload": {
+  "dimension": "dim:studio_climate",
+  "granularity": "week",
+  "source_world_revision": 111,
+  "sources": [
+   {
+    "metadata": {
+     "dimension": "dim:studio_climate",
+     "summary_kind": "single_dimension_temporal"
+    },
+    "object_id": "sum_7a74e73e9198c3edbd655c6e",
+    "object_type": "summary",
+    "occurred_at": "2026-10-01T00:00:00Z",
+    "revision": 1,
+    "text": "工作室湿度（dim:studio_climate，UTC 日窗 2026-10-01，实际对应本地 10-02 早晨）：06:00–07:00 稳定在 57.1–58.0 %RH，均值 57.5，3 个采样；07:30–08:30 稳定在 63.8–64.2 %RH，均值 64.0，3 个采样。两段各自内部波动都在 0.5 %RH 以内，段与段之间抬升约 6.5 个百分点，跳变发生在 07:00–07:30 之间——该区间没有采样，跳变过程本身未被观测到。原始逐点数值未保留，只存了压缩后的段统计，因此无法回溯具体曲线形状。"
+   },
+   {
+    "metadata": {
+     "adapter_id": "habitation.sensor_studio_climate.numeric.v1",
+     "dimension": "dim:studio_climate",
+     "mechanical_compression": true,
+     "mechanical_ingest": true,
+     "raw_sample_values_retained": false,
+     "series_id": "studio_humidity_20261002_am",
+     "source_class": "sensor",
+     "source_digest": "d39092371ea78a971f90183fc37790ce24cd460c30a04b206b01dcf26f3cb47b",
+     "source_locator_range": {
+      "first": null,
+      "last": null
+     },
+     "source_record_ids_digest": "97169e9caeea34cdb631285d739e783306ddc4d15d50407be3401f8ffa5c158e",
+     "source_record_range": {
+      "count": 3,
+      "first": "rh-20261002-0600",
+      "last": "rh-20261002-0700"
+     }
+    },
+    "object_id": "obs_num_segment_efff21c2c7b32bbcd202806e",
+    "object_type": "observation",
+    "occurred_at": "2026-10-01T22:00:00Z",
+    "revision": 1,
+    "text": "{\"max\": 58.0, \"mean\": 57.5, \"min\": 57.1, \"sample_count\": 3}"
+   },
+   {
+    "metadata": {
+     "adapter_id": "habitation.sensor_studio_climate.numeric.v1",
+     "dimension": "dim:studio_climate",
+     "mechanical_compression": true,
+     "mechanical_ingest": true,
+     "raw_sample_values_retained": false,
+     "series_id": "studio_humidity_20261002_am",
+     "source_class": "sensor",
+     "source_digest": "e192e1c5c7074f56f097e4fa66f697bbdd2f0ec46f8a4b29106944bc43c8bdb1",
+     "source_locator_range": {
+      "first": null,
+      "last": null
+     },
+     "source_record_ids_digest": "b5ea85bfc3f6bb418cb3af5fd848703bdad9561cc85821030f7133c251bd90cc",
+     "source_record_range": {
+      "count": 3,
+      "first": "rh-20261002-0730",
+      "last": "rh-20261002-0830"
+     }
+    },
+    "object_id": "obs_num_segment_bb0c5aa7ada9816893d6e068",
+    "object_type": "observation",
+    "occurred_at": "2026-10-01T23:30:00Z",
+    "revision": 1,
+    "text": "{\"max\": 64.2, \"mean\": 64.0, \"min\": 63.8, \"sample_count\": 3}"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:studio_climate",
+     "summary_kind": "single_dimension_temporal"
+    },
+    "object_id": "sum_09b17fc6b3536c598e03972d",
+    "object_type": "summary",
+    "occurred_at": "2026-10-02T00:00:00Z",
+    "revision": 1,
+    "text": "工作室湿度（UTC 日窗 2026-10-02，实际对应本地 10-03 07:00–08:30）：四个采样落在 61.2–61.6 %RH，均值约 61.4，全段波动 0.4 个百分点，机械压缩后为单一稳定段，没有阈值跳变，因此未触发任何 Wake。\n与前一日对照：10-02 早晨曾从 57.5 抬升到 64.0（跳变区间无采样）；本日早晨稳定在 61 上下，比昨日峰值低约 2.6 个百分点，但高于昨日起始的 57.5。\n说明：61 %RH 对纸本修复是否偏高，属于我尚未在世界里建立任何依据的判断，因此此处只记录数值与趋势，不下结论。原始逐点数值未保留。"
+   },
+   {
+    "metadata": {
+     "adapter_id": "habitation.sensor_studio_climate.numeric.v1",
+     "dimension": "dim:studio_climate",
+     "mechanical_compression": true,
+     "mechanical_ingest": true,
+     "raw_sample_values_retained": false,
+     "series_id": "studio_humidity_20261003_am",
+     "source_class": "sensor",
+     "source_digest": "9f12483021548fa7058bae8f82b39b6e35101d12ae1dcda47353d6eb8025eeee",
+     "source_locator_range": {
+      "first": null,
+      "last": null
+     },
+     "source_record_ids_digest": "1fcb2f436bb6f3a0cd646c3bd125eab1f37891698d89c9f73116e19830638ba6",
+     "source_record_range": {
+      "count": 4,
+      "first": "rh-20261003-0700",
+      "last": "rh-20261003-0830"
+     }
+    },
+    "object_id": "obs_num_segment_9ac20378a47a7c59c900d6d4",
+    "object_type": "observation",
+    "occurred_at": "2026-10-02T23:00:00Z",
+    "revision": 1,
+    "text": "{\"max\": 61.6, \"mean\": 61.4, \"min\": 61.2, \"sample_count\": 4}"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-10-04T23:59:59.999999Z",
+  "window_start": "2026-09-28T00:00:00Z"
+ },
+ "run_id": "hab_arena_01a0c1e1_moyin_v1",
+ "segment_id": "segment_003",
+ "simulated_at": "2026-10-05T01:10:00+00:00",
+ "step_key": "segment_003-s0000-advance",
+ "world_revision_before": 111
+}

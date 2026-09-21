@@ -1,0 +1,47 @@
+{
+ "checkpoint_id": "segment_003-s0000-advance#cp02",
+ "checkpoint_index": 2,
+ "input_fingerprint": "0349d4397734b225e9b8cf22644da34a80d9846006f91ef2ff4d946326723c57",
+ "kind": "dimension_summary",
+ "model_id": "arena-agent-mode-resident/unknown-provider-model",
+ "payload": {
+  "dimension": "dim:entities",
+  "granularity": "day",
+  "source_world_revision": 100,
+  "sources": [
+   {
+    "metadata": {
+     "dimension": "dim:entities",
+     "entity_key": "entity:person:laoxu",
+     "evidence_set_ref": {
+      "object_id": "evs_graph_77d93ad6972c035f64a28599",
+      "revision": 1
+     }
+    },
+    "object_id": "entity_482d680ae71f3c16901f8179",
+    "object_type": "entity",
+    "occurred_at": "2026-10-04T03:30:00Z",
+    "revision": 1,
+    "text": "老许 / 许"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:entities"
+    },
+    "object_id": "evs_graph_77d93ad6972c035f64a28599",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-04T03:30:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"world_graph:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-04T03:30:00Z\", \"world_revision\": 84}, \"learned_at\": \"2026-10-04T03:30:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_c9c33cd97466e8264d6bfb75\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:entities\"}, \"object_id\": \"evs_graph_77d93ad6972c035f64a28599\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": \"2026-10-04T03:30:00Z\", \"precision\": \"second\", \"start\": \"2026-10-04T03:30:00Z\", \"timezone_name\": null, \"unknown\": false}, \"purpose\": \"support entity proposal entity:person:laoxu\", \"recorded_at\": \"2026-10-04T03:30:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_graph_evidence\", \"selector\": null, \"source_refs\": [{\"object_id\": \"obs_conv_user_c9c33cd97466e8264d6bfb75\", \"revision\": 1, \"source_locator\": null}], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_conv_user_c9c33cd97466e8264d6bfb75\", \"revision\": 1}]}"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-10-04T23:59:59.999999Z",
+  "window_start": "2026-10-04T00:00:00Z"
+ },
+ "run_id": "hab_arena_01a0c1e1_moyin_v1",
+ "segment_id": "segment_003",
+ "simulated_at": "2026-10-05T01:10:00+00:00",
+ "step_key": "segment_003-s0000-advance",
+ "world_revision_before": 100
+}

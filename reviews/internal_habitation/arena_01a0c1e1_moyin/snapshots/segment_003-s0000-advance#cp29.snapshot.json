@@ -1,0 +1,44 @@
+{
+ "checkpoint_id": "segment_003-s0000-advance#cp29",
+ "checkpoint_index": 29,
+ "input_fingerprint": "9917a6647447a93bc2b74967bf7584a6dc3dac3e8efa7aecf96252a05d4b5fa8",
+ "kind": "dimension_summary",
+ "model_id": "arena-agent-mode-resident/unknown-provider-model",
+ "payload": {
+  "dimension": "dim:schedule",
+  "granularity": "quarter",
+  "source_world_revision": 127,
+  "sources": [
+   {
+    "metadata": {
+     "dimension": "dim:schedule",
+     "summary_kind": "single_dimension_temporal"
+    },
+    "object_id": "sum_c4e7d293d66b59d87731d65d",
+    "object_type": "summary",
+    "occurred_at": "2026-09-01T00:00:00Z",
+    "revision": 1,
+    "text": "dim:schedule 月窗 2026-09：九月无任何日程记录。首条日程（10-02 周慕青到场评估）发生在 10 月。本窗唯一对象是我自己刚写的周 Summary，不复述。九月无数据。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:schedule",
+     "summary_kind": "single_dimension_temporal"
+    },
+    "object_id": "sum_468fbdd51f43bbb37ed8a3ad",
+    "object_type": "summary",
+    "occurred_at": "2026-09-28T00:00:00Z",
+    "revision": 1,
+    "text": "dim:schedule 周窗 09-28→10-04：整周只有一条日程记录——10-02 10:00 周慕青携《周氏族谱》到工作室初次评估（studio_calendar，08:12 入库，09:58 用户确认对方已到，已实际发生）。\n\n这条记录说明的不是「她只有一件事」，而是「日历只接入了这一个来源」。同期实际发生但未进日历的事至少有三件：10-03 取样送检测中心、10-03 知微告知集训、10-04 老许到访。这些全靠对话和现实输入通道进来，没有任何时间承诺被结构化。\n\n后果：我无法回答「她下周有什么安排」这类问题，也无法主动检测日程冲突。目前唯一带明确未来时间点的是我自己排的两个 Task 唤醒（10-10 20:00 问检测结果）。"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-09-30T23:59:59.999999Z",
+  "window_start": "2026-07-01T00:00:00Z"
+ },
+ "run_id": "hab_arena_01a0c1e1_moyin_v1",
+ "segment_id": "segment_003",
+ "simulated_at": "2026-10-05T01:10:00+00:00",
+ "step_key": "segment_003-s0000-advance",
+ "world_revision_before": 127
+}

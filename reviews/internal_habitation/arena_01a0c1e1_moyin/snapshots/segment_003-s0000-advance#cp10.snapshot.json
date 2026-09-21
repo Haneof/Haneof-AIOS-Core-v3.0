@@ -1,0 +1,55 @@
+{
+ "checkpoint_id": "segment_003-s0000-advance#cp10",
+ "checkpoint_index": 10,
+ "input_fingerprint": "f373f9985217aa9a90cbc41a9e5b3e22dfaa32fcc836e1cee41b3ccb26add682",
+ "kind": "dimension_summary",
+ "model_id": "arena-agent-mode-resident/unknown-provider-model",
+ "payload": {
+  "dimension": "dim:relations",
+  "granularity": "week",
+  "source_world_revision": 108,
+  "sources": [
+   {
+    "metadata": {
+     "dimension": "dim:relations",
+     "summary_kind": "single_dimension_temporal"
+    },
+    "object_id": "sum_db587ba1761a2aa7d5eac611",
+    "object_type": "summary",
+    "occurred_at": "2026-10-02T00:00:00Z",
+    "revision": 1,
+    "text": "2026-10-02 只建立了 1 条显式关系：周慕青 —持有并委托评估→ 《周氏族谱》（confidence 0.9，依据为日历记录＋用户确认其人已到场）。\n故意留空、等后续证据再补的关系：\n- 用户 ↔ 阿桐 的用工关系：目前只有一条推断性 Claim，没有建 Relation，因为用户本人还没有身份锚点（她未自报姓名）。\n- 沈守拙 ↔ 用户 的父子关系：归并本身仍是推断。\n- 周慕青 ↔ 其兄长 的原属关系：兄长无姓名、无锚点。\n结论：本维度的稀疏是有意为之，不是遗漏。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:relations"
+    },
+    "object_id": "evs_graph_ce17bf23e3c2c7b3f8eb7c17",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-02T03:41:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 2, \"missing_description\": [], \"observed_count\": 2}, \"created_by\": \"world_graph:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-02T03:41:00Z\", \"world_revision\": 15}, \"learned_at\": \"2026-10-02T03:41:00Z\", \"member_refs\": [{\"object_id\": \"obs_src_7d32dec1342583c418c6e25d\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_2a148004b025e1aca99657f5\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:relations\"}, \"object_id\": \"evs_graph_ce17bf23e3c2c7b3f8eb7c17\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": \"2026-10-02T03:41:00Z\", \"precision\": \"second\", \"start\": \"2026-10-02T03:41:00Z\", \"timezone_name\": null, \"unknown\": false}, \"purpose\": \"support relation relation_1ca987c432fbdc8d39ff0044@1\", \"recorded_at\": \"2026-10-02T03:41:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_graph_evidence\", \"selector\": null, \"source_refs\": [{\"object_id\": \"obs_src_7d32dec1342583c418c6e25d\", \"revision\": 1, \"source_locator\": null}, {\"object_id\": \"obs_conv_user_2a148004b025e1aca99657f5\", \"revision\": 1, \"source_locator\": null}], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_src_7d32dec1342583c418c6e25d\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_2a148004b025e1aca99657f5\", \"revision\": 1}]}"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:relations",
+     "reason": "日历记录周慕青携《周氏族谱》到工作室做初次评估，用户确认人已到场",
+     "supersedes_revision": null
+    },
+    "object_id": "relation_1ca987c432fbdc8d39ff0044",
+    "object_type": "relation",
+    "occurred_at": "2026-10-02T03:41:00Z",
+    "revision": 1,
+    "text": "{\"confidence\": 0.9, \"created_by\": \"world_graph:resident_ai\", \"evidence_set_refs\": [{\"object_id\": \"evs_graph_ce17bf23e3c2c7b3f8eb7c17\", \"revision\": 1}], \"learned_at\": \"2026-10-02T03:41:00Z\", \"left\": {\"object_id\": \"entity_6fe409517002c45cc25bb11c\", \"revision\": 1}, \"metadata\": {\"dimension\": \"dim:relations\", \"reason\": \"日历记录周慕青携《周氏族谱》到工作室做初次评估，用户确认人已到场\", \"supersedes_revision\": null}, \"object_id\": \"relation_1ca987c432fbdc8d39ff0044\", \"object_type\": \"relation\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"recorded_at\": \"2026-10-02T03:41:00Z\", \"relation_type\": \"持有并委托评估\", \"revision\": 1, \"right\": {\"object_id\": \"entity_5aeb17d17c30f7c7705601c1\", \"revision\": 1}, \"source_refs\": [{\"object_id\": \"obs_src_7d32dec1342583c418c6e25d\", \"revision\": 1, \"source_locator\": null}, {\"object_id\": \"obs_conv_user_2a148004b025e1aca99657f5\", \"revision\": 1, \"source_locator\": null}], \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"valid_time\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}}"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-10-04T23:59:59.999999Z",
+  "window_start": "2026-09-28T00:00:00Z"
+ },
+ "run_id": "hab_arena_01a0c1e1_moyin_v1",
+ "segment_id": "segment_003",
+ "simulated_at": "2026-10-05T01:10:00+00:00",
+ "step_key": "segment_003-s0000-advance",
+ "world_revision_before": 108
+}

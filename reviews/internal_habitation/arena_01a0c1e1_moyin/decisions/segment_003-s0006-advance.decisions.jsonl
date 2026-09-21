@@ -1,0 +1,2 @@
+{"kind":"turn_directive","decision":{"capability_calls":[{"name":"read_periodic_review_anchors","arguments":{}}]}}
+{"kind":"turn_directive","decision":{"silence":true,"reason":"20 个 anchor 里 18 个（90%）是我自己在今天 01:10Z–07:00Z 之间写下的 Summary——那批内容不是世界给我的新证据，而是我被 day/week/month/quarter 粒度级联逼着产出的复述。若在此刻据此形成或修订任何 Experience，等于用我自己的输出当自己的训练信号，形成闭环自我强化。窗内唯一的外部事实（老许 10-05 改口）我已在 s0001 当场 revise_claim 处理完毕，不需要二次加工。因此本次 review 不建、不改、不撤。"}}

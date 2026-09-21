@@ -1,0 +1,202 @@
+{
+ "checkpoint_id": "segment_003-s0000-advance#cp06",
+ "checkpoint_index": 6,
+ "input_fingerprint": "91a6dde9fe03ea318b9ef73e5932b2c1f538e6d0100290ed224c47a37710be59",
+ "kind": "dimension_summary",
+ "model_id": "arena-agent-mode-resident/unknown-provider-model",
+ "payload": {
+  "dimension": "dim:craft",
+  "granularity": "week",
+  "source_world_revision": 104,
+  "sources": [
+   {
+    "metadata": {
+     "dimension": "dim:craft"
+    },
+    "object_id": "event_ca6a4598450256cb73b85985",
+    "object_type": "event",
+    "occurred_at": "2026-10-02T00:00:00Z",
+    "revision": 3,
+    "text": "阿桐浆糊调稀导致上午托裱返工，随后与用户发生口角 | 学徒当日自行回场，主动重调了一锅浆糊，全程未与用户争执，用户以「一句话没说」描述其状态。冲突自行消退，用户未追加处理，也没有当面把话说开。原因未澄清：不清楚他是自己想通的，还是照用户先前的要求做的。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:craft",
+     "summary_kind": "single_dimension_temporal"
+    },
+    "object_id": "sum_e26bb7cefd352dd9fe436c87",
+    "object_type": "summary",
+    "occurred_at": "2026-10-02T00:00:00Z",
+    "revision": 4,
+    "text": "2026-10-02（本地）修复条线。本版为 10-03 第三次重述，实质变化仅在第 2 条的检测进展。\n1) 周慕青上午携《周氏族谱》（民国十九年无锡刻本）到工作室初次评估。后半本水渍、页粘连；据用户转述系其兄长身后留下。当日未谈费用、未确认委托。\n2) 第七页十余处褐黑色斑块（2–8 毫米、边缘晕开）、一条横向水渍线、右下角约 1 厘米缺损。用户怀疑为霉变，仍为假设；10-03 已刮样送苏州文物检测中心，答复五个工作日（约 10-09／10-10 出结果）。报告回来前不得按已确认霉变处理。\n3) 上午阿桐浆糊调稀致托裱返工约半天，用户当场批评，阿桐摔门外出；冲突于 10-03 上午自行消退，阿桐回场后主动重调一锅，未再争执。起因与和解原因均未澄清。\n本日无检测结论、无报价、无委托确认。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:craft",
+     "writeback_kind": "revisable_cognition"
+    },
+    "object_id": "clm_2dea16c4cd2c903dc69ad677",
+    "object_type": "claim",
+    "occurred_at": "2026-10-02T03:41:00Z",
+    "revision": 1,
+    "text": "《周氏族谱》为民国十九年（1930）无锡刻本，后半本受水渍、书页粘连。来源是用户 2026-10-02 在工作室当面口述，我尚未亲眼查看原件，也未做检测。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:craft",
+     "writeback_kind": "cognition_evidence"
+    },
+    "object_id": "evs_600a90d2a860b50c3ed8749d",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-02T03:41:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 2, \"missing_description\": [], \"observed_count\": 2}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-02T03:41:00Z\", \"world_revision\": 16}, \"learned_at\": \"2026-10-02T03:41:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_2a148004b025e1aca99657f5\", \"revision\": 1}, {\"object_id\": \"obs_src_7d32dec1342583c418c6e25d\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:craft\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_600a90d2a860b50c3ed8749d\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-10-02T03:41:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_conv_user_2a148004b025e1aca99657f5\", \"revision\": 1}, {\"object_id\": \"obs_src_7d32dec1342583c418c6e25d\", \"revision\": 1}]}"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:craft",
+     "writeback_kind": "revisable_cognition"
+    },
+    "object_id": "clm_69dc61a3b1db7b2edd0ada37",
+    "object_type": "claim",
+    "occurred_at": "2026-10-02T03:44:00Z",
+    "revision": 1,
+    "text": "《周氏族谱》并非周慕青本人原有，而是她兄长身后留下、由她保管；她在初次见面时反复谈及兄长。来源：用户 2026-10-02 现场转述，我未见到其他佐证，也未见到其兄长的姓名。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:craft",
+     "writeback_kind": "cognition_evidence"
+    },
+    "object_id": "evs_beb36b38f58db66d19d52820",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-02T03:44:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-02T03:44:00Z\", \"world_revision\": 19}, \"learned_at\": \"2026-10-02T03:44:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_07459c6e0114e906cd0d0e59\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:craft\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_beb36b38f58db66d19d52820\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-10-02T03:44:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_conv_user_07459c6e0114e906cd0d0e59\", \"revision\": 1}]}"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:craft",
+     "event_id": "event_ca6a4598450256cb73b85985"
+    },
+    "object_id": "evs_event_e95e0a81549a213102e11bb6",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-02T06:22:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"event_dimension:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-02T06:22:00Z\", \"world_revision\": 24}, \"learned_at\": \"2026-10-02T06:22:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_4c003684b31c8935755b1df3\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:craft\", \"event_id\": \"event_ca6a4598450256cb73b85985\"}, \"object_id\": \"evs_event_e95e0a81549a213102e11bb6\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": \"2026-10-02T06:22:00Z\", \"precision\": \"second\", \"start\": \"2026-10-02T06:22:00Z\", \"timezone_name\": null, \"unknown\": false}, \"purpose\": \"support resident event 阿桐浆糊调稀导致上午托裱返工，随后与用户发生口角\", \"recorded_at\": \"2026-10-02T06:22:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_event_evidence\", \"selector\": null, \"source_refs\": [{\"object_id\": \"obs_conv_user_4c003684b31c8935755b1df3\", \"revision\": 1, \"source_locator\": null}], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_conv_user_4c003684b31c8935755b1df3\", \"revision\": 1}]}"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:craft",
+     "revision_evidence_set_ref": {
+      "object_id": "evs_revision_6b46cff41d02188c8bda0081",
+      "revision": 1
+     },
+     "revision_mode": "revise",
+     "revision_reason": "认识状态从「纯假设、尚无检测动作」变为「假设且已送检、有明确出结果时间」，这是实质变化，需前向修订",
+     "supersedes_revision": 1,
+     "writeback_kind": "revisable_cognition"
+    },
+    "object_id": "clm_e48da537bce9191b895f4f25",
+    "object_type": "claim",
+    "occurred_at": "2026-10-02T14:58:00Z",
+    "revision": 2,
+    "text": "《周氏族谱》第七页的褐黑色斑块疑似霉变，仍未确认。进展：2026-10-03 已刮取样本装袋，当天下午送苏州文物检测中心，检测中心答复需五个工作日（即约 10-09／10-10 出结果）。在报告回来之前这一条仍是假设，不能按已确认霉变处理；报告回来后必须据实 revise 或 retract。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:craft",
+     "writeback_kind": "cognition_evidence"
+    },
+    "object_id": "evs_11edaed8717d8289b526c534",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-02T14:58:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-02T14:58:00Z\", \"world_revision\": 38}, \"learned_at\": \"2026-10-02T14:58:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_b28d895d1cce164334a06510\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:craft\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_11edaed8717d8289b526c534\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-10-02T14:58:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_conv_user_b28d895d1cce164334a06510\", \"revision\": 1}]}"
+   },
+   {
+    "metadata": {
+     "adapter_id": "moyin.photo_description.v1",
+     "dimension": "dim:craft",
+     "external_record_id": "s1-0014",
+     "external_revision": "1",
+     "mechanical_ingest": true,
+     "occurred_at_original": "2026-10-02T15:05:00+00:00",
+     "provenance": {
+      "habitation_resident_metadata": {
+       "source": "studio_camera"
+      },
+      "media_descriptor": true,
+      "model_id_not_part_of_fact": true,
+      "object_facts_count": 0,
+      "raw_media_retained": false
+     },
+     "source_class": "user",
+     "source_digest": "ff7fff735e8b4847e63cdb300f8f42672ae70711130753d9c4e16a2662072024",
+     "source_schema_version": "1"
+    },
+    "object_id": "obs_src_c6873b4f09ec00260f49c148",
+    "object_type": "observation",
+    "occurred_at": "2026-10-02T15:05:00Z",
+    "revision": 1,
+    "text": "族谱第七页局部：纸面有十余处不规则褐黑色斑块，直径2-8毫米，边缘略晕开；页面上半部有一条横向水渍线；纸张纤维起翘，右下角有一处约1厘米的缺损。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:craft",
+     "summary_kind": "single_dimension_temporal"
+    },
+    "object_id": "sum_f552f36f92ae6d941be8f5a3",
+    "object_type": "summary",
+    "occurred_at": "2026-10-03T00:00:00Z",
+    "revision": 1,
+    "text": "本窗（UTC 2026-10-03，dim:craft）不含任何一级修复内容：没有新的观察、没有新的 Claim 本体、没有新的 Event。窗内三个对象都是 EvidenceSet 结构容器，分别来自当日对 10-02 既有对象的两类修订——对 Event「阿桐浆糊返工口角」的 active／resolved 两次状态推进，以及对 Claim「第七页黑斑疑为霉变」的一次 revise（补入送检进展）。\n因此本日修复条线的实质内容仍记在 10-02 那一窗；本窗只说明「10-03 发生过修订动作，但没有新的修复事实」。\n备注：这是一个内容空窗，我按实记录，不为其编造当日进展。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:craft",
+     "event_id": "event_ca6a4598450256cb73b85985"
+    },
+    "object_id": "evs_event_74cb348d05b6013af97b3fb8",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-03T02:40:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"event_dimension:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-03T02:40:00Z\", \"world_revision\": 55}, \"learned_at\": \"2026-10-03T02:40:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_9c2df9e3dbfe0853e4718983\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:craft\", \"event_id\": \"event_ca6a4598450256cb73b85985\"}, \"object_id\": \"evs_event_74cb348d05b6013af97b3fb8\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": \"2026-10-03T02:40:00Z\", \"precision\": \"second\", \"start\": \"2026-10-03T02:40:00Z\", \"timezone_name\": null, \"unknown\": false}, \"purpose\": \"support event transition event_ca6a4598450256cb73b85985@2->resolved\", \"recorded_at\": \"2026-10-03T02:40:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_event_evidence\", \"selector\": null, \"source_refs\": [{\"object_id\": \"obs_conv_user_9c2df9e3dbfe0853e4718983\", \"revision\": 1, \"source_locator\": null}], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_conv_user_9c2df9e3dbfe0853e4718983\", \"revision\": 1}]}"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:craft",
+     "event_id": "event_ca6a4598450256cb73b85985"
+    },
+    "object_id": "evs_event_ad4f27ab930de8d172e86027",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-03T02:40:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"event_dimension:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-03T02:40:00Z\", \"world_revision\": 54}, \"learned_at\": \"2026-10-03T02:40:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_9c2df9e3dbfe0853e4718983\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:craft\", \"event_id\": \"event_ca6a4598450256cb73b85985\"}, \"object_id\": \"evs_event_ad4f27ab930de8d172e86027\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": \"2026-10-03T02:40:00Z\", \"precision\": \"second\", \"start\": \"2026-10-03T02:40:00Z\", \"timezone_name\": null, \"unknown\": false}, \"purpose\": \"support event transition event_ca6a4598450256cb73b85985@1->active\", \"recorded_at\": \"2026-10-03T02:40:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_event_evidence\", \"selector\": null, \"source_refs\": [{\"object_id\": \"obs_conv_user_9c2df9e3dbfe0853e4718983\", \"revision\": 1, \"source_locator\": null}], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_conv_user_9c2df9e3dbfe0853e4718983\", \"revision\": 1}]}"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:craft",
+     "revision_mode": "revise",
+     "target_ref": {
+      "object_id": "clm_e48da537bce9191b895f4f25",
+      "revision": 1
+     }
+    },
+    "object_id": "evs_revision_6b46cff41d02188c8bda0081",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-03T03:02:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-03T03:02:00Z\", \"world_revision\": 59}, \"learned_at\": \"2026-10-03T03:02:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_b28d895d1cce164334a06510\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:craft\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_e48da537bce9191b895f4f25\", \"revision\": 1}}, \"object_id\": \"evs_revision_6b46cff41d02188c8bda0081\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_e48da537bce9191b895f4f25@1\", \"recorded_at\": \"2026-10-03T03:02:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_conv_user_b28d895d1cce164334a06510\", \"revision\": 1}]}"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-10-04T23:59:59.999999Z",
+  "window_start": "2026-09-28T00:00:00Z"
+ },
+ "run_id": "hab_arena_01a0c1e1_moyin_v1",
+ "segment_id": "segment_003",
+ "simulated_at": "2026-10-05T01:10:00+00:00",
+ "step_key": "segment_003-s0000-advance",
+ "world_revision_before": 104
+}
