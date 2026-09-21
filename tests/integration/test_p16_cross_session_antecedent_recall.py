@@ -337,3 +337,18 @@ def test_embedded_continuation_word_in_self_contained_request_does_not_open_hist
     assert state.continued_from_recent_turn is False
     assert state.antecedent_recall_needed is False
     assert state.history_may_help is False
+
+
+def test_self_contained_current_clause_stays_current_even_with_same_session_history():
+    state = TopicStateService().resolve(
+        user_input="今天我准备继续学习 Python，请帮我整理计划。",
+        recent_turns=(
+            {"role": "user", "text": "上一轮我们讨论的是咖啡机清洁。"},
+            {"role": "assistant", "text": "可以。"},
+        ),
+    )
+
+    assert state.continued_from_recent_turn is False
+    assert state.antecedent_recall_needed is False
+    assert state.history_may_help is False
+    assert state.topic == "今天我准备继续学习 Python，请帮我整理计划。"
