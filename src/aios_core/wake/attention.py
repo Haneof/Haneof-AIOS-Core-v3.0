@@ -1,0 +1,466 @@
+"""Resident-authored mechanical attention watches and wake batching.
+
+The resident model decides *what deserves future attention*.  This module stores
+that intent as a constrained observation Task and evaluates only mechanical
+predicates over later Observation facts.  It never infers semantic meaning.
+
+The AttentionRouter batches already-created non-safety Wake objects so bursts of
+related low-level changes can invoke the Resident once rather than once per signal.
+"""
+
+from __future__ import annotations
+
+from dataclasses import asdict, dataclass
+from datetime import datetime, timedelta
+from typing import Any, Literal, Mapping, Sequence
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+from aios_core.contracts.enums import ObjectType, TaskState, TaskType, WakeSource, WakeState
+from aios_core.contracts.models import Observation, Task, Wake
+from aios_core.contracts.operations import OperationRequest
+from aios_core.contracts.refs import ObjectRef, SourceRef
+from aios_core.contracts.time import TemporalExtent, as_utc
+from aios_core.execution import GoalTaskActionService, TaskCreateRequest
+from aios_core.query.search import WorldSearchIndex
+from aios_core.storage.idempotency import canonical_json_dumps
+from aios_core.storage.sqlite_store import SQLiteWorldStore
+
+from .service import WakeBus, WakeSignalReceipt, WakeSignalRequest
+
+
+NumericOperator = Literal["gt", "gte", "lt", "lte", "eq", "ne"]
+
+
+class NumericPredicate(BaseModel):
+    """Purely mechanical numeric comparison against Observation.value."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    operator: NumericOperator
+    threshold: float
+    path: tuple[str, ...] = ()
+
+    @model_validator(mode="after")
+    def validate_path(self) -> "NumericPredicate":
+        if any(not str(item).strip() for item in self.path):
+            raise ValueError("numeric predicate path parts must be non-blank")
+        return self
+
+
+class AttentionWatchRequest(BaseModel):
+    """Resident-authored future-attention intent compiled to a mechanical predicate."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    title: str = Field(min_length=1)
+    dimensions: tuple[str, ...] = Field(min_length=1)
+    reason_refs: tuple[ObjectRef, ...] = Field(min_length=1)
+    goal_ref: ObjectRef | None = None
+    source_kind: str | None = None
+    modality: str | None = None
+    metadata_equals: Mapping[str, Any] = Field(default_factory=dict)
+    numeric: NumericPredicate | None = None
+    priority: int = Field(default=50, ge=0, le=100)
+    cooldown_seconds: int = Field(default=0, ge=0)
+    expires_at: datetime | None = None
+
+    @model_validator(mode="after")
+    def validate_request(self) -> "AttentionWatchRequest":
+        if not self.title.strip():
+            raise ValueError("title must not be blank")
+        clean_dims = [str(item).strip() for item in self.dimensions]
+        if any(not item or not item.startswith("dim:") for item in clean_dims):
+            raise ValueError("attention watch dimensions must start with 'dim:'")
+        if len(set(clean_dims)) != len(clean_dims):
+            raise ValueError("attention watch dimensions must be unique")
+        if self.source_kind is not None and not self.source_kind.strip():
+            raise ValueError("source_kind must not be blank")
+        if self.modality is not None and not self.modality.strip():
+            raise ValueError("modality must not be blank")
+        if any(not str(key).strip() for key in self.metadata_equals):
+            raise ValueError("metadata predicate keys must be non-blank")
+        if self.expires_at is not None:
+            as_utc(self.expires_at, "expires_at")
+        for ref in self.reason_refs:
+            if ref.revision is None:
+                raise ValueError("attention watch reason_refs must pin revisions")
+        if self.goal_ref is not None and self.goal_ref.revision is None:
+            raise ValueError("attention watch goal_ref must pin a revision")
+        return self
+
+
+@dataclass(frozen=True, slots=True)
+class AttentionWatchReceipt:
+    task_id: str
+    revision: int
+    state: str
+    world_revision: int
+
+
+@dataclass(frozen=True, slots=True)
+class AttentionBundleReceipt:
+    wake_id: str
+    revision: int
+    member_count: int
+    member_wake_ids: tuple[str, ...]
+    world_revision: int
+
+
+def _stable_id(prefix: str, *parts: object) -> str:
+    raw = canonical_json_dumps(list(parts))
+    import hashlib
+
+    return f"{prefix}_{hashlib.sha256(raw.encode('utf-8')).hexdigest()[:24]}"
+
+
+def _extract_numeric(value: Any, path: Sequence[str]) -> float | None:
+    current = value
+    for part in path:
+        if not isinstance(current, Mapping) or part not in current:
+            return None
+        current = current[part]
+    if isinstance(current, bool) or not isinstance(current, (int, float)):
+        return None
+    return float(current)
+
+
+def _numeric_matches(actual: float, predicate: NumericPredicate) -> bool:
+    threshold = float(predicate.threshold)
+    if predicate.operator == "gt":
+        return actual > threshold
+    if predicate.operator == "gte":
+        return actual >= threshold
+    if predicate.operator == "lt":
+        return actual < threshold
+    if predicate.operator == "lte":
+        return actual <= threshold
+    if predicate.operator == "eq":
+        return actual == threshold
+    if predicate.operator == "ne":
+        return actual != threshold
+    raise AssertionError("unreachable numeric operator")
+
+
+class AttentionWatchService:
+    """Compile Resident attention intent to durable Task + mechanical matching."""
+
+    CONDITION_KIND = "attention_watch_v1"
+
+    def __init__(
+        self,
+        *,
+        store: SQLiteWorldStore,
+        index: WorldSearchIndex,
+        execution_world: GoalTaskActionService,
+        wake_bus: WakeBus,
+        subject_id: str = "user_1",
+    ) -> None:
+        self.store = store
+        self.index = index
+        self.execution_world = execution_world
+        self.wake_bus = wake_bus
+        self.subject_id = subject_id.strip()
+
+    def create(
+        self,
+        request: AttentionWatchRequest,
+        *,
+        created_at: datetime,
+    ) -> AttentionWatchReceipt:
+        created = as_utc(created_at, "created_at")
+        if request.expires_at is not None and as_utc(
+            request.expires_at, "expires_at"
+        ) <= created:
+            raise ValueError("attention watch expires_at must be after created_at")
+
+        condition = {
+            "kind": self.CONDITION_KIND,
+            "dimensions": [str(item).strip() for item in request.dimensions],
+            "source_kind": (
+                None if request.source_kind is None else request.source_kind.strip()
+            ),
+            "modality": (
+                None if request.modality is None else request.modality.strip()
+            ),
+            "metadata_equals": dict(request.metadata_equals),
+            "numeric": (
+                None if request.numeric is None else request.numeric.model_dump(mode="json")
+            ),
+            "cooldown_seconds": int(request.cooldown_seconds),
+            "predicate_semantics": "mechanical_only",
+        }
+        receipt = self.execution_world.create_task(
+            TaskCreateRequest(
+                title=request.title.strip(),
+                task_type=TaskType.OBSERVATION,
+                reason_refs=request.reason_refs,
+                goal_ref=request.goal_ref,
+                initial_state=TaskState.WAITING_EVIDENCE,
+                priority=request.priority,
+                deadline=request.expires_at,
+                next_step=(
+                    "Mechanically watch matching Observation facts; "
+                    "Resident interprets meaning only after Wake."
+                ),
+                completion_condition=condition,
+            ),
+            created_at=created,
+        )
+        return AttentionWatchReceipt(
+            task_id=receipt.task_id,
+            revision=receipt.revision,
+            state=receipt.state,
+            world_revision=receipt.world_revision,
+        )
+
+    def current(self) -> tuple[Task, ...]:
+        watches: list[Task] = []
+        for task in self.execution_world.current_tasks():
+            if task.task_type is not TaskType.OBSERVATION:
+                continue
+            if task.task_state is not TaskState.WAITING_EVIDENCE:
+                continue
+            condition = task.completion_condition
+            if condition.get("kind") != self.CONDITION_KIND:
+                continue
+            watches.append(task)
+        watches.sort(key=lambda item: (-item.priority, item.object_id))
+        return tuple(watches)
+
+    @staticmethod
+    def _matches(task: Task, observation: Observation) -> bool:
+        condition = task.completion_condition
+        dimensions = tuple(str(item) for item in condition.get("dimensions") or ())
+        dimension = str(observation.metadata.get("dimension") or "")
+        if dimension not in dimensions:
+            return False
+
+        source_kind = condition.get("source_kind")
+        if source_kind is not None and observation.source_kind != source_kind:
+            return False
+        modality = condition.get("modality")
+        if modality is not None and observation.modality != modality:
+            return False
+
+        metadata_equals = condition.get("metadata_equals") or {}
+        if not isinstance(metadata_equals, Mapping):
+            return False
+        for key, expected in metadata_equals.items():
+            if observation.metadata.get(str(key)) != expected:
+                return False
+
+        numeric_raw = condition.get("numeric")
+        if numeric_raw is not None:
+            predicate = NumericPredicate.model_validate(numeric_raw)
+            actual = _extract_numeric(observation.value, predicate.path)
+            if actual is None or not _numeric_matches(actual, predicate):
+                return False
+
+        return True
+
+    def evaluate_observation(
+        self,
+        observation_ref: ObjectRef,
+    ) -> tuple[WakeSignalReceipt, ...]:
+        if observation_ref.revision is None:
+            raise ValueError("observation_ref must pin an exact revision")
+        payload = self.store.get_payload(
+            observation_ref.object_id,
+            revision=observation_ref.revision,
+        )
+        if payload.get("object_type") != ObjectType.OBSERVATION.value:
+            raise ValueError("attention watches evaluate Observation objects only")
+        observation = Observation.model_validate(payload)
+        if observation.subject_id != self.subject_id:
+            raise ValueError("Observation belongs to another subject")
+
+        receipts: list[WakeSignalReceipt] = []
+        for task in self.current():
+            if task.deadline is not None and as_utc(
+                task.deadline, "deadline"
+            ) < as_utc(observation.recorded_at, "recorded_at"):
+                continue
+            if not self._matches(task, observation):
+                continue
+
+            condition = task.completion_condition
+            task_ref = ObjectRef(object_id=task.object_id, revision=task.revision)
+            receipts.append(
+                self.wake_bus.emit(
+                    WakeSignalRequest(
+                        wake_source=WakeSource.WATCH_MATCH,
+                        rule_id=f"attention_watch:{task.object_id}",
+                        observed_at=observation.recorded_at,
+                        evidence_refs=(task_ref, observation_ref),
+                        priority=task.priority,
+                        dedupe_key=f"attention_watch:{task.object_id}",
+                        cooldown_seconds=int(
+                            condition.get("cooldown_seconds") or 0
+                        ),
+                        metadata={
+                            "trigger_kind": "resident_attention_watch",
+                            "watch_task_ref": task_ref.model_dump(mode="json"),
+                            "matched_dimension": observation.metadata.get("dimension"),
+                            "predicate_semantics": "mechanical_only",
+                        },
+                    )
+                )
+            )
+        return tuple(receipts)
+
+
+class AttentionRouter:
+    """Mechanically batch a short burst of pending non-safety Wakes into one Wake."""
+
+    def __init__(
+        self,
+        *,
+        store: SQLiteWorldStore,
+        wake_bus: WakeBus,
+        subject_id: str = "user_1",
+    ) -> None:
+        self.store = store
+        self.wake_bus = wake_bus
+        self.subject_id = subject_id.strip()
+
+    def bundle_pending(
+        self,
+        *,
+        now: datetime,
+        window_seconds: int = 60,
+        max_wakes: int = 16,
+    ) -> AttentionBundleReceipt | None:
+        moment = as_utc(now, "now")
+        if window_seconds < 0:
+            raise ValueError("window_seconds must be >= 0")
+        if max_wakes < 2:
+            raise ValueError("max_wakes must be >= 2")
+
+        cutoff = moment - timedelta(seconds=window_seconds)
+        eligible = [
+            wake
+            for wake in self.wake_bus.pending_wakes()
+            if wake.wake_source
+            not in {
+                WakeSource.SAFETY,
+                WakeSource.PERIODIC_REVIEW,
+                WakeSource.USER_INTERACTION,
+                WakeSource.ATTENTION_BUNDLE,
+            }
+            and cutoff <= as_utc(wake.last_hit_at, "last_hit_at") <= moment
+        ][:max_wakes]
+
+        if len(eligible) < 2:
+            return None
+
+        member_refs = [
+            ObjectRef(object_id=wake.object_id, revision=wake.revision)
+            for wake in eligible
+        ]
+        evidence_refs: list[ObjectRef] = []
+        for wake in eligible:
+            for ref in wake.evidence_refs:
+                if ref not in evidence_refs:
+                    evidence_refs.append(ref)
+            ref = ObjectRef(object_id=wake.object_id, revision=wake.revision)
+            if ref not in evidence_refs:
+                evidence_refs.append(ref)
+
+        bundle_id = _stable_id(
+            "wake_bundle",
+            self.subject_id,
+            tuple((ref.object_id, ref.revision) for ref in member_refs),
+        )
+        bundle = Wake(
+            object_id=bundle_id,
+            subject_id=self.subject_id,
+            occurred=TemporalExtent.point(moment),
+            learned_at=moment,
+            recorded_at=moment,
+            source_refs=[
+                SourceRef(object_id=ref.object_id, revision=ref.revision)
+                for ref in evidence_refs
+            ],
+            created_by="attention_router:bundle",
+            wake_source=WakeSource.ATTENTION_BUNDLE,
+            wake_state=WakeState.NEW,
+            rule_id="attention.router.bundle",
+            first_hit_at=min(
+                as_utc(item.first_hit_at, "first_hit_at") for item in eligible
+            ),
+            last_hit_at=max(
+                as_utc(item.last_hit_at, "last_hit_at") for item in eligible
+            ),
+            hit_count=sum(item.hit_count for item in eligible),
+            evidence_refs=evidence_refs,
+            priority=max(item.priority for item in eligible),
+            dedupe_key=f"attention_bundle:{bundle_id}",
+            metadata={
+                "attention_bundle": {
+                    "member_count": len(eligible),
+                    "members": [
+                        {
+                            "wake_ref": {
+                                "object_id": item.object_id,
+                                "revision": item.revision,
+                            },
+                            "wake_source": item.wake_source.value,
+                            "rule_id": item.rule_id,
+                            "priority": item.priority,
+                            "hit_count": item.hit_count,
+                        }
+                        for item in eligible
+                    ],
+                },
+                "semantic_conclusions": False,
+                "routing_only": True,
+            },
+        )
+
+        merged_children: list[Wake] = []
+        for wake in eligible:
+            metadata = dict(wake.metadata)
+            metadata["merged_into_attention_bundle"] = {
+                "object_id": bundle_id,
+                "revision": 1,
+            }
+            merged_children.append(
+                Wake.model_validate(
+                    {
+                        **wake.model_dump(mode="python", round_trip=True),
+                        "revision": wake.revision + 1,
+                        "occurred": TemporalExtent.point(moment),
+                        "learned_at": moment,
+                        "recorded_at": moment,
+                        "wake_state": WakeState.MERGED,
+                        "status": WakeState.MERGED.value,
+                        "metadata": metadata,
+                    }
+                )
+            )
+
+        result = self.store.commit(
+            [bundle, *merged_children],
+            OperationRequest(
+                operation_name="wake.attention.bundle",
+                arguments={
+                    "bundle_id": bundle_id,
+                    "member_wake_ids": [item.object_id for item in eligible],
+                    "window_seconds": int(window_seconds),
+                },
+                expected_world_revision=int(self.store.current_world_revision()),
+                reason="mechanically batch pending non-safety Wakes before Resident invocation",
+                idempotency_key=f"attention-bundle:{bundle_id}",
+                source_class="maintenance",
+                maintenance_class="wake_scheduler",
+            ),
+        )
+        self.wake_bus._catch_up()
+        return AttentionBundleReceipt(
+            wake_id=bundle_id,
+            revision=1,
+            member_count=len(eligible),
+            member_wake_ids=tuple(item.object_id for item in eligible),
+            world_revision=result.world_revision,
+        )
