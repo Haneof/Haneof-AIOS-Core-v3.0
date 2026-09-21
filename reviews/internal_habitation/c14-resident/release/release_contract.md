@@ -36,7 +36,7 @@ For one released event, the Release Operator may expose exactly these fields:
 
 The orchestrator-only `phase` field is not part of the Resident-visible projection.
 
-No batch listing, next-event preview, future count-by-content, hidden tag, evaluator label, expected cognition, or future payload may be emitted.
+No batch listing, next-event preview, future count-by-content, hidden semantic tag, answer-key material, or future payload may be emitted.
 
 ## 3. Cursor state
 
