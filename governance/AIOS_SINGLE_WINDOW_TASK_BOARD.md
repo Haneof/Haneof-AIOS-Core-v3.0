@@ -71,8 +71,8 @@
 | 7 | `T35-IMPL-001` | 按 T35-RULE-001 裁决实现 Task 完成闭环 | **DONE** | T35-RULE-001, T34-EXEC-001 | PR #55; candidate `07617df8ab87550289c1498cf3df387626d55e40`; squash merge `141dc177be895f9894a05227cbb132207ebf784d`; required candidate Gates GREEN; merge-result P12/P16 GREEN | 外部 Action/Outcome 保持强制链；WORLD_EVIDENCE / MIXED 按结构化 completion contract 校验；真实凭据、subject/current/provenance、幂等/restart/history 与 T34 回归全部 GREEN |
 | 8 | `T33-RECALL-001` | 用自包含表达/跨会话省略/无前文三类对照重新验证 recall 误触；只有复现才修 | **DONE** | AUDIT-001 | PR #51; candidate `91f1eecc1eb1a5aeb3dd2fa4566f045b6abea796`; squash merge `cb8eab12e9747bece41b14d183840e2cf13bd183`; repro run `35566569236`; required Gates GREEN | Case A/B/C、same-session canonical antecedent、assistant-raw exclusion、P14/Fused/P16 回归 GREEN；Core 只暴露候选，不绑定指代 |
 | 9 | `C14-RULE-001` | 冻结持续认知派生语义：Summary 只产生认知机会；高阶认知证据闭包必须落到合格非 Summary 叶子；定义跨维、silence、new-session 消费、provenance 与 Periodic Review 分工 | **DONE** | T35-IMPL-001 | `governance/C14_CONTINUOUS_COGNITIVE_DERIVATION_RULING_2026-09-21.md`; PR #58; candidate `33effe8a86af3d5a34a6b227618db82caf519c37`; squash merge `f9438cce087a422ad6d2394b8f0c2a22307fe283` | Authoritative ruling frozen: Summary may navigate/compress but not terminate proof; support provenance closure, domain-appropriate leaf grounding, derived lineage, cross-dimensional autonomy, valid silence, matched negative control, new-runtime behavior consumption, and Periodic Review split are binding; no Core/constitution/registry change |
-| 10 | `C14-SCHED-001` | 实现 Summary → Cognitive Derivation Wake：递归 leaf provenance、幂等、revision、crash/restart recovery、纯 AI-cognition Summary 防回环 | **READY** | C14-RULE-001 | Ruling: `governance/C14_CONTINUOUS_COGNITIVE_DERIVATION_RULING_2026-09-21.md`; 复用 Dimension Summary + WakeBus + AttentionRouter；不得新增 CognitionCandidate DB 或第二套来源真相 | eligible reality/mixed Summary revision 恰好一个 durable opportunity；嵌套 Summary lineage 可机械追至叶子；AI_COGNITION_ONLY/MAINTENANCE_ONLY/UNKNOWN 按 ruling 处理；unchanged 不重复；N+1 新机会；restart 可补失落 Wake |
-| 11 | `C14-RUNTIME-001` | 将 derivation Wake 接入同一 Resident CognitiveRuntime，装配 pinned Summary、跨维能力、AI-world context；形成/修正认知前必须满足 leaf-grounded evidence 规则，或 silence | **BLOCKED** | C14-SCHED-001 | 复用 CognitiveRuntime、AIWorldCognitionService、search/compare/all-dimensions、C13 metering；不得把 Summary-only EvidenceSet 当高阶认知充分依据 | 无第二模型循环；BACKGROUND 不主动打扰用户；Resident 可跨维取证并写/revise/retract；Summary 只能导航/上下文；assistant/AI material 不被提升成独立用户事实；silence 不生成伪 Claim/Experience |
+| 10 | `C14-SCHED-001` | 实现 Summary → Cognitive Derivation Wake：递归 leaf provenance、幂等、revision、crash/restart recovery、纯 AI-cognition Summary 防回环 | **DONE** | C14-RULE-001 | PR #59; candidate `5389118b9e37b8f0b33552099e39d5c8a31eaffb`; squash merge `f0b24cda3c76d5170f5f27fb5a94107036e2f2c4`; C14 gate run `35579489466` SUCCESS | Dedicated `COGNITIVE_DERIVATION` BACKGROUND Wake; recursive pinned provenance; REALITY/MIXED eligible; AI_COGNITION_ONLY/MAINTENANCE_ONLY/UNKNOWN fail closed; deterministic per-Summary-revision Wake identity; restart reconciliation; no second provenance/scheduler DB; no Claim/Resident semantic change |
+| 11 | `C14-RUNTIME-001` | 将 derivation Wake 接入同一 Resident CognitiveRuntime，装配 pinned Summary、跨维能力、AI-world context；形成/修正认知前必须满足 leaf-grounded evidence 规则，或 silence | **READY** | C14-SCHED-001 | 复用 CognitiveRuntime、AIWorldCognitionService、search/compare/all-dimensions、C13 metering；不得把 Summary-only EvidenceSet 当高阶认知充分依据 | 无第二模型循环；BACKGROUND 不主动打扰用户；Resident 可跨维取证并写/revise/retract；Summary 只能导航/上下文；assistant/AI material 不被提升成独立用户事实；silence 不生成伪 Claim/Experience |
 | 12 | `C14-LOOP-001` | 持续认知派生加固：防 Summary/AI cognition 自证循环；预算/合并/延迟/恢复；Periodic Review 共存；验证 new-runtime 恢复消费路径 | **BLOCKED** | C14-RUNTIME-001 | 复用 BackgroundBudgetGate、Attention Bundle、P15 Review、现有 context/search；禁止 claim conversion rate 成为质量策略 | cognition-write→AI summary 不制造 storm；10+ sibling summary 可机械合并；budget defer/restart 不丢机会；Wake completion 不成为用户偏好/成功证据；新 Runtime 仅恢复 World/Index 后可正常找回 durable cognition |
 | 13 | `C14-RES-001` | 真实 Resident 认知形成入住验证：跨维正例 + 同次数低证据负例 silence + 后续反例 revision + 新 session/new runtime 只恢复 AIOS World 后消费旧认知并影响行为 | **BLOCKED** | C14-LOOP-001 | 禁止 pseudo-LLM / Python 关键词答案；fresh/private World；隐藏语义期望；保存 provider/model/checkpoint/digest | 至少验证：真正跨维 cognition、正确 silence、上下文替换后的 cognition retrieval/behavior consumption、Outcome→revision；不以 Claim 数量/转化率 PASS；必须有 observable refs/decision effects 而非 CoT |
 | 14 | `C14-CLOSE-001` | 独立审计 C14 规则、代码、Gate 与真实 Resident 证据；只做收口，不写新 Core 功能 | **BLOCKED** | C14-RES-001 | C14 全链证据 + deterministic gates + Resident evaluator + PM hardening requirements | 任一以下成立即 FAIL：Summary-only 自证 cognition、无跨维正例、无 negative silence、无 new-session/new-runtime 行为消费、provenance 用语义启发式/第二来源库、claim count 成质量目标、存在 wake storm；全部通过才恢复 P16 |
@@ -651,4 +651,75 @@ Constitution / registry changes: NONE; existing Fused Baseline + mechanism const
 Bugs found: no Core bug fixed in this governance task; the unresolved semantic boundary was Summary support closure / derived lineage and is now frozen.
 Deferred issues: implementation belongs exclusively to C14-SCHED-001 and later tasks.
 Next READY task: C14-SCHED-001
+```
+
+
+### C14-SCHED-001 completion — 2026-09-21
+
+```text
+Task ID: C14-SCHED-001
+Status: DONE
+Started from main: 26d406314850327e4965bd2d4c7e84cf7431372b
+Work branch: c14/sched-cognitive-derivation-20260921
+Candidate SHA: 5389118b9e37b8f0b33552099e39d5c8a31eaffb
+PR: #59
+Merge SHA: f0b24cda3c76d5170f5f27fb5a94107036e2f2c4
+Core implementation:
+- src/aios_core/contracts/enums.py
+- src/aios_core/storage/sqlite_store.py
+- src/aios_core/summaries/cognitive_derivation.py
+- src/aios_core/summaries/scheduler.py
+- src/aios_core/summaries/__init__.py
+Test / gate support:
+- tests/integration/test_v3_c14_cognitive_derivation_scheduler.py
+- tests/habitation/current_core.py (stale merged-Wake snapshot compatibility only; no P16 task execution)
+- .github/workflows/c14-cognitive-derivation-scheduler.yml
+Provenance:
+- derived runtime view only: REALITY / AI_COGNITION_ONLY / MAINTENANCE_ONLY / MIXED / UNKNOWN
+- recursively walks exact pinned SourceRef, EvidenceSet support/member/context/counter refs, and registered support/source Dependency edges
+- exact object revision SourceClass comes from the existing world_commits/object_revisions ledger
+- Summary/EvidenceSet/Dependency/Wake maintenance scaffolding does not become terminal reality proof
+- legacy combined conversation turns preserve assistant-vs-user provenance using already-persisted Observation role metadata; no prose/NLP/keyword/count/confidence scoring
+- any unpinned, missing, corrupt, cyclic, cross-subject, or otherwise unresolved required branch forces UNKNOWN
+Wake identity / idempotency:
+- WakeSource.COGNITIVE_DERIVATION
+- BACKGROUND attention class
+- deterministic dedupe scope: c14:cognitive-derivation:<summary_object_id>:<summary_revision>
+- observed_at is the durable Summary recorded_at; retry resolves to the same Wake
+- revision N+1 receives a distinct opportunity; superseded/stale/partial/missing/inactive/tombstoned Summary revisions do not create new opportunities
+Crash recovery:
+- each MultiScaleSummaryScheduler run reconciles durable current Summary revisions before new scheduling
+- post-commit ensure uses the same deterministic identity
+- restart requires no second scheduler DB/cursor; a fresh scheduler over the same World re-creates only a missing opportunity and retry remains idempotent
+Self-loop prevention:
+- AI_COGNITION_ONLY and MAINTENANCE_ONLY do not immediate self-derive; UNKNOWN fails closed
+- C14 Wake carries summary_dimension as audit metadata rather than generic metadata.dimension, so the Wake cannot re-enter future Dimension Summary source selection as same-dimension material
+Gates:
+- C14 scheduler acceptance workflow 35579489466 / SUCCESS
+  - c14-scheduler-targeted SUCCESS
+  - dimension-summary SUCCESS
+  - world-index SUCCESS
+  - c09-wake-dispatch SUCCESS
+  - cognitive-runtime SUCCESS
+  - fused-turn-runtime SUCCESS
+  - p15-periodic-review SUCCESS
+  - c13-metering SUCCESS
+  - p14-long-context SUCCESS
+  - memory-recommendation-t28 SUCCESS
+  - p16-habitation-harness SUCCESS
+  - p16-convergence-gate SUCCESS
+- native c09-wake-dispatch 35579489436 / SUCCESS
+- native dimension-summary 35579489555 / SUCCESS
+- native world-index 35579489460 / SUCCESS
+- native constitutional-cognition-closure 35579489456 / SUCCESS
+- native p16-habitation-harness 35579489564 / SUCCESS
+- native p16-convergence-gate 35579489485 / SUCCESS
+Additional green: world-kernel 35579489440; p9-revision-gate 35579489464
+Bugs found:
+- C14 Wake audit dimension initially risked re-entering later Summary discovery through generic metadata.dimension; fixed before acceptance by using summary_dimension.
+- Required habitation regression exposed stale pending-Wake snapshots after AttentionRouter mechanically merged sibling BACKGROUND Wakes; adapter now re-reads durable current state and skips already MERGED children. Core Resident/runtime semantics were not changed.
+Deferred issues:
+- Resident semantic consumption belongs exclusively to C14-RUNTIME-001.
+- burst/budget/new-runtime loop hardening remains C14-LOOP-001 after Runtime.
+Next READY task: C14-RUNTIME-001 — new window only.
 ```
