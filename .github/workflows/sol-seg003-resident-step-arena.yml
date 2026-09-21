@@ -209,7 +209,7 @@ jobs:
               return text.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
 
           def emit(title: str, text: str) -> None:
-              chunk = 24000
+              chunk = 3800
               pieces = [text[i : i + chunk] for i in range(0, len(text), chunk)] or [""]
               for index, piece in enumerate(pieces, start=1):
                   suffix = "" if len(pieces) == 1 else f"-{index}of{len(pieces)}"
