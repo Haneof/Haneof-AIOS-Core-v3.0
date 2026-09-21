@@ -390,6 +390,28 @@ class ReleaseOperatorTests(unittest.TestCase):
         self.assertEqual(proc.stdout, "")
         self.assertIn(expected_error, proc.stderr)
 
+    def test_14_wrong_private_world_missing_prior_receipt_is_rejected(self) -> None:
+        self.init_a()
+        event1 = self.reveal("A")
+        ingest1 = self.ingest(event1)
+        self.ack("A", event1, ingest1["ingest_ref"])
+        event2 = self.reveal("A")
+
+        other_world = Path(self.temp.name) / "other_private_world.db"
+        ingest2_other = self.adapter_module.ingest_projection(other_world, event2)
+        proc = self.ack(
+            "A",
+            event2,
+            ingest2_other["ingest_ref"],
+            world_db=other_world,
+            ok=False,
+        )
+        self.assertEqual(proc.stdout, "")
+        self.assertIn("exact durable ingest revision", proc.stderr)
+        state = json.loads(self.state.read_text(encoding="utf-8"))
+        self.assertEqual(state["next_sequence"], 2)
+        self.assertEqual(state["pending_reveal"]["event_id"], event2["event_id"])
+
     def test_14_payload_mismatch_is_rejected(self) -> None:
         self._assert_modified_projection_rejected(
             "resident_visible_payload",
