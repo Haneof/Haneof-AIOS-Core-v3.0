@@ -1,0 +1,52 @@
+RESTORE_OK {"clock": "2027-01-19T08:15:00+00:00", "index_watermark": 145, "subject_id": "sol-resident-20260921-001", "world_revision": 145, "world_sha256": "93056d4b663017c14a85b83890c62471bc53a83e9a8d9e3349d6790b490b13d6"}
+MANUAL_SUMMARY_PENDING_BEGIN
+{
+  "decision_key": "6c5e75a4f06fb0489811c6ccf7f2b68bb4bc22d6db19ddf93a18df2bc2e3e506",
+  "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
+  "schema": "aios.segment003.manual-summary.pending.v1",
+  "simulated_clock": "2027-01-20T20:30:00+00:00",
+  "summary_request": {
+    "request": {
+      "dimension": "dim:equipment_telemetry",
+      "granularity": "day",
+      "source_world_revision": 166,
+      "sources": [
+        {
+          "metadata": {
+            "adapter_id": "habitation.equipment_telemetry.v1",
+            "dimension": "dim:equipment_telemetry",
+            "external_record_id": "d031-equipment",
+            "external_revision": "1",
+            "mechanical_ingest": true,
+            "occurred_at_original": "2027-01-20T10:05:00+00:00",
+            "provenance": {
+              "habitation_resident_metadata": {
+                "source": "oven_controller"
+              },
+              "model_id_not_part_of_fact": true
+            },
+            "source_class": "user",
+            "source_digest": "f7b0a96d1e70ec4c5eb2fa571fe4cd3ac66123e1fdb75b91713304fa20f1e18f",
+            "source_schema_version": "1"
+          },
+          "object_id": "obs_src_972d74f06c87a81231892a69",
+          "object_type": "observation",
+          "occurred_at": "2027-01-20T10:05:00Z",
+          "revision": 1,
+          "text": "{\"band_window\": \"2027-01-20T05:47:00+00:00/2027-01-20T08:15:00+00:00\", \"device\": \"deck_oven_1\", \"fault_codes\": [], \"preheat_target_c\": 205, \"target_reached_at\": \"2027-01-20T05:47:00+00:00\", \"temperature_band_c\": [203, 207]}"
+        }
+      ],
+      "truncated": false,
+      "window_end": "2027-01-20T23:59:59.999999Z",
+      "window_start": "2027-01-20T00:00:00Z"
+    },
+    "summary_request_type": "DimensionSummaryInput"
+  },
+  "world_revision_before": 166
+}
+MANUAL_SUMMARY_PENDING_END
+SEG003_STATUS=pending decision_key=6c5e75a4f06fb0489811c6ccf7f2b68bb4bc22d6db19ddf93a18df2bc2e3e506
+SEG003_CURSOR=d033-chat-17
+SEG003_WORLD_REVISION=166
+SEG003_RESIDENT_REPLAYED=11
+SEG003_SUMMARY_REPLAYED=3
