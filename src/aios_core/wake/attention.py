@@ -341,7 +341,7 @@ class AttentionWatchService:
         for task in self.current():
             if task.deadline is None:
                 continue
-            if as_utc(task.deadline, "deadline") >= moment:
+            if as_utc(task.deadline, "deadline") > moment:
                 continue
             revised = self._transition_watch_mechanically(
                 task,
