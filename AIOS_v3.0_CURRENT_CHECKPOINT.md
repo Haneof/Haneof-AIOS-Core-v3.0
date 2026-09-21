@@ -1462,3 +1462,28 @@ This is test-method hardening only; no Core/runtime semantics are changed.
 Next READY task:
 
 `C14-RES-FIX-001`.
+
+
+---
+
+## 2026-09-21 — C14 fixture v1 PM semantic-design blocker
+
+Independent PM review accepts the mechanical integrity of `C14-RES-FIX-001` v1 but does not accept it for formal Resident semantic validation.
+
+Three blockers were found:
+
+1. Phase-A `dim:conversation` events themselves substantially disclose the intended solo-writing/focus synthesis, so the positive case does not force genuinely cross-dimensional cognition.
+2. Phase-B 09:00 vs 11:30 synchronization is strongly decided by current duration/deadline facts, so a correct-looking choice would not demonstrate that prior durable cognition materially changed behavior.
+3. The repository contains a release contract but no executable blind release operator that can reveal only the current cursor without the Resident opening the sealed fixture.
+
+Canonical review:
+
+`reviews/C14_RES_FIX_001_PM_REVIEW_2026-09-21.md`
+
+Next task:
+
+`C14-RES-FIX-002`
+
+Required outcome: sealed fixture v2 + new digest + improved hidden design + executable mechanical release helper. No Core changes and no Resident run.
+
+`C14-RES-A-001` is blocked until v2 independently passes.
