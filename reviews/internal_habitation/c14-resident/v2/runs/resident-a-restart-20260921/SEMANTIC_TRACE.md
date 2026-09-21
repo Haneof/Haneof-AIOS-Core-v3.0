@@ -389,3 +389,23 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
 **Due work at T = 2026-10-17T06:09:00-07:00**（`receipts/process-due-20261017T130900Z.json`）: 无摘要窗口闭合（10-17 日窗仍开）、无 C14 唤醒、Periodic Review 未触发。机械跑完即止，无模型决策点。
 
 **Resulting state**: world_revision 135, index watermark 135, pending wakes 0。
+
+---
+
+## Cursor 20 — `c14resv2-020` — 2026-10-19T08:38:00-07:00 (dim:sleep)
+
+**Released**
+- dimension `dim:sleep`, source_kind `wearable`, source_class `SENSOR`
+- payload: "昨晚睡眠 8小时09分；08:34 醒来。"（第 7 个睡眠样本；全序列最长的一夜）
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-020.json`; ingest → `obs_c14_fixture_76d93e859e7e0873ed9ba7e4@1` (world_revision 136); watch hook: no match; ack → `receipts/ack/cursor-020.json`, `next_sequence=21`。
+
+**Due work at T = 2026-10-19T08:38:00-07:00**（`receipts/process-due-20261019T153800Z.json`；跨过 10-17/10-18 与 10-12–10-18 周窗）:
+- 我撰写并提交 5 条摘要：10-17 的 schedule/sleep 日摘要；10-12–10-18 的 environment/schedule/sleep 周摘要。
+- C14 5 成员 bundle `wake_0c29429ae3d11e1c43802888`：
+  - round 0：`read_ai_world(50)`（空）+ `search_timeline(dim:sleep, 10-01→10-20)` + `search_timeline(dim:schedule, 10-12→10-20)`。
+  - round 1：**silence** — 关键点是跨窗检索把 10-19 的 8h09 夜带进判断：它**否证**了我在 S18 记下的“近三夜 6h25–6h42 窄带/醒来前移”候选假设，睡眠线因此确认无稳定模式（7h44/84、7h39/82、5h48/60、~6h42、~6h35、~6h25、8h09），不形成 Claim；也不对 8h09 作恢复/周末的因果解释（无可比样本）。
+- Periodic Review `wake_review_e96b2ad8987a5a7024ba7291`（窗口 10-17T13:07Z→10-19T15:39Z，8 anchors）：round 0 读锚点；round 1 **silence** — 既有 Claim 无新同类观察亦无反例；睡眠候选假设已被否证；无操作经验登记。
+- 决策文件：`checkpoints/decisions/wake-cognitive_derivation-wake_0c29429ae3d11e1c43802888-rev1-7bb99b6e/round-{0,1}.json`、`checkpoints/decisions/periodic-review-20261019T153901Z-1c09914c/round-{0,1}.json`。
+
+**Resulting state**: world_revision 152, index watermark 152, pending wakes 0, Claims 1（rev 2）, 41 条摘要, operation experiences 0。
