@@ -1,0 +1,98 @@
+{
+  "dfcc64766f18b7aa11f48a4ecbd26766a25105d2e82fd52568a6b5acd0f54379": {
+    "calls": [
+      {
+        "arguments": {
+          "evidence_refs": [
+            {
+              "object_id": "obs_src_b5bd2f96dac8066bb4c24333",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_8fa54d11e0014eb7f22ff285",
+              "revision": 1
+            }
+          ],
+          "new_state": "waiting_user",
+          "next_step": "等待用户或现实输入提供消防检查准备完成/变化证据；不再重复提醒。",
+          "reason": "Sunday verification wake found the latest available preparation record still incomplete and no later completion record. Deliver the one reminder requested by the user, then wait for new evidence without repeated reminders.",
+          "task_ref": {
+            "object_id": "task_69ef4867f08ab38263ae2547",
+            "revision": 2
+          }
+        },
+        "call_id": "sol-seg002-jan17-fire-task-wait-user",
+        "name": "transition_task"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "e3166c2d9c4961f4e492b7cfcbdbab43411574de7997588839a51fc9457b85e8": {
+    "kind": "summary",
+    "summary": "2027-01-04 至 2027-01-10 的用户-AI 互动记录显示：1 月 5 日用户明确要求降低主动打扰，只在可能影响开店、进货或重要家人安排时主动提醒。1 月 8 日围绕凌晨 04:30 面粉到货与妹妹到机场的安排，AIOS 在航班时间未确认时未断言冲突；时间确认后，用户安排自己接妹妹、小赵负责收货，并一度要求 AIOS 给小赵发消息。AIOS明确说明当时只有发送提案、没有真实执行结果；用户随后表示已自己打电话并撤销发送要求，AIOS确认不再发送。1 月 9 日用户确认面粉已收妥、妹妹已接到，并明确认可此前保留不确定性的处理。1 月 10 日用户把当前经营优先级改为先稳定早高峰出品，暂缓新品和扩菜单；AIOS表示先依据真实早高峰记录观察卡点，不提前猜原因。"
+  },
+  "e93463c01b222585a97d1b067bb171ceb2af2890f52a88989fa9d1234e885a02": {
+    "kind": "response",
+    "response": "好。现在只把这条记成“你确认还没准备，并准备马上处理”，不会提前当成已经完成。你把灭火器周围清开、通道记录打印好之后，有新的实际记录我再按完成状态处理；今天不再重复催你。"
+  },
+  "eb0f2e9d3981f8baf45c14d1a3ee44736569fba4e65f796b40a66aa4daaaf22e": {
+    "kind": "summary",
+    "summary": "2027-01-15 的照片描述显示：烘焙店后场灭火器旁有两个面粉袋，安全通道仍可通行，但空间变窄。该视觉描述本身不构成通道不合格或违规的证据。"
+  },
+  "ee389476e0a611553283e9f43a0c7c5cf0bf6e2caf4a8e7f46b586d1e624e025": {
+    "kind": "summary",
+    "summary": "2027-01-11 的采购订单记录：North Mill 对 180 kg bread flour 给出 quoted 状态报价，单价为 1.42 USD/kg。该记录只描述本次供应商报价，不包含历史价格比较，也不能单独证明价格上涨。"
+  },
+  "ef2102702bafb67cee9dab539236a130f3cea1806a730b3878d53be1cd1ceb2f": {
+    "kind": "summary",
+    "summary": "2027-01-04 至 2027-01-10 的 bakery POS 数据只有 1 月 9 日这一条可见日记录：gross_sales 1286.5 USD、orders 96、refunds 2。当前周内样本不足以支持趋势、原因或经营策略判断。"
+  },
+  "f0396958f10fc59ba7de02f98007b9dbdd82716940d543eca321e00684fe57fe": {
+    "calls": [
+      {
+        "arguments": {
+          "limit": 20,
+          "offset": 0
+        },
+        "call_id": "sol-seg002-review-jan15-anchors",
+        "name": "read_periodic_review_anchors"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "f0899f03bb7624fcea7597a0b07e31ae2d7125f997f33e16bd241204b6c0550d": {
+    "kind": "summary",
+    "summary": "2027-01-11 至 2027-01-17，purchase_order 维度记录 North Mill 对 180 kg bread flour 的 quoted 报价为 1.42 USD/kg。该报价是本次采购事实；历史比较需要结合旧发票，不能仅凭此订单认定涨价幅度。"
+  },
+  "f0d21640b9e74bdbf1d176668dcd3513a5ad59df7953463c551afeb0bda75bf3": {
+    "calls": [
+      {
+        "arguments": {
+          "allowed_range_or_choices": [
+            "normal",
+            "require_specific_evidence_before_problem_or_trait_label"
+          ],
+          "current_value": "require_specific_evidence_before_problem_or_trait_label",
+          "default_value": "normal",
+          "evaluation_window": "30d",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_556816d100a613651fd56eda",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_3be97316c269123df4d36569",
+              "revision": 1
+            }
+          ],
+          "policy_id": "communication.evidence_before_adverse_conclusion",
+          "reason": "The user explicitly instructed AIOS not to infer fire-safety noncompliance from one photo and to state problems according to evidence. This is consistent with the user correcting an exaggerated price description and previously requiring uncertainty to remain explicit. The policy governs communication framing, not truth creation.",
+          "scope": "per-user:sol-resident-20260921-001"
+        },
+        "call_id": "sol-seg002-review-jan16-policy-evidence-before-label",
+        "name": "propose_cognitive_policy"
+      }
+    ],
+    "kind": "capability_calls"
+  }
+}

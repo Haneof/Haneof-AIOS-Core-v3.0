@@ -1,0 +1,33 @@
+{
+  "f2b56c53f53a7412d70efd8e6598089fd95ddb7ff2e0e2c28800219094167bf1": {
+    "kind": "silence"
+  },
+  "f3b3067f591c21cb3178b99f837757321003e2890e261e9adb5b19c07e134e2e": {
+    "calls": [
+      {
+        "arguments": {
+          "limit": 12,
+          "query": "不要下结论 按证据 实际数字 不要贴标签 未确认"
+        },
+        "call_id": "sol-seg002-review-jan16-search-evidence-preference",
+        "name": "search_world"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "f5a86d7c762e67bf286a310ca21add3cffc560227008b994f32b637514b60be6": {
+    "kind": "summary",
+    "summary": "2027-01-04 至 2027-01-10 的 AI CognitivePolicy 记录包含两项用户证据驱动的可修订策略：1 月 5 日建立 `communication.proactive_interruption_threshold`，要求仅在实质影响开店、采购或重要家庭安排时主动打扰，30 天评估窗口，下一次评估为 2027-02-04；1 月 9 日建立 `communication.uncertain_schedule_conflict_escalation`，要求在有具体时间证据前不把未确认安排描述为冲突，30 天评估窗口，下一次评估为 2027-02-08。两项策略均由对应用户 Observation 作为固定证据，本周没有记录到策略修订或回滚。"
+  },
+  "f75013364a13afbb122ce00a7b301ff08c406b4e6528b438906e021d57e090b0": {
+    "kind": "summary",
+    "summary": "2027-01-11 至 2027-01-17，body_activity 维度只有 2027-01-13 的一个机械压缩步数样本：4820 steps（sample_count=1）。该单点事实不足以推断用户的日常活动水平、生活习惯或周趋势。"
+  },
+  "fc7d8a2034dab09cdff45e7612cf16fd68da9fe924ea7a260139e7b0cf6edb8d": {
+    "kind": "silence"
+  },
+  "fea7195c7874dbcbacf5db70a2aae37cf2f0c547470c3d3b0048a40139fc94a5": {
+    "kind": "summary",
+    "summary": "2027-01-11 至 2027-01-17，日历记录新增一项店内消防检查：时间为 2027-01-18 16:00 UTC，需准备灭火器和通道记录。该周日历记录只确定检查安排与准备项目，不包含检查结果。"
+  }
+}

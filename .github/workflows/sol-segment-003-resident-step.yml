@@ -1,0 +1,196 @@
+name: sol-segment-003-resident-step
+
+on:
+  push:
+    branches:
+      - "arena/01a0bfa6-haneof-aios-core-v3-0"
+    paths:
+      - ".github/workflows/sol-segment-003-resident-step.yml"
+      - "reviews/internal_habitation/sol-yearlong/segments/segment-003/resume_bridge.py"
+      - "reviews/internal_habitation/sol-yearlong/segments/segment-003/decisions/**"
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  resident-step:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Download frozen Segment 002 world artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sol-segment-002-35535082511
+          path: artifacts/source-segment-002
+          github-token: ${{ github.token }}
+          repository: Haneof/Haneof-AIOS-Core-v3.0
+          run-id: 35535082511
+
+      - name: Download sealed Segment 003 hidden package artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sol-segment-003-hidden-35553766484
+          path: artifacts/hidden-segment-003
+          github-token: ${{ github.token }}
+          repository: Haneof/Haneof-AIOS-Core-v3.0
+          run-id: 35553766484
+
+      - name: Verify opaque inputs
+        run: |
+          set -euo pipefail
+          world_sha="$(sha256sum artifacts/source-segment-002/world.sqlite | awk '{print $1}')"
+          fixture_sha="$(sha256sum artifacts/hidden-segment-003/sealed_fixture.json | awk '{print $1}')"
+          echo "source_world_sha256=$world_sha"
+          echo "sealed_fixture_sha256=$fixture_sha"
+          test "$world_sha" = "ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8"
+          test "$fixture_sha" = "6a41a0ac1a6421d2ad54bf27c96f11fd2a5ec9822c6109466000f37ea9d00f4d"
+          echo "future_payloads_printed=false"
+          mkdir -p artifacts/segment-003
+          echo "$world_sha" > artifacts/segment-003/world.sha256
+
+      - name: Merge Resident decision fragments
+        run: |
+          set -euo pipefail
+          decisions_dir="reviews/internal_habitation/sol-yearlong/segments/segment-003/decisions"
+          mkdir -p artifacts/segment-003
+          if [[ ! -d "$decisions_dir" ]]; then
+            echo '{}' > artifacts/segment-003/merged-decisions.json
+            echo "decision_fragments=0"
+          else
+            python - <<'PY'
+          import glob, json, pathlib
+          paths = sorted(pathlib.Path(p) for p in glob.glob("reviews/internal_habitation/sol-yearlong/segments/segment-003/decisions/part-*.json"))
+          merged = {}
+          for path in paths:
+              data = json.loads(path.read_text(encoding="utf-8"))
+              dupes = set(data) & set(merged)
+              if dupes:
+                  raise SystemExit(f"duplicate decision_keys across fragments: {sorted(dupes)}")
+              merged.update(data)
+          pathlib.Path("artifacts/segment-003/merged-decisions.json").write_text(json.dumps(merged, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          print(f"decision_fragments={len(paths)}")
+          print(f"decision_keys={len(merged)}")
+          PY
+          fi
+          sha256sum artifacts/segment-003/merged-decisions.json | awk '{print $1}' > artifacts/segment-003/merged-decisions.sha256
+          echo "merged_sha256=$(cat artifacts/segment-003/merged-decisions.sha256)"
+
+      - name: Run mechanical Segment 003 resume bridge
+        id: bridge
+        run: |
+          set +e
+          PYTHONPATH="${PWD}/tests:${PWD}/src:${PWD}" python \
+            reviews/internal_habitation/sol-yearlong/segments/segment-003/resume_bridge.py \
+            --fixture artifacts/hidden-segment-003/sealed_fixture.json \
+            --source-world artifacts/source-segment-002/world.sqlite \
+            --working-world artifacts/segment-003/world.sqlite \
+            --after-event-id d026-pos \
+            --segment-end 2027-01-31T08:15:00Z \
+            --expected-world-sha256 ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8 \
+            --expected-revision 145 \
+            --expected-subject sol-resident-20260921-001 \
+            --decisions artifacts/segment-003/merged-decisions.json \
+            --state-out artifacts/segment-003/state.json \
+            --snapshot-out artifacts/segment-003/snapshot.json \
+            --event-trace-out artifacts/segment-003/event-trace.json \
+            2>&1 | tee artifacts/segment-003/stdout.txt
+          rc=${PIPESTATUS[0]}
+          echo "bridge_exit_code=$rc" >> "$GITHUB_OUTPUT"
+          echo "$rc" > artifacts/segment-003/bridge-exit-code.txt
+          if [[ "$rc" -eq 0 || "$rc" -eq 42 ]]; then
+            exit 0
+          fi
+          exit "$rc"
+
+      - name: Print runner attestation
+        if: always()
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import datetime as dt, json, pathlib
+          version = "unknown"
+          try:
+              from importlib.metadata import version as pkg_version
+              version = pkg_version("aios-core")
+          except Exception:
+              try:
+                  import aios_core
+                  version = getattr(aios_core, "__version__", "unknown")
+              except Exception:
+                  pass
+          state = {}
+          path = pathlib.Path("artifacts/segment-003/state.json")
+          if path.exists():
+              state = json.loads(path.read_text(encoding="utf-8"))
+          payload = {
+              "schema": "aios.p16.segment003.runner-attestation.v1",
+              "timestamp_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+              "job": "sol-segment-003-resident-step",
+              "core_version": version,
+              "future_payloads_printed": False,
+              "notes": [
+                  "Restore bridge used the sealed Segment 003 fixture as an opaque program input.",
+                  "Only RuntimeSnapshot/Summary pending envelopes were printed for manual Resident continuation.",
+              ],
+              "resident_step_status": state.get("status"),
+              "last_consumed_external_event_id": state.get("last_consumed_external_event_id"),
+              "simulated_clock": state.get("simulated_clock"),
+              "world_revision": state.get("world_revision"),
+              "resident_replayed_calls": state.get("resident_replayed_calls"),
+              "summary_replayed_calls": state.get("summary_replayed_calls"),
+              "delivered_external_events": state.get("delivered_external_events"),
+          }
+          pathlib.Path("artifacts/segment-003/runner-attestation.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload manual-resident step artifact bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sol-segment-003-resident-step-${{ github.run_id }}
+          path: artifacts/segment-003/
+          retention-days: 90
+
+      - name: Commit run evidence to this branch
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          DEST="reviews/internal_habitation/sol-yearlong/segments/segment-003/evidence/run-${{ github.run_id }}"
+          mkdir -p "$DEST"
+          for f in stdout.txt state.json event-trace.json merged-decisions.json bridge-exit-code.txt runner-attestation.json world.sha256 merged-decisions.sha256 snapshot.json; do
+            if [ -f "artifacts/segment-003/$f" ]; then cp "artifacts/segment-003/$f" "$DEST/"; fi
+          done
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$DEST"
+          if git diff --cached --quiet; then
+            echo "no evidence changes"
+            exit 0
+          fi
+          git commit -m "seg003 run evidence ${{ github.run_id }} [skip ci]"
+          for attempt in 1 2 3; do
+            git fetch origin "${{ github.ref_name }}" || true
+            git rebase "origin/${{ github.ref_name }}" || git rebase --abort || true
+            if git push origin "HEAD:${{ github.ref }}"; then
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "evidence push failed after retries" >&2
+          exit 1

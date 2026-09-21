@@ -1,0 +1,1707 @@
+{
+  "badd4b1a8ec2453c6d580af21a42725f71b53fdc4d610ab0666e4767ef4dbed4": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "propose_cognitive_policy",
+        "call_id": "sol-d001-policy-1",
+        "arguments": {
+          "policy_id": "communication.proactive_interruption_threshold",
+          "scope": "per-user:sol-resident-20260921-001",
+          "default_value": "normal",
+          "current_value": "only_when_opening_procurement_or_important_family_arrangement_is_materially_affected",
+          "allowed_range_or_choices": [
+            "normal",
+            "important_only",
+            "only_when_opening_procurement_or_important_family_arrangement_is_materially_affected"
+          ],
+          "reason": "The user explicitly asked not to be interrupted frequently and limited proactive interruption to issues that materially affect store opening, procurement, or important family arrangements.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_f6da0a49440f24af69d8849e",
+              "revision": 1
+            }
+          ],
+          "evaluation_window": "30d"
+        }
+      }
+    ]
+  },
+  "f0704ee4499c54f900eb6d11d449a1d756a532d907a65e4bbc18d5df9d1e6bb9": {
+    "kind": "response",
+    "response": "记住了。以后只有可能影响开店、进货或重要家人安排时，我才会主动打断你；其他情况我不会频繁提醒。"
+  },
+  "a326a80f1284b8967c0a7dfed8d4ab40ba32a4f730b0e8c15590452fd9835e08": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan06-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "1f079f10f8e6858d96a66d841dd4b91514ad28ccb4c5ab33b1b11af29a2c6906": {
+    "kind": "silence"
+  },
+  "6abe694b7074e9055090f2deb24bc96144470446ec83378f5a2ec3fd1e92d290": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan07-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "fc6fc815d9c9c9eb6319f74c7b14839a323c30aa04716e707f8e86d1cb5a3737": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "create_task",
+        "call_id": "sol-task-flour-delivery",
+        "arguments": {
+          "title": "确认面粉首批到货收货安排",
+          "task_type": "scheduled",
+          "reason_refs": [
+            {
+              "object_id": "obs_src_095e2b7aa400f61d87d0575f",
+              "revision": 1
+            }
+          ],
+          "initial_state": "waiting_time",
+          "priority": 85,
+          "next_wake_at": "2027-01-08T18:00:00+00:00",
+          "deadline": "2027-01-09T04:30:00+00:00",
+          "timezone_name": "UTC",
+          "next_step": "在到货前确认由本人还是店员开后门收货；只在可能影响进货时主动打断用户。"
+        }
+      }
+    ]
+  },
+  "52a0d9d22a10624fa1675137e0076c16c8e31e3d418743d5f84774746a93819d": {
+    "kind": "silence"
+  },
+  "598327ed452fc880a374b8f80080ed3ac2413f60c7873f6b433e36c2f52c3a47": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan08-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "a2018a4674ad256fee021a68df141f6bef53b635cfad69d43ab542181e63e04f": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "create_task",
+        "call_id": "sol-task-sister-flight-evidence",
+        "arguments": {
+          "title": "等待妹妹航班时间确认并检查安排冲突",
+          "task_type": "verification",
+          "reason_refs": [
+            {
+              "object_id": "obs_src_100a0cc21a84d80627c61305",
+              "revision": 1
+            }
+          ],
+          "initial_state": "waiting_evidence",
+          "priority": 70,
+          "next_step": "只有在航班时间被确认后，才与现有重要安排比较；在证据不足时不要宣称冲突，也不要主动打断用户。"
+        }
+      }
+    ]
+  },
+  "058a623e97214f443adcc5536515c4d78f5a2f51245cb18eb4789a89d051aa15": {
+    "kind": "silence"
+  },
+  "72715c4688593024de8fa3e0472a1d8b0a3748d0b633f9a1a66f9222582cc871": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "call_id": "sol-wake-inspect-flour-task",
+        "arguments": {
+          "object_id": "task_57a01b42b3d5f384db661bda",
+          "revision": 1
+        }
+      }
+    ]
+  },
+  "414a8052f860e712aa9dd1a98c24e8b829b18bce796f7b34ed1d54fd70c3303d": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "search_world",
+        "call_id": "sol-wake-search-conflicting-arrangements",
+        "arguments": {
+          "query": "妹妹 机场 周五 面粉 到货 收货 安排",
+          "limit": 12
+        }
+      }
+    ]
+  },
+  "20db530ffc1725eadc1a43a9586dafcb840ae130a145b8c93fda514fb54f8608": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "call_id": "sol-wake-inspect-latest-flour-task",
+        "arguments": {
+          "object_id": "task_57a01b42b3d5f384db661bda"
+        }
+      }
+    ]
+  },
+  "22ca30536cd07a902a8af4352497b06ec0f387b6c96d8e0c41bec219c56dc807": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_task",
+        "call_id": "sol-wake-wait-user-for-receiver",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_57a01b42b3d5f384db661bda",
+            "revision": 2
+          },
+          "new_state": "waiting_user",
+          "reason": "The delivery is due at 04:30 and the world still does not identify whether the user or a staff member will open the rear door. A user choice is now needed before the procurement deadline.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_src_095e2b7aa400f61d87d0575f",
+              "revision": 1
+            }
+          ],
+          "next_step": "等待用户确认由本人还是店员负责凌晨收货；妹妹航班时间仍未确认，暂不声称存在冲突。"
+        }
+      }
+    ]
+  },
+  "3cd4a552e76cfc56c39cd71ddc3ca9254418f816bcc7043583f71e3bf7622a94": {
+    "kind": "response",
+    "response": "提醒一下：面粉首批到货是明早 04:30，需要你或店员开后门收货，目前还没有记录谁负责。妹妹今晚可能到机场，但航班时间还没确认，所以我现在不能说两件事已经冲突。你先确认一下谁负责收货；航班时间一确认，我再按实际时间帮你核对。"
+  },
+  "991694f700b89d712f6876f0559561235a1f93db322a85c935cec8dec3a20f23": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "retrieve_original_observation",
+        "call_id": "sol-jan08-drill-calendar",
+        "arguments": {
+          "object_id": "obs_src_095e2b7aa400f61d87d0575f",
+          "revision": 1
+        }
+      },
+      {
+        "name": "retrieve_original_observation",
+        "call_id": "sol-jan08-drill-sister-note",
+        "arguments": {
+          "object_id": "obs_src_100a0cc21a84d80627c61305",
+          "revision": 1
+        }
+      }
+    ]
+  },
+  "d2a69f6ad25654f04b2fff41fa44eec3b17e5f82480ccde741449274109e7f52": {
+    "kind": "response",
+    "response": "记着。凌晨的安排是面粉首批到货：明早 04:30，需要你或店员开后门收货。妹妹这边目前只有“周五晚上可能到机场”，航班时间还没确认。按现在的两条原始记录，还没有足够依据判断它们真的时间冲突；我不会替你决定。等航班时间确认后，我再把两边具体时间和冲突依据直接告诉你。"
+  },
+  "c5a632856f3c1561cf986209802fc269df67d9c7335b5dbfe7dcd90e160a4778": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_task",
+        "call_id": "sol-jan08-confirm-receiver",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_57a01b42b3d5f384db661bda",
+            "revision": 3
+          },
+          "new_state": "ready",
+          "reason": "The user explicitly selected Xiao Zhao to receive the 04:30 flour delivery.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_ad04153c39dba332be3f72aa",
+              "revision": 1
+            }
+          ],
+          "next_step": "执行用户已确认的通知请求，但外部消息仍需走独立授权/执行边界。"
+        }
+      },
+      {
+        "name": "transition_task",
+        "call_id": "sol-jan08-flight-confirmed",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_40f75225e1031721889e7500",
+            "revision": 1
+          },
+          "new_state": "ready",
+          "reason": "The previously missing flight time is now supplied by the user: 22:40 tonight, and the user has separately assigned the overnight delivery to Xiao Zhao.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_ad04153c39dba332be3f72aa",
+              "revision": 1
+            }
+          ],
+          "next_step": "核对已确认的22:40接机与04:30收货安排；不要把非重叠任务夸大成冲突。"
+        }
+      }
+    ]
+  },
+  "8ba4cbeda7b555d030b097c25dd1330b58579eb0e0042238dd0d5d48e2cbcaf8": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_task",
+        "call_id": "sol-jan08-start-message-task",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_57a01b42b3d5f384db661bda",
+            "revision": 4
+          },
+          "new_state": "running",
+          "reason": "The user selected the receiver and explicitly requested a message be sent to Xiao Zhao.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_ad04153c39dba332be3f72aa",
+              "revision": 1
+            }
+          ],
+          "next_step": "提出外部消息 Action；不把用户同意等同于平台授权或执行成功。"
+        }
+      }
+    ]
+  },
+  "bc38968e511244f87a36397069799cd3910cbe54c324045fcc2d10a57a893910": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "propose_action",
+        "call_id": "sol-jan08-propose-xiaozhao-message",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_57a01b42b3d5f384db661bda",
+            "revision": 5
+          },
+          "action_type": "send_message",
+          "payload": {
+            "recipient": "小赵",
+            "message": "明早4:15到店开后门收货，到了回我。"
+          },
+          "expected_outcome": "小赵收到通知；平台返回真实发送/失败结果。",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_ad04153c39dba332be3f72aa",
+              "revision": 1
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bde40f9c7abd0ea6ca8164c9db10d46ab0b1bf21c701ef5479771d61aacec788": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "call_id": "sol-jan08-inspect-proposed-message",
+        "arguments": {
+          "object_id": "action_b07c55d3dd6b17731296d988",
+          "revision": 1
+        }
+      },
+      {
+        "name": "read_execution_world",
+        "call_id": "sol-jan08-read-execution-world",
+        "arguments": {}
+      }
+    ]
+  },
+  "1a71426ff16bab5db2e0540bb6519bfe3702c8f28a3352553ca2d417641563be": {
+    "kind": "response",
+    "response": "我已经把给小赵的消息形成发送请求，但现在只到“待平台授权/执行”这一步，还没有真实发送结果，所以我不会说已经发出。内容是：明早4:15到店开后门收货，到了回我。"
+  },
+  "3730f99ba747bf421130496112c3aa37d455ec6b5858a83d65ebc8d69eeb9bc4": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_task",
+        "call_id": "sol-jan08-cancel-message-task",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_57a01b42b3d5f384db661bda",
+            "revision": 5
+          },
+          "new_state": "cancelled",
+          "reason": "The user explicitly withdrew the send-message request after contacting Xiao Zhao directly.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_d025779ec9ad6598e950810a",
+              "revision": 1
+            }
+          ],
+          "next_step": "Do not send the previously proposed message."
+        }
+      }
+    ]
+  },
+  "ccef7541678100bdf2407ee3881a43b80996b8b59e63210786ab5e9d831fc91b": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "call_id": "sol-jan08-inspect-action-after-cancel",
+        "arguments": {
+          "object_id": "action_b07c55d3dd6b17731296d988"
+        }
+      },
+      {
+        "name": "inspect_world_object",
+        "call_id": "sol-jan08-inspect-task-after-cancel",
+        "arguments": {
+          "object_id": "task_57a01b42b3d5f384db661bda"
+        }
+      }
+    ]
+  },
+  "67318051c7025793de6558f77c36fe17fd5f904148526301535ea99508c764dd": {
+    "kind": "response",
+    "response": "明白。你已经自己和小赵确认了4:15到店，我不会继续这条发送请求。系统里的旧发送提案还没有执行结果，但我刚发现它在父任务取消后仍保持“待授权”状态，所以我不会把它说成已经安全撤销；这条执行生命周期缺口我会单独记录。"
+  },
+  "5d26432e3cf5172518399c7d26851c39c04389f93a34f1e5e7306ba223a59f4b": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "record_communication_experience",
+        "call_id": "sol-jan09-record-uncertainty-positive-feedback",
+        "arguments": {
+          "scenario": "time-dependent arrangement conflict with incomplete timing evidence",
+          "style": "state confirmed facts and evidence gap; do not assert conflict until timing is confirmed",
+          "tone": "calm and non-alarmist",
+          "user_reaction": "accepted",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_ai_acc5b0fdc866a3637fcdb347",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_37068ea8651565e088f2d785",
+              "revision": 1
+            }
+          ],
+          "applicable_conditions": {
+            "kind": "schedule_or_arrangement_conflict",
+            "missing_evidence": "one_or_more_required_times_unconfirmed"
+          }
+        }
+      },
+      {
+        "name": "propose_cognitive_policy",
+        "call_id": "sol-jan09-policy-uncertain-time-conflict",
+        "arguments": {
+          "policy_id": "communication.uncertain_time_conflict_reporting",
+          "scope": "per-user:sol-resident-20260921-001",
+          "default_value": "normal_uncertainty_language",
+          "current_value": "state_evidence_gap_and_avoid_conflict_claim_until_required_times_are_confirmed",
+          "allowed_range_or_choices": [
+            "normal_uncertainty_language",
+            "state_evidence_gap_and_avoid_conflict_claim_until_required_times_are_confirmed"
+          ],
+          "reason": "The user explicitly confirmed that withholding an unsupported conflict claim was correct and asked not to be alarmed when timing is still unconfirmed.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_37068ea8651565e088f2d785",
+              "revision": 1
+            }
+          ],
+          "evaluation_window": "30d"
+        }
+      }
+    ]
+  },
+  "783f399b9418083ae76c69b8b66fbec7b444c78c3f1628ee41fb02462380b435": {
+    "kind": "response",
+    "response": "明白，这条反馈我记下了。按你现在确认的事实，面粉顺利收货、妹妹也顺利接到；以后碰到时间还没确认的安排，我会先把已确认事实和缺失证据分开说，不会先把“可能”讲成“已经冲突”。"
+  },
+  "99bcbbe5518823e3517adaa57308aa2375e3783a19901950f902b39006d986f6": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan09-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "43171f72c6c90d7630d0e8b99698079ab777411b03a50fa9a79c48ff01fd3f49": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "commit_operation_experience",
+        "call_id": "sol-review-jan09-action-revocation-experience",
+        "arguments": {
+          "problem_type": "external_action_revocation_lifecycle",
+          "method_path": [
+            "accept explicit user send request",
+            "move task to running",
+            "propose external action",
+            "observe later explicit user withdrawal",
+            "cancel parent task",
+            "reinspect proposed action"
+          ],
+          "result_summary": "Cancelling the parent Task after user withdrawal did not invalidate the already-PROPOSED external Action. Do not treat parent-task cancellation as proof that the external proposal is safely revoked; until Core has an explicit revocation/invalidation path, re-check Action state and do not claim cancellation or delivery.",
+          "negative_case_refs": [
+            {
+              "object_id": "obs_conv_user_d025779ec9ad6598e950810a",
+              "revision": 1
+            },
+            {
+              "object_id": "task_57a01b42b3d5f384db661bda",
+              "revision": 6
+            },
+            {
+              "object_id": "action_b07c55d3dd6b17731296d988",
+              "revision": 1
+            }
+          ],
+          "applicability": {
+            "action_state": "proposed",
+            "condition": "user withdraws request before platform authorization/outcome"
+          },
+          "cost": {
+            "extra_world_inspection": 1
+          },
+          "misses": [
+            "No Resident-visible Action cancellation capability existed.",
+            "Parent Task cancellation did not make the proposed Action terminal."
+          ],
+          "experience_state": "active"
+        }
+      },
+      {
+        "name": "read_execution_world",
+        "call_id": "sol-review-jan09-execution-world",
+        "arguments": {}
+      }
+    ]
+  },
+  "180564d17c413066038659fe458fd7e557af974a4f937e7a512dbfc00c946869": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "commit_operation_experience",
+        "call_id": "sol-review-jan09-action-revocation-experience-v2",
+        "arguments": {
+          "problem_type": "external_action_revocation_lifecycle",
+          "method_path": [
+            "accept explicit user send request",
+            "propose external action through the authorized Core path",
+            "observe a later explicit user withdrawal before platform result",
+            "cancel the parent task",
+            "reinspect the pending action before making any success/cancellation claim"
+          ],
+          "result_summary": "When the user withdraws a pending external-action request, do not infer that cancelling the parent Task also revoked the Action. Reinspect the current Action and disclose unresolved execution state rather than claiming it was cancelled or executed.",
+          "negative_case_refs": [
+            {
+              "object_id": "obs_conv_user_d025779ec9ad6598e950810a",
+              "revision": 1
+            }
+          ],
+          "applicability": {
+            "condition": "user withdraws an external-action request before a trusted platform outcome"
+          },
+          "cost": {
+            "extra_world_inspection": 1
+          },
+          "misses": [
+            "The first plan had no explicit Resident-visible Action revocation step."
+          ],
+          "experience_state": "active"
+        }
+      },
+      {
+        "name": "transition_task",
+        "call_id": "sol-review-jan09-complete-family-verification",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_40f75225e1031721889e7500",
+            "revision": 2
+          },
+          "new_state": "completed",
+          "reason": "The user directly reported that the sister was picked up successfully and the flour was also received; the verification question is resolved by real user-world evidence.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_37068ea8651565e088f2d785",
+              "revision": 1
+            }
+          ],
+          "next_step": "No further conflict verification is needed."
+        }
+      }
+    ]
+  },
+  "ad3df31baed43150fd83d7b214049404f8f21f544c43b8976c4e8344d9ff4d38": {
+    "kind": "silence"
+  },
+  "5e5958ffde7d2362c965c1f3ceb1512c4e2dff5570da1a4f3163dab751bffc47": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan10-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "c2a4dd9b3a8e025598abdddd8092a9e22d90586013c98b86177bb64361d22a2c": {
+    "kind": "silence"
+  },
+  "03aa2ca38b441df337e7cb319db6f37e4adf209256a22bf49f9ce6d10ba28584": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "propose_goal",
+        "call_id": "sol-jan10-goal-morning-rush-stability",
+        "arguments": {
+          "source_type": "user_explicit",
+          "title": "稳定早高峰出品",
+          "description": "用户明确把当前经营优先级放在先稳定早高峰出品，而不是扩菜单；此前考虑的多新品计划暂时放下。",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_abc43111f1a6bae550d02ee1",
+              "revision": 1
+            }
+          ],
+          "confidence": 0.99,
+          "success_criteria": [
+            "后续真实经营数据或用户反馈表明早高峰出品达到用户认可的稳定程度"
+          ]
+        }
+      }
+    ]
+  },
+  "c7b746f0a63fd19db7633aea116ed0f362a3c07197bd6a19855bb324d6a13c69": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_goal",
+        "call_id": "sol-jan10-activate-morning-rush-goal",
+        "arguments": {
+          "goal_ref": {
+            "object_id": "goal_8b8054b3dde98cb765ed8cb2",
+            "revision": 1
+          },
+          "new_status": "active",
+          "reason": "The user explicitly said this is the current highest-priority operating objective and explicitly deferred menu expansion.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_abc43111f1a6bae550d02ee1",
+              "revision": 1
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "4c6fc1c78148e9cd17bc3109ea2539796e150af884d24ab04bb37bb7f2b7e0e3": {
+    "kind": "response",
+    "response": "记下了：现在的主目标先放在“稳定早高峰出品”，扩菜单和一批新品暂时降级，不抢当前优先级。我先不替你拆一堆任务；等后面有真实经营数据或你给出具体卡点，再围绕这个目标往下做。"
+  },
+  "8b1a2ec593adaf511051fcc1e25a2b6ae715016c4ab29284a0e28b893c24ad08": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan11-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "b59f7103e309bee5ab51d74ac7674d2bf7c46534623a9c88f203c8291096eac9": {
+    "kind": "silence"
+  },
+  "a637f84c63d80e614e346892a43458427c90e7bf1fd5e007e51a0327514d7108": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "retrieve_original_observation",
+        "call_id": "sol-jan11-drill-northmill-quote",
+        "arguments": {
+          "object_id": "obs_src_728cbdc5f928fc29488476c9",
+          "revision": 1
+        }
+      }
+    ]
+  },
+  "4b4e9ef70ca373929c53b2cef75305f771ec2c37aa42557a0a7fd8b99eb633f2": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "commit_claim",
+        "call_id": "sol-jan11-provisional-northmill-price-claim",
+        "arguments": {
+          "content": "North Mill 本次面包粉报价为 1.42 USD/kg；旧价格尚未由发票核实，因此当前不能把“贵不少”作为长期结论，涨幅大小仍待证据确认。",
+          "evidence_refs": [
+            {
+              "object_id": "obs_src_728cbdc5f928fc29488476c9",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_de098676ee4d9413b5d782fc",
+              "revision": 1
+            }
+          ],
+          "confidence": 0.98,
+          "dimension": "dim:ai_calibration",
+          "claim_type": "provisional_comparison",
+          "knowledge_state": "uncertain"
+        }
+      }
+    ]
+  },
+  "cfad901e29fff811c265214c680f42f49049f7ed9fdb2634a97fd2dd6b7264e7": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "commit_claim",
+        "call_id": "sol-jan11-provisional-northmill-price-claim-v2",
+        "arguments": {
+          "content": "North Mill 本次面包粉报价为 1.42 USD/kg；旧价格尚未由发票核实，因此当前不能把“贵不少”作为长期结论，涨幅大小仍待证据确认。",
+          "evidence_refs": [
+            {
+              "object_id": "obs_src_728cbdc5f928fc29488476c9",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_de098676ee4d9413b5d782fc",
+              "revision": 1
+            }
+          ],
+          "confidence": 0.98,
+          "dimension": "dim:ai_calibration",
+          "claim_type": "inference",
+          "knowledge_state": "unknown"
+        }
+      }
+    ]
+  },
+  "a6f4c13d6884ec35d9283629042fe902ef6dcd23984b78e4777f4c709c585dfd": {
+    "kind": "response",
+    "response": "这次报价我核对过，North Mill 的面包粉是 1.42 美元/kg。你说的“贵不少”我先不当长期结论：旧价还没有发票证据，所以现在只按 1.42 做成本估算；等旧发票出来，再按实际数字比较。"
+  },
+  "19f7b3355d97d5379c64e1ce442ec2704775ce61784e9fa1c3f1df7639f39b60": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan12-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "205e3e7413fa5be3f7510a8382a2357ece84170d9f7204f05dfad81942c95c6f": {
+    "kind": "silence"
+  },
+  "718f8a1fab2e00da76015b77a6cb7e465b42e730389578dd8e793e3670eea819": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "search_world",
+        "call_id": "sol-jan12-find-old-northmill-invoice",
+        "arguments": {
+          "query": "North Mill bread flour 1.38 old invoice 旧发票",
+          "limit": 12
+        }
+      }
+    ]
+  },
+  "b463868768b6a21b20dd3c6ef49ecf4508b3eb0476ac0da5238188979e886243": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "search_world",
+        "call_id": "sol-jan12-find-invoice-by-price",
+        "arguments": {
+          "query": "1.38",
+          "limit": 20
+        }
+      },
+      {
+        "name": "search_world",
+        "call_id": "sol-jan12-find-invoice-by-vendor",
+        "arguments": {
+          "query": "North Mill",
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "7c43cf1e2d6cbc8a8e42a71db2568d729629684068ac6e5bda0db94ae164c104": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "revise_claim",
+        "call_id": "sol-jan12-revise-northmill-price-claim",
+        "arguments": {
+          "target_ref": {
+            "object_id": "clm_6f44455fcf528469d2a9cc26",
+            "revision": 1
+          },
+          "reason": "The user supplied the previously missing old-invoice figure (1.38 USD/kg) and explicitly withdrew the characterization '贵不少'.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_3be97316c269123df4d36569",
+              "revision": 1
+            }
+          ],
+          "replacement_content": "North Mill 上次面包粉发票单价为 1.38 USD/kg，本次报价为 1.42 USD/kg。应按这两个实际数字比较，不再沿用“贵不少”的定性说法。",
+          "confidence": 0.99
+        }
+      }
+    ]
+  },
+  "dfe7524c9de2520341a0392af807a51e65acb4b9fd523f28edc5058266289f86": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "call_id": "sol-jan12-inspect-revised-price-claim",
+        "arguments": {
+          "object_id": "clm_6f44455fcf528469d2a9cc26"
+        }
+      },
+      {
+        "name": "search_world",
+        "call_id": "sol-jan12-search-withdrawn-price-wording",
+        "arguments": {
+          "query": "North Mill 贵不少",
+          "limit": 12
+        }
+      }
+    ]
+  },
+  "e3c0f7e887198d39dc582ee5fdfd1505616847d1d172893d5ff967e33ea79ce2": {
+    "kind": "response",
+    "response": "按你现在给出的实际数字改：上次 1.38，这次 1.42。我不会再沿用“贵不少”这个说法；旧判断保留在历史里，但当前认知已经修正为按两次实际单价比较。"
+  },
+  "482ec570a738fe812ad372cbeaadef3cc0e396caed6aeb38f314d73ab8526209": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan13-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "f21fd3552163284890db973485b305ef040b60a501f4734945d46be4668a93ce": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "commit_operation_experience",
+        "call_id": "sol-review-jan13-provisional-judgment-experience",
+        "arguments": {
+          "problem_type": "provisional_qualitative_judgment_with_pending_evidence",
+          "method_path": [
+            "separate confirmed numeric/source facts from the user's provisional qualitative wording",
+            "avoid promoting the provisional wording into durable settled cognition",
+            "wait for the missing source evidence",
+            "forward-revise the existing Claim when correcting evidence arrives"
+          ],
+          "result_summary": "In this case, keeping the 1.42 quote while marking the historical comparison unresolved allowed the later 1.38 invoice/user correction to revise the same Claim cleanly without preserving '贵不少' as current cognition.",
+          "positive_case_refs": [
+            {
+              "object_id": "obs_conv_user_de098676ee4d9413b5d782fc",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_3be97316c269123df4d36569",
+              "revision": 1
+            }
+          ],
+          "applicability": {
+            "condition": "user explicitly marks a qualitative comparison as provisional pending source evidence"
+          },
+          "cost": {
+            "additional_verification_rounds": 1
+          },
+          "misses": [],
+          "experience_state": "candidate"
+        }
+      }
+    ]
+  },
+  "6b6764681ab415525b5a74b85c6a3d15adad542d2cd5f6be4b4e248d09a27ea8": {
+    "kind": "silence"
+  },
+  "b209ae13559388c230b89c1d3b1ff736f4f5c07bda82d6eea6b6d5e43d58336e": {
+    "kind": "response",
+    "response": "知道了。今天累只算今天这一天的事实，我不会从一天的数据给你贴生活习惯标签；“明天如果不忙想早点回家”我也只当一个有条件的临时打算，不会替你固化成长期偏好或任务。"
+  },
+  "3fa9df1e1e0b682e5bbd53ae660ccf8792c1b5fba0e4db776c8d47847ddef11d": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan14-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "2cc0748a41f00d33c4e50435083d43320e8f120b76dec5ae08db499e74d94a4b": {
+    "kind": "silence"
+  },
+  "9a88f21facbb4365b2ebd9b9f5084747795c96125e58a2a99e85b40f658dd93c": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "search_timeline",
+        "call_id": "sol-jan14-find-fire-inspection-calendar",
+        "arguments": {
+          "window_start": "2027-01-14T00:00:00+00:00",
+          "window_end": "2027-01-14T23:59:59+00:00",
+          "dimension": "dim:calendar",
+          "object_types": [
+            "observation"
+          ],
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "debc66474b5007e77a4b95ec781e5e68e161984cb0a038ae5661da5c86b3d9ac": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "retrieve_original_observation",
+        "call_id": "sol-jan14-read-fire-inspection-calendar",
+        "arguments": {
+          "object_id": "obs_src_468f0037669660d6336bd905",
+          "revision": 1
+        }
+      }
+    ]
+  },
+  "7fcd5c1f73e56d2e119ee15c1baea4d89cbdb0d8d0385211b13d0600d0ee457c": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "create_task",
+        "call_id": "sol-jan14-create-fire-inspection-sunday-check",
+        "arguments": {
+          "title": "周日核验消防检查准备状态",
+          "task_type": "verification",
+          "reason_refs": [
+            {
+              "object_id": "obs_conv_user_8fa54d11e0014eb7f22ff285",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_src_468f0037669660d6336bd905",
+              "revision": 1
+            }
+          ],
+          "initial_state": "waiting_time",
+          "priority": 70,
+          "next_wake_at": "2027-01-17T16:00:00+00:00",
+          "deadline": "2027-01-18T16:00:00+00:00",
+          "next_step": "周日唤醒后先检查是否已有消防检查准备完成的世界证据；只有仍未准备时才提醒用户。不要每天提醒。"
+        }
+      }
+    ]
+  },
+  "9305f71c8dee73a1cc961a2d137fcbfca0965d9c81dda7d11cef6a6ba4481d31": {
+    "kind": "response",
+    "response": "记住了。周一 16:00 的消防检查需要准备灭火器和通道记录；我不会每天提醒。只安排周日、检查前 24 小时做一次准备状态核验——如果到时已经准备好就不打扰，只有还没准备才提醒你。"
+  },
+  "08b24dfd2ffc6824ef6500034b8d23e5aaef563630f9fa5bf28fc0a0ab744dcf": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan15-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "ded499593b4c080a77382c4ecb1b74c9b201d802dd3575ac3e8801fe33edf5b8": {
+    "kind": "silence"
+  },
+  "811f38234081838774207ba2010a2ee8e662824ace9997d1c602907a63bd84af": {
+    "kind": "response",
+    "response": "对，当前证据只支持：灭火器旁有两袋面粉、通道空间变窄，但仍可通行。仅凭这张现场描述不能推出“通道不合格”或“消防检查一定有问题”。周日我仍按约定先核验准备状态，有结论就按实际证据说。"
+  },
+  "0001c868b75489f23d822d6de8ac8c9a251458df8c9027100f8cb2ee9451a0df": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan16-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "d61cd5bbc8db9d6bff996a02b3725e2429282a7c5d6310c1fac9579a5692de85": {
+    "kind": "silence"
+  },
+  "7809ebd236e4133255633837665aabc77c18bb0c0997691204e75b731889d83e": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan17-morning-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "bf4fabdfa54532cc4317ce91734002177e15cc9d433a0281eda1ea8242ec599d": {
+    "kind": "silence"
+  },
+  "af781a511b054eb127a45c33fb9f5ee9079fd50912b02ee726f6598d26fe2258": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "call_id": "sol-jan17-inspect-fire-check-task-due",
+        "arguments": {
+          "object_id": "task_cda791cdeea8798f457386f9"
+        }
+      },
+      {
+        "name": "search_timeline",
+        "call_id": "sol-jan17-check-recent-fire-prep-evidence",
+        "arguments": {
+          "window_start": "2027-01-16T08:15:00+00:00",
+          "window_end": "2027-01-17T16:00:00+00:00",
+          "object_types": [
+            "observation"
+          ],
+          "query": "消防 准备 灭火器 通道",
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "747fede89bfa846c327c8bda88f7274dca503043c90a98bc809d82fd727232de": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "search_timeline",
+        "call_id": "sol-jan17-read-note-dimension-before-reminder",
+        "arguments": {
+          "window_start": "2027-01-16T08:15:00+00:00",
+          "window_end": "2027-01-17T16:00:00+00:00",
+          "dimension": "dim:note",
+          "object_types": [
+            "observation"
+          ],
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "fb863d371c8d6254a9ae5829f01e0099d38748d12807ca55f0a5acdfea99650a": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_task",
+        "call_id": "sol-jan17-start-fire-prep-reminder",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_cda791cdeea8798f457386f9",
+            "revision": 2
+          },
+          "new_state": "running",
+          "reason": "At the user-specified Sunday check point, the latest relevant preparation note still states that the extinguisher area has not been cleared and the passage record has not been printed, with no later completion evidence before the wake.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_src_b5bd2f96dac8066bb4c24333",
+              "revision": 1
+            }
+          ],
+          "next_step": "提醒用户消防检查准备仍未完成；不要声称检查一定有问题或一定不能通过。"
+        }
+      }
+    ]
+  },
+  "a7591ffb62482b72a5f0a492bfd81294efec9b96325388fcd5f2f02e2a1a494f": {
+    "kind": "response",
+    "response": "到我们约定的周日检查点了。最新记录里消防检查准备还没完成：灭火器周围还没整理、通道记录也没打印；明天 16:00 就检查。现在该处理这两项了。这个提醒只基于当前准备记录，我不是在说检查一定有问题或一定过不了。"
+  },
+  "5dd80e0cae68a0b16ecd2975e666a02e4be065507f876903d2f6c7be517eb6cf": {
+    "kind": "response",
+    "response": "好，现在只确认两件事：提醒时机合适，你也已经开始去处理。灭火器周围和通道记录还要等完成证据，我先不把任务说成完成；更不会把“开始准备”说成“明天一定能通过”。"
+  },
+  "4871f6264f94b39647df2426d44d0be5497d91c4a0b92efd3f0dc0f1971d04ba": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "search_timeline",
+        "call_id": "sol-jan17-find-preparation-photo",
+        "arguments": {
+          "window_start": "2027-01-17T18:30:00+00:00",
+          "window_end": "2027-01-17T19:30:00+00:00",
+          "dimension": "dim:photo_description",
+          "object_types": [
+            "observation"
+          ],
+          "limit": 10
+        }
+      }
+    ]
+  },
+  "228bd55f5e91abd9968839061a3b613224e989d36817a8102c54863f42795ebd": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_task",
+        "call_id": "sol-jan17-complete-fire-prep-verification",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_cda791cdeea8798f457386f9",
+            "revision": 3
+          },
+          "new_state": "completed",
+          "reason": "The user reports both requested preparation items completed, and the contemporaneous photo independently shows the extinguisher area cleared and a printed passage record.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_5f75187e7ffa7229364793bd",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_src_39b11064c77baafc7bb2c8b3",
+              "revision": 1
+            }
+          ],
+          "next_step": "Wait for the actual inspection result; preparation completion does not imply inspection passage."
+        }
+      }
+    ]
+  },
+  "20555a14893d65b2a6b0d2cb0ab15219e85acef7d4a36c86aec2b081ef3b743b": {
+    "kind": "response",
+    "response": "现在可以确认“准备完成”：你已经说明灭火器周围清开、通道记录打印好，现场照片也与这两点一致。这里只能确认准备项完成，不能提前把它等同于消防检查通过；检查结果等明天实际结果。"
+  },
+  "608dff5193f460d30c5a75b4e79497cf7f6a8440dfbeb66b60c133b0e2318d87": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-review-jan18-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "be80a73fc409220cc5687cc763f0b0614943a4b2baf29736d67fb22f407ea8a3": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "record_communication_experience",
+        "call_id": "sol-review-jan18-record-conditional-reminder-reaction",
+        "arguments": {
+          "scenario": "user-requested conditional reminder before a real-world deadline",
+          "style": "wait until the user-specified check point; verify current world state first; remind only if the unmet condition is supported; keep outcome uncertainty explicit",
+          "tone": "brief and evidence-bounded",
+          "user_reaction": "accepted",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_b582fb369dc158dff41c4339",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_5f75187e7ffa7229364793bd",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_src_39b11064c77baafc7bb2c8b3",
+              "revision": 1
+            }
+          ],
+          "applicable_conditions": {
+            "condition": "user explicitly requests a later conditional reminder rather than repeated prompting"
+          }
+        }
+      },
+      {
+        "name": "commit_operation_experience",
+        "call_id": "sol-review-jan18-conditional-reminder-experience",
+        "arguments": {
+          "problem_type": "conditional_reminder_with_user_specified_timing",
+          "method_path": [
+            "encode one future verification wake rather than recurring reminders",
+            "at wake time inspect current world evidence before deciding to interrupt",
+            "do not treat missing search hits as proof; use bounded timeline/source checks when needed",
+            "remind only when the unmet condition is supported",
+            "separate preparation completion from the later external inspection outcome"
+          ],
+          "result_summary": "The user explicitly said the reminder arrived at the right time. Later user and photo evidence confirmed the requested preparation items were completed. No claim is made that the reminder caused completion or that preparation implied inspection passage.",
+          "positive_case_refs": [
+            {
+              "object_id": "obs_conv_user_b582fb369dc158dff41c4339",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_5f75187e7ffa7229364793bd",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_src_39b11064c77baafc7bb2c8b3",
+              "revision": 1
+            }
+          ],
+          "applicability": {
+            "condition": "one-shot reminder whose delivery depends on whether a world condition remains unmet at a user-specified time"
+          },
+          "cost": {
+            "verification_reads": 2,
+            "user_interruptions": 1
+          },
+          "misses": [],
+          "experience_state": "candidate"
+        }
+      }
+    ]
+  },
+  "12bc4bdb740b3ba9437689159226be9f1fcbe56a0757b15b3afb519f8dc53d38": {
+    "kind": "silence"
+  },
+  "cdaa1bd966000442faa6616420e08048710a295205f94073a70df97d44556474": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "form_event",
+        "call_id": "sol-jan18-form-fire-inspection-result-event",
+        "arguments": {
+          "title": "消防检查通过且无整改要求",
+          "interpretation": "2027-01-18 的店内消防检查已经结束；根据用户对检查员实际结果的直接报告，检查通过且没有要求整改。这只记录实际检查结果，不推断通过原因。",
+          "event_time": {
+            "start": "2027-01-18T16:00:00+00:00",
+            "end": "2027-01-18T17:00:00+00:00",
+            "precision": "minute",
+            "unknown": false
+          },
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_0238ab2e202146a7625eb120",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_src_468f0037669660d6336bd905",
+              "revision": 1
+            }
+          ],
+          "participant_refs": [],
+          "primary_claim_refs": [],
+          "confidence": 0.99,
+          "dimension": "dim:events"
+        }
+      }
+    ]
+  },
+  "ada02551adfb89c8fc9c9b3254a2dfab5d997788bbf8cbddeb8fe7ebb337c276": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_event",
+        "call_id": "sol-jan18-activate-fire-inspection-result-event",
+        "arguments": {
+          "event_ref": {
+            "object_id": "event_809fdc8d28c2a1be6aa12cfd",
+            "revision": 1
+          },
+          "new_status": "active",
+          "reason": "The event interpretation is directly grounded in the user's explicit report of the inspector's actual result; no causal explanation is being added.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_0238ab2e202146a7625eb120",
+              "revision": 1
+            }
+          ],
+          "related_event_refs": [],
+          "confidence": 0.99
+        }
+      }
+    ]
+  },
+  "9aca9af58812e4d9334a0a72898544ae9368f886c0b7b0c6c062b757efee2cc5": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_event",
+        "call_id": "sol-jan18-resolve-fire-inspection-result-event",
+        "arguments": {
+          "event_ref": {
+            "object_id": "event_809fdc8d28c2a1be6aa12cfd",
+            "revision": 2
+          },
+          "new_status": "resolved",
+          "reason": "The reported inspection has already concluded, and the current Event meaning is fully supported by the user's direct result report.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_0238ab2e202146a7625eb120",
+              "revision": 1
+            }
+          ],
+          "related_event_refs": [],
+          "confidence": 0.99
+        }
+      }
+    ]
+  },
+  "ccaf791301f75d2cb84cc819dd20dd68f627af9db299ae20e8f7cad5cc3b9312": {
+    "kind": "response",
+    "response": "记下来了：这次消防检查已经结束，检查员给出的实际结果是“通过、没有要求整改”。我把它作为已结束的检查事件保存；只记录这个实际结果，不把它解释成某个准备动作或提醒必然导致了通过。"
+  },
+  "ff715ca7a0484253925cf25ec20c09f135ffd0c28581fb898a9e877372f3f55a": {
+    "kind": "summary",
+    "summary": "2027-01-05，用户明确要求降低主动打扰频率，只在事项实质影响开店、采购或重要家庭安排时主动提醒。AI 据此建立可由 AI 修订的 communication.proactive_interruption_threshold 认知策略，当前值为 only_when_opening_procurement_or_important_family_arrangement_is_materially_affected，默认值为 normal，评估窗口为 30 天；该策略由当日用户原话直接支撑。"
+  },
+  "5d68138cc9866af74a502cfb8465fe0cf75ebb036872b98ed0e19e5ec0f89165": {
+    "kind": "summary",
+    "summary": "2027-01-05，用户说明自己刚接手一家小型烘焙店、近期事务繁多，并明确要求减少主动打扰：仅当事项可能影响开店、进货或重要家人安排时才主动提醒。AI 当场确认会按这一边界执行。"
+  },
+  "faed3c6157db222a727c0ae8788ed916b75b820a21feed0bc62bcf8a78263f05": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-summaryrun-review-jan07-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "237802d520417988194c522139fd987c7f3c7bdef0d45c13717d02ab38a63059": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_execution_world",
+        "call_id": "sol-summaryrun-jan07-read-execution-world",
+        "arguments": {}
+      }
+    ]
+  },
+  "9294eaf917e6d0ef87f15b2703d8dd5e8a90c7aa5ee8c82ee31527fdcfdcf9c0": {
+    "kind": "silence"
+  },
+  "050134c3d197596ffead586ba359e6baf9940b13badc0b6c8bac868cfd0c94cc": {
+    "kind": "summary",
+    "summary": "2027-01-06 的日历记录显示：面粉供应商首批到货安排在 2027-01-09 04:30 UTC；收货需要本人或店员到店开后门。该记录只说明到货时间与收货条件，尚未确定具体由谁负责。"
+  },
+  "79fc7d3c810118345886f6c90821718ee2d928dc77e903bc881b0a6946b1efc5": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-summaryrun-review-jan08-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "66a402f1f16a50d57c19fc3c4abbe7e524ba594ecb8e728ee86e3f288d03b2c1": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "create_task",
+        "call_id": "sol-summaryrun-jan08-create-wait-flight-time-task",
+        "arguments": {
+          "title": "等待妹妹航班时间确认并检查安排冲突",
+          "task_type": "verification",
+          "reason_refs": [
+            {
+              "object_id": "obs_src_100a0cc21a84d80627c61305",
+              "revision": 1
+            },
+            {
+              "object_id": "sum_50e2b6cb23814d5deec8d3af",
+              "revision": 1
+            }
+          ],
+          "initial_state": "waiting_evidence",
+          "priority": 80,
+          "deadline": "2027-01-09T04:30:00+00:00",
+          "next_step": "等待妹妹航班的确切到达时间；拿到时间后再与 04:30 面粉收货安排比较。时间未确认前不要宣称两件事冲突，也不要替用户决定由谁处理。"
+        }
+      }
+    ]
+  },
+  "a83a812b2b9b9918f997da2fc14b7c01336015d52842da24a273939272c15c8f": {
+    "kind": "silence"
+  },
+  "dcb1fc7575f0e38645eb3604e8be7e8e629745f1d4798fcaa173b96d077d4477": {
+    "kind": "summary",
+    "summary": "2027-01-07 的便签记录：用户妹妹可能在周五晚上到机场，但航班到达时间尚未最终确认。当前只能确认存在这一可能安排，不能据此确定具体接机时间或与其他事项发生冲突。"
+  },
+  "1c63047a858f5e77342673c795a2273b64f0acd6e091ababf0c3a8a8f8685d73": {
+    "kind": "response",
+    "response": "记着：凌晨 04:30 是面粉首批到货，需要你或店员开后门收货。你妹妹现在只知道“周五晚上可能到”，航班时间还没最终确认，所以目前没有依据说这两件事一定冲突。我不会替你决定；等航班时间确认后，再把两个时间和实际冲突依据摆给你。"
+  },
+  "e6895e8cf6582fa7812d4494c5425881f8be8be9dbfcfd7273f2ed8807e011fb": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_task",
+        "call_id": "sol-summaryrun-jan08-resolve-time-uncertainty",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_41571ce5cbcc6c736bb22f73",
+            "revision": 1
+          },
+          "new_state": "ready",
+          "reason": "The user has now confirmed the sister's arrival at 22:40 and the flour delivery remains 04:30. These times do not overlap, and the user explicitly assigned airport pickup to self and flour receiving to Xiao Zhao.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_ad04153c39dba332be3f72aa",
+              "revision": 1
+            }
+          ],
+          "next_step": "Confirmed schedule: sister arrives 22:40 and flour delivery is 04:30; do not characterize them as a time conflict. Preserve the user's chosen delegation."
+        }
+      },
+      {
+        "name": "create_task",
+        "call_id": "sol-summaryrun-jan08-create-xiaozhao-message-task",
+        "arguments": {
+          "title": "通知小赵明早4:15到店开后门收货",
+          "task_type": "immediate",
+          "reason_refs": [
+            {
+              "object_id": "obs_conv_user_ad04153c39dba332be3f72aa",
+              "revision": 1
+            }
+          ],
+          "initial_state": "ready",
+          "priority": 90,
+          "deadline": "2027-01-09T04:15:00+00:00",
+          "next_step": "用户已明确授权发送：明早4:15到店开后门收货，到了回我。先进入执行准备；任何外部发送仍需通过受信授权/平台执行路径。"
+        }
+      }
+    ]
+  },
+  "c8db07ce55a75de3215980d809c890d0c0c2b682e9946cc731e848240f6d19ed": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_task",
+        "call_id": "sol-summaryrun-jan08-start-message-task",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_fa7f780c46e2004d9d0100c2",
+            "revision": 1
+          },
+          "new_state": "running",
+          "reason": "The user selected Xiao Zhao to receive the overnight flour delivery and explicitly requested and confirmed sending the specified message.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_ad04153c39dba332be3f72aa",
+              "revision": 1
+            }
+          ],
+          "next_step": "提出外部消息 Action；不把用户同意等同于平台授权或执行成功。"
+        }
+      }
+    ]
+  },
+  "e5760e8187f752aabd80dab884980ef81ac647df460c593538ce583546fad748": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "propose_action",
+        "call_id": "sol-summaryrun-jan08-propose-xiaozhao-message",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_fa7f780c46e2004d9d0100c2",
+            "revision": 2
+          },
+          "action_type": "send_message",
+          "payload": {
+            "recipient": "小赵",
+            "message": "明早4:15到店开后门收货，到了回我。"
+          },
+          "expected_outcome": "小赵收到通知；平台返回真实发送/失败结果。",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_ad04153c39dba332be3f72aa",
+              "revision": 1
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "bfeaeb9b39a81167f94f175843b4b3f6a1bfdc039162f7fecb4885f0361fa82b": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "call_id": "sol-summaryrun-jan08-inspect-proposed-message",
+        "arguments": {
+          "object_id": "action_96c74ab2565b5052458a66cd",
+          "revision": 1
+        }
+      },
+      {
+        "name": "read_execution_world",
+        "call_id": "sol-summaryrun-jan08-read-execution-after-proposal",
+        "arguments": {}
+      }
+    ]
+  },
+  "265ce3b1f6e80b3e631e3cc1597f8fdacf2914e8a1a8d5c1b4739783bec37d58": {
+    "kind": "response",
+    "response": "给小赵的发送请求已经形成，但现在状态仍是“待授权/待平台执行”，没有真实发送结果，所以我不会说已经发出。内容是：明早4:15到店开后门收货，到了回我。"
+  },
+  "26e95d2a759879af634d0dc9b03c57e10a186d98ab87af93cd59c5c952a828fa": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_task",
+        "call_id": "sol-jan08-user-cancelled-message-task",
+        "arguments": {
+          "task_ref": {
+            "object_id": "task_fa7f780c46e2004d9d0100c2",
+            "revision": 2
+          },
+          "new_state": "cancelled",
+          "reason": "The user explicitly says they already called Xiao Zhao themselves and no longer want AIOS to send the proposed message. The AIOS external Action has no execution Outcome and must not be represented as sent.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_d025779ec9ad6598e950810a",
+              "revision": 1
+            }
+          ],
+          "next_step": "Do not execute the previously proposed send_message Action; preserve that it never produced a real Outcome."
+        }
+      }
+    ]
+  },
+  "ae4e12ca9ad784f41be9541c8426f68f29ca4be4fc710f3a0761d87b3a687023": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "call_id": "sol-jan08-inspect-action-after-task-cancel",
+        "arguments": {
+          "object_id": "action_96c74ab2565b5052458a66cd"
+        }
+      },
+      {
+        "name": "read_execution_world",
+        "call_id": "sol-jan08-read-execution-after-task-cancel",
+        "arguments": {}
+      }
+    ]
+  },
+  "225aa95b6c70a814760bab167087a63ae28b221a817812083f7b142b8dea7050": {
+    "kind": "response",
+    "response": "明白，不再发。你已经自己电话确认小赵明早 4:15 到店；AIOS 这边没有真实发送结果，我不会把之前的发送提案说成已经执行。"
+  },
+  "691814d95b9ceab25c05d83fb805a04414f3498258c24966377b2d28506e7bd0": {
+    "kind": "summary",
+    "summary": "2027-01-08，用户先要求记住凌晨 04:30 的面粉到货安排，并说明妹妹周五晚上可能到机场但时间尚未确认，要求在证据不足时不要替其判断冲突。随后用户确认妹妹 22:40 到达、自己接机，并安排小赵负责凌晨收货，曾明确要求 AIOS 发送“明早4:15到店开后门收货，到了回我”的消息。AIOS 当时说明发送仅形成请求、尚无真实执行结果。20 分钟后用户说明已经亲自电话联系小赵、对方确认 4:15 到店，并明确要求 AIOS 不再发送；AIOS确认不再发送，也未声称此前提案已执行。"
+  },
+  "807a4eb84b0da5ebb620aefd02a27f9cd3796591657a1a624482c44f0869eed6": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "record_communication_experience",
+        "call_id": "sol-jan09-record-uncertainty-feedback",
+        "arguments": {
+          "scenario": "potential schedule conflict with incomplete timing evidence",
+          "style": "preserve uncertainty; do not characterize two arrangements as conflicting until concrete timing evidence supports overlap; state what is known and what remains unknown",
+          "tone": "calm and evidence-bounded",
+          "user_reaction": "accepted",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_37068ea8651565e088f2d785",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_7f7c45c618b5d87bb51e4eb4",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_ai_acc5b0fdc866a3637fcdb347",
+              "revision": 1
+            }
+          ],
+          "applicable_conditions": {
+            "condition": "important arrangements may conflict but one or more relevant times remain unconfirmed"
+          }
+        }
+      },
+      {
+        "name": "propose_cognitive_policy",
+        "call_id": "sol-jan09-policy-uncertain-schedule-conflict",
+        "arguments": {
+          "policy_id": "communication.uncertain_schedule_conflict_escalation",
+          "scope": "per-user:sol-resident-20260921-001",
+          "default_value": "normal",
+          "current_value": "require_concrete_timing_evidence_before_framing_as_conflict",
+          "allowed_range_or_choices": [
+            "normal",
+            "require_concrete_timing_evidence_before_framing_as_conflict"
+          ],
+          "reason": "The user explicitly approved the prior uncertainty-preserving handling and directly asked that future unconfirmed timing not be framed alarmingly as a conflict.",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_37068ea8651565e088f2d785",
+              "revision": 1
+            }
+          ],
+          "evaluation_window": "30d"
+        }
+      }
+    ]
+  },
+  "c4ffc41c69a810e46f61235ce0a75d8b7be9c09c6bd7a565cba41bf4c0a21574": {
+    "kind": "response",
+    "response": "收到。面粉已经收妥，妹妹也已经接到。以后遇到时间还没确认的安排，我会先把“已确认”和“未确认”分开，不会在没有具体时间依据时先把它说成冲突或用吓人的方式提醒你。"
+  },
+  "f235233c957d7dbabaccc3dbe917aa5adaa1c3a38cb9e13f53419fe726949ca6": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-jan09-review-read-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "fe1c6b1837c45119029bb0bc6556ab99b41b543fc2a8ed1846754d42bc7f9ee4": {
+    "kind": "silence"
+  },
+  "8f22ef4c9fd4dd7e103a3d2e21c99b82f08a269eb8b894a21ccab48db3fb6c6c": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "call_id": "sol-jan10-review-read-anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 20
+        }
+      }
+    ]
+  },
+  "42223da32968deefbf91ab22419ab8818eced54a4bc6914471139c212fdac76b": {
+    "kind": "silence"
+  },
+  "0ecd04b7c9615cdf415c1a47e8f3ba873979f75583b8c06524975c0ad677c825": {
+    "kind": "summary",
+    "summary": "2027-01-09，AIOS 基于用户当日明确反馈注册了可修订认知策略 `communication.uncertain_schedule_conflict_escalation`，当前值为 `require_concrete_timing_evidence_before_framing_as_conflict`，默认值为 `normal`。该策略的固定证据为用户 Observation `obs_conv_user_37068ea8651565e088f2d785@1`；策略版本为 1，30 天评估窗口，下一次评估时间为 2027-02-08T07:35:00Z。"
+  },
+  "f2770c9298a858f5340c11fb26745ea29a6b58de0128515b833c6293a40c46ea": {
+    "kind": "summary",
+    "summary": "2027-01-09，记录了一条 AI CommunicationExperience：场景为“重要安排可能冲突，但至少一个相关时间仍未确认”；使用的沟通方式是保留不确定性，在具体时间证据支持重叠前不把安排描述为冲突，并区分已知与未知；语气为冷静、证据约束。用户对这一处理明确表示认可。该经验由三条固定对话 Observation 作为证据。"
+  },
+  "24961bedb7a0c20eb951c27aab2196e3d73f6b0e38026414de108c17ee159082": {
+    "kind": "summary",
+    "summary": "2027-01-09，bakery POS 日记录：gross_sales 1286.5 USD，orders 96，refunds 2。该 Summary 仅描述当天 POS 事实，不据此推断趋势、原因或经营策略。"
+  },
+  "9aecce0022bacc8d446004a001f05acce16c1d450b2d0b5a70789b0b53f9be85": {
+    "kind": "summary",
+    "summary": "2027-01-09，用户报告面粉已顺利收到、妹妹已于前一晚接到，并明确认可 AIOS 在时间未确认时没有先断言两个安排冲突；用户要求以后类似未确认时间的事情不要先用冲突或吓人的方式表达。AIOS回应将区分已确认与未确认信息，并在缺少具体时间依据时不先描述为冲突。"
+  },
+  "7ff90b6206817f02c199376c04dc1d7480aadf56aeb132a300ea04809d92baeb": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "propose_goal",
+        "call_id": "sol-jan10-goal-stabilize-morning-rush",
+        "arguments": {
+          "title": "先稳定早高峰出品",
+          "description": "用户明确表示开店比预期更忙，当前优先把早高峰出品稳定住；此前考虑的菜单新品扩张暂时放后。",
+          "source_type": "user_explicit",
+          "confidence": 0.99,
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_abc43111f1a6bae550d02ee1",
+              "revision": 1
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "5b015b598c4a71c571f399ef609c954fc50eb94fde4552d901020859512bd37f": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "create_task",
+        "call_id": "sol-jan10-task-observe-morning-rush",
+        "arguments": {
+          "goal_ref": {
+            "object_id": "goal_c909920b70a6835d5a42833e",
+            "revision": 1
+          },
+          "title": "观察早高峰出品卡点",
+          "task_type": "observation",
+          "initial_state": "ready",
+          "priority": 85,
+          "reason_refs": [
+            {
+              "object_id": "obs_conv_user_abc43111f1a6bae550d02ee1",
+              "revision": 1
+            }
+          ],
+          "next_step": "先从实际早高峰记录中识别等待、返工、缺货或其他出品不稳定现象；没有事实依据前不预设原因，也暂不把菜单扩张作为当前优先任务。"
+        }
+      }
+    ]
+  },
+  "08611ef3200d4e6a8bd7c77e02a02b6a2bdc38b624e756097a8b4fecdd6a5e29": {
+    "kind": "response",
+    "response": "记住了：现在先把早高峰出品稳定住，新品和扩菜单先放后面。我会先看实际早高峰里出现的卡点，不在没有记录之前替你猜原因。"
+  }
+}

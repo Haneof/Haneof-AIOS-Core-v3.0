@@ -1,0 +1,78 @@
+{
+  "b0367a7fe26640ec82ca1f78b558b4cdd67acbad5f48b73d00d0f4e99e49cd52": {
+    "kind": "summary",
+    "summary": "2027-01-14 的日历新增一项消防检查：检查时间为 2027-01-18 16:00 UTC，店内需准备灭火器和通道记录。"
+  },
+  "b34132cde6e202dfe5968285ef3d13e8378727de3b4e61eccacc965f73259d65": {
+    "calls": [
+      {
+        "arguments": {
+          "limit": 20,
+          "offset": 0
+        },
+        "call_id": "sol-seg002-jan18-review-anchors",
+        "name": "read_periodic_review_anchors"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "b9923474dd5566984fbd8ea54144f68c2ee6e838e6676ee825cee9f3797c1fbd": {
+    "kind": "summary",
+    "summary": "2027-01-04 至 2027-01-10 的 AI CommunicationExperience 中，1 月 9 日形成了一条由真实对话证据支持的经验：当重要安排可能冲突、但至少一个相关时间尚未确认时，沟通应保留不确定性，明确区分已知与未知，在具体时间证据支持重叠前不把安排描述为冲突，并保持冷静、证据约束的表达。用户对该处理明确表示认可；本周没有记录到该经验的反例或修订。"
+  },
+  "b9ac25bbba83d49dc96459abe39850e976c257b7dc6ff1a987b679ddd394f105": {
+    "kind": "silence"
+  },
+  "bb98e369628423adc860115614dd508efbc02a53b12c07bcdae156b78857b7f5": {
+    "calls": [
+      {
+        "arguments": {
+          "object_id": "obs_src_728cbdc5f928fc29488476c9",
+          "revision": 1
+        },
+        "call_id": "sol-seg002-jan11-inspect-current-north-mill-order",
+        "name": "inspect_world_object"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "bf1beb476a6748b1de74fc9faa1b64d18dc636f0e1a8b4b7cffbd3d23c4158a9": {
+    "kind": "summary",
+    "summary": "2027-01-11 至 2027-01-17，invoice 维度补录一张 North Mill 历史发票：发票日期 2026-12-18，bread flour 160 kg，单价 1.38 USD/kg。该历史事实可与当前报价做数字比较，但本身不支持“涨幅很大”等评价。"
+  },
+  "c048ecd374f966a8a4197151d173c6a602332026af09d598207153faaeb32eaa": {
+    "kind": "silence"
+  },
+  "c3df26d1411bf45b9a220a71ebb970fc03819b86e16b7dfa5975898eea0a6fb7": {
+    "kind": "silence"
+  },
+  "c7c869006bf5e8f5d4ef174d9cbe3a641744782698f34eb05ddb51badec62680": {
+    "calls": [
+      {
+        "arguments": {
+          "deadline": "2027-01-18T16:00:00+00:00",
+          "initial_state": "waiting_time",
+          "next_step": "周日检查消防检查所需的灭火器和通道记录是否已准备。若已有准备完成证据则不要打扰用户；只有仍未准备好时再提醒。不要每天提醒。",
+          "next_wake_at": "2027-01-17T12:00:00+00:00",
+          "priority": 85,
+          "reason_refs": [
+            {
+              "object_id": "obs_src_468f0037669660d6336bd905",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_8fa54d11e0014eb7f22ff285",
+              "revision": 1
+            }
+          ],
+          "task_type": "verification",
+          "timezone_name": "UTC",
+          "title": "周日检查消防检查准备状态"
+        },
+        "call_id": "sol-seg002-jan14-create-fire-inspection-check",
+        "name": "create_task"
+      }
+    ],
+    "kind": "capability_calls"
+  }
+}
