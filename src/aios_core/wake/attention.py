@@ -17,6 +17,7 @@ from typing import Any, Literal, Mapping, Sequence
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from aios_core.contracts.enums import (
+    AttentionClass,
     MaintenanceClass,
     ObjectType,
     SourceClass,
@@ -71,6 +72,7 @@ class AttentionWatchRequest(BaseModel):
     numeric: NumericPredicate | None = None
     priority: int = Field(default=50, ge=0, le=100)
     cooldown_seconds: int = Field(default=0, ge=0)
+    attention_class: AttentionClass = AttentionClass.BACKGROUND
     expires_at: datetime | None = None
 
     @model_validator(mode="after")
@@ -196,6 +198,7 @@ class AttentionWatchService:
                 None if request.numeric is None else request.numeric.model_dump(mode="json")
             ),
             "cooldown_seconds": int(request.cooldown_seconds),
+            "attention_class": request.attention_class.value,
             "predicate_semantics": "mechanical_only",
         }
         receipt = self.execution_world.create_task(
@@ -306,6 +309,12 @@ class AttentionWatchService:
                         cooldown_seconds=int(
                             condition.get("cooldown_seconds") or 0
                         ),
+                        attention_class=AttentionClass(
+                            str(
+                                condition.get("attention_class")
+                                or AttentionClass.BACKGROUND.value
+                            )
+                        ),
                         metadata={
                             "trigger_kind": "resident_attention_watch",
                             "watch_task_ref": task_ref.model_dump(mode="json"),
@@ -332,6 +341,46 @@ class AttentionRouter:
         self.wake_bus = wake_bus
         self.subject_id = subject_id.strip()
 
+    def pending_review_queue(self) -> tuple[Wake, ...]:
+        """Return durable low-urgency Wakes reserved for periodic Resident review."""
+
+        queued = [
+            wake
+            for wake in self.wake_bus.pending_wakes()
+            if self.wake_bus.attention_class_for_wake(wake)
+            is AttentionClass.REVIEW_QUEUE
+        ]
+        queued.sort(
+            key=lambda item: (
+                as_utc(item.first_hit_at, "first_hit_at"),
+                item.object_id,
+            )
+        )
+        return tuple(queued)
+
+    def complete_review_queue(
+        self,
+        wake_ids: Sequence[str],
+        *,
+        completed_at: datetime,
+    ) -> tuple[str, ...]:
+        completed: list[str] = []
+        for wake_id in wake_ids:
+            wake = self.wake_bus.current_wake(str(wake_id))
+            if wake.wake_state not in {WakeState.NEW, WakeState.QUEUED}:
+                continue
+            self.wake_bus.complete(
+                wake.object_id,
+                completed_at=completed_at,
+                termination_reason="periodic_review_consumed",
+                model_rounds=0,
+                capability_names=(),
+                delivery_allowed=False,
+                step0_state="review_queue",
+            )
+            completed.append(wake.object_id)
+        return tuple(completed)
+
     def bundle_pending(
         self,
         *,
@@ -356,6 +405,8 @@ class AttentionRouter:
                 WakeSource.USER_INTERACTION,
                 WakeSource.ATTENTION_BUNDLE,
             }
+            and self.wake_bus.attention_class_for_wake(wake)
+            is AttentionClass.BACKGROUND
             and cutoff <= as_utc(wake.last_hit_at, "last_hit_at") <= moment
         ][:max_wakes]
 
@@ -423,6 +474,7 @@ class AttentionRouter:
                 },
                 "semantic_conclusions": False,
                 "routing_only": True,
+                "attention_class": AttentionClass.BACKGROUND.value,
             },
         )
 
