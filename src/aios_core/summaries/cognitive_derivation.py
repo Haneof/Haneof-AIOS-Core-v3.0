@@ -703,6 +703,13 @@ class CognitiveDerivationScheduler:
                 reason=f"lineage_{lineage.classification.value.lower()}",
                 lineage=lineage,
             )
+        if not lineage.grounding_leaf_refs:
+            return CognitiveDerivationScheduleReceipt(
+                summary_ref=summary_ref,
+                eligible=False,
+                reason="lineage_no_direct_reality_grounding",
+                lineage=lineage,
+            )
 
         dimension = str(
             summary.metadata.get("dimension")
