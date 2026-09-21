@@ -1,0 +1,1 @@
+{"d507119be49d4cba8383e5b2396077086598799d8a13c955b28b45750fa303d4":{"kind":"capability_calls","calls":[{"name":"search_timeline","arguments":{"window_start":"2027-01-20T00:00:00Z","window_end":"2027-01-20T09:10:00Z","object_types":["observation"],"limit":20},"call_id":"seg003-jan20-production-records"}]}}
