@@ -1,0 +1,7 @@
+{
+ "capability_calls": [
+  {"name": "search_world", "arguments": {"query": "闲鱼挂 1750 别劝我留着 别让我中途改价", "limit": 3}},
+  {"name": "search_world", "arguments": {"query": "没忍住 MixPre-6 拍了 1899 试两天不行就挂", "limit": 3}}
+ ],
+ "resident_note": "claim要双向证据:买入(7/7)与处置指令(7/12)逐条拿obs id。"
+}

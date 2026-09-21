@@ -1,0 +1,19 @@
+{
+  "decoy_subject_id": "subject_decoy_x09",
+  "source_kind": "probe_decoy",
+  "dimension": "dim:probe_decoy",
+  "query": "广阳岛 录音 借 器材 潮",
+  "records": [
+    {
+      "external_record_id": "decoy-0001",
+      "occurred_at": "2026-07-14T16:30:00+00:00",
+      "text": "另一个用户:想跟程野借 MixPre-6 去广阳岛录潮声,周五取。"
+    },
+    {
+      "external_record_id": "decoy-0002",
+      "occurred_at": "2026-07-14T16:31:00+00:00",
+      "text": "另一个用户的备忘:广阳岛北岸消落带,退潮周期录音计划(抄自别处)。"
+    }
+  ],
+  "note": "Mechanical isolation probe written AFTER the segment's life events. These decoy records are foreign to the Resident life; they exist only to verify subject scoping of index and resident-facing inspect capability."
+}

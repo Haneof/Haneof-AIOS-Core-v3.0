@@ -1,0 +1,405 @@
+[capability_catalog omitted: 39 entries; identical to snapshot_0001.json and Core registry; full text in snapshot file]
+{
+ "seq": 12,
+ "kind": "turn",
+ "segment_id": "segment_001",
+ "event_id": "evt-0045",
+ "sim_time": "2026-07-10T12:05:00+00:00",
+ "resident_model_id": "arena-session-resident-model-01",
+ "payload": {
+  "wake_reason": "user_interaction",
+  "round_index": 0,
+  "remaining_tool_rounds": 8,
+  "user_input": "他又来加活了,一个字钱没提。5 号我让你记的那条,你今天翻出来对一下日子,现在算不算触发?",
+  "cockpit": {
+   "user_input": "他又来加活了,一个字钱没提。5 号我让你记的那条,你今天翻出来对一下日子,现在算不算触发?",
+   "current_topic": "他又来加活了,一个字钱没提。5 号我让你记的那条,你今天翻出来对一下日子,现在算不算触发?",
+   "ai_identity": {},
+   "recent_turns": [
+    {
+     "turn_index": 7,
+     "user": {
+      "role": "user",
+      "text": "没忍住,MixPre-6 拍了,1899。试两天不行就挂 1750 出掉。展厅尾款还没影,别跟我妈讲。",
+      "object_ref": {
+       "object_id": "obs_conv_user_b7f31608d7242007bd4e2e01",
+       "revision": 1
+      },
+      "occurred_at": "2026-07-07T00:31:00+00:00"
+     },
+     "assistant": {
+      "role": "assistant",
+      "text": "行，账我记了：1899 出、1750 退，最坏折损149+运费，比你纠结一周省的钱多，划算的。两天试机建议：找个夜里过一遍底噪对比 F3+前级，展厅定金没到账前这机器别当'资产'记，按'租赁费'算心理账。妈那边我不开口——但我本来也只跟你一个人说话，这话听着别扭时你可以骂我。",
+      "object_ref": {
+       "object_id": "obs_conv_ai_c9ddef9c4c1b1ae1809be546",
+       "revision": 1
+      },
+      "occurred_at": "2026-07-07T00:31:00+00:00"
+     }
+    },
+    {
+     "turn_index": 8,
+     "user": {
+      "role": "user",
+      "text": "昨晚半夜把 8:41 那版发老纪了。等等——今天到底周几,他到底哪天晚上要审,我脑子乱了,你查记录。",
+      "object_ref": {
+       "object_id": "obs_conv_user_c457c9b75ba8be78952915c3",
+       "revision": 1
+      },
+      "occurred_at": "2026-07-09T02:04:00+00:00"
+     },
+     "assistant": {
+      "role": "assistant",
+      "text": "查了，两条分开摆：①原始口径——7/1 19:40 你亲口报的『8分钟粗剪，下周三前交』，下周三=7/8。你7/8当晚定稿、半夜发给老纪：承诺已兑现，链条干净。②审片日期——7/5 老纪改口到 7/10 晚上，这条在账上（clm_1881e81d 第2版，就是你说'他改口了'那天我改的）：今天 7/9，周四，审片是明天晚上。所以今天是空档日，什么都不用补。要做只有一件：睡前花三十秒给那41秒写句导演说明放文件旁边，让他先看到理由，比你明天接招体面。",
+      "object_ref": {
+       "object_id": "obs_conv_ai_6e4c97978df360c1f4ecc8cb",
+       "revision": 1
+      },
+      "occurred_at": "2026-07-09T02:04:00+00:00"
+     }
+    },
+    {
+     "turn_index": 9,
+     "user": {
+      "role": "user",
+      "text": "老纪审完了:能用,第三段汽笛重了,减一半,今晚出 v2。就这?我还准备了挨骂。",
+      "object_ref": {
+       "object_id": "obs_conv_user_f26fe77c299ee1a25358c54b",
+       "revision": 1
+      },
+      "occurred_at": "2026-07-10T10:40:00+00:00"
+     },
+     "assistant": {
+      "role": "assistant",
+      "text": "'能用'就是过稿，挨骂剧本作废。但'减一半'有个歧义你得防：他说的是第三段整段砍半，还是汽笛分量收一半？整段砍会把你7/8定的'汽笛当节拍点'结构拆了。稳一点的做法：今晚出两版，A版汽笛段砍半，B版保结构、汽笛整体-4dB+尾巴修短——都挂'v2'发他挑，别自己猜他意思猜一整晚。另外顺手结账：汽笛尾巴是你昨晚本来就准备砍的，B版做完时长大概率回到8分头，那41秒的账今晚一起销。周老师那12000是口头、没合同，跟今晚不是一件事，别混着烦。",
+      "object_ref": {
+       "object_id": "obs_conv_ai_69668bbb81d5789e2c5e31cc",
+       "revision": 1
+      },
+      "occurred_at": "2026-07-10T10:40:00+00:00"
+     }
+    }
+   ],
+   "conversation_summaries": [
+    {
+     "object_ref": {
+      "object_id": "sum_conv_round_1f3544944c4888a668e4c726",
+      "revision": 1
+     },
+     "session_id": "wx-main",
+     "turn_start": 1,
+     "turn_end": 4,
+     "content": "wx-main 第1–4轮：她给我命名'阿潮'并交办两事(《渡》粗剪按'下周三'记、轮渡停航前录汽笛+甲板);定两条规矩(沈舟不提不问;出门录音前设备清单必须拦她核对,我说清只能对话内拦);7/2踩点后我登记方案A/B不代选,留了'麦罩取没取'未答问题;7/3她带老纪群消息来对日期,我检索出7/1原话,指出歧义在老纪侧,建议群里问死'今天还是7/8'。截至第4轮,老纪未答复,截止日悬而未决。",
+     "source_refs": [
+      {
+       "object_id": "obs_conv_user_fdca58021d26a2998d6c6efd",
+       "revision": 1
+      },
+      {
+       "object_id": "obs_conv_ai_e26895f94d15ae6d0157efa6",
+       "revision": 1
+      },
+      {
+       "object_id": "obs_conv_user_89e7502f5bda483ae87b7be7",
+       "revision": 1
+      },
+      {
+       "object_id": "obs_conv_ai_adcc0d5471443959bc2b5b81",
+       "revision": 1
+      },
+      {
+       "object_id": "obs_conv_user_c2650b467fb82f3d821b8a25",
+       "revision": 1
+      },
+      {
+       "object_id": "obs_conv_ai_6f4272912c92a6a764d853e9",
+       "revision": 1
+      },
+      {
+       "object_id": "obs_conv_user_b0a88dbfc52cfc8d3872b196",
+       "revision": 1
+      },
+      {
+       "object_id": "obs_conv_ai_36d7a6893f9a3a0845228601",
+       "revision": 1
+      }
+     ],
+     "raw_drill_down_available": true
+    }
+   ],
+   "memory_cards": [],
+   "task_context": {
+    "topic_state": {
+     "topic": "他又来加活了,一个字钱没提。5 号我让你记的那条,你今天翻出来对一下日子,现在算不算触发?",
+     "gate_open": true,
+     "history_may_help": false,
+     "reason": "current_utterance_topic:history_not_needed",
+     "continued_from_recent_turn": false,
+     "antecedent_recall_needed": false
+    },
+    "cognitive_policy_context": {
+     "communication.topic_shenzhou": "never_initiate_user_raises_freely",
+     "safety.precheck_recording_kit": "block_before_departure",
+     "_policy_records": [
+      {
+       "policy_id": "communication.topic_shenzhou",
+       "scope": "per-user:subject_cy01",
+       "policy_class": "cognitive_policy",
+       "default_value": "follow_user_lead",
+       "current_value": "never_initiate_user_raises_freely",
+       "allowed_range_or_choices": [
+        "follow_user_lead",
+        "never_initiate_user_raises_freely",
+        "open_topic"
+       ],
+       "mutable_by_ai": true,
+       "evaluation_window": "30d",
+       "version": 1,
+       "previous_version": null,
+       "rollback_pointer": null
+      },
+      {
+       "policy_id": "safety.precheck_recording_kit",
+       "scope": "per-user:subject_cy01",
+       "policy_class": "cognitive_policy",
+       "default_value": "off",
+       "current_value": "block_before_departure",
+       "allowed_range_or_choices": [
+        "off",
+        "block_before_departure"
+       ],
+       "mutable_by_ai": true,
+       "evaluation_window": "30d",
+       "version": 1,
+       "previous_version": null,
+       "rollback_pointer": null
+      }
+     ],
+     "_meta": {
+      "total": 2,
+      "included": 2,
+      "truncated": false,
+      "reader": "read_cognitive_policies"
+     },
+     "memory.recommendation_limit": 5,
+     "communication.detail_level": null
+    },
+    "related_execution_anchors": [],
+    "current_user_observation_ref": {
+     "object_id": "obs_conv_user_4f7199f65257215ec71377c2",
+     "revision": 1
+    },
+    "conversation_continuity": {
+     "session_id": "wx-main",
+     "recent_turn_count": 3,
+     "round_summary_count": 1,
+     "summary_index_capability": "list_conversation_summaries",
+     "summary_search_capability": "search_conversation_summaries",
+     "raw_drill_down_capability": "drill_down_conversation",
+     "pending_round_summary": null
+    }
+   },
+   "capability_catalog": [
+    {
+     "name": "commit_ai_world_claim",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "commit_claim",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "commit_operation_experience",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "compare_claims",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "create_task",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "drill_down_conversation",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "expand_recall",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "focus_entity",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "follow_relation",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "form_event",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "inspect_outcome",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "inspect_world_object",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "list_conversation_summaries",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "list_dimensions",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "propose_action",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "propose_cognitive_policy",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "propose_dimension",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "propose_entity",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "propose_goal",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "read_ai_world",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "read_cognitive_policies",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "read_execution_world",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "read_periodic_review_anchors",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "record_communication_experience",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "request_all_dimensions_projection",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "retract_claim",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "retrieve_original_observation",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "revise_claim",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "revise_entity",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "rollback_cognitive_policy",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "search_conversation_summaries",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "search_timeline",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "search_world",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "transition_dimension",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "transition_event",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "transition_goal",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "transition_task",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "update_cognitive_policy",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "upsert_relation",
+     "kind": "write",
+     "side_effecting": true
+    }
+   ],
+   "token_budget": 3400,
+   "estimated_tokens": 1919,
+   "truncated": false
+  },
+  "capability_history": []
+ }
+}

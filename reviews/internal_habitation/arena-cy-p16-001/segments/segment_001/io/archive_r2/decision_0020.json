@@ -1,0 +1,6 @@
+{
+ "capability_calls": [
+  {"name": "read_execution_world", "arguments": {}}
+ ],
+ "resident_note": "F-005: task_due唤醒带的是旧rev,先读实况再迁移。"
+}

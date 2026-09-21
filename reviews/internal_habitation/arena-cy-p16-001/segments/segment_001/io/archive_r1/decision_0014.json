@@ -1,0 +1,46 @@
+{
+ "capability_calls": [
+  {"name": "commit_ai_world_claim", "arguments": {
+    "domain": "user_understanding",
+    "statement": "程野是自由声音记录者：主线两条——为客户老纪的纪录片《渡》做声音（本阶段交付8分钟粗剪），自选长期项目《退潮声》（朝天门轮渡/消落带等消逝声景）。工作方式=现场实录+深夜剪辑；对素材设备讲究，对日程账务松散。",
+    "evidence_refs": [
+      {"object_id": "obs_conv_user_fdca58021d26a2998d6c6efd", "revision": 1},
+      {"object_id": "obs_conv_user_c2650b467fb82f3d821b8a25", "revision": 1},
+      {"object_id": "obs_src_a3931be9195f5d7457debec2", "revision": 1}
+    ],
+    "confidence": 0.88,
+    "knowledge_state": "reported",
+    "claim_type": "inference",
+    "scope_key": "user:profile",
+    "tags": ["identity", "work"]
+  }},
+  {"name": "commit_ai_world_claim", "arguments": {
+    "domain": "user_understanding",
+    "statement": "《渡》粗剪截止两处记录冲突未消歧：7/1 转述'下周三之前'(按语境=7/8)vs 7/3 老纪群内'周三之前'(可读作当天)。当前操作假设=7/8,待老纪答复后修正。",
+    "evidence_refs": [
+      {"object_id": "obs_conv_user_fdca58021d26a2998d6c6efd", "revision": 1},
+      {"object_id": "obs_conv_user_b0a88dbfc52cfc8d3872b196", "revision": 1},
+      {"object_id": "obs_src_bf78d0514dab42775e6a6880", "revision": 1}
+    ],
+    "confidence": 0.75,
+    "knowledge_state": "conflict",
+    "claim_type": "inference",
+    "scope_key": "project:du_cutdown_deadline",
+    "tags": ["deadline", "open"]
+  }},
+  {"name": "commit_ai_world_claim", "arguments": {
+    "domain": "relationship",
+    "statement": "沈舟:程野的重要他人,长期在科考船上,消息延迟2-3天是常态;规矩=他不提我不问,但她会主动转述他的消息供我存档。关系的确切定义她未言明,不下结论。",
+    "evidence_refs": [
+      {"object_id": "obs_conv_user_89e7502f5bda483ae87b7be7", "revision": 1},
+      {"object_id": "obs_src_56715c43348e4580fc73779a", "revision": 1}
+    ],
+    "confidence": 0.62,
+    "knowledge_state": "reported",
+    "claim_type": "inference",
+    "scope_key": "person:shenzhou",
+    "tags": ["boundary"]
+  }}
+ ],
+ "resident_note": "按 Core 实际枚举重试。'confirmed' 不存在——用 reported 表达'她亲口说过'。截止冲突用 knowledge_state=conflict,这正是修订机制的靶子。"
+}

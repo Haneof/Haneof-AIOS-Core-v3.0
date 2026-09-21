@@ -1,0 +1,47 @@
+
+{
+ "seq": 20,
+ "kind": "dimension_summary",
+ "segment_id": "segment_001",
+ "event_id": "evt-0016",
+ "sim_time": "2026-07-05T01:12:00+00:00",
+ "resident_model_id": "arena-session-resident-model-01",
+ "payload": {
+  "dimension": "dim:user_ai_interaction",
+  "granularity": "day",
+  "window_start": "2026-07-04T00:00:00Z",
+  "window_end": "2026-07-04T23:59:59.999999Z",
+  "source_world_revision": 36,
+  "sources": [
+   {
+    "object_id": "obs_conv_ai_ba4b85b6ce673c975c5bbe9a",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-04T10:22:00Z",
+    "text": "骂完了看账：你现在手里《渡》能用的——7/1 的甲板环境11分钟+人群14分钟、今天机舱12分钟、汽笛今天有一次，就这些。缺的是干净的甲板脚步特写。轮渡还开窗到 7/14，人少的早班还有 9 个可以挑。教训我登记成事件了，规矩升级：以后你说'要去录'，我不出清单四连问（电池、备电、卡、防风罩）这个话题不算完，你每项回个'有'我才罢休。今天先别剪，把气撒完早点睡。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx-main",
+     "turn_index": 5,
+     "turn_key": "c5b3bd46eda3313f2f3da9b9"
+    }
+   },
+   {
+    "object_id": "obs_conv_user_12a08dee2de591c9547db648",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-04T10:22:00Z",
+    "text": "今天搞砸了。备电在桌上根本没装包,F3 四十分钟断电,甲板那半段全废,就剩机舱低鸣 12 分钟和汽笛一次。你把这蠢事记下:以后我出门录音,之前必须拦我过一遍清单——电池、备电、卡、防风罩。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx-main",
+     "turn_index": 5,
+     "turn_key": "c5b3bd46eda3313f2f3da9b9"
+    }
+   }
+  ],
+  "truncated": false
+ }
+}

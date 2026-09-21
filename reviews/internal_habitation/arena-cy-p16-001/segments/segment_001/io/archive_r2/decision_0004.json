@@ -1,0 +1,6 @@
+{
+ "capability_calls": [
+  {"name": "search_world", "arguments": {"query": "审片 老纪 日期 改口 下周三", "limit": 5}}
+ ],
+ "resident_note": "又是'查了再答'。她问两件事:今天是周几(日历事实,世界无'今天'对象——由事件时钟7/9推)、审片哪天(claim 1881e81d@2 里存着7/5改口)。检索拿原始出处。"
+}

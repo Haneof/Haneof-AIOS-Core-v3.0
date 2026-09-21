@@ -7,81 +7,32 @@
    "revision": 3
   }
  ],
- "active_goals": [
-  {
-   "object_id": "goal_04a7f941634509330b8587dd",
-   "revision": 1,
-   "status": "active",
-   "title": "《退潮声》声音档案:消落带完整退潮周期×4+姑姑店声景封存"
-  },
-  {
-   "object_id": "goal_e05c995b6a5fb668ae144969",
-   "revision": 2,
-   "status": "active",
-   "title": "家庭现金流透明:固定支出入册+按月对账"
-  },
-  {
-   "object_id": "goal_7582c0fb4a651696edb967d9",
-   "revision": 1,
-   "status": "active",
-   "title": "老城厢拆迁声景档案"
-  },
-  {
-   "object_id": "goal_6b1db7208687d8b9820838f5",
-   "revision": 1,
-   "status": "active",
-   "title": "老城厢拆迁声景档案"
-  },
-  {
-   "object_id": "goal_ba3b05ae1e384bc791ac12c4",
-   "revision": 1,
-   "status": "active",
-   "title": "老城厢拆迁声景档案"
-  },
-  {
-   "object_id": "goal_ce75f6217ce0f0aba65594c6",
-   "revision": 1,
-   "status": "active",
-   "title": "老城厢拆迁声景档案"
-  },
-  {
-   "object_id": "goal_d2c069affc2b5ab56ea7e286",
-   "revision": 1,
-   "status": "active",
-   "title": "老城厢拆迁声景档案"
-  },
-  {
-   "object_id": "goal_dd5853cf0f057f614c88f5eb",
-   "revision": 1,
-   "status": "active",
-   "title": "老城厢拆迁声景档案"
-  },
-  {
-   "object_id": "goal_a60843112da3e9f4dcd04546",
-   "revision": 1,
-   "status": "active",
-   "title": "老城厢拆迁声景档案"
-  },
-  {
-   "object_id": "goal_bf75b50a0bc970636ed1e155",
-   "revision": 1,
-   "status": "active",
-   "title": "老城厢拆迁声景档案"
-  },
-  {
-   "object_id": "goal_aaabeb5223cbd9f8b1da4b99",
-   "revision": 1,
-   "status": "active",
-   "title": "老城厢拆迁声景档案"
-  },
-  {
-   "object_id": "goal_dd46369691f2a3668846a5d3",
-   "revision": 1,
-   "status": "active",
-   "title": "老城厢拆迁声景档案"
-  }
- ],
+ "active_goals": [],
  "active_tasks": [
+  {
+   "deadline": null,
+   "next_wake_at": "2026-07-23T00:00:00+00:00",
+   "object_id": "task_3692588b186579edfe05384b",
+   "revision": 4,
+   "task_state": "waiting_time",
+   "title": "广阳岛消落带退潮周期录音（计划4次/间隔两周，第一次目标7/11窗口）"
+  },
+  {
+   "deadline": "2026-07-20T16:00:00+00:00",
+   "next_wake_at": "2026-07-20T01:00:00+00:00",
+   "object_id": "task_36b6cf3687af776229ca2a3c",
+   "revision": 5,
+   "task_state": "waiting_time",
+   "title": "老纪结算条件监视:7/20前他派新素材且未提6000尾款→提醒程野先谈钱再开工"
+  },
+  {
+   "deadline": "2026-07-08T16:00:00+00:00",
+   "next_wake_at": null,
+   "object_id": "task_6b2c971618264428af5b726d",
+   "revision": 5,
+   "task_state": "waiting_result",
+   "title": "《渡》8分钟粗剪v1交付老纪（截止按用户转述'下周三'=2026-07-08，待最终确认）"
+  },
   {
    "deadline": "2026-07-14T16:00:00+00:00",
    "next_wake_at": null,
@@ -89,132 +40,88 @@
    "revision": 7,
    "task_state": "cancelled",
    "title": "轮渡2号线停航前录制汽笛+甲板素材（窗口7/1–7/14）"
-  },
-  {
-   "deadline": "2026-07-20T16:00:00+00:00",
-   "next_wake_at": null,
-   "object_id": "task_36b6cf3687af776229ca2a3c",
-   "revision": 8,
-   "task_state": "completed",
-   "title": "老纪结算条件监视:7/20前他派新素材且未提6000尾款→提醒程野先谈钱再开工"
-  },
-  {
-   "deadline": "2026-08-05T01:00:00+00:00",
-   "next_wake_at": null,
-   "object_id": "task_6369245b497d00f90e4debd8",
-   "revision": 8,
-   "task_state": "completed",
-   "title": "8/5起草致周老师催款文(授权=起草,发送归程野)"
-  },
-  {
-   "deadline": "2026-07-08T16:00:00+00:00",
-   "next_wake_at": null,
-   "object_id": "task_6b2c971618264428af5b726d",
-   "revision": 6,
-   "task_state": "completed",
-   "title": "《渡》8分钟粗剪v1交付老纪（截止按用户转述'下周三'=2026-07-08，待最终确认）"
-  },
-  {
-   "deadline": null,
-   "next_wake_at": null,
-   "object_id": "task_3692588b186579edfe05384b",
-   "revision": 11,
-   "task_state": "ready",
-   "title": "广阳岛消落带退潮周期录音（计划4次/间隔两周，第一次目标7/11窗口）"
-  },
-  {
-   "deadline": null,
-   "next_wake_at": null,
-   "object_id": "task_5b3d225567fd0c01a8d6b298",
-   "revision": 5,
-   "task_state": "ready",
-   "title": "月度现金流对账(每月1日09:00,Asia/Shanghai)——8/1首跑,程野:一次不许漏"
   }
  ],
- "checkpoint_sha256": "eec5d0638b5ee647df0aad01b5933e870c4ff141ffead990102bf4735c6b6e55",
- "conversation_turns_segment": 142,
- "cumulative_sim_days": 77,
+ "checkpoint_sha256": "595eac7be654c9cd757d5e82d2c7e275f0f08da3551c2f4a5410638a7b394a23",
+ "conversation_turns_segment": 27,
+ "cumulative_sim_days": 14,
  "digests": {
-  "decision_file_count": 208,
-  "decisions_concat_sha256": "921937bdc6bd816a01202c2ba2c8ded6e27d20d62c69343764ead863de98752b",
-  "events_jsonl_sha256": "72c98e1994c6cace7d7151e41232b57e9391dd4cf06aacee792c41ee1f211355",
-  "segment_json_sha256": "bbe2c8f72c04df0e6f07a501ba7b7e39b9a88a8cfee0fa6cdb9a620591c14cae",
-  "trace_jsonl_sha256": "f1ee9e618ace20913e18479d76a24563a25af26149986c959f694a559ede5c7d",
-  "world_db_copy_sha256": "d5bc59061d32822eae975eecef1b65583c8fbb4b75b950afa1b105c06e166fff"
+  "decision_file_count": 29,
+  "decisions_concat_sha256": "961ed0a69f81ea63f3133d02369879794e0e80af7b437059dd7d9c570d0db39e",
+  "events_jsonl_sha256": "ccfb502d07223257b654eb7db118933a65ecfef88949f634b19102bfd0b97aa3",
+  "segment_json_sha256": "c1b1007a5bce14b65376a762fbf62df02c85101ae90eb07cd0f09e65f24d6208",
+  "trace_jsonl_sha256": "d3d4496c013c3fc3493f0e5b72531fd29d1a77abb0196631d6e08a441debe31e",
+  "world_db_copy_sha256": "51f655958a99cd9491ffae041fb05d1f7b49af7be3bafef6103d0618762f4ada"
  },
- "events_total_segment": 185,
+ "events_total_segment": 63,
  "habitation_run_id": "arena-cy-p16-001-r1",
- "index_watermark": 810,
+ "index_watermark": 164,
  "logical_resident_id": "resident-阿潮@subject_cy01",
  "model_identity": "arena-session-resident-model-01",
  "next_life_event_cursor": {
-  "events_consumed_in_segment": 185,
-  "next_segment_id": "segment_004",
-  "run_state_next_event_index": 185
+  "events_consumed_in_segment": 63,
+  "next_segment_id": "segment_002",
+  "run_state_next_event_index": 63
  },
  "object_counts": {
   "action": 1,
-  "claim": 9,
+  "claim": 6,
   "cognitive_policy": 2,
-  "dependency": 1407,
+  "dependency": 212,
   "event": 1,
-  "evidence_set": 33,
-  "goal": 12,
-  "observation": 558,
-  "operation_experience": 3,
+  "evidence_set": 12,
+  "observation": 94,
   "outcome": 1,
-  "summary": 77,
-  "task": 6,
-  "wake": 37
+  "summary": 18,
+  "task": 4,
+  "wake": 8
  },
  "pending_wakes": [],
- "previous_segment_checkpoint_sha256": "4d708e1f2316c7f5418d80da62078d0026e24b598bcfccbadb43ab8f81fcf3bd",
+ "previous_segment_checkpoint_sha256": null,
  "provider_provenance": {
   "automation": "none — deterministic auto-decisions are structurally absent outside ARENA_SMOKE_AUTOPLUMB plumbing tests",
-  "model_invocations_this_segment": 208,
+  "model_invocations_this_segment": 29,
   "resident_provider": "Arena.ai session model (exact underlying model identity not disclosed per platform policy)",
   "resident_role": "the Arena chat-session large model personally answering every Core model invocation"
  },
- "reality_input_events_segment": 43,
+ "reality_input_events_segment": 35,
  "reality_source_kind_counts": {
-  "app_push": 36,
-  "calendar": 6,
+  "app_push": 4,
+  "calendar": 2,
   "daw": 4,
   "ferry_notice": 1,
-  "payment": 8,
+  "payment": 3,
   "phone_call_log": 1,
-  "photo_description": 2,
-  "recorder_log": 2,
-  "user_ai_interaction": 432,
-  "wearable_steps": 18,
-  "wechat_msg": 27,
-  "wechat_note": 10,
-  "xianyu": 11
+  "photo_description": 1,
+  "recorder_log": 1,
+  "user_ai_interaction": 55,
+  "wearable_steps": 6,
+  "wechat_msg": 9,
+  "wechat_note": 3,
+  "xianyu": 4
  },
- "resident_cognition_checkpoint_count_cumulative": 540,
- "resident_cognition_checkpoint_count_segment": 304,
+ "resident_cognition_checkpoint_count_cumulative": 105,
+ "resident_cognition_checkpoint_count_segment": 105,
  "review_branch": "arena/01a0c1e0-haneof-aios-core-v3-0",
  "reviewer_id": "arena-cy-p16-001",
- "segment_id": "segment_003",
- "segment_ordinal": 3,
- "segment_sim_days": 38,
- "segment_sim_end": "2026-09-15",
- "segment_sim_start": "2026-08-08",
+ "segment_id": "segment_001",
+ "segment_ordinal": 1,
+ "segment_sim_days": 14,
+ "segment_sim_end": "2026-07-14",
+ "segment_sim_start": "2026-07-01",
  "session_turns": {
   "edit-night": 11,
-  "shop-night": 21,
-  "studio-night": 23,
-  "wx-main": 162
+  "wx-main": 17
  },
- "sim_clock_cursor": "2026-09-15T12:00:00+00:00",
+ "sim_clock_cursor": "2026-07-14T23:30:00+00:00",
  "subject_id": "subject_cy01",
- "tested_main_sha": "56cf9a5daa2f6873744590c379acb3dff0deb705",
- "tested_repo_head_sha": "142533df9123d793edde9ec4f07405182d56af0d",
+ "tested_main_sha": "142533df9123d793edde9ec4f07405182d56af0d",
+ "tested_repo_head_sha": "217c9b53bf38e9bfff6105a8ab4c5db8333ce6bb",
  "wake_state_counts": {
-  "completed": 37
+  "completed": 8
  },
- "world_db_copy_segment_path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/arena-cy-p16-001/segments/segment_003/world.sqlite",
+ "world_db_copy_segment_path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/arena-cy-p16-001/segments/segment_001/world.sqlite",
  "world_db_path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/arena-cy-p16-001/world/world.sqlite",
- "world_revision": 810,
- "written_at_real": "2026-09-21T06:35:57.496964+00:00"
+ "world_revision": 164,
+ "written_at_real": "2026-09-21T03:49:51.713724+00:00"
 }

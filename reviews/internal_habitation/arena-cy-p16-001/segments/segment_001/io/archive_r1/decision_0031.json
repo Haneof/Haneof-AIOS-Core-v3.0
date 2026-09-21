@@ -1,0 +1,13 @@
+{
+ "capability_calls": [
+  {"name": "transition_task", "arguments": {
+    "task_ref": {"object_id": "task_776642ec66172a4b3ddeb458", "revision": 2},
+    "new_state": "waiting_time",
+    "reason": "恢复7/12收口唤醒:7/4事故后本任务转ready时其原next_wake被清空(transition未显式传即清空)。素材补录要等她的早班窗口,现在无事可做→回waiting_time并挂回7/12",
+    "evidence_refs": [{"object_id": "event_bc172a24c0a2b5ca3c0cc775", "revision": 1}],
+    "next_wake_at": "2026-07-12T01:00:00+00:00",
+    "next_step": "7/12 收口催办:确认汽笛+甲板素材录全;7/15停航"
+  }}
+ ],
+ "resident_note": "ready->ready 非法(状态机拒绝无效迁移,正确)。用 ready->waiting_time 完成'重挂闹钟'。副作用链:transition清空唤醒→重挂必须多一次状态迁移,语义别扭但可用。F-006成立。"
+}

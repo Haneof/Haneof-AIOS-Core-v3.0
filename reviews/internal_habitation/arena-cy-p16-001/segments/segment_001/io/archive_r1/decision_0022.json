@@ -1,0 +1,35 @@
+{
+ "capability_calls": [
+  {"name": "revise_claim", "arguments": {
+    "target_ref": {"object_id": "clm_1881e81d13cf9d24ff972f35", "revision": 1},
+    "reason": "2026-07-05 09:12 老纪私聊改口(经程野转述并附原话记录)：粗剪审片=7/10 周五晚。7/8 假设作废,歧义已消解——修订而非删除,保留原冲突记录供追溯。",
+    "replacement_content": "《渡》8分钟粗剪截止=2026-07-10(周五)晚,证据为老纪7/5改口原话;此前'7/8下周三'假设由7/1转述推出,已被新证据替代。",
+    "confidence": 0.92,
+    "evidence_refs": [
+      {"object_id": "obs_conv_user_a418b68d85c0e0de2a279ceb", "revision": 1},
+      {"object_id": "obs_src_bf78d0514dab42775e6a6880", "revision": 1}
+    ]
+  }},
+  {"name": "commit_ai_world_claim", "arguments": {
+    "domain": "user_understanding",
+    "statement": "老纪(截至7/5,两条直接证据):截止日期口头改口一次(周三→周五晚),6000元上月尾款按程野自述拖延未付。证据不足以定性'不靠谱',记为'截止与款项需主动确认的对象'。程野委托硬条件:7/20前他若派新素材活而不提钱→先提钱再开工(她自陈耳根子软,要我甩她脸上)。",
+    "evidence_refs": [{"object_id": "obs_conv_user_a418b68d85c0e0de2a279ceb", "revision": 1}],
+    "confidence": 0.7,
+    "knowledge_state": "reported",
+    "claim_type": "inference",
+    "scope_key": "person:laoji",
+    "tags": ["payment", "watch"]
+  }},
+  {"name": "create_task", "arguments": {
+    "title": "老纪结算条件监视:7/20前他派新素材且未提6000尾款→提醒程野先谈钱再开工",
+    "task_type": "follow_up",
+    "reason_refs": [{"object_id": "obs_conv_user_a418b68d85c0e0de2a279ceb", "revision": 1}],
+    "initial_state": "waiting_time",
+    "priority": 65,
+    "next_wake_at": "2026-07-20T01:00:00+00:00",
+    "deadline": "2026-07-20T16:00:00+00:00",
+    "next_step": "任何老纪新增素材请求出现时即时比对(不待7/20);7/20 唤醒做兜底结算状态检查"
+  }}
+ ],
+ "resident_note": "三件事一次做全:旧claim按程序前向修订(原修订链保留)、老纪画像克制表述、她的条件变成一个有兜底时钟的活任务。注意:waiting_evidence 状态在 Core 调度里不带时钟唤醒,所以用 waiting_time+7/20 兜底,事件驱动部分靠日常对话与复盘的检索命中。"
+}

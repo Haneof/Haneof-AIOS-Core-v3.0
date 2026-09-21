@@ -1,0 +1,6 @@
+{
+ "capability_calls": [
+  {"name": "read_execution_world", "arguments": {}}
+ ],
+ "resident_note": "收口:776642ec当前rev?complete目标状态名待看schema。"
+}

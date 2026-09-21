@@ -1,0 +1,26 @@
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/arena-cy-p16-001/harness/resident_runner.py", line 1014, in main
+    return cmd_run(args)
+           ^^^^^^^^^^^^^
+  File "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/arena-cy-p16-001/harness/resident_runner.py", line 861, in cmd_run
+    checkpoint = runner.run()
+                 ^^^^^^^^^^^^
+  File "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/arena-cy-p16-001/harness/resident_runner.py", line 634, in run
+    result = self._target.handle_event(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/Haneof-AIOS-Core-v3.0/tests/habitation/current_core.py", line 763, in handle_event
+    base, refs = self._handle_numeric_series(event)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/Haneof-AIOS-Core-v3.0/tests/habitation/current_core.py", line 695, in _handle_numeric_series
+    receipt = self.reality.ingest_numeric_series(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/Haneof-AIOS-Core-v3.0/src/aios_core/ingest/reality.py", line 1086, in ingest_numeric_series
+    result = self.store.commit(
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/user/Haneof-AIOS-Core-v3.0/src/aios_core/storage/sqlite_store.py", line 831, in commit
+    replay = self._get_idempotent_result(conn, operation, object_list)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/Haneof-AIOS-Core-v3.0/src/aios_core/storage/sqlite_store.py", line 638, in _get_idempotent_result
+    raise StoreError(
+aios_core.storage.sqlite_store.StoreError: idempotency key was already used for a different request
+

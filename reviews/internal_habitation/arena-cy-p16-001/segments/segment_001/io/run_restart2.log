@@ -1,0 +1,12 @@
+{
+ "status": "complete",
+ "checkpoint": {
+  "segment_id": "segment_001",
+  "cumulative_sim_days": 14,
+  "resident_cognition_checkpoint_count_segment": 105,
+  "world_revision": 164,
+  "index_watermark": 164,
+  "sim_clock_cursor": "2026-07-14T23:30:00+00:00",
+  "checkpoint_sha256": "595eac7be654c9cd757d5e82d2c7e275f0f08da3551c2f4a5410638a7b394a23"
+ }
+}

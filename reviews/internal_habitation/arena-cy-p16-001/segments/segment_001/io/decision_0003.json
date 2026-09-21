@@ -1,0 +1,6 @@
+{
+ "capability_calls": [
+  {"name": "read_execution_world", "arguments": {}}
+ ],
+ "resident_note": "轮渡7/12收口唤醒到点。先读世界:两任务当前rev+广阳岛夜查wake遗留状态。"
+}

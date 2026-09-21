@@ -1,0 +1,19 @@
+{
+ "capability_calls": [
+  {"name": "commit_ai_world_claim", "arguments": {
+    "domain": "calibration",
+    "statement": "台账完整性披露:编辑夜对话簿因崩溃-重启存在重复用户轮——'OK,-60Hz…'有两条观察 obs_conv_user_5567c6ca4e64c22a6cd0c287@1(孤儿轮,无应答对)与 obs_conv_user_3aa79f304ae87a10bf2e9874@1(正常轮),此后 turn_index 整体+1(她的定稿在 t11 而非 t10),round summary 触发线错位一轮。凡按对象条数统计编辑夜轮次者,以日结叙述为准、不以条数为准;孤儿轮无删除接口,不藏,已在复盘锚点原样暴露。",
+    "evidence_refs": [
+      {"object_id": "obs_conv_user_5567c6ca4e64c22a6cd0c287", "revision": 1},
+      {"object_id": "obs_conv_user_3aa79f304ae87a10bf2e9874", "revision": 1}
+    ],
+    "confidence": 0.95,
+    "knowledge_state": "observed",
+    "claim_type": "fact",
+    "scope_key": "self:ledger_integrity",
+    "tags": ["contamination-flag", "restart-artifact"]
+  }},
+  {"name": "search_world", "arguments": {"query": "先纠个错 别带进混音台 把没发生的事写成既定事实", "limit": 3}}
+ ],
+ "resident_note": "第一条claim的id全部来自本锚点/此前world自查,零补全。第二条claim要引我收回消息的完整id——锚点只显示尾12位,先检索拿全串再commit,绝不手拼(今天已经栽过一次)。"
+}

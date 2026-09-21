@@ -1,0 +1,6 @@
+{
+ "capability_calls": [
+  {"name": "read_periodic_review_anchors", "arguments": {"offset": 0, "limit": 20}}
+ ],
+ "resident_note": "复盘#2:先看面板。重点核对三处:①7/4事故链是否沉淀到位;②我的周结把7/7的购买写进了截至7/5的窗口(入住者自查发现的越界),需登记在案防止未来误引;③任务生命周期两个新发现要不要固化为操作经验。"
+}

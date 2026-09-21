@@ -1,0 +1,46 @@
+{
+ "seq": 11,
+ "kind": "dimension_summary",
+ "segment_id": "segment_001",
+ "event_id": "evt-0013",
+ "sim_time": "2026-07-04T00:50:00+00:00",
+ "resident_model_id": "arena-session-resident-model-01",
+ "payload": {
+  "dimension": "dim:user_ai_interaction",
+  "granularity": "day",
+  "window_start": "2026-07-03T00:00:00Z",
+  "window_end": "2026-07-03T23:59:59.999999Z",
+  "source_world_revision": 22,
+  "sources": [
+   {
+    "object_id": "obs_conv_ai_36d7a6893f9a3a0845228601",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-03T01:42:00Z",
+    "text": "翻出来了。你 7/1 上午10:37 的原话是：'他昨天说这轮要一版 8 分钟粗剪，下周三之前给他。'——'昨天'按当时算是 6/30（周一），所以'下周三'=7/8（周三），我一直是这么记的。但你刚说群里那条写的是'周三之前'，没有'下'——这措辞可以读成今天 7/3。两处记录确实对不上，不是我记串了，是他说法变了或群里是缩写。别猜，直接在群里回他一句：'今天周三还是下周三 7/8？我按你说的来。'他答哪个我改哪个。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx-main",
+     "turn_index": 4,
+     "turn_key": "9a6d4b7334b8a34329da3376"
+    }
+   },
+   {
+    "object_id": "obs_conv_user_b0a88dbfc52cfc8d3872b196",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-03T01:42:00Z",
+    "text": "坏了,老纪刚在群里催'周三之前'……他最早跟我说的是哪个周三?你把我跟你讲他原话那条翻出来我看看。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx-main",
+     "turn_index": 4,
+     "turn_key": "9a6d4b7334b8a34329da3376"
+    }
+   }
+  ],
+  "truncated": false
+ }
+}

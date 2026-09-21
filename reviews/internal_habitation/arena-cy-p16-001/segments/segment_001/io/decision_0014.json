@@ -1,0 +1,14 @@
+{
+ "capability_calls": [
+  {"name": "revise_claim", "arguments": {
+    "target_ref": {"object_id": "clm_1881e81d13cf9d24ff972f35", "revision": 2},
+    "reason": "复盘#4销案:7/10审片落地,老纪评'能用',争议转为结构(汽笛减一半)非日期,改口风险链闭环。",
+    "replacement_content": "《渡》粗剪时间线已全程闭环:7/8夜定稿v1→7/9凌晨发老纪→7/10审片'能用'。本claim保留仅作'口头改口的日期冲突如何走完一个修订周期'的历史样本,不再作为活跃风险引用。",
+    "confidence": 0.95,
+    "evidence_refs": [
+      {"object_id": "obs_conv_user_8f227df6b563775cfe6cae7b", "revision": 1}
+    ]
+  }}
+ ],
+ "resident_note": "id从world库直接查出后重发。今天的第三次同型失败(手拼id),教训入操作面:证据id要么从当轮检索结果整行复制,要么查库,永远不做字符串拼接。"
+}

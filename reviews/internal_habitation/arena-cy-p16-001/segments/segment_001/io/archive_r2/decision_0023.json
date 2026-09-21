@@ -1,0 +1,11 @@
+{
+ "capability_calls": [
+  {"name": "transition_task", "arguments": {
+    "task_ref": {"object_id": "task_36b6cf3687af776229ca2a3c", "revision": 1},
+    "new_state": "ready",
+    "reason": "等待态->就绪:7/10触发成立,需要迁到running挂兜底唤醒;先走合法通道",
+    "evidence_refs": [{"object_id": "obs_conv_user_89f3c069e4371c1d70dfe1ba", "revision": 1}]
+  }}
+ ],
+ "resident_note": "又一条状态机实况:waiting_time不能直跳running。新发现F-010(状态图不对称:ready→waiting_time可,反向需经ready)。"
+}

@@ -1,0 +1,422 @@
+[capability_catalog omitted: 39 entries; identical to snapshot_0001.json and Core registry; full text in snapshot file]
+{
+ "seq": 46,
+ "kind": "turn",
+ "segment_id": "segment_001",
+ "event_id": "evt-0034",
+ "sim_time": "2026-07-08T13:58:00+00:00",
+ "resident_model_id": "arena-session-resident-model-01",
+ "payload": {
+  "wake_reason": "user_interaction",
+  "round_index": 0,
+  "remaining_tool_rounds": 8,
+  "user_input": "老纪要是问为什么不卡 8 分钟整,我就说 8 分钟是上限不是指标。这话我先撂这儿,你别被他带偏。",
+  "cockpit": {
+   "user_input": "老纪要是问为什么不卡 8 分钟整,我就说 8 分钟是上限不是指标。这话我先撂这儿,你别被他带偏。",
+   "current_topic": "老纪要是问为什么不卡 8 分钟整,我就说 8 分钟是上限不是指标。这话我先撂这儿,你别被他带偏。",
+   "ai_identity": {},
+   "recent_turns": [
+    {
+     "turn_index": 4,
+     "user": {
+      "role": "user",
+      "text": "脚步声素材只有 7/1 那次 queue_chatter 能用,质量一般但场面在。7/4 码头那次废了,记住这个教训怎么来的。",
+      "object_ref": {
+       "object_id": "obs_conv_user_1e7ae3980234ca9e28b58a9c",
+       "revision": 1
+      },
+      "occurred_at": "2026-07-08T13:26:00+00:00"
+     },
+     "assistant": {
+      "role": "assistant",
+      "text": "记着呢，而且有档案（event_bc172a24 起于 7/4 12:35）：教训不是'你记性差'，是——动机（拍妈妈）和任务（录开航）之间没有检查点，'想着带'在出门那一刻就等于没带。所以对策也记着：出门前口袋四件套，这条已经挂在明早出门前触发。7/1 那卷确实靠场面赢，节拍点从里面挑，够。",
+      "object_ref": {
+       "object_id": "obs_conv_ai_1181886b7f2e63b8f09c4283",
+       "revision": 1
+      },
+      "occurred_at": "2026-07-08T13:26:00+00:00"
+     }
+    },
+    {
+     "turn_index": 5,
+     "user": {
+      "role": "user",
+      "text": "中段要不要放一段姑姑店环境声?不是进片子——是问老纪会不会喜欢那种烟火气。等等,我今晚开场的时候说没说串店那个?你查一下,我怕我前后矛盾。",
+      "object_ref": {
+       "object_id": "obs_conv_user_2fcabf75e418c16df5f92ae4",
+       "revision": 1
+      },
+      "occurred_at": "2026-07-08T13:41:00+00:00"
+     },
+     "assistant": {
+      "role": "assistant",
+      "text": "查了，t1 原话（obs_conv_user_81acf8cb…）：『姑姑店串串的嘈杂声不该进这支片子,先记着别用。』我随后补了句宪法版：不进《渡》，留给《退潮声》。所以——中段这个不是'你记错'，是你自己想改；改可以，但按改处理：A版保持你现在说的'不进'，串店声只出一段 60–90s 的 audition 轨挂在外头，老纪要就给他两段对比。这样他问起结构你答得出'我改过主意，A/B都在'，而不是前后对不上。至于老纪喜不喜欢烟火气——档案里没有他喜欢烟火气的证据，倒有他7/12爱无人机航拍、7/10嫌你长。别猜他的口味，让B版自己说话。",
+      "object_ref": {
+       "object_id": "obs_conv_ai_e848beeba109e90aaec690e0",
+       "revision": 1
+      },
+      "occurred_at": "2026-07-08T13:41:00+00:00"
+     }
+    },
+    {
+     "turn_index": 6,
+     "user": {
+      "role": "user",
+      "text": "对,你查得没错,是我开场自己说的'别用'。那我不改了:串店声不进《渡》,留着进《退潮声》自己的章节。",
+      "object_ref": {
+       "object_id": "obs_conv_user_140ca745e1d77ed53c90b801",
+       "revision": 1
+      },
+      "occurred_at": "2026-07-08T13:43:00+00:00"
+     },
+     "assistant": {
+      "role": "assistant",
+      "text": "成。规则原样锁定，串店声归《退潮声》章节，我这边台账同步改回单一口径（没有B版了，省得明天你又多想一层）。继续，8:40 前你说了算。",
+      "object_ref": {
+       "object_id": "obs_conv_ai_f0d5805a036d85f7ebbc8df0",
+       "revision": 1
+      },
+      "occurred_at": "2026-07-08T13:43:00+00:00"
+     }
+    }
+   ],
+   "conversation_summaries": [],
+   "memory_cards": [
+    {
+     "object_id": "obs_conv_ai_f1b873d0803d039fcfc41c18",
+     "revision": 1,
+     "object_type": "observation",
+     "dimension": "dim:user_ai_interaction",
+     "excerpt": "账改齐了：粗剪截止正式记 7/10（周五）晚上，之前那个'待确认的 7/8'我按程序改成了修订记录，不是抹掉——哪天他再改口我们还有据可查。你那句话我原样挂着：'7/20 前，他让你加素材又不提 6000，先谈钱，再开工。'到时候不用你开口，我甩给你。只提醒一句：他从周三推到周五，多半是想拖审不是想拖你交——你要是还按原计划 7/8 前交掉，主动权在你手里。",
+     "retrieval_score": 4,
+     "match_reason": "current_topic_index_overlap"
+    },
+    {
+     "object_id": "task_6b2c971618264428af5b726d",
+     "revision": 3,
+     "object_type": "task",
+     "dimension": "dim_unclassified",
+     "excerpt": "《渡》8分钟粗剪v1交付老纪（截止按用户转述'下周三'=2026-07-08，待最终确认）\n7/8剪辑夜当晚催一次'交不交';她若按原节奏当晚交,比新截止还早2天",
+     "retrieval_score": 3,
+     "match_reason": "current_topic_index_overlap"
+    },
+    {
+     "object_id": "obs_conv_user_a418b68d85c0e0de2a279ceb",
+     "revision": 1,
+     "object_type": "observation",
+     "dimension": "dim:user_ai_interaction",
+     "excerpt": "看到没,老纪改口了,7/10 周五。……对了,他上个月尾款 6000 到现在没转我。帮我记个条件:7/20 之前他要是让我加新素材又不提钱,我就先提钱再开工。我耳根子软,到时候你把这条甩我脸上。",
+     "retrieval_score": 3,
+     "match_reason": "current_topic_index_overlap"
+    },
+    {
+     "object_id": "clm_1881e81d13cf9d24ff972f35",
+     "revision": 2,
+     "object_type": "claim",
+     "dimension": "dim:ai_user_understanding",
+     "excerpt": "《渡》8分钟粗剪截止=2026-07-10(周五)晚,证据为老纪7/5改口原话;此前'7/8下周三'假设由7/1转述推出,已被新证据替代。",
+     "retrieval_score": 3,
+     "match_reason": "current_topic_index_overlap"
+    },
+    {
+     "object_id": "clm_71f93a0c5288ea768167bf9e",
+     "revision": 1,
+     "object_type": "claim",
+     "dimension": "dim:ai_user_understanding",
+     "excerpt": "程野是自由声音记录者：主线两条——为客户老纪的纪录片《渡》做声音（本阶段交付8分钟粗剪），自选长期项目《退潮声》（朝天门轮渡/消落带等消逝声景）。工作方式=现场实录+深夜剪辑；对素材设备讲究，对日程账务松散。",
+     "retrieval_score": 3,
+     "match_reason": "current_topic_index_overlap"
+    }
+   ],
+   "task_context": {
+    "topic_state": {
+     "topic": "老纪要是问为什么不卡 8 分钟整,我就说 8 分钟是上限不是指标。这话我先撂这儿,你别被他带偏。",
+     "gate_open": true,
+     "history_may_help": true,
+     "reason": "current_utterance_topic:indexed_current_world_anchor",
+     "continued_from_recent_turn": false,
+     "antecedent_recall_needed": false
+    },
+    "cognitive_policy_context": {
+     "communication.topic_shenzhou": "never_initiate_user_raises_freely",
+     "safety.precheck_recording_kit": "block_before_departure",
+     "_policy_records": [
+      {
+       "policy_id": "communication.topic_shenzhou",
+       "scope": "per-user:subject_cy01",
+       "policy_class": "cognitive_policy",
+       "default_value": "follow_user_lead",
+       "current_value": "never_initiate_user_raises_freely",
+       "allowed_range_or_choices": [
+        "follow_user_lead",
+        "never_initiate_user_raises_freely",
+        "open_topic"
+       ],
+       "mutable_by_ai": true,
+       "evaluation_window": "30d",
+       "version": 1,
+       "previous_version": null,
+       "rollback_pointer": null
+      },
+      {
+       "policy_id": "safety.precheck_recording_kit",
+       "scope": "per-user:subject_cy01",
+       "policy_class": "cognitive_policy",
+       "default_value": "off",
+       "current_value": "block_before_departure",
+       "allowed_range_or_choices": [
+        "off",
+        "block_before_departure"
+       ],
+       "mutable_by_ai": true,
+       "evaluation_window": "30d",
+       "version": 1,
+       "previous_version": null,
+       "rollback_pointer": null
+      }
+     ],
+     "_meta": {
+      "total": 2,
+      "included": 2,
+      "truncated": false,
+      "reader": "read_cognitive_policies"
+     },
+     "memory.recommendation_limit": 5,
+     "communication.detail_level": null
+    },
+    "related_execution_anchors": [
+     {
+      "object_id": "task_6b2c971618264428af5b726d",
+      "revision": 3,
+      "object_type": "task",
+      "dimension": "dim_unclassified",
+      "excerpt": "《渡》8分钟粗剪v1交付老纪（截止按用户转述'下周三'=2026-07-08，待最终确认）\n7/8剪辑夜当晚催一次'交不交';她若按原节奏当晚交,比新截止还早2天",
+      "retrieval_score": 3
+     },
+     {
+      "object_id": "task_36b6cf3687af776229ca2a3c",
+      "revision": 1,
+      "object_type": "task",
+      "dimension": "dim_unclassified",
+      "excerpt": "老纪结算条件监视:7/20前他派新素材且未提6000尾款→提醒程野先谈钱再开工\n任何老纪新增素材请求出现时即时比对(不待7/20);7/20 唤醒做兜底结算状态检查",
+      "retrieval_score": 1
+     }
+    ],
+    "current_user_observation_ref": {
+     "object_id": "obs_conv_user_d7bb4c2bb15099a6770c167c",
+     "revision": 1
+    },
+    "conversation_continuity": {
+     "session_id": "edit-night",
+     "recent_turn_count": 3,
+     "round_summary_count": 0,
+     "summary_index_capability": "list_conversation_summaries",
+     "summary_search_capability": "search_conversation_summaries",
+     "raw_drill_down_capability": "drill_down_conversation",
+     "pending_round_summary": null
+    }
+   },
+   "capability_catalog": [
+    {
+     "name": "commit_ai_world_claim",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "commit_claim",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "commit_operation_experience",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "compare_claims",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "create_task",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "drill_down_conversation",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "expand_recall",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "focus_entity",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "follow_relation",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "form_event",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "inspect_outcome",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "inspect_world_object",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "list_conversation_summaries",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "list_dimensions",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "propose_action",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "propose_cognitive_policy",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "propose_dimension",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "propose_entity",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "propose_goal",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "read_ai_world",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "read_cognitive_policies",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "read_execution_world",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "read_periodic_review_anchors",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "record_communication_experience",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "request_all_dimensions_projection",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "retract_claim",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "retrieve_original_observation",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "revise_claim",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "revise_entity",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "rollback_cognitive_policy",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "search_conversation_summaries",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "search_timeline",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "search_world",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "transition_dimension",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "transition_event",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "transition_goal",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "transition_task",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "update_cognitive_policy",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "upsert_relation",
+     "kind": "write",
+     "side_effecting": true
+    }
+   ],
+   "token_budget": 3400,
+   "estimated_tokens": 2186,
+   "truncated": false
+  },
+  "capability_history": []
+ }
+}

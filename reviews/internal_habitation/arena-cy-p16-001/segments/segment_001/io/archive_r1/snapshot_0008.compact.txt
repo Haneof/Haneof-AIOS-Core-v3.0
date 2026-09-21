@@ -1,0 +1,47 @@
+
+{
+ "seq": 8,
+ "kind": "dimension_summary",
+ "segment_id": "segment_001",
+ "event_id": "evt-0010",
+ "sim_time": "2026-07-03T01:42:00+00:00",
+ "resident_model_id": "arena-session-resident-model-01",
+ "payload": {
+  "dimension": "dim:user_ai_interaction",
+  "granularity": "day",
+  "window_start": "2026-07-02T00:00:00Z",
+  "window_end": "2026-07-02T23:59:59.999999Z",
+  "source_world_revision": 17,
+  "sources": [
+   {
+    "object_id": "obs_conv_ai_6f4272912c92a6a764d853e9",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-02T01:56:00Z",
+    "text": "两句都记好：方案A=指向麦主录船机低鸣、人声铺底（稳妥，但甲板素材可能不够《渡》用）；方案B=甲板脚步+汽笛为主体、人声入戏（素材更活，人群噪音是变量）。不替你选，只提一句：A的短板可以靠人少的早班补录来救，B的短板靠后期降噪也救得半。另，昨天下午老王音响那笔取麦罩的日历过了——麦罩拿到了没？拿没拿到直接影响你B方案收不收得住风。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx-main",
+     "turn_index": 3,
+     "turn_key": "27bb771d0acc14336956a24f"
+    }
+   },
+   {
+    "object_id": "obs_conv_user_c2650b467fb82f3d821b8a25",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-02T01:56:00Z",
+    "text": "今天去码头踩点:16:00 那班人最多,甲板脚步声全混在人群里。方案A,指向麦主录船机低鸣,人声当底;方案B,上甲板录脚步+汽笛,人声当主体。两条都帮我记一句,先别替我选。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx-main",
+     "turn_index": 3,
+     "turn_key": "27bb771d0acc14336956a24f"
+    }
+   }
+  ],
+  "truncated": false
+ }
+}

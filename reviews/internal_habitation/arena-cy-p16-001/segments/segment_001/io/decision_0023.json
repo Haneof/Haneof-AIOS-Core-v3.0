@@ -1,0 +1,18 @@
+{
+ "capability_calls": [
+  {"name": "commit_ai_world_claim", "arguments": {
+    "domain": "user_understanding",
+    "statement": "12000展厅定金时点修订(覆盖性)：7/9通话'月底前付'为周老师口头承诺(无合同无邮件)，7/13 21:31其私信'内部预算卡住,挪到下月,合同同步延后'——7月内该笔为0入账,8月到账以合同落地为准、不按'会到'预排。既往日结/周结凡涉此款均带'口头待验'标签、未记为应收,无需回改;后续现金流表述以本claim为准。程野指令:从计划中拿掉。[备注:AIWorldDomain无财务域,此款只能寄居user_understanding——域粒度缺口入报告]",
+    "evidence_refs": [
+      {"object_id": "obs_src_1611e51f205405c7066b9607", "revision": 1},
+      {"object_id": "obs_src_96b1f8f63810440562160889", "revision": 1}
+    ],
+    "confidence": 0.95,
+    "knowledge_state": "reported",
+    "claim_type": "fact",
+    "scope_key": "user:cashflow_12000",
+    "tags": ["delayed-truth", "overlay-correction", "verbal-to-reality"]
+  }}
+ ],
+ "resident_note": "域枚举缺口(F-013):cognition八域里没有money/commitment位。"
+}

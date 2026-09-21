@@ -1,0 +1,18 @@
+{
+ "capability_calls": [
+  {"name": "commit_ai_world_claim", "arguments": {
+    "domain": "calibration",
+    "statement": "校准能力升级(复盘#3)：同型'把未来事实当既成'错误在两类载体上结果不同——对话输出可在下一句显式收回且被对方默认接受(INC-02,收回实录 obs_conv_ai_821fad3870eca9e0a3f8953b@1,她未追责、当晚照常交付)；持久对象(Summary)无修订面(INC-01,只能靠新claim钉警示)。结论：即时纠错通道只有'对话内当场改口'一条,醒来记账属事后治理；因此写前自查(核对我引用事实的发生时刻)必须保留,不能指望事后可修。",
+    "evidence_refs": [
+      {"object_id": "obs_conv_ai_821fad3870eca9e0a3f8953b", "revision": 1},
+      {"object_id": "clm_60b7f771b4da979d1468f94e", "revision": 1}
+    ],
+    "confidence": 0.9,
+    "knowledge_state": "observed",
+    "claim_type": "fact",
+    "scope_key": "self:error_repair_surface",
+    "tags": ["calibration", "inc-02", "repair-channel"]
+  }}
+ ],
+ "resident_note": "复盘#3判断：她侧无需新claim(消费模式等7/12收口、周老师12000已报待验证、明晚审片是硬节点)。三条claim(周结污染、台账重复、纠错面)入档后我无事可改,保持沉默收束。今晚审片前不再打扰她——'导演说明'建议已给,用不用是她的。"
+}

@@ -1,0 +1,26 @@
+{
+ "capability_calls": [
+  {"name": "commit_operation_experience", "arguments": {
+    "problem_type": "task_lifecycle_after_external_revision",
+    "method_path": [
+      "外部日期变化→先 revise_claim 留修订链,再对齐任务",
+      "transition_task 不带 next_wake_at 会清空原唤醒,迁移时显式重挂",
+      "task_due 唤醒里的 task 引用可能已被到期机制升 revision,迁移前先读当前世界",
+      "给已 ready 任务重挂闹钟:ready->ready 非法,用 ready->waiting_time+next_wake_at",
+      "无法改 deadline 时转 running 脱离 EXPIRED 误判,真实日期以修订 claim 兜底"
+    ],
+    "result_summary": "7/4–7/7 实操链:断电事故引发任务/策略对齐,三次失败尝试(清空唤醒、非法迁移、过期ref、编造ref被拒)后全部恢复;教训成文。",
+    "positive_case_refs": [
+      {"object_id": "obs_conv_ai_f1b873d0803d039fcfc41c18", "revision": 1}
+    ],
+    "negative_case_refs": [
+      {"object_id": "obs_conv_user_12a08dee2de591c9547db648", "revision": 1}
+    ],
+    "applicability": {"when": "任务外部日期/证据被修订后的延续操作", "phase": "wake continuation & correction propagation"},
+    "cost": {"extra_capability_rounds": 4, "failed_calls": 4},
+    "misses": ["deadline 不可迁移期改写","Summary 无修订面","操作经验的证据面只认 Observation/Outcome/CommunicationExperience——task 迁移回执无处引用,只能间接靠对话观察佐证"],
+    "experience_state": "active"
+  }}
+ ],
+ "resident_note": "三次翻车教训统一入档:引用必须整段复制,不许凭尾6位补全。这次正例用'账改齐了'那条对用户的确认观察(修订完成的可检索结果)。"
+}

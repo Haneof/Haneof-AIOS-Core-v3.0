@@ -1,0 +1,37 @@
+{
+ "capability_calls": [
+  {"name": "commit_ai_world_claim", "arguments": {
+    "domain": "calibration",
+    "statement": "自我校准记录:周结 sum_…(6/29–7/5窗口,dim:user_ai_interaction,rev1)把'MixPre-6已拍下/试机'写入了窗口期——成交事实实际发生在 7/7 00:29–00:33(支付记录为准),写结时(7/6)该事实尚未发生。事实本身真实、时间越界。Summary 对象在我可见的机制里不可编辑/不可撤回;后续引用该周结时,购买时间一律以 dim:payment 原始观察为准。",
+    "evidence_refs": [
+      {"object_id": "sum_0e11a3bb9bd12517826eb1d1", "revision": 1},
+      {"object_id": "obs_conv_ai_ba4b85b6ce673c975c5bbe9a", "revision": 1}
+    ],
+    "confidence": 0.9,
+    "knowledge_state": "observed",
+    "claim_type": "fact",
+    "scope_key": "self:record_quality",
+    "tags": ["contamination-flag", "forward-correction"]
+  }},
+  {"name": "commit_operation_experience", "arguments": {
+    "problem_type": "task_lifecycle_after_external_revision",
+    "method_path": [
+      "外部世界改了日期→先 revise_claim(留修订链),再对齐任务",
+      "transition_task 不带 next_wake_at 会清空原唤醒——迁移时必须显式重挂",
+      "task_due 唤醒交给模型的 task 引用可能已过期(到期机制自己会升 revision),迁移前先 read_execution_world 拿当前 rev",
+      "需要给'已 ready'的任务重挂闹钟时,ready->ready 非法,用 ready->waiting_time+next_wake_at",
+      "Core 不允许 transition 改 deadline:旧 deadline 会误标 EXPIRED,转入 running 脱离误判,真实截止以修订 claim 为准并在 next_step 里复述"
+    ],
+    "result_summary": "7/4–7/7 三次实操:误清唤醒已恢复(task_7766@3),误期截止用 running 绕开(task_6b2c@3),claim rev2 兜底真实日期。代价:一次失败迁移+一次非法迁移尝试。",
+    "positive_case_refs": [
+      {"object_id": "task_776642ec66172a4b3ddeb458", "revision": 3},
+      {"object_id": "task_6b2c971618264428af5b726d", "revision": 3}
+    ],
+    "applicability": {"when": "任务关联的外部日期/证据被后续信息修订时", "phase": "task continuation after wake or correction"},
+    "cost": {"extra_capability_rounds": 3, "failed_calls": 2},
+    "misses": ["没找到给任务直接改 deadline 的口子", "Summary 无修订面,只能旁证兜底"],
+    "experience_state": "active"
+  }}
+ ],
+ "resident_note": "calibration 域第一次有了真实用例——不是夸自己,是把'我写脏了哪条记录'钉在可检索处。操作经验=从两次失败调用里长出来的,全部有真实 case ref 支撑,符合'OperationExperience 必须来自真实结果'。消费画像 claim 依旧不建(等7/12前后看挂售是否兑现,再定'n=2'成立否)。"
+}

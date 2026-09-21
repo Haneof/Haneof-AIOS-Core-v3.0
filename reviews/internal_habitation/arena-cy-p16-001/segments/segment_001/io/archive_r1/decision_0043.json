@@ -1,0 +1,6 @@
+{
+ "capability_calls": [
+  {"name": "drill_down_conversation", "arguments": {"session_id": "edit-night", "turn_start": 1, "turn_end": 1}}
+ ],
+ "resident_note": "她要我查了再答。recent窗口(t2–t4)盖不到开场,本轮摘要还没生成(4轮资格线未到)——精确钻取t1原文,引证要带引号,不转述。"
+}
