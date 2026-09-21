@@ -9,7 +9,7 @@ from aios_core.contracts.enums import (
     TaskState,
     TaskType,
 )
-from aios_core.contracts.models import Observation
+from aios_core.contracts.models import Observation, Task
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import TemporalExtent
@@ -361,3 +361,172 @@ def test_action_and_outcome_are_retrievable_world_anchors(tmp_path):
         object_types=["outcome"],
     )
     assert outcome.outcome_id in {hit.object_id for hit in outcome_hits.hits}
+
+
+def test_cancelled_parent_task_cannot_authorize_retry_or_restart(tmp_path):
+    store, index, intent, authorization = _seed(tmp_path)
+    service, _, task = _active_goal_and_running_task(store, index, intent)
+    action = service.propose_action(
+        ActionProposalRequest(
+            task_ref=ObjectRef(object_id=task.task_id, revision=task.revision),
+            action_type="send_team_message",
+            payload={"channel": "team", "document": "weekly-report"},
+            evidence_refs=(ObjectRef(object_id=intent.object_id, revision=1),),
+        ),
+        proposed_at=NOW + timedelta(seconds=4),
+    )
+
+    cancelled = service.transition_task(
+        TaskTransitionRequest(
+            task_ref=ObjectRef(object_id=task.task_id, revision=task.revision),
+            new_state=TaskState.CANCELLED,
+            reason="用户撤销发送请求。",
+            evidence_refs=(ObjectRef(object_id=intent.object_id, revision=1),),
+        ),
+        changed_at=NOW + timedelta(seconds=5),
+    )
+    assert cancelled.state == "cancelled"
+    assert store.get_payload(task.task_id)["task_state"] == "cancelled"
+    cancelled_world_revision = cancelled.world_revision
+
+    authorizer_calls = 0
+
+    def allow(_action, _refs):
+        nonlocal authorizer_calls
+        authorizer_calls += 1
+        return True
+
+    restarted_store = SQLiteWorldStore(tmp_path / "world.db")
+    restarted_service = GoalTaskActionService(store=restarted_store)
+
+    for candidate in (service, restarted_service):
+        with pytest.raises(ValueError):
+            candidate.authorize_action(
+                action_ref=ObjectRef(object_id=action.action_id, revision=1),
+                authorization_refs=(
+                    ObjectRef(object_id=authorization.object_id, revision=1),
+                ),
+                authorized_by="platform_permission_gate",
+                authorized_at=NOW + timedelta(seconds=6),
+                authorizer=allow,
+            )
+
+    # Task cancellation must forward-invalidate the pending proposal without
+    # rewriting history. Retry/restart therefore fail before the authorizer is
+    # consulted, while the original PROPOSED revision remains auditable.
+    assert authorizer_calls == 0
+    assert store.current_world_revision() == cancelled_world_revision
+    assert store.get_payload(action.action_id, revision=1)["action_status"] == "proposed"
+    latest_action = store.get_payload(action.action_id)
+    assert latest_action["revision"] == 2
+    assert latest_action["action_status"] == "cancelled"
+    assert latest_action["status"] == "cancelled"
+
+
+def test_restart_rejects_legacy_proposed_action_with_cancelled_parent(tmp_path):
+    store, index, intent, authorization = _seed(tmp_path)
+    service, _, task = _active_goal_and_running_task(store, index, intent)
+    action = service.propose_action(
+        ActionProposalRequest(
+            task_ref=ObjectRef(object_id=task.task_id, revision=task.revision),
+            action_type="send_team_message",
+            payload={"channel": "team"},
+            evidence_refs=(ObjectRef(object_id=intent.object_id, revision=1),),
+        ),
+        proposed_at=NOW + timedelta(seconds=4),
+    )
+
+    # Reconstruct the durable shape produced by pre-T34 Core: parent Task has
+    # advanced to CANCELLED, but the pending Action still has only PROPOSED rev1.
+    # This bypasses the new transition service only to model an existing World
+    # written before forward invalidation existed.
+    task_payload = store.get_payload(task.task_id)
+    legacy_cancelled_task = Task.model_validate(
+        {
+            **task_payload,
+            "revision": task.revision + 1,
+            "occurred": TemporalExtent.point(NOW + timedelta(seconds=5)),
+            "learned_at": NOW + timedelta(seconds=5),
+            "recorded_at": NOW + timedelta(seconds=5),
+            "task_state": TaskState.CANCELLED,
+            "status": TaskState.CANCELLED.value,
+        }
+    )
+    store.commit(
+        [legacy_cancelled_task],
+        OperationRequest(
+            operation_name="test.seed.pre_t34_cancelled_parent",
+            expected_world_revision=int(store.current_world_revision()),
+            reason="seed persisted pre-T34 cancelled Task with pending Action",
+            idempotency_key="test-pre-t34-cancelled-parent",
+            source_class=SourceClass.USER,
+        ),
+    )
+    world_revision_before_retry = int(store.current_world_revision())
+    assert store.get_payload(action.action_id)["action_status"] == "proposed"
+
+    restarted_store = SQLiteWorldStore(tmp_path / "world.db")
+    restarted_service = GoalTaskActionService(store=restarted_store)
+    authorizer_calls = 0
+
+    def allow(_action, _refs):
+        nonlocal authorizer_calls
+        authorizer_calls += 1
+        return True
+
+    with pytest.raises(ValueError, match="parent Task"):
+        restarted_service.authorize_action(
+            action_ref=ObjectRef(object_id=action.action_id, revision=1),
+            authorization_refs=(
+                ObjectRef(object_id=authorization.object_id, revision=1),
+            ),
+            authorized_by="platform_permission_gate",
+            authorized_at=NOW + timedelta(seconds=6),
+            authorizer=allow,
+        )
+
+    assert authorizer_calls == 0
+    assert restarted_store.current_world_revision() == world_revision_before_retry
+    assert restarted_store.get_payload(action.action_id, revision=1)["action_status"] == "proposed"
+    assert restarted_store.get_payload(action.action_id)["revision"] == 1
+
+
+def test_cancel_authorize_race_is_fail_closed(tmp_path):
+    store, index, intent, authorization = _seed(tmp_path)
+    service, _, task = _active_goal_and_running_task(store, index, intent)
+    action = service.propose_action(
+        ActionProposalRequest(
+            task_ref=ObjectRef(object_id=task.task_id, revision=task.revision),
+            action_type="send_team_message",
+            payload={"channel": "team"},
+            evidence_refs=(ObjectRef(object_id=intent.object_id, revision=1),),
+        ),
+        proposed_at=NOW + timedelta(seconds=4),
+    )
+
+    def allow_after_user_cancel(_action, _refs):
+        service.transition_task(
+            TaskTransitionRequest(
+                task_ref=ObjectRef(object_id=task.task_id, revision=task.revision),
+                new_state=TaskState.CANCELLED,
+                reason="授权等待期间用户撤销发送请求。",
+                evidence_refs=(ObjectRef(object_id=intent.object_id, revision=1),),
+            ),
+            changed_at=NOW + timedelta(seconds=5),
+        )
+        return True
+
+    with pytest.raises(ValueError):
+        service.authorize_action(
+            action_ref=ObjectRef(object_id=action.action_id, revision=1),
+            authorization_refs=(
+                ObjectRef(object_id=authorization.object_id, revision=1),
+            ),
+            authorized_by="platform_permission_gate",
+            authorized_at=NOW + timedelta(seconds=6),
+            authorizer=allow_after_user_cancel,
+        )
+
+    assert store.get_payload(task.task_id)["task_state"] == "cancelled"
+    assert store.get_payload(action.action_id, revision=1)["action_status"] == "proposed"
+    assert store.get_payload(action.action_id)["action_status"] == "cancelled"
