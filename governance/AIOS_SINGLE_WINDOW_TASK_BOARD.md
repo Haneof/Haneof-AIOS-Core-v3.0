@@ -75,8 +75,8 @@
 | 11 | `C14-RUNTIME-001` | 将 derivation Wake 接入同一 Resident CognitiveRuntime，装配 pinned Summary、跨维能力、AI-world context；形成/修正认知前必须满足 leaf-grounded evidence 规则，或 silence | **DONE** | C14-SCHED-001 | PR #61; candidate `75cc62ca13169c6ba8752e0562224705fe6f9ac2`; squash merge `a887ba537e9797d4bf5a7b7fb482fa4a55f47df7`; candidate + merge-result required Gates GREEN | 同一 Resident Runtime 完成 derivation cockpit + leaf-grounded create/revise/retract/silence 闭环；Summary-only/AI recursion/T28 assistant-only fail closed；真实 user/Outcome case grounding保持合法；BACKGROUND 不直接投放用户；完整证据见 C14-RUNTIME-001 completion |
 | 12 | `C14-RUNTIME-HARDEN-001` | 封闭 COGNITIVE_DERIVATION 的 side-effect 逃逸：该 Wake 只允许 leaf-grounded Claim create/revise/retract 写入；Event/Entity/Relation/Dimension/Goal/Task/Action/AttentionWatch/Experience/Policy 等持久副作用不得从此后台认知入口写入 | **DONE** | C14-RUNTIME-001 | PR #63; candidate `3accaeebe8ee1b3d420d2dfa3528ecb5e7388d86`; squash merge `09002ddf8fd1fd4af08f54ac5b190d4c39c9e25b`; `reviews/C14_RUNTIME_HARDEN_001_COMPLETION_EVIDENCE_2026-09-21.md`; required Gates GREEN | COGNITIVE_DERIVATION 显式 side-effect allowlist 仅含 `commit_claim`, `commit_ai_world_claim`, `revise_claim`, `retract_claim`; 其他 writes 全部 deny；read capabilities 保留；普通 user turn / Periodic Review 不退化；专项+全回归 GREEN |
 | 13 | `C14-LOOP-001` | 持续认知派生加固：C14-aware burst bundling、防 contract laundering、自激防护、预算/合并/延迟/恢复、Periodic Review 共存、新 Runtime 检索、长期 provenance reconcile 规模加固 | **DONE** | C14-RUNTIME-HARDEN-001 | PR #65; candidate `f48c3c9cfa8a24fa2e0e0220d7fe20bcda1be34d`; squash merge `a385f7b3fcc71982aae0611a382502c9a37ba71e`; `reviews/C14_LOOP_001_COMPLETION_EVIDENCE_2026-09-21.md`; exact-candidate 14 workflows GREEN | C14-only homogeneous AttentionBundle preserves effective derivation contract/allowlist/no-delivery; model/tool/capability exhaustion durable/resumable; partial-write retry idempotent; unfinished spend remains in C13 budget truth; AI cognition self-excitation blocked; Review coexistence/new-runtime retrieval/reconcile-scale regressions GREEN |
-| 14 | `C14-RES-FIX-001` | Life Director 准备 C14 真实 Resident sealed life fixture / sequential release contract；只做测试输入与未来隔离，不运行 Resident 语义 | **READY** | C14-LOOP-001 | `governance/C14_REAL_RESIDENT_VALIDATION_PROTOCOL_2026-09-21.md`; `reviews/C14_LOOP_PM_ACCEPTANCE_REVIEW_2026-09-21.md` | 自然人生输入必须包含隐藏跨维正例、匹配负例、后续反证、fresh-window 后的相关新决策与 Outcome；Resident-visible 事件不得标注预期认知；固定 fixture digest / event count / time range / release contract；不得改 Core |
-| 15 | `C14-RES-A-001` | 第一真实 Resident 窗口逐事件生活与认知：模型本人基于当前 RuntimeSnapshot 作 search/inspect/Claim/revise/retract/silence；在 sealed handoff boundary 停止 | **BLOCKED** | C14-RES-FIX-001 | real model only; sequential release; fresh/private World; no future fixture/oracle | 保存 exact main/model/provider、World/checkpoint/index digest、release cursor、cognition refs、capability/writeback trace；不得读未来；不得程序代替语义；不得越过 handoff boundary |
+| 14 | `C14-RES-FIX-001` | Life Director 准备 C14 真实 Resident sealed life fixture / sequential release contract；只做测试输入与未来隔离，不运行 Resident 语义 | **DONE** | C14-LOOP-001 | PR #68; candidate `e174a016c25d34c05ef096129d1c537ca5b19de8`; squash merge `796d9c357bb08f3042f103bc66260fdb3cdcd88c`; fixture SHA256 `a0f9dfd0985560ce80f568b6cd11d46b13f5dc352a664c005fcb165ea5a67485`; `reviews/internal_habitation/c14-resident/C14_RES_FIX_001_COMPLETION_EVIDENCE_2026-09-21.md` | 36 条自然人生事件已冻结；Phase A 24 / Phase B 12；cursor 24/25 sealed handoff；逐项 release contract + evaluator-only notes + digest/顺序/时间/泄漏机械校验 PASS；无 Core 修改、无 Resident 语义运行 |
+| 15 | `C14-RES-A-001` | 第一真实 Resident 窗口逐事件生活与认知：模型本人基于当前 RuntimeSnapshot 作 search/inspect/Claim/revise/retract/silence；在 sealed handoff boundary 停止 | **READY** | C14-RES-FIX-001 | sealed fixture `reviews/internal_habitation/c14-resident/fixture/sealed_fixture.json`; release contract `reviews/internal_habitation/c14-resident/release/release_contract.md`; fixture SHA256 `a0f9dfd0985560ce80f568b6cd11d46b13f5dc352a664c005fcb165ea5a67485`; real model only; fresh/private World; no future fixture/oracle | 保存 exact main/model/provider、World/checkpoint/index digest、release cursor、cognition refs、capability/writeback trace；只机械获得当前 cursor 事件；不得读未来；不得程序代替语义；到 cursor 24 必须停止，不得释放 25 |
 | 16 | `C14-RES-B-001` | 全新模型窗口恢复 Phase-A durable AIOS World 后继续人生；禁止注入 Phase-A 对话/总结，验证旧 cognition 在新情境下被 AIOS 正常检索并实际影响未来行为与 Outcome | **BLOCKED** | C14-RES-A-001 | 新 ChatGPT/agent conversation；只给 World/checkpoint/digest + release contract/current cursor | 新 Runtime/Index/session；普通 AIOS capability 找回 exact cognition；至少一项 prior cognition materially participates in later decision；随后 Outcome/new evidence 可支持 retain/revise/retract；无 prior chat contamination |
 | 17 | `C14-RES-EVAL-001` | 独立 evaluator 审计 C14 Resident A/B 真实语义证据；不修 Core | **BLOCKED** | C14-RES-B-001 | sealed fixture chronology + A/B artifacts + World/checkpoint/digests + protocol | 分别裁决跨维正例、matched negative silence、fresh-window cognition consumption、contradiction/revision、future-leak/pseudo-LLM；每项 VALID/PARTIAL/INVALID；任一关键项非 VALID 则不能进入 C14 closure PASS |
 | 18 | `C14-CLOSE-001` | 独立审计 C14 规则、代码、Gate 与真实 Resident 证据；只做收口，不写新 Core 功能 | **BLOCKED** | C14-RES-EVAL-001 | C14 全链证据 + deterministic gates + Resident evaluator + PM hardening requirements | 任一以下成立即 FAIL：Summary-only 自证 cognition、无跨维正例、无 matched negative silence、无真正 fresh-window/new-runtime 行为消费、provenance 用语义启发式/第二来源库、claim count 成质量目标、存在 wake storm/future leak/pseudo-LLM；全部通过才恢复 P16 |
@@ -952,3 +952,39 @@ Required chain:
 `C14-RES-FIX-001 -> C14-RES-A-001 -> C14-RES-B-001 -> C14-RES-EVAL-001 -> C14-CLOSE-001`
 
 This changes test methodology only. No Core/runtime semantics are changed.
+
+
+### C14-RES-FIX-001 completion — 2026-09-21
+
+```text
+Task ID: C14-RES-FIX-001
+Status: DONE
+Started from main: 01ad300bfd8a102e8b2fd5fc9bfbfb6fd5e4ff29
+Work branch: c14/res-fixture-20260921-sol
+Candidate SHA: e174a016c25d34c05ef096129d1c537ca5b19de8
+PR: #68
+Merge SHA: 796d9c357bb08f3042f103bc66260fdb3cdcd88c
+Required gates: Life Director mechanical fixture/release validation only; no Resident semantic run and no Core/runtime gate required by this task
+Gate run IDs / conclusions:
+- fixture JSON parse / PASS
+- event id uniqueness / PASS
+- contiguous sequence 1..36 / PASS
+- strict monotonic timestamps / PASS
+- Phase A/B unique boundary 24->25 / PASS
+- manifest SHA256 exact match / PASS
+- sequential cursor simulation 1..36 / PASS
+- Resident-visible payload label leak scan / PASS
+- Resident-readable release/schema answer-key leak scan / PASS
+- src/aios_core diff / NONE
+Evidence/report paths:
+- reviews/internal_habitation/c14-resident/fixture/sealed_fixture.json
+- reviews/internal_habitation/c14-resident/fixture/fixture_manifest.json
+- reviews/internal_habitation/c14-resident/release/release_contract.md
+- reviews/internal_habitation/c14-resident/release/event_schema.json
+- reviews/internal_habitation/c14-resident/evaluator/EVALUATOR_ONLY_design_notes.md
+- reviews/internal_habitation/c14-resident/C14_RES_FIX_001_COMPLETION_EVIDENCE_2026-09-21.md
+Fixture: 36 events; Phase A 24; Phase B 12; 2026-10-01T07:15:00-07:00 -> 2026-10-29T18:40:00-07:00; handoff cursor 24/25; SHA256 a0f9dfd0985560ce80f568b6cd11d46b13f5dc352a664c005fcb165ea5a67485
+Bugs found: Resident-readable release contract initially contained answer-label wording inside a prohibition sentence; removed before merge so Resident-readable artifacts carry no answer-key label text.
+Deferred issues: Resident semantics belong exclusively to C14-RES-A-001 / C14-RES-B-001; independent semantic judgment belongs to C14-RES-EVAL-001; no Runtime bug was repaired here.
+Next READY task: C14-RES-A-001 — new window only.
+```
