@@ -1,5 +1,13 @@
 """Constitutional C09 wake scheduling and dispatch primitives."""
 
+from .attention import (
+    AttentionBundleReceipt,
+    AttentionRouter,
+    AttentionWatchReceipt,
+    AttentionWatchRequest,
+    AttentionWatchService,
+    NumericPredicate,
+)
 from .service import (
     ObservationTriggerService,
     ObservationWakeRule,
@@ -12,6 +20,12 @@ from .service import (
 )
 
 __all__ = [
+    "AttentionBundleReceipt",
+    "AttentionRouter",
+    "AttentionWatchReceipt",
+    "AttentionWatchRequest",
+    "AttentionWatchService",
+    "NumericPredicate",
     "ObservationTriggerService",
     "ObservationWakeRule",
     "Step0GateInput",
