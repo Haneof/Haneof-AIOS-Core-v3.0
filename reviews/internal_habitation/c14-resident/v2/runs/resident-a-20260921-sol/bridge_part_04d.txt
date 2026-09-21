@@ -1,0 +1,20 @@
+if __name__ == "__main__":
+    try:
+        raise SystemExit(main())
+    except Exception as exc:
+        EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
+        blocker = {
+            "task_id": "C14-RES-A-001",
+            "evaluated_main_sha": EVALUATED_MAIN_SHA,
+            "branch": BRANCH,
+            "event_sequence": CURRENT_EVENT_SEQUENCE,
+            "event_id": CURRENT_EVENT_ID,
+            "error_type": type(exc).__name__,
+            "error": str(exc),
+            "traceback": traceback.format_exc(),
+        }
+        _write_json(EVIDENCE_DIR / "BLOCKER.json", blocker)
+        _append_trace("blocker", blocker)
+        _write_session_state(stage="blocked")
+        print("C14_BLOCKER::" + json.dumps(blocker, ensure_ascii=False, sort_keys=True, separators=(",", ":")), flush=True)
+        raise

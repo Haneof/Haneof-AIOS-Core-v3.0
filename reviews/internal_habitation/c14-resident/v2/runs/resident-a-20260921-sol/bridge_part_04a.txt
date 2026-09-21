@@ -1,0 +1,32 @@
+        (EVIDENCE_DIR / name).mkdir(parents=True, exist_ok=True)
+
+    if WORLD_DB.exists() or RELEASE_STATE.exists() or INDEX_DB.exists():
+        raise RuntimeError("fresh Resident run requires absent World/index/release state")
+
+    _write_json(
+        EVIDENCE_DIR / "session_metadata.json",
+        {
+            "task_id": "C14-RES-A-001",
+            "evaluated_main_sha": EVALUATED_MAIN_SHA,
+            "branch": BRANCH,
+            "subject_id": SUBJECT_ID,
+            "model_identity": MODEL_ID,
+            "provider_identity": PROVIDER_ID,
+            "window_identifier": WINDOW_ID,
+            "initial_world_revision": 0,
+            "initial_index_watermark": 0,
+        },
+    )
+
+    store = SQLiteWorldStore(WORLD_DB)
+    index = WorldSearchIndex(INDEX_DB, store=store)
+    if int(store.current_world_revision()) != 0 or int(index.watermark()) != 0:
+        raise RuntimeError("fresh World/index did not start at revision/watermark 0")
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=_model_handler,
+        subject_id=SUBJECT_ID,
+        dimension_summary_handler=_summary_handler,
+    )

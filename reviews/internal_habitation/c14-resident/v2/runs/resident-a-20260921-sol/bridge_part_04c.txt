@@ -1,0 +1,48 @@
+        ack_path = EVIDENCE_DIR / "ack" / f"cursor-{sequence:03d}.json"
+        ack = _subprocess_json(
+            [
+                sys.executable,
+                str(OPERATOR),
+                "ack",
+                "--phase",
+                "A",
+                "--state",
+                str(RELEASE_STATE),
+                "--world-db",
+                str(WORLD_DB),
+                "--sequence",
+                str(sequence),
+                "--event-id",
+                CURRENT_EVENT_ID,
+                "--ingest-ref",
+                str(ingest["ingest_ref"]),
+            ],
+            stdout_path=ack_path,
+        )
+        _append_trace("release_ack", ack)
+        index.catch_up()
+        _write_world_checkpoint(store, index, sequence)
+
+        gate = _wait_for_input(
+            "current_event",
+            {
+                "released_event": event,
+                "ingest_receipt": ingest,
+                "ack_receipt": ack,
+                "world_revision": int(store.current_world_revision()),
+                "index_watermark": int(index.watermark()),
+                "instruction": "Acknowledge only that the current cursor may enter normal AIOS processing; do not provide cognition here.",
+            },
+            expected_input_kind="continue_current_event",
+        )
+        if gate.get("action") != "process_current_event":
+            raise ValueError("continue_current_event requires action=process_current_event")
+
+        _run_due_for_event(runtime, store, index, CURRENT_EVENT_TIME)
+        index.catch_up()
+        _write_world_checkpoint(store, index, sequence)
+        _write_session_state(stage=f"cursor-{sequence:03d}-processed")
+
+    handoff = _finalize(store, index)
+    print("C14_FINAL::" + json.dumps(handoff, ensure_ascii=False, sort_keys=True, separators=(",", ":")), flush=True)
+    return 0

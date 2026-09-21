@@ -1,0 +1,25 @@
+    _subprocess_json(
+        [sys.executable, str(OPERATOR), "init", "--phase", "A", "--state", str(RELEASE_STATE)],
+        stdout_path=EVIDENCE_DIR / "release_init.json",
+    )
+    _write_session_state(stage="initialized")
+
+    for sequence in range(1, 25):
+        CURRENT_EVENT_SEQUENCE = sequence
+        reveal_path = EVIDENCE_DIR / "reveal" / f"cursor-{sequence:03d}.json"
+        event = _subprocess_json(
+            [sys.executable, str(OPERATOR), "reveal", "--phase", "A", "--state", str(RELEASE_STATE)],
+            stdout_path=reveal_path,
+        )
+        if int(event.get("sequence", -1)) != sequence:
+            raise RuntimeError(f"operator revealed unexpected sequence for cursor {sequence}")
+        CURRENT_EVENT_ID = str(event["event_id"])
+        CURRENT_EVENT_TIME = datetime.fromisoformat(str(event["occurred_at"]).replace("Z", "+00:00"))
+        _append_trace("release_reveal", event)
+
+        ingest_path = EVIDENCE_DIR / "ingest" / f"cursor-{sequence:03d}.json"
+        ingest = _subprocess_json(
+            [sys.executable, str(ADAPTER), "--world-db", str(WORLD_DB), "--event-file", str(reveal_path)],
+            stdout_path=ingest_path,
+        )
+        _append_trace("mechanical_ingest", ingest)

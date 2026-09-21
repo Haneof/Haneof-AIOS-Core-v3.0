@@ -1,0 +1,150 @@
+        "index_watermark": int(index.watermark()),
+        "index_lag": int(index.lag()),
+        "last_acked_sequence": release.get("last_acked_sequence"),
+        "next_sequence": release.get("next_sequence"),
+    }
+    _write_json(EVIDENCE_DIR / "world_checkpoints" / f"cursor-{sequence:03d}.json", payload)
+    _append_trace("world_checkpoint", payload)
+
+
+def _run_due_for_event(runtime: FusedTurnRuntime, store: SQLiteWorldStore, index: WorldSearchIndex, now: datetime) -> None:
+    index.catch_up()
+    summary_result = runtime.run_due_dimension_summaries(now=now)
+    _append_trace("summary_scheduler_result", summary_result)
+    index.catch_up()
+    reconcile = runtime.cognitive_derivation.reconcile()
+    _append_trace("c14_reconcile", reconcile)
+    index.catch_up()
+
+    for _ in range(100):
+        result = runtime.dispatch_next_pending_wake(now=now)
+        if result is None:
+            break
+        _append_trace("wake_dispatch_result", result)
+        index.catch_up()
+    else:
+        raise RuntimeError("mechanical wake drain exceeded 100 iterations at one simulated time")
+
+    review = runtime.run_periodic_review(now=now)
+    if review is not None:
+        _append_trace("periodic_review_result", review)
+        index.catch_up()
+
+
+def _finalize(store: SQLiteWorldStore, index: WorldSearchIndex) -> dict[str, Any]:
+    release = json.loads(RELEASE_STATE.read_text(encoding="utf-8"))
+    if int(release.get("last_acked_sequence", -1)) != 24:
+        raise RuntimeError("final release state does not show last_acked_sequence=24")
+    if int(release.get("next_sequence", -1)) != 25:
+        raise RuntimeError("final release state does not show next_sequence=25")
+    if release.get("pending_reveal") is not None:
+        raise RuntimeError("final release state still has pending reveal")
+
+    claims = _current_refs(store, ObjectType.CLAIM.value)
+    summaries = _current_refs(store, ObjectType.SUMMARY.value)
+    c14_wakes: list[dict[str, Any]] = []
+    periodic_wakes: list[dict[str, Any]] = []
+    wake_refs: list[dict[str, Any]] = []
+    for payload in store.list_payloads(object_type=ObjectType.WAKE.value, subject_id=SUBJECT_ID):
+        item = {
+            "object_id": payload.get("object_id"),
+            "revision": payload.get("revision"),
+            "wake_source": payload.get("wake_source"),
+            "wake_state": payload.get("wake_state"),
+        }
+        wake_refs.append(item)
+        if payload.get("wake_source") == WakeSource.COGNITIVE_DERIVATION.value:
+            c14_wakes.append(item)
+        if payload.get("wake_source") == WakeSource.PERIODIC_REVIEW.value:
+            periodic_wakes.append(item)
+    wake_refs.sort(key=lambda x: (str(x.get("object_id")), int(x.get("revision") or 0)))
+
+    silence_count = 0
+    cognition_ops: list[dict[str, Any]] = []
+    if TRACE.exists():
+        for line in TRACE.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            record = json.loads(line)
+            if record.get("kind") != "model_directive_selected":
+                continue
+            payload = record.get("payload") or {}
+            directive = payload.get("directive") or {}
+            if directive.get("silence") is True:
+                silence_count += 1
+            for call in directive.get("capability_calls") or []:
+                name = call.get("name")
+                if name in {"commit_claim", "commit_ai_world_claim", "revise_claim", "retract_claim"}:
+                    cognition_ops.append(
+                        {
+                            "source": payload.get("wake_reason"),
+                            "name": name,
+                            "call_id": call.get("call_id"),
+                            "arguments": call.get("arguments") or {},
+                        }
+                    )
+
+    handoff = {
+        "task_id": "C14-RES-A-001",
+        "evaluated_main_sha": EVALUATED_MAIN_SHA,
+        "branch": BRANCH,
+        "subject_id": SUBJECT_ID,
+        "model_identity": MODEL_ID,
+        "provider_identity": PROVIDER_ID,
+        "window_identifier": WINDOW_ID,
+        "private_world_path": str(WORLD_DB.relative_to(ROOT)),
+        "private_index_path": str(INDEX_DB.relative_to(ROOT)),
+        "release_state_path": str(RELEASE_STATE.relative_to(ROOT)),
+        "cursor_processed": "1-24",
+        "cursor_25_revealed": False,
+        "last_acked_sequence": 24,
+        "next_sequence": 25,
+        "world_revision": int(store.current_world_revision()),
+        "index_watermark": int(index.watermark()),
+        "index_lag": int(index.lag()),
+        "world_sha256": _sha256_file(WORLD_DB),
+        "index_sha256": _sha256_file(INDEX_DB),
+        "release_state_sha256": _sha256_file(RELEASE_STATE),
+        "summary_count": len(summaries),
+        "summary_refs": summaries,
+        "c14_wake_count": len(c14_wakes),
+        "c14_wake_refs": c14_wakes,
+        "wake_refs": wake_refs,
+        "periodic_review_refs": periodic_wakes,
+        "durable_cognition_refs": claims,
+        "observable_cognition_operations": cognition_ops,
+        "silence_count": silence_count,
+        "semantic_trace_path": str(TRACE.relative_to(ROOT)),
+        "stopped_after_phase_a": True,
+    }
+    _write_json(EVIDENCE_DIR / "PHASE_A_HANDOFF.json", handoff)
+
+    files = []
+    for path in sorted(EVIDENCE_DIR.rglob("*")):
+        if not path.is_file() or path.name in {"evidence_manifest.json", "evidence_manifest.sha256"}:
+            continue
+        files.append(
+            {
+                "path": str(path.relative_to(ROOT)),
+                "sha256": _sha256_file(path),
+                "bytes": path.stat().st_size,
+            }
+        )
+    manifest = {
+        "task_id": "C14-RES-A-001",
+        "evaluated_main_sha": EVALUATED_MAIN_SHA,
+        "branch": BRANCH,
+        "cursor_25_revealed": False,
+        "files": files,
+    }
+    manifest_path = EVIDENCE_DIR / "evidence_manifest.json"
+    _write_json(manifest_path, manifest)
+    (EVIDENCE_DIR / "evidence_manifest.sha256").write_text(_sha256_file(manifest_path) + "\n", encoding="utf-8")
+    _write_session_state(stage="finished", checkpoint_id=None)
+    return handoff
+
+
+def main() -> int:
+    global CURRENT_EVENT_SEQUENCE, CURRENT_EVENT_ID, CURRENT_EVENT_TIME
+    EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
+    for name in ("reveal", "ingest", "ack", "checkpoints", "inputs", "summaries", "world_checkpoints"):
