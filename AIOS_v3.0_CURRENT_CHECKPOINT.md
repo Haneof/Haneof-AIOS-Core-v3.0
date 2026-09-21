@@ -14,6 +14,24 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
+## 当前工程断点 — Resident Cognitive Continuity 路线已冻结，先执行 C14 最小语义修复
+
+- Governance planning baseline: `main@426f049d890d82121388ed5d52eecf66e48856f8`.
+- Canonical C15 plan: `governance/C15_RESIDENT_COGNITIVE_CONTINUITY_TEST_PLAN_2026-09-22.md`.
+- C15 root gate renamed/reframed as **Resident Cognitive Continuity (RCC)**: bottom model may change; durable User Understanding / Relationship-Role / Self-Calibration / Strategy-Experience must not silently reset.
+- Existing P15/C14 mechanisms remain authoritative. C15 begins with `C15-RCC-PREFLIGHT-001`; it must mark existing capabilities `ALREADY_IMPLEMENTED` instead of rebuilding them.
+- Replacement-model continuity is now mandatory for full C15 VALID. Same wording/style is not required; durable cognition recovery and material behavioral continuity are.
+- Historical C14 evaluator remains authoritative: E1 PARTIAL / E2 VALID / E3 VALID / E4 VALID / E5 INVALID / E6 VALID.
+- C14 historical PR #75 / PR #79 evidence remains frozen and must not be edited to make the test pass.
+- A minimal repair chain is inserted:
+  - `C14-SEM-REPAIR-FIX-001 = READY`
+  - `C14-SEM-REPAIR-RES-001 = BLOCKED`
+  - `C14-SEM-REPAIR-EVAL-001 = BLOCKED`
+  - `C14-CLOSE-001 = BLOCKED`
+- Repair scope is only the two failed semantic axes: exact leaf support for every material Claim fact, and strict planned / observed / Outcome separation during later revision.
+- C15, C16 and broad P16 remain blocked until their declared dependencies close.
+- **Current first READY task after this governance merge: `C14-SEM-REPAIR-FIX-001`.**
+
 ## 当前工程断点 — C14-RES-EVAL-001 已完成
 
 - `C14-RES-EVAL-001 = DONE`
