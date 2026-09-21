@@ -45,6 +45,8 @@ from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackS
 UTC = timezone.utc
 NOW = datetime(2026, 9, 21, 9, 30, tzinfo=UTC)
 
+# C14-LOOP final candidate gate anchor: all assertions below are mechanical engineering proofs.
+
 
 def _commit(store, objects, *, source_class: SourceClass, tag: str) -> None:
     store.commit(
