@@ -744,3 +744,62 @@ PR #21 accepted head 触发的 **20 个 workflow 全部 SUCCESS**，包括：
 8. 证据成立后才允许 P16 PASS / P17。
 
 > 注意：确定性 Gate 只证明机制、隔离、持久化、状态机和接线正确，不能替代真实模型长期认知质量证明。
+
+
+---
+
+## 2026-09-21 — T33-RECALL-001 DONE
+
+- Task ID: `T33-RECALL-001`
+- Status: **DONE**
+- Started from main: `f8a2f8e4cf53de579bd0bc69cfd85421d109d65b`
+- Work branch: `fix/t33-recall-antecedent-gate-20260921`
+- Final candidate: `91f1eecc1eb1a5aeb3dd2fa4566f045b6abea796`
+- PR: #51
+- Squash merge: `cb8eab12e9747bece41b14d183840e2cf13bd183`
+- Task-board close commit: `f022fafde2f281fa35dd2492bdcb31aaad855214`
+
+### Current-main reproduction
+
+Pre-fix regression commit `e962585a346949dd884e202ffc7cabb5e306161c` triggered
+`p16-convergence-gate` run `35566569236` and failed exactly on Case A:
+a self-contained fresh-session input containing a local demonstrative opened
+`antecedent_recall_needed=True`.
+
+### Accepted behavior
+
+1. Self-contained current expression does not open cross-session antecedent recall merely
+   because a demonstrative/continuation word appears as an arbitrary substring.
+2. True discourse-level cross-session omission/deixis may expose bounded historical
+   candidates; deterministic Core does not select the antecedent identity.
+3. No credible historical candidate means zero fabricated candidate.
+4. Same-session continuity now reads the canonical P14 `user.text` turn shape.
+   Assistant raw dialogue is never used as the same-session antecedent source.
+5. Embedded `继续` no longer independently opens the history gate, while discourse-level
+   `继续。` remains supported.
+6. Resident `search_world`, summary/raw drill-down, proactive relevant memory, and subject
+   isolation remain unchanged.
+
+### Final Gate evidence
+
+- `memory-recommendation` — run `35567409150` — **SUCCESS**
+- `p14-long-context` — run `35567409136` — **SUCCESS**
+- `fused-turn-runtime` — run `35567409167` — **SUCCESS**
+- `p16-habitation-harness` — run `35567409218` — **SUCCESS**
+- `p16-convergence-gate` — run `35567409187` — **SUCCESS**
+- `constitutional-cognition-closure` — run `35567409138` — **SUCCESS**
+- `p9-revision-gate` — run `35567409173` — **SUCCESS**
+- `p10-ai-world-gate` — run `35567409295` — **SUCCESS**
+- `p11-dimension-gate` — run `35567409158` — **SUCCESS**
+- `p12-execution-gate` — run `35567409155` — **SUCCESS**
+
+The final green merge-ref combined candidate `91f1eecc...` with
+`main@3cd793e3d9325c316d1bcf4beb29a0ab02c195fd`. Before the squash merge,
+the only later main delta was checkpoint documentation; no Runtime/Core/Test code changed.
+
+### Deferred / handoff
+
+- No WorldSearchIndex/query code was changed, so world-index was outside the T33 impact scope.
+- `T36-SEARCH-001` and `T35-IMPL-001` were not executed in this window.
+- Next READY by task-board ordering: **T36-SEARCH-001**.
+- This window stops here.
