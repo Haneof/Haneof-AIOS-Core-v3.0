@@ -1407,3 +1407,34 @@ Also retain:
 - bounded provenance reconcile complexity.
 
 Canonical detail: `governance/C14_LOOP_PM_PREFLIGHT_2026-09-21.md`.
+
+
+---
+
+## 2026-09-21 — C14 real Resident validation split
+
+Independent PM acceptance confirmed `C14-LOOP-001 = PASS`.
+
+However, the previous single-window `C14-RES-001` methodology was not sufficient to prove the strongest C14 requirement:
+
+> prior cognition must survive the end of the original model session and later affect behavior in a genuinely fresh model context using only durable AIOS state.
+
+Destroying/recreating only `FusedTurnRuntime` inside the same ChatGPT/agent conversation does not eliminate residual chat/model context.
+
+Therefore C14 Resident validation is now split into:
+
+1. `C14-RES-FIX-001` — Life Director sealed fixture / sequential release contract;
+2. `C14-RES-A-001` — first real Resident window, stop at sealed handoff boundary;
+3. `C14-RES-B-001` — completely new model window, restore only durable AIOS World/checkpoint and continue;
+4. `C14-RES-EVAL-001` — independent semantic evaluator;
+5. then `C14-CLOSE-001`.
+
+Canonical protocol:
+
+`governance/C14_REAL_RESIDENT_VALIDATION_PROTOCOL_2026-09-21.md`
+
+This is test-method hardening only; no Core/runtime semantics are changed.
+
+Next READY task:
+
+`C14-RES-FIX-001`.
