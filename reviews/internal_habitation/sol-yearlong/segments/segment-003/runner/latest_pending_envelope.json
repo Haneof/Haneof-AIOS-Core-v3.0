@@ -1,8 +1,8 @@
 {
-  "decision_key": "27d5f4021b206bcaaef1f2f03a2d9e729fadb6e90b3fdcae8f50f3b032a63821",
+  "decision_key": "1cd8d0b294092e202e28596ef9c533403f52b46d97bc7aaba46c217d1ce8ea99",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-resident.pending.v1",
-  "simulated_clock": "2027-01-20T08:15:00+00:00",
+  "simulated_clock": "2027-01-22T18:20:00+00:00",
   "snapshot": {
     "capability_catalog": [
       {
@@ -542,21 +542,187 @@
     ],
     "capability_history": [
       {
-        "call_id": "seg003-jan20-review-anchors",
+        "call_id": "seg003-jan22-today-records",
         "data": [
           {
-            "excerpt": "{'currency': 'USD', 'gross_sales': 1297.6, 'orders': 97, 'refunds': 1, 'store': 'bakery'}",
-            "object_ref": {
-              "object_id": "obs_src_60bc8c48b8f0290b5b94ae48",
-              "revision": 1
-            },
+            "dimension": "dim_unclassified",
+            "excerpt": "periodic_review.interval\nperiodic-review:sol-resident-20260921-001:2027-01-22T08:15:00+00:00",
+            "object_id": "wake_review_57c61fbe51075eaeb9366c9b",
+            "object_type": "wake",
+            "retrieval_score": 0,
+            "revision": 3
+          },
+          {
+            "dimension": "dim_unclassified",
+            "excerpt": "",
+            "object_id": "dep_39c698425e790c10af67f916",
+            "object_type": "dependency",
+            "retrieval_score": 0,
+            "revision": 1
+          },
+          {
+            "dimension": "dim_unclassified",
+            "excerpt": "",
+            "object_id": "dep_abeb5c5709ce9136084d8f33",
+            "object_type": "dependency",
+            "retrieval_score": 0,
+            "revision": 1
+          },
+          {
+            "dimension": "dim_unclassified",
+            "excerpt": "",
+            "object_id": "dep_cbb13206772470a53f85282e",
+            "object_type": "dependency",
+            "retrieval_score": 0,
+            "revision": 1
+          },
+          {
+            "dimension": "dim_unclassified",
+            "excerpt": "",
+            "object_id": "dep_d03effff281195e8f55712e4",
+            "object_type": "dependency",
+            "retrieval_score": 0,
+            "revision": 1
+          },
+          {
+            "dimension": "dim:user_ai_interaction",
+            "excerpt": "这次面粉1.41就继续跟North Mill走吧。和1.42差这一点我不想来回折腾供应商，我现在更想把出品稳定下来。",
+            "object_id": "obs_conv_user_54903466038169effa3b1926",
             "object_type": "observation",
-            "recorded_at": "2027-01-19T20:05:00Z"
+            "retrieval_score": 0,
+            "revision": 1
+          },
+          {
+            "dimension": "dim:purchase_order",
+            "excerpt": "",
+            "object_id": "obs_src_6cc6f858c2e5e5c0cb05d1a8",
+            "object_type": "observation",
+            "retrieval_score": 0,
+            "revision": 1
+          },
+          {
+            "dimension": "dim:purchase_order",
+            "excerpt": "",
+            "object_id": "obs_src_a46c3fac2a66319044463248",
+            "object_type": "observation",
+            "retrieval_score": 0,
+            "revision": 1
           }
         ],
         "error_code": null,
         "error_message": null,
-        "name": "read_periodic_review_anchors",
+        "name": "search_timeline",
+        "ok": true
+      },
+      {
+        "call_id": "seg003-jan22-po-1",
+        "data": {
+          "created_by": "reality_ingest:habitation.purchase_order.v1",
+          "data_quality": {},
+          "learned_at": "2027-01-22T11:20:00Z",
+          "metadata": {
+            "adapter_id": "habitation.purchase_order.v1",
+            "dimension": "dim:purchase_order",
+            "external_record_id": "d038-order-confirmed",
+            "external_revision": "1",
+            "mechanical_ingest": true,
+            "occurred_at_original": "2027-01-22T11:20:00+00:00",
+            "provenance": {
+              "habitation_resident_metadata": {
+                "source": "supplier_portal"
+              },
+              "model_id_not_part_of_fact": true
+            },
+            "source_class": "user",
+            "source_digest": "327eb2a21989bde1a4bf9f773bda3c848a21c5b1b82458f53b4407ad76de344f",
+            "source_schema_version": "1"
+          },
+          "modality": "structured_record",
+          "object_id": "obs_src_6cc6f858c2e5e5c0cb05d1a8",
+          "object_type": "observation",
+          "occurred": {
+            "end": "2027-01-22T11:20:00Z",
+            "precision": "second",
+            "start": "2027-01-22T11:20:00Z",
+            "timezone_name": null,
+            "unknown": false
+          },
+          "raw_locator": "habitation://sol-resident-20260921-001/purchase_order/d038-order-confirmed",
+          "recorded_at": "2027-01-22T11:20:00Z",
+          "revision": 1,
+          "source_kind": "purchase_order",
+          "source_refs": [],
+          "status": "active",
+          "subject_id": "sol-resident-20260921-001",
+          "unit": null,
+          "value": {
+            "currency": "USD",
+            "item": "bread flour",
+            "quantity_kg": 180,
+            "scheduled_delivery": "2027-01-25T04:30:00+00:00",
+            "status": "confirmed",
+            "unit_price": 1.41,
+            "vendor": "North Mill"
+          }
+        },
+        "error_code": null,
+        "error_message": null,
+        "name": "inspect_world_object",
+        "ok": true
+      },
+      {
+        "call_id": "seg003-jan22-po-2",
+        "data": {
+          "created_by": "reality_ingest:habitation.purchase_order.v1",
+          "data_quality": {},
+          "learned_at": "2027-01-22T11:00:00Z",
+          "metadata": {
+            "adapter_id": "habitation.purchase_order.v1",
+            "dimension": "dim:purchase_order",
+            "external_record_id": "d037-supplier-quote",
+            "external_revision": "1",
+            "mechanical_ingest": true,
+            "occurred_at_original": "2027-01-22T11:00:00+00:00",
+            "provenance": {
+              "habitation_resident_metadata": {
+                "source": "supplier_portal"
+              },
+              "model_id_not_part_of_fact": true
+            },
+            "source_class": "user",
+            "source_digest": "02fa2e886d61c89d87a519aa36a83e04276acebd293ce4842a123f83ad241d96",
+            "source_schema_version": "1"
+          },
+          "modality": "structured_record",
+          "object_id": "obs_src_a46c3fac2a66319044463248",
+          "object_type": "observation",
+          "occurred": {
+            "end": "2027-01-22T11:00:00Z",
+            "precision": "second",
+            "start": "2027-01-22T11:00:00Z",
+            "timezone_name": null,
+            "unknown": false
+          },
+          "raw_locator": "habitation://sol-resident-20260921-001/purchase_order/d037-supplier-quote",
+          "recorded_at": "2027-01-22T11:00:00Z",
+          "revision": 1,
+          "source_kind": "purchase_order",
+          "source_refs": [],
+          "status": "active",
+          "subject_id": "sol-resident-20260921-001",
+          "unit": null,
+          "value": {
+            "currency": "USD",
+            "item": "bread flour",
+            "quantity_kg": 180,
+            "quoted_unit_price": 1.41,
+            "status": "quoted",
+            "vendor": "North Mill"
+          }
+        },
+        "error_code": null,
+        "error_message": null,
+        "name": "inspect_world_object",
         "ok": true
       }
     ],
@@ -564,544 +730,251 @@
       "ai_identity": {},
       "capability_catalog": [
         {
-          "description": "Persist a typed AI-world cognition using the unified EvidenceSet + Claim + Dependency path.",
-          "hard_boundary": false,
-          "input_schema": {
-            "claim_type": "string?",
-            "confidence": "number[0,1]",
-            "domain": "user_understanding|relationship|self|intent|strategy|cognitive_boundary|personality|calibration",
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "knowledge_state": "string?",
-            "scope_key": "string?",
-            "statement": "string",
-            "tags": "array[string]?"
-          },
           "kind": "write",
           "name": "commit_ai_world_claim",
           "side_effecting": true
         },
         {
-          "description": "Persist a revisable AI cognition Claim grounded in pinned world evidence. This capability cannot create Observation facts.",
-          "hard_boundary": false,
-          "input_schema": {
-            "claim_type": "string?",
-            "confidence": "number[0,1]",
-            "content": "string",
-            "dimension": "string",
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "knowledge_state": "string?"
-          },
           "kind": "write",
           "name": "commit_claim",
           "side_effecting": true
         },
         {
-          "description": "During an active periodic review, persist a model-authored operation experience grounded in pinned real case refs.",
-          "hard_boundary": false,
-          "input_schema": {
-            "applicability": "object?",
-            "cost": "object[number]?",
-            "experience_state": "string?",
-            "method_path": "array[string]",
-            "misses": "array[string]?",
-            "negative_case_refs": "array[{object_id:string,revision:integer}]?",
-            "positive_case_refs": "array[{object_id:string,revision:integer}]?",
-            "problem_type": "string",
-            "result_summary": "string"
-          },
           "kind": "write",
           "name": "commit_operation_experience",
           "side_effecting": true
         },
         {
-          "description": "Inspect multiple pinned Claims side by side with their evidence/status; the model decides meaning.",
-          "hard_boundary": false,
-          "input_schema": {
-            "claim_refs": "array[{object_id:string,revision:integer}]"
-          },
           "kind": "read",
           "name": "compare_claims",
           "side_effecting": false
         },
         {
-          "description": "Create a concrete evidence-grounded Task, optionally under a current Goal.",
-          "hard_boundary": false,
-          "input_schema": {
-            "deadline": "ISO-8601 datetime?",
-            "goal_ref": "{object_id:string,revision:integer}?",
-            "initial_state": "string?",
-            "next_step": "string?",
-            "next_wake_at": "ISO-8601 datetime?",
-            "priority": "integer?",
-            "reason_refs": "array[{object_id:string,revision:integer}]",
-            "task_type": "string",
-            "timezone_name": "string?",
-            "title": "string"
-          },
           "kind": "write",
           "name": "create_task",
           "side_effecting": true
         },
         {
-          "description": "Read exact pinned raw dialogue behind a same-session round summary, or an explicit turn range. Round summaries are indexes, not truth.",
-          "hard_boundary": false,
-          "input_schema": {
-            "revision": "integer?",
-            "session_id": "string?",
-            "summary_id": "string?",
-            "turn_end": "integer?",
-            "turn_start": "integer?"
-          },
           "kind": "read",
           "name": "drill_down_conversation",
           "side_effecting": false
         },
         {
-          "description": "Request a broader bounded world recall after the initial recommendation/search was insufficient.",
-          "hard_boundary": false,
-          "input_schema": {
-            "dimension": "string?",
-            "limit": "integer?",
-            "query": "string"
-          },
           "kind": "read",
           "name": "expand_recall",
           "side_effecting": false
         },
         {
-          "description": "Focus retrieval on one known Entity id without semantic reinterpretation.",
-          "hard_boundary": false,
-          "input_schema": {
-            "entity_id": "string",
-            "limit": "integer?",
-            "query": "string?"
-          },
           "kind": "read",
           "name": "focus_entity",
           "side_effecting": false
         },
         {
-          "description": "Follow one-hop explicit Relation objects connected to a world object.",
-          "hard_boundary": false,
-          "input_schema": {
-            "limit": "integer?",
-            "object_id": "string"
-          },
           "kind": "read",
           "name": "follow_relation",
           "side_effecting": false
         },
         {
-          "description": "Form a revisable Event candidate from pinned world evidence. The model supplies the event meaning; code only validates provenance.",
-          "hard_boundary": false,
-          "input_schema": {
-            "confidence": "number[0,1]",
-            "dimension": "string?",
-            "event_time": "TemporalExtent object",
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "interpretation": "string",
-            "participant_refs": "array[{object_id:string,revision:integer}]?",
-            "primary_claim_refs": "array[{object_id:string,revision:integer}]?",
-            "title": "string"
-          },
           "kind": "write",
           "name": "form_event",
           "side_effecting": true
         },
         {
-          "description": "Inspect a pinned real Action Outcome and its Action reference.",
-          "hard_boundary": false,
-          "input_schema": {
-            "outcome_ref": "{object_id:string,revision:integer}"
-          },
           "kind": "read",
           "name": "inspect_outcome",
           "side_effecting": false
         },
         {
-          "description": "Read one pinned or latest world object by object id.",
-          "hard_boundary": false,
-          "input_schema": {
-            "object_id": "string",
-            "revision": "integer?"
-          },
           "kind": "read",
           "name": "inspect_world_object",
           "side_effecting": false
         },
         {
-          "description": "List same-session continuity summary windows on demand. Use this when token budgeting omitted summary content from the cockpit.",
-          "hard_boundary": false,
-          "input_schema": {
-            "limit": "integer?",
-            "session_id": "string?"
-          },
           "kind": "read",
           "name": "list_conversation_summaries",
           "side_effecting": false
         },
         {
-          "description": "List current registered dimension definitions so the resident AI can check whether an existing observation axis already serves the need.",
-          "hard_boundary": false,
-          "input_schema": {
-            "include_terminal": "boolean?"
-          },
           "kind": "read",
           "name": "list_dimensions",
           "side_effecting": false
         },
         {
-          "description": "Create a PROPOSED external Action for a RUNNING Task. This capability never executes the side effect and cannot authorize itself.",
-          "hard_boundary": false,
-          "input_schema": {
-            "action_type": "string",
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "expected_outcome": "string?",
-            "payload": "object",
-            "task_ref": "{object_id:string,revision:integer}"
-          },
           "kind": "write",
           "name": "propose_action",
           "side_effecting": true
         },
         {
-          "description": "Register a new evidence-grounded AI-mutable cognitive policy. Only real user/world result evidence is accepted; hard boundaries cannot be created by the resident AI.",
-          "hard_boundary": false,
-          "input_schema": {
-            "allowed_range_or_choices": "json value?",
-            "current_value": "json value",
-            "default_value": "json value",
-            "evaluation_window": "string",
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "policy_id": "string",
-            "reason": "string",
-            "scope": "string"
-          },
           "kind": "write",
           "name": "propose_cognitive_policy",
           "side_effecting": true
         },
         {
-          "description": "Submit an evidence-grounded candidate observation axis. The system validates structure; the model supplies semantic rationale.",
-          "hard_boundary": false,
-          "input_schema": {
-            "confidence": "number[0,1]",
-            "continuity_rationale": "string",
-            "data_shape": "string",
-            "description": "string",
-            "dimension_key": "string starting dim:",
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "expected_value": "string?",
-            "maintenance_cost_rationale": "string",
-            "name": "string",
-            "update_method": "string?",
-            "user_value_rationale": "string",
-            "why_existing_dimensions_are_insufficient": "string"
-          },
           "kind": "write",
           "name": "propose_dimension",
           "side_effecting": true
         },
         {
-          "description": "Create a durable Entity anchor from pinned same-world evidence. The resident supplies identity meaning; Core enforces explicit entity_key and provenance.",
-          "hard_boundary": false,
-          "input_schema": {
-            "aliases": "array[string]?",
-            "canonical_name": "string?",
-            "entity_key": "string",
-            "entity_kind": "string",
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "identity_claim_refs": "array[{object_id:string,revision:integer}]?"
-          },
           "kind": "write",
           "name": "propose_entity",
           "side_effecting": true
         },
         {
-          "description": "Create an evidence-grounded Goal proposal in the unified world. A proposal does not grant external-action authorization.",
-          "hard_boundary": false,
-          "input_schema": {
-            "confidence": "number[0,1]",
-            "description": "string",
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "source_type": "user_explicit|user_inferred|ai_self|app|external",
-            "success_criteria": "array[string]?",
-            "title": "string"
-          },
           "kind": "write",
           "name": "propose_goal",
           "side_effecting": true
         },
         {
-          "description": "Read current evidence-grounded AI cognition across user understanding, relationship, self, intent, strategy, boundary, personality and calibration.",
-          "hard_boundary": false,
-          "input_schema": {
-            "domains": "array[string]?",
-            "limit": "integer?",
-            "scope_key": "string?"
-          },
           "kind": "read",
           "name": "read_ai_world",
           "side_effecting": false
         },
         {
-          "description": "Read current versioned R6 policy records from the unified world.",
-          "hard_boundary": false,
-          "input_schema": {
-            "policy_id": "string?"
-          },
           "kind": "read",
           "name": "read_cognitive_policies",
           "side_effecting": false
         },
         {
-          "description": "Read current Goals, Tasks and proposed/executed Actions from the unified world. This is a read-only planning view.",
-          "hard_boundary": false,
-          "input_schema": {},
           "kind": "read",
           "name": "read_execution_world",
           "side_effecting": false
         },
         {
-          "description": "Read a bounded page of the evidence anchors selected for the currently active periodic review. Available only during review.",
-          "hard_boundary": false,
-          "input_schema": {
-            "limit": "integer?",
-            "offset": "integer?"
-          },
           "kind": "read",
           "name": "read_periodic_review_anchors",
           "side_effecting": false
         },
         {
-          "description": "Record what communication style was used and the real user/world reaction. This records evidence only and does not choose a future style.",
-          "hard_boundary": false,
-          "input_schema": {
-            "action_ref": "{object_id:string,revision:integer}?",
-            "applicable_conditions": "object?",
-            "counterexample_refs": "array[{object_id:string,revision:integer}]?",
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "scenario": "string",
-            "style": "string",
-            "tone": "string?",
-            "user_reaction": "accepted|resisted|ignored|unknown"
-          },
           "kind": "write",
           "name": "record_communication_experience",
           "side_effecting": true
         },
         {
-          "description": "Observe several parallel dimensions in one time window without turning co-occurrence into a causal conclusion.",
-          "hard_boundary": false,
-          "input_schema": {
-            "dimensions": "array[string]",
-            "query": "string?",
-            "window_end": "ISO-8601 datetime",
-            "window_start": "ISO-8601 datetime"
-          },
           "kind": "read",
           "name": "request_all_dimensions_projection",
           "side_effecting": false
         },
         {
-          "description": "Retract the current Claim using pinned contrary/correcting evidence and propagate review-required state to dependents.",
-          "hard_boundary": false,
-          "input_schema": {
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "reason": "string",
-            "target_ref": "{object_id:string,revision:integer}"
-          },
           "kind": "write",
           "name": "retract_claim",
           "side_effecting": true
         },
         {
-          "description": "Retrieve an exact Observation fact by id/revision for evidence drill-down.",
-          "hard_boundary": false,
-          "input_schema": {
-            "object_id": "string",
-            "revision": "integer?"
-          },
           "kind": "read",
           "name": "retrieve_original_observation",
           "side_effecting": false
         },
         {
-          "description": "Create a forward-only new revision of the current Claim and mark dependent cognition review-required.",
-          "hard_boundary": false,
-          "input_schema": {
-            "confidence": "number[0,1]?",
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "reason": "string",
-            "replacement_content": "string",
-            "target_ref": "{object_id:string,revision:integer}"
-          },
           "kind": "write",
           "name": "revise_claim",
           "side_effecting": true
         },
         {
-          "description": "Append a new revision of the current Entity identity anchor using pinned evidence.",
-          "hard_boundary": false,
-          "input_schema": {
-            "aliases": "array[string]?",
-            "canonical_name": "string?",
-            "entity_ref": "{object_id:string,revision:integer}",
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "identity_claim_refs": "array[{object_id:string,revision:integer}]?",
-            "reason": "string"
-          },
           "kind": "write",
           "name": "revise_entity",
           "side_effecting": true
         },
         {
-          "description": "Forward-append a rollback to an earlier policy version using pinned evidence.",
-          "hard_boundary": false,
-          "input_schema": {
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "policy_id": "string",
-            "reason": "string",
-            "target_version": "integer"
-          },
           "kind": "write",
           "name": "rollback_cognitive_policy",
           "side_effecting": true
         },
         {
-          "description": "Search same-session round-summary indexes by topic/text, then drill down to exact pinned raw dialogue when precision is needed.",
-          "hard_boundary": false,
-          "input_schema": {
-            "limit": "integer?",
-            "query": "string",
-            "session_id": "string?"
-          },
           "kind": "read",
           "name": "search_conversation_summaries",
           "side_effecting": false
         },
         {
-          "description": "Search the world inside an explicit time window, optionally bounded by dimension/type/query.",
-          "hard_boundary": false,
-          "input_schema": {
-            "dimension": "string?",
-            "limit": "integer?",
-            "object_types": "array[string]?",
-            "query": "string?",
-            "window_end": "ISO-8601 datetime",
-            "window_start": "ISO-8601 datetime"
-          },
           "kind": "read",
           "name": "search_timeline",
           "side_effecting": false
         },
         {
-          "description": "Recall candidate world objects related to a query.",
-          "hard_boundary": false,
-          "input_schema": {
-            "limit": "integer?",
-            "query": "string"
-          },
           "kind": "read",
           "name": "search_world",
           "side_effecting": false
         },
         {
-          "description": "Move the current dimension revision through a legal lifecycle transition using pinned evidence and an AI-supplied reason.",
-          "hard_boundary": false,
-          "input_schema": {
-            "dimension_ref": "{object_id:string,revision:integer}",
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "new_lifecycle": "candidate|trial|active|low_activity|dormant|merged|split|revised|rejected|reactivated|archived",
-            "reason": "string",
-            "related_dimension_refs": "array[{object_id:string,revision:integer}]?"
-          },
           "kind": "write",
           "name": "transition_dimension",
           "side_effecting": true
         },
         {
-          "description": "Forward-revise/resolve/reject/merge/split the current Event using pinned evidence.",
-          "hard_boundary": false,
-          "input_schema": {
-            "confidence": "number[0,1]?",
-            "event_ref": "{object_id:string,revision:integer}",
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "new_status": "candidate|active|resolved|revised|rejected|merged|split",
-            "reason": "string",
-            "related_event_refs": "array[{object_id:string,revision:integer}]?",
-            "replacement_interpretation": "string?",
-            "replacement_title": "string?"
-          },
           "kind": "write",
           "name": "transition_event",
           "side_effecting": true
         },
         {
-          "description": "Move the current Goal revision through a legal evidence-backed state transition.",
-          "hard_boundary": false,
-          "input_schema": {
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "goal_ref": "{object_id:string,revision:integer}",
-            "new_status": "proposed|active|paused|achieved|abandoned|unknown",
-            "reason": "string"
-          },
           "kind": "write",
           "name": "transition_goal",
           "side_effecting": true
         },
         {
-          "description": "Move the current Task revision through a legal state transition. COMPLETED/FAILED requires real Outcome refs.",
-          "hard_boundary": false,
-          "input_schema": {
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "execution_refs": "array[{object_id:string,revision:integer}]?",
-            "new_state": "string",
-            "next_step": "string?",
-            "next_wake_at": "ISO-8601 datetime?",
-            "outcome_refs": "array[{object_id:string,revision:integer}]?",
-            "reason": "string",
-            "task_ref": "{object_id:string,revision:integer}"
-          },
           "kind": "write",
           "name": "transition_task",
           "side_effecting": true
         },
         {
-          "description": "Append an evidence-grounded value revision to an already-registered AI-mutable cognitive policy. Cannot create or loosen hard boundaries.",
-          "hard_boundary": false,
-          "input_schema": {
-            "current_value": "json value",
-            "evaluation_window": "string?",
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "policy_id": "string",
-            "reason": "string"
-          },
           "kind": "write",
           "name": "update_cognitive_policy",
           "side_effecting": true
         },
         {
-          "description": "Create or forward-revise an evidence-grounded Relation between current Entity revisions.",
-          "hard_boundary": false,
-          "input_schema": {
-            "confidence": "number[0,1]",
-            "evidence_refs": "array[{object_id:string,revision:integer}]",
-            "left_ref": "{object_id:string,revision:integer}",
-            "reason": "string",
-            "relation_type": "string",
-            "right_ref": "{object_id:string,revision:integer}",
-            "valid_time": "TemporalExtent object?"
-          },
           "kind": "write",
           "name": "upsert_relation",
           "side_effecting": true
         }
       ],
       "conversation_summaries": [],
-      "current_topic": null,
-      "estimated_tokens": 4786,
-      "memory_cards": [],
+      "current_topic": "这次面粉1.41就继续跟North Mill走吧。和1.42差这一点我不想来回折腾供应商，我现在更想把出品稳定下来。",
+      "estimated_tokens": 2010,
+      "memory_cards": [
+        {
+          "dimension": "dim:ai_user_understanding",
+          "excerpt": "用户在业务结论上的证据门槛很高：单日数据只算当日事实，不能直接推出趋势、原因或好坏。这个要求出现在三个不同场景——1/15 消防通道照片判读（两袋面粉不等于通道不合格）、1/11-1/17 North Mill 报价从“贵不少”的印象回到 1.38/1.42 的实际数字、1/19 明确要求不要因为某一天的销售数字就直接下结论。",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "clm_59f65954ee744b1fd64c9e7e",
+          "object_type": "claim",
+          "retrieval_score": 6,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:purchase_order",
+          "excerpt": "2027-01-11 的采购订单记录：North Mill 对 180 kg bread flour 给出 quoted 状态报价，单价为 1.42 USD/kg。该记录只描述本次供应商报价，不包含历史价格比较，也不能单独证明价格上涨。",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "sum_c55c3bfa1d6d12832db224fe",
+          "object_type": "summary",
+          "retrieval_score": 6,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:ai_user_understanding",
+          "excerpt": "2027-01-19，ai_user_understanding 维度写入一条新认知（clm_59f65954ee744b1fd64c9e7e，置信度 0.65，knowledge_state=inferred）：用户在业务结论上要求足够的证据跨度——单日数据只算当日事实，不能直接推出趋势、原因或好坏。触发证据是当天 08:15 用户明确说“不要因为某一天的销售数字就直接下结论”；同一证据集还包含",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "sum_9d8a76779e0644e8438c4dfd",
+          "object_type": "summary",
+          "retrieval_score": 5,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:user_ai_interaction",
+          "excerpt": "这两天开店比我想的忙。我现在最想先把早高峰出品稳定住，不急着扩菜单。之前想过做很多新品，现在先放一放。",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "obs_conv_user_abc43111f1a6bae550d02ee1",
+          "object_type": "observation",
+          "retrieval_score": 5,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:pos_daily",
+          "excerpt": "2027-01-19，bakery POS 日记录：gross_sales 1297.6 USD，orders 97，refunds 1。该单日记录只描述当天经营事实，不据此推断趋势、原因或早高峰出品稳定性。",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "sum_857a1a47de99eafe1fa7db89",
+          "object_type": "summary",
+          "retrieval_score": 4,
+          "revision": 1
+        }
+      ],
       "recent_turns": [],
       "task_context": {
         "cognitive_policy_context": {
@@ -1162,32 +1035,61 @@
               "version": 1
             }
           ],
+          "communication.detail_level": null,
           "communication.evidence_before_adverse_conclusion": "require_specific_evidence_before_problem_or_trait_label",
           "communication.proactive_interruption_threshold": "only_when_opening_procurement_or_important_family_arrangement_is_materially_affected",
-          "communication.uncertain_schedule_conflict_escalation": "require_concrete_timing_evidence_before_framing_as_conflict"
+          "communication.uncertain_schedule_conflict_escalation": "require_concrete_timing_evidence_before_framing_as_conflict",
+          "memory.recommendation_limit": 5
         },
-        "periodic_review": {
-          "anchor_count": 1,
-          "anchor_reader": "read_periodic_review_anchors",
-          "instruction": "Review the supplied world anchors and decide whether any previous AI understanding, strategy, calibration, self-understanding, goal handling, operation method, or due CognitivePolicy should be revised, confirmed, or rolled back. Use existing search/inspect tools when needed. Do not invent user growth, causal meaning, success, failure, or policy changes that are not supported by world evidence.",
-          "review_id": "wake_review_b3c6b6cf9cc2ca4df59727fe",
-          "wake_ref": {
-            "object_id": "wake_review_b3c6b6cf9cc2ca4df59727fe",
+        "conversation_continuity": {
+          "pending_round_summary": null,
+          "raw_drill_down_capability": "drill_down_conversation",
+          "recent_turn_count": 0,
+          "round_summary_count": 0,
+          "session_id": "jan22-evening",
+          "summary_index_capability": "list_conversation_summaries",
+          "summary_search_capability": "search_conversation_summaries"
+        },
+        "current_user_observation_ref": {
+          "object_id": "obs_conv_user_54903466038169effa3b1926",
+          "revision": 1
+        },
+        "related_execution_anchors": [
+          {
+            "dimension": "dim_unclassified",
+            "excerpt": "先稳定早高峰出品\n用户明确表示开店比预期更忙，当前优先把早高峰出品稳定住；此前考虑的菜单新品扩张暂时放后。",
+            "object_id": "goal_c909920b70a6835d5a42833e",
+            "object_type": "goal",
+            "retrieval_score": 3,
             "revision": 2
           },
-          "window_end": "2027-01-20T08:15:00+00:00",
-          "window_start": "2027-01-19T08:15:00+00:00"
+          {
+            "dimension": "dim_unclassified",
+            "excerpt": "观察早高峰出品卡点\n按日收集早高峰的实际记录（出餐等待、返工、缺货），只保留当日事实；1/26 汇总一次，只有出现跨多日的同类现象才提出调整建议。",
+            "object_id": "task_4ab2a4531967655198502158",
+            "object_type": "task",
+            "retrieval_score": 2,
+            "revision": 3
+          }
+        ],
+        "topic_state": {
+          "antecedent_recall_needed": true,
+          "continued_from_recent_turn": false,
+          "gate_open": true,
+          "history_may_help": true,
+          "reason": "current_utterance_topic:antecedent_candidate_recall:indexed_current_world_anchor",
+          "topic": "这次面粉1.41就继续跟North Mill走吧。和1.42差这一点我不想来回折腾供应商，我现在更想把出品稳定下来。"
         }
       },
       "token_budget": 3400,
-      "truncated": true,
-      "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged."
+      "truncated": false,
+      "user_input": "这次面粉1.41就继续跟North Mill走吧。和1.42差这一点我不想来回折腾供应商，我现在更想把出品稳定下来。"
     },
-    "remaining_tool_rounds": 7,
-    "round_index": 1,
-    "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged.",
-    "wake_reason": "periodic_review"
+    "remaining_tool_rounds": 6,
+    "round_index": 2,
+    "user_input": "这次面粉1.41就继续跟North Mill走吧。和1.42差这一点我不想来回折腾供应商，我现在更想把出品稳定下来。",
+    "wake_reason": "user_interaction"
   },
-  "world_revision_before": 155,
+  "world_revision_before": 186,
   "_kind": "resident"
 }
