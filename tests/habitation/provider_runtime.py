@@ -346,7 +346,12 @@ def _non_negative_int(value: object) -> int | None:
     return value
 
 
-def _model_usage(provider: str, response: Mapping[str, Any]) -> ModelUsage | None:
+def _model_usage(
+    provider: str,
+    response: Mapping[str, Any],
+    *,
+    model: str,
+) -> ModelUsage | None:
     """Normalize only exact provider-reported token usage.
 
     Unknown or incomplete shapes return None rather than estimating tokens.
@@ -366,10 +371,18 @@ def _model_usage(provider: str, response: Mapping[str, Any]) -> ModelUsage | Non
             total_tokens = input_tokens + output_tokens
         if total_tokens is None:
             return None
+        request_id = response.get("id")
         return ModelUsage(
             total_tokens=total_tokens,
             input_tokens=input_tokens,
             output_tokens=output_tokens,
+            provider=provider,
+            model=model,
+            request_id=(
+                request_id
+                if isinstance(request_id, str) and request_id.strip()
+                else None
+            ),
         )
 
     if provider == "anthropic":
@@ -380,10 +393,18 @@ def _model_usage(provider: str, response: Mapping[str, Any]) -> ModelUsage | Non
         if base_input is None or output_tokens is None:
             return None
         input_tokens = base_input + (cache_create or 0) + (cache_read or 0)
+        request_id = response.get("id")
         return ModelUsage(
             total_tokens=input_tokens + output_tokens,
             input_tokens=input_tokens,
             output_tokens=output_tokens,
+            provider=provider,
+            model=model,
+            request_id=(
+                request_id
+                if isinstance(request_id, str) and request_id.strip()
+                else None
+            ),
         )
 
     if provider == "gemini":
@@ -401,10 +422,18 @@ def _model_usage(provider: str, response: Mapping[str, Any]) -> ModelUsage | Non
 
         if total_tokens is None:
             return None
+        request_id = response.get("id")
         return ModelUsage(
             total_tokens=total_tokens,
             input_tokens=input_tokens,
             output_tokens=output_tokens,
+            provider=provider,
+            model=model,
+            request_id=(
+                request_id
+                if isinstance(request_id, str) and request_id.strip()
+                else None
+            ),
         )
 
     return None
@@ -835,7 +864,11 @@ class ProviderResidentHandler:
             body["input"] = input_items
 
         response = self.client.request(body, purpose="resident")
-        usage = _model_usage("openai", response)
+        usage = _model_usage(
+            "openai",
+            response,
+            model=self.client.config.model,
+        )
         response_id = response.get("id")
         if not isinstance(response_id, str) or not response_id.strip():
             raise ProviderProtocolError("OpenAI response missing id")
@@ -917,7 +950,11 @@ class ProviderResidentHandler:
             body["temperature"] = self.client.config.temperature
 
         response = self.client.request(body, purpose="resident")
-        usage = _model_usage("anthropic", response)
+        usage = _model_usage(
+            "anthropic",
+            response,
+            model=self.client.config.model,
+        )
         response_id = response.get("id")
         if not isinstance(response_id, str) or not response_id.strip():
             raise ProviderProtocolError("Anthropic response missing id")
@@ -996,7 +1033,11 @@ class ProviderResidentHandler:
             body["input"] = result_steps
 
         response = self.client.request(body, purpose="resident")
-        usage = _model_usage("gemini", response)
+        usage = _model_usage(
+            "gemini",
+            response,
+            model=self.client.config.model,
+        )
         response_id = response.get("id")
         if not isinstance(response_id, str) or not response_id.strip():
             raise ProviderProtocolError("Gemini interaction response missing id")
