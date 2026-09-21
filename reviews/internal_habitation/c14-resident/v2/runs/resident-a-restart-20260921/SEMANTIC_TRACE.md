@@ -63,3 +63,22 @@ writing occurred (this is the mechanical scheduler's own outcome, not a Resident
 **Resulting state**
 - world_revision 5, index watermark 5, pending wakes 0, durable cognition unchanged (0 Claims)
 - release state: `last_acked_sequence=2`, `next_sequence=3`, phase A
+
+---
+
+## Cursor 3 — `c14resv2-003` — 2026-10-01T10:22:00-07:00 (dim:device_activity)
+
+**Released**
+- dimension `dim:device_activity`, source_kind `device`, source_class `PLATFORM`, modality `structured_text`
+- payload: "08:02–10:18 开启专注模式；期间主动解锁 3 次，26 条通知被静音。"
+
+**Mechanical chain**
+- reveal → `receipts/reveal/cursor-003.json`
+- ingest → `obs_c14_fixture_7422eaba53dc07eb87572e67@1` (world_revision 6)
+- reality→watch hook: no watch matches
+- ack → `receipts/ack/cursor-003.json`, `next_sequence=4`
+
+**Due work at T = 2026-10-01T10:22:00-07:00**: none (day window open; no C14 opportunity;
+Periodic Review interval not reached). No model invocation, no semantic write.
+
+**Resulting state**: world_revision 6, index watermark 6, pending wakes 0, durable cognition unchanged.
