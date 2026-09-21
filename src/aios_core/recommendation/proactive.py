@@ -38,7 +38,7 @@ class RecommendationBundle(BaseModel):
 
 
 class ProactiveMemoryRecommender:
-    """Prepare a small historical memory bundle before model inference."""
+    """Prepare historical memory cards without treating assistant raw prose as user fact."""
 
     def __init__(
         self,
