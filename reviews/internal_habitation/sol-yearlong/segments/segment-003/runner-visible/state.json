@@ -1,20 +1,20 @@
 {
   "branch": "arena/01a0bf95-haneof-aios-core-v3-0",
   "export_rule": "Only first missing semantic request; no hidden fixture copied.",
-  "head_sha": "ed4716a774594ec2552fbd111a3d5ac94b545c71",
+  "head_sha": "ca31801ecbb4ee01b3849342b48992a486cced20",
   "pending_blocks_printed": 1,
-  "run_id": 35555864061,
+  "run_id": 35555904686,
   "runner_attestation": {
     "current_state": {
-      "delivered_external_events": 8,
-      "index_watermark": 167,
-      "last_consumed_external_event_id": "d034-staff-note",
-      "resident_replayed_calls": 13,
-      "simulated_clock": "2027-01-21T08:15:00+00:00",
+      "delivered_external_events": 9,
+      "index_watermark": 170,
+      "last_consumed_external_event_id": "d035-pos",
+      "resident_replayed_calls": 14,
+      "simulated_clock": "2027-01-21T21:10:00+00:00",
       "status": "pending",
       "summary_replayed_calls": 5,
-      "world_revision": 167,
-      "world_sha256": "a96b5d382c42a2b784cb608677d9f84379ef849f1795d98361458e06347e68a6"
+      "world_revision": 170,
+      "world_sha256": "a4d7577190915641a0bc47639376f9d31bd965def5959b38ffd1c8495ad667d2"
     },
     "expected_source_revision": 145,
     "expected_subject": "sol-resident-20260921-001",
@@ -30,14 +30,14 @@
     "source_world_sha256": "ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8"
   },
   "state": {
-    "delivered_external_events": 8,
-    "index_watermark": 167,
-    "last_consumed_external_event_id": "d034-staff-note",
-    "resident_replayed_calls": 13,
-    "simulated_clock": "2027-01-21T08:15:00+00:00",
+    "delivered_external_events": 9,
+    "index_watermark": 170,
+    "last_consumed_external_event_id": "d035-pos",
+    "resident_replayed_calls": 14,
+    "simulated_clock": "2027-01-21T21:10:00+00:00",
     "status": "pending",
     "summary_replayed_calls": 5,
-    "world_revision": 167,
-    "world_sha256": "a96b5d382c42a2b784cb608677d9f84379ef849f1795d98361458e06347e68a6"
+    "world_revision": 170,
+    "world_sha256": "a4d7577190915641a0bc47639376f9d31bd965def5959b38ffd1c8495ad667d2"
   }
 }
