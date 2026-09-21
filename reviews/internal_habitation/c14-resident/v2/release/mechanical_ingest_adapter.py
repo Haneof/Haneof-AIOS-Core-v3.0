@@ -11,10 +11,16 @@ from typing import Any
 
 RELEASE_DIR = Path(__file__).resolve().parent
 V2_ROOT = RELEASE_DIR.parent
-REPO_ROOT = Path(__file__).resolve().parents[5]
-SRC_DIR = REPO_ROOT / "src"
-if SRC_DIR.is_dir():
-    sys.path.insert(0, str(SRC_DIR))
+def _bootstrap_repo_src() -> None:
+    here = Path(__file__).resolve()
+    for parent in here.parents:
+        candidate = parent / "src"
+        if (candidate / "aios_core").is_dir():
+            sys.path.insert(0, str(candidate))
+            return
+
+
+_bootstrap_repo_src()
 
 from aios_core.contracts.enums import ErrorCode, SourceClass
 from aios_core.contracts.models import Observation
