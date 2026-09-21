@@ -1,0 +1,43 @@
+name: tmp-extract-world
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "arena/sol-yearlong-resident-20260921"
+    paths:
+      - ".github/workflows/tmp-extract-world.yml"
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/sol-yearlong-resident-20260921
+      - name: Download frozen Segment 002 World
+        uses: actions/download-artifact@v4
+        with:
+          name: sol-segment-002-35535082511
+          path: artifacts/source-segment-002
+          github-token: ${{ github.token }}
+          repository: Haneof/Haneof-AIOS-Core-v3.0
+          run-id: 35535082511
+      - name: Copy world to repo
+        run: |
+          set -e
+          WORLD=$(find artifacts/source-segment-002 -type f -name world.sqlite -print -quit)
+          echo "Found $WORLD"
+          ls -lh $WORLD
+          sha256sum $WORLD
+          cp $WORLD ./world-145.sqlite
+          ls -lh ./world-145.sqlite
+      - name: Commit world file
+        run: |
+          set -e
+          git config user.name "arena-bot"
+          git config user.email "arena-bot@example.com"
+          git add world-145.sqlite
+          git commit -m "tmp: add world-145.sqlite for local reconstruction" || echo "no changes"
+          git push origin arena/sol-yearlong-resident-20260921
