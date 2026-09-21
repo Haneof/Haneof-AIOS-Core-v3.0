@@ -1,10 +1,16 @@
 # C14-RES-FIX-001 Completion Evidence
 
+> Status: **DONE / MERGED**  
 > Date: 2026-09-21  
 > Task: `C14-RES-FIX-001`  
 > Role: Life Director / Sealed Fixture Designer  
 > Started from main: `01ad300bfd8a102e8b2fd5fc9bfbfb6fd5e4ff29`  
-> Work branch: `c14/res-fixture-20260921-sol`
+> Work branch: `c14/res-fixture-20260921-sol`  
+> Candidate: `e174a016c25d34c05ef096129d1c537ca5b19de8`  
+> PR: #68  
+> Squash merge: `796d9c357bb08f3042f103bc66260fdb3cdcd88c`  
+> Task-board closure: `1329cd31455d6f8c9b51ad7638ceeddda4b8a1cd`  
+> Checkpoint closure: `f9add49378d1365ed20b5322541fa9a538e3616b`
 
 ## Scope
 
