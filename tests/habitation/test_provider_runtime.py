@@ -174,6 +174,8 @@ def test_openai_responses_tool_loop_and_provenance() -> None:
     first = handler(_snapshot(0))
     assert len(first.capability_calls) == 1
     assert first.capability_calls[0].call_id == "call_1"
+    assert first.usage is not None
+    assert first.usage.total_tokens == 28
     assert first.capability_calls[0].arguments["query"] == "Seattle"
 
     result = CapabilityResult(
@@ -184,6 +186,8 @@ def test_openai_responses_tool_loop_and_provenance() -> None:
     )
     second = handler(_snapshot(1, (result,)))
     assert second.response == "You mentioned Seattle."
+    assert second.usage is not None
+    assert second.usage.total_tokens == 15
 
     assert transport.calls[0]["payload"]["tools"][0]["name"] == "search_world"
     continuation = transport.calls[1]["payload"]
@@ -234,6 +238,8 @@ def test_anthropic_messages_tool_loop_round_trips_tool_result() -> None:
 
     first = handler(_snapshot(0))
     assert first.capability_calls[0].call_id == "toolu_1"
+    assert first.usage is not None
+    assert first.usage.total_tokens == 21
 
     result = CapabilityResult(
         name="search_world",
@@ -243,6 +249,8 @@ def test_anthropic_messages_tool_loop_round_trips_tool_result() -> None:
     )
     second = handler(_snapshot(1, (result,)))
     assert second.response == "Claude continued from the world."
+    assert second.usage is not None
+    assert second.usage.total_tokens == 16
 
     second_request = transport.calls[1]["payload"]
     assert second_request["messages"][-2]["role"] == "assistant"
@@ -266,13 +274,13 @@ def test_gemini_interactions_tool_loop_uses_previous_interaction() -> None:
                         "arguments": {"query": "Seattle"},
                     }
                 ],
-                "usage_metadata": {"prompt_token_count": 12},
+                "usage_metadata": {"prompt_token_count": 12, "total_token_count": 12},
             },
             {
                 "id": "interaction_2",
                 "steps": [],
                 "output_text": "Gemini continued from the world.",
-                "usage_metadata": {"output_token_count": 6},
+                "usage_metadata": {"candidates_token_count": 6, "total_token_count": 6},
             },
         ]
     )
@@ -285,6 +293,8 @@ def test_gemini_interactions_tool_loop_uses_previous_interaction() -> None:
 
     first = handler(_snapshot(0))
     assert first.capability_calls[0].call_id == "fc_1"
+    assert first.usage is not None
+    assert first.usage.total_tokens == 12
 
     result = CapabilityResult(
         name="search_world",
@@ -294,6 +304,8 @@ def test_gemini_interactions_tool_loop_uses_previous_interaction() -> None:
     )
     second = handler(_snapshot(1, (result,)))
     assert second.response == "Gemini continued from the world."
+    assert second.usage is not None
+    assert second.usage.total_tokens == 6
 
     continuation = transport.calls[1]["payload"]
     assert continuation["previous_interaction_id"] == "interaction_1"
@@ -435,3 +447,28 @@ def test_provider_protocol_rejects_missing_call_id_on_continuation() -> None:
                 ),
             )
         )
+
+
+
+def test_gemini_without_total_token_count_does_not_guess_usage() -> None:
+    transport = FakeTransport(
+        [
+            {
+                "id": "interaction_no_total",
+                "steps": [],
+                "output_text": "done",
+                "usage_metadata": {
+                    "prompt_token_count": 12,
+                    "candidates_token_count": 3,
+                },
+            }
+        ]
+    )
+    client = ProviderClient(
+        ProviderConfig(provider="gemini", model="test-gemini"),
+        transport=transport,
+        api_key="secret-gemini-test-key",
+    )
+    directive = ProviderResidentHandler(client)(_snapshot(0))
+    assert directive.response == "done"
+    assert directive.usage is None
