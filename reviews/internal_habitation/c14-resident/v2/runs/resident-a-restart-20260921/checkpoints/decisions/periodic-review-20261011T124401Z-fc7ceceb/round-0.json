@@ -1,0 +1,6 @@
+{
+  "capability_calls": [
+    {"name": "read_periodic_review_anchors", "arguments": {"limit": 25}}
+  ],
+  "rationale": "读取本轮锚点（窗口含 10-08 摘要 bundle、Claim 创建与修订、10-09 摘要、10-11 睡眠），核对是否需要确认/修订既有认知。"
+}

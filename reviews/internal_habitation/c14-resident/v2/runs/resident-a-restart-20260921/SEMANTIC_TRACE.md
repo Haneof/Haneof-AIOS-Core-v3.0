@@ -280,3 +280,23 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
 - 决策文件：`checkpoints/decisions/wake-cognitive_derivation-wake_146f08e22bd4f1e6f33a3e12-rev1-23ec6958/round-{0,1,2}.json`。
 
 **Resulting state**: world_revision 82, index watermark 82, pending wakes 0, **Claims 1**（首条持久认知）, 24 条摘要。
+
+---
+
+## Cursor 14 — `c14resv2-014` — 2026-10-11T05:43:00-07:00 (dim:sleep)
+
+**Released**
+- dimension `dim:sleep`, source_kind `wearable`, source_class `SENSOR`, modality `structured_text`
+- payload: "昨晚 22:57 入睡；05:39 醒来。"（第 4 个睡眠样本；未给评分，入睡/醒来时间推得约 6h42m）
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-014.json`; ingest → `obs_c14_fixture_36306372faac84bd3a098bd6@1` (world_revision 83); watch hook: no match; ack → `receipts/ack/cursor-014.json`, `next_sequence=15`。
+
+**Due work at T = 2026-10-11T05:43:00-07:00**（`receipts/process-due-20261011T124300Z.json`；跨过 10-09/10-10 窗口）:
+- 我撰写并提交 2 条摘要：`sum_eb6c6e069e53ce16d9e3c4d4`（dim:conversation 10-09，源=10-08 用户自述）与 `sum_9e81acf33a4abc28c291e3af`（dim:work_outcome 10-09，**该窗口内只含我 10-09 写入的 Claim + 证据集**，故摘要明确标注为“AI 认知记录，非现实观测”）。
+- C14 bundle `wake_7198b085c5bc20fcee8fd8de`（2 成员：上述两条；work_outcome 成员 lineage=MIXED/has_ai=true，conversation 成员=REALITY）：
+  - round 0（我的决定，说明写入路径曾有误：先落到字面 `-rev1-*` 目录，已移正）：**revise_claim** → `clm_79df61916b8bb4c10cb3faa3` **rev 2**，新证据集 `evs_revision_c35b94500be71d9af1b5a6d0`（10 条观测：原 9 条 + 10-09 会话 `obs_c14_fixture_f3557413048807b17b9487bc`）；内容补入“10-08 困倦仍按计划交付 → 精力/疲劳非主要区分因素”；confidence 仍 0.5；修订触发 `stale_refs=[sum_9e81acf33a4abc28c291e3af@1]`（依赖该 Claim 的 10-09 摘要被标记 review-required，属预期，后续循环会重算）。
+  - round 1：**silence**（后台 wake）。
+- Periodic Review `wake_review_69a94d15d95cea86c74a93e1`（窗口 10-08T13:53Z→10-11T12:44Z，14 anchors）：round 0 读取锚点；round 1 **silence** — 既有 1 条 Claim 无新现实证据需修订（窗口内新增现实观测仅 10-11 睡眠），不无谓改版；睡眠第 4 样本继续发散（7h44/84、7h39/82、5h48/60、~6h42）；无方法—结果对应的操作经验。
+- 决策文件：`checkpoints/decisions/wake-cognitive_derivation-wake_7198b085c5bc20fcee8fd8de-rev1-3b442dee/round-{0,1}.json`、`checkpoints/decisions/periodic-review-20261011T124401Z-fc7ceceb/round-{0,1}.json`。
+
+**Resulting state**: world_revision 94, index watermark 94, pending wakes 0, Claims 1（rev 2）, 26 条摘要, operation experiences 0。
