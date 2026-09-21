@@ -329,8 +329,8 @@ def test_usage_recorder_runs_before_capability_execution():
     result = CognitiveRuntime(
         registry=registry,
         model_handler=model,
-        model_usage_recorder=lambda snapshot, usage: recorded.append(
-            (snapshot.round_index, usage)
+        model_usage_recorder=lambda snapshot, directive: recorded.append(
+            (snapshot.round_index, directive.usage)
         ),
     ).run_turn("continue")
 
