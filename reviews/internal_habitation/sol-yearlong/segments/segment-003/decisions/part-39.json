@@ -1,0 +1,31 @@
+{
+  "39b3809447d82480367b232541477423e4b3f5ee04a683209f861baaad2885fa": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "record_communication_experience",
+        "arguments": {
+          "scenario": "用户报告一个时间已确认、责任已分好的安排（例如 1/24 19:00 与妹妹吃饭、小赵负责晚间收尾）",
+          "style": "record_as_settled_and_stop_reminding",
+          "tone": "plain",
+          "user_reaction": "accepted",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_37068ea8651565e088f2d785",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_c7cceef8903fa9d2c58b9daa",
+              "revision": 1
+            }
+          ],
+          "applicable_conditions": {
+            "arrangement_state": "confirmed_by_user",
+            "avoid": "repeat_reminders_or_conflict_framing"
+          }
+        },
+        "call_id": "seg003-jan24-comm-experience"
+      }
+    ]
+  }
+}
