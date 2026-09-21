@@ -987,7 +987,6 @@ class GoalTaskActionService:
                 if (
                     action.task_ref is None
                     or action.task_ref.object_id != current.object_id
-                    or int(action.task_ref.revision or 0) != int(current.revision)
                 ):
                     continue
                 action_revision = int(action.revision) + 1
