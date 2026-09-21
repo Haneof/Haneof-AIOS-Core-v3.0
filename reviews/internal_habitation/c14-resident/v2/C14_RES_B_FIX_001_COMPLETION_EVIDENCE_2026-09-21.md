@@ -1,13 +1,16 @@
 # C14-RES-B-FIX-001 Completion Evidence
 
-> Status: **CANDIDATE COMPLETE / CANONICAL CONVERSATION RELEASE GATE PASS**  
+> Status: **DONE / MERGED / CANONICAL CONVERSATION RELEASE GATE PASS**  
 > Date: 2026-09-21  
 > Task: `C14-RES-B-FIX-001`  
 > Role: Release / Test Infrastructure Engineer; Sealed Resident Infrastructure Designer  
 > Started from main: `08ceb9ab3f68d5d3ececaaa26832912323d73851`  
 > Work branch: `c14/res-b-canonical-conversation-ingest-20260921-sol`  
+> Exact candidate: `cb3a417f3c29b29d6aa2bf364386aec12b17e623`  
 > PR: #78  
-> Pre-evidence GREEN head: `97353dc4e84f1713e14e50cfcd2db466b9a0a32c`
+> Squash merge: `1c7a8c1466911f8617ed39348a50ac8041f23715`  
+> Pre-evidence GREEN head: `97353dc4e84f1713e14e50cfcd2db466b9a0a32c`  
+> Exact-candidate GREEN run: `35631789929`
 
 ## 1. Scope
 
@@ -196,6 +199,10 @@ Formal Python:
 Pre-evidence GREEN run:
 
 `35631613259`
+
+Exact-candidate GREEN run:
+
+`35631789929`
 
 Results:
 
