@@ -1,72 +1,48 @@
 {
-  "decision_key": "a47bc876b701d88195e8380bc94f839c528ab619bba09213424ca257b4a8f0ba",
+  "decision_key": "1636a70564a273a4c2cf19de007473e9062533fe2eaf08c8448df09f3fe1adfe",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-summary.pending.v1",
   "simulated_clock": "2027-01-24T20:15:00+00:00",
   "summary_request": {
     "request": {
-      "dimension": "dim:purchase_order",
+      "dimension": "dim:staff_note",
       "granularity": "week",
-      "source_world_revision": 204,
+      "source_world_revision": 205,
       "sources": [
         {
           "metadata": {
-            "dimension": "dim:purchase_order",
+            "dimension": "dim:staff_note",
             "summary_kind": "single_dimension_temporal"
           },
-          "object_id": "sum_e05c5ff7571042be53082792",
+          "object_id": "sum_a7f5e2f18b9c8ebddcb9c6cd",
           "object_type": "summary",
-          "occurred_at": "2027-01-22T00:00:00Z",
+          "occurred_at": "2027-01-21T00:00:00Z",
           "revision": 1,
-          "text": "2027-01-22供应商门户有两条North Mill采购记录：11:00为180 kg bread flour报价，quoted_unit_price 1.41 USD，状态quoted；11:20记录相同供应商、品类和数量，unit_price 1.41 USD，状态confirmed，计划2027-01-25 04:30 UTC配送。确认订单与计划配送不等于货物已送达或已验收。"
+          "text": "2027-01-21小赵的员工记录：6:10—6:42醒发架满，两盘面团在推车上等空位，6:42后恢复周转。此为当日具体时段的记录，未给出两盘面团各自等候时长或对最终出品时间的影响，不能据此认定长期瓶颈。"
         },
         {
           "metadata": {
-            "adapter_id": "habitation.purchase_order.v1",
-            "dimension": "dim:purchase_order",
-            "external_record_id": "d037-supplier-quote",
+            "adapter_id": "habitation.staff_note.v1",
+            "dimension": "dim:staff_note",
+            "external_record_id": "d034-staff-note",
             "external_revision": "1",
             "mechanical_ingest": true,
-            "occurred_at_original": "2027-01-22T11:00:00+00:00",
+            "occurred_at_original": "2027-01-21T06:55:00+00:00",
             "provenance": {
               "habitation_resident_metadata": {
-                "source": "supplier_portal"
+                "source": "staff_notes"
               },
               "model_id_not_part_of_fact": true
             },
             "source_class": "user",
-            "source_digest": "02fa2e886d61c89d87a519aa36a83e04276acebd293ce4842a123f83ad241d96",
+            "source_digest": "fceb3f69e4af759ba89778ad275f393693825636b7c172b1e2f91b05e6ddb700",
             "source_schema_version": "1"
           },
-          "object_id": "obs_src_a46c3fac2a66319044463248",
+          "object_id": "obs_src_facf2b040e0feb3a89b935f2",
           "object_type": "observation",
-          "occurred_at": "2027-01-22T11:00:00Z",
+          "occurred_at": "2027-01-21T06:55:00Z",
           "revision": 1,
-          "text": "{\"currency\": \"USD\", \"item\": \"bread flour\", \"quantity_kg\": 180, \"quoted_unit_price\": 1.41, \"status\": \"quoted\", \"vendor\": \"North Mill\"}"
-        },
-        {
-          "metadata": {
-            "adapter_id": "habitation.purchase_order.v1",
-            "dimension": "dim:purchase_order",
-            "external_record_id": "d038-order-confirmed",
-            "external_revision": "1",
-            "mechanical_ingest": true,
-            "occurred_at_original": "2027-01-22T11:20:00+00:00",
-            "provenance": {
-              "habitation_resident_metadata": {
-                "source": "supplier_portal"
-              },
-              "model_id_not_part_of_fact": true
-            },
-            "source_class": "user",
-            "source_digest": "327eb2a21989bde1a4bf9f773bda3c848a21c5b1b82458f53b4407ad76de344f",
-            "source_schema_version": "1"
-          },
-          "object_id": "obs_src_6cc6f858c2e5e5c0cb05d1a8",
-          "object_type": "observation",
-          "occurred_at": "2027-01-22T11:20:00Z",
-          "revision": 1,
-          "text": "{\"currency\": \"USD\", \"item\": \"bread flour\", \"quantity_kg\": 180, \"scheduled_delivery\": \"2027-01-25T04:30:00+00:00\", \"status\": \"confirmed\", \"unit_price\": 1.41, \"vendor\": \"North Mill\"}"
+          "text": "小赵记录：06:10到06:42醒发架满，两盘面团在推车上等待空位；06:42后恢复周转。"
         }
       ],
       "truncated": false,
@@ -75,5 +51,5 @@
     },
     "summary_request_type": "DimensionSummaryInput"
   },
-  "world_revision_before": 204
+  "world_revision_before": 205
 }
