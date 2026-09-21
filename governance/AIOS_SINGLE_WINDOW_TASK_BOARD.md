@@ -63,7 +63,7 @@
 | 顺序 | Task ID | 单窗口任务 | 状态 | Dependencies | 当前现场 / 证据 | 完成定义 |
 |---:|---|---|---|---|---|---|
 | 1 | `C13-MTR-001` | 完成 C13 non-world Metering Ledger：模型返回后立即落 operations-side meter；token 真值不再依赖 Wake World metadata；crash 后计量不丢；Periodic Review 计费时间不倒带 | **DONE** | — | PR #47; final candidate `47ed2de25cdcb26c8c552a3db0640a59f9a15817`; squash merge `f9baacd5ac7be1646036a4e878934e77965c6640`; required Gates GREEN | 已从冻结 WIP 完成、自审、专项 Gate + P16 full regression GREEN、squash merge；完整证据见 §5 完成记录 |
-| 2 | `AUDIT-001` | 对 Issue #30 的 T34/T36/T28/T35/T33 与 PR #37 在**最新 main**逐项重新复核，只做裁决，不修代码 | **READY** | C13-MTR-001 | C13-MTR-001 DONE at merge `f9baacd5ac7be1646036a4e878934e77965c6640`; Issue #30 的证据基线早于当前 main | **下一新窗口**输出 current-main evidence matrix：每项 = STILL_OPEN / ALREADY_FIXED / NOT_REPRODUCED；写 exact main SHA；不得施工 |
+| 2 | `AUDIT-001` | 对 Issue #30 的 T34/T36/T28/T35/T33 与 PR #37 在**最新 main**逐项重新复核，只做裁决，不修代码 | **DONE** | C13-MTR-001 | `main@e9862103a753be026edf1745c6a5d07fa56c0cf4`; `reviews/AUDIT-001_ISSUE30_CURRENT_MAIN_EVIDENCE_MATRIX_2026-09-21.md` | 五项 current-main 裁决已落库；无 Core 修改 |
 | 3 | `T34-EXEC-001` | Action 授权前重新验证父 Task/撤销状态，关闭 cancel→authorize 竞态 | **WAITING_AUDIT** | AUDIT-001 | Issue #30 / #34 | 仅当 AUDIT-001=STILL_OPEN 激活；修复前复现 + 修复后回归 + execution/P12/P16 Gate GREEN |
 | 4 | `T36-SEARCH-001` | 结构化 Observation scalar 派生索引，不改原 typed fact，不做语义推断 | **WAITING_AUDIT** | AUDIT-001 | Issue #30 / #36 | 仅当 STILL_OPEN；dict/list/number/bool 可检索；rebuild=incremental；subject/current/stale 语义不退化 |
 | 5 | `T28-REC-001` | 普通推荐与 antecedent 路径统一隔离 assistant raw dialogue，避免把 AI 自己的话当用户事实主动推荐 | **WAITING_AUDIT** | AUDIT-001 | Issue #30 / #28 | 仅当 STILL_OPEN；continuity/raw drill-down 仍可访问；用户/外部 fact 与 evidence-grounded Claim 不误删 |
