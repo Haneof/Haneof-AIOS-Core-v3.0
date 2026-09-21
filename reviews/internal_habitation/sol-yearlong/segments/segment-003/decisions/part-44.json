@@ -1,0 +1,6 @@
+{
+  "384d90f5330725008f19e394c413c364cfd2f2c4941756ca27c322abaeb58b4f": {
+    "kind": "summary",
+    "summary": "2027-01-24，ai_communication_experience 维度新增一条沟通经验（commexp_2640ff465139d1b671699796，state=candidate）：当用户报告一个时间已确认、责任已分好的安排时，按已定事实记录并停止提醒，也不把它描述成仍在冲突；适用条件 arrangement_state=confirmed_by_user、avoid=repeat_reminders_or_conflict_framing。证据是 1/9 用户对“没有先断言冲突”的认可，和 1/23 用户“已经定了、不用再提醒、也别把它说成还在冲突”的明确要求。当天该维度没有其他新增或修订。"
+  }
+}
