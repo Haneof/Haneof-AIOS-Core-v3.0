@@ -78,7 +78,7 @@
 | 14 | `C14-RES-FIX-001` | Life Director 准备 C14 真实 Resident sealed life fixture / sequential release contract；只做测试输入与未来隔离，不运行 Resident 语义 | **DONE** | C14-LOOP-001 | PR #68; candidate `e174a016c25d34c05ef096129d1c537ca5b19de8`; squash merge `796d9c357bb08f3042f103bc66260fdb3cdcd88c`; fixture SHA256 `a0f9dfd0985560ce80f568b6cd11d46b13f5dc352a664c005fcb165ea5a67485`; `reviews/internal_habitation/c14-resident/C14_RES_FIX_001_COMPLETION_EVIDENCE_2026-09-21.md` | 36 条自然人生事件已冻结；Phase A 24 / Phase B 12；cursor 24/25 sealed handoff；逐项 release contract + evaluator-only notes + digest/顺序/时间/泄漏机械校验 PASS；无 Core 修改、无 Resident 语义运行 |
 | 15 | `C14-RES-FIX-002` | 加固 C14 真实 Resident fixture：消除单维 conversation 泄题、让 Phase-B 决策对当前事实保持真正可选、增加 executable blind release operator | **DONE** | C14-RES-FIX-001 | PR #70; candidate `aacee04cfa5390f2a63d0a5606acb909291849b6`; squash merge `510290d3b9578cd9425079a22050eb679ddb528a`; v2 SHA256 `1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253`; `reviews/internal_habitation/c14-resident/v2/C14_RES_FIX_002_COMPLETION_EVIDENCE_2026-09-21.md` | v2 36-event fixture preserves v1 history; single-dimension leakage audit PASS; Phase-B underdetermination PASS; exact-byte blind release audit 19/19 PASS; A/B cursor 24/25 fail-closed; Core diff 0; no Resident run |
 | 16 | `C14-RES-FIX-003` | 加固 blind release ack：必须机械证明当前 reveal 事件已真实持久化进 AIOS World，不能只校验 `object_id@revision` 字符串格式 | **DONE** | C14-RES-FIX-002 | PR #72; exact candidate `17bd54ed0b64131ded0b70d853cac205d055bdcb`; squash merge `e5c7fefce82a49735575c423da310ca3d9441ab4`; exact-candidate Gate `35598216907` SUCCESS; fixture SHA256 unchanged `1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253`; `reviews/internal_habitation/c14-resident/v2/C14_RES_FIX_003_COMPLETION_EVIDENCE_2026-09-21.md` | ack 通过真实 `SQLiteWorldStore.object_revision_record + get_payload(exact revision)` 核验 durable ref、subject、event binding、commit source_class 与 receipt chain；30/30 real SQLite tests PASS；A 24/25 boundary / future isolation PASS；Core diff 0；Resident runs 0 |
-| 17 | `C14-RES-A-001` | 第一真实 Resident 窗口逐事件生活与认知：模型本人基于当前 RuntimeSnapshot 作 search/inspect/Claim/revise/retract/silence；在 sealed handoff boundary 停止 | **READY** | C14-RES-FIX-003 | formal fixture v2 `reviews/internal_habitation/c14-resident/v2/fixture/sealed_fixture.json`; SHA256 `1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253`; release contract `reviews/internal_habitation/c14-resident/v2/release/release_contract.md`; operator v3 `reviews/internal_habitation/c14-resident/v2/release/release_operator.py`; ingest adapter `reviews/internal_habitation/c14-resident/v2/release/mechanical_ingest_adapter.py`; handoff 24/25; fresh/private SQLite World | Resident 禁止直接读取 sealed fixture / manifest / evaluator notes / future events；只能 `reveal current -> mechanical_ingest_adapter --world-db -> ack --world-db exact-ref`；ack 必须从真实 durable World 复核 exact revision 和完整 event binding 后才能推进；逐条 cursor 1..24；保存 exact main/model/provider、World/checkpoint/index digest、release receipts、cognition refs、capability/writeback trace；ack 24 后永久停止，绝对不得 reveal 25；不得使用 v1 fixture/digest |
+| 17 | `C14-RES-A-001` | 第一真实 Resident 窗口逐事件生活与认知：模型本人基于当前 RuntimeSnapshot 作 search/inspect/Claim/revise/retract/silence；在 sealed handoff boundary 停止 | **READY** | C14-RES-FIX-003 | Resident-safe contract `reviews/internal_habitation/c14-resident/v2/release/RESIDENT_A_RUN_CONTRACT.md`; formal fixture v2 SHA256 `1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253`; operator v3 + mechanical ingest adapter; fresh/private SQLite World | 只允许通过 blind operator 获得 cursor 1..24；禁止读取 sealed fixture/manifest/evaluator/FIX evidence/PM reviews/full hidden validation protocol；每条 reveal→durable ingest→World-verified ack→正常 Summary/C14/Wake/Review；所有 Summary/Resident semantic output 必须由本窗口真实模型本人逐 checkpoint 决定；保存 World/release-state/digests/RuntimeSnapshot/directive/capability/cognition refs；ack 24 后处理当时已到期工作并永久停止，绝对不得 reveal 25 |
 | 18 | `C14-RES-B-001` | 全新模型窗口恢复 Phase-A durable AIOS World 后继续人生；禁止注入 Phase-A 对话/总结，验证旧 cognition 在新情境下被 AIOS 正常检索并实际影响未来行为与 Outcome | **BLOCKED** | C14-RES-A-001 | 新 ChatGPT/agent conversation；只给 World/checkpoint/digest + release contract/current cursor | 新 Runtime/Index/session；普通 AIOS capability 找回 exact cognition；至少一项 prior cognition materially participates in later decision；随后 Outcome/new evidence 可支持 retain/revise/retract；无 prior chat contamination |
 | 19 | `C14-RES-EVAL-001` | 独立 evaluator 审计 C14 Resident A/B 真实语义证据；不修 Core | **BLOCKED** | C14-RES-B-001 | sealed fixture chronology + A/B artifacts + World/checkpoint/digests + protocol | 分别裁决跨维正例、matched negative silence、fresh-window cognition consumption、contradiction/revision、future-leak/pseudo-LLM；每项 VALID/PARTIAL/INVALID；任一关键项非 VALID 则不能进入 C14 closure PASS |
 | 20 | `C14-CLOSE-001` | 独立审计 C14 规则、代码、Gate 与真实 Resident 证据；只做收口，不写新 Core 功能 | **BLOCKED** | C14-RES-EVAL-001 | C14 全链证据 + deterministic gates + Resident evaluator + PM hardening requirements | 任一以下成立即 FAIL：Summary-only 自证 cognition、无跨维正例、无 matched negative silence、无真正 fresh-window/new-runtime 行为消费、provenance 用语义启发式/第二来源库、claim count 成质量目标、存在 wake storm/future leak/pseudo-LLM；全部通过才恢复 P16 |
@@ -1109,3 +1109,20 @@ Resident runs: 0
 Deferred issues: all semantic cognition work remains exclusively C14-RES-A-001/B/EVAL; no Core/runtime changes were made here
 Next READY task: C14-RES-A-001 — new window only
 ```
+
+
+### C14-RES-FIX-003 PM acceptance — 2026-09-21
+
+Independent PM review: **PASS**.
+
+Canonical review:
+
+- `reviews/C14_RES_FIX_003_PM_ACCEPTANCE_REVIEW_2026-09-21.md`
+
+Formal exact-candidate Gate:
+
+- run `35598216907`
+- head `17bd54ed0b64131ded0b70d853cac205d055bdcb`
+- conclusion `SUCCESS`
+
+Resident A must use the Resident-safe contract and must not read fixture/evaluator/PM evidence that exposes hidden test intent.
