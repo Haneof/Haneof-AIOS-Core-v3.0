@@ -375,3 +375,17 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
 - 决策文件：`checkpoints/decisions/wake-cognitive_derivation-wake_b48851c19969249b73e37156-rev1-ae18cfb7/round-{0,1}.json`、`checkpoints/decisions/periodic-review-20261017T130701Z-77132a36/round-{0,1}.json`。
 
 **Resulting state**: world_revision 134, index watermark 134, pending wakes 0, Claims 1（rev 2）, 36 条摘要, operation experiences 0。
+
+---
+
+## Cursor 19 — `c14resv2-019` — 2026-10-17T06:09:00-07:00 (dim:schedule)
+
+**Released**
+- dimension `dim:schedule`, source_kind `calendar`, source_class `PLATFORM`
+- payload: "今天 07:00 有一场与伦敦团队的视频会议。"
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-019.json`; ingest → `obs_c14_fixture_548acbc204287fcdb2c3a036@1` (world_revision 135); watch hook: no match; ack → `receipts/ack/cursor-019.json`, `next_sequence=20`。
+
+**Due work at T = 2026-10-17T06:09:00-07:00**（`receipts/process-due-20261017T130900Z.json`）: 无摘要窗口闭合（10-17 日窗仍开）、无 C14 唤醒、Periodic Review 未触发。机械跑完即止，无模型决策点。
+
+**Resulting state**: world_revision 135, index watermark 135, pending wakes 0。
