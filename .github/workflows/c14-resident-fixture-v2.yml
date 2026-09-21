@@ -1,4 +1,4 @@
-# C14-RES-FIX-002 mechanical gate
+# C14-RES-FIX-003 durable-ingest gate
 name: c14-resident-fixture-v2
 
 on:
@@ -12,19 +12,29 @@ permissions:
   contents: read
 
 jobs:
-  mechanical-fixture-gate:
+  durable-release-gate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Run blind release operator tests
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - name: Run World-verified blind release tests
         run: python -m unittest -v reviews/internal_habitation/c14-resident/v2/release/test_release_operator.py
+      - name: Prove frozen fixture SHA256
+        shell: bash
+        run: |
+          actual="sha256:$(sha256sum reviews/internal_habitation/c14-resident/v2/fixture/sealed_fixture.json | awk '{print $1}')"
+          expected="sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253"
+          test "$actual" = "$expected"
       - name: Confirm no Core changes in this task
         shell: bash
         run: |
           git fetch origin main --depth=1
           if git diff --name-only origin/main...HEAD | grep -q '^src/aios_core/'; then
-            echo "C14-RES-FIX-002 must not modify src/aios_core/**"
+            echo "C14-RES-FIX-003 must not modify src/aios_core/**"
             exit 1
           fi
