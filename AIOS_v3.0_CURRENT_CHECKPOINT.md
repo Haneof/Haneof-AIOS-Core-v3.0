@@ -14,6 +14,21 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
+## 当前工程断点 — C14-RES-EVAL-001 已完成
+
+- `C14-RES-EVAL-001 = DONE`
+- Evaluated main: `8e6f9febc5f006605116c526796fa21435b4b22e`
+- A evidence: PR #75 @ `cb9b56b7039272d932158f33bfe979eff6749c9b`
+- B evidence: PR #79 @ `546449a453e6e6dff3a2eeb2b52e7cf6786927be`
+- Report: `reviews/C14_RES_EVAL_001_INDEPENDENT_SEMANTIC_EVALUATION_2026-09-22.md`
+- Matrix: E1 **PARTIAL** / E2 **VALID** / E3 **VALID** / E4 **VALID** / E5 **INVALID** / E6 **VALID**.
+- Overall: `C14 RESIDENT SEMANTIC EVIDENCE = NOT VALID`.
+- Blocking findings: Phase-A Claim rev2 contains a material sleep fact not pinned by its EvidenceSet; Phase-B rev4 treats the Resident's earlier 09:00 designer plan as observed reality although the pinned later Observations do not prove that treatment and cursor30 records drafting already began at 08:05.
+- `C14-CLOSE-001` remains **BLOCKED**. C15 remains **BLOCKED**.
+- Next action: PM must choose fail-closure recording or a dedicated Resident/evidence-semantic repair task. This evaluator did not repair Core or evidence.
+
+
+
 ## 当前工程断点 — C14-RES-B-001 已完成，等待独立语义评估
 
 最近完成任务：`C14-RES-B-001` — **DONE / RUN COMPLETE / EVIDENCE ACCEPTED FOR EVALUATION**。
