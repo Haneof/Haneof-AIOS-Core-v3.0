@@ -1,5 +1,5 @@
 {
-  "decision_key": "261fa5a6feef720ab13738d4ae8c76d150b4dd33dc0627040c77873063fb9a57",
+  "decision_key": "81519c9ad2fd656943413d69b71d9baa09629845aa945a5a6ba38676fc59f841",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-resident.pending.v1",
   "simulated_clock": "2027-01-26T18:10:00+00:00",
@@ -540,7 +540,81 @@
         "side_effecting": true
       }
     ],
-    "capability_history": [],
+    "capability_history": [
+      {
+        "call_id": "seg003-feedback-date-evidence",
+        "data": [
+          {
+            "dimension": "dim:user_ai_interaction",
+            "excerpt": "是，先把它保留为1月26日一位顾客关于“8点左右牛角包还没出齐”的反馈，纳入现有早高峰观察。它提示我们核对今天相关批次的计划与实际出品时间，但没有说明具体等候环节；不能直接归到烤箱或醒发架，也不能据此说与1月20日是同一个原因。后续对上当天出品记录再判断。",
+            "object_id": "obs_conv_ai_bcd12dbeb8c1777a6dd48667",
+            "object_type": "observation",
+            "retrieval_score": 0,
+            "revision": 1
+          },
+          {
+            "dimension": "dim:user_ai_interaction",
+            "excerpt": "我刚看见那条反馈附的小票了，是1月24日的订单，不是今天。我之前顺着客人写的“今天”理解错日期了，按小票时间记。",
+            "object_id": "obs_conv_user_5b4f93997ce703139c198d76",
+            "object_type": "observation",
+            "retrieval_score": 0,
+            "revision": 1
+          },
+          {
+            "dimension": "dim:user_ai_interaction",
+            "excerpt": "刚收到一个客人说“今天八点左右牛角包还没出齐”。这听起来和我们正在看的早高峰有关，但先别因为一条反馈就认定原因。",
+            "object_id": "obs_conv_user_cff02b70d74b67a47d62aeec",
+            "object_type": "observation",
+            "retrieval_score": 0,
+            "revision": 1
+          },
+          {
+            "dimension": "dim:body_activity",
+            "excerpt": "",
+            "object_id": "obs_num_segment_434a1e266d9a8bb052381559",
+            "object_type": "observation",
+            "retrieval_score": 0,
+            "revision": 1
+          },
+          {
+            "dimension": "dim:pos_daily",
+            "excerpt": "",
+            "object_id": "obs_src_1ed1e4dd5570969912d66fcf",
+            "object_type": "observation",
+            "retrieval_score": 0,
+            "revision": 1
+          },
+          {
+            "dimension": "dim:order_record",
+            "excerpt": "",
+            "object_id": "obs_src_68577035417278e6a8241cd5",
+            "object_type": "observation",
+            "retrieval_score": 0,
+            "revision": 1
+          },
+          {
+            "dimension": "dim:delivery_receipt",
+            "excerpt": "",
+            "object_id": "obs_src_9475c3feb631894bf90a2ad6",
+            "object_type": "observation",
+            "retrieval_score": 0,
+            "revision": 1
+          },
+          {
+            "dimension": "dim:customer_feedback",
+            "excerpt": "",
+            "object_id": "obs_src_d34628f3afced9cf073f3009",
+            "object_type": "observation",
+            "retrieval_score": 0,
+            "revision": 1
+          }
+        ],
+        "error_code": null,
+        "error_message": null,
+        "name": "search_timeline",
+        "ok": true
+      }
+    ],
     "cockpit": {
       "ai_identity": {},
       "capability_catalog": [
@@ -892,8 +966,8 @@
       "truncated": false,
       "user_input": "我刚看见那条反馈附的小票了，是1月24日的订单，不是今天。我之前顺着客人写的“今天”理解错日期了，按小票时间记。"
     },
-    "remaining_tool_rounds": 8,
-    "round_index": 0,
+    "remaining_tool_rounds": 7,
+    "round_index": 1,
     "user_input": "我刚看见那条反馈附的小票了，是1月24日的订单，不是今天。我之前顺着客人写的“今天”理解错日期了，按小票时间记。",
     "wake_reason": "user_interaction"
   },
