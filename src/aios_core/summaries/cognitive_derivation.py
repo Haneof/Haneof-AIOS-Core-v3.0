@@ -626,7 +626,7 @@ class CognitiveDerivationScheduler:
                 metadata={
                     "trigger_kind": "dimension_summary_cognitive_derivation",
                     "summary_ref": summary_ref.model_dump(mode="json"),
-                    "dimension": dimension,
+                    "summary_dimension": dimension,
                     "granularity": summary.granularity,
                     "summary_window": summary.summary_time.model_dump(mode="json"),
                     "derived_lineage": lineage.audit_payload(),
