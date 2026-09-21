@@ -9,7 +9,7 @@ vertical slice stays green.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Callable, Mapping, Sequence
 
 from aios_core.ai_world import (
@@ -2642,7 +2642,23 @@ class FusedTurnRuntime:
             raise ValueError("wake_ref must point to a Wake object")
 
         initial_wake = self.wake_bus.current_wake(ref.object_id)
-        if initial_wake.wake_state.value in {"new", "queued"}:
+        bundle_excluded_sources = {
+            WakeSource.SAFETY,
+            WakeSource.PERIODIC_REVIEW,
+            WakeSource.USER_INTERACTION,
+            WakeSource.ATTENTION_BUNDLE,
+        }
+        initial_last_hit = initial_wake.last_hit_at
+        within_bundle_window = (
+            now - timedelta(seconds=60)
+            <= initial_last_hit
+            <= now
+        )
+        if (
+            initial_wake.wake_state.value in {"new", "queued"}
+            and initial_wake.wake_source not in bundle_excluded_sources
+            and within_bundle_window
+        ):
             bundle = self.attention_router.bundle_pending(
                 now=now,
                 window_seconds=60,
