@@ -199,9 +199,10 @@ jobs:
       - name: Publish pending checkpoint to the Arena session branch
         if: always()
         shell: bash
+        env:
+          RUN_DIR: reviews/internal_habitation/sol-yearlong/segments/segment-003/runner/${{ github.run_id }}
         run: |
           set -uo pipefail
-          RUN_DIR="reviews/internal_habitation/sol-yearlong/segments/segment-003/runner/${GITHUB_RUN_ID}"
           rm -rf /tmp/pub
           mkdir -p "/tmp/pub/${RUN_DIR}"
           for f in state.json snapshot.json stdout.txt sanitized.txt bridge-exit-code.txt world.sha256; do
@@ -232,7 +233,7 @@ jobs:
                   "the current pending RuntimeSnapshot/Summary request. No semantic decision is made here."
               ),
           }
-          out = Path("/tmp/pub") / os.environ["RUN_DIR"] / "meta.json"
+          out = Path("/tmp/pub") / os.environ.get("RUN_DIR", "") / "meta.json"
           out.parent.mkdir(parents=True, exist_ok=True)
           out.write_text(json.dumps(meta, ensure_ascii=False, sort_keys=True, indent=2) + "\n", encoding="utf-8")
           print(f"published_files={sorted(p.name for p in out.parent.iterdir())}")
