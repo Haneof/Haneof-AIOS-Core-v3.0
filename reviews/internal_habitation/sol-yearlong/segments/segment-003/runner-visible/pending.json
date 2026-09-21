@@ -1,8 +1,8 @@
 {
-  "decision_key": "208470a48f2d38622117f20baa48cd8c7a9ce8b89e2b0ff9075203055a941526",
+  "decision_key": "00b33f0299bae18ffd72e6a62390a5c8faf6ce0e6168a8aefcf36f886d06139c",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-resident.pending.v1",
-  "simulated_clock": "2027-01-25T08:15:00+00:00",
+  "simulated_clock": "2027-01-26T08:15:00+00:00",
   "snapshot": {
     "capability_catalog": [
       {
@@ -540,143 +540,7 @@
         "side_effecting": true
       }
     ],
-    "capability_history": [
-      {
-        "call_id": "seg003-jan25-review-anchors",
-        "data": [
-          {
-            "excerpt": "{'currency': 'USD', 'gross_sales': 1458.8, 'orders': 111, 'refunds': 1, 'store': 'bakery'}",
-            "object_ref": {
-              "object_id": "obs_src_1ed1e4dd5570969912d66fcf",
-              "revision": 1
-            },
-            "object_type": "observation",
-            "recorded_at": "2027-01-24T20:15:00Z"
-          },
-          {
-            "excerpt": "2027-01-23的排班记录显示：小赵2027-01-24班次为12:30—21:00，备注已确认负责晚间收尾。该记录确认职责安排，不代表该班次或收尾工作已实际完成。",
-            "object_ref": {
-              "object_id": "sum_2699cc4606d12dfb79f7e4dd",
-              "revision": 1
-            },
-            "object_type": "summary",
-            "recorded_at": "2027-01-24T20:15:00Z"
-          },
-          {
-            "excerpt": "2027-01-23晚间，用户确认1月24日19点和妹妹吃饭，小赵已确认负责晚间收尾；明确要求不再提醒，不要继续描述为冲突。AIOS回应按已定安排处理，不再提醒或称其为未解决冲突。该交流确认计划及分工，不是晚餐或收尾已经完成的报告。",
-            "object_ref": {
-              "object_id": "sum_4f83fd9e72755ce58b734186",
-              "revision": 1
-            },
-            "object_type": "summary",
-            "recorded_at": "2027-01-24T20:15:00Z"
-          },
-          {
-            "excerpt": "2027-01-23录入的日历安排：2027-01-24 19:00 UTC和妹妹晚饭，备注妹妹来店附近一起吃饭。该记录是计划，不是晚餐已发生的确认；来源未列结束时间，也没有说明存在安排冲突。",
-            "object_ref": {
-              "object_id": "sum_e0fe6ab03d0526f3a459688a",
-              "revision": 1
-            },
-            "object_type": "summary",
-            "recorded_at": "2027-01-24T20:15:00Z"
-          },
-          {
-            "excerpt": "{'currency': 'USD', 'item': 'bread flour', 'quantity_kg': 180, 'received_at': '2027-01-25T04:36:00+00:00', 'signed_by': '小赵', 'status': 'received', 'unit_price': 1.41, 'vendor': 'North Mill'}",
-            "object_ref": {
-              "object_id": "obs_src_9475c3feb631894bf90a2ad6",
-              "revision": 1
-            },
-            "object_type": "observation",
-            "recorded_at": "2027-01-25T04:36:00Z"
-          },
-          {
-            "excerpt": "2027-01-18至24日本次采购来源为1月22日North Mill两条门户记录及其日摘要：180 kg bread flour，11:00报价单价1.41 USD、状态quoted；11:20同供应商、品类和数量的记录为单价1.41 USD、状态confirmed，计划1月25日04:30 UTC配送。不要将报价、确认及摘要算成三笔独立采购或累计540 kg；材料未确认送达或验收，也未提供本周其他采购以作全面比较。",
-            "object_ref": {
-              "object_id": "sum_1748fd204801f6ef47414372",
-              "revision": 1
-            },
-            "object_type": "summary",
-            "recorded_at": "2027-01-25T04:36:00Z"
-          },
-          {
-            "excerpt": "2027-01-18至24日的本次日历来源包含一项安排及其日摘要：1月23日录入1月24日19:00 UTC与妹妹在店附近吃晚饭的计划。两项来源指向同一安排，不是两次晚餐；未提供结束时间、实际履行结果或冲突证据。",
-            "object_ref": {
-              "object_id": "sum_2385148e9d53f5ea4793ea46",
-              "revision": 1
-            },
-            "object_type": "summary",
-            "recorded_at": "2027-01-25T04:36:00Z"
-          },
-          {
-            "excerpt": "2027-01-18至24日的本次POS来源覆盖四个日期：18日93单、gross_sales 1261.4 USD、refunds 1；19日97单、1297.6 USD、1；21日104单、1376.3 USD、2；24日111单、1458.8 USD、1。原始记录与对应日摘要去重后，这四日合计405单、5394.1 USD、refunds 5。未提供20、22、23日POS，不能将缺项当零或把上述合计称为完整周总额。没有分时出品、等候及退款原因信息，不能由这些日汇总判断早高峰已稳定、具体根因或完整周趋势。",
-            "object_ref": {
-              "object_id": "sum_5871a6d7661fd34a8556127d",
-              "revision": 1
-            },
-            "object_type": "summary",
-            "recorded_at": "2027-01-25T04:36:00Z"
-          },
-          {
-            "excerpt": "2027-01-18至24日的本次设备遥测来源仅覆盖1月20日一条原始记录及其日摘要：deck_oven_1在5:47达到205°C预热目标，5:47—8:15温度范围203—207°C，无故障码。摘要不是另一份独立测量；该时段数据不足以代表整周设备表现、排除所有设备或操作因素，或确定出品延后的原因。",
-            "object_ref": {
-              "object_id": "sum_69f85e2877d238e4d6fe4635",
-              "revision": 1
-            },
-            "object_type": "summary",
-            "recorded_at": "2027-01-25T04:36:00Z"
-          },
-          {
-            "excerpt": "2027-01-18至24日窗口内，本次互动来源覆盖18—23日交流及对应日摘要，应去重理解。18日用户报告消防检查通过、无整改，19日要求消防事项收口；AIOS核对原提醒已取消，不重新开启。用户当前优先稳定早高峰出品，要求连续观察，不凭单日销售或初步猜测归因。20日用户提出但暂不采信“烤箱慢”，AIOS查到牛角包延后22分钟、成型台等候及所测时段烤箱达温且无故障码；双方未确认根因。21日用户确认当日醒发架短时拥挤，但反对将其写成长期瓶颈；AIOS保持具体时段和日期边界，不用它解释前一天全部延误。22日用户选本次North Mill面粉1.41，不为相对1.42的微小差额反复换供应商；AIOS不另起供应商比较，菜单扩张仍非当前重点。23日用户确认24日19点与妹妹晚饭、小赵负责收尾，要求不再提醒或描述为冲突，AIOS接受。来源没有确认晚餐、收尾已经履行，也没有证明出品已稳定、永久根因已确定或用户形成固定性格偏好。",
-            "object_ref": {
-              "object_id": "sum_b1915595dcdcb5a7bbb15244",
-              "revision": 1
-            },
-            "object_type": "summary",
-            "recorded_at": "2027-01-25T04:36:00Z"
-          },
-          {
-            "excerpt": "2027-01-18至24日的本次员工笔记来源为1月21日小赵的一条记录及其日摘要：6:10—6:42醒发架满，两盘面团在推车上等空位，6:42后恢复周转。两项来源描述同一情况，未提供各盘等候时长、最终出品受影响程度或其他日期的重复情况，不能将它扩写为整周常态或长期瓶颈。",
-            "object_ref": {
-              "object_id": "sum_bef90a66ccd7856a0d297e18",
-              "revision": 1
-            },
-            "object_type": "summary",
-            "recorded_at": "2027-01-25T04:36:00Z"
-          },
-          {
-            "excerpt": "2027-01-18至24日本次排班来源只有1月23日录入的小赵班次及其日摘要：1月24日12:30—21:00，已确认负责晚间收尾。记录和摘要指向同一安排，不能重复计班；没有实际出勤或收尾完成结果，也不足以概括整周人员配置。",
-            "object_ref": {
-              "object_id": "sum_e94d5e935ead2fb4e2161938",
-              "revision": 1
-            },
-            "object_type": "summary",
-            "recorded_at": "2027-01-25T04:36:00Z"
-          },
-          {
-            "excerpt": "2027-01-18至24日的本次出品来源包含1月20日两条原始日志及日摘要、1月21日AI Claim及其证据集和摘要。20日牛角包计划7:40、实际8:02，延后22分钟，成型台前等待17分钟而原因未填；6:00—8:30成型台三批排队12、8、17分钟，未记录成因，批次对应关系不明，不重复相加。21日可修订认识clm_e53b73a8448b388aeabdc6bf@1建议继续观察成型等候与醒发架周转，援引当日小赵记录的6:10—6:42架满、两盘等空位后恢复，以及20日烤箱所测时段达温、无故障码等证据；它明确不把烤箱或醒发架定为永久唯一原因，不以21日情况解释20日全部延误，也不排除所有设备因素。四个固定Observation引用、Claim及其摘要不是多份独立确认；这些局部材料不足以概括整周出品稳定性或确定长期根因。",
-            "object_ref": {
-              "object_id": "sum_eb87017128f4999339bdffe0",
-              "revision": 1
-            },
-            "object_type": "summary",
-            "recorded_at": "2027-01-25T04:36:00Z"
-          },
-          {
-            "excerpt": "2027-01-24，bakery POS日记录：orders 111，gross_sales 1458.8 USD，refunds 1。未提供早高峰分段、出品等候或退款原因；这些日汇总数值本身不能证明出品已稳定或排除具体等待环节。",
-            "object_ref": {
-              "object_id": "sum_eda7aa4ed331747a5bc494f5",
-              "revision": 1
-            },
-            "object_type": "summary",
-            "recorded_at": "2027-01-25T04:36:00Z"
-          }
-        ],
-        "error_code": null,
-        "error_message": null,
-        "name": "read_periodic_review_anchors",
-        "ok": true
-      }
-    ],
+    "capability_history": [],
     "cockpit": {
       "ai_identity": {},
       "capability_catalog": [
@@ -1284,26 +1148,26 @@
           "communication.uncertain_schedule_conflict_escalation": "require_concrete_timing_evidence_before_framing_as_conflict"
         },
         "periodic_review": {
-          "anchor_count": 14,
+          "anchor_count": 1,
           "anchor_reader": "read_periodic_review_anchors",
           "instruction": "Review the supplied world anchors and decide whether any previous AI understanding, strategy, calibration, self-understanding, goal handling, operation method, or due CognitivePolicy should be revised, confirmed, or rolled back. Use existing search/inspect tools when needed. Do not invent user growth, causal meaning, success, failure, or policy changes that are not supported by world evidence.",
-          "review_id": "wake_review_aee3c1b977140ecb6d89c711",
+          "review_id": "wake_review_91d231223232c2985783871b",
           "wake_ref": {
-            "object_id": "wake_review_aee3c1b977140ecb6d89c711",
+            "object_id": "wake_review_91d231223232c2985783871b",
             "revision": 2
           },
-          "window_end": "2027-01-25T08:15:00+00:00",
-          "window_start": "2027-01-24T08:15:00+00:00"
+          "window_end": "2027-01-26T08:15:00+00:00",
+          "window_start": "2027-01-25T08:15:00+00:00"
         }
       },
       "token_budget": 3400,
       "truncated": true,
       "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged."
     },
-    "remaining_tool_rounds": 7,
-    "round_index": 1,
+    "remaining_tool_rounds": 8,
+    "round_index": 0,
     "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged.",
     "wake_reason": "periodic_review"
   },
-  "world_revision_before": 211
+  "world_revision_before": 215
 }

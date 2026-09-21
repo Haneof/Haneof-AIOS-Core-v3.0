@@ -1,20 +1,20 @@
 {
   "branch": "arena/01a0bf95-haneof-aios-core-v3-0",
   "export_rule": "Only first missing semantic request; no hidden fixture copied.",
-  "head_sha": "f9ac864e9ecdc49488b0e64735f66d4ce90cf497",
+  "head_sha": "f17982b76dc9874359590d2510c67871a69b5f23",
   "pending_blocks_printed": 1,
-  "run_id": 35557557115,
+  "run_id": 35557610126,
   "runner_attestation": {
     "current_state": {
-      "delivered_external_events": 18,
-      "index_watermark": 211,
-      "last_consumed_external_event_id": "d044-delivery",
-      "resident_replayed_calls": 27,
-      "simulated_clock": "2027-01-25T08:15:00+00:00",
+      "delivered_external_events": 19,
+      "index_watermark": 215,
+      "last_consumed_external_event_id": "d045-sensor",
+      "resident_replayed_calls": 28,
+      "simulated_clock": "2027-01-26T08:15:00+00:00",
       "status": "pending",
       "summary_replayed_calls": 23,
-      "world_revision": 211,
-      "world_sha256": "10a3e75270ba0b35da43c7158c4ddb0c6a7478af1425dcb32302c32c28fbdc62"
+      "world_revision": 215,
+      "world_sha256": "d48e4ac33b53b55b3c7c570195b9f63b868a91f2d023b89ecd07020baad255cf"
     },
     "expected_source_revision": 145,
     "expected_subject": "sol-resident-20260921-001",
@@ -30,14 +30,14 @@
     "source_world_sha256": "ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8"
   },
   "state": {
-    "delivered_external_events": 18,
-    "index_watermark": 211,
-    "last_consumed_external_event_id": "d044-delivery",
-    "resident_replayed_calls": 27,
-    "simulated_clock": "2027-01-25T08:15:00+00:00",
+    "delivered_external_events": 19,
+    "index_watermark": 215,
+    "last_consumed_external_event_id": "d045-sensor",
+    "resident_replayed_calls": 28,
+    "simulated_clock": "2027-01-26T08:15:00+00:00",
     "status": "pending",
     "summary_replayed_calls": 23,
-    "world_revision": 211,
-    "world_sha256": "10a3e75270ba0b35da43c7158c4ddb0c6a7478af1425dcb32302c32c28fbdc62"
+    "world_revision": 215,
+    "world_sha256": "d48e4ac33b53b55b3c7c570195b9f63b868a91f2d023b89ecd07020baad255cf"
   }
 }
