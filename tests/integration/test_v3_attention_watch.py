@@ -666,3 +666,109 @@ def test_step0_splits_cognition_action_and_delivery_rights(tmp_path):
     assert cognition_blocked.model_allowed is False
     assert cognition_blocked.action_allowed is False
     assert cognition_blocked.delivery_allowed is False
+
+
+def test_resident_wake_can_register_followup_watch_for_future_reality(tmp_path):
+    store, index = _world(tmp_path)
+    seed = Observation(
+        object_id="obs_followup_watch_seed",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW),
+        learned_at=NOW,
+        recorded_at=NOW,
+        created_by="attention-followup-test",
+        source_kind="system",
+        modality="marker",
+        value={"stage": "initial"},
+        metadata={"dimension": "dim:test"},
+    )
+    store.commit(
+        [seed],
+        OperationRequest(
+            operation_name="test.seed.followup.watch",
+            expected_world_revision=0,
+            reason="seed follow-up attention evidence",
+            idempotency_key="seed-followup-watch",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index.catch_up()
+
+    model_calls = 0
+
+    def model(snapshot):
+        nonlocal model_calls
+        model_calls += 1
+        assert snapshot.wake_reason == "watch_match"
+        history = snapshot.capability_history
+        wake = snapshot.cockpit["task_context"]["wake"]
+
+        if not history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="create_attention_watch",
+                        arguments={
+                            "title": "继续观察后续事实",
+                            "dimensions": ["dim:followup"],
+                            "reason_refs": [wake["evidence_refs"][0]],
+                            "source_kind": "followup_sensor",
+                            "priority": 45,
+                            "attention_class": "background",
+                            "cooldown_seconds": 60,
+                        },
+                    ),
+                )
+            )
+
+        assert history[-1].name == "create_attention_watch"
+        assert history[-1].ok is True
+        return ModelDirective(silence=True)
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+    )
+    initial = runtime.wake_bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.WATCH_MATCH,
+            rule_id="followup.initial",
+            observed_at=NOW + timedelta(seconds=1),
+            evidence_refs=(ObjectRef(object_id=seed.object_id, revision=1),),
+            dedupe_key="followup-initial",
+            attention_class=AttentionClass.BACKGROUND,
+        )
+    )
+
+    first = runtime.run_wake(
+        wake_ref=ObjectRef(object_id=initial.wake_id, revision=1),
+        now=NOW + timedelta(seconds=2),
+    )
+    assert first.runtime is not None
+    assert model_calls == 2
+    watches = runtime.attention_watches.current()
+    assert len(watches) == 1
+    assert watches[0].completion_condition["dimensions"] == ["dim:followup"]
+
+    runtime.reality_ingest.ingest_record(
+        SourceAdapterSpec(
+            adapter_id="followup.sensor",
+            source_kind="followup_sensor",
+            dimension="dim:followup",
+            source_class=SourceClass.SENSOR,
+            default_modality="structured_record",
+        ),
+        RealityRecord(
+            external_record_id="followup-1",
+            occurred_at=NOW + timedelta(minutes=10),
+            received_at=NOW + timedelta(minutes=10),
+            value={"changed": True},
+        ),
+    )
+
+    pending = runtime.wake_bus.pending_wakes()
+    assert len(pending) == 1
+    assert pending[0].wake_source is WakeSource.WATCH_MATCH
+    assert pending[0].metadata["trigger_kind"] == "resident_attention_watch"
+    assert pending[0].metadata["attention_class"] == "background"
