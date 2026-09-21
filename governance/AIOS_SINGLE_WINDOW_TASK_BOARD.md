@@ -72,8 +72,8 @@
 | 8 | `T33-RECALL-001` | 用自包含表达/跨会话省略/无前文三类对照重新验证 recall 误触；只有复现才修 | **DONE** | AUDIT-001 | PR #51; candidate `91f1eecc1eb1a5aeb3dd2fa4566f045b6abea796`; squash merge `cb8eab12e9747bece41b14d183840e2cf13bd183`; repro run `35566569236`; required Gates GREEN | Case A/B/C、same-session canonical antecedent、assistant-raw exclusion、P14/Fused/P16 回归 GREEN；Core 只暴露候选，不绑定指代 |
 | 9 | `C14-RULE-001` | 冻结持续认知派生语义：Summary 只产生认知机会；高阶认知证据闭包必须落到合格非 Summary 叶子；定义跨维、silence、new-session 消费、provenance 与 Periodic Review 分工 | **DONE** | T35-IMPL-001 | `governance/C14_CONTINUOUS_COGNITIVE_DERIVATION_RULING_2026-09-21.md`; PR #58; candidate `33effe8a86af3d5a34a6b227618db82caf519c37`; squash merge `f9438cce087a422ad6d2394b8f0c2a22307fe283` | Authoritative ruling frozen: Summary may navigate/compress but not terminate proof; support provenance closure, domain-appropriate leaf grounding, derived lineage, cross-dimensional autonomy, valid silence, matched negative control, new-runtime behavior consumption, and Periodic Review split are binding; no Core/constitution/registry change |
 | 10 | `C14-SCHED-001` | 实现 Summary → Cognitive Derivation Wake：递归 leaf provenance、幂等、revision、crash/restart recovery、纯 AI-cognition Summary 防回环 | **DONE** | C14-RULE-001 | PR #59; candidate `5389118b9e37b8f0b33552099e39d5c8a31eaffb`; squash merge `f0b24cda3c76d5170f5f27fb5a94107036e2f2c4`; C14 gate run `35579489466` SUCCESS | Dedicated `COGNITIVE_DERIVATION` BACKGROUND Wake; recursive pinned provenance; REALITY/MIXED eligible; AI_COGNITION_ONLY/MAINTENANCE_ONLY/UNKNOWN fail closed; deterministic per-Summary-revision Wake identity; restart reconciliation; no second provenance/scheduler DB; no Claim/Resident semantic change |
-| 11 | `C14-RUNTIME-001` | 将 derivation Wake 接入同一 Resident CognitiveRuntime，装配 pinned Summary、跨维能力、AI-world context；形成/修正认知前必须满足 leaf-grounded evidence 规则，或 silence | **READY** | C14-SCHED-001 | 复用 CognitiveRuntime、AIWorldCognitionService、search/compare/all-dimensions、C13 metering；不得把 Summary-only EvidenceSet 当高阶认知充分依据 | 无第二模型循环；BACKGROUND 不主动打扰用户；Resident 可跨维取证并写/revise/retract；Summary 只能导航/上下文；assistant/AI material 不被提升成独立用户事实；silence 不生成伪 Claim/Experience |
-| 12 | `C14-LOOP-001` | 持续认知派生加固：防 Summary/AI cognition 自证循环；预算/合并/延迟/恢复；Periodic Review 共存；验证 new-runtime 恢复消费路径；加固长期 provenance reconcile 复杂度 | **BLOCKED** | C14-RUNTIME-001 | 复用 BackgroundBudgetGate、Attention Bundle、P15 Review、现有 context/search；禁止 claim conversion rate 成为质量策略；PM 验收发现当前 reconcile 存在 per-Summary 重建 support-dependency 视图的长期重复扫描风险 | cognition-write→AI summary 不制造 storm；10+ sibling summary 可机械合并；budget defer/restart 不丢机会；Wake completion 不成为用户偏好/成功证据；新 Runtime 仅恢复 World/Index 后可正常找回 durable cognition；reconcile 不得随着 Summary×Dependency 规模产生不必要的全图重复扫描，需一次构图/缓存/增量等有界方案并有规模回归 |
+| 11 | `C14-RUNTIME-001` | 将 derivation Wake 接入同一 Resident CognitiveRuntime，装配 pinned Summary、跨维能力、AI-world context；形成/修正认知前必须满足 leaf-grounded evidence 规则，或 silence | **DONE** | C14-SCHED-001 | PR #61; candidate `75cc62ca13169c6ba8752e0562224705fe6f9ac2`; squash merge `a887ba537e9797d4bf5a7b7fb482fa4a55f47df7`; candidate + merge-result required Gates GREEN | 同一 Resident Runtime 完成 derivation cockpit + leaf-grounded create/revise/retract/silence 闭环；Summary-only/AI recursion/T28 assistant-only fail closed；真实 user/Outcome case grounding保持合法；BACKGROUND 不直接投放用户；完整证据见 C14-RUNTIME-001 completion |
+| 12 | `C14-LOOP-001` | 持续认知派生加固：防 Summary/AI cognition 自证循环；预算/合并/延迟/恢复；Periodic Review 共存；验证 new-runtime 恢复消费路径；加固长期 provenance reconcile 复杂度 | **READY** | C14-RUNTIME-001 | C14 Runtime 已闭环并 merge；复用 BackgroundBudgetGate、Attention Bundle、P15 Review、现有 context/search；禁止 claim conversion rate 成为质量策略；PM 验收发现当前 reconcile 存在 per-Summary 重建 support-dependency 视图的长期重复扫描风险 | cognition-write→AI summary 不制造 storm；10+ sibling summary 可机械合并；budget defer/restart 不丢机会；Wake completion 不成为用户偏好/成功证据；新 Runtime 仅恢复 World/Index 后可正常找回 durable cognition；reconcile 不得随着 Summary×Dependency 规模产生不必要的全图重复扫描，需一次构图/缓存/增量等有界方案并有规模回归 |
 | 13 | `C14-RES-001` | 真实 Resident 认知形成入住验证：跨维正例 + 同次数低证据负例 silence + 后续反例 revision + 新 session/new runtime 只恢复 AIOS World 后消费旧认知并影响行为 | **BLOCKED** | C14-LOOP-001 | 禁止 pseudo-LLM / Python 关键词答案；fresh/private World；隐藏语义期望；保存 provider/model/checkpoint/digest | 至少验证：真正跨维 cognition、正确 silence、上下文替换后的 cognition retrieval/behavior consumption、Outcome→revision；不以 Claim 数量/转化率 PASS；必须有 observable refs/decision effects 而非 CoT |
 | 14 | `C14-CLOSE-001` | 独立审计 C14 规则、代码、Gate 与真实 Resident 证据；只做收口，不写新 Core 功能 | **BLOCKED** | C14-RES-001 | C14 全链证据 + deterministic gates + Resident evaluator + PM hardening requirements | 任一以下成立即 FAIL：Summary-only 自证 cognition、无跨维正例、无 negative silence、无 new-session/new-runtime 行为消费、provenance 用语义启发式/第二来源库、claim count 成质量目标、存在 wake storm；全部通过才恢复 P16 |
 | 15 | `P16-TRIAGE-001` | 更新 PR #37 / Issue #30 中央证据分流到当前 segmented protocol；历史无效年度、PARTIAL、机械复现、有效缺陷分开登记 | **BLOCKED** | AUDIT-001, all activated T34/T36/T28/T35/T33 tasks resolved, C14-CLOSE-001 | all historical Core blockers resolved; C14 是 77-day Resident 新暴露的架构缺口；P16 暂停避免继续测已知缺陷 | 冻结被评 Core SHA；不把旧“几天统计”冒充当前进度；中央报告进入 main；恢复 campaign 前必须引用 C14 closure |
@@ -734,3 +734,69 @@ C14-SCHED-001 correctness is accepted. One non-blocking long-horizon hardening i
 - this can cause repeated whole-Dependency scans as Summary count grows.
 
 C14-LOOP-001 must preserve the same mechanical semantics while removing avoidable Summary×Dependency full-graph repetition, using a bounded approach such as one graph build per reconciliation pass, safe caching, or an incremental index. This is a performance/resource-safety requirement only; it must not introduce semantic ranking, a second provenance truth, or a second scheduler database.
+
+### C14-RUNTIME-001 completion — 2026-09-21
+
+```text
+Task ID: C14-RUNTIME-001
+Status: DONE
+Started from main: 461a2289247eeb0cbbc39bbcfbe613022c885311
+Work branch: c14/runtime-cognitive-derivation-20260921
+Candidate SHA: 75cc62ca13169c6ba8752e0562224705fe6f9ac2
+PR: #61
+Merge SHA: a887ba537e9797d4bf5a7b7fb482fa4a55f47df7
+Required gates: C14 scheduler targeted; C14 runtime targeted; cognition-writeback; cognition-revision; AI-world; cognitive-runtime; constitutional-cognition-closure; C09 wake dispatch; fused-turn-runtime; dimension-summary; world-index; P15 periodic-review; C13 metering/background-budget; P14 long-context; memory recommendation/T28; P12 execution; P16 habitation harness; P16 convergence
+Candidate Gate run IDs / conclusions:
+- c14-cognitive-derivation-runtime 35582197711 / SUCCESS (all 7 jobs)
+- c14-cognitive-derivation-scheduler 35582197425 / SUCCESS
+- constitutional-cognition-closure 35582197542 / SUCCESS
+- p16-convergence-gate 35582198031 / SUCCESS
+- p15-periodic-review 35582197360 / SUCCESS
+- dimension-summary 35582197498 / SUCCESS
+- p14-long-context 35582197567 / SUCCESS
+- c09-wake-dispatch 35582197629 / SUCCESS
+- p10-ai-world-gate 35582197450 / SUCCESS
+- p9-revision-gate 35582197446 / SUCCESS
+- p12-execution-gate 35582197586 / SUCCESS
+- fused-turn-runtime 35582197662 / SUCCESS
+- p11-dimension-gate 35582197613 / SUCCESS
+Merge-result main Gate run IDs / conclusions:
+- c14-cognitive-derivation-runtime 35582457482 / SUCCESS
+- c14-cognitive-derivation-scheduler 35582457687 / SUCCESS
+- p16-convergence-gate 35582457558 / SUCCESS
+- p15-periodic-review 35582457662 / SUCCESS
+- p10-ai-world-gate 35582457462 / SUCCESS
+- dimension-summary 35582457614 / SUCCESS
+- c09-wake-dispatch 35582457569 / SUCCESS
+- p11-dimension-gate 35582457737 / SUCCESS
+- p9-revision-gate 35582457356 / SUCCESS
+- fused-turn-runtime 35582457578 / SUCCESS
+- all-dimensions-projection 35582457352 / SUCCESS
+- p12-execution-gate 35582457490 / SUCCESS
+- p14-long-context 35582457564 / SUCCESS
+Evidence/report paths:
+- src/aios_core/runtime/turn_runtime.py
+- src/aios_core/summaries/cognitive_derivation.py
+- tests/integration/test_v3_c14_cognitive_derivation_runtime.py
+- tests/integration/test_v3_c14_cognitive_derivation_scheduler.py
+- .github/workflows/c14-cognitive-derivation-runtime.yml
+Implementation evidence:
+- COGNITIVE_DERIVATION dispatches through the same existing FusedTurnRuntime -> CognitiveRuntime and the same WakeBus/model handler/capability loop/C13 metering; no second Resident/model/World/database.
+- Runtime cockpit exposes exact Wake/Summary anchor, Summary dimension/granularity/window, scheduler + runtime derived-lineage audit, current AI-world snapshot, normal capability catalog, Step-0 and background budget.
+- Summary is explicitly a temporal/navigation anchor, not a semantic conclusion or sufficient proof; no expected Claim is hidden.
+- Scheduler and Runtime share one lineage resolver. grounding_leaf_refs prevents old AI Claim recursion from certifying new cognition while allowing a Summary whose transitive closure reaches qualifying reality/case leaves.
+- C14 guard covers commit_claim, commit_ai_world_claim, revise_claim and retract_claim; alternate experience/policy cognition channels are denied during derivation rather than becoming bypasses.
+- assistant-only dialogue remains AI_COGNITION_ONLY and cannot become an independent user fact; legal user raw -> Summary -> inspected Observation can ground cognition.
+- OperationExperience -> real Outcome lineage remains legal for Strategy/AI learning.
+- background derivation responses are never directly delivered to the user; silence completes Wake with zero semantic write.
+- C13 provider/token/model truth remains in the non-world ModelMeteringLedger.
+Bugs found:
+- derivation Wake used the generic Wake instruction/cockpit and could be folded by generic BACKGROUND bundling, losing the exact dedicated C14 inspection contract.
+- Summary/AI cognition support closure was not enforced at the Resident cognition create/revise/retract capability boundary.
+- commit_ai_world_claim and revision/retraction paths could bypass a commit_claim-only fix.
+Deferred issues:
+- C14-LOOP-001 only: burst/budget/merge/restart hardening, Periodic Review coexistence, new-runtime recovery/consumption, and the bounded provenance-reconcile scale item already accepted from C14-SCHED.
+- C14-RES-001 and P16 campaign were not started.
+Next READY task: C14-LOOP-001 — new window only; this C14-RUNTIME window stops here.
+```
+
