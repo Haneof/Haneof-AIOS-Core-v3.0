@@ -20,12 +20,38 @@ from .capabilities import (
 
 
 @dataclass(frozen=True)
+class ModelUsage:
+    """Exact provider-reported usage for one model invocation."""
+
+    total_tokens: int
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+
+    def __post_init__(self) -> None:
+        for field_name in ("total_tokens", "input_tokens", "output_tokens"):
+            value = getattr(self, field_name)
+            if value is None:
+                continue
+            if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+                raise ValueError(f"{field_name} must be a non-negative integer")
+        if (
+            self.input_tokens is not None
+            and self.output_tokens is not None
+            and self.total_tokens < self.input_tokens + self.output_tokens
+        ):
+            raise ValueError(
+                "total_tokens must cover reported input_tokens + output_tokens"
+            )
+
+
+@dataclass(frozen=True)
 class ModelDirective:
     """Observable model decision surface; never carries hidden chain-of-thought."""
 
     capability_calls: tuple[CapabilityCall, ...] = ()
     response: str | None = None
     silence: bool = False
+    usage: ModelUsage | None = None
 
     def __post_init__(self) -> None:
         terminal_count = int(self.response is not None) + int(self.silence)
@@ -55,6 +81,10 @@ class RuntimeTurnResult:
     capability_history: tuple[CapabilityResult, ...]
     model_rounds: int
     termination_reason: str
+    model_input_tokens: int | None = None
+    model_output_tokens: int | None = None
+    model_total_tokens: int | None = None
+    model_usage_complete: bool = False
 
 
 ModelHandler = Callable[[RuntimeSnapshot], ModelDirective]
@@ -125,6 +155,37 @@ class CognitiveRuntime:
         signature_counts: dict[tuple[str, tuple[tuple[str, str], ...]], int] = {}
         total_calls = 0
         cockpit_data = dict(cockpit or {})
+        model_usages: list[ModelUsage] = []
+        model_usage_complete = True
+
+        def _result(**kwargs: Any) -> RuntimeTurnResult:
+            rounds = int(kwargs["model_rounds"])
+            complete = model_usage_complete and len(model_usages) == rounds
+            input_complete = complete and all(
+                item.input_tokens is not None for item in model_usages
+            )
+            output_complete = complete and all(
+                item.output_tokens is not None for item in model_usages
+            )
+            return _result(
+                **kwargs,
+                model_input_tokens=(
+                    sum(int(item.input_tokens or 0) for item in model_usages)
+                    if input_complete
+                    else None
+                ),
+                model_output_tokens=(
+                    sum(int(item.output_tokens or 0) for item in model_usages)
+                    if output_complete
+                    else None
+                ),
+                model_total_tokens=(
+                    sum(item.total_tokens for item in model_usages)
+                    if complete
+                    else None
+                ),
+                model_usage_complete=complete,
+            )
 
         normal_model_rounds = self.max_tool_rounds + 1
         if max_model_rounds is None:
@@ -150,9 +211,13 @@ class CognitiveRuntime:
             directive = self.model_handler(snapshot)
             if not isinstance(directive, ModelDirective):
                 raise TypeError("model_handler must return ModelDirective")
+            if directive.usage is None:
+                model_usage_complete = False
+            else:
+                model_usages.append(directive.usage)
 
             if directive.response is not None:
-                return RuntimeTurnResult(
+                return _result(
                     response=directive.response,
                     silenced=False,
                     capability_history=tuple(history),
@@ -160,7 +225,7 @@ class CognitiveRuntime:
                     termination_reason="responded",
                 )
             if directive.silence:
-                return RuntimeTurnResult(
+                return _result(
                     response=None,
                     silenced=True,
                     capability_history=tuple(history),
@@ -171,7 +236,7 @@ class CognitiveRuntime:
             # At the final allowed model round, new tool requests are not executed.
             # We fail closed rather than silently granting unbounded autonomous loops.
             if round_index >= effective_model_rounds - 1:
-                return RuntimeTurnResult(
+                return _result(
                     response=None,
                     silenced=False,
                     capability_history=tuple(history),
@@ -185,7 +250,7 @@ class CognitiveRuntime:
 
             for call in directive.capability_calls:
                 if total_calls >= self.max_total_capability_calls:
-                    return RuntimeTurnResult(
+                    return _result(
                         response=None,
                         silenced=False,
                         capability_history=tuple(history),
