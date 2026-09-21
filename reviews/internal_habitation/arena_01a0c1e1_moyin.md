@@ -104,9 +104,9 @@
 
 ---
 
-## 4. 发现（F-001 … F-014）
+## 4. 发现（F-001 … F-015）
 
-完整台账含逐条 repro 见 `reviews/internal_habitation/arena_01a0c1e1_moyin/findings/FINDINGS.md`。
+完整台账含逐条 repro 见 `reviews/internal_habitation/arena_01a0c1e1_moyin/findings/FINDINGS.md`（共 15 条，已用 `grep -c "^## F-"` 核对）。
 
 ### HIGH
 
@@ -136,6 +136,7 @@
 | F-002 | BUG | `entity_key` schema 发布成裸 `"string"`，不体现 `entity:` 前缀约束 |
 | F-003 | MECHANISM GAP | 无法创建无名字的 identity anchor（用户妹妹有确切事实但没名字 → 无法建实体） |
 | F-008 | OPTIMIZATION | 任何对历史对象的修订都会重开其所在 day-window，`skipped_unchanged` 被击穿（`dim:craft` 10-02 窗口被重写 3 次） |
+| F-015 | **TEST ARTIFACT** | World 产物摘要基于 .gz 文件字节，无法验证跨机器逻辑等价。这是我 harness 的缺陷（`driver.py:680,702`），不是 Core 的。详见 §5 冻结完整性核对 |
 
 ### 关于本次修正的说明
 
@@ -212,7 +213,7 @@ F-012 我先前把它记成"backlog 分页导致 cursor 滞后"，这个描述�
 
 ```
 reviews/internal_habitation/arena_01a0c1e1_moyin/
-├── findings/FINDINGS.md              # F-001 … F-014，含逐条 repro
+├── findings/FINDINGS.md              # F-001 … F-015，含逐条 repro
 ├── harness/{bridge,daemon,next,peek,driver}.py
 ├── life/segment_001/life.jsonl       # 14 条外部世界事件
 ├── life/segment_002/{life,decoy}.jsonl   # 10 + 2 条
