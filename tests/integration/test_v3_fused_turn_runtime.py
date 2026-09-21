@@ -10,7 +10,7 @@ from aios_core.dimensions import DimensionProposalRequest, DimensionRegistryServ
 from aios_core.ingest.conversation import ConversationIngestor
 from aios_core.query.search import WorldSearchIndex
 from aios_core.runtime.capabilities import CapabilityCall
-from aios_core.runtime.cognitive_runtime import ModelDirective
+from aios_core.runtime.cognitive_runtime import ModelDirective, ModelUsage
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
@@ -912,3 +912,49 @@ def test_current_user_input_can_ground_same_turn_goal_task_and_action_proposal(t
     assert len(actions) == 1
     assert actions[0]["action_status"] == "proposed"
     assert actions[0]["metadata"]["authorization_required"] is True
+
+
+
+def test_user_interaction_model_call_is_metered_outside_world(tmp_path):
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda snapshot: ModelDirective(
+            response="收到。",
+            usage=ModelUsage(
+                input_tokens=13,
+                output_tokens=2,
+                total_tokens=15,
+                provider="openai",
+                model="test-model",
+                request_id="resp_user_meter",
+            ),
+        ),
+    )
+    result = runtime.run_turn(
+        session_id="meter-session",
+        turn_index=1,
+        user_input="测试计量。",
+        current_topic=None,
+        occurred_at=NOW,
+    )
+
+    rows = runtime.metering.list_model_calls(subject_id="user_1")
+    assert len(rows) == 1
+    assert rows[0].execution_class == "user_interaction"
+    assert rows[0].session_id == "meter-session"
+    assert rows[0].wake_id is None
+    assert rows[0].total_tokens == 15
+    assert rows[0].provider_request_id == "resp_user_meter"
+
+    # The model call is metered between user-ingest and assistant writeback without
+    # creating an extra world commit of its own.
+    assert rows[0].world_revision == result.conversation_commit.user_world_revision
+    assert result.conversation_commit.assistant_world_revision == (
+        result.conversation_commit.user_world_revision + 1
+    )
