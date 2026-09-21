@@ -110,6 +110,16 @@ from .metering import ModelMeteringLedger
 
 _AUTO_TOPIC = object()
 
+_C14_COGNITIVE_SIDE_EFFECT_ALLOWLIST = frozenset(
+    {
+        "commit_claim",
+        "commit_ai_world_claim",
+        "revise_claim",
+        "retract_claim",
+    }
+)
+
+
 
 @dataclass(frozen=True, slots=True)
 class FusedTurnResult:
@@ -2170,26 +2180,21 @@ class FusedTurnRuntime:
         }
 
     def _authorize_side_effect(self, spec, call, snapshot) -> bool:
-        # C14 derivation may use the normal catalog, but cognition-policy and
-        # experience writers are not alternate Claim channels for this background
-        # inspection. Claim create/revise/retract stay authorized and pass the shared
-        # leaf-grounding closure below.
-        if (
-            snapshot.wake_reason == WakeSource.COGNITIVE_DERIVATION.value
-            and spec.name
-            in {
-                "commit_operation_experience",
-                "record_communication_experience",
-                "propose_cognitive_policy",
-                "update_cognitive_policy",
-                "rollback_cognitive_policy",
-            }
-        ):
-            return False
+        # Reads never need side-effect authorization. CognitiveRuntime calls this
+        # authorizer only for side-effecting specs, but keeping the boundary explicit
+        # makes the C14 rule safe to inspect/test directly as the catalog evolves.
+        if not spec.side_effecting:
+            return True
 
-        # Internal cognition writeback is allowed because the handler itself enforces
-        # pinned evidence and writes only revisable cognition. External actions stay
-        # denied until a separate capability-specific authorization layer exists.
+        # C14 is a bounded background cognition-derivation wake. It may persist only
+        # cognition create/revise/retract operations; every other present or future
+        # side-effecting capability is denied by default. The four allowed handlers
+        # still pass through _validate_c14_cognition_grounding().
+        if snapshot.wake_reason == WakeSource.COGNITIVE_DERIVATION.value:
+            return spec.name in _C14_COGNITIVE_SIDE_EFFECT_ALLOWLIST
+
+        # Preserve existing authorization semantics for user turns, Periodic Review,
+        # and other Wake sources.
         return spec.name in {
             "commit_claim",
             "commit_ai_world_claim",
