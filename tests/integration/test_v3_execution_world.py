@@ -387,6 +387,7 @@ def test_cancelled_parent_task_cannot_authorize_retry_or_restart(tmp_path):
     )
     assert cancelled.state == "cancelled"
     assert store.get_payload(task.task_id)["task_state"] == "cancelled"
+    cancelled_world_revision = cancelled.world_revision
 
     authorizer_calls = 0
 
@@ -414,6 +415,7 @@ def test_cancelled_parent_task_cannot_authorize_retry_or_restart(tmp_path):
     # rewriting history. Retry/restart therefore fail before the authorizer is
     # consulted, while the original PROPOSED revision remains auditable.
     assert authorizer_calls == 0
+    assert store.current_world_revision() == cancelled_world_revision
     assert store.get_payload(action.action_id, revision=1)["action_status"] == "proposed"
     latest_action = store.get_payload(action.action_id)
     assert latest_action["revision"] == 2
@@ -460,4 +462,3 @@ def test_cancel_authorize_race_is_fail_closed(tmp_path):
     assert store.get_payload(task.task_id)["task_state"] == "cancelled"
     assert store.get_payload(action.action_id, revision=1)["action_status"] == "proposed"
     assert store.get_payload(action.action_id)["action_status"] == "cancelled"
-# T34-EXEC-001 reproduction boundary: implementation intentionally unchanged above.
