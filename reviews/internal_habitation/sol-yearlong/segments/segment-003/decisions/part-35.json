@@ -1,0 +1,23 @@
+{
+  "1e99fe28dd8b163612d1c7f7adede514cea10e1fdf199277e98aadd07c1794d8": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "arguments": {
+          "object_id": "task_41571ce5cbcc6c736bb22f73"
+        },
+        "call_id": "seg003-jan23-task-check"
+      },
+      {
+        "name": "search_timeline",
+        "arguments": {
+          "window_start": "2027-01-23T00:00:00Z",
+          "window_end": "2027-01-23T20:10:00Z",
+          "limit": 20
+        },
+        "call_id": "seg003-jan23-today-records"
+      }
+    ]
+  }
+}
