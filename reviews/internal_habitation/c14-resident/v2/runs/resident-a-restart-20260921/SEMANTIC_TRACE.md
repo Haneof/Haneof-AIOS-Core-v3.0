@@ -423,3 +423,21 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
 **Due work at T = 2026-10-19T08:41:00-07:00**（`receipts/process-due-20261019T154100Z.json`）: 无摘要窗口闭合（10-19 日窗仍开）、无 C14 唤醒、Periodic Review 未触发。机械跑完即止，无模型决策点。
 
 **Resulting state**: world_revision 153, index watermark 153, pending wakes 0。
+
+---
+
+## Cursor 22 — `c14resv2-022` — 2026-10-21T08:04:00-07:00 (dim:schedule)
+
+**Released**
+- dimension `dim:schedule`, source_kind `calendar`, source_class `PLATFORM`
+- payload: "今天 08:30–10:00 是客户共创工作坊；10:20–11:50 安排“方案修改”。"
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-022.json`; ingest → `obs_c14_fixture_2ef7e5aea9885147e524e1c8@1` (world_revision 154); watch hook: no match; ack → `receipts/ack/cursor-022.json`, `next_sequence=23`。
+
+**Due work at T = 2026-10-21T08:04:00-07:00**（`receipts/process-due-20261021T150400Z.json`；跨过 10-19/10-20 窗口）:
+- 我撰写并提交 2 条摘要：`sum_7ae8788a8e00c3bdfb1f9e02`（dim:schedule 10-19）与 `sum_a052565b0b46fd1f226b2991`（dim:sleep 10-19，8h09/08:34）。
+- C14 2 成员 bundle `wake_41f660b597ba3dd50a781ad7`：round 0 = `read_ai_world(20)`（空）+ 4 条 `search_timeline`（work_outcome / schedule / device_activity / conversation，10-01→10-22），把既有 Claim 与其证据链重新核对一遍；round 1 **silence**——Claim rev2 的三次写作块观察未变，自 rev2 以来没有新的“写作块—交付/顺延”结果案例、也无反例，故不修订、不撤回、不另立新 Claim；并记录 10-21“工作坊 + 方案修改”是潜在的新检验结构，待其工作产出观测出现后再判断。
+- Periodic Review `wake_review_ab4fee9a829b57cf3603b86a`（窗口 10-19T15:39Z→10-21T15:05Z，5 anchors）：round 0 读锚点；round 1 **silence**（同上理由；无操作经验登记）。
+- 决策文件：`checkpoints/decisions/wake-cognitive_derivation-wake_41f660b597ba3dd50a781ad7-rev1-77b6fe23/round-{0,1}.json`、`checkpoints/decisions/periodic-review-20261021T150501Z-64749b7d/round-{0,1}.json`。
+
+**Resulting state**: world_revision 164, index watermark 164, pending wakes 0, Claims 1（rev 2）, 43 条摘要, operation experiences 0。

@@ -21,7 +21,8 @@ Resident model (as declared): `GPT-5.6 Sol`; platform provider/session id: `unkn
 | S19 | Cursor 19 end-to-end (schedule calendar: London video call; nothing due) | DONE | `receipts/*/cursor-019.json`, `receipts/process-due-20261017T130900Z.json`, `SEMANTIC_TRACE.md` |
 | S20 | Cursor 20 end-to-end, incl. due work after the 10-17/10-18 windows and the 10-12–10-18 week | DONE | `receipts/*/cursor-020.json`, `receipts/process-due-20261019T153800Z.json`, `SEMANTIC_TRACE.md` |
 | S21 | Cursor 21 end-to-end (schedule calendar: 11:30 前无安排; nothing due) | DONE | `receipts/*/cursor-021.json`, `receipts/process-due-20261019T154100Z.json`, `SEMANTIC_TRACE.md` |
-| S22..S24 | Cursor 22..24, one stage each | NOT_STARTED | — |
+| S22 | Cursor 22 end-to-end, incl. due work after the 10-19/10-20 windows | DONE | `receipts/*/cursor-022.json`, `receipts/process-due-20261021T150400Z.json`, `SEMANTIC_TRACE.md` |
+| S23..S24 | Cursor 23..24, one stage each | NOT_STARTED | — |
 | S25 | Handoff freeze | NOT_STARTED | — |
 
 ### S0 notes
@@ -67,6 +68,7 @@ Resident model (as declared): `GPT-5.6 Sol`; platform provider/session id: `unkn
 | 19 | `c14resv2-019` | 2026-10-17T06:09:00-07:00 | `obs_c14_fixture_548acbc204287fcdb2c3a036@1` | yes (`next=20`) | none due（日窗未闭合；C14 幂等；review 刚跑过） | 135 | dim:schedule 07:00 与伦敦团队视频会议（醒来 06:02 后即有一场会议） |
 | 20 | `c14resv2-020` | 2026-10-19T08:38:00-07:00 | `obs_c14_fixture_76d93e859e7e0873ed9ba7e4@1` | yes (`next=21`) | 5 摘要（10-17 日 + 10-12–10-18 周）；C14 5 成员 bundle `wake_0c29429ae3d11e1c43802888` → read_ai_world + 2×search_timeline → **silence**（8h09 夜否证窄带候选）；Periodic Review `wake_review_e96b2ad8987a5a7024ba7291`（8 anchors）→ **silence** | 152 | 睡眠第 7 样本 8h09（最长）；睡眠线确认无稳定模式，不形成 Claim |
 | 21 | `c14resv2-021` | 2026-10-19T08:41:00-07:00 | `obs_c14_fixture_e72bc48cd34bac898ca91029@1` | yes (`next=22`) | none due（日窗未闭合；C14 幂等；review 刚跑过） | 153 | dim:schedule 11:30 前无日历安排（08:34 醒来的长睡眠日） |
+| 22 | `c14resv2-022` | 2026-10-21T08:04:00-07:00 | `obs_c14_fixture_2ef7e5aea9885147e524e1c8@1` | yes (`next=23`) | 2 摘要（10-19 日程/睡眠）；C14 2 成员 bundle `wake_41f660b597ba3dd50a781ad7` → read_ai_world + 4×search_timeline（四维全序列复核 Claim 证据链）→ **silence**；Periodic Review `wake_review_ab4fee9a829b57cf3603b86a`（5 anchors）→ **silence** | 164 | 10-21 客户共创工作坊 08:30–10:00 + 方案修改 10:20–11:50（潜在 Claim 检验结构，待产出观测） |
 
 ## Blockers / contamination
 

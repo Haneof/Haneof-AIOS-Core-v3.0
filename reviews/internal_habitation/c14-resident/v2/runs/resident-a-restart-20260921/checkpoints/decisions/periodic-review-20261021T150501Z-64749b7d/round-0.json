@@ -1,0 +1,6 @@
+{
+  "capability_calls": [
+    {"name": "read_periodic_review_anchors", "arguments": {"limit": 25}}
+  ],
+  "rationale": "常规 Periodic Review（窗口 10-19T15:39Z→10-21T15:05Z，5 anchors）：读锚点，核对本窗口新增证据（10-21 工作坊与方案修改、10-19/10-21 睡眠等）是否影响既有 Claim 或需要登记操作经验。"
+}
