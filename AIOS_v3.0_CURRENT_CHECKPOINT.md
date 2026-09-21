@@ -15,7 +15,22 @@
 
 当前审计冻结 main：`e9862103a753be026edf1745c6a5d07fa56c0cf4`。
 
-最近完成任务：`AUDIT-001` — **DONE / AUDIT ONLY**。
+最近完成任务：`T35-RULE-001` — **DONE / GOVERNANCE CONTRACT ONLY**。
+
+- Started from main：`f8a2f8e4cf53de579bd0bc69cfd85421d109d65b`
+- Governance claim commit：`f83438729b7ef0a0ba58b0c3302e1deb5f4ca6bd`
+- Work branch：`governance/t35-rule-non-action-completion-20260921`
+- Semantic candidate：`b58bbb31a04a119897890452e76461f14fd46288`
+- PR：#53
+- Merge SHA：`PENDING_POST_MERGE_METADATA`
+- 正式裁决：`governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md`
+- 裁决核心：所有 Task 终态都必须由 pinned durable evidence 支撑；只有需要 AIOS 外部执行的 Task 才强制 `Action → Outcome`；纯验证/分析/Review/内部工作产物不得伪造 Action/Outcome。
+- `TaskType` 不承担外部授权分类；完成证据模式与 TaskType 正交，裁决定义 `WORLD_EVIDENCE / ACTION_OUTCOME / MIXED` 三种 completion contract。
+- assistant raw response、unsupported Claim、Task/Goal 自引用、AI 自述“完成”、synthetic Outcome、循环 OperationExperience、world_revision 单独存在均不得作为完成凭据。
+- 本任务未修改 Runtime/Core/schema/state machine；因此不伪跑无关 Core Gate，只做法源/源码/审计证据复核与 diff-scope 验证。
+- `T35-IMPL-001` 继续 **BLOCKED**，直到 `T34-EXEC-001` 完成；实现必须另开窗口/PR。
+
+上一完成任务：`AUDIT-001` — **DONE / AUDIT ONLY**。
 
 - 证据矩阵：`reviews/AUDIT-001_ISSUE30_CURRENT_MAIN_EVIDENCE_MATRIX_2026-09-21.md`
 - PR #48 / squash merge：`0ecacd8204414fd41e7ebda8e8b4521406154d3f`
@@ -28,8 +43,8 @@
 - AUDIT-001 未修改任何 Core/runtime/test 实现。
 - PR #37 仍是旧基线上的历史中央分流证据，不能作为当前 main 的修复证明。
 - 当前第一个 READY：`T34-EXEC-001`。
-- 其他已激活 READY：`T36-SEARCH-001`、`T28-REC-001`、`T35-RULE-001`、`T33-RECALL-001`。
-- `T35-IMPL-001` 继续 BLOCKED，等待 `T35-RULE-001` 与 `T34-EXEC-001`。
+- 其他已激活 READY：`T36-SEARCH-001`、`T28-REC-001`、`T33-RECALL-001`。
+- `T35-IMPL-001` 继续 BLOCKED；`T35-RULE-001` 已完成，只剩 `T34-EXEC-001` 前置未满足。
 - `P16-TRIAGE-001` 继续 BLOCKED，直到本轮激活缺陷全部解决。
 
 历史段落继续保留为工程证据。任何下方“当前 blocker=0 / 下一动作 / 唯一 blocker”表述若与本节或 task board 冲突，均视为历史快照，以本节 + task board + 最新 main 为准。
