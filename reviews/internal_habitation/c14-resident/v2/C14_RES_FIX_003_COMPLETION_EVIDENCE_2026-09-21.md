@@ -1,12 +1,16 @@
 # C14-RES-FIX-003 Completion Evidence
 
-> Status: **CANDIDATE COMPLETE / DURABLE WORLD ACK GATE PASS**  
+> Status: **DONE / MERGED / DURABLE WORLD ACK GATE PASS**  
 > Date: 2026-09-21  
 > Task: `C14-RES-FIX-003`  
 > Role: Life Director / Sealed Release Infrastructure Designer  
 > Started from main: `0ec8d8bc16c2b0e572a9ae1de5cdc89c0416ea70`  
 > Work branch: `c14/res-fixture-v3-durable-ack-20260921-sol`  
-> PR: #72
+> Exact candidate: `17bd54ed0b64131ded0b70d853cac205d055bdcb`  
+> PR: #72  
+> Squash merge: `e5c7fefce82a49735575c423da310ca3d9441ab4`  
+> Task-board closure: `dc2bc982d2e86b7a76f0e2e8ffaedaef9451fdb6`  
+> Checkpoint closure: `0e816e16c9cfa3274c7b957b8bf9a6944ec46428`
 
 ## 1. Scope
 
