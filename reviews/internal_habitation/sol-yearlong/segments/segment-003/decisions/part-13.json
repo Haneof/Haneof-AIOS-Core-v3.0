@@ -1,0 +1,16 @@
+{
+  "436dcf8f865f5eaf5ec3172697b7b704a4b68437af42e47d980ef4a6c3d05838": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "search_timeline",
+        "arguments": {
+          "window_start": "2027-01-20T08:00:00Z",
+          "window_end": "2027-01-20T20:30:00Z",
+          "limit": 20
+        },
+        "call_id": "seg003-jan20-evening-records"
+      }
+    ]
+  }
+}
