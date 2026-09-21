@@ -1,37 +1,35 @@
 {
-  "decision_key": "7e470c30f13c5f37846428bc8520dd0fcaa8d0a23e74aad782a2305fccd4090a",
+  "decision_key": "0c9e280f9ff37f9f0c5db57d8d7c7fe26e4d527302d483d7e143a338424387a7",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-summary.pending.v1",
   "simulated_clock": "2027-01-22T08:15:00+00:00",
   "summary_request": {
     "request": {
-      "dimension": "dim:pos_daily",
+      "dimension": "dim:production_log",
       "granularity": "day",
-      "source_world_revision": 174,
+      "source_world_revision": 175,
       "sources": [
         {
           "metadata": {
-            "adapter_id": "habitation.pos_daily.v1",
-            "dimension": "dim:pos_daily",
-            "external_record_id": "d035-pos",
-            "external_revision": "1",
-            "mechanical_ingest": true,
-            "occurred_at_original": "2027-01-21T20:00:00+00:00",
-            "provenance": {
-              "habitation_resident_metadata": {
-                "source": "pos"
-              },
-              "model_id_not_part_of_fact": true
-            },
-            "source_class": "user",
-            "source_digest": "8f54245a9af900982fa649a87d7c74668b98ef733196647897f1cf4f07e740c6",
-            "source_schema_version": "1"
+            "dimension": "dim:production_log",
+            "writeback_kind": "revisable_cognition"
           },
-          "object_id": "obs_src_8be223034a08d925243afe76",
-          "object_type": "observation",
-          "occurred_at": "2027-01-21T20:00:00Z",
+          "object_id": "clm_e53b73a8448b388aeabdc6bf",
+          "object_type": "claim",
+          "occurred_at": "2027-01-21T08:15:00Z",
           "revision": 1,
-          "text": "{\"currency\": \"USD\", \"gross_sales\": 1376.3, \"orders\": 104, \"refunds\": 2, \"store\": \"bakery\"}"
+          "text": "截至2027-01-21早晨，早高峰观察应同时关注成型台等候和醒发架空位周转，而非先把原因固定为烤箱。1月20日成型台有12、8、17分钟的三批等待但未记成因；当日烤箱在所测时段达温且无故障码，只能限制有关烤箱的推断，不能排除全部设备因素。1月21日小赵记录的06:10—06:42醒发架满、两盘面团等空位、随后恢复周转，提供了一个具体且有时间边界的等待环节。它不证明1月20日延误由同一因素造成，也不证明醒发架是长期唯一瓶颈；应沿用现有观察任务继续核对实际等候点。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:production_log",
+            "writeback_kind": "cognition_evidence"
+          },
+          "object_id": "evs_43116b3d89fe990a89e63c84",
+          "object_type": "evidence_set",
+          "occurred_at": "2027-01-21T08:15:00Z",
+          "revision": 1,
+          "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 4, \"missing_description\": [], \"observed_count\": 4}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2027-01-21T08:15:00Z\", \"world_revision\": 166}, \"learned_at\": \"2027-01-21T08:15:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_cc031f2f198bf709cea0cc61\", \"revision\": 1}, {\"object_id\": \"obs_src_972d74f06c87a81231892a69\", \"revision\": 1}, {\"object_id\": \"obs_src_980c3eaef1a3002ec7d24958\", \"revision\": 1}, {\"object_id\": \"obs_src_facf2b040e0feb3a89b935f2\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:production_log\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_43116b3d89fe990a89e63c84\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2027-01-21T08:15:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"sol-resident-20260921-001\", \"support_refs\": [{\"object_id\": \"obs_conv_user_cc031f2f198bf709cea0cc61\", \"revision\": 1}, {\"object_id\": \"obs_src_972d74f06c87a81231892a69\", \"revision\": 1}, {\"object_id\": \"obs_src_980c3eaef1a3002ec7d24958\", \"revision\": 1}, {\"object_id\": \"obs_src_facf2b040e0feb3a89b935f2\", \"revision\": 1}]}"
         }
       ],
       "truncated": false,
@@ -40,5 +38,5 @@
     },
     "summary_request_type": "DimensionSummaryInput"
   },
-  "world_revision_before": 174
+  "world_revision_before": 175
 }
