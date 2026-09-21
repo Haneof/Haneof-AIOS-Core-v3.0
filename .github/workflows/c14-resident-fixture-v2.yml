@@ -1,0 +1,29 @@
+name: c14-resident-fixture-v2
+
+on:
+  pull_request:
+    paths:
+      - "reviews/internal_habitation/c14-resident/v2/**"
+      - ".github/workflows/c14-resident-fixture-v2.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mechanical-fixture-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run blind release operator tests
+        run: python -m unittest -v reviews/internal_habitation/c14-resident/v2/release/test_release_operator.py
+      - name: Confirm no Core changes in this task
+        shell: bash
+        run: |
+          git fetch origin main --depth=1
+          if git diff --name-only origin/main...HEAD | grep -q '^src/aios_core/'; then
+            echo "C14-RES-FIX-002 must not modify src/aios_core/**"
+            exit 1
+          fi
