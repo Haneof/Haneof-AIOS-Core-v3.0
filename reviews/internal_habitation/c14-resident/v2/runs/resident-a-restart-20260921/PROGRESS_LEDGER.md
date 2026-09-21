@@ -10,7 +10,7 @@ Resident model (as declared): `GPT-5.6 Sol`; platform provider/session id: `unkn
 | Stage | Scope | Status | Evidence |
 |---|---|---|---|
 | S0 | Recon, READY proof, plan, ledger, bridge, bridge self-test | DONE | `PLAN.md`, `SESSION.md`, `bridge/resident_checkpoint.py` |
-| S1 | Fresh World, Phase A init, cursor 1 end-to-end | NOT_STARTED | — |
+| S1 | Fresh World, Phase A init, cursor 1 end-to-end | DONE | `receipts/{reveal,ingest,ack}/cursor-001.json`, `SEMANTIC_TRACE.md` |
 | S2..S24 | Cursor 2..24, one stage each | NOT_STARTED | — |
 | S25 | Handoff freeze | NOT_STARTED | — |
 
@@ -34,9 +34,9 @@ Resident model (as declared): `GPT-5.6 Sol`; platform provider/session id: `unkn
 
 ## Cursor ledger
 
-| Cursor | Event id | Revealed | Ingested (ref) | Acked | Due work processed | World rev | Notes |
+| Cursor | Event id | Occurred at | Ingest ref | Acked | Due work processed at that time | World rev | Notes |
 |---:|---|---|---|---|---|---|---|
-| 1 | — | — | — | — | — | — | — |
+| 1 | `c14resv2-001` | 2026-10-01T07:12:00-07:00 | `obs_c14_fixture_b32d3cded992194438f114a9@1` | yes (`next=2`) | Periodic Review due → Resident inspected anchor → **silence**; no Summary window closed yet; no C14 wake | 4 | dim:sleep wearable fact; 0 Claims (silence is valid) |
 
 ## Blockers / contamination
 
