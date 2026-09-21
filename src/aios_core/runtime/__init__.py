@@ -18,6 +18,7 @@ from .capabilities import (
 )
 from .cognitive_runtime import (
     CognitiveRuntime,
+    ModelCallProvenance,
     ModelDirective,
     ModelUsage,
     RuntimeSnapshot,
