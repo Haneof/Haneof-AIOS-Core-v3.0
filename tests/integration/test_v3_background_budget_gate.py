@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
+import pytest
+
 from aios_core.contracts.enums import (
     AttentionClass,
     BudgetOnExceed,
@@ -414,6 +416,62 @@ def _revise_budget(store, policy, *, changed_at, max_wakes=None, max_model_calls
         ),
     )
     return revised
+
+
+def test_provider_usage_is_durable_even_if_wake_completion_crashes(tmp_path, monkeypatch):
+    store, index = _world(tmp_path)
+    _commit_budget(store, max_model_calls=5)
+    ref = _commit_evidence(store, object_id="obs_meter_crash")
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda snapshot: ModelDirective(
+            silence=True,
+            usage=ModelUsage(
+                input_tokens=17,
+                output_tokens=5,
+                total_tokens=22,
+                provider="openai",
+                model="test-model",
+                request_id="resp_before_completion_crash",
+            ),
+        ),
+    )
+    signal = _emit_background(
+        runtime,
+        ref,
+        key="budget.meter-before-complete",
+        observed_at=NOW + timedelta(minutes=1),
+    )
+
+    def crash_complete(*args, **kwargs):
+        raise RuntimeError("simulated crash before Wake completion")
+
+    monkeypatch.setattr(runtime.wake_bus, "complete", crash_complete)
+
+    with pytest.raises(RuntimeError, match="simulated crash"):
+        runtime.run_wake(
+            wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
+            now=NOW + timedelta(minutes=2),
+        )
+
+    current = runtime.wake_bus.current_wake(signal.wake_id)
+    assert current.wake_state.value == "running"
+    assert "model_total_tokens" not in current.metadata
+
+    rows = runtime.metering.list_model_calls(
+        subject_id="user_1",
+        wake_id=signal.wake_id,
+    )
+    assert len(rows) == 1
+    assert rows[0].usage_complete is True
+    assert rows[0].total_tokens == 22
+    assert rows[0].provider_request_id == "resp_before_completion_crash"
+
+    # Metering is not a World write: after the claim, the failed completion adds no
+    # extra world revision even though the provider call is durably accounted.
+    assert rows[0].world_revision == int(store.current_world_revision())
 
 
 def test_running_budget_reservation_is_not_a_free_same_day_retry(tmp_path):
