@@ -1,0 +1,81 @@
+{
+  "schema": "aios.p16.segment-checkpoint.v1",
+  "habitation_run_id": "sol-resident-20260921-001",
+  "reviewer_id": "arena/sol-yearlong-resident-20260921",
+  "logical_resident_id": "gpt-5.6-sol-interactive-resident-001",
+  "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
+  "segment_id": "segment-003",
+  "segment_status": "completed",
+  "segment_reason": "Segment 003 continuation from frozen Segment 002 World (rev145, SHA ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8) completed through 2027-01-31T08:15:00Z. 35 external events delivered (d027-chat-15 through d061-chat-27), covering fire inspection closure, early-peak production bottleneck observation, flour procurement at 1.41 USD/kg, sister dinner arrangement, customer feedback date correction, 3-day early-peak wait recording (Jan27-29), fridge maintenance reschedule, and final decision to keep existing process without immediate equipment purchase. Resident cognition respected evidence-before-conclusion policies, avoided single-day sales or single-feedback causal attribution, and scoped all summaries to their factual windows.",
+  "tested_main_sha": "7966e2ce227a41dc4d1e2c53d6f3dbb745311570",
+  "review_branch_artifact_head_sha": "6617621fe16702520b10042765aab507a7b15d0c",
+  "simulated_start": "2027-01-19T08:15:00+00:00",
+  "simulated_end_cursor": "2027-01-31T08:15:00+00:00",
+  "segment_simulated_days": 12,
+  "cumulative_simulated_days": 26,
+  "last_consumed_external_event_id": "d061-chat-27",
+  "next_external_event": null,
+  "next_external_event_cursor": {
+    "after_event_id": "d061-chat-27",
+    "fixture_state": "exhausted_at_segment_boundary",
+    "rule": "Segment 003 is complete at 2027-01-31T08:15:00Z. Do not invent future events."
+  },
+  "segment_resident_cognition_calls": 61,
+  "segment_summary_calls": 40,
+  "cumulative_resident_cognition_calls": 129,
+  "cumulative_summary_calls": 83,
+  "subject_id": "sol-resident-20260921-001",
+  "world": {
+    "workflow_run_id": 35557181277,
+    "artifact_id": 10620621809,
+    "artifact_name": "sol-segment-003-resident-step-35557181277",
+    "artifact_digest": "sha256:a2e57d6d7e5a6c99a7d47fa181f3753389ef6035f2ca926ec88d18cd710620dd",
+    "artifact_size_bytes": 696509,
+    "world_path_in_artifact": "world.sqlite",
+    "world_sha256": "8d84d83a50b17b84dac690165db4f031351ebb26524785d96da2dcf3b810f3ba",
+    "world_size_bytes": 2977792,
+    "world_revision": 281,
+    "index_watermark": 281,
+    "source_segment_artifact_id": 10612379363,
+    "source_world_sha256": "ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8",
+    "merged_decisions_sha256": "e12ec7780dd6672b32e114d853b79e260c9d137a9a6187c6b6bf94ea52627fb9",
+    "hidden_fixture_artifact_id": 10619247168,
+    "hidden_fixture_sha256": "6a41a0ac1a6421d2ad54bf27c96f11fd2a5ec9822c6109466000f37ea9d00f4d"
+  },
+  "pending_running_wakes": [],
+  "last_completed_periodic_review": {
+    "object_id": "wake_review_b3c6b6cf9cc2ca4df59727fe",
+    "revision": 2,
+    "wake_state": "completed",
+    "window_start": "2027-01-19T08:15:00+00:00",
+    "window_end": "2027-01-20T08:15:00+00:00",
+    "termination_reason": "silence"
+  },
+  "active_goal_refs": [
+    {
+      "object_id": "goal_c909920b70a6835d5a42833e",
+      "revision": 1,
+      "goal_status": "proposed",
+      "title": "先稳定早高峰出品"
+    }
+  ],
+  "active_task_refs": [
+    {
+      "object_id": "task_4ab2a4531967655198502158",
+      "revision": 1,
+      "task_state": "ready",
+      "title": "观察早高峰出品卡点",
+      "role": "current_operating_priority"
+    }
+  ],
+  "previous_segment_checkpoint": {
+    "path": "reviews/internal_habitation/sol-yearlong/segments/segment-002/checkpoint.json",
+    "sha256": "ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8"
+  },
+  "previous_segment_checkpoint_digest": "sha256:ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8",
+  "model_identity": {
+    "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
+    "logical_resident_id": "gpt-5.6-sol-interactive-resident-001",
+    "habitation_run_id": "sol-resident-20260921-001"
+  }
+}
