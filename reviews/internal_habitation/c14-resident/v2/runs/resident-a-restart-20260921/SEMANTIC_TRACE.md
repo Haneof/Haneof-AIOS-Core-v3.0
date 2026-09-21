@@ -205,3 +205,19 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
   - 决策文件：`checkpoints/decisions/periodic-review-20261008T135301Z-50aa7d26/round-{0,1}.json`、`checkpoints/decisions/wake-cognitive_derivation-wake_400ea8877e999e1c3902995d-rev1-efd901af/round-0.json`。
 
 **Resulting state**: world_revision 66, index watermark 66, pending wakes 0, Claims 0, operation experiences 0（20 条摘要）。
+
+---
+
+## Cursor 10 — `c14resv2-010` — 2026-10-08T08:08:00-07:00 (dim:schedule)
+
+**Released**
+- dimension `dim:schedule`, source_kind `calendar`, source_class `PLATFORM`, modality `structured_text`
+- payload: "今天 08:15–10:35 安排“设计评审稿”；11:20 前没有会议。"
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-010.json`; ingest → `obs_c14_fixture_6e081d5c46196e1781165d5c@1` (world_revision 67); watch hook: no match; ack → `receipts/ack/cursor-010.json`, `next_sequence=11`.
+
+**Due work at T = 2026-10-08T08:08:00-07:00**（`process-due-20261008T150800Z.json`）: 无到期工作 — Summaries attempted=44/committed=0（20 unchanged、24 empty）；C14 reconcile 幂等（20 个既有 wake，无新 wake/无 dispatch）；Periodic Review not due（18 分钟前刚完成）。无模型调用、无语义写入。
+
+**Resulting state**: world_revision 67, index watermark 67, pending wakes 0, Claims 0。
+
+> 观察（不构成认知）：10-08 在 5h48m 短睡之后仍安排 08:15 起的两小时写作块；单点，不足以支撑任何 Claim。
