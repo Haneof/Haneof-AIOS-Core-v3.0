@@ -308,3 +308,245 @@ def test_conversation_index_preserves_assistant_raw_dialogue_for_explicit_search
 
     page = idx.recall_candidates("蓝色文件夹")
     assert any(hit.object_id == turn.assistant_observation_id for hit in page.hits)
+
+# ---------------------------------------------------------------- T36 structured Observation projection
+# Scope: rebuildable derived search projection only; durable Observation semantics stay unchanged and no semantic inference is introduced.
+
+
+def structured_observation(
+    object_id: str,
+    value,
+    *,
+    subject_id: str = "user_1",
+    revision: int = 1,
+    status: str = "active",
+    at: datetime = NOW,
+) -> Observation:
+    return Observation(
+        object_id=object_id,
+        subject_id=subject_id,
+        revision=revision,
+        occurred=TemporalExtent.point(at),
+        learned_at=NOW,
+        recorded_at=NOW,
+        created_by="t36-structured-search-tests",
+        source_kind="structured_fixture",
+        modality="structured",
+        value=value,
+        status=status,
+    )
+
+
+def _hit_refs(page):
+    return {(hit.object_id, hit.revision) for hit in page.hits}
+
+
+def test_t36_structured_observation_scalars_feed_only_derived_projection(tmp_path):
+    store = SQLiteWorldStore(tmp_path / "world.db")
+    nested_id = new_object_id(ObjectType.OBSERVATION)
+    list_id = new_object_id(ObjectType.OBSERVATION)
+    number_id = new_object_id(ObjectType.OBSERVATION)
+    bool_id = new_object_id(ObjectType.OBSERVATION)
+    null_id = new_object_id(ObjectType.OBSERVATION)
+    text_id = new_object_id(ObjectType.OBSERVATION)
+
+    nested_value = {
+        "invoice": {
+            "vendor": "North Mill",
+            "item": "bread flour",
+            "unit_price": 1.38,
+            "paid": False,
+            "tags": ["wholesale", "priority"],
+            "nullable": None,
+        }
+    }
+    mixed_list = ["alpha", 7, True, {"code": "XK42"}]
+    objects = [
+        structured_observation(nested_id, nested_value),
+        structured_observation(list_id, mixed_list),
+        structured_observation(number_id, 42.75),
+        structured_observation(bool_id, True),
+        structured_observation(null_id, None),
+        observation(text_id, "legacy text observation still searchable"),
+    ]
+    store.commit(objects, op(store, "observation.write", "t36-scalars"))
+
+    raw_before = store.get_payload(nested_id)
+    idx = index_for(store)
+    assert idx.rebuild() == len(objects)
+
+    assert (nested_id, 1) in _hit_refs(idx.recall_candidates("North Mill"))
+    assert (nested_id, 1) in _hit_refs(idx.recall_candidates("bread flour"))
+    assert (nested_id, 1) in _hit_refs(idx.recall_candidates("1.38"))
+    assert (nested_id, 1) in _hit_refs(idx.recall_candidates("false"))
+    assert (nested_id, 1) in _hit_refs(idx.recall_candidates("priority"))
+    assert (nested_id, 1) in _hit_refs(idx.recall_candidates("vendor"))
+    assert (list_id, 1) in _hit_refs(idx.recall_candidates("alpha"))
+    assert (list_id, 1) in _hit_refs(idx.recall_candidates("7"))
+    assert (list_id, 1) in _hit_refs(idx.recall_candidates("XK42"))
+    assert (number_id, 1) in _hit_refs(idx.recall_candidates("42.75"))
+    assert (bool_id, 1) in _hit_refs(idx.recall_candidates("true"))
+    assert (null_id, 1) in _hit_refs(idx.recall_candidates("null"))
+    assert (text_id, 1) in _hit_refs(idx.recall_candidates("legacy text observation"))
+
+    with sqlite3.connect(store.db_path) as conn:
+        row = conn.execute(
+            "SELECT haystack, excerpt FROM search_doc WHERE object_id=? AND revision=1",
+            (nested_id,),
+        ).fetchone()
+    assert row is not None
+    haystack, excerpt = row
+    assert haystack.splitlines() == [
+        "invoice",
+        "item",
+        "bread flour",
+        "nullable",
+        "null",
+        "paid",
+        "false",
+        "tags",
+        "wholesale",
+        "priority",
+        "unit_price",
+        "1.38",
+        "vendor",
+        "north mill",
+    ]
+    assert excerpt.splitlines()[-1] == "North Mill"
+    assert "{" not in haystack and "}" not in haystack
+    assert store.get_payload(nested_id) == raw_before
+    assert store.get_payload(nested_id)["value"] == nested_value
+    assert nested_id not in {hit.object_id for hit in idx.recall_candidates("financial").hits}
+
+
+def test_t36_incremental_rebuild_subject_current_and_inactive_rules(tmp_path):
+    store = SQLiteWorldStore(tmp_path / "world.db")
+    idx = index_for(store)
+
+    user1_id = new_object_id(ObjectType.OBSERVATION)
+    user2_id = new_object_id(ObjectType.OBSERVATION)
+    text_id = new_object_id(ObjectType.OBSERVATION)
+    store.commit(
+        [
+            structured_observation(
+                user1_id,
+                {"vendor": "sharedvendortoken", "amount": 9.25},
+                subject_id="user_1",
+            ),
+            structured_observation(
+                user2_id,
+                {"vendor": "sharedvendortoken", "amount": 9.25},
+                subject_id="user_2",
+            ),
+            observation(text_id, "plain text control needle"),
+        ],
+        op(store, "observation.write", "t36-subject-seed"),
+    )
+    idx.rebuild()
+
+    user1_hits = idx.recall_candidates("sharedvendortoken", subject="user_1")
+    assert _hit_refs(user1_hits) == {(user1_id, 1)}
+    user2_hits = idx.recall_candidates("sharedvendortoken", subject="user_2")
+    assert _hit_refs(user2_hits) == {(user2_id, 1)}
+    assert (text_id, 1) in _hit_refs(idx.recall_candidates("plain text control"))
+
+    # Simulate a pre-T36 derived projection over an already-populated World.
+    # Rebuild must be sufficient to upgrade it; the durable Observation is untouched.
+    with sqlite3.connect(store.db_path) as conn:
+        conn.execute(
+            "DELETE FROM search_postings WHERE object_id=? AND revision=1",
+            (user1_id,),
+        )
+        conn.execute(
+            "UPDATE search_doc SET haystack='', excerpt='' WHERE object_id=? AND revision=1",
+            (user1_id,),
+        )
+        conn.commit()
+    assert user1_id not in {
+        hit.object_id
+        for hit in idx.recall_candidates("sharedvendortoken", subject="user_1").hits
+    }
+    idx.rebuild()
+    assert (user1_id, 1) in _hit_refs(
+        idx.recall_candidates("sharedvendortoken", subject="user_1")
+    )
+
+    incremental_id = new_object_id(ObjectType.OBSERVATION)
+    store.commit(
+        [structured_observation(incremental_id, {"code": "incrementalneedle", "enabled": True})],
+        op(store, "observation.write", "t36-incremental"),
+    )
+    assert idx.catch_up() == 1
+    incremental_before = _hit_refs(idx.recall_candidates("incrementalneedle"))
+    assert (incremental_id, 1) in incremental_before
+    idx.rebuild()
+    incremental_after = _hit_refs(idx.recall_candidates("incrementalneedle"))
+    assert incremental_after == incremental_before
+
+    versioned_id = new_object_id(ObjectType.OBSERVATION)
+    store.commit(
+        [structured_observation(versioned_id, {"code": "obsoletetoken"})],
+        op(store, "observation.write", "t36-version-1"),
+    )
+    idx.catch_up()
+    store.commit(
+        [
+            structured_observation(
+                versioned_id,
+                {"code": "currenttoken"},
+                revision=2,
+            )
+        ],
+        op(store, "observation.write", "t36-version-2"),
+    )
+    idx.catch_up()
+    assert versioned_id not in {
+        hit.object_id for hit in idx.recall_candidates("obsoletetoken").hits
+    }
+    assert (versioned_id, 2) in _hit_refs(idx.recall_candidates("currenttoken"))
+
+    store.commit(
+        [
+            structured_observation(
+                versioned_id,
+                {"code": "retractedtoken"},
+                revision=3,
+                status="retracted",
+            )
+        ],
+        op(store, "observation.write", "t36-version-3"),
+    )
+    idx.catch_up()
+    assert versioned_id not in {
+        hit.object_id for hit in idx.recall_candidates("retractedtoken").hits
+    }
+    assert (versioned_id, 3) in _hit_refs(
+        idx.recall_candidates("retractedtoken", include_inactive=True)
+    )
+
+    stale_id = new_object_id(ObjectType.OBSERVATION)
+    store.commit(
+        [structured_observation(stale_id, {"code": "staletoken"}, status="stale")],
+        op(store, "observation.write", "t36-stale"),
+    )
+    idx.catch_up()
+    assert stale_id not in {
+        hit.object_id for hit in idx.recall_candidates("staletoken").hits
+    }
+
+    tombstone_id = new_object_id(ObjectType.OBSERVATION)
+    store.commit(
+        [structured_observation(tombstone_id, {"code": "deletedtoken"})],
+        op(store, "observation.write", "t36-tombstone"),
+    )
+    idx.catch_up()
+    assert (tombstone_id, 1) in _hit_refs(idx.recall_candidates("deletedtoken"))
+    with sqlite3.connect(store.db_path) as conn:
+        conn.execute(
+            "INSERT OR REPLACE INTO search_tombstones(object_id) VALUES(?)",
+            (tombstone_id,),
+        )
+        conn.commit()
+    assert tombstone_id not in {
+        hit.object_id for hit in idx.recall_candidates("deletedtoken").hits
+    }

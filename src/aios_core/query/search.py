@@ -148,6 +148,45 @@ def _iter_ref_ids(node: Any) -> Iterator[str]:
             yield from _iter_ref_ids(item)
 
 
+def _iter_projection_scalar_texts(node: Any) -> Iterator[str]:
+    """Flatten JSON-like scalars for the rebuildable Observation search projection.
+
+    This is mechanical projection only: mapping keys and scalar values become
+    searchable text, with deterministic key ordering and original list ordering.
+    It never rewrites the durable Observation and never infers semantic meaning.
+    """
+
+    if isinstance(node, str):
+        text = node.strip()
+        if text:
+            yield text
+        return
+    if node is None:
+        yield "null"
+        return
+    if isinstance(node, bool):
+        yield "true" if node else "false"
+        return
+    if isinstance(node, (int, float)):
+        try:
+            yield json.dumps(node, ensure_ascii=False, allow_nan=False)
+        except (TypeError, ValueError):
+            return
+        return
+    if isinstance(node, dict):
+        for key in sorted(node):
+            if not isinstance(key, str):
+                continue
+            key_text = key.strip()
+            if key_text:
+                yield key_text
+            yield from _iter_projection_scalar_texts(node[key])
+        return
+    if isinstance(node, list):
+        for item in node:
+            yield from _iter_projection_scalar_texts(item)
+
+
 def _extent_us(payload: dict, object_type: str) -> tuple[int | None, int | None]:
     extent = None
     for name in _TIME_FIELDS.get(object_type, ()) + ("occurred",):
@@ -386,7 +425,9 @@ class WorldSearchIndex:
         texts: list[str] = []
         for name in _TEXT_FIELDS.get(object_type, ()):
             value = payload.get(name)
-            if isinstance(value, str) and value.strip():
+            if object_type == "observation" and name == "value":
+                texts.extend(_iter_projection_scalar_texts(value))
+            elif isinstance(value, str) and value.strip():
                 texts.append(value.strip())
         tokens: set[str] = set()
         for text in texts:
