@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from aios_core.runtime.capabilities import (
     CapabilityCall,
     CapabilityKind,
@@ -261,3 +263,19 @@ def test_partial_multi_round_usage_never_becomes_a_fake_total():
     assert result.model_input_tokens is None
     assert result.model_output_tokens is None
     assert result.model_total_tokens is None
+
+
+
+def test_model_usage_contract_rejects_invalid_exact_counts():
+    with pytest.raises(ValueError, match="total_tokens"):
+        ModelUsage(total_tokens=-1)
+
+    with pytest.raises(ValueError, match="input_tokens"):
+        ModelUsage(total_tokens=1, input_tokens=True)
+
+    with pytest.raises(ValueError, match="cover reported"):
+        ModelUsage(
+            total_tokens=9,
+            input_tokens=7,
+            output_tokens=3,
+        )
