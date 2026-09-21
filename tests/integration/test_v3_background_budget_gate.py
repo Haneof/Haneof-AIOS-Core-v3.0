@@ -288,10 +288,18 @@ def test_completed_background_wake_exposes_exact_token_usage_in_budget_status(tm
     assert result.runtime.model_total_tokens == 30
 
     current = runtime.wake_bus.current_wake(result.wake.wake_id)
-    assert current.metadata["model_usage_complete"] is True
-    assert current.metadata["model_input_tokens"] == 21
-    assert current.metadata["model_output_tokens"] == 9
-    assert current.metadata["model_total_tokens"] == 30
+    assert "model_usage_complete" not in current.metadata
+    assert "model_total_tokens" not in current.metadata
+
+    meter_rows = runtime.metering.list_model_calls(
+        subject_id="user_1",
+        wake_id=result.wake.wake_id,
+    )
+    assert len(meter_rows) == 1
+    assert meter_rows[0].usage_complete is True
+    assert meter_rows[0].input_tokens == 21
+    assert meter_rows[0].output_tokens == 9
+    assert meter_rows[0].total_tokens == 30
 
     status = runtime.background_budget_gate.status(
         now=NOW + timedelta(minutes=3),
@@ -542,8 +550,15 @@ def test_periodic_review_budget_defers_then_resumes_same_anchors(tmp_path):
         resumed.wake.wake_id,
         revision=resumed.wake.revision,
     )
-    assert completed_payload["metadata"]["model_usage_complete"] is True
-    assert completed_payload["metadata"]["model_total_tokens"] == 44
+    assert "model_usage_complete" not in completed_payload["metadata"]
+    assert "model_total_tokens" not in completed_payload["metadata"]
+    review_meter_rows = runtime.metering.list_model_calls(
+        subject_id="user_1",
+        wake_id=resumed.wake.wake_id,
+    )
+    assert len(review_meter_rows) == 1
+    assert review_meter_rows[0].total_tokens == 44
+    assert review_meter_rows[0].execution_class == "periodic_review"
     status = runtime.background_budget_gate.status(
         now=NOW + timedelta(hours=28),
     )
