@@ -1,0 +1,17 @@
+{
+  "seg003-d026-capability-calls": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "search_world",
+        "arguments": {
+          "query": "徐汇区 老办公楼群 商业区 拍摄 2026",
+          "time_range_start": "2026-09-01T00:00:00Z",
+          "time_range_end": "2026-11-30T23:59:59Z",
+          "object_types": ["observation", "event"]
+        },
+        "call_id": "seg003-d026-search-001"
+      }
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "source_artifact_id": "10612379363",
+  "world_revision": 146,
+  "index_watermark": 145,
+  "world_sha256": "ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8",
+  "current_simulated_time": "2027-01-19T08:15:00Z",
+  "last_consumed_event": "d026-pos",
+  "cumulative_residency_days": 14,
+  "segment": "segment-003",
+  "habitation_run": "sol-resident-20260921-001",
+  "logical_resident": "gpt-5.6-sol-interactive-resident-001",
+  "seg003_status": "pending",
+  "cursor": "d026-pos",
+  "resident_replayed": 0,
+  "summary_replayed": 0
+}

@@ -1,0 +1,50 @@
+name: sol-restore-world
+on:
+  workflow_dispatch:
+    inputs:
+      artifact_id:
+        description: "Source artifact id"
+        required: true
+        default: "10612379363"
+      run_id:
+        description: "Source run id"
+        required: true
+        default: "35535082511"
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/sol-yearlong-resident-20260921
+      - name: Download frozen Segment 002 World
+        uses: actions/download-artifact@v4
+        with:
+          name: sol-segment-002-35535082511
+          path: artifacts/source-segment-002
+          github-token: ${{ github.token }}
+          repository: Haneof/Haneof-AIOS-Core-v3.0
+          run-id: ${{ inputs.run_id }}
+      - name: Copy to repo path
+        shell: bash
+        run: |
+          set -e
+          SRC=$(find artifacts/source-segment-002 -type f -name world.sqlite -print -quit)
+          echo "SRC=$SRC"
+          ls -lh "$SRC"
+          sha256sum "$SRC"
+          mkdir -p reviews/internal_habitation/sol-yearlong/segments/segment-002/
+          cp "$SRC" reviews/internal_habitation/sol-yearlong/segments/segment-002/world.sqlite
+          sha256sum reviews/internal_habitation/sol-yearlong/segments/segment-002/world.sqlite
+      - name: Commit world.sqlite
+        shell: bash
+        run: |
+          git config user.name "sol-restore-bot"
+          git config user.email "sol-restore-bot@users.noreply.github.com"
+          git add reviews/internal_habitation/sol-yearlong/segments/segment-002/world.sqlite
+          git commit -m "chore: restore frozen Segment 002 world.sqlite for local continuation" || echo "no changes"
+          git push origin arena/sol-yearlong-resident-20260921
