@@ -1,0 +1,14 @@
+{
+  "d34aa27018dba2f9714d460569ea6a32d2c1e73a7788f7f7c253d3b950d3b300": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "search_world",
+        "arguments": {
+          "query": "牛角包 早高峰 成型台 烤箱 等待 记录 2027-01-20"
+        },
+        "call_id": "seg003-d030-search-001"
+      }
+    ]
+  }
+}
