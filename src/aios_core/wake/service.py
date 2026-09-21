@@ -18,6 +18,7 @@ from typing import Any, Literal, Mapping
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from aios_core.contracts.enums import (
+    AttentionClass,
     MaintenanceClass,
     ObjectType,
     SourceClass,
@@ -33,7 +34,7 @@ from aios_core.storage.idempotency import canonical_json_dumps
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 
 
-Step0State = Literal["ok", "quiet", "hard_block"]
+Step0State = Literal["ok", "quiet", "background", "review_queue", "hard_block"]
 
 
 def _stable_id(prefix: str, *parts: object) -> str:
@@ -57,6 +58,7 @@ class WakeSignalRequest(BaseModel):
     priority: int = Field(default=50, ge=0, le=100)
     dedupe_key: str = Field(min_length=1)
     cooldown_seconds: int = Field(default=0, ge=0)
+    attention_class: AttentionClass | None = None
     metadata: Mapping[str, Any] = Field(default_factory=dict)
 
     @model_validator(mode="after")
@@ -94,6 +96,7 @@ class ObservationWakeRule(BaseModel):
     dedupe_metadata_keys: tuple[str, ...] = ()
     priority: int = Field(default=50, ge=0, le=100)
     cooldown_seconds: int = Field(default=0, ge=0)
+    attention_class: AttentionClass | None = None
     enabled: bool = True
 
     @model_validator(mode="after")
@@ -129,6 +132,9 @@ class Step0GateInput(BaseModel):
     budget_available: bool = True
     hard_blocked: bool = False
     safety_action_complete: bool = True
+    cognition_allowed: bool = True
+    external_action_allowed: bool = True
+    user_delivery_allowed: bool = True
     reasons: tuple[str, ...] = ()
 
 
@@ -242,6 +248,7 @@ class ObservationTriggerService:
                         priority=rule.priority,
                         dedupe_key=dedupe_key,
                         cooldown_seconds=rule.cooldown_seconds,
+                        attention_class=rule.attention_class,
                         metadata={
                             "trigger_kind": "registered_observation_rule",
                             "trigger_rule_id": rule.rule_id,
@@ -318,45 +325,115 @@ class WakeBus:
         return tuple(pending)
 
     @staticmethod
+    def default_attention_class(
+        wake_source: WakeSource,
+        *,
+        priority: int = 50,
+    ) -> AttentionClass:
+        """Mechanical default routing; never a semantic importance judgment."""
+
+        if wake_source in {WakeSource.SAFETY, WakeSource.USER_INTERACTION}:
+            return AttentionClass.INTERRUPT
+        if wake_source is WakeSource.PERIODIC_REVIEW:
+            return AttentionClass.REVIEW_QUEUE
+        if wake_source is WakeSource.TASK_DUE and int(priority) >= 80:
+            return AttentionClass.INTERRUPT
+        return AttentionClass.BACKGROUND
+
+    @classmethod
+    def attention_class_for_wake(cls, wake: Wake) -> AttentionClass:
+        raw = wake.metadata.get("attention_class")
+        if raw is not None:
+            try:
+                return AttentionClass(str(raw))
+            except ValueError:
+                pass
+        return cls.default_attention_class(
+            wake.wake_source,
+            priority=wake.priority,
+        )
+
+    @classmethod
     def evaluate_step0(
+        cls,
         wake: Wake,
         gate: Step0GateInput | None = None,
     ) -> Step0GateResult:
         value = gate or Step0GateInput()
         reasons = [item.strip() for item in value.reasons if item.strip()]
-        model_allowed = True
-        delivery_allowed = True
-        state: Step0State = "ok"
+        attention_class = cls.attention_class_for_wake(wake)
+
+        model_allowed = attention_class is not AttentionClass.REVIEW_QUEUE
+        action_allowed = bool(value.external_action_allowed)
+        delivery_allowed = (
+            attention_class is AttentionClass.INTERRUPT
+            and bool(value.user_delivery_allowed)
+        )
+
+        if attention_class is AttentionClass.REVIEW_QUEUE:
+            state: Step0State = "review_queue"
+            action_allowed = False
+            delivery_allowed = False
+            reasons.append("queued_for_periodic_review")
+        elif attention_class is AttentionClass.BACKGROUND:
+            state = "background"
+            delivery_allowed = False
+            reasons.append("background_attention_no_user_interrupt")
+        else:
+            state = "ok"
 
         if wake.wake_source is WakeSource.SAFETY and not value.safety_action_complete:
             state = "hard_block"
             model_allowed = False
+            action_allowed = False
             delivery_allowed = False
             reasons.append("required_pre_model_safety_action_not_complete")
 
         if value.hard_blocked:
             state = "hard_block"
+            action_allowed = False
             delivery_allowed = False
             reasons.append("mechanical_hard_block")
 
         if not value.channel_allowed:
-            state = "hard_block"
             delivery_allowed = False
             reasons.append("delivery_channel_not_allowed")
+            if state == "ok":
+                state = "quiet"
+
+        if not value.cognition_allowed:
+            state = "hard_block"
+            model_allowed = False
+            action_allowed = False
+            delivery_allowed = False
+            reasons.append("cognition_not_allowed")
 
         if not value.budget_available:
             state = "hard_block"
             model_allowed = False
+            action_allowed = False
             delivery_allowed = False
             reasons.append("model_budget_unavailable")
-        elif state == "ok" and not value.convenience_allowed:
-            state = "quiet"
+        elif not value.convenience_allowed:
             delivery_allowed = False
             reasons.append("user_context_not_convenient_for_delivery")
+            if state == "ok":
+                state = "quiet"
+
+        if not value.user_delivery_allowed:
+            delivery_allowed = False
+            reasons.append("user_delivery_not_allowed")
+            if state == "ok":
+                state = "quiet"
+
+        if not value.external_action_allowed:
+            action_allowed = False
+            reasons.append("external_action_not_allowed")
 
         return Step0GateResult(
             state=state,
             model_allowed=model_allowed,
+            action_allowed=action_allowed,
             delivery_allowed=delivery_allowed,
             reasons=tuple(dict.fromkeys(reasons)),
         )
@@ -380,6 +457,11 @@ class WakeBus:
                 for ref in refs
             ],
             request.priority,
+            (
+                request.attention_class.value
+                if request.attention_class is not None
+                else None
+            ),
             dict(request.metadata),
         )
 
@@ -431,6 +513,25 @@ class WakeBus:
             revision = latest.revision + 1
             metadata = dict(latest.metadata)
             metadata.update(dict(request.metadata))
+            existing_class = self.attention_class_for_wake(latest)
+            incoming_class = (
+                request.attention_class
+                or self.default_attention_class(
+                    request.wake_source,
+                    priority=request.priority,
+                )
+            )
+            rank = {
+                AttentionClass.REVIEW_QUEUE: 0,
+                AttentionClass.BACKGROUND: 1,
+                AttentionClass.INTERRUPT: 2,
+            }
+            effective_class = (
+                incoming_class
+                if rank[incoming_class] > rank[existing_class]
+                else existing_class
+            )
+            metadata["attention_class"] = effective_class.value
             metadata["last_merge_at"] = moment.isoformat()
             metadata["merged_hit_count"] = latest.hit_count + 1
             metadata["signal_ids"] = [
@@ -526,6 +627,13 @@ class WakeBus:
                     status=WakeState.SUPPRESSED.value,
                     metadata={
                         **dict(request.metadata),
+                        "attention_class": (
+                            request.attention_class
+                            or self.default_attention_class(
+                                request.wake_source,
+                                priority=request.priority,
+                            )
+                        ).value,
                         "signal_ids": [signal_id],
                         "suppression_reason": "cooldown",
                         "cooldown_seconds": request.cooldown_seconds,
@@ -590,6 +698,13 @@ class WakeBus:
             status=WakeState.NEW.value,
             metadata={
                 **dict(request.metadata),
+                "attention_class": (
+                    request.attention_class
+                    or self.default_attention_class(
+                        request.wake_source,
+                        priority=request.priority,
+                    )
+                ).value,
                 "signal_ids": [signal_id],
             },
         )
