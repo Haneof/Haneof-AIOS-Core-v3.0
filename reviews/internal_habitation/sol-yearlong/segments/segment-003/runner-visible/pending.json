@@ -1,61 +1,41 @@
 {
-  "decision_key": "8529485ae03ad78feed637a5f18e31defb4c654a2de0e48d8f738d56fc866d01",
+  "decision_key": "b4abf22296c2790bfdb21ad7335ed4f5b9303ef440fdbd34ede7a4d1ac9576a5",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-summary.pending.v1",
   "simulated_clock": "2027-01-23T08:15:00+00:00",
   "summary_request": {
     "request": {
-      "dimension": "dim:purchase_order",
+      "dimension": "dim:user_ai_interaction",
       "granularity": "day",
-      "source_world_revision": 185,
+      "source_world_revision": 186,
       "sources": [
         {
           "metadata": {
-            "adapter_id": "habitation.purchase_order.v1",
-            "dimension": "dim:purchase_order",
-            "external_record_id": "d037-supplier-quote",
-            "external_revision": "1",
-            "mechanical_ingest": true,
-            "occurred_at_original": "2027-01-22T11:00:00+00:00",
-            "provenance": {
-              "habitation_resident_metadata": {
-                "source": "supplier_portal"
-              },
-              "model_id_not_part_of_fact": true
-            },
-            "source_class": "user",
-            "source_digest": "02fa2e886d61c89d87a519aa36a83e04276acebd293ce4842a123f83ad241d96",
-            "source_schema_version": "1"
+            "dimension": "dim:user_ai_interaction",
+            "role": "assistant",
+            "session_id": "jan22-evening",
+            "turn_index": 1,
+            "turn_key": "47529a47cb9fde8377b6c36f"
           },
-          "object_id": "obs_src_a46c3fac2a66319044463248",
+          "object_id": "obs_conv_ai_13a09c952700f6ec77d1b9a4",
           "object_type": "observation",
-          "occurred_at": "2027-01-22T11:00:00Z",
+          "occurred_at": "2027-01-22T18:20:00Z",
           "revision": 1,
-          "text": "{\"currency\": \"USD\", \"item\": \"bread flour\", \"quantity_kg\": 180, \"quoted_unit_price\": 1.41, \"status\": \"quoted\", \"vendor\": \"North Mill\"}"
+          "text": "好，这次按你的选择继续用North Mill。1.41与1.42的差额是0.01，不把这点价差说成大幅变化，也不为此另起一轮换供应商的比较。当前重点仍是把早高峰出品稳定下来，沿用实际等候点的观察，不分散到菜单扩张上。"
         },
         {
           "metadata": {
-            "adapter_id": "habitation.purchase_order.v1",
-            "dimension": "dim:purchase_order",
-            "external_record_id": "d038-order-confirmed",
-            "external_revision": "1",
-            "mechanical_ingest": true,
-            "occurred_at_original": "2027-01-22T11:20:00+00:00",
-            "provenance": {
-              "habitation_resident_metadata": {
-                "source": "supplier_portal"
-              },
-              "model_id_not_part_of_fact": true
-            },
-            "source_class": "user",
-            "source_digest": "327eb2a21989bde1a4bf9f773bda3c848a21c5b1b82458f53b4407ad76de344f",
-            "source_schema_version": "1"
+            "dimension": "dim:user_ai_interaction",
+            "role": "user",
+            "session_id": "jan22-evening",
+            "turn_index": 1,
+            "turn_key": "47529a47cb9fde8377b6c36f"
           },
-          "object_id": "obs_src_6cc6f858c2e5e5c0cb05d1a8",
+          "object_id": "obs_conv_user_54903466038169effa3b1926",
           "object_type": "observation",
-          "occurred_at": "2027-01-22T11:20:00Z",
+          "occurred_at": "2027-01-22T18:20:00Z",
           "revision": 1,
-          "text": "{\"currency\": \"USD\", \"item\": \"bread flour\", \"quantity_kg\": 180, \"scheduled_delivery\": \"2027-01-25T04:30:00+00:00\", \"status\": \"confirmed\", \"unit_price\": 1.41, \"vendor\": \"North Mill\"}"
+          "text": "这次面粉1.41就继续跟North Mill走吧。和1.42差这一点我不想来回折腾供应商，我现在更想把出品稳定下来。"
         }
       ],
       "truncated": false,
@@ -64,5 +44,5 @@
     },
     "summary_request_type": "DimensionSummaryInput"
   },
-  "world_revision_before": 185
+  "world_revision_before": 186
 }
