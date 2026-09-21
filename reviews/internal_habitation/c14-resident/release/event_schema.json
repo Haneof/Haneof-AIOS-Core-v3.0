@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "c14-resident-event-v1",
+  "title": "C14 Resident Sealed Fixture",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "fixture_version",
+    "schema_version",
+    "release_contract_version",
+    "timezone",
+    "subject_id",
+    "events"
+  ],
+  "properties": {
+    "fixture_version": {
+      "const": "c14-resident-fixture-v1"
+    },
+    "schema_version": {
+      "const": "c14-resident-event-v1"
+    },
+    "release_contract_version": {
+      "const": "c14-sequential-release-v1"
+    },
+    "timezone": {
+      "const": "America/Los_Angeles"
+    },
+    "subject_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "events": {
+      "type": "array",
+      "minItems": 24,
+      "maxItems": 45,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "event_id",
+          "sequence",
+          "phase",
+          "occurred_at",
+          "dimension",
+          "source_kind",
+          "source_class",
+          "modality",
+          "resident_visible_payload"
+        ],
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "pattern": "^c14res-[0-9]{3}$"
+          },
+          "sequence": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "phase": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B"
+            ],
+            "description": "Orchestrator-only boundary metadata; do not expose in Resident event projection."
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dimension": {
+            "type": "string",
+            "pattern": "^dim:"
+          },
+          "source_kind": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_class": {
+            "type": "string",
+            "enum": [
+              "USER",
+              "SENSOR",
+              "PLATFORM",
+              "SAFETY"
+            ]
+          },
+          "modality": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resident_visible_payload": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

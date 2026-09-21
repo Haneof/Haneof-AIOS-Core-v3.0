@@ -1,0 +1,22 @@
+{
+  "fixture_version": "c14-resident-fixture-v1",
+  "event_count": 36,
+  "phase_a_count": 24,
+  "phase_b_count": 12,
+  "timezone": "America/Los_Angeles",
+  "first_timestamp": "2026-10-01T07:15:00-07:00",
+  "handoff": {
+    "phase_a_final_cursor": 24,
+    "phase_a_final_event_id": "c14res-024",
+    "phase_a_final_timestamp": "2026-10-20T18:20:00-07:00",
+    "phase_b_first_cursor": 25,
+    "phase_b_first_event_id": "c14res-025",
+    "phase_b_first_timestamp": "2026-10-22T07:05:00-07:00"
+  },
+  "final_timestamp": "2026-10-29T18:40:00-07:00",
+  "fixture_sha256": "sha256:a0f9dfd0985560ce80f568b6cd11d46b13f5dc352a664c005fcb165ea5a67485",
+  "digest_scope": "UTF-8 bytes of sealed_fixture.json exactly as committed, including the trailing LF",
+  "release_contract_version": "c14-sequential-release-v1",
+  "schema_version": "c14-resident-event-v1",
+  "resident_access": "FORBIDDEN"
+}
