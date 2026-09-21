@@ -1,20 +1,20 @@
 {
   "branch": "arena/01a0bf95-haneof-aios-core-v3-0",
   "export_rule": "Only first missing semantic request; no hidden fixture copied.",
-  "head_sha": "21c2b86691fc278d4be1cc241df5e893311dd5b4",
+  "head_sha": "c5083b8bdfde36392c821358cc89615de6f3c08a",
   "pending_blocks_printed": 1,
-  "run_id": 35555663688,
+  "run_id": 35555709312,
   "runner_attestation": {
     "current_state": {
-      "delivered_external_events": 7,
-      "index_watermark": 162,
-      "last_consumed_external_event_id": "d033-chat-17",
+      "delivered_external_events": 8,
+      "index_watermark": 166,
+      "last_consumed_external_event_id": "d034-staff-note",
       "resident_replayed_calls": 10,
-      "simulated_clock": "2027-01-20T20:30:00+00:00",
+      "simulated_clock": "2027-01-21T08:15:00+00:00",
       "status": "pending",
-      "summary_replayed_calls": 4,
-      "world_revision": 162,
-      "world_sha256": "e4fc130009a99605c347c35101e2dd6c8f17055a73c63cad7213bcec291f2298"
+      "summary_replayed_calls": 5,
+      "world_revision": 166,
+      "world_sha256": "4ec10c69815db9abfe58ade2da2699e9214a37313d58af1333efe5afbeaf2d14"
     },
     "expected_source_revision": 145,
     "expected_subject": "sol-resident-20260921-001",
@@ -30,14 +30,14 @@
     "source_world_sha256": "ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8"
   },
   "state": {
-    "delivered_external_events": 7,
-    "index_watermark": 162,
-    "last_consumed_external_event_id": "d033-chat-17",
+    "delivered_external_events": 8,
+    "index_watermark": 166,
+    "last_consumed_external_event_id": "d034-staff-note",
     "resident_replayed_calls": 10,
-    "simulated_clock": "2027-01-20T20:30:00+00:00",
+    "simulated_clock": "2027-01-21T08:15:00+00:00",
     "status": "pending",
-    "summary_replayed_calls": 4,
-    "world_revision": 162,
-    "world_sha256": "e4fc130009a99605c347c35101e2dd6c8f17055a73c63cad7213bcec291f2298"
+    "summary_replayed_calls": 5,
+    "world_revision": 166,
+    "world_sha256": "4ec10c69815db9abfe58ade2da2699e9214a37313d58af1333efe5afbeaf2d14"
   }
 }
