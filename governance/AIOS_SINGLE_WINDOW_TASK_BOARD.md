@@ -67,7 +67,7 @@
 | 3 | `T34-EXEC-001` | Action 授权前重新验证父 Task/撤销状态，关闭 cancel→authorize 竞态 | **READY** | AUDIT-001 | AUDIT-001=`STILL_OPEN`; Issue #30 / #34 | 修复前复现 + 修复后回归 + execution/P12/P16 Gate GREEN |
 | 4 | `T36-SEARCH-001` | 结构化 Observation scalar 派生索引，不改原 typed fact，不做语义推断 | **READY** | AUDIT-001 | AUDIT-001=`STILL_OPEN`; Issue #30 / #36 | dict/list/number/bool 可检索；rebuild=incremental；subject/current/stale 语义不退化 |
 | 5 | `T28-REC-001` | 普通推荐与 antecedent 路径统一隔离 assistant raw dialogue，避免把 AI 自己的话当用户事实主动推荐 | **READY** | AUDIT-001 | AUDIT-001=`STILL_OPEN`; Issue #30 / #28 | continuity/raw drill-down 仍可访问；用户/外部 fact 与 evidence-grounded Claim 不误删 |
-| 6 | `T35-RULE-001` | 只做“非 Action Task 的可信完成凭据”语义裁决；不改 execution 代码 | **DONE** | AUDIT-001 | `governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md`; PR #53; semantic candidate `b58bbb31a04a119897890452e76461f14fd46288`; merge metadata pending until PR merge | 唯一裁决已形成：所有 Task 终态必须真实证据化；外部执行保持 Action→Outcome；非 Action Task 可用合格 pinned World evidence / validated durable artifact；禁止 AI 自述、伪 Outcome、循环 OperationExperience |
+| 6 | `T35-RULE-001` | 只做“非 Action Task 的可信完成凭据”语义裁决；不改 execution 代码 | **DONE** | AUDIT-001 | `governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md`; PR #53; semantic candidate `b58bbb31a04a119897890452e76461f14fd46288`; squash merge `6fcb51d6e2ecf6e2ab8ff0fa62013f094b32f21c` | 唯一裁决已形成：所有 Task 终态必须真实证据化；外部执行保持 Action→Outcome；非 Action Task 可用合格 pinned World evidence / validated durable artifact；禁止 AI 自述、伪 Outcome、循环 OperationExperience |
 | 7 | `T35-IMPL-001` | 按 T35-RULE-001 裁决实现 Task 完成闭环 | **BLOCKED** | T35-RULE-001, T34-EXEC-001 | T35-RULE-001 semantic ruling complete in PR #53; still blocked until T34-EXEC-001 is resolved; implementation must follow `governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md` | 单独 PR；正常 Action/Outcome 不退化；非 Action Task 有合法真实凭据；P12/P15/P16 GREEN |
 | 8 | `T33-RECALL-001` | 用自包含表达/跨会话省略/无前文三类对照重新验证 recall 误触；只有复现才修 | **READY** | AUDIT-001 | AUDIT-001=`STILL_OPEN`; Issue #30 / #33 | 禁止场景短语黑名单；程序只提供候选，不替 Resident 判断指代 |
 | 9 | `P16-TRIAGE-001` | 更新 PR #37 / Issue #30 中央证据分流到当前 segmented protocol；历史无效年度、PARTIAL、机械复现、有效缺陷分开登记 | **BLOCKED** | AUDIT-001, all activated T34/T36/T28/T35/T33 tasks resolved | PR #37 仍 open，base 较旧 | 冻结被评 Core SHA；不把旧“几天统计”冒充当前进度；中央报告进入 main |
@@ -215,7 +215,7 @@ Governance claim commit: f83438729b7ef0a0ba58b0c3302e1deb5f4ca6bd
 Work branch: governance/t35-rule-non-action-completion-20260921
 Candidate SHA: b58bbb31a04a119897890452e76461f14fd46288
 PR: #53
-Merge SHA: PENDING_POST_MERGE_METADATA
+Merge SHA: 6fcb51d6e2ecf6e2ab8ff0fa62013f094b32f21c
 Required gates: governance/contract only; no Runtime/Core gate required by task
 Gate run IDs / conclusions:
 - N/A — source/evidence review and diff-scope verification only
