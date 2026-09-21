@@ -9,6 +9,10 @@ on:
       - "reviews/internal_habitation/sol-yearlong/segments/segment-003/resume_bridge.py"
       - "reviews/internal_habitation/sol-yearlong/segments/segment-003/decisions/**"
 
+concurrency:
+  group: sol-segment-003-resident-step
+  cancel-in-progress: false
+
 permissions:
   contents: write
   actions: read
