@@ -66,19 +66,19 @@
 
 | 维度 | 要求 | 实际 | 达成 |
 |---|---|---|---|
-| 模拟天数 | ≥365 | **5.17** | ❌ |
-| Resident 认知 checkpoint | ≥365 | **108** | ❌ |
+| 模拟天数 | ≥365 | **7.91** | ❌ |
+| Resident 认知 checkpoint | ≥365 | **132** | ❌ |
 | 事件总数 | 365 | **27 已投喂** (+4 decoy，已入库未建任何 Claim/Relation) | ❌ |
-| 对话轮次 | 240 | **17**（wx_studio 16 + wx_zhiwei 1） | ❌ |
+| 对话轮次 | 240 | **19**（wx_studio 18 + wx_zhiwei 1） | ❌ |
 | 20+ 轮长对话 | 12 | **0**（最长单会话 14 轮跨会话累计，无单场 ≥20） | ❌ |
 | 非对话现实输入 | 60 | **9**（calendar 1, sensor 2, group 3, call_log 1, photo 1, order 1） | ❌ |
 | Goal/Task 生命周期 | 12 | **2**（均未闭环，见 F-014） | ❌ |
 | Action/Outcome | 6 | **0** —— Core 无创建 Outcome 的 capability（F-014） | ❌ |
-| Periodic Review | 12 | **4** | ❌ |
+| Periodic Review | 12 | **6** | ❌ |
 | 延迟真相修正 | 6 | **1 进行中**（第七页黑斑，10-10 检测回报未达）＋ **1 已发生的部分反转**（房东 10-04 预告卖房、10-05 自我否认，Claim 已 revise 降至 0.55 而非撤销） | ❌ |
 | 模糊指代 | 12 | **≥4**（"那个""上次说的""他""这页"） | ❌ |
 | 噪音期 | 6 | **1**（10-03 两条同行群消息，我未建任何 Claim/Goal） | ❌ |
-| 重启 | 4 | **2**（segment_002←001、segment_003←002，均 `fresh_world=false` 且恢复验证通过） | ❌ |
+| 重启 | 4 | **3**（segment_002←001、segment_003←002，均 `fresh_world=false` 且恢复验证通过） | ❌ |
 | decoy subject | 1 | **1** ✅ | ✅ |
 
 ---
@@ -104,9 +104,9 @@
 
 ---
 
-## 4. 发现（F-001 … F-017）
+## 4. 发现（F-001 … F-020）
 
-完整台账含逐条 repro 见 `reviews/internal_habitation/arena_01a0c1e1_moyin/findings/FINDINGS.md`（共 17 条，已用 `grep -c "^## F-"` 核对）。
+完整台账含逐条 repro 见 `reviews/internal_habitation/arena_01a0c1e1_moyin/findings/FINDINGS.md`（共 20 条，已用 `grep -c "^## F-"` 核对）。
 
 ### HIGH
 
@@ -146,9 +146,18 @@ F-012 我先前把它记成"backlog 分页导致 cursor 滞后"，这个描述�
 
 ---
 
-### 3.3 segment_003（本次，**部分完成**，已冻结，`checkpoint sha256=5585bce1…`）
-2026-10-05 07:00 → 2026-10-06 04:00 本地（时钟停在 `2026-10-05T20:00Z`），43 个新 checkpoint，world_revision 95 → 144。
-**这是一个部分段：34 步只走到第 7 步**，durable cursor 停在 `next_step_key=segment_003-s0007-advance`。
+### 3.3 segment_003（**部分完成**，两次冻结，最新 `checkpoint sha256=bca1dda2…`）
+2026-10-05 07:00 → 2026-10-08 21:55 本地（时钟停在 `2026-10-08T13:55Z`），67 个新 checkpoint，world_revision 95 → 174。
+**这是一个部分段：34 步走到第 20 步**，durable cursor 停在 `segment_003-s0020-ev-s3-0009`。
+
+第二轮（restart #3，含 `crash_recovery`）新增的关键内容：
+
+- **第一条 OperationExperience**：`opexp_9fa2d00208fbeedf48976158` —— 「用户以纯指代开场、先行词未被召回」时的取回流程。正面案例有真实 case ref，misses 里如实记了我两次参数名试错。
+- **F-018（HIGH）**：wake 投递出去的回复不落 World。`LIKE '%再拖票更难买%'` 在 `object_revisions` 返回 **0 行**，而普通轮说过的「让你有个准备」能查到 `obs_conv_ai_85849e2a`。后果是我在这段生活里**最有效的一次干预对自己的记忆不可见**，也因此无法为「带时间锚点＋给退出选项 → 35 分钟内决定」这条真实成立的沟通模式记 CommunicationExperience。
+- **F-019（MODEL BEHAVIOR，我的错）**：`clm_8522f237`（无锡决定）上一轮被我钉到了 `obs_conv_user_c9c33cd9…`，而那条正文是「老许来了 说这房子明年可能要卖」。读库发现后 `revise_claim` → rev2 换成正确出处 `obs_conv_user_caa9f3e4…`。**Core 不报错是对的**——语义一致性本就该由 Resident 负责，所以这类错误只能自己复核发现。
+- **F-020（MODEL BEHAVIOR，我的错）**：我在 F-016 补强段里断言「招标公告在 review #5 窗口内却被截断挤掉，延迟了一个周期」。查日志原文后：#5 窗口止于 `10-05T14:40Z`，公告发生在 `10-06T03:00Z`，**根本不在窗内**，它出现在第一个真正包含它的 #6，没有延迟。已原地撤回，「截断是否造成真实证据丢失」降级为 **INSUFFICIENT EVIDENCE**。
+- **一次真实的判断**：10-07 `watch_match` 唤醒（妹妹转述父亲问「你是谁」）。我建了 Claim 但明确不诊断、不否定妹妹的解释，并给出一个**她不需要回无锡就能做**的动作（请妹妹记录发作频次与情境）。理由写在 Summary 里：只报事实会把这条消息变成她的一次内疚。
+- **能力 API 事实订正**：`record_communication_experience`、`commit_operation_experience`、`propose_goal` **都存在**（我先前说「未验证存在」是不准确的）。参数字段名是 `input_schema` 而非 `parameters`。本段我因参数名试错被拒 3 次（`search_world` keywords→query、`inspect_world_object` target_ref→object_id、`revise_claim` claim_ref→target_ref）。
 
 关键节点：
 
@@ -189,13 +198,13 @@ F-012 我先前把它记成"backlog 分页导致 cursor 滞后"，这个描述�
 | 项 | 值 |
 |---|---|
 | World 位置 | `reviews/internal_habitation/arena_01a0c1e1_moyin/segments/segment_003/world.sqlite.gz` |
-| `world_artifact_sha256` | `90bffae8dccef12bfd97790f1271c9fbb238e9f8b5cd966fdf3e50bd500843c3` |
-| checkpoint digest | `5585bce1fde5de6e61f930e76511c47f434ea8bcdfe15244cfaea9c86abfec87` |
-| 链上前一个 | `576b5510d8fd4a4a240835a0b24613de8ff1e1e4c88da753a99385cb90727413` |
-| 模拟时钟 | `run/state.json` 记为 `2026-10-05T20:00:00+00:00`（本地 10-06 04:00） |
-| world_revision | 144（`index_watermark=144`，索引 lag = 0） |
-| **durable cursor** | **step 7 / 34，`next_step_key=segment_003-s0007-advance`** |
-| 剩余事件 | `s3-0004` … `s3-0014` 共 11 条已写好但未投喂；**`s3-0012`（10-10 检测报告）是延迟真相 #1 的落点，尚未到达** |
+| `world_artifact_sha256` | `5e7fce6354f8e352648e37216da8da0b357571e327dcd039ac5c6857e79ff08a` |
+| checkpoint digest | `bca1dda28a2e1860a2114a0ddcec6fb416b7147161d8727a27022a017020b47e` |
+| 链上前一个 | `5585bce1fde5de6e61f930e76511c47f434ea8bcdfe15244cfaea9c86abfec87` |
+| 模拟时钟 | `2026-10-08T13:55:00+00:00`（本地 10-08 21:55） |
+| world_revision | 174 |
+| **durable cursor** | **step 20 / 34，`next_step_key=segment_003-s0020-ev-s3-0009`**（该事件已投喂，等待我的决策） |
+| 剩余事件 | `s3-0009`（10-08 21:55「看着不太像霉」）**正待处理**；其后 `s3-0010` … `s3-0014`，其中 **`s3-0012`（10-10 检测报告）是延迟真相 #1 的落点** |
 
 ⚠️ 一处需说明的 harness 不精确：`checkpoint.json` 的 `simulated_time_cursor` 记为
 `2026-10-05T14:40:00Z`，而 `run/state.json` 的 clock 是 `2026-10-05T20:00:00Z`。
@@ -237,13 +246,13 @@ daemon 的 `clock_regap` 逻辑读的也是 `state.json`。这是我自己 harne
 
 ## 6. Resident 认知真实性声明
 
-> 在本 session 中实际完成的 108 个 Resident 认知 checkpoint 中，**全部 108 个**的语义决策（是否回应、回应什么、检索什么、Summary 写什么、Claim 建/改/撤、Task 状态迁移、是否沉默）都由**我本人当场判断**作出，依据仅为当时可见的 `RuntimeSnapshot`。
+> 在本 session 中实际完成的 132 个 Resident 认知 checkpoint 中，**全部 132 个**的语义决策（是否回应、回应什么、检索什么、Summary 写什么、Claim 建/改/撤、Task 状态迁移、是否沉默）都由**我本人当场判断**作出，依据仅为当时可见的 `RuntimeSnapshot`。
 >
 > **没有任何一部分由确定性替身、脚本、关键词表或预生成答案顶替。**
 >
 > 程序侧仅执行我明确选定的 capability call 并原样回传结果。capability call 逐条记录在 `trace/trace.jsonl`，与 `snapshots/*.snapshot.json` 的 `input_fingerprint` 一一对应。
 >
-> **一年期目标本身：INVALID —— 未完成。** 5.17 / 365 天，108 / 365 checkpoint。我没有伪造剩余部分。
+> **一年期目标本身：INVALID —— 未完成。** 7.91 / 365 天，132 / 365 checkpoint。我没有伪造剩余部分。
 >
 > 需要额外声明一点：108 个 checkpoint 里有 **18 个是被 F-016 的粒度级联强制产出的空窗 Summary**。它们确实是当场的真实判断（判断的内容是「这个窗口没有数据，我不编」），但把它们计入认知密度是有水分的。扣掉这 18 个，实质认知 checkpoint 为 **90 个**。
 
@@ -253,7 +262,7 @@ daemon 的 `clock_regap` 逻辑读的也是 `state.json`。这是我自己 harne
 
 ```
 reviews/internal_habitation/arena_01a0c1e1_moyin/
-├── findings/FINDINGS.md              # F-001 … F-017，含逐条 repro
+├── findings/FINDINGS.md              # F-001 … F-020，含逐条 repro
 ├── harness/{bridge,daemon,next,peek,driver}.py
 ├── life/segment_001/life.jsonl       # 14 条外部世界事件
 ├── life/segment_002/{life,decoy}.jsonl   # 10 + 2 条
