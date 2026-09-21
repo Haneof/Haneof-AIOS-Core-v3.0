@@ -293,7 +293,7 @@ def test_scale_smoke_reduced_g_m1p(world):
 
 
 # ---------------------------------------------------------------- T36 structured Observation projection
-# Scope: derived search projection only; durable Observation semantics stay unchanged and no semantic inference is introduced.
+# Scope: rebuildable derived search projection only; durable Observation semantics stay unchanged and no semantic inference is introduced.
 
 
 def structured_observation(
