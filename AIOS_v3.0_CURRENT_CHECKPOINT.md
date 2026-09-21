@@ -14,7 +14,36 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
-## 当前工程断点 — C14-RES-FIX-002 已收口
+## 当前工程断点 — C14-RES-FIX-003 已收口
+
+最近完成任务：`C14-RES-FIX-003` — **DONE / DURABLE WORLD ACK VERIFIED**。
+
+- Started from main：`0ec8d8bc16c2b0e572a9ae1de5cdc89c0416ea70`
+- Work branch：`c14/res-fixture-v3-durable-ack-20260921-sol`
+- Exact candidate：`17bd54ed0b64131ded0b70d853cac205d055bdcb`
+- PR：#72
+- Squash merge：`e5c7fefce82a49735575c423da310ca3d9441ab4`
+- Completion evidence：`reviews/internal_habitation/c14-resident/v2/C14_RES_FIX_003_COMPLETION_EVIDENCE_2026-09-21.md`
+- Formal fixture v2：`reviews/internal_habitation/c14-resident/v2/fixture/sealed_fixture.json`
+- Frozen fixture SHA256 before/after：`1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253` / **unchanged**
+- Frozen fixture Git blob before/candidate：`7bd1935c9855ee5a71cd74b45bc693e01d21ca1b` / identical.
+- Release operator：`c14-blind-release-operator-v3` at `reviews/internal_habitation/c14-resident/v2/release/release_operator.py`
+- Mechanical ingest adapter：`c14-mechanical-ingest-adapter-v1` at `reviews/internal_habitation/c14-resident/v2/release/mechanical_ingest_adapter.py`
+- Durable World verification：ack 强制 `--world-db`；通过正式 `SQLiteWorldStore.object_revision_record(object_id, revision=N)` + `get_payload(object_id, revision=N)` 回读 exact durable revision；commit `source_class` 从现有 `world_commits` provenance 读取，不信任调用方字符串。
+- Exact binding：subject / Observation type / exact object revision / event id / sequence / occurred_at / dimension / source_kind / durable source_class / modality / payload / fixture version+digest+binding version / payload SHA256 / projection SHA256。
+- Receipt chain：已有 receipt 会在每次 ack 前从同一个 supplied private World 重新验证；换错 World 且缺少历史 exact revisions 会 fail closed。
+- Receipt：保存 exact ingest object id / revision / world revision / durable source class / payload+projection digest，可供后续 Evaluator 逐条回放。
+- Exact-candidate Gate：GitHub Actions run `35598216907` — **SUCCESS**；30/30 real SQLiteWorldStore tests PASS；frozen fixture SHA proof PASS；no-Core-diff PASS。
+- Pre-candidate GREEN：run `35598032585` — **SUCCESS**；同样 30/30 PASS。
+- Candidate iteration failures 保留为证据：`35597626462` 是 test-copy path bootstrap 问题；`35597785208` 已到 durable logic 27/29，通过后仅两条测试误绑错误文案，均在最终 candidate 前修正。
+- Core diff：`src/aios_core/** = 0`。
+- Resident runs：**0**；未运行 pseudo-LLM / semantic oracle / Claim/revise/retract。
+- 当前第一个 READY：`C14-RES-A-001`，必须由新的真实 Resident 模型窗口执行。
+- Resident A 正式流程只认 fixture v2：不得打开 sealed fixture / manifest / evaluator notes；只能逐条 `reveal -> mechanical_ingest_adapter --world-db -> ack --world-db exact-ref`；cursor 1..24；ack 24 后永久停止，绝对不得 reveal 25。
+
+以下 `C14-RES-FIX-002` 及更早段落均为历史快照；下一任务只以 Task Board 和本段为准。
+
+## 历史工程断点 — C14-RES-FIX-002 已收口
 
 最近完成任务：`C14-RES-FIX-002` — **DONE / RESIDENT FIXTURE V2 HARDENED**。
 
