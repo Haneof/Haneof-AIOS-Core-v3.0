@@ -16,7 +16,15 @@ from typing import Any, Literal, Mapping, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from aios_core.contracts.enums import ObjectType, TaskState, TaskType, WakeSource, WakeState
+from aios_core.contracts.enums import (
+    MaintenanceClass,
+    ObjectType,
+    SourceClass,
+    TaskState,
+    TaskType,
+    WakeSource,
+    WakeState,
+)
 from aios_core.contracts.models import Observation, Task, Wake
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef, SourceRef
@@ -452,8 +460,8 @@ class AttentionRouter:
                 expected_world_revision=int(self.store.current_world_revision()),
                 reason="mechanically batch pending non-safety Wakes before Resident invocation",
                 idempotency_key=f"attention-bundle:{bundle_id}",
-                source_class="maintenance",
-                maintenance_class="wake_scheduler",
+                source_class=SourceClass.MAINTENANCE,
+                maintenance_class=MaintenanceClass.WAKE_SCHEDULER,
             ),
         )
         self.wake_bus._catch_up()
