@@ -58,6 +58,17 @@ def _clean(value: str | None) -> str:
 
 def _recent_user_text(recent_turns: Sequence[Mapping[str, Any]]) -> str | None:
     for item in reversed(recent_turns):
+        # P14 canonical continuity exposes one turn as
+        # {"turn_index": ..., "user": {"text": ...}, "assistant": {...}}.
+        # Accept that durable shape first and read only the user side.
+        canonical_user = item.get("user")
+        if isinstance(canonical_user, Mapping):
+            text = _clean(str(canonical_user.get("text") or ""))
+            if text:
+                return text
+
+        # Keep the direct role/text shape for TopicState's small deterministic API
+        # and existing callers/tests. Assistant rows are never antecedent sources.
         if str(item.get("role") or "").strip().lower() != "user":
             continue
         text = _clean(str(item.get("text") or ""))
