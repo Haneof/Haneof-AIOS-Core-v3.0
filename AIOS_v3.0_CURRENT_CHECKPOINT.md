@@ -14,7 +14,38 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
-## 当前工程断点 — C14-RES-FIX-001 已收口
+## 当前工程断点 — C14-RES-FIX-002 已收口
+
+最近完成任务：`C14-RES-FIX-002` — **DONE / RESIDENT FIXTURE V2 HARDENED**。
+
+- Started from main：`075685b5b9b632988baa4e2de61c6d05aa469d32`
+- Work branch：`c14/res-fixture-v2-hardening-20260921-sol`
+- Exact candidate：`aacee04cfa5390f2a63d0a5606acb909291849b6`
+- PR：#70
+- Squash merge：`510290d3b9578cd9425079a22050eb679ddb528a`
+- Completion evidence：`reviews/internal_habitation/c14-resident/v2/C14_RES_FIX_002_COMPLETION_EVIDENCE_2026-09-21.md`
+- Formal fixture v2：`reviews/internal_habitation/c14-resident/v2/fixture/sealed_fixture.json`
+- Manifest v2：`reviews/internal_habitation/c14-resident/v2/fixture/fixture_manifest.json`
+- Release contract v2：`reviews/internal_habitation/c14-resident/v2/release/release_contract.md`
+- Blind release operator：`reviews/internal_habitation/c14-resident/v2/release/release_operator.py`
+- Evaluator-only notes：`reviews/internal_habitation/c14-resident/v2/evaluator/EVALUATOR_ONLY_design_notes.md`
+- Fixture v2 SHA256：`1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253`
+- 时间轴：`2026-10-01T07:12:00-07:00` → `2026-10-31T12:03:00-07:00`，timezone `America/Los_Angeles`。
+- 事件数：36；Phase A = 24；Phase B = 12；handoff = ack cursor 24 后 next=25，Resident A 必须停止。
+- v1：完整保留为历史审查证据；**不得**再作为正式 C14 Resident 输入。
+- Single-dimension leakage audit：**PASS**。Phase-A positive design 中 schedule / sleep / work_outcome / device_activity / conversation 任一单维都不足以独立建立高阶 longitudinal cognition；conversation 只保留局部当日事实。
+- Phase-B underdetermination audit：**PASS**。09:00 提前澄清与 11:00 保护初始连续工作均由当前事实支持；deadline arithmetic 不会机械排除任一方案；fixture 不规定正确选项。
+- Blind release：可执行 `init / reveal / ack`；reveal 只输出当前 event projection 且不推进；durable ingest ref + exact ack 后才推进；A 禁止 cursor 25；B 只能从 exact 24→25 handoff 启动。
+- Exact-byte mechanical audit：**19/19 PASS**，包含 digest/version/skip/repeat/wrong-event/no-ingest-ref fail-closed、24/25 boundary、stdout future isolation。
+- GitHub Actions：已提交可复现 v2 mechanical workflow；本窗口 GitHub workflow/status API 未产生 app-authored PR head 的 run record，因此没有伪报 CI GREEN。
+- Core diff：`src/aios_core/** = 0`；fixture-v1 mutations = 0。
+- 本窗口没有运行 Resident、pseudo-LLM、semantic oracle，也没有启动 `C14-RES-A-001` / B / EVAL / P16。
+- 当前第一个 READY：`C14-RES-A-001`。必须在**新的真实 Resident 模型窗口**执行。
+- Resident A 正式输入只认 v2：不得直接打开 sealed fixture / manifest / evaluator notes；只能调用 v2 `release_operator.py` 逐条获得 cursor 1..24；每条 event durable ingest 后才 ack；ack 24 后永久停止，绝对不得 reveal 25。
+
+以下 `C14-RES-FIX-001` / v1 及更早段落均为历史快照；下一任务只以 task board 和本段为准。
+
+## 历史工程断点 — C14-RES-FIX-001 已收口
 
 最近完成任务：`C14-RES-FIX-001` — **DONE / SEALED RESIDENT FIXTURE READY**。
 
