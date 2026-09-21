@@ -803,3 +803,58 @@ the only later main delta was checkpoint documentation; no Runtime/Core/Test cod
 - `T36-SEARCH-001` and `T35-IMPL-001` were not executed in this window.
 - Next READY by task-board ordering: **T36-SEARCH-001**.
 - This window stops here.
+
+
+---
+
+## 2026-09-21 — T36-SEARCH-001 DONE
+
+- Task ID: `T36-SEARCH-001`
+- Status: **DONE**
+- Started from main: `f8a2f8e4cf53de579bd0bc69cfd85421d109d65b`
+- Final synchronization base: `56cf9a5daa2f6873744590c379acb3dff0deb705`
+- Work branch: `task/t36-search-001-structured-scalar-20260921`
+- Candidate SHA: `afc62009340f4451d15400c4860ee880296d9c7c`
+- PR: #52
+- Squash merge SHA: `07965029285cf3dfc0fdb5e506a65add60c76c29`
+- Task-board close commit: `a0b9834e39168fa3f9bca09c5cf0ba756ef3f71d`
+
+### Reproduction evidence
+
+Test-only pre-fix run `35566751016` reproduced Issue #36 on then-current main semantics:
+a nested structured Observation with `value.vendor="North Mill"` was durable in World but
+`recall_candidates("North Mill")` returned zero matching Observation hits. Subject-scoped
+structured scalar retrieval failed for the same reason. The defect was the string-only
+`_index_row()` text-field projection.
+
+### Accepted repair
+
+`WorldSearchIndex` now mechanically expands only structured `Observation.value` into the
+rebuildable derived search projection. Mapping keys are deterministic, list order is stable,
+and string/number/bool/null scalars are searchable. The durable typed Observation is not
+rewritten, no semantic Claim/Summary is generated, and the indexer performs no interpretation.
+
+The accepted regressions cover nested dict/list/mixed scalars, numeric/boolean/null retrieval,
+incremental indexing, full rebuild, projection rebuild upgrade, rebuild/incremental parity,
+subject isolation, current-version filtering, inactive/retracted/stale/tombstone behavior,
+legacy text Observation retrieval, P16 habitation invoice retrieval, and preservation of the
+T28/T33 main regressions.
+
+### Gate runs
+
+- `world-index` — `35568085113` — **SUCCESS**
+- `memory-recommendation` — `35568085081` — **SUCCESS**
+- `p16-habitation-harness` — `35568085280` — **SUCCESS**
+- `p16-convergence-gate` — `35568085170` — **SUCCESS**
+- `p9-revision-gate` — `35568085180` — **SUCCESS**
+- `dimension-summary` — `35568085143` — **SUCCESS**
+- `constitutional-cognition-closure` — `35568085182` — **SUCCESS**
+- fused-turn equivalent regression — `35568044160` — **SUCCESS**; temporary branch-only
+  workflow removed before final candidate, so it is absent from the merged diff.
+
+### Deferred / next
+
+- Deferred issues: none inside T36 scope.
+- T33/T28/T34/T35 semantics were not changed by T36.
+- Next READY task: **T35-IMPL-001**.
+- Per single-window rule, this T36 window stops here and must not execute the next task.
