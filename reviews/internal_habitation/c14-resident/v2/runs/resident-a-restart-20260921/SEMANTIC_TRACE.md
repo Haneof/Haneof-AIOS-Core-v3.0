@@ -237,3 +237,21 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
 **Resulting state**: world_revision 68, index watermark 68, pending wakes 0, Claims 0。
 
 > 观察（不构成认知）：这是第二次“晨间写作块 + 专注模式”记录（10-01：08:02–10:18，3 次解锁/26 条静音；10-08：08:13–10:34，2 次解锁/29 条静音）。同类行为已 2 次，接近我自设的 ≥3 门槛。
+
+---
+
+## Cursor 12 — `c14resv2-012` — 2026-10-08T10:43:00-07:00 (dim:work_outcome)
+
+**Released**
+- dimension `dim:work_outcome`, source_kind `task_tracker`, source_class `PLATFORM`, modality `structured_text`
+- payload: "“设计评审稿”于 10:31 完成；三个待决问题已在文档中给出处理方案。"
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-012.json`; ingest → `obs_c14_fixture_96ba14d7f113e478b8a8bae8@1` (world_revision 69); watch hook: no match; ack → `receipts/ack/cursor-012.json`, `next_sequence=13`.
+
+**Bridge 缺陷与修复（机械、可追溯）**: S11 的 stdout 降噪改动引入 `AttributeError: 'CognitiveDerivationReconcileResult' object has no attribute 'get'`，导致首次 process-due 在 reconcile 之后、dispatch 之前中止（`C14_RECONCILE` 前的摘要步已完成且无提交，reconcile 为幂等，无副作用泄漏）。修复为 `getattr(reconcile, ...)` 并重跑：`receipts/process-due-20261008T174300Z.json`。
+
+**Due work at T = 2026-10-08T10:43:00-07:00**（重跑）：无到期工作 — Summaries attempted=44/committed=0（20 unchanged、24 empty）；C14 reconcile examined=20/scheduled=20（全幂等）；Periodic Review not due。
+
+**Resulting state**: world_revision 69, index watermark 69, pending wakes 0, Claims 0。
+
+> 观察（不构成认知）：这是第二次“晨间写作块按时交付”（10-01 memo 10:16 交、计划 10:20 止；10-08 设计评审稿 10:31 交、计划 10:35 止），与 10-05 被会议打断致 65% 顺延形成对照。三次工作块中 2 次受保护、1 次被打断——已接近可成型的“日程保护—交付”模式，待 10-08 日窗闭合后的 C14 派生中复核跨日证据再定。

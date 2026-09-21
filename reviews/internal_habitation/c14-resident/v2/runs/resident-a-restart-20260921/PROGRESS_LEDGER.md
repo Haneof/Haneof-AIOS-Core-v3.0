@@ -49,6 +49,7 @@ Resident model (as declared): `GPT-5.6 Sol`; platform provider/session id: `unkn
 | 9 | `c14resv2-009` | 2026-10-08T06:52:00-07:00 | `obs_c14_fixture_056dddd04850d813437e8532@1` | yes (`next=10`) | 1 Summary（conversation 10-06）由我撰写；C14 `wake_400ea8877e999e1c3902995d` → **silence**；Periodic Review `wake_review_e1002d5562f2ae6d74007e1e` → anchors 复盘 → **silence** | 66 | 短睡 5h48m/60 使睡眠样本发散；0 Claims（拒绝过早“稳定模式”） |
 | 10 | `c14resv2-010` | 2026-10-08T08:08:00-07:00 | `obs_c14_fixture_6e081d5c46196e1781165d5c@1` | yes (`next=11`) | none due（日窗未闭合；C14 幂等；review 刚跑过） | 67 | dim:schedule 短睡次日的 08:15–10:35 设计评审稿块 |
 | 11 | `c14resv2-011` | 2026-10-08T10:38:00-07:00 | `obs_c14_fixture_522a6cbeb84ced83b62def58@1` | yes (`next=12`) | none due | 68 | 第二次晨间专注块记录（2 次解锁/29 条静音）；bridge 审计日志降噪（stdout 摘要，文件保留全量） |
+| 12 | `c14resv2-012` | 2026-10-08T10:43:00-07:00 | `obs_c14_fixture_96ba14d7f113e478b8a8bae8@1` | yes (`next=13`) | none due；bridge stdout 降噪 bug 修复后重跑 | 69 | 第二次按时交付（设计评审稿 10:31 / 计划止 10:35） |
 
 ## Blockers / contamination
 

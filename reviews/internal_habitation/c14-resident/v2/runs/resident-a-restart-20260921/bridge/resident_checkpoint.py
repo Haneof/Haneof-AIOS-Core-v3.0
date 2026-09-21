@@ -596,8 +596,8 @@ def cmd_process_due(args: argparse.Namespace) -> None:
         "C14_RECONCILE",
         result=_jsonable(reconcile),
         stdout_summary={
-            "examined": reconcile.get("examined"),
-            "scheduled": len(reconcile.get("scheduled") or ()),
+            "examined": getattr(reconcile, "examined", None),
+            "scheduled": len(getattr(reconcile, "scheduled", ()) or ()),
         },
     )
 
