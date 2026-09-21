@@ -1,0 +1,157 @@
+name: sol-segment-003-resident-step
+
+on:
+  push:
+    branches:
+      - "arena/sol-yearlong-resident-20260921"
+    paths:
+      - ".github/workflows/sol-segment-003-resident-step.yml"
+      - "reviews/internal_habitation/sol-yearlong/segments/segment-003/resume_bridge.py"
+      - "reviews/internal_habitation/sol-yearlong/segments/segment-003/decisions/**"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  resident-step:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+
+      - name: Download frozen Segment 002 World
+        uses: actions/download-artifact@v4
+        with:
+          name: sol-segment-002-35535082511
+          path: artifacts/source-segment-002
+          github-token: ${{ github.token }}
+          repository: Haneof/Haneof-AIOS-Core-v3.0
+          run-id: 35535082511
+
+      - name: Download sealed Segment 003 Life Director package
+        uses: actions/download-artifact@v4
+        with:
+          name: sol-segment-003-hidden-35553766484
+          path: artifacts/hidden-segment-003
+          github-token: ${{ github.token }}
+          repository: Haneof/Haneof-AIOS-Core-v3.0
+          run-id: 35553766484
+
+      - name: Verify opaque inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_WORLD="$(find artifacts/source-segment-002 -type f -name world.sqlite -print -quit)"
+          FIXTURE="$(find artifacts/hidden-segment-003 -type f -name sealed_fixture.json -print -quit)"
+          test -n "$SOURCE_WORLD"
+          test -n "$FIXTURE"
+
+          SOURCE_SHA="$(sha256sum "$SOURCE_WORLD" | awk '{print $1}')"
+          FIXTURE_SHA="$(sha256sum "$FIXTURE" | awk '{print $1}')"
+
+          test "$SOURCE_SHA" = "ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8"
+          test "$FIXTURE_SHA" = "6a41a0ac1a6421d2ad54bf27c96f11fd2a5ec9822c6109466000f37ea9d00f4d"
+
+          echo "source_world_sha256=$SOURCE_SHA"
+          echo "hidden_fixture_sha256=$FIXTURE_SHA"
+          echo "future_payloads_printed=false"
+
+      - name: Merge Segment 003 Resident decisions
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          decisions_dir = Path("reviews/internal_habitation/sol-yearlong/segments/segment-003/decisions")
+          merged = {}
+          if decisions_dir.exists():
+              for path in sorted(decisions_dir.glob("part-*.json")):
+                  fragment = json.loads(path.read_text(encoding="utf-8"))
+                  if not isinstance(fragment, dict):
+                      raise SystemExit(f"decision fragment is not an object: {path}")
+                  overlap = set(merged).intersection(fragment)
+                  if overlap:
+                      raise SystemExit(f"duplicate decision keys in {path}: {sorted(overlap)}")
+                  merged.update(fragment)
+
+          out = Path("artifacts/segment-003/merged-decisions.json")
+          out.parent.mkdir(parents=True, exist_ok=True)
+          out.write_text(
+              json.dumps(merged, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          print(f"segment003_decisions={len(merged)}")
+          PY
+
+      - name: Run until next Resident semantic checkpoint
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p artifacts/segment-003
+
+          SOURCE_WORLD="$(find artifacts/source-segment-002 -type f -name world.sqlite -print -quit)"
+          FIXTURE="$(find artifacts/hidden-segment-003 -type f -name sealed_fixture.json -print -quit)"
+
+          set +e
+          PYTHONPATH="$PWD/src:$PWD/tests:$PWD" python             reviews/internal_habitation/sol-yearlong/segments/segment-003/resume_bridge.py             --fixture "$FIXTURE"             --source-world "$SOURCE_WORLD"             --working-world artifacts/segment-003/world.sqlite             --after-event-id d026-pos             --segment-end 2027-01-31T08:15:00Z             --expected-world-sha256 ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8             --expected-revision 145             --expected-subject sol-resident-20260921-001             --decisions artifacts/segment-003/merged-decisions.json             --state-out artifacts/segment-003/state.json             --snapshot-out artifacts/segment-003/snapshot.json             --event-trace-out artifacts/segment-003/event-trace.json             2>&1 | tee artifacts/segment-003/stdout.txt
+          CODE="${PIPESTATUS[0]}"
+          set -e
+
+          echo "$CODE" > artifacts/segment-003/bridge-exit-code.txt
+          if [ "$CODE" -ne 0 ] && [ "$CODE" -ne 42 ]; then
+            exit "$CODE"
+          fi
+
+      - name: Freeze Resident-side evidence
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f artifacts/segment-003/state.json
+          sha256sum artifacts/segment-003/world.sqlite > artifacts/segment-003/world.sha256
+          sha256sum artifacts/segment-003/merged-decisions.json > artifacts/segment-003/merged-decisions.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          state = json.loads(Path("artifacts/segment-003/state.json").read_text(encoding="utf-8"))
+          attestation = {
+              "schema": "aios.p16.segment003.runner-attestation.v1",
+              "habitation_run_id": "sol-resident-20260921-001",
+              "logical_resident_id": "gpt-5.6-sol-interactive-resident-001",
+              "segment_id": "segment-003",
+              "source_artifact_id": 10612379363,
+              "source_world_sha256": "ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8",
+              "hidden_fixture_artifact_id": 10619247168,
+              "hidden_fixture_sha256": "6a41a0ac1a6421d2ad54bf27c96f11fd2a5ec9822c6109466000f37ea9d00f4d",
+              "expected_source_revision": 145,
+              "expected_subject": "sol-resident-20260921-001",
+              "require_fresh": False,
+              "current_state": state,
+              "runner_boundary": "The runner may read the sealed fixture mechanically but prints only the current pending RuntimeSnapshot/Summary request. It does not author semantic Resident decisions."
+          }
+          Path("artifacts/segment-003/runner-attestation.json").write_text(
+              json.dumps(attestation, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          print(f"resident_step_status={state['status']}")
+          print(f"resident_step_cursor={state['last_consumed_external_event_id']}")
+          print(f"resident_step_world_revision={state['world_revision']}")
+          PY
+
+      - name: Upload Resident step artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sol-segment-003-resident-step-${{ github.run_id }}
+          path: artifacts/segment-003/
+          if-no-files-found: error
+          retention-days: 90
