@@ -300,3 +300,24 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
 - 决策文件：`checkpoints/decisions/wake-cognitive_derivation-wake_7198b085c5bc20fcee8fd8de-rev1-3b442dee/round-{0,1}.json`、`checkpoints/decisions/periodic-review-20261011T124401Z-fc7ceceb/round-{0,1}.json`。
 
 **Resulting state**: world_revision 94, index watermark 94, pending wakes 0, Claims 1（rev 2）, 26 条摘要, operation experiences 0。
+
+---
+
+## Cursor 15 — `c14resv2-015` — 2026-10-11T05:48:00-07:00 (dim:schedule)
+
+**Released**
+- dimension `dim:schedule`, source_kind `calendar`, source_class `PLATFORM`
+- payload: "今天 06:25 航班；日历标记 05:52 出门。"（10-11 为出行日；出门时间距航班约 33 分钟）
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-015.json`; ingest → `obs_c14_fixture_979fd7bab5a31f3239b61e0b@1` (world_revision 95); watch hook: no match; ack → `receipts/ack/cursor-015.json`, `next_sequence=16`。
+
+**Due work at T = 2026-10-11T05:48:00-07:00**（`receipts/process-due-20261011T124800Z.json`）:
+- 摘要：唯一被重算的单元是 dim:work_outcome 10-09（S14 的 `revise_claim` 让它进入 `stale_review_required`）。其 checkpoint 目录里的 `summary.txt` 仍是我 S14 亲笔文本，管道据此提交 **rev3**（source_refs = `clm_79df61916b8bb4c10cb3faa3@2` + `evs_fc254abd76b116a56bb77c04@1`）。
+  - 我复核并记录：rev3 文本中的括注（“截至 10-08 的 3 次观察”“9 条观测”）反映的是 claim rev1 时代的措辞；当前认知以 claim rev2 自身为准（截至 10-09、10 条观测、已含疲劳—交付区分）。摘要按契约只是时间导航锚点（`summary_is_semantic_conclusion=false`），不构成结论；我不为措辞差异制造额外写入。
+- C14 wake `wake_7a5808cbfef6321783bf0cb3`（单成员 = 上述 10-09 work_outcome 摘要 rev3；lineage MIXED/has_ai=true；leaves = claim rev2 + 10 条观测）：
+  - round 0（我的决定）：`read_ai_world(50)`（空）、`inspect_world_object(sum_9e81acf33a4abc28c291e3af@3)`、`search_timeline(dim:work_outcome, 10-09 全天)`、`search_timeline(dim:conversation, 10-09 全天)`。
+  - round 1：**silence** — 窗口内无新的现实观测；10-09 会话自述早在 S14 已折入 claim rev2 的证据集；无新证据可闭合、亦无反证，故不形成、不修订、不撤回认知。
+- 决策文件：`checkpoints/decisions/wake-cognitive_derivation-wake_7a5808cbfef6321783bf0cb3-rev1-923378aa/round-{0,1}.json`。
+- Periodic Review：本 T 未触发（S14 刚执行过）。
+
+**Resulting state**: world_revision 99, index watermark 99, pending wakes 0, Claims 1（rev 2）, 26 条摘要, operation experiences 0。
