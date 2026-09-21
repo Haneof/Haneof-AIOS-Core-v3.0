@@ -1,0 +1,52 @@
+{
+  "d0a591a9e2b036c1fa47c4a09e2cd1ee0b55205b55e811b9f2d0a0fcad35eb12": {
+    "calls": [
+      {
+        "arguments": {
+          "claim_type": "fact",
+          "confidence": 0.95,
+          "content": "2027-01-20 牛角包计划出炉 07:40Z、实际 08:02Z（约晚 22 分钟）；车间日志记录成型台前出现 17 分钟等待且记录员未填写原因。该记录未提及烤箱，现有证据不足以确定延迟原因，暂不把烤箱作为原因。",
+          "dimension": "dim:production_log",
+          "evidence_refs": [
+            {
+              "object_id": "obs_src_4ca5f23159a0a691650430b5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_0f575c8301820e6a83ab4e38",
+              "revision": 1
+            }
+          ]
+        },
+        "call_id": "seg003-006",
+        "name": "commit_claim"
+      },
+      {
+        "arguments": {
+          "confidence": 0.95,
+          "dimension": "dim:production_log",
+          "event_time": {
+            "end": "2027-01-20T08:02:00Z",
+            "precision": "minute",
+            "start": "2027-01-20T07:40:00Z"
+          },
+          "evidence_refs": [
+            {
+              "object_id": "obs_src_4ca5f23159a0a691650430b5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_0f575c8301820e6a83ab4e38",
+              "revision": 1
+            }
+          ],
+          "interpretation": "计划出炉 07:40Z、实际 08:02Z。车间日志记录的可见卡点位于成型台前的等待（17 分钟，原因未填）。现有证据不支持任何具体原因（含烤箱在内），标记为单次未归因的出品延迟事件，待连续观察。",
+          "title": "2027-01-20 牛角包早高峰出品晚约 22 分钟"
+        },
+        "call_id": "seg003-007",
+        "name": "form_event"
+      }
+    ],
+    "kind": "capability_calls"
+  }
+}
