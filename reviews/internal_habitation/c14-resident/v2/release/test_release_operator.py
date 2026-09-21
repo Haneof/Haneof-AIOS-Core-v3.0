@@ -266,5 +266,14 @@ class ReleaseOperatorTests(unittest.TestCase):
             self.assertNotIn("反例", event["resident_visible_payload"])
 
 
+    def test_19_manifest_and_operator_version_mismatch_fail_closed(self) -> None:
+        manifest = json.loads(self.manifest_path.read_text(encoding="utf-8"))
+        manifest["release_operator_version"] = "wrong-operator-version"
+        self.manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        proc = self.run_op("init", "--phase", "A", "--state", str(self.state), ok=False)
+        self.assertEqual(proc.stdout, "")
+        self.assertIn("release operator version mismatch", proc.stderr)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
