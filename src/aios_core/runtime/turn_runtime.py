@@ -2963,10 +2963,6 @@ class FusedTurnRuntime:
             ),
             delivery_allowed=gate_result.delivery_allowed,
             step0_state=gate_result.state,
-            model_input_tokens=runtime_result.model_input_tokens,
-            model_output_tokens=runtime_result.model_output_tokens,
-            model_total_tokens=runtime_result.model_total_tokens,
-            model_usage_complete=runtime_result.model_usage_complete,
         )
         delivery_response = (
             runtime_result.response
@@ -3178,10 +3174,6 @@ class FusedTurnRuntime:
             capability_names=[
                 result.name for result in runtime_result.capability_history
             ],
-            model_input_tokens=runtime_result.model_input_tokens,
-            model_output_tokens=runtime_result.model_output_tokens,
-            model_total_tokens=runtime_result.model_total_tokens,
-            model_usage_complete=runtime_result.model_usage_complete,
         )
         self.attention_router.complete_review_queue(
             review_queue_consumed_ids,
