@@ -18,7 +18,7 @@ from urllib import error as urllib_error
 from urllib import request as urllib_request
 
 from aios_core.runtime.capabilities import CapabilityCall, CapabilityResult
-from aios_core.runtime.cognitive_runtime import ModelDirective, ModelUsage, RuntimeSnapshot
+from aios_core.runtime.cognitive_runtime import ModelCallProvenance, ModelDirective, ModelUsage, RuntimeSnapshot
 
 
 SILENCE_TOKEN = "<AIOS_SILENCE>"
@@ -709,13 +709,14 @@ def _terminal_directive(
     text: str,
     *,
     usage: ModelUsage | None = None,
+    provenance: ModelCallProvenance | None = None,
 ) -> ModelDirective:
     clean = text.strip()
     if clean == SILENCE_TOKEN:
-        return ModelDirective(silence=True, usage=usage)
+        return ModelDirective(silence=True, usage=usage, provenance=provenance)
     if not clean:
         raise ProviderProtocolError("provider returned no terminal text or tool call")
-    return ModelDirective(response=clean, usage=usage)
+    return ModelDirective(response=clean, usage=usage, provenance=provenance)
 
 
 def _openai_text(response: Mapping[str, Any]) -> str:
@@ -872,6 +873,11 @@ class ProviderResidentHandler:
         response_id = response.get("id")
         if not isinstance(response_id, str) or not response_id.strip():
             raise ProviderProtocolError("OpenAI response missing id")
+        provenance = ModelCallProvenance(
+            provider="openai",
+            model=self.client.config.model,
+            request_id=response_id,
+        )
         self._state_id = response_id
 
         calls: list[CapabilityCall] = []
@@ -894,8 +900,16 @@ class ProviderResidentHandler:
                     )
                 )
         if calls:
-            return ModelDirective(capability_calls=tuple(calls), usage=usage)
-        return _terminal_directive(_openai_text(response), usage=usage)
+            return ModelDirective(
+                capability_calls=tuple(calls),
+                usage=usage,
+                provenance=provenance,
+            )
+        return _terminal_directive(
+            _openai_text(response),
+            usage=usage,
+            provenance=provenance,
+        )
 
     def _anthropic(self, snapshot: RuntimeSnapshot) -> ModelDirective:
         tools = provider_tools(
@@ -958,6 +972,11 @@ class ProviderResidentHandler:
         response_id = response.get("id")
         if not isinstance(response_id, str) or not response_id.strip():
             raise ProviderProtocolError("Anthropic response missing id")
+        provenance = ModelCallProvenance(
+            provider="anthropic",
+            model=self.client.config.model,
+            request_id=response_id,
+        )
         self._state_id = response_id
         content = response.get("content")
         if not isinstance(content, list):
@@ -982,8 +1001,16 @@ class ProviderResidentHandler:
                 )
             )
         if calls:
-            return ModelDirective(capability_calls=tuple(calls), usage=usage)
-        return _terminal_directive(_anthropic_text(response), usage=usage)
+            return ModelDirective(
+                capability_calls=tuple(calls),
+                usage=usage,
+                provenance=provenance,
+            )
+        return _terminal_directive(
+            _anthropic_text(response),
+            usage=usage,
+            provenance=provenance,
+        )
 
     def _gemini(self, snapshot: RuntimeSnapshot) -> ModelDirective:
         tools = provider_tools(
@@ -1041,6 +1068,11 @@ class ProviderResidentHandler:
         response_id = response.get("id")
         if not isinstance(response_id, str) or not response_id.strip():
             raise ProviderProtocolError("Gemini interaction response missing id")
+        provenance = ModelCallProvenance(
+            provider="gemini",
+            model=self.client.config.model,
+            request_id=response_id,
+        )
         self._state_id = response_id
 
         calls: list[CapabilityCall] = []
@@ -1063,8 +1095,16 @@ class ProviderResidentHandler:
                     )
                 )
         if calls:
-            return ModelDirective(capability_calls=tuple(calls), usage=usage)
-        return _terminal_directive(_gemini_text(response), usage=usage)
+            return ModelDirective(
+                capability_calls=tuple(calls),
+                usage=usage,
+                provenance=provenance,
+            )
+        return _terminal_directive(
+            _gemini_text(response),
+            usage=usage,
+            provenance=provenance,
+        )
 
 
 class ProviderRoundSummaryHandler:
