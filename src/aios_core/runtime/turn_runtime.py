@@ -2072,6 +2072,7 @@ class FusedTurnRuntime:
             "transition_goal",
             "create_task",
             "transition_task",
+            "create_attention_watch",
             "propose_action",
             "commit_operation_experience",
             "revise_claim",
