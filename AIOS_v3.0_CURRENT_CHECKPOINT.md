@@ -7,24 +7,30 @@
 
 ## 2026-09-21 单窗口执行控制
 
-从本节起，跨窗口施工的“下一任务”唯一来源改为：
+跨窗口施工的“下一任务”唯一来源：
 
 `governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md`
 
-规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据本文件下方历史“下一动作”直接重复施工。
+规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
-当前已验证 C13 功能合并锚点：`f9baacd5ac7be1646036a4e878934e77965c6640`。
+当前审计冻结 main：`e9862103a753be026edf1745c6a5d07fa56c0cf4`。
 
-最近完成任务：`C13-MTR-001` — **DONE**。
+最近完成任务：`AUDIT-001` — **DONE / AUDIT ONLY**。
 
-- started main: `12dfff3868f38f5af85e237cd65f2a441793a548`
-- frozen WIP: `arena/c13-metering-ledger-20260921@b6d90f2c8c7d37d0a17ed080c011e24d9e01c805`
-- final candidate: `47ed2de25cdcb26c8c552a3db0640a59f9a15817`
-- PR #47 / squash merge: `f9baacd5ac7be1646036a4e878934e77965c6640`
-- required Gates: cognitive-runtime `35564798270`, fused-turn-runtime `35564798226`, c09-wake-dispatch `35564798233`, p15-periodic-review `35564798249`, p16-habitation-harness `35564798243`, p16-convergence-gate `35564798235` — **all SUCCESS**
-- 下一窗口唯一 READY：`AUDIT-001`。**本窗口不得执行 AUDIT-001；必须由新窗口接手。**
+- 证据矩阵：`reviews/AUDIT-001_ISSUE30_CURRENT_MAIN_EVIDENCE_MATRIX_2026-09-21.md`
+- T34 / #34：`STILL_OPEN`
+- T36 / #36：`STILL_OPEN`
+- T28 / #28：`STILL_OPEN`
+- T35 / #35：`STILL_OPEN`
+- T33 / #33：`STILL_OPEN`
+- AUDIT-001 未修改任何 Core/runtime/test 实现。
+- PR #37 仍是旧基线上的历史中央分流证据，不能作为当前 main 的修复证明。
+- 当前第一个 READY：`T34-EXEC-001`。
+- 其他已激活 READY：`T36-SEARCH-001`、`T28-REC-001`、`T35-RULE-001`、`T33-RECALL-001`。
+- `T35-IMPL-001` 继续 BLOCKED，等待 `T35-RULE-001` 与 `T34-EXEC-001`。
+- `P16-TRIAGE-001` 继续 BLOCKED，直到本轮激活缺陷全部解决。
 
-历史段落继续作为工程证据保留；若历史“当前 blocker / 下一动作”与 task board 冲突，以 task board + 最新 main 事实为准。
+历史段落继续保留为工程证据。任何下方“当前 blocker=0 / 下一动作 / 唯一 blocker”表述若与本节或 task board 冲突，均视为历史快照，以本节 + task board + 最新 main 为准。
 
 ## 2026-09-21 C13-MTR-001 — non-world Metering Ledger CLOSED
 
