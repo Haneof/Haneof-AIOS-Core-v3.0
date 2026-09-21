@@ -26,7 +26,7 @@ from aios_core.contracts.enums import (
     WakeSource,
     WakeState,
 )
-from aios_core.contracts.models import Observation, Task, Wake
+from aios_core.contracts.models import Dependency, Observation, Task, Wake
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import TemporalExtent, as_utc
@@ -284,8 +284,32 @@ class AttentionWatchService:
                 "metadata": metadata,
             }
         )
+        dependencies: list[Dependency] = []
+        if source_ref is not None:
+            dependencies.append(
+                Dependency(
+                    object_id=_stable_id(
+                        "dep",
+                        revised.object_id,
+                        revised.revision,
+                        source_ref.object_id,
+                        source_ref.revision,
+                    ),
+                    subject_id=self.subject_id,
+                    learned_at=changed,
+                    recorded_at=changed,
+                    created_by="wake:attention_dependency",
+                    dependent_ref=ObjectRef(
+                        object_id=revised.object_id,
+                        revision=revised.revision,
+                    ),
+                    dependency_ref=source_ref,
+                    dependency_type="attention_watch_transition_uses_evidence",
+                )
+            )
+
         self.store.commit(
-            [revised],
+            [revised, *dependencies],
             OperationRequest(
                 operation_name="wake.attention.watch_transition",
                 arguments={
