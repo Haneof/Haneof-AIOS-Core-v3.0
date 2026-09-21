@@ -1,0 +1,16 @@
+{
+  "7ad49da729766cf4dfd5b435cd18981674dda0697a7d87cdc4dbe0f9455c059a": {
+    "calls": [
+      {
+        "arguments": {
+          "limit": 50,
+          "window_end": "2027-01-20T09:10:00Z",
+          "window_start": "2027-01-20T00:00:00Z"
+        },
+        "call_id": "seg003-004",
+        "name": "search_timeline"
+      }
+    ],
+    "kind": "capability_calls"
+  }
+}
