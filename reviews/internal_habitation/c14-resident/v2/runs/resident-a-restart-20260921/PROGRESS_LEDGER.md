@@ -37,6 +37,7 @@ Resident model (as declared): `GPT-5.6 Sol`; platform provider/session id: `unkn
 | Cursor | Event id | Occurred at | Ingest ref | Acked | Due work processed at that time | World rev | Notes |
 |---:|---|---|---|---|---|---|---|
 | 1 | `c14resv2-001` | 2026-10-01T07:12:00-07:00 | `obs_c14_fixture_b32d3cded992194438f114a9@1` | yes (`next=2`) | Periodic Review due → Resident inspected anchor → **silence**; no Summary window closed yet; no C14 wake | 4 | dim:sleep wearable fact; 0 Claims (silence is valid) |
+| 2 | `c14resv2-002` | 2026-10-01T07:48:00-07:00 | `obs_c14_fixture_3195efa3abad26d259380073@1` | yes (`next=3`) | none due (day window open; review not due until 2026-10-02T14:13Z) | 5 | dim:schedule calendar fact |
 
 ## Blockers / contamination
 

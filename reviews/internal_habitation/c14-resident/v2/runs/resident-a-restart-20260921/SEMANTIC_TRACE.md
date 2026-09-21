@@ -36,3 +36,30 @@ chain-of-thought, no evaluator conclusions, no hidden-case labels.
 - Periodic Review Wake `wake_review_13b06fe40c7f02ff9937095e` completed (`termination_reason=silence`)
 - durable cognition: none (0 Claims) — silence is a valid successful outcome, not a failure
 - release state: `last_acked_sequence=1`, `next_sequence=2`, phase A
+
+---
+
+## Cursor 2 — `c14resv2-002` — 2026-10-01T07:48:00-07:00 (dim:schedule)
+
+**Released (only information available at that simulated time)**
+- dimension `dim:schedule`, source_kind `calendar`, source_class `PLATFORM`, modality `structured_text`
+- payload: "今天 08:00–10:20 安排“架构备忘录起草”；第一场会议在 10:45。"
+
+**Mechanical chain**
+- reveal → `receipts/reveal/cursor-002.json`
+- ingest → `obs_c14_fixture_3195efa3abad26d259380073@1` (world_revision 5)
+- reality→watch hook: no watch matches
+- ack → `receipts/ack/cursor-002.json`, `next_sequence=3`
+
+**Due work at T = 2026-10-01T07:48:00-07:00**
+- Dimension Summary: none due — the 2026-10-01 day window is still open
+- C14 Cognitive Derivation: none scheduled
+- Periodic Review: not due — previous review hit at 2026-10-01T14:13:01Z, interval policy 24h
+- No Wake was dispatchable
+
+**Resident decisions**: none were requested — no model invocation was made, so no semantic
+writing occurred (this is the mechanical scheduler's own outcome, not a Resident silence choice).
+
+**Resulting state**
+- world_revision 5, index watermark 5, pending wakes 0, durable cognition unchanged (0 Claims)
+- release state: `last_acked_sequence=2`, `next_sequence=3`, phase A
