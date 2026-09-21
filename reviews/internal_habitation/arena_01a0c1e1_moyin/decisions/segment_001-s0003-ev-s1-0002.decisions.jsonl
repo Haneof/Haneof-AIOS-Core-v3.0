@@ -1,0 +1,2 @@
+{"kind":"turn_directive","decision":{"capability_calls":[{"name":"read_ai_world","arguments":{"limit":5}},{"name":"list_dimensions","arguments":{"include_terminal":false}}]}}
+{"kind":"turn_directive","decision":{"response":"只有这个对话框里的。你发什么我看什么，别的没接进来——我刚查了一遍，我这头是空的。"}}

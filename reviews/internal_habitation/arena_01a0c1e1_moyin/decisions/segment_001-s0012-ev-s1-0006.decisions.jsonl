@@ -1,0 +1,2 @@
+{"kind":"turn_directive","decision":{"capability_calls":[{"name":"search_world","arguments":{"query":"客户 上午 十点 工作室 评估","limit":6}}]}}
+{"kind":"turn_directive","decision":{"response":"日历上是十点，周慕青，带《周氏族谱》来做初次评估。要记什么随时发我。"}}

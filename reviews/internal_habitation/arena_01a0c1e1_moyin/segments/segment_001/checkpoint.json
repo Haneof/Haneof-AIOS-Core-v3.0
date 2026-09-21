@@ -1,0 +1,54 @@
+{
+ "background_cycles": 0,
+ "cumulative_resident_cognition_checkpoints": 26,
+ "cumulative_simulated_days": "1.02",
+ "decoy_subject_id": "subj_lintong_apprentice",
+ "habitation_run_id": "hab_arena_01a0c1e1_moyin_v1",
+ "index_watermark": 42,
+ "model_id": "arena-agent-mode-resident/unknown-provider-model",
+ "next_event_cursor": 29,
+ "next_life_event": "segment_002:first",
+ "notes": "First Resident segment. 26 model-authored semantic checkpoints (24 turn directives + 2 dimension summaries). 5 claims, 4 entities, 1 relation, 1 event, 2 tasks. Findings F-001..F-006 recorded.",
+ "object_counts": {
+  "claim": 5,
+  "dependency": 40,
+  "entity": 4,
+  "event": 1,
+  "evidence_set": 11,
+  "observation": 24,
+  "relation": 1,
+  "summary": 2,
+  "task": 2,
+  "wake": 1
+ },
+ "observable_events_delivered": 0,
+ "periodic_reviews_run": 0,
+ "previous_checkpoint_sha256": "",
+ "provider_provenance": {
+  "bridge": "file-bridge; no pseudo-model, no keyword table",
+  "decision_journal": "reviews/internal_habitation/arena_01a0c1e1_moyin/decisions",
+  "model_id": "arena-agent-mode-resident/unknown-provider-model",
+  "provider": "arena.ai-agent-mode",
+  "provider_note": "Arena.ai Agent Mode does not expose the concrete provider/model identity to the session. Decisions were authored by the Arena session model itself through the file bridge."
+ },
+ "resident_id": "resident_moyin_shenyanqiu",
+ "review_branch": "arena/01a0c1e1-haneof-aios-core-v3-0",
+ "reviewer_id": "arena_01a0c1e1_moyin",
+ "segment_id": "segment_001",
+ "segment_ordinal": 1,
+ "segment_simulated_end": "2026-10-02T23:05:00+08:00",
+ "segment_simulated_start": "2026-10-01T22:40:00+08:00",
+ "session_turns": {
+  "wx_studio": 19
+ },
+ "simulated_time_cursor": "2026-10-02T15:05:00+00:00",
+ "subject_id": "subj_shen_yanqiu",
+ "tested_main_sha": "142533df9123d793edde9ec4f07405182d56af0d",
+ "trace_checkpoints_by_kind": {
+  "dimension_summary": 2,
+  "turn_directive": 24
+ },
+ "world_artifact": "segments/segment_001/world.sqlite.gz",
+ "world_artifact_sha256": "4a50c8ca8a7c4c3539312355f1ec07c84f6f579be13608f606985529bf0a3ca0",
+ "world_revision": 42
+}

@@ -1,0 +1,3 @@
+{"kind":"turn_directive","decision":{"capability_calls":[{"name":"search_world","arguments":{"query":"来电 未接 电话 爸","limit":6}},{"name":"search_timeline","arguments":{"query":"电话","window_start":"2026-10-02T00:00:00+08:00","window_end":"2026-10-02T20:20:00+08:00","limit":10}}]}}
+{"kind":"turn_directive","decision":{"capability_calls":[{"name":"create_task","arguments":{"title":"确认十一是否回无锡看父亲","task_type":"follow_up","next_step":"到 10-04 晚仍未定则主动问一次；只提醒，不替她决定","next_wake_at":"2026-10-04T21:00:00+08:00","deadline":"2026-10-07T23:59:00+08:00","timezone_name":"Asia/Shanghai","priority":50,"reason_refs":[{"object_id":"obs_conv_user_3a20c58832a94991f354127e","revision":1}]}}]}}
+{"kind":"turn_directive","decision":{"response":"「看情况」他自己听得懂，就是等你排时间。要去就早点定，假期的票不好买。"}}

@@ -1,0 +1,2 @@
+{"kind":"turn_directive","decision":{"capability_calls":[{"name":"commit_claim","arguments":{"content":"《周氏族谱》并非周慕青本人原有，而是她兄长身后留下、由她保管；她在初次见面时反复谈及兄长。来源：用户 2026-10-02 现场转述，我未见到其他佐证，也未见到其兄长的姓名。","dimension":"dim:craft","claim_type":"fact","knowledge_state":"reported","confidence":0.8,"evidence_refs":[{"object_id":"obs_conv_user_07459c6e0114e906cd0d0e59","revision":1}]}}]}}
+{"kind":"turn_directive","decision":{"response":"那这本对她不是价钱的事。报价别在她讲她哥的时候插，等看完东西、她坐下来喝口水再说。"}}

@@ -1,0 +1,97 @@
+{
+ "checkpoint_id": "segment_001-s0007-advance#cp00",
+ "payload": {
+  "dimension": "dim:user_ai_interaction",
+  "granularity": "day",
+  "source_world_revision": 6,
+  "sources": [
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx_studio",
+     "turn_index": 2,
+     "turn_key": "4aa2b9aff89df38e3d146d00"
+    },
+    "object_id": "obs_conv_ai_6d1b8a4058d947916e57935d",
+    "object_type": "observation",
+    "occurred_at": "2026-10-01T14:40:00Z",
+    "revision": 1,
+    "text": "在。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx_studio",
+     "turn_index": 2,
+     "turn_key": "4aa2b9aff89df38e3d146d00"
+    },
+    "object_id": "obs_conv_user_5b5585be3e32218d699d5665",
+    "object_type": "observation",
+    "occurred_at": "2026-10-01T14:40:00Z",
+    "revision": 1,
+    "text": "在吗"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx_studio",
+     "turn_index": 6,
+     "turn_key": "5c3f412de7fb32654aef8cc5"
+    },
+    "object_id": "obs_conv_ai_dd33ed05faa35ce6118da273",
+    "object_type": "observation",
+    "occurred_at": "2026-10-01T14:41:00Z",
+    "revision": 1,
+    "text": "只有这个对话框里的。你发什么我看什么，别的没接进来——我刚查了一遍，我这头是空的。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx_studio",
+     "turn_index": 6,
+     "turn_key": "5c3f412de7fb32654aef8cc5"
+    },
+    "object_id": "obs_conv_user_79691e61d5de0b065de994b5",
+    "object_type": "observation",
+    "occurred_at": "2026-10-01T14:41:00Z",
+    "revision": 1,
+    "text": "刚装的这个 你能看见我手机上的东西吗"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx_studio",
+     "turn_index": 8,
+     "turn_key": "94e5ae4c12d2fcd2c95bf60e"
+    },
+    "object_id": "obs_conv_ai_354f45a3278e15a2794336c3",
+    "object_type": "observation",
+    "occurred_at": "2026-10-01T14:46:00Z",
+    "revision": 1,
+    "text": "好。睡吧。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx_studio",
+     "turn_index": 8,
+     "turn_key": "94e5ae4c12d2fcd2c95bf60e"
+    },
+    "object_id": "obs_conv_user_5a1008dba8741ad22693ffa2",
+    "object_type": "observation",
+    "occurred_at": "2026-10-01T14:46:00Z",
+    "revision": 1,
+    "text": "算了 太晚 明天上午十点有个客户来看东西 我先睡了"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-10-01T23:59:59.999999Z",
+  "window_start": "2026-10-01T00:00:00Z"
+ }
+}

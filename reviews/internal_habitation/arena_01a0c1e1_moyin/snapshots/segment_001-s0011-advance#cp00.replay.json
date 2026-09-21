@@ -1,0 +1,67 @@
+{
+ "checkpoint_id": "segment_001-s0011-advance#cp00",
+ "payload": {
+  "dimension": "dim:studio_climate",
+  "granularity": "day",
+  "source_world_revision": 9,
+  "sources": [
+   {
+    "metadata": {
+     "adapter_id": "habitation.sensor_studio_climate.numeric.v1",
+     "dimension": "dim:studio_climate",
+     "mechanical_compression": true,
+     "mechanical_ingest": true,
+     "raw_sample_values_retained": false,
+     "series_id": "studio_humidity_20261002_am",
+     "source_class": "sensor",
+     "source_digest": "d39092371ea78a971f90183fc37790ce24cd460c30a04b206b01dcf26f3cb47b",
+     "source_locator_range": {
+      "first": null,
+      "last": null
+     },
+     "source_record_ids_digest": "97169e9caeea34cdb631285d739e783306ddc4d15d50407be3401f8ffa5c158e",
+     "source_record_range": {
+      "count": 3,
+      "first": "rh-20261002-0600",
+      "last": "rh-20261002-0700"
+     }
+    },
+    "object_id": "obs_num_segment_efff21c2c7b32bbcd202806e",
+    "object_type": "observation",
+    "occurred_at": "2026-10-01T22:00:00Z",
+    "revision": 1,
+    "text": "{\"max\": 58.0, \"mean\": 57.5, \"min\": 57.1, \"sample_count\": 3}"
+   },
+   {
+    "metadata": {
+     "adapter_id": "habitation.sensor_studio_climate.numeric.v1",
+     "dimension": "dim:studio_climate",
+     "mechanical_compression": true,
+     "mechanical_ingest": true,
+     "raw_sample_values_retained": false,
+     "series_id": "studio_humidity_20261002_am",
+     "source_class": "sensor",
+     "source_digest": "e192e1c5c7074f56f097e4fa66f697bbdd2f0ec46f8a4b29106944bc43c8bdb1",
+     "source_locator_range": {
+      "first": null,
+      "last": null
+     },
+     "source_record_ids_digest": "b5ea85bfc3f6bb418cb3af5fd848703bdad9561cc85821030f7133c251bd90cc",
+     "source_record_range": {
+      "count": 3,
+      "first": "rh-20261002-0730",
+      "last": "rh-20261002-0830"
+     }
+    },
+    "object_id": "obs_num_segment_bb0c5aa7ada9816893d6e068",
+    "object_type": "observation",
+    "occurred_at": "2026-10-01T23:30:00Z",
+    "revision": 1,
+    "text": "{\"max\": 64.2, \"mean\": 64.0, \"min\": 63.8, \"sample_count\": 3}"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-10-01T23:59:59.999999Z",
+  "window_start": "2026-10-01T00:00:00Z"
+ }
+}
