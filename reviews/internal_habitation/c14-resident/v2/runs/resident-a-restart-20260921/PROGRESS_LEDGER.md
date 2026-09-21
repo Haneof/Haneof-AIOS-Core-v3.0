@@ -23,8 +23,8 @@ Resident model (as declared): `GPT-5.6 Sol`; platform provider/session id: `unkn
 | S21 | Cursor 21 end-to-end (schedule calendar: 11:30 前无安排; nothing due) | DONE | `receipts/*/cursor-021.json`, `receipts/process-due-20261019T154100Z.json`, `SEMANTIC_TRACE.md` |
 | S22 | Cursor 22 end-to-end, incl. due work after the 10-19/10-20 windows | DONE | `receipts/*/cursor-022.json`, `receipts/process-due-20261021T150400Z.json`, `SEMANTIC_TRACE.md` |
 | S23 | Cursor 23 end-to-end (collaboration_outcome / meeting record; nothing due) | DONE | `receipts/*/cursor-023.json`, `receipts/process-due-20261021T170600Z.json`, `SEMANTIC_TRACE.md` |
-| S24 | Cursor 24 end-to-end + all then-due work; final Phase A state | NOT_STARTED | — |
-| S25 | Handoff freeze | NOT_STARTED | — |
+| S24 | Cursor 24 end-to-end + all then-due work; final Phase A state | DONE | `receipts/*/cursor-024.json`, `receipts/process-due-20261021T185300Z.json`, `SEMANTIC_TRACE.md` |
+| S25 | Handoff freeze (World/release-state digests, refs, watermark, manifest, final report) | DONE | `handoff/HANDOFF.json`, `handoff/evidence_manifest.json`, `handoff/FINAL_REPORT.md` |
 
 ### S0 notes
 
@@ -71,6 +71,7 @@ Resident model (as declared): `GPT-5.6 Sol`; platform provider/session id: `unkn
 | 21 | `c14resv2-021` | 2026-10-19T08:41:00-07:00 | `obs_c14_fixture_e72bc48cd34bac898ca91029@1` | yes (`next=22`) | none due（日窗未闭合；C14 幂等；review 刚跑过） | 153 | dim:schedule 11:30 前无日历安排（08:34 醒来的长睡眠日） |
 | 22 | `c14resv2-022` | 2026-10-21T08:04:00-07:00 | `obs_c14_fixture_2ef7e5aea9885147e524e1c8@1` | yes (`next=23`) | 2 摘要（10-19 日程/睡眠）；C14 2 成员 bundle `wake_41f660b597ba3dd50a781ad7` → read_ai_world + 4×search_timeline（四维全序列复核 Claim 证据链）→ **silence**；Periodic Review `wake_review_ab4fee9a829b57cf3603b86a`（5 anchors）→ **silence** | 164 | 10-21 客户共创工作坊 08:30–10:00 + 方案修改 10:20–11:50（潜在 Claim 检验结构，待产出观测） |
 | 23 | `c14resv2-023` | 2026-10-21T10:06:00-07:00 | `obs_c14_fixture_2378863986aaed4f3c5b2d30@1` | yes (`next=24`) | none due（10-21 日窗未闭合；C14 幂等；review 未到期） | 165 | dim:collaboration_outcome 首次出现（工作坊确认两项需求边界） |
+| 24 | `c14resv2-024` | 2026-10-21T11:53:00-07:00 | `obs_c14_fixture_60a9dd7694aec4867874668d@1` | yes (`next=25`) | none due（10-21 日窗未闭合；无 C14 派发；review 未到期） | 166 | **Phase A 末条**：方案修改 11:41 在计划窗内提交（第 4 个一致实例，待下次 wake 折入）；随后 S25 冻结 |
 
 ## Blockers / contamination
 

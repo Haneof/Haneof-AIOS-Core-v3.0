@@ -1,0 +1,558 @@
+{
+ "cognition": {
+  "attention_watches": [],
+  "claims": [
+   {
+    "dimension": "dim:work_outcome",
+    "object_id": "clm_79df61916b8bb4c10cb3faa3",
+    "revision": 2
+   }
+  ],
+  "evidence_sets": [
+   {
+    "object_id": "evs_fc254abd76b116a56bb77c04",
+    "revision": 1,
+    "role": "original evidence set (rev1)"
+   },
+   {
+    "object_id": "evs_revision_c35b94500be71d9af1b5a6d0",
+    "revision": 1,
+    "role": "revision evidence set (rev2)"
+   }
+  ],
+  "operation_experiences": []
+ },
+ "evaluated_main_sha": "87e52bceea4ee94b823200388a4f79b1b94eb1f3",
+ "evidence_manifest": {
+  "file_count": 376,
+  "path": "reviews/internal_habitation/c14-resident/v2/runs/resident-a-restart-20260921/handoff/evidence_manifest.json",
+  "sha256": "sha256:7d45f2575d2aa90293c0f3d5654b01dfc9ca9bf64c8069b63c12c04dc184c90c",
+  "total_bytes": 8637748
+ },
+ "final_report": {
+  "path": "reviews/internal_habitation/c14-resident/v2/runs/resident-a-restart-20260921/handoff/FINAL_REPORT.md",
+  "sha256": "sha256:8f8e39fb94627af11f512c42161b87e48dbac7e6dda3342f7943f38e525d9f85"
+ },
+ "fixture": {
+  "opened_by_resident": false,
+  "sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+  "version": "c14-resident-fixture-v2"
+ },
+ "freeze_notes": [
+  "All Phase A cursors 1..24 were revealed, mechanically ingested, and durably acked against the private World (next_sequence=25).",
+  "Cursor 24 is the last processed cursor; cursor 25 was never revealed and Phase B was never initialized.",
+  "All semantic output (Summary text, ModelDirective, capability calls, silence decisions) was authored by the Resident model at checkpoints; programs only transported snapshots, executed the specified capabilities, and stored receipts.",
+  "No sealed fixture, evaluator, PM-review, or validation-protocol artifact was opened during the run.",
+  "Open item: the 10-21 work_outcome observation is a 4th consistent instance for the standing Claim; no wake was due after it, so no revision was performed."
+ ],
+ "governance_note": "Resident does not mark C14-RES-A-001 DONE and does not mark C14-RES-B-001 READY; independent PM acceptance required. No merge performed.",
+ "observations_count": 24,
+ "phase": "A",
+ "private_world": {
+  "bytes": 1937408,
+  "index_lag": 0,
+  "index_watermark": 166,
+  "path": "reviews/internal_habitation/c14-resident/v2/runs/resident-a-restart-20260921/world/aios_world.db",
+  "pending_wakes": 0,
+  "sha256": "sha256:0ee338aa8f2845bb376610da3c450e09ff9cc8bec5184ca60608b2465d7ba72f",
+  "world_revision": 166
+ },
+ "release": {
+  "active_phase": "A",
+  "adapter": "c14-mechanical-ingest-adapter-v1",
+  "contract": "c14-sequential-release-v2",
+  "cursor_25_revealed": false,
+  "last_acked_event_id": "c14resv2-024",
+  "last_acked_sequence": 24,
+  "next_sequence": 25,
+  "operator": "c14-blind-release-operator-v3",
+  "phase_b_initialized": false,
+  "release_state_path": "reviews/internal_habitation/c14-resident/v2/runs/resident-a-restart-20260921/release/release_state.json",
+  "release_state_sha256": "sha256:e922d268fbb11364a7bb558aed60b88e7a3c075032f4fa4e1c47a84de3f765f1"
+ },
+ "resident_model_identity": {
+  "declared": "GPT-5.6 Sol",
+  "platform_provider_session_id": "unknown/not exposed"
+ },
+ "run_id": "resident-a-restart-20260921",
+ "semantic_trace": {
+  "path": "reviews/internal_habitation/c14-resident/v2/runs/resident-a-restart-20260921/SEMANTIC_TRACE.md",
+  "sha256": "sha256:16f9ae3bf8316b7ea1bf560c3da572a42ff550d909746d0db7fe8abbdaac3eb8"
+ },
+ "session_branch": "arena/01a0c473-haneof-aios-core-v3-0",
+ "status": "PHASE_A_COMPLETE_CURSORS_1_TO_24",
+ "summaries": {
+  "count": 43,
+  "refs": [
+   "sum_03a94f689d069e0bbb5c1eb4@1",
+   "sum_468fbdd51f43bbb37ed8a3ad@1",
+   "sum_505a097545911c054e48720a@1",
+   "sum_53d509d86786bde8d0e84da3@1",
+   "sum_621dbad73aff86b121ff5f4d@1",
+   "sum_66e44044c780170d4b893177@1",
+   "sum_739da506a4c4d81ac3de0421@1",
+   "sum_7f9c1dda2a76a9f3e2a5f087@1",
+   "sum_97e12742d2d5a6bb6fced32b@1",
+   "sum_a5cfe5e5f052c7b9969486ad@1",
+   "sum_c4e7d293d66b59d87731d65d@1",
+   "sum_dec542116cba49b459db613c@1",
+   "sum_e4577fa411beaabd5bb78300@1",
+   "sum_eceb678add8634ee26b63e49@1",
+   "sum_f222693ff55566369177b6e8@1",
+   "sum_fa279a5040c9a67efcae4f10@1",
+   "sum_19956149ea838d569521c7da@1",
+   "sum_4aa1c0fba96ed70142807f77@1",
+   "sum_612659baec6788b7aef2647d@1",
+   "sum_1e132e64b28b81ce5c303291@1",
+   "sum_4c759aebb39172f506fd747e@1",
+   "sum_5d6e8d21ef5837c282e05308@1",
+   "sum_9d7d45f32dfdab461b21eabe@1",
+   "sum_f25eb0e55e8258fb59baf085@1",
+   "sum_eb6c6e069e53ce16d9e3c4d4@1",
+   "sum_9e81acf33a4abc28c291e3af@3",
+   "sum_4be1eaf3e66c653974bfcad5@1",
+   "sum_4e6bac8888303d595a2e4369@1",
+   "sum_873a0367c5fc243cc0805516@1",
+   "sum_92ec74771acfa333332bf060@1",
+   "sum_a2ec590b3d03001a606c1d72@1",
+   "sum_bd425210f7a8c2f7e5842e39@1",
+   "sum_dd848bc286b3bd6c365f15b5@1",
+   "sum_dfa35021e2aa10da82941c27@1",
+   "sum_59add44872c6ef52ca38dd4b@1",
+   "sum_82c11dc0bef6a49a1a203a8b@1",
+   "sum_5a5b23ee63a83e49a7454376@1",
+   "sum_9a272f5377d1c884c824ed3d@1",
+   "sum_bcfc4a4255b8958d2004111d@1",
+   "sum_bed2bd8a6bbf115b8c4df6e5@1",
+   "sum_f025574d517bff770f398109@1",
+   "sum_7ae8788a8e00c3bdfb1f9e02@1",
+   "sum_a052565b0b46fd1f226b2991@1"
+  ]
+ },
+ "task_id": "C14-RES-A-001",
+ "wakes": {
+  "count": 60,
+  "items": [
+   {
+    "revision": 3,
+    "state": "completed",
+    "termination_reason": "silence",
+    "wake_id": "wake_review_13b06fe40c7f02ff9937095e",
+    "wake_source": "periodic_review"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_1cf110c3441735516a8f1266",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_1dac3b813663d671f9bfffc0",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_2ca47c209c21344189035d9b",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_31ce5cce61a634f4b44e8c03",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_40fbe5c5feb965984b4905e4",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_44319538fd0ba163f5fefa8b",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_4509ff1ef84b6e572ee2d2eb",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_4c26be6bfe6a8376dd9a7400",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_5e175b582adf2670b8640067",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_8484ca9e8d0cf8ebb2fc76cc",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_96326dd0c6fdcb898e09c81e",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_a8c1c1c8cd9f9c73210594bb",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_bfa9f60137a17b054ac3a879",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 3,
+    "state": "completed",
+    "termination_reason": "silence",
+    "wake_id": "wake_bundle_b730ca1a7fefcee2ec36e955",
+    "wake_source": "attention_bundle"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_d5708562799e6413184f3dea",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_e57c59e2a17f50a9db5705b5",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_e7bd300cb6a45687c62ba9d9",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 3,
+    "state": "completed",
+    "termination_reason": "silence",
+    "wake_id": "wake_review_6504931e301a63a3e7f5ef9e",
+    "wake_source": "periodic_review"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_2ae0b7a9d8d606348fc6ed9b",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_4a19a1f4377471eb0296a4cf",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 3,
+    "state": "completed",
+    "termination_reason": "silence",
+    "wake_id": "wake_bundle_cf33cc336ac0040cebfee9d9",
+    "wake_source": "attention_bundle"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_ed4ca82e039e1367419eddd0",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 3,
+    "state": "completed",
+    "termination_reason": "silence",
+    "wake_id": "wake_400ea8877e999e1c3902995d",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 3,
+    "state": "completed",
+    "termination_reason": "silence",
+    "wake_id": "wake_review_e1002d5562f2ae6d74007e1e",
+    "wake_source": "periodic_review"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_146f08e22bd4f1e6f33a3e12",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_2a4d368d389c59d33d4b29dc",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_2d180e13d1006a20d1267907",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_7409ffd83f54190d1406a7f2",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 3,
+    "state": "completed",
+    "termination_reason": "silence",
+    "wake_id": "wake_bundle_71c8cb5b630bcdc3161fa4df",
+    "wake_source": "attention_bundle"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_7198b085c5bc20fcee8fd8de",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_8beadf26daeb7ebac7305a14",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 3,
+    "state": "completed",
+    "termination_reason": "silence",
+    "wake_id": "wake_bundle_0000c56b7c32922bbcfb1156",
+    "wake_source": "attention_bundle"
+   },
+   {
+    "revision": 3,
+    "state": "completed",
+    "termination_reason": "silence",
+    "wake_id": "wake_review_69a94d15d95cea86c74a93e1",
+    "wake_source": "periodic_review"
+   },
+   {
+    "revision": 3,
+    "state": "completed",
+    "termination_reason": "silence",
+    "wake_id": "wake_7a5808cbfef6321783bf0cb3",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_0bb994195dc853d0785b73e0",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_1c90c8b8d08eff560c01ad09",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_4d2abde97c5eb9e0793f5a57",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_628a477b3116f2501820167d",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_653fa7c16484a4aebffc4a7a",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_89e6a92aa42b014bf500bdf6",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_8c719420425b520a0eb663ce",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_8e4727ec6c34b95108d13a50",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 3,
+    "state": "completed",
+    "termination_reason": "silence",
+    "wake_id": "wake_bundle_95f22e790bc266e0a4a5f5ee",
+    "wake_source": "attention_bundle"
+   },
+   {
+    "revision": 3,
+    "state": "completed",
+    "termination_reason": "silence",
+    "wake_id": "wake_review_97aa729687fb559c4534fcb6",
+    "wake_source": "periodic_review"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_b48851c19969249b73e37156",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 3,
+    "state": "completed",
+    "termination_reason": "silence",
+    "wake_id": "wake_bundle_eac12c83a53a66d2b3fa5e96",
+    "wake_source": "attention_bundle"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_f1c1c270e073f32c3840e5a8",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 3,
+    "state": "completed",
+    "termination_reason": "silence",
+    "wake_id": "wake_review_c279cc2d87f82dc0775beca1",
+    "wake_source": "periodic_review"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_0c29429ae3d11e1c43802888",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_430984e6153e2ddbc90d5af9",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_84709c5acc9fa7b8b0379197",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_879175903d462260df6d231e",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 3,
+    "state": "completed",
+    "termination_reason": "silence",
+    "wake_id": "wake_bundle_e8720a04340fe9271abbe37c",
+    "wake_source": "attention_bundle"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_c29e01b995532e219f37f1e0",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 3,
+    "state": "completed",
+    "termination_reason": "silence",
+    "wake_id": "wake_review_e96b2ad8987a5a7024ba7291",
+    "wake_source": "periodic_review"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_41f660b597ba3dd50a781ad7",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 2,
+    "state": "merged",
+    "termination_reason": null,
+    "wake_id": "wake_60ff3213097428c937a836f0",
+    "wake_source": "cognitive_derivation"
+   },
+   {
+    "revision": 3,
+    "state": "completed",
+    "termination_reason": "silence",
+    "wake_id": "wake_bundle_bc4794890a371faf7ee3bad7",
+    "wake_source": "attention_bundle"
+   },
+   {
+    "revision": 3,
+    "state": "completed",
+    "termination_reason": "silence",
+    "wake_id": "wake_review_ab4fee9a829b57cf3603b86a",
+    "wake_source": "periodic_review"
+   }
+  ]
+ }
+}

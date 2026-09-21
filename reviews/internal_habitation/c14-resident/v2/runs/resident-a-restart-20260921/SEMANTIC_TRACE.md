@@ -455,3 +455,21 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
 **Due work at T = 2026-10-21T10:06:00-07:00**（`receipts/process-due-20261021T170600Z.json`）: 无摘要窗口闭合（10-21 日窗仍开、10-19–10-25 周窗未闭）、无 C14 唤醒、Periodic Review 未触发。机械跑完即止，无模型决策点。
 
 **Resulting state**: world_revision 165, index watermark 165, pending wakes 0。（下一条即 Phase A 末条 cursor 24。）
+
+---
+
+## Cursor 24 — `c14resv2-024` — 2026-10-21T11:53:00-07:00 (dim:work_outcome) — **final Phase A cursor**
+
+**Released**
+- dimension `dim:work_outcome`, source_kind `task_tracker`, source_class `PLATFORM`
+- payload: "“方案修改”于 11:41 完成并提交；会议中确认的两项需求均已落实，未重新打开。"
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-024.json`; ingest → `obs_c14_fixture_60a9dd7694aec4867874668d@1` (world_revision 166); watch hook: no match; ack → `receipts/ack/cursor-024.json`, `next_sequence=25`。Phase A is closed; cursor 25 was never revealed.
+
+**Due work at T = 2026-10-21T11:53:00-07:00**（`receipts/process-due-20261021T185300Z.json`）: 无摘要窗口闭合（10-21 日窗未闭）、无 C14 唤醒待派发、Periodic Review 未触发。机械跑完即止，无模型决策点。
+
+**Freeze (S25)**: `handoff/HANDOFF.json`（World / release-state 摘要、refs、watermark）、`handoff/evidence_manifest.json`（375 个文件、8,630,886 字节的逐文件 SHA256）、`handoff/FINAL_REPORT.md`。
+
+**Phase A final state**: world_revision 166, index watermark 166, pending wakes 0, Claims 1（rev 2）, 43 条摘要, operation experiences 0, 24/24 cursors acked, `next_sequence=25`（未释放）。
+
+**Forward note**: 本 cursor 的 work_outcome 观测（方案修改 11:41 在 10:20–11:50 计划窗内提交、工作坊确认的两项需求均落实且未重开）是该 Claim 的**第 4 个一致实例**；cursors 23/24 之后没有到期 wake，故本轮不做修订——留给下一次 Cognitive Derivation 机会折入。
