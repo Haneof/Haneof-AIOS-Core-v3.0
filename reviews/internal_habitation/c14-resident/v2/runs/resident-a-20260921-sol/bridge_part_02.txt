@@ -1,0 +1,150 @@
+        "checkpoint_id": checkpoint_id,
+        "checkpoint_kind": kind,
+        "expected_input_kind": expected_input_kind,
+        "event_sequence": CURRENT_EVENT_SEQUENCE,
+        "event_id": CURRENT_EVENT_ID,
+        "simulated_time": None if CURRENT_EVENT_TIME is None else CURRENT_EVENT_TIME.isoformat(),
+        "payload": _jsonable(payload),
+    }
+    _write_json(PENDING, checkpoint)
+    _write_json(EVIDENCE_DIR / "checkpoints" / f"{checkpoint_id}.json", checkpoint)
+    _append_trace("checkpoint_presented", checkpoint)
+    _write_session_state(stage=f"waiting:{kind}", checkpoint_id=checkpoint_id)
+    print("C14_PENDING::" + json.dumps(checkpoint, ensure_ascii=False, sort_keys=True, separators=(",", ":")), flush=True)
+
+    while True:
+        candidate = _read_remote_input()
+        if (
+            isinstance(candidate, dict)
+            and candidate.get("checkpoint_id") == checkpoint_id
+            and candidate.get("kind") == expected_input_kind
+        ):
+            _write_json(EVIDENCE_DIR / "inputs" / f"{checkpoint_id}.json", candidate)
+            _append_trace("resident_input", candidate)
+            _write_session_state(stage=f"consumed:{kind}", checkpoint_id=checkpoint_id)
+            print("C14_INPUT_CONSUMED::" + checkpoint_id, flush=True)
+            return candidate
+        time.sleep(3)
+
+
+def _write_session_state(*, stage: str, checkpoint_id: str | None = None) -> None:
+    _write_json(
+        SESSION_STATE,
+        {
+            "evaluated_main_sha": EVALUATED_MAIN_SHA,
+            "branch": BRANCH,
+            "subject_id": SUBJECT_ID,
+            "model_identity": MODEL_ID,
+            "provider_identity": PROVIDER_ID,
+            "window_identifier": WINDOW_ID,
+            "world_db": str(WORLD_DB.relative_to(ROOT)),
+            "index_db": str(INDEX_DB.relative_to(ROOT)),
+            "release_state": str(RELEASE_STATE.relative_to(ROOT)),
+            "stage": stage,
+            "checkpoint_id": checkpoint_id,
+            "event_sequence": CURRENT_EVENT_SEQUENCE,
+            "event_id": CURRENT_EVENT_ID,
+            "simulated_time": None if CURRENT_EVENT_TIME is None else CURRENT_EVENT_TIME.isoformat(),
+        },
+    )
+
+
+def _subprocess_json(args: list[str], *, stdout_path: Path) -> dict[str, Any]:
+    result = _run(args)
+    stdout_path.parent.mkdir(parents=True, exist_ok=True)
+    stdout_path.write_text(result.stdout, encoding="utf-8")
+    if result.stderr:
+        stdout_path.with_suffix(stdout_path.suffix + ".stderr").write_text(result.stderr, encoding="utf-8")
+    return json.loads(result.stdout)
+
+
+def _sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            h.update(chunk)
+    return "sha256:" + h.hexdigest()
+
+
+def _model_handler(snapshot: RuntimeSnapshot) -> ModelDirective:
+    snap = _jsonable(snapshot)
+    response = _wait_for_input("runtime_snapshot", snap, expected_input_kind="model_directive")
+    raw = response.get("directive")
+    if not isinstance(raw, dict):
+        raise ValueError("model_directive input requires a directive object")
+    calls_raw = raw.get("capability_calls") or []
+    if not isinstance(calls_raw, list):
+        raise ValueError("directive capability_calls must be a list")
+    calls: list[CapabilityCall] = []
+    for item in calls_raw:
+        if not isinstance(item, dict):
+            raise ValueError("capability call must be an object")
+        arguments = item.get("arguments") or {}
+        if not isinstance(arguments, dict):
+            raise ValueError("capability call arguments must be an object")
+        calls.append(
+            CapabilityCall(
+                name=str(item["name"]),
+                arguments=arguments,
+                call_id=(None if item.get("call_id") is None else str(item["call_id"])),
+            )
+        )
+    directive = ModelDirective(
+        capability_calls=tuple(calls),
+        response=(None if raw.get("response") is None else str(raw.get("response"))),
+        silence=bool(raw.get("silence", False)),
+        usage=None,
+        provenance=None,
+    )
+    _append_trace(
+        "model_directive_selected",
+        {
+            "wake_reason": snapshot.wake_reason,
+            "round_index": snapshot.round_index,
+            "directive": raw,
+            "provider_usage": "unknown/not exposed",
+        },
+    )
+    return directive
+
+
+def _summary_handler(summary_input) -> str:
+    raw = summary_input.model_dump(mode="json")
+    response = _wait_for_input("dimension_summary", raw, expected_input_kind="summary_text")
+    text = response.get("summary_text")
+    if not isinstance(text, str) or not text.strip():
+        raise ValueError("summary_text input requires non-blank summary_text")
+    _write_json(
+        EVIDENCE_DIR / "summaries" / f"summary-output-{CHECKPOINT_COUNTER:04d}.json",
+        {"summary_input": raw, "summary_text": text},
+    )
+    _append_trace("dimension_summary_authored", {"input": raw, "output": text})
+    return text
+
+
+def _current_refs(store: SQLiteWorldStore, object_type: str) -> list[dict[str, Any]]:
+    refs = []
+    for payload in store.list_payloads(object_type=object_type):
+        subject = str(payload.get("subject_id") or "")
+        if subject not in {SUBJECT_ID, AI_SELF_SUBJECT_ID}:
+            continue
+        refs.append(
+            {
+                "object_id": payload.get("object_id"),
+                "revision": payload.get("revision"),
+                "subject_id": subject,
+                "object_type": payload.get("object_type"),
+                "metadata": payload.get("metadata") or {},
+                "lifecycle": payload.get("lifecycle"),
+                "knowledge_state": payload.get("knowledge_state"),
+            }
+        )
+    refs.sort(key=lambda x: (str(x.get("object_id")), int(x.get("revision") or 0)))
+    return refs
+
+
+def _write_world_checkpoint(store: SQLiteWorldStore, index: WorldSearchIndex, sequence: int) -> None:
+    release = json.loads(RELEASE_STATE.read_text(encoding="utf-8"))
+    payload = {
+        "sequence": sequence,
+        "world_revision": int(store.current_world_revision()),
