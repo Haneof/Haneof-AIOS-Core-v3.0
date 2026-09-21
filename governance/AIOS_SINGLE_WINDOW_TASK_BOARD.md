@@ -64,11 +64,11 @@
 |---:|---|---|---|---|---|---|
 | 1 | `C13-MTR-001` | 完成 C13 non-world Metering Ledger：模型返回后立即落 operations-side meter；token 真值不再依赖 Wake World metadata；crash 后计量不丢；Periodic Review 计费时间不倒带 | **DONE** | — | PR #47; final candidate `47ed2de25cdcb26c8c552a3db0640a59f9a15817`; squash merge `f9baacd5ac7be1646036a4e878934e77965c6640`; required Gates GREEN | 已从冻结 WIP 完成、自审、专项 Gate + P16 full regression GREEN、squash merge；完整证据见 §5 完成记录 |
 | 2 | `AUDIT-001` | 对 Issue #30 的 T34/T36/T28/T35/T33 与 PR #37 在**最新 main**逐项重新复核，只做裁决，不修代码 | **DONE** | C13-MTR-001 | `main@e9862103a753be026edf1745c6a5d07fa56c0cf4`; `reviews/AUDIT-001_ISSUE30_CURRENT_MAIN_EVIDENCE_MATRIX_2026-09-21.md` | 五项 current-main 裁决已落库；无 Core 修改 |
-| 3 | `T34-EXEC-001` | Action 授权前重新验证父 Task/撤销状态，关闭 cancel→authorize 竞态 | **READY** | AUDIT-001 | AUDIT-001=`STILL_OPEN`; Issue #30 / #34 | 修复前复现 + 修复后回归 + execution/P12/P16 Gate GREEN |
+| 3 | `T34-EXEC-001` | Action 授权前重新验证父 Task/撤销状态，关闭 cancel→authorize 竞态 | **DONE** | AUDIT-001 | PR #54; candidate `da14638fc0f8cf14bad6b5315988d7c7db691ac8`; squash merge `48f5e29ad564ef7c1687b5a0d81cede1452e82e8`; repro run `35566808198`; candidate gate run `35566890602`; merge-result P12/P16 GREEN | 修复前 current-main 复现；cancel/retry/restart/race/legacy-world/history/normal-authorize 回归 GREEN |
 | 4 | `T36-SEARCH-001` | 结构化 Observation scalar 派生索引，不改原 typed fact，不做语义推断 | **READY** | AUDIT-001 | AUDIT-001=`STILL_OPEN`; Issue #30 / #36 | dict/list/number/bool 可检索；rebuild=incremental；subject/current/stale 语义不退化 |
 | 5 | `T28-REC-001` | 普通推荐与 antecedent 路径统一隔离 assistant raw dialogue，避免把 AI 自己的话当用户事实主动推荐 | **READY** | AUDIT-001 | AUDIT-001=`STILL_OPEN`; Issue #30 / #28 | continuity/raw drill-down 仍可访问；用户/外部 fact 与 evidence-grounded Claim 不误删 |
 | 6 | `T35-RULE-001` | 只做“非 Action Task 的可信完成凭据”语义裁决；不改 execution 代码 | **DONE** | AUDIT-001 | `governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md`; PR #53; semantic candidate `b58bbb31a04a119897890452e76461f14fd46288`; squash merge `6fcb51d6e2ecf6e2ab8ff0fa62013f094b32f21c` | 唯一裁决已形成：所有 Task 终态必须真实证据化；外部执行保持 Action→Outcome；非 Action Task 可用合格 pinned World evidence / validated durable artifact；禁止 AI 自述、伪 Outcome、循环 OperationExperience |
-| 7 | `T35-IMPL-001` | 按 T35-RULE-001 裁决实现 Task 完成闭环 | **BLOCKED** | T35-RULE-001, T34-EXEC-001 | T35-RULE-001 semantic ruling complete in PR #53; still blocked until T34-EXEC-001 is resolved; implementation must follow `governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md` | 单独 PR；正常 Action/Outcome 不退化；非 Action Task 有合法真实凭据；P12/P15/P16 GREEN |
+| 7 | `T35-IMPL-001` | 按 T35-RULE-001 裁决实现 Task 完成闭环 | **READY** | T35-RULE-001, T34-EXEC-001 | T35-RULE-001 DONE; T34-EXEC-001 DONE via PR #54 / `48f5e29ad564ef7c1687b5a0d81cede1452e82e8`; dependencies satisfied; implementation remains a separate new-window task following `governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md` | 单独 PR；正常 Action/Outcome 不退化；非 Action Task 有合法真实凭据；P12/P15/P16 GREEN |
 | 8 | `T33-RECALL-001` | 用自包含表达/跨会话省略/无前文三类对照重新验证 recall 误触；只有复现才修 | **READY** | AUDIT-001 | AUDIT-001=`STILL_OPEN`; Issue #30 / #33 | 禁止场景短语黑名单；程序只提供候选，不替 Resident 判断指代 |
 | 9 | `P16-TRIAGE-001` | 更新 PR #37 / Issue #30 中央证据分流到当前 segmented protocol；历史无效年度、PARTIAL、机械复现、有效缺陷分开登记 | **BLOCKED** | AUDIT-001, all activated T34/T36/T28/T35/T33 tasks resolved | PR #37 仍 open，base 较旧 | 冻结被评 Core SHA；不把旧“几天统计”冒充当前进度；中央报告进入 main |
 | 10 | `P16-CAMPAIGN-001` | 建立/恢复唯一 P16 分段入住 Campaign Ledger：找出当前 canonical life、最后有效 segment、World/checkpoint digest、累计天数/交互/认知 checkpoint | **BLOCKED** | P16-TRIAGE-001 | `reviews/internal_habitation/ARENA_RESIDENT_YEARLONG_TASK.md` | 创建 `reviews/internal_habitation/P16_SEGMENT_PROGRESS_LEDGER.md`；历史 segment 不重复跑；下一 segment ID 唯一 |
@@ -240,6 +240,52 @@ Deferred issues:
 - T35-IMPL-001 remains BLOCKED until T34-EXEC-001 is resolved; it must implement this ruling in a separate window/PR
 - T34/T36/T28/T33 were not executed in this window
 Next READY task: T34-EXEC-001 (new window only; not executed here)
+```
+
+
+### T34-EXEC-001 completion — 2026-09-21
+
+```text
+Task ID: T34-EXEC-001
+Status: DONE
+Started from main: f8a2f8e4cf53de579bd0bc69cfd85421d109d65b
+Final clean sync base: 04f3170f5e09c7ab00ffd4233465560c78dc2423
+Reproduction/WIP branch: fix/t34-exec-001-cancel-authorize-20260921
+Work branch: fix/t34-exec-001-final-20260921
+Pre-fix test-only SHA: d622958dc286bfae816fd4f2e36d9fb063d8252e
+Candidate SHA: da14638fc0f8cf14bad6b5315988d7c7db691ac8
+PR: #54
+Merge SHA: 48f5e29ad564ef7c1687b5a0d81cede1452e82e8
+Required gates: T34 targeted execution; P12 execution; fused-turn-runtime; C09 wake dispatch regression; P15 periodic review regression; p16-habitation-harness; p16-convergence-gate
+Gate run IDs / conclusions:
+- pre-fix reproduction 35566808198 / SUCCESS as evidence harness; exact pre-fix tests produced two expected failures: Failed: DID NOT RAISE <class 'ValueError'>; marker T34_REPRO_RESULT=BUG_REPRODUCED
+- exact clean candidate 35566890602 / SUCCESS; T34 targeted, P12, fused-turn-runtime, C09, P15, P16 habitation and P16 convergence steps all SUCCESS
+- merge-result p12-execution-gate 35567021266 / SUCCESS
+- merge-result p12-execution-world 35567021273 / SUCCESS
+- merge-result p16-convergence-gate 35567021258 / SUCCESS
+Evidence/report paths:
+- src/aios_core/execution/service.py
+- tests/integration/test_v3_execution_world.py
+- reviews/AUDIT-001_ISSUE30_CURRENT_MAIN_EVIDENCE_MATRIX_2026-09-21.md
+- Issue #30 / #34
+- PR #54
+Exact reproduction:
+- pre-fix authorize_action accepted a PROPOSED Action after its parent Task had already reached CANCELLED
+- cancel performed inside the external authorizer callback also still returned a dispatch envelope because authorize_action re-read the newer world_revision and did not revalidate the parent
+Exact fix:
+- authorization now requires the parent Task to remain the exact current RUNNING revision before and after the external authorizer
+- Task CANCELLED atomically forward-revises every still-PROPOSED child Action to CANCELLED; historical Action revisions are retained
+- authorization freezes expected_world_revision after final revalidation, so a later concurrent write fails closed through WorldStore VERSION_CONFLICT
+- restart/retry of cancelled or legacy pre-fix persisted state is rejected without calling the authorizer or writing new World revisions
+- normal RUNNING Task authorization remains GREEN
+Bugs found:
+- parent Task state/revision was not checked during authorization
+- Task cancellation did not forward-invalidate pending external Actions
+- expected_world_revision was read after the authorizer callback, allowing a cancellation committed during authorization to be absorbed rather than rejected
+Deferred issues:
+- T35-IMPL-001 was not implemented here; its dependencies are now satisfied and it remains a separate new-window task
+- T36-SEARCH-001, T28-REC-001 and T33-RECALL-001 were not executed in this window
+Next READY task: T36-SEARCH-001 — new window only
 ```
 
 ---
