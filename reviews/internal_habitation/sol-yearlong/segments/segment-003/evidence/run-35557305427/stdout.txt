@@ -1,0 +1,84 @@
+RESTORE_OK {"clock": "2027-01-19T08:15:00+00:00", "index_watermark": 145, "subject_id": "sol-resident-20260921-001", "world_revision": 145, "world_sha256": "cdc2505dd61c8c2199d07019c25933bce57aa875a881160d3e97f975855ca008"}
+MANUAL_SUMMARY_PENDING_BEGIN
+{
+  "decision_key": "90aedc011db8481c957e659c0e360e571648d413ad5e16c9bf5a003f6c32492c",
+  "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
+  "schema": "aios.segment003.manual-summary.pending.v1",
+  "simulated_clock": "2027-01-20T20:30:00+00:00",
+  "summary_request": {
+    "request": {
+      "dimension": "dim:user_ai_interaction",
+      "granularity": "day",
+      "source_world_revision": 168,
+      "sources": [
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "assistant",
+            "session_id": "jan20-morning",
+            "turn_index": 1,
+            "turn_key": "8637ff572bc77696f208d6db"
+          },
+          "object_id": "obs_conv_ai_a9d579f856f4865db902aae4",
+          "object_type": "observation",
+          "occurred_at": "2027-01-20T09:10:00Z",
+          "revision": 1,
+          "text": "今天的记录我看了：牛角包计划 07:40 出炉，实际 08:02，晚了约 22 分钟。车间日志里能看到的卡点是成型台前有 17 分钟的等待，但记录员没有填原因。\n按你的规矩先说清楚：这条记录里没有提到烤箱，目前没有任何证据证明是烤箱拖慢了，我不会把你的第一反应当成原因。\n我把今天这次延迟按事实记下来了（时间、成型台等待、原因未定）。接下来几天继续盯出品日志：如果成型台等待反复出现、或哪天的记录写出了具体原因，就有依据可以谈了。单这一天，我只得出‘晚了、原因未定’。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "user",
+            "session_id": "jan20-morning",
+            "turn_index": 1,
+            "turn_key": "8637ff572bc77696f208d6db"
+          },
+          "object_id": "obs_conv_user_0f575c8301820e6a83ab4e38",
+          "object_type": "observation",
+          "occurred_at": "2027-01-20T09:10:00Z",
+          "revision": 1,
+          "text": "今天牛角包确实晚了一些。我第一反应是烤箱拖慢了，但先别把这个当原因，看看今天留下来的记录再说。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "assistant",
+            "session_id": "jan20-evening",
+            "turn_index": 1,
+            "turn_key": "b24a07b5af6224c12e0da22d"
+          },
+          "object_id": "obs_conv_ai_aaf5d28718878a7acfe8ad49",
+          "object_type": "observation",
+          "occurred_at": "2027-01-20T20:30:00Z",
+          "revision": 1,
+          "text": "同意。今天的记录只能说出品确实晚了、可见的等候点在成型台；烤箱没有被任何记录证实。\n接下来我继续按天记实际等候点——车间日志里出现的等待、返工、缺货都照实记，不提前安原因。\n等连续几天攒起来，要是某个等候点反复对得上，再拿这几天的记录一起看，到时候才谈得上判断原因。现在不给早高峰定永久原因。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "user",
+            "session_id": "jan20-evening",
+            "turn_index": 1,
+            "turn_key": "b24a07b5af6224c12e0da22d"
+          },
+          "object_id": "obs_conv_user_cc031f2f198bf709cea0cc61",
+          "object_type": "observation",
+          "occurred_at": "2027-01-20T20:30:00Z",
+          "revision": 1,
+          "text": "从今天这些记录看，至少不能只怪烤箱。先继续记实际等候点，别急着给早高峰定一个永久原因。"
+        }
+      ],
+      "truncated": false,
+      "window_end": "2027-01-20T23:59:59.999999Z",
+      "window_start": "2027-01-20T00:00:00Z"
+    },
+    "summary_request_type": "DimensionSummaryInput"
+  },
+  "world_revision_before": 168
+}
+MANUAL_SUMMARY_PENDING_END
+SEG003_STATUS=pending decision_key=90aedc011db8481c957e659c0e360e571648d413ad5e16c9bf5a003f6c32492c
+SEG003_CURSOR=d033-chat-17
+SEG003_WORLD_REVISION=168
+SEG003_RESIDENT_REPLAYED=11
+SEG003_SUMMARY_REPLAYED=5
