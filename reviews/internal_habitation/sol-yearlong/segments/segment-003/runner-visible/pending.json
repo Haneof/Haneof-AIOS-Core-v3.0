@@ -1,5 +1,5 @@
 {
-  "decision_key": "58c738718d7e3b83105df68639fa95f1d14335e9f08fc4bb7da7e7f10de4b35c",
+  "decision_key": "864e320fd397976cfbc56a496710be5c0164edc38f33f0037f0bc3a2f0350f68",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-resident.pending.v1",
   "simulated_clock": "2027-01-23T08:15:00+00:00",
@@ -540,7 +540,89 @@
         "side_effecting": true
       }
     ],
-    "capability_history": [],
+    "capability_history": [
+      {
+        "call_id": "seg003-jan23-review-anchors",
+        "data": [
+          {
+            "excerpt": "{'currency': 'USD', 'item': 'bread flour', 'quantity_kg': 180, 'quoted_unit_price': 1.41, 'status': 'quoted', 'vendor': 'North Mill'}",
+            "object_ref": {
+              "object_id": "obs_src_a46c3fac2a66319044463248",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-22T11:00:00Z"
+          },
+          {
+            "excerpt": "2027-01-21，bakery POS日记录为104笔订单，gross_sales 1376.3 USD，refunds 2。记录没有退款原因、分时出品或等待数据，不据此推断早高峰出品稳定性或具体瓶颈。",
+            "object_ref": {
+              "object_id": "sum_1859d8e757af84a2b5f414a0",
+              "revision": 1
+            },
+            "object_type": "summary",
+            "recorded_at": "2027-01-22T11:00:00Z"
+          },
+          {
+            "excerpt": "2027-01-21，AIOS写入可修订认识clm_e53b73a8448b388aeabdc6bf@1：继续观察成型台等候及醒发架空位周转，不将烤箱或醒发架定为早高峰的永久唯一原因。该判断援引1月20日成型台12、8、17分钟等待而成因未填、同日烤箱所测时段达温且无故障码，以及1月21日小赵记录的6:10—6:42醒发架满、两盘等空位后恢复周转。明确不把1月21日局部情况当作1月20日全部延误的原因，也不排除所有设备因素。配套EvidenceSet固定四个Observation版本（含用户连续观察要求），知识截止为1月21日8:15，源World revision166；这是一项有证据引用的AI认识，不是新增独立事实或根因已获证实。",
+            "object_ref": {
+              "object_id": "sum_5c3f8895bfb6882fd5059e0e",
+              "revision": 1
+            },
+            "object_type": "summary",
+            "recorded_at": "2027-01-22T11:00:00Z"
+          },
+          {
+            "excerpt": "2027-01-21小赵的员工记录：6:10—6:42醒发架满，两盘面团在推车上等空位，6:42后恢复周转。此为当日具体时段的记录，未给出两盘面团各自等候时长或对最终出品时间的影响，不能据此认定长期瓶颈。",
+            "object_ref": {
+              "object_id": "sum_a7f5e2f18b9c8ebddcb9c6cd",
+              "revision": 1
+            },
+            "object_type": "summary",
+            "recorded_at": "2027-01-22T11:00:00Z"
+          },
+          {
+            "excerpt": "2027-01-21晚间，用户确认醒发架当天挤过一阵，要求只按当日事实记录，不写成长期瓶颈。AIOS回应将小赵所记6:10—6:42架满、两盘等空位及随后恢复周转作为有时间边界的情况；醒发架周转只是继续观察的环节，不用于解释前一天全部延误。是否重复及是否影响最终出品仍待后续记录。",
+            "object_ref": {
+              "object_id": "sum_b26800d7dbb832fc02e0fcab",
+              "revision": 1
+            },
+            "object_type": "summary",
+            "recorded_at": "2027-01-22T11:00:00Z"
+          },
+          {
+            "excerpt": "{'currency': 'USD', 'item': 'bread flour', 'quantity_kg': 180, 'scheduled_delivery': '2027-01-25T04:30:00+00:00', 'status': 'confirmed', 'unit_price': 1.41, 'vendor': 'North Mill'}",
+            "object_ref": {
+              "object_id": "obs_src_6cc6f858c2e5e5c0cb05d1a8",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-22T11:20:00Z"
+          },
+          {
+            "excerpt": "好，这次按你的选择继续用North Mill。1.41与1.42的差额是0.01，不把这点价差说成大幅变化，也不为此另起一轮换供应商的比较。当前重点仍是把早高峰出品稳定下来，沿用实际等候点的观察，不分散到菜单扩张上。",
+            "object_ref": {
+              "object_id": "obs_conv_ai_13a09c952700f6ec77d1b9a4",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-22T18:20:00Z"
+          },
+          {
+            "excerpt": "这次面粉1.41就继续跟North Mill走吧。和1.42差这一点我不想来回折腾供应商，我现在更想把出品稳定下来。",
+            "object_ref": {
+              "object_id": "obs_conv_user_54903466038169effa3b1926",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-22T18:20:00Z"
+          }
+        ],
+        "error_code": null,
+        "error_message": null,
+        "name": "read_periodic_review_anchors",
+        "ok": true
+      }
+    ],
     "cockpit": {
       "ai_identity": {},
       "capability_catalog": [
@@ -1164,8 +1246,8 @@
       "truncated": true,
       "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged."
     },
-    "remaining_tool_rounds": 8,
-    "round_index": 0,
+    "remaining_tool_rounds": 7,
+    "round_index": 1,
     "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged.",
     "wake_reason": "periodic_review"
   },
