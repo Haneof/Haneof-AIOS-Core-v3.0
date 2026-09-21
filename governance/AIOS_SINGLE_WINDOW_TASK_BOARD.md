@@ -74,8 +74,8 @@
 | 10 | `C14-SCHED-001` | 实现 Summary → Cognitive Derivation Wake：递归 leaf provenance、幂等、revision、crash/restart recovery、纯 AI-cognition Summary 防回环 | **DONE** | C14-RULE-001 | PR #59; candidate `5389118b9e37b8f0b33552099e39d5c8a31eaffb`; squash merge `f0b24cda3c76d5170f5f27fb5a94107036e2f2c4`; C14 gate run `35579489466` SUCCESS | Dedicated `COGNITIVE_DERIVATION` BACKGROUND Wake; recursive pinned provenance; REALITY/MIXED eligible; AI_COGNITION_ONLY/MAINTENANCE_ONLY/UNKNOWN fail closed; deterministic per-Summary-revision Wake identity; restart reconciliation; no second provenance/scheduler DB; no Claim/Resident semantic change |
 | 11 | `C14-RUNTIME-001` | 将 derivation Wake 接入同一 Resident CognitiveRuntime，装配 pinned Summary、跨维能力、AI-world context；形成/修正认知前必须满足 leaf-grounded evidence 规则，或 silence | **DONE** | C14-SCHED-001 | PR #61; candidate `75cc62ca13169c6ba8752e0562224705fe6f9ac2`; squash merge `a887ba537e9797d4bf5a7b7fb482fa4a55f47df7`; candidate + merge-result required Gates GREEN | 同一 Resident Runtime 完成 derivation cockpit + leaf-grounded create/revise/retract/silence 闭环；Summary-only/AI recursion/T28 assistant-only fail closed；真实 user/Outcome case grounding保持合法；BACKGROUND 不直接投放用户；完整证据见 C14-RUNTIME-001 completion |
 | 12 | `C14-RUNTIME-HARDEN-001` | 封闭 COGNITIVE_DERIVATION 的 side-effect 逃逸：该 Wake 只允许 leaf-grounded Claim create/revise/retract 写入；Event/Entity/Relation/Dimension/Goal/Task/Action/AttentionWatch/Experience/Policy 等持久副作用不得从此后台认知入口写入 | **DONE** | C14-RUNTIME-001 | PR #63; candidate `3accaeebe8ee1b3d420d2dfa3528ecb5e7388d86`; squash merge `09002ddf8fd1fd4af08f54ac5b190d4c39c9e25b`; `reviews/C14_RUNTIME_HARDEN_001_COMPLETION_EVIDENCE_2026-09-21.md`; required Gates GREEN | COGNITIVE_DERIVATION 显式 side-effect allowlist 仅含 `commit_claim`, `commit_ai_world_claim`, `revise_claim`, `retract_claim`; 其他 writes 全部 deny；read capabilities 保留；普通 user turn / Periodic Review 不退化；专项+全回归 GREEN |
-| 13 | `C14-LOOP-001` | 持续认知派生加固：C14-aware burst bundling、防 contract laundering、自激防护、预算/合并/延迟/恢复、Periodic Review 共存、新 Runtime 检索、长期 provenance reconcile 规模加固 | **READY** | C14-RUNTIME-HARDEN-001 | `governance/C14_LOOP_PM_PREFLIGHT_2026-09-21.md`; 复用 BackgroundBudgetGate、AttentionRouter/Bundle、P15 Review、现有 context/search；禁止 claim conversion rate 成为质量策略 | 10+ sibling C14 derivation 可在同 execution contract 下机械合并且保留 C14 cockpit/allowlist/no-delivery；不得混入更宽权限普通 bundle；model/tool/capability budget exhaustion 不得误标 COMPLETED，必须 durable resumable/restart-safe；AI cognition 不自激；Periodic Review 独立共存；新 Runtime 可从 durable World/Index 找回 cognition；reconcile 不得产生 Summary×Dependency 重复全图扫描 |
-| 14 | `C14-RES-001` | 真实 Resident 认知形成入住验证：跨维正例 + 同次数低证据负例 silence + 后续反例 revision + 新 session/new runtime 只恢复 AIOS World 后消费旧认知并影响行为 | **BLOCKED** | C14-LOOP-001 | 禁止 pseudo-LLM / Python 关键词答案；fresh/private World；隐藏语义期望；保存 provider/model/checkpoint/digest | 至少验证：真正跨维 cognition、正确 silence、上下文替换后的 cognition retrieval/behavior consumption、Outcome→revision；不以 Claim 数量/转化率 PASS；必须有 observable refs/decision effects 而非 CoT |
+| 13 | `C14-LOOP-001` | 持续认知派生加固：C14-aware burst bundling、防 contract laundering、自激防护、预算/合并/延迟/恢复、Periodic Review 共存、新 Runtime 检索、长期 provenance reconcile 规模加固 | **DONE** | C14-RUNTIME-HARDEN-001 | PR #65; candidate `f48c3c9cfa8a24fa2e0e0220d7fe20bcda1be34d`; squash merge `a385f7b3fcc71982aae0611a382502c9a37ba71e`; `reviews/C14_LOOP_001_COMPLETION_EVIDENCE_2026-09-21.md`; exact-candidate 14 workflows GREEN | C14-only homogeneous AttentionBundle preserves effective derivation contract/allowlist/no-delivery; model/tool/capability exhaustion durable/resumable; partial-write retry idempotent; unfinished spend remains in C13 budget truth; AI cognition self-excitation blocked; Review coexistence/new-runtime retrieval/reconcile-scale regressions GREEN |
+| 14 | `C14-RES-001` | 真实 Resident 认知形成入住验证：跨维正例 + 同次数低证据负例 silence + 后续反例 revision + 新 session/new runtime 只恢复 AIOS World 后消费旧认知并影响行为 | **READY** | C14-LOOP-001 | 禁止 pseudo-LLM / Python 关键词答案；fresh/private World；隐藏语义期望；保存 provider/model/checkpoint/digest | 至少验证：真正跨维 cognition、正确 silence、上下文替换后的 cognition retrieval/behavior consumption、Outcome→revision；不以 Claim 数量/转化率 PASS；必须有 observable refs/decision effects 而非 CoT |
 | 15 | `C14-CLOSE-001` | 独立审计 C14 规则、代码、Gate 与真实 Resident 证据；只做收口，不写新 Core 功能 | **BLOCKED** | C14-RES-001 | C14 全链证据 + deterministic gates + Resident evaluator + PM hardening requirements | 任一以下成立即 FAIL：Summary-only 自证 cognition、无跨维正例、无 negative silence、无 new-session/new-runtime 行为消费、provenance 用语义启发式/第二来源库、claim count 成质量目标、存在 wake storm；全部通过才恢复 P16 |
 | 16 | `P16-TRIAGE-001` | 更新 PR #37 / Issue #30 中央证据分流到当前 segmented protocol；历史无效年度、PARTIAL、机械复现、有效缺陷分开登记 | **BLOCKED** | AUDIT-001, all activated T34/T36/T28/T35/T33 tasks resolved, C14-CLOSE-001 | all historical Core blockers resolved; C14 是 77-day Resident 新暴露的架构缺口；P16 暂停避免继续测已知缺陷 | 冻结被评 Core SHA；不把旧“几天统计”冒充当前进度；中央报告进入 main；恢复 campaign 前必须引用 C14 closure |
 | 17 | `P16-CAMPAIGN-001` | 建立/恢复唯一 P16 分段入住 Campaign Ledger：找出当前 canonical life、最后有效 segment、World/checkpoint digest、累计天数/交互/认知 checkpoint | **BLOCKED** | P16-TRIAGE-001 | `reviews/internal_habitation/ARENA_RESIDENT_YEARLONG_TASK.md` | 创建 `reviews/internal_habitation/P16_SEGMENT_PROGRESS_LEDGER.md`；历史 segment 不重复跑；下一 segment ID 唯一 |
@@ -876,3 +876,61 @@ Additional explicit LOOP blockers now frozen:
 - previously registered provenance reconcile scale hardening remains mandatory.
 
 `C14-LOOP-001` stays READY; C14-RES and P16 remain blocked.
+
+
+### C14-LOOP-001 completion — 2026-09-21
+
+```text
+Task ID: C14-LOOP-001
+Status: DONE
+Started from main: c4689fd595fc9308e71332e0c0dda17e49cffb95
+Work branch: c14/loop-hardening-20260921-sol
+Candidate SHA: f48c3c9cfa8a24fa2e0e0220d7fe20bcda1be34d
+PR: #65
+Merge SHA: a385f7b3fcc71982aae0611a382502c9a37ba71e
+Required gates: C14 loop/runtime/scheduler targeted; CognitiveRuntime; cognition writeback/revision; AI-world; constitutional cognition closure; C13 metering/background budget; C09 wake; Dimension Summary/World Index; P12; P14; P15; T28; P16 habitation; P16 convergence/full core
+Gate run IDs / conclusions:
+- c14-cognitive-derivation-loop 35591908702 / SUCCESS
+- c14-cognitive-derivation-scheduler 35591908713 / SUCCESS
+- c14-cognitive-derivation-runtime 35591908736 / SUCCESS
+- p16-convergence-gate 35591908701 / SUCCESS
+- constitutional-cognition-closure 35591908860 / SUCCESS
+- p15-periodic-review 35591908756 / SUCCESS
+- p14-long-context 35591908792 / SUCCESS
+- p12-execution-gate 35591908744 / SUCCESS
+- c09-wake-dispatch 35591908712 / SUCCESS
+- fused-turn-runtime 35591908706 / SUCCESS
+- dimension-summary 35591908763 / SUCCESS
+- p11-dimension-gate 35591908700 / SUCCESS
+- p10-ai-world-gate 35591908737 / SUCCESS
+- p9-revision-gate 35591908842 / SUCCESS
+Evidence/report paths:
+- reviews/C14_LOOP_001_COMPLETION_EVIDENCE_2026-09-21.md
+- .github/workflows/c14-cognitive-derivation-loop.yml
+- src/aios_core/runtime/budget_gate.py
+- src/aios_core/runtime/turn_runtime.py
+- src/aios_core/summaries/cognitive_derivation.py
+- src/aios_core/wake/attention.py
+- src/aios_core/wake/service.py
+- tests/integration/test_v3_c14_cognitive_derivation_runtime.py
+- tests/integration/test_v3_c14_cognitive_derivation_scheduler.py
+Bugs found:
+- C14 sibling bursts lost the dedicated execution contract through ordinary bundling
+- budget/tool/capability exhaustion could be misclassified as semantic completion
+- partial successful cognition could be re-bundled under a fresh execution identity and duplicate semantic writes
+- queued runtime-incomplete provider spend was invisible to other background budget decisions
+- completed retry chains could undercount prior provider calls if only final model_rounds metadata was used
+- old AI Claim -> AI Summary could immediately manufacture another C14 opportunity
+- reconcile rebuilt the whole support Dependency view once per Summary
+Fix:
+- homogeneous execution-contract bundling with pinned member refs and effective COGNITIVE_DERIVATION restoration
+- durable QUEUED runtime-incomplete lifecycle and in-place resume
+- C13 MeteringLedger used as retry-spanning model-call truth
+- immediate scheduling requires direct grounding_leaf_refs while mixed new-reality lineage remains eligible
+- one support Dependency graph build per reconcile pass
+Deferred issues:
+- real semantic formation/negative-silence/revision/new-runtime behavior consumption remains exclusively C14-RES-001
+- C14-CLOSE-001 remains blocked until Resident evidence is valid
+- P16 remains paused until C14 closure
+Next READY task: C14-RES-001 — new window only
+```
