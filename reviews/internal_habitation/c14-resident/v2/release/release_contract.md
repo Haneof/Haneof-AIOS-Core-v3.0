@@ -131,7 +131,9 @@ python reviews/internal_habitation/c14-resident/v2/release/release_operator.py \
   --ingest-ref <OBJECT_ID>@<REVISION>
 ```
 
-Before cursor movement, ack itself reopens/queries the durable World and requires all of the following:
+Before cursor movement, ack itself reopens/queries the durable World. If prior release receipts exist, ack first revalidates every prior exact receipt against the same supplied private World; switching to another World that lacks the acknowledged history therefore fails closed.
+
+For the current pending event, ack requires all of the following:
 
 1. exact `object_id@revision` exists;
 2. object type is `Observation`;
@@ -198,7 +200,8 @@ Ack refuses, without cursor advancement:
 - ack before reveal;
 - wrong sequence/event id;
 - skip/repeat/reorder;
-- malformed state/receipt chain.
+- malformed state/receipt chain;
+- a different private World that cannot reproduce the already-acknowledged exact receipt chain.
 
 All previous future-isolation and phase guards remain binding.
 
