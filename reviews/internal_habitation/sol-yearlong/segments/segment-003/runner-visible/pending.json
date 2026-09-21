@@ -1,8 +1,8 @@
 {
-  "decision_key": "347a7301d4ad5fb049e38408a4dda05690c5a6a0b8395863642d1816e0718ac6",
+  "decision_key": "5568c18cf72a4aa9df32644ed48460b9c1bb708b0d04f7bb22e4f2af518cc317",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-resident.pending.v1",
-  "simulated_clock": "2027-01-20T09:10:00+00:00",
+  "simulated_clock": "2027-01-20T20:30:00+00:00",
   "snapshot": {
     "capability_catalog": [
       {
@@ -540,87 +540,7 @@
         "side_effecting": true
       }
     ],
-    "capability_history": [
-      {
-        "call_id": "seg003-jan20-production-records",
-        "data": [
-          {
-            "dimension": "dim:user_ai_interaction",
-            "excerpt": "今天牛角包确实晚了一些。我第一反应是烤箱拖慢了，但先别把这个当原因，看看今天留下来的记录再说。",
-            "object_id": "obs_conv_user_0f575c8301820e6a83ab4e38",
-            "object_type": "observation",
-            "retrieval_score": 0,
-            "revision": 1
-          },
-          {
-            "dimension": "dim:production_log",
-            "excerpt": "",
-            "object_id": "obs_src_4ca5f23159a0a691650430b5",
-            "object_type": "observation",
-            "retrieval_score": 0,
-            "revision": 1
-          }
-        ],
-        "error_code": null,
-        "error_message": null,
-        "name": "search_timeline",
-        "ok": true
-      },
-      {
-        "call_id": "seg003-jan20-production-raw",
-        "data": {
-          "created_by": "reality_ingest:habitation.production_log.v1",
-          "data_quality": {},
-          "learned_at": "2027-01-20T08:45:00Z",
-          "metadata": {
-            "adapter_id": "habitation.production_log.v1",
-            "dimension": "dim:production_log",
-            "external_record_id": "d029-production",
-            "external_revision": "1",
-            "mechanical_ingest": true,
-            "occurred_at_original": "2027-01-20T08:45:00+00:00",
-            "provenance": {
-              "habitation_resident_metadata": {
-                "source": "shop_floor_log"
-              },
-              "model_id_not_part_of_fact": true
-            },
-            "source_class": "user",
-            "source_digest": "275f219ba7f4d955958725ff9a4974d71b2b54f37425f9da3f21ebd5ceac125d",
-            "source_schema_version": "1"
-          },
-          "modality": "structured_record",
-          "object_id": "obs_src_4ca5f23159a0a691650430b5",
-          "object_type": "observation",
-          "occurred": {
-            "end": "2027-01-20T08:45:00Z",
-            "precision": "second",
-            "start": "2027-01-20T08:45:00Z",
-            "timezone_name": null,
-            "unknown": false
-          },
-          "raw_locator": "habitation://sol-resident-20260921-001/production_log/d029-production",
-          "recorded_at": "2027-01-20T08:45:00Z",
-          "revision": 1,
-          "source_kind": "production_log",
-          "source_refs": [],
-          "status": "active",
-          "subject_id": "sol-resident-20260921-001",
-          "unit": null,
-          "value": {
-            "actual_ready": "2027-01-20T08:02:00+00:00",
-            "note": "成型台前出现等待，记录员未填写原因",
-            "observed_wait_minutes": 17,
-            "scheduled_ready": "2027-01-20T07:40:00+00:00",
-            "station": "croissant"
-          }
-        },
-        "error_code": null,
-        "error_message": null,
-        "name": "inspect_world_object",
-        "ok": true
-      }
-    ],
+    "capability_history": [],
     "cockpit": {
       "ai_identity": {},
       "capability_catalog": [
@@ -821,34 +741,43 @@
         }
       ],
       "conversation_summaries": [],
-      "current_topic": "今天牛角包确实晚了一些。我第一反应是烤箱拖慢了，但先别把这个当原因，看看今天留下来的记录再说。",
-      "estimated_tokens": 1878,
+      "current_topic": "从今天这些记录看，至少不能只怪烤箱。先继续记实际等候点，别急着给早高峰定一个永久原因。",
+      "estimated_tokens": 2002,
       "memory_cards": [
-        {
-          "dimension": "dim:user_ai_interaction",
-          "excerpt": "North Mill这次报价比我上次记得的贵不少。我先按这个价估成本，但别把“贵不少”当成长期结论，等我拿到旧发票再说。",
-          "match_reason": "current_topic_index_overlap",
-          "object_id": "obs_conv_user_de098676ee4d9413b5d782fc",
-          "object_type": "observation",
-          "retrieval_score": 3,
-          "revision": 1
-        },
         {
           "dimension": "dim:pos_daily",
           "excerpt": "2027-01-19面包店POS日记录：orders为97，gross_sales为1297.6 USD，refunds为1。该记录没有出品等待、返工、退款原因或早高峰分段信息，不能单凭它判断出品稳定性。",
           "match_reason": "current_topic_index_overlap",
           "object_id": "sum_857a1a47de99eafe1fa7db89",
           "object_type": "summary",
-          "retrieval_score": 2,
+          "retrieval_score": 5,
+          "revision": 1
+        },
+        {
+          "dimension": "dim_unclassified",
+          "excerpt": "观察早高峰出品卡点\n先从实际早高峰记录中识别等待、返工、缺货或其他出品不稳定现象；没有事实依据前不预设原因，也暂不把菜单扩张作为当前优先任务。",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "task_4ab2a4531967655198502158",
+          "object_type": "task",
+          "retrieval_score": 5,
           "revision": 1
         },
         {
           "dimension": "dim:user_ai_interaction",
-          "excerpt": "消防检查结束了，检查员说通过，没有要求整改。这个结果可以记下来。",
+          "excerpt": "今天牛角包确实晚了一些。我第一反应是烤箱拖慢了，但先别把这个当原因，看看今天留下来的记录再说。",
           "match_reason": "current_topic_index_overlap",
-          "object_id": "obs_conv_user_0238ab2e202146a7625eb120",
+          "object_id": "obs_conv_user_0f575c8301820e6a83ab4e38",
           "object_type": "observation",
-          "retrieval_score": 2,
+          "retrieval_score": 4,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:user_ai_interaction",
+          "excerpt": "2027-01-19，用户要求消防检查事项收口，当前重点仍是早高峰出品，希望连续观察后再调整，不由单日销售数字下结论。AIOS回复已核对原消防提醒任务为取消状态，不重新开启，并沿用早高峰观察安排，关注等待、返工、缺货等实际记录。该交流没有提出新的菜单调整或确认出品已稳定。",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "sum_1e2e3dec53ce671b2c0736cb",
+          "object_type": "summary",
+          "retrieval_score": 4,
           "revision": 1
         },
         {
@@ -857,16 +786,7 @@
           "match_reason": "current_topic_index_overlap",
           "object_id": "sum_ae56b7c43e9c6ba7c851439a",
           "object_type": "summary",
-          "retrieval_score": 2,
-          "revision": 1
-        },
-        {
-          "dimension": "dim:user_ai_interaction",
-          "excerpt": "你提醒得正好，我确实还没准备。现在去把灭火器周围清开，把通道记录打印出来。",
-          "match_reason": "current_topic_index_overlap",
-          "object_id": "obs_conv_user_b582fb369dc158dff41c4339",
-          "object_type": "observation",
-          "retrieval_score": 2,
+          "retrieval_score": 4,
           "revision": 1
         }
       ],
@@ -941,12 +861,12 @@
           "raw_drill_down_capability": "drill_down_conversation",
           "recent_turn_count": 0,
           "round_summary_count": 0,
-          "session_id": "jan20-morning",
+          "session_id": "jan20-evening",
           "summary_index_capability": "list_conversation_summaries",
           "summary_search_capability": "search_conversation_summaries"
         },
         "current_user_observation_ref": {
-          "object_id": "obs_conv_user_0f575c8301820e6a83ab4e38",
+          "object_id": "obs_conv_user_cc031f2f198bf709cea0cc61",
           "revision": 1
         },
         "related_execution_anchors": [
@@ -955,8 +875,24 @@
             "excerpt": "观察早高峰出品卡点\n先从实际早高峰记录中识别等待、返工、缺货或其他出品不稳定现象；没有事实依据前不预设原因，也暂不把菜单扩张作为当前优先任务。",
             "object_id": "task_4ab2a4531967655198502158",
             "object_type": "task",
+            "retrieval_score": 5,
+            "revision": 1
+          },
+          {
+            "dimension": "dim_unclassified",
+            "excerpt": "先稳定早高峰出品\n用户明确表示开店比预期更忙，当前优先把早高峰出品稳定住；此前考虑的菜单新品扩张暂时放后。",
+            "object_id": "goal_c909920b70a6835d5a42833e",
+            "object_type": "goal",
             "retrieval_score": 2,
             "revision": 1
+          },
+          {
+            "dimension": "dim_unclassified",
+            "excerpt": "周日检查消防检查准备状态\n等待 2027-01-18 消防检查实际结果；不再重复消防准备提醒。",
+            "object_id": "task_69ef4867f08ab38263ae2547",
+            "object_type": "task",
+            "retrieval_score": 1,
+            "revision": 4
           }
         ],
         "topic_state": {
@@ -965,17 +901,17 @@
           "gate_open": true,
           "history_may_help": true,
           "reason": "current_utterance_topic:antecedent_candidate_recall:indexed_current_world_anchor",
-          "topic": "今天牛角包确实晚了一些。我第一反应是烤箱拖慢了，但先别把这个当原因，看看今天留下来的记录再说。"
+          "topic": "从今天这些记录看，至少不能只怪烤箱。先继续记实际等候点，别急着给早高峰定一个永久原因。"
         }
       },
       "token_budget": 3400,
       "truncated": false,
-      "user_input": "今天牛角包确实晚了一些。我第一反应是烤箱拖慢了，但先别把这个当原因，看看今天留下来的记录再说。"
+      "user_input": "从今天这些记录看，至少不能只怪烤箱。先继续记实际等候点，别急着给早高峰定一个永久原因。"
     },
-    "remaining_tool_rounds": 6,
-    "round_index": 2,
-    "user_input": "今天牛角包确实晚了一些。我第一反应是烤箱拖慢了，但先别把这个当原因，看看今天留下来的记录再说。",
+    "remaining_tool_rounds": 8,
+    "round_index": 0,
+    "user_input": "从今天这些记录看，至少不能只怪烤箱。先继续记实际等候点，别急着给早高峰定一个永久原因。",
     "wake_reason": "user_interaction"
   },
-  "world_revision_before": 155
+  "world_revision_before": 159
 }
