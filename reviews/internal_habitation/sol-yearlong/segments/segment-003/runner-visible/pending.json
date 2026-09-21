@@ -1,5 +1,5 @@
 {
-  "decision_key": "9187a12b1158fca7e7d2abaccb7498d9af739133823914fedf6bd1ef5beb0a63",
+  "decision_key": "54f28d9989878eb7f20b604c9952a5f2c629edefd880133b545c77d2ab6fd37c",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-resident.pending.v1",
   "simulated_clock": "2027-01-21T08:15:00+00:00",
@@ -540,7 +540,134 @@
         "side_effecting": true
       }
     ],
-    "capability_history": [],
+    "capability_history": [
+      {
+        "call_id": "seg003-jan21-review-anchors",
+        "data": [
+          {
+            "excerpt": "{'actual_ready': '2027-01-20T08:02:00+00:00', 'note': '成型台前出现等待，记录员未填写原因', 'observed_wait_minutes': 17, 'scheduled_ready': '2027-01-20T07:40:00+00:00', 'station': 'croissant'}",
+            "object_ref": {
+              "object_id": "obs_src_4ca5f23159a0a691650430b5",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-20T08:45:00Z"
+          },
+          {
+            "excerpt": "2027-01-19，用户要求消防检查事项收口，当前重点仍是早高峰出品，希望连续观察后再调整，不由单日销售数字下结论。AIOS回复已核对原消防提醒任务为取消状态，不重新开启，并沿用早高峰观察安排，关注等待、返工、缺货等实际记录。该交流没有提出新的菜单调整或确认出品已稳定。",
+            "object_ref": {
+              "object_id": "sum_1e2e3dec53ce671b2c0736cb",
+              "revision": 1
+            },
+            "object_type": "summary",
+            "recorded_at": "2027-01-20T08:45:00Z"
+          },
+          {
+            "excerpt": "2027-01-19面包店POS日记录：orders为97，gross_sales为1297.6 USD，refunds为1。该记录没有出品等待、返工、退款原因或早高峰分段信息，不能单凭它判断出品稳定性。",
+            "object_ref": {
+              "object_id": "sum_857a1a47de99eafe1fa7db89",
+              "revision": 1
+            },
+            "object_type": "summary",
+            "recorded_at": "2027-01-20T08:45:00Z"
+          },
+          {
+            "excerpt": "看了今天的原始出品记录：牛角包计划7:40就绪，实际8:02，晚了22分钟；另记有成型台前17分钟等待，但原因栏没有填写。这能确认今天有延后和等待，不能据此认定烤箱拖慢了，也不能把17分钟直接算作全部延误的原因。先保留“烤箱慢”这个待核实的猜测，不写成结论。接下来沿用连续观察，重点对照成型、进炉和出炉时间，看看等待发生在哪里、是否重复出现。",
+            "object_ref": {
+              "object_id": "obs_conv_ai_a9d579f856f4865db902aae4",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-20T09:10:00Z"
+          },
+          {
+            "excerpt": "今天牛角包确实晚了一些。我第一反应是烤箱拖慢了，但先别把这个当原因，看看今天留下来的记录再说。",
+            "object_ref": {
+              "object_id": "obs_conv_user_0f575c8301820e6a83ab4e38",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-20T09:10:00Z"
+          },
+          {
+            "excerpt": "{'band_window': '2027-01-20T05:47:00+00:00/2027-01-20T08:15:00+00:00', 'device': 'deck_oven_1', 'fault_codes': [], 'preheat_target_c': 205, 'target_reached_at': '2027-01-20T05:47:00+00:00', 'temperature_band_c': [203, 207]}",
+            "object_ref": {
+              "object_id": "obs_src_972d74f06c87a81231892a69",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-20T10:05:00Z"
+          },
+          {
+            "excerpt": "{'batch_wait_minutes': [12, 8, 17], 'note': '仅记录排队时间，未记录成因', 'station': 'shaping_table', 'window': '2027-01-20T06:00:00+00:00/2027-01-20T08:30:00+00:00'}",
+            "object_ref": {
+              "object_id": "obs_src_980c3eaef1a3002ec7d24958",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-20T12:20:00Z"
+          },
+          {
+            "excerpt": "对，今天的记录还不支持把原因定在烤箱上：烤箱5:47达到205°C，记录的5:47—8:15温度范围是203—207°C，没有故障码；成型台6:00—8:30则记录了三批等待，分别12、8、17分钟，但没有记录成因。可以确认成型台有等待，不能把“成型台是永久瓶颈”当成新结论，也不能凭这些指标排除所有烤箱因素。继续按实际等候点观察，分清发生了什么和为什么发生；暂不据此换设备或扩菜单。",
+            "object_ref": {
+              "object_id": "obs_conv_ai_aaf5d28718878a7acfe8ad49",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-20T20:30:00Z"
+          },
+          {
+            "excerpt": "从今天这些记录看，至少不能只怪烤箱。先继续记实际等候点，别急着给早高峰定一个永久原因。",
+            "object_ref": {
+              "object_id": "obs_conv_user_cc031f2f198bf709cea0cc61",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-20T20:30:00Z"
+          },
+          {
+            "excerpt": "小赵记录：06:10到06:42醒发架满，两盘面团在推车上等待空位；06:42后恢复周转。",
+            "object_ref": {
+              "object_id": "obs_src_facf2b040e0feb3a89b935f2",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-21T06:55:00Z"
+          },
+          {
+            "excerpt": "2027-01-20设备遥测：deck_oven_1的预热目标为205°C，5:47达到目标；5:47—8:15记录的温度范围为203—207°C，fault_codes为空。数据由oven_controller来源记录，于10:05入库。该记录只描述这台设备在所列时段的指标，不能单独确定出品延后原因，也不等于已排除全部设备或操作因素。",
+            "object_ref": {
+              "object_id": "sum_2777735c7b2f7091760212db",
+              "revision": 1
+            },
+            "object_type": "summary",
+            "recorded_at": "2027-01-21T06:55:00Z"
+          },
+          {
+            "excerpt": "2027-01-20，用户上午报告牛角包出品晚了，提出烤箱拖慢的第一反应，但明确要求不要当成原因，先查记录。AIOS核对后说明计划7:40、实际8:02，延后22分钟；成型台前等待17分钟而原因未填，暂不能归因于烤箱。晚间用户要求继续记录实际等候点，不给早高峰定永久原因。AIOS结合当日烤箱达温、温度范围与无故障码记录，以及成型台三批12、8、17分钟的等候记录，说明当前不足以定烤箱为原因，也不能改断言成型台是永久瓶颈或排除所有设备因素。交流维持连续观察方向，没有确认根因；AIOS表示暂不据此换设备或扩菜单。",
+            "object_ref": {
+              "object_id": "sum_cd829a818aa7393666ff7f33",
+              "revision": 1
+            },
+            "object_type": "summary",
+            "recorded_at": "2027-01-21T06:55:00Z"
+          },
+          {
+            "excerpt": "2027-01-20的shop_floor_log有两条出品记录。牛角包计划7:40就绪，实际8:02，延后22分钟；记录成型台前等待17分钟，未填写原因。另一条记录覆盖6:00—8:30，成型台三批排队时间分别为12、8、17分钟，仅记录等候，未记录成因。两条记录未明确批次对应关系，不能将其中两个17分钟视为两次独立等待再相加，也不能由排队时长确认全部延误的因果或早高峰的永久原因。",
+            "object_ref": {
+              "object_id": "sum_f86057a5cbb41415185a3689",
+              "revision": 1
+            },
+            "object_type": "summary",
+            "recorded_at": "2027-01-21T06:55:00Z"
+          }
+        ],
+        "error_code": null,
+        "error_message": null,
+        "name": "read_periodic_review_anchors",
+        "ok": true
+      }
+    ],
     "cockpit": {
       "ai_identity": {},
       "capability_catalog": [
@@ -1164,8 +1291,8 @@
       "truncated": true,
       "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged."
     },
-    "remaining_tool_rounds": 8,
-    "round_index": 0,
+    "remaining_tool_rounds": 7,
+    "round_index": 1,
     "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged.",
     "wake_reason": "periodic_review"
   },
