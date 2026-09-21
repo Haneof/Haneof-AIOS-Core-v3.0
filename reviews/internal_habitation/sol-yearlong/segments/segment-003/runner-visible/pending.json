@@ -1,37 +1,41 @@
 {
-  "decision_key": "27ee00351d67a37a33707611c8def879f3cfdb224b8e38b3d12df0598df93b64",
+  "decision_key": "e087dfa91378834e563916db1e89a23cd9188567ce29c8970a1b44785cbaff51",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-summary.pending.v1",
   "simulated_clock": "2027-01-24T08:15:00+00:00",
   "summary_request": {
     "request": {
-      "dimension": "dim:staff_schedule",
+      "dimension": "dim:user_ai_interaction",
       "granularity": "day",
-      "source_world_revision": 196,
+      "source_world_revision": 197,
       "sources": [
         {
           "metadata": {
-            "adapter_id": "habitation.staff_schedule.v1",
-            "dimension": "dim:staff_schedule",
-            "external_record_id": "d041-staff-schedule",
-            "external_revision": "1",
-            "mechanical_ingest": true,
-            "occurred_at_original": "2027-01-23T12:00:00+00:00",
-            "provenance": {
-              "habitation_resident_metadata": {
-                "source": "staff_schedule_app"
-              },
-              "model_id_not_part_of_fact": true
-            },
-            "source_class": "user",
-            "source_digest": "216721959fdc6bcfc23cbe021472444c914b0dc5574588f0ba44a6fe9c74ca13",
-            "source_schema_version": "1"
+            "dimension": "dim:user_ai_interaction",
+            "role": "assistant",
+            "session_id": "jan23-evening",
+            "turn_index": 1,
+            "turn_key": "c08def7e5ba06dbeb0d88d2e"
           },
-          "object_id": "obs_src_b06cc41ee7cc41bf8c27a8b4",
+          "object_id": "obs_conv_ai_205b44baf294efb8bbd7b66d",
           "object_type": "observation",
-          "occurred_at": "2027-01-23T12:00:00Z",
+          "occurred_at": "2027-01-23T20:10:00Z",
           "revision": 1,
-          "text": "{\"date\": \"2027-01-24\", \"employee\": \"小赵\", \"note\": \"已确认负责晚间收尾\", \"shift_end\": \"21:00\", \"shift_start\": \"12:30\"}"
+          "text": "收到：明晚1月24日19点，你和妹妹吃饭，小赵已确认负责晚间收尾。按已定安排处理，不再提醒，也不把它描述为尚未解决的冲突。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "user",
+            "session_id": "jan23-evening",
+            "turn_index": 1,
+            "turn_key": "c08def7e5ba06dbeb0d88d2e"
+          },
+          "object_id": "obs_conv_user_c7cceef8903fa9d2c58b9daa",
+          "object_type": "observation",
+          "occurred_at": "2027-01-23T20:10:00Z",
+          "revision": 1,
+          "text": "明晚19点我和妹妹吃饭，小赵已经确认负责晚间收尾。这个安排现在已经定了，不用再提醒我，也别把它说成还在冲突。"
         }
       ],
       "truncated": false,
@@ -40,5 +44,5 @@
     },
     "summary_request_type": "DimensionSummaryInput"
   },
-  "world_revision_before": 196
+  "world_revision_before": 197
 }
