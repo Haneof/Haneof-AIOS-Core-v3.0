@@ -355,10 +355,19 @@ class CurrentCoreHabitationTarget(HabitationTarget):
                 WakeSource.USER_INTERACTION,
             }:
                 continue
+
+            # A prior dispatch in this same snapshot may mechanically merge sibling
+            # BACKGROUND Wakes into one AttentionBundle. Re-read the durable current
+            # Wake before dispatch so the habitation adapter never tries to claim a
+            # child that has already become MERGED.
+            current = self.runtime.wake_bus.current_wake(wake.object_id)
+            if current.wake_state.value not in {"new", "queued"}:
+                continue
+
             result = self.runtime.run_wake(
                 wake_ref=ObjectRef(
-                    object_id=wake.object_id,
-                    revision=wake.revision,
+                    object_id=current.object_id,
+                    revision=current.revision,
                 ),
                 now=now,
                 step0=self._step0_for_wake(wake, now),

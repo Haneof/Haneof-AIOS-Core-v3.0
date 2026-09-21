@@ -16,7 +16,9 @@ from aios_core.contracts.enums import ObjectType
 from aios_core.contracts.time import as_utc
 from aios_core.query.search import derive_dimension, WorldSearchIndex
 from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.contracts.refs import ObjectRef
 
+from .cognitive_derivation import CognitiveDerivationReconcileResult, CognitiveDerivationScheduler
 from .dimension_summary import DimensionSummaryInput, DimensionSummaryService, SummaryCommit
 
 UTC = timezone.utc
@@ -125,6 +127,7 @@ class MultiScaleSummaryScheduler:
         summary_handler: Callable[[DimensionSummaryInput], str],
         subject_id: str = "user_1",
         max_source_objects: int = 500,
+        cognitive_derivation_scheduler: CognitiveDerivationScheduler | None = None,
     ) -> None:
         self.store = store
         self.index = index
@@ -136,6 +139,19 @@ class MultiScaleSummaryScheduler:
             subject_id=subject_id,
             max_source_objects=max_source_objects,
         )
+        self.cognitive_derivation_scheduler = (
+            cognitive_derivation_scheduler
+            or CognitiveDerivationScheduler(
+                store=store,
+                index=index,
+                subject_id=subject_id,
+            )
+        )
+
+    def reconcile_cognitive_derivation(self) -> CognitiveDerivationReconcileResult:
+        """Re-ensure durable C14 opportunities after process restart."""
+
+        return self.cognitive_derivation_scheduler.reconcile()
 
     def active_dimensions(self) -> tuple[str, ...]:
         payloads = self.store.list_payloads(subject_id=self.subject_id)
@@ -295,6 +311,9 @@ class MultiScaleSummaryScheduler:
         truncated = False
         semantic_jobs = 0
 
+        # Close the commit -> crash -> missing-Wake gap before doing new work.
+        self.reconcile_cognitive_derivation()
+
         for scale_value in scales:
             scale = SummaryScale(scale_value)
             for dimension in dims:
@@ -345,11 +364,16 @@ class MultiScaleSummaryScheduler:
                         raise ValueError(
                             "dimension summary handler must return non-blank text"
                         )
-                    commits.append(
-                        self.service.commit(
-                            prepared,
-                            content=content,
-                            generated_at=current,
+                    committed = self.service.commit(
+                        prepared,
+                        content=content,
+                        generated_at=current,
+                    )
+                    commits.append(committed)
+                    self.cognitive_derivation_scheduler.ensure(
+                        ObjectRef(
+                            object_id=committed.object_id,
+                            revision=committed.revision,
                         )
                     )
                     semantic_jobs += 1

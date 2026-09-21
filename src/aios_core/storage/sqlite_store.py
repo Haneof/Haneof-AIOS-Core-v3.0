@@ -487,6 +487,51 @@ class SQLiteWorldStore:
             ).fetchone()
             return None if row is None else str(row["source_class"])
 
+    def object_revision_record(self, object_id: str, *, revision: int) -> dict:
+        """Return durable mechanical provenance for one exact object revision.
+
+        C14 uses this read surface to derive routing lineage from the existing
+        world ledger.  It intentionally exposes no semantic classification and
+        creates no second provenance store.
+        """
+
+        revision = _normalize_query_integer(revision, "revision")
+        with self._connection() as conn:
+            row = conn.execute(
+                """
+                SELECT
+                    o.object_id,
+                    o.revision,
+                    o.object_type,
+                    o.subject_id,
+                    o.world_revision,
+                    o.revision_kind,
+                    c.source_class,
+                    (
+                        SELECT MAX(o2.revision)
+                        FROM object_revisions o2
+                        WHERE o2.object_id=o.object_id
+                    ) AS latest_revision
+                FROM object_revisions o
+                JOIN world_commits c ON c.world_revision=o.world_revision
+                WHERE o.object_id=? AND o.revision=?
+                """,
+                (object_id, revision),
+            ).fetchone()
+        if row is None:
+            raise StoreError(
+                ErrorCode.NOT_FOUND,
+                f"object revision not found: {object_id}@{revision}",
+                context={
+                    "object_id": object_id,
+                    "revision": revision,
+                    "reason": "exact_revision_not_found",
+                },
+            )
+        record = dict(row)
+        record["is_latest"] = int(record["latest_revision"]) == int(record["revision"])
+        return record
+
     def triggerable_commits_after(
         self, world_revision: int, *, limit: int = 500
     ) -> list[dict]:
