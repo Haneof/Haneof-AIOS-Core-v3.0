@@ -1019,3 +1019,158 @@ def test_expired_attention_watch_is_retired_before_late_fact_can_wake(tmp_path):
     assert latest_watch["revision"] == 2
     assert latest_watch["task_state"] == "expired"
     assert "attention_watch_expired_at" in latest_watch["metadata"]
+
+
+
+def test_pending_dispatcher_holds_background_then_batches_once(tmp_path):
+    store, index = _world(tmp_path)
+    evidence = Observation(
+        object_id="obs_background_batch_scheduler",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW),
+        learned_at=NOW,
+        recorded_at=NOW,
+        created_by="background-batch-scheduler-test",
+        source_kind="system",
+        modality="marker",
+        value={"changed": True},
+        metadata={"dimension": "dim:test"},
+    )
+    store.commit(
+        [evidence],
+        OperationRequest(
+            operation_name="test.seed.background.batch.scheduler",
+            expected_world_revision=0,
+            reason="seed background batch scheduler evidence",
+            idempotency_key="seed-background-batch-scheduler",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index.catch_up()
+
+    model_calls = []
+
+    def model(snapshot):
+        model_calls.append(snapshot.wake_reason)
+        wake = snapshot.cockpit["task_context"]["wake"]
+        assert wake["wake_source"] == "attention_bundle"
+        assert wake["attention_bundle"]["member_count"] == 2
+        return ModelDirective(silence=True)
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+    )
+    ref = ObjectRef(object_id=evidence.object_id, revision=1)
+    runtime.wake_bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.WATCH_MATCH,
+            rule_id="background.batch.one",
+            observed_at=NOW + timedelta(seconds=1),
+            evidence_refs=(ref,),
+            dedupe_key="background-batch-one",
+            priority=40,
+            attention_class=AttentionClass.BACKGROUND,
+        )
+    )
+    runtime.wake_bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.WATCH_MATCH,
+            rule_id="background.batch.two",
+            observed_at=NOW + timedelta(seconds=20),
+            evidence_refs=(ref,),
+            dedupe_key="background-batch-two",
+            priority=60,
+            attention_class=AttentionClass.BACKGROUND,
+        )
+    )
+
+    early = runtime.dispatch_next_pending_wake(
+        now=NOW + timedelta(seconds=30),
+    )
+    assert early is None
+    assert model_calls == []
+
+    dispatched = runtime.dispatch_next_pending_wake(
+        now=NOW + timedelta(seconds=61),
+    )
+    assert dispatched is not None
+    assert dispatched.runtime is not None
+    assert dispatched.context is not None
+    assert dispatched.context.task_context["wake"]["wake_source"] == "attention_bundle"
+    assert model_calls == ["attention_bundle"]
+    assert runtime.wake_bus.pending_wakes() == ()
+
+
+def test_pending_dispatcher_interrupt_bypasses_background_hold(tmp_path):
+    store, index = _world(tmp_path)
+    evidence = Observation(
+        object_id="obs_interrupt_bypass_scheduler",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW),
+        learned_at=NOW,
+        recorded_at=NOW,
+        created_by="interrupt-bypass-scheduler-test",
+        source_kind="system",
+        modality="marker",
+        value={"changed": True},
+        metadata={"dimension": "dim:test"},
+    )
+    store.commit(
+        [evidence],
+        OperationRequest(
+            operation_name="test.seed.interrupt.bypass.scheduler",
+            expected_world_revision=0,
+            reason="seed interrupt bypass scheduler evidence",
+            idempotency_key="seed-interrupt-bypass-scheduler",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index.catch_up()
+
+    seen_classes = []
+
+    def model(snapshot):
+        seen_classes.append(
+            snapshot.cockpit["task_context"]["wake"]["attention_class"]
+        )
+        return ModelDirective(silence=True)
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+    )
+    ref = ObjectRef(object_id=evidence.object_id, revision=1)
+    background = runtime.wake_bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.WATCH_MATCH,
+            rule_id="background.waiting",
+            observed_at=NOW + timedelta(seconds=1),
+            evidence_refs=(ref,),
+            dedupe_key="background-waiting",
+            attention_class=AttentionClass.BACKGROUND,
+        )
+    )
+    interrupt = runtime.wake_bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.WATCH_MATCH,
+            rule_id="interrupt.immediate",
+            observed_at=NOW + timedelta(seconds=2),
+            evidence_refs=(ref,),
+            dedupe_key="interrupt-immediate",
+            priority=80,
+            attention_class=AttentionClass.INTERRUPT,
+        )
+    )
+
+    dispatched = runtime.dispatch_next_pending_wake(
+        now=NOW + timedelta(seconds=3),
+    )
+    assert dispatched is not None
+    assert dispatched.wake.wake_id == interrupt.wake_id
+    assert seen_classes == ["interrupt"]
+    assert runtime.wake_bus.current_wake(
+        background.wake_id
+    ).wake_state.value == "new"
