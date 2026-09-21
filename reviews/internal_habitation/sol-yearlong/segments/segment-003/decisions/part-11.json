@@ -1,0 +1,12 @@
+{
+  "9872d233137defdd8327a861503f2fe3e3083c7bae1e78e3610dbd8f0be206c8": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "arguments": {"object_id": "obs_src_4ca5f23159a0a691650430b5", "revision": 1},
+        "call_id": "seg003-jan20-production-record"
+      }
+    ]
+  }
+}
