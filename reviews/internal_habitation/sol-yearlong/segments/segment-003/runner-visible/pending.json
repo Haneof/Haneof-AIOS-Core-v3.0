@@ -1,5 +1,5 @@
 {
-  "decision_key": "882fc18638f05cc0c06aacab5b442a105b90980ec09bb46bbdbcf77c40b17a4e",
+  "decision_key": "80e70b3fab604bc8b35217c8725a069d019b1c3b138c2367700a04c01be30696",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-resident.pending.v1",
   "simulated_clock": "2027-01-24T08:15:00+00:00",
@@ -540,7 +540,80 @@
         "side_effecting": true
       }
     ],
-    "capability_history": [],
+    "capability_history": [
+      {
+        "call_id": "seg003-jan24-review-anchors",
+        "data": [
+          {
+            "excerpt": "{'note': '妹妹来店附近，一起吃晚饭', 'start': '2027-01-24T19:00:00+00:00', 'title': '和妹妹晚饭'}",
+            "object_ref": {
+              "object_id": "obs_src_e44a236a9610c234a1e59e11",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-23T09:00:00Z"
+          },
+          {
+            "excerpt": "2027-01-22，用户决定本次面粉按1.41继续选择North Mill，认为与1.42的微小差额不值得反复更换供应商，当前更想稳定出品。AIOS确认两数差额为0.01，不夸大价差、不另起换供应商比较，并维持早高峰实际等候点的观察方向，菜单扩张暂不优先。这是本次采购选择和当前优先级，不等于用户永久不比较供应商或采购已由AIOS执行。",
+            "object_ref": {
+              "object_id": "sum_1b6cbd575be66c708eb34265",
+              "revision": 1
+            },
+            "object_type": "summary",
+            "recorded_at": "2027-01-23T09:00:00Z"
+          },
+          {
+            "excerpt": "2027-01-22供应商门户有两条North Mill采购记录：11:00为180 kg bread flour报价，quoted_unit_price 1.41 USD，状态quoted；11:20记录相同供应商、品类和数量，unit_price 1.41 USD，状态confirmed，计划2027-01-25 04:30 UTC配送。确认订单与计划配送不等于货物已送达或已验收。",
+            "object_ref": {
+              "object_id": "sum_e05c5ff7571042be53082792",
+              "revision": 1
+            },
+            "object_type": "summary",
+            "recorded_at": "2027-01-23T09:00:00Z"
+          },
+          {
+            "excerpt": "{'date': '2027-01-24', 'employee': '小赵', 'note': '已确认负责晚间收尾', 'shift_end': '21:00', 'shift_start': '12:30'}",
+            "object_ref": {
+              "object_id": "obs_src_b06cc41ee7cc41bf8c27a8b4",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-23T12:00:00Z"
+          },
+          {
+            "excerpt": "收到：明晚1月24日19点，你和妹妹吃饭，小赵已确认负责晚间收尾。按已定安排处理，不再提醒，也不把它描述为尚未解决的冲突。",
+            "object_ref": {
+              "object_id": "obs_conv_ai_205b44baf294efb8bbd7b66d",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-23T20:10:00Z"
+          },
+          {
+            "excerpt": "明晚19点我和妹妹吃饭，小赵已经确认负责晚间收尾。这个安排现在已经定了，不用再提醒我，也别把它说成还在冲突。",
+            "object_ref": {
+              "object_id": "obs_conv_user_c7cceef8903fa9d2c58b9daa",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-23T20:10:00Z"
+          },
+          {
+            "excerpt": "cancelled: 等待妹妹航班时间确认并检查安排冲突 | next=旧航班与到货时间核实事项收口，不再提醒或重述为冲突；不为此产生新的发送动作。",
+            "object_ref": {
+              "object_id": "task_41571ce5cbcc6c736bb22f73",
+              "revision": 3
+            },
+            "object_type": "task",
+            "recorded_at": "2027-01-23T20:10:00Z"
+          }
+        ],
+        "error_code": null,
+        "error_message": null,
+        "name": "read_periodic_review_anchors",
+        "ok": true
+      }
+    ],
     "cockpit": {
       "ai_identity": {},
       "capability_catalog": [
@@ -1164,8 +1237,8 @@
       "truncated": true,
       "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged."
     },
-    "remaining_tool_rounds": 8,
-    "round_index": 0,
+    "remaining_tool_rounds": 7,
+    "round_index": 1,
     "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged.",
     "wake_reason": "periodic_review"
   },
