@@ -1,0 +1,46 @@
+{
+ "checkpoint_id": "segment_003-s0012-advance#cp00",
+ "checkpoint_index": 0,
+ "input_fingerprint": "303edc60918d4685aba3aaaeb0c3e842d450497106fa7c7cfdca7568f69eccd6",
+ "kind": "dimension_summary",
+ "model_id": "arena-agent-mode-resident/unknown-provider-model",
+ "payload": {
+  "dimension": "dim:social",
+  "granularity": "day",
+  "source_world_revision": 153,
+  "sources": [
+   {
+    "metadata": {
+     "adapter_id": "moyin.group_message.v1",
+     "dimension": "dim:social",
+     "external_record_id": "s3-0004",
+     "external_revision": "1",
+     "mechanical_ingest": true,
+     "occurred_at_original": "2026-10-06T03:00:00+00:00",
+     "provenance": {
+      "habitation_resident_metadata": {
+       "source": "wx_group_guild"
+      },
+      "model_id_not_part_of_fact": true
+     },
+     "source_class": "user",
+     "source_digest": "0d07ee6522995a37171bf5fad3d9051f6913bd3d65b72e115d1e4ce0df48cffa",
+     "source_schema_version": "1"
+    },
+    "object_id": "obs_src_e78cff24a12e5bdf649a2fd5",
+    "object_type": "observation",
+    "occurred_at": "2026-10-06T03:00:00Z",
+    "revision": 1,
+    "text": "【苏州图书馆】2027年度古籍修复外包项目招标公告已挂网，预算 380 万，投标截止 11 月 20 日。"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-10-06T23:59:59.999999Z",
+  "window_start": "2026-10-06T00:00:00Z"
+ },
+ "run_id": "hab_arena_01a0c1e1_moyin_v1",
+ "segment_id": "segment_003",
+ "simulated_at": "2026-10-07T02:30:00+00:00",
+ "step_key": "segment_003-s0012-advance",
+ "world_revision_before": 153
+}

@@ -1,0 +1,83 @@
+{
+ "checkpoint_id": "segment_003-s0017-advance#cp00",
+ "checkpoint_index": 0,
+ "input_fingerprint": "0ccf2b3943ef0eecc361a8376bc4cecc6ac97cf2d80d578d94f07a989db5934e",
+ "kind": "dimension_summary",
+ "model_id": "arena-agent-mode-resident/unknown-provider-model",
+ "payload": {
+  "dimension": "dim:family",
+  "granularity": "day",
+  "source_world_revision": 170,
+  "sources": [
+   {
+    "metadata": {
+     "dimension": "dim:family",
+     "writeback_kind": "revisable_cognition"
+    },
+    "object_id": "clm_7034a713ff417d48447ce66e",
+    "object_type": "claim",
+    "occurred_at": "2026-10-07T12:05:00Z",
+    "revision": 1,
+    "text": "2026-10-07 下午，沈守拙（74，无锡）向用户妹妹问出「你是谁」，约半分钟后自行恢复并叫出她的名字；同日晚间进食正常、认得出菜。信息来源是妹妹的转述（二手），妹妹自己的归因是「可能没睡好」，该归因未经验证。\n\n明确不下的判断：单次短暂认人障碍不能支持任何认知障碍的诊断，也不能否定妹妹的解释。同样不能忽略的是，这与 10-02 他本人在电话里说的「没事」并存——本人自述在这种情况下的可信度有限。\n\n真正有诊断价值的变量是频次与情境（发作时间、前置活动、恢复时长），这些目前都不在世界内。已建议用户请妹妹开始记录。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:family",
+     "writeback_kind": "cognition_evidence"
+    },
+    "object_id": "evs_5356acb010a29e2d889f2d48",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-07T12:05:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-07T12:05:00Z\", \"world_revision\": 159}, \"learned_at\": \"2026-10-07T12:05:00Z\", \"member_refs\": [{\"object_id\": \"obs_src_ab380fc9f566b0c767c01c18\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:family\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_5356acb010a29e2d889f2d48\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-10-07T12:05:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_src_ab380fc9f566b0c767c01c18\", \"revision\": 1}]}"
+   },
+   {
+    "metadata": {
+     "adapter_id": "moyin.care_note.v1",
+     "dimension": "dim:family",
+     "external_record_id": "s3-0007",
+     "external_revision": "1",
+     "mechanical_ingest": true,
+     "occurred_at_original": "2026-10-07T12:05:00+00:00",
+     "provenance": {
+      "habitation_resident_metadata": {
+       "source": "wx_family_note"
+      },
+      "model_id_not_part_of_fact": true
+     },
+     "source_class": "user",
+     "source_digest": "ea395885285fa85702c3cdfd1521feb4df572f99e3af83fa1e091fa2ff7cf99b",
+     "source_schema_version": "1"
+    },
+    "object_id": "obs_src_ab380fc9f566b0c767c01c18",
+    "object_type": "observation",
+    "occurred_at": "2026-10-07T12:05:00Z",
+    "revision": 1,
+    "text": "妹妹说今天下午爸问她「你是谁」，愣了大概半分钟又叫出名字了。晚上吃饭正常，认得出菜。妹妹说可能是没睡好。"
+   },
+   {
+    "metadata": {
+     "dimension": "dim:family",
+     "revision_mode": "revise",
+     "target_ref": {
+      "object_id": "clm_8522f237c4a2aaebb8d9145b",
+      "revision": 1
+     }
+    },
+    "object_id": "evs_revision_d135752d6f9cbbdcc20a93fc",
+    "object_type": "evidence_set",
+    "occurred_at": "2026-10-07T14:40:00Z",
+    "revision": 1,
+    "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-07T14:40:00Z\", \"world_revision\": 164}, \"learned_at\": \"2026-10-07T14:40:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_caa9f3e49dba2624487447d1\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:family\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_8522f237c4a2aaebb8d9145b\", \"revision\": 1}}, \"object_id\": \"evs_revision_d135752d6f9cbbdcc20a93fc\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_8522f237c4a2aaebb8d9145b@1\", \"recorded_at\": \"2026-10-07T14:40:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"subj_shen_yanqiu\", \"support_refs\": [{\"object_id\": \"obs_conv_user_caa9f3e49dba2624487447d1\", \"revision\": 1}]}"
+   }
+  ],
+  "truncated": false,
+  "window_end": "2026-10-07T23:59:59.999999Z",
+  "window_start": "2026-10-07T00:00:00Z"
+ },
+ "run_id": "hab_arena_01a0c1e1_moyin_v1",
+ "segment_id": "segment_003",
+ "simulated_at": "2026-10-08T07:20:00+00:00",
+ "step_key": "segment_003-s0017-advance",
+ "world_revision_before": 170
+}

@@ -1,0 +1,2 @@
+{"kind":"turn_directive","decision":{"capability_calls":[{"name":"read_periodic_review_anchors","arguments":{}}]}}
+{"kind":"turn_directive","decision":{"silence":true,"reason":"11 个 anchor 全部（100%）是我自己写的 Summary，外部对象为零。其中还包括四条明确写着「九月无数据」「Q3 无数据」的空窗复述——review 正在让我审阅我自己声明过的『这里什么都没有』。与此同时，本窗口内真正重要的外部事实（10-06 11:00 苏州图书馆 380 万招标公告）一个都没进来。在这种情况下形成任何 Experience 都只是自我确认。不建、不改、不撤。"}}
