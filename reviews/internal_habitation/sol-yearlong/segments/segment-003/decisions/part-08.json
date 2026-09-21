@@ -1,0 +1,1 @@
+{"302fd1d5f7b9dd81eb01d4ceabbb070c50660193a2baca64db929c5941a2d81c":{"kind":"capability_calls","calls":[{"name":"inspect_world_object","arguments":{"object_id":"obs_src_4ca5f23159a0a691650430b5","revision":1},"call_id":"seg003-jan20-production-raw"}]}}
