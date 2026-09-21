@@ -97,9 +97,15 @@ def test_round_summary_pins_raw_dialogue_and_drills_down_without_deleting_truth(
         (2, "assistant", "raw-assistant-2"),
     ]
 
-    # Summary is an index only. All raw dialogue facts remain durable.
+    # Summary is an index only. All raw dialogue facts, including assistant
+    # messages excluded from proactive personalization, remain durable.
     observations = store.list_payloads(object_type=ObjectType.OBSERVATION)
     assert len(observations) == 6
+    assert sum(
+        1
+        for payload in observations
+        if (payload.get("metadata") or {}).get("role") == "assistant"
+    ) == 3
 
 
 def test_summary_retry_is_idempotent_but_changed_summary_fails_closed(tmp_path):

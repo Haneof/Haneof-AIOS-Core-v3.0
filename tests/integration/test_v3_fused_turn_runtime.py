@@ -23,7 +23,7 @@ def test_vertical_slice_proactively_remembers_then_writes_new_turn(tmp_path):
     db = tmp_path / "world.db"
     store = SQLiteWorldStore(db)
     seed = ConversationIngestor(store)
-    seed.commit_turn(
+    seed_result = seed.commit_turn(
         session_id="history",
         turn_index=1,
         user_text="智能索引和智能推荐一定要分开。",
@@ -36,6 +36,9 @@ def test_vertical_slice_proactively_remembers_then_writes_new_turn(tmp_path):
     def model(snapshot):
         cards = snapshot.cockpit["memory_cards"]
         assert cards
+        refs = {card["object_id"] for card in cards}
+        assert seed_result.user_observation_id in refs
+        assert seed_result.assistant_observation_id not in refs
         assert any("索引" in card["excerpt"] for card in cards)
         return ModelDirective(response="接着之前的方案：索引继续作为公共能力。")
 
@@ -56,6 +59,53 @@ def test_vertical_slice_proactively_remembers_then_writes_new_turn(tmp_path):
 
     page = index.recall_candidates("继续这个方案")
     assert any(hit.object_id == result.conversation_commit.user_observation_id for hit in page.hits)
+
+
+def test_assistant_raw_dialogue_stays_available_to_explicit_search(tmp_path):
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    seed = ConversationIngestor(store)
+    prior = seed.commit_turn(
+        session_id="history",
+        turn_index=1,
+        user_text="今天先整理桌面。",
+        assistant_text="我之前建议把蓝色文件夹放到左边抽屉。",
+        occurred_at=NOW - timedelta(days=2),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    def model(snapshot):
+        if not snapshot.capability_history:
+            assert snapshot.cockpit["memory_cards"] == ()
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="search_world",
+                        arguments={"query": "蓝色文件夹", "limit": 5},
+                    ),
+                )
+            )
+        search_result = snapshot.capability_history[-1]
+        assert search_result.ok is True
+        assert any(
+            item["object_id"] == prior.assistant_observation_id
+            for item in search_result.data
+        )
+        return ModelDirective(response="我查到了之前 assistant 的原话。")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    result = runtime.run_turn(
+        session_id="current",
+        turn_index=1,
+        user_input="你之前提到的蓝色文件夹原话是什么？",
+        current_topic="蓝色文件夹",
+        occurred_at=NOW,
+    )
+
+    assert result.recommendation.cards == ()
+    assert result.runtime.response == "我查到了之前 assistant 的原话。"
+
 
 
 def test_model_can_ignore_empty_prefetch_and_deep_search(tmp_path):
