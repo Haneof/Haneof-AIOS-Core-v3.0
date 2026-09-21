@@ -1,5 +1,5 @@
 {
-  "decision_key": "b5404873c41ffe3630297db0a261f61a967070437c04a48a4d6bc5d9e70cd83a",
+  "decision_key": "95120e01ec7e5486652e85e0622f5484ca753de3ec9e47d447b5e335ef3ccbef",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-resident.pending.v1",
   "simulated_clock": "2027-01-26T08:15:00+00:00",
@@ -557,6 +557,69 @@
         "error_code": null,
         "error_message": null,
         "name": "read_periodic_review_anchors",
+        "ok": true
+      },
+      {
+        "call_id": "seg003-jan26-sensor-context",
+        "data": {
+          "created_by": "reality_ingest:habitation.wearable_step_count.numeric.v1:numeric",
+          "data_quality": {
+            "compression": "mechanical_tolerance_segment",
+            "policy": {
+              "change_threshold": 500.0,
+              "max_gap_seconds": 1800.0,
+              "tolerance": 0.0
+            }
+          },
+          "learned_at": "2027-01-25T12:00:00Z",
+          "metadata": {
+            "adapter_id": "habitation.wearable_step_count.numeric.v1",
+            "dimension": "dim:body_activity",
+            "mechanical_compression": true,
+            "mechanical_ingest": true,
+            "raw_sample_values_retained": false,
+            "series_id": "steps-2027-01-25",
+            "source_class": "sensor",
+            "source_digest": "02ec73d5652118a02bbfe78ef99d7f93f639589983762b52b43e3627cbf82fc0",
+            "source_locator_range": {
+              "first": null,
+              "last": null
+            },
+            "source_record_ids_digest": "f79ed3570fd1cbddef96847adb53caae8371d30e9fb121063326710004e0c1bf",
+            "source_record_range": {
+              "count": 1,
+              "first": "steps-1200",
+              "last": "steps-1200"
+            }
+          },
+          "modality": "numeric_segment",
+          "object_id": "obs_num_segment_434a1e266d9a8bb052381559",
+          "object_type": "observation",
+          "occurred": {
+            "end": "2027-01-25T12:00:00Z",
+            "precision": "second",
+            "start": "2027-01-25T12:00:00Z",
+            "timezone_name": "UTC",
+            "unknown": false
+          },
+          "raw_locator": "adapter://habitation.wearable_step_count.numeric.v1/series/steps-2027-01-25/segment/0",
+          "recorded_at": "2027-01-25T12:00:00Z",
+          "revision": 1,
+          "source_kind": "wearable_step_count",
+          "source_refs": [],
+          "status": "active",
+          "subject_id": "sol-resident-20260921-001",
+          "unit": null,
+          "value": {
+            "max": 6170.0,
+            "mean": 6170.0,
+            "min": 6170.0,
+            "sample_count": 1
+          }
+        },
+        "error_code": null,
+        "error_message": null,
+        "name": "inspect_world_object",
         "ok": true
       }
     ],
@@ -1183,8 +1246,8 @@
       "truncated": true,
       "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged."
     },
-    "remaining_tool_rounds": 7,
-    "round_index": 1,
+    "remaining_tool_rounds": 6,
+    "round_index": 2,
     "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged.",
     "wake_reason": "periodic_review"
   },
