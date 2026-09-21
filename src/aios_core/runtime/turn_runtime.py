@@ -345,6 +345,19 @@ class FusedTurnRuntime:
         )
         registry.register(
             CapabilitySpec(
+                name="read_world_map",
+                description=(
+                    "Refresh the compact L0 world-map directory. Returns dimension identity, "
+                    "mechanical activity/count metadata and expansion capability names only; "
+                    "it does not return dimension payloads or semantic conclusions."
+                ),
+                kind=CapabilityKind.READ,
+                input_schema={},
+            ),
+            self._read_world_map,
+        )
+        registry.register(
+            CapabilitySpec(
                 name="read_execution_world",
                 description=(
                     "Read current Goals, Tasks and proposed/executed Actions from the "
@@ -1073,6 +1086,92 @@ class FusedTurnRuntime:
                 limit=max(1, min(int(limit), 200)),
             )
         ]
+    def _world_map_context(self, as_of: datetime) -> dict[str, Any]:
+        """Build the always-visible L0 world directory without injecting payload semantics."""
+
+        directory = self.index.dimension_directory(
+            subject=self.subject_id,
+            as_of=as_of,
+            include_inactive=False,
+            limit=24,
+        )
+        rows_by_key = {
+            str(item["dimension"]): dict(item)
+            for item in directory["dimensions"]
+        }
+
+        for definition in self.dimensions.current_dimensions(include_terminal=False):
+            key = str(definition.metadata.get("dimension_key") or "").strip()
+            if not key:
+                continue
+            row = rows_by_key.setdefault(
+                key,
+                {
+                    "dimension": key,
+                    "current_object_count": 0,
+                    "recent_24h_count": 0,
+                    "recent_7d_count": 0,
+                    "latest_activity_at": None,
+                    "object_types": [],
+                },
+            )
+            row.update(
+                {
+                    "registered": True,
+                    "name": definition.name,
+                    "lifecycle": definition.lifecycle.value,
+                    "definition_ref": {
+                        "object_id": definition.object_id,
+                        "revision": definition.revision,
+                    },
+                }
+            )
+
+        dimensions: list[dict[str, Any]] = []
+        for key, row in rows_by_key.items():
+            normalized = dict(row)
+            normalized.setdefault("registered", False)
+            normalized.setdefault("name", None)
+            normalized.setdefault("lifecycle", None)
+            normalized.setdefault("definition_ref", None)
+            normalized["object_types"] = list(normalized.get("object_types") or [])[:8]
+            dimensions.append(normalized)
+
+        dimensions.sort(
+            key=lambda item: (
+                -int(item.get("recent_24h_count") or 0),
+                -int(item.get("recent_7d_count") or 0),
+                str(item.get("dimension") or ""),
+            )
+        )
+
+        return {
+            "schema": "aios.world-map.l0.v1",
+            "directory_only": True,
+            "semantic_conclusions": False,
+            "world_revision": int(directory["world_revision"]),
+            "index_watermark": int(directory["index_watermark"]),
+            "index_lag": int(directory["lag"]),
+            "as_of": directory["as_of"],
+            "dimension_count": len(dimensions),
+            "dimensions": dimensions,
+            "truncated": bool(directory["truncated"]),
+            "expand_capabilities": {
+                "multi_dimension_window": "request_all_dimensions_projection",
+                "single_dimension_timeline": "search_timeline",
+                "semantic_recall": "search_world",
+                "broader_recall": "expand_recall",
+                "exact_object": "inspect_world_object",
+                "dimension_definitions": "list_dimensions",
+                "refresh_directory": "read_world_map",
+            },
+        }
+
+    def _read_world_map(self) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError("read_world_map is only available during an active AIOS turn")
+        return self._world_map_context(self._active_turn_time)
+
     def _list_dimensions(
         self,
         include_terminal: bool = False,
@@ -2299,6 +2398,7 @@ class FusedTurnRuntime:
             recent_turns=continuity_snapshot.recent_turns,
             conversation_summaries=continuity_snapshot.round_summaries,
             ai_identity=continuity_context,
+            world_map=self._world_map_context(occurred_at),
             task_context=current_task_context,
             capability_catalog=self._cockpit_capability_catalog(),
             token_budget=token_budget,
@@ -2491,6 +2591,7 @@ class FusedTurnRuntime:
             recent_turns=(),
             conversation_summaries=(),
             ai_identity=continuity_context,
+            world_map=self._world_map_context(now),
             task_context={
                 "wake": wake_context,
                 "cognitive_policy_context": self._cognitive_policy_context(),
@@ -2601,6 +2702,7 @@ class FusedTurnRuntime:
             recent_turns=(),
             conversation_summaries=(),
             ai_identity=continuity_context,
+            world_map=self._world_map_context(now),
             task_context={
                 "periodic_review": review_context,
                 "cognitive_policy_context": self._cognitive_policy_context(),
