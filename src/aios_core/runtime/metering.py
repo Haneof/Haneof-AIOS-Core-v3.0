@@ -17,7 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from aios_core.contracts.time import as_utc, canonical_utc_iso
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 
-from .cognitive_runtime import ModelUsage
+from .cognitive_runtime import ModelCallProvenance, ModelUsage
 
 
 MeterExecutionClass = Literal[
@@ -150,12 +150,31 @@ class ModelMeteringLedger:
         wake_reason: str,
         model_round_index: int,
         usage: ModelUsage | None,
+        provenance: ModelCallProvenance | None = None,
         wake_id: str | None = None,
         session_id: str | None = None,
     ) -> MeteringRecord:
-        provider = None if usage is None else usage.provider
-        model = None if usage is None else usage.model
-        provider_request_id = None if usage is None else usage.request_id
+        provider = None if provenance is None else provenance.provider
+        model = None if provenance is None else provenance.model
+        provider_request_id = None if provenance is None else provenance.request_id
+        if usage is not None:
+            for field_name, usage_value in (
+                ("provider", usage.provider),
+                ("model", usage.model),
+                ("request_id", usage.request_id),
+            ):
+                current = {
+                    "provider": provider,
+                    "model": model,
+                    "request_id": provider_request_id,
+                }[field_name]
+                if current is not None and usage_value is not None and current != usage_value:
+                    raise ValueError(
+                        f"usage {field_name} conflicts with model-call provenance"
+                    )
+            provider = usage.provider or provider
+            model = usage.model or model
+            provider_request_id = usage.request_id or provider_request_id
         record = MeteringRecord(
             record_id=self._record_id(
                 provider=provider,
@@ -230,7 +249,33 @@ class ModelMeteringLedger:
             ).fetchone()
         if row is None:
             raise RuntimeError("metering record insert was not durable")
-        return self._from_row(row)
+        persisted = self._from_row(row)
+        immutable_replay_fields = (
+            "subject_id",
+            "execution_class",
+            "wake_id",
+            "session_id",
+            "wake_reason",
+            "model_round_index",
+            "provider",
+            "model",
+            "provider_request_id",
+            "usage_complete",
+            "input_tokens",
+            "output_tokens",
+            "total_tokens",
+        )
+        conflicts = [
+            field_name
+            for field_name in immutable_replay_fields
+            if getattr(persisted, field_name) != getattr(record, field_name)
+        ]
+        if conflicts:
+            raise RuntimeError(
+                "metering replay conflicts with durable provider response identity: "
+                + ", ".join(conflicts)
+            )
+        return persisted
 
     def list_model_calls(
         self,
