@@ -311,6 +311,17 @@ P9 认知翻案传播 ✅
 
 ---
 
+## 9. 项目导航文件的分工
+
+新增执行控制层：
+
+```text
+governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md
+= 唯一“下一窗口做什么”的任务队列；一个窗口一个 Task ID；完成后写回进度
+```
+
+新会话恢复顺序更新为：先读 task board，再读本 Master Map、Current Checkpoint 和 Fused Baseline。若 task board 已明确冻结 WIP，禁止从头重做同一任务。
+
 ## 9. 三套项目导航文件的分工
 
 ```text
