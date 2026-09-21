@@ -28,6 +28,7 @@ from aios_core.contracts import (
     TemporalExtent,
     new_object_id,
 )
+from aios_core.ingest.conversation import ConversationIngestor
 from aios_core.query.search import WorldSearchIndex, tokens_for
 from aios_core.storage import SQLiteWorldStore
 
@@ -291,6 +292,22 @@ def test_scale_smoke_reduced_g_m1p(world):
     assert p95 < 0.250, f"p95={p95 * 1000:.1f}ms 超出降规模闸门"
     assert idx.lag() == 0
 
+
+def test_conversation_index_preserves_assistant_raw_dialogue_for_explicit_search(tmp_path):
+    store = SQLiteWorldStore(tmp_path / "world.db")
+    ingest = ConversationIngestor(store)
+    turn = ingest.commit_turn(
+        session_id="t28-world-index",
+        turn_index=1,
+        user_text="今天先整理桌面。",
+        assistant_text="我之前建议把蓝色文件夹放到左边抽屉。",
+        occurred_at=NOW,
+    )
+    idx = index_for(store)
+    idx.rebuild()
+
+    page = idx.recall_candidates("蓝色文件夹")
+    assert any(hit.object_id == turn.assistant_observation_id for hit in page.hits)
 
 # ---------------------------------------------------------------- T36 structured Observation projection
 # Scope: rebuildable derived search projection only; durable Observation semantics stay unchanged and no semantic inference is introduced.
