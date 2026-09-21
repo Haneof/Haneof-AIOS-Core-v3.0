@@ -46,6 +46,7 @@ Resident model (as declared): `GPT-5.6 Sol`; platform provider/session id: `unkn
 | 6 | `c14resv2-006` | 2026-10-05T08:18:00-07:00 | `obs_c14_fixture_8a41a59c20d2aac5789bf0f1@1` | yes (`next=7`) | none due (day/week windows open; C14 reconcile idempotent; review not due) | 47 | dim:schedule 计划被插入会议打断、写作时间重排 |
 | 7 | `c14resv2-007` | 2026-10-05T15:12:00-07:00 | `obs_c14_fixture_35f8ca5c3abafa4ba5c8650a@1` | yes (`next=8`) | none due（10-05 日窗未闭合；C14 幂等；review 未到期） | 48 | dim:work_outcome 定价说明 65%，余量移至次日上午 |
 | 8 | `c14resv2-008` | 2026-10-05T18:35:00-07:00 | `obs_c14_fixture_0ca259ffc10ff4a9218561d0@1` | yes (`next=9`) | 3 day Summaries (schedule/sleep/work_outcome) authored; C14 bundle `wake_bundle_cf33cc336ac0040cebfee9d9` (3 REALITY members) → read_ai_world(0) → **silence**; review not invoked | 58 | 首个 USER 类事件（会话）；0 Claims（sleep n=2 未达 ≥3 门槛） |
+| 9 | `c14resv2-009` | 2026-10-08T06:52:00-07:00 | `obs_c14_fixture_056dddd04850d813437e8532@1` | yes (`next=10`) | 1 Summary（conversation 10-06）由我撰写；C14 `wake_400ea8877e999e1c3902995d` → **silence**；Periodic Review `wake_review_e1002d5562f2ae6d74007e1e` → anchors 复盘 → **silence** | 66 | 短睡 5h48m/60 使睡眠样本发散；0 Claims（拒绝过早“稳定模式”） |
 
 ## Blockers / contamination
 

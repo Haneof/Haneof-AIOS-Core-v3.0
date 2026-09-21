@@ -185,3 +185,23 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
 - 决策文件：`checkpoints/decisions/wake-cognitive_derivation-wake_2ae0b7a9d8d606348fc6ed9b-rev1-62ca150a/round-{0,1}.json`。
 
 **Resulting state**: world_revision 58, index watermark 58, pending wakes 0, Claims 0（19 条摘要）。
+
+---
+
+## Cursor 9 — `c14resv2-009` — 2026-10-08T06:52:00-07:00 (dim:sleep)
+
+**Released**
+- dimension `dim:sleep`, source_kind `wearable`, source_class `SENSOR`, modality `structured_text`
+- payload: "昨晚睡眠 5小时48分；睡眠评分 60/100；06:46 醒来。"（第三个睡眠样本，明显短于前两次）
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-009.json`; ingest → `obs_c14_fixture_056dddd04850d813437e8532@1` (world_revision 59); watch hook: no match; ack → `receipts/ack/cursor-009.json`, `next_sequence=10`.
+
+**Due work at T = 2026-10-08T06:52:00-07:00**（`process-due-20261008T135200Z.json`；处理时刻跨过 10-06、10-07 窗口）:
+- Summaries: attempted=44, committed=1 → `sum_1e132e64b28b81ce5c303291`（dim:conversation 日摘要，源=10-05 用户自述；我撰写）。skipped_unchanged=19, skipped_empty=24。
+- C14：`wake_400ea8877e999e1c3902995d`（单成员，dim:conversation，REALITY）→ 我直接判定 **silence**（单条自述；且 `commit_operation_experience` 仅限 Periodic Review 期间，此处不可用）。
+- Periodic Review `wake_review_e1002d5562f2ae6d74007e1e`（窗口 10-05T14:07Z→10-08T13:53Z，10 anchors，含 10-08 短睡观测）：
+  - round 0：`read_periodic_review_anchors(limit=20)`。
+  - round 1：**silence** — 无既存认知可修订；睡眠三次样本发散（7h44/84、7h39/82、5h48/60）故不形成“稳定模式”Claim；打断—恢复摩擦缺方法—结果对应，不足以登记操作经验；不另注册 attention watch（Review 锚点已覆盖会话观测）。设定后续触发条件：第 4 个睡眠样本若继续落在 ~7h40/83 区间，将以跨观测 evidence_refs 形成有界基线 Claim。
+  - 决策文件：`checkpoints/decisions/periodic-review-20261008T135301Z-50aa7d26/round-{0,1}.json`、`checkpoints/decisions/wake-cognitive_derivation-wake_400ea8877e999e1c3902995d-rev1-efd901af/round-0.json`。
+
+**Resulting state**: world_revision 66, index watermark 66, pending wakes 0, Claims 0, operation experiences 0（20 条摘要）。
