@@ -496,6 +496,43 @@ class AttentionRouter:
         self.wake_bus = wake_bus
         self.subject_id = subject_id.strip()
 
+    def next_dispatchable(self) -> Wake | None:
+        """Choose the next non-conversation Wake by mechanical routing class.
+
+        INTERRUPT always precedes BACKGROUND.  REVIEW_QUEUE is deliberately
+        invisible here and can only be consumed by periodic review.
+        """
+
+        candidates = [
+            wake
+            for wake in self.wake_bus.pending_wakes()
+            if wake.wake_source
+            not in {
+                WakeSource.PERIODIC_REVIEW,
+                WakeSource.USER_INTERACTION,
+            }
+            and self.wake_bus.attention_class_for_wake(wake)
+            is not AttentionClass.REVIEW_QUEUE
+        ]
+        if not candidates:
+            return None
+
+        route_rank = {
+            AttentionClass.INTERRUPT: 0,
+            AttentionClass.BACKGROUND: 1,
+        }
+        candidates.sort(
+            key=lambda wake: (
+                route_rank[
+                    self.wake_bus.attention_class_for_wake(wake)
+                ],
+                -wake.priority,
+                as_utc(wake.first_hit_at, "first_hit_at"),
+                wake.object_id,
+            )
+        )
+        return candidates[0]
+
     def pending_review_queue(self) -> tuple[Wake, ...]:
         """Return durable low-urgency Wakes reserved for periodic Resident review."""
 
