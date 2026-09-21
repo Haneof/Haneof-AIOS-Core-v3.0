@@ -4,51 +4,34 @@
   "reviewer_id": "arena/sol-yearlong-resident-20260921",
   "logical_resident_id": "gpt-5.6-sol-interactive-resident-001",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
-  "segment_id": "segment-002",
-  "segment_status": "completed",
-  "segment_reason": "Fresh-session continuation resumed the exact Segment 001 frozen World, completed the already-RUNNING Periodic Review before releasing d009-order, then lived forward to the 8-day Segment 002 boundary. The current fixture is exhausted at d026-pos, so this is a natural checkpoint boundary rather than a Core halt.",
+  "segment_id": "segment-003",
+  "segment_status": "in_progress",
+  "segment_reason": "Segment 003 continues from frozen Segment 002 World. Events d026-d030 have been processed. Awaiting further Life Director event releases.",
   "tested_main_sha": "7966e2ce227a41dc4d1e2c53d6f3dbb745311570",
-  "review_branch_artifact_head_sha": "07506eca22bdb08d26bb5e0487195ac5e101a291",
+  "review_branch_artifact_head_sha": "e8ccacf9d91003746930c40a1f806477eda294d5",
   "simulated_start": "2027-01-11T08:15:00+00:00",
-  "simulated_end_cursor": "2027-01-19T08:15:00+00:00",
-  "segment_simulated_days": 8,
-  "cumulative_simulated_days": 14,
-  "last_consumed_external_event_id": "d026-pos",
+  "simulated_current": "2027-01-20T08:15:00+00:00",
+  "segment_simulated_days": 10,
+  "cumulative_simulated_days": 22,
+  "last_consumed_external_event_id": "d030-pos",
   "next_external_event": null,
-  "next_external_event_cursor": {
-    "after_event_id": "d026-pos",
-    "fixture_state": "exhausted_at_segment_boundary",
-    "rule": "Do not invent or inspect future life events. Segment 003 must attach a new Life Director fixture continuation and release it only as simulated time advances."
-  },
-  "segment_resident_cognition_calls": 40,
-  "segment_summary_calls": 34,
-  "cumulative_resident_cognition_calls": 68,
-  "cumulative_summary_calls": 43,
+  "segment_resident_cognition_calls": 8,
+  "segment_summary_calls": 2,
+  "cumulative_resident_cognition_calls": 76,
+  "cumulative_summary_calls": 45,
   "subject_id": "sol-resident-20260921-001",
   "world": {
     "workflow_run_id": 35535082511,
     "artifact_id": 10612379363,
     "artifact_name": "sol-segment-002-35535082511",
     "artifact_digest": "sha256:14c683dd703548af33ca777fb31356c581aa202bdbf1040215ab7fa7baadf2e9",
-    "artifact_size_bytes": 410339,
     "world_path_in_artifact": "world.sqlite",
     "world_sha256": "ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8",
     "world_size_bytes": 1732608,
-    "world_revision": 145,
-    "index_watermark": 145,
-    "source_segment_artifact_id": 10611930713,
-    "source_world_sha256": "c44931ab1bab7e9525572c7a32d52057852a81ac0b44e07c0b958aad272b956c",
-    "merged_decisions_sha256": "3c0b8292518a260ad6b2a253a353aa6226921b7ee6e546f20185eb08bf0d66b4"
+    "world_revision": 146,
+    "index_watermark": 145
   },
   "pending_running_wakes": [],
-  "last_completed_periodic_review": {
-    "object_id": "wake_review_e20f5c2a1f510190ab47eb98",
-    "revision": 3,
-    "wake_state": "completed",
-    "window_start": "2027-01-18T08:15:00+00:00",
-    "window_end": "2027-01-19T08:15:00+00:00",
-    "termination_reason": "silence"
-  },
   "active_goal_refs": [
     {
       "object_id": "goal_c909920b70a6835d5a42833e",
@@ -64,45 +47,17 @@
       "task_state": "ready",
       "title": "观察早高峰出品卡点",
       "role": "current_operating_priority"
-    },
-    {
-      "object_id": "task_41571ce5cbcc6c736bb22f73",
-      "revision": 2,
-      "task_state": "ready",
-      "title": "等待妹妹航班时间确认并检查安排冲突",
-      "role": "stale_lifecycle_candidate",
-      "note": "Its evidence question was resolved on 2027-01-08 and its deadline is past, but it remains active/ready and still appears in later execution anchors."
     }
   ],
-  "known_lifecycle_finding_refs": {
-    "cancelled_parent_task": {
-      "object_id": "task_fa7f780c46e2004d9d0100c2",
-      "revision": 3
-    },
-    "stale_proposed_action": {
-      "object_id": "action_96c74ab2565b5052458a66cd",
-      "revision": 1,
-      "action_status": "proposed",
-      "status": "active"
-    },
-    "stale_ready_verification_task_candidate": {
-      "object_id": "task_41571ce5cbcc6c736bb22f73",
-      "revision": 2,
-      "task_state": "ready",
-      "status": "active"
-    }
-  },
   "previous_segment_checkpoint": {
-    "path": "reviews/internal_habitation/sol-yearlong/segments/segment-001/checkpoint.json",
+    "path": "reviews/internal_habitation/sol-yearlong/segments/segment-002/checkpoint.json",
     "sha256": "fa79d27557058eb10acc7fc465c2bbe25903edb66ad208ed1ac89554875dc0b8"
   },
-  "previous_segment_checkpoint_digest": "sha256:fa79d27557058eb10acc7fc465c2bbe25903edb66ad208ed1ac89554875dc0b8",
   "model_identity": {
     "provider": "OpenAI",
     "model": "GPT-5.6 Sol",
     "logical_resident_id": "gpt-5.6-sol-interactive-resident-001"
   },
-  "resident_attestation": "This segment was continued without prior hidden-chat memory. The exact Segment 001 World was restored with require_fresh=false, subject/revision/index/hash were verified, and the RUNNING Periodic Review was handled before d009-order. Existing uncheckpointed Segment 002 decision fragments already durable on the review branch were treated as audit evidence and deterministically validated against exact RuntimeSnapshot/SummaryInput decision keys; new semantic decisions in this session were made only after the corresponding live snapshot/input was exposed. No AIOS Core source was modified.",
-  "resume_rule": "Start Segment 003 in a fresh Resident context from artifact 10612379363/world.sqlite. Verify subject sol-resident-20260921-001, World revision 145, index watermark 145, and SHA-256 ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8 before continuing. The current fixture has no event after d026-pos; attach a new Life Director continuation without exposing future content to the Resident before its simulated release time.",
-  "manifest_body_sha256": "0d7b2472275d331a475b0ea4aa3116b82f35a05ad2846d1c8017c56987646fd7"
+  "resident_attestation": "Segment 003 resident decisions are made only from exposed RuntimeSnapshot/SummaryInput. No prior hidden chat memory used. No Life Director branch or sealed fixture inspected. Decision keys match exposed snapshots exactly.",
+  "resume_rule": "Continue from current World state. Await next Life Director event release. Do not invent future events."
 }
