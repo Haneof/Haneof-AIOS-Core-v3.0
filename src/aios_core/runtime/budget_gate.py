@@ -287,12 +287,17 @@ class BackgroundBudgetGate:
             ):
                 continue
             used_wakes += 1
-            used_model_calls += rounds
 
-            # Legacy Wakes completed before MeteringLedger cannot prove token spend.
-            # A complete modern Wake has one metering row per model round.
+            # C13 MeteringLedger is the economic truth. A C14 Wake may span
+            # multiple runtime-incomplete attempts before semantic completion, so
+            # the final Wake metadata only describes the last attempt. Count every
+            # durable provider response for modern Wakes; fall back to lifecycle
+            # metadata only for legacy Wakes that predate the ledger.
             wake_records = records_by_wake.get(wake.object_id, ())
-            if len(wake_records) < rounds:
+            if wake_records:
+                used_model_calls += len(wake_records)
+            else:
+                used_model_calls += rounds
                 token_usage_available = False
 
         return (
