@@ -28,9 +28,15 @@ _SOCIAL_ONLY = {
     "谢谢", "感谢", "ok", "okay", "好的", "好", "嗯", "哈哈", "再见",
 }
 _CONTINUATION_CUES = (
-    "继续", "接着", "刚才", "上面", "前面", "这个", "那个", "那这个", "那怎么办",
-    "那怎么", "然后呢", "还有呢", "what about that", "continue", "go on",
+    "继续", "接着", "刚才", "上面", "前面", "那怎么办", "那怎么",
+    "然后呢", "还有呢", "what about that", "continue", "go on",
 )
+# Bare demonstratives are useful for same-session continuity, where the recent turn is
+# already present in the cockpit, but are too weak to justify opening cross-session
+# recall on their own. In particular, a demonstrative embedded in a locally specified
+# noun phrase ("这个偏好", "那个方案") is not mechanical evidence of missing history.
+_BARE_REFERENCE_CUES = ("这个", "那个", "那这个")
+_TRAILING_DISCOURSE_PUNCTUATION = " \t\r\n,.!?;:，。！？；："
 _HISTORY_CUES = (
     "之前", "上次", "昨天", "前天", "最近", "过去", "以前", "去年", "前年", "历史",
     "还记得", "我们聊过", "继续", "again", "last time", "yesterday", "recently", "before",
@@ -60,6 +66,32 @@ def _recent_user_text(recent_turns: Sequence[Mapping[str, Any]]) -> str | None:
     return None
 
 
+def _strip_trailing_discourse_punctuation(value: str) -> str:
+    return value.rstrip(_TRAILING_DISCOURSE_PUNCTUATION)
+
+
+def _has_discourse_continuation_cue(value: str) -> bool:
+    """Detect a discourse-level continuation request without substring inference.
+
+    The gate intentionally recognizes only cues that stand at the end of the current
+    utterance after punctuation is removed. This keeps deterministic Core from
+    treating ordinary self-contained clauses such as "继续学习 Python" as evidence
+    that hidden history is required. It still does not resolve any antecedent.
+    """
+
+    surface = _strip_trailing_discourse_punctuation(value)
+    return any(surface == cue or surface.endswith(cue) for cue in _CONTINUATION_CUES)
+
+
+def _has_same_session_continuation_cue(value: str) -> bool:
+    """Recognize local continuity without turning arbitrary substrings into recall."""
+
+    surface = _strip_trailing_discourse_punctuation(value).lstrip()
+    return _has_discourse_continuation_cue(surface) or any(
+        surface.startswith(cue) for cue in _BARE_REFERENCE_CUES
+    )
+
+
 class TopicStateService:
     def resolve(
         self,
@@ -78,16 +110,22 @@ class TopicStateService:
             return TopicState(reason="social_or_phatic_input")
 
         previous = _recent_user_text(recent_turns)
-        continuation_cue = any(cue in lower for cue in _CONTINUATION_CUES)
+        # Same-session continuity already has a bounded, canonical recent user turn
+        # in the cockpit, but even there an arbitrary substring is not enough to
+        # replace the current topic with history. A discourse-level continuation or
+        # a leading demonstrative can expose the recent turn without resolving it.
+        same_session_continuation_cue = _has_same_session_continuation_cue(lower)
+        cross_session_continuation_cue = _has_discourse_continuation_cue(lower)
         deictic_cue = any(cue in lower for cue in _DEICTIC_CUES)
         explicit = _clean(explicit_topic)
 
-        continued = bool(continuation_cue and previous)
-        # A continuation/deictic surface cue with no same-session antecedent is not
-        # evidence of what the user means. It is only a mechanical reason to expose
-        # a small, auditable cross-session antecedent candidate set.
+        continued = bool(previous and same_session_continuation_cue)
+        # A discourse-level continuation/deictic surface cue with no same-session
+        # antecedent is not evidence of what the user means. It is only a mechanical
+        # reason to expose a small, auditable cross-session candidate set.
         antecedent_recall_needed = bool(
-            deictic_cue or (continuation_cue and previous is None)
+            deictic_cue
+            or (cross_session_continuation_cue and previous is None)
         )
 
         if continued:
