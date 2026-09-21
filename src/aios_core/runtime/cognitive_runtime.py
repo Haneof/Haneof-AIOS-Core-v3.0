@@ -52,6 +52,21 @@ class ModelUsage:
 
 
 @dataclass(frozen=True)
+class ModelCallProvenance:
+    """Stable provider identity for one billable model response."""
+
+    provider: str
+    model: str
+    request_id: str
+
+    def __post_init__(self) -> None:
+        for field_name in ("provider", "model", "request_id"):
+            value = getattr(self, field_name)
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"{field_name} must be non-blank")
+
+
+@dataclass(frozen=True)
 class ModelDirective:
     """Observable model decision surface; never carries hidden chain-of-thought."""
 
@@ -59,6 +74,7 @@ class ModelDirective:
     response: str | None = None
     silence: bool = False
     usage: ModelUsage | None = None
+    provenance: ModelCallProvenance | None = None
 
     def __post_init__(self) -> None:
         terminal_count = int(self.response is not None) + int(self.silence)
@@ -70,6 +86,22 @@ class ModelDirective:
             raise ValueError("response must be non-blank when provided")
         if self.usage is not None and not isinstance(self.usage, ModelUsage):
             raise TypeError("usage must be ModelUsage when provided")
+        if self.provenance is not None and not isinstance(
+            self.provenance,
+            ModelCallProvenance,
+        ):
+            raise TypeError("provenance must be ModelCallProvenance when provided")
+        if self.usage is not None and self.provenance is not None:
+            for field_name, provenance_value in (
+                ("provider", self.provenance.provider),
+                ("model", self.provenance.model),
+                ("request_id", self.provenance.request_id),
+            ):
+                usage_value = getattr(self.usage, field_name)
+                if usage_value is not None and usage_value != provenance_value:
+                    raise ValueError(
+                        f"usage {field_name} conflicts with model-call provenance"
+                    )
 
 
 @dataclass(frozen=True)
@@ -97,7 +129,7 @@ class RuntimeTurnResult:
 
 
 ModelHandler = Callable[[RuntimeSnapshot], ModelDirective]
-ModelUsageRecorder = Callable[[RuntimeSnapshot, ModelUsage | None], None]
+ModelUsageRecorder = Callable[[RuntimeSnapshot, ModelDirective], None]
 SideEffectAuthorizer = Callable[[CapabilitySpec, CapabilityCall, RuntimeSnapshot], bool]
 
 
@@ -231,7 +263,7 @@ class CognitiveRuntime:
                 # Meter immediately after the provider/model returns. This intentionally
                 # happens before tool execution or Wake completion so a later crash
                 # cannot erase an already-consumed model call.
-                self.model_usage_recorder(snapshot, directive.usage)
+                self.model_usage_recorder(snapshot, directive)
 
             if directive.response is not None:
                 return _result(
