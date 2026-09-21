@@ -1088,3 +1088,18 @@ AI Claim -> AI Summary -> Derivation Wake -> AI Claim loop at scheduler level.
   implemented in this task.
 - C14-LOOP-001 and Resident validation remain blocked on the runtime task.
 - This C14-SCHED window stops here and must not execute C14-RUNTIME-001.
+
+
+---
+
+## 2026-09-21 — C14-SCHED PM acceptance follow-up
+
+C14-SCHED-001 correctness is accepted.
+
+Non-blocking item deferred to `C14-LOOP-001`:
+
+Current reconciliation rebuilds the support Dependency view during each per-Summary lineage derivation. That is correct but may cause unnecessary repeated whole-graph scans as long-term Summary/Dependency volume grows.
+
+C14-LOOP must add a bounded long-horizon reconciliation strategy (for example, one support graph build per reconciliation pass, safe cache, or incremental equivalent) without creating a second provenance truth or semantic importance index.
+
+This does not block `C14-RUNTIME-001`.
