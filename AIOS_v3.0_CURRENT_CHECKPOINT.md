@@ -22,7 +22,8 @@
 - Work branch：`governance/t35-rule-non-action-completion-20260921`
 - Semantic candidate：`b58bbb31a04a119897890452e76461f14fd46288`
 - PR：#53
-- Merge SHA：`PENDING_POST_MERGE_METADATA`
+- Merge SHA：`6fcb51d6e2ecf6e2ab8ff0fa62013f094b32f21c`
+- Final task-board merge-metadata commit：`f55c47bd892d738852d80f6cb783768659c02b90`
 - 正式裁决：`governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md`
 - 裁决核心：所有 Task 终态都必须由 pinned durable evidence 支撑；只有需要 AIOS 外部执行的 Task 才强制 `Action → Outcome`；纯验证/分析/Review/内部工作产物不得伪造 Action/Outcome。
 - `TaskType` 不承担外部授权分类；完成证据模式与 TaskType 正交，裁决定义 `WORLD_EVIDENCE / ACTION_OUTCOME / MIXED` 三种 completion contract。
