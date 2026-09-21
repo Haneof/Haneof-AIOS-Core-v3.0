@@ -1,0 +1,16 @@
+{
+  "ae1cd209fe6d8a08fe610d02f08eee156d22e7bc0931a77ccdf4a12084fe0e1e": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "search_timeline",
+        "arguments": {
+          "window_start": "2027-01-22T00:00:00Z",
+          "window_end": "2027-01-22T18:20:00Z",
+          "limit": 20
+        },
+        "call_id": "seg003-jan22-today-records"
+      }
+    ]
+  }
+}
