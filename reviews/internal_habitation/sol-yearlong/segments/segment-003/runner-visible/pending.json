@@ -1,40 +1,37 @@
 {
-  "decision_key": "7559646166311fc442b46dc2b6562530e252b9975b611b73df8535b1f1392489",
+  "decision_key": "0a4dfbdd9ef80f99ac91b7c506938313d2daeb40d19e43c7c8716fce95a991d4",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-summary.pending.v1",
   "simulated_clock": "2027-01-26T08:15:00+00:00",
   "summary_request": {
     "request": {
-      "dimension": "dim:body_activity",
+      "dimension": "dim:delivery_receipt",
       "granularity": "day",
-      "source_world_revision": 216,
+      "source_world_revision": 217,
       "sources": [
         {
           "metadata": {
-            "adapter_id": "habitation.wearable_step_count.numeric.v1",
-            "dimension": "dim:body_activity",
-            "mechanical_compression": true,
+            "adapter_id": "habitation.delivery_receipt.v1",
+            "dimension": "dim:delivery_receipt",
+            "external_record_id": "d044-delivery",
+            "external_revision": "1",
             "mechanical_ingest": true,
-            "raw_sample_values_retained": false,
-            "series_id": "steps-2027-01-25",
-            "source_class": "sensor",
-            "source_digest": "02ec73d5652118a02bbfe78ef99d7f93f639589983762b52b43e3627cbf82fc0",
-            "source_locator_range": {
-              "first": null,
-              "last": null
+            "occurred_at_original": "2027-01-25T04:36:00+00:00",
+            "provenance": {
+              "habitation_resident_metadata": {
+                "source": "supplier_portal"
+              },
+              "model_id_not_part_of_fact": true
             },
-            "source_record_ids_digest": "f79ed3570fd1cbddef96847adb53caae8371d30e9fb121063326710004e0c1bf",
-            "source_record_range": {
-              "count": 1,
-              "first": "steps-1200",
-              "last": "steps-1200"
-            }
+            "source_class": "user",
+            "source_digest": "62d2ae881cbc5f91c114e5d799dbae1676bae1319d72dd2c31100eebbd831695",
+            "source_schema_version": "1"
           },
-          "object_id": "obs_num_segment_434a1e266d9a8bb052381559",
+          "object_id": "obs_src_9475c3feb631894bf90a2ad6",
           "object_type": "observation",
-          "occurred_at": "2027-01-25T12:00:00Z",
+          "occurred_at": "2027-01-25T04:36:00Z",
           "revision": 1,
-          "text": "{\"max\": 6170.0, \"mean\": 6170.0, \"min\": 6170.0, \"sample_count\": 1}"
+          "text": "{\"currency\": \"USD\", \"item\": \"bread flour\", \"quantity_kg\": 180, \"received_at\": \"2027-01-25T04:36:00+00:00\", \"signed_by\": \"小赵\", \"status\": \"received\", \"unit_price\": 1.41, \"vendor\": \"North Mill\"}"
         }
       ],
       "truncated": false,
@@ -43,5 +40,5 @@
     },
     "summary_request_type": "DimensionSummaryInput"
   },
-  "world_revision_before": 216
+  "world_revision_before": 217
 }
