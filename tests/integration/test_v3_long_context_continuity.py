@@ -726,3 +726,34 @@ def test_model_can_search_same_session_summary_before_raw_drilldown(tmp_path):
         "drill_down_conversation",
     ]
     assert result.runtime.response == "found exact old dialogue"
+
+
+def test_same_session_bare_reference_keeps_recent_continuity_without_cross_session_fallback(tmp_path):
+    store, index = _world(tmp_path)
+    seen = []
+
+    def model(snapshot):
+        seen.append(snapshot.cockpit)
+        if snapshot.user_input == "这个。":
+            topic = snapshot.cockpit["task_context"]["topic_state"]
+            assert topic["continued_from_recent_turn"] is True
+            assert topic["antecedent_recall_needed"] is False
+            assert topic["history_may_help"] is True
+            assert snapshot.cockpit["recent_turns"][-1]["user"]["text"] == "我们先讨论预算上限。"
+        return ModelDirective(response="ok")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    runtime.run_turn(
+        session_id="same",
+        turn_index=1,
+        user_input="我们先讨论预算上限。",
+        occurred_at=NOW,
+    )
+    runtime.run_turn(
+        session_id="same",
+        turn_index=2,
+        user_input="这个。",
+        occurred_at=NOW + timedelta(minutes=1),
+    )
+
+    assert len(seen) == 2

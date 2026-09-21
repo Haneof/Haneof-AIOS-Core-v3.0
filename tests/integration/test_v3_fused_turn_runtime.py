@@ -1047,3 +1047,36 @@ def test_user_interaction_unknown_usage_is_metered_with_provider_identity(tmp_pa
     assert rows[0].output_tokens is None
     assert rows[0].total_tokens is None
 
+
+
+def test_self_contained_current_utterance_does_not_prefetch_cross_session_history(tmp_path):
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    seed = ConversationIngestor(store)
+    seed.commit_turn(
+        session_id="old",
+        turn_index=1,
+        user_text="我以前比较过红色和绿色的包装。",
+        assistant_text="那是旧话题。",
+        occurred_at=NOW - timedelta(days=14),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    def model(snapshot):
+        topic = snapshot.cockpit["task_context"]["topic_state"]
+        assert topic["antecedent_recall_needed"] is False
+        assert topic["history_may_help"] is False
+        assert snapshot.cockpit["memory_cards"] == ()
+        return ModelDirective(response="按当前明确表达处理。")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    result = runtime.run_turn(
+        session_id="new",
+        turn_index=1,
+        user_input="我喜欢这个颜色：深蓝色。请把它作为当前偏好记录。",
+        occurred_at=NOW,
+    )
+
+    assert result.recommendation.cards == ()
+    assert result.recommendation.reason == "current_topic_does_not_need_history"
