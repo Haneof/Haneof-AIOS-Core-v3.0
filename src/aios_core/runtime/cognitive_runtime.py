@@ -61,6 +61,8 @@ class ModelDirective:
             raise ValueError("directive must either request capabilities, respond, or stay silent")
         if self.response is not None and not self.response.strip():
             raise ValueError("response must be non-blank when provided")
+        if self.usage is not None and not isinstance(self.usage, ModelUsage):
+            raise TypeError("usage must be ModelUsage when provided")
 
 
 @dataclass(frozen=True)
@@ -167,7 +169,7 @@ class CognitiveRuntime:
             output_complete = complete and all(
                 item.output_tokens is not None for item in model_usages
             )
-            return _result(
+            return RuntimeTurnResult(
                 **kwargs,
                 model_input_tokens=(
                     sum(int(item.input_tokens or 0) for item in model_usages)
