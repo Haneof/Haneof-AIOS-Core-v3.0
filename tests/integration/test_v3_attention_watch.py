@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from aios_core.contracts.enums import SourceClass, WakeSource
+from aios_core.contracts.enums import AttentionClass, SourceClass, WakeSource
 from aios_core.contracts.models import Observation
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef
@@ -11,6 +11,11 @@ from aios_core.runtime.capabilities import CapabilityCall
 from aios_core.runtime.cognitive_runtime import ModelDirective
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.wake import (
+    AttentionWatchRequest,
+    Step0GateInput,
+    WakeSignalRequest,
+)
 
 
 NOW = datetime(2026, 9, 21, 12, 0, tzinfo=timezone.utc)
@@ -367,3 +372,297 @@ def test_safety_wake_is_never_batched_with_attention_burst(tmp_path):
     )
     assert bundle is None
     assert runtime.wake_bus.current_wake(safety.wake_id).wake_state.value == "new"
+
+
+def test_background_attention_runs_cognition_without_user_delivery(tmp_path):
+    store, index = _world(tmp_path)
+    reason = Observation(
+        object_id="obs_background_attention_reason",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW),
+        learned_at=NOW,
+        recorded_at=NOW,
+        created_by="attention-class-test",
+        source_kind="system",
+        modality="marker",
+        value={"changed": True},
+        metadata={"dimension": "dim:test"},
+    )
+    store.commit(
+        [reason],
+        OperationRequest(
+            operation_name="test.seed.background.attention",
+            expected_world_revision=0,
+            reason="seed background attention evidence",
+            idempotency_key="seed-background-attention",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index.catch_up()
+
+    def model(snapshot):
+        wake = snapshot.cockpit["task_context"]["wake"]
+        assert wake["attention_class"] == "background"
+        assert wake["step0"]["model_allowed"] is True
+        assert wake["step0"]["action_allowed"] is True
+        assert wake["step0"]["delivery_allowed"] is False
+        return ModelDirective(response="后台认知已完成。")
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+    )
+    signal = runtime.wake_bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.WATCH_MATCH,
+            rule_id="attention.background",
+            observed_at=NOW + timedelta(seconds=1),
+            evidence_refs=(ObjectRef(object_id=reason.object_id, revision=1),),
+            dedupe_key="attention-background",
+            attention_class=AttentionClass.BACKGROUND,
+        )
+    )
+    result = runtime.run_wake(
+        wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
+        now=NOW + timedelta(seconds=2),
+    )
+
+    assert result.runtime is not None
+    assert result.runtime.response == "后台认知已完成。"
+    assert result.step0.state == "background"
+    assert result.delivery_response is None
+    assert result.delivery_suppressed is True
+
+
+def test_interrupt_attention_can_deliver_after_resident_judgment(tmp_path):
+    store, index = _world(tmp_path)
+    reason = Observation(
+        object_id="obs_interrupt_attention_reason",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW),
+        learned_at=NOW,
+        recorded_at=NOW,
+        created_by="attention-class-test",
+        source_kind="system",
+        modality="marker",
+        value={"changed": True},
+        metadata={"dimension": "dim:test"},
+    )
+    store.commit(
+        [reason],
+        OperationRequest(
+            operation_name="test.seed.interrupt.attention",
+            expected_world_revision=0,
+            reason="seed interrupt attention evidence",
+            idempotency_key="seed-interrupt-attention",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index.catch_up()
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda snapshot: ModelDirective(
+            response="这件事现在值得提醒你。"
+        ),
+    )
+    signal = runtime.wake_bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.WATCH_MATCH,
+            rule_id="attention.interrupt",
+            observed_at=NOW + timedelta(seconds=1),
+            evidence_refs=(ObjectRef(object_id=reason.object_id, revision=1),),
+            dedupe_key="attention-interrupt",
+            attention_class=AttentionClass.INTERRUPT,
+        )
+    )
+    result = runtime.run_wake(
+        wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
+        now=NOW + timedelta(seconds=2),
+    )
+
+    assert result.step0.state == "ok"
+    assert result.step0.model_allowed is True
+    assert result.step0.action_allowed is True
+    assert result.step0.delivery_allowed is True
+    assert result.delivery_response == "这件事现在值得提醒你。"
+
+
+def test_review_queue_waits_for_periodic_review_then_is_consumed(tmp_path):
+    store, index = _world(tmp_path)
+    reason = Observation(
+        object_id="obs_review_queue_reason",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW),
+        learned_at=NOW,
+        recorded_at=NOW,
+        created_by="attention-class-test",
+        source_kind="user_note",
+        modality="text",
+        value="这个变化不必立刻打扰我，留到复盘时一起看。",
+        metadata={"dimension": "dim:user_ai_interaction"},
+    )
+    store.commit(
+        [reason],
+        OperationRequest(
+            operation_name="test.seed.review.queue.reason",
+            expected_world_revision=0,
+            reason="seed review queue reason",
+            idempotency_key="seed-review-queue-reason",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index.catch_up()
+
+    model_calls = []
+
+    def model(snapshot):
+        model_calls.append(snapshot.wake_reason)
+        if snapshot.wake_reason == "periodic_review":
+            review = snapshot.cockpit["task_context"]["periodic_review"]
+            assert review["review_queue_wake_count"] == 1
+            return ModelDirective(silence=True)
+        raise AssertionError(
+            f"review-queue wake must not invoke model directly: {snapshot.wake_reason}"
+        )
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+    )
+    runtime.attention_watches.create(
+        AttentionWatchRequest(
+            title="把普通日历变化留到复盘",
+            dimensions=("dim:calendar",),
+            reason_refs=(ObjectRef(object_id=reason.object_id, revision=1),),
+            source_kind="calendar_source",
+            priority=20,
+            attention_class=AttentionClass.REVIEW_QUEUE,
+        ),
+        created_at=NOW,
+    )
+
+    runtime.reality_ingest.ingest_record(
+        SourceAdapterSpec(
+            adapter_id="calendar.review.queue",
+            source_kind="calendar_source",
+            dimension="dim:calendar",
+            source_class=SourceClass.USER,
+            default_modality="structured_record",
+        ),
+        RealityRecord(
+            external_record_id="calendar-change-1",
+            occurred_at=NOW + timedelta(minutes=1),
+            received_at=NOW + timedelta(minutes=1),
+            value={"changed": True},
+        ),
+    )
+
+    pending = runtime.attention_router.pending_review_queue()
+    assert len(pending) == 1
+    queued_wake = pending[0]
+    assert queued_wake.metadata["attention_class"] == "review_queue"
+
+    deferred = runtime.run_wake(
+        wake_ref=ObjectRef(
+            object_id=queued_wake.object_id,
+            revision=queued_wake.revision,
+        ),
+        now=NOW + timedelta(minutes=2),
+    )
+    assert deferred.runtime is None
+    assert deferred.step0.state == "review_queue"
+    assert deferred.wake.state == "queued"
+    assert model_calls == []
+
+    from aios_core.review import ReviewSchedulePolicy
+
+    reviewed = runtime.run_periodic_review(
+        now=NOW + timedelta(hours=25),
+        policy=ReviewSchedulePolicy(
+            interval_hours=24,
+            lookback_hours=72,
+            max_candidates=80,
+            max_per_object_type=20,
+        ),
+    )
+    assert reviewed is not None
+    assert model_calls == ["periodic_review"]
+    assert runtime.wake_bus.current_wake(
+        queued_wake.object_id
+    ).wake_state.value == "completed"
+
+
+def test_step0_splits_cognition_action_and_delivery_rights(tmp_path):
+    store, index = _world(tmp_path)
+    ref = ObjectRef(
+        object_id="obs_step0_rights",
+        revision=1,
+    )
+    observation = Observation(
+        object_id=ref.object_id,
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW),
+        learned_at=NOW,
+        recorded_at=NOW,
+        created_by="step0-rights-test",
+        source_kind="system",
+        modality="marker",
+        value={"marker": True},
+        metadata={"dimension": "dim:test"},
+    )
+    store.commit(
+        [observation],
+        OperationRequest(
+            operation_name="test.seed.step0.rights",
+            expected_world_revision=0,
+            reason="seed step0 rights",
+            idempotency_key="seed-step0-rights",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index.catch_up()
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda snapshot: ModelDirective(silence=True),
+    )
+    signal = runtime.wake_bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.WATCH_MATCH,
+            rule_id="attention.rights",
+            observed_at=NOW + timedelta(seconds=1),
+            evidence_refs=(ref,),
+            dedupe_key="attention-rights",
+            attention_class=AttentionClass.INTERRUPT,
+        )
+    )
+    wake = runtime.wake_bus.current_wake(signal.wake_id)
+
+    action_blocked = runtime.wake_bus.evaluate_step0(
+        wake,
+        Step0GateInput(external_action_allowed=False),
+    )
+    assert action_blocked.model_allowed is True
+    assert action_blocked.action_allowed is False
+    assert action_blocked.delivery_allowed is True
+
+    delivery_blocked = runtime.wake_bus.evaluate_step0(
+        wake,
+        Step0GateInput(user_delivery_allowed=False),
+    )
+    assert delivery_blocked.model_allowed is True
+    assert delivery_blocked.action_allowed is True
+    assert delivery_blocked.delivery_allowed is False
+
+    cognition_blocked = runtime.wake_bus.evaluate_step0(
+        wake,
+        Step0GateInput(cognition_allowed=False),
+    )
+    assert cognition_blocked.model_allowed is False
+    assert cognition_blocked.action_allowed is False
+    assert cognition_blocked.delivery_allowed is False
