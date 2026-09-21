@@ -1,20 +1,20 @@
 {
   "branch": "arena/01a0bf95-haneof-aios-core-v3-0",
   "export_rule": "Only first missing semantic request; no hidden fixture copied.",
-  "head_sha": "8c2de8d4ad0300b4ee0be2236ad78350ed1c2b10",
+  "head_sha": "559cc203f2ce6c59ded41129025293505a948436",
   "pending_blocks_printed": 1,
-  "run_id": 35555460397,
+  "run_id": 35555503972,
   "runner_attestation": {
     "current_state": {
       "delivered_external_events": 6,
       "index_watermark": 159,
       "last_consumed_external_event_id": "d032-queue",
-      "resident_replayed_calls": 7,
+      "resident_replayed_calls": 8,
       "simulated_clock": "2027-01-20T20:30:00+00:00",
       "status": "pending",
       "summary_replayed_calls": 2,
       "world_revision": 159,
-      "world_sha256": "16e3b33fbdf6a3b5b881f2dec32ae01636595c87843a71c3322ddb316b89650f"
+      "world_sha256": "26bfff26e63922f99d80cf0a4fc63dc263eb5bf32ce7000048fbe1caeefa737a"
     },
     "expected_source_revision": 145,
     "expected_subject": "sol-resident-20260921-001",
@@ -33,11 +33,11 @@
     "delivered_external_events": 6,
     "index_watermark": 159,
     "last_consumed_external_event_id": "d032-queue",
-    "resident_replayed_calls": 7,
+    "resident_replayed_calls": 8,
     "simulated_clock": "2027-01-20T20:30:00+00:00",
     "status": "pending",
     "summary_replayed_calls": 2,
     "world_revision": 159,
-    "world_sha256": "16e3b33fbdf6a3b5b881f2dec32ae01636595c87843a71c3322ddb316b89650f"
+    "world_sha256": "26bfff26e63922f99d80cf0a4fc63dc263eb5bf32ce7000048fbe1caeefa737a"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "decision_key": "5568c18cf72a4aa9df32644ed48460b9c1bb708b0d04f7bb22e4f2af518cc317",
+  "decision_key": "dc876536903226426555e447885fee5ca9ff6ca4153370a134585bc74526e1a0",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-resident.pending.v1",
   "simulated_clock": "2027-01-20T20:30:00+00:00",
@@ -540,7 +540,41 @@
         "side_effecting": true
       }
     ],
-    "capability_history": [],
+    "capability_history": [
+      {
+        "call_id": "seg003-jan20-later-records",
+        "data": [
+          {
+            "dimension": "dim:user_ai_interaction",
+            "excerpt": "从今天这些记录看，至少不能只怪烤箱。先继续记实际等候点，别急着给早高峰定一个永久原因。",
+            "object_id": "obs_conv_user_cc031f2f198bf709cea0cc61",
+            "object_type": "observation",
+            "retrieval_score": 0,
+            "revision": 1
+          },
+          {
+            "dimension": "dim:equipment_telemetry",
+            "excerpt": "",
+            "object_id": "obs_src_972d74f06c87a81231892a69",
+            "object_type": "observation",
+            "retrieval_score": 0,
+            "revision": 1
+          },
+          {
+            "dimension": "dim:production_log",
+            "excerpt": "",
+            "object_id": "obs_src_980c3eaef1a3002ec7d24958",
+            "object_type": "observation",
+            "retrieval_score": 0,
+            "revision": 1
+          }
+        ],
+        "error_code": null,
+        "error_message": null,
+        "name": "search_timeline",
+        "ok": true
+      }
+    ],
     "cockpit": {
       "ai_identity": {},
       "capability_catalog": [
@@ -908,8 +942,8 @@
       "truncated": false,
       "user_input": "从今天这些记录看，至少不能只怪烤箱。先继续记实际等候点，别急着给早高峰定一个永久原因。"
     },
-    "remaining_tool_rounds": 8,
-    "round_index": 0,
+    "remaining_tool_rounds": 7,
+    "round_index": 1,
     "user_input": "从今天这些记录看，至少不能只怪烤箱。先继续记实际等候点，别急着给早高峰定一个永久原因。",
     "wake_reason": "user_interaction"
   },
