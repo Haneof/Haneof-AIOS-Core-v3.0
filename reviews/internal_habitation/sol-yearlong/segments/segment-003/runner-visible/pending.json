@@ -1,5 +1,5 @@
 {
-  "decision_key": "23365f6690ad0c4cd32b5e9340c4605764e44d50ff7c876fa6bd145bc5d0884c",
+  "decision_key": "2bb0cf37d48b2c38f370e652866cd2e3660940797788c7ea6d777bcb390f8e98",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-resident.pending.v1",
   "simulated_clock": "2027-01-20T08:15:00+00:00",
@@ -540,7 +540,26 @@
         "side_effecting": true
       }
     ],
-    "capability_history": [],
+    "capability_history": [
+      {
+        "call_id": "seg003-review-jan20-anchors",
+        "data": [
+          {
+            "excerpt": "{'currency': 'USD', 'gross_sales': 1297.6, 'orders': 97, 'refunds': 1, 'store': 'bakery'}",
+            "object_ref": {
+              "object_id": "obs_src_60bc8c48b8f0290b5b94ae48",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-19T20:05:00Z"
+          }
+        ],
+        "error_code": null,
+        "error_message": null,
+        "name": "read_periodic_review_anchors",
+        "ok": true
+      }
+    ],
     "cockpit": {
       "ai_identity": {},
       "capability_catalog": [
@@ -1164,8 +1183,8 @@
       "truncated": true,
       "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged."
     },
-    "remaining_tool_rounds": 8,
-    "round_index": 0,
+    "remaining_tool_rounds": 7,
+    "round_index": 1,
     "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged.",
     "wake_reason": "periodic_review"
   },
