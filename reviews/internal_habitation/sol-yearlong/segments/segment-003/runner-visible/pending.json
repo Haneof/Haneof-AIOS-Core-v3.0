@@ -1,5 +1,5 @@
 {
-  "decision_key": "40b69f1276fe082fe88a56fed4357c2a28b4ea073870fb7ff4e905672b3e9a8d",
+  "decision_key": "7d715e21cefc7d7a9d08efa1a5ec85a17f4153191b6fe7113107b82b2e9224ee",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-resident.pending.v1",
   "simulated_clock": "2027-01-23T20:10:00+00:00",
@@ -610,6 +610,19 @@
         "error_message": null,
         "name": "inspect_world_object",
         "ok": true
+      },
+      {
+        "call_id": "seg003-close-obsolete-flight-verification",
+        "data": {
+          "revision": 3,
+          "state": "cancelled",
+          "task_id": "task_41571ce5cbcc6c736bb22f73",
+          "world_revision": 191
+        },
+        "error_code": null,
+        "error_message": null,
+        "name": "transition_task",
+        "ok": true
       }
     ],
     "cockpit": {
@@ -987,10 +1000,10 @@
       "truncated": false,
       "user_input": "明晚19点我和妹妹吃饭，小赵已经确认负责晚间收尾。这个安排现在已经定了，不用再提醒我，也别把它说成还在冲突。"
     },
-    "remaining_tool_rounds": 7,
-    "round_index": 1,
+    "remaining_tool_rounds": 6,
+    "round_index": 2,
     "user_input": "明晚19点我和妹妹吃饭，小赵已经确认负责晚间收尾。这个安排现在已经定了，不用再提醒我，也别把它说成还在冲突。",
     "wake_reason": "user_interaction"
   },
-  "world_revision_before": 190
+  "world_revision_before": 191
 }
