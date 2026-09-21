@@ -1,0 +1,12 @@
+{
+  "354d8413f389d2b56b01ee3a14345e3757b134a0b09ba19bd4723ecf98c79f4f": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "arguments": {"offset": 0, "limit": 14},
+        "call_id": "seg003-jan21-review-anchors"
+      }
+    ]
+  }
+}
