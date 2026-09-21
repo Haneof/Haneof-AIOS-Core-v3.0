@@ -627,6 +627,72 @@ class PeriodicReviewService:
             anchors=anchors,
         )
 
+    def augment_request_with_attention_refs(
+        self,
+        request: PeriodicReviewRequest,
+        refs: Sequence[ObjectRef],
+        *,
+        max_extra: int = 40,
+    ) -> PeriodicReviewRequest:
+        """Add mechanically queued attention evidence to an already-due review."""
+
+        if request.subject_id != self.subject_id:
+            raise ValueError("review request belongs to another subject")
+        if max_extra < 0:
+            raise ValueError("max_extra must be >= 0")
+
+        merged = list(request.anchors)
+        seen = {
+            (item.object_ref.object_id, int(item.object_ref.revision or 0))
+            for item in merged
+        }
+        added = 0
+        for ref in refs:
+            if added >= max_extra:
+                break
+            if ref.revision is None:
+                raise ValueError("attention review refs must pin exact revisions")
+            key = (ref.object_id, int(ref.revision))
+            if key in seen:
+                continue
+            payload = self.store.get_payload(
+                ref.object_id,
+                revision=ref.revision,
+            )
+            if str(payload.get("subject_id") or "") != self.subject_id:
+                raise ValueError("attention review ref belongs to another subject")
+            recorded = _parse_time(payload.get("recorded_at"), "recorded_at")
+            merged.append(
+                ReviewAnchor(
+                    object_ref=ref,
+                    object_type=str(payload["object_type"]),
+                    recorded_at=recorded,
+                    excerpt=_excerpt(payload),
+                )
+            )
+            seen.add(key)
+            added += 1
+
+        merged.sort(
+            key=lambda item: (
+                item.recorded_at,
+                item.object_type,
+                item.object_ref.object_id,
+                int(item.object_ref.revision or 0),
+            )
+        )
+        return request.model_copy(
+            update={
+                "anchors": tuple(merged),
+                "instruction": (
+                    request.instruction
+                    + " Some anchors were explicitly queued by the Resident's "
+                    "mechanical attention watches for this periodic review; treat "
+                    "that routing fact as attention only, not as semantic truth."
+                ),
+            }
+        )
+
     def begin_review(
         self,
         request: PeriodicReviewRequest,
