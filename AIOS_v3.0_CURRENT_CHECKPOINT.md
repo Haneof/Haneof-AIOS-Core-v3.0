@@ -13,10 +13,38 @@
 
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
-当前 T35 功能合并锚点：`141dc177be895f9894a05227cbb132207ebf784d`。  
+
+## 当前工程断点 — C14-LOOP-001 已收口
+
+最近完成任务：`C14-LOOP-001` — **DONE / CONTINUOUS COGNITIVE DERIVATION LOOP HARDENED**。
+
+- Started from main：`c4689fd595fc9308e71332e0c0dda17e49cffb95`
+- Work branch：`c14/loop-hardening-20260921-sol`
+- Exact candidate：`f48c3c9cfa8a24fa2e0e0220d7fe20bcda1be34d`
+- PR：#65
+- Squash merge：`a385f7b3fcc71982aae0611a382502c9a37ba71e`
+- Completion evidence：`reviews/C14_LOOP_001_COMPLETION_EVIDENCE_2026-09-21.md`
+- Task-board closure commit：`cf6b059ceaa5eaf7403ee2f742ba17d17804d139`
+- Exact-candidate Gates：14/14 workflows SUCCESS，包括 C14 loop/runtime/scheduler、P16 full convergence、constitutional cognition closure、P15、P14、P12、C09、Fused、Dimension Summary、P11/P10/P9。
+- Burst：10+ sibling C14 opportunities 复用现有 AttentionBundle，按 homogeneous execution contract 合并；Bundle 本体仍是 routing object，但 Runtime 验证 pinned members 后恢复 effective `COGNITIVE_DERIVATION`。
+- Authorization：C14 Bundle 继续只允许 `commit_claim / commit_ai_world_claim / revise_claim / retract_claim` 四类 cognition writes；其他 side effects default-deny；read/search/inspect 保留；后台结果不直接投放用户。
+- Exhaustion：model/tool/capability budget exhaustion 不再误标 semantic completion，而是 durable `QUEUED + runtime_incomplete`，SQLite restart 可恢复。
+- Partial write：已成功写入的 Claim 在 exhaustion/restart 后保持 durable/idempotent；runtime-incomplete individual Wake 不再重新组成新 Bundle，从而不改变 semantic execution identity。
+- Budget truth：QUEUED unfinished spend 对其他 background Wake 可见；最终完成后的 retry chain 继续以 C13 Metering Ledger 所有 provider response 为模型调用真值。
+- Self-excitation：即时 C14 scheduling 除 REALITY/MIXED 外，还要求至少一条不经旧 AI semantic assertion 阻断的 `grounding_leaf_ref`；old AI Claim -> AI Summary 不再自动再造 C14 Wake；新 direct reality + old cognition 的 mixed case 仍合法。
+- Review：Periodic Review 与 C14 各自保持独立生命周期/权限。
+- New Runtime：新 SQLite reopen + 新 Index + 新 `FusedTurnRuntime` + 新 session，在不注入旧对话的情况下，通过 `read_ai_world -> search_world -> inspect_world_object` 找回 exact durable cognition revision。
+- Reconcile：support Dependency graph 改为每次 reconciliation pass 构建一次；200 Summary scale 回归不再出现 Summary×Dependency 重复全图扫描。
+- Merge-tree：candidate 与 squash merge 的 8 个变更文件 blob 全部一致。
+- 本窗口明确未开始：`C14-RES-001`、`C14-CLOSE-001`、`P16-TRIAGE-001`、Resident habitation。
+- 当前第一个 READY：`C14-RES-001`。必须由新窗口作为真实 Resident 模型执行，不得用 pseudo-LLM / Python 关键词答案 / 预计算 oracle 代替模型本人逐次语义判断。
+
+以下内容均为历史完成快照；下一任务只以 task board 和本段为准。
+
+历史 T35 功能合并锚点：`141dc177be895f9894a05227cbb132207ebf784d`。  
 T35 task-board 收口提交：`4f8d291b00f885542793a0c7f6139da5420ef78b`。
 
-最近完成任务：`T35-IMPL-001` — **DONE / NON-ACTION TASK COMPLETION EVIDENCE CLOSED**。
+历史完成任务快照：`T35-IMPL-001` — **DONE / NON-ACTION TASK COMPLETION EVIDENCE CLOSED**。
 
 - Started from main：`eeb982162e0e553a34039134bde3595abd2f3607`
 - Work branch：`task/t35-impl-001-completion-evidence-20260921`
@@ -39,7 +67,7 @@ T35 task-board 收口提交：`4f8d291b00f885542793a0c7f6139da5420ef78b`。
 - Merge-result Gates：p12-execution-world `35569585991 / SUCCESS`；p12-execution-gate `35569586060 / SUCCESS`；p15-periodic-review `35569585969 / SUCCESS`；fused-turn-runtime `35569586033 / SUCCESS`；c09-wake-dispatch `35569586006 / SUCCESS`；p16-convergence-gate `35569586008 / SUCCESS`。
 - Affected files：`src/aios_core/execution/service.py`；`src/aios_core/runtime/turn_runtime.py`；`tests/integration/test_v3_execution_world.py`。
 - Deferred：本窗口未执行 `P16-TRIAGE-001`、`P16-CAMPAIGN-001` 或 Resident habitation。
-- 当前第一个 READY：`P16-TRIAGE-001`；必须由新窗口执行，本 T35 窗口在 checkpoint 写回后停止。
+- 当时第一个 READY：`P16-TRIAGE-001`；后续 C14 PM reprioritization 已覆盖此历史状态。
 
 以下 T28/T34/T35-RULE/AUDIT 等段落保留为历史完成快照，不再代表当前 READY 状态。
 
