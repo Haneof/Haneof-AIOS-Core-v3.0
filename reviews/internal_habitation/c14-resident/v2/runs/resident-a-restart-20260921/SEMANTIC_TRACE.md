@@ -164,3 +164,24 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
 - 无模型调用、无语义写入。
 
 **Resulting state**: world_revision 48, index watermark 48, pending wakes 0, Claims 0。
+
+---
+
+## Cursor 8 — `c14resv2-008` — 2026-10-05T18:35:00-07:00 (dim:conversation)
+
+**Released**
+- dimension `dim:conversation`, source_kind `conversation`, source_class `USER`, modality `structured_text`
+- payload: "用户说：“下午接着写时，我先花了十来分钟重新找上午引用的那几张表。”"
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-008.json`; ingest → `obs_c14_fixture_0ca259ffc10ff4a9218561d0@1` (world_revision 49); watch hook: no match; ack → `receipts/ack/cursor-008.json`, `next_sequence=9`.
+
+**Due work at T = 2026-10-05T18:35:00-07:00**（`receipts/process-due-20261006T013500Z.json`；处理时刻跨过 2026-10-06T00:00Z，10-05 的 UTC 日窗闭合）:
+- 3 条日摘要由我逐条撰写并提交：`sum_4aa1c0fba96ed70142807f77`(schedule)、`sum_19956149ea838d569521c7da`(sleep)、`sum_612659baec6788b7aef2647d`(work_outcome)。
+- `dim:conversation` 不进入维度摘要阶梯，故无会话摘要。
+- C14 bundle `wake_bundle_cf33cc336ac0040cebfee9d9`（3 成员，全 REALITY）：
+  - round 0：`read_ai_world(limit=50)` → 0 条认知（确认无程序侧自动写入）。
+  - round 1：**silence** — 3 成员均为 10-05 单日事实（日程被 stand-up/供应商电话打断并重排；睡眠 7h39m/82 为第二个样本，与 10-01 的 7h44m/84 相似但 n=2 且中间 4 天无数据；定价说明 15:00 仅 65%、余量移至次日上午）。跨维度的“中断—恢复成本”叙事（含用户自述重找表格 10 余分钟）尚未重复出现，睡眠样本低于自设 ≥3 门槛；无可修订对象。
+- Periodic Review: not invoked。
+- 决策文件：`checkpoints/decisions/wake-cognitive_derivation-wake_2ae0b7a9d8d606348fc6ed9b-rev1-62ca150a/round-{0,1}.json`。
+
+**Resulting state**: world_revision 58, index watermark 58, pending wakes 0, Claims 0（19 条摘要）。
