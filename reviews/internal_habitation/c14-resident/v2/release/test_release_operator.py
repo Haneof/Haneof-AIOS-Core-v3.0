@@ -347,7 +347,10 @@ class ReleaseOperatorTests(unittest.TestCase):
         event2 = self.reveal("A")
         proc = self.ack("A", event2, ingest1["ingest_ref"], ok=False)
         self.assertEqual(proc.stdout, "")
-        self.assertIn("binding mismatch", proc.stderr)
+        self.assertTrue(proc.stderr.startswith("release-operator-error: durable ingest "))
+        state = json.loads(self.state.read_text(encoding="utf-8"))
+        self.assertEqual(state["next_sequence"], 2)
+        self.assertEqual(state["pending_reveal"]["event_id"], event2["event_id"])
 
     def test_12_other_event_ref_is_rejected(self) -> None:
         self.init_a()
@@ -355,7 +358,10 @@ class ReleaseOperatorTests(unittest.TestCase):
         ingest2 = self.ingest(self.event_projection(2))
         proc = self.ack("A", event1, ingest2["ingest_ref"], ok=False)
         self.assertEqual(proc.stdout, "")
-        self.assertIn("binding mismatch", proc.stderr)
+        self.assertTrue(proc.stderr.startswith("release-operator-error: durable ingest "))
+        state = json.loads(self.state.read_text(encoding="utf-8"))
+        self.assertEqual(state["next_sequence"], 1)
+        self.assertEqual(state["pending_reveal"]["event_id"], event1["event_id"])
 
     def test_13_other_subject_real_observation_is_rejected(self) -> None:
         self.init_a()
