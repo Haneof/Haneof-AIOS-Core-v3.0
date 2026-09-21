@@ -90,7 +90,7 @@ from aios_core.world_graph import (
 
 from .budget_gate import BackgroundBudgetDecision, BackgroundBudgetGate
 from .capabilities import CapabilityKind, CapabilityRegistry, CapabilitySpec
-from .cognitive_runtime import CognitiveRuntime, ModelHandler, RuntimeTurnResult
+from .cognitive_runtime import CognitiveRuntime, ModelDirective, ModelHandler, RuntimeTurnResult
 
 
 _AUTO_TOPIC = object()
@@ -1010,7 +1010,7 @@ class FusedTurnRuntime:
     def _record_model_usage(
         self,
         snapshot: RuntimeSnapshot,
-        usage: ModelUsage | None,
+        directive: ModelDirective,
     ) -> None:
         if self._active_meter_time is None:
             raise RuntimeError(
@@ -1038,7 +1038,8 @@ class FusedTurnRuntime:
             session_id=self._active_session_id,
             wake_reason=wake_reason,
             model_round_index=snapshot.round_index,
-            usage=usage,
+            usage=directive.usage,
+            provenance=directive.provenance,
         )
 
     def _cockpit_capability_catalog(self) -> tuple[dict[str, Any], ...]:
