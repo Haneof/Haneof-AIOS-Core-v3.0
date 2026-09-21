@@ -1,0 +1,148 @@
+[
+  {
+    "advance": {
+      "background_cycles": 0,
+      "dimension_summaries": {
+        "at": "2027-01-19T08:15:00+00:00",
+        "attempted_jobs": 56,
+        "commits": [],
+        "invoked": true,
+        "skipped_empty": 13,
+        "skipped_unchanged": 43,
+        "truncated": false
+      },
+      "from": "2027-01-19T08:15:00+00:00",
+      "periodic_reviews": [],
+      "task_cycles": [],
+      "to": "2027-01-19T08:15:00+00:00",
+      "world_revision": 145
+    },
+    "channel": "conversation",
+    "event_id": "d027-chat-15",
+    "occurred_at": "2027-01-19T08:15:00+00:00",
+    "result": {
+      "capabilities": [
+        "commit_ai_world_claim",
+        "transition_goal",
+        "commit_ai_world_claim"
+      ],
+      "continuity_summary_error": null,
+      "continuity_summary_ids": [],
+      "kind": "conversation",
+      "recommended_memory_count": 5,
+      "response": "收到，消防检查这件事就收口了，我不再提醒。\n早高峰出品还是当前的第一优先：接下来几天我会跟着实际的早高峰出品记录看——只看事实，比如等待时间、返工、缺货这些情况，连续观察一小段再说。\n单日某一天的销售数字我不会拿来下结论；只有当连续几天出现稳定的模式，我才会拿依据跟你讨论要不要调整。",
+      "session_id": "jan19-morning",
+      "silenced": false,
+      "termination_reason": "responded",
+      "turn_index": 1,
+      "world_revision": 149
+    },
+    "world_revision": 149
+  },
+  {
+    "advance": {
+      "background_cycles": 0,
+      "dimension_summaries": {
+        "at": "2027-01-19T20:05:00+00:00",
+        "attempted_jobs": 56,
+        "commits": [],
+        "invoked": true,
+        "skipped_empty": 13,
+        "skipped_unchanged": 43,
+        "truncated": false
+      },
+      "from": "2027-01-19T08:15:00+00:00",
+      "periodic_reviews": [],
+      "task_cycles": [],
+      "to": "2027-01-19T20:05:00+00:00",
+      "world_revision": 149
+    },
+    "channel": "pos_daily",
+    "event_id": "d028-pos",
+    "occurred_at": "2027-01-19T20:05:00+00:00",
+    "result": {
+      "kind": "reality",
+      "observation_refs": [
+        {
+          "object_id": "obs_src_60bc8c48b8f0290b5b94ae48",
+          "revision": 1
+        }
+      ],
+      "reused_existing": false,
+      "trigger_wakes": [],
+      "wake_runs": [],
+      "world_revision": 150
+    },
+    "world_revision": 150
+  },
+  {
+    "advance": {
+      "background_cycles": 1,
+      "dimension_summaries": {
+        "at": "2027-01-20T08:45:00+00:00",
+        "attempted_jobs": 58,
+        "commits": [
+          {
+            "object_id": "sum_857a1a47de99eafe1fa7db89",
+            "reused_existing": false,
+            "revision": 1,
+            "world_revision": 154
+          },
+          {
+            "object_id": "sum_1e2e3dec53ce671b2c0736cb",
+            "reused_existing": false,
+            "revision": 1,
+            "world_revision": 155
+          }
+        ],
+        "invoked": true,
+        "skipped_empty": 13,
+        "skipped_unchanged": 43,
+        "truncated": false
+      },
+      "from": "2027-01-19T20:05:00+00:00",
+      "periodic_reviews": [
+        {
+          "anchor_count": 1,
+          "at": "2027-01-20T08:15:00+00:00",
+          "invoked": true,
+          "review_id": "wake_review_b3c6b6cf9cc2ca4df59727fe",
+          "runtime": {
+            "capabilities": [
+              "read_periodic_review_anchors"
+            ],
+            "invoked": true,
+            "model_rounds": 2,
+            "response": null,
+            "silenced": true,
+            "termination_reason": "silence"
+          },
+          "wake_id": "wake_review_b3c6b6cf9cc2ca4df59727fe",
+          "wake_revision": 3,
+          "window_end": "2027-01-20T08:15:00+00:00",
+          "window_start": "2027-01-19T08:15:00+00:00"
+        }
+      ],
+      "task_cycles": [],
+      "to": "2027-01-20T08:45:00+00:00",
+      "world_revision": 155
+    },
+    "channel": "production_log",
+    "event_id": "d029-production",
+    "occurred_at": "2027-01-20T08:45:00+00:00",
+    "result": {
+      "kind": "reality",
+      "observation_refs": [
+        {
+          "object_id": "obs_src_4ca5f23159a0a691650430b5",
+          "revision": 1
+        }
+      ],
+      "reused_existing": false,
+      "trigger_wakes": [],
+      "wake_runs": [],
+      "world_revision": 156
+    },
+    "world_revision": 156
+  }
+]
