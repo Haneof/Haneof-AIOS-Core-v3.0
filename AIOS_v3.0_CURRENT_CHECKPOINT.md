@@ -18,6 +18,8 @@
 最近完成任务：`AUDIT-001` — **DONE / AUDIT ONLY**。
 
 - 证据矩阵：`reviews/AUDIT-001_ISSUE30_CURRENT_MAIN_EVIDENCE_MATRIX_2026-09-21.md`
+- PR #48 / squash merge：`0ecacd8204414fd41e7ebda8e8b4521406154d3f`
+- final governance metadata commit：`05fc6b81ed78a0903915432afe1835e5537a96c7`
 - T34 / #34：`STILL_OPEN`
 - T36 / #36：`STILL_OPEN`
 - T28 / #28：`STILL_OPEN`
