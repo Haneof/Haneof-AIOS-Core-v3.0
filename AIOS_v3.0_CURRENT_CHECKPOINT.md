@@ -14,7 +14,39 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
-## 当前工程断点 — C14-RES-FIX-003 已收口
+## 当前工程断点 — C14-RES-B-FIX-001 已收口
+
+最近完成任务：`C14-RES-B-FIX-001` — **DONE / CANONICAL PHASE-B CONVERSATION RELEASE VERIFIED**。
+
+- Started main：`08ceb9ab3f68d5d3ececaaa26832912323d73851`
+- Work branch：`c14/res-b-canonical-conversation-ingest-20260921-sol`
+- Exact candidate：`cb3a417f3c29b29d6aa2bf364386aec12b17e623`
+- PR：#78
+- Squash merge：`1c7a8c1466911f8617ed39348a50ac8041f23715`
+- Completion evidence：`reviews/internal_habitation/c14-resident/v2/C14_RES_B_FIX_001_COMPLETION_EVIDENCE_2026-09-21.md`
+- Formal Python：`3.12.14`
+- Exact-candidate workflow：`35631789929` — **SUCCESS**
+- Pre-evidence GREEN：`35631613259` — **SUCCESS**
+- Generic blind-release regressions：**30/30 PASS**
+- Canonical conversation release/idempotency regressions：**15/15 PASS**
+- Existing conversation + fused-runtime regressions：**16/16 PASS**
+- Canonical adapter：`reviews/internal_habitation/c14-resident/v2/release/canonical_conversation_ingest.py`
+- Release operator：`c14-blind-release-operator-v4`
+- Phase-B USER conversation 不再允许 generic fixture Observation；generic adapter 对该 envelope fail closed。
+- Specialized ack 必须机械验证 exact canonical user Observation：exact revision / subject / durable USER authority / Observation / `user_ai_interaction` / text / role=user / exact session / exact turn / exact text / exact occurred_at。
+- Exact idempotency proof：先由 `ConversationIngestor.commit_user_input()` 写入 canonical user Observation，再由 fresh `FusedTurnRuntime.run_turn()` 以完全相同 subject/session/turn/text/time 调用；内部 user commit 返回 `idempotent_replay=True`，World 中该 turn 仍只有 1 条 canonical user Observation，assistant 形成独立正常 Observation。
+- Fail-closed：generic fixture masquerade / missing canonical fields / wrong session / turn / text / timestamp / subject / assistant role / AI_COGNITION authority / other conversation event / nonexistent ref or revision / repeat / skip / reorder / boundary 均拒绝。
+- Resident-A v3 state 只允许在 exact A 24→25 handoff 的 `init --phase B` test-copy 升级到 v4；PR #75 冻结 evidence/World/state 未修改。
+- Frozen fixture SHA256 before/after：`1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253` / unchanged。
+- Core diff：`src/aios_core/** = 0`。
+- Resident-A evidence diff：0。
+- Resident-B semantic execution：**0**。
+- 当前第一个 READY：`C14-RES-B-001`，必须在新的真实 Resident 模型窗口执行。
+- Resident B release 规则：non-conversation 继续 `reveal -> mechanical_ingest_adapter -> ack`；USER conversation 必须 `reveal -> canonical_conversation_ingest -> canonical ack -> run_turn(same subject/session/turn/text/time)`。不得先 generic ingest 再 run_turn。
+
+以下 C14-RES-FIX-003 及更早段落为历史快照；下一任务只以 Task Board 和本段为准。
+
+## 历史工程断点 — C14-RES-FIX-003 已收口
 
 最近完成任务：`C14-RES-FIX-003` — **DONE / DURABLE WORLD ACK VERIFIED**。
 
