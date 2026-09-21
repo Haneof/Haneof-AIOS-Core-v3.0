@@ -740,15 +740,19 @@ class WakeBus:
         moment = as_utc(started_at, "started_at")
         wake = self.current_wake(wake_id)
 
-        if wake.wake_state is WakeState.RUNNING:
+        if wake.wake_state is WakeState.RUNNING and not metadata_update:
             return WakeStateReceipt(
                 wake_id=wake.object_id,
                 revision=wake.revision,
                 state=wake.wake_state.value,
                 world_revision=int(self.store.current_world_revision()),
             )
-        if wake.wake_state not in {WakeState.NEW, WakeState.QUEUED}:
-            raise ValueError("only NEW/QUEUED Wake may be claimed")
+        if wake.wake_state not in {
+            WakeState.NEW,
+            WakeState.QUEUED,
+            WakeState.RUNNING,
+        }:
+            raise ValueError("only NEW/QUEUED/RUNNING Wake may be claimed")
 
         revision = wake.revision + 1
         metadata = dict(wake.metadata)
