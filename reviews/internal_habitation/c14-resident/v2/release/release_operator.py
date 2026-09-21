@@ -391,6 +391,39 @@ def _verify_durable_world_binding(
     }
 
 
+def _verify_prior_receipt_chain_in_world(
+    *,
+    world_db: str,
+    state: dict[str, Any],
+    events: list[dict[str, Any]],
+    fixture: dict[str, Any],
+    manifest: dict[str, Any],
+) -> None:
+    for receipt in state["receipts"]:
+        sequence = int(receipt["sequence"])
+        event = events[sequence - 1]
+        durable = _verify_durable_world_binding(
+            world_db=world_db,
+            ingest_ref=str(receipt["ingest_ref"]),
+            event=event,
+            fixture=fixture,
+            manifest=manifest,
+        )
+        for key in (
+            "ingest_ref",
+            "ingest_object_id",
+            "ingest_revision",
+            "ingest_world_revision",
+            "ingest_source_class",
+            "fixture_payload_sha256",
+            "fixture_projection_sha256",
+        ):
+            if receipt.get(key) != durable.get(key):
+                raise ReleaseError(
+                    f"release receipt no longer matches supplied private World: {key}"
+                )
+
+
 def cmd_init(args: argparse.Namespace) -> None:
     _, manifest, events = _load_bundle()
     state_path = Path(args.state)
@@ -479,6 +512,13 @@ def cmd_ack(args: argparse.Namespace) -> None:
     if args.event_id != pending.get("event_id"):
         raise ReleaseError("ack event id is not the current revealed event")
 
+    _verify_prior_receipt_chain_in_world(
+        world_db=args.world_db,
+        state=state,
+        events=events,
+        fixture=fixture,
+        manifest=manifest,
+    )
     event = events[nxt - 1]
     durable = _verify_durable_world_binding(
         world_db=args.world_db,
