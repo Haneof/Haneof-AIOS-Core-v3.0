@@ -1,0 +1,150 @@
+from __future__ import annotations
+
+import dataclasses
+import hashlib
+import json
+import os
+import subprocess
+import urllib.parse
+import urllib.request
+import sys
+import time
+import traceback
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Mapping
+
+from pydantic import BaseModel
+
+from aios_core.ai_world import AI_SELF_SUBJECT_ID
+from aios_core.contracts.enums import ObjectType, WakeSource
+from aios_core.query.search import WorldSearchIndex
+from aios_core.runtime.capabilities import CapabilityCall
+from aios_core.runtime.cognitive_runtime import ModelDirective, RuntimeSnapshot
+from aios_core.runtime.turn_runtime import FusedTurnRuntime
+from aios_core.storage.sqlite_store import SQLiteWorldStore
+
+ROOT = Path(__file__).resolve().parents[6]
+EVIDENCE_DIR = Path(__file__).resolve().parent
+RELEASE_DIR = ROOT / "reviews/internal_habitation/c14-resident/v2/release"
+OPERATOR = RELEASE_DIR / "release_operator.py"
+ADAPTER = RELEASE_DIR / "mechanical_ingest_adapter.py"
+WORLD_DB = EVIDENCE_DIR / "private_world.db"
+INDEX_DB = EVIDENCE_DIR / "private_index.db"
+RELEASE_STATE = EVIDENCE_DIR / "release_state.json"
+PENDING = EVIDENCE_DIR / "pending_checkpoint.json"
+INPUT_REPO_PATH = (
+    "reviews/internal_habitation/c14-resident/v2/runs/"
+    "resident-a-20260921-sol/resident_input.json"
+)
+TRACE = EVIDENCE_DIR / "semantic_trace.jsonl"
+SESSION_STATE = EVIDENCE_DIR / "session_state.json"
+
+BRANCH = os.environ["SESSION_BRANCH"]
+EVALUATED_MAIN_SHA = os.environ["EVALUATED_MAIN_SHA"]
+MODEL_ID = os.environ.get("RESIDENT_MODEL_ID", "unknown/not exposed")
+PROVIDER_ID = os.environ.get("RESIDENT_PROVIDER_ID", "unknown/not exposed")
+WINDOW_ID = os.environ.get("RESIDENT_WINDOW_ID", "unknown/not exposed")
+SUBJECT_ID = "user_1"
+
+CHECKPOINT_COUNTER = 0
+CURRENT_EVENT_SEQUENCE: int | None = None
+CURRENT_EVENT_ID: str | None = None
+CURRENT_EVENT_TIME: datetime | None = None
+
+
+class NeedInput(RuntimeError):
+    pass
+
+
+def _jsonable(value: Any) -> Any:
+    if isinstance(value, BaseModel):
+        return value.model_dump(mode="json")
+    if dataclasses.is_dataclass(value):
+        return _jsonable(dataclasses.asdict(value))
+    if isinstance(value, Mapping):
+        return {str(k): _jsonable(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple, set, frozenset)):
+        return [_jsonable(v) for v in value]
+    if isinstance(value, datetime):
+        return value.isoformat()
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, bytes):
+        return value.hex()
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    return str(value)
+
+
+def _write_json(path: Path, value: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(
+        json.dumps(_jsonable(value), ensure_ascii=False, sort_keys=True, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(tmp, path)
+
+
+def _append_trace(kind: str, payload: Any) -> None:
+    TRACE.parent.mkdir(parents=True, exist_ok=True)
+    record = {
+        "kind": kind,
+        "event_sequence": CURRENT_EVENT_SEQUENCE,
+        "event_id": CURRENT_EVENT_ID,
+        "simulated_time": None if CURRENT_EVENT_TIME is None else CURRENT_EVENT_TIME.isoformat(),
+        "payload": _jsonable(payload),
+    }
+    with TRACE.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\n")
+
+
+def _run(args: list[str], *, capture: bool = True) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        args,
+        cwd=ROOT,
+        check=True,
+        text=True,
+        capture_output=capture,
+    )
+
+
+def _next_checkpoint_id(kind: str) -> str:
+    global CHECKPOINT_COUNTER
+    CHECKPOINT_COUNTER += 1
+    return f"{CHECKPOINT_COUNTER:04d}-{kind}"
+
+
+def _read_remote_input() -> dict[str, Any] | None:
+    token = os.environ.get("GITHUB_TOKEN", "").strip()
+    repository = os.environ.get("GITHUB_REPOSITORY", "").strip()
+    if not token or not repository:
+        raise RuntimeError("GITHUB_TOKEN and GITHUB_REPOSITORY are required for control polling")
+    quoted_path = urllib.parse.quote(INPUT_REPO_PATH, safe="/")
+    quoted_ref = urllib.parse.quote(BRANCH, safe="")
+    url = f"https://api.github.com/repos/{repository}/contents/{quoted_path}?ref={quoted_ref}"
+    request = urllib.request.Request(
+        url,
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/vnd.github.raw+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "User-Agent": "c14-resident-a-interactive-bridge",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            raw = response.read().decode("utf-8")
+    except Exception:
+        return None
+    try:
+        value = json.loads(raw)
+    except json.JSONDecodeError:
+        return None
+    return value if isinstance(value, dict) else None
+
+
+def _wait_for_input(kind: str, payload: Any, *, expected_input_kind: str) -> dict[str, Any]:
+    checkpoint_id = _next_checkpoint_id(kind)
+    checkpoint = {
