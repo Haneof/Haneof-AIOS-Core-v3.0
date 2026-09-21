@@ -1,0 +1,1 @@
+{"b5404873c41ffe3630297db0a261f61a967070437c04a48a4d6bc5d9e70cd83a":{"kind":"capability_calls","calls":[{"name":"inspect_world_object","arguments":{"object_id":"obs_num_segment_434a1e266d9a8bb052381559","revision":1},"call_id":"seg003-jan26-sensor-context"}]}}
