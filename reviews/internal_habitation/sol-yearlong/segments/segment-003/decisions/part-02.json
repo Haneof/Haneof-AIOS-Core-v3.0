@@ -1,0 +1,64 @@
+{
+  "aa7cb79b91f385297abe9f4dd28797b701d62a03729dd67c98a9b07c1e36472d": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "transition_goal",
+        "arguments": {
+          "goal_ref": {"object_id": "goal_c909920b70a6835d5a42833e", "revision": 1},
+          "new_status": "active",
+          "reason": "用户今天明确重申早高峰出品是当前最关心的事，并要求先连续观察再调整；这与 1/10 由用户提出的优先事项一致，目标不再只是候选。",
+          "evidence_refs": [
+            {"object_id": "obs_conv_user_ebc76d6d091f87202351a7c0", "revision": 1},
+            {"object_id": "sum_a07360119a1f04499ab17fdb", "revision": 1}
+          ]
+        },
+        "call_id": "seg003-jan19-goal-active"
+      },
+      {
+        "name": "transition_task",
+        "arguments": {
+          "task_ref": {"object_id": "task_4ab2a4531967655198502158", "revision": 1},
+          "new_state": "running",
+          "reason": "用户要求先连续观察一阵再调整；把这一周的实际早高峰记录当作观察期，周末汇总一次，而不是每天根据单日数字下结论。",
+          "next_step": "按日收集早高峰的实际记录（出餐等待、返工、缺货），只保留当日事实；1/26 汇总一次，只有出现跨多日的同类现象才提出调整建议。",
+          "next_wake_at": "2027-01-26T08:00:00+00:00",
+          "evidence_refs": [
+            {"object_id": "obs_conv_user_ebc76d6d091f87202351a7c0", "revision": 1},
+            {"object_id": "sum_a07360119a1f04499ab17fdb", "revision": 1}
+          ]
+        },
+        "call_id": "seg003-jan19-observation-window"
+      },
+      {
+        "name": "transition_task",
+        "arguments": {
+          "task_ref": {"object_id": "task_41571ce5cbcc6c736bb22f73", "revision": 2},
+          "new_state": "completed",
+          "reason": "该任务的问题已在 1/8 解决：航班时间确认、到货与接人时间不冲突，用户当天已自行分工（自己接妹妹、小赵收货）。deadline（1/9 04:30）已过且没有新的待办，继续留在 ready 会让执行世界一直挂着一个已经结束的验证任务。",
+          "evidence_refs": [
+            {"object_id": "sum_f5ca4683cd9011f0a2302652", "revision": 1}
+          ]
+        },
+        "call_id": "seg003-jan19-close-resolved-verification"
+      },
+      {
+        "name": "commit_ai_world_claim",
+        "arguments": {
+          "domain": "user_understanding",
+          "statement": "用户在业务结论上的证据门槛很高：单日数据只算当日事实，不能直接推出趋势、原因或好坏。这个要求出现在三个不同场景——1/15 消防通道照片判读（两袋面粉不等于通道不合格）、1/11-1/17 North Mill 报价从“贵不少”的印象回到 1.38/1.42 的实际数字、1/19 明确要求不要因为某一天的销售数字就直接下结论。",
+          "confidence": 0.65,
+          "knowledge_state": "inferred",
+          "claim_type": "preference",
+          "tags": ["evidence_before_conclusion", "single_day_not_trend", "business_conclusions"],
+          "evidence_refs": [
+            {"object_id": "obs_conv_user_ebc76d6d091f87202351a7c0", "revision": 1},
+            {"object_id": "sum_18f38f168fb21a084c39684c", "revision": 1},
+            {"object_id": "sum_6dfbc01843af38ce6a9f668a", "revision": 1}
+          ]
+        },
+        "call_id": "seg003-jan19-evidence-standard"
+      }
+    ]
+  }
+}
