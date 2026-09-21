@@ -5,6 +5,24 @@
 > 仓库：`Haneof/Haneof-AIOS-Core-v3.0`  
 > 分支：`main`
 
+## 2026-09-21 单窗口执行控制
+
+从本节起，跨窗口施工的“下一任务”唯一来源改为：
+
+`governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md`
+
+规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据本文件下方历史“下一动作”直接重复施工。
+
+当前已验证 main 功能锚点：`45d6c353b75048197c438ee5384074c5beea94d3`。
+
+当前冻结未完成任务：`C13-MTR-001`。
+
+- WIP branch: `arena/c13-metering-ledger-20260921`
+- frozen WIP head: `b6d90f2c8c7d37d0a17ed080c011e24d9e01c805`
+- 下一窗口：只完成 `C13-MTR-001`，不得顺手进入后续任务。
+
+历史段落继续作为工程证据保留；若历史“当前 blocker / 下一动作”与 task board 冲突，以 task board + 最新 main 事实为准。
+
 ## 当前快照
 
 - 时间：2026-09-20
