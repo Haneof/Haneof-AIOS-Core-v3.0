@@ -20,9 +20,11 @@
   "digest_scope": "UTF-8 bytes of v2/fixture/sealed_fixture.json exactly as committed, including the trailing LF",
   "release_contract_version": "c14-sequential-release-v2",
   "schema_version": "c14-resident-event-v2",
-  "release_operator_version": "c14-blind-release-operator-v3",
+  "release_operator_version": "c14-blind-release-operator-v4",
   "resident_access": "FORBIDDEN",
   "subject_id": "user_1",
   "ingest_adapter_version": "c14-mechanical-ingest-adapter-v1",
-  "fixture_binding_version": "c14-fixture-event-binding-v1"
+  "fixture_binding_version": "c14-fixture-event-binding-v1",
+  "canonical_conversation_adapter_version": "c14-canonical-conversation-adapter-v1",
+  "canonical_conversation_binding_version": "c14-canonical-conversation-binding-v1"
 }
