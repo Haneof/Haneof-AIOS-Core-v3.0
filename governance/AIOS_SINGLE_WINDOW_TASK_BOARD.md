@@ -69,7 +69,7 @@
 | 5 | `T28-REC-001` | 普通推荐与 antecedent 路径统一隔离 assistant raw dialogue，避免把 AI 自己的话当用户事实主动推荐 | **DONE** | AUDIT-001 | PR #49; candidate `2a16d1ffaaec877356f4f281e82d884e6ac97ab5`; squash merge `e159ab30a12b819ca053085d5103460e66ef9f16`; required Gates GREEN | assistant raw dialogue 不再作为普通 proactive user/world memory；raw continuity/search/drill-down 保留；用户/外部 fact 与 evidence-grounded Claim 不退化 |
 | 6 | `T35-RULE-001` | 只做“非 Action Task 的可信完成凭据”语义裁决；不改 execution 代码 | **DONE** | AUDIT-001 | `governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md`; PR #53; semantic candidate `b58bbb31a04a119897890452e76461f14fd46288`; squash merge `6fcb51d6e2ecf6e2ab8ff0fa62013f094b32f21c` | 唯一裁决已形成：所有 Task 终态必须真实证据化；外部执行保持 Action→Outcome；非 Action Task 可用合格 pinned World evidence / validated durable artifact；禁止 AI 自述、伪 Outcome、循环 OperationExperience |
 | 7 | `T35-IMPL-001` | 按 T35-RULE-001 裁决实现 Task 完成闭环 | **READY** | T35-RULE-001, T34-EXEC-001 | T35-RULE-001 DONE; T34-EXEC-001 DONE via PR #54 / `48f5e29ad564ef7c1687b5a0d81cede1452e82e8`; dependencies satisfied; implementation remains a separate new-window task following `governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md` | 单独 PR；正常 Action/Outcome 不退化；非 Action Task 有合法真实凭据；P12/P15/P16 GREEN |
-| 8 | `T33-RECALL-001` | 用自包含表达/跨会话省略/无前文三类对照重新验证 recall 误触；只有复现才修 | **READY** | AUDIT-001 | AUDIT-001=`STILL_OPEN`; Issue #30 / #33 | 禁止场景短语黑名单；程序只提供候选，不替 Resident 判断指代 |
+| 8 | `T33-RECALL-001` | 用自包含表达/跨会话省略/无前文三类对照重新验证 recall 误触；只有复现才修 | **DONE** | AUDIT-001 | PR #51; candidate `91f1eecc1eb1a5aeb3dd2fa4566f045b6abea796`; squash merge `cb8eab12e9747bece41b14d183840e2cf13bd183`; repro run `35566569236`; required Gates GREEN | Case A/B/C、same-session canonical antecedent、assistant-raw exclusion、P14/Fused/P16 回归 GREEN；Core 只暴露候选，不绑定指代 |
 | 9 | `P16-TRIAGE-001` | 更新 PR #37 / Issue #30 中央证据分流到当前 segmented protocol；历史无效年度、PARTIAL、机械复现、有效缺陷分开登记 | **BLOCKED** | AUDIT-001, all activated T34/T36/T28/T35/T33 tasks resolved | PR #37 仍 open，base 较旧 | 冻结被评 Core SHA；不把旧“几天统计”冒充当前进度；中央报告进入 main |
 | 10 | `P16-CAMPAIGN-001` | 建立/恢复唯一 P16 分段入住 Campaign Ledger：找出当前 canonical life、最后有效 segment、World/checkpoint digest、累计天数/交互/认知 checkpoint | **BLOCKED** | P16-TRIAGE-001 | `reviews/internal_habitation/ARENA_RESIDENT_YEARLONG_TASK.md` | 创建 `reviews/internal_habitation/P16_SEGMENT_PROGRESS_LEDGER.md`；历史 segment 不重复跑；下一 segment ID 唯一 |
 | 11 | `P16-RES-NEXT` | **一次只执行一个** Resident habitation segment（7–30 simulated days），模型本人逐次作语义判断 | **BLOCKED** | P16-CAMPAIGN-001 or previous P16-RES segment | Campaign Ledger 决定实际 segment number | 每个窗口只做 1 segment；保存 World/checkpoint/digest/时间/交互/认知计数；更新 ledger；未到 365 天则自动追加下一 `P16-RES-NEXT` |
@@ -408,3 +408,54 @@ C13 冻结现场已经由专用单窗口完成并收口：
 - PR: **#47**
 - C13 squash merge / verified functional main anchor: `f9baacd5ac7be1646036a4e878934e77965c6640`
 - next dedicated window action: **只执行 AUDIT-001；本 C13 窗口到此停止，不得继续审计。**
+
+
+### T33-RECALL-001 completion — 2026-09-21
+
+```text
+Task ID: T33-RECALL-001
+Status: DONE
+Started from main: f8a2f8e4cf53de579bd0bc69cfd85421d109d65b
+Work branch: fix/t33-recall-antecedent-gate-20260921
+Candidate SHA: 91f1eecc1eb1a5aeb3dd2fa4566f045b6abea796
+PR: #51
+Merge SHA: cb8eab12e9747bece41b14d183840e2cf13bd183
+Required gates: memory-recommendation; p14-long-context; fused-turn-runtime; p16-habitation-harness; p16-convergence-gate
+Gate run IDs / conclusions:
+- memory-recommendation 35567409150 / SUCCESS
+- p14-long-context 35567409136 / SUCCESS
+- fused-turn-runtime 35567409167 / SUCCESS
+- p16-habitation-harness 35567409218 / SUCCESS
+- p16-convergence-gate 35567409187 / SUCCESS
+Additional regression gates:
+- constitutional-cognition-closure 35567409138 / SUCCESS
+- p9-revision-gate 35567409173 / SUCCESS
+- p10-ai-world-gate 35567409295 / SUCCESS
+- p11-dimension-gate 35567409158 / SUCCESS
+- p12-execution-gate 35567409155 / SUCCESS
+Reproduction evidence:
+- pre-fix reproduction commit e962585a346949dd884e202ffc7cabb5e306161c
+- p16-convergence-gate 35566569236 / FAILURE as expected
+- exact Case A failure: fresh-session self-contained demonstrative incorrectly produced antecedent_recall_needed=True
+Fix evidence:
+- cross-session recall no longer opens from arbitrary substring occurrence of local demonstrative/continuation words
+- discourse-level continuation/deixis may expose bounded candidates but deterministic Core never binds antecedent identity
+- same-session continuity reads canonical P14 user.text and never assistant.text as antecedent
+- duplicate substring "继续" history gate removed; discourse-level "继续。" remains supported
+- first over-tight candidate was rejected by constitutional-cognition-closure; corrected candidate preserves "那这个怎么实现？" same-session continuity
+- final green merge-ref tested candidate 91f1eecc against main@3cd793e3d9325c316d1bcf4beb29a0ab02c195fd; the only later main delta before merge was checkpoint documentation, not Runtime/Core/Test
+Evidence/report paths:
+- src/aios_core/recommendation/topic_state.py
+- tests/integration/test_p16_cross_session_antecedent_recall.py
+- tests/integration/test_v3_fused_turn_runtime.py
+- tests/integration/test_v3_long_context_continuity.py
+- tests/habitation/test_current_core_target.py
+Bugs found:
+- bare "这个/那个" and embedded "继续" could mechanically open unnecessary history
+- P14 canonical recent-turn shape was not consumed by TopicState, so runtime same-session antecedent continuity could be lost
+- first fix candidate over-tightened same-session demonstrative continuity; Gate caught and corrected before merge
+Deferred issues:
+- no WorldSearchIndex/query implementation changes; world-index Gate was not required by impact scope
+- T36-SEARCH-001 and T35-IMPL-001 remain separate tasks and were not executed here
+Next READY task: T36-SEARCH-001 — new window only; this T33 window stops
+```
