@@ -65,7 +65,7 @@
 | 1 | `C13-MTR-001` | 完成 C13 non-world Metering Ledger：模型返回后立即落 operations-side meter；token 真值不再依赖 Wake World metadata；crash 后计量不丢；Periodic Review 计费时间不倒带 | **DONE** | — | PR #47; final candidate `47ed2de25cdcb26c8c552a3db0640a59f9a15817`; squash merge `f9baacd5ac7be1646036a4e878934e77965c6640`; required Gates GREEN | 已从冻结 WIP 完成、自审、专项 Gate + P16 full regression GREEN、squash merge；完整证据见 §5 完成记录 |
 | 2 | `AUDIT-001` | 对 Issue #30 的 T34/T36/T28/T35/T33 与 PR #37 在**最新 main**逐项重新复核，只做裁决，不修代码 | **DONE** | C13-MTR-001 | `main@e9862103a753be026edf1745c6a5d07fa56c0cf4`; `reviews/AUDIT-001_ISSUE30_CURRENT_MAIN_EVIDENCE_MATRIX_2026-09-21.md` | 五项 current-main 裁决已落库；无 Core 修改 |
 | 3 | `T34-EXEC-001` | Action 授权前重新验证父 Task/撤销状态，关闭 cancel→authorize 竞态 | **DONE** | AUDIT-001 | PR #54; candidate `da14638fc0f8cf14bad6b5315988d7c7db691ac8`; squash merge `48f5e29ad564ef7c1687b5a0d81cede1452e82e8`; repro run `35566808198`; candidate gate run `35566890602`; merge-result P12/P16 GREEN | 修复前 current-main 复现；cancel/retry/restart/race/legacy-world/history/normal-authorize 回归 GREEN |
-| 4 | `T36-SEARCH-001` | 结构化 Observation scalar 派生索引，不改原 typed fact，不做语义推断 | **READY** | AUDIT-001 | AUDIT-001=`STILL_OPEN`; Issue #30 / #36 | dict/list/number/bool 可检索；rebuild=incremental；subject/current/stale 语义不退化 |
+| 4 | `T36-SEARCH-001` | 结构化 Observation scalar 派生索引，不改原 typed fact，不做语义推断 | **DONE** | AUDIT-001 | PR #52; squash merge `07965029285cf3dfc0fdb5e506a65add60c76c29`; before-fix repro run `35566751016`; final candidate `afc62009340f4451d15400c4860ee880296d9c7c`; required Gates GREEN | dict/list/number/bool/null 可检索；rebuild=incremental；subject/current/inactive/tombstone/text 语义不退化；原 typed Observation 不改写 |
 | 5 | `T28-REC-001` | 普通推荐与 antecedent 路径统一隔离 assistant raw dialogue，避免把 AI 自己的话当用户事实主动推荐 | **DONE** | AUDIT-001 | PR #49; candidate `2a16d1ffaaec877356f4f281e82d884e6ac97ab5`; squash merge `e159ab30a12b819ca053085d5103460e66ef9f16`; required Gates GREEN | assistant raw dialogue 不再作为普通 proactive user/world memory；raw continuity/search/drill-down 保留；用户/外部 fact 与 evidence-grounded Claim 不退化 |
 | 6 | `T35-RULE-001` | 只做“非 Action Task 的可信完成凭据”语义裁决；不改 execution 代码 | **DONE** | AUDIT-001 | `governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md`; PR #53; semantic candidate `b58bbb31a04a119897890452e76461f14fd46288`; squash merge `6fcb51d6e2ecf6e2ab8ff0fa62013f094b32f21c` | 唯一裁决已形成：所有 Task 终态必须真实证据化；外部执行保持 Action→Outcome；非 Action Task 可用合格 pinned World evidence / validated durable artifact；禁止 AI 自述、伪 Outcome、循环 OperationExperience |
 | 7 | `T35-IMPL-001` | 按 T35-RULE-001 裁决实现 Task 完成闭环 | **READY** | T35-RULE-001, T34-EXEC-001 | T35-RULE-001 DONE; T34-EXEC-001 DONE via PR #54 / `48f5e29ad564ef7c1687b5a0d81cede1452e82e8`; dependencies satisfied; implementation remains a separate new-window task following `governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md` | 单独 PR；正常 Action/Outcome 不退化；非 Action Task 有合法真实凭据；P12/P15/P16 GREEN |
@@ -459,3 +459,70 @@ Deferred issues:
 - T36-SEARCH-001 and T35-IMPL-001 remain separate tasks and were not executed here
 Next READY task: T36-SEARCH-001 — new window only; this T33 window stops
 ```
+
+
+### T36-SEARCH-001 completion — 2026-09-21
+
+Task ID: `T36-SEARCH-001`
+
+Status: **DONE**
+
+- Started from main: `f8a2f8e4cf53de579bd0bc69cfd85421d109d65b`
+- Final synchronization base: `56cf9a5daa2f6873744590c379acb3dff0deb705`
+- Work branch: `task/t36-search-001-structured-scalar-20260921`
+- Final candidate SHA: `afc62009340f4451d15400c4860ee880296d9c7c`
+- PR: #52
+- Squash merge SHA: `07965029285cf3dfc0fdb5e506a65add60c76c29`
+- Issue #36: closed by PR #52
+
+#### Exact current-main reproduction
+
+Before production code changed, test-only run `35566751016` failed on the structured Observation path:
+`recall_candidates("North Mill")` returned no hit for a durable Observation whose legal
+`value` was a nested mapping containing `vendor="North Mill"`. A subject-scoped structured
+scalar lookup failed for the same mechanism. Root cause remained
+`WorldSearchIndex._index_row()` accepting only string values from configured text fields.
+
+#### Exact fix
+
+The repair is confined to the rebuildable search projection:
+
+- only `Observation.value` receives mechanical JSON-like scalar projection;
+- mapping keys are emitted deterministically in sorted order;
+- list order is preserved;
+- string, integer, float, boolean and null scalar content becomes derived searchable text;
+- the original typed Observation payload is never rewritten;
+- no Claim, Summary or other semantic object is created;
+- no health/psychology/causal or other semantic inference is performed by the indexer.
+
+Regression coverage proves nested dict, list, number, boolean, null, mixed payload,
+incremental catch-up, full rebuild, legacy projection rebuild/upgrade, incremental=rebuild,
+subject isolation, current-version filtering, inactive/retracted/stale/tombstone filtering,
+text Observation preservation, and no synthetic semantic inference.
+
+#### Gate evidence
+
+- `world-index` — run `35568085113` — **SUCCESS**
+- `memory-recommendation` — run `35568085081` — **SUCCESS**
+- `p16-habitation-harness` — run `35568085280` — **SUCCESS**
+- `p16-convergence-gate` — run `35568085170` — **SUCCESS**
+- `p9-revision-gate` — run `35568085180` — **SUCCESS**
+- `dimension-summary` — run `35568085143` — **SUCCESS**
+- `constitutional-cognition-closure` — run `35568085182` — **SUCCESS**
+- fused-turn equivalent regression — run `35568044160` — **SUCCESS**; temporary
+  branch-only workflow was removed before the final candidate and is absent from the PR diff.
+
+#### Affected files
+
+- `src/aios_core/query/search.py`
+- `tests/integration/test_m0_prime_store_delta_and_search.py`
+- `tests/habitation/test_t36_structured_observation_search.py`
+
+#### Deferred / handoff
+
+- No T33, T28, T34, T35 runtime semantics were changed.
+- A transient rebase accidentally dropped the newly merged T28 search regression; final diff
+  review caught it, and the candidate was replayed on latest main before acceptance. Final PR
+  preserves the T28/T33 main regressions.
+- Next READY task by task-board ordering: **T35-IMPL-001** — new window only.
+- This T36 window stops here after checkpoint writeback.
