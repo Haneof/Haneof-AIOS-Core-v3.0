@@ -1,3 +1,23 @@
+def _emit_evidence_archive() -> None:
+    import base64
+    import io
+    import tarfile
+
+    buffer = io.BytesIO()
+    with tarfile.open(fileobj=buffer, mode="w:gz") as archive:
+        archive.add(EVIDENCE_DIR, arcname=EVIDENCE_DIR.name)
+    raw = buffer.getvalue()
+    digest = hashlib.sha256(raw).hexdigest()
+    encoded = base64.b64encode(raw).decode("ascii")
+    chunk_size = 24000
+    total = (len(encoded) + chunk_size - 1) // chunk_size
+    print(f"C14_ARTIFACT_BEGIN::sha256:{digest}::bytes:{len(raw)}::chunks:{total}", flush=True)
+    for index in range(total):
+        chunk = encoded[index * chunk_size : (index + 1) * chunk_size]
+        print(f"C14_ARTIFACT_CHUNK::{index + 1}/{total}::{chunk}", flush=True)
+    print("C14_ARTIFACT_END", flush=True)
+
+
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
