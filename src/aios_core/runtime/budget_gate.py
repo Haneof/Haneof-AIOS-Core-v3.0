@@ -3,9 +3,10 @@
 The gate reads durable BudgetPolicy objects from the unified World and measures
 usage from durable Wake lifecycle records. It never judges semantic importance.
 
-Provider token usage is intentionally *not* estimated here. If an active budget
-declares max_tokens before real provider telemetry exists, the gate fails closed
-instead of inventing usage numbers.
+Provider token usage is intentionally *not* estimated here. Exact completed usage
+is counted when a model handler reports it. A hard max_tokens policy still fails
+closed unless a reliable pre-invocation token bound exists, because post-call usage
+cannot guarantee that the first request stayed under the cap.
 """
 
 from __future__ import annotations
@@ -37,6 +38,8 @@ class BackgroundBudgetDecision:
     policy_refs: tuple[ObjectRef, ...] = ()
     used_wakes: int = 0
     used_model_calls: int = 0
+    used_tokens: int = 0
+    token_usage_available: bool = False
     max_wakes: int | None = None
     max_model_calls: int | None = None
     model_round_limit: int | None = None
@@ -84,6 +87,8 @@ class BackgroundBudgetDecision:
             ],
             "used_wakes": self.used_wakes,
             "used_model_calls": self.used_model_calls,
+            "used_tokens": self.used_tokens,
+            "token_usage_available": self.token_usage_available,
             "max_wakes": self.max_wakes,
             "max_model_calls": self.max_model_calls,
             "model_round_limit": self.model_round_limit,
@@ -159,9 +164,11 @@ class BackgroundBudgetGate:
         window_start: datetime,
         window_end: datetime,
         exclude_wake_id: str,
-    ) -> tuple[int, int]:
+    ) -> tuple[int, int, int, bool]:
         used_wakes = 0
         used_model_calls = 0
+        used_tokens = 0
+        token_usage_available = True
 
         for payload in self.store.list_payloads(
             object_type=ObjectType.WAKE,
@@ -188,9 +195,9 @@ class BackgroundBudgetGate:
                 if isinstance(reserved, int) and not isinstance(reserved, bool) and reserved > 0:
                     used_model_calls += reserved
                 else:
-                    # Legacy RUNNING work has already crossed the model boundary.
-                    # Count at least one call rather than pretending it costs zero.
                     used_model_calls += 1
+                # In-flight provider work has no final exact usage yet.
+                token_usage_available = False
                 continue
 
             if wake.wake_state is not WakeState.COMPLETED:
@@ -220,7 +227,24 @@ class BackgroundBudgetGate:
             used_wakes += 1
             used_model_calls += rounds
 
-        return used_wakes, used_model_calls
+            total_tokens = metadata.get("model_total_tokens")
+            usage_complete = metadata.get("model_usage_complete") is True
+            if (
+                usage_complete
+                and isinstance(total_tokens, int)
+                and not isinstance(total_tokens, bool)
+                and total_tokens >= 0
+            ):
+                used_tokens += total_tokens
+            else:
+                token_usage_available = False
+
+        return (
+            used_wakes,
+            used_model_calls,
+            used_tokens,
+            token_usage_available,
+        )
 
     def status(self, *, now: datetime) -> dict[str, Any]:
         """Return mechanical BACKGROUND_DAY policy/usage facts for Resident inspection."""
@@ -235,17 +259,24 @@ class BackgroundBudgetGate:
                 "policy_refs": [],
                 "used_wakes": 0,
                 "used_model_calls": 0,
+                "used_tokens": 0,
                 "max_wakes": None,
                 "max_model_calls": None,
                 "max_tokens": None,
                 "remaining_wakes": None,
                 "remaining_model_calls": None,
+                "remaining_tokens": None,
                 "token_usage_available": False,
                 "on_exceed": [],
             }
 
         window_start, window_end = self._window(now)
-        used_wakes, used_model_calls = self._usage(
+        (
+            used_wakes,
+            used_model_calls,
+            used_tokens,
+            token_usage_available,
+        ) = self._usage(
             window_start=window_start,
             window_end=window_end,
             exclude_wake_id="",
@@ -276,6 +307,7 @@ class BackgroundBudgetGate:
             ],
             "used_wakes": used_wakes,
             "used_model_calls": used_model_calls,
+            "used_tokens": used_tokens,
             "max_wakes": max_wakes,
             "max_model_calls": max_model_calls,
             "max_tokens": max_tokens,
@@ -287,7 +319,12 @@ class BackgroundBudgetGate:
                 if max_model_calls is None
                 else max(0, max_model_calls - used_model_calls)
             ),
-            "token_usage_available": False,
+            "remaining_tokens": (
+                None
+                if max_tokens is None or not token_usage_available
+                else max(0, max_tokens - used_tokens)
+            ),
+            "token_usage_available": token_usage_available,
             "on_exceed": list(
                 dict.fromkeys(item.on_exceed.value for item in policies)
             ),
@@ -356,7 +393,12 @@ class BackgroundBudgetGate:
                         reasons=("background_budget_reservation_already_running",),
                     )
 
-        used_wakes, used_model_calls = self._usage(
+        (
+            used_wakes,
+            used_model_calls,
+            used_tokens,
+            token_usage_available,
+        ) = self._usage(
             window_start=window_start,
             window_end=window_end,
             exclude_wake_id=wake.object_id,
@@ -376,7 +418,11 @@ class BackgroundBudgetGate:
 
         token_policies = [item for item in policies if item.max_tokens is not None]
         if token_policies:
-            reasons.append("background_token_budget_requires_provider_usage_telemetry")
+            reasons.append(
+                "background_token_budget_requires_preflight_token_bound"
+                if token_usage_available
+                else "background_token_budget_usage_incomplete"
+            )
             exceeded_modes.extend(item.on_exceed for item in token_policies)
 
         if max_wakes is not None and used_wakes >= max_wakes:
@@ -428,6 +474,8 @@ class BackgroundBudgetGate:
                 policy_refs=policy_refs,
                 used_wakes=used_wakes,
                 used_model_calls=used_model_calls,
+                used_tokens=used_tokens,
+                token_usage_available=token_usage_available,
                 max_wakes=max_wakes,
                 max_model_calls=max_model_calls,
                 reasons=tuple(dict.fromkeys(reasons)),
@@ -453,6 +501,8 @@ class BackgroundBudgetGate:
             policy_refs=policy_refs,
             used_wakes=used_wakes,
             used_model_calls=used_model_calls,
+            used_tokens=used_tokens,
+            token_usage_available=token_usage_available,
             max_wakes=max_wakes,
             max_model_calls=max_model_calls,
             model_round_limit=model_round_limit,
