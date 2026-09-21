@@ -2,20 +2,20 @@
   "run_id": "arena_resident_sol_01",
   "reviewer_id": "arena_reviewer_sol",
   "logical_resident_id": "resident:arena_reviewer_sol",
-  "latest_segment_id": "segment_001",
+  "latest_segment_id": "segment_002",
   "tested_main_sha": "142533df9123d793edde9ec4f07405182d56af0d",
   "simulated_start": "2026-01-01T08:00:00+00:00",
-  "simulated_end": "2026-01-21T23:59:59+00:00",
-  "cumulative_simulated_days": 21,
-  "cumulative_cognition_checkpoints": 28,
-  "cumulative_observable_events": 23,
+  "simulated_end": "2026-02-15T23:59:59+00:00",
+  "cumulative_simulated_days": 46,
+  "cumulative_cognition_checkpoints": 52,
+  "cumulative_observable_events": 48,
   "subject_id": "user_lin_jiang",
-  "world_database": "segments/segment_001/world_segment_001.sqlite",
-  "world_revision": 72,
-  "index_watermark": 72,
-  "current_clock": "2026-01-21T23:59:59+00:00",
+  "world_database": "segments/segment_002/world_segment_002.sqlite",
+  "world_revision": 142,
+  "index_watermark": 142,
+  "current_clock": "2026-02-15T23:59:59+00:00",
   "active_goals": ["goal_fe270ba78ff65d35c0da923a"],
-  "completed_wakes_count": 10,
+  "completed_wakes_count": 22,
   "pending_wakes_count": 0,
   "model_identity": "arena_large_model_session",
   "segment_chain": [
@@ -23,6 +23,11 @@
       "segment_id": "segment_001",
       "days": 21,
       "manifest": "segments/segment_001/manifest.json"
+    },
+    {
+      "segment_id": "segment_002",
+      "days": 25,
+      "manifest": "segments/segment_002/manifest.json"
     }
   ]
 }
