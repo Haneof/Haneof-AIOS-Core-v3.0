@@ -12,6 +12,7 @@ from aios_core.runtime.cognitive_runtime import ModelDirective
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.wake import (
+    AttentionSchedulingPolicy,
     AttentionWatchRequest,
     Step0GateInput,
     WakeSignalRequest,
@@ -1174,3 +1175,81 @@ def test_pending_dispatcher_interrupt_bypasses_background_hold(tmp_path):
     assert runtime.wake_bus.current_wake(
         background.wake_id
     ).wake_state.value == "new"
+
+
+
+def test_attention_scheduling_policy_controls_background_window_and_bundle_size(tmp_path):
+    store, index = _world(tmp_path)
+    evidence = Observation(
+        object_id="obs_attention_scheduling_policy",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW),
+        learned_at=NOW,
+        recorded_at=NOW,
+        created_by="attention-scheduling-policy-test",
+        source_kind="system",
+        modality="marker",
+        value={"changed": True},
+        metadata={"dimension": "dim:test"},
+    )
+    store.commit(
+        [evidence],
+        OperationRequest(
+            operation_name="test.seed.attention.scheduling.policy",
+            expected_world_revision=0,
+            reason="seed attention scheduling policy evidence",
+            idempotency_key="seed-attention-scheduling-policy",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index.catch_up()
+
+    model_calls = []
+
+    def model(snapshot):
+        model_calls.append(snapshot.wake_reason)
+        wake = snapshot.cockpit["task_context"]["wake"]
+        assert wake["wake_source"] == "attention_bundle"
+        assert wake["attention_bundle"]["member_count"] == 2
+        return ModelDirective(silence=True)
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+        attention_scheduling_policy=AttentionSchedulingPolicy(
+            background_batch_window_seconds=10,
+            background_bundle_max_wakes=2,
+        ),
+    )
+    ref = ObjectRef(object_id=evidence.object_id, revision=1)
+    for offset, rule_id in (
+        (1, "policy.batch.one"),
+        (2, "policy.batch.two"),
+        (3, "policy.batch.three"),
+    ):
+        runtime.wake_bus.emit(
+            WakeSignalRequest(
+                wake_source=WakeSource.WATCH_MATCH,
+                rule_id=rule_id,
+                observed_at=NOW + timedelta(seconds=offset),
+                evidence_refs=(ref,),
+                dedupe_key=rule_id,
+                attention_class=AttentionClass.BACKGROUND,
+            )
+        )
+
+    assert runtime.dispatch_next_pending_wake(
+        now=NOW + timedelta(seconds=10),
+    ) is None
+    assert model_calls == []
+
+    dispatched = runtime.dispatch_next_pending_wake(
+        now=NOW + timedelta(seconds=11),
+    )
+    assert dispatched is not None
+    assert model_calls == ["attention_bundle"]
+
+    remaining = runtime.wake_bus.pending_wakes()
+    assert len(remaining) == 1
+    assert remaining[0].rule_id == "policy.batch.three"
