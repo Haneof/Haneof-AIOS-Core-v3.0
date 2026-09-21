@@ -14,6 +14,29 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
+## 当前工程断点 — C14-RES-B-001 已完成，等待独立语义评估
+
+最近完成任务：`C14-RES-B-001` — **DONE / RUN COMPLETE / EVIDENCE ACCEPTED FOR EVALUATION**。
+
+- Evaluated main：`9578d990fc47943b69c77b12d126255f6691a6dc`
+- Evidence PR：#79（**保持 open / unmerged**）
+- Exact evidence head：`546449a453e6e6dff3a2eeb2b52e7cf6786927be`
+- Resident-B branch：`arena/01a0c517-haneof-aios-core-v3-0`
+- PM review：`reviews/C14_RES_B_001_PM_ACCEPTANCE_REVIEW_2026-09-21.md`
+- Phase B：cursor 25..36 完成；9 mechanical + 3 canonical USER conversation。
+- Fresh runtime 首个认知 wake 通过正常 `search_timeline(object_types=["claim"])` 找回 A 的 `clm_79df...@2`，随后 inspect。
+- Cursor 26 正常 Runtime 自动将其 rev3 作为 score-10 memory card 带入；Resident 创建的新 Task 的 `reason_refs` 明确包含 Claim rev3。
+- Cursor 31 后续真实 work_outcome 推动该 Claim rev3→rev4；cursor 32 支持性用户反馈保持 rev4。
+- Final World SHA256：`a288fc5d11a1a73006725efdd906a7ab014d4228085c610b4a32f887cfe3d615`
+- Final release-state SHA256：`9281ced5013b45445574698d53ff9a2d57d5308ac5d1221e5db178efcf0c8a4f`
+- PR #79 全部 280 个变更文件只位于 Resident-B evidence run 目录；Core/governance diff 0。
+- `cursor_037/event.json` 为空；未见 future payload 泄露。
+- Bridge 为同步机械桥；未见关键词规则/预期答案/Claim 自动决策/pseudo-LLM。
+- Provenance caveats：底层模型身份未暴露；Resident 环境 Python 3.11.2；仓库证据只能支持“未发现污染证据”，不能数学证明模型绝未读取外部材料。
+- 本 PM 仅接受 B run 完整性与可审计性；**不裁决 C14 semantic PASS**。
+
+当前第一个 READY：`C14-RES-EVAL-001`。必须由新的独立 evaluator 窗口执行，不修 Core。
+
 ## 当前工程断点 — C14-RES-B-FIX-001 已收口
 
 最近完成任务：`C14-RES-B-FIX-001` — **DONE / CANONICAL PHASE-B CONVERSATION RELEASE VERIFIED**。
