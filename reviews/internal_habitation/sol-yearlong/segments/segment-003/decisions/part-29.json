@@ -1,0 +1,23 @@
+{
+  "536767bb097b1067f88a6419e5892fb8f05efd8b0f573d87e00e4a8b5a461c16": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "arguments": {
+          "object_id": "obs_src_6cc6f858c2e5e5c0cb05d1a8",
+          "revision": 1
+        },
+        "call_id": "seg003-jan22-po-1"
+      },
+      {
+        "name": "inspect_world_object",
+        "arguments": {
+          "object_id": "obs_src_a46c3fac2a66319044463248",
+          "revision": 1
+        },
+        "call_id": "seg003-jan22-po-2"
+      }
+    ]
+  }
+}
