@@ -15,7 +15,29 @@
 
 当前审计冻结 main：`e9862103a753be026edf1745c6a5d07fa56c0cf4`。
 
-最近完成任务：`T35-RULE-001` — **DONE / GOVERNANCE CONTRACT ONLY**。
+最近完成任务：`T34-EXEC-001` — **DONE / CORE EXECUTION RACE CLOSED**。
+
+- Started from main：`f8a2f8e4cf53de579bd0bc69cfd85421d109d65b`
+- Final clean sync base：`04f3170f5e09c7ab00ffd4233465560c78dc2423`
+- Reproduction/WIP branch：`fix/t34-exec-001-cancel-authorize-20260921`
+- Final work branch：`fix/t34-exec-001-final-20260921`
+- Pre-fix test-only SHA：`d622958dc286bfae816fd4f2e36d9fb063d8252e`
+- Current-main reproduction：Actions run `35566808198 / SUCCESS`；pre-fix 两个 T34 用例均真实出现 `Failed: DID NOT RAISE <class 'ValueError'>`，marker=`T34_REPRO_RESULT=BUG_REPRODUCED`
+- Candidate：`da14638fc0f8cf14bad6b5315988d7c7db691ac8`
+- PR：#54
+- Squash merge：`48f5e29ad564ef7c1687b5a0d81cede1452e82e8`
+- Exact-candidate Gate：run `35566890602 / SUCCESS`；T34 targeted、P12、fused-turn-runtime、C09、P15、P16 habitation、P16 convergence 全部 GREEN
+- Merge-result Gates：p12-execution-gate `35567021266 / SUCCESS`；p12-execution-world `35567021273 / SUCCESS`；p16-convergence-gate `35567021258 / SUCCESS`
+- Task-board completion metadata commit：`fe802801fd2f23081ef605b489f73ea831b577ef`
+- 修复语义：authorize 前后都要求父 Task 仍为同一 current RUNNING revision；Task CANCELLED 时在同一提交中把仍为 PROPOSED 的子 Action 前向修订为 CANCELLED；历史 Action revision 不删除、不覆写。
+- 竞态语义：final eligibility revalidation 后冻结 `expected_world_revision`；其后的并发 World 写入由 WorldStore `VERSION_CONFLICT` fail closed，不能吸收 Task cancel 后继续生成 dispatch envelope。
+- restart/retry：新 SQLite store reopen 及 pre-T34 已持久化“Task cancelled / Action proposed”坏世界均被拒绝；拒绝发生在 authorizer 调用前且不增加 world revision。
+- normal path：RUNNING Task 的正常 Action authorize 仍通过既有与新增 P12/P16 回归。
+- 当前第一个 READY：`T36-SEARCH-001`。
+- `T35-IMPL-001` 的 T35-RULE + T34 两个 dependency 现已满足，task board 状态为 READY；必须另开窗口执行，本窗口没有进入 T35 实现。
+- `T28-REC-001`、`T33-RECALL-001` 仍为独立 READY；`P16-TRIAGE-001` 继续等待本轮 activated blockers 全部解决。
+
+上一完成任务：`T35-RULE-001` — **DONE / GOVERNANCE CONTRACT ONLY**。
 
 - Started from main：`f8a2f8e4cf53de579bd0bc69cfd85421d109d65b`
 - Governance claim commit：`f83438729b7ef0a0ba58b0c3302e1deb5f4ca6bd`
@@ -29,9 +51,9 @@
 - `TaskType` 不承担外部授权分类；完成证据模式与 TaskType 正交，裁决定义 `WORLD_EVIDENCE / ACTION_OUTCOME / MIXED` 三种 completion contract。
 - assistant raw response、unsupported Claim、Task/Goal 自引用、AI 自述“完成”、synthetic Outcome、循环 OperationExperience、world_revision 单独存在均不得作为完成凭据。
 - 本任务未修改 Runtime/Core/schema/state machine；因此不伪跑无关 Core Gate，只做法源/源码/审计证据复核与 diff-scope 验证。
-- `T35-IMPL-001` 继续 **BLOCKED**，直到 `T34-EXEC-001` 完成；实现必须另开窗口/PR。
+- `T35-IMPL-001` 在 T35-RULE-001 完成当时保持 **BLOCKED**；现 T34-EXEC-001 已完成，实时状态以 task board 的 **READY** 为准，仍必须另开窗口/PR。
 
-上一完成任务：`AUDIT-001` — **DONE / AUDIT ONLY**。
+再上一完成任务：`AUDIT-001` — **DONE / AUDIT ONLY**。
 
 - 证据矩阵：`reviews/AUDIT-001_ISSUE30_CURRENT_MAIN_EVIDENCE_MATRIX_2026-09-21.md`
 - PR #48 / squash merge：`0ecacd8204414fd41e7ebda8e8b4521406154d3f`
@@ -43,9 +65,9 @@
 - T33 / #33：`STILL_OPEN`
 - AUDIT-001 未修改任何 Core/runtime/test 实现。
 - PR #37 仍是旧基线上的历史中央分流证据，不能作为当前 main 的修复证明。
-- 当前第一个 READY：`T34-EXEC-001`。
-- 其他已激活 READY：`T36-SEARCH-001`、`T28-REC-001`、`T33-RECALL-001`。
-- `T35-IMPL-001` 继续 BLOCKED；`T35-RULE-001` 已完成，只剩 `T34-EXEC-001` 前置未满足。
+- 当前第一个 READY：`T36-SEARCH-001`。
+- 其他已激活 READY：`T28-REC-001`、`T35-IMPL-001`、`T33-RECALL-001`。
+- `T35-IMPL-001` 的 `T35-RULE-001` 与 `T34-EXEC-001` 前置均已满足，现为 READY；仍必须独立新窗口执行。
 - `P16-TRIAGE-001` 继续 BLOCKED，直到本轮激活缺陷全部解决。
 
 历史段落继续保留为工程证据。任何下方“当前 blocker=0 / 下一动作 / 唯一 blocker”表述若与本节或 task board 冲突，均视为历史快照，以本节 + task board + 最新 main 为准。
