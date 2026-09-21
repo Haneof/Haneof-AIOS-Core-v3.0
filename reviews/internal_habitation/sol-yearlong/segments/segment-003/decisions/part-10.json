@@ -1,0 +1,24 @@
+{
+  "f2e4c8f0cf841509a8480e5dfad571bace2409e30b705741bec16619c3ebd438": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "search_timeline",
+        "arguments": {
+          "window_start": "2027-01-20T00:00:00Z",
+          "window_end": "2027-01-20T09:10:00Z",
+          "limit": 20
+        },
+        "call_id": "seg003-jan20-today-records"
+      },
+      {
+        "name": "search_world",
+        "arguments": {
+          "query": "牛角包 烤箱 出炉 等待 早高峰 出品",
+          "limit": 8
+        },
+        "call_id": "seg003-jan20-croissant-search"
+      }
+    ]
+  }
+}
