@@ -1,0 +1,11 @@
+{
+  "delivered_external_events": 8,
+  "index_watermark": 172,
+  "last_consumed_external_event_id": "d034-staff-note",
+  "resident_replayed_calls": 12,
+  "simulated_clock": "2027-01-21T08:15:00+00:00",
+  "status": "pending",
+  "summary_replayed_calls": 6,
+  "world_revision": 172,
+  "world_sha256": "ec69d907999b2ec77ac34ccef4e101baf71eac6317328ee569d55572da8f6787"
+}
