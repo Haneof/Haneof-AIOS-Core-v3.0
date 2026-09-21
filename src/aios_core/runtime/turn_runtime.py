@@ -88,6 +88,7 @@ from aios_core.world_graph import (
     RelationUpsertRequest,
 )
 
+from .budget_gate import BackgroundBudgetGate
 from .capabilities import CapabilityKind, CapabilityRegistry, CapabilitySpec
 from .cognitive_runtime import CognitiveRuntime, ModelHandler, RuntimeTurnResult
 
@@ -253,6 +254,10 @@ class FusedTurnRuntime:
         self.attention_router = AttentionRouter(
             store=store,
             wake_bus=self.wake_bus,
+            subject_id=self.subject_id,
+        )
+        self.background_budget_gate = BackgroundBudgetGate(
+            store=store,
             subject_id=self.subject_id,
         )
         self.reality_ingest = RealityIngestService(
@@ -2733,22 +2738,54 @@ class FusedTurnRuntime:
                 "USER_INTERACTION must use run_turn so the user utterance enters the world"
             )
 
-        gate_result = self.wake_bus.evaluate_step0(wake, step0)
+        budget_decision = self.background_budget_gate.evaluate(
+            wake,
+            now=now,
+            max_model_rounds=self.cognitive_runtime.max_tool_rounds + 1,
+        )
+        effective_step0 = step0 or Step0GateInput()
+        if budget_decision.applies:
+            effective_step0 = effective_step0.model_copy(
+                update={
+                    "budget_available": (
+                        effective_step0.budget_available
+                        and budget_decision.available
+                    ),
+                    "reasons": tuple(
+                        dict.fromkeys(
+                            [
+                                *effective_step0.reasons,
+                                *budget_decision.reasons,
+                            ]
+                        )
+                    ),
+                }
+            )
+
+        gate_result = self.wake_bus.evaluate_step0(wake, effective_step0)
         if not gate_result.model_allowed:
-            queued = self.wake_bus.defer(
-                wake.object_id,
-                deferred_at=now,
-                step0=gate_result,
+            terminal = (
+                self.wake_bus.suppress(
+                    wake.object_id,
+                    suppressed_at=now,
+                    step0=gate_result,
+                )
+                if budget_decision.hard_deny
+                else self.wake_bus.defer(
+                    wake.object_id,
+                    deferred_at=now,
+                    step0=gate_result,
+                )
             )
             return WakeDispatchRunResult(
                 wake_ref=ObjectRef(
-                    object_id=queued.wake_id,
-                    revision=queued.revision,
+                    object_id=terminal.wake_id,
+                    revision=terminal.revision,
                 ),
                 runtime=None,
                 context=None,
                 step0=gate_result,
-                wake=queued,
+                wake=terminal,
                 delivery_response=None,
                 delivery_suppressed=True,
             )
@@ -2756,6 +2793,13 @@ class FusedTurnRuntime:
         claimed = self.wake_bus.claim(
             wake.object_id,
             started_at=now,
+            expected_world_revision=(
+                budget_decision.world_revision
+                if budget_decision.requires_reservation
+                and wake.wake_state.value in {"new", "queued"}
+                else None
+            ),
+            metadata_update=budget_decision.reservation_metadata(),
         )
         running = self.wake_bus.current_wake(claimed.wake_id)
         running_ref = ObjectRef(
@@ -2789,6 +2833,7 @@ class FusedTurnRuntime:
                 for item in running.evidence_refs
             ],
             "step0": gate_result.model_dump(mode="json"),
+            "budget": budget_decision.context_payload(),
             "evidence_reader": "inspect_world_object",
             "attention_bundle": (
                 running.metadata.get("attention_bundle")
@@ -2826,6 +2871,7 @@ class FusedTurnRuntime:
                 wake_input,
                 wake_reason=running.wake_source.value,
                 cockpit=context.as_cockpit(),
+                max_model_rounds=budget_decision.model_round_limit,
             )
         finally:
             self._active_turn_time = None
