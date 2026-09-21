@@ -26,6 +26,9 @@ class ModelUsage:
     total_tokens: int
     input_tokens: int | None = None
     output_tokens: int | None = None
+    provider: str | None = None
+    model: str | None = None
+    request_id: str | None = None
 
     def __post_init__(self) -> None:
         for field_name in ("total_tokens", "input_tokens", "output_tokens"):
@@ -42,6 +45,10 @@ class ModelUsage:
             raise ValueError(
                 "total_tokens must cover reported input_tokens + output_tokens"
             )
+        for field_name in ("provider", "model", "request_id"):
+            value = getattr(self, field_name)
+            if value is not None and (not isinstance(value, str) or not value.strip()):
+                raise ValueError(f"{field_name} must be non-blank when provided")
 
 
 @dataclass(frozen=True)
@@ -90,6 +97,7 @@ class RuntimeTurnResult:
 
 
 ModelHandler = Callable[[RuntimeSnapshot], ModelDirective]
+ModelUsageRecorder = Callable[[RuntimeSnapshot, ModelUsage | None], None]
 SideEffectAuthorizer = Callable[[CapabilitySpec, CapabilityCall, RuntimeSnapshot], bool]
 
 
@@ -105,6 +113,7 @@ class CognitiveRuntime:
         max_total_capability_calls: int = 12,
         repeated_call_limit: int = 2,
         side_effect_authorizer: SideEffectAuthorizer | None = None,
+        model_usage_recorder: ModelUsageRecorder | None = None,
     ) -> None:
         if max_tool_rounds < 0:
             raise ValueError("max_tool_rounds must be >= 0")
@@ -118,6 +127,7 @@ class CognitiveRuntime:
         self.max_total_capability_calls = max_total_capability_calls
         self.repeated_call_limit = repeated_call_limit
         self.side_effect_authorizer = side_effect_authorizer
+        self.model_usage_recorder = model_usage_recorder
 
     def _snapshot(
         self,
@@ -217,6 +227,11 @@ class CognitiveRuntime:
                 model_usage_complete = False
             else:
                 model_usages.append(directive.usage)
+            if self.model_usage_recorder is not None:
+                # Meter immediately after the provider/model returns. This intentionally
+                # happens before tool execution or Wake completion so a later crash
+                # cannot erase an already-consumed model call.
+                self.model_usage_recorder(snapshot, directive.usage)
 
             if directive.response is not None:
                 return _result(
