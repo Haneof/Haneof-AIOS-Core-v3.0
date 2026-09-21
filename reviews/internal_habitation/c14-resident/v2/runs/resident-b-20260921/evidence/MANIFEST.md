@@ -123,7 +123,9 @@ Run date: 2026-09-21 (UTC, wall clock) / simulated life span 2026-10-23T07:08 �
 **PHASE_B_COMPLETE / AWAITING_INDEPENDENT_EVALUATION**
 （不判断 C14 是否 PASS；语义裁决属于 C14-RES-EVAL-001）
 
-## 10. Git 状态（2026-09-21 运行结束时）
+## 10. Git 状态（2026-09-21 handoff 完成）
 
-- 本地 commit：`de25b7c`（branch `arena/01a0c517-haneof-aios-core-v3-0`，基于 main `9578d99`）
-- push / evidence PR：**未完成**——sandbox 内 GitHub token 失效（`gh auth status`: authentication failed）。evidence 已完整保存在本分支 commit 中；GitHub 重连后重试 `git push origin arena/01a0c517-haneof-aios-core-v3-0` 即可。不合并任何 evidence PR；C14-RES-B-001 保持 READY/未写 DONE。
+- evidence commit：`fafadfc`（branch `arena/01a0c517-haneof-aios-core-v3-0`，基于 main `9578d99`，已推送 origin）
+- evidence PR：**#79**（OPEN，不合并）https://github.com/Haneof/Haneof-AIOS-Core-v3.0/pull/79
+- 过程备注：运行结束时 sandbox GitHub token 一度失效（push 阻塞）；GitHub 重连后于同日完成 push 与 PR 创建。
+- 未合并任何 evidence PR；C14-RES-B-001 未写 DONE；未启动 C14-RES-EVAL-001。
