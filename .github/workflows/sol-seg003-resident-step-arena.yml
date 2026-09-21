@@ -1,21 +1,21 @@
 name: sol-seg003-resident-step-arena
 
 # Mechanical Segment 003 Resident step runner, executed on the Arena session
-# branch so that the session-side Resident can read back only the *current*
-# pending RuntimeSnapshot / Summary request.
+# branch so the session-side Resident can read back only the *current* pending
+# RuntimeSnapshot / Summary request.
 #
-# Continuity guarantees kept identical to the canonical runner:
+# Continuity guarantees are identical to the canonical runner:
 #   - same frozen Segment 002 source World artifact (SHA-256 pinned)
 #   - same sealed Segment 003 Life Director package (SHA-256 pinned)
-#   - same canonical harness/runtime code revision (checked out from the
-#     canonical Resident branch, read-only usage)
-#   - same bridge source and same CLI contract
-# The only difference is where the Resident decision fragments are read from
-# and where the sanitized pending envelope is published (the Arena branch).
+#   - same canonical harness/runtime code revision (checked out read-only from
+#     the canonical Resident branch)
+#   - same bridge source and CLI contract
+# The only differences are where Resident decision fragments are read from and
+# where the sanitized pending envelope is published.
 #
 # This workflow performs no semantic Resident decision. It merges decision
-# fragments, replays them, advances the World, and prints only the current
-# pending checkpoint.
+# fragments, replays them, advances the World over already-released events and
+# prints only the current pending checkpoint.
 
 on:
   push:
@@ -189,130 +189,104 @@ jobs:
                   continue
               if capturing or line.startswith(("SEG003_", "RESTORE_OK", "segment003_decisions=")):
                   kept.append(line)
-          if not any(l.endswith("_PENDING_BEGIN") for l in kept):
+          if not any(line.endswith("_PENDING_BEGIN") for line in kept):
               kept.append("### tail of runner stdout ###")
               kept.extend(lines[-40:])
           Path("artifacts/segment-003/sanitized.txt").write_text("\n".join(kept) + "\n", encoding="utf-8")
           print(f"sanitized_lines={len(kept)}")
           PY
 
+      - name: Emit current pending checkpoint as readable annotations
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -uo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          def escape(text: str) -> str:
+              return text.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+
+          def emit(title: str, text: str) -> None:
+              chunk = 24000
+              pieces = [text[i : i + chunk] for i in range(0, len(text), chunk)] or [""]
+              for index, piece in enumerate(pieces, start=1):
+                  suffix = "" if len(pieces) == 1 else f"-{index}of{len(pieces)}"
+                  print(f"::warning title={title}{suffix}::{escape(piece)}")
+              print(f"{title}: emitted {len(pieces)} annotation chunk(s), {len(text)} chars")
+
+          for name in ("sanitized.txt", "state.json", "bridge-exit-code.txt"):
+              path = Path("artifacts/segment-003") / name
+              text = path.read_text(encoding="utf-8", errors="replace") if path.exists() else "(missing)"
+              emit(f"seg003-{name.replace('.', '-')}", text)
+          PY
+
       - name: Publish pending checkpoint to the Arena session branch
         if: always()
+        continue-on-error: true
         shell: bash
         env:
           RUN_DIR: reviews/internal_habitation/sol-yearlong/segments/segment-003/runner/${{ github.run_id }}
         run: |
           set -uo pipefail
+          fail() {
+            echo "::error title=seg003-publish::${1}"
+            exit 0
+          }
           rm -rf /tmp/pub
           mkdir -p "/tmp/pub/${RUN_DIR}"
-          for f in state.json snapshot.json stdout.txt sanitized.txt bridge-exit-code.txt world.sha256; do
-            if [ -f "artifacts/segment-003/$f" ]; then
-              cp "artifacts/segment-003/$f" "/tmp/pub/${RUN_DIR}/$f"
-            fi
+          for f in state.json snapshot.json stdout.txt sanitized.txt bridge-exit-code.txt; do
+            [ -f "artifacts/segment-003/$f" ] && cp "artifacts/segment-003/$f" "/tmp/pub/${RUN_DIR}/$f"
           done
-          python - <<'PY'
+          python3 - "${RUN_DIR}" <<'PY'
           import json
           import os
+          import sys
           from pathlib import Path
 
-          state_path = Path("artifacts/segment-003/state.json")
-          state = json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else {"status": "runner-did-not-write-state"}
+          run_dir = sys.argv[1]
+          state_file = Path("artifacts/segment-003/state.json")
+          state = json.loads(state_file.read_text(encoding="utf-8")) if state_file.exists() else {"status": "missing"}
           meta = {
               "schema": "aios.p16.segment003.session-step.v1",
-              "run_id": os.environ["GITHUB_RUN_ID"],
-              "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
-              "canonical_ref": os.environ["CANONICAL_REF"],
-              "arena_ref": os.environ["ARENA_REF"],
-              "canonical_head_sha": os.environ["GITHUB_SHA"],
-              "source_world_sha256": os.environ["SOURCE_WORLD_SHA"],
-              "hidden_fixture_sha256": os.environ["HIDDEN_FIXTURE_SHA"],
+              "run_id": os.environ.get("GITHUB_RUN_ID"),
+              "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+              "canonical_ref": os.environ.get("CANONICAL_REF"),
+              "arena_ref": os.environ.get("ARENA_REF"),
+              "canonical_head_sha": os.environ.get("GITHUB_SHA"),
+              "source_world_sha256": os.environ.get("SOURCE_WORLD_SHA"),
+              "hidden_fixture_sha256": os.environ.get("HIDDEN_FIXTURE_SHA"),
               "state": state,
               "runner_boundary": (
                   "Mechanical runner only: restores the pinned World, replays recorded Resident "
-                  "decisions, advances simulated time over already-released events, and prints only "
-                  "the current pending RuntimeSnapshot/Summary request. No semantic decision is made here."
+                  "decisions, advances simulated time over already-released events, and prints only the "
+                  "current pending RuntimeSnapshot/Summary request. No semantic decision is made here."
               ),
           }
-          out = Path("/tmp/pub") / os.environ.get("RUN_DIR", "") / "meta.json"
-          out.parent.mkdir(parents=True, exist_ok=True)
-          out.write_text(json.dumps(meta, ensure_ascii=False, sort_keys=True, indent=2) + "\n", encoding="utf-8")
-          print(f"published_files={sorted(p.name for p in out.parent.iterdir())}")
+          target = Path("/tmp/pub") / run_dir / "meta.json"
+          target.parent.mkdir(parents=True, exist_ok=True)
+          target.write_text(json.dumps(meta, ensure_ascii=False, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+          print("meta written")
           PY
-
-          cd /tmp/pub
-          git init -q .
-          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          cd /tmp/pub || fail "no /tmp/pub"
+          git init -q . || fail "git init failed"
+          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git" || fail "remote add failed"
           git config http.extraheader "AUTHORIZATION: bearer ${GITHUB_TOKEN}"
           git config user.name "arena-agent"
           git config user.email "arena-agent@users.noreply.github.com"
-          if ! git fetch -q --depth 1 origin "$ARENA_REF" 2>/tmp/pub/fetch.err; then
-            echo "::error title=seg003-publish-fetch::$(head -c 300 /tmp/pub/fetch.err | tr '\n' ' ')"
+          if ! git fetch -q --depth 1 origin "$ARENA_REF" 2>/tmp/pub-err.txt; then
+            fail "fetch failed: $(head -c 500 /tmp/pub-err.txt | tr '\n' ' ' | tr '%' '#')"
           fi
-          git checkout -q -b arena-publish FETCH_HEAD || git checkout -q -b arena-publish "$(git rev-parse FETCH_HEAD)"
-          git add -A "$RUN_DIR"
-          git commit -q -m "seg003 resident step ${GITHUB_RUN_ID}: current pending checkpoint" || echo "no staged change"
-          if git push -q origin "HEAD:${ARENA_REF}" 2>/tmp/pub/push.err; then
-            echo "seg003_publish=push_ok"
+          git checkout -q -b arena-publish FETCH_HEAD || fail "checkout failed"
+          git add -A "$RUN_DIR" || fail "add failed"
+          if git diff --cached --quiet; then
+            echo "nothing staged"
           else
-            echo "seg003_publish=push_failed"
-            echo "::error title=seg003-publish-push::$(head -c 300 /tmp/pub/push.err | tr '\n' ' ')"
-            python - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-          import urllib.request
-
-          repo = os.environ["GITHUB_REPOSITORY"]
-          token = os.environ["GITHUB_TOKEN"]
-
-          def call(path: str, method: str = "GET", data=None):
-              body = None if data is None else json.dumps(data).encode("utf-8")
-              request = urllib.request.Request(
-                  f"https://api.github.com/repos/{repo}{path}",
-                  method=method,
-                  data=body,
-                  headers={
-                      "Authorization": f"Bearer {token}",
-                      "Accept": "application/vnd.github+json",
-                      "User-Agent": os.environ.get("GITHUB_RUN_ID", "seg003"),
-                  },
-              )
-              with urllib.request.urlopen(request) as response:
-                  return json.load(response)
-
-          title = "p16-sol-seg003-resident-channel"
-          number = None
-          try:
-              for issue in call("/issues?state=all&per_page=100"):
-                  if issue.get("title") == title:
-                      number = issue["number"]
-                      break
-              if number is None:
-                  number = call(
-                      "/issues",
-                      "POST",
-                      {
-                          "title": title,
-                          "body": (
-                              "Mechanical fallback channel for the Segment 003 Resident step runner. "
-                              "Comments contain only the current pending RuntimeSnapshot envelope that "
-                              "the runner already printed for the Resident; no future fixture content."
-                          ),
-                      },
-                  )["number"]
-              text = ""
-              sanitized = Path(
-                  "artifacts/segment-003/sanitized.txt"
-              )
-              if sanitized.exists():
-                  text = sanitized.read_text(encoding="utf-8", errors="replace")
-              call(
-                  f"/issues/{number}/comments",
-                  "POST",
-                  {"body": "run " + os.environ["GITHUB_RUN_ID"] + "\n\n```\n" + text[:60000] + "\n```"},
-              )
-              print(f"seg003_publish=issue_comment_ok issue={number}")
-          except Exception as exc:  # noqa: BLE001
-              print(f"seg003_publish=issue_comment_failed {exc}")
-          PY
+            git commit -q -m "seg003 resident step ${GITHUB_RUN_ID}: current pending checkpoint" || fail "commit failed"
+            if git push -q origin "HEAD:${ARENA_REF}" 2>/tmp/push-err.txt; then
+              echo "seg003_publish=push_ok"
+            else
+              fail "push failed: $(head -c 500 /tmp/push-err.txt | tr '\n' ' ' | tr '%' '#')"
+            fi
           fi
