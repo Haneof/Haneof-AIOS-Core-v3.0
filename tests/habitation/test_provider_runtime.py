@@ -177,8 +177,12 @@ def test_openai_responses_tool_loop_and_provenance() -> None:
     assert first.usage is not None
     assert first.usage.total_tokens == 28
     assert first.usage.provider == "openai"
-    assert first.usage.model == "test-openai"
+    assert first.usage.model == "test-model"
     assert first.usage.request_id == "resp_1"
+    assert first.provenance is not None
+    assert first.provenance.provider == "openai"
+    assert first.provenance.model == "test-model"
+    assert first.provenance.request_id == "resp_1"
     assert first.capability_calls[0].arguments["query"] == "Seattle"
 
     result = CapabilityResult(
@@ -246,6 +250,10 @@ def test_anthropic_messages_tool_loop_round_trips_tool_result() -> None:
     assert first.usage.provider == "anthropic"
     assert first.usage.model == "test-claude"
     assert first.usage.request_id == "msg_1"
+    assert first.provenance is not None
+    assert first.provenance.provider == "anthropic"
+    assert first.provenance.model == "test-claude"
+    assert first.provenance.request_id == "msg_1"
 
     result = CapabilityResult(
         name="search_world",
@@ -312,6 +320,10 @@ def test_gemini_interactions_tool_loop_uses_previous_interaction() -> None:
     assert first.usage.provider == "gemini"
     assert first.usage.model == "test-gemini"
     assert first.usage.request_id == "interaction_1"
+    assert first.provenance is not None
+    assert first.provenance.provider == "gemini"
+    assert first.provenance.model == "test-gemini"
+    assert first.provenance.request_id == "interaction_1"
 
     result = CapabilityResult(
         name="search_world",
@@ -329,6 +341,69 @@ def test_gemini_interactions_tool_loop_uses_previous_interaction() -> None:
     assert continuation["input"][0]["type"] == "function_result"
     assert continuation["input"][0]["call_id"] == "fc_1"
     assert transport.calls[0]["headers"]["x-goog-api-key"] == "secret-gemini-test-key"
+
+
+
+
+
+@pytest.mark.parametrize(
+    ("provider", "model", "response", "response_id"),
+    (
+        (
+            "openai",
+            "no-usage-openai",
+            {
+                "id": "resp_no_usage",
+                "output": [
+                    {
+                        "type": "message",
+                        "content": [{"type": "output_text", "text": "done"}],
+                    }
+                ],
+            },
+            "resp_no_usage",
+        ),
+        (
+            "anthropic",
+            "no-usage-claude",
+            {
+                "id": "msg_no_usage",
+                "stop_reason": "end_turn",
+                "content": [{"type": "text", "text": "done"}],
+            },
+            "msg_no_usage",
+        ),
+        (
+            "gemini",
+            "no-usage-gemini",
+            {
+                "id": "interaction_no_usage",
+                "steps": [],
+                "output_text": "done",
+            },
+            "interaction_no_usage",
+        ),
+    ),
+)
+def test_provider_response_keeps_auditable_identity_when_usage_is_unknown(
+    provider,
+    model,
+    response,
+    response_id,
+) -> None:
+    client = ProviderClient(
+        ProviderConfig(provider=provider, model=model),
+        transport=FakeTransport([response]),
+        api_key="secret-test-key",
+    )
+    directive = ProviderResidentHandler(client)(_snapshot(0))
+
+    assert directive.response == "done"
+    assert directive.usage is None
+    assert directive.provenance is not None
+    assert directive.provenance.provider == provider
+    assert directive.provenance.model == model
+    assert directive.provenance.request_id == response_id
 
 
 def test_provider_round_summary_uses_same_secret_safe_provenance() -> None:
