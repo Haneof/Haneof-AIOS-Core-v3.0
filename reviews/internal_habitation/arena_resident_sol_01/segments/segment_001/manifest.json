@@ -1,0 +1,26 @@
+{
+  "run_id": "arena_resident_sol_01",
+  "segment_id": "segment_001",
+  "tested_main_sha": "142533df9123d793edde9ec4f07405182d56af0d",
+  "model_id": "resident:arena_reviewer_sol",
+  "subject_id": "user_lin_jiang",
+  "simulated_start": "2026-01-01T08:00:00+00:00",
+  "simulated_end": "2026-01-21T23:59:59+00:00",
+  "simulated_days": 21,
+  "total_observable_events": 23,
+  "cognition_checkpoints": 28,
+  "world_revision": 72,
+  "index_watermark": 72,
+  "object_counts": {
+    "claim": 3,
+    "cognitive_policy": 1,
+    "communication_experience": 1,
+    "dependency": 11,
+    "evidence_set": 5,
+    "goal": 1,
+    "observation": 34,
+    "wake": 10
+  },
+  "db_path": "world_segment_001.sqlite",
+  "trace_file": "cognition_traces.jsonl"
+}
