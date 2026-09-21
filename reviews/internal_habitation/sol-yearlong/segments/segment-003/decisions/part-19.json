@@ -1,0 +1,28 @@
+{
+  "ff3a55bf2fca013dd64f45876d3fa4ea8ef0f73e04e6b8985779f5b7133e65a2": {
+    "calls": [
+      {
+        "arguments": {
+          "confidence": 0.9,
+          "dimension": "dim:production_log",
+          "event_time": {
+            "end": "2027-01-21T06:42:00Z",
+            "precision": "minute",
+            "start": "2027-01-21T06:10:00Z"
+          },
+          "evidence_refs": [
+            {
+              "object_id": "obs_src_facf2b040e0feb3a89b935f2",
+              "revision": 1
+            }
+          ],
+          "interpretation": "小赵车间记录：06:10–06:42 醒发架满载，两盘面团在推车上等待空位，06:42 后恢复周转。这是逐日观察记录到的又一个实际等候点，位于成型与烘烤之前的上游环节；作为连续观察的一部分登记，不据此断言任何永久原因。",
+          "title": "2027-01-21 早高峰醒发架满载致面团等待空位约32分钟"
+        },
+        "call_id": "seg003-010",
+        "name": "form_event"
+      }
+    ],
+    "kind": "capability_calls"
+  }
+}
