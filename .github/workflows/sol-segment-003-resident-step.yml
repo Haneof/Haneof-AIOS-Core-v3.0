@@ -151,32 +151,50 @@ jobs:
           print(f"resident_step_world_revision={state['world_revision']}")
           PY
 
+      - name: Debug artifacts
+        if: always()
+        shell: bash
+        run: |
+          ls -lh artifacts/segment-003/ || true
+          cat artifacts/segment-003/state.json || true
+          cat artifacts/segment-003/bridge-exit-code.txt || true
+          echo "---stdout tail---"
+          tail -n 200 artifacts/segment-003/stdout.txt || true
+
       - name: Commit pending snapshot for local Resident (bypass blob)
         if: always()
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p reviews/internal_habitation/sol-yearlong/segments/segment-003
+          echo "Checking for pending in stdout.txt"
+          ls -lh artifacts/segment-003/stdout.txt || true
           if grep -q "MANUAL_RESIDENT_PENDING_BEGIN" artifacts/segment-003/stdout.txt; then
             echo "Found MANUAL_RESIDENT_PENDING"
             awk '/MANUAL_RESIDENT_PENDING_BEGIN/{flag=1;next}/MANUAL_RESIDENT_PENDING_END/{flag=0}flag' artifacts/segment-003/stdout.txt > /tmp/pending.json
             cp /tmp/pending.json reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_snapshot.json
             echo "Pending snapshot saved"
-            cat /tmp/pending.json | head -100
+            wc -l /tmp/pending.json
+          else
+            echo "No MANUAL_RESIDENT_PENDING found"
           fi
           if grep -q "MANUAL_SUMMARY_PENDING_BEGIN" artifacts/segment-003/stdout.txt; then
             echo "Found MANUAL_SUMMARY_PENDING"
             awk '/MANUAL_SUMMARY_PENDING_BEGIN/{flag=1;next}/MANUAL_SUMMARY_PENDING_END/{flag=0}flag' artifacts/segment-003/stdout.txt > /tmp/pending_summary.json
             cp /tmp/pending_summary.json reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_summary.json
             echo "Pending summary saved"
-            cat /tmp/pending_summary.json | head -100
+          else
+            echo "No MANUAL_SUMMARY_PENDING found"
           fi
-          cp artifacts/segment-003/state.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_state.json || true
-          cp artifacts/segment-003/stdout.txt reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_stdout.txt || true
-          cp artifacts/segment-003/world.sha256 reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_world.sha256 || true
+          cp artifacts/segment-003/state.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_state.json || echo "no state.json"
+          cp artifacts/segment-003/stdout.txt reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_stdout.txt || echo "no stdout.txt"
+          cp artifacts/segment-003/world.sha256 reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_world.sha256 || echo "no world.sha256"
+          cp artifacts/segment-003/merged-decisions.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_merged_decisions.json || echo "no merged"
+          ls -lh reviews/internal_habitation/sol-yearlong/segments/segment-003/
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_snapshot.json reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_summary.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_state.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_stdout.txt reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_world.sha256 || true
+          git add reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_snapshot.json reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_summary.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_state.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_stdout.txt reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_world.sha256 reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_merged_decisions.json || true
+          git status
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
@@ -189,7 +207,16 @@ jobs:
               fi
               echo "Push failed, rebasing"
               git fetch origin arena/sol-yearlong-resident-20260921
-              git rebase origin/arena/sol-yearlong-resident-20260921 || git rebase --abort && git reset --hard origin/arena/sol-yearlong-resident-20260921 && cp /tmp/pending.json reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_snapshot.json 2>/dev/null || true; cp /tmp/pending_summary.json reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_summary.json 2>/dev/null || true; cp artifacts/segment-003/state.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_state.json 2>/dev/null || true; cp artifacts/segment-003/stdout.txt reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_stdout.txt 2>/dev/null || true; git add reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_snapshot.json reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_summary.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_state.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_stdout.txt reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_world.sha256 2>/dev/null || true; git commit -m "chore(sol-003): expose pending snapshot retry $i (run ${{ github.run_id }})" 2>/dev/null || true
+              git rebase origin/arena/sol-yearlong-resident-20260921 || (git rebase --abort; git reset --hard origin/arena/sol-yearlong-resident-20260921)
+              mkdir -p reviews/internal_habitation/sol-yearlong/segments/segment-003
+              cp /tmp/pending.json reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_snapshot.json 2>/dev/null || true
+              cp /tmp/pending_summary.json reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_summary.json 2>/dev/null || true
+              cp artifacts/segment-003/state.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_state.json 2>/dev/null || true
+              cp artifacts/segment-003/stdout.txt reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_stdout.txt 2>/dev/null || true
+              cp artifacts/segment-003/world.sha256 reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_world.sha256 2>/dev/null || true
+              cp artifacts/segment-003/merged-decisions.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_merged_decisions.json 2>/dev/null || true
+              git add reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_snapshot.json reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_summary.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_state.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_stdout.txt reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_world.sha256 reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_merged_decisions.json 2>/dev/null || true
+              git commit -m "chore(sol-003): expose pending snapshot retry $i (run ${{ github.run_id }})" 2>/dev/null || true
               sleep 2
             done
           fi
