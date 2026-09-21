@@ -477,7 +477,14 @@ def test_periodic_review_budget_defers_then_resumes_same_anchors(tmp_path):
         model_calls.append(snapshot.wake_reason)
         review = snapshot.cockpit["task_context"]["periodic_review"]
         assert review["budget"]["available"] is True
-        return ModelDirective(silence=True)
+        return ModelDirective(
+            silence=True,
+            usage=ModelUsage(
+                input_tokens=31,
+                output_tokens=13,
+                total_tokens=44,
+            ),
+        )
 
     runtime = FusedTurnRuntime(
         store=store,
@@ -530,6 +537,18 @@ def test_periodic_review_budget_defers_then_resumes_same_anchors(tmp_path):
     )
     assert resumed_anchor_refs == queued_anchor_refs
     assert model_calls == ["periodic_review"]
+
+    completed_payload = store.get_payload(
+        resumed.wake.wake_id,
+        revision=resumed.wake.revision,
+    )
+    assert completed_payload["metadata"]["model_usage_complete"] is True
+    assert completed_payload["metadata"]["model_total_tokens"] == 44
+    status = runtime.background_budget_gate.status(
+        now=NOW + timedelta(hours=28),
+    )
+    assert status["used_tokens"] == 44
+    assert status["token_usage_available"] is True
 
 
 def test_periodic_review_requires_full_model_round_budget(tmp_path):
