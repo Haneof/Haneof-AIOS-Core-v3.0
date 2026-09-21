@@ -1,48 +1,48 @@
 {
-  "decision_key": "1636a70564a273a4c2cf19de007473e9062533fe2eaf08c8448df09f3fe1adfe",
+  "decision_key": "42a7047fbc2aadb856eb4d4ab6ea2e03e81648bf98778178a47e4b45da6ae0f2",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-summary.pending.v1",
   "simulated_clock": "2027-01-24T20:15:00+00:00",
   "summary_request": {
     "request": {
-      "dimension": "dim:staff_note",
+      "dimension": "dim:staff_schedule",
       "granularity": "week",
-      "source_world_revision": 205,
+      "source_world_revision": 206,
       "sources": [
         {
           "metadata": {
-            "dimension": "dim:staff_note",
+            "dimension": "dim:staff_schedule",
             "summary_kind": "single_dimension_temporal"
           },
-          "object_id": "sum_a7f5e2f18b9c8ebddcb9c6cd",
+          "object_id": "sum_2699cc4606d12dfb79f7e4dd",
           "object_type": "summary",
-          "occurred_at": "2027-01-21T00:00:00Z",
+          "occurred_at": "2027-01-23T00:00:00Z",
           "revision": 1,
-          "text": "2027-01-21小赵的员工记录：6:10—6:42醒发架满，两盘面团在推车上等空位，6:42后恢复周转。此为当日具体时段的记录，未给出两盘面团各自等候时长或对最终出品时间的影响，不能据此认定长期瓶颈。"
+          "text": "2027-01-23的排班记录显示：小赵2027-01-24班次为12:30—21:00，备注已确认负责晚间收尾。该记录确认职责安排，不代表该班次或收尾工作已实际完成。"
         },
         {
           "metadata": {
-            "adapter_id": "habitation.staff_note.v1",
-            "dimension": "dim:staff_note",
-            "external_record_id": "d034-staff-note",
+            "adapter_id": "habitation.staff_schedule.v1",
+            "dimension": "dim:staff_schedule",
+            "external_record_id": "d041-staff-schedule",
             "external_revision": "1",
             "mechanical_ingest": true,
-            "occurred_at_original": "2027-01-21T06:55:00+00:00",
+            "occurred_at_original": "2027-01-23T12:00:00+00:00",
             "provenance": {
               "habitation_resident_metadata": {
-                "source": "staff_notes"
+                "source": "staff_schedule_app"
               },
               "model_id_not_part_of_fact": true
             },
             "source_class": "user",
-            "source_digest": "fceb3f69e4af759ba89778ad275f393693825636b7c172b1e2f91b05e6ddb700",
+            "source_digest": "216721959fdc6bcfc23cbe021472444c914b0dc5574588f0ba44a6fe9c74ca13",
             "source_schema_version": "1"
           },
-          "object_id": "obs_src_facf2b040e0feb3a89b935f2",
+          "object_id": "obs_src_b06cc41ee7cc41bf8c27a8b4",
           "object_type": "observation",
-          "occurred_at": "2027-01-21T06:55:00Z",
+          "occurred_at": "2027-01-23T12:00:00Z",
           "revision": 1,
-          "text": "小赵记录：06:10到06:42醒发架满，两盘面团在推车上等待空位；06:42后恢复周转。"
+          "text": "{\"date\": \"2027-01-24\", \"employee\": \"小赵\", \"note\": \"已确认负责晚间收尾\", \"shift_end\": \"21:00\", \"shift_start\": \"12:30\"}"
         }
       ],
       "truncated": false,
@@ -51,5 +51,5 @@
     },
     "summary_request_type": "DimensionSummaryInput"
   },
-  "world_revision_before": 205
+  "world_revision_before": 206
 }
