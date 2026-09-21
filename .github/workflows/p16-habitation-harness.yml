@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - "main"
-      - "arena/c13-metering-ledger-20260921"
       - "parallel/p16-habitation-harness-*"
     paths:
       - "tests/habitation/**"
