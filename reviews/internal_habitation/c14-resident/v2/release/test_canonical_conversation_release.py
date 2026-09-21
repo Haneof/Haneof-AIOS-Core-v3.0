@@ -15,7 +15,7 @@ from aios_core.contracts.enums import ObjectType, SourceClass
 from aios_core.contracts.models import Observation
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.time import TemporalExtent
-from aios_core.ingest import ConversationIngestor
+from aios_core.ingest import ConversationIngestor, INTERACTION_DIMENSION
 from aios_core.query.search import WorldSearchIndex
 from aios_core.runtime.cognitive_runtime import ModelDirective
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
@@ -370,7 +370,7 @@ class CanonicalConversationReleaseTests(unittest.TestCase):
             modality="text",
             value=event["resident_visible_payload"] if text is None else text,
             metadata={
-                "dimension": "dim:interaction",
+                "dimension": INTERACTION_DIMENSION,
                 "session_id": session_id,
                 "turn_index": turn_index,
                 "turn_key": f"bfix-{object_id}",
