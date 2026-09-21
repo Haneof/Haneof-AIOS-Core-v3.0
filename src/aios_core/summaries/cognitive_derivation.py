@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 from pydantic import ValidationError
 
@@ -41,6 +41,7 @@ class DerivedLineageClass(StrEnum):
 class DerivedLineageView:
     classification: DerivedLineageClass
     leaf_refs: tuple[ObjectRef, ...]
+    grounding_leaf_refs: tuple[ObjectRef, ...]
     unresolved_refs: tuple[ObjectRef, ...]
     issues: tuple[str, ...]
     has_reality: bool
@@ -51,6 +52,9 @@ class DerivedLineageView:
         return {
             "classification": self.classification.value,
             "leaf_refs": [ref.model_dump(mode="json") for ref in self.leaf_refs],
+            "grounding_leaf_refs": [
+                ref.model_dump(mode="json") for ref in self.grounding_leaf_refs
+            ],
             "unresolved_refs": [
                 ref.model_dump(mode="json") for ref in self.unresolved_refs
             ],
@@ -79,6 +83,7 @@ class CognitiveDerivationReconcileResult:
 @dataclass(slots=True)
 class _TraversalState:
     leaves: dict[tuple[str, int], ObjectRef]
+    grounding_leaves: dict[tuple[str, int], ObjectRef]
     unresolved: dict[tuple[str, int | None], ObjectRef]
     issues: set[str]
     has_reality: bool = False
@@ -107,6 +112,10 @@ _SUPPORT_DEPENDENCY_TYPES = frozenset(
         "action_evidence_set_contains_source",
         "outcome_reports_action",
         "outcome_uses_evidence",
+        "operation_experience_uses_case",
+        "communication_experience_feedback_evidence",
+        "communication_experience_counterexample",
+        "communication_experience_follows_action",
     }
 )
 
@@ -116,6 +125,27 @@ _REALITY_SOURCE_CLASSES = frozenset(
         SourceClass.SENSOR,
         SourceClass.PLATFORM,
         SourceClass.SAFETY,
+    }
+)
+
+# These objects carry provenance without themselves asserting a new semantic fact.
+# They therefore do not break the path to a qualifying non-Summary leaf.
+_TRANSPARENT_GROUNDING_CONTAINERS = frozenset(
+    {
+        ObjectType.SUMMARY,
+        ObjectType.EVIDENCE_SET,
+        ObjectType.DEPENDENCY,
+        ObjectType.WAKE,
+    }
+)
+
+# AI-authored experience objects may summarize a real case. Their exact dependency
+# lineage is followed so the real Outcome/user/world feedback, not the experience
+# prose, is what can close grounding.
+_CASE_GROUNDING_CONTAINERS = frozenset(
+    {
+        ObjectType.OPERATION_EXPERIENCE,
+        ObjectType.COMMUNICATION_EXPERIENCE,
     }
 )
 
@@ -147,12 +177,20 @@ class CognitiveDerivationScheduler:
         index: WorldSearchIndex | None = None,
         wake_bus: WakeBus | None = None,
         subject_id: str = "user_1",
+        allowed_subject_ids: Sequence[str] | None = None,
     ) -> None:
         if not isinstance(subject_id, str) or not subject_id.strip():
             raise ValueError("subject_id must not be blank")
         self.store = store
         self.index = index
         self.subject_id = subject_id.strip()
+        allowed_subjects = {self.subject_id}
+        allowed_subjects.update(
+            str(item).strip()
+            for item in (allowed_subject_ids or ())
+            if str(item).strip()
+        )
+        self.allowed_subject_ids = frozenset(allowed_subjects)
         self.wake_bus = wake_bus or WakeBus(
             store=store,
             index=index,
@@ -163,8 +201,9 @@ class CognitiveDerivationScheduler:
         grouped: dict[tuple[str, int], list[ObjectRef]] = {}
         for payload in self.store.list_payloads(
             object_type=ObjectType.DEPENDENCY,
-            subject_id=self.subject_id,
         ):
+            if str(payload.get("subject_id") or "") not in self.allowed_subject_ids:
+                continue
             try:
                 dep = Dependency.model_validate(payload)
             except (ValidationError, TypeError, ValueError):
@@ -197,12 +236,17 @@ class CognitiveDerivationScheduler:
         state: _TraversalState,
         ref: ObjectRef,
         source_class: SourceClass,
+        *,
+        grounding_blocked: bool,
     ) -> None:
         if ref.revision is None:
             return
-        state.leaves[(ref.object_id, ref.revision)] = ref
+        key = (ref.object_id, ref.revision)
+        state.leaves[key] = ref
         if source_class in _REALITY_SOURCE_CLASSES:
             state.has_reality = True
+            if not grounding_blocked:
+                state.grounding_leaves[key] = ref
         elif source_class is SourceClass.AI_COGNITION:
             state.has_ai_cognition = True
         elif source_class is SourceClass.MAINTENANCE:
@@ -278,16 +322,18 @@ class CognitiveDerivationScheduler:
         state: _TraversalState,
         dependencies: Mapping[tuple[str, int], tuple[ObjectRef, ...]],
         active_stack: set[tuple[str, int]],
-        completed: set[tuple[str, int]],
+        completed: set[tuple[str, int, bool]],
+        grounding_blocked: bool,
     ) -> None:
         if ref.revision is None:
             self._record_unresolved(state, ref, "unpinned_ref")
             return
         key = (ref.object_id, ref.revision)
+        completed_key = (ref.object_id, ref.revision, grounding_blocked)
         if key in active_stack:
             self._record_unresolved(state, ref, "lineage_cycle")
             return
-        if key in completed:
+        if completed_key in completed:
             return
 
         try:
@@ -303,7 +349,7 @@ class CognitiveDerivationScheduler:
             self._record_unresolved(state, ref, "missing_or_corrupt_ref")
             return
 
-        if str(record.get("subject_id") or "") != self.subject_id:
+        if str(record.get("subject_id") or "") not in self.allowed_subject_ids:
             self._record_unresolved(state, ref, "cross_subject_ref")
             return
         if str(record.get("revision_kind") or "content") != "content":
@@ -316,6 +362,13 @@ class CognitiveDerivationScheduler:
         except ValueError:
             self._record_unresolved(state, ref, "invalid_durable_provenance")
             return
+
+        blocks_grounding = (
+            source_class is SourceClass.AI_COGNITION
+            and object_type not in _TRANSPARENT_GROUNDING_CONTAINERS
+            and object_type not in _CASE_GROUNDING_CONTAINERS
+        )
+        child_grounding_blocked = grounding_blocked or blocks_grounding
 
         active_stack.add(key)
         try:
@@ -443,6 +496,7 @@ class CognitiveDerivationScheduler:
                     state,
                     ref,
                     override or source_class,
+                    grounding_blocked=grounding_blocked,
                 )
 
                 # Known support EvidenceSet fields are structural refs, not prose.
@@ -486,28 +540,14 @@ class CognitiveDerivationScheduler:
                     dependencies=dependencies,
                     active_stack=active_stack,
                     completed=completed,
+                    grounding_blocked=child_grounding_blocked,
                 )
         finally:
             active_stack.discard(key)
-            completed.add(key)
+            completed.add(completed_key)
 
-    def derive_lineage(self, summary_ref: ObjectRef) -> DerivedLineageView:
-        state = _TraversalState(
-            leaves={},
-            unresolved={},
-            issues=set(),
-        )
-        if summary_ref.revision is None:
-            self._record_unresolved(state, summary_ref, "summary_ref_unpinned")
-        else:
-            self._walk(
-                summary_ref,
-                state=state,
-                dependencies=self._support_dependencies(),
-                active_stack=set(),
-                completed=set(),
-            )
-
+    @staticmethod
+    def _lineage_view(state: _TraversalState) -> DerivedLineageView:
         if state.unresolved or state.issues:
             classification = DerivedLineageClass.UNKNOWN
         elif state.has_reality and state.has_ai_cognition:
@@ -522,6 +562,9 @@ class CognitiveDerivationScheduler:
             classification = DerivedLineageClass.UNKNOWN
 
         leaves = tuple(state.leaves[key] for key in sorted(state.leaves))
+        grounding_leaves = tuple(
+            state.grounding_leaves[key] for key in sorted(state.grounding_leaves)
+        )
         unresolved = tuple(
             state.unresolved[key]
             for key in sorted(
@@ -532,12 +575,51 @@ class CognitiveDerivationScheduler:
         return DerivedLineageView(
             classification=classification,
             leaf_refs=leaves,
+            grounding_leaf_refs=grounding_leaves,
             unresolved_refs=unresolved,
             issues=tuple(sorted(state.issues)),
             has_reality=state.has_reality,
             has_ai_cognition=state.has_ai_cognition,
             has_maintenance=state.has_maintenance,
         )
+
+    def derive_lineage_for_refs(
+        self,
+        refs: Sequence[ObjectRef],
+    ) -> DerivedLineageView:
+        """Resolve exact support closure for arbitrary pinned cognition evidence.
+
+        The scheduler and C14 runtime share this method so routing and writeback do
+        not drift into two provenance algorithms. grounding_leaf_refs records
+        reality/case leaves reached without using an intervening AI semantic
+        assertion (for example, an old Claim) as the only bridge.
+        """
+
+        state = _TraversalState(
+            leaves={},
+            grounding_leaves={},
+            unresolved={},
+            issues=set(),
+        )
+        dependencies = self._support_dependencies()
+        active_stack: set[tuple[str, int]] = set()
+        completed: set[tuple[str, int, bool]] = set()
+        for ref in refs:
+            if ref.revision is None:
+                self._record_unresolved(state, ref, "unpinned_ref")
+                continue
+            self._walk(
+                ref,
+                state=state,
+                dependencies=dependencies,
+                active_stack=active_stack,
+                completed=completed,
+                grounding_blocked=False,
+            )
+        return self._lineage_view(state)
+
+    def derive_lineage(self, summary_ref: ObjectRef) -> DerivedLineageView:
+        return self.derive_lineage_for_refs((summary_ref,))
 
     def _current_eligible_summary(
         self,
