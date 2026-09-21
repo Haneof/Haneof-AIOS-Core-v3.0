@@ -1,0 +1,1 @@
+{"5568c18cf72a4aa9df32644ed48460b9c1bb708b0d04f7bb22e4f2af518cc317":{"kind":"capability_calls","calls":[{"name":"search_timeline","arguments":{"window_start":"2027-01-20T09:10:01Z","window_end":"2027-01-20T20:30:00Z","object_types":["observation"],"limit":20},"call_id":"seg003-jan20-later-records"}]}}
