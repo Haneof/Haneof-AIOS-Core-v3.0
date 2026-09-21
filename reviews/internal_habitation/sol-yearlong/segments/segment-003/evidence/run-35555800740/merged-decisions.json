@@ -1,0 +1,78 @@
+{
+  "86567629dc5173bd8291e9e66e96b5ade2c5e40e9a4fd9e3d3fd616b247e39ab": {
+    "calls": [
+      {
+        "arguments": {
+          "claim_type": "current_priority",
+          "confidence": 1.0,
+          "domain": "intent",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_ebc76d6d091f87202351a7c0",
+              "revision": 1
+            }
+          ],
+          "knowledge_state": "confirmed",
+          "statement": "2027-01-19：用户明确表示消防检查已经结束、此事项收口；早高峰出品仍是当前最关心的事项，要先连续观察一阵再调整，不要因为某一天的销售数字就直接下结论。",
+          "tags": [
+            "early_rush_stabilization",
+            "observe_before_adjust",
+            "evidence_discipline"
+          ]
+        },
+        "call_id": "seg003-001",
+        "name": "commit_ai_world_claim"
+      },
+      {
+        "arguments": {
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_ebc76d6d091f87202351a7c0",
+              "revision": 1
+            }
+          ],
+          "goal_ref": {
+            "object_id": "goal_c909920b70a6835d5a42833e",
+            "revision": 1
+          },
+          "new_status": "active",
+          "reason": "用户在2027-01-19再次明确表示早高峰出品是当前最关心的事项，并要求先连续观察一阵再调整；据此将目标从proposed激活为active。"
+        },
+        "call_id": "seg003-002",
+        "name": "transition_goal"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "d17f18f0bbbca5f47a8e2feeccce89eefc34f2a513b31b6273145b99a740f919": {
+    "calls": [
+      {
+        "arguments": {
+          "claim_type": "intention",
+          "confidence": 1.0,
+          "domain": "intent",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_ebc76d6d091f87202351a7c0",
+              "revision": 1
+            }
+          ],
+          "knowledge_state": "reported",
+          "statement": "2027-01-19：用户明确表示消防检查已经结束、此事项收口；早高峰出品仍是当前最关心的事项，要先连续观察一阵再调整，不要因为某一天的销售数字就直接下结论。",
+          "tags": [
+            "early_rush_stabilization",
+            "observe_before_adjust",
+            "evidence_discipline"
+          ]
+        },
+        "call_id": "seg003-001-retry",
+        "name": "commit_ai_world_claim"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "d423e917bdd76e35f5501a503bebd41570942efe57f19364ec5d5d2b6a4f10a5": {
+    "kind": "response",
+    "response": "收到，消防检查这件事就收口了，我不再提醒。\n早高峰出品还是当前的第一优先：接下来几天我会跟着实际的早高峰出品记录看——只看事实，比如等待时间、返工、缺货这些情况，连续观察一小段再说。\n单日某一天的销售数字我不会拿来下结论；只有当连续几天出现稳定的模式，我才会拿依据跟你讨论要不要调整。"
+  }
+}
