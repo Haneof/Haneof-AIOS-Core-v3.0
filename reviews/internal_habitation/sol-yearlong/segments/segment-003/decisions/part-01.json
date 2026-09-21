@@ -1,0 +1,20 @@
+{
+  "86567629dc5173bd8291e9e66e96b5ade2c5e40e9a4fd9e3d3fd616b247e39ab": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "read_execution_world",
+        "arguments": {},
+        "call_id": "seg003-jan19-exec-world"
+      },
+      {
+        "name": "search_world",
+        "arguments": {
+          "query": "早高峰 出品 卡点 等待 返工 缺货",
+          "limit": 8
+        },
+        "call_id": "seg003-jan19-early-rush-search"
+      }
+    ]
+  }
+}
