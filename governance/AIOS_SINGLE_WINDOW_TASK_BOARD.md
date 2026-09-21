@@ -58,7 +58,7 @@
 
 ## 3. 当前唯一施工队列
 
-> 选择规则：严格从上到下。条件任务在 `AUDIT-001` 后才能激活。
+> 选择规则：严格从上到下。条件任务在 `AUDIT-001` 后才能激活。\n> 2026-09-21 PM reprioritization: 77-day Resident evidence exposed a missing continuous User/World → AI-world cognition-derivation bridge. C14 is now inserted before P16 campaign continuation; P16-TRIAGE is paused until C14 closure.
 
 | 顺序 | Task ID | 单窗口任务 | 状态 | Dependencies | 当前现场 / 证据 | 完成定义 |
 |---:|---|---|---|---|---|---|
@@ -70,16 +70,22 @@
 | 6 | `T35-RULE-001` | 只做“非 Action Task 的可信完成凭据”语义裁决；不改 execution 代码 | **DONE** | AUDIT-001 | `governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md`; PR #53; semantic candidate `b58bbb31a04a119897890452e76461f14fd46288`; squash merge `6fcb51d6e2ecf6e2ab8ff0fa62013f094b32f21c` | 唯一裁决已形成：所有 Task 终态必须真实证据化；外部执行保持 Action→Outcome；非 Action Task 可用合格 pinned World evidence / validated durable artifact；禁止 AI 自述、伪 Outcome、循环 OperationExperience |
 | 7 | `T35-IMPL-001` | 按 T35-RULE-001 裁决实现 Task 完成闭环 | **DONE** | T35-RULE-001, T34-EXEC-001 | PR #55; candidate `07617df8ab87550289c1498cf3df387626d55e40`; squash merge `141dc177be895f9894a05227cbb132207ebf784d`; required candidate Gates GREEN; merge-result P12/P16 GREEN | 外部 Action/Outcome 保持强制链；WORLD_EVIDENCE / MIXED 按结构化 completion contract 校验；真实凭据、subject/current/provenance、幂等/restart/history 与 T34 回归全部 GREEN |
 | 8 | `T33-RECALL-001` | 用自包含表达/跨会话省略/无前文三类对照重新验证 recall 误触；只有复现才修 | **DONE** | AUDIT-001 | PR #51; candidate `91f1eecc1eb1a5aeb3dd2fa4566f045b6abea796`; squash merge `cb8eab12e9747bece41b14d183840e2cf13bd183`; repro run `35566569236`; required Gates GREEN | Case A/B/C、same-session canonical antecedent、assistant-raw exclusion、P14/Fused/P16 回归 GREEN；Core 只暴露候选，不绑定指代 |
-| 9 | `P16-TRIAGE-001` | 更新 PR #37 / Issue #30 中央证据分流到当前 segmented protocol；历史无效年度、PARTIAL、机械复现、有效缺陷分开登记 | **READY** | AUDIT-001, all activated T34/T36/T28/T35/T33 tasks resolved | all activated Core blockers resolved; T35 merged via PR #55 / `141dc177be895f9894a05227cbb132207ebf784d`; PR #37 仍 open，base 较旧 | 冻结被评 Core SHA；不把旧“几天统计”冒充当前进度；中央报告进入 main |
-| 10 | `P16-CAMPAIGN-001` | 建立/恢复唯一 P16 分段入住 Campaign Ledger：找出当前 canonical life、最后有效 segment、World/checkpoint digest、累计天数/交互/认知 checkpoint | **BLOCKED** | P16-TRIAGE-001 | `reviews/internal_habitation/ARENA_RESIDENT_YEARLONG_TASK.md` | 创建 `reviews/internal_habitation/P16_SEGMENT_PROGRESS_LEDGER.md`；历史 segment 不重复跑；下一 segment ID 唯一 |
-| 11 | `P16-RES-NEXT` | **一次只执行一个** Resident habitation segment（7–30 simulated days），模型本人逐次作语义判断 | **BLOCKED** | P16-CAMPAIGN-001 or previous P16-RES segment | Campaign Ledger 决定实际 segment number | 每个窗口只做 1 segment；保存 World/checkpoint/digest/时间/交互/认知计数；更新 ledger；未到 365 天则自动追加下一 `P16-RES-NEXT` |
-| 12 | `P16-YEAR-AUDIT-001` | 累计达到协议年度门槛后，对完整 Resident 年度证据做独立有效性审计 | **BLOCKED** | cumulative P16-RES >= protocol thresholds | — | 验证真实模型逐次决定、时间单调、跨窗口仅从 AIOS 恢复、无 future leak / pseudo-LLM；只给 VALID / PARTIAL / INVALID evidence verdict |
-| 13 | `P16-PROV-A-001` | 正式 provider/model A 在 sealed scenario bundle 上独立运行，fresh private World | **BLOCKED** | all Core blockers resolved, P16 campaign protocol stable | P16 convergence control | 完整 provider/model/config/timestamps/errors/tool calls/run artifacts；resident 不见 oracle |
-| 14 | `P16-PROV-B-001` | 正式 provider/model B 在**同一 resident-visible sealed bundle**独立运行，fresh private World | **BLOCKED** | P16-PROV-A-001 | — | resident-visible fingerprint 与 A 对等；World 独立；完整 provenance |
-| 15 | `P16-EVAL-001` | evaluator-only hidden-oracle 评估 A/B；不得把 harness GREEN 当 cognition PASS | **BLOCKED** | P16-PROV-A-001, P16-PROV-B-001 | — | separate evaluator artifacts；错误记忆/无证据强断言/翻案/summary misuse/dimension spam/伪经验全部有证据 |
-| 16 | `P16-REDTEAM-001` | 独立红队复审正式 provider runs 与年度 Resident evidence | **BLOCKED** | P16-EVAL-001, P16-YEAR-AUDIT-001 | — | 红队报告；任何 blocker 回流为新的唯一 task row，不在本窗口顺手修 |
-| 17 | `P16-CLOSE-001` | 最高 PM 只做 P16 收口裁决与治理更新，不写新 Core 功能 | **BLOCKED** | P16-REDTEAM-001 | — | 若证据满足正式 Gate：P16 PASS；否则明确 remaining blocker；同步 checkpoint/master map |
-| 18 | `P17-ENTRY-001` | P17 Core Release Gate 入口审查 | **BLOCKED** | P16-CLOSE-001 = PASS | — | reproducible build、full CI、migration/current schema、release evidence；不在同窗口进入 P18 |
+| 9 | `C14-RULE-001` | 冻结“持续认知派生”语义：Summary 只产生认知机会，不直接生成认知；定义 user/world → AI-world 派生边界、silence 合法性、Period Review 分工与无自激规则 | **READY** | T35-IMPL-001 | `governance/C14_CONTINUOUS_COGNITIVE_DERIVATION_IMPLEMENTATION_PLAN_2026-09-21.md` | 形成唯一 ruling；不写 Core；明确每个 eligible changed Summary 的 durable cognition opportunity、AI 高阶判断主权、无固定重要性阈值、无第二数据库/第二 runtime |
+| 10 | `C14-SCHED-001` | 实现 Summary → Cognitive Derivation Wake：机械 provenance、幂等、revision、crash/restart recovery、纯 AI-cognition Summary 防回环 | **BLOCKED** | C14-RULE-001 | 复用 Dimension Summary + WakeBus + AttentionRouter；不得新增 CognitionCandidate DB | eligible Summary revision 恰好有一个 durable opportunity；unchanged 不重复；N+1 新机会；纯 AI cognition 不自激；restart 可补失落 Wake |
+| 11 | `C14-RUNTIME-001` | 将 derivation Wake 接入同一 Resident CognitiveRuntime，装配 pinned Summary / AI-world context / capabilities；支持 form/revise/retract 或 silence | **BLOCKED** | C14-SCHED-001 | 复用现有 CognitiveRuntime、AIWorldCognitionService、search/compare/all-dimensions capabilities、C13 metering | 无第二模型循环；BACKGROUND 不主动打扰用户；Resident 可跨维取证并写/修认知；silence 不生成伪 Claim/Experience |
+| 12 | `C14-LOOP-001` | 持续认知派生加固：防 AI-world 自我总结→自我派生风暴；预算/合并/延迟/恢复；Periodic Review 与 derivation 共存 | **BLOCKED** | C14-RUNTIME-001 | 复用 BackgroundBudgetGate、Attention Bundle、P15 Review | 10+ sibling summary 可机械合并；budget defer/restart 不丢机会；Wake completion 不被当用户成功/偏好证据；无无限 cognition loop |
+| 13 | `C14-RES-001` | 真实 Resident 认知形成入住验证：重复事实→Summary 后模式→认知；后续反例→修正；未来决策消费认知 | **BLOCKED** | C14-LOOP-001 | 禁止 pseudo-LLM / Python 关键词答案；fresh private World；保存 provider/model/checkpoint/digest | 真实模型逐次判断；允许“有证据的 silence”；验证认知形成/修正/行为消费，不以 Claim 数量作为 PASS |
+| 14 | `C14-CLOSE-001` | 独立审计 C14 规则、代码、Gate 与真实 Resident 证据；只做收口，不写新 Core 功能 | **BLOCKED** | C14-RES-001 | C14 全链证据 + deterministic gates + Resident evaluator | 无第二认知系统、无固定语义规则、无 wake storm；Summary/Review/C13/T28/P14/P12/P16 回归 GREEN 后才恢复 P16 campaign |
+| 15 | `P16-TRIAGE-001` | 更新 PR #37 / Issue #30 中央证据分流到当前 segmented protocol；历史无效年度、PARTIAL、机械复现、有效缺陷分开登记 | **BLOCKED** | AUDIT-001, all activated T34/T36/T28/T35/T33 tasks resolved, C14-CLOSE-001 | all historical Core blockers resolved; C14 是 77-day Resident 新暴露的架构缺口；P16 暂停避免继续测已知缺陷 | 冻结被评 Core SHA；不把旧“几天统计”冒充当前进度；中央报告进入 main；恢复 campaign 前必须引用 C14 closure |
+| 16 | `P16-CAMPAIGN-001` | 建立/恢复唯一 P16 分段入住 Campaign Ledger：找出当前 canonical life、最后有效 segment、World/checkpoint digest、累计天数/交互/认知 checkpoint | **BLOCKED** | P16-TRIAGE-001 | `reviews/internal_habitation/ARENA_RESIDENT_YEARLONG_TASK.md` | 创建 `reviews/internal_habitation/P16_SEGMENT_PROGRESS_LEDGER.md`；历史 segment 不重复跑；下一 segment ID 唯一 |
+| 17 | `P16-RES-NEXT` | **一次只执行一个** Resident habitation segment（7–30 simulated days），模型本人逐次作语义判断 | **BLOCKED** | P16-CAMPAIGN-001 or previous P16-RES segment | Campaign Ledger 决定实际 segment number | 每个窗口只做 1 segment；保存 World/checkpoint/digest/时间/交互/认知计数；更新 ledger；未到 365 天则自动追加下一 `P16-RES-NEXT` |
+| 18 | `P16-YEAR-AUDIT-001` | 累计达到协议年度门槛后，对完整 Resident 年度证据做独立有效性审计 | **BLOCKED** | cumulative P16-RES >= protocol thresholds | — | 验证真实模型逐次决定、时间单调、跨窗口仅从 AIOS 恢复、无 future leak / pseudo-LLM；只给 VALID / PARTIAL / INVALID evidence verdict |
+| 19 | `P16-PROV-A-001` | 正式 provider/model A 在 sealed scenario bundle 上独立运行，fresh private World | **BLOCKED** | all Core blockers resolved, P16 campaign protocol stable | P16 convergence control | 完整 provider/model/config/timestamps/errors/tool calls/run artifacts；resident 不见 oracle |
+| 20 | `P16-PROV-B-001` | 正式 provider/model B 在**同一 resident-visible sealed bundle**独立运行，fresh private World | **BLOCKED** | P16-PROV-A-001 | — | resident-visible fingerprint 与 A 对等；World 独立；完整 provenance |
+| 21 | `P16-EVAL-001` | evaluator-only hidden-oracle 评估 A/B；不得把 harness GREEN 当 cognition PASS | **BLOCKED** | P16-PROV-A-001, P16-PROV-B-001 | — | separate evaluator artifacts；错误记忆/无证据强断言/翻案/summary misuse/dimension spam/伪经验全部有证据 |
+| 22 | `P16-REDTEAM-001` | 独立红队复审正式 provider runs 与年度 Resident evidence | **BLOCKED** | P16-EVAL-001, P16-YEAR-AUDIT-001 | — | 红队报告；任何 blocker 回流为新的唯一 task row，不在本窗口顺手修 |
+| 23 | `P16-CLOSE-001` | 最高 PM 只做 P16 收口裁决与治理更新，不写新 Core 功能 | **BLOCKED** | P16-REDTEAM-001 | — | 若证据满足正式 Gate：P16 PASS；否则明确 remaining blocker；同步 checkpoint/master map |
+| 24 | `P17-ENTRY-001` | P17 Core Release Gate 入口审查 | **BLOCKED** | P16-CLOSE-001 = PASS | — | reproducible build、full CI、migration/current schema、release evidence；不在同窗口进入 P18 |
 
 ---
 
@@ -588,3 +594,29 @@ Deferred issues:
 - P16-TRIAGE-001 was not executed in this window and is now the next READY task
 Next READY task: P16-TRIAGE-001 — new window only
 ```
+
+
+---
+
+## 10. C14 PM reprioritization record — 2026-09-21
+
+A 77-day cumulative Resident run (reported as 810 World revisions with substantial Observation/Summary volume but comparatively sparse durable cognition) exposed a structural gap: Summary and AI-world cognition both exist, but current Runtime does not guarantee a durable Summary → Resident cognition-derivation opportunity.
+
+PM decision:
+
+- treat this as a pre-P16-campaign Core architecture blocker, not as a request to increase Claim counts;
+- preserve Summary/Cognition separation;
+- reuse Wake + Background Budget + Attention Bundle + the same CognitiveRuntime;
+- forbid deterministic semantic-importance scoring, keyword-to-Claim logic, a second cognition database, or a second model loop;
+- require real Resident validation before C14 closure;
+- pause P16-TRIAGE/Campaign continuation until C14-CLOSE-001.
+
+Canonical implementation plan:
+
+- `governance/C14_CONTINUOUS_COGNITIVE_DERIVATION_IMPLEMENTATION_PLAN_2026-09-21.md`
+
+New first READY task:
+
+- `C14-RULE-001`
+
+This planning window does not execute C14-RULE-001 or any downstream Core task.
