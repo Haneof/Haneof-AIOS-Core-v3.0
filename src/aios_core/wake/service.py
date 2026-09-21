@@ -929,19 +929,32 @@ class WakeBus:
         capability_names: tuple[str, ...] = (),
         delivery_allowed: bool,
         step0_state: Step0State,
+        model_input_tokens: int | None = None,
+        model_output_tokens: int | None = None,
+        model_total_tokens: int | None = None,
+        model_usage_complete: bool = False,
     ) -> WakeStateReceipt:
+        metadata_update: dict[str, Any] = {
+            "completed_at": as_utc(completed_at, "completed_at").isoformat(),
+            "termination_reason": termination_reason,
+            "model_rounds": int(model_rounds),
+            "capability_names": list(capability_names),
+            "delivery_allowed": bool(delivery_allowed),
+            "step0_state": step0_state,
+            "model_usage_complete": bool(model_usage_complete),
+        }
+        if model_input_tokens is not None:
+            metadata_update["model_input_tokens"] = int(model_input_tokens)
+        if model_output_tokens is not None:
+            metadata_update["model_output_tokens"] = int(model_output_tokens)
+        if model_total_tokens is not None:
+            metadata_update["model_total_tokens"] = int(model_total_tokens)
+
         return self._finish(
             wake_id,
             finished_at=completed_at,
             target_state=WakeState.COMPLETED,
-            metadata_update={
-                "completed_at": as_utc(completed_at, "completed_at").isoformat(),
-                "termination_reason": termination_reason,
-                "model_rounds": int(model_rounds),
-                "capability_names": list(capability_names),
-                "delivery_allowed": bool(delivery_allowed),
-                "step0_state": step0_state,
-            },
+            metadata_update=metadata_update,
             reason="complete Resident Wake dispatch",
         )
 
