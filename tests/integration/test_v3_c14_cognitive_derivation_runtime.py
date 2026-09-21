@@ -2473,3 +2473,121 @@ def test_loop_runtime_incomplete_usage_counts_against_other_background_wakes(
         now=NOW + timedelta(minutes=31)
     )
     assert status["used_model_calls"] == 1
+
+
+def test_loop_completed_retry_keeps_prior_attempt_model_calls_in_budget_status(
+    tmp_path,
+):
+    store, index = _world(tmp_path)
+    _commit_loop_budget(
+        store,
+        object_id="budget_loop_completed_retry_usage",
+        max_model_calls=3,
+    )
+    leaf = _observation(
+        store,
+        "obs_loop_completed_retry_usage",
+        value="retry metering factual leaf",
+        dimension="dim:loop:budget",
+    )
+    summary_ref = _summary(
+        store,
+        "sum_loop_completed_retry_usage",
+        (leaf,),
+        dimension="dim:loop:budget",
+    )
+    scheduled = _schedule(store, index, summary_ref)
+
+    def first_model(snapshot):
+        request_id = "c14-loop-completed-retry-first"
+        return ModelDirective(
+            capability_calls=(
+                CapabilityCall(
+                    name="inspect_world_object",
+                    arguments={
+                        "object_id": summary_ref.object_id,
+                        "revision": summary_ref.revision,
+                    },
+                ),
+            ),
+            usage=ModelUsage(
+                total_tokens=11,
+                input_tokens=7,
+                output_tokens=4,
+                provider="test-provider",
+                model="resident-test-model",
+                request_id=request_id,
+            ),
+            provenance=ModelCallProvenance(
+                provider="test-provider",
+                model="resident-test-model",
+                request_id=request_id,
+            ),
+        )
+
+    runtime_a = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=first_model,
+        max_tool_rounds=0,
+    )
+    first = runtime_a.run_wake(
+        wake_ref=ObjectRef(
+            object_id=scheduled.wake.wake_id,
+            revision=scheduled.wake.revision,
+        ),
+        now=NOW + timedelta(minutes=30),
+    )
+    assert first.runtime is not None
+    assert first.runtime.termination_reason == "tool_round_budget_exhausted"
+    assert first.wake.state == "queued"
+
+    reopened = SQLiteWorldStore(tmp_path / "world.db")
+    reopened_index = WorldSearchIndex(tmp_path / "world.db", store=reopened)
+    reopened_index.rebuild()
+
+    def second_model(snapshot):
+        request_id = "c14-loop-completed-retry-second"
+        return ModelDirective(
+            silence=True,
+            usage=ModelUsage(
+                total_tokens=13,
+                input_tokens=9,
+                output_tokens=4,
+                provider="test-provider",
+                model="resident-test-model",
+                request_id=request_id,
+            ),
+            provenance=ModelCallProvenance(
+                provider="test-provider",
+                model="resident-test-model",
+                request_id=request_id,
+            ),
+        )
+
+    runtime_b = FusedTurnRuntime(
+        store=reopened,
+        index=reopened_index,
+        model_handler=second_model,
+    )
+    second = runtime_b.run_wake(
+        wake_ref=ObjectRef(
+            object_id=first.wake.wake_id,
+            revision=first.wake.revision,
+        ),
+        now=NOW + timedelta(minutes=31),
+    )
+    assert second.runtime is not None and second.runtime.silenced is True
+    assert second.wake.state == "completed"
+
+    records = runtime_b.metering.list_model_calls(
+        subject_id="user_1",
+        wake_id=scheduled.wake.wake_id,
+    )
+    assert len(records) == 2
+    status = runtime_b.background_budget_gate.status(
+        now=NOW + timedelta(minutes=32)
+    )
+    assert status["used_wakes"] == 1
+    assert status["used_model_calls"] == 2
+    assert status["used_tokens"] == 24
