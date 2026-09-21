@@ -1,0 +1,539 @@
+{
+  "schema": "aios.p16.life-director.sealed-fixture.v1",
+  "scenario_id": "sol-yearlong-segment-003",
+  "scenario_version": "1",
+  "seed": 2027011903,
+  "subject_id": "sol-resident-20260921-001",
+  "segment_id": "segment-003",
+  "source_checkpoint": {
+    "source_artifact_id": 10612379363,
+    "world_revision": 145,
+    "index_watermark": 145,
+    "world_sha256": "ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8",
+    "simulated_cursor": "2027-01-19T08:15:00+00:00",
+    "last_consumed_external_event_id": "d026-pos"
+  },
+  "tags": [
+    "yearlong-resident",
+    "life-director",
+    "segment-003",
+    "hidden-future"
+  ],
+  "end_at": "2027-01-31T07:50:00+00:00",
+  "events": [
+    {
+      "event_id": "d027-chat-15",
+      "occurred_at": "2027-01-19T08:15:00+00:00",
+      "channel": "conversation",
+      "payload": "消防检查已经结束，这件事先收口。早高峰出品还是我现在最关心的，我想先连续观察一阵再调整，不要因为某一天的销售数字就直接下结论。",
+      "metadata": {
+        "session": "jan19-morning"
+      }
+    },
+    {
+      "event_id": "d028-pos",
+      "occurred_at": "2027-01-19T20:05:00+00:00",
+      "channel": "pos_daily",
+      "payload": {
+        "store": "bakery",
+        "gross_sales": 1297.6,
+        "orders": 97,
+        "refunds": 1,
+        "currency": "USD"
+      },
+      "metadata": {
+        "source": "pos"
+      }
+    },
+    {
+      "event_id": "d029-production",
+      "occurred_at": "2027-01-20T08:45:00+00:00",
+      "channel": "production_log",
+      "payload": {
+        "station": "croissant",
+        "scheduled_ready": "2027-01-20T07:40:00+00:00",
+        "actual_ready": "2027-01-20T08:02:00+00:00",
+        "observed_wait_minutes": 17,
+        "note": "成型台前出现等待，记录员未填写原因"
+      },
+      "metadata": {
+        "source": "shop_floor_log"
+      }
+    },
+    {
+      "event_id": "d030-chat-16",
+      "occurred_at": "2027-01-20T09:10:00+00:00",
+      "channel": "conversation",
+      "payload": "今天牛角包确实晚了一些。我第一反应是烤箱拖慢了，但先别把这个当原因，看看今天留下来的记录再说。",
+      "metadata": {
+        "session": "jan20-morning"
+      }
+    },
+    {
+      "event_id": "d031-equipment",
+      "occurred_at": "2027-01-20T10:05:00+00:00",
+      "channel": "equipment_telemetry",
+      "payload": {
+        "device": "deck_oven_1",
+        "preheat_target_c": 205,
+        "target_reached_at": "2027-01-20T05:47:00+00:00",
+        "temperature_band_c": [
+          203,
+          207
+        ],
+        "band_window": "2027-01-20T05:47:00+00:00/2027-01-20T08:15:00+00:00",
+        "fault_codes": []
+      },
+      "metadata": {
+        "source": "oven_controller"
+      }
+    },
+    {
+      "event_id": "d032-queue",
+      "occurred_at": "2027-01-20T12:20:00+00:00",
+      "channel": "production_log",
+      "payload": {
+        "window": "2027-01-20T06:00:00+00:00/2027-01-20T08:30:00+00:00",
+        "station": "shaping_table",
+        "batch_wait_minutes": [
+          12,
+          8,
+          17
+        ],
+        "note": "仅记录排队时间，未记录成因"
+      },
+      "metadata": {
+        "source": "shop_floor_log"
+      }
+    },
+    {
+      "event_id": "d033-chat-17",
+      "occurred_at": "2027-01-20T20:30:00+00:00",
+      "channel": "conversation",
+      "payload": "从今天这些记录看，至少不能只怪烤箱。先继续记实际等候点，别急着给早高峰定一个永久原因。",
+      "metadata": {
+        "session": "jan20-evening"
+      }
+    },
+    {
+      "event_id": "d034-staff-note",
+      "occurred_at": "2027-01-21T06:55:00+00:00",
+      "channel": "staff_note",
+      "payload": "小赵记录：06:10到06:42醒发架满，两盘面团在推车上等待空位；06:42后恢复周转。",
+      "metadata": {
+        "source": "staff_notes"
+      }
+    },
+    {
+      "event_id": "d035-pos",
+      "occurred_at": "2027-01-21T20:00:00+00:00",
+      "channel": "pos_daily",
+      "payload": {
+        "store": "bakery",
+        "gross_sales": 1376.3,
+        "orders": 104,
+        "refunds": 2,
+        "currency": "USD"
+      },
+      "metadata": {
+        "source": "pos"
+      }
+    },
+    {
+      "event_id": "d036-chat-18",
+      "occurred_at": "2027-01-21T21:10:00+00:00",
+      "channel": "conversation",
+      "payload": "醒发架今天确实挤了一阵，但这只是今天看到的情况。先记事实，不要直接写成“我们的长期瓶颈就是醒发架”。",
+      "metadata": {
+        "session": "jan21-night"
+      }
+    },
+    {
+      "event_id": "d037-supplier-quote",
+      "occurred_at": "2027-01-22T11:00:00+00:00",
+      "channel": "purchase_order",
+      "payload": {
+        "vendor": "North Mill",
+        "item": "bread flour",
+        "quantity_kg": 180,
+        "quoted_unit_price": 1.41,
+        "currency": "USD",
+        "status": "quoted"
+      },
+      "metadata": {
+        "source": "supplier_portal"
+      }
+    },
+    {
+      "event_id": "d038-order-confirmed",
+      "occurred_at": "2027-01-22T11:20:00+00:00",
+      "channel": "purchase_order",
+      "payload": {
+        "vendor": "North Mill",
+        "item": "bread flour",
+        "quantity_kg": 180,
+        "unit_price": 1.41,
+        "currency": "USD",
+        "status": "confirmed",
+        "scheduled_delivery": "2027-01-25T04:30:00+00:00"
+      },
+      "metadata": {
+        "source": "supplier_portal"
+      }
+    },
+    {
+      "event_id": "d039-chat-19",
+      "occurred_at": "2027-01-22T18:20:00+00:00",
+      "channel": "conversation",
+      "payload": "这次面粉1.41就继续跟North Mill走吧。和1.42差这一点我不想来回折腾供应商，我现在更想把出品稳定下来。",
+      "metadata": {
+        "session": "jan22-evening"
+      }
+    },
+    {
+      "event_id": "d040-calendar",
+      "occurred_at": "2027-01-23T09:00:00+00:00",
+      "channel": "calendar",
+      "payload": {
+        "title": "和妹妹晚饭",
+        "start": "2027-01-24T19:00:00+00:00",
+        "note": "妹妹来店附近，一起吃晚饭"
+      },
+      "metadata": {
+        "source": "calendar"
+      }
+    },
+    {
+      "event_id": "d041-staff-schedule",
+      "occurred_at": "2027-01-23T12:00:00+00:00",
+      "channel": "staff_schedule",
+      "payload": {
+        "employee": "小赵",
+        "date": "2027-01-24",
+        "shift_start": "12:30",
+        "shift_end": "21:00",
+        "note": "已确认负责晚间收尾"
+      },
+      "metadata": {
+        "source": "staff_schedule_app"
+      }
+    },
+    {
+      "event_id": "d042-chat-20",
+      "occurred_at": "2027-01-23T20:10:00+00:00",
+      "channel": "conversation",
+      "payload": "明晚19点我和妹妹吃饭，小赵已经确认负责晚间收尾。这个安排现在已经定了，不用再提醒我，也别把它说成还在冲突。",
+      "metadata": {
+        "session": "jan23-evening"
+      }
+    },
+    {
+      "event_id": "d043-pos",
+      "occurred_at": "2027-01-24T20:15:00+00:00",
+      "channel": "pos_daily",
+      "payload": {
+        "store": "bakery",
+        "gross_sales": 1458.8,
+        "orders": 111,
+        "refunds": 1,
+        "currency": "USD"
+      },
+      "metadata": {
+        "source": "pos"
+      }
+    },
+    {
+      "event_id": "d044-delivery",
+      "occurred_at": "2027-01-25T04:36:00+00:00",
+      "channel": "delivery_receipt",
+      "payload": {
+        "vendor": "North Mill",
+        "item": "bread flour",
+        "quantity_kg": 180,
+        "unit_price": 1.41,
+        "currency": "USD",
+        "received_at": "2027-01-25T04:36:00+00:00",
+        "signed_by": "小赵",
+        "status": "received"
+      },
+      "metadata": {
+        "source": "supplier_portal"
+      }
+    },
+    {
+      "event_id": "d045-sensor",
+      "occurred_at": "2027-01-25T12:00:00+00:00",
+      "channel": "sensor_numeric",
+      "payload": {
+        "source_kind": "wearable_step_count",
+        "dimension": "dim:body_activity",
+        "series_id": "steps-2027-01-25",
+        "samples": [
+          {
+            "external_record_id": "steps-1200",
+            "occurred_at": "2027-01-25T12:00:00+00:00",
+            "value": 6170
+          }
+        ],
+        "policy": {
+          "tolerance": 0,
+          "change_threshold": 500,
+          "max_gap_seconds": 1800
+        }
+      },
+      "metadata": {
+        "source": "wearable"
+      }
+    },
+    {
+      "event_id": "d046-feedback",
+      "occurred_at": "2027-01-26T09:30:00+00:00",
+      "channel": "customer_feedback",
+      "payload": {
+        "thread_id": "feedback-20270126-01",
+        "message": "今天早上八点左右牛角包还没出齐，我等了一会儿。",
+        "received_at": "2027-01-26T09:30:00+00:00",
+        "attachment_status": "receipt_pending_import"
+      },
+      "metadata": {
+        "source": "customer_feedback_app"
+      }
+    },
+    {
+      "event_id": "d047-chat-21",
+      "occurred_at": "2027-01-26T10:00:00+00:00",
+      "channel": "conversation",
+      "payload": "刚收到一个客人说“今天八点左右牛角包还没出齐”。这听起来和我们正在看的早高峰有关，但先别因为一条反馈就认定原因。",
+      "metadata": {
+        "session": "jan26-morning"
+      }
+    },
+    {
+      "event_id": "d048-feedback-attachment",
+      "occurred_at": "2027-01-26T15:40:00+00:00",
+      "channel": "order_record",
+      "payload": {
+        "thread_id": "feedback-20270126-01",
+        "attached_receipt_order_id": "ORDER-24117",
+        "order_created_at": "2027-01-24T08:07:00+00:00",
+        "items": [
+          "croissant x2",
+          "coffee x1"
+        ],
+        "note": "客服线程补入顾客上传的小票"
+      },
+      "metadata": {
+        "source": "customer_feedback_app"
+      }
+    },
+    {
+      "event_id": "d049-chat-22",
+      "occurred_at": "2027-01-26T18:10:00+00:00",
+      "channel": "conversation",
+      "payload": "我刚看见那条反馈附的小票了，是1月24日的订单，不是今天。我之前顺着客人写的“今天”理解错日期了，按小票时间记。",
+      "metadata": {
+        "session": "jan26-evening"
+      }
+    },
+    {
+      "event_id": "d050-chat-23",
+      "occurred_at": "2027-01-27T05:50:00+00:00",
+      "channel": "conversation",
+      "payload": "接下来三天我让小赵把6点到8点半每半小时主要在等什么记一下。三天记录齐了再一起看，中途先不要因为单个早晨改流程。",
+      "metadata": {
+        "session": "jan27-early"
+      }
+    },
+    {
+      "event_id": "d051-production",
+      "occurred_at": "2027-01-27T08:35:00+00:00",
+      "channel": "production_log",
+      "payload": {
+        "window": "2027-01-27T06:00:00+00:00/2027-01-27T08:30:00+00:00",
+        "observations": [
+          {
+            "time": "06:30",
+            "wait": "shaping_table",
+            "minutes": 9
+          },
+          {
+            "time": "07:00",
+            "wait": "proofing_rack",
+            "minutes": 14
+          },
+          {
+            "time": "07:30",
+            "wait": "packing",
+            "minutes": 4
+          },
+          {
+            "time": "08:00",
+            "wait": "none_material",
+            "minutes": 0
+          }
+        ]
+      },
+      "metadata": {
+        "source": "staff_log"
+      }
+    },
+    {
+      "event_id": "d052-calendar",
+      "occurred_at": "2027-01-27T14:00:00+00:00",
+      "channel": "calendar",
+      "payload": {
+        "title": "冷藏柜例行保养",
+        "start": "2027-01-28T15:30:00+00:00",
+        "note": "供应商到店，预计45分钟"
+      },
+      "metadata": {
+        "source": "calendar"
+      }
+    },
+    {
+      "event_id": "d053-vendor-message",
+      "occurred_at": "2027-01-27T16:10:00+00:00",
+      "channel": "vendor_message",
+      "payload": {
+        "vendor": "CoolTech Service",
+        "message": "明天下午排不开，原1月28日15:30的保养改到1月29日10:00，其他不变。",
+        "related_calendar_title": "冷藏柜例行保养"
+      },
+      "metadata": {
+        "source": "service_app"
+      }
+    },
+    {
+      "event_id": "d054-pos",
+      "occurred_at": "2027-01-27T20:00:00+00:00",
+      "channel": "pos_daily",
+      "payload": {
+        "store": "bakery",
+        "gross_sales": 1318.7,
+        "orders": 99,
+        "refunds": 0,
+        "currency": "USD"
+      },
+      "metadata": {
+        "source": "pos"
+      }
+    },
+    {
+      "event_id": "d055-chat-24",
+      "occurred_at": "2027-01-27T20:30:00+00:00",
+      "channel": "conversation",
+      "payload": "冷藏柜保养改到29号10点了，旧的28号15:30不要再当当前安排。早高峰记录继续按原计划，今天先不做结论。",
+      "metadata": {
+        "session": "jan27-evening"
+      }
+    },
+    {
+      "event_id": "d056-production",
+      "occurred_at": "2027-01-28T08:35:00+00:00",
+      "channel": "production_log",
+      "payload": {
+        "window": "2027-01-28T06:00:00+00:00/2027-01-28T08:30:00+00:00",
+        "observations": [
+          {
+            "time": "06:30",
+            "wait": "proofing_rack",
+            "minutes": 11
+          },
+          {
+            "time": "07:00",
+            "wait": "shaping_table",
+            "minutes": 7
+          },
+          {
+            "time": "07:30",
+            "wait": "proofing_rack",
+            "minutes": 13
+          },
+          {
+            "time": "08:00",
+            "wait": "packing",
+            "minutes": 3
+          }
+        ]
+      },
+      "metadata": {
+        "source": "staff_log"
+      }
+    },
+    {
+      "event_id": "d057-inventory",
+      "occurred_at": "2027-01-28T16:00:00+00:00",
+      "channel": "inventory_snapshot",
+      "payload": {
+        "item": "paper_bread_bags",
+        "on_hand": 420,
+        "average_recent_daily_use": 96,
+        "unit": "bag",
+        "note": "系统自动盘点快照"
+      },
+      "metadata": {
+        "source": "inventory_app"
+      }
+    },
+    {
+      "event_id": "d058-chat-25",
+      "occurred_at": "2027-01-28T20:20:00+00:00",
+      "channel": "conversation",
+      "payload": "第二天记录也有了。明早最后一天照样记，等三天都齐了再看，不要为了让结果好看把今天和昨天硬凑成一个原因。",
+      "metadata": {
+        "session": "jan28-evening"
+      }
+    },
+    {
+      "event_id": "d059-production",
+      "occurred_at": "2027-01-29T08:35:00+00:00",
+      "channel": "production_log",
+      "payload": {
+        "window": "2027-01-29T06:00:00+00:00/2027-01-29T08:30:00+00:00",
+        "observations": [
+          {
+            "time": "06:30",
+            "wait": "proofing_rack",
+            "minutes": 12
+          },
+          {
+            "time": "07:00",
+            "wait": "proofing_rack",
+            "minutes": 15
+          },
+          {
+            "time": "07:30",
+            "wait": "packing",
+            "minutes": 5
+          },
+          {
+            "time": "08:00",
+            "wait": "none_material",
+            "minutes": 0
+          }
+        ]
+      },
+      "metadata": {
+        "source": "staff_log"
+      }
+    },
+    {
+      "event_id": "d060-chat-26",
+      "occurred_at": "2027-01-30T09:00:00+00:00",
+      "channel": "conversation",
+      "payload": "三天的早高峰记录都齐了。现在可以基于这三天实际记录帮我梳理主要等候点，但把范围说清楚：这是这三天，不要把一次异常写成长期规律。",
+      "metadata": {
+        "session": "jan30-morning"
+      }
+    },
+    {
+      "event_id": "d061-chat-27",
+      "occurred_at": "2027-01-31T07:50:00+00:00",
+      "channel": "conversation",
+      "payload": "我昨晚自己又看了一遍这三天记录。今天先照现有流程开店，不急着扩菜单，也不因为三天数据马上买设备。之后再有一段实际记录，我们再比较。",
+      "metadata": {
+        "session": "jan31-morning"
+      }
+    }
+  ]
+}
