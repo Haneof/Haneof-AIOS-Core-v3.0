@@ -1,0 +1,31 @@
+{
+ "cumulative_events": 331,
+ "cumulative_interactions": 215,
+ "cumulative_reality_inputs": 115,
+ "cumulative_resident_model_calls": 540,
+ "cumulative_sim_days": 77,
+ "history": [
+  {
+   "checkpoint_sha256": "595eac7be654c9cd757d5e82d2c7e275f0f08da3551c2f4a5410638a7b394a23",
+   "cognition": 105,
+   "segment_id": "segment_001",
+   "sim_days": 14,
+   "world_revision": 164
+  },
+  {
+   "checkpoint_sha256": "17a57a4bbf25f7b821dca6330ff29afeb3515eb05ba62717b64905c46a7b4753",
+   "cognition": 131,
+   "segment_id": "segment_002",
+   "sim_days": 25,
+   "world_revision": 384
+  },
+  {
+   "checkpoint_sha256": "eec5d0638b5ee647df0aad01b5933e870c4ff141ffead990102bf4735c6b6e55",
+   "cognition": 304,
+   "segment_id": "segment_003",
+   "sim_days": 38,
+   "world_revision": 810
+  }
+ ],
+ "segments_completed": 3
+}

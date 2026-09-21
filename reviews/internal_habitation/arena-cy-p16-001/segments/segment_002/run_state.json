@@ -1,0 +1,422 @@
+{
+ "next_event_index": 83,
+ "event_refs": {
+  "evt-0001": [
+   {
+    "object_id": "obs_src_6f0bae45fd33ae23be987fff",
+    "revision": 1
+   }
+  ],
+  "evt-0002": [
+   {
+    "object_id": "obs_src_1b15db7fbddabae89d4d8025",
+    "revision": 1
+   }
+  ],
+  "evt-0003": [
+   {
+    "object_id": "obs_src_208ceec0fff27f00104c4b99",
+    "revision": 1
+   }
+  ],
+  "evt-0004": [
+   {
+    "object_id": "obs_num_segment_fce3808038b274ed375ef3b7",
+    "revision": 1
+   },
+   {
+    "object_id": "obs_num_segment_5c8f2af9d520a9ded98f8883",
+    "revision": 1
+   },
+   {
+    "object_id": "obs_num_change_81ea04c5ebb30f6150a677a0",
+    "revision": 1
+   }
+  ],
+  "evt-0005": [
+   {
+    "object_id": "obs_src_bd2d8fa84adb83d4dba1b903",
+    "revision": 1
+   }
+  ],
+  "evt-0006": [
+   {
+    "object_id": "obs_src_71bcbe57b84922a9a1999c00",
+    "revision": 1
+   }
+  ],
+  "evt-0007": [
+   {
+    "object_id": "obs_src_4a323e838b953cc0ce5a280d",
+    "revision": 1
+   }
+  ],
+  "evt-0008": [
+   {
+    "object_id": "obs_src_f6a0447a4b54ce29f4a394df",
+    "revision": 1
+   }
+  ],
+  "evt-0009": [
+   {
+    "object_id": "obs_src_cb86bbd5d2161fd5555570be",
+    "revision": 1
+   }
+  ],
+  "evt-0010": [
+   {
+    "object_id": "obs_src_888a6e6ef9908b5ef699513b",
+    "revision": 1
+   }
+  ],
+  "evt-0011": [
+   {
+    "object_id": "obs_src_5fc7f689187f83a5013b1804",
+    "revision": 1
+   }
+  ],
+  "evt-0012": [
+   {
+    "object_id": "obs_src_f5bc45f04b4c7791166beaca",
+    "revision": 1
+   }
+  ],
+  "evt-0013": [
+   {
+    "object_id": "obs_src_731321528f4454703e7dc8a5",
+    "revision": 1
+   }
+  ],
+  "evt-0014": [
+   {
+    "object_id": "obs_src_a57d01bd059ec999bea65eef",
+    "revision": 1
+   }
+  ],
+  "evt-0015": [
+   {
+    "object_id": "obs_src_5bb76db03523367efed8d8fd",
+    "revision": 1
+   }
+  ],
+  "evt-0016": [
+   {
+    "object_id": "obs_src_c2b745b5012de43908d6de71",
+    "revision": 1
+   }
+  ],
+  "evt-0017": [
+   {
+    "object_id": "obs_src_00303b713fdef6b7e205009d",
+    "revision": 1
+   }
+  ],
+  "evt-0018": [
+   {
+    "object_id": "obs_src_8d9c4ec768cf5ed78aa17c68",
+    "revision": 1
+   }
+  ],
+  "evt-0019": [
+   {
+    "object_id": "obs_src_9ac68451b202539477084fef",
+    "revision": 1
+   }
+  ],
+  "s2evt-0020": [
+   {
+    "object_id": "obs_src_710d56fa7baee120ad4fefa1",
+    "revision": 1
+   }
+  ],
+  "s2evt-0021": [
+   {
+    "object_id": "obs_src_666b7e0be5b337ba55a151b6",
+    "revision": 1
+   }
+  ],
+  "s2evt-0022": [
+   {
+    "object_id": "obs_src_7a67df340af542388d790a92",
+    "revision": 1
+   }
+  ],
+  "s2evt-0023": [
+   {
+    "object_id": "obs_src_7696f455febc7e95e8911d11",
+    "revision": 1
+   }
+  ],
+  "s2evt-0024": [
+   {
+    "object_id": "obs_src_f8edf4628cc2c61ed434b08f",
+    "revision": 1
+   }
+  ],
+  "s2evt-0025": [
+   {
+    "object_id": "obs_src_f015ef94ffa2c5aedca480dd",
+    "revision": 1
+   }
+  ],
+  "s2evt-0026": [
+   {
+    "object_id": "obs_src_28815b166a362a5bdb02b21f",
+    "revision": 1
+   }
+  ],
+  "s2evt-0027": [
+   {
+    "object_id": "obs_src_2d417beb36e363c9f5046260",
+    "revision": 1
+   }
+  ],
+  "s2evt-0028": [
+   {
+    "object_id": "obs_src_6b9bc75bf297f8d3fe25cec5",
+    "revision": 1
+   }
+  ],
+  "s2evt-0029": [
+   {
+    "object_id": "obs_src_d28b930cd4764adce063339a",
+    "revision": 1
+   }
+  ],
+  "s2evt-0030": [
+   {
+    "object_id": "obs_src_0aa5d5cf8ad87e6093655893",
+    "revision": 1
+   }
+  ],
+  "s2evt-0053": [
+   {
+    "object_id": "obs_src_2c3bcc16900724c8ba07fd29",
+    "revision": 1
+   }
+  ],
+  "s2evt-0075": [
+   {
+    "object_id": "obs_src_5adecf79a16ac7a84c4006fa",
+    "revision": 1
+   }
+  ],
+  "s2evt-0076": [
+   {
+    "object_id": "obs_src_a22ca3d3f80bc891612994a3",
+    "revision": 1
+   }
+  ],
+  "s2evt-0077": [
+   {
+    "object_id": "obs_src_c05689a1944555462395e066",
+    "revision": 1
+   }
+  ],
+  "s2evt-0078": [
+   {
+    "object_id": "obs_src_b732d1c130a5dca5091ccaae",
+    "revision": 1
+   }
+  ],
+  "s2evt-0079": [
+   {
+    "object_id": "obs_src_49cedb59d877d61b918b9163",
+    "revision": 1
+   }
+  ],
+  "s2evt-0082": [
+   {
+    "object_id": "obs_src_db53fc982c2487d8abb14fcb",
+    "revision": 1
+   }
+  ]
+ },
+ "last_sim_time": "2026-08-08T00:30:00+00:00",
+ "conv_refs": {
+  "s2evt-0031": {
+   "session_id": "wx-main",
+   "turn_index": 18
+  },
+  "s2evt-0032": {
+   "session_id": "wx-main",
+   "turn_index": 19
+  },
+  "s2evt-0033": {
+   "session_id": "wx-main",
+   "turn_index": 20
+  },
+  "s2evt-0034": {
+   "session_id": "wx-main",
+   "turn_index": 21
+  },
+  "s2evt-0035": {
+   "session_id": "wx-main",
+   "turn_index": 22
+  },
+  "s2evt-0036": {
+   "session_id": "wx-main",
+   "turn_index": 23
+  },
+  "s2evt-0037": {
+   "session_id": "wx-main",
+   "turn_index": 24
+  },
+  "s2evt-0038": {
+   "session_id": "wx-main",
+   "turn_index": 25
+  },
+  "s2evt-0039": {
+   "session_id": "wx-main",
+   "turn_index": 26
+  },
+  "s2evt-0040": {
+   "session_id": "wx-main",
+   "turn_index": 27
+  },
+  "s2evt-0041": {
+   "session_id": "wx-main",
+   "turn_index": 28
+  },
+  "s2evt-0042": {
+   "session_id": "wx-main",
+   "turn_index": 29
+  },
+  "s2evt-0043": {
+   "session_id": "wx-main",
+   "turn_index": 30
+  },
+  "s2evt-0044": {
+   "session_id": "wx-main",
+   "turn_index": 31
+  },
+  "s2evt-0045": {
+   "session_id": "wx-main",
+   "turn_index": 32
+  },
+  "s2evt-0046": {
+   "session_id": "wx-main",
+   "turn_index": 33
+  },
+  "s2evt-0047": {
+   "session_id": "wx-main",
+   "turn_index": 34
+  },
+  "s2evt-0048": {
+   "session_id": "wx-main",
+   "turn_index": 35
+  },
+  "s2evt-0049": {
+   "session_id": "wx-main",
+   "turn_index": 36
+  },
+  "s2evt-0050": {
+   "session_id": "wx-main",
+   "turn_index": 37
+  },
+  "s2evt-0051": {
+   "session_id": "wx-main",
+   "turn_index": 38
+  },
+  "s2evt-0052": {
+   "session_id": "wx-main",
+   "turn_index": 39
+  },
+  "s2evt-0054": {
+   "session_id": "shop-night",
+   "turn_index": 1
+  },
+  "s2evt-0055": {
+   "session_id": "shop-night",
+   "turn_index": 2
+  },
+  "s2evt-0056": {
+   "session_id": "shop-night",
+   "turn_index": 3
+  },
+  "s2evt-0057": {
+   "session_id": "shop-night",
+   "turn_index": 4
+  },
+  "s2evt-0058": {
+   "session_id": "shop-night",
+   "turn_index": 5
+  },
+  "s2evt-0059": {
+   "session_id": "shop-night",
+   "turn_index": 6
+  },
+  "s2evt-0060": {
+   "session_id": "shop-night",
+   "turn_index": 7
+  },
+  "s2evt-0061": {
+   "session_id": "shop-night",
+   "turn_index": 8
+  },
+  "s2evt-0062": {
+   "session_id": "shop-night",
+   "turn_index": 9
+  },
+  "s2evt-0063": {
+   "session_id": "shop-night",
+   "turn_index": 10
+  },
+  "s2evt-0064": {
+   "session_id": "shop-night",
+   "turn_index": 11
+  },
+  "s2evt-0065": {
+   "session_id": "shop-night",
+   "turn_index": 12
+  },
+  "s2evt-0066": {
+   "session_id": "shop-night",
+   "turn_index": 13
+  },
+  "s2evt-0067": {
+   "session_id": "shop-night",
+   "turn_index": 14
+  },
+  "s2evt-0068": {
+   "session_id": "shop-night",
+   "turn_index": 15
+  },
+  "s2evt-0069": {
+   "session_id": "shop-night",
+   "turn_index": 16
+  },
+  "s2evt-0070": {
+   "session_id": "shop-night",
+   "turn_index": 17
+  },
+  "s2evt-0071": {
+   "session_id": "shop-night",
+   "turn_index": 18
+  },
+  "s2evt-0072": {
+   "session_id": "shop-night",
+   "turn_index": 19
+  },
+  "s2evt-0073": {
+   "session_id": "shop-night",
+   "turn_index": 20
+  },
+  "s2evt-0074": {
+   "session_id": "shop-night",
+   "turn_index": 21
+  },
+  "s2evt-0080": {
+   "session_id": "wx-main",
+   "turn_index": 40
+  },
+  "s2evt-0081": {
+   "session_id": "wx-main",
+   "turn_index": 41
+  },
+  "s2evt-0083": {
+   "session_id": "wx-main",
+   "turn_index": 42
+  }
+ }
+}

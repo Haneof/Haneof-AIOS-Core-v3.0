@@ -1,0 +1,342 @@
+{
+ "next_event_index": 63,
+ "event_refs": {
+  "evt-0003": [
+   {
+    "object_id": "obs_src_a3931be9195f5d7457debec2",
+    "revision": 1
+   }
+  ],
+  "evt-0004": [
+   {
+    "object_id": "obs_src_5806db7401674f359618af84",
+    "revision": 1
+   }
+  ],
+  "evt-0005": [
+   {
+    "object_id": "obs_src_248236c3ffafbfc67fe4f7a7",
+    "revision": 1
+   }
+  ],
+  "evt-0007": [
+   {
+    "object_id": "obs_src_4da0fe3b3ebcdf72fdb96878",
+    "revision": 1
+   }
+  ],
+  "evt-0008": [
+   {
+    "object_id": "obs_src_d7525d530305c3baf397af3e",
+    "revision": 1
+   }
+  ],
+  "evt-0009": [
+   {
+    "object_id": "obs_num_segment_7f35acab1d5f2382c19d8a48",
+    "revision": 1
+   },
+   {
+    "object_id": "obs_num_segment_52286bb1fa9888383e998663",
+    "revision": 1
+   },
+   {
+    "object_id": "obs_num_change_27cf2db82a87b17843e1f617",
+    "revision": 1
+   }
+  ],
+  "evt-0011": [
+   {
+    "object_id": "obs_src_bf78d0514dab42775e6a6880",
+    "revision": 1
+   }
+  ],
+  "evt-0012": [
+   {
+    "object_id": "obs_src_56715c43348e4580fc73779a",
+    "revision": 1
+   }
+  ],
+  "evt-0013": [
+   {
+    "object_id": "obs_src_9908a7a45fad268655f1dddc",
+    "revision": 1
+   }
+  ],
+  "evt-0015": [
+   {
+    "object_id": "obs_src_9699e2e5ddad4fda30755333",
+    "revision": 1
+   }
+  ],
+  "evt-0016": [
+   {
+    "object_id": "obs_src_e9c166cafe198c781ccc2942",
+    "revision": 1
+   }
+  ],
+  "evt-0018": [
+   {
+    "object_id": "obs_src_e2f1f848fd65b05dd20902a6",
+    "revision": 1
+   }
+  ],
+  "evt-0019": [
+   {
+    "object_id": "obs_src_d1af2fa4857559770ec3e994",
+    "revision": 1
+   }
+  ],
+  "evt-0020": [
+   {
+    "object_id": "obs_src_29d0a4b447268a6e243fe3a2",
+    "revision": 1
+   }
+  ],
+  "evt-0021": [
+   {
+    "object_id": "obs_src_ba9961111f60d5c59ede2de7",
+    "revision": 1
+   }
+  ],
+  "evt-0022": [
+   {
+    "object_id": "obs_src_6042981ce7f8181065cb8faa",
+    "revision": 1
+   }
+  ],
+  "evt-0023": [
+   {
+    "object_id": "obs_src_5117362f5c008f89421593eb",
+    "revision": 1
+   }
+  ],
+  "evt-0024": [
+   {
+    "object_id": "obs_src_05fe238532c21e3931e3a96f",
+    "revision": 1
+   }
+  ],
+  "evt-0026": [
+   {
+    "object_id": "obs_src_0eea16f75ff347ab3d6d72c3",
+    "revision": 1
+   }
+  ],
+  "evt-0027": [
+   {
+    "object_id": "obs_src_3c0b7944f5fbd5c22bfa4042",
+    "revision": 1
+   }
+  ],
+  "evt-0039": [
+   {
+    "object_id": "obs_src_5331e6932ea1022abb42da61",
+    "revision": 1
+   }
+  ],
+  "evt-0040": [
+   {
+    "object_id": "obs_src_1611e51f205405c7066b9607",
+    "revision": 1
+   }
+  ],
+  "evt-0041": [
+   {
+    "object_id": "obs_src_081c9358e56b1a112a40a946",
+    "revision": 1
+   }
+  ],
+  "evt-0042": [
+   {
+    "object_id": "obs_src_c9f9673bd5c00c2bdb2c19b4",
+    "revision": 1
+   }
+  ],
+  "evt-0044": [
+   {
+    "object_id": "obs_src_eab658fb0791831822f59db4",
+    "revision": 1
+   }
+  ],
+  "evt-0046": [
+   {
+    "object_id": "obs_src_2775e3a7bc1991d56ff9df96",
+    "revision": 1
+   }
+  ],
+  "evt-0049": [
+   {
+    "object_id": "obs_src_d36f408c2b5f8ba09512a72b",
+    "revision": 1
+   }
+  ],
+  "evt-0051": [
+   {
+    "object_id": "obs_src_1e997338d299df271a9e2b1a",
+    "revision": 1
+   }
+  ],
+  "evt-0052": [
+   {
+    "object_id": "obs_num_segment_d786b09179269f08fa25d1fe",
+    "revision": 1
+   },
+   {
+    "object_id": "obs_num_segment_1d209ad48052173f8a0d30ed",
+    "revision": 1
+   },
+   {
+    "object_id": "obs_num_change_ea5fcd519eecb9eaf3085014",
+    "revision": 1
+   }
+  ],
+  "evt-0053": [
+   {
+    "object_id": "obs_src_47ecdf81d77996b97d56a77b",
+    "revision": 1
+   }
+  ],
+  "evt-0055": [
+   {
+    "object_id": "obs_src_2978ba83c650f4691849dda2",
+    "revision": 1
+   }
+  ],
+  "evt-0057": [
+   {
+    "object_id": "obs_src_59c341c72443ddeb6918a505",
+    "revision": 1
+   }
+  ],
+  "evt-0059": [
+   {
+    "object_id": "obs_src_96b1f8f63810440562160889",
+    "revision": 1
+   }
+  ],
+  "evt-0061": [
+   {
+    "object_id": "obs_src_8b8cbef1b9a2c9d887bd0ade",
+    "revision": 1
+   }
+  ],
+  "evt-0062": [
+   {
+    "object_id": "obs_src_1cff85484d6110a9af5a9a64",
+    "revision": 1
+   }
+  ]
+ },
+ "conv_refs": {
+  "evt-0001": {
+   "session_id": "wx-main",
+   "turn_index": 1
+  },
+  "evt-0002": {
+   "session_id": "wx-main",
+   "turn_index": 2
+  },
+  "evt-0006": {
+   "session_id": "wx-main",
+   "turn_index": 3
+  },
+  "evt-0010": {
+   "session_id": "wx-main",
+   "turn_index": 4
+  },
+  "evt-0014": {
+   "session_id": "wx-main",
+   "turn_index": 5
+  },
+  "evt-0017": {
+   "session_id": "wx-main",
+   "turn_index": 6
+  },
+  "evt-0025": {
+   "session_id": "wx-main",
+   "turn_index": 7
+  },
+  "evt-0028": {
+   "session_id": "edit-night",
+   "turn_index": 1
+  },
+  "evt-0029": {
+   "session_id": "edit-night",
+   "turn_index": 2
+  },
+  "evt-0030": {
+   "session_id": "edit-night",
+   "turn_index": 3
+  },
+  "evt-0031": {
+   "session_id": "edit-night",
+   "turn_index": 4
+  },
+  "evt-0032": {
+   "session_id": "edit-night",
+   "turn_index": 5
+  },
+  "evt-0033": {
+   "session_id": "edit-night",
+   "turn_index": 6
+  },
+  "evt-0034": {
+   "session_id": "edit-night",
+   "turn_index": 7
+  },
+  "evt-0035": {
+   "session_id": "edit-night",
+   "turn_index": 8
+  },
+  "evt-0036": {
+   "session_id": "edit-night",
+   "turn_index": 10
+  },
+  "evt-0037": {
+   "session_id": "edit-night",
+   "turn_index": 11
+  },
+  "evt-0038": {
+   "session_id": "wx-main",
+   "turn_index": 8
+  },
+  "evt-0043": {
+   "session_id": "wx-main",
+   "turn_index": 9
+  },
+  "evt-0045": {
+   "session_id": "wx-main",
+   "turn_index": 10
+  },
+  "evt-0047": {
+   "session_id": "wx-main",
+   "turn_index": 11
+  },
+  "evt-0050": {
+   "session_id": "wx-main",
+   "turn_index": 12
+  },
+  "evt-0054": {
+   "session_id": "wx-main",
+   "turn_index": 13
+  },
+  "evt-0056": {
+   "session_id": "wx-main",
+   "turn_index": 14
+  },
+  "evt-0058": {
+   "session_id": "wx-main",
+   "turn_index": 15
+  },
+  "evt-0060": {
+   "session_id": "wx-main",
+   "turn_index": 16
+  },
+  "evt-0063": {
+   "session_id": "wx-main",
+   "turn_index": 17
+  }
+ },
+ "last_sim_time": "2026-07-14T15:45:00+00:00"
+}
