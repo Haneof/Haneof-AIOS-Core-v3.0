@@ -1,0 +1,1 @@
+{"58c738718d7e3b83105df68639fa95f1d14335e9f08fc4bb7da7e7f10de4b35c":{"kind":"capability_calls","calls":[{"name":"read_periodic_review_anchors","arguments":{"offset":0,"limit":20},"call_id":"seg003-jan23-review-anchors"}]}}
