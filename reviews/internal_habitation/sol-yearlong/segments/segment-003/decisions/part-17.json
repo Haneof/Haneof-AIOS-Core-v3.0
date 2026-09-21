@@ -1,0 +1,1 @@
+{"54f28d9989878eb7f20b604c9952a5f2c629edefd880133b545c77d2ab6fd37c":{"kind":"capability_calls","calls":[{"name":"inspect_world_object","arguments":{"object_id":"obs_src_facf2b040e0feb3a89b935f2","revision":1},"call_id":"seg003-jan21-staff-raw"},{"name":"inspect_world_object","arguments":{"object_id":"task_4ab2a4531967655198502158"},"call_id":"seg003-morning-observation-task"}]}}
