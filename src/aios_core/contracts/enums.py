@@ -224,6 +224,14 @@ class TaskState(StrEnum):
     CANCELLED = "cancelled"
 
 
+class AttentionClass(StrEnum):
+    """Mechanical routing class for Resident attention."""
+
+    INTERRUPT = "interrupt"
+    BACKGROUND = "background"
+    REVIEW_QUEUE = "review_queue"
+
+
 class WakeSource(StrEnum):
     MECHANICAL_CHANGE = "mechanical_change"
     KEYWORD_ENTITY = "keyword_entity"
