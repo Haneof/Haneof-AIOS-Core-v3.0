@@ -1,0 +1,14 @@
+{
+  "86567629dc5173bd8291e9e66e96b5ade2c5e40e9a4fd9e3d3fd616b247e39ab": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "arguments": {
+          "object_id": "task_69ef4867f08ab38263ae2547"
+        },
+        "call_id": "seg003-fire-current-state-01"
+      }
+    ]
+  }
+}
