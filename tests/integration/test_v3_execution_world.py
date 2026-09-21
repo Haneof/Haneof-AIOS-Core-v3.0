@@ -460,3 +460,4 @@ def test_cancel_authorize_race_is_fail_closed(tmp_path):
     assert store.get_payload(task.task_id)["task_state"] == "cancelled"
     assert store.get_payload(action.action_id, revision=1)["action_status"] == "proposed"
     assert store.get_payload(action.action_id)["action_status"] == "cancelled"
+# T34-EXEC-001 reproduction boundary: implementation intentionally unchanged above.
