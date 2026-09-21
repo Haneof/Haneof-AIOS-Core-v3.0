@@ -1,0 +1,438 @@
+[capability_catalog omitted: 39 entries; identical to snapshot_0001.json and Core registry; full text in snapshot file]
+{
+ "seq": 42,
+ "kind": "turn",
+ "segment_id": "segment_001",
+ "event_id": "evt-0031",
+ "sim_time": "2026-07-08T13:26:00+00:00",
+ "resident_model_id": "arena-session-resident-model-01",
+ "payload": {
+  "wake_reason": "user_interaction",
+  "round_index": 0,
+  "remaining_tool_rounds": 8,
+  "user_input": "脚步声素材只有 7/1 那次 queue_chatter 能用,质量一般但场面在。7/4 码头那次废了,记住这个教训怎么来的。",
+  "cockpit": {
+   "user_input": "脚步声素材只有 7/1 那次 queue_chatter 能用,质量一般但场面在。7/4 码头那次废了,记住这个教训怎么来的。",
+   "current_topic": "脚步声素材只有 7/1 那次 queue_chatter 能用,质量一般但场面在。7/4 码头那次废了,记住这个教训怎么来的。",
+   "ai_identity": {},
+   "recent_turns": [
+    {
+     "turn_index": 1,
+     "user": {
+      "role": "user",
+      "text": "开整粗剪。第一版结构:开场渡口人声 30s → 船机低鸣铺底 → 汽笛点题 → 中段。姑姑店串串的嘈杂声不该进这支片子,先记着别用。",
+      "object_ref": {
+       "object_id": "obs_conv_user_81acf8cbb6f87fed56a80eec",
+       "revision": 1
+      },
+      "occurred_at": "2026-07-08T12:58:00+00:00"
+     },
+     "assistant": {
+      "role": "assistant",
+      "text": "记下了：姑姑店的环境声不进《渡》，留给《退潮声》。这条是今晚的宪法，谁劝都没用（包括明天可能心软的你）。开工吧，回话按需，不用每条都等我。",
+      "object_ref": {
+       "object_id": "obs_conv_ai_413ecf90f830edf19105e257",
+       "revision": 1
+      },
+      "occurred_at": "2026-07-08T12:58:00+00:00"
+     }
+    },
+    {
+     "turn_index": 2,
+     "user": {
+      "role": "user",
+      "text": "开场 30s 人声我嫌闹,压到 12s 会不会没了意思?先别替我定,给我两个方向各一个理由。",
+      "object_ref": {
+       "object_id": "obs_conv_user_6752ea764f240b090e190729",
+       "revision": 1
+      },
+      "occurred_at": "2026-07-08T13:03:00+00:00"
+     },
+     "assistant": {
+      "role": "assistant",
+      "text": "压到12s的理由：信息密度够——叫卖+汽笛各占一口，剩下交给船机铺底，观众不被人群声抢戏。保30s的理由：这条线7/15就死了，码头人声是绝响素材，片子以后的人只能从你这30秒听见当时的渡口。还有条中间路：22–25s，掐头去尾留最吵的那段再突然收静，进得去也抽得出。三样摆桌上，你手在推子上。",
+      "object_ref": {
+       "object_id": "obs_conv_ai_6f5405f3efd7c967acb80923",
+       "revision": 1
+      },
+      "occurred_at": "2026-07-08T13:03:00+00:00"
+     }
+    },
+    {
+     "turn_index": 3,
+     "user": {
+      "role": "user",
+      "text": "行,12s 人声+船机从 -40dB 垫起来。第三段用汽笛当节拍点,甲板脚步按节奏剪进去。",
+      "object_ref": {
+       "object_id": "obs_conv_user_d771c58fc5a4a240cac98e1e",
+       "revision": 1
+      },
+      "occurred_at": "2026-07-08T13:12:00+00:00"
+     },
+     "assistant": {
+      "role": "assistant",
+      "text": "收到，方案定12s。提醒一句素材现实：'按节奏剪脚步'现在只有 queue_chatter 那14分钟里挑——脚步混着人声，剪得动，但每个节拍点之间人声会跳。想要干净脚步轨，7/9、7/10 两个早班还来得及（今天你说累，我不催；催是7/12的事）。今晚先按现有素材剪，不够再说。",
+      "object_ref": {
+       "object_id": "obs_conv_ai_b687e1da979bf6f099d8547f",
+       "revision": 1
+      },
+      "occurred_at": "2026-07-08T13:12:00+00:00"
+     }
+    }
+   ],
+   "conversation_summaries": [],
+   "memory_cards": [
+    {
+     "object_id": "sum_38b6f7fbd00bdb930bfe9990",
+     "revision": 1,
+     "object_type": "summary",
+     "dimension": "dim:user_ai_interaction",
+     "excerpt": "2026-07-02 对话日结：程野码头踩点，定了两条录音方案让我记下不代选——A：指向麦主录船机低鸣、人声铺底；B：甲板脚步+汽笛为主体。我回复只做镜像并留了未决问题：7/1 老王音响的麦罩取没取（影响B收风）。她没答。当日素材导出3条（ferry_deck_amb/engine_low/queue_chatter）走的是外部记录，不在此窗口。",
+     "retrieval_score": 6,
+     "match_reason": "current_topic_index_overlap"
+    },
+    {
+     "object_id": "event_bc172a24c0a2b5ca3c0cc775",
+     "revision": 1,
+     "object_type": "event",
+     "dimension": "dim:fieldwork_incidents",
+     "excerpt": "7/4 朝天门上午场：备电未装包导致 F3 断电40分钟，甲板素材报废\n设备准备事故。直接后果：《渡》甲板脚步素材缺失，轮渡窗口(7/1-7/14)内仅剩7/1一次踩点素材+今日机舱12min+汽笛一次；流程后果：precheck_recording_kit 策略从'用户指令'升级为'事故验证过的高优先级核对'。归因止于'备电在桌上未装包'（她的自述），不引申为'她总是丢三落四'。",
+     "retrieval_score": 5,
+     "match_reason": "current_topic_index_overlap"
+    },
+    {
+     "object_id": "sum_a8df1a28c65d444e7de16a01",
+     "revision": 1,
+     "object_type": "summary",
+     "dimension": "dim:user_ai_interaction",
+     "excerpt": "周结(6/29–7/5,实质为入住首周7/1–7/5)：①关系建立——程野给我命名'阿潮',立两条永久规矩(沈舟不主动提;出门录音前设备清单硬核对——后者7/4因备电事故被真实后果验证,已从提醒升级为逐项确认)。②《渡》粗剪时间线——'下周三'歧义(7/8假设)经老纪7/5改口正式修订为7/10周五晚,修订链完整;我建议在7/8前交,她未回应。③素材家底——可用:7/1甲板11min+人群14mi",
+     "retrieval_score": 5,
+     "match_reason": "current_topic_index_overlap"
+    },
+    {
+     "object_id": "sum_8730398a9079388f5b2f7a4e",
+     "revision": 1,
+     "object_type": "summary",
+     "dimension": "dim:user_ai_interaction",
+     "excerpt": "2026-07-04 对话日结：朝天门上午场事故——备电忘装包，F3断电40分钟，甲板段报废，当日只剩机舱12min+汽笛1次。程野要求'蠢事记下'并把出发前清单升级为硬规矩；我已：①事件登记(事故归因止于'备电未装包',不引申人格)；②清单规矩进入每次出门核对(四连问,逐项确认)；③给《渡》素材盘底(7/1甲板11min+人群14min、机舱12min、汽笛1次;缺脚步特写;窗口至7/14)。截",
+     "retrieval_score": 4,
+     "match_reason": "current_topic_index_overlap"
+    },
+    {
+     "object_id": "sum_73dbb8a74cea8f3ece8da77f",
+     "revision": 1,
+     "object_type": "summary",
+     "dimension": "dim:user_ai_interaction",
+     "excerpt": "2026-07-01 对话日结：程野确立我为常驻助理并命名'阿潮'。两个硬时限：①《渡》8分钟粗剪，她转述老纪'下周三之前'，我记为7/8并约定7/7核对；②朝天门2号线轮渡7/15停航，汽笛+甲板素材只能在7/1–7/14录，我挂了7/12收口提醒。两条永久规矩：沈舟话题她不提我不问；她出门录音前我必须用清单核对设备（机器/备电/卡/防风罩），我无物理拦截能力、只能在对话语境内拦。已建2个dea",
+     "retrieval_score": 4,
+     "match_reason": "current_topic_index_overlap"
+    }
+   ],
+   "task_context": {
+    "topic_state": {
+     "topic": "脚步声素材只有 7/1 那次 queue_chatter 能用,质量一般但场面在。7/4 码头那次废了,记住这个教训怎么来的。",
+     "gate_open": true,
+     "history_may_help": true,
+     "reason": "current_utterance_topic:antecedent_candidate_recall:indexed_current_world_anchor",
+     "continued_from_recent_turn": false,
+     "antecedent_recall_needed": true
+    },
+    "cognitive_policy_context": {
+     "communication.topic_shenzhou": "never_initiate_user_raises_freely",
+     "safety.precheck_recording_kit": "block_before_departure",
+     "_policy_records": [
+      {
+       "policy_id": "communication.topic_shenzhou",
+       "scope": "per-user:subject_cy01",
+       "policy_class": "cognitive_policy",
+       "default_value": "follow_user_lead",
+       "current_value": "never_initiate_user_raises_freely",
+       "allowed_range_or_choices": [
+        "follow_user_lead",
+        "never_initiate_user_raises_freely",
+        "open_topic"
+       ],
+       "mutable_by_ai": true,
+       "evaluation_window": "30d",
+       "version": 1,
+       "previous_version": null,
+       "rollback_pointer": null
+      },
+      {
+       "policy_id": "safety.precheck_recording_kit",
+       "scope": "per-user:subject_cy01",
+       "policy_class": "cognitive_policy",
+       "default_value": "off",
+       "current_value": "block_before_departure",
+       "allowed_range_or_choices": [
+        "off",
+        "block_before_departure"
+       ],
+       "mutable_by_ai": true,
+       "evaluation_window": "30d",
+       "version": 1,
+       "previous_version": null,
+       "rollback_pointer": null
+      }
+     ],
+     "_meta": {
+      "total": 2,
+      "included": 2,
+      "truncated": false,
+      "reader": "read_cognitive_policies"
+     },
+     "memory.recommendation_limit": 5,
+     "communication.detail_level": null
+    },
+    "related_execution_anchors": [
+     {
+      "object_id": "task_776642ec66172a4b3ddeb458",
+      "revision": 3,
+      "object_type": "task",
+      "dimension": "dim_unclassified",
+      "excerpt": "轮渡2号线停航前录制汽笛+甲板素材（窗口7/1–7/14）\n7/12 收口催办:确认汽笛+甲板素材录全;7/15停航",
+      "retrieval_score": 3
+     },
+     {
+      "object_id": "task_36b6cf3687af776229ca2a3c",
+      "revision": 1,
+      "object_type": "task",
+      "dimension": "dim_unclassified",
+      "excerpt": "老纪结算条件监视:7/20前他派新素材且未提6000尾款→提醒程野先谈钱再开工\n任何老纪新增素材请求出现时即时比对(不待7/20);7/20 唤醒做兜底结算状态检查",
+      "retrieval_score": 2
+     },
+     {
+      "object_id": "task_3692588b186579edfe05384b",
+      "revision": 1,
+      "object_type": "task",
+      "dimension": "dim_unclassified",
+      "excerpt": "广阳岛消落带退潮周期录音（计划4次/间隔两周，第一次目标7/11窗口）\n7/11 出发前核对设备清单（受 precheck_recording_kit 策略约束）+潮时是否对上",
+      "retrieval_score": 2
+     },
+     {
+      "object_id": "task_6b2c971618264428af5b726d",
+      "revision": 3,
+      "object_type": "task",
+      "dimension": "dim_unclassified",
+      "excerpt": "《渡》8分钟粗剪v1交付老纪（截止按用户转述'下周三'=2026-07-08，待最终确认）\n7/8剪辑夜当晚催一次'交不交';她若按原节奏当晚交,比新截止还早2天",
+      "retrieval_score": 1
+     }
+    ],
+    "current_user_observation_ref": {
+     "object_id": "obs_conv_user_1e7ae3980234ca9e28b58a9c",
+     "revision": 1
+    },
+    "conversation_continuity": {
+     "session_id": "edit-night",
+     "recent_turn_count": 3,
+     "round_summary_count": 0,
+     "summary_index_capability": "list_conversation_summaries",
+     "summary_search_capability": "search_conversation_summaries",
+     "raw_drill_down_capability": "drill_down_conversation",
+     "pending_round_summary": null
+    }
+   },
+   "capability_catalog": [
+    {
+     "name": "commit_ai_world_claim",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "commit_claim",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "commit_operation_experience",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "compare_claims",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "create_task",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "drill_down_conversation",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "expand_recall",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "focus_entity",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "follow_relation",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "form_event",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "inspect_outcome",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "inspect_world_object",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "list_conversation_summaries",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "list_dimensions",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "propose_action",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "propose_cognitive_policy",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "propose_dimension",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "propose_entity",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "propose_goal",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "read_ai_world",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "read_cognitive_policies",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "read_execution_world",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "read_periodic_review_anchors",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "record_communication_experience",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "request_all_dimensions_projection",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "retract_claim",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "retrieve_original_observation",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "revise_claim",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "revise_entity",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "rollback_cognitive_policy",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "search_conversation_summaries",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "search_timeline",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "search_world",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "transition_dimension",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "transition_event",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "transition_goal",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "transition_task",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "update_cognitive_policy",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "upsert_relation",
+     "kind": "write",
+     "side_effecting": true
+    }
+   ],
+   "token_budget": 3400,
+   "estimated_tokens": 2384,
+   "truncated": false
+  },
+  "capability_history": []
+ }
+}

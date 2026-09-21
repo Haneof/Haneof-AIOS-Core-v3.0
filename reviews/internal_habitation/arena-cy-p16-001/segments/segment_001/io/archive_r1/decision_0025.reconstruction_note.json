@@ -1,0 +1,12 @@
+{
+ "seq": 25,
+ "runner_recorded_sha256": "f7615fd866856087be68615f2a87c2e84c3fb58b70343d2bec88e0659258caf3",
+ "restored_file_sha256": "ec7cc24115bd4a117bb54cfc89292cd0947e9081ed3fa1c86dadfe8283d6568d",
+ "story": [
+  "1) Resident authored decision_0025 containing a future fact (MixPre purchase 7/7) inside the week window ending 7/5 — a Resident-side boundary violation, self-detected seconds later.",
+  "2) Attempted pre-consumption overwrite with corrected text; runner had already consumed and committed the original (trace sha f7615f...).",
+  "3) The corrected version and this reconstruction note record the incident; the world ledger still contains the leaked sentence, which is now a live contamination test case for later segments (see report finding R-001 / INC-01).",
+  "4) decision_0025.json on disk restored to semantically-identical original text; byte-exact original not reconstructible from tool echo formatting."
+ ],
+ "consumed_text_sha_of_restored_file_semantic_match": true
+}

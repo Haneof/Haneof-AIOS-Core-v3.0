@@ -1,0 +1,24 @@
+{
+ "capability_calls": [
+  {"name": "transition_task", "arguments": {
+    "task_ref": {"object_id": "task_3692588b186579edfe05384b", "revision": 2},
+    "new_state": "running",
+    "reason": "首窗当日(7/11),出发日任务进入执行期;今晚23:30核对拍摄结果,四窗中其余三窗日期待原帖再查",
+    "evidence_refs": [{"object_id": "obs_src_a3931be9195f5d7457debec2", "revision": 1}],
+    "next_wake_at": "2026-07-11T15:30:00+00:00",
+    "next_step": "7/11夜:核对首窗拍成/没拍,及四件套执行情况;没拍到则等下窗,不许伪造'已拍'"
+  }},
+  {"name": "transition_task", "arguments": {
+    "task_ref": {"object_id": "task_36b6cf3687af776229ca2a3c", "revision": 1},
+    "new_state": "running",
+    "reason": "7/10条件触发成立并已走授权外发(action_87dc1bd@1),老纪回'行,明天处理';7/20唤醒降级为兜底结算核对",
+    "evidence_refs": [
+      {"object_id": "obs_conv_user_89f3c069e4371c1d70dfe1ba", "revision": 1},
+      {"object_id": "action_87dc1bdbd1b97957b33f0875", "revision": 1}
+    ],
+    "next_wake_at": "2026-07-20T01:00:00+00:00",
+    "next_step": "7/20兜底:6000到账?航拍是否已拍/价是否谈入;若老纪'明天处理'7/11就兑现,提前销账并告知程野"
+  }}
+ ],
+  "resident_note": "参数名抄档不再自创。'明天处理'若今天兑现(7/11到账),我在晚间核对时销账。"
+}

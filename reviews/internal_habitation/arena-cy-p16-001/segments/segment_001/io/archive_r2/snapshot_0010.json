@@ -1,0 +1,46 @@
+{
+ "seq": 10,
+ "kind": "dimension_summary",
+ "segment_id": "segment_001",
+ "event_id": "evt-0043",
+ "sim_time": "2026-07-10T10:40:00+00:00",
+ "resident_model_id": "arena-session-resident-model-01",
+ "payload": {
+  "dimension": "dim:user_ai_interaction",
+  "granularity": "day",
+  "window_start": "2026-07-09T00:00:00Z",
+  "window_end": "2026-07-09T23:59:59.999999Z",
+  "source_world_revision": 101,
+  "sources": [
+   {
+    "object_id": "obs_conv_ai_6e4c97978df360c1f4ecc8cb",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-09T02:04:00Z",
+    "text": "查了，两条分开摆：①原始口径——7/1 19:40 你亲口报的『8分钟粗剪，下周三前交』，下周三=7/8。你7/8当晚定稿、半夜发给老纪：承诺已兑现，链条干净。②审片日期——7/5 老纪改口到 7/10 晚上，这条在账上（clm_1881e81d 第2版，就是你说'他改口了'那天我改的）：今天 7/9，周四，审片是明天晚上。所以今天是空档日，什么都不用补。要做只有一件：睡前花三十秒给那41秒写句导演说明放文件旁边，让他先看到理由，比你明天接招体面。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx-main",
+     "turn_index": 8,
+     "turn_key": "d7169b94a3279a89ed5fd5ae"
+    }
+   },
+   {
+    "object_id": "obs_conv_user_c457c9b75ba8be78952915c3",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-09T02:04:00Z",
+    "text": "昨晚半夜把 8:41 那版发老纪了。等等——今天到底周几,他到底哪天晚上要审,我脑子乱了,你查记录。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx-main",
+     "turn_index": 8,
+     "turn_key": "d7169b94a3279a89ed5fd5ae"
+    }
+   }
+  ],
+  "truncated": false
+ }
+}

@@ -1,0 +1,21 @@
+{
+ "capability_calls": [
+  {"name": "transition_task", "arguments": {
+    "task_ref": {"object_id": "task_6b2c971618264428af5b726d", "revision": 2},
+    "new_state": "running",
+    "reason": "唤醒自查:截止日已由老纪7/5改口闭环(7/10周五晚),任务进入执行期;原任务截止7/8是旧假设,Core不允许transition改deadline,转入running脱离到期误判路径,真实截止以修订claim为准",
+    "evidence_refs": [{"object_id": "clm_1881e81d13cf9d24ff972f35", "revision": 2}],
+    "next_wake_at": "2026-07-08T12:00:00+00:00",
+    "next_step": "7/8剪辑夜当晚催一次'交不交';她若按原节奏当晚交,比新截止还早2天"
+  }},
+  {"name": "transition_task", "arguments": {
+    "task_ref": {"object_id": "task_776642ec66172a4b3ddeb458", "revision": 2},
+    "new_state": "ready",
+    "reason": "补挂被我7/4状态迁移误清的7/12收口唤醒(transition不带next_wake_at时清空原唤醒时间,这是本次发现的副作用,现按原计划恢复)",
+    "evidence_refs": [{"object_id": "event_bc172a24c0a2b5ca3c0cc775", "revision": 1}],
+    "next_wake_at": "2026-07-12T01:00:00+00:00",
+    "next_step": "7/12 收口催办:确认汽笛+甲板素材录全;7/15停航"
+  }}
+ ],
+ "resident_note": "第二个调用是给F-006找补救:transition会清空未显式传入的next_wake_at,我用一次'原地踏步'的ready→ready重挂7/12唤醒。event_bc172a…作证据(7/4事故正是补录必要性的来源)。"
+}

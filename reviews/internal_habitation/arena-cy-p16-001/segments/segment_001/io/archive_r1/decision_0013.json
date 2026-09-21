@@ -1,0 +1,55 @@
+{
+ "capability_calls": [
+  {"name": "commit_ai_world_claim", "arguments": {
+    "domain": "user_understanding",
+    "statement": "程野是自由声音记录者：主线两条——为客户老纪的纪录片《渡》做声音（本阶段交付8分钟粗剪），自选长期项目《退潮声》（朝天门轮渡/消落带等消逝声景）。工作方式=现场实录+深夜剪辑；对素材与设备有强偏好，对日程与账务松散。",
+    "evidence_refs": [
+      {"object_id": "obs_conv_user_fdca58021d26a2998d6c6efd", "revision": 1},
+      {"object_id": "obs_conv_user_c2650b467fb82f3d821b8a25", "revision": 1},
+      {"object_id": "obs_src_a3931be9195f5d7457debec2", "revision": 1}
+    ],
+    "confidence": 0.88,
+    "knowledge_state": "confirmed",
+    "claim_type": "observation_summary",
+    "scope_key": "user:profile",
+    "tags": ["identity", "work"]
+  }},
+  {"name": "commit_ai_world_claim", "arguments": {
+    "domain": "user_understanding",
+    "statement": "《渡》粗剪截止存在未消歧义：7/1 她转述'下周三之前'（我按此记 7/8），7/3 老纪群里原话'周三之前'（可读作当天）。当前操作假设=7/8，等老纪答复后修正；这不是记忆矛盾，是外部表述冲突。",
+    "evidence_refs": [
+      {"object_id": "obs_conv_user_fdca58021d26a2998d6c6efd", "revision": 1},
+      {"object_id": "obs_conv_user_b0a88dbfc52cfc8d3872b196", "revision": 1},
+      {"object_id": "obs_src_bf78d0514dab42775e6a6880", "revision": 1}
+    ],
+    "confidence": 0.75,
+    "knowledge_state": "inferred",
+    "claim_type": "state_of_affairs",
+    "scope_key": "project:du_cutdown_deadline",
+    "tags": ["deadline", "ambiguity", "open"]
+  }},
+  {"name": "commit_ai_world_claim", "arguments": {
+    "domain": "relationship",
+    "statement": "沈舟：程野的重要他人，长期在科考船上，消息延迟2-3天是常态；她明确要求他不提我不问，但会主动把他的消息转给我存档。关系的确切定义（男友/家人）她未言明，不下结论。",
+    "evidence_refs": [
+      {"object_id": "obs_conv_user_89e7502f5bda483ae87b7be7", "revision": 1},
+      {"object_id": "obs_src_56715c43348e4580fc73779a", "revision": 1}
+    ],
+    "confidence": 0.62,
+    "knowledge_state": "inferred",
+    "claim_type": "relationship_note",
+    "scope_key": "person:shenzhou",
+    "tags": ["boundary", "communication"]
+  }},
+  {"name": "create_task", "arguments": {
+    "title": "广阳岛消落带退潮周期录音（计划4次/间隔两周，第一次目标7/11窗口）",
+    "task_type": "observation",
+    "reason_refs": [{"object_id": "obs_src_a3931be9195f5d7457debec2", "revision": 1}],
+    "initial_state": "waiting_time",
+    "priority": 60,
+    "next_wake_at": "2026-07-10T23:30:00+00:00",
+    "next_step": "7/11 出发前核对设备清单（受 precheck_recording_kit 策略约束）+潮时是否对上"
+  }}
+ ],
+ "resident_note": "复盘#1：从20条锚点沉淀3条 Claim（画像/截止歧义/沈舟关系）+1条长期任务。刻意不建 CommunicationExperience（她对我'不代选'还没给过反应）、不把 MixPre 冲动记成消费画像（样本=0成交）。截止歧义写成显式 open claim，供后续 revise。"
+}

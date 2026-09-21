@@ -1,0 +1,27 @@
+{
+ "status": "verify",
+ "segment_id": "segment_001",
+ "reopened_existing_world": true,
+ "world_revision": 164,
+ "index_watermark": 164,
+ "restored_sim_clock": "2026-07-14T15:45:00+00:00",
+ "restored_session_turns": {
+  "edit-night": 11,
+  "wx-main": 17
+ },
+ "object_counts": {
+  "action": 1,
+  "claim": 6,
+  "cognitive_policy": 2,
+  "dependency": 212,
+  "event": 1,
+  "evidence_set": 12,
+  "observation": 94,
+  "outcome": 1,
+  "summary": 18,
+  "task": 4,
+  "wake": 8
+ },
+ "pending_wakes": [],
+ "verified_at_real": "2026-09-21T03:50:06.043733+00:00"
+}

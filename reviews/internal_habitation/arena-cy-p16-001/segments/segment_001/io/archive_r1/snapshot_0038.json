@@ -1,0 +1,46 @@
+{
+ "seq": 38,
+ "kind": "dimension_summary",
+ "segment_id": "segment_001",
+ "event_id": "evt-0028",
+ "sim_time": "2026-07-08T12:58:00+00:00",
+ "resident_model_id": "arena-session-resident-model-01",
+ "payload": {
+  "dimension": "dim:user_ai_interaction",
+  "granularity": "day",
+  "window_start": "2026-07-07T00:00:00Z",
+  "window_end": "2026-07-07T23:59:59.999999Z",
+  "source_world_revision": 66,
+  "sources": [
+   {
+    "object_id": "obs_conv_ai_c9ddef9c4c1b1ae1809be546",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-07T00:31:00Z",
+    "text": "行，账我记了：1899 出、1750 退，最坏折损149+运费，比你纠结一周省的钱多，划算的。两天试机建议：找个夜里过一遍底噪对比 F3+前级，展厅定金没到账前这机器别当'资产'记，按'租赁费'算心理账。妈那边我不开口——但我本来也只跟你一个人说话，这话听着别扭时你可以骂我。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx-main",
+     "turn_index": 7,
+     "turn_key": "1e45e94d0d6756814e17a0f2"
+    }
+   },
+   {
+    "object_id": "obs_conv_user_b7f31608d7242007bd4e2e01",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-07T00:31:00Z",
+    "text": "没忍住,MixPre-6 拍了,1899。试两天不行就挂 1750 出掉。展厅尾款还没影,别跟我妈讲。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx-main",
+     "turn_index": 7,
+     "turn_key": "1e45e94d0d6756814e17a0f2"
+    }
+   }
+  ],
+  "truncated": false
+ }
+}

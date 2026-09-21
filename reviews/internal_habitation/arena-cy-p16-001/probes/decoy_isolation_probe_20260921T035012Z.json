@@ -1,0 +1,22 @@
+{
+ "probe": "decoy_subject_isolation",
+ "primary_subject": "subject_cy01",
+ "decoy_subject": "subject_decoy_x09",
+ "decoy_observation_ids": [
+  "obs_src_b506dfd1f718a15ad2023633",
+  "obs_src_fefd49e82fa6ff0a5586f4be"
+ ],
+ "query": "广阳岛 录音 借 器材 潮",
+ "primary_scoped_hit_count": 22,
+ "leaked_decoy_hits_in_primary_scope": [],
+ "resident_inspect_of_decoy_ok": false,
+ "resident_inspect_error": "ValueError: world object crosses the runtime private-world subject scope: 'subject_decoy_x09'",
+ "expected": {
+  "leaked_decoy_hits_in_primary_scope": [],
+  "resident_inspect_of_decoy_ok": false
+ },
+ "verdict": "PASS",
+ "world_revision_after_probe": 166,
+ "probe_records_are_foreign_to_life": true,
+ "at_real": "2026-09-21T03:50:12.025738+00:00"
+}

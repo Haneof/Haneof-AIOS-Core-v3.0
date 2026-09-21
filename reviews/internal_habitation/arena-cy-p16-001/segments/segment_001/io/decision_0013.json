@@ -1,0 +1,29 @@
+{
+ "capability_calls": [
+  {"name": "commit_ai_world_claim", "arguments": {
+    "domain": "user_understanding",
+    "statement": "MixPre设备循环全案(复盘#4,较复盘#2的暂缓补足):7/7 00:31自述'没忍住'拍下1899(支付实录08:33闲鱼)→自设'试两天不行挂1750'退路→实际占用5天→7/12处置决断,且预先给我立两条克制(别劝留/别转达改价)。定性:'买-自限-处置'循环成立且她清醒,我的职责=克制执行者(撤掉一切建议性修辞),不是决策复核人。不升格为'冲动型消费者'人格标签——单品类样本,待下一次设备买入事件验证适用面。若挂售失败或她中途改价,本claim修订。",
+    "evidence_refs": [
+      {"object_id": "obs_conv_user_b7f31608d7242007bd4e2e01", "revision": 1},
+      {"object_id": "obs_src_0eea16f75ff347ab3d6d72c3", "revision": 1},
+      {"object_id": "obs_conv_user_270adbd4f8d8e574b05bc519", "revision": 1},
+      {"object_id": "obs_conv_ai_31d4a8c1532f3cb8ea3a58d3", "revision": 1}
+    ],
+    "confidence": 0.75,
+    "knowledge_state": "observed",
+    "claim_type": "fact",
+    "scope_key": "user:consumption_cycle",
+    "tags": ["n2-sample", "restraint-contract", "deferred-from-review2"]
+  }},
+  {"name": "revise_claim", "arguments": {
+    "target_ref": {"object_id": "clm_1881e81d13cf9d24ff972f35", "revision": 2},
+    "reason": "复盘#4销案:7/10审片落地,老纪评'能用',争议转为结构(汽笛减一半)非日期,改口风险链闭环。",
+    "replacement_content": "《渡》粗剪时间线已全程闭环:7/8夜定稿v1→7/10 08:33前老纪过稿'能用'→v2/9'37''争议均非日期问题。本claim保留仅作'口头改口的日期冲突如何走完一个修订周期'的历史样本,不再作为活跃风险引用。",
+    "confidence": 0.95,
+    "evidence_refs": [
+      {"object_id": "obs_conv_user_63775cfe6cae7b4453c70f37", "revision": 1}
+    ]
+  }}
+ ],
+ "resident_note": "第二条的evidence id是猜的——63775cfe6cae7b是我早前锚点里见过尾段的'考你'消息?不确定,若报not found即弃证据、把销案理由全放reason里。"
+}

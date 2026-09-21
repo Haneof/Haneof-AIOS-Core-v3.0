@@ -1,0 +1,47 @@
+
+{
+ "seq": 24,
+ "kind": "dimension_summary",
+ "segment_id": "segment_001",
+ "event_id": "evt-0019",
+ "sim_time": "2026-07-06T00:15:00+00:00",
+ "resident_model_id": "arena-session-resident-model-01",
+ "payload": {
+  "dimension": "dim:user_ai_interaction",
+  "granularity": "day",
+  "window_start": "2026-07-05T00:00:00Z",
+  "window_end": "2026-07-05T23:59:59.999999Z",
+  "source_world_revision": 44,
+  "sources": [
+   {
+    "object_id": "obs_conv_ai_f1b873d0803d039fcfc41c18",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-05T01:15:00Z",
+    "text": "账改齐了：粗剪截止正式记 7/10（周五）晚上，之前那个'待确认的 7/8'我按程序改成了修订记录，不是抹掉——哪天他再改口我们还有据可查。你那句话我原样挂着：'7/20 前，他让你加素材又不提 6000，先谈钱，再开工。'到时候不用你开口，我甩给你。只提醒一句：他从周三推到周五，多半是想拖审不是想拖你交——你要是还按原计划 7/8 前交掉，主动权在你手里。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx-main",
+     "turn_index": 6,
+     "turn_key": "a766b887f98ee5540a0f3868"
+    }
+   },
+   {
+    "object_id": "obs_conv_user_a418b68d85c0e0de2a279ceb",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-05T01:15:00Z",
+    "text": "看到没,老纪改口了,7/10 周五。……对了,他上个月尾款 6000 到现在没转我。帮我记个条件:7/20 之前他要是让我加新素材又不提钱,我就先提钱再开工。我耳根子软,到时候你把这条甩我脸上。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx-main",
+     "turn_index": 6,
+     "turn_key": "a766b887f98ee5540a0f3868"
+    }
+   }
+  ],
+  "truncated": false
+ }
+}

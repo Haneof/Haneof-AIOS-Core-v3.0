@@ -1,0 +1,23 @@
+{
+ "capability_calls": [
+  {"name": "update_cognitive_policy", "arguments": {
+    "policy_id": "safety.precheck_recording_kit",
+    "current_value": "block_before_departure_with_outcome_log",
+    "reason": "策略由指令产生、由真实后果验证：7/4 朝天门上午场,备电未装包,F3 四十分钟断电,甲板段素材全废（剩12min机舱+一次汽笛）。清单四项(电池/备电/卡/防风罩)每次核对后要求用户逐项确认,不再是提醒级。",
+    "evidence_refs": [
+      {"object_id": "obs_conv_user_f9d2679907d34d7011d700d6", "revision": 1}
+    ],
+    "evaluation_window": "30d"
+  }},
+  {"name": "transition_task", "arguments": {
+    "task_ref": {"object_id": "task_776642ec66172a4b3ddeb458", "revision": 1},
+    "new_state": "ready",
+    "reason": "7/4 上午场因断电报废:窗口7/1-7/14未关闭,汽笛仅存一次可用素材,甲板脚步缺失,需组织补录;任务从等待时间转入可执行状态",
+    "evidence_refs": [
+      {"object_id": "obs_conv_user_f9d2679907d34d7011d700d6", "revision": 1}
+    ],
+    "next_step": "盘点现有素材(deck_amb 11min/engine_low 6min/queue_chatter 14min/7月4日机舱12min+汽笛1次),安排一次人少早班补录甲板脚步,出发前过设备清单"
+  }}
+ ],
+ "resident_note": "先处理后果:把事故与既有策略对上账(更新策略=真实后果驱动,不是又一次口头强调),再推进受影响的任务状态。'蠢事'本身由原始观察持久保存,不单独造负面 Claim 避免羞辱性记忆堆积。"
+}

@@ -1,0 +1,6 @@
+{
+ "capability_calls": [
+  {"name": "read_execution_world", "arguments": {}}
+ ],
+ "resident_note": "轮渡任务rev被到期机制+1(唤醒语义),取当前rev。"
+}

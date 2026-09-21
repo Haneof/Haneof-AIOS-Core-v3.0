@@ -1,0 +1,7 @@
+{
+ "capability_calls": [
+  {"name": "read_execution_world", "arguments": {}},
+  {"name": "inspect_world_object", "arguments": {"object_id": "clm_1881e81d13cf9d24ff972f35"}}
+ ],
+ "resident_note": "transition失败:task被到期机制升到rev2,唤醒给我的是rev1。先读当前世界拿准确 revision 再动。"
+}

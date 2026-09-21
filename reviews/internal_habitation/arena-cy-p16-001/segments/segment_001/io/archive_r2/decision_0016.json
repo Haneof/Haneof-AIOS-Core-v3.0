@@ -1,0 +1,6 @@
+{
+ "capability_calls": [
+  {"name": "search_world", "arguments": {"query": "我授权你发条消息给老纪 先结6000尾款", "limit": 3}}
+ ],
+ "resident_note": "取她授权原话的obs id做action证据——授权必须可回溯。"
+}

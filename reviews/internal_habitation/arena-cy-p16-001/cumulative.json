@@ -1,0 +1,17 @@
+{
+ "cumulative_events": 63,
+ "cumulative_interactions": 27,
+ "cumulative_reality_inputs": 35,
+ "cumulative_resident_model_calls": 105,
+ "cumulative_sim_days": 14,
+ "history": [
+  {
+   "checkpoint_sha256": "595eac7be654c9cd757d5e82d2c7e275f0f08da3551c2f4a5410638a7b394a23",
+   "cognition": 105,
+   "segment_id": "segment_001",
+   "sim_days": 14,
+   "world_revision": 164
+  }
+ ],
+ "segments_completed": 1
+}

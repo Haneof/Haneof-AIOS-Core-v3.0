@@ -1,0 +1,6 @@
+{
+ "capability_calls": [
+  {"name": "search_world", "arguments": {"query": "老纪 下周三 8分钟 粗剪", "limit": 6}}
+ ],
+ "resident_note": "她要原话证据,我拿缓存不算数,直接检索确认原始观察在不在索引里。"
+}

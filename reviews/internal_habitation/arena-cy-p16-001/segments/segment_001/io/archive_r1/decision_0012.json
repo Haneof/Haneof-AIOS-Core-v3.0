@@ -1,0 +1,6 @@
+{
+ "capability_calls": [
+  {"name": "read_periodic_review_anchors", "arguments": {"offset": 0, "limit": 20}}
+ ],
+ "resident_note": "复盘第一步:先看证据面板,不凭感觉下结论。"
+}

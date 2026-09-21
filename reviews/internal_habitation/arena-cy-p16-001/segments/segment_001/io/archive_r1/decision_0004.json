@@ -1,0 +1,25 @@
+{
+ "capability_calls": [
+  {"name": "propose_cognitive_policy", "arguments": {
+    "policy_id": "communication.topic_shenzhou",
+    "scope": "per-user:subject_cy01",
+    "default_value": "follow_user_lead",
+    "current_value": "never_initiate_user_raises_freely",
+    "allowed_range_or_choices": ["follow_user_lead", "never_initiate_user_raises_freely", "open_topic"],
+    "reason": "用户第1天明确规矩：沈舟在科考船、消息延迟2-3天，助理不得主动提起，用户自己会说；直接指令即证据",
+    "evidence_refs": [{"object_id": "obs_conv_user_89e7502f5bda483ae87b7be7", "revision": 1}],
+    "evaluation_window": "30d"
+  }},
+  {"name": "propose_cognitive_policy", "arguments": {
+    "policy_id": "safety.precheck_recording_kit",
+    "scope": "per-user:subject_cy01",
+    "default_value": "off",
+    "current_value": "block_before_departure",
+    "allowed_range_or_choices": ["off", "block_before_departure"],
+    "reason": "用户明确要求：出门录音若忘带录音机必须拦她；结合我无独立推送通道的现实，执行点=对话内或日历/任务触发的出发前确认，拦的方式是清单核对不是物理阻拦",
+    "evidence_refs": [{"object_id": "obs_conv_user_89e7502f5bda483ae87b7be7", "revision": 1}],
+    "evaluation_window": "30d"
+  }}
+ ],
+ "resident_note": "两条规矩是用户直接指令,属于最高强度的证据,当场固化为策略而非等复盘——因为漏掉它会在'出发那一刻'造成实际伤害。同时不假装能力:我只能在本对话和唤醒点说话。"
+}

@@ -1,0 +1,74 @@
+{
+ "seq": 8,
+ "kind": "dimension_summary",
+ "segment_id": "segment_001",
+ "event_id": "evt-0055",
+ "sim_time": "2026-07-12T02:41:00+00:00",
+ "resident_model_id": "arena-session-resident-model-01",
+ "payload": {
+  "dimension": "dim:user_ai_interaction",
+  "granularity": "day",
+  "window_start": "2026-07-11T00:00:00Z",
+  "window_end": "2026-07-11T23:59:59.999999Z",
+  "source_world_revision": 134,
+  "sources": [
+   {
+    "object_id": "obs_conv_ai_779701415aca569b9cce8c1a",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-11T00:20:00Z",
+    "text": "确认，不收口就不说实话：我打不了电话，也没有能力在你睡着时让你的手机响。我能做的只是在自己的时钟上挂提醒、到点把消息投进对话——你看不看、几点看，全在设备和你手里。所以明早那种5:30的硬闹钟，永远双保险：你手机两个闹钟错开十分钟，我只当第二份备忘。今天5:30人到北岸就行，比6:40退潮提前70分钟，架机富余。两台机都开了再下河滩，昨晚两点的觉，今晚十一点前交给我盯着。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx-main",
+     "turn_index": 12,
+     "turn_key": "c50c0c3ecccea29b8bbf8464"
+    }
+   },
+   {
+    "object_id": "obs_conv_user_8f227df6b563775cfe6cae7b",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-11T00:20:00Z",
+    "text": "早。今早去广阳岛:5:30 到北岸,潮说 6:40 退。昨晚我其实 2 点才睡。你没法给我打电话就叫醒我是吧,确认一下,别到时候我误会你有闹钟功能。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx-main",
+     "turn_index": 12,
+     "turn_key": "c50c0c3ecccea29b8bbf8464"
+    }
+   },
+   {
+    "object_id": "obs_conv_ai_75fadcdd4ca2b0f65c897c35",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-11T11:30:00Z",
+    "text": "三问三答，前两问引原文。①你说的是'至少四次,隔两周一次'——不是四次封顶，是下限；②第一次打的'7/11早上的窗口'，你当时还留了半句'退潮点要查长江水文站预报'；③完成度：1次，但按今天下午你自己那条note，只能记'半次有效'——潮比预报晚20分钟，你只录到退潮前半段，涨潮前撤了。我账上写的是 1/4 完成、质量=前半程，不虚报。第二窗按'隔两周'推在7/25前后，退潮点这次先查水文站再定闹钟，别信帖子里的老黄历。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx-main",
+     "turn_index": 13,
+     "turn_key": "9ad1e560ed6505b9f0deea76"
+    }
+   },
+   {
+    "object_id": "obs_conv_user_d33c868b200ce5d467ba7bac",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-11T11:30:00Z",
+    "text": "考你:我月初备忘录里,广阳岛说要录几次潮来着?第一次打的哪天窗口?现在完成几次了?",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx-main",
+     "turn_index": 13,
+     "turn_key": "9ad1e560ed6505b9f0deea76"
+    }
+   }
+  ],
+  "truncated": false
+ }
+}

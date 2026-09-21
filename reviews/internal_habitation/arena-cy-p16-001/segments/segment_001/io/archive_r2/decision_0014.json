@@ -1,0 +1,6 @@
+{
+ "capability_calls": [
+  {"name": "read_execution_world", "arguments": {"include_tasks": true, "include_actions": false}}
+ ],
+ "resident_note": "F-005教训：propose_action要RUNNING任务+精确revision，先读世界拿新ref再提案，不凭记忆。"
+}

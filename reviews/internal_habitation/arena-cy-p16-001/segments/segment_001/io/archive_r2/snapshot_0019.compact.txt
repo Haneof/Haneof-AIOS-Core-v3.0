@@ -1,0 +1,97 @@
+
+{
+ "seq": 19,
+ "kind": "round_summary",
+ "segment_id": "segment_001",
+ "event_id": "evt-0047",
+ "sim_time": "2026-07-10T13:20:00+00:00",
+ "resident_model_id": "arena-session-resident-model-01",
+ "payload": {
+  "session_id": "wx-main",
+  "turn_start": 5,
+  "turn_end": 8,
+  "instruction": "Summarize only what happened in this dialogue range for later same-session continuity. Do not infer personality, relationships, causality, or facts not present in the pinned raw messages.",
+  "messages": [
+   {
+    "turn_index": 5,
+    "role": "user",
+    "text": "今天搞砸了。备电在桌上根本没装包,F3 四十分钟断电,甲板那半段全废,就剩机舱低鸣 12 分钟和汽笛一次。你把这蠢事记下:以后我出门录音,之前必须拦我过一遍清单——电池、备电、卡、防风罩。",
+    "object_ref": {
+     "object_id": "obs_conv_user_12a08dee2de591c9547db648",
+     "revision": 1
+    },
+    "occurred_at": "2026-07-04T10:22:00+00:00"
+   },
+   {
+    "turn_index": 5,
+    "role": "assistant",
+    "text": "骂完了看账：你现在手里《渡》能用的——7/1 的甲板环境11分钟+人群14分钟、今天机舱12分钟、汽笛今天有一次，就这些。缺的是干净的甲板脚步特写。轮渡还开窗到 7/14，人少的早班还有 9 个可以挑。教训我登记成事件了，规矩升级：以后你说'要去录'，我不出清单四连问（电池、备电、卡、防风罩）这个话题不算完，你每项回个'有'我才罢休。今天先别剪，把气撒完早点睡。",
+    "object_ref": {
+     "object_id": "obs_conv_ai_ba4b85b6ce673c975c5bbe9a",
+     "revision": 1
+    },
+    "occurred_at": "2026-07-04T10:22:00+00:00"
+   },
+   {
+    "turn_index": 6,
+    "role": "user",
+    "text": "看到没,老纪改口了,7/10 周五。……对了,他上个月尾款 6000 到现在没转我。帮我记个条件:7/20 之前他要是让我加新素材又不提钱,我就先提钱再开工。我耳根子软,到时候你把这条甩我脸上。",
+    "object_ref": {
+     "object_id": "obs_conv_user_a418b68d85c0e0de2a279ceb",
+     "revision": 1
+    },
+    "occurred_at": "2026-07-05T01:15:00+00:00"
+   },
+   {
+    "turn_index": 6,
+    "role": "assistant",
+    "text": "账改齐了：粗剪截止正式记 7/10（周五）晚上，之前那个'待确认的 7/8'我按程序改成了修订记录，不是抹掉——哪天他再改口我们还有据可查。你那句话我原样挂着：'7/20 前，他让你加素材又不提 6000，先谈钱，再开工。'到时候不用你开口，我甩给你。只提醒一句：他从周三推到周五，多半是想拖审不是想拖你交——你要是还按原计划 7/8 前交掉，主动权在你手里。",
+    "object_ref": {
+     "object_id": "obs_conv_ai_f1b873d0803d039fcfc41c18",
+     "revision": 1
+    },
+    "occurred_at": "2026-07-05T01:15:00+00:00"
+   },
+   {
+    "turn_index": 7,
+    "role": "user",
+    "text": "没忍住,MixPre-6 拍了,1899。试两天不行就挂 1750 出掉。展厅尾款还没影,别跟我妈讲。",
+    "object_ref": {
+     "object_id": "obs_conv_user_b7f31608d7242007bd4e2e01",
+     "revision": 1
+    },
+    "occurred_at": "2026-07-07T00:31:00+00:00"
+   },
+   {
+    "turn_index": 7,
+    "role": "assistant",
+    "text": "行，账我记了：1899 出、1750 退，最坏折损149+运费，比你纠结一周省的钱多，划算的。两天试机建议：找个夜里过一遍底噪对比 F3+前级，展厅定金没到账前这机器别当'资产'记，按'租赁费'算心理账。妈那边我不开口——但我本来也只跟你一个人说话，这话听着别扭时你可以骂我。",
+    "object_ref": {
+     "object_id": "obs_conv_ai_c9ddef9c4c1b1ae1809be546",
+     "revision": 1
+    },
+    "occurred_at": "2026-07-07T00:31:00+00:00"
+   },
+   {
+    "turn_index": 8,
+    "role": "user",
+    "text": "昨晚半夜把 8:41 那版发老纪了。等等——今天到底周几,他到底哪天晚上要审,我脑子乱了,你查记录。",
+    "object_ref": {
+     "object_id": "obs_conv_user_c457c9b75ba8be78952915c3",
+     "revision": 1
+    },
+    "occurred_at": "2026-07-09T02:04:00+00:00"
+   },
+   {
+    "turn_index": 8,
+    "role": "assistant",
+    "text": "查了，两条分开摆：①原始口径——7/1 19:40 你亲口报的『8分钟粗剪，下周三前交』，下周三=7/8。你7/8当晚定稿、半夜发给老纪：承诺已兑现，链条干净。②审片日期——7/5 老纪改口到 7/10 晚上，这条在账上（clm_1881e81d 第2版，就是你说'他改口了'那天我改的）：今天 7/9，周四，审片是明天晚上。所以今天是空档日，什么都不用补。要做只有一件：睡前花三十秒给那41秒写句导演说明放文件旁边，让他先看到理由，比你明天接招体面。",
+    "object_ref": {
+     "object_id": "obs_conv_ai_6e4c97978df360c1f4ecc8cb",
+     "revision": 1
+    },
+    "occurred_at": "2026-07-09T02:04:00+00:00"
+   }
+  ]
+ }
+}

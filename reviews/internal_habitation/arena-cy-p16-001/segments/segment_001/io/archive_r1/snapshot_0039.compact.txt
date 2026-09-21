@@ -1,0 +1,366 @@
+[capability_catalog omitted: 39 entries; identical to snapshot_0001.json and Core registry; full text in snapshot file]
+{
+ "seq": 39,
+ "kind": "turn",
+ "segment_id": "segment_001",
+ "event_id": "evt-0028",
+ "sim_time": "2026-07-08T12:58:00+00:00",
+ "resident_model_id": "arena-session-resident-model-01",
+ "payload": {
+  "wake_reason": "user_interaction",
+  "round_index": 0,
+  "remaining_tool_rounds": 8,
+  "user_input": "开整粗剪。第一版结构:开场渡口人声 30s → 船机低鸣铺底 → 汽笛点题 → 中段。姑姑店串串的嘈杂声不该进这支片子,先记着别用。",
+  "cockpit": {
+   "user_input": "开整粗剪。第一版结构:开场渡口人声 30s → 船机低鸣铺底 → 汽笛点题 → 中段。姑姑店串串的嘈杂声不该进这支片子,先记着别用。",
+   "current_topic": "开整粗剪。第一版结构:开场渡口人声 30s → 船机低鸣铺底 → 汽笛点题 → 中段。姑姑店串串的嘈杂声不该进这支片子,先记着别用。",
+   "ai_identity": {},
+   "recent_turns": [],
+   "conversation_summaries": [],
+   "memory_cards": [
+    {
+     "object_id": "obs_conv_ai_6f4272912c92a6a764d853e9",
+     "revision": 1,
+     "object_type": "observation",
+     "dimension": "dim:user_ai_interaction",
+     "excerpt": "两句都记好：方案A=指向麦主录船机低鸣、人声铺底（稳妥，但甲板素材可能不够《渡》用）；方案B=甲板脚步+汽笛为主体、人声入戏（素材更活，人群噪音是变量）。不替你选，只提一句：A的短板可以靠人少的早班补录来救，B的短板靠后期降噪也救得半。另，昨天下午老王音响那笔取麦罩的日历过了——麦罩拿到了没？拿没拿到直接影响你B方案收不收得住风。",
+     "retrieval_score": 6,
+     "match_reason": "current_topic_index_overlap"
+    },
+    {
+     "object_id": "sum_38b6f7fbd00bdb930bfe9990",
+     "revision": 1,
+     "object_type": "summary",
+     "dimension": "dim:user_ai_interaction",
+     "excerpt": "2026-07-02 对话日结：程野码头踩点，定了两条录音方案让我记下不代选——A：指向麦主录船机低鸣、人声铺底；B：甲板脚步+汽笛为主体。我回复只做镜像并留了未决问题：7/1 老王音响的麦罩取没取（影响B收风）。她没答。当日素材导出3条（ferry_deck_amb/engine_low/queue_chatter）走的是外部记录，不在此窗口。",
+     "retrieval_score": 6,
+     "match_reason": "current_topic_index_overlap"
+    },
+    {
+     "object_id": "obs_conv_user_c2650b467fb82f3d821b8a25",
+     "revision": 1,
+     "object_type": "observation",
+     "dimension": "dim:user_ai_interaction",
+     "excerpt": "今天去码头踩点:16:00 那班人最多,甲板脚步声全混在人群里。方案A,指向麦主录船机低鸣,人声当底;方案B,上甲板录脚步+汽笛,人声当主体。两条都帮我记一句,先别替我选。",
+     "retrieval_score": 5,
+     "match_reason": "current_topic_index_overlap"
+    },
+    {
+     "object_id": "obs_conv_user_fdca58021d26a2998d6c6efd",
+     "revision": 1,
+     "object_type": "observation",
+     "dimension": "dim:user_ai_interaction",
+     "excerpt": "在吗。从今天起你就是我的常驻助理了,给你起个名:阿潮。先把事记上:老纪的纪录片《渡》卡在声音上,他昨天说这轮要一版 8 分钟粗剪,下周三之前给他。朝天门 2 号线轮渡 7/15 起停航改造,我只剩 7/1–7/14 能录它的汽笛和甲板。",
+     "retrieval_score": 3,
+     "match_reason": "current_topic_index_overlap"
+    },
+    {
+     "object_id": "obs_src_3c0b7944f5fbd5c22bfa4042",
+     "revision": 1,
+     "object_type": "observation",
+     "dimension": "dim:daw",
+     "excerpt": "F3 素材抢救:机舱低鸣 12min 去直流噪声完成 engine_a.wav;汽笛那耳朵有爆音,待处理。",
+     "retrieval_score": 2,
+     "match_reason": "current_topic_index_overlap"
+    }
+   ],
+   "task_context": {
+    "topic_state": {
+     "topic": "开整粗剪。第一版结构:开场渡口人声 30s → 船机低鸣铺底 → 汽笛点题 → 中段。姑姑店串串的嘈杂声不该进这支片子,先记着别用。",
+     "gate_open": true,
+     "history_may_help": true,
+     "reason": "current_utterance_topic:indexed_external_observation_anchor",
+     "continued_from_recent_turn": false,
+     "antecedent_recall_needed": false
+    },
+    "cognitive_policy_context": {
+     "communication.topic_shenzhou": "never_initiate_user_raises_freely",
+     "safety.precheck_recording_kit": "block_before_departure",
+     "_policy_records": [
+      {
+       "policy_id": "communication.topic_shenzhou",
+       "scope": "per-user:subject_cy01",
+       "policy_class": "cognitive_policy",
+       "default_value": "follow_user_lead",
+       "current_value": "never_initiate_user_raises_freely",
+       "allowed_range_or_choices": [
+        "follow_user_lead",
+        "never_initiate_user_raises_freely",
+        "open_topic"
+       ],
+       "mutable_by_ai": true,
+       "evaluation_window": "30d",
+       "version": 1,
+       "previous_version": null,
+       "rollback_pointer": null
+      },
+      {
+       "policy_id": "safety.precheck_recording_kit",
+       "scope": "per-user:subject_cy01",
+       "policy_class": "cognitive_policy",
+       "default_value": "off",
+       "current_value": "block_before_departure",
+       "allowed_range_or_choices": [
+        "off",
+        "block_before_departure"
+       ],
+       "mutable_by_ai": true,
+       "evaluation_window": "30d",
+       "version": 1,
+       "previous_version": null,
+       "rollback_pointer": null
+      }
+     ],
+     "_meta": {
+      "total": 2,
+      "included": 2,
+      "truncated": false,
+      "reader": "read_cognitive_policies"
+     },
+     "memory.recommendation_limit": 5,
+     "communication.detail_level": null
+    },
+    "related_execution_anchors": [
+     {
+      "object_id": "task_6b2c971618264428af5b726d",
+      "revision": 3,
+      "object_type": "task",
+      "dimension": "dim_unclassified",
+      "excerpt": "《渡》8分钟粗剪v1交付老纪（截止按用户转述'下周三'=2026-07-08，待最终确认）\n7/8剪辑夜当晚催一次'交不交';她若按原节奏当晚交,比新截止还早2天",
+      "retrieval_score": 1
+     },
+     {
+      "object_id": "task_776642ec66172a4b3ddeb458",
+      "revision": 3,
+      "object_type": "task",
+      "dimension": "dim_unclassified",
+      "excerpt": "轮渡2号线停航前录制汽笛+甲板素材（窗口7/1–7/14）\n7/12 收口催办:确认汽笛+甲板素材录全;7/15停航",
+      "retrieval_score": 1
+     },
+     {
+      "object_id": "task_3692588b186579edfe05384b",
+      "revision": 1,
+      "object_type": "task",
+      "dimension": "dim_unclassified",
+      "excerpt": "广阳岛消落带退潮周期录音（计划4次/间隔两周，第一次目标7/11窗口）\n7/11 出发前核对设备清单（受 precheck_recording_kit 策略约束）+潮时是否对上",
+      "retrieval_score": 1
+     }
+    ],
+    "current_user_observation_ref": {
+     "object_id": "obs_conv_user_81acf8cbb6f87fed56a80eec",
+     "revision": 1
+    },
+    "conversation_continuity": {
+     "session_id": "edit-night",
+     "recent_turn_count": 0,
+     "round_summary_count": 0,
+     "summary_index_capability": "list_conversation_summaries",
+     "summary_search_capability": "search_conversation_summaries",
+     "raw_drill_down_capability": "drill_down_conversation",
+     "pending_round_summary": null
+    }
+   },
+   "capability_catalog": [
+    {
+     "name": "commit_ai_world_claim",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "commit_claim",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "commit_operation_experience",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "compare_claims",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "create_task",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "drill_down_conversation",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "expand_recall",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "focus_entity",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "follow_relation",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "form_event",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "inspect_outcome",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "inspect_world_object",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "list_conversation_summaries",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "list_dimensions",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "propose_action",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "propose_cognitive_policy",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "propose_dimension",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "propose_entity",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "propose_goal",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "read_ai_world",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "read_cognitive_policies",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "read_execution_world",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "read_periodic_review_anchors",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "record_communication_experience",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "request_all_dimensions_projection",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "retract_claim",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "retrieve_original_observation",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "revise_claim",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "revise_entity",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "rollback_cognitive_policy",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "search_conversation_summaries",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "search_timeline",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "search_world",
+     "kind": "read",
+     "side_effecting": false
+    },
+    {
+     "name": "transition_dimension",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "transition_event",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "transition_goal",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "transition_task",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "update_cognitive_policy",
+     "kind": "write",
+     "side_effecting": true
+    },
+    {
+     "name": "upsert_relation",
+     "kind": "write",
+     "side_effecting": true
+    }
+   ],
+   "token_budget": 3400,
+   "estimated_tokens": 1837,
+   "truncated": false
+  },
+  "capability_history": []
+ }
+}

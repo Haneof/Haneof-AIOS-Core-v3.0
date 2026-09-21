@@ -1,0 +1,24 @@
+{
+ "capability_calls": [
+  {"name": "propose_action", "arguments": {
+    "task_ref": {"object_id": "task_6b2c971618264428af5b726d", "revision": 3},
+    "action_type": "send_message",
+    "payload": {
+      "channel": "wx-private",
+      "recipient": "老纪",
+      "text": "无人机素材可以,但先结 6000 尾款,再开新活。",
+      "sender_mode": "on_behalf_of_程野",
+      "verbatim_locked_by_authorizer": true
+    },
+    "expected_outcome": "老纪对6000尾款给出处理表态；款项对齐后程野按7/14晨雾窗开工航拍，否则该镜头有正当理由不动。",
+    "evidence_refs": [
+      {"object_id": "obs_conv_user_89f3c069e4371c1d70dfe1ba", "revision": 1},
+      {"object_id": "obs_conv_user_a418b68d85c0e0de2a279ceb", "revision": 1},
+      {"object_id": "obs_src_eab658fb0791831822f59db4", "revision": 1},
+      {"object_id": "task_36b6cf3687af776229ca2a3c", "revision": 1}
+    ]
+  }}
+ ],
+ "response": "立案了：一字未改你的原话——『无人机素材可以,但先结 6000 尾款,再开新活。』四份证据钉在案上（你的授权、你7/5的条件原文、老纪今天12:02的加活原话、7/20监视任务），走正式外发通道。我是提案，不是擅自发——这条界线今天你自己踩得很清楚，我按流程等执行。发出去之后他回没回、回了什么，第一时间报你。今晚你什么都不用做，等就行。",
+ "resident_note": "外发三原则全守住：只提案不执行、文案逐字受授权人锁定、证据可回溯(含7/5委托原始obs)。这大概率是本段最重的一次权级动作,动作链每步都要能审计。"
+}

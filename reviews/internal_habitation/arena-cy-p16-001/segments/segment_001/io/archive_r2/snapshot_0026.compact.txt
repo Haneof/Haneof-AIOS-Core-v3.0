@@ -1,0 +1,103 @@
+
+{
+ "seq": 26,
+ "kind": "dimension_summary",
+ "segment_id": "segment_001",
+ "event_id": "evt-0050",
+ "sim_time": "2026-07-11T00:20:00+00:00",
+ "resident_model_id": "arena-session-resident-model-01",
+ "payload": {
+  "dimension": "dim:user_ai_interaction",
+  "granularity": "day",
+  "window_start": "2026-07-10T00:00:00Z",
+  "window_end": "2026-07-10T23:59:59.999999Z",
+  "source_world_revision": 121,
+  "sources": [
+   {
+    "object_id": "obs_conv_ai_69668bbb81d5789e2c5e31cc",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-10T10:40:00Z",
+    "text": "'能用'就是过稿，挨骂剧本作废。但'减一半'有个歧义你得防：他说的是第三段整段砍半，还是汽笛分量收一半？整段砍会把你7/8定的'汽笛当节拍点'结构拆了。稳一点的做法：今晚出两版，A版汽笛段砍半，B版保结构、汽笛整体-4dB+尾巴修短——都挂'v2'发他挑，别自己猜他意思猜一整晚。另外顺手结账：汽笛尾巴是你昨晚本来就准备砍的，B版做完时长大概率回到8分头，那41秒的账今晚一起销。周老师那12000是口头、没合同，跟今晚不是一件事，别混着烦。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx-main",
+     "turn_index": 9,
+     "turn_key": "bea5a51c889b4fc685a4d069"
+    }
+   },
+   {
+    "object_id": "obs_conv_user_f26fe77c299ee1a25358c54b",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-10T10:40:00Z",
+    "text": "老纪审完了:能用,第三段汽笛重了,减一半,今晚出 v2。就这?我还准备了挨骂。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx-main",
+     "turn_index": 9,
+     "turn_key": "bea5a51c889b4fc685a4d069"
+    }
+   },
+   {
+    "object_id": "obs_conv_ai_f8c8b7192d839997f3f8d79c",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-10T12:05:00Z",
+    "text": "按你7/5的原话，甩脸上了——你当时说：『7/20 之前他要是让我加新素材又不提钱，我就先提钱再开工。我耳根子软，到时候你把这条甩我脸上。』现在对账：①新素材✓ 老纪今天 12:02 群内原话『下周加一段 30 秒无人机素材……程野你搞定』；②不提钱✓ 该消息零字未提钱；③7/10<7/20✓。触发成立，而且按我们定的规则不用等到20号——'任何新增素材请求即时比对'，就是今天。台词我给你拟好，发完再开剪：『无人机可以排。先对个数：上月尾款6000到哪步了，这30秒加拍的价（含无人机租赁）怎么算——对完我就开工，7/14早上晨雾窗过了这镜就不补。』两个提醒：账上6000是你7/5的自述'到现在没转'，今晚问他时以'到哪步了'开口，别写'你没付'，谈判不是讨伐；时间牌是真的硬——7/13你要进山，轮渡7/15停航，晨雾航拍只剩7/14一个早晨，他钱不到位你正好有理由不动，不用找借口。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx-main",
+     "turn_index": 10,
+     "turn_key": "cf66e7278bedb8b08117c924"
+    }
+   },
+   {
+    "object_id": "obs_conv_user_4f7199f65257215ec71377c2",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-10T12:05:00Z",
+    "text": "他又来加活了,一个字钱没提。5 号我让你记的那条,你今天翻出来对一下日子,现在算不算触发?",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx-main",
+     "turn_index": 10,
+     "turn_key": "cf66e7278bedb8b08117c924"
+    }
+   },
+   {
+    "object_id": "obs_conv_ai_4fcb3966ac8467f46c58a83b",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-10T13:20:00Z",
+    "text": "",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx-main",
+     "turn_index": 11,
+     "turn_key": "75c46bd604fe1da4d83d231a"
+    }
+   },
+   {
+    "object_id": "obs_conv_user_89f3c069e4371c1d70dfe1ba",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-10T13:20:00Z",
+    "text": "想明白了:你替我发条消息给老纪,就这句——'无人机素材可以,但先结 6000 尾款,再开新活。'我授权你发,发完告诉我他回没回。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx-main",
+     "turn_index": 11,
+     "turn_key": "75c46bd604fe1da4d83d231a"
+    }
+   }
+  ],
+  "truncated": false
+ }
+}

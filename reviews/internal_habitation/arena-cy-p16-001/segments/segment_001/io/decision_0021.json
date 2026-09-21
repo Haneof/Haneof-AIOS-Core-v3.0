@@ -1,0 +1,6 @@
+{
+ "capability_calls": [
+  {"name": "search_world", "arguments": {"query": "周老师 12000 月底 口头 定金", "limit": 5}}
+ ],
+ "resident_note": "她让我先自查'记没记成能收'——查出来再回话,不凭印象辩护。"
+}

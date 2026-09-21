@@ -1,0 +1,6 @@
+{
+ "capability_calls": [
+  {"name": "read_periodic_review_anchors", "arguments": {"offset": 0, "limit": 20}}
+ ],
+ "resident_note": "复盘#4:重点验两件事——消费模式claim可否落地(挂单实录要在锚点里)、7/20兜底与轮渡默认销账的状态是否自洽。"
+}

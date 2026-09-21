@@ -1,0 +1,27 @@
+{
+ "capability_calls": [
+  {"name": "transition_task", "arguments": {
+    "task_ref": {"object_id": "task_3692588b186579edfe05384b", "revision": 3},
+    "new_state": "waiting_time",
+    "reason": "7/11首窗:1/4完成、仅退潮前半段(她note实录obs_src_47ecdf81…)。'至少四次隔两周一次'→二窗约7/25,7/23先查水文站预报(她自己条款)。7/11夜查未独立成唤醒,由本wake合并处理,不算漏拍",
+    "evidence_refs": [
+      {"object_id": "obs_src_a3931be9195f5d7457debec2", "revision": 1},
+      {"object_id": "obs_src_47ecdf81d77996b97d56a77b", "revision": 1}
+    ],
+    "next_wake_at": "2026-07-23T00:00:00+00:00",
+    "next_step": "7/23:查长江水文站退潮预报→定7/25±窗闹钟(她定我提词);出发前四件套;目标录完整周期,重点补后半段"
+  }},
+  {"name": "transition_task", "arguments": {
+    "task_ref": {"object_id": "task_776642ec66172a4b3ddeb458", "revision": 4},
+    "new_state": "waiting_time",
+    "reason": "7/12收口信息已发(素材够/或14号早班末班补录二选一)。挂7/14夜验收;7/15停航后本任务强制收口,不许烂尾",
+    "evidence_refs": [
+      {"object_id": "obs_src_4da0fe3b3ebcdf72fdb96878", "revision": 1},
+      {"object_id": "obs_src_a3931be9195f5d7457debec2", "revision": 1}
+    ],
+    "next_wake_at": "2026-07-14T14:00:00+00:00",
+    "next_step": "7/14夜:她若14早班补录→验收汽笛+甲板;若声明素材够→销账完结"
+  }}
+ ],
+ "resident_note": "id全部抄档不再手拼。两笔各带独立到期,互不缠。"
+}

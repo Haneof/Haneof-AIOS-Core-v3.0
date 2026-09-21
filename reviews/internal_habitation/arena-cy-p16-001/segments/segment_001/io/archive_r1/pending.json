@@ -1,0 +1,7 @@
+{
+ "seq": 49,
+ "kind": "turn",
+ "snapshot": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/arena-cy-p16-001/segments/segment_001/io/snapshot_0049.json",
+ "compact": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/arena-cy-p16-001/segments/segment_001/io/snapshot_0049.compact.txt",
+ "decision_expected_at": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/arena-cy-p16-001/segments/segment_001/io/decision_0049.json"
+}

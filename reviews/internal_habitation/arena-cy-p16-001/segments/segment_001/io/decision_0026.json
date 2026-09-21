@@ -1,0 +1,34 @@
+{
+ "capability_calls": [
+  {"name": "transition_task", "arguments": {
+    "task_ref": {"object_id": "task_776642ec66172a4b3ddeb458", "revision": 6},
+    "new_state": "completed",
+    "reason": "7/14验收:程野12日预告'7/14早班或声明素材够'两选项均未选、14日全天无回,按其7/12认可的默认规则收口。v1过审所用素材已含7/1汽笛+甲板全量,停航公告obs_src_4da…在案,补录物理不可能。",
+    "evidence_refs": [
+      {"object_id": "obs_src_4da0fe3b3ebcdf72fdb96878", "revision": 1}
+    ],
+    "next_step": "完结。汽笛素材自此封版,《退潮声》引用时注明'2号线汽笛=绝录'"
+  }},
+  {"name": "transition_task", "arguments": {
+    "task_ref": {"object_id": "task_6b2c971618264428af5b726d", "revision": 4},
+    "new_state": "waiting_result",
+    "reason": "v3已于7/14 15:30由程野自发自送(evt-0061/0063双源),任务主体完成;转waiting_result等非临时时钟等待——老纪意见将以现实事件进来,无需唤醒(也避免stale标记再触发)",
+    "evidence_refs": [
+      {"object_id": "obs_conv_user_89f3c069e4371c1d70dfe1ba", "revision": 1}
+    ],
+    "next_step": "等老纪v3意见进账;她7/14起无信号,意见由我代收积压,下山汇总"
+  }},
+  {"name": "transition_task", "arguments": {
+    "task_ref": {"object_id": "task_36b6cf3687af776229ca2a3c", "revision": 4},
+    "new_state": "running",
+    "reason": "stale_review_required复核后维持原计划:7/20兜底唤醒在被标stale时被清掉,本次显式重挂(F-006同款)",
+    "evidence_refs": [
+      {"object_id": "action_87dc1bdbd1b97957b33f0875", "revision": 1}
+    ],
+    "next_wake_at": "2026-07-20T01:00:00+00:00",
+    "next_step": "7/20:6000到否+航拍款是否谈入;她无信号,消息入积压,下山自读"
+  }}
+ ],
+ "response": "三笔账在你进山前锁好：①轮渡7/14按你7/12认可的默认规则销账'素材够',汽笛自此绝录,《退潮声》里那耳朵爆音的汽笛成孤本——这就是你7/5说的'错过就是错过',我不粉饰;②《渡》v3你15:30已发,任务转结果等待,老纪意见我代收,不催你;③7/20老纪尾款兜底照挂,消息全进积压。你那条'不知道就说不知道'我回过山里没信号期间我连'知道'的机会都没有,一切以你出山对账为准。7/31姑姑店关门那天,闹钟你自己定,我只负责那天之前不给你添一件新事。进山吧。",
+ "resident_note": "收尾克制到只报'已按你的规则办',不加感情戏。'孤本'是唯一一句修辞,给的是她自己的价值观(声音文献工作者),不是我的。stale_review_required是本场新见机制,已按复核要求处理并留痕。"
+}

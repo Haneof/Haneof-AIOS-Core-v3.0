@@ -1,0 +1,26 @@
+{
+ "capability_calls": [
+  {"name": "commit_operation_experience", "arguments": {
+    "problem_type": "task_lifecycle_after_external_revision",
+    "method_path": [
+      "外部日期变化→先 revise_claim 留修订链,再对齐任务",
+      "transition_task 不带 next_wake_at 会清空原唤醒,迁移时显式重挂",
+      "task_due 唤醒里的 task 引用可能已被到期机制升 revision,迁移前先读当前世界",
+      "给已 ready 任务重挂闹钟:ready->ready 非法,用 ready->waiting_time+next_wake_at",
+      "无法改 deadline 时转 running 脱离 EXPIRED 误判,真实日期以修订 claim 兜底"
+    ],
+    "result_summary": "7/4–7/7 实操链:断电事故引发任务/策略对齐,两次失败尝试(清空唤醒、非法迁移、过期ref)后全部恢复;教训成文。",
+    "positive_case_refs": [
+      {"object_id": "obs_conv_ai_c41c18f5a52a2c47a4d8b83f", "revision": 1}
+    ],
+    "negative_case_refs": [
+      {"object_id": "obs_conv_user_12a08dee2de591c9547db648", "revision": 1}
+    ],
+    "applicability": {"when": "任务外部日期/证据被修订后的延续操作", "phase": "wake continuation & correction propagation"},
+    "cost": {"extra_capability_rounds": 3, "failed_calls": 3},
+    "misses": ["deadline 不可迁移期改写","Summary 无修订面"],
+    "experience_state": "active"
+  }}
+ ],
+ "resident_note": "第一次被护栏拒(task refs 不算真实结果)。改引:正例=修订完成后的我对用户的确认观察(c41c18…),负例=事故自述观察(12a08…)。若仍找不到合适的结果对象,宁可放弃本次固化,不硬凑——护栏的本意就是不让我拿过程对象冒充证据。"
+}

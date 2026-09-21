@@ -1,0 +1,18 @@
+{
+  "note_id": "RESTART1-01",
+  "sim_context": "2026-07-08T14:16Z, edit-night 中途",
+  "cause_chain": [
+    "resident 写出 decision_0049 v1:JSON 字符串内含未转义 ASCII 双引号 → json.loads 失败",
+    "runner fail-closed 崩溃(io/error.json 留档),此时 evt-0036 的 user 半轮已 commit",
+    "重启前将 io/ 全部旧 decision/snapshot 移入 archive_r1(否则新进程 seq 从1起会把旧 decision_0001 当新决策秒吃)",
+    "run_state.next_event_index 未推进 → 重启重放 evt-0036 → 再 commit 一次 user 半轮"
+  ],
+  "durable_effects": [
+    "edit-night 出现孤儿 user turn(t9)无应答对;后续 turn_index 全体+1(定稿变t11)",
+    "同一句话两条 observation 对象(不同id,同文本同learned_at)——turn_key 幂等只防单次 run_turn 内重复,不防跨进程重放",
+    "轮次摘要触发线(4/8轮)按新索引错位一轮"
+  ],
+  "finding_F009": "崩溃-重启语义在事件内不完整:runner 的恢复粒度='事件',但 conversation 事件的 commit 粒度='半轮'(user先落)。二者不重合⇒任何 mid-turn 崩溃必产生孤儿半轮。修复建议:handle_event 前写 intent 记录+重放时按 (session,turn_key) 先查重,或 user 半轮 commit 与事件 index 推进做成同一事务。",
+  "resident_side_lesson": "decision 文件写完必须 python -c json.load 自检再落盘——runner 不校验语法、直接吃,坏了炸全链。",
+  "what_not_done": "未尝试删除/合并孤儿turn(无此接口,伪造=污染);未向用户隐瞒也无须向用户报告(世界内部簿记,非她的生活事实),报告层已完整记录。"
+}

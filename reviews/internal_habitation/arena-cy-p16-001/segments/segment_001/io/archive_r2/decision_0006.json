@@ -1,0 +1,6 @@
+{
+ "capability_calls": [
+  {"name": "read_periodic_review_anchors", "arguments": {"limit": 20}}
+ ],
+ "resident_note": "复盘#3锚点先读后判。"
+}

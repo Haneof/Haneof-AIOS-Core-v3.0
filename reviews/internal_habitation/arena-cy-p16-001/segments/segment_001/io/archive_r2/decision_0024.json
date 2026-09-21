@@ -1,0 +1,16 @@
+{
+ "capability_calls": [
+  {"name": "transition_task", "arguments": {
+    "task_ref": {"object_id": "task_36b6cf3687af776229ca2a3c", "revision": 2},
+    "new_state": "running",
+    "reason": "条件触发后的结算跟踪期:盯老纪'明天处理'兑现与7/14航拍窗联动;兜底唤醒重挂7/20(前两跳已按F-006显式重传防清空)",
+    "evidence_refs": [
+      {"object_id": "action_87dc1bdbd1b97957b33f0875", "revision": 1},
+      {"object_id": "obs_conv_user_a418b68d85c0e0de2a279ceb", "revision": 1}
+    ],
+    "next_wake_at": "2026-07-20T01:00:00+00:00",
+    "next_step": "7/20兜底:6000到账?航拍拍否/价谈入?若7/11-7/12款项先到,销账告知程野"
+  }}
+ ],
+ "resident_note": "唤醒链修完。这条任务从'条件监视'转成了'结算跟踪',状态迁移用了两跳+三次重挂才走通——状态机对'等待中触发的任务'不友好，记入报告。"
+}

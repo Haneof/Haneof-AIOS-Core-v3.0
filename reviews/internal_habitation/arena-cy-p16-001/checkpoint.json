@@ -1,0 +1,127 @@
+{
+ "actions": [
+  {
+   "action_status": "completed",
+   "action_type": "send_message",
+   "object_id": "action_87dc1bdbd1b97957b33f0875",
+   "revision": 3
+  }
+ ],
+ "active_goals": [],
+ "active_tasks": [
+  {
+   "deadline": null,
+   "next_wake_at": "2026-07-23T00:00:00+00:00",
+   "object_id": "task_3692588b186579edfe05384b",
+   "revision": 4,
+   "task_state": "waiting_time",
+   "title": "广阳岛消落带退潮周期录音（计划4次/间隔两周，第一次目标7/11窗口）"
+  },
+  {
+   "deadline": "2026-07-20T16:00:00+00:00",
+   "next_wake_at": "2026-07-20T01:00:00+00:00",
+   "object_id": "task_36b6cf3687af776229ca2a3c",
+   "revision": 5,
+   "task_state": "waiting_time",
+   "title": "老纪结算条件监视:7/20前他派新素材且未提6000尾款→提醒程野先谈钱再开工"
+  },
+  {
+   "deadline": "2026-07-08T16:00:00+00:00",
+   "next_wake_at": null,
+   "object_id": "task_6b2c971618264428af5b726d",
+   "revision": 5,
+   "task_state": "waiting_result",
+   "title": "《渡》8分钟粗剪v1交付老纪（截止按用户转述'下周三'=2026-07-08，待最终确认）"
+  },
+  {
+   "deadline": "2026-07-14T16:00:00+00:00",
+   "next_wake_at": null,
+   "object_id": "task_776642ec66172a4b3ddeb458",
+   "revision": 7,
+   "task_state": "cancelled",
+   "title": "轮渡2号线停航前录制汽笛+甲板素材（窗口7/1–7/14）"
+  }
+ ],
+ "checkpoint_sha256": "595eac7be654c9cd757d5e82d2c7e275f0f08da3551c2f4a5410638a7b394a23",
+ "conversation_turns_segment": 27,
+ "cumulative_sim_days": 14,
+ "digests": {
+  "decision_file_count": 29,
+  "decisions_concat_sha256": "961ed0a69f81ea63f3133d02369879794e0e80af7b437059dd7d9c570d0db39e",
+  "events_jsonl_sha256": "ccfb502d07223257b654eb7db118933a65ecfef88949f634b19102bfd0b97aa3",
+  "segment_json_sha256": "c1b1007a5bce14b65376a762fbf62df02c85101ae90eb07cd0f09e65f24d6208",
+  "trace_jsonl_sha256": "d3d4496c013c3fc3493f0e5b72531fd29d1a77abb0196631d6e08a441debe31e",
+  "world_db_copy_sha256": "51f655958a99cd9491ffae041fb05d1f7b49af7be3bafef6103d0618762f4ada"
+ },
+ "events_total_segment": 63,
+ "habitation_run_id": "arena-cy-p16-001-r1",
+ "index_watermark": 164,
+ "logical_resident_id": "resident-阿潮@subject_cy01",
+ "model_identity": "arena-session-resident-model-01",
+ "next_life_event_cursor": {
+  "events_consumed_in_segment": 63,
+  "next_segment_id": "segment_002",
+  "run_state_next_event_index": 63
+ },
+ "object_counts": {
+  "action": 1,
+  "claim": 6,
+  "cognitive_policy": 2,
+  "dependency": 212,
+  "event": 1,
+  "evidence_set": 12,
+  "observation": 94,
+  "outcome": 1,
+  "summary": 18,
+  "task": 4,
+  "wake": 8
+ },
+ "pending_wakes": [],
+ "previous_segment_checkpoint_sha256": null,
+ "provider_provenance": {
+  "automation": "none — deterministic auto-decisions are structurally absent outside ARENA_SMOKE_AUTOPLUMB plumbing tests",
+  "model_invocations_this_segment": 29,
+  "resident_provider": "Arena.ai session model (exact underlying model identity not disclosed per platform policy)",
+  "resident_role": "the Arena chat-session large model personally answering every Core model invocation"
+ },
+ "reality_input_events_segment": 35,
+ "reality_source_kind_counts": {
+  "app_push": 4,
+  "calendar": 2,
+  "daw": 4,
+  "ferry_notice": 1,
+  "payment": 3,
+  "phone_call_log": 1,
+  "photo_description": 1,
+  "recorder_log": 1,
+  "user_ai_interaction": 55,
+  "wearable_steps": 6,
+  "wechat_msg": 9,
+  "wechat_note": 3,
+  "xianyu": 4
+ },
+ "resident_cognition_checkpoint_count_cumulative": 105,
+ "resident_cognition_checkpoint_count_segment": 105,
+ "review_branch": "arena/01a0c1e0-haneof-aios-core-v3-0",
+ "reviewer_id": "arena-cy-p16-001",
+ "segment_id": "segment_001",
+ "segment_ordinal": 1,
+ "segment_sim_days": 14,
+ "segment_sim_end": "2026-07-14",
+ "segment_sim_start": "2026-07-01",
+ "session_turns": {
+  "edit-night": 11,
+  "wx-main": 17
+ },
+ "sim_clock_cursor": "2026-07-14T23:30:00+00:00",
+ "subject_id": "subject_cy01",
+ "tested_main_sha": "142533df9123d793edde9ec4f07405182d56af0d",
+ "tested_repo_head_sha": "217c9b53bf38e9bfff6105a8ab4c5db8333ce6bb",
+ "wake_state_counts": {
+  "completed": 8
+ },
+ "world_db_copy_segment_path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/arena-cy-p16-001/segments/segment_001/world.sqlite",
+ "world_db_path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/arena-cy-p16-001/world/world.sqlite",
+ "world_revision": 164,
+ "written_at_real": "2026-09-21T03:49:51.713724+00:00"
+}

@@ -1,0 +1,6 @@
+{
+ "capability_calls": [
+  {"name": "read_ai_world", "arguments": {"domains": ["user_understanding", "relationship"], "scope_key": "project:du_cutdown_deadline", "limit": 5}}
+ ],
+ "resident_note": "先取回我那条 7/8 待确认 claim 的精确 id+revision,再谈修订——引用必须抄不能背(上次的教训)。"
+}

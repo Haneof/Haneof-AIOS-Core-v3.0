@@ -1,0 +1,13 @@
+{
+ "capability_calls": [
+  {"name": "form_event", "arguments": {
+    "title": "7/4 朝天门上午场：备电未装包导致 F3 断电40分钟，甲板素材报废",
+    "interpretation": "设备准备事故。直接后果：《渡》甲板脚步素材缺失，轮渡窗口(7/1-7/14)内仅剩7/1一次踩点素材+今日机舱12min+汽笛一次；流程后果：precheck_recording_kit 策略从'用户指令'升级为'事故验证过的高优先级核对'。归因止于'备电在桌上未装包'（她的自述），不引申为'她总是丢三落四'。",
+    "event_time": {"start": "2026-07-04T01:30:00+00:00", "end": "2026-07-04T03:30:00+00:00", "precision": "minute", "timezone_name": "UTC"},
+    "evidence_refs": [{"object_id": "obs_conv_user_12a08dee2de591c9547db648", "revision": 1}],
+    "confidence": 0.85,
+    "dimension": "dim:fieldwork_incidents"
+  }}
+ ],
+ "resident_note": "F-003:策略允许值边界强制生效(好),但 pydantic 模型级校验的错误回显把整个 payload 当 input_value 打印,可读性差(优化项)。事件解释克制归因,防画像污染。"
+}

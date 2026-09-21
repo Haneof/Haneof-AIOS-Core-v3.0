@@ -1,0 +1,7 @@
+{
+ "capability_calls": [
+  {"name": "search_world", "arguments": {"query": "条件 老纪 再让我加活 钱 提醒我 20号", "limit": 5}},
+  {"name": "search_world", "arguments": {"query": "无人机素材 航拍 晨雾 下周 搞定", "limit": 4}}
+ ],
+ "resident_note": "她要'翻出原文对日子'。检索两路：7/5条件原话、7/10加活原文，都要逐字。"
+}

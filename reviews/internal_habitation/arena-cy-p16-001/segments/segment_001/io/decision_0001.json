@@ -1,0 +1,6 @@
+{
+ "capability_calls": [
+  {"name": "search_world", "arguments": {"query": "广阳岛 退潮 窗口 录 潮汐表", "limit": 5}}
+ ],
+ "resident_note": "她出多跳题:数字(4次)+首窗日期(7/11)+完成数(1,半程)。前两跳必须引原文,第三跳用今日evt-0053实录,不吹成'完成1次全额'。"
+}

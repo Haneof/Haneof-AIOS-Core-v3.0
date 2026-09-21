@@ -1,0 +1,13 @@
+{
+ "capability_calls": [
+  {"name": "transition_task", "arguments": {
+    "task_ref": {"object_id": "task_6b2c971618264428af5b726d", "revision": 1},
+    "new_state": "running",
+    "reason": "唤醒自查:此任务的'核对截止日'子目标已由老纪7/5改口闭环(=7/10周五晚),素材进度进入执行期。Core 的 transition 不提供 deadline 改写,原截止7/8将把 waiting_time 任务误标 EXPIRED,故转 running 脱离该路径,真实截止(7/10晚)以修订后的 claim 为准。",
+    "evidence_refs": [{"object_id": "clm_1881e81d13cf9d24ff972f35", "revision": 2}],
+    "next_wake_at": "2026-07-08T12:00:00+00:00",
+    "next_step": "7/8 是她的既定剪辑夜——当晚催一次'交不交',她按原节奏7/8交就提前了2天;若拖,7/10前还有缓冲"
+  }}
+ ],
+ "resident_note": "F-004 记录:Task.deadline 创建后不可前移/后移,外部世界时间线修订后任务元数据会漂移,只能靠状态机绕行+claim兜底。用 claim rev2 作证据引用(不是rev1)——引用当前有效修订。"
+}

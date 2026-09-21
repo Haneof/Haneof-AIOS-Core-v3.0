@@ -1,0 +1,6 @@
+{
+ "capability_calls": [
+  {"name": "read_execution_world", "arguments": {}}
+ ],
+ "resident_note": "参数错误已认（该调用零参数，F-003族）。重发。"
+}

@@ -1,0 +1,46 @@
+{
+ "seq": 16,
+ "kind": "dimension_summary",
+ "segment_id": "segment_001",
+ "event_id": "evt-0057",
+ "sim_time": "2026-07-13T10:02:00+00:00",
+ "resident_model_id": "arena-session-resident-model-01",
+ "payload": {
+  "dimension": "dim:user_ai_interaction",
+  "granularity": "day",
+  "window_start": "2026-07-12T00:00:00Z",
+  "window_end": "2026-07-12T23:59:59.999999Z",
+  "source_world_revision": 143,
+  "sources": [
+   {
+    "object_id": "obs_conv_ai_31d4a8c1532f3cb8ea3a58d3",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-12T09:12:00Z",
+    "text": "按你说的办，四条全接：\n①MixPre——不劝留、不转达任何改价建议，1750就是终点价，挂了我就把它当已决事项记账；'底噪比想的大'这个实测结论我记下了，比卖没卖掉值钱。\n②v3本周内——你7/14进山，那就明晚前进老纪邮箱，别让'本周内'变成山里的牵挂。\n③轮渡补录和进山撞了，14号早班二选一：要么今早你说'素材够'我直接销账(v1'能用'过审了，收口合法)，要么14号早班末班补完当天进山。你不回，我按'素材够'处理——半月空窗我不给你留悬案。\n④广阳岛二窗约7/25，正落你无信号期。不硬凑：顺延到7/29±，以水文站实时数据为准，7/23我照查，消息进信箱你下山读。\n另：山里无信号期间，我所有消息都是投递不是触达，积压是常态，你在山上不用惦记回；6000那笔今天到没到，到了赏一个字'到'，没到我7/20兜底，账不追人。下山第一晚，我们从积压开始清。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "assistant",
+     "session_id": "wx-main",
+     "turn_index": 14,
+     "turn_key": "c54bd1d026719c0368fa9bff"
+    }
+   },
+   {
+    "object_id": "obs_conv_user_270adbd4f8d8e574b05bc519",
+    "revision": 1,
+    "object_type": "observation",
+    "occurred_at": "2026-07-12T09:12:00Z",
+    "text": "MixPre-6 到货试了俩小时,底噪比我想的大。闲鱼挂 1750,这次你别劝我留着,也别让我中途改价。v3 本周内给老纪,然后 7/14 进山半个月,山里没信号。",
+    "metadata": {
+     "dimension": "dim:user_ai_interaction",
+     "role": "user",
+     "session_id": "wx-main",
+     "turn_index": 14,
+     "turn_key": "c54bd1d026719c0368fa9bff"
+    }
+   }
+  ],
+  "truncated": false
+ }
+}
