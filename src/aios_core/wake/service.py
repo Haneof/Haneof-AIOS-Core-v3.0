@@ -143,6 +143,7 @@ class Step0GateResult(BaseModel):
 
     state: Step0State
     model_allowed: bool
+    action_allowed: bool
     delivery_allowed: bool
     reasons: tuple[str, ...] = ()
 
