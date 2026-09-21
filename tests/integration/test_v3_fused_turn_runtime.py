@@ -10,7 +10,7 @@ from aios_core.dimensions import DimensionProposalRequest, DimensionRegistryServ
 from aios_core.ingest.conversation import ConversationIngestor
 from aios_core.query.search import WorldSearchIndex
 from aios_core.runtime.capabilities import CapabilityCall
-from aios_core.runtime.cognitive_runtime import ModelDirective, ModelUsage
+from aios_core.runtime.cognitive_runtime import ModelCallProvenance, ModelDirective, ModelUsage
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
@@ -958,3 +958,42 @@ def test_user_interaction_model_call_is_metered_outside_world(tmp_path):
     assert result.conversation_commit.assistant_world_revision == (
         result.conversation_commit.user_world_revision + 1
     )
+
+
+def test_user_interaction_unknown_usage_is_metered_with_provider_identity(tmp_path):
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda snapshot: ModelDirective(
+            response="收到。",
+            provenance=ModelCallProvenance(
+                provider="openai",
+                model="test-model",
+                request_id="resp_user_unknown_usage",
+            ),
+        ),
+    )
+    runtime.run_turn(
+        session_id="meter-unknown-session",
+        turn_index=1,
+        user_input="测试未知 usage 计量。",
+        current_topic=None,
+        occurred_at=NOW,
+    )
+
+    rows = runtime.metering.list_model_calls(subject_id="user_1")
+    assert len(rows) == 1
+    assert rows[0].execution_class == "user_interaction"
+    assert rows[0].provider == "openai"
+    assert rows[0].model == "test-model"
+    assert rows[0].provider_request_id == "resp_user_unknown_usage"
+    assert rows[0].usage_complete is False
+    assert rows[0].input_tokens is None
+    assert rows[0].output_tokens is None
+    assert rows[0].total_tokens is None
+
