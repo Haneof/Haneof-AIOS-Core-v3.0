@@ -279,3 +279,61 @@ def test_model_usage_contract_rejects_invalid_exact_counts():
             input_tokens=7,
             output_tokens=3,
         )
+
+
+
+def test_usage_recorder_runs_before_capability_execution():
+    registry = CapabilityRegistry()
+    recorded = []
+
+    def capability(query):
+        assert len(recorded) == 1
+        assert recorded[0][0] == 0
+        assert recorded[0][1] is not None
+        assert recorded[0][1].total_tokens == 14
+        return [{"match": query}]
+
+    registry.register(
+        CapabilitySpec(
+            name="search_world",
+            description="search",
+            kind=CapabilityKind.READ,
+        ),
+        capability,
+    )
+
+    def model(snapshot):
+        if not snapshot.capability_history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="search_world",
+                        arguments={"query": "meter-first"},
+                    ),
+                ),
+                usage=ModelUsage(
+                    input_tokens=10,
+                    output_tokens=4,
+                    total_tokens=14,
+                ),
+            )
+        return ModelDirective(
+            response="done",
+            usage=ModelUsage(
+                input_tokens=8,
+                output_tokens=2,
+                total_tokens=10,
+            ),
+        )
+
+    result = CognitiveRuntime(
+        registry=registry,
+        model_handler=model,
+        model_usage_recorder=lambda snapshot, directive: recorded.append(
+            (snapshot.round_index, directive.usage)
+        ),
+    ).run_turn("continue")
+
+    assert result.response == "done"
+    assert [item[0] for item in recorded] == [0, 1]
+    assert [item[1].total_tokens for item in recorded] == [14, 10]

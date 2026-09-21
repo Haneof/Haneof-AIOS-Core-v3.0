@@ -90,7 +90,14 @@ from aios_core.world_graph import (
 
 from .budget_gate import BackgroundBudgetDecision, BackgroundBudgetGate
 from .capabilities import CapabilityKind, CapabilityRegistry, CapabilitySpec
-from .cognitive_runtime import CognitiveRuntime, ModelHandler, RuntimeTurnResult
+from .cognitive_runtime import (
+    CognitiveRuntime,
+    ModelDirective,
+    ModelHandler,
+    RuntimeSnapshot,
+    RuntimeTurnResult,
+)
+from .metering import ModelMeteringLedger
 
 
 _AUTO_TOPIC = object()
@@ -257,9 +264,11 @@ class FusedTurnRuntime:
             wake_bus=self.wake_bus,
             subject_id=self.subject_id,
         )
+        self.metering = ModelMeteringLedger(store)
         self.background_budget_gate = BackgroundBudgetGate(
             store=store,
             subject_id=self.subject_id,
+            metering_ledger=self.metering,
         )
         self.reality_ingest = RealityIngestService(
             store=store,
@@ -268,7 +277,9 @@ class FusedTurnRuntime:
             observation_listener=self.attention_watches.evaluate_observation,
         )
         self._active_turn_time: datetime | None = None
+        self._active_meter_time: datetime | None = None
         self._active_session_id: str | None = None
+        self._active_wake_id: str | None = None
         self._active_review_request: PeriodicReviewRequest | None = None
 
         registry = CapabilityRegistry()
@@ -1000,6 +1011,42 @@ class FusedTurnRuntime:
             model_handler=model_handler,
             max_tool_rounds=max_tool_rounds,
             side_effect_authorizer=self._authorize_side_effect,
+            model_usage_recorder=self._record_model_usage,
+        )
+
+    def _record_model_usage(
+        self,
+        snapshot: RuntimeSnapshot,
+        directive: ModelDirective,
+    ) -> None:
+        if self._active_meter_time is None:
+            raise RuntimeError(
+                "FusedTurnRuntime model invocation is missing active metering time"
+            )
+
+        wake_reason = snapshot.wake_reason
+        if wake_reason == WakeSource.USER_INTERACTION.value:
+            execution_class = "user_interaction"
+        elif wake_reason == WakeSource.PERIODIC_REVIEW.value:
+            execution_class = "periodic_review"
+        elif wake_reason == WakeSource.SAFETY.value:
+            execution_class = "safety"
+        elif self._active_wake_id is not None:
+            execution_class = "background"
+        else:
+            execution_class = "other"
+
+        self.metering.record_model_call(
+            subject_id=self.subject_id,
+            world_revision=int(self.store.current_world_revision()),
+            recorded_at=self._active_meter_time,
+            execution_class=execution_class,
+            wake_id=self._active_wake_id,
+            session_id=self._active_session_id,
+            wake_reason=wake_reason,
+            model_round_index=snapshot.round_index,
+            usage=directive.usage,
+            provenance=directive.provenance,
         )
 
     def _cockpit_capability_catalog(self) -> tuple[dict[str, Any], ...]:
@@ -2577,7 +2624,9 @@ class FusedTurnRuntime:
         )
 
         self._active_turn_time = occurred_at
+        self._active_meter_time = occurred_at
         self._active_session_id = session
+        self._active_wake_id = None
         try:
             runtime_result = self.cognitive_runtime.run_turn(
                 user_input,
@@ -2586,7 +2635,9 @@ class FusedTurnRuntime:
             )
         finally:
             self._active_turn_time = None
+            self._active_meter_time = None
             self._active_session_id = None
+            self._active_wake_id = None
 
         assistant_text = runtime_result.response or ""
         assistant_commit = self.ingestor.commit_assistant_output(
@@ -2897,7 +2948,9 @@ class FusedTurnRuntime:
         )
 
         self._active_turn_time = now
+        self._active_meter_time = now
         self._active_session_id = None
+        self._active_wake_id = running.object_id
         self._active_review_request = None
         try:
             runtime_result = self.cognitive_runtime.run_turn(
@@ -2908,7 +2961,9 @@ class FusedTurnRuntime:
             )
         finally:
             self._active_turn_time = None
+            self._active_meter_time = None
             self._active_session_id = None
+            self._active_wake_id = None
             self._active_review_request = None
 
         completed = self.wake_bus.complete(
@@ -2921,10 +2976,6 @@ class FusedTurnRuntime:
             ),
             delivery_allowed=gate_result.delivery_allowed,
             step0_state=gate_result.state,
-            model_input_tokens=runtime_result.model_input_tokens,
-            model_output_tokens=runtime_result.model_output_tokens,
-            model_total_tokens=runtime_result.model_total_tokens,
-            model_usage_complete=runtime_result.model_usage_complete,
         )
         delivery_response = (
             runtime_result.response
@@ -3095,7 +3146,9 @@ class FusedTurnRuntime:
         # model-authored writebacks deterministic across crash/budget retries instead
         # of creating a second "same lesson" merely because the worker restarted later.
         self._active_turn_time = review_write_time
+        self._active_meter_time = now
         self._active_session_id = None
+        self._active_wake_id = request.wake_ref.object_id
         self._active_review_request = request
         try:
             runtime_result = self.cognitive_runtime.run_turn(
@@ -3107,7 +3160,9 @@ class FusedTurnRuntime:
         finally:
             self._active_review_request = None
             self._active_turn_time = None
+            self._active_meter_time = None
             self._active_session_id = None
+            self._active_wake_id = None
 
         # Tool/capability budget exhaustion is not a completed semantic review.
         # Keep the durable Wake RUNNING so a later worker can resume the exact review.
@@ -3134,10 +3189,6 @@ class FusedTurnRuntime:
             capability_names=[
                 result.name for result in runtime_result.capability_history
             ],
-            model_input_tokens=runtime_result.model_input_tokens,
-            model_output_tokens=runtime_result.model_output_tokens,
-            model_total_tokens=runtime_result.model_total_tokens,
-            model_usage_complete=runtime_result.model_usage_complete,
         )
         self.attention_router.complete_review_queue(
             review_queue_consumed_ids,

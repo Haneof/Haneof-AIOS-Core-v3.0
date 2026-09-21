@@ -26,6 +26,9 @@ class ModelUsage:
     total_tokens: int
     input_tokens: int | None = None
     output_tokens: int | None = None
+    provider: str | None = None
+    model: str | None = None
+    request_id: str | None = None
 
     def __post_init__(self) -> None:
         for field_name in ("total_tokens", "input_tokens", "output_tokens"):
@@ -42,6 +45,25 @@ class ModelUsage:
             raise ValueError(
                 "total_tokens must cover reported input_tokens + output_tokens"
             )
+        for field_name in ("provider", "model", "request_id"):
+            value = getattr(self, field_name)
+            if value is not None and (not isinstance(value, str) or not value.strip()):
+                raise ValueError(f"{field_name} must be non-blank when provided")
+
+
+@dataclass(frozen=True)
+class ModelCallProvenance:
+    """Stable provider identity for one billable model response."""
+
+    provider: str
+    model: str
+    request_id: str
+
+    def __post_init__(self) -> None:
+        for field_name in ("provider", "model", "request_id"):
+            value = getattr(self, field_name)
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"{field_name} must be non-blank")
 
 
 @dataclass(frozen=True)
@@ -52,6 +74,7 @@ class ModelDirective:
     response: str | None = None
     silence: bool = False
     usage: ModelUsage | None = None
+    provenance: ModelCallProvenance | None = None
 
     def __post_init__(self) -> None:
         terminal_count = int(self.response is not None) + int(self.silence)
@@ -63,6 +86,22 @@ class ModelDirective:
             raise ValueError("response must be non-blank when provided")
         if self.usage is not None and not isinstance(self.usage, ModelUsage):
             raise TypeError("usage must be ModelUsage when provided")
+        if self.provenance is not None and not isinstance(
+            self.provenance,
+            ModelCallProvenance,
+        ):
+            raise TypeError("provenance must be ModelCallProvenance when provided")
+        if self.usage is not None and self.provenance is not None:
+            for field_name, provenance_value in (
+                ("provider", self.provenance.provider),
+                ("model", self.provenance.model),
+                ("request_id", self.provenance.request_id),
+            ):
+                usage_value = getattr(self.usage, field_name)
+                if usage_value is not None and usage_value != provenance_value:
+                    raise ValueError(
+                        f"usage {field_name} conflicts with model-call provenance"
+                    )
 
 
 @dataclass(frozen=True)
@@ -90,6 +129,7 @@ class RuntimeTurnResult:
 
 
 ModelHandler = Callable[[RuntimeSnapshot], ModelDirective]
+ModelUsageRecorder = Callable[[RuntimeSnapshot, ModelDirective], None]
 SideEffectAuthorizer = Callable[[CapabilitySpec, CapabilityCall, RuntimeSnapshot], bool]
 
 
@@ -105,6 +145,7 @@ class CognitiveRuntime:
         max_total_capability_calls: int = 12,
         repeated_call_limit: int = 2,
         side_effect_authorizer: SideEffectAuthorizer | None = None,
+        model_usage_recorder: ModelUsageRecorder | None = None,
     ) -> None:
         if max_tool_rounds < 0:
             raise ValueError("max_tool_rounds must be >= 0")
@@ -118,6 +159,7 @@ class CognitiveRuntime:
         self.max_total_capability_calls = max_total_capability_calls
         self.repeated_call_limit = repeated_call_limit
         self.side_effect_authorizer = side_effect_authorizer
+        self.model_usage_recorder = model_usage_recorder
 
     def _snapshot(
         self,
@@ -217,6 +259,11 @@ class CognitiveRuntime:
                 model_usage_complete = False
             else:
                 model_usages.append(directive.usage)
+            if self.model_usage_recorder is not None:
+                # Meter immediately after the provider/model returns. This intentionally
+                # happens before tool execution or Wake completion so a later crash
+                # cannot erase an already-consumed model call.
+                self.model_usage_recorder(snapshot, directive)
 
             if directive.response is not None:
                 return _result(

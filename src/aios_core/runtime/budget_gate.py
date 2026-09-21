@@ -27,6 +27,8 @@ from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import as_utc
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 
+from .metering import ModelMeteringLedger
+
 
 @dataclass(frozen=True, slots=True)
 class BackgroundBudgetDecision:
@@ -105,11 +107,13 @@ class BackgroundBudgetGate:
         *,
         store: SQLiteWorldStore,
         subject_id: str = "user_1",
+        metering_ledger: ModelMeteringLedger | None = None,
     ) -> None:
         if not isinstance(subject_id, str) or not subject_id.strip():
             raise ValueError("subject_id must not be blank")
         self.store = store
         self.subject_id = subject_id.strip()
+        self.metering_ledger = metering_ledger or ModelMeteringLedger(store)
 
     @staticmethod
     def _window(now: datetime) -> tuple[datetime, datetime]:
@@ -167,8 +171,27 @@ class BackgroundBudgetGate:
     ) -> tuple[int, int, int, bool]:
         used_wakes = 0
         used_model_calls = 0
+
+        # Token truth comes from the non-world metering ledger. Wake metadata remains
+        # lifecycle/grant state and is not the authoritative economic ledger.
+        meter_records = self.metering_ledger.list_model_calls(
+            subject_id=self.subject_id,
+            start_at=window_start,
+            end_at=window_end,
+            execution_classes=("background", "periodic_review"),
+        )
+        records_by_wake: dict[str, list[Any]] = {}
         used_tokens = 0
         token_usage_available = True
+        for record in meter_records:
+            if record.wake_id == exclude_wake_id:
+                continue
+            if record.wake_id is not None:
+                records_by_wake.setdefault(record.wake_id, []).append(record)
+            if record.usage_complete and record.total_tokens is not None:
+                used_tokens += record.total_tokens
+            else:
+                token_usage_available = False
 
         for payload in self.store.list_payloads(
             object_type=ObjectType.WAKE,
@@ -195,8 +218,12 @@ class BackgroundBudgetGate:
                 if isinstance(reserved, int) and not isinstance(reserved, bool) and reserved > 0:
                     used_model_calls += reserved
                 else:
-                    used_model_calls += 1
-                # In-flight provider work has no final exact usage yet.
+                    used_model_calls += max(
+                        1,
+                        len(records_by_wake.get(wake.object_id, ())),
+                    )
+                # A RUNNING invocation may still consume another model call. Exact
+                # spend-so-far is visible above, but the final token total is unknown.
                 token_usage_available = False
                 continue
 
@@ -227,16 +254,10 @@ class BackgroundBudgetGate:
             used_wakes += 1
             used_model_calls += rounds
 
-            total_tokens = metadata.get("model_total_tokens")
-            usage_complete = metadata.get("model_usage_complete") is True
-            if (
-                usage_complete
-                and isinstance(total_tokens, int)
-                and not isinstance(total_tokens, bool)
-                and total_tokens >= 0
-            ):
-                used_tokens += total_tokens
-            else:
+            # Legacy Wakes completed before MeteringLedger cannot prove token spend.
+            # A complete modern Wake has one metering row per model round.
+            wake_records = records_by_wake.get(wake.object_id, ())
+            if len(wake_records) < rounds:
                 token_usage_available = False
 
         return (

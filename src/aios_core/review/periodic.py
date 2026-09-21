@@ -1100,7 +1100,11 @@ class PeriodicReviewService:
 
         new_revision = wake.revision + 1
         metadata = dict(wake.metadata)
-        metadata["started_at"] = started.isoformat()
+        # A RUNNING review may refresh a budget reservation after a window rollover.
+        # Keep the original cognition/write timestamp stable across that recovery;
+        # economic metering uses the actual execution time independently.
+        if wake.wake_state is not WakeState.RUNNING or metadata.get("started_at") is None:
+            metadata["started_at"] = started.isoformat()
         metadata.update(dict(metadata_update or {}))
         running = Wake.model_validate(
             {
@@ -1154,10 +1158,6 @@ class PeriodicReviewService:
         termination_reason: str,
         model_rounds: int,
         capability_names: Sequence[str],
-        model_input_tokens: int | None = None,
-        model_output_tokens: int | None = None,
-        model_total_tokens: int | None = None,
-        model_usage_complete: bool = False,
     ) -> ReviewWakeReceipt:
         if request.subject_id != self.subject_id:
             raise ValueError("review request belongs to another subject")
@@ -1187,15 +1187,8 @@ class PeriodicReviewService:
                 "termination_reason": termination_reason,
                 "model_rounds": int(model_rounds),
                 "capability_names": list(capability_names),
-                "model_usage_complete": bool(model_usage_complete),
             }
         )
-        if model_input_tokens is not None:
-            metadata["model_input_tokens"] = int(model_input_tokens)
-        if model_output_tokens is not None:
-            metadata["model_output_tokens"] = int(model_output_tokens)
-        if model_total_tokens is not None:
-            metadata["model_total_tokens"] = int(model_total_tokens)
         new_revision = wake.revision + 1
         completed_wake = Wake.model_validate(
             {

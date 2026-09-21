@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
+import pytest
+
 from aios_core.contracts.enums import (
     AttentionClass,
     BudgetOnExceed,
@@ -288,10 +290,18 @@ def test_completed_background_wake_exposes_exact_token_usage_in_budget_status(tm
     assert result.runtime.model_total_tokens == 30
 
     current = runtime.wake_bus.current_wake(result.wake.wake_id)
-    assert current.metadata["model_usage_complete"] is True
-    assert current.metadata["model_input_tokens"] == 21
-    assert current.metadata["model_output_tokens"] == 9
-    assert current.metadata["model_total_tokens"] == 30
+    assert "model_usage_complete" not in current.metadata
+    assert "model_total_tokens" not in current.metadata
+
+    meter_rows = runtime.metering.list_model_calls(
+        subject_id="user_1",
+        wake_id=result.wake.wake_id,
+    )
+    assert len(meter_rows) == 1
+    assert meter_rows[0].usage_complete is True
+    assert meter_rows[0].input_tokens == 21
+    assert meter_rows[0].output_tokens == 9
+    assert meter_rows[0].total_tokens == 30
 
     status = runtime.background_budget_gate.status(
         now=NOW + timedelta(minutes=3),
@@ -406,6 +416,62 @@ def _revise_budget(store, policy, *, changed_at, max_wakes=None, max_model_calls
         ),
     )
     return revised
+
+
+def test_provider_usage_is_durable_even_if_wake_completion_crashes(tmp_path, monkeypatch):
+    store, index = _world(tmp_path)
+    _commit_budget(store, max_model_calls=5)
+    ref = _commit_evidence(store, object_id="obs_meter_crash")
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda snapshot: ModelDirective(
+            silence=True,
+            usage=ModelUsage(
+                input_tokens=17,
+                output_tokens=5,
+                total_tokens=22,
+                provider="openai",
+                model="test-model",
+                request_id="resp_before_completion_crash",
+            ),
+        ),
+    )
+    signal = _emit_background(
+        runtime,
+        ref,
+        key="budget.meter-before-complete",
+        observed_at=NOW + timedelta(minutes=1),
+    )
+
+    def crash_complete(*args, **kwargs):
+        raise RuntimeError("simulated crash before Wake completion")
+
+    monkeypatch.setattr(runtime.wake_bus, "complete", crash_complete)
+
+    with pytest.raises(RuntimeError, match="simulated crash"):
+        runtime.run_wake(
+            wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
+            now=NOW + timedelta(minutes=2),
+        )
+
+    current = runtime.wake_bus.current_wake(signal.wake_id)
+    assert current.wake_state.value == "running"
+    assert "model_total_tokens" not in current.metadata
+
+    rows = runtime.metering.list_model_calls(
+        subject_id="user_1",
+        wake_id=signal.wake_id,
+    )
+    assert len(rows) == 1
+    assert rows[0].usage_complete is True
+    assert rows[0].total_tokens == 22
+    assert rows[0].provider_request_id == "resp_before_completion_crash"
+
+    # Metering is not a World write: after the claim, the failed completion adds no
+    # extra world revision even though the provider call is durably accounted.
+    assert rows[0].world_revision == int(store.current_world_revision())
 
 
 def test_running_budget_reservation_is_not_a_free_same_day_retry(tmp_path):
@@ -542,8 +608,16 @@ def test_periodic_review_budget_defers_then_resumes_same_anchors(tmp_path):
         resumed.wake.wake_id,
         revision=resumed.wake.revision,
     )
-    assert completed_payload["metadata"]["model_usage_complete"] is True
-    assert completed_payload["metadata"]["model_total_tokens"] == 44
+    assert "model_usage_complete" not in completed_payload["metadata"]
+    assert "model_total_tokens" not in completed_payload["metadata"]
+    review_meter_rows = runtime.metering.list_model_calls(
+        subject_id="user_1",
+        wake_id=resumed.wake.wake_id,
+    )
+    assert len(review_meter_rows) == 1
+    assert review_meter_rows[0].total_tokens == 44
+    assert review_meter_rows[0].execution_class == "periodic_review"
+    assert review_meter_rows[0].recorded_at == NOW + timedelta(hours=27)
     status = runtime.background_budget_gate.status(
         now=NOW + timedelta(hours=28),
     )
@@ -610,7 +684,17 @@ def test_periodic_running_review_does_not_repeat_same_day_and_can_refresh_next_d
                     ),
                 )
             )
-        return ModelDirective(silence=True)
+        return ModelDirective(
+            silence=True,
+            usage=ModelUsage(
+                input_tokens=18,
+                output_tokens=4,
+                total_tokens=22,
+                provider="openai",
+                model="review-model",
+                request_id="resp_resumed_review_next_day",
+            ),
+        )
 
     runtime = FusedTurnRuntime(
         store=store,
@@ -633,6 +717,9 @@ def test_periodic_running_review_does_not_repeat_same_day_and_can_refresh_next_d
     assert first.runtime.model_rounds == 5
     assert first.wake.state == "running"
     assert model_calls == 5
+    first_running = store.get_payload(first.wake.wake_id)
+    original_started_at = first_running["metadata"]["started_at"]
+    assert original_started_at == (NOW + timedelta(hours=25)).isoformat()
 
     same_day = runtime.run_periodic_review(
         now=NOW + timedelta(hours=26),
@@ -657,6 +744,24 @@ def test_periodic_running_review_does_not_repeat_same_day_and_can_refresh_next_d
     assert next_day.runtime.silenced is True
     assert next_day.wake.state == "completed"
     assert model_calls == 6
+
+    completed = store.get_payload(
+        next_day.wake.wake_id,
+        revision=next_day.wake.revision,
+    )
+    # The review's cognition/write clock stays pinned to the original RUNNING
+    # review start even though the provider call happened in the next budget day.
+    assert completed["metadata"]["started_at"] == original_started_at
+
+    meter_rows = runtime.metering.list_model_calls(
+        subject_id="user_1",
+        wake_id=next_day.wake.wake_id,
+    )
+    exact_rows = [row for row in meter_rows if row.usage_complete]
+    assert len(exact_rows) == 1
+    assert exact_rows[0].recorded_at == NOW + timedelta(hours=49)
+    assert exact_rows[0].total_tokens == 22
+    assert exact_rows[0].provider_request_id == "resp_resumed_review_next_day"
 
 
 
