@@ -347,8 +347,8 @@ class AttentionRouter:
         queued = [
             wake
             for wake in self.wake_bus.pending_wakes()
-            if self.wake_bus.attention_class_for_wake(wake)
-            is AttentionClass.REVIEW_QUEUE
+            if str(wake.metadata.get("attention_class") or "")
+            == AttentionClass.REVIEW_QUEUE.value
         ]
         queued.sort(
             key=lambda item: (
