@@ -1100,7 +1100,11 @@ class PeriodicReviewService:
 
         new_revision = wake.revision + 1
         metadata = dict(wake.metadata)
-        metadata["started_at"] = started.isoformat()
+        # A RUNNING review may refresh a budget reservation after a window rollover.
+        # Keep the original cognition/write timestamp stable across that recovery;
+        # economic metering uses the actual execution time independently.
+        if wake.wake_state is not WakeState.RUNNING or metadata.get("started_at") is None:
+            metadata["started_at"] = started.isoformat()
         metadata.update(dict(metadata_update or {}))
         running = Wake.model_validate(
             {
