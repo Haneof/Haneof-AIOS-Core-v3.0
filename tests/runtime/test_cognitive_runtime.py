@@ -8,7 +8,7 @@ from aios_core.runtime.capabilities import (
     CapabilityRegistry,
     CapabilitySpec,
 )
-from aios_core.runtime.cognitive_runtime import CognitiveRuntime, ModelDirective
+from aios_core.runtime.cognitive_runtime import CognitiveRuntime, ModelDirective, ModelUsage
 
 
 def test_direct_response_needs_no_capability_call():
@@ -157,3 +157,63 @@ def test_side_effecting_capability_runs_only_when_authorized():
     assert executed == ["有证据的结论"]
     assert result.capability_history[0].ok is True
     assert result.response == "已通过受控写入路径提交。"
+
+
+
+def test_exact_model_usage_is_aggregated_across_tool_rounds():
+    registry = CapabilityRegistry()
+    registry.register(
+        CapabilitySpec(
+            name="search_world",
+            description="search",
+            kind=CapabilityKind.READ,
+        ),
+        lambda query: [{"match": query}],
+    )
+
+    def model(snapshot):
+        if not snapshot.capability_history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="search_world",
+                        arguments={"query": "Seattle"},
+                    ),
+                ),
+                usage=ModelUsage(
+                    input_tokens=20,
+                    output_tokens=5,
+                    total_tokens=25,
+                ),
+            )
+        return ModelDirective(
+            response="done",
+            usage=ModelUsage(
+                input_tokens=12,
+                output_tokens=3,
+                total_tokens=15,
+            ),
+        )
+
+    result = CognitiveRuntime(
+        registry=registry,
+        model_handler=model,
+    ).run_turn("continue")
+
+    assert result.model_rounds == 2
+    assert result.model_usage_complete is True
+    assert result.model_input_tokens == 32
+    assert result.model_output_tokens == 8
+    assert result.model_total_tokens == 40
+
+
+def test_missing_usage_keeps_runtime_token_total_unknown():
+    result = CognitiveRuntime(
+        registry=CapabilityRegistry(),
+        model_handler=lambda snapshot: ModelDirective(response="done"),
+    ).run_turn("hello")
+
+    assert result.model_usage_complete is False
+    assert result.model_input_tokens is None
+    assert result.model_output_tokens is None
+    assert result.model_total_tokens is None
