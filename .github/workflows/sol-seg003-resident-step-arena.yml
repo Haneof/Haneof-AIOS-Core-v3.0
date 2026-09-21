@@ -205,15 +205,19 @@ jobs:
           python - <<'PY'
           from pathlib import Path
 
+          import hashlib
+
           def escape(text: str) -> str:
               return text.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+
+          LIMIT = 3600  # escaped bytes per annotation, safely below the platform cap
 
           def emit(title: str, text: str) -> None:
               pieces: list[str] = []
               current = ""
               for line in text.split("\n"):
                   encoded = escape(line)
-                  if current and len(current) + 3 + len(encoded) > 3900:
+                  if current and len((current + "%0A" + encoded).encode("utf-8")) > LIMIT:
                       pieces.append(current)
                       current = encoded
                   else:
@@ -222,7 +226,9 @@ jobs:
               for index, piece in enumerate(pieces, start=1):
                   suffix = "" if len(pieces) == 1 else f"-{index}of{len(pieces)}"
                   print(f"::warning title={title}{suffix}::{piece}")
-              print(f"{title}: emitted {len(pieces)} annotation chunk(s), {len(text)} chars")
+              digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
+              print(f"::warning title={title}-integrity::{digest}:{len(text.encode('utf-8'))}:{len(pieces)}")
+              print(f"{title}: emitted {len(pieces)} annotation chunk(s), {len(text.encode('utf-8'))} bytes")
 
           for name in ("sanitized.txt", "state.json", "bridge-exit-code.txt"):
               path = Path("artifacts/segment-003") / name
