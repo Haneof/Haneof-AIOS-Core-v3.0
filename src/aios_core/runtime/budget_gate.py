@@ -204,6 +204,41 @@ class BackgroundBudgetGate:
                 continue
 
             metadata: Mapping[str, Any] = wake.metadata
+            if (
+                wake.wake_state is WakeState.QUEUED
+                and bool(metadata.get("runtime_incomplete"))
+            ):
+                attempt_at = self._parse_time(
+                    metadata.get("runtime_incomplete_at")
+                    or metadata.get("runtime_first_started_at")
+                    or wake.recorded_at,
+                    "runtime_incomplete_at",
+                )
+                if attempt_at is None or not (
+                    window_start <= attempt_at < window_end
+                ):
+                    continue
+                wake_records = records_by_wake.get(wake.object_id, ())
+                rounds = len(wake_records)
+                if rounds == 0:
+                    raw_rounds = metadata.get("runtime_incomplete_model_rounds")
+                    if (
+                        isinstance(raw_rounds, int)
+                        and not isinstance(raw_rounds, bool)
+                        and raw_rounds > 0
+                    ):
+                        rounds = raw_rounds
+                    token_usage_available = False
+                elif not all(
+                    record.usage_complete and record.total_tokens is not None
+                    for record in wake_records
+                ):
+                    token_usage_available = False
+                if rounds > 0:
+                    used_wakes += 1
+                    used_model_calls += rounds
+                continue
+
             if wake.wake_state is WakeState.RUNNING:
                 started_at = self._parse_time(
                     metadata.get("started_at"),
