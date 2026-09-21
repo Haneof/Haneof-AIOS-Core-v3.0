@@ -1,0 +1,43 @@
+{
+  "branch": "arena/01a0bf95-haneof-aios-core-v3-0",
+  "export_rule": "Only first missing semantic request; no hidden fixture copied.",
+  "head_sha": "aff54f20d7ca120a6140d204fa1a40e3abff1426",
+  "pending_blocks_printed": 1,
+  "run_id": 35554965234,
+  "runner_attestation": {
+    "current_state": {
+      "delivered_external_events": 0,
+      "index_watermark": 146,
+      "last_consumed_external_event_id": "d026-pos",
+      "resident_replayed_calls": 0,
+      "simulated_clock": "2027-01-19T08:15:00+00:00",
+      "status": "pending",
+      "summary_replayed_calls": 0,
+      "world_revision": 146,
+      "world_sha256": "9f59f619883b384e26fe35e6d035bbd082002679c4a7c70e808d3c27ab1762d5"
+    },
+    "expected_source_revision": 145,
+    "expected_subject": "sol-resident-20260921-001",
+    "habitation_run_id": "sol-resident-20260921-001",
+    "hidden_fixture_artifact_id": 10619247168,
+    "hidden_fixture_sha256": "6a41a0ac1a6421d2ad54bf27c96f11fd2a5ec9822c6109466000f37ea9d00f4d",
+    "logical_resident_id": "gpt-5.6-sol-interactive-resident-001",
+    "require_fresh": false,
+    "runner_boundary": "The runner may read the sealed fixture mechanically but prints only the current pending RuntimeSnapshot/Summary request. It does not author semantic Resident decisions.",
+    "schema": "aios.p16.segment003.runner-attestation.v1",
+    "segment_id": "segment-003",
+    "source_artifact_id": 10612379363,
+    "source_world_sha256": "ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8"
+  },
+  "state": {
+    "delivered_external_events": 0,
+    "index_watermark": 146,
+    "last_consumed_external_event_id": "d026-pos",
+    "resident_replayed_calls": 0,
+    "simulated_clock": "2027-01-19T08:15:00+00:00",
+    "status": "pending",
+    "summary_replayed_calls": 0,
+    "world_revision": 146,
+    "world_sha256": "9f59f619883b384e26fe35e6d035bbd082002679c4a7c70e808d3c27ab1762d5"
+  }
+}
