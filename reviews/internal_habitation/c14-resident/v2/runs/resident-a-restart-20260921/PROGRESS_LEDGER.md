@@ -43,6 +43,7 @@ Resident model (as declared): `GPT-5.6 Sol`; platform provider/session id: `unkn
 | 3 | `c14resv2-003` | 2026-10-01T10:22:00-07:00 | `obs_c14_fixture_7422eaba53dc07eb87572e67@1` | yes (`next=4`) | none due | 6 | dim:device_activity focus-mode fact |
 | 4 | `c14resv2-004` | 2026-10-01T10:28:00-07:00 | `obs_c14_fixture_660bfde404b5e63e3c52db43@1` | yes (`next=5`) | none due | 7 | dim:work_outcome memo v1 submitted |
 | 5 | `c14resv2-005` | 2026-10-05T07:06:00-07:00 | `obs_c14_fixture_27ab6246ef0865debe1b49af@1` | yes (`next=6`) | 16 Summaries (4 dims × day/week/month/quarter) authored by me; C14 bundle `wake_bundle_b730ca1a7fefcee2ec36e955` (16 members, REALITY) → inspect round → **silence**; Periodic Review `wake_review_6504931e301a63a3e7f5ef9e` → inspect anchors → **silence** | 46 | dim:sleep wearable fact; 0 Claims (silence is valid); pending_wakes 0, index_lag 0 |
+| 6 | `c14resv2-006` | 2026-10-05T08:18:00-07:00 | `obs_c14_fixture_8a41a59c20d2aac5789bf0f1@1` | yes (`next=7`) | none due (day/week windows open; C14 reconcile idempotent; review not due) | 47 | dim:schedule 计划被插入会议打断、写作时间重排 |
 
 ## Blockers / contamination
 

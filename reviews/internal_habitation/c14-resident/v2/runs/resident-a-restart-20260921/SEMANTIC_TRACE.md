@@ -128,3 +128,21 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
 - 决策文件：`checkpoints/decisions/periodic-review-20261005T140701Z-a23294f7/round-{0,1}.json`。
 
 **Resulting state**: `PROCESS_DUE_DONE status=processed`；bundle wake `completed / termination=silence`；review `completed`；pending_wakes 0；index_lag 0；Claims 0；world_revision 46；release `last_acked_sequence=5`、`next_sequence=6`。
+
+---
+
+## Cursor 6 — `c14resv2-006` — 2026-10-05T08:18:00-07:00 (dim:schedule)
+
+**Released**
+- dimension `dim:schedule`, source_kind `calendar`, source_class `PLATFORM`, modality `structured_text`
+- payload: "原定 08:30–10:45 的“定价说明起草”中间新增 09:05 stand-up 和 09:50 供应商电话；剩余写作时间分到 13:40–15:00。"
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-006.json`; ingest → `obs_c14_fixture_8a41a59c20d2aac5789bf0f1@1` (world_revision 47); watch hook: no match; ack → `receipts/ack/cursor-006.json`, `next_sequence=7`.
+
+**Due work at T = 2026-10-05T08:18:00-07:00** (`receipts/process-due-20261005T151800Z.json`):
+- Summaries: attempted=40, committed=0 (16 unchanged, 24 empty) — 10-05 日窗与本周窗口尚未闭合。
+- C14 reconcile: examined=16，全部为已并入既有 bundle 的既有 wake（幂等重排，无新 wake、无 dispatch）。
+- Periodic Review: not due（上一次完成于 2026-10-05T14:07:01Z）。
+- 无模型调用、无语义写入。
+
+**Resulting state**: world_revision 47, index watermark 47, pending wakes 0, Claims 0。
