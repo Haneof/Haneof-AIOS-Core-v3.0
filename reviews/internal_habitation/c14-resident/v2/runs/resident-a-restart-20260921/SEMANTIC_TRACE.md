@@ -441,3 +441,17 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
 - 决策文件：`checkpoints/decisions/wake-cognitive_derivation-wake_41f660b597ba3dd50a781ad7-rev1-77b6fe23/round-{0,1}.json`、`checkpoints/decisions/periodic-review-20261021T150501Z-64749b7d/round-{0,1}.json`。
 
 **Resulting state**: world_revision 164, index watermark 164, pending wakes 0, Claims 1（rev 2）, 43 条摘要, operation experiences 0。
+
+---
+
+## Cursor 23 — `c14resv2-023` — 2026-10-21T10:06:00-07:00 (dim:collaboration_outcome)
+
+**Released**
+- dimension `dim:collaboration_outcome`（本 run 首次出现）, source_kind `meeting_record`, source_class `PLATFORM`
+- payload: "共创工作坊结束时，两项原本未定的需求边界已由客户确认；会议记录列出明确决议。"
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-023.json`; ingest → `obs_c14_fixture_2378863986aaed4f3c5b2d30@1` (world_revision 165); watch hook: no match; ack → `receipts/ack/cursor-023.json`, `next_sequence=24`。
+
+**Due work at T = 2026-10-21T10:06:00-07:00**（`receipts/process-due-20261021T170600Z.json`）: 无摘要窗口闭合（10-21 日窗仍开、10-19–10-25 周窗未闭）、无 C14 唤醒、Periodic Review 未触发。机械跑完即止，无模型决策点。
+
+**Resulting state**: world_revision 165, index watermark 165, pending wakes 0。（下一条即 Phase A 末条 cursor 24。）
