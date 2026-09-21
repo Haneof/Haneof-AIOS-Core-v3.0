@@ -72,6 +72,7 @@ from aios_core.contracts.time import TemporalExtent
 from aios_core.contracts.enums import AttentionClass, ObjectType, PolicyClass, WakeSource
 from aios_core.wake import (
     AttentionRouter,
+    AttentionSchedulingPolicy,
     AttentionWatchRequest,
     AttentionWatchService,
     NumericPredicate,
@@ -141,6 +142,7 @@ class FusedTurnRuntime:
         recent_turn_limit: int = 8,
         summary_chunk_turns: int = 12,
         max_round_summaries_per_turn: int = 1,
+        attention_scheduling_policy: AttentionSchedulingPolicy | None = None,
     ) -> None:
         if recent_turn_limit < 0:
             raise ValueError("recent_turn_limit must be >= 0")
@@ -161,6 +163,9 @@ class FusedTurnRuntime:
         self.recent_turn_limit = int(recent_turn_limit)
         self.summary_chunk_turns = int(summary_chunk_turns)
         self.max_round_summaries_per_turn = int(max_round_summaries_per_turn)
+        self.attention_scheduling_policy = (
+            attention_scheduling_policy or AttentionSchedulingPolicy()
+        )
         self.recommender = ProactiveMemoryRecommender(
             index=index,
             store=store,
@@ -2635,7 +2640,9 @@ class FusedTurnRuntime:
 
         wake = self.attention_router.next_dispatchable(
             now=now,
-            background_batch_window_seconds=60,
+            background_batch_window_seconds=(
+                self.attention_scheduling_policy.background_batch_window_seconds
+            ),
         )
         if wake is None:
             return None
@@ -2701,8 +2708,10 @@ class FusedTurnRuntime:
         ):
             bundle = self.attention_router.bundle_pending(
                 now=now,
-                window_seconds=60,
-                max_wakes=16,
+                window_seconds=(
+                    self.attention_scheduling_policy.background_batch_window_seconds
+                ),
+                max_wakes=self.attention_scheduling_policy.background_bundle_max_wakes,
                 anchor_wake_id=initial_wake.object_id,
             )
             if (
