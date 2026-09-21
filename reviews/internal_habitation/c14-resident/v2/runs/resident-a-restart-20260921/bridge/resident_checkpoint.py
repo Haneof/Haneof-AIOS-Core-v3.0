@@ -130,9 +130,13 @@ class Audit:
         }
         with self.path.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(payload, ensure_ascii=False, sort_keys=True) + "\n")
+        printable = dict(fields)
+        stdout_summary = printable.pop("stdout_summary", None)
+        if stdout_summary is not None:
+            printable = {"summary": stdout_summary}
         readable = " ".join(
             f"{key}={json.dumps(value, ensure_ascii=False)}"
-            for key, value in fields.items()
+            for key, value in printable.items()
             if key not in {"cockpit", "capability_history"}
         )
         print(f"[bridge] {event} {readable}".rstrip(), flush=True)
@@ -588,7 +592,14 @@ def cmd_process_due(args: argparse.Namespace) -> None:
     )
 
     reconcile = runtime.dimension_summary_scheduler.reconcile_cognitive_derivation()
-    audit("C14_RECONCILE", result=_jsonable(reconcile))
+    audit(
+        "C14_RECONCILE",
+        result=_jsonable(reconcile),
+        stdout_summary={
+            "examined": reconcile.get("examined"),
+            "scheduled": len(reconcile.get("scheduled") or ()),
+        },
+    )
 
     dispatches: list[dict[str, Any]] = []
     for _ in range(int(args.max_wakes)):

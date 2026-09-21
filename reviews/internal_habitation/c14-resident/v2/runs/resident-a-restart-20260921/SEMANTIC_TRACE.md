@@ -221,3 +221,19 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
 **Resulting state**: world_revision 67, index watermark 67, pending wakes 0, Claims 0。
 
 > 观察（不构成认知）：10-08 在 5h48m 短睡之后仍安排 08:15 起的两小时写作块；单点，不足以支撑任何 Claim。
+
+---
+
+## Cursor 11 — `c14resv2-011` — 2026-10-08T10:38:00-07:00 (dim:device_activity)
+
+**Released**
+- dimension `dim:device_activity`, source_kind `device`, source_class `PLATFORM`, modality `structured_text`
+- payload: "08:13–10:34 开启专注模式；期间主动解锁 2 次，29 条通知被静音。"
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-011.json`; ingest → `obs_c14_fixture_522a6cbeb84ced83b62def58@1` (world_revision 68); watch hook: no match; ack → `receipts/ack/cursor-011.json`, `next_sequence=12`.
+
+**Due work at T = 2026-10-08T10:38:00-07:00**（`receipts/process-due-20261008T173800Z.json`）: 无到期工作（0 摘要提交；20 个既有 C14 wake 幂等；review 未到期）。无模型调用、无语义写入。
+
+**Resulting state**: world_revision 68, index watermark 68, pending wakes 0, Claims 0。
+
+> 观察（不构成认知）：这是第二次“晨间写作块 + 专注模式”记录（10-01：08:02–10:18，3 次解锁/26 条静音；10-08：08:13–10:34，2 次解锁/29 条静音）。同类行为已 2 次，接近我自设的 ≥3 门槛。
