@@ -24,6 +24,7 @@ def _bootstrap_repo_src() -> None:
 
 _bootstrap_repo_src()
 
+from aios_core.ingest import INTERACTION_DIMENSION
 from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
 OPERATOR_VERSION = "c14-blind-release-operator-v4"
@@ -489,7 +490,7 @@ def _verify_canonical_conversation_binding(
         (payload.get("modality"), "text", "modality"),
         (payload.get("value"), event["resident_visible_payload"], "text"),
         (payload.get("created_by"), "conversation_ingest:user", "created_by"),
-        (metadata.get("dimension"), "dim:interaction", "dimension"),
+        (metadata.get("dimension"), INTERACTION_DIMENSION, "dimension"),
         (metadata.get("role"), "user", "role"),
         (metadata.get("session_id"), session_id, "session id"),
         (metadata.get("turn_index"), turn_index, "turn index"),
