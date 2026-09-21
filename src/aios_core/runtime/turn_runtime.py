@@ -38,6 +38,7 @@ from aios_core.execution import (
     TaskCreateRequest,
     TaskTransitionRequest,
 )
+from aios_core.ingest import RealityIngestService
 from aios_core.ingest.conversation import (
     INTERACTION_DIMENSION,
     ConversationCommit,
@@ -69,7 +70,16 @@ from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackS
 from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import TemporalExtent
 from aios_core.contracts.enums import ObjectType, PolicyClass, WakeSource
-from aios_core.wake import Step0GateInput, Step0GateResult, WakeBus, WakeStateReceipt
+from aios_core.wake import (
+    AttentionRouter,
+    AttentionWatchRequest,
+    AttentionWatchService,
+    NumericPredicate,
+    Step0GateInput,
+    Step0GateResult,
+    WakeBus,
+    WakeStateReceipt,
+)
 from aios_core.world_graph import (
     EntityProposalRequest,
     EntityRelationService,
@@ -228,6 +238,24 @@ class FusedTurnRuntime:
             index=index,
             subject_id=self.subject_id,
         )
+        self.attention_watches = AttentionWatchService(
+            store=store,
+            index=index,
+            execution_world=self.execution_world,
+            wake_bus=self.wake_bus,
+            subject_id=self.subject_id,
+        )
+        self.attention_router = AttentionRouter(
+            store=store,
+            wake_bus=self.wake_bus,
+            subject_id=self.subject_id,
+        )
+        self.reality_ingest = RealityIngestService(
+            store=store,
+            index=index,
+            subject_id=self.subject_id,
+            observation_listener=self.attention_watches.evaluate_observation,
+        )
         self._active_turn_time: datetime | None = None
         self._active_session_id: str | None = None
         self._active_review_request: PeriodicReviewRequest | None = None
@@ -355,6 +383,44 @@ class FusedTurnRuntime:
                 input_schema={},
             ),
             self._read_world_map,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="list_attention_watches",
+                description=(
+                    "List Resident-authored active attention watches. Watches contain only "
+                    "mechanical future-match predicates; the Resident interprets meaning after Wake."
+                ),
+                kind=CapabilityKind.READ,
+                input_schema={},
+            ),
+            self._list_attention_watches,
+        )
+        registry.register(
+            CapabilitySpec(
+                name="create_attention_watch",
+                description=(
+                    "Register future attention as a constrained mechanical Observation watch. "
+                    "Use this when you want AIOS to wake you later if explicit world facts match. "
+                    "Do not encode emotion, intent, diagnosis, or other semantic conclusions in the predicate."
+                ),
+                kind=CapabilityKind.WRITE,
+                side_effecting=True,
+                input_schema={
+                    "title": "string",
+                    "dimensions": "array[string]",
+                    "reason_refs": "array[{object_id:string,revision:integer}]",
+                    "goal_ref": "{object_id:string,revision:integer}?",
+                    "source_kind": "string?",
+                    "modality": "string?",
+                    "metadata_equals": "object?",
+                    "numeric": "{operator:gt|gte|lt|lte|eq|ne,threshold:number,path:array[string]?}?",
+                    "priority": "integer[0,100]?",
+                    "cooldown_seconds": "integer?",
+                    "expires_at": "ISO-8601 datetime?",
+                },
+            ),
+            self._create_attention_watch,
         )
         registry.register(
             CapabilitySpec(
@@ -1171,6 +1237,67 @@ class FusedTurnRuntime:
         if self._active_turn_time is None:
             raise RuntimeError("read_world_map is only available during an active AIOS turn")
         return self._world_map_context(self._active_turn_time)
+
+    def _list_attention_watches(self) -> list[dict[str, Any]]:
+        return [
+            item.model_dump(mode="json")
+            for item in self.attention_watches.current()
+        ]
+
+    def _create_attention_watch(
+        self,
+        title: str,
+        dimensions: Sequence[str],
+        reason_refs: Sequence[Mapping[str, Any]],
+        goal_ref: Mapping[str, Any] | None = None,
+        source_kind: str | None = None,
+        modality: str | None = None,
+        metadata_equals: Mapping[str, Any] | None = None,
+        numeric: Mapping[str, Any] | None = None,
+        priority: int = 50,
+        cooldown_seconds: int = 0,
+        expires_at: str | None = None,
+    ) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError(
+                "create_attention_watch is only available during an active AIOS turn"
+            )
+        parsed_goal = (
+            None
+            if goal_ref is None
+            else ObjectRef(
+                object_id=str(goal_ref["object_id"]),
+                revision=int(goal_ref["revision"]),
+            )
+        )
+        parsed_numeric = (
+            None
+            if numeric is None
+            else NumericPredicate.model_validate(dict(numeric))
+        )
+        receipt = self.attention_watches.create(
+            AttentionWatchRequest(
+                title=str(title),
+                dimensions=tuple(str(item) for item in dimensions),
+                reason_refs=self._coerce_refs(reason_refs),
+                goal_ref=parsed_goal,
+                source_kind=source_kind,
+                modality=modality,
+                metadata_equals=dict(metadata_equals or {}),
+                numeric=parsed_numeric,
+                priority=int(priority),
+                cooldown_seconds=int(cooldown_seconds),
+                expires_at=(
+                    None
+                    if expires_at is None
+                    else datetime.fromisoformat(
+                        str(expires_at).replace("Z", "+00:00")
+                    )
+                ),
+            ),
+            created_at=self._active_turn_time,
+        )
+        return asdict(receipt)
 
     def _list_dimensions(
         self,
@@ -2513,6 +2640,22 @@ class FusedTurnRuntime:
         if exact_payload.get("object_type") != "wake":
             raise ValueError("wake_ref must point to a Wake object")
 
+        initial_wake = self.wake_bus.current_wake(ref.object_id)
+        if initial_wake.wake_state.value in {"new", "queued"}:
+            bundle = self.attention_router.bundle_pending(
+                now=now,
+                window_seconds=60,
+                max_wakes=16,
+            )
+            if (
+                bundle is not None
+                and initial_wake.object_id in bundle.member_wake_ids
+            ):
+                ref = ObjectRef(
+                    object_id=bundle.wake_id,
+                    revision=bundle.revision,
+                )
+
         wake = self.wake_bus.current_wake(ref.object_id)
         if wake.wake_source is WakeSource.PERIODIC_REVIEW:
             raise ValueError(
@@ -2577,6 +2720,11 @@ class FusedTurnRuntime:
             ],
             "step0": gate_result.model_dump(mode="json"),
             "evidence_reader": "inspect_world_object",
+            "attention_bundle": (
+                running.metadata.get("attention_bundle")
+                if running.wake_source is WakeSource.ATTENTION_BUNDLE
+                else None
+            ),
         }
         wake_input = (
             "System Wake. Start from the supplied Wake Reason and pinned evidence. "
