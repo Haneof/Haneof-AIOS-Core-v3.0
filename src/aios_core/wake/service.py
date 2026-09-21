@@ -734,6 +734,8 @@ class WakeBus:
         wake_id: str,
         *,
         started_at: datetime,
+        expected_world_revision: int | None = None,
+        metadata_update: Mapping[str, Any] | None = None,
     ) -> WakeStateReceipt:
         moment = as_utc(started_at, "started_at")
         wake = self.current_wake(wake_id)
@@ -751,6 +753,7 @@ class WakeBus:
         revision = wake.revision + 1
         metadata = dict(wake.metadata)
         metadata["started_at"] = moment.isoformat()
+        metadata.update(dict(metadata_update or {}))
         running = Wake.model_validate(
             {
                 **wake.model_dump(mode="python", round_trip=True),
@@ -768,7 +771,11 @@ class WakeBus:
             OperationRequest(
                 operation_name="wake.dispatch.claim",
                 arguments={"wake_id": wake.object_id, "revision": revision},
-                expected_world_revision=int(self.store.current_world_revision()),
+                expected_world_revision=(
+                    int(self.store.current_world_revision())
+                    if expected_world_revision is None
+                    else int(expected_world_revision)
+                ),
                 reason="claim Wake for Resident CognitiveRuntime dispatch",
                 idempotency_key=f"wake-claim:{wake.object_id}:{revision}",
                 source_class=SourceClass.MAINTENANCE,
