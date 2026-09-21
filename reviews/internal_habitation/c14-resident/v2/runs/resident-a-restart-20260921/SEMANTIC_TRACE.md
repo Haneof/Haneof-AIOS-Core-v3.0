@@ -409,3 +409,17 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
 - 决策文件：`checkpoints/decisions/wake-cognitive_derivation-wake_0c29429ae3d11e1c43802888-rev1-7bb99b6e/round-{0,1}.json`、`checkpoints/decisions/periodic-review-20261019T153901Z-1c09914c/round-{0,1}.json`。
 
 **Resulting state**: world_revision 152, index watermark 152, pending wakes 0, Claims 1（rev 2）, 41 条摘要, operation experiences 0。
+
+---
+
+## Cursor 21 — `c14resv2-021` — 2026-10-19T08:41:00-07:00 (dim:schedule)
+
+**Released**
+- dimension `dim:schedule`, source_kind `calendar`, source_class `PLATFORM`
+- payload: "今天 11:30 前没有日历安排。"
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-021.json`; ingest → `obs_c14_fixture_e72bc48cd34bac898ca91029@1` (world_revision 153); watch hook: no match; ack → `receipts/ack/cursor-021.json`, `next_sequence=22`。
+
+**Due work at T = 2026-10-19T08:41:00-07:00**（`receipts/process-due-20261019T154100Z.json`）: 无摘要窗口闭合（10-19 日窗仍开）、无 C14 唤醒、Periodic Review 未触发。机械跑完即止，无模型决策点。
+
+**Resulting state**: world_revision 153, index watermark 153, pending wakes 0。
