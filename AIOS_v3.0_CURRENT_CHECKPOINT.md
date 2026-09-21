@@ -14,7 +14,31 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
-## 当前工程断点 — C14-LOOP-001 已收口
+## 当前工程断点 — C14-RES-FIX-001 已收口
+
+最近完成任务：`C14-RES-FIX-001` — **DONE / SEALED RESIDENT FIXTURE READY**。
+
+- Started from main：`01ad300bfd8a102e8b2fd5fc9bfbfb6fd5e4ff29`
+- Work branch：`c14/res-fixture-20260921-sol`
+- Candidate：`e174a016c25d34c05ef096129d1c537ca5b19de8`
+- PR：#68
+- Squash merge：`796d9c357bb08f3042f103bc66260fdb3cdcd88c`
+- Completion evidence：`reviews/internal_habitation/c14-resident/C14_RES_FIX_001_COMPLETION_EVIDENCE_2026-09-21.md`
+- Fixture：`reviews/internal_habitation/c14-resident/fixture/sealed_fixture.json`
+- Manifest：`reviews/internal_habitation/c14-resident/fixture/fixture_manifest.json`
+- Release contract：`reviews/internal_habitation/c14-resident/release/release_contract.md`
+- Evaluator-only notes：`reviews/internal_habitation/c14-resident/evaluator/EVALUATOR_ONLY_design_notes.md`
+- Fixture SHA256：`a0f9dfd0985560ce80f568b6cd11d46b13f5dc352a664c005fcb165ea5a67485`
+- 时间轴：`2026-10-01T07:15:00-07:00` → `2026-10-29T18:40:00-07:00`，timezone `America/Los_Angeles`。
+- 事件数：36；Phase A = 24；Phase B = 12；handoff = cursor 24 完成后停止，cursor 25 保持未释放。
+- 机械 Gate：parse / unique ids / 1..36 连续序列 / 严格单调时间 / 唯一 A-B boundary / manifest digest / 逐 cursor release simulation / Resident-visible leak scan 全部 PASS。
+- Core diff：`src/aios_core/** = 0`。
+- 本窗口未运行任何 Resident 语义，未开始 `C14-RES-A-001`、`C14-RES-B-001`、`C14-RES-EVAL-001` 或 P16。
+- 当前第一个 READY：`C14-RES-A-001`。必须由**新的真实 Resident 模型窗口**执行；只能按 release contract 逐事件获得 cursor 1..24，禁止读取 sealed fixture / manifest / evaluator notes / 未来事件；到 cursor 24 后必须永久停止，不得释放 cursor 25。
+
+以下 `C14-LOOP-001` 及更早段落均为历史完成快照；下一任务只以 task board 和本段为准。
+
+## 历史工程断点 — C14-LOOP-001 已收口
 
 最近完成任务：`C14-LOOP-001` — **DONE / CONTINUOUS COGNITIVE DERIVATION LOOP HARDENED**。
 
