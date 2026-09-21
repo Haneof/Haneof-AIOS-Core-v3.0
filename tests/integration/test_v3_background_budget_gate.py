@@ -590,3 +590,82 @@ def test_periodic_running_review_does_not_repeat_same_day_and_can_refresh_next_d
     assert next_day.runtime.silenced is True
     assert next_day.wake.state == "completed"
     assert model_calls == 6
+
+
+
+def test_resident_can_read_budget_and_attention_routing_contract(tmp_path):
+    store, index = _world(tmp_path)
+    _commit_budget(
+        store,
+        max_wakes=3,
+        max_model_calls=4,
+    )
+    ref = _commit_evidence(store, object_id="obs_budget_awareness")
+
+    phase = {"background_done": False}
+
+    def model(snapshot):
+        if snapshot.wake_reason == "watch_match":
+            phase["background_done"] = True
+            return ModelDirective(silence=True)
+
+        assert snapshot.wake_reason == "user_interaction"
+        spec = next(
+            item
+            for item in snapshot.capability_catalog
+            if item["name"] == "create_attention_watch"
+        )
+        description = spec["description"]
+        assert "interrupt" in description
+        assert "background" in description
+        assert "review_queue" in description
+        assert "Core does not infer urgency for you" in description
+
+        if not snapshot.capability_history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="read_background_budget",
+                        arguments={},
+                    ),
+                )
+            )
+
+        budget = snapshot.capability_history[-1].data
+        assert budget["applies"] is True
+        assert budget["used_wakes"] == 1
+        assert budget["used_model_calls"] == 1
+        assert budget["remaining_wakes"] == 2
+        assert budget["remaining_model_calls"] == 3
+        assert budget["token_usage_available"] is False
+        return ModelDirective(response="我会按当前预算和注意力档位自行决定后续关注方式。")
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+    )
+    signal = _emit_background(
+        runtime,
+        ref,
+        key="budget.awareness.seed-use",
+        observed_at=NOW + timedelta(minutes=1),
+    )
+    used = runtime.run_wake(
+        wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
+        now=NOW + timedelta(minutes=2),
+    )
+    assert used.runtime is not None
+    assert phase["background_done"] is True
+
+    turn = runtime.run_turn(
+        session_id="budget-awareness",
+        turn_index=1,
+        user_input="以后如果世界发生变化，你自己判断什么时候值得叫醒。",
+        current_topic=None,
+        occurred_at=NOW + timedelta(minutes=3),
+    )
+    assert (
+        turn.runtime.response
+        == "我会按当前预算和注意力档位自行决定后续关注方式。"
+    )

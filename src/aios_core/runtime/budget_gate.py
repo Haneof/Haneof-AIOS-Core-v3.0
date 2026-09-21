@@ -222,6 +222,77 @@ class BackgroundBudgetGate:
 
         return used_wakes, used_model_calls
 
+    def status(self, *, now: datetime) -> dict[str, Any]:
+        """Return mechanical BACKGROUND_DAY policy/usage facts for Resident inspection."""
+
+        world_revision = int(self.store.current_world_revision())
+        policies = self._policies()
+        if not policies:
+            return {
+                "applies": False,
+                "scope": BudgetScope.BACKGROUND_DAY.value,
+                "world_revision": world_revision,
+                "policy_refs": [],
+                "used_wakes": 0,
+                "used_model_calls": 0,
+                "max_wakes": None,
+                "max_model_calls": None,
+                "max_tokens": None,
+                "remaining_wakes": None,
+                "remaining_model_calls": None,
+                "token_usage_available": False,
+                "on_exceed": [],
+            }
+
+        window_start, window_end = self._window(now)
+        used_wakes, used_model_calls = self._usage(
+            window_start=window_start,
+            window_end=window_end,
+            exclude_wake_id="",
+        )
+        wake_caps = [item.max_wakes for item in policies if item.max_wakes is not None]
+        call_caps = [
+            item.max_model_calls
+            for item in policies
+            if item.max_model_calls is not None
+        ]
+        token_caps = [item.max_tokens for item in policies if item.max_tokens is not None]
+        max_wakes = min(wake_caps) if wake_caps else None
+        max_model_calls = min(call_caps) if call_caps else None
+        max_tokens = min(token_caps) if token_caps else None
+
+        return {
+            "applies": True,
+            "scope": BudgetScope.BACKGROUND_DAY.value,
+            "world_revision": world_revision,
+            "window_start": window_start.isoformat(),
+            "window_end": window_end.isoformat(),
+            "policy_refs": [
+                ObjectRef(
+                    object_id=item.object_id,
+                    revision=item.revision,
+                ).model_dump(mode="json")
+                for item in policies
+            ],
+            "used_wakes": used_wakes,
+            "used_model_calls": used_model_calls,
+            "max_wakes": max_wakes,
+            "max_model_calls": max_model_calls,
+            "max_tokens": max_tokens,
+            "remaining_wakes": (
+                None if max_wakes is None else max(0, max_wakes - used_wakes)
+            ),
+            "remaining_model_calls": (
+                None
+                if max_model_calls is None
+                else max(0, max_model_calls - used_model_calls)
+            ),
+            "token_usage_available": False,
+            "on_exceed": list(
+                dict.fromkeys(item.on_exceed.value for item in policies)
+            ),
+        }
+
     def evaluate(
         self,
         wake: Wake,
