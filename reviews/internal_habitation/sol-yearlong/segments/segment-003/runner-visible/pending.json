@@ -1,105 +1,72 @@
 {
-  "decision_key": "3c4f79eed2caa1810e5580c48bbb1248cc5f8802bfdea587dde3fa79cfa6191e",
+  "decision_key": "a47bc876b701d88195e8380bc94f839c528ab619bba09213424ca257b4a8f0ba",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-summary.pending.v1",
   "simulated_clock": "2027-01-24T20:15:00+00:00",
   "summary_request": {
     "request": {
-      "dimension": "dim:production_log",
+      "dimension": "dim:purchase_order",
       "granularity": "week",
-      "source_world_revision": 203,
+      "source_world_revision": 204,
       "sources": [
         {
           "metadata": {
-            "dimension": "dim:production_log",
+            "dimension": "dim:purchase_order",
             "summary_kind": "single_dimension_temporal"
           },
-          "object_id": "sum_f86057a5cbb41415185a3689",
+          "object_id": "sum_e05c5ff7571042be53082792",
           "object_type": "summary",
-          "occurred_at": "2027-01-20T00:00:00Z",
+          "occurred_at": "2027-01-22T00:00:00Z",
           "revision": 1,
-          "text": "2027-01-20的shop_floor_log有两条出品记录。牛角包计划7:40就绪，实际8:02，延后22分钟；记录成型台前等待17分钟，未填写原因。另一条记录覆盖6:00—8:30，成型台三批排队时间分别为12、8、17分钟，仅记录等候，未记录成因。两条记录未明确批次对应关系，不能将其中两个17分钟视为两次独立等待再相加，也不能由排队时长确认全部延误的因果或早高峰的永久原因。"
+          "text": "2027-01-22供应商门户有两条North Mill采购记录：11:00为180 kg bread flour报价，quoted_unit_price 1.41 USD，状态quoted；11:20记录相同供应商、品类和数量，unit_price 1.41 USD，状态confirmed，计划2027-01-25 04:30 UTC配送。确认订单与计划配送不等于货物已送达或已验收。"
         },
         {
           "metadata": {
-            "adapter_id": "habitation.production_log.v1",
-            "dimension": "dim:production_log",
-            "external_record_id": "d029-production",
+            "adapter_id": "habitation.purchase_order.v1",
+            "dimension": "dim:purchase_order",
+            "external_record_id": "d037-supplier-quote",
             "external_revision": "1",
             "mechanical_ingest": true,
-            "occurred_at_original": "2027-01-20T08:45:00+00:00",
+            "occurred_at_original": "2027-01-22T11:00:00+00:00",
             "provenance": {
               "habitation_resident_metadata": {
-                "source": "shop_floor_log"
+                "source": "supplier_portal"
               },
               "model_id_not_part_of_fact": true
             },
             "source_class": "user",
-            "source_digest": "275f219ba7f4d955958725ff9a4974d71b2b54f37425f9da3f21ebd5ceac125d",
+            "source_digest": "02fa2e886d61c89d87a519aa36a83e04276acebd293ce4842a123f83ad241d96",
             "source_schema_version": "1"
           },
-          "object_id": "obs_src_4ca5f23159a0a691650430b5",
+          "object_id": "obs_src_a46c3fac2a66319044463248",
           "object_type": "observation",
-          "occurred_at": "2027-01-20T08:45:00Z",
+          "occurred_at": "2027-01-22T11:00:00Z",
           "revision": 1,
-          "text": "{\"actual_ready\": \"2027-01-20T08:02:00+00:00\", \"note\": \"成型台前出现等待，记录员未填写原因\", \"observed_wait_minutes\": 17, \"scheduled_ready\": \"2027-01-20T07:40:00+00:00\", \"station\": \"croissant\"}"
+          "text": "{\"currency\": \"USD\", \"item\": \"bread flour\", \"quantity_kg\": 180, \"quoted_unit_price\": 1.41, \"status\": \"quoted\", \"vendor\": \"North Mill\"}"
         },
         {
           "metadata": {
-            "adapter_id": "habitation.production_log.v1",
-            "dimension": "dim:production_log",
-            "external_record_id": "d032-queue",
+            "adapter_id": "habitation.purchase_order.v1",
+            "dimension": "dim:purchase_order",
+            "external_record_id": "d038-order-confirmed",
             "external_revision": "1",
             "mechanical_ingest": true,
-            "occurred_at_original": "2027-01-20T12:20:00+00:00",
+            "occurred_at_original": "2027-01-22T11:20:00+00:00",
             "provenance": {
               "habitation_resident_metadata": {
-                "source": "shop_floor_log"
+                "source": "supplier_portal"
               },
               "model_id_not_part_of_fact": true
             },
             "source_class": "user",
-            "source_digest": "052fa1f98c03f27edad028b3d09e2e07f66b97078dd6e6bc75e13da0f196a8a4",
+            "source_digest": "327eb2a21989bde1a4bf9f773bda3c848a21c5b1b82458f53b4407ad76de344f",
             "source_schema_version": "1"
           },
-          "object_id": "obs_src_980c3eaef1a3002ec7d24958",
+          "object_id": "obs_src_6cc6f858c2e5e5c0cb05d1a8",
           "object_type": "observation",
-          "occurred_at": "2027-01-20T12:20:00Z",
+          "occurred_at": "2027-01-22T11:20:00Z",
           "revision": 1,
-          "text": "{\"batch_wait_minutes\": [12, 8, 17], \"note\": \"仅记录排队时间，未记录成因\", \"station\": \"shaping_table\", \"window\": \"2027-01-20T06:00:00+00:00/2027-01-20T08:30:00+00:00\"}"
-        },
-        {
-          "metadata": {
-            "dimension": "dim:production_log",
-            "summary_kind": "single_dimension_temporal"
-          },
-          "object_id": "sum_5c3f8895bfb6882fd5059e0e",
-          "object_type": "summary",
-          "occurred_at": "2027-01-21T00:00:00Z",
-          "revision": 1,
-          "text": "2027-01-21，AIOS写入可修订认识clm_e53b73a8448b388aeabdc6bf@1：继续观察成型台等候及醒发架空位周转，不将烤箱或醒发架定为早高峰的永久唯一原因。该判断援引1月20日成型台12、8、17分钟等待而成因未填、同日烤箱所测时段达温且无故障码，以及1月21日小赵记录的6:10—6:42醒发架满、两盘等空位后恢复周转。明确不把1月21日局部情况当作1月20日全部延误的原因，也不排除所有设备因素。配套EvidenceSet固定四个Observation版本（含用户连续观察要求），知识截止为1月21日8:15，源World revision166；这是一项有证据引用的AI认识，不是新增独立事实或根因已获证实。"
-        },
-        {
-          "metadata": {
-            "dimension": "dim:production_log",
-            "writeback_kind": "revisable_cognition"
-          },
-          "object_id": "clm_e53b73a8448b388aeabdc6bf",
-          "object_type": "claim",
-          "occurred_at": "2027-01-21T08:15:00Z",
-          "revision": 1,
-          "text": "截至2027-01-21早晨，早高峰观察应同时关注成型台等候和醒发架空位周转，而非先把原因固定为烤箱。1月20日成型台有12、8、17分钟的三批等待但未记成因；当日烤箱在所测时段达温且无故障码，只能限制有关烤箱的推断，不能排除全部设备因素。1月21日小赵记录的06:10—06:42醒发架满、两盘面团等空位、随后恢复周转，提供了一个具体且有时间边界的等待环节。它不证明1月20日延误由同一因素造成，也不证明醒发架是长期唯一瓶颈；应沿用现有观察任务继续核对实际等候点。"
-        },
-        {
-          "metadata": {
-            "dimension": "dim:production_log",
-            "writeback_kind": "cognition_evidence"
-          },
-          "object_id": "evs_43116b3d89fe990a89e63c84",
-          "object_type": "evidence_set",
-          "occurred_at": "2027-01-21T08:15:00Z",
-          "revision": 1,
-          "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 4, \"missing_description\": [], \"observed_count\": 4}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2027-01-21T08:15:00Z\", \"world_revision\": 166}, \"learned_at\": \"2027-01-21T08:15:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_cc031f2f198bf709cea0cc61\", \"revision\": 1}, {\"object_id\": \"obs_src_972d74f06c87a81231892a69\", \"revision\": 1}, {\"object_id\": \"obs_src_980c3eaef1a3002ec7d24958\", \"revision\": 1}, {\"object_id\": \"obs_src_facf2b040e0feb3a89b935f2\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:production_log\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_43116b3d89fe990a89e63c84\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2027-01-21T08:15:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"sol-resident-20260921-001\", \"support_refs\": [{\"object_id\": \"obs_conv_user_cc031f2f198bf709cea0cc61\", \"revision\": 1}, {\"object_id\": \"obs_src_972d74f06c87a81231892a69\", \"revision\": 1}, {\"object_id\": \"obs_src_980c3eaef1a3002ec7d24958\", \"revision\": 1}, {\"object_id\": \"obs_src_facf2b040e0feb3a89b935f2\", \"revision\": 1}]}"
+          "text": "{\"currency\": \"USD\", \"item\": \"bread flour\", \"quantity_kg\": 180, \"scheduled_delivery\": \"2027-01-25T04:30:00+00:00\", \"status\": \"confirmed\", \"unit_price\": 1.41, \"vendor\": \"North Mill\"}"
         }
       ],
       "truncated": false,
@@ -108,5 +75,5 @@
     },
     "summary_request_type": "DimensionSummaryInput"
   },
-  "world_revision_before": 203
+  "world_revision_before": 204
 }
