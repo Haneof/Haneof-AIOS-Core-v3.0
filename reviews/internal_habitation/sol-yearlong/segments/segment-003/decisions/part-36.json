@@ -1,0 +1,23 @@
+{
+  "54a197eb07bd399cf389f525397a9fe62d8813e106dc4800ba1c9d9858dd105c": {
+    "kind": "capability_calls",
+    "calls": [
+      {
+        "name": "inspect_world_object",
+        "arguments": {
+          "object_id": "obs_src_e44a236a9610c234a1e59e11",
+          "revision": 1
+        },
+        "call_id": "seg003-jan23-calendar"
+      },
+      {
+        "name": "inspect_world_object",
+        "arguments": {
+          "object_id": "obs_src_b06cc41ee7cc41bf8c27a8b4",
+          "revision": 1
+        },
+        "call_id": "seg003-jan23-staff-schedule"
+      }
+    ]
+  }
+}
