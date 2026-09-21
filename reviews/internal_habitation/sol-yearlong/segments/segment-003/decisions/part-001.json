@@ -1,16 +1,20 @@
 {
-  "seg003-d026-capability-calls": {
+  "86567629dc5173bd8291e9e66e96b5ade2c5e40e9a4fd9e3d3fd616b247e39ab": {
     "kind": "capability_calls",
     "calls": [
       {
-        "name": "search_world",
+        "name": "commit_ai_world_claim",
         "arguments": {
-          "query": "徐汇区 老办公楼群 商业区 拍摄 2026",
-          "time_range_start": "2026-09-01T00:00:00Z",
-          "time_range_end": "2026-11-30T23:59:59Z",
-          "object_types": ["observation", "event"]
+          "domain": "intent",
+          "statement": "用户在2027-01-19明确要求消防检查事项收口，不再作为当前关注点；当前最关心的是早高峰出品稳定性，希望先连续观察一阵再调整，明确要求不要因为某一天的销售数字就直接下结论。",
+          "confidence": 0.92,
+          "evidence_refs": [
+            {"object_id": "obs_conv_user_ebc76d6d091f87202351a7c0", "revision": 1}
+          ],
+          "scope_key": "early-peak-observation-preference-20270119",
+          "tags": ["fire-inspection-closed", "early-peak", "continuous-observation"]
         },
-        "call_id": "seg003-d026-search-001"
+        "call_id": "seg003-d027-claim-001"
       }
     ]
   }
