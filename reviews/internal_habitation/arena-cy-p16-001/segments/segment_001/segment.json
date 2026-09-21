@@ -1,0 +1,21 @@
+{
+ "segment_id": "segment_001",
+ "segment_ordinal": 1,
+ "habitation_run_id": "arena-cy-p16-001-r1",
+ "subject_id": "subject_cy01",
+ "fresh": true,
+ "allow_resume": true,
+ "segment_sim_start": "2026-07-01",
+ "segment_sim_end": "2026-07-14",
+ "segment_sim_days": 14,
+ "next_segment_id": "segment_002",
+ "events_file": "events.jsonl",
+ "review_policy": {"interval_hours": 72.0, "lookback_hours": 72.0, "max_candidates": 80, "max_per_object_type": 20},
+ "dimension_summaries": {"scales": ["day", "week"], "dimensions": ["dim:user_ai_interaction"], "max_jobs": 12},
+ "summary_chunk_turns": 4,
+ "recent_turn_limit": 3,
+ "max_round_summaries_per_turn": 3,
+ "token_budget": null,
+ "decision_timeout_s": 5400,
+ "tail_advance_to": "2026-07-14T23:30:00+00:00"
+}

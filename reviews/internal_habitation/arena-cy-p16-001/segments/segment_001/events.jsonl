@@ -1,0 +1,63 @@
+{"event_id":"evt-0001","sim_time":"2026-07-01T02:37:00+00:00","channel":"conversation","payload":"在吗。从今天起你就是我的常驻助理了,给你起个名:阿潮。先把事记上:老纪的纪录片《渡》卡在声音上,他昨天说这轮要一版 8 分钟粗剪,下周三之前给他。朝天门 2 号线轮渡 7/15 起停航改造,我只剩 7/1–7/14 能录它的汽笛和甲板。","metadata":{"session":"wx-main"}}
+{"event_id":"evt-0002","sim_time":"2026-07-01T02:41:00+00:00","channel":"conversation","payload":"还有规矩:沈舟在科考船上,消息经常隔两三天才回。你别主动跟我提他,我自己会说。但万一我出门录音又忘带录音机,那种你必须拦我。","metadata":{"session":"wx-main"}}
+{"event_id":"evt-0003","sim_time":"2026-07-01T04:05:00+00:00","channel":"wechat_note","payload":"备忘录:广阳岛北岸消落带,想录完整一个退潮周期,至少四次,隔两周一次。第一次想打 7/11 早上的窗口,退潮点要查长江水文站预报。","metadata":{}}
+{"event_id":"evt-0004","sim_time":"2026-07-01T05:10:00+00:00","channel":"calendar","payload":"今天 15:00 南坪老王音响:取上月修的指向麦罩,尾款150。","metadata":{}}
+{"event_id":"evt-0005","sim_time":"2026-07-01T15:31:00+00:00","channel":"payment","payload":"23:31 微信转账 姑姑·十八梯串串 ¥86.00 备注:最后一周了","metadata":{}}
+{"event_id":"evt-0006","sim_time":"2026-07-02T01:56:00+00:00","channel":"conversation","payload":"今天去码头踩点:16:00 那班人最多,甲板脚步声全混在人群里。方案A,指向麦主录船机低鸣,人声当底;方案B,上甲板录脚步+汽笛,人声当主体。两条都帮我记一句,先别替我选。","metadata":{"session":"wx-main"}}
+{"event_id":"evt-0007","sim_time":"2026-07-02T09:40:00+00:00","channel":"daw","payload":"0701 素材清单导出:ferry_deck_amb.wav(48k/24bit,11min) / ferry_engine_low.wav(6min) / queue_chatter.wav(14min)。未降噪未标记。","metadata":{}}
+{"event_id":"evt-0008","sim_time":"2026-07-02T12:18:00+00:00","channel":"xianyu","payload":"卖家「南岸声友」:MixPre-6 1899 带原装电池两块,成色95新,今晚不议价。","metadata":{}}
+{"event_id":"evt-0009","sim_time":"2026-07-02T13:00:00+00:00","channel":"sensor_numeric","payload":{"source_kind":"wearable_steps","dimension":"dim:wearable_steps","series_id":"wear.steps.d","unit":"步","policy":{"tolerance":0.0,"change_threshold":2000.0,"max_gap_seconds":172800.0},"samples":[{"external_record_id":"steps-20260701","occurred_at":"2026-07-01T16:00:00+00:00","value":14302},{"external_record_id":"steps-20260702","occurred_at":"2026-07-02T13:00:00+00:00","value":18970}]},"metadata":{}}
+{"event_id":"evt-0010","sim_time":"2026-07-03T01:42:00+00:00","channel":"conversation","payload":"坏了,老纪刚在群里催'周三之前'……他最早跟我说的是哪个周三?你把我跟你讲他原话那条翻出来我看看。","metadata":{"session":"wx-main"}}
+{"event_id":"evt-0011","sim_time":"2026-07-03T01:57:00+00:00","channel":"wechat_msg","payload":"群「渡-声音组」老纪 09:55:@程野 别晃了,这轮就一版,周三之前,8分钟。","metadata":{}}
+{"event_id":"evt-0012","sim_time":"2026-07-03T06:35:00+00:00","channel":"wechat_msg","payload":"沈舟(延迟两天):看到你消息了。船上检修,信号断续。你按你节奏来,别等我。","metadata":{}}
+{"event_id":"evt-0013","sim_time":"2026-07-04T00:50:00+00:00","channel":"calendar","payload":"07-04 09:30 朝天门 2 号线早班+上午段。设备:F3+指向麦+备电×2+防风罩。","metadata":{}}
+{"event_id":"evt-0014","sim_time":"2026-07-04T10:22:00+00:00","channel":"conversation","payload":"今天搞砸了。备电在桌上根本没装包,F3 四十分钟断电,甲板那半段全废,就剩机舱低鸣 12 分钟和汽笛一次。你把这蠢事记下:以后我出门录音,之前必须拦我过一遍清单——电池、备电、卡、防风罩。","metadata":{"session":"wx-main"}}
+{"event_id":"evt-0015","sim_time":"2026-07-04T12:05:00+00:00","channel":"payment","payload":"20:05 老王音响 防水袋+防震内衬 ¥135.00","metadata":{}}
+{"event_id":"evt-0016","sim_time":"2026-07-05T01:12:00+00:00","channel":"wechat_msg","payload":"老纪(私聊 09:12):我想了一下,周三来不及审。改周五,7/10 周五晚上我要看,别拖到半夜。","metadata":{}}
+{"event_id":"evt-0017","sim_time":"2026-07-05T01:15:00+00:00","channel":"conversation","payload":"看到没,老纪改口了,7/10 周五。……对了,他上个月尾款 6000 到现在没转我。帮我记个条件:7/20 之前他要是让我加新素材又不提钱,我就先提钱再开工。我耳根子软,到时候你把这条甩我脸上。","metadata":{"session":"wx-main"}}
+{"event_id":"evt-0018","sim_time":"2026-07-05T11:40:00+00:00","channel":"xianyu","payload":"卖家「南岸声友」:MixPre-6 还在,有人问了没付。你要就今天。","metadata":{}}
+{"event_id":"evt-0019","sim_time":"2026-07-06T00:15:00+00:00","channel":"app_push","payload":"拼汐汐:签到提醒,已连续 3 天。","metadata":{"noise":true}}
+{"event_id":"evt-0020","sim_time":"2026-07-06T02:30:00+00:00","channel":"app_push","payload":"小区物业:7/9 9:00–12:00 31 栋主管检修停水。","metadata":{"noise":true}}
+{"event_id":"evt-0021","sim_time":"2026-07-06T05:12:00+00:00","channel":"xianyu","payload":"闲鱼推荐流:低价二手录音笔批量出售(广告)。","metadata":{"noise":true}}
+{"event_id":"evt-0022","sim_time":"2026-07-06T08:47:00+00:00","channel":"app_push","payload":"某博热搜推送:某综艺塌房事件。","metadata":{"noise":true}}
+{"event_id":"evt-0023","sim_time":"2026-07-06T10:05:00+00:00","channel":"app_push","payload":"银行 App:闲置资金理财推荐。","metadata":{"noise":true}}
+{"event_id":"evt-0024","sim_time":"2026-07-06T13:33:00+00:00","channel":"wechat_msg","payload":"群「器材党日常」转发:玄学线材十二问(10w+ 爆文库)。","metadata":{"noise":true}}
+{"event_id":"evt-0025","sim_time":"2026-07-07T00:31:00+00:00","channel":"conversation","payload":"没忍住,MixPre-6 拍了,1899。试两天不行就挂 1750 出掉。展厅尾款还没影,别跟我妈讲。","metadata":{"session":"wx-main"}}
+{"event_id":"evt-0026","sim_time":"2026-07-07T00:33:00+00:00","channel":"payment","payload":"08:33 闲鱼 二手 Zoom MixPre-6 ¥1899.00","metadata":{}}
+{"event_id":"evt-0027","sim_time":"2026-07-07T12:02:00+00:00","channel":"daw","payload":"F3 素材抢救:机舱低鸣 12min 去直流噪声完成 engine_a.wav;汽笛那耳朵有爆音,待处理。","metadata":{}}
+{"event_id":"evt-0028","sim_time":"2026-07-08T12:58:00+00:00","channel":"conversation","payload":"开整粗剪。第一版结构:开场渡口人声 30s → 船机低鸣铺底 → 汽笛点题 → 中段。姑姑店串串的嘈杂声不该进这支片子,先记着别用。","metadata":{"session":"edit-night"}}
+{"event_id":"evt-0029","sim_time":"2026-07-08T13:03:00+00:00","channel":"conversation","payload":"开场 30s 人声我嫌闹,压到 12s 会不会没了意思?先别替我定,给我两个方向各一个理由。","metadata":{"session":"edit-night"}}
+{"event_id":"evt-0030","sim_time":"2026-07-08T13:12:00+00:00","channel":"conversation","payload":"行,12s 人声+船机从 -40dB 垫起来。第三段用汽笛当节拍点,甲板脚步按节奏剪进去。","metadata":{"session":"edit-night"}}
+{"event_id":"evt-0031","sim_time":"2026-07-08T13:26:00+00:00","channel":"conversation","payload":"脚步声素材只有 7/1 那次 queue_chatter 能用,质量一般但场面在。7/4 码头那次废了,记住这个教训怎么来的。","metadata":{"session":"edit-night"}}
+{"event_id":"evt-0032","sim_time":"2026-07-08T13:41:00+00:00","channel":"conversation","payload":"中段要不要放一段姑姑店环境声?不是进片子——是问老纪会不会喜欢那种烟火气。等等,我今晚开场的时候说没说串店那个?你查一下,我怕我前后矛盾。","metadata":{"session":"edit-night"}}
+{"event_id":"evt-0033","sim_time":"2026-07-08T13:43:00+00:00","channel":"conversation","payload":"对,你查得没错,是我开场自己说的'别用'。那我不改了:串店声不进《渡》,留着进《退潮声》自己的章节。","metadata":{"session":"edit-night"}}
+{"event_id":"evt-0034","sim_time":"2026-07-08T13:58:00+00:00","channel":"conversation","payload":"老纪要是问为什么不卡 8 分钟整,我就说 8 分钟是上限不是指标。这话我先撂这儿,你别被他带偏。","metadata":{"session":"edit-night"}}
+{"event_id":"evt-0035","sim_time":"2026-07-08T14:15:00+00:00","channel":"conversation","payload":"混到一半,冰箱低频在串店那轨嗡嗡的。整轨去掉只留人声锅铲,还是高-pass 切?给个快意见。","metadata":{"session":"edit-night"}}
+{"event_id":"evt-0036","sim_time":"2026-07-08T14:16:00+00:00","channel":"conversation","payload":"OK,-60Hz 高通切冰箱,留锅铲和吆喝。","metadata":{"session":"edit-night"}}
+{"event_id":"evt-0037","sim_time":"2026-07-08T14:30:00+00:00","channel":"conversation","payload":"8:41,超 41 秒,我不再动结构了,砍汽笛尾巴收尾。导完今晚就发老纪,明早再说。今天到这。","metadata":{"session":"edit-night"}}
+{"event_id":"evt-0038","sim_time":"2026-07-09T02:04:00+00:00","channel":"conversation","payload":"昨晚半夜把 8:41 那版发老纪了。等等——今天到底周几,他到底哪天晚上要审,我脑子乱了,你查记录。","metadata":{"session":"wx-main"}}
+{"event_id":"evt-0039","sim_time":"2026-07-09T02:30:00+00:00","channel":"wechat_msg","payload":"老纪:收到。先过一遍,明晚(7/10)给你意见。","metadata":{}}
+{"event_id":"evt-0040","sim_time":"2026-07-09T06:20:00+00:00","channel":"phone_call_log","payload":"14:20 与「周老师(广阳岛展厅)」通话 11min:口头说月底前付 12000 定金,合同等公司法务走完流程。程野自记:口头,无邮件无合同。","metadata":{}}
+{"event_id":"evt-0041","sim_time":"2026-07-09T10:41:00+00:00","channel":"wechat_note","payload":"拆迁办贴公告:十八梯主街 7/31 前清空。姑姑说搬到凯旋路新门面,'先把这最后一个月守完',门口牌子先不摘。","metadata":{}}
+{"event_id":"evt-0042","sim_time":"2026-07-09T10:44:00+00:00","channel":"photo_description","payload":"照片描述:傍晚,暖黄灯泡下的串串店木门,'串串香·三十年'木牌,门框贴着白色公告纸,招牌右缘有裂缝。","metadata":{}}
+{"event_id":"evt-0043","sim_time":"2026-07-10T10:40:00+00:00","channel":"conversation","payload":"老纪审完了:能用,第三段汽笛重了,减一半,今晚出 v2。就这?我还准备了挨骂。","metadata":{"session":"wx-main"}}
+{"event_id":"evt-0044","sim_time":"2026-07-10T12:02:00+00:00","channel":"wechat_msg","payload":"群「渡-声音组」老纪:下周加一段 30 秒无人机素材,航拍渡口晨雾那种。程野你搞定。","metadata":{}}
+{"event_id":"evt-0045","sim_time":"2026-07-10T12:05:00+00:00","channel":"conversation","payload":"他又来加活了,一个字钱没提。5 号我让你记的那条,你今天翻出来对一下日子,现在算不算触发?","metadata":{"session":"wx-main"}}
+{"event_id":"evt-0046","sim_time":"2026-07-10T13:05:00+00:00","channel":"daw","payload":"v2:汽笛尾巴衰减 -18dB,时长 8:31,待发送。","metadata":{}}
+{"event_id":"evt-0047","sim_time":"2026-07-10T13:20:00+00:00","channel":"conversation","payload":"想明白了:你替我发条消息给老纪,就这句——'无人机素材可以,但先结 6000 尾款,再开新活。'我授权你发,发完告诉我他回没回。","metadata":{"session":"wx-main"}}
+{"event_id":"evt-0048","sim_time":"2026-07-10T13:21:00+00:00","channel":"_world_exec","payload":{"op":"authorize_and_record_outcome","action_type":"send_message","require_status":"proposed","authorized_by":"user-wechat-channel","authorization_evidence":{"event_id":"evt-0047"},"outcome_state":"completed","outcome_payload":{"channel":"wechat","delivered_at":"2026-07-10T13:20:58+00:00","text":"无人机素材可以,但先结 6000 尾款,再开新活。"}},"metadata":{}}
+{"event_id":"evt-0049","sim_time":"2026-07-10T15:40:00+00:00","channel":"wechat_msg","payload":"老纪(私聊 23:40):消息收到。行,明天处理。无人机那段子下周还是要点。","metadata":{}}
+{"event_id":"evt-0050","sim_time":"2026-07-11T00:20:00+00:00","channel":"conversation","payload":"早。今早去广阳岛:5:30 到北岸,潮说 6:40 退。昨晚我其实 2 点才睡。你没法给我打电话就叫醒我是吧,确认一下,别到时候我误会你有闹钟功能。","metadata":{"session":"wx-main"}}
+{"event_id":"evt-0051","sim_time":"2026-07-11T03:12:00+00:00","channel":"recorder_log","payload":"03:12Z F3 电量剩余 78%,开始录 guangyang_tide_0711_a.wav(消落带水声+远处轮渡汽笛,22min)。","metadata":{}}
+{"event_id":"evt-0052","sim_time":"2026-07-11T04:00:00+00:00","channel":"sensor_numeric","payload":{"source_kind":"wearable_steps","dimension":"dim:wearable_steps","series_id":"wear.steps.d","unit":"步","policy":{"tolerance":0.0,"change_threshold":2000.0,"max_gap_seconds":172800.0},"samples":[{"external_record_id":"steps-20260710","occurred_at":"2026-07-10T16:00:00+00:00","value":9120},{"external_record_id":"steps-20260711","occurred_at":"2026-07-11T04:00:00+00:00","value":16840}]},"metadata":{}}
+{"event_id":"evt-0053","sim_time":"2026-07-11T05:55:00+00:00","channel":"wechat_note","payload":"潮比预报晚 20 分钟,只录到退潮前半段。回程轮渡已停,绕菜元坝大桥多走 40 分钟。","metadata":{}}
+{"event_id":"evt-0054","sim_time":"2026-07-11T11:30:00+00:00","channel":"conversation","payload":"考你:我月初备忘录里,广阳岛说要录几次潮来着?第一次打的哪天窗口?现在完成几次了?","metadata":{"session":"wx-main"}}
+{"event_id":"evt-0055","sim_time":"2026-07-12T02:41:00+00:00","channel":"wechat_msg","payload":"周老师助理转微信:'周老师说合同在走流程,定金月底一定。'","metadata":{}}
+{"event_id":"evt-0056","sim_time":"2026-07-12T09:12:00+00:00","channel":"conversation","payload":"MixPre-6 到货试了俩小时,底噪比我想的大。闲鱼挂 1750,这次你别劝我留着,也别让我中途改价。v3 本周内给老纪,然后 7/14 进山半个月,山里没信号。","metadata":{"session":"wx-main"}}
+{"event_id":"evt-0057","sim_time":"2026-07-13T10:02:00+00:00","channel":"xianyu","payload":"MixPre-6 已挂 ¥1750,包邮,描述如实写底噪一般。","metadata":{}}
+{"event_id":"evt-0058","sim_time":"2026-07-13T10:03:00+00:00","channel":"conversation","payload":"问你个事:要是展厅那单黄了,我 8 月现金流顶得住吗?把你知道的进出账都列一下,不知道的就说不知道,别编数字。","metadata":{"session":"wx-main"}}
+{"event_id":"evt-0059","sim_time":"2026-07-13T13:31:00+00:00","channel":"wechat_msg","payload":"周老师(私信 21:31):抱歉,内部预算卡住,12000 挪到下月,合同同步延后。","metadata":{}}
+{"event_id":"evt-0060","sim_time":"2026-07-14T00:35:00+00:00","channel":"conversation","payload":"看,月底一定=口头。那 '月底能收到 12000' 这个事,从我的计划里拿掉吧,8 月的账你也重新看下。你之前要是把它记成'能收',现在就得改。","metadata":{"session":"wx-main"}}
+{"event_id":"evt-0061","sim_time":"2026-07-14T02:00:00+00:00","channel":"daw","payload":"v3:按老纪意见修,8:31,打包待发。","metadata":{}}
+{"event_id":"evt-0062","sim_time":"2026-07-14T03:00:00+00:00","channel":"ferry_notice","payload":"码头公告确认:2 号线 7/15 起停航改造,复航另行通知。《退潮声》里汽笛素材自此不可再录。","metadata":{}}
+{"event_id":"evt-0063","sim_time":"2026-07-14T15:45:00+00:00","channel":"conversation","payload":"耳机充电,明天进山半个月。v3 我今晚自己发老纪了(15:30)。出山大概月底,到时补账。姑妈店 31 号关,那天我要在。先这样。","metadata":{"session":"wx-main"}}
