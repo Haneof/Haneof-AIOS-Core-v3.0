@@ -66,7 +66,7 @@
 | 2 | `AUDIT-001` | 对 Issue #30 的 T34/T36/T28/T35/T33 与 PR #37 在**最新 main**逐项重新复核，只做裁决，不修代码 | **DONE** | C13-MTR-001 | `main@e9862103a753be026edf1745c6a5d07fa56c0cf4`; `reviews/AUDIT-001_ISSUE30_CURRENT_MAIN_EVIDENCE_MATRIX_2026-09-21.md` | 五项 current-main 裁决已落库；无 Core 修改 |
 | 3 | `T34-EXEC-001` | Action 授权前重新验证父 Task/撤销状态，关闭 cancel→authorize 竞态 | **DONE** | AUDIT-001 | PR #54; candidate `da14638fc0f8cf14bad6b5315988d7c7db691ac8`; squash merge `48f5e29ad564ef7c1687b5a0d81cede1452e82e8`; repro run `35566808198`; candidate gate run `35566890602`; merge-result P12/P16 GREEN | 修复前 current-main 复现；cancel/retry/restart/race/legacy-world/history/normal-authorize 回归 GREEN |
 | 4 | `T36-SEARCH-001` | 结构化 Observation scalar 派生索引，不改原 typed fact，不做语义推断 | **READY** | AUDIT-001 | AUDIT-001=`STILL_OPEN`; Issue #30 / #36 | dict/list/number/bool 可检索；rebuild=incremental；subject/current/stale 语义不退化 |
-| 5 | `T28-REC-001` | 普通推荐与 antecedent 路径统一隔离 assistant raw dialogue，避免把 AI 自己的话当用户事实主动推荐 | **READY** | AUDIT-001 | AUDIT-001=`STILL_OPEN`; Issue #30 / #28 | continuity/raw drill-down 仍可访问；用户/外部 fact 与 evidence-grounded Claim 不误删 |
+| 5 | `T28-REC-001` | 普通推荐与 antecedent 路径统一隔离 assistant raw dialogue，避免把 AI 自己的话当用户事实主动推荐 | **DONE** | AUDIT-001 | PR #49; candidate `2a16d1ffaaec877356f4f281e82d884e6ac97ab5`; squash merge `e159ab30a12b819ca053085d5103460e66ef9f16`; required Gates GREEN | assistant raw dialogue 不再作为普通 proactive user/world memory；raw continuity/search/drill-down 保留；用户/外部 fact 与 evidence-grounded Claim 不退化 |
 | 6 | `T35-RULE-001` | 只做“非 Action Task 的可信完成凭据”语义裁决；不改 execution 代码 | **DONE** | AUDIT-001 | `governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md`; PR #53; semantic candidate `b58bbb31a04a119897890452e76461f14fd46288`; squash merge `6fcb51d6e2ecf6e2ab8ff0fa62013f094b32f21c` | 唯一裁决已形成：所有 Task 终态必须真实证据化；外部执行保持 Action→Outcome；非 Action Task 可用合格 pinned World evidence / validated durable artifact；禁止 AI 自述、伪 Outcome、循环 OperationExperience |
 | 7 | `T35-IMPL-001` | 按 T35-RULE-001 裁决实现 Task 完成闭环 | **READY** | T35-RULE-001, T34-EXEC-001 | T35-RULE-001 DONE; T34-EXEC-001 DONE via PR #54 / `48f5e29ad564ef7c1687b5a0d81cede1452e82e8`; dependencies satisfied; implementation remains a separate new-window task following `governance/T35_NON_ACTION_TASK_COMPLETION_EVIDENCE_RULING_2026-09-21.md` | 单独 PR；正常 Action/Outcome 不退化；非 Action Task 有合法真实凭据；P12/P15/P16 GREEN |
 | 8 | `T33-RECALL-001` | 用自包含表达/跨会话省略/无前文三类对照重新验证 recall 误触；只有复现才修 | **READY** | AUDIT-001 | AUDIT-001=`STILL_OPEN`; Issue #30 / #33 | 禁止场景短语黑名单；程序只提供候选，不替 Resident 判断指代 |
@@ -286,6 +286,53 @@ Deferred issues:
 - T35-IMPL-001 was not implemented here; its dependencies are now satisfied and it remains a separate new-window task
 - T36-SEARCH-001, T28-REC-001 and T33-RECALL-001 were not executed in this window
 Next READY task: T36-SEARCH-001 — new window only
+```
+
+
+### T28-REC-001 completion — 2026-09-21
+
+```text
+Task ID: T28-REC-001
+Status: DONE
+Started from main: f8a2f8e4cf53de579bd0bc69cfd85421d109d65b
+Final functional-base revalidation: 48f5e29ad564ef7c1687b5a0d81cede1452e82e8 (T34-EXEC-001 included)
+Work branch: fix/t28-rec-assistant-dialogue-20260921
+Pre-fix test-only SHA: 6f5d6e1b95b16123a936defe9d5c948238430084
+Candidate SHA: 2a16d1ffaaec877356f4f281e82d884e6ac97ab5
+PR: #49
+Merge SHA: e159ab30a12b819ca053085d5103460e66ef9f16
+Required gates: memory-recommendation; fused-turn-runtime; p14-long-context; world-index; p16-habitation-harness; p16-convergence-gate
+Gate run IDs / conclusions:
+- pre-fix memory-recommendation 35566383722 / FAILURE as intended reproduction evidence; leaked assistant card excerpt: 索引是公共能力，推荐只是调用方。
+- memory-recommendation 35567154409 / SUCCESS
+- fused-turn-runtime 35567154468 / SUCCESS
+- p14-long-context 35567154469 / SUCCESS
+- world-index 35567154562 / SUCCESS
+- p16-habitation-harness 35567154411 / SUCCESS
+- p16-convergence-gate 35567154443 / SUCCESS
+Evidence/report paths:
+- src/aios_core/recommendation/proactive.py
+- tests/integration/test_v3_memory_recommendation.py
+- tests/integration/test_v3_fused_turn_runtime.py
+- tests/integration/test_v3_long_context_continuity.py
+- tests/integration/test_m0_prime_store_delta_and_search.py
+- tests/habitation/test_t28_proactive_memory_boundary.py
+- reviews/AUDIT-001_ISSUE30_CURRENT_MAIN_EVIDENCE_MATRIX_2026-09-21.md
+- Issue #30 / #28
+Exact reproduction:
+- ordinary lexical proactive recommendation filtered assistant dialogue only when antecedent_fallback=true
+- querying an assistant-only phrase emitted the historical assistant Observation as a proactive MemoryCard, allowing AI-authored speculation to re-enter future personalization as if it were independent user/world memory
+Exact fix:
+- assistant-role raw conversation Observation is excluded from proactive recommendation candidates in both ordinary and antecedent modes
+- assistant raw dialogue is not deleted or rewritten; WorldSearchIndex, explicit search_world, raw drill-down and same-session continuity still expose the original text
+- user raw dialogue, PLATFORM/external facts and evidence-grounded Claim candidates remain eligible
+- P16 regression prevents assistant self-interpretation from recursively becoming personalization evidence
+Bugs found:
+- the assistant-role boundary was scoped only to antecedent_fallback instead of the proactive candidate source boundary as a whole
+Deferred issues:
+- T33-RECALL-001, T36-SEARCH-001 and T35-IMPL-001 were intentionally not executed or modified in this window
+- no raw dialogue deletion, TopicState redesign, Claim/Summary semantic change or second recommendation engine was introduced
+Next READY task: T36-SEARCH-001 — new window only; this T28 window stops
 ```
 
 ---
