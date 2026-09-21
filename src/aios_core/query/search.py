@@ -1172,6 +1172,146 @@ class WorldSearchIndex:
                 query_intent=query,
             )
 
+    def dimension_directory(
+        self,
+        *,
+        subject: str | None = None,
+        as_of: datetime | None = None,
+        include_inactive: bool = False,
+        limit: int = 24,
+    ) -> dict[str, Any]:
+        """Return a compact mechanical L0 directory of dimensions in the current view.
+
+        This is deliberately not semantic recall. It exposes only dimension identity,
+        activity/count metadata and object-type availability so the resident model can
+        decide which dimensions to expand with higher-level capabilities.
+        """
+
+        current = int(self._store.current_world_revision())
+        wm_before = self.watermark()
+        if wm_before < current:
+            self.catch_up()
+        wm = self.watermark()
+
+        reference = None if as_of is None else as_of.astimezone(timezone.utc)
+        reference_us = (
+            None
+            if reference is None
+            else int(reference.timestamp() * 1_000_000)
+        )
+        day_us = 24 * 60 * 60 * 1_000_000
+        week_us = 7 * day_us
+
+        params: list[Any] = []
+        clauses = ["1=1"]
+        if subject is not None:
+            clauses.append("o.subject_id = ?")
+            params.append(str(subject))
+        where_sql = " AND ".join(clauses)
+
+        with self._connect() as conn:
+            tombstones = {
+                str(row[0])
+                for row in conn.execute(
+                    "SELECT object_id FROM search_tombstones"
+                ).fetchall()
+            }
+            rows = conn.execute(
+                f"""
+                SELECT o.object_id, o.revision, o.object_type, o.subject_id,
+                       o.dimension, o.occurred_start_us
+                FROM search_occurred o
+                JOIN (
+                    SELECT object_id, MAX(revision) AS max_revision
+                    FROM search_occurred
+                    GROUP BY object_id
+                ) latest
+                  ON latest.object_id=o.object_id
+                 AND latest.max_revision=o.revision
+                WHERE {where_sql}
+                """,
+                params,
+            ).fetchall()
+
+        buckets: dict[str, dict[str, Any]] = {}
+        for row in rows:
+            object_id = str(row["object_id"])
+            revision = int(row["revision"])
+            object_type = str(row["object_type"])
+            if object_id in tombstones:
+                continue
+            if not include_inactive and not self._visible_in_current_view(
+                object_id,
+                revision,
+                object_type,
+            ):
+                continue
+
+            dimension = str(row["dimension"] or "dim_unclassified")
+            bucket = buckets.setdefault(
+                dimension,
+                {
+                    "dimension": dimension,
+                    "current_object_count": 0,
+                    "recent_24h_count": 0,
+                    "recent_7d_count": 0,
+                    "latest_occurred_us": None,
+                    "object_types": set(),
+                },
+            )
+            bucket["current_object_count"] += 1
+            bucket["object_types"].add(object_type)
+
+            occurred_us = row["occurred_start_us"]
+            if occurred_us is None:
+                continue
+            occurred_us = int(occurred_us)
+            latest = bucket["latest_occurred_us"]
+            if latest is None or occurred_us > latest:
+                bucket["latest_occurred_us"] = occurred_us
+            if reference_us is not None and occurred_us <= reference_us:
+                age = reference_us - occurred_us
+                if age <= day_us:
+                    bucket["recent_24h_count"] += 1
+                if age <= week_us:
+                    bucket["recent_7d_count"] += 1
+
+        entries: list[dict[str, Any]] = []
+        for bucket in buckets.values():
+            latest_us = bucket.pop("latest_occurred_us")
+            entries.append(
+                {
+                    **bucket,
+                    "latest_activity_at": (
+                        None
+                        if latest_us is None
+                        else datetime.fromtimestamp(
+                            latest_us / 1_000_000,
+                            tz=timezone.utc,
+                        ).isoformat()
+                    ),
+                    "object_types": sorted(bucket["object_types"])[:8],
+                }
+            )
+
+        entries.sort(
+            key=lambda item: (
+                -int(item["recent_24h_count"]),
+                -int(item["recent_7d_count"]),
+                str(item["dimension"]),
+            )
+        )
+        bounded = max(1, min(int(limit), 64))
+        return {
+            "status": "ok",
+            "lag": current - wm,
+            "world_revision": current,
+            "index_watermark": wm,
+            "as_of": None if reference is None else reference.isoformat(),
+            "dimensions": entries[:bounded],
+            "truncated": len(entries) > bounded,
+        }
+
     def recent_candidates(
         self,
         *,
