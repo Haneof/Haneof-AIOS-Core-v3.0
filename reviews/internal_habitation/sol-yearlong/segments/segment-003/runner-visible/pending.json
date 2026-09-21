@@ -1,5 +1,5 @@
 {
-  "decision_key": "1e1483d5e796d75575f66cec0a49c9d197c983907d844584e23e7c6ad32e1bb9",
+  "decision_key": "3ea286ad65ec052a97a84035873738a1fe39833183b395cbac365344548f0e5e",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-resident.pending.v1",
   "simulated_clock": "2027-01-22T08:15:00+00:00",
@@ -540,7 +540,44 @@
         "side_effecting": true
       }
     ],
-    "capability_history": [],
+    "capability_history": [
+      {
+        "call_id": "seg003-jan22-review-anchors",
+        "data": [
+          {
+            "excerpt": "{'currency': 'USD', 'gross_sales': 1376.3, 'orders': 104, 'refunds': 2, 'store': 'bakery'}",
+            "object_ref": {
+              "object_id": "obs_src_8be223034a08d925243afe76",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-21T20:00:00Z"
+          },
+          {
+            "excerpt": "明白，按今天这次有边界的事实记：小赵记录6:10—6:42醒发架满，两盘面团等空位，6:42后恢复周转。现有判断只是把醒发架周转列为继续观察的环节，不是“长期瓶颈”，也不拿它解释昨天全部延误。是否反复出现、是否影响实际出品时间，还要看后续记录。",
+            "object_ref": {
+              "object_id": "obs_conv_ai_18cb3daac965bfcd1b673390",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-21T21:10:00Z"
+          },
+          {
+            "excerpt": "醒发架今天确实挤了一阵，但这只是今天看到的情况。先记事实，不要直接写成“我们的长期瓶颈就是醒发架”。",
+            "object_ref": {
+              "object_id": "obs_conv_user_2906f3bcf7dffcb7612ac88f",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2027-01-21T21:10:00Z"
+          }
+        ],
+        "error_code": null,
+        "error_message": null,
+        "name": "read_periodic_review_anchors",
+        "ok": true
+      }
+    ],
     "cockpit": {
       "ai_identity": {},
       "capability_catalog": [
@@ -1164,8 +1201,8 @@
       "truncated": true,
       "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged."
     },
-    "remaining_tool_rounds": 8,
-    "round_index": 0,
+    "remaining_tool_rounds": 7,
+    "round_index": 1,
     "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged.",
     "wake_reason": "periodic_review"
   },
