@@ -26,6 +26,7 @@ class ModelContextBundle(BaseModel):
     user_input: str = Field(min_length=1)
     current_topic: str | None = None
     ai_identity: Mapping[str, Any] = Field(default_factory=dict)
+    world_map: Mapping[str, Any] = Field(default_factory=dict)
     recent_turns: tuple[Mapping[str, Any], ...] = ()
     conversation_summaries: tuple[Mapping[str, Any], ...] = ()
     memory_cards: tuple[MemoryCard, ...] = ()
@@ -56,6 +57,7 @@ class ContextController:
         recent_turns: Sequence[Mapping[str, Any]] = (),
         conversation_summaries: Sequence[Mapping[str, Any]] = (),
         ai_identity: Mapping[str, Any] | None = None,
+        world_map: Mapping[str, Any] | None = None,
         task_context: Mapping[str, Any] | None = None,
         capability_catalog: Sequence[Mapping[str, Any]] = (),
         token_budget: int | None = None,
@@ -68,6 +70,7 @@ class ContextController:
             raise ValueError("token_budget must be >= 128")
 
         identity = dict(ai_identity or {})
+        map_context = dict(world_map or {})
         tasks = dict(task_context or {})
         capabilities = tuple(dict(item) for item in capability_catalog)
 
@@ -75,6 +78,7 @@ class ContextController:
             "user_input": user_input,
             "current_topic": current_topic,
             "ai_identity": identity,
+            "world_map": map_context,
             "task_context": tasks,
             "capability_catalog": capabilities,
         }
@@ -117,6 +121,7 @@ class ContextController:
             user_input=user_input,
             current_topic=(current_topic or "").strip() or None,
             ai_identity=identity,
+            world_map=map_context,
             recent_turns=tuple(selected_turns),
             conversation_summaries=tuple(selected_summaries),
             memory_cards=tuple(selected_cards),
