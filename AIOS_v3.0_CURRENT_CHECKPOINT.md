@@ -996,3 +996,95 @@ C14 completion is now explicitly behavior-based, not Claim-count based.
 - Periodic Review remains the longer-window consolidation/backstop and is not replaced by Continuous Derivation.
 - Next READY task after this merge: **C14-SCHED-001**.
 - This window must stop after C14-RULE-001 and must not execute C14-SCHED-001.
+
+
+---
+
+## 2026-09-21 — C14-SCHED-001 DONE
+
+- Status: **DONE / MERGED**
+- Started from main: `26d406314850327e4965bd2d4c7e84cf7431372b`
+- Work branch: `c14/sched-cognitive-derivation-20260921`
+- Candidate: `5389118b9e37b8f0b33552099e39d5c8a31eaffb`
+- PR: #59
+- Squash merge: `f0b24cda3c76d5170f5f27fb5a94107036e2f2c4`
+
+### Accepted scheduler boundary
+
+C14 now has a durable deterministic bridge from an eligible Dimension Summary revision to a
+Resident cognition **opportunity**, without performing cognition in Core.
+
+- dedicated `WakeSource.COGNITIVE_DERIVATION`;
+- routing is `BACKGROUND`, through the existing WakeBus / AttentionRouter / Background Budget;
+- Wake contains exact Summary ref, summary dimension/window/granularity and mechanical lineage audit only;
+- Wake carries no meaning/Claim/preference/personality conclusion;
+- no `CognitionCandidate` table, second scheduler database, second World, second model, or deterministic Claim conversion was added.
+
+### Mechanical provenance
+
+The runtime view is recomputed from existing durable World truth only:
+
+`REALITY / AI_COGNITION_ONLY / MAINTENANCE_ONLY / MIXED / UNKNOWN`.
+
+Traversal recursively follows exact pinned SourceRefs, EvidenceSet refs and registered support/source
+Dependency edges to leaf revisions. Exact revision SourceClass is read from the existing
+`object_revisions -> world_commits` ledger. Summary's own MAINTENANCE commit is scaffolding and is
+not treated as content provenance. Unpinned/missing/corrupt/cyclic/cross-subject lineage fails closed
+to UNKNOWN. Legacy combined conversation turns use the already-durable Observation `metadata.role`
+to prevent assistant raw dialogue from inheriting the shared USER commit class.
+
+Eligibility is limited to latest content revision + `CURRENT` + active + non-truncated Summary.
+REALITY and MIXED may schedule; AI_COGNITION_ONLY, MAINTENANCE_ONLY and UNKNOWN do not immediate
+self-derive. Periodic Review remains the backstop.
+
+### Identity and crash recovery
+
+Wake identity is deterministic per Summary revision through
+`c14:cognitive-derivation:<summary_id>:<revision>`, with durable Summary `recorded_at` as the
+signal timestamp. Exact retries return the same Wake; revision N+1 creates a distinct Wake.
+
+`MultiScaleSummaryScheduler` reconciles current durable summaries before each new scheduling pass,
+and performs post-commit ensure after a new Summary commit. Therefore the hard crash gap
+
+`Summary commit -> process crash -> Wake missing -> restart -> reconcile`
+
+is closed using World + Summary revision + Wake lifecycle only, with no extra scheduler ledger.
+
+### Self-loop hardening
+
+C14 Wake audit stores `summary_dimension` rather than generic `metadata.dimension`, preventing the
+mechanical Wake from being rediscovered as same-dimension source material by a later Dimension
+Summary. AI-only/maintenance-only lineage is also non-immediate, preventing the direct
+AI Claim -> AI Summary -> Derivation Wake -> AI Claim loop at scheduler level.
+
+### Gate evidence
+
+- `c14-cognitive-derivation-scheduler` — run `35579489466` — **SUCCESS**
+  - C14 scheduler targeted, dimension-summary, world-index, C09 wake dispatch,
+    cognitive-runtime, fused-turn-runtime, P15 periodic review, C13 metering,
+    P14 long-context, memory/T28, P16 habitation, P16 convergence: all **SUCCESS**
+- `c09-wake-dispatch` — run `35579489436` — **SUCCESS**
+- `dimension-summary` — run `35579489555` — **SUCCESS**
+- `world-index` — run `35579489460` — **SUCCESS**
+- `constitutional-cognition-closure` — run `35579489456` — **SUCCESS**
+- `p16-habitation-harness` — run `35579489564` — **SUCCESS**
+- `p16-convergence-gate` — run `35579489485` — **SUCCESS**
+- additional: `world-kernel` `35579489440` SUCCESS; `p9-revision-gate` `35579489464` SUCCESS
+
+### Bugs found / fixed during acceptance
+
+1. C14 Wake's dimension audit field initially used generic `metadata.dimension`; because the World
+   search projection mechanically derives dimensions from that field, the Wake could have become a
+   source in a later Summary window. It was changed to `summary_dimension` before acceptance.
+2. The required habitation regression exposed an adapter bug: it snapshotted all pending Wakes, then
+   the first dispatch could merge sibling BACKGROUND Wakes and leave stale MERGED children in the
+   snapshot. The adapter now re-reads current durable Wake state before dispatch and skips terminal
+   merged children. No Resident semantic behavior or C14-RUNTIME implementation was added.
+
+### Deferred / handoff
+
+- **C14-RUNTIME-001 = READY**.
+- Resident semantic interpretation/form-revise-retract/silence behavior is intentionally not
+  implemented in this task.
+- C14-LOOP-001 and Resident validation remain blocked on the runtime task.
+- This C14-SCHED window stops here and must not execute C14-RUNTIME-001.
