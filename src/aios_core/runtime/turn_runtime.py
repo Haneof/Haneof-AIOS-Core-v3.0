@@ -2633,7 +2633,10 @@ class FusedTurnRuntime:
         self.attention_watches.expire_due(now=now)
         self.execution_world.wake_due_tasks(now=now)
 
-        wake = self.attention_router.next_dispatchable()
+        wake = self.attention_router.next_dispatchable(
+            now=now,
+            background_batch_window_seconds=60,
+        )
         if wake is None:
             return None
 
@@ -2691,22 +2694,16 @@ class FusedTurnRuntime:
             WakeSource.USER_INTERACTION,
             WakeSource.ATTENTION_BUNDLE,
         }
-        initial_last_hit = initial_wake.last_hit_at
-        within_bundle_window = (
-            now - timedelta(seconds=60)
-            <= initial_last_hit
-            <= now
-        )
         if (
             initial_wake.wake_state.value in {"new", "queued"}
             and initial_wake.wake_source not in bundle_excluded_sources
             and initial_attention_class is AttentionClass.BACKGROUND
-            and within_bundle_window
         ):
             bundle = self.attention_router.bundle_pending(
                 now=now,
                 window_seconds=60,
                 max_wakes=16,
+                anchor_wake_id=initial_wake.object_id,
             )
             if (
                 bundle is not None
