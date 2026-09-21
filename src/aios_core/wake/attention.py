@@ -73,6 +73,7 @@ class AttentionWatchRequest(BaseModel):
     priority: int = Field(default=50, ge=0, le=100)
     cooldown_seconds: int = Field(default=0, ge=0)
     attention_class: AttentionClass = AttentionClass.BACKGROUND
+    mode: Literal["recurring", "one_shot"] = "recurring"
     expires_at: datetime | None = None
 
     @model_validator(mode="after")
@@ -199,6 +200,7 @@ class AttentionWatchService:
             ),
             "cooldown_seconds": int(request.cooldown_seconds),
             "attention_class": request.attention_class.value,
+            "watch_mode": request.mode,
             "predicate_semantics": "mechanical_only",
         }
         receipt = self.execution_world.create_task(
@@ -224,6 +226,114 @@ class AttentionWatchService:
             state=receipt.state,
             world_revision=receipt.world_revision,
         )
+
+    def _transition_watch_mechanically(
+        self,
+        task: Task,
+        *,
+        target: TaskState,
+        changed_at: datetime,
+        metadata_update: Mapping[str, Any],
+        source_ref: ObjectRef | None = None,
+    ) -> Task:
+        """Advance watch lifecycle from objective time/match facts only."""
+
+        if task.task_state is not TaskState.WAITING_EVIDENCE:
+            raise ValueError("only WAITING_EVIDENCE attention watch may auto-transition")
+        if target not in {TaskState.READY, TaskState.EXPIRED}:
+            raise ValueError("mechanical attention transition must target READY or EXPIRED")
+
+        changed = as_utc(changed_at, "changed_at")
+        metadata = dict(task.metadata)
+        metadata.update(dict(metadata_update))
+        history = list(metadata.get("task_state_history") or [])
+        history.append(
+            {
+                "from": TaskState.WAITING_EVIDENCE.value,
+                "to": target.value,
+                "reason": "mechanical_attention_lifecycle",
+                "changed_at": changed.isoformat(),
+            }
+        )
+        metadata["task_state_history"] = history
+
+        revision = task.revision + 1
+        revised = Task.model_validate(
+            {
+                **task.model_dump(mode="python", round_trip=True),
+                "revision": revision,
+                "occurred": TemporalExtent.point(changed),
+                "learned_at": changed,
+                "recorded_at": changed,
+                "source_refs": (
+                    []
+                    if source_ref is None
+                    else [
+                        SourceRef(
+                            object_id=source_ref.object_id,
+                            revision=source_ref.revision,
+                        )
+                    ]
+                ),
+                "task_state": target,
+                "status": (
+                    TaskState.EXPIRED.value
+                    if target is TaskState.EXPIRED
+                    else "active"
+                ),
+                "metadata": metadata,
+            }
+        )
+        self.store.commit(
+            [revised],
+            OperationRequest(
+                operation_name="wake.attention.watch_transition",
+                arguments={
+                    "task_id": task.object_id,
+                    "from": task.task_state.value,
+                    "to": target.value,
+                    "source_ref": (
+                        None
+                        if source_ref is None
+                        else source_ref.model_dump(mode="json")
+                    ),
+                },
+                expected_world_revision=int(self.store.current_world_revision()),
+                reason="mechanical attention-watch lifecycle transition",
+                idempotency_key=(
+                    f"attention-watch-transition:{task.object_id}:"
+                    f"{revision}:{target.value}"
+                ),
+                source_class=SourceClass.MAINTENANCE,
+                maintenance_class=MaintenanceClass.WAKE_SCHEDULER,
+            ),
+        )
+        self.index.catch_up()
+        return revised
+
+    def expire_due(self, *, now: datetime) -> tuple[ObjectRef, ...]:
+        moment = as_utc(now, "now")
+        expired: list[ObjectRef] = []
+        for task in self.current():
+            if task.deadline is None:
+                continue
+            if as_utc(task.deadline, "deadline") >= moment:
+                continue
+            revised = self._transition_watch_mechanically(
+                task,
+                target=TaskState.EXPIRED,
+                changed_at=moment,
+                metadata_update={
+                    "attention_watch_expired_at": moment.isoformat(),
+                },
+            )
+            expired.append(
+                ObjectRef(
+                    object_id=revised.object_id,
+                    revision=revised.revision,
+                )
+            )
+        return tuple(expired)
 
     def current(self) -> tuple[Task, ...]:
         watches: list[Task] = []
@@ -286,6 +396,7 @@ class AttentionWatchService:
         if observation.subject_id != self.subject_id:
             raise ValueError("Observation belongs to another subject")
 
+        self.expire_due(now=observation.recorded_at)
         receipts: list[WakeSignalReceipt] = []
         for task in self.current():
             if task.deadline is not None and as_utc(
@@ -297,33 +408,53 @@ class AttentionWatchService:
 
             condition = task.completion_condition
             task_ref = ObjectRef(object_id=task.object_id, revision=task.revision)
-            receipts.append(
-                self.wake_bus.emit(
-                    WakeSignalRequest(
-                        wake_source=WakeSource.WATCH_MATCH,
-                        rule_id=f"attention_watch:{task.object_id}",
-                        observed_at=observation.recorded_at,
-                        evidence_refs=(task_ref, observation_ref),
-                        priority=task.priority,
-                        dedupe_key=f"attention_watch:{task.object_id}",
-                        cooldown_seconds=int(
-                            condition.get("cooldown_seconds") or 0
+            receipt = self.wake_bus.emit(
+                WakeSignalRequest(
+                    wake_source=WakeSource.WATCH_MATCH,
+                    rule_id=f"attention_watch:{task.object_id}",
+                    observed_at=observation.recorded_at,
+                    evidence_refs=(task_ref, observation_ref),
+                    priority=task.priority,
+                    dedupe_key=f"attention_watch:{task.object_id}",
+                    cooldown_seconds=int(
+                        condition.get("cooldown_seconds") or 0
+                    ),
+                    attention_class=AttentionClass(
+                        str(
+                            condition.get("attention_class")
+                            or AttentionClass.BACKGROUND.value
+                        )
+                    ),
+                    metadata={
+                        "trigger_kind": "resident_attention_watch",
+                        "watch_task_ref": task_ref.model_dump(mode="json"),
+                        "matched_dimension": observation.metadata.get("dimension"),
+                        "watch_mode": str(
+                            condition.get("watch_mode") or "recurring"
                         ),
-                        attention_class=AttentionClass(
-                            str(
-                                condition.get("attention_class")
-                                or AttentionClass.BACKGROUND.value
-                            )
-                        ),
-                        metadata={
-                            "trigger_kind": "resident_attention_watch",
-                            "watch_task_ref": task_ref.model_dump(mode="json"),
-                            "matched_dimension": observation.metadata.get("dimension"),
-                            "predicate_semantics": "mechanical_only",
-                        },
-                    )
+                        "predicate_semantics": "mechanical_only",
+                    },
                 )
             )
+            receipts.append(receipt)
+
+            if str(condition.get("watch_mode") or "recurring") == "one_shot":
+                self._transition_watch_mechanically(
+                    task,
+                    target=TaskState.READY,
+                    changed_at=observation.recorded_at,
+                    metadata_update={
+                        "attention_watch_matched_at": observation.recorded_at.isoformat(),
+                        "attention_watch_match_observation_ref": (
+                            observation_ref.model_dump(mode="json")
+                        ),
+                        "attention_watch_match_wake_ref": {
+                            "object_id": receipt.wake_id,
+                            "revision": receipt.revision,
+                        },
+                    },
+                    source_ref=observation_ref,
+                )
         return tuple(receipts)
 
 
