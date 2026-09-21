@@ -409,11 +409,29 @@ class FusedTurnRuntime:
         )
         registry.register(
             CapabilitySpec(
+                name="read_background_budget",
+                description=(
+                    "Read the current mechanical BACKGROUND_DAY budget and durable usage. "
+                    "This reports policy caps, Wake/model-call usage and remaining capacity only; "
+                    "it does not decide which future fact is important."
+                ),
+                kind=CapabilityKind.READ,
+                input_schema={},
+            ),
+            self._read_background_budget,
+        )
+        registry.register(
+            CapabilitySpec(
                 name="create_attention_watch",
                 description=(
                     "Register future attention as a constrained mechanical Observation watch. "
-                    "Use this when you want AIOS to wake you later if explicit world facts match. "
-                    "Do not encode emotion, intent, diagnosis, or other semantic conclusions in the predicate."
+                    "The Resident chooses the routing class: interrupt wakes cognition immediately "
+                    "and may allow user delivery after Resident judgment; background waits for short "
+                    "mechanical batching, invokes cognition, and is silent to the user by default; "
+                    "review_queue does not invoke the Resident immediately and carries matched evidence "
+                    "into Periodic Review. Choose the class from the future-attention intent and current "
+                    "runtime facts; Core does not infer urgency for you. Do not encode emotion, intent, "
+                    "diagnosis, or other semantic conclusions in the mechanical predicate."
                 ),
                 kind=CapabilityKind.WRITE,
                 side_effecting=True,
@@ -1256,6 +1274,13 @@ class FusedTurnRuntime:
             item.model_dump(mode="json")
             for item in self.attention_watches.current()
         ]
+
+    def _read_background_budget(self) -> dict[str, Any]:
+        if self._active_turn_time is None:
+            raise RuntimeError(
+                "read_background_budget is only available during an active AIOS turn"
+            )
+        return self.background_budget_gate.status(now=self._active_turn_time)
 
     def _create_attention_watch(
         self,
