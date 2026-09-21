@@ -1288,3 +1288,72 @@ Next action:
 Preferred minimal fix: for `COGNITIVE_DERIVATION`, authorize only `commit_claim`, `commit_ai_world_claim`, `revise_claim`, and `retract_claim` as side-effecting capabilities. Keep all legitimate read capabilities. Do not change normal user-turn or Periodic Review write semantics.
 
 `C14-LOOP-001` is blocked until this hardening task is merged and independently accepted.
+
+
+---
+
+## 2026-09-21 — C14-RUNTIME-HARDEN-001 DONE
+
+- Status: **DONE / MERGED**
+- Started main: `646c5a3d0cf22cfa99c70667925ad240ea53f663`
+- Work branch: `c14/runtime-hardening-side-effects-20260921`
+- Candidate: `3accaeebe8ee1b3d420d2dfa3528ecb5e7388d86`
+- PR: **#63**
+- Core squash merge: `09002ddf8fd1fd4af08f54ac5b190d4c39c9e25b`
+- Evidence: `reviews/C14_RUNTIME_HARDEN_001_COMPLETION_EVIDENCE_2026-09-21.md`
+
+### Accepted authorization boundary
+
+For `WakeSource.COGNITIVE_DERIVATION`, the side-effect authorizer is now
+default-deny. The only authorized persistent cognition writes are:
+
+- `commit_claim`
+- `commit_ai_world_claim`
+- `revise_claim`
+- `retract_claim`
+
+All four continue through `_validate_c14_cognition_grounding()`. All other current
+or future side-effecting capabilities are denied for this Wake source. Read
+capabilities remain available.
+
+The denial is scoped only to `COGNITIVE_DERIVATION`; ordinary user interaction,
+Periodic Review, and other Wake sources retain existing write semantics.
+
+### Escape regressions
+
+Entity, Relation, Dimension, Goal, Task, AttentionWatch, Action, Event,
+Operation/Communication Experience, and CognitivePolicy write paths are denied
+before handler execution. The regression captures `world_revision` across the
+rejected call and proves no durable world write occurs.
+
+A synthetic future side-effecting capability is also denied, preventing future
+registry additions from silently reopening the C14 boundary.
+
+### Gate evidence
+
+- `c14-cognitive-derivation-runtime` `35586168903` — **SUCCESS** (7/7 aggregate jobs)
+- `constitutional-cognition-closure` `35586168941` — **SUCCESS**
+- `p16-convergence-gate` `35586168937` — **SUCCESS**
+- `p15-periodic-review` `35586168873` — **SUCCESS**
+- `fused-turn-runtime` `35586168861` — **SUCCESS**
+- `c09-wake-dispatch` `35586168846` — **SUCCESS**
+- `p11-dimension-gate` `35586168851` — **SUCCESS**
+- `p10-ai-world-gate` `35586168898` — **SUCCESS**
+- `p9-revision-gate` `35586168883` — **SUCCESS**
+- `p12-execution-gate` `35586168915` — **SUCCESS**
+- `p14-long-context` `35586168872` — **SUCCESS**
+
+The C14 aggregate run includes scheduler/runtime targeted tests, cognitive-runtime,
+cognition writeback/revision, AI-world, constitutional closure, Dimension Summary,
+World Index, C13 metering, T28, P16 habitation harness, and full P16 convergence.
+
+The tested candidate and squash merge use identical blobs for both changed
+implementation/test files.
+
+### Handoff
+
+- `C14-RUNTIME-HARDEN-001 = DONE`
+- `C14-LOOP-001 = READY`
+- `C14-RES-001` remains blocked on LOOP
+- P16 remains blocked on the full C14 chain
+- this window does **not** start `C14-LOOP-001`
