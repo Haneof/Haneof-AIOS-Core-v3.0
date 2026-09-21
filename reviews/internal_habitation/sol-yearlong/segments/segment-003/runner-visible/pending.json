@@ -1,5 +1,5 @@
 {
-  "decision_key": "86567629dc5173bd8291e9e66e96b5ade2c5e40e9a4fd9e3d3fd616b247e39ab",
+  "decision_key": "698d5bb97e19d100adb11b3a2fe40cf08aadf06c5f1f904e02baf214808b2be6",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-resident.pending.v1",
   "simulated_clock": "2027-01-19T08:15:00+00:00",
@@ -540,7 +540,93 @@
         "side_effecting": true
       }
     ],
-    "capability_history": [],
+    "capability_history": [
+      {
+        "call_id": "seg003-fire-current-state-01",
+        "data": {
+          "app_id": null,
+          "attempts": 0,
+          "cancel_condition": {},
+          "completion_condition": {},
+          "created_by": "execution_world:resident_ai",
+          "deadline": "2027-01-18T16:00:00Z",
+          "dependency_refs": [],
+          "execution_refs": [],
+          "goal_ref": null,
+          "learned_at": "2027-01-17T20:00:00Z",
+          "metadata": {
+            "last_wake_ref": {
+              "object_id": "wake_520011469685cc471d0e423b",
+              "revision": 1
+            },
+            "task_origin": "resident_ai",
+            "task_state_history": [
+              {
+                "changed_at": "2027-01-17T12:00:00+00:00",
+                "from": "ready",
+                "reason": "Sunday verification wake found the latest available preparation record still incomplete and no later completion record. Deliver the one reminder requested by the user, then wait for new evidence without repeated reminders.",
+                "to": "waiting_user"
+              },
+              {
+                "changed_at": "2027-01-17T20:00:00+00:00",
+                "from": "waiting_user",
+                "reason": "The reminder/verification condition is no longer needed: the user states the extinguisher area was cleared and the passage record printed, and a current photo independently shows those preparation facts. Cancelling this reminder task does not assert that the fire inspection will pass; that outcome remains unknown until the actual inspection.",
+                "to": "cancelled"
+              }
+            ]
+          },
+          "next_step": "等待 2027-01-18 消防检查实际结果；不再重复消防准备提醒。",
+          "next_wake_at": null,
+          "object_id": "task_69ef4867f08ab38263ae2547",
+          "object_type": "task",
+          "occurred": {
+            "end": "2027-01-17T20:00:00Z",
+            "precision": "second",
+            "start": "2027-01-17T20:00:00Z",
+            "timezone_name": null,
+            "unknown": false
+          },
+          "outcome_refs": [],
+          "priority": 85,
+          "reason_refs": [
+            {
+              "object_id": "obs_src_468f0037669660d6336bd905",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_8fa54d11e0014eb7f22ff285",
+              "revision": 1
+            }
+          ],
+          "recorded_at": "2027-01-17T20:00:00Z",
+          "recurrence": null,
+          "related_entity_refs": [],
+          "revision": 4,
+          "source_refs": [
+            {
+              "object_id": "obs_conv_user_5f75187e7ffa7229364793bd",
+              "revision": 1,
+              "source_locator": null
+            },
+            {
+              "object_id": "obs_src_39b11064c77baafc7bb2c8b3",
+              "revision": 1,
+              "source_locator": null
+            }
+          ],
+          "status": "cancelled",
+          "subject_id": "sol-resident-20260921-001",
+          "task_state": "cancelled",
+          "task_type": "verification",
+          "timezone_name": "UTC",
+          "title": "周日检查消防检查准备状态"
+        },
+        "error_code": null,
+        "error_message": null,
+        "name": "inspect_world_object",
+        "ok": true
+      }
+    ],
     "cockpit": {
       "ai_identity": {},
       "capability_catalog": [
@@ -916,8 +1002,8 @@
       "truncated": false,
       "user_input": "消防检查已经结束，这件事先收口。早高峰出品还是我现在最关心的，我想先连续观察一阵再调整，不要因为某一天的销售数字就直接下结论。"
     },
-    "remaining_tool_rounds": 8,
-    "round_index": 0,
+    "remaining_tool_rounds": 7,
+    "round_index": 1,
     "user_input": "消防检查已经结束，这件事先收口。早高峰出品还是我现在最关心的，我想先连续观察一阵再调整，不要因为某一天的销售数字就直接下结论。",
     "wake_reason": "user_interaction"
   },
