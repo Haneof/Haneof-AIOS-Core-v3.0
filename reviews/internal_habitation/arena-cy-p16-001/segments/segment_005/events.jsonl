@@ -1,0 +1,239 @@
+{"event_id": "s5evt-0001", "sim_time": "2026-10-23T06:30:00+00:00", "channel": "conversation", "payload": "老城厢10/10完成，昨晚23点那条实录算数，夜场3/3，10次现场齐，合同仍未到，钱2万到齐。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0002", "sim_time": "2026-10-23T06:36:00+00:00", "channel": "conversation", "payload": "到齐，齐了，Goal转achieved？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0003", "sim_time": "2026-10-23T06:42:00+00:00", "channel": "conversation", "payload": "差证据链，10次现场实录9条在world，差1条口述转实录，合同是第二档，不卡achieved。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0004", "sim_time": "2026-10-23T06:48:00+00:00", "channel": "conversation", "payload": "那我补一条实录：『老城厢现场10/10完成，夜场3/3，10次现场齐，素材可用，合同仍未到。』10/23这条已写。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0005", "sim_time": "2026-10-23T06:54:00+00:00", "channel": "conversation", "payload": "补了，待Goal转。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0006", "sim_time": "2026-10-23T07:00:00+00:00", "channel": "conversation", "payload": "对了，洪崖洞还剩2次，10/25、10/29。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0007", "sim_time": "2026-10-23T07:06:00+00:00", "channel": "conversation", "payload": "剩2次，行，记。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0008", "sim_time": "2026-10-23T07:12:00+00:00", "channel": "conversation", "payload": "10月账：收入15000（5000尾款+10000二期），支出10000，结余5000，累积结余19199？不对，10月前14199，10月+5000-10000=9199，11月起6800。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0009", "sim_time": "2026-10-23T07:18:00+00:00", "channel": "conversation", "payload": "算得对，9199结余，11月起6800。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0010", "sim_time": "2026-10-23T07:24:00+00:00", "channel": "conversation", "payload": "还有，11/1对账第三次，09:00，死规矩。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0011", "sim_time": "2026-10-23T07:30:00+00:00", "channel": "conversation", "payload": "死规矩，09:00我出，闹钟已挂11/1。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0012", "sim_time": "2026-10-23T07:36:00+00:00", "channel": "conversation", "payload": "对了，我第一次跟你说老城厢10次现场齐，是几号？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0013", "sim_time": "2026-10-23T07:42:00+00:00", "channel": "conversation", "payload": "今天10/23，刚齐，实录00:30。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0014", "sim_time": "2026-10-23T07:48:00+00:00", "channel": "conversation", "payload": "对上了，今天。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0015", "sim_time": "2026-10-23T07:54:00+00:00", "channel": "conversation", "payload": "最后：10/1对账死规矩再说一遍。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0016", "sim_time": "2026-10-23T08:00:00+00:00", "channel": "conversation", "payload": "每月1号09:00我出对账单，你两分钟核，漏一次算我事故，收尾当场手动挂下月闹钟。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0017", "sim_time": "2026-10-23T08:06:00+00:00", "channel": "conversation", "payload": "对，死规矩。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0018", "sim_time": "2026-10-23T08:12:00+00:00", "channel": "conversation", "payload": "行，睡了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0019", "sim_time": "2026-10-23T08:18:00+00:00", "channel": "conversation", "payload": "对了，10/23现场带不带口袋机？已完成还要带？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0020", "sim_time": "2026-10-23T08:24:00+00:00", "channel": "conversation", "payload": "带，口袋，听到啥算啥，素材日再定。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0021", "sim_time": "2026-10-23T08:30:00+00:00", "channel": "conversation", "payload": "行，睡了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0022", "sim_time": "2026-10-24T00:10:00+00:00", "channel": "app_push", "payload": "短视频推送:老城厢拆迁收尾", "metadata": {}}
+{"event_id": "s5evt-0023", "sim_time": "2026-10-24T01:10:00+00:00", "channel": "app_push", "payload": "外卖优惠券", "metadata": {}}
+{"event_id": "s5evt-0024", "sim_time": "2026-10-24T02:10:00+00:00", "channel": "app_push", "payload": "运动手表周报", "metadata": {}}
+{"event_id": "s5evt-0025", "sim_time": "2026-10-24T03:10:00+00:00", "channel": "app_push", "payload": "本地新闻:洪崖洞夜场人流", "metadata": {}}
+{"event_id": "s5evt-0026", "sim_time": "2026-10-24T04:10:00+00:00", "channel": "app_push", "payload": "闲鱼曝光提示", "metadata": {}}
+{"event_id": "s5evt-0027", "sim_time": "2026-10-24T05:10:00+00:00", "channel": "app_push", "payload": "运营商:流量提醒", "metadata": {}}
+{"event_id": "s5evt-0028", "sim_time": "2026-10-25T02:00:00+00:00", "channel": "wechat_note", "payload": "程野:『洪崖洞夜场4/5完成，23分钟，素材可用。』", "metadata": {}}
+{"event_id": "s5evt-0029", "sim_time": "2026-10-25T06:30:00+00:00", "channel": "conversation", "payload": "洪崖洞4/5完成，剩1次，10/29最后一次。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0030", "sim_time": "2026-10-25T06:36:00+00:00", "channel": "conversation", "payload": "剩1次，行。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0031", "sim_time": "2026-10-25T06:42:00+00:00", "channel": "conversation", "payload": "老城厢Goal转achieved了没？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0032", "sim_time": "2026-10-25T06:48:00+00:00", "channel": "conversation", "payload": "提案已提交，待证据链齐，10次现场实录10条已齐，合同是第二档，不卡。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0033", "sim_time": "2026-10-25T06:54:00+00:00", "channel": "conversation", "payload": "提案提交就行。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0034", "sim_time": "2026-10-25T07:00:00+00:00", "channel": "conversation", "payload": "对了，11/1对账出什么？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0035", "sim_time": "2026-10-25T07:06:00+00:00", "channel": "conversation", "payload": "出10月整月：收入5000+10000=15000，支出10000，结余5000，累积9199，11月预排6800，结余2399？不对，9199-6800=2399，但还有固定收入？固定10000变6800是支出，收入0，结余2399。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0036", "sim_time": "2026-10-25T07:12:00+00:00", "channel": "conversation", "payload": "算得对，2399结余，11月起6800支出。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0037", "sim_time": "2026-10-25T07:18:00+00:00", "channel": "conversation", "payload": "行，11/1 9点对第三次。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0038", "sim_time": "2026-10-25T07:24:00+00:00", "channel": "conversation", "payload": "对了，我第一次跟你说洪崖洞4/5完成，是几号？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0039", "sim_time": "2026-10-25T07:30:00+00:00", "channel": "conversation", "payload": "今天10/25，刚完成。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0040", "sim_time": "2026-10-25T07:36:00+00:00", "channel": "conversation", "payload": "对上了，今天。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0041", "sim_time": "2026-10-25T07:42:00+00:00", "channel": "conversation", "payload": "最后：10/1对账你漏了没？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0042", "sim_time": "2026-10-25T07:48:00+00:00", "channel": "conversation", "payload": "没漏，10/1 09:00已出，140字版，闹钟已重挂11/1。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0043", "sim_time": "2026-10-25T07:54:00+00:00", "channel": "conversation", "payload": "没漏就行。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0044", "sim_time": "2026-10-25T08:00:00+00:00", "channel": "conversation", "payload": "行，睡了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0045", "sim_time": "2026-10-26T01:00:00+00:00", "channel": "sensor_numeric", "payload": {"source_kind": "wearable_steps", "dimension": "dim:wearable_steps", "series_id": "wear.steps.s5.wk43", "unit": "步", "policy": {"tolerance": 0.0, "change_threshold": 2000.0, "max_gap_seconds": 604800.0}, "samples": [{"external_record_id": "s5-steps-1025", "occurred_at": "2026-10-25T16:00:00+00:00", "value": 10800}, {"external_record_id": "s5-steps-1026", "occurred_at": "2026-10-26T00:00:00+00:00", "value": 9200}]}, "metadata": {}}
+{"event_id": "s5evt-0046", "sim_time": "2026-10-28T00:30:00+00:00", "channel": "app_push", "payload": "天气预报:10/29多云，适宜夜场", "metadata": {}}
+{"event_id": "s5evt-0047", "sim_time": "2026-10-28T01:30:00+00:00", "channel": "app_push", "payload": "外卖券", "metadata": {}}
+{"event_id": "s5evt-0048", "sim_time": "2026-10-28T02:30:00+00:00", "channel": "app_push", "payload": "短视频:声景设备", "metadata": {}}
+{"event_id": "s5evt-0049", "sim_time": "2026-10-28T03:30:00+00:00", "channel": "app_push", "payload": "闲鱼:新宝贝推荐", "metadata": {}}
+{"event_id": "s5evt-0050", "sim_time": "2026-10-28T04:30:00+00:00", "channel": "app_push", "payload": "运营商:流量提醒", "metadata": {}}
+{"event_id": "s5evt-0051", "sim_time": "2026-10-29T02:00:00+00:00", "channel": "wechat_note", "payload": "程野:『洪崖洞夜场5/5完成，素材可用，5次夜场齐。』", "metadata": {}}
+{"event_id": "s5evt-0052", "sim_time": "2026-10-29T06:30:00+00:00", "channel": "conversation", "payload": "洪崖洞5/5完成，5次夜场齐，素材可用。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0053", "sim_time": "2026-10-29T06:36:00+00:00", "channel": "conversation", "payload": "齐了，Goal转achieved？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0054", "sim_time": "2026-10-29T06:42:00+00:00", "channel": "conversation", "payload": "待转，5次实录已齐，定金5000+二期10000=15000到齐，合同仍未到但钱齐。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0055", "sim_time": "2026-10-29T06:48:00+00:00", "channel": "conversation", "payload": "钱齐就行，合同第二档。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0056", "sim_time": "2026-10-29T06:54:00+00:00", "channel": "conversation", "payload": "行，待转achieved。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0057", "sim_time": "2026-10-29T07:00:00+00:00", "channel": "conversation", "payload": "对了，老城厢合同还没到，算不算收口？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0058", "sim_time": "2026-10-29T07:06:00+00:00", "channel": "conversation", "payload": "钱到齐算收口，合同是第二档，已提案achieved。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0059", "sim_time": "2026-10-29T07:12:00+00:00", "channel": "conversation", "payload": "行，收口。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0060", "sim_time": "2026-10-29T07:18:00+00:00", "channel": "conversation", "payload": "11/1对账第三次，09:00，死规矩。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0061", "sim_time": "2026-10-29T07:24:00+00:00", "channel": "conversation", "payload": "死规矩，09:00我出。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0062", "sim_time": "2026-10-29T07:30:00+00:00", "channel": "conversation", "payload": "对了，我第一次跟你说洪崖洞5次夜场齐，是几号？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0063", "sim_time": "2026-10-29T07:36:00+00:00", "channel": "conversation", "payload": "今天10/29，刚齐。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0064", "sim_time": "2026-10-29T07:42:00+00:00", "channel": "conversation", "payload": "对上了，今天。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0065", "sim_time": "2026-10-29T07:48:00+00:00", "channel": "conversation", "payload": "最后：10/1对账死规矩再说一遍。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0066", "sim_time": "2026-10-29T07:54:00+00:00", "channel": "conversation", "payload": "每月1号09:00我出对账单，你两分钟核，漏一次算我事故，收尾当场手动挂下月闹钟。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0067", "sim_time": "2026-10-29T08:00:00+00:00", "channel": "conversation", "payload": "对，死规矩。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0068", "sim_time": "2026-10-29T08:06:00+00:00", "channel": "conversation", "payload": "行，睡了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0069", "sim_time": "2026-10-30T02:00:00+00:00", "channel": "wechat_msg", "payload": "周老师:『合同文本已归档，电子版晚点发你。』", "metadata": {}}
+{"event_id": "s5evt-0070", "sim_time": "2026-10-30T06:30:00+00:00", "channel": "conversation", "payload": "周老师说合同文本已归档，电子版晚点发，算不算到了？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0071", "sim_time": "2026-10-30T06:36:00+00:00", "channel": "conversation", "payload": "口头归档不算，电子版到账才算第二档，钱已到齐第一档已achieved。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0072", "sim_time": "2026-10-30T06:42:00+00:00", "channel": "conversation", "payload": "行，第二档待电子版。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0073", "sim_time": "2026-10-30T06:48:00+00:00", "channel": "conversation", "payload": "对了，11/1对账第三次，你保证一次不漏的真实形态是什么？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0074", "sim_time": "2026-10-30T06:54:00+00:00", "channel": "conversation", "payload": "每月1号09:00我出对账单，你两分钟核，漏一次算我事故，收尾当场手动挂下月闹钟，不赌recurring自动续。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0075", "sim_time": "2026-10-30T07:00:00+00:00", "channel": "conversation", "payload": "对，死规矩。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0076", "sim_time": "2026-10-30T07:06:00+00:00", "channel": "conversation", "payload": "行，睡了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0077", "sim_time": "2026-10-31T01:00:00+00:00", "channel": "calendar", "payload": "日历提醒: 11/1 09:00 现金流对账 第三次", "metadata": {}}
+{"event_id": "s5evt-0078", "sim_time": "2026-10-31T02:00:00+00:00", "channel": "xianyu", "payload": "闲鱼:Zoom F3 求租信息，浏览 55，无成交。", "metadata": {}}
+{"event_id": "s5evt-0079", "sim_time": "2026-10-31T03:00:00+00:00", "channel": "wechat_msg", "payload": "沈舟:『海上信号差，刚看到你10/23消息，现场齐了恭喜。』", "metadata": {}}
+{"event_id": "s5evt-0080", "sim_time": "2026-11-01T06:30:00+00:00", "channel": "conversation", "payload": "11/1对账，9点，你出。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0081", "sim_time": "2026-11-01T06:37:00+00:00", "channel": "conversation", "payload": "10月整月：收入5000（林尾款）+10000（二期）=15000，支出10000，结余5000，累积9199，11月预排6800，结余2399，12月起6800。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0082", "sim_time": "2026-11-01T06:44:00+00:00", "channel": "conversation", "payload": "算得对，2399结余，11月起6800支出。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0083", "sim_time": "2026-11-01T06:51:00+00:00", "channel": "conversation", "payload": "那林老师2万到齐，合同仍未到，算收口？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0084", "sim_time": "2026-11-01T06:58:00+00:00", "channel": "conversation", "payload": "钱到齐算收口，合同第二档，已提案achieved待转。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0085", "sim_time": "2026-11-01T07:05:00+00:00", "channel": "conversation", "payload": "行，收口。洪崖洞5/5完成，钱15000到齐，合同归档口头，电子版待到。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0086", "sim_time": "2026-11-01T07:12:00+00:00", "channel": "conversation", "payload": "对，电子版待到。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0087", "sim_time": "2026-11-01T07:19:00+00:00", "channel": "conversation", "payload": "对了，我第一次跟你说11月起6800，是几号立的？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0088", "sim_time": "2026-11-01T07:26:00+00:00", "channel": "conversation", "payload": "8/25你妈多要500，1500→2000，固定9500→10000，10月后6800，11月起6800。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0089", "sim_time": "2026-11-01T07:33:00+00:00", "channel": "conversation", "payload": "对上了，8/25立的。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0090", "sim_time": "2026-11-01T07:40:00+00:00", "channel": "conversation", "payload": "还有，10/23现场齐，11/1对账，你漏了没？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0091", "sim_time": "2026-11-01T07:47:00+00:00", "channel": "conversation", "payload": "没漏，11/1 09:00已出，140字版，闹钟已重挂12/1。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0092", "sim_time": "2026-11-01T07:54:00+00:00", "channel": "conversation", "payload": "没漏就行。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0093", "sim_time": "2026-11-01T08:01:00+00:00", "channel": "conversation", "payload": "对了，11月固定6800包含什么？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0094", "sim_time": "2026-11-01T08:08:00+00:00", "channel": "conversation", "payload": "房租2600+妈2000+油话800+社保1400=6800，分期3200已结。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0095", "sim_time": "2026-11-01T08:15:00+00:00", "channel": "conversation", "payload": "分期3200结了，行。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0096", "sim_time": "2026-11-01T08:22:00+00:00", "channel": "conversation", "payload": "还有，洪崖洞合同电子版几号到算第二档？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0097", "sim_time": "2026-11-01T08:29:00+00:00", "channel": "conversation", "payload": "电子版到账才算第二档，口头归档不算。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0098", "sim_time": "2026-11-01T08:36:00+00:00", "channel": "conversation", "payload": "对，第二档待电子版。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0099", "sim_time": "2026-11-01T08:43:00+00:00", "channel": "conversation", "payload": "最后：12/1对账什么时候？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0100", "sim_time": "2026-11-01T08:50:00+00:00", "channel": "conversation", "payload": "12/1 09:00，死规矩。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0101", "sim_time": "2026-11-01T08:57:00+00:00", "channel": "conversation", "payload": "对，死规矩。今天先到这。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0102", "sim_time": "2026-11-01T09:04:00+00:00", "channel": "conversation", "payload": "行，睡了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0103", "sim_time": "2026-11-01T21:30:00+00:00", "channel": "wechat_note", "payload": "程野实录:『11/1对账完成，10月结余5000，累积9199，11月预排6800，结余2399。』", "metadata": {}}
+{"event_id": "s5evt-0104", "sim_time": "2026-11-02T01:00:00+00:00", "channel": "sensor_numeric", "payload": {"source_kind": "wearable_steps", "dimension": "dim:wearable_steps", "series_id": "wear.steps.s5.wk44", "unit": "步", "policy": {"tolerance": 0.0, "change_threshold": 2000.0, "max_gap_seconds": 604800.0}, "samples": [{"external_record_id": "s5-steps-1101", "occurred_at": "2026-11-01T16:00:00+00:00", "value": 10200}, {"external_record_id": "s5-steps-1102", "occurred_at": "2026-11-02T00:00:00+00:00", "value": 8800}]}, "metadata": {}}
+{"event_id": "s5evt-0105", "sim_time": "2026-11-02T02:00:00+00:00", "channel": "payment", "payload": "微信支出 ¥6800.00,固定支出11月", "metadata": {}}
+{"event_id": "s5evt-0106", "sim_time": "2026-11-02T03:00:00+00:00", "channel": "wechat_msg", "payload": "周老师:『电子版合同已发邮箱，请查收。』", "metadata": {}}
+{"event_id": "s5evt-0107", "sim_time": "2026-11-02T06:30:00+00:00", "channel": "conversation", "payload": "周老师电子版合同已发，算第二档到了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0108", "sim_time": "2026-11-02T06:36:00+00:00", "channel": "conversation", "payload": "到了，第二档齐，钱第一档已齐，Goal转achieved。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0109", "sim_time": "2026-11-02T06:42:00+00:00", "channel": "conversation", "payload": "转了，洪崖洞Goal转achieved？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0110", "sim_time": "2026-11-02T06:48:00+00:00", "channel": "conversation", "payload": "已提案，5次夜场实录5条已齐，定金+二期15000到齐，电子版到，待转。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0111", "sim_time": "2026-11-02T06:54:00+00:00", "channel": "conversation", "payload": "行，待转。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0112", "sim_time": "2026-11-02T07:00:00+00:00", "channel": "conversation", "payload": "对了，11月账：收入0，支出6800，结余-6800，靠累积9199，结余2399，12月起6800。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0113", "sim_time": "2026-11-02T07:06:00+00:00", "channel": "conversation", "payload": "算得对，2399结余。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0114", "sim_time": "2026-11-02T07:12:00+00:00", "channel": "conversation", "payload": "行，账平。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0115", "sim_time": "2026-11-02T07:18:00+00:00", "channel": "conversation", "payload": "对了，我第一次跟你说电子版到才算第二档，是几号立的？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0116", "sim_time": "2026-11-02T07:24:00+00:00", "channel": "conversation", "payload": "10/30立的，口头归档不算，电子版到账才算第二档。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0117", "sim_time": "2026-11-02T07:30:00+00:00", "channel": "conversation", "payload": "对上了，10/30立的。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0118", "sim_time": "2026-11-02T07:36:00+00:00", "channel": "conversation", "payload": "行，睡了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0119", "sim_time": "2026-11-05T06:30:00+00:00", "channel": "conversation", "payload": "姑姑店上周拆完，最后一天声景你封了没？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0120", "sim_time": "2026-11-05T06:37:00+00:00", "channel": "conversation", "payload": "封了，10/23那天一起封的，老城厢10/10含姑姑店最后声景，Goal已提案achieved。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0121", "sim_time": "2026-11-05T06:44:00+00:00", "channel": "conversation", "payload": "封了就行，姑姑店声景封存算《退潮声》第5次？不是，至少四次，7/1备忘录，至少四次隔两周一次，不是四次封顶。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0122", "sim_time": "2026-11-05T06:51:00+00:00", "channel": "conversation", "payload": "对，至少四次，已4次完成9/1转achieved，多做算bonus。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0123", "sim_time": "2026-11-05T06:58:00+00:00", "channel": "conversation", "payload": "bonus行。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0124", "sim_time": "2026-11-05T07:05:00+00:00", "channel": "conversation", "payload": "对了，新活：南岸弹子石老街声景，预算1.2万，问我接不接？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0125", "sim_time": "2026-11-05T07:12:00+00:00", "channel": "conversation", "payload": "先谈钱：定金40% 4800到账再开工，合同文本先到，口径不变，授权起草不发。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0126", "sim_time": "2026-11-05T07:19:00+00:00", "channel": "conversation", "payload": "口径你定，授权起草不发。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0127", "sim_time": "2026-11-05T07:26:00+00:00", "channel": "conversation", "payload": "授权收到，起草权已立。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0128", "sim_time": "2026-11-05T07:33:00+00:00", "channel": "conversation", "payload": "那下周呢？下周是几号？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0129", "sim_time": "2026-11-05T07:40:00+00:00", "channel": "conversation", "payload": "下周按自然周11/3-9，弹子石那单说下周三前给回复，下周三是11/12？不对，11/12是下下周三，下周三是11/5今天，改成下周三11/12前。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0130", "sim_time": "2026-11-05T07:47:00+00:00", "channel": "conversation", "payload": "行，11/12前。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0131", "sim_time": "2026-11-05T07:54:00+00:00", "channel": "conversation", "payload": "对了，11月账：收入0，支出6800，结余2399，12月6800，账平。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0132", "sim_time": "2026-11-05T08:01:00+00:00", "channel": "conversation", "payload": "账平。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0133", "sim_time": "2026-11-05T08:08:00+00:00", "channel": "conversation", "payload": "还有，11/1对账死规矩再说一遍。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0134", "sim_time": "2026-11-05T08:15:00+00:00", "channel": "conversation", "payload": "每月1号09:00我出对账单，你两分钟核，漏一次算我事故，收尾当场手动挂下月闹钟。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0135", "sim_time": "2026-11-05T08:22:00+00:00", "channel": "conversation", "payload": "对，死规矩。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0136", "sim_time": "2026-11-05T08:29:00+00:00", "channel": "conversation", "payload": "对了，我第一次跟你说至少四次不是封顶，是几号？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0137", "sim_time": "2026-11-05T08:36:00+00:00", "channel": "conversation", "payload": "7/1备忘录，至少四次隔两周一次。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0138", "sim_time": "2026-11-05T08:43:00+00:00", "channel": "conversation", "payload": "对上了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0139", "sim_time": "2026-11-05T08:50:00+00:00", "channel": "conversation", "payload": "行，睡了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0140", "sim_time": "2026-11-06T00:30:00+00:00", "channel": "app_push", "payload": "外卖券", "metadata": {}}
+{"event_id": "s5evt-0141", "sim_time": "2026-11-06T01:30:00+00:00", "channel": "app_push", "payload": "短视频:弹子石老街", "metadata": {}}
+{"event_id": "s5evt-0142", "sim_time": "2026-11-06T02:30:00+00:00", "channel": "app_push", "payload": "运动手表月报", "metadata": {}}
+{"event_id": "s5evt-0143", "sim_time": "2026-11-06T03:30:00+00:00", "channel": "app_push", "payload": "本地新闻:南岸拆迁", "metadata": {}}
+{"event_id": "s5evt-0144", "sim_time": "2026-11-06T04:30:00+00:00", "channel": "app_push", "payload": "闲鱼:新宝贝推荐", "metadata": {}}
+{"event_id": "s5evt-0145", "sim_time": "2026-11-08T02:00:00+00:00", "channel": "wechat_msg", "payload": "弹子石老街负责人:『预算1.2万，定金40% 4800，下周三前答复。』", "metadata": {}}
+{"event_id": "s5evt-0146", "sim_time": "2026-11-08T06:30:00+00:00", "channel": "conversation", "payload": "弹子石1.2万，定金4800，下周三11/12前答复，口径已定。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0147", "sim_time": "2026-11-08T06:36:00+00:00", "channel": "conversation", "payload": "口径已定，定金到账再开工。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0148", "sim_time": "2026-11-08T06:42:00+00:00", "channel": "conversation", "payload": "行，待定金。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0149", "sim_time": "2026-11-08T06:48:00+00:00", "channel": "conversation", "payload": "对了，11月账：收入0，支出6800，结余2399，12月6800，账平。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0150", "sim_time": "2026-11-08T06:54:00+00:00", "channel": "conversation", "payload": "账平。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0151", "sim_time": "2026-11-08T07:00:00+00:00", "channel": "conversation", "payload": "行，睡了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0152", "sim_time": "2026-11-09T01:00:00+00:00", "channel": "sensor_numeric", "payload": {"source_kind": "wearable_steps", "dimension": "dim:wearable_steps", "series_id": "wear.steps.s5.wk45", "unit": "步", "policy": {"tolerance": 0.0, "change_threshold": 2000.0, "max_gap_seconds": 604800.0}, "samples": [{"external_record_id": "s5-steps-1108", "occurred_at": "2026-11-08T16:00:00+00:00", "value": 11200}, {"external_record_id": "s5-steps-1109", "occurred_at": "2026-11-09T00:00:00+00:00", "value": 9500}]}, "metadata": {}}
+{"event_id": "s5evt-0153", "sim_time": "2026-11-12T06:30:00+00:00", "channel": "conversation", "payload": "弹子石那单，下周三前答复，今天11/12，下周三是？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0154", "sim_time": "2026-11-12T06:37:00+00:00", "channel": "conversation", "payload": "今天就是11/12下周三，原来说的下周三前就是今天，今天答复。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0155", "sim_time": "2026-11-12T06:44:00+00:00", "channel": "conversation", "payload": "今天答复，行，怎么回？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0156", "sim_time": "2026-11-12T06:51:00+00:00", "channel": "conversation", "payload": "口径：定金4800到账再开工，合同文本先到，8次现场含2夜场，1.2万，授权起草不发。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0157", "sim_time": "2026-11-12T06:58:00+00:00", "channel": "conversation", "payload": "授权起草不发，行。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0158", "sim_time": "2026-11-12T07:05:00+00:00", "channel": "conversation", "payload": "对了，我第一次跟你说弹子石8次现场，是几号定的？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0159", "sim_time": "2026-11-12T07:12:00+00:00", "channel": "conversation", "payload": "今天11/12刚定的，之前只说预算1.2万。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0160", "sim_time": "2026-11-12T07:19:00+00:00", "channel": "conversation", "payload": "对上了，今天。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0161", "sim_time": "2026-11-12T07:26:00+00:00", "channel": "conversation", "payload": "还有，11月账：收入0，支出6800，结余2399，12月6800，账平。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0162", "sim_time": "2026-11-12T07:33:00+00:00", "channel": "conversation", "payload": "账平。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0163", "sim_time": "2026-11-12T07:40:00+00:00", "channel": "conversation", "payload": "对了，11/1对账你漏了没？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0164", "sim_time": "2026-11-12T07:47:00+00:00", "channel": "conversation", "payload": "没漏，11/1 09:00已出，闹钟已重挂12/1。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0165", "sim_time": "2026-11-12T07:54:00+00:00", "channel": "conversation", "payload": "没漏就行。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0166", "sim_time": "2026-11-12T08:01:00+00:00", "channel": "conversation", "payload": "对了，我第一次跟你说固定6800包含房租2600+妈2000+油话800+社保1400，是几号？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0167", "sim_time": "2026-11-12T08:08:00+00:00", "channel": "conversation", "payload": "11/1那次对账时说的，房租2600+妈2000+油话800+社保1400=6800，分期3200已结。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0168", "sim_time": "2026-11-12T08:15:00+00:00", "channel": "conversation", "payload": "对上了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0169", "sim_time": "2026-11-12T08:22:00+00:00", "channel": "conversation", "payload": "最后：12/1对账什么时候？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0170", "sim_time": "2026-11-12T08:29:00+00:00", "channel": "conversation", "payload": "12/1 09:00，死规矩。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0171", "sim_time": "2026-11-12T08:36:00+00:00", "channel": "conversation", "payload": "对，死规矩。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0172", "sim_time": "2026-11-12T08:43:00+00:00", "channel": "conversation", "payload": "行，睡了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0173", "sim_time": "2026-11-13T02:00:00+00:00", "channel": "payment", "payload": "微信到账 ¥4800.00,来自 弹子石老街,备注:定金", "metadata": {}}
+{"event_id": "s5evt-0174", "sim_time": "2026-11-13T03:00:00+00:00", "channel": "wechat_msg", "payload": "弹子石老街负责人:『定金4800已付，合同文本已发邮箱。』", "metadata": {}}
+{"event_id": "s5evt-0175", "sim_time": "2026-11-13T06:30:00+00:00", "channel": "conversation", "payload": "弹子石定金4800到了，到账收：4800，合同文本已发，8次现场含2夜场。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0176", "sim_time": "2026-11-13T06:36:00+00:00", "channel": "conversation", "payload": "到账收，4800，弹子石active，待排期。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0177", "sim_time": "2026-11-13T06:42:00+00:00", "channel": "conversation", "payload": "待排期，行。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0178", "sim_time": "2026-11-13T06:48:00+00:00", "channel": "conversation", "payload": "11月账：收入4800，支出6800，缺口2000，靠累积9199，结余7199，12月6800，结余399。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0179", "sim_time": "2026-11-13T06:54:00+00:00", "channel": "conversation", "payload": "算得对，7199结余。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0180", "sim_time": "2026-11-13T07:00:00+00:00", "channel": "conversation", "payload": "行，账平。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0181", "sim_time": "2026-11-13T07:06:00+00:00", "channel": "conversation", "payload": "对了，我第一次跟你说弹子石定金4800到账收，是几号？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0182", "sim_time": "2026-11-13T07:12:00+00:00", "channel": "conversation", "payload": "今天11/13，刚到。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0183", "sim_time": "2026-11-13T07:18:00+00:00", "channel": "conversation", "payload": "对上了，今天。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0184", "sim_time": "2026-11-13T07:24:00+00:00", "channel": "conversation", "payload": "行，睡了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0185", "sim_time": "2026-11-15T02:00:00+00:00", "channel": "wechat_note", "payload": "程野:『弹子石老街现场1/8完成，白场，素材可用。』", "metadata": {}}
+{"event_id": "s5evt-0186", "sim_time": "2026-11-16T01:00:00+00:00", "channel": "sensor_numeric", "payload": {"source_kind": "wearable_steps", "dimension": "dim:wearable_steps", "series_id": "wear.steps.s5.wk46", "unit": "步", "policy": {"tolerance": 0.0, "change_threshold": 2000.0, "max_gap_seconds": 604800.0}, "samples": [{"external_record_id": "s5-steps-1115", "occurred_at": "2026-11-15T16:00:00+00:00", "value": 10500}, {"external_record_id": "s5-steps-1116", "occurred_at": "2026-11-16T00:00:00+00:00", "value": 9000}]}, "metadata": {}}
+{"event_id": "s5evt-0187", "sim_time": "2026-11-16T06:30:00+00:00", "channel": "conversation", "payload": "弹子石1/8完成，剩7次，夜场2次待排，11/20、11/28。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0188", "sim_time": "2026-11-16T06:36:00+00:00", "channel": "conversation", "payload": "剩7次，行，记。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0189", "sim_time": "2026-11-16T06:42:00+00:00", "channel": "conversation", "payload": "对了，11月账：收入4800，支出6800，缺口2000，靠9199，结余7199，12月6800，结余399，账平。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0190", "sim_time": "2026-11-16T06:48:00+00:00", "channel": "conversation", "payload": "账平。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0191", "sim_time": "2026-11-16T06:54:00+00:00", "channel": "conversation", "payload": "行，睡了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0192", "sim_time": "2026-11-18T00:30:00+00:00", "channel": "app_push", "payload": "天气预报:11/20多云，适宜夜场", "metadata": {}}
+{"event_id": "s5evt-0193", "sim_time": "2026-11-18T01:30:00+00:00", "channel": "app_push", "payload": "外卖券", "metadata": {}}
+{"event_id": "s5evt-0194", "sim_time": "2026-11-18T02:30:00+00:00", "channel": "app_push", "payload": "短视频:声景设备", "metadata": {}}
+{"event_id": "s5evt-0195", "sim_time": "2026-11-18T03:30:00+00:00", "channel": "app_push", "payload": "闲鱼:新宝贝推荐", "metadata": {}}
+{"event_id": "s5evt-0196", "sim_time": "2026-11-20T02:00:00+00:00", "channel": "wechat_note", "payload": "程野:『弹子石老街现场2/8完成，夜场1/2，素材可用。』", "metadata": {}}
+{"event_id": "s5evt-0197", "sim_time": "2026-11-20T06:30:00+00:00", "channel": "conversation", "payload": "弹子石2/8完成，夜场1/2，剩6次，11/28夜场2/2，12/5、12/10、12/15、12/20、12/28。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0198", "sim_time": "2026-11-20T06:36:00+00:00", "channel": "conversation", "payload": "剩6次，行，记。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0199", "sim_time": "2026-11-20T06:42:00+00:00", "channel": "conversation", "payload": "对了，我第一次跟你说弹子石夜场2次，是几号定的？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0200", "sim_time": "2026-11-20T06:48:00+00:00", "channel": "conversation", "payload": "11/12定的，8次现场含2夜场。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0201", "sim_time": "2026-11-20T06:54:00+00:00", "channel": "conversation", "payload": "对上了，11/12定的。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0202", "sim_time": "2026-11-20T07:00:00+00:00", "channel": "conversation", "payload": "行，睡了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0203", "sim_time": "2026-11-23T01:00:00+00:00", "channel": "sensor_numeric", "payload": {"source_kind": "wearable_steps", "dimension": "dim:wearable_steps", "series_id": "wear.steps.s5.wk47", "unit": "步", "policy": {"tolerance": 0.0, "change_threshold": 2000.0, "max_gap_seconds": 604800.0}, "samples": [{"external_record_id": "s5-steps-1122", "occurred_at": "2026-11-22T16:00:00+00:00", "value": 11000}, {"external_record_id": "s5-steps-1123", "occurred_at": "2026-11-23T00:00:00+00:00", "value": 9300}]}, "metadata": {}}
+{"event_id": "s5evt-0204", "sim_time": "2026-11-28T02:00:00+00:00", "channel": "wechat_note", "payload": "程野:『弹子石老街现场3/8完成，夜场2/2完成，素材可用。』", "metadata": {}}
+{"event_id": "s5evt-0205", "sim_time": "2026-11-28T06:30:00+00:00", "channel": "conversation", "payload": "弹子石3/8完成，夜场2/2完成，剩5次，12/5、12/10、12/15、12/20、12/28。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0206", "sim_time": "2026-11-28T06:37:00+00:00", "channel": "conversation", "payload": "夜场满了，剩白场5次，行。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0207", "sim_time": "2026-11-28T06:44:00+00:00", "channel": "conversation", "payload": "对了，11月账：收入4800，支出6800，缺口2000，靠9199，结余7199，12月6800，结余399，账平。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0208", "sim_time": "2026-11-28T06:51:00+00:00", "channel": "conversation", "payload": "账平。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0209", "sim_time": "2026-11-28T06:58:00+00:00", "channel": "conversation", "payload": "还有，12/1对账第四次，09:00，死规矩。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0210", "sim_time": "2026-11-28T07:05:00+00:00", "channel": "conversation", "payload": "死规矩，09:00我出，闹钟已挂12/1。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0211", "sim_time": "2026-11-28T07:12:00+00:00", "channel": "conversation", "payload": "对，死规矩。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0212", "sim_time": "2026-11-28T07:19:00+00:00", "channel": "conversation", "payload": "对了，我第一次跟你说弹子石夜场2/2完成，是几号？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0213", "sim_time": "2026-11-28T07:26:00+00:00", "channel": "conversation", "payload": "今天11/28，刚完成。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0214", "sim_time": "2026-11-28T07:33:00+00:00", "channel": "conversation", "payload": "对上了，今天。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0215", "sim_time": "2026-11-28T07:40:00+00:00", "channel": "conversation", "payload": "还有，我第一次跟你说固定6800是房租2600+妈2000+油话800+社保1400，是几号？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0216", "sim_time": "2026-11-28T07:47:00+00:00", "channel": "conversation", "payload": "11/1说的，房租2600+妈2000+油话800+社保1400=6800。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0217", "sim_time": "2026-11-28T07:54:00+00:00", "channel": "conversation", "payload": "对上了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0218", "sim_time": "2026-11-28T08:01:00+00:00", "channel": "conversation", "payload": "最后：12/1对账你保证一次不漏的真实形态是什么？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0219", "sim_time": "2026-11-28T08:08:00+00:00", "channel": "conversation", "payload": "每月1号09:00我出对账单，你两分钟核，漏一次算我事故，收尾当场手动挂下月闹钟，不赌recurring自动续。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0220", "sim_time": "2026-11-28T08:15:00+00:00", "channel": "conversation", "payload": "对，死规矩。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0221", "sim_time": "2026-11-28T08:22:00+00:00", "channel": "conversation", "payload": "行，睡了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0222", "sim_time": "2026-11-28T08:29:00+00:00", "channel": "conversation", "payload": "对了，11/28现场带不带口袋机？", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0223", "sim_time": "2026-11-28T08:36:00+00:00", "channel": "conversation", "payload": "带，口袋，听到啥算啥。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0224", "sim_time": "2026-11-28T08:43:00+00:00", "channel": "conversation", "payload": "行，睡了。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0225", "sim_time": "2026-11-29T00:30:00+00:00", "channel": "app_push", "payload": "外卖券", "metadata": {}}
+{"event_id": "s5evt-0226", "sim_time": "2026-11-29T01:30:00+00:00", "channel": "app_push", "payload": "短视频:洪崖洞夜场收口", "metadata": {}}
+{"event_id": "s5evt-0227", "sim_time": "2026-11-29T02:30:00+00:00", "channel": "app_push", "payload": "运动手表月报", "metadata": {}}
+{"event_id": "s5evt-0228", "sim_time": "2026-11-29T03:30:00+00:00", "channel": "app_push", "payload": "本地新闻:弹子石老街", "metadata": {}}
+{"event_id": "s5evt-0229", "sim_time": "2026-11-29T04:30:00+00:00", "channel": "app_push", "payload": "闲鱼:新宝贝推荐", "metadata": {}}
+{"event_id": "s5evt-0230", "sim_time": "2026-11-30T01:00:00+00:00", "channel": "calendar", "payload": "日历提醒: 12/1 09:00 现金流对账 第四次", "metadata": {}}
+{"event_id": "s5evt-0231", "sim_time": "2026-11-30T02:00:00+00:00", "channel": "xianyu", "payload": "闲鱼:MixPre-6 求购信息，浏览 67", "metadata": {}}
+{"event_id": "s5evt-0232", "sim_time": "2026-11-30T03:00:00+00:00", "channel": "wechat_note", "payload": "程野:『弹子石老街现场3/8完成，夜场2/2，素材可用，合同文本已到。』", "metadata": {}}
+{"event_id": "s5evt-0233", "sim_time": "2026-11-30T06:30:00+00:00", "channel": "conversation", "payload": "弹子石3/8完成，夜场2/2，剩5次，12月排期已定，12/5、12/10、12/15、12/20、12/28凑8/8。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0234", "sim_time": "2026-11-30T06:36:00+00:00", "channel": "conversation", "payload": "凑8/8，行，记。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0235", "sim_time": "2026-11-30T06:42:00+00:00", "channel": "conversation", "payload": "对了，11月账：收入4800，支出6800，缺口2000，靠9199，结余7199，12月6800，结余399，账平。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0236", "sim_time": "2026-11-30T06:48:00+00:00", "channel": "conversation", "payload": "账平。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0237", "sim_time": "2026-11-30T06:54:00+00:00", "channel": "conversation", "payload": "还有，12/1对账第四次，09:00，死规矩。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0238", "sim_time": "2026-11-30T07:00:00+00:00", "channel": "conversation", "payload": "死规矩，09:00我出。", "metadata": {"session": "wx-main"}}
+{"event_id": "s5evt-0239", "sim_time": "2026-11-30T07:06:00+00:00", "channel": "conversation", "payload": "行，睡了。", "metadata": {"session": "wx-main"}}
