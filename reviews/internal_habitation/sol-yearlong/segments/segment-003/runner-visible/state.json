@@ -1,20 +1,20 @@
 {
   "branch": "arena/01a0bf95-haneof-aios-core-v3-0",
   "export_rule": "Only first missing semantic request; no hidden fixture copied.",
-  "head_sha": "3a83eee90fe407b5f318487522b5b89497095056",
+  "head_sha": "4df6da344fbee57facafeaa198d16cd15766b1cd",
   "pending_blocks_printed": 1,
-  "run_id": 35556441777,
+  "run_id": 35556490107,
   "runner_attestation": {
     "current_state": {
-      "delivered_external_events": 13,
-      "index_watermark": 186,
-      "last_consumed_external_event_id": "d039-chat-19",
+      "delivered_external_events": 15,
+      "index_watermark": 190,
+      "last_consumed_external_event_id": "d041-staff-schedule",
       "resident_replayed_calls": 20,
-      "simulated_clock": "2027-01-23T08:15:00+00:00",
+      "simulated_clock": "2027-01-23T20:10:00+00:00",
       "status": "pending",
-      "summary_replayed_calls": 10,
-      "world_revision": 186,
-      "world_sha256": "aad925793d8fda54771c896951ab168e8a8a565ed4c8110dc5af9bb3e8279fd8"
+      "summary_replayed_calls": 11,
+      "world_revision": 190,
+      "world_sha256": "125d48a57bb455e4ab40becf6f405b43795ed68f3a5d359bf33720dd7d2ab995"
     },
     "expected_source_revision": 145,
     "expected_subject": "sol-resident-20260921-001",
@@ -30,14 +30,14 @@
     "source_world_sha256": "ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8"
   },
   "state": {
-    "delivered_external_events": 13,
-    "index_watermark": 186,
-    "last_consumed_external_event_id": "d039-chat-19",
+    "delivered_external_events": 15,
+    "index_watermark": 190,
+    "last_consumed_external_event_id": "d041-staff-schedule",
     "resident_replayed_calls": 20,
-    "simulated_clock": "2027-01-23T08:15:00+00:00",
+    "simulated_clock": "2027-01-23T20:10:00+00:00",
     "status": "pending",
-    "summary_replayed_calls": 10,
-    "world_revision": 186,
-    "world_sha256": "aad925793d8fda54771c896951ab168e8a8a565ed4c8110dc5af9bb3e8279fd8"
+    "summary_replayed_calls": 11,
+    "world_revision": 190,
+    "world_sha256": "125d48a57bb455e4ab40becf6f405b43795ed68f3a5d359bf33720dd7d2ab995"
   }
 }
