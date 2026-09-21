@@ -1,0 +1,18 @@
+{
+  "core_version": "0.3.0.dev0",
+  "delivered_external_events": 2,
+  "future_payloads_printed": false,
+  "job": "sol-segment-003-resident-step",
+  "last_consumed_external_event_id": "d028-pos",
+  "notes": [
+    "Restore bridge used the sealed Segment 003 fixture as an opaque program input.",
+    "Only RuntimeSnapshot/Summary pending envelopes were printed for manual Resident continuation."
+  ],
+  "resident_replayed_calls": 5,
+  "resident_step_status": "pending",
+  "schema": "aios.p16.segment003.runner-attestation.v1",
+  "simulated_clock": "2027-01-20T08:15:00+00:00",
+  "summary_replayed_calls": 0,
+  "timestamp_utc": "2026-09-21T03:00:06.809353+00:00",
+  "world_revision": 153
+}

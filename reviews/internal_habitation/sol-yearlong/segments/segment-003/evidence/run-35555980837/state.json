@@ -1,0 +1,11 @@
+{
+  "delivered_external_events": 2,
+  "index_watermark": 153,
+  "last_consumed_external_event_id": "d028-pos",
+  "resident_replayed_calls": 5,
+  "simulated_clock": "2027-01-20T08:15:00+00:00",
+  "status": "pending",
+  "summary_replayed_calls": 0,
+  "world_revision": 153,
+  "world_sha256": "1d2cc4c3eeb09aff476fc9a3448a8f184062fbf840acee93bad03cbddf90a0a1"
+}

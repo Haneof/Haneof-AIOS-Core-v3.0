@@ -1,0 +1,52 @@
+RESTORE_OK {"clock": "2027-01-19T08:15:00+00:00", "index_watermark": 145, "subject_id": "sol-resident-20260921-001", "world_revision": 145, "world_sha256": "9e7fc2e97d4656898a31f62ee5967729c62dd101bb4393dfdfbc4f3de3e91807"}
+MANUAL_SUMMARY_PENDING_BEGIN
+{
+  "decision_key": "84ac37e307b829c33895c09ff317770ad3c7cfcc078ae29ad062045a2c87f875",
+  "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
+  "schema": "aios.segment003.manual-summary.pending.v1",
+  "simulated_clock": "2027-01-20T08:15:00+00:00",
+  "summary_request": {
+    "request": {
+      "dimension": "dim:pos_daily",
+      "granularity": "day",
+      "source_world_revision": 153,
+      "sources": [
+        {
+          "metadata": {
+            "adapter_id": "habitation.pos_daily.v1",
+            "dimension": "dim:pos_daily",
+            "external_record_id": "d028-pos",
+            "external_revision": "1",
+            "mechanical_ingest": true,
+            "occurred_at_original": "2027-01-19T20:05:00+00:00",
+            "provenance": {
+              "habitation_resident_metadata": {
+                "source": "pos"
+              },
+              "model_id_not_part_of_fact": true
+            },
+            "source_class": "user",
+            "source_digest": "f7fe6c12046a7dc83434fcb1350675c50ba42466096279c1b53ebe7831c2ae17",
+            "source_schema_version": "1"
+          },
+          "object_id": "obs_src_60bc8c48b8f0290b5b94ae48",
+          "object_type": "observation",
+          "occurred_at": "2027-01-19T20:05:00Z",
+          "revision": 1,
+          "text": "{\"currency\": \"USD\", \"gross_sales\": 1297.6, \"orders\": 97, \"refunds\": 1, \"store\": \"bakery\"}"
+        }
+      ],
+      "truncated": false,
+      "window_end": "2027-01-19T23:59:59.999999Z",
+      "window_start": "2027-01-19T00:00:00Z"
+    },
+    "summary_request_type": "DimensionSummaryInput"
+  },
+  "world_revision_before": 153
+}
+MANUAL_SUMMARY_PENDING_END
+SEG003_STATUS=pending decision_key=84ac37e307b829c33895c09ff317770ad3c7cfcc078ae29ad062045a2c87f875
+SEG003_CURSOR=d028-pos
+SEG003_WORLD_REVISION=153
+SEG003_RESIDENT_REPLAYED=5
+SEG003_SUMMARY_REPLAYED=0
