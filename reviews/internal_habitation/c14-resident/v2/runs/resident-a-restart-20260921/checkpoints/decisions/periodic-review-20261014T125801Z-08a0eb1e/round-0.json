@@ -1,0 +1,6 @@
+{
+  "capability_calls": [
+    {"name": "read_periodic_review_anchors", "arguments": {"limit": 25}}
+  ],
+  "rationale": "常规 Periodic Review（窗口约 10-11T12:44Z→10-14T12:58Z，13 anchors）：先读锚点，核对本轮新增的现实证据（10-11 出行日、10-14 睡眠）与我自己的认知产物（Claim rev2、10-11 各摘要），判断既有理解/策略/操作经验是否需要修订、确认或回滚。"
+}

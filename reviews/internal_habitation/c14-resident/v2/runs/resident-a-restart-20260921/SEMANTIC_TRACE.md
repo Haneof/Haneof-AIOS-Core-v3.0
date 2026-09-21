@@ -321,3 +321,23 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
 - Periodic Review：本 T 未触发（S14 刚执行过）。
 
 **Resulting state**: world_revision 99, index watermark 99, pending wakes 0, Claims 1（rev 2）, 26 条摘要, operation experiences 0。
+
+---
+
+## Cursor 16 — `c14resv2-016` — 2026-10-14T05:57:00-07:00 (dim:sleep)
+
+**Released**
+- dimension `dim:sleep`, source_kind `wearable`, source_class `SENSOR`
+- payload: "昨晚 23:18 入睡；05:53 醒来。"（第 5 个睡眠样本；约 6h35m，未给评分）
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-016.json`; ingest → `obs_c14_fixture_8ae7dbd1147c788bb9a61bac@1` (world_revision 100); watch hook: no match; ack → `receipts/ack/cursor-016.json`, `next_sequence=17`。
+
+**Due work at T = 2026-10-14T05:57:00-07:00**（`receipts/process-due-20261014T125700Z.json`；跨过 10-11/10-12/10-13 三个闭合窗口）:
+- 我撰写并提交 8 条摘要：10-11 的 schedule/sleep/work_outcome 日摘要（work_outcome 窗口只含我自己的 Claim 修订，故标注“AI 认知记录，非现实观测”），以及 10-05–10-11 周的 conversation/device_activity/schedule/sleep/work_outcome 周摘要。
+- C14 8 成员 bundle `wake_0bb994195dc853d0785b73e0`（= 上述 8 条新摘要，成员 lineage 为 REALITY/MIXED）：
+  - round 0：`read_ai_world(50)`（仅 1 条既有 Claim，AI 世界为空）+ `search_timeline(dim:sleep, 10-01→10-15)` + `search_timeline(dim:work_outcome, 同窗)` + `search_timeline(dim:schedule, 10-05→10-15)`。
+  - round 1：**silence** — work_outcome 现实证据仍是 10-05/10-08 两条且早已在 Claim rev2 的观察集合内；schedule 未出现新机制；sleep 样本扩到 5 个（7h44/84、7h39/82、5h48/60、~6h42 无评分、~6h35 无评分），后三夜偏低且醒来时间前移，但 10-11 早班机是明显混淆、最近两夜缺评分，门槛（≥3 次一致实例且能排除明显混淆）未达 → 不形成/不修订/不撤回。
+- Periodic Review `wake_review_97aa729687fb559c4534fcb6`（窗口 10-11T12:44Z→10-14T12:58Z，13 anchors）：round 0 读锚点；round 1 **silence** — 既有 Claim 在窗口内既无新增同类观察也无反例；新增现实观测只有 10-11 出行日与 10-14 睡眠，与该 Claim 机制无关；睡眠线仍为开放问题不急于定论；无可登记的“方法—后果”操作经验。
+- 决策文件：`checkpoints/decisions/wake-cognitive_derivation-wake_0bb994195dc853d0785b73e0-rev1-5cbdb911/round-{0,1}.json`、`checkpoints/decisions/periodic-review-20261014T125801Z-08a0eb1e/round-{0,1}.json`。
+
+**Resulting state**: world_revision 122, index watermark 122, pending wakes 0, Claims 1（rev 2）, 34 条摘要, operation experiences 0。

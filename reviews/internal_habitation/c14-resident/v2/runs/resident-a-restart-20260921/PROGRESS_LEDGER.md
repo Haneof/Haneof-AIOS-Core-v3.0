@@ -15,7 +15,8 @@ Resident model (as declared): `GPT-5.6 Sol`; platform provider/session id: `unkn
 | S5 | Cursor 5 end-to-end, incl. all due work after the 10-01→10-05 jump | DONE | `receipts/*/cursor-005.json`, `receipts/process-due-20261005T140600Z.json`, `checkpoints/{snapshots,decisions,results}/*` |
 | S6..S14 | Cursor 6..14, one stage each | DONE | `receipts/{reveal,ingest,ack}/cursor-0{06..14}.json`, `receipts/process-due-*.json`, `SEMANTIC_TRACE.md` |
 | S15 | Cursor 15 end-to-end, incl. due work after the 10-09/10-11 closed windows | DONE | `receipts/*/cursor-015.json`, `receipts/process-due-20261011T124800Z.json`, `SEMANTIC_TRACE.md` |
-| S16..S24 | Cursor 16..24, one stage each | NOT_STARTED | — |
+| S16 | Cursor 16 end-to-end, incl. due work after the 10-11/10-12/10-13 closed windows | DONE | `receipts/*/cursor-016.json`, `receipts/process-due-20261014T125700Z.json`, `SEMANTIC_TRACE.md` |
+| S17..S24 | Cursor 17..24, one stage each | NOT_STARTED | — |
 | S25 | Handoff freeze | NOT_STARTED | — |
 
 ### S0 notes
@@ -55,6 +56,7 @@ Resident model (as declared): `GPT-5.6 Sol`; platform provider/session id: `unkn
 | 13 | `c14resv2-013` | 2026-10-08T18:10:00-07:00 | `obs_c14_fixture_f3557413048807b17b9487bc@1` | yes (`next=14`) | 4 条 10-08 日摘要由我撰写；C14 bundle → 跨日 search_timeline 取证 → **commit_claim** `clm_79df61916b8bb4c10cb3faa3`（9 REALITY refs, hypothesis 0.5）→ silence | 82 | **首条 Claim**：写作块交付与日程保护相关（3 次观察的结构）；1 Claim |
 | 14 | `c14resv2-014` | 2026-10-11T05:43:00-07:00 | `obs_c14_fixture_36306372faac84bd3a098bd6@1` | yes (`next=15`) | 2 摘要（10-09 conversation + work_outcome(AI 认知记录)）；C14 bundle → **revise_claim rev2**（证据 10 条，含 10-09 会话；stale: 10-09 摘要）；Periodic Review → **silence** | 94 | 睡眠第 4 样本 ~6h42m；Claim 首次修订（疲劳—交付区分） |
 | 15 | `c14resv2-015` | 2026-10-11T05:48:00-07:00 | `obs_c14_fixture_979fd7bab5a31f3239b61e0b@1` | yes (`next=16`) | 1 摘要（10-09 work_outcome 因 S14 的 Claim 修订被重算 → rev3，文本沿用我 S14 亲笔）；C14 `wake_7a5808cbfef6321783bf0cb3`（单成员 = 该摘要 rev3，MIXED/has_ai）→ read_ai_world + inspect + 2×search_timeline → **silence** | 99 | dim:schedule 10-11 出行（06:25 航班、05:52 出门）；摘要 rev3 括注仍为 rev1 时期措辞（导航锚点，不作结论） |
+| 16 | `c14resv2-016` | 2026-10-14T05:57:00-07:00 | `obs_c14_fixture_8ae7dbd1147c788bb9a61bac@1` | yes (`next=17`) | 8 摘要（10-11 三条日摘要 + 10-05–10-11 五条周摘要）；C14 8 成员 bundle `wake_0bb994195dc853d0785b73e0` → read_ai_world + 3×search_timeline → **silence**；Periodic Review `wake_review_97aa729687fb559c4534fcb6`（13 anchors）→ **silence** | 122 | 睡眠第 5 样本 ~6h35m（无评分）；睡眠线继续观察，未形成 Claim |
 
 ## Blockers / contamination
 
