@@ -228,6 +228,7 @@ class BackgroundBudgetGate:
         *,
         now: datetime,
         max_model_rounds: int,
+        require_full_model_round_budget: bool = False,
     ) -> BackgroundBudgetDecision:
         if max_model_rounds < 1:
             raise ValueError("max_model_rounds must be >= 1")
@@ -254,29 +255,35 @@ class BackgroundBudgetGate:
             for item in policies
         )
 
-        # A resumed RUNNING Wake keeps its already-durable reservation. This avoids
-        # charging the same invocation twice after process recovery.
+        # A budget-reserved RUNNING Wake must never become a free same-day retry.
+        # The process may have crashed after calling the provider, so Core cannot
+        # safely assume the reservation is unused. Keep it blocked for that budget
+        # window; after the window rolls over a fresh reservation may be claimed.
         if wake.wake_state is WakeState.RUNNING:
             metadata = wake.metadata
             if str(metadata.get("budget_scope") or "") == BudgetScope.BACKGROUND_DAY.value:
-                reserved = metadata.get("budget_reserved_model_calls")
-                limit = (
-                    int(reserved)
-                    if isinstance(reserved, int)
-                    and not isinstance(reserved, bool)
-                    and reserved > 0
-                    else None
+                reserved_start = self._parse_time(
+                    metadata.get("budget_window_start"),
+                    "budget_window_start",
                 )
-                return BackgroundBudgetDecision(
-                    applies=True,
-                    available=True,
-                    world_revision=world_revision,
-                    window_start=window_start,
-                    window_end=window_end,
-                    policy_refs=policy_refs,
-                    model_round_limit=limit,
-                    reserved_model_calls=limit or 0,
+                reserved_end = self._parse_time(
+                    metadata.get("budget_window_end"),
+                    "budget_window_end",
                 )
+                if (
+                    reserved_start is not None
+                    and reserved_end is not None
+                    and reserved_start <= as_utc(now, "now") < reserved_end
+                ):
+                    return BackgroundBudgetDecision(
+                        applies=True,
+                        available=False,
+                        world_revision=world_revision,
+                        window_start=window_start,
+                        window_end=window_end,
+                        policy_refs=policy_refs,
+                        reasons=("background_budget_reservation_already_running",),
+                    )
 
         used_wakes, used_model_calls = self._usage(
             window_start=window_start,
@@ -325,6 +332,19 @@ class BackgroundBudgetGate:
                     if item.max_model_calls is not None
                     and used_model_calls >= item.max_model_calls
                 )
+            elif (
+                require_full_model_round_budget
+                and remaining_calls < max_model_rounds
+            ):
+                reasons.append(
+                    "background_model_call_budget_insufficient_for_full_run:"
+                    f"{remaining_calls}/{max_model_rounds}"
+                )
+                exceeded_modes.extend(
+                    item.on_exceed
+                    for item in policies
+                    if item.max_model_calls is not None
+                )
 
         available = not reasons
         if not available:
@@ -346,7 +366,11 @@ class BackgroundBudgetGate:
         model_round_limit = None
         reserved_model_calls = 0
         if remaining_calls is not None:
-            model_round_limit = min(max_model_rounds, remaining_calls)
+            model_round_limit = (
+                max_model_rounds
+                if require_full_model_round_budget
+                else min(max_model_rounds, remaining_calls)
+            )
             reserved_model_calls = model_round_limit
 
         return BackgroundBudgetDecision(
