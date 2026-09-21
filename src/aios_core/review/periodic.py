@@ -646,6 +646,7 @@ class PeriodicReviewService:
 
         if latest is not None and latest.wake_state in {
             WakeState.NEW,
+            WakeState.QUEUED,
             WakeState.RUNNING,
         }:
             metadata = latest.metadata
@@ -914,6 +915,8 @@ class PeriodicReviewService:
         request: PeriodicReviewRequest,
         *,
         started_at: datetime,
+        expected_world_revision: int | None = None,
+        metadata_update: Mapping[str, Any] | None = None,
     ) -> PeriodicReviewRequest:
         """Atomically claim a due review before invoking the resident model.
 
@@ -931,7 +934,7 @@ class PeriodicReviewService:
         wake = Wake.model_validate(payload)
         latest = Wake.model_validate(self.store.get_payload(wake.object_id))
 
-        if latest.wake_state is WakeState.RUNNING:
+        if latest.wake_state is WakeState.RUNNING and not metadata_update:
             if latest.revision != request.wake_ref.revision:
                 return request.model_copy(
                     update={
@@ -943,14 +946,22 @@ class PeriodicReviewService:
                 )
             return request
 
-        if latest.revision != wake.revision:
+        if latest.wake_state is WakeState.RUNNING and metadata_update:
+            wake = latest
+        elif latest.revision != wake.revision:
             raise ValueError("review wake is no longer current")
-        if wake.wake_state is not WakeState.NEW:
-            raise ValueError("only NEW periodic review wake may begin")
+
+        if wake.wake_state not in {
+            WakeState.NEW,
+            WakeState.QUEUED,
+            WakeState.RUNNING,
+        }:
+            raise ValueError("only NEW/QUEUED/RUNNING periodic review wake may begin")
 
         new_revision = wake.revision + 1
         metadata = dict(wake.metadata)
         metadata["started_at"] = started.isoformat()
+        metadata.update(dict(metadata_update or {}))
         running = Wake.model_validate(
             {
                 **wake.model_dump(mode="python", round_trip=True),
@@ -973,7 +984,11 @@ class PeriodicReviewService:
                     "wake_id": wake.object_id,
                     "revision": new_revision,
                 },
-                expected_world_revision=int(self.store.current_world_revision()),
+                expected_world_revision=(
+                    int(self.store.current_world_revision())
+                    if expected_world_revision is None
+                    else int(expected_world_revision)
+                ),
                 reason="claim due periodic review for resident-model execution",
                 idempotency_key=f"review-begin:{wake.object_id}:{new_revision}",
                 source_class=SourceClass.MAINTENANCE,
