@@ -1,0 +1,11 @@
+{
+  "delivered_external_events": 10,
+  "index_watermark": 179,
+  "last_consumed_external_event_id": "d036-chat-18",
+  "resident_replayed_calls": 15,
+  "simulated_clock": "2027-01-22T08:15:00+00:00",
+  "status": "pending",
+  "summary_replayed_calls": 6,
+  "world_revision": 179,
+  "world_sha256": "55c1af6b9601eddfea9cef8253a991a461b682de7a451b090cac064979218613"
+}
