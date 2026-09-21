@@ -696,6 +696,10 @@ class FusedTurnRuntime:
                     "deadline": "ISO-8601 datetime?",
                     "timezone_name": "string?",
                     "next_step": "string?",
+                    "completion_condition": (
+                        "object?; use mode=world_evidence|action_outcome|mixed; "
+                        "optional result_object_types=array[string]"
+                    ),
                 },
             ),
             self._create_task,
@@ -705,7 +709,9 @@ class FusedTurnRuntime:
                 name="transition_task",
                 description=(
                     "Move the current Task revision through a legal state transition. "
-                    "COMPLETED/FAILED requires real Outcome refs."
+                    "Terminal transitions obey the Task's explicit completion mode: "
+                    "WORLD_EVIDENCE uses pinned durable evidence; ACTION_OUTCOME "
+                    "requires a real authorized Action-linked Outcome; MIXED requires both."
                 ),
                 kind=CapabilityKind.WRITE,
                 side_effecting=True,
@@ -1480,6 +1486,7 @@ class FusedTurnRuntime:
         deadline: str | None = None,
         timezone_name: str | None = None,
         next_step: str | None = None,
+        completion_condition: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
         if self._active_turn_time is None:
             raise RuntimeError("create_task is only available during an active AIOS turn")
@@ -1503,6 +1510,7 @@ class FusedTurnRuntime:
                 deadline=self._optional_datetime(deadline),
                 timezone_name=timezone_name,
                 next_step=next_step,
+                completion_condition=dict(completion_condition or {}),
             ),
             created_at=self._active_turn_time,
         )
