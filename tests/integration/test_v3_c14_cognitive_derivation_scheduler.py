@@ -204,7 +204,8 @@ def test_reality_summary_schedules_exactly_one_background_opportunity_and_router
     assert scheduler.wake_bus.attention_class_for_wake(wake) is AttentionClass.BACKGROUND
     assert wake.evidence_refs == [summary_ref]
     assert wake.metadata["summary_ref"] == summary_ref.model_dump(mode="json")
-    assert wake.metadata["dimension"] == "dim:test"
+    assert wake.metadata["summary_dimension"] == "dim:test"
+    assert "dimension" not in wake.metadata
     assert wake.metadata["semantic_conclusions"] is False
     assert wake.metadata["routing_only"] is True
     assert set(wake.metadata).isdisjoint(
