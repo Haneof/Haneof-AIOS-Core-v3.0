@@ -121,6 +121,16 @@ def _validate_projection(raw: Any) -> dict[str, Any]:
             raise IngestAdapterError(f"{key} must be non-blank text")
     if event["source_class"] not in ALLOWED_SOURCE_CLASSES:
         raise IngestAdapterError("unsupported source_class")
+    if (
+        event["sequence"] >= 25
+        and event["dimension"] == "dim:conversation"
+        and event["source_kind"] == "conversation"
+        and event["source_class"] == "USER"
+        and event["modality"] == "text"
+    ):
+        raise IngestAdapterError(
+            "Phase-B USER conversation must use canonical_conversation_ingest.py"
+        )
     return event
 
 

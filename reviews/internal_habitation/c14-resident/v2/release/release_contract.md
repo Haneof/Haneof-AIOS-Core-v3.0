@@ -4,9 +4,11 @@
 > Durable-ack amendment task: `C14-RES-FIX-003`  
 > Fixture: `c14-resident-fixture-v2`  
 > Frozen fixture SHA256: `sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253`  
-> Release operator: `c14-blind-release-operator-v3`  
+> Release operator: `c14-blind-release-operator-v4`  
 > Mechanical ingest adapter: `c14-mechanical-ingest-adapter-v1`  
-> Binding: `c14-fixture-event-binding-v1`  
+> Canonical conversation adapter: `c14-canonical-conversation-adapter-v1`  
+> Generic binding: `c14-fixture-event-binding-v1`  
+> Canonical conversation binding: `c14-canonical-conversation-binding-v1`  
 > Timezone: `America/Los_Angeles`
 
 The contract identity remains v2 because the sealed fixture embeds `c14-sequential-release-v2` and its bytes are constitutionally frozen for this validation. FIX-003 strengthens only the release/ingest proof. It does not alter any life event, phase, timestamp, semantic design, or fixture digest.
@@ -19,6 +21,7 @@ Resident A/B may read and execute:
 - `event_schema.json`;
 - `release_operator.py`;
 - `mechanical_ingest_adapter.py`;
+- `canonical_conversation_ingest.py`;
 - their own durable release state/receipts;
 - the single current event projection emitted by `reveal`;
 - the mechanical ingest receipt for that current event.
@@ -235,11 +238,64 @@ python reviews/internal_habitation/c14-resident/v2/release/release_operator.py \
 
 It succeeds only after cursor 24 was acknowledged and cursor 25 is next.
 
-Phase B then continues the same:
+Phase B uses two mutually exclusive mechanical release paths.
 
-`reveal -> mechanical ingest -> durable World verified ack`
+For non-conversation events:
 
-discipline from cursor 25 onward.
+`reveal -> mechanical_ingest_adapter.py -> durable World verified ack`
+
+For a released event whose exact mechanical envelope is:
+
+- `phase=B`;
+- `dimension=dim:conversation`;
+- `source_kind=conversation`;
+- `source_class=USER`;
+- `modality=text`;
+
+the generic fixture Observation path is forbidden. The event must instead use:
+
+`reveal -> canonical_conversation_ingest.py -> canonical durable ack -> FusedTurnRuntime.run_turn(...same turn identity...)`
+
+Example:
+
+```bash
+python reviews/internal_habitation/c14-resident/v2/release/canonical_conversation_ingest.py \
+  --world-db <private-world.db> \
+  --session-id <fresh-resident-b-session> \
+  --turn-index <N> \
+  --event-file <current-event.json>
+```
+
+The adapter calls the existing `ConversationIngestor.commit_user_input()` public Core API. It does not create a fixture Observation and does not perform cognition.
+
+The corresponding ack must include:
+
+```text
+--conversation-session-id <same-session>
+--conversation-turn-index <same-turn-index>
+```
+
+The operator verifies the exact durable canonical user Observation:
+
+- exact revision exists;
+- subject equals the fixture subject;
+- durable commit authority is `USER`;
+- object type is `Observation`;
+- source kind is `user_ai_interaction`;
+- modality is `text`;
+- metadata role is `user`;
+- metadata session id and turn index exactly match the supplied values;
+- value exactly equals the current released payload;
+- occurred_at is the exact released instant;
+- release state event id/sequence remain the current pending reveal.
+
+No fuzzy matching, NLP similarity, or semantic inference is permitted.
+
+The successful release receipt records the fixture event id/sequence, exact canonical ref, session id, turn index, payload digest and projection digest. This is release provenance only.
+
+After ack, normal `FusedTurnRuntime.run_turn()` must receive exactly the same subject/session/turn/text/occurred_at. Its internal `ConversationIngestor.commit_user_input()` is expected to return an idempotent replay of the already durable user Observation. The assistant response may then create the normal separate assistant Observation.
+
+A v3 Resident-A release state may be upgraded to operator v4 only during `init --phase B` and only when it is the exact sealed handoff: active Phase A, 24 acknowledged receipts, `last_acked_sequence=24`, `next_sequence=25`, and no pending reveal. No other legacy state is accepted.
 
 ## 11. No semantic verdict in release infrastructure
 

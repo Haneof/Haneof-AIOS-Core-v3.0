@@ -184,7 +184,7 @@ class ReleaseOperatorTests(unittest.TestCase):
             "fixture_version": "c14-resident-fixture-v2",
             "schema_version": "c14-resident-event-v2",
             "release_contract_version": "c14-sequential-release-v2",
-            "release_operator_version": "c14-blind-release-operator-v3",
+            "release_operator_version": "c14-blind-release-operator-v4",
             "fixture_sha256": self.manifest["fixture_sha256"],
             "active_phase": "A",
             "last_acked_sequence": last_acked,
@@ -636,7 +636,7 @@ class ReleaseOperatorTests(unittest.TestCase):
         self.assertEqual(self.manifest["subject_id"], "user_1")
         self.assertEqual(
             self.manifest["release_operator_version"],
-            "c14-blind-release-operator-v3",
+            "c14-blind-release-operator-v4",
         )
         self.assertEqual(
             self.manifest["ingest_adapter_version"],
