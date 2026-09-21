@@ -35,7 +35,7 @@ RELEASE_STATE = EVIDENCE_DIR / "release_state.json"
 PENDING = EVIDENCE_DIR / "pending_checkpoint.json"
 INPUT_REPO_PATH = (
     "reviews/internal_habitation/c14-resident/v2/runs/"
-    "resident-a-20260921-sol/resident_input.json"
+    "resident-a-20260921-sol/resident_checkpoint_input.json"
 )
 TRACE = EVIDENCE_DIR / "semantic_trace.jsonl"
 SESSION_STATE = EVIDENCE_DIR / "session_state.json"
