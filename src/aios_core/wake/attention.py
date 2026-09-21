@@ -57,6 +57,15 @@ class NumericPredicate(BaseModel):
         return self
 
 
+class AttentionSchedulingPolicy(BaseModel):
+    """Injectable engineering parameters for non-semantic attention scheduling."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    background_batch_window_seconds: int = Field(default=60, ge=0)
+    background_bundle_max_wakes: int = Field(default=16, ge=2)
+
+
 class AttentionWatchRequest(BaseModel):
     """Resident-authored future-attention intent compiled to a mechanical predicate."""
 

@@ -3,6 +3,7 @@
 from .attention import (
     AttentionBundleReceipt,
     AttentionRouter,
+    AttentionSchedulingPolicy,
     AttentionWatchReceipt,
     AttentionWatchRequest,
     AttentionWatchService,
@@ -22,6 +23,7 @@ from .service import (
 __all__ = [
     "AttentionBundleReceipt",
     "AttentionRouter",
+    "AttentionSchedulingPolicy",
     "AttentionWatchReceipt",
     "AttentionWatchRequest",
     "AttentionWatchService",
