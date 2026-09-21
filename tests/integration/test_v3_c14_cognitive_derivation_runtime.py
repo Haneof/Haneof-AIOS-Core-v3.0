@@ -2089,7 +2089,70 @@ def test_loop_new_runtime_recovers_exact_durable_ai_world_cognition(tmp_path):
     reopened = SQLiteWorldStore(db)
     reopened_index = WorldSearchIndex(db, store=reopened)
     reopened_index.rebuild()
-    fresh_model = lambda _snapshot: ModelDirective(silence=True)
+    retrieval_trace = {}
+
+    def fresh_model(snapshot):
+        history = snapshot.capability_history
+        assert snapshot.wake_reason == WakeSource.USER_INTERACTION.value
+        continuity = snapshot.cockpit["task_context"]["conversation_continuity"]
+        assert continuity["session_id"] == "c14-loop-fresh-session"
+        assert continuity["recent_turn_count"] == 0
+        if len(history) == 0:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="read_ai_world",
+                        arguments={
+                            "domains": [
+                                AIWorldDomain.USER_UNDERSTANDING.value,
+                            ],
+                            "limit": 20,
+                        },
+                    ),
+                )
+            )
+        if len(history) == 1:
+            assert history[-1].name == "read_ai_world"
+            assert history[-1].ok is True
+            matches = [
+                item
+                for item in history[-1].data
+                if item.get("statement") == marker
+            ]
+            assert len(matches) == 1
+            retrieval_trace["exact_ref"] = (
+                matches[0]["object_id"],
+                matches[0]["revision"],
+            )
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="search_world",
+                        arguments={"query": marker, "limit": 10},
+                    ),
+                )
+            )
+        if len(history) == 2:
+            assert history[-1].name == "search_world"
+            assert history[-1].ok is True
+            assert retrieval_trace["exact_ref"][0] in str(history[-1].data)
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="inspect_world_object",
+                        arguments={
+                            "object_id": retrieval_trace["exact_ref"][0],
+                            "revision": retrieval_trace["exact_ref"][1],
+                        },
+                    ),
+                )
+            )
+        assert len(history) == 3
+        assert history[-1].name == "inspect_world_object"
+        assert history[-1].ok is True
+        assert marker in str(history[-1].data)
+        return ModelDirective(response="durable cognition retrieved")
+
     runtime_b = FusedTurnRuntime(
         store=reopened,
         index=reopened_index,
@@ -2105,26 +2168,23 @@ def test_loop_new_runtime_recovers_exact_durable_ai_world_cognition(tmp_path):
         durable.revision,
     )
 
-    inspected = runtime_b.registry.invoke(
-        CapabilityCall(
-            name="inspect_world_object",
-            arguments={
-                "object_id": exact.object_id,
-                "revision": exact.revision,
-            },
-        )
+    fresh_turn = runtime_b.run_turn(
+        session_id="c14-loop-fresh-session",
+        turn_index=1,
+        user_input="这是一个全新的会话，请只使用持久 AIOS 世界检查已有理解。",
+        occurred_at=NOW + timedelta(hours=1),
+        current_topic=None,
     )
-    assert inspected.ok is True
-    assert marker in str(inspected.data)
-
-    searched = runtime_b.registry.invoke(
-        CapabilityCall(
-            name="search_world",
-            arguments={"query": marker, "limit": 10},
-        )
+    assert fresh_turn.runtime.response == "durable cognition retrieved"
+    assert [item.name for item in fresh_turn.runtime.capability_history] == [
+        "read_ai_world",
+        "search_world",
+        "inspect_world_object",
+    ]
+    assert retrieval_trace["exact_ref"] == (
+        durable.object_id,
+        durable.revision,
     )
-    assert searched.ok is True
-    assert exact.object_id in str(searched.data)
 
 
 def test_loop_bundle_keeps_grounded_cognition_writer_authorized(tmp_path):
