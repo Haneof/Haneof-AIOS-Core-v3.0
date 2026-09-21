@@ -1,12 +1,16 @@
 # C14-RES-FIX-002 Completion Evidence
 
-> Status: **CANDIDATE COMPLETE / LIFE-DIRECTOR MECHANICAL GATES PASS**  
+> Status: **DONE / MERGED / LIFE-DIRECTOR MECHANICAL GATES PASS**  
 > Date: 2026-09-21  
 > Task: `C14-RES-FIX-002`  
 > Role: Life Director / Sealed Fixture Designer  
 > Started from main: `075685b5b9b632988baa4e2de61c6d05aa469d32`  
 > Work branch: `c14/res-fixture-v2-hardening-20260921-sol`  
-> PR: #70
+> Exact candidate: `aacee04cfa5390f2a63d0a5606acb909291849b6`  
+> PR: #70  
+> Squash merge: `510290d3b9578cd9425079a22050eb679ddb528a`  
+> Task-board closure: `490aa747b8d9a0dc9365d58ae58bfff1e71faf2c`  
+> Checkpoint closure: `2043d4d498447312c0851468e971c950c23836e3`
 
 ## 1. Scope and hard boundary
 
