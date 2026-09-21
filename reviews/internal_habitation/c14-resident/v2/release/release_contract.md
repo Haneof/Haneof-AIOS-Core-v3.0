@@ -1,51 +1,74 @@
-# C14 Resident Sequential Release Contract v2
+# C14 Resident Sequential Release Contract v2 — Durable Ack Amendment
 
-> Version: `c14-sequential-release-v2`  
-> Task: `C14-RES-FIX-002`  
+> Contract identity: `c14-sequential-release-v2`  
+> Durable-ack amendment task: `C14-RES-FIX-003`  
 > Fixture: `c14-resident-fixture-v2`  
-> Release operator: `c14-blind-release-operator-v2`  
+> Frozen fixture SHA256: `sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253`  
+> Release operator: `c14-blind-release-operator-v3`  
+> Mechanical ingest adapter: `c14-mechanical-ingest-adapter-v1`  
+> Binding: `c14-fixture-event-binding-v1`  
 > Timezone: `America/Los_Angeles`
 
-This contract supersedes the v1 release contract for formal C14 Resident validation. The v1 files remain historical evidence and must not be used as the formal Resident input.
+The contract identity remains v2 because the sealed fixture embeds `c14-sequential-release-v2` and its bytes are constitutionally frozen for this validation. FIX-003 strengthens only the release/ingest proof. It does not alter any life event, phase, timestamp, semantic design, or fixture digest.
 
 ## 1. Resident access boundary
 
-Resident A/B may read:
+Resident A/B may read and execute:
 
 - this contract;
 - `event_schema.json`;
 - `release_operator.py`;
+- `mechanical_ingest_adapter.py`;
 - their own durable release state/receipts;
-- the current event projection printed by the operator.
+- the single current event projection emitted by `reveal`;
+- the mechanical ingest receipt for that current event.
 
 Resident A/B must not open or read:
 
 - `../fixture/sealed_fixture.json`;
 - `../fixture/fixture_manifest.json`;
 - `../evaluator/EVALUATOR_ONLY_design_notes.md`;
-- any unreleased future event or hidden design material.
+- any unreleased future event or hidden evaluator/design material.
 
-Formal fixture SHA256:
+The release operator may read the sealed fixture internally only to select and validate the exact current cursor. The ingest adapter does **not** read the sealed fixture; it accepts only the already-released projection.
 
-`sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253`
+## 2. Required private World
 
-If a Resident reads forbidden fixture/design material directly, the affected semantic evidence is invalid.
+Every formal Resident run uses one private SQLite AIOS World.
 
-## 2. Normal command flow
+The World path is supplied explicitly as:
 
-Initialize Phase A once:
+`--world-db <private-world.db>`
+
+The durable truth queried by ack is the existing AIOS `SQLiteWorldStore`. No sidecar registry, fake receipt database, or second source of truth is legal.
+
+The exact revision is verified through the public WorldStore read surfaces:
+
+- `object_revision_record(object_id, revision=N)`;
+- `get_payload(object_id, revision=N)`.
+
+The first read proves exact durable revision/provenance existence; the second retrieves the exact persisted payload.
+
+## 3. Phase-A initialization
+
+Initialize one release state:
 
 ```bash
-python reviews/internal_habitation/c14-resident/v2/release/release_operator.py init --phase A --state <state-file>
+python reviews/internal_habitation/c14-resident/v2/release/release_operator.py \
+  init --phase A --state <release-state.json>
 ```
 
-Reveal exactly the current event:
+Phase A always begins at cursor 1.
+
+## 4. Reveal exactly one current event
 
 ```bash
-python reviews/internal_habitation/c14-resident/v2/release/release_operator.py reveal --phase A --state <state-file>
+python reviews/internal_habitation/c14-resident/v2/release/release_operator.py \
+  reveal --phase A --state <release-state.json> \
+  > <current-event.json>
 ```
 
-The `reveal` command prints exactly these event fields and no others:
+`reveal` outputs exactly:
 
 - `event_id`
 - `sequence`
@@ -56,84 +79,169 @@ The `reveal` command prints exactly these event fields and no others:
 - `modality`
 - `resident_visible_payload`
 
-It does **not** advance the cursor. It records only that the current cursor has been revealed and is awaiting durable ingest acknowledgement.
+It does not output hidden `phase`, manifest content, evaluator content, future payload, remaining-event information, or semantic labels.
 
-After that exact event has been durably ingested into the private AIOS World, acknowledge it:
+It records only a pending reveal. **It does not advance the cursor.**
+
+## 5. Mechanical ingest of the released projection
+
+Only after reveal, mechanically ingest that same projection into the current private World:
 
 ```bash
-python reviews/internal_habitation/c14-resident/v2/release/release_operator.py ack \
+python reviews/internal_habitation/c14-resident/v2/release/mechanical_ingest_adapter.py \
+  --world-db <private-world.db> \
+  --event-file <current-event.json> \
+  > <ingest-receipt.json>
+```
+
+The adapter performs no cognition, search, Summary interpretation, importance ranking, preference detection, Claim selection, revision, retraction, or silence decision.
+
+It creates one durable AIOS `Observation` using the existing:
+
+- `Observation` contract;
+- `OperationRequest`;
+- `SQLiteWorldStore.commit`.
+
+The adapter stores mechanical fixture-binding metadata only:
+
+- fixture version and frozen digest;
+- fixture event id;
+- fixture sequence;
+- deterministic payload SHA256;
+- deterministic current-projection SHA256;
+- dimension;
+- original occurred_at;
+- external record identity;
+- mechanical-ingest marker.
+
+The actual source authority is committed through the WorldStore `source_class`; ack later reads it from the exact revision's `world_commits` provenance instead of trusting a caller string.
+
+## 6. Durable ack
+
+Ack now requires both the exact ingest ref and the private World:
+
+```bash
+python reviews/internal_habitation/c14-resident/v2/release/release_operator.py \
+  ack \
   --phase A \
-  --state <state-file> \
+  --state <release-state.json> \
+  --world-db <private-world.db> \
   --sequence <N> \
   --event-id <EVENT_ID> \
   --ingest-ref <OBJECT_ID>@<REVISION>
 ```
 
-Only a matching pending reveal with a non-empty durable `object_id@revision` reference may advance the cursor.
+Before cursor movement, ack itself reopens/queries the durable World and requires all of the following:
 
-## 3. Fail-closed guarantees
+1. exact `object_id@revision` exists;
+2. object type is `Observation`;
+3. revision kind is content;
+4. durable revision subject equals fixture subject `user_1`;
+5. payload subject equals the same subject;
+6. exact payload object id/revision equal the supplied ref;
+7. commit provenance `source_class` equals the released event's source class;
+8. stored `source_kind` equals the released event;
+9. stored modality equals the released event;
+10. stored value exactly equals `resident_visible_payload`;
+11. stored point timestamp equals the released `occurred_at` instant;
+12. metadata dimension equals the released dimension;
+13. metadata fixture event id equals the pending event id;
+14. metadata fixture sequence equals the pending sequence;
+15. fixture version/digest/binding version match the frozen v2 contract;
+16. deterministic payload SHA256 matches;
+17. deterministic projection SHA256 matches;
+18. original occurred_at metadata matches exactly;
+19. mechanical-ingest marker is present.
 
-The operator refuses:
+No semantic similarity, NLP, model judgment, or fuzzy matching is used.
 
-- fixture digest mismatch;
-- fixture / schema / contract / operator version mismatch;
-- malformed or non-monotonic fixture chronology;
-- duplicate ids or non-contiguous sequence;
-- cursor skip or state corruption;
-- acknowledgement of a non-current event;
-- repeat acknowledgement;
-- acknowledgement without a valid durable ingest reference;
-- Phase A access to cursor 25;
-- Phase B initialization before the exact 24 -> 25 handoff;
-- Phase B access to Phase-A cursors;
-- phase mismatch between command and durable state.
+If any equality fails, stdout contains no ack success and the cursor/pending reveal stay unchanged.
 
-Errors go to stderr and emit no event payload on stdout.
+## 7. Receipt chain
 
-The helper performs no NLP, semantic ranking, search-target selection, Claim selection, cognition generation, revise/retract decision, or Resident response generation.
+A successful ack persists a receipt containing at least:
 
-## 4. Phase-A sealed handoff
+- `fixture_sha256`;
+- `event_id`;
+- `sequence`;
+- `occurred_at`;
+- `ingest_ref`;
+- `ingest_object_id`;
+- `ingest_revision`;
+- `ingest_world_revision`;
+- durable commit `ingest_source_class`;
+- `fixture_payload_sha256`;
+- `fixture_projection_sha256`.
 
-Phase A is exactly cursors **1 through 24**.
+This permits a later evaluator to follow:
 
-The final Phase-A event is:
+`release receipt -> exact World revision -> original released event`.
 
-- cursor: `24`
-- event id: `c14resv2-024`
-- occurred_at: `2026-10-21T11:53:00-07:00`
+## 8. Fail-closed conditions
 
-After cursor 24 is durably ingested and acknowledged:
+Ack refuses, without cursor advancement:
 
-- `last_acked_sequence = 24`
-- `next_sequence = 25`
-- Resident A saves the required World/checkpoint/index/model/capability evidence;
-- Resident A stops permanently;
-- Resident A must not run another `reveal`.
+- missing private World DB;
+- syntactically valid but nonexistent ref such as `fake_object@1`;
+- nonexistent revision of a real object;
+- wrong existing revision;
+- previous-event ref;
+- another/future fixture-event ref;
+- cross-subject Observation;
+- payload mismatch;
+- timestamp mismatch;
+- dimension mismatch;
+- source-kind mismatch;
+- source-class mismatch;
+- modality mismatch;
+- fixture/binding/version/digest mismatch;
+- ack before reveal;
+- wrong sequence/event id;
+- skip/repeat/reorder;
+- malformed state/receipt chain.
 
-## 5. Phase-B fresh-window start
+All previous future-isolation and phase guards remain binding.
 
-Resident B must be a completely new ChatGPT/Agent window.
+## 9. Phase-A sealed handoff
 
-It receives only the legal task/protocol material, the Phase-A durable AIOS World/checkpoint and digests, and the durable release state at cursor 25. It receives no Phase-A chat transcript or prose summary.
+Phase A is cursors **1 through 24**.
 
-Phase B is initialized against the existing handoff state:
+Cursor 24:
+
+- event id: `c14resv2-024`;
+- occurred_at: `2026-10-21T11:53:00-07:00`.
+
+Only after cursor 24 has a verified exact durable World revision may ack advance state to:
+
+`next_sequence = 25`.
+
+Resident A then saves the required World/checkpoint/index/model/capability evidence and stops permanently.
+
+Phase A `reveal` at cursor 25 is rejected.
+
+## 10. Phase-B start
+
+Resident B must be a completely new ChatGPT/Agent window and must receive no Phase-A chat transcript or prose memory.
+
+Phase B initializes only from the exact sealed handoff state:
 
 ```bash
-python reviews/internal_habitation/c14-resident/v2/release/release_operator.py init --phase B --state <state-file>
+python reviews/internal_habitation/c14-resident/v2/release/release_operator.py \
+  init --phase B --state <release-state.json>
 ```
 
-That command succeeds only if the state proves cursor 24 was acknowledged and cursor 25 is next.
+It succeeds only after cursor 24 was acknowledged and cursor 25 is next.
 
-The first Phase-B reveal is then:
+Phase B then continues the same:
 
-```bash
-python reviews/internal_habitation/c14-resident/v2/release/release_operator.py reveal --phase B --state <state-file>
-```
+`reveal -> mechanical ingest -> durable World verified ack`
 
-Phase B proceeds sequentially through cursor 36 with the same reveal -> durable ingest -> ack discipline.
+discipline from cursor 25 onward.
 
-## 6. Release completion
+## 11. No semantic verdict in release infrastructure
 
-The final event is cursor `36`, `c14resv2-036`, at `2026-10-31T12:03:00-07:00`.
+Successful release/ingest/ack means only that chronological test input was durably persisted and mechanically bound.
 
-Chronological release completion is not a cognition verdict. Semantic evaluation remains the responsibility of the later independent evaluator window.
+It is **not** evidence that the Resident formed correct cognition.
+
+Semantic validity remains exclusively with the later real Resident and independent evaluator tasks.
