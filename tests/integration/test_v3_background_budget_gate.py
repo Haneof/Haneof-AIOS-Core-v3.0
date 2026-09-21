@@ -684,7 +684,17 @@ def test_periodic_running_review_does_not_repeat_same_day_and_can_refresh_next_d
                     ),
                 )
             )
-        return ModelDirective(silence=True)
+        return ModelDirective(
+            silence=True,
+            usage=ModelUsage(
+                input_tokens=18,
+                output_tokens=4,
+                total_tokens=22,
+                provider="openai",
+                model="review-model",
+                request_id="resp_resumed_review_next_day",
+            ),
+        )
 
     runtime = FusedTurnRuntime(
         store=store,
@@ -707,6 +717,9 @@ def test_periodic_running_review_does_not_repeat_same_day_and_can_refresh_next_d
     assert first.runtime.model_rounds == 5
     assert first.wake.state == "running"
     assert model_calls == 5
+    first_running = store.get_payload(first.wake.wake_id)
+    original_started_at = first_running["metadata"]["started_at"]
+    assert original_started_at == (NOW + timedelta(hours=25)).isoformat()
 
     same_day = runtime.run_periodic_review(
         now=NOW + timedelta(hours=26),
@@ -731,6 +744,24 @@ def test_periodic_running_review_does_not_repeat_same_day_and_can_refresh_next_d
     assert next_day.runtime.silenced is True
     assert next_day.wake.state == "completed"
     assert model_calls == 6
+
+    completed = store.get_payload(
+        next_day.wake.wake_id,
+        revision=next_day.wake.revision,
+    )
+    # The review's cognition/write clock stays pinned to the original RUNNING
+    # review start even though the provider call happened in the next budget day.
+    assert completed["metadata"]["started_at"] == original_started_at
+
+    meter_rows = runtime.metering.list_model_calls(
+        subject_id="user_1",
+        wake_id=next_day.wake.wake_id,
+    )
+    exact_rows = [row for row in meter_rows if row.usage_complete]
+    assert len(exact_rows) == 1
+    assert exact_rows[0].recorded_at == NOW + timedelta(hours=49)
+    assert exact_rows[0].total_tokens == 22
+    assert exact_rows[0].provider_request_id == "resp_resumed_review_next_day"
 
 
 
