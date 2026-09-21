@@ -95,6 +95,7 @@ class CognitiveRuntime:
         cockpit: Mapping[str, Any],
         history: Sequence[CapabilityResult],
         round_index: int,
+        effective_model_rounds: int,
     ) -> RuntimeSnapshot:
         return RuntimeSnapshot(
             user_input=user_input,
@@ -103,7 +104,10 @@ class CognitiveRuntime:
             capability_catalog=tuple(self.registry.catalog()),
             capability_history=tuple(history),
             round_index=round_index,
-            remaining_tool_rounds=max(0, self.max_tool_rounds - round_index),
+            remaining_tool_rounds=max(
+                0,
+                effective_model_rounds - round_index - 1,
+            ),
         )
 
     def run_turn(
@@ -112,6 +116,7 @@ class CognitiveRuntime:
         *,
         wake_reason: str = "user_interaction",
         cockpit: Mapping[str, Any] | None = None,
+        max_model_rounds: int | None = None,
     ) -> RuntimeTurnResult:
         if not isinstance(user_input, str) or not user_input.strip():
             raise ValueError("user_input must be non-blank")
@@ -121,14 +126,26 @@ class CognitiveRuntime:
         total_calls = 0
         cockpit_data = dict(cockpit or {})
 
+        normal_model_rounds = self.max_tool_rounds + 1
+        if max_model_rounds is None:
+            effective_model_rounds = normal_model_rounds
+        else:
+            if max_model_rounds < 1:
+                raise ValueError("max_model_rounds must be >= 1")
+            effective_model_rounds = min(
+                int(max_model_rounds),
+                normal_model_rounds,
+            )
+
         # round_index counts model decisions, not a prescribed thought stage.
-        for round_index in range(self.max_tool_rounds + 1):
+        for round_index in range(effective_model_rounds):
             snapshot = self._snapshot(
                 user_input=user_input,
                 wake_reason=wake_reason,
                 cockpit=cockpit_data,
                 history=history,
                 round_index=round_index,
+                effective_model_rounds=effective_model_rounds,
             )
             directive = self.model_handler(snapshot)
             if not isinstance(directive, ModelDirective):
@@ -153,13 +170,17 @@ class CognitiveRuntime:
 
             # At the final allowed model round, new tool requests are not executed.
             # We fail closed rather than silently granting unbounded autonomous loops.
-            if round_index >= self.max_tool_rounds:
+            if round_index >= effective_model_rounds - 1:
                 return RuntimeTurnResult(
                     response=None,
                     silenced=False,
                     capability_history=tuple(history),
                     model_rounds=round_index + 1,
-                    termination_reason="tool_round_budget_exhausted",
+                    termination_reason=(
+                        "model_round_budget_exhausted"
+                        if effective_model_rounds < normal_model_rounds
+                        else "tool_round_budget_exhausted"
+                    ),
                 )
 
             for call in directive.capability_calls:
