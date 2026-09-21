@@ -3,9 +3,10 @@
 The gate reads durable BudgetPolicy objects from the unified World and measures
 usage from durable Wake lifecycle records. It never judges semantic importance.
 
-Provider token usage is intentionally *not* estimated here. If an active budget
-declares max_tokens before real provider telemetry exists, the gate fails closed
-instead of inventing usage numbers.
+Provider token usage is intentionally *not* estimated here. Exact completed usage
+is counted when a model handler reports it. A hard max_tokens policy still fails
+closed unless a reliable pre-invocation token bound exists, because post-call usage
+cannot guarantee that the first request stayed under the cap.
 """
 
 from __future__ import annotations
@@ -264,6 +265,7 @@ class BackgroundBudgetGate:
                 "max_tokens": None,
                 "remaining_wakes": None,
                 "remaining_model_calls": None,
+                "remaining_tokens": None,
                 "token_usage_available": False,
                 "on_exceed": [],
             }
