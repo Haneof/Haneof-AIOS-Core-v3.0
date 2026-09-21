@@ -594,3 +594,38 @@ def test_multiscale_scheduler_auto_schedules_new_summary_and_unchanged_rerun_add
     assert second.commits == ()
     assert second.skipped_unchanged
     assert len(_derivation_wakes(store)) == 1
+
+
+def test_loop_repro_reconcile_builds_support_dependency_graph_once_per_pass(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    _db, store, index = _world(tmp_path)
+    source = _observation(store, "obs_c14_loop_scale")
+    for offset in range(200):
+        _summary(
+            store,
+            f"sum_c14_loop_scale_{offset}",
+            (source,),
+            dimension=f"dim:scale:{offset}",
+            at=NOW + timedelta(minutes=20, seconds=offset),
+        )
+
+    scheduler = CognitiveDerivationScheduler(store=store, index=index)
+    original = scheduler._support_dependencies
+    scans = {"count": 0}
+
+    def counted_support_dependencies():
+        scans["count"] += 1
+        return original()
+
+    monkeypatch.setattr(
+        scheduler,
+        "_support_dependencies",
+        counted_support_dependencies,
+    )
+    result = scheduler.reconcile()
+
+    assert result.examined == 200
+    assert len(result.scheduled) == 200
+    assert scans["count"] == 1
