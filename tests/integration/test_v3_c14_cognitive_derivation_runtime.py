@@ -2307,3 +2307,92 @@ def test_loop_runtime_incomplete_individual_is_not_rebundled_after_partial_write
     ]
     assert len(final_claims) == 1
     assert final_claims[0]["object_id"] == durable_claim_id
+
+
+def test_loop_runtime_incomplete_usage_counts_against_other_background_wakes(
+    tmp_path,
+):
+    store, index = _world(tmp_path)
+    _commit_loop_budget(
+        store,
+        object_id="budget_loop_incomplete_global_usage",
+        max_model_calls=1,
+    )
+    leaf_a = _observation(
+        store,
+        "obs_loop_incomplete_budget_a",
+        value="unfinished model call consumes global background budget",
+        dimension="dim:loop:budget",
+    )
+    summary_a = _summary(
+        store,
+        "sum_loop_incomplete_budget_a",
+        (leaf_a,),
+        dimension="dim:loop:budget",
+        at=NOW + timedelta(minutes=10),
+    )
+    scheduled_a = _schedule(store, index, summary_a)
+    model_calls = {"count": 0}
+
+    def model(snapshot):
+        model_calls["count"] += 1
+        return ModelDirective(
+            capability_calls=(
+                CapabilityCall(
+                    name="inspect_world_object",
+                    arguments={
+                        "object_id": summary_a.object_id,
+                        "revision": summary_a.revision,
+                    },
+                ),
+            ),
+            **_usage(snapshot),
+        )
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+        max_tool_rounds=0,
+    )
+    first = runtime.run_wake(
+        wake_ref=ObjectRef(
+            object_id=scheduled_a.wake.wake_id,
+            revision=scheduled_a.wake.revision,
+        ),
+        now=NOW + timedelta(minutes=30),
+    )
+    assert first.runtime is not None
+    assert first.wake.state == "queued"
+    assert model_calls["count"] == 1
+
+    leaf_b = _observation(
+        store,
+        "obs_loop_incomplete_budget_b",
+        value="second background opportunity must see first call spend",
+        dimension="dim:loop:budget",
+        at=NOW + timedelta(minutes=2),
+    )
+    summary_b = _summary(
+        store,
+        "sum_loop_incomplete_budget_b",
+        (leaf_b,),
+        dimension="dim:loop:budget",
+        at=NOW + timedelta(minutes=12),
+    )
+    scheduled_b = _schedule(store, index, summary_b)
+
+    second = runtime.run_wake(
+        wake_ref=ObjectRef(
+            object_id=scheduled_b.wake.wake_id,
+            revision=scheduled_b.wake.revision,
+        ),
+        now=NOW + timedelta(minutes=31),
+    )
+    assert second.runtime is None
+    assert second.wake.state == "queued"
+    assert model_calls["count"] == 1
+    status = runtime.background_budget_gate.status(
+        now=NOW + timedelta(minutes=31)
+    )
+    assert status["used_model_calls"] == 1
