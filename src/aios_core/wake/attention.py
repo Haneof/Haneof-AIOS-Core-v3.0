@@ -678,8 +678,6 @@ class AttentionRouter:
                 return None
             window_start = as_utc(anchor.first_hit_at, "first_hit_at")
             window_end = window_start + timedelta(seconds=window_seconds)
-            if moment < window_end:
-                return None
             eligible = [
                 wake
                 for wake in pending_background
