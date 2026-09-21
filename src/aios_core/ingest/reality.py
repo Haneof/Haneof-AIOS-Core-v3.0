@@ -10,7 +10,7 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass, fields as dataclass_fields, is_dataclass
 from datetime import datetime, timezone
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 from pydantic import (
     BaseModel,
@@ -25,6 +25,7 @@ from pydantic import (
 from aios_core.contracts.enums import ErrorCode, ObjectType, SourceClass
 from aios_core.contracts.models import Observation
 from aios_core.contracts.operations import OperationRequest
+from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import TemporalExtent, TimePrecision, as_utc
 from aios_core.query.search import WorldSearchIndex
 from aios_core.storage.idempotency import canonical_json_dumps
@@ -340,12 +341,14 @@ class RealityIngestService:
         store: SQLiteWorldStore,
         index: WorldSearchIndex | None = None,
         subject_id: str = "user_1",
+        observation_listener: Callable[[ObjectRef], Any] | None = None,
     ) -> None:
         if not isinstance(subject_id, str) or not subject_id.strip():
             raise ValueError("subject_id must not be blank")
         self.store = store
         self.index = index
         self.subject_id = subject_id.strip()
+        self.observation_listener = observation_listener
 
     @staticmethod
     def _validated_spec(spec: SourceAdapterSpec) -> SourceAdapterSpec:
@@ -387,6 +390,15 @@ class RealityIngestService:
     def _catch_up(self) -> None:
         if self.index is not None:
             self.index.catch_up()
+
+    def _notify_observation(self, object_id: str, revision: int = 1) -> None:
+        """Notify a mechanical post-ingest observer without giving it write semantics."""
+
+        if self.observation_listener is None:
+            return
+        self.observation_listener(
+            ObjectRef(object_id=str(object_id), revision=int(revision))
+        )
 
     @staticmethod
     def _adapter_identity(spec: SourceAdapterSpec) -> dict[str, str]:
@@ -577,6 +589,8 @@ class RealityIngestService:
             ),
         )
         self._catch_up()
+        if not result.idempotent_replay:
+            self._notify_observation(observation.object_id, 1)
         return IngestReceipt(
             observation_id=observation.object_id,
             world_revision=result.world_revision,
@@ -1111,6 +1125,8 @@ class RealityIngestService:
             world_revision = result.world_revision
 
         self._catch_up()
+        for observation in new_objects:
+            self._notify_observation(observation.object_id, 1)
         return MechanicalSeriesReceipt(
             series_id=series_id,
             segment_observation_ids=tuple(segment_ids),
