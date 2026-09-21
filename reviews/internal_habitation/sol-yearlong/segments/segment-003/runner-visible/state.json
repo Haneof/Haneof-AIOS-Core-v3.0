@@ -1,20 +1,20 @@
 {
   "branch": "arena/01a0bf95-haneof-aios-core-v3-0",
   "export_rule": "Only first missing semantic request; no hidden fixture copied.",
-  "head_sha": "5df32a6ea1d4178fba8d320612b62a99aa5b9832",
+  "head_sha": "51a2a2e6996a440b99a1849d52c3209aa2fc57e0",
   "pending_blocks_printed": 1,
-  "run_id": 35556164080,
+  "run_id": 35556210450,
   "runner_attestation": {
     "current_state": {
-      "delivered_external_events": 10,
-      "index_watermark": 177,
-      "last_consumed_external_event_id": "d036-chat-18",
+      "delivered_external_events": 12,
+      "index_watermark": 181,
+      "last_consumed_external_event_id": "d038-order-confirmed",
       "resident_replayed_calls": 17,
-      "simulated_clock": "2027-01-22T08:15:00+00:00",
+      "simulated_clock": "2027-01-22T18:20:00+00:00",
       "status": "pending",
-      "summary_replayed_calls": 8,
-      "world_revision": 177,
-      "world_sha256": "91ee8cba68ba1c4628ecf7d5fcd41551819ce204fa5b1eb3d98810f4e9f10787"
+      "summary_replayed_calls": 9,
+      "world_revision": 181,
+      "world_sha256": "5774a3312aba2fc15502d398dc2b1eeec75bf44788f77caad19e53f1c0521ddf"
     },
     "expected_source_revision": 145,
     "expected_subject": "sol-resident-20260921-001",
@@ -30,14 +30,14 @@
     "source_world_sha256": "ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8"
   },
   "state": {
-    "delivered_external_events": 10,
-    "index_watermark": 177,
-    "last_consumed_external_event_id": "d036-chat-18",
+    "delivered_external_events": 12,
+    "index_watermark": 181,
+    "last_consumed_external_event_id": "d038-order-confirmed",
     "resident_replayed_calls": 17,
-    "simulated_clock": "2027-01-22T08:15:00+00:00",
+    "simulated_clock": "2027-01-22T18:20:00+00:00",
     "status": "pending",
-    "summary_replayed_calls": 8,
-    "world_revision": 177,
-    "world_sha256": "91ee8cba68ba1c4628ecf7d5fcd41551819ce204fa5b1eb3d98810f4e9f10787"
+    "summary_replayed_calls": 9,
+    "world_revision": 181,
+    "world_sha256": "5774a3312aba2fc15502d398dc2b1eeec75bf44788f77caad19e53f1c0521ddf"
   }
 }
