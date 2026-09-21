@@ -496,12 +496,26 @@ class AttentionRouter:
         self.wake_bus = wake_bus
         self.subject_id = subject_id.strip()
 
-    def next_dispatchable(self) -> Wake | None:
+    def next_dispatchable(
+        self,
+        *,
+        now: datetime | None = None,
+        background_batch_window_seconds: int = 60,
+    ) -> Wake | None:
         """Choose the next non-conversation Wake by mechanical routing class.
 
-        INTERRUPT always precedes BACKGROUND.  REVIEW_QUEUE is deliberately
-        invisible here and can only be consumed by periodic review.
+        INTERRUPT always dispatches immediately and precedes BACKGROUND.
+        REVIEW_QUEUE is deliberately invisible here and can only be consumed by
+        periodic review.
+
+        When now is supplied, BACKGROUND wakes are held for one short mechanical
+        coalescing window measured from the oldest pending BACKGROUND wake. This gives
+        sibling world changes time to accumulate before one Resident invocation. The
+        wait is scheduling only; it never infers whether a change is important.
         """
+
+        if background_batch_window_seconds < 0:
+            raise ValueError("background_batch_window_seconds must be >= 0")
 
         candidates = [
             wake
@@ -517,21 +531,56 @@ class AttentionRouter:
         if not candidates:
             return None
 
-        route_rank = {
-            AttentionClass.INTERRUPT: 0,
-            AttentionClass.BACKGROUND: 1,
-        }
-        candidates.sort(
+        interrupts = [
+            wake
+            for wake in candidates
+            if self.wake_bus.attention_class_for_wake(wake)
+            is AttentionClass.INTERRUPT
+        ]
+        if interrupts:
+            interrupts.sort(
+                key=lambda wake: (
+                    -wake.priority,
+                    as_utc(wake.first_hit_at, "first_hit_at"),
+                    wake.object_id,
+                )
+            )
+            return interrupts[0]
+
+        backgrounds = [
+            wake
+            for wake in candidates
+            if self.wake_bus.attention_class_for_wake(wake)
+            is AttentionClass.BACKGROUND
+        ]
+        if not backgrounds:
+            return None
+
+        if now is None or background_batch_window_seconds == 0:
+            backgrounds.sort(
+                key=lambda wake: (
+                    -wake.priority,
+                    as_utc(wake.first_hit_at, "first_hit_at"),
+                    wake.object_id,
+                )
+            )
+            return backgrounds[0]
+
+        moment = as_utc(now, "now")
+        backgrounds.sort(
             key=lambda wake: (
-                route_rank[
-                    self.wake_bus.attention_class_for_wake(wake)
-                ],
-                -wake.priority,
                 as_utc(wake.first_hit_at, "first_hit_at"),
+                -wake.priority,
                 wake.object_id,
             )
         )
-        return candidates[0]
+        oldest = backgrounds[0]
+        ready_at = as_utc(oldest.first_hit_at, "first_hit_at") + timedelta(
+            seconds=background_batch_window_seconds
+        )
+        if moment < ready_at:
+            return None
+        return oldest
 
     def pending_review_queue(self) -> tuple[Wake, ...]:
         """Return durable low-urgency Wakes reserved for periodic Resident review."""
@@ -579,6 +628,7 @@ class AttentionRouter:
         now: datetime,
         window_seconds: int = 60,
         max_wakes: int = 16,
+        anchor_wake_id: str | None = None,
     ) -> AttentionBundleReceipt | None:
         moment = as_utc(now, "now")
         if window_seconds < 0:
@@ -586,8 +636,7 @@ class AttentionRouter:
         if max_wakes < 2:
             raise ValueError("max_wakes must be >= 2")
 
-        cutoff = moment - timedelta(seconds=window_seconds)
-        eligible = [
+        pending_background = [
             wake
             for wake in self.wake_bus.pending_wakes()
             if wake.wake_source
@@ -599,8 +648,45 @@ class AttentionRouter:
             }
             and self.wake_bus.attention_class_for_wake(wake)
             is AttentionClass.BACKGROUND
-            and cutoff <= as_utc(wake.last_hit_at, "last_hit_at") <= moment
-        ][:max_wakes]
+            and as_utc(wake.first_hit_at, "first_hit_at") <= moment
+        ]
+        pending_background.sort(
+            key=lambda wake: (
+                as_utc(wake.first_hit_at, "first_hit_at"),
+                -wake.priority,
+                wake.object_id,
+            )
+        )
+
+        if anchor_wake_id is None:
+            cutoff = moment - timedelta(seconds=window_seconds)
+            eligible = [
+                wake
+                for wake in pending_background
+                if cutoff <= as_utc(wake.last_hit_at, "last_hit_at") <= moment
+            ][:max_wakes]
+        else:
+            anchor = next(
+                (
+                    wake
+                    for wake in pending_background
+                    if wake.object_id == str(anchor_wake_id)
+                ),
+                None,
+            )
+            if anchor is None:
+                return None
+            window_start = as_utc(anchor.first_hit_at, "first_hit_at")
+            window_end = window_start + timedelta(seconds=window_seconds)
+            if moment < window_end:
+                return None
+            eligible = [
+                wake
+                for wake in pending_background
+                if window_start
+                <= as_utc(wake.first_hit_at, "first_hit_at")
+                <= window_end
+            ][:max_wakes]
 
         if len(eligible) < 2:
             return None
