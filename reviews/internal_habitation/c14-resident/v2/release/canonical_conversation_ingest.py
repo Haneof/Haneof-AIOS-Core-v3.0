@@ -5,7 +5,7 @@ import argparse
 import hashlib
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -188,7 +188,10 @@ def _verify_exact_canonical_user(
             raise CanonicalConversationIngestError(
                 "canonical user Observation point time missing"
             )
-        if _parse_time(value).astimezone() != expected_time.astimezone():
+        if (
+            _parse_time(value).astimezone(timezone.utc)
+            != expected_time.astimezone(timezone.utc)
+        ):
             raise CanonicalConversationIngestError(
                 "canonical user Observation timestamp mismatch"
             )
