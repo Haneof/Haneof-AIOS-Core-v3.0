@@ -1,0 +1,65 @@
+name: t34-candidate-gates
+
+on:
+  push:
+    branches:
+      - "ci/t34-exec-001-candidate-gates-20260921"
+    paths:
+      - ".github/workflows/t34-candidate-gates.yml"
+
+jobs:
+  required-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: da14638fc0f8cf14bad6b5315988d7c7db691ac8
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+
+      - name: T34 targeted execution regression
+        run: pytest -q tests/integration/test_v3_execution_world.py
+
+      - name: P12 execution gate
+        run: |
+          pytest -q \
+            tests/integration/test_v3_execution_world.py \
+            tests/integration/test_v3_fused_turn_runtime.py \
+            tests/integration/test_v3_ai_world.py \
+            tests/integration/test_v3_cognition_revision.py \
+            tests/integration/test_v3_memory_recommendation.py \
+            tests/integration/test_m0_prime_store_delta_and_search.py \
+            tests/runtime/test_cognitive_runtime.py
+
+      - name: Fused turn runtime gate
+        run: pytest -q tests/integration/test_v3_fused_turn_runtime.py tests/runtime/test_cognitive_runtime.py
+
+      - name: C09 wake dispatch regression
+        run: |
+          pytest -q \
+            tests/integration/test_v3_wake_dispatch.py \
+            tests/integration/test_v3_execution_world.py \
+            tests/integration/test_v3_periodic_review.py \
+            tests/integration/test_v3_reality_ingest.py \
+            tests/integration/test_v3_fused_turn_runtime.py \
+            tests/runtime/test_cognitive_runtime.py
+
+      - name: P15 periodic review regression
+        run: |
+          pytest -q \
+            tests/integration/test_v3_periodic_review.py \
+            tests/integration/test_v3_fused_turn_runtime.py \
+            tests/integration/test_v3_ai_world.py \
+            tests/integration/test_v3_cognition_revision.py \
+            tests/integration/test_v3_execution_world.py \
+            tests/integration/test_v3_long_context_continuity.py \
+            tests/runtime/test_cognitive_runtime.py
+
+      - name: P16 habitation harness
+        run: pytest -q tests/habitation
+
+      - name: P16 convergence gate
+        run: pytest -q
