@@ -772,3 +772,98 @@ def test_resident_wake_can_register_followup_watch_for_future_reality(tmp_path):
     assert pending[0].wake_source is WakeSource.WATCH_MATCH
     assert pending[0].metadata["trigger_kind"] == "resident_attention_watch"
     assert pending[0].metadata["attention_class"] == "background"
+
+
+def test_periodic_review_can_inspect_mechanical_attention_outcomes(tmp_path):
+    store, index = _world(tmp_path)
+    evidence = Observation(
+        object_id="obs_attention_outcome_seed",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW),
+        learned_at=NOW,
+        recorded_at=NOW,
+        created_by="attention-outcome-test",
+        source_kind="system",
+        modality="marker",
+        value={"changed": True},
+        metadata={"dimension": "dim:test"},
+    )
+    store.commit(
+        [evidence],
+        OperationRequest(
+            operation_name="test.seed.attention.outcome",
+            expected_world_revision=0,
+            reason="seed attention outcome evidence",
+            idempotency_key="seed-attention-outcome",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index.catch_up()
+
+    saw_outcome = {"value": False}
+
+    def model(snapshot):
+        if snapshot.wake_reason == "watch_match":
+            return ModelDirective(response="后台判断完成。")
+
+        assert snapshot.wake_reason == "periodic_review"
+        if not snapshot.capability_history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="read_periodic_review_anchors",
+                        arguments={"offset": 0, "limit": 100},
+                    ),
+                )
+            )
+
+        anchors = snapshot.capability_history[-1].data
+        wake_anchors = [
+            item
+            for item in anchors
+            if item["object_type"] == "wake"
+            and "attention=background" in item["excerpt"]
+        ]
+        assert len(wake_anchors) == 1
+        assert "delivery=False" in wake_anchors[0]["excerpt"]
+        assert "termination=responded" in wake_anchors[0]["excerpt"]
+        saw_outcome["value"] = True
+        return ModelDirective(silence=True)
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+        max_tool_rounds=4,
+    )
+    signal = runtime.wake_bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.WATCH_MATCH,
+            rule_id="attention.outcome",
+            observed_at=NOW + timedelta(minutes=1),
+            evidence_refs=(ObjectRef(object_id=evidence.object_id, revision=1),),
+            dedupe_key="attention-outcome",
+            attention_class=AttentionClass.BACKGROUND,
+        )
+    )
+    dispatched = runtime.run_wake(
+        wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
+        now=NOW + timedelta(minutes=2),
+    )
+    assert dispatched.runtime is not None
+    assert dispatched.runtime.response == "后台判断完成。"
+    assert dispatched.delivery_response is None
+
+    from aios_core.review import ReviewSchedulePolicy
+
+    reviewed = runtime.run_periodic_review(
+        now=NOW + timedelta(hours=25),
+        policy=ReviewSchedulePolicy(
+            interval_hours=24,
+            lookback_hours=72,
+            max_candidates=80,
+            max_per_object_type=20,
+        ),
+    )
+    assert reviewed is not None
+    assert saw_outcome["value"] is True
