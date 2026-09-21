@@ -14,7 +14,7 @@ from aios_core.contracts.time import TemporalExtent
 from aios_core.query.search import WorldSearchIndex
 from aios_core.review import ReviewSchedulePolicy
 from aios_core.runtime.capabilities import CapabilityCall
-from aios_core.runtime.cognitive_runtime import ModelDirective
+from aios_core.runtime.cognitive_runtime import ModelDirective, ModelUsage
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.wake import WakeSignalRequest
@@ -249,10 +249,58 @@ def test_background_token_budget_fails_closed_without_provider_usage_telemetry(t
     assert result.runtime is None
     assert result.wake.state == "queued"
     assert (
-        "background_token_budget_requires_provider_usage_telemetry"
+        "background_token_budget_requires_preflight_token_bound"
         in result.step0.reasons
     )
     assert model_calls == 0
+
+
+def test_completed_background_wake_exposes_exact_token_usage_in_budget_status(tmp_path):
+    store, index = _world(tmp_path)
+    _commit_budget(store, max_wakes=3, max_model_calls=4)
+    ref = _commit_evidence(store, object_id="obs_exact_token_usage")
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda snapshot: ModelDirective(
+            silence=True,
+            usage=ModelUsage(
+                input_tokens=21,
+                output_tokens=9,
+                total_tokens=30,
+            ),
+        ),
+    )
+    wake = _emit_background(
+        runtime,
+        ref,
+        key="budget.exact-token-usage",
+        observed_at=NOW + timedelta(minutes=1),
+    )
+    result = runtime.run_wake(
+        wake_ref=ObjectRef(object_id=wake.wake_id, revision=1),
+        now=NOW + timedelta(minutes=2),
+    )
+
+    assert result.runtime is not None
+    assert result.runtime.model_usage_complete is True
+    assert result.runtime.model_total_tokens == 30
+
+    current = runtime.wake_bus.current_wake(result.wake.wake_id)
+    assert current.metadata["model_usage_complete"] is True
+    assert current.metadata["model_input_tokens"] == 21
+    assert current.metadata["model_output_tokens"] == 9
+    assert current.metadata["model_total_tokens"] == 30
+
+    status = runtime.background_budget_gate.status(
+        now=NOW + timedelta(minutes=3),
+    )
+    assert status["used_wakes"] == 1
+    assert status["used_model_calls"] == 1
+    assert status["used_tokens"] == 30
+    assert status["token_usage_available"] is True
+    assert status["remaining_tokens"] is None
 
 
 def test_budget_hard_deny_suppresses_background_wake(tmp_path):
