@@ -74,12 +74,45 @@ class ReleaseOperatorTests(unittest.TestCase):
         )
         return json.loads(proc.stdout)
 
+    def seed_a_state(self, last_acked: int) -> None:
+        manifest = json.loads(self.manifest_path.read_text(encoding="utf-8"))
+        receipts = []
+        for seq in range(1, last_acked + 1):
+            event = self.fixture["events"][seq - 1]
+            receipts.append(
+                {
+                    "fixture_sha256": manifest["fixture_sha256"],
+                    "sequence": seq,
+                    "event_id": event["event_id"],
+                    "occurred_at": event["occurred_at"],
+                    "ingest_ref": f"obs_{seq:03d}@1",
+                }
+            )
+        state = {
+            "state_version": "c14-release-state-v2",
+            "fixture_version": "c14-resident-fixture-v2",
+            "schema_version": "c14-resident-event-v2",
+            "release_contract_version": "c14-sequential-release-v2",
+            "fixture_sha256": manifest["fixture_sha256"],
+            "active_phase": "A",
+            "last_acked_sequence": last_acked,
+            "last_acked_event_id": (
+                None if last_acked == 0 else self.fixture["events"][last_acked - 1]["event_id"]
+            ),
+            "next_sequence": last_acked + 1,
+            "pending_reveal": None,
+            "receipts": receipts,
+        }
+        self.state.write_text(
+            json.dumps(state, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+
     def advance_a_to_24(self) -> None:
-        self.init_a()
-        for seq in range(1, 25):
-            event = self.reveal("A")
-            self.assertEqual(event["sequence"], seq)
-            self.ack("A", event)
+        self.seed_a_state(23)
+        event = self.reveal("A")
+        self.assertEqual(event["sequence"], 24)
+        self.ack("A", event)
 
     def test_01_init_phase_a(self) -> None:
         proc = self.run_op("init", "--phase", "A", "--state", str(self.state))
@@ -163,10 +196,7 @@ class ReleaseOperatorTests(unittest.TestCase):
         self.assertIn("digest mismatch", proc.stderr)
 
     def test_08_phase_a_cursor_24_reveal_and_ack_to_25(self) -> None:
-        self.init_a()
-        for seq in range(1, 24):
-            event = self.reveal("A")
-            self.ack("A", event)
+        self.seed_a_state(23)
         event24 = self.reveal("A")
         self.assertEqual(event24["sequence"], 24)
         self.assertEqual(event24["event_id"], "c14resv2-024")
