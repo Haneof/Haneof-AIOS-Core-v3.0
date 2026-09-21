@@ -217,3 +217,47 @@ def test_missing_usage_keeps_runtime_token_total_unknown():
     assert result.model_input_tokens is None
     assert result.model_output_tokens is None
     assert result.model_total_tokens is None
+
+
+
+def test_partial_multi_round_usage_never_becomes_a_fake_total():
+    registry = CapabilityRegistry()
+    registry.register(
+        CapabilitySpec(
+            name="search_world",
+            description="search",
+            kind=CapabilityKind.READ,
+        ),
+        lambda query: [],
+    )
+    calls = 0
+
+    def model(snapshot):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="search_world",
+                        arguments={"query": "x"},
+                    ),
+                ),
+                usage=ModelUsage(
+                    input_tokens=10,
+                    output_tokens=2,
+                    total_tokens=12,
+                ),
+            )
+        return ModelDirective(response="done")
+
+    result = CognitiveRuntime(
+        registry=registry,
+        model_handler=model,
+    ).run_turn("continue")
+
+    assert result.model_rounds == 2
+    assert result.model_usage_complete is False
+    assert result.model_input_tokens is None
+    assert result.model_output_tokens is None
+    assert result.model_total_tokens is None
