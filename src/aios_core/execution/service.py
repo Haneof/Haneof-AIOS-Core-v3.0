@@ -707,11 +707,15 @@ class GoalTaskActionService:
                     raise ValueError(
                         "EvidenceSet with missing coverage cannot complete a Task"
                     )
+            nested_allowed = frozenset(
+                set(allowed_types)
+                | {ObjectType.OBSERVATION, ObjectType.EVIDENCE_SET}
+            )
             for member_ref in member_refs:
                 self._validate_world_evidence_ref(
                     task=task,
                     ref=member_ref,
-                    allowed_types=allowed_types,
+                    allowed_types=nested_allowed,
                     seen=stack,
                 )
             return payload
