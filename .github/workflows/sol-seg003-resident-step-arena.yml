@@ -203,32 +203,27 @@ jobs:
         run: |
           set -uo pipefail
           python - <<'PY'
+          import base64
+          import hashlib
+          import math
+          import zlib
           from pathlib import Path
 
-          import hashlib
-
-          def escape(text: str) -> str:
-              return text.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
-
-          LIMIT = 3600  # escaped bytes per annotation, safely below the platform cap
+          CHUNK = 3600  # escaped ASCII bytes per annotation
+          MAX_CHUNKS = 8  # platform keeps the first 10 annotations of a step
 
           def emit(title: str, text: str) -> None:
-              pieces: list[str] = []
-              current = ""
-              for line in text.split("\n"):
-                  encoded = escape(line)
-                  if current and len((current + "%0A" + encoded).encode("utf-8")) > LIMIT:
-                      pieces.append(current)
-                      current = encoded
-                  else:
-                      current = current + "%0A" + encoded if current else encoded
-              pieces.append(current)
-              for index, piece in enumerate(pieces, start=1):
-                  suffix = "" if len(pieces) == 1 else f"-{index}of{len(pieces)}"
-                  print(f"::warning title={title}{suffix}::{piece}")
-              digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
-              print(f"::warning title={title}-integrity::{digest}:{len(text.encode('utf-8'))}:{len(pieces)}")
-              print(f"{title}: emitted {len(pieces)} annotation chunk(s), {len(text.encode('utf-8'))} bytes")
+              raw = text.encode("utf-8")
+              payload = base64.b64encode(zlib.compress(raw, 9)).decode("ascii")
+              chunks = max(1, min(MAX_CHUNKS, math.ceil(len(payload) / CHUNK)))
+              size = math.ceil(len(payload) / chunks)
+              for index in range(chunks):
+                  piece = payload[index * size : (index + 1) * size]
+                  suffix = "" if chunks == 1 else f"-{index + 1}of{chunks}"
+                  print(f"::warning title={title}-z{suffix}::{piece}")
+              digest = hashlib.sha256(raw).hexdigest()
+              print(f"::warning title={title}-z-integrity::{digest}:{len(raw)}:{chunks}")
+              print(f"{title}: {len(raw)} bytes -> {len(payload)} zlib-b64 chars in {chunks} chunk(s)")
 
           for name in ("sanitized.txt", "state.json", "bridge-exit-code.txt"):
               path = Path("artifacts/segment-003") / name
