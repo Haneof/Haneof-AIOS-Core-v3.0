@@ -66,6 +66,7 @@ class MaintenanceClass(StrEnum):
     INDEX_META = "index_meta"
     POLICY_SYNC = "policy_sync"
     PERIODIC_REVIEW = "periodic_review"
+    ATTENTION_BUNDLE = "attention_bundle"
     WAKE_SCHEDULER = "wake_scheduler"
 
 
