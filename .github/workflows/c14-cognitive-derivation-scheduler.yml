@@ -17,167 +17,112 @@ on:
       - "tests/integration/test_v3_c14_cognitive_derivation_scheduler.py"
       - ".github/workflows/c14-cognitive-derivation-scheduler.yml"
 
-x-test-setup: &test-setup
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
-      with:
-        python-version: "3.12"
-    - run: python -m pip install --upgrade pip
-    - run: pip install -e ".[dev]"
-
 jobs:
   c14-scheduler-targeted:
-    <<: *test-setup
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - run: python -m pip install --upgrade pip
+        with: {python-version: "3.12"}
       - run: pip install -e ".[dev]"
-      - name: C14 scheduler targeted tests
-        run: |
-          pytest -q \
-            tests/integration/test_v3_c14_cognitive_derivation_scheduler.py \
-            tests/integration/test_v3_dimension_summary.py \
-            tests/integration/test_v3_summary_hierarchy.py
+      - run: pytest -q tests/integration/test_v3_c14_cognitive_derivation_scheduler.py tests/integration/test_v3_dimension_summary.py tests/integration/test_v3_summary_hierarchy.py
 
   dimension-summary:
-    <<: *test-setup
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+        with: {python-version: "3.12"}
       - run: pip install -e ".[dev]"
       - run: pytest -q tests/integration/test_v3_dimension_summary.py tests/integration/test_v3_summary_hierarchy.py
 
   world-index:
-    <<: *test-setup
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+        with: {python-version: "3.12"}
       - run: pip install -e ".[dev]"
       - run: pytest -q tests/integration/test_m0_prime_store_delta_and_search.py
 
   c09-wake-dispatch:
-    <<: *test-setup
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+        with: {python-version: "3.12"}
       - run: pip install -e ".[dev]"
-      - run: |
-          pytest -q \
-            tests/integration/test_v3_wake_dispatch.py \
-            tests/integration/test_v3_execution_world.py \
-            tests/integration/test_v3_periodic_review.py \
-            tests/integration/test_v3_reality_ingest.py \
-            tests/integration/test_v3_fused_turn_runtime.py \
-            tests/runtime/test_cognitive_runtime.py
+      - run: pytest -q tests/integration/test_v3_wake_dispatch.py tests/integration/test_v3_execution_world.py tests/integration/test_v3_periodic_review.py tests/integration/test_v3_reality_ingest.py tests/integration/test_v3_fused_turn_runtime.py tests/runtime/test_cognitive_runtime.py
 
   cognitive-runtime:
-    <<: *test-setup
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+        with: {python-version: "3.12"}
       - run: pip install -e ".[dev]"
       - run: pytest -q tests/runtime/test_cognitive_runtime.py
 
   fused-turn-runtime:
-    <<: *test-setup
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+        with: {python-version: "3.12"}
       - run: pip install -e ".[dev]"
       - run: pytest -q tests/integration/test_v3_fused_turn_runtime.py tests/runtime/test_cognitive_runtime.py
 
   p15-periodic-review:
-    <<: *test-setup
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+        with: {python-version: "3.12"}
       - run: pip install -e ".[dev]"
-      - run: |
-          pytest -q \
-            tests/integration/test_v3_periodic_review.py \
-            tests/integration/test_v3_fused_turn_runtime.py \
-            tests/integration/test_v3_ai_world.py \
-            tests/integration/test_v3_cognition_revision.py \
-            tests/integration/test_v3_execution_world.py \
-            tests/integration/test_v3_long_context_continuity.py \
-            tests/runtime/test_cognitive_runtime.py
+      - run: pytest -q tests/integration/test_v3_periodic_review.py tests/integration/test_v3_fused_turn_runtime.py tests/integration/test_v3_ai_world.py tests/integration/test_v3_cognition_revision.py tests/integration/test_v3_execution_world.py tests/integration/test_v3_long_context_continuity.py tests/runtime/test_cognitive_runtime.py
 
   c13-metering:
-    <<: *test-setup
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+        with: {python-version: "3.12"}
       - run: pip install -e ".[dev]"
-      - run: |
-          pytest -q \
-            tests/runtime/test_metering_ledger.py \
-            tests/integration/test_v3_background_budget_gate.py \
-            tests/integration/test_v3_periodic_review.py
+      - run: pytest -q tests/runtime/test_metering_ledger.py tests/integration/test_v3_background_budget_gate.py tests/integration/test_v3_periodic_review.py
 
   p14-long-context:
-    <<: *test-setup
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+        with: {python-version: "3.12"}
       - run: pip install -e ".[dev]"
-      - run: |
-          pytest -q \
-            tests/integration/test_v3_long_context_continuity.py \
-            tests/integration/test_v3_conversation_world_ingest.py \
-            tests/integration/test_v3_dimension_summary.py \
-            tests/integration/test_v3_fused_turn_runtime.py
+      - run: pytest -q tests/integration/test_v3_long_context_continuity.py tests/integration/test_v3_conversation_world_ingest.py tests/integration/test_v3_dimension_summary.py tests/integration/test_v3_fused_turn_runtime.py
 
   memory-recommendation-t28:
-    <<: *test-setup
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+        with: {python-version: "3.12"}
       - run: pip install -e ".[dev]"
-      - run: |
-          pytest -q \
-            tests/integration/test_v3_memory_recommendation.py \
-            tests/integration/test_m0_prime_store_delta_and_search.py
+      - run: pytest -q tests/integration/test_v3_memory_recommendation.py tests/integration/test_m0_prime_store_delta_and_search.py
 
   p16-habitation-harness:
-    <<: *test-setup
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+        with: {python-version: "3.12"}
       - run: pip install -e ".[dev]"
       - run: pytest -q tests/habitation
 
   p16-convergence-gate:
-    <<: *test-setup
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+        with: {python-version: "3.12"}
       - run: pip install -e ".[dev]"
       - name: Full AIOS Core and P16 regression
         run: pytest -q
