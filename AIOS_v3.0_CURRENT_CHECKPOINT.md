@@ -1251,3 +1251,40 @@ Test / Gate:
 - P16 campaign remains blocked until the full C14 chain closes.
 - This window does **not** start C14-LOOP-001.
 
+
+
+---
+
+## 2026-09-21 — C14-RUNTIME-001 PM acceptance found side-effect escape blocker
+
+Reviewed main: `97554b041768d93a6ab9f83d80e87f27972eeaf0`
+
+PR #61 correctly closed the intended Claim paths:
+
+- same Resident CognitiveRuntime;
+- exact derivation cockpit;
+- shared provenance resolver;
+- Summary-only / old-AI-Claim recursive support rejected;
+- user/Outcome grounding preserved;
+- T28 protected;
+- silence valid;
+- BACKGROUND delivery suppressed;
+- C13 non-world metering preserved.
+
+However PM side-effect audit found that `COGNITIVE_DERIVATION` still falls through to the general durable-write allowlist after denying Experience/Policy writers.
+
+As a result it can still request writes such as Event, Entity/Relation, Dimension, Goal/Task/Action, and AttentionWatch. Those handlers do not uniformly invoke the C14 leaf-grounding validator; Event and Dimension paths were specifically verified to enforce ordinary pinned/scope rules rather than the C14 support-provenance closure.
+
+This creates a route around the intended "leaf-grounded cognition OR silence" contract and can also create background semantic/execution spam.
+
+Canonical review:
+
+`governance/C14_RUNTIME_PM_ACCEPTANCE_REVIEW_2026-09-21.md`
+
+Next action:
+
+`C14-RUNTIME-HARDEN-001`
+
+Preferred minimal fix: for `COGNITIVE_DERIVATION`, authorize only `commit_claim`, `commit_ai_world_claim`, `revise_claim`, and `retract_claim` as side-effecting capabilities. Keep all legitimate read capabilities. Do not change normal user-turn or Periodic Review write semantics.
+
+`C14-LOOP-001` is blocked until this hardening task is merged and independently accepted.
