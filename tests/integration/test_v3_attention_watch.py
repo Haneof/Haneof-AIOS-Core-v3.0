@@ -867,3 +867,155 @@ def test_periodic_review_can_inspect_mechanical_attention_outcomes(tmp_path):
     )
     assert reviewed is not None
     assert saw_outcome["value"] is True
+
+
+def test_one_shot_attention_watch_matches_once_then_leaves_active_set(tmp_path):
+    store, index = _world(tmp_path)
+    reason = Observation(
+        object_id="obs_one_shot_watch_reason",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW),
+        learned_at=NOW,
+        recorded_at=NOW,
+        created_by="attention-lifecycle-test",
+        source_kind="user_note",
+        modality="text",
+        value="下一次设备状态变化时再看一次。",
+        metadata={"dimension": "dim:user_ai_interaction"},
+    )
+    store.commit(
+        [reason],
+        OperationRequest(
+            operation_name="test.seed.one.shot.watch",
+            expected_world_revision=0,
+            reason="seed one-shot attention watch",
+            idempotency_key="seed-one-shot-watch",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index.catch_up()
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda snapshot: ModelDirective(silence=True),
+    )
+    watch = runtime.attention_watches.create(
+        AttentionWatchRequest(
+            title="下一次设备变化",
+            dimensions=("dim:device",),
+            reason_refs=(ObjectRef(object_id=reason.object_id, revision=1),),
+            source_kind="device_state",
+            mode="one_shot",
+            attention_class=AttentionClass.BACKGROUND,
+        ),
+        created_at=NOW,
+    )
+
+    adapter = SourceAdapterSpec(
+        adapter_id="device.one.shot",
+        source_kind="device_state",
+        dimension="dim:device",
+        source_class=SourceClass.USER,
+        default_modality="structured_record",
+    )
+    runtime.reality_ingest.ingest_record(
+        adapter,
+        RealityRecord(
+            external_record_id="device-change-1",
+            occurred_at=NOW + timedelta(minutes=1),
+            received_at=NOW + timedelta(minutes=1),
+            value={"state": "changed"},
+        ),
+    )
+
+    first_pending = runtime.wake_bus.pending_wakes()
+    assert len(first_pending) == 1
+    assert first_pending[0].metadata["watch_mode"] == "one_shot"
+    assert runtime.attention_watches.current() == ()
+    latest_watch = store.get_payload(watch.task_id)
+    assert latest_watch["revision"] == 2
+    assert latest_watch["task_state"] == "ready"
+    assert (
+        latest_watch["metadata"]["attention_watch_match_observation_ref"]["object_id"]
+        != ""
+    )
+
+    runtime.reality_ingest.ingest_record(
+        adapter,
+        RealityRecord(
+            external_record_id="device-change-2",
+            occurred_at=NOW + timedelta(minutes=2),
+            received_at=NOW + timedelta(minutes=2),
+            value={"state": "changed_again"},
+        ),
+    )
+    second_pending = runtime.wake_bus.pending_wakes()
+    assert len(second_pending) == 1
+    assert second_pending[0].object_id == first_pending[0].object_id
+
+
+def test_expired_attention_watch_is_retired_before_late_fact_can_wake(tmp_path):
+    store, index = _world(tmp_path)
+    reason = Observation(
+        object_id="obs_expiring_watch_reason",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW),
+        learned_at=NOW,
+        recorded_at=NOW,
+        created_by="attention-lifecycle-test",
+        source_kind="user_note",
+        modality="text",
+        value="只在接下来五分钟关注这个传感器。",
+        metadata={"dimension": "dim:user_ai_interaction"},
+    )
+    store.commit(
+        [reason],
+        OperationRequest(
+            operation_name="test.seed.expiring.watch",
+            expected_world_revision=0,
+            reason="seed expiring attention watch",
+            idempotency_key="seed-expiring-watch",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index.catch_up()
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda snapshot: ModelDirective(silence=True),
+    )
+    watch = runtime.attention_watches.create(
+        AttentionWatchRequest(
+            title="五分钟传感器观察",
+            dimensions=("dim:temporary_sensor",),
+            reason_refs=(ObjectRef(object_id=reason.object_id, revision=1),),
+            source_kind="temporary_sensor",
+            expires_at=NOW + timedelta(minutes=5),
+        ),
+        created_at=NOW,
+    )
+
+    runtime.reality_ingest.ingest_record(
+        SourceAdapterSpec(
+            adapter_id="temporary.sensor",
+            source_kind="temporary_sensor",
+            dimension="dim:temporary_sensor",
+            source_class=SourceClass.SENSOR,
+            default_modality="structured_record",
+        ),
+        RealityRecord(
+            external_record_id="late-sensor-fact",
+            occurred_at=NOW + timedelta(minutes=10),
+            received_at=NOW + timedelta(minutes=10),
+            value={"value": 1},
+        ),
+    )
+
+    assert runtime.wake_bus.pending_wakes() == ()
+    assert runtime.attention_watches.current() == ()
+    latest_watch = store.get_payload(watch.task_id)
+    assert latest_watch["revision"] == 2
+    assert latest_watch["task_state"] == "expired"
+    assert "attention_watch_expired_at" in latest_watch["metadata"]
