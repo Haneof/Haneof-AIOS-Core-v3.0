@@ -1518,3 +1518,36 @@ Next task:
 Required outcome: sealed fixture v2 + new digest + improved hidden design + executable mechanical release helper. No Core changes and no Resident run.
 
 `C14-RES-A-001` is blocked until v2 independently passes.
+
+
+---
+
+## 2026-09-21 — C14 fixture v2 semantic PASS / release-ack durability blocker
+
+Independent PM review confirms that fixture v2 closes the v1 semantic-design blockers:
+
+- the positive case is genuinely cross-dimensional;
+- Phase-B planning is underdetermined from current facts;
+- blind reveal hides future/evaluator material and enforces the 24/25 phase boundary.
+
+One mechanical blocker remains before real Resident execution:
+
+Current `release_operator.py ack` accepts any syntactically valid `object_id@revision` and does not prove that the exact revision exists in durable AIOS storage or is bound to the currently revealed event.
+
+Therefore a fabricated value such as `fake_object@1` can satisfy the current ack format check and advance the release cursor.
+
+Canonical review:
+
+`reviews/C14_RES_FIX_002_PM_REVIEW_2026-09-21.md`
+
+Next task:
+
+`C14-RES-FIX-003`
+
+Requirements:
+- keep fixture v2 bytes/digest frozen;
+- verify ack against actual durable AIOS World or an equivalently trusted World-derived ingest receipt;
+- bind exact durable ref to current released event using mechanical, non-semantic fields;
+- no Core changes and no Resident run.
+
+`C14-RES-A-001` remains blocked until this passes.
