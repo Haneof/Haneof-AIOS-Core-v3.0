@@ -1,5 +1,5 @@
 {
-  "decision_key": "d507119be49d4cba8383e5b2396077086598799d8a13c955b28b45750fa303d4",
+  "decision_key": "302fd1d5f7b9dd81eb01d4ceabbb070c50660193a2baca64db929c5941a2d81c",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-resident.pending.v1",
   "simulated_clock": "2027-01-20T09:10:00+00:00",
@@ -540,7 +540,33 @@
         "side_effecting": true
       }
     ],
-    "capability_history": [],
+    "capability_history": [
+      {
+        "call_id": "seg003-jan20-production-records",
+        "data": [
+          {
+            "dimension": "dim:user_ai_interaction",
+            "excerpt": "今天牛角包确实晚了一些。我第一反应是烤箱拖慢了，但先别把这个当原因，看看今天留下来的记录再说。",
+            "object_id": "obs_conv_user_0f575c8301820e6a83ab4e38",
+            "object_type": "observation",
+            "retrieval_score": 0,
+            "revision": 1
+          },
+          {
+            "dimension": "dim:production_log",
+            "excerpt": "",
+            "object_id": "obs_src_4ca5f23159a0a691650430b5",
+            "object_type": "observation",
+            "retrieval_score": 0,
+            "revision": 1
+          }
+        ],
+        "error_code": null,
+        "error_message": null,
+        "name": "search_timeline",
+        "ok": true
+      }
+    ],
     "cockpit": {
       "ai_identity": {},
       "capability_catalog": [
@@ -892,8 +918,8 @@
       "truncated": false,
       "user_input": "今天牛角包确实晚了一些。我第一反应是烤箱拖慢了，但先别把这个当原因，看看今天留下来的记录再说。"
     },
-    "remaining_tool_rounds": 8,
-    "round_index": 0,
+    "remaining_tool_rounds": 7,
+    "round_index": 1,
     "user_input": "今天牛角包确实晚了一些。我第一反应是烤箱拖慢了，但先别把这个当原因，看看今天留下来的记录再说。",
     "wake_reason": "user_interaction"
   },
