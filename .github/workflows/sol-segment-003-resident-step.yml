@@ -190,10 +190,11 @@ jobs:
           cp artifacts/segment-003/stdout.txt reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_stdout.txt || echo "no stdout.txt"
           cp artifacts/segment-003/world.sha256 reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_world.sha256 || echo "no world.sha256"
           cp artifacts/segment-003/merged-decisions.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_merged_decisions.json || echo "no merged"
+          date -u +%Y-%m-%dT%H:%M:%SZ > reviews/internal_habitation/sol-yearlong/segments/segment-003/last_run.txt
           ls -lh reviews/internal_habitation/sol-yearlong/segments/segment-003/
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_snapshot.json reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_summary.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_state.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_stdout.txt reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_world.sha256 reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_merged_decisions.json || true
+          git add reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_snapshot.json reviews/internal_habitation/sol-yearlong/segments/segment-003/pending_summary.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_state.json reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_stdout.txt reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_world.sha256 reviews/internal_habitation/sol-yearlong/segments/segment-003/latest_merged_decisions.json reviews/internal_habitation/sol-yearlong/segments/segment-003/last_run.txt || true
           git status
           if git diff --cached --quiet; then
             echo "No changes to commit"
