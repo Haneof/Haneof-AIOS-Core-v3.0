@@ -1,0 +1,35 @@
+name: t34-reproduction
+
+on:
+  push:
+    branches:
+      - "fix/t34-exec-001-cancel-authorize-20260921"
+    paths:
+      - ".github/workflows/t34-reproduction.yml"
+
+jobs:
+  pre-fix-reproduction:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: d622958dc286bfae816fd4f2e36d9fb063d8252e
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - name: Reproduce T34 on latest-main implementation before fix
+        shell: bash
+        run: |
+          set +e
+          pytest -q tests/integration/test_v3_execution_world.py \
+            -k "cancelled_parent_task_cannot_authorize_retry_or_restart or cancel_authorize_race_is_fail_closed"
+          status=$?
+          set -e
+          if [ "$status" -eq 0 ]; then
+            echo "T34_REPRO_RESULT=UNEXPECTED_GREEN"
+            exit 1
+          fi
+          echo "T34_REPRO_RESULT=BUG_REPRODUCED"
+          echo "T34_PRE_FIX_SHA=d622958dc286bfae816fd4f2e36d9fb063d8252e"
