@@ -26,12 +26,18 @@
  "evidence_manifest": {
   "file_count": 376,
   "path": "reviews/internal_habitation/c14-resident/v2/runs/resident-a-restart-20260921/handoff/evidence_manifest.json",
-  "sha256": "sha256:7d45f2575d2aa90293c0f3d5654b01dfc9ca9bf64c8069b63c12c04dc184c90c",
-  "total_bytes": 8637748
+  "sha256": "sha256:2da4d5ab4113ef36d736fa64f21013f36110d28190a092abb57074bdbaf13853",
+  "total_bytes": 8642720
+ },
+ "evidence_pr": {
+  "merged": false,
+  "state": "open",
+  "url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/pull/75"
  },
  "final_report": {
+  "note": "Contains the full §21 field list of the task's final-report section.",
   "path": "reviews/internal_habitation/c14-resident/v2/runs/resident-a-restart-20260921/handoff/FINAL_REPORT.md",
-  "sha256": "sha256:8f8e39fb94627af11f512c42161b87e48dbac7e6dda3342f7943f38e525d9f85"
+  "sha256": "sha256:66ce9ddfdd169169bd521e68e1fa664b258b7e016a43ce767a1224f42fe0ac4f"
  },
  "fixture": {
   "opened_by_resident": false,
@@ -43,7 +49,8 @@
   "Cursor 24 is the last processed cursor; cursor 25 was never revealed and Phase B was never initialized.",
   "All semantic output (Summary text, ModelDirective, capability calls, silence decisions) was authored by the Resident model at checkpoints; programs only transported snapshots, executed the specified capabilities, and stored receipts.",
   "No sealed fixture, evaluator, PM-review, or validation-protocol artifact was opened during the run.",
-  "Open item: the 10-21 work_outcome observation is a 4th consistent instance for the standing Claim; no wake was due after it, so no revision was performed."
+  "Open item: the 10-21 work_outcome observation is a 4th consistent instance for the standing Claim; no wake was due after it, so no revision was performed.",
+  "Post-freeze documentation patch (S26): FINAL_REPORT.md extended to the task's §21 field list (branch/SHA256s/wake refs/cognition create-revise-retract/silence count/review refs/evidence PR/blockers); manifest and HANDOFF digests regenerated. No cursor, World, release state, cognition or semantic content changed."
  ],
  "governance_note": "Resident does not mark C14-RES-A-001 DONE and does not mark C14-RES-B-001 READY; independent PM acceptance required. No merge performed.",
  "observations_count": 24,

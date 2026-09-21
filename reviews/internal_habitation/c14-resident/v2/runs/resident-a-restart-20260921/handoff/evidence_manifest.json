@@ -1316,9 +1316,9 @@
    "sha256": "sha256:2dc8a08b4a7591433c765a6144c91be2e33255c270f7573810e7a7af8e6c6f44"
   },
   {
-   "bytes": 4690,
+   "bytes": 9662,
    "path": "handoff/FINAL_REPORT.md",
-   "sha256": "sha256:8f8e39fb94627af11f512c42161b87e48dbac7e6dda3342f7943f38e525d9f85"
+   "sha256": "sha256:66ce9ddfdd169169bd521e68e1fa664b258b7e016a43ce767a1224f42fe0ac4f"
   },
   {
    "bytes": 607,
@@ -1890,5 +1890,5 @@
  "root": "reviews/internal_habitation/c14-resident/v2/runs/resident-a-restart-20260921",
  "run_id": "resident-a-restart-20260921",
  "task_id": "C14-RES-A-001",
- "total_bytes": 8637748
+ "total_bytes": 8642720
 }
