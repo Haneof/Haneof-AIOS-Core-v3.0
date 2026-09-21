@@ -1,48 +1,153 @@
 {
-  "decision_key": "c0d876c21901934724c47822b46f9ad2e2abd71bb24f6315722b38f7f043df77",
+  "decision_key": "362eedb0ee9a7b8eeb8748da3ffb027b274e5db6002519c121a96bb0a3c775b1",
   "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
   "schema": "aios.segment003.manual-summary.pending.v1",
   "simulated_clock": "2027-01-24T20:15:00+00:00",
   "summary_request": {
     "request": {
-      "dimension": "dim:equipment_telemetry",
+      "dimension": "dim:pos_daily",
       "granularity": "week",
-      "source_world_revision": 201,
+      "source_world_revision": 202,
       "sources": [
         {
           "metadata": {
-            "dimension": "dim:equipment_telemetry",
+            "dimension": "dim:pos_daily",
             "summary_kind": "single_dimension_temporal"
           },
-          "object_id": "sum_2777735c7b2f7091760212db",
+          "object_id": "sum_ae56b7c43e9c6ba7c851439a",
           "object_type": "summary",
-          "occurred_at": "2027-01-20T00:00:00Z",
+          "occurred_at": "2027-01-18T00:00:00Z",
           "revision": 1,
-          "text": "2027-01-20设备遥测：deck_oven_1的预热目标为205°C，5:47达到目标；5:47—8:15记录的温度范围为203—207°C，fault_codes为空。数据由oven_controller来源记录，于10:05入库。该记录只描述这台设备在所列时段的指标，不能单独确定出品延后原因，也不等于已排除全部设备或操作因素。"
+          "text": "2027-01-18，bakery POS 日记录：gross_sales 1261.4 USD，orders 93，refunds 1。该单日记录只描述当天经营事实，不据此推断趋势、原因或早高峰出品稳定性。"
         },
         {
           "metadata": {
-            "adapter_id": "habitation.equipment_telemetry.v1",
-            "dimension": "dim:equipment_telemetry",
-            "external_record_id": "d031-equipment",
+            "adapter_id": "habitation.pos_daily.v1",
+            "dimension": "dim:pos_daily",
+            "external_record_id": "d026-pos",
             "external_revision": "1",
             "mechanical_ingest": true,
-            "occurred_at_original": "2027-01-20T10:05:00+00:00",
+            "occurred_at_original": "2027-01-18T20:00:00+00:00",
             "provenance": {
               "habitation_resident_metadata": {
-                "source": "oven_controller"
+                "source": "pos"
               },
               "model_id_not_part_of_fact": true
             },
             "source_class": "user",
-            "source_digest": "f7b0a96d1e70ec4c5eb2fa571fe4cd3ac66123e1fdb75b91713304fa20f1e18f",
+            "source_digest": "6baa6e3ddd4c2b06cbbefd106c126d57b30a16d80354c65074c38da6183c5953",
             "source_schema_version": "1"
           },
-          "object_id": "obs_src_972d74f06c87a81231892a69",
+          "object_id": "obs_src_b81ef1c353d8355427a1d66b",
           "object_type": "observation",
-          "occurred_at": "2027-01-20T10:05:00Z",
+          "occurred_at": "2027-01-18T20:00:00Z",
           "revision": 1,
-          "text": "{\"band_window\": \"2027-01-20T05:47:00+00:00/2027-01-20T08:15:00+00:00\", \"device\": \"deck_oven_1\", \"fault_codes\": [], \"preheat_target_c\": 205, \"target_reached_at\": \"2027-01-20T05:47:00+00:00\", \"temperature_band_c\": [203, 207]}"
+          "text": "{\"currency\": \"USD\", \"gross_sales\": 1261.4, \"orders\": 93, \"refunds\": 1, \"store\": \"bakery\"}"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:pos_daily",
+            "summary_kind": "single_dimension_temporal"
+          },
+          "object_id": "sum_857a1a47de99eafe1fa7db89",
+          "object_type": "summary",
+          "occurred_at": "2027-01-19T00:00:00Z",
+          "revision": 1,
+          "text": "2027-01-19面包店POS日记录：orders为97，gross_sales为1297.6 USD，refunds为1。该记录没有出品等待、返工、退款原因或早高峰分段信息，不能单凭它判断出品稳定性。"
+        },
+        {
+          "metadata": {
+            "adapter_id": "habitation.pos_daily.v1",
+            "dimension": "dim:pos_daily",
+            "external_record_id": "d028-pos",
+            "external_revision": "1",
+            "mechanical_ingest": true,
+            "occurred_at_original": "2027-01-19T20:05:00+00:00",
+            "provenance": {
+              "habitation_resident_metadata": {
+                "source": "pos"
+              },
+              "model_id_not_part_of_fact": true
+            },
+            "source_class": "user",
+            "source_digest": "f7fe6c12046a7dc83434fcb1350675c50ba42466096279c1b53ebe7831c2ae17",
+            "source_schema_version": "1"
+          },
+          "object_id": "obs_src_60bc8c48b8f0290b5b94ae48",
+          "object_type": "observation",
+          "occurred_at": "2027-01-19T20:05:00Z",
+          "revision": 1,
+          "text": "{\"currency\": \"USD\", \"gross_sales\": 1297.6, \"orders\": 97, \"refunds\": 1, \"store\": \"bakery\"}"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:pos_daily",
+            "summary_kind": "single_dimension_temporal"
+          },
+          "object_id": "sum_1859d8e757af84a2b5f414a0",
+          "object_type": "summary",
+          "occurred_at": "2027-01-21T00:00:00Z",
+          "revision": 1,
+          "text": "2027-01-21，bakery POS日记录为104笔订单，gross_sales 1376.3 USD，refunds 2。记录没有退款原因、分时出品或等待数据，不据此推断早高峰出品稳定性或具体瓶颈。"
+        },
+        {
+          "metadata": {
+            "adapter_id": "habitation.pos_daily.v1",
+            "dimension": "dim:pos_daily",
+            "external_record_id": "d035-pos",
+            "external_revision": "1",
+            "mechanical_ingest": true,
+            "occurred_at_original": "2027-01-21T20:00:00+00:00",
+            "provenance": {
+              "habitation_resident_metadata": {
+                "source": "pos"
+              },
+              "model_id_not_part_of_fact": true
+            },
+            "source_class": "user",
+            "source_digest": "8f54245a9af900982fa649a87d7c74668b98ef733196647897f1cf4f07e740c6",
+            "source_schema_version": "1"
+          },
+          "object_id": "obs_src_8be223034a08d925243afe76",
+          "object_type": "observation",
+          "occurred_at": "2027-01-21T20:00:00Z",
+          "revision": 1,
+          "text": "{\"currency\": \"USD\", \"gross_sales\": 1376.3, \"orders\": 104, \"refunds\": 2, \"store\": \"bakery\"}"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:pos_daily",
+            "summary_kind": "single_dimension_temporal"
+          },
+          "object_id": "sum_eda7aa4ed331747a5bc494f5",
+          "object_type": "summary",
+          "occurred_at": "2027-01-24T00:00:00Z",
+          "revision": 1,
+          "text": "2027-01-24，bakery POS日记录：orders 111，gross_sales 1458.8 USD，refunds 1。未提供早高峰分段、出品等候或退款原因；这些日汇总数值本身不能证明出品已稳定或排除具体等待环节。"
+        },
+        {
+          "metadata": {
+            "adapter_id": "habitation.pos_daily.v1",
+            "dimension": "dim:pos_daily",
+            "external_record_id": "d043-pos",
+            "external_revision": "1",
+            "mechanical_ingest": true,
+            "occurred_at_original": "2027-01-24T20:15:00+00:00",
+            "provenance": {
+              "habitation_resident_metadata": {
+                "source": "pos"
+              },
+              "model_id_not_part_of_fact": true
+            },
+            "source_class": "user",
+            "source_digest": "fd0d0de3d2e6c29cf7d1c5c93100db03c5d6a6a499dc598b5b59ade4cae48b49",
+            "source_schema_version": "1"
+          },
+          "object_id": "obs_src_1ed1e4dd5570969912d66fcf",
+          "object_type": "observation",
+          "occurred_at": "2027-01-24T20:15:00Z",
+          "revision": 1,
+          "text": "{\"currency\": \"USD\", \"gross_sales\": 1458.8, \"orders\": 111, \"refunds\": 1, \"store\": \"bakery\"}"
         }
       ],
       "truncated": false,
@@ -51,5 +156,5 @@
     },
     "summary_request_type": "DimensionSummaryInput"
   },
-  "world_revision_before": 201
+  "world_revision_before": 202
 }
