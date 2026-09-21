@@ -80,8 +80,8 @@
 | 15 | `C14-RES-FIX-002` | 加固 C14 真实 Resident fixture：消除单维 conversation 泄题、让 Phase-B 决策对当前事实保持真正可选、增加 executable blind release operator | **DONE** | C14-RES-FIX-001 | PR #70; candidate `aacee04cfa5390f2a63d0a5606acb909291849b6`; squash merge `510290d3b9578cd9425079a22050eb679ddb528a`; v2 SHA256 `1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253`; `reviews/internal_habitation/c14-resident/v2/C14_RES_FIX_002_COMPLETION_EVIDENCE_2026-09-21.md` | v2 36-event fixture preserves v1 history; single-dimension leakage audit PASS; Phase-B underdetermination PASS; exact-byte blind release audit 19/19 PASS; A/B cursor 24/25 fail-closed; Core diff 0; no Resident run |
 | 16 | `C14-RES-FIX-003` | 加固 blind release ack：必须机械证明当前 reveal 事件已真实持久化进 AIOS World，不能只校验 `object_id@revision` 字符串格式 | **DONE** | C14-RES-FIX-002 | PR #72; exact candidate `17bd54ed0b64131ded0b70d853cac205d055bdcb`; squash merge `e5c7fefce82a49735575c423da310ca3d9441ab4`; exact-candidate Gate `35598216907` SUCCESS; fixture SHA256 unchanged `1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253`; `reviews/internal_habitation/c14-resident/v2/C14_RES_FIX_003_COMPLETION_EVIDENCE_2026-09-21.md` | ack 通过真实 `SQLiteWorldStore.object_revision_record + get_payload(exact revision)` 核验 durable ref、subject、event binding、commit source_class 与 receipt chain；30/30 real SQLite tests PASS；A 24/25 boundary / future isolation PASS；Core diff 0；Resident runs 0 |
 | 17 | `C14-RES-A-001` | 第一真实 Resident 窗口逐事件生活与认知：模型本人基于当前 RuntimeSnapshot 作 search/inspect/Claim/revise/retract/silence；在 sealed handoff boundary 停止 | **DONE** | C14-RES-FIX-003 | PR #75 evidence head `cb9b56b7039272d932158f33bfe979eff6749c9b` (unmerged/pinned); `reviews/C14_RES_A_001_PM_ACCEPTANCE_REVIEW_2026-09-21.md`; World SHA256 `0ee338aa8f2845bb376610da3c450e09ff9cc8bec5184ca60608b2465d7ba72f`; release-state SHA256 `e922d268fbb11364a7bb558aed60b88e7a3c075032f4fa4e1c47a84de3f765f1` | Independent PM PASS: 24/24 sequential durable acks; cursor25 not revealed; same-window Resident authored 43 Summaries + Runtime directives; one cross-dimensional leaf-grounded hypothesis Claim created then revised to rev2; matched negative remained silence; no Core/governance diff or future leak; Python 3.11.2 and unverified exact model identity recorded as non-blocking provenance deviations |
-| 18 | `C14-RES-B-FIX-001` | Phase-B canonical conversation ingest preflight：让 blind release 的 USER conversation 直接落成 canonical ConversationIngestor user Observation，并由后续 `run_turn` 幂等复用，避免同一句用户输入在 World 中重复两次 | **READY** | C14-RES-A-001 | `governance/C14_RES_B_CONVERSATION_INGEST_PREFLIGHT_2026-09-21.md`; frozen fixture v2; A evidence head pinned only, no Resident-B semantics | test-side only；禁止 `src/aios_core/**` 和 fixture semantic changes；specialized canonical-user-turn ack must verify exact durable user Observation; same session/turn/text/time `run_turn` must idempotently reuse it; fake/wrong session/turn/text/time/subject/role/ref all fail closed；Python 3.12+ formal gate；完成后 B 才 READY |
-| 19 | `C14-RES-B-001` | 全新模型窗口恢复 Phase-A durable AIOS World 后继续人生；禁止注入 Phase-A 对话/总结，验证旧 cognition 在新情境下被 AIOS 正常检索并实际影响未来行为与 Outcome | **BLOCKED** | C14-RES-B-FIX-001 | 新 ChatGPT/agent conversation；只给 World/checkpoint/digest + release contract/current cursor | 新 Runtime/Index/session；普通 AIOS capability 找回 exact cognition；至少一项 prior cognition materially participates in later decision；随后 Outcome/new evidence 可支持 retain/revise/retract；无 prior chat contamination |
+| 18 | `C14-RES-B-FIX-001` | Phase-B canonical conversation ingest preflight：让 blind release 的 USER conversation 直接落成 canonical ConversationIngestor user Observation，并由后续 `run_turn` 幂等复用，避免同一句用户输入在 World 中重复两次 | **DONE** | C14-RES-A-001 | PR #78; exact candidate `cb3a417f3c29b29d6aa2bf364386aec12b17e623`; squash merge `1c7a8c1466911f8617ed39348a50ac8041f23715`; exact-candidate workflow `35631789929` SUCCESS; completion evidence `reviews/internal_habitation/c14-resident/v2/C14_RES_B_FIX_001_COMPLETION_EVIDENCE_2026-09-21.md` | Python 3.12.14；generic 30/30 PASS；canonical conversation 15/15 PASS；现有 conversation/fused-runtime 16/16 PASS；same session/turn/text/time `run_turn` user commit idempotent replay；最终每 turn 仅 1 条 canonical user Observation + 独立 assistant Observation；generic conversation path/错误 session/turn/text/time/subject/role/authority/ref/order 均 fail closed；fixture SHA unchanged；Core diff 0；Resident-A evidence diff 0；Resident-B semantic execution 0 |
+| 19 | `C14-RES-B-001` | 全新模型窗口恢复 Phase-A durable AIOS World 后继续人生；禁止注入 Phase-A 对话/总结，验证旧 cognition 在新情境下被 AIOS 正常检索并实际影响未来行为与 Outcome | **READY** | C14-RES-B-FIX-001 | 新 ChatGPT/agent conversation；只给 World/checkpoint/digest + release contract/current cursor；正式 release operator v4；canonical conversation adapter `reviews/internal_habitation/c14-resident/v2/release/canonical_conversation_ingest.py` | 新 Runtime/Index/session；普通 AIOS capability 找回 exact cognition；Phase-B 非 conversation 事件继续 `reveal -> mechanical_ingest_adapter -> ack`；Phase-B USER conversation 必须 `reveal -> canonical_conversation_ingest -> canonical ack -> run_turn(same subject/session/turn/text/time)`，禁止 generic fixture Observation；至少一项 prior cognition materially participates in later decision；随后 Outcome/new evidence 可支持 retain/revise/retract；无 prior chat contamination |
 | 20 | `C14-RES-EVAL-001` | 独立 evaluator 审计 C14 Resident A/B 真实语义证据；不修 Core | **BLOCKED** | C14-RES-B-001 | sealed fixture chronology + A/B artifacts + World/checkpoint/digests + protocol | 分别裁决跨维正例、matched negative silence、fresh-window cognition consumption、contradiction/revision、future-leak/pseudo-LLM；每项 VALID/PARTIAL/INVALID；任一关键项非 VALID 则不能进入 C14 closure PASS |
 | 21 | `C14-CLOSE-001` | 独立审计 C14 规则、代码、Gate 与真实 Resident 证据；只做收口，不写新 Core 功能 | **BLOCKED** | C14-RES-EVAL-001 | C14 全链证据 + deterministic gates + Resident evaluator + PM hardening requirements | 任一以下成立即 FAIL：Summary-only 自证 cognition、无跨维正例、无 matched negative silence、无真正 fresh-window/new-runtime 行为消费、provenance 用语义启发式/第二来源库、claim count 成质量目标、存在 wake storm/future leak/pseudo-LLM；全部通过才恢复 P16 |
 | 22 | `C15-GROWTH-RULE-001` | 冻结 AI 可持续成长语义：真实 Outcome 才能支撑 OperationExperience；区分 Strategy / Calibration / Self cognition；禁止 AI 自述、自评和循环经验成为完成凭据 | **BLOCKED** | C14-CLOSE-001 | C14 closure + T35 evidence rules + P15 Periodic Review semantics | 明确 Situation/Decision/Action→real Outcome→Review→OperationExperience→Strategy/Calibration/Self 的唯一合法证据链；无真实 Outcome 不得制造经验；用户 World 与 AI 自我学习边界清晰 |
@@ -1161,3 +1161,30 @@ A narrow Phase-B transport issue was discovered during PM preflight: generic fix
 Therefore:
 - `C14-RES-B-FIX-001 = READY`
 - `C14-RES-B-001 = BLOCKED` until the canonical conversation pre-ingest/idempotent run-turn boundary is proven.
+
+
+### C14-RES-B-FIX-001 completion — 2026-09-21
+
+```text
+Task ID: C14-RES-B-FIX-001
+Status: DONE
+Started main: 08ceb9ab3f68d5d3ececaaa26832912323d73851
+Work branch: c14/res-b-canonical-conversation-ingest-20260921-sol
+Exact candidate: cb3a417f3c29b29d6aa2bf364386aec12b17e623
+PR: #78
+Merge SHA: 1c7a8c1466911f8617ed39348a50ac8041f23715
+Formal Python: 3.12.14
+Exact-candidate workflow: 35631789929 / SUCCESS
+Pre-evidence GREEN: 35631613259 / SUCCESS
+Generic blind-release regressions: 30/30 PASS
+Canonical conversation release/idempotency regressions: 15/15 PASS
+Existing conversation + fused-runtime regressions: 16/16 PASS
+Exact idempotency proof: precommitted canonical user Observation reused by FusedTurnRuntime.run_turn with idempotent_replay=True; no duplicate user Observation; one separate assistant Observation
+Fail closed: generic fixture masquerade, missing canonical ack fields, wrong session/turn/text/time/subject/role/AI_COGNITION authority/other event/ref/revision/repeat/skip/reorder/boundary
+Fixture SHA256 before/after: 1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253 / unchanged
+Core diff: NONE
+Resident-A evidence diff: NONE
+Resident-B semantic execution: 0
+Completion evidence: reviews/internal_habitation/c14-resident/v2/C14_RES_B_FIX_001_COMPLETION_EVIDENCE_2026-09-21.md
+Next READY: C14-RES-B-001 — new Resident window only
+```
