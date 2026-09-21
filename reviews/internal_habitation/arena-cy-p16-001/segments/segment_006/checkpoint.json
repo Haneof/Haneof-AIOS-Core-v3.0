@@ -1,0 +1,303 @@
+{
+ "actions": [
+  {
+   "action_status": "completed",
+   "action_type": "send_message",
+   "object_id": "action_87dc1bdbd1b97957b33f0875",
+   "revision": 3
+  }
+ ],
+ "active_goals": [
+  {
+   "object_id": "goal_04a7f941634509330b8587dd",
+   "revision": 1,
+   "status": "active",
+   "title": "《退潮声》声音档案:消落带完整退潮周期×4+姑姑店声景封存"
+  },
+  {
+   "object_id": "goal_e05c995b6a5fb668ae144969",
+   "revision": 2,
+   "status": "active",
+   "title": "家庭现金流透明:固定支出入册+按月对账"
+  },
+  {
+   "object_id": "goal_7582c0fb4a651696edb967d9",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_6b1db7208687d8b9820838f5",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_ba3b05ae1e384bc791ac12c4",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_ce75f6217ce0f0aba65594c6",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_d2c069affc2b5ab56ea7e286",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_dd5853cf0f057f614c88f5eb",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_a60843112da3e9f4dcd04546",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_bf75b50a0bc970636ed1e155",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_aaabeb5223cbd9f8b1da4b99",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_dd46369691f2a3668846a5d3",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_10cadfe22f3b48bcba227342",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_e0a93a12c715b61d313ff6ec",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_a573e76ebc484258ae536be5",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_b106472df9f73d7bf0264e01",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_7871d910f7b0effd109e918b",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_401ea67571e1bd55563e7a25",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_8d64256b79c533814318d5c5",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_f234f6d6271d7492ca3eb63b",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_bb689259a271fd093e28f099",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_e9ed0b2ee4d7cca9fc9a2913",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_056bcbf9a3f50090f968c17e",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_e3f4b1b6d29d74afa205a7b7",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_7bd46532719ff7044be1e849",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_cf3f98c8afb748fb47411fd8",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  }
+ ],
+ "active_tasks": [
+  {
+   "deadline": "2026-07-14T16:00:00+00:00",
+   "next_wake_at": null,
+   "object_id": "task_776642ec66172a4b3ddeb458",
+   "revision": 7,
+   "task_state": "cancelled",
+   "title": "轮渡2号线停航前录制汽笛+甲板素材（窗口7/1–7/14）"
+  },
+  {
+   "deadline": "2026-07-20T16:00:00+00:00",
+   "next_wake_at": null,
+   "object_id": "task_36b6cf3687af776229ca2a3c",
+   "revision": 8,
+   "task_state": "completed",
+   "title": "老纪结算条件监视:7/20前他派新素材且未提6000尾款→提醒程野先谈钱再开工"
+  },
+  {
+   "deadline": "2026-08-05T01:00:00+00:00",
+   "next_wake_at": null,
+   "object_id": "task_6369245b497d00f90e4debd8",
+   "revision": 8,
+   "task_state": "completed",
+   "title": "8/5起草致周老师催款文(授权=起草,发送归程野)"
+  },
+  {
+   "deadline": "2026-07-08T16:00:00+00:00",
+   "next_wake_at": null,
+   "object_id": "task_6b2c971618264428af5b726d",
+   "revision": 6,
+   "task_state": "completed",
+   "title": "《渡》8分钟粗剪v1交付老纪（截止按用户转述'下周三'=2026-07-08，待最终确认）"
+  },
+  {
+   "deadline": null,
+   "next_wake_at": null,
+   "object_id": "task_3692588b186579edfe05384b",
+   "revision": 11,
+   "task_state": "ready",
+   "title": "广阳岛消落带退潮周期录音（计划4次/间隔两周，第一次目标7/11窗口）"
+  },
+  {
+   "deadline": null,
+   "next_wake_at": null,
+   "object_id": "task_5b3d225567fd0c01a8d6b298",
+   "revision": 5,
+   "task_state": "ready",
+   "title": "月度现金流对账(每月1日09:00,Asia/Shanghai)——8/1首跑,程野:一次不许漏"
+  }
+ ],
+ "conversation_turns_segment": 113,
+ "cumulative_sim_days": 191,
+ "digests": {
+  "decision_file_count": 198,
+  "decisions_concat_sha256": "7ba2f89c84249c7e9e6065572d6a7956b8e740a12da4aa179bcc2fc491a451c2",
+  "events_jsonl_sha256": "c7b5d90e61750878b7680ce2b845471981e907f32033d2494ef9bb15abd9e422",
+  "segment_json_sha256": "b70828d3605b5609e2df92ebb9b22a8636edc5637373cdba2f334983f6b1a113",
+  "trace_jsonl_sha256": "166c7c9a2ab3cc9f55e9a13aeab018996445f143cedcf6332c6adf31a55dda8c",
+  "world_db_copy_sha256": "1e1b15adbfd3477ddb6b4962fce22e8dc76089e77f635469a3b02ffbd9886b7d"
+ },
+ "events_total_segment": 151,
+ "habitation_run_id": "arena-cy-p16-001-r1",
+ "index_watermark": 2084,
+ "logical_resident_id": "resident-阿潮@subject_cy01",
+ "model_identity": "arena-session-resident-model-01",
+ "next_life_event_cursor": {
+  "events_consumed_in_segment": 151,
+  "next_segment_id": "segment_007",
+  "run_state_next_event_index": 151
+ },
+ "object_counts": {
+  "action": 1,
+  "claim": 9,
+  "cognitive_policy": 2,
+  "dependency": 4082,
+  "event": 1,
+  "evidence_set": 47,
+  "goal": 26,
+  "observation": 1558,
+  "operation_experience": 3,
+  "outcome": 1,
+  "summary": 233,
+  "task": 6,
+  "wake": 75
+ },
+ "pending_wakes": [],
+ "previous_segment_checkpoint_sha256": "f66183c11dda7a5abc7ca567130d6964b35910e2214e2ca3a68da9dfc1a16535",
+ "provider_provenance": {
+  "automation": "none — deterministic auto-decisions are structurally absent outside ARENA_SMOKE_AUTOPLUMB plumbing tests",
+  "model_invocations_this_segment": 198,
+  "resident_provider": "Arena.ai session model (exact underlying model identity not disclosed per platform policy)",
+  "resident_role": "the Arena chat-session large model personally answering every Core model invocation"
+ },
+ "reality_input_events_segment": 38,
+ "reality_source_kind_counts": {
+  "app_push": 88,
+  "calendar": 12,
+  "daw": 4,
+  "ferry_notice": 1,
+  "payment": 16,
+  "phone_call_log": 1,
+  "photo_description": 2,
+  "recorder_log": 2,
+  "user_ai_interaction": 1306,
+  "wearable_steps": 38,
+  "wechat_msg": 39,
+  "wechat_note": 33,
+  "xianyu": 16
+ },
+ "resident_cognition_checkpoint_count_cumulative": 1259,
+ "resident_cognition_checkpoint_count_segment": 198,
+ "review_branch": "arena/01a0c1e0-haneof-aios-core-v3-0",
+ "reviewer_id": "arena-cy-p16-001",
+ "segment_id": "segment_006",
+ "segment_ordinal": 6,
+ "segment_sim_days": 38,
+ "segment_sim_end": "2027-01-07",
+ "segment_sim_start": "2026-11-30",
+ "session_turns": {
+  "edit-night": 11,
+  "shop-night": 21,
+  "studio-night": 23,
+  "wx-main": 599
+ },
+ "sim_clock_cursor": "2027-01-07T12:00:00+00:00",
+ "subject_id": "subject_cy01",
+ "tested_main_sha": "eae9f6e74f5a51b3869b2151f56ca8875e5c8372",
+ "tested_repo_head_sha": "4f7ba2497f66cced9c24d73a6dbd19bbe46eec41",
+ "wake_state_counts": {
+  "completed": 75
+ },
+ "world_db_copy_segment_path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/arena-cy-p16-001/segments/segment_006/world.sqlite",
+ "world_db_path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/arena-cy-p16-001/world/world.sqlite",
+ "world_revision": 2084,
+ "written_at_real": "2026-09-21T08:31:45.896293+00:00"
+}

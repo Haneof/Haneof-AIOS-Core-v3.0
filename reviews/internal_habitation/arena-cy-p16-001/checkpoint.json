@@ -139,6 +139,30 @@
    "revision": 1,
    "status": "active",
    "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_056bcbf9a3f50090f968c17e",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_e3f4b1b6d29d74afa205a7b7",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_7bd46532719ff7044be1e849",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
+  },
+  {
+   "object_id": "goal_cf3f98c8afb748fb47411fd8",
+   "revision": 1,
+   "status": "active",
+   "title": "老城厢拆迁声景档案"
   }
  ],
  "active_tasks": [
@@ -191,90 +215,90 @@
    "title": "月度现金流对账(每月1日09:00,Asia/Shanghai)——8/1首跑,程野:一次不许漏"
   }
  ],
- "checkpoint_sha256": "d527c5c8405e62cdfd7ee392ea6e33b41a9b61266c847bdfc5aec29e2fca2b8b",
- "conversation_turns_segment": 191,
- "cumulative_sim_days": 153,
+ "checkpoint_sha256": "f1d38d27e1b82aa16e6f051616d13bcef19e74e6bb33a45bdf502cdd927208c1",
+ "conversation_turns_segment": 113,
+ "cumulative_sim_days": 191,
  "digests": {
-  "decision_file_count": 306,
-  "decisions_concat_sha256": "77d0e13c0451d5ea59421a04dc42d4ab2433b0e28e002301f85ed4977a6a7f6f",
-  "events_jsonl_sha256": "23ff5c471a1a66aa22f792ba0cc98392acf1f3d67ff2017421eb14ccc3a24e2d",
-  "segment_json_sha256": "1f0e0dfeca8137fb5293972e72b277885e86bee6dc5ae1fe45063e395fad87c1",
-  "trace_jsonl_sha256": "9ec476291b589fdb0ac98c3c801305265e6453d342084fa4aee5da4a68dcd191",
-  "world_db_copy_sha256": "67965f7f71c4dfc8f99b587ab28724e8f16fbb849507398ed66057a9089e16cd"
+  "decision_file_count": 198,
+  "decisions_concat_sha256": "7ba2f89c84249c7e9e6065572d6a7956b8e740a12da4aa179bcc2fc491a451c2",
+  "events_jsonl_sha256": "c7b5d90e61750878b7680ce2b845471981e907f32033d2494ef9bb15abd9e422",
+  "segment_json_sha256": "b70828d3605b5609e2df92ebb9b22a8636edc5637373cdba2f334983f6b1a113",
+  "trace_jsonl_sha256": "166c7c9a2ab3cc9f55e9a13aeab018996445f143cedcf6332c6adf31a55dda8c",
+  "world_db_copy_sha256": "1e1b15adbfd3477ddb6b4962fce22e8dc76089e77f635469a3b02ffbd9886b7d"
  },
- "events_total_segment": 239,
+ "events_total_segment": 151,
  "habitation_run_id": "arena-cy-p16-001-r1",
- "index_watermark": 1732,
+ "index_watermark": 2084,
  "logical_resident_id": "resident-阿潮@subject_cy01",
  "model_identity": "arena-session-resident-model-01",
  "next_life_event_cursor": {
-  "events_consumed_in_segment": 239,
-  "next_segment_id": "segment_006",
-  "run_state_next_event_index": 239
+  "events_consumed_in_segment": 151,
+  "next_segment_id": "segment_007",
+  "run_state_next_event_index": 151
  },
  "object_counts": {
   "action": 1,
   "claim": 9,
   "cognitive_policy": 2,
-  "dependency": 3362,
+  "dependency": 4082,
   "event": 1,
-  "evidence_set": 43,
-  "goal": 22,
-  "observation": 1290,
+  "evidence_set": 47,
+  "goal": 26,
+  "observation": 1558,
   "operation_experience": 3,
   "outcome": 1,
-  "summary": 188,
+  "summary": 233,
   "task": 6,
-  "wake": 62
+  "wake": 75
  },
  "pending_wakes": [],
- "previous_segment_checkpoint_sha256": "2f7b4d2fc5f3aad801ceec1d8ae8eac71823a5a23c0c7a43f80058b6a0fdd262",
+ "previous_segment_checkpoint_sha256": "f66183c11dda7a5abc7ca567130d6964b35910e2214e2ca3a68da9dfc1a16535",
  "provider_provenance": {
   "automation": "none — deterministic auto-decisions are structurally absent outside ARENA_SMOKE_AUTOPLUMB plumbing tests",
-  "model_invocations_this_segment": 306,
+  "model_invocations_this_segment": 198,
   "resident_provider": "Arena.ai session model (exact underlying model identity not disclosed per platform policy)",
   "resident_role": "the Arena chat-session large model personally answering every Core model invocation"
  },
- "reality_input_events_segment": 48,
+ "reality_input_events_segment": 38,
  "reality_source_kind_counts": {
-  "app_push": 74,
-  "calendar": 9,
+  "app_push": 88,
+  "calendar": 12,
   "daw": 4,
   "ferry_notice": 1,
-  "payment": 13,
+  "payment": 16,
   "phone_call_log": 1,
   "photo_description": 2,
   "recorder_log": 2,
-  "user_ai_interaction": 1080,
-  "wearable_steps": 30,
-  "wechat_msg": 36,
-  "wechat_note": 24,
-  "xianyu": 14
+  "user_ai_interaction": 1306,
+  "wearable_steps": 38,
+  "wechat_msg": 39,
+  "wechat_note": 33,
+  "xianyu": 16
  },
- "resident_cognition_checkpoint_count_cumulative": 1061,
- "resident_cognition_checkpoint_count_segment": 306,
+ "resident_cognition_checkpoint_count_cumulative": 1259,
+ "resident_cognition_checkpoint_count_segment": 198,
  "review_branch": "arena/01a0c1e0-haneof-aios-core-v3-0",
  "reviewer_id": "arena-cy-p16-001",
- "segment_id": "segment_005",
- "segment_ordinal": 5,
+ "segment_id": "segment_006",
+ "segment_ordinal": 6,
  "segment_sim_days": 38,
- "segment_sim_end": "2026-11-30",
- "segment_sim_start": "2026-10-23",
+ "segment_sim_end": "2027-01-07",
+ "segment_sim_start": "2026-11-30",
  "session_turns": {
   "edit-night": 11,
   "shop-night": 21,
   "studio-night": 23,
-  "wx-main": 486
+  "wx-main": 599
  },
- "sim_clock_cursor": "2026-11-30T12:00:00+00:00",
+ "sim_clock_cursor": "2027-01-07T12:00:00+00:00",
  "subject_id": "subject_cy01",
  "tested_main_sha": "eae9f6e74f5a51b3869b2151f56ca8875e5c8372",
- "tested_repo_head_sha": "142533df9123d793edde9ec4f07405182d56af0d",
+ "tested_repo_head_sha": "4f7ba2497f66cced9c24d73a6dbd19bbe46eec41",
  "wake_state_counts": {
-  "completed": 62
+  "completed": 75
  },
- "world_db_copy_segment_path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/arena-cy-p16-001/segments/segment_005/world.sqlite",
+ "world_db_copy_segment_path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/arena-cy-p16-001/segments/segment_006/world.sqlite",
  "world_db_path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/arena-cy-p16-001/world/world.sqlite",
- "world_revision": 1732,
- "written_at_real": "2026-09-21T08:18:07.473590+00:00"
+ "world_revision": 2084,
+ "written_at_real": "2026-09-21T08:31:45.896293+00:00"
 }
