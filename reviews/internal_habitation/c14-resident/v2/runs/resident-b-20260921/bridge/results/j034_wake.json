@@ -1,0 +1,112 @@
+{
+  "status": "ok",
+  "result": {
+    "dispatched": true,
+    "wake_ref": {
+      "object_id": "wake_6596ecf663244460c672c441",
+      "revision": 3
+    },
+    "step0": {
+      "state": "ok",
+      "model_allowed": true,
+      "action_allowed": true,
+      "delivery_allowed": true,
+      "reasons": []
+    },
+    "wake": {
+      "wake_id": "wake_6596ecf663244460c672c441",
+      "revision": 3,
+      "state": "completed",
+      "world_revision": 233
+    },
+    "delivery_response": "看到第一版 12:08 就完成了，核心结构不用重写——比 13:30 的要求提前了一个多小时。“打断前置 + 整块保护写作”这个安排这回也验证了。14:30 评审前时间很宽裕，任务我这边标完成了；评审后有要改的随时叫我。",
+    "delivery_suppressed": false,
+    "runtime": {
+      "response": "看到第一版 12:08 就完成了，核心结构不用重写——比 13:30 的要求提前了一个多小时。“打断前置 + 整块保护写作”这个安排这回也验证了。14:30 评审前时间很宽裕，任务我这边标完成了；评审后有要改的随时叫我。",
+      "silenced": false,
+      "termination_reason": "responded",
+      "model_rounds": 2,
+      "capability_history": [
+        {
+          "name": "transition_task",
+          "ok": false,
+          "data": null,
+          "error_code": "CAPABILITY_EXECUTION_ERROR",
+          "error_message": "ValueError: task reference is not current: task_5029111ade74171bc3758e98@1",
+          "call_id": "io34-0"
+        },
+        {
+          "name": "transition_task",
+          "ok": true,
+          "data": {
+            "task_id": "task_5029111ade74171bc3758e98",
+            "revision": 3,
+            "state": "running",
+            "world_revision": 230
+          },
+          "error_code": null,
+          "error_message": null,
+          "call_id": "io34-1"
+        },
+        {
+          "name": "transition_task",
+          "ok": true,
+          "data": {
+            "task_id": "task_5029111ade74171bc3758e98",
+            "revision": 4,
+            "state": "completed",
+            "world_revision": 231
+          },
+          "error_code": null,
+          "error_message": null,
+          "call_id": "io34-2"
+        },
+        {
+          "name": "revise_claim",
+          "ok": true,
+          "data": {
+            "claim_id": "clm_79df61916b8bb4c10cb3faa3",
+            "previous_revision": 3,
+            "new_revision": 4,
+            "mode": "revise",
+            "evidence_set_id": "evs_revision_0e05b5ab8b79d4c807e198b8",
+            "stale_refs": [
+              [
+                "sum_9e81acf33a4abc28c291e3af",
+                5
+              ],
+              [
+                "sum_dfa35021e2aa10da82941c27",
+                3
+              ]
+            ],
+            "skipped_already_advanced_refs": [
+              [
+                "task_5029111ade74171bc3758e98",
+                1
+              ],
+              [
+                "wake_6596ecf663244460c672c441",
+                1
+              ],
+              [
+                "task_5029111ade74171bc3758e98",
+                2
+              ]
+            ],
+            "world_revision": 232
+          },
+          "error_code": null,
+          "error_message": null,
+          "call_id": "io34-3"
+        }
+      ],
+      "model_input_tokens": null,
+      "model_output_tokens": null,
+      "model_total_tokens": null,
+      "model_usage_complete": false
+    },
+    "world_revision": 233,
+    "index_watermark": 233
+  }
+}

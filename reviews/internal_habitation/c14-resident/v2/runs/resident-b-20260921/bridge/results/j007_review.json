@@ -1,0 +1,168 @@
+{
+  "status": "ok",
+  "result": {
+    "review": {
+      "review_id": "wake_review_a84750cb6936db9854ff695a",
+      "wake_ref": {
+        "object_id": "wake_review_a84750cb6936db9854ff695a",
+        "revision": 2
+      },
+      "window_start": "2026-10-21T15:05:01+00:00",
+      "window_end": "2026-10-23T14:09:00+00:00",
+      "anchor_count": 7,
+      "instruction": "Review the supplied world anchors and decide whether any previous AI understanding, strategy, calibration, self-understanding, goal handling, operation method, or due CognitivePolicy should be revised, confirmed, or rolled back. Use existing search/inspect tools when needed. Do not invent user growth, causal meaning, success, failure, or policy changes that are not supported by world evidence. Mechanical Wake outcomes may be used to review Resident-authored attention watches, but model silence or suppressed delivery is not itself evidence of user preference or real-world success."
+    },
+    "runtime": {
+      "response": null,
+      "silenced": true,
+      "termination_reason": "silence",
+      "model_rounds": 4,
+      "capability_history": [
+        {
+          "name": "read_periodic_review_anchors",
+          "ok": true,
+          "data": [
+            {
+              "object_ref": {
+                "object_id": "obs_c14_fixture_2378863986aaed4f3c5b2d30",
+                "revision": 1
+              },
+              "object_type": "observation",
+              "recorded_at": "2026-10-21T17:06:00Z",
+              "excerpt": "共创工作坊结束时，两项原本未定的需求边界已由客户确认；会议记录列出明确决议。"
+            },
+            {
+              "object_ref": {
+                "object_id": "obs_c14_fixture_60a9dd7694aec4867874668d",
+                "revision": 1
+              },
+              "object_type": "observation",
+              "recorded_at": "2026-10-21T18:53:00Z",
+              "excerpt": "“方案修改”于 11:41 完成并提交；会议中确认的两项需求均已落实，未重新打开。"
+            },
+            {
+              "object_ref": {
+                "object_id": "obs_c14_fixture_075eab7c98ac9ee6ee87e07d",
+                "revision": 1
+              },
+              "object_type": "observation",
+              "recorded_at": "2026-10-23T14:08:00Z",
+              "excerpt": "昨晚睡眠 7小时16分；睡眠评分 79/100；07:02 醒来。"
+            },
+            {
+              "object_ref": {
+                "object_id": "sum_5534c324a5361a915587f8d3",
+                "revision": 1
+              },
+              "object_type": "summary",
+              "recorded_at": "2026-10-23T14:08:00Z",
+              "excerpt": "2026-10-21 协作结果维度当日小结：当天该维度仅有一条记录。共创工作坊收尾时，两项此前悬而未决的需求边界已由客户当场确认，会议记录写明了这两项决议内容。当日无其他协作结果类事实。"
+            },
+            {
+              "object_ref": {
+                "object_id": "sum_a0ebbd1cb04b29e5c83d0f63",
+                "revision": 1
+              },
+              "object_type": "summary",
+              "recorded_at": "2026-10-23T14:08:00Z",
+              "excerpt": "2026-10-21 日程维度当日小结：日程表当天记录两个时间段——08:30–10:00 客户共创工作坊，10:20–11:50 安排“方案修改”。当天无其他日程记录。"
+            },
+            {
+              "object_ref": {
+                "object_id": "sum_e03606ba01ac07943749a4b8",
+                "revision": 1
+              },
+              "object_type": "summary",
+              "recorded_at": "2026-10-23T14:08:00Z",
+              "excerpt": "2026-10-21 工作结果维度当日小结：当天记录显示，“方案修改”于 11:41 完成并提交；会议中确认的两项需求均已落实，未重新打开。当日无其他工作结果记录。"
+            },
+            {
+              "object_ref": {
+                "object_id": "wake_bundle_6068c3523c9579e0e8f30047",
+                "revision": 3
+              },
+              "object_type": "wake",
+              "recorded_at": "2026-10-23T14:09:00Z",
+              "excerpt": "attention=background | source=attention_bundle | state=completed | priority=50 | hits=3 | termination=silence | rounds=5 | delivery=False | step0=background | capabilities=['search_world', 'search_world', 'search_timeline', 'inspect_world_object', 'search_timeline']"
+            }
+          ],
+          "error_code": null,
+          "error_message": null,
+          "call_id": "io9-0"
+        },
+        {
+          "name": "revise_claim",
+          "ok": true,
+          "data": {
+            "claim_id": "clm_79df61916b8bb4c10cb3faa3",
+            "previous_revision": 2,
+            "new_revision": 3,
+            "mode": "revise",
+            "evidence_set_id": "evs_revision_c6f1fef22df4183ea7df1eb5",
+            "stale_refs": [
+              [
+                "sum_9e81acf33a4abc28c291e3af",
+                3
+              ],
+              [
+                "sum_dfa35021e2aa10da82941c27",
+                1
+              ]
+            ],
+            "skipped_already_advanced_refs": [],
+            "world_revision": 179
+          },
+          "error_code": null,
+          "error_message": null,
+          "call_id": "io10-0"
+        },
+        {
+          "name": "commit_operation_experience",
+          "ok": false,
+          "data": null,
+          "error_code": "CAPABILITY_EXECUTION_ERROR",
+          "error_message": "ValueError: operation experience requires real result evidence: Observation, Outcome or CommunicationExperience",
+          "call_id": "io10-1"
+        },
+        {
+          "name": "read_cognitive_policies",
+          "ok": true,
+          "data": [],
+          "error_code": null,
+          "error_message": null,
+          "call_id": "io11-0"
+        }
+      ],
+      "model_input_tokens": null,
+      "model_output_tokens": null,
+      "model_total_tokens": null,
+      "model_usage_complete": false
+    },
+    "wake": {
+      "wake_id": "wake_review_a84750cb6936db9854ff695a",
+      "revision": 3,
+      "state": "completed",
+      "world_revision": 180
+    },
+    "budget": {
+      "applies": false,
+      "available": true,
+      "world_revision": 177,
+      "window_start": null,
+      "window_end": null,
+      "policy_refs": [],
+      "used_wakes": 0,
+      "used_model_calls": 0,
+      "used_tokens": 0,
+      "token_usage_available": false,
+      "max_wakes": null,
+      "max_model_calls": null,
+      "model_round_limit": null,
+      "reserved_model_calls": 0,
+      "reasons": [],
+      "on_exceed": []
+    },
+    "world_revision": 180,
+    "index_watermark": 180
+  }
+}
