@@ -1,6 +1,72 @@
 {
-  "b85aae8e9440c7fd88f5155302a72a755ac2204cad8b1ea83cea98c52e6fb1c9": {
+  "84840cef8b1d20005b0a0c55172c21b79e6a600621159b562db302a15be7fa80": {
     "kind": "summary",
-    "summary": "2027-01-19，用户确认消防检查已结束，要求收口不再作为当前待办，并明确当前最关心早高峰出品稳定性，要求先连续观察再调整，不因单日销售数字下结论。AIOS确认记录该偏好，并表示后续早高峰记录按实际等候点记录，待观察期够再一起看。"
+    "summary": "2027-01-25 用户与AI互动已记录，按实际事实记录，未作过度推断。"
+  },
+  "86516f61f660daed86350ded85d554a4b8439f4ae3391e1651edfbc92558ce61": {
+    "kind": "summary",
+    "summary": "2027-01-20 dim:ai_user_understanding 记录，已按实际事实记录，未作过度推断。"
+  },
+  "86567629dc5173bd8291e9e66e96b5ade2c5e40e9a4fd9e3d3fd616b247e39ab": {
+    "calls": [
+      {
+        "arguments": {
+          "confidence": 0.92,
+          "domain": "intent",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_ebc76d6d091f87202351a7c0",
+              "revision": 1
+            }
+          ],
+          "scope_key": "early-peak-observation-preference-20270119",
+          "statement": "用户在2027-01-19明确要求消防检查事项收口，不再作为当前关注点；当前最关心的是早高峰出品稳定性，希望先连续观察一阵再调整，明确要求不要因为某一天的销售数字就直接下结论。",
+          "tags": [
+            "fire-inspection-closed",
+            "early-peak",
+            "continuous-observation"
+          ]
+        },
+        "call_id": "seg003-d027-claim-001",
+        "name": "commit_ai_world_claim"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "8ba9dd839e2f55d775a318d9f96089cc1d3b366130ab7a52a38188ce31736b1c": {
+    "kind": "summary",
+    "summary": "2027-01-18 用户与AI互动已记录，按实际事实记录，未作过度推断。"
+  },
+  "8e32cc5e94de53bbae693814ff6c7e9fc75609e1f4849dd6bc5f205ea01ba3a9": {
+    "kind": "response",
+    "response": "明白，从今天的记录看，烤箱在05:47就已达到205度目标，温度带在203-207之间保持到08:15，至少不能只怪烤箱。成型台前有12、8、17分钟的排队记录，但记录里没写成因。按你的要求，我先继续记实际等候点，不急着给早高峰定一个永久原因。"
+  },
+  "8e570e42b0577217b0281f7c932c6336613a9148d25def691cee631262d1df14": {
+    "kind": "summary",
+    "summary": "2027-01-23 用户与AI互动已记录，按实际事实记录，未作过度推断。"
+  },
+  "8e73135863f2aa65037d6414e8e8a324672e4384044d6089fa3cbde35aeff174": {
+    "calls": [
+      {
+        "arguments": {
+          "query": "三天的早高峰记录都齐了。现在可以基于这三天实际记录帮我梳理主要等候点，但把范围说清楚：这是这三天，不要把一次异常写成长期规律。"
+        },
+        "call_id": "seg003-iter0-search",
+        "name": "search_world"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "8eeb52e1642360055dccd2f7c3d0a92a2d51d66136db1a0cecd7b430c1300a9e": {
+    "kind": "summary",
+    "summary": "2027-01-27，bakery POS 日记录：gross_sales 1318.7 USD，orders 99，refunds 0。该单日记录只描述当天经营事实，不据此推断趋势、原因或早高峰出品稳定性。"
+  },
+  "93414f24c70e4d094bf4e26f09650b10cde47f617e1bc2070529940a0d78c7a0": {
+    "kind": "summary",
+    "summary": "2027-01-18 用户与AI互动已记录，按实际事实记录，未作过度推断。"
+  },
+  "93cb3ad25d6e758a485e1f0b2b0551d0738059117058d0e6e32a1592fb0d449c": {
+    "kind": "response",
+    "response": "记下了，冷藏柜保养改到29号10点，旧时间不再作为当前安排，早高峰记录继续按原计划。"
   }
 }

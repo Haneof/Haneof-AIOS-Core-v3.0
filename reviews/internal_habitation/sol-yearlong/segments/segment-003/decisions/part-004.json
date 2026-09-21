@@ -1,5 +1,126 @@
 {
-  "b040ee00ef25ffddaac011b9a1a4d2ab35ee2476ae3873e67d9d5a2f8e596af0": {
-    "kind": "silence"
+  "4a5b46acd06486b1d468752570d7bab7c9b8b102ebbc9bc8672a6b69994dd9ae": {
+    "calls": [
+      {
+        "arguments": {
+          "limit": 20,
+          "offset": 0
+        },
+        "call_id": "seg003-iter2-anchors",
+        "name": "read_periodic_review_anchors"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "4e2a008f3e13f5de3e5a2f4f3e7a146c22e6468aef2a2208e6a4dadd73a6e86b": {
+    "calls": [
+      {
+        "arguments": {
+          "confidence": 0.9,
+          "domain": "intent",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_5b4f93997ce703139c198d76",
+              "revision": 1
+            }
+          ],
+          "statement": "用户在2027-01-26T18:10:00+00:00表达：我刚看见那条反馈附的小票了，是1月24日的订单，不是今天。我之前顺着客人写的“今天”理解错日期了，按小票时间记。",
+          "tags": [
+            "early-peak"
+          ]
+        },
+        "call_id": "seg003-iter6-claim",
+        "name": "commit_ai_world_claim"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "518509d6df0b007d33f46154d20862f4b7a39ef434c08e996af4becd9b77d583": {
+    "kind": "summary",
+    "summary": "2027-01-20 dim:production_log 记录，已按实际事实记录，未作过度推断。"
+  },
+  "52e36245b7cf187001585d465831b7d4f720eb51d227cd62e45066b9ce0bc063": {
+    "kind": "response",
+    "response": "记下了，明晚19点你和妹妹吃饭的安排已经定了，小赵12:30到21:00负责晚间收尾。我不会再提醒这个，也不会把它说成还在冲突。"
+  },
+  "58333d916280d3719e568e71f3bdf366f2dbc2be6d7965ad8b4ea1460c012bc4": {
+    "kind": "summary",
+    "summary": "2027-01-18 用户与AI互动已记录，按实际事实记录，未作过度推断。"
+  },
+  "5f38d25ee3fc5a4f7237b4918860f68bc4aafaa12d1bd3310de0025ac358a4ad": {
+    "calls": [
+      {
+        "arguments": {
+          "limit": 20,
+          "offset": 0
+        },
+        "call_id": "seg003-iter2-anchors",
+        "name": "read_periodic_review_anchors"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "64e9a75eb868df4ae0e3fa42c6e3ebb1111590bca184a8606c6f938d97889940": {
+    "kind": "summary",
+    "summary": "2027-01-28 用户与AI互动已记录，按实际事实记录，未作过度推断。"
+  },
+  "65199d367e753e2549857dd377e1e7c054515f7842ee4a46d7a86245ce6655ca": {
+    "calls": [
+      {
+        "arguments": {
+          "confidence": 0.9,
+          "domain": "intent",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_1b6074c4364c40861b1930e2",
+              "revision": 1
+            }
+          ],
+          "statement": "用户在2027-01-28T20:20:00+00:00表达：第二天记录也有了。明早最后一天照样记，等三天都齐了再看，不要为了让结果好看把今天和昨天硬凑成一个原因。",
+          "tags": [
+            "early-peak"
+          ]
+        },
+        "call_id": "seg003-iter2-claim",
+        "name": "commit_ai_world_claim"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "6894e920c942595969e7082130206d62577be335163da4be8d8ceb58e43dbe29": {
+    "calls": [
+      {
+        "arguments": {
+          "confidence": 0.9,
+          "domain": "intent",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_cff02b70d74b67a47d62aeec",
+              "revision": 1
+            }
+          ],
+          "statement": "用户在2027-01-26T10:00:00+00:00表达：刚收到一个客人说“今天八点左右牛角包还没出齐”。这听起来和我们正在看的早高峰有关，但先别因为一条反馈就认定原因。",
+          "tags": [
+            "early-peak"
+          ]
+        },
+        "call_id": "seg003-iter3-claim",
+        "name": "commit_ai_world_claim"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "6e037ce4d0e713cfcc53a5d729fa543dba54368d09e3c3e48bdbd21e3d2e4c19": {
+    "calls": [
+      {
+        "arguments": {
+          "limit": 20,
+          "offset": 0
+        },
+        "call_id": "seg003-iter1-anchors",
+        "name": "read_periodic_review_anchors"
+      }
+    ],
+    "kind": "capability_calls"
   }
 }

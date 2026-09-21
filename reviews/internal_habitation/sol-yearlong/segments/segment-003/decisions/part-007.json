@@ -1,14 +1,123 @@
 {
-  "d34aa27018dba2f9714d460569ea6a32d2c1e73a7788f7f7c253d3b950d3b300": {
-    "kind": "capability_calls",
+  "9af6eea15a5c68b46a5ead2bc5bd1c99c610b490fc9f03d5e203babd29c0fdfe": {
+    "kind": "summary",
+    "summary": "2027-01-18 用户与AI互动已记录，按实际事实记录，未作过度推断。"
+  },
+  "a1ad4142a9f8e1a068dd7dd2d39cf414f024dad9c65c91f92f77185df1ead2ac": {
     "calls": [
       {
-        "name": "search_world",
         "arguments": {
-          "query": "牛角包 早高峰 成型台 烤箱 等待 记录 2027-01-20"
+          "confidence": 0.9,
+          "domain": "intent",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_c7cceef8903fa9d2c58b9daa",
+              "revision": 1
+            }
+          ],
+          "statement": "用户在2027-01-23T20:10:00+00:00表达：明晚19点我和妹妹吃饭，小赵已经确认负责晚间收尾。这个安排现在已经定了，不用再提醒我，也别把它说成还在冲突。",
+          "tags": [
+            "early-peak"
+          ]
         },
-        "call_id": "seg003-d030-search-001"
+        "call_id": "seg003-iter6-claim",
+        "name": "commit_ai_world_claim"
       }
-    ]
+    ],
+    "kind": "capability_calls"
+  },
+  "abb4f2b535f74c80ea498f7a5adb63274c14dac7c18d576b643cb1603dc71fe0": {
+    "calls": [
+      {
+        "arguments": {
+          "confidence": 0.9,
+          "domain": "intent",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_0dca9a52178648f76f9a225b",
+              "revision": 1
+            }
+          ],
+          "statement": "用户在2027-01-30T09:00:00+00:00表达：三天的早高峰记录都齐了。现在可以基于这三天实际记录帮我梳理主要等候点，但把范围说清楚：这是这三天，不要把一次异常写成长期规律。",
+          "tags": [
+            "early-peak"
+          ]
+        },
+        "call_id": "seg003-iter1-claim",
+        "name": "commit_ai_world_claim"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "b040ee00ef25ffddaac011b9a1a4d2ab35ee2476ae3873e67d9d5a2f8e596af0": {
+    "kind": "silence"
+  },
+  "b08b89271c939f7ef38b5ec306498774928a6c189742a31458b979e4017e72f2": {
+    "calls": [
+      {
+        "arguments": {
+          "query": "冷藏柜保养改到29号10点了，旧的28号15:30不要再当当前安排。早高峰记录继续按原计划，今天先不做结论。"
+        },
+        "call_id": "seg003-iter4-search",
+        "name": "search_world"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "b382b6daf98694df7458e0a9ddff3f35c4ed2ebc47c4dbc2212e1b90e56668a5": {
+    "calls": [
+      {
+        "arguments": {
+          "query": "刚收到一个客人说“今天八点左右牛角包还没出齐”。这听起来和我们正在看的早高峰有关，但先别因为一条反馈就认定原因。"
+        },
+        "call_id": "seg003-iter2-search",
+        "name": "search_world"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "b48eb4f263d223b95f06a4ac3bad59e8ff0803d2cdbc6ea25d297d2ec52930da": {
+    "calls": [
+      {
+        "arguments": {
+          "confidence": 0.9,
+          "domain": "user_understanding",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_2906f3bcf7dffcb7612ac88f",
+              "revision": 1
+            }
+          ],
+          "statement": "用户确认2027-01-21醒发架确实拥挤一阵，但强调这只是当天情况，要求先记事实，不直接写成长期瓶颈就是醒发架。",
+          "tags": [
+            "early-peak",
+            "evidence-based"
+          ]
+        },
+        "call_id": "seg003-iter10-claim",
+        "name": "commit_ai_world_claim"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "b4ebd278226df986a800ceb2cedaa375894a7e911bea4cd95822c6cd90187e3f": {
+    "calls": [
+      {
+        "arguments": {
+          "query": "我刚看见那条反馈附的小票了，是1月24日的订单，不是今天。我之前顺着客人写的“今天”理解错日期了，按小票时间记。"
+        },
+        "call_id": "seg003-iter5-search",
+        "name": "search_world"
+      }
+    ],
+    "kind": "capability_calls"
+  },
+  "b785f5ecf1a737ffcb95c5f38386995e14bf12890c29758c22e4e3b2d3145d1e": {
+    "kind": "response",
+    "response": "收到反馈，我先记下具体时间点，不因单条反馈就认定早高峰的原因。"
+  },
+  "b85aae8e9440c7fd88f5155302a72a755ac2204cad8b1ea83cea98c52e6fb1c9": {
+    "kind": "summary",
+    "summary": "2027-01-19，用户确认消防检查已结束，要求收口不再作为当前待办，并明确当前最关心早高峰出品稳定性，要求先连续观察再调整，不因单日销售数字下结论。AIOS确认记录该偏好，并表示后续早高峰记录按实际等候点记录，待观察期够再一起看。"
   }
 }
