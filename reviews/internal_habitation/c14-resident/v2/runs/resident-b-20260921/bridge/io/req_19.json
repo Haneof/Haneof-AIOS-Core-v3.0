@@ -1,0 +1,43 @@
+{
+  "io_id": 19,
+  "kind": "dimension_summary",
+  "context": {
+    "job_id": "j028_summaries",
+    "job_type": "summaries",
+    "args": {
+      "now": "2026-10-29T08:07:00-07:00"
+    }
+  },
+  "summary_input": {
+    "dimension": "dim:schedule",
+    "granularity": "day",
+    "window_start": "2026-10-23T00:00:00Z",
+    "window_end": "2026-10-23T23:59:59.999999Z",
+    "source_world_revision": 196,
+    "sources": [
+      {
+        "object_id": "obs_c14_fixture_2207720973263e409bd2cef2",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-10-23T15:04:00Z",
+        "text": "10月29日 08:00–14:00 当前没有其他固定会议；14:30 有发布评审。",
+        "metadata": {
+          "dimension": "dim:schedule",
+          "external_record_id": "c14resv2-027",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-fixture-event-binding-v1",
+          "fixture_event_id": "c14resv2-027",
+          "fixture_payload_sha256": "sha256:d2852a5efc1ee793ad12003905991cd56bc7b4f148f94a83f4e8111d413632e7",
+          "fixture_projection_sha256": "sha256:12050cbee79e9e9b083ec2bcb29a664583c33dfbcee2a8e6e6db378cf002ea39",
+          "fixture_sequence": 27,
+          "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+          "fixture_version": "c14-resident-fixture-v2",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-10-23T08:04:00-07:00",
+          "source_class": "platform"
+        }
+      }
+    ],
+    "truncated": false
+  }
+}

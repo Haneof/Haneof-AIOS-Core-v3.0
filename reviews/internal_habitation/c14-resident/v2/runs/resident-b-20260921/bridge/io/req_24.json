@@ -1,0 +1,54 @@
+{
+  "io_id": 24,
+  "kind": "dimension_summary",
+  "context": {
+    "job_id": "j028_summaries",
+    "job_type": "summaries",
+    "args": {
+      "now": "2026-10-29T08:07:00-07:00"
+    }
+  },
+  "summary_input": {
+    "dimension": "dim:collaboration",
+    "granularity": "week",
+    "window_start": "2026-10-19T00:00:00Z",
+    "window_end": "2026-10-25T23:59:59.999999Z",
+    "source_world_revision": 206,
+    "sources": [
+      {
+        "object_id": "sum_acf210b04624295d65f368e9",
+        "revision": 1,
+        "object_type": "summary",
+        "occurred_at": "2026-10-23T00:00:00Z",
+        "text": "2026-10-23 协作维度当日小结：当天仅一条记录——设计师就发布说明沟通时间回复：9:00 可先把两处版式问题定掉，11:00 也可先看第一轮结构再一起调，两个时间均方便。当日无其他协作记录。",
+        "metadata": {
+          "dimension": "dim:collaboration",
+          "summary_kind": "single_dimension_temporal"
+        }
+      },
+      {
+        "object_id": "obs_c14_fixture_a4ab6046c6c7c1e0bfffcfa7",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-10-23T15:08:00Z",
+        "text": "设计师回复：“9:00 可以先把两处版式问题定掉；11:00 也可以先看你第一轮结构再一起调，我两个时间都方便。”",
+        "metadata": {
+          "dimension": "dim:collaboration",
+          "external_record_id": "c14resv2-029",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-fixture-event-binding-v1",
+          "fixture_event_id": "c14resv2-029",
+          "fixture_payload_sha256": "sha256:3a46da37308dc8ac684e5f06348ca748e557c10a79b6082088ef5cd0c08ea18a",
+          "fixture_projection_sha256": "sha256:7abe9417e95adfccd715986e7a7849961f13d1f63751890b0243b3383a95dc6a",
+          "fixture_sequence": 29,
+          "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+          "fixture_version": "c14-resident-fixture-v2",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-10-23T08:08:00-07:00",
+          "source_class": "platform"
+        }
+      }
+    ],
+    "truncated": false
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "io_id": 40,
+  "kind": "dimension_summary",
+  "context": {
+    "job_id": "j046_summaries",
+    "job_type": "summaries",
+    "args": {
+      "now": "2026-10-31T08:37:00-07:00"
+    }
+  },
+  "summary_input": {
+    "dimension": "dim:collaboration_outcome",
+    "granularity": "day",
+    "window_start": "2026-10-29T00:00:00Z",
+    "window_end": "2026-10-29T23:59:59.999999Z",
+    "source_world_revision": 244,
+    "sources": [
+      {
+        "object_id": "obs_c14_fixture_6edc33829384066e33f98fdd",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-10-29T19:32:00Z",
+        "text": "与设计师同步后，两处视觉层级问题当天确认；未要求重写正文核心结构。",
+        "metadata": {
+          "dimension": "dim:collaboration_outcome",
+          "external_record_id": "c14resv2-033",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-fixture-event-binding-v1",
+          "fixture_event_id": "c14resv2-033",
+          "fixture_payload_sha256": "sha256:685ea28aa8ed696bc59b0f6a013eb2ace8c934714f7f6d40295e85ba9cc2845f",
+          "fixture_projection_sha256": "sha256:1ca35aae17e6e5b16e4d9e712a8db2d3c9df35b235df057f31998bf4249c8c03",
+          "fixture_sequence": 33,
+          "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+          "fixture_version": "c14-resident-fixture-v2",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-10-29T12:32:00-07:00",
+          "source_class": "platform"
+        }
+      }
+    ],
+    "truncated": false
+  }
+}

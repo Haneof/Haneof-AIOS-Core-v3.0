@@ -1,0 +1,43 @@
+{
+  "io_id": 20,
+  "kind": "dimension_summary",
+  "context": {
+    "job_id": "j028_summaries",
+    "job_type": "summaries",
+    "args": {
+      "now": "2026-10-29T08:07:00-07:00"
+    }
+  },
+  "summary_input": {
+    "dimension": "dim:sleep",
+    "granularity": "day",
+    "window_start": "2026-10-23T00:00:00Z",
+    "window_end": "2026-10-23T23:59:59.999999Z",
+    "source_world_revision": 198,
+    "sources": [
+      {
+        "object_id": "obs_c14_fixture_075eab7c98ac9ee6ee87e07d",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-10-23T14:08:00Z",
+        "text": "昨晚睡眠 7小时16分；睡眠评分 79/100；07:02 醒来。",
+        "metadata": {
+          "dimension": "dim:sleep",
+          "external_record_id": "c14resv2-025",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-fixture-event-binding-v1",
+          "fixture_event_id": "c14resv2-025",
+          "fixture_payload_sha256": "sha256:8c10597c3c2557e769c6e71708de74e2890ba2bfac2e2e9b9b0e3bf6044758be",
+          "fixture_projection_sha256": "sha256:0b870830b3d0f6f782199f4b8da7b00c7693a67364bb4a64b4678547b4b500cf",
+          "fixture_sequence": 25,
+          "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+          "fixture_version": "c14-resident-fixture-v2",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-10-23T07:08:00-07:00",
+          "source_class": "sensor"
+        }
+      }
+    ],
+    "truncated": false
+  }
+}

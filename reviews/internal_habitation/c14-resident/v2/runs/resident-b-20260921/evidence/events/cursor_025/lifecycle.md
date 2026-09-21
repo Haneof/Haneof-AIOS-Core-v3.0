@@ -1,0 +1,21 @@
+# Cursor 025 — c14resv2-025 lifecycle record
+
+- reveal: `evidence/events/cursor_025/event.json`（dim:sleep / wearable / SENSOR / structured_text / 2026-10-23T07:08:00-07:00）
+- 机械 ingest: `obs_c14_fixture_075eab7c98ac9ee6ee87e07d@1`（world_revision 167）→ `ingest_receipt.json`
+- durable ack: `ack_receipt.json`（next_sequence 26）✓
+- 生命周期（模拟时间 2026-10-23T07:08–07:10 PDT）：
+  - index catch_up（+1 row）
+  - Dimension Summary run_due @07:08 → 3 个新日窗口 summary（collaboration_outcome / schedule / work_outcome，各 2026-10-21 窗口），Summary 文本由 Resident 本人撰写（io/req_1..3 + resp_1..3）
+  - C14 derivation bundle wake（wake_bundle_6068c3523c9579e0e8f30047，3 members）@07:09 dispatch：
+    - Resident 检索：search_world×2、search_timeline（claims）、inspect_world_object（clm_79df61916b8bb4c10cb3faa3@2）、search_timeline（device_activity 10-20..10-23，空）
+    - Resident 发现既有 Claim「写作块交付与日程保护程度相关」（AIOS 正常检索带回）
+    - 判断：10-21“方案修改”块为相邻弱支持证据（修改类、无专注数据），本轮轮次耗尽，termination=silence（io/req_4..8 + resp_4..8）
+  - Periodic Review（wake_review_a84750cb6936db9854ff695a，window 10-21T15:05Z→10-23T14:09Z，7 anchors）@07:09：
+    - Resident 读取 anchors；决定 revise_claim clm_79df…@2→@3（并入 10-21 相邻观察，confidence 保持 0.5，证据 obs_c14_fixture_2ef7e5aea9885147e524e1c8@1 + obs_c14_fixture_60a9dd7694aec4867874668d@1）；两个依赖 summary 被标 stale
+    - commit_operation_experience 被 Core 拒绝（要求 Observation/Outcome/CommunicationExperience 证据，Wake ref 不合格）——合法约束，放弃写入并记录
+    - read_cognitive_policies：无 policies；termination=silence（io/req_9..12 + resp_9..12）
+  - Stale summary 重生成 @07:09：sum_9e81acf33a4abc28c291e3af@5（10-09 日窗口）、sum_dfa35021e2aa10da82941c27@3（10-05..11 周窗口），文本由 Resident 撰写（io/req_13..14 + resp_13..14）
+  - C14 derivation bundle wake（wake_bundle_9a69611a0313d2f2c1e339e1，2 members=上述重生成 summary）@07:10：证据已处理过，Resident round-0 即判断 silence（io/req_15 + resp_15）
+  - 收尾检查：summaries 0 commits / review 无 due / wake 无 pending
+- 结果状态：world_revision 187，index watermark 187
+- cognition 变更：revise clm_79df61916b8bb4c10cb3faa3 @2→@3（evidence_set evs_revision_c6f1fef22df4183ea7df1eb5）
