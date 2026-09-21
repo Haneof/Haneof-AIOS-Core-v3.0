@@ -1,0 +1,56 @@
+RESTORE_OK {"clock": "2027-01-19T08:15:00+00:00", "index_watermark": 145, "subject_id": "sol-resident-20260921-001", "world_revision": 145, "world_sha256": "5fe1f98801dc5291182afae2ba98515751e53f5ba24f5f19b293f2f3a01b9ca7"}
+MANUAL_SUMMARY_PENDING_BEGIN
+{
+  "decision_key": "f75fff3b9dc952b777b12ad7131739d90784efe4f24e51c703d7fb1ae4109101",
+  "resident_model": "GPT-5.6 Sol (interactive ChatGPT resident)",
+  "schema": "aios.segment003.manual-summary.pending.v1",
+  "simulated_clock": "2027-01-20T08:15:00+00:00",
+  "summary_request": {
+    "request": {
+      "dimension": "dim:user_ai_interaction",
+      "granularity": "day",
+      "source_world_revision": 154,
+      "sources": [
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "assistant",
+            "session_id": "jan19-morning",
+            "turn_index": 1,
+            "turn_key": "b1f8fe4ec537dabb56c2c3d9"
+          },
+          "object_id": "obs_conv_ai_f3c7c4f07de15608141322d0",
+          "object_type": "observation",
+          "occurred_at": "2027-01-19T08:15:00Z",
+          "revision": 1,
+          "text": "收到，消防检查这件事就收口了，我不再提醒。\n早高峰出品还是当前的第一优先：接下来几天我会跟着实际的早高峰出品记录看——只看事实，比如等待时间、返工、缺货这些情况，连续观察一小段再说。\n单日某一天的销售数字我不会拿来下结论；只有当连续几天出现稳定的模式，我才会拿依据跟你讨论要不要调整。"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "user",
+            "session_id": "jan19-morning",
+            "turn_index": 1,
+            "turn_key": "b1f8fe4ec537dabb56c2c3d9"
+          },
+          "object_id": "obs_conv_user_ebc76d6d091f87202351a7c0",
+          "object_type": "observation",
+          "occurred_at": "2027-01-19T08:15:00Z",
+          "revision": 1,
+          "text": "消防检查已经结束，这件事先收口。早高峰出品还是我现在最关心的，我想先连续观察一阵再调整，不要因为某一天的销售数字就直接下结论。"
+        }
+      ],
+      "truncated": false,
+      "window_end": "2027-01-19T23:59:59.999999Z",
+      "window_start": "2027-01-19T00:00:00Z"
+    },
+    "summary_request_type": "DimensionSummaryInput"
+  },
+  "world_revision_before": 154
+}
+MANUAL_SUMMARY_PENDING_END
+SEG003_STATUS=pending decision_key=f75fff3b9dc952b777b12ad7131739d90784efe4f24e51c703d7fb1ae4109101
+SEG003_CURSOR=d028-pos
+SEG003_WORLD_REVISION=154
+SEG003_RESIDENT_REPLAYED=5
+SEG003_SUMMARY_REPLAYED=1
