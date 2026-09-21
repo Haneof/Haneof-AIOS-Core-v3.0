@@ -1,20 +1,20 @@
 {
   "branch": "arena/01a0bf95-haneof-aios-core-v3-0",
   "export_rule": "Only first missing semantic request; no hidden fixture copied.",
-  "head_sha": "0854d499bdf3d7fb22d1767463520981a4ca6f75",
+  "head_sha": "4e8c5df939e1c207f19634cafbecd31bd4cd9bf8",
   "pending_blocks_printed": 1,
-  "run_id": 35555226185,
+  "run_id": 35555258612,
   "runner_attestation": {
     "current_state": {
-      "delivered_external_events": 2,
-      "index_watermark": 152,
-      "last_consumed_external_event_id": "d028-pos",
+      "delivered_external_events": 3,
+      "index_watermark": 155,
+      "last_consumed_external_event_id": "d029-production",
       "resident_replayed_calls": 4,
-      "simulated_clock": "2027-01-20T08:15:00+00:00",
+      "simulated_clock": "2027-01-20T09:10:00+00:00",
       "status": "pending",
-      "summary_replayed_calls": 1,
-      "world_revision": 152,
-      "world_sha256": "b22c795036d9f77a67669f4df2b8d4fedb6f0c62526004d418d6f13a779ed2c2"
+      "summary_replayed_calls": 2,
+      "world_revision": 155,
+      "world_sha256": "9de27c390bb3180d90448a53ee44135cc65bf5c073af168cbe0ad4bc4701d9f2"
     },
     "expected_source_revision": 145,
     "expected_subject": "sol-resident-20260921-001",
@@ -30,14 +30,14 @@
     "source_world_sha256": "ba843f00e107cf6184ae25941d96ceb4ddb9a19234c99a789967c48f21cabec8"
   },
   "state": {
-    "delivered_external_events": 2,
-    "index_watermark": 152,
-    "last_consumed_external_event_id": "d028-pos",
+    "delivered_external_events": 3,
+    "index_watermark": 155,
+    "last_consumed_external_event_id": "d029-production",
     "resident_replayed_calls": 4,
-    "simulated_clock": "2027-01-20T08:15:00+00:00",
+    "simulated_clock": "2027-01-20T09:10:00+00:00",
     "status": "pending",
-    "summary_replayed_calls": 1,
-    "world_revision": 152,
-    "world_sha256": "b22c795036d9f77a67669f4df2b8d4fedb6f0c62526004d418d6f13a779ed2c2"
+    "summary_replayed_calls": 2,
+    "world_revision": 155,
+    "world_sha256": "9de27c390bb3180d90448a53ee44135cc65bf5c073af168cbe0ad4bc4701d9f2"
   }
 }
