@@ -146,3 +146,21 @@ Periodic Review（窗口 2026-10-01T14:13:01Z → 2026-10-05T14:07:01Z，21 anch
 - 无模型调用、无语义写入。
 
 **Resulting state**: world_revision 47, index watermark 47, pending wakes 0, Claims 0。
+
+---
+
+## Cursor 7 — `c14resv2-007` — 2026-10-05T15:12:00-07:00 (dim:work_outcome)
+
+**Released**
+- dimension `dim:work_outcome`, source_kind `task_tracker`, source_class `PLATFORM`, modality `structured_text`
+- payload: "“定价说明”到 15:00 完成约 65%；剩余部分移到次日上午继续。"
+
+**Mechanical chain**: reveal → `receipts/reveal/cursor-007.json`; ingest → `obs_c14_fixture_35f8ca5c3abafa4ba5c8650a@1` (world_revision 48); watch hook: no match; ack → `receipts/ack/cursor-007.json`, `next_sequence=8`.
+
+**Due work at T = 2026-10-05T15:12:00-07:00** (`receipts/process-due-20261005T221200Z.json`):
+- Summaries: attempted=40, committed=0（16 unchanged / 24 empty）；10-05 日窗未闭合。
+- C14 reconcile: examined=16，全部幂等（既有 merged wake，无新 wake、无 dispatch）。
+- Periodic Review: not due。
+- 无模型调用、无语义写入。
+
+**Resulting state**: world_revision 48, index watermark 48, pending wakes 0, Claims 0。
