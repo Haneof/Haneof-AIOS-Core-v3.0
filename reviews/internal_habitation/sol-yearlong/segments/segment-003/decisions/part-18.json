@@ -1,0 +1,14 @@
+{
+  "a9871e32f4a93ea9b84891e530008fe737f71139696628c1edfab93a895be469": {
+    "calls": [
+      {
+        "arguments": {
+          "limit": 50
+        },
+        "call_id": "seg003-009",
+        "name": "read_periodic_review_anchors"
+      }
+    ],
+    "kind": "capability_calls"
+  }
+}
