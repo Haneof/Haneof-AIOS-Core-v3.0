@@ -18,7 +18,7 @@ from urllib import error as urllib_error
 from urllib import request as urllib_request
 
 from aios_core.runtime.capabilities import CapabilityCall, CapabilityResult
-from aios_core.runtime.cognitive_runtime import ModelDirective, RuntimeSnapshot
+from aios_core.runtime.cognitive_runtime import ModelDirective, ModelUsage, RuntimeSnapshot
 
 
 SILENCE_TOKEN = "<AIOS_SILENCE>"
@@ -340,6 +340,67 @@ class ProviderRequestRecord:
     error_message: str | None = None
 
 
+def _non_negative_int(value: object) -> int | None:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        return None
+    return value
+
+
+def _model_usage(provider: str, response: Mapping[str, Any]) -> ModelUsage | None:
+    """Normalize only exact provider-reported token usage.
+
+    Unknown or incomplete shapes return None rather than estimating tokens.
+    """
+
+    raw = response.get("usage")
+    if not isinstance(raw, Mapping):
+        raw = response.get("usage_metadata")
+    if not isinstance(raw, Mapping):
+        return None
+
+    if provider == "openai":
+        input_tokens = _non_negative_int(raw.get("input_tokens"))
+        output_tokens = _non_negative_int(raw.get("output_tokens"))
+        total_tokens = _non_negative_int(raw.get("total_tokens"))
+        if total_tokens is None and input_tokens is not None and output_tokens is not None:
+            total_tokens = input_tokens + output_tokens
+        if total_tokens is None:
+            return None
+        return ModelUsage(
+            total_tokens=total_tokens,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+        )
+
+    if provider == "anthropic":
+        base_input = _non_negative_int(raw.get("input_tokens"))
+        cache_create = _non_negative_int(raw.get("cache_creation_input_tokens"))
+        cache_read = _non_negative_int(raw.get("cache_read_input_tokens"))
+        output_tokens = _non_negative_int(raw.get("output_tokens"))
+        if base_input is None or output_tokens is None:
+            return None
+        input_tokens = base_input + (cache_create or 0) + (cache_read or 0)
+        return ModelUsage(
+            total_tokens=input_tokens + output_tokens,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+        )
+
+    if provider == "gemini":
+        input_tokens = _non_negative_int(raw.get("prompt_token_count"))
+        output_tokens = _non_negative_int(raw.get("candidates_token_count"))
+        total_tokens = _non_negative_int(raw.get("total_token_count"))
+        if total_tokens is None:
+            return None
+        return ModelUsage(
+            total_tokens=total_tokens,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+        )
+
+    return None
+
+
 def urllib_json_transport(
     url: str,
     headers: Mapping[str, str],
@@ -606,13 +667,17 @@ def _arguments(value: Any) -> Mapping[str, Any]:
     raise ProviderProtocolError("provider tool arguments must be object or JSON string")
 
 
-def _terminal_directive(text: str) -> ModelDirective:
+def _terminal_directive(
+    text: str,
+    *,
+    usage: ModelUsage | None = None,
+) -> ModelDirective:
     clean = text.strip()
     if clean == SILENCE_TOKEN:
-        return ModelDirective(silence=True)
+        return ModelDirective(silence=True, usage=usage)
     if not clean:
         raise ProviderProtocolError("provider returned no terminal text or tool call")
-    return ModelDirective(response=clean)
+    return ModelDirective(response=clean, usage=usage)
 
 
 def _openai_text(response: Mapping[str, Any]) -> str:
@@ -761,6 +826,7 @@ class ProviderResidentHandler:
             body["input"] = input_items
 
         response = self.client.request(body, purpose="resident")
+        usage = _model_usage("openai", response)
         response_id = response.get("id")
         if not isinstance(response_id, str) or not response_id.strip():
             raise ProviderProtocolError("OpenAI response missing id")
@@ -786,8 +852,8 @@ class ProviderResidentHandler:
                     )
                 )
         if calls:
-            return ModelDirective(capability_calls=tuple(calls))
-        return _terminal_directive(_openai_text(response))
+            return ModelDirective(capability_calls=tuple(calls), usage=usage)
+        return _terminal_directive(_openai_text(response), usage=usage)
 
     def _anthropic(self, snapshot: RuntimeSnapshot) -> ModelDirective:
         tools = provider_tools(
@@ -842,6 +908,7 @@ class ProviderResidentHandler:
             body["temperature"] = self.client.config.temperature
 
         response = self.client.request(body, purpose="resident")
+        usage = _model_usage("anthropic", response)
         response_id = response.get("id")
         if not isinstance(response_id, str) or not response_id.strip():
             raise ProviderProtocolError("Anthropic response missing id")
@@ -869,8 +936,8 @@ class ProviderResidentHandler:
                 )
             )
         if calls:
-            return ModelDirective(capability_calls=tuple(calls))
-        return _terminal_directive(_anthropic_text(response))
+            return ModelDirective(capability_calls=tuple(calls), usage=usage)
+        return _terminal_directive(_anthropic_text(response), usage=usage)
 
     def _gemini(self, snapshot: RuntimeSnapshot) -> ModelDirective:
         tools = provider_tools(
@@ -920,6 +987,7 @@ class ProviderResidentHandler:
             body["input"] = result_steps
 
         response = self.client.request(body, purpose="resident")
+        usage = _model_usage("gemini", response)
         response_id = response.get("id")
         if not isinstance(response_id, str) or not response_id.strip():
             raise ProviderProtocolError("Gemini interaction response missing id")
@@ -945,8 +1013,8 @@ class ProviderResidentHandler:
                     )
                 )
         if calls:
-            return ModelDirective(capability_calls=tuple(calls))
-        return _terminal_directive(_gemini_text(response))
+            return ModelDirective(capability_calls=tuple(calls), usage=usage)
+        return _terminal_directive(_gemini_text(response), usage=usage)
 
 
 class ProviderRoundSummaryHandler:
