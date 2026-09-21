@@ -1,0 +1,19 @@
+name: t36-required-fused-turn-gate
+
+on:
+  push:
+    branches:
+      - "task/t36-search-001-structured-scalar-20260921"
+
+jobs:
+  fused-turn-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - name: Run fused-turn runtime regression
+        run: pytest -q tests/integration/test_v3_fused_turn_runtime.py tests/runtime/test_cognitive_runtime.py
