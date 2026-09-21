@@ -1,0 +1,1 @@
+{"261fa5a6feef720ab13738d4ae8c76d150b4dd33dc0627040c77873063fb9a57":{"kind":"capability_calls","calls":[{"name":"search_timeline","arguments":{"window_start":"2027-01-24T00:00:00Z","window_end":"2027-01-26T18:10:00Z","object_types":["observation"],"limit":20},"call_id":"seg003-feedback-date-evidence"}]}}
