@@ -1,0 +1,30 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "object_id": "clm_7672f379ea32d16e77ea7e97",
+        "revision": 1
+      },
+      "call_id": "cp0013-inspect-work-pattern-claim",
+      "name": "inspect_world_object"
+    },
+    {
+      "arguments": {
+        "dimensions": [
+          "dim:sleep",
+          "dim:collaboration_activity",
+          "dim:work",
+          "dim:work_outcome",
+          "dim:user_ai_interaction"
+        ],
+        "window_end": "2026-11-11T00:00:00Z",
+        "window_start": "2026-11-10T00:00:00Z"
+      },
+      "call_id": "cp0013-nov10-all-dimensions",
+      "name": "request_all_dimensions_projection"
+    }
+  ],
+  "checkpoint_id": "cp0013",
+  "decision_rationale": "The user's report is new counter-evidence relevant to an existing work-pattern hypothesis. Inspect the pinned Claim and the direct Nov-10 cross-dimensional reality before revising or responding.",
+  "github_author": "single-window-resident-control"
+}
