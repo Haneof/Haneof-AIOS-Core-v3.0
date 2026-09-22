@@ -1,0 +1,15 @@
+{
+  "item_id": "c14semrep-001",
+  "kind": "EVENT",
+  "payload": {
+    "dimension": "dim:sleep",
+    "event_id": "c14semrep-001",
+    "modality": "structured_text",
+    "occurred_at": "2026-11-03T07:06:00-08:00",
+    "resident_visible_payload": "昨晚睡眠 7小时46分；睡眠评分 83/100；07:01 醒来。",
+    "sequence": 1,
+    "source_class": "SENSOR",
+    "source_kind": "wearable"
+  },
+  "run_id": "c14-sem-repair-resident-20260922-sol-r5-b81e37"
+}
