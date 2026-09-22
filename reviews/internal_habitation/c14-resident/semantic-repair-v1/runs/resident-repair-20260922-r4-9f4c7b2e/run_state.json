@@ -6,7 +6,7 @@
   "current_simulated_timestamp": "2026-11-06T06:53:00-08:00",
   "errors": [],
   "next_checkpoint": 3,
-  "next_summary_request": 1,
+  "next_summary_request": 2,
   "phase": "A",
   "released_cursors": [
     1,
@@ -36,5 +36,12 @@
   ],
   "session_id": "resident-sem-repair-sol-20260922-r4-9f4c7b2e",
   "silence_count": 1,
-  "summary_requests": []
+  "summary_requests": [
+    {
+      "github_author": "single-window-resident-control",
+      "kind": "dimension_summary",
+      "released_cursor": 4,
+      "request_id": "sum0001"
+    }
+  ]
 }
