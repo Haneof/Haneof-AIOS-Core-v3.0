@@ -1,0 +1,6 @@
+{
+  "checkpoint_id": "cp0002",
+  "decision_rationale": "The pinned anchor confirms only one ordinary sleep measurement. It supports no durable user-understanding, strategy, calibration, policy, or operation-experience conclusion, so silence is the evidence-grounded choice.",
+  "github_author": "single-window-resident-control",
+  "silence": true
+}

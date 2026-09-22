@@ -5,7 +5,7 @@
   "conversation_turn_index": 0,
   "current_simulated_timestamp": "2026-11-03T07:06:00-08:00",
   "errors": [],
-  "next_checkpoint": 2,
+  "next_checkpoint": 3,
   "next_summary_request": 1,
   "phase": "A",
   "released_cursors": [
@@ -21,9 +21,17 @@
       "released_cursor": 1,
       "simulated_timestamp": "2026-11-03T07:06:00-08:00",
       "world_revision_before": 3
+    },
+    {
+      "checkpoint_id": "cp0002",
+      "directive_kind": "silence",
+      "github_author": "single-window-resident-control",
+      "released_cursor": 1,
+      "simulated_timestamp": "2026-11-03T07:06:00-08:00",
+      "world_revision_before": 3
     }
   ],
   "session_id": "resident-sem-repair-sol-20260922-r4-9f4c7b2e",
-  "silence_count": 0,
+  "silence_count": 1,
   "summary_requests": []
 }
