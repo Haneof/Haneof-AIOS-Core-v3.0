@@ -5,7 +5,7 @@ on:
     branches:
       - c14/semantic-repair-resident-control-20260922-sol
     paths:
-      - resident-control-r2.json
+      - resident-control-r2.txt
 
 permissions:
   contents: read
@@ -24,18 +24,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python - <<'PY'
-          import json, os, urllib.request
+          import base64, json, os, urllib.request
           from pathlib import Path
-          c = json.loads(Path("resident-control-r2.json").read_text(encoding="utf-8"))
-          run_id = c["run_id"]
-          kind = c["kind"]
-          item_id = c["item_id"]
-          payload = c.get("payload")
-          text = c.get("text")
-          if payload is not None:
-              body = f"AIOS_RESIDENT_{kind} {run_id} {item_id}\n" + json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
-          else:
-              body = f"AIOS_RESIDENT_{kind} {run_id} {item_id}\n" + str(text or "")
+          body = base64.b64decode(Path("resident-control-r2.txt").read_text(encoding="ascii").strip()).decode("utf-8")
           req = urllib.request.Request(
               "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/issues/84/comments",
               data=json.dumps({"body": body}, ensure_ascii=False).encode("utf-8"),
