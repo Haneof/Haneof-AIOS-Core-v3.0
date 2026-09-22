@@ -29,6 +29,7 @@ from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.registry import canonical_model_for_object_type
 from aios_core.contracts.time import KnowledgeWindow, as_utc
 from aios_core.dependency.graph import collect_impacted_dependents
+from aios_core.policy.evidence import CognitionEvidencePolicy
 from aios_core.query.search import WorldSearchIndex
 from aios_core.storage.idempotency import canonical_json_dumps
 from aios_core.storage.sqlite_store import SQLiteWorldStore
@@ -91,10 +92,12 @@ class CognitionRevisionService:
         index: WorldSearchIndex | None = None,
         subject_id: str = "user_1",
         evidence_subject_ids: Sequence[str] | None = None,
+        evidence_policy: CognitionEvidencePolicy | None = None,
     ) -> None:
         self.store = store
         self.index = index
         self.subject_id = subject_id
+        self.evidence_policy = evidence_policy
         allowed = tuple(evidence_subject_ids or (subject_id,))
         self.evidence_subject_ids = frozenset(
             str(item).strip() for item in allowed if str(item).strip()
@@ -188,6 +191,12 @@ class CognitionRevisionService:
         # stale_review_required is intentionally revisable: propagation marks a
         # dependent for model review, and the resident AI must be able to replace
         # that stale revision with a new active understanding.
+
+        if self.evidence_policy is not None:
+            self.evidence_policy.validate(
+                request.evidence_refs,
+                operation=f"cognition_revision.{request.mode}",
+            )
 
         for ref in request.evidence_refs:
             evidence_payload = self.store.get_payload(

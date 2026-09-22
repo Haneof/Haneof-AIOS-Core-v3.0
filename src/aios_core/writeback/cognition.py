@@ -19,6 +19,7 @@ from aios_core.contracts.models import Claim, Dependency, EvidenceCoverage, Evid
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import KnowledgeWindow, TemporalExtent, as_utc
+from aios_core.policy.evidence import CognitionEvidencePolicy
 from aios_core.query.search import WorldSearchIndex
 from aios_core.storage.idempotency import canonical_json_dumps
 from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
@@ -70,10 +71,12 @@ class CognitionWritebackService:
         index: WorldSearchIndex | None = None,
         subject_id: str = "user_1",
         evidence_subject_ids: Sequence[str] | None = None,
+        evidence_policy: CognitionEvidencePolicy | None = None,
     ) -> None:
         self.store = store
         self.index = index
         self.subject_id = subject_id
+        self.evidence_policy = evidence_policy
         allowed = tuple(evidence_subject_ids or (subject_id,))
         self.evidence_subject_ids = frozenset(
             str(item).strip() for item in allowed if str(item).strip()
@@ -94,6 +97,12 @@ class CognitionWritebackService:
                 key=lambda ref: (ref.object_id, int(ref.revision or 0)),
             )
         )
+
+        if self.evidence_policy is not None:
+            self.evidence_policy.validate(
+                pinned,
+                operation="cognition_writeback.commit_claim",
+            )
 
         # Evidence must already exist in the same private-world subject scope at
         # exactly the pinned revision. AI-self cognition may explicitly opt into
