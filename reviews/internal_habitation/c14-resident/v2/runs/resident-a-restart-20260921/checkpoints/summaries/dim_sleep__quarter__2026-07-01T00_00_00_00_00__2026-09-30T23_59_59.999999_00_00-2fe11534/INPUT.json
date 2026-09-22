@@ -1,0 +1,33 @@
+{
+  "dimension": "dim:sleep",
+  "granularity": "quarter",
+  "source_world_revision": 36,
+  "sources": [
+    {
+      "metadata": {
+        "dimension": "dim:sleep",
+        "summary_kind": "single_dimension_temporal"
+      },
+      "object_id": "sum_f222693ff55566369177b6e8",
+      "object_type": "summary",
+      "occurred_at": "2026-09-01T00:00:00Z",
+      "revision": 1,
+      "text": "2026-09 睡眠：本月窗口内仅含一份下级摘要（09-28–10-04 周摘要）：该周唯一睡眠记录为 10-01 的睡眠 7小时44分、评分 84/100、07:08 醒来。"
+    },
+    {
+      "metadata": {
+        "dimension": "dim:sleep",
+        "summary_kind": "single_dimension_temporal"
+      },
+      "object_id": "sum_7f9c1dda2a76a9f3e2a5f087",
+      "object_type": "summary",
+      "occurred_at": "2026-09-28T00:00:00Z",
+      "revision": 1,
+      "text": "2026-09-28–10-04 当周睡眠：本周仅 10-01 有一条睡眠记录——睡眠 7小时44分，评分 84/100，07:08 醒来。"
+    }
+  ],
+  "summary_key": "dim:sleep__quarter__2026-07-01T00:00:00+00:00__2026-09-30T23:59:59.999999+00:00",
+  "truncated": false,
+  "window_end": "2026-09-30T23:59:59.999999+00:00",
+  "window_start": "2026-07-01T00:00:00+00:00"
+}

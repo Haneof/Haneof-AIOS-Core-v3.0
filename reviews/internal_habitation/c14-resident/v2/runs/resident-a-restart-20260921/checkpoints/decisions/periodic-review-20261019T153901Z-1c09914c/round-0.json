@@ -1,0 +1,6 @@
+{
+  "capability_calls": [
+    {"name": "read_periodic_review_anchors", "arguments": {"limit": 25}}
+  ],
+  "rationale": "常规 Periodic Review（窗口 10-17T13:07Z→10-19T15:39Z，8 anchors）：读锚点，核对本窗口新增证据（10-17 会议与睡眠、10-19 长睡眠）与既有认知，判断是否需要修订/确认/回滚，或登记操作经验。"
+}

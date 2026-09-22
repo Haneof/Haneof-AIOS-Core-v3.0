@@ -1,0 +1,28 @@
+# DimensionSummaryInput — dim:device_activity__week__2026-10-05T00:00:00+00:00__2026-10-11T23:59:59.999999+00:00
+
+- dimension: dim:device_activity
+- granularity: week
+- window: 2026-10-05T00:00:00+00:00 .. 2026-10-11T23:59:59.999999+00:00
+- source_world_revision: 108
+- source_count: 2
+- truncated: False
+
+## sources (exact pinned material)
+
+### 1. sum_5d6e8d21ef5837c282e05308@1 (summary)
+
+- occurred_at: 2026-10-08T00:00:00Z
+- metadata: {"dimension": "dim:device_activity", "summary_kind": "single_dimension_temporal"}
+
+```text
+2026-10-08 设备活动：08:13–10:34 处于专注模式；期间主动解锁 2 次，29 条通知被静音。
+```
+
+### 2. obs_c14_fixture_522a6cbeb84ced83b62def58@1 (observation)
+
+- occurred_at: 2026-10-08T17:38:00Z
+- metadata: {"dimension": "dim:device_activity", "external_record_id": "c14resv2-011", "external_revision": "1", "fixture_binding_version": "c14-fixture-event-binding-v1", "fixture_event_id": "c14resv2-011", "fixture_payload_sha256": "sha256:547539c50c9873709005bddede82991e544581274367210dca761bf4becd6794", "fixture_projection_sha256": "sha256:5a11b264b4a569d6980d377fecff80aab6d3b7c4b1bae048d2f629b4d6520445", "fixture_sequence": 11, "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253", "fixture_version": "c14-resident-fixture-v2", "mechanical_ingest": true, "occurred_at_original": "2026-10-08T10:38:00-07:00", "source_class": "platform"}
+
+```text
+08:13–10:34 开启专注模式；期间主动解锁 2 次，29 条通知被静音。
+```

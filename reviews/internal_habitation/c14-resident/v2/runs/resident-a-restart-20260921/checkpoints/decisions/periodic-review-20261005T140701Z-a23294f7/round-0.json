@@ -1,0 +1,6 @@
+{
+  "capability_calls": [
+    {"name": "read_periodic_review_anchors", "arguments": {"limit": 25}}
+  ],
+  "rationale": "先读取本轮窗口（10-01T14:13Z → 10-05T14:07Z）的 21 个锚点，再判断是否需要修订/确认既有认知或操作经验。"
+}

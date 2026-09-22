@@ -1,0 +1,27 @@
+{
+  "capability_history": [
+    {
+      "call_id": null,
+      "data": [
+        {
+          "excerpt": "昨晚睡眠 7小时44分；睡眠评分 84/100；07:08 醒来。",
+          "object_ref": {
+            "object_id": "obs_c14_fixture_b32d3cded992194438f114a9",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-10-01T14:12:00Z"
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "name": "read_periodic_review_anchors",
+      "ok": true
+    }
+  ],
+  "directive": {
+    "silence": true
+  },
+  "round_index": 1,
+  "unit_key": "periodic-review-20261001T141301Z"
+}

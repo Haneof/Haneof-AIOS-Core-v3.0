@@ -1,0 +1,18 @@
+{
+  "capability_history": [
+    {
+      "call_id": null,
+      "data": [],
+      "error_code": null,
+      "error_message": null,
+      "name": "read_ai_world",
+      "ok": true
+    }
+  ],
+  "directive": {
+    "rationale": "已核对 AI-world：仍为 0 条认知，无程序侧自动写入。3 名成员均为 10-05 单日 REALITY 摘要：日程被 09:05 stand-up 与 09:50 供应商电话打断、写作时间重排；睡眠 7h39m/82（第二晚样本，与 10-01 的 7h44m/84 相似但 n=2、中间 4 天无数据）；工作产出 15:00 完成约 65%、余量移至次日上午。单日中断叙事（含用户自述的重新找表 10 余分钟）尚未重复出现；睡眠样本低于我自设的 ≥3 一致样本门槛。无可修订对象。故保持沉默，待重复模式出现再评。",
+    "silence": true
+  },
+  "round_index": 1,
+  "unit_key": "wake-cognitive_derivation-wake_2ae0b7a9d8d606348fc6ed9b-rev1"
+}

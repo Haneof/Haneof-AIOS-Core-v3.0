@@ -1,0 +1,23 @@
+{
+  "capability_calls": [
+    {"name": "commit_claim", "arguments": {
+      "content": "写作块交付与日程保护程度相关（截至 10-08 的 3 次观察）：未被会议插入的写作块——10-01“架构备忘录起草”08:00–10:20、10-08“设计评审稿”08:15–10:35——都在计划区间内完成（10:16 / 10:31 提交），且整块处于专注模式（主动解锁 3 / 2 次，静音通知 26 / 29 条）；被会议插入的一次——10-05“定价说明起草”08:30–10:45 期间加入 09:05 stand-up 与 09:50 供应商电话、剩余写作被重排到 13:40–15:00——到 15:00 仅完成约 65%，余量顺延至次日上午，且用户续写时需约十余分钟重新定位上午引用的材料。假设：日程保护是该用户写作块按时交付的关键条件之一。",
+      "evidence_refs": [
+        {"object_id": "obs_c14_fixture_3195efa3abad26d259380073", "revision": 1},
+        {"object_id": "obs_c14_fixture_7422eaba53dc07eb87572e67", "revision": 1},
+        {"object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43", "revision": 1},
+        {"object_id": "obs_c14_fixture_8a41a59c20d2aac5789bf0f1", "revision": 1},
+        {"object_id": "obs_c14_fixture_35f8ca5c3abafa4ba5c8650a", "revision": 1},
+        {"object_id": "obs_c14_fixture_0ca259ffc10ff4a9218561d0", "revision": 1},
+        {"object_id": "obs_c14_fixture_6e081d5c46196e1781165d5c", "revision": 1},
+        {"object_id": "obs_c14_fixture_522a6cbeb84ced83b62def58", "revision": 1},
+        {"object_id": "obs_c14_fixture_96ba14d7f113e478b8a8bae8", "revision": 1}
+      ],
+      "confidence": 0.5,
+      "dimension": "dim:work_outcome",
+      "claim_type": "hypothesis",
+      "knowledge_state": "hypothesis"
+    }}
+  ],
+  "rationale": "跨日证据（自取 search_timeline）覆盖三次写作块及其日程/设备/会话上下文，结构为“受保护→按计划交付（2/2）”与“被打断→顺延并产生恢复成本（1/1）”。达到我自设的 ≥3 实例门槛，按 hypothesis/0.5 登记以便后续修订或撤回。"
+}

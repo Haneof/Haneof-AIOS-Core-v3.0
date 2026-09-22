@@ -1,0 +1,8 @@
+{
+  "capability_calls": [
+    {"name": "read_ai_world", "arguments": {"limit": 50}},
+    {"name": "search_timeline", "arguments": {"dimension": "dim:sleep", "window_start": "2026-10-01T00:00:00Z", "window_end": "2026-10-20T00:00:00Z", "limit": 20}},
+    {"name": "search_timeline", "arguments": {"dimension": "dim:schedule", "window_start": "2026-10-12T00:00:00Z", "window_end": "2026-10-20T00:00:00Z", "limit": 20}}
+  ],
+  "rationale": "5 成员 bundle（10-17 的 schedule/sleep 日摘要 + 10-12–10-18 的 environment/schedule/sleep 周摘要，均 REALITY）。先读既有认知，再取睡眠与日程的全序列（含刚入库、落在本 bundle 窗口之外的 10-19 睡眠观测），据此判断睡眠线是否需要形成/修订/撤回认知。"
+}
