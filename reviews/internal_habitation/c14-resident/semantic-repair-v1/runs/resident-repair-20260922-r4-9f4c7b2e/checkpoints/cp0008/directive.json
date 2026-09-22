@@ -1,0 +1,21 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "dimensions": [
+          "dim:sleep",
+          "dim:device_activity",
+          "dim:collaboration_activity",
+          "dim:work_outcome"
+        ],
+        "window_end": "2026-11-07T00:00:00Z",
+        "window_start": "2026-11-03T00:00:00Z"
+      },
+      "call_id": "cp0008-all-dimensions-unfiltered",
+      "name": "request_all_dimensions_projection"
+    }
+  ],
+  "checkpoint_id": "cp0008",
+  "decision_rationale": "The first ALL_DIMENSIONS query returned empty slices because the semantic query did not match indexed payloads. Retry the same bounded window without query rather than treating that empty retrieval as absence of evidence.",
+  "github_author": "single-window-resident-control"
+}
