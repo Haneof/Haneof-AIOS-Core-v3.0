@@ -14,6 +14,18 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
+## 当前工程断点 — C15-RCC-RES-A-001 evidence 已验收：Phase A frozen，唯一下一 READY = C15-RCC-RES-B-001
+
+- 2026-09-22 更新：`C15-RCC-RES-A-001 = DONE`；`C15-RCC-RES-B-001 = READY`；`C15-RCC-RES-C-001 = BLOCKED`；`C15-RCC-EVAL-001 = BLOCKED`；`C15-RCC-CLOSE-001 = BLOCKED`。
+- Canonical Resident A evidence: PR #101 @ `bfbfa059e2ac616326eecdfe3ffa7a927bdc7ce2`，保持 **OPEN / UNMERGED / PINNED**；session `resident-a-c15-rcc-20260922`。
+- Mechanical freeze: cursor `1..13` complete；cursor 14 not revealed；Phase B not initialized；World revision `90`；Index watermark `90`；lag `0`。
+- Digests: World `ea9ea2384bc10e7fbe12c2015074f25193ada134530882cf5b3276d9201df15a`；Index `0d73069608a0293f938a8bb711096273cbad81dd9e6117118d9517e5791ffc80`；release-state `3ca82ff1454deaa9c703c7a0d8e2d7a01b581751bac52286ae390728651591b0`。
+- Resident A Phase A frozen and accepted.
+- Resident B must recover only durable AIOS state from PR #101 exact head.
+- B legal recovery inputs are limited to accepted private World bytes, rebuildable index, runtime/checkpoint state, release state, mechanical digests, the B-safe run contract, and normal RuntimeSnapshot/capabilities. Do not provide A transcript, A run report, PM semantic summary, checkpoint prose dump, expected cognition, or evaluator notes.
+- PM acceptance: `reviews/C15_RCC_RES_A_001_PM_ACCEPTANCE_REVIEW_2026-09-22.md`.
+- **Next unique READY: `C15-RCC-RES-B-001`.**
+
 ## 当前工程断点 — C15-RCC-FIXTURE-001 已完成：sealed RCC life 已冻结，唯一下一 READY = C15-RCC-RES-A-001
 
 - 2026-09-22 更新：`C15-RCC-FIXTURE-001 = DONE`；`C15-RCC-RES-A-001 = READY`；`C15-RCC-RES-B-001 = BLOCKED`；`C15-RCC-RES-C-001 = BLOCKED`；`C15-RCC-EVAL-001 = BLOCKED`。
