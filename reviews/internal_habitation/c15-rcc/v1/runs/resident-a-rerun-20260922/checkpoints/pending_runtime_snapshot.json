@@ -1,6 +1,3 @@
-INDEX {"caught_up_rows": 1, "watermark": 1, "lag": 0, "world_revision": 1}
-DUE_SUMMARY_RESULT SummaryScheduleResult(attempted_jobs=(), commits=(), skipped_unchanged=(), skipped_empty=(), truncated=False)
-NEED_RESIDENT_DECISION resident decision required
 {
   "kind": "runtime_snapshot",
   "cursor": 1,
