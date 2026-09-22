@@ -278,6 +278,11 @@ def test_derivation_cockpit_uses_same_resident_runtime_metering_and_suppresses_b
         for value in vars(runtime).values()
     ) == 1
     assert runtime.cognitive_runtime.model_handler is model
+    before_interactions = [
+        item
+        for item in store.list_payloads(object_type=ObjectType.OBSERVATION)
+        if item.get("source_kind") == "user_ai_interaction"
+    ]
 
     result = runtime.run_wake(
         wake_ref=ObjectRef(
@@ -286,11 +291,18 @@ def test_derivation_cockpit_uses_same_resident_runtime_metering_and_suppresses_b
         ),
         now=NOW + timedelta(minutes=30),
     )
+    after_interactions = [
+        item
+        for item in store.list_payloads(object_type=ObjectType.OBSERVATION)
+        if item.get("source_kind") == "user_ai_interaction"
+    ]
 
     assert result.runtime is not None
     assert result.runtime.response is not None
     assert result.delivery_response is None
     assert result.delivery_suppressed is True
+    assert result.delivery_observation_ref is None
+    assert after_interactions == before_interactions
     assert result.wake.state == "completed"
     calls = runtime.metering.list_model_calls(
         subject_id="user_1",
