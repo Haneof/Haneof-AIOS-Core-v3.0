@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 set -euo pipefail
-python resident_ops/c15_due_probe_generic.py
+python resident_ops/c15_review_cursor13.py
