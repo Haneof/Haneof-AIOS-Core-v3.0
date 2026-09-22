@@ -36,6 +36,9 @@ class ClaimWriteRequest(BaseModel):
     knowledge_state: KnowledgeState = KnowledgeState.INFERRED
     claimant_id: str = "resident_ai"
     metadata: dict[str, Any] = Field(default_factory=dict)
+    valid_time: TemporalExtent = Field(default_factory=TemporalExtent.unknown_time)
+    unknown_items: tuple[str, ...] = ()
+    counter_evidence_refs: tuple[ObjectRef, ...] = ()
 
     @model_validator(mode="after")
     def validate_refs(self) -> "ClaimWriteRequest":
@@ -44,6 +47,11 @@ class ClaimWriteRequest(BaseModel):
         for ref in self.evidence_refs:
             if ref.revision is None:
                 raise ValueError("cognitive writeback requires pinned evidence revisions")
+        for ref in self.counter_evidence_refs:
+            if ref.revision is None:
+                raise ValueError("cognitive writeback requires pinned counter evidence revisions")
+        if any(not item.strip() for item in self.unknown_items):
+            raise ValueError("unknown_items must not contain blank values")
         return self
 
 
@@ -122,10 +130,30 @@ class CognitionWritebackService:
                     f"{ref.object_id}@{ref.revision} belongs to {evidence_subject!r}"
                 )
 
+        counter_pinned = tuple(
+            sorted(
+                request.counter_evidence_refs,
+                key=lambda ref: (ref.object_id, int(ref.revision or 0)),
+            )
+        )
+        for ref in counter_pinned:
+            payload = self.store.get_payload(ref.object_id, revision=ref.revision)
+            evidence_subject = str(payload.get("subject_id") or "")
+            if evidence_subject not in self.evidence_subject_ids:
+                raise ValueError(
+                    "cognitive writeback counter evidence crosses the allowed subject scope: "
+                    f"{ref.object_id}@{ref.revision} belongs to {evidence_subject!r}"
+                )
+
         self.evidence_policy.validate(
             pinned,
             operation="cognition_writeback.commit_claim",
         )
+        if counter_pinned:
+            self.evidence_policy.validate(
+                counter_pinned,
+                operation="cognition_writeback.commit_claim:counter_evidence",
+            )
 
         evidence_key = tuple((ref.object_id, ref.revision) for ref in pinned)
         evidence_set_id = _stable_id(
@@ -134,6 +162,17 @@ class CognitionWritebackService:
             request.dimension,
             evidence_key,
             learned.isoformat(),
+        )
+        counter_evidence_set_id = (
+            _stable_id(
+                "evs_counter",
+                self.subject_id,
+                request.dimension,
+                tuple((ref.object_id, ref.revision) for ref in counter_pinned),
+                learned.isoformat(),
+            )
+            if counter_pinned
+            else None
         )
         claim_id = _stable_id(
             "clm",
@@ -145,6 +184,9 @@ class CognitionWritebackService:
             request.confidence,
             request.metadata,
             evidence_set_id,
+            counter_evidence_set_id,
+            request.valid_time.model_dump(mode="json"),
+            list(request.unknown_items),
             learned.isoformat(),
         )
 
@@ -155,6 +197,12 @@ class CognitionWritebackService:
                 for ref in pinned
             ],
         ]
+        if counter_evidence_set_id is not None:
+            dependency_ids.append(_stable_id("dep", claim_id, 1, counter_evidence_set_id, 1))
+            for ref in counter_pinned:
+                dependency_ids.append(
+                    _stable_id("dep", counter_evidence_set_id, 1, ref.object_id, ref.revision)
+                )
 
         # Exact retry: atomic commit guarantees that if the claim exists, the whole
         # evidence/dependency bundle exists too.
@@ -200,6 +248,41 @@ class CognitionWritebackService:
             },
         )
         evidence_ref = ObjectRef(object_id=evidence_set_id, revision=1)
+        objects_to_commit: list[Any] = [evidence_set]
+
+        counter_evidence_ref = None
+        if counter_evidence_set_id is not None:
+            counter_evidence_set = EvidenceSet(
+                object_id=counter_evidence_set_id,
+                subject_id=self.subject_id,
+                learned_at=learned,
+                recorded_at=learned,
+                created_by="cognition_writeback:counter_evidence",
+                purpose="support resident AI cognition counter evidence",
+                knowledge_window=KnowledgeWindow(
+                    knowledge_cutoff=learned,
+                    world_revision=current_world_revision,
+                ),
+                member_refs=list(counter_pinned),
+                counter_refs=list(counter_pinned),
+                selection_method="resident_model_selected_pinned_world_evidence",
+                coverage=EvidenceCoverage(
+                    expected_count=len(counter_pinned),
+                    observed_count=len(counter_pinned),
+                    coverage_ratio=1.0,
+                ),
+                metadata={
+                    **request.metadata,
+                    "dimension": request.dimension,
+                    "writeback_kind": "cognition_counter_evidence",
+                },
+            )
+            counter_evidence_ref = ObjectRef(object_id=counter_evidence_set_id, revision=1)
+            objects_to_commit.append(counter_evidence_set)
+
+        counter_evidence_set_refs = (
+            [counter_evidence_ref] if counter_evidence_ref is not None else []
+        )
         claim = Claim(
             object_id=claim_id,
             subject_id=self.subject_id,
@@ -210,17 +293,20 @@ class CognitionWritebackService:
             claim_type=request.claim_type,
             content=request.content.strip(),
             occurred=TemporalExtent.point(learned),
-            valid_time=TemporalExtent.unknown_time(),
+            valid_time=request.valid_time,
             asserted_at=learned,
             knowledge_state=request.knowledge_state,
             confidence=request.confidence,
             support_evidence_set_refs=[evidence_ref],
+            counter_evidence_set_refs=counter_evidence_set_refs,
+            unknown_items=list(request.unknown_items),
             metadata={
                 **request.metadata,
                 "dimension": request.dimension,
                 "writeback_kind": "revisable_cognition",
             },
         )
+        objects_to_commit.append(claim)
 
         dependency_objects: list[Dependency] = [
             Dependency(
@@ -234,7 +320,7 @@ class CognitionWritebackService:
                 dependency_type="claim_uses_evidence_set",
             )
         ]
-        for dep_id, ref in zip(dependency_ids[1:], pinned):
+        for dep_id, ref in zip(dependency_ids[1 : 1 + len(pinned)], pinned):
             dependency_objects.append(
                 Dependency(
                     object_id=dep_id,
@@ -248,6 +334,36 @@ class CognitionWritebackService:
                 )
             )
 
+        if counter_evidence_ref is not None:
+            c_offset = 1 + len(pinned)
+            dependency_objects.append(
+                Dependency(
+                    object_id=dependency_ids[c_offset],
+                    subject_id=self.subject_id,
+                    learned_at=learned,
+                    recorded_at=learned,
+                    created_by="cognition_writeback:dependency",
+                    dependent_ref=ObjectRef(object_id=claim_id, revision=1),
+                    dependency_ref=counter_evidence_ref,
+                    dependency_type="claim_uses_evidence_set",
+                )
+            )
+            for dep_id, ref in zip(dependency_ids[c_offset + 1 :], counter_pinned):
+                dependency_objects.append(
+                    Dependency(
+                        object_id=dep_id,
+                        subject_id=self.subject_id,
+                        learned_at=learned,
+                        recorded_at=learned,
+                        created_by="cognition_writeback:dependency",
+                        dependent_ref=counter_evidence_ref,
+                        dependency_ref=ref,
+                        dependency_type="evidence_set_contains_source",
+                    )
+                )
+
+        objects_to_commit.extend(dependency_objects)
+
         op_key = _stable_id("write", claim_id, evidence_set_id)
         operation = OperationRequest(
             operation_id=f"op_{op_key}",
@@ -256,6 +372,7 @@ class CognitionWritebackService:
                 "claim_id": claim_id,
                 "dimension": request.dimension,
                 "evidence_count": len(pinned),
+                "counter_evidence_count": len(counter_pinned),
             },
             expected_world_revision=current_world_revision,
             reason="commit revisable evidence-grounded AI cognition",
@@ -263,7 +380,7 @@ class CognitionWritebackService:
             source_class=SourceClass.AI_COGNITION,
         )
         result = self.store.commit(
-            [evidence_set, claim, *dependency_objects],
+            objects_to_commit,
             operation,
         )
         if self.index is not None:
