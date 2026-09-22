@@ -1,11 +1,16 @@
 {
-  "active_phase": "A",
+  "active_phase": "B",
   "fixture_sha256": "sha256:1095d5aef52061753db7d9dab558af1361b92976f2ded0e6956d70afe3e6527f",
   "fixture_version": "c14-semantic-repair-fixture-v1",
   "last_acked_event_id": "c14semrep-006",
   "last_acked_sequence": 6,
   "next_sequence": 7,
-  "pending_reveal": null,
+  "pending_reveal": {
+    "event_id": "c14semrep-007",
+    "fixture_sha256": "sha256:1095d5aef52061753db7d9dab558af1361b92976f2ded0e6956d70afe3e6527f",
+    "occurred_at": "2026-11-10T07:34:00-08:00",
+    "sequence": 7
+  },
   "receipts": [
     {
       "binding_mode": "fixture_observation",
