@@ -1,0 +1,12 @@
+{
+  "checkpoint_id": "cp0016",
+  "model": "GPT-5.6 Sol",
+  "provider": "OpenAI",
+  "provider_request_attestation": null,
+  "released_cursor": 12,
+  "resident_session_id": "resident-sem-repair-sol-20260922-r8-3e8a71",
+  "run_id": "c14-sem-repair-resident-20260922-sol-r8-3e8a71",
+  "simulated_timestamp": "2026-11-10T11:06:00-08:00",
+  "world_revision_after": 50,
+  "world_revision_before": 49
+}

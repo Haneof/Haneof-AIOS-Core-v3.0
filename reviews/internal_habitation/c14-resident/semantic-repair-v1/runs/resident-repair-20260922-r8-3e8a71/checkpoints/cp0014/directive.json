@@ -1,0 +1,71 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "object_id": "clm_457125b0d4422b2f159091e0",
+        "revision": 1
+      },
+      "call_id": "cp0014-current-claim",
+      "name": "inspect_world_object"
+    },
+    {
+      "arguments": {
+        "object_id": "obs_conv_user_9e55dd343bf3abbb84663780",
+        "revision": 1
+      },
+      "call_id": "cp0014-user-statement",
+      "name": "inspect_world_object"
+    },
+    {
+      "arguments": {
+        "object_id": "obs_c14_fixture_eacb9de67251ec8bb98476a4",
+        "revision": 1
+      },
+      "call_id": "cp0014-work-outcome",
+      "name": "inspect_world_object"
+    },
+    {
+      "arguments": {
+        "dimension": "dim:collaboration_activity",
+        "limit": 20,
+        "object_types": [
+          "observation"
+        ],
+        "window_end": "2026-11-10T19:06:00Z",
+        "window_start": "2026-11-10T00:00:00Z"
+      },
+      "call_id": "cp0014-collab",
+      "name": "search_timeline"
+    },
+    {
+      "arguments": {
+        "dimension": "dim:sleep",
+        "limit": 20,
+        "object_types": [
+          "observation"
+        ],
+        "window_end": "2026-11-10T19:06:00Z",
+        "window_start": "2026-11-10T00:00:00Z"
+      },
+      "call_id": "cp0014-sleep",
+      "name": "search_timeline"
+    },
+    {
+      "arguments": {
+        "dimension": "dim:work",
+        "limit": 20,
+        "object_types": [
+          "observation"
+        ],
+        "window_end": "2026-11-10T19:06:00Z",
+        "window_start": "2026-11-10T00:00:00Z"
+      },
+      "call_id": "cp0014-work-process",
+      "name": "search_timeline"
+    }
+  ],
+  "checkpoint_id": "cp0014",
+  "decision_rationale": "The user's statement may materially update the work-pattern hypothesis, but it must be grounded with the canonical user Observation and the actual meeting, sleep, work-process, and outcome facts rather than the schedule plan alone.",
+  "github_author": "Haneof",
+  "run_id": "c14-sem-repair-resident-20260922-sol-r8-3e8a71"
+}

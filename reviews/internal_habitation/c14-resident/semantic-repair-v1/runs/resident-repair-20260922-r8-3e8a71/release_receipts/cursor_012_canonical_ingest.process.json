@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "/opt/hostedtoolcache/Python/3.12.14/x64/bin/python",
+    "/home/runner/work/Haneof-AIOS-Core-v3.0/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c14-resident/semantic-repair-v1/release/canonical_conversation_ingest.py",
+    "--world-db",
+    "/home/runner/work/Haneof-AIOS-Core-v3.0/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c14-resident/semantic-repair-v1/runs/resident-repair-20260922-r8-3e8a71/private_world.sqlite",
+    "--session-id",
+    "resident-sem-repair-sol-20260922-r8-3e8a71",
+    "--turn-index",
+    "1",
+    "--event-file",
+    "/home/runner/work/Haneof-AIOS-Core-v3.0/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c14-resident/semantic-repair-v1/runs/resident-repair-20260922-r8-3e8a71/current_event.json"
+  ],
+  "returncode": 0
+}

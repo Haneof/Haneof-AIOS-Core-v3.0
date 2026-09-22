@@ -1,0 +1,67 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "confidence": 0.74,
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_5bf4b05a9dafdb85ec5bb688",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_536104c70eaad761d2583410",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_16b3967abe086c1bbae30bf7",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_3187c6e6c4a710447d75b09e",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_4707b28549e22ebbc07bc197",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_3ec2502eb5b3e04c32469e65",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_e097d1109d87846dabdb0060",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_eacb9de67251ec8bb98476a4",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_conv_user_9e55dd343bf3abbb84663780",
+            "revision": 1
+          }
+        ],
+        "reason": "第三个真实案例显示一次短同步后用户报告恢复上下文成本很低且仍提前交付，因此应收窄旧假设，保留睡眠、打断负担和任务差异的混杂不确定性。",
+        "replacement_content": "三次可比文档工作上午显示：11/3 睡眠7h46、评分83且专注/无通话，第一版提前18分钟；11/6 睡眠5h34、评分58且上午三次通话，第一版晚62分钟；11/10 睡眠7h31、评分80且09:06–09:24有一次同步，用户说会后几乎无需重找上下文，第一版仍提前38分钟。第三个案例削弱“只要有会议/通话就会延迟”的简单解释；当前更应把中断负担与恢复成本、睡眠和任务差异视为共同变化的候选因素，仍不能确定任何单一因素的独立因果贡献。",
+        "target_ref": {
+          "object_id": "clm_457125b0d4422b2f159091e0",
+          "revision": 1
+        }
+      },
+      "call_id": "cp0015-revise-work-pattern",
+      "name": "revise_claim"
+    }
+  ],
+  "checkpoint_id": "cp0015",
+  "decision_rationale": "Third qualifying case narrows the existing hypothesis; forward-revise rather than overwrite or generalize.",
+  "github_author": "Haneof",
+  "run_id": "c14-sem-repair-resident-20260922-sol-r8-3e8a71"
+}
