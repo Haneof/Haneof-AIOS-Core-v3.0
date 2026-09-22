@@ -1,0 +1,60 @@
+{
+  "kind": "dimension_summary",
+  "released_cursor": 13,
+  "request": {
+    "dimension": "dim:work_pattern",
+    "granularity": "day",
+    "source_world_revision": 63,
+    "sources": [
+      {
+        "metadata": {
+          "dimension": "dim:work_pattern",
+          "revision_evidence_set_ref": {
+            "object_id": "evs_revision_e19f746060117ce5ca17b2ba",
+            "revision": 1
+          },
+          "revision_mode": "revise",
+          "revision_reason": "A third real case is counter-evidence to the overly broad interpretation that any call predicts delay: one actual sync with low reported context-recovery cost still ended in an early draft. Narrow the hypothesis to fragmentation/recovery-cost association while retaining sleep and small-sample uncertainty.",
+          "supersedes_revision": 1,
+          "writeback_kind": "revisable_cognition"
+        },
+        "object_id": "clm_7672f379ea32d16e77ea7e97",
+        "object_type": "claim",
+        "occurred_at": "2026-11-10T16:02:00Z",
+        "revision": 2,
+        "text": "目前三个已观察的文档任务案例表明，是否存在一次工作沟通本身不足以解释交付时点：无通话的连续专注案例提前提交；三次实际通话且当日睡眠较短的案例延后提交；一次约18分钟同步、睡眠较好且用户自述几乎无需重新找上下文的案例仍提前提交。当前更值得继续观察的是沟通碎片化程度与恢复上下文成本是否和交付时点同现，但样本仍很小且睡眠等因素混杂，不支持因果结论。"
+      },
+      {
+        "metadata": {
+          "dimension": "dim:work_pattern",
+          "writeback_kind": "cognition_evidence"
+        },
+        "object_id": "evs_5d44a812980f91394214c35f",
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-10T16:02:00Z",
+        "revision": 1,
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 6, \"missing_description\": [], \"observed_count\": 6}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-10T16:02:00Z\", \"world_revision\": 42}, \"learned_at\": \"2026-11-10T16:02:00Z\", \"member_refs\": [{\"object_id\": \"obs_c14_fixture_16b3967abe086c1bbae30bf7\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_3187c6e6c4a710447d75b09e\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_536104c70eaad761d2583410\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_5bf4b05a9dafdb85ec5bb688\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_b2ff4a1d0c68345be781f7cf\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_d15395b6bb573ddfcc1abbe9\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:work_pattern\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_5d44a812980f91394214c35f\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-11-10T16:02:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_c14_fixture_16b3967abe086c1bbae30bf7\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_3187c6e6c4a710447d75b09e\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_536104c70eaad761d2583410\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_5bf4b05a9dafdb85ec5bb688\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_b2ff4a1d0c68345be781f7cf\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_d15395b6bb573ddfcc1abbe9\", \"revision\": 1}]}"
+      },
+      {
+        "metadata": {
+          "dimension": "dim:work_pattern",
+          "revision_mode": "revise",
+          "target_ref": {
+            "object_id": "clm_7672f379ea32d16e77ea7e97",
+            "revision": 1
+          }
+        },
+        "object_id": "evs_revision_e19f746060117ce5ca17b2ba",
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-10T19:06:00Z",
+        "revision": 1,
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 10, \"missing_description\": [], \"observed_count\": 10}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-10T19:06:00Z\", \"world_revision\": 48}, \"learned_at\": \"2026-11-10T19:06:00Z\", \"member_refs\": [{\"object_id\": \"obs_c14_fixture_b2ff4a1d0c68345be781f7cf\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_d15395b6bb573ddfcc1abbe9\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_5bf4b05a9dafdb85ec5bb688\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_16b3967abe086c1bbae30bf7\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_3187c6e6c4a710447d75b09e\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_536104c70eaad761d2583410\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_4707b28549e22ebbc07bc197\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_e097d1109d87846dabdb0060\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_eacb9de67251ec8bb98476a4\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_0e039f93acf136af2ed01fde\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:work_pattern\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_7672f379ea32d16e77ea7e97\", \"revision\": 1}}, \"object_id\": \"evs_revision_e19f746060117ce5ca17b2ba\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_7672f379ea32d16e77ea7e97@1\", \"recorded_at\": \"2026-11-10T19:06:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_c14_fixture_b2ff4a1d0c68345be781f7cf\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_d15395b6bb573ddfcc1abbe9\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_5bf4b05a9dafdb85ec5bb688\", \"revision\": 1}, {\"object_id\": "
+      }
+    ],
+    "truncated": false,
+    "window_end": "2026-11-10T23:59:59.999999Z",
+    "window_start": "2026-11-10T00:00:00Z"
+  },
+  "request_id": "sum0017",
+  "simulated_timestamp": "2026-11-13T08:21:00-08:00"
+}
