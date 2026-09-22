@@ -69,6 +69,17 @@ class ClaimRevisionRequest(BaseModel):
             raise ValueError("revise requires replacement_content")
         if self.unknown_items is not None and any(not item.strip() for item in self.unknown_items):
             raise ValueError("unknown_items must not contain blank values")
+        if self.mode == "retract":
+            if self.valid_time is not None:
+                raise ValueError("retract must not carry valid_time")
+            if self.unknown_items is not None:
+                raise ValueError("retract must not carry unknown_items")
+            if self.counter_evidence_refs:
+                raise ValueError(
+                    "retract must not carry counter_evidence_refs; use evidence_refs as counter"
+                )
+            if self.replacement_content is not None and self.replacement_content.strip():
+                raise ValueError("retract must not carry replacement_content")
         return self
 
 

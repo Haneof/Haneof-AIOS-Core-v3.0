@@ -86,6 +86,8 @@ class AIWorldClaimRequest(BaseModel):
             raise ValueError("scope_key must not be blank")
         if any(not tag.strip() for tag in self.tags):
             raise ValueError("tags must not contain blank values")
+        if any(not item.strip() for item in self.unknown_items):
+            raise ValueError("unknown_items must not contain blank values")
         for ref in self.evidence_refs:
             if ref.revision is None:
                 raise ValueError("AI-world cognition requires pinned evidence revisions")
