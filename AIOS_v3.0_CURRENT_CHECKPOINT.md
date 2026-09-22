@@ -14,7 +14,21 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
-## 当前工程断点 — C15-RCC-RES-A-001 evidence 已验收：Phase A frozen，唯一下一 READY = C15-RCC-RES-B-001
+## 当前工程断点 — C15 Wake user-delivery persistence 纠偏：A/B 已重新阻塞，唯一下一 READY = C15-RCC-WAKE-DELIVERY-FIX-001
+
+- 2026-09-22 corrective governance：PR #102 对 cursor 9 / 11 的 `non-conversation Wake delivery boundary` 解释不足；两次均为 `watch_match` / `interrupt`，`delivery_allowed=true`、Resident response 非空、`termination=responded`、`delivery_response` 非空、`delivery_suppressed=false`，但 PR #101 durable World 没有对应 assistant interaction Observation。
+- Constitution: `docs/constitution/AIOS_v3.0_User_AI_Interaction_Dimension_Constitution.md` 要求用户-AI交流本身作为世界事实保存，并记录用户输入、AI输出、时间与对话关系。Wake 不应伪造 USER input，但真实 delivered assistant output 仍是 interaction World fact。
+- Current-main mechanism verdict: **`WAKE USER-DELIVERED ASSISTANT OUTPUT PERSISTENCE = MECHANISM_GAP`**。普通 `run_turn()` 调用 `ConversationIngestor.commit_assistant_output(...)`；当前 `run_wake()` 只产生 `delivery_response`，没有 durable assistant-interaction commit。
+- `C15-RCC-RES-A-001 = BLOCKED` — evidence run complete, acceptance deferred by Wake-delivery persistence gap。
+- `C15-RCC-RES-B-001 = BLOCKED`；`C15-RCC-RES-C-001 = BLOCKED`；`C15-RCC-EVAL-001 = BLOCKED`；`C15-RCC-CLOSE-001 = BLOCKED`。
+- PR #101 @ `bfbfa059e2ac616326eecdfe3ffa7a927bdc7ce2` 保持 **OPEN / UNMERGED / PINNED**，重新定义为 **PRE-FIX / DIAGNOSTIC RESIDENT A EVIDENCE**；禁止 post-hoc 修改其 private World。
+- `C15-RCC-WAKE-DELIVERY-FIX-001 = READY`：唯一允许的下一工程任务是最小 Core 修复；真实 delivered Wake assistant output exactly-once 写入统一 interaction World，suppressed/denied/internal/silence 不写，且绝不伪造 USER Observation。
+- `C15-RCC-RES-A-REPAIR-DECISION-001 = BLOCKED` on Core fix。修复完成后由新的独立 PM 决定 pure mechanical historical persistence 或 fresh World rerun；本纠偏窗口不决定 Path A/B。
+- Corrective review: `reviews/C15_RCC_RES_A_WAKE_DELIVERY_CORRECTIVE_REVIEW_2026-09-22.md`。
+- **Next unique READY: `C15-RCC-WAKE-DELIVERY-FIX-001`.**
+
+## 历史工程断点 — C15-RCC-RES-A-001 曾由 PR #102 验收：该 B handoff 已被 Wake-delivery corrective governance supersede
+
 
 - 2026-09-22 更新：`C15-RCC-RES-A-001 = DONE`；`C15-RCC-RES-B-001 = READY`；`C15-RCC-RES-C-001 = BLOCKED`；`C15-RCC-EVAL-001 = BLOCKED`；`C15-RCC-CLOSE-001 = BLOCKED`。
 - Canonical Resident A evidence: PR #101 @ `bfbfa059e2ac616326eecdfe3ffa7a927bdc7ce2`，保持 **OPEN / UNMERGED / PINNED**；session `resident-a-c15-rcc-20260922`。
