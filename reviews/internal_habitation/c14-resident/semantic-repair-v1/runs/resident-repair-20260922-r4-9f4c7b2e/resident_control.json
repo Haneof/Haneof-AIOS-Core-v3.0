@@ -1,11 +1,9 @@
 {
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
   "nonce": "9f4c7b2e-6a31-4c97-bd28-1f0b88a9d453",
-  "kind": "DIRECTIVE",
-  "item_id": "cp0005",
+  "kind": "EVENT_SEEN",
+  "item_id": "c14semrep-006",
   "payload": {
-    "checkpoint_id": "cp0005",
-    "silence": true,
-    "decision_rationale": "The derivation bundle contains only one qualifying work case: a single focus-mode interval followed by an early submission. Sleep is merely co-present. One case is insufficient for a durable work-pattern or causal claim; no existing cognition needs revision."
+    "seen": true
   }
 }
