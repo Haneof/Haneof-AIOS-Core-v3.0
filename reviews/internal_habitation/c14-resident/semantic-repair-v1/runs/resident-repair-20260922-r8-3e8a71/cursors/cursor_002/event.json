@@ -1,0 +1,10 @@
+{
+  "dimension": "dim:device_activity",
+  "event_id": "c14semrep-002",
+  "modality": "structured_text",
+  "occurred_at": "2026-11-03T10:29:00-08:00",
+  "resident_visible_payload": "08:28–10:25 开启专注模式；期间没有加入语音或视频通话，21 条通知被静音。",
+  "sequence": 2,
+  "source_class": "PLATFORM",
+  "source_kind": "device"
+}
