@@ -324,7 +324,11 @@ class LocalResidentBridge:
                     {"checkpoint_id": cp_id, "name": name, "arguments": jsonable(args)}
                 )
 
-        response = directive_raw.get("response")
+        response = (
+            directive_raw.get("response")
+            if directive_raw.get("response") is not None
+            else directive_raw.get("assistant_message")
+        )
         silence = bool(directive_raw.get("silence", False))
         if calls:
             if response is not None or silence:
@@ -740,20 +744,34 @@ def main() -> int:
         event_file = cursor_dir / "event.json"
         ack_file = RECEIPTS / f"cursor_{expected_sequence:03d}_ack.process.json"
         mech_file = RECEIPTS / f"cursor_{expected_sequence:03d}_mechanical_ingest.process.json"
+        canon_file = RECEIPTS / f"cursor_{expected_sequence:03d}_canonical_ingest.process.json"
 
         if event_file.exists() and ack_file.exists():
             print(f"CURSOR {expected_sequence:03d} (Phase {phase}) already revealed & acked. Resuming execution...", flush=True)
             event = load_json(event_file, {})
             sequence = int(event.get("sequence") or 0)
-            ingest = {
-                "kind": "mechanical",
-                "ingest_process": load_json(mech_file, {}),
-                "ack_process": load_json(ack_file, {}),
-            }
+            is_conversation = (
+                event.get("dimension") == "dim:conversation"
+                and event.get("source_kind") == "conversation"
+                and event.get("source_class") == "USER"
+                and event.get("modality") == "text"
+            )
+            if is_conversation:
+                ingest = {
+                    "kind": "canonical_conversation",
+                    "ingest_process": load_json(canon_file, {}),
+                    "ack_process": load_json(ack_file, {}),
+                }
+            else:
+                ingest = {
+                    "kind": "mechanical",
+                    "ingest_process": load_json(mech_file, {}),
+                    "ack_process": load_json(ack_file, {}),
+                }
             prev_lc_file = CURSORS / f"cursor_{sequence-1:03d}" / "lifecycle.json"
             prev_lc = load_json(prev_lc_file, {}) if prev_lc_file.exists() else {}
-            before_ingest = int(prev_lc.get("world_revision_after_cursor") or 22)
-            after_ack = int(load_json(RECEIPTS / f"cursor_{sequence:03d}_ack.stdout.txt", {}).get("ingest_world_revision") or 23)
+            before_ingest = int(prev_lc.get("world_revision_after_cursor") or 55)
+            after_ack = int(load_json(RECEIPTS / f"cursor_{sequence:03d}_ack.stdout.txt", {}).get("ingest_world_revision") or 56)
             state["current_simulated_timestamp"] = str(event["occurred_at"])
             save_state(state)
         else:

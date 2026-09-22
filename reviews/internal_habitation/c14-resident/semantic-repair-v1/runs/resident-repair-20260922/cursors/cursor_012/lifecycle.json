@@ -1,0 +1,788 @@
+{
+  "conversation_turn_index": 1,
+  "dimension_summaries": {
+    "attempted_jobs": [
+      {
+        "dimension": "dim:collaboration_activity",
+        "scale": "day",
+        "source_count": 0,
+        "window_end": "2026-11-02T23:59:59.999999+00:00",
+        "window_start": "2026-11-02T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:collaboration_activity",
+        "scale": "day",
+        "source_count": 1,
+        "window_end": "2026-11-06T23:59:59.999999+00:00",
+        "window_start": "2026-11-06T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "day",
+        "source_count": 0,
+        "window_end": "2026-11-02T23:59:59.999999+00:00",
+        "window_start": "2026-11-02T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "day",
+        "source_count": 1,
+        "window_end": "2026-11-03T23:59:59.999999+00:00",
+        "window_start": "2026-11-03T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "source_count": 0,
+        "window_end": "2026-11-02T23:59:59.999999+00:00",
+        "window_start": "2026-11-02T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "source_count": 1,
+        "window_end": "2026-11-03T23:59:59.999999+00:00",
+        "window_start": "2026-11-03T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "source_count": 1,
+        "window_end": "2026-11-06T23:59:59.999999+00:00",
+        "window_start": "2026-11-06T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "source_count": 0,
+        "window_end": "2026-11-02T23:59:59.999999+00:00",
+        "window_start": "2026-11-02T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "source_count": 1,
+        "window_end": "2026-11-03T23:59:59.999999+00:00",
+        "window_start": "2026-11-03T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "source_count": 3,
+        "window_end": "2026-11-06T23:59:59.999999+00:00",
+        "window_start": "2026-11-06T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:collaboration_activity",
+        "scale": "week",
+        "source_count": 2,
+        "window_end": "2026-11-08T23:59:59.999999+00:00",
+        "window_start": "2026-11-02T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "week",
+        "source_count": 2,
+        "window_end": "2026-11-08T23:59:59.999999+00:00",
+        "window_start": "2026-11-02T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "week",
+        "source_count": 4,
+        "window_end": "2026-11-08T23:59:59.999999+00:00",
+        "window_start": "2026-11-02T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "week",
+        "source_count": 6,
+        "window_end": "2026-11-08T23:59:59.999999+00:00",
+        "window_start": "2026-11-02T00:00:00+00:00"
+      }
+    ],
+    "commits": [],
+    "skipped_empty": [
+      {
+        "dimension": "dim:collaboration_activity",
+        "scale": "day",
+        "source_count": 0,
+        "window_end": "2026-11-02T23:59:59.999999+00:00",
+        "window_start": "2026-11-02T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "day",
+        "source_count": 0,
+        "window_end": "2026-11-02T23:59:59.999999+00:00",
+        "window_start": "2026-11-02T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "source_count": 0,
+        "window_end": "2026-11-02T23:59:59.999999+00:00",
+        "window_start": "2026-11-02T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "source_count": 0,
+        "window_end": "2026-11-02T23:59:59.999999+00:00",
+        "window_start": "2026-11-02T00:00:00+00:00"
+      }
+    ],
+    "skipped_unchanged": [
+      {
+        "dimension": "dim:collaboration_activity",
+        "scale": "day",
+        "source_count": 1,
+        "window_end": "2026-11-06T23:59:59.999999+00:00",
+        "window_start": "2026-11-06T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "day",
+        "source_count": 1,
+        "window_end": "2026-11-03T23:59:59.999999+00:00",
+        "window_start": "2026-11-03T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "source_count": 1,
+        "window_end": "2026-11-03T23:59:59.999999+00:00",
+        "window_start": "2026-11-03T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "source_count": 1,
+        "window_end": "2026-11-06T23:59:59.999999+00:00",
+        "window_start": "2026-11-06T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "source_count": 1,
+        "window_end": "2026-11-03T23:59:59.999999+00:00",
+        "window_start": "2026-11-03T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "source_count": 3,
+        "window_end": "2026-11-06T23:59:59.999999+00:00",
+        "window_start": "2026-11-06T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:collaboration_activity",
+        "scale": "week",
+        "source_count": 2,
+        "window_end": "2026-11-08T23:59:59.999999+00:00",
+        "window_start": "2026-11-02T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "week",
+        "source_count": 2,
+        "window_end": "2026-11-08T23:59:59.999999+00:00",
+        "window_start": "2026-11-02T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "week",
+        "source_count": 4,
+        "window_end": "2026-11-08T23:59:59.999999+00:00",
+        "window_start": "2026-11-02T00:00:00+00:00"
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "week",
+        "source_count": 6,
+        "window_end": "2026-11-08T23:59:59.999999+00:00",
+        "window_start": "2026-11-02T00:00:00+00:00"
+      }
+    ],
+    "truncated": false
+  },
+  "event_id": "c14semrep-012",
+  "ingest": {
+    "ack_process": {
+      "argv": [
+        "/usr/bin/python3",
+        "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c14-resident/semantic-repair-v1/release/release_operator.py",
+        "ack",
+        "--phase",
+        "B",
+        "--state",
+        "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c14-resident/semantic-repair-v1/runs/resident-repair-20260922/release_state.json",
+        "--world-db",
+        "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c14-resident/semantic-repair-v1/runs/resident-repair-20260922/private_world.sqlite",
+        "--sequence",
+        "12",
+        "--event-id",
+        "c14semrep-012",
+        "--ingest-ref",
+        "obs_conv_user_366afd061716259ae44a289a@1",
+        "--conversation-session-id",
+        "resident-sem-repair-20260922",
+        "--conversation-turn-index",
+        "1"
+      ],
+      "returncode": 0
+    },
+    "ingest_process": {
+      "argv": [
+        "/usr/bin/python3",
+        "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c14-resident/semantic-repair-v1/release/canonical_conversation_ingest.py",
+        "--world-db",
+        "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c14-resident/semantic-repair-v1/runs/resident-repair-20260922/private_world.sqlite",
+        "--session-id",
+        "resident-sem-repair-20260922",
+        "--turn-index",
+        "1",
+        "--event-file",
+        "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c14-resident/semantic-repair-v1/runs/resident-repair-20260922/current_event.json"
+      ],
+      "returncode": 0
+    },
+    "kind": "canonical_conversation"
+  },
+  "occurred_at": "2026-11-10T11:06:00-08:00",
+  "periodic_reviews": [],
+  "phase": "B",
+  "run_turn": {
+    "context": {
+      "ai_identity": {},
+      "capability_catalog": [
+        {
+          "kind": "write",
+          "name": "commit_ai_world_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "commit_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "commit_operation_experience",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "compare_claims",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "create_attention_watch",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "create_task",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "drill_down_conversation",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "expand_recall",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "focus_entity",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "follow_relation",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "form_event",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "inspect_outcome",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "inspect_world_object",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "list_attention_watches",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "list_conversation_summaries",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "list_dimensions",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "propose_action",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_cognitive_policy",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_dimension",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_entity",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_goal",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "read_ai_world",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_background_budget",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_cognitive_policies",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_execution_world",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_periodic_review_anchors",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_world_map",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "record_communication_experience",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "request_all_dimensions_projection",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "retract_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "retrieve_original_observation",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "revise_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "revise_entity",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "rollback_cognitive_policy",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "search_conversation_summaries",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "search_timeline",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "search_world",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "transition_dimension",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "transition_event",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "transition_goal",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "transition_task",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "update_cognitive_policy",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "upsert_relation",
+          "side_effecting": true
+        }
+      ],
+      "conversation_summaries": [],
+      "current_topic": "用户说：“九点聊完回来接着写，没怎么重新找上下文，十一点前一版就出来了。”",
+      "estimated_tokens": 2148,
+      "memory_cards": [
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "对比分析已记录事实：\n1. 2026-11-03 用户睡眠7小时46分（评分83/100，07:01醒来），上午 08:28–10:25 开启专注模式且无通话干扰（静音21条通知），于 10:27 提前交付“API 迁移说明”第一版（目标10:45）；\n2. 2026-11-06 用户睡眠5小时34分（评分58/100，06:48醒来），上午经历3次通话（08:58–09:09、09:37–09:",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "clm_b4df2179bb8ffec020a39ede",
+          "object_type": "claim",
+          "retrieval_score": 2,
+          "revision": 2
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "“发布说明”第一版于 10:52 提交；目标时间 11:30；评审前未要求重写核心结构。",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "obs_c14_fixture_eacb9de67251ec8bb98476a4",
+          "object_type": "observation",
+          "retrieval_score": 1,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "今天计划 09:00–09:25 与设计师同步；08:00–11:20 其余时间留给“发布说明”起草；第一版目标时间 11:30。",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "obs_c14_fixture_3f4a7a47f483b4459d92d94e",
+          "object_type": "observation",
+          "retrieval_score": 1,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "“权限迁移说明”第一版于 12:02 提交；该任务登记目标时间为 11:00。",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "obs_c14_fixture_3187c6e6c4a710447d75b09e",
+          "object_type": "observation",
+          "retrieval_score": 1,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "2026-11-06 工作产出记录：“权限迁移说明”第一版于 12:02 提交（登记目标时间 11:00，延后62分钟交付）；当日工作假说已完成证据对齐与版本修订。",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "sum_5da5ad96f3c4d02497cedd35",
+          "object_type": "summary",
+          "retrieval_score": 1,
+          "revision": 3
+        }
+      ],
+      "recent_turns": [],
+      "task_context": {
+        "cognitive_policy_context": {
+          "_meta": {
+            "included": 0,
+            "reader": "read_cognitive_policies",
+            "total": 0,
+            "truncated": false
+          },
+          "_policy_records": [],
+          "communication.detail_level": null,
+          "memory.recommendation_limit": 5
+        },
+        "conversation_continuity": {
+          "pending_round_summary": null,
+          "raw_drill_down_capability": "drill_down_conversation",
+          "recent_turn_count": 0,
+          "round_summary_count": 0,
+          "session_id": "resident-sem-repair-20260922",
+          "summary_index_capability": "list_conversation_summaries",
+          "summary_search_capability": "search_conversation_summaries"
+        },
+        "current_user_observation_ref": {
+          "object_id": "obs_conv_user_366afd061716259ae44a289a",
+          "revision": 1
+        },
+        "related_execution_anchors": [],
+        "topic_state": {
+          "antecedent_recall_needed": false,
+          "continued_from_recent_turn": false,
+          "gate_open": true,
+          "history_may_help": true,
+          "reason": "current_utterance_topic:indexed_current_world_anchor",
+          "topic": "用户说：“九点聊完回来接着写，没怎么重新找上下文，十一点前一版就出来了。”"
+        }
+      },
+      "token_budget": 3400,
+      "truncated": false,
+      "user_input": "用户说：“九点聊完回来接着写，没怎么重新找上下文，十一点前一版就出来了。”",
+      "world_map": {
+        "as_of": "2026-11-10T19:06:00+00:00",
+        "dimension_count": 8,
+        "dimensions": [
+          {
+            "current_object_count": 50,
+            "definition_ref": null,
+            "dimension": "dim_unclassified",
+            "latest_activity_at": "2026-11-10T17:32:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "dependency",
+              "wake"
+            ],
+            "recent_24h_count": 40,
+            "recent_7d_count": 49,
+            "registered": false
+          },
+          {
+            "current_object_count": 9,
+            "definition_ref": null,
+            "dimension": "dim:work_outcome",
+            "latest_activity_at": "2026-11-10T18:58:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "claim",
+              "evidence_set",
+              "observation",
+              "summary"
+            ],
+            "recent_24h_count": 2,
+            "recent_7d_count": 6,
+            "registered": false
+          },
+          {
+            "current_object_count": 4,
+            "definition_ref": null,
+            "dimension": "dim:collaboration_activity",
+            "latest_activity_at": "2026-11-10T17:32:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "observation",
+              "summary"
+            ],
+            "recent_24h_count": 1,
+            "recent_7d_count": 3,
+            "registered": false
+          },
+          {
+            "current_object_count": 6,
+            "definition_ref": null,
+            "dimension": "dim:sleep",
+            "latest_activity_at": "2026-11-10T15:34:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "observation",
+              "summary"
+            ],
+            "recent_24h_count": 1,
+            "recent_7d_count": 3,
+            "registered": false
+          },
+          {
+            "current_object_count": 1,
+            "definition_ref": null,
+            "dimension": "dim:schedule",
+            "latest_activity_at": "2026-11-10T16:02:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "observation"
+            ],
+            "recent_24h_count": 1,
+            "recent_7d_count": 1,
+            "registered": false
+          },
+          {
+            "current_object_count": 1,
+            "definition_ref": null,
+            "dimension": "dim:user_ai_interaction",
+            "latest_activity_at": "2026-11-10T19:06:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "observation"
+            ],
+            "recent_24h_count": 1,
+            "recent_7d_count": 1,
+            "registered": false
+          },
+          {
+            "current_object_count": 1,
+            "definition_ref": null,
+            "dimension": "dim:work",
+            "latest_activity_at": "2026-11-10T17:12:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "observation"
+            ],
+            "recent_24h_count": 1,
+            "recent_7d_count": 1,
+            "registered": false
+          },
+          {
+            "current_object_count": 3,
+            "definition_ref": null,
+            "dimension": "dim:device_activity",
+            "latest_activity_at": "2026-11-03T18:29:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "observation",
+              "summary"
+            ],
+            "recent_24h_count": 0,
+            "recent_7d_count": 0,
+            "registered": false
+          }
+        ],
+        "directory_only": true,
+        "expand_capabilities": {
+          "broader_recall": "expand_recall",
+          "dimension_definitions": "list_dimensions",
+          "exact_object": "inspect_world_object",
+          "multi_dimension_window": "request_all_dimensions_projection",
+          "refresh_directory": "read_world_map",
+          "semantic_recall": "search_world",
+          "single_dimension_timeline": "search_timeline"
+        },
+        "index_lag": 0,
+        "index_watermark": 56,
+        "schema": "aios.world-map.l0.v1",
+        "semantic_conclusions": false,
+        "truncated": false,
+        "world_revision": 56
+      }
+    },
+    "continuity_summary_commits": [],
+    "continuity_summary_error": null,
+    "conversation_commit": {
+      "assistant_observation_id": "obs_conv_ai_4cef47b028bbbef476bd9062",
+      "assistant_world_revision": 57,
+      "idempotent_replay": false,
+      "user_observation_id": "obs_conv_user_366afd061716259ae44a289a",
+      "user_world_revision": 56,
+      "world_revision": 57
+    },
+    "recommendation": {
+      "cards": [
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "对比分析已记录事实：\n1. 2026-11-03 用户睡眠7小时46分（评分83/100，07:01醒来），上午 08:28–10:25 开启专注模式且无通话干扰（静音21条通知），于 10:27 提前交付“API 迁移说明”第一版（目标10:45）；\n2. 2026-11-06 用户睡眠5小时34分（评分58/100，06:48醒来），上午经历3次通话（08:58–09:09、09:37–09:",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "clm_b4df2179bb8ffec020a39ede",
+          "object_type": "claim",
+          "retrieval_score": 2,
+          "revision": 2
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "“发布说明”第一版于 10:52 提交；目标时间 11:30；评审前未要求重写核心结构。",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "obs_c14_fixture_eacb9de67251ec8bb98476a4",
+          "object_type": "observation",
+          "retrieval_score": 1,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:schedule",
+          "excerpt": "今天计划 09:00–09:25 与设计师同步；08:00–11:20 其余时间留给“发布说明”起草；第一版目标时间 11:30。",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "obs_c14_fixture_3f4a7a47f483b4459d92d94e",
+          "object_type": "observation",
+          "retrieval_score": 1,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "“权限迁移说明”第一版于 12:02 提交；该任务登记目标时间为 11:00。",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "obs_c14_fixture_3187c6e6c4a710447d75b09e",
+          "object_type": "observation",
+          "retrieval_score": 1,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "2026-11-06 工作产出记录：“权限迁移说明”第一版于 12:02 提交（登记目标时间 11:00，延后62分钟交付）；当日工作假说已完成证据对齐与版本修订。",
+          "match_reason": "current_topic_index_overlap",
+          "object_id": "sum_5da5ad96f3c4d02497cedd35",
+          "object_type": "summary",
+          "retrieval_score": 1,
+          "revision": 3
+        }
+      ],
+      "current_topic": "用户说：“九点聊完回来接着写，没怎么重新找上下文，十一点前一版就出来了。”",
+      "index_watermark": 56,
+      "reason": "topic_matched_history",
+      "topic_gate_open": true,
+      "world_revision": 56
+    },
+    "runtime": {
+      "capability_history": [],
+      "model_input_tokens": null,
+      "model_output_tokens": null,
+      "model_rounds": 1,
+      "model_total_tokens": null,
+      "model_usage_complete": false,
+      "response": "今天上午的节奏保持得很好！虽然在09:06到09:24之间进行了与设计师的沟通同步，但会后几乎没有受到上下文切换的影响，很快继续投入编写，并在10:52就提前交付了“发布说明”第一版（比原定11:30的目标提前了近38分钟）。",
+      "silenced": false,
+      "termination_reason": "responded"
+    }
+  },
+  "sequence": 12,
+  "wakes_after_review": [],
+  "wakes_before_review": [],
+  "world_revision_after_ack": 56,
+  "world_revision_after_cursor": 57,
+  "world_revision_before_ingest": 55
+}

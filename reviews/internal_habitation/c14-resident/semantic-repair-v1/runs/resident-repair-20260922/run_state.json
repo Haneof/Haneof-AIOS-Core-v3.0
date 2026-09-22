@@ -1,5 +1,5 @@
 {
-  "capability_call_count": 8,
+  "capability_call_count": 12,
   "cognition_calls": [
     {
       "arguments": {
@@ -67,10 +67,10 @@
     }
   ],
   "complete": false,
-  "conversation_turn_index": 0,
-  "current_simulated_timestamp": "2026-11-10T10:58:00-08:00",
+  "conversation_turn_index": 1,
+  "current_simulated_timestamp": "2026-11-10T11:06:00-08:00",
   "errors": [],
-  "next_checkpoint": 11,
+  "next_checkpoint": 13,
   "next_summary_request": 13,
   "phase": "B",
   "released_cursors": [
@@ -84,9 +84,10 @@
     8,
     9,
     10,
-    11
+    11,
+    12
   ],
-  "response_count": 0,
+  "response_count": 1,
   "run_id": "resident-repair-20260922",
   "semantic_checkpoints": [
     {
@@ -158,6 +159,20 @@
       "released_cursor": 10,
       "simulated_timestamp": "2026-11-10T09:32:00-08:00",
       "world_revision_before": 53
+    },
+    {
+      "checkpoint_id": "cp0011",
+      "directive_kind": "capability_calls",
+      "released_cursor": 12,
+      "simulated_timestamp": "2026-11-10T11:06:00-08:00",
+      "world_revision_before": 56
+    },
+    {
+      "checkpoint_id": "cp0012",
+      "directive_kind": "response",
+      "released_cursor": 12,
+      "simulated_timestamp": "2026-11-10T11:06:00-08:00",
+      "world_revision_before": 56
     }
   ],
   "session_id": "resident-sem-repair-20260922",
