@@ -1,0 +1,37 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "claim_type": "hypothesis",
+        "confidence": 0.45,
+        "domain": "strategy",
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_5bf4b05a9dafdb85ec5bb688",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+            "revision": 1
+          }
+        ],
+        "knowledge_state": "hypothesis",
+        "scope_key": "protected_focus_work_pattern",
+        "statement": "工作模式假设：2026-11-03 这一次案例中，7小时46分睡眠后，08:28–10:25 的专注模式期间无语音/视频通话且21条通知被静音，随后“API 迁移说明”第一版于10:27提交，早于10:45目标时间。该单一案例提示受保护的专注时段可能与及时交付相伴，但不足以证明因果或稳定规律。",
+        "tags": [
+          "work_pattern",
+          "protected_focus",
+          "single_case"
+        ]
+      },
+      "call_id": "cp0005-commit-hypothesis",
+      "name": "commit_ai_world_claim"
+    }
+  ],
+  "checkpoint_id": "cp0005",
+  "github_author": "Haneof"
+}

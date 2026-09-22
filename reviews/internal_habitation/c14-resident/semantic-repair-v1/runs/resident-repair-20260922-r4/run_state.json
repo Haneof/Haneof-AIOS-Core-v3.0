@@ -1,18 +1,51 @@
 {
-  "capability_call_count": 2,
-  "cognition_calls": [],
+  "capability_call_count": 3,
+  "cognition_calls": [
+    {
+      "arguments": {
+        "claim_type": "hypothesis",
+        "confidence": 0.45,
+        "domain": "strategy",
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_5bf4b05a9dafdb85ec5bb688",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+            "revision": 1
+          }
+        ],
+        "knowledge_state": "hypothesis",
+        "scope_key": "protected_focus_work_pattern",
+        "statement": "工作模式假设：2026-11-03 这一次案例中，7小时46分睡眠后，08:28–10:25 的专注模式期间无语音/视频通话且21条通知被静音，随后“API 迁移说明”第一版于10:27提交，早于10:45目标时间。该单一案例提示受保护的专注时段可能与及时交付相伴，但不足以证明因果或稳定规律。",
+        "tags": [
+          "work_pattern",
+          "protected_focus",
+          "single_case"
+        ]
+      },
+      "checkpoint_id": "cp0005",
+      "name": "commit_ai_world_claim"
+    }
+  ],
   "complete": false,
   "conversation_turn_index": 0,
-  "current_simulated_timestamp": "2026-11-06T06:53:00-08:00",
+  "current_simulated_timestamp": "2026-11-06T10:23:00-08:00",
   "errors": [],
-  "next_checkpoint": 5,
+  "next_checkpoint": 7,
   "next_summary_request": 4,
   "phase": "A",
   "released_cursors": [
     1,
     2,
     3,
-    4
+    4,
+    5
   ],
   "response_count": 0,
   "run_id": "c14-sem-repair-resident-20260922-sol-r4",
@@ -48,10 +81,26 @@
       "released_cursor": 4,
       "simulated_timestamp": "2026-11-06T06:53:00-08:00",
       "world_revision_before": 15
+    },
+    {
+      "checkpoint_id": "cp0005",
+      "directive_kind": "capability_calls",
+      "github_author": "Haneof",
+      "released_cursor": 5,
+      "simulated_timestamp": "2026-11-06T10:23:00-08:00",
+      "world_revision_before": 19
+    },
+    {
+      "checkpoint_id": "cp0006",
+      "directive_kind": "silence",
+      "github_author": "Haneof",
+      "released_cursor": 5,
+      "simulated_timestamp": "2026-11-06T10:23:00-08:00",
+      "world_revision_before": 20
     }
   ],
   "session_id": "resident-sem-repair-sol-20260922-r4",
-  "silence_count": 2,
+  "silence_count": 3,
   "summary_requests": [
     {
       "github_author": "Haneof",
