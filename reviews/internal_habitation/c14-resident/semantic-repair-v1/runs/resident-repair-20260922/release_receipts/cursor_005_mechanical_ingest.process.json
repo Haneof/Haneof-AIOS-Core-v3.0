@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/usr/bin/python3",
+    "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c14-resident/semantic-repair-v1/release/mechanical_ingest_adapter.py",
+    "--world-db",
+    "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c14-resident/semantic-repair-v1/runs/resident-repair-20260922/private_world.sqlite",
+    "--event-file",
+    "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c14-resident/semantic-repair-v1/runs/resident-repair-20260922/current_event.json"
+  ],
+  "returncode": 0
+}

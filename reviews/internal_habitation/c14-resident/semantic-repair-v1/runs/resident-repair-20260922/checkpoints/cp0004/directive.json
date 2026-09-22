@@ -1,0 +1,30 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "claim_type": "hypothesis",
+        "confidence": 0.65,
+        "content": "根据已记录事实：2026-11-03 睡眠7小时46分（评分83/100，07:01醒来）；当日上午 08:28–10:25 开启专注模式且未接通语音/视频通话，静音21条通知；随后于 10:27 提前完成并提交‘API 迁移说明’第一版（目标时间10:45）。初步形成工作模式假说：夜间充足睡眠配合上午无干扰专注时段，有助于高效完成并提前交付复杂文档任务。",
+        "dimension": "dim:work_outcome",
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_5bf4b05a9dafdb85ec5bb688",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+            "revision": 1
+          }
+        ],
+        "knowledge_state": "hypothesis"
+      },
+      "call_id": "cp0004-call-1",
+      "name": "commit_claim"
+    }
+  ],
+  "checkpoint_id": "cp0004"
+}

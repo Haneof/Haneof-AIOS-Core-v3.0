@@ -1,18 +1,45 @@
 {
-  "capability_call_count": 0,
-  "cognition_calls": [],
+  "capability_call_count": 4,
+  "cognition_calls": [
+    {
+      "arguments": {
+        "claim_type": "hypothesis",
+        "confidence": 0.65,
+        "content": "根据已记录事实：2026-11-03 睡眠7小时46分（评分83/100，07:01醒来）；当日上午 08:28–10:25 开启专注模式且未接通语音/视频通话，静音21条通知；随后于 10:27 提前完成并提交‘API 迁移说明’第一版（目标时间10:45）。初步形成工作模式假说：夜间充足睡眠配合上午无干扰专注时段，有助于高效完成并提前交付复杂文档任务。",
+        "dimension": "dim:work_outcome",
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_5bf4b05a9dafdb85ec5bb688",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+            "revision": 1
+          }
+        ],
+        "knowledge_state": "hypothesis"
+      },
+      "checkpoint_id": "cp0004",
+      "name": "commit_claim"
+    }
+  ],
   "complete": false,
   "conversation_turn_index": 0,
-  "current_simulated_timestamp": "2026-11-06T06:53:00-08:00",
+  "current_simulated_timestamp": "2026-11-06T10:23:00-08:00",
   "errors": [],
-  "next_checkpoint": 3,
+  "next_checkpoint": 6,
   "next_summary_request": 4,
   "phase": "A",
   "released_cursors": [
     1,
     2,
     3,
-    4
+    4,
+    5
   ],
   "response_count": 0,
   "run_id": "resident-repair-20260922",
@@ -30,10 +57,31 @@
       "released_cursor": 4,
       "simulated_timestamp": "2026-11-06T06:53:00-08:00",
       "world_revision_before": 15
+    },
+    {
+      "checkpoint_id": "cp0003",
+      "directive_kind": "capability_calls",
+      "released_cursor": 5,
+      "simulated_timestamp": "2026-11-06T10:23:00-08:00",
+      "world_revision_before": 19
+    },
+    {
+      "checkpoint_id": "cp0004",
+      "directive_kind": "capability_calls",
+      "released_cursor": 5,
+      "simulated_timestamp": "2026-11-06T10:23:00-08:00",
+      "world_revision_before": 19
+    },
+    {
+      "checkpoint_id": "cp0005",
+      "directive_kind": "silence",
+      "released_cursor": 5,
+      "simulated_timestamp": "2026-11-06T10:23:00-08:00",
+      "world_revision_before": 20
     }
   ],
   "session_id": "resident-sem-repair-20260922",
-  "silence_count": 2,
+  "silence_count": 3,
   "summary_requests": [
     {
       "kind": "dimension_summary",
