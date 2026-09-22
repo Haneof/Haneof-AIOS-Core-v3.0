@@ -783,6 +783,7 @@ def main() -> int:
     store = SQLiteWorldStore(WORLD_DB)
     index = WorldSearchIndex(INDEX_DB, store=store)
     bridge = GithubBridge(state, store)
+    bridge.post_text("HEARTBEAT", "bridge_ready", "bridge initialized; no event revealed yet")
 
     runtime = FusedTurnRuntime(
         store=store,
@@ -815,6 +816,7 @@ def main() -> int:
     atomic_json(RUN_DIR / "run_manifest.json", run_manifest)
 
     run_release_init("A", "phase_A_init")
+    bridge.post_text("HEARTBEAT", "phase_a_init", "Phase A initialized; next operation is cursor 1 reveal")
 
     for expected_sequence in range(1, 16):
         phase = "A" if expected_sequence <= 6 else "B"
