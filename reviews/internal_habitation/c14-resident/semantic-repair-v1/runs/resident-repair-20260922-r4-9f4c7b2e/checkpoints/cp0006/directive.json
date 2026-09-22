@@ -1,0 +1,15 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "limit": 32,
+        "offset": 0
+      },
+      "call_id": "cp0006-read-anchors",
+      "name": "read_periodic_review_anchors"
+    }
+  ],
+  "checkpoint_id": "cp0006",
+  "decision_rationale": "This review spans 11 anchors across multiple dimensions and summary levels. Inspect the exact pinned anchors before deciding whether the two observed work cases justify only a hypothesis, a durable claim, or continued silence.",
+  "github_author": "single-window-resident-control"
+}
