@@ -1,7 +1,1 @@
-{"fixture_payload_sha256":"sha256:6a31f70d43b4d1e296d08fca670a0f3de92ca58b8f0de73b71c62d0cdb54357c","fixture_projection_sha256":"sha256:7f13690d0a934cf007dd16908b6586ad6533d6d12a7ca171b9c60d321baab4ec","ingest_ref":"obs_c14_fixture_5d4dfcf42055c00135a78a54@1","object_id":"obs_c14_fixture_5d4dfcf42055c00135a78a54","reused_existing":false,"revision":1,"world_revision":13}
-{"binding_mode":"fixture_observation","event_id":"c15rcc-004","fixture_payload_sha256":"sha256:6a31f70d43b4d1e296d08fca670a0f3de92ca58b8f0de73b71c62d0cdb54357c","fixture_projection_sha256":"sha256:7f13690d0a934cf007dd16908b6586ad6533d6d12a7ca171b9c60d321baab4ec","fixture_sha256":"sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46","ingest_object_id":"obs_c14_fixture_5d4dfcf42055c00135a78a54","ingest_ref":"obs_c14_fixture_5d4dfcf42055c00135a78a54@1","ingest_revision":1,"ingest_source_class":"platform","ingest_world_revision":13,"next_sequence":5,"occurred_at":"2026-11-02T12:40:00-08:00","sequence":4,"status":"acked"}
-INDEX {"caught": 1, "watermark": 13, "lag": 0, "world_revision": 13}
-SUMMARY {'attempted_jobs': (), 'commits': (), 'skipped_unchanged': (), 'skipped_empty': (), 'truncated': False}
-REVIEW None
-NO_SEMANTIC_WORK
-STATE {"world_revision": 13, "watermark": 13, "lag": 0}
+{"dimension":"dim:conversation","event_id":"c15rcc-005","modality":"text","occurred_at":"2026-11-02T12:52:00-08:00","resident_visible_payload":"这次我没跟着过程，结果直接能用，挺省事。以后这类低风险实现就保持这个节奏；真正影响生产、删东西或花钱的时候再集中问我。","sequence":5,"source_class":"USER","source_kind":"conversation"}
