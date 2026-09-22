@@ -1,0 +1,174 @@
+{
+  "fixture_version": "c14-semantic-repair-fixture-v1",
+  "schema_version": "c14-semantic-repair-event-v1",
+  "release_contract_version": "c14-semantic-repair-sequential-release-v1",
+  "timezone": "America/Los_Angeles",
+  "subject_id": "user_1",
+  "events": [
+    {
+      "event_id": "c14semrep-001",
+      "sequence": 1,
+      "phase": "A",
+      "occurred_at": "2026-11-03T07:06:00-08:00",
+      "dimension": "dim:sleep",
+      "source_kind": "wearable",
+      "source_class": "SENSOR",
+      "modality": "structured_text",
+      "resident_visible_payload": "昨晚睡眠 7小时46分；睡眠评分 83/100；07:01 醒来。"
+    },
+    {
+      "event_id": "c14semrep-002",
+      "sequence": 2,
+      "phase": "A",
+      "occurred_at": "2026-11-03T10:29:00-08:00",
+      "dimension": "dim:device_activity",
+      "source_kind": "device",
+      "source_class": "PLATFORM",
+      "modality": "structured_text",
+      "resident_visible_payload": "08:28–10:25 开启专注模式；期间没有加入语音或视频通话，21 条通知被静音。"
+    },
+    {
+      "event_id": "c14semrep-003",
+      "sequence": 3,
+      "phase": "A",
+      "occurred_at": "2026-11-03T10:34:00-08:00",
+      "dimension": "dim:work_outcome",
+      "source_kind": "task_tracker",
+      "source_class": "PLATFORM",
+      "modality": "structured_text",
+      "resident_visible_payload": "“API 迁移说明”第一版于 10:27 提交；该任务登记目标时间为 10:45。"
+    },
+    {
+      "event_id": "c14semrep-004",
+      "sequence": 4,
+      "phase": "A",
+      "occurred_at": "2026-11-06T06:53:00-08:00",
+      "dimension": "dim:sleep",
+      "source_kind": "wearable",
+      "source_class": "SENSOR",
+      "modality": "structured_text",
+      "resident_visible_payload": "昨晚睡眠 5小时34分；睡眠评分 58/100；06:48 醒来。"
+    },
+    {
+      "event_id": "c14semrep-005",
+      "sequence": 5,
+      "phase": "A",
+      "occurred_at": "2026-11-06T10:23:00-08:00",
+      "dimension": "dim:collaboration_activity",
+      "source_kind": "communication_platform",
+      "source_class": "PLATFORM",
+      "modality": "structured_text",
+      "resident_visible_payload": "当天上午实际通话记录：08:58–09:09 供应商电话；09:37–09:49 团队临时同步；10:08–10:19 客户回电。三次均已实际接通并结束。"
+    },
+    {
+      "event_id": "c14semrep-006",
+      "sequence": 6,
+      "phase": "A",
+      "occurred_at": "2026-11-06T12:08:00-08:00",
+      "dimension": "dim:work_outcome",
+      "source_kind": "task_tracker",
+      "source_class": "PLATFORM",
+      "modality": "structured_text",
+      "resident_visible_payload": "“权限迁移说明”第一版于 12:02 提交；该任务登记目标时间为 11:00。"
+    },
+    {
+      "event_id": "c14semrep-007",
+      "sequence": 7,
+      "phase": "B",
+      "occurred_at": "2026-11-10T07:34:00-08:00",
+      "dimension": "dim:sleep",
+      "source_kind": "wearable",
+      "source_class": "SENSOR",
+      "modality": "structured_text",
+      "resident_visible_payload": "昨晚睡眠 7小时31分；睡眠评分 80/100；07:29 醒来。"
+    },
+    {
+      "event_id": "c14semrep-008",
+      "sequence": 8,
+      "phase": "B",
+      "occurred_at": "2026-11-10T08:02:00-08:00",
+      "dimension": "dim:schedule",
+      "source_kind": "calendar",
+      "source_class": "PLATFORM",
+      "modality": "structured_text",
+      "resident_visible_payload": "今天计划 09:00–09:25 与设计师同步；08:00–11:20 其余时间留给“发布说明”起草；第一版目标时间 11:30。"
+    },
+    {
+      "event_id": "c14semrep-009",
+      "sequence": 9,
+      "phase": "B",
+      "occurred_at": "2026-11-10T09:12:00-08:00",
+      "dimension": "dim:work",
+      "source_kind": "task_tracker",
+      "source_class": "PLATFORM",
+      "modality": "structured_text",
+      "resident_visible_payload": "“发布说明”状态为进行中；实际开始时间 08:05；截至 09:11 任务仍为进行中，最近一次内容保存时间为 08:54。"
+    },
+    {
+      "event_id": "c14semrep-010",
+      "sequence": 10,
+      "phase": "B",
+      "occurred_at": "2026-11-10T09:32:00-08:00",
+      "dimension": "dim:collaboration_activity",
+      "source_kind": "meeting_platform",
+      "source_class": "PLATFORM",
+      "modality": "structured_text",
+      "resident_visible_payload": "会议平台日志显示：设计师同步实际于 09:06 接通，09:24 结束；参会双方均有音频活动。"
+    },
+    {
+      "event_id": "c14semrep-011",
+      "sequence": 11,
+      "phase": "B",
+      "occurred_at": "2026-11-10T10:58:00-08:00",
+      "dimension": "dim:work_outcome",
+      "source_kind": "task_tracker",
+      "source_class": "PLATFORM",
+      "modality": "structured_text",
+      "resident_visible_payload": "“发布说明”第一版于 10:52 提交；目标时间 11:30；评审前未要求重写核心结构。"
+    },
+    {
+      "event_id": "c14semrep-012",
+      "sequence": 12,
+      "phase": "B",
+      "occurred_at": "2026-11-10T11:06:00-08:00",
+      "dimension": "dim:conversation",
+      "source_kind": "conversation",
+      "source_class": "USER",
+      "modality": "text",
+      "resident_visible_payload": "用户说：“九点聊完回来接着写，没怎么重新找上下文，十一点前一版就出来了。”"
+    },
+    {
+      "event_id": "c14semrep-013",
+      "sequence": 13,
+      "phase": "B",
+      "occurred_at": "2026-11-13T08:21:00-08:00",
+      "dimension": "dim:schedule",
+      "source_kind": "calendar",
+      "source_class": "PLATFORM",
+      "modality": "structured_text",
+      "resident_visible_payload": "今天 08:30–10:15 预留“客户分析”连续工作块；日历没有会议；该任务目标时间 10:45。"
+    },
+    {
+      "event_id": "c14semrep-014",
+      "sequence": 14,
+      "phase": "B",
+      "occurred_at": "2026-11-13T10:05:00-08:00",
+      "dimension": "dim:service_status",
+      "source_kind": "third_party_status",
+      "source_class": "PLATFORM",
+      "modality": "structured_text",
+      "resident_visible_payload": "第三方文档服务状态页确认 08:47–10:03 编辑与保存接口不可用，事件编号 INC-4821；10:03 恢复。"
+    },
+    {
+      "event_id": "c14semrep-015",
+      "sequence": 15,
+      "phase": "B",
+      "occurred_at": "2026-11-13T11:23:00-08:00",
+      "dimension": "dim:work_outcome",
+      "source_kind": "task_tracker",
+      "source_class": "PLATFORM",
+      "modality": "structured_text",
+      "resident_visible_payload": "“客户分析”于 11:18 提交，晚于 10:45 目标时间；任务记录显示 08:50–10:04 处于“外部文档服务不可用”阻塞状态。"
+    }
+  ]
+}
