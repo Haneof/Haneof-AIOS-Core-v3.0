@@ -257,6 +257,25 @@ class ConversationIngestor:
             raise ValueError("wake delivery Observation has invalid interaction_kind")
         if metadata.get("origin_wake_id") != wake_id.strip():
             raise ValueError("wake delivery Observation has invalid Wake provenance")
+        expected_key, _assistant_id = self._wake_delivery_identity(wake_id)
+        if metadata.get("delivery_key") != expected_key:
+            raise ValueError("wake delivery Observation has invalid delivery identity")
+        raw_origin_ref = metadata.get("origin_wake_ref")
+        if not isinstance(raw_origin_ref, Mapping):
+            raise ValueError("wake delivery Observation lacks exact Wake provenance")
+        origin_ref = ObjectRef.model_validate(raw_origin_ref)
+        if origin_ref.revision is None or origin_ref.object_id != wake_id.strip():
+            raise ValueError("wake delivery Observation has invalid exact Wake ref")
+        if metadata.get("origin_wake_revision") != origin_ref.revision:
+            raise ValueError("wake delivery Observation Wake revision mismatch")
+        origin_payload = self.store.get_payload(
+            origin_ref.object_id,
+            revision=origin_ref.revision,
+        )
+        if origin_payload.get("object_type") != ObjectType.WAKE.value:
+            raise ValueError("wake delivery provenance does not point to a Wake")
+        if origin_payload.get("subject_id") != self.subject_id:
+            raise ValueError("wake delivery provenance crosses subject scope")
         return payload
 
     def commit_assistant_delivery(
@@ -273,9 +292,10 @@ class ConversationIngestor:
     ) -> ConversationMessageCommit:
         """Persist one proactive assistant->user delivery without fabricating USER input.
 
-        The exact originating Wake revision is part of the durable identity and
-        provenance. Replaying the same delivery is idempotent; reusing the same
-        identity with different text or metadata fails closed in SQLiteWorldStore.
+        The logical Wake object id is the stable delivery identity; the first exact
+        RUNNING Wake revision remains immutable provenance. Replaying the same exact
+        persistence request is idempotent, while changed text/metadata under the same
+        logical delivery identity fails closed in SQLiteWorldStore.
         """
 
         if origin_wake_ref.revision is None:
