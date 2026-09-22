@@ -86,8 +86,8 @@
 | 21 | `C14-SEM-REPAIR-FIX-001` | 为 C14 E1/E5 blocker 准备最小 sealed semantic-repair fixture；只替换受影响语义证据，不改旧 A/B evidence，不改 Core | **DONE** | C14-RES-EVAL-001 | PR #83; final candidate `11ee54c0ecaca3462fd526f27c2a5b526a6e8295`; squash merge `aacf70e381a78b5955304e894ebce445ce3ffe49`; fixture `reviews/internal_habitation/c14-resident/semantic-repair-v1/fixture/sealed_fixture.json`; SHA256 `1095d5aef52061753db7d9dab558af1361b92976f2ded0e6956d70afe3e6527f`; exact-candidate gate `35678649521` SUCCESS; completion evidence `reviews/internal_habitation/c14-resident/semantic-repair-v1/C14_SEM_REPAIR_FIX_001_COMPLETION_EVIDENCE_2026-09-22.md` | 15-event R-A/R-B repair fixture; E1 material facts independently leaf-groundable; E5 planned/observed/outcome split + later user feedback + external-failure control; 25/25 mechanical checks PASS; canonical/fused regressions 16/16 PASS; Core/v2 diff 0; no Resident run |
 | 22 | `C14-SEM-REPAIR-RES-001` | 新真实 Resident 窗口执行最小 repair life；模型本人形成/修订/保持 cognition，不得程序代答 | **DONE** | C14-SEM-REPAIR-FIX-001 | canonical evidence **PR #92 (OPEN/UNMERGED/PINNED, never merge)**; exact evidence head `9e870514b57bf07c00018d7dcf7435f2702f8730`; PM acceptance report `reviews/C14_SEM_REPAIR_RES_001_PM_ACCEPTANCE_REVIEW_2026-09-22.md`; run dir `reviews/internal_habitation/c14-resident/semantic-repair-v1/runs/resident-repair-20260922/`; session `resident-sem-repair-20260922`; final World SHA256 `a7a7cd9f9166eb41d3b93d85820a9c7a4ab0aa57b81787d89f395482742bae57` (rev 83); release-state SHA256 `4f41d709a76e0f40ce5b0093f540cc286dde84a1906a575019199cc7a7970081`; index SHA256 `ae296ee44a000eb7ea5bf122184bfb9dd65c80f14f9e94e9fb64fce039658caf` | PM evidence acceptance 2026-09-22: cursors 15/15 sequential (A=1..6, B=7..15), durable SQLite acks verified; 16 checkpoints, 20 Resident-authored summaries, 18 capability calls (15 inspect / 1 commit_claim / 2 revise_claim), 8 silences, 1 response; final Claim `clm_b4df2179bb8ffec020a39ede@3` with durable revision chain rev1@wr20→rev2@wr44→rev3@wr77 and pinned leaf evidence sets; bridge transport-only, no pseudo-LLM; zero future leak; `src/aios_core/**`=0; v2/PR#75/PR#79 historical evidence untouched; trial PRs #84–#91 dispositioned ABORTED/SCAFFOLD/NON-CANONICAL. **Semantic verdict NOT PERFORMED — E1/E5 validity is exclusively C14-SEM-REPAIR-EVAL-001**; evaluator must use PR #92 exact head only |
 | 23 | `C14-SEM-REPAIR-EVAL-001` | 独立 evaluator 只审计 replacement E1/E5 evidence，并与原 E2/E3/E4/E6 VALID 证据组合；不修 Core | **DONE** | C14-SEM-REPAIR-RES-001 | `reviews/C14_SEM_REPAIR_EVAL_001_INDEPENDENT_SEMANTIC_EVALUATION_2026-09-22.md`; evaluated live main `655e1d48c2b53dd4f5a10485a9d530ed13ca69a3` (run's declared main `7611fa5059f5dc8a20835cab5b312be2f43d11e8`); canonical evidence PR #92 @ exact head `9e870514b57bf07c00018d7dcf7435f2702f8730` ONLY (kept OPEN/UNMERGED/PINNED); World/release-state/index SHA256 independently recomputed and matched | **E1 VALID / E5 VALID**；repair 未污染 E2/E3/E4/E6；combined matrix 全 VALID；overall `C14 RESIDENT SEMANTIC EVIDENCE = VALID`；`C14-CLOSE-001 = READY`；禁止使用 #84–#91（未使用）；未修 Core/fixture/evidence |
-| 24 | `C14-CLOSE-001` | 独立审计 C14 规则、代码、Gate、原 Resident 证据与 repair evidence；只做收口，不写新 Core 功能 | **READY** | C14-SEM-REPAIR-EVAL-001 | C14 full chain + deterministic gates + original evaluator (`reviews/C14_RES_EVAL_001_INDEPENDENT_SEMANTIC_EVALUATION_2026-09-22.md`) + repair evaluator (`reviews/C14_SEM_REPAIR_EVAL_001_INDEPENDENT_SEMANTIC_EVALUATION_2026-09-22.md`: E1/E5 replacement VALID, combined matrix all VALID) | 只有 E1-E6 最终全部 VALID 才 PASS；不得通过修改历史 evidence 收口；PASS 后才能进入 C15；收口时须保留 PR #75/#79/#92 OPEN/UNMERGED/PINNED |
-| 25 | `C15-RCC-RULE-001` | 冻结 Resident Cognitive Continuity 语义：模型可替换，Resident 的 User Understanding / Relationship-Role / Self-Calibration / Strategy-Experience 不得重置 | **BLOCKED** | C14-CLOSE-001 | `governance/C15_RESIDENT_COGNITIVE_CONTINUITY_TEST_PLAN_2026-09-22.md` + AI User Understanding / Self / Calibration / Strategy / Periodic Review constitutions | 明确统一 World、真实 Outcome/feedback grounding、可修订认知、style != identity；禁止第二 self DB、persona prompt 替代认知、AI 自述自证 |
+| 24 | `C14-CLOSE-001` | 独立审计 C14 规则、代码、Gate、原 Resident 证据与 repair evidence；只做收口，不写新 Core 功能 | **DONE** | C14-SEM-REPAIR-EVAL-001 | reviews/C14_CLOSE_001_FINAL_CLOSURE_REVIEW_2026-09-22.md; closure PR opened and merged; C14 PASS; PR #75/#79/#92 kept OPEN/UNMERGED/PINNED | 规则无冲突、main 对齐、341/341 Gates GREEN、Summary 不成终态 proof、reality 叶子闭合、Core 无语义推断、side-effect allowlist 封闭、E1–E6 全 VALID；C14 CLOSURE = PASS |
+| 25 | `C15-RCC-RULE-001` | 冻结 Resident Cognitive Continuity 语义：模型可替换，Resident 的 User Understanding / Relationship-Role / Self-Calibration / Strategy-Experience 不得重置 | **READY** | C14-CLOSE-001 | `governance/C15_RESIDENT_COGNITIVE_CONTINUITY_TEST_PLAN_2026-09-22.md` + AI User Understanding / Self / Calibration / Strategy / Periodic Review constitutions | 明确统一 World、真实 Outcome/feedback grounding、可修订认知、style != identity；禁止第二 self DB、persona prompt 替代认知、AI 自述自证 |
 | 26 | `C15-RCC-PREFLIGHT-001` | 审计 current main 是否已具备形成、索引、检索、fresh Runtime 恢复 Self/Calibration/Strategy/User Understanding/Experience 的机制；先审计再决定是否施工 | **BLOCKED** | C15-RCC-RULE-001 | P15 mechanisms + current Runtime/World/Index + focused tests | 每项只判 ALREADY_IMPLEMENTED / MECHANISM_GAP / INSUFFICIENT_EVIDENCE；若全已实现则禁止创建重复 Core；若有真实 gap，PM 另开单一最小实现任务并 Gate 后回到本链 |
 | 27 | `C15-RCC-FIXTURE-001` | Life Director 准备 sealed Resident Cognitive Continuity life：用户理解、关系/角色、真实成功、真实错误、外部失败负对照、反证、fresh-window 与 replacement-model 场景 | **BLOCKED** | C15-RCC-PREFLIGHT-001 + any activated gap task DONE/ALREADY_IMPLEMENTED | canonical RCC plan + blind release patterns | 无 expected Claim/tool/答案；未来隔离；fixture 提供真实机会但不强迫 Claim quota；能独立评价 user-facing 与 self-learning 两侧 continuity |
 | 28 | `C15-RCC-RES-A-001` | Resident A 逐事件生活，基于真实 Outcome/feedback 自主形成或保持 User Understanding / Relationship-Role / Self-Calibration / Strategy-Experience cognition | **BLOCKED** | C15-RCC-FIXTURE-001 | sealed Phase A + fresh private World | 模型本人作 search/inspect/write/revise/retract/silence；形成可测试的 user-facing cognition 与 self-learning cognition 时必须真实 grounding；保存 exact World/checkpoint/index/release digests 后停止 |
@@ -1297,3 +1297,34 @@ Bugs found: none in evidence; minor non-blocking observations recorded in the re
 Deferred issues: none inside this task; C14-CLOSE-001 must keep PR #75/#79/#92 OPEN/UNMERGED/PINNED and respect the report's limitations section
 Next READY task: C14-CLOSE-001 — new window only
 ```
+
+### C14-CLOSE-001 completion — 2026-09-22
+
+```text
+Task ID: C14-CLOSE-001
+Status: DONE
+Final Verdict: C14 CLOSURE = PASS
+Started from main: f5866974726c6327ab5a33236eed8912178d0c33
+Work branch: arena/01a0c7b3-haneof-aios-core-v3-0
+Closure report path: reviews/C14_CLOSE_001_FINAL_CLOSURE_REVIEW_2026-09-22.md
+Core diff: src/aios_core/** = 0 files changed, 0 lines modified
+Deterministic Gates: 341/341 passed (100% GREEN)
+Pinned historical evidence PRs (verified OPEN, UNMERGED, PINNED):
+- PR #75 @ cb9b56b7039272d932158f33bfe979eff6749c9b (Resident A)
+- PR #79 @ 546449a453e6e6dff3a2eeb2b52e7cf6786927be (Resident B)
+- PR #92 @ 9e870514b57bf07c00018d7dcf7435f2702f8730 (Semantic Repair Resident)
+Final Semantic Evidence Matrix:
+- E1: VALID (PR #92 replacement)
+- E2: VALID (PR #75 original)
+- E3: VALID (PR #79 original)
+- E4: VALID (PR #79 original)
+- E5: VALID (PR #92 replacement)
+- E6: VALID (PR #75/#79/#92 non-contamination)
+Combined Semantic Evidence Verdict: VALID
+Limitations disposition: Provider attestation, run-end pending triggers wr81/wr83, minor wording nuances, and closed-trial scaffolding all assessed as non-blocking.
+Authoritative Formal Statement:
+«AIOS 已证明：durable User/World reality 可触发真实 Resident 高阶认知机会；Resident 能跨维检查真实证据形成或修正 cognition；该 cognition 能跨 fresh runtime/session 恢复并实际影响后续行为；后续真实世界证据能够修正或保留 cognition；整个过程不依赖 Summary 自证、pseudo-LLM、future leak 或 deterministic semantic inference。»
+Task board final status: C14-CLOSE-001 = DONE; C15-RCC-RULE-001 = READY; C15-RCC-PREFLIGHT-001 = BLOCKED
+Next READY task: C15-RCC-RULE-001 — new window only
+```
+

@@ -14,6 +14,27 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
+## 当前工程断点 — C14-CLOSE-001 已收口：C14 CLOSURE = PASS，唯一下一 READY = C15-RCC-RULE-001
+
+- 2026-09-22 更新：`C14-CLOSE-001 = DONE`（独立总收口完成）；**`C14 CLOSURE = PASS`**；`C15-RCC-RULE-001 = READY`；`C15-RCC-PREFLIGHT-001` 保持 **BLOCKED**（直到 RCC-RULE 完成，禁止直接设 READY）。
+- Reviewed main anchor: `f5866974726c6327ab5a33236eed8912178d0c33`；Core diff: `src/aios_core/**` = 0 文件变更。
+- Deterministic Gates: 341/341 passed (100% GREEN)；包含 C14 scheduler、runtime、loop、writeback、revision、AI-world、Periodic Review、habitation harness 及 25 项 semantic-repair mechanical gate。
+- 历史 Evidence PRs 状态再核查：全部保持 **OPEN / UNMERGED / PINNED**（严禁 merge）：
+  - PR #75 @ `cb9b56b7039272d932158f33bfe979eff6749c9b` (Resident A)
+  - PR #79 @ `546449a453e6e6dff3a2eeb2b52e7cf6786927be` (Resident B)
+  - PR #92 @ `9e870514b57bf07c00018d7dcf7435f2702f8730` (Semantic Repair Resident)
+- 最终组合语义证据矩阵：
+  - E1 (Cross-dimensional cognition): **VALID** (PR #92 替换证据)
+  - E2 (Matched-negative silence): **VALID** (PR #75 原始证据)
+  - E3 (Fresh-window cognition recovery): **VALID** (PR #79 原始证据)
+  - E4 (Cognition materially affects behavior): **VALID** (PR #79 原始证据)
+  - E5 (Later outcome / revision): **VALID** (PR #92 替换证据)
+  - E6 (Integrity / no pseudo-LLM / no future leak): **VALID** (无污染再核)
+- 权威正式结论声明：
+  «AIOS 已证明：durable User/World reality 可触发真实 Resident 高阶认知机会；Resident 能跨维检查真实证据形成或修正 cognition；该 cognition 能跨 fresh runtime/session 恢复并实际影响后续行为；后续真实世界证据能够修正或保留 cognition；整个过程不依赖 Summary 自证、pseudo-LLM、future leak 或 deterministic semantic inference。»
+- 收口审计报告：`reviews/C14_CLOSE_001_FINAL_CLOSURE_REVIEW_2026-09-22.md`。
+- 下一步：`C15-RCC-RULE-001`（新独立窗口），冻结 Resident Cognitive Continuity 语义。
+
 ## 当前工程断点 — C14-SEM-REPAIR-EVAL-001 已完成：C14 RESIDENT SEMANTIC EVIDENCE = VALID，唯一下一 READY = C14-CLOSE-001
 
 - 2026-09-22 更新：`C14-SEM-REPAIR-EVAL-001 = DONE`（独立语义评估完成）；`C14-CLOSE-001 = READY`；`C15-RCC-RULE-001` 保持 **BLOCKED**（直到 C14-CLOSE 真正完成）。
