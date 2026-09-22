@@ -1,4 +1,6 @@
 import sqlite3
+
+import pytest
 from datetime import datetime, timedelta, timezone
 
 from aios_core.ai_world import (
@@ -14,6 +16,7 @@ from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import TemporalExtent
 from aios_core.query.search import WorldSearchIndex
 from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 
 
 NOW = datetime(2026, 9, 20, 13, 10, tzinfo=timezone.utc)
@@ -272,3 +275,389 @@ def test_all_p10_domains_are_typed_views_over_the_same_claim_engine(tmp_path):
         "dim:ai_personality",
         "dim:ai_calibration",
     }
+
+
+
+def _seed_subject_isolation_world(tmp_path):
+    db = tmp_path / "subject_isolation.db"
+    store = SQLiteWorldStore(db)
+    facts = {
+        "user_A": Observation(
+            object_id="obs_subject_isolation_a",
+            subject_id="user_A",
+            occurred=TemporalExtent.point(NOW - timedelta(days=2)),
+            learned_at=NOW - timedelta(days=2),
+            recorded_at=NOW - timedelta(days=2),
+            created_by="c15-subject-isolation",
+            source_kind="conversation",
+            modality="text",
+            value="User A evidence",
+            metadata={"dimension": "dim:user_ai_interaction"},
+        ),
+        "user_B": Observation(
+            object_id="obs_subject_isolation_b",
+            subject_id="user_B",
+            occurred=TemporalExtent.point(NOW - timedelta(days=1)),
+            learned_at=NOW - timedelta(days=1),
+            recorded_at=NOW - timedelta(days=1),
+            created_by="c15-subject-isolation",
+            source_kind="conversation",
+            modality="text",
+            value="User B evidence",
+            metadata={"dimension": "dim:user_ai_interaction"},
+        ),
+    }
+    store.commit(
+        list(facts.values()),
+        OperationRequest(
+            operation_name="test.seed.c15.subject_isolation",
+            expected_world_revision=0,
+            reason="seed two-subject C15 isolation evidence",
+            idempotency_key="c15-subject-isolation-seed",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+    return store, index, facts
+
+
+def _commit_for_subject(service, *, domain, evidence, statement, scope_key, tags=()):
+    return service.commit(
+        AIWorldClaimRequest(
+            domain=domain,
+            statement=statement,
+            evidence_refs=(ObjectRef(object_id=evidence.object_id, revision=1),),
+            confidence=0.9,
+            scope_key=scope_key,
+            tags=tags,
+        ),
+        learned_at=NOW,
+    )
+
+
+def test_user_understanding_current_isolated_by_service_user(tmp_path):
+    store, index, facts = _seed_subject_isolation_world(tmp_path)
+    service_a = AIWorldCognitionService(store=store, index=index, user_id="user_A")
+    service_b = AIWorldCognitionService(store=store, index=index, user_id="user_B")
+    a = _commit_for_subject(
+        service_a,
+        domain=AIWorldDomain.USER_UNDERSTANDING,
+        evidence=facts["user_A"],
+        statement="User A prefers terse status reports.",
+        scope_key="communication.style",
+    )
+    b = _commit_for_subject(
+        service_b,
+        domain=AIWorldDomain.USER_UNDERSTANDING,
+        evidence=facts["user_B"],
+        statement="User B prefers detailed status reports.",
+        scope_key="communication.style",
+    )
+
+    current = service_b.current(domains=[AIWorldDomain.USER_UNDERSTANDING])
+
+    assert {item.object_id for item in current} == {b.claim.claim_id}
+    assert a.claim.claim_id not in {item.object_id for item in current}
+
+
+def test_relationship_current_isolated_by_service_user(tmp_path):
+    store, index, facts = _seed_subject_isolation_world(tmp_path)
+    service_a = AIWorldCognitionService(store=store, index=index, user_id="user_A")
+    service_b = AIWorldCognitionService(store=store, index=index, user_id="user_B")
+    a = _commit_for_subject(
+        service_a,
+        domain=AIWorldDomain.RELATIONSHIP,
+        evidence=facts["user_A"],
+        statement="User A relationship cognition.",
+        scope_key="relationship.current",
+    )
+    b = _commit_for_subject(
+        service_b,
+        domain=AIWorldDomain.RELATIONSHIP,
+        evidence=facts["user_B"],
+        statement="User B relationship cognition.",
+        scope_key="relationship.current",
+    )
+
+    current = service_b.current(domains=[AIWorldDomain.RELATIONSHIP])
+
+    assert {item.object_id for item in current} == {b.claim.claim_id}
+    assert a.claim.claim_id not in {item.object_id for item in current}
+
+
+def test_strategy_current_isolated_by_service_user(tmp_path):
+    store, index, facts = _seed_subject_isolation_world(tmp_path)
+    service_a = AIWorldCognitionService(store=store, index=index, user_id="user_A")
+    service_b = AIWorldCognitionService(store=store, index=index, user_id="user_B")
+    a = _commit_for_subject(
+        service_a,
+        domain=AIWorldDomain.STRATEGY,
+        evidence=facts["user_A"],
+        statement="User A strategy cognition.",
+        scope_key="strategy.delivery",
+    )
+    b = _commit_for_subject(
+        service_b,
+        domain=AIWorldDomain.STRATEGY,
+        evidence=facts["user_B"],
+        statement="User B strategy cognition.",
+        scope_key="strategy.delivery",
+    )
+
+    current = service_b.current(domains=[AIWorldDomain.STRATEGY])
+
+    assert {item.object_id for item in current} == {b.claim.claim_id}
+    assert a.claim.claim_id not in {item.object_id for item in current}
+
+
+def test_core_context_does_not_cross_user_but_keeps_ai_self(tmp_path):
+    store, index, facts = _seed_subject_isolation_world(tmp_path)
+    service_a = AIWorldCognitionService(store=store, index=index, user_id="user_A")
+    service_b = AIWorldCognitionService(store=store, index=index, user_id="user_B")
+    user_claim = _commit_for_subject(
+        service_a,
+        domain=AIWorldDomain.USER_UNDERSTANDING,
+        evidence=facts["user_A"],
+        statement="User A core understanding.",
+        scope_key="core.user",
+        tags=("core_context",),
+    )
+    relationship_claim = _commit_for_subject(
+        service_a,
+        domain=AIWorldDomain.RELATIONSHIP,
+        evidence=facts["user_A"],
+        statement="User A core relationship.",
+        scope_key="core.relationship",
+        tags=("core_context",),
+    )
+    self_claim = _commit_for_subject(
+        service_a,
+        domain=AIWorldDomain.SELF,
+        evidence=facts["user_A"],
+        statement="Resident self cognition shared across users.",
+        scope_key="core.self",
+        tags=("core_context",),
+    )
+
+    context = service_b.core_context()
+    flattened = {
+        item["object_id"]
+        for items in context.values()
+        for item in items
+    }
+
+    assert user_claim.claim.claim_id not in flattened
+    assert relationship_claim.claim.claim_id not in flattened
+    assert self_claim.claim.claim_id in flattened
+
+
+def test_snapshot_does_not_cross_user_scoped_domains(tmp_path):
+    store, index, facts = _seed_subject_isolation_world(tmp_path)
+    service_a = AIWorldCognitionService(store=store, index=index, user_id="user_A")
+    service_b = AIWorldCognitionService(store=store, index=index, user_id="user_B")
+    a_claims = {
+        _commit_for_subject(
+            service_a,
+            domain=domain,
+            evidence=facts["user_A"],
+            statement=f"User A {domain.value} cognition.",
+            scope_key=f"scope.{domain.value}",
+        ).claim.claim_id
+        for domain in (
+            AIWorldDomain.USER_UNDERSTANDING,
+            AIWorldDomain.RELATIONSHIP,
+            AIWorldDomain.STRATEGY,
+        )
+    }
+
+    snapshot = service_b.snapshot()
+    visible = {
+        item["object_id"]
+        for items in snapshot.values()
+        for item in items
+    }
+
+    assert a_claims.isdisjoint(visible)
+
+
+def test_self_continuity_preserved_across_user_services(tmp_path):
+    store, index, facts = _seed_subject_isolation_world(tmp_path)
+    service_a = AIWorldCognitionService(store=store, index=index, user_id="user_A")
+    service_b = AIWorldCognitionService(store=store, index=index, user_id="user_B")
+    self_claim = _commit_for_subject(
+        service_a,
+        domain=AIWorldDomain.SELF,
+        evidence=facts["user_A"],
+        statement="Resident durable self cognition.",
+        scope_key="self.identity",
+    )
+
+    assert {item.object_id for item in service_a.current(domains=[AIWorldDomain.SELF])} == {
+        self_claim.claim.claim_id
+    }
+    assert {item.object_id for item in service_b.current(domains=[AIWorldDomain.SELF])} == {
+        self_claim.claim.claim_id
+    }
+
+
+def test_calibration_continuity_preserved_across_user_services(tmp_path):
+    store, index, facts = _seed_subject_isolation_world(tmp_path)
+    service_a = AIWorldCognitionService(store=store, index=index, user_id="user_A")
+    service_b = AIWorldCognitionService(store=store, index=index, user_id="user_B")
+    calibration = _commit_for_subject(
+        service_a,
+        domain=AIWorldDomain.CALIBRATION,
+        evidence=facts["user_A"],
+        statement="Resident durable calibration cognition.",
+        scope_key="calibration.fact_state",
+    )
+
+    assert {item.object_id for item in service_a.current(domains=[AIWorldDomain.CALIBRATION])} == {
+        calibration.claim.claim_id
+    }
+    assert {item.object_id for item in service_b.current(domains=[AIWorldDomain.CALIBRATION])} == {
+        calibration.claim.claim_id
+    }
+
+
+def test_cross_user_typed_revise_is_rejected_for_user_scoped_domains(tmp_path):
+    store, index, facts = _seed_subject_isolation_world(tmp_path)
+    service_a = AIWorldCognitionService(store=store, index=index, user_id="user_A")
+    service_b = AIWorldCognitionService(store=store, index=index, user_id="user_B")
+    claims = [
+        _commit_for_subject(
+            service_a,
+            domain=domain,
+            evidence=facts["user_A"],
+            statement=f"User A {domain.value} original.",
+            scope_key=f"revise.{domain.value}",
+        )
+        for domain in (
+            AIWorldDomain.USER_UNDERSTANDING,
+            AIWorldDomain.RELATIONSHIP,
+            AIWorldDomain.STRATEGY,
+        )
+    ]
+
+    for receipt in claims:
+        with pytest.raises(ValueError, match="subject"):
+            service_b.revise(
+                target_ref=ObjectRef(object_id=receipt.claim.claim_id, revision=1),
+                evidence_refs=(ObjectRef(object_id=facts["user_B"].object_id, revision=1),),
+                replacement_statement="Illegal cross-user replacement.",
+                reason="must be rejected by typed facade subject authorization",
+                confidence=0.8,
+                changed_at=NOW + timedelta(seconds=1),
+            )
+        assert store.get_payload(receipt.claim.claim_id)["revision"] == 1
+
+
+def test_cross_user_typed_retract_is_rejected_for_user_scoped_domains(tmp_path):
+    store, index, facts = _seed_subject_isolation_world(tmp_path)
+    service_a = AIWorldCognitionService(store=store, index=index, user_id="user_A")
+    service_b = AIWorldCognitionService(store=store, index=index, user_id="user_B")
+    claims = [
+        _commit_for_subject(
+            service_a,
+            domain=domain,
+            evidence=facts["user_A"],
+            statement=f"User A {domain.value} original.",
+            scope_key=f"retract.{domain.value}",
+        )
+        for domain in (
+            AIWorldDomain.USER_UNDERSTANDING,
+            AIWorldDomain.RELATIONSHIP,
+            AIWorldDomain.STRATEGY,
+        )
+    ]
+
+    for receipt in claims:
+        with pytest.raises(ValueError, match="subject"):
+            service_b.retract(
+                target_ref=ObjectRef(object_id=receipt.claim.claim_id, revision=1),
+                evidence_refs=(ObjectRef(object_id=facts["user_B"].object_id, revision=1),),
+                reason="must be rejected by typed facade subject authorization",
+                changed_at=NOW + timedelta(seconds=1),
+            )
+        assert store.get_payload(receipt.claim.claim_id)["revision"] == 1
+
+
+@pytest.mark.parametrize("domain", [AIWorldDomain.SELF, AIWorldDomain.CALIBRATION])
+def test_legitimate_ai_self_revision_still_works_across_current_user(tmp_path, domain):
+    store, index, facts = _seed_subject_isolation_world(tmp_path)
+    service_a = AIWorldCognitionService(store=store, index=index, user_id="user_A")
+    service_b = AIWorldCognitionService(store=store, index=index, user_id="user_B")
+    initial = _commit_for_subject(
+        service_a,
+        domain=domain,
+        evidence=facts["user_A"],
+        statement=f"Initial resident {domain.value}.",
+        scope_key=f"resident.{domain.value}",
+    )
+
+    revised = service_b.revise(
+        target_ref=ObjectRef(object_id=initial.claim.claim_id, revision=1),
+        evidence_refs=(ObjectRef(object_id=facts["user_B"].object_id, revision=1),),
+        replacement_statement=f"Revised resident {domain.value}.",
+        reason="new current-user evidence updates valid AI-self cognition",
+        confidence=0.92,
+        changed_at=NOW + timedelta(seconds=1),
+    )
+
+    assert revised.new_revision == 2
+    assert store.get_payload(initial.claim.claim_id)["subject_id"] == AI_SELF_SUBJECT_ID
+    assert store.get_payload(initial.claim.claim_id)["revision"] == 2
+
+
+@pytest.mark.parametrize(
+    "metadata",
+    [
+        {"ai_world": False, "ai_domain": "user_understanding"},
+        {"ai_world": True},
+        {"ai_world": True, "ai_domain": "not_a_domain"},
+    ],
+)
+@pytest.mark.parametrize("mode", ["revise", "retract"])
+def test_typed_mutation_rejects_malformed_ai_world_metadata(tmp_path, metadata, mode):
+    store, index, facts = _seed_subject_isolation_world(tmp_path)
+    writer = CognitionWritebackService(
+        store=store,
+        index=index,
+        subject_id="user_A",
+        evidence_subject_ids=("user_A",),
+    )
+    malformed = writer.commit_claim(
+        ClaimWriteRequest(
+            content="Malformed typed facade target.",
+            evidence_refs=(ObjectRef(object_id=facts["user_A"].object_id, revision=1),),
+            confidence=0.8,
+            dimension="dim:ai_user_understanding",
+            claim_type=ClaimType.INFERENCE,
+            knowledge_state=KnowledgeState.INFERRED,
+            claimant_id="resident_ai",
+            metadata=metadata,
+        ),
+        learned_at=NOW,
+    )
+    service_b = AIWorldCognitionService(store=store, index=index, user_id="user_B")
+    target_ref = ObjectRef(object_id=malformed.claim_id, revision=1)
+    evidence_refs = (ObjectRef(object_id=facts["user_B"].object_id, revision=1),)
+
+    with pytest.raises(ValueError, match="AI-world"):
+        if mode == "revise":
+            service_b.revise(
+                target_ref=target_ref,
+                evidence_refs=evidence_refs,
+                replacement_statement="Must not revise malformed typed target.",
+                reason="fail closed on malformed metadata",
+                changed_at=NOW + timedelta(seconds=1),
+            )
+        else:
+            service_b.retract(
+                target_ref=target_ref,
+                evidence_refs=evidence_refs,
+                reason="fail closed on malformed metadata",
+                changed_at=NOW + timedelta(seconds=1),
+            )
+    assert store.get_payload(malformed.claim_id)["revision"] == 1

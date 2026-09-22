@@ -14,7 +14,28 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
-## 当前工程断点 — C15-RCC-PREFLIGHT-001 已完成：P11 = MECHANISM_GAP，唯一下一 READY = C15-RCC-MECH-FIX-001
+## 当前工程断点 — C15-RCC-MECH-FIX-001 已完成：Subject/User isolation 已封闭，唯一下一 READY = C15-RCC-FIXTURE-001
+
+- 2026-09-22 更新：`C15-RCC-MECH-FIX-001 = DONE`；`C15-RCC-FIXTURE-001 = READY`；`C15-RCC-RES-A-001 = BLOCKED`。
+- Starting main: `a6e2adf5d5676f765e40150aa3e21d145d4aef30`。
+- Engineering branch: `fix/c15-rcc-mech-fix-001-20260922-sol`。
+- PR: #98。
+- Exact gated implementation candidate: `de65572d2ce31cc53d5daadc252fe91e94e045d2`。
+- Completion evidence: `reviews/C15_RCC_MECH_FIX_001_COMPLETION_EVIDENCE_2026-09-22.md`。
+- Before-fix reproduction: test-only head `9cfe55d6ca920441b37799e51ed1330e8c26ca08` kept Core identical to starting main; `p10-ai-world` run `35698757405` failed 9/27 and `fused-turn-runtime` run `35698757513` failed 1/26, proving User A user-scoped AI-world cognition leaked through User B typed reads/runtime and typed mutation did not fail closed.
+- Root cause: `AIWorldCognitionService.current()` did not enforce the domain-derived subject; `revise()/retract()` trusted `payload["subject_id"]` as revision authorization.
+- Fix: `current()` now filters on `expected_subject = _subject_for(domain)`; `core_context()` / `snapshot()` continue to reuse `current()`; typed mutation validates `ai_world=True`, valid `AIWorldDomain`, and target subject equality with the domain-derived expected subject before constructing `CognitionRevisionService`.
+- Ownership semantics unchanged: User Understanding / Relationship / Strategy remain current-user scoped; Self / Calibration / Intent / Cognitive Boundary / Personality remain `ai_agent_self` scoped. No global Strategy scope, inheritance policy, second DB, second Runtime or semantic inference was added.
+- AI-self continuity non-regression: Self and Calibration remain readable across User A/User B service contexts and legitimate AI-self revision remains legal.
+- Exact-candidate Gates: `p10-ai-world 35698883015 SUCCESS (31 passed)`; `fused-turn-runtime 35698882956 SUCCESS (26 passed)`; `p9-revision-gate 35698883322 SUCCESS (54 passed)`; `p10-ai-world-gate 35698883102 SUCCESS`; `p11-dimension-gate 35698882916 SUCCESS`; `p12-execution-gate 35698883026 SUCCESS`; `constitutional-cognition-closure 35698882994 SUCCESS`; `c14-cognitive-derivation-runtime 35698883045 SUCCESS`; `c14-cognitive-derivation-loop 35698882999 SUCCESS`。
+- Full Core regression: `p16-convergence-gate 35698883072 SUCCESS`; exact run's `pytest -q` progress contained 431 tests and reached 100%。
+- Ordinary `search_world`, timeline, recommendation and direct `inspect_world_object` paths were not refactored and remained GREEN through related C14/P16 regressions.
+- P12 replacement-model identity attestation remains **INSUFFICIENT_EVIDENCE**. This task did not add model-name signatures, trust configured/declared model identity, modify provider harness to fabricate attestation, or create a model identity DB. R6 must remain non-VALID until the later execution/evidence environment provides trusted replacement-model identity evidence.
+- Next unique READY: **`C15-RCC-FIXTURE-001`**（必须由新窗口执行）。本窗口禁止开始 fixture、Resident、semantic evaluation、replacement-model test、C16/P16。
+
+
+
+## 历史工程断点 — C15-RCC-PREFLIGHT-001 已完成：P11 = MECHANISM_GAP，当时下一 READY = C15-RCC-MECH-FIX-001
 
 - 2026-09-22 更新：`C15-RCC-PREFLIGHT-001 = DONE`；`C15-RCC-MECH-FIX-001 = READY`；`C15-RCC-FIXTURE-001 = BLOCKED`。
 - Reviewed main: `fb7921df2231ac8fb6af85f29d6e9eff64272245`。

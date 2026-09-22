@@ -1080,3 +1080,82 @@ def test_self_contained_current_utterance_does_not_prefetch_cross_session_histor
 
     assert result.recommendation.cards == ()
     assert result.recommendation.reason == "current_topic_does_not_need_history"
+
+
+
+def test_read_ai_world_runtime_capability_does_not_cross_user_subject(tmp_path):
+    db = tmp_path / "c15_runtime_subject_isolation.db"
+    store = SQLiteWorldStore(db)
+    evidence = Observation(
+        object_id="obs_c15_runtime_user_a",
+        subject_id="user_A",
+        occurred=TemporalExtent.point(NOW - timedelta(days=1)),
+        learned_at=NOW - timedelta(days=1),
+        recorded_at=NOW - timedelta(days=1),
+        created_by="c15-runtime-subject-isolation",
+        source_kind="conversation",
+        modality="text",
+        value="User A private preference evidence.",
+        metadata={"dimension": "dim:user_ai_interaction"},
+    )
+    store.commit(
+        [evidence],
+        OperationRequest(
+            operation_name="test.seed.c15.runtime.subject_isolation",
+            expected_world_revision=0,
+            reason="seed User A AI-world evidence",
+            idempotency_key="c15-runtime-subject-isolation-seed",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+    service_a = AIWorldCognitionService(
+        store=store,
+        index=index,
+        user_id="user_A",
+    )
+    private_claim = service_a.commit(
+        AIWorldClaimRequest(
+            domain=AIWorldDomain.USER_UNDERSTANDING,
+            statement="User A private preference must not enter User B runtime.",
+            evidence_refs=(ObjectRef(object_id=evidence.object_id, revision=1),),
+            confidence=0.95,
+            scope_key="c15.private.preference",
+        ),
+        learned_at=NOW - timedelta(hours=12),
+    )
+
+    def model(snapshot):
+        if not snapshot.capability_history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="read_ai_world",
+                        arguments={"domains": ["user_understanding"], "limit": 50},
+                    ),
+                )
+            )
+        read_result = snapshot.capability_history[-1]
+        assert read_result.ok is True
+        assert private_claim.claim.claim_id not in {
+            item["object_id"] for item in read_result.data
+        }
+        assert read_result.data == []
+        return ModelDirective(response="User B runtime remained subject-isolated.")
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+        subject_id="user_B",
+    )
+    result = runtime.run_turn(
+        session_id="c15-user-b-session",
+        turn_index=1,
+        user_input="读取我的长期认知。",
+        current_topic=None,
+        occurred_at=NOW,
+    )
+
+    assert result.runtime.response == "User B runtime remained subject-isolated."
