@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from aios_core.contracts.enums import AttentionClass, SourceClass, WakeSource
+from aios_core.contracts.enums import AttentionClass, ObjectType, SourceClass, WakeSource
 from aios_core.contracts.models import Observation
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef
@@ -479,16 +479,31 @@ def test_interrupt_attention_can_deliver_after_resident_judgment(tmp_path):
             attention_class=AttentionClass.INTERRUPT,
         )
     )
+    before_assistant_interactions = [
+        item
+        for item in store.list_payloads(object_type=ObjectType.OBSERVATION)
+        if item.get("source_kind") == "user_ai_interaction"
+        and (item.get("metadata") or {}).get("role") == "assistant"
+    ]
     result = runtime.run_wake(
         wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
         now=NOW + timedelta(seconds=2),
     )
+    after_assistant_interactions = [
+        item
+        for item in store.list_payloads(object_type=ObjectType.OBSERVATION)
+        if item.get("source_kind") == "user_ai_interaction"
+        and (item.get("metadata") or {}).get("role") == "assistant"
+    ]
 
     assert result.step0.state == "ok"
     assert result.step0.model_allowed is True
     assert result.step0.action_allowed is True
     assert result.step0.delivery_allowed is True
     assert result.delivery_response == "这件事现在值得提醒你。"
+    # C15-RCC-WAKE-DELIVERY-FIX-001 pre-fix reproduction:
+    # user-facing delivery succeeds, but no durable assistant interaction fact exists.
+    assert len(after_assistant_interactions) - len(before_assistant_interactions) == 0
 
 
 def test_review_queue_waits_for_periodic_review_then_is_consumed(tmp_path):
