@@ -14,6 +14,21 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
+## 当前工程断点 — C15-RCC-PREFLIGHT-001 已完成：P11 = MECHANISM_GAP，唯一下一 READY = C15-RCC-MECH-FIX-001
+
+- 2026-09-22 更新：`C15-RCC-PREFLIGHT-001 = DONE`；`C15-RCC-MECH-FIX-001 = READY`；`C15-RCC-FIXTURE-001 = BLOCKED`。
+- Reviewed main: `fb7921df2231ac8fb6af85f29d6e9eff64272245`。
+- Audit branch: `audit/c15-rcc-preflight-20260922-sol`。
+- Canonical preflight report: `reviews/C15_RCC_PREFLIGHT_001_MECHANISM_AUDIT_2026-09-22.md`。
+- Core diff in preflight: `src/aios_core/** = 0`。
+- P1–P13: P1/P2/P3/P4/P5/P6/P7/P8/P9/P10/P13 = **ALREADY_IMPLEMENTED**；P11 = **MECHANISM_GAP**；P12 = **INSUFFICIENT_EVIDENCE**。
+- Subject-isolation verdict: ordinary `search_world`, timeline, recommendation and direct `inspect_world_object` already enforce runtime subject scope；但 `AIWorldCognitionService.current()/core_context()/snapshot()` 未按 AI-world domain 派生并过滤合法 subject，typed `revise/retract` 又从 target payload 自身采用 subject，因此 shared WorldStore 中 User A 的 user-scoped AI-world cognition 可能进入/被 User B typed facade 读取或修改。此为真实机械 fail-closed 缺口。
+- Replacement-model identity attestation verdict: **INSUFFICIENT_EVIDENCE**。当前 provider harness 保存 configured/declared `provider/model`、config fingerprint 与 provider response/request id；`ModelCallProvenance.model` 仍来自配置值，并非独立不可篡改的平台/provider model binding。R6 在未来 Resident-C 执行时若无 trusted external attestation，必须保持未 VALID。
+- Existing mechanisms accepted: unified World Claim/EvidenceSet/Dependency/Revision/Experience；User Understanding / Relationship / Self / Calibration / Strategy writeback；OperationExperience / CommunicationExperience real-case lineage；WorldSearchIndex；bounded relevant context；fresh Runtime SQLite reopen + index rebuild + ordinary retrieval；retain/revise/retract；C14 anti-self-proof mechanical closure；same Resident CognitiveRuntime / no second cognition DB。
+- Fresh-runtime evidence reused: `test_loop_new_runtime_recovers_exact_durable_ai_world_cognition` 已执行过 SQLite reopen → Index rebuild → new FusedTurnRuntime/new session → `read_ai_world -> search_world -> inspect_world_object` exact durable Claim recovery。
+- Core implementation decision: **YES, exactly one narrow fix task**。只允许修 `AIWorldCognitionService` domain-derived subject authorization，primary target `src/aios_core/ai_world/cognition.py`；不得新建 identity/personality DB、第二 Runtime、hidden handoff，且不得把 R6 identity attestation 伪装成 Core semantic logic。
+- Next unique READY: **`C15-RCC-MECH-FIX-001`**。完成并 Gate 后才可释放 fixture；本 preflight 窗口禁止开始该实现。
+
 ## 当前工程断点 — C15-RCC-RULE-001 已冻结：NO CONSTITUTION CHANGE REQUIRED，唯一下一 READY = C15-RCC-PREFLIGHT-001
 
 - 2026-09-22 更新：`C15-RCC-RULE-001 = DONE`（RCC 正式语义边界与验收定义已冻结）；**`NO CONSTITUTION CHANGE REQUIRED`**；`C15-RCC-PREFLIGHT-001 = READY`；`C15-RCC-FIXTURE-001` 保持 **BLOCKED**（禁止本窗口或下一窗口顺手做 fixture / Resident / evaluator）。
