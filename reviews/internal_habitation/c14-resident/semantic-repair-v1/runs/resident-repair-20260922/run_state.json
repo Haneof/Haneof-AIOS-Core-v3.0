@@ -29,18 +29,19 @@
   ],
   "complete": false,
   "conversation_turn_index": 0,
-  "current_simulated_timestamp": "2026-11-06T12:08:00-08:00",
+  "current_simulated_timestamp": "2026-11-10T07:34:00-08:00",
   "errors": [],
-  "next_checkpoint": 6,
-  "next_summary_request": 4,
-  "phase": "A",
+  "next_checkpoint": 7,
+  "next_summary_request": 11,
+  "phase": "B",
   "released_cursors": [
     1,
     2,
     3,
     4,
     5,
-    6
+    6,
+    7
   ],
   "response_count": 0,
   "run_id": "resident-repair-20260922",
@@ -79,10 +80,17 @@
       "released_cursor": 5,
       "simulated_timestamp": "2026-11-06T10:23:00-08:00",
       "world_revision_before": 20
+    },
+    {
+      "checkpoint_id": "cp0006",
+      "directive_kind": "silence",
+      "released_cursor": 7,
+      "simulated_timestamp": "2026-11-10T07:34:00-08:00",
+      "world_revision_before": 39
     }
   ],
   "session_id": "resident-sem-repair-20260922",
-  "silence_count": 3,
+  "silence_count": 4,
   "summary_requests": [
     {
       "kind": "dimension_summary",
@@ -98,6 +106,41 @@
       "kind": "dimension_summary",
       "released_cursor": 4,
       "request_id": "sum0003"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0004"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0005"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0006"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0007"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0008"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0009"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0010"
     }
   ]
 }

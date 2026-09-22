@@ -391,7 +391,7 @@ class LocalResidentBridge:
         if PENDING_FILE.exists():
             PENDING_FILE.unlink()
 
-        content = str(raw.get("content") or "")
+        content = str(raw.get("content") or raw.get("summary_text") or "")
         if not content.strip():
             raise RuntimeError("summary response content must be nonblank")
         atomic_json(req_dir / "response.json", {"content": content})
@@ -424,6 +424,8 @@ def git_checkpoint(message: str) -> None:
 
 
 def run_release_init(phase: str, label: str) -> None:
+    if (RECEIPTS / f"{label}.json").exists():
+        return
     proc = run_cmd(
         [
             sys.executable,
@@ -677,7 +679,9 @@ def main() -> int:
     if state.get("complete"):
         print("RESIDENT_RUN_ALREADY_COMPLETE", flush=True)
         return 0
-    if WORLD_DB.exists() or RELEASE_STATE.exists():
+
+    is_resuming = bool(RUN_STATE.exists() and not state.get("complete") and state.get("released_cursors"))
+    if not is_resuming and (WORLD_DB.exists() or RELEASE_STATE.exists()):
         raise RuntimeError(
             "formal live run must start from a fresh private World/state"
         )
@@ -695,30 +699,37 @@ def main() -> int:
         dimension_summary_handler=bridge.dimension_summary_handler,
     )
 
-    run_manifest = {
-        "task": "C14-SEM-REPAIR-RES-001",
-        "run_id": RUN_ID,
-        "starting_main_sha": STARTING_MAIN,
-        "exact_evaluated_main": STARTING_MAIN,
-        "resident_branch": BRANCH,
-        "resident_session_id": SESSION_ID,
-        "subject_id": SUBJECT_ID,
-        "declared_provider": DECLARED_PROVIDER,
-        "declared_model": DECLARED_MODEL,
-        "provider_request_attestation": None,
-        "world_revision_start": int(store.current_world_revision()),
-        "phase_a": "1..6",
-        "phase_b": "7..15",
-        "sequential_release": True,
-        "future_preview": False,
-        "semantic_engine": "external real Resident via RuntimeSnapshot/ModelDirective bridge",
-    }
-    atomic_json(RUN_DIR / "run_manifest.json", run_manifest)
+    if not is_resuming:
+        run_manifest = {
+            "task": "C14-SEM-REPAIR-RES-001",
+            "run_id": RUN_ID,
+            "starting_main_sha": STARTING_MAIN,
+            "exact_evaluated_main": STARTING_MAIN,
+            "resident_branch": BRANCH,
+            "resident_session_id": SESSION_ID,
+            "subject_id": SUBJECT_ID,
+            "declared_provider": DECLARED_PROVIDER,
+            "declared_model": DECLARED_MODEL,
+            "provider_request_attestation": None,
+            "world_revision_start": int(store.current_world_revision()),
+            "phase_a": "1..6",
+            "phase_b": "7..15",
+            "sequential_release": True,
+            "future_preview": False,
+            "semantic_engine": "external real Resident via RuntimeSnapshot/ModelDirective bridge",
+        }
+        atomic_json(RUN_DIR / "run_manifest.json", run_manifest)
 
-    print("INIT: Phase A...", flush=True)
-    run_release_init("A", "phase_A_init")
+        print("INIT: Phase A...", flush=True)
+        run_release_init("A", "phase_A_init")
 
     for expected_sequence in range(1, 16):
+        cursor_dir = CURSORS / f"cursor_{expected_sequence:03d}"
+        lifecycle_file = cursor_dir / "lifecycle.json"
+        if lifecycle_file.exists():
+            print(f"CURSOR {expected_sequence:03d} ALREADY COMPLETE. Skipping.", flush=True)
+            continue
+
         phase = "A" if expected_sequence <= 6 else "B"
         if expected_sequence == 7:
             print("INIT: Phase B handoff...", flush=True)
@@ -726,18 +737,63 @@ def main() -> int:
             state["phase"] = "B"
             save_state(state)
 
-        print(f"REVEAL: cursor {expected_sequence:03d} (Phase {phase})...", flush=True)
-        event = reveal_event(phase, expected_sequence)
-        sequence = int(event.get("sequence") or 0)
-        if sequence != expected_sequence:
-            raise RuntimeError(f"release order violation: expected {expected_sequence}, got {sequence}")
-        cursor_dir = CURSORS / f"cursor_{sequence:03d}"
-        cursor_dir.mkdir(parents=True, exist_ok=True)
-        atomic_json(cursor_dir / "event.json", event)
-        state["current_simulated_timestamp"] = str(event["occurred_at"])
-        save_state(state)
+        event_file = cursor_dir / "event.json"
+        ack_file = RECEIPTS / f"cursor_{expected_sequence:03d}_ack.process.json"
+        mech_file = RECEIPTS / f"cursor_{expected_sequence:03d}_mechanical_ingest.process.json"
 
-        bridge.wait_event_seen(event)
+        if event_file.exists() and ack_file.exists():
+            print(f"CURSOR {expected_sequence:03d} (Phase {phase}) already revealed & acked. Resuming execution...", flush=True)
+            event = load_json(event_file, {})
+            sequence = int(event.get("sequence") or 0)
+            ingest = {
+                "kind": "mechanical",
+                "ingest_process": load_json(mech_file, {}),
+                "ack_process": load_json(ack_file, {}),
+            }
+            prev_lc_file = CURSORS / f"cursor_{sequence-1:03d}" / "lifecycle.json"
+            prev_lc = load_json(prev_lc_file, {}) if prev_lc_file.exists() else {}
+            before_ingest = int(prev_lc.get("world_revision_after_cursor") or 22)
+            after_ack = int(load_json(RECEIPTS / f"cursor_{sequence:03d}_ack.stdout.txt", {}).get("ingest_world_revision") or 23)
+            state["current_simulated_timestamp"] = str(event["occurred_at"])
+            save_state(state)
+        else:
+            print(f"REVEAL: cursor {expected_sequence:03d} (Phase {phase})...", flush=True)
+            event = reveal_event(phase, expected_sequence)
+            sequence = int(event.get("sequence") or 0)
+            if sequence != expected_sequence:
+                raise RuntimeError(f"release order violation: expected {expected_sequence}, got {sequence}")
+            cursor_dir.mkdir(parents=True, exist_ok=True)
+            atomic_json(cursor_dir / "event.json", event)
+            state["current_simulated_timestamp"] = str(event["occurred_at"])
+            save_state(state)
+
+            bridge.wait_event_seen(event)
+
+            is_conversation = (
+                event.get("dimension") == "dim:conversation"
+                and event.get("source_kind") == "conversation"
+                and event.get("source_class") == "USER"
+                and event.get("modality") == "text"
+            )
+            turn_index: int | None = None
+            if is_conversation:
+                turn_index = int(state["conversation_turn_index"]) + 1
+                state["conversation_turn_index"] = turn_index
+                save_state(state)
+
+            before_ingest = int(store.current_world_revision())
+            print(f"INGEST & ACK: cursor {sequence:03d}...", flush=True)
+            ingest = ingest_and_ack(
+                event=event,
+                phase=phase,
+                conversation_turn_index=turn_index,
+            )
+            index.catch_up()
+            after_ack = int(store.current_world_revision())
+
+            if sequence not in state["released_cursors"]:
+                state["released_cursors"].append(sequence)
+            save_state(state)
 
         is_conversation = (
             event.get("dimension") == "dim:conversation"
@@ -745,25 +801,7 @@ def main() -> int:
             and event.get("source_class") == "USER"
             and event.get("modality") == "text"
         )
-        turn_index: int | None = None
-        if is_conversation:
-            turn_index = int(state["conversation_turn_index"]) + 1
-            state["conversation_turn_index"] = turn_index
-            save_state(state)
-
-        before_ingest = int(store.current_world_revision())
-        print(f"INGEST & ACK: cursor {sequence:03d}...", flush=True)
-        ingest = ingest_and_ack(
-            event=event,
-            phase=phase,
-            conversation_turn_index=turn_index,
-        )
-        index.catch_up()
-        after_ack = int(store.current_world_revision())
-
-        state["released_cursors"].append(sequence)
-        save_state(state)
-
+        turn_index = int(state["conversation_turn_index"]) if is_conversation else None
         now = datetime.fromisoformat(str(event["occurred_at"]).replace("Z", "+00:00"))
         lifecycle: dict[str, Any] = {
             "sequence": sequence,
