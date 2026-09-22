@@ -1,9 +1,9 @@
 {
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
   "nonce": "9f4c7b2e-6a31-4c97-bd28-1f0b88a9d453",
-  "kind": "EVENT_SEEN",
-  "item_id": "c14semrep-013",
+  "kind": "SUMMARY_RESPONSE",
+  "item_id": "sum0011",
   "payload": {
-    "seen": true
+    "content": "2026-11-10，设计师同步于 09:06 实际接通、09:24 结束，参会双方均有音频活动。"
   }
 }
