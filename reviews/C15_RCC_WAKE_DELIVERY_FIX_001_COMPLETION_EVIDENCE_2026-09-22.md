@@ -238,9 +238,9 @@ No existing `commit_user_input`, `commit_assistant_output`, turn identity, sessi
 
 Relevant workflows on the Core candidate are GREEN:
 
-- `fused-turn-runtime` run **35716484136** — SUCCESS.
-- `conversation-world` run **35716484085** — SUCCESS.
-- `p14-long-context` run **35716484194** — SUCCESS.
+- `fused-turn-runtime` run **35716742443** — SUCCESS.
+- `conversation-world` run **35716742268** — SUCCESS.
+- `p14-long-context` run **35716742139** — SUCCESS.
 
 Ordinary USER turn semantics remain USER Observation + assistant Observation with existing canonical identities.
 
@@ -252,8 +252,8 @@ Current proactive recommendation filtering identifies dialogue by interaction di
 
 Relevant T28/continuity jobs are GREEN on the candidate:
 
-- C14 loop workflow `p15-c13-p14-t28` job in run **35716484077** — SUCCESS.
-- C14 runtime workflow `p15-c13-p14-t28` job in run **35716484000** — SUCCESS.
+- C14 loop workflow `p15-c13-p14-t28` job in run **35716742162** — SUCCESS.
+- C14 runtime workflow `p15-c13-p14-t28` job in run **35716742137** — SUCCESS.
 
 The new output is searchable interaction history but is not promoted as independent user/world fact.
 
@@ -261,28 +261,30 @@ The new output is searchable interaction history but is not promoted as independ
 
 Core implementation candidate:
 
-`5ad62fbfe341cf0d7cfd9c3f0129b1c6522372bb`
+`98e6f1c190cef4ad8743e6eaa4eb023f2fda18b7`
 
 Targeted / relevant workflow results:
 
-- `fused-turn-runtime` **35716484136** — SUCCESS.
-- `conversation-world` **35716484085** — SUCCESS.
-- `c09-wake-dispatch` **35716484146** — SUCCESS.
-- `p15-periodic-review` **35716484113** — SUCCESS.
-- `p10-ai-world-gate` **35716484140** — SUCCESS.
-- `p11-dimension-gate` **35716484172** — SUCCESS.
-- `p12-execution-gate` **35716484121** — SUCCESS.
-- `p13-ingest-gate` **35716484094** — SUCCESS.
-- `p13-reality-ingest` **35716484006** — SUCCESS.
-- `p14-long-context` **35716484194** — SUCCESS.
-- `p9-revision-gate` **35716484071** — SUCCESS.
-- `constitutional-cognition-closure` **35716484100** — SUCCESS.
-- C14 loop `c14-loop-targeted`, `runtime-wake-attention-budget`, `p15-c13-p14-t28`, `p16-habitation-harness` jobs in run **35716484077** — SUCCESS.
-- C14 runtime `c14-runtime-targeted`, `runtime-wake-turn`, `p15-c13-p14-t28`, `p16-habitation-harness` jobs in run **35716484000** — SUCCESS.
+- `fused-turn-runtime` **35716742443** — SUCCESS.
+- `conversation-world` **35716742268** — SUCCESS.
+- `c09-wake-dispatch` **35716742346** — SUCCESS.
+- `p15-periodic-review` **35716742287** — SUCCESS.
+- `p10-ai-world-gate` **35716742190** — SUCCESS.
+- `p11-dimension-gate` **35716742274** — SUCCESS.
+- `p12-execution-gate` **35716742375** — SUCCESS.
+- `p13-ingest-gate` **35716742189** — SUCCESS.
+- `p13-reality-ingest` **35716742229** — SUCCESS.
+- `p14-long-context` **35716742139** — SUCCESS.
+- `p9-revision-gate` **35716742218** — SUCCESS.
+- `constitutional-cognition-closure` **35716742401** — SUCCESS.
+- C14 loop `c14-loop-targeted`, `runtime-wake-attention-budget`, `p15-c13-p14-t28`, `p16-habitation-harness` jobs in run **35716742162** — SUCCESS.
+- C14 runtime `c14-runtime-targeted`, `runtime-wake-turn`, `p15-c13-p14-t28`, `p16-habitation-harness` jobs in run **35716742137** — SUCCESS.
 
 ## 17. Full Core / P16 regression
 
-- standalone `p16-convergence-gate` run **35716484139** — **SUCCESS** on validation head `e60cdb5d131ea34f42084bc6799737c1fb952104`; Core bytes are identical to exact implementation candidate `5ad62fbfe341cf0d7cfd9c3f0129b1c6522372bb`.
+- standalone `p16-convergence-gate` run **35716742340** — **SUCCESS** on exact Core implementation candidate `98e6f1c190cef4ad8743e6eaa4eb023f2fda18b7`.
+- `constitutional-cognition-closure` run **35716742401** — **SUCCESS** on the same exact Core candidate.
+- C14 loop run **35716742162** and C14 runtime run **35716742137** — **SUCCESS** on the same exact Core candidate, including their P16 convergence / habitation / T28 sub-jobs.
 
 Test counts are intentionally not copied from historical prompts; the workflow's current suite is authoritative.
 
@@ -304,8 +306,8 @@ No fixture, constitution, RCC ruling, Resident evidence, PR #101 artifact, or hi
 
 - PR: **#104**
 - branch: `core/c15-rcc-wake-delivery-fix-20260922`
-- exact Core implementation candidate: `5ad62fbfe341cf0d7cfd9c3f0129b1c6522372bb`
-- full validation head (Core-identical; evidence-only follow-up): `e60cdb5d131ea34f42084bc6799737c1fb952104`
+- exact Core implementation candidate: `98e6f1c190cef4ad8743e6eaa4eb023f2fda18b7`
+- full validation head (Core-identical; evidence-only follow-up): `98e6f1c190cef4ad8743e6eaa4eb023f2fda18b7`
 - pre-fix reproduction commit: `2c0dfc10b92b6122ce08754407393ef87a3ea073`
 
 The governance/evidence writeback that follows this report does not alter the Core implementation.
