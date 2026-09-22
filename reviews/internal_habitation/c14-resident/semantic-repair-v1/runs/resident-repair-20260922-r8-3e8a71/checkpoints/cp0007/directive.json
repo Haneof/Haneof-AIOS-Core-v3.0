@@ -1,0 +1,31 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "limit": 20,
+        "offset": 0
+      },
+      "call_id": "cp0007-read-anchors",
+      "name": "read_periodic_review_anchors"
+    },
+    {
+      "arguments": {
+        "dimensions": [
+          "dim:sleep",
+          "dim:device_activity",
+          "dim:collaboration_activity",
+          "dim:work_outcome"
+        ],
+        "query": "work morning conditions and first-draft timing",
+        "window_end": "2026-11-07T00:00:00Z",
+        "window_start": "2026-11-03T00:00:00Z"
+      },
+      "call_id": "cp0007-all-dimensions",
+      "name": "request_all_dimensions_projection"
+    }
+  ],
+  "checkpoint_id": "cp0007",
+  "decision_rationale": "The review now spans two work cases plus sleep and interruption context. Inspect exact review anchors and a bounded cross-dimensional projection before deciding whether a durable hypothesis is warranted; do not infer causation from summaries.",
+  "github_author": "Haneof",
+  "run_id": "c14-sem-repair-resident-20260922-sol-r8-3e8a71"
+}

@@ -1,0 +1,60 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "dimension": "dim:sleep",
+        "limit": 20,
+        "object_types": [
+          "observation"
+        ],
+        "window_end": "2026-11-07T00:00:00Z",
+        "window_start": "2026-11-03T00:00:00Z"
+      },
+      "call_id": "cp0008-sleep",
+      "name": "search_timeline"
+    },
+    {
+      "arguments": {
+        "dimension": "dim:device_activity",
+        "limit": 20,
+        "object_types": [
+          "observation"
+        ],
+        "window_end": "2026-11-07T00:00:00Z",
+        "window_start": "2026-11-03T00:00:00Z"
+      },
+      "call_id": "cp0008-device",
+      "name": "search_timeline"
+    },
+    {
+      "arguments": {
+        "dimension": "dim:collaboration_activity",
+        "limit": 20,
+        "object_types": [
+          "observation"
+        ],
+        "window_end": "2026-11-07T00:00:00Z",
+        "window_start": "2026-11-03T00:00:00Z"
+      },
+      "call_id": "cp0008-collab",
+      "name": "search_timeline"
+    },
+    {
+      "arguments": {
+        "dimension": "dim:work_outcome",
+        "limit": 20,
+        "object_types": [
+          "observation"
+        ],
+        "window_end": "2026-11-07T00:00:00Z",
+        "window_start": "2026-11-03T00:00:00Z"
+      },
+      "call_id": "cp0008-outcomes",
+      "name": "search_timeline"
+    }
+  ],
+  "checkpoint_id": "cp0008",
+  "decision_rationale": "The ALL_DIMENSIONS query produced empty slices despite pinned reality already present. Re-read raw Observation timelines without semantic query terms so an empty semantic search cannot erase durable facts.",
+  "github_author": "Haneof",
+  "run_id": "c14-sem-repair-resident-20260922-sol-r8-3e8a71"
+}

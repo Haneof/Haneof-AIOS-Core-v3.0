@@ -1,9 +1,84 @@
 {
-  "capability_call_count": 6,
-  "cognition_calls": [],
+  "capability_call_count": 14,
+  "cognition_calls": [
+    {
+      "arguments": {
+        "claim_type": "pattern_hypothesis",
+        "confidence": 0.68,
+        "content": "在目前两次可比较的文档工作上午中：11 月 3 日较好睡眠（7小时46分、评分83）且 08:28–10:25 为专注模式/无语音视频通话时，第一版比目标时间提前18分钟提交；11 月 6 日较短低分睡眠（5小时34分、评分58）且上午有三次实际通话时，第一版比目标时间晚62分钟提交。现有证据支持工作结果与这些上下文共同变化，但不足以区分睡眠、通话中断、任务差异或其他因素的独立贡献。",
+        "dimension": "dim:work_pattern",
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_5bf4b05a9dafdb85ec5bb688",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_536104c70eaad761d2583410",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_16b3967abe086c1bbae30bf7",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_3187c6e6c4a710447d75b09e",
+            "revision": 1
+          }
+        ],
+        "knowledge_state": "hypothesis"
+      },
+      "checkpoint_id": "cp0009",
+      "name": "commit_claim"
+    },
+    {
+      "arguments": {
+        "claim_type": "hypothesis",
+        "confidence": 0.68,
+        "content": "在目前两次可比较的文档工作上午中：11 月 3 日较好睡眠（7小时46分、评分83）且 08:28–10:25 为专注模式/无语音视频通话时，第一版比目标时间提前18分钟提交；11 月 6 日较短低分睡眠（5小时34分、评分58）且上午有三次实际通话时，第一版比目标时间晚62分钟提交。现有证据支持工作结果与这些上下文共同变化，但不足以区分睡眠、通话中断、任务差异或其他因素的独立贡献。",
+        "dimension": "dim:work_pattern",
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_5bf4b05a9dafdb85ec5bb688",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_536104c70eaad761d2583410",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_16b3967abe086c1bbae30bf7",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_3187c6e6c4a710447d75b09e",
+            "revision": 1
+          }
+        ],
+        "knowledge_state": "hypothesis"
+      },
+      "checkpoint_id": "cp0010",
+      "name": "commit_claim"
+    }
+  ],
   "complete": false,
   "conversation_turn_index": 0,
-  "current_simulated_timestamp": "2026-11-06T12:08:00-08:00",
+  "current_simulated_timestamp": "2026-11-10T07:34:00-08:00",
   "errors": [
     {
       "attempt": 1,
@@ -11,16 +86,17 @@
       "reason": "cursor-1 evidence push targeted stale r3 branch; semantic cp0001/cp0002 were authored by the same Resident and will be mechanically replayed; no cursor 2 or future event was revealed"
     }
   ],
-  "next_checkpoint": 7,
-  "next_summary_request": 4,
-  "phase": "A",
+  "next_checkpoint": 12,
+  "next_summary_request": 11,
+  "phase": "B",
   "released_cursors": [
     1,
     2,
     3,
     4,
     5,
-    6
+    6,
+    7
   ],
   "response_count": 0,
   "run_id": "c14-sem-repair-resident-20260922-sol-r8-3e8a71",
@@ -72,10 +148,50 @@
       "released_cursor": 5,
       "simulated_timestamp": "2026-11-06T10:23:00-08:00",
       "world_revision_before": 19
+    },
+    {
+      "checkpoint_id": "cp0007",
+      "directive_kind": "capability_calls",
+      "github_author": "Haneof",
+      "released_cursor": 7,
+      "simulated_timestamp": "2026-11-10T07:34:00-08:00",
+      "world_revision_before": 38
+    },
+    {
+      "checkpoint_id": "cp0008",
+      "directive_kind": "capability_calls",
+      "github_author": "Haneof",
+      "released_cursor": 7,
+      "simulated_timestamp": "2026-11-10T07:34:00-08:00",
+      "world_revision_before": 38
+    },
+    {
+      "checkpoint_id": "cp0009",
+      "directive_kind": "capability_calls",
+      "github_author": "Haneof",
+      "released_cursor": 7,
+      "simulated_timestamp": "2026-11-10T07:34:00-08:00",
+      "world_revision_before": 38
+    },
+    {
+      "checkpoint_id": "cp0010",
+      "directive_kind": "capability_calls",
+      "github_author": "Haneof",
+      "released_cursor": 7,
+      "simulated_timestamp": "2026-11-10T07:34:00-08:00",
+      "world_revision_before": 38
+    },
+    {
+      "checkpoint_id": "cp0011",
+      "directive_kind": "silence",
+      "github_author": "Haneof",
+      "released_cursor": 7,
+      "simulated_timestamp": "2026-11-10T07:34:00-08:00",
+      "world_revision_before": 39
     }
   ],
   "session_id": "resident-sem-repair-sol-20260922-r8-3e8a71",
-  "silence_count": 3,
+  "silence_count": 4,
   "summary_requests": [
     {
       "github_author": "Haneof",
@@ -94,6 +210,48 @@
       "kind": "dimension_summary",
       "released_cursor": 4,
       "request_id": "sum0003"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0004"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0005"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0006"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0007"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0008"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0009"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0010"
     }
   ]
 }
