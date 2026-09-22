@@ -1,0 +1,25 @@
+name: C14 Resident R4 Cancel Stale Runs
+
+on:
+  push:
+    branches:
+      - c14/semantic-repair-resident-20260922-sol-r4
+    paths:
+      - .github/workflows/c14-resident-r4-cancel-stale.yml
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cancel-stale:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel stale Resident runs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          for run_id in 35687146532 35687210543 35687235834; do
+            gh api --method POST "/repos/$GH_REPO/actions/runs/$run_id/cancel" || true
+          done
