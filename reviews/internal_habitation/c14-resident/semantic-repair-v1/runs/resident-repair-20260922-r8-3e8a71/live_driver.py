@@ -41,7 +41,7 @@ RUN_ID = "c14-sem-repair-resident-20260922-sol-r8-3e8a71"
 SESSION_ID = "resident-sem-repair-sol-20260922-r8-3e8a71"
 SUBJECT_ID = "user_1"
 STARTING_MAIN = "7611fa5059f5dc8a20835cab5b312be2f43d11e8"
-BRANCH = "c14/semantic-repair-resident-20260922-sol-r3"
+BRANCH = "c14/sem-res-sol-r8-3e8a71"
 DECLARED_PROVIDER = "OpenAI"
 DECLARED_MODEL = "GPT-5.6 Sol"
 
@@ -209,7 +209,7 @@ def load_state() -> dict[str, Any]:
             "released_cursors": [],
             "semantic_checkpoints": [],
             "summary_requests": [],
-            "errors": [],
+            "errors": [{"kind":"infrastructure_retry","attempt":1,"reason":"cursor-1 evidence push targeted stale r3 branch; semantic cp0001/cp0002 were authored by the same Resident and will be mechanically replayed; no cursor 2 or future event was revealed"}],
             "silence_count": 0,
             "response_count": 0,
             "capability_call_count": 0,
@@ -487,7 +487,8 @@ def git_checkpoint(message: str) -> None:
     if diff.returncode == 0:
         return
     subprocess.run(["git", "commit", "-m", message], cwd=REPO_ROOT, check=True)
-    head_ref = os.environ.get("GITHUB_HEAD_REF", "").strip() or BRANCH
+    head_ref = BRANCH
+    subprocess.run(["git", "fetch", "origin", head_ref], cwd=REPO_ROOT, check=True)
     subprocess.run(["git", "push", "origin", f"HEAD:{head_ref}"], cwd=REPO_ROOT, check=True)
 
 
@@ -783,6 +784,7 @@ def main() -> int:
         "sequential_release": True,
         "future_preview": False,
         "semantic_engine": "external real Resident via RuntimeSnapshot/ModelDirective bridge",
+        "infrastructure_retry": {"attempt": 2, "replayed_resident_decisions": ["cp0001", "cp0002"], "future_event_leak": false},
     }
     atomic_json(RUN_DIR / "run_manifest.json", run_manifest)
 
