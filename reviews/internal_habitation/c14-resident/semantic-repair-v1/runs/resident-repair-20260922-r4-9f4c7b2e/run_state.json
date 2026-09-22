@@ -1,11 +1,11 @@
 {
-  "capability_call_count": 3,
+  "capability_call_count": 4,
   "cognition_calls": [],
   "complete": false,
   "conversation_turn_index": 0,
   "current_simulated_timestamp": "2026-11-10T07:34:00-08:00",
   "errors": [],
-  "next_checkpoint": 7,
+  "next_checkpoint": 8,
   "next_summary_request": 11,
   "phase": "B",
   "released_cursors": [
@@ -62,6 +62,14 @@
     },
     {
       "checkpoint_id": "cp0006",
+      "directive_kind": "capability_calls",
+      "github_author": "single-window-resident-control",
+      "released_cursor": 7,
+      "simulated_timestamp": "2026-11-10T07:34:00-08:00",
+      "world_revision_before": 38
+    },
+    {
+      "checkpoint_id": "cp0007",
       "directive_kind": "capability_calls",
       "github_author": "single-window-resident-control",
       "released_cursor": 7,

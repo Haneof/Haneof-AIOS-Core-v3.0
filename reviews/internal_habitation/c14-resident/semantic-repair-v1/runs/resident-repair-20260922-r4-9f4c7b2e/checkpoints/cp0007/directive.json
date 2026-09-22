@@ -1,0 +1,22 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "dimensions": [
+          "dim:sleep",
+          "dim:device_activity",
+          "dim:collaboration_activity",
+          "dim:work_outcome"
+        ],
+        "query": "compare observed work conditions and submission timing without inferring causality",
+        "window_end": "2026-11-07T00:00:00Z",
+        "window_start": "2026-11-03T00:00:00Z"
+      },
+      "call_id": "cp0007-all-dimensions",
+      "name": "request_all_dimensions_projection"
+    }
+  ],
+  "checkpoint_id": "cp0007",
+  "decision_rationale": "Two contrasting work cases now exist, but sleep differs between them. Cross-check the direct multi-dimensional world evidence before deciding whether to persist a low-confidence hypothesis.",
+  "github_author": "single-window-resident-control"
+}
