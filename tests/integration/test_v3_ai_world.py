@@ -452,6 +452,42 @@ def test_core_context_does_not_cross_user_but_keeps_ai_self(tmp_path):
     assert self_claim.claim.claim_id in flattened
 
 
+
+def test_core_context_filters_core_tag_before_domain_limit(tmp_path):
+    store, index, facts = _seed(tmp_path)
+    service = AIWorldCognitionService(store=store, index=index)
+
+    core = service.commit(
+        AIWorldClaimRequest(
+            domain=AIWorldDomain.USER_UNDERSTANDING,
+            statement="用户长期要求 Resident 直接承担工程执行责任。",
+            evidence_refs=(ObjectRef(object_id=facts[0].object_id, revision=1),),
+            confidence=0.95,
+            scope_key="collaboration.long_term_role",
+            tags=("core_context",),
+        ),
+        learned_at=NOW,
+    )
+
+    for offset in range(1, 201):
+        service.commit(
+            AIWorldClaimRequest(
+                domain=AIWorldDomain.USER_UNDERSTANDING,
+                statement=f"普通非核心认知 {offset}",
+                evidence_refs=(ObjectRef(object_id=facts[0].object_id, revision=1),),
+                confidence=0.6,
+                scope_key=f"ordinary.{offset}",
+                tags=("ordinary",),
+            ),
+            learned_at=NOW + timedelta(seconds=offset),
+        )
+
+    context = service.core_context(per_domain=3)
+    user_context = context["user_understanding"]
+
+    assert [item["object_id"] for item in user_context] == [core.claim.claim_id]
+    assert user_context[0]["scope_key"] == "collaboration.long_term_role"
+
 def test_snapshot_does_not_cross_user_scoped_domains(tmp_path):
     store, index, facts = _seed_subject_isolation_world(tmp_path)
     service_a = AIWorldCognitionService(store=store, index=index, user_id="user_A")
