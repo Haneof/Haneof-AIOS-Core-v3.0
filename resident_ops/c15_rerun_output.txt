@@ -1,1 +1,27 @@
-{"dimension":"dim:release_state","event_id":"c15rcc-009","modality":"structured_text","occurred_at":"2026-11-04T14:17:00-08:00","resident_visible_payload":"registry 上传尝试在 14:16 被拒绝：checksum mismatch。edge-2026.11.4 未发布，tag 未创建，registry 中没有对应 digest。","sequence":9,"source_class":"PLATFORM","source_kind":"registry"}
+usage: mechanical_ingest_adapter.py [-h] --world-db WORLD_DB
+                                    [--event-file EVENT_FILE]
+
+Mechanically ingest exactly one already-released C14 fixture event.
+
+options:
+  -h, --help            show this help message and exit
+  --world-db WORLD_DB
+  --event-file EVENT_FILE
+                        JSON file containing only the released event
+                        projection; '-' reads stdin.
+usage: release_operator.py ack [-h] --phase {A,B,C} --state STATE --world-db
+                               WORLD_DB --sequence SEQUENCE --event-id
+                               EVENT_ID --ingest-ref INGEST_REF
+                               [--conversation-session-id CONVERSATION_SESSION_ID]
+                               [--conversation-turn-index CONVERSATION_TURN_INDEX]
+
+options:
+  -h, --help            show this help message and exit
+  --phase {A,B,C}
+  --state STATE
+  --world-db WORLD_DB
+  --sequence SEQUENCE
+  --event-id EVENT_ID
+  --ingest-ref INGEST_REF
+  --conversation-session-id CONVERSATION_SESSION_ID
+  --conversation-turn-index CONVERSATION_TURN_INDEX
