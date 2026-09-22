@@ -1,0 +1,29 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "object_id": "clm_457125b0d4422b2f159091e0",
+        "revision": 2
+      },
+      "call_id": "cp0019-current-claim",
+      "name": "inspect_world_object"
+    },
+    {
+      "arguments": {
+        "dimension": "dim:work_outcome",
+        "limit": 20,
+        "object_types": [
+          "observation"
+        ],
+        "window_end": "2026-11-13T18:05:00Z",
+        "window_start": "2026-11-13T00:00:00Z"
+      },
+      "call_id": "cp0019-current-outcomes",
+      "name": "search_timeline"
+    }
+  ],
+  "checkpoint_id": "cp0019",
+  "decision_rationale": "The bundle mainly re-presents Nov-10 summaries, including a cognition summary that cannot self-validate. Check the current Claim and whether the newly released Nov-13 service incident is yet paired with any real work outcome.",
+  "github_author": "Haneof",
+  "run_id": "c14-sem-repair-resident-20260922-sol-r8-3e8a71"
+}

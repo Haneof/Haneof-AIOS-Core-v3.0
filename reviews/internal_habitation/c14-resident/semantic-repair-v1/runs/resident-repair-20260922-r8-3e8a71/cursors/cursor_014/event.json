@@ -1,0 +1,10 @@
+{
+  "dimension": "dim:service_status",
+  "event_id": "c14semrep-014",
+  "modality": "structured_text",
+  "occurred_at": "2026-11-13T10:05:00-08:00",
+  "resident_visible_payload": "第三方文档服务状态页确认 08:47–10:03 编辑与保存接口不可用，事件编号 INC-4821；10:03 恢复。",
+  "sequence": 14,
+  "source_class": "PLATFORM",
+  "source_kind": "third_party_status"
+}
