@@ -187,6 +187,7 @@ class AIWorldCognitionService:
         *,
         domains: Sequence[AIWorldDomain] | None = None,
         scope_key: str | None = None,
+        required_tags: Sequence[str] | None = None,
         limit: int = 100,
     ) -> tuple[AIWorldClaimView, ...]:
         allowed = (
@@ -197,6 +198,12 @@ class AIWorldCognitionService:
         clean_scope = None if scope_key is None else scope_key.strip()
         if scope_key is not None and not clean_scope:
             raise ValueError("scope_key must not be blank")
+        clean_required_tags = tuple(
+            str(tag).strip() for tag in (required_tags or ())
+        )
+        if any(not tag for tag in clean_required_tags):
+            raise ValueError("required_tags must not contain blank values")
+        required_tag_set = frozenset(clean_required_tags)
 
         views: list[AIWorldClaimView] = []
         for payload in self.store.list_payloads(object_type=ObjectType.CLAIM):
@@ -216,6 +223,9 @@ class AIWorldCognitionService:
                 continue
             if clean_scope is not None and metadata.get("scope_key") != clean_scope:
                 continue
+            tags = tuple(str(tag) for tag in metadata.get("tags") or ())
+            if required_tag_set and not required_tag_set.issubset(tags):
+                continue
 
             views.append(
                 AIWorldClaimView(
@@ -234,7 +244,7 @@ class AIWorldCognitionService:
                         if metadata.get("scope_key") is not None
                         else None
                     ),
-                    tags=tuple(str(tag) for tag in metadata.get("tags") or ()),
+                    tags=tags,
                 )
             )
 
@@ -267,11 +277,11 @@ class AIWorldCognitionService:
             AIWorldDomain.RELATIONSHIP,
             AIWorldDomain.SELF,
         ):
-            selected = [
-                item
-                for item in self.current(domains=[domain], limit=200)
-                if "core_context" in item.tags
-            ][:per_domain]
+            selected = self.current(
+                domains=[domain],
+                required_tags=("core_context",),
+                limit=per_domain,
+            )
             if selected:
                 result[domain.value] = [
                     item.model_dump(mode="json")
