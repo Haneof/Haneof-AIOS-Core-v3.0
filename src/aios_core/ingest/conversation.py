@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Any, Mapping
 
 from aios_core.contracts.enums import ErrorCode, ObjectType, SourceClass
 from aios_core.contracts.models import Observation
@@ -220,12 +221,54 @@ class ConversationIngestor:
             idempotent_replay=result.idempotent_replay,
         )
 
+    def _wake_delivery_identity(self, wake_id: str) -> tuple[str, str]:
+        if not isinstance(wake_id, str) or not wake_id.strip():
+            raise ValueError("wake_id must not be blank")
+        wake_id = wake_id.strip()
+        delivery_key = _stable_suffix(
+            self.subject_id,
+            wake_id,
+            "wake_user_delivery",
+        )
+        return delivery_key, f"obs_wake_ai_{delivery_key}"
+
+    def assistant_delivery_payload(self, wake_id: str) -> dict[str, Any] | None:
+        """Return the durable proactive assistant delivery for one logical Wake."""
+
+        _delivery_key, assistant_id = self._wake_delivery_identity(wake_id)
+        try:
+            payload = self.store.get_payload(assistant_id)
+        except StoreError as exc:
+            if exc.code == ErrorCode.NOT_FOUND:
+                return None
+            raise
+        metadata = payload.get("metadata")
+        if not isinstance(metadata, Mapping):
+            raise ValueError("wake delivery Observation metadata is invalid")
+        if payload.get("object_type") != ObjectType.OBSERVATION.value:
+            raise ValueError("wake delivery identity points to a non-Observation")
+        if payload.get("subject_id") != self.subject_id:
+            raise ValueError("wake delivery Observation crosses subject scope")
+        if payload.get("source_kind") != "user_ai_interaction":
+            raise ValueError("wake delivery Observation has invalid source_kind")
+        if metadata.get("role") != "assistant":
+            raise ValueError("wake delivery Observation has invalid role")
+        if metadata.get("interaction_kind") != "wake_delivery":
+            raise ValueError("wake delivery Observation has invalid interaction_kind")
+        if metadata.get("origin_wake_id") != wake_id.strip():
+            raise ValueError("wake delivery Observation has invalid Wake provenance")
+        return payload
+
     def commit_assistant_delivery(
         self,
         *,
         assistant_text: str,
         occurred_at: datetime,
         origin_wake_ref: ObjectRef,
+        termination_reason: str,
+        model_rounds: int,
+        capability_names: tuple[str, ...],
+        step0: Mapping[str, Any],
         recorded_at: datetime | None = None,
     ) -> ConversationMessageCommit:
         """Persist one proactive assistant->user delivery without fabricating USER input.
@@ -251,13 +294,9 @@ class ConversationIngestor:
         if wake_payload.get("subject_id") != self.subject_id:
             raise ValueError("origin_wake_ref crosses the interaction subject scope")
 
-        delivery_key = _stable_suffix(
-            self.subject_id,
-            origin_wake_ref.object_id,
-            origin_wake_ref.revision,
-            "wake_user_delivery",
+        delivery_key, assistant_id = self._wake_delivery_identity(
+            origin_wake_ref.object_id
         )
-        assistant_id = f"obs_wake_ai_{delivery_key}"
         origin_ref_payload = origin_wake_ref.model_dump(mode="json")
         metadata = {
             "dimension": INTERACTION_DIMENSION,
@@ -269,6 +308,12 @@ class ConversationIngestor:
             "origin_wake_id": origin_wake_ref.object_id,
             "origin_wake_revision": origin_wake_ref.revision,
             "delivery_key": delivery_key,
+            "delivery_runtime": {
+                "termination_reason": str(termination_reason),
+                "model_rounds": int(model_rounds),
+                "capability_names": list(capability_names),
+                "step0": dict(step0),
+            },
         }
         assistant_obs = Observation(
             object_id=assistant_id,
@@ -304,8 +349,7 @@ class ConversationIngestor:
                 idempotency_key=(
                     "wake-assistant-delivery:"
                     f"{self.subject_id}:"
-                    f"{origin_wake_ref.object_id}:"
-                    f"{origin_wake_ref.revision}"
+                    f"{origin_wake_ref.object_id}"
                 ),
                 source_class=SourceClass.AI_COGNITION,
             ),
