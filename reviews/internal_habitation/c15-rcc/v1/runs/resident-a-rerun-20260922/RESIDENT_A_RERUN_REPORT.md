@@ -10,8 +10,8 @@
 2. Resident branch: `resident/c15-rcc-res-a-rerun-20260922-sol`
 3. Fresh session id: `resident-a-rerun-20260922-sol-001`
 4. Fresh World: **YES**; run manifest records `fresh_world=true`, `old_world_copied=false`
-5. Evidence PR: **PR_PENDING**
-6. Exact evidence head: **FINAL_HEAD_PENDING**
+5. Evidence PR: **#109 — OPEN / UNMERGED / PINNED / DO NOT MERGE**
+6. Exact evidence head: recorded in the pinned PR #109 exact-head comment after final metadata write
 7. Cursor range completed: `1..13` with 13 durable release receipts
 8. Final simulated time: `2026-11-06T11:10:00-08:00`
 9. Final World revision: `77`
@@ -43,3 +43,7 @@ The final reality only established that the production rollback automation runbo
 ## Stop boundary
 
 After cursor 13 ack and genuinely due work at its timestamp, the Resident did not reveal any later cursor and did not initialize Phase B. Pending later/background work was not forced by advancing time.
+
+## Evidence packaging note
+
+Cursor 9–13 standalone receipt/lifecycle envelopes were materialized after World freeze by copying the exact authoritative receipt fields already present in final `release_state.json`. This was evidence packaging only: no World mutation, semantic backfill, event replay, or cognition write occurred.
