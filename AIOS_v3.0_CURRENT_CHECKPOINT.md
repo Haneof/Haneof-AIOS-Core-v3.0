@@ -19,6 +19,7 @@
 - 2026-09-22 更新：`C15-RCC-PREFLIGHT-001 = DONE`；`C15-RCC-MECH-FIX-001 = READY`；`C15-RCC-FIXTURE-001 = BLOCKED`。
 - Reviewed main: `fb7921df2231ac8fb6af85f29d6e9eff64272245`。
 - Audit branch: `audit/c15-rcc-preflight-20260922-sol`。
+- Audit PR: #97。
 - Canonical preflight report: `reviews/C15_RCC_PREFLIGHT_001_MECHANISM_AUDIT_2026-09-22.md`。
 - Core diff in preflight: `src/aios_core/** = 0`。
 - P1–P13: P1/P2/P3/P4/P5/P6/P7/P8/P9/P10/P13 = **ALREADY_IMPLEMENTED**；P11 = **MECHANISM_GAP**；P12 = **INSUFFICIENT_EVIDENCE**。
