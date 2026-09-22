@@ -1,0 +1,62 @@
+name: c15-rcc-fixture
+
+on:
+  pull_request:
+    paths:
+      - "reviews/internal_habitation/c15-rcc/v1/**"
+      - "governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md"
+      - "AIOS_v3.0_CURRENT_CHECKPOINT.md"
+      - ".github/workflows/c15-rcc-fixture.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  c15-rcc-fixture-mechanical-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Record Python version
+        run: python --version
+      - name: Install AIOS dev environment
+        run: pip install -e ".[dev]"
+      - name: Compile C15 fixture infrastructure
+        run: |
+          python -m py_compile \
+            reviews/internal_habitation/c15-rcc/v1/release/bindings.py \
+            reviews/internal_habitation/c15-rcc/v1/release/release_operator.py \
+            reviews/internal_habitation/c15-rcc/v1/release/mechanical_ingest_adapter.py \
+            reviews/internal_habitation/c15-rcc/v1/release/canonical_conversation_ingest.py \
+            reviews/internal_habitation/c15-rcc/v1/release/mechanical_gate.py
+      - name: Run C15 mechanical gate
+        run: python reviews/internal_habitation/c15-rcc/v1/release/mechanical_gate.py
+      - name: Prove sealed fixture SHA256
+        shell: bash
+        run: |
+          actual="sha256:$(sha256sum reviews/internal_habitation/c15-rcc/v1/fixture/sealed_fixture.json | awk '{print $1}')"
+          expected="sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46"
+          test "$actual" = "$expected"
+      - name: Re-run mature C14 sealed release gate
+        run: python reviews/internal_habitation/c14-resident/semantic-repair-v1/release/mechanical_gate.py
+      - name: Run C15 subject isolation and fused runtime regressions
+        run: |
+          pytest -q \
+            tests/integration/test_v3_ai_world.py \
+            tests/integration/test_v3_fused_turn_runtime.py
+      - name: Run canonical conversation ingest regressions
+        run: pytest -q tests/integration/test_v3_conversation_world_ingest.py
+      - name: Prove fixture task has zero Core diff
+        shell: bash
+        run: |
+          git fetch origin main --depth=1
+          changed="$(git diff --name-only origin/main...HEAD)"
+          if printf '%s\n' "$changed" | grep -q '^src/aios_core/'; then
+            echo "C15-RCC-FIXTURE-001 must not modify src/aios_core/**"
+            exit 1
+          fi
