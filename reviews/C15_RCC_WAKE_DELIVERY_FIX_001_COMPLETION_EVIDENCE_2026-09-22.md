@@ -236,11 +236,11 @@ Added/strengthened regressions verify:
 
 No existing `commit_user_input`, `commit_assistant_output`, turn identity, session identity, canonical USER ingest, or ordinary conversation write path was rewritten.
 
-Relevant workflows on the Core candidate are GREEN:
+Relevant workflows on the fully validated Core-identical head `c2d693b2bc232e3ec8bc31f1ca207717ad05ca89` are GREEN:
 
-- `fused-turn-runtime` run **35716742443** — SUCCESS.
-- `conversation-world` run **35716742268** — SUCCESS.
-- `p14-long-context` run **35716742139** — SUCCESS.
+- `fused-turn-runtime` run **35716772730** — SUCCESS.
+- `conversation-world` run **35716772640** — SUCCESS.
+- `p14-long-context` run **35716772775** — SUCCESS.
 
 Ordinary USER turn semantics remain USER Observation + assistant Observation with existing canonical identities.
 
@@ -250,45 +250,47 @@ The new delivery Observation intentionally uses the same interaction dimension a
 
 Current proactive recommendation filtering identifies dialogue by interaction dimension/source kind and excludes `role=assistant`, independent of `created_by` or raw locator.
 
-Relevant T28/continuity jobs are GREEN on the candidate:
+Relevant T28/continuity jobs are GREEN on the same fully validated head:
 
-- C14 loop workflow `p15-c13-p14-t28` job in run **35716742162** — SUCCESS.
-- C14 runtime workflow `p15-c13-p14-t28` job in run **35716742137** — SUCCESS.
+- C14 loop workflow `p15-c13-p14-t28` job in run **35716772806** — SUCCESS.
+- C14 runtime workflow `p15-c13-p14-t28` job in run **35716772677** — SUCCESS.
 
 The new output is searchable interaction history but is not promoted as independent user/world fact.
 
 ## 16. Targeted Gate results
 
-Core implementation candidate:
+Exact Core implementation commit:
 
-`98e6f1c190cef4ad8743e6eaa4eb023f2fda18b7`
+`41f2a5da2153c55b137741fdd71983eea2a011f7`
 
-Targeted / relevant workflow results:
+The later validation head `c2d693b2bc232e3ec8bc31f1ca207717ad05ca89` changes only completion evidence after that Core implementation; Core/test bytes are identical.
 
-- `fused-turn-runtime` **35716742443** — SUCCESS.
-- `conversation-world` **35716742268** — SUCCESS.
-- `c09-wake-dispatch` **35716742346** — SUCCESS.
-- `p15-periodic-review` **35716742287** — SUCCESS.
-- `p10-ai-world-gate` **35716742190** — SUCCESS.
-- `p11-dimension-gate` **35716742274** — SUCCESS.
-- `p12-execution-gate` **35716742375** — SUCCESS.
-- `p13-ingest-gate` **35716742189** — SUCCESS.
-- `p13-reality-ingest` **35716742229** — SUCCESS.
-- `p14-long-context` **35716742139** — SUCCESS.
-- `p9-revision-gate` **35716742218** — SUCCESS.
-- `constitutional-cognition-closure` **35716742401** — SUCCESS.
-- C14 loop `c14-loop-targeted`, `runtime-wake-attention-budget`, `p15-c13-p14-t28`, `p16-habitation-harness` jobs in run **35716742162** — SUCCESS.
-- C14 runtime `c14-runtime-targeted`, `runtime-wake-turn`, `p15-c13-p14-t28`, `p16-habitation-harness` jobs in run **35716742137** — SUCCESS.
+Targeted / relevant workflow results on validation head `c2d693b2bc232e3ec8bc31f1ca207717ad05ca89`:
+
+- `fused-turn-runtime` **35716772730** — SUCCESS.
+- `conversation-world` **35716772640** — SUCCESS.
+- `c09-wake-dispatch` **35716772741** — SUCCESS.
+- `p15-periodic-review` **35716772636** — SUCCESS.
+- `p10-ai-world-gate` **35716772658** — SUCCESS.
+- `p11-dimension-gate` **35716772686** — SUCCESS.
+- `p12-execution-gate` **35716772796** — SUCCESS.
+- `p13-ingest-gate` **35716772682** — SUCCESS.
+- `p13-reality-ingest` **35716772768** — SUCCESS.
+- `p14-long-context` **35716772775** — SUCCESS.
+- `p9-revision-gate` **35716772689** — SUCCESS.
+- `constitutional-cognition-closure` **35716772866** — SUCCESS.
+- C14 loop run **35716772806** — SUCCESS, including `c14-loop-targeted`, `runtime-wake-attention-budget`, T28, habitation and its P16 convergence job.
+- C14 runtime run **35716772677** — SUCCESS, including `c14-runtime-targeted`, `runtime-wake-turn`, T28, habitation and its P16 convergence job.
 
 ## 17. Full Core / P16 regression
 
-- standalone `p16-convergence-gate` run **35716742340** — **SUCCESS** on exact Core implementation candidate `98e6f1c190cef4ad8743e6eaa4eb023f2fda18b7`.
-- `constitutional-cognition-closure` run **35716742401** — **SUCCESS** on the same exact Core candidate.
-- C14 loop run **35716742162** and C14 runtime run **35716742137** — **SUCCESS** on the same exact Core candidate, including their P16 convergence / habitation / T28 sub-jobs.
+- standalone `p16-convergence-gate` run **35716772841** — **SUCCESS** on validation head `c2d693b2bc232e3ec8bc31f1ca207717ad05ca89`.
+- `constitutional-cognition-closure` run **35716772866** — **SUCCESS**.
+- C14 loop run **35716772806** and C14 runtime run **35716772677** — **SUCCESS**, including their P16 convergence / habitation / T28 sub-jobs.
 
 Test counts are intentionally not copied from historical prompts; the workflow's current suite is authoritative.
 
-## 18. Changed files at exact Core candidate
+## 18. Changed files at exact Core implementation
 
 Core:
 
@@ -300,17 +302,21 @@ Tests:
 - `tests/integration/test_v3_attention_watch.py`
 - `tests/integration/test_v3_c14_cognitive_derivation_runtime.py`
 
+Completion evidence:
+
+- `reviews/C15_RCC_WAKE_DELIVERY_FIX_001_COMPLETION_EVIDENCE_2026-09-22.md`
+
 No fixture, constitution, RCC ruling, Resident evidence, PR #101 artifact, or historical private World was modified.
 
 ## 19. PR / gated candidate
 
 - PR: **#104**
 - branch: `core/c15-rcc-wake-delivery-fix-20260922`
-- exact Core implementation candidate: `98e6f1c190cef4ad8743e6eaa4eb023f2fda18b7`
-- full validation head (Core-identical; evidence-only follow-up): `98e6f1c190cef4ad8743e6eaa4eb023f2fda18b7`
 - pre-fix reproduction commit: `2c0dfc10b92b6122ce08754407393ef87a3ea073`
+- exact Core implementation commit: `41f2a5da2153c55b137741fdd71983eea2a011f7`
+- fully gated validation head with identical Core/test bytes: `c2d693b2bc232e3ec8bc31f1ca207717ad05ca89`
 
-The governance/evidence writeback that follows this report does not alter the Core implementation.
+Any later evidence-only commit on PR #104 must retain identical Core/test bytes and itself pass the PR's required Gates before merge.
 
 ## 20. Handoff
 
