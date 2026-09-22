@@ -80,7 +80,7 @@
   "conversation_turn_index": 0,
   "current_simulated_timestamp": "2026-11-10T08:02:00-08:00",
   "errors": [],
-  "next_checkpoint": 12,
+  "next_checkpoint": 13,
   "next_summary_request": 11,
   "phase": "B",
   "released_cursors": [
@@ -183,10 +183,18 @@
       "released_cursor": 8,
       "simulated_timestamp": "2026-11-10T08:02:00-08:00",
       "world_revision_before": 42
+    },
+    {
+      "checkpoint_id": "cp0012",
+      "directive_kind": "silence",
+      "github_author": "single-window-resident-control",
+      "released_cursor": 8,
+      "simulated_timestamp": "2026-11-10T08:02:00-08:00",
+      "world_revision_before": 43
     }
   ],
   "session_id": "resident-sem-repair-sol-20260922-r4-9f4c7b2e",
-  "silence_count": 4,
+  "silence_count": 5,
   "summary_requests": [
     {
       "github_author": "single-window-resident-control",
