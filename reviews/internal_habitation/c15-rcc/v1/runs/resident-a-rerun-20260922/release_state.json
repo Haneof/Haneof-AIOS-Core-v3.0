@@ -5,7 +5,12 @@
   "last_acked_event_id": "c15rcc-003",
   "last_acked_sequence": 3,
   "next_sequence": 4,
-  "pending_reveal": null,
+  "pending_reveal": {
+    "event_id": "c15rcc-004",
+    "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+    "occurred_at": "2026-11-02T12:40:00-08:00",
+    "sequence": 4
+  },
   "receipts": [
     {
       "binding_mode": "canonical_user_turn",
