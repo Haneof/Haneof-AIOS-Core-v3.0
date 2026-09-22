@@ -8,6 +8,7 @@
 - Ruling anchor: `governance/C15_RESIDENT_COGNITIVE_CONTINUITY_RULING_2026-09-22.md`
 - Test-plan anchor: `governance/C15_RESIDENT_COGNITIVE_CONTINUITY_TEST_PLAN_2026-09-22.md`
 - C14 closure anchor: `reviews/C14_CLOSE_001_FINAL_CLOSURE_REVIEW_2026-09-22.md`
+- Audit PR: #97
 - Core changes in this audit: **NONE**
 - Audit verdict: **ONE MECHANISM GAP FOUND**
 - Next implementation task: `C15-RCC-MECH-FIX-001`
