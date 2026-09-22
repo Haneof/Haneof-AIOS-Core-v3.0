@@ -1,0 +1,18 @@
+{
+  "declared_model": "GPT-5.6 Sol",
+  "declared_provider": "OpenAI",
+  "exact_evaluated_main": "7611fa5059f5dc8a20835cab5b312be2f43d11e8",
+  "future_preview": false,
+  "phase_a": "1..6",
+  "phase_b": "7..15",
+  "provider_request_attestation": null,
+  "resident_branch": "c14/semantic-repair-resident-20260922-sol",
+  "resident_session_id": "resident-sem-repair-sol-20260922-r2",
+  "run_id": "c14-sem-repair-resident-20260922-sol-r2",
+  "semantic_engine": "external real Resident via RuntimeSnapshot/ModelDirective bridge",
+  "sequential_release": true,
+  "starting_main_sha": "7611fa5059f5dc8a20835cab5b312be2f43d11e8",
+  "subject_id": "user_1",
+  "task": "C14-SEM-REPAIR-RES-001",
+  "world_revision_start": 0
+}
