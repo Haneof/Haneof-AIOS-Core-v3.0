@@ -1,0 +1,10 @@
+{
+  "dimension": "dim:collaboration_activity",
+  "event_id": "c14semrep-005",
+  "modality": "structured_text",
+  "occurred_at": "2026-11-06T10:23:00-08:00",
+  "resident_visible_payload": "当天上午实际通话记录：08:58–09:09 供应商电话；09:37–09:49 团队临时同步；10:08–10:19 客户回电。三次均已实际接通并结束。",
+  "sequence": 5,
+  "source_class": "PLATFORM",
+  "source_kind": "communication_platform"
+}
