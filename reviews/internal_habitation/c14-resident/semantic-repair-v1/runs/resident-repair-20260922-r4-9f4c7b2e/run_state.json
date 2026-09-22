@@ -1,11 +1,11 @@
 {
-  "capability_call_count": 0,
+  "capability_call_count": 1,
   "cognition_calls": [],
   "complete": false,
   "conversation_turn_index": 0,
   "current_simulated_timestamp": "2026-11-03T07:06:00-08:00",
   "errors": [],
-  "next_checkpoint": 1,
+  "next_checkpoint": 2,
   "next_summary_request": 1,
   "phase": "A",
   "released_cursors": [
@@ -13,7 +13,16 @@
   ],
   "response_count": 0,
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
-  "semantic_checkpoints": [],
+  "semantic_checkpoints": [
+    {
+      "checkpoint_id": "cp0001",
+      "directive_kind": "capability_calls",
+      "github_author": "single-window-resident-control",
+      "released_cursor": 1,
+      "simulated_timestamp": "2026-11-03T07:06:00-08:00",
+      "world_revision_before": 3
+    }
+  ],
   "session_id": "resident-sem-repair-sol-20260922-r4-9f4c7b2e",
   "silence_count": 0,
   "summary_requests": []
