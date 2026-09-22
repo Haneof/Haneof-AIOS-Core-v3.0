@@ -2913,6 +2913,87 @@ class FusedTurnRuntime:
                 "USER_INTERACTION must use run_turn so the user utterance enters the world"
             )
 
+        # A delivery fact may already exist if the process failed after persisting
+        # the user-facing assistant output but before making the Wake terminal.
+        # Recover from that durable boundary without invoking the model again.
+        persisted_delivery = self.ingestor.assistant_delivery_payload(wake.object_id)
+        if persisted_delivery is not None:
+            metadata = persisted_delivery.get("metadata")
+            if not isinstance(metadata, Mapping):
+                raise ValueError("persisted Wake delivery metadata is invalid")
+            runtime_metadata = metadata.get("delivery_runtime")
+            if not isinstance(runtime_metadata, Mapping):
+                raise ValueError("persisted Wake delivery runtime metadata is invalid")
+            stored_step0_raw = runtime_metadata.get("step0")
+            if not isinstance(stored_step0_raw, Mapping):
+                raise ValueError("persisted Wake delivery Step0 metadata is invalid")
+            stored_step0 = Step0GateResult.model_validate(stored_step0_raw)
+            delivery_text = persisted_delivery.get("value")
+            if not isinstance(delivery_text, str):
+                raise ValueError("persisted Wake delivery text is invalid")
+            raw_capability_names = runtime_metadata.get("capability_names")
+            if not isinstance(raw_capability_names, list) or not all(
+                isinstance(item, str) for item in raw_capability_names
+            ):
+                raise ValueError(
+                    "persisted Wake delivery capability metadata is invalid"
+                )
+            termination_reason = runtime_metadata.get("termination_reason")
+            model_rounds = runtime_metadata.get("model_rounds")
+            if not isinstance(termination_reason, str) or not termination_reason:
+                raise ValueError(
+                    "persisted Wake delivery termination metadata is invalid"
+                )
+            if (
+                not isinstance(model_rounds, int)
+                or isinstance(model_rounds, bool)
+                or model_rounds < 0
+            ):
+                raise ValueError(
+                    "persisted Wake delivery model-round metadata is invalid"
+                )
+
+            if wake.wake_state.value == "running":
+                recovered_wake = self.wake_bus.complete(
+                    wake.object_id,
+                    completed_at=now,
+                    termination_reason=termination_reason,
+                    model_rounds=model_rounds,
+                    capability_names=tuple(raw_capability_names),
+                    delivery_allowed=True,
+                    step0_state=stored_step0.state,
+                )
+            elif wake.wake_state.value == "completed":
+                recovered_wake = WakeStateReceipt(
+                    wake_id=wake.object_id,
+                    revision=wake.revision,
+                    state=wake.wake_state.value,
+                    world_revision=int(self.store.current_world_revision()),
+                )
+            else:
+                raise ValueError(
+                    "persisted Wake delivery requires RUNNING or COMPLETED Wake state"
+                )
+
+            delivery_observation_ref = ObjectRef(
+                object_id=str(persisted_delivery["object_id"]),
+                revision=int(persisted_delivery["revision"]),
+            )
+            self.index.catch_up()
+            return WakeDispatchRunResult(
+                wake_ref=ObjectRef(
+                    object_id=recovered_wake.wake_id,
+                    revision=recovered_wake.revision,
+                ),
+                runtime=None,
+                context=None,
+                step0=stored_step0,
+                wake=recovered_wake,
+                delivery_response=delivery_text,
+                delivery_suppressed=False,
+                delivery_observation_ref=delivery_observation_ref,
+            )
+
         budget_decision = self.background_budget_gate.evaluate(
             wake,
             now=now,
@@ -3343,15 +3424,22 @@ class FusedTurnRuntime:
         # Wake from becoming durable without its delivered interaction fact.
         #
         # If the process dies after this commit and before Wake completion, the
-        # Wake remains RUNNING. Retrying the same exact Wake execution reuses the
-        # deterministic assistant-delivery identity; equivalent text is an
-        # idempotent replay and changed text fails closed instead of duplicating.
+        # Wake remains RUNNING. Recovery detects the durable delivery by logical
+        # Wake identity, does not invoke the model again, and completes the Wake.
+        # Direct exact replay of the persistence operation remains idempotent and
+        # changed text under the same delivery identity fails closed.
         delivery_observation_ref: ObjectRef | None = None
         if not runtime_incomplete and delivery_response is not None:
             delivery_commit = self.ingestor.commit_assistant_delivery(
                 assistant_text=delivery_response,
                 occurred_at=now,
                 origin_wake_ref=running_ref,
+                termination_reason=runtime_result.termination_reason,
+                model_rounds=runtime_result.model_rounds,
+                capability_names=tuple(
+                    item.name for item in runtime_result.capability_history
+                ),
+                step0=gate_result.model_dump(mode="json"),
             )
             delivery_observation_ref = ObjectRef(
                 object_id=delivery_commit.observation_id,
