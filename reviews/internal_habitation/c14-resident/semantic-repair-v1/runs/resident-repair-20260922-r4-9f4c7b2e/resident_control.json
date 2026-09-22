@@ -1,11 +1,9 @@
 {
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
   "nonce": "9f4c7b2e-6a31-4c97-bd28-1f0b88a9d453",
-  "kind": "DIRECTIVE",
-  "item_id": "cp0010",
+  "kind": "EVENT_SEEN",
+  "item_id": "c14semrep-008",
   "payload": {
-    "checkpoint_id": "cp0010",
-    "silence": true,
-    "decision_rationale": "The cognition write was rejected because claim_type='pattern_hypothesis' is not a valid enum; the valid semantic type is 'hypothesis'. No cognition was written. This is the final model round for this review, so do not fake or force a retry here; preserve the evidence and retry only in a later legitimate semantic wake if still warranted."
+    "seen": true
   }
 }
