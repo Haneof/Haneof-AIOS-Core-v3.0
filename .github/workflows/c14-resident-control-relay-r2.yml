@@ -1,0 +1,53 @@
+name: C14 Resident Control Relay R2
+
+on:
+  push:
+    branches:
+      - c14/semantic-repair-resident-control-20260922-sol
+    paths:
+      - resident-control-r2.json
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  relay:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: c14/semantic-repair-resident-control-20260922-sol
+      - name: Relay exact Resident decision
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          from pathlib import Path
+          c = json.loads(Path("resident-control-r2.json").read_text(encoding="utf-8"))
+          run_id = c["run_id"]
+          kind = c["kind"]
+          item_id = c["item_id"]
+          payload = c.get("payload")
+          text = c.get("text")
+          if payload is not None:
+              body = f"AIOS_RESIDENT_{kind} {run_id} {item_id}\n" + json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+          else:
+              body = f"AIOS_RESIDENT_{kind} {run_id} {item_id}\n" + str(text or "")
+          req = urllib.request.Request(
+              "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/issues/84/comments",
+              data=json.dumps({"body": body}, ensure_ascii=False).encode("utf-8"),
+              method="POST",
+              headers={
+                  "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
+                  "Accept": "application/vnd.github+json",
+                  "X-GitHub-Api-Version": "2022-11-28",
+                  "Content-Type": "application/json",
+                  "User-Agent": "aios-resident-control-relay-r2",
+              },
+          )
+          with urllib.request.urlopen(req, timeout=30) as resp:
+              print(resp.status)
+          PY
