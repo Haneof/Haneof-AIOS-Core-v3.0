@@ -2387,20 +2387,39 @@ class FusedTurnRuntime:
             refs,
             operation="revise_claim",
         )
-        receipt = self.revision.apply(
-            ClaimRevisionRequest(
-                target_ref=ObjectRef(
-                    object_id=str(target_ref["object_id"]),
-                    revision=int(target_ref["revision"]),
-                ),
-                mode="revise",
-                reason=reason,
-                evidence_refs=refs,
-                replacement_content=replacement_content,
-                confidence=confidence,
-            ),
-            changed_at=self._active_turn_time,
+        target = ObjectRef(
+            object_id=str(target_ref["object_id"]),
+            revision=int(target_ref["revision"]),
         )
+        payload = self.store.get_payload(
+            target.object_id,
+            revision=target.revision,
+        )
+        metadata = payload.get("metadata")
+        is_ai_world_target = isinstance(metadata, dict) and (
+            metadata.get("ai_world") is True or "ai_domain" in metadata
+        )
+        if is_ai_world_target:
+            receipt = self.ai_world.revise(
+                target_ref=target,
+                evidence_refs=refs,
+                replacement_statement=replacement_content,
+                reason=reason,
+                changed_at=self._active_turn_time,
+                confidence=confidence,
+            )
+        else:
+            receipt = self.revision.apply(
+                ClaimRevisionRequest(
+                    target_ref=target,
+                    mode="revise",
+                    reason=reason,
+                    evidence_refs=refs,
+                    replacement_content=replacement_content,
+                    confidence=confidence,
+                ),
+                changed_at=self._active_turn_time,
+            )
         return asdict(receipt)
 
     def _retract_claim(
@@ -2416,18 +2435,35 @@ class FusedTurnRuntime:
             refs,
             operation="retract_claim",
         )
-        receipt = self.revision.apply(
-            ClaimRevisionRequest(
-                target_ref=ObjectRef(
-                    object_id=str(target_ref["object_id"]),
-                    revision=int(target_ref["revision"]),
-                ),
-                mode="retract",
-                reason=reason,
-                evidence_refs=refs,
-            ),
-            changed_at=self._active_turn_time,
+        target = ObjectRef(
+            object_id=str(target_ref["object_id"]),
+            revision=int(target_ref["revision"]),
         )
+        payload = self.store.get_payload(
+            target.object_id,
+            revision=target.revision,
+        )
+        metadata = payload.get("metadata")
+        is_ai_world_target = isinstance(metadata, dict) and (
+            metadata.get("ai_world") is True or "ai_domain" in metadata
+        )
+        if is_ai_world_target:
+            receipt = self.ai_world.retract(
+                target_ref=target,
+                evidence_refs=refs,
+                reason=reason,
+                changed_at=self._active_turn_time,
+            )
+        else:
+            receipt = self.revision.apply(
+                ClaimRevisionRequest(
+                    target_ref=target,
+                    mode="retract",
+                    reason=reason,
+                    evidence_refs=refs,
+                ),
+                changed_at=self._active_turn_time,
+            )
         return asdict(receipt)
 
     def run_due_dimension_summaries(
