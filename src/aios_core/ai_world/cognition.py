@@ -17,6 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from aios_core.contracts.enums import ClaimType, KnowledgeState, ObjectType
 from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import as_utc
+from aios_core.policy.evidence import CognitionEvidencePolicy
 from aios_core.query.search import WorldSearchIndex
 from aios_core.revision.service import (
     ClaimRevisionReceipt,
@@ -129,11 +130,21 @@ class AIWorldCognitionService:
         index: WorldSearchIndex | None = None,
         user_id: str = "user_1",
         ai_subject_id: str = AI_SELF_SUBJECT_ID,
+        evidence_policy: CognitionEvidencePolicy | None = None,
     ) -> None:
         self.store = store
         self.index = index
         self.user_id = user_id
         self.ai_subject_id = ai_subject_id
+        # C15-RCC-EVIDENCE-POLICY-001: structural, never optional. The typed AI-world
+        # facade spans both the user subject and the AI-self subject, so the default
+        # policy is built over exactly that allowed subject pair.
+        self.evidence_policy = evidence_policy or CognitionEvidencePolicy(
+            store=store,
+            index=index,
+            subject_id=user_id,
+            allowed_subject_ids=(user_id, ai_subject_id),
+        )
 
     def _subject_for(self, domain: AIWorldDomain) -> str:
         return self.user_id if domain in _USER_SCOPED_DOMAINS else self.ai_subject_id
@@ -152,6 +163,7 @@ class AIWorldCognitionService:
             index=self.index,
             subject_id=subject_id,
             evidence_subject_ids=(self.user_id, self.ai_subject_id),
+            evidence_policy=self.evidence_policy,
         )
         metadata: dict[str, Any] = {
             "ai_domain": domain.value,
@@ -343,6 +355,7 @@ class AIWorldCognitionService:
             index=self.index,
             subject_id=expected_subject,
             evidence_subject_ids=(self.user_id, self.ai_subject_id),
+            evidence_policy=self.evidence_policy,
         )
         return service.apply(
             ClaimRevisionRequest(
@@ -374,6 +387,7 @@ class AIWorldCognitionService:
             index=self.index,
             subject_id=expected_subject,
             evidence_subject_ids=(self.user_id, self.ai_subject_id),
+            evidence_policy=self.evidence_policy,
         )
         return service.apply(
             ClaimRevisionRequest(

@@ -14,7 +14,17 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
-## 当前工程断点 — C15 Resident A historical repair 已拒绝：唯一下一 READY = C15-RCC-RES-A-RERUN-001
+## 当前工程断点 — C15 cognition hardening 已裁决（先于 A rerun）：集成合并 #111+#113 → 单一 anchor → 冻结 ACTIVE → A 重跑；PR #109 已判 SUPERSEDED
+
+- 2026-09-23：`C15-RCC-HARDEN-DECISION-001 = APPROVED`（hardening 先于 `C15-RCC-RES-A-RERUN-001`）。裁决依据：roadmap frozen order（hardening 在 A rerun 之前）+ PR #101 precedent（run 之后 Core semantics 变化使该 run 证据失效）+ R9 anti-self-proof 需机械强制。
+- **PR #109（先前 post-fix Resident A 重跑）= SUPERSEDED / pre-hardening diagnostic**，非 canonical C15 RCC A 证据。原因：其起始 main `1b0d478`（2026-09-22 11:27）在 COG-FIX-001（`c146ceb`，13:52）与加固（#111/#113）之前，与最终 post-加固 anchor 不同基线；A/B/C/EVAL 必须同 anchor，故 PR #109 不得作为 A 证据（同 PR #101 的 pre-fix diagnostic 待遇）。
+- C15 关键路径（已裁决）：集成合并 #111+#113（单一 post-加固 anchor）→ 语义冻结 ACTIVE → 更新 checkpoint + board（记 anchor）→ 解锁 A（29.4 READY，on post-加固 anchor）→ B → C → EVAL → CLOSE。
+- 语义冻结文档已备（`governance/C15_RCC_COGNITION_SEMANTIC_FREEZE_2026-09-23.md`），merge 后 ACTIVE，至 `C15-RCC-EVAL-001` 结束。
+- `C15-RCC-RES-A-RERUN-001 = BLOCKED`（on hardening gate 29.35）；`C15-RCC-RES-B-001 / RES-C-001 / EVAL-001 / CLOSE-001 = BLOCKED`。
+- **Next unique READY: 集成 + 合并 #111+#113（hardening gate 29.35）→ 单一 post-加固 anchor。**
+- 治理文档：`governance/C15_RCC_HARDEN_DECISION_001_2026-09-23.md`（裁决）、`governance/C15_RCC_COGNITION_SEMANTIC_FREEZE_2026-09-23.md`（冻结）、`governance/C15_RCC_HARDENING_MASTER_STATUS_REPORT_2026-09-23.md`（总报告）。
+
+## 历史工程断点 — C15 Resident A historical repair 已拒绝（2026-09-22，已被 2026-09-23 hardening 断点取代）
 
 - 2026-09-22：`C15-RCC-RES-A-REPAIR-DECISION-001 = DONE`。
 - Decision: **`PATH A = REJECTED` / `PATH B = REQUIRED`**。
