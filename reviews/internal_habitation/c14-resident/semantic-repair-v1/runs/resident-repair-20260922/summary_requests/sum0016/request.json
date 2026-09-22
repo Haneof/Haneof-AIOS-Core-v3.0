@@ -1,0 +1,44 @@
+{
+  "kind": "dimension_summary",
+  "released_cursor": 13,
+  "request": {
+    "dimension": "dim:user_ai_interaction",
+    "granularity": "day",
+    "source_world_revision": 64,
+    "sources": [
+      {
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "assistant",
+          "session_id": "resident-sem-repair-20260922",
+          "turn_index": 1,
+          "turn_key": "22fbcd8c0004bb061e681201"
+        },
+        "object_id": "obs_conv_ai_4cef47b028bbbef476bd9062",
+        "object_type": "observation",
+        "occurred_at": "2026-11-10T19:06:00Z",
+        "revision": 1,
+        "text": "今天上午的节奏保持得很好！虽然在09:06到09:24之间进行了与设计师的沟通同步，但会后几乎没有受到上下文切换的影响，很快继续投入编写，并在10:52就提前交付了“发布说明”第一版（比原定11:30的目标提前了近38分钟）。"
+      },
+      {
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "user",
+          "session_id": "resident-sem-repair-20260922",
+          "turn_index": 1,
+          "turn_key": "22fbcd8c0004bb061e681201"
+        },
+        "object_id": "obs_conv_user_366afd061716259ae44a289a",
+        "object_type": "observation",
+        "occurred_at": "2026-11-10T19:06:00Z",
+        "revision": 1,
+        "text": "用户说：“九点聊完回来接着写，没怎么重新找上下文，十一点前一版就出来了。”"
+      }
+    ],
+    "truncated": false,
+    "window_end": "2026-11-10T23:59:59.999999Z",
+    "window_start": "2026-11-10T00:00:00Z"
+  },
+  "request_id": "sum0016",
+  "simulated_timestamp": "2026-11-13T08:21:00-08:00"
+}
