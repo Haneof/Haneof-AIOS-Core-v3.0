@@ -237,6 +237,25 @@ def load_release_operator() -> ModuleType:
         module._atomic_write(state_path, state)
         module._emit({"status": "initialized", "phase": phase, "next_sequence": cur_lo, "fixture_sha256": manifest["fixture_sha256"]})
 
+    def cmd_reveal(args):
+        _, manifest, events = load_bundle()
+        state_path = Path(args.state)
+        if not state_path.exists():
+            raise module.ReleaseError("release state does not exist")
+        state = load_state(state_path, manifest, events)
+        nxt = phase_guard(args.phase, state, events)
+        if state.get("pending_reveal") is not None:
+            raise module.ReleaseError("duplicate reveal before durable ack is forbidden")
+        event = events[nxt - 1]
+        state["pending_reveal"] = {
+            "sequence": event["sequence"],
+            "event_id": event["event_id"],
+            "occurred_at": event["occurred_at"],
+            "fixture_sha256": manifest["fixture_sha256"],
+        }
+        module._atomic_write(state_path, state)
+        module._emit(module._projection(event))
+
     def build_parser():
         parser = argparse.ArgumentParser(description="Blind three-phase sequential release operator for C15 RCC fixture.")
         sub = parser.add_subparsers(dest="command", required=True)
@@ -247,7 +266,7 @@ def load_release_operator() -> ModuleType:
         reveal_p = sub.add_parser("reveal")
         reveal_p.add_argument("--phase", choices=("A", "B", "C"), required=True)
         reveal_p.add_argument("--state", required=True)
-        reveal_p.set_defaults(func=module.cmd_reveal)
+        reveal_p.set_defaults(func=cmd_reveal)
         ack_p = sub.add_parser("ack")
         ack_p.add_argument("--phase", choices=("A", "B", "C"), required=True)
         ack_p.add_argument("--state", required=True)
@@ -265,6 +284,7 @@ def load_release_operator() -> ModuleType:
     module._phase_guard = phase_guard
     module._is_phase_b_canonical_conversation_event = is_canonical_user_event
     module.cmd_init = cmd_init
+    module.cmd_reveal = cmd_reveal
     module.build_parser = build_parser
     return module
 
