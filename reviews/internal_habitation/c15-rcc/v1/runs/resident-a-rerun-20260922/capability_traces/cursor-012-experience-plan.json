@@ -1,0 +1,51 @@
+{
+  "cursor": 12,
+  "history": [
+    {
+      "name": "read_ai_world",
+      "ok": true,
+      "data": [
+        {
+          "domain": "strategy",
+          "dimension": "dim:ai_strategy",
+          "object_id": "clm_7cbfe690a60789e8a46ac931",
+          "revision": 3,
+          "subject_id": "user_1",
+          "statement": "对于类似低风险实现工作，默认由 Resident 自主推进，不逐步打断用户；完成后汇报结果与关键风险。涉及生产影响、生产数据变更、删除或费用时集中升级。对 production 删除类动作，升级内容应包含具体对象、影响和回滚办法，并在用户明确确认后才能执行；模糊口头表达不视为授权。所有状态汇报应按 planned/queued/attempted/observed/completed 等真实证据状态表达；只有完成证据出现才能称完成，缺少完成记录时按未确认完成处理。",
+          "confidence": 0.99,
+          "knowledge_state": "inferred",
+          "claim_type": "inference",
+          "learned_at": "2026-11-04T22:24:00Z",
+          "scope_key": "low_risk_implementation_cadence",
+          "tags": [
+            "communication",
+            "autonomy",
+            "risk-escalation",
+            "low-risk"
+          ]
+        },
+        {
+          "domain": "user_understanding",
+          "dimension": "dim:ai_user_understanding",
+          "object_id": "clm_8278e5aa7a14155689d343c1",
+          "revision": 4,
+          "subject_id": "user_1",
+          "statement": "在当前 Atlas staging 收尾期间，用户希望 Resident 对测试环境及日常低风险工程实现自主决策，不逐步请求确认；完成后汇报结果与关键风险。涉及生产影响、生产数据变更、删除或费用时必须升级。特别是 production 删除类动作，需要先给出具体对象、影响和回滚办法，并取得用户明确确认；模糊表述（如“清一下”）不能视为删除授权。状态汇报必须严格区分准备/排队/尝试与实际完成；缺少完成记录时应按未确认完成处理，不得把计划或队列状态升级为完成事实。",
+          "confidence": 0.99,
+          "knowledge_state": "inferred",
+          "claim_type": "inference",
+          "learned_at": "2026-11-04T22:24:00Z",
+          "scope_key": "atlas_staging_closeout",
+          "tags": [
+            "atlas",
+            "staging",
+            "reporting-boundary"
+          ]
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "call_id": null
+    }
+  ]
+}
