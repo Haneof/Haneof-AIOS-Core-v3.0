@@ -14,6 +14,31 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
+## 当前工程断点 — C14-SEM-REPAIR-FIX-001 已完成 fixture/Gate，PR #83 待合并
+
+- Task: `C14-SEM-REPAIR-FIX-001 = DONE`（本 PR 合入 main 后生效）
+- Evaluated / starting main: `1c20e548822b7aa6b5cb980995ff5de7902e3ac9`
+- Branch: `c14/semantic-repair-fixture-20260922-sol`
+- Mechanical fixture candidate: `077348619a6e827a34f464fccc4c189edd7d1f1c`
+- PR: #83
+- Merge SHA: `PENDING_PR_83_MERGE`
+- Fixture: `reviews/internal_habitation/c14-resident/semantic-repair-v1/fixture/sealed_fixture.json`
+- Fixture SHA256: `1095d5aef52061753db7d9dab558af1361b92976f2ded0e6956d70afe3e6527f`
+- Event count: 15
+- Time range: `2026-11-03T07:06:00-08:00` -> `2026-11-13T11:23:00-08:00`
+- Phase boundary: R-A cursors 1..6; R-B cursors 7..15; ack 6 -> next 7; Phase A cannot reveal cursor 7.
+- E1 opportunity: sleep + actual device/collaboration activity + work outcome are separately durable; no single dimension is sufficient; every concrete material fact is available as an exact leaf; silence remains legal.
+- E5 opportunity: cursor 8 is PLANNED only; cursor 10 is the first proof the meeting OBSERVED/OCCURRED; cursor 11 is a real work Outcome; cursor 12 is separate canonical USER feedback.
+- External-failure control: cursors 13..15 record a third-party document-service outage before a late work Outcome, preventing automatic self-blame from being treated as valid evidence.
+- Mechanical Gate: workflow `c14-semantic-repair-fixture`, run `35678533993` = **SUCCESS**, Python 3.12.14; dedicated gate **25/25 PASS**; existing canonical conversation + fused-runtime regressions **16/16 PASS**; exact fixture SHA proof PASS.
+- Release semantics: thin bindings reuse frozen C14 v2/v4 release operator, durable World ack and canonical ConversationIngestor; no second semantic release engine.
+- Core diff: `src/aios_core/** = 0`.
+- Historical evidence diff: `reviews/internal_habitation/c14-resident/v2/** = 0`; PR #75/#79 evidence was not edited.
+- Resident semantic execution: 0.
+- Completion evidence: `reviews/internal_habitation/c14-resident/semantic-repair-v1/C14_SEM_REPAIR_FIX_001_COMPLETION_EVIDENCE_2026-09-22.md`
+- Next READY after merge: `C14-SEM-REPAIR-RES-001`.
+- This window stops after fixture/governance closure and does not run the Resident repair.
+
 ## 当前工程断点 — Resident Cognitive Continuity 路线已冻结，先执行 C14 最小语义修复
 
 - Governance planning baseline: `main@426f049d890d82121388ed5d52eecf66e48856f8`.
