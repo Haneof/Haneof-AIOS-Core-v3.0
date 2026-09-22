@@ -131,10 +131,10 @@
   ],
   "complete": false,
   "conversation_turn_index": 1,
-  "current_simulated_timestamp": "2026-11-13T10:05:00-08:00",
+  "current_simulated_timestamp": "2026-11-13T11:23:00-08:00",
   "errors": [],
   "next_checkpoint": 17,
-  "next_summary_request": 19,
+  "next_summary_request": 21,
   "phase": "B",
   "released_cursors": [
     1,
@@ -150,7 +150,8 @@
     11,
     12,
     13,
-    14
+    14,
+    15
   ],
   "response_count": 1,
   "run_id": "resident-repair-20260922",
@@ -360,6 +361,16 @@
       "kind": "dimension_summary",
       "released_cursor": 13,
       "request_id": "sum0018"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 15,
+      "request_id": "sum0019"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 15,
+      "request_id": "sum0020"
     }
   ]
 }
