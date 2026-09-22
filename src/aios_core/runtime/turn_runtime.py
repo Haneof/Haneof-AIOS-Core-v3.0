@@ -149,6 +149,7 @@ class WakeDispatchRunResult:
     wake: WakeStateReceipt
     delivery_response: str | None
     delivery_suppressed: bool
+    delivery_observation_ref: ObjectRef | None = None
 
 
 class FusedTurnRuntime:
@@ -3326,10 +3327,39 @@ class FusedTurnRuntime:
             gate_result.delivery_allowed
             and effective_wake_source is not WakeSource.COGNITIVE_DERIVATION
         )
-        if (
+        delivery_response = (
+            runtime_result.response
+            if delivery_allowed
+            else None
+        )
+        runtime_incomplete = (
             effective_wake_source is WakeSource.COGNITIVE_DERIVATION
             and runtime_result.termination_reason not in _C14_SEMANTIC_TERMINATIONS
-        ):
+        )
+
+        # A real proactive assistant->user delivery is itself interaction-world
+        # truth. Persist it after the delivery gate has allowed the exact model
+        # response, but before Wake completion. This ordering prevents a terminal
+        # Wake from becoming durable without its delivered interaction fact.
+        #
+        # If the process dies after this commit and before Wake completion, the
+        # Wake remains RUNNING. Retrying the same exact Wake execution reuses the
+        # deterministic assistant-delivery identity; equivalent text is an
+        # idempotent replay and changed text fails closed instead of duplicating.
+        delivery_observation_ref: ObjectRef | None = None
+        if not runtime_incomplete and delivery_response is not None:
+            delivery_commit = self.ingestor.commit_assistant_delivery(
+                assistant_text=delivery_response,
+                occurred_at=now,
+                origin_wake_ref=running_ref,
+            )
+            delivery_observation_ref = ObjectRef(
+                object_id=delivery_commit.observation_id,
+                revision=1,
+            )
+            self.index.catch_up()
+
+        if runtime_incomplete:
             completed = self.wake_bus.requeue_runtime_incomplete(
                 running.object_id,
                 requeued_at=now,
@@ -3352,11 +3382,6 @@ class FusedTurnRuntime:
                 delivery_allowed=delivery_allowed,
                 step0_state=gate_result.state,
             )
-        delivery_response = (
-            runtime_result.response
-            if delivery_allowed
-            else None
-        )
         return WakeDispatchRunResult(
             wake_ref=ObjectRef(
                 object_id=completed.wake_id,
@@ -3371,6 +3396,7 @@ class FusedTurnRuntime:
                 runtime_result.response is not None
                 and not delivery_allowed
             ),
+            delivery_observation_ref=delivery_observation_ref,
         )
 
 
