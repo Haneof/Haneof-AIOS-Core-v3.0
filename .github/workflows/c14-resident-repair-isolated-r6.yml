@@ -15,7 +15,7 @@ permissions:
 
 concurrency:
   group: c14-sem-repair-resident-isolated-r6-cc73a1
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   resident-isolated-r6:
