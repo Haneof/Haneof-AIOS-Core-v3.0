@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 set -euo pipefail
-echo CURSOR10_DUE_WORK_PENDING
+python resident_ops/c15_due_probe.py
