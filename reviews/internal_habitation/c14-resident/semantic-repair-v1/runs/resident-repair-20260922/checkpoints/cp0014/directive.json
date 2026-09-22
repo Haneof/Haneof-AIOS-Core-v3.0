@@ -1,0 +1,45 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "object_id": "obs_c14_fixture_4707b28549e22ebbc07bc197",
+        "revision": 1
+      },
+      "call_id": "cp0014-call-1",
+      "name": "inspect_world_object"
+    },
+    {
+      "arguments": {
+        "object_id": "obs_c14_fixture_3f4a7a47f483b4459d92d94e",
+        "revision": 1
+      },
+      "call_id": "cp0014-call-2",
+      "name": "inspect_world_object"
+    },
+    {
+      "arguments": {
+        "object_id": "obs_c14_fixture_3ec2502eb5b3e04c32469e65",
+        "revision": 1
+      },
+      "call_id": "cp0014-call-3",
+      "name": "inspect_world_object"
+    },
+    {
+      "arguments": {
+        "object_id": "obs_c14_fixture_e097d1109d87846dabdb0060",
+        "revision": 1
+      },
+      "call_id": "cp0014-call-4",
+      "name": "inspect_world_object"
+    },
+    {
+      "arguments": {
+        "object_id": "obs_c14_fixture_eacb9de67251ec8bb98476a4",
+        "revision": 1
+      },
+      "call_id": "cp0014-call-5",
+      "name": "inspect_world_object"
+    }
+  ],
+  "checkpoint_id": "cp0014"
+}

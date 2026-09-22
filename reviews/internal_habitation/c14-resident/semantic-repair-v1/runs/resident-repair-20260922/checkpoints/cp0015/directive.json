@@ -1,0 +1,68 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "confidence": 0.78,
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_5bf4b05a9dafdb85ec5bb688",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_536104c70eaad761d2583410",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_16b3967abe086c1bbae30bf7",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_3187c6e6c4a710447d75b09e",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_4707b28549e22ebbc07bc197",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_3f4a7a47f483b4459d92d94e",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_3ec2502eb5b3e04c32469e65",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_e097d1109d87846dabdb0060",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_eacb9de67251ec8bb98476a4",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_conv_user_366afd061716259ae44a289a",
+            "revision": 1
+          }
+        ],
+        "reason": "整合2026-11-10全维度记录（充足睡眠、实际08:05起草、09:06–09:24同步会议、10:52提前提交），严格分离日程计划、实际执行观察与交付结果，完善工作模式假说。",
+        "replacement_content": "综合多日已记录事实与执行观察：\n1. 2026-11-03（基准无干扰）：睡眠7小时46分（评分83/100，07:01醒来），08:28–10:25开启专注模式无通话干扰（静音21条通知），10:27提前提交“API 迁移说明”第一版（目标10:45）；\n2. 2026-11-06（多次意外打断）：睡眠5小时34分（评分58/100，06:48醒来），上午经历3次通话打断（08:58–09:09、09:37–09:49、10:08–10:19），12:02提交“权限迁移说明”第一版（目标11:00，延后62分钟交付）；\n3. 2026-11-10（受控单次同步）：睡眠7小时31分（评分80/100，07:29醒来）。日历计划（Plan）为09:00–09:25同步且08:00–11:20起草，但实际执行观察（Observed）表明起草实际于08:05开始、会议实际于09:06–09:24接通进行（双方均有音频），用户反馈会后快速恢复上下文，最终产出（Outcome）于10:52提前交付“发布说明”第一版（目标11:30，提前38分钟且结构完整）。\n假说演进：严格区分日程计划与实际执行观察；充足睡眠支持下，单次预期内短时间聚焦同步对心流影响有限且可按时提前交付，而多次零散意外打断则显著增加延误风险。",
+        "target_ref": {
+          "object_id": "clm_b4df2179bb8ffec020a39ede",
+          "revision": 2
+        }
+      },
+      "call_id": "cp0015-call-1",
+      "name": "revise_claim"
+    }
+  ],
+  "checkpoint_id": "cp0015"
+}
