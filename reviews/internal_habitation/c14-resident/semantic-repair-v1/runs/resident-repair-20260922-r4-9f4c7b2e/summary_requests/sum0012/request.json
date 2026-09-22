@@ -1,0 +1,38 @@
+{
+  "kind": "dimension_summary",
+  "released_cursor": 13,
+  "request": {
+    "dimension": "dim:schedule",
+    "granularity": "day",
+    "source_world_revision": 53,
+    "sources": [
+      {
+        "metadata": {
+          "dimension": "dim:schedule",
+          "external_record_id": "c14semrep-008",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-sem-repair-fixture-event-binding-v1",
+          "fixture_event_id": "c14semrep-008",
+          "fixture_payload_sha256": "sha256:f64419f338138ea1a10b593e55d3d4ed0722044b24282f2c9bb3838ed0f894c7",
+          "fixture_projection_sha256": "sha256:698e3c6b777249a502db7f40330e7d236393929be2797b70cfa4ccbfddd81425",
+          "fixture_sequence": 8,
+          "fixture_sha256": "sha256:1095d5aef52061753db7d9dab558af1361b92976f2ded0e6956d70afe3e6527f",
+          "fixture_version": "c14-semantic-repair-fixture-v1",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-11-10T08:02:00-08:00",
+          "source_class": "platform"
+        },
+        "object_id": "obs_c14_fixture_3f4a7a47f483b4459d92d94e",
+        "object_type": "observation",
+        "occurred_at": "2026-11-10T16:02:00Z",
+        "revision": 1,
+        "text": "今天计划 09:00–09:25 与设计师同步；08:00–11:20 其余时间留给“发布说明”起草；第一版目标时间 11:30。"
+      }
+    ],
+    "truncated": false,
+    "window_end": "2026-11-10T23:59:59.999999Z",
+    "window_start": "2026-11-10T00:00:00Z"
+  },
+  "request_id": "sum0012",
+  "simulated_timestamp": "2026-11-13T08:21:00-08:00"
+}
