@@ -1,0 +1,6 @@
+{
+  "run_id": "c14-sem-repair-resident-20260922-sol-r7-d42f18",
+  "event_id": "c14semrep-001",
+  "seen": true,
+  "resident_ack_rationale": "Resident read only the currently released cursor-1 sleep observation; proceed with canonical mechanical ingest/ack and current-time runtime scheduling."
+}
