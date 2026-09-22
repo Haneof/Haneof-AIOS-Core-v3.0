@@ -2,8 +2,8 @@
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
   "nonce": "9f4c7b2e-6a31-4c97-bd28-1f0b88a9d453",
   "kind": "SUMMARY_RESPONSE",
-  "item_id": "sum0001",
+  "item_id": "sum0002",
   "payload": {
-    "content": "2026-11-03 08:28–10:25，设备开启专注模式；期间未加入语音或视频通话，21 条通知被静音。"
+    "content": "2026-11-03 记录：昨晚睡眠 7 小时 46 分，睡眠评分 83/100，07:01 醒来。"
   }
 }
