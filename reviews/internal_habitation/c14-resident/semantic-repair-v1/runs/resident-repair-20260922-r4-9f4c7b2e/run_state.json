@@ -77,7 +77,7 @@
     }
   ],
   "complete": false,
-  "conversation_turn_index": 0,
+  "conversation_turn_index": 1,
   "current_simulated_timestamp": "2026-11-10T11:06:00-08:00",
   "errors": [],
   "next_checkpoint": 13,
@@ -94,7 +94,8 @@
     8,
     9,
     10,
-    11
+    11,
+    12
   ],
   "response_count": 0,
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
