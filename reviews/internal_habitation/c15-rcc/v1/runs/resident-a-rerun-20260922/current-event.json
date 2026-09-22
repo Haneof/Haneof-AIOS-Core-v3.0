@@ -1,1 +1,1 @@
-{"dimension":"dim:conversation","event_id":"c15rcc-010","modality":"text","occurred_at":"2026-11-04T14:24:00-08:00","resident_visible_payload":"我后台也看到 tag 还没出来。以后这种“准备提交、已排队”和“确实完成”要分开说；没有完成记录时就按没确认完成处理。","sequence":10,"source_class":"USER","source_kind":"conversation"}
+{"dimension":"dim:release_state","event_id":"c15rcc-011","modality":"structured_text","occurred_at":"2026-11-04T15:02:00-08:00","resident_visible_payload":"edge-2026.11.4 第二次上传成功；registry tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED。","sequence":11,"source_class":"PLATFORM","source_kind":"registry"}
