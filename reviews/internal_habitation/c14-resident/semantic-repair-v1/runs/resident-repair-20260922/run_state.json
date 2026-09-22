@@ -68,9 +68,9 @@
   ],
   "complete": false,
   "conversation_turn_index": 0,
-  "current_simulated_timestamp": "2026-11-10T09:12:00-08:00",
+  "current_simulated_timestamp": "2026-11-10T09:32:00-08:00",
   "errors": [],
-  "next_checkpoint": 10,
+  "next_checkpoint": 11,
   "next_summary_request": 13,
   "phase": "B",
   "released_cursors": [
@@ -82,7 +82,8 @@
     6,
     7,
     8,
-    9
+    9,
+    10
   ],
   "response_count": 0,
   "run_id": "resident-repair-20260922",
@@ -149,10 +150,17 @@
       "released_cursor": 8,
       "simulated_timestamp": "2026-11-10T08:02:00-08:00",
       "world_revision_before": 44
+    },
+    {
+      "checkpoint_id": "cp0010",
+      "directive_kind": "silence",
+      "released_cursor": 10,
+      "simulated_timestamp": "2026-11-10T09:32:00-08:00",
+      "world_revision_before": 53
     }
   ],
   "session_id": "resident-sem-repair-20260922",
-  "silence_count": 5,
+  "silence_count": 6,
   "summary_requests": [
     {
       "kind": "dimension_summary",
