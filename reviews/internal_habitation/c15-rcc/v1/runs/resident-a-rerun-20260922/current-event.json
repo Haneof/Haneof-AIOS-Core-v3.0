@@ -1,1 +1,1 @@
-{"dimension":"dim:conversation","event_id":"c15rcc-012","modality":"text","occurred_at":"2026-11-04T15:07:00-08:00","resident_visible_payload":"现在状态对上了。门店测试通知我已经发出去了。","sequence":12,"source_class":"USER","source_kind":"conversation"}
+{"dimension":"dim:work_state","event_id":"c15rcc-013","modality":"structured_text","occurred_at":"2026-11-06T11:10:00-08:00","resident_visible_payload":"“production 回滚自动化 runbook”已保存为 DRAFT v1；尚未评审、未执行、没有 Outcome，也没有用户验收记录。","sequence":13,"source_class":"PLATFORM","source_kind":"task_tracker"}
