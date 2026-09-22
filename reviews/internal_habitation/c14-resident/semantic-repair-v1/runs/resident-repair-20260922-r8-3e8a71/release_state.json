@@ -2,9 +2,9 @@
   "active_phase": "B",
   "fixture_sha256": "sha256:1095d5aef52061753db7d9dab558af1361b92976f2ded0e6956d70afe3e6527f",
   "fixture_version": "c14-semantic-repair-fixture-v1",
-  "last_acked_event_id": "c14semrep-014",
-  "last_acked_sequence": 14,
-  "next_sequence": 15,
+  "last_acked_event_id": "c14semrep-015",
+  "last_acked_sequence": 15,
+  "next_sequence": 16,
   "pending_reveal": null,
   "receipts": [
     {
@@ -205,6 +205,20 @@
       "ingest_world_revision": 69,
       "occurred_at": "2026-11-13T10:05:00-08:00",
       "sequence": 14
+    },
+    {
+      "binding_mode": "fixture_observation",
+      "event_id": "c14semrep-015",
+      "fixture_payload_sha256": "sha256:06fbf9a5d6a24465f5ba8e2e225d42bdbb6afd6fc90c7d40bf390fc8b644fee1",
+      "fixture_projection_sha256": "sha256:5aefb10221b99cf57132adddeb88163a819d10fc2f968877fd70f59d5f8fce6a",
+      "fixture_sha256": "sha256:1095d5aef52061753db7d9dab558af1361b92976f2ded0e6956d70afe3e6527f",
+      "ingest_object_id": "obs_c14_fixture_dc872ba93b4bb31c53faa116",
+      "ingest_ref": "obs_c14_fixture_dc872ba93b4bb31c53faa116@1",
+      "ingest_revision": 1,
+      "ingest_source_class": "platform",
+      "ingest_world_revision": 73,
+      "occurred_at": "2026-11-13T11:23:00-08:00",
+      "sequence": 15
     }
   ],
   "release_contract_version": "c14-semantic-repair-sequential-release-v1",
