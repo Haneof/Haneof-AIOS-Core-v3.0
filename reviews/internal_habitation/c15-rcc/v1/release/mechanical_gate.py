@@ -238,12 +238,16 @@ def main() -> int:
         )
 
         first = _call(op.cmd_reveal, phase="A", state=str(state))
-        duplicate_reveal = _call(op.cmd_reveal, phase="A", state=str(state))
-        assert first == duplicate_reveal
         assert set(first) == set(op.VISIBLE_KEYS)
         assert "phase" not in first
         assert _state(state)["next_sequence"] == 1
-        checks.append("duplicate-reveal-stays-current-no-future-no-advance")
+        _expect_fail(
+            "duplicate-reveal-fails-closed",
+            lambda: _call(op.cmd_reveal, phase="A", state=str(state)),
+            op.ReleaseError,
+            checks,
+        )
+        assert _state(state)["next_sequence"] == 1
 
         _expect_fail(
             "generic-user-conversation-ingest-fails",

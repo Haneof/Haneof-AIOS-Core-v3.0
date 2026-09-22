@@ -9,8 +9,10 @@
 
 - Starting main: `d65a7b24366cb612d042a3feedb92f0a3d90b02c`
 - Fixture branch: `test/c15-rcc-fixture-001-20260922-sol`
-- PR: #99
-- Pre-governance exact gated candidate: `74ff20d06b30847557c25c08e4deabd9d4578c84`
+- Initial fixture PR: #99
+- Initial pre-governance exact gated candidate: `74ff20d06b30847557c25c08e4deabd9d4578c84`
+- Corrective mechanical PR: #100
+- Corrective exact candidate: `629cf587f37f7cea25595e456d5e4de4c03fa7d5`
 
 The task started only after the board verified:
 
@@ -169,7 +171,7 @@ Future isolation is enforced mechanically and by access contract:
 - shared release source/contract is operator/evaluator-only because it contains all phase boundaries;
 - each Resident gets only its own safe contract;
 - reveal exposes exactly one current projection and never advances the cursor;
-- duplicate reveal stays on the same cursor and cannot expose the future;
+- a second reveal while the current event is pending is rejected fail-closed and cannot expose the future;
 - ack requires an exact durable World revision;
 - phase transitions require exact previous-boundary durable state;
 - A cannot reveal cursor 14;
@@ -191,7 +193,7 @@ C15 does not create a second semantic release engine.
 - fail-closed cursor/order behavior;
 - canonical `ConversationIngestor` USER path.
 
-The C15 binding changes only fixture/version/path identity, enforces canonical USER conversation ingest in every phase, and extends the mechanical state machine to the required A/B/C boundaries.
+The C15 binding changes only fixture/version/path identity, enforces canonical USER conversation ingest in every phase, extends the mechanical state machine to the required A/B/C boundaries, and rejects duplicate reveal attempts while an event awaits durable acknowledgement.
 
 The release operator forms no Claim, makes no semantic inference, chooses no evidence, and emits no ModelDirective.
 
@@ -212,7 +214,22 @@ Exact pre-governance candidate `74ff20d06b30847557c25c08e4deabd9d4578c84`:
 - canonical conversation-ingest regression: **PASS**
 - `src/aios_core/** = 0` workflow diff assertion: **PASS**
 
-The 35-check C15 gate includes JSON/schema-contract validation, fixed count/SHA, strictly monotonic cursors/timestamps, A/B/C boundary checks, oracle-label scan, null/unverified attestation enforcement, Resident-contract isolation, wrong-phase init rejection, ack-before-reveal rejection, duplicate-reveal no-future/no-advance behavior, duplicate-ack rejection, wrong cursor/ref/session rejection, skip/reorder rejection, canonical USER enforcement, exact A->B and B->C handoffs, all-30 durable acknowledgements, full receipt-chain re-read from the supplied SQLite World, and end-of-fixture fail-closed behavior.
+The 35-check C15 gate includes JSON/schema-contract validation, fixed count/SHA, strictly monotonic cursors/timestamps, A/B/C boundary checks, oracle-label scan, null/unverified attestation enforcement, Resident-contract isolation, wrong-phase init rejection, ack-before-reveal rejection, **duplicate-reveal fail-closed rejection**, duplicate-ack rejection, wrong cursor/ref/session rejection, skip/reorder rejection, canonical USER enforcement, exact A->B and B->C handoffs, all-30 durable acknowledgements, full receipt-chain re-read from the supplied SQLite World, and end-of-fixture fail-closed behavior.
+
+### Post-merge mechanical correction
+
+After PR #99 merged, a final requirement-by-requirement audit found one mismatch with the task's explicit Gate wording: the inherited C14 behavior allowed an idempotent second reveal of the same pending cursor. Although it did not advance or leak future events, C15 specifically required **duplicate reveal/ack fail closed**.
+
+Corrective PR #100 changes only the C15 thin binding and its mechanical gate:
+
+- duplicate reveal with a pending event now raises a release error;
+- cursor state remains unchanged;
+- duplicate ack continues to fail closed;
+- sealed fixture bytes and SHA256 are unchanged;
+- no Resident contract, evaluator semantics, or Core code changed;
+- corrective exact candidate `629cf587f37f7cea25595e456d5e4de4c03fa7d5`;
+- corrective workflow run `35702939513`: **SUCCESS**;
+- C15 mechanical gate, sealed SHA proof, mature C14 sealed release gate, C15 subject-isolation/fused-runtime regressions, canonical conversation regression, and zero-Core-diff assertion all passed.
 
 ## 18. Evaluator-only notes
 

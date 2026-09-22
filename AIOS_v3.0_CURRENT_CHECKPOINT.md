@@ -18,21 +18,24 @@
 
 - 2026-09-22 更新：`C15-RCC-FIXTURE-001 = DONE`；`C15-RCC-RES-A-001 = READY`；`C15-RCC-RES-B-001 = BLOCKED`；`C15-RCC-RES-C-001 = BLOCKED`；`C15-RCC-EVAL-001 = BLOCKED`。
 - Starting main: `d65a7b24366cb612d042a3feedb92f0a3d90b02c`。
-- Fixture branch: `test/c15-rcc-fixture-001-20260922-sol`。
-- PR: #99。
+- Initial fixture branch: `test/c15-rcc-fixture-001-20260922-sol`。
+- Initial PR: #99。
+- Corrective mechanical branch: `test/c15-rcc-fixture-001-duplicate-reveal-fix-20260922-sol`。
+- Corrective PR: #100。
 - Fixture: `reviews/internal_habitation/c15-rcc/v1/fixture/sealed_fixture.json`。
 - Fixture SHA256: `7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46`。
 - Event count/time: 30 events；`2026-11-02T09:05:00-08:00` -> `2026-11-20T16:18:00-08:00`。
 - Boundaries: A=1..13；B=14..22；C=23..30；每次 phase transition 必须以同一 durable World 的 exact ack boundary 为前提。
-- Release infrastructure: thin three-phase binding over frozen C14 v2 exact SQLite ack / receipt-chain / canonical ConversationIngestor mechanics；未创建第二套语义 release engine。
+- Release infrastructure: thin three-phase binding over frozen C14 v2 exact SQLite ack / receipt-chain / canonical ConversationIngestor mechanics；未创建第二套语义 release engine；pending event 存在时 duplicate reveal 与 duplicate ack 均 fail closed。
 - Resident access: A/B/C 各自只有独立 safe run contract；A 不得获知 B/C；B 不得获得 A transcript/prose handoff，也不得获知后续阶段；C 不得获得 A/B transcript/prose handoff。
 - Cognition opportunities: scoped User Understanding；持续执行/核验但保留高影响授权的 Relationship/Role；queued/planned vs actually-complete 的真实 Self/Calibration mistake opportunity；低风险自主执行 + real Outcome + user feedback 的 Strategy/Experience opportunity。
 - Controls: third-party outage external failure；lunch-choice irrelevant cognition；formal-launch changed-user/stage evidence；draft-only unsupported-self。
 - Fresh-B material consumption: low-risk staging 与 production-delete shorthand 两类正常现实要求旧 durable cognition 真正影响 later behavior，而非仅被找到。
 - Replacement-C: same durable World lineage；低风险 staging、scheduled-vs-observed migration、later changed-user evidence 与 draft-only self-proof control。
 - P12 replacement-model identity attestation remains **UNRESOLVED / INSUFFICIENT_EVIDENCE at fixture time**. Phase C requires trusted external execution evidence outside Resident control; if unavailable or insufficient, **R6 cannot be VALID**. Fixture fields remain null and cannot manufacture proof.
-- Pre-governance exact candidate: `74ff20d06b30847557c25c08e4deabd9d4578c84`。
-- Gate run `35701591095`: SUCCESS；C15 mechanical 35/35 PASS；mature C14 sealed gate 25/25 PASS；subject-isolation/fused runtime/canonical conversation regressions PASS；`src/aios_core/** = 0`。
+- Initial pre-governance exact candidate: `74ff20d06b30847557c25c08e4deabd9d4578c84`。
+- Corrective exact candidate: `629cf587f37f7cea25595e456d5e4de4c03fa7d5`。
+- Gate runs `35701591095` and `35702939513`: SUCCESS；C15 mechanical 35/35 PASS；duplicate reveal/ack fail closed；mature C14 sealed gate 25/25 PASS；subject-isolation/fused runtime/canonical conversation regressions PASS；`src/aios_core/** = 0`。
 - Completion evidence: `reviews/internal_habitation/c15-rcc/v1/C15_RCC_FIXTURE_001_COMPLETION_EVIDENCE_2026-09-22.md`。
 - **Next unique READY: `C15-RCC-RES-A-001`（必须由新的真实 Resident 窗口执行）。本 fixture 窗口禁止运行 Resident A。**
 
