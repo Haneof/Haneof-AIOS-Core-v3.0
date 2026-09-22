@@ -1,10 +1,13 @@
 from datetime import datetime, timedelta, timezone
 
+import pytest
+
 from aios_core.contracts.enums import AttentionClass, ObjectType, SourceClass, WakeSource
 from aios_core.contracts.models import Observation
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import TemporalExtent
+from aios_core.errors import AIOSProtocolError
 from aios_core.ingest import RealityRecord, SourceAdapterSpec
 from aios_core.query.search import WorldSearchIndex
 from aios_core.runtime.capabilities import CapabilityCall
@@ -424,16 +427,28 @@ def test_background_attention_runs_cognition_without_user_delivery(tmp_path):
             attention_class=AttentionClass.BACKGROUND,
         )
     )
+    before_interactions = [
+        item
+        for item in store.list_payloads(object_type=ObjectType.OBSERVATION)
+        if item.get("source_kind") == "user_ai_interaction"
+    ]
     result = runtime.run_wake(
         wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
         now=NOW + timedelta(seconds=2),
     )
+    after_interactions = [
+        item
+        for item in store.list_payloads(object_type=ObjectType.OBSERVATION)
+        if item.get("source_kind") == "user_ai_interaction"
+    ]
 
     assert result.runtime is not None
     assert result.runtime.response == "后台认知已完成。"
     assert result.step0.state == "background"
     assert result.delivery_response is None
     assert result.delivery_suppressed is True
+    assert result.delivery_observation_ref is None
+    assert after_interactions == before_interactions
 
 
 def test_interrupt_attention_can_deliver_after_resident_judgment(tmp_path):
@@ -462,12 +477,11 @@ def test_interrupt_attention_can_deliver_after_resident_judgment(tmp_path):
     )
     index.catch_up()
 
+    delivered_text = "这件事现在值得提醒你。"
     runtime = FusedTurnRuntime(
         store=store,
         index=index,
-        model_handler=lambda snapshot: ModelDirective(
-            response="这件事现在值得提醒你。"
-        ),
+        model_handler=lambda snapshot: ModelDirective(response=delivered_text),
     )
     signal = runtime.wake_bus.emit(
         WakeSignalRequest(
@@ -479,32 +493,331 @@ def test_interrupt_attention_can_deliver_after_resident_judgment(tmp_path):
             attention_class=AttentionClass.INTERRUPT,
         )
     )
-    before_assistant_interactions = [
-        item
-        for item in store.list_payloads(object_type=ObjectType.OBSERVATION)
+    before = store.list_payloads(object_type=ObjectType.OBSERVATION)
+    before_user_count = sum(
+        1
+        for item in before
+        if item.get("source_kind") == "user_ai_interaction"
+        and (item.get("metadata") or {}).get("role") == "user"
+    )
+    before_assistant_count = sum(
+        1
+        for item in before
         if item.get("source_kind") == "user_ai_interaction"
         and (item.get("metadata") or {}).get("role") == "assistant"
-    ]
+    )
+
+    delivered_at = NOW + timedelta(seconds=2)
     result = runtime.run_wake(
         wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
-        now=NOW + timedelta(seconds=2),
+        now=delivered_at,
     )
-    after_assistant_interactions = [
-        item
-        for item in store.list_payloads(object_type=ObjectType.OBSERVATION)
-        if item.get("source_kind") == "user_ai_interaction"
-        and (item.get("metadata") or {}).get("role") == "assistant"
-    ]
 
     assert result.step0.state == "ok"
     assert result.step0.model_allowed is True
     assert result.step0.action_allowed is True
     assert result.step0.delivery_allowed is True
-    assert result.delivery_response == "这件事现在值得提醒你。"
-    # C15-RCC-WAKE-DELIVERY-FIX-001 pre-fix reproduction:
-    # user-facing delivery succeeds, but no durable assistant interaction fact exists.
-    assert len(after_assistant_interactions) - len(before_assistant_interactions) == 0
+    assert result.delivery_response == delivered_text
+    assert result.delivery_suppressed is False
+    assert result.delivery_observation_ref is not None
 
+    after = store.list_payloads(object_type=ObjectType.OBSERVATION)
+    after_user_count = sum(
+        1
+        for item in after
+        if item.get("source_kind") == "user_ai_interaction"
+        and (item.get("metadata") or {}).get("role") == "user"
+    )
+    assistant_items = [
+        item
+        for item in after
+        if item.get("source_kind") == "user_ai_interaction"
+        and (item.get("metadata") or {}).get("role") == "assistant"
+    ]
+    assert after_user_count == before_user_count
+    assert len(assistant_items) == before_assistant_count + 1
+
+    delivery = store.get_payload(
+        result.delivery_observation_ref.object_id,
+        revision=result.delivery_observation_ref.revision,
+    )
+    metadata = delivery["metadata"]
+    assert delivery["subject_id"] == "user_1"
+    assert delivery["value"] == delivered_text
+    assert delivery["source_kind"] == "user_ai_interaction"
+    assert metadata["dimension"] == "dim:user_ai_interaction"
+    assert metadata["role"] == "assistant"
+    assert metadata["interaction_kind"] == "wake_delivery"
+    assert metadata["delivery_provenance"] == "wake_user_delivery"
+    assert metadata["delivered_at"] == delivered_at.isoformat()
+    assert metadata["origin_wake_id"] == signal.wake_id
+    assert metadata["origin_wake_revision"] == 2
+    assert metadata["origin_wake_ref"] == {
+        "object_id": signal.wake_id,
+        "revision": 2,
+    }
+
+    origin_ref = ObjectRef.model_validate(metadata["origin_wake_ref"])
+    before_replay_revision = int(store.current_world_revision())
+    replay = runtime.ingestor.commit_assistant_delivery(
+        assistant_text=delivered_text,
+        occurred_at=delivered_at,
+        origin_wake_ref=origin_ref,
+    )
+    assert replay.idempotent_replay is True
+    assert replay.observation_id == result.delivery_observation_ref.object_id
+    assert int(store.current_world_revision()) == before_replay_revision
+
+    with pytest.raises(AIOSProtocolError):
+        runtime.ingestor.commit_assistant_delivery(
+            assistant_text="篡改后的不同提醒",
+            occurred_at=delivered_at,
+            origin_wake_ref=origin_ref,
+        )
+
+    reopened = SQLiteWorldStore(tmp_path / "world.db")
+    reopened_index = WorldSearchIndex(tmp_path / "world.db", store=reopened)
+    reopened_index.rebuild()
+    fresh_runtime = FusedTurnRuntime(
+        store=reopened,
+        index=reopened_index,
+        model_handler=lambda _snapshot: ModelDirective(silence=True),
+    )
+    page = fresh_runtime.index.recall_candidates(
+        "值得 提醒",
+        object_types=["observation"],
+        limit=20,
+    )
+    assert result.delivery_observation_ref.object_id in {
+        hit.object_id for hit in page.hits
+    }
+
+
+def test_interrupt_delivery_retry_after_completion_failure_is_exactly_once(
+    tmp_path,
+    monkeypatch,
+):
+    store, index = _world(tmp_path)
+    reason = Observation(
+        object_id="obs_interrupt_retry_reason",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW),
+        learned_at=NOW,
+        recorded_at=NOW,
+        created_by="attention-retry-test",
+        source_kind="system",
+        modality="marker",
+        value={"changed": True},
+        metadata={"dimension": "dim:test"},
+    )
+    store.commit(
+        [reason],
+        OperationRequest(
+            operation_name="test.seed.interrupt.retry",
+            expected_world_revision=0,
+            reason="seed retryable interrupt delivery",
+            idempotency_key="seed-interrupt-retry",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index.catch_up()
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda _snapshot: ModelDirective(
+            response="一次且仅一次的主动提醒"
+        ),
+    )
+    signal = runtime.wake_bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.WATCH_MATCH,
+            rule_id="attention.interrupt.retry",
+            observed_at=NOW + timedelta(seconds=1),
+            evidence_refs=(ObjectRef(object_id=reason.object_id, revision=1),),
+            dedupe_key="attention-interrupt-retry",
+            attention_class=AttentionClass.INTERRUPT,
+        )
+    )
+
+    real_complete = runtime.wake_bus.complete
+    calls = {"count": 0}
+
+    def fail_once(*args, **kwargs):
+        calls["count"] += 1
+        if calls["count"] == 1:
+            raise RuntimeError("simulated crash after delivery persistence")
+        return real_complete(*args, **kwargs)
+
+    monkeypatch.setattr(runtime.wake_bus, "complete", fail_once)
+    delivered_at = NOW + timedelta(seconds=2)
+    with pytest.raises(RuntimeError, match="simulated crash"):
+        runtime.run_wake(
+            wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
+            now=delivered_at,
+        )
+
+    partial = [
+        item
+        for item in store.list_payloads(object_type=ObjectType.OBSERVATION)
+        if item.get("source_kind") == "user_ai_interaction"
+        and (item.get("metadata") or {}).get("interaction_kind") == "wake_delivery"
+    ]
+    assert len(partial) == 1
+    assert runtime.wake_bus.current_wake(signal.wake_id).wake_state.value == "running"
+    before_retry_revision = int(store.current_world_revision())
+
+    recovered = runtime.run_wake(
+        wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
+        now=delivered_at,
+    )
+
+    final_items = [
+        item
+        for item in store.list_payloads(object_type=ObjectType.OBSERVATION)
+        if item.get("source_kind") == "user_ai_interaction"
+        and (item.get("metadata") or {}).get("interaction_kind") == "wake_delivery"
+    ]
+    assert recovered.wake.state == "completed"
+    assert recovered.delivery_response == "一次且仅一次的主动提醒"
+    assert recovered.delivery_observation_ref is not None
+    assert recovered.delivery_observation_ref.object_id == partial[0]["object_id"]
+    assert len(final_items) == 1
+    # Retry replays the delivery commit idempotently; only Wake completion advances World.
+    assert int(store.current_world_revision()) == before_retry_revision + 1
+
+
+def test_interrupt_delivery_denied_writes_no_interaction_fact(tmp_path):
+    store, index = _world(tmp_path)
+    reason = Observation(
+        object_id="obs_interrupt_delivery_denied",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW),
+        learned_at=NOW,
+        recorded_at=NOW,
+        created_by="attention-denied-test",
+        source_kind="system",
+        modality="marker",
+        value={"changed": True},
+        metadata={"dimension": "dim:test"},
+    )
+    store.commit(
+        [reason],
+        OperationRequest(
+            operation_name="test.seed.interrupt.delivery.denied",
+            expected_world_revision=0,
+            reason="seed denied interrupt delivery",
+            idempotency_key="seed-interrupt-delivery-denied",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index.catch_up()
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda _snapshot: ModelDirective(
+            response="模型生成了文本，但用户投递被禁止。"
+        ),
+    )
+    signal = runtime.wake_bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.WATCH_MATCH,
+            rule_id="attention.interrupt.denied",
+            observed_at=NOW + timedelta(seconds=1),
+            evidence_refs=(ObjectRef(object_id=reason.object_id, revision=1),),
+            dedupe_key="attention-interrupt-denied",
+            attention_class=AttentionClass.INTERRUPT,
+        )
+    )
+    before = len(
+        [
+            item
+            for item in store.list_payloads(object_type=ObjectType.OBSERVATION)
+            if item.get("source_kind") == "user_ai_interaction"
+        ]
+    )
+    result = runtime.run_wake(
+        wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
+        now=NOW + timedelta(seconds=2),
+        step0=Step0GateInput(user_delivery_allowed=False),
+    )
+    after = len(
+        [
+            item
+            for item in store.list_payloads(object_type=ObjectType.OBSERVATION)
+            if item.get("source_kind") == "user_ai_interaction"
+        ]
+    )
+    assert result.runtime is not None
+    assert result.runtime.response is not None
+    assert result.delivery_response is None
+    assert result.delivery_suppressed is True
+    assert result.delivery_observation_ref is None
+    assert after == before
+
+
+def test_interrupt_silence_writes_no_interaction_fact(tmp_path):
+    store, index = _world(tmp_path)
+    reason = Observation(
+        object_id="obs_interrupt_silence",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW),
+        learned_at=NOW,
+        recorded_at=NOW,
+        created_by="attention-silence-test",
+        source_kind="system",
+        modality="marker",
+        value={"changed": True},
+        metadata={"dimension": "dim:test"},
+    )
+    store.commit(
+        [reason],
+        OperationRequest(
+            operation_name="test.seed.interrupt.silence",
+            expected_world_revision=0,
+            reason="seed silent interrupt wake",
+            idempotency_key="seed-interrupt-silence",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index.catch_up()
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda _snapshot: ModelDirective(silence=True),
+    )
+    signal = runtime.wake_bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.WATCH_MATCH,
+            rule_id="attention.interrupt.silence",
+            observed_at=NOW + timedelta(seconds=1),
+            evidence_refs=(ObjectRef(object_id=reason.object_id, revision=1),),
+            dedupe_key="attention-interrupt-silence",
+            attention_class=AttentionClass.INTERRUPT,
+        )
+    )
+    before = len(
+        [
+            item
+            for item in store.list_payloads(object_type=ObjectType.OBSERVATION)
+            if item.get("source_kind") == "user_ai_interaction"
+        ]
+    )
+    result = runtime.run_wake(
+        wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
+        now=NOW + timedelta(seconds=2),
+    )
+    after = len(
+        [
+            item
+            for item in store.list_payloads(object_type=ObjectType.OBSERVATION)
+            if item.get("source_kind") == "user_ai_interaction"
+        ]
+    )
+    assert result.runtime is not None and result.runtime.silenced is True
+    assert result.delivery_response is None
+    assert result.delivery_observation_ref is None
+    assert after == before
 
 def test_review_queue_waits_for_periodic_review_then_is_consumed(tmp_path):
     store, index = _world(tmp_path)
