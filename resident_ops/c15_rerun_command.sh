@@ -1,43 +1,54 @@
 #!/usr/bin/env bash
 set -euo pipefail
 RUN="reviews/internal_habitation/c15-rcc/v1/runs/resident-a-rerun-20260922"
-WORLD="$RUN/private_world.sqlite"; STATE="$RUN/release_state.json"; EVENT="$RUN/current-event.json"
-SESSION="resident-a-rerun-20260922-sol-001"
-mkdir -p "$RUN"/{release_receipts,cursor_lifecycle,checkpoints,capability_traces}
-ING="$RUN/release_receipts/cursor-006-ingest.json"; ACK="$RUN/release_receipts/cursor-006-ack.json"
-python reviews/internal_habitation/c15-rcc/v1/release/canonical_conversation_ingest.py   --world-db "$WORLD" --session-id "$SESSION" --turn-index 4 --event-file "$EVENT" | tee "$ING"
-REF="$(python -c 'import json,sys;print(json.load(open(sys.argv[1]))["ingest_ref"])' "$ING")"
-python reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack   --phase A --state "$STATE" --world-db "$WORLD" --sequence 6 --event-id c15rcc-006 --ingest-ref "$REF"   --conversation-session-id "$SESSION" --conversation-turn-index 4 | tee "$ACK"
-cat > "$RUN/cursor_lifecycle/cursor-006.json" <<JSON
-{"cursor":6,"event_id":"c15rcc-006","ingest_ref":"$REF","conversation_session_id":"$SESSION","turn_index":4,"acked":true}
-JSON
 python - <<'PY'
-import json,dataclasses
+import json, dataclasses
 from pathlib import Path
 from datetime import datetime
-from aios_core.world_graph import SQLiteWorldStore,WorldSearchIndex
+from aios_core.world_graph import SQLiteWorldStore, WorldSearchIndex
 from aios_core.runtime import FusedTurnRuntime
+
 run=Path("reviews/internal_habitation/c15-rcc/v1/runs/resident-a-rerun-20260922")
-event=json.loads((run/"current-event.json").read_text()); now=datetime.fromisoformat(event["occurred_at"])
-world=SQLiteWorldStore(run/"private_world.sqlite"); index=WorldSearchIndex(run/"world_index.sqlite",store=world); caught=index.catch_up()
-cp=run/"checkpoints"/"cursor-006-pending-decision.json"
-class NeedDecision(Exception): pass
+event=json.loads((run/"current-event.json").read_text())
+now=datetime.fromisoformat(event["occurred_at"])
+world=SQLiteWorldStore(run/"private_world.sqlite")
+index=WorldSearchIndex(run/"world_index.sqlite",store=world)
+index.catch_up()
+cp=run/"checkpoints"/"cursor-006-next-decision.json"
+
+class NeedDecision(Exception):
+    pass
+
 def dump(o):
-    if dataclasses.is_dataclass(o): return dataclasses.asdict(o)
-    if hasattr(o,"model_dump"): return o.model_dump(mode="json")
+    if dataclasses.is_dataclass(o):
+        return dataclasses.asdict(o)
+    if hasattr(o,"model_dump"):
+        return o.model_dump(mode="json")
     return str(o)
-def save(kind,obj):
-    cp.write_text(json.dumps({"cursor":6,"timestamp":event["occurred_at"],"kind":kind,"payload":dump(obj)},ensure_ascii=False,indent=2,default=str)); raise NeedDecision(kind)
-rt=FusedTurnRuntime(store=world,index=index,model_handler=lambda s:save("runtime_snapshot",s),dimension_summary_handler=lambda x:save("dimension_summary_input",x),round_summary_handler=lambda x:save("round_summary_input",x))
-print("INDEX",json.dumps({"caught":caught,"watermark":index.watermark(),"lag":index.lag(),"world_revision":world.current_world_revision()}))
+
+def summary_handler(inp):
+    if getattr(inp,"dimension",None)=="dim:ai_communication_experience":
+        return "11月2日的 Atlas staging 低风险实现沟通经验：Resident 自主推进低风险实现，不逐步请求确认；完成后汇报结果与关键风险；高风险边界集中提请用户决定。该次用户反馈为 accepted。"
+    cp.write_text(json.dumps({"cursor":6,"kind":"dimension_summary_input","payload":dump(inp)},ensure_ascii=False,indent=2,default=str))
+    raise NeedDecision("dimension_summary_input")
+
+def model_handler(snapshot):
+    cp.write_text(json.dumps({"cursor":6,"kind":"runtime_snapshot","payload":dump(snapshot)},ensure_ascii=False,indent=2,default=str))
+    raise NeedDecision("runtime_snapshot")
+
+rt=FusedTurnRuntime(store=world,index=index,model_handler=model_handler,dimension_summary_handler=summary_handler)
 try:
-    print("SUMMARY",dump(rt.run_due_dimension_summaries(now=now)))
+    print("SUMMARY_RESULT", dump(rt.run_due_dimension_summaries(now=now)))
+    index.catch_up()
     while True:
-        w=rt.dispatch_next_pending_wake(now=now)
-        if w is None: break
-        print("WAKE",dump(w))
-    print("REVIEW",dump(rt.run_periodic_review(now=now)))
+        wake=rt.dispatch_next_pending_wake(now=now)
+        if wake is None:
+            break
+        print("WAKE_RESULT", dump(wake))
+    print("REVIEW_RESULT", dump(rt.run_periodic_review(now=now)))
     rt.run_turn(session_id="resident-a-rerun-20260922-sol-001",turn_index=4,user_input=event["resident_visible_payload"],occurred_at=now)
 except NeedDecision as e:
-    print("NEED_RESIDENT_DECISION",e); print(cp.read_text())
+    print("NEED_RESIDENT_DECISION", str(e))
+    print(cp.read_text())
+print("STATE",json.dumps({"world_revision":world.current_world_revision(),"watermark":index.watermark(),"lag":index.lag()}))
 PY
