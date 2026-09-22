@@ -2,8 +2,8 @@
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
   "nonce": "9f4c7b2e-6a31-4c97-bd28-1f0b88a9d453",
   "kind": "SUMMARY_RESPONSE",
-  "item_id": "sum0015",
+  "item_id": "sum0016",
   "payload": {
-    "content": "2026-11-10，“发布说明”于 08:05 实际开始；截至 09:11 仍在进行中，最近一次内容保存时间为 08:54。"
+    "content": "2026-11-10，“发布说明”第一版于 10:52 提交，目标时间 11:30；评审前未要求重写核心结构。"
   }
 }
