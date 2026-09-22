@@ -49,6 +49,7 @@
   "future_leak": false,
   "pr_101_untouched": true,
   "core_diff_files": 0,
-  "evidence_head": "FINAL_HEAD_PENDING",
-  "evidence_pr": "PR_PENDING"
+  "evidence_head": "See pinned PR #109 exact-head comment; head is frozen after final metadata write.",
+  "evidence_pr": "#109",
+  "evidence_packaging_note": "Cursor 9-13 standalone receipt/lifecycle envelopes were mechanically materialized from the final authoritative release_state after the World was frozen; no World mutation or semantic backfill."
 }
