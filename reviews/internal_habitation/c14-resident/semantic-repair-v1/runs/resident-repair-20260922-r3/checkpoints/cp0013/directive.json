@@ -1,0 +1,6 @@
+{
+  "checkpoint_id": "cp0013",
+  "decision_rationale": "Revision 2 was successfully committed from six pinned leaf observations. It now represents both cases, keeps confidence limited, and explicitly preserves the inability to separate sleep from interruption effects or infer causality. No additional write is warranted in this review.",
+  "github_author": "Haneof",
+  "silence": true
+}

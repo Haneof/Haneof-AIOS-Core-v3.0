@@ -1,0 +1,15 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "object_id": "clm_2f6130964e3eb3a3cd0c6e92",
+        "revision": 1
+      },
+      "call_id": "cp0011-inspect-claim",
+      "name": "inspect_world_object"
+    }
+  ],
+  "checkpoint_id": "cp0011",
+  "decision_rationale": "The Nov 6 sleep leaf is now reacquired. Inspect the exact current Claim to recover its pinned lineage before composing any replacement that mentions both cases.",
+  "github_author": "Haneof"
+}

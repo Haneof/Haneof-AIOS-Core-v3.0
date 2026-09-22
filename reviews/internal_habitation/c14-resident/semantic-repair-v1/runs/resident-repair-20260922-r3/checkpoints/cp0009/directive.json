@@ -1,0 +1,15 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "limit": 40,
+        "offset": 0
+      },
+      "call_id": "cp0009-read-anchors",
+      "name": "read_periodic_review_anchors"
+    }
+  ],
+  "checkpoint_id": "cp0009",
+  "decision_rationale": "The review window now contains a second case plus existing cognition. Read all pinned anchors first so any revision can be grounded only in exact facts rather than summary prose.",
+  "github_author": "Haneof"
+}

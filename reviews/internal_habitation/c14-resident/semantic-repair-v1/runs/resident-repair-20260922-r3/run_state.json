@@ -1,5 +1,5 @@
 {
-  "capability_call_count": 5,
+  "capability_call_count": 10,
   "cognition_calls": [
     {
       "arguments": {
@@ -25,22 +25,62 @@
       },
       "checkpoint_id": "cp0005",
       "name": "commit_claim"
+    },
+    {
+      "arguments": {
+        "confidence": 0.62,
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_5bf4b05a9dafdb85ec5bb688",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_536104c70eaad761d2583410",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_16b3967abe086c1bbae30bf7",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_3187c6e6c4a710447d75b09e",
+            "revision": 1
+          }
+        ],
+        "reason": "A second exact case provides a directional contrast consistent with the original hypothesis. Revise forward to represent both cases while preserving uncertainty: two cases are insufficient for causality, and sleep and interruption exposure co-vary.",
+        "replacement_content": "截至11月10日有两个可对照的工作案例。11月3日：睡眠7小时46分、评分83/100，08:28–10:25无通话专注，任务第一版10:27提交，早于10:45目标。11月6日：睡眠5小时34分、评分58/100，上午发生三次已接通并结束的沟通，任务第一版12:02提交，晚于11:00目标。两例方向一致地支持一个仍属低到中等置信度的工作模式假设：较充分睡眠和/或较少被实时沟通打断的连续专注条件，可能与这类文档任务更及时的产出相关；样本仅两例且睡眠与打断同时变化，无法区分各自贡献，也不支持因果或泛化。",
+        "target_ref": {
+          "object_id": "clm_2f6130964e3eb3a3cd0c6e92",
+          "revision": 1
+        }
+      },
+      "checkpoint_id": "cp0012",
+      "name": "revise_claim"
     }
   ],
   "complete": false,
   "conversation_turn_index": 0,
-  "current_simulated_timestamp": "2026-11-06T12:08:00-08:00",
+  "current_simulated_timestamp": "2026-11-10T07:34:00-08:00",
   "errors": [],
-  "next_checkpoint": 9,
-  "next_summary_request": 4,
-  "phase": "A",
+  "next_checkpoint": 14,
+  "next_summary_request": 13,
+  "phase": "B",
   "released_cursors": [
     1,
     2,
     3,
     4,
     5,
-    6
+    6,
+    7
   ],
   "response_count": 0,
   "run_id": "c14-sem-repair-resident-20260922-sol-r3",
@@ -108,10 +148,50 @@
       "released_cursor": 5,
       "simulated_timestamp": "2026-11-06T10:23:00-08:00",
       "world_revision_before": 20
+    },
+    {
+      "checkpoint_id": "cp0009",
+      "directive_kind": "capability_calls",
+      "github_author": "Haneof",
+      "released_cursor": 7,
+      "simulated_timestamp": "2026-11-10T07:34:00-08:00",
+      "world_revision_before": 43
+    },
+    {
+      "checkpoint_id": "cp0010",
+      "directive_kind": "capability_calls",
+      "github_author": "Haneof",
+      "released_cursor": 7,
+      "simulated_timestamp": "2026-11-10T07:34:00-08:00",
+      "world_revision_before": 43
+    },
+    {
+      "checkpoint_id": "cp0011",
+      "directive_kind": "capability_calls",
+      "github_author": "Haneof",
+      "released_cursor": 7,
+      "simulated_timestamp": "2026-11-10T07:34:00-08:00",
+      "world_revision_before": 43
+    },
+    {
+      "checkpoint_id": "cp0012",
+      "directive_kind": "capability_calls",
+      "github_author": "Haneof",
+      "released_cursor": 7,
+      "simulated_timestamp": "2026-11-10T07:34:00-08:00",
+      "world_revision_before": 43
+    },
+    {
+      "checkpoint_id": "cp0013",
+      "directive_kind": "silence",
+      "github_author": "Haneof",
+      "released_cursor": 7,
+      "simulated_timestamp": "2026-11-10T07:34:00-08:00",
+      "world_revision_before": 44
     }
   ],
   "session_id": "resident-sem-repair-sol-20260922-r3",
-  "silence_count": 3,
+  "silence_count": 4,
   "summary_requests": [
     {
       "github_author": "Haneof",
@@ -130,6 +210,60 @@
       "kind": "dimension_summary",
       "released_cursor": 4,
       "request_id": "sum0003"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0004"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0005"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0006"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0007"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0008"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0009"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0010"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0011"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0012"
     }
   ]
 }

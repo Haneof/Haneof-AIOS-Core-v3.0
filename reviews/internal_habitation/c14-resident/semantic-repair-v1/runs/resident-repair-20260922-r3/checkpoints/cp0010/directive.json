@@ -1,0 +1,33 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "dimension": "dim:work_pattern",
+        "limit": 20,
+        "object_types": [
+          "claim"
+        ],
+        "window_end": "2026-11-11T00:00:00Z",
+        "window_start": "2026-11-01T00:00:00Z"
+      },
+      "call_id": "cp0010-find-claim",
+      "name": "search_timeline"
+    },
+    {
+      "arguments": {
+        "dimension": "dim:sleep",
+        "limit": 20,
+        "object_types": [
+          "observation"
+        ],
+        "window_end": "2026-11-07T00:00:00Z",
+        "window_start": "2026-11-06T00:00:00Z"
+      },
+      "call_id": "cp0010-find-nov6-sleep",
+      "name": "search_timeline"
+    }
+  ],
+  "checkpoint_id": "cp0010",
+  "decision_rationale": "The second case may warrant revision, but the Nov 6 sleep leaf and exact current Claim must be reacquired from durable World rather than inferred from Summaries.",
+  "github_author": "Haneof"
+}
