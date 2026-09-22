@@ -2,7 +2,7 @@ name: C15 Resident A Rerun Mechanical Executor
 on:
   push:
     branches:
-      - resident/c15-rcc-res-a-rerun-20260922-sol
+      - resident/c15-rcc-res-a-rerun-20260922-sol-final
     paths:
       - 'resident_ops/c15_rerun_command.sh'
 permissions:
@@ -38,5 +38,5 @@ jobs:
           fi
           if ! git diff --cached --quiet; then
             git commit -m 'evidence(c15): persist Resident A rerun mechanical state'
-            git push origin HEAD:resident/c15-rcc-res-a-rerun-20260922-sol
+            git push origin HEAD:resident/c15-rcc-res-a-rerun-20260922-sol-final
           fi
