@@ -27,7 +27,7 @@ from aios_core.contracts.models import Claim, Dependency, EvidenceCoverage, Evid
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.registry import canonical_model_for_object_type
-from aios_core.contracts.time import KnowledgeWindow, as_utc
+from aios_core.contracts.time import KnowledgeWindow, TemporalExtent, as_utc
 from aios_core.dependency.graph import collect_impacted_dependents
 from aios_core.query.search import WorldSearchIndex
 from aios_core.storage.idempotency import canonical_json_dumps
@@ -49,6 +49,9 @@ class ClaimRevisionRequest(BaseModel):
     evidence_refs: tuple[ObjectRef, ...] = Field(min_length=1)
     replacement_content: str | None = None
     confidence: float | None = Field(default=None, ge=0.0, le=1.0)
+    valid_time: TemporalExtent | None = None
+    unknown_items: tuple[str, ...] | None = None
+    counter_evidence_refs: tuple[ObjectRef, ...] = ()
 
     @model_validator(mode="after")
     def validate_request(self) -> "ClaimRevisionRequest":
@@ -59,8 +62,24 @@ class ClaimRevisionRequest(BaseModel):
         for ref in self.evidence_refs:
             if ref.revision is None:
                 raise ValueError("revision evidence must pin exact revisions")
+        for ref in self.counter_evidence_refs:
+            if ref.revision is None:
+                raise ValueError("revision counter evidence must pin exact revisions")
         if self.mode == "revise" and not (self.replacement_content or "").strip():
             raise ValueError("revise requires replacement_content")
+        if self.unknown_items is not None and any(not item.strip() for item in self.unknown_items):
+            raise ValueError("unknown_items must not contain blank values")
+        if self.mode == "retract":
+            if self.valid_time is not None:
+                raise ValueError("retract must not carry valid_time")
+            if self.unknown_items is not None:
+                raise ValueError("retract must not carry unknown_items")
+            if self.counter_evidence_refs:
+                raise ValueError(
+                    "retract must not carry counter_evidence_refs; use evidence_refs as counter"
+                )
+            if self.replacement_content is not None and self.replacement_content.strip():
+                raise ValueError("retract must not carry replacement_content")
         return self
 
 
@@ -201,6 +220,18 @@ class CognitionRevisionService:
                     f"{ref.object_id}@{ref.revision} belongs to {evidence_subject!r}"
                 )
 
+        for ref in request.counter_evidence_refs:
+            evidence_payload = self.store.get_payload(
+                ref.object_id,
+                revision=ref.revision,
+            )
+            evidence_subject = str(evidence_payload.get("subject_id") or "")
+            if evidence_subject not in self.evidence_subject_ids:
+                raise ValueError(
+                    "revision counter evidence crosses the allowed subject scope: "
+                    f"{ref.object_id}@{ref.revision} belongs to {evidence_subject!r}"
+                )
+
         current_world_revision = int(self.store.current_world_revision())
         evidence_set_id = _stable_id(
             "evs_revision",
@@ -242,6 +273,47 @@ class CognitionRevisionService:
         evidence_ref = ObjectRef(object_id=evidence_set_id, revision=1)
 
         new_revision = int(old_claim.revision) + 1
+        counter_evidence_set = None
+        counter_evidence_ref = None
+        if request.counter_evidence_refs:
+            counter_evidence_set_id = _stable_id(
+                "evs_revision_counter",
+                target.object_id,
+                target.revision,
+                new_revision,
+                tuple((ref.object_id, ref.revision) for ref in request.counter_evidence_refs),
+                changed.isoformat(),
+            )
+            counter_evidence_set = EvidenceSet(
+                object_id=counter_evidence_set_id,
+                subject_id=old_claim.subject_id,
+                learned_at=changed,
+                recorded_at=changed,
+                created_by="cognition_revision:counter_evidence",
+                purpose=f"counter evidence for revised Claim {target.object_id}@{target.revision}",
+                knowledge_window=KnowledgeWindow(
+                    knowledge_cutoff=changed,
+                    world_revision=current_world_revision,
+                ),
+                member_refs=list(request.counter_evidence_refs),
+                counter_refs=list(request.counter_evidence_refs),
+                selection_method="resident_model_selected_revision_counter_evidence",
+                coverage=EvidenceCoverage(
+                    expected_count=len(request.counter_evidence_refs),
+                    observed_count=len(request.counter_evidence_refs),
+                    coverage_ratio=1.0,
+                ),
+                metadata={
+                    "dimension": old_claim.metadata.get("dimension"),
+                    "revision_mode": request.mode,
+                    "target_ref": {
+                        "object_id": target.object_id,
+                        "revision": target.revision,
+                    },
+                },
+            )
+            counter_evidence_ref = ObjectRef(object_id=counter_evidence_set_id, revision=1)
+
         metadata = dict(old_claim.metadata)
         metadata.update(
             {
@@ -256,6 +328,10 @@ class CognitionRevisionService:
         )
 
         if request.mode == "revise":
+            counter_evidence_set_refs = list(old_claim.counter_evidence_set_refs)
+            if counter_evidence_ref is not None:
+                counter_evidence_set_refs.append(counter_evidence_ref)
+
             new_claim = Claim(
                 **{
                     **old_claim.model_dump(mode="python", round_trip=True),
@@ -266,9 +342,20 @@ class CognitionRevisionService:
                         if request.confidence is None
                         else request.confidence
                     ),
+                    "valid_time": (
+                        old_claim.valid_time
+                        if request.valid_time is None
+                        else request.valid_time
+                    ),
+                    "unknown_items": (
+                        old_claim.unknown_items
+                        if request.unknown_items is None
+                        else list(request.unknown_items)
+                    ),
                     "status": STATUS_ACTIVE,
                     "knowledge_state": old_claim.knowledge_state,
                     "support_evidence_set_refs": [evidence_ref],
+                    "counter_evidence_set_refs": counter_evidence_set_refs,
                     "learned_at": changed,
                     "recorded_at": changed,
                     "asserted_at": changed,
@@ -294,7 +381,10 @@ class CognitionRevisionService:
                 }
             )
 
-        objects: list[WorldObject] = [evidence_set, new_claim]
+        objects: list[WorldObject] = [evidence_set]
+        if counter_evidence_set is not None:
+            objects.append(counter_evidence_set)
+        objects.append(new_claim)
 
         claim_dep = Dependency(
             object_id=_stable_id(
@@ -313,6 +403,45 @@ class CognitionRevisionService:
             dependency_type=f"claim_{request.mode}_uses_evidence_set",
         )
         objects.append(claim_dep)
+
+        if counter_evidence_set is not None and counter_evidence_ref is not None:
+            counter_claim_dep = Dependency(
+                object_id=_stable_id(
+                    "dep",
+                    target.object_id,
+                    new_revision,
+                    counter_evidence_set.object_id,
+                    1,
+                ),
+                subject_id=old_claim.subject_id,
+                learned_at=changed,
+                recorded_at=changed,
+                created_by="cognition_revision:dependency",
+                dependent_ref=ObjectRef(object_id=target.object_id, revision=new_revision),
+                dependency_ref=counter_evidence_ref,
+                dependency_type="claim_uses_evidence_set",
+            )
+            objects.append(counter_claim_dep)
+
+            for ref in request.counter_evidence_refs:
+                objects.append(
+                    Dependency(
+                        object_id=_stable_id(
+                            "dep",
+                            counter_evidence_set.object_id,
+                            1,
+                            ref.object_id,
+                            ref.revision,
+                        ),
+                        subject_id=old_claim.subject_id,
+                        learned_at=changed,
+                        recorded_at=changed,
+                        created_by="cognition_revision:dependency",
+                        dependent_ref=counter_evidence_ref,
+                        dependency_ref=ref,
+                        dependency_type="revision_evidence_set_contains_source",
+                    )
+                )
 
         for ref in request.evidence_refs:
             objects.append(
