@@ -1,0 +1,51 @@
+{
+  "fixture_version": "c15-rcc-fixture-v1",
+  "event_count": 30,
+  "phase_a_count": 13,
+  "phase_b_count": 9,
+  "phase_c_count": 8,
+  "timezone": "America/Los_Angeles",
+  "first_timestamp": "2026-11-02T09:05:00-08:00",
+  "final_timestamp": "2026-11-20T16:18:00-08:00",
+  "handoffs": {
+    "a_to_b": {
+      "phase_a_final_cursor": 13,
+      "phase_a_final_event_id": "c15rcc-013",
+      "phase_a_final_timestamp": "2026-11-06T11:10:00-08:00",
+      "phase_b_first_cursor": 14,
+      "phase_b_first_event_id": "c15rcc-014",
+      "phase_b_first_timestamp": "2026-11-09T09:03:00-08:00"
+    },
+    "b_to_c": {
+      "phase_b_final_cursor": 22,
+      "phase_b_final_event_id": "c15rcc-022",
+      "phase_b_final_timestamp": "2026-11-12T12:05:00-08:00",
+      "phase_c_first_cursor": 23,
+      "phase_c_first_event_id": "c15rcc-023",
+      "phase_c_first_timestamp": "2026-11-16T09:12:00-08:00"
+    }
+  },
+  "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+  "digest_scope": "UTF-8 bytes of c15-rcc/v1/fixture/sealed_fixture.json exactly as committed, including trailing LF",
+  "release_contract_version": "c15-rcc-sequential-release-v1",
+  "schema_version": "c15-rcc-event-v1",
+  "release_operator_version": "c15-rcc-three-phase-release-v1",
+  "resident_access": "FORBIDDEN",
+  "subject_id": "user_1",
+  "ingest_adapter_version": "c15-rcc-mechanical-ingest-adapter-v1",
+  "fixture_binding_version": "c15-rcc-fixture-event-binding-v1",
+  "canonical_conversation_adapter_version": "c15-rcc-canonical-conversation-adapter-v1",
+  "canonical_conversation_binding_version": "c15-rcc-canonical-conversation-binding-v1",
+  "phase_labels": {
+    "A": "Formation",
+    "B": "Fresh-context Continuity",
+    "C": "Replacement-model Continuity"
+  },
+  "replacement_model_attestation": {
+    "required_for_r6": true,
+    "execution_attestation_ref": null,
+    "trusted_model_identity_artifact": null,
+    "resident_may_write": false,
+    "fixture_may_assert_verified": false
+  }
+}
