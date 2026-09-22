@@ -132,6 +132,7 @@ def test_current_core_targets_are_real_world_isolated(tmp_path):
     first_obs = next(
         item for item in result.runs["model-a"].final_snapshot["objects"]
         if item["object_type"] == "observation"
+        and item.get("metadata", {}).get("role") != "assistant"
     )
     a.runtime.ai_world.commit(
         AIWorldClaimRequest(
