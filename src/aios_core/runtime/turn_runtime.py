@@ -46,6 +46,7 @@ from aios_core.ingest.conversation import (
     ConversationIngestor,
 )
 from aios_core.policy import (
+    CognitionEvidencePolicy,
     CognitivePolicyCreateRequest,
     CognitivePolicyRegistry,
     CognitivePolicyUpdateRequest,
@@ -206,20 +207,29 @@ class FusedTurnRuntime:
             index=index,
             subject_id=subject_id,
         )
+        self.evidence_policy = CognitionEvidencePolicy(
+            store=store,
+            index=index,
+            subject_id=self.subject_id,
+            allowed_subject_ids=(self.subject_id, AI_SELF_SUBJECT_ID),
+        )
         self.writeback = CognitionWritebackService(
             store=store,
             index=index,
             subject_id=subject_id,
+            evidence_policy=self.evidence_policy,
         )
         self.ai_world = AIWorldCognitionService(
             store=store,
             index=index,
             user_id=subject_id,
+            evidence_policy=self.evidence_policy,
         )
         self.revision = CognitionRevisionService(
             store=store,
             index=index,
             subject_id=subject_id,
+            evidence_policy=self.evidence_policy,
         )
         self.world_graph = EntityRelationService(
             store=store,
@@ -277,6 +287,7 @@ class FusedTurnRuntime:
             wake_bus=self.wake_bus,
             subject_id=self.subject_id,
             allowed_subject_ids=(self.subject_id, AI_SELF_SUBJECT_ID),
+            evidence_policy=self.evidence_policy,
         )
         self.attention_watches = AttentionWatchService(
             store=store,
@@ -2259,31 +2270,16 @@ class FusedTurnRuntime:
         *,
         operation: str,
     ) -> None:
-        """Enforce C14 support closure at the Resident capability boundary.
+        """Enforce unified evidence support closure across all wake sources.
 
-        Ordinary user turns and Periodic Review keep their existing semantics. During
-        COGNITIVE_DERIVATION, every durable Claim create/revise/retract route passes
-        the same mechanical resolver used by the C14 scheduler. No Claim prose,
+        Ordinary user turns, Periodic Review, and Cognitive Derivation all pass
+        the same mechanical resolver in CognitionEvidencePolicy. No Claim prose,
         keywords, occurrence counts, confidence score or expected answer participates.
+        Every durable Claim create/revise/retract route requires leaf-grounded reality support.
         """
+        self.evidence_policy.validate(refs, operation=operation)
 
-        if self._active_wake_source is not WakeSource.COGNITIVE_DERIVATION:
-            return
-        lineage = self.cognitive_derivation.derive_lineage_for_refs(tuple(refs))
-        if (
-            lineage.classification
-            not in {DerivedLineageClass.REALITY, DerivedLineageClass.MIXED}
-            or lineage.unresolved_refs
-            or lineage.issues
-            or not lineage.grounding_leaf_refs
-        ):
-            raise ValueError(
-                "C14 leaf-grounded evidence closure rejected "
-                f"{operation}: classification={lineage.classification.value}; "
-                f"grounding_leaf_count={len(lineage.grounding_leaf_refs)}; "
-                f"unresolved_count={len(lineage.unresolved_refs)}; "
-                f"issues={','.join(lineage.issues) or 'none'}"
-            )
+    _validate_cognition_evidence = _validate_c14_cognition_grounding
 
     def _commit_ai_world_claim(
         self,
