@@ -1,0 +1,6 @@
+{
+  "checkpoint_id": "cp0010",
+  "decision_rationale": "The cognition write was rejected because claim_type='pattern_hypothesis' is not a valid enum; the valid semantic type is 'hypothesis'. No cognition was written. This is the final model round for this review, so do not fake or force a retry here; preserve the evidence and retry only in a later legitimate semantic wake if still warranted.",
+  "github_author": "single-window-resident-control",
+  "silence": true
+}
