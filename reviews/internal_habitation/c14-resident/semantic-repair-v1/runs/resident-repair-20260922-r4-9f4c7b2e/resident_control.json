@@ -2,9 +2,9 @@
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
   "nonce": "9f4c7b2e-6a31-4c97-bd28-1f0b88a9d453",
   "kind": "DIRECTIVE",
-  "item_id": "cp0007",
+  "item_id": "cp0008",
   "payload": {
-    "checkpoint_id": "cp0007",
+    "checkpoint_id": "cp0008",
     "capability_calls": [
       {
         "name": "request_all_dimensions_projection",
@@ -16,12 +16,11 @@
             "dim:work_outcome"
           ],
           "window_start": "2026-11-03T00:00:00Z",
-          "window_end": "2026-11-07T00:00:00Z",
-          "query": "compare observed work conditions and submission timing without inferring causality"
+          "window_end": "2026-11-07T00:00:00Z"
         },
-        "call_id": "cp0007-all-dimensions"
+        "call_id": "cp0008-all-dimensions-unfiltered"
       }
     ],
-    "decision_rationale": "Two contrasting work cases now exist, but sleep differs between them. Cross-check the direct multi-dimensional world evidence before deciding whether to persist a low-confidence hypothesis."
+    "decision_rationale": "The first ALL_DIMENSIONS query returned empty slices because the semantic query did not match indexed payloads. Retry the same bounded window without query rather than treating that empty retrieval as absence of evidence."
   }
 }
