@@ -209,6 +209,9 @@ class AIWorldCognitionService:
                 continue
             if domain not in allowed:
                 continue
+            expected_subject = self._subject_for(domain)
+            if str(payload.get("subject_id") or "") != expected_subject:
+                continue
             if str(payload.get("status") or "active") != "active":
                 continue
             if clean_scope is not None and metadata.get("scope_key") != clean_scope:
@@ -292,6 +295,24 @@ class AIWorldCognitionService:
             ]
         return snapshot
 
+    def _authorized_target_subject(self, payload: Mapping[str, Any]) -> str:
+        metadata = payload.get("metadata")
+        if not isinstance(metadata, dict) or metadata.get("ai_world") is not True:
+            raise ValueError("target_ref is not an AI-world cognition Claim")
+        try:
+            domain = AIWorldDomain(str(metadata.get("ai_domain")))
+        except (TypeError, ValueError) as exc:
+            raise ValueError("target_ref has invalid AI-world cognition metadata") from exc
+
+        expected_subject = self._subject_for(domain)
+        actual_subject = str(payload.get("subject_id") or "")
+        if actual_subject != expected_subject:
+            raise ValueError(
+                "target_ref AI-world subject mismatch: "
+                f"{actual_subject!r} != {expected_subject!r}"
+            )
+        return expected_subject
+
     def revise(
         self,
         *,
@@ -306,13 +327,11 @@ class AIWorldCognitionService:
             target_ref.object_id,
             revision=target_ref.revision,
         )
-        metadata = payload.get("metadata")
-        if not isinstance(metadata, dict) or not metadata.get("ai_world"):
-            raise ValueError("target_ref is not an AI-world cognition Claim")
+        expected_subject = self._authorized_target_subject(payload)
         service = CognitionRevisionService(
             store=self.store,
             index=self.index,
-            subject_id=str(payload["subject_id"]),
+            subject_id=expected_subject,
             evidence_subject_ids=(self.user_id, self.ai_subject_id),
         )
         return service.apply(
@@ -339,13 +358,11 @@ class AIWorldCognitionService:
             target_ref.object_id,
             revision=target_ref.revision,
         )
-        metadata = payload.get("metadata")
-        if not isinstance(metadata, dict) or not metadata.get("ai_world"):
-            raise ValueError("target_ref is not an AI-world cognition Claim")
+        expected_subject = self._authorized_target_subject(payload)
         service = CognitionRevisionService(
             store=self.store,
             index=self.index,
-            subject_id=str(payload["subject_id"]),
+            subject_id=expected_subject,
             evidence_subject_ids=(self.user_id, self.ai_subject_id),
         )
         return service.apply(
