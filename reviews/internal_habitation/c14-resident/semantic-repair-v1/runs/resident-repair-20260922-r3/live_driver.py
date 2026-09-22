@@ -36,7 +36,7 @@ RELEASE_OPERATOR = RELEASE_DIR / "release_operator.py"
 MECHANICAL_ADAPTER = RELEASE_DIR / "mechanical_ingest_adapter.py"
 CANONICAL_ADAPTER = RELEASE_DIR / "canonical_conversation_ingest.py"
 
-RUN_ID = "c14-sem-repair-resident-20260922-sol-r3"
+# Formal single-window isolated Resident run; do not reuse PR #84 semantics.\nRUN_ID = "c14-sem-repair-resident-20260922-sol-r3"
 SESSION_ID = "resident-sem-repair-sol-20260922-r3"
 SUBJECT_ID = "user_1"
 STARTING_MAIN = "7611fa5059f5dc8a20835cab5b312be2f43d11e8"
