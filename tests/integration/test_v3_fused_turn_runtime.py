@@ -1,6 +1,11 @@
 from datetime import datetime, timedelta, timezone
 
-from aios_core.ai_world import AIWorldClaimRequest, AIWorldCognitionService, AIWorldDomain
+from aios_core.ai_world import (
+    AI_SELF_SUBJECT_ID,
+    AIWorldClaimRequest,
+    AIWorldCognitionService,
+    AIWorldDomain,
+)
 from aios_core.contracts.enums import SourceClass
 from aios_core.contracts.models import Observation
 from aios_core.contracts.operations import OperationRequest
@@ -497,6 +502,138 @@ def test_resident_model_can_build_and_read_user_understanding_in_unified_ai_worl
     assert len(ai_claims) == 1
     assert ai_claims[0]["metadata"]["scope_key"] == "collaboration.engineering_autonomy"
 
+
+
+def test_runtime_can_create_revise_and_retract_ai_self_world_claim(tmp_path):
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    evidence = Observation(
+        object_id="obs_ai_self_revision_runtime",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW - timedelta(days=1)),
+        learned_at=NOW - timedelta(days=1),
+        recorded_at=NOW - timedelta(days=1),
+        created_by="ai-self-revision-runtime-test",
+        source_kind="conversation",
+        modality="text",
+        value="你刚才判断得太快了，之后遇到这种情况先核对事实。",
+        metadata={"dimension": "dim:user_ai_interaction"},
+    )
+    store.commit(
+        [evidence],
+        OperationRequest(
+            operation_name="test.seed.ai_self_revision.runtime",
+            expected_world_revision=0,
+            reason="seed AI-self revision evidence",
+            idempotency_key="seed-ai-self-revision-runtime",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    def model(snapshot):
+        history = snapshot.capability_history
+        if not history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="commit_ai_world_claim",
+                        arguments={
+                            "domain": "self",
+                            "statement": "我在这类判断中应更快给出结论。",
+                            "evidence_refs": [
+                                {
+                                    "object_id": evidence.object_id,
+                                    "revision": 1,
+                                }
+                            ],
+                            "confidence": 0.55,
+                            "scope_key": "decision_pacing",
+                            "tags": ["core_context"],
+                        },
+                    ),
+                )
+            )
+        if len(history) == 1:
+            created = history[-1]
+            assert created.ok is True
+            assert created.data["subject_id"] == AI_SELF_SUBJECT_ID
+            claim_id = created.data["claim"]["claim_id"]
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="revise_claim",
+                        arguments={
+                            "target_ref": {
+                                "object_id": claim_id,
+                                "revision": 1,
+                            },
+                            "reason": "用户纠正表明此前自我判断方向相反",
+                            "evidence_refs": [
+                                {
+                                    "object_id": evidence.object_id,
+                                    "revision": 1,
+                                }
+                            ],
+                            "replacement_content": "我在这类判断中容易过快下结论，应先核对事实。",
+                            "confidence": 0.93,
+                        },
+                    ),
+                )
+            )
+        if len(history) == 2:
+            revised = history[-1]
+            assert revised.ok is True
+            assert revised.data["mode"] == "revise"
+            assert revised.data["new_revision"] == 2
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="retract_claim",
+                        arguments={
+                            "target_ref": {
+                                "object_id": revised.data["claim_id"],
+                                "revision": 2,
+                            },
+                            "reason": "该自我概括证据不足，撤回等待更多真实案例",
+                            "evidence_refs": [
+                                {
+                                    "object_id": evidence.object_id,
+                                    "revision": 1,
+                                }
+                            ],
+                        },
+                    ),
+                )
+            )
+
+        retracted = history[-1]
+        assert retracted.ok is True
+        assert retracted.data["mode"] == "retract"
+        assert retracted.data["new_revision"] == 3
+        return ModelDirective(response="这条自我判断已撤回，等待更多真实证据。")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    result = runtime.run_turn(
+        session_id="ai-self-revision",
+        turn_index=1,
+        user_input="把刚才那条自我判断纠正掉。",
+        current_topic=None,
+        occurred_at=NOW,
+    )
+
+    assert [item.name for item in result.runtime.capability_history] == [
+        "commit_ai_world_claim",
+        "revise_claim",
+        "retract_claim",
+    ]
+    claim_id = result.runtime.capability_history[0].data["claim"]["claim_id"]
+    assert store.get_payload(claim_id, revision=1)["subject_id"] == AI_SELF_SUBJECT_ID
+    assert store.get_payload(claim_id, revision=2)["content"] == (
+        "我在这类判断中容易过快下结论，应先核对事实。"
+    )
+    assert store.get_payload(claim_id, revision=3)["status"] == "retracted"
 
 def test_new_session_loads_only_explicit_core_ai_world_context(tmp_path):
     db = tmp_path / "world.db"
