@@ -784,7 +784,7 @@ def main() -> int:
         "sequential_release": True,
         "future_preview": False,
         "semantic_engine": "external real Resident via RuntimeSnapshot/ModelDirective bridge",
-        "infrastructure_retry": {"attempt": 2, "replayed_resident_decisions": ["cp0001", "cp0002"], "future_event_leak": false},
+        "infrastructure_retry": {"attempt": 2, "replayed_resident_decisions": ["cp0001", "cp0002"], "future_event_leak": False},
     }
     atomic_json(RUN_DIR / "run_manifest.json", run_manifest)
 
