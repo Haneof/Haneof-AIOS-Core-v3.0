@@ -14,6 +14,28 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
+## 当前工程断点 — C14-SEM-REPAIR-RES-001 证据已由 PM 正式接受，唯一下一 READY = C14-SEM-REPAIR-EVAL-001
+
+- 2026-09-22 更新：`C14-SEM-REPAIR-RES-001 = DONE`（PM evidence acceptance 完成）；`C14-SEM-REPAIR-EVAL-001 = READY`。
+- Starting / evaluated main: `7611fa5059f5dc8a20835cab5b312be2f43d11e8`
+- **Canonical evidence PR: #92（OPEN / UNMERGED / PINNED — 禁止 merge；private World 不得进入 main）**
+- **Exact canonical evidence head: `9e870514b57bf07c00018d7dcf7435f2702f8730`（evaluator 只能使用该 head）**
+- Resident branch: `arena/01a0c773-haneof-aios-core-v3-0`
+- Resident session: `resident-sem-repair-20260922`; Run ID: `resident-repair-20260922`
+- Run directory: `reviews/internal_habitation/c14-resident/semantic-repair-v1/runs/resident-repair-20260922/`
+- Cursors: 15/15 顺序释放（Phase A = 1..6, Phase B = 7..15），全部 durable SQLite ack，PM 独立重验。
+- Semantic checkpoints: 16；Resident-authored summaries: 20；capability calls: 18（15 inspect_world_object / 1 commit_claim / 2 revise_claim）；silence 8；response 1。
+- Final current Claim: `clm_b4df2179bb8ffec020a39ede@3`（active, confidence 0.78；durable revision chain rev1@wr20 → rev2@wr44 → rev3@wr77，support evidence sets 逐级解析到 pinned leaf Observations）。
+- Final World revision: 83；Final World SHA256: `a7a7cd9f9166eb41d3b93d85820a9c7a4ab0aa57b81787d89f395482742bae57`
+- Release-state SHA256: `4f41d709a76e0f40ce5b0093f540cc286dde84a1906a575019199cc7a7970081`; Index SHA256: `ae296ee44a000eb7ea5bf122184bfb9dd65c80f14f9e94e9fb64fce039658caf`
+- PM audit 结论（仅完整性/出处）：bridge transport-only、无 pseudo-LLM / keyword→Claim / 预设答案；16 snapshots + 20 summary requests 零 future leak；`src/aios_core/** = 0`；`reviews/internal_habitation/c14-resident/v2/** = 0`，PR #75（`cb9b56b7…`）/ PR #79（`546449a4…`）历史证据未动。
+- 试运行 PR disposition：#84/#85 ABORTED·NON-CANONICAL（已关闭）；#86/#87/#91 SCAFFOLD ONLY（已关闭；#91 提交是 canonical head 的祖先）；#88 NON-CANONICAL 并行 r8 run——DO NOT EVALUATE（已关闭）；#89/#90 ABORTED（保持关闭）。
+- PM acceptance report: `reviews/C14_SEM_REPAIR_RES_001_PM_ACCEPTANCE_REVIEW_2026-09-22.md`
+- **E1/E5 语义裁决 = NOT PERFORMED**，只能由新独立 evaluator 窗口在 `C14-SEM-REPAIR-EVAL-001` 执行；只审计 PR #92 @ `9e870514…`，禁止使用 #84–#91。
+- `C14-CLOSE-001` 保持 **BLOCKED**；`C15-RCC-RULE-001` 保持 **BLOCKED**。
+- Evidence branch 末提交（`9e87051`）内含 Resident 窗口自记的 task board/checkpoint 文本，已被本 PM 写回取代；不影响任何 run artifact。
+
+
 ## 当前工程断点 — C14-SEM-REPAIR-FIX-001 已完成并合入 main
 
 - Task: `C14-SEM-REPAIR-FIX-001 = DONE`
