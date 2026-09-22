@@ -1,0 +1,16 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "limit": 10,
+        "offset": 0
+      },
+      "call_id": "cp0003-read-anchors",
+      "name": "read_periodic_review_anchors"
+    }
+  ],
+  "checkpoint_id": "cp0003",
+  "decision_rationale": "The review has six anchors after three summaries. Read exact anchors first; summaries are navigation only and must not be treated as semantic evidence by themselves.",
+  "github_author": "Haneof",
+  "run_id": "c14-sem-repair-resident-20260922-sol-r8-3e8a71"
+}
