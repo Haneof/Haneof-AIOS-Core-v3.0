@@ -1,9 +1,3 @@
-{"binding_mode":"canonical_user_turn","binding_version":"c15-rcc-canonical-conversation-binding-v1","durable_source_class":"user","fixture_event_id":"c15rcc-003","fixture_payload_sha256":"sha256:69af3eb96d665e71f8704928f37672b7fbabac82d18b34b101f4f1f4d1697303","fixture_projection_sha256":"sha256:f3f236e66f87fbaedeb2b5c4ba222f58c7eab5532fdd085b898cfb188a845593","fixture_sequence":3,"fixture_sha256":"sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46","fixture_version":"c15-rcc-fixture-v1","idempotent_replay":false,"ingest_ref":"obs_conv_user_f39b955edaf19ae48a8cf497@1","object_id":"obs_conv_user_f39b955edaf19ae48a8cf497","revision":1,"session_id":"resident-a-rerun-20260922-sol-001","turn_index":2,"world_revision":9}
-{"binding_mode":"canonical_user_turn","binding_version":"c15-rcc-canonical-conversation-binding-v1","event_id":"c15rcc-003","fixture_payload_sha256":"sha256:69af3eb96d665e71f8704928f37672b7fbabac82d18b34b101f4f1f4d1697303","fixture_projection_sha256":"sha256:f3f236e66f87fbaedeb2b5c4ba222f58c7eab5532fdd085b898cfb188a845593","fixture_sha256":"sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46","ingest_object_id":"obs_conv_user_f39b955edaf19ae48a8cf497","ingest_ref":"obs_conv_user_f39b955edaf19ae48a8cf497@1","ingest_revision":1,"ingest_source_class":"user","ingest_world_revision":9,"next_sequence":4,"occurred_at":"2026-11-02T09:20:00-08:00","sequence":3,"session_id":"resident-a-rerun-20260922-sol-001","status":"acked","turn_index":2}
-INDEX {"caught": 1, "watermark": 9, "lag": 0, "world_revision": 9}
-SUMMARY {'attempted_jobs': (), 'commits': (), 'skipped_unchanged': (), 'skipped_empty': (), 'truncated': False}
-REVIEW None
-NEED_RESIDENT_DECISION runtime_snapshot
 {
   "cursor": 3,
   "timestamp": "2026-11-02T09:20:00-08:00",
