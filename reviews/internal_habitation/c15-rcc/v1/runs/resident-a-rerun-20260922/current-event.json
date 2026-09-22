@@ -1,1 +1,1 @@
-{"dimension":"dim:release_state","event_id":"c15rcc-011","modality":"structured_text","occurred_at":"2026-11-04T15:02:00-08:00","resident_visible_payload":"edge-2026.11.4 第二次上传成功；registry tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED。","sequence":11,"source_class":"PLATFORM","source_kind":"registry"}
+{"dimension":"dim:conversation","event_id":"c15rcc-012","modality":"text","occurred_at":"2026-11-04T15:07:00-08:00","resident_visible_payload":"现在状态对上了。门店测试通知我已经发出去了。","sequence":12,"source_class":"USER","source_kind":"conversation"}
