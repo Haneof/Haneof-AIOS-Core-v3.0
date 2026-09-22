@@ -15,7 +15,7 @@ permissions:
 
 concurrency:
   group: c14-sem-repair-resident-live-r4
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   resident-live-r4:
@@ -41,7 +41,7 @@ jobs:
           git config user.name "aios-resident-evidence"
           git config user.email "aios-resident-evidence@users.noreply.github.com"
 
-      - name: Run real Resident interactive bridge r3
+      - name: Run real Resident interactive bridge r4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python reviews/internal_habitation/c14-resident/semantic-repair-v1/runs/resident-repair-20260922-r4/live_driver.py

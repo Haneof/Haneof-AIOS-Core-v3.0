@@ -41,7 +41,7 @@ RUN_ID = "c14-sem-repair-resident-20260922-sol-r4"
 SESSION_ID = "resident-sem-repair-sol-20260922-r4"
 SUBJECT_ID = "user_1"
 STARTING_MAIN = "7611fa5059f5dc8a20835cab5b312be2f43d11e8"
-BRANCH = "c14/semantic-repair-resident-20260922-sol-r3"
+BRANCH = "c14/semantic-repair-resident-20260922-sol-r4"
 DECLARED_PROVIDER = "OpenAI"
 DECLARED_MODEL = "GPT-5.6 Sol"
 
