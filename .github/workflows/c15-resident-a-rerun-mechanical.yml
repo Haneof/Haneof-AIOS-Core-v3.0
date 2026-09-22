@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: resident/c15-rcc-res-a-rerun-20260922-sol
+          ref: ${{ github.sha }}
           fetch-depth: 1
       - uses: actions/setup-python@v5
         with:
