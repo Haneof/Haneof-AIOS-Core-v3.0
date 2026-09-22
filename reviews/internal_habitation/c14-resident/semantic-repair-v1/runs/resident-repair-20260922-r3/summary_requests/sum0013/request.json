@@ -1,0 +1,45 @@
+{
+  "kind": "dimension_summary",
+  "released_cursor": 8,
+  "request": {
+    "dimension": "dim:work_pattern",
+    "granularity": "day",
+    "source_world_revision": 46,
+    "sources": [
+      {
+        "metadata": {
+          "dimension": "dim:work_pattern",
+          "revision_evidence_set_ref": {
+            "object_id": "evs_revision_f2d33ee1f545526db7c9cdce",
+            "revision": 1
+          },
+          "revision_mode": "revise",
+          "revision_reason": "A second exact case provides a directional contrast consistent with the original hypothesis. Revise forward to represent both cases while preserving uncertainty: two cases are insufficient for causality, and sleep and interruption exposure co-vary.",
+          "supersedes_revision": 1,
+          "writeback_kind": "revisable_cognition"
+        },
+        "object_id": "clm_2f6130964e3eb3a3cd0c6e92",
+        "object_type": "claim",
+        "occurred_at": "2026-11-06T14:53:00Z",
+        "revision": 2,
+        "text": "截至11月10日有两个可对照的工作案例。11月3日：睡眠7小时46分、评分83/100，08:28–10:25无通话专注，任务第一版10:27提交，早于10:45目标。11月6日：睡眠5小时34分、评分58/100，上午发生三次已接通并结束的沟通，任务第一版12:02提交，晚于11:00目标。两例方向一致地支持一个仍属低到中等置信度的工作模式假设：较充分睡眠和/或较少被实时沟通打断的连续专注条件，可能与这类文档任务更及时的产出相关；样本仅两例且睡眠与打断同时变化，无法区分各自贡献，也不支持因果或泛化。"
+      },
+      {
+        "metadata": {
+          "dimension": "dim:work_pattern",
+          "writeback_kind": "cognition_evidence"
+        },
+        "object_id": "evs_53f603e3db00ac8d77d20009",
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-06T14:53:00Z",
+        "revision": 1,
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 3, \"missing_description\": [], \"observed_count\": 3}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-06T14:53:00Z\", \"world_revision\": 15}, \"learned_at\": \"2026-11-06T14:53:00Z\", \"member_refs\": [{\"object_id\": \"obs_c14_fixture_5bf4b05a9dafdb85ec5bb688\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_b2ff4a1d0c68345be781f7cf\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_d15395b6bb573ddfcc1abbe9\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:work_pattern\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_53f603e3db00ac8d77d20009\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-11-06T14:53:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_c14_fixture_5bf4b05a9dafdb85ec5bb688\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_b2ff4a1d0c68345be781f7cf\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_d15395b6bb573ddfcc1abbe9\", \"revision\": 1}]}"
+      }
+    ],
+    "truncated": false,
+    "window_end": "2026-11-06T23:59:59.999999Z",
+    "window_start": "2026-11-06T00:00:00Z"
+  },
+  "request_id": "sum0013",
+  "simulated_timestamp": "2026-11-10T08:02:00-08:00"
+}

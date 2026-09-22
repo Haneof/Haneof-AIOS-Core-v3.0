@@ -1,0 +1,15 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "object_id": "clm_2f6130964e3eb3a3cd0c6e92",
+        "revision": 2
+      },
+      "call_id": "cp0014-inspect-current-claim",
+      "name": "inspect_world_object"
+    }
+  ],
+  "checkpoint_id": "cp0014",
+  "decision_rationale": "This bundle replays temporal summaries from the two already-reviewed cases, including stale cognition navigation anchors. Read the durable current Claim revision 2; do not derive a duplicate Claim from Summaries.",
+  "github_author": "Haneof"
+}
