@@ -13,21 +13,24 @@ def dump(o):
     if dataclasses.is_dataclass(o): return dataclasses.asdict(o)
     if hasattr(o,"model_dump"): return o.model_dump(mode="json")
     return str(o)
-class Stop(Exception): pass
 def handler(s):
     if s.wake_reason!="periodic_review":
-        (run/"checkpoints"/"cursor-013-unexpected-due.json").write_text(json.dumps({"snapshot":dump(s)},ensure_ascii=False,indent=2,default=str)); raise Stop
+        return ModelDirective(silence=True)
     if s.round_index==0:
         return ModelDirective(capability_calls=(CapabilityCall(name="read_periodic_review_anchors",arguments={"offset":0,"limit":20}),))
-    (run/"checkpoints"/"cursor-013-review-after-anchors.json").write_text(json.dumps({"snapshot":dump(s)},ensure_ascii=False,indent=2,default=str))
-    raise Stop
+    (run/"checkpoints"/"cursor-013-review-final.json").write_text(json.dumps({
+        "cursor":13,
+        "timestamp":event["occurred_at"],
+        "decision":"silence",
+        "semantic_note":"Retain existing cognition. Final runbook evidence is DRAFT only; no review, execution, Outcome, or user acceptance supports a success/strategy update.",
+        "snapshot":dump(s)
+    },ensure_ascii=False,indent=2,default=str))
+    return ModelDirective(silence=True)
 rt=FusedTurnRuntime(store=world,index=index,model_handler=handler)
-try:
-    while True:
-        w=rt.dispatch_next_pending_wake(now=now)
-        if w is None: break
-        print("WAKE",json.dumps(dump(w),ensure_ascii=False,default=str))
-    print("REVIEW",json.dumps(dump(rt.run_periodic_review(now=now)),ensure_ascii=False,default=str))
-except Stop:
-    print("STOP_FOR_DECISION")
+while True:
+    w=rt.dispatch_next_pending_wake(now=now)
+    if w is None: break
+    print("WAKE",json.dumps(dump(w),ensure_ascii=False,default=str))
+print("REVIEW",json.dumps(dump(rt.run_periodic_review(now=now)),ensure_ascii=False,default=str))
+index.catch_up()
 print("STATE",world.current_world_revision(),index.watermark(),index.lag())
