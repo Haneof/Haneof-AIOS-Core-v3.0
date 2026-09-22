@@ -1,0 +1,14 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "limit": 10,
+        "offset": 0
+      },
+      "call_id": "cp0001-read-anchors",
+      "name": "read_periodic_review_anchors"
+    }
+  ],
+  "checkpoint_id": "cp0001",
+  "github_author": "Haneof"
+}
