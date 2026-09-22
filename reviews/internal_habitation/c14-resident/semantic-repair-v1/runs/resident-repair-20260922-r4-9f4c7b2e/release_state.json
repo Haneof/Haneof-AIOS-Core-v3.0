@@ -5,7 +5,12 @@
   "last_acked_event_id": "c14semrep-003",
   "last_acked_sequence": 3,
   "next_sequence": 4,
-  "pending_reveal": null,
+  "pending_reveal": {
+    "event_id": "c14semrep-004",
+    "fixture_sha256": "sha256:1095d5aef52061753db7d9dab558af1361b92976f2ded0e6956d70afe3e6527f",
+    "occurred_at": "2026-11-06T06:53:00-08:00",
+    "sequence": 4
+  },
   "receipts": [
     {
       "binding_mode": "fixture_observation",
