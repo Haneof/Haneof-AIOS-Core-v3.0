@@ -1,9 +1,35 @@
 {
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
   "nonce": "9f4c7b2e-6a31-4c97-bd28-1f0b88a9d453",
-  "kind": "EVENT_SEEN",
-  "item_id": "c14semrep-012",
+  "kind": "DIRECTIVE",
+  "item_id": "cp0013",
   "payload": {
-    "seen": true
+    "checkpoint_id": "cp0013",
+    "capability_calls": [
+      {
+        "name": "inspect_world_object",
+        "arguments": {
+          "object_id": "clm_7672f379ea32d16e77ea7e97",
+          "revision": 1
+        },
+        "call_id": "cp0013-inspect-work-pattern-claim"
+      },
+      {
+        "name": "request_all_dimensions_projection",
+        "arguments": {
+          "dimensions": [
+            "dim:sleep",
+            "dim:collaboration_activity",
+            "dim:work",
+            "dim:work_outcome",
+            "dim:user_ai_interaction"
+          ],
+          "window_start": "2026-11-10T00:00:00Z",
+          "window_end": "2026-11-11T00:00:00Z"
+        },
+        "call_id": "cp0013-nov10-all-dimensions"
+      }
+    ],
+    "decision_rationale": "The user's report is new counter-evidence relevant to an existing work-pattern hypothesis. Inspect the pinned Claim and the direct Nov-10 cross-dimensional reality before revising or responding."
   }
 }
