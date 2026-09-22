@@ -14,7 +14,21 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
-## 当前工程断点 — C15 Wake user-delivery persistence 纠偏：A/B 已重新阻塞，唯一下一 READY = C15-RCC-WAKE-DELIVERY-FIX-001
+## 当前工程断点 — C15-RCC-WAKE-DELIVERY-FIX-001 已完成：唯一下一 READY = C15-RCC-RES-A-REPAIR-DECISION-001
+
+- 2026-09-22 Core completion：`C15-RCC-WAKE-DELIVERY-FIX-001 = DONE`；`C15-RCC-RES-A-REPAIR-DECISION-001 = READY`。
+- Starting main：`ff47e82f586a47a3d9bb28b83545b8b9044e7ed3`；PR #104；pre-fix reproduction `2c0dfc10b92b6122ce08754407393ef87a3ea073`；exact gated Core implementation candidate `41522c1776dfdce3f7ad855f9846a0b4705162c5`。
+- Core fix：现有 `ConversationIngestor` 新增 assistant-only Wake delivery persistence；仅真实允许投递且有 response 时写 `dim:user_ai_interaction` assistant Observation；保存 exact originating Wake ref/provenance；稳定 identity/idempotency；绝不伪造 USER input。
+- Recovery boundary：delivery interaction 在 Wake completion 前持久化；若中间 crash，Wake 保持 RUNNING，重试相同 exact Wake delivery 幂等收敛为 1 assistant interaction + 1 completed Wake；篡改 payload fail closed。
+- Negative boundary：suppressed/denied/cognitive-derivation internal/silence 不写 interaction；ordinary `run_turn()` 语义不变；fresh Runtime/rebuilt index 可检索 proactive delivered assistant output；T28 assistant-dialogue recommendation boundary保持 GREEN。
+- Evidence：`reviews/C15_RCC_WAKE_DELIVERY_FIX_001_COMPLETION_EVIDENCE_2026-09-22.md`。
+- `C15-RCC-RES-A-001 = BLOCKED`；`C15-RCC-RES-B-001 = BLOCKED`；`C15-RCC-RES-C-001 = BLOCKED`；`C15-RCC-EVAL-001 = BLOCKED`；`C15-RCC-CLOSE-001 = BLOCKED`。
+- PR #101 @ `bfbfa059e2ac616326eecdfe3ffa7a927bdc7ce2` 仍为 immutable **OPEN / UNMERGED / PINNED PRE-FIX / DIAGNOSTIC** evidence；本 Core 任务未 backfill、未重跑 A/B。
+- 下一窗口必须由独立 PM 执行 `C15-RCC-RES-A-REPAIR-DECISION-001`，仅决定 Path A mechanical historical persistence 是否可证明等价，或 Path B fresh World rerun。Core 工程窗口不做该判断。
+- **Next unique READY: `C15-RCC-RES-A-REPAIR-DECISION-001`.**
+
+## 历史工程断点 — C15 Wake user-delivery persistence 纠偏：该 FIX handoff 已完成
+
 
 - 2026-09-22 corrective governance：PR #102 对 cursor 9 / 11 的 `non-conversation Wake delivery boundary` 解释不足；两次均为 `watch_match` / `interrupt`，`delivery_allowed=true`、Resident response 非空、`termination=responded`、`delivery_response` 非空、`delivery_suppressed=false`，但 PR #101 durable World 没有对应 assistant interaction Observation。
 - Constitution: `docs/constitution/AIOS_v3.0_User_AI_Interaction_Dimension_Constitution.md` 要求用户-AI交流本身作为世界事实保存，并记录用户输入、AI输出、时间与对话关系。Wake 不应伪造 USER input，但真实 delivered assistant output 仍是 interaction World fact。
