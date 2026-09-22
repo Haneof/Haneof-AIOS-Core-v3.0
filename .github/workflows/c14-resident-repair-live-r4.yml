@@ -14,7 +14,7 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: c14-sem-repair-resident-live-r4
+  group: c14-sem-repair-resident-live-r4-isolated
   cancel-in-progress: true
 
 jobs:
