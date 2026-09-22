@@ -69,7 +69,6 @@ from aios_core.review import (
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.summaries import (
     CognitiveDerivationScheduler,
-    DerivedLineageClass,
     DimensionSummaryInput,
     MultiScaleSummaryScheduler,
     SummaryScale,
@@ -2201,7 +2200,7 @@ class FusedTurnRuntime:
         # C14 is a bounded background cognition-derivation wake. It may persist only
         # cognition create/revise/retract operations; every other present or future
         # side-effecting capability is denied by default. The four allowed handlers
-        # still pass through _validate_c14_cognition_grounding().
+        # still pass through _validate_cognition_evidence().
         if snapshot.wake_reason == WakeSource.COGNITIVE_DERIVATION.value:
             return spec.name in _C14_COGNITIVE_SIDE_EFFECT_ALLOWLIST
 
@@ -2264,7 +2263,7 @@ class FusedTurnRuntime:
         )
         return asdict(receipt)
 
-    def _validate_c14_cognition_grounding(
+    def _validate_cognition_evidence(
         self,
         refs: Sequence[ObjectRef],
         *,
@@ -2278,8 +2277,6 @@ class FusedTurnRuntime:
         Every durable Claim create/revise/retract route requires leaf-grounded reality support.
         """
         self.evidence_policy.validate(refs, operation=operation)
-
-    _validate_cognition_evidence = _validate_c14_cognition_grounding
 
     def _commit_ai_world_claim(
         self,
@@ -2297,7 +2294,7 @@ class FusedTurnRuntime:
                 "commit_ai_world_claim is only available during an active AIOS turn"
             )
         refs = self._coerce_refs(evidence_refs)
-        self._validate_c14_cognition_grounding(
+        self._validate_cognition_evidence(
             refs,
             operation="commit_ai_world_claim",
         )
@@ -2339,7 +2336,7 @@ class FusedTurnRuntime:
             )
             for item in evidence_refs
         )
-        self._validate_c14_cognition_grounding(
+        self._validate_cognition_evidence(
             refs,
             operation="commit_claim",
         )
@@ -2379,7 +2376,7 @@ class FusedTurnRuntime:
         if self._active_turn_time is None:
             raise RuntimeError("revise_claim is only available during an active AIOS turn")
         refs = self._coerce_refs(evidence_refs)
-        self._validate_c14_cognition_grounding(
+        self._validate_cognition_evidence(
             refs,
             operation="revise_claim",
         )
@@ -2427,7 +2424,7 @@ class FusedTurnRuntime:
         if self._active_turn_time is None:
             raise RuntimeError("retract_claim is only available during an active AIOS turn")
         refs = self._coerce_refs(evidence_refs)
-        self._validate_c14_cognition_grounding(
+        self._validate_cognition_evidence(
             refs,
             operation="retract_claim",
         )

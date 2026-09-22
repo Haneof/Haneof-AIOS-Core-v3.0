@@ -97,13 +97,20 @@ class CognitionRevisionService:
         self.store = store
         self.index = index
         self.subject_id = subject_id
-        self.evidence_policy = evidence_policy
         allowed = tuple(evidence_subject_ids or (subject_id,))
         self.evidence_subject_ids = frozenset(
             str(item).strip() for item in allowed if str(item).strip()
         )
         if not self.evidence_subject_ids:
             raise ValueError("evidence_subject_ids must contain at least one subject")
+        # C15-RCC-EVIDENCE-POLICY-001: structural, never optional. See
+        # CognitionWritebackService.__init__ for the same contract.
+        self.evidence_policy = evidence_policy or CognitionEvidencePolicy(
+            store=store,
+            index=index,
+            subject_id=self.subject_id,
+            allowed_subject_ids=tuple(self.evidence_subject_ids),
+        )
 
     def _current_dependencies(self) -> tuple[Dependency, ...]:
         payloads = self.store.list_payloads(object_type=ObjectType.DEPENDENCY)
@@ -192,12 +199,8 @@ class CognitionRevisionService:
         # dependent for model review, and the resident AI must be able to replace
         # that stale revision with a new active understanding.
 
-        if self.evidence_policy is not None:
-            self.evidence_policy.validate(
-                request.evidence_refs,
-                operation=f"cognition_revision.{request.mode}",
-            )
-
+        # Subject isolation is checked first so cross-user refs keep reporting the
+        # precise isolation violation rather than a generic closure failure.
         for ref in request.evidence_refs:
             evidence_payload = self.store.get_payload(
                 ref.object_id,
@@ -209,6 +212,11 @@ class CognitionRevisionService:
                     "revision evidence crosses the allowed subject scope: "
                     f"{ref.object_id}@{ref.revision} belongs to {evidence_subject!r}"
                 )
+
+        self.evidence_policy.validate(
+            request.evidence_refs,
+            operation=f"cognition_revision.{request.mode}",
+        )
 
         current_world_revision = int(self.store.current_world_revision())
         evidence_set_id = _stable_id(

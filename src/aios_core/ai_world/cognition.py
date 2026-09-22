@@ -136,7 +136,15 @@ class AIWorldCognitionService:
         self.index = index
         self.user_id = user_id
         self.ai_subject_id = ai_subject_id
-        self.evidence_policy = evidence_policy
+        # C15-RCC-EVIDENCE-POLICY-001: structural, never optional. The typed AI-world
+        # facade spans both the user subject and the AI-self subject, so the default
+        # policy is built over exactly that allowed subject pair.
+        self.evidence_policy = evidence_policy or CognitionEvidencePolicy(
+            store=store,
+            index=index,
+            subject_id=user_id,
+            allowed_subject_ids=(user_id, ai_subject_id),
+        )
 
     def _subject_for(self, domain: AIWorldDomain) -> str:
         return self.user_id if domain in _USER_SCOPED_DOMAINS else self.ai_subject_id

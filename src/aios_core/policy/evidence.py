@@ -1,4 +1,4 @@
-﻿"""Unified cognition evidence policy and leaf-grounding resolver for AIOS v3.0.
+"""Unified cognition evidence policy and leaf-grounding resolver for AIOS v3.0.
 
 This module provides the central policy layer (CognitionEvidencePolicy) ensuring
 that any durable Claim creation or revision is grounded in qualifying reality leaves
@@ -17,7 +17,6 @@ from pydantic import ValidationError
 from aios_core.contracts.enums import (
     ObjectType,
     SourceClass,
-    SummaryStatus,
 )
 from aios_core.contracts.models import Dependency, EvidenceSet, Summary, Wake
 from aios_core.contracts.refs import ObjectRef, SourceRef
@@ -85,6 +84,8 @@ _SUPPORT_DEPENDENCY_TYPES = frozenset(
         "claim_retract_uses_evidence_set",
         "evidence_set_contains_source",
         "revision_evidence_set_contains_source",
+        "event_uses_evidence_set",
+        "event_evidence_set_contains_source",
         "goal_uses_evidence_set",
         "goal_evidence_set_contains_source",
         "goal_transition_uses_evidence_set",
@@ -122,11 +123,30 @@ _TRANSPARENT_GROUNDING_CONTAINERS = frozenset(
     }
 )
 
-# AI-authored experience objects may summarize a real case. Their exact dependency
-# lineage is followed so the real Outcome/user/world feedback, not the experience
-# prose, is what can close grounding.
+# AI-authored case objects may anchor or summarize a real case. Their exact
+# dependency lineage is followed so the real Outcome/user/world feedback, not the
+# AI-authored prose, is what can close grounding.
+#
+# C15-RCC-EVIDENCE-POLICY-001 semantic decision — ObjectType.EVENT:
+# An EventAnchor is committed with source_class=AI_COGNITION because the resident
+# AI authors its `title`/`interpretation`. It is nevertheless a LEGAL cognition
+# grounding container, for the same reason the Experience objects are: an
+# EventAnchor cannot be created without pinned `evidence_refs` (see
+# EventWriteRequest, which enforces `min_length=1` plus a pinned-ref check), and
+# those refs are persisted as real support edges. The Event therefore *carries*
+# provenance to reality rather than asserting an unsupported new fact.
+#
+# Membership here does NOT make an EventAnchor a leaf. It is still recorded as an
+# AI_COGNITION atomic source (has_ai_cognition=True) and never enters
+# grounding_leaf_refs. It only stops being a grounding *barrier*, so traversal can
+# continue to the real USER/SENSOR/PLATFORM/SAFETY leaves underneath it. An Event
+# whose own lineage bottoms out in AI cognition still fails closed, and Event
+# prose alone can never terminate proof. This preserves the C14 rule that a
+# navigational/compressing container may not terminate proof, while keeping the
+# pre-existing legal path Observation -> Event -> Claim formable.
 _CASE_GROUNDING_CONTAINERS = frozenset(
     {
+        ObjectType.EVENT,
         ObjectType.OPERATION_EXPERIENCE,
         ObjectType.COMMUNICATION_EXPERIENCE,
     }

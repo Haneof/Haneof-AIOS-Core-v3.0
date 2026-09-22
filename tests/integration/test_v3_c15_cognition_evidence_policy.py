@@ -1,4 +1,4 @@
-﻿"""Integration tests for C15 CognitionEvidencePolicy evidence closure.
+"""Integration tests for C15 CognitionEvidencePolicy evidence closure.
 
 Verifies:
 1. Reality leaf closure is required for all Claim creation and revision.
@@ -39,6 +39,7 @@ from aios_core.contracts.models import (
 )
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef, SourceRef
+from aios_core.events.service import EventDimensionService, EventWriteRequest
 from aios_core.contracts.time import TemporalExtent, TimePrecision
 from aios_core.policy.evidence import (
     CognitionEvidencePolicy,
@@ -585,3 +586,360 @@ def test_direct_writeback_and_revision_services_enforce_policy(tmp_path):
         changed_at=NOW,
     )
     assert rev_receipt.new_revision == 2
+
+# ---------------------------------------------------------------------------
+# C15-RCC-EVIDENCE-POLICY-001 — legal grounding paths per evidence object type.
+#
+# These positive controls exist to prove the unified policy is not over-tight:
+# every one of these is an ordinary, legal cognition opportunity that existed
+# before the policy layer and must keep forming afterwards.
+# ---------------------------------------------------------------------------
+
+
+def _seed_action_outcome(
+    store: SQLiteWorldStore,
+    *,
+    obs_ref: ObjectRef,
+    action_id: str = "act_legal",
+    outcome_id: str = "out_legal",
+) -> tuple[ObjectRef, ObjectRef]:
+    """Seed a real platform Action + Outcome supported by a real user Observation."""
+    action = Action(
+        object_id=action_id,
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW - timedelta(hours=2)),
+        learned_at=NOW - timedelta(hours=2),
+        recorded_at=NOW - timedelta(hours=2),
+        created_by="test:c15",
+        execution_id=f"exec-{action_id}",
+        action_type="send_report",
+        action_status=ActionStatus.COMPLETED,
+        payload={"channel": "team"},
+        expected_outcome="delivery accepted",
+    )
+    outcome = Outcome(
+        object_id=outcome_id,
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW - timedelta(minutes=30)),
+        learned_at=NOW - timedelta(minutes=30),
+        recorded_at=NOW - timedelta(minutes=30),
+        created_by="test:c15",
+        action_ref=ObjectRef(object_id=action_id, revision=1),
+        outcome_state="completed",
+        payload={"delivery": "accepted"},
+        evidence_refs=[obs_ref],
+    )
+    store.commit(
+        [action, outcome],
+        OperationRequest(
+            operation_name="test.seed.action_outcome",
+            expected_world_revision=int(store.current_world_revision()),
+            reason="seed real platform action/outcome",
+            idempotency_key=f"seed-ao-{action_id}",
+            source_class=SourceClass.PLATFORM,
+        ),
+    )
+    return (
+        ObjectRef(object_id=action_id, revision=1),
+        ObjectRef(object_id=outcome_id, revision=1),
+    )
+
+
+def test_observation_is_a_legal_grounding_path(tmp_path):
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    obs_ref = _seed_observation(store, object_id="obs_legal_plain")
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    lineage = CognitionEvidencePolicy(store=store, index=index).validate(
+        [obs_ref],
+        operation="legal_observation",
+    )
+    assert lineage.classification is DerivedLineageClass.REALITY
+    assert lineage.grounding_leaf_refs == (obs_ref,)
+
+    receipt = CognitionWritebackService(store=store, index=index).commit_claim(
+        ClaimWriteRequest(
+            content="Observation-grounded claim",
+            evidence_refs=(obs_ref,),
+            confidence=0.8,
+            dimension="dim:user_ai_interaction",
+        ),
+        learned_at=NOW,
+    )
+    assert store.get_payload(receipt.claim_id)["revision"] == 1
+
+
+def test_action_is_a_legal_grounding_path(tmp_path):
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    obs_ref = _seed_observation(store, object_id="obs_legal_action")
+    action_ref, _ = _seed_action_outcome(
+        store,
+        obs_ref=obs_ref,
+        action_id="act_legal_a",
+        outcome_id="out_legal_a",
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    lineage = CognitionEvidencePolicy(store=store, index=index).validate(
+        [action_ref],
+        operation="legal_action",
+    )
+    assert lineage.classification is DerivedLineageClass.REALITY
+    assert lineage.grounding_leaf_refs
+
+    receipt = CognitionWritebackService(store=store, index=index).commit_claim(
+        ClaimWriteRequest(
+            content="Action-grounded claim",
+            evidence_refs=(action_ref,),
+            confidence=0.8,
+            dimension="dim:user_ai_interaction",
+        ),
+        learned_at=NOW,
+    )
+    assert store.get_payload(receipt.claim_id)["revision"] == 1
+
+
+def test_outcome_is_a_legal_grounding_path(tmp_path):
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    obs_ref = _seed_observation(store, object_id="obs_legal_outcome")
+    _, outcome_ref = _seed_action_outcome(
+        store,
+        obs_ref=obs_ref,
+        action_id="act_legal_o",
+        outcome_id="out_legal_o",
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    lineage = CognitionEvidencePolicy(store=store, index=index).validate(
+        [outcome_ref],
+        operation="legal_outcome",
+    )
+    # A PLATFORM-committed Outcome is itself a qualifying reality leaf.
+    assert lineage.classification is DerivedLineageClass.REALITY
+    assert outcome_ref in lineage.grounding_leaf_refs
+    assert lineage.has_ai_cognition is False
+
+    receipt = CognitionWritebackService(store=store, index=index).commit_claim(
+        ClaimWriteRequest(
+            content="Outcome-grounded strategy claim",
+            evidence_refs=(outcome_ref,),
+            confidence=0.8,
+            dimension="dim:user_ai_interaction",
+        ),
+        learned_at=NOW,
+    )
+    assert store.get_payload(receipt.claim_id)["revision"] == 1
+
+
+def test_event_anchor_is_a_legal_case_grounding_container(tmp_path):
+    """EventAnchor is AI-authored but carries pinned reality evidence.
+
+    Semantic decision C15-RCC-EVIDENCE-POLICY-001: EventAnchor is a legal case
+    grounding container. It is never itself a grounding leaf, but it must not block
+    the path to the real Observation underneath it.
+    """
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    obs_ref = _seed_observation(
+        store,
+        object_id="obs_legal_event",
+        value="user said he moved to Berlin",
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    events = EventDimensionService(store=store, index=index)
+    event_receipt = events.form_event(
+        EventWriteRequest(
+            title="Moved to Berlin",
+            interpretation="user relocated",
+            dimension="dim:user_ai_interaction",
+            event_time=TemporalExtent.point(NOW - timedelta(minutes=30)),
+            evidence_refs=(obs_ref,),
+            confidence=0.9,
+        ),
+        learned_at=NOW,
+    )
+    event_ref = ObjectRef(object_id=event_receipt.event_id, revision=1)
+
+    lineage = CognitionEvidencePolicy(store=store, index=index).validate(
+        [event_ref],
+        operation="legal_event",
+    )
+    # The Event itself is AI-authored, so the lineage is MIXED, not pure REALITY.
+    assert lineage.classification is DerivedLineageClass.MIXED
+    assert lineage.has_ai_cognition is True
+    # The real Observation underneath still closes the proof.
+    assert obs_ref in lineage.grounding_leaf_refs
+    # The Event is never itself a grounding leaf.
+    assert event_ref not in lineage.grounding_leaf_refs
+
+    receipt = CognitionWritebackService(store=store, index=index).commit_claim(
+        ClaimWriteRequest(
+            content="User lives in Berlin",
+            evidence_refs=(event_ref,),
+            confidence=0.8,
+            dimension="dim:user_ai_interaction",
+        ),
+        learned_at=NOW,
+    )
+    assert store.get_payload(receipt.claim_id)["revision"] == 1
+
+
+def test_event_anchor_over_ai_only_lineage_still_fails_closed(tmp_path):
+    """Case-container status must not become a laundering route.
+
+    An Event whose own evidence is an ungrounded Claim/Summary cannot manufacture
+    grounding. Only real leaves underneath the Event may close the proof.
+    """
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    obs_ref = _seed_observation(store, object_id="obs_event_launder")
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    claim_ref = _seed_claim(store, index, evidence_refs=(obs_ref,))
+    ungrounded_summary = _seed_summary(
+        store,
+        object_id="sum_event_launder",
+        claim_refs=(claim_ref,),
+    )
+
+    events = EventDimensionService(store=store, index=index)
+    event_receipt = events.form_event(
+        EventWriteRequest(
+            title="Laundered event",
+            interpretation="event built only on AI cognition",
+            dimension="dim:user_ai_interaction",
+            event_time=TemporalExtent.point(NOW - timedelta(minutes=10)),
+            evidence_refs=(ungrounded_summary,),
+            confidence=0.9,
+        ),
+        learned_at=NOW,
+    )
+    event_ref = ObjectRef(object_id=event_receipt.event_id, revision=1)
+
+    policy = CognitionEvidencePolicy(store=store, index=index)
+    with pytest.raises(ValueError, match="leaf-grounded evidence closure rejected"):
+        policy.validate([event_ref], operation="laundered_event")
+
+
+def test_event_grounded_cognition_forms_on_an_ordinary_user_turn(tmp_path):
+    """End-to-end control for the ordinary-turn entrypoint, not just the policy."""
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    obs_ref = _seed_observation(store, object_id="obs_turn_event")
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    events = EventDimensionService(store=store, index=index)
+    event_receipt = events.form_event(
+        EventWriteRequest(
+            title="Turn event",
+            interpretation="event formed from real user observation",
+            dimension="dim:user_ai_interaction",
+            event_time=TemporalExtent.point(NOW - timedelta(minutes=5)),
+            evidence_refs=(obs_ref,),
+            confidence=0.9,
+        ),
+        learned_at=NOW,
+    )
+    event_arg = {"object_id": event_receipt.event_id, "revision": 1}
+
+    def model(snapshot):
+        if len(snapshot.capability_history) == 0:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="commit_claim",
+                        arguments={
+                            "content": "Event-grounded claim on ordinary turn",
+                            "evidence_refs": [event_arg],
+                            "confidence": 0.8,
+                            "dimension": "dim:user_ai_interaction",
+                        },
+                    ),
+                )
+            )
+        assert snapshot.capability_history[0].ok is True, (
+            snapshot.capability_history[0].error_message
+        )
+        return ModelDirective(response="done")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    result = runtime.run_turn(
+        session_id="session_event",
+        turn_index=1,
+        user_input="hello",
+        current_topic=None,
+        occurred_at=NOW + timedelta(seconds=1),
+    )
+    assert result.runtime.capability_history[0].ok is True
+
+
+def test_services_enforce_policy_without_explicit_injection(tmp_path):
+    """Structural unification: no construction path can bypass the policy.
+
+    Constructing the cognition services directly, with no evidence_policy argument,
+    must still enforce leaf-grounded closure.
+    """
+    db = tmp_path / "world.db"
+    store = SQLiteWorldStore(db)
+    obs_ref = _seed_observation(store, object_id="obs_default_policy")
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    writeback = CognitionWritebackService(store=store, index=index)
+    revision = CognitionRevisionService(store=store, index=index)
+    ai_world = AIWorldCognitionService(store=store, index=index)
+
+    assert writeback.evidence_policy is not None
+    assert revision.evidence_policy is not None
+    assert ai_world.evidence_policy is not None
+
+    claim_ref = _seed_claim(store, index, evidence_refs=(obs_ref,))
+    ungrounded_summary = _seed_summary(
+        store,
+        object_id="sum_default_policy",
+        claim_refs=(claim_ref,),
+    )
+
+    with pytest.raises(ValueError, match="leaf-grounded evidence closure rejected"):
+        writeback.commit_claim(
+            ClaimWriteRequest(
+                content="bypass attempt",
+                evidence_refs=(ungrounded_summary,),
+                confidence=0.8,
+                dimension="dim:user_ai_interaction",
+            ),
+            learned_at=NOW,
+        )
+
+    with pytest.raises(ValueError, match="leaf-grounded evidence closure rejected"):
+        revision.apply(
+            ClaimRevisionRequest(
+                target_ref=claim_ref,
+                mode="revise",
+                reason="bypass attempt",
+                evidence_refs=(ungrounded_summary,),
+                replacement_content="revised without reality",
+            ),
+            changed_at=NOW,
+        )
+
+    with pytest.raises(ValueError, match="leaf-grounded evidence closure rejected"):
+        ai_world.commit(
+            AIWorldClaimRequest(
+                domain=AIWorldDomain.USER_UNDERSTANDING,
+                statement="bypass attempt",
+                evidence_refs=(ungrounded_summary,),
+                confidence=0.8,
+            ),
+            learned_at=NOW,
+        )
