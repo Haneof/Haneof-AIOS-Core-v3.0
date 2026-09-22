@@ -1,47 +1,64 @@
 #!/usr/bin/env bash
 set -euo pipefail
 RUN="reviews/internal_habitation/c15-rcc/v1/runs/resident-a-rerun-20260922"
-WORLD="$RUN/private_world.sqlite"; STATE="$RUN/release_state.json"; EVENT="$RUN/current-event.json"
-SESSION="resident-a-rerun-20260922-sol-001"
-mkdir -p "$RUN"/{release_receipts,cursor_lifecycle,checkpoints,capability_traces}
-ING="$RUN/release_receipts/cursor-003-ingest.json"; ACK="$RUN/release_receipts/cursor-003-ack.json"
-python reviews/internal_habitation/c15-rcc/v1/release/canonical_conversation_ingest.py   --world-db "$WORLD" --session-id "$SESSION" --turn-index 2 --event-file "$EVENT" | tee "$ING"
-REF="$(python -c 'import json,sys;print(json.load(open(sys.argv[1]))["ingest_ref"])' "$ING")"
-python reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack   --phase A --state "$STATE" --world-db "$WORLD" --sequence 3 --event-id c15rcc-003 --ingest-ref "$REF"   --conversation-session-id "$SESSION" --conversation-turn-index 2 | tee "$ACK"
-cat > "$RUN/cursor_lifecycle/cursor-003.json" <<JSON
-{"cursor":3,"event_id":"c15rcc-003","ingest_ref":"$REF","conversation_session_id":"$SESSION","turn_index":2,"acked":true}
-JSON
 python - <<'PY'
 import json,dataclasses
 from pathlib import Path
 from datetime import datetime
 from aios_core.world_graph import SQLiteWorldStore,WorldSearchIndex
-from aios_core.runtime import FusedTurnRuntime
+from aios_core.runtime import FusedTurnRuntime,ModelDirective,CapabilityCall
 run=Path("reviews/internal_habitation/c15-rcc/v1/runs/resident-a-rerun-20260922")
 event=json.loads((run/"current-event.json").read_text())
-world=SQLiteWorldStore(run/"private_world.sqlite"); index=WorldSearchIndex(run/"world_index.sqlite",store=world); caught=index.catch_up()
-now=datetime.fromisoformat(event["occurred_at"]); cp=run/"checkpoints"/"cursor-003-pending-decision.json"
+world=SQLiteWorldStore(run/"private_world.sqlite"); index=WorldSearchIndex(run/"world_index.sqlite",store=world); index.catch_up()
+now=datetime.fromisoformat(event["occurred_at"])
+trace=run/"capability_traces"/"cursor-003-user-turn.json"; wakecp=run/"checkpoints"/"cursor-003-post-turn-wake.json"
 class NeedDecision(Exception): pass
 def dump(o):
     if dataclasses.is_dataclass(o): return dataclasses.asdict(o)
     if hasattr(o,"model_dump"): return o.model_dump(mode="json")
     return str(o)
-def save(kind,obj):
-    cp.write_text(json.dumps({"cursor":3,"timestamp":event["occurred_at"],"kind":kind,"payload":dump(obj)},ensure_ascii=False,indent=2,default=str)); raise NeedDecision(kind)
-def mh(s): save("runtime_snapshot",s)
-def dh(x): save("dimension_summary_input",x)
-def rh(x): save("round_summary_input",x)
-rt=FusedTurnRuntime(store=world,index=index,model_handler=mh,dimension_summary_handler=dh,round_summary_handler=rh)
-print("INDEX",json.dumps({"caught":caught,"watermark":index.watermark(),"lag":index.lag(),"world_revision":world.current_world_revision()}))
+def handler(s):
+    if s.wake_reason=="user_interaction":
+        if s.round_index==0:
+            return ModelDirective(capability_calls=(
+                CapabilityCall(name="revise_claim",arguments={
+                    "target_ref":{"object_id":"clm_8278e5aa7a14155689d343c1","revision":1},
+                    "reason":"用户进一步明确 Atlas staging 的测试环境自主决策和生产边界升级方式。",
+                    "evidence_refs":[
+                        {"object_id":"obs_conv_user_bc08dbb216ee8ecb3412c93f","revision":1},
+                        {"object_id":"obs_conv_user_f39b955edaf19ae48a8cf497","revision":1}
+                    ],
+                    "replacement_content":"在当前 Atlas staging 收尾期间，用户希望 Resident 对测试环境及日常工程实现细节自主决策，不逐步请求确认；完成后汇报结果与关键风险。涉及生产影响、生产数据变更、数据删除或产生费用的边界事项，需要单独并集中列出供用户决定。",
+                    "confidence":0.99
+                }),
+                CapabilityCall(name="revise_claim",arguments={
+                    "target_ref":{"object_id":"clm_5a9a70582966de897e504a21","revision":1},
+                    "reason":"用户补充了测试环境自主推进与生产数据边界集中决策的协作分工。",
+                    "evidence_refs":[
+                        {"object_id":"obs_conv_user_bc08dbb216ee8ecb3412c93f","revision":1},
+                        {"object_id":"obs_conv_user_f39b955edaf19ae48a8cf497","revision":1}
+                    ],
+                    "replacement_content":"Atlas staging 当前协作分工是：Resident 自主推进测试环境与日常工程实现细节，不逐步等待用户确认；完成后向用户提供结果和关键风险。涉及生产影响或生产数据变更、数据删除、费用的事项，应集中列出并提请用户决定。",
+                    "confidence":0.99
+                })
+            ))
+        trace.write_text(json.dumps({"cursor":3,"round_index":s.round_index,"capability_history":[dump(x) for x in s.capability_history],"resident_response":"明白。测试环境和日常实现我会自己定并推进，不逐步打断你；做完直接给你结果和关键风险。遇到生产数据变更、删除或费用边界，我会把需要你决定的事项集中列出来。"},ensure_ascii=False,indent=2,default=str))
+        return ModelDirective(response="明白。测试环境和日常实现我会自己定并推进，不逐步打断你；做完直接给你结果和关键风险。遇到生产数据变更、删除或费用边界，我会把需要你决定的事项集中列出来。")
+    wakecp.write_text(json.dumps({"cursor":3,"timestamp":event["occurred_at"],"runtime_snapshot":dump(s)},ensure_ascii=False,indent=2,default=str))
+    raise NeedDecision
+rt=FusedTurnRuntime(store=world,index=index,model_handler=handler)
+res=rt.run_turn(session_id="resident-a-rerun-20260922-sol-001",turn_index=2,user_input=event["resident_visible_payload"],occurred_at=now)
+(run/"checkpoints"/"cursor-003-user-turn-result.json").write_text(json.dumps(dump(res),ensure_ascii=False,indent=2,default=str))
+print("TURN",json.dumps(dump(res),ensure_ascii=False,default=str))
+index.catch_up()
+print("STATE",json.dumps({"world_revision":world.current_world_revision(),"watermark":index.watermark(),"lag":index.lag()}))
 try:
-    print("SUMMARY",dump(rt.run_due_dimension_summaries(now=now)))
     while True:
         w=rt.dispatch_next_pending_wake(now=now)
-        if w is None: break
-        print("WAKE",dump(w))
-    print("REVIEW",dump(rt.run_periodic_review(now=now)))
-    rt.run_turn(session_id="resident-a-rerun-20260922-sol-001",turn_index=2,user_input=event["resident_visible_payload"],occurred_at=now)
-except NeedDecision as e:
-    print("NEED_RESIDENT_DECISION",e)
-    print(cp.read_text())
+        if w is None:
+            print("NO_MORE_DUE_WAKE");break
+        print("WAKE",json.dumps(dump(w),ensure_ascii=False,default=str))
+except NeedDecision:
+    print("NEED_DUE_WAKE_DECISION")
+    print(wakecp.read_text())
 PY
