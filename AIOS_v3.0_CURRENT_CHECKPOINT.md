@@ -14,9 +14,9 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
-## 当前工程断点 — C14-SEM-REPAIR-FIX-001 已完成 fixture/Gate，PR #83 待合并
+## 当前工程断点 — C14-SEM-REPAIR-FIX-001 已完成并合入 main
 
-- Task: `C14-SEM-REPAIR-FIX-001 = DONE`（本 PR 合入 main 后生效）
+- Task: `C14-SEM-REPAIR-FIX-001 = DONE`
 - Evaluated / starting main: `1c20e548822b7aa6b5cb980995ff5de7902e3ac9`
 - Branch: `c14/semantic-repair-fixture-20260922-sol`
 - Mechanical fixture candidate: `077348619a6e827a34f464fccc4c189edd7d1f1c`
@@ -37,7 +37,7 @@
 - Historical evidence diff: `reviews/internal_habitation/c14-resident/v2/** = 0`; PR #75/#79 evidence was not edited.
 - Resident semantic execution: 0.
 - Completion evidence: `reviews/internal_habitation/c14-resident/semantic-repair-v1/C14_SEM_REPAIR_FIX_001_COMPLETION_EVIDENCE_2026-09-22.md`
-- Next READY after merge: `C14-SEM-REPAIR-RES-001`.
+- Current next READY: `C14-SEM-REPAIR-RES-001`.
 - This window stops after fixture/governance closure and does not run the Resident repair.
 
 ## 当前工程断点 — Resident Cognitive Continuity 路线已冻结，先执行 C14 最小语义修复
