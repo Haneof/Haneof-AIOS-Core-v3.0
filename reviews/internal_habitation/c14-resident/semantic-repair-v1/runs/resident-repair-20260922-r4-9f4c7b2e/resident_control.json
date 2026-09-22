@@ -1,11 +1,9 @@
 {
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
   "nonce": "9f4c7b2e-6a31-4c97-bd28-1f0b88a9d453",
-  "kind": "DIRECTIVE",
-  "item_id": "cp0004",
+  "kind": "EVENT_SEEN",
+  "item_id": "c14semrep-005",
   "payload": {
-    "checkpoint_id": "cp0004",
-    "silence": true,
-    "decision_rationale": "The review anchors reduce to three underlying observations: one focus-mode interval, one early task submission, and one later short-sleep record. Their coexistence does not establish a stable work pattern or causal relation, and the summaries add no independent evidence."
+    "seen": true
   }
 }
