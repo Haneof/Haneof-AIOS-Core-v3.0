@@ -1,9 +1,9 @@
 {
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
   "nonce": "9f4c7b2e-6a31-4c97-bd28-1f0b88a9d453",
-  "kind": "EVENT_SEEN",
-  "item_id": "c14semrep-007",
+  "kind": "SUMMARY_RESPONSE",
+  "item_id": "sum0004",
   "payload": {
-    "seen": true
+    "content": "2026-11-06 上午有三次实际接通并结束的通话：08:58–09:09 供应商电话，09:37–09:49 团队临时同步，10:08–10:19 客户回电。"
   }
 }
