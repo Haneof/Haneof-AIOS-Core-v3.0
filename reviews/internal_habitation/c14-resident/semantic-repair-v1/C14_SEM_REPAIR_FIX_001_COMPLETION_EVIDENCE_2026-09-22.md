@@ -6,7 +6,9 @@
 > Starting main: `1c20e548822b7aa6b5cb980995ff5de7902e3ac9`  
 > Branch: `c14/semantic-repair-fixture-20260922-sol`  
 > PR: #83  
-> Mechanical candidate: `077348619a6e827a34f464fccc4c189edd7d1f1c`
+> Mechanical candidate: `077348619a6e827a34f464fccc4c189edd7d1f1c`  
+> Final PR candidate: `11ee54c0ecaca3462fd526f27c2a5b526a6e8295`  
+> Merge SHA: `aacf70e381a78b5955304e894ebce445ce3ffe49`
 
 ## 1. Scope
 
@@ -89,7 +91,8 @@ Repair USER conversation events are made stricter: generic mechanical ingest rej
 ## 7. Mechanical Gate
 
 Workflow: `c14-semantic-repair-fixture`  
-Run: `35678533993`  
+Pre-governance run: `35678533993` — **SUCCESS**  
+Final exact-candidate run: `35678649521` — **SUCCESS**  
 Formal Python: `3.12.14`  
 Conclusion: **SUCCESS**
 
@@ -145,7 +148,7 @@ Therefore the historical fixture and Resident A/B evidence are unchanged by this
 
 ## 10. Handoff
 
-After this fixture task is merged and the governance checkpoint records the merge:
+PR #83 is merged at `aacf70e381a78b5955304e894ebce445ce3ffe49`, and the governance checkpoint records the merge:
 
 - `C14-SEM-REPAIR-FIX-001 = DONE`
 - `C14-SEM-REPAIR-RES-001 = READY`
