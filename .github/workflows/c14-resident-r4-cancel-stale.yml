@@ -1,4 +1,4 @@
-name: C14 Resident R4 Cancel Stale Runs
+name: C14 Resident R4 Abort Contaminated Run
 
 on:
   push:
@@ -15,11 +15,11 @@ jobs:
   cancel-stale:
     runs-on: ubuntu-latest
     steps:
-      - name: Cancel remaining stale Resident run
+      - name: Abort contaminated Resident run
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
         run: |
-          for run_id in 35687210543; do
+          for run_id in 35687357582; do
             gh api --method POST "/repos/$GH_REPO/actions/runs/$run_id/cancel" || true
           done
