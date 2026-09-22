@@ -1,0 +1,9 @@
+{
+  "run_id": "c14-sem-repair-resident-20260922-sol-r1",
+  "kind": "DIRECTIVE",
+  "item_id": "cp0001",
+  "payload": {
+    "checkpoint_id": "cp0001",
+    "silence": true
+  }
+}
