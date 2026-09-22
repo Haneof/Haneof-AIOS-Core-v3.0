@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "/opt/hostedtoolcache/Python/3.12.14/x64/bin/python",
+    "/home/runner/work/Haneof-AIOS-Core-v3.0/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c14-resident/semantic-repair-v1/release/release_operator.py",
+    "ack",
+    "--phase",
+    "A",
+    "--state",
+    "/home/runner/work/Haneof-AIOS-Core-v3.0/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c14-resident/semantic-repair-v1/runs/resident-repair-20260922-r2/release_state.json",
+    "--world-db",
+    "/home/runner/work/Haneof-AIOS-Core-v3.0/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c14-resident/semantic-repair-v1/runs/resident-repair-20260922-r2/private_world.sqlite",
+    "--sequence",
+    "3",
+    "--event-id",
+    "c14semrep-003",
+    "--ingest-ref",
+    "obs_c14_fixture_d15395b6bb573ddfcc1abbe9@1"
+  ],
+  "returncode": 0
+}
