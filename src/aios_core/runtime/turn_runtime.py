@@ -2928,6 +2928,10 @@ class FusedTurnRuntime:
             if not isinstance(stored_step0_raw, Mapping):
                 raise ValueError("persisted Wake delivery Step0 metadata is invalid")
             stored_step0 = Step0GateResult.model_validate(stored_step0_raw)
+            if not stored_step0.delivery_allowed:
+                raise ValueError(
+                    "persisted Wake delivery cannot carry a denied Step0 result"
+                )
             delivery_text = persisted_delivery.get("value")
             if not isinstance(delivery_text, str):
                 raise ValueError("persisted Wake delivery text is invalid")
