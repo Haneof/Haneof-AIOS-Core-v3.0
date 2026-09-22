@@ -14,6 +14,20 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
+## 当前工程断点 — C14-SEM-REPAIR-EVAL-001 已完成：C14 RESIDENT SEMANTIC EVIDENCE = VALID，唯一下一 READY = C14-CLOSE-001
+
+- 2026-09-22 更新：`C14-SEM-REPAIR-EVAL-001 = DONE`（独立语义评估完成）；`C14-CLOSE-001 = READY`；`C15-RCC-RULE-001` 保持 **BLOCKED**（直到 C14-CLOSE 真正完成）。
+- Evaluated live main: `655e1d48c2b53dd4f5a10485a9d530ed13ca69a3`；run's declared evaluated main: `7611fa5059f5dc8a20835cab5b312be2f43d11e8`。
+- Canonical evidence: **PR #92 @ exact head `9e870514b57bf07c00018d7dcf7435f2702f8730` ONLY（保持 OPEN / UNMERGED / PINNED，永远禁止 merge）**；试运行 PR #84–#91 未被使用。
+- 独立重算并匹配：World SHA256 `a7a7cd9f9166eb41d3b93d85820a9c7a4ab0aa57b81787d89f395482742bae57`；release-state SHA256 `4f41d709a76e0f40ce5b0093f540cc286dde84a1906a575019199cc7a7970081`；index SHA256 `ae296ee44a000eb7ea5bf122184bfb9dd65c80f14f9e94e9fb64fce039658caf`；fixture SHA256 `1095d5aef52061753db7d9dab558af1361b92976f2ded0e6956d70afe3e6527f`（与 main 逐字节一致）。
+- **E1 = VALID**：`clm_b4df2179bb8ffec020a39ede` rev1@wr20 → rev2@wr44 → rev3@wr77；EvidenceSet 3/6/12 个 pinned 非 Summary 叶子逐一闭合每条 material fact；hypothesis 纪律保持；confidence 0.65→0.70→0.78 均由新增真实叶子支撑。
+- **E5 = VALID**：cp0007–cp0009（仅计划窗口）未把 11-10 会议写成已发生；rev3 仅在 cursor 10/11/12 真实证据到达后以 Plan/Observed/Outcome 显式分层升级；external-failure（cursor 13–15）期间无 self-blame、无无关 Claim 修改、wr78 后零语义写入。
+- Repair contamination 审计：无 pseudo-LLM / keyword→Claim / oracle / future leak；`src/aios_core/**` diff = 0；`reviews/internal_habitation/c14-resident/v2/**` diff = 0；PR #75（`cb9b56b7…`）/ PR #79（`546449a4…`）head 未动；fixture/evaluator/release 目录与 main 逐字节一致。
+- Combined matrix：E1 VALID / E2 VALID / E3 VALID / E4 VALID / E5 VALID / E6 VALID → **`C14 RESIDENT SEMANTIC EVIDENCE = VALID`**。
+- Evaluator report: `reviews/C14_SEM_REPAIR_EVAL_001_INDEPENDENT_SEMANTIC_EVALUATION_2026-09-22.md`（含 limitations：provenance 无法密码学证明、run-end 两个 pending trigger（wr81/wr83）未派发、若干非阻断措辞观察）。
+- 本窗口未修改 Core、fixture、Claim、EvidenceSet、World、Resident run；未创建“正确答案”。
+- 下一步：`C14-CLOSE-001`（新独立窗口）只做收口审计，不得写新 Core 功能；收口必须保留 PR #75/#79/#92 OPEN/UNMERGED/PINNED。
+
 ## 当前工程断点 — C14-SEM-REPAIR-RES-001 证据已由 PM 正式接受，唯一下一 READY = C14-SEM-REPAIR-EVAL-001
 
 - 2026-09-22 更新：`C14-SEM-REPAIR-RES-001 = DONE`（PM evidence acceptance 完成）；`C14-SEM-REPAIR-EVAL-001 = READY`。
