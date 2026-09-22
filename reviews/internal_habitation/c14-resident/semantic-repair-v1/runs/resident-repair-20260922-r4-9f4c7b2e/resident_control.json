@@ -1,9 +1,20 @@
 {
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
   "nonce": "9f4c7b2e-6a31-4c97-bd28-1f0b88a9d453",
-  "kind": "SUMMARY_RESPONSE",
-  "item_id": "sum0010",
+  "kind": "DIRECTIVE",
+  "item_id": "cp0006",
   "payload": {
-    "content": "2026-11-02 至 2026-11-08 的工作结果记录包含两项：11 月 3 日“API 迁移说明”第一版 10:27 提交，登记目标 10:45；11 月 6 日“权限迁移说明”第一版 12:02 提交，登记目标 11:00。"
+    "checkpoint_id": "cp0006",
+    "capability_calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 32
+        },
+        "call_id": "cp0006-read-anchors"
+      }
+    ],
+    "decision_rationale": "This review spans 11 anchors across multiple dimensions and summary levels. Inspect the exact pinned anchors before deciding whether the two observed work cases justify only a hypothesis, a durable claim, or continued silence."
   }
 }
