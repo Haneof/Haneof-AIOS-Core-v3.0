@@ -1,11 +1,49 @@
 {
-  "capability_call_count": 5,
-  "cognition_calls": [],
+  "capability_call_count": 6,
+  "cognition_calls": [
+    {
+      "arguments": {
+        "claim_type": "pattern_hypothesis",
+        "confidence": 0.58,
+        "content": "在目前两个已观察的文档任务案例中，较连续的无通话专注窗口与提前提交同现；多次实际通话的上午与延后提交同现。两例睡眠状态也不同且样本很小，因此目前只支持暂定关联，不支持专注或通话对交付时点的因果结论。",
+        "dimension": "dim:work_pattern",
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_5bf4b05a9dafdb85ec5bb688",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_16b3967abe086c1bbae30bf7",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_3187c6e6c4a710447d75b09e",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_536104c70eaad761d2583410",
+            "revision": 1
+          }
+        ],
+        "knowledge_state": "hypothesis"
+      },
+      "checkpoint_id": "cp0009",
+      "name": "commit_claim"
+    }
+  ],
   "complete": false,
   "conversation_turn_index": 0,
   "current_simulated_timestamp": "2026-11-10T07:34:00-08:00",
   "errors": [],
-  "next_checkpoint": 9,
+  "next_checkpoint": 10,
   "next_summary_request": 11,
   "phase": "B",
   "released_cursors": [
@@ -78,6 +116,14 @@
     },
     {
       "checkpoint_id": "cp0008",
+      "directive_kind": "capability_calls",
+      "github_author": "single-window-resident-control",
+      "released_cursor": 7,
+      "simulated_timestamp": "2026-11-10T07:34:00-08:00",
+      "world_revision_before": 38
+    },
+    {
+      "checkpoint_id": "cp0009",
       "directive_kind": "capability_calls",
       "github_author": "single-window-resident-control",
       "released_cursor": 7,
