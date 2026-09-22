@@ -1,0 +1,105 @@
+{
+  "kind": "dimension_summary",
+  "checkpoint_id": "sum0011",
+  "summary_id": "sum0011",
+  "simulated_time": "2026-11-06T11:10:00-08:00",
+  "current_released_cursor": 13,
+  "world_revision_before": 83,
+  "request": {
+    "dimension": "dim:user_ai_interaction",
+    "granularity": "day",
+    "window_start": "2026-11-04T00:00:00Z",
+    "window_end": "2026-11-04T23:59:59.999999Z",
+    "source_world_revision": 83,
+    "sources": [
+      {
+        "object_id": "obs_conv_ai_fff46dab8642ef4767cc1458",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-11-04T21:42:00Z",
+        "text": "还不能通知门店。我这边只有 13:30 的记录：镜像 edge-2026.11.4 构建完成，状态是 READY_FOR_UPLOAD；registry 上传已排队，计划 14:00 才开始。那条记录没有 tag、digest，也没有 upload-complete。现在是 13:42，没有更新的完成记录，所以不能说已经推到 registry。",
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "assistant",
+          "session_id": "resident-a-c15-rcc-20260922",
+          "turn_index": 5,
+          "turn_key": "c40bedb9e4c3612299faefcf"
+        }
+      },
+      {
+        "object_id": "obs_conv_user_24843998506b575cc3f98915",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-11-04T21:42:00Z",
+        "text": "我刚开完会，那个镜像已经推到 registry 了吗？如果好了我就通知门店开始测。",
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "user",
+          "session_id": "resident-a-c15-rcc-20260922",
+          "turn_index": 5,
+          "turn_key": "c40bedb9e4c3612299faefcf"
+        }
+      },
+      {
+        "object_id": "obs_conv_ai_718dc834318477eb0dbff23f",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-11-04T22:24:00Z",
+        "text": "明白。准备提交、已排队，和确实完成，我会分开说。没有完成记录，就按没确认完成处理。这次 tag 还没出来，edge-2026.11.4 仍然不能算已发布。",
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "assistant",
+          "session_id": "resident-a-c15-rcc-20260922",
+          "turn_index": 6,
+          "turn_key": "02eddd8d65ab2a2990642262"
+        }
+      },
+      {
+        "object_id": "obs_conv_user_1b929906e9a92dce0e19ef96",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-11-04T22:24:00Z",
+        "text": "我后台也看到 tag 还没出来。以后这种“准备提交、已排队”和“确实完成”要分开说；没有完成记录时就按没确认完成处理。",
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "user",
+          "session_id": "resident-a-c15-rcc-20260922",
+          "turn_index": 6,
+          "turn_key": "02eddd8d65ab2a2990642262"
+        }
+      },
+      {
+        "object_id": "obs_conv_ai_b9e2ed5d3583b8456b40b6fb",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-11-04T23:07:00Z",
+        "text": "收到。通知是你发出的。我这边还没有门店已经开始测或测完的记录，所以先不把测试说成已经开始或通过。",
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "assistant",
+          "session_id": "resident-a-c15-rcc-20260922",
+          "turn_index": 7,
+          "turn_key": "0b3908e531fd7893bdfa1e70"
+        }
+      },
+      {
+        "object_id": "obs_conv_user_498b81effac90ab9381a2533",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-11-04T23:07:00Z",
+        "text": "现在状态对上了。门店测试通知我已经发出去了。",
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "user",
+          "session_id": "resident-a-c15-rcc-20260922",
+          "turn_index": 7,
+          "turn_key": "0b3908e531fd7893bdfa1e70"
+        }
+      }
+    ],
+    "truncated": false
+  },
+  "resident_authored_response": "2026-11-04 的对话有三轮。21:42Z 用户问镜像是否已经推到 registry，并说如果好了就通知门店开始测。我根据当时唯一的 13:30 记录回答还不能通知：只是构建完成、上传已排队、计划 14:00 开始，没有 tag、digest 或 upload-complete。22:24Z 用户说后台也看到 tag 还没出来，并要求以后把准备提交、已排队和确实完成分开说，没有完成记录就按没确认完成处理。我确认按这个区分，并说当时仍不能算已发布。23:07Z 用户说状态对上了，门店测试通知已经由用户发出。我确认通知是用户发出的，并说还没有门店已经开始测或测完的记录。这些是对话原文，不是测试结果。",
+  "decision_rationale": "Summarize the six conversation observations in time order. Keep notification distinct from test start.",
+  "world_revision_after": 85
+}

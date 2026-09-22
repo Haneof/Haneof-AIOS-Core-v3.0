@@ -1,0 +1,15 @@
+{
+  "capability_calls": [
+    {
+      "name": "inspect_world_object",
+      "arguments": {
+        "object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+        "revision": 1
+      },
+      "call_id": "cp0029-inspect-reject"
+    }
+  ],
+  "response": null,
+  "silence": false,
+  "decision_rationale": "An interrupt matched a new release record. Read it before deciding whether the user, who was about to notify stores, should hear it."
+}

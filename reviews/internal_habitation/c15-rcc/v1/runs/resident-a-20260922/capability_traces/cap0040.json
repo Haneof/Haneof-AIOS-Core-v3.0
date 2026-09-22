@@ -1,0 +1,192 @@
+{
+  "trace_id": "cap0040",
+  "checkpoint_id": "cp0040",
+  "cursor": 13,
+  "directive": {
+    "capability_calls": [
+      {
+        "name": "inspect_world_object",
+        "arguments": {
+          "object_id": "obs_c14_fixture_e2c76be3450b6e9dc8316b9d",
+          "revision": 1
+        },
+        "call_id": "cp0040-inspect-draft"
+      }
+    ],
+    "response": null,
+    "silence": false
+  },
+  "history_before": [
+    {
+      "name": "read_periodic_review_anchors",
+      "ok": true,
+      "data": [
+        {
+          "object_ref": {
+            "object_id": "obs_conv_ai_fff46dab8642ef4767cc1458",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-11-04T21:42:00Z",
+          "excerpt": "还不能通知门店。我这边只有 13:30 的记录：镜像 edge-2026.11.4 构建完成，状态是 READY_FOR_UPLOAD；registry 上传已排队，计划 14:00 才开始。那条记录没有 tag、digest，也没有 upload-complete。现在是 13:42，没有更新的完成记录，所以不能说已经推到 registry。"
+        },
+        {
+          "object_ref": {
+            "object_id": "obs_conv_user_24843998506b575cc3f98915",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-11-04T21:42:00Z",
+          "excerpt": "我刚开完会，那个镜像已经推到 registry 了吗？如果好了我就通知门店开始测。"
+        },
+        {
+          "object_ref": {
+            "object_id": "task_a5e9f5f12df83a410ab102e9",
+            "revision": 1
+          },
+          "object_type": "task",
+          "recorded_at": "2026-11-04T21:42:00Z",
+          "excerpt": "waiting_evidence: release_state records | next=Mechanically watch matching Observation facts; Resident interprets meaning only after Wake."
+        },
+        {
+          "object_ref": {
+            "object_id": "wake_bundle_f215f451b68389ceb109c3e1",
+            "revision": 3
+          },
+          "object_type": "wake",
+          "recorded_at": "2026-11-04T21:42:00Z",
+          "excerpt": "attention=background | source=attention_bundle | state=completed | priority=50 | hits=3 | termination=silence | rounds=1 | delivery=False | step0=background | capabilities=[]"
+        },
+        {
+          "object_ref": {
+            "object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-11-04T22:17:00Z",
+          "excerpt": "registry 上传尝试在 14:16 被拒绝：checksum mismatch。edge-2026.11.4 未发布，tag 未创建，registry 中没有对应 digest。"
+        },
+        {
+          "object_ref": {
+            "object_id": "wake_3df17e4ced76971ebbf90c05",
+            "revision": 3
+          },
+          "object_type": "wake",
+          "recorded_at": "2026-11-04T22:17:00Z",
+          "excerpt": "attention=interrupt | source=watch_match | state=completed | priority=50 | hits=1 | termination=responded | rounds=3 | delivery=True | step0=ok | capabilities=['inspect_world_object', 'commit_ai_world_claim']"
+        },
+        {
+          "object_ref": {
+            "object_id": "clm_cd72e732da9af444d863ca96",
+            "revision": 1
+          },
+          "object_type": "claim",
+          "recorded_at": "2026-11-04T22:24:00Z",
+          "excerpt": "用户要求以后把“准备提交、已排队”和“确实完成”分开说；没有完成记录时，按没确认完成处理。这是对这类发布状态说法的要求。用户同时说自己后台也看到 tag 还没出来。这还不是所有项目、所有状态的总规则。"
+        },
+        {
+          "object_ref": {
+            "object_id": "obs_conv_ai_718dc834318477eb0dbff23f",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-11-04T22:24:00Z",
+          "excerpt": "明白。准备提交、已排队，和确实完成，我会分开说。没有完成记录，就按没确认完成处理。这次 tag 还没出来，edge-2026.11.4 仍然不能算已发布。"
+        },
+        {
+          "object_ref": {
+            "object_id": "obs_conv_user_1b929906e9a92dce0e19ef96",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-11-04T22:24:00Z",
+          "excerpt": "我后台也看到 tag 还没出来。以后这种“准备提交、已排队”和“确实完成”要分开说；没有完成记录时就按没确认完成处理。"
+        },
+        {
+          "object_ref": {
+            "object_id": "obs_c14_fixture_291beec37165eb34a35f8f85",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-11-04T23:02:00Z",
+          "excerpt": "edge-2026.11.4 第二次上传成功；registry tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED。"
+        },
+        {
+          "object_ref": {
+            "object_id": "wake_c9ebc3c1cf7b2a3f1b9b953a",
+            "revision": 3
+          },
+          "object_type": "wake",
+          "recorded_at": "2026-11-04T23:02:00Z",
+          "excerpt": "attention=interrupt | source=watch_match | state=completed | priority=50 | hits=1 | termination=responded | rounds=3 | delivery=True | step0=ok | capabilities=['inspect_world_object', 'commit_ai_world_claim']"
+        },
+        {
+          "object_ref": {
+            "object_id": "clm_3b884846f2a60109552b3e53",
+            "revision": 1
+          },
+          "object_type": "claim",
+          "recorded_at": "2026-11-04T23:07:00Z",
+          "excerpt": "用户在 15:07 说状态对上了，并且门店测试通知已经由用户发出。这只是用户报告通知已发出，不说明门店已经开始测试，也不说明测试通过。"
+        },
+        {
+          "object_ref": {
+            "object_id": "obs_conv_ai_b9e2ed5d3583b8456b40b6fb",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-11-04T23:07:00Z",
+          "excerpt": "收到。通知是你发出的。我这边还没有门店已经开始测或测完的记录，所以先不把测试说成已经开始或通过。"
+        },
+        {
+          "object_ref": {
+            "object_id": "obs_conv_user_498b81effac90ab9381a2533",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-11-04T23:07:00Z",
+          "excerpt": "现在状态对上了。门店测试通知我已经发出去了。"
+        },
+        {
+          "object_ref": {
+            "object_id": "obs_c14_fixture_e2c76be3450b6e9dc8316b9d",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-11-06T19:10:00Z",
+          "excerpt": "“production 回滚自动化 runbook”已保存为 DRAFT v1；尚未评审、未执行、没有 Outcome，也没有用户验收记录。"
+        },
+        {
+          "object_ref": {
+            "object_id": "sum_3cbea124313860afc0ed7ede",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-11-06T19:10:00Z",
+          "excerpt": "2026-11-04 的用户理解维度新增两条认知。22:24Z 的一条写：用户要求把“准备提交、已排队”和“确实完成”分开说，没有完成记录就按没确认完成处理；用户当时也说后台看到 tag 还没出来。文本限定这不是所有项目、所有状态的总规则。23:07Z 的一条写：用户说状态对上了，并且门店测试通知已经由用户发出；这只是通知已发出的报告，不说明门店已经开始测试或测试通过。同窗口各有一个证据集支撑，没有额外事实。"
+        },
+        {
+          "object_ref": {
+            "object_id": "sum_bbd1e5bef32dcaf8f73ccf20",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-11-06T19:10:00Z",
+          "excerpt": "2026-11-04 的对话有三轮。21:42Z 用户问镜像是否已经推到 registry，并说如果好了就通知门店开始测。我根据当时唯一的 13:30 记录回答还不能通知：只是构建完成、上传已排队、计划 14:00 开始，没有 tag、digest 或 upload-complete。22:24Z 用户说后台也看到 tag 还没出来，并要求以后把准备提交、已排队和确实完成分开说，没有完成记录就按没确认完成处理。我确认按这个区分，并说当时仍不能算已发布。23:07Z 用户说状态对上了，门店测试通知已经由用户发出。我确认通知是用户发出的，并说还没有门店已经开始测或测完的记录。这些是对话原文，不是测试结果。"
+        },
+        {
+          "object_ref": {
+            "object_id": "sum_ddb6c40bb1513b2d42802bd3",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-11-06T19:10:00Z",
+          "excerpt": "2026-11-04 的发布状态有三条记录，不能并成一句完成。21:30Z：镜像 edge-2026.11.4 构建完成，状态 READY_FOR_UPLOAD，registry 上传已排队并计划 14:00 开始，当时没有 tag、digest 或 upload-complete。22:17Z：14:16 的上传尝试被拒绝，原因是 checksum mismatch；镜像未发布，tag 未创建，registry 中没有对应 digest。23:02Z：第二次上传成功，registry tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED。后一条是完成记录，不抹掉前面的排队和拒绝，来源里也没有门店测试或生产部署。"
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "call_id": "cp0039-anchors"
+    }
+  ]
+}

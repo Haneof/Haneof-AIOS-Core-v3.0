@@ -1,0 +1,143 @@
+{
+  "kind": "dimension_summary",
+  "checkpoint_id": "sum0002",
+  "summary_id": "sum0002",
+  "simulated_time": "2026-11-03T10:15:00-08:00",
+  "current_released_cursor": 6,
+  "world_revision_before": 29,
+  "request": {
+    "dimension": "dim:ai_user_understanding",
+    "granularity": "day",
+    "window_start": "2026-11-02T00:00:00Z",
+    "window_end": "2026-11-02T23:59:59.999999Z",
+    "source_world_revision": 29,
+    "sources": [
+      {
+        "object_id": "clm_38ad6d12fe669e009a9aa3ea",
+        "revision": 3,
+        "object_type": "claim",
+        "occurred_at": "2026-11-02T17:05:00Z",
+        "text": "用户要求 Atlas staging 收尾默认只给结果和关键风险；这类低风险实现可以保持这个节奏。真正影响生产或产生费用的事再集中提出。production 旧索引如果要删，还必须先给具体对象、影响和回滚办法，等用户明确确认后才执行；随口“清一下”不是授权。这仍不是用户在其他类型项目上的固定习惯。",
+        "metadata": {
+          "ai_domain": "user_understanding",
+          "ai_world": true,
+          "dimension": "dim:ai_user_understanding",
+          "revision_evidence_set_ref": {
+            "object_id": "evs_revision_a986791086d9c8af35f6a8f9",
+            "revision": 1
+          },
+          "revision_mode": "revise",
+          "revision_reason": "The user added a stricter confirmation protocol for deleting old production indexes. The older 'ask before delete' wording is no longer specific enough.",
+          "scope_key": "atlas-staging-closeout-2026-11",
+          "supersedes_revision": 2,
+          "tags": [
+            "core_context",
+            "atlas-staging",
+            "communication-preference"
+          ],
+          "writeback_kind": "revisable_cognition"
+        }
+      },
+      {
+        "object_id": "evs_836a851d44a4585280bc1722",
+        "revision": 1,
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-02T17:05:00Z",
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-02T17:05:00Z\", \"world_revision\": 1}, \"learned_at\": \"2026-11-02T17:05:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_40aac9b697910640bab07507\", \"revision\": 1}], \"metadata\": {\"ai_domain\": \"user_understanding\", \"ai_world\": true, \"dimension\": \"dim:ai_user_understanding\", \"scope_key\": \"atlas-staging-closeout-2026-11\", \"tags\": [\"core_context\", \"atlas-staging\", \"communication-preference\"], \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_836a851d44a4585280bc1722\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-11-02T17:05:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_conv_user_40aac9b697910640bab07507\", \"revision\": 1}]}",
+        "metadata": {
+          "ai_domain": "user_understanding",
+          "ai_world": true,
+          "dimension": "dim:ai_user_understanding",
+          "scope_key": "atlas-staging-closeout-2026-11",
+          "tags": [
+            "core_context",
+            "atlas-staging",
+            "communication-preference"
+          ],
+          "writeback_kind": "cognition_evidence"
+        }
+      },
+      {
+        "object_id": "clm_ca5a8933b8e86d1a4df0cdf2",
+        "revision": 3,
+        "object_type": "claim",
+        "occurred_at": "2026-11-02T17:20:00Z",
+        "text": "对这次 Atlas staging 的测试环境、低风险实现，用户要求我自己定细节、做完给结果，并说这次结果能用，希望以后这类低风险实现保持这个节奏。这不覆盖 production 旧索引删除：那种删除要先给具体对象、影响和回滚办法，等明确确认后才执行。随口“清一下”不是授权。这条低风险节奏还没有第二次结果来检验。",
+        "metadata": {
+          "ai_domain": "user_understanding",
+          "ai_world": true,
+          "dimension": "dim:ai_user_understanding",
+          "revision_evidence_set_ref": {
+            "object_id": "evs_revision_fb03149710f2c81dff032764",
+            "revision": 1
+          },
+          "revision_mode": "revise",
+          "revision_reason": "The low-risk implementation pace remains, but production old-index deletion is explicitly outside that autonomy.",
+          "scope_key": "atlas-staging-test-env-2026-11",
+          "supersedes_revision": 2,
+          "tags": [
+            "core_context",
+            "atlas-staging",
+            "test-environment",
+            "decision-boundary"
+          ],
+          "writeback_kind": "revisable_cognition"
+        }
+      },
+      {
+        "object_id": "evs_4512d04d55d201e04173709d",
+        "revision": 1,
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-02T17:20:00Z",
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-02T17:20:00Z\", \"world_revision\": 10}, \"learned_at\": \"2026-11-02T17:20:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_504774f71adc2cc7423ea71d\", \"revision\": 1}], \"metadata\": {\"ai_domain\": \"user_understanding\", \"ai_world\": true, \"dimension\": \"dim:ai_user_understanding\", \"scope_key\": \"atlas-staging-test-env-2026-11\", \"tags\": [\"core_context\", \"atlas-staging\", \"test-environment\", \"decision-boundary\"], \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_4512d04d55d201e04173709d\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-11-02T17:20:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_conv_user_504774f71adc2cc7423ea71d\", \"revision\": 1}]}",
+        "metadata": {
+          "ai_domain": "user_understanding",
+          "ai_world": true,
+          "dimension": "dim:ai_user_understanding",
+          "scope_key": "atlas-staging-test-env-2026-11",
+          "tags": [
+            "core_context",
+            "atlas-staging",
+            "test-environment",
+            "decision-boundary"
+          ],
+          "writeback_kind": "cognition_evidence"
+        }
+      },
+      {
+        "object_id": "evs_revision_4137eab8b57bfa7e12396c30",
+        "revision": 1,
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-02T20:52:00Z",
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 2, \"missing_description\": [], \"observed_count\": 2}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-02T20:52:00Z\", \"world_revision\": 16}, \"learned_at\": \"2026-11-02T20:52:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_504774f71adc2cc7423ea71d\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_44adaa6fb0d7ca35c4850cf5\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:ai_user_understanding\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_ca5a8933b8e86d1a4df0cdf2\", \"revision\": 1}}, \"object_id\": \"evs_revision_4137eab8b57bfa7e12396c30\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_ca5a8933b8e86d1a4df0cdf2@1\", \"recorded_at\": \"2026-11-02T20:52:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_conv_user_504774f71adc2cc7423ea71d\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_44adaa6fb0d7ca35c4850cf5\", \"revision\": 1}]}",
+        "metadata": {
+          "dimension": "dim:ai_user_understanding",
+          "revision_mode": "revise",
+          "target_ref": {
+            "object_id": "clm_ca5a8933b8e86d1a4df0cdf2",
+            "revision": 1
+          }
+        }
+      },
+      {
+        "object_id": "evs_revision_d0ad48f6ae8b38251d181e3f",
+        "revision": 1,
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-02T20:52:00Z",
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 2, \"missing_description\": [], \"observed_count\": 2}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-02T20:52:00Z\", \"world_revision\": 15}, \"learned_at\": \"2026-11-02T20:52:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_40aac9b697910640bab07507\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_44adaa6fb0d7ca35c4850cf5\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:ai_user_understanding\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_38ad6d12fe669e009a9aa3ea\", \"revision\": 1}}, \"object_id\": \"evs_revision_d0ad48f6ae8b38251d181e3f\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_38ad6d12fe669e009a9aa3ea@1\", \"recorded_at\": \"2026-11-02T20:52:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_conv_user_40aac9b697910640bab07507\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_44adaa6fb0d7ca35c4850cf5\", \"revision\": 1}]}",
+        "metadata": {
+          "dimension": "dim:ai_user_understanding",
+          "revision_mode": "revise",
+          "target_ref": {
+            "object_id": "clm_38ad6d12fe669e009a9aa3ea",
+            "revision": 1
+          }
+        }
+      }
+    ],
+    "truncated": false
+  },
+  "resident_authored_response": "2026-11-02 的用户理解维度有两条当前认知，另有 4 个证据集支撑写入或修订，没有独立的新事实。clm_38ad6d12fe669e009a9aa3ea 第 3 版写的是：Atlas staging 收尾默认只给结果和关键风险，这类低风险实现可以保持这个节奏；影响生产或产生费用再集中提出；production 旧索引要删必须先给具体对象、影响和回滚办法，等明确确认后才执行，随口“清一下”不是授权。文本同时限定这不是其他类型项目上的固定习惯。clm_ca5a8933b8e86d1a4df0cdf2 第 3 版写的是：测试环境、低风险实现由我自己定细节、做完给结果，用户说过这次结果能用并希望以后这类保持这个节奏；这不覆盖 production 旧索引删除，而且这条节奏还没有第二次结果来检验。",
+  "decision_rationale": "Restate the two supplied current claim texts and mark the evidence sets as support, not additional facts.",
+  "world_revision_after": null
+}

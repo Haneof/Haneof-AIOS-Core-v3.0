@@ -1,0 +1,20 @@
+{
+  "trace_id": "cap0034",
+  "checkpoint_id": "cp0034",
+  "cursor": 11,
+  "directive": {
+    "capability_calls": [
+      {
+        "name": "inspect_world_object",
+        "arguments": {
+          "object_id": "obs_c14_fixture_291beec37165eb34a35f8f85",
+          "revision": 1
+        },
+        "call_id": "cp0034-inspect-published"
+      }
+    ],
+    "response": null,
+    "silence": false
+  },
+  "history_before": []
+}

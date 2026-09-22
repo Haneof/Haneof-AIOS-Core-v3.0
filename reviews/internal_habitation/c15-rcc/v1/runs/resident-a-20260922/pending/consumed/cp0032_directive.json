@@ -1,0 +1,57 @@
+{
+  "capability_calls": [
+    {
+      "name": "commit_ai_world_claim",
+      "call_id": "cp0032-status-language",
+      "arguments": {
+        "domain": "user_understanding",
+        "statement": "用户要求以后把“准备提交、已排队”和“确实完成”分开说；没有完成记录时，按没确认完成处理。这是对这类发布状态说法的要求。用户同时说自己后台也看到 tag 还没出来。这还不是所有项目、所有状态的总规则。",
+        "evidence_refs": [
+          {
+            "object_id": "obs_conv_user_1b929906e9a92dce0e19ef96",
+            "revision": 1
+          }
+        ],
+        "confidence": 0.84,
+        "knowledge_state": "reported",
+        "claim_type": "preference",
+        "scope_key": "release-status-language",
+        "tags": [
+          "core_context",
+          "release",
+          "status-language"
+        ]
+      }
+    },
+    {
+      "name": "commit_ai_world_claim",
+      "call_id": "cp0032-status-boundary",
+      "arguments": {
+        "domain": "cognitive_boundary",
+        "statement": "对这类发布状态，没有完成记录时，准备提交或已排队不能说成确实完成。edge-2026.11.4 目前仍没有 tag 和 upload-complete，所以不能说已发布。",
+        "evidence_refs": [
+          {
+            "object_id": "obs_conv_user_1b929906e9a92dce0e19ef96",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+            "revision": 1
+          }
+        ],
+        "confidence": 0.86,
+        "knowledge_state": "reported",
+        "claim_type": "preference",
+        "scope_key": "release-status-language",
+        "tags": [
+          "release",
+          "not-complete",
+          "status-language"
+        ]
+      }
+    }
+  ],
+  "response": null,
+  "silence": false,
+  "decision_rationale": "The user stated a forward reporting rule and confirmed the tag is still absent. Record the rule as scoped status language, and keep the current image not-complete. Do not turn one instruction into a universal policy."
+}

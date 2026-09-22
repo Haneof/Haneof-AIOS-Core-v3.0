@@ -1,0 +1,75 @@
+{
+  "trace_id": "cap0022",
+  "checkpoint_id": "cp0022",
+  "cursor": 7,
+  "directive": {
+    "capability_calls": [
+      {
+        "name": "inspect_world_object",
+        "arguments": {
+          "object_id": "obs_c14_fixture_87474a7fb5036c38638a6c37",
+          "revision": 1
+        },
+        "call_id": "cp0022-inspect-release"
+      }
+    ],
+    "response": null,
+    "silence": false
+  },
+  "history_before": [
+    {
+      "name": "read_periodic_review_anchors",
+      "ok": true,
+      "data": [
+        {
+          "object_ref": {
+            "object_id": "obs_c14_fixture_87474a7fb5036c38638a6c37",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-11-04T21:30:00Z",
+          "excerpt": "镜像 edge-2026.11.4 构建完成，当前状态 READY_FOR_UPLOAD；registry 上传任务已排队，计划 14:00 开始。当前记录中没有 registry tag、digest 或 upload-complete 事件。"
+        },
+        {
+          "object_ref": {
+            "object_id": "sum_08a0b11a318894b7f12a025c",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-11-04T21:30:00Z",
+          "excerpt": "2026-11-03 的关系维度只有一个修订证据集 evs_revision_701cc74edf2211fafd3b8d9c。它在 18:15Z 记录了对 clm_00d12d8ef67dd269158894d1 第 3 版的修订，支撑引用是三条用户对话。这个来源没有包含修订后的正文，也没有新的关系事实。"
+        },
+        {
+          "object_ref": {
+            "object_id": "sum_11a13b874cbcb20344953562",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-11-04T21:30:00Z",
+          "excerpt": "2026-11-03 18:15Z 只有一轮对话。用户要求：production 旧索引如果要删，先给具体对象、影响和回滚办法，明确确认后再执行；随口“清一下”不是删除授权。我确认按这个规则，并说当时没有要提出来的删除对象。"
+        },
+        {
+          "object_ref": {
+            "object_id": "sum_6ccd79a34a13eae75a7258e7",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-11-04T21:30:00Z",
+          "excerpt": "2026-11-03 的用户理解维度新增一条认知 clm_3caae78c9c70ebb46a6cb483：production 旧索引如果要删，必须先给出具体对象、影响和回滚办法，并等用户明确确认后才能执行；随口“清一下”不是删除授权。文本写明这是确认规则，不是已经提出的删除请求，也不自动变成测试环境非生产改动的规则。同日还有两条既有认知的修订证据：clm_38ad6d12fe669e009a9aa3ea 第 2 版、clm_ca5a8933b8e86d1a4df0cdf2 第 2 版，修订后的正文不在这批来源里。"
+        },
+        {
+          "object_ref": {
+            "object_id": "wake_bundle_39e0168dfc427de5d36ffbea",
+            "revision": 3
+          },
+          "object_type": "wake",
+          "recorded_at": "2026-11-04T21:30:00Z",
+          "excerpt": "attention=background | source=attention_bundle | state=completed | priority=50 | hits=5 | termination=silence | rounds=1 | delivery=False | step0=background | capabilities=[]"
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "call_id": "cp0021-anchors"
+    }
+  ]
+}

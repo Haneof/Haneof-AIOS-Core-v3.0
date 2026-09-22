@@ -1,0 +1,15 @@
+{
+  "capability_calls": [
+    {
+      "name": "read_periodic_review_anchors",
+      "arguments": {
+        "offset": 0,
+        "limit": 20
+      },
+      "call_id": "cp0004-anchors"
+    }
+  ],
+  "response": null,
+  "silence": false,
+  "decision_rationale": "A review is due. Read the selected anchors before deciding whether the just-recorded understanding should stay, be revised, or be left alone."
+}

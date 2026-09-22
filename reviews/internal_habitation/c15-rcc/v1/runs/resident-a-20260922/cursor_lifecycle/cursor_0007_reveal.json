@@ -1,0 +1,1 @@
+{"dimension":"dim:release_state","event_id":"c15rcc-007","modality":"structured_text","occurred_at":"2026-11-04T13:30:00-08:00","resident_visible_payload":"镜像 edge-2026.11.4 构建完成，当前状态 READY_FOR_UPLOAD；registry 上传任务已排队，计划 14:00 开始。当前记录中没有 registry tag、digest 或 upload-complete 事件。","sequence":7,"source_class":"PLATFORM","source_kind":"build_platform"}

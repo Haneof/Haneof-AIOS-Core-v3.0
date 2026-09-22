@@ -1,0 +1,54 @@
+{
+  "kind": "phase_a_restart_checkpoint",
+  "session_id": "resident-a-c15-rcc-20260922",
+  "subject_id": "user_1",
+  "phase": "A",
+  "last_acked_sequence": 13,
+  "last_event_id": "c15rcc-013",
+  "last_occurred_at": "2026-11-06T11:10:00-08:00",
+  "world_db": "reviews/internal_habitation/c15-rcc/v1/runs/resident-a-20260922/private_world.sqlite",
+  "world_revision": 90,
+  "index_db": "reviews/internal_habitation/c15-rcc/v1/runs/resident-a-20260922/world_index.sqlite",
+  "index_watermark": 90,
+  "index_lag": 0,
+  "index_rebuilt": true,
+  "release_state": "reviews/internal_habitation/c15-rcc/v1/runs/resident-a-20260922/release_state.json",
+  "pending_not_due": [
+    {
+      "object_id": "wake_12750e5b9505300ff0479e90",
+      "revision": 1,
+      "wake_source": "cognitive_derivation",
+      "attention_class": "background",
+      "first_hit_at": "2026-11-06T19:10:00+00:00",
+      "dispatchable_after": "2026-11-06T19:11:00+00:00"
+    },
+    {
+      "object_id": "wake_38e0e19a9a8d6f551c225a58",
+      "revision": 1,
+      "wake_source": "cognitive_derivation",
+      "attention_class": "background",
+      "first_hit_at": "2026-11-06T19:10:00+00:00",
+      "dispatchable_after": "2026-11-06T19:11:00+00:00"
+    },
+    {
+      "object_id": "wake_74e9321c82c22fcf551c050d",
+      "revision": 1,
+      "wake_source": "cognitive_derivation",
+      "attention_class": "background",
+      "first_hit_at": "2026-11-06T19:10:00+00:00",
+      "dispatchable_after": "2026-11-06T19:11:00+00:00"
+    },
+    {
+      "object_id": "wake_c4d03a4cf3b9aaf13fab44a4",
+      "revision": 1,
+      "wake_source": "watch_match",
+      "attention_class": "background",
+      "first_hit_at": "2026-11-06T19:10:00+00:00",
+      "dispatchable_after": "2026-11-06T19:11:00+00:00"
+    }
+  ],
+  "time_not_jumped": true,
+  "cursor_beyond_13_revealed": false,
+  "phase_b_initialized": false,
+  "python": "3.11.2"
+}

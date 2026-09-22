@@ -1,0 +1,29 @@
+{
+  "trace_id": "cap0011",
+  "checkpoint_id": "cp0011",
+  "cursor": 5,
+  "directive": {
+    "capability_calls": [
+      {
+        "name": "search_world",
+        "arguments": {
+          "query": "smoke test",
+          "limit": 5
+        },
+        "call_id": "cp0011-search-outcome"
+      }
+    ],
+    "response": null,
+    "silence": false
+  },
+  "history_before": [
+    {
+      "name": "search_world",
+      "ok": false,
+      "data": null,
+      "error_code": "CAPABILITY_ARGUMENT_ERROR",
+      "error_message": "FusedTurnRuntime._search_world() got an unexpected keyword argument 'dimensions'",
+      "call_id": "cp0010-search-outcome"
+    }
+  ]
+}
