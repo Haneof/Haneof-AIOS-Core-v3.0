@@ -2,8 +2,8 @@
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
   "nonce": "9f4c7b2e-6a31-4c97-bd28-1f0b88a9d453",
   "kind": "SUMMARY_RESPONSE",
-  "item_id": "sum0016",
+  "item_id": "sum0017",
   "payload": {
-    "content": "2026-11-10，“发布说明”第一版于 10:52 提交，目标时间 11:30；评审前未要求重写核心结构。"
+    "content": "2026-11-10，Resident AI 的 dim:work_pattern 假设被修订为：三个已观察案例不足以用“是否存在一次工作沟通”解释交付时点；后续更值得观察沟通碎片化程度与恢复上下文成本，但样本仍小、睡眠等因素混杂，不支持因果结论。该内容是 AI cognition 的修订记录，其支持来自对应 EvidenceSet，不是独立现实事实。"
   }
 }
