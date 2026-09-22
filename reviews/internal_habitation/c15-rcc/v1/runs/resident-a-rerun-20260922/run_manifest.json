@@ -1,0 +1,9 @@
+{
+  "task_id": "C15-RCC-RES-A-RERUN-001",
+  "starting_main": "1b0d478add02ca133965db84bff60d322749e02b",
+  "resident_branch": "resident/c15-rcc-res-a-rerun-20260922-sol",
+  "resident_session_id": "resident-a-rerun-20260922-sol-001",
+  "phase": "A",
+  "fresh_world": true,
+  "old_world_copied": false
+}

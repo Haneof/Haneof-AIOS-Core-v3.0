@@ -1,0 +1,19 @@
+{
+  "active_phase": "A",
+  "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+  "fixture_version": "c15-rcc-fixture-v1",
+  "last_acked_event_id": null,
+  "last_acked_sequence": 0,
+  "next_sequence": 1,
+  "pending_reveal": {
+    "event_id": "c15rcc-001",
+    "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+    "occurred_at": "2026-11-02T09:05:00-08:00",
+    "sequence": 1
+  },
+  "receipts": [],
+  "release_contract_version": "c15-rcc-sequential-release-v1",
+  "release_operator_version": "c15-rcc-three-phase-release-v1",
+  "schema_version": "c15-rcc-event-v1",
+  "state_version": "c15-rcc-release-state-v1"
+}
