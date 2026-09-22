@@ -3,7 +3,7 @@
   "cognition_calls": [],
   "complete": false,
   "conversation_turn_index": 0,
-  "current_simulated_timestamp": "2026-11-03T10:29:00-08:00",
+  "current_simulated_timestamp": "2026-11-03T10:34:00-08:00",
   "errors": [
     {
       "attempt": 1,
@@ -16,7 +16,8 @@
   "phase": "A",
   "released_cursors": [
     1,
-    2
+    2,
+    3
   ],
   "response_count": 0,
   "run_id": "c14-sem-repair-resident-20260922-sol-r8-3e8a71",
