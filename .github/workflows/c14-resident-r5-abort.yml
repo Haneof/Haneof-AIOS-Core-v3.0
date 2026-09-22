@@ -1,0 +1,19 @@
+name: C14 Resident R5 Abort Future-Contaminated Window
+on:
+  push:
+    branches:
+      - c14/semantic-repair-resident-20260922-sol-r5-8d41ac
+    paths:
+      - .github/workflows/c14-resident-r5-abort.yml
+permissions:
+  actions: write
+  contents: read
+jobs:
+  abort:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Abort r5 live runner
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: gh api --method POST "/repos/$GH_REPO/actions/runs/35687864768/cancel" || true
