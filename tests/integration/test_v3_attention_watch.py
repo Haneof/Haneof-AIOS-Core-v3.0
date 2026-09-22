@@ -563,6 +563,10 @@ def test_interrupt_attention_can_deliver_after_resident_judgment(tmp_path):
         assistant_text=delivered_text,
         occurred_at=delivered_at,
         origin_wake_ref=origin_ref,
+        termination_reason="responded",
+        model_rounds=1,
+        capability_names=(),
+        step0=result.step0.model_dump(mode="json"),
     )
     assert replay.idempotent_replay is True
     assert replay.observation_id == result.delivery_observation_ref.object_id
@@ -573,6 +577,10 @@ def test_interrupt_attention_can_deliver_after_resident_judgment(tmp_path):
             assistant_text="篡改后的不同提醒",
             occurred_at=delivered_at,
             origin_wake_ref=origin_ref,
+            termination_reason="responded",
+            model_rounds=1,
+            capability_names=(),
+            step0=result.step0.model_dump(mode="json"),
         )
 
     reopened = SQLiteWorldStore(tmp_path / "world.db")
@@ -667,9 +675,21 @@ def test_interrupt_delivery_retry_after_completion_failure_is_exactly_once(
     assert runtime.wake_bus.current_wake(signal.wake_id).wake_state.value == "running"
     before_retry_revision = int(store.current_world_revision())
 
-    recovered = runtime.run_wake(
+    reopened = SQLiteWorldStore(tmp_path / "world.db")
+    reopened_index = WorldSearchIndex(tmp_path / "world.db", store=reopened)
+    reopened_index.rebuild()
+
+    def must_not_reinvoke_model(_snapshot):
+        raise AssertionError("durable Wake delivery recovery must not call the model")
+
+    recovered_runtime = FusedTurnRuntime(
+        store=reopened,
+        index=reopened_index,
+        model_handler=must_not_reinvoke_model,
+    )
+    recovered = recovered_runtime.run_wake(
         wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
-        now=delivered_at,
+        now=delivered_at + timedelta(hours=25),
     )
 
     final_items = [
@@ -682,9 +702,24 @@ def test_interrupt_delivery_retry_after_completion_failure_is_exactly_once(
     assert recovered.delivery_response == "一次且仅一次的主动提醒"
     assert recovered.delivery_observation_ref is not None
     assert recovered.delivery_observation_ref.object_id == partial[0]["object_id"]
+    assert recovered.runtime is None
     assert len(final_items) == 1
-    # Retry replays the delivery commit idempotently; only Wake completion advances World.
-    assert int(store.current_world_revision()) == before_retry_revision + 1
+    # Recovery consumes the already-durable delivery and only completes the Wake.
+    assert int(reopened.current_world_revision()) == before_retry_revision + 1
+
+    completed_revision = int(reopened.current_world_revision())
+    exact_replay = recovered_runtime.run_wake(
+        wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
+        now=delivered_at + timedelta(hours=26),
+    )
+    assert exact_replay.runtime is None
+    assert exact_replay.wake.state == "completed"
+    assert exact_replay.delivery_response == "一次且仅一次的主动提醒"
+    assert (
+        exact_replay.delivery_observation_ref.object_id
+        == recovered.delivery_observation_ref.object_id
+    )
+    assert int(reopened.current_world_revision()) == completed_revision
 
 
 def test_interrupt_delivery_denied_writes_no_interaction_fact(tmp_path):
