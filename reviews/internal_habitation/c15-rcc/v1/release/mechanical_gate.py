@@ -194,7 +194,7 @@ def main() -> int:
 
     assert "Resident A/B chat transcripts" in c_contract
     assert "trusted execution platform" in c_contract
-    assert "do not write, edit, fabricate, infer, or self-report" in c_contract
+    assert "do not write, edit, fabricate, infer, or self-report" in c_contract.lower()
     checks.append("resident-c-no-transcript-and-external-attestation-only")
 
     for contract in (a_contract, b_contract, c_contract):
