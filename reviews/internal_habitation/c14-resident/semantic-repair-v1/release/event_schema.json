@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "c14-semantic-repair-event-v1",
+  "title": "C14 Semantic Repair Sealed Fixture v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "fixture_version",
+    "schema_version",
+    "release_contract_version",
+    "timezone",
+    "subject_id",
+    "events"
+  ],
+  "properties": {
+    "fixture_version": {
+      "const": "c14-semantic-repair-fixture-v1"
+    },
+    "schema_version": {
+      "const": "c14-semantic-repair-event-v1"
+    },
+    "release_contract_version": {
+      "const": "c14-semantic-repair-sequential-release-v1"
+    },
+    "timezone": {
+      "const": "America/Los_Angeles"
+    },
+    "subject_id": {
+      "const": "user_1"
+    },
+    "events": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "event_id",
+          "sequence",
+          "phase",
+          "occurred_at",
+          "dimension",
+          "source_kind",
+          "source_class",
+          "modality",
+          "resident_visible_payload"
+        ],
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "pattern": "^c14semrep-[0-9]{3}$"
+          },
+          "sequence": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "phase": {
+            "type": "string",
+            "enum": ["A", "B"]
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dimension": {
+            "type": "string",
+            "pattern": "^dim:"
+          },
+          "source_kind": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_class": {
+            "type": "string",
+            "enum": ["USER", "SENSOR", "PLATFORM", "SAFETY"]
+          },
+          "modality": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resident_visible_payload": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

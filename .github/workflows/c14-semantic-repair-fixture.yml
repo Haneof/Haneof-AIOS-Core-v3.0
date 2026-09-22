@@ -1,0 +1,62 @@
+name: c14-semantic-repair-fixture
+
+on:
+  pull_request:
+    paths:
+      - "reviews/internal_habitation/c14-resident/semantic-repair-v1/**"
+      - "governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md"
+      - "AIOS_v3.0_CURRENT_CHECKPOINT.md"
+      - ".github/workflows/c14-semantic-repair-fixture.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  semantic-repair-mechanical-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Record formal Python version
+        run: python --version
+      - name: Install AIOS dev environment
+        run: pip install -e ".[dev]"
+      - name: Compile repair release infrastructure
+        run: |
+          python -m py_compile \
+            reviews/internal_habitation/c14-resident/semantic-repair-v1/release/bindings.py \
+            reviews/internal_habitation/c14-resident/semantic-repair-v1/release/release_operator.py \
+            reviews/internal_habitation/c14-resident/semantic-repair-v1/release/mechanical_ingest_adapter.py \
+            reviews/internal_habitation/c14-resident/semantic-repair-v1/release/canonical_conversation_ingest.py \
+            reviews/internal_habitation/c14-resident/semantic-repair-v1/release/mechanical_gate.py
+      - name: Run repair mechanical gate
+        run: python reviews/internal_habitation/c14-resident/semantic-repair-v1/release/mechanical_gate.py
+      - name: Prove sealed repair fixture SHA256
+        shell: bash
+        run: |
+          actual="sha256:$(sha256sum reviews/internal_habitation/c14-resident/semantic-repair-v1/fixture/sealed_fixture.json | awk '{print $1}')"
+          expected="sha256:1095d5aef52061753db7d9dab558af1361b92976f2ded0e6956d70afe3e6527f"
+          test "$actual" = "$expected"
+      - name: Run canonical conversation regressions
+        run: |
+          pytest -q \
+            tests/integration/test_v3_conversation_world_ingest.py \
+            tests/integration/test_v3_fused_turn_runtime.py
+      - name: Prove fixture task did not modify Core or historical C14 evidence
+        shell: bash
+        run: |
+          git fetch origin main --depth=1
+          changed="$(git diff --name-only origin/main...HEAD)"
+          if printf '%s\n' "$changed" | grep -q '^src/aios_core/'; then
+            echo "C14-SEM-REPAIR-FIX-001 must not modify src/aios_core/**"
+            exit 1
+          fi
+          if printf '%s\n' "$changed" | grep -q '^reviews/internal_habitation/c14-resident/v2/'; then
+            echo "C14-SEM-REPAIR-FIX-001 must not modify frozen v2 fixture or Resident A/B evidence"
+            exit 1
+          fi
