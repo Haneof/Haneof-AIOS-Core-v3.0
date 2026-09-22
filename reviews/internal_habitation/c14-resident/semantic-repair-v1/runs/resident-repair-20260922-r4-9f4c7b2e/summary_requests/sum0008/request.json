@@ -1,0 +1,49 @@
+{
+  "kind": "dimension_summary",
+  "released_cursor": 7,
+  "request": {
+    "dimension": "dim:device_activity",
+    "granularity": "week",
+    "source_world_revision": 30,
+    "sources": [
+      {
+        "metadata": {
+          "dimension": "dim:device_activity",
+          "summary_kind": "single_dimension_temporal"
+        },
+        "object_id": "sum_6c1994975a4486604171a308",
+        "object_type": "summary",
+        "occurred_at": "2026-11-03T00:00:00Z",
+        "revision": 1,
+        "text": "2026-11-03 08:28–10:25，设备开启专注模式；期间未加入语音或视频通话，21 条通知被静音。"
+      },
+      {
+        "metadata": {
+          "dimension": "dim:device_activity",
+          "external_record_id": "c14semrep-002",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-sem-repair-fixture-event-binding-v1",
+          "fixture_event_id": "c14semrep-002",
+          "fixture_payload_sha256": "sha256:3fc32b662de4cac869772c4a0f2874bd0be02a10c07d41b6b75555114cfe151a",
+          "fixture_projection_sha256": "sha256:93e22eeee15b62e922a5ece2084a510bf05fbf937428c69c91057b8a6f853bdf",
+          "fixture_sequence": 2,
+          "fixture_sha256": "sha256:1095d5aef52061753db7d9dab558af1361b92976f2ded0e6956d70afe3e6527f",
+          "fixture_version": "c14-semantic-repair-fixture-v1",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-11-03T10:29:00-08:00",
+          "source_class": "platform"
+        },
+        "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+        "object_type": "observation",
+        "occurred_at": "2026-11-03T18:29:00Z",
+        "revision": 1,
+        "text": "08:28–10:25 开启专注模式；期间没有加入语音或视频通话，21 条通知被静音。"
+      }
+    ],
+    "truncated": false,
+    "window_end": "2026-11-08T23:59:59.999999Z",
+    "window_start": "2026-11-02T00:00:00Z"
+  },
+  "request_id": "sum0008",
+  "simulated_timestamp": "2026-11-10T07:34:00-08:00"
+}
