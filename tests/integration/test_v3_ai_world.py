@@ -613,11 +613,13 @@ def test_legitimate_ai_self_revision_still_works_across_current_user(tmp_path, d
 @pytest.mark.parametrize(
     "metadata",
     [
+        {"ai_world": False, "ai_domain": "user_understanding"},
         {"ai_world": True},
         {"ai_world": True, "ai_domain": "not_a_domain"},
     ],
 )
-def test_typed_mutation_rejects_malformed_ai_world_metadata(tmp_path, metadata):
+@pytest.mark.parametrize("mode", ["revise", "retract"])
+def test_typed_mutation_rejects_malformed_ai_world_metadata(tmp_path, metadata, mode):
     store, index, facts = _seed_subject_isolation_world(tmp_path)
     writer = CognitionWritebackService(
         store=store,
@@ -639,12 +641,23 @@ def test_typed_mutation_rejects_malformed_ai_world_metadata(tmp_path, metadata):
         learned_at=NOW,
     )
     service_b = AIWorldCognitionService(store=store, index=index, user_id="user_B")
+    target_ref = ObjectRef(object_id=malformed.claim_id, revision=1)
+    evidence_refs = (ObjectRef(object_id=facts["user_B"].object_id, revision=1),)
 
     with pytest.raises(ValueError, match="AI-world"):
-        service_b.revise(
-            target_ref=ObjectRef(object_id=malformed.claim_id, revision=1),
-            evidence_refs=(ObjectRef(object_id=facts["user_B"].object_id, revision=1),),
-            replacement_statement="Must not revise malformed typed target.",
-            reason="fail closed on malformed metadata",
-            changed_at=NOW + timedelta(seconds=1),
-        )
+        if mode == "revise":
+            service_b.revise(
+                target_ref=target_ref,
+                evidence_refs=evidence_refs,
+                replacement_statement="Must not revise malformed typed target.",
+                reason="fail closed on malformed metadata",
+                changed_at=NOW + timedelta(seconds=1),
+            )
+        else:
+            service_b.retract(
+                target_ref=target_ref,
+                evidence_refs=evidence_refs,
+                reason="fail closed on malformed metadata",
+                changed_at=NOW + timedelta(seconds=1),
+            )
+    assert store.get_payload(malformed.claim_id)["revision"] == 1
