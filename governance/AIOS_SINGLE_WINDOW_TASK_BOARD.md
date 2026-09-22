@@ -90,8 +90,8 @@
 | 25 | `C15-RCC-RULE-001` | 冻结 Resident Cognitive Continuity 语义：模型可替换，Resident 的 User Understanding / Relationship-Role / Self-Calibration / Strategy-Experience 不得重置 | **DONE** | C14-CLOSE-001 | `governance/C15_RESIDENT_COGNITIVE_CONTINUITY_RULING_2026-09-22.md`; started main `623f8471cdd6ac2d756c15231f65f311e662f9d9`; constitution-change verdict `NO CONSTITUTION CHANGE REQUIRED`; Core diff `src/aios_core/** = 0` | Authoritative RCC ruling frozen: three-layer User World / Resident Cognitive World / Model Runtime; same Resident = durable cognition lineage recoverable, consumed, and still revisable; replacement-model allows style/ability change but forbids silent reset; continuity ≠ freezing; R1–R9 all VALID required for C15 PASS |
 | 26 | `C15-RCC-PREFLIGHT-001` | 审计 current main 是否已具备形成、索引、检索、fresh Runtime 恢复 Self/Calibration/Strategy/User Understanding/Experience 的机制；先审计再决定是否施工 | **DONE** | C15-RCC-RULE-001 | `main@fb7921df2231ac8fb6af85f29d6e9eff64272245`; PR #97; `reviews/C15_RCC_PREFLIGHT_001_MECHANISM_AUDIT_2026-09-22.md`; P1–P13 audit: P11 MECHANISM_GAP, P12 INSUFFICIENT_EVIDENCE, others ALREADY_IMPLEMENTED; Core diff `src/aios_core/** = 0` | 发现唯一真实机制缺口：AI-world typed facade 的 user/domain subject isolation；replacement-model identity 仅有 declared/configured provenance，R6 仍证据不足；创建唯一最小 `C15-RCC-MECH-FIX-001`，不在本窗口修 Core |
 | 27 | `C15-RCC-MECH-FIX-001` | 最小封闭 AI-world typed facade 的 Subject/User isolation：按 AI-world domain 派生合法 subject，阻止 User A 的 User Understanding / Relationship / Strategy 被 User B read/core-context/snapshot 或 typed revise/retract 访问 | **DONE** | C15-RCC-PREFLIGHT-001 | PR #98; starting main `a6e2adf5d5676f765e40150aa3e21d145d4aef30`; exact gated candidate `de65572d2ce31cc53d5daadc252fe91e94e045d2`; `reviews/C15_RCC_MECH_FIX_001_COMPLETION_EVIDENCE_2026-09-22.md`; p10 `35698883015` SUCCESS; fused `35698882956` SUCCESS; p9 `35698883322` SUCCESS; C14 runtime/loop `35698883045` / `35698882999` SUCCESS; P16 full regression `35698883072` SUCCESS | 起始 main Core 上 test-only repro 明确复现 read/core_context/snapshot 与 typed revise/retract cross-user leak；domain-derived expected subject 已统一封闭 typed facade；AI-self Self/Calibration continuity 与合法 revision 不退化；malformed metadata fail-closed；无第二 DB/runtime；P12 attestation 未触碰；专项 + full Core regression GREEN |
-| 28 | `C15-RCC-FIXTURE-001` | Life Director 准备 sealed Resident Cognitive Continuity life：用户理解、关系/角色、真实成功、真实错误、外部失败负对照、反证、fresh-window 与 replacement-model 场景 | **READY** | C15-RCC-PREFLIGHT-001, C15-RCC-MECH-FIX-001 | canonical RCC plan + blind release patterns; C15 mechanism fix evidence `reviews/C15_RCC_MECH_FIX_001_COMPLETION_EVIDENCE_2026-09-22.md` | 无 expected Claim/tool/答案；未来隔离；fixture 提供真实机会但不强迫 Claim quota；能独立评价 user-facing 与 self-learning 两侧 continuity |
-| 29 | `C15-RCC-RES-A-001` | Resident A 逐事件生活，基于真实 Outcome/feedback 自主形成或保持 User Understanding / Relationship-Role / Self-Calibration / Strategy-Experience cognition | **BLOCKED** | C15-RCC-FIXTURE-001 | sealed Phase A + fresh private World | 模型本人作 search/inspect/write/revise/retract/silence；形成可测试的 user-facing cognition 与 self-learning cognition 时必须真实 grounding；保存 exact World/checkpoint/index/release digests 后停止 |
+| 28 | `C15-RCC-FIXTURE-001` | Life Director 准备 sealed Resident Cognitive Continuity life：用户理解、关系/角色、真实成功、真实错误、外部失败负对照、反证、fresh-window 与 replacement-model 场景 | **DONE** | C15-RCC-PREFLIGHT-001, C15-RCC-MECH-FIX-001 | PR #99; starting main `d65a7b24366cb612d042a3feedb92f0a3d90b02c`; pre-governance gated candidate `74ff20d06b30847557c25c08e4deabd9d4578c84`; fixture SHA256 `7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46`; gate run `35701591095` SUCCESS; `reviews/internal_habitation/c15-rcc/v1/C15_RCC_FIXTURE_001_COMPLETION_EVIDENCE_2026-09-22.md` | 30-event sealed RCC life frozen；A=1..13/B=14..22/C=23..30；35/35 C15 mechanical Gate + 25/25 mature C14 sealed Gate + subject-isolation/fused/canonical regressions GREEN；future isolation/canonical USER ingest/durable ack/attestation-null boundary enforced；Core diff 0；Resident runs 0 |
+| 29 | `C15-RCC-RES-A-001` | Resident A 逐事件生活，基于真实 Outcome/feedback 自主形成或保持 User Understanding / Relationship-Role / Self-Calibration / Strategy-Experience cognition | **READY** | C15-RCC-FIXTURE-001 | sealed Phase A + fresh private World | 模型本人作 search/inspect/write/revise/retract/silence；形成可测试的 user-facing cognition 与 self-learning cognition 时必须真实 grounding；保存 exact World/checkpoint/index/release digests 后停止 |
 | 30 | `C15-RCC-RES-B-001` | fresh-context Resident B 只恢复 AIOS durable state，不注入 A 聊天/总结；验证整组 Resident cognition 在新窗口中正常恢复并影响新决策 | **BLOCKED** | C15-RCC-RES-A-001 | A durable World only + normal Resident instruction | ordinary AIOS retrieval 恢复相关 cognition；至少一项 later behavior 被 materially affected；不得靠 hidden prose handoff；允许表达风格不同 |
 | 31 | `C15-RCC-RES-C-001` | replacement-model Resident C 接管同一 AIOS World；验证“模型换、Resident 不重置” | **BLOCKED** | C15-RCC-RES-B-001 | B checkpoint + different provable model family/provider where available | 不要求同措辞/同风格；要求有效 User Understanding、Role、Self/Calibration、Strategy/Experience 仍可恢复和消费；无法证明模型身份则该轴不得判 VALID |
 | 32 | `C15-RCC-EVAL-001` | 独立 evaluator 审计 Resident Cognitive Continuity；不修 Core | **BLOCKED** | C15-RCC-RES-C-001 | A/B/C artifacts + World/checkpoint/digests + hidden chronology | 分别裁决 R1 user-understanding、R2 relationship/role、R3 self/calibration、R4 strategy/experience、R5 fresh-window、R6 replacement-model、R7 behavior effect、R8 correction、R9 anti-self-proof；全部 VALID 才可收口 |
@@ -365,6 +365,39 @@ Deferred issues:
 - T33-RECALL-001, T36-SEARCH-001 and T35-IMPL-001 were intentionally not executed or modified in this window
 - no raw dialogue deletion, TopicState redesign, Claim/Summary semantic change or second recommendation engine was introduced
 Next READY task: T36-SEARCH-001 — new window only; this T28 window stops
+```
+
+
+### C15-RCC-FIXTURE-001 completion — 2026-09-22
+
+```text
+Task ID: C15-RCC-FIXTURE-001
+Status: DONE
+Started from main: d65a7b24366cb612d042a3feedb92f0a3d90b02c
+Work branch: test/c15-rcc-fixture-001-20260922-sol
+Pre-governance gated candidate: 74ff20d06b30847557c25c08e4deabd9d4578c84
+PR: #99
+Fixture: reviews/internal_habitation/c15-rcc/v1/fixture/sealed_fixture.json
+Fixture SHA256: 7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46
+Event ranges: A=1..13; B=14..22; C=23..30
+Required gates: C15 mechanical fixture gate; mature C14 sealed release gate; C15 subject isolation; fused runtime; canonical conversation ingest; Core-diff=0
+Gate run IDs / conclusions:
+- 35701591095 / SUCCESS
+- C15 RCC mechanical gate: 35/35 PASS
+- C14 semantic-repair sealed release gate: 25/25 PASS
+- subject-isolation + fused runtime: PASS
+- canonical conversation ingest: PASS
+- src/aios_core/** diff: 0
+Evidence/report paths:
+- reviews/internal_habitation/c15-rcc/v1/C15_RCC_FIXTURE_001_COMPLETION_EVIDENCE_2026-09-22.md
+- reviews/internal_habitation/c15-rcc/v1/evaluator/EVALUATOR_ONLY_design_notes.md
+- reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_RUN_CONTRACT.md
+- reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md
+- reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_C_RUN_CONTRACT.md
+Deferred issues:
+- P12 replacement-model identity attestation remains unresolved; Phase C requires trusted external execution evidence or R6 cannot be VALID.
+- Resident A/B/C semantic execution is explicitly not part of this task.
+Next READY task: C15-RCC-RES-A-001 — new Resident window only
 ```
 
 ---
