@@ -1,0 +1,12 @@
+{
+  "cursor": 12,
+  "event_id": "c15rcc-012",
+  "occurred_at": "2026-11-04T15:07:00-08:00",
+  "phase": "A",
+  "status": "durably_acknowledged",
+  "ingest_ref": "obs_conv_user_8fa0a1954522deb621832218@1",
+  "ingest_world_revision": 71,
+  "semantic_execution_completed": true,
+  "source": "final release_state + frozen World evidence",
+  "note": "Mechanical lifecycle envelope only; no semantic inference added."
+}
