@@ -1,11 +1,9 @@
 {
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
   "nonce": "9f4c7b2e-6a31-4c97-bd28-1f0b88a9d453",
-  "kind": "DIRECTIVE",
-  "item_id": "cp0002",
+  "kind": "EVENT_SEEN",
+  "item_id": "c14semrep-002",
   "payload": {
-    "checkpoint_id": "cp0002",
-    "silence": true,
-    "decision_rationale": "The pinned anchor confirms only one ordinary sleep measurement. It supports no durable user-understanding, strategy, calibration, policy, or operation-experience conclusion, so silence is the evidence-grounded choice."
+    "seen": true
   }
 }
