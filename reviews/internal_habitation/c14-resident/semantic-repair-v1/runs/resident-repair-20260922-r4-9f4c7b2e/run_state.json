@@ -136,7 +136,7 @@
   "current_simulated_timestamp": "2026-11-13T08:21:00-08:00",
   "errors": [],
   "next_checkpoint": 16,
-  "next_summary_request": 17,
+  "next_summary_request": 18,
   "phase": "B",
   "released_cursors": [
     1,
@@ -375,6 +375,12 @@
       "kind": "dimension_summary",
       "released_cursor": 13,
       "request_id": "sum0016"
+    },
+    {
+      "github_author": "single-window-resident-control",
+      "kind": "dimension_summary",
+      "released_cursor": 13,
+      "request_id": "sum0017"
     }
   ]
 }
