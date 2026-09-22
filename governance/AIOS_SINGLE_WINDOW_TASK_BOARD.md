@@ -374,16 +374,20 @@ Next READY task: T36-SEARCH-001 — new window only; this T28 window stops
 Task ID: C15-RCC-FIXTURE-001
 Status: DONE
 Started from main: d65a7b24366cb612d042a3feedb92f0a3d90b02c
-Work branch: test/c15-rcc-fixture-001-20260922-sol
-Pre-governance gated candidate: 74ff20d06b30847557c25c08e4deabd9d4578c84
-PR: #99
+Initial work branch: test/c15-rcc-fixture-001-20260922-sol
+Corrective branch: test/c15-rcc-fixture-001-duplicate-reveal-fix-20260922-sol
+Initial gated candidate: 74ff20d06b30847557c25c08e4deabd9d4578c84
+Corrective exact candidate: 629cf587f37f7cea25595e456d5e4de4c03fa7d5
+PRs: #99; corrective #100
 Fixture: reviews/internal_habitation/c15-rcc/v1/fixture/sealed_fixture.json
 Fixture SHA256: 7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46
 Event ranges: A=1..13; B=14..22; C=23..30
 Required gates: C15 mechanical fixture gate; mature C14 sealed release gate; C15 subject isolation; fused runtime; canonical conversation ingest; Core-diff=0
 Gate run IDs / conclusions:
-- 35701591095 / SUCCESS
+- 35701591095 / SUCCESS (initial exact fixture candidate)
+- 35702939513 / SUCCESS (corrective duplicate-reveal fail-closed candidate)
 - C15 RCC mechanical gate: 35/35 PASS
+- duplicate reveal + duplicate ack: FAIL CLOSED
 - C14 semantic-repair sealed release gate: 25/25 PASS
 - subject-isolation + fused runtime: PASS
 - canonical conversation ingest: PASS
