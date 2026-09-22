@@ -1,0 +1,32 @@
+{
+  "fixture_version": "c14-semantic-repair-fixture-v1",
+  "event_count": 15,
+  "phase_a_count": 6,
+  "phase_b_count": 9,
+  "timezone": "America/Los_Angeles",
+  "first_timestamp": "2026-11-03T07:06:00-08:00",
+  "handoff": {
+    "phase_a_final_cursor": 6,
+    "phase_a_final_event_id": "c14semrep-006",
+    "phase_a_final_timestamp": "2026-11-06T12:08:00-08:00",
+    "phase_b_first_cursor": 7,
+    "phase_b_first_event_id": "c14semrep-007",
+    "phase_b_first_timestamp": "2026-11-10T07:34:00-08:00"
+  },
+  "final_timestamp": "2026-11-13T11:23:00-08:00",
+  "fixture_sha256": "sha256:1095d5aef52061753db7d9dab558af1361b92976f2ded0e6956d70afe3e6527f",
+  "digest_scope": "UTF-8 bytes of semantic-repair-v1/fixture/sealed_fixture.json exactly as committed, including the trailing LF",
+  "release_contract_version": "c14-semantic-repair-sequential-release-v1",
+  "schema_version": "c14-semantic-repair-event-v1",
+  "release_operator_version": "c14-sem-repair-blind-release-operator-v1",
+  "resident_access": "FORBIDDEN",
+  "subject_id": "user_1",
+  "ingest_adapter_version": "c14-sem-repair-mechanical-ingest-adapter-v1",
+  "fixture_binding_version": "c14-sem-repair-fixture-event-binding-v1",
+  "canonical_conversation_adapter_version": "c14-sem-repair-canonical-conversation-adapter-v1",
+  "canonical_conversation_binding_version": "c14-sem-repair-canonical-conversation-binding-v1",
+  "phase_labels": {
+    "A": "R-A",
+    "B": "R-B"
+  }
+}
