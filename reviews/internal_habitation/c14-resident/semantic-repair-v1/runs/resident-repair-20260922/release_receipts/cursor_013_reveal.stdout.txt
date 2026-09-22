@@ -1,0 +1,1 @@
+{"dimension":"dim:schedule","event_id":"c14semrep-013","modality":"structured_text","occurred_at":"2026-11-13T08:21:00-08:00","resident_visible_payload":"今天 08:30–10:15 预留“客户分析”连续工作块；日历没有会议；该任务目标时间 10:45。","sequence":13,"source_class":"PLATFORM","source_kind":"calendar"}

@@ -1,0 +1,1 @@
+{"dimension":"dim:collaboration_activity","event_id":"c14semrep-010","modality":"structured_text","occurred_at":"2026-11-10T09:32:00-08:00","resident_visible_payload":"会议平台日志显示：设计师同步实际于 09:06 接通，09:24 结束；参会双方均有音频活动。","sequence":10,"source_class":"PLATFORM","source_kind":"meeting_platform"}

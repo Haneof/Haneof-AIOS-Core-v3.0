@@ -1,0 +1,12 @@
+{
+  "checkpoint_id": "cp0008",
+  "model": "Agent Mode",
+  "provider": "Arena.ai",
+  "provider_request_attestation": null,
+  "released_cursor": 8,
+  "resident_session_id": "resident-sem-repair-20260922",
+  "run_id": "resident-repair-20260922",
+  "simulated_timestamp": "2026-11-10T08:02:00-08:00",
+  "world_revision_after": 44,
+  "world_revision_before": 43
+}

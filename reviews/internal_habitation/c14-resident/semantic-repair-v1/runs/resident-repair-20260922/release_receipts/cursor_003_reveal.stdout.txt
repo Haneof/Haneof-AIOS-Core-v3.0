@@ -1,0 +1,1 @@
+{"dimension":"dim:work_outcome","event_id":"c14semrep-003","modality":"structured_text","occurred_at":"2026-11-03T10:34:00-08:00","resident_visible_payload":"“API 迁移说明”第一版于 10:27 提交；该任务登记目标时间为 10:45。","sequence":3,"source_class":"PLATFORM","source_kind":"task_tracker"}

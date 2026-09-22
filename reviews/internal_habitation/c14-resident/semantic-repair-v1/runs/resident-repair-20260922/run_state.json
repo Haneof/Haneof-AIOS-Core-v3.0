@@ -1,0 +1,376 @@
+{
+  "capability_call_count": 18,
+  "cognition_calls": [
+    {
+      "arguments": {
+        "claim_type": "hypothesis",
+        "confidence": 0.65,
+        "content": "根据已记录事实：2026-11-03 睡眠7小时46分（评分83/100，07:01醒来）；当日上午 08:28–10:25 开启专注模式且未接通语音/视频通话，静音21条通知；随后于 10:27 提前完成并提交‘API 迁移说明’第一版（目标时间10:45）。初步形成工作模式假说：夜间充足睡眠配合上午无干扰专注时段，有助于高效完成并提前交付复杂文档任务。",
+        "dimension": "dim:work_outcome",
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_5bf4b05a9dafdb85ec5bb688",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+            "revision": 1
+          }
+        ],
+        "knowledge_state": "hypothesis"
+      },
+      "checkpoint_id": "cp0004",
+      "name": "commit_claim"
+    },
+    {
+      "arguments": {
+        "confidence": 0.7,
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_5bf4b05a9dafdb85ec5bb688",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_536104c70eaad761d2583410",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_16b3967abe086c1bbae30bf7",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_3187c6e6c4a710447d75b09e",
+            "revision": 1
+          }
+        ],
+        "reason": "整合2026-11-06反向对照事实（5小时34分睡眠、3次通话打断、交付延后62分钟），完善工作模式假说并严格对齐叶子证据。",
+        "replacement_content": "对比分析已记录事实：\n1. 2026-11-03 用户睡眠7小时46分（评分83/100，07:01醒来），上午 08:28–10:25 开启专注模式且无通话干扰（静音21条通知），于 10:27 提前交付“API 迁移说明”第一版（目标10:45）；\n2. 2026-11-06 用户睡眠5小时34分（评分58/100，06:48醒来），上午经历3次通话（08:58–09:09、09:37–09:49、10:08–10:19），于 12:02 交付“权限迁移说明”第一版（目标11:00，延后62分钟）。\n对照支持工作模式假说：充足睡眠配合上午无干扰专注块有助于按时或提前完成结构化文档任务，而睡眠欠佳及上午频繁通话打断与任务延后交付相关。",
+        "target_ref": {
+          "object_id": "clm_b4df2179bb8ffec020a39ede",
+          "revision": 1
+        }
+      },
+      "checkpoint_id": "cp0008",
+      "name": "revise_claim"
+    },
+    {
+      "arguments": {
+        "confidence": 0.78,
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_5bf4b05a9dafdb85ec5bb688",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_536104c70eaad761d2583410",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_16b3967abe086c1bbae30bf7",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_3187c6e6c4a710447d75b09e",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_4707b28549e22ebbc07bc197",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_3f4a7a47f483b4459d92d94e",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_3ec2502eb5b3e04c32469e65",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_e097d1109d87846dabdb0060",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_eacb9de67251ec8bb98476a4",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_conv_user_366afd061716259ae44a289a",
+            "revision": 1
+          }
+        ],
+        "reason": "整合2026-11-10全维度记录（充足睡眠、实际08:05起草、09:06–09:24同步会议、10:52提前提交），严格分离日程计划、实际执行观察与交付结果，完善工作模式假说。",
+        "replacement_content": "综合多日已记录事实与执行观察：\n1. 2026-11-03（基准无干扰）：睡眠7小时46分（评分83/100，07:01醒来），08:28–10:25开启专注模式无通话干扰（静音21条通知），10:27提前提交“API 迁移说明”第一版（目标10:45）；\n2. 2026-11-06（多次意外打断）：睡眠5小时34分（评分58/100，06:48醒来），上午经历3次通话打断（08:58–09:09、09:37–09:49、10:08–10:19），12:02提交“权限迁移说明”第一版（目标11:00，延后62分钟交付）；\n3. 2026-11-10（受控单次同步）：睡眠7小时31分（评分80/100，07:29醒来）。日历计划（Plan）为09:00–09:25同步且08:00–11:20起草，但实际执行观察（Observed）表明起草实际于08:05开始、会议实际于09:06–09:24接通进行（双方均有音频），用户反馈会后快速恢复上下文，最终产出（Outcome）于10:52提前交付“发布说明”第一版（目标11:30，提前38分钟且结构完整）。\n假说演进：严格区分日程计划与实际执行观察；充足睡眠支持下，单次预期内短时间聚焦同步对心流影响有限且可按时提前交付，而多次零散意外打断则显著增加延误风险。",
+        "target_ref": {
+          "object_id": "clm_b4df2179bb8ffec020a39ede",
+          "revision": 2
+        }
+      },
+      "checkpoint_id": "cp0015",
+      "name": "revise_claim"
+    }
+  ],
+  "complete": true,
+  "conversation_turn_index": 1,
+  "current_simulated_timestamp": null,
+  "errors": [],
+  "next_checkpoint": 17,
+  "next_summary_request": 21,
+  "phase": "B",
+  "released_cursors": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "response_count": 1,
+  "run_id": "resident-repair-20260922",
+  "semantic_checkpoints": [
+    {
+      "checkpoint_id": "cp0001",
+      "directive_kind": "silence",
+      "released_cursor": 1,
+      "simulated_timestamp": "2026-11-03T07:06:00-08:00",
+      "world_revision_before": 3
+    },
+    {
+      "checkpoint_id": "cp0002",
+      "directive_kind": "silence",
+      "released_cursor": 4,
+      "simulated_timestamp": "2026-11-06T06:53:00-08:00",
+      "world_revision_before": 15
+    },
+    {
+      "checkpoint_id": "cp0003",
+      "directive_kind": "capability_calls",
+      "released_cursor": 5,
+      "simulated_timestamp": "2026-11-06T10:23:00-08:00",
+      "world_revision_before": 19
+    },
+    {
+      "checkpoint_id": "cp0004",
+      "directive_kind": "capability_calls",
+      "released_cursor": 5,
+      "simulated_timestamp": "2026-11-06T10:23:00-08:00",
+      "world_revision_before": 19
+    },
+    {
+      "checkpoint_id": "cp0005",
+      "directive_kind": "silence",
+      "released_cursor": 5,
+      "simulated_timestamp": "2026-11-06T10:23:00-08:00",
+      "world_revision_before": 20
+    },
+    {
+      "checkpoint_id": "cp0006",
+      "directive_kind": "silence",
+      "released_cursor": 7,
+      "simulated_timestamp": "2026-11-10T07:34:00-08:00",
+      "world_revision_before": 39
+    },
+    {
+      "checkpoint_id": "cp0007",
+      "directive_kind": "capability_calls",
+      "released_cursor": 8,
+      "simulated_timestamp": "2026-11-10T08:02:00-08:00",
+      "world_revision_before": 43
+    },
+    {
+      "checkpoint_id": "cp0008",
+      "directive_kind": "capability_calls",
+      "released_cursor": 8,
+      "simulated_timestamp": "2026-11-10T08:02:00-08:00",
+      "world_revision_before": 43
+    },
+    {
+      "checkpoint_id": "cp0009",
+      "directive_kind": "silence",
+      "released_cursor": 8,
+      "simulated_timestamp": "2026-11-10T08:02:00-08:00",
+      "world_revision_before": 44
+    },
+    {
+      "checkpoint_id": "cp0010",
+      "directive_kind": "silence",
+      "released_cursor": 10,
+      "simulated_timestamp": "2026-11-10T09:32:00-08:00",
+      "world_revision_before": 53
+    },
+    {
+      "checkpoint_id": "cp0011",
+      "directive_kind": "capability_calls",
+      "released_cursor": 12,
+      "simulated_timestamp": "2026-11-10T11:06:00-08:00",
+      "world_revision_before": 56
+    },
+    {
+      "checkpoint_id": "cp0012",
+      "directive_kind": "response",
+      "released_cursor": 12,
+      "simulated_timestamp": "2026-11-10T11:06:00-08:00",
+      "world_revision_before": 56
+    },
+    {
+      "checkpoint_id": "cp0013",
+      "directive_kind": "silence",
+      "released_cursor": 13,
+      "simulated_timestamp": "2026-11-13T08:21:00-08:00",
+      "world_revision_before": 72
+    },
+    {
+      "checkpoint_id": "cp0014",
+      "directive_kind": "capability_calls",
+      "released_cursor": 14,
+      "simulated_timestamp": "2026-11-13T10:05:00-08:00",
+      "world_revision_before": 76
+    },
+    {
+      "checkpoint_id": "cp0015",
+      "directive_kind": "capability_calls",
+      "released_cursor": 14,
+      "simulated_timestamp": "2026-11-13T10:05:00-08:00",
+      "world_revision_before": 76
+    },
+    {
+      "checkpoint_id": "cp0016",
+      "directive_kind": "silence",
+      "released_cursor": 14,
+      "simulated_timestamp": "2026-11-13T10:05:00-08:00",
+      "world_revision_before": 77
+    }
+  ],
+  "session_id": "resident-sem-repair-20260922",
+  "silence_count": 8,
+  "summary_requests": [
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 4,
+      "request_id": "sum0001"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 4,
+      "request_id": "sum0002"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 4,
+      "request_id": "sum0003"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0004"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0005"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0006"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0007"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0008"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0009"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0010"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 9,
+      "request_id": "sum0011"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 9,
+      "request_id": "sum0012"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 13,
+      "request_id": "sum0013"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 13,
+      "request_id": "sum0014"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 13,
+      "request_id": "sum0015"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 13,
+      "request_id": "sum0016"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 13,
+      "request_id": "sum0017"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 13,
+      "request_id": "sum0018"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 15,
+      "request_id": "sum0019"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 15,
+      "request_id": "sum0020"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+{"dimension":"dim:work","event_id":"c14semrep-009","modality":"structured_text","occurred_at":"2026-11-10T09:12:00-08:00","resident_visible_payload":"“发布说明”状态为进行中；实际开始时间 08:05；截至 09:11 任务仍为进行中，最近一次内容保存时间为 08:54。","sequence":9,"source_class":"PLATFORM","source_kind":"task_tracker"}

@@ -1,0 +1,29 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "object_id": "obs_c14_fixture_536104c70eaad761d2583410",
+        "revision": 1
+      },
+      "call_id": "cp0007-call-1",
+      "name": "inspect_world_object"
+    },
+    {
+      "arguments": {
+        "object_id": "obs_c14_fixture_16b3967abe086c1bbae30bf7",
+        "revision": 1
+      },
+      "call_id": "cp0007-call-2",
+      "name": "inspect_world_object"
+    },
+    {
+      "arguments": {
+        "object_id": "obs_c14_fixture_3187c6e6c4a710447d75b09e",
+        "revision": 1
+      },
+      "call_id": "cp0007-call-3",
+      "name": "inspect_world_object"
+    }
+  ],
+  "checkpoint_id": "cp0007"
+}

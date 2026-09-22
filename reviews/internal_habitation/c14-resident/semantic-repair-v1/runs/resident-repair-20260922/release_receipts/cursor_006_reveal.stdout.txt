@@ -1,0 +1,1 @@
+{"dimension":"dim:work_outcome","event_id":"c14semrep-006","modality":"structured_text","occurred_at":"2026-11-06T12:08:00-08:00","resident_visible_payload":"“权限迁移说明”第一版于 12:02 提交；该任务登记目标时间为 11:00。","sequence":6,"source_class":"PLATFORM","source_kind":"task_tracker"}

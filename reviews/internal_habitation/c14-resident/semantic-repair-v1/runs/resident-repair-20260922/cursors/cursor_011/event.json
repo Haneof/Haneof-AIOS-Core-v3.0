@@ -1,0 +1,10 @@
+{
+  "dimension": "dim:work_outcome",
+  "event_id": "c14semrep-011",
+  "modality": "structured_text",
+  "occurred_at": "2026-11-10T10:58:00-08:00",
+  "resident_visible_payload": "“发布说明”第一版于 10:52 提交；目标时间 11:30；评审前未要求重写核心结构。",
+  "sequence": 11,
+  "source_class": "PLATFORM",
+  "source_kind": "task_tracker"
+}

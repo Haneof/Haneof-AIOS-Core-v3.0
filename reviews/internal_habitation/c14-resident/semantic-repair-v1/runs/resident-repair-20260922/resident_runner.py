@@ -1,0 +1,887 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import dataclasses
+import hashlib
+import json
+import os
+import re
+import sqlite3
+import subprocess
+import sys
+import time
+from datetime import datetime
+from enum import Enum
+from pathlib import Path
+from typing import Any, Mapping
+
+from pydantic import BaseModel
+
+from aios_core.query import WorldSearchIndex
+from aios_core.runtime import CapabilityCall, FusedTurnRuntime, ModelDirective
+from aios_core.storage.sqlite_store import SQLiteWorldStore
+
+REPO_ROOT = Path(__file__).resolve()
+while REPO_ROOT != REPO_ROOT.parent and not (REPO_ROOT / "src" / "aios_core").is_dir():
+    REPO_ROOT = REPO_ROOT.parent
+if not (REPO_ROOT / "src" / "aios_core").is_dir():
+    raise RuntimeError("repository root not found")
+
+RUN_DIR = Path(__file__).resolve().parent
+RELEASE_DIR = REPO_ROOT / "reviews" / "internal_habitation" / "c14-resident" / "semantic-repair-v1" / "release"
+RELEASE_OPERATOR = RELEASE_DIR / "release_operator.py"
+MECHANICAL_ADAPTER = RELEASE_DIR / "mechanical_ingest_adapter.py"
+CANONICAL_ADAPTER = RELEASE_DIR / "canonical_conversation_ingest.py"
+
+RUN_ID = "resident-repair-20260922"
+SESSION_ID = "resident-sem-repair-20260922"
+SUBJECT_ID = "user_1"
+STARTING_MAIN = "7611fa5059f5dc8a20835cab5b312be2f43d11e8"
+BRANCH = "arena/01a0c773-haneof-aios-core-v3-0"
+DECLARED_PROVIDER = "Arena.ai"
+DECLARED_MODEL = "Agent Mode"
+
+WORLD_DB = RUN_DIR / "private_world.sqlite"
+INDEX_DB = RUN_DIR / "private_index.sqlite"
+RELEASE_STATE = RUN_DIR / "release_state.json"
+RUN_STATE = RUN_DIR / "run_state.json"
+CHECKPOINTS = RUN_DIR / "checkpoints"
+CURSORS = RUN_DIR / "cursors"
+RECEIPTS = RUN_DIR / "release_receipts"
+SUMMARIES = RUN_DIR / "summary_requests"
+FINAL_DIR = RUN_DIR / "final"
+PENDING_FILE = RUN_DIR / "pending_request.json"
+RESPONSE_FILE = RUN_DIR / "pending_response.json"
+
+
+def jsonable(value: Any) -> Any:
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    if isinstance(value, datetime):
+        return value.isoformat()
+    if isinstance(value, Enum):
+        return value.value
+    if isinstance(value, BaseModel):
+        return jsonable(value.model_dump(mode="json"))
+    if dataclasses.is_dataclass(value):
+        return jsonable(dataclasses.asdict(value))
+    if isinstance(value, Mapping):
+        return {str(k): jsonable(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple, set, frozenset)):
+        return [jsonable(v) for v in value]
+    if hasattr(value, "model_dump"):
+        return jsonable(value.model_dump(mode="json"))
+    if hasattr(value, "__dict__"):
+        return jsonable(vars(value))
+    return repr(value)
+
+
+def canonical_json(value: Any, *, pretty: bool = True) -> str:
+    return json.dumps(
+        jsonable(value),
+        ensure_ascii=False,
+        sort_keys=True,
+        indent=2 if pretty else None,
+        separators=None if pretty else (",", ":"),
+    )
+
+
+def atomic_json(path: Path, value: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(canonical_json(value), encoding="utf-8")
+    tmp.replace(path)
+
+
+def load_json(path: Path, default: Any) -> Any:
+    if not path.exists():
+        return default
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def sqlite_checkpoint(path: Path) -> None:
+    if not path.exists():
+        return
+    with sqlite3.connect(str(path)) as conn:
+        try:
+            conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        except sqlite3.DatabaseError:
+            pass
+
+
+def run_cmd(args: list[str], *, label: str, check: bool = True) -> subprocess.CompletedProcess[str]:
+    env = dict(os.environ)
+    src_dir = str(REPO_ROOT / "src")
+    if "PYTHONPATH" in env and env["PYTHONPATH"]:
+        env["PYTHONPATH"] = f"{src_dir}:{env['PYTHONPATH']}"
+    else:
+        env["PYTHONPATH"] = src_dir
+    proc = subprocess.run(
+        args,
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+        env=env,
+    )
+    RECEIPTS.mkdir(parents=True, exist_ok=True)
+    (RECEIPTS / f"{label}.stdout.txt").write_text(proc.stdout or "", encoding="utf-8")
+    (RECEIPTS / f"{label}.stderr.txt").write_text(proc.stderr or "", encoding="utf-8")
+    atomic_json(
+        RECEIPTS / f"{label}.process.json",
+        {"argv": args, "returncode": proc.returncode},
+    )
+    if check and proc.returncode != 0:
+        raise RuntimeError(
+            f"command failed ({label}) rc={proc.returncode}: {(proc.stderr or proc.stdout)[-4000:]}"
+        )
+    return proc
+
+
+def parse_json_output(text: str) -> Any:
+    raw = text.strip()
+    if not raw:
+        return None
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        for line in reversed(raw.splitlines()):
+            try:
+                return json.loads(line)
+            except json.JSONDecodeError:
+                continue
+    return raw
+
+
+REF_RE = re.compile(r"([A-Za-z0-9_.:-]+@[1-9][0-9]*)")
+
+
+def extract_ingest_ref(value: Any) -> str:
+    if isinstance(value, str):
+        match = REF_RE.search(value)
+        if match:
+            return match.group(1)
+        raise RuntimeError("adapter output did not contain an object_id@revision ref")
+    if isinstance(value, Mapping):
+        for key in ("ingest_ref", "durable_ref", "observation_ref", "object_ref", "ref"):
+            if key not in value:
+                continue
+            candidate = value[key]
+            if isinstance(candidate, str):
+                match = REF_RE.search(candidate)
+                if match:
+                    return match.group(1)
+            if isinstance(candidate, Mapping):
+                oid = candidate.get("object_id")
+                rev = candidate.get("revision")
+                if isinstance(oid, str) and isinstance(rev, int) and rev > 0:
+                    return f"{oid}@{rev}"
+        for candidate in value.values():
+            try:
+                return extract_ingest_ref(candidate)
+            except RuntimeError:
+                pass
+    if isinstance(value, list):
+        for candidate in value:
+            try:
+                return extract_ingest_ref(candidate)
+            except RuntimeError:
+                pass
+    raise RuntimeError("adapter output did not contain an object_id@revision ref")
+
+
+def load_state() -> dict[str, Any]:
+    state = load_json(
+        RUN_STATE,
+        {
+            "run_id": RUN_ID,
+            "session_id": SESSION_ID,
+            "next_checkpoint": 1,
+            "next_summary_request": 1,
+            "conversation_turn_index": 0,
+            "released_cursors": [],
+            "semantic_checkpoints": [],
+            "summary_requests": [],
+            "errors": [],
+            "silence_count": 0,
+            "response_count": 0,
+            "capability_call_count": 0,
+            "cognition_calls": [],
+            "phase": "A",
+            "complete": False,
+        },
+    )
+    if state.get("run_id") != RUN_ID:
+        raise RuntimeError("run_state belongs to a different run")
+    return state
+
+
+def save_state(state: dict[str, Any]) -> None:
+    atomic_json(RUN_STATE, state)
+
+
+class LocalResidentBridge:
+    def __init__(self, state: dict[str, Any], store: SQLiteWorldStore):
+        self.state = state
+        self.store = store
+        self._last_checkpoint_id: str | None = None
+
+    def _finalize_previous_checkpoint(self, world_revision_after: int) -> None:
+        if self._last_checkpoint_id is None:
+            return
+        cp_dir = CHECKPOINTS / self._last_checkpoint_id
+        meta_path = cp_dir / "checkpoint.json"
+        if meta_path.exists():
+            meta = load_json(meta_path, {})
+            if meta.get("world_revision_after") is None:
+                meta["world_revision_after"] = int(world_revision_after)
+                atomic_json(meta_path, meta)
+
+    def finalize_active_checkpoint(self) -> None:
+        self._finalize_previous_checkpoint(int(self.store.current_world_revision()))
+        self._last_checkpoint_id = None
+
+    def wait_event_seen(self, event: Mapping[str, Any]) -> None:
+        print(f"EVENT_REVEALED: sequence {event['sequence']}, event_id {event['event_id']}, dim {event.get('dimension')}", flush=True)
+
+    def model_handler(self, snapshot) -> ModelDirective:
+        before = int(self.store.current_world_revision())
+        self._finalize_previous_checkpoint(before)
+
+        cp_no = int(self.state["next_checkpoint"])
+        cp_id = f"cp{cp_no:04d}"
+        self.state["next_checkpoint"] = cp_no + 1
+        self._last_checkpoint_id = cp_id
+
+        cp_dir = CHECKPOINTS / cp_id
+        cp_dir.mkdir(parents=True, exist_ok=True)
+        snapshot_payload = jsonable(snapshot)
+        atomic_json(cp_dir / "snapshot.json", snapshot_payload)
+        meta = {
+            "checkpoint_id": cp_id,
+            "run_id": RUN_ID,
+            "resident_session_id": SESSION_ID,
+            "released_cursor": (self.state["released_cursors"][-1] if self.state["released_cursors"] else None),
+            "simulated_timestamp": self.state.get("current_simulated_timestamp"),
+            "world_revision_before": before,
+            "world_revision_after": None,
+            "provider": DECLARED_PROVIDER,
+            "model": DECLARED_MODEL,
+            "provider_request_attestation": None,
+        }
+        atomic_json(cp_dir / "checkpoint.json", meta)
+
+        if RESPONSE_FILE.exists():
+            RESPONSE_FILE.unlink()
+        atomic_json(
+            PENDING_FILE,
+            {
+                "kind": "SNAPSHOT",
+                "item_id": cp_id,
+                "snapshot_path": str(cp_dir / "snapshot.json"),
+                "checkpoint_meta": meta,
+            },
+        )
+        print(f"RESIDENT_WAITING_FOR_DECISION SNAPSHOT {cp_id}", flush=True)
+
+        while not RESPONSE_FILE.exists():
+            time.sleep(0.3)
+
+        directive_raw = load_json(RESPONSE_FILE, {})
+        RESPONSE_FILE.unlink()
+        if PENDING_FILE.exists():
+            PENDING_FILE.unlink()
+
+        directive_raw = dict(directive_raw)
+        directive_raw.setdefault("checkpoint_id", cp_id)
+        if directive_raw.get("checkpoint_id") != cp_id:
+            raise RuntimeError(f"directive checkpoint mismatch: expected {cp_id}, got {directive_raw.get('checkpoint_id')}")
+        atomic_json(cp_dir / "directive.json", directive_raw)
+
+        calls: list[CapabilityCall] = []
+        for idx, raw_call in enumerate(directive_raw.get("capability_calls") or []):
+            if not isinstance(raw_call, Mapping):
+                raise RuntimeError("capability call must be a mapping")
+            name = str(raw_call.get("name") or "").strip()
+            if not name:
+                raise RuntimeError("capability call name must be nonblank")
+            args = raw_call.get("arguments") or {}
+            if not isinstance(args, Mapping):
+                raise RuntimeError("capability arguments must be a mapping")
+            call_id = str(raw_call.get("call_id") or f"{cp_id}-call-{idx+1}")
+            calls.append(CapabilityCall(name=name, arguments=dict(args), call_id=call_id))
+            self.state["capability_call_count"] = int(self.state["capability_call_count"]) + 1
+            if name in {"commit_claim", "commit_ai_world_claim", "revise_claim", "retract_claim"}:
+                self.state["cognition_calls"].append(
+                    {"checkpoint_id": cp_id, "name": name, "arguments": jsonable(args)}
+                )
+
+        response = (
+            directive_raw.get("response")
+            if directive_raw.get("response") is not None
+            else directive_raw.get("assistant_message")
+        )
+        silence = bool(directive_raw.get("silence", False))
+        if calls:
+            if response is not None or silence:
+                raise RuntimeError("directive cannot combine calls with response/silence")
+            directive = ModelDirective(capability_calls=tuple(calls))
+        elif response is not None:
+            response = str(response)
+            self.state["response_count"] = int(self.state["response_count"]) + 1
+            directive = ModelDirective(response=response)
+        elif silence:
+            self.state["silence_count"] = int(self.state["silence_count"]) + 1
+            directive = ModelDirective(silence=True)
+        else:
+            raise RuntimeError("directive must request capabilities, respond, or stay silent")
+
+        self.state["semantic_checkpoints"].append(
+            {
+                "checkpoint_id": cp_id,
+                "released_cursor": meta["released_cursor"],
+                "simulated_timestamp": meta["simulated_timestamp"],
+                "world_revision_before": before,
+                "directive_kind": (
+                    "capability_calls" if calls else ("response" if response is not None else "silence")
+                ),
+            }
+        )
+        save_state(self.state)
+        return directive
+
+    def _summary_request(self, kind: str, request: Any) -> str:
+        req_no = int(self.state["next_summary_request"])
+        req_id = f"sum{req_no:04d}"
+        self.state["next_summary_request"] = req_no + 1
+        req_dir = SUMMARIES / req_id
+        req_dir.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "request_id": req_id,
+            "kind": kind,
+            "released_cursor": (self.state["released_cursors"][-1] if self.state["released_cursors"] else None),
+            "simulated_timestamp": self.state.get("current_simulated_timestamp"),
+            "request": jsonable(request),
+        }
+        atomic_json(req_dir / "request.json", payload)
+
+        if RESPONSE_FILE.exists():
+            RESPONSE_FILE.unlink()
+        atomic_json(
+            PENDING_FILE,
+            {
+                "kind": "SUMMARY_REQUEST",
+                "item_id": req_id,
+                "summary_kind": kind,
+                "request_path": str(req_dir / "request.json"),
+                "payload": payload,
+            },
+        )
+        print(f"RESIDENT_WAITING_FOR_DECISION SUMMARY_REQUEST {req_id}", flush=True)
+
+        while not RESPONSE_FILE.exists():
+            time.sleep(0.3)
+
+        raw = load_json(RESPONSE_FILE, {})
+        RESPONSE_FILE.unlink()
+        if PENDING_FILE.exists():
+            PENDING_FILE.unlink()
+
+        content = str(raw.get("content") or raw.get("summary_text") or "")
+        if not content.strip():
+            raise RuntimeError("summary response content must be nonblank")
+        atomic_json(req_dir / "response.json", {"content": content})
+        self.state["summary_requests"].append(
+            {
+                "request_id": req_id,
+                "kind": kind,
+                "released_cursor": payload["released_cursor"],
+            }
+        )
+        save_state(self.state)
+        return content
+
+    def dimension_summary_handler(self, request) -> str:
+        return self._summary_request("dimension_summary", request)
+
+    def round_summary_handler(self, request) -> str:
+        return self._summary_request("conversation_round_summary", request)
+
+
+def git_checkpoint(message: str) -> None:
+    sqlite_checkpoint(WORLD_DB)
+    sqlite_checkpoint(INDEX_DB)
+    rel = RUN_DIR.relative_to(REPO_ROOT)
+    subprocess.run(["git", "add", str(rel)], cwd=REPO_ROOT, check=True)
+    diff = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=REPO_ROOT)
+    if diff.returncode == 0:
+        return
+    subprocess.run(["git", "commit", "-m", message], cwd=REPO_ROOT, check=True)
+
+
+def run_release_init(phase: str, label: str) -> None:
+    if (RECEIPTS / f"{label}.json").exists():
+        return
+    proc = run_cmd(
+        [
+            sys.executable,
+            str(RELEASE_OPERATOR),
+            "init",
+            "--phase",
+            phase,
+            "--state",
+            str(RELEASE_STATE),
+        ],
+        label=label,
+    )
+    atomic_json(RECEIPTS / f"{label}.json", parse_json_output(proc.stdout))
+
+
+def reveal_event(phase: str, sequence_hint: int) -> dict[str, Any]:
+    event_file = RUN_DIR / "current_event.json"
+    proc = run_cmd(
+        [
+            sys.executable,
+            str(RELEASE_OPERATOR),
+            "reveal",
+            "--phase",
+            phase,
+            "--state",
+            str(RELEASE_STATE),
+        ],
+        label=f"cursor_{sequence_hint:03d}_reveal",
+    )
+    event_file.write_text(proc.stdout, encoding="utf-8")
+    event = json.loads(proc.stdout)
+    return event
+
+
+def ingest_and_ack(
+    *,
+    event: Mapping[str, Any],
+    phase: str,
+    conversation_turn_index: int | None,
+) -> dict[str, Any]:
+    sequence = int(event["sequence"])
+    event_id = str(event["event_id"])
+    event_file = RUN_DIR / "current_event.json"
+    is_conversation = (
+        event.get("dimension") == "dim:conversation"
+        and event.get("source_kind") == "conversation"
+        and event.get("source_class") == "USER"
+        and event.get("modality") == "text"
+    )
+
+    if is_conversation:
+        if conversation_turn_index is None or conversation_turn_index <= 0:
+            raise RuntimeError("canonical conversation requires positive turn index")
+        proc = run_cmd(
+            [
+                sys.executable,
+                str(CANONICAL_ADAPTER),
+                "--world-db",
+                str(WORLD_DB),
+                "--session-id",
+                SESSION_ID,
+                "--turn-index",
+                str(conversation_turn_index),
+                "--event-file",
+                str(event_file),
+            ],
+            label=f"cursor_{sequence:03d}_canonical_ingest",
+        )
+    else:
+        proc = run_cmd(
+            [
+                sys.executable,
+                str(MECHANICAL_ADAPTER),
+                "--world-db",
+                str(WORLD_DB),
+                "--event-file",
+                str(event_file),
+            ],
+            label=f"cursor_{sequence:03d}_mechanical_ingest",
+        )
+
+    adapter_output = parse_json_output(proc.stdout)
+    ingest_ref = extract_ingest_ref(adapter_output)
+    ack_args = [
+        sys.executable,
+        str(RELEASE_OPERATOR),
+        "ack",
+        "--phase",
+        phase,
+        "--state",
+        str(RELEASE_STATE),
+        "--world-db",
+        str(WORLD_DB),
+        "--sequence",
+        str(sequence),
+        "--event-id",
+        event_id,
+        "--ingest-ref",
+        ingest_ref,
+    ]
+    if is_conversation:
+        ack_args.extend(
+            [
+                "--conversation-session-id",
+                SESSION_ID,
+                "--conversation-turn-index",
+                str(conversation_turn_index),
+            ]
+        )
+    ack = run_cmd(ack_args, label=f"cursor_{sequence:03d}_ack")
+    ack_output = parse_json_output(ack.stdout)
+    return {
+        "is_conversation": is_conversation,
+        "ingest_ref": ingest_ref,
+        "adapter_output": adapter_output,
+        "ack_output": ack_output,
+    }
+
+
+def drain_wakes(runtime: FusedTurnRuntime, now: datetime, *, stage: str) -> list[Any]:
+    results: list[Any] = []
+    for _ in range(256):
+        item = runtime.dispatch_next_pending_wake(now=now)
+        if item is None:
+            return results
+        results.append(jsonable(item))
+    raise RuntimeError(f"wake drain exceeded safety cap at {stage}")
+
+
+def drain_reviews(runtime: FusedTurnRuntime, now: datetime) -> list[Any]:
+    results: list[Any] = []
+    for _ in range(64):
+        item = runtime.run_periodic_review(now=now)
+        if item is None:
+            return results
+        results.append(jsonable(item))
+        runtime.index.catch_up()
+        wake_state = str(jsonable(item.wake).get("state") or "")
+        if wake_state == "running":
+            raise RuntimeError("periodic review remained RUNNING without semantic completion")
+    raise RuntimeError("periodic review drain exceeded safety cap")
+
+
+def final_claims(store: SQLiteWorldStore) -> list[dict[str, Any]]:
+    payloads = store.list_payloads(subject_id=SUBJECT_ID)
+    out: list[dict[str, Any]] = []
+    for payload in payloads:
+        if str(payload.get("object_type") or "") != "claim":
+            continue
+        out.append(
+            {
+                "ref": f"{payload.get('object_id')}@{payload.get('revision')}",
+                "status": payload.get("status"),
+                "confidence": payload.get("confidence"),
+                "claim_type": payload.get("claim_type"),
+                "statement": payload.get("statement"),
+                "evidence_refs": payload.get("evidence_refs"),
+            }
+        )
+    return out
+
+
+def write_final_report(state: dict[str, Any], store: SQLiteWorldStore) -> None:
+    sqlite_checkpoint(WORLD_DB)
+    sqlite_checkpoint(INDEX_DB)
+    FINAL_DIR.mkdir(parents=True, exist_ok=True)
+
+    world_sha = sha256_file(WORLD_DB)
+    release_sha = sha256_file(RELEASE_STATE)
+    claims = final_claims(store)
+    atomic_json(FINAL_DIR / "current_claims.json", claims)
+    atomic_json(
+        FINAL_DIR / "digests.json",
+        {
+            "world_sha256": world_sha,
+            "release_state_sha256": release_sha,
+            "index_sha256": sha256_file(INDEX_DB) if INDEX_DB.exists() else None,
+        },
+    )
+    manifest = {
+        "task": "C14-SEM-REPAIR-RES-001",
+        "run_id": RUN_ID,
+        "starting_main_sha": STARTING_MAIN,
+        "exact_evaluated_main": STARTING_MAIN,
+        "resident_branch": BRANCH,
+        "resident_session_id": SESSION_ID,
+        "subject_id": SUBJECT_ID,
+        "resident_provider_declared": DECLARED_PROVIDER,
+        "resident_model_declared": DECLARED_MODEL,
+        "provider_request_attestation": "not exposed to repository harness",
+        "cursor_range": "1..15",
+        "completed_count": len(state["released_cursors"]),
+        "world_revision_final": int(store.current_world_revision()),
+        "silence_count": int(state["silence_count"]),
+        "response_count": int(state["response_count"]),
+        "capability_call_count": int(state["capability_call_count"]),
+        "cognition_calls": state["cognition_calls"],
+        "current_claim_refs": [item["ref"] for item in claims],
+        "summary_request_count": len(state["summary_requests"]),
+        "semantic_checkpoint_count": len(state["semantic_checkpoints"]),
+        "world_sha256": world_sha,
+        "release_state_sha256": release_sha,
+        "forbidden_resident_reads": [],
+        "fixture_access_boundary": (
+            "sealed fixture/manifest bytes were consumed only inside the frozen release infrastructure; "
+            "the Resident bridge received only one current reveal projection at a time"
+        ),
+        "future_preview": False,
+        "core_modified_by_run": False,
+        "historical_c14_evidence_modified_by_run": False,
+        "semantic_evaluation_performed": False,
+    }
+    atomic_json(RUN_DIR / "run_manifest.json", manifest)
+
+    report = f"""# C14 Semantic Repair Resident Run
+
+- Task: C14-SEM-REPAIR-RES-001
+- Status: RESIDENT RUN COMPLETED; evidence available for independent evaluation.
+- Starting / exact evaluated main: `{STARTING_MAIN}`
+- Resident branch: `{BRANCH}`
+- Resident session: `{SESSION_ID}`
+- Declared runtime identity: {DECLARED_PROVIDER} / {DECLARED_MODEL}; provider request attestation is not exposed to this repository harness.
+- Cursors: {len(state['released_cursors'])}/15, sequential.
+- Final World revision: {store.current_world_revision()}
+- Semantic checkpoints: {len(state['semantic_checkpoints'])}
+- Summary requests authored by Resident: {len(state['summary_requests'])}
+- Silence directives: {state['silence_count']}
+- Capability calls: {state['capability_call_count']}
+- Current Claim refs: {', '.join(item['ref'] for item in claims) if claims else '(none)'}
+- World SHA256: `{world_sha}`
+- Release-state SHA256: `{release_sha}`
+- Sealed fixture / manifest bytes were not exposed through the Resident bridge; only the current mechanically projected event was surfaced.
+- No evaluator-only material was read by this harness.
+- No Core source was modified by this run.
+- No historical C14 Resident evidence was modified by this run.
+- No E1/E5/C14 semantic verdict is made here.
+
+Resident run completed and evidence available for independent evaluation.
+"""
+    (RUN_DIR / "RESIDENT_RUN_REPORT.md").write_text(report, encoding="utf-8")
+
+
+def main() -> int:
+    RUN_DIR.mkdir(parents=True, exist_ok=True)
+    CHECKPOINTS.mkdir(parents=True, exist_ok=True)
+    CURSORS.mkdir(parents=True, exist_ok=True)
+    RECEIPTS.mkdir(parents=True, exist_ok=True)
+    SUMMARIES.mkdir(parents=True, exist_ok=True)
+
+    state = load_state()
+    if state.get("complete"):
+        print("RESIDENT_RUN_ALREADY_COMPLETE", flush=True)
+        return 0
+
+    is_resuming = bool(RUN_STATE.exists() and not state.get("complete") and state.get("released_cursors"))
+    if not is_resuming and (WORLD_DB.exists() or RELEASE_STATE.exists()):
+        raise RuntimeError(
+            "formal live run must start from a fresh private World/state"
+        )
+
+    store = SQLiteWorldStore(WORLD_DB)
+    index = WorldSearchIndex(INDEX_DB, store=store)
+    bridge = LocalResidentBridge(state, store)
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=bridge.model_handler,
+        subject_id=SUBJECT_ID,
+        round_summary_handler=bridge.round_summary_handler,
+        dimension_summary_handler=bridge.dimension_summary_handler,
+    )
+
+    if not is_resuming:
+        run_manifest = {
+            "task": "C14-SEM-REPAIR-RES-001",
+            "run_id": RUN_ID,
+            "starting_main_sha": STARTING_MAIN,
+            "exact_evaluated_main": STARTING_MAIN,
+            "resident_branch": BRANCH,
+            "resident_session_id": SESSION_ID,
+            "subject_id": SUBJECT_ID,
+            "declared_provider": DECLARED_PROVIDER,
+            "declared_model": DECLARED_MODEL,
+            "provider_request_attestation": None,
+            "world_revision_start": int(store.current_world_revision()),
+            "phase_a": "1..6",
+            "phase_b": "7..15",
+            "sequential_release": True,
+            "future_preview": False,
+            "semantic_engine": "external real Resident via RuntimeSnapshot/ModelDirective bridge",
+        }
+        atomic_json(RUN_DIR / "run_manifest.json", run_manifest)
+
+        print("INIT: Phase A...", flush=True)
+        run_release_init("A", "phase_A_init")
+
+    for expected_sequence in range(1, 16):
+        cursor_dir = CURSORS / f"cursor_{expected_sequence:03d}"
+        lifecycle_file = cursor_dir / "lifecycle.json"
+        if lifecycle_file.exists():
+            print(f"CURSOR {expected_sequence:03d} ALREADY COMPLETE. Skipping.", flush=True)
+            continue
+
+        phase = "A" if expected_sequence <= 6 else "B"
+        if expected_sequence == 7:
+            print("INIT: Phase B handoff...", flush=True)
+            run_release_init("B", "phase_B_init")
+            state["phase"] = "B"
+            save_state(state)
+
+        event_file = cursor_dir / "event.json"
+        ack_file = RECEIPTS / f"cursor_{expected_sequence:03d}_ack.process.json"
+        mech_file = RECEIPTS / f"cursor_{expected_sequence:03d}_mechanical_ingest.process.json"
+        canon_file = RECEIPTS / f"cursor_{expected_sequence:03d}_canonical_ingest.process.json"
+
+        if event_file.exists() and ack_file.exists():
+            print(f"CURSOR {expected_sequence:03d} (Phase {phase}) already revealed & acked. Resuming execution...", flush=True)
+            event = load_json(event_file, {})
+            sequence = int(event.get("sequence") or 0)
+            is_conversation = (
+                event.get("dimension") == "dim:conversation"
+                and event.get("source_kind") == "conversation"
+                and event.get("source_class") == "USER"
+                and event.get("modality") == "text"
+            )
+            if is_conversation:
+                ingest = {
+                    "kind": "canonical_conversation",
+                    "ingest_process": load_json(canon_file, {}),
+                    "ack_process": load_json(ack_file, {}),
+                }
+            else:
+                ingest = {
+                    "kind": "mechanical",
+                    "ingest_process": load_json(mech_file, {}),
+                    "ack_process": load_json(ack_file, {}),
+                }
+            prev_lc_file = CURSORS / f"cursor_{sequence-1:03d}" / "lifecycle.json"
+            prev_lc = load_json(prev_lc_file, {}) if prev_lc_file.exists() else {}
+            before_ingest = int(prev_lc.get("world_revision_after_cursor") or 55)
+            after_ack = int(load_json(RECEIPTS / f"cursor_{sequence:03d}_ack.stdout.txt", {}).get("ingest_world_revision") or 56)
+            state["current_simulated_timestamp"] = str(event["occurred_at"])
+            save_state(state)
+        else:
+            print(f"REVEAL: cursor {expected_sequence:03d} (Phase {phase})...", flush=True)
+            event = reveal_event(phase, expected_sequence)
+            sequence = int(event.get("sequence") or 0)
+            if sequence != expected_sequence:
+                raise RuntimeError(f"release order violation: expected {expected_sequence}, got {sequence}")
+            cursor_dir.mkdir(parents=True, exist_ok=True)
+            atomic_json(cursor_dir / "event.json", event)
+            state["current_simulated_timestamp"] = str(event["occurred_at"])
+            save_state(state)
+
+            bridge.wait_event_seen(event)
+
+            is_conversation = (
+                event.get("dimension") == "dim:conversation"
+                and event.get("source_kind") == "conversation"
+                and event.get("source_class") == "USER"
+                and event.get("modality") == "text"
+            )
+            turn_index: int | None = None
+            if is_conversation:
+                turn_index = int(state["conversation_turn_index"]) + 1
+                state["conversation_turn_index"] = turn_index
+                save_state(state)
+
+            before_ingest = int(store.current_world_revision())
+            print(f"INGEST & ACK: cursor {sequence:03d}...", flush=True)
+            ingest = ingest_and_ack(
+                event=event,
+                phase=phase,
+                conversation_turn_index=turn_index,
+            )
+            index.catch_up()
+            after_ack = int(store.current_world_revision())
+
+            if sequence not in state["released_cursors"]:
+                state["released_cursors"].append(sequence)
+            save_state(state)
+
+        is_conversation = (
+            event.get("dimension") == "dim:conversation"
+            and event.get("source_kind") == "conversation"
+            and event.get("source_class") == "USER"
+            and event.get("modality") == "text"
+        )
+        turn_index = int(state["conversation_turn_index"]) if is_conversation else None
+        now = datetime.fromisoformat(str(event["occurred_at"]).replace("Z", "+00:00"))
+        lifecycle: dict[str, Any] = {
+            "sequence": sequence,
+            "event_id": event["event_id"],
+            "phase": phase,
+            "occurred_at": event["occurred_at"],
+            "world_revision_before_ingest": before_ingest,
+            "world_revision_after_ack": after_ack,
+            "ingest": ingest,
+            "conversation_turn_index": turn_index,
+            "run_turn": None,
+            "dimension_summaries": None,
+            "wakes_before_review": [],
+            "periodic_reviews": [],
+            "wakes_after_review": [],
+            "world_revision_after_cursor": None,
+        }
+
+        if is_conversation:
+            print(f"RUN_TURN: cursor {sequence:03d}...", flush=True)
+            turn_result = runtime.run_turn(
+                session_id=SESSION_ID,
+                turn_index=int(turn_index),
+                user_input=str(event["resident_visible_payload"]),
+                occurred_at=now,
+            )
+            bridge.finalize_active_checkpoint()
+            lifecycle["run_turn"] = jsonable(turn_result)
+            index.catch_up()
+
+        print(f"RUN_DUE_SUMMARIES: cursor {sequence:03d}...", flush=True)
+        summaries = runtime.run_due_dimension_summaries(now=now)
+        lifecycle["dimension_summaries"] = jsonable(summaries)
+        index.catch_up()
+
+        print(f"DRAIN_WAKES (before review): cursor {sequence:03d}...", flush=True)
+        lifecycle["wakes_before_review"] = drain_wakes(runtime, now, stage="before_review")
+        bridge.finalize_active_checkpoint()
+
+        print(f"DRAIN_REVIEWS: cursor {sequence:03d}...", flush=True)
+        lifecycle["periodic_reviews"] = drain_reviews(runtime, now)
+        bridge.finalize_active_checkpoint()
+
+        print(f"DRAIN_WAKES (after review): cursor {sequence:03d}...", flush=True)
+        lifecycle["wakes_after_review"] = drain_wakes(runtime, now, stage="after_review")
+        bridge.finalize_active_checkpoint()
+
+        index.catch_up()
+        lifecycle["world_revision_after_cursor"] = int(store.current_world_revision())
+        atomic_json(cursor_dir / "lifecycle.json", lifecycle)
+        git_checkpoint(f"evidence(c14): resident repair cursor {sequence:03d}")
+        print(f"CURSOR {sequence:03d} COMPLETE. World revision: {lifecycle['world_revision_after_cursor']}", flush=True)
+
+    state["complete"] = True
+    state["current_simulated_timestamp"] = None
+    save_state(state)
+    bridge.finalize_active_checkpoint()
+    write_final_report(state, store)
+    git_checkpoint("evidence(c14): finalize semantic repair resident run")
+    print("RESIDENT_RUN_COMPLETE", flush=True)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

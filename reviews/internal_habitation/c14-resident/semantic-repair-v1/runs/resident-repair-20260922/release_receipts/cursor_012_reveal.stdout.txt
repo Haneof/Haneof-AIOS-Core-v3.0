@@ -1,0 +1,1 @@
+{"dimension":"dim:conversation","event_id":"c14semrep-012","modality":"text","occurred_at":"2026-11-10T11:06:00-08:00","resident_visible_payload":"用户说：“九点聊完回来接着写，没怎么重新找上下文，十一点前一版就出来了。”","sequence":12,"source_class":"USER","source_kind":"conversation"}

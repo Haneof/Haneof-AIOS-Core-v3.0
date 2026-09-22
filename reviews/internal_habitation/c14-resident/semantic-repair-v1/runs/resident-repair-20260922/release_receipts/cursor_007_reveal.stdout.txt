@@ -1,0 +1,1 @@
+{"dimension":"dim:sleep","event_id":"c14semrep-007","modality":"structured_text","occurred_at":"2026-11-10T07:34:00-08:00","resident_visible_payload":"昨晚睡眠 7小时31分；睡眠评分 80/100；07:29 醒来。","sequence":7,"source_class":"SENSOR","source_kind":"wearable"}
