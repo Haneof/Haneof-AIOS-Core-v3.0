@@ -9,7 +9,8 @@
   "next_summary_request": 1,
   "phase": "A",
   "released_cursors": [
-    1
+    1,
+    2
   ],
   "response_count": 0,
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
