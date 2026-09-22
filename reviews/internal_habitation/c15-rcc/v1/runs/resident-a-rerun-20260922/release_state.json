@@ -2,15 +2,10 @@
   "active_phase": "A",
   "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
   "fixture_version": "c15-rcc-fixture-v1",
-  "last_acked_event_id": "c15rcc-005",
-  "last_acked_sequence": 5,
-  "next_sequence": 6,
-  "pending_reveal": {
-    "event_id": "c15rcc-006",
-    "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
-    "occurred_at": "2026-11-03T10:15:00-08:00",
-    "sequence": 6
-  },
+  "last_acked_event_id": "c15rcc-006",
+  "last_acked_sequence": 6,
+  "next_sequence": 7,
+  "pending_reveal": null,
   "receipts": [
     {
       "binding_mode": "canonical_user_turn",
@@ -90,6 +85,23 @@
       "sequence": 5,
       "session_id": "resident-a-rerun-20260922-sol-001",
       "turn_index": 3
+    },
+    {
+      "binding_mode": "canonical_user_turn",
+      "binding_version": "c15-rcc-canonical-conversation-binding-v1",
+      "event_id": "c15rcc-006",
+      "fixture_payload_sha256": "sha256:bbc17affa31401eab9f9e57acd053ecfee39411f900dce06b700dec6f0f03c32",
+      "fixture_projection_sha256": "sha256:d2ecb3ce17f510ad17b36959fea9cedbefe0d87a93a54957cbe385c9423f161d",
+      "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+      "ingest_object_id": "obs_conv_user_8263c9ad110da7805f31b86d",
+      "ingest_ref": "obs_conv_user_8263c9ad110da7805f31b86d@1",
+      "ingest_revision": 1,
+      "ingest_source_class": "user",
+      "ingest_world_revision": 18,
+      "occurred_at": "2026-11-03T10:15:00-08:00",
+      "sequence": 6,
+      "session_id": "resident-a-rerun-20260922-sol-001",
+      "turn_index": 4
     }
   ],
   "release_contract_version": "c15-rcc-sequential-release-v1",
