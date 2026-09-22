@@ -175,7 +175,7 @@ If a crash occurs after the delivery fact commit but before Wake completion:
 - the Wake remains RUNNING;
 - a fresh runtime first detects the already-durable delivery by logical Wake id;
 - the Resident model/provider is **not invoked again**;
-- the stored exact delivery text, first exact Wake provenance, Step0 and mechanical runtime-completion metadata are reused to finish the Wake;
+- the stored exact delivery text, first exact Wake provenance, Step0 and mechanical runtime-completion metadata are validated and reused to finish the Wake;
 - only Wake completion advances the World on recovery.
 
 A targeted test injects a simulated failure at Wake completion, reopens the SQLite World with a fresh runtime whose model handler would fail if called, and verifies final convergence to:
@@ -183,6 +183,7 @@ A targeted test injects a simulated failure at Wake completion, reopens the SQLi
 - exactly 1 completed Wake;
 - exactly 1 delivered assistant interaction Observation;
 - zero model replay during recovery;
+- fail-closed validation of stored delivery key / exact Wake ref / subject / Step0 delivery grant;
 - no duplicate World write.
 
 A second replay after the Wake is already completed is also a no-write idempotent return. Direct persistence retry with changed text under the same logical delivery identity fails closed.
