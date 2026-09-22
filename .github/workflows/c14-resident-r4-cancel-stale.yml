@@ -15,11 +15,11 @@ jobs:
   cancel-stale:
     runs-on: ubuntu-latest
     steps:
-      - name: Cancel stale Resident runs
+      - name: Cancel remaining stale Resident run
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
         run: |
-          for run_id in 35687146532 35687210543 35687235834; do
+          for run_id in 35687210543; do
             gh api --method POST "/repos/$GH_REPO/actions/runs/$run_id/cancel" || true
           done
