@@ -2,19 +2,10 @@
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
   "nonce": "9f4c7b2e-6a31-4c97-bd28-1f0b88a9d453",
   "kind": "DIRECTIVE",
-  "item_id": "cp0003",
+  "item_id": "cp0004",
   "payload": {
-    "checkpoint_id": "cp0003",
-    "capability_calls": [
-      {
-        "name": "read_periodic_review_anchors",
-        "arguments": {
-          "offset": 0,
-          "limit": 20
-        },
-        "call_id": "cp0003-read-anchors"
-      }
-    ],
-    "decision_rationale": "Six anchors span multiple dimensions and include derived summaries; inspect the exact pinned anchors before deciding whether any durable cognition is justified."
+    "checkpoint_id": "cp0004",
+    "silence": true,
+    "decision_rationale": "The review anchors reduce to three underlying observations: one focus-mode interval, one early task submission, and one later short-sleep record. Their coexistence does not establish a stable work pattern or causal relation, and the summaries add no independent evidence."
   }
 }
