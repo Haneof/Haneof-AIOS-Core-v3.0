@@ -1,4 +1,3 @@
-NEED_RESIDENT_DECISION dimension_summary_input
 {
   "cursor": 6,
   "kind": "dimension_summary_input",
@@ -73,4 +72,3 @@ NEED_RESIDENT_DECISION dimension_summary_input
     "truncated": false
   }
 }
-STATE {"world_revision": 20, "watermark": 20, "lag": 0}
