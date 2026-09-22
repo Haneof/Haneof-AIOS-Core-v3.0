@@ -113,18 +113,21 @@ The raw locator is Wake-specific, not a fabricated conversation turn locator.
 
 ## 6. Stable delivery identity
 
-The assistant Observation id is deterministic from:
+The assistant Observation id is deterministic from the **logical Wake delivery identity**:
 
 - subject id;
-- exact originating Wake object id;
-- exact originating Wake revision;
+- originating Wake object id;
 - constant delivery class `wake_user_delivery`.
+
+The exact RUNNING Wake revision used by the first delivery execution is **not** part of the Observation identity; it is retained immutably in provenance as `origin_wake_ref` / `origin_wake_revision`.
+
+This distinction is deliberate: the same logical Wake can remain RUNNING across process recovery or budget-window transitions without becoming a second user delivery.
 
 Format:
 
 `obs_wake_ai_<stable digest>`
 
-The operation id is deterministic from the same delivery key:
+The operation id is deterministic from the same logical delivery key:
 
 `op_wake_ai_<stable digest>`
 
@@ -134,7 +137,7 @@ No random UUID participates in delivery identity.
 
 The store idempotency key is deterministic:
 
-`wake-assistant-delivery:<subject>:<wake-id>:<wake-revision>`
+`wake-assistant-delivery:<subject>:<wake-id>`
 
 Exact replay with the same text/time/provenance:
 
@@ -170,18 +173,19 @@ completed Wake → crash → permanently missing interaction fact.
 If a crash occurs after the delivery fact commit but before Wake completion:
 
 - the Wake remains RUNNING;
-- retry re-enters the same exact running Wake;
-- the delivery API resolves to the same deterministic Observation/operation identity;
-- equivalent replay is idempotent;
+- a fresh runtime first detects the already-durable delivery by logical Wake id;
+- the Resident model/provider is **not invoked again**;
+- the stored exact delivery text, first exact Wake provenance, Step0 and mechanical runtime-completion metadata are reused to finish the Wake;
 - only Wake completion advances the World on recovery.
 
-A targeted test injects a simulated failure at Wake completion and verifies final convergence to:
+A targeted test injects a simulated failure at Wake completion, reopens the SQLite World with a fresh runtime whose model handler would fail if called, and verifies final convergence to:
 
 - exactly 1 completed Wake;
 - exactly 1 delivered assistant interaction Observation;
+- zero model replay during recovery;
 - no duplicate World write.
 
-Changed replay text fails closed.
+A second replay after the Wake is already completed is also a no-write idempotent return. Direct persistence retry with changed text under the same logical delivery identity fails closed.
 
 ## 10. No-synthetic-USER proof
 
