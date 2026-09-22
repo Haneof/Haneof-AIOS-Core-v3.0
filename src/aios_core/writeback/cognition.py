@@ -19,6 +19,7 @@ from aios_core.contracts.models import Claim, Dependency, EvidenceCoverage, Evid
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import KnowledgeWindow, TemporalExtent, as_utc
+from aios_core.policy.evidence import CognitionEvidencePolicy
 from aios_core.query.search import WorldSearchIndex
 from aios_core.storage.idempotency import canonical_json_dumps
 from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
@@ -70,6 +71,7 @@ class CognitionWritebackService:
         index: WorldSearchIndex | None = None,
         subject_id: str = "user_1",
         evidence_subject_ids: Sequence[str] | None = None,
+        evidence_policy: CognitionEvidencePolicy | None = None,
     ) -> None:
         self.store = store
         self.index = index
@@ -80,6 +82,16 @@ class CognitionWritebackService:
         )
         if not self.evidence_subject_ids:
             raise ValueError("evidence_subject_ids must contain at least one subject")
+        # C15-RCC-EVIDENCE-POLICY-001: the evidence policy is structural, never
+        # optional. An injected policy keeps one resolver instance shared with the
+        # runtime; omitting it builds an equivalent policy rather than disabling
+        # enforcement, so no construction path can bypass leaf-grounded closure.
+        self.evidence_policy = evidence_policy or CognitionEvidencePolicy(
+            store=store,
+            index=index,
+            subject_id=self.subject_id,
+            allowed_subject_ids=tuple(self.evidence_subject_ids),
+        )
 
     def commit_claim(
         self,
@@ -98,6 +110,9 @@ class CognitionWritebackService:
         # Evidence must already exist in the same private-world subject scope at
         # exactly the pinned revision. AI-self cognition may explicitly opt into
         # both the user subject and AI-self subject; unrelated user subjects may not.
+        # This subject check stays ahead of the evidence policy so cross-user refs
+        # keep reporting the precise isolation violation rather than a generic
+        # closure failure.
         for ref in pinned:
             payload = self.store.get_payload(ref.object_id, revision=ref.revision)
             evidence_subject = str(payload.get("subject_id") or "")
@@ -106,6 +121,11 @@ class CognitionWritebackService:
                     "cognitive writeback evidence crosses the allowed subject scope: "
                     f"{ref.object_id}@{ref.revision} belongs to {evidence_subject!r}"
                 )
+
+        self.evidence_policy.validate(
+            pinned,
+            operation="cognition_writeback.commit_claim",
+        )
 
         evidence_key = tuple((ref.object_id, ref.revision) for ref in pinned)
         evidence_set_id = _stable_id(

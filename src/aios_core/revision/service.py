@@ -29,6 +29,7 @@ from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.registry import canonical_model_for_object_type
 from aios_core.contracts.time import KnowledgeWindow, as_utc
 from aios_core.dependency.graph import collect_impacted_dependents
+from aios_core.policy.evidence import CognitionEvidencePolicy
 from aios_core.query.search import WorldSearchIndex
 from aios_core.storage.idempotency import canonical_json_dumps
 from aios_core.storage.sqlite_store import SQLiteWorldStore
@@ -91,6 +92,7 @@ class CognitionRevisionService:
         index: WorldSearchIndex | None = None,
         subject_id: str = "user_1",
         evidence_subject_ids: Sequence[str] | None = None,
+        evidence_policy: CognitionEvidencePolicy | None = None,
     ) -> None:
         self.store = store
         self.index = index
@@ -101,6 +103,14 @@ class CognitionRevisionService:
         )
         if not self.evidence_subject_ids:
             raise ValueError("evidence_subject_ids must contain at least one subject")
+        # C15-RCC-EVIDENCE-POLICY-001: structural, never optional. See
+        # CognitionWritebackService.__init__ for the same contract.
+        self.evidence_policy = evidence_policy or CognitionEvidencePolicy(
+            store=store,
+            index=index,
+            subject_id=self.subject_id,
+            allowed_subject_ids=tuple(self.evidence_subject_ids),
+        )
 
     def _current_dependencies(self) -> tuple[Dependency, ...]:
         payloads = self.store.list_payloads(object_type=ObjectType.DEPENDENCY)
@@ -189,6 +199,8 @@ class CognitionRevisionService:
         # dependent for model review, and the resident AI must be able to replace
         # that stale revision with a new active understanding.
 
+        # Subject isolation is checked first so cross-user refs keep reporting the
+        # precise isolation violation rather than a generic closure failure.
         for ref in request.evidence_refs:
             evidence_payload = self.store.get_payload(
                 ref.object_id,
@@ -200,6 +212,11 @@ class CognitionRevisionService:
                     "revision evidence crosses the allowed subject scope: "
                     f"{ref.object_id}@{ref.revision} belongs to {evidence_subject!r}"
                 )
+
+        self.evidence_policy.validate(
+            request.evidence_refs,
+            operation=f"cognition_revision.{request.mode}",
+        )
 
         current_world_revision = int(self.store.current_world_revision())
         evidence_set_id = _stable_id(

@@ -67,10 +67,18 @@ def _seed_world(tmp_path):
         ),
         learned_at=NOW - timedelta(days=9),
     )
+    # C15-RCC-EVIDENCE-POLICY-001: a dependent Claim may still build on an earlier
+    # Claim, but the earlier Claim can no longer be the *only* support. The real
+    # Observation is pinned alongside it so the lineage still closes on a reality
+    # leaf. The Claim -> Claim dependency edge under test here is unchanged, so the
+    # revision/propagation semantics these tests cover are preserved exactly.
     b = writeback.commit_claim(
         ClaimWriteRequest(
             content="用户的饮品习惯目前以茶为主。",
-            evidence_refs=(ObjectRef(object_id=a.claim_id, revision=1),),
+            evidence_refs=(
+                ObjectRef(object_id=a.claim_id, revision=1),
+                ObjectRef(object_id=first.object_id, revision=1),
+            ),
             confidence=0.72,
             dimension="dim:ai_user_understanding",
         ),
@@ -225,7 +233,13 @@ def test_stale_dependent_can_be_re_evaluated_into_new_active_revision(tmp_path):
             target_ref=ObjectRef(object_id=b.claim_id, revision=2),
             mode="revise",
             reason="上游用户偏好已更新，重新评估饮品习惯结论",
-            evidence_refs=(ObjectRef(object_id=a.claim_id, revision=2),),
+            # Re-evaluating a stale dependent still cites the revised upstream Claim,
+            # pinned alongside the real correcting Observation so the revision
+            # lineage closes on a reality leaf (C15-RCC-EVIDENCE-POLICY-001).
+            evidence_refs=(
+                ObjectRef(object_id=a.claim_id, revision=2),
+                ObjectRef(object_id=correction.object_id, revision=1),
+            ),
             replacement_content="用户的当前饮品习惯以咖啡为主。",
             confidence=0.84,
         ),
