@@ -14,7 +14,29 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
-## 当前工程断点 — C15 Wake user-delivery Core fix 已完成：唯一下一 READY = C15-RCC-RES-A-REPAIR-DECISION-001
+## 当前工程断点 — C15 Resident A historical repair 已拒绝：唯一下一 READY = C15-RCC-RES-A-RERUN-001
+
+- 2026-09-22：`C15-RCC-RES-A-REPAIR-DECISION-001 = DONE`。
+- Decision: **`PATH A = REJECTED` / `PATH B = REQUIRED`**。
+- Reviewed main anchor: `4fbfe16ea0c500fcd30f049f0a4b6d662dbe624a`；fixed Core merge `fd9ba5de329abb025f52de76f1ab658cdafb4897`；exact Core implementation `41f2a5da2153c55b137741fdd71983eea2a011f7`。
+- PR #101 @ `bfbfa059e2ac616326eecdfe3ffa7a927bdc7ce2` remains **OPEN / UNMERGED / PINNED / IMMUTABLE** and is now permanently classified **PRE-FIX DIAGNOSTIC / SUPERSEDED RESIDENT A RUN**. It is not a canonical RCC A World.
+- Provenance verified:
+  - cursor 9 executed on `wake_3df17e4ced76971ebbf90c05@2`, completed as `@3`;
+  - cursor 11 executed on `wake_c9ebc3c1cf7b2a3f1b9b953a@2`, completed as `@3`.
+- Fixed-Core deterministic delivery facts would be:
+  - `obs_wake_ai_2f90e34a8f88bd517552bfcf@1` at `2026-11-04T22:17:00Z`;
+  - `obs_wake_ai_dee8e0cd2712ed78f3bf05da@1` at `2026-11-04T23:02:00Z`.
+- `sum0011` (`dim:user_ai_interaction`, day `2026-11-04`) was actually Resident-authored during Phase A. Original source set = **6**; corrected-world mechanical source set = **8**. Therefore the old summary semantic output is not historical-equivalent to the corrected execution.
+- Cursor-13 Periodic Review also changes mechanically: original **9 Observation / 18 total anchors**; corrected history necessarily adds both delivery Observations, producing **11 Observation / 20 total anchors** under current review limits. The review Wake identity and Resident-visible review input therefore differ.
+- Because actual Phase A model-visible inputs differ, post-hoc persistence cannot reconstruct the semantic execution that should have occurred. No historical backfill task is authorized.
+- `C15-RCC-RES-A-001 = BLOCKED / SUPERSEDED`.
+- `C15-RCC-RES-A-RERUN-001 = READY`: same frozen fixture, fixed Core, **fresh private World**, fresh session/window, sequential release, no old transcript/semantic decisions/Claims, no requirement to reproduce old cognition.
+- `C15-RCC-RES-B-001 = BLOCKED`; `C15-RCC-RES-C-001 = BLOCKED`; `C15-RCC-EVAL-001 = BLOCKED`; `C15-RCC-CLOSE-001 = BLOCKED`.
+- Decision report: `reviews/C15_RCC_RES_A_REPAIR_DECISION_2026-09-22.md`.
+- **Next unique READY: `C15-RCC-RES-A-RERUN-001`.**
+
+## 历史工程断点 — C15 Wake user-delivery Core fix 已完成：该 repair-decision READY handoff 已完成
+
 
 - 2026-09-22：`C15-RCC-WAKE-DELIVERY-FIX-001 = DONE`；Core PR #104 已 merge 到 `main@fd9ba5de329abb025f52de76f1ab658cdafb4897`。
 - Exact final Core candidate: `41f2a5da2153c55b137741fdd71983eea2a011f7`；最终 PR-head targeted/full Gates GREEN。
