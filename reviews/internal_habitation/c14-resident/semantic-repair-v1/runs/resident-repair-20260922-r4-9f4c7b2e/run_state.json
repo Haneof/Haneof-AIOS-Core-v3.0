@@ -6,7 +6,7 @@
   "current_simulated_timestamp": "2026-11-10T07:34:00-08:00",
   "errors": [],
   "next_checkpoint": 6,
-  "next_summary_request": 5,
+  "next_summary_request": 6,
   "phase": "B",
   "released_cursors": [
     1,
@@ -87,6 +87,12 @@
       "kind": "dimension_summary",
       "released_cursor": 7,
       "request_id": "sum0004"
+    },
+    {
+      "github_author": "single-window-resident-control",
+      "kind": "dimension_summary",
+      "released_cursor": 7,
+      "request_id": "sum0005"
     }
   ]
 }
