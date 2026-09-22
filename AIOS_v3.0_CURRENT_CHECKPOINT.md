@@ -14,6 +14,37 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
+## 当前工程断点 — C14-SEM-REPAIR-RES-001 已完成，等待独立语义评估 (C14-SEM-REPAIR-EVAL-001)
+
+- Task: `C14-SEM-REPAIR-RES-001 = DONE`
+- Evaluated / starting main: `7611fa5059f5dc8a20835cab5b312be2f43d11e8`
+- Resident branch: `arena/01a0c773-haneof-aios-core-v3-0`
+- Resident session: `resident-sem-repair-20260922`
+- Run ID: `resident-repair-20260922`
+- Run directory: `reviews/internal_habitation/c14-resident/semantic-repair-v1/runs/resident-repair-20260922/`
+- Report: `reviews/internal_habitation/c14-resident/semantic-repair-v1/runs/resident-repair-20260922/RESIDENT_RUN_REPORT.md`
+- Model provider: `Arena.ai / Agent Mode`
+- Execution mode: 真实模型认知交互桥接（LocalResidentBridge via `pending_request.json` / `pending_response.json`），禁止任何伪LLM、if-else硬编码或预设规则。
+- Cursors: 15/15 全部顺序释放完成（Phase A: 1..6, Phase B: 7..15）。
+- Mechanical & canonical conversation ingest: 14 mechanical + 1 canonical USER conversation (cursor 12)，15/15 均通过严格 SQLite durable world ack 校验。
+- Final World revision: 83
+- Final World SHA256: `a7a7cd9f9166eb41d3b93d85820a9c7a4ab0aa57b81787d89f395482742bae57`
+- Release-state SHA256: `4f41d709a76e0f40ce5b0093f540cc286dde84a1906a575019199cc7a7970081`
+- Index SHA256: `ae296ee44a000eb7ea5bf122184bfb9dd65c80f14f9e94e9fb64fce039658caf`
+- Checkpoints: 16 (cp0001..cp0016)
+- Dimension summaries authored: 20 (sum0001..sum0020)
+- Silence directives: 8
+- Capability calls: 18
+- Current Claim: `clm_b4df2179bb8ffec020a39ede@3` (confidence: 0.78, status: active, support_evidence_set: `evs_revision_911ec259592b21ccd3944479@1`)
+- E1 修复验证准备（叶子闭环）：Claim rev 3 包含的所有 12 项具体事实（涵盖 11-03 睡眠/专注/提交、11-06 睡眠/通话/延后、11-10 睡眠/计划/起草/会议/提交及对话反馈）均在 support_evidence_set 中逐项闭环至非 Summary 的真实 Observation 叶子节点，无悬空断言。
+- E5 修复验证准备（计划/观察/结果严格分离）：严格区分 11-10 日历计划（09:00–09:25 与设计师同步；08:00–11:20 起草）与实际系统观察（08:05 实际开始起草；09:06–09:24 实际接通会议；10:52 提交第一版），不将计划混同为已执行现实。在面对 11-13 外部文档服务故障（INC-4821）及延后交付时，保持审慎求真，不盲目归因自我模式。
+- Core diff: `src/aios_core/** = 0`。
+- Historical evidence: PR #75 / PR #79 历史证据完全未修改。
+- Sealed fixture & notes: 密封 fixture、manifest 与 evaluator notes 严格未读。
+- Evaluator verdict: 本 Resident 窗口严禁下达 E1/E5 或 C14 裁决，所有独立评估权留给 `C14-SEM-REPAIR-EVAL-001`。
+- 当前唯一下一 READY 任务：`C14-SEM-REPAIR-EVAL-001`（必须由新的独立 evaluator 窗口执行）。
+
+
 ## 当前工程断点 — C14-SEM-REPAIR-FIX-001 已完成并合入 main
 
 - Task: `C14-SEM-REPAIR-FIX-001 = DONE`
