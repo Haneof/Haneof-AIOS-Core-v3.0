@@ -1,0 +1,28 @@
+{
+  "capability_call_count": 0,
+  "cognition_calls": [],
+  "complete": false,
+  "conversation_turn_index": 0,
+  "current_simulated_timestamp": "2026-11-03T07:06:00-08:00",
+  "errors": [],
+  "next_checkpoint": 2,
+  "next_summary_request": 1,
+  "phase": "A",
+  "released_cursors": [
+    1
+  ],
+  "response_count": 0,
+  "run_id": "resident-repair-20260922",
+  "semantic_checkpoints": [
+    {
+      "checkpoint_id": "cp0001",
+      "directive_kind": "silence",
+      "released_cursor": 1,
+      "simulated_timestamp": "2026-11-03T07:06:00-08:00",
+      "world_revision_before": 3
+    }
+  ],
+  "session_id": "resident-sem-repair-20260922",
+  "silence_count": 1,
+  "summary_requests": []
+}
