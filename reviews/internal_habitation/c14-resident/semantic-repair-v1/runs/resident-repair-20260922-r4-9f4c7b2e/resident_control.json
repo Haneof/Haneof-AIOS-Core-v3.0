@@ -2,25 +2,48 @@
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
   "nonce": "9f4c7b2e-6a31-4c97-bd28-1f0b88a9d453",
   "kind": "DIRECTIVE",
-  "item_id": "cp0008",
+  "item_id": "cp0009",
   "payload": {
-    "checkpoint_id": "cp0008",
+    "checkpoint_id": "cp0009",
     "capability_calls": [
       {
-        "name": "request_all_dimensions_projection",
+        "name": "commit_claim",
         "arguments": {
-          "dimensions": [
-            "dim:sleep",
-            "dim:device_activity",
-            "dim:collaboration_activity",
-            "dim:work_outcome"
-          ],
-          "window_start": "2026-11-03T00:00:00Z",
-          "window_end": "2026-11-07T00:00:00Z"
+          "dimension": "dim:work_pattern",
+          "content": "在目前两个已观察的文档任务案例中，较连续的无通话专注窗口与提前提交同现；多次实际通话的上午与延后提交同现。两例睡眠状态也不同且样本很小，因此目前只支持暂定关联，不支持专注或通话对交付时点的因果结论。",
+          "confidence": 0.58,
+          "claim_type": "pattern_hypothesis",
+          "knowledge_state": "hypothesis",
+          "evidence_refs": [
+            {
+              "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_c14_fixture_5bf4b05a9dafdb85ec5bb688",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_c14_fixture_16b3967abe086c1bbae30bf7",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_c14_fixture_3187c6e6c4a710447d75b09e",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_c14_fixture_536104c70eaad761d2583410",
+              "revision": 1
+            }
+          ]
         },
-        "call_id": "cp0008-all-dimensions-unfiltered"
+        "call_id": "cp0009-commit-work-pattern-hypothesis"
       }
     ],
-    "decision_rationale": "The first ALL_DIMENSIONS query returned empty slices because the semantic query did not match indexed payloads. Retry the same bounded window without query rather than treating that empty retrieval as absence of evidence."
+    "decision_rationale": "Two contrasting work cases now support a useful but weak pattern hypothesis. The write explicitly preserves small-sample uncertainty and the sleep confounder, and pins only direct Observation evidence."
   }
 }
