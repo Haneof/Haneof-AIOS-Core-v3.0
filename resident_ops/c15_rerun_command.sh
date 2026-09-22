@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-python reviews/internal_habitation/c15-rcc/v1/release/mechanical_ingest_adapter.py --help
-python reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --help
+RUN="reviews/internal_habitation/c15-rcc/v1/runs/resident-a-rerun-20260922"
+python reviews/internal_habitation/c15-rcc/v1/release/mechanical_ingest_adapter.py \
+  --world-db "$RUN/private_world.sqlite" \
+  --event-file "$RUN/current-event.json"
