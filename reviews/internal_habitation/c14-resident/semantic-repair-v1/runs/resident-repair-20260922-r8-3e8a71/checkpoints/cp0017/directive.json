@@ -1,0 +1,37 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "limit": 30,
+        "offset": 0
+      },
+      "call_id": "cp0017-read-anchors",
+      "name": "read_periodic_review_anchors"
+    },
+    {
+      "arguments": {
+        "object_id": "clm_457125b0d4422b2f159091e0",
+        "revision": 2
+      },
+      "call_id": "cp0017-current-claim",
+      "name": "inspect_world_object"
+    },
+    {
+      "arguments": {
+        "dimension": "dim:work_outcome",
+        "limit": 20,
+        "object_types": [
+          "observation"
+        ],
+        "window_end": "2026-11-13T16:21:00Z",
+        "window_start": "2026-11-10T19:06:00Z"
+      },
+      "call_id": "cp0017-new-outcomes",
+      "name": "search_timeline"
+    }
+  ],
+  "checkpoint_id": "cp0017",
+  "decision_rationale": "A schedule plan is not outcome evidence. Review exact anchors, the current revised Claim, and any post-revision work outcomes before deciding whether cognition should change.",
+  "github_author": "Haneof",
+  "run_id": "c14-sem-repair-resident-20260922-sol-r8-3e8a71"
+}

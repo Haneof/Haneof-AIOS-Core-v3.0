@@ -1,5 +1,5 @@
 {
-  "capability_call_count": 23,
+  "capability_call_count": 26,
   "cognition_calls": [
     {
       "arguments": {
@@ -137,7 +137,7 @@
   ],
   "complete": false,
   "conversation_turn_index": 1,
-  "current_simulated_timestamp": "2026-11-10T11:06:00-08:00",
+  "current_simulated_timestamp": "2026-11-13T08:21:00-08:00",
   "errors": [
     {
       "attempt": 1,
@@ -145,8 +145,8 @@
       "reason": "cursor-1 evidence push targeted stale r3 branch; semantic cp0001/cp0002 were authored by the same Resident and will be mechanically replayed; no cursor 2 or future event was revealed"
     }
   ],
-  "next_checkpoint": 17,
-  "next_summary_request": 11,
+  "next_checkpoint": 19,
+  "next_summary_request": 18,
   "phase": "B",
   "released_cursors": [
     1,
@@ -160,7 +160,8 @@
     9,
     10,
     11,
-    12
+    12,
+    13
   ],
   "response_count": 1,
   "run_id": "c14-sem-repair-resident-20260922-sol-r8-3e8a71",
@@ -292,10 +293,26 @@
       "released_cursor": 12,
       "simulated_timestamp": "2026-11-10T11:06:00-08:00",
       "world_revision_before": 49
+    },
+    {
+      "checkpoint_id": "cp0017",
+      "directive_kind": "capability_calls",
+      "github_author": "Haneof",
+      "released_cursor": 13,
+      "simulated_timestamp": "2026-11-13T08:21:00-08:00",
+      "world_revision_before": 67
+    },
+    {
+      "checkpoint_id": "cp0018",
+      "directive_kind": "silence",
+      "github_author": "Haneof",
+      "released_cursor": 13,
+      "simulated_timestamp": "2026-11-13T08:21:00-08:00",
+      "world_revision_before": 67
     }
   ],
   "session_id": "resident-sem-repair-sol-20260922-r8-3e8a71",
-  "silence_count": 5,
+  "silence_count": 6,
   "summary_requests": [
     {
       "github_author": "Haneof",
@@ -356,6 +373,48 @@
       "kind": "dimension_summary",
       "released_cursor": 7,
       "request_id": "sum0010"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 13,
+      "request_id": "sum0011"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 13,
+      "request_id": "sum0012"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 13,
+      "request_id": "sum0013"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 13,
+      "request_id": "sum0014"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 13,
+      "request_id": "sum0015"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 13,
+      "request_id": "sum0016"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 13,
+      "request_id": "sum0017"
     }
   ]
 }

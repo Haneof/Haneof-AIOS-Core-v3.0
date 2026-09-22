@@ -1,0 +1,44 @@
+{
+  "kind": "dimension_summary",
+  "released_cursor": 13,
+  "request": {
+    "dimension": "dim:user_ai_interaction",
+    "granularity": "day",
+    "source_world_revision": 57,
+    "sources": [
+      {
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "assistant",
+          "session_id": "resident-sem-repair-sol-20260922-r8-3e8a71",
+          "turn_index": 1,
+          "turn_key": "00ce9920a4c4b1b5c9f67026"
+        },
+        "object_id": "obs_conv_ai_2219f70ca63f98850199560c",
+        "object_type": "observation",
+        "occurred_at": "2026-11-10T19:06:00Z",
+        "revision": 1,
+        "text": "这次这个细节挺关键：你 09:06–09:24 同步完，回来几乎不用重新找上下文，而且 10:52 就出了第一版，比 11:30 的目标还早。这样看，我不会把“有没有会议”本身当成主要判断点；更值得继续观察的是中断的长度和密度、回来后的恢复成本，再加上当天睡眠和任务本身的差异。现在这只是更具体的假设，还不能下因果结论。"
+      },
+      {
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "user",
+          "session_id": "resident-sem-repair-sol-20260922-r8-3e8a71",
+          "turn_index": 1,
+          "turn_key": "00ce9920a4c4b1b5c9f67026"
+        },
+        "object_id": "obs_conv_user_9e55dd343bf3abbb84663780",
+        "object_type": "observation",
+        "occurred_at": "2026-11-10T19:06:00Z",
+        "revision": 1,
+        "text": "用户说：“九点聊完回来接着写，没怎么重新找上下文，十一点前一版就出来了。”"
+      }
+    ],
+    "truncated": false,
+    "window_end": "2026-11-10T23:59:59.999999Z",
+    "window_start": "2026-11-10T00:00:00Z"
+  },
+  "request_id": "sum0014",
+  "simulated_timestamp": "2026-11-13T08:21:00-08:00"
+}

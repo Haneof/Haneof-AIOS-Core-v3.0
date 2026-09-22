@@ -1,0 +1,38 @@
+{
+  "kind": "dimension_summary",
+  "released_cursor": 13,
+  "request": {
+    "dimension": "dim:collaboration_activity",
+    "granularity": "day",
+    "source_world_revision": 51,
+    "sources": [
+      {
+        "metadata": {
+          "dimension": "dim:collaboration_activity",
+          "external_record_id": "c14semrep-010",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-sem-repair-fixture-event-binding-v1",
+          "fixture_event_id": "c14semrep-010",
+          "fixture_payload_sha256": "sha256:e9d6f95423db407c0333437ca3567df4fd6bc94f793bca8e646e1d4781bc771a",
+          "fixture_projection_sha256": "sha256:1e01575a9c7d28d16b80b5dae4bdb47f29af87de3a86fba643c925b2c19c59c1",
+          "fixture_sequence": 10,
+          "fixture_sha256": "sha256:1095d5aef52061753db7d9dab558af1361b92976f2ded0e6956d70afe3e6527f",
+          "fixture_version": "c14-semantic-repair-fixture-v1",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-11-10T09:32:00-08:00",
+          "source_class": "platform"
+        },
+        "object_id": "obs_c14_fixture_e097d1109d87846dabdb0060",
+        "object_type": "observation",
+        "occurred_at": "2026-11-10T17:32:00Z",
+        "revision": 1,
+        "text": "会议平台日志显示：设计师同步实际于 09:06 接通，09:24 结束；参会双方均有音频活动。"
+      }
+    ],
+    "truncated": false,
+    "window_end": "2026-11-10T23:59:59.999999Z",
+    "window_start": "2026-11-10T00:00:00Z"
+  },
+  "request_id": "sum0011",
+  "simulated_timestamp": "2026-11-13T08:21:00-08:00"
+}
