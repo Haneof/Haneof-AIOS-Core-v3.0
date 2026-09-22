@@ -2,19 +2,26 @@
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
   "nonce": "9f4c7b2e-6a31-4c97-bd28-1f0b88a9d453",
   "kind": "DIRECTIVE",
-  "item_id": "cp0006",
+  "item_id": "cp0007",
   "payload": {
-    "checkpoint_id": "cp0006",
+    "checkpoint_id": "cp0007",
     "capability_calls": [
       {
-        "name": "read_periodic_review_anchors",
+        "name": "request_all_dimensions_projection",
         "arguments": {
-          "offset": 0,
-          "limit": 32
+          "dimensions": [
+            "dim:sleep",
+            "dim:device_activity",
+            "dim:collaboration_activity",
+            "dim:work_outcome"
+          ],
+          "window_start": "2026-11-03T00:00:00Z",
+          "window_end": "2026-11-07T00:00:00Z",
+          "query": "compare observed work conditions and submission timing without inferring causality"
         },
-        "call_id": "cp0006-read-anchors"
+        "call_id": "cp0007-all-dimensions"
       }
     ],
-    "decision_rationale": "This review spans 11 anchors across multiple dimensions and summary levels. Inspect the exact pinned anchors before deciding whether the two observed work cases justify only a hypothesis, a durable claim, or continued silence."
+    "decision_rationale": "Two contrasting work cases now exist, but sleep differs between them. Cross-check the direct multi-dimensional world evidence before deciding whether to persist a low-confidence hypothesis."
   }
 }
