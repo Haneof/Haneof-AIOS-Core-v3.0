@@ -1,0 +1,20 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "dimension": "dim:work_pattern",
+        "limit": 20,
+        "object_types": [
+          "claim"
+        ],
+        "window_end": "2026-11-07T23:59:59Z",
+        "window_start": "2026-11-01T00:00:00Z"
+      },
+      "call_id": "cp0007-find-current-work-pattern",
+      "name": "search_timeline"
+    }
+  ],
+  "checkpoint_id": "cp0007",
+  "decision_rationale": "The derivation bundle covers the same Nov 3 leaves already reviewed. Check the durable current Claim through normal World retrieval before deciding whether this wake adds anything.",
+  "github_author": "Haneof"
+}
