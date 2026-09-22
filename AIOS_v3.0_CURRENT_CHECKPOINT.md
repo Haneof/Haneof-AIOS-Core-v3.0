@@ -14,7 +14,27 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
-## 当前工程断点 — C14-CLOSE-001 已收口：C14 CLOSURE = PASS，唯一下一 READY = C15-RCC-RULE-001
+## 当前工程断点 — C15-RCC-RULE-001 已冻结：NO CONSTITUTION CHANGE REQUIRED，唯一下一 READY = C15-RCC-PREFLIGHT-001
+
+- 2026-09-22 更新：`C15-RCC-RULE-001 = DONE`（RCC 正式语义边界与验收定义已冻结）；**`NO CONSTITUTION CHANGE REQUIRED`**；`C15-RCC-PREFLIGHT-001 = READY`；`C15-RCC-FIXTURE-001` 保持 **BLOCKED**（禁止本窗口或下一窗口顺手做 fixture / Resident / evaluator）。
+- Started / reviewed main: `623f8471cdd6ac2d756c15231f65f311e662f9d9`（C14-CLOSE-001 squash merge `#95`）。
+- Authoritative ruling: `governance/C15_RESIDENT_COGNITIVE_CONTINUITY_RULING_2026-09-22.md`。
+- Core diff: `src/aios_core/**` = 0 文件变更。
+- Constitution / registry changes: **NONE**。现有 User Understanding / Relationship / Self / Calibration / Strategy / Periodic Review / Cognitive Runtime / AI Dimension / Cognitive Boundary / Adaptive Cognitive Policy 已足够支撑 RCC；本窗口只做法统解释，不重写主宪法。
+- 根定义：`model can change; Resident cognition must not silently reset`。
+- 同一个 Resident：同一条 durable cognition lineage 在新 Runtime / 新模型中可通过合法 AIOS 能力恢复、被实际消费、并继续被现实修正。不要求同措辞 / 同文风 / 同 reasoning path。
+- 四类长期认知：User Understanding；Relationship / Role；Self / Calibration；Strategy / Experience。
+- 三层分离：User World（发生了什么） / Resident Cognitive World（这些事实对我意味着什么） / Current Model Runtime（可替换执行引擎）。
+- Replacement-model：允许能力、表达、检索顺序变化及有 Evidence 的纠错；禁止无 Evidence 地忘记已成立 cognition、把 UNKNOWN 当 FACT、或完全不检索已有 Calibration 防线。
+- Continuity ≠ freezing：retain / strengthen / weaken / revise / retract / silence 必须有新现实 Evidence。
+- Anti-self-proof：AI 自述不得终止证明；错误经验必须可长期检索；UNKNOWN 是合法 durable cognition。
+- 禁止第二身份数据库、persona prompt 替代认知、hidden transcript/scratchpad/evaluator-notes handoff。
+- Evaluator matrix R1–R9；C15 PASS 当且仅当全部 VALID。无法证明模型身份不同时 R6 不得 VALID，只能 PARTIAL（reason `INSUFFICIENT_EVIDENCE`）。
+- 与 C14：C14 已 PASS 机制闭环；C15 不重证 C14，只把 cognition 内容提升到 Resident 身份/成长门。
+- 与 C16 / P16：本窗口不启动系统反馈闭环、不启动年度入住。
+- 下一步：**唯一 READY = `C15-RCC-PREFLIGHT-001`**（新独立窗口）。只审计 current main 机制是否 `ALREADY_IMPLEMENTED` / `MECHANISM_GAP` / `INSUFFICIENT_EVIDENCE`。禁止创建第二认知库；禁止本窗口未完成事项被下一窗口跳过。
+
+## 历史工程断点 — C14-CLOSE-001 已收口：C14 CLOSURE = PASS，当时下一 READY = C15-RCC-RULE-001
 
 - 2026-09-22 更新：`C14-CLOSE-001 = DONE`（独立总收口完成）；**`C14 CLOSURE = PASS`**；`C15-RCC-RULE-001 = READY`；`C15-RCC-PREFLIGHT-001` 保持 **BLOCKED**（直到 RCC-RULE 完成，禁止直接设 READY）。
 - Reviewed main anchor: `f5866974726c6327ab5a33236eed8912178d0c33`；Core diff: `src/aios_core/**` = 0 文件变更。
