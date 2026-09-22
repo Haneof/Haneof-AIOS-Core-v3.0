@@ -1,0 +1,16 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "limit": 10,
+        "offset": 0
+      },
+      "call_id": "cp0001-read-anchors",
+      "name": "read_periodic_review_anchors"
+    }
+  ],
+  "checkpoint_id": "cp0001",
+  "decision_rationale": "Only one sleep observation is visible and there is no prior cognition. Inspect the exact pinned periodic-review anchor before deciding; do not infer a durable pattern from a single night.",
+  "github_author": "Haneof",
+  "run_id": "c14-sem-repair-resident-20260922-sol-r8-3e8a71"
+}
