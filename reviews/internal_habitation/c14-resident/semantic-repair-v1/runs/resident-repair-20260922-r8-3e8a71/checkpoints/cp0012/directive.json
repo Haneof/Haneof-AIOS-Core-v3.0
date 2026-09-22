@@ -1,0 +1,29 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "object_id": "clm_457125b0d4422b2f159091e0",
+        "revision": 1
+      },
+      "call_id": "cp0012-inspect-current-claim",
+      "name": "inspect_world_object"
+    },
+    {
+      "arguments": {
+        "dimension": "dim:work_outcome",
+        "limit": 20,
+        "object_types": [
+          "observation"
+        ],
+        "window_end": "2026-11-10T16:02:00Z",
+        "window_start": "2026-11-07T00:00:00Z"
+      },
+      "call_id": "cp0012-new-outcomes",
+      "name": "search_timeline"
+    }
+  ],
+  "checkpoint_id": "cp0012",
+  "decision_rationale": "This derivation bundle mostly re-presents the same raw leaves already used by the current hypothesis. Verify the exact current Claim and whether any new released work outcome exists before considering revision; the schedule plan is not an outcome.",
+  "github_author": "Haneof",
+  "run_id": "c14-sem-repair-resident-20260922-sol-r8-3e8a71"
+}
