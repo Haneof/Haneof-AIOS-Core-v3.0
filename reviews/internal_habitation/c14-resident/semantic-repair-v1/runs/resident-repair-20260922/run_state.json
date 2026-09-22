@@ -129,9 +129,9 @@
       "name": "revise_claim"
     }
   ],
-  "complete": false,
+  "complete": true,
   "conversation_turn_index": 1,
-  "current_simulated_timestamp": "2026-11-13T11:23:00-08:00",
+  "current_simulated_timestamp": null,
   "errors": [],
   "next_checkpoint": 17,
   "next_summary_request": 21,
