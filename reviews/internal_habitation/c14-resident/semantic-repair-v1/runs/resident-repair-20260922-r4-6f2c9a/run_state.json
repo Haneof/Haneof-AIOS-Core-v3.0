@@ -1,0 +1,18 @@
+{
+  "capability_call_count": 0,
+  "cognition_calls": [],
+  "complete": false,
+  "conversation_turn_index": 0,
+  "current_simulated_timestamp": "2026-11-03T07:06:00-08:00",
+  "errors": [],
+  "next_checkpoint": 1,
+  "next_summary_request": 1,
+  "phase": "A",
+  "released_cursors": [],
+  "response_count": 0,
+  "run_id": "c14-sem-repair-resident-20260922-sol-r4-6f2c9a",
+  "semantic_checkpoints": [],
+  "session_id": "resident-sem-repair-sol-20260922-r4-6f2c9a",
+  "silence_count": 0,
+  "summary_requests": []
+}
