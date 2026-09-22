@@ -1,0 +1,19 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "dimension": "dim:sleep",
+        "limit": 20,
+        "object_types": [
+          "observation"
+        ],
+        "window_end": "2026-11-04T00:00:00Z",
+        "window_start": "2026-11-03T00:00:00Z"
+      },
+      "call_id": "cp0004-sleep-leaf",
+      "name": "search_timeline"
+    }
+  ],
+  "checkpoint_id": "cp0004",
+  "github_author": "Haneof"
+}

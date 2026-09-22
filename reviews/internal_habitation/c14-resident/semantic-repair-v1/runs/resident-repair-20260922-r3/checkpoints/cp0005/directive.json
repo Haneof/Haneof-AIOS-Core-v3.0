@@ -1,0 +1,31 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "claim_type": "hypothesis",
+        "confidence": 0.52,
+        "content": "11月3日同一日内，7小时46分且评分83/100的睡眠记录、08:28–10:25的无通话专注时段，以及10:27早于10:45目标提交第一版同时出现。仅作为单案例低置信度假设：这些条件可能与该次工作及时完成相关，不推断因果或泛化。",
+        "dimension": "dim:work_pattern",
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_5bf4b05a9dafdb85ec5bb688",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+            "revision": 1
+          }
+        ],
+        "knowledge_state": "hypothesis"
+      },
+      "call_id": "cp0005-commit-hypothesis",
+      "name": "commit_claim"
+    }
+  ],
+  "checkpoint_id": "cp0005",
+  "github_author": "Haneof"
+}

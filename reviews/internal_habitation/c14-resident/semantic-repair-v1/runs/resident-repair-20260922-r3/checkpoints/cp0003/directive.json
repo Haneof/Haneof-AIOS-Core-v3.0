@@ -1,0 +1,15 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "limit": 20,
+        "offset": 0
+      },
+      "call_id": "cp0003-read-anchors",
+      "name": "read_periodic_review_anchors"
+    }
+  ],
+  "checkpoint_id": "cp0003",
+  "decision_rationale": "Review has six anchors across sleep/device/work. Inspect exact pinned anchors before deciding whether any durable cognition is warranted.",
+  "github_author": "Haneof"
+}

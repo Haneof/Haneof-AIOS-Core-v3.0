@@ -1,0 +1,1371 @@
+{
+  "capability_catalog": [
+    {
+      "description": "Persist a typed AI-world cognition using the unified EvidenceSet + Claim + Dependency path.",
+      "hard_boundary": false,
+      "input_schema": {
+        "claim_type": "string?",
+        "confidence": "number[0,1]",
+        "domain": "user_understanding|relationship|self|intent|strategy|cognitive_boundary|personality|calibration",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "knowledge_state": "string?",
+        "scope_key": "string?",
+        "statement": "string",
+        "tags": "array[string]?"
+      },
+      "kind": "write",
+      "name": "commit_ai_world_claim",
+      "side_effecting": true
+    },
+    {
+      "description": "Persist a revisable AI cognition Claim grounded in pinned world evidence. This capability cannot create Observation facts.",
+      "hard_boundary": false,
+      "input_schema": {
+        "claim_type": "string?",
+        "confidence": "number[0,1]",
+        "content": "string",
+        "dimension": "string",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "knowledge_state": "string?"
+      },
+      "kind": "write",
+      "name": "commit_claim",
+      "side_effecting": true
+    },
+    {
+      "description": "During an active periodic review, persist a model-authored operation experience grounded in pinned real case refs.",
+      "hard_boundary": false,
+      "input_schema": {
+        "applicability": "object?",
+        "cost": "object[number]?",
+        "experience_state": "string?",
+        "method_path": "array[string]",
+        "misses": "array[string]?",
+        "negative_case_refs": "array[{object_id:string,revision:integer}]?",
+        "positive_case_refs": "array[{object_id:string,revision:integer}]?",
+        "problem_type": "string",
+        "result_summary": "string"
+      },
+      "kind": "write",
+      "name": "commit_operation_experience",
+      "side_effecting": true
+    },
+    {
+      "description": "Inspect multiple pinned Claims side by side with their evidence/status; the model decides meaning.",
+      "hard_boundary": false,
+      "input_schema": {
+        "claim_refs": "array[{object_id:string,revision:integer}]"
+      },
+      "kind": "read",
+      "name": "compare_claims",
+      "side_effecting": false
+    },
+    {
+      "description": "Register future attention as a constrained mechanical Observation watch. The Resident chooses the routing class: interrupt wakes cognition immediately and may allow user delivery after Resident judgment; background waits for short mechanical batching, invokes cognition, and is silent to the user by default; review_queue does not invoke the Resident immediately and carries matched evidence into Periodic Review. Choose the class from the future-attention intent and current runtime facts; Core does not infer urgency for you. Do not encode emotion, intent, diagnosis, or other semantic conclusions in the mechanical predicate.",
+      "hard_boundary": false,
+      "input_schema": {
+        "attention_class": "interrupt|background|review_queue?",
+        "cooldown_seconds": "integer?",
+        "dimensions": "array[string]",
+        "expires_at": "ISO-8601 datetime?",
+        "goal_ref": "{object_id:string,revision:integer}?",
+        "metadata_equals": "object?",
+        "modality": "string?",
+        "mode": "recurring|one_shot?",
+        "numeric": "{operator:gt|gte|lt|lte|eq|ne,threshold:number,path:array[string]?}?",
+        "priority": "integer?",
+        "reason_refs": "array[{object_id:string,revision:integer}]",
+        "source_kind": "string?",
+        "title": "string"
+      },
+      "kind": "write",
+      "name": "create_attention_watch",
+      "side_effecting": true
+    },
+    {
+      "description": "Create a concrete evidence-grounded Task, optionally under a current Goal.",
+      "hard_boundary": false,
+      "input_schema": {
+        "completion_condition": "object?; use mode=world_evidence|action_outcome|mixed; optional result_object_types=array[string]",
+        "deadline": "ISO-8601 datetime?",
+        "goal_ref": "{object_id:string,revision:integer}?",
+        "initial_state": "string?",
+        "next_step": "string?",
+        "next_wake_at": "ISO-8601 datetime?",
+        "priority": "integer?",
+        "reason_refs": "array[{object_id:string,revision:integer}]",
+        "task_type": "string",
+        "timezone_name": "string?",
+        "title": "string"
+      },
+      "kind": "write",
+      "name": "create_task",
+      "side_effecting": true
+    },
+    {
+      "description": "Read exact pinned raw dialogue behind a same-session round summary, or an explicit turn range. Round summaries are indexes, not truth.",
+      "hard_boundary": false,
+      "input_schema": {
+        "revision": "integer?",
+        "session_id": "string?",
+        "summary_id": "string?",
+        "turn_end": "integer?",
+        "turn_start": "integer?"
+      },
+      "kind": "read",
+      "name": "drill_down_conversation",
+      "side_effecting": false
+    },
+    {
+      "description": "Request a broader bounded world recall after the initial recommendation/search was insufficient.",
+      "hard_boundary": false,
+      "input_schema": {
+        "dimension": "string?",
+        "limit": "integer?",
+        "query": "string"
+      },
+      "kind": "read",
+      "name": "expand_recall",
+      "side_effecting": false
+    },
+    {
+      "description": "Focus retrieval on one known Entity id without semantic reinterpretation.",
+      "hard_boundary": false,
+      "input_schema": {
+        "entity_id": "string",
+        "limit": "integer?",
+        "query": "string?"
+      },
+      "kind": "read",
+      "name": "focus_entity",
+      "side_effecting": false
+    },
+    {
+      "description": "Follow one-hop explicit Relation objects connected to a world object.",
+      "hard_boundary": false,
+      "input_schema": {
+        "limit": "integer?",
+        "object_id": "string"
+      },
+      "kind": "read",
+      "name": "follow_relation",
+      "side_effecting": false
+    },
+    {
+      "description": "Form a revisable Event candidate from pinned world evidence. The model supplies the event meaning; code only validates provenance.",
+      "hard_boundary": false,
+      "input_schema": {
+        "confidence": "number[0,1]",
+        "dimension": "string?",
+        "event_time": "TemporalExtent object",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "interpretation": "string",
+        "participant_refs": "array[{object_id:string,revision:integer}]?",
+        "primary_claim_refs": "array[{object_id:string,revision:integer}]?",
+        "title": "string"
+      },
+      "kind": "write",
+      "name": "form_event",
+      "side_effecting": true
+    },
+    {
+      "description": "Inspect a pinned real Action Outcome and its Action reference.",
+      "hard_boundary": false,
+      "input_schema": {
+        "outcome_ref": "{object_id:string,revision:integer}"
+      },
+      "kind": "read",
+      "name": "inspect_outcome",
+      "side_effecting": false
+    },
+    {
+      "description": "Read one pinned or latest world object by object id.",
+      "hard_boundary": false,
+      "input_schema": {
+        "object_id": "string",
+        "revision": "integer?"
+      },
+      "kind": "read",
+      "name": "inspect_world_object",
+      "side_effecting": false
+    },
+    {
+      "description": "List Resident-authored active attention watches. Watches contain only mechanical future-match predicates; the Resident interprets meaning after Wake.",
+      "hard_boundary": false,
+      "input_schema": {},
+      "kind": "read",
+      "name": "list_attention_watches",
+      "side_effecting": false
+    },
+    {
+      "description": "List same-session continuity summary windows on demand. Use this when token budgeting omitted summary content from the cockpit.",
+      "hard_boundary": false,
+      "input_schema": {
+        "limit": "integer?",
+        "session_id": "string?"
+      },
+      "kind": "read",
+      "name": "list_conversation_summaries",
+      "side_effecting": false
+    },
+    {
+      "description": "List current registered dimension definitions so the resident AI can check whether an existing observation axis already serves the need.",
+      "hard_boundary": false,
+      "input_schema": {
+        "include_terminal": "boolean?"
+      },
+      "kind": "read",
+      "name": "list_dimensions",
+      "side_effecting": false
+    },
+    {
+      "description": "Create a PROPOSED external Action for a RUNNING Task. This capability never executes the side effect and cannot authorize itself.",
+      "hard_boundary": false,
+      "input_schema": {
+        "action_type": "string",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "expected_outcome": "string?",
+        "payload": "object",
+        "task_ref": "{object_id:string,revision:integer}"
+      },
+      "kind": "write",
+      "name": "propose_action",
+      "side_effecting": true
+    },
+    {
+      "description": "Register a new evidence-grounded AI-mutable cognitive policy. Only real user/world result evidence is accepted; hard boundaries cannot be created by the resident AI.",
+      "hard_boundary": false,
+      "input_schema": {
+        "allowed_range_or_choices": "json value?",
+        "current_value": "json value",
+        "default_value": "json value",
+        "evaluation_window": "string",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "policy_id": "string",
+        "reason": "string",
+        "scope": "string"
+      },
+      "kind": "write",
+      "name": "propose_cognitive_policy",
+      "side_effecting": true
+    },
+    {
+      "description": "Submit an evidence-grounded candidate observation axis. The system validates structure; the model supplies semantic rationale.",
+      "hard_boundary": false,
+      "input_schema": {
+        "confidence": "number[0,1]",
+        "continuity_rationale": "string",
+        "data_shape": "string",
+        "description": "string",
+        "dimension_key": "string starting dim:",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "expected_value": "string?",
+        "maintenance_cost_rationale": "string",
+        "name": "string",
+        "update_method": "string?",
+        "user_value_rationale": "string",
+        "why_existing_dimensions_are_insufficient": "string"
+      },
+      "kind": "write",
+      "name": "propose_dimension",
+      "side_effecting": true
+    },
+    {
+      "description": "Create a durable Entity anchor from pinned same-world evidence. The resident supplies identity meaning; Core enforces explicit entity_key and provenance.",
+      "hard_boundary": false,
+      "input_schema": {
+        "aliases": "array[string]?",
+        "canonical_name": "string?",
+        "entity_key": "string",
+        "entity_kind": "string",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "identity_claim_refs": "array[{object_id:string,revision:integer}]?"
+      },
+      "kind": "write",
+      "name": "propose_entity",
+      "side_effecting": true
+    },
+    {
+      "description": "Create an evidence-grounded Goal proposal in the unified world. A proposal does not grant external-action authorization.",
+      "hard_boundary": false,
+      "input_schema": {
+        "confidence": "number[0,1]",
+        "description": "string",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "source_type": "user_explicit|user_inferred|ai_self|app|external",
+        "success_criteria": "array[string]?",
+        "title": "string"
+      },
+      "kind": "write",
+      "name": "propose_goal",
+      "side_effecting": true
+    },
+    {
+      "description": "Read current evidence-grounded AI cognition across user understanding, relationship, self, intent, strategy, boundary, personality and calibration.",
+      "hard_boundary": false,
+      "input_schema": {
+        "domains": "array[string]?",
+        "limit": "integer?",
+        "scope_key": "string?"
+      },
+      "kind": "read",
+      "name": "read_ai_world",
+      "side_effecting": false
+    },
+    {
+      "description": "Read the current mechanical BACKGROUND_DAY budget and durable usage. This reports policy caps, Wake/model-call usage and remaining capacity only; it does not decide which future fact is important.",
+      "hard_boundary": false,
+      "input_schema": {},
+      "kind": "read",
+      "name": "read_background_budget",
+      "side_effecting": false
+    },
+    {
+      "description": "Read current versioned R6 policy records from the unified world.",
+      "hard_boundary": false,
+      "input_schema": {
+        "policy_id": "string?"
+      },
+      "kind": "read",
+      "name": "read_cognitive_policies",
+      "side_effecting": false
+    },
+    {
+      "description": "Read current Goals, Tasks and proposed/executed Actions from the unified world. This is a read-only planning view.",
+      "hard_boundary": false,
+      "input_schema": {},
+      "kind": "read",
+      "name": "read_execution_world",
+      "side_effecting": false
+    },
+    {
+      "description": "Read a bounded page of the evidence anchors selected for the currently active periodic review. Available only during review.",
+      "hard_boundary": false,
+      "input_schema": {
+        "limit": "integer?",
+        "offset": "integer?"
+      },
+      "kind": "read",
+      "name": "read_periodic_review_anchors",
+      "side_effecting": false
+    },
+    {
+      "description": "Refresh the compact L0 world-map directory. Returns dimension identity, mechanical activity/count metadata and expansion capability names only; it does not return dimension payloads or semantic conclusions.",
+      "hard_boundary": false,
+      "input_schema": {},
+      "kind": "read",
+      "name": "read_world_map",
+      "side_effecting": false
+    },
+    {
+      "description": "Record what communication style was used and the real user/world reaction. This records evidence only and does not choose a future style.",
+      "hard_boundary": false,
+      "input_schema": {
+        "action_ref": "{object_id:string,revision:integer}?",
+        "applicable_conditions": "object?",
+        "counterexample_refs": "array[{object_id:string,revision:integer}]?",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "scenario": "string",
+        "style": "string",
+        "tone": "string?",
+        "user_reaction": "accepted|resisted|ignored|unknown"
+      },
+      "kind": "write",
+      "name": "record_communication_experience",
+      "side_effecting": true
+    },
+    {
+      "description": "Observe several parallel dimensions in one time window without turning co-occurrence into a causal conclusion.",
+      "hard_boundary": false,
+      "input_schema": {
+        "dimensions": "array[string]",
+        "query": "string?",
+        "window_end": "ISO-8601 datetime",
+        "window_start": "ISO-8601 datetime"
+      },
+      "kind": "read",
+      "name": "request_all_dimensions_projection",
+      "side_effecting": false
+    },
+    {
+      "description": "Retract the current Claim using pinned contrary/correcting evidence and propagate review-required state to dependents.",
+      "hard_boundary": false,
+      "input_schema": {
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "reason": "string",
+        "target_ref": "{object_id:string,revision:integer}"
+      },
+      "kind": "write",
+      "name": "retract_claim",
+      "side_effecting": true
+    },
+    {
+      "description": "Retrieve an exact Observation fact by id/revision for evidence drill-down.",
+      "hard_boundary": false,
+      "input_schema": {
+        "object_id": "string",
+        "revision": "integer?"
+      },
+      "kind": "read",
+      "name": "retrieve_original_observation",
+      "side_effecting": false
+    },
+    {
+      "description": "Create a forward-only new revision of the current Claim and mark dependent cognition review-required.",
+      "hard_boundary": false,
+      "input_schema": {
+        "confidence": "number[0,1]?",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "reason": "string",
+        "replacement_content": "string",
+        "target_ref": "{object_id:string,revision:integer}"
+      },
+      "kind": "write",
+      "name": "revise_claim",
+      "side_effecting": true
+    },
+    {
+      "description": "Append a new revision of the current Entity identity anchor using pinned evidence.",
+      "hard_boundary": false,
+      "input_schema": {
+        "aliases": "array[string]?",
+        "canonical_name": "string?",
+        "entity_ref": "{object_id:string,revision:integer}",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "identity_claim_refs": "array[{object_id:string,revision:integer}]?",
+        "reason": "string"
+      },
+      "kind": "write",
+      "name": "revise_entity",
+      "side_effecting": true
+    },
+    {
+      "description": "Forward-append a rollback to an earlier policy version using pinned evidence.",
+      "hard_boundary": false,
+      "input_schema": {
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "policy_id": "string",
+        "reason": "string",
+        "target_version": "integer"
+      },
+      "kind": "write",
+      "name": "rollback_cognitive_policy",
+      "side_effecting": true
+    },
+    {
+      "description": "Search same-session round-summary indexes by topic/text, then drill down to exact pinned raw dialogue when precision is needed.",
+      "hard_boundary": false,
+      "input_schema": {
+        "limit": "integer?",
+        "query": "string",
+        "session_id": "string?"
+      },
+      "kind": "read",
+      "name": "search_conversation_summaries",
+      "side_effecting": false
+    },
+    {
+      "description": "Search the world inside an explicit time window, optionally bounded by dimension/type/query.",
+      "hard_boundary": false,
+      "input_schema": {
+        "dimension": "string?",
+        "limit": "integer?",
+        "object_types": "array[string]?",
+        "query": "string?",
+        "window_end": "ISO-8601 datetime",
+        "window_start": "ISO-8601 datetime"
+      },
+      "kind": "read",
+      "name": "search_timeline",
+      "side_effecting": false
+    },
+    {
+      "description": "Recall candidate world objects related to a query.",
+      "hard_boundary": false,
+      "input_schema": {
+        "limit": "integer?",
+        "query": "string"
+      },
+      "kind": "read",
+      "name": "search_world",
+      "side_effecting": false
+    },
+    {
+      "description": "Move the current dimension revision through a legal lifecycle transition using pinned evidence and an AI-supplied reason.",
+      "hard_boundary": false,
+      "input_schema": {
+        "dimension_ref": "{object_id:string,revision:integer}",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "new_lifecycle": "candidate|trial|active|low_activity|dormant|merged|split|revised|rejected|reactivated|archived",
+        "reason": "string",
+        "related_dimension_refs": "array[{object_id:string,revision:integer}]?"
+      },
+      "kind": "write",
+      "name": "transition_dimension",
+      "side_effecting": true
+    },
+    {
+      "description": "Forward-revise/resolve/reject/merge/split the current Event using pinned evidence.",
+      "hard_boundary": false,
+      "input_schema": {
+        "confidence": "number[0,1]?",
+        "event_ref": "{object_id:string,revision:integer}",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "new_status": "candidate|active|resolved|revised|rejected|merged|split",
+        "reason": "string",
+        "related_event_refs": "array[{object_id:string,revision:integer}]?",
+        "replacement_interpretation": "string?",
+        "replacement_title": "string?"
+      },
+      "kind": "write",
+      "name": "transition_event",
+      "side_effecting": true
+    },
+    {
+      "description": "Move the current Goal revision through a legal evidence-backed state transition.",
+      "hard_boundary": false,
+      "input_schema": {
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "goal_ref": "{object_id:string,revision:integer}",
+        "new_status": "proposed|active|paused|achieved|abandoned|unknown",
+        "reason": "string"
+      },
+      "kind": "write",
+      "name": "transition_goal",
+      "side_effecting": true
+    },
+    {
+      "description": "Move the current Task revision through a legal state transition. Terminal transitions obey the Task's explicit completion mode: WORLD_EVIDENCE uses pinned durable evidence; ACTION_OUTCOME requires a real authorized Action-linked Outcome; MIXED requires both.",
+      "hard_boundary": false,
+      "input_schema": {
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "execution_refs": "array[{object_id:string,revision:integer}]?",
+        "new_state": "string",
+        "next_step": "string?",
+        "next_wake_at": "ISO-8601 datetime?",
+        "outcome_refs": "array[{object_id:string,revision:integer}]?",
+        "reason": "string",
+        "task_ref": "{object_id:string,revision:integer}"
+      },
+      "kind": "write",
+      "name": "transition_task",
+      "side_effecting": true
+    },
+    {
+      "description": "Append an evidence-grounded value revision to an already-registered AI-mutable cognitive policy. Cannot create or loosen hard boundaries.",
+      "hard_boundary": false,
+      "input_schema": {
+        "current_value": "json value",
+        "evaluation_window": "string?",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "policy_id": "string",
+        "reason": "string"
+      },
+      "kind": "write",
+      "name": "update_cognitive_policy",
+      "side_effecting": true
+    },
+    {
+      "description": "Create or forward-revise an evidence-grounded Relation between current Entity revisions.",
+      "hard_boundary": false,
+      "input_schema": {
+        "confidence": "number[0,1]",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "left_ref": "{object_id:string,revision:integer}",
+        "reason": "string",
+        "relation_type": "string",
+        "right_ref": "{object_id:string,revision:integer}",
+        "valid_time": "TemporalExtent object?"
+      },
+      "kind": "write",
+      "name": "upsert_relation",
+      "side_effecting": true
+    }
+  ],
+  "capability_history": [
+    {
+      "call_id": "cp0003-read-anchors",
+      "data": [
+        {
+          "excerpt": "08:28–10:25 开启专注模式；期间没有加入语音或视频通话，21 条通知被静音。",
+          "object_ref": {
+            "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-11-03T18:29:00Z"
+        },
+        {
+          "excerpt": "“API 迁移说明”第一版于 10:27 提交；该任务登记目标时间为 10:45。",
+          "object_ref": {
+            "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-11-03T18:34:00Z"
+        },
+        {
+          "excerpt": "昨晚睡眠 5小时34分；睡眠评分 58/100；06:48 醒来。",
+          "object_ref": {
+            "object_id": "obs_c14_fixture_536104c70eaad761d2583410",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-11-06T14:53:00Z"
+        },
+        {
+          "excerpt": "11月3日睡眠记录：昨晚睡眠 7小时46分，睡眠评分 83/100，07:01 醒来。",
+          "object_ref": {
+            "object_id": "sum_36c428557067be25d7288668",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-11-06T14:53:00Z"
+        },
+        {
+          "excerpt": "11月3日工作结果记录：“API 迁移说明”第一版于 10:27 提交；任务登记目标时间为 10:45。",
+          "object_ref": {
+            "object_id": "sum_6a44ce0ef0fb3bf29a70011e",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-11-06T14:53:00Z"
+        },
+        {
+          "excerpt": "11月3日设备活动记录：08:28–10:25 开启专注模式；该时段未加入语音或视频通话，21 条通知被静音。",
+          "object_ref": {
+            "object_id": "sum_6c1994975a4486604171a308",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-11-06T14:53:00Z"
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "name": "read_periodic_review_anchors",
+      "ok": true
+    }
+  ],
+  "cockpit": {
+    "ai_identity": {},
+    "capability_catalog": [
+      {
+        "description": "Persist a typed AI-world cognition using the unified EvidenceSet + Claim + Dependency path.",
+        "hard_boundary": false,
+        "input_schema": {
+          "claim_type": "string?",
+          "confidence": "number[0,1]",
+          "domain": "user_understanding|relationship|self|intent|strategy|cognitive_boundary|personality|calibration",
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "knowledge_state": "string?",
+          "scope_key": "string?",
+          "statement": "string",
+          "tags": "array[string]?"
+        },
+        "kind": "write",
+        "name": "commit_ai_world_claim",
+        "side_effecting": true
+      },
+      {
+        "description": "Persist a revisable AI cognition Claim grounded in pinned world evidence. This capability cannot create Observation facts.",
+        "hard_boundary": false,
+        "input_schema": {
+          "claim_type": "string?",
+          "confidence": "number[0,1]",
+          "content": "string",
+          "dimension": "string",
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "knowledge_state": "string?"
+        },
+        "kind": "write",
+        "name": "commit_claim",
+        "side_effecting": true
+      },
+      {
+        "description": "During an active periodic review, persist a model-authored operation experience grounded in pinned real case refs.",
+        "hard_boundary": false,
+        "input_schema": {
+          "applicability": "object?",
+          "cost": "object[number]?",
+          "experience_state": "string?",
+          "method_path": "array[string]",
+          "misses": "array[string]?",
+          "negative_case_refs": "array[{object_id:string,revision:integer}]?",
+          "positive_case_refs": "array[{object_id:string,revision:integer}]?",
+          "problem_type": "string",
+          "result_summary": "string"
+        },
+        "kind": "write",
+        "name": "commit_operation_experience",
+        "side_effecting": true
+      },
+      {
+        "description": "Inspect multiple pinned Claims side by side with their evidence/status; the model decides meaning.",
+        "hard_boundary": false,
+        "input_schema": {
+          "claim_refs": "array[{object_id:string,revision:integer}]"
+        },
+        "kind": "read",
+        "name": "compare_claims",
+        "side_effecting": false
+      },
+      {
+        "description": "Register future attention as a constrained mechanical Observation watch. The Resident chooses the routing class: interrupt wakes cognition immediately and may allow user delivery after Resident judgment; background waits for short mechanical batching, invokes cognition, and is silent to the user by default; review_queue does not invoke the Resident immediately and carries matched evidence into Periodic Review. Choose the class from the future-attention intent and current runtime facts; Core does not infer urgency for you. Do not encode emotion, intent, diagnosis, or other semantic conclusions in the mechanical predicate.",
+        "hard_boundary": false,
+        "input_schema": {
+          "attention_class": "interrupt|background|review_queue?",
+          "cooldown_seconds": "integer?",
+          "dimensions": "array[string]",
+          "expires_at": "ISO-8601 datetime?",
+          "goal_ref": "{object_id:string,revision:integer}?",
+          "metadata_equals": "object?",
+          "modality": "string?",
+          "mode": "recurring|one_shot?",
+          "numeric": "{operator:gt|gte|lt|lte|eq|ne,threshold:number,path:array[string]?}?",
+          "priority": "integer?",
+          "reason_refs": "array[{object_id:string,revision:integer}]",
+          "source_kind": "string?",
+          "title": "string"
+        },
+        "kind": "write",
+        "name": "create_attention_watch",
+        "side_effecting": true
+      },
+      {
+        "description": "Create a concrete evidence-grounded Task, optionally under a current Goal.",
+        "hard_boundary": false,
+        "input_schema": {
+          "completion_condition": "object?; use mode=world_evidence|action_outcome|mixed; optional result_object_types=array[string]",
+          "deadline": "ISO-8601 datetime?",
+          "goal_ref": "{object_id:string,revision:integer}?",
+          "initial_state": "string?",
+          "next_step": "string?",
+          "next_wake_at": "ISO-8601 datetime?",
+          "priority": "integer?",
+          "reason_refs": "array[{object_id:string,revision:integer}]",
+          "task_type": "string",
+          "timezone_name": "string?",
+          "title": "string"
+        },
+        "kind": "write",
+        "name": "create_task",
+        "side_effecting": true
+      },
+      {
+        "description": "Read exact pinned raw dialogue behind a same-session round summary, or an explicit turn range. Round summaries are indexes, not truth.",
+        "hard_boundary": false,
+        "input_schema": {
+          "revision": "integer?",
+          "session_id": "string?",
+          "summary_id": "string?",
+          "turn_end": "integer?",
+          "turn_start": "integer?"
+        },
+        "kind": "read",
+        "name": "drill_down_conversation",
+        "side_effecting": false
+      },
+      {
+        "description": "Request a broader bounded world recall after the initial recommendation/search was insufficient.",
+        "hard_boundary": false,
+        "input_schema": {
+          "dimension": "string?",
+          "limit": "integer?",
+          "query": "string"
+        },
+        "kind": "read",
+        "name": "expand_recall",
+        "side_effecting": false
+      },
+      {
+        "description": "Focus retrieval on one known Entity id without semantic reinterpretation.",
+        "hard_boundary": false,
+        "input_schema": {
+          "entity_id": "string",
+          "limit": "integer?",
+          "query": "string?"
+        },
+        "kind": "read",
+        "name": "focus_entity",
+        "side_effecting": false
+      },
+      {
+        "description": "Follow one-hop explicit Relation objects connected to a world object.",
+        "hard_boundary": false,
+        "input_schema": {
+          "limit": "integer?",
+          "object_id": "string"
+        },
+        "kind": "read",
+        "name": "follow_relation",
+        "side_effecting": false
+      },
+      {
+        "description": "Form a revisable Event candidate from pinned world evidence. The model supplies the event meaning; code only validates provenance.",
+        "hard_boundary": false,
+        "input_schema": {
+          "confidence": "number[0,1]",
+          "dimension": "string?",
+          "event_time": "TemporalExtent object",
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "interpretation": "string",
+          "participant_refs": "array[{object_id:string,revision:integer}]?",
+          "primary_claim_refs": "array[{object_id:string,revision:integer}]?",
+          "title": "string"
+        },
+        "kind": "write",
+        "name": "form_event",
+        "side_effecting": true
+      },
+      {
+        "description": "Inspect a pinned real Action Outcome and its Action reference.",
+        "hard_boundary": false,
+        "input_schema": {
+          "outcome_ref": "{object_id:string,revision:integer}"
+        },
+        "kind": "read",
+        "name": "inspect_outcome",
+        "side_effecting": false
+      },
+      {
+        "description": "Read one pinned or latest world object by object id.",
+        "hard_boundary": false,
+        "input_schema": {
+          "object_id": "string",
+          "revision": "integer?"
+        },
+        "kind": "read",
+        "name": "inspect_world_object",
+        "side_effecting": false
+      },
+      {
+        "description": "List Resident-authored active attention watches. Watches contain only mechanical future-match predicates; the Resident interprets meaning after Wake.",
+        "hard_boundary": false,
+        "input_schema": {},
+        "kind": "read",
+        "name": "list_attention_watches",
+        "side_effecting": false
+      },
+      {
+        "description": "List same-session continuity summary windows on demand. Use this when token budgeting omitted summary content from the cockpit.",
+        "hard_boundary": false,
+        "input_schema": {
+          "limit": "integer?",
+          "session_id": "string?"
+        },
+        "kind": "read",
+        "name": "list_conversation_summaries",
+        "side_effecting": false
+      },
+      {
+        "description": "List current registered dimension definitions so the resident AI can check whether an existing observation axis already serves the need.",
+        "hard_boundary": false,
+        "input_schema": {
+          "include_terminal": "boolean?"
+        },
+        "kind": "read",
+        "name": "list_dimensions",
+        "side_effecting": false
+      },
+      {
+        "description": "Create a PROPOSED external Action for a RUNNING Task. This capability never executes the side effect and cannot authorize itself.",
+        "hard_boundary": false,
+        "input_schema": {
+          "action_type": "string",
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "expected_outcome": "string?",
+          "payload": "object",
+          "task_ref": "{object_id:string,revision:integer}"
+        },
+        "kind": "write",
+        "name": "propose_action",
+        "side_effecting": true
+      },
+      {
+        "description": "Register a new evidence-grounded AI-mutable cognitive policy. Only real user/world result evidence is accepted; hard boundaries cannot be created by the resident AI.",
+        "hard_boundary": false,
+        "input_schema": {
+          "allowed_range_or_choices": "json value?",
+          "current_value": "json value",
+          "default_value": "json value",
+          "evaluation_window": "string",
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "policy_id": "string",
+          "reason": "string",
+          "scope": "string"
+        },
+        "kind": "write",
+        "name": "propose_cognitive_policy",
+        "side_effecting": true
+      },
+      {
+        "description": "Submit an evidence-grounded candidate observation axis. The system validates structure; the model supplies semantic rationale.",
+        "hard_boundary": false,
+        "input_schema": {
+          "confidence": "number[0,1]",
+          "continuity_rationale": "string",
+          "data_shape": "string",
+          "description": "string",
+          "dimension_key": "string starting dim:",
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "expected_value": "string?",
+          "maintenance_cost_rationale": "string",
+          "name": "string",
+          "update_method": "string?",
+          "user_value_rationale": "string",
+          "why_existing_dimensions_are_insufficient": "string"
+        },
+        "kind": "write",
+        "name": "propose_dimension",
+        "side_effecting": true
+      },
+      {
+        "description": "Create a durable Entity anchor from pinned same-world evidence. The resident supplies identity meaning; Core enforces explicit entity_key and provenance.",
+        "hard_boundary": false,
+        "input_schema": {
+          "aliases": "array[string]?",
+          "canonical_name": "string?",
+          "entity_key": "string",
+          "entity_kind": "string",
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "identity_claim_refs": "array[{object_id:string,revision:integer}]?"
+        },
+        "kind": "write",
+        "name": "propose_entity",
+        "side_effecting": true
+      },
+      {
+        "description": "Create an evidence-grounded Goal proposal in the unified world. A proposal does not grant external-action authorization.",
+        "hard_boundary": false,
+        "input_schema": {
+          "confidence": "number[0,1]",
+          "description": "string",
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "source_type": "user_explicit|user_inferred|ai_self|app|external",
+          "success_criteria": "array[string]?",
+          "title": "string"
+        },
+        "kind": "write",
+        "name": "propose_goal",
+        "side_effecting": true
+      },
+      {
+        "description": "Read current evidence-grounded AI cognition across user understanding, relationship, self, intent, strategy, boundary, personality and calibration.",
+        "hard_boundary": false,
+        "input_schema": {
+          "domains": "array[string]?",
+          "limit": "integer?",
+          "scope_key": "string?"
+        },
+        "kind": "read",
+        "name": "read_ai_world",
+        "side_effecting": false
+      },
+      {
+        "description": "Read the current mechanical BACKGROUND_DAY budget and durable usage. This reports policy caps, Wake/model-call usage and remaining capacity only; it does not decide which future fact is important.",
+        "hard_boundary": false,
+        "input_schema": {},
+        "kind": "read",
+        "name": "read_background_budget",
+        "side_effecting": false
+      },
+      {
+        "description": "Read current versioned R6 policy records from the unified world.",
+        "hard_boundary": false,
+        "input_schema": {
+          "policy_id": "string?"
+        },
+        "kind": "read",
+        "name": "read_cognitive_policies",
+        "side_effecting": false
+      },
+      {
+        "description": "Read current Goals, Tasks and proposed/executed Actions from the unified world. This is a read-only planning view.",
+        "hard_boundary": false,
+        "input_schema": {},
+        "kind": "read",
+        "name": "read_execution_world",
+        "side_effecting": false
+      },
+      {
+        "description": "Read a bounded page of the evidence anchors selected for the currently active periodic review. Available only during review.",
+        "hard_boundary": false,
+        "input_schema": {
+          "limit": "integer?",
+          "offset": "integer?"
+        },
+        "kind": "read",
+        "name": "read_periodic_review_anchors",
+        "side_effecting": false
+      },
+      {
+        "description": "Refresh the compact L0 world-map directory. Returns dimension identity, mechanical activity/count metadata and expansion capability names only; it does not return dimension payloads or semantic conclusions.",
+        "hard_boundary": false,
+        "input_schema": {},
+        "kind": "read",
+        "name": "read_world_map",
+        "side_effecting": false
+      },
+      {
+        "description": "Record what communication style was used and the real user/world reaction. This records evidence only and does not choose a future style.",
+        "hard_boundary": false,
+        "input_schema": {
+          "action_ref": "{object_id:string,revision:integer}?",
+          "applicable_conditions": "object?",
+          "counterexample_refs": "array[{object_id:string,revision:integer}]?",
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "scenario": "string",
+          "style": "string",
+          "tone": "string?",
+          "user_reaction": "accepted|resisted|ignored|unknown"
+        },
+        "kind": "write",
+        "name": "record_communication_experience",
+        "side_effecting": true
+      },
+      {
+        "description": "Observe several parallel dimensions in one time window without turning co-occurrence into a causal conclusion.",
+        "hard_boundary": false,
+        "input_schema": {
+          "dimensions": "array[string]",
+          "query": "string?",
+          "window_end": "ISO-8601 datetime",
+          "window_start": "ISO-8601 datetime"
+        },
+        "kind": "read",
+        "name": "request_all_dimensions_projection",
+        "side_effecting": false
+      },
+      {
+        "description": "Retract the current Claim using pinned contrary/correcting evidence and propagate review-required state to dependents.",
+        "hard_boundary": false,
+        "input_schema": {
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "reason": "string",
+          "target_ref": "{object_id:string,revision:integer}"
+        },
+        "kind": "write",
+        "name": "retract_claim",
+        "side_effecting": true
+      },
+      {
+        "description": "Retrieve an exact Observation fact by id/revision for evidence drill-down.",
+        "hard_boundary": false,
+        "input_schema": {
+          "object_id": "string",
+          "revision": "integer?"
+        },
+        "kind": "read",
+        "name": "retrieve_original_observation",
+        "side_effecting": false
+      },
+      {
+        "description": "Create a forward-only new revision of the current Claim and mark dependent cognition review-required.",
+        "hard_boundary": false,
+        "input_schema": {
+          "confidence": "number[0,1]?",
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "reason": "string",
+          "replacement_content": "string",
+          "target_ref": "{object_id:string,revision:integer}"
+        },
+        "kind": "write",
+        "name": "revise_claim",
+        "side_effecting": true
+      },
+      {
+        "description": "Append a new revision of the current Entity identity anchor using pinned evidence.",
+        "hard_boundary": false,
+        "input_schema": {
+          "aliases": "array[string]?",
+          "canonical_name": "string?",
+          "entity_ref": "{object_id:string,revision:integer}",
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "identity_claim_refs": "array[{object_id:string,revision:integer}]?",
+          "reason": "string"
+        },
+        "kind": "write",
+        "name": "revise_entity",
+        "side_effecting": true
+      },
+      {
+        "description": "Forward-append a rollback to an earlier policy version using pinned evidence.",
+        "hard_boundary": false,
+        "input_schema": {
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "policy_id": "string",
+          "reason": "string",
+          "target_version": "integer"
+        },
+        "kind": "write",
+        "name": "rollback_cognitive_policy",
+        "side_effecting": true
+      },
+      {
+        "description": "Search same-session round-summary indexes by topic/text, then drill down to exact pinned raw dialogue when precision is needed.",
+        "hard_boundary": false,
+        "input_schema": {
+          "limit": "integer?",
+          "query": "string",
+          "session_id": "string?"
+        },
+        "kind": "read",
+        "name": "search_conversation_summaries",
+        "side_effecting": false
+      },
+      {
+        "description": "Search the world inside an explicit time window, optionally bounded by dimension/type/query.",
+        "hard_boundary": false,
+        "input_schema": {
+          "dimension": "string?",
+          "limit": "integer?",
+          "object_types": "array[string]?",
+          "query": "string?",
+          "window_end": "ISO-8601 datetime",
+          "window_start": "ISO-8601 datetime"
+        },
+        "kind": "read",
+        "name": "search_timeline",
+        "side_effecting": false
+      },
+      {
+        "description": "Recall candidate world objects related to a query.",
+        "hard_boundary": false,
+        "input_schema": {
+          "limit": "integer?",
+          "query": "string"
+        },
+        "kind": "read",
+        "name": "search_world",
+        "side_effecting": false
+      },
+      {
+        "description": "Move the current dimension revision through a legal lifecycle transition using pinned evidence and an AI-supplied reason.",
+        "hard_boundary": false,
+        "input_schema": {
+          "dimension_ref": "{object_id:string,revision:integer}",
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "new_lifecycle": "candidate|trial|active|low_activity|dormant|merged|split|revised|rejected|reactivated|archived",
+          "reason": "string",
+          "related_dimension_refs": "array[{object_id:string,revision:integer}]?"
+        },
+        "kind": "write",
+        "name": "transition_dimension",
+        "side_effecting": true
+      },
+      {
+        "description": "Forward-revise/resolve/reject/merge/split the current Event using pinned evidence.",
+        "hard_boundary": false,
+        "input_schema": {
+          "confidence": "number[0,1]?",
+          "event_ref": "{object_id:string,revision:integer}",
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "new_status": "candidate|active|resolved|revised|rejected|merged|split",
+          "reason": "string",
+          "related_event_refs": "array[{object_id:string,revision:integer}]?",
+          "replacement_interpretation": "string?",
+          "replacement_title": "string?"
+        },
+        "kind": "write",
+        "name": "transition_event",
+        "side_effecting": true
+      },
+      {
+        "description": "Move the current Goal revision through a legal evidence-backed state transition.",
+        "hard_boundary": false,
+        "input_schema": {
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "goal_ref": "{object_id:string,revision:integer}",
+          "new_status": "proposed|active|paused|achieved|abandoned|unknown",
+          "reason": "string"
+        },
+        "kind": "write",
+        "name": "transition_goal",
+        "side_effecting": true
+      },
+      {
+        "description": "Move the current Task revision through a legal state transition. Terminal transitions obey the Task's explicit completion mode: WORLD_EVIDENCE uses pinned durable evidence; ACTION_OUTCOME requires a real authorized Action-linked Outcome; MIXED requires both.",
+        "hard_boundary": false,
+        "input_schema": {
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "execution_refs": "array[{object_id:string,revision:integer}]?",
+          "new_state": "string",
+          "next_step": "string?",
+          "next_wake_at": "ISO-8601 datetime?",
+          "outcome_refs": "array[{object_id:string,revision:integer}]?",
+          "reason": "string",
+          "task_ref": "{object_id:string,revision:integer}"
+        },
+        "kind": "write",
+        "name": "transition_task",
+        "side_effecting": true
+      },
+      {
+        "description": "Append an evidence-grounded value revision to an already-registered AI-mutable cognitive policy. Cannot create or loosen hard boundaries.",
+        "hard_boundary": false,
+        "input_schema": {
+          "current_value": "json value",
+          "evaluation_window": "string?",
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "policy_id": "string",
+          "reason": "string"
+        },
+        "kind": "write",
+        "name": "update_cognitive_policy",
+        "side_effecting": true
+      },
+      {
+        "description": "Create or forward-revise an evidence-grounded Relation between current Entity revisions.",
+        "hard_boundary": false,
+        "input_schema": {
+          "confidence": "number[0,1]",
+          "evidence_refs": "array[{object_id:string,revision:integer}]",
+          "left_ref": "{object_id:string,revision:integer}",
+          "reason": "string",
+          "relation_type": "string",
+          "right_ref": "{object_id:string,revision:integer}",
+          "valid_time": "TemporalExtent object?"
+        },
+        "kind": "write",
+        "name": "upsert_relation",
+        "side_effecting": true
+      }
+    ],
+    "conversation_summaries": [],
+    "current_topic": null,
+    "estimated_tokens": 5510,
+    "memory_cards": [],
+    "recent_turns": [],
+    "task_context": {
+      "cognitive_policy_context": {
+        "_meta": {
+          "included": 0,
+          "reader": "read_cognitive_policies",
+          "total": 0,
+          "truncated": false
+        },
+        "_policy_records": []
+      },
+      "periodic_review": {
+        "anchor_count": 6,
+        "anchor_reader": "read_periodic_review_anchors",
+        "budget": {
+          "applies": false,
+          "available": true,
+          "max_model_calls": null,
+          "max_wakes": null,
+          "model_round_limit": null,
+          "policy_refs": [],
+          "reasons": [],
+          "reserved_model_calls": 0,
+          "scope": null,
+          "token_usage_available": false,
+          "used_model_calls": 0,
+          "used_tokens": 0,
+          "used_wakes": 0,
+          "window_end": null,
+          "window_start": null
+        },
+        "instruction": "Review the supplied world anchors and decide whether any previous AI understanding, strategy, calibration, self-understanding, goal handling, operation method, or due CognitivePolicy should be revised, confirmed, or rolled back. Use existing search/inspect tools when needed. Do not invent user growth, causal meaning, success, failure, or policy changes that are not supported by world evidence. Mechanical Wake outcomes may be used to review Resident-authored attention watches, but model silence or suppressed delivery is not itself evidence of user preference or real-world success.",
+        "review_id": "wake_review_bb1ea1797acd8233a2a9f69b",
+        "review_queue_wake_count": 0,
+        "wake_ref": {
+          "object_id": "wake_review_bb1ea1797acd8233a2a9f69b",
+          "revision": 2
+        },
+        "window_end": "2026-11-06T14:53:00+00:00",
+        "window_start": "2026-11-03T15:06:00+00:00"
+      }
+    },
+    "token_budget": 3400,
+    "truncated": true,
+    "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged.",
+    "world_map": {
+      "as_of": "2026-11-06T14:53:00+00:00",
+      "dimension_count": 4,
+      "dimensions": [
+        {
+          "current_object_count": 8,
+          "definition_ref": null,
+          "dimension": "dim_unclassified",
+          "latest_activity_at": "2026-11-06T14:53:00+00:00",
+          "lifecycle": null,
+          "name": null,
+          "object_types": [
+            "dependency",
+            "wake"
+          ],
+          "recent_24h_count": 7,
+          "recent_7d_count": 8,
+          "registered": false
+        },
+        {
+          "current_object_count": 3,
+          "definition_ref": null,
+          "dimension": "dim:sleep",
+          "latest_activity_at": "2026-11-06T14:53:00+00:00",
+          "lifecycle": null,
+          "name": null,
+          "object_types": [
+            "observation",
+            "summary"
+          ],
+          "recent_24h_count": 1,
+          "recent_7d_count": 3,
+          "registered": false
+        },
+        {
+          "current_object_count": 2,
+          "definition_ref": null,
+          "dimension": "dim:device_activity",
+          "latest_activity_at": "2026-11-03T18:29:00+00:00",
+          "lifecycle": null,
+          "name": null,
+          "object_types": [
+            "observation",
+            "summary"
+          ],
+          "recent_24h_count": 0,
+          "recent_7d_count": 2,
+          "registered": false
+        },
+        {
+          "current_object_count": 2,
+          "definition_ref": null,
+          "dimension": "dim:work_outcome",
+          "latest_activity_at": "2026-11-03T18:34:00+00:00",
+          "lifecycle": null,
+          "name": null,
+          "object_types": [
+            "observation",
+            "summary"
+          ],
+          "recent_24h_count": 0,
+          "recent_7d_count": 2,
+          "registered": false
+        }
+      ],
+      "directory_only": true,
+      "expand_capabilities": {
+        "broader_recall": "expand_recall",
+        "dimension_definitions": "list_dimensions",
+        "exact_object": "inspect_world_object",
+        "multi_dimension_window": "request_all_dimensions_projection",
+        "refresh_directory": "read_world_map",
+        "semantic_recall": "search_world",
+        "single_dimension_timeline": "search_timeline"
+      },
+      "index_lag": 0,
+      "index_watermark": 15,
+      "schema": "aios.world-map.l0.v1",
+      "semantic_conclusions": false,
+      "truncated": false,
+      "world_revision": 15
+    }
+  },
+  "remaining_tool_rounds": 3,
+  "round_index": 1,
+  "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged.",
+  "wake_reason": "periodic_review"
+}

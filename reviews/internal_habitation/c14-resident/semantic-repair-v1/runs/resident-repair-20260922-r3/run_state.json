@@ -1,17 +1,44 @@
 {
-  "capability_call_count": 1,
-  "cognition_calls": [],
+  "capability_call_count": 4,
+  "cognition_calls": [
+    {
+      "arguments": {
+        "claim_type": "hypothesis",
+        "confidence": 0.52,
+        "content": "11月3日同一日内，7小时46分且评分83/100的睡眠记录、08:28–10:25的无通话专注时段，以及10:27早于10:45目标提交第一版同时出现。仅作为单案例低置信度假设：这些条件可能与该次工作及时完成相关，不推断因果或泛化。",
+        "dimension": "dim:work_pattern",
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_5bf4b05a9dafdb85ec5bb688",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+            "revision": 1
+          }
+        ],
+        "knowledge_state": "hypothesis"
+      },
+      "checkpoint_id": "cp0005",
+      "name": "commit_claim"
+    }
+  ],
   "complete": false,
   "conversation_turn_index": 0,
-  "current_simulated_timestamp": "2026-11-03T10:34:00-08:00",
+  "current_simulated_timestamp": "2026-11-06T06:53:00-08:00",
   "errors": [],
-  "next_checkpoint": 3,
-  "next_summary_request": 1,
+  "next_checkpoint": 7,
+  "next_summary_request": 4,
   "phase": "A",
   "released_cursors": [
     1,
     2,
-    3
+    3,
+    4
   ],
   "response_count": 0,
   "run_id": "c14-sem-repair-resident-20260922-sol-r3",
@@ -31,9 +58,60 @@
       "released_cursor": 1,
       "simulated_timestamp": "2026-11-03T07:06:00-08:00",
       "world_revision_before": 3
+    },
+    {
+      "checkpoint_id": "cp0003",
+      "directive_kind": "capability_calls",
+      "github_author": "Haneof",
+      "released_cursor": 4,
+      "simulated_timestamp": "2026-11-06T06:53:00-08:00",
+      "world_revision_before": 15
+    },
+    {
+      "checkpoint_id": "cp0004",
+      "directive_kind": "capability_calls",
+      "github_author": "Haneof",
+      "released_cursor": 4,
+      "simulated_timestamp": "2026-11-06T06:53:00-08:00",
+      "world_revision_before": 15
+    },
+    {
+      "checkpoint_id": "cp0005",
+      "directive_kind": "capability_calls",
+      "github_author": "Haneof",
+      "released_cursor": 4,
+      "simulated_timestamp": "2026-11-06T06:53:00-08:00",
+      "world_revision_before": 15
+    },
+    {
+      "checkpoint_id": "cp0006",
+      "directive_kind": "silence",
+      "github_author": "Haneof",
+      "released_cursor": 4,
+      "simulated_timestamp": "2026-11-06T06:53:00-08:00",
+      "world_revision_before": 16
     }
   ],
   "session_id": "resident-sem-repair-sol-20260922-r3",
-  "silence_count": 1,
-  "summary_requests": []
+  "silence_count": 2,
+  "summary_requests": [
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 4,
+      "request_id": "sum0001"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 4,
+      "request_id": "sum0002"
+    },
+    {
+      "github_author": "Haneof",
+      "kind": "dimension_summary",
+      "released_cursor": 4,
+      "request_id": "sum0003"
+    }
+  ]
 }
