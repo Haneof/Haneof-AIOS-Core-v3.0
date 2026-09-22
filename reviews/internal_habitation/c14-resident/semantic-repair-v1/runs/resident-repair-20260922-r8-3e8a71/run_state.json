@@ -1,9 +1,9 @@
 {
-  "capability_call_count": 2,
+  "capability_call_count": 6,
   "cognition_calls": [],
   "complete": false,
   "conversation_turn_index": 0,
-  "current_simulated_timestamp": "2026-11-06T06:53:00-08:00",
+  "current_simulated_timestamp": "2026-11-06T10:23:00-08:00",
   "errors": [
     {
       "attempt": 1,
@@ -11,14 +11,15 @@
       "reason": "cursor-1 evidence push targeted stale r3 branch; semantic cp0001/cp0002 were authored by the same Resident and will be mechanically replayed; no cursor 2 or future event was revealed"
     }
   ],
-  "next_checkpoint": 5,
+  "next_checkpoint": 7,
   "next_summary_request": 4,
   "phase": "A",
   "released_cursors": [
     1,
     2,
     3,
-    4
+    4,
+    5
   ],
   "response_count": 0,
   "run_id": "c14-sem-repair-resident-20260922-sol-r8-3e8a71",
@@ -54,10 +55,26 @@
       "released_cursor": 4,
       "simulated_timestamp": "2026-11-06T06:53:00-08:00",
       "world_revision_before": 15
+    },
+    {
+      "checkpoint_id": "cp0005",
+      "directive_kind": "capability_calls",
+      "github_author": "Haneof",
+      "released_cursor": 5,
+      "simulated_timestamp": "2026-11-06T10:23:00-08:00",
+      "world_revision_before": 19
+    },
+    {
+      "checkpoint_id": "cp0006",
+      "directive_kind": "silence",
+      "github_author": "Haneof",
+      "released_cursor": 5,
+      "simulated_timestamp": "2026-11-06T10:23:00-08:00",
+      "world_revision_before": 19
     }
   ],
   "session_id": "resident-sem-repair-sol-20260922-r8-3e8a71",
-  "silence_count": 2,
+  "silence_count": 3,
   "summary_requests": [
     {
       "github_author": "Haneof",

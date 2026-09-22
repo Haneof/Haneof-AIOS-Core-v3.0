@@ -1,0 +1,42 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+        "revision": 1
+      },
+      "call_id": "cp0005-inspect-device",
+      "name": "inspect_world_object"
+    },
+    {
+      "arguments": {
+        "object_id": "obs_c14_fixture_5bf4b05a9dafdb85ec5bb688",
+        "revision": 1
+      },
+      "call_id": "cp0005-inspect-sleep",
+      "name": "inspect_world_object"
+    },
+    {
+      "arguments": {
+        "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+        "revision": 1
+      },
+      "call_id": "cp0005-inspect-outcome",
+      "name": "inspect_world_object"
+    },
+    {
+      "arguments": {
+        "dimension": "dim:collaboration_activity",
+        "limit": 20,
+        "window_end": "2026-11-06T18:23:00Z",
+        "window_start": "2026-11-06T00:00:00Z"
+      },
+      "call_id": "cp0005-collab-now",
+      "name": "search_timeline"
+    }
+  ],
+  "checkpoint_id": "cp0005",
+  "decision_rationale": "The bundle only points to summaries. Re-open the three grounding reality leaves and current released collaboration reality before deciding whether there is more than one comparable work case.",
+  "github_author": "Haneof",
+  "run_id": "c14-sem-repair-resident-20260922-sol-r8-3e8a71"
+}
