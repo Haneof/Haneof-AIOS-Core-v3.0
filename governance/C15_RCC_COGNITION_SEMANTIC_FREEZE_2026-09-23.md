@@ -35,11 +35,17 @@ keeps it that way for the entire A/B/C window.
 
 ### Activation anchor
 
-This document exists now, committed alongside the hardening candidate, but it
-becomes **ACTIVE** only at the merge of the C15 cognition hardening (PR #113,
-candidate `a00e39796f2f34ea6a598653fe274f9354ab4d5b`, subject
-`C15-RCC-EVIDENCE-POLICY-001`). At that merge the PM must record the resulting
-`main` SHA as the **Core anchor** in board rows 30/31/32 (Resident A/B/C). While
+This document exists now, committed alongside the hardening candidates, but it
+becomes **ACTIVE** only at the merge of the C15 cognition hardening — the
+integrated landing of **PR #113** (`C15-RCC-EVIDENCE-POLICY-001`, candidate
+`a00e39796f2f34ea6a598653fe274f9354ab4d5b`) **and PR #111**
+(`C15-RCC-COGNITION-FIELDS-001`, candidate `abb85e050f2f1bd19c5ce4f847b14b54259d6339`),
+both listed under the `C15-RCC-HARDEN-001` umbrella in the hardening roadmap.
+The two PRs diverge and modify the same four source files; they cannot be
+merged sequentially without conflict resolution, so "the hardening merge" is
+the **integrated** merge (see the C15 hardening master status report,
+§5). At that merge the PM must record the resulting `main` SHA as the **Core
+anchor** in board rows 30/31/32 (Resident A/B/C). While
 the freeze is ACTIVE, every Resident run and every evaluator comparison must
 verify that the Core in use is exactly that anchor, or an explicitly
 PM-approved exception (Section 5).
@@ -62,6 +68,7 @@ Preconditions recorded at authoring time (2026-09-23):
 |---|---|
 | `C15-RCC-COG-FIX-001` (PR #108, `c146cebbdfa8ac714fc236652a4452c60bcfa0bb`) | merged on `main` |
 | PR #113 (`C15-RCC-EVIDENCE-POLICY-001`, candidate `a00e397`) | technically passed independent review; **open, unmerged**, awaiting this governance anchor and the PM sequencing ruling |
+| PR #111 (`C15-RCC-COGNITION-FIELDS-001`, candidate `abb85e0`) | hardening-umbrella task per roadmap; **open, unmerged**; diverges from PR #113 on four source files — must be **integrated** with PR #113 before the hardening merge (master status report, §5) |
 | `C15-RCC-HARDEN-DECISION-001` (sequencing, BEFORE-order) | PROPOSED, awaiting PM review |
 | `C15-RCC-RES-A-RERUN-001` | **not started**; board row 29.4 still reads `READY` (to be amended by PM under the sequencing ruling) |
 
