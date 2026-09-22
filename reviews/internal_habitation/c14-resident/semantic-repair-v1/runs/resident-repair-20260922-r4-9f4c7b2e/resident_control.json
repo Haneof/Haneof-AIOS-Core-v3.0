@@ -1,11 +1,9 @@
 {
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
   "nonce": "9f4c7b2e-6a31-4c97-bd28-1f0b88a9d453",
-  "kind": "DIRECTIVE",
-  "item_id": "cp0012",
+  "kind": "EVENT_SEEN",
+  "item_id": "c14semrep-009",
   "payload": {
-    "checkpoint_id": "cp0012",
-    "silence": true,
-    "decision_rationale": "The bounded work-pattern hypothesis was successfully committed at world revision 43 with six direct Observation refs. No new reality has appeared within this wake, so further cognition would be duplicate."
+    "seen": true
   }
 }
