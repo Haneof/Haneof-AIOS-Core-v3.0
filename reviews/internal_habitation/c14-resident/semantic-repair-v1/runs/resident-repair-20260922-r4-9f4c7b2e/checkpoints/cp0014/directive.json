@@ -1,0 +1,62 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "confidence": 0.6,
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_b2ff4a1d0c68345be781f7cf",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_d15395b6bb573ddfcc1abbe9",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_5bf4b05a9dafdb85ec5bb688",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_16b3967abe086c1bbae30bf7",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_3187c6e6c4a710447d75b09e",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_536104c70eaad761d2583410",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_4707b28549e22ebbc07bc197",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_e097d1109d87846dabdb0060",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_eacb9de67251ec8bb98476a4",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_conv_user_0e039f93acf136af2ed01fde",
+            "revision": 1
+          }
+        ],
+        "reason": "A third real case is counter-evidence to the overly broad interpretation that any call predicts delay: one actual sync with low reported context-recovery cost still ended in an early draft. Narrow the hypothesis to fragmentation/recovery-cost association while retaining sleep and small-sample uncertainty.",
+        "replacement_content": "目前三个已观察的文档任务案例表明，是否存在一次工作沟通本身不足以解释交付时点：无通话的连续专注案例提前提交；三次实际通话且当日睡眠较短的案例延后提交；一次约18分钟同步、睡眠较好且用户自述几乎无需重新找上下文的案例仍提前提交。当前更值得继续观察的是沟通碎片化程度与恢复上下文成本是否和交付时点同现，但样本仍很小且睡眠等因素混杂，不支持因果结论。",
+        "target_ref": {
+          "object_id": "clm_7672f379ea32d16e77ea7e97",
+          "revision": 1
+        }
+      },
+      "call_id": "cp0014-revise-work-pattern",
+      "name": "revise_claim"
+    }
+  ],
+  "checkpoint_id": "cp0014",
+  "decision_rationale": "The third case materially narrows the existing hypothesis. Revision is preferable to merely raising confidence or retaining the original wording.",
+  "github_author": "single-window-resident-control"
+}
