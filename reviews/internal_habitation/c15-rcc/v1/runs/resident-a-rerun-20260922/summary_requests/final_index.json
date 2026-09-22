@@ -1,0 +1,7 @@
+{
+  "evidence_kind": "summary request index",
+  "summary_revision_count": 19,
+  "authoritative_storage": "private_world.sqlite",
+  "final_world_revision": 77,
+  "note": "No standalone summary-request transport files were emitted for later cursors; this index makes the evidence directory explicit without reconstructing semantic requests. Summary objects remain auditable in the frozen World."
+}
