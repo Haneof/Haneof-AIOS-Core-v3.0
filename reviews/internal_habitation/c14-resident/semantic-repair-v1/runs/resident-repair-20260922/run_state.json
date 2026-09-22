@@ -3,15 +3,16 @@
   "cognition_calls": [],
   "complete": false,
   "conversation_turn_index": 0,
-  "current_simulated_timestamp": "2026-11-03T10:34:00-08:00",
+  "current_simulated_timestamp": "2026-11-06T06:53:00-08:00",
   "errors": [],
-  "next_checkpoint": 2,
-  "next_summary_request": 1,
+  "next_checkpoint": 3,
+  "next_summary_request": 4,
   "phase": "A",
   "released_cursors": [
     1,
     2,
-    3
+    3,
+    4
   ],
   "response_count": 0,
   "run_id": "resident-repair-20260922",
@@ -22,9 +23,32 @@
       "released_cursor": 1,
       "simulated_timestamp": "2026-11-03T07:06:00-08:00",
       "world_revision_before": 3
+    },
+    {
+      "checkpoint_id": "cp0002",
+      "directive_kind": "silence",
+      "released_cursor": 4,
+      "simulated_timestamp": "2026-11-06T06:53:00-08:00",
+      "world_revision_before": 15
     }
   ],
   "session_id": "resident-sem-repair-20260922",
-  "silence_count": 1,
-  "summary_requests": []
+  "silence_count": 2,
+  "summary_requests": [
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 4,
+      "request_id": "sum0001"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 4,
+      "request_id": "sum0002"
+    },
+    {
+      "kind": "dimension_summary",
+      "released_cursor": 4,
+      "request_id": "sum0003"
+    }
+  ]
 }

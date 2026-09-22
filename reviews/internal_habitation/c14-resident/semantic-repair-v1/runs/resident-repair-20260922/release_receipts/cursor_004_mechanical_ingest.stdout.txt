@@ -1,0 +1,1 @@
+{"fixture_payload_sha256":"sha256:a8b7c29223fb721b6074433d812a0ab0d5070c812d272e4d77fd73eb274a9a5d","fixture_projection_sha256":"sha256:628c2a671c003108961c13ca86298d8d9f5e356c4bf49ea4419c7787bc69f399","ingest_ref":"obs_c14_fixture_536104c70eaad761d2583410@1","object_id":"obs_c14_fixture_536104c70eaad761d2583410","reused_existing":false,"revision":1,"world_revision":7}
