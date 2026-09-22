@@ -1,9 +1,9 @@
 {
   "run_id": "c14-sem-repair-resident-20260922-sol-r4-9f4c7b2e",
   "nonce": "9f4c7b2e-6a31-4c97-bd28-1f0b88a9d453",
-  "kind": "EVENT_SEEN",
-  "item_id": "c14semrep-004",
+  "kind": "SUMMARY_RESPONSE",
+  "item_id": "sum0001",
   "payload": {
-    "seen": true
+    "content": "2026-11-03 08:28–10:25，设备开启专注模式；期间未加入语音或视频通话，21 条通知被静音。"
   }
 }
