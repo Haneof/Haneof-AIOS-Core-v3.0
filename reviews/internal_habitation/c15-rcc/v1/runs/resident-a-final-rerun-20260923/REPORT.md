@@ -2,7 +2,9 @@
 
 > Status: **OPEN-REVIEW EVIDENCE PACKAGE** （非验收结论）。
 > Run id: `C15-RCC-RES-A-RERUN-001-CANONICAL`
-> Anchor commit: `30e0dca1f08c49ed9bacc66b49313ac536d512af`（post-PR112 final anchor）
+> Canonical Core anchor: `bcd6bf353126318f9a97076b52ec1740d43f35a4`  
+> Evidence-branch baseline: `6abfd4d19d03a60a81b7ca336efbe3c9c726b3bb`（the governance-only direct child of the canonical anchor; zero `src/aios_core/**` diff）  
+> The former `30e0dca1f08c49ed9bacc66b49313ac536d512af` label was an unresolvable metadata error, not a distinct Core baseline; see `ANCHOR_PROVENANCE.md`.
 > 生产时间（wall clock）: 2026-09-23（Asia/Shanghai 同日完成）
 > 本包不提供执行身份 attestation（`execution_attestation_ref = null`）；依 release contract §8，R6 不据此评 VALID。
 
@@ -51,7 +53,7 @@
 
 ## 6. 文件与 digest
 
-见 `ARTIFACT_MANIFEST.json`（119 个证据文件 sha256：冻结 world/index、release-state、restart-state、driver 日志与传输源、43 checkpoint、43 decision、13 stage、13 cursor 投影）。manifest 自身 sha256 将在本 run 目录的 git 提交中固定。
+见 `ARTIFACT_MANIFEST.json`（121 个证据文件 sha256：anchor provenance proof、冻结 world/index、release-state、restart-state、driver 日志与传输源、43 checkpoint、43 decision、13 stage、13 cursor 投影及本报告）。manifest 自身由 PR head Git blob 固定。
 
 ## 7. 与后续评审的关系
 

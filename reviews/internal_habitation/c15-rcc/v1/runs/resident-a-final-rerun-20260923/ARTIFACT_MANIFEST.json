@@ -1,7 +1,7 @@
 {
  "manifest_format": "c15-rcc-rerun-artifact-manifest-v1",
  "run_id": "C15-RCC-RES-A-RERUN-001-CANONICAL",
- "anchor_commit": "30e0dca1f08c49ed9bacc66b49313ac536d512af",
+ "anchor_commit": "bcd6bf353126318f9a97076b52ec1740d43f35a4",
  "created_at_wall": "2026-09-23T06:22:56.408416+00:00",
  "fixture_version": "c15-rcc-fixture-v1",
  "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
@@ -17,8 +17,14 @@
   {
    "path": "REPORT.md",
    "role": "evidence report (this package report; does not quote manifest hash to avoid self-reference)",
-   "sha256": "sha256:5e5bac3a3c257a608b2df7edc500df27b004648b9fe1a56d7b9a48fd28a1f0ad",
-   "bytes": 6426
+   "sha256": "sha256:8c2c37d31017d5bad11d854df2df24b864e9592f31e67afb7e5c5696c8972f42",
+   "bytes": 6742
+  },
+  {
+   "path": "ANCHOR_PROVENANCE.md",
+   "role": "canonical Core anchor provenance proof and metadata-only correction record",
+   "sha256": "sha256:6e6aec7aad40df3a1199e12750ee9f97632f3cdc162777649daacff5fb8dcee3",
+   "bytes": 2579
   },
   {
    "path": "checkpoints/dec-0001.json",
@@ -734,5 +740,13 @@
    "sha256": "sha256:55282a61d714f732f1b10fa6b450853f8425b5c9f741090fcaad0f1e673a6643",
    "bytes": 1060864
   }
- ]
+ ],
+ "anchor_provenance": {
+  "classification": "metadata-only correction",
+  "canonical_core_anchor": "bcd6bf353126318f9a97076b52ec1740d43f35a4",
+  "evidence_branch_baseline": "6abfd4d19d03a60a81b7ca336efbe3c9c726b3bb",
+  "superseded_metadata_value": "30e0dca1f08c49ed9bacc66b49313ac536d512af",
+  "proof_path": "ANCHOR_PROVENANCE.md",
+  "frozen_world_artifacts_changed": false
+ }
 }
