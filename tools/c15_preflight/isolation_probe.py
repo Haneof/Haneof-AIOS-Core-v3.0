@@ -118,36 +118,67 @@ def probe(repo: Path | None = None, private_a: Path | None = None) -> dict:
         allowed.write_text(json.dumps({"synthetic": True, "nonce": os.urandom(16).hex()}))
         allowed_sha256 = hashlib.sha256(allowed.read_bytes()).hexdigest()
         script = base / "probe.py"; script.write_text(PROBE)
-        interpreter = Path('/usr/bin/python3.11')
+        # Try to find a suitable interpreter: prefer python3.11 if exists, else python3, else current
+        interpreter_candidates = [Path('/usr/bin/python3.11'), Path('/usr/bin/python3'), Path('/usr/bin/python3.12'), Path('/usr/bin/python3.10')]
+        interpreter = None
+        for cand in interpreter_candidates:
+            if cand.is_file() and not cand.is_symlink():
+                interpreter = cand
+                break
+        if interpreter is None:
+            # No interpreter found, treat as env unsupported -> INCONCLUSIVE via RuntimeError
+            raise RuntimeError("isolation probe INCONCLUSIVE: no suitable python interpreter found")
         setpriv = Path('/usr/bin/setpriv')
+        if not setpriv.is_file():
+            raise RuntimeError("isolation probe INCONCLUSIVE: setpriv not found")
+        # Build mount list, handling ldd failures gracefully
         mounts = {str(interpreter): str(interpreter), str(setpriv): str(setpriv),
-                  '/usr/lib/python3.11': '/usr/lib/python3.11', str(packet): '/packet', str(script): '/probe.py'}
+                  str(packet): '/packet', str(script): '/probe.py'}
+        # Try to include lib dir for interpreter if exists
+        for lib_dir in [f'/usr/lib/{interpreter.name}', '/usr/lib/python3.11', '/usr/lib/python3.12', '/usr/lib/python3.10', '/usr/lib/python3']:
+            if Path(lib_dir).is_dir():
+                mounts[lib_dir] = lib_dir
         for binary in (interpreter, setpriv):
-            output = subprocess.check_output(['ldd', str(binary)], text=True)
+            try:
+                output = subprocess.check_output(['ldd', str(binary)], text=True, stderr=subprocess.DEVNULL)
+            except (FileNotFoundError, PermissionError, OSError, subprocess.SubprocessError) as e:
+                # ldd not available or binary not found -> env unsupported
+                raise RuntimeError(f"isolation probe INCONCLUSIVE: ldd failed for {binary}: {e}") from e
             for token in output.split():
                 if token.startswith('/'):
-                    mounts[token] = token
+                    # Only include if file exists
+                    if Path(token).exists():
+                        mounts[token] = token
         import shlex
         q = shlex.quote
         script_lines = ['set -eu', 'mount --make-rprivate /']
         for source, target in mounts.items():
             dst = root / target.lstrip('/')
-            if Path(source).is_dir():
-                dst.mkdir(parents=True, exist_ok=True)
-            else:
-                dst.parent.mkdir(parents=True, exist_ok=True); dst.touch()
-            script_lines += [f'mount --bind {q(source)} {q(str(dst))}',
-                             f'mount -o remount,bind,ro,nosuid,nodev {q(str(dst))}']
+            try:
+                if Path(source).is_dir():
+                    dst.mkdir(parents=True, exist_ok=True)
+                else:
+                    dst.parent.mkdir(parents=True, exist_ok=True); dst.touch()
+                script_lines += [f'mount --bind {q(source)} {q(str(dst))}',
+                                 f'mount -o remount,bind,ro,nosuid,nodev {q(str(dst))}']
+            except OSError as e:
+                raise RuntimeError(f"isolation probe INCONCLUSIVE: mount setup failed {source}: {e}") from e
         script_lines += [f'cd {q(str(root))}',
-            f'exec /usr/sbin/chroot {q(str(root))} /usr/bin/setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all /usr/bin/python3.11 -I -B /probe.py']
+            f'exec /usr/sbin/chroot {q(str(root))} /usr/bin/setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all {q(str(interpreter))} -I -B /probe.py']
         request = {"canaries": {k: str(v) for k, v in paths.items()}, "allowed_sha256": allowed_sha256}
-        result = subprocess.run(['unshare', '--user', '--map-root-user', '--mount', '--net', '--pid', '--fork',
-                                 '/bin/sh', '-c', '\n'.join(script_lines)], input=json.dumps(request),
-                                text=True, capture_output=True, timeout=20, close_fds=True,
-                                env={'PATH': '/usr/sbin:/usr/bin:/bin', 'LANG': 'C.UTF-8'})
+        try:
+            result = subprocess.run(['unshare', '--user', '--map-root-user', '--mount', '--net', '--pid', '--fork',
+                                     '/bin/sh', '-c', '\n'.join(script_lines)], input=json.dumps(request),
+                                    text=True, capture_output=True, timeout=20, close_fds=True,
+                                    env={'PATH': '/usr/sbin:/usr/bin:/bin', 'LANG': 'C.UTF-8'})
+        except (FileNotFoundError, PermissionError, OSError) as e:
+            raise RuntimeError(f"isolation probe INCONCLUSIVE: unshare failed: {e}") from e
         if result.returncode:
             raise RuntimeError(f"isolation probe INCONCLUSIVE ({result.returncode}): {result.stderr.strip()}")
-        report = assess(before, json.loads(result.stdout), outside_checks(paths, hashes))
+        try:
+            report = assess(before, json.loads(result.stdout), outside_checks(paths, hashes))
+        except Exception as e:
+            raise RuntimeError(f"isolation probe INCONCLUSIVE: output parse failed: {e}") from e
         return report
 
 
