@@ -4,10 +4,19 @@ SQLite writer reservations on BOTH files remain held during backup and checks.
 This is stronger than two unrelated successful backups. Non-DB state is protected
 by the coordinator's lifetime flock and hash checks. A hostile operator/same-UID
 writer remains outside this trust model; no isolation claim is made here.
+
+Publication confirmation is now persistent and auditable (v3):
+- After successful rename and parent fsync, a receipt file
+  `publication_receipt.json` containing manifest SHA and publication ID is
+  atomically created and fsynced.
+- Restore requires pinned manifest hash AND valid receipt.
+- If parent fsync or receipt creation fails, package may remain visible but
+  WITHOUT receipt; ordinary restore is BLOCKED and source driver is marked
+  FAILED/UNCERTAIN. Operator must independently verify before explicit
+  confirmation via confirm_uncertain_package (requires attestation).
 """
 from __future__ import annotations
 
-import json
 import os
 import shutil
 import sqlite3
@@ -18,7 +27,7 @@ from uuid import uuid4
 
 from .audit import digest, readonly
 from .driver import DriverBlocked, atomic_json
-from .publication import FrozenPackage, _confirm
+from .publication import FrozenPackage, create_receipt
 
 
 def backup(source: Path, destination: Path):
@@ -66,7 +75,7 @@ def freeze(driver, destination: Path):
             backup(index, stage / "world_index.sqlite")
             shutil.copyfile(driver.port.state, stage / "release_state.json")
             # READY describes a completed runtime boundary, NOT authorization to
-            # restore. A separate live publication confirmation is mandatory.
+            # restore. A persistent receipt after successful publication is mandatory.
             atomic_json(stage / "restart_state.json", {**driver.state, "stage": "READY"})
             shutil.copyfile(driver.trace.path, stage / "trace.jsonl")
             with closing(readonly(stage / "private_world.sqlite")) as w, closing(readonly(stage / "world_index.sqlite")) as i:
@@ -95,8 +104,8 @@ def freeze(driver, destination: Path):
                 os.chmod(path, 0o600)
                 with path.open("rb") as stream:
                     os.fsync(stream.fileno())
-            manifest = {"format": "c15-synthetic-freeze-v2", "world_revision": revision,
-                        "publication": {"id": publication_id, "status": "VALIDATED_NOT_CONFIRMED"},
+            manifest = {"format": "c15-synthetic-freeze-v3", "world_revision": revision,
+                        "publication": {"id": publication_id, "status": "VALIDATED"},
                         "index_watermark": revision, "completed_sequence": driver.state["completed_sequence"],
                         "files": {p.name: digest(p) for p in stage.iterdir()}}
             atomic_json(stage / "manifest.json", manifest)
@@ -106,7 +115,7 @@ def freeze(driver, destination: Path):
             driver.transition("PUBLISHING")
             # From rename through the last successful fsync, durability is not
             # confirmed. An exception leaves the package for inspection, but NO
-            # restore capability exists, even if every on-disk byte looks valid.
+            # receipt exists, so ordinary restore is blocked.
             os.rename(stage, destination)
             stage = None
             fd = os.open(destination.parent, os.O_RDONLY | os.O_DIRECTORY)
@@ -114,10 +123,24 @@ def freeze(driver, destination: Path):
                 os.fsync(fd)
             finally:
                 os.close(fd)
+            # Persistent, auditable receipt after successful publication.
+            # Reuses manifest hash and publication ID, does not introduce new auth system.
+            manifest_sha = digest(destination / "manifest.json")
+            receipt_path = create_receipt(
+                destination,
+                manifest_sha256=manifest_sha,
+                publication_id=publication_id,
+                driver_state_sha256=state_hash,
+                release_sha256=release_hash,
+            )
         driver.transition("FROZEN")
-        # Last action: no I/O follows issuance. A process crash before delivery
-        # loses confirmation and requires independent review, not auto-recovery.
-        return FrozenPackage(manifest, _confirm(digest(destination / "manifest.json"), publication_id))
+        return FrozenPackage(
+            manifest=manifest,
+            receipt_path=receipt_path,
+            manifest_sha256=manifest_sha,
+            publication_id=publication_id,
+            confirmation=None,
+        )
     except BaseException as exc:
         driver.state.update(stage="FAILED", publication_status="UNCERTAIN",
                             publication_id=publication_id,
@@ -128,4 +151,8 @@ def freeze(driver, destination: Path):
             exc.add_note(f"failure checkpoint also failed: {type(checkpoint_error).__name__}")
         # Preserve both partial staging and visible-but-unconfirmed publication.
         # Safety does NOT depend on persisting FAILED or deleting a marker.
+        # No receipt is created on failure path, so ordinary restore remains blocked.
+        if stage is not None and stage.exists():
+            # Keep stage for inspection; do not auto-delete to hide evidence
+            pass
         raise

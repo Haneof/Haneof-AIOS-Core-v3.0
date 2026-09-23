@@ -71,13 +71,13 @@ def bindings(tmp_path):
     return b.load_release_operator(), b.load_canonical_adapter(), b.load_mechanical_adapter()
 
 
-def setup(tmp_path, *, fail_kind=None, mutate=None, stop=3, modules=None, restore=None, confirmation=None):
+def setup(tmp_path, *, fail_kind=None, mutate=None, stop=3, modules=None, restore=None):
     modules = modules or bindings(tmp_path)
     run = tmp_path / 'run'
     if restore is None:
         run.mkdir()
     else:
-        restore_frozen(restore, run, manifest_sha256=digest(restore / 'manifest.json'), confirmation=confirmation)
+        restore_frozen(restore, run, manifest_sha256=digest(restore / 'manifest.json'))
     store = SQLiteWorldStore(run / 'private_world.sqlite')
     index = WorldSearchIndex(run / 'world_index.sqlite', store=store)
     trace = Trace(run / 'trace.jsonl', store.current_world_revision)
@@ -166,11 +166,12 @@ def test_clean_freeze_restart_continues_no_transcript_replay(tmp_path):
     d.step()
     final=tmp_path/'frozen'; published=freeze(d,final)
     assert published.manifest['world_revision']==published.manifest['index_watermark']
+    assert (final / 'publication_receipt.json').exists()
     assert d.state['stage']=='FROZEN'
     with pytest.raises(DriverBlocked): d.step()
     d.close();d.trace.close()
     other=tmp_path/'other';other.mkdir()
-    resumed,peer,_=setup(other,modules=modules,restore=final,confirmation=published.confirmation)
+    resumed,peer,_=setup(other,modules=modules,restore=final)
     assert resumed.step() and resumed.state['completed_sequence']==2
     assert all(r['input'].get('user_input')!='SYNTHETIC event 1' for r in peer.calls)
     assert resumed.state['next_turn']==2
