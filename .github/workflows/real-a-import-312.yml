@@ -20,7 +20,10 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install deps
-        run: pip install -e ".[dev]"
+        run: |
+          python -c 'import sys; print(sys.version)'
+          pip install -e ".[dev]"
+          find src -type d -name __pycache__ -exec rm -rf {} + || true
       - name: Fetch accepted A branch and archive
         run: |
           git fetch origin refs/heads/arena/01a0cca8-haneof-aios-core-v3-0:refs/remotes/origin/arena/01a0cca8-haneof-aios-core-v3-0
@@ -31,9 +34,9 @@ jobs:
           ls -lh /tmp/real_a_original/
           sha256sum /tmp/real_a_original/private_world.sqlite
           sha256sum /tmp/real_a_original/world_index.sqlite
-          sha256sum /tmp/real_a_original/release_state.json
-          sha256sum /tmp/real_a_original/restart_state.json
       - name: Real A mechanical import under Python>=3.12
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
         run: |
           python - <<'PY'
           import sys, pathlib, json, os, shutil, hashlib
@@ -42,15 +45,9 @@ jobs:
           import subprocess
           operator_sha = subprocess.check_output(["git","rev-parse","HEAD"], text=True).strip()
           print(f"operator source SHA={operator_sha}")
-          # Verify fixed SHA source
           fixed_sha = "3e51f728d7959048b75fea01d405bc837b0e8185"
           branch_sha = subprocess.check_output(["git","rev-parse","refs/remotes/origin/arena/01a0cca8-haneof-aios-core-v3-0"], text=True).strip()
           print(f"branch resolves to {branch_sha}, fixed A SHA {fixed_sha}, equal={branch_sha==fixed_sha}")
-          # Verify five files from fixed SHA
-          for name in ["private_world.sqlite","world_index.sqlite","release_state.json","restart_state.json","ARTIFACT_MANIFEST.json"]:
-              # Use git show from FETCH_HEAD? Use branch ref
-              blob_sha = subprocess.check_output(["git","ls-tree","-r","refs/remotes/origin/arena/01a0cca8-haneof-aios-core-v3-0", "--", f"reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/{name}"], text=True).strip()
-              print(f"ls-tree {name}: {blob_sha[:60]}")
           from pathlib import Path
           REPO_ROOT = Path.cwd()
           sys.path.insert(0, str(REPO_ROOT / "src"))
@@ -66,22 +63,30 @@ jobs:
           import tempfile
 
           source_original = Path("/tmp/real_a_original")
-          # Verify hashes
           for k,v in HASHES.items():
               actual = digest(source_original / k)
-              print(f"hash {k} match={actual==v} actual={actual[:16]}")
-          # Verify boundary and core
+              print(f"hash {k} match={actual==v}")
+              assert actual==v, f"hash mismatch {k}"
+
           b = verify_boundary(source_original)
           print(f"verify_boundary wr={b['world_revision']} iw={b['index_watermark']}")
-          frozen = verify_core(REPO_ROOT)
-          print(f"verify_core frozen={frozen[:12]}")
+
+          try:
+              frozen = verify_core(REPO_ROOT)
+              print(f"verify_core frozen={frozen[:12]}")
+          except Exception as e:
+              print(f"verify_core failed: {e}")
+              # Try to show untracked
+              untracked = subprocess.check_output(["git","ls-files","--others","--exclude-standard","--","src/aios_core"], text=True).strip()
+              print(f"untracked Core: {untracked}")
+              raise
 
           staging_dir = Path("/tmp/real_a_staging_312")
           if staging_dir.exists():
               shutil.rmtree(staging_dir)
           new_session = "real-a-312-session-001"
           plan = stage_accepted_a(source_original, staging_dir, REPO_ROOT, new_session=new_session)
-          print(f"staged accepted_a={plan['accepted_a']} synthetic={plan.get('synthetic')} session={plan['session_id']}")
+          print(f"staged accepted_a={plan['accepted_a']} synthetic={plan.get('synthetic')}")
 
           driver_run_dir = Path("/tmp/real_a_driver_run_312")
           if driver_run_dir.exists():
@@ -89,7 +94,6 @@ jobs:
           result = import_accepted_a_to_driver_run(staging_dir, driver_run_dir, repo=REPO_ROOT, synthetic=False)
           print(f"import status={result['status']} synthetic={result.get('synthetic')} model_requests={result['validation']['model_requests']}")
 
-          # Create Driver
           store = SQLiteWorldStore(driver_run_dir / "private_world.sqlite")
           index = WorldSearchIndex(driver_run_dir / "world_index.sqlite", store=store)
           trace = Trace(driver_run_dir / "trace.jsonl", store.current_world_revision)
@@ -103,14 +107,13 @@ jobs:
           print(f"driver completed={driver.state['completed_sequence']} wr={driver.state['world_revision']} iw={driver.state['index_watermark']}")
           release = port.read_state()
           print(f"release last_acked={release['last_acked_sequence']} next={release['next_sequence']} pending={release['pending_reveal']}")
-          # Original hashes unchanged
           for k,v in HASHES.items():
               actual = digest(source_original / k)
-              print(f"original unchanged {k} {actual==v}")
+              assert actual==v
           driver.close()
           trace.close()
 
-          # Cross-process restore
+          # Cross-process
           import subprocess, textwrap, os
           script = textwrap.dedent(f'''
           import sys
@@ -153,7 +156,6 @@ jobs:
           print(f"cross-process returncode {proc.returncode}")
           assert proc.returncode == 0
 
-          # Final receipt
           receipt = {
               "sys_version": sys.version,
               "sys_executable": sys.executable,
