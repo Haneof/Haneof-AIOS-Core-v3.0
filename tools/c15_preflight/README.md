@@ -1,109 +1,114 @@
-# C15 operator preflight — reviewable increment 1
+# C15 operator preflight — increment 2
 
-**OPERATOR ONLY. NOT A RESIDENT LAUNCHER. Overall preflight BLOCKED / incomplete.**
-Task `C15-RCC-RES-B-PREFLIGHT-001`; claim issue #124. This is new work: the
-previous window's local commit/patch was not obtained and is not represented as
-recovered. Do not start real B/C using this package.
+**OPERATOR ONLY. Preflight remains IN_PROGRESS / BLOCKED; no real Resident launch.**
+PR #125 / claim #124. Fixed branch `arena/01a0cf25-haneof-aios-core-v3-0`.
+No recovered previous-window local patch; increment 1 was new engineering.
 
-## Implemented / not implemented
+## Implemented boundaries
 
-- `audit.py`: immutable accepted-A byte pins, manifest cross-check, read-only
-  World/index 88/88, 13 durable Observation references, mechanical restart field
-  inventory, tracked Core tree comparison. It does not open a sealed fixture,
-  execute A, initialize B, copy a World, or load historical decisions.
-- `transport.py`: synchronous request-bound stream callback for existing
-  `RuntimeSnapshot`, `RoundSummaryRequest`, and `DimensionSummaryInput`.
-  Explicit structured output only; EOF/invalid returns raise. No fallback model,
-  silence, answer, inferred telemetry, prompt-side cognition policy or replay.
-- `RuntimeRecorder`: observer of existing FusedTurnRuntime entrypoints and
-  actual registry invocations. Does not replace Runtime, ingest, clock or budgets.
-  Records input/result/error, genuine capability requests/results, World revision,
-  Core metering and index watermark. Final results/snapshots retain Core-denied
-  capabilities as returned by Core. An exclusive fsynced hash-chain trace is
-  operator-private, not a second World. A hash chain is NOT trusted attestation.
-- Tests use in-memory **scripted synthetic peers**, never actual Resident/model
-  responses. They exercise real Core paths in independent temporary Worlds.
-- **Not implemented:** one-event release → canonical adapter → durable ACK →
-  timestamp scheduling driver; real restart loading; complete durable due-work
-  checkpoint; cancellation/resume; WAL-safe final freeze/export; actual host
-  isolation; attested provider telemetry. Do not call this a completed driver.
-- Summary callback records are observable transport data, **not proof of a
-  provider-metered Summary call**. The current bridge deliberately passes no
-  unverified usage/provenance into Core. Transport disconnects are recorded as
-  errors, not successful calls.
+- `audit.py`: fixed accepted-A bytes, manifest, 88/88 watermarks, durable receipt
+  references, tracked Core tree. Does not open a real sealed fixture.
+- `restart.py`: exact A copied into an exclusive new directory; mechanical-only
+  fresh-session plan. A note/prose/old session turn index is not injected. Core
+  services open only the COPY, with a callback that raises on any model request.
+  Validate unchanged watermarks and the normal durable Review marker's next due
+  time. SUPPRESSED is a legitimate terminal *scheduling* marker, not semantic
+  success. Unresolved/backlogged markers fail closed. Verify Core import paths.
+- `transport.py`: request UUID + request kind + canonical input SHA256 binding;
+  explicit directive/summary only. No default answer/silence, output replay or
+  self-reported telemetry. Callback failure poisons further execution even if
+  Core catches the exception internally (e.g. round Summary). Observe full
+  actual returns, tools, failures, metering and revisions. Trace files are
+  exclusive, mode 0600 from creation, fsynced and hash chained; not attestation.
+- `driver.py`: single-writer/flock coordination of frozen C15 release, canonical
+  user/mechanical ingest, existing durable ACK and ordinary Fused run_turn. ACK
+  certifies ingest only; processing completion is a separate checkpoint. Session,
+  turn, text and timestamp are identical between canonical adapter and run_turn.
+  Stop before revealing beyond the authorized synthetic boundary. Persist phase
+  intent before effects; failed/interrupted stages cannot silently resume/replay.
+- `clock.py`: reuse `tests/habitation/current_core.py`'s existing advance_to and
+  task/Review helpers attached to the *same* Runtime/store/index, not its target
+  constructor. Genuine Runtime calls pass through the observer. Its direct Wake
+  helper is routed through normal `dispatch_next_pending_wake` to respect batching
+  and REVIEW_QUEUE exclusions. Prior clock deadlines run before current-event
+  ingest so earlier snapshots cannot see that future input. At the event time,
+  normal Summary/Wake paths run and legitimate queued/deferred work is recorded.
+  No clock jumps to force a successful response. Safety/source caps fail closed.
+- `freeze.py`: only a clean, owned boundary. Canonical index rebuild, simultaneous
+  SQLite BEGIN IMMEDIATE writer reservations on BOTH DBs, SQLite backup API
+  including WAL, verify joint watermarks, durable receipt refs, source state and
+  release hashes. Publish the private hash manifest/package only after checks.
+  A partial backup is not a completed freeze. Source becomes FROZEN, not runnable.
+  Advisory file lock is not protection against a malicious same-user operator.
+- `restore_frozen`: requires an externally pinned manifest hash; copies only
+  durable World/index/release/mechanical checkpoint, NOT old trace/model output.
+  New callback and new trace are required. This is clean-boundary resume only.
+- `isolation_probe.py`: an actual minimal user/mount/network/PID namespace + chroot
+  probe, no capabilities/no-new-privileges, read-only allowlisted Python/packet,
+  no proc/Git/gh/shell/env credentials. **Synthetic process only, not a Resident.**
 
-## Commands and environment
+The executable ReleasePort refuses the real C15 fixture pin. Tests configure
+copies of existing release modules with newly generated synthetic files in tmp
+folders. No fixture source is modified and no real B/C content is loaded.
+Only tests contain scripted peers. There is no live model/provider implementation.
 
-From repository root, with Python >=3.12:
+## Commands (repository root; Python >=3.12)
 
 ```sh
 python --version
 python -m pip install -e '.[dev]'
-python -m pytest -o addopts='' -q tests/preflight/test_c15_operator_preflight.py
+python -m pytest -o addopts='' -q tests/preflight
+python -m pytest -o addopts='' -q tests
 python -m tools.c15_preflight.audit --handoff-dir /PRIVATE/accepted-a --repo "$PWD"
+python -m tools.c15_preflight.isolation_probe --repo "$PWD" --private-a /PRIVATE/accepted-a
 ```
 
-The audit CLI refuses Python 3.11. Put the **exact five allowlisted files** listed
-in `audit.HASHES` in the private directory, from #117 at `audit.A_SHA`; no A
-transcript/decisions/checkpoints are needed or permitted as restart input. Obtain
-raw bytes (the index exceeds 1 MB); never substitute a Contents API empty base64
-field. Source archives must have no WAL/SHM/journal sidecar. A live DB instead
-requires a separately reviewed WAL-safe snapshot process, not `immutable=1`.
-The audit's receipt check validates durable refs, NOT a full fixture payload hash
-recomputation. Core proof is tracked-source equality, NOT executable import-path
-or process isolation attestation. Do not overinterpret these checks.
+The isolation probe additionally requires Linux unprivileged user/mount/net/PID
+namespaces, mount/chroot/setpriv, `/usr/bin/python3.11` and its stdlib. It reports a
+failure instead of pretending success if unavailable. Its supervisor can be 3.12;
+the minimal child's exact system interpreter is separately reported. It is **not**
+a provider/runtime test. Public CI does not require this host facility or private A.
 
-GitHub workflow `c15-operator-preflight` runs Python 3.12 synthetic mechanics and
-relevant regressions. It does not retrieve private A material. Exact CI outcome
-and Python version belong in the PR evidence, not inferred from this document.
-
-The existing entrypoints can be wired by a future reviewed host:
+For private restart verification (operator only, no model/fixture calls):
 
 ```python
-bridge = StreamBridge(incoming, outgoing, operator_trace)
-runtime = FusedTurnRuntime(
-    store=store, index=index, model_handler=bridge.model,
-    round_summary_handler=bridge.round_summary,
-    dimension_summary_handler=bridge.dimension_summary,
-)
-observer = RuntimeRecorder(runtime, operator_trace)
-# Host, not this adapter, must supply authorized event/session/turn/time bindings.
-# No real-session launcher or real-fixture command is provided in this increment.
+from pathlib import Path
+from tools.c15_preflight.restart import stage_accepted_a, validate_staged_core
+stage_accepted_a(Path('/PRIVATE/accepted-a'), Path('/PRIVATE/new-copy'), Path.cwd(),
+                 new_session='operator-restore-validation-NOT-B')
+validate_staged_core(Path('/PRIVATE/new-copy'))
 ```
 
-## Isolation and separated packet
+Supply exact five files in `audit.HASHES`, raw bytes from #117 at `audit.A_SHA`.
+Never use an empty base64 Contents API field for the >1MB index. Real A originals
+must have no live WAL/SHM/journal; hash check precedes immutable read. Do not use
+`immutable=1` for a live database. Initial staging uses exact frozen bytes; final
+freezing of a running synthetic World uses SQLite backup, not file copy.
 
-`resident_packet/` has only a protocol and draft mechanical manifest. No session
-interface is approved (`launchable=false`). Do not give the Resident this README,
-operator manifest, audit/source files, repository checkout, Git/PR tools, PM
-reports, old A/B outputs or sealed data. A whitelist document alone is **not** an
-access boundary. This same-user coding sandbox was negatively probed: an isolated
-Python child could actually read PM/operator files and run `git rev-parse`.
-**Current environment is not a blind Resident environment.**
+## Remaining blockers and limits (not a complete preflight)
 
-Required before release: a separate principal/container or equivalent externally
-approved tool interface with no repository/Git/GitHub credential mounts, no shared
-operator/private evidence directory, network/tool allowlists and tested denial of
-filesystem, Git, PR, search and out-of-band access. Test from the actual Resident
-principal, not the operator. The permitted interface must expose only current
-request/response data. Packet changes invalidate its pin and require re-review.
+1. Independent PM approval of real session/restart/packet and a real release host
+   is absent. No real launch command is supplied; packet `launchable=false`.
+2. Linux synthetic denial checks do NOT isolate this Arena coding agent's tools.
+   A Resident-safe broker/client must actually be connected to the minimal
+   boundary, with platform tool/network/search/PR access denied and tested. Same
+   user subprocess without that boundary remains known unsafe.
+3. Interrupted/ambiguous ACK/model/freeze phases stop for operator review. No
+   general mid-phase crash recovery or automatic model re-request. Clean frozen
+   restart is tested; arbitrary RUNNING-Wake/deferred recovery across process
+   death still needs dedicated end-to-end coverage before release.
+4. Summary text callback does not provide trusted provider usage. Core C13
+   metering is retained for its normal model calls; identity/tokens remain
+   UNKNOWN without trusted external telemetry. Hash chains are not provenance
+   attestation; no R6 claim.
+5. A private cache survives ordinary processes in this sandbox, not session
+   snapshot restoration. No approved persistent private store was provided.
+   Re-fetch exact pins from #117; do not upload A to Git or public CI/artifacts.
+6. Local Python 3.12.11 was built from upstream CPython tag in an external cache
+   because binary/apt HTTPS endpoints were unavailable. It has SQLite 3.40.1;
+   SSL and some optional stdlib modules are absent. Mechanical tests can run,
+   but this is NOT certification of a production/provider Python environment.
 
-## Restart and freeze checklist for independent review (all still open)
-
-1. Approve exact A World/index/release/restart bytes and a fresh B session. The A
-   `session_id` and `conversation_turn_index` are historical audit values, not
-   defaults for the new session. Retain permitted mechanical clock/Review cadence;
-   never inject restart prose, A transcript, old directives or cognition summaries.
-2. Prove canonical adapter and run_turn identical subject/session/turn/text/time;
-   use the existing release/ingest/ack infrastructure without reading future
-   cursors in preflight. Complete synthetic error/retry/due-work integration.
-3. Demonstrate real-clock due Summary/Wake/Review paths respecting Core budget
-   deferral. Do not force drain or advance clock to manufacture success.
-4. Capture durable restart/due-work, release receipts, immediate usage/error chain,
-   final synchronized index and World; quiesce writes and snapshot with SQLite's
-   supported backup/checkpoint mechanism. Reopen immutable snapshot and validate
-   hashes/revisions. No file copy of a live WAL database.
-5. Validate actual isolation and obtain independent PM release. Identity/usage
-   stays UNKNOWN until trustworthy external evidence exists. No R6 verdict.
-
-No accepted-A private file, generated trace, cache or credential belongs in Git.
+Detailed evidence: `reviews/C15_RCC_RES_B_PREFLIGHT_ROUND2_2026-09-24.md`.
+The protocol-only `resident_packet/` excludes operator documents/source/old runs.
+It is not an approved launch packet or proof of the actual model's tool isolation.

@@ -52,11 +52,13 @@ class Trace:
     traces outside Git. Runtime crash recovery/final freeze are NOT implemented.
     """
     def __init__(self, path: Path, revision: Callable[[], int]):
-        self.file = path.open("x", encoding="utf-8")
-        os.chmod(path, 0o600)
+        fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW, 0o600)
+        self.file = os.fdopen(fd, "w", encoding="utf-8")
+        self.path = path
         self.revision = revision
         self.previous = "0" * 64
         self.sequence = 0
+        self.failure: str | None = None
 
     def append(self, kind: str, data: Any) -> None:
         body = {"sequence": self.sequence + 1, "kind": kind,
@@ -127,9 +129,13 @@ class StreamBridge:
         self.max_reply_chars = max_reply_chars
 
     def _request(self, kind: str, payload: Any, parse: Callable) -> Any:
+        if self.trace.failure is not None:
+            raise TransportError("transport poisoned; explicit operator recovery required")
         request_id = uuid4().hex
-        request = {"protocol": "c15-transport-v1", "request_id": request_id,
-                   "kind": kind, "input": plain(payload)}
+        serialized = plain(payload)
+        input_sha256 = hashlib.sha256(encode(serialized).encode()).hexdigest()
+        request = {"protocol": "c15-transport-v2", "request_id": request_id,
+                   "kind": kind, "input_sha256": input_sha256, "input": serialized}
         self.trace.append("model_request", request)
         try:
             self.outgoing.write(encode(request) + "\n")
@@ -141,13 +147,15 @@ class StreamBridge:
                 raise TransportError("oversized or incomplete response frame")
             self.trace.append("model_return_raw", {"request_id": request_id, "raw": raw})
             value = json.loads(raw, object_pairs_hook=strict_object, parse_constant=reject_constant)
-            if not isinstance(value, dict) or set(value) != {"request_id", "output"} or value["request_id"] != request_id:
+            if (not isinstance(value, dict) or set(value) != {"request_id", "kind", "input_sha256", "output"}
+                    or any(value[k] != request[k] for k in ("request_id", "kind", "input_sha256"))):
                 raise TransportError("response request binding mismatch")
             result = parse(value["output"])
             self.trace.append("model_return_validated", {"request_id": request_id, "output": result,
                               "provider_identity": "UNKNOWN", "usage": "UNKNOWN"})
             return result
-        except Exception as exc:
+        except BaseException as exc:
+            self.trace.failure = f"{type(exc).__name__}: {exc}"
             # No fallback response. The host must stop the event; it may not ACK completion.
             self.trace.append("model_error", {"request_id": request_id, "error_type": type(exc).__name__, "message": str(exc)})
             raise
@@ -183,7 +191,7 @@ class RuntimeRecorder:
     records actual invocations; Core-denied calls remain in snapshots/final result.
     Single-threaded use only. The surrounding host owns timeout/cancellation.
     """
-    METHODS = {"run_turn", "run_due_dimension_summaries", "dispatch_next_pending_wake", "run_periodic_review"}
+    METHODS = {"run_turn", "run_due_dimension_summaries", "dispatch_next_pending_wake", "run_periodic_review", "run_wake"}
 
     def __init__(self, runtime, trace: Trace):
         self.runtime, self.trace = runtime, trace
@@ -192,6 +200,8 @@ class RuntimeRecorder:
         if method not in self.METHODS:
             raise ValueError("unsupported runtime entrypoint")
         runtime, trace = self.runtime, self.trace
+        if trace.failure is not None:
+            raise TransportError("failed callback/phase prohibits subsequent execution")
         trace.append("runtime_input", {"method": method, "arguments": kwargs})
         registry = runtime.cognitive_runtime.registry
         original = registry.invoke
@@ -205,9 +215,13 @@ class RuntimeRecorder:
         registry.invoke = invoke
         try:
             result = getattr(runtime, method)(**kwargs)
+            if trace.failure is not None or getattr(result, "continuity_summary_error", None):
+                trace.append("runtime_return_failed", {"method": method, "result": result})
+                raise TransportError("Core caught callback failure; phase is not complete")
             trace.append("runtime_result", {"method": method, "result": result})
             return result
-        except Exception as exc:
+        except BaseException as exc:
+            trace.failure = f"{type(exc).__name__}: {exc}"
             trace.append("runtime_error", {"method": method, "error_type": type(exc).__name__, "message": str(exc)})
             raise
         finally:

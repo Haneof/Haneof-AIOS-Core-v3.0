@@ -1,8 +1,10 @@
-# Structured transport protocol v1
+# Structured transport protocol v2
 
-A request contains `protocol`, `request_id`, `kind`, and `input`.
+A request contains `protocol`, `request_id`, `kind`, `input_sha256`, and `input`.
 The authorized interface supplies the current request. Echo its exact
-`request_id` in one newline-terminated JSON response with an `output` field.
+`request_id`, `kind`, and `input_sha256` in one newline-terminated JSON response
+with an `output` field. The digest identifies the exact current input; do not
+substitute a reply for a different request type or input.
 
 For `kind: runtime`, output is exactly one of:
 

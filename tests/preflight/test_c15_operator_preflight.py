@@ -35,7 +35,7 @@ class SyntheticPeer:
     def readline(self, limit):
         request = json.loads(self.outbound.getvalue().splitlines()[-1])
         output = next(self.outputs)
-        return encode({"request_id": request["request_id"], "output": output}) + "\n"
+        return encode({**{k: request[k] for k in ("request_id", "kind", "input_sha256")}, "output": output}) + "\n"
 
 
 def setup(tmp_path, outputs=(), incoming=None):
