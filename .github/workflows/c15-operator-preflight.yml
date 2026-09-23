@@ -1,0 +1,43 @@
+name: c15-operator-preflight
+on:
+  pull_request:
+    paths:
+      - "tools/c15_preflight/**"
+      - "tests/preflight/**"
+      - ".github/workflows/c15-operator-preflight.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  synthetic-mechanics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Enforce formal Python gate
+        run: python -c 'import sys; print(sys.version); assert sys.version_info >= (3, 12)'
+      - run: pip install -e ".[dev]"
+      - name: Frozen Core and sealed evidence unchanged
+        run: |
+          git diff --exit-code bcd6bf353126318f9a97076b52ec1740d43f35a4 HEAD -- src/aios_core
+          # Main already added a governance-only Resident prompt after Core freeze.
+          # Prove this increment changes no existing evidence/fixture material.
+          git diff --exit-code 849bfd41c623fb336b392a3e6e933cfad93620e9 HEAD -- reviews/internal_habitation
+      - name: Synthetic transport and handoff-negative checks only
+        run: python -m pytest -o addopts='' -q tests/preflight/test_c15_operator_preflight.py
+      - name: Relevant existing Core regressions (synthetic Worlds)
+        run: |
+          python -m pytest -o addopts='' -q \
+            tests/runtime \
+            tests/integration/test_v3_fused_turn_runtime.py \
+            tests/integration/test_v3_conversation_world_ingest.py \
+            tests/integration/test_v3_dimension_summary.py \
+            tests/integration/test_v3_summary_hierarchy.py \
+            tests/integration/test_v3_periodic_review.py \
+            tests/integration/test_v3_wake_dispatch.py \
+            tests/integration/test_v3_c14_cognitive_derivation_runtime.py \
+            tests/integration/test_v3_c14_cognitive_derivation_scheduler.py
