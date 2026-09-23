@@ -12,6 +12,9 @@ on:
 permissions:
   contents: read
 
+env:
+  PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+
 # Synthetic mechanics only. A passing job is NOT a Core freeze, a real Resident
 # isolation attestation, or permission to launch B/C. PR126 remains draft/blocked.
 jobs:

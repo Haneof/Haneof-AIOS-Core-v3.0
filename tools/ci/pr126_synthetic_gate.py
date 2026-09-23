@@ -137,6 +137,26 @@ def evaluate(report: Report, *, mode: str, pytest_exit: int) -> Decision:
     return Decision(tuple(errors), len(core_scope), len(preflight), synthetic_isolation)
 
 
+def exact_receipt(report: Report, decision: Decision, *, mode: str) -> dict[str, object]:
+    """Publish exact numbers as an Actions annotation even if logs are unavailable."""
+    return {
+        "mode": mode,
+        "python": sys.version.split()[0],
+        "pr_head": os.environ.get("PR_HEAD_SHA", "local"),
+        "checkout": os.environ.get("GITHUB_SHA", "local"),
+        "tests": len(report.cases),
+        "passed": len(report.cases) - report.failures - report.errors - report.skipped,
+        "failures": report.failures,
+        "errors": report.errors,
+        "skipped": report.skipped,
+        "a01_a10": sum(case.module == POSITIVE_MODULE for case in report.cases),
+        "core": decision.core_count,
+        "preflight": decision.preflight_count,
+        "synthetic_isolation": decision.synthetic_isolation,
+        "resident_isolation": decision.resident_isolation,
+    }
+
+
 def _escape(value: str) -> str:
     return value.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
 
@@ -156,12 +176,9 @@ def main() -> int:
         report = read_junit(args.junit)
         decision = evaluate(report, mode=args.mode, pytest_exit=args.pytest_exit)
         errors.extend(decision.errors)
-        print(f"{args.mode.upper()} SYNTHETIC RECEIPT: tests={len(report.cases)} "
-              f"failures={report.failures} errors={report.errors} skipped={report.skipped} "
-              f"A01-A10={sum(case.module == POSITIVE_MODULE for case in report.cases)} "
-              f"preflight={decision.preflight_count} "
-              f"synthetic_isolation={decision.synthetic_isolation} "
-              f"resident_isolation={decision.resident_isolation}")
+        receipt = exact_receipt(report, decision, mode=args.mode)
+        print(f"{args.mode.upper()} SYNTHETIC RECEIPT: " + json.dumps(receipt, sort_keys=True))
+        print("::notice title=PR126 synthetic receipt::" + _escape(json.dumps(receipt, sort_keys=True)))
         for case in report.cases:
             if case.outcome == "skipped":
                 print(f"SKIP REASON {case.identity}: {case.detail}")

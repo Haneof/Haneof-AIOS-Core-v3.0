@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 
 import pytest
 
-from tools.ci.pr126_synthetic_gate import Case, Report, evaluate, read_junit
+from tools.ci.pr126_synthetic_gate import Case, Report, evaluate, exact_receipt, read_junit
 
 
 def _core_cases() -> list[Case]:
@@ -71,6 +71,21 @@ def test_full_gate_pass_is_synthetic_only_and_does_not_release_resident():
     assert receipt.passed and receipt.core_count == 409 and receipt.preflight_count == 108
     assert receipt.synthetic_isolation == "SYNTHETIC_CANARY_PASS_ONLY"
     assert receipt.resident_isolation == "BLOCKED / REAL RESOURCES NOT_TESTED"
+
+
+def test_exact_receipt_preserves_skip_and_real_resource_block(monkeypatch):
+    monkeypatch.setenv("PR_HEAD_SHA", "synthetic-head-sha")
+    cases = _full_cases()
+    cases[-1] = Case(cases[-1].classname, cases[-1].name, "skipped", "unshare is blocked")
+    report = _report(cases)
+    decision = evaluate(report, mode="full", pytest_exit=0)
+    receipt = exact_receipt(report, decision, mode="full")
+    assert receipt["tests"] == 517 and receipt["passed"] == 516
+    assert receipt["skipped"] == 1 and receipt["a01_a10"] == 42
+    assert receipt["core"] == 409 and receipt["preflight"] == 108
+    assert receipt["synthetic_isolation"] == "NOT_TESTED/BLOCKED"
+    assert receipt["resident_isolation"].startswith("BLOCKED")
+    assert receipt["pr_head"] == "synthetic-head-sha"
 
 
 def test_full_gate_refuses_missing_probe_and_other_unexpected_skips():
