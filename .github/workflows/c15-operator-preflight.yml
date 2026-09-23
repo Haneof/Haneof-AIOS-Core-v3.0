@@ -27,13 +27,23 @@ jobs:
           git diff --exit-code 849bfd41c623fb336b392a3e6e933cfad93620e9 HEAD -- reviews/internal_habitation
       - name: Synthetic transport and handoff-negative checks only
         run: |
-          python -m pytest -o addopts='' -q tests/preflight --junitxml=preflight-results.xml 2>&1 | tee preflight-q.log; echo "exit code ${PIPESTATUS[0]}" > exit.txt; cat preflight-q.log; cat exit.txt
-          if [ "$(cat exit.txt | awk '{print $3}')" != "0" ]; then
+          python -m pytest -o addopts='' -q tests/preflight --junitxml=preflight-results.xml 2>&1 | tee preflight-q.log; echo ${PIPESTATUS[0]} > exit.txt; cat preflight-q.log
+          if [ "$(cat exit.txt)" != "0" ]; then
             echo "--- q failed, retry with -v ---"
             python -m pytest -o addopts='' -v tests/preflight 2>&1 | tee preflight-v.log
+            echo "--- junit xml ---"
+            cat preflight-results.xml
           fi
-          # fail if q failed
-          test "$(cat exit.txt | awk '{print $3}')" = "0"
+          test "$(cat exit.txt)" = "0"
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: preflight-logs
+          path: |
+            preflight-q.log
+            preflight-v.log
+            preflight-results.xml
       - name: Relevant existing Core regressions (synthetic Worlds)
         run: |
           python -m pytest -o addopts='' -q --junitxml=regression-results.xml \
@@ -71,7 +81,3 @@ jobs:
               print(f"parse error {e}")
               print(open(p).read()[:20000] if p.exists() else "no file")
           PYTHON
-          echo "--- preflight-q.log ---"
-          cat preflight-q.log 2>/dev/null || echo "no q log"
-          echo "--- preflight-v.log ---"
-          cat preflight-v.log 2>/dev/null || echo "no v log"
