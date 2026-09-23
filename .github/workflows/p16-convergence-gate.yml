@@ -25,6 +25,4 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: pip install -e ".[dev]"
       - name: Run full AIOS Core and P16 regression suite
-        run: |
-          pytest -v 2>&1 | tee full.log
-          cat full.log
+        run: pytest -q
