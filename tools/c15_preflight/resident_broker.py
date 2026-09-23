@@ -1,24 +1,40 @@
-"""Operator broker for Resident isolation - Architecture A.
+"""Operator broker for Resident isolation - Architecture A (CORRECTED).
 
-Model only receives explicit serialized Runtime/模型输入,
-not repo, filesystem, GitHub, arbitrary network or platform tools.
+CORRECTION 2026-09-24: Real Resident must be AI itself in new Arena window,
+not external LLM API. External provider/API adaptation is PAUSED.
+Do NOT require user to provide endpoint or API Key.
+Keep existing generic transport and tests, but MUST NOT mark as
+Arena Resident already connected or already isolated.
 
-Deployable boundary: operator process owns repo, filesystem,
-GitHub credentials, and calls external model via broker with explicit
-packet. Model endpoint is synthetic for tests, real endpoint would be
-external LLM API with no tool access.
+Real Resident architecture:
+- New Arena window AI itself calls normal AIOS interfaces via Driver/Runtime
+- Must verify file, repo, history evidence, future materials, tool access boundaries
+- Model judgment must come from Arena AI's real sequential output, not script replacing cognition
+- If platform cannot provide required boundaries, report specific limitations,
+  not prompt self-discipline instead of isolation, not switch to API route,
+  not run real B/C.
 
-Data flow:
-  Driver -> RuntimeRecorder -> RuntimeSnapshot (plain) -> Broker -> HTTP POST -> External Model (synthetic endpoint)
-  External Model -> ModelDirective (validated) -> Broker -> Driver
-
-Permission boundary:
-- Broker runs in operator host, has filesystem, but only emits plain(snapshot) from approved structure
-- Model endpoint is transport test double; no sensitive info sent is verified, process read permission separately
+This file retains synthetic transport for mechanical checks only:
+- Broker runs in operator host, owns repo/filesystem/GitHub credentials
+- Emits only plain(snapshot) from approved structure, not repo, not private checkpoint
+- Synthetic endpoint is transport test double for boundary tests
 - Logs owned by operator (trace.jsonl), not model
 - Timeout and error handling fail-closed, no default silence
-- Credentials stay in HTTP auth layer, not in model message or ordinary log
-- Core provided legal AIOS capability calls retained via Runtime execution, not filtered
+- Credentials stay in HTTP auth layer if used, not in model message or ordinary log
+- Core provided legal AIOS capability calls retained via Runtime execution
+
+Deployable boundary (synthetic only, NOT Arena Resident attestation):
+  Driver -> RuntimeRecorder -> RuntimeSnapshot (plain) -> Broker -> HTTP POST -> Synthetic Endpoint (test double)
+  Synthetic Endpoint -> ModelDirective (validated) -> Broker -> Driver
+
+For real Arena Resident:
+  - Must be new Arena window AI, not external API
+  - Must call normal AIOS interfaces via explicit packet manifest
+  - File/repo/history evidence/future materials/tool access boundaries must be verifiable
+  - Current Arena platform limitations: see reviews/C15_RCC_RES_B_ARENA_RESIDENT_ARCHITECTURE_VERIFICATION_2026-09-24.md
+  - Isolation remains BLOCKED until platform provides required boundaries
+
+PR stays OPEN, no merge.
 """
 from __future__ import annotations
 
@@ -37,12 +53,22 @@ from .transport import plain, encode, directive, TransportError
 from .audit import require
 
 
+# Architecture correction flag: external LLM API adaptation PAUSED
+EXTERNAL_PROVIDER_PAUSED = True
+REAL_RESIDENT_IS_ARENA_WINDOW = True  # Real Resident must be new Arena window AI itself
+
+
 class BrokerError(TransportError):
     pass
 
 
 class ResidentBroker:
     """Operator-side broker that calls external model via explicit packet.
+
+    NOTE: External provider adaptation PAUSED per 2026-09-24 correction.
+    This class is retained for synthetic transport tests only,
+    MUST NOT be marked as Arena Resident connected or isolated.
+    Real Resident must be new Arena window AI itself.
 
     Based on approved input structure and source, not string blacklist.
     Operator private checkpoint, credentials, governance material must not enter model input.
@@ -77,7 +103,7 @@ class ResidentBroker:
         input_data = packet.get("input")
         require(isinstance(input_data, dict), "input must be dict")
         # Ensure input only contains approved snapshot keys (or subset), not operator private checkpoint fields
-        # Operator private checkpoint fields that must NOT enter: world_revision, index_watermark, release_sha256, session, clock, driver_state, etc.
+        # Operator private checkpoint fields that must NOT enter: world_revision, index_watermark, release_sha256, driver_state, etc.
         forbidden_keys = {"world_revision", "index_watermark", "release_sha256", "driver_state", "session", "clock", "private_world", "world_index", "release_state", "operator", "git_metadata", "private_a"}
         for fk in forbidden_keys:
             require(fk not in input_data, f"operator private material must not enter model input: {fk}")
@@ -89,7 +115,11 @@ class ResidentBroker:
             require(k in approved_snapshot_keys, f"unapproved snapshot field: {k} - must be from approved RuntimeSnapshot structure")
 
     def invoke(self, snapshot: Any) -> Any:
-        """Call external model with explicit serialized snapshot, fail-closed."""
+        """Call external model with explicit serialized snapshot, fail-closed.
+
+        NOTE: This is synthetic transport test only, NOT Arena Resident connected.
+        External provider adaptation PAUSED.
+        """
         from uuid import uuid4
         from aios_core.runtime.cognitive_runtime import RuntimeSnapshot
         if not isinstance(snapshot, RuntimeSnapshot):
@@ -116,6 +146,7 @@ class ResidentBroker:
             "input_keys": list(serialized_input.keys()) if isinstance(serialized_input, dict) else [],
             "at": time.time(),
             "protocol": "c15-resident-broker-v1",
+            "note": "synthetic transport only, NOT Arena Resident connected/isolated",
         })
 
         data = (encode(packet) + "\n").encode("utf-8")
@@ -165,6 +196,10 @@ class ResidentBroker:
 class SyntheticModelEndpoint(BaseHTTPRequestHandler):
     """Synthetic external model endpoint for boundary tests - transport test double.
 
+    NOTE: This is NOT Arena Resident. Real Resident must be new Arena window AI itself.
+    External provider adaptation PAUSED. This endpoint is retained for synthetic
+    transport tests only, MUST NOT be marked as Arena Resident connected/isolated.
+
     Only receives packet, logs what it received for verification.
     Does NOT claim 'no filesystem' unless OS permission verified.
     No sensitive info sent and process has no read permission are separately accounted.
@@ -205,6 +240,7 @@ class SyntheticModelEndpoint(BaseHTTPRequestHandler):
             "has_repo_in_body": "Haneof-AIOS-Core" in text,
             "size": len(raw),
             "protocol": packet.get("protocol"),
+            "note": "synthetic transport only, NOT Arena Resident",
         })
 
         if SyntheticModelEndpoint.delay_seconds:
