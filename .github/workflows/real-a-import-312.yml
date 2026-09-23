@@ -1,15 +1,26 @@
 name: real-a-import-312
+# PM 2026-09-24 closure: private A must NOT enter public CI automatically.
+# Previous version triggered on pull_request paths, allowing any PR that touches
+# tools/c15_preflight/** to fetch arena/01a0cca8 branch containing private A.
+# Minimal blocking measure: disable automatic PR trigger, keep only workflow_dispatch.
+# This prevents ordinary PRs from automatically obtaining private A in CI.
+# Real A import receipt already obtained (runs 35924742929, 35924990859, 35925311828, 35925861876)
+# is registered as executor measured result, no repeat execution needed.
+# No artifact upload, no cache, no private World content output - only desensitized receipt.
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - "tools/c15_preflight/**"
-      - ".github/workflows/real-a-import-312.yml"
+# pull_request trigger REMOVED per PM closure to block automatic private A fetch
+#  pull_request:
+#    paths:
+#      - "tools/c15_preflight/**"
+#      - ".github/workflows/real-a-import-312.yml"
 permissions:
   contents: read
 jobs:
   real-a-312:
     runs-on: ubuntu-latest
+    # Extra guard: only allow manual dispatch by repository owner/collaborator, not fork PRs
+    if: github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout exact PR head
         uses: actions/checkout@v4
