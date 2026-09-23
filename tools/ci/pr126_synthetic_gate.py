@@ -7,6 +7,7 @@ that is NOT_TESTED/BLOCKED, never a passing isolation result.
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import json
 import os
@@ -25,10 +26,11 @@ ISOLATION_CASE = "test_isolation_probe_execution_result"
 REAL_A_CASE = "test_real_a_copy_mechanical_import_not_tested_or_verified"
 INTEGRATED_BASE_SHA = "76112ca0bb70bd4cdde2a62dee8deb7a7810a370"
 MINIMUM_CORE_CASES = 409  # 367 pre-existing + 42 positive A01-A10 regressions
-# Specified PR125 head adds 18 public round5 cases to the prior 108; the exact
-# collected count is still printed from JUnit. Do not accept the old 108 alone.
-MINIMUM_PREFLIGHT_CASES = 126
-MINIMUM_ROUND5_CASES = 18
+# The reviewed upstream adds 18 round5 cases; its real-A auto-probe is NOT a
+# synthetic test. The safe default suite retains the other 17 (108 + 17).
+# Report the *actual* JUnit counts; never pad these numbers with NOT_TESTED.
+MINIMUM_PREFLIGHT_CASES = 125
+MINIMUM_ROUND5_CASES = 17
 
 
 @dataclass(frozen=True)
@@ -62,7 +64,7 @@ class Decision:
     preflight_count: int
     round5_count: int
     synthetic_isolation: str
-    real_a_import: str = "NOT_TESTED/BLOCKED / REAL A NOT ACCESSED"
+    real_a_import: str = "NOT_TESTED/BLOCKED"
     resident_isolation: str = "BLOCKED / REAL RESOURCES NOT_TESTED"
 
     @property
@@ -108,6 +110,25 @@ def verify_positive_source(repo: Path) -> None:
         raise ValueError("A01-A10 positive test source differs from the reviewed handoff manifest")
 
 
+def verify_default_synthetic_boundary(repo: Path) -> None:
+    """Before pytest, reject the known real-A auto-probe and host-path scans.
+
+    This is a test-entry guard, not a real-A attestation. Authorized real-A
+    validation remains an independent invocation of the existing fixed-hash
+    production entry point, never part of the public synthetic suite.
+    """
+    path = repo / "tests/preflight/test_round5_fixes.py"
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    unsafe_paths = {"/tmp/real_a", "/tmp/accepted_a", "private_a"}
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == REAL_A_CASE:
+            raise ValueError("real-A auto-probe must not be a default pytest test")
+        if isinstance(node, ast.Constant) and isinstance(node.value, str) and node.value in unsafe_paths:
+            raise ValueError("default preflight test contains a real-A host-path lookup")
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "validate_staged_core":
+            raise ValueError("default preflight test must not invoke real-A verification")
+
+
 def evaluate(report: Report, *, mode: str, pytest_exit: int) -> Decision:
     if mode not in {"core", "full"}:
         raise ValueError("mode must be core or full")
@@ -131,6 +152,8 @@ def evaluate(report: Report, *, mode: str, pytest_exit: int) -> Decision:
 
     preflight = [case for case in report.cases if case.module in PREFLIGHT_MODULES]
     round5 = [case for case in preflight if case.module == "test_round5_fixes"]
+    if any(case.name == REAL_A_CASE for case in report.cases):
+        errors.append("real-A auto-probe appeared in the default synthetic test list")
     synthetic_isolation = "NOT_RUN" if mode == "core" else "NOT_TESTED/BLOCKED"
     if mode == "full":
         if len(preflight) < MINIMUM_PREFLIGHT_CASES:
@@ -143,13 +166,9 @@ def evaluate(report: Report, *, mode: str, pytest_exit: int) -> Decision:
             errors.append("the round4 synthetic isolation probe was not executed exactly once")
         elif probes[0].outcome == "passed":
             synthetic_isolation = "SYNTHETIC_CANARY_PASS_ONLY"
-        real_a = [case for case in round5 if case.name == REAL_A_CASE]
-        if len(real_a) != 1:
-            errors.append("round5 real-A mechanical test was not collected exactly once")
-        # The PR125 test prints NOT_TESTED and returns normally when real A is
-        # absent. Even a JUnit 'passed' result is NOT evidence of real A import.
-        # No private A is read by this synthetic receipt; real A stays BLOCKED.
-        # A probe skip/failure never becomes a synthetic isolation PASS either.
+        # Real A has zero default testcases by design; it must remain a
+        # separately authorized operation, not a pytest PASS or a hidden skip.
+        # A namespace probe skip/failure never becomes an isolation PASS.
     return Decision(tuple(errors), len(core_scope), len(preflight), len(round5), synthetic_isolation)
 
 
@@ -183,6 +202,7 @@ def exact_receipt(report: Report, decision: Decision, *, mode: str, checkout: st
         "preflight": decision.preflight_count,
         "round5": decision.round5_count,
         "synthetic_isolation": decision.synthetic_isolation,
+        "real_a_testcases": sum(case.name == REAL_A_CASE for case in report.cases),
         "real_a_import": decision.real_a_import,
         "resident_isolation": decision.resident_isolation,
     }
@@ -206,6 +226,7 @@ def main() -> int:
         repo = Path.cwd()
         checkout = verify_checkout(repo)
         verify_positive_source(repo)
+        verify_default_synthetic_boundary(repo)
         report = read_junit(args.junit)
         decision = evaluate(report, mode=args.mode, pytest_exit=args.pytest_exit)
         errors.extend(decision.errors)
@@ -224,13 +245,13 @@ def main() -> int:
         with open(summary_path, "a", encoding="utf-8") as summary:
             summary.write(f"\n### PR126 {args.mode} synthetic-only gate\n")
             summary.write(f"- Python: {sys.version.split()[0]}\n")
-            summary.write(f"- Checkout: {os.environ.get('GITHUB_SHA', 'local')}\n")
+            summary.write(f"- Checkout: {checkout if decision else 'NOT_VERIFIED'}\n")
             summary.write(f"- Status: {'BLOCKED' if errors else 'MECHANICAL_PASS_ONLY'}\n")
             if decision:
                 summary.write(f"- A01-A10/Core cases: 42/{decision.core_count}\n")
                 summary.write(f"- Preflight cases (including round5): {decision.preflight_count} ({decision.round5_count} round5)\n")
                 summary.write(f"- Synthetic isolation: {decision.synthetic_isolation}\n")
-                summary.write(f"- Real A: {decision.real_a_import}; a passing round5 unit test may print NOT_TESTED\n")
+                summary.write(f"- Real A: {decision.real_a_import}; {sum(case.name == REAL_A_CASE for case in report.cases)} default testcases (explicit authorization required)\n")
                 summary.write(f"- Real Resident isolation: {decision.resident_isolation}\n")
             for error in errors:
                 summary.write(f"- {error}\n")

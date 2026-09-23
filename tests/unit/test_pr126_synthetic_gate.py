@@ -5,7 +5,12 @@ import xml.etree.ElementTree as ET
 
 import pytest
 
-from tools.ci.pr126_synthetic_gate import Case, Report, evaluate, exact_receipt, read_junit
+from pathlib import Path
+
+from tools.ci.pr126_synthetic_gate import (
+    REAL_A_CASE, Case, Report, evaluate, exact_receipt, read_junit,
+    verify_default_synthetic_boundary,
+)
 
 
 def _core_cases() -> list[Case]:
@@ -23,8 +28,7 @@ def _full_cases() -> list[Case]:
     ], Case("test_round4_fixes", "test_isolation_probe_execution_result", "passed"), *[
         Case("tests.preflight.test_round5_fixes", f"test_synthetic_round5_{i}", "passed")
         for i in range(17)
-    ], Case("tests.preflight.test_round5_fixes",
-            "test_real_a_copy_mechanical_import_not_tested_or_verified", "passed")]
+    ]]
 
 
 def _report(cases: list[Case]) -> Report:
@@ -78,10 +82,10 @@ def test_full_gate_treats_environmental_isolation_skip_as_blocked_with_reason():
 
 def test_full_gate_pass_is_synthetic_only_and_does_not_release_resident():
     receipt = evaluate(_report(_full_cases()), mode="full", pytest_exit=0)
-    assert receipt.passed and receipt.core_count == 409 and receipt.preflight_count == 126
-    assert receipt.round5_count == 18
+    assert receipt.passed and receipt.core_count == 409 and receipt.preflight_count == 125
+    assert receipt.round5_count == 17
     assert receipt.synthetic_isolation == "SYNTHETIC_CANARY_PASS_ONLY"
-    assert receipt.real_a_import == "NOT_TESTED/BLOCKED / REAL A NOT ACCESSED"
+    assert receipt.real_a_import == "NOT_TESTED/BLOCKED"
     assert receipt.resident_isolation == "BLOCKED / REAL RESOURCES NOT_TESTED"
 
 
@@ -93,11 +97,12 @@ def test_exact_receipt_preserves_skip_and_real_resource_block(monkeypatch):
     report = _report(cases)
     decision = evaluate(report, mode="full", pytest_exit=0)
     receipt = exact_receipt(report, decision, mode="full")
-    assert receipt["tests"] == 535 and receipt["passed"] == 534
+    assert receipt["tests"] == 534 and receipt["passed"] == 533
     assert receipt["skipped"] == 1 and receipt["a01_a10"] == 42
-    assert receipt["core"] == 409 and receipt["preflight"] == 126 and receipt["round5"] == 18
+    assert receipt["core"] == 409 and receipt["preflight"] == 125 and receipt["round5"] == 17
     assert receipt["synthetic_isolation"] == "NOT_TESTED/BLOCKED"
-    assert receipt["real_a_import"].startswith("NOT_TESTED/BLOCKED")
+    assert receipt["real_a_testcases"] == 0
+    assert receipt["real_a_import"] == "NOT_TESTED/BLOCKED"
     assert receipt["resident_isolation"].startswith("BLOCKED")
     assert receipt["pr_head"] == "synthetic-head-sha"
 
@@ -114,16 +119,28 @@ def test_full_gate_refuses_missing_probe_and_other_unexpected_skips():
         evaluate(_report(cases), mode="full", pytest_exit=0).errors)
 
 
-def test_full_gate_cannot_mislabel_real_a_not_tested_as_proven():
+def test_full_gate_excludes_real_a_and_rejects_automatic_reintroduction(tmp_path):
+    source_root = Path(__file__).resolve().parents[2]
+    verify_default_synthetic_boundary(source_root)  # public test source only
     cases = _full_cases()
     receipt = evaluate(_report(cases), mode="full", pytest_exit=0)
-    assert receipt.passed  # mechanical suite may pass without access to real A
-    assert receipt.real_a_import.startswith("NOT_TESTED/BLOCKED")
-    cases.pop()  # the PR125 real-A test was not even collected
+    assert receipt.passed and receipt.preflight_count == 125
+    assert receipt.real_a_import == "NOT_TESTED/BLOCKED"
+    assert all(case.name != REAL_A_CASE for case in cases)
+
+    cases.append(Case("tests.preflight.test_round5_fixes", REAL_A_CASE, "passed"))
     blocked = evaluate(_report(cases), mode="full", pytest_exit=0)
     assert not blocked.passed
-    assert any("real-A mechanical test" in error for error in blocked.errors)
-    assert any("coverage shrank" in error for error in blocked.errors)
+    assert any("auto-probe appeared" in error for error in blocked.errors)
+
+    synthetic = tmp_path / "tests/preflight/test_round5_fixes.py"
+    synthetic.parent.mkdir(parents=True)
+    synthetic.write_text(f"def {REAL_A_CASE}():\n    pass\n")
+    with pytest.raises(ValueError, match="real-A auto-probe"):
+        verify_default_synthetic_boundary(tmp_path)
+    synthetic.write_text('def test_synthetic():\n    return "/tmp/real_a"\n')
+    with pytest.raises(ValueError, match="host-path lookup"):
+        verify_default_synthetic_boundary(tmp_path)
 
 
 def test_junit_reader_refuses_inconsistent_declared_counts(tmp_path):

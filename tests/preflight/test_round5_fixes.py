@@ -460,29 +460,9 @@ def test_formal_fixed_hash_a_import_entry_exists(tmp_path):
     with pytest.raises(Exception):
         import_accepted_a_to_driver_run(staging, tmp_path / "should_fail", repo=REPO_ROOT, synthetic=False)
 
-def test_real_a_copy_mechanical_import_not_tested_or_verified(tmp_path):
-    """C: real A copy mechanical import - if not present, NOT_TESTED, not using synthetic result."""
-    # Try to find real A handoff dir (maybe in /tmp or elsewhere, but not in Git)
-    # In this environment, we don't have real A, so we mark NOT_TESTED
-    # If it were present, we would verify it is read-only, independent copy, model_requests 0, no B release
-    # For now, we explicitly report NOT_TESTED for C
-    real_a_candidates = [Path("/tmp/real_a"), Path("/tmp/accepted_a"), REPO_ROOT / "private_a"]
-    found = None
-    for cand in real_a_candidates:
-        if cand.is_dir() and (cand / "private_world.sqlite").exists():
-            found = cand
-            break
-    if found is None:
-        # Real A not present in CI, report NOT_TESTED without counting as skipped (to satisfy CI gate that requires skipped==0)
-        # This satisfies requirement: if not executed mark NOT_TESTED, not claim real A verified with alternative pin
-        print("C: real A copy NOT_TESTED in this environment, synthetic result not used as replacement")
-        assert True
-        return
-    # If found, we would verify (this branch not executed in CI)
-    from tools.c15_preflight.restart import validate_staged_core
-    result = validate_staged_core(found, repo=REPO_ROOT)
-    assert result["model_requests"] == 0
-    assert result["world_revision"] == 88
+# Real A import is not a synthetic pytest test. The existing fixed-hash audit
+# and staged-A entry points require an independently authorized, explicit real
+# handoff path; the default suite must never search host paths for one.
 
 def test_checkpoint_loss_cannot_bypass_via_accepted_a_import(tmp_path):
     """New regression: existing progress -> checkpoint loss/damage -> try accepted_a_dir import -> rejected and no overwrite."""
