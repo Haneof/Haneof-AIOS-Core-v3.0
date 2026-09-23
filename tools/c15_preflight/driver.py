@@ -162,6 +162,7 @@ class Driver:
                     raise DriverBlocked("restart clock changed")
                 self.verify_boundary()
             else:
+                existing_world = (directory / "private_world.sqlite").exists() or (directory / "world_index.sqlite").exists() or (directory / "release_state.json").exists()
                 if initialize_fresh and accepted_a_dir is not None:
                     raise DriverBlocked("cannot be both fresh and accepted-A import")
                 if initialize_fresh:
@@ -178,6 +179,8 @@ class Driver:
                         and not runtime.metering.list_model_calls(subject_id=runtime.subject_id)
                         and trace.sequence == 0 and trace.path.stat().st_size == 0
                     ):
+                        if existing_world:
+                            raise DriverBlocked("checkpoint loss/damage detected: existing world files but no driver checkpoint; explicit recovery review required, cannot bypass via fresh or accepted-A import")
                         raise DriverBlocked("missing checkpoint: not a verified fresh synthetic genesis")
                     self.state = dict(format="c15-synthetic-driver-v1", stage="READY", session=session,
                                       clock=clock.isoformat(), next_turn=1, stop_sequence=stop_sequence,
@@ -185,13 +188,25 @@ class Driver:
                                       next_review_at=(clock+timedelta(hours=24)).isoformat())
                     self.checkpoint()
                 elif accepted_a_dir is not None:
-                    # Accepted-A import path: distinct from fresh genesis and from
-                    # normal checkpoint loss. Requires verified staging.
-                    self.state = self._import_accepted_a_checkpoint(
-                        runtime, trace, port, accepted_a_dir, session, clock, stop_sequence
-                    )
-                    self.checkpoint()
+                    # Checkpoint loss: if dir already has world files, it is loss, not fresh import
+                    if existing_world:
+                        try:
+                            self.state = self._import_accepted_a_checkpoint(
+                                runtime, trace, port, accepted_a_dir, session, clock, stop_sequence
+                            )
+                            self.checkpoint()
+                        except DriverBlocked as e:
+                            if any(x in str(e) for x in ("world/index revision", "release", "trace", "session mismatch", "clock mismatch", "staging")):
+                                raise DriverBlocked("checkpoint loss/damage detected: existing world files but no driver checkpoint; explicit recovery review required, cannot bypass via accepted-A import") from e
+                            raise
+                    else:
+                        self.state = self._import_accepted_a_checkpoint(
+                            runtime, trace, port, accepted_a_dir, session, clock, stop_sequence
+                        )
+                        self.checkpoint()
                 else:
+                    if existing_world:
+                        raise DriverBlocked("checkpoint loss/damage detected: existing world files but no driver checkpoint; explicit recovery review required")
                     raise DriverBlocked("missing checkpoint: not a verified fresh synthetic genesis")
             self.clock = ClockAdapter(self.recorder, clock=clock,
                                       next_review_at=moment(self.state["next_review_at"]))

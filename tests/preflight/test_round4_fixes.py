@@ -279,7 +279,7 @@ def _create_synthetic_a_staging(tmp_path: Path):
     (staging / "restart_state.json").write_text(json.dumps(restart_state))
     os.chmod(staging / "restart_state.json", 0o600)
 
-    plan = restart_plan(restart_state, "synthetic-new")
+    plan = restart_plan(restart_state, "synthetic-new", synthetic=True)
     (staging / "mechanical_restart.json").write_text(json.dumps(plan))
     os.chmod(staging / "mechanical_restart.json", 0o600)
 

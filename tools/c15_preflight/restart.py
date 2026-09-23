@@ -15,7 +15,7 @@ from .audit import A_SHA, HASHES, RESTART_KEYS, audit, digest, require, verify_f
 from .driver import DriverBlocked, atomic_json, moment
 
 
-def restart_plan(raw, new_session: str):
+def restart_plan(raw, new_session: str, *, synthetic: bool = False):
     require(set(raw) == RESTART_KEYS, "unreviewed restart fields")
     require(isinstance(new_session, str) and bool(new_session.strip()) and new_session == new_session.strip(),
             "new session must be canonical nonblank text")
@@ -30,16 +30,21 @@ def restart_plan(raw, new_session: str):
     require(raw["review_interval_hours"] == 24, "unapproved Review cadence")
     require(raw["done_at_cursor"] == 13 and raw["release_state_next_sequence"] == 14, "restart cursor mismatch")
     require(raw["final_world_revision"] == raw["final_index_watermark"] == 88, "restart watermark")
-    return dict(format="c15-mechanical-restart-plan-v1", accepted_a=A_SHA, session_id=new_session,
+    base = dict(format="c15-mechanical-restart-plan-v1", accepted_a=A_SHA, session_id=new_session,
                 subject_id=raw["subject_id"], next_turn=1, clock=clock.isoformat(),
                 next_review_at=review.isoformat(), review_interval_hours=24, completed_sequence=13,
                 status="STAGED_NOT_RELEASED", launchable=False)
+    if synthetic:
+        # Explicit synthetic identifier, cannot be mistaken as authenticated accepted A
+        base["synthetic"] = True
+        base["accepted_a"] = "SYNTHETIC:" + A_SHA
+    return base
 
 
 def stage_accepted_a(source: Path, destination: Path, repo: Path, *, new_session: str):
     audit(source, repo)
     raw = json.loads((source / "restart_state.json").read_text())
-    plan = restart_plan(raw, new_session)
+    plan = restart_plan(raw, new_session, synthetic=False)
     destination.mkdir(mode=0o700)
     try:
         for name in HASHES:
@@ -69,7 +74,10 @@ def validate_staged_core(destination: Path, repo: Path | None = None):
             require(file is not None and Path(file).resolve().is_relative_to(root), "Core import path shadowed")
     verify_files(destination, HASHES)
     plan = json.loads((destination / "mechanical_restart.json").read_text())
-    expected = restart_plan(json.loads((destination / "restart_state.json").read_text()), plan["session_id"])
+    # Production entry must NOT be synthetic
+    require(plan.get("synthetic") is not True, "synthetic plan cannot be used for real A import")
+    require(plan.get("accepted_a") == A_SHA, "real A plan must have exact A_SHA")
+    expected = restart_plan(json.loads((destination / "restart_state.json").read_text()), plan["session_id"], synthetic=False)
     require(plan == expected, "restart plan was edited")
     requested = []
 
@@ -106,15 +114,14 @@ def validate_synthetic_a_staging(destination: Path, repo: Path | None = None):
     Does NOT call verify_core for untracked files, because synthetic tests run
     in an environment where __pycache__ may be present. Real A validation still
     calls verify_core separately.
+
+    Requires explicit synthetic identifier to prevent production misuse.
     """
     from aios_core.query.search import WorldSearchIndex
     from aios_core.runtime.turn_runtime import FusedTurnRuntime
     from aios_core.storage.sqlite_store import SQLiteWorldStore
 
     import sys
-    # For synthetic, we optionally check Core import path is not shadowed if repo provided,
-    # but we do NOT enforce untracked Core source check, to avoid __pycache__ false positives
-    # in full pytest runs.
     if repo is not None:
         root = (repo).resolve() / "src/aios_core"
         for name, module in tuple(sys.modules.items()):
@@ -122,22 +129,22 @@ def validate_synthetic_a_staging(destination: Path, repo: Path | None = None):
                 file = getattr(module, "__file__", None)
                 if file is not None:
                     try:
-                        # Only enforce if file is inside repo but not in src/aios_core
                         p = Path(file).resolve()
                         if p.is_relative_to(repo.resolve()) and not p.is_relative_to(root):
                             require(False, "Core import path shadowed")
                     except Exception:
                         pass
-    # Do NOT check fixed HASHES for synthetic
     for name in ("private_world.sqlite", "world_index.sqlite", "release_state.json", "restart_state.json", "mechanical_restart.json"):
         p = destination / name
         require(p.is_file() and not p.is_symlink(), f"missing synthetic A file: {name}")
 
     plan = json.loads((destination / "mechanical_restart.json").read_text())
-    # Synthetic plan may have accepted_a = real A_SHA or synthetic marker, allow both
     require(plan.get("format") == "c15-mechanical-restart-plan-v1", "synthetic plan format")
     require(plan.get("completed_sequence") == 13, "synthetic plan completed_sequence")
     require(plan.get("status") == "STAGED_NOT_RELEASED", "synthetic plan status")
+    # Explicit synthetic identifier
+    require(plan.get("synthetic") is True, "synthetic A must have explicit synthetic identifier")
+    require(isinstance(plan.get("accepted_a"), str) and plan["accepted_a"].startswith("SYNTHETIC:"), "synthetic A accepted_a must be marked synthetic")
 
     requested = []
 
@@ -159,7 +166,7 @@ def validate_synthetic_a_staging(destination: Path, repo: Path | None = None):
     due = marker.last_hit_at + timedelta(hours=plan["review_interval_hours"])
     require(due == moment(plan["next_review_at"]), "synthetic A Review deadline mismatch")
     require(not requested, "synthetic A unexpected model request")
-    return {"status": "SYNTHETIC_A_VERIFIED", "world_revision": 88, "index_watermark": 88, "model_requests": 0}
+    return {"status": "SYNTHETIC_A_VERIFIED", "world_revision": 88, "index_watermark": 88, "model_requests": 0, "synthetic": True}
 
 
 def restore_frozen(source: Path, destination: Path, *, manifest_sha256: str):
@@ -196,8 +203,9 @@ def import_accepted_a_to_driver_run(
 ):
     """Create a Driver run directory from a verified staged accepted-A.
 
-    If synthetic=True, uses synthetic validation without fixed hash pins.
-    Otherwise uses real A validation with fixed hashes.
+    If synthetic=True, uses synthetic validation without fixed hash pins and
+    requires explicit synthetic identifier. Otherwise uses real A validation
+    with fixed hashes and rejects synthetic.
     """
     staged_a_dir = staged_a_dir.resolve()
     driver_run_dir = driver_run_dir.resolve()
@@ -206,13 +214,20 @@ def import_accepted_a_to_driver_run(
 
     if synthetic:
         validation = validate_synthetic_a_staging(staged_a_dir, repo=repo)
+        require(validation.get("synthetic") is True, "synthetic validation must have synthetic flag")
     else:
         validation = validate_staged_core(staged_a_dir, repo=repo)
+        require(validation.get("synthetic") is not True, "real A validation must not be synthetic")
     require(validation["model_requests"] == 0, "staged core made model requests")
 
     plan_path = staged_a_dir / "mechanical_restart.json"
     require(plan_path.is_file(), "mechanical plan missing")
     plan = json.loads(plan_path.read_text())
+    # Additional check: synthetic flag in plan must match synthetic param
+    if synthetic:
+        require(plan.get("synthetic") is True, "synthetic import requires synthetic plan")
+    else:
+        require(plan.get("synthetic") is not True, "real import must not use synthetic plan")
 
     driver_run_dir.mkdir(mode=0o700)
     try:
@@ -225,6 +240,7 @@ def import_accepted_a_to_driver_run(
         os.chmod(driver_run_dir / "mechanical_restart.json", 0o600)
         return {
             "status": "ACCEPTED_A_DRIVER_RUN_PREPARED",
+            "synthetic": synthetic,
             "plan": plan,
             "validation": validation,
             "driver_run_dir": str(driver_run_dir),

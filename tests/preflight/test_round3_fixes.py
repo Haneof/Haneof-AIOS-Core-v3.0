@@ -214,7 +214,7 @@ def test_checkpoint_missing_with_ack_blocks(tmp_path):
     d.state_path.unlink()
     d.close();d.trace.close()
     t=Trace(d.directory / "new-trace", d.runtime.store.current_world_revision)
-    with pytest.raises(DriverBlocked, match="missing checkpoint|fresh synthetic genesis"):
+    with pytest.raises(DriverBlocked, match="missing checkpoint|fresh synthetic genesis|checkpoint loss"):
         Driver(d.runtime,t,d.port,d.directory,session="synthetic-session",clock=NOW,stop_sequence=3)
     t.close()
 

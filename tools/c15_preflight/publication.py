@@ -32,11 +32,27 @@ hardware failure. Uncertain states stop and require explicit verification.
 
 Limits: not a durable distributed commit service, not proof that the
 underlying device honored fsync, not hostile-Python isolation.
+
+Commit point definition:
+- The persistent receipt `publication_receipt.json` is the formal commit
+  point of publication. After successful creation and fsync of receipt
+  plus its parent directories, the package is considered confirmed and
+  restorable via ordinary restore, even if subsequent source checkpoint
+  (FROZEN) fails. In that case, source driver is marked FAILED/UNCERTAIN
+  but package remains confirmed; operator must recover source driver
+  separately, not re-confirm package. If receipt is missing (failure before
+  receipt), package is uncertain and ordinary restore is BLOCKED; operator
+  must use confirm_uncertain_package after mechanical verification.
+- This ensures no "same protocol judged uncertain but ordinary restore
+  considers confirmed": uncertain = no receipt = blocked; confirmed =
+  receipt exists = restorable.
 """
 from __future__ import annotations
 
 import json
 import os
+import sqlite3
+from contextlib import closing
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -95,6 +111,9 @@ def create_receipt(
     Must be called ONLY after all prior I/O succeeded. Writes atomically
     and fsyncs the receipt file and its parent directory (destination).
     Also fsyncs destination's parent for durability of the new file entry.
+
+    This is the formal commit point: after this succeeds, package is
+    confirmed and restorable, even if subsequent FROZEN checkpoint fails.
     """
     receipt = {
         "format": RECEIPT_FORMAT,
@@ -117,6 +136,12 @@ def create_receipt(
     except BaseException:
         # If parent fsync fails, receipt may still exist but durability uncertain.
         # Caller should treat this as failure and not mark FROZEN.
+        # The receipt file itself is already durable (atomic_json fsynced it and its dir),
+        # but parent entry may not be. We leave receipt for inspection but consider
+        # this a failure path: no FROZEN, and ordinary restore will still succeed
+        # because receipt exists, which is correct per commit point definition.
+        # However, to be conservative, we raise so caller marks FAILED and operator
+        # can verify.
         raise
     return receipt_path
 
@@ -154,6 +179,72 @@ def load_and_verify_receipt(
     require(actual_manifest_hash == data["manifest_sha256"], "receipt manifest hash does not match actual manifest")
     return data
 
+def _verify_manifest_files(source: Path, manifest: dict) -> None:
+    """Verify all files listed in manifest exist and match digests."""
+    files = manifest.get("files")
+    require(isinstance(files, dict) and len(files) > 0, "manifest missing files")
+    expected_names = {"private_world.sqlite", "world_index.sqlite", "release_state.json", "restart_state.json", "trace.jsonl"}
+    require(set(files.keys()) == expected_names, f"manifest files mismatch, expected {expected_names}")
+    for name, expected_digest in files.items():
+        path = source / name
+        require(path.is_file() and not path.is_symlink(), f"missing/non-regular artifact: {name}")
+        # Check no sidecars
+        for suffix in ("-wal", "-shm", "-journal"):
+            require(not Path(str(path) + suffix).exists(), f"unfrozen sidecar: {name}{suffix}")
+        actual = digest(path)
+        require(actual == expected_digest, f"hash mismatch: {name} expected {expected_digest[:8]} got {actual[:8]}")
+
+def _verify_sqlite_integrity(source: Path) -> None:
+    """Verify sqlite files integrity and watermark match manifest.
+    Uses immutable flag to avoid creating -wal/-shm sidecars, and cleans any leftovers.
+    """
+    for db_name in ("private_world.sqlite", "world_index.sqlite"):
+        db_path = source / db_name
+        require(db_path.is_file(), f"missing db: {db_name}")
+        # Use immutable to avoid sidecar creation; fallback to ro if immutable not supported
+        try:
+            conn = sqlite3.connect(f"file:{db_path}?mode=ro&immutable=1", uri=True)
+        except Exception:
+            conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+        try:
+            cur = conn.execute("PRAGMA quick_check")
+            rows = cur.fetchall()
+            require(rows == [("ok",)], f"SQLite integrity failure: {db_name} {rows}")
+        finally:
+            conn.close()
+        # Cleanup any sidecars created during verification
+        for suffix in ("-wal", "-shm"):
+            side = Path(str(db_path) + suffix)
+            try:
+                if side.exists():
+                    side.unlink()
+            except Exception:
+                pass
+    # Check watermark consistency
+    world_path = source / "private_world.sqlite"
+    index_path = source / "world_index.sqlite"
+    manifest = json.loads((source / "manifest.json").read_text())
+    expected_wr = manifest.get("world_revision")
+    expected_iw = manifest.get("index_watermark")
+    require(isinstance(expected_wr, int) and isinstance(expected_iw, int), "manifest missing watermarks")
+    try:
+        conn_w = sqlite3.connect(f"file:{world_path}?mode=ro&immutable=1", uri=True)
+    except Exception:
+        conn_w = sqlite3.connect(f"file:{world_path}?mode=ro", uri=True)
+    try:
+        conn_i = sqlite3.connect(f"file:{index_path}?mode=ro&immutable=1", uri=True)
+    except Exception:
+        conn_i = sqlite3.connect(f"file:{index_path}?mode=ro", uri=True)
+    try:
+        wr = int(conn_w.execute("SELECT value FROM world_meta WHERE key='world_revision'").fetchone()[0])
+        iw = int(conn_i.execute("SELECT value FROM search_meta WHERE key='search_watermark_world_revision'").fetchone()[0])
+        require(wr == iw, f"world/index watermark mismatch {wr} vs {iw}")
+        require(wr == expected_wr, f"world revision mismatch manifest {expected_wr} vs actual {wr}")
+        require(iw == expected_iw, f"index watermark mismatch manifest {expected_iw} vs actual {iw}")
+    finally:
+        conn_w.close()
+        conn_i.close()
+
 def confirm_uncertain_package(
     source: Path,
     *,
@@ -167,29 +258,63 @@ def confirm_uncertain_package(
     - operator provides an explicit attestation JSON file containing:
       { "operator": str, "reason": str, "verified_checks": [str], "at": iso }
       and listing the manual checks performed (file digests, watermarks, receipts, etc.)
-    - The attestation file itself is read-only and its hash is recorded in receipt.
+    - The attestation must list required checks and those checks are actually performed:
+      manifest_hash, file_digests, sqlite_integrity, watermark_match
+    - verified_checks must correspond to actual executed checks.
 
     Only after manual verification should this be used. It creates a receipt
     marked as operator-confirmed, distinct from normal publication receipt.
+    This proves artifact verification, not model identity or real cognition.
+
+    It does NOT auto replay model or execute real B.
     """
     require(operator_attestation_path.is_file() and not operator_attestation_path.is_symlink(), "attestation file missing or symlink")
     try:
         att = json.loads(operator_attestation_path.read_text(encoding="utf-8"))
     except Exception as exc:
         raise ValueError(f"attestation unreadable: {exc}") from exc
+    # Blank or arbitrary attestation cannot replace mechanical verification
     require(isinstance(att.get("operator"), str) and att["operator"].strip(), "attestation missing operator")
     require(isinstance(att.get("reason"), str) and att["reason"].strip(), "attestation missing reason")
     require(isinstance(att.get("verified_checks"), list) and len(att["verified_checks"]) > 0, "attestation must list verified checks")
+    # Require at least the core checks
+    required_checks = {"manifest_hash", "file_digests", "sqlite_integrity", "watermark_match"}
+    provided = set(att["verified_checks"])
+    require(required_checks.issubset(provided), f"attestation missing required checks, need {required_checks}, got {provided}")
 
     # Verify package itself is at least structurally valid (manifest hash matches)
     manifest_path = source / "manifest.json"
-    require(manifest_path.is_file(), "manifest missing")
+    require(manifest_path.is_file() and not manifest_path.is_symlink(), "manifest missing or symlink")
     actual_hash = digest(manifest_path)
     require(actual_hash == expected_manifest_sha256, "manifest hash mismatch, cannot confirm uncertain package")
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     pub_id = manifest.get("publication", {}).get("id")
     require(isinstance(pub_id, str) and pub_id, "manifest missing publication id")
+    # Verify manifest's publication status is VALIDATED
+    require(manifest.get("publication", {}).get("status") == "VALIDATED", "manifest publication status not VALIDATED")
+
+    # Perform actual mechanical checks corresponding to verified_checks
+    # 1. manifest_hash already checked
+    # 2. file_digests
+    if "file_digests" in provided:
+        _verify_manifest_files(source, manifest)
+    # 3. sqlite_integrity and watermark_match
+    if "sqlite_integrity" in provided or "watermark_match" in provided:
+        _verify_sqlite_integrity(source)
+    # Additional optional checks
+    if "release_boundary" in provided:
+        release_path = source / "release_state.json"
+        require(release_path.is_file(), "release_state missing")
+        release = json.loads(release_path.read_text())
+        require(release.get("pending_reveal") is None, "release pending_reveal must be None")
+        require(isinstance(release.get("last_acked_sequence"), int), "release last_acked invalid")
+    if "trace_presence" in provided:
+        require((source / "trace.jsonl").is_file(), "trace.jsonl missing")
+
+    # Do not overwrite existing valid receipt - ordinary restore should be used
+    receipt_path = source / RECEIPT_NAME
+    require(not receipt_path.exists(), "receipt already exists; ordinary restore should be used")
 
     # Create operator-confirmed receipt
     receipt = {
@@ -203,9 +328,6 @@ def confirm_uncertain_package(
         "verified_checks": att["verified_checks"],
         "confirmed_at": datetime.now(timezone.utc).isoformat(),
     }
-    receipt_path = source / RECEIPT_NAME
-    # Do not overwrite existing valid receipt
-    require(not receipt_path.exists(), "receipt already exists; ordinary restore should be used")
     atomic_json(receipt_path, receipt)
     try:
         fd = os.open(source.parent, os.O_RDONLY | os.O_DIRECTORY)
@@ -214,5 +336,7 @@ def confirm_uncertain_package(
         finally:
             os.close(fd)
     except BaseException:
+        # If parent fsync fails, receipt may exist but durability uncertain
+        # We leave it but raise for operator to verify
         raise
     return receipt_path
