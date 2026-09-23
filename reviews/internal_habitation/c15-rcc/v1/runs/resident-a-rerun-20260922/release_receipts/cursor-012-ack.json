@@ -1,0 +1,20 @@
+{
+  "evidence_kind": "post-run mechanical receipt extraction",
+  "source": "release_state.json",
+  "phase": "A",
+  "sequence": 12,
+  "event_id": "c15rcc-012",
+  "occurred_at": "2026-11-04T15:07:00-08:00",
+  "binding_mode": "canonical_user_turn",
+  "ingest_ref": "obs_conv_user_8fa0a1954522deb621832218@1",
+  "ingest_object_id": "obs_conv_user_8fa0a1954522deb621832218",
+  "ingest_revision": 1,
+  "ingest_world_revision": 71,
+  "ingest_source_class": "user",
+  "session_id": "resident-a-rerun-20260922-sol-001",
+  "turn_index": 7,
+  "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+  "fixture_payload_sha256": "sha256:700a3de330b2a7fbc06c762661ba6091e431ab06ea19caa98ef3f748230ce87b",
+  "fixture_projection_sha256": "sha256:30a22ee06c2bf9ea781acfa9e8d3adc6353f66b6333b0c3337c2917b1d301412",
+  "note": "Copied exactly from the final authoritative release_state receipt; no World mutation or semantic backfill."
+}

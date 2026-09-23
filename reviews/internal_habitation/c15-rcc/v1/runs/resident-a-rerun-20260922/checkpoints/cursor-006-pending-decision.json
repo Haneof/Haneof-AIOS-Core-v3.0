@@ -1,0 +1,39 @@
+{
+  "cursor": 6,
+  "timestamp": "2026-11-03T10:15:00-08:00",
+  "kind": "dimension_summary_input",
+  "payload": {
+    "dimension": "dim:ai_communication_experience",
+    "granularity": "day",
+    "window_start": "2026-11-02T00:00:00Z",
+    "window_end": "2026-11-02T23:59:59.999999Z",
+    "source_world_revision": 18,
+    "sources": [
+      {
+        "object_id": "commexp_9baf4f659290c9b646d48180",
+        "revision": 1,
+        "object_type": "communication_experience",
+        "occurred_at": "2026-11-02T20:52:00Z",
+        "text": "{\"action_ref\": null, \"applicable_conditions\": {\"exception_boundaries\": [\"production\", \"deletion\", \"cost\"], \"risk\": \"low\", \"work_class\": \"implementation\"}, \"counterexample_refs\": [], \"created_by\": \"communication_experience:resident_ai\", \"learned_at\": \"2026-11-02T20:52:00Z\", \"metadata\": {\"dimension\": \"dim:ai_communication_experience\", \"evidence_refs\": [{\"object_id\": \"obs_conv_ai_46efd80fa2169a69d043503b\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_5d4dfcf42055c00135a78a54\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_f34226f9e0d4064df40603ca\", \"revision\": 1}]}, \"object_id\": \"commexp_9baf4f659290c9b646d48180\", \"object_type\": \"communication_experience\", \"occurred\": {\"end\": \"2026-11-02T20:52:00Z\", \"precision\": \"second\", \"start\": \"2026-11-02T20:52:00Z\", \"timezone_name\": null, \"unknown\": false}, \"recorded_at\": \"2026-11-02T20:52:00Z\", \"revision\": 1, \"scenario\": \"Atlas staging 低风险实现收尾\", \"source_refs\": [{\"object_id\": \"obs_conv_ai_46efd80fa2169a69d043503b\", \"revision\": 1, \"source_locator\": null}, {\"object_id\": \"obs_c14_fixture_5d4dfcf42055c00135a78a54\", \"revision\": 1, \"source_locator\": null}, {\"object_id\": \"obs_conv_user_f34226f9e0d4064df40603ca\", \"revision\": 1, \"source_locator\": null}], \"status\": \"active\", \"style\": \"低风险实现自主推进，不逐步请求确认；完成后汇报结果与关键风险；高风险边界集中提请决定\", \"subject_id\": \"user_1\", \"tone\": \"concise_result_and_risk\", \"user_reaction\": \"accepted\"}",
+        "metadata": {
+          "dimension": "dim:ai_communication_experience",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_ai_46efd80fa2169a69d043503b",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_c14_fixture_5d4dfcf42055c00135a78a54",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_f34226f9e0d4064df40603ca",
+              "revision": 1
+            }
+          ]
+        }
+      }
+    ],
+    "truncated": false
+  }
+}

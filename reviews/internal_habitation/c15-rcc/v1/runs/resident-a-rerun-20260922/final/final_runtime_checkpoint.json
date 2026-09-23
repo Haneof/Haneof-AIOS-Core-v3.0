@@ -1,0 +1,17 @@
+{
+  "checkpoint_kind": "final_runtime_checkpoint",
+  "task_id": "C15-RCC-RES-A-RERUN-001",
+  "resident_session_id": "resident-a-rerun-20260922-sol-001",
+  "final_simulated_time": "2026-11-06T11:10:00-08:00",
+  "world_revision": 77,
+  "index_watermark": 77,
+  "index_lag": 0,
+  "last_acked_sequence": 13,
+  "next_sequence": 14,
+  "pending_reveal": null,
+  "pending_wakes": [
+    "wake_bundle_4aa515bf3c07b8bc46c79160@2",
+    "wake_bundle_8efb078a4b632ee3df1ffad7@2"
+  ],
+  "process_stop": "Phase A stopped without advancing virtual time or revealing cursor 14"
+}

@@ -1,0 +1,9 @@
+{
+  "cursor": 1,
+  "event_id": "c15rcc-001",
+  "ingest_ref": "obs_conv_user_bc08dbb216ee8ecb3412c93f@1",
+  "conversation_session_id": "resident-a-rerun-20260922-sol-001",
+  "turn_index": 1,
+  "ingest_retry_reason": "initial receipt directory was not materialized by git; canonical ingest retried idempotently",
+  "acked": true
+}
