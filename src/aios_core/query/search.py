@@ -372,25 +372,23 @@ class WorldSearchIndex:
         never leave a watermark that skips objects of one logical commit.
         """
 
-        target = int(self._store.current_world_revision())
-        start = self.watermark()
-        if start >= target:
-            return 0
-        rows = self._store.revisions_after(start, limit=max_rows)
-        if not rows:
-            return 0
-        cut = int(rows[-1]["world_revision"])
-        if len(rows) >= max_rows and int(rows[0]["world_revision"]) != cut:
-            # 截断必须落在逻辑提交边界：丢掉可能残缺的尾组，
-            # 水位绝不越过未完整索引的 world_revision（已知限制：单提交
-            # 行数超过 max_rows 时需要流式重建，属 M1 Gate 后扩展）
-            while rows and int(rows[-1]["world_revision"]) == cut:
-                rows.pop()
-            if not rows:
-                return 0
-            cut = int(rows[-1]["world_revision"])
+        if type(max_rows) is not int or max_rows < 1:
+            raise ValueError("max_rows must be a positive integer")
+        # Serialize watermark read + publication, including concurrent catch_up
+        # callers. A slower reader must never move the projection cursor backwards.
         with self._connect() as conn:
             conn.execute("BEGIN IMMEDIATE")
+            cursor = conn.execute(
+                "SELECT value FROM search_meta WHERE key=?", (_WATERMARK_KEY,)
+            ).fetchone()
+            start = int(cursor["value"]) if cursor else 0
+            rows = self._store.revisions_after(
+                start, limit=max_rows, complete_commits=True
+            )
+            if not rows:
+                conn.commit()
+                return 0
+            cut = int(rows[-1]["world_revision"])
             for row in rows:
                 self._index_row(conn, row)
             conn.execute(

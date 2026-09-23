@@ -19,6 +19,7 @@ from aios_core.contracts.models import Dependency, EventAnchor, EvidenceCoverage
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import KnowledgeWindow, TemporalExtent, as_utc
+from aios_core.revision.propagation import plan_invalidation
 from aios_core.query.search import WorldSearchIndex
 from aios_core.storage.idempotency import canonical_json_dumps
 from aios_core.storage.sqlite_store import SQLiteWorldStore
@@ -147,10 +148,12 @@ class EventDimensionService:
         store: SQLiteWorldStore,
         index: WorldSearchIndex | None = None,
         subject_id: str = "user_1",
+        propagation_subject_ids: Sequence[str] | None = None,
     ) -> None:
         self.store = store
         self.index = index
         self.subject_id = subject_id
+        self.propagation_subject_ids = tuple(dict.fromkeys((subject_id, *(propagation_subject_ids or ()))))
 
     def _validate_refs(self, refs: Sequence[ObjectRef]) -> None:
         _require_pinned(refs, "event refs")
@@ -294,6 +297,7 @@ class EventDimensionService:
 
     def transition(self, request: EventTransitionRequest, *, changed_at: datetime) -> EventTransitionReceipt:
         changed = as_utc(changed_at, "changed_at")
+        expected_world_revision = int(self.store.current_world_revision())
         payload = self.store.get_payload(request.event_ref.object_id, revision=request.event_ref.revision)
         latest = self.store.get_payload(request.event_ref.object_id)
         if int(latest["revision"]) != int(request.event_ref.revision or 0):
@@ -359,8 +363,13 @@ class EventDimensionService:
                     dependency_type=f"event_{request.new_status.value}_related_event",
                 )
             )
+        invalidation = plan_invalidation(
+            self.store, changed_ref=request.event_ref, changed_at=changed,
+            reason=f"Event {current.object_id}@{current.revision} transitioned to {request.new_status.value}: {request.reason.strip()}",
+            subject_ids=self.propagation_subject_ids,
+        )
         result = self.store.commit(
-            [evidence, new_event, *deps],
+            [evidence, new_event, *deps, *invalidation.objects],
             OperationRequest(
                 operation_name="event.transition",
                 arguments={
@@ -368,7 +377,7 @@ class EventDimensionService:
                     "from": current.event_status.value,
                     "to": request.new_status.value,
                 },
-                expected_world_revision=int(self.store.current_world_revision()),
+                expected_world_revision=expected_world_revision,
                 reason=request.reason.strip(),
                 idempotency_key=f"event-transition:{current.object_id}:{new_revision}:{request.new_status.value}",
                 source_class=SourceClass.AI_COGNITION,

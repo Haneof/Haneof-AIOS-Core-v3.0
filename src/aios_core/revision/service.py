@@ -18,21 +18,19 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from aios_core.contracts.base import WorldObject
 from aios_core.contracts.enums import (
     KnowledgeState,
-    MaintenanceClass,
     ObjectType,
     SourceClass,
-    SummaryStatus,
 )
 from aios_core.contracts.models import Claim, Dependency, EvidenceCoverage, EvidenceSet
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef
-from aios_core.contracts.registry import canonical_model_for_object_type
 from aios_core.contracts.time import KnowledgeWindow, TemporalExtent, as_utc
-from aios_core.dependency.graph import collect_impacted_dependents
 from aios_core.policy.evidence import CognitionEvidencePolicy
 from aios_core.query.search import WorldSearchIndex
 from aios_core.storage.idempotency import canonical_json_dumps
 from aios_core.storage.sqlite_store import SQLiteWorldStore
+
+from .propagation import plan_invalidation
 
 RevisionMode = Literal["revise", "retract"]
 
@@ -131,60 +129,6 @@ class CognitionRevisionService:
             allowed_subject_ids=tuple(self.evidence_subject_ids),
         )
 
-    def _current_dependencies(self) -> tuple[Dependency, ...]:
-        payloads = self.store.list_payloads(object_type=ObjectType.DEPENDENCY)
-        return tuple(
-            Dependency.model_validate(item)
-            for item in payloads
-            if str(item.get("subject_id") or "") in self.evidence_subject_ids
-        )
-
-    def _mark_stale(
-        self,
-        ref: ObjectRef,
-        *,
-        changed_ref: ObjectRef,
-        changed_at: datetime,
-        reason: str,
-    ) -> WorldObject | None:
-        latest_payload = self.store.get_payload(ref.object_id)
-        latest_revision = int(latest_payload["revision"])
-        if latest_revision != int(ref.revision or 0):
-            # The dependent has already moved on since this dependency edge was made.
-            return None
-
-        object_type = ObjectType(str(latest_payload["object_type"]))
-        model = canonical_model_for_object_type(object_type)
-        data = dict(latest_payload)
-        data["revision"] = latest_revision + 1
-        data["learned_at"] = changed_at
-        data["recorded_at"] = changed_at
-        data["status"] = STATUS_REVIEW_REQUIRED
-
-        metadata = dict(data.get("metadata") or {})
-        stale_due_to = list(metadata.get("stale_due_to_refs") or [])
-        marker = {
-            "object_id": changed_ref.object_id,
-            "revision": changed_ref.revision,
-        }
-        if marker not in stale_due_to:
-            stale_due_to.append(marker)
-        metadata.update(
-            {
-                "stale_due_to_refs": stale_due_to,
-                "stale_reason": reason,
-                "stale_at": changed_at.isoformat(),
-            }
-        )
-        data["metadata"] = metadata
-
-        if object_type is ObjectType.EVIDENCE_SET:
-            data["stale"] = True
-        if object_type is ObjectType.SUMMARY:
-            data["summary_status"] = SummaryStatus.STALE.value
-
-        return model.model_validate(data)
-
     def apply(
         self,
         request: ClaimRevisionRequest,
@@ -192,6 +136,7 @@ class CognitionRevisionService:
         changed_at: datetime,
     ) -> ClaimRevisionReceipt:
         changed = as_utc(changed_at, "changed_at")
+        current_world_revision = int(self.store.current_world_revision())
         target = request.target_ref
         old_payload = self.store.get_payload(
             target.object_id,
@@ -254,7 +199,6 @@ class CognitionRevisionService:
                 operation=f"cognition_revision.{request.mode}:counter_evidence",
             )
 
-        current_world_revision = int(self.store.current_world_revision())
         evidence_set_id = _stable_id(
             "evs_revision",
             target.object_id,
@@ -485,51 +429,14 @@ class CognitionRevisionService:
                 )
             )
 
-        dependencies = self._current_dependencies()
-        impacted = collect_impacted_dependents(
-            dependencies,
-            target,
-            transitive=True,
+        invalidation = plan_invalidation(
+            self.store, changed_ref=target, changed_at=changed,
+            reason=f"upstream Claim {target.object_id}@{target.revision} was {request.mode}d: {request.reason.strip()}",
+            subject_ids=tuple(self.evidence_subject_ids | {self.subject_id}),
         )
-        stale_refs: list[tuple[str, int]] = []
-        skipped: list[tuple[str, int]] = []
-
-        for ref in impacted:
-            stale_obj = self._mark_stale(
-                ref,
-                changed_ref=target,
-                changed_at=changed,
-                reason=(
-                    f"upstream Claim {target.object_id}@{target.revision} "
-                    f"was {request.mode}d: {request.reason.strip()}"
-                ),
-            )
-            if stale_obj is None:
-                skipped.append((ref.object_id, int(ref.revision or 0)))
-                continue
-            objects.append(stale_obj)
-            stale_refs.append((ref.object_id, int(ref.revision or 0)))
-            objects.append(
-                Dependency(
-                    object_id=_stable_id(
-                        "dep_stale",
-                        stale_obj.object_id,
-                        stale_obj.revision,
-                        target.object_id,
-                        target.revision,
-                    ),
-                    subject_id=stale_obj.subject_id,
-                    learned_at=changed,
-                    recorded_at=changed,
-                    created_by="cognition_revision:propagation",
-                    dependent_ref=ObjectRef(
-                        object_id=stale_obj.object_id,
-                        revision=stale_obj.revision,
-                    ),
-                    dependency_ref=target,
-                    dependency_type="stale_due_to_superseded_cognition",
-                )
-            )
+        objects.extend(invalidation.objects)
+        stale_refs = invalidation.stale_refs
+        skipped = invalidation.skipped_refs
 
         operation_key = _stable_id(
             "revision",
