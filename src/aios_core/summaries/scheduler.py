@@ -127,17 +127,20 @@ class MultiScaleSummaryScheduler:
         summary_handler: Callable[[DimensionSummaryInput], str],
         subject_id: str = "user_1",
         max_source_objects: int = 500,
+        source_subject_ids: Sequence[str] | None = None,
         cognitive_derivation_scheduler: CognitiveDerivationScheduler | None = None,
     ) -> None:
         self.store = store
         self.index = index
         self.summary_handler = summary_handler
         self.subject_id = subject_id
+        self.source_subject_ids = tuple(dict.fromkeys((subject_id, *(source_subject_ids or ()))))
         self.service = DimensionSummaryService(
             store=store,
             index=index,
             subject_id=subject_id,
             max_source_objects=max_source_objects,
+            source_subject_ids=self.source_subject_ids,
         )
         self.cognitive_derivation_scheduler = (
             cognitive_derivation_scheduler
@@ -145,6 +148,7 @@ class MultiScaleSummaryScheduler:
                 store=store,
                 index=index,
                 subject_id=subject_id,
+                allowed_subject_ids=self.source_subject_ids,
             )
         )
 
@@ -153,8 +157,12 @@ class MultiScaleSummaryScheduler:
 
         return self.cognitive_derivation_scheduler.reconcile()
 
+    def _source_payloads(self) -> list[dict]:
+        return [payload for subject in self.source_subject_ids
+                for payload in self.store.list_payloads(subject_id=subject)]
+
     def active_dimensions(self) -> tuple[str, ...]:
-        payloads = self.store.list_payloads(subject_id=self.subject_id)
+        payloads = self._source_payloads()
         terminal = {"merged", "split", "rejected", "archived"}
         terminal_keys: set[str] = set()
         active_definition_keys: set[str] = set()
@@ -219,7 +227,7 @@ class MultiScaleSummaryScheduler:
     ) -> tuple[tuple[datetime, datetime], ...]:
         current_start, _ = window_bounds(now, scale)
         windows: set[tuple[datetime, datetime]] = set()
-        for payload in self.store.list_payloads(subject_id=self.subject_id):
+        for payload in self._source_payloads():
             object_type = str(payload.get("object_type") or "")
             if derive_dimension(payload, object_type) != dimension:
                 continue
@@ -272,7 +280,8 @@ class MultiScaleSummaryScheduler:
 
     def _unchanged(self, prepared: DimensionSummaryInput) -> bool:
         latest = self._matching_current_summary(prepared)
-        if latest is None:
+        if (latest is None or latest.get("summary_status") != "current"
+                or latest.get("status", "active") != "active"):
             return False
         existing = tuple(
             (str(item.get("object_id")), int(item.get("revision") or 0))

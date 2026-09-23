@@ -1,0 +1,39 @@
+{
+  "date_local": "2026-09-24",
+  "branch": "arena/01a0cf7f-haneof-aios-core-v3-0",
+  "base_commit": "849bfd41c623fb336b392a3e6e933cfad93620e9",
+  "validation": {
+    "counts": {
+      "tests": 507,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "new_positive_cases": 42,
+    "checkout_existing_cases": 367,
+    "old_preflight_compatibility_cases": 98,
+    "old_preflight_source_sha": "2aae7a6f771276a6c2ccff212d7e5ff586804873",
+    "core_under_test": "checkout modified src, NOT immutable exported Core",
+    "synthetic_only": true,
+    "release_approval": false,
+    "latest_pr125_operator_tested": false
+  },
+  "sha256": {
+    "reviews/AIOS_CONSTITUTION_FIXES_2026-09-24/HANDOFF.md": "3e6bf046b0ca21e09d9c7fff72e97ed87b4b92aa44b56d927e6e75edcc5ac96d",
+    "reviews/AIOS_CONSTITUTION_FIXES_2026-09-24/results.xml": "2d7fdc7d60e914d2f103fd1df150bd57c7080e5b0913a53dd2d541f079828b69",
+    "reviews/AIOS_CONSTITUTION_FIXES_2026-09-24/validation.txt": "70a54916041dd2e28a54d6a3c973b6a4e3baa0aab9c52c90fc9500ed3b44e8db",
+    "src/aios_core/dependency/graph.py": "5d3fae870f4962e0e7e06c6ed9e87a221e58b2aa044e254d643b34127c2ce254",
+    "src/aios_core/events/service.py": "aee307a7f5dd348c4b9cdd6cb7c6c9bd1cb1f16c6fd69527d44184ee465f6885",
+    "src/aios_core/policy/service.py": "a025baacba1dc16ffc1bb2c5f2f6df6f74e5a89a29bf1746ebd88dedec50055a",
+    "src/aios_core/query/search.py": "1d346c75889b413b0fb3ebc55be5503f404dd7a0d15f09469fdc6dbd4b16614f",
+    "src/aios_core/revision/propagation.py": "b45cdab5bb11d26feee07821b3741a40ad810249429c9e24f550e49e2da71c52",
+    "src/aios_core/revision/service.py": "5f0030dfa45a1cc4cf98dde6238bea878daf989daf39c43bc489e5867ab4c2dd",
+    "src/aios_core/runtime/__init__.py": "0af84c7a6db8ddb575fcadb8f2d67e32adf9e4c067d055e69c885bb57e7b0581",
+    "src/aios_core/runtime/turn_execution.py": "da4958a971ee9e6cbd99b1786433e772b7353d85ee0dedf47a5a70906c2d1c29",
+    "src/aios_core/runtime/turn_runtime.py": "0bdab28eafad8f1b7d390257837df61b0765e6045cc1a307bad827a2e90444e5",
+    "src/aios_core/storage/sqlite_store.py": "5d9dc849f76b706edaaa0de5372f9746af126dc00869a5b5ef4a22284b1a6a21",
+    "src/aios_core/summaries/dimension_summary.py": "0f0a66a92640ac8c439257b7806f1bb38e0c0811a581f55b9061b58288b47c15",
+    "src/aios_core/summaries/scheduler.py": "1cbb82053d5d3e6b7d86a27ff5288df5a7f870cbee6bf5ec0679613753b5a360",
+    "tests/integration/test_v3_audit_bugfixes.py": "339e7dba59e0469672ff5722fb32a6b5da469041190f3ae4106944c19d618aa4"
+  }
+}

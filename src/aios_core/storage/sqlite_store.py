@@ -554,14 +554,20 @@ class SQLiteWorldStore:
             ).fetchall()
         return [dict(row) for row in rows]
 
-    def revisions_after(self, world_revision: int, *, limit: int = 5000) -> list[dict]:
+    def revisions_after(
+        self, world_revision: int, *, limit: int = 5000, complete_commits: bool = False
+    ) -> list[dict]:
         """Replay surface for rebuildable projections (search index, hot cards).
 
         Delivers every object revision committed after ``world_revision`` in
         commit order. Projections must never scan the whole object table to
-        stay fresh.
+        stay fresh. With ``complete_commits=True``, ``limit`` is a soft row
+        target: the boundary commit is returned in full, even when a single
+        commit exceeds the target. The default retains the bounded row API.
         """
 
+        if type(limit) is not int or limit < 1:
+            raise ValueError("limit must be a positive integer")
         with self._connection() as conn:
             rows = conn.execute(
                 """
@@ -573,6 +579,20 @@ class SQLiteWorldStore:
                 """,
                 (world_revision, limit),
             ).fetchall()
+            if complete_commits and len(rows) == limit:
+                # A World commit is immutable once visible. Complete the last
+                # group rather than advertising a watermark across a partial cut.
+                # limit is a soft batching target in this explicitly opted-in mode.
+                last = rows[-1]
+                rows.extend(conn.execute(
+                    """
+                    SELECT world_revision, object_id, revision, object_type, subject_id, payload_json
+                    FROM object_revisions
+                    WHERE world_revision = ? AND (object_id, revision) > (?, ?)
+                    ORDER BY object_id, revision
+                    """,
+                    (last["world_revision"], last["object_id"], last["revision"]),
+                ).fetchall())
         return [dict(row) for row in rows]
 
     def current_world_revision(self) -> int:

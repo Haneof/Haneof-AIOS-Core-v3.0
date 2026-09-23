@@ -12,6 +12,8 @@ from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 from typing import Any, Callable, Mapping, Sequence
 
+from .turn_execution import TurnExecutionStore
+
 from aios_core.ai_world import (
     AI_SELF_SUBJECT_ID,
     AIWorldClaimRequest,
@@ -76,7 +78,7 @@ from aios_core.summaries import (
 )
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 from aios_core.contracts.refs import ObjectRef
-from aios_core.contracts.time import TemporalExtent
+from aios_core.contracts.time import TemporalExtent, canonical_utc_iso
 from aios_core.contracts.enums import AttentionClass, ObjectType, PolicyClass, WakeSource
 from aios_core.wake import (
     AttentionRouter,
@@ -182,6 +184,7 @@ class FusedTurnRuntime:
         self.index = index
         self.subject_id = subject_id.strip()
         self.ingestor = ConversationIngestor(store, subject_id=self.subject_id)
+        self.turn_executions = TurnExecutionStore(store.db_path)
         self.continuity = ConversationContinuityService(
             store=store,
             index=index,
@@ -228,6 +231,7 @@ class FusedTurnRuntime:
             store=store,
             index=index,
             subject_id=subject_id,
+            evidence_subject_ids=(self.subject_id, self.ai_world.ai_subject_id),
             evidence_policy=self.evidence_policy,
         )
         self.world_graph = EntityRelationService(
@@ -249,6 +253,7 @@ class FusedTurnRuntime:
             store=store,
             index=index,
             subject_id=subject_id,
+            propagation_subject_ids=(self.subject_id, self.ai_world.ai_subject_id),
         )
         self.communication_experience = CommunicationExperienceService(
             store=store,
@@ -268,6 +273,7 @@ class FusedTurnRuntime:
                 index=index,
                 summary_handler=dimension_summary_handler,
                 subject_id=subject_id,
+                source_subject_ids=(self.subject_id, self.ai_world.ai_subject_id),
             )
         )
         self.periodic_review = PeriodicReviewService(
@@ -2144,7 +2150,8 @@ class FusedTurnRuntime:
 
         if limit < 1:
             raise ValueError("policy context limit must be >= 1")
-        items = list(self.policies.list_current())
+        items = [item for item in self.policies.list_current()
+                 if self.policies.is_effective(item)]
         values: dict[str, Any] = {}
         records: list[dict[str, Any]] = []
         for item in items[:limit]:
@@ -2669,6 +2676,17 @@ class FusedTurnRuntime:
                 "an externally maintained conversation history"
             )
 
+        if type(turn_index) is not int or turn_index < 1:
+            raise ValueError("turn_index must be a positive integer")
+        if not isinstance(user_input, str):
+            raise ValueError("user_input must be text")
+        occurred_iso = canonical_utc_iso(occurred_at, "occurred_at")
+        _, _, assistant_id = self.ingestor._turn_identity(session, turn_index)
+        self.turn_executions.claim(
+            subject_id=self.subject_id, session_id=session, turn_index=turn_index,
+            user_input=user_input, occurred_at=occurred_iso, assistant_id=assistant_id,
+        )
+
         self.attention_watches.expire_due(now=occurred_at)
 
         # The current user utterance enters the world before model inference. The
@@ -2882,6 +2900,9 @@ class FusedTurnRuntime:
                 summary_error = f"{type(exc).__name__}: {exc}"
 
         self.index.catch_up()
+        self.turn_executions.complete(
+            subject_id=self.subject_id, session_id=session, turn_index=turn_index,
+        )
         return FusedTurnResult(
             runtime=runtime_result,
             recommendation=recommendation,
