@@ -10,6 +10,7 @@ import argparse
 import hashlib
 import json
 import os
+import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
@@ -17,11 +18,17 @@ from pathlib import Path
 
 POSITIVE_MODULE = "test_v3_audit_bugfixes"
 PREFLIGHT_MODULES = frozenset({
-    "test_c15_operator_preflight", "test_driver", "test_round3_fixes", "test_round4_fixes",
+    "test_c15_operator_preflight", "test_driver", "test_round3_fixes",
+    "test_round4_fixes", "test_round5_fixes",
 })
 ISOLATION_CASE = "test_isolation_probe_execution_result"
+REAL_A_CASE = "test_real_a_copy_mechanical_import_not_tested_or_verified"
+INTEGRATED_BASE_SHA = "76112ca0bb70bd4cdde2a62dee8deb7a7810a370"
 MINIMUM_CORE_CASES = 409  # 367 pre-existing + 42 positive A01-A10 regressions
-MINIMUM_PREFLIGHT_CASES = 108  # PR125's reviewed synthetic test tree
+# Specified PR125 head adds 18 public round5 cases to the prior 108; the exact
+# collected count is still printed from JUnit. Do not accept the old 108 alone.
+MINIMUM_PREFLIGHT_CASES = 126
+MINIMUM_ROUND5_CASES = 18
 
 
 @dataclass(frozen=True)
@@ -53,7 +60,9 @@ class Decision:
     errors: tuple[str, ...]
     core_count: int
     preflight_count: int
+    round5_count: int
     synthetic_isolation: str
+    real_a_import: str = "NOT_TESTED/BLOCKED / REAL A NOT ACCESSED"
     resident_isolation: str = "BLOCKED / REAL RESOURCES NOT_TESTED"
 
     @property
@@ -121,29 +130,49 @@ def evaluate(report: Report, *, mode: str, pytest_exit: int) -> Decision:
         errors.append("the Core-only run included unexpected test modules")
 
     preflight = [case for case in report.cases if case.module in PREFLIGHT_MODULES]
+    round5 = [case for case in preflight if case.module == "test_round5_fixes"]
     synthetic_isolation = "NOT_RUN" if mode == "core" else "NOT_TESTED/BLOCKED"
     if mode == "full":
         if len(preflight) < MINIMUM_PREFLIGHT_CASES:
             errors.append(f"synthetic preflight coverage shrank: {len(preflight)} < {MINIMUM_PREFLIGHT_CASES}")
+        if len(round5) < MINIMUM_ROUND5_CASES:
+            errors.append(f"reviewed PR125 round5 coverage shrank: {len(round5)} < {MINIMUM_ROUND5_CASES}")
         probes = [case for case in preflight if case.name == ISOLATION_CASE
                   and case.module == "test_round4_fixes"]
         if len(probes) != 1:
             errors.append("the round4 synthetic isolation probe was not executed exactly once")
         elif probes[0].outcome == "passed":
             synthetic_isolation = "SYNTHETIC_CANARY_PASS_ONLY"
-        # A skip/failure leaves the synthetic proof NOT_TESTED/BLOCKED even when
-        # every other mechanical test passes. Real Resident isolation is *always*
-        # out of scope; its status is never inferred from this test.
-    return Decision(tuple(errors), len(core_scope), len(preflight), synthetic_isolation)
+        real_a = [case for case in round5 if case.name == REAL_A_CASE]
+        if len(real_a) != 1:
+            errors.append("round5 real-A mechanical test was not collected exactly once")
+        # The PR125 test prints NOT_TESTED and returns normally when real A is
+        # absent. Even a JUnit 'passed' result is NOT evidence of real A import.
+        # No private A is read by this synthetic receipt; real A stays BLOCKED.
+        # A probe skip/failure never becomes a synthetic isolation PASS either.
+    return Decision(tuple(errors), len(core_scope), len(preflight), len(round5), synthetic_isolation)
 
 
-def exact_receipt(report: Report, decision: Decision, *, mode: str) -> dict[str, object]:
-    """Publish exact numbers as an Actions annotation even if logs are unavailable."""
+def verify_checkout(repo: Path) -> str:
+    """Reject GitHub's moving base merge-ref; attest to this one PR125 base."""
+    head = subprocess.check_output(["git", "-C", str(repo), "rev-parse", "HEAD"], text=True).strip()
+    intended = os.environ.get("PR_HEAD_SHA")
+    if intended and head != intended:
+        raise ValueError(f"checkout {head} is not the pinned PR head {intended}")
+    if subprocess.run(["git", "-C", str(repo), "merge-base", "--is-ancestor",
+                       INTEGRATED_BASE_SHA, head], check=False, capture_output=True).returncode != 0:
+        raise ValueError(f"checkout does not include the specified PR125 base {INTEGRATED_BASE_SHA}")
+    return head
+
+
+def exact_receipt(report: Report, decision: Decision, *, mode: str, checkout: str = "local") -> dict[str, object]:
+    """Publish exact numbers and proof boundaries, even if logs are unavailable."""
     return {
         "mode": mode,
         "python": sys.version.split()[0],
         "pr_head": os.environ.get("PR_HEAD_SHA", "local"),
-        "checkout": os.environ.get("GITHUB_SHA", "local"),
+        "checkout": checkout,
+        "integrated_base": INTEGRATED_BASE_SHA,
         "tests": len(report.cases),
         "passed": len(report.cases) - report.failures - report.errors - report.skipped,
         "failures": report.failures,
@@ -152,7 +181,9 @@ def exact_receipt(report: Report, decision: Decision, *, mode: str) -> dict[str,
         "a01_a10": sum(case.module == POSITIVE_MODULE for case in report.cases),
         "core": decision.core_count,
         "preflight": decision.preflight_count,
+        "round5": decision.round5_count,
         "synthetic_isolation": decision.synthetic_isolation,
+        "real_a_import": decision.real_a_import,
         "resident_isolation": decision.resident_isolation,
     }
 
@@ -172,17 +203,19 @@ def main() -> int:
     try:
         if sys.version_info < (3, 12):
             raise ValueError("Python >=3.12 is required")
-        verify_positive_source(Path.cwd())
+        repo = Path.cwd()
+        checkout = verify_checkout(repo)
+        verify_positive_source(repo)
         report = read_junit(args.junit)
         decision = evaluate(report, mode=args.mode, pytest_exit=args.pytest_exit)
         errors.extend(decision.errors)
-        receipt = exact_receipt(report, decision, mode=args.mode)
+        receipt = exact_receipt(report, decision, mode=args.mode, checkout=checkout)
         print(f"{args.mode.upper()} SYNTHETIC RECEIPT: " + json.dumps(receipt, sort_keys=True))
         print("::notice title=PR126 synthetic receipt::" + _escape(json.dumps(receipt, sort_keys=True)))
         for case in report.cases:
             if case.outcome == "skipped":
                 print(f"SKIP REASON {case.identity}: {case.detail}")
-    except (OSError, ValueError, ET.ParseError, KeyError, TypeError) as exc:
+    except (OSError, ValueError, ET.ParseError, KeyError, TypeError, subprocess.CalledProcessError) as exc:
         errors.append(f"unable to certify public synthetic test receipt: {exc}")
     for error in errors:
         print("::error title=PR126 synthetic gate::" + _escape(error[:650]))
@@ -195,8 +228,9 @@ def main() -> int:
             summary.write(f"- Status: {'BLOCKED' if errors else 'MECHANICAL_PASS_ONLY'}\n")
             if decision:
                 summary.write(f"- A01-A10/Core cases: 42/{decision.core_count}\n")
-                summary.write(f"- Preflight cases: {decision.preflight_count}\n")
+                summary.write(f"- Preflight cases (including round5): {decision.preflight_count} ({decision.round5_count} round5)\n")
                 summary.write(f"- Synthetic isolation: {decision.synthetic_isolation}\n")
+                summary.write(f"- Real A: {decision.real_a_import}; a passing round5 unit test may print NOT_TESTED\n")
                 summary.write(f"- Real Resident isolation: {decision.resident_isolation}\n")
             for error in errors:
                 summary.write(f"- {error}\n")

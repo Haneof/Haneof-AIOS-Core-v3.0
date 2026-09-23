@@ -20,13 +20,22 @@ def _full_cases() -> list[Case]:
     return [*_core_cases(), *[
         Case("test_driver", f"test_synthetic_preflight_{i}", "passed")
         for i in range(107)
-    ], Case("test_round4_fixes", "test_isolation_probe_execution_result", "passed")]
+    ], Case("test_round4_fixes", "test_isolation_probe_execution_result", "passed"), *[
+        Case("tests.preflight.test_round5_fixes", f"test_synthetic_round5_{i}", "passed")
+        for i in range(17)
+    ], Case("tests.preflight.test_round5_fixes",
+            "test_real_a_copy_mechanical_import_not_tested_or_verified", "passed")]
 
 
 def _report(cases: list[Case]) -> Report:
     return Report(tuple(cases), sum(c.outcome == "failure" for c in cases),
                   sum(c.outcome == "error" for c in cases),
                   sum(c.outcome == "skipped" for c in cases))
+
+
+def _probe_index(cases: list[Case]) -> int:
+    return next(i for i, case in enumerate(cases)
+                if case.name == "test_isolation_probe_execution_result")
 
 
 def test_core_gate_requires_all_42_cases_and_never_claims_real_isolation():
@@ -57,8 +66,9 @@ def test_core_gate_preserves_nonzero_pytest_exit_even_with_all_green_xml():
 
 def test_full_gate_treats_environmental_isolation_skip_as_blocked_with_reason():
     cases = _full_cases()
-    cases[-1] = Case(cases[-1].classname, cases[-1].name, "skipped",
-                     "B: probe INCONCLUSIVE (unshare not permitted)")
+    probe = _probe_index(cases)
+    cases[probe] = Case(cases[probe].classname, cases[probe].name, "skipped",
+                        "B: probe INCONCLUSIVE (unshare not permitted)")
     receipt = evaluate(_report(cases), mode="full", pytest_exit=0)
     assert not receipt.passed
     assert receipt.synthetic_isolation == "NOT_TESTED/BLOCKED"
@@ -68,35 +78,52 @@ def test_full_gate_treats_environmental_isolation_skip_as_blocked_with_reason():
 
 def test_full_gate_pass_is_synthetic_only_and_does_not_release_resident():
     receipt = evaluate(_report(_full_cases()), mode="full", pytest_exit=0)
-    assert receipt.passed and receipt.core_count == 409 and receipt.preflight_count == 108
+    assert receipt.passed and receipt.core_count == 409 and receipt.preflight_count == 126
+    assert receipt.round5_count == 18
     assert receipt.synthetic_isolation == "SYNTHETIC_CANARY_PASS_ONLY"
+    assert receipt.real_a_import == "NOT_TESTED/BLOCKED / REAL A NOT ACCESSED"
     assert receipt.resident_isolation == "BLOCKED / REAL RESOURCES NOT_TESTED"
 
 
 def test_exact_receipt_preserves_skip_and_real_resource_block(monkeypatch):
     monkeypatch.setenv("PR_HEAD_SHA", "synthetic-head-sha")
     cases = _full_cases()
-    cases[-1] = Case(cases[-1].classname, cases[-1].name, "skipped", "unshare is blocked")
+    probe = _probe_index(cases)
+    cases[probe] = Case(cases[probe].classname, cases[probe].name, "skipped", "unshare is blocked")
     report = _report(cases)
     decision = evaluate(report, mode="full", pytest_exit=0)
     receipt = exact_receipt(report, decision, mode="full")
-    assert receipt["tests"] == 517 and receipt["passed"] == 516
+    assert receipt["tests"] == 535 and receipt["passed"] == 534
     assert receipt["skipped"] == 1 and receipt["a01_a10"] == 42
-    assert receipt["core"] == 409 and receipt["preflight"] == 108
+    assert receipt["core"] == 409 and receipt["preflight"] == 126 and receipt["round5"] == 18
     assert receipt["synthetic_isolation"] == "NOT_TESTED/BLOCKED"
+    assert receipt["real_a_import"].startswith("NOT_TESTED/BLOCKED")
     assert receipt["resident_isolation"].startswith("BLOCKED")
     assert receipt["pr_head"] == "synthetic-head-sha"
 
 
 def test_full_gate_refuses_missing_probe_and_other_unexpected_skips():
     cases = _full_cases()
-    cases[-1] = Case("test_round4_fixes", "different_test", "passed")
+    probe = _probe_index(cases)
+    cases[probe] = Case("test_round4_fixes", "different_test", "passed")
     assert "not executed exactly once" in " ".join(
         evaluate(_report(cases), mode="full", pytest_exit=0).errors)
-    cases[-1] = _full_cases()[-1]
+    cases[probe] = _full_cases()[probe]
     cases[43] = Case(cases[43].classname, cases[43].name, "skipped", "unrelated skip")
     assert "unrelated skip" in " ".join(
         evaluate(_report(cases), mode="full", pytest_exit=0).errors)
+
+
+def test_full_gate_cannot_mislabel_real_a_not_tested_as_proven():
+    cases = _full_cases()
+    receipt = evaluate(_report(cases), mode="full", pytest_exit=0)
+    assert receipt.passed  # mechanical suite may pass without access to real A
+    assert receipt.real_a_import.startswith("NOT_TESTED/BLOCKED")
+    cases.pop()  # the PR125 real-A test was not even collected
+    blocked = evaluate(_report(cases), mode="full", pytest_exit=0)
+    assert not blocked.passed
+    assert any("real-A mechanical test" in error for error in blocked.errors)
+    assert any("coverage shrank" in error for error in blocked.errors)
 
 
 def test_junit_reader_refuses_inconsistent_declared_counts(tmp_path):

@@ -27,6 +27,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # Pin to PR126 head: GitHub merge-ref otherwise includes later PR125 commits.
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
@@ -48,6 +50,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # Pin to PR126 head: GitHub merge-ref otherwise includes later PR125 commits.
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
