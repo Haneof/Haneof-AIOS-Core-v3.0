@@ -2,11 +2,14 @@ name: real-a-import-312
 # PM 2026-09-24 closure: private A must NOT enter public CI automatically.
 # Previous version triggered on pull_request paths, allowing any PR that touches
 # tools/c15_preflight/** to fetch arena/01a0cca8 branch containing private A.
-# Minimal blocking measure: disable automatic PR trigger, keep only workflow_dispatch.
-# This prevents ordinary PRs from automatically obtaining private A in CI.
+# Minimal blocking measure: disable automatic PR trigger, keep only workflow_dispatch initially.
+# PM stage ruling 2026-09-24 final: real A workflow currently PROHIBITED to continue running.
+# workflow_dispatch is NOT private environment, NOT new authorization.
 # Real A import receipt already obtained (runs 35924742929, 35924990859, 35925311828, 35925861876)
 # is registered as executor measured result, no repeat execution needed.
 # No artifact upload, no cache, no private World content output - only desensitized receipt.
+# Final minimal disabling: set job if: false to prevent any trigger (including manual dispatch)
+# from obtaining real A in public CI. Historical runs preserved.
 on:
   workflow_dispatch:
 # pull_request trigger REMOVED per PM closure to block automatic private A fetch
@@ -19,8 +22,10 @@ permissions:
 jobs:
   real-a-312:
     runs-on: ubuntu-latest
-    # Extra guard: only allow manual dispatch by repository owner/collaborator, not fork PRs
-    if: github.event_name == 'workflow_dispatch'
+    # FINAL DISABLED per PM stage ruling: prohibited to continue running
+    # workflow_dispatch is NOT private environment, NOT authorization
+    # if: false prevents any execution, including manual dispatch
+    if: false
     steps:
       - name: Checkout exact PR head
         uses: actions/checkout@v4
@@ -87,7 +92,6 @@ jobs:
               print(f"verify_core frozen={frozen[:12]}")
           except Exception as e:
               print(f"verify_core failed: {e}")
-              # Try to show untracked
               untracked = subprocess.check_output(["git","ls-files","--others","--exclude-standard","--","src/aios_core"], text=True).strip()
               print(f"untracked Core: {untracked}")
               raise
