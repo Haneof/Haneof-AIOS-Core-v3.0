@@ -14,24 +14,23 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
-## 当前工程断点 — B candidate 未通过；纠偏治理 GATE，实验不得启动
+## 当前工程断点 — 2026-09-24 纠偏治理 DONE；下一唯一 READY = B operator preflight
 
-> PM / operator only。盲测 Resident 不得读取本 checkpoint；只读独立获准的安全启动包。下方所有“历史工程断点”的 READY/下一动作只记录当时状态，不再作为当前任务授权。
+> PM / operator only。盲测 Resident 不读取本 checkpoint。以下历史 READY/下一动作只记录当时状态，不构成当前授权。
 
-- 2026-09-23 reviewed main：`ed07b5890909ae09cb2a0849729662b4235c1e3b`。
-- Canonical frozen Core：`bcd6bf353126318f9a97076b52ec1740d43f35a4`；语义 freeze ACTIVE；该 exact Core 的 19 个 push workflows 均 SUCCESS（历史 GitHub 结果，本窗口未跑测试）。
-- C14 既有闭环 PASS；canonical A #117 @ `3e51f728d7959048b75fea01d405bc837b0e8185` 接受状态和原始 hash 不变。
-- Reviewed B #121 @ `b6e5ac939bef83615292bcf9b9099d76737d82b0`：NOT ACCEPTED。World 97 / index 88；新增 9 条均为输入 Observation；无 B session 计量、原始模型/能力调用轨迹或 restart checkpoint。报告自评 PASS 不替代独立验收。
-- 新 Claim 数量不是 Gate；不足是运行证据与索引交付，而非要求模型制造认知。不据此修改 frozen Core。
-- 处置随纠偏 PR 合入生效：旧 B task FAILED（candidate acceptance），#121 保持 OPEN / UNMERGED / PINNED / NON-CANONICAL；不回填、不覆盖、不传给 C。
-- `C15-RCC-RES-B-CORRECTIVE-001 = GATE / PENDING_MAIN_INTEGRATION`。集成 PM 审查治理/CI，实际合入并写回 DONE 后，唯一下一 READY 为 `C15-RCC-RES-B-PREFLIGHT-001`；当前无获准启动的 Resident 实验。
-- 后续：operator preflight → 独立环境放行 → fresh B → 独立执行证据验收 → 模型身份证明 → C → EVAL → CLOSE；其余均 BLOCKED。
-- R6 可信身份仍不足；PR #120 的 zero-Core-diff 检查 exit 128 仍待 disposition；规模与历史 Issue 状态只登记风险，不形成第二施工队列。
-- 裁决：`governance/C15_RCC_RES_B_CORRECTIVE_DECISION_2026-09-23.md`。
-- 审查：`reviews/C15_RCC_RES_B_001_PM_CORRECTIVE_REVIEW_2026-09-23.md`。
-- PM 风险：`governance/C15_PM_RISK_REGISTER_2026-09-23.md`。
-- 下一窗口分角色说明：`governance/prompts/`。Blind Resident 只接收被独立 release pin 的安全包，不接收这些 PM 提示词或审查结论。
-- 治理 PR：[#122](https://github.com/Haneof/Haneof-AIOS-Core-v3.0/pull/122)，OPEN / 待 PM 自审与集成。真实 merge SHA 与新 CI 由集成 PM 从 GitHub 记录；未合并前不得声称 main 已更新。本窗口没有执行 preflight 或实验。
+- 治理 PR [#122](https://github.com/Haneof/Haneof-AIOS-Core-v3.0/pull/122) 已实际合入 main。
+- Accepted exact head：`bbf45baf2e2a6314483d8355c1ee8badc09aa4a9`；actual merge：`2a68df3f8901138fa3126a91063c430f69102049`。
+- 合并时间：`2026-09-23T16:13:48Z`（2026-09-24 Asia/Shanghai）。审查身份是**原 PM 自审**，不是独立实验/语义评估；未绕过分支保护。
+- `C15-RCC-RES-B-CORRECTIVE-001 = DONE`。本收据状态写回合入后，唯一 READY = **`C15-RCC-RES-B-PREFLIGHT-001`**，仅做 operator 机械预检，不能直接开始 Resident 盲测。
+- 最新 exact-head CI：C15 run `35887196676` SUCCESS；C14 semantic-repair run `35887196757` SUCCESS。无本地测试或 Resident 执行；自动 PR CI 与历史 frozen Core 19 项绿灯分别记录。
+- Frozen Core 不变：`bcd6bf353126318f9a97076b52ec1740d43f35a4`，与已合治理 main 无 Core diff；freeze ACTIVE。
+- C14 既有收口 PASS；canonical A #117 @ `3e51f728d7959048b75fea01d405bc837b0e8185` 不变。
+- 旧 B #121 @ `b6e5ac939bef83615292bcf9b9099d76737d82b0` candidate 验收 FAILED：输入落库不能替代 Runtime 行为证据，World/index 97/88；保留 OPEN / UNMERGED / PINNED / NON-CANONICAL。不是 Core 失败裁决，不要求新 Claim 数量。
+- B 环境放行/盲测/独立验收/模型身份、C/EVAL/CLOSE、C16、广泛 P16、P17 均继续 BLOCKED。
+- 治理普通自审无需再开窗口。真正 fresh-context Resident 和协议要求的独立评估仍必须隔离；本 PM 不能兼任盲测。
+- 合入收据：`governance/C15_RCC_RES_B_CORRECTIVE_INTEGRATION_RECEIPT_2026-09-24.md`。
+- 裁决/审查/风险：`governance/C15_RCC_RES_B_CORRECTIVE_DECISION_2026-09-23.md`、`reviews/C15_RCC_RES_B_001_PM_CORRECTIVE_REVIEW_2026-09-23.md`、`governance/C15_PM_RISK_REGISTER_2026-09-23.md`。
+- 下一任务说明：`governance/prompts/C15_RES_B_OPERATOR_PREFLIGHT_PROMPT_2026-09-23.md`。历史集成提示词已经完成，不重复执行。
 
 ## 历史工程断点 — C15 Resident A canonical PASS；唯一下一 READY = C15-RCC-RES-B-001
 
