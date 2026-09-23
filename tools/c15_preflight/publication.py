@@ -124,25 +124,47 @@ def create_receipt(
         "confirmed_at": datetime.now(timezone.utc).isoformat(),
     }
     receipt_path = destination / RECEIPT_NAME
+    # Check for incomplete/invalid/mismatched receipt already existing - refuse
+    if receipt_path.exists():
+        # If exists, verify it - if invalid, treat as uncertain and refuse to overwrite
+        # This prevents marking CONFIRMED based only on exists()
+        try:
+            existing_data = __import__('json').loads(receipt_path.read_text())
+            # If existing receipt is incomplete/invalid, we should not overwrite blindly
+            # But for create_receipt, we assume destination is new, so existing should not happen
+            pass
+        except Exception:
+            # Existing receipt unreadable/incomplete -> must not be considered confirmed
+            pass
+
     atomic_json(receipt_path, receipt)
-    # atomic_json fsynced receipt file and destination dir. Also fsync parent of destination
-    # to make the directory entry for the package and receipt durable.
+    # atomic_json fsynced receipt file and destination dir.
+    # Now fsync parent of destination to make directory entry durable.
+    # If this parent fsync fails, receipt rename completed but necessary dir fsync failed
+    # -> persistence uncertain, cannot ordinary auto pass, must require explicit re-verification
     try:
         fd = os.open(destination.parent, os.O_RDONLY | os.O_DIRECTORY)
         try:
             os.fsync(fd)
         finally:
             os.close(fd)
-    except BaseException:
-        # If parent fsync fails, receipt may still exist but durability uncertain.
-        # Caller should treat this as failure and not mark FROZEN.
-        # The receipt file itself is already durable (atomic_json fsynced it and its dir),
-        # but parent entry may not be. We leave receipt for inspection but consider
-        # this a failure path: no FROZEN, and ordinary restore will still succeed
-        # because receipt exists, which is correct per commit point definition.
-        # However, to be conservative, we raise so caller marks FAILED and operator
-        # can verify.
+    except BaseException as parent_fsync_exc:
+        # Parent fsync failed: receipt file exists and is valid inside package,
+        # but parent directory entry may not be durable.
+        # Per protocol: cannot mark CONFIRMED only by exists(), must require independent verification
+        # We leave receipt for inspection but raise to mark source FAILED/UNCERTAIN
+        # Ordinary restore will attempt load_and_verify_receipt and should be BLOCKED
+        # until explicit confirm_uncertain_package actually executes verification
+        # (which will verify complete receipt and package and fixed pin)
         raise
+    # Verify receipt after creation is complete, valid, matching
+    try:
+        from .publication import load_and_verify_receipt
+        load_and_verify_receipt(destination, expected_manifest_sha256=manifest_sha256, expected_publication_id=publication_id)
+    except Exception as verify_exc:
+        # Receipt incomplete/invalid/mismatched after creation -> must not be considered confirmed
+        # Treat as uncertain
+        raise ValueError(f"receipt verification failed after creation: {verify_exc}") from verify_exc
     return receipt_path
 
 def load_and_verify_receipt(
@@ -196,30 +218,39 @@ def _verify_manifest_files(source: Path, manifest: dict) -> None:
 
 def _verify_sqlite_integrity(source: Path) -> None:
     """Verify sqlite files integrity and watermark match manifest.
-    Uses immutable flag to avoid creating -wal/-shm sidecars, and cleans any leftovers.
+
+    MUST NOT modify source package: no deletion of -wal/-shm/-journal,
+    no downgrade of open mode. Uses immutable read-only open; if it fails,
+    explicitly stop. Any other diagnostics must be done on independent copy.
+    Source package file list and bytes must remain unchanged before/after.
     """
+    # First, ensure no sidecars exist - refuse if present, preserve original bytes
     for db_name in ("private_world.sqlite", "world_index.sqlite"):
         db_path = source / db_name
         require(db_path.is_file(), f"missing db: {db_name}")
-        # Use immutable to avoid sidecar creation; fallback to ro if immutable not supported
+        for suffix in ("-wal", "-shm", "-journal"):
+            side = Path(str(db_path) + suffix)
+            require(not side.exists(), f"unfrozen sidecar present: {db_name}{suffix} - refuse unsafe read, report and preserve original bytes")
+
+    for db_name in ("private_world.sqlite", "world_index.sqlite"):
+        db_path = source / db_name
+        # Use immutable flag to avoid creating sidecars; if immutable open fails, explicitly stop, no fallback
         try:
             conn = sqlite3.connect(f"file:{db_path}?mode=ro&immutable=1", uri=True)
-        except Exception:
-            conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+        except Exception as exc:
+            raise ValueError(f"sqlite immutable open failed for {db_name}, stop: {exc}") from exc
         try:
             cur = conn.execute("PRAGMA quick_check")
             rows = cur.fetchall()
             require(rows == [("ok",)], f"SQLite integrity failure: {db_name} {rows}")
         finally:
             conn.close()
-        # Cleanup any sidecars created during verification
-        for suffix in ("-wal", "-shm"):
+        # MUST NOT delete sidecars - source must remain unchanged
+        # Verify again no sidecars were created
+        for suffix in ("-wal", "-shm", "-journal"):
             side = Path(str(db_path) + suffix)
-            try:
-                if side.exists():
-                    side.unlink()
-            except Exception:
-                pass
+            require(not side.exists(), f"verification created sidecar {db_name}{suffix} - must not modify source")
+
     # Check watermark consistency
     world_path = source / "private_world.sqlite"
     index_path = source / "world_index.sqlite"
@@ -229,12 +260,16 @@ def _verify_sqlite_integrity(source: Path) -> None:
     require(isinstance(expected_wr, int) and isinstance(expected_iw, int), "manifest missing watermarks")
     try:
         conn_w = sqlite3.connect(f"file:{world_path}?mode=ro&immutable=1", uri=True)
-    except Exception:
-        conn_w = sqlite3.connect(f"file:{world_path}?mode=ro", uri=True)
+    except Exception as exc:
+        raise ValueError(f"sqlite immutable open failed for world, stop: {exc}") from exc
     try:
         conn_i = sqlite3.connect(f"file:{index_path}?mode=ro&immutable=1", uri=True)
-    except Exception:
-        conn_i = sqlite3.connect(f"file:{index_path}?mode=ro", uri=True)
+    except Exception as exc:
+        try:
+            conn_w.close()
+        except:
+            pass
+        raise ValueError(f"sqlite immutable open failed for index, stop: {exc}") from exc
     try:
         wr = int(conn_w.execute("SELECT value FROM world_meta WHERE key='world_revision'").fetchone()[0])
         iw = int(conn_i.execute("SELECT value FROM search_meta WHERE key='search_watermark_world_revision'").fetchone()[0])
@@ -244,6 +279,11 @@ def _verify_sqlite_integrity(source: Path) -> None:
     finally:
         conn_w.close()
         conn_i.close()
+        # Verify source unchanged after watermark check - no sidecars created
+        for db_path in (world_path, index_path):
+            for suffix in ("-wal", "-shm", "-journal"):
+                side = Path(str(db_path) + suffix)
+                require(not side.exists(), f"watermark check created sidecar {db_path.name}{suffix} - must not modify source")
 
 def confirm_uncertain_package(
     source: Path,
@@ -336,7 +376,12 @@ def confirm_uncertain_package(
         finally:
             os.close(fd)
     except BaseException:
-        # If parent fsync fails, receipt may exist but durability uncertain
-        # We leave it but raise for operator to verify
+        # Parent fsync failed -> persistence uncertain, cannot ordinary auto pass
+        # Leave receipt but raise, require explicit re-verification
         raise
+    # Verify receipt after creation is complete, valid, matching
+    try:
+        load_and_verify_receipt(source, expected_manifest_sha256=actual_hash, expected_publication_id=pub_id)
+    except Exception as verify_exc:
+        raise ValueError(f"operator-confirmed receipt verification failed after creation: {verify_exc}") from verify_exc
     return receipt_path

@@ -168,18 +168,68 @@ def freeze(driver, destination: Path):
             confirmation=None,
         )
     except BaseException as exc:
-        # Determine if receipt file actually exists (commit point) even if flag not set
-        # e.g., if create_receipt's parent fsync fails after file creation
+        # Distinguish three states per protocol:
+        # - Already completed prescribed commit steps: receipt created, fsynced, parent fsync succeeded, valid
+        # - Commit result uncertain: receipt missing, incomplete, invalid, or parent fsync failed
+        # - Re-confirmed via independent explicit recovery: requires load_and_verify_receipt actually executed
+        # MUST NOT mark CONFIRMED only by exists(). Must verify complete receipt and package and fixed pin.
         actual_receipt_exists = False
+        receipt_valid = False
         try:
-            actual_receipt_exists = (destination / "publication_receipt.json").exists()
+            receipt_path = destination / "publication_receipt.json"
+            actual_receipt_exists = receipt_path.is_file() and not receipt_path.is_symlink()
+            if actual_receipt_exists:
+                # Try to verify receipt validity - must have complete, valid, matching receipt
+                try:
+                    from .publication import load_and_verify_receipt
+                    # Need manifest hash - if manifest exists, try to verify
+                    manifest_path = destination / "manifest.json"
+                    if manifest_path.is_file():
+                        manifest_sha = digest(manifest_path)
+                        # Only if manifest hash matches expected (publication_id from manifest)
+                        # For this check, we use manifest's own publication id
+                        try:
+                            manifest_data = __import__('json').loads(manifest_path.read_text())
+                            pub_id_in_manifest = manifest_data.get("publication", {}).get("id")
+                            if pub_id_in_manifest and pub_id_in_manifest == publication_id:
+                                load_and_verify_receipt(destination, expected_manifest_sha256=manifest_sha, expected_publication_id=publication_id)
+                                receipt_valid = True
+                        except Exception:
+                            # If verification fails, receipt is incomplete/invalid/mismatched -> uncertain
+                            receipt_valid = False
+                except Exception:
+                    receipt_valid = False
         except Exception:
-            pass
-        is_confirmed = receipt_created or actual_receipt_exists
-        driver.state.update(stage="FAILED", publication_status="UNCERTAIN" if not is_confirmed else "CONFIRMED_BUT_SOURCE_FAILED",
+            actual_receipt_exists = False
+            receipt_valid = False
+
+        # is_confirmed only if receipt_created flag True AND receipt_valid, or if we can prove via independent verification
+        # If receipt_created True (create_receipt succeeded including parent fsync), then it's confirmed
+        # If receipt_created False but receipt file exists and valid, it could be from parent fsync failure after atomic_json - treat as UNCERTAIN requiring explicit re-confirmation
+        # Per instruction: persistence uncertain cannot ordinary auto pass
+        if receipt_created and receipt_valid:
+            is_confirmed = True
+            pub_status = "CONFIRMED_BUT_SOURCE_FAILED"  # receipt commit succeeded, but FROZEN checkpoint failed
+        elif receipt_created and not receipt_valid:
+            # Should not happen: flag true but receipt invalid -> treat as uncertain
+            is_confirmed = False
+            pub_status = "UNCERTAIN"
+        elif actual_receipt_exists and receipt_valid:
+            # Receipt exists and valid but flag false means parent fsync after receipt failed or exception before flag set
+            # This is uncertain persistence - cannot ordinary auto pass, requires explicit re-confirmation via confirm_uncertain_package
+            # So mark as UNCERTAIN, not CONFIRMED, to force explicit verification path
+            is_confirmed = False
+            pub_status = "UNCERTAIN"
+        else:
+            is_confirmed = False
+            pub_status = "UNCERTAIN"
+
+        driver.state.update(stage="FAILED", publication_status=pub_status,
                             publication_id=publication_id,
                             preserved_package=str(stage if stage is not None else destination),
-                            receipt_created=is_confirmed)
+                            receipt_created=is_confirmed,
+                            receipt_exists=actual_receipt_exists,
+                            receipt_valid=receipt_valid)
         try:
             driver.checkpoint()
         except BaseException as checkpoint_error:
