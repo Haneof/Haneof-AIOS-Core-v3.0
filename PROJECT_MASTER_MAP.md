@@ -17,7 +17,7 @@
 - P0–P15：已形成 Core 机制与阶段 Gate；不等于真实设备产品集成或长期模型认知已全面通过。
 - C14：已正式 PASS；C15 hardening：已冻结；canonical A：#117 已接受。
 - B：#121 已提交但当前 candidate **NOT ACCEPTED**（执行证据不足、最终索引落后）；不是“尚无人执行”，也不是“报告写 PASS 所以完成”。
-- 当前治理工作：`C15-RCC-RES-B-CORRECTIVE-001 = GATE`；裁决、导航与队列待独立集成。**未合入前不启动实验；合入并写回后唯一下一 READY 是 operator preflight，而非 Resident B/C。**
+- 当前治理工作：`C15-RCC-RES-B-CORRECTIVE-001 = GATE`；裁决、导航与队列待 PM 自审与集成。**未合入前不启动实验；合入并写回后唯一下一 READY 是 operator preflight，而非 Resident B/C。**
 - 纠偏裁决：`governance/C15_RCC_RES_B_CORRECTIVE_DECISION_2026-09-23.md`；审查证据：`reviews/C15_RCC_RES_B_001_PM_CORRECTIVE_REVIEW_2026-09-23.md`。
 - C15 C/EVAL/CLOSE、C16、广泛 P16 及 P17 均未放行。机械 CI SUCCESS、运行报告、自评 PASS、独立证据接受与语义 VALID 必须分开。
 

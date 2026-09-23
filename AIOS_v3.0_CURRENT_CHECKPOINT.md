@@ -24,14 +24,14 @@
 - Reviewed B #121 @ `b6e5ac939bef83615292bcf9b9099d76737d82b0`：NOT ACCEPTED。World 97 / index 88；新增 9 条均为输入 Observation；无 B session 计量、原始模型/能力调用轨迹或 restart checkpoint。报告自评 PASS 不替代独立验收。
 - 新 Claim 数量不是 Gate；不足是运行证据与索引交付，而非要求模型制造认知。不据此修改 frozen Core。
 - 处置随纠偏 PR 合入生效：旧 B task FAILED（candidate acceptance），#121 保持 OPEN / UNMERGED / PINNED / NON-CANONICAL；不回填、不覆盖、不传给 C。
-- `C15-RCC-RES-B-CORRECTIVE-001 = GATE / PENDING_MAIN_INTEGRATION`。独立集成 PM 审查治理/CI，实际合入并写回 DONE 后，唯一下一 READY 为 `C15-RCC-RES-B-PREFLIGHT-001`；当前无获准启动的 Resident 实验。
+- `C15-RCC-RES-B-CORRECTIVE-001 = GATE / PENDING_MAIN_INTEGRATION`。集成 PM 审查治理/CI，实际合入并写回 DONE 后，唯一下一 READY 为 `C15-RCC-RES-B-PREFLIGHT-001`；当前无获准启动的 Resident 实验。
 - 后续：operator preflight → 独立环境放行 → fresh B → 独立执行证据验收 → 模型身份证明 → C → EVAL → CLOSE；其余均 BLOCKED。
 - R6 可信身份仍不足；PR #120 的 zero-Core-diff 检查 exit 128 仍待 disposition；规模与历史 Issue 状态只登记风险，不形成第二施工队列。
 - 裁决：`governance/C15_RCC_RES_B_CORRECTIVE_DECISION_2026-09-23.md`。
 - 审查：`reviews/C15_RCC_RES_B_001_PM_CORRECTIVE_REVIEW_2026-09-23.md`。
 - PM 风险：`governance/C15_PM_RISK_REGISTER_2026-09-23.md`。
 - 下一窗口分角色说明：`governance/prompts/`。Blind Resident 只接收被独立 release pin 的安全包，不接收这些 PM 提示词或审查结论。
-- 治理 PR：[#122](https://github.com/Haneof/Haneof-AIOS-Core-v3.0/pull/122)，OPEN / 待独立集成。真实 merge SHA 与新 CI 由集成 PM 从 GitHub 记录；未合并前不得声称 main 已更新。本窗口没有执行 preflight 或实验。
+- 治理 PR：[#122](https://github.com/Haneof/Haneof-AIOS-Core-v3.0/pull/122)，OPEN / 待 PM 自审与集成。真实 merge SHA 与新 CI 由集成 PM 从 GitHub 记录；未合并前不得声称 main 已更新。本窗口没有执行 preflight 或实验。
 
 ## 历史工程断点 — C15 Resident A canonical PASS；唯一下一 READY = C15-RCC-RES-B-001
 

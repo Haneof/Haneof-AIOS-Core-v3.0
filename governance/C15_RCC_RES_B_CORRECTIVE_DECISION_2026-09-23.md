@@ -11,6 +11,12 @@ This is one governance/acceptance task authorized by the project owner. It updat
 
 **Integration barrier:** this decision and its queue changes become authoritative only when the governance PR containing this file is merged into `main`. An unmerged branch, chat message or prepared prompt does not release a new experiment. Until integration, treat this as a proposed corrective decision; do not start another B run using the obsolete READY row. After integration, select work from the live-main board.
 
+### 2026-09-24 owner-requested process clarification
+
+Routine governance-document review and integration may be performed by the authoring PM in this same window. This is **PM self-review**, not independent review. A new AI window is not a prerequisite for merging maps, task status and this ruling. The previous request for an independent integration window was unnecessary and is withdrawn. Check exact scope, evidence, current PR CI and actual merge result; respect branch protection and never use an administrator bypass. If protection requires another approval, report that real requirement rather than inventing a process gate.
+
+This clarification does not relax fresh-context blindness, independence from the experiment implementer where explicitly required, Resident evidence acceptance, or C15 independent semantic evaluation. Do not treat self-review of this governance PR as any of those experiments or verdicts. Integration and its status receipt remain the same governance task, not permission to execute the next task.
+
 Reviewed live main: `ed07b5890909ae09cb2a0849729662b4235c1e3b`.
 
 - Frozen Core: `bcd6bf353126318f9a97076b52ec1740d43f35a4`.
