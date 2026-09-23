@@ -8,19 +8,21 @@
 
 ---
 
-## 0. 当前 PM 快照 — 2026-09-23 B candidate 纠偏（治理集成门禁）
+## 0. 当前 PM 快照 — 2026-09-24 治理已合入，唯一 READY = B operator preflight
 
-**仅供 PM / 工程 / operator 阅读；盲测 Resident 不得读取本板或项目 checkpoint。** 盲测角色必须使用经独立放行的安全包，不能执行下方通用仓库恢复步骤。Operator 与 PM 仍必须遵守本板。
+**仅供 PM / 工程 / operator 阅读；盲测 Resident 不得读取本板或项目 checkpoint。** 盲测角色只接收独立获准的安全包，不能执行下方通用仓库恢复步骤。
 
-- Reviewed main：`ed07b5890909ae09cb2a0849729662b4235c1e3b`；frozen Core：`bcd6bf353126318f9a97076b52ec1740d43f35a4`（语义冻结继续 ACTIVE）。
-- C14 已正式 PASS；canonical A 为 PR #117 @ `3e51f728d7959048b75fea01d405bc837b0e8185`，接受状态不变。
-- B PR #121 @ `b6e5ac939bef83615292bcf9b9099d76737d82b0` 的当前交付未通过 PM execution-evidence 验收。保留 OPEN / UNMERGED / PINNED / NON-CANONICAL；不得初始化 C 或覆盖旧证据。
-- 裁决：`governance/C15_RCC_RES_B_CORRECTIVE_DECISION_2026-09-23.md`；证据：`reviews/C15_RCC_RES_B_001_PM_CORRECTIVE_REVIEW_2026-09-23.md`。
-- **本次纠偏治理状态 = GATE，尚不能声称已合入 main。当前没有可启动的 Resident 实验。** 先由集成 PM 审查治理 PR 与其 CI；实际合入并将纠偏任务写回 DONE 后，只释放 `C15-RCC-RES-B-PREFLIGHT-001` 为唯一 READY。
-- 此分支中的候选处置/队列变更在治理 PR 合入 main 后生效；合入前旧 main 的 B=READY 不能作为重复开跑授权。下一窗口首先核对是否已有更新的治理裁决。
-- B 环境预检 → 独立放行 → fresh B → 独立接受 → 模型身份证明 → C → EVAL → CLOSE；C16 / broad P16 / P17 继续 BLOCKED。
-- 非盲角色提示词：`governance/prompts/`；盲测提示词仅由独立放行 PM 交付，不含本板或审查报告。
-- 风险登记：`governance/C15_PM_RISK_REGISTER_2026-09-23.md`，不是第二施工队列。
+- 治理 PR [#122](https://github.com/Haneof/Haneof-AIOS-Core-v3.0/pull/122) 已合入，真实 merge SHA：`2a68df3f8901138fa3126a91063c430f69102049`。
+- 实际审查身份：**原 PM 自审**，不是独立语义评估。普通治理文档集成无需另开 AI 窗口；正常 CI/分支保护仍必须遵守，盲测与协议要求的独立评估不豁免。
+- `C15-RCC-RES-B-CORRECTIVE-001 = DONE`；**唯一下一 READY = `C15-RCC-RES-B-PREFLIGHT-001`**。本状态写回随收据 PR 合入生效，未合入的工作分支不能释放实验。
+- Canonical frozen Core：`bcd6bf353126318f9a97076b52ec1740d43f35a4`；与已合入治理的 Core tree 无差异，语义 freeze ACTIVE。
+- C14 已 PASS；canonical A #117 @ `3e51f728d7959048b75fea01d405bc837b0e8185` 已接受且未改。
+- 旧 B #121 @ `b6e5ac939bef83615292bcf9b9099d76737d82b0` 当前 candidate 验收 FAILED；OPEN / UNMERGED / PINNED / NON-CANONICAL，不得用于初始化 C。
+- 下一任务只做 operator 机械预检；**盲测 B 仍 BLOCKED**，需经过环境预检与独立放行。C/EVAL/CLOSE、C16、广泛 P16、P17 继续 BLOCKED。
+- 治理合入收据：`governance/C15_RCC_RES_B_CORRECTIVE_INTEGRATION_RECEIPT_2026-09-24.md`。
+- 裁决：`governance/C15_RCC_RES_B_CORRECTIVE_DECISION_2026-09-23.md`；审查：`reviews/C15_RCC_RES_B_001_PM_CORRECTIVE_REVIEW_2026-09-23.md`。
+- 操作员提示词：`governance/prompts/C15_RES_B_OPERATOR_PREFLIGHT_PROMPT_2026-09-23.md`。历史 PM 集成提示词已完成，不再开重复审查窗口。
+- 风险登记不是第二施工队列；#120 历史 CI 异常仍有记录，本次绿灯不抹去旧失败。
 
 ---
 
@@ -114,8 +116,8 @@
 | 29.3 | `C15-RCC-RES-A-REPAIR-DECISION-001` | Core 修复后由独立 PM 决定 Resident A evidence 的恢复路径：可验证的纯机械 historical persistence，或 fresh World 重跑 Resident A | **DONE** | C15-RCC-WAKE-DELIVERY-FIX-001 | `reviews/C15_RCC_RES_A_REPAIR_DECISION_2026-09-22.md`; PR #101 exact diagnostic evidence; fixed Core @ `41f2a5da2153c55b137741fdd71983eea2a011f7` | `PATH A = REJECTED`; `PATH B = REQUIRED`. Corrected history changes actual summary/review source sets during Phase A, so old semantic outputs are not historical-equivalent. |
 | 29.4 | `C15-RCC-RES-A-RERUN-001` | 在 frozen Core 上使用 frozen C15 fixture，从 fresh private World / fresh session 重新执行 Phase A cursor 1..13；必须由新的真实 Resident A 窗口逐事件生活 | **DONE** | C15-RCC-RES-A-REPAIR-DECISION-001 | PR #117 @ `3e51f728d7959048b75fea01d405bc837b0e8185` remains OPEN / UNMERGED / PINNED; canonical Core anchor `bcd6bf353126318f9a97076b52ec1740d43f35a4`; `governance/C15_FINAL_RELEASE_DECISION_2026-09-23.md` | Independent acceptance PASS: cursor 1..13 sealed, 13/13 durable ack, fresh World/session, cognition/revision lineage valid, UNKNOWN discipline preserved; World/index/release-state frozen for B. |
 | 30 | `C15-RCC-RES-B-001` | 原 fresh-context B 候选执行证据验收 | **FAILED** | C15-RCC-RES-A-RERUN-001 | PR #121 @ `b6e5ac939bef83615292bcf9b9099d76737d82b0`；本处置随纠偏治理集成生效；OPEN / UNMERGED / PINNED / NON-CANONICAL | 仅 9 条输入落库、无 B 模型计量/原始 Runtime 轨迹、World/index 97/88，当前 candidate 不可接受；不是 Core 认知能力失败裁决，不以新 Claim 数量评分 |
-| 30.1 | `C15-RCC-RES-B-CORRECTIVE-001` | PM 证据纠偏、地图/队列/检查点同步与隔离角色提示词 | **GATE** | C15-RCC-RES-B-001 candidate disposition | `governance/C15_RCC_RES_B_CORRECTIVE_DECISION_2026-09-23.md`；本治理 PR 待 PM 自审/集成 | 原始字节只读审查；无 Core/fixture/evidence 修改；治理 PR 合入 main 并记录 PR/merge SHA/CI 后写 DONE，仅释放 operator preflight |
-| 30.2 | `C15-RCC-RES-B-PREFLIGHT-001` | 非盲 operator 准备正常 Runtime 传输桥、实时记录、合法 A 状态与实际隔离；不运行真实 B | **BLOCKED** | C15-RCC-RES-B-CORRECTIVE-001 | 冻结 Core + #117 exact A；完成定义见纠偏裁决 §3；独立的新 operator 窗口 | 无语义规则/旧答案；合成数据机械检查；operator/safe-packet manifests、entry commands、hash/pin、隔离证据、身份盘点；不得自放行 |
+| 30.1 | `C15-RCC-RES-B-CORRECTIVE-001` | PM 证据纠偏、地图/队列/检查点同步与隔离角色提示词 | **DONE** | C15-RCC-RES-B-001 candidate disposition | PR #122；accepted head `bbf45baf2e2a6314483d8355c1ee8badc09aa4a9`；merge `2a68df3f8901138fa3126a91063c430f69102049`；integration receipt 2026-09-24 | PM 自审明确记录；exact-head C15/C14 CI SUCCESS；无 Core/fixture/evidence 改动；仅释放 operator preflight，不是实验 PASS |
+| 30.2 | `C15-RCC-RES-B-PREFLIGHT-001` | 非盲 operator 准备正常 Runtime 传输桥、实时记录、合法 A 状态与实际隔离；不运行真实 B | **READY** | C15-RCC-RES-B-CORRECTIVE-001 | 冻结 Core + #117 exact A；完成定义见纠偏裁决 §3；独立的新 operator 窗口 | 无语义规则/旧答案；合成数据机械检查；operator/safe-packet manifests、entry commands、hash/pin、隔离证据、身份盘点；不得自放行 |
 | 30.3 | `C15-RCC-RES-B-RELEASE-001` | 独立 PM 审查 preflight 并放行唯一安全启动包 | **BLOCKED** | C15-RCC-RES-B-PREFLIGHT-001 | 已接受并合入的 operator exact source + 机械证据；新独立 PM | 冻结 Core/A bytes、正常 Runtime 与记录链、实际隔离均通过；pin packet/bridge、run/session；放行治理合入后才释放 rerun；不执行 Resident |
 | 30.4 | `C15-RCC-RES-B-RERUN-001` | 全新盲测 Resident 从 accepted A 执行唯一 B 段 cursor 14..22 | **BLOCKED** | C15-RCC-RES-B-RELEASE-001 | 仅批准的 Resident-safe packet / 正常 AIOS 接口；不读治理/旧证据 | 真实模型逐次选择；normal run_turn/due-work；Snapshot/directive/工具结果/计量/输出实时可审计；最终 World/index/restart/receipts/hash 冻结；仅报 RUN_COMPLETE 待独立验收 |
 | 30.5 | `C15-RCC-RES-B-ACCEPT-001` | 独立 PM 验收 fresh B 执行完整性与 provenance，不替代语义终评 | **BLOCKED** | C15-RCC-RES-B-RERUN-001 | exact evidence head + raw runtime trace + frozen state | receipt/World/index/计量/行为原始链匹配，无污染；认知可保留/沉默；private World 不合 main；通过并写回后释放身份预检 |
@@ -1438,7 +1440,7 @@ Next READY task: C15-RCC-PREFLIGHT-001 — new window only; this window must not
 - `C15-RCC-RES-C-001`, `C15-RCC-EVAL-001`, and `C15-RCC-CLOSE-001` remain BLOCKED by their declared dependencies.
 - **Next unique READY: `C15-RCC-RES-B-001`.**
 
-## 2026-09-23 — C15-RCC-RES-B-CORRECTIVE-001 integration record
+## 历史记录：2026-09-23 — C15-RCC-RES-B-CORRECTIVE-001 pending integration
 
 - Status: **GATE / PENDING_MAIN_INTEGRATION**. This record is not a claim of merge or experiment completion.
 - Started/reviewed main: `ed07b5890909ae09cb2a0849729662b4235c1e3b`.
@@ -1449,3 +1451,14 @@ Next READY task: C15-RCC-PREFLIGHT-001 — new window only; this window must not
 - Gate evidence: local document/diff-scope inspection; historical Core 19 push workflows SUCCESS; new governance PR CI must be recorded separately. PR #120 failure is still tracked, not waived.
 - Integration PR: [#122](https://github.com/Haneof/Haneof-AIOS-Core-v3.0/pull/122), OPEN / pending PM self-review and normal protected merge. Actual merge SHA / new CI conclusions must be recorded from GitHub by the integrating PM; none may be invented before merge.
 - Handoff: once integrated and this task written DONE, set only `C15-RCC-RES-B-PREFLIGHT-001` READY. Release/rerun/accept/identity/C/EVAL/CLOSE remain BLOCKED.
+
+## 2026-09-24 — C15-RCC-RES-B-CORRECTIVE-001 completed integration
+
+- Status: **DONE**; reviewed/merged governance PR #122.
+- Review type: authoring PM self-review, not an independent experiment/semantic verdict. No extra integration window required; normal branch protection honored without admin bypass.
+- Accepted candidate: `bbf45baf2e2a6314483d8355c1ee8badc09aa4a9`.
+- Actual main merge: `2a68df3f8901138fa3126a91063c430f69102049` at `2026-09-23T16:13:48Z` (2026-09-24 Asia/Shanghai).
+- CI: C15 `35887196676` SUCCESS; C14 semantic-repair `35887196757` SUCCESS; no local tests/Resident run.
+- Source/evidence scope: zero Core/tests/workflows/sealed-fixture/historical-evidence modification; #117/#121 exact heads unchanged.
+- Receipt: `governance/C15_RCC_RES_B_CORRECTIVE_INTEGRATION_RECEIPT_2026-09-24.md`.
+- Next unique READY after this state-writeback PR is merged: **C15-RCC-RES-B-PREFLIGHT-001**. No Resident experiment is released.
