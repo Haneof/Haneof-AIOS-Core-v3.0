@@ -1,6 +1,8 @@
 # C15_FINAL_RELEASE_DECISION
 
-Status: **PASS — C15-RCC-RES-B-001 READY**  
+> Historical A acceptance / original B-start release. Accepted A and its immutable hashes remain authoritative. The later `C15_RCC_RES_B_CORRECTIVE_DECISION_2026-09-23.md`, once integrated into main, supersedes only the unconditional B-start authorization below: #121 is not accepted, operator preflight and independent release must precede a fresh B. Until that integration is resolved, do not start a duplicate B from this historical status. Consult the current task-board snapshot; do not merge private evidence PRs.
+
+Historical status at issuance: **PASS — C15-RCC-RES-B-001 READY**
 Decision date: 2026-09-23  
 Authority: C15 Release PM + Independent Governance Integrator
 

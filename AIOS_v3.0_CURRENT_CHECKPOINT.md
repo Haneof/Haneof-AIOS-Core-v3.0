@@ -14,7 +14,26 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
-## 当前工程断点 — C15 Resident A canonical PASS；唯一下一 READY = C15-RCC-RES-B-001
+## 当前工程断点 — B candidate 未通过；纠偏治理 GATE，实验不得启动
+
+> PM / operator only。盲测 Resident 不得读取本 checkpoint；只读独立获准的安全启动包。下方所有“历史工程断点”的 READY/下一动作只记录当时状态，不再作为当前任务授权。
+
+- 2026-09-23 reviewed main：`ed07b5890909ae09cb2a0849729662b4235c1e3b`。
+- Canonical frozen Core：`bcd6bf353126318f9a97076b52ec1740d43f35a4`；语义 freeze ACTIVE；该 exact Core 的 19 个 push workflows 均 SUCCESS（历史 GitHub 结果，本窗口未跑测试）。
+- C14 既有闭环 PASS；canonical A #117 @ `3e51f728d7959048b75fea01d405bc837b0e8185` 接受状态和原始 hash 不变。
+- Reviewed B #121 @ `b6e5ac939bef83615292bcf9b9099d76737d82b0`：NOT ACCEPTED。World 97 / index 88；新增 9 条均为输入 Observation；无 B session 计量、原始模型/能力调用轨迹或 restart checkpoint。报告自评 PASS 不替代独立验收。
+- 新 Claim 数量不是 Gate；不足是运行证据与索引交付，而非要求模型制造认知。不据此修改 frozen Core。
+- 处置随纠偏 PR 合入生效：旧 B task FAILED（candidate acceptance），#121 保持 OPEN / UNMERGED / PINNED / NON-CANONICAL；不回填、不覆盖、不传给 C。
+- `C15-RCC-RES-B-CORRECTIVE-001 = GATE / PENDING_MAIN_INTEGRATION`。独立集成 PM 审查治理/CI，实际合入并写回 DONE 后，唯一下一 READY 为 `C15-RCC-RES-B-PREFLIGHT-001`；当前无获准启动的 Resident 实验。
+- 后续：operator preflight → 独立环境放行 → fresh B → 独立执行证据验收 → 模型身份证明 → C → EVAL → CLOSE；其余均 BLOCKED。
+- R6 可信身份仍不足；PR #120 的 zero-Core-diff 检查 exit 128 仍待 disposition；规模与历史 Issue 状态只登记风险，不形成第二施工队列。
+- 裁决：`governance/C15_RCC_RES_B_CORRECTIVE_DECISION_2026-09-23.md`。
+- 审查：`reviews/C15_RCC_RES_B_001_PM_CORRECTIVE_REVIEW_2026-09-23.md`。
+- PM 风险：`governance/C15_PM_RISK_REGISTER_2026-09-23.md`。
+- 下一窗口分角色说明：`governance/prompts/`。Blind Resident 只接收被独立 release pin 的安全包，不接收这些 PM 提示词或审查结论。
+- PR/merge SHA 与新 CI 由集成 PM 从 GitHub 记录；未合并前不得声称 main 已更新。本窗口没有执行 preflight 或实验。
+
+## 历史工程断点 — C15 Resident A canonical PASS；唯一下一 READY = C15-RCC-RES-B-001
 
 - 2026-09-23：`C15-RCC-RES-A-RERUN-001 = DONE / ACCEPTED`。
 - Canonical frozen Core anchor：`bcd6bf353126318f9a97076b52ec1740d43f35a4`。
@@ -96,7 +115,7 @@
 - PM acceptance: `reviews/C15_RCC_RES_A_001_PM_ACCEPTANCE_REVIEW_2026-09-22.md`.
 - **Next unique READY: `C15-RCC-RES-B-001`.**
 
-## 当前工程断点 — C15-RCC-FIXTURE-001 已完成：sealed RCC life 已冻结，唯一下一 READY = C15-RCC-RES-A-001
+## 历史工程断点 — C15-RCC-FIXTURE-001 已完成：sealed RCC life 已冻结，唯一下一 READY = C15-RCC-RES-A-001
 
 - 2026-09-22 更新：`C15-RCC-FIXTURE-001 = DONE`；`C15-RCC-RES-A-001 = READY`；`C15-RCC-RES-B-001 = BLOCKED`；`C15-RCC-RES-C-001 = BLOCKED`；`C15-RCC-EVAL-001 = BLOCKED`。
 - Starting main: `d65a7b24366cb612d042a3feedb92f0a3d90b02c`。
@@ -159,7 +178,7 @@
 - Core implementation decision: **YES, exactly one narrow fix task**。只允许修 `AIWorldCognitionService` domain-derived subject authorization，primary target `src/aios_core/ai_world/cognition.py`；不得新建 identity/personality DB、第二 Runtime、hidden handoff，且不得把 R6 identity attestation 伪装成 Core semantic logic。
 - Next unique READY: **`C15-RCC-MECH-FIX-001`**。完成并 Gate 后才可释放 fixture；本 preflight 窗口禁止开始该实现。
 
-## 当前工程断点 — C15-RCC-RULE-001 已冻结：NO CONSTITUTION CHANGE REQUIRED，唯一下一 READY = C15-RCC-PREFLIGHT-001
+## 历史工程断点 — C15-RCC-RULE-001 已冻结：NO CONSTITUTION CHANGE REQUIRED，唯一下一 READY = C15-RCC-PREFLIGHT-001
 
 - 2026-09-22 更新：`C15-RCC-RULE-001 = DONE`（RCC 正式语义边界与验收定义已冻结）；**`NO CONSTITUTION CHANGE REQUIRED`**；`C15-RCC-PREFLIGHT-001 = READY`；`C15-RCC-FIXTURE-001` 保持 **BLOCKED**（禁止本窗口或下一窗口顺手做 fixture / Resident / evaluator）。
 - Started / reviewed main: `623f8471cdd6ac2d756c15231f65f311e662f9d9`（C14-CLOSE-001 squash merge `#95`）。
@@ -200,7 +219,7 @@
 - 收口审计报告：`reviews/C14_CLOSE_001_FINAL_CLOSURE_REVIEW_2026-09-22.md`。
 - 下一步：`C15-RCC-RULE-001`（新独立窗口），冻结 Resident Cognitive Continuity 语义。
 
-## 当前工程断点 — C14-SEM-REPAIR-EVAL-001 已完成：C14 RESIDENT SEMANTIC EVIDENCE = VALID，唯一下一 READY = C14-CLOSE-001
+## 历史工程断点 — C14-SEM-REPAIR-EVAL-001 已完成：C14 RESIDENT SEMANTIC EVIDENCE = VALID，唯一下一 READY = C14-CLOSE-001
 
 - 2026-09-22 更新：`C14-SEM-REPAIR-EVAL-001 = DONE`（独立语义评估完成）；`C14-CLOSE-001 = READY`；`C15-RCC-RULE-001` 保持 **BLOCKED**（直到 C14-CLOSE 真正完成）。
 - Evaluated live main: `655e1d48c2b53dd4f5a10485a9d530ed13ca69a3`；run's declared evaluated main: `7611fa5059f5dc8a20835cab5b312be2f43d11e8`。
@@ -214,7 +233,7 @@
 - 本窗口未修改 Core、fixture、Claim、EvidenceSet、World、Resident run；未创建“正确答案”。
 - 下一步：`C14-CLOSE-001`（新独立窗口）只做收口审计，不得写新 Core 功能；收口必须保留 PR #75/#79/#92 OPEN/UNMERGED/PINNED。
 
-## 当前工程断点 — C14-SEM-REPAIR-RES-001 证据已由 PM 正式接受，唯一下一 READY = C14-SEM-REPAIR-EVAL-001
+## 历史工程断点 — C14-SEM-REPAIR-RES-001 证据已由 PM 正式接受，唯一下一 READY = C14-SEM-REPAIR-EVAL-001
 
 - 2026-09-22 更新：`C14-SEM-REPAIR-RES-001 = DONE`（PM evidence acceptance 完成）；`C14-SEM-REPAIR-EVAL-001 = READY`。
 - Starting / evaluated main: `7611fa5059f5dc8a20835cab5b312be2f43d11e8`
@@ -236,7 +255,7 @@
 - Evidence branch 末提交（`9e87051`）内含 Resident 窗口自记的 task board/checkpoint 文本，已被本 PM 写回取代；不影响任何 run artifact。
 
 
-## 当前工程断点 — C14-SEM-REPAIR-FIX-001 已完成并合入 main
+## 历史工程断点 — C14-SEM-REPAIR-FIX-001 已完成并合入 main
 
 - Task: `C14-SEM-REPAIR-FIX-001 = DONE`
 - Evaluated / starting main: `1c20e548822b7aa6b5cb980995ff5de7902e3ac9`
@@ -262,7 +281,7 @@
 - Current next READY: `C14-SEM-REPAIR-RES-001`.
 - This window stops after fixture/governance closure and does not run the Resident repair.
 
-## 当前工程断点 — Resident Cognitive Continuity 路线已冻结，先执行 C14 最小语义修复
+## 历史工程断点 — Resident Cognitive Continuity 路线已冻结，先执行 C14 最小语义修复
 
 - Governance planning baseline: `main@426f049d890d82121388ed5d52eecf66e48856f8`.
 - Canonical C15 plan: `governance/C15_RESIDENT_COGNITIVE_CONTINUITY_TEST_PLAN_2026-09-22.md`.
@@ -280,7 +299,7 @@
 - C15, C16 and broad P16 remain blocked until their declared dependencies close.
 - **Current first READY task after this governance merge: `C14-SEM-REPAIR-FIX-001`.**
 
-## 当前工程断点 — C14-RES-EVAL-001 已完成
+## 历史工程断点 — C14-RES-EVAL-001 已完成
 
 - `C14-RES-EVAL-001 = DONE`
 - Evaluated main: `8e6f9febc5f006605116c526796fa21435b4b22e`
@@ -295,7 +314,7 @@
 
 
 
-## 当前工程断点 — C14-RES-B-001 已完成，等待独立语义评估
+## 历史工程断点 — C14-RES-B-001 已完成，等待独立语义评估
 
 最近完成任务：`C14-RES-B-001` — **DONE / RUN COMPLETE / EVIDENCE ACCEPTED FOR EVALUATION**。
 
@@ -318,7 +337,7 @@
 
 当前第一个 READY：`C14-RES-EVAL-001`。必须由新的独立 evaluator 窗口执行，不修 Core。
 
-## 当前工程断点 — C14-RES-B-FIX-001 已收口
+## 历史工程断点 — C14-RES-B-FIX-001 已收口
 
 最近完成任务：`C14-RES-B-FIX-001` — **DONE / CANONICAL PHASE-B CONVERSATION RELEASE VERIFIED**。
 
@@ -579,7 +598,7 @@ T35 task-board 收口提交：`4f8d291b00f885542793a0c7f6139da5420ef78b`。
 - PR #47 已 squash merge：`f9baacd5ac7be1646036a4e878934e77965c6640`。
 - 下一任务仅为新窗口 `AUDIT-001`；本窗口停止。
 
-## 当前快照
+## 历史基线快照（非当前任务授权）
 
 - 时间：2026-09-20
 - 最后已验证功能代码锚点：`8ddb7a606fda375aad98a0b2545a992c2497d828`
@@ -860,7 +879,7 @@ Periodic Review
 - 多 Agent 是多个模型分别入住/测试同一套 AIOS 机制，不是让一堆 Agent 在世界里互相协作完成固定答案。
 - P16 分支不得重新造第二套 World、Index、Recommendation、Runtime 或 Review 系统。
 
-## 当前工程断点
+## 历史工程断点（非当前任务授权）
 
 - 时间：2026-09-20 17:40 +08:00
 - 最后已验证功能代码锚点：`6b68cb2953d7747a784c1a5a737c66f9de101f29`

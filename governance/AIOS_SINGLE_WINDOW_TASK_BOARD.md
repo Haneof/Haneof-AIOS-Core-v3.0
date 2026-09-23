@@ -8,9 +8,25 @@
 
 ---
 
+## 0. 当前 PM 快照 — 2026-09-23 B candidate 纠偏（治理集成门禁）
+
+**仅供 PM / 工程 / operator 阅读；盲测 Resident 不得读取本板或项目 checkpoint。** 盲测角色必须使用经独立放行的安全包，不能执行下方通用仓库恢复步骤。Operator 与 PM 仍必须遵守本板。
+
+- Reviewed main：`ed07b5890909ae09cb2a0849729662b4235c1e3b`；frozen Core：`bcd6bf353126318f9a97076b52ec1740d43f35a4`（语义冻结继续 ACTIVE）。
+- C14 已正式 PASS；canonical A 为 PR #117 @ `3e51f728d7959048b75fea01d405bc837b0e8185`，接受状态不变。
+- B PR #121 @ `b6e5ac939bef83615292bcf9b9099d76737d82b0` 的当前交付未通过 PM execution-evidence 验收。保留 OPEN / UNMERGED / PINNED / NON-CANONICAL；不得初始化 C 或覆盖旧证据。
+- 裁决：`governance/C15_RCC_RES_B_CORRECTIVE_DECISION_2026-09-23.md`；证据：`reviews/C15_RCC_RES_B_001_PM_CORRECTIVE_REVIEW_2026-09-23.md`。
+- **本次纠偏治理状态 = GATE，尚不能声称已合入 main。当前没有可启动的 Resident 实验。** 先由独立集成 PM 审查治理 PR 与其 CI；实际合入并将纠偏任务写回 DONE 后，只释放 `C15-RCC-RES-B-PREFLIGHT-001` 为唯一 READY。
+- 此分支中的候选处置/队列变更在治理 PR 合入 main 后生效；合入前旧 main 的 B=READY 不能作为重复开跑授权。下一窗口首先核对是否已有更新的治理裁决。
+- B 环境预检 → 独立放行 → fresh B → 独立接受 → 模型身份证明 → C → EVAL → CLOSE；C16 / broad P16 / P17 继续 BLOCKED。
+- 非盲角色提示词：`governance/prompts/`；盲测提示词仅由独立放行 PM 交付，不含本板或审查报告。
+- 风险登记：`governance/C15_PM_RISK_REGISTER_2026-09-23.md`，不是第二施工队列。
+
+---
+
 ## 1. 最高执行规则
 
-从本文件生效起，任何 ChatGPT / Arena / reviewer / programmer 新窗口都不得凭聊天记忆自行选择工作。
+从本文件生效起，任何 PM / operator / reviewer / programmer 新窗口都不得凭聊天记忆自行选择工作。盲测 Resident 适用 §0 的隔离例外，只读批准的安全包，不读治理材料。
 
 每个窗口必须：
 
@@ -58,7 +74,8 @@
 
 ## 3. 当前唯一施工队列
 
-> 选择规则：严格从上到下。条件任务在 `AUDIT-001` 后才能激活。\n> 2026-09-21 PM reprioritization: 77-day Resident evidence exposed a missing continuous User/World → AI-world cognition-derivation bridge. C14 is now inserted before P16 campaign continuation; P16-TRIAGE is paused until C14 closure.
+> 选择规则：严格从上到下。条件任务在 `AUDIT-001` 后才能激活。
+> 2026-09-21 PM reprioritization: 77-day Resident evidence exposed a missing continuous User/World → AI-world cognition-derivation bridge. C14 is now inserted before P16 campaign continuation; P16-TRIAGE is paused until C14 closure.
 > 2026-09-22 PM roadmap: after a narrow C14 semantic-evidence repair closes the existing E1/E5 blockers, C15 becomes the Resident Cognitive Continuity Gate: durable User Understanding / Relationship-Role / Self-Calibration / Strategy-Experience must survive fresh-session and replacement-model handoff through AIOS, materially affect later behavior, and remain revisable. C16 then validates the separate non-world Resident system-improvement feedback loop before broad P16 resumes.
 
 | 顺序 | Task ID | 单窗口任务 | 状态 | Dependencies | 当前现场 / 证据 | 完成定义 |
@@ -96,8 +113,14 @@
 | 29.2 | `C15-RCC-WAKE-DELIVERY-FIX-001` | 最小修复真实 user-delivered non-conversation Wake assistant output 持久化：仅实际允许并返回用户的 assistant response exactly-once 写入统一用户-AI交流维度；绝不伪造 USER input | **DONE** | C15-RCC-A-WAKE-DELIVERY-CORRECTIVE-001 | PR #104; Core merge `fd9ba5de329abb025f52de76f1ab658cdafb4897`; exact final Core candidate `41f2a5da2153c55b137741fdd71983eea2a011f7`; completion evidence `reviews/C15_RCC_WAKE_DELIVERY_FIX_001_COMPLETION_EVIDENCE_2026-09-22.md`; final PR-head Gates GREEN | Delivered Wake assistant output is durable/searchable with exact Wake provenance and stable exactly-once recovery; suppressed/denied/internal/silence write 0; ordinary run_turn unchanged; no synthetic USER; PR #101 untouched. |
 | 29.3 | `C15-RCC-RES-A-REPAIR-DECISION-001` | Core 修复后由独立 PM 决定 Resident A evidence 的恢复路径：可验证的纯机械 historical persistence，或 fresh World 重跑 Resident A | **DONE** | C15-RCC-WAKE-DELIVERY-FIX-001 | `reviews/C15_RCC_RES_A_REPAIR_DECISION_2026-09-22.md`; PR #101 exact diagnostic evidence; fixed Core @ `41f2a5da2153c55b137741fdd71983eea2a011f7` | `PATH A = REJECTED`; `PATH B = REQUIRED`. Corrected history changes actual summary/review source sets during Phase A, so old semantic outputs are not historical-equivalent. |
 | 29.4 | `C15-RCC-RES-A-RERUN-001` | 在 frozen Core 上使用 frozen C15 fixture，从 fresh private World / fresh session 重新执行 Phase A cursor 1..13；必须由新的真实 Resident A 窗口逐事件生活 | **DONE** | C15-RCC-RES-A-REPAIR-DECISION-001 | PR #117 @ `3e51f728d7959048b75fea01d405bc837b0e8185` remains OPEN / UNMERGED / PINNED; canonical Core anchor `bcd6bf353126318f9a97076b52ec1740d43f35a4`; `governance/C15_FINAL_RELEASE_DECISION_2026-09-23.md` | Independent acceptance PASS: cursor 1..13 sealed, 13/13 durable ack, fresh World/session, cognition/revision lineage valid, UNKNOWN discipline preserved; World/index/release-state frozen for B. |
-| 30 | `C15-RCC-RES-B-001` | fresh-context Resident B 只恢复 AIOS durable state，不注入 A 聊天/总结；验证整组 Resident cognition 在新窗口中正常恢复并影响新决策 | **READY** | C15-RCC-RES-A-RERUN-001 | PR #117 exact durable lineage only: World `sha256:9ff2b13cc1ec6e4d61a7910b4177ed3e1f25cfc47df8e18481a0199dd1aad395`; index `sha256:55282a61d714f732f1b10fa6b450853f8425b5c9f741090fcaad0f1e673a6643`; release-state `sha256:b626cdd7d8ee16bcc9123ef8641bb05637d73d713023a471a74d7f6a392e052e`; `RESIDENT_B_RUN_CONTRACT.md` | Start a new model process/session; restore only durable AIOS World/index/runtime state and exact receipt chain; no A transcript/report/decisions/checkpoints/out-of-band summary; execute sealed cursor 14..22 and stop. |
-| 31 | `C15-RCC-RES-C-001` | replacement-model Resident C 接管同一 AIOS World；验证“模型换、Resident 不重置” | **BLOCKED** | C15-RCC-RES-B-001 | B checkpoint + different provable model family/provider where available | 不要求同措辞/同风格；要求有效 User Understanding、Role、Self/Calibration、Strategy/Experience 仍可恢复和消费；无法证明模型身份则该轴不得判 VALID |
+| 30 | `C15-RCC-RES-B-001` | 原 fresh-context B 候选执行证据验收 | **FAILED** | C15-RCC-RES-A-RERUN-001 | PR #121 @ `b6e5ac939bef83615292bcf9b9099d76737d82b0`；本处置随纠偏治理集成生效；OPEN / UNMERGED / PINNED / NON-CANONICAL | 仅 9 条输入落库、无 B 模型计量/原始 Runtime 轨迹、World/index 97/88，当前 candidate 不可接受；不是 Core 认知能力失败裁决，不以新 Claim 数量评分 |
+| 30.1 | `C15-RCC-RES-B-CORRECTIVE-001` | PM 证据纠偏、地图/队列/检查点同步与隔离角色提示词 | **GATE** | C15-RCC-RES-B-001 candidate disposition | `governance/C15_RCC_RES_B_CORRECTIVE_DECISION_2026-09-23.md`；本治理 PR 待独立审查/集成 | 原始字节只读审查；无 Core/fixture/evidence 修改；治理 PR 合入 main 并记录 PR/merge SHA/CI 后写 DONE，仅释放 operator preflight |
+| 30.2 | `C15-RCC-RES-B-PREFLIGHT-001` | 非盲 operator 准备正常 Runtime 传输桥、实时记录、合法 A 状态与实际隔离；不运行真实 B | **BLOCKED** | C15-RCC-RES-B-CORRECTIVE-001 | 冻结 Core + #117 exact A；完成定义见纠偏裁决 §3；独立的新 operator 窗口 | 无语义规则/旧答案；合成数据机械检查；operator/safe-packet manifests、entry commands、hash/pin、隔离证据、身份盘点；不得自放行 |
+| 30.3 | `C15-RCC-RES-B-RELEASE-001` | 独立 PM 审查 preflight 并放行唯一安全启动包 | **BLOCKED** | C15-RCC-RES-B-PREFLIGHT-001 | 已接受并合入的 operator exact source + 机械证据；新独立 PM | 冻结 Core/A bytes、正常 Runtime 与记录链、实际隔离均通过；pin packet/bridge、run/session；放行治理合入后才释放 rerun；不执行 Resident |
+| 30.4 | `C15-RCC-RES-B-RERUN-001` | 全新盲测 Resident 从 accepted A 执行唯一 B 段 cursor 14..22 | **BLOCKED** | C15-RCC-RES-B-RELEASE-001 | 仅批准的 Resident-safe packet / 正常 AIOS 接口；不读治理/旧证据 | 真实模型逐次选择；normal run_turn/due-work；Snapshot/directive/工具结果/计量/输出实时可审计；最终 World/index/restart/receipts/hash 冻结；仅报 RUN_COMPLETE 待独立验收 |
+| 30.5 | `C15-RCC-RES-B-ACCEPT-001` | 独立 PM 验收 fresh B 执行完整性与 provenance，不替代语义终评 | **BLOCKED** | C15-RCC-RES-B-RERUN-001 | exact evidence head + raw runtime trace + frozen state | receipt/World/index/计量/行为原始链匹配，无污染；认知可保留/沉默；private World 不合 main；通过并写回后释放身份预检 |
+| 30.6 | `C15-RCC-MODEL-ATTEST-001` | operator/PM 核实 A/B 与拟 C 的可信平台/provider 身份绑定，只做跨模型启动前置 | **BLOCKED** | C15-RCC-RES-B-ACCEPT-001 | actual session-bound external identity evidence；自报/配置名/新窗口不算 | 可独立证明不同底层 model family/provider 才释放 C；否则 INSUFFICIENT_EVIDENCE，C 保持 BLOCKED，R6 不得 VALID；禁止造身份库/伪签名 |
+| 31 | `C15-RCC-RES-C-001` | replacement-model Resident C 接管同一 AIOS World；验证“模型换、Resident 不重置” | **BLOCKED** | C15-RCC-RES-B-ACCEPT-001, C15-RCC-MODEL-ATTEST-001 | accepted rerun B checkpoint + trusted different-model identity; never PR #121 World | 不要求同措辞/同风格；要求有效 User Understanding、Role、Self/Calibration、Strategy/Experience 仍可恢复和消费；无法证明模型身份则该轴不得判 VALID |
 | 32 | `C15-RCC-EVAL-001` | 独立 evaluator 审计 Resident Cognitive Continuity；不修 Core | **BLOCKED** | C15-RCC-RES-C-001 | A/B/C artifacts + World/checkpoint/digests + hidden chronology | 分别裁决 R1 user-understanding、R2 relationship/role、R3 self/calibration、R4 strategy/experience、R5 fresh-window、R6 replacement-model、R7 behavior effect、R8 correction、R9 anti-self-proof；全部 VALID 才可收口 |
 | 33 | `C15-RCC-CLOSE-001` | 最高 PM 收口 Resident Cognitive Continuity Gate | **BLOCKED** | C15-RCC-EVAL-001 | C15 full-chain evidence | 只有“形成真实认知 + fresh-window 连续 + replacement-model 连续 + later behavior consumption + 可被新现实修正 + 无循环自证”全部成立才 PASS |
 | 34 | `C16-FEEDBACK-RULE-001` | 冻结 Resident→AIOS 系统改进反馈语义：系统摩擦/缺陷/优化建议与用户人生 World 分离，Resident 可提案但不得自行修改/裁决/合并 Core | **BLOCKED** | C15-RCC-CLOSE-001 | C15 closure + Metering/non-world governance patterns | 定义 non-world System Improvement / Habitation Feedback Ledger、证据与严重度/复现字段、去重/聚合/PM 裁决边界；明确 Resident proposal ≠ bug truth ≠ merge authority |
@@ -1393,7 +1416,7 @@ Next READY task: C15-RCC-PREFLIGHT-001 — new window only; this window must not
 
 ---
 
-## 2026-09-23 — C15 Resident A canonical acceptance / Resident B release handoff
+## 历史记录：2026-09-23 — C15 Resident A canonical acceptance / original B release handoff
 
 - `C15-RCC-RES-A-RERUN-001 = DONE / ACCEPTED`.
 - `C15-RCC-RES-B-001 = READY`.
@@ -1414,3 +1437,15 @@ Next READY task: C15-RCC-PREFLIGHT-001 — new window only; this window must not
 - Canonical decision: `governance/C15_FINAL_RELEASE_DECISION_2026-09-23.md`.
 - `C15-RCC-RES-C-001`, `C15-RCC-EVAL-001`, and `C15-RCC-CLOSE-001` remain BLOCKED by their declared dependencies.
 - **Next unique READY: `C15-RCC-RES-B-001`.**
+
+## 2026-09-23 — C15-RCC-RES-B-CORRECTIVE-001 integration record
+
+- Status: **GATE / PENDING_MAIN_INTEGRATION**. This record is not a claim of merge or experiment completion.
+- Started/reviewed main: `ed07b5890909ae09cb2a0849729662b4235c1e3b`.
+- Work branch: `arena/01a0cee4-haneof-aios-core-v3-0`.
+- Reviewed evidence: #121 @ `b6e5ac939bef83615292bcf9b9099d76737d82b0`; raw hashes and read-only queries recorded in corrective review.
+- Candidate disposition: NOT ACCEPTED; historical evidence stays pinned; canonical A unchanged.
+- Scope: governance/map/checkpoint/review/prompts only; no Core, fixture-byte, historical-evidence or test changes; no Resident run.
+- Gate evidence: local document/diff-scope inspection; historical Core 19 push workflows SUCCESS; new governance PR CI must be recorded separately. PR #120 failure is still tracked, not waived.
+- Integration PR / actual merge SHA / new CI conclusions: the integrating PM must record these from GitHub when integration occurs; none may be invented before merge.
+- Handoff: once integrated and this task written DONE, set only `C15-RCC-RES-B-PREFLIGHT-001` READY. Release/rerun/accept/identity/C/EVAL/CLOSE remain BLOCKED.
