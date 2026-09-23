@@ -27,23 +27,26 @@ jobs:
           git diff --exit-code 849bfd41c623fb336b392a3e6e933cfad93620e9 HEAD -- reviews/internal_habitation
       - name: Synthetic transport and handoff-negative checks only
         run: |
-          python -m pytest -o addopts='' -q tests/preflight --junitxml=preflight-results.xml 2>&1 | tee preflight-q.log; echo ${PIPESTATUS[0]} > exit.txt; cat preflight-q.log
-          if [ "$(cat exit.txt)" != "0" ]; then
-            echo "--- q failed, retry with -v ---"
-            python -m pytest -o addopts='' -v tests/preflight 2>&1 | tee preflight-v.log
-            echo "--- junit xml ---"
-            cat preflight-results.xml
+          set +e
+          python -m pytest -o addopts='' -q tests/preflight --junitxml=preflight-results.xml 2>&1 | tee preflight-q.log
+          CODE=${PIPESTATUS[0]}
+          echo "exit code $CODE"
+          cat preflight-results.xml | head -n 200
+          if [ "$CODE" != "0" ]; then
+            echo "::error::preflight q failed, see junit"
+            python - <<'PY'
+          import xml.etree.ElementTree as ET
+          tree=ET.parse('preflight-results.xml')
+          for tc in tree.getroot().iter('testcase'):
+            for child in tc:
+              if child.tag in ('failure','error'):
+                print(f"FAILED: {tc.get('classname')}::{tc.get('name')}")
+                print(child.text[:5000])
+          PY
+            echo "--- retry v ---"
+            python -m pytest -o addopts='' -v tests/preflight 2>&1 | tail -n 100
           fi
-          test "$(cat exit.txt)" = "0"
-      - name: Upload logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: preflight-logs
-          path: |
-            preflight-q.log
-            preflight-v.log
-            preflight-results.xml
+          exit $CODE
       - name: Relevant existing Core regressions (synthetic Worlds)
         run: |
           python -m pytest -o addopts='' -q --junitxml=regression-results.xml \
@@ -76,6 +79,9 @@ jobs:
               with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as out:
                 out.write(receipt + "\n")
               if counts["failures"] or counts["errors"]:
+                # also write failures to summary
+                with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as out:
+                  out.write(open(p).read()[:20000] + "\n")
                 print(open(p).read()[:20000])
             except Exception as e:
               print(f"parse error {e}")
