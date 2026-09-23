@@ -31,20 +31,24 @@ jobs:
           python -m pytest -o addopts='' -q tests/preflight --junitxml=preflight-results.xml 2>&1 | tee preflight-q.log
           CODE=${PIPESTATUS[0]}
           echo "exit code $CODE"
-          cat preflight-results.xml | head -n 200
-          if [ "$CODE" != "0" ]; then
-            echo "::error::preflight q failed, see junit"
-            python - <<'PY'
-          import xml.etree.ElementTree as ET
-          tree=ET.parse('preflight-results.xml')
-          for tc in tree.getroot().iter('testcase'):
-            for child in tc:
-              if child.tag in ('failure','error'):
-                print(f"FAILED: {tc.get('classname')}::{tc.get('name')}")
-                print(child.text[:5000])
+          cat preflight-results.xml | head -n 500
+          python - <<'PY'
+          import xml.etree.ElementTree as ET, pathlib
+          p=pathlib.Path('preflight-results.xml')
+          if p.exists():
+            tree=ET.parse(p)
+            for tc in tree.getroot().iter('testcase'):
+              for child in tc:
+                if child.tag in ('failure','error'):
+                  name=f"{tc.get('classname')}::{tc.get('name')}"
+                  msg=(child.text or '')[:2000].replace('\n','%0A')
+                  print(f"::error title={name}::{msg[:1000]}")
+                  print(f"FAILED: {name}")
+                  print(child.text[:5000])
           PY
+          if [ "$CODE" != "0" ]; then
             echo "--- retry v ---"
-            python -m pytest -o addopts='' -v tests/preflight 2>&1 | tail -n 100
+            python -m pytest -o addopts='' -v tests/preflight 2>&1 | tail -n 200
           fi
           exit $CODE
       - name: Relevant existing Core regressions (synthetic Worlds)
@@ -79,7 +83,6 @@ jobs:
               with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as out:
                 out.write(receipt + "\n")
               if counts["failures"] or counts["errors"]:
-                # also write failures to summary
                 with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as out:
                   out.write(open(p).read()[:20000] + "\n")
                 print(open(p).read()[:20000])
