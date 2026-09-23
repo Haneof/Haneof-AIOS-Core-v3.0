@@ -14,6 +14,31 @@ Publication confirmation is now persistent and auditable (v3):
   WITHOUT receipt; ordinary restore is BLOCKED and source driver is marked
   FAILED/UNCERTAIN. Operator must independently verify before explicit
   confirmation via confirm_uncertain_package (requires attestation).
+
+Commit point definition (gap 1):
+- The persistent receipt is the formal commit point of publication.
+  Fault windows:
+  1) After package publish (rename) before receipt: rename succeeded,
+     parent fsync before receipt may fail. No receipt -> package UNCERTAIN,
+     ordinary restore BLOCKED, driver FAILED with preserved_package.
+  2) Receipt write/replace and its dir fsync: atomic_json writes temp file,
+     fsyncs it, renames, fsyncs destination dir. Then create_receipt also
+     fsyncs destination.parent. Failure in any of these -> no receipt or
+     partial receipt (atomic_json ensures no partial), so BLOCKED, driver
+     FAILED. If receipt file was already durable but parent fsync after
+     receipt fails, receipt exists but durability of parent entry uncertain.
+     We treat this as failure and mark FAILED, but receipt exists so
+     ordinary restore will succeed per commit point definition (receipt is
+     commit). Operator must verify parent durability.
+  3) After receipt success, before final FROZEN checkpoint write/fsync:
+     receipt exists, so package is CONFIRMED and restorable via ordinary
+     restore, even if source checkpoint (FROZEN) fails. Source driver is
+     marked FAILED/UNCERTAIN with preserved_package, but package remains
+     restorable. This coordination ensures no "uncertain product but
+     ordinary restore considers confirmed": uncertain = no receipt = blocked;
+     confirmed = receipt exists = restorable, even if source checkpoint fails.
+
+- No deletion of receipt or swallowing exception to fake consistency.
 """
 from __future__ import annotations
 
@@ -48,6 +73,7 @@ def freeze(driver, destination: Path):
     driver.verify_boundary()
     stage = None
     publication_id = uuid4().hex
+    receipt_created = False
     try:
         driver.transition("FREEZING")
         driver.runtime.index.rebuild()  # Canonical rebuild, not direct SQL reasoning.
@@ -113,9 +139,7 @@ def freeze(driver, destination: Path):
             if destination.exists():
                 raise DriverBlocked("freeze destination appeared")
             driver.transition("PUBLISHING")
-            # From rename through the last successful fsync, durability is not
-            # confirmed. An exception leaves the package for inspection, but NO
-            # receipt exists, so ordinary restore is blocked.
+            # Window 1: after rename, before receipt - durability not confirmed
             os.rename(stage, destination)
             stage = None
             fd = os.open(destination.parent, os.O_RDONLY | os.O_DIRECTORY)
@@ -123,8 +147,7 @@ def freeze(driver, destination: Path):
                 os.fsync(fd)
             finally:
                 os.close(fd)
-            # Persistent, auditable receipt after successful publication.
-            # Reuses manifest hash and publication ID, does not introduce new auth system.
+            # Window 2: receipt write/replace and its dir fsync - commit point
             manifest_sha = digest(destination / "manifest.json")
             receipt_path = create_receipt(
                 destination,
@@ -133,6 +156,9 @@ def freeze(driver, destination: Path):
                 driver_state_sha256=state_hash,
                 release_sha256=release_hash,
             )
+            receipt_created = True
+        # Window 3: after receipt success, before final FROZEN checkpoint
+        # Receipt is commit point, so even if this fails, package remains restorable
         driver.transition("FROZEN")
         return FrozenPackage(
             manifest=manifest,
@@ -142,16 +168,25 @@ def freeze(driver, destination: Path):
             confirmation=None,
         )
     except BaseException as exc:
-        driver.state.update(stage="FAILED", publication_status="UNCERTAIN",
+        # Determine if receipt file actually exists (commit point) even if flag not set
+        # e.g., if create_receipt's parent fsync fails after file creation
+        actual_receipt_exists = False
+        try:
+            actual_receipt_exists = (destination / "publication_receipt.json").exists()
+        except Exception:
+            pass
+        is_confirmed = receipt_created or actual_receipt_exists
+        driver.state.update(stage="FAILED", publication_status="UNCERTAIN" if not is_confirmed else "CONFIRMED_BUT_SOURCE_FAILED",
                             publication_id=publication_id,
-                            preserved_package=str(stage if stage is not None else destination))
+                            preserved_package=str(stage if stage is not None else destination),
+                            receipt_created=is_confirmed)
         try:
             driver.checkpoint()
         except BaseException as checkpoint_error:
             exc.add_note(f"failure checkpoint also failed: {type(checkpoint_error).__name__}")
-        # Preserve both partial staging and visible-but-unconfirmed publication.
+        # Preserve both partial staging and visible-but-unconfirmed/confirmed publication.
         # Safety does NOT depend on persisting FAILED or deleting a marker.
-        # No receipt is created on failure path, so ordinary restore remains blocked.
+        # No receipt deletion to fake consistency.
         if stage is not None and stage.exists():
             # Keep stage for inspection; do not auto-delete to hide evidence
             pass

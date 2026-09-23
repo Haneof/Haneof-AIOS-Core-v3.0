@@ -108,17 +108,21 @@ def probe(repo: Path | None = None, private_a: Path | None = None) -> dict:
     # Deprecated positional arguments are deliberately NOT dereferenced. All
     # resources used for this proof are generated in this private temporary dir.
     with tempfile.TemporaryDirectory(prefix="c15-isolation-") as tmp:
-        base = Path(tmp); root = base / "root"; root.mkdir()
+        base = Path(tmp)
+        root = base / "root"
+        root.mkdir()
         paths, hashes = create_canaries(base)
         before = outside_checks(paths, hashes)
         if any(v != "VERIFIED" for v in before.values()):
             return assess(before, {}, outside_checks(paths, hashes))
-        packet = base / "packet"; packet.mkdir()
+        packet = base / "packet"
+        packet.mkdir()
         allowed = packet / "request.json"
         allowed.write_text(json.dumps({"synthetic": True, "nonce": os.urandom(16).hex()}))
         allowed_sha256 = hashlib.sha256(allowed.read_bytes()).hexdigest()
-        script = base / "probe.py"; script.write_text(PROBE)
-        # Try to find a suitable interpreter: prefer python3.11 if exists, else python3, else current
+        script = base / "probe.py"
+        script.write_text(PROBE)
+        # Interpreter selection: try 3.11, then 3, 3.12, 3.10
         interpreter_candidates = [Path('/usr/bin/python3.11'), Path('/usr/bin/python3'), Path('/usr/bin/python3.12'), Path('/usr/bin/python3.10')]
         interpreter = None
         for cand in interpreter_candidates:
@@ -126,15 +130,12 @@ def probe(repo: Path | None = None, private_a: Path | None = None) -> dict:
                 interpreter = cand
                 break
         if interpreter is None:
-            # No interpreter found, treat as env unsupported -> INCONCLUSIVE via RuntimeError
             raise RuntimeError("isolation probe INCONCLUSIVE: no suitable python interpreter found")
         setpriv = Path('/usr/bin/setpriv')
         if not setpriv.is_file():
             raise RuntimeError("isolation probe INCONCLUSIVE: setpriv not found")
-        # Build mount list, handling ldd failures gracefully
         mounts = {str(interpreter): str(interpreter), str(setpriv): str(setpriv),
                   str(packet): '/packet', str(script): '/probe.py'}
-        # Try to include lib dir for interpreter if exists
         for lib_dir in [f'/usr/lib/{interpreter.name}', '/usr/lib/python3.11', '/usr/lib/python3.12', '/usr/lib/python3.10', '/usr/lib/python3']:
             if Path(lib_dir).is_dir():
                 mounts[lib_dir] = lib_dir
@@ -142,11 +143,9 @@ def probe(repo: Path | None = None, private_a: Path | None = None) -> dict:
             try:
                 output = subprocess.check_output(['ldd', str(binary)], text=True, stderr=subprocess.DEVNULL)
             except (FileNotFoundError, PermissionError, OSError, subprocess.SubprocessError) as e:
-                # ldd not available or binary not found -> env unsupported
                 raise RuntimeError(f"isolation probe INCONCLUSIVE: ldd failed for {binary}: {e}") from e
             for token in output.split():
                 if token.startswith('/'):
-                    # Only include if file exists
                     if Path(token).exists():
                         mounts[token] = token
         import shlex
@@ -158,27 +157,51 @@ def probe(repo: Path | None = None, private_a: Path | None = None) -> dict:
                 if Path(source).is_dir():
                     dst.mkdir(parents=True, exist_ok=True)
                 else:
-                    dst.parent.mkdir(parents=True, exist_ok=True); dst.touch()
-                script_lines += [f'mount --bind {q(source)} {q(str(dst))}',
-                                 f'mount -o remount,bind,ro,nosuid,nodev {q(str(dst))}']
-            except OSError as e:
+                    dst.parent.mkdir(parents=True, exist_ok=True)
+                    dst.touch()
+                script_lines.append(f'mount --bind {q(source)} {q(str(dst))}')
+                script_lines.append(f'mount -o remount,bind,ro,nosuid,nodev {q(str(dst))}')
+            except PermissionError as e:
                 raise RuntimeError(f"isolation probe INCONCLUSIVE: mount setup failed {source}: {e}") from e
-        script_lines += [f'cd {q(str(root))}',
-            f'exec /usr/sbin/chroot {q(str(root))} /usr/bin/setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all {q(str(interpreter))} -I -B /probe.py']
+            except OSError as e:
+                # Only PermissionError or explicit permission messages are facility unsupported
+                # Other OSError (ENOSPC, EIO, etc.) must fail explicitly
+                msg = str(e).lower()
+                if "operation not permitted" in msg or "permission denied" in msg:
+                    raise RuntimeError(f"isolation probe INCONCLUSIVE: mount setup failed {source}: {e}") from e
+                raise
+        script_lines.append(f'cd {q(str(root))}')
+        script_lines.append(f'exec /usr/sbin/chroot {q(str(root))} /usr/bin/setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all {q(str(interpreter))} -I -B /probe.py')
         request = {"canaries": {k: str(v) for k, v in paths.items()}, "allowed_sha256": allowed_sha256}
+        # Join with newline, avoid triple escaping issues
+        shell_script = "\n".join(script_lines)
         try:
             result = subprocess.run(['unshare', '--user', '--map-root-user', '--mount', '--net', '--pid', '--fork',
-                                     '/bin/sh', '-c', '\n'.join(script_lines)], input=json.dumps(request),
+                                     '/bin/sh', '-c', shell_script], input=json.dumps(request),
                                     text=True, capture_output=True, timeout=20, close_fds=True,
                                     env={'PATH': '/usr/sbin:/usr/bin:/bin', 'LANG': 'C.UTF-8'})
-        except (FileNotFoundError, PermissionError, OSError) as e:
+        except FileNotFoundError as e:
+            raise RuntimeError(f"isolation probe INCONCLUSIVE: unshare not found: {e}") from e
+        except PermissionError as e:
             raise RuntimeError(f"isolation probe INCONCLUSIVE: unshare failed: {e}") from e
-        if result.returncode:
-            raise RuntimeError(f"isolation probe INCONCLUSIVE ({result.returncode}): {result.stderr.strip()}")
+        except OSError as e:
+            msg = str(e).lower()
+            if "operation not permitted" in msg or "permission denied" in msg:
+                raise RuntimeError(f"isolation probe INCONCLUSIVE: unshare failed: {e}") from e
+            raise
+        if result.returncode != 0:
+            stderr_low = result.stderr.strip().lower()
+            if "operation not permitted" in stderr_low or "permission denied" in stderr_low or "unshare: unshare failed" in stderr_low:
+                raise RuntimeError(f"isolation probe INCONCLUSIVE ({result.returncode}): {result.stderr.strip()}")
+            raise RuntimeError(f"isolation probe FAILED ({result.returncode}): {result.stderr.strip()}")
         try:
-            report = assess(before, json.loads(result.stdout), outside_checks(paths, hashes))
+            parsed = json.loads(result.stdout)
         except Exception as e:
-            raise RuntimeError(f"isolation probe INCONCLUSIVE: output parse failed: {e}") from e
+            raise ValueError(f"isolation probe FAILED: illegal output not JSON: {e}, stdout={result.stdout[:200]}") from e
+        try:
+            report = assess(before, parsed, outside_checks(paths, hashes))
+        except Exception as e:
+            raise RuntimeError(f"isolation probe FAILED: assess protocol error: {e}") from e
         return report
 
 
