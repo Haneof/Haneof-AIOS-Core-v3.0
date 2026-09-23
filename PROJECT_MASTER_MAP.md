@@ -9,6 +9,34 @@
 
 ---
 
+## 0. 当前项目快照 — 2026-09-23 PM 纠偏
+
+> **PM / 工程 / operator 导航，不是 Resident 盲测资料。** 盲测 Resident 不读地图/任务板/checkpoint，只接收独立放行的安全包。
+
+- reviewed main：`ed07b5890909ae09cb2a0849729662b4235c1e3b`；frozen Core：`bcd6bf353126318f9a97076b52ec1740d43f35a4`。
+- P0–P15：已形成 Core 机制与阶段 Gate；不等于真实设备产品集成或长期模型认知已全面通过。
+- C14：已正式 PASS；C15 hardening：已冻结；canonical A：#117 已接受。
+- B：#121 已提交但当前 candidate **NOT ACCEPTED**（执行证据不足、最终索引落后）；不是“尚无人执行”，也不是“报告写 PASS 所以完成”。
+- 当前治理工作：`C15-RCC-RES-B-CORRECTIVE-001 = GATE`；裁决、导航与队列待 PM 自审与集成。**未合入前不启动实验；合入并写回后唯一下一 READY 是 operator preflight，而非 Resident B/C。**
+- 纠偏裁决：`governance/C15_RCC_RES_B_CORRECTIVE_DECISION_2026-09-23.md`；审查证据：`reviews/C15_RCC_RES_B_001_PM_CORRECTIVE_REVIEW_2026-09-23.md`。
+- C15 C/EVAL/CLOSE、C16、广泛 P16 及 P17 均未放行。机械 CI SUCCESS、运行报告、自评 PASS、独立证据接受与语义 VALID 必须分开。
+
+| P16 内部子阶段 | 当前状态 / 下一合法出口 |
+|---|---|
+| C13 / 历史 T34/T36/T28/T35/T33 修复 | 已有 task-board 完成证据；不因旧 Issue OPEN 重做 |
+| C14 持续认知派生 | 正式收口 PASS |
+| C15 Resident A | canonical #117，DONE / ACCEPTED |
+| C15 旧 B candidate | #121 NOT ACCEPTED；保留 immutable non-canonical evidence |
+| C15 B 恢复链 | 纠偏治理集成 → operator preflight → 独立放行 → fresh B → 独立接受 |
+| C15 C 与终评 | B 接受 + 可信模型身份前置后才可启动 C；R1–R9 全 VALID 才收口 |
+| C16 系统改进反馈 | BLOCKED；Resident proposal 与用户 World 分离，独立复现/工程/Gate/再验证 |
+| 广泛 P16 | C15/C16 关闭后恢复有效分段 ledger、年度证据、多 provider/model、独立评估和红队 |
+| P17 / P18 / P19 | 发布 Gate / 平台 / 产品依次后置 |
+
+不将通过的阶段数量等权换算为总体完成百分比，不把代码完整性当长期认知成功。
+
+---
+
 ## 1. 项目最终目标
 
 AIOS v3.0 不是一个“聊天机器人外壳”，而是一个可长期运行的 AI-Operated System：
@@ -82,14 +110,14 @@ Evidence + Dependency + Revision
 | P13 数据接入与机械清洗 | 对话外现实持续进入世界 | 手机/App/传感器/相册/麦克风/日历等 adapter | 数据接入不得越权产生高阶认知 | ✅ 已通过 P13 Gate |
 | P14 长会话连续性完整接线 | 超长单会话不因 context limit 失忆 | rolling state、轮总结、summary drill-down | raw dialogue 永久保留；summary 只是索引 | ✅ 已通过 P14 Gate |
 | P15 周期 Review / AI 成长 | AI 定期回看世界、修正理解、沉淀 Operation/Communication Experience，并可基于真实反馈调整 Cognitive Policy | periodic review、OperationExperience、CommunicationExperience、CognitivePolicy | 不以固定模板替代模型判断；经验/策略必须有真实证据且可回滚 | ✅ 已通过并收口 |
-| P16 多 Agent 长期入住测试 | 用真实模型和隐藏人生测试是否真的“活在世界中” | habitation harness / hidden-life / Current-Core target / run artifacts | harness 已合入；下一步是真实模型独立入住，不以关键词题库证明认知能力 | 🔵 当前主阶段 |
+| P16 多 Agent 长期入住测试 | 用真实模型和隐藏人生测试是否真的“活在世界中” | habitation harness / hidden-life / Current-Core target / run artifacts | C14 已收口；C15/C16 专项门后恢复长期多模型入住、独立评估和红队 | 🔵 当前主阶段；B 纠偏治理待集成 |
 | P17 Core Release Gate | 形成第一个稳定可运行 AIOS Core | reproducible build、full CI、migration report | 世界闭环、认知闭环、任务闭环均稳定 | ⏳ 待做 |
 | P18 平台适配 | 把同一套 Core 放到真实运行环境 | Android/Linux service、device adapters | Core 语义不因平台重写 | ⏳ 后置 |
 | P19 产品层 | AIOS UI、数字人、系统入口、设备体验 | Launcher/UI/Voice/Digital Human | 产品层不得反向污染 Core 世界语义 | ⏳ 后置 |
 
 ---
 
-## 3.1 2026-09-20 宪法认知代码收口
+## 3.1 历史记录：2026-09-20 宪法认知代码收口
 
 历史审查 `reviews/AIOS_V3_CONSTITUTION_CODE_ALIGNMENT_AUDIT_2026-09-20.md` 发现的代码缺口，已通过 PR #20 全部关闭并 squash merge 到：
 
@@ -119,14 +147,14 @@ Evidence + Dependency + Revision
 
 因此，**旧审查中的“缺 Event / Policy / CommunicationExperience / generic multi-scale Summary / topic-state orchestration”已不再是 P17 blocker。**
 
-当前唯一项目级阻塞仍然是 P16：
+在 2026-09-20 该历史节点，项目级阻塞被记录为 P16（当前细分状态以 §0/任务板为准）：
 
 > 尚未产生至少两个真实 provider/model 独立长期入住的可审计 cognition artifacts 与独立 oracle evaluator 证据。
 
 机械 Gate 不能替代真实模型认知证明，所以 P16 仍是 CONTINUE / NOT PASS，P17 仍不得启动。
 
 
-## 3.2 2026-09-20 第二轮代码完整性收口
+## 3.2 历史记录：2026-09-20 第二轮代码完整性收口
 
 第二轮复审 `reviews/AIOS_V3_CODE_COMPLETENESS_REAUDIT_2026-09-20.md` 重新发现的代码级 blocker，已通过 PR #21 全部关闭。
 
@@ -151,7 +179,7 @@ Evidence + Dependency + Revision
 
 accepted head 触发的 20 个相关 workflow **全部 SUCCESS**，包含 `p16-convergence-gate` full-core regression 与 `constitutional-cognition-closure`。
 
-因此当前项目重新回到：
+因此在 2026-09-20 该历史节点，项目记录为（不是后续所有节点的零缺陷保证）：
 
 > **已知 audited Core code blocker = 0；P16 唯一项目级 blocker = 尚无真实 provider/model 长期入住 cognition evidence。**
 
@@ -218,10 +246,13 @@ P14 Long Conversation Continuity  ✅
                     ↓
 P15 Periodic Review / AI Growth  ✅
                     ↓
-P16 Multi-Agent Long-Term Habitation Test  ← 当前主任务
+P16 主阶段
+  C14 PASS → C15 B corrective integration / operator preflight
+           → fresh B acceptance → attested C → C15 close
+           → C16 → broad long-term habitation
 ```
 
-P9 要解决的核心场景：
+P9 已实现并应持续保持的核心场景（不是重新施工授权）：
 
 ```text
 旧 Evidence
@@ -259,7 +290,11 @@ P9 认知翻案传播 ✅
 → P13 多源现实数据接入 ✅
 → P14 长会话连续完整接线 ✅
 → P15 周期Review与AI经验成长 ✅
-→ P16 多Agent长期入住测试 ← 当前
+→ P16 内部专项：C14 PASS → C15 B纠偏/预检/独立放行/重跑/验收
+→ C15 可信模型身份 → Resident C → 独立语义终评 → 收口
+→ C16 Resident系统改进反馈闭环
+→ 恢复 P16 分段/年度 + 多provider独立入住 + evaluator/red-team
+→ P16正式收口
 → P17 Core Release Gate
 → P18 Android/Linux平台适配
 → P19 产品UI/数字人/硬件
@@ -271,7 +306,7 @@ P9 认知翻案传播 ✅
 
 ## 7. 断点续传协议
 
-以后任何新会话、新模型、新工程师接手 AIOS 时，不允许先凭记忆重新设计项目。
+以后任何 PM/operator/工程师新会话接手 AIOS 时，不允许先凭记忆重新设计项目。盲测 Resident 不适用本仓库导航协议，只使用经独立放行的安全包，防止治理材料污染实验。
 
 必须按以下顺序恢复现场：
 
@@ -322,7 +357,7 @@ governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md
 
 新会话恢复顺序更新为：先读 task board，再读本 Master Map、Current Checkpoint 和 Fused Baseline。若 task board 已明确冻结 WIP，禁止从头重做同一任务。
 
-## 9. 三套项目导航文件的分工
+## 9.1 项目导航文件的分工
 
 ```text
 PROJECT_MASTER_MAP.md
