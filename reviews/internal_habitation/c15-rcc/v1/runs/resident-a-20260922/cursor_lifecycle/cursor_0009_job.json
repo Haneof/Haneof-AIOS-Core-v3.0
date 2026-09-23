@@ -1,0 +1,11 @@
+{
+  "cursor": 9,
+  "subject_id": "user_1",
+  "occurred_at": "2026-11-04T14:17:00-08:00",
+  "reveal_file": "reviews/internal_habitation/c15-rcc/v1/runs/resident-a-20260922/cursor_lifecycle/cursor_0009_reveal.json",
+  "run_turn": false,
+  "evaluate_observation_ref": {
+    "object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+    "revision": 1
+  }
+}

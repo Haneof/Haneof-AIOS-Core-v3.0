@@ -1,0 +1,30 @@
+{
+  "capability_calls": [
+    {
+      "name": "commit_ai_world_claim",
+      "call_id": "cp0035-published",
+      "arguments": {
+        "domain": "cognitive_boundary",
+        "statement": "15:02 的 registry 记录说 edge-2026.11.4 第二次上传成功，tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED。这是一条发布完成记录，不再是排队。它不说明门店已经开始测试，也不说明已经进入生产。14:16 的拒绝仍然是更早的失败记录，没有被这条成功记录抹掉。",
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_291beec37165eb34a35f8f85",
+            "revision": 1
+          }
+        ],
+        "confidence": 0.9,
+        "knowledge_state": "observed",
+        "claim_type": "fact",
+        "scope_key": "edge-2026.11.4-upload",
+        "tags": [
+          "release",
+          "edge-2026.11.4",
+          "published"
+        ]
+      }
+    }
+  ],
+  "response": null,
+  "silence": false,
+  "decision_rationale": "The new record has tag, digest, and PUBLISHED, so it is a completion record under the user's status rule. It does not show store testing or a production deploy, and it does not erase the earlier rejection."
+}

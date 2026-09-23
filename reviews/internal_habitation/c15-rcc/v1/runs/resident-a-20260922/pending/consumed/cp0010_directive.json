@@ -1,0 +1,18 @@
+{
+  "capability_calls": [
+    {
+      "name": "search_world",
+      "arguments": {
+        "query": "CI staging smoke",
+        "dimensions": [
+          "dim:work_outcome"
+        ],
+        "limit": 5
+      },
+      "call_id": "cp0010-search-outcome"
+    }
+  ],
+  "response": null,
+  "silence": false,
+  "decision_rationale": "The user is commenting on a result. The world map has a work_outcome observation that is not in the pinned turn; inspect it before treating their satisfaction as the outcome itself."
+}

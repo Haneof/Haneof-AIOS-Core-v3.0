@@ -1,0 +1,34 @@
+{
+  "trace_id": "cap0038",
+  "checkpoint_id": "cp0038",
+  "cursor": 12,
+  "directive": {
+    "capability_calls": [],
+    "response": "收到。通知是你发出的。我这边还没有门店已经开始测或测完的记录，所以先不把测试说成已经开始或通过。",
+    "silence": false
+  },
+  "history_before": [
+    {
+      "name": "commit_ai_world_claim",
+      "ok": true,
+      "data": {
+        "domain": "user_understanding",
+        "dimension": "dim:ai_user_understanding",
+        "subject_id": "user_1",
+        "claim": {
+          "claim_id": "clm_3b884846f2a60109552b3e53",
+          "evidence_set_id": "evs_73643f02ac83f9ccb217f775",
+          "dependency_ids": [
+            "dep_c1d2b1ac00069fac1a3bf1fb",
+            "dep_8517879d6935cf092307010e"
+          ],
+          "world_revision": 77,
+          "reused_existing": false
+        }
+      },
+      "error_code": null,
+      "error_message": null,
+      "call_id": "cp0037-store-notice"
+    }
+  ]
+}

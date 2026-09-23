@@ -1,0 +1,20 @@
+{
+  "trace_id": "cap0021",
+  "checkpoint_id": "cp0021",
+  "cursor": 7,
+  "directive": {
+    "capability_calls": [
+      {
+        "name": "read_periodic_review_anchors",
+        "arguments": {
+          "offset": 0,
+          "limit": 10
+        },
+        "call_id": "cp0021-anchors"
+      }
+    ],
+    "response": null,
+    "silence": false
+  },
+  "history_before": []
+}

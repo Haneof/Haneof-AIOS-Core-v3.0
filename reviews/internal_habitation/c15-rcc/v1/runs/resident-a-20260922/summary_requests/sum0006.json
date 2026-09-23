@@ -1,0 +1,36 @@
+{
+  "kind": "dimension_summary",
+  "checkpoint_id": "sum0006",
+  "summary_id": "sum0006",
+  "simulated_time": "2026-11-04T13:30:00-08:00",
+  "current_released_cursor": 7,
+  "world_revision_before": 41,
+  "request": {
+    "dimension": "dim:ai_relationship",
+    "granularity": "day",
+    "window_start": "2026-11-03T00:00:00Z",
+    "window_end": "2026-11-03T23:59:59.999999Z",
+    "source_world_revision": 41,
+    "sources": [
+      {
+        "object_id": "evs_revision_701cc74edf2211fafd3b8d9c",
+        "revision": 1,
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-03T18:15:00Z",
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 3, \"missing_description\": [], \"observed_count\": 3}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-03T18:15:00Z\", \"world_revision\": 25}, \"learned_at\": \"2026-11-03T18:15:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_40aac9b697910640bab07507\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_44adaa6fb0d7ca35c4850cf5\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_a44137d1edddb299e74a940a\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:ai_relationship\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_00d12d8ef67dd269158894d1\", \"revision\": 3}}, \"object_id\": \"evs_revision_701cc74edf2211fafd3b8d9c\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_00d12d8ef67dd269158894d1@3\", \"recorded_at\": \"2026-11-03T18:15:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_conv_user_40aac9b697910640bab07507\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_44adaa6fb0d7ca35c4850cf5\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_a44137d1edddb299e74a940a\", \"revision\": 1}]}",
+        "metadata": {
+          "dimension": "dim:ai_relationship",
+          "revision_mode": "revise",
+          "target_ref": {
+            "object_id": "clm_00d12d8ef67dd269158894d1",
+            "revision": 3
+          }
+        }
+      }
+    ],
+    "truncated": false
+  },
+  "resident_authored_response": "2026-11-03 的关系维度只有一个修订证据集 evs_revision_701cc74edf2211fafd3b8d9c。它在 18:15Z 记录了对 clm_00d12d8ef67dd269158894d1 第 3 版的修订，支撑引用是三条用户对话。这个来源没有包含修订后的正文，也没有新的关系事实。",
+  "decision_rationale": "Describe the only supplied evidence set. Do not import the revised claim text from outside this window.",
+  "world_revision_after": 47
+}

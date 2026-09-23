@@ -1,0 +1,6 @@
+{
+  "capability_calls": [],
+  "response": "明白。准备提交、已排队，和确实完成，我会分开说。没有完成记录，就按没确认完成处理。这次 tag 还没出来，edge-2026.11.4 仍然不能算已发布。",
+  "silence": false,
+  "decision_rationale": "Accept the explicit status-language rule and apply it to the current image, which still has no completion record."
+}

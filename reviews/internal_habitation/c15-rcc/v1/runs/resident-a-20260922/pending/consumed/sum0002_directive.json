@@ -1,0 +1,4 @@
+{
+  "summary_text": "2026-11-02 的用户理解维度有两条当前认知，另有 4 个证据集支撑写入或修订，没有独立的新事实。clm_38ad6d12fe669e009a9aa3ea 第 3 版写的是：Atlas staging 收尾默认只给结果和关键风险，这类低风险实现可以保持这个节奏；影响生产或产生费用再集中提出；production 旧索引要删必须先给具体对象、影响和回滚办法，等明确确认后才执行，随口“清一下”不是授权。文本同时限定这不是其他类型项目上的固定习惯。clm_ca5a8933b8e86d1a4df0cdf2 第 3 版写的是：测试环境、低风险实现由我自己定细节、做完给结果，用户说过这次结果能用并希望以后这类保持这个节奏；这不覆盖 production 旧索引删除，而且这条节奏还没有第二次结果来检验。",
+  "decision_rationale": "Restate the two supplied current claim texts and mark the evidence sets as support, not additional facts."
+}
