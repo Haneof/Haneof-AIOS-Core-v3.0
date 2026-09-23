@@ -1,0 +1,58 @@
+name: pr126-strict-synthetic-integration
+
+on:
+  pull_request:
+    paths:
+      - "src/aios_core/**"
+      - "tests/**"
+      - "tools/ci/**"
+      - "tools/c15_preflight/**"
+      - ".github/workflows/pr126-strict-synthetic-integration.yml"
+
+permissions:
+  contents: read
+
+# Synthetic mechanics only. A passing job is NOT a Core freeze, a real Resident
+# isolation attestation, or permission to launch B/C. PR126 remains draft/blocked.
+jobs:
+  core-positive-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONPATH: ".:src"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e ".[dev]"
+      - name: Execute every Core case and all 42 positive audit regressions
+        run: |
+          set +e
+          python -m pytest tests/unit tests/runtime tests/integration -ra --junitxml="$RUNNER_TEMP/pr126-core.xml"
+          pytest_exit=$?
+          python tools/ci/pr126_synthetic_gate.py --mode core --junit "$RUNNER_TEMP/pr126-core.xml" --pytest-exit "$pytest_exit"
+
+  full-public-synthetic-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONPATH: ".:src"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e ".[dev]"
+      - name: Execute public synthetic tests and fail closed on any skip
+        run: |
+          set +e
+          python -m pytest tests -ra --junitxml="$RUNNER_TEMP/pr126-full.xml"
+          pytest_exit=$?
+          python tools/ci/pr126_synthetic_gate.py --mode full --junit "$RUNNER_TEMP/pr126-full.xml" --pytest-exit "$pytest_exit"
