@@ -27,8 +27,13 @@ jobs:
           git diff --exit-code 849bfd41c623fb336b392a3e6e933cfad93620e9 HEAD -- reviews/internal_habitation
       - name: Synthetic transport and handoff-negative checks only
         run: |
-          python -m pytest -o addopts='' -v tests/preflight --junitxml=preflight-results.xml 2>&1 | tee preflight.log
-          cat preflight.log
+          python -m pytest -o addopts='' -q tests/preflight --junitxml=preflight-results.xml 2>&1 | tee preflight-q.log; echo "exit code ${PIPESTATUS[0]}" > exit.txt; cat preflight-q.log; cat exit.txt
+          if [ "$(cat exit.txt | awk '{print $3}')" != "0" ]; then
+            echo "--- q failed, retry with -v ---"
+            python -m pytest -o addopts='' -v tests/preflight 2>&1 | tee preflight-v.log
+          fi
+          # fail if q failed
+          test "$(cat exit.txt | awk '{print $3}')" = "0"
       - name: Relevant existing Core regressions (synthetic Worlds)
         run: |
           python -m pytest -o addopts='' -q --junitxml=regression-results.xml \
@@ -53,14 +58,20 @@ jobs:
             if not p.exists():
               print(f"missing {name}-results.xml")
               continue
-            suites = list(ET.parse(p).getroot().iter("testsuite"))
-            counts = {key: sum(int(s.get(key, 0)) for s in suites) for key in ("tests", "failures", "errors", "skipped")}
-            receipt = json.dumps({"suite": name, "python": sys.version.split()[0], "head": head, **counts})
-            print("::notice title=C15 synthetic test receipt::" + receipt)
-            with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as out:
-              out.write(receipt + "\n")
-            if counts["failures"] or counts["errors"]:
-              # print junit for debugging
-              print(open(p).read()[:20000])
+            try:
+              suites = list(ET.parse(p).getroot().iter("testsuite"))
+              counts = {key: sum(int(s.get(key, 0)) for s in suites) for key in ("tests", "failures", "errors", "skipped")}
+              receipt = json.dumps({"suite": name, "python": sys.version.split()[0], "head": head, **counts})
+              print("::notice title=C15 synthetic test receipt::" + receipt)
+              with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as out:
+                out.write(receipt + "\n")
+              if counts["failures"] or counts["errors"]:
+                print(open(p).read()[:20000])
+            except Exception as e:
+              print(f"parse error {e}")
+              print(open(p).read()[:20000] if p.exists() else "no file")
           PYTHON
-          cat preflight.log || true
+          echo "--- preflight-q.log ---"
+          cat preflight-q.log 2>/dev/null || echo "no q log"
+          echo "--- preflight-v.log ---"
+          cat preflight-v.log 2>/dev/null || echo "no v log"
