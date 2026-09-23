@@ -14,7 +14,27 @@
 规则：一个窗口只执行一个 Task ID；完成后必须写回 task board + 本 checkpoint，然后停止。不得根据下方历史“下一动作”重复施工。
 
 
-## 当前工程断点 — C15 Resident A historical repair 已拒绝：唯一下一 READY = C15-RCC-RES-A-RERUN-001
+## 当前工程断点 — C15 Resident A canonical PASS；唯一下一 READY = C15-RCC-RES-B-001
+
+- 2026-09-23：`C15-RCC-RES-A-RERUN-001 = DONE / ACCEPTED`。
+- Canonical frozen Core anchor：`bcd6bf353126318f9a97076b52ec1740d43f35a4`。
+- Reviewed main before governance close：`6abfd4d19d03a60a81b7ca336efbe3c9c726b3bb`；该提交只是 anchor 的治理 handoff 子提交，`src/aios_core/**` diff 为 0。
+- Canonical evidence：PR #117 @ `3e51f728d7959048b75fea01d405bc837b0e8185`，保持 **OPEN / UNMERGED / PINNED**。
+- `30e0dca1f08c49ed9bacc66b49313ac536d512af` 已裁决为 metadata-only 错标：GitHub 不存在可解析 commit/ref；PR #117 的父基线为 `6abfd4d19d03a60a81b7ca336efbe3c9c726b3bb`，其 Core tree 与冻结 anchor 相同。仅修正 manifest/report/PR 描述并新增 anchor proof，World/cognition 等冻结字节未改。
+- Execution PASS：cursor 1..13、13 条唯一 durable ack、`next_sequence=14`、无 pending reveal；final World/index = `88/88`。
+- Freshness PASS：fresh World + session `resident-a-final-rerun-20260923-001`；未复用 PR #101 session、Claim IDs、transcript 或 World。
+- Cognition / revision PASS：UU rev1→rev5、Relationship rev1→rev3、Strategy rev1→rev3、Communication Experience 与 Operation Experience 均有 pinned evidence；所有 revision 为 forward-only old→new 且生成新 EvidenceSet。
+- UNKNOWN PASS：READY_FOR_UPLOAD/queued 未提升为 completed；checksum mismatch 被保持为 rejected；仅在 tag+digest+PUBLISHED 完成记录出现后确认 completed；DRAFT runbook 未提升为 reviewed/accepted/executed。
+- Durable handoff：
+  - World `sha256:9ff2b13cc1ec6e4d61a7910b4177ed3e1f25cfc47df8e18481a0199dd1aad395`
+  - Index `sha256:55282a61d714f732f1b10fa6b450853f8425b5c9f741090fcaad0f1e673a6643`
+  - release-state `sha256:b626cdd7d8ee16bcc9123ef8641bb05637d73d713023a471a74d7f6a392e052e`
+- `C15-RCC-RES-B-001 = READY`；B 必须是新模型进程/会话，只恢复 durable AIOS lineage，不得读取或注入 A transcript/report/decision/checkpoint/out-of-band summary，合法范围仅 cursor 14..22。
+- `C15-RCC-RES-C-001`、`C15-RCC-EVAL-001`、`C15-RCC-CLOSE-001` 继续 BLOCKED。
+- Final decision：`governance/C15_FINAL_RELEASE_DECISION_2026-09-23.md`。
+- **Next unique READY：`C15-RCC-RES-B-001`。**
+
+## 历史工程断点 — C15 Resident A historical repair 已拒绝：该 rerun handoff 已完成
 
 - 2026-09-22：`C15-RCC-RES-A-REPAIR-DECISION-001 = DONE`。
 - Decision: **`PATH A = REJECTED` / `PATH B = REQUIRED`**。

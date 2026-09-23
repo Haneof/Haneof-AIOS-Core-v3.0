@@ -95,8 +95,8 @@
 | 29.1 | `C15-RCC-A-WAKE-DELIVERY-CORRECTIVE-001` | 独立纠偏 PR #102 对 interrupt-Wake user delivery 的治理解释：真实 delivered AI output 属于用户-AI交流 World fact；缺失持久化时不得把 A World 交给 fresh B | **DONE** | C15-RCC-RES-A-001 evidence run | `reviews/C15_RCC_RES_A_WAKE_DELIVERY_CORRECTIVE_REVIEW_2026-09-22.md`; current-main Core audit; PR #101 exact evidence audit | 裁决 `WAKE USER-DELIVERED ASSISTANT OUTPUT PERSISTENCE = MECHANISM_GAP`；A/B 重新 BLOCKED；PR #101 保持 pre-fix diagnostic、OPEN/UNMERGED/PINNED；本窗口 Core diff 0 |
 | 29.2 | `C15-RCC-WAKE-DELIVERY-FIX-001` | 最小修复真实 user-delivered non-conversation Wake assistant output 持久化：仅实际允许并返回用户的 assistant response exactly-once 写入统一用户-AI交流维度；绝不伪造 USER input | **DONE** | C15-RCC-A-WAKE-DELIVERY-CORRECTIVE-001 | PR #104; Core merge `fd9ba5de329abb025f52de76f1ab658cdafb4897`; exact final Core candidate `41f2a5da2153c55b137741fdd71983eea2a011f7`; completion evidence `reviews/C15_RCC_WAKE_DELIVERY_FIX_001_COMPLETION_EVIDENCE_2026-09-22.md`; final PR-head Gates GREEN | Delivered Wake assistant output is durable/searchable with exact Wake provenance and stable exactly-once recovery; suppressed/denied/internal/silence write 0; ordinary run_turn unchanged; no synthetic USER; PR #101 untouched. |
 | 29.3 | `C15-RCC-RES-A-REPAIR-DECISION-001` | Core 修复后由独立 PM 决定 Resident A evidence 的恢复路径：可验证的纯机械 historical persistence，或 fresh World 重跑 Resident A | **DONE** | C15-RCC-WAKE-DELIVERY-FIX-001 | `reviews/C15_RCC_RES_A_REPAIR_DECISION_2026-09-22.md`; PR #101 exact diagnostic evidence; fixed Core @ `41f2a5da2153c55b137741fdd71983eea2a011f7` | `PATH A = REJECTED`; `PATH B = REQUIRED`. Corrected history changes actual summary/review source sets during Phase A, so old semantic outputs are not historical-equivalent. |
-| 29.4 | `C15-RCC-RES-A-RERUN-001` | 在 fixed Core 上使用 frozen C15 fixture，从 fresh private World / fresh session 重新执行 Phase A cursor 1..13；必须由新的真实 Resident A 窗口逐事件生活 | **READY** | C15-RCC-RES-A-REPAIR-DECISION-001 | Same frozen C15 fixture; fixed Core on current main; no access to PR #101 semantic decisions/transcript/Claims | Fresh World only; do not copy old Claims; do not require old answers; Resident may form different legal cognition/silence/confidence/capability path; sequential reveal/no future leak; after run freeze evidence for independent PM acceptance before B |
-| 30 | `C15-RCC-RES-B-001` | fresh-context Resident B 只恢复 AIOS durable state，不注入 A 聊天/总结；验证整组 Resident cognition 在新窗口中正常恢复并影响新决策 | **BLOCKED** | C15-RCC-RES-A-001 | Canonical post-fix Resident A durable World only + normal Resident instruction | Remains blocked. PR #101 is superseded diagnostic evidence; B may start only after `C15-RCC-RES-A-RERUN-001` completes and the new A evidence is independently accepted. |
+| 29.4 | `C15-RCC-RES-A-RERUN-001` | 在 frozen Core 上使用 frozen C15 fixture，从 fresh private World / fresh session 重新执行 Phase A cursor 1..13；必须由新的真实 Resident A 窗口逐事件生活 | **DONE** | C15-RCC-RES-A-REPAIR-DECISION-001 | PR #117 @ `3e51f728d7959048b75fea01d405bc837b0e8185` remains OPEN / UNMERGED / PINNED; canonical Core anchor `bcd6bf353126318f9a97076b52ec1740d43f35a4`; `governance/C15_FINAL_RELEASE_DECISION_2026-09-23.md` | Independent acceptance PASS: cursor 1..13 sealed, 13/13 durable ack, fresh World/session, cognition/revision lineage valid, UNKNOWN discipline preserved; World/index/release-state frozen for B. |
+| 30 | `C15-RCC-RES-B-001` | fresh-context Resident B 只恢复 AIOS durable state，不注入 A 聊天/总结；验证整组 Resident cognition 在新窗口中正常恢复并影响新决策 | **READY** | C15-RCC-RES-A-RERUN-001 | PR #117 exact durable lineage only: World `sha256:9ff2b13cc1ec6e4d61a7910b4177ed3e1f25cfc47df8e18481a0199dd1aad395`; index `sha256:55282a61d714f732f1b10fa6b450853f8425b5c9f741090fcaad0f1e673a6643`; release-state `sha256:b626cdd7d8ee16bcc9123ef8641bb05637d73d713023a471a74d7f6a392e052e`; `RESIDENT_B_RUN_CONTRACT.md` | Start a new model process/session; restore only durable AIOS World/index/runtime state and exact receipt chain; no A transcript/report/decisions/checkpoints/out-of-band summary; execute sealed cursor 14..22 and stop. |
 | 31 | `C15-RCC-RES-C-001` | replacement-model Resident C 接管同一 AIOS World；验证“模型换、Resident 不重置” | **BLOCKED** | C15-RCC-RES-B-001 | B checkpoint + different provable model family/provider where available | 不要求同措辞/同风格；要求有效 User Understanding、Role、Self/Calibration、Strategy/Experience 仍可恢复和消费；无法证明模型身份则该轴不得判 VALID |
 | 32 | `C15-RCC-EVAL-001` | 独立 evaluator 审计 Resident Cognitive Continuity；不修 Core | **BLOCKED** | C15-RCC-RES-C-001 | A/B/C artifacts + World/checkpoint/digests + hidden chronology | 分别裁决 R1 user-understanding、R2 relationship/role、R3 self/calibration、R4 strategy/experience、R5 fresh-window、R6 replacement-model、R7 behavior effect、R8 correction、R9 anti-self-proof；全部 VALID 才可收口 |
 | 33 | `C15-RCC-CLOSE-001` | 最高 PM 收口 Resident Cognitive Continuity Gate | **BLOCKED** | C15-RCC-EVAL-001 | C15 full-chain evidence | 只有“形成真实认知 + fresh-window 连续 + replacement-model 连续 + later behavior consumption + 可被新现实修正 + 无循环自证”全部成立才 PASS |
@@ -1391,3 +1391,26 @@ Deferred issues: mechanism audit belongs exclusively to C15-RCC-PREFLIGHT-001; f
 Next READY task: C15-RCC-PREFLIGHT-001 — new window only; this window must not execute preflight
 ```
 
+---
+
+## 2026-09-23 — C15 Resident A canonical acceptance / Resident B release handoff
+
+- `C15-RCC-RES-A-RERUN-001 = DONE / ACCEPTED`.
+- `C15-RCC-RES-B-001 = READY`.
+- Frozen Core anchor remains exactly `bcd6bf353126318f9a97076b52ec1740d43f35a4`.
+- Reviewed main before this governance close: `6abfd4d19d03a60a81b7ca336efbe3c9c726b3bb` (governance-only direct child of the frozen Core anchor; zero `src/aios_core/**` diff).
+- Canonical evidence: PR #117 @ `3e51f728d7959048b75fea01d405bc837b0e8185`, retained **OPEN / UNMERGED / PINNED**.
+- Anchor anomaly resolved as metadata-only: `30e0dca1f08c49ed9bacc66b49313ac536d512af` is not a resolvable Git object/ref; the evidence branch is rooted at `6abfd4d19d03a60a81b7ca336efbe3c9c726b3bb`, whose Core tree equals the frozen anchor. `ANCHOR_PROVENANCE.md`, manifest, report, and PR description were corrected without changing World, index, release/restart state, cursor/stage/checkpoint/decision, or cognition bytes.
+- Phase A acceptance:
+  - cursor 1..13 present, ordered, uniquely acknowledged; `next_sequence=14`; no pending reveal;
+  - World revision / index watermark = `88 / 88`;
+  - fresh session `resident-a-final-rerun-20260923-001`; no PR #101 session, claim, transcript, or World reuse;
+  - User Understanding `clm_d95e2508b26a0292b94a7a59` rev1→rev5;
+  - Relationship `clm_776c4bbfaab7540a23c418cb` rev1→rev3;
+  - Strategy `clm_52276ec49967d10c72861d07` rev1→rev3;
+  - Communication Experience `commexp_f3778968f998cd698281e0ee@1`;
+  - Operation Experience `opexp_4c982ed6ba398f2a8404e4d0@1`;
+  - planned/queued, rejected, completed, and DRAFT states remain distinct; no unsupported completion/acceptance/execution promotion.
+- Canonical decision: `governance/C15_FINAL_RELEASE_DECISION_2026-09-23.md`.
+- `C15-RCC-RES-C-001`, `C15-RCC-EVAL-001`, and `C15-RCC-CLOSE-001` remain BLOCKED by their declared dependencies.
+- **Next unique READY: `C15-RCC-RES-B-001`.**
