@@ -20,7 +20,7 @@ from aios_core.contracts.models import Dependency, Summary
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import TemporalExtent, TimePrecision, as_utc
-from aios_core.query.search import WorldSearchIndex
+from aios_core.query.search import WorldSearchIndex, derive_dimension
 from aios_core.storage.idempotency import canonical_json_dumps
 from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
@@ -45,6 +45,8 @@ class DimensionSummarySource(BaseModel):
 class DimensionSummaryInput(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
+    subject_id: str = ""  # Legacy unbound inputs must be prepared again before commit.
+    include_summary_sources: bool = False
     dimension: str = Field(min_length=1)
     granularity: str = Field(min_length=1)
     window_start: datetime
@@ -154,13 +156,97 @@ class DimensionSummaryService:
         index: WorldSearchIndex,
         subject_id: str = "user_1",
         max_source_objects: int = 500,
+        source_subject_ids: Sequence[str] | None = None,
     ) -> None:
         if max_source_objects < 1:
             raise ValueError("max_source_objects must be >= 1")
         self.store = store
         self.index = index
         self.subject_id = subject_id
+        self.source_subject_ids = tuple(dict.fromkeys((subject_id, *(source_subject_ids or ()))))
         self.max_source_objects = max_source_objects
+
+    def _summary_id(self, dimension: str, granularity: str,
+                    start: datetime, end: datetime) -> str:
+        parts = (dimension, granularity, start.isoformat(), end.isoformat())
+        scoped = "sum_" + _stable_id(self.subject_id, *parts)
+        legacy = "sum_" + _stable_id(*parts)
+        for candidate in (scoped, legacy):
+            try:
+                raw = self.store.get_payload(candidate)
+            except StoreError as exc:
+                if exc.code is ErrorCode.NOT_FOUND:
+                    continue
+                raise
+            owned = raw.get("subject_id") == self.subject_id
+            if not owned:
+                if candidate == scoped:
+                    raise ValueError("summary ID belongs to another subject")
+                continue
+            summary = Summary.model_validate(raw)
+            if (summary.metadata.get("dimension") != dimension
+                    or summary.granularity != granularity
+                    or summary.summary_time.start != start
+                    or summary.summary_time.end != end):
+                raise ValueError("summary ID does not match its owner/window")
+            return candidate
+        return scoped
+
+    def _check_owner(self, prepared: DimensionSummaryInput) -> None:
+        if prepared.subject_id != self.subject_id:
+            raise ValueError("summary input must be bound to this subject; prepare again")
+
+    def _validate_sources(self, prepared: DimensionSummaryInput) -> None:
+        self._check_owner(prepared)
+        if prepared.truncated:
+            raise ValueError("cannot publish a truncated summary as CURRENT")
+        if prepared.source_world_revision > self.store.current_world_revision():
+            raise ValueError("summary input refers to a future World revision")
+        target_rank = _SUMMARY_SCALE_RANK.get(prepared.granularity)
+        seen = set()
+        for source in prepared.sources:
+            raw = self.store.get_payload(source.object_id)
+            # A caller must not label a newer source as belonging to an older cut.
+            self.store.get_payload(
+                source.object_id, revision=source.revision,
+                as_of_world_revision=prepared.source_world_revision,
+            )
+            if (raw["subject_id"] not in self.source_subject_ids
+                    or raw["revision"] != source.revision
+                    or raw["object_type"] != source.object_type):
+                raise ValueError("summary source must be current, typed and within scope")
+            if (raw.get("status", "active") in WorldSearchIndex._INACTIVE_CURRENT_STATUSES
+                    or raw.get("summary_status", "current") != "current"
+                    or raw.get("event_status") in {"rejected", "merged", "split"}
+                    or raw.get("stale", False)):
+                raise ValueError("summary source is not current/admissible")
+            if derive_dimension(raw, source.object_type) != prepared.dimension:
+                raise ValueError("summary source belongs to a different dimension")
+            if source.object_type == "summary":
+                rank = _SUMMARY_SCALE_RANK.get(raw.get("granularity"))
+                if (not prepared.include_summary_sources or rank is None
+                        or target_rank is None or rank >= target_rank):
+                    raise ValueError("summary sources must aggregate strictly bottom-up")
+            if (source.text != _text_from_payload(raw)
+                    or source.occurred_at != _occurred_start(raw)
+                    or source.metadata != (raw.get("metadata") or {})):
+                raise ValueError("summary source does not match its pinned revision")
+            key = (source.object_id, source.revision)
+            if key in seen:
+                raise ValueError("duplicate summary source")
+            seen.add(key)
+        # A bounded input is not a completeness certificate by itself: new facts
+        # may have arrived while the model was generating the summary. Recheck
+        # selection as well as pinned revisions; the caller's CAS covers races
+        # between this validation and publication.
+        current = self.prepare(
+            dimension=prepared.dimension, granularity=prepared.granularity,
+            window_start=prepared.window_start, window_end=prepared.window_end,
+            include_summary_sources=prepared.include_summary_sources,
+        )
+        current_refs = {(item.object_id, item.revision) for item in current.sources}
+        if current.truncated or current_refs != seen:
+            raise ValueError("summary source window changed or is incomplete; prepare again")
 
     def prepare(
         self,
@@ -176,12 +262,13 @@ class DimensionSummaryService:
         if end < start:
             raise ValueError("window_end must not be before window_start")
 
+        self.index.catch_up()
         source_world_revision = int(self.store.current_world_revision())
-        target_summary_id = "sum_" + _stable_id(
+        target_summary_id = self._summary_id(
             dimension,
             granularity,
-            start.isoformat(),
-            end.isoformat(),
+            start,
+            end,
         )
         target_rank = _SUMMARY_SCALE_RANK.get(granularity)
 
@@ -192,15 +279,18 @@ class DimensionSummaryService:
             self.max_source_objects + 1,
             min(10_000, self.max_source_objects * 8 + 64),
         )
-        page = self.index.search_mind(
-            subject=self.subject_id,
-            dimension=dimension,
-            time_range=(start, end),
-            limit=scan_limit,
-        )
+        hits = []
+        saturated = self.index.lag() > 0
+        for subject in self.source_subject_ids:
+            page = self.index.search_mind(
+                subject=subject, dimension=dimension,
+                time_range=(start, end), limit=scan_limit,
+            )
+            hits.extend(page.hits)
+            saturated |= len(page.hits) >= scan_limit
 
         eligible: list[tuple[Any, dict[str, Any]]] = []
-        for hit in page.hits:
+        for hit in hits:
             if hit.object_id == target_summary_id:
                 continue
             payload = self.store.get_payload(hit.object_id, revision=hit.revision)
@@ -219,7 +309,8 @@ class DimensionSummaryService:
                     continue
             eligible.append((hit, payload))
 
-        truncated = len(eligible) > self.max_source_objects
+        truncated = (saturated or len(eligible) > self.max_source_objects
+                     or source_world_revision != self.store.current_world_revision())
         sources: list[DimensionSummarySource] = []
         for hit, payload in eligible[: self.max_source_objects]:
             metadata = payload.get("metadata")
@@ -241,6 +332,8 @@ class DimensionSummaryService:
             )
         )
         return DimensionSummaryInput(
+            subject_id=self.subject_id,
+            include_summary_sources=include_summary_sources,
             dimension=dimension,
             granularity=granularity,
             window_start=start,
@@ -259,12 +352,12 @@ class DimensionSummaryService:
     ) -> SummaryCommit | None:
         """Forward-mark an existing window Summary stale when completeness is lost."""
 
+        self._check_owner(prepared)
+        expected_world_revision = int(self.store.current_world_revision())
         changed = as_utc(changed_at, "changed_at")
-        object_id = "sum_" + _stable_id(
-            prepared.dimension,
-            prepared.granularity,
-            prepared.window_start.isoformat(),
-            prepared.window_end.isoformat(),
+        object_id = self._summary_id(
+            prepared.dimension, prepared.granularity,
+            prepared.window_start, prepared.window_end,
         )
         try:
             latest_payload = self.store.get_payload(object_id)
@@ -355,7 +448,7 @@ class DimensionSummaryService:
                     "dimension": prepared.dimension,
                     "granularity": prepared.granularity,
                 },
-                expected_world_revision=int(self.store.current_world_revision()),
+                expected_world_revision=expected_world_revision,
                 reason=reason.strip(),
                 idempotency_key=f"summary-stale:{op_key}",
                 source_class=SourceClass.MAINTENANCE,
@@ -377,16 +470,16 @@ class DimensionSummaryService:
         content: str,
         generated_at: datetime,
     ) -> SummaryCommit:
+        expected_world_revision = int(self.store.current_world_revision())
+        self._validate_sources(prepared)
         text = content.strip()
         if not text:
             raise ValueError("summary content must be non-blank")
         generated = as_utc(generated_at, "generated_at")
 
-        object_id = "sum_" + _stable_id(
-            prepared.dimension,
-            prepared.granularity,
-            prepared.window_start.isoformat(),
-            prepared.window_end.isoformat(),
+        object_id = self._summary_id(
+            prepared.dimension, prepared.granularity,
+            prepared.window_start, prepared.window_end,
         )
 
         latest: dict[str, Any] | None
@@ -397,7 +490,9 @@ class DimensionSummaryService:
                 raise
             latest = None
 
-        if latest is not None and int(latest.get("source_world_revision", -1)) == prepared.source_world_revision:
+        if (latest is not None and latest.get("summary_status") == "current"
+                and latest.get("status", "active") == "active"
+                and int(latest.get("source_world_revision", -1)) == prepared.source_world_revision):
             if str(latest.get("content") or "") != text:
                 raise ValueError(
                     "the same source world revision is already summarized with different content"
@@ -457,7 +552,7 @@ class DimensionSummaryService:
                 "granularity": prepared.granularity,
                 "source_world_revision": prepared.source_world_revision,
             },
-            expected_world_revision=self.store.current_world_revision(),
+            expected_world_revision=expected_world_revision,
             reason="commit model-generated single-dimension temporal summary",
             idempotency_key=f"summary:{op_key}",
             source_class=SourceClass.MAINTENANCE,
