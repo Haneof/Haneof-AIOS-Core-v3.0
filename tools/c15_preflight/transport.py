@@ -53,27 +53,54 @@ class Trace:
     """
     def __init__(self, path: Path, revision: Callable[[], int]):
         fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW, 0o600)
-        self.file = os.fdopen(fd, "w", encoding="utf-8")
+        # Unbuffered journal: close after a failure must not flush pending text
+        # behind our back. No uncertain tail is retried or repaired.
+        self.file = os.fdopen(fd, "wb", buffering=0)
         self.path = path
         self.revision = revision
         self.previous = "0" * 64
         self.sequence = 0
         self.failure: str | None = None
+        self.io_failure: str | None = None
 
     def append(self, kind: str, data: Any) -> None:
+        if self.io_failure is not None:
+            raise JournalPoisoned("journal I/O outcome uncertain; no further appends")
         body = {"sequence": self.sequence + 1, "kind": kind,
                 "at": datetime.now(timezone.utc).isoformat(),
                 "world_revision": int(self.revision()), "previous": self.previous,
                 "data": plain(data)}
         digest = hashlib.sha256(encode(body).encode()).hexdigest()
-        self.file.write(encode({**body, "sha256": digest}) + "\n")
-        self.file.flush()
-        os.fsync(self.file.fileno())
+        frame = (encode({**body, "sha256": digest}) + "\n").encode("utf-8")
+        try:
+            count = self.file.write(frame)
+            if type(count) is not int or count != len(frame):
+                raise OSError("incomplete journal write; tail is uncertain")
+            self.file.flush()
+            os.fsync(self.file.fileno())
+        except BaseException as exc:
+            self.io_failure = self.failure = f"{type(exc).__name__}: {exc}"
+            raise
         self.previous = digest
         self.sequence += 1
 
     def close(self) -> None:
-        self.file.close()
+        try:
+            self.file.close()
+        except BaseException:
+            # If journal already poisoned, close must not raise or repair tail.
+            if self.io_failure is None:
+                raise
+            try:
+                # Best-effort raw close without second flush attempt.
+                import os as _os
+                _os.close(self.file.fileno())
+            except BaseException:
+                pass
+
+
+class JournalPoisoned(RuntimeError):
+    pass
 
 
 class TransportError(ValueError):
@@ -136,10 +163,24 @@ class StreamBridge:
         input_sha256 = hashlib.sha256(encode(serialized).encode()).hexdigest()
         request = {"protocol": "c15-transport-v2", "request_id": request_id,
                    "kind": kind, "input_sha256": input_sha256, "input": serialized}
-        self.trace.append("model_request", request)
         try:
-            self.outgoing.write(encode(request) + "\n")
-            self.outgoing.flush()
+            self.trace.append("model_request", request)
+            frame = encode(request) + "\n"
+            offset = 0
+            # Strict positive progress bounds iterations by frame length. Never
+            # resend a prefix; no reply read until the entire frame is flushed.
+            while offset < len(frame):
+                try:
+                    count = self.outgoing.write(frame[offset:])
+                except BaseException as write_exc:
+                    raise TransportError(f"send failed: {type(write_exc).__name__}: {write_exc}") from write_exc
+                if type(count) is not int or not 0 < count <= len(frame) - offset:
+                    raise TransportError("invalid send progress")
+                offset += count
+            try:
+                self.outgoing.flush()
+            except BaseException as flush_exc:
+                raise TransportError(f"flush failed: {type(flush_exc).__name__}: {flush_exc}") from flush_exc
             raw = self.incoming.readline(self.max_reply_chars + 1)
             if not raw:
                 raise TransportError("missing response: EOF")
@@ -155,10 +196,16 @@ class StreamBridge:
                               "provider_identity": "UNKNOWN", "usage": "UNKNOWN"})
             return result
         except BaseException as exc:
-            self.trace.failure = f"{type(exc).__name__}: {exc}"
-            # No fallback response. The host must stop the event; it may not ACK completion.
-            self.trace.append("model_error", {"request_id": request_id, "error_type": type(exc).__name__, "message": str(exc)})
-            raise
+            if self.trace.failure is None:
+                self.trace.failure = f"{type(exc).__name__}: {exc}"
+            if self.trace.io_failure is None:
+                try:
+                    self.trace.append("model_error", {"request_id": request_id, "error_type": type(exc).__name__, "message": str(exc)})
+                except BaseException:
+                    pass
+            if isinstance(exc, TransportError):
+                raise
+            raise TransportError(f"{type(exc).__name__}: {exc}") from exc
 
     def model(self, snapshot: RuntimeSnapshot) -> ModelDirective:
         if not isinstance(snapshot, RuntimeSnapshot):
@@ -216,17 +263,20 @@ class RuntimeRecorder:
         try:
             result = getattr(runtime, method)(**kwargs)
             if trace.failure is not None or getattr(result, "continuity_summary_error", None):
-                trace.append("runtime_return_failed", {"method": method, "result": result})
+                if trace.io_failure is None:
+                    trace.append("runtime_return_failed", {"method": method, "result": result})
                 raise TransportError("Core caught callback failure; phase is not complete")
             trace.append("runtime_result", {"method": method, "result": result})
             return result
         except BaseException as exc:
             trace.failure = f"{type(exc).__name__}: {exc}"
-            trace.append("runtime_error", {"method": method, "error_type": type(exc).__name__, "message": str(exc)})
+            if trace.io_failure is None:
+                trace.append("runtime_error", {"method": method, "error_type": type(exc).__name__, "message": str(exc)})
             raise
         finally:
             registry.invoke = original
-            trace.append("runtime_state", {
-                "index_watermark": runtime.index.watermark(),
-                "metering": runtime.metering.list_model_calls(subject_id=runtime.subject_id),
-            })
+            if trace.io_failure is None:
+                trace.append("runtime_state", {
+                    "index_watermark": runtime.index.watermark(),
+                    "metering": runtime.metering.list_model_calls(subject_id=runtime.subject_id),
+                })

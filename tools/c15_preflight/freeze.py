@@ -14,9 +14,11 @@ import sqlite3
 import tempfile
 from contextlib import ExitStack, closing
 from pathlib import Path
+from uuid import uuid4
 
 from .audit import digest, readonly
 from .driver import DriverBlocked, atomic_json
+from .publication import FrozenPackage, _confirm
 
 
 def backup(source: Path, destination: Path):
@@ -36,6 +38,7 @@ def freeze(driver, destination: Path):
         raise DriverBlocked("freeze destination already exists")
     driver.verify_boundary()
     stage = None
+    publication_id = uuid4().hex
     try:
         driver.transition("FREEZING")
         driver.runtime.index.rebuild()  # Canonical rebuild, not direct SQL reasoning.
@@ -62,7 +65,8 @@ def freeze(driver, destination: Path):
             backup(world, stage / "private_world.sqlite")
             backup(index, stage / "world_index.sqlite")
             shutil.copyfile(driver.port.state, stage / "release_state.json")
-            # The resumable package says READY, but the source driver becomes FROZEN.
+            # READY describes a completed runtime boundary, NOT authorization to
+            # restore. A separate live publication confirmation is mandatory.
             atomic_json(stage / "restart_state.json", {**driver.state, "stage": "READY"})
             shutil.copyfile(driver.trace.path, stage / "trace.jsonl")
             with closing(readonly(stage / "private_world.sqlite")) as w, closing(readonly(stage / "world_index.sqlite")) as i:
@@ -91,13 +95,18 @@ def freeze(driver, destination: Path):
                 os.chmod(path, 0o600)
                 with path.open("rb") as stream:
                     os.fsync(stream.fileno())
-            manifest = {"format": "c15-synthetic-freeze-v1", "world_revision": revision,
+            manifest = {"format": "c15-synthetic-freeze-v2", "world_revision": revision,
+                        "publication": {"id": publication_id, "status": "VALIDATED_NOT_CONFIRMED"},
                         "index_watermark": revision, "completed_sequence": driver.state["completed_sequence"],
                         "files": {p.name: digest(p) for p in stage.iterdir()}}
             atomic_json(stage / "manifest.json", manifest)
             # Under the exclusively owned run parent, never overwrite an existing package.
             if destination.exists():
                 raise DriverBlocked("freeze destination appeared")
+            driver.transition("PUBLISHING")
+            # From rename through the last successful fsync, durability is not
+            # confirmed. An exception leaves the package for inspection, but NO
+            # restore capability exists, even if every on-disk byte looks valid.
             os.rename(stage, destination)
             stage = None
             fd = os.open(destination.parent, os.O_RDONLY | os.O_DIRECTORY)
@@ -106,10 +115,17 @@ def freeze(driver, destination: Path):
             finally:
                 os.close(fd)
         driver.transition("FROZEN")
-        return manifest
-    except BaseException:
-        driver.transition("FAILED")
-        # No manifest/publication on partial backup; retain only source failure state.
-        if stage is not None:
-            shutil.rmtree(stage)
+        # Last action: no I/O follows issuance. A process crash before delivery
+        # loses confirmation and requires independent review, not auto-recovery.
+        return FrozenPackage(manifest, _confirm(digest(destination / "manifest.json"), publication_id))
+    except BaseException as exc:
+        driver.state.update(stage="FAILED", publication_status="UNCERTAIN",
+                            publication_id=publication_id,
+                            preserved_package=str(stage if stage is not None else destination))
+        try:
+            driver.checkpoint()
+        except BaseException as checkpoint_error:
+            exc.add_note(f"failure checkpoint also failed: {type(checkpoint_error).__name__}")
+        # Preserve both partial staging and visible-but-unconfirmed publication.
+        # Safety does NOT depend on persisting FAILED or deleting a marker.
         raise

@@ -66,4 +66,9 @@ class ClockAdapter(_clock_type()):
         result = super().advance_to(instant)
         if result.get('dimension_summaries', {}).get('truncated'):
             raise RuntimeError('clock Summary incomplete; not completion')
+        # advance_to only dispatches at Task/Review ticks. A boundary with no
+        # such tick still needs the normal router pass BEFORE the new input is
+        # ingested. Use this protocol boundary, never backdate model execution
+        # to the Wake's origin or force-drain a budget-deferred queue.
+        result['pre_ingest_wakes'] = self._dispatch_pending_wakes(instant)
         return result

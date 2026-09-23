@@ -71,13 +71,13 @@ def bindings(tmp_path):
     return b.load_release_operator(), b.load_canonical_adapter(), b.load_mechanical_adapter()
 
 
-def setup(tmp_path, *, fail_kind=None, mutate=None, stop=3, modules=None, restore=None):
+def setup(tmp_path, *, fail_kind=None, mutate=None, stop=3, modules=None, restore=None, confirmation=None):
     modules = modules or bindings(tmp_path)
     run = tmp_path / 'run'
     if restore is None:
         run.mkdir()
     else:
-        restore_frozen(restore, run, manifest_sha256=digest(restore / 'manifest.json'))
+        restore_frozen(restore, run, manifest_sha256=digest(restore / 'manifest.json'), confirmation=confirmation)
     store = SQLiteWorldStore(run / 'private_world.sqlite')
     index = WorldSearchIndex(run / 'world_index.sqlite', store=store)
     trace = Trace(run / 'trace.jsonl', store.current_world_revision)
@@ -91,7 +91,7 @@ def setup(tmp_path, *, fail_kind=None, mutate=None, stop=3, modules=None, restor
         port.invoke(modules[0].cmd_init)
     else:
         clock = datetime.fromisoformat(json.loads((run/'driver_state.json').read_text())['clock'])
-    driver = Driver(runtime,trace,port,run,session='synthetic-session',clock=clock,stop_sequence=stop)
+    driver = Driver(runtime,trace,port,run,session='synthetic-session',clock=clock,stop_sequence=stop,initialize_fresh=restore is None)
     return driver, peer, modules
 
 
@@ -164,13 +164,13 @@ def test_single_writer_and_interrupted_ack_never_implicitly_replayed(tmp_path):
 def test_clean_freeze_restart_continues_no_transcript_replay(tmp_path):
     d, _, modules=setup(tmp_path)
     d.step()
-    final=tmp_path/'frozen'; manifest=freeze(d,final)
-    assert manifest['world_revision']==manifest['index_watermark']
+    final=tmp_path/'frozen'; published=freeze(d,final)
+    assert published.manifest['world_revision']==published.manifest['index_watermark']
     assert d.state['stage']=='FROZEN'
     with pytest.raises(DriverBlocked): d.step()
     d.close();d.trace.close()
     other=tmp_path/'other';other.mkdir()
-    resumed,peer,_=setup(other,modules=modules,restore=final)
+    resumed,peer,_=setup(other,modules=modules,restore=final,confirmation=published.confirmation)
     assert resumed.step() and resumed.state['completed_sequence']==2
     assert all(r['input'].get('user_input')!='SYNTHETIC event 1' for r in peer.calls)
     assert resumed.state['next_turn']==2
@@ -212,7 +212,7 @@ def test_snapshot_failure_never_publishes_success(tmp_path,monkeypatch):
     final=tmp_path/'frozen'
     with pytest.raises(OSError): freeze(d,final)
     assert not final.exists() and d.state['stage']=='FAILED'
-    assert not list(tmp_path.glob('.c15-freeze-*'))
+    assert list(tmp_path.glob('.c15-freeze-*'))  # retained uncertain staging, never auto-repaired
     d.close();d.trace.close()
 
 

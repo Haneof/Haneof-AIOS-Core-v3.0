@@ -101,13 +101,22 @@ def validate_staged_core(destination: Path, repo: Path | None = None):
             "limitations": ["no due work executed", "no real B release", "fresh session authorization pending"]}
 
 
-def restore_frozen(source: Path, destination: Path, *, manifest_sha256: str):
-    """Verify a pinned clean synthetic freeze, copy state only; never replay trace."""
+def restore_frozen(source: Path, destination: Path, *, manifest_sha256: str, confirmation=None):
+    """Require live publication confirmation AND pinned bytes; never replay trace.
+
+    A dead controller/missing receipt or uncertain publication has no automatic
+    recovery path here, even if the package's mechanical checkpoint says READY.
+    """
     require(digest(source / "manifest.json") == manifest_sha256, "untrusted freeze manifest")
     manifest = json.loads((source / "manifest.json").read_text())
     expected_names = {"private_world.sqlite", "world_index.sqlite", "release_state.json", "restart_state.json", "trace.jsonl"}
-    require(manifest.get("format") == "c15-synthetic-freeze-v1" and set(manifest["files"]) == expected_names,
+    require(manifest.get("format") == "c15-synthetic-freeze-v2" and set(manifest["files"]) == expected_names,
             "unexpected freeze manifest fields")
+    from .publication import require_confirmation
+    publication = manifest.get("publication", {})
+    require(publication.get("status") == "VALIDATED_NOT_CONFIRMED", "unexpected publication state")
+    require_confirmation(confirmation, manifest_sha256=manifest_sha256,
+                         publication_id=publication.get("id"))
     verify_files(source, manifest["files"])
     state = json.loads((source / "restart_state.json").read_text())
     require(state["stage"] == "READY", "interrupted restart forbidden")

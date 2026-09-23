@@ -99,7 +99,8 @@ class Driver:
     Freeze adds real SQLite writer locks. An actual Resident gets no directory.
     """
     def __init__(self, runtime, trace, port: ReleasePort, directory: Path, *, session: str,
-                 clock: datetime, stop_sequence: int, max_dispatches: int = 64):
+                 clock: datetime, stop_sequence: int, max_dispatches: int = 64,
+                 initialize_fresh: bool = False):
         if not session.strip() or clock.tzinfo is None or max_dispatches < 1:
             raise DriverBlocked("invalid mechanical configuration")
         if trace.failure:
@@ -114,8 +115,16 @@ class Driver:
             release = port.read_state()
             if release["pending_reveal"] is not None:
                 raise DriverBlocked("interrupted reveal requires explicit review; no implicit replay")
+            if self.state_path.is_symlink() or self.state_path.with_name(self.state_path.name + ".tmp").exists():
+                raise DriverBlocked("checkpoint path ambiguous; explicit review required")
             if self.state_path.exists():
-                self.state = json.loads(self.state_path.read_text())
+                if initialize_fresh:
+                    raise DriverBlocked("fresh initialization cannot reuse a checkpoint")
+                try:
+                    self.state = json.loads(self.state_path.read_text())
+                    self._validate_checkpoint()
+                except (OSError, ValueError, TypeError, KeyError) as exc:
+                    raise DriverBlocked("checkpoint unreadable/corrupt; no ACK inference or replay") from exc
                 if self.state["stage"] != "READY":
                     raise DriverBlocked("interrupted/failed/frozen phase cannot automatically resume")
                 if self.state["session"] != session or self.state["stop_sequence"] != stop_sequence:
@@ -124,9 +133,23 @@ class Driver:
                     raise DriverBlocked("restart clock changed")
                 self.verify_boundary()
             else:
+                # This path is ONLY an explicitly requested pristine synthetic
+                # genesis, not accepted-A import and not interrupted recovery.
+                if not initialize_fresh or not (
+                    release.get("active_phase") == "A"
+                    and release.get("last_acked_sequence") == 0
+                    and release.get("last_acked_event_id") is None
+                    and release.get("next_sequence") == 1
+                    and release.get("receipts") == []
+                    and int(runtime.store.current_world_revision()) == 0
+                    and runtime.index.watermark() == 0
+                    and not runtime.metering.list_model_calls(subject_id=runtime.subject_id)
+                    and trace.sequence == 0 and trace.path.stat().st_size == 0
+                ):
+                    raise DriverBlocked("missing checkpoint: not a verified fresh synthetic genesis")
                 self.state = dict(format="c15-synthetic-driver-v1", stage="READY", session=session,
                                   clock=clock.isoformat(), next_turn=1, stop_sequence=stop_sequence,
-                                  completed_sequence=release["last_acked_sequence"], due_work={},
+                                  completed_sequence=0, due_work={},
                                   next_review_at=(clock+timedelta(hours=24)).isoformat())
                 self.checkpoint()
             self.clock = ClockAdapter(self.recorder, clock=clock,
@@ -134,6 +157,24 @@ class Driver:
         except BaseException:
             self.lock.close()
             raise
+
+    def _validate_checkpoint(self):
+        state = self.state
+        if not isinstance(state, dict) or state.get("format") != "c15-synthetic-driver-v1":
+            raise ValueError("checkpoint format")
+        for key in ("next_turn", "stop_sequence", "completed_sequence", "world_revision", "index_watermark"):
+            if type(state[key]) is not int or state[key] < (1 if key == "next_turn" else 0):
+                raise ValueError("checkpoint integer")
+        if not isinstance(state["session"], str) or not state["session"].strip():
+            raise ValueError("checkpoint session")
+        moment(state["clock"])
+        moment(state["next_review_at"])
+        if not isinstance(state["due_work"], dict) or not isinstance(state["stage"], str):
+            raise ValueError("checkpoint stage/due work")
+        if not isinstance(state["release_sha256"], str) or len(state["release_sha256"]) != 64:
+            raise ValueError("checkpoint release digest")
+        if state["completed_sequence"] > state["stop_sequence"]:
+            raise ValueError("checkpoint stop boundary")
 
     def checkpoint(self):
         self.state.update(world_revision=int(self.runtime.store.current_world_revision()),
