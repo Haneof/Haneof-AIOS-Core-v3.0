@@ -1,0 +1,43 @@
+{
+ "note": "Review 3: resubmit opexp in correct schema (problem_type/method_path/result_summary + positive/negative case refs).",
+ "capability_calls": [
+  {
+   "name": "commit_operation_experience",
+   "arguments": {
+    "problem_type": "构建→registry 上传链路的状态确认与对外表述（区分「计划/已排队」与「确实完成」）",
+    "method_path": [
+     "以最晚平台记录为准判断状态，不把计划时间或排队状态当作完成",
+     "对外表述只分级两类事实：未确认完成（含排队/被拒/无记录）与已确认完成（平台完成事件+tag+digest+PUBLISHED）",
+     "上传被拒（如 checksum mismatch）时如实先报失败事实，再追加重试",
+     "用户在拿到完成记录前不触达下游（本例：门店测试通知）"
+    ],
+    "result_summary": "edge-2026.11.4 上传链路上按该规则执行：排队时不报完成；14:16 上传被拒（checksum mismatch）如实报告；15:02 第二次上传成功（tag 创建、digest sha256:7f2a9d1c54b0、PUBLISHED）后报告完成；用户确认状态对上后自行发出门店测试通知。过程中无未授权动作。",
+    "positive_case_refs": [
+     {
+      "object_id": "obs_c14_fixture_291beec37165eb34a35f8f85",
+      "revision": 1
+     },
+     {
+      "object_id": "obs_conv_user_1b8b15a865579a5b93d58460",
+      "revision": 1
+     }
+    ],
+    "negative_case_refs": [
+     {
+      "object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+      "revision": 1
+     }
+    ],
+    "applicability": {
+     "work_class": "build_and_release_link",
+     "status_reporting": "completion-record-only",
+     "risk": "low_to_moderate"
+    },
+    "misses": [
+     "目前仅覆盖构建→上传链路一次完整案例；其它链路是否同质待实例验证",
+     "checksum mismatch 的根因（构建侧还是传输侧）未在记录中给出，重试成功不等于根因已定位"
+    ]
+   }
+  }
+ ]
+}

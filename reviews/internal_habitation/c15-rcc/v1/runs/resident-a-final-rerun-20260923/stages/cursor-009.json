@@ -1,0 +1,174 @@
+{
+ "sequence": 9,
+ "event": {
+  "dimension": "dim:release_state",
+  "event_id": "c15rcc-009",
+  "modality": "structured_text",
+  "occurred_at": "2026-11-04T14:17:00-08:00",
+  "resident_visible_payload": "registry 上传尝试在 14:16 被拒绝：checksum mismatch。edge-2026.11.4 未发布，tag 未创建，registry 中没有对应 digest。",
+  "sequence": 9,
+  "source_class": "PLATFORM",
+  "source_kind": "registry"
+ },
+ "ingest_ref": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2@1",
+ "ack": "5de82e84384271ce\",\"fixture_sha256\":\"sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46\",\"ingest_object_id\":\"obs_c14_fixture_b798e2dbd5b0fabdec6680a2\",\"ingest_ref\":\"obs_c14_fixture_b798e2dbd5b0fabdec6680a2@1\",\"ingest_revision\":1,\"ingest_source_class\":\"platform\",\"ingest_world_revision\":57,\"next_sequence\":10,\"occurred_at\":\"2026-11-04T14:17:00-08:00\",\"sequence\":9,\"status\":\"acked\"}",
+ "advance": {
+  "from": "2026-11-04T21:42:00+00:00",
+  "to": "2026-11-04T22:17:00+00:00",
+  "task_cycles": [],
+  "periodic_reviews": [],
+  "background_cycles": 0,
+  "dimension_summaries": {
+   "attempted_jobs": [
+    {
+     "dimension": "dim:ai_communication_experience",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 1
+    },
+    {
+     "dimension": "dim:ai_relationship",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 4
+    },
+    {
+     "dimension": "dim:ai_strategy",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 2
+    },
+    {
+     "dimension": "dim:ai_strategy",
+     "scale": "day",
+     "window_start": "2026-11-03T00:00:00+00:00",
+     "window_end": "2026-11-03T23:59:59.999999+00:00",
+     "source_count": 1
+    },
+    {
+     "dimension": "dim:ai_user_understanding",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 4
+    },
+    {
+     "dimension": "dim:ai_user_understanding",
+     "scale": "day",
+     "window_start": "2026-11-03T00:00:00+00:00",
+     "window_end": "2026-11-03T23:59:59.999999+00:00",
+     "source_count": 1
+    },
+    {
+     "dimension": "dim:user_ai_interaction",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 6
+    },
+    {
+     "dimension": "dim:user_ai_interaction",
+     "scale": "day",
+     "window_start": "2026-11-03T00:00:00+00:00",
+     "window_end": "2026-11-03T23:59:59.999999+00:00",
+     "source_count": 2
+    },
+    {
+     "dimension": "dim:work_outcome",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 1
+    },
+    {
+     "dimension": "dim:work_state",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 1
+    }
+   ],
+   "commits": [],
+   "skipped_unchanged": [
+    {
+     "dimension": "dim:ai_communication_experience",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 1
+    },
+    {
+     "dimension": "dim:ai_relationship",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 4
+    },
+    {
+     "dimension": "dim:ai_strategy",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 2
+    },
+    {
+     "dimension": "dim:ai_strategy",
+     "scale": "day",
+     "window_start": "2026-11-03T00:00:00+00:00",
+     "window_end": "2026-11-03T23:59:59.999999+00:00",
+     "source_count": 1
+    },
+    {
+     "dimension": "dim:ai_user_understanding",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 4
+    },
+    {
+     "dimension": "dim:ai_user_understanding",
+     "scale": "day",
+     "window_start": "2026-11-03T00:00:00+00:00",
+     "window_end": "2026-11-03T23:59:59.999999+00:00",
+     "source_count": 1
+    },
+    {
+     "dimension": "dim:user_ai_interaction",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 6
+    },
+    {
+     "dimension": "dim:user_ai_interaction",
+     "scale": "day",
+     "window_start": "2026-11-03T00:00:00+00:00",
+     "window_end": "2026-11-03T23:59:59.999999+00:00",
+     "source_count": 2
+    },
+    {
+     "dimension": "dim:work_outcome",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 1
+    },
+    {
+     "dimension": "dim:work_state",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 1
+    }
+   ],
+   "skipped_empty": [],
+   "truncated": false
+  },
+  "world_revision": 57
+ },
+ "world_revision": 57,
+ "index_watermark": 57
+}

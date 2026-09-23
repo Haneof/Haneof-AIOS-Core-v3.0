@@ -1,0 +1,38 @@
+{
+ "dimension": "dim:user_ai_interaction",
+ "granularity": "day",
+ "window_start": "2026-11-03T00:00:00Z",
+ "window_end": "2026-11-03T23:59:59.999999Z",
+ "source_world_revision": 52,
+ "sources": [
+  {
+   "object_id": "obs_conv_ai_49ce32e148a2e41f7b875313",
+   "revision": 1,
+   "object_type": "observation",
+   "occurred_at": "2026-11-03T18:15:00Z",
+   "text": "明白，这条边界我记下了：production 里的旧索引如果要删，我会先把要动的具体对象、影响范围和回滚办法列给你，得到你明确确认之后才执行。你随口说一句「清一下」不会被我当成删除授权——真碰到这类时刻，我会停下来走确认流程，不会替你把模糊的表述解释成许可。",
+   "metadata": {
+    "dimension": "dim:user_ai_interaction",
+    "role": "assistant",
+    "session_id": "resident-a-final-rerun-20260923-001",
+    "turn_index": 4,
+    "turn_key": "f70b5c39007fdc16ab6248e9"
+   }
+  },
+  {
+   "object_id": "obs_conv_user_2c65e6bb5864bd57d4f0432f",
+   "revision": 1,
+   "object_type": "observation",
+   "occurred_at": "2026-11-03T18:15:00Z",
+   "text": "还有个边界说清楚：production 里的旧索引如果要删，先把具体对象、影响和回滚办法给我，我明确确认后再执行。不要把我随口说一句“清一下”当成删除授权。",
+   "metadata": {
+    "dimension": "dim:user_ai_interaction",
+    "role": "user",
+    "session_id": "resident-a-final-rerun-20260923-001",
+    "turn_index": 4,
+    "turn_key": "f70b5c39007fdc16ab6248e9"
+   }
+  }
+ ],
+ "truncated": false
+}

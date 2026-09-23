@@ -1,0 +1,32 @@
+{
+ "sequence": 4,
+ "event": {
+  "dimension": "dim:work_outcome",
+  "event_id": "c15rcc-004",
+  "modality": "structured_text",
+  "occurred_at": "2026-11-02T12:40:00-08:00",
+  "resident_visible_payload": "Atlas staging 变更已合入：测试索引冲突解除，日志保留调整完成；CI 48/48 通过，staging smoke test 通过；本次没有 production 变更，验收未要求返工。",
+  "sequence": 4,
+  "source_class": "PLATFORM",
+  "source_kind": "ci_platform"
+ },
+ "ingest_ref": "obs_c14_fixture_5d4dfcf42055c00135a78a54@1",
+ "ack": "1b9c60d321baab4ec\",\"fixture_sha256\":\"sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46\",\"ingest_object_id\":\"obs_c14_fixture_5d4dfcf42055c00135a78a54\",\"ingest_ref\":\"obs_c14_fixture_5d4dfcf42055c00135a78a54@1\",\"ingest_revision\":1,\"ingest_source_class\":\"platform\",\"ingest_world_revision\":10,\"next_sequence\":5,\"occurred_at\":\"2026-11-02T12:40:00-08:00\",\"sequence\":4,\"status\":\"acked\"}",
+ "advance": {
+  "from": "2026-11-02T17:20:00+00:00",
+  "to": "2026-11-02T20:40:00+00:00",
+  "task_cycles": [],
+  "periodic_reviews": [],
+  "background_cycles": 0,
+  "dimension_summaries": {
+   "attempted_jobs": [],
+   "commits": [],
+   "skipped_unchanged": [],
+   "skipped_empty": [],
+   "truncated": false
+  },
+  "world_revision": 10
+ },
+ "world_revision": 10,
+ "index_watermark": 10
+}
