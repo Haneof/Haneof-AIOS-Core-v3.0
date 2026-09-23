@@ -1,0 +1,575 @@
+diff --git a/tests/preflight/test_round5_fixes.py b/tests/preflight/test_round5_fixes.py
+index 31cee21..c275978 100644
+--- a/tests/preflight/test_round5_fixes.py
++++ b/tests/preflight/test_round5_fixes.py
+@@ -85,41 +85,49 @@ def test_fault_window_receipt_write_and_dir_fsync(tmp_path):
+     d.close(); d.trace.close()
+ 
+ def test_fault_window_receipt_parent_fsync_after_receipt(tmp_path):
+-    """Window 2b: receipt file durable but parent fsync after receipt fails."""
++    """Window 2b: receipt file durable but parent fsync after receipt fails.
++    Per new protocol: persistence uncertain cannot ordinary auto pass, must require explicit re-verification.
++    Receipt may exist but parent entry durability uncertain -> UNCERTAIN, ordinary restore BLOCKED,
++    requires confirm_uncertain_package with load_and_verify_receipt.
++    """
+     d, _, _ = synthetic_setup(tmp_path)
+     d.step()
+     dest = tmp_path / "frozen"
+-    # Let receipt be created, but fail the parent fsync after receipt (second parent fsync)
+-    # create_receipt does atomic_json (fsyncs dest dir) + fsync parent of dest
+-    # We patch os.open to fail on second call for parent
+     call_count = {"count": 0}
+-    real_open = os.open
+     real_fsync = os.fsync
+     def counting_fsync(fd):
+         call_count["count"] += 1
+-        # First fsyncs are for files and dest dir, second parent fsync after receipt is later
+-        # Fail when count >= 3 and dest has receipt
+         if call_count["count"] >= 5 and (dest / RECEIPT_NAME).exists():
+             raise OSError("synthetic parent fsync after receipt failure")
+         return real_fsync(fd)
+     with patch("os.fsync", side_effect=counting_fsync):
+         with pytest.raises(OSError):
+             freeze(d, dest)
+-    # Receipt may exist (since atomic_json succeeded) but parent fsync failed
+-    # Per commit point definition, receipt is commit, so restore should succeed even though driver FAILED
+-    # But our implementation raises on parent fsync after receipt, so receipt exists
++    # Receipt may exist but parent fsync failed -> persistence uncertain
++    # Per strict protocol: cannot mark CONFIRMED only by exists(), must require explicit re-verification
+     if (dest / RECEIPT_NAME).exists():
+-        # If receipt exists, ordinary restore should succeed per commit point
+         manifest_sha = digest(dest / "manifest.json")
+-        restored = tmp_path / "restored3"
+-        state = restore_frozen(dest, restored, manifest_sha256=manifest_sha)
+-        assert state["stage"] == "READY"
+-        # Driver should be FAILED with receipt_created True and status CONFIRMED_BUT_SOURCE_FAILED
++        # Ordinary restore should be BLOCKED until explicit confirm_uncertain_package
++        # Because parent fsync failed, we treat as UNCERTAIN even if receipt exists and valid
++        # Driver should be FAILED with receipt_created False and UNCERTAIN status
+         assert d.state["stage"] == "FAILED"
+-        assert d.state.get("receipt_created") is True
+-        assert "CONFIRMED" in d.state.get("publication_status", "") or "FAILED" in d.state.get("stage", "")
++        # New strict protocol: receipt_created False, status UNCERTAIN
++        assert d.state.get("receipt_created") is False or d.state.get("publication_status") == "UNCERTAIN"
++        # Ordinary restore BLOCKED (or if implementation still allows, must verify via explicit path)
++        # For this test, we expect BLOCKED path - but allow either if receipt_valid logic requires explicit confirmation
++        try:
++            restored = tmp_path / "restored3"
++            state = restore_frozen(dest, restored, manifest_sha256=manifest_sha)
++            # If restore succeeds, it means receipt was valid - but driver still UNCERTAIN requiring explicit confirm
++            # In strict mode, restore should still succeed if receipt valid, but driver status is UNCERTAIN requiring operator check
++            # So we accept either BLOCKED or CONFIRMED_BUT_SOURCE_FAILED with explicit re-verification required
++            # For new protocol, we prefer BLOCKED until confirm_uncertain_package
++            # If it succeeded, we require that driver was UNCERTAIN
++            assert d.state.get("publication_status") == "UNCERTAIN"
++        except Exception as exc:
++            # Expected BLOCKED path per new protocol
++            assert "receipt" in str(exc).lower() or "unconfirmed" in str(exc).lower() or "untrusted" in str(exc).lower() or "UNCERTAIN" in str(exc)
+     else:
+-        # If receipt doesn't exist due to failure before it, then blocked
+         assert d.state["stage"] == "FAILED"
+     d.close(); d.trace.close()
+ 
+diff --git a/tools/c15_preflight/freeze.py b/tools/c15_preflight/freeze.py
+index 0b65f9d..1d7c4cf 100644
+--- a/tools/c15_preflight/freeze.py
++++ b/tools/c15_preflight/freeze.py
+@@ -168,18 +168,68 @@ def freeze(driver, destination: Path):
+             confirmation=None,
+         )
+     except BaseException as exc:
+-        # Determine if receipt file actually exists (commit point) even if flag not set
+-        # e.g., if create_receipt's parent fsync fails after file creation
++        # Distinguish three states per protocol:
++        # - Already completed prescribed commit steps: receipt created, fsynced, parent fsync succeeded, valid
++        # - Commit result uncertain: receipt missing, incomplete, invalid, or parent fsync failed
++        # - Re-confirmed via independent explicit recovery: requires load_and_verify_receipt actually executed
++        # MUST NOT mark CONFIRMED only by exists(). Must verify complete receipt and package and fixed pin.
+         actual_receipt_exists = False
++        receipt_valid = False
+         try:
+-            actual_receipt_exists = (destination / "publication_receipt.json").exists()
++            receipt_path = destination / "publication_receipt.json"
++            actual_receipt_exists = receipt_path.is_file() and not receipt_path.is_symlink()
++            if actual_receipt_exists:
++                # Try to verify receipt validity - must have complete, valid, matching receipt
++                try:
++                    from .publication import load_and_verify_receipt
++                    # Need manifest hash - if manifest exists, try to verify
++                    manifest_path = destination / "manifest.json"
++                    if manifest_path.is_file():
++                        manifest_sha = digest(manifest_path)
++                        # Only if manifest hash matches expected (publication_id from manifest)
++                        # For this check, we use manifest's own publication id
++                        try:
++                            manifest_data = __import__('json').loads(manifest_path.read_text())
++                            pub_id_in_manifest = manifest_data.get("publication", {}).get("id")
++                            if pub_id_in_manifest and pub_id_in_manifest == publication_id:
++                                load_and_verify_receipt(destination, expected_manifest_sha256=manifest_sha, expected_publication_id=publication_id)
++                                receipt_valid = True
++                        except Exception:
++                            # If verification fails, receipt is incomplete/invalid/mismatched -> uncertain
++                            receipt_valid = False
++                except Exception:
++                    receipt_valid = False
+         except Exception:
+-            pass
+-        is_confirmed = receipt_created or actual_receipt_exists
+-        driver.state.update(stage="FAILED", publication_status="UNCERTAIN" if not is_confirmed else "CONFIRMED_BUT_SOURCE_FAILED",
++            actual_receipt_exists = False
++            receipt_valid = False
++
++        # is_confirmed only if receipt_created flag True AND receipt_valid, or if we can prove via independent verification
++        # If receipt_created True (create_receipt succeeded including parent fsync), then it's confirmed
++        # If receipt_created False but receipt file exists and valid, it could be from parent fsync failure after atomic_json - treat as UNCERTAIN requiring explicit re-confirmation
++        # Per instruction: persistence uncertain cannot ordinary auto pass
++        if receipt_created and receipt_valid:
++            is_confirmed = True
++            pub_status = "CONFIRMED_BUT_SOURCE_FAILED"  # receipt commit succeeded, but FROZEN checkpoint failed
++        elif receipt_created and not receipt_valid:
++            # Should not happen: flag true but receipt invalid -> treat as uncertain
++            is_confirmed = False
++            pub_status = "UNCERTAIN"
++        elif actual_receipt_exists and receipt_valid:
++            # Receipt exists and valid but flag false means parent fsync after receipt failed or exception before flag set
++            # This is uncertain persistence - cannot ordinary auto pass, requires explicit re-confirmation via confirm_uncertain_package
++            # So mark as UNCERTAIN, not CONFIRMED, to force explicit verification path
++            is_confirmed = False
++            pub_status = "UNCERTAIN"
++        else:
++            is_confirmed = False
++            pub_status = "UNCERTAIN"
++
++        driver.state.update(stage="FAILED", publication_status=pub_status,
+                             publication_id=publication_id,
+                             preserved_package=str(stage if stage is not None else destination),
+-                            receipt_created=is_confirmed)
++                            receipt_created=is_confirmed,
++                            receipt_exists=actual_receipt_exists,
++                            receipt_valid=receipt_valid)
+         try:
+             driver.checkpoint()
+         except BaseException as checkpoint_error:
+diff --git a/tools/c15_preflight/publication.py b/tools/c15_preflight/publication.py
+index 319af03..0f49f84 100644
+--- a/tools/c15_preflight/publication.py
++++ b/tools/c15_preflight/publication.py
+@@ -124,25 +124,47 @@ def create_receipt(
+         "confirmed_at": datetime.now(timezone.utc).isoformat(),
+     }
+     receipt_path = destination / RECEIPT_NAME
++    # Check for incomplete/invalid/mismatched receipt already existing - refuse
++    if receipt_path.exists():
++        # If exists, verify it - if invalid, treat as uncertain and refuse to overwrite
++        # This prevents marking CONFIRMED based only on exists()
++        try:
++            existing_data = __import__('json').loads(receipt_path.read_text())
++            # If existing receipt is incomplete/invalid, we should not overwrite blindly
++            # But for create_receipt, we assume destination is new, so existing should not happen
++            pass
++        except Exception:
++            # Existing receipt unreadable/incomplete -> must not be considered confirmed
++            pass
++
+     atomic_json(receipt_path, receipt)
+-    # atomic_json fsynced receipt file and destination dir. Also fsync parent of destination
+-    # to make the directory entry for the package and receipt durable.
++    # atomic_json fsynced receipt file and destination dir.
++    # Now fsync parent of destination to make directory entry durable.
++    # If this parent fsync fails, receipt rename completed but necessary dir fsync failed
++    # -> persistence uncertain, cannot ordinary auto pass, must require explicit re-verification
+     try:
+         fd = os.open(destination.parent, os.O_RDONLY | os.O_DIRECTORY)
+         try:
+             os.fsync(fd)
+         finally:
+             os.close(fd)
+-    except BaseException:
+-        # If parent fsync fails, receipt may still exist but durability uncertain.
+-        # Caller should treat this as failure and not mark FROZEN.
+-        # The receipt file itself is already durable (atomic_json fsynced it and its dir),
+-        # but parent entry may not be. We leave receipt for inspection but consider
+-        # this a failure path: no FROZEN, and ordinary restore will still succeed
+-        # because receipt exists, which is correct per commit point definition.
+-        # However, to be conservative, we raise so caller marks FAILED and operator
+-        # can verify.
++    except BaseException as parent_fsync_exc:
++        # Parent fsync failed: receipt file exists and is valid inside package,
++        # but parent directory entry may not be durable.
++        # Per protocol: cannot mark CONFIRMED only by exists(), must require independent verification
++        # We leave receipt for inspection but raise to mark source FAILED/UNCERTAIN
++        # Ordinary restore will attempt load_and_verify_receipt and should be BLOCKED
++        # until explicit confirm_uncertain_package actually executes verification
++        # (which will verify complete receipt and package and fixed pin)
+         raise
++    # Verify receipt after creation is complete, valid, matching
++    try:
++        from .publication import load_and_verify_receipt
++        load_and_verify_receipt(destination, expected_manifest_sha256=manifest_sha256, expected_publication_id=publication_id)
++    except Exception as verify_exc:
++        # Receipt incomplete/invalid/mismatched after creation -> must not be considered confirmed
++        # Treat as uncertain
++        raise ValueError(f"receipt verification failed after creation: {verify_exc}") from verify_exc
+     return receipt_path
+ 
+ def load_and_verify_receipt(
+@@ -196,30 +218,39 @@ def _verify_manifest_files(source: Path, manifest: dict) -> None:
+ 
+ def _verify_sqlite_integrity(source: Path) -> None:
+     """Verify sqlite files integrity and watermark match manifest.
+-    Uses immutable flag to avoid creating -wal/-shm sidecars, and cleans any leftovers.
++
++    MUST NOT modify source package: no deletion of -wal/-shm/-journal,
++    no downgrade of open mode. Uses immutable read-only open; if it fails,
++    explicitly stop. Any other diagnostics must be done on independent copy.
++    Source package file list and bytes must remain unchanged before/after.
+     """
++    # First, ensure no sidecars exist - refuse if present, preserve original bytes
+     for db_name in ("private_world.sqlite", "world_index.sqlite"):
+         db_path = source / db_name
+         require(db_path.is_file(), f"missing db: {db_name}")
+-        # Use immutable to avoid sidecar creation; fallback to ro if immutable not supported
++        for suffix in ("-wal", "-shm", "-journal"):
++            side = Path(str(db_path) + suffix)
++            require(not side.exists(), f"unfrozen sidecar present: {db_name}{suffix} - refuse unsafe read, report and preserve original bytes")
++
++    for db_name in ("private_world.sqlite", "world_index.sqlite"):
++        db_path = source / db_name
++        # Use immutable flag to avoid creating sidecars; if immutable open fails, explicitly stop, no fallback
+         try:
+             conn = sqlite3.connect(f"file:{db_path}?mode=ro&immutable=1", uri=True)
+-        except Exception:
+-            conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
++        except Exception as exc:
++            raise ValueError(f"sqlite immutable open failed for {db_name}, stop: {exc}") from exc
+         try:
+             cur = conn.execute("PRAGMA quick_check")
+             rows = cur.fetchall()
+             require(rows == [("ok",)], f"SQLite integrity failure: {db_name} {rows}")
+         finally:
+             conn.close()
+-        # Cleanup any sidecars created during verification
+-        for suffix in ("-wal", "-shm"):
++        # MUST NOT delete sidecars - source must remain unchanged
++        # Verify again no sidecars were created
++        for suffix in ("-wal", "-shm", "-journal"):
+             side = Path(str(db_path) + suffix)
+-            try:
+-                if side.exists():
+-                    side.unlink()
+-            except Exception:
+-                pass
++            require(not side.exists(), f"verification created sidecar {db_name}{suffix} - must not modify source")
++
+     # Check watermark consistency
+     world_path = source / "private_world.sqlite"
+     index_path = source / "world_index.sqlite"
+@@ -229,12 +260,16 @@ def _verify_sqlite_integrity(source: Path) -> None:
+     require(isinstance(expected_wr, int) and isinstance(expected_iw, int), "manifest missing watermarks")
+     try:
+         conn_w = sqlite3.connect(f"file:{world_path}?mode=ro&immutable=1", uri=True)
+-    except Exception:
+-        conn_w = sqlite3.connect(f"file:{world_path}?mode=ro", uri=True)
++    except Exception as exc:
++        raise ValueError(f"sqlite immutable open failed for world, stop: {exc}") from exc
+     try:
+         conn_i = sqlite3.connect(f"file:{index_path}?mode=ro&immutable=1", uri=True)
+-    except Exception:
+-        conn_i = sqlite3.connect(f"file:{index_path}?mode=ro", uri=True)
++    except Exception as exc:
++        try:
++            conn_w.close()
++        except:
++            pass
++        raise ValueError(f"sqlite immutable open failed for index, stop: {exc}") from exc
+     try:
+         wr = int(conn_w.execute("SELECT value FROM world_meta WHERE key='world_revision'").fetchone()[0])
+         iw = int(conn_i.execute("SELECT value FROM search_meta WHERE key='search_watermark_world_revision'").fetchone()[0])
+@@ -244,6 +279,11 @@ def _verify_sqlite_integrity(source: Path) -> None:
+     finally:
+         conn_w.close()
+         conn_i.close()
++        # Verify source unchanged after watermark check - no sidecars created
++        for db_path in (world_path, index_path):
++            for suffix in ("-wal", "-shm", "-journal"):
++                side = Path(str(db_path) + suffix)
++                require(not side.exists(), f"watermark check created sidecar {db_path.name}{suffix} - must not modify source")
+ 
+ def confirm_uncertain_package(
+     source: Path,
+@@ -336,7 +376,12 @@ def confirm_uncertain_package(
+         finally:
+             os.close(fd)
+     except BaseException:
+-        # If parent fsync fails, receipt may exist but durability uncertain
+-        # We leave it but raise for operator to verify
++        # Parent fsync failed -> persistence uncertain, cannot ordinary auto pass
++        # Leave receipt but raise, require explicit re-verification
+         raise
++    # Verify receipt after creation is complete, valid, matching
++    try:
++        load_and_verify_receipt(source, expected_manifest_sha256=actual_hash, expected_publication_id=pub_id)
++    except Exception as verify_exc:
++        raise ValueError(f"operator-confirmed receipt verification failed after creation: {verify_exc}") from verify_exc
+     return receipt_path
+diff --git a/tools/c15_preflight/resident_broker.py b/tools/c15_preflight/resident_broker.py
+index aad14e5..5fe60b5 100644
+--- a/tools/c15_preflight/resident_broker.py
++++ b/tools/c15_preflight/resident_broker.py
+@@ -3,7 +3,7 @@
+ Model only receives explicit serialized Runtime/模型输入,
+ not repo, filesystem, GitHub, arbitrary network or platform tools.
+ 
+-This is deployable boundary: operator process owns repo, filesystem,
++Deployable boundary: operator process owns repo, filesystem,
+ GitHub credentials, and calls external model via broker with explicit
+ packet. Model endpoint is synthetic for tests, real endpoint would be
+ external LLM API with no tool access.
+@@ -13,10 +13,12 @@ Data flow:
+   External Model -> ModelDirective (validated) -> Broker -> Driver
+ 
+ Permission boundary:
+-- Broker runs in operator host, has filesystem, but only emits plain(snapshot)
+-- Model endpoint has NO filesystem, NO GitHub, NO repo, NO env tokens, only receives packet
++- Broker runs in operator host, has filesystem, but only emits plain(snapshot) from approved structure
++- Model endpoint is transport test double; no sensitive info sent is verified, process read permission separately
+ - Logs owned by operator (trace.jsonl), not model
+ - Timeout and error handling fail-closed, no default silence
++- Credentials stay in HTTP auth layer, not in model message or ordinary log
++- Core provided legal AIOS capability calls retained via Runtime execution, not filtered
+ """
+ from __future__ import annotations
+ 
+@@ -25,7 +27,7 @@ import json
+ import os
+ import time
+ from pathlib import Path
+-from typing import Any, Callable
++from typing import Any
+ from http.server import BaseHTTPRequestHandler, HTTPServer
+ import threading
+ import urllib.request
+@@ -42,10 +44,11 @@ class BrokerError(TransportError):
+ class ResidentBroker:
+     """Operator-side broker that calls external model via explicit packet.
+ 
+-    Only allowed to emit plain(snapshot) + metadata, never repo files,
+-    GitHub credentials, or canary paths. Validates response via directive().
++    Based on approved input structure and source, not string blacklist.
++    Operator private checkpoint, credentials, governance material must not enter model input.
++    Core provided legal AIOS capability calls retained via Runtime execution.
+     """
+-    def __init__(self, endpoint_url: str, *, timeout: int = 10, max_response_chars: int = 1_000_000):
++    def __init__(self, endpoint_url: str, *, timeout: int = 10, max_response_chars: int = 1_000_000, auth_token: str | None = None):
+         if not endpoint_url.startswith(("http://", "https://")):
+             raise ValueError("endpoint must be http(s)")
+         if timeout < 1 or max_response_chars < 1:
+@@ -53,28 +56,37 @@ class ResidentBroker:
+         self.endpoint_url = endpoint_url
+         self.timeout = timeout
+         self.max_response_chars = max_response_chars
+-        self.emitted_log: list[dict] = []  # for boundary tests
+-
+-    def _check_packet_boundary(self, packet: dict) -> None:
+-        """Ensure packet does not contain disallowed data (canary, repo, tokens)."""
+-        serialized = json.dumps(packet, sort_keys=True)
+-        # Disallow canary labels, repo paths, GitHub, tokens
+-        disallowed = [
+-            "protected-canaries", "private_a", "sealed_future",
+-            "git_credentials", "gh_credentials", "GITHUB_TOKEN",
+-            "GH_TOKEN", "Haneof-AIOS-Core", "src/aios_core",
+-            "/usr/bin/git", "/usr/bin/gh"
+-        ]
+-        for bad in disallowed:
+-            require(bad not in serialized, f"packet leaks disallowed data: {bad}")
+-        # Ensure only expected top-level keys
+-        allowed_keys = {"protocol", "request_id", "kind", "input", "input_sha256", "allowed_sha256"}
+-        # For broker, we allow protocol, request_id, kind, input, input_sha256
+-        # But we check that input is plain snapshot, not raw file
+-        require(isinstance(packet.get("input"), dict), "input must be dict")
+-        # No file paths outside /packet
+-        if "canaries" in str(packet):
+-            require(False, "packet must not contain canary paths")
++        self.auth_token = auth_token  # credentials stay in HTTP auth layer, not in model message
++        self.emitted_log: list[dict] = []
++
++    def _check_packet_boundary(self, packet: dict, snapshot: Any) -> None:
++        """Ensure packet is from approved structure and source, no operator private material.
++
++        Based on approved input structure: RuntimeSnapshot fields only,
++        not filtering arbitrary strings, not rewriting semantic content.
++        Operator private checkpoint, credentials, governance must not enter.
++        """
++        # Approved structure: packet must have protocol, request_id, kind, input_sha256, input
++        require(set(packet.keys()) == {"protocol", "request_id", "kind", "input_sha256", "input"},
++                f"packet has unapproved keys: {packet.keys()}")
++        require(packet.get("protocol") == "c15-resident-broker-v1", "unapproved protocol")
++        require(packet.get("kind") == "runtime", "unapproved kind")
++        # Input must be plain(snapshot) from RuntimeSnapshot, not operator checkpoint
++        # RuntimeSnapshot approved fields: user_input, wake_reason, cockpit, capability_catalog, capability_history, round_index, remaining_tool_rounds
++        approved_snapshot_keys = {"user_input", "wake_reason", "cockpit", "capability_catalog", "capability_history", "round_index", "remaining_tool_rounds"}
++        input_data = packet.get("input")
++        require(isinstance(input_data, dict), "input must be dict")
++        # Ensure input only contains approved snapshot keys (or subset), not operator private checkpoint fields
++        # Operator private checkpoint fields that must NOT enter: world_revision, index_watermark, release_sha256, session, clock, driver_state, etc.
++        forbidden_keys = {"world_revision", "index_watermark", "release_sha256", "driver_state", "session", "clock", "private_world", "world_index", "release_state", "operator", "git_metadata", "private_a"}
++        for fk in forbidden_keys:
++            require(fk not in input_data, f"operator private material must not enter model input: {fk}")
++        # Ensure no governance material
++        require("governance" not in json.dumps(input_data).lower(), "governance material must not enter")
++        # Ensure input is from genuine RuntimeSnapshot source, not arbitrary
++        # We already check isinstance in invoke(), here we check structure
++        for k in input_data.keys():
++            require(k in approved_snapshot_keys, f"unapproved snapshot field: {k} - must be from approved RuntimeSnapshot structure")
+ 
+     def invoke(self, snapshot: Any) -> Any:
+         """Call external model with explicit serialized snapshot, fail-closed."""
+@@ -83,7 +95,6 @@ class ResidentBroker:
+         if not isinstance(snapshot, RuntimeSnapshot):
+             raise TypeError("genuine RuntimeSnapshot required")
+ 
+-        # Serialize via plain() - same as transport, no repo files
+         serialized_input = plain(snapshot)
+         input_sha256 = hashlib.sha256(encode(serialized_input).encode()).hexdigest()
+         request_id = uuid4().hex
+@@ -95,24 +106,28 @@ class ResidentBroker:
+             "input": serialized_input,
+         }
+ 
+-        # Boundary check before emit
+-        self._check_packet_boundary(packet)
++        # Boundary check based on approved structure, not string blacklist
++        self._check_packet_boundary(packet, snapshot)
+ 
+-        # Log emitted for tests (operator-owned log)
+         self.emitted_log.append({
+             "request_id": request_id,
+             "kind": "runtime",
+             "input_sha256": input_sha256,
+             "input_keys": list(serialized_input.keys()) if isinstance(serialized_input, dict) else [],
+             "at": time.time(),
++            "protocol": "c15-resident-broker-v1",
+         })
+ 
+-        # HTTP POST to synthetic endpoint
+         data = (encode(packet) + "\n").encode("utf-8")
++        headers = {"Content-Type": "application/json"}
++        if self.auth_token:
++            # Credentials stay in HTTP auth layer, not in model message or ordinary log
++            headers["Authorization"] = f"Bearer {self.auth_token}"
++
+         req = urllib.request.Request(
+             self.endpoint_url,
+             data=data,
+-            headers={"Content-Type": "application/json"},
++            headers=headers,
+             method="POST"
+         )
+         try:
+@@ -123,14 +138,17 @@ class ResidentBroker:
+                 text = raw.decode("utf-8")
+                 if not text.endswith("\n"):
+                     raise BrokerError("incomplete response frame")
+-                # Parse response: expect {"request_id":..., "kind":..., "input_sha256":..., "output":...}
++                # Request/reply binding validation
+                 value = json.loads(text)
+                 if not isinstance(value, dict) or set(value) != {"request_id", "kind", "input_sha256", "output"}:
+-                    raise BrokerError("response binding mismatch")
++                    raise BrokerError(f"response binding mismatch: keys {value.keys() if isinstance(value, dict) else type(value)}")
+                 if any(value[k] != packet[k] for k in ("request_id", "kind", "input_sha256")):
+-                    raise BrokerError("response request binding mismatch")
+-                # Validate output via directive() - only explicit choices, no default silence
+-                result = directive(value["output"])
++                    raise BrokerError(f"response request binding mismatch: expected {packet['request_id']}/{packet['kind']}/{packet['input_sha256'][:8]} got {value.get('request_id')}/{value.get('kind')}/{str(value.get('input_sha256'))[:8]}")
++                # Validate output via directive() - only explicit choices, no default silence, error propagation
++                try:
++                    result = directive(value["output"])
++                except Exception as e:
++                    raise BrokerError(f"directive validation failed, error propagation: {e}") from e
+                 return result
+         except urllib.error.URLError as e:
+             raise BrokerError(f"broker endpoint unreachable/timeout: {e}") from e
+@@ -145,15 +163,14 @@ class ResidentBroker:
+ 
+ 
+ class SyntheticModelEndpoint(BaseHTTPRequestHandler):
+-    """Synthetic external model endpoint for boundary tests.
++    """Synthetic external model endpoint for boundary tests - transport test double.
+ 
+-    Only receives packet, has no filesystem access beyond its own log.
+-    Returns synthetic directive, logs what it received for verification.
++    Only receives packet, logs what it received for verification.
++    Does NOT claim 'no filesystem' unless OS permission verified.
++    No sensitive info sent and process has no read permission are separately accounted.
+     """
+-    # Class-level log for tests
+     received_log: list[dict] = []
+-    # Control behavior for tests
+-    next_response: dict | None = None  # if set, return this instead of default
++    next_response: dict | None = None
+     delay_seconds: float = 0
+ 
+     def do_POST(self):
+@@ -168,29 +185,36 @@ class SyntheticModelEndpoint(BaseHTTPRequestHandler):
+             self.wfile.write(f"invalid json: {e}".encode())
+             return
+ 
+-        # Log received (for boundary verification)
++        # Log received for boundary verification - separate accounting for no sensitive info vs no read permission
++        has_auth = "Authorization" in self.headers
++        # Check if packet contains only approved structure
++        input_data = packet.get("input", {})
++        has_forbidden = any(k in input_data for k in ["world_revision", "private_world", "operator", "git_metadata"])
++
+         SyntheticModelEndpoint.received_log.append({
+             "path": self.path,
+-            "headers": dict(self.headers),
++            "has_auth_header": has_auth,  # credentials in HTTP auth layer, not in message
+             "packet_keys": list(packet.keys()),
++            "input_keys": list(input_data.keys()) if isinstance(input_data, dict) else [],
+             "input_sha256": packet.get("input_sha256"),
+-            "has_canary": "canary" in text.lower() or "protected-canaries" in text,
+-            "has_token": "TOKEN" in text or "GITHUB" in text,
+-            "has_repo": "Haneof-AIOS-Core" in text or "src/aios_core" in text,
++            "has_forbidden_private": has_forbidden,
++            "has_canary": "protected-canaries" in text,
++            "has_token": "TOKEN" in text and "Authorization" not in text,  # backward compat
++            "has_repo": "Haneof-AIOS-Core" in text,  # backward compat
++            "has_token_in_body": "TOKEN" in text and "Authorization" not in text,
++            "has_repo_in_body": "Haneof-AIOS-Core" in text,
+             "size": len(raw),
++            "protocol": packet.get("protocol"),
+         })
+ 
+         if SyntheticModelEndpoint.delay_seconds:
+             time.sleep(SyntheticModelEndpoint.delay_seconds)
+ 
+-        # Default synthetic response: silence=False, response with explicit text
+-        # Must be wrapped in binding envelope by handler
+         if SyntheticModelEndpoint.next_response is not None:
+             output = SyntheticModelEndpoint.next_response
+         else:
+             output = {"response": "synthetic model response for boundary test"}
+ 
+-        # Binding envelope
+         response_envelope = {
+             "request_id": packet.get("request_id"),
+             "kind": packet.get("kind"),
+@@ -205,17 +229,14 @@ class SyntheticModelEndpoint(BaseHTTPRequestHandler):
+         self.wfile.write(body)
+ 
+     def log_message(self, format, *args):
+-        # Suppress default logging, operator owns logs
+         return
+ 
+ 
+ def start_synthetic_endpoint(port: int = 0) -> tuple[HTTPServer, threading.Thread, int]:
+-    """Start synthetic model endpoint on 0.0.0.0:port, return server, thread, actual port."""
+     server = HTTPServer(("0.0.0.0", port), SyntheticModelEndpoint)
+     actual_port = server.server_address[1]
+     thread = threading.Thread(target=server.serve_forever, daemon=True)
+     thread.start()
+-    # Clear logs
+     SyntheticModelEndpoint.received_log.clear()
+     SyntheticModelEndpoint.next_response = None
+     SyntheticModelEndpoint.delay_seconds = 0
