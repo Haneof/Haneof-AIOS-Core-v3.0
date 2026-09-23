@@ -6,7 +6,7 @@
 
 你是 AIOS v3.0 的独立治理集成 PM。本窗口只完成 **C15-RCC-RES-B-CORRECTIVE-001 的 GATE 审查与集成**，不做下一任务。
 
-1. 遵守平台给定固定分支，不切换或推送其他分支。用 gh 获取实时 main 和来自 `arena/01a0cee4-haneof-aios-core-v3-0` 的纠偏治理 PR，检查 exact head 和 diff。若有更新的 PM 裁决或其他窗口已接管，先报告冲突，禁止盲目套用旧指令。
+1. 遵守平台给定固定分支，不切换或推送其他分支。用 gh 获取实时 main 和纠偏治理 PR #122（来自 `arena/01a0cee4-haneof-aios-core-v3-0`），检查 exact head 和 diff。若有更新的 PM 裁决或其他窗口已接管，先报告冲突，禁止盲目套用旧指令。
 2. 阅读该 PR 中的纠偏裁决、B 独立审查、地图、task board、checkpoint、风险登记及分角色提示词。确认只修改治理/文档/Resident-safe 指令；不改 Core、封存事件、历史 evidence、测试或工作流，不夹带动画 HTML/SQLite/凭据。
 3. 独立核查 #121 @ `b6e5ac939bef83615292bcf9b9099d76737d82b0` 的原始证据与审查结论；可只读下载固定产物并重算 hash/查询 SQLite。无新 Claim 不是失败理由；关注正常 Runtime 运行链、B计量、行为证据、index 88 / World 97 的具体缺口。不要索取模型隐藏思维链。
 4. 核查 #117 @ `3e51f728d7959048b75fea01d405bc837b0e8185` 未变；Core tree 与 `bcd6bf353126318f9a97076b52ec1740d43f35a4` 一致；旧 evidence 仍 OPEN/UNMERGED/PINNED。

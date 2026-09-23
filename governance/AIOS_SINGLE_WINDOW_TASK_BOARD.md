@@ -1447,5 +1447,5 @@ Next READY task: C15-RCC-PREFLIGHT-001 — new window only; this window must not
 - Candidate disposition: NOT ACCEPTED; historical evidence stays pinned; canonical A unchanged.
 - Scope: governance/map/checkpoint/review/prompts only; no Core, fixture-byte, historical-evidence or test changes; no Resident run.
 - Gate evidence: local document/diff-scope inspection; historical Core 19 push workflows SUCCESS; new governance PR CI must be recorded separately. PR #120 failure is still tracked, not waived.
-- Integration PR / actual merge SHA / new CI conclusions: the integrating PM must record these from GitHub when integration occurs; none may be invented before merge.
+- Integration PR: [#122](https://github.com/Haneof/Haneof-AIOS-Core-v3.0/pull/122), OPEN / pending independent review. Actual merge SHA / new CI conclusions must be recorded from GitHub by the integrating PM; none may be invented before merge.
 - Handoff: once integrated and this task written DONE, set only `C15-RCC-RES-B-PREFLIGHT-001` READY. Release/rerun/accept/identity/C/EVAL/CLOSE remain BLOCKED.

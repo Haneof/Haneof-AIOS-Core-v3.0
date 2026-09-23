@@ -31,7 +31,7 @@
 - 审查：`reviews/C15_RCC_RES_B_001_PM_CORRECTIVE_REVIEW_2026-09-23.md`。
 - PM 风险：`governance/C15_PM_RISK_REGISTER_2026-09-23.md`。
 - 下一窗口分角色说明：`governance/prompts/`。Blind Resident 只接收被独立 release pin 的安全包，不接收这些 PM 提示词或审查结论。
-- PR/merge SHA 与新 CI 由集成 PM 从 GitHub 记录；未合并前不得声称 main 已更新。本窗口没有执行 preflight 或实验。
+- 治理 PR：[#122](https://github.com/Haneof/Haneof-AIOS-Core-v3.0/pull/122)，OPEN / 待独立集成。真实 merge SHA 与新 CI 由集成 PM 从 GitHub 记录；未合并前不得声称 main 已更新。本窗口没有执行 preflight 或实验。
 
 ## 历史工程断点 — C15 Resident A canonical PASS；唯一下一 READY = C15-RCC-RES-B-001
 
