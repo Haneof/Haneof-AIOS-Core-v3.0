@@ -11,6 +11,7 @@ import ast
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
@@ -23,14 +24,17 @@ PREFLIGHT_MODULES = frozenset({
     "test_round4_fixes", "test_round5_fixes",
 })
 ISOLATION_CASE = "test_isolation_probe_execution_result"
+ISOLATION_NODEID = "tests/preflight/test_round4_fixes.py::" + ISOLATION_CASE
 REAL_A_CASE = "test_real_a_copy_mechanical_import_not_tested_or_verified"
 INTEGRATED_BASE_SHA = "76112ca0bb70bd4cdde2a62dee8deb7a7810a370"
-MINIMUM_CORE_CASES = 409  # 367 pre-existing + 42 positive A01-A10 regressions
-# The reviewed upstream adds 18 round5 cases; its real-A auto-probe is NOT a
-# synthetic test. The safe default suite retains the other 17 (108 + 17).
-# Report the *actual* JUnit counts; never pad these numbers with NOT_TESTED.
+# Coverage floors reflect the previously collected public sources, not target
+# numbers to pad: Core 420 (including 42 A01-A10), preflight 125 (including
+# the one environmental probe and 17 round5), habitation 92. Additions count
+# as executed; a removed case needs explicit review instead of a green gate.
+MINIMUM_CORE_CASES = 420
 MINIMUM_PREFLIGHT_CASES = 125
 MINIMUM_ROUND5_CASES = 17
+MINIMUM_HABITATION_CASES = 92
 
 
 @dataclass(frozen=True)
@@ -101,6 +105,82 @@ def read_junit(path: Path) -> Report:
     return Report(tuple(cases), actual["failures"], actual["errors"], actual["skipped"])
 
 
+def read_collection(path: Path) -> tuple[str, ...]:
+    """Read pytest -o addopts='' -q --collect-only, not grouped quiet totals."""
+    nodeids = tuple(line.strip() for line in path.read_text(encoding="utf-8").splitlines()
+                    if line.startswith("tests/") and ".py::" in line)
+    if not nodeids or len(nodeids) != len(set(nodeids)):
+        raise ValueError("public test collection is empty, duplicated, or not in pytest nodeid format")
+    return nodeids
+
+
+def junit_nodeid(case: Case) -> str:
+    """Restore a pytest nodeid from its JUnit classname/name (incl. classes)."""
+    parts = case.classname.split(".")
+    module_index = next((i for i, part in enumerate(parts) if part.startswith("test_")), None)
+    if module_index is None or not case.name:
+        raise ValueError(f"testcase has no pytest nodeid: {case.identity}")
+    path = "/".join(parts[:module_index + 1]) + ".py"
+    suffix = "::".join(parts[module_index + 1:] + [case.name])
+    return f"{path}::{suffix}"
+
+
+def compare_software_collection(report: Report, nodeids: tuple[str, ...]) -> tuple[str, ...]:
+    """Exact identity inventory: the *only* missing public case is the probe."""
+    executed = tuple(junit_nodeid(case) for case in report.cases)
+    expected = set(nodeids) - {ISOLATION_NODEID}
+    missing = sorted(expected - set(executed))
+    extra = sorted(set(executed) - expected)
+    errors = []
+    if len(executed) != len(set(executed)):
+        errors.append("software JUnit contains duplicate executed nodeids")
+    if len(nodeids) != len(executed) + 1 or missing or extra:
+        errors.append(f"software must execute exactly default collection minus original probe: "
+                      f"collected={len(nodeids)} executed={len(executed)} "
+                      f"missing={missing[:3]} extra={extra[:3]}")
+    return tuple(errors)
+
+
+def collection_counts(nodeids: tuple[str, ...]) -> dict[str, int]:
+    return {
+        "core": sum(node.startswith(("tests/unit/", "tests/runtime/", "tests/integration/"))
+                    for node in nodeids),
+        "preflight": sum(node.startswith("tests/preflight/") for node in nodeids),
+        "habitation": sum(node.startswith("tests/habitation/") for node in nodeids),
+        "round5": sum(node.startswith("tests/preflight/test_round5_fixes.py::") for node in nodeids),
+        "a01_a10": sum(node.startswith("tests/integration/test_v3_audit_bugfixes.py::")
+                        for node in nodeids),
+    }
+
+
+def evaluate_collection(nodeids: tuple[str, ...], *, pytest_exit: int) -> tuple[str, ...]:
+    errors = []
+    if pytest_exit != 0:
+        errors.append(f"public pytest collection returned {pytest_exit}")
+    probes = [nodeid for nodeid in nodeids if nodeid == ISOLATION_NODEID]
+    if len(probes) != 1:
+        errors.append(f"default collection must include exactly one original isolation probe; got {len(probes)}")
+    real_a = [nodeid for nodeid in nodeids
+              if re.search(r"::test_real_a(?:_|$)", nodeid)]
+    if real_a:
+        errors.append(f"default public collection contains real-A tests: {real_a[:3]}")
+    counts = collection_counts(nodeids)
+    for name, floor in (("core", MINIMUM_CORE_CASES), ("preflight", MINIMUM_PREFLIGHT_CASES),
+                        ("round5", MINIMUM_ROUND5_CASES), ("habitation", MINIMUM_HABITATION_CASES)):
+        if counts[name] < floor:
+            errors.append(f"public {name} collection shrank: {counts[name]} < {floor}")
+    if counts["a01_a10"] != 42:
+        errors.append(f"expected 42 A01-A10 collected cases, got {counts['a01_a10']}")
+    for index in range(1, 11):
+        if not any(node.startswith("tests/integration/test_v3_audit_bugfixes.py::")
+                   and re.search(rf"(?:^|_)a{index:02d}_", node.rsplit("::", 1)[-1])
+                   for node in nodeids):
+            errors.append(f"A{index:02d} is absent from default collection")
+    if len(nodeids) != counts["core"] + counts["preflight"] + counts["habitation"]:
+        errors.append("public collection included testcases outside Core/preflight/habitation")
+    return tuple(errors)
+
+
 def verify_positive_source(repo: Path) -> None:
     path = "tests/integration/test_v3_audit_bugfixes.py"
     manifest = json.loads((repo / "reviews/AIOS_CONSTITUTION_FIXES_2026-09-24/manifest.json").read_text())
@@ -117,21 +197,26 @@ def verify_default_synthetic_boundary(repo: Path) -> None:
     validation remains an independent invocation of the existing fixed-hash
     production entry point, never part of the public synthetic suite.
     """
-    path = repo / "tests/preflight/test_round5_fixes.py"
-    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
     unsafe_paths = {"/tmp/real_a", "/tmp/accepted_a", "private_a"}
-    for node in ast.walk(tree):
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == REAL_A_CASE:
-            raise ValueError("real-A auto-probe must not be a default pytest test")
-        if isinstance(node, ast.Constant) and isinstance(node.value, str) and node.value in unsafe_paths:
-            raise ValueError("default preflight test contains a real-A host-path lookup")
-        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "validate_staged_core":
-            raise ValueError("default preflight test must not invoke real-A verification")
+    for path in sorted((repo / "tests/preflight").glob("test_*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith("test_real_a_"):
+                raise ValueError("real-A auto-probe must not be a default pytest test")
+            if isinstance(node, ast.Constant) and isinstance(node.value, str) and node.value in unsafe_paths:
+                raise ValueError("default preflight test contains a real-A host-path lookup")
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "validate_staged_core":
+                raise ValueError("default preflight test must not invoke real-A verification")
 
 
 def evaluate(report: Report, *, mode: str, pytest_exit: int) -> Decision:
-    if mode not in {"core", "full"}:
-        raise ValueError("mode must be core or full")
+    """Three independent lanes; keep 'full' strict for older callers.
+
+    Only the exact original probe is excluded from the software lane; it must
+    run on its own and cannot turn an unsupported namespace into a PASS.
+    """
+    if mode not in {"core", "software", "isolation", "full"}:
+        raise ValueError("mode must be core, software, isolation, or full")
     errors = []
     if pytest_exit != 0:
         errors.append(f"pytest returned {pytest_exit}; a nonzero test run cannot pass")
@@ -140,35 +225,57 @@ def evaluate(report: Report, *, mode: str, pytest_exit: int) -> Decision:
             errors.append(f"{case.identity}: {case.outcome}: {case.detail[:300]}")
         elif case.outcome == "skipped":
             errors.append(f"{case.identity}: NOT_TESTED/BLOCKED (skipped: {case.detail[:300]})")
-    core = [case for case in report.cases if case.module in {"test_v3_audit_bugfixes"}]
+    core = [case for case in report.cases if case.module == POSITIVE_MODULE]
     core_scope = [case for case in report.cases if case.classname.startswith(
         ("tests.unit.", "tests.runtime.", "tests.integration."))]
-    if len(core) != 42:
-        errors.append(f"expected all 42 A01-A10 cases, actually executed {len(core)}")
-    if len(core_scope) < MINIMUM_CORE_CASES:
-        errors.append(f"Core regression coverage shrank: {len(core_scope)} < {MINIMUM_CORE_CASES}")
-    if mode == "core" and len(report.cases) != len(core_scope):
-        errors.append("the Core-only run included unexpected test modules")
-
     preflight = [case for case in report.cases if case.module in PREFLIGHT_MODULES]
     round5 = [case for case in preflight if case.module == "test_round5_fixes"]
-    if any(case.name == REAL_A_CASE for case in report.cases):
+    habitation = [case for case in report.cases if case.classname.startswith("tests.habitation.")]
+    probes = [case for case in preflight if case.name == ISOLATION_CASE
+              and case.module == "test_round4_fixes"]
+    if any(re.search(r"^test_real_a(?:_|$)", case.name) for case in report.cases):
         errors.append("real-A auto-probe appeared in the default synthetic test list")
-    synthetic_isolation = "NOT_RUN" if mode == "core" else "NOT_TESTED/BLOCKED"
-    if mode == "full":
-        if len(preflight) < MINIMUM_PREFLIGHT_CASES:
-            errors.append(f"synthetic preflight coverage shrank: {len(preflight)} < {MINIMUM_PREFLIGHT_CASES}")
-        if len(round5) < MINIMUM_ROUND5_CASES:
-            errors.append(f"reviewed PR125 round5 coverage shrank: {len(round5)} < {MINIMUM_ROUND5_CASES}")
-        probes = [case for case in preflight if case.name == ISOLATION_CASE
-                  and case.module == "test_round4_fixes"]
-        if len(probes) != 1:
-            errors.append("the round4 synthetic isolation probe was not executed exactly once")
+
+    synthetic_isolation = "NOT_RUN" if mode in {"core", "software"} else "NOT_TESTED/BLOCKED"
+    if mode == "isolation":
+        if len(report.cases) != 1 or len(probes) != 1:
+            errors.append("the original round4 isolation probe must be the only executed case")
         elif probes[0].outcome == "passed":
             synthetic_isolation = "SYNTHETIC_CANARY_PASS_ONLY"
-        # Real A has zero default testcases by design; it must remain a
-        # separately authorized operation, not a pytest PASS or a hidden skip.
-        # A namespace probe skip/failure never becomes an isolation PASS.
+        elif probes[0].outcome in {"failure", "error"}:
+            synthetic_isolation = "FAIL/BLOCKED"
+        # An unsupported (skipped) probe is NOT_TESTED/BLOCKED, never a pass.
+    else:
+        if len(core) != 42:
+            errors.append(f"expected all 42 A01-A10 cases, actually executed {len(core)}")
+        for index in range(1, 11):
+            bug_id = f"A{index:02d}"
+            if not any(re.search(rf"(?:^|_)a{index:02d}_", case.name) for case in core):
+                errors.append(f"{bug_id} has no executed positive regression")
+        if len(core_scope) < MINIMUM_CORE_CASES:
+            errors.append(f"Core regression coverage shrank: {len(core_scope)} < {MINIMUM_CORE_CASES}")
+        if mode == "core":
+            if len(report.cases) != len(core_scope):
+                errors.append("the Core-only run included unexpected test modules")
+        else:
+            minimum_preflight = MINIMUM_PREFLIGHT_CASES - (mode == "software")
+            if len(preflight) < minimum_preflight:
+                errors.append(f"synthetic preflight coverage shrank: {len(preflight)} < {minimum_preflight}")
+            if len(round5) < MINIMUM_ROUND5_CASES:
+                errors.append(f"reviewed PR125 round5 coverage shrank: {len(round5)} < {MINIMUM_ROUND5_CASES}")
+            if len(habitation) < MINIMUM_HABITATION_CASES:
+                errors.append(f"habitation public coverage shrank: {len(habitation)} < {MINIMUM_HABITATION_CASES}")
+            if len(report.cases) != len(core_scope) + len(preflight) + len(habitation):
+                errors.append("public suite included testcases outside Core/preflight/habitation")
+            if mode == "software" and probes:
+                errors.append("software lane ran the isolation probe; run it only in the environment lane")
+            if mode == "full":
+                if len(probes) != 1:
+                    errors.append("the round4 synthetic isolation probe was not executed exactly once")
+                elif probes[0].outcome == "passed":
+                    synthetic_isolation = "SYNTHETIC_CANARY_PASS_ONLY"
+                elif probes[0].outcome in {"failure", "error"}:
+                    synthetic_isolation = "FAIL/BLOCKED"
     return Decision(tuple(errors), len(core_scope), len(preflight), len(round5), synthetic_isolation)
 
 
@@ -186,8 +293,22 @@ def verify_checkout(repo: Path) -> str:
 
 def exact_receipt(report: Report, decision: Decision, *, mode: str, checkout: str = "local") -> dict[str, object]:
     """Publish exact numbers and proof boundaries, even if logs are unavailable."""
+    by_bug = {}
+    for index in range(1, 11):
+        matches = [case for case in report.cases if case.module == POSITIVE_MODULE
+                   and re.search(rf"(?:^|_)a{index:02d}_", case.name)]
+        by_bug[f"A{index:02d}"] = {
+            "executed": len(matches),
+            "passed": sum(case.outcome == "passed" for case in matches),
+            "failures": sum(case.outcome == "failure" for case in matches),
+            "errors": sum(case.outcome == "error" for case in matches),
+            "skipped": sum(case.outcome == "skipped" for case in matches),
+        }
     return {
         "mode": mode,
+        "software_regressions": ("PASS" if decision.passed else "BLOCKED")
+        if mode in {"core", "software"} else "NOT_EVALUATED",
+        "a01_a10_by_bug": by_bug,
         "python": sys.version.split()[0],
         "pr_head": os.environ.get("PR_HEAD_SHA", "local"),
         "checkout": checkout,
@@ -214,12 +335,16 @@ def _escape(value: str) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--mode", choices=("core", "full"), required=True)
-    parser.add_argument("--junit", type=Path, required=True)
+    parser.add_argument("--mode", choices=("boundary", "core", "software", "isolation", "full"), required=True)
+    parser.add_argument("--junit", type=Path)
+    parser.add_argument("--collected", type=Path)
     parser.add_argument("--pytest-exit", type=int, required=True)
     args = parser.parse_args()
     errors = []
     decision = None
+    report = None
+    receipt = None
+    checkout = "NOT_VERIFIED"
     try:
         if sys.version_info < (3, 12):
             raise ValueError("Python >=3.12 is required")
@@ -227,15 +352,41 @@ def main() -> int:
         checkout = verify_checkout(repo)
         verify_positive_source(repo)
         verify_default_synthetic_boundary(repo)
-        report = read_junit(args.junit)
-        decision = evaluate(report, mode=args.mode, pytest_exit=args.pytest_exit)
-        errors.extend(decision.errors)
-        receipt = exact_receipt(report, decision, mode=args.mode, checkout=checkout)
+        if args.mode == "boundary":
+            if args.collected is None or args.junit is not None:
+                raise ValueError("boundary mode needs --collected and no --junit")
+            nodeids = read_collection(args.collected)
+            errors.extend(evaluate_collection(nodeids, pytest_exit=args.pytest_exit))
+            real_a = sum(bool(re.search(r"::test_real_a(?:_|$)", nodeid)) for nodeid in nodeids)
+            receipt = {
+                "mode": "boundary", "pr_head": os.environ.get("PR_HEAD_SHA", "local"),
+                "checkout": checkout, "integrated_base": INTEGRATED_BASE_SHA,
+                "default_collected": len(nodeids), **collection_counts(nodeids),
+                "original_isolation_probe": nodeids.count(ISOLATION_NODEID),
+                "real_a_testcases": real_a, "real_a_import": "NOT_TESTED/BLOCKED",
+                "resident_isolation": "BLOCKED / REAL RESOURCES NOT_TESTED",
+                "status": "BLOCKED" if errors else "DEFAULT_COLLECTION_BOUNDARY_PASS_ONLY",
+            }
+        else:
+            if args.junit is None or (args.mode == "software") != (args.collected is not None):
+                raise ValueError("test modes need --junit; software additionally needs --collected")
+            report = read_junit(args.junit)
+            decision = evaluate(report, mode=args.mode, pytest_exit=args.pytest_exit)
+            errors.extend(decision.errors)
+            receipt = exact_receipt(report, decision, mode=args.mode, checkout=checkout)
+            if args.mode == "software":
+                nodeids = read_collection(args.collected)
+                errors.extend(evaluate_collection(nodeids, pytest_exit=0))
+                errors.extend(compare_software_collection(report, nodeids))
+                receipt.update({"default_collected": len(nodeids),
+                                "separately_executed_environment_case": ISOLATION_NODEID,
+                                "deliberate_deselections": len(nodeids) - len(report.cases),
+                                "software_regressions": "BLOCKED" if errors else "PASS"})
+            for case in report.cases:
+                if case.outcome == "skipped":
+                    print(f"SKIP REASON {case.identity}: {case.detail}")
         print(f"{args.mode.upper()} SYNTHETIC RECEIPT: " + json.dumps(receipt, sort_keys=True))
         print("::notice title=PR126 synthetic receipt::" + _escape(json.dumps(receipt, sort_keys=True)))
-        for case in report.cases:
-            if case.outcome == "skipped":
-                print(f"SKIP REASON {case.identity}: {case.detail}")
     except (OSError, ValueError, ET.ParseError, KeyError, TypeError, subprocess.CalledProcessError) as exc:
         errors.append(f"unable to certify public synthetic test receipt: {exc}")
     for error in errors:
@@ -245,13 +396,15 @@ def main() -> int:
         with open(summary_path, "a", encoding="utf-8") as summary:
             summary.write(f"\n### PR126 {args.mode} synthetic-only gate\n")
             summary.write(f"- Python: {sys.version.split()[0]}\n")
-            summary.write(f"- Checkout: {checkout if decision else 'NOT_VERIFIED'}\n")
-            summary.write(f"- Status: {'BLOCKED' if errors else 'MECHANICAL_PASS_ONLY'}\n")
+            summary.write(f"- Checkout: {checkout}\n")
+            status = ("BLOCKED" if errors else "SOFTWARE_PASS_ONLY" if args.mode in {"core", "software"}
+                      else "DEFAULT_COLLECTION_BOUNDARY_PASS_ONLY" if args.mode == "boundary"
+                      else "SYNTHETIC_CANARY_PASS_ONLY")
+            summary.write(f"- Status: {status}\n")
+            if receipt:
+                summary.write(f"- Actual receipt: {json.dumps(receipt, sort_keys=True)}\n")
             if decision:
-                summary.write(f"- A01-A10/Core cases: 42/{decision.core_count}\n")
-                summary.write(f"- Preflight cases (including round5): {decision.preflight_count} ({decision.round5_count} round5)\n")
                 summary.write(f"- Synthetic isolation: {decision.synthetic_isolation}\n")
-                summary.write(f"- Real A: {decision.real_a_import}; {sum(case.name == REAL_A_CASE for case in report.cases)} default testcases (explicit authorization required)\n")
                 summary.write(f"- Real Resident isolation: {decision.resident_isolation}\n")
             for error in errors:
                 summary.write(f"- {error}\n")

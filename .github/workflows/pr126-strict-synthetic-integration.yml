@@ -15,10 +15,12 @@ permissions:
 env:
   PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
 
-# Synthetic mechanics only. A passing job is NOT a Core freeze, a real Resident
-# isolation attestation, or permission to launch B/C. PR126 remains draft/blocked.
+# Three separately reported outcomes. A software pass is not a real-A/Resident
+# isolation attestation, Core freeze, or permission to run A/B/C. No privileged
+# runner is provisioned; an unsupported synthetic namespace probe must be RED.
 jobs:
-  core-positive-regressions:
+  real-resource-access-boundary:
+    name: real-resource-access-boundary (default collection only)
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
@@ -27,21 +29,59 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # Pin to PR126 head: GitHub merge-ref otherwise includes later PR125 commits.
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - run: python -m pip install -e ".[dev]"
+      - name: Reject real-A auto-probes before public collection
+        run: python -c 'from pathlib import Path; from tools.ci.pr126_synthetic_gate import verify_default_synthetic_boundary; verify_default_synthetic_boundary(Path.cwd())'
+      - name: Check the actual default public collection without executing tests
+        run: |
+          set +e
+          # Override pyproject addopts=-q so this prints nodeids, not grouped totals.
+          python -m pytest -o addopts='' --collect-only -q tests > "$RUNNER_TEMP/pr126-collected.txt" 2>&1
+          pytest_exit=$?
+          python tools/ci/pr126_synthetic_gate.py --mode boundary --collected "$RUNNER_TEMP/pr126-collected.txt" --pytest-exit "$pytest_exit"
+
+  public-synthetic-core-regression:
+    name: public-synthetic-core-regression (software only)
+    needs: real-resource-access-boundary
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONPATH: ".:src"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e ".[dev]"
+      - name: Reject real-A auto-probes before executing public tests
+        run: python -c 'from pathlib import Path; from tools.ci.pr126_synthetic_gate import verify_default_synthetic_boundary; verify_default_synthetic_boundary(Path.cwd())'
+      - name: Capture actual collection to prove the only deselection is the separate probe
+        run: python -m pytest -o addopts='' --collect-only -q tests > "$RUNNER_TEMP/pr126-software-collected.txt"
       - name: Execute every Core case and all 42 positive audit regressions
         run: |
           set +e
           python -m pytest tests/unit tests/runtime tests/integration -ra --junitxml="$RUNNER_TEMP/pr126-core.xml"
           pytest_exit=$?
           python tools/ci/pr126_synthetic_gate.py --mode core --junit "$RUNNER_TEMP/pr126-core.xml" --pytest-exit "$pytest_exit"
+      - name: Execute public software suite, excluding only the separately run environment probe
+        run: |
+          set +e
+          python -m pytest tests --deselect=tests/preflight/test_round4_fixes.py::test_isolation_probe_execution_result -ra --junitxml="$RUNNER_TEMP/pr126-software.xml"
+          pytest_exit=$?
+          python tools/ci/pr126_synthetic_gate.py --mode software --junit "$RUNNER_TEMP/pr126-software.xml" --collected "$RUNNER_TEMP/pr126-software-collected.txt" --pytest-exit "$pytest_exit"
 
-  full-public-synthetic-suite:
+  isolation-environment-result:
+    name: isolation-environment-result (unsupported probe is BLOCKED)
+    needs: real-resource-access-boundary
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
@@ -50,18 +90,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # Pin to PR126 head: GitHub merge-ref otherwise includes later PR125 commits.
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - run: python -m pip install -e ".[dev]"
-      - name: Refuse real-A auto-probes before collecting public synthetic tests
+      - name: Reject real-A auto-probes before executing the original synthetic probe
         run: python -c 'from pathlib import Path; from tools.ci.pr126_synthetic_gate import verify_default_synthetic_boundary; verify_default_synthetic_boundary(Path.cwd())'
-      - name: Execute public synthetic tests and fail closed on any skip
+      - name: Execute the original isolation probe; unsupported is NOT_TESTED/BLOCKED
         run: |
           set +e
-          python -m pytest tests -ra --junitxml="$RUNNER_TEMP/pr126-full.xml"
+          python -m pytest tests/preflight/test_round4_fixes.py::test_isolation_probe_execution_result -ra --junitxml="$RUNNER_TEMP/pr126-isolation.xml"
           pytest_exit=$?
-          python tools/ci/pr126_synthetic_gate.py --mode full --junit "$RUNNER_TEMP/pr126-full.xml" --pytest-exit "$pytest_exit"
+          python tools/ci/pr126_synthetic_gate.py --mode isolation --junit "$RUNNER_TEMP/pr126-isolation.xml" --pytest-exit "$pytest_exit"
