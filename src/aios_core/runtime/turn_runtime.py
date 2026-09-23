@@ -46,6 +46,7 @@ from aios_core.ingest.conversation import (
     ConversationIngestor,
 )
 from aios_core.policy import (
+    CognitionEvidencePolicy,
     CognitivePolicyCreateRequest,
     CognitivePolicyRegistry,
     CognitivePolicyUpdateRequest,
@@ -68,7 +69,6 @@ from aios_core.review import (
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.summaries import (
     CognitiveDerivationScheduler,
-    DerivedLineageClass,
     DimensionSummaryInput,
     MultiScaleSummaryScheduler,
     SummaryScale,
@@ -206,20 +206,29 @@ class FusedTurnRuntime:
             index=index,
             subject_id=subject_id,
         )
+        self.evidence_policy = CognitionEvidencePolicy(
+            store=store,
+            index=index,
+            subject_id=self.subject_id,
+            allowed_subject_ids=(self.subject_id, AI_SELF_SUBJECT_ID),
+        )
         self.writeback = CognitionWritebackService(
             store=store,
             index=index,
             subject_id=subject_id,
+            evidence_policy=self.evidence_policy,
         )
         self.ai_world = AIWorldCognitionService(
             store=store,
             index=index,
             user_id=subject_id,
+            evidence_policy=self.evidence_policy,
         )
         self.revision = CognitionRevisionService(
             store=store,
             index=index,
             subject_id=subject_id,
+            evidence_policy=self.evidence_policy,
         )
         self.world_graph = EntityRelationService(
             store=store,
@@ -277,6 +286,7 @@ class FusedTurnRuntime:
             wake_bus=self.wake_bus,
             subject_id=self.subject_id,
             allowed_subject_ids=(self.subject_id, AI_SELF_SUBJECT_ID),
+            evidence_policy=self.evidence_policy,
         )
         self.attention_watches = AttentionWatchService(
             store=store,
@@ -397,7 +407,8 @@ class FusedTurnRuntime:
                 name="read_ai_world",
                 description=(
                     "Read current evidence-grounded AI cognition across user understanding, "
-                    "relationship, self, intent, strategy, boundary, personality and calibration."
+                    "relationship, self, intent, strategy, boundary, personality and calibration. "
+                    "Displays valid_time, unknown_items, and counter_evidence_summary."
                 ),
                 kind=CapabilityKind.READ,
                 input_schema={
@@ -536,6 +547,9 @@ class FusedTurnRuntime:
                     "dimension": "string",
                     "claim_type": "string?",
                     "knowledge_state": "string?",
+                    "valid_time": "TemporalExtent object?",
+                    "unknown_items": "array[string]?",
+                    "counter_evidence_refs": "array[{object_id:string,revision:integer}]?",
                 },
             ),
             self._commit_claim,
@@ -558,6 +572,9 @@ class FusedTurnRuntime:
                     "claim_type": "string?",
                     "scope_key": "string?",
                     "tags": "array[string]?",
+                    "valid_time": "TemporalExtent object?",
+                    "unknown_items": "array[string]?",
+                    "counter_evidence_refs": "array[{object_id:string,revision:integer}]?",
                 },
             ),
             self._commit_ai_world_claim,
@@ -812,6 +829,9 @@ class FusedTurnRuntime:
                     "evidence_refs": "array[{object_id:string,revision:integer}]",
                     "replacement_content": "string",
                     "confidence": "number[0,1]?",
+                    "valid_time": "TemporalExtent object?",
+                    "unknown_items": "array[string]?",
+                    "counter_evidence_refs": "array[{object_id:string,revision:integer}]?",
                 },
             ),
             self._revise_claim,
@@ -2190,7 +2210,7 @@ class FusedTurnRuntime:
         # C14 is a bounded background cognition-derivation wake. It may persist only
         # cognition create/revise/retract operations; every other present or future
         # side-effecting capability is denied by default. The four allowed handlers
-        # still pass through _validate_c14_cognition_grounding().
+        # still pass through _validate_cognition_evidence().
         if snapshot.wake_reason == WakeSource.COGNITIVE_DERIVATION.value:
             return spec.name in _C14_COGNITIVE_SIDE_EFFECT_ALLOWLIST
 
@@ -2253,37 +2273,20 @@ class FusedTurnRuntime:
         )
         return asdict(receipt)
 
-    def _validate_c14_cognition_grounding(
+    def _validate_cognition_evidence(
         self,
         refs: Sequence[ObjectRef],
         *,
         operation: str,
     ) -> None:
-        """Enforce C14 support closure at the Resident capability boundary.
+        """Enforce unified evidence support closure across all wake sources.
 
-        Ordinary user turns and Periodic Review keep their existing semantics. During
-        COGNITIVE_DERIVATION, every durable Claim create/revise/retract route passes
-        the same mechanical resolver used by the C14 scheduler. No Claim prose,
+        Ordinary user turns, Periodic Review, and Cognitive Derivation all pass
+        the same mechanical resolver in CognitionEvidencePolicy. No Claim prose,
         keywords, occurrence counts, confidence score or expected answer participates.
+        Every durable Claim create/revise/retract route requires leaf-grounded reality support.
         """
-
-        if self._active_wake_source is not WakeSource.COGNITIVE_DERIVATION:
-            return
-        lineage = self.cognitive_derivation.derive_lineage_for_refs(tuple(refs))
-        if (
-            lineage.classification
-            not in {DerivedLineageClass.REALITY, DerivedLineageClass.MIXED}
-            or lineage.unresolved_refs
-            or lineage.issues
-            or not lineage.grounding_leaf_refs
-        ):
-            raise ValueError(
-                "C14 leaf-grounded evidence closure rejected "
-                f"{operation}: classification={lineage.classification.value}; "
-                f"grounding_leaf_count={len(lineage.grounding_leaf_refs)}; "
-                f"unresolved_count={len(lineage.unresolved_refs)}; "
-                f"issues={','.join(lineage.issues) or 'none'}"
-            )
+        self.evidence_policy.validate(refs, operation=operation)
 
     def _commit_ai_world_claim(
         self,
@@ -2295,15 +2298,29 @@ class FusedTurnRuntime:
         claim_type: str = "inference",
         scope_key: str | None = None,
         tags: Sequence[str] = (),
+        valid_time: Mapping[str, Any] | None = None,
+        unknown_items: Sequence[str] = (),
+        counter_evidence_refs: Sequence[Mapping[str, Any]] = (),
     ) -> dict[str, Any]:
         if self._active_turn_time is None:
             raise RuntimeError(
                 "commit_ai_world_claim is only available during an active AIOS turn"
             )
         refs = self._coerce_refs(evidence_refs)
-        self._validate_c14_cognition_grounding(
+        self._validate_cognition_evidence(
             refs,
             operation="commit_ai_world_claim",
+        )
+        counter_refs = self._coerce_refs(counter_evidence_refs)
+        if counter_refs:
+            self._validate_cognition_evidence(
+                counter_refs,
+                operation="commit_ai_world_claim:counter_evidence",
+            )
+        parsed_valid_time = (
+            TemporalExtent.unknown_time()
+            if valid_time is None
+            else TemporalExtent.model_validate(valid_time)
         )
         receipt = self.ai_world.commit(
             AIWorldClaimRequest(
@@ -2315,6 +2332,9 @@ class FusedTurnRuntime:
                 claim_type=claim_type,
                 scope_key=scope_key,
                 tags=tuple(tags),
+                valid_time=parsed_valid_time,
+                unknown_items=tuple(unknown_items),
+                counter_evidence_refs=counter_refs,
             ),
             learned_at=self._active_turn_time,
         )
@@ -2333,19 +2353,27 @@ class FusedTurnRuntime:
         dimension: str,
         claim_type: str = "inference",
         knowledge_state: str = "inferred",
+        valid_time: Mapping[str, Any] | None = None,
+        unknown_items: Sequence[str] = (),
+        counter_evidence_refs: Sequence[Mapping[str, Any]] = (),
     ) -> dict[str, Any]:
         if self._active_turn_time is None:
             raise RuntimeError("commit_claim is only available during an active AIOS turn")
-        refs = tuple(
-            ObjectRef(
-                object_id=str(item["object_id"]),
-                revision=int(item["revision"]),
-            )
-            for item in evidence_refs
-        )
-        self._validate_c14_cognition_grounding(
+        refs = self._coerce_refs(evidence_refs)
+        self._validate_cognition_evidence(
             refs,
             operation="commit_claim",
+        )
+        counter_refs = self._coerce_refs(counter_evidence_refs)
+        if counter_refs:
+            self._validate_cognition_evidence(
+                counter_refs,
+                operation="commit_claim:counter_evidence",
+            )
+        parsed_valid_time = (
+            TemporalExtent.unknown_time()
+            if valid_time is None
+            else TemporalExtent.model_validate(valid_time)
         )
         receipt = self.writeback.commit_claim(
             ClaimWriteRequest(
@@ -2355,6 +2383,9 @@ class FusedTurnRuntime:
                 dimension=dimension,
                 claim_type=claim_type,
                 knowledge_state=knowledge_state,
+                valid_time=parsed_valid_time,
+                unknown_items=tuple(unknown_items),
+                counter_evidence_refs=counter_refs,
             ),
             learned_at=self._active_turn_time,
         )
@@ -2379,14 +2410,23 @@ class FusedTurnRuntime:
         evidence_refs: Sequence[Mapping[str, Any]],
         replacement_content: str,
         confidence: float | None = None,
+        valid_time: Mapping[str, Any] | None = None,
+        unknown_items: Sequence[str] | None = None,
+        counter_evidence_refs: Sequence[Mapping[str, Any]] = (),
     ) -> dict[str, Any]:
         if self._active_turn_time is None:
             raise RuntimeError("revise_claim is only available during an active AIOS turn")
         refs = self._coerce_refs(evidence_refs)
-        self._validate_c14_cognition_grounding(
+        self._validate_cognition_evidence(
             refs,
             operation="revise_claim",
         )
+        counter_refs = self._coerce_refs(counter_evidence_refs)
+        if counter_refs:
+            self._validate_cognition_evidence(
+                counter_refs,
+                operation="revise_claim:counter_evidence",
+            )
         target = ObjectRef(
             object_id=str(target_ref["object_id"]),
             revision=int(target_ref["revision"]),
@@ -2399,6 +2439,16 @@ class FusedTurnRuntime:
         is_ai_world_target = isinstance(metadata, dict) and (
             metadata.get("ai_world") is True or "ai_domain" in metadata
         )
+        parsed_valid_time = (
+            None
+            if valid_time is None
+            else TemporalExtent.model_validate(valid_time)
+        )
+        parsed_unknown_items = (
+            None
+            if unknown_items is None
+            else tuple(unknown_items)
+        )
         if is_ai_world_target:
             receipt = self.ai_world.revise(
                 target_ref=target,
@@ -2407,6 +2457,9 @@ class FusedTurnRuntime:
                 reason=reason,
                 changed_at=self._active_turn_time,
                 confidence=confidence,
+                valid_time=parsed_valid_time,
+                unknown_items=parsed_unknown_items,
+                counter_evidence_refs=counter_refs,
             )
         else:
             receipt = self.revision.apply(
@@ -2417,6 +2470,9 @@ class FusedTurnRuntime:
                     evidence_refs=refs,
                     replacement_content=replacement_content,
                     confidence=confidence,
+                    valid_time=parsed_valid_time,
+                    unknown_items=parsed_unknown_items,
+                    counter_evidence_refs=counter_refs,
                 ),
                 changed_at=self._active_turn_time,
             )
@@ -2431,7 +2487,7 @@ class FusedTurnRuntime:
         if self._active_turn_time is None:
             raise RuntimeError("retract_claim is only available during an active AIOS turn")
         refs = self._coerce_refs(evidence_refs)
-        self._validate_c14_cognition_grounding(
+        self._validate_cognition_evidence(
             refs,
             operation="retract_claim",
         )

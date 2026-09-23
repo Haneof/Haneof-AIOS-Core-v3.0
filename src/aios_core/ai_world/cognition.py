@@ -16,7 +16,8 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from aios_core.contracts.enums import ClaimType, KnowledgeState, ObjectType
 from aios_core.contracts.refs import ObjectRef
-from aios_core.contracts.time import as_utc
+from aios_core.contracts.time import TemporalExtent, as_utc
+from aios_core.policy.evidence import CognitionEvidencePolicy
 from aios_core.query.search import WorldSearchIndex
 from aios_core.revision.service import (
     ClaimRevisionReceipt,
@@ -74,6 +75,9 @@ class AIWorldClaimRequest(BaseModel):
     claim_type: ClaimType = ClaimType.INFERENCE
     scope_key: str | None = None
     tags: tuple[str, ...] = ()
+    valid_time: TemporalExtent = Field(default_factory=TemporalExtent.unknown_time)
+    unknown_items: tuple[str, ...] = ()
+    counter_evidence_refs: tuple[ObjectRef, ...] = ()
 
     @model_validator(mode="after")
     def validate_request(self) -> "AIWorldClaimRequest":
@@ -83,9 +87,14 @@ class AIWorldClaimRequest(BaseModel):
             raise ValueError("scope_key must not be blank")
         if any(not tag.strip() for tag in self.tags):
             raise ValueError("tags must not contain blank values")
+        if any(not item.strip() for item in self.unknown_items):
+            raise ValueError("unknown_items must not contain blank values")
         for ref in self.evidence_refs:
             if ref.revision is None:
                 raise ValueError("AI-world cognition requires pinned evidence revisions")
+        for ref in self.counter_evidence_refs:
+            if ref.revision is None:
+                raise ValueError("AI-world cognition requires pinned counter evidence revisions")
         return self
 
 
@@ -104,6 +113,9 @@ class AIWorldClaimView(BaseModel):
     learned_at: datetime
     scope_key: str | None = None
     tags: tuple[str, ...] = ()
+    valid_time: TemporalExtent = Field(default_factory=TemporalExtent.unknown_time)
+    unknown_items: tuple[str, ...] = ()
+    counter_evidence_summary: dict[str, Any] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def validate_time(self) -> "AIWorldClaimView":
@@ -129,11 +141,21 @@ class AIWorldCognitionService:
         index: WorldSearchIndex | None = None,
         user_id: str = "user_1",
         ai_subject_id: str = AI_SELF_SUBJECT_ID,
+        evidence_policy: CognitionEvidencePolicy | None = None,
     ) -> None:
         self.store = store
         self.index = index
         self.user_id = user_id
         self.ai_subject_id = ai_subject_id
+        # C15-RCC-EVIDENCE-POLICY-001: structural, never optional. The typed AI-world
+        # facade spans both the user subject and the AI-self subject, so the default
+        # policy is built over exactly that allowed subject pair.
+        self.evidence_policy = evidence_policy or CognitionEvidencePolicy(
+            store=store,
+            index=index,
+            subject_id=user_id,
+            allowed_subject_ids=(user_id, ai_subject_id),
+        )
 
     def _subject_for(self, domain: AIWorldDomain) -> str:
         return self.user_id if domain in _USER_SCOPED_DOMAINS else self.ai_subject_id
@@ -152,6 +174,7 @@ class AIWorldCognitionService:
             index=self.index,
             subject_id=subject_id,
             evidence_subject_ids=(self.user_id, self.ai_subject_id),
+            evidence_policy=self.evidence_policy,
         )
         metadata: dict[str, Any] = {
             "ai_domain": domain.value,
@@ -172,6 +195,9 @@ class AIWorldCognitionService:
                 knowledge_state=request.knowledge_state,
                 claimant_id="resident_ai",
                 metadata=metadata,
+                valid_time=request.valid_time,
+                unknown_items=request.unknown_items,
+                counter_evidence_refs=request.counter_evidence_refs,
             ),
             learned_at=learned_at,
         )
@@ -227,6 +253,51 @@ class AIWorldCognitionService:
             if required_tag_set and not required_tag_set.issubset(tags):
                 continue
 
+            raw_valid_time = payload.get("valid_time")
+            valid_time = (
+                TemporalExtent.model_validate(raw_valid_time)
+                if isinstance(raw_valid_time, dict)
+                else TemporalExtent.unknown_time()
+            )
+            raw_unknown = payload.get("unknown_items")
+            unknown_items = tuple(str(x) for x in (raw_unknown or ()))
+
+            counter_set_refs = payload.get("counter_evidence_set_refs") or []
+            counter_refs_collected: list[dict[str, Any]] = []
+            seen_refs: set[tuple[str, int]] = set()
+            counter_set_ids: list[str] = []
+            for ref_item in counter_set_refs:
+                if isinstance(ref_item, dict):
+                    s_id = str(ref_item.get("object_id") or "")
+                    s_rev = int(ref_item.get("revision") or 1)
+                else:
+                    s_id = str(getattr(ref_item, "object_id", ""))
+                    s_rev = int(getattr(ref_item, "revision", 1) or 1)
+                if not s_id:
+                    continue
+                counter_set_ids.append(f"{s_id}@{s_rev}")
+                try:
+                    ev_payload = self.store.get_payload(s_id, revision=s_rev)
+                    raw_refs = ev_payload.get("counter_refs") or ev_payload.get("member_refs") or []
+                    for c_ref in raw_refs:
+                        if isinstance(c_ref, dict):
+                            c_id = str(c_ref.get("object_id") or "")
+                            c_rev = int(c_ref.get("revision") or 1)
+                        else:
+                            c_id = str(getattr(c_ref, "object_id", ""))
+                            c_rev = int(getattr(c_ref, "revision", 1) or 1)
+                        if c_id and (c_id, c_rev) not in seen_refs:
+                            seen_refs.add((c_id, c_rev))
+                            counter_refs_collected.append({"object_id": c_id, "revision": c_rev})
+                except Exception:
+                    pass
+
+            counter_evidence_summary = {
+                "count": len(counter_refs_collected),
+                "counter_evidence_set_refs": counter_set_ids,
+                "counter_refs": counter_refs_collected,
+            }
+
             views.append(
                 AIWorldClaimView(
                     domain=domain,
@@ -245,6 +316,9 @@ class AIWorldCognitionService:
                         else None
                     ),
                     tags=tags,
+                    valid_time=valid_time,
+                    unknown_items=unknown_items,
+                    counter_evidence_summary=counter_evidence_summary,
                 )
             )
 
@@ -332,6 +406,9 @@ class AIWorldCognitionService:
         reason: str,
         changed_at: datetime,
         confidence: float | None = None,
+        valid_time: TemporalExtent | None = None,
+        unknown_items: tuple[str, ...] | None = None,
+        counter_evidence_refs: Sequence[ObjectRef] = (),
     ) -> ClaimRevisionReceipt:
         payload = self.store.get_payload(
             target_ref.object_id,
@@ -343,6 +420,7 @@ class AIWorldCognitionService:
             index=self.index,
             subject_id=expected_subject,
             evidence_subject_ids=(self.user_id, self.ai_subject_id),
+            evidence_policy=self.evidence_policy,
         )
         return service.apply(
             ClaimRevisionRequest(
@@ -352,6 +430,9 @@ class AIWorldCognitionService:
                 evidence_refs=tuple(evidence_refs),
                 replacement_content=replacement_statement,
                 confidence=confidence,
+                valid_time=valid_time,
+                unknown_items=unknown_items,
+                counter_evidence_refs=tuple(counter_evidence_refs),
             ),
             changed_at=changed_at,
         )
@@ -374,6 +455,7 @@ class AIWorldCognitionService:
             index=self.index,
             subject_id=expected_subject,
             evidence_subject_ids=(self.user_id, self.ai_subject_id),
+            evidence_policy=self.evidence_policy,
         )
         return service.apply(
             ClaimRevisionRequest(

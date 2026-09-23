@@ -94,9 +94,15 @@ def test_all_ai_domains_share_one_world_store_without_second_ai_database(tmp_pat
         AIWorldClaimRequest(
             domain=AIWorldDomain.SELF,
             statement="我在这个项目中的角色需要包含持续执行、核验和断点续传，而不只是对话回答。",
+            # C15-RCC-EVIDENCE-POLICY-001: a Self Claim may build on earlier
+            # User/Relationship Claims, but those Claims alone cannot close the proof.
+            # The real user Observations are pinned alongside them so the lineage
+            # still terminates on reality leaves. The cross-domain single-store
+            # property under test is unchanged.
             evidence_refs=(
                 ObjectRef(object_id=user.claim.claim_id, revision=1),
                 ObjectRef(object_id=relationship.claim.claim_id, revision=1),
+                ObjectRef(object_id=facts[1].object_id, revision=1),
             ),
             confidence=0.86,
             scope_key="project_role",

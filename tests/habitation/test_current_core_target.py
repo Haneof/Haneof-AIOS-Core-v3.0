@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
+import pytest
+
 from aios_core.contracts.enums import ObjectType, SourceClass, WakeSource
 from aios_core.ingest import SourceAdapterSpec
 from aios_core.runtime.capabilities import CapabilityCall
@@ -129,9 +131,41 @@ def test_current_core_targets_are_real_world_isolated(tmp_path):
         AIWorldClaimRequest,
         AIWorldDomain,
     )
-    first_obs = next(
+    observations = [
         item for item in result.runs["model-a"].final_snapshot["objects"]
         if item["object_type"] == "observation"
+    ]
+    first_obs = next(iter(observations))
+
+    # C15-RCC-EVIDENCE-POLICY-001 — explicit, non-silent behaviour record.
+    #
+    # The first Observation in this snapshot is the assistant-role turn of the
+    # user/AI interaction. Under the unified CognitionEvidencePolicy, AI speech may
+    # never close evidence for durable cognition, so committing a Claim on it is now
+    # rejected. That is the intended C14/C15 anti-self-proof rule, not a regression,
+    # and it is asserted here rather than hidden by quietly re-selecting evidence.
+    assert first_obs.get("metadata", {}).get("role") == "assistant"
+    with pytest.raises(ValueError, match="leaf-grounded evidence closure rejected"):
+        a.runtime.ai_world.commit(
+            AIWorldClaimRequest(
+                domain=AIWorldDomain.USER_UNDERSTANDING,
+                statement="AI 自述不得作为自身证明。",
+                evidence_refs=(
+                    ObjectRef(
+                        object_id=first_obs["object_id"],
+                        revision=first_obs["revision"],
+                    ),
+                ),
+                confidence=0.5,
+                scope_key="p16.isolation_test.assistant_self_proof",
+            ),
+            learned_at=NOW + timedelta(minutes=1),
+        )
+
+    # The isolation property under test is proven with real USER evidence.
+    first_user_obs = next(
+        item for item in observations
+        if item.get("metadata", {}).get("role") == "user"
     )
     a.runtime.ai_world.commit(
         AIWorldClaimRequest(
@@ -139,8 +173,8 @@ def test_current_core_targets_are_real_world_isolated(tmp_path):
             statement="仅用于验证私有世界隔离，不是认知能力测试。",
             evidence_refs=(
                 ObjectRef(
-                    object_id=first_obs["object_id"],
-                    revision=first_obs["revision"],
+                    object_id=first_user_obs["object_id"],
+                    revision=first_user_obs["revision"],
                 ),
             ),
             confidence=0.5,
