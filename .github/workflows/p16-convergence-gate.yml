@@ -18,7 +18,16 @@ jobs:
   full-core-regression:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout (full CI may be merge-result)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Record actual tested SHA vs event head
+        run: |
+          echo "event_name=${{ github.event_name }}"
+          echo "event_head_sha=${{ github.event.pull_request.head.sha || github.sha }}"
+          echo "tested_sha=$(git rev-parse HEAD)"
+          echo "If pull_request, this run tests merge-result refs/pull/.../merge, not PR head directly"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
