@@ -1,6 +1,12 @@
 # C15-RCC-COGNITION-SEMANTIC-FREEZE-001
 
-Status: READY FOR ACTIVATION AFTER C15 HARDENING MERGE
+Status: ACTIVE
+
+Activated: 2026-09-23
+
+Frozen Core anchor: `bcd6bf353126318f9a97076b52ec1740d43f35a4`
+
+Activation evidence: `governance/C15_RCC_HARDENING_FINAL_ANCHOR_HANDOFF_2026-09-23.md`
 
 ## Purpose
 
@@ -32,7 +38,7 @@ After activation, no cognition-semantic change may enter main before C15-RCC-EVA
 
 ## Activation Condition
 
-Semantic freeze becomes ACTIVE when the integrated C15-RCC-HARDEN-001 merge creates the final Core anchor SHA.
+Semantic freeze became ACTIVE when integrated C15 hardening created `bcd6bf353126318f9a97076b52ec1740d43f35a4`. The governance-only child `6abfd4d19d03a60a81b7ca336efbe3c9c726b3bb` and the accepted Resident A evidence branch change no frozen Core file.
 
 ## Resident Requirement
 
