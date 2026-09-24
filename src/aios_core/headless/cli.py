@@ -366,6 +366,7 @@ def main(argv: list[str] | None = None) -> int:
         BackgroundModelAttemptBlocked,
         BackgroundModelExecutionInDoubt,
         BackgroundModelResponsePending,
+        TimeoutError,
     ) as exc:
         _emit(
             {
