@@ -49,24 +49,26 @@ class ClockAdapter(_clock_type()):
         self._background_log = []
 
     def _dispatch_pending_wakes(self, now):
-        return []
+        # The underlying clock's old helper dispatches a snapshot directly via
+        # run_wake. Use the normal router instead to retain background batching
+        # and REVIEW_QUEUE exclusion. Never repeatedly retry a deferred head.
+        results = []
+        for _ in range(self._max_background_cycles):
+            result = self.runtime.dispatch_next_pending_wake(now=now)
+            if result is None:
+                return results
+            results.append({'wake_id': result.wake_ref.object_id, 'state': result.wake.state})
+            if result.runtime is None or result.wake.state != 'completed':
+                return results
+        raise RuntimeError('clock dispatch safety cap; not completion')
 
     def advance_to(self, instant):
-        # For formal B, ensure B14 ack durable before any model blocking.
-        # Original super().advance_to does task_cycles, periodic_reviews, dimension_summaries which all may require model and block before ingest,
-        # causing checkpoint lagging (wr89..108 committed but driver_state wr88) and pending_reveal left.
-        # Fix: for formal B, skip all model-requiring work in pre_ingest phase, just advance clock and return empty result.
-        # Dimension summaries and pending wakes will be handled in due_work after checkpoint, where ack already durable.
-        # This preserves mechanical path and ensures ack durable before model.
-        self._clock = instant
-        result = {
-            "from": None,
-            "to": instant.isoformat(),
-            "task_cycles": [],
-            "periodic_reviews": [],
-            "dimension_summaries": {"at": instant.isoformat(), "invoked": False, "reason": "skipped_for_formal_b_ack_durable"},
-            "background_cycles": 0,
-            "world_revision": int(self.store.current_world_revision()),
-            "pre_ingest_wakes": [],
-        }
+        result = super().advance_to(instant)
+        if result.get('dimension_summaries', {}).get('truncated'):
+            raise RuntimeError('clock Summary incomplete; not completion')
+        # advance_to only dispatches at Task/Review ticks. A boundary with no
+        # such tick still needs the normal router pass BEFORE the new input is
+        # ingested. Use this protocol boundary, never backdate model execution
+        # to the Wake's origin or force-drain a budget-deferred queue.
+        result['pre_ingest_wakes'] = self._dispatch_pending_wakes(instant)
         return result
