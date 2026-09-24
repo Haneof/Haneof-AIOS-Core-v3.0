@@ -30,6 +30,13 @@ from .core import (
     HeadlessWriterBusy,
     load_model_handler,
 )
+from .recovery import (
+    RecoveryError,
+    backup_world,
+    rebuild_index,
+    recovery_status,
+    restore_world,
+)
 
 
 def _iso_time(raw: str | None) -> datetime:
@@ -99,6 +106,24 @@ def _global_parser() -> argparse.ArgumentParser:
 
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("status", help="Open the configured World and report operational status.")
+    sub.add_parser(
+        "recovery-status",
+        help="Inspect World/schema/index recovery state without invoking a model provider.",
+    )
+    sub.add_parser(
+        "rebuild-index",
+        help="Rebuild the non-authoritative search projection atomically from World truth.",
+    )
+    backup = sub.add_parser(
+        "backup",
+        help="Create a coherent SQLite online-backup snapshot of the World.",
+    )
+    backup.add_argument("--to", required=True, dest="backup_to")
+    restore = sub.add_parser(
+        "restore",
+        help="Restore a backup into the new --world path; existing Worlds are never overwritten.",
+    )
+    restore.add_argument("--from-backup", required=True, dest="restore_from")
 
     turn = sub.add_parser("turn", help="Submit one ordinary user turn.")
     turn.add_argument("--session", required=True)
@@ -137,6 +162,19 @@ def _global_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _build_recovery_config(args: argparse.Namespace) -> HeadlessConfig:
+    if not args.world:
+        raise HeadlessConfigurationError(
+            "persistent World path is required via --world or AIOS_WORLD_PATH"
+        )
+    return HeadlessConfig(
+        world_path=Path(args.world),
+        index_path=None if not args.index else Path(args.index),
+        lock_path=None if not args.lock else Path(args.lock),
+        subject_id=args.subject,
+    )
+
+
 def _build_core(args: argparse.Namespace) -> HeadlessCore:
     if not args.world:
         raise HeadlessConfigurationError(
@@ -171,6 +209,18 @@ def _build_core(args: argparse.Namespace) -> HeadlessCore:
 
 
 def _run(args: argparse.Namespace) -> dict[str, Any]:
+    if args.command in {"recovery-status", "rebuild-index", "backup", "restore"}:
+        config = _build_recovery_config(args)
+        if args.command == "recovery-status":
+            return recovery_status(config)
+        if args.command == "rebuild-index":
+            return rebuild_index(config)
+        if args.command == "backup":
+            return backup_world(config, args.backup_to)
+        if args.command == "restore":
+            return restore_world(config, args.restore_from)
+        raise RuntimeError(f"unsupported recovery command: {args.command}")
+
     core = _build_core(args)
     with core:
         if args.command == "status":
@@ -316,6 +366,7 @@ def main(argv: list[str] | None = None) -> int:
         BackgroundModelAttemptBlocked,
         BackgroundModelExecutionInDoubt,
         BackgroundModelResponsePending,
+        TimeoutError,
     ) as exc:
         _emit(
             {
@@ -355,10 +406,20 @@ def main(argv: list[str] | None = None) -> int:
                 "status": "storage_error",
                 "error_code": str(exc.code),
                 "error": str(exc),
+                "context": getattr(exc, "context", None),
             },
             stream=sys.stderr,
         )
         return 7
+    except RecoveryError as exc:
+        _emit(
+            {
+                "status": "recovery_error",
+                "error": str(exc),
+            },
+            stream=sys.stderr,
+        )
+        return 9
     except (ValueError, TypeError, OSError) as exc:
         _emit(
             {

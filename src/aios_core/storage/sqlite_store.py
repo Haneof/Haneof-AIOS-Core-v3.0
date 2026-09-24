@@ -176,10 +176,56 @@ class SQLiteWorldStore:
     """
 
     SQLITE_BUSY_TIMEOUT_MS = 5000
+    CURRENT_SCHEMA_VERSION = 1
 
     def __init__(self, db_path: str | Path):
         self.db_path = str(db_path)
+        self._preflight_schema_compatibility()
         self._initialize()
+
+    def _preflight_schema_compatibility(self) -> None:
+        """Reject future World schemas before any writable SQLite open.
+
+        Version 0 is the historical unversioned schema and remains eligible for the
+        small idempotent migrations below. A version newer than this runtime must
+        fail without changing the database, creating WAL state, or attempting a
+        downgrade.
+        """
+
+        path = Path(self.db_path)
+        if not path.exists():
+            return
+        conn: sqlite3.Connection | None = None
+        try:
+            conn = sqlite3.connect(
+                path.resolve().as_uri() + "?mode=ro",
+                uri=True,
+                timeout=self.SQLITE_BUSY_TIMEOUT_MS / 1000.0,
+            )
+            row = conn.execute("PRAGMA user_version").fetchone()
+            version = 0 if row is None else int(row[0])
+        except (sqlite3.DatabaseError, OSError, TypeError, ValueError) as exc:
+            raise StoreError(
+                ErrorCode.STORAGE_FAILURE,
+                "World schema compatibility preflight failed",
+                context={"reason": "schema_preflight_failed"},
+            ) from exc
+        finally:
+            if conn is not None:
+                conn.close()
+        if version > self.CURRENT_SCHEMA_VERSION:
+            raise StoreError(
+                ErrorCode.STORAGE_FAILURE,
+                (
+                    f"World schema version {version} is newer than supported "
+                    f"version {self.CURRENT_SCHEMA_VERSION}"
+                ),
+                context={
+                    "reason": "incompatible_future_schema",
+                    "schema_version": version,
+                    "supported_schema_version": self.CURRENT_SCHEMA_VERSION,
+                },
+            )
 
     @contextmanager
     def _connection(self) -> Iterator[sqlite3.Connection]:
@@ -302,7 +348,22 @@ class SQLiteWorldStore:
                 );
                 """
             )
+            # Publish the compatibility marker only after all supported legacy
+            # migrations and current DDL completed successfully. A failed upgrade
+            # therefore never leaves the World falsely marked current.
+            conn.execute(f"PRAGMA user_version = {self.CURRENT_SCHEMA_VERSION}")
             conn.commit()
+
+    def schema_version(self) -> int:
+        with self._connection() as conn:
+            row = conn.execute("PRAGMA user_version").fetchone()
+            return 0 if row is None else int(row[0])
+
+    def quick_check(self) -> tuple[str, ...]:
+        """Return SQLite quick-check rows without treating them as World truth."""
+
+        with self._connection() as conn:
+            return tuple(str(row[0]) for row in conn.execute("PRAGMA quick_check").fetchall())
 
     def _ensure_source_class_schema(self, conn: sqlite3.Connection) -> None:
         """Keep the frozen commit-authority taxonomy forward compatible.
