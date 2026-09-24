@@ -2493,6 +2493,7 @@ class FusedTurnRuntime:
         topic: str | None,
         *,
         limit: int = 6,
+        as_of: datetime | None = None,
     ) -> dict[str, Any]:
         clean = "" if topic is None else str(topic).strip()
         if not clean:
@@ -2506,6 +2507,7 @@ class FusedTurnRuntime:
                 ObjectType.ACTION.value,
                 ObjectType.OUTCOME.value,
             ),
+            as_of=as_of,
             limit=max(1, min(int(limit), 20)),
         )
         return {
@@ -3017,7 +3019,7 @@ class FusedTurnRuntime:
             128,
             int(effective_token_budget * 0.65),
         )
-        continuity_snapshot = self.continuity.snapshot(
+        continuity_snapshot = self._continuity_reader(occurred_at).snapshot(
             session_id=session,
             before_turn=turn_index,
             recent_turn_limit=self.recent_turn_limit,
@@ -3055,7 +3057,8 @@ class FusedTurnRuntime:
                 structured_history_signal=structured_history_signal,
                 structured_signal_reason=structured_signal_reason,
             )
-        raw_recommendation_limit = self.policies.effective_value(
+        policy_reader = self._policy_reader(occurred_at)
+        raw_recommendation_limit = policy_reader.effective_value(
             "memory.recommendation_limit",
             self.recommender.default_limit,
         )
@@ -3067,7 +3070,11 @@ class FusedTurnRuntime:
         except (TypeError, ValueError):
             effective_recommendation_limit = self.recommender.default_limit
 
-        recommendation = self.recommender.recommend(
+        recommendation = ProactiveMemoryRecommender(
+            index=self.index,
+            store=self._cutoff_store(occurred_at),
+            default_limit=self.recommender.default_limit,
+        ).recommend(
             current_topic=topic_state.topic,
             subject_id=self.subject_id,
             exclude_session_id=session,
@@ -3079,25 +3086,28 @@ class FusedTurnRuntime:
         continuity_context = (
             dict(ai_identity)
             if ai_identity is not None
-            else self.ai_world.core_context(per_domain=3)
+            else self._ai_world_core_context(occurred_at, per_domain=3)
         )
 
         current_task_context = dict(task_context or {})
         current_task_context["topic_state"] = topic_state.model_dump(mode="json")
         current_task_context["cognitive_policy_context"] = (
-            self._cognitive_policy_context()
+            self._cognitive_policy_context(as_of=occurred_at)
         )
         current_task_context["cognitive_policy_context"][
             "memory.recommendation_limit"
         ] = effective_recommendation_limit
         current_task_context["cognitive_policy_context"].setdefault(
             "communication.detail_level",
-            self.policies.effective_value(
+            policy_reader.effective_value(
                 "communication.detail_level",
                 None,
             ),
         )
-        automatic_execution_context = self._execution_context_for_topic(topic_state.topic)
+        automatic_execution_context = self._execution_context_for_topic(
+            topic_state.topic,
+            as_of=occurred_at,
+        )
         current_task_context.setdefault(
             "related_execution_anchors",
             automatic_execution_context["related_execution_anchors"],
