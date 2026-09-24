@@ -1338,11 +1338,10 @@ class WorldSearchIndex:
                     "SELECT object_id FROM search_tombstones"
                 ).fetchall()
             }
-            rows = conn.execute(
-                f"""
-                SELECT o.object_id, o.revision, o.object_type, o.subject_id,
-                       o.dimension, o.occurred_start_us
-                FROM search_occurred o
+            latest_join = (
+                ""
+                if reference is not None
+                else """
                 JOIN (
                     SELECT object_id, MAX(revision) AS max_revision
                     FROM search_occurred
@@ -1350,30 +1349,53 @@ class WorldSearchIndex:
                 ) latest
                   ON latest.object_id=o.object_id
                  AND latest.max_revision=o.revision
+                """
+            )
+            rows = conn.execute(
+                f"""
+                SELECT o.object_id, o.revision, o.object_type, o.subject_id,
+                       o.dimension, o.occurred_start_us
+                FROM search_occurred o
+                {latest_join}
                 WHERE {where_sql}
                 """,
                 params,
             ).fetchall()
             if reference is not None:
-                rows = [
-                    row
-                    for row in rows
-                    if self._known_at_cutoff(
-                        conn,
-                        str(row["object_id"]),
-                        int(row["revision"]),
-                        reference,
-                    )
-                ]
+                historical_rows = []
+                for row in rows:
+                    object_id = str(row["object_id"])
+                    revision = int(row["revision"])
+                    if str(row["object_type"]) == "reinterpretation":
+                        if self._known_at_cutoff(
+                            conn,
+                            object_id,
+                            revision,
+                            reference,
+                        ):
+                            historical_rows.append(row)
+                        continue
+                    payload = self._payload_at_cutoff(object_id, reference)
+                    if payload is None:
+                        continue
+                    if int(payload.get("revision", 0)) == revision:
+                        historical_rows.append(row)
+                rows = historical_rows
 
         buckets: dict[str, dict[str, Any]] = {}
         for row in rows:
             object_id = str(row["object_id"])
             revision = int(row["revision"])
             object_type = str(row["object_type"])
-            if object_id in tombstones:
+            if reference is None and object_id in tombstones:
                 continue
-            if not include_inactive and not self._visible_in_current_view(
+            if reference is not None and object_type != "reinterpretation":
+                historical = self._payload_at_cutoff(object_id, reference)
+                if historical is None:
+                    continue
+                if not include_inactive and not self._payload_visible(historical):
+                    continue
+            elif not include_inactive and not self._visible_in_current_view(
                 object_id,
                 revision,
                 object_type,
@@ -1485,11 +1507,10 @@ class WorldSearchIndex:
                     "SELECT object_id FROM search_tombstones"
                 ).fetchall()
             }
-            rows = conn.execute(
-                f"""
-                SELECT o.object_id, o.revision, o.object_type, o.subject_id,
-                       o.dimension, o.occurred_start_us, d.excerpt
-                FROM search_occurred o
+            latest_join = (
+                ""
+                if as_of is not None
+                else """
                 JOIN (
                     SELECT object_id, MAX(revision) AS max_revision
                     FROM search_occurred
@@ -1497,6 +1518,14 @@ class WorldSearchIndex:
                 ) latest
                   ON latest.object_id=o.object_id
                  AND latest.max_revision=o.revision
+                """
+            )
+            rows = conn.execute(
+                f"""
+                SELECT o.object_id, o.revision, o.object_type, o.subject_id,
+                       o.dimension, o.occurred_start_us, d.excerpt
+                FROM search_occurred o
+                {latest_join}
                 JOIN search_doc d
                   ON d.object_id=o.object_id AND d.revision=o.revision
                 WHERE {where_sql}
@@ -1513,19 +1542,30 @@ class WorldSearchIndex:
             for row in rows:
                 object_id = str(row["object_id"])
                 revision = int(row["revision"])
-                if object_id in tombstones:
+                object_type = str(row["object_type"])
+                if as_of is None and object_id in tombstones:
                     continue
-                if as_of is not None and not self._known_at_cutoff(
-                    conn,
+                if as_of is not None:
+                    if object_type == "reinterpretation":
+                        if not self._known_at_cutoff(
+                            conn,
+                            object_id,
+                            revision,
+                            as_of,
+                        ):
+                            continue
+                    else:
+                        historical = self._payload_at_cutoff(object_id, as_of)
+                        if historical is None:
+                            continue
+                        if int(historical.get("revision", 0)) != revision:
+                            continue
+                        if not include_inactive and not self._payload_visible(historical):
+                            continue
+                elif not include_inactive and not self._visible_in_current_view(
                     object_id,
                     revision,
-                    as_of,
-                ):
-                    continue
-                if not include_inactive and not self._visible_in_current_view(
-                    object_id,
-                    revision,
-                    str(row["object_type"]),
+                    object_type,
                 ):
                     continue
                 excerpt = str(row["excerpt"] or "")
