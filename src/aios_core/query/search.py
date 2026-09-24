@@ -36,7 +36,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Optional, Sequence, Tuple
+from typing import Any, Mapping, Optional, Sequence, Tuple
 
 from aios_core.contracts.enums import ErrorCode
 from aios_core.contracts.time import as_utc
