@@ -1,5 +1,36 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 当前控制入口 — 2026-09-24 Core completion PM handoff
+
+所有者已要求：**先完成 Core，UI 不开发；接任 PM 负责安排其他 AI 执行和验收。**
+
+- 本次治理变更合入 main 后，本节取代下方旧的“当前快照/下一 READY”；下方旧冻结和 READY 描述为历史，不再独立授权。
+- 阶段范围及完成定义：`governance/AIOS_CORE_COMPLETION_PLAN_2026-09-24.md`。
+- 接任提示词：`governance/prompts/AIOS_CORE_PM_HANDOFF_2026-09-24.md`。
+- 开发 main 审查点 `6924d8b5` 已合 #127，Core 已不同于历史冻结 `bcd6bf3`；历史 A 身份保留，新候选的 A/实验使用必须单独裁决。
+- #125 已有施工和 B14 尝试陈述，但最新已审 head `b14b5d84` 的 3 项预检/回归失败；不是无人开始的 READY，也不是实验完成。
+- 唯一下一 READY：`CORE-BASELINE-001`（治理集成后）。原 `C15-RCC-RES-B-PREFLIGHT-001` 为已有 WIP / BLOCKED，恢复入口为新计划 `CORE-OPERATOR-001`，二者同一工程交付，不重复造桥。
+- C15 启动、C16、广泛 P16、P17 仍受各自 Gate 约束。UI/P18/P19 不派工。
+- 执行 AI 继续一窗口一任务；PM 可持续跨任务协调/验收，不冒充 fresh Resident。
+
+### 当前优先队列（优先于下方历史队列）
+
+| Task ID | 状态 | 依赖 / 放行出口 |
+|---|---|---|
+| CORE-BASELINE-001 | READY（本治理合入后） | 基线/已有 WIP/实验影响裁决，同步三入口 |
+| CORE-OPERATOR-001 | BLOCKED | BASELINE；接续原 B-PREFLIGHT 成果，修复并验收 |
+| CORE-GAP-AUDIT-001 | BLOCKED | BASELINE；可与无冲突 operator 工作并行 |
+| CORE-GAP-FIX-NNN | BLOCKED / 条件任务 | 审计确认后逐项创建，未复现不施工 |
+| CORE-HEADLESS-001 | BLOCKED | BASELINE + GAP-AUDIT |
+| CORE-RECOVERY-001 | BLOCKED | S2 功能候选，含所有激活缺口及 headless |
+| CORE-SCALE-001 | BLOCKED | S2 功能候选 |
+| CORE-RC-FREEZE-001 | BLOCKED | OPERATOR + 所有激活修复 + HEADLESS + RECOVERY + SCALE |
+| 既有 C15 release / rerun / accept / attest / C / eval / close | BLOCKED | RC-FREEZE；必要 A/fixture 前置由 BASELINE 裁决后显式插入 |
+| 既有 C16 → P16 → P17 队列 | BLOCKED | 保留原逐项依赖及验收要求，UI 排除 |
+
+接任 PM 在本队列更新 READY/IN_PROGRESS/DONE；下方已完成历史记录保留。每次只释放依赖已完成且有明确 owner 的任务；并行任务逐项登记，不能把本计划变成未登记的第二队列。
+
+
 > Status: ACTIVE  
 > Effective: 2026-09-21  
 > Repository truth: `Haneof/Haneof-AIOS-Core-v3.0@main`  
@@ -117,7 +148,7 @@
 | 29.4 | `C15-RCC-RES-A-RERUN-001` | 在 frozen Core 上使用 frozen C15 fixture，从 fresh private World / fresh session 重新执行 Phase A cursor 1..13；必须由新的真实 Resident A 窗口逐事件生活 | **DONE** | C15-RCC-RES-A-REPAIR-DECISION-001 | PR #117 @ `3e51f728d7959048b75fea01d405bc837b0e8185` remains OPEN / UNMERGED / PINNED; canonical Core anchor `bcd6bf353126318f9a97076b52ec1740d43f35a4`; `governance/C15_FINAL_RELEASE_DECISION_2026-09-23.md` | Independent acceptance PASS: cursor 1..13 sealed, 13/13 durable ack, fresh World/session, cognition/revision lineage valid, UNKNOWN discipline preserved; World/index/release-state frozen for B. |
 | 30 | `C15-RCC-RES-B-001` | 原 fresh-context B 候选执行证据验收 | **FAILED** | C15-RCC-RES-A-RERUN-001 | PR #121 @ `b6e5ac939bef83615292bcf9b9099d76737d82b0`；本处置随纠偏治理集成生效；OPEN / UNMERGED / PINNED / NON-CANONICAL | 仅 9 条输入落库、无 B 模型计量/原始 Runtime 轨迹、World/index 97/88，当前 candidate 不可接受；不是 Core 认知能力失败裁决，不以新 Claim 数量评分 |
 | 30.1 | `C15-RCC-RES-B-CORRECTIVE-001` | PM 证据纠偏、地图/队列/检查点同步与隔离角色提示词 | **DONE** | C15-RCC-RES-B-001 candidate disposition | PR #122；accepted head `bbf45baf2e2a6314483d8355c1ee8badc09aa4a9`；merge `2a68df3f8901138fa3126a91063c430f69102049`；integration receipt 2026-09-24 | PM 自审明确记录；exact-head C15/C14 CI SUCCESS；无 Core/fixture/evidence 改动；仅释放 operator preflight，不是实验 PASS |
-| 30.2 | `C15-RCC-RES-B-PREFLIGHT-001` | 非盲 operator 准备正常 Runtime 传输桥、实时记录、合法 A 状态与实际隔离；不运行真实 B | **READY** | C15-RCC-RES-B-CORRECTIVE-001 | 冻结 Core + #117 exact A；完成定义见纠偏裁决 §3；独立的新 operator 窗口 | 无语义规则/旧答案；合成数据机械检查；operator/safe-packet manifests、entry commands、hash/pin、隔离证据、身份盘点；不得自放行 |
+| 30.2 | `C15-RCC-RES-B-PREFLIGHT-001` | 非盲 operator 准备正常 Runtime 传输桥、实时记录、合法 A 状态与实际隔离；不运行真实 B | **BLOCKED / WIP** | CORE-BASELINE-001；接续 CORE-OPERATOR-001 | 冻结 Core + #117 exact A；完成定义见纠偏裁决 §3；独立的新 operator 窗口 | 无语义规则/旧答案；合成数据机械检查；operator/safe-packet manifests、entry commands、hash/pin、隔离证据、身份盘点；不得自放行 |
 | 30.3 | `C15-RCC-RES-B-RELEASE-001` | 独立 PM 审查 preflight 并放行唯一安全启动包 | **BLOCKED** | C15-RCC-RES-B-PREFLIGHT-001 | 已接受并合入的 operator exact source + 机械证据；新独立 PM | 冻结 Core/A bytes、正常 Runtime 与记录链、实际隔离均通过；pin packet/bridge、run/session；放行治理合入后才释放 rerun；不执行 Resident |
 | 30.4 | `C15-RCC-RES-B-RERUN-001` | 全新盲测 Resident 从 accepted A 执行唯一 B 段 cursor 14..22 | **BLOCKED** | C15-RCC-RES-B-RELEASE-001 | 仅批准的 Resident-safe packet / 正常 AIOS 接口；不读治理/旧证据 | 真实模型逐次选择；normal run_turn/due-work；Snapshot/directive/工具结果/计量/输出实时可审计；最终 World/index/restart/receipts/hash 冻结；仅报 RUN_COMPLETE 待独立验收 |
 | 30.5 | `C15-RCC-RES-B-ACCEPT-001` | 独立 PM 验收 fresh B 执行完整性与 provenance，不替代语义终评 | **BLOCKED** | C15-RCC-RES-B-RERUN-001 | exact evidence head + raw runtime trace + frozen state | receipt/World/index/计量/行为原始链匹配，无污染；认知可保留/沉默；private World 不合 main；通过并写回后释放身份预检 |

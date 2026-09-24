@@ -1,5 +1,19 @@
 # AIOS v3.0 当前工程断点
 
+## 当前控制入口 — 2026-09-24 Core completion PM handoff
+
+所有者已要求：**先完成 Core，UI 不开发；接任 PM 负责安排其他 AI 执行和验收。**
+
+- 本次治理变更合入 main 后，本节取代下方旧的“当前快照/下一 READY”；下方旧冻结和 READY 描述为历史，不再独立授权。
+- 阶段范围及完成定义：`governance/AIOS_CORE_COMPLETION_PLAN_2026-09-24.md`。
+- 接任提示词：`governance/prompts/AIOS_CORE_PM_HANDOFF_2026-09-24.md`。
+- 开发 main 审查点 `6924d8b5` 已合 #127，Core 已不同于历史冻结 `bcd6bf3`；历史 A 身份保留，新候选的 A/实验使用必须单独裁决。
+- #125 已有施工和 B14 尝试陈述，但最新已审 head `b14b5d84` 的 3 项预检/回归失败；不是无人开始的 READY，也不是实验完成。
+- 唯一下一 READY：`CORE-BASELINE-001`（治理集成后）。原 `C15-RCC-RES-B-PREFLIGHT-001` 为已有 WIP / BLOCKED，恢复入口为新计划 `CORE-OPERATOR-001`，二者同一工程交付，不重复造桥。
+- C15 启动、C16、广泛 P16、P17 仍受各自 Gate 约束。UI/P18/P19 不派工。
+- 执行 AI 继续一窗口一任务；PM 可持续跨任务协调/验收，不冒充 fresh Resident。
+
+
 > 用途：新会话 / 新模型 / 新工程师进入仓库后的第一现场状态文件  
 > 更新规则：每完成一个可验证节点立即更新；不得靠聊天记忆代替本文件  
 > 仓库：`Haneof/Haneof-AIOS-Core-v3.0`  
