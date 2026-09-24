@@ -1144,9 +1144,10 @@ class WorldSearchIndex:
     ) -> MindSearchPage:
         """Broad lexical candidate generation for AI/system callers.
 
-        This is intentionally *candidate recall*, not semantic judgment. Query
-        tokens are OR-recalled and ranked by token overlap so the recommendation
-        system or resident model can decide what is actually relevant.
+        Candidate generation remains a rebuildable projection operation. Visibility,
+        current revision, inactive-state and historical knowledge-cut authority are
+        still verified against the World; the verification is batched rather than
+        issuing per-candidate SQLite queries.
         """
 
         query = query_text.strip()
@@ -1171,6 +1172,16 @@ class WorldSearchIndex:
                 query_intent=query,
             )
 
+        cutoff = None if as_of is None else as_utc(as_of, "as_of")
+        object_type_filter = set(object_types or ())
+        if time_range is None:
+            time_bounds: tuple[int, int] | None = None
+        else:
+            time_bounds = (
+                int(time_range[0].astimezone(timezone.utc).timestamp() * 1_000_000),
+                int(time_range[1].astimezone(timezone.utc).timestamp() * 1_000_000),
+            )
+
         with self._connect() as conn:
             hits_map = self._postings_for(conn, query_tokens)
             if not hits_map:
@@ -1184,115 +1195,180 @@ class WorldSearchIndex:
                     query_intent=query,
                 )
 
-            tombstones = {
-                str(row[0])
-                for row in conn.execute("SELECT object_id FROM search_tombstones").fetchall()
-            }
+            tombstones = (
+                {
+                    str(row[0])
+                    for row in conn.execute(
+                        "SELECT object_id FROM search_tombstones"
+                    ).fetchall()
+                }
+                if cutoff is None
+                else set()
+            )
 
-            rows: list[tuple[sqlite3.Row, int]] = []
-            for (object_id, revision), score in hits_map.items():
-                if as_of is None and object_id in tombstones:
-                    continue
-                row = conn.execute(
-                    """
+            candidate_pairs = set(hits_map)
+            object_ids = tuple(
+                sorted({str(object_id) for object_id, _revision in candidate_pairs})
+            )
+            candidate_rows: dict[tuple[str, int], sqlite3.Row] = {}
+            latest_index_revision: dict[str, int] = {}
+            chunk_size = 400
+            for offset in range(0, len(object_ids), chunk_size):
+                chunk = object_ids[offset : offset + chunk_size]
+                placeholders = ",".join("?" for _ in chunk)
+                fetched = conn.execute(
+                    f"""
                     SELECT o.object_id, o.revision, o.object_type, o.subject_id,
                            o.dimension, o.occurred_start_us, o.occurred_end_us,
-                           d.excerpt
+                           d.excerpt, a.created_at AS annotation_created_at
                     FROM search_occurred o
                     JOIN search_doc d
                       ON d.object_id=o.object_id AND d.revision=o.revision
-                    WHERE o.object_id=? AND o.revision=?
+                    LEFT JOIN search_annotations a
+                      ON a.annotation_id=o.object_id
+                    WHERE o.object_id IN ({placeholders})
                     """,
-                    (object_id, revision),
-                ).fetchone()
-                if row is None:
-                    continue
-                if as_of is not None:
-                    if str(row["object_type"]) == "reinterpretation":
-                        if not self._known_at_cutoff(
-                            conn,
-                            str(object_id),
-                            int(revision),
-                            as_of,
-                        ):
-                            continue
-                    else:
-                        historical = self._payload_at_cutoff(str(object_id), as_of)
-                        if historical is None:
-                            continue
-                        if int(historical.get("revision", 0)) != int(revision):
-                            continue
-                        if not include_inactive and not self._payload_visible(historical):
-                            continue
-                else:
-                    latest = conn.execute(
-                        "SELECT MAX(revision) FROM search_occurred WHERE object_id=?",
-                        (object_id,),
-                    ).fetchone()
-                    if latest is not None and int(latest[0]) != int(revision):
+                    tuple(chunk),
+                ).fetchall()
+                for row in fetched:
+                    object_id = str(row["object_id"])
+                    revision = int(row["revision"])
+                    previous = latest_index_revision.get(object_id)
+                    if previous is None or revision > previous:
+                        latest_index_revision[object_id] = revision
+                    pair = (object_id, revision)
+                    if pair in candidate_pairs:
+                        candidate_rows[pair] = row
+
+        world_ids = tuple(
+            sorted(
+                {
+                    object_id
+                    for (object_id, revision), row in candidate_rows.items()
+                    if str(row["object_type"]) != "reinterpretation"
+                }
+            )
+        )
+        if hasattr(self._store, "get_payloads_for_ids"):
+            world_payloads = self._store.get_payloads_for_ids(
+                world_ids,
+                knowledge_cutoff=cutoff,
+            )
+        else:
+            world_payloads = {}
+            for object_id in world_ids:
+                try:
+                    world_payloads[object_id] = self._store.get_payload(
+                        object_id,
+                        knowledge_cutoff=cutoff,
+                    )
+                except StoreError as exc:
+                    if exc.code is not ErrorCode.NOT_FOUND:
+                        raise
+
+        rows: list[tuple[sqlite3.Row, int]] = []
+        for (object_id, revision), score in hits_map.items():
+            if cutoff is None and object_id in tombstones:
+                continue
+            row = candidate_rows.get((str(object_id), int(revision)))
+            if row is None:
+                continue
+
+            object_type = str(row["object_type"])
+            if cutoff is not None:
+                if object_type == "reinterpretation":
+                    raw_created = row["annotation_created_at"]
+                    if not isinstance(raw_created, str) or not raw_created.strip():
                         continue
-                    if not include_inactive and not self._visible_in_current_view(
-                        str(object_id),
-                        int(revision),
-                        str(row["object_type"]),
+                    try:
+                        created_at = as_utc(
+                            datetime.fromisoformat(raw_created),
+                            "annotation_created_at",
+                        )
+                    except (TypeError, ValueError):
+                        continue
+                    if created_at > cutoff:
+                        continue
+                else:
+                    historical = world_payloads.get(str(object_id))
+                    if historical is None:
+                        continue
+                    if int(historical.get("revision", 0)) != int(revision):
+                        continue
+                    if not include_inactive and not self._payload_visible(historical):
+                        continue
+            else:
+                if latest_index_revision.get(str(object_id)) != int(revision):
+                    continue
+                if object_type != "reinterpretation":
+                    current_payload = world_payloads.get(str(object_id))
+                    if current_payload is None:
+                        continue
+                    if int(current_payload.get("revision", 0)) != int(revision):
+                        continue
+                    if not include_inactive and not self._payload_visible(
+                        current_payload
                     ):
                         continue
-                if subject is not None and str(row["subject_id"]) != subject:
+
+            if subject is not None and str(row["subject_id"]) != subject:
+                continue
+            if dimension is not None and str(row["dimension"] or "") != dimension:
+                continue
+            if object_type_filter and object_type not in object_type_filter:
+                continue
+
+            if time_bounds is not None:
+                start_us = row["occurred_start_us"]
+                end_us = row["occurred_end_us"]
+                if start_us is None:
                     continue
-                if dimension is not None and str(row["dimension"] or "") != dimension:
-                    continue
-                if object_types and str(row["object_type"]) not in set(object_types):
+                effective_end = int(end_us if end_us is not None else start_us)
+                if effective_end < time_bounds[0] or int(start_us) > time_bounds[1]:
                     continue
 
-                if time_range is not None:
-                    start_us = row["occurred_start_us"]
-                    end_us = row["occurred_end_us"]
-                    if start_us is None:
-                        continue
-                    t0 = int(time_range[0].astimezone(timezone.utc).timestamp() * 1_000_000)
-                    t1 = int(time_range[1].astimezone(timezone.utc).timestamp() * 1_000_000)
-                    effective_end = int(end_us if end_us is not None else start_us)
-                    if effective_end < t0 or int(start_us) > t1:
-                        continue
+            rows.append((row, int(score)))
 
-                rows.append((row, int(score)))
+        rows.sort(
+            key=lambda item: (
+                -item[1],
+                -(
+                    int(item[0]["occurred_start_us"])
+                    if item[0]["occurred_start_us"] is not None
+                    else -1
+                ),
+                str(item[0]["object_id"]),
+            )
+        )
 
-            rows.sort(
-                key=lambda item: (
-                    -item[1],
-                    -(int(item[0]["occurred_start_us"]) if item[0]["occurred_start_us"] is not None else -1),
-                    str(item[0]["object_id"]),
+        hits: list[MindSearchHit] = []
+        total_tokens = 0
+        for row, score in rows[: max(0, int(limit))]:
+            excerpt = str(row["excerpt"] or "")
+            estimated = max(10, len(excerpt) // 3)
+            total_tokens += estimated
+            hits.append(
+                MindSearchHit(
+                    object_id=str(row["object_id"]),
+                    revision=int(row["revision"]),
+                    object_type=str(row["object_type"]),
+                    subject_id=str(row["subject_id"]),
+                    score=score,
+                    dimension=str(row["dimension"] or "dim_unclassified"),
+                    excerpt=excerpt,
+                    estimated_tokens=estimated,
                 )
             )
 
-            hits: list[MindSearchHit] = []
-            total_tokens = 0
-            for row, score in rows[: max(0, int(limit))]:
-                excerpt = str(row["excerpt"] or "")
-                estimated = max(10, len(excerpt) // 3)
-                total_tokens += estimated
-                hits.append(
-                    MindSearchHit(
-                        object_id=str(row["object_id"]),
-                        revision=int(row["revision"]),
-                        object_type=str(row["object_type"]),
-                        subject_id=str(row["subject_id"]),
-                        score=score,
-                        dimension=str(row["dimension"] or "dim_unclassified"),
-                        excerpt=excerpt,
-                        estimated_tokens=estimated,
-                    )
-                )
-
-            return MindSearchPage(
-                status="ok",
-                lag=current - wm,
-                world_revision=current,
-                index_watermark=wm,
-                hits=hits,
-                total_estimated_tokens=total_tokens,
-                query_intent=query,
-            )
+        return MindSearchPage(
+            status="ok",
+            lag=current - wm,
+            world_revision=current,
+            index_watermark=wm,
+            hits=hits,
+            total_estimated_tokens=total_tokens,
+            query_intent=query,
+        )
 
     def dimension_directory(
         self,
