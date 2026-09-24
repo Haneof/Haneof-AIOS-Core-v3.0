@@ -8,6 +8,7 @@
 - Active blockers: CG-001 runtime temporal read cut；CG-002 background model execution IN_DOUBT；CG-003 user-turn IN_DOUBT recovery。
 - 当前可并行施工（待启动，尚无提交）：`CORE-GAP-FIX-001`、`CORE-GAP-FIX-002`。FIX-003 依赖 FIX-002 独立验收与集成，当前 BLOCKED。
 - `CORE-OPERATOR-001 = DONE`：#135 ACCEPTANCE_PASS → #131 exact head `0e1d69ee` merged at `e72a63874ed2c28798b00cec51f191caf1594a00`；Core ZERO DIFF；#130 SUPERSEDED。
+- 单一集成收据（两份 PM 写回已对账合并）：`governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`；含集成时 API 复核、本地 repro/修复复算（`3865da88` 三项失败 → accepted head `632 passed`）、合后 push gate run `35958610555` SUCCESS 及全部诚实限制。operator 集成不是 SOFTWARE_RC，也不是 CORE_COMPLETE。
 - 路线保持：operator acceptance + three accepted gap fixes → headless → recovery → scale → RC freeze → fresh C15 A/B/C → C16 → P16 → P17 Core release closure。
 - 历史实验与开发线继续分离：#117 historical A 不 hash-swap；#121 failed/non-canonical；Core 变化后只在 RC freeze 后新跑 fresh A。
 - UI、数字人、Launcher、动画、硬件、ROM 不开发。

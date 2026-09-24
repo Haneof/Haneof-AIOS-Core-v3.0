@@ -11,6 +11,10 @@
 - PR #136（pelican 动画）= EXCLUDED，永不合入；分支保留，不作关闭/删除（计划未授权）。
 - PM 补充（`governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`）：合后 p16-convergence-gate run `35958610555` @ `e72a6387` SUCCESS；PR #130（`core/operator-001-20260924-sol` @ `16eb1d40`，同 Task 竞争候选、未经独立验收）= **SUPERSEDED / NOT INTEGRATED**，保留不合并；`core-gap-fix-001/002` 分支停在 `27135e39`、零提交，无施工现场。
 - Gap fix 独立验收统一提示词：`governance/prompts/CORE_GAP_FIX_ACCEPTANCE_2026-09-24.md`（每个候选另开不同 reviewer 窗口）。
+- 集成时复核（由执行两次 merge 的集成 PM 窗口做，不只读验收报告）：exact head 未漂移；4 条 CI 经 API 复核（`35955458275`/`35955458266` 复现 FAILURE，`35955695487`/`35955695492` exact-head SUCCESS）；候选 26 文件、`src/` 0 文件；本地在 repro commit `3865da88` 真实复现三项失败，在 accepted head 与 merge 结果各 `632 passed`（与 CI 计数一致）。细节见收据 §5。
+- 诚实限制：本地复算用 CPython 3.11.2（低于 >=3.12 gate），仅佐证；`gh run rerun` 与 `workflow_dispatch` 被平台 403 拒绝（未绕权限），合后证据以 push run `35958610555` 为准；作者与验收为不同窗口但同一 GitHub 账号，无跨账号 APPROVE，不宣称账号级独立。
+- **PM 写回并发规则（新增，因本日出现两个 PM 窗口并行写回同一状态）**：同一时刻只保留**一个**集成 PM 写回入口。先合入者为准，后到窗口必须**对账合并**已合入内容，不得覆盖、不得新建同事件的第二份收据/第二条控制入口。本日 #137 / #136 / #138 三份 PM 写回已在此合并，单一收据 = `governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`。
+- S2 两个并行修复窗口的写入范围隔离与 operator 面禁改规则见 `governance/AIOS_CORE_GAP_DISPATCH_2026-09-24.md` 的 "Dispatch update — 2026-09-24"。
 - HEADLESS/RECOVERY/SCALE/RC-FREEZE 与 Resident A/B/C 继续 BLOCKED；UI/P18/P19 排除。
 
 ## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / S1-S2 ACTIVE
