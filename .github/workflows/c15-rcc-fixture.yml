@@ -54,9 +54,43 @@ jobs:
       - name: Prove fixture task has zero Core diff
         shell: bash
         run: |
-          git fetch origin main --depth=1
-          changed="$(git diff --name-only origin/main...HEAD)"
+          set -euo pipefail
+
+          guard_could_not_be_evaluated() {
+            echo "::error::guard could not be evaluated: $*" >&2
+            exit 2
+          }
+
+          if [ -z "${GITHUB_REF:-}" ]; then
+            guard_could_not_be_evaluated "GITHUB_REF is unavailable"
+          fi
+
+          if ! shallow_state="$(git rev-parse --is-shallow-repository 2>&1)"; then
+            guard_could_not_be_evaluated "cannot determine repository shallow state: ${shallow_state}"
+          fi
+
+          if [ "$shallow_state" = "true" ]; then
+            if ! git fetch --no-tags --prune --unshallow origin \
+              "+${GITHUB_REF}:refs/remotes/origin/ci-guard-head" \
+              "+refs/heads/main:refs/remotes/origin/main"; then
+              guard_could_not_be_evaluated "failed to fetch complete current-ref and main history"
+            fi
+          else
+            if ! git fetch --no-tags --prune origin \
+              "+refs/heads/main:refs/remotes/origin/main"; then
+              guard_could_not_be_evaluated "failed to refresh main history"
+            fi
+          fi
+
+          if ! merge_base="$(git merge-base origin/main HEAD 2>&1)"; then
+            guard_could_not_be_evaluated "git merge-base origin/main HEAD failed: ${merge_base}"
+          fi
+
+          if ! changed="$(git diff --name-only "$merge_base" HEAD 2>&1)"; then
+            guard_could_not_be_evaluated "git diff from merge base failed: ${changed}"
+          fi
           if printf '%s\n' "$changed" | grep -q '^src/aios_core/'; then
-            echo "C15-RCC-FIXTURE-001 must not modify src/aios_core/**"
+            echo "::error::invariant rejected: C15-RCC-FIXTURE-001 must not modify src/aios_core/**"
             exit 1
           fi
+          echo "guard evaluated: invariant accepted (merge-base=$merge_base)"
