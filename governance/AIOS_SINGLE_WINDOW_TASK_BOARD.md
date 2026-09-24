@@ -1,6 +1,6 @@
 # AIOS v3.0 单窗口任务执行总表
 
-## 当前控制入口 — 2026-09-24 FIX-001/002/003 DONE / HEADLESS DONE / RECOVERY DONE / SCALE REVIEW_READY / CI-FIX DONE
+## 当前控制入口 — 2026-09-24 FIX-001/002/003 DONE / HEADLESS DONE / RECOVERY DONE / SCALE DONE / RC-FREEZE READY / CI-FIX DONE
 
 - 接任 PM 依 #128 治理接手；接手与 live 复核：`governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
 - **派工基线 = live main `079d7516f195cf6973933acc8cd057d59adc3a9f`**（其后仅治理/审查文档变更）；`CORE-OPERATOR-001` 集成点 = `e72a63874ed2c28798b00cec51f191caf1594a00`；Core tree 自审计以来始终 `7db4f72e7b3c29c74082f9984141159f8f1d6071`。每个新窗口仍须自行重取 live main，不得把本 SHA 当永久施工基线。
@@ -17,7 +17,7 @@
 - S2 两个并行修复窗口的写入范围隔离与 operator 面禁改规则见 `governance/AIOS_CORE_GAP_DISPATCH_2026-09-24.md` 的 "Dispatch update — 2026-09-24"。
 - **`CORE-CI-FIX-001 = DONE`**：首轮 review #150 对 head `1896b3e5...` 正确给出 ACCEPTANCE_FAIL（历史 blocker 保留）；corrective review #156 对 exact head `1eb24e101cdb1579c22c69b435cf9f79a3c359ad` 给出 ACCEPTANCE_PASS / 0 blockers；#156 先合 `f3d20c22...`，随后 #146 以 pinned head 合入 `c3ec42214db57864f7951e28b75811b10db8be21`。收据：`governance/CORE_CI_FIX_001_INTEGRATION_RECEIPT_2026-09-24.md`。PR #144 继续 SUPERSEDED / NOT INTEGRATED。历史派工说明：**（release/CI 基础设施）：`c15-rcc-fixture-mechanical-gate` 与 `semantic-repair-mechanical-gate` 的 "prove zero Core diff" 步骤在浅克隆上 `git` 自身 exit 128，随分支形状时红时绿（#133 红 / #137 绿 / #138 #139 红），不是策略违规。发现与 PM 裁决：`governance/AIOS_CORE_CI_FINDING_001_2026-09-24.md`；提示词：`governance/prompts/CORE_CI_FIX_001_2026-09-24.md`。不阻塞 FIX-001/002，但 **必须在 `CORE-RC-FREEZE-001` 之前关闭**。
 - #138/#139 两条红检查登记为 **INFRASTRUCTURE_FAILURE**，不登记为通过、也不登记为已接受的违规；PM 已用直接证据独立验证不变式成立（`git diff e72a638..main -- src/` 为空，Core tree 仍 `7db4f72e`），未绕过分支保护（该两项非 required）。
-- `CORE-HEADLESS-001 = DONE`；`CORE-RECOVERY-001 = DONE`。`CORE-SCALE-001 = GATE / REVIEW_READY`：PR #197，tested exact `ba23767d...`，evidence-only `2c8f16fe...`；baseline red preserved，S10K/S100K/S1M + semantic equivalence + full P16 全绿；等待 fresh Independent Acceptance。RC-FREEZE 与 fresh Resident A/B/C 继续 BLOCKED；UI/P18/P19 排除。
+- `CORE-HEADLESS-001 = DONE`；`CORE-RECOVERY-001 = DONE`；`CORE-SCALE-001 = DONE`：#200 ACCEPTANCE_PASS / 0 blockers，#197 merged as `46c7cf97...`。`CORE-RC-FREEZE-001 = READY`；fresh Resident A/B/C 继续 BLOCKED，直到 RC-FREEZE 独立接受并集成；UI/P18/P19 排除。
 
 ## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / S1-S2 ACTIVE
 
@@ -46,12 +46,12 @@
 | CORE-HEADLESS-001 | **DONE** | 历史 #185 ACCEPTANCE_FAIL 保留；corrective review #189 ACCEPTANCE_PASS / 0 blockers；#181 tested corrective exact `16e983a536b124ddb600981fc16326d9db54358f` + evidence-only `f25218aa...` merged as `6ccd79d93f8fa8845bf392bd3c1ef0641ad1cde6`；receipt `governance/CORE_HEADLESS_001_INTEGRATION_RECEIPT_2026-09-24.md` |
 | CORE-HEADLESS-001-CORRECTIVE-001 | **DONE** | new exact `16e983a5...`；fresh probe #188 PASS；review #189 ACCEPTANCE_PASS；candidate integrated with #181 merge `6ccd79d9...` |
 | CORE-RECOVERY-001 | **DONE** | Independent review #195 ACCEPTANCE_PASS / 0 blockers；#191 tested exact `58b6b5e2e653e258e778a0f2dd3d77978cd585ff` + evidence-only `f90b9360...` merged as `17e3807024359e990890ff4c249e55da93886475`；receipt `governance/CORE_RECOVERY_001_INTEGRATION_RECEIPT_2026-09-24.md` |
-| CORE-SCALE-001 | **GATE / REVIEW_READY** | PR #197；tested exact `ba23767d4c1565fbe494419dd01c32123495884c`；evidence-only handoff `2c8f16fed52c2a13183870da4ec5dff27892ceb4`；baseline red run `36007169180` preserved；final scale `36010524179` SUCCESS；full P16 `36010524104` 692 pass markers；等待 fresh Independent Acceptance。提示词：`governance/prompts/CORE_SCALE_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md` |
-| CORE-RC-FREEZE-001 | **BLOCKED** | CI prerequisite `CORE-CI-FIX-001` **已满足**；仍等待 GAP fixes + HEADLESS + RECOVERY + SCALE 全部独立接受/集成 |
+| CORE-SCALE-001 | **DONE** | Independent review #200 ACCEPTANCE_PASS / 0 blockers；#197 tested exact `ba23767d4c1565fbe494419dd01c32123495884c` + evidence-only `2c8f16fe...` merged as `46c7cf9771274559b42dade9359e2e2cae5f245f`；receipt `governance/CORE_SCALE_001_INTEGRATION_RECEIPT_2026-09-24.md` |
+| CORE-RC-FREEZE-001 | **READY** | GAP fixes + CI-FIX + HEADLESS + RECOVERY + SCALE 均已 accepted/integrated；只做软件 RC 冻结、manifest、clean-install/full regression、impact/rerun decision，不运行 Resident。提示词：`governance/prompts/CORE_RC_FREEZE_001_2026-09-24.md` |
 | 新 C15 fresh A → B → C / EVAL / CLOSE | **BLOCKED** | RC-FREEZE；旧 #117 A 不能 hash-swap 为新 RC A |
 | C16 → P16 → P17 | **BLOCKED** | 保留原逐项 Gate；只有 P17 PASS 才可称 Core complete |
 
-FIX-001 / FIX-002 / FIX-003 三项 audited Core gap 已全部独立接受并集成；CG-001/002/003 均 CLOSED。`CORE-HEADLESS-001` 与 `CORE-RECOVERY-001` 均已独立接受并集成；`CORE-SCALE-001` 已完成工程施工并进入 `GATE / REVIEW_READY`，当前唯一合法下一动作是 fresh Independent Acceptance；RC-FREEZE、fresh Resident A/B/C 继续等待各自前置。CI corrective 已关闭。
+FIX-001 / FIX-002 / FIX-003 三项 audited Core gap 已全部独立接受并集成；CG-001/002/003 均 CLOSED。`CORE-HEADLESS-001`、`CORE-RECOVERY-001`、`CORE-SCALE-001` 均已独立接受并集成；当前唯一合法下一任务为 `CORE-RC-FREEZE-001 = READY`；fresh Resident A/B/C 继续等待 RC-FREEZE 独立接受并集成。CI corrective 已关闭。
 
 > Status: ACTIVE  
 > Effective: 2026-09-21  
