@@ -274,8 +274,7 @@ def restore_world(config: HeadlessConfig, source_backup: str | Path) -> dict[str
             with sqlite3.connect(str(staged)) as checkpoint:
                 checkpoint.execute("PRAGMA wal_checkpoint(FULL)")
                 checkpoint.commit()
-            _unlink_sqlite_family(Path(str(staged) + "-wal"))
-            # The helper above expects a database base path; remove sidecars directly.
+            # The staged database is checkpointed; sidecars are mechanical residue.
             for sidecar in (Path(str(staged) + "-wal"), Path(str(staged) + "-shm")):
                 try:
                     sidecar.unlink()
