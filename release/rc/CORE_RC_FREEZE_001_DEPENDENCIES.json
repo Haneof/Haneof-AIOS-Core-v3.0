@@ -1,0 +1,85 @@
+{
+  "schema": "CORE_RC_FREEZE_001_DEPENDENCIES.v1",
+  "task_id": "CORE-RC-FREEZE-001",
+  "frozen_main_sha": "773876f92d5f8e53422f8f5a68cc651953d93052",
+  "evidence": {
+    "workflow_run_id": 36019155145,
+    "workflow_job_id": 107699305699,
+    "pr_branch_head": "58de2e39bc6acd06eb9b5dcf93b846560685f524",
+    "workflow_checkout_sha": "11f5c8e7330678a16c079d279e541c984adce000",
+    "artifact_id": 10816735414,
+    "artifact_digest": "sha256:b759cd6d74a33f8cebc9e58576181c81ede2fe788e0ea1be4ed873d020f4c093"
+  },
+  "runtime": {
+    "implementation": "CPython",
+    "python": "3.12.14",
+    "python_full": "3.12.14 (main, Aug 13 2026, 02:47:42) [GCC 13.3.0]",
+    "sqlite": "3.45.1",
+    "os": "Ubuntu 24.04.5 LTS",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "kernel": "6.17.0-1022-azure",
+    "machine": "x86_64",
+    "architecture": [
+      "64bit",
+      "ELF"
+    ]
+  },
+  "package": {
+    "name": "aios-core",
+    "version": "0.3.0.dev0",
+    "requires_python": ">=3.12",
+    "declared_dependencies": [
+      "pydantic>=2.10,<3"
+    ],
+    "dev_dependencies": [
+      "pytest>=8,<9"
+    ],
+    "build_backend": "setuptools.build_meta",
+    "build_requires": [
+      "setuptools>=75",
+      "wheel"
+    ],
+    "install_mode": "non-editable wheel",
+    "entrypoints": [
+      {
+        "group": "console_scripts",
+        "name": "aios-core-headless",
+        "value": "aios_core.headless.cli:main"
+      }
+    ],
+    "wheel": {
+      "filename": "aios_core-0.3.0.dev0-py3-none-any.whl",
+      "sha256": "d9c1ee2bfe71f5c66106e8ca2c580a3d964e0df1becbcda739e9c6a2f58c1bb1",
+      "metadata_version": "2.4"
+    }
+  },
+  "installed_distributions": {
+    "aios-core": "0.3.0.dev0",
+    "annotated-types": "0.8.0",
+    "iniconfig": "2.3.0",
+    "packaging": "26.3",
+    "pip": "26.2.1",
+    "pluggy": "1.6.0",
+    "pydantic": "2.13.5",
+    "pydantic_core": "2.46.5",
+    "pygments": "2.21.0",
+    "pytest": "8.4.2",
+    "typing-inspection": "0.4.4",
+    "typing_extensions": "4.16.0"
+  },
+  "exact_test_environment_install": [
+    "python -m pip install --upgrade pip",
+    "python -m pip wheel . --no-deps -w dist",
+    "python -m pip install dist/aios_core-0.3.0.dev0-py3-none-any.whl \"pytest>=8,<9\""
+  ],
+  "reproducibility": {
+    "repository_lockfile_present": false,
+    "lockfile_added_by_rc_freeze": false,
+    "statement": "The repository intentionally has no dependency lockfile. The RC freezes the exact successfully tested environment in this manifest; future clean installs must compare resolved versions to this manifest before claiming equivalence.",
+    "blocker": false
+  },
+  "notes": [
+    "The wheel SHA256 identifies the wheel built in the final successful RC probe environment; it is evidence, not a public release artifact.",
+    "Provider/token cost is not inferred from package metadata."
+  ]
+}

@@ -1,0 +1,747 @@
+{
+  "checkpoint": {
+    "git_blob_sha1": "2e1d0a85e1855e7d7cdcaaea9e42d8a96f05258b",
+    "path": "AIOS_v3.0_CURRENT_CHECKPOINT.md",
+    "sha256": "591a4deb135d9f1bb24cdff67cfcc069dd3d66bf9f1c614136d836da0e1f3820",
+    "size": 134358
+  },
+  "constitution_registry": {
+    "git_blob_sha1": "ac15b6e404b3737037a975137b0f9475ffa9908c",
+    "path": "docs/constitution/AIOS_v3.0_Fused_Baseline_Registry.md",
+    "sha256": "8bb6e2e0d9f6b87e41a291f74f4a0841565588d807442360e01314e3efa78f06",
+    "size": 14202
+  },
+  "core_files": [
+    {
+      "git_blob_sha1": "bebd474ac441d99f895ec4e3c5ec0173988ff6bd",
+      "path": "src/aios_core/__init__.py",
+      "sha256": "49d0b9594f4a55a52ef053fca39b80d58ffed8801776e342d5453d2653479a7d",
+      "size": 314
+    },
+    {
+      "git_blob_sha1": "1b7f55557a5852372bfb33bc32b91a59c8caf5f2",
+      "path": "src/aios_core/ai_world/__init__.py",
+      "sha256": "588a581c90a96e015f2b95a001b569980fc60982c2218350a43871f0f8219361",
+      "size": 433
+    },
+    {
+      "git_blob_sha1": "88f038dcf772a9013295c709ee078ba055573b6b",
+      "path": "src/aios_core/ai_world/cognition.py",
+      "sha256": "9898b2f9908fd20da72eb9a6a76ae6b82a10bf5d333d1503f1ffe9cc6e672ff9",
+      "size": 20786
+    },
+    {
+      "git_blob_sha1": "d5162893e2531df38d02f3b49d69250354432efd",
+      "path": "src/aios_core/communication/__init__.py",
+      "sha256": "9985a60b559ce16972a7589f20b2f8935d8d5b3c68017ae22e0b053a2785b74d",
+      "size": 317
+    },
+    {
+      "git_blob_sha1": "6c0f66b8dbadb0f541c18eb398c392fc3cd0d014",
+      "path": "src/aios_core/communication/service.py",
+      "sha256": "c574480180048605e2d95fd58919f625faecef05928e2c4b4999563825f55aeb",
+      "size": 9530
+    },
+    {
+      "git_blob_sha1": "1cce58be45d5de01dc1b9110f8893d7ec0eb4827",
+      "path": "src/aios_core/context/__init__.py",
+      "sha256": "b105ca649e8720a86b55d56dc7d2a1de85150cf52ab030bfeb131facb190e08f",
+      "size": 570
+    },
+    {
+      "git_blob_sha1": "e3e107bec13e1ac24089ebd8a14631ac06c536eb",
+      "path": "src/aios_core/context/continuity.py",
+      "sha256": "5075bbc4b0637a292bf9388495908fb4f52b22d084d4750ab12a59b4c3265893",
+      "size": 29725
+    },
+    {
+      "git_blob_sha1": "6ebe36b9ee93b23bb53242ef67ec0a71427f254c",
+      "path": "src/aios_core/context/controller.py",
+      "sha256": "4264b3cad91f39c2aa8c171529d8728000c6274d630ce1d7ec8e7d74116fe9fc",
+      "size": 4950
+    },
+    {
+      "git_blob_sha1": "752f8bc7389a212d5c24157732e546271acdd643",
+      "path": "src/aios_core/contracts/__init__.py",
+      "sha256": "a3ec7d1c04dafba4e3408fd335f7c18298edf9ce67f4291e3f7c0de9bca53bba",
+      "size": 600
+    },
+    {
+      "git_blob_sha1": "b6b50a08b157aee650463a3dfdf83233ef583969",
+      "path": "src/aios_core/contracts/base.py",
+      "sha256": "b3a6d333736e0990995662e1f7096520d800c4621c9d3d68750392ca1d238d82",
+      "size": 1585
+    },
+    {
+      "git_blob_sha1": "e881f88a4c7fc4e967e875e2e2044ebd2e74dd6f",
+      "path": "src/aios_core/contracts/enums.py",
+      "sha256": "0dea6d6b0022a0705d1292c62e9344b484e5da26d64f98d09d2e248885e86d13",
+      "size": 7870
+    },
+    {
+      "git_blob_sha1": "eef9624b217f0645b46fa214b429a19116146e50",
+      "path": "src/aios_core/contracts/errors.py",
+      "sha256": "b7c3bd696b057f93acfa603ceac14bbc28085e171e18a805abea884a383a5110",
+      "size": 825
+    },
+    {
+      "git_blob_sha1": "5b844cdc38bf4748fa2eaafc13b35650a925d579",
+      "path": "src/aios_core/contracts/ids.py",
+      "sha256": "7338a5564e5fb916e02e657ae0ef451a922a2ba0beac0e823a06f7d1ec139a9a",
+      "size": 1578
+    },
+    {
+      "git_blob_sha1": "dd37b83a1ae151974ad74055095e15e7ec533c99",
+      "path": "src/aios_core/contracts/models.py",
+      "sha256": "fce902b86170b9a17dab74a72a8775417b45325dd449a0fa08f19f247aa80813",
+      "size": 40721
+    },
+    {
+      "git_blob_sha1": "769c82738f75c529e9ff9f19c6865daefbac521d",
+      "path": "src/aios_core/contracts/operations.py",
+      "sha256": "2b62dd152c4490468ff8d36fa4375416ecc082fc7c5bd227e6b2b09b38662dab",
+      "size": 2898
+    },
+    {
+      "git_blob_sha1": "44ab8abbfe040f22447369ce0f87f8c59955218d",
+      "path": "src/aios_core/contracts/refs.py",
+      "sha256": "b7198632aee172b2daf9101eb0f0cc1a9e483a4cd51685f7ab05661c54fcef40",
+      "size": 640
+    },
+    {
+      "git_blob_sha1": "e9ec5a57e39be148f3a0c2e547b75de90639d1f8",
+      "path": "src/aios_core/contracts/registry.py",
+      "sha256": "b4861db4d677cbed5dadbf1df8c9eb9943f670116ddbf225876fec9d5dcbd649",
+      "size": 2554
+    },
+    {
+      "git_blob_sha1": "90b5f9b0c0fa9328c48b7ce4e0db2c2f855a7872",
+      "path": "src/aios_core/contracts/safety_bypass.py",
+      "sha256": "8e27f179b33955799189b890b473bb5cb6e0fba0a4ae8c27007fe54d3c044843",
+      "size": 1652
+    },
+    {
+      "git_blob_sha1": "5bfd2c86b4813c60c38c6410541d68ded68a7d28",
+      "path": "src/aios_core/contracts/time.py",
+      "sha256": "99fc6011f0a9a0a6bd2870da7e30cdbf640d1c33778922c8d1f20e102167413a",
+      "size": 4485
+    },
+    {
+      "git_blob_sha1": "e71526fc4eacc82ac916b34cd1bbb0fe31946f2f",
+      "path": "src/aios_core/dependency/__init__.py",
+      "sha256": "827e4c835836869fce4f65dd0fd6e79d090a08bc0ce802d3bd14d7330eea92e1",
+      "size": 460
+    },
+    {
+      "git_blob_sha1": "b59d4711b47ae0bc770fe5706c254d2539353317",
+      "path": "src/aios_core/dependency/graph.py",
+      "sha256": "5d3fae870f4962e0e7e06c6ed9e87a221e58b2aa044e254d643b34127c2ce254",
+      "size": 4289
+    },
+    {
+      "git_blob_sha1": "88bebad274290b58ac49cbb155aa872f1e616cbc",
+      "path": "src/aios_core/dimensions/__init__.py",
+      "sha256": "9ac79e71e298de4642f2a989a0de2521cf30615eb89a108bbfa5941cf37914e4",
+      "size": 412
+    },
+    {
+      "git_blob_sha1": "552b2a98e71bdb0c1d939882edd6d1dc3bacdb8b",
+      "path": "src/aios_core/dimensions/registry.py",
+      "sha256": "1504007ad98595165ca3220484c51940ab99842483e3f94da7b5bfefc8feaf00",
+      "size": 22613
+    },
+    {
+      "git_blob_sha1": "884464afb8bfd92ce8640be2dd1abd8bb8e7d079",
+      "path": "src/aios_core/errors.py",
+      "sha256": "5a2fc091d6e7eeac2aced1f5a83b008be337c2bf57a9eecabb3489409dd35a8c",
+      "size": 2431
+    },
+    {
+      "git_blob_sha1": "984c2b6c7abecf563149671c9afa052b69396470",
+      "path": "src/aios_core/events/__init__.py",
+      "sha256": "5ed215dff08a7811c4c75ccd814ce775ec999abde1cbe03db10c00749be0c58c",
+      "size": 374
+    },
+    {
+      "git_blob_sha1": "8aca7caf3020da4c338ae09b41a15b11235cd873",
+      "path": "src/aios_core/events/service.py",
+      "sha256": "aee307a7f5dd348c4b9cdd6cb7c6c9bd1cb1f16c6fd69527d44184ee465f6885",
+      "size": 17416
+    },
+    {
+      "git_blob_sha1": "6249dd1c8ba22af426574ebbf06744da43512583",
+      "path": "src/aios_core/execution/__init__.py",
+      "sha256": "bc4a10244b5841fff3e371babc54cb49da2f723ecc3cc7fd84befc3323aef646",
+      "size": 743
+    },
+    {
+      "git_blob_sha1": "2c55b478603d9191a7e2617d81f28f1604a9f57e",
+      "path": "src/aios_core/execution/service.py",
+      "sha256": "9cb045a5784c7e6f854433c984e301a600283f9056c90ae7a63c2dbb92d3d5ee",
+      "size": 81444
+    },
+    {
+      "git_blob_sha1": "27681d8efae3ce65a4f166eee3b28c9ca7ebf7f2",
+      "path": "src/aios_core/headless/__init__.py",
+      "sha256": "57a21022e70c9f3161ba3dda976b8d3f603358eba95dab625ded596a940a8ebf",
+      "size": 398
+    },
+    {
+      "git_blob_sha1": "a1a34442b11cc77ebcddbdfbecd5bbdb2fc71f01",
+      "path": "src/aios_core/headless/cli.py",
+      "sha256": "573c4a383801a3df6be3d341f27e4a133d5ba2c84bc441d08c448bcd5abd55e8",
+      "size": 15490
+    },
+    {
+      "git_blob_sha1": "f3fde30ea01cf414565cdd2700d5044251b09529",
+      "path": "src/aios_core/headless/core.py",
+      "sha256": "a4c26ce58cbe8261e0445550abc62c95bddb0d643feca7b4a4c7c0ba3ad19ec3",
+      "size": 12885
+    },
+    {
+      "git_blob_sha1": "e578e2a634d5f9c0992dd09fe52df043a350c838",
+      "path": "src/aios_core/headless/recovery.py",
+      "sha256": "70048e5d4bf5c5151084251559da0e78cfc6a14c47178eed34a4e3dfe0fc9656",
+      "size": 14549
+    },
+    {
+      "git_blob_sha1": "ea6205986abab4b6e0506eee40986c1ba665e42c",
+      "path": "src/aios_core/headless/testing.py",
+      "sha256": "9cb3817df4250d897aea04eda592a8af7f8d785bd0ef23191c3d0b93bca82517",
+      "size": 1068
+    },
+    {
+      "git_blob_sha1": "8017fda499eb92e48eabeb5461bd7f5207ed7a5f",
+      "path": "src/aios_core/ingest/__init__.py",
+      "sha256": "9299b3a89a1b194adf6359570bf75ca26228c5ba4093b9f9f759e329ae95388d",
+      "size": 834
+    },
+    {
+      "git_blob_sha1": "9fc8e691e7902b24368ca38d07e00fa72c1f243e",
+      "path": "src/aios_core/ingest/conversation.py",
+      "sha256": "0e1bde032000df69c5af245c07e141eb67f20fdf68d5700ae6068f329d013eeb",
+      "size": 19256
+    },
+    {
+      "git_blob_sha1": "a977e8dc8b3a46d4e4108c732f61e9bc8a86fb77",
+      "path": "src/aios_core/ingest/reality.py",
+      "sha256": "b35d630ac55c07cd4606ad592f8c2f2136bee26e3a13070272f698c25fc63a3a",
+      "size": 43214
+    },
+    {
+      "git_blob_sha1": "db4f7a51e8677689f43ff31445d37a73624a820e",
+      "path": "src/aios_core/policy/__init__.py",
+      "sha256": "942eb0a781649d584c7aedb55283ef170ba3e677fd1ac11d4fad07fb87b44372",
+      "size": 607
+    },
+    {
+      "git_blob_sha1": "146b2b5132179b3cde9055c1611642519b3ff9fa",
+      "path": "src/aios_core/policy/evidence.py",
+      "sha256": "8b0d3c0563abe5c14936a0deb3c1e910113745257f5a99d986b5f78f97784a6f",
+      "size": 25520
+    },
+    {
+      "git_blob_sha1": "fe6b74105159d0749770e40796c56158b0395e7e",
+      "path": "src/aios_core/policy/service.py",
+      "sha256": "a025baacba1dc16ffc1bb2c5f2f6df6f74e5a89a29bf1746ebd88dedec50055a",
+      "size": 23385
+    },
+    {
+      "git_blob_sha1": "872c915935e190defeb7d3b64d1471eb7de07c9b",
+      "path": "src/aios_core/projections/__init__.py",
+      "sha256": "19d598bf43bcd890af3eb5ca8c24a5e5f9438917917309cc655351a6b2796f9f",
+      "size": 341
+    },
+    {
+      "git_blob_sha1": "af6ee201586e0688a3d1ee0651b5e375d97f2fa6",
+      "path": "src/aios_core/projections/all_dimensions.py",
+      "sha256": "4e85afd9795071a8e6bcf602d55f1f08f0b958a6da6eacbbedc56d27dc659d7c",
+      "size": 9002
+    },
+    {
+      "git_blob_sha1": "f4ad38ea430ee102b1ce12b915601be7e73ed689",
+      "path": "src/aios_core/query/__init__.py",
+      "sha256": "d1fe2db4014308f00826220224c2001d7dc56cf5f8bac8a98b496a4239d4796a",
+      "size": 589
+    },
+    {
+      "git_blob_sha1": "783cf0233bd02c973f1af010ad9ecd7ac5054ce6",
+      "path": "src/aios_core/query/cjk_inverted_index.py",
+      "sha256": "2c7da821afbfa9ca8fceec0926f0929a6afeed727288988e4c4404315c145e4a",
+      "size": 13464
+    },
+    {
+      "git_blob_sha1": "5242bfc88aab5437202d5933326cba37b5fc08e8",
+      "path": "src/aios_core/query/history.py",
+      "sha256": "7654f7e3e557a5dd1161aea2e4abe5472167135fc819397a8f29893c3e0ee549",
+      "size": 3301
+    },
+    {
+      "git_blob_sha1": "2250249ed5b644481e56ea7a0e8ac1aa60527254",
+      "path": "src/aios_core/query/hyperlink_traverser.py",
+      "sha256": "3884e52cea290b0ee77dee75b3af9dcc5906844bd1b256ae165a094fcfdeccf0",
+      "size": 50644
+    },
+    {
+      "git_blob_sha1": "06a04f6d3e5cae1a5863f4fba46c7edef8c24599",
+      "path": "src/aios_core/query/search.py",
+      "sha256": "2a617937b6da835f70b56621e8d4b0aa86e08804c791864a15ad4862e604bd33",
+      "size": 70156
+    },
+    {
+      "git_blob_sha1": "253373ce155ea034ce4b2c140754ebd5ea0c39a8",
+      "path": "src/aios_core/recommendation/__init__.py",
+      "sha256": "d0b0a0ce625218bb346e62e29720132b78bd993284e6597464f20641c9647f86",
+      "size": 324
+    },
+    {
+      "git_blob_sha1": "72ca76d01792216b902e1779521bdd3b979f258d",
+      "path": "src/aios_core/recommendation/proactive.py",
+      "sha256": "d98d811c95313f35633c96b7a57ada22f044c6880ba7c5bd5910b64ddd235fe9",
+      "size": 10042
+    },
+    {
+      "git_blob_sha1": "c8fbe5275068f06eea2315d068b2a512f42bbc95",
+      "path": "src/aios_core/recommendation/topic_state.py",
+      "sha256": "d8b87c0069dd75b97c07e6470a8f542b038942c58108656886cacffc14e70d73",
+      "size": 7506
+    },
+    {
+      "git_blob_sha1": "813a850f887c2231907f084ad9b2ac42c755cd0e",
+      "path": "src/aios_core/review/__init__.py",
+      "sha256": "9d01cccce9d684500427614edd601340c86b0d1efa193699e631d05a898787d5",
+      "size": 521
+    },
+    {
+      "git_blob_sha1": "caf785d6b98f11ef727feb5f117c2d17c4faeccc",
+      "path": "src/aios_core/review/periodic.py",
+      "sha256": "86331b8ad339ebab4d461565696e53c7d2efc3cf24650d1d1593f2b8e5595eb9",
+      "size": 55957
+    },
+    {
+      "git_blob_sha1": "686dcd2d06f01ad6011257f4e8e213c8fe69080a",
+      "path": "src/aios_core/revision/__init__.py",
+      "sha256": "73a2e715ae28e9c463573b51ee68bb27f5e2ca1b98e7031a4b142ea2ff6de276",
+      "size": 405
+    },
+    {
+      "git_blob_sha1": "4575b624c181feaeeb57b8fa34ff36cc9d1998fe",
+      "path": "src/aios_core/revision/propagation.py",
+      "sha256": "b45cdab5bb11d26feee07821b3741a40ad810249429c9e24f550e49e2da71c52",
+      "size": 4750
+    },
+    {
+      "git_blob_sha1": "1dfd6159b67d3147eb65f10a04d1ea745ebfed62",
+      "path": "src/aios_core/revision/service.py",
+      "sha256": "5f0030dfa45a1cc4cf98dde6238bea878daf989daf39c43bc489e5867ab4c2dd",
+      "size": 20001
+    },
+    {
+      "git_blob_sha1": "7ee8d7706472deb5073d65ffc76e44c143219e94",
+      "path": "src/aios_core/runtime/__init__.py",
+      "sha256": "794493b09e576d37a97818149a066696828ada97407898ee87a9a988917d03d7",
+      "size": 1212
+    },
+    {
+      "git_blob_sha1": "3335eed50d5d4e0d31a9fde72be51bdb3a48a069",
+      "path": "src/aios_core/runtime/background_attempt.py",
+      "sha256": "c80cff62b50ee4ced0eeeb25ab671e785a4edeecc750dac80f9f9a900b1a9c56",
+      "size": 27061
+    },
+    {
+      "git_blob_sha1": "e2b198a05b48734317a90b4a1742df4d40a9d195",
+      "path": "src/aios_core/runtime/budget_gate.py",
+      "sha256": "cc8ea725cd021d4ee6043cf104b545578d39dac18ee330e2a36788336e4cbefc",
+      "size": 24077
+    },
+    {
+      "git_blob_sha1": "aa315afecdb566b0967abf062601def23d075084",
+      "path": "src/aios_core/runtime/capabilities.py",
+      "sha256": "cec5cd809c8bcb8776794889fd6e0a352229ad3dd5162e381568d782e5afb870",
+      "size": 4804
+    },
+    {
+      "git_blob_sha1": "3910f5a92fa73b5e09921e1756dda7dcabaca3e3",
+      "path": "src/aios_core/runtime/cognitive_runtime.py",
+      "sha256": "ab78f25ae73d9ba2dcd986f0f622715760b27c9094de3ca59915c5a3134e6556",
+      "size": 16796
+    },
+    {
+      "git_blob_sha1": "7dd63f98fe28b66b94164325abdc6b68ab2a8582",
+      "path": "src/aios_core/runtime/conversation_state.py",
+      "sha256": "385c5929941fd504286774fc6d3481552d236f2686fc992cf9e15e18a04184a9",
+      "size": 6699
+    },
+    {
+      "git_blob_sha1": "303e2e9aa87ba90660da3eb0efa4b77d8eaed6ea",
+      "path": "src/aios_core/runtime/conversation_timeline.py",
+      "sha256": "93860f1b00fcc57a64445549c48c8941484cc93a6743cb34ea8dd73480817121",
+      "size": 9176
+    },
+    {
+      "git_blob_sha1": "b17aceec9b7ada93df7b7081979a87bbc14a47a5",
+      "path": "src/aios_core/runtime/metering.py",
+      "sha256": "d635158195a29a62e7bd236f685f41ff601a06a6d1ee99c5ddbf0dc2a2f0fbae",
+      "size": 17184
+    },
+    {
+      "git_blob_sha1": "b4ffc01df55c762f3ae2eb4b87a95b042434ffdd",
+      "path": "src/aios_core/runtime/turn_execution.py",
+      "sha256": "3679e5f023c75ad44d773990e601861ae5e770fc9f87a9d27d6e5c531407e75f",
+      "size": 22467
+    },
+    {
+      "git_blob_sha1": "03722c989eb9dfaff5aa2b56985e8e82556a6d4f",
+      "path": "src/aios_core/runtime/turn_runtime.py",
+      "sha256": "07a90adbe7147bd196cbb051fdf05607400cfa8c484bd26247d0f2045cf46443",
+      "size": 178076
+    },
+    {
+      "git_blob_sha1": "de6b69819f812cebd6ef34720fe113caee4bf0a9",
+      "path": "src/aios_core/storage/__init__.py",
+      "sha256": "f35fea785fdea7795c7b5bdea81a11f5ee20bd013f2117eb30ca6a1d6c736dfd",
+      "size": 101
+    },
+    {
+      "git_blob_sha1": "99bbb04a11a28a5dabef052c8b3030be7043ffb9",
+      "path": "src/aios_core/storage/idempotency.py",
+      "sha256": "8493eb2c471bb9fef8e722c49cb79e60501a47178959cd7ea0862208bfc4025a",
+      "size": 25520
+    },
+    {
+      "git_blob_sha1": "b239a646cf00455a04942307cd35e8338eb0a16c",
+      "path": "src/aios_core/storage/sqlite_store.py",
+      "sha256": "5b3e56c878b9bd6d4329148d3626fe3805883b072b924886533714d079d580b6",
+      "size": 68642
+    },
+    {
+      "git_blob_sha1": "082902c16f1467857f4c25f1553fec006d91e699",
+      "path": "src/aios_core/summaries/__init__.py",
+      "sha256": "9103ebe1fb37ffb9563e89fb9a614e266b1649b8838461843ef72fc939e46b64",
+      "size": 1097
+    },
+    {
+      "git_blob_sha1": "f34e05daa68ff6cf135a4b1bfe183483299e09d6",
+      "path": "src/aios_core/summaries/cognitive_derivation.py",
+      "sha256": "f2701722e01174a31c46bb42b2b4ede750c5da1e8fa6eda7f315ecad1b5c90ae",
+      "size": 9646
+    },
+    {
+      "git_blob_sha1": "9806d131385397931ad5dda2d8e7060584c0d817",
+      "path": "src/aios_core/summaries/dimension_summary.py",
+      "sha256": "0f0a66a92640ac8c439257b7806f1bb38e0c0811a581f55b9061b58288b47c15",
+      "size": 23293
+    },
+    {
+      "git_blob_sha1": "2c60c2f72ee53240ed494d374ee7ee3964f667f1",
+      "path": "src/aios_core/summaries/scheduler.py",
+      "sha256": "1cbb82053d5d3e6b7d86a27ff5288df5a7f870cbee6bf5ec0679613753b5a360",
+      "size": 15812
+    },
+    {
+      "git_blob_sha1": "9f6818072e9724552a258e8e032e4643d3804804",
+      "path": "src/aios_core/wake/__init__.py",
+      "sha256": "1fcd8640945ed5f35be8f9eb52e3b659de4ca118d2f2a29793d802cce3e531f7",
+      "size": 886
+    },
+    {
+      "git_blob_sha1": "b06bad12effd872c0f4e1435f96f2769f0f5774e",
+      "path": "src/aios_core/wake/attention.py",
+      "sha256": "08d2dce5f0cf989c2fea35691a29f0c57ad50235d19f476f90b40a8b66125ec8",
+      "size": 31701
+    },
+    {
+      "git_blob_sha1": "426811b4fd71b8bfd14b3f0dd21d9cc5ab312181",
+      "path": "src/aios_core/wake/service.py",
+      "sha256": "6b3bd82597cc6ea0b3875fec1d9f8a2b4b22d9ed572f12b2aab61a47836bf1c8",
+      "size": 39931
+    },
+    {
+      "git_blob_sha1": "d781d1a932b2828422dc3b7268b35d92f1a6e62d",
+      "path": "src/aios_core/world_graph.py",
+      "sha256": "d2a5dd21e54964f0c36c582df264856491fa451da4b16ce23a2dc61936c1ca61",
+      "size": 22098
+    },
+    {
+      "git_blob_sha1": "ed628016afb9af5f63671bf68d78bc58bb45ac85",
+      "path": "src/aios_core/writeback/__init__.py",
+      "sha256": "de1009eaa4c3cc50f9e98c6b198a3e90844b80dba2f8e7b00350822db458d8cc",
+      "size": 219
+    },
+    {
+      "git_blob_sha1": "a415d1237f75a3320ecc47ead9f8b070d9ab330d",
+      "path": "src/aios_core/writeback/cognition.py",
+      "sha256": "0f3d31bec76dc0d4537c11005945cf7478f79a542dba62be6644537a502c7ac1",
+      "size": 16177
+    }
+  ],
+  "core_tree_sha1": "fe77f8a0706acfaf369041d0882b6d0e6de39f22",
+  "frozen_main_sha": "773876f92d5f8e53422f8f5a68cc651953d93052",
+  "notes": [
+    "Hashes are generated mechanically from the exact frozen base commit, not from the transient probe workflow tree.",
+    "Private Resident Worlds, run databases, credentials, and generated caches are excluded."
+  ],
+  "package_metadata": {
+    "git_blob_sha1": "b38833c7537fa60d5c2f02ed4bb19158d8995a11",
+    "path": "pyproject.toml",
+    "sha256": "993a6e9dd821d8d5885f4cc1f2da0aa34d40284618097a1de507e885f2eaab30",
+    "size": 643
+  },
+  "schema": "CORE_RC_FREEZE_001_MANIFEST.v1",
+  "task_board": {
+    "git_blob_sha1": "64538f771257bbd74d87db5f7d3cbda094d8893d",
+    "path": "governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md",
+    "sha256": "95ae56fe2de3baf1dc038c541a242431d61f265314133fbf815cb4de6deef34d",
+    "size": 126490
+  },
+  "tests_tree_sha1": "815a3a460f14d073cf07d6191ea4c3edfd5457e5",
+  "top_tree_sha1": "2cc91595532fcd437b7aaa4efebd39ca9a0b3786",
+  "workflow_files": [
+    {
+      "git_blob_sha1": "4d54c413842af5e376075d624e05dd177217d697",
+      "path": ".github/workflows/all-dimensions-projection.yml",
+      "sha256": "bbc783a209e057a11d40df25183f833abe8ab85a2e1aea18b818fd6a43661c93",
+      "size": 820
+    },
+    {
+      "git_blob_sha1": "5030a5eee981b52045230473bbd7ce2a601429e1",
+      "path": ".github/workflows/c09-wake-dispatch.yml",
+      "sha256": "d027650f8c093942776a34e796b9c2be8d617f8ea6acd60befdf396d06b4964e",
+      "size": 1197
+    },
+    {
+      "git_blob_sha1": "067a162e74a2ce32703bc24642912b92d0f4c37e",
+      "path": ".github/workflows/c14-cognitive-derivation-loop.yml",
+      "sha256": "f1c652b17be610942c6861428ae9c5c63244196af26c041f77350796bd680cd1",
+      "size": 4423
+    },
+    {
+      "git_blob_sha1": "4f3430f4396f00f3b3a86b007e007677a08a241a",
+      "path": ".github/workflows/c14-cognitive-derivation-runtime.yml",
+      "sha256": "6762b0a81a5f930910293d0dc46fa6ac9d15255b8a90b217b5809b7adbf369ca",
+      "size": 4060
+    },
+    {
+      "git_blob_sha1": "68f12e16e349c30c8fe8e03f006bca7af6738b1c",
+      "path": ".github/workflows/c14-cognitive-derivation-scheduler.yml",
+      "sha256": "436aed96007198e8dbaa166192fde062c06d404dfaa4dc092695e033f8e40896",
+      "size": 4973
+    },
+    {
+      "git_blob_sha1": "ae107fa3762f25cb7a683fd0629e2aabde24e54a",
+      "path": ".github/workflows/c14-resident-fixture-v2.yml",
+      "sha256": "c3182c760b33d68cb3c629c451c40c99a9b85fd31eefd6052159d8b43079d478",
+      "size": 4276
+    },
+    {
+      "git_blob_sha1": "879c0bb95f434ca5bf871e7da9b8f79e87e2c07e",
+      "path": ".github/workflows/c14-semantic-repair-fixture.yml",
+      "sha256": "f9b710d6d06e4db65a46188a5b57f0f4e2f7218c226d77606b8a396dc0b9183b",
+      "size": 4458
+    },
+    {
+      "git_blob_sha1": "5f962be36fa013386665ff8c9253aeabc3771019",
+      "path": ".github/workflows/c15-cognition-evidence-policy.yml",
+      "sha256": "a72f3061a1fd1c83d6a6ca7032955721c4d8c3933f5f788f7f9cffd48499a1ae",
+      "size": 1572
+    },
+    {
+      "git_blob_sha1": "b612512d82f2dbea50a6d48b0e058ff2421d841f",
+      "path": ".github/workflows/c15-operator-preflight.yml",
+      "sha256": "ace266a33ec7469ad77763191687c4ca61469be69cc12f25c5075c1bf1a4c766",
+      "size": 4612
+    },
+    {
+      "git_blob_sha1": "1d4eb2ddec31af6909a3a894fb0aadec05de8fd3",
+      "path": ".github/workflows/c15-rcc-fixture.yml",
+      "sha256": "e11d574e2092a495944e37ca6dc228f550bc56f1fa764a5635cea3cd143d75e4",
+      "size": 4261
+    },
+    {
+      "git_blob_sha1": "eb46d6fe4e9549bdbcd0cf329f9b771d219e1d98",
+      "path": ".github/workflows/cognition-revision.yml",
+      "sha256": "e54e69996e113cf96a54a6f7ff87d222eb3dc3e6b8894eb95d7e1c3dc08de271",
+      "size": 770
+    },
+    {
+      "git_blob_sha1": "6021ec4b9864e8d4c1caedcccf1e6a6c93ac1a18",
+      "path": ".github/workflows/cognition-writeback.yml",
+      "sha256": "073c01f43be1f3a622415866dd7f6d8ab65f1a75d6cd3f44538eccd6c34f5581",
+      "size": 744
+    },
+    {
+      "git_blob_sha1": "ac72e4ef56b5858e2b62205fb124d70e93f54ed1",
+      "path": ".github/workflows/cognitive-runtime.yml",
+      "sha256": "b747610fda8a56a9e88f981763ab0da7b7484f31bd4162245cfdd0a230a45940",
+      "size": 766
+    },
+    {
+      "git_blob_sha1": "3410ba82911cabba07ff7fe301ec4e0480628d84",
+      "path": ".github/workflows/constitutional-cognition-closure.yml",
+      "sha256": "d7d5b8e1083732a74dd1dc9208b72e557d3e93ac399c2f2c714fd0ad73a5e97e",
+      "size": 1509
+    },
+    {
+      "git_blob_sha1": "824aa67ca82a37f2705aa90b7a4cb74de4d6c4c1",
+      "path": ".github/workflows/conversation-runtime.yml",
+      "sha256": "6eaa671cf446aca2601663e408b800b89c88f6f25ab872012f5bbde23d03a370",
+      "size": 947
+    },
+    {
+      "git_blob_sha1": "8f01f823123b259cd893da2f553d94d4c4c20344",
+      "path": ".github/workflows/conversation-world.yml",
+      "sha256": "ef00507ec9614683b2e6ab1b5f8b5563cb2ba443138ef7b68b4fe1f3575bcd56",
+      "size": 887
+    },
+    {
+      "git_blob_sha1": "2f3aab05047dc76f8d345e4556f56c7a5c77bd44",
+      "path": ".github/workflows/core-headless.yml",
+      "sha256": "fff348128b6614e8feaec12fc902e286b3e5b7a760e8255775de3cf3bf4d33ba",
+      "size": 2171
+    },
+    {
+      "git_blob_sha1": "b5373c2e95a5a45c962365318a9f908317471d7f",
+      "path": ".github/workflows/core-recovery.yml",
+      "sha256": "f60f15a86b832cf0f1f3616392fdbbc595b5f47dd3edc5c9b7449e9465d25abd",
+      "size": 6832
+    },
+    {
+      "git_blob_sha1": "7dc2a1754c0e1b83c8f9ba14f016b0be37f7e85c",
+      "path": ".github/workflows/core-scale.yml",
+      "sha256": "df4bdfdd2b0c8388bf059fa39971efa05abd984be0987b6e84a0557e0ed5f0f3",
+      "size": 5204
+    },
+    {
+      "git_blob_sha1": "29694e790ad3902a8209e0a4a0f107b60eb6eca2",
+      "path": ".github/workflows/dimension-summary.yml",
+      "sha256": "507e8f8008754fa0b6aed07c71b60ea86ba7ba16b62e1af68beb1e7af1ac6768",
+      "size": 827
+    },
+    {
+      "git_blob_sha1": "f42f06813a8233c1aedcc91d3bb6826607b6ffc0",
+      "path": ".github/workflows/fused-turn-runtime.yml",
+      "sha256": "c901ff1699b14969ad081f66005eb4add380f91a214c61d78cf1b40e6e5c9ccc",
+      "size": 924
+    },
+    {
+      "git_blob_sha1": "e36a3c23feb17cc95686be28116121ed3970fd52",
+      "path": ".github/workflows/memory-recommendation.yml",
+      "sha256": "8989db24ba57807170f51ec3d7f234e04dc0b87f2e9fa57bf3c4f8e35b6fba0c",
+      "size": 827
+    },
+    {
+      "git_blob_sha1": "cecc3d0252173ec92b0cbd21891f1629970daada",
+      "path": ".github/workflows/p10-ai-world-gate.yml",
+      "sha256": "75cc1f7db9fafc2428027c30b00f0755286ac2ea015fab091660e46947003b42",
+      "size": 1482
+    },
+    {
+      "git_blob_sha1": "c559bffee55b12b0aad0915332807d9333d4b022",
+      "path": ".github/workflows/p10-ai-world.yml",
+      "sha256": "b8b6f38b617691bc2de1a0475cbedefeb1af49b31bc4a841912101a8a7abfd8b",
+      "size": 789
+    },
+    {
+      "git_blob_sha1": "d1a7f27c6c9e7647f547941009fd836885d6c4de",
+      "path": ".github/workflows/p11-dimension-gate.yml",
+      "sha256": "33a2d73447daabf44498ab680b981e7aceff03d5d282b792748e961c11d6a438",
+      "size": 1354
+    },
+    {
+      "git_blob_sha1": "d86cf13ef0038657d6844b812db8ee5b89ff33cd",
+      "path": ".github/workflows/p11-dimension-registry.yml",
+      "sha256": "909506c8efc5fab4900a9a133e5ddc54ef4c08cf1756df958792ffe363f5ca3b",
+      "size": 716
+    },
+    {
+      "git_blob_sha1": "4c0a0b1242b785235cfe6f1c9b2579a51851ac3d",
+      "path": ".github/workflows/p12-execution-gate.yml",
+      "sha256": "0f96325369403686c600bcaf96902615d1130dc0c9e9f162c767bf761bf6c946",
+      "size": 1430
+    },
+    {
+      "git_blob_sha1": "3cdc57ba83b7e73ad9759065aa44e575a217cbe1",
+      "path": ".github/workflows/p12-execution-world.yml",
+      "sha256": "27210bf62736946aadcc34c082c7f198a150e91896f5fc188b0dbc50fd9c6dc4",
+      "size": 700
+    },
+    {
+      "git_blob_sha1": "52a6b7fc103dab3ac0b5c9adec8ec8aa4ef2e352",
+      "path": ".github/workflows/p13-ingest-gate.yml",
+      "sha256": "4326bb4c544d8d0a40e630fe19a42ec275655c2ac6e95784a6771f96f4203513",
+      "size": 1206
+    },
+    {
+      "git_blob_sha1": "a23e2d73619f99b06f3368a62b537d85a2192da5",
+      "path": ".github/workflows/p13-reality-ingest.yml",
+      "sha256": "99b348ed4bbb4c1fb4c78b3c02f1814d2db4c8c1e89a4ad83c75879973f36d51",
+      "size": 700
+    },
+    {
+      "git_blob_sha1": "2b1499ac4785d1d0c5abbe727c6fafbc6cd93708",
+      "path": ".github/workflows/p14-long-context.yml",
+      "sha256": "7e1872219161e275f95cf5cffd42093a4c8a8a696b690b5990dfec9b783bcceb",
+      "size": 1396
+    },
+    {
+      "git_blob_sha1": "7f3bea2330af62718252bf0c32a70f07033bc83c",
+      "path": ".github/workflows/p15-periodic-review.yml",
+      "sha256": "60af2c9e9fa91bb217b98be5bbd6f7e077d4cced5ce5caeb7b98706a6c6a504f",
+      "size": 1164
+    },
+    {
+      "git_blob_sha1": "e7a220435ff7619d82a837aa02580c6e324d366f",
+      "path": ".github/workflows/p16-convergence-gate.yml",
+      "sha256": "499fdbc22eb5aac37bb7e8984ae7baecdf6ca376d436febc63d18af4a66eb138",
+      "size": 658
+    },
+    {
+      "git_blob_sha1": "0569a436145e830fd90be73377efbfdbf1f4df48",
+      "path": ".github/workflows/p16-habitation-harness.yml",
+      "sha256": "259ac18011953bae3da5fc2f95da8b72f18a97826f47a96244ddcf15aaea399e",
+      "size": 795
+    },
+    {
+      "git_blob_sha1": "af77d4b980282f195c19b6349670f956cc59541b",
+      "path": ".github/workflows/p16-provider-evaluation-manual.yml",
+      "sha256": "0a3171761834f032e3fb4e68fb3fb1fe23794492b642f52fcd6678eac7f426f7",
+      "size": 4456
+    },
+    {
+      "git_blob_sha1": "b8900a8af092d5a03d3a49624fe00d274278c34e",
+      "path": ".github/workflows/p16-provider-habitation-manual.yml",
+      "sha256": "92f046921ac9d8e5103c28dbc1ddf1b6121b90f5baf7c11b4bad10bcbb8a2d82",
+      "size": 2955
+    },
+    {
+      "git_blob_sha1": "caa33a8b3bd4a46401ef0f6d57f98c7fcc8b295b",
+      "path": ".github/workflows/p9-revision-gate.yml",
+      "sha256": "0f47a27820230b0c956e8820dba453c52f12cc7a56ac514cae008aa17d4eb6cb",
+      "size": 1791
+    },
+    {
+      "git_blob_sha1": "5bea273c771564dd41e197ec1cabc4fc6db79d41",
+      "path": ".github/workflows/world-index.yml",
+      "sha256": "7b0cd44a1b08ed42e80856727d74a9a5aefd181792b3b2863304f6101b4fba12",
+      "size": 816
+    },
+    {
+      "git_blob_sha1": "89c72fb87323a69cbb34612408df950dd1a587f8",
+      "path": ".github/workflows/world-kernel.yml",
+      "sha256": "cfc21c6bdd2649be7bc33ac01a77df5473b042a5a0064dcbbbbb4c6662265252",
+      "size": 1112
+    }
+  ],
+  "workflow_tree_sha1": "8d1ea1cbb9993f9ff29155e4d04833bd53b45272",
+  "generated_by": {
+    "workflow_run_id": 36019155145,
+    "workflow_job_id": 107699305699,
+    "pr_number": 202,
+    "pr_branch_head": "58de2e39bc6acd06eb9b5dcf93b846560685f524",
+    "workflow_checkout_sha": "11f5c8e7330678a16c079d279e541c984adce000",
+    "artifact_id": 10816735414,
+    "artifact_digest": "sha256:b759cd6d74a33f8cebc9e58576181c81ede2fe788e0ea1be4ed873d020f4c093"
+  },
+  "freeze_status": "REVIEW_READY_CANDIDATE",
+  "resident_execution_count": 0
+}
