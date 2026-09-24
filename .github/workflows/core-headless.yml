@@ -1,0 +1,54 @@
+name: core-headless
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "pyproject.toml"
+      - "src/aios_core/headless/**"
+      - "tests/integration/test_core_headless.py"
+      - ".github/workflows/core-headless.yml"
+  pull_request:
+    paths:
+      - "pyproject.toml"
+      - "src/aios_core/headless/**"
+      - "tests/integration/test_core_headless.py"
+      - ".github/workflows/core-headless.yml"
+
+jobs:
+  headless-lifecycle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - name: Clean install from repository
+        run: pip install ".[dev]"
+      - name: Installed CLI start-stop-restart smoke
+        run: |
+          set -euo pipefail
+          WORLD="$RUNNER_TEMP/aios-headless-smoke/world.sqlite"
+          MODEL="aios_core.headless.testing:deterministic_model_handler"
+          mkdir -p "$(dirname "$WORLD")"
+          aios-core-headless --world "$WORLD" --model-handler "$MODEL" status
+          aios-core-headless --world "$WORLD" --model-handler "$MODEL" turn \
+            --session smoke --turn-index 1 --text "mechanical smoke" \
+            --at "2026-09-24T12:00:00+00:00"
+          aios-core-headless --world "$WORLD" --model-handler "$MODEL" status
+      - name: Targeted headless lifecycle and restart boundaries
+        run: pytest -q tests/integration/test_core_headless.py
+      - name: Existing runtime compatibility gates
+        run: |
+          pytest -q \
+            tests/integration/test_v3_fused_turn_runtime.py \
+            tests/integration/test_v3_wake_dispatch.py \
+            tests/integration/test_v3_periodic_review.py \
+            tests/integration/test_v3_reality_ingest.py \
+            tests/integration/test_v3_c14_cognitive_derivation_runtime.py \
+            tests/integration/test_v3_ai_world.py \
+            tests/integration/test_v3_execution_world.py \
+            tests/integration/test_core_gap_fix_002_background_attempts.py \
+            tests/runtime/test_turn_execution_recovery.py \
+            tests/runtime/test_cognitive_runtime.py
