@@ -275,6 +275,7 @@ class TurnExecutionStore:
                         WHERE subject_id=? AND session_id=? AND turn_index=?
                           AND state='started'
                     """, key)
+                    conn.commit()
                     raise TurnAlreadyCompleted(
                         state="recovered_completed_output",
                         assistant_ref=ref,
