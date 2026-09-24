@@ -51,7 +51,7 @@
 | 新 C15 fresh A → B → C / EVAL / CLOSE | **BLOCKED** | RC-FREEZE；旧 #117 A 不能 hash-swap 为新 RC A |
 | C16 → P16 → P17 | **BLOCKED** | 保留原逐项 Gate；只有 P17 PASS 才可称 Core complete |
 
-FIX-001 / FIX-002 / FIX-003 三项 audited Core gap 已全部独立接受并集成；CG-001/002/003 均 CLOSED。`CORE-HEADLESS-001` 已独立接受并集成；`CORE-RECOVERY-001` 工程已完成并进入 `GATE / REVIEW_READY`，当前唯一合法下一动作是 fresh Independent Acceptance；RECOVERY、SCALE、RC-FREEZE、fresh Resident A/B/C 继续等待各自前置。CI corrective 已关闭。
+FIX-001 / FIX-002 / FIX-003 三项 audited Core gap 已全部独立接受并集成；CG-001/002/003 均 CLOSED。`CORE-HEADLESS-001` 已独立接受并集成；`CORE-RECOVERY-001` 工程已完成并进入 `GATE / REVIEW_READY`，当前唯一合法下一动作是 fresh Independent Acceptance；SCALE、RC-FREEZE、fresh Resident A/B/C 继续等待各自前置。CI corrective 已关闭。
 
 > Status: ACTIVE  
 > Effective: 2026-09-21  
