@@ -1,13 +1,13 @@
 # AIOS v3.0 单窗口任务执行总表
 
-## 当前控制入口 — 2026-09-24 S2 SERIALIZED / FIX-002 REVIEW_READY / FIX-001 FROZEN_WIP / CI-FIX CORRECTIVE REVIEW_READY
+## 当前控制入口 — 2026-09-24 FIX-002 DONE / FIX-001 RESUME READY / FIX-003 READY / CI-FIX CORRECTIVE REVIEW_READY
 
 - 接任 PM 依 #128 治理接手；接手与 live 复核：`governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
 - **派工基线 = live main `079d7516f195cf6973933acc8cd057d59adc3a9f`**（其后仅治理/审查文档变更）；`CORE-OPERATOR-001` 集成点 = `e72a63874ed2c28798b00cec51f191caf1594a00`；Core tree 自审计以来始终 `7db4f72e7b3c29c74082f9984141159f8f1d6071`。每个新窗口仍须自行重取 live main，不得把本 SHA 当永久施工基线。
 - `CORE-BASELINE-001 = DONE（re-verified）`：S0 裁决成立；dev 基线前移至 `e72a63874e...`；历史 pin #117/#121/#125/#126 不变；fresh A 仅在 RC-FREEZE 后。
 - `CORE-OPERATOR-001 = DONE`：独立验收 #135（ACCEPTANCE_PASS，0 blocker）`fe6f1740eb`（05:08:01Z）先合，候选 #131 `e72a63874e`（05:08:07Z）后合；报告 `reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md`。
 - `CORE-GAP-AUDIT-001 = DONE`（#132 合 `bc4bf735...`）；RC blockers = CG-001/002/003；14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE 不得无依据重开。
-- **S2 已触发强制串行化**：PR #145（FIX-001）证明完整 CG-001 closure 必须在 `run_wake` / `run_periodic_review` 建立 historical read cutoff，已跨入 FIX-002 的 symbol ownership。依原 parallelism ruling 的 stop-and-report 条款，PM 裁决 **FIX-002 先完成/独立验收/集成，FIX-001 保留现场后从新 main rebase 继续**。绑定裁决：`governance/AIOS_CORE_S2_SERIALIZATION_RULING_2026-09-24.md`。当前 FIX-002 PR #143 @ `c5382a16...` = GATE / REVIEW_READY；FIX-001 draft #145 @ `97a76e3b...` = FROZEN_WIP / BLOCKED_ON_FIX_002_INTEGRATION；FIX-003 继续 BLOCKED。
+- **S2 已触发强制串行化**：PR #145（FIX-001）证明完整 CG-001 closure 必须在 `run_wake` / `run_periodic_review` 建立 historical read cutoff，已跨入 FIX-002 的 symbol ownership。依原 parallelism ruling 的 stop-and-report 条款，PM 裁决 **FIX-002 先完成/独立验收/集成，FIX-001 保留现场后从新 main rebase 继续**。绑定裁决：`governance/AIOS_CORE_S2_SERIALIZATION_RULING_2026-09-24.md`。FIX-002 已独立验收 #154 PASS 并集成 #143，merge `3d980fad...`；FIX-001 draft #145 解除冻结，必须从 live main rebase 后继续既有 WIP；FIX-003 的 FIX-002 前置已满足，现 READY。后续符号级并行边界见 `governance/AIOS_CORE_S2_POST_FIX002_PARALLELISM_RULING_2026-09-24.md`。
 - PR #136（pelican 动画）= EXCLUDED，永不合入；分支保留，不作关闭/删除（计划未授权）。
 - PM 补充（`governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`）：合后 p16-convergence-gate run `35958610555` @ `e72a6387` SUCCESS；PR #130（`core/operator-001-20260924-sol` @ `16eb1d40`，同 Task 竞争候选、未经独立验收）= **SUPERSEDED / NOT INTEGRATED**，保留不合并；`core-gap-fix-001/002` 分支停在 `27135e39`、零提交，无施工现场。
 - Gap fix 独立验收统一提示词：`governance/prompts/CORE_GAP_FIX_ACCEPTANCE_2026-09-24.md`（每个候选另开不同 reviewer 窗口）。
@@ -36,11 +36,11 @@
 | CORE-BASELINE-001 | **DONE（re-verified）** | S0 ruling 已落 main；接任 PM 于 `e72a63874e...` 复核成立（governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md） |
 | CORE-OPERATOR-001 | **DONE** | 独立验收 #135 先合（fe6f1740eb）→ 候选 #131 后合（e72a63874e）；报告 reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md |
 | CORE-GAP-AUDIT-001 | **DONE** | PR #132 已接受并合入；报告 `reviews/CORE_GAP_AUDIT_001_2026-09-24.md` |
-| CORE-GAP-FIX-001 | **FROZEN_WIP / BLOCKED_ON_FIX_002_INTEGRATION** | Draft PR #145；repro `a9a089a6...`；WIP head `97a76e3b...`；不得重做/验收/合并，待 FIX-002 独立验收并集成后 rebase live main 继续 |
-| CORE-GAP-FIX-002 | **GATE / REVIEW_READY** | PR #143 @ `c5382a1653b66654df23d0938d9d19a80a12619c`；修前 Wake/Periodic Review 双重 provider 调用已复现；exact-head affected workflows + full P16 SUCCESS；等待不同 Independent Reviewer，未验收/未合并 |
+| CORE-GAP-FIX-001 | **READY / RESUME_EXISTING_WIP** | 继续 PR #145 / branch `core-gap-fix-001-temporal-read-cut-20260924-r2`；保留 repro `a9a089a6...` 与 WIP `97a76e3b...`；先 rebase/merge live main（含 FIX-002）再按 resume prompt 完成 CG-001；不得重做 |
+| CORE-GAP-FIX-002 | **DONE** | Independent review #154 ACCEPTANCE_PASS / 0 blockers；candidate #143 exact `c5382a1653...` merged as `3d980fadf6beefcdd02ff4367ba834a5b013d871`；receipt `governance/CORE_GAP_FIX_002_INTEGRATION_RECEIPT_2026-09-24.md` |
 | CORE-CI-FIX-001 | **GATE / ACCEPTANCE_FAIL** | PR #146 failed independent acceptance in merged review #150；blocker `CORE-CI-FIX-001-ACCEPT-BLOCKER-001`；不得 merge |
 | CORE-CI-FIX-001-CORRECTIVE-001 | **GATE / REVIEW_READY** | PR #146 @ `1eb24e101cdb1579c22c69b435cf9f79a3c359ad`；6 个 protected-path predicates 已改为 non-pipe input；large-list negative probe + branch-shape positive proof + 三条 final exact-head Gate 均有证据；等待新的 Independent Reviewer，未验收/未合并 |
-| CORE-GAP-FIX-003 | **BLOCKED** | 依赖 FIX-002 独立验收 + PM integration；提示词 `governance/prompts/CORE_GAP_FIX_003_2026-09-24.md`，当前不得施工 |
+| CORE-GAP-FIX-003 | **READY / NOT_STARTED** | FIX-002 前置已满足；从当前 live main 新分支启动 user-turn IN_DOUBT recovery；提示词 `governance/prompts/CORE_GAP_FIX_003_2026-09-24.md`；不得触碰 FIX-001 read-cut/background entrypoint 语义 |
 | CORE-HEADLESS-001 | **BLOCKED** | OPERATOR accepted + FIX-001/002/003 accepted/integrated |
 | CORE-RECOVERY-001 | **BLOCKED** | HEADLESS + 三项 gap 修复进入 S2 candidate |
 | CORE-SCALE-001 | **BLOCKED** | S2 功能候选 |
@@ -48,7 +48,7 @@
 | 新 C15 fresh A → B → C / EVAL / CLOSE | **BLOCKED** | RC-FREEZE；旧 #117 A 不能 hash-swap 为新 RC A |
 | C16 → P16 → P17 | **BLOCKED** | 保留原逐项 Gate；只有 P17 PASS 才可称 Core complete |
 
-`CORE-GAP-FIX-001` 与 `CORE-GAP-FIX-002` 的开发并行授权已因实际跨-symbol 冲突触发串行化：FIX-002 先集成，随后恢复 FIX-001。`CORE-CI-FIX-001-CORRECTIVE-001` 可与 FIX-002 并行；corrective 完成后必须重新独立验收。一个工程窗口只负责一个 Task ID；作者不得自验收。
+FIX-002 已完成串行前置并集成。现在 FIX-001（resume existing WIP）与 FIX-003（new task）可并行开发，但必须遵守 `AIOS_CORE_S2_POST_FIX002_PARALLELISM_RULING_2026-09-24.md` 的符号级隔离，并串行集成；第二个合入者必须基于新 main rebase/重跑 Gate/重新独立验收。CI corrective 可独立并行。
 
 > Status: ACTIVE  
 > Effective: 2026-09-21  
