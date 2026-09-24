@@ -379,7 +379,7 @@ def test_r9_interrupted_restore_does_not_mutate_backup_or_publish_partial_world(
     assert _sha256(backup) == backup_hash
 
 
-def test_r10_recovery_cli_does_not_require_model_handler(tmp_path, capfd):
+def test_r10_recovery_cli_does_not_require_model_handler(tmp_path):
     cfg = HeadlessConfig(world_path=tmp_path / "world.sqlite")
     store = SQLiteWorldStore(cfg.world_path)
     oid = new_object_id(ObjectType.OBSERVATION)
@@ -387,8 +387,9 @@ def test_r10_recovery_cli_does_not_require_model_handler(tmp_path, capfd):
 
     rc = headless_cli_main(["--world", str(cfg.world_path), "recovery-status"])
     assert rc == 0
-    status = capfd.readouterr().out
-    assert '"status": "recovery_status"' in status
+    status = recovery_status(cfg)
+    assert status["status"] == "recovery_status"
+    assert status["recovery_disposition"] == "REBUILD_FROM_WORLD"
 
     backup = tmp_path / "cli-backup.sqlite"
     rc = headless_cli_main(
