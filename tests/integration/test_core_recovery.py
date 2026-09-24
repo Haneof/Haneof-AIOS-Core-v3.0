@@ -359,20 +359,20 @@ def test_r9_interrupted_backup_does_not_publish_partial_snapshot(
 
     import aios_core.headless.recovery as recovery_module
 
-    original_replace = recovery_module.os.replace
+    original_link = recovery_module.os.link
 
     def fail_publish(_source, _target):
         raise OSError("synthetic backup publish interruption")
 
     backup = tmp_path / "interrupted-backup.sqlite"
-    monkeypatch.setattr(recovery_module.os, "replace", fail_publish)
-    with pytest.raises(OSError, match="backup publish interruption"):
+    monkeypatch.setattr(recovery_module.os, "link", fail_publish)
+    with pytest.raises(RecoveryError, match="backup publish interruption"):
         backup_world(cfg, backup)
     assert not backup.exists()
     assert not Path(str(backup) + ".tmp").exists()
     assert SQLiteWorldStore(cfg.world_path).current_world_revision() == source_revision
 
-    monkeypatch.setattr(recovery_module.os, "replace", original_replace)
+    monkeypatch.setattr(recovery_module.os, "link", original_link)
     done = backup_world(cfg, backup)
     assert done["world_revision"] == source_revision
     assert backup.exists()
