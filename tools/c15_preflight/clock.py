@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import importlib.util
 import sys
-from datetime import timedelta
 from functools import partial
 from pathlib import Path
 
@@ -48,25 +47,52 @@ class ClockAdapter(_clock_type()):
         self._max_background_cycles = 10_000
         self._background_log = []
 
-    def _dispatch_pending_wakes(self, now):
-        return []
+    @staticmethod
+    def _pre_ingest_view(run):
+        """Expose only mechanical scheduling state required by the operator.
+
+        Core owns the Wake state transition and budget decision.  The operator
+        records it; it never rewrites QUEUED/RUNNING into completion.
+        """
+        runtime = run.get("runtime")
+        return {
+            "wake_ref": {
+                "object_id": run["wake_id"],
+                "revision": run["wake_revision"],
+            },
+            "wake_source": run["wake_source"],
+            "state": run["wake_state"],
+            "termination_reason": (
+                runtime.get("termination_reason")
+                if isinstance(runtime, dict)
+                else None
+            ),
+            "step0": run.get("step0"),
+        }
 
     def advance_to(self, instant):
-        # For formal B, ensure B14 ack durable before any model blocking.
-        # Original super().advance_to does task_cycles, periodic_reviews, dimension_summaries which all may require model and block before ingest,
-        # causing checkpoint lagging (wr89..108 committed but driver_state wr88) and pending_reveal left.
-        # Fix: for formal B, skip all model-requiring work in pre_ingest phase, just advance clock and return empty result.
-        # Dimension summaries and pending wakes will be handled in due_work after checkpoint, where ack already durable.
-        # This preserves mechanical path and ensures ack durable before model.
-        self._clock = instant
-        result = {
-            "from": None,
-            "to": instant.isoformat(),
-            "task_cycles": [],
-            "periodic_reviews": [],
-            "dimension_summaries": {"at": instant.isoformat(), "invoked": False, "reason": "skipped_for_formal_b_ack_durable"},
-            "background_cycles": 0,
-            "world_revision": int(self.store.current_world_revision()),
-            "pre_ingest_wakes": [],
-        }
+        """Advance with the existing scheduler before the caller ingests input.
+
+        The inherited habitation scheduler owns intermediate task/review ticks,
+        so a T+49h advance still executes the T+24h review at T+24h.  Its normal
+        Wake dispatch path is observed through RuntimeRecorder.
+
+        Dimension-summary work is also executed by the inherited scheduler at
+        the target instant.  After that, drain any remaining non-user/background
+        Wake once through the same normal Core path *before* returning to Driver,
+        while the newly revealed event is still not in World.  A budget-denied
+        or otherwise unfinished Wake remains non-completed and is merely
+        reported in pre_ingest_wakes; this adapter never force-completes it.
+        """
+        result = dict(super().advance_to(instant))
+
+        # The parent scheduler dispatches Wakes at intermediate due ticks.  A
+        # Wake can also already be pending when there is no intermediate tick,
+        # or be emitted by the target-time dimension-summary pass.  Dispatch
+        # those now, still before Driver.ingest(event).
+        trailing = self._dispatch_pending_wakes(self._clock)
+        result["pre_ingest_wakes"] = [
+            self._pre_ingest_view(run) for run in trailing
+        ]
+        result["world_revision"] = int(self.store.current_world_revision())
         return result
