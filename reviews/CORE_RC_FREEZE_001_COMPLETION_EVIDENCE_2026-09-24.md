@@ -14,7 +14,7 @@ Public release/tag performed: **NO**
 
 - Frozen software RC commit: `773876f92d5f8e53422f8f5a68cc651953d93052`.
 - Tested exact RC-freeze packet candidate: `11f4aed2eba055356730dc77922ced39b25a7d63`.
-- Candidate -> final PR handoff is evidence-only: the next commit changes only this completion-evidence report.
+- Candidate -> final PR handoff is evidence-only: all subsequent handoff commits change only this completion-evidence report.
 - At exact candidate `11f4aed2...`, compare against frozen main changes exactly seven documentation/governance files:
   - `AIOS_v3.0_CURRENT_CHECKPOINT.md`
   - `PROJECT_MASTER_MAP.md`
