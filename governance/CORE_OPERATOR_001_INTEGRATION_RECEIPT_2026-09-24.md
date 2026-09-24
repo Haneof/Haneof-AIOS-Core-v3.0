@@ -1,4 +1,6 @@
-# CORE-OPERATOR-001 集成收据及 PM 接任核验（2026-09-24）
+# CORE-OPERATOR-001 集成收据补充（2026-09-24）
+
+> 主接任核验记录见 `governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`（#137，已合入）。本文件只补充其中未登记的项：合后 Gate run、#130 处置、FIX 分支现场、验收提示词。两者结论一致，不构成第二套计划。
 
 Role: AIOS Core Delivery PM（接任）。这是普通治理写回，由 PM 明示自审；不是独立工程或语义验收。
 
