@@ -38,7 +38,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional, Sequence, Tuple
 
+from aios_core.contracts.enums import ErrorCode
 from aios_core.contracts.time import as_utc
+from aios_core.storage.sqlite_store import StoreError
 
 _WORD_RE = re.compile(r"[a-z0-9_]+")
 _CJK_RUN_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]+")
@@ -811,6 +813,45 @@ class WorldSearchIndex:
         "split",
     }
 
+    def _payload_visible(self, payload: Mapping[str, Any]) -> bool:
+        if bool(payload.get("pruned")):
+            return False
+        status = str(payload.get("status") or "active").strip().lower()
+        if status in self._INACTIVE_CURRENT_STATUSES:
+            return False
+        if str(payload.get("object_type") or "") == "summary":
+            if str(payload.get("summary_status") or "").strip().lower() == "stale":
+                return False
+        if str(payload.get("object_type") or "") == "evidence_set":
+            if bool(payload.get("stale")):
+                return False
+        return True
+
+    def _payload_at_cutoff(
+        self,
+        object_id: str,
+        as_of: datetime,
+    ) -> Mapping[str, Any] | None:
+        try:
+            payload = self._store.get_payload(
+                object_id,
+                knowledge_cutoff=as_utc(as_of, "as_of"),
+            )
+        except StoreError as exc:
+            if exc.code is ErrorCode.NOT_FOUND:
+                return None
+            raise
+        raw_learned = payload.get("learned_at")
+        if not isinstance(raw_learned, str) or not raw_learned.strip():
+            return None
+        try:
+            learned_at = as_utc(datetime.fromisoformat(raw_learned), "learned_at")
+        except (TypeError, ValueError):
+            return None
+        if learned_at > as_utc(as_of, "as_of"):
+            return None
+        return payload
+
     def _visible_in_current_view(
         self,
         object_id: str,
@@ -828,23 +869,9 @@ class WorldSearchIndex:
             # the rebuildable index and intentionally have no WorldStore payload.
             return True
         payload = self._store.get_payload(object_id)
-
         if int(payload.get("revision", 0)) != int(revision):
             return False
-
-        status = str(payload.get("status") or "active").strip().lower()
-        if status in self._INACTIVE_CURRENT_STATUSES:
-            return False
-
-        if str(payload.get("object_type") or "") == "summary":
-            if str(payload.get("summary_status") or "").strip().lower() == "stale":
-                return False
-
-        if str(payload.get("object_type") or "") == "evidence_set":
-            if bool(payload.get("stale")):
-                return False
-
-        return True
+        return self._payload_visible(payload)
 
     def search_mind(
         self,
@@ -955,18 +982,23 @@ class WorldSearchIndex:
             for r in rows:
                 oid = r["object_id"]
                 rev = int(r["revision"])
-                if oid in tombstones:
+                if as_of is None and oid in tombstones:
                     continue
                 if candidate_pairs is not None and (oid, rev) not in candidate_pairs:
                     continue
-                if as_of is not None and not self._known_at_cutoff(
-                    conn,
-                    str(oid),
-                    rev,
-                    as_of,
-                ):
-                    continue
-                if not include_inactive and not self._visible_in_current_view(
+                if as_of is not None:
+                    if str(r["object_type"]) == "reinterpretation":
+                        if not self._known_at_cutoff(conn, str(oid), rev, as_of):
+                            continue
+                    else:
+                        historical = self._payload_at_cutoff(str(oid), as_of)
+                        if historical is None:
+                            continue
+                        if int(historical.get("revision", 0)) != rev:
+                            continue
+                        if not include_inactive and not self._payload_visible(historical):
+                            continue
+                elif not include_inactive and not self._visible_in_current_view(
                     str(oid),
                     rev,
                     str(r["object_type"]),
@@ -1159,7 +1191,7 @@ class WorldSearchIndex:
 
             rows: list[tuple[sqlite3.Row, int]] = []
             for (object_id, revision), score in hits_map.items():
-                if object_id in tombstones:
+                if as_of is None and object_id in tombstones:
                     continue
                 row = conn.execute(
                     """
@@ -1175,26 +1207,36 @@ class WorldSearchIndex:
                 ).fetchone()
                 if row is None:
                     continue
-                if as_of is not None and not self._known_at_cutoff(
-                    conn,
-                    str(object_id),
-                    int(revision),
-                    as_of,
-                ):
-                    continue
-
-                latest = conn.execute(
-                    "SELECT MAX(revision) FROM search_occurred WHERE object_id=?",
-                    (object_id,),
-                ).fetchone()
-                if latest is not None and int(latest[0]) != int(revision):
-                    continue
-                if not include_inactive and not self._visible_in_current_view(
-                    str(object_id),
-                    int(revision),
-                    str(row["object_type"]),
-                ):
-                    continue
+                if as_of is not None:
+                    if str(row["object_type"]) == "reinterpretation":
+                        if not self._known_at_cutoff(
+                            conn,
+                            str(object_id),
+                            int(revision),
+                            as_of,
+                        ):
+                            continue
+                    else:
+                        historical = self._payload_at_cutoff(str(object_id), as_of)
+                        if historical is None:
+                            continue
+                        if int(historical.get("revision", 0)) != int(revision):
+                            continue
+                        if not include_inactive and not self._payload_visible(historical):
+                            continue
+                else:
+                    latest = conn.execute(
+                        "SELECT MAX(revision) FROM search_occurred WHERE object_id=?",
+                        (object_id,),
+                    ).fetchone()
+                    if latest is not None and int(latest[0]) != int(revision):
+                        continue
+                    if not include_inactive and not self._visible_in_current_view(
+                        str(object_id),
+                        int(revision),
+                        str(row["object_type"]),
+                    ):
+                        continue
                 if subject is not None and str(row["subject_id"]) != subject:
                     continue
                 if dimension is not None and str(row["dimension"] or "") != dimension:
