@@ -1,0 +1,100 @@
+{
+  "verified_at_utc": "2026-09-24T02:28:54.460597+00:00",
+  "result": "PASS: ten Core fixes integrated into main and post-merge software verification complete",
+  "main_commit": "6924d8b50cf08eb632f9cfa513a3cc49faad0c72",
+  "merge_pr": 127,
+  "merge_parents": [
+    "849bfd41c623fb336b392a3e6e933cfad93620e9",
+    "ba3ed05ec751f80b890aed2dfc2be12ec80d597d"
+  ],
+  "main_tree": "b375420314c4c6e3226aaca99d4f77a6086cd8c0",
+  "core_tree": "7db4f72e7b3c29c74082f9984141159f8f1d6071",
+  "regression_blob": "e4ce7c223452e04fa10f9cb0bbcf787fe4feb00e",
+  "source_export_files": 132,
+  "source_hashes_verified_after_tests": true,
+  "main_complete_tree_equals_reviewed_candidate": true,
+  "changed_paths_count": 27,
+  "original_repair_files": 17,
+  "additional_evidence_files": 10,
+  "local_python": "3.12.11",
+  "local_pytest": "8.4.2",
+  "local_pydantic": "2.13.5",
+  "local_sqlite": "3.40.1",
+  "local_results": {
+    "core": {
+      "tests": 409,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "bugs": {
+      "tests": 42,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "public": {
+      "tests": 492,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "local_default_collection": 501,
+  "local_excluded_fixture_cases": [
+    "tests/habitation/test_fixture_separation.py::test_resident_fixture_contains_only_deliverable_life_events",
+    "tests/habitation/test_fixture_separation.py::test_oracle_fixture_is_physically_separate_from_resident_stream",
+    "tests/habitation/test_fixture_separation.py::test_manifest_requires_fresh_world_and_evaluator_only_oracle",
+    "tests/habitation/test_fixture_separation.py::test_catalog_scenarios_have_separate_resident_and_oracle_files",
+    "tests/habitation/test_fixture_separation.py::test_catalog_focuses_on_behavior_not_expected_response_strings",
+    "tests/habitation/test_fixture_separation.py::test_resident_subject_ids_are_opaque_and_non_semantic",
+    "tests/habitation/test_fixture_separation.py::test_every_catalog_fixture_bundle_has_matching_resident_and_oracle_identity",
+    "tests/habitation/test_sol_manual_resident_replay.py::test_sol_manual_resident_replay_exposes_learned_custom_policies",
+    "tests/habitation/test_provider_evaluator.py::test_evaluator_cli_writes_report_for_matching_completed_run"
+  ],
+  "per_bug_attributions": {
+    "A01": 4,
+    "A02": 1,
+    "A03": 3,
+    "A04": 9,
+    "A05": 4,
+    "A06": 2,
+    "A07": 13,
+    "A08": 1,
+    "A09": 5,
+    "A10": 2
+  },
+  "main_ci": {
+    "workflows": 23,
+    "checks": 46,
+    "all_success": true,
+    "full_default_regression_run": 35947043535,
+    "full_default_regression_job": 107467211750,
+    "exact_ci_test_count": "NOT_EXTRACTED: log asset download EOF; API confirms successful actual-main full-regression step, no count invented"
+  },
+  "preserved_prs": [
+    {
+      "baseRefName": "main",
+      "headRefOid": "d2058bfc1f089d743aea3c323f1c91c4ba7e85ff",
+      "number": 125,
+      "state": "OPEN"
+    },
+    {
+      "baseRefName": "arena/01a0cf25-haneof-aios-core-v3-0",
+      "headRefOid": "8e31deca02a5062d7bb9ffe6dd840abbaaf6970e",
+      "number": 126,
+      "state": "OPEN"
+    }
+  ],
+  "pr125_external_advance": {
+    "before": "996638c90a0b167a228c90cb5020b0ebbe0643da",
+    "after": "d2058bfc1f089d743aea3c323f1c91c4ba7e85ff",
+    "written_by_this_session": false,
+    "incorporated_into_main": false
+  },
+  "formal_isolation": "NOT_TESTED",
+  "real_A_B_C": "NOT_TESTED",
+  "resident": "BLOCKED",
+  "launchable": false,
+  "release_approval": false
+}
