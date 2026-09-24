@@ -2605,3 +2605,122 @@ def test_loop_completed_retry_keeps_prior_attempt_model_calls_in_budget_status(
     assert status["used_wakes"] == 1
     assert status["used_model_calls"] == 2
     assert status["used_tokens"] == 24
+
+
+def test_cg001_resumed_c14_uses_first_start_as_model_visible_read_cut(tmp_path):
+    """A resumed C14 execution must not read T2 facts while writing cognition at T1."""
+    store, index = _world(tmp_path)
+    leaf = _observation(
+        store,
+        "obs_cg001_c14_t1_leaf",
+        value="cg001 c14 grounding leaf",
+        dimension="dim:cg001:c14",
+        at=NOW,
+    )
+    summary_ref = _summary(
+        store,
+        "sum_cg001_c14",
+        (leaf,),
+        dimension="dim:cg001:c14",
+        at=NOW + timedelta(minutes=10),
+    )
+    scheduled = _schedule(store, index, summary_ref)
+    t1 = NOW + timedelta(minutes=30)
+    t2 = t1 + timedelta(minutes=5)
+
+    def first_model(snapshot):
+        return ModelDirective(
+            capability_calls=(
+                CapabilityCall(
+                    name="search_world",
+                    arguments={"query": "cg001 c14 first pass", "limit": 1},
+                ),
+            ),
+            **_usage(snapshot),
+        )
+
+    first_runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=first_model,
+        max_tool_rounds=0,
+    )
+    first = first_runtime.run_wake(
+        wake_ref=ObjectRef(
+            object_id=scheduled.wake.wake_id,
+            revision=scheduled.wake.revision,
+        ),
+        now=t1,
+    )
+    assert first.runtime is not None
+    assert first.runtime.termination_reason == "tool_round_budget_exhausted"
+
+    late = _observation(
+        store,
+        "obs_cg001_c14_t2_late",
+        value="cg001 c14 late temporal marker gamma",
+        dimension="dim:cg001:c14",
+        at=t2,
+    )
+    index.catch_up()
+    seen = {}
+
+    def resumed_model(snapshot):
+        history = snapshot.capability_history
+        if not history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="search_world",
+                        arguments={
+                            "query": "cg001 c14 late temporal marker gamma",
+                            "limit": 5,
+                        },
+                    ),
+                ),
+                **_usage(snapshot),
+            )
+        if len(history) == 1:
+            search = history[-1]
+            assert search.ok is True
+            assert late.object_id not in {
+                item["object_id"] for item in search.data
+            }
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="commit_claim",
+                        arguments={
+                            "content": "cg001 resumed C14 write remains pinned to T1",
+                            "evidence_refs": [leaf.model_dump(mode="json")],
+                            "confidence": 0.8,
+                            "dimension": "dim:cg001:cognition",
+                        },
+                    ),
+                ),
+                **_usage(snapshot),
+            )
+        written = history[-1]
+        assert written.ok is True
+        seen["claim_id"] = written.data["claim_id"]
+        return ModelDirective(silence=True, **_usage(snapshot))
+
+    resumed_runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=resumed_model,
+    )
+    resumed = resumed_runtime.run_wake(
+        wake_ref=ObjectRef(
+            object_id=first.wake.wake_id,
+            revision=first.wake.revision,
+        ),
+        now=t2,
+    )
+
+    assert resumed.runtime is not None
+    assert resumed.runtime.silenced is True
+    written_payload = store.get_payload(seen["claim_id"])
+    assert datetime.fromisoformat(
+        str(written_payload["learned_at"]).replace("Z", "+00:00")
+    ) == t1
