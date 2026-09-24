@@ -29,6 +29,12 @@ jobs:
           # resident/fixture evidence must remain byte-identical to the task baseline.
           git diff --exit-code c8807876ba62a4f4180beba8ff974e2342786340 HEAD -- src/aios_core
           git diff --exit-code c8807876ba62a4f4180beba8ff974e2342786340 HEAD -- reviews/internal_habitation
+      - name: Exact three historical operator regressions
+        run: |
+          python -m pytest -o addopts='' -q \
+            tests/preflight/test_driver.py::test_clock_reuses_existing_scheduler_at_intermediate_deadline_without_future_input \
+            tests/preflight/test_round3_fixes.py::test_old_wake_cannot_see_future_input \
+            tests/preflight/test_round3_fixes.py::test_budget_deferral_not_forced
       - name: Synthetic transport and handoff-negative checks only
         run: python -m pytest -o addopts='' -q tests/preflight --junitxml=preflight-results.xml
       - name: Relevant existing Core regressions (synthetic Worlds)
