@@ -6,7 +6,7 @@
 - `CORE-GAP-AUDIT-001 = DONE`：PR #132 accepted/merged at `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`；audited Core tree `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
 - Audit disposition: 3 STILL_OPEN RC blockers / 14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE。
 - Active audited Core gap blocker: none. CG-001 / CG-002 / CG-003 are DONE.
-- S2 当前：`CORE-GAP-FIX-001/002/003 = DONE`；`CORE-CI-FIX-001 = DONE`；`CORE-HEADLESS-001 = DONE`；`CORE-RECOVERY-001 = DONE`；`CORE-SCALE-001 = DONE`；`CORE-RC-FREEZE-001 = DONE`。独立验收 #203 先合 `85c0aba5...`，candidate #202 后合 `305aea16...`；frozen software `773876f9...` / Core tree `fe77f8a0...`；impact `FRESH_A_REQUIRED`。唯一下一 READY = `C15-RCC-RES-A-RERUN-002`。
+- S2 当前：`CORE-GAP-FIX-001/002/003 = DONE`；`CORE-CI-FIX-001 = DONE`；`CORE-HEADLESS-001 = DONE`；`CORE-RECOVERY-001 = DONE`；`CORE-SCALE-001 = DONE`；`CORE-RC-FREEZE-001 = DONE`。独立验收 #203 先合 `85c0aba5...`，candidate #202 后合 `305aea16...`；frozen software `773876f9...` / Core tree `fe77f8a0...`；impact `FRESH_A_REQUIRED`。`C15-RCC-RES-A-RERUN-002` 已完成 Phase A 并进入 `GATE / REVIEW_READY`（PR #205 @ `d17ae972...`）；唯一下一 READY = `C15-RCC-RES-A-RERUN-002-ACCEPT-001`。
 - `CORE-OPERATOR-001 = DONE`：#135 ACCEPTANCE_PASS → #131 exact head `0e1d69ee` merged at `e72a63874ed2c28798b00cec51f191caf1594a00`；Core ZERO DIFF；#130 SUPERSEDED。
 - 单一集成收据（两份 PM 写回已对账合并）：`governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`；含集成时 API 复核、本地 repro/修复复算（`3865da88` 三项失败 → accepted head `632 passed`）、合后 push gate run `35958610555` SUCCESS 及全部诚实限制。operator 集成不是 SOFTWARE_RC，也不是 CORE_COMPLETE。
 - 路线保持：operator acceptance + three accepted gap fixes → headless → recovery → scale → RC freeze ✅ → `C15-RCC-RES-A-RERUN-002` → A independent acceptance → B preflight/release/rerun/accept → attested C → C15 close → C16 → broad P16 → P17 Core release closure。
@@ -22,13 +22,13 @@
 
 ---
 
-## 0. 当前项目快照 — 2026-09-24 RC-FREEZE DONE / fresh A-002 READY
+## 0. 当前项目快照 — 2026-09-25 RC-FREEZE DONE / fresh A-002 REVIEW_READY / A acceptance READY
 
 > **PM / 工程 / operator 导航，不是 Resident 盲测资料。** 盲测 Resident 不读地图/任务板/checkpoint，只接收独立放行的安全包。
 
 - 已验证治理 merge：`2a68df3f8901138fa3126a91063c430f69102049`（PR #122）；frozen Core：`bcd6bf353126318f9a97076b52ec1740d43f35a4`。
 - P0–P15：已形成 Core 机制与阶段 Gate；不等于真实设备产品集成或长期模型认知已全面通过。
-- C14：已正式 PASS；C15 hardening：已冻结。historical canonical A #117 仍对其 old Core 有效，但对新 RC 仅属历史证据；RC impact = `FRESH_A_REQUIRED`，新任务 `C15-RCC-RES-A-RERUN-002 = READY`。
+- C14：已正式 PASS；C15 hardening：已冻结。historical canonical A #117 仍对其 old Core 有效，但对新 RC 仅属历史证据；RC impact = `FRESH_A_REQUIRED`；新 RC Fresh A-002 已完成 Phase A，PR #205 @ `d17ae972...` = `RUN_COMPLETE / AWAITING_INDEPENDENT_ACCEPTANCE`；当前 A acceptance = READY。
 - B：#121 已提交但当前 candidate **NOT ACCEPTED**（执行证据不足、最终索引落后）；不是“尚无人执行”，也不是“报告写 PASS 所以完成”。
 - 纠偏治理：`C15-RCC-RES-B-CORRECTIVE-001 = DONE`；PR #122 历史合入事实不变。其原先释放的 B preflight 已被后续 Core completion / RC-FREEZE 影响裁决重新阻塞；当前必须先完成 `C15-RCC-RES-A-RERUN-002` 及 fresh independent acceptance，之后才可重新释放 B preflight。
 - 纠偏裁决：`governance/C15_RCC_RES_B_CORRECTIVE_DECISION_2026-09-23.md`；审查证据：`reviews/C15_RCC_RES_B_001_PM_CORRECTIVE_REVIEW_2026-09-23.md`。
@@ -38,7 +38,7 @@
 |---|---|
 | C13 / 历史 T34/T36/T28/T35/T33 修复 | 已有 task-board 完成证据；不因旧 Issue OPEN 重做 |
 | C14 持续认知派生 | 正式收口 PASS |
-| C15 Resident A | historical #117 仅对 old Core 有效；新 RC 要求 `C15-RCC-RES-A-RERUN-002 = READY`，fresh World/session，完成后独立验收 |
+| C15 Resident A | historical #117 仅对 old Core 有效；新 RC `C15-RCC-RES-A-RERUN-002` 已完成 Phase A（PR #205 @ `d17ae972...`，World/index `98/98`）；当前等待 `C15-RCC-RES-A-RERUN-002-ACCEPT-001` 独立验收 |
 | C15 旧 B candidate | #121 NOT ACCEPTED；保留 immutable non-canonical evidence |
 | C15 B 恢复链 | BLOCKED on new-RC A independent acceptance → operator preflight → 独立放行 → fresh B → 独立接受 |
 | C15 C 与终评 | B 接受 + 可信模型身份前置后才可启动 C；R1–R9 全 VALID 才收口 |
