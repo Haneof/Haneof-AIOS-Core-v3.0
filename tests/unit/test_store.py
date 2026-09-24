@@ -97,5 +97,3 @@ def test_wrong_object_revision_rejected(tmp_path):
     with pytest.raises(StoreError) as exc:
         store.commit([make_obs(oid, 2, "bad")], op(0, "k1"))
     assert exc.value.code == ErrorCode.VERSION_CONFLICT
-
-# CORE-RC-FREEZE-001 transient probe trigger; test semantics unchanged.

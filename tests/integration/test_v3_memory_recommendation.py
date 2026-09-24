@@ -174,5 +174,3 @@ def test_external_fact_and_grounded_claim_remain_proactively_recallable(tmp_path
 
     claim_bundle = recommender.recommend(current_topic="提前十分钟到场")
     assert any(card.object_id == receipt.claim_id for card in claim_bundle.cards)
-
-# CORE-RC-FREEZE-001 transient probe trigger; test semantics unchanged.

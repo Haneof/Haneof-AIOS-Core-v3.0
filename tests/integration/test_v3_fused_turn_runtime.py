@@ -1624,5 +1624,3 @@ def test_cg001_historical_ai_world_reads_preserve_latest_knowable_revision(tmp_p
     )
 
     assert result.runtime.response == "historical cognition stayed on rev1"
-
-# CORE-RC-FREEZE-001 transient probe trigger; test semantics unchanged.

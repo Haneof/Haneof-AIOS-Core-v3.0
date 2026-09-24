@@ -550,5 +550,3 @@ def test_t36_incremental_rebuild_subject_current_and_inactive_rules(tmp_path):
     assert tombstone_id not in {
         hit.object_id for hit in idx.recall_candidates("deletedtoken").hits
     }
-
-# CORE-RC-FREEZE-001 transient probe trigger; test semantics unchanged.

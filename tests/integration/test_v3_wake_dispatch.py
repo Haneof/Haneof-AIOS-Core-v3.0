@@ -750,5 +750,3 @@ def test_periodic_review_task_due_and_generic_wake_dispatch_form_one_loop(tmp_pa
         if item.get("source_kind") == "conversation"
     ]
     assert conversation_observations == []
-
-# CORE-RC-FREEZE-001 transient probe trigger; test semantics unchanged.
