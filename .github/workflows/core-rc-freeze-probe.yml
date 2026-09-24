@@ -205,7 +205,7 @@ jobs:
                   tables={r[0] for r in c.execute("select name from sqlite_master where type='table'")}
                   def count(name):
                       return c.execute(f"select count(*) from {name}").fetchone()[0] if name in tables else None
-                  ids=[tuple(r) for r in c.execute("select object_id, object_revision from object_revisions order by object_id, object_revision")]
+                  ids=[tuple(r) for r in c.execute("select object_id, revision from object_revisions order by object_id, revision")]
                   return {
                       "world_revision": c.execute("select coalesce(max(world_revision),0) from world_commits").fetchone()[0],
                       "object_revisions": count("object_revisions"),
