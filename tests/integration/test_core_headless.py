@@ -7,6 +7,7 @@ import pytest
 from aios_core.contracts.enums import SourceClass, WakeSource
 from aios_core.contracts.refs import ObjectRef
 from aios_core.headless import HeadlessConfig, HeadlessCore, HeadlessWriterBusy
+from aios_core.headless.testing import deterministic_model_handler
 from aios_core.ingest.reality import RealityRecord, SourceAdapterSpec
 from aios_core.runtime.background_attempt import BackgroundModelExecutionInDoubt
 from aios_core.runtime.capabilities import CapabilityCall
@@ -36,7 +37,7 @@ def config(tmp_path):
 
 
 def test_headless_start_turn_ingest_stop_restart_same_world(tmp_path):
-    handler = CountingHandler("assistant-one")
+    handler = deterministic_model_handler
     cfg = config(tmp_path)
     spec = SourceAdapterSpec(
         adapter_id="headless-test-source",
@@ -63,9 +64,13 @@ def test_headless_start_turn_ingest_stop_restart_same_world(tmp_path):
         )
         before = first.status()
         assert receipt.observation_id
-        assert result.runtime.response == "assistant-one"
+        assert result.runtime.response == "HEADLESS_MECHANICAL_OK"
         assert before["world_revision"] == before["index_watermark"]
-        assert handler.calls == 1
+        assert first.runtime is not None
+        meter_count = len(
+            first.runtime.metering.list_model_calls(subject_id=cfg.subject_id)
+        )
+        assert meter_count == 1
 
     with HeadlessCore(config=cfg, model_handler=handler) as second:
         after = second.status()
@@ -74,9 +79,17 @@ def test_headless_start_turn_ingest_stop_restart_same_world(tmp_path):
         assert after["index_lag"] == 0
         payload = second.store.get_payload(receipt.observation_id, revision=1)
         assert payload["value"] == "durable external fact"
+        assert second.runtime is not None
+        assert len(
+            second.runtime.metering.list_model_calls(subject_id=cfg.subject_id)
+        ) == meter_count
 
     with HeadlessCore(config=cfg, model_handler=handler) as third:
         assert third.status()["world_revision"] == before["world_revision"]
+        assert third.runtime is not None
+        assert len(
+            third.runtime.metering.list_model_calls(subject_id=cfg.subject_id)
+        ) == meter_count
 
 
 def test_headless_single_writer_fails_closed_and_releases_on_stop(tmp_path):
@@ -196,6 +209,18 @@ def test_headless_restart_keeps_pending_due_work_and_executes_after_reopen(tmp_p
     finally:
         second.stop()
 
+    third = HeadlessCore(config=cfg, model_handler=handler).start()
+    try:
+        due_again = third.process_due_work(
+            now=T2 + timedelta(minutes=1),
+            max_wakes=1,
+            include_periodic_review=False,
+        )
+        assert due_again.wakes == ()
+        assert handler.calls == 1
+    finally:
+        third.stop()
+
 
 class AmbiguousHandler:
     def __init__(self) -> None:
@@ -286,16 +311,33 @@ def test_headless_restart_keeps_fix001_historical_knowledge_cut(tmp_path):
         modality="text",
     )
 
-    with HeadlessCore(config=cfg, model_handler=setup_handler) as first:
-        first.ingest_external_fact(adapter=late_spec, record=late_record)
+    first = HeadlessCore(config=cfg, model_handler=setup_handler).start()
+    assert first.runtime is not None
+    first.ingest_external_fact(adapter=late_spec, record=late_record)
+    receipt = first.runtime.wake_bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.SAFETY,
+            rule_id="historical-background-cut",
+            observed_at=T1,
+            priority=100,
+            dedupe_key="historical-background-cut",
+        )
+    )
+    first.stop()
 
     probe = TemporalProbeHandler()
-    with HeadlessCore(config=cfg, model_handler=probe) as restarted:
-        result = restarted.submit_user_turn(
-            session_id="historical-cut",
-            turn_index=1,
-            user_input="what did I know then?",
-            occurred_at=T1,
+    restarted = HeadlessCore(config=cfg, model_handler=probe).start()
+    try:
+        assert restarted.runtime is not None
+        result = restarted.runtime.run_wake(
+            wake_ref=ObjectRef(
+                object_id=receipt.wake_id,
+                revision=receipt.revision,
+            ),
+            now=T1,
         )
+        assert result.runtime is not None
         assert result.runtime.response == "historical cut preserved"
         assert probe.calls == 2
+    finally:
+        restarted.stop()
