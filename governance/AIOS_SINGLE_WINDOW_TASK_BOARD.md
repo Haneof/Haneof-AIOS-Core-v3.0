@@ -1,6 +1,6 @@
 # AIOS v3.0 单窗口任务执行总表
 
-## 当前控制入口 — 2026-09-24 FIX-001 DONE / FIX-002 DONE / FIX-003 REBASE+REVALIDATE REQUIRED / CI-FIX DONE
+## 当前控制入口 — 2026-09-24 FIX-001 DONE / FIX-002 DONE / FIX-003 POST-FIX001 REVIEW_READY / CI-FIX DONE
 
 - 接任 PM 依 #128 治理接手；接手与 live 复核：`governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
 - **派工基线 = live main `079d7516f195cf6973933acc8cd057d59adc3a9f`**（其后仅治理/审查文档变更）；`CORE-OPERATOR-001` 集成点 = `e72a63874ed2c28798b00cec51f191caf1594a00`；Core tree 自审计以来始终 `7db4f72e7b3c29c74082f9984141159f8f1d6071`。每个新窗口仍须自行重取 live main，不得把本 SHA 当永久施工基线。
@@ -42,7 +42,7 @@
 | CORE-CI-FIX-001 | **DONE** | 首轮 #150 ACCEPTANCE_FAIL 历史保留；corrective #156 ACCEPTANCE_PASS / 0 blockers；#146 exact `1eb24e101cdb1579c22c69b435cf9f79a3c359ad` merged as `c3ec42214db57864f7951e28b75811b10db8be21`；receipt `governance/CORE_CI_FIX_001_INTEGRATION_RECEIPT_2026-09-24.md` |
 | CORE-CI-FIX-001-CORRECTIVE-001 | **DONE** | blocker `CORE-CI-FIX-001-ACCEPT-BLOCKER-001` closed by the accepted corrective; historical fail evidence remains unchanged |
 | CORE-GAP-FIX-003 | **GATE / ACCEPTANCE_FAIL** | Independent review #162 对 exact `81d626820cfa31e4f3f1aba0e892eb48cb11e46c` 给出 ACCEPTANCE_FAIL；唯一 blocker `CORE-GAP-FIX-003-ACCEPT-BLOCKER-001` = initial user-turn claim 与 round-0 provider-attempt admission 之间存在 crash dead zone；PR #157 保持 OPEN / UNMERGED，不得 merge |
-| CORE-GAP-FIX-003-CORRECTIVE-001 | **READY / REBASE_REVALIDATION_REQUIRED** | FIX-001 已先合入 main (`d97a1bfa...`)；旧 corrective head `ac8d5a43...` 不得直接 merge/accept-for-integration。继续原 PR #157，先 merge/rebase live main，再重跑 targeted + full gates，形成新 exact head 后重新独立验收。提示词：`governance/prompts/CORE_GAP_FIX_003_REBASE_AFTER_FIX001_2026-09-24.md` |
+| CORE-GAP-FIX-003-CORRECTIVE-001 | **GATE / REVIEW_READY (POST-FIX001)** | 原 PR #157 已吸收 FIX-001-integrated main `9cfcd2d7...`，新 exact head `7c0c51a7e9cda41a5aa61357ebba96955948a4a7`；13/13 workflows SUCCESS，P16 run `35986286182` / job `107589604043`，`pytest -q` 100%（662 pass markers）；当前仅等待 fresh post-FIX001 Independent Acceptance。提示词：`governance/prompts/CORE_GAP_FIX_003_POST_FIX001_REVALIDATION_ACCEPTANCE_2026-09-24.md` |
 | CORE-HEADLESS-001 | **BLOCKED** | OPERATOR accepted + FIX-001/002/003 accepted/integrated |
 | CORE-RECOVERY-001 | **BLOCKED** | HEADLESS + 三项 gap 修复进入 S2 candidate |
 | CORE-SCALE-001 | **BLOCKED** | S2 功能候选 |
@@ -50,7 +50,7 @@
 | 新 C15 fresh A → B → C / EVAL / CLOSE | **BLOCKED** | RC-FREEZE；旧 #117 A 不能 hash-swap 为新 RC A |
 | C16 → P16 → P17 | **BLOCKED** | 保留原逐项 Gate；只有 P17 PASS 才可称 Core complete |
 
-FIX-001 与 FIX-002 均已完成并集成。串行规则现已落到 FIX-003：#157 必须先基于含 FIX-001 的 live main rebase/merge、重跑 Gate、生成新 exact head，再由新的 Independent Reviewer 验收；旧 `ac8d5a43...` 不得直接交 PM merge。CI corrective 已关闭。
+FIX-001 与 FIX-002 均已完成并集成。FIX-003 已完成基于 FIX-001-integrated main 的 rebase/revalidation，新 exact head 为 `7c0c51a7...`，13/13 Gate 全绿；当前唯一合法下一步是 fresh post-FIX001 Independent Acceptance。旧 `ac8d5a43...` 与 #174 仅保留为历史序列化证据。CI corrective 已关闭。
 
 > Status: ACTIVE  
 > Effective: 2026-09-21  
