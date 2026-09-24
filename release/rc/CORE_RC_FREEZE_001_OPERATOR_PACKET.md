@@ -1,6 +1,6 @@
 # CORE-RC-FREEZE-001 Operator Packet
 
-Status: RC FREEZE CANDIDATE — pending independent acceptance  
+Status: **REVIEW_READY candidate — pending independent acceptance**  
 Repository: `Haneof/Haneof-AIOS-Core-v3.0`
 
 ## 1. Frozen software boundary
@@ -231,3 +231,46 @@ This software RC explicitly does **not** claim:
 - final AIOS Core completion.
 
 The software RC remains subject to fresh Resident continuity, C16, applicable broad P16, and P17 release-closure gates. No public release/tag is authorized by CORE-RC-FREEZE-001.
+
+
+## 12. Fresh RC-FREEZE verification
+
+The final software-only probe ran against the frozen Core/tests tree with only transient workflow trigger comments plus the RC probe workflow on the PR branch. The final release candidate removes all transient workflow changes.
+
+Fresh successful evidence:
+
+- full P16: run `36019155127`, job `107699305204` — SUCCESS, 692 pass markers / 100%;
+- RC clean-install/full-regression probe: run `36019155145`, job `107699305699` — SUCCESS;
+- non-editable wheel build/install — SUCCESS;
+- direct full `pytest -q` — 692 pass markers / 100%;
+- installed headless lifecycle — SUCCESS;
+- backup/restore/index rebuild/source-logical-immutability smoke — SUCCESS;
+- writer/restart + FIX-001/002/003 spot checks — 156 pass markers / 100%;
+- headless: `36019154789` — SUCCESS;
+- recovery: `36019154783` — SUCCESS;
+- scale: `36019154843` — SUCCESS;
+- world-kernel: `36019155008` — SUCCESS;
+- world-index: `36019154864` — SUCCESS;
+- memory-recommendation: `36019154801` — SUCCESS;
+- fused-turn-runtime: `36019154857` — SUCCESS;
+- C09 Wake: `36019154941` — SUCCESS;
+- P15 Periodic Review: `36019154821` — SUCCESS;
+- C14 runtime/scheduler/loop: `36019155213` / `36019154823` / `36019154793` — SUCCESS;
+- constitutional cognition closure: `36019154893` — SUCCESS.
+
+The RC probe artifact is `10816735414`, digest
+`sha256:b759cd6d74a33f8cebc9e58576181c81ede2fe788e0ea1be4ed873d020f4c093`.
+
+## 13. Historical Resident A impact decision
+
+**FRESH_A_REQUIRED**
+
+Historical canonical A #117 used Core tree
+`eed27d58041dbaf2ceb0a65c1305bb332aef082e`.
+
+This RC freezes Core tree
+`fe77f8a0706acfaf369041d0882b6d0e6de39f22`.
+
+The post-A integrated changes reach Resident-visible/execution-relevant paths including context/retrieval, temporal knowledge cut, Wake/Review, user-turn/background execution recovery, headless lifecycle, and SCALE read paths. Semantic identity for every Resident-visible path is therefore not proven.
+
+Historical #117 remains historical evidence only. It must not be hash-swapped or relabeled as new-RC Resident evidence. After independent RC-freeze acceptance and PM integration, any released Resident chain must start with a fresh private World / fresh context A on this frozen RC.
