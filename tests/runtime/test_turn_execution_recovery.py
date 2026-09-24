@@ -52,6 +52,38 @@ def successful_directive(request_id="cg003-ok"):
     )
 
 
+def test_cg003_pre_model_failure_is_durably_proven_not_dispatched(tmp_path, monkeypatch):
+    store, index = world(tmp_path)
+    model_calls = []
+
+    def model(_snapshot):
+        model_calls.append("called")
+        return successful_directive("must-not-run")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+
+    def fail_before_model(*, now):
+        raise RuntimeError("SYNTHETIC pre-model preparation failure")
+
+    monkeypatch.setattr(runtime.attention_watches, "expire_due", fail_before_model)
+    with pytest.raises(RuntimeError, match="pre-model preparation failure"):
+        runtime.run_turn(**TURN)
+
+    inspected = runtime.inspect_turn_execution(**TURN)
+    assert inspected.recovery_disposition == "safe_to_retry"
+    assert [attempt.state for attempt in inspected.model_attempts] == ["admitted"]
+    assert model_calls == []
+
+    with pytest.raises(TurnExecutionInDoubt):
+        runtime.run_turn(**TURN)
+
+    authorized = runtime.authorize_turn_retry(
+        **TURN,
+        evidence="durable attempt remained admitted before provider dispatch",
+    )
+    assert authorized.recovery_disposition == "retry_authorized"
+
+
 def test_cg003_known_not_submitted_requires_explicit_retry_authorization(tmp_path):
     store, index = world(tmp_path)
     calls = []
