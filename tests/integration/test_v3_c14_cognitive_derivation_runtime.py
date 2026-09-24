@@ -4,7 +4,11 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from aios_core.ai_world import AIWorldDomain
+from aios_core.ai_world import (
+    AIWorldClaimRequest,
+    AIWorldCognitionService,
+    AIWorldDomain,
+)
 from aios_core.contracts.enums import (
     ActionStatus,
     AttentionClass,
@@ -2662,11 +2666,26 @@ def test_cg001_resumed_c14_uses_first_start_as_model_visible_read_cut(tmp_path):
         dimension="dim:cg001:c14",
         at=t2,
     )
+    late_cognition_marker = "cg001 c14 T2 cognition must not enter T1 cockpit"
+    AIWorldCognitionService(store=store, index=index).commit(
+        AIWorldClaimRequest(
+            domain=AIWorldDomain.USER_UNDERSTANDING,
+            statement=late_cognition_marker,
+            evidence_refs=(late,),
+            confidence=0.9,
+            scope_key="cg001.c14.late",
+            tags=("core_context",),
+        ),
+        learned_at=t2,
+    )
     index.catch_up()
     seen = {}
 
     def resumed_model(snapshot):
         history = snapshot.capability_history
+        assert late_cognition_marker not in str(snapshot.cockpit["ai_identity"])
+        derivation = snapshot.cockpit["task_context"]["cognitive_derivation"]
+        assert late_cognition_marker not in str(derivation["current_ai_world"])
         if not history:
             return ModelDirective(
                 capability_calls=(
