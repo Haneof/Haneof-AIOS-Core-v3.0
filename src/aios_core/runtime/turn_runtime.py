@@ -98,6 +98,10 @@ from aios_core.world_graph import (
     RelationUpsertRequest,
 )
 
+from .background_attempt import (
+    BackgroundModelAttemptStore,
+    BackgroundModelExecutionInDoubt,
+)
 from .budget_gate import BackgroundBudgetDecision, BackgroundBudgetGate
 from .capabilities import CapabilityKind, CapabilityRegistry, CapabilitySpec
 from .cognitive_runtime import (
@@ -306,6 +310,7 @@ class FusedTurnRuntime:
             wake_bus=self.wake_bus,
             subject_id=self.subject_id,
         )
+        self.background_model_attempts = BackgroundModelAttemptStore(store)
         self.metering = ModelMeteringLedger(store)
         self.background_budget_gate = BackgroundBudgetGate(
             store=store,
@@ -1071,6 +1076,150 @@ class FusedTurnRuntime:
             max_tool_rounds=max_tool_rounds,
             side_effect_authorizer=self._authorize_side_effect,
             model_usage_recorder=self._record_model_usage,
+            model_attempt_admitter=self._admit_background_model_attempt,
+            model_dispatch_recorder=self._mark_background_model_dispatch,
+            model_response_recorder=self._record_background_model_response,
+            model_failure_recorder=self._record_background_model_failure,
+        )
+
+    def _active_background_attempt_scope(self) -> tuple[str, str] | None:
+        if self._active_wake_id is None:
+            return None
+        return (
+            (
+                "periodic_review"
+                if self._active_review_request is not None
+                else "wake"
+            ),
+            self._active_wake_id,
+        )
+
+    def _background_model_round_offset(
+        self,
+        *,
+        wake_id: str,
+        metadata: Mapping[str, Any],
+    ) -> int:
+        if not bool(metadata.get("runtime_incomplete")):
+            return 0
+        raw_next = metadata.get("runtime_incomplete_next_model_round_index")
+        if isinstance(raw_next, int) and not isinstance(raw_next, bool) and raw_next >= 1:
+            return raw_next
+
+        # Upgrade compatibility for pre-FIX-002 runtime-incomplete Wakes. The old
+        # runtime persisted this marker only after a ModelDirective had returned, and
+        # C13 metering was already written before requeue. Those durable meter rows
+        # prove that the old provider rounds returned; use their count only to choose
+        # a fresh post-upgrade round identity. Missing meter evidence fails closed.
+        legacy_records = self.metering.list_model_calls(
+            subject_id=self.subject_id,
+            wake_id=wake_id,
+        )
+        if not legacy_records:
+            raise RuntimeError(
+                "legacy runtime-incomplete work lacks durable metering evidence"
+            )
+        return len(legacy_records)
+
+    def _protect_legacy_running_background_work(
+        self,
+        *,
+        wake: Any,
+        work_kind: str,
+        wake_reason: str,
+        now: datetime,
+        model_round_offset: int,
+    ) -> None:
+        if wake.wake_state.value != "running":
+            return
+        metadata = wake.metadata
+        if bool(metadata.get("runtime_incomplete")):
+            return
+        existing = self.background_model_attempts.inspect(
+            subject_id=self.subject_id,
+            work_kind=work_kind,
+            work_id=wake.object_id,
+            model_round_index=model_round_offset,
+        )
+        if existing is not None:
+            return
+        if metadata.get("background_model_attempt_protocol") == "v1":
+            # New-code invariant: the Wake/Review became RUNNING before provider
+            # admission, and every provider call is preceded by a durable attempt.
+            # No attempt row therefore proves dispatch did not start yet.
+            return
+        adopted = self.background_model_attempts.adopt_legacy_in_doubt(
+            subject_id=self.subject_id,
+            work_kind=work_kind,
+            work_id=wake.object_id,
+            wake_reason=wake_reason,
+            model_round_index=model_round_offset,
+            world_revision=int(self.store.current_world_revision()),
+            observed_at=now,
+        )
+        raise BackgroundModelExecutionInDoubt(adopted)
+
+    def _admit_background_model_attempt(
+        self,
+        snapshot: RuntimeSnapshot,
+    ) -> str | None:
+        scope = self._active_background_attempt_scope()
+        if scope is None:
+            return None
+        if self._active_meter_time is None:
+            raise RuntimeError("background model attempt is missing execution time")
+        work_kind, work_id = scope
+        attempt = self.background_model_attempts.admit(
+            subject_id=self.subject_id,
+            work_kind=work_kind,
+            work_id=work_id,
+            wake_reason=snapshot.wake_reason,
+            model_round_index=snapshot.round_index,
+            world_revision=int(self.store.current_world_revision()),
+            admitted_at=self._active_meter_time,
+        )
+        return attempt.attempt_id
+
+    def _mark_background_model_dispatch(self, snapshot: RuntimeSnapshot) -> None:
+        if snapshot.model_attempt_id is None:
+            return
+        if self._active_meter_time is None:
+            raise RuntimeError("background model dispatch is missing execution time")
+        self.background_model_attempts.mark_dispatching(
+            snapshot.model_attempt_id,
+            dispatched_at=self._active_meter_time,
+        )
+
+    def _record_background_model_response(
+        self,
+        snapshot: RuntimeSnapshot,
+        directive: ModelDirective,
+    ) -> None:
+        if snapshot.model_attempt_id is None:
+            return
+        if self._active_meter_time is None:
+            raise RuntimeError("background model response is missing execution time")
+        self.background_model_attempts.record_response(
+            snapshot.model_attempt_id,
+            returned_at=self._active_meter_time,
+            directive=directive,
+        )
+
+    def _record_background_model_failure(
+        self,
+        snapshot: RuntimeSnapshot,
+        error: BaseException,
+        definitely_not_submitted: bool,
+    ) -> None:
+        if snapshot.model_attempt_id is None:
+            return
+        if self._active_meter_time is None:
+            raise RuntimeError("background model failure is missing execution time")
+        self.background_model_attempts.mark_failure(
+            snapshot.model_attempt_id,
+            failed_at=self._active_meter_time,
+            definitely_not_submitted=definitely_not_submitted,
+            error=error,
         )
 
     def _record_model_usage(
@@ -1106,6 +1255,7 @@ class FusedTurnRuntime:
             model_round_index=snapshot.round_index,
             usage=directive.usage,
             provenance=directive.provenance,
+            background_attempt_id=snapshot.model_attempt_id,
         )
 
     def _cockpit_capability_catalog(self) -> tuple[dict[str, Any], ...]:
@@ -3171,6 +3321,23 @@ class FusedTurnRuntime:
                 delivery_suppressed=True,
             )
 
+        model_round_offset = self._background_model_round_offset(
+            wake_id=wake.object_id,
+            metadata=wake.metadata,
+        )
+        self._protect_legacy_running_background_work(
+            wake=wake,
+            work_kind="wake",
+            wake_reason=wake.wake_source.value,
+            now=now,
+            model_round_offset=model_round_offset,
+        )
+        claim_metadata = budget_decision.reservation_metadata()
+        if wake.metadata.get("background_model_attempt_protocol") != "v1":
+            claim_metadata = {
+                **claim_metadata,
+                "background_model_attempt_protocol": "v1",
+            }
         claimed = self.wake_bus.claim(
             wake.object_id,
             started_at=now,
@@ -3179,7 +3346,7 @@ class FusedTurnRuntime:
                 if budget_decision.requires_reservation
                 else None
             ),
-            metadata_update=budget_decision.reservation_metadata(),
+            metadata_update=claim_metadata,
         )
         running = self.wake_bus.current_wake(claimed.wake_id)
         running_ref = ObjectRef(
@@ -3512,6 +3679,7 @@ class FusedTurnRuntime:
                 wake_reason=effective_wake_source.value,
                 cockpit=context.as_cockpit(),
                 max_model_rounds=budget_decision.model_round_limit,
+                model_round_offset=model_round_offset,
             )
         finally:
             self._active_turn_time = None
@@ -3570,6 +3738,9 @@ class FusedTurnRuntime:
                 requeued_at=now,
                 termination_reason=runtime_result.termination_reason,
                 model_rounds=runtime_result.model_rounds,
+                next_model_round_index=(
+                    model_round_offset + runtime_result.model_rounds
+                ),
                 capability_names=tuple(
                     item.name for item in runtime_result.capability_history
                 ),
@@ -3679,6 +3850,23 @@ class FusedTurnRuntime:
             )
         )
 
+        model_round_offset = self._background_model_round_offset(
+            wake_id=review_wake.object_id,
+            metadata=review_wake.metadata,
+        )
+        self._protect_legacy_running_background_work(
+            wake=review_wake,
+            work_kind="periodic_review",
+            wake_reason=WakeSource.PERIODIC_REVIEW.value,
+            now=now,
+            model_round_offset=model_round_offset,
+        )
+        review_metadata = budget_decision.reservation_metadata()
+        if review_wake.metadata.get("background_model_attempt_protocol") != "v1":
+            review_metadata = {
+                **review_metadata,
+                "background_model_attempt_protocol": "v1",
+            }
         request = self.periodic_review.begin_review(
             request,
             started_at=now,
@@ -3687,7 +3875,7 @@ class FusedTurnRuntime:
                 if budget_decision.requires_reservation
                 else None
             ),
-            metadata_update=budget_decision.reservation_metadata(),
+            metadata_update=review_metadata,
         )
         self.index.catch_up()
 
@@ -3762,6 +3950,7 @@ class FusedTurnRuntime:
                 wake_reason="periodic_review",
                 cockpit=context.as_cockpit(),
                 max_model_rounds=budget_decision.model_round_limit,
+                model_round_offset=model_round_offset,
             )
         finally:
             self._active_review_request = None
@@ -3773,6 +3962,18 @@ class FusedTurnRuntime:
         # Tool/capability budget exhaustion is not a completed semantic review.
         # Keep the durable Wake RUNNING so a later worker can resume the exact review.
         if runtime_result.termination_reason not in {"responded", "silence"}:
+            request = self.periodic_review.mark_runtime_incomplete(
+                request,
+                marked_at=now,
+                termination_reason=runtime_result.termination_reason,
+                model_rounds=runtime_result.model_rounds,
+                next_model_round_index=(
+                    model_round_offset + runtime_result.model_rounds
+                ),
+                capability_names=[
+                    result.name for result in runtime_result.capability_history
+                ],
+            )
             self.index.catch_up()
             return PeriodicReviewRunResult(
                 request=request,

@@ -17,6 +17,7 @@ from aios_core.query.search import WorldSearchIndex
 from aios_core.review import ReviewSchedulePolicy
 from aios_core.runtime.capabilities import CapabilityCall
 from aios_core.runtime.cognitive_runtime import ModelDirective, ModelUsage
+from aios_core.runtime import BackgroundModelExecutionInDoubt
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.wake import WakeSignalRequest
@@ -520,16 +521,17 @@ def test_running_budget_reservation_is_not_a_free_same_day_retry(tmp_path):
     assert "background_budget_reservation_already_running" in same_day.step0.reasons
     assert model_calls == 0
 
-    next_day = runtime.run_wake(
-        wake_ref=ObjectRef(object_id=wake.object_id, revision=2),
-        now=NOW + timedelta(days=1, minutes=5),
-    )
-    assert next_day.runtime is not None
-    assert next_day.runtime.silenced is True
-    assert next_day.wake.state == "completed"
-    assert model_calls == 1
-    latest = runtime.wake_bus.current_wake(wake.object_id)
-    assert latest.metadata["budget_window_start"].startswith("2026-09-22")
+    # The old-style RUNNING reservation has no FIX-002 provider-attempt
+    # boundary. Budget rollover may make capacity available, but it cannot prove
+    # that the pre-upgrade provider request was never submitted.
+    with pytest.raises(BackgroundModelExecutionInDoubt) as blocked:
+        runtime.run_wake(
+            wake_ref=ObjectRef(object_id=wake.object_id, revision=2),
+            now=NOW + timedelta(days=1, minutes=5),
+        )
+    assert blocked.value.attempt.state == "in_doubt"
+    assert blocked.value.attempt.failure_kind == "legacy_running_without_attempt"
+    assert model_calls == 0
 
 
 def test_periodic_review_budget_defers_then_resumes_same_anchors(tmp_path):

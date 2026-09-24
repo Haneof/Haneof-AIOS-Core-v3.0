@@ -1150,6 +1150,97 @@ class PeriodicReviewService:
             }
         )
 
+    def mark_runtime_incomplete(
+        self,
+        request: PeriodicReviewRequest,
+        *,
+        marked_at: datetime,
+        termination_reason: str,
+        model_rounds: int,
+        next_model_round_index: int,
+        capability_names: Sequence[str],
+    ) -> PeriodicReviewRequest:
+        """Persist a known-safe continuation point without completing the review."""
+
+        if request.subject_id != self.subject_id:
+            raise ValueError("review request belongs to another subject")
+        if (
+            isinstance(next_model_round_index, bool)
+            or not isinstance(next_model_round_index, int)
+            or next_model_round_index < 1
+        ):
+            raise ValueError("next_model_round_index must be a positive integer")
+        moment = as_utc(marked_at, "marked_at")
+        payload = self.store.get_payload(
+            request.wake_ref.object_id,
+            revision=request.wake_ref.revision,
+        )
+        wake = Wake.model_validate(payload)
+        latest = Wake.model_validate(self.store.get_payload(wake.object_id))
+        if latest.revision != wake.revision:
+            raise ValueError("review wake is no longer current")
+        if wake.wake_state is not WakeState.RUNNING:
+            raise ValueError("only RUNNING periodic review may be runtime-incomplete")
+
+        metadata = dict(wake.metadata)
+        attempts = metadata.get("runtime_incomplete_attempts", 0)
+        if not isinstance(attempts, int) or isinstance(attempts, bool) or attempts < 0:
+            attempts = 0
+        metadata.update(
+            {
+                "runtime_incomplete": True,
+                "runtime_incomplete_at": moment.isoformat(),
+                "runtime_incomplete_reason": str(termination_reason),
+                "runtime_incomplete_attempts": attempts + 1,
+                "runtime_incomplete_model_rounds": int(model_rounds),
+                "runtime_incomplete_next_model_round_index": int(
+                    next_model_round_index
+                ),
+                "runtime_incomplete_capability_names": [
+                    str(item) for item in capability_names
+                ],
+            }
+        )
+        new_revision = wake.revision + 1
+        running = Wake.model_validate(
+            {
+                **wake.model_dump(mode="python", round_trip=True),
+                "revision": new_revision,
+                "occurred": TemporalExtent.point(moment),
+                "learned_at": moment,
+                "recorded_at": moment,
+                "wake_state": WakeState.RUNNING,
+                "status": WakeState.RUNNING.value,
+                "metadata": metadata,
+            }
+        )
+        self.store.commit(
+            [running],
+            OperationRequest(
+                operation_name="review.runtime_incomplete",
+                arguments={
+                    "wake_id": wake.object_id,
+                    "revision": new_revision,
+                    "termination_reason": str(termination_reason),
+                    "next_model_round_index": int(next_model_round_index),
+                },
+                expected_world_revision=int(self.store.current_world_revision()),
+                reason="persist known-safe periodic review model continuation point",
+                idempotency_key=f"review-runtime-incomplete:{wake.object_id}:{new_revision}",
+                source_class=SourceClass.MAINTENANCE,
+                maintenance_class=MaintenanceClass.PERIODIC_REVIEW,
+            ),
+        )
+        self._catch_up()
+        return request.model_copy(
+            update={
+                "wake_ref": ObjectRef(
+                    object_id=running.object_id,
+                    revision=new_revision,
+                )
+            }
+        )
+
     def complete_review(
         self,
         request: PeriodicReviewRequest,

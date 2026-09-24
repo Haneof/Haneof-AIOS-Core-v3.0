@@ -44,6 +44,7 @@ class MeteringRecord(BaseModel):
     provider: str | None = None
     model: str | None = None
     provider_request_id: str | None = None
+    background_attempt_id: str | None = None
     usage_complete: bool
     input_tokens: int | None = Field(default=None, ge=0)
     output_tokens: int | None = Field(default=None, ge=0)
@@ -58,6 +59,7 @@ class MeteringRecord(BaseModel):
             "provider",
             "model",
             "provider_request_id",
+            "background_attempt_id",
         ):
             value = getattr(self, field_name)
             if value is not None and not value.strip():
@@ -111,6 +113,7 @@ class ModelMeteringLedger:
                     provider TEXT,
                     model TEXT,
                     provider_request_id TEXT,
+                    background_attempt_id TEXT,
                     usage_complete INTEGER NOT NULL
                         CHECK(usage_complete IN (0, 1)),
                     input_tokens INTEGER CHECK(input_tokens IS NULL OR input_tokens >= 0),
@@ -127,6 +130,21 @@ class ModelMeteringLedger:
                     WHERE provider IS NOT NULL AND provider_request_id IS NOT NULL;
                 """
             )
+            columns = {
+                str(row["name"])
+                for row in conn.execute("PRAGMA table_info(metering_records)").fetchall()
+            }
+            if "background_attempt_id" not in columns:
+                conn.execute(
+                    "ALTER TABLE metering_records ADD COLUMN background_attempt_id TEXT"
+                )
+            conn.execute(
+                """
+                CREATE UNIQUE INDEX IF NOT EXISTS idx_meter_background_attempt
+                    ON metering_records(background_attempt_id)
+                    WHERE background_attempt_id IS NOT NULL
+                """
+            )
             conn.commit()
 
     @staticmethod
@@ -134,9 +152,13 @@ class ModelMeteringLedger:
         *,
         provider: str | None,
         provider_request_id: str | None,
+        background_attempt_id: str | None = None,
     ) -> str:
         if provider and provider_request_id:
             raw = f"{provider}\0{provider_request_id}".encode("utf-8")
+            return f"meter_{hashlib.sha256(raw).hexdigest()[:32]}"
+        if background_attempt_id:
+            raw = f"background-attempt\0{background_attempt_id}".encode("utf-8")
             return f"meter_{hashlib.sha256(raw).hexdigest()[:32]}"
         return f"meter_{uuid4().hex}"
 
@@ -153,6 +175,7 @@ class ModelMeteringLedger:
         provenance: ModelCallProvenance | None = None,
         wake_id: str | None = None,
         session_id: str | None = None,
+        background_attempt_id: str | None = None,
     ) -> MeteringRecord:
         provider = None if provenance is None else provenance.provider
         model = None if provenance is None else provenance.model
@@ -179,6 +202,7 @@ class ModelMeteringLedger:
             record_id=self._record_id(
                 provider=provider,
                 provider_request_id=provider_request_id,
+                background_attempt_id=background_attempt_id,
             ),
             subject_id=subject_id,
             world_revision=int(world_revision),
@@ -191,6 +215,7 @@ class ModelMeteringLedger:
             provider=provider,
             model=model,
             provider_request_id=provider_request_id,
+            background_attempt_id=background_attempt_id,
             usage_complete=usage is not None,
             input_tokens=None if usage is None else usage.input_tokens,
             output_tokens=None if usage is None else usage.output_tokens,
@@ -198,6 +223,37 @@ class ModelMeteringLedger:
         )
 
         with self.store._connection() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            if background_attempt_id is not None:
+                attempt_row = conn.execute(
+                    """
+                    SELECT *
+                    FROM background_model_attempts
+                    WHERE attempt_id=?
+                    """,
+                    (background_attempt_id,),
+                ).fetchone()
+                if attempt_row is None:
+                    conn.rollback()
+                    raise RuntimeError(
+                        "metering references an unknown background model attempt"
+                    )
+                if (
+                    str(attempt_row["subject_id"]) != record.subject_id
+                    or str(attempt_row["work_id"]) != str(record.wake_id or "")
+                    or int(attempt_row["model_round_index"]) != record.model_round_index
+                ):
+                    conn.rollback()
+                    raise RuntimeError(
+                        "metering background attempt conflicts with durable work identity"
+                    )
+                if str(attempt_row["state"]) not in {"response_returned", "metered"}:
+                    conn.rollback()
+                    raise RuntimeError(
+                        "background attempt must durably record provider response "
+                        "before metering"
+                    )
+
             conn.execute(
                 """
                 INSERT OR IGNORE INTO metering_records(
@@ -213,11 +269,12 @@ class ModelMeteringLedger:
                     provider,
                     model,
                     provider_request_id,
+                    background_attempt_id,
                     usage_complete,
                     input_tokens,
                     output_tokens,
                     total_tokens
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     record.record_id,
@@ -232,13 +289,13 @@ class ModelMeteringLedger:
                     record.provider,
                     record.model,
                     record.provider_request_id,
+                    record.background_attempt_id,
                     int(record.usage_complete),
                     record.input_tokens,
                     record.output_tokens,
                     record.total_tokens,
                 ),
             )
-            conn.commit()
             row = conn.execute(
                 """
                 SELECT *
@@ -247,34 +304,73 @@ class ModelMeteringLedger:
                 """,
                 (record.record_id,),
             ).fetchone()
-        if row is None:
-            raise RuntimeError("metering record insert was not durable")
-        persisted = self._from_row(row)
-        immutable_replay_fields = (
-            "subject_id",
-            "execution_class",
-            "wake_id",
-            "session_id",
-            "wake_reason",
-            "model_round_index",
-            "provider",
-            "model",
-            "provider_request_id",
-            "usage_complete",
-            "input_tokens",
-            "output_tokens",
-            "total_tokens",
-        )
-        conflicts = [
-            field_name
-            for field_name in immutable_replay_fields
-            if getattr(persisted, field_name) != getattr(record, field_name)
-        ]
-        if conflicts:
-            raise RuntimeError(
-                "metering replay conflicts with durable provider response identity: "
-                + ", ".join(conflicts)
+            if row is None:
+                conn.rollback()
+                raise RuntimeError("metering record insert was not durable")
+            persisted = self._from_row(row)
+            immutable_replay_fields = (
+                "subject_id",
+                "execution_class",
+                "wake_id",
+                "session_id",
+                "wake_reason",
+                "model_round_index",
+                "provider",
+                "model",
+                "provider_request_id",
+                "background_attempt_id",
+                "usage_complete",
+                "input_tokens",
+                "output_tokens",
+                "total_tokens",
             )
+            conflicts = [
+                field_name
+                for field_name in immutable_replay_fields
+                if getattr(persisted, field_name) != getattr(record, field_name)
+            ]
+            if conflicts:
+                conn.rollback()
+                raise RuntimeError(
+                    "metering replay conflicts with durable provider response identity: "
+                    + ", ".join(conflicts)
+                )
+
+            if background_attempt_id is not None:
+                changed = conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='metered', meter_record_id=?, updated_at=?
+                    WHERE attempt_id=?
+                      AND state IN ('response_returned', 'metered')
+                      AND (meter_record_id IS NULL OR meter_record_id=?)
+                    """,
+                    (
+                        persisted.record_id,
+                        canonical_utc_iso(record.recorded_at, "recorded_at"),
+                        background_attempt_id,
+                        persisted.record_id,
+                    ),
+                ).rowcount
+                attempt_row = conn.execute(
+                    """
+                    SELECT state, meter_record_id
+                    FROM background_model_attempts
+                    WHERE attempt_id=?
+                    """,
+                    (background_attempt_id,),
+                ).fetchone()
+                if (
+                    attempt_row is None
+                    or str(attempt_row["state"]) != "metered"
+                    or str(attempt_row["meter_record_id"]) != persisted.record_id
+                    or changed not in {0, 1}
+                ):
+                    conn.rollback()
+                    raise RuntimeError(
+                        "metering could not atomically close the background attempt"
+                    )
+            conn.commit()
         return persisted
 
     def list_model_calls(
@@ -330,6 +426,7 @@ class ModelMeteringLedger:
             provider=row["provider"],
             model=row["model"],
             provider_request_id=row["provider_request_id"],
+            background_attempt_id=row["background_attempt_id"],
             usage_complete=bool(row["usage_complete"]),
             input_tokens=row["input_tokens"],
             output_tokens=row["output_tokens"],
