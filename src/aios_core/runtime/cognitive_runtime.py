@@ -8,7 +8,7 @@ executes calls, enforces budgets/authorization, records results, and terminates 
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field
 from typing import Any, Callable, Mapping, Sequence
 
 from .capabilities import (
@@ -113,7 +113,11 @@ class RuntimeSnapshot:
     capability_history: tuple[CapabilityResult, ...]
     round_index: int
     remaining_tool_rounds: int
-    model_attempt_id: str | None = None
+
+    @property
+    def model_attempt_id(self) -> str | None:
+        value = getattr(self, "_model_attempt_id", None)
+        return value if isinstance(value, str) else None
 
 
 @dataclass(frozen=True)
@@ -281,7 +285,9 @@ class CognitiveRuntime:
             if self.model_attempt_admitter is not None:
                 attempt_id = self.model_attempt_admitter(snapshot)
                 if attempt_id is not None:
-                    snapshot = replace(snapshot, model_attempt_id=attempt_id)
+                    # Provider-attempt correlation is runtime-private metadata, not
+                    # part of the serialized Resident RuntimeSnapshot contract.
+                    object.__setattr__(snapshot, "_model_attempt_id", attempt_id)
             if self.model_dispatch_recorder is not None:
                 self.model_dispatch_recorder(snapshot)
             try:
