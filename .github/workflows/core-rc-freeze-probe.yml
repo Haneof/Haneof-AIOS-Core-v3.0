@@ -189,7 +189,7 @@ jobs:
           print(payload)
           PY
           python - <<'PY'
-          import json
+          import json, os
           from pathlib import Path
           a=json.loads(Path("rc-evidence/source-before.json").read_text())
           b=json.loads(Path("rc-evidence/source-after.json").read_text())
@@ -249,7 +249,7 @@ jobs:
               },
               "reproduction_note":"The repository has version ranges rather than a lockfile. This manifest pins the exact successful RC clean-install environment; no new lockfile is introduced by RC-FREEZE."
           }
-          Path("$RUNNER_TEMP/CORE_RC_FREEZE_001_DEPENDENCIES.json").write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
+          Path(os.environ["RUNNER_TEMP"], "CORE_RC_FREEZE_001_DEPENDENCIES.json").write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
           PY
           git fetch origin "$RC_BRANCH"
           git checkout -B "$RC_BRANCH" "origin/$RC_BRANCH"
