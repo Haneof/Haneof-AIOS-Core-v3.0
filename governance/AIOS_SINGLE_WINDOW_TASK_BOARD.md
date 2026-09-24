@@ -63,13 +63,13 @@ FIX-001 / FIX-002 / FIX-003 三项 audited Core gap 已全部独立接受并集�
 
 ---
 
-## 0. 当前 PM 快照 — 2026-09-24 治理已合入，唯一 READY = B operator preflight
+## 0. 历史 PM 快照 — 2026-09-24 B corrective 已合入、RC completion 之前
 
 **仅供 PM / 工程 / operator 阅读；盲测 Resident 不得读取本板或项目 checkpoint。** 盲测角色只接收独立获准的安全包，不能执行下方通用仓库恢复步骤。
 
 - 治理 PR [#122](https://github.com/Haneof/Haneof-AIOS-Core-v3.0/pull/122) 已合入，真实 merge SHA：`2a68df3f8901138fa3126a91063c430f69102049`。
 - 实际审查身份：**原 PM 自审**，不是独立语义评估。普通治理文档集成无需另开 AI 窗口；正常 CI/分支保护仍必须遵守，盲测与协议要求的独立评估不豁免。
-- `C15-RCC-RES-B-CORRECTIVE-001 = DONE`；**唯一下一 READY = `C15-RCC-RES-B-PREFLIGHT-001`**。本状态写回随收据 PR 合入生效，未合入的工作分支不能释放实验。
+- 历史节点：`C15-RCC-RES-B-CORRECTIVE-001 = DONE` 后，当时的**唯一下一 READY 曾是 `C15-RCC-RES-B-PREFLIGHT-001`**；该状态已被后续 Core completion / RC-FREEZE / `FRESH_A_REQUIRED` 裁决 supersede。当前状态只认文件顶部控制入口与 §3 正式任务表。
 - Canonical frozen Core：`bcd6bf353126318f9a97076b52ec1740d43f35a4`；与已合入治理的 Core tree 无差异，语义 freeze ACTIVE。
 - C14 已 PASS；canonical A #117 @ `3e51f728d7959048b75fea01d405bc837b0e8185` 已接受且未改。
 - 旧 B #121 @ `b6e5ac939bef83615292bcf9b9099d76737d82b0` 当前 candidate 验收 FAILED；OPEN / UNMERGED / PINNED / NON-CANONICAL，不得用于初始化 C。
