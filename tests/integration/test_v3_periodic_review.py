@@ -871,3 +871,5 @@ def test_cg001_resumed_periodic_review_uses_original_start_as_read_cut(tmp_path)
     assert datetime.fromisoformat(
         str(written_payload["learned_at"]).replace("Z", "+00:00")
     ) == t1
+
+# CORE-RC-FREEZE-001 transient probe trigger; test semantics unchanged.
