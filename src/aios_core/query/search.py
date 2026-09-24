@@ -1531,12 +1531,14 @@ class WorldSearchIndex:
         limit: int = 20,
         *,
         subject: str | None = None,
+        as_of: datetime | None = None,
     ) -> MindSearchPage:
         """按实体关系网络检索，并可限定私有世界主体。"""
         return self.search_mind(
             keywords=keywords,
             subject=subject,
             entity_id=entity_id,
+            as_of=as_of,
             limit=limit,
         )
 
