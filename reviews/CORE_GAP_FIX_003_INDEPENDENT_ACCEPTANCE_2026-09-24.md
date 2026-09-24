@@ -16,7 +16,7 @@ This review is review-only. It does not modify PR #157, Core code, tests, task b
 - PR state at final recheck: OPEN / UNMERGED / Ready for review / mergeable
 - candidate base recorded by GitHub: `f8eb271453b12c3896cd55381b8bdb8dc5da5632`
 - FIX-001 PR #145 at final recheck: OPEN / UNMERGED, exact head `b5a50435b3f9048bf94d88e9625b9e5bc2b83f42`
-- therefore the post-FIX002 serialized-integration rule has **not** triggered a mandatory rebase during this review.
+- late final live-main recheck: `a1a7a7dad32b9877c7841cd2679066157a196dbf`\n- that late main advance is only `reviews/CORE_GAP_FIX_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md` (FIX-001 failed-acceptance evidence); no Core source changed\n- therefore the post-FIX002 serialized-integration rule has **not** triggered a mandatory rebase during this review.
 
 Required governance state was independently re-read from live main. `CORE-GAP-FIX-003 = GATE / REVIEW_READY` and FIX-002 is already independently accepted/integrated.
 
@@ -316,7 +316,7 @@ Independent compare shows the drift is CI workflow/governance/review material on
 
 The exact CI merge base `09e5b57d...` to review-time main adds only task-board/checkpoint/project-map writeback.
 
-At final serialization recheck, FIX-001 PR #145 remains OPEN / UNMERGED. Therefore:
+At final serialization recheck, live main had advanced from the review-start pin to `a1a7a7dad32b9877c7841cd2679066157a196dbf` only by merging FIX-001 failed-acceptance review evidence (#161). FIX-001 PR #145 itself remains OPEN / UNMERGED. No `src/**` change occurred in that late drift. Therefore:
 
 **serialization verdict: current #157 exact head does not require rebase solely from FIX-001 integration at this review time.**
 
