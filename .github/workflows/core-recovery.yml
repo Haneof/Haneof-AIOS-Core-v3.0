@@ -127,5 +127,3 @@ jobs:
                   assert dict(attempts).get("in_doubt") == 1
                   assert meters == 1
           PY
-
-# CORE-RC-FREEZE-001 transient probe trigger; no command or test semantics changed.
