@@ -1,18 +1,16 @@
 # AIOS v3.0 当前工程断点
 
-## 当前控制入口 — 2026-09-24 CORE-BASELINE-001 DONE
+## 当前控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / FIX-001+002 READY
 
-- PR #128 已合入，当前开发基线审查点：`main@33436565c109c2c47cf2c3150084fcce22810124`。
-- 当前 Core tree：`7db4f72e7b3c29c74082f9984141159f8f1d6071`；#127 已把十项 Core 修复正式带入 main。
-- #126 @ `8e31deca...` 与 main Core tree 相同，保持 OPEN/DRAFT 作为 CI/测试参考，不重复 merge Core。
-- #125 @ `b14b5d84...` 是 operator WIP 源，不是集成基线。其 Core 仍为旧 `eed27d58...`，exact-head 当前有 3 个已确认 regression：24h 中间 Review 缺失、旧 Wake 可见未来输入、预算 deferral 丢失。
-- canonical A #117 @ `3e51f728...` 继续作为历史 frozen-Core accepted evidence；旧 B #121 继续 FAILED / NON-CANONICAL。
-- 新 Core release 必须在 S2 完成并 `CORE-RC-FREEZE-001` 后重新 fresh A；现在不运行 A/B/C，不改历史 evidence。
-- 详细 baseline / impact ruling：`governance/AIOS_CORE_BASELINE_001_DECISION_2026-09-24.md`。
-- 当前两个并行 READY、均尚未启动：
-  - `CORE-OPERATOR-001` — 从 current main 定向收口 #125 operator；提示词 `governance/prompts/CORE_OPERATOR_001_2026-09-24.md`。
-  - `CORE-GAP-AUDIT-001` — 独立只读 Core 缺口审计；提示词 `governance/prompts/CORE_GAP_AUDIT_001_2026-09-24.md`。
-- HEADLESS / RECOVERY / SCALE / RC-FREEZE、C15 新实验、C16/P16/P17 继续按依赖 BLOCKED。UI/P18/P19 不进入本轮。
+- 独立审计 PR #132 已合入；PM acceptance main = `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`，Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
+- 审计报告：`reviews/CORE_GAP_AUDIT_001_2026-09-24.md`。正式 RC blockers：CG-001 temporal read cut、CG-002 background model execution IN_DOUBT、CG-003 user-turn IN_DOUBT recovery。
+- `CORE-GAP-FIX-001 = READY / NOT_STARTED`；提示词 `governance/prompts/CORE_GAP_FIX_001_2026-09-24.md`。
+- `CORE-GAP-FIX-002 = READY / NOT_STARTED`；提示词 `governance/prompts/CORE_GAP_FIX_002_2026-09-24.md`。
+- `CORE-GAP-FIX-003 = BLOCKED`，等待 FIX-002 独立验收并 PM 集成后再从 live main 开始。
+- `CORE-OPERATOR-001` candidate PR #131 @ `0e1d69eebc801278f93ccc1941b8f066a4ea09ef` = GATE / REVIEW_READY；当前必须由不同 independent reviewer 验收，尚未 DONE、尚未 merge。
+- PM dispatch / sequencing：`governance/AIOS_CORE_GAP_DISPATCH_2026-09-24.md`。
+- HEADLESS / RECOVERY / SCALE / RC-FREEZE 继续 BLOCKED；fresh Resident A/B/C 继续禁止，历史 #117/#121 不改。
+- UI/P18/P19 不进入本轮 Core completion。
 
 > 用途：新会话 / 新模型 / 新工程师进入仓库后的第一现场状态文件  
 > 更新规则：每完成一个可验证节点立即更新；不得靠聊天记忆代替本文件  
