@@ -1,18 +1,17 @@
 # AIOS v3.0 项目全流程总地图
 
-## 当前控制入口 — 2026-09-24 Core completion PM handoff
+## 当前控制入口 — 2026-09-24 Core S0 baseline closed
 
-所有者已要求：**先完成 Core，UI 不开发；接任 PM 负责安排其他 AI 执行和验收。**
-
-- 本次治理变更合入 main 后，本节取代下方旧的“当前快照/下一 READY”；下方旧冻结和 READY 描述为历史，不再独立授权。
-- 阶段范围及完成定义：`governance/AIOS_CORE_COMPLETION_PLAN_2026-09-24.md`。
-- 接任提示词：`governance/prompts/AIOS_CORE_PM_HANDOFF_2026-09-24.md`。
-- 开发 main 审查点 `6924d8b5` 已合 #127，Core 已不同于历史冻结 `bcd6bf3`；历史 A 身份保留，新候选的 A/实验使用必须单独裁决。
-- #125 已有施工和 B14 尝试陈述，但最新已审 head `b14b5d84` 的 3 项预检/回归失败；不是无人开始的 READY，也不是实验完成。
-- 唯一下一 READY：`CORE-BASELINE-001`（治理集成后）。原 `C15-RCC-RES-B-PREFLIGHT-001` 为已有 WIP / BLOCKED，恢复入口为新计划 `CORE-OPERATOR-001`，二者同一工程交付，不重复造桥。
-- C15 启动、C16、广泛 P16、P17 仍受各自 Gate 约束。UI/P18/P19 不派工。
-- 执行 AI 继续一窗口一任务；PM 可持续跨任务协调/验收，不冒充 fresh Resident。
-
+- `CORE-BASELINE-001 = DONE`。裁决：`governance/AIOS_CORE_BASELINE_001_DECISION_2026-09-24.md`。
+- 开发主线审查点：`main@33436565c109c2c47cf2c3150084fcce22810124`；Core tree `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
+- #127 Core 修复已在 main；#126 Core 与 main 相同，不重复集成；#125 保留 operator WIP，禁止把其旧 Core 整包带回 main。
+- 历史实验与开发线分离：#117 A = historical accepted on frozen Core；#121 B = failed/non-canonical；二者都不是新 RC 的可直接继续点。
+- 新 RC 需要 fresh A，但只在 S2 工程收口并 `CORE-RC-FREEZE-001` 后启动，避免 Core 继续变化导致重复入住。
+- 当前可并行推进且无写冲突：
+  - `CORE-OPERATOR-001 = READY / NOT_STARTED`；
+  - `CORE-GAP-AUDIT-001 = READY / NOT_STARTED`。
+- 固定路线：S1 operator + independent gap audit → 条件最小 Core fixes → S2 headless/recovery/scale → RC freeze → fresh C15 A/B/C → C16 → P16 → P17 Core release closure。
+- UI、数字人、Launcher、动画、硬件、ROM 不开发。
 
 > 文件角色：项目级唯一“全流程地图”入口  
 > 用途：跨会话、跨模型、跨工程师断点续传；判断“现在做到哪、下一步做什么、哪些不能重做”  
