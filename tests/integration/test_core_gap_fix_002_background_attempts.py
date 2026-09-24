@@ -123,7 +123,7 @@ def test_before_fix_running_periodic_review_can_blindly_reinvoke_provider_after_
         payload
         for payload in store.list_payloads(object_type=ObjectType.WAKE, subject_id="user_1")
         if payload.get("wake_state") == "running"
-        and (payload.get("metadata") or {}).get("review_kind") == "periodic_review"
+        and payload.get("wake_source") == WakeSource.PERIODIC_REVIEW.value
     ]
     assert len(running) == 1
 
