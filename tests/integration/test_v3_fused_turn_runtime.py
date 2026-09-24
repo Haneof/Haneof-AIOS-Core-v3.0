@@ -1563,6 +1563,25 @@ def test_cg001_historical_ai_world_reads_preserve_latest_knowable_revision(tmp_p
             return ModelDirective(
                 capability_calls=(
                     CapabilityCall(
+                        name="search_world",
+                        arguments={
+                            "query": "historical cognition rev1 prefers tea",
+                            "limit": 10,
+                        },
+                    ),
+                )
+            )
+        if len(history) == 1:
+            search = history[-1]
+            assert search.ok is True
+            historical_hit = next(
+                item for item in search.data
+                if item["object_id"] == claim_id
+            )
+            assert historical_hit["revision"] == 1
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
                         name="read_ai_world",
                         arguments={
                             "domains": ["user_understanding"],
@@ -1572,7 +1591,7 @@ def test_cg001_historical_ai_world_reads_preserve_latest_knowable_revision(tmp_p
                     ),
                 )
             )
-        if len(history) == 1:
+        if len(history) == 2:
             read = history[-1]
             assert read.ok is True
             assert len(read.data) == 1
