@@ -3,7 +3,7 @@
 Date: 2026-09-24
 Issued by: Core Delivery PM (integrating PM window)
 Live main at ruling: `0d0d2a2` lineage (post `CORE-OPERATOR-001` integration; Core tree `src/aios_core = 7db4f72e7b3c29c74082f9984141159f8f1d6071`)
-Status: ACTIVE — binding on the two S2 engineering windows and on their independent reviewers
+Status: HISTORICAL / SUPERSEDED FOR ACTIVE ORDER after cross-symbol conflict. The stop-and-report rule in this document was triggered by PR #145. Current binding order: `governance/AIOS_CORE_S2_SERIALIZATION_RULING_2026-09-24.md`.
 
 ## 1. Why this ruling exists
 

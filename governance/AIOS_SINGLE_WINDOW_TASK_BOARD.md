@@ -1,13 +1,13 @@
 # AIOS v3.0 单窗口任务执行总表
 
-## 当前控制入口 — 2026-09-24 PM TAKEOVER / S0 RE-VERIFIED / OPERATOR DONE / 待启动 = FIX-001 + FIX-002 + CI-FIX-001
+## 当前控制入口 — 2026-09-24 S2 SERIALIZED / FIX-002 IN_PROGRESS / FIX-001 FROZEN_WIP / CI-FIX CORRECTIVE READY
 
 - 接任 PM 依 #128 治理接手；接手与 live 复核：`governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
 - **派工基线 = live main `079d7516f195cf6973933acc8cd057d59adc3a9f`**（其后仅治理/审查文档变更）；`CORE-OPERATOR-001` 集成点 = `e72a63874ed2c28798b00cec51f191caf1594a00`；Core tree 自审计以来始终 `7db4f72e7b3c29c74082f9984141159f8f1d6071`。每个新窗口仍须自行重取 live main，不得把本 SHA 当永久施工基线。
 - `CORE-BASELINE-001 = DONE（re-verified）`：S0 裁决成立；dev 基线前移至 `e72a63874e...`；历史 pin #117/#121/#125/#126 不变；fresh A 仅在 RC-FREEZE 后。
 - `CORE-OPERATOR-001 = DONE`：独立验收 #135（ACCEPTANCE_PASS，0 blocker）`fe6f1740eb`（05:08:01Z）先合，候选 #131 `e72a63874e`（05:08:07Z）后合；报告 `reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md`。
 - `CORE-GAP-AUDIT-001 = DONE`（#132 合 `bc4bf735...`）；RC blockers = CG-001/002/003；14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE 不得无依据重开。
-- `CORE-GAP-FIX-001` / `CORE-GAP-FIX-002` = **READY / 待启动**：两个独立工程窗口可并行，但**并非路径不相交** —— 经对现行源码核对，两者都必须改 `src/aios_core/runtime/turn_runtime.py`（FIX-001 改 `_search_world`/`_inspect_world_object`/`_world_map_context`；FIX-002 改 `run_wake`/`run_periodic_review`）。并行条件、符号级归属、串行集成与 rebase 后重验要求见 **`governance/AIOS_CORE_S2_PARALLELISM_RULING_2026-09-24.md`**（binding）。`CORE-GAP-FIX-003` BLOCKED（同样写 turn_runtime.py / turn_execution.py，状态机须与 FIX-002 一致）。
+- **S2 已触发强制串行化**：PR #145（FIX-001）证明完整 CG-001 closure 必须在 `run_wake` / `run_periodic_review` 建立 historical read cutoff，已跨入 FIX-002 的 symbol ownership。依原 parallelism ruling 的 stop-and-report 条款，PM 裁决 **FIX-002 先完成/独立验收/集成，FIX-001 保留现场后从新 main rebase 继续**。绑定裁决：`governance/AIOS_CORE_S2_SERIALIZATION_RULING_2026-09-24.md`。当前 FIX-002 draft #143 = IN_PROGRESS；FIX-001 draft #145 @ `97a76e3b...` = FROZEN_WIP / BLOCKED_ON_FIX_002_INTEGRATION；FIX-003 继续 BLOCKED。
 - PR #136（pelican 动画）= EXCLUDED，永不合入；分支保留，不作关闭/删除（计划未授权）。
 - PM 补充（`governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`）：合后 p16-convergence-gate run `35958610555` @ `e72a6387` SUCCESS；PR #130（`core/operator-001-20260924-sol` @ `16eb1d40`，同 Task 竞争候选、未经独立验收）= **SUPERSEDED / NOT INTEGRATED**，保留不合并；`core-gap-fix-001/002` 分支停在 `27135e39`、零提交，无施工现场。
 - Gap fix 独立验收统一提示词：`governance/prompts/CORE_GAP_FIX_ACCEPTANCE_2026-09-24.md`（每个候选另开不同 reviewer 窗口）。
@@ -15,7 +15,7 @@
 - 诚实限制：本地复算用 CPython 3.11.2（低于 >=3.12 gate），仅佐证；`gh run rerun` 与 `workflow_dispatch` 被平台 403 拒绝（未绕权限），合后证据以 push run `35958610555` 为准；作者与验收为不同窗口但同一 GitHub 账号，无跨账号 APPROVE，不宣称账号级独立。
 - **PM 写回并发规则（新增，因本日出现两个 PM 窗口并行写回同一状态）**：同一时刻只保留**一个**集成 PM 写回入口。先合入者为准，后到窗口必须**对账合并**已合入内容，不得覆盖、不得新建同事件的第二份收据/第二条控制入口。本日 #137 / #136 / #138 三份 PM 写回已在此合并，单一收据 = `governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`。
 - S2 两个并行修复窗口的写入范围隔离与 operator 面禁改规则见 `governance/AIOS_CORE_GAP_DISPATCH_2026-09-24.md` 的 "Dispatch update — 2026-09-24"。
-- **新任务 `CORE-CI-FIX-001` = READY / 待启动**（release/CI 基础设施）：`c15-rcc-fixture-mechanical-gate` 与 `semantic-repair-mechanical-gate` 的 "prove zero Core diff" 步骤在浅克隆上 `git` 自身 exit 128，随分支形状时红时绿（#133 红 / #137 绿 / #138 #139 红），不是策略违规。发现与 PM 裁决：`governance/AIOS_CORE_CI_FINDING_001_2026-09-24.md`；提示词：`governance/prompts/CORE_CI_FIX_001_2026-09-24.md`。不阻塞 FIX-001/002，但 **必须在 `CORE-RC-FREEZE-001` 之前关闭**。
+- **`CORE-CI-FIX-001` independent acceptance = FAIL**：review PR #150 已合入（merge `905ad890...`），blocker `CORE-CI-FIX-001-ACCEPT-BLOCKER-001` = `pipefail + printf | grep -q` 在大 changed-list / early match 下可因 SIGPIPE 返回 141 而 fail-open。PR #146 保持 OPEN / UNMERGED；唯一 corrective 任务 `CORE-CI-FIX-001-CORRECTIVE-001 = READY`，复用 #146，仅修三条 workflow predicate；PR #144 继续 SUPERSEDED / NOT INTEGRATED。历史派工说明：**（release/CI 基础设施）：`c15-rcc-fixture-mechanical-gate` 与 `semantic-repair-mechanical-gate` 的 "prove zero Core diff" 步骤在浅克隆上 `git` 自身 exit 128，随分支形状时红时绿（#133 红 / #137 绿 / #138 #139 红），不是策略违规。发现与 PM 裁决：`governance/AIOS_CORE_CI_FINDING_001_2026-09-24.md`；提示词：`governance/prompts/CORE_CI_FIX_001_2026-09-24.md`。不阻塞 FIX-001/002，但 **必须在 `CORE-RC-FREEZE-001` 之前关闭**。
 - #138/#139 两条红检查登记为 **INFRASTRUCTURE_FAILURE**，不登记为通过、也不登记为已接受的违规；PM 已用直接证据独立验证不变式成立（`git diff e72a638..main -- src/` 为空，Core tree 仍 `7db4f72e`），未绕过分支保护（该两项非 required）。
 - HEADLESS/RECOVERY/SCALE/RC-FREEZE 与 Resident A/B/C 继续 BLOCKED；UI/P18/P19 排除。
 
@@ -36,9 +36,10 @@
 | CORE-BASELINE-001 | **DONE（re-verified）** | S0 ruling 已落 main；接任 PM 于 `e72a63874e...` 复核成立（governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md） |
 | CORE-OPERATOR-001 | **DONE** | 独立验收 #135 先合（fe6f1740eb）→ 候选 #131 后合（e72a63874e）；报告 reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md |
 | CORE-GAP-AUDIT-001 | **DONE** | PR #132 已接受并合入；报告 `reviews/CORE_GAP_AUDIT_001_2026-09-24.md` |
-| CORE-GAP-FIX-001 | **READY / NOT_STARTED** | Runtime Temporal Read Cut；提示词 `governance/prompts/CORE_GAP_FIX_001_2026-09-24.md`；另开独立验收 |
-| CORE-GAP-FIX-002 | **READY / NOT_STARTED** | Background Model Execution IN_DOUBT；提示词 `governance/prompts/CORE_GAP_FIX_002_2026-09-24.md`；另开独立验收 |
-| CORE-CI-FIX-001 | **READY / NOT_STARTED** | Release/CI Infrastructure Engineer 单窗口；修复两条 mechanical gate 的 shallow-clone Core-diff 守卫（exit 128）；提示词 `governance/prompts/CORE_CI_FIX_001_2026-09-24.md`；不阻塞 FIX-001/002，阻塞 RC-FREEZE；另开独立验收 |
+| CORE-GAP-FIX-001 | **FROZEN_WIP / BLOCKED_ON_FIX_002_INTEGRATION** | Draft PR #145；repro `a9a089a6...`；WIP head `97a76e3b...`；不得重做/验收/合并，待 FIX-002 独立验收并集成后 rebase live main 继续 |
+| CORE-GAP-FIX-002 | **IN_PROGRESS** | Draft PR #143；当前 head `4d04e0d8...`；继续完成 CG-002，作者只能到 REVIEW_READY，之后不同窗口独立验收 |
+| CORE-CI-FIX-001 | **GATE / ACCEPTANCE_FAIL** | PR #146 failed independent acceptance in merged review #150；blocker `CORE-CI-FIX-001-ACCEPT-BLOCKER-001`；不得 merge |
+| CORE-CI-FIX-001-CORRECTIVE-001 | **READY** | 复用 PR #146 / branch `core-ci-fix-001-20260924-sol`；只修 pipefail/grep-q fail-open；提示词 `governance/prompts/CORE_CI_FIX_001_CORRECTIVE_001_2026-09-24.md`；完成后重新独立验收 |
 | CORE-GAP-FIX-003 | **BLOCKED** | 依赖 FIX-002 独立验收 + PM integration；提示词 `governance/prompts/CORE_GAP_FIX_003_2026-09-24.md`，当前不得施工 |
 | CORE-HEADLESS-001 | **BLOCKED** | OPERATOR accepted + FIX-001/002/003 accepted/integrated |
 | CORE-RECOVERY-001 | **BLOCKED** | HEADLESS + 三项 gap 修复进入 S2 candidate |
@@ -47,7 +48,7 @@
 | 新 C15 fresh A → B → C / EVAL / CLOSE | **BLOCKED** | RC-FREEZE；旧 #117 A 不能 hash-swap 为新 RC A |
 | C16 → P16 → P17 | **BLOCKED** | 保留原逐项 Gate；只有 P17 PASS 才可称 Core complete |
 
-`CORE-GAP-FIX-001` 与 `CORE-GAP-FIX-002` 当前允许并行；`CORE-OPERATOR-001` 的独立验收也可并行。一个工程窗口只负责一个 Task ID；作者不得自验收。
+`CORE-GAP-FIX-001` 与 `CORE-GAP-FIX-002` 的开发并行授权已因实际跨-symbol 冲突触发串行化：FIX-002 先集成，随后恢复 FIX-001。`CORE-CI-FIX-001-CORRECTIVE-001` 可与 FIX-002 并行；corrective 完成后必须重新独立验收。一个工程窗口只负责一个 Task ID；作者不得自验收。
 
 > Status: ACTIVE  
 > Effective: 2026-09-21  
