@@ -27,3 +27,5 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: pip install -e ".[dev]"
       - run: pytest tests/integration/test_m0_prime_store_delta_and_search.py
+
+# CORE-RC-FREEZE-001 transient probe trigger; no command or test semantics changed.

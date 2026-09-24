@@ -31,3 +31,5 @@ jobs:
       - name: C09 wake bus and dispatch closure
         run: |
           pytest -q             tests/integration/test_v3_wake_dispatch.py             tests/integration/test_v3_execution_world.py             tests/integration/test_v3_periodic_review.py             tests/integration/test_v3_reality_ingest.py             tests/integration/test_v3_fused_turn_runtime.py             tests/runtime/test_cognitive_runtime.py
+
+# CORE-RC-FREEZE-001 transient probe trigger; no command or test semantics changed.

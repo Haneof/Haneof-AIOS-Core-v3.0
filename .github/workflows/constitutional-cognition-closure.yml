@@ -29,3 +29,5 @@ jobs:
           python -m pytest             tests/integration/test_v3_constitutional_cognition_closure.py             tests/integration/test_v3_completeness_closure.py             tests/integration/test_v3_memory_recommendation.py             tests/integration/test_v3_dimension_summary.py             tests/integration/test_v3_all_dimensions_projection.py             tests/integration/test_v3_cognition_writeback.py             tests/integration/test_v3_ai_world.py             tests/integration/test_v3_dimension_registry.py             tests/integration/test_v3_execution_world.py             tests/integration/test_v3_wake_dispatch.py
       - name: P16 harness regression
         run: python -m pytest tests/habitation
+
+# CORE-RC-FREEZE-001 transient probe trigger; no command or test semantics changed.

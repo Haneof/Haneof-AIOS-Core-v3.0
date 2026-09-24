@@ -161,3 +161,5 @@ jobs:
           name: core-scale-backlog
           path: scale-evidence/
           if-no-files-found: warn
+
+# CORE-RC-FREEZE-001 transient probe trigger; no command or test semantics changed.

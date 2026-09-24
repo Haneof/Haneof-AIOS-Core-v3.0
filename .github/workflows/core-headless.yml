@@ -52,3 +52,5 @@ jobs:
             tests/integration/test_core_gap_fix_002_background_attempts.py \
             tests/runtime/test_turn_execution_recovery.py \
             tests/runtime/test_cognitive_runtime.py
+
+# CORE-RC-FREEZE-001 transient probe trigger; no command or test semantics changed.

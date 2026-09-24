@@ -28,3 +28,5 @@ jobs:
       - run: pip install -e ".[dev]"
       - run: |
           pytest             tests/integration/test_v3_periodic_review.py             tests/integration/test_v3_fused_turn_runtime.py             tests/integration/test_v3_ai_world.py             tests/integration/test_v3_cognition_revision.py             tests/integration/test_v3_execution_world.py             tests/integration/test_v3_long_context_continuity.py             tests/runtime/test_cognitive_runtime.py
+
+# CORE-RC-FREEZE-001 transient probe trigger; no command or test semantics changed.
