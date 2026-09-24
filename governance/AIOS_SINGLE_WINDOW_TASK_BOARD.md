@@ -1,6 +1,6 @@
 # AIOS v3.0 单窗口任务执行总表
 
-## 当前控制入口 — 2026-09-24 FIX-002 DONE / FIX-001 IN_PROGRESS / FIX-003 IN_PROGRESS / CI-FIX DONE
+## 当前控制入口 — 2026-09-24 FIX-002 DONE / FIX-001 IN_PROGRESS / FIX-003 REVIEW_READY / CI-FIX DONE
 
 - 接任 PM 依 #128 治理接手；接手与 live 复核：`governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
 - **派工基线 = live main `079d7516f195cf6973933acc8cd057d59adc3a9f`**（其后仅治理/审查文档变更）；`CORE-OPERATOR-001` 集成点 = `e72a63874ed2c28798b00cec51f191caf1594a00`；Core tree 自审计以来始终 `7db4f72e7b3c29c74082f9984141159f8f1d6071`。每个新窗口仍须自行重取 live main，不得把本 SHA 当永久施工基线。
@@ -40,7 +40,7 @@
 | CORE-GAP-FIX-002 | **DONE** | Independent review #154 ACCEPTANCE_PASS / 0 blockers；candidate #143 exact `c5382a1653...` merged as `3d980fadf6beefcdd02ff4367ba834a5b013d871`；receipt `governance/CORE_GAP_FIX_002_INTEGRATION_RECEIPT_2026-09-24.md` |
 | CORE-CI-FIX-001 | **DONE** | 首轮 #150 ACCEPTANCE_FAIL 历史保留；corrective #156 ACCEPTANCE_PASS / 0 blockers；#146 exact `1eb24e101cdb1579c22c69b435cf9f79a3c359ad` merged as `c3ec42214db57864f7951e28b75811b10db8be21`；receipt `governance/CORE_CI_FIX_001_INTEGRATION_RECEIPT_2026-09-24.md` |
 | CORE-CI-FIX-001-CORRECTIVE-001 | **DONE** | blocker `CORE-CI-FIX-001-ACCEPT-BLOCKER-001` closed by the accepted corrective; historical fail evidence remains unchanged |
-| CORE-GAP-FIX-003 | **IN_PROGRESS / DRAFT** | PR #157 已启动 user-turn IN_DOUBT recovery；仍处工程阶段、未独立验收；必须遵守 post-FIX002 symbol boundary，不得触碰 FIX-001 read-cut/background entrypoint 语义 |
+| CORE-GAP-FIX-003 | **GATE / REVIEW_READY** | PR #157 @ `81d626820cfa31e4f3f1aba0e892eb48cb11e46c`；before-fix repro `56529c39...` 已真实失败；13/13 exact-head workflows SUCCESS，full P16 652 tests / 100%；等待不同 Independent Reviewer，未验收/未合并 |
 | CORE-HEADLESS-001 | **BLOCKED** | OPERATOR accepted + FIX-001/002/003 accepted/integrated |
 | CORE-RECOVERY-001 | **BLOCKED** | HEADLESS + 三项 gap 修复进入 S2 candidate |
 | CORE-SCALE-001 | **BLOCKED** | S2 功能候选 |
