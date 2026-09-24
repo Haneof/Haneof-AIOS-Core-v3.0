@@ -162,7 +162,7 @@ def test_cg003_legacy_and_old_v1_zero_attempt_rows_remain_in_doubt(tmp_path):
         index=index,
         model_handler=lambda _snapshot: successful_directive("must-not-run"),
     )
-    occurred_iso = "2026-09-24T07:00:00Z"
+    occurred_iso = NOW.isoformat(timespec="microseconds")
 
     def insert_started(*, session_id, turn_index, protocol):
         digest = runtime.turn_executions._input_hash(
