@@ -65,7 +65,7 @@ jobs:
                   "Private Resident Worlds, run databases, credentials, and generated caches are excluded."
               ]
           }
-          Path("rc-evidence/source-manifest.json").write_text(json.dumps(manifest,indent=2,sort_keys=True)+"\\n")
+          Path("rc-evidence/source-manifest.json").write_text(json.dumps(manifest,indent=2,sort_keys=True)+"\n")
           print("===RC_SOURCE_MANIFEST_BEGIN===")
           print(json.dumps(manifest,indent=2,sort_keys=True))
           print("===RC_SOURCE_MANIFEST_END===")
