@@ -1,0 +1,11 @@
+{
+  "format": "c15-resident-packet-draft-v2",
+  "launchable": false,
+  "session_interface": null,
+  "files": [
+    {
+      "path": "PROTOCOL.md",
+      "sha256": "8f92a6f194711ca18ef967f40dae57d8dfd1f44e294184f3217f02d926b2e844"
+    }
+  ]
+}
