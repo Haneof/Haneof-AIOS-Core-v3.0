@@ -47,6 +47,28 @@ def _fsync_path(path: Path) -> None:
         os.close(directory_fd)
 
 
+def _publish_new_file(staged: Path, target: Path) -> None:
+    """Atomically publish a same-directory staged file without overwriting target."""
+
+    try:
+        os.link(staged, target)
+    except FileExistsError as exc:
+        raise RecoveryError(f"recovery destination already exists: {target}") from exc
+    except OSError as exc:
+        raise RecoveryError(f"cannot publish recovery artifact {target}: {exc}") from exc
+    try:
+        _fsync_path(target)
+    except Exception:
+        # The target may already be durably linked even if a later fsync reports
+        # failure. Never delete it and falsely claim it was never published.
+        raise
+    finally:
+        try:
+            staged.unlink()
+        except FileNotFoundError:
+            pass
+
+
 def _read_only_world_probe(path: Path) -> dict[str, Any]:
     if not path.exists() or not path.is_file():
         raise RecoveryError(f"World snapshot does not exist: {path}")
@@ -217,8 +239,7 @@ def backup_world(config: HeadlessConfig, destination: str | Path) -> dict[str, A
             if int(probe["schema_version"]) != source_schema:
                 raise RecoveryError("backup schema version does not match source snapshot")
             _fsync_path(staged)
-            os.replace(staged, target)
-            _fsync_path(target)
+            _publish_new_file(staged, target)
         except Exception:
             _unlink_sqlite_family(staged)
             raise
@@ -281,8 +302,7 @@ def restore_world(config: HeadlessConfig, source_backup: str | Path) -> dict[str
                 except FileNotFoundError:
                     pass
             _fsync_path(staged)
-            os.replace(staged, target)
-            _fsync_path(target)
+            _publish_new_file(staged, target)
         except Exception:
             _unlink_sqlite_family(staged)
             raise
