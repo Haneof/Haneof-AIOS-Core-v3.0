@@ -1,11 +1,11 @@
 # AIOS v3.0 当前工程断点
 
-## 当前控制入口 — 2026-09-24 FIX-001/002/003 DONE / HEADLESS DONE / RECOVERY DONE / SCALE REVIEW_READY / CI-FIX DONE
+## 当前控制入口 — 2026-09-24 FIX-001/002/003 DONE / HEADLESS DONE / RECOVERY DONE / SCALE DONE / RC-FREEZE READY / CI-FIX DONE
 
 - 接任 PM live 复核：live main = `e72a63874ed2c28798b00cec51f191caf1594a00`，Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`；见 `governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
 - `CORE-OPERATOR-001 = DONE`：独立验收 #135（ACCEPTANCE_PASS）先合 `fe6f1740eb`，候选 #131 后合 `e72a63874e`；报告 `reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md`。
 - `CORE-BASELINE-001 = DONE（re-verified）`；PR #136 已去除 pelican 文件，改作本 PM 补充治理 PR（pelican 提交 `f8edb5d1` 仅留历史，不合入）。
-- 合后 p16 `35958610555` SUCCESS；PR #130 = SUPERSEDED / NOT INTEGRATED。当前 S2：FIX-001 = DONE（#145 merge `d97a1bfa...`）；FIX-002 = DONE（#143 merge `3d980fad...`）；FIX-003 = DONE（final review #178 ACCEPTANCE_PASS / 0 blockers；#157 exact `7c0c51a7...` merged `78c10332...`；receipt `governance/CORE_GAP_FIX_003_INTEGRATION_RECEIPT_2026-09-24.md`）。三项 audited Core gap 均 CLOSED。`CORE-HEADLESS-001 = DONE`；`CORE-RECOVERY-001 = DONE`。`CORE-SCALE-001 = GATE / REVIEW_READY`：PR #197；tested exact `ba23767d...`，evidence-only `2c8f16fe...`；baseline red 保留，S10K/S100K/S1M、semantic equivalence、Recovery compatibility、full P16 均 SUCCESS；fresh acceptance prompt `governance/prompts/CORE_SCALE_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md`。RC-FREEZE/fresh Resident 仍 BLOCKED。CI-FIX = DONE。
+- 合后 p16 `35958610555` SUCCESS；PR #130 = SUPERSEDED / NOT INTEGRATED。当前 S2：FIX-001 = DONE（#145 merge `d97a1bfa...`）；FIX-002 = DONE（#143 merge `3d980fad...`）；FIX-003 = DONE（final review #178 ACCEPTANCE_PASS / 0 blockers；#157 exact `7c0c51a7...` merged `78c10332...`；receipt `governance/CORE_GAP_FIX_003_INTEGRATION_RECEIPT_2026-09-24.md`）。三项 audited Core gap 均 CLOSED。`CORE-HEADLESS-001 = DONE`；`CORE-RECOVERY-001 = DONE`；`CORE-SCALE-001 = DONE`：#200 ACCEPTANCE_PASS / 0 blockers；#197 tested exact `ba23767d...` + evidence-only `2c8f16fe...` merged `46c7cf97...`；receipt `governance/CORE_SCALE_001_INTEGRATION_RECEIPT_2026-09-24.md`。`CORE-RC-FREEZE-001 = READY`，prompt `governance/prompts/CORE_RC_FREEZE_001_2026-09-24.md`。fresh Resident 仍 BLOCKED。CI-FIX = DONE。
 
 ## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / FIX-001+002 READY
 
