@@ -1477,7 +1477,7 @@ def test_cg001_exact_read_fails_closed_for_missing_or_corrupt_learned_at(
     monkeypatch.setattr(
         store,
         "get_payload",
-        lambda object_id, revision=None: dict(payloads[str(object_id)]),
+        lambda object_id, revision=None, **kwargs: dict(payloads[str(object_id)]),
     )
 
     with pytest.raises(ValueError):
@@ -1486,3 +1486,122 @@ def test_cg001_exact_read_fails_closed_for_missing_or_corrupt_learned_at(
         runtime._inspect_world_object("corrupt", revision=1)
 
     runtime._active_turn_time = None
+
+
+def test_cg001_historical_ai_world_reads_preserve_latest_knowable_revision(tmp_path):
+    """Historical cognition reads expose rev1 known at T1, not the T2 replacement."""
+    db = tmp_path / "cg001_ai_world_revision_cut.db"
+    store = SQLiteWorldStore(db)
+    t1 = NOW
+    t2 = NOW + timedelta(hours=1)
+
+    initial_evidence = Observation(
+        object_id="obs_cg001_aiworld_initial",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(t1 - timedelta(hours=1)),
+        learned_at=t1 - timedelta(hours=1),
+        recorded_at=t1 - timedelta(hours=1),
+        created_by="test:cg001",
+        source_kind="conversation",
+        modality="text",
+        value="cg001 historical preference initially prefers tea",
+        metadata={"dimension": "dim:user_ai_interaction", "role": "user"},
+    )
+    correction = Observation(
+        object_id="obs_cg001_aiworld_correction",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(t1 - timedelta(days=1)),
+        learned_at=t2,
+        recorded_at=t2,
+        created_by="test:cg001",
+        source_kind="conversation",
+        modality="text",
+        value="cg001 late correction now prefers coffee",
+        metadata={"dimension": "dim:user_ai_interaction", "role": "user"},
+    )
+    store.commit(
+        [initial_evidence, correction],
+        OperationRequest(
+            operation_name="test.cg001.seed.aiworld.revision_cut",
+            expected_world_revision=0,
+            reason="seed early evidence and a later-learned correction",
+            idempotency_key="test-cg001-aiworld-revision-cut",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+    service = AIWorldCognitionService(store=store, index=index)
+    original = service.commit(
+        AIWorldClaimRequest(
+            domain=AIWorldDomain.USER_UNDERSTANDING,
+            statement="cg001 historical cognition rev1 prefers tea",
+            evidence_refs=(ObjectRef(object_id=initial_evidence.object_id, revision=1),),
+            confidence=0.9,
+            scope_key="cg001.temporal.preference",
+            tags=("core_context",),
+        ),
+        learned_at=t1 - timedelta(minutes=30),
+    )
+    claim_id = original.claim.claim_id
+    service.revise(
+        target_ref=ObjectRef(object_id=claim_id, revision=1),
+        evidence_refs=(ObjectRef(object_id=correction.object_id, revision=1),),
+        replacement_statement="cg001 late cognition rev2 prefers coffee",
+        reason="later evidence changed the preference",
+        changed_at=t2,
+    )
+    index.catch_up()
+
+    def model(snapshot):
+        history = snapshot.capability_history
+        identity = str(snapshot.cockpit["ai_identity"])
+        assert "historical cognition rev1 prefers tea" in identity
+        assert "late cognition rev2 prefers coffee" not in identity
+
+        if not history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="read_ai_world",
+                        arguments={
+                            "domains": ["user_understanding"],
+                            "scope_key": "cg001.temporal.preference",
+                            "limit": 10,
+                        },
+                    ),
+                )
+            )
+        if len(history) == 1:
+            read = history[-1]
+            assert read.ok is True
+            assert len(read.data) == 1
+            assert read.data[0]["object_id"] == claim_id
+            assert read.data[0]["revision"] == 1
+            assert "prefers tea" in read.data[0]["statement"]
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="inspect_world_object",
+                        arguments={"object_id": claim_id},
+                    ),
+                )
+            )
+
+        exact = history[-1]
+        assert exact.ok is True
+        assert exact.data["object_id"] == claim_id
+        assert exact.data["revision"] == 1
+        assert "prefers tea" in exact.data["content"]
+        return ModelDirective(response="historical cognition stayed on rev1")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    result = runtime.run_turn(
+        session_id="cg001-aiworld-history",
+        turn_index=1,
+        user_input="read the historical cognition cut",
+        current_topic=None,
+        occurred_at=t1,
+    )
+
+    assert result.runtime.response == "historical cognition stayed on rev1"
