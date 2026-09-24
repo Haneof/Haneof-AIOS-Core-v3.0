@@ -1,6 +1,6 @@
 # AIOS v3.0 单窗口任务执行总表
 
-## 当前控制入口 — 2026-09-24 FIX-002 DONE / FIX-001 IN_PROGRESS / FIX-003 REVIEW_READY / CI-FIX DONE
+## 当前控制入口 — 2026-09-24 FIX-002 DONE / FIX-001 REVIEW_READY / FIX-003 REVIEW_READY / CI-FIX DONE
 
 - 接任 PM 依 #128 治理接手；接手与 live 复核：`governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
 - **派工基线 = live main `079d7516f195cf6973933acc8cd057d59adc3a9f`**（其后仅治理/审查文档变更）；`CORE-OPERATOR-001` 集成点 = `e72a63874ed2c28798b00cec51f191caf1594a00`；Core tree 自审计以来始终 `7db4f72e7b3c29c74082f9984141159f8f1d6071`。每个新窗口仍须自行重取 live main，不得把本 SHA 当永久施工基线。
@@ -36,7 +36,7 @@
 | CORE-BASELINE-001 | **DONE（re-verified）** | S0 ruling 已落 main；接任 PM 于 `e72a63874e...` 复核成立（governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md） |
 | CORE-OPERATOR-001 | **DONE** | 独立验收 #135 先合（fe6f1740eb）→ 候选 #131 后合（e72a63874e）；报告 reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md |
 | CORE-GAP-AUDIT-001 | **DONE** | PR #132 已接受并合入；报告 `reviews/CORE_GAP_AUDIT_001_2026-09-24.md` |
-| CORE-GAP-FIX-001 | **IN_PROGRESS / DRAFT** | 原 PR #145 已恢复施工并已基于含 FIX-002 的主线继续；保留原 repro `a9a089a6...`，不得重做；仍需完成 CG-001、转 REVIEW_READY、独立验收后才能集成 |
+| CORE-GAP-FIX-001 | **GATE / REVIEW_READY** | PR #145 @ `b5a50435b3f9048bf94d88e9625b9e5bc2b83f42`；before-fix repro `a9a089a6...` 保留；17/17 exact-head workflows SUCCESS，full P16 649 passed / 0 failed / 0 skipped；等待不同 Independent Reviewer，未验收/未合并 |
 | CORE-GAP-FIX-002 | **DONE** | Independent review #154 ACCEPTANCE_PASS / 0 blockers；candidate #143 exact `c5382a1653...` merged as `3d980fadf6beefcdd02ff4367ba834a5b013d871`；receipt `governance/CORE_GAP_FIX_002_INTEGRATION_RECEIPT_2026-09-24.md` |
 | CORE-CI-FIX-001 | **DONE** | 首轮 #150 ACCEPTANCE_FAIL 历史保留；corrective #156 ACCEPTANCE_PASS / 0 blockers；#146 exact `1eb24e101cdb1579c22c69b435cf9f79a3c359ad` merged as `c3ec42214db57864f7951e28b75811b10db8be21`；receipt `governance/CORE_CI_FIX_001_INTEGRATION_RECEIPT_2026-09-24.md` |
 | CORE-CI-FIX-001-CORRECTIVE-001 | **DONE** | blocker `CORE-CI-FIX-001-ACCEPT-BLOCKER-001` closed by the accepted corrective; historical fail evidence remains unchanged |
