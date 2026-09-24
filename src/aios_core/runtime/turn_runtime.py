@@ -116,6 +116,29 @@ from .metering import ModelMeteringLedger
 
 _AUTO_TOPIC = object()
 
+class _KnowledgeCutoffStoreView:
+    """Read-only temporal lens over the durable World store.
+
+    Services using this view keep their existing parsing, subject isolation and
+    revision semantics while every object lookup is constrained to one knowledge cut.
+    """
+
+    def __init__(self, store: SQLiteWorldStore, cutoff: datetime) -> None:
+        self._store = store
+        self._cutoff = as_utc(cutoff, "knowledge_cutoff")
+
+    def get_payload(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
+        kwargs["knowledge_cutoff"] = self._cutoff
+        return self._store.get_payload(*args, **kwargs)
+
+    def list_payloads(self, *args: Any, **kwargs: Any) -> list[dict[str, Any]]:
+        kwargs["knowledge_cutoff"] = self._cutoff
+        return self._store.list_payloads(*args, **kwargs)
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._store, name)
+
+
 _C14_COGNITIVE_SIDE_EFFECT_ALLOWLIST = frozenset(
     {
         "commit_claim",
@@ -1295,6 +1318,40 @@ class FusedTurnRuntime:
             for hit in page.hits
         ]
 
+    def _cutoff_store(
+        self,
+        cutoff: datetime | None = None,
+    ) -> SQLiteWorldStore | _KnowledgeCutoffStoreView:
+        effective = self._active_turn_time if cutoff is None else cutoff
+        if effective is None:
+            return self.store
+        return _KnowledgeCutoffStoreView(self.store, effective)
+
+    def _ai_world_reader(
+        self,
+        cutoff: datetime | None = None,
+    ) -> AIWorldCognitionService:
+        effective = self._active_turn_time if cutoff is None else cutoff
+        if effective is None:
+            return self.ai_world
+        return AIWorldCognitionService(
+            store=self._cutoff_store(effective),
+            index=self.index,
+            user_id=self.subject_id,
+            ai_subject_id=self.ai_world.ai_subject_id,
+            evidence_policy=self.evidence_policy,
+        )
+
+    def _continuity_reader(
+        self,
+        cutoff: datetime | None = None,
+    ) -> ConversationContinuityService:
+        return ConversationContinuityService(
+            store=self._cutoff_store(cutoff),
+            index=self.index,
+            subject_id=self.subject_id,
+        )
+
     def _runtime_subject_scope(self) -> frozenset[str]:
         """Subjects that belong to this resident private user/AI world."""
 
@@ -1338,7 +1395,10 @@ class FusedTurnRuntime:
         object_id: str,
         revision: int | None = None,
     ) -> dict[str, Any]:
-        payload = self.store.get_payload(str(object_id), revision=revision)
+        payload = self._cutoff_store().get_payload(
+            str(object_id),
+            revision=revision,
+        )
         payload_subject = str(payload.get("subject_id") or "")
         if payload_subject not in self._runtime_subject_scope():
             raise ValueError(
@@ -1387,7 +1447,7 @@ class FusedTurnRuntime:
                 "session_id is required outside an active turn"
             )
         bounded = max(1, min(int(limit), 200))
-        summaries = self.continuity.round_summaries(
+        summaries = self._continuity_reader().round_summaries(
             session_id=active_session,
         )
         return [dict(item) for item in summaries[-bounded:]]
@@ -1409,7 +1469,7 @@ class FusedTurnRuntime:
             )
         return [
             dict(item)
-            for item in self.continuity.search_round_summaries(
+            for item in self._continuity_reader().search_round_summaries(
                 session_id=active_session,
                 query=str(query),
                 limit=max(1, min(int(limit), 20)),
@@ -1427,7 +1487,7 @@ class FusedTurnRuntime:
         if summary_id is not None:
             return [
                 dict(item)
-                for item in self.continuity.drill_down_summary(
+                for item in self._continuity_reader().drill_down_summary(
                     str(summary_id),
                     revision=(None if revision is None else int(revision)),
                 )
@@ -1448,7 +1508,7 @@ class FusedTurnRuntime:
             )
         return [
             dict(item)
-            for item in self.continuity.drill_down_range(
+            for item in self._continuity_reader().drill_down_range(
                 session_id=active_session,
                 turn_start=int(turn_start),
                 turn_end=int(turn_end),
@@ -1468,12 +1528,29 @@ class FusedTurnRuntime:
         )
         return [
             item.model_dump(mode="json")
-            for item in self.ai_world.current(
+            for item in self._ai_world_reader().current(
                 domains=parsed,
                 scope_key=scope_key,
                 limit=max(1, min(int(limit), 200)),
             )
         ]
+
+    def _ai_world_core_context(
+        self,
+        as_of: datetime,
+        *,
+        per_domain: int = 3,
+    ) -> dict[str, list[dict[str, Any]]]:
+        return self._ai_world_reader(as_of).core_context(per_domain=per_domain)
+
+    def _ai_world_snapshot(
+        self,
+        as_of: datetime,
+        *,
+        per_domain: int = 3,
+    ) -> dict[str, list[dict[str, Any]]]:
+        return self._ai_world_reader(as_of).snapshot(per_domain=per_domain)
+
     def _world_map_context(self, as_of: datetime) -> dict[str, Any]:
         """Build the always-visible L0 world directory without injecting payload semantics."""
 
@@ -1488,9 +1565,18 @@ class FusedTurnRuntime:
             for item in directory["dimensions"]
         }
 
-        for definition in self.dimensions.current_dimensions(include_terminal=False):
-            key = str(definition.metadata.get("dimension_key") or "").strip()
-            if not key:
+        terminal_lifecycles = {"merged", "split", "rejected", "archived"}
+        for definition in self.store.list_payloads(
+            object_type=ObjectType.DIMENSION_DEFINITION,
+            subject_id=self.subject_id,
+            knowledge_cutoff=as_of,
+        ):
+            metadata = definition.get("metadata")
+            if not isinstance(metadata, Mapping):
+                metadata = {}
+            key = str(metadata.get("dimension_key") or "").strip()
+            lifecycle = str(definition.get("lifecycle") or "")
+            if not key or lifecycle in terminal_lifecycles:
                 continue
             row = rows_by_key.setdefault(
                 key,
@@ -1506,11 +1592,11 @@ class FusedTurnRuntime:
             row.update(
                 {
                     "registered": True,
-                    "name": definition.name,
-                    "lifecycle": definition.lifecycle.value,
+                    "name": definition.get("name"),
+                    "lifecycle": lifecycle,
                     "definition_ref": {
-                        "object_id": definition.object_id,
-                        "revision": definition.revision,
+                        "object_id": str(definition["object_id"]),
+                        "revision": int(definition.get("revision", 1)),
                     },
                 }
             )
@@ -1636,27 +1722,32 @@ class FusedTurnRuntime:
         self,
         include_terminal: bool = False,
     ) -> list[dict[str, Any]]:
+        terminal_lifecycles = {"merged", "split", "rejected", "archived"}
         return [
-            item.model_dump(mode="json")
-            for item in self.dimensions.current_dimensions(
-                include_terminal=bool(include_terminal)
+            payload
+            for payload in self._cutoff_store().list_payloads(
+                object_type=ObjectType.DIMENSION_DEFINITION,
+                subject_id=self.subject_id,
             )
+            if bool(include_terminal)
+            or str(payload.get("lifecycle") or "") not in terminal_lifecycles
         ]
 
     def _read_execution_world(self) -> dict[str, Any]:
+        reader = self._cutoff_store()
         return {
-            "goals": [
-                item.model_dump(mode="json")
-                for item in self.execution_world.current_goals()
-            ],
-            "tasks": [
-                item.model_dump(mode="json")
-                for item in self.execution_world.current_tasks()
-            ],
-            "actions": [
-                item.model_dump(mode="json")
-                for item in self.execution_world.current_actions()
-            ],
+            "goals": reader.list_payloads(
+                object_type=ObjectType.GOAL,
+                subject_id=self.subject_id,
+            ),
+            "tasks": reader.list_payloads(
+                object_type=ObjectType.TASK,
+                subject_id=self.subject_id,
+            ),
+            "actions": reader.list_payloads(
+                object_type=ObjectType.ACTION,
+                subject_id=self.subject_id,
+            ),
         }
 
     @staticmethod
@@ -1979,7 +2070,13 @@ class FusedTurnRuntime:
     ) -> dict[str, Any]:
         start = datetime.fromisoformat(str(window_start).replace("Z", "+00:00"))
         end = datetime.fromisoformat(str(window_end).replace("Z", "+00:00"))
-        projection = self.all_dimensions.project(
+        projection_reader = AllDimensionsProjectionService(
+            store=self._cutoff_store(),
+            index=self.index,
+            subject_id=self.subject_id,
+            max_items_per_dimension=self.all_dimensions.max_items_per_dimension,
+        )
+        projection = projection_reader.project(
             dimensions=dimensions,
             window_start=start,
             window_end=end,
@@ -2008,6 +2105,7 @@ class FusedTurnRuntime:
             str(entity_id),
             keywords=(() if query is None or not str(query).strip() else (str(query),)),
             subject=self.subject_id,
+            as_of=self._active_turn_time,
             limit=max(1, min(int(limit), 50)),
         )
         return [self._search_hit_payload(hit) for hit in page.hits]
@@ -2029,6 +2127,7 @@ class FusedTurnRuntime:
             dimension=(None if dimension is None else str(dimension)),
             object_types=(None if object_types is None else tuple(str(x) for x in object_types)),
             time_range=(start, end),
+            as_of=self._active_turn_time,
             limit=max(1, min(int(limit), 100)),
         )
         return [self._search_hit_payload(hit) for hit in page.hits]
@@ -2040,7 +2139,7 @@ class FusedTurnRuntime:
     ) -> list[dict[str, Any]]:
         target = str(object_id)
         matched: list[dict[str, Any]] = []
-        for payload in self.store.list_payloads(
+        for payload in self._cutoff_store().list_payloads(
             object_type=ObjectType.RELATION,
             subject_id=self.subject_id,
         ):
@@ -2106,6 +2205,7 @@ class FusedTurnRuntime:
             str(query),
             subject=self.subject_id,
             dimension=(None if dimension is None else str(dimension)),
+            as_of=self._active_turn_time,
             limit=max(1, min(int(limit), 100)),
         )
         return [self._search_hit_payload(hit) for hit in page.hits]
@@ -3467,6 +3567,17 @@ class FusedTurnRuntime:
             else running.wake_source
         )
 
+        active_write_time = now
+        if effective_wake_source is WakeSource.COGNITIVE_DERIVATION:
+            raw_first_started_at = (
+                running.metadata.get("runtime_first_started_at")
+                or running.metadata.get("started_at")
+            )
+            if raw_first_started_at is not None:
+                active_write_time = datetime.fromisoformat(
+                    str(raw_first_started_at).replace("Z", "+00:00")
+                )
+
         empty_recommendation = RecommendationBundle(
             current_topic=None,
             topic_gate_open=False,
@@ -3475,7 +3586,10 @@ class FusedTurnRuntime:
             cards=(),
             reason="wake_dispatch_uses_wake_reason_as_first_pointer",
         )
-        continuity_context = self.ai_world.core_context(per_domain=3)
+        continuity_context = self._ai_world_core_context(
+            active_write_time,
+            per_domain=3,
+        )
         wake_context = {
             "wake_ref": running_ref.model_dump(mode="json"),
             "wake_source": running.wake_source.value,
@@ -3564,7 +3678,10 @@ class FusedTurnRuntime:
                 "summary_window": summary_payload.get("summary_time"),
                 "scheduler_derived_lineage": dict(scheduler_lineage),
                 "runtime_derived_lineage": runtime_lineage.audit_payload(),
-                "current_ai_world": self.ai_world.snapshot(per_domain=3),
+                "current_ai_world": self._ai_world_snapshot(
+                    active_write_time,
+                    per_domain=3,
+                ),
                 "capability_names": [
                     item["name"] for item in self.registry.catalog()
                 ],
@@ -3686,22 +3803,12 @@ class FusedTurnRuntime:
             recent_turns=(),
             conversation_summaries=(),
             ai_identity=continuity_context,
-            world_map=self._world_map_context(now),
+            world_map=self._world_map_context(active_write_time),
             task_context=task_context,
             capability_catalog=self.registry.catalog(),
             token_budget=token_budget,
         )
 
-        active_write_time = now
-        if effective_wake_source is WakeSource.COGNITIVE_DERIVATION:
-            raw_first_started_at = (
-                running.metadata.get("runtime_first_started_at")
-                or running.metadata.get("started_at")
-            )
-            if raw_first_started_at is not None:
-                active_write_time = datetime.fromisoformat(
-                    str(raw_first_started_at).replace("Z", "+00:00")
-                )
         self._active_turn_time = active_write_time
         self._active_meter_time = now
         self._active_session_id = None
@@ -3914,6 +4021,22 @@ class FusedTurnRuntime:
         )
         self.index.catch_up()
 
+        running_payload = self.store.get_payload(
+            request.wake_ref.object_id,
+            revision=request.wake_ref.revision,
+        )
+        running_metadata = running_payload.get("metadata")
+        raw_started_at = (
+            running_metadata.get("started_at")
+            if isinstance(running_metadata, Mapping)
+            else None
+        )
+        review_write_time = (
+            datetime.fromisoformat(str(raw_started_at).replace("Z", "+00:00"))
+            if raw_started_at is not None
+            else now
+        )
+
         empty_recommendation = RecommendationBundle(
             current_topic=None,
             topic_gate_open=False,
@@ -3922,7 +4045,10 @@ class FusedTurnRuntime:
             cards=(),
             reason="periodic_review_does_not_use_proactive_memory_injection",
         )
-        continuity_context = self.ai_world.core_context(per_domain=3)
+        continuity_context = self._ai_world_core_context(
+            review_write_time,
+            per_domain=3,
+        )
         review_context = {
             "review_id": request.review_id,
             "wake_ref": request.wake_ref.model_dump(mode="json"),
@@ -3946,29 +4072,13 @@ class FusedTurnRuntime:
             recent_turns=(),
             conversation_summaries=(),
             ai_identity=continuity_context,
-            world_map=self._world_map_context(now),
+            world_map=self._world_map_context(review_write_time),
             task_context={
                 "periodic_review": review_context,
                 "cognitive_policy_context": self._cognitive_policy_context(),
             },
             capability_catalog=self.registry.catalog(),
             token_budget=token_budget,
-        )
-
-        running_payload = self.store.get_payload(
-            request.wake_ref.object_id,
-            revision=request.wake_ref.revision,
-        )
-        running_metadata = running_payload.get("metadata")
-        raw_started_at = (
-            running_metadata.get("started_at")
-            if isinstance(running_metadata, Mapping)
-            else None
-        )
-        review_write_time = (
-            datetime.fromisoformat(str(raw_started_at).replace("Z", "+00:00"))
-            if raw_started_at is not None
-            else now
         )
 
         # A resumed RUNNING review keeps its original write time. This makes
