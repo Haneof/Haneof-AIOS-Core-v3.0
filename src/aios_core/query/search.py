@@ -592,33 +592,11 @@ class WorldSearchIndex:
             # 必须由 learned_at 截止。occurred_at 只描述世界何时发生，不能证明
             # AIOS 当时已经知道该事件。缺失/损坏 learned_at 时 fail closed，避免
             # 把后来获知的过去事件泄漏进历史视图。
-            cutoff = as_utc(as_of, "as_of")
-            valid_candidates: set[tuple[str, int]] = set()
-            for oid, rev in candidates:
-                learned_at: datetime | None = None
-                annotation = conn.execute(
-                    "SELECT created_at FROM search_annotations WHERE annotation_id=?",
-                    (oid,),
-                ).fetchone()
-                if annotation is not None:
-                    try:
-                        learned_at = as_utc(
-                            datetime.fromisoformat(str(annotation["created_at"])),
-                            "annotation_created_at",
-                        )
-                    except (TypeError, ValueError):
-                        learned_at = None
-                else:
-                    payload = self._store.get_payload(oid, revision=rev)
-                    raw_learned = payload.get("learned_at")
-                    if isinstance(raw_learned, str):
-                        learned_at = as_utc(
-                            datetime.fromisoformat(raw_learned),
-                            "learned_at",
-                        )
-                if learned_at is not None and learned_at <= cutoff:
-                    valid_candidates.add((oid, rev))
-            candidates = valid_candidates
+            candidates = {
+                (oid, rev)
+                for oid, rev in candidates
+                if self._known_at_cutoff(conn, oid, rev, as_of)
+            }
 
         pairs = sorted(candidates)
         # 50 万修订下的物理计划纪律（G-M1P/T2-I 禁扫描）：候选对经临时表
@@ -782,6 +760,46 @@ class WorldSearchIndex:
             # annotation table are index corruption and must not be hidden.
             raise RuntimeError("retrospective annotation projection failed") from exc
 
+    def _known_at_cutoff(
+        self,
+        conn: sqlite3.Connection,
+        object_id: str,
+        revision: int,
+        as_of: datetime,
+    ) -> bool:
+        """Return whether an indexed revision was knowable at the requested cutoff.
+
+        This is the shared AS_KNOWN primitive for runtime-facing query paths.
+        Knowledge time is learned_at for World objects and created_at for
+        projection-only retrospective annotations. Missing, malformed, or naive
+        timestamps fail closed.
+        """
+
+        cutoff = as_utc(as_of, "as_of")
+        annotation = conn.execute(
+            "SELECT created_at FROM search_annotations WHERE annotation_id=?",
+            (object_id,),
+        ).fetchone()
+        raw_known_at: Any
+        field_name: str
+        if annotation is not None:
+            raw_known_at = annotation["created_at"]
+            field_name = "annotation_created_at"
+        else:
+            payload = self._store.get_payload(object_id, revision=revision)
+            raw_known_at = payload.get("learned_at")
+            field_name = "learned_at"
+        if not isinstance(raw_known_at, str) or not raw_known_at.strip():
+            return False
+        try:
+            known_at = as_utc(
+                datetime.fromisoformat(raw_known_at),
+                field_name,
+            )
+        except (TypeError, ValueError):
+            return False
+        return known_at <= cutoff
+
     _INACTIVE_CURRENT_STATUSES = {
         "retracted",
         "superseded",
@@ -841,6 +859,7 @@ class WorldSearchIndex:
         time_range: Optional[Tuple[datetime, datetime]] = None,
         include_annotations: bool = True,
         include_inactive: bool = False,
+        as_of: datetime | None = None,
         limit: int = 20,
     ) -> MindSearchPage:
         """宪法第二十章：多维心智联合感知检索入口。
@@ -940,6 +959,13 @@ class WorldSearchIndex:
                     continue
                 if candidate_pairs is not None and (oid, rev) not in candidate_pairs:
                     continue
+                if as_of is not None and not self._known_at_cutoff(
+                    conn,
+                    str(oid),
+                    rev,
+                    as_of,
+                ):
+                    continue
                 if not include_inactive and not self._visible_in_current_view(
                     str(oid),
                     rev,
@@ -1021,6 +1047,13 @@ class WorldSearchIndex:
                 ).fetchall()
                 for ar in anno_rows:
                     aid = str(ar[0])
+                    if as_of is not None and not self._known_at_cutoff(
+                        conn,
+                        aid,
+                        1,
+                        as_of,
+                    ):
+                        continue
                     if aid not in retrieved_object_ids:
                         claim_txt = str(ar[3])
                         est_a_tok = max(10, len(claim_txt) // 3)
@@ -1074,6 +1107,7 @@ class WorldSearchIndex:
         object_types: Sequence[str] | None = None,
         time_range: Tuple[datetime, datetime] | None = None,
         include_inactive: bool = False,
+        as_of: datetime | None = None,
         limit: int = 20,
     ) -> MindSearchPage:
         """Broad lexical candidate generation for AI/system callers.
@@ -1140,6 +1174,13 @@ class WorldSearchIndex:
                     (object_id, revision),
                 ).fetchone()
                 if row is None:
+                    continue
+                if as_of is not None and not self._known_at_cutoff(
+                    conn,
+                    str(object_id),
+                    int(revision),
+                    as_of,
+                ):
                     continue
 
                 latest = conn.execute(
@@ -1271,6 +1312,17 @@ class WorldSearchIndex:
                 """,
                 params,
             ).fetchall()
+            if reference is not None:
+                rows = [
+                    row
+                    for row in rows
+                    if self._known_at_cutoff(
+                        conn,
+                        str(row["object_id"]),
+                        int(row["revision"]),
+                        reference,
+                    )
+                ]
 
         buckets: dict[str, dict[str, Any]] = {}
         for row in rows:
@@ -1357,6 +1409,7 @@ class WorldSearchIndex:
         subject: str | None = None,
         object_types: Sequence[str] | None = None,
         include_inactive: bool = False,
+        as_of: datetime | None = None,
         limit: int = 20,
     ) -> MindSearchPage:
         """Return a bounded recent-current candidate set without semantic ranking.
@@ -1419,6 +1472,13 @@ class WorldSearchIndex:
                 object_id = str(row["object_id"])
                 revision = int(row["revision"])
                 if object_id in tombstones:
+                    continue
+                if as_of is not None and not self._known_at_cutoff(
+                    conn,
+                    object_id,
+                    revision,
+                    as_of,
+                ):
                     continue
                 if not include_inactive and not self._visible_in_current_view(
                     object_id,
