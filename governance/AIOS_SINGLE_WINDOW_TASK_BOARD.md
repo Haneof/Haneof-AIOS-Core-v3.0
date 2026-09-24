@@ -17,7 +17,7 @@
 - S2 两个并行修复窗口的写入范围隔离与 operator 面禁改规则见 `governance/AIOS_CORE_GAP_DISPATCH_2026-09-24.md` 的 "Dispatch update — 2026-09-24"。
 - **`CORE-CI-FIX-001 = DONE`**：首轮 review #150 对 head `1896b3e5...` 正确给出 ACCEPTANCE_FAIL（历史 blocker 保留）；corrective review #156 对 exact head `1eb24e101cdb1579c22c69b435cf9f79a3c359ad` 给出 ACCEPTANCE_PASS / 0 blockers；#156 先合 `f3d20c22...`，随后 #146 以 pinned head 合入 `c3ec42214db57864f7951e28b75811b10db8be21`。收据：`governance/CORE_CI_FIX_001_INTEGRATION_RECEIPT_2026-09-24.md`。PR #144 继续 SUPERSEDED / NOT INTEGRATED。历史派工说明：**（release/CI 基础设施）：`c15-rcc-fixture-mechanical-gate` 与 `semantic-repair-mechanical-gate` 的 "prove zero Core diff" 步骤在浅克隆上 `git` 自身 exit 128，随分支形状时红时绿（#133 红 / #137 绿 / #138 #139 红），不是策略违规。发现与 PM 裁决：`governance/AIOS_CORE_CI_FINDING_001_2026-09-24.md`；提示词：`governance/prompts/CORE_CI_FIX_001_2026-09-24.md`。不阻塞 FIX-001/002，但 **必须在 `CORE-RC-FREEZE-001` 之前关闭**。
 - #138/#139 两条红检查登记为 **INFRASTRUCTURE_FAILURE**，不登记为通过、也不登记为已接受的违规；PM 已用直接证据独立验证不变式成立（`git diff e72a638..main -- src/` 为空，Core tree 仍 `7db4f72e`），未绕过分支保护（该两项非 required）。
-- `CORE-HEADLESS-001 = READY`；RECOVERY/SCALE/RC-FREEZE 与 fresh Resident A/B/C 继续 BLOCKED；UI/P18/P19 排除。
+- `CORE-HEADLESS-001 = GATE / REVIEW_READY`；当前只允许 Independent Acceptance；RECOVERY/SCALE/RC-FREEZE 与 fresh Resident A/B/C 继续 BLOCKED；UI/P18/P19 排除。
 
 ## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / S1-S2 ACTIVE
 
