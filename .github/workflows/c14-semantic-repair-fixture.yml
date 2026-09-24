@@ -50,13 +50,54 @@ jobs:
       - name: Prove fixture task did not modify Core or historical C14 evidence
         shell: bash
         run: |
-          git fetch origin main --depth=1
-          changed="$(git diff --name-only origin/main...HEAD)"
-          if printf '%s\n' "$changed" | grep -q '^src/aios_core/'; then
-            echo "C14-SEM-REPAIR-FIX-001 must not modify src/aios_core/**"
+          set -euo pipefail
+
+          guard_error() {
+            echo "::error::Guard could not be evaluated: $1"
+            exit 2
+          }
+
+          event_name='${{ github.event_name }}'
+          pr_base_sha='${{ github.event.pull_request.base.sha }}'
+
+          if [ "$event_name" = "pull_request" ]; then
+            if [ -z "$pr_base_sha" ]; then
+              guard_error "pull_request.base.sha is missing"
+            fi
+            if ! git cat-file -e "${pr_base_sha}^{commit}" 2>/dev/null; then
+              if ! git fetch --no-tags --depth=1 origin "$pr_base_sha"; then
+                guard_error "failed to fetch PR base $pr_base_sha"
+              fi
+            fi
+            if ! changed="$(git diff --name-only "$pr_base_sha" HEAD)"; then
+              guard_error "git diff failed for PR base $pr_base_sha"
+            fi
+            echo "Guard evaluated against PR base $pr_base_sha"
+          else
+            if ! shallow="$(git rev-parse --is-shallow-repository)"; then
+              guard_error "could not determine whether checkout is shallow"
+            fi
+            if [ "$shallow" = "true" ]; then
+              if ! git fetch --no-tags --unshallow origin; then
+                guard_error "failed to unshallow checkout"
+              fi
+            fi
+            if ! git fetch --no-tags origin main; then
+              guard_error "failed to fetch main"
+            fi
+            if ! merge_base="$(git merge-base origin/main HEAD)"; then
+              guard_error "no merge base between origin/main and HEAD"
+            fi
+            if ! changed="$(git diff --name-only "$merge_base" HEAD)"; then
+              guard_error "git diff failed from merge base $merge_base"
+            fi
+            echo "Guard evaluated from merge base $merge_base"
+          fi
+          if grep -q '^src/aios_core/' <<<"$changed"; then
+            echo "::error::Invariant rejected: C14-SEM-REPAIR-FIX-001 must not modify src/aios_core/**"
             exit 1
           fi
-          if printf '%s\n' "$changed" | grep -q '^reviews/internal_habitation/c14-resident/v2/'; then
-            echo "C14-SEM-REPAIR-FIX-001 must not modify frozen v2 fixture or Resident A/B evidence"
+          if grep -q '^reviews/internal_habitation/c14-resident/v2/' <<<"$changed"; then
+            echo "::error::Invariant rejected: C14-SEM-REPAIR-FIX-001 must not modify frozen v2 fixture or Resident A/B evidence"
             exit 1
           fi
