@@ -1,13 +1,13 @@
 # AIOS v3.0 项目全流程总地图
 
-## 当前控制入口 — 2026-09-24 Core gap audit accepted; S1/S2 active
+## 当前控制入口 — 2026-09-24 Core operator DONE; gap fixes S2 active
 
 - `CORE-BASELINE-001 = DONE`。
 - `CORE-GAP-AUDIT-001 = DONE`：PR #132 accepted/merged at `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`；audited Core tree `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
 - Audit disposition: 3 STILL_OPEN RC blockers / 14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE。
 - Active blockers: CG-001 runtime temporal read cut；CG-002 background model execution IN_DOUBT；CG-003 user-turn IN_DOUBT recovery。
-- 当前可并行施工：`CORE-GAP-FIX-001`、`CORE-GAP-FIX-002`。FIX-003 依赖 FIX-002 独立验收与集成，当前 BLOCKED。
-- `CORE-OPERATOR-001` 已有 PR #131 engineering candidate，状态 GATE / REVIEW_READY，等待不同 independent reviewer；未验收前不 merge。
+- 当前可并行施工（待启动，尚无提交）：`CORE-GAP-FIX-001`、`CORE-GAP-FIX-002`。FIX-003 依赖 FIX-002 独立验收与集成，当前 BLOCKED。
+- `CORE-OPERATOR-001 = DONE`：#135 ACCEPTANCE_PASS → #131 exact head `0e1d69ee` merged at `e72a63874ed2c28798b00cec51f191caf1594a00`；Core ZERO DIFF；#130 SUPERSEDED。
 - 路线保持：operator acceptance + three accepted gap fixes → headless → recovery → scale → RC freeze → fresh C15 A/B/C → C16 → P16 → P17 Core release closure。
 - 历史实验与开发线继续分离：#117 historical A 不 hash-swap；#121 failed/non-canonical；Core 变化后只在 RC freeze 后新跑 fresh A。
 - UI、数字人、Launcher、动画、硬件、ROM 不开发。

@@ -4,7 +4,8 @@
 
 - 接任 PM live 复核：live main = `e72a63874ed2c28798b00cec51f191caf1594a00`，Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`；见 `governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
 - `CORE-OPERATOR-001 = DONE`：独立验收 #135（ACCEPTANCE_PASS）先合 `fe6f1740eb`，候选 #131 后合 `e72a63874e`；报告 `reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md`。
-- `CORE-BASELINE-001 = DONE（re-verified）`；PR #136（pelican 动画）EXCLUDED 永不合入。
+- `CORE-BASELINE-001 = DONE（re-verified）`；PR #136 已去除 pelican 文件，改作本 PM 补充治理 PR（pelican 提交 `f8edb5d1` 仅留历史，不合入）。
+- 合后 p16 `35958610555` SUCCESS；PR #130 = SUPERSEDED / NOT INTEGRATED；FIX-001/002 待启动（分支零提交）；验收提示词 `governance/prompts/CORE_GAP_FIX_ACCEPTANCE_2026-09-24.md`。
 
 ## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / FIX-001+002 READY
 
