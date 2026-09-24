@@ -1,6 +1,6 @@
 # AIOS v3.0 单窗口任务执行总表
 
-## 当前控制入口 — 2026-09-24 FIX-002 DONE / FIX-001 ACCEPTANCE_FAIL + CORRECTIVE READY / FIX-003 ACCEPTANCE_FAIL + CORRECTIVE READY / CI-FIX DONE
+## 当前控制入口 — 2026-09-24 FIX-002 DONE / FIX-001 CORRECTIVE IN_PROGRESS / FIX-003 CORRECTIVE REVIEW_READY / CI-FIX DONE
 
 - 接任 PM 依 #128 治理接手；接手与 live 复核：`governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
 - **派工基线 = live main `079d7516f195cf6973933acc8cd057d59adc3a9f`**（其后仅治理/审查文档变更）；`CORE-OPERATOR-001` 集成点 = `e72a63874ed2c28798b00cec51f191caf1594a00`；Core tree 自审计以来始终 `7db4f72e7b3c29c74082f9984141159f8f1d6071`。每个新窗口仍须自行重取 live main，不得把本 SHA 当永久施工基线。
@@ -37,12 +37,12 @@
 | CORE-OPERATOR-001 | **DONE** | 独立验收 #135 先合（fe6f1740eb）→ 候选 #131 后合（e72a63874e）；报告 reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md |
 | CORE-GAP-AUDIT-001 | **DONE** | PR #132 已接受并合入；报告 `reviews/CORE_GAP_AUDIT_001_2026-09-24.md` |
 | CORE-GAP-FIX-001 | **GATE / ACCEPTANCE_FAIL** | Independent review #161 对 exact `b5a50435b3f9048bf94d88e9625b9e5bc2b83f42` 给出 ACCEPTANCE_FAIL；唯一 blocker `CORE-GAP-FIX-001-ACCEPT-BLOCKER-001 = C14_RUNTIME_DERIVED_LINEAGE_NOT_CUTOFF`；PR #145 保持 OPEN / UNMERGED，不得 merge |
-| CORE-GAP-FIX-001-CORRECTIVE-001 | **READY** | 继续原 PR #145 / branch `core-gap-fix-001-temporal-read-cut-20260924-r2`；只修 C14 `runtime_derived_lineage` dependency traversal 未 obey Tcut；提示词 `governance/prompts/CORE_GAP_FIX_001_CORRECTIVE_001_2026-09-24.md`；完成后重新独立验收 |
+| CORE-GAP-FIX-001-CORRECTIVE-001 | **IN_PROGRESS** | 继续原 PR #145 / branch `core-gap-fix-001-temporal-read-cut-20260924-r2`；只修 C14 `runtime_derived_lineage` dependency traversal 未 obey Tcut；提示词 `governance/prompts/CORE_GAP_FIX_001_CORRECTIVE_001_2026-09-24.md`；完成后重新独立验收 |
 | CORE-GAP-FIX-002 | **DONE** | Independent review #154 ACCEPTANCE_PASS / 0 blockers；candidate #143 exact `c5382a1653...` merged as `3d980fadf6beefcdd02ff4367ba834a5b013d871`；receipt `governance/CORE_GAP_FIX_002_INTEGRATION_RECEIPT_2026-09-24.md` |
 | CORE-CI-FIX-001 | **DONE** | 首轮 #150 ACCEPTANCE_FAIL 历史保留；corrective #156 ACCEPTANCE_PASS / 0 blockers；#146 exact `1eb24e101cdb1579c22c69b435cf9f79a3c359ad` merged as `c3ec42214db57864f7951e28b75811b10db8be21`；receipt `governance/CORE_CI_FIX_001_INTEGRATION_RECEIPT_2026-09-24.md` |
 | CORE-CI-FIX-001-CORRECTIVE-001 | **DONE** | blocker `CORE-CI-FIX-001-ACCEPT-BLOCKER-001` closed by the accepted corrective; historical fail evidence remains unchanged |
 | CORE-GAP-FIX-003 | **GATE / ACCEPTANCE_FAIL** | Independent review #162 对 exact `81d626820cfa31e4f3f1aba0e892eb48cb11e46c` 给出 ACCEPTANCE_FAIL；唯一 blocker `CORE-GAP-FIX-003-ACCEPT-BLOCKER-001` = initial user-turn claim 与 round-0 provider-attempt admission 之间存在 crash dead zone；PR #157 保持 OPEN / UNMERGED，不得 merge |
-| CORE-GAP-FIX-003-CORRECTIVE-001 | **READY** | 继续原 PR #157 / branch `core-gap-fix-003-user-turn-recovery-20260924-sol`；只关闭 claim→initial-attempt admission crash gap；提示词 `governance/prompts/CORE_GAP_FIX_003_CORRECTIVE_001_2026-09-24.md`；完成后重新独立验收 |
+| CORE-GAP-FIX-003-CORRECTIVE-001 | **GATE / REVIEW_READY** | PR #157 @ `ac8d5a43993a50caa27fe89a52f55a6e6e69ec9d`；显式 `model_attempt_pre_admission_v1` 关闭 claim→initial-attempt crash dead zone；double-crash fault injection PASS；13/13 exact-head workflows SUCCESS，P16 654 passed；等待新的 Independent Reviewer，未验收/未合并 |
 | CORE-HEADLESS-001 | **BLOCKED** | OPERATOR accepted + FIX-001/002/003 accepted/integrated |
 | CORE-RECOVERY-001 | **BLOCKED** | HEADLESS + 三项 gap 修复进入 S2 candidate |
 | CORE-SCALE-001 | **BLOCKED** | S2 功能候选 |
