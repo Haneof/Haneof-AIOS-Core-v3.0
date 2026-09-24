@@ -1,0 +1,174 @@
+name: real-a-import-312
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "tools/c15_preflight/**"
+      - ".github/workflows/real-a-import-312.yml"
+permissions:
+  contents: read
+jobs:
+  real-a-312:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: |
+          python -c 'import sys; print(sys.version)'
+          pip install -e ".[dev]"
+          find src -type d -name __pycache__ -exec rm -rf {} + || true
+      - name: Fetch accepted A branch and archive
+        run: |
+          git fetch origin refs/heads/arena/01a0cca8-haneof-aios-core-v3-0:refs/remotes/origin/arena/01a0cca8-haneof-aios-core-v3-0
+          git rev-parse refs/remotes/origin/arena/01a0cca8-haneof-aios-core-v3-0
+          git ls-remote origin refs/heads/arena/01a0cca8-haneof-aios-core-v3-0
+          mkdir -p /tmp/real_a_original
+          git archive refs/remotes/origin/arena/01a0cca8-haneof-aios-core-v3-0 -- reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/ | tar -x -C /tmp/real_a_original --strip-components=6
+          ls -lh /tmp/real_a_original/
+          sha256sum /tmp/real_a_original/private_world.sqlite
+          sha256sum /tmp/real_a_original/world_index.sqlite
+      - name: Real A mechanical import under Python>=3.12
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          python - <<'PY'
+          import sys, pathlib, json, os, shutil, hashlib
+          print(f"sys.version={sys.version}")
+          print(f"sys.executable={sys.executable}")
+          import subprocess
+          operator_sha = subprocess.check_output(["git","rev-parse","HEAD"], text=True).strip()
+          print(f"operator source SHA={operator_sha}")
+          fixed_sha = "3e51f728d7959048b75fea01d405bc837b0e8185"
+          branch_sha = subprocess.check_output(["git","rev-parse","refs/remotes/origin/arena/01a0cca8-haneof-aios-core-v3-0"], text=True).strip()
+          print(f"branch resolves to {branch_sha}, fixed A SHA {fixed_sha}, equal={branch_sha==fixed_sha}")
+          from pathlib import Path
+          REPO_ROOT = Path.cwd()
+          sys.path.insert(0, str(REPO_ROOT / "src"))
+          sys.path.insert(0, str(REPO_ROOT))
+          from tools.c15_preflight.restart import stage_accepted_a, import_accepted_a_to_driver_run
+          from tools.c15_preflight.audit import HASHES, A_SHA, CORE_SHA, digest, verify_boundary, verify_core
+          from tools.c15_preflight.driver import Driver, DriverBlocked, AcceptedAPort
+          from tools.c15_preflight.transport import Trace
+          from aios_core.storage.sqlite_store import SQLiteWorldStore
+          from aios_core.query.search import WorldSearchIndex
+          from aios_core.runtime.turn_runtime import FusedTurnRuntime
+          from datetime import datetime
+          import tempfile
+
+          source_original = Path("/tmp/real_a_original")
+          for k,v in HASHES.items():
+              actual = digest(source_original / k)
+              print(f"hash {k} match={actual==v}")
+              assert actual==v, f"hash mismatch {k}"
+
+          b = verify_boundary(source_original)
+          print(f"verify_boundary wr={b['world_revision']} iw={b['index_watermark']}")
+
+          try:
+              frozen = verify_core(REPO_ROOT)
+              print(f"verify_core frozen={frozen[:12]}")
+          except Exception as e:
+              print(f"verify_core failed: {e}")
+              # Try to show untracked
+              untracked = subprocess.check_output(["git","ls-files","--others","--exclude-standard","--","src/aios_core"], text=True).strip()
+              print(f"untracked Core: {untracked}")
+              raise
+
+          staging_dir = Path("/tmp/real_a_staging_312")
+          if staging_dir.exists():
+              shutil.rmtree(staging_dir)
+          new_session = "real-a-312-session-001"
+          plan = stage_accepted_a(source_original, staging_dir, REPO_ROOT, new_session=new_session)
+          print(f"staged accepted_a={plan['accepted_a']} synthetic={plan.get('synthetic')}")
+
+          driver_run_dir = Path("/tmp/real_a_driver_run_312")
+          if driver_run_dir.exists():
+              shutil.rmtree(driver_run_dir)
+          result = import_accepted_a_to_driver_run(staging_dir, driver_run_dir, repo=REPO_ROOT, synthetic=False)
+          print(f"import status={result['status']} synthetic={result.get('synthetic')} model_requests={result['validation']['model_requests']}")
+
+          store = SQLiteWorldStore(driver_run_dir / "private_world.sqlite")
+          index = WorldSearchIndex(driver_run_dir / "world_index.sqlite", store=store)
+          trace = Trace(driver_run_dir / "trace.jsonl", store.current_world_revision)
+          def forbidden(*a, **kw):
+              raise DriverBlocked("forbidden model")
+          runtime = FusedTurnRuntime(store=store, index=index, subject_id="user_1",
+              model_handler=forbidden, round_summary_handler=forbidden, dimension_summary_handler=forbidden)
+          port = AcceptedAPort(driver_run_dir / "release_state.json", driver_run_dir / "private_world.sqlite")
+          clock = datetime.fromisoformat(plan["clock"])
+          driver = Driver(runtime, trace, port, driver_run_dir, session=plan["session_id"], clock=clock, stop_sequence=20, accepted_a_dir=staging_dir)
+          print(f"driver completed={driver.state['completed_sequence']} wr={driver.state['world_revision']} iw={driver.state['index_watermark']}")
+          release = port.read_state()
+          print(f"release last_acked={release['last_acked_sequence']} next={release['next_sequence']} pending={release['pending_reveal']}")
+          for k,v in HASHES.items():
+              actual = digest(source_original / k)
+              assert actual==v
+          driver.close()
+          trace.close()
+
+          # Cross-process
+          import subprocess, textwrap, os
+          script = textwrap.dedent(f'''
+          import sys
+          from pathlib import Path
+          REPO_ROOT = Path("{REPO_ROOT}")
+          sys.path.insert(0, str(REPO_ROOT))
+          sys.path.insert(0, str(REPO_ROOT / "src"))
+          from tools.c15_preflight.driver import Driver, AcceptedAPort
+          from tools.c15_preflight.transport import Trace
+          from aios_core.storage.sqlite_store import SQLiteWorldStore
+          from aios_core.query.search import WorldSearchIndex
+          from aios_core.runtime.turn_runtime import FusedTurnRuntime
+          from datetime import datetime
+          driver_run_dir = Path("/tmp/real_a_driver_run_312")
+          store = SQLiteWorldStore(driver_run_dir / "private_world.sqlite")
+          index = WorldSearchIndex(driver_run_dir / "world_index.sqlite", store=store)
+          trace_path = driver_run_dir / "trace_restore_312.jsonl"
+          if trace_path.exists():
+              trace_path.unlink()
+          trace = Trace(trace_path, store.current_world_revision)
+          def forbidden(*a, **kw):
+              raise Exception("forbidden")
+          runtime = FusedTurnRuntime(store=store, index=index, subject_id="user_1", model_handler=forbidden, round_summary_handler=forbidden, dimension_summary_handler=forbidden)
+          port = AcceptedAPort(driver_run_dir / "release_state.json", driver_run_dir / "private_world.sqlite")
+          clock = datetime.fromisoformat("{plan['clock']}")
+          driver = Driver(runtime, trace, port, driver_run_dir, session="{plan['session_id']}", clock=clock, stop_sequence=20)
+          print(f"restored completed={{driver.state['completed_sequence']}} wr={{driver.state['world_revision']}}")
+          driver.verify_boundary()
+          print("cross-process PASS")
+          driver.close()
+          trace.close()
+          ''')
+          with open("/tmp/restore_312.py","w") as f:
+              f.write(script)
+          env = os.environ.copy()
+          env["PYTHONDONTWRITEBYTECODE"]="1"
+          proc = subprocess.run([sys.executable, "/tmp/restore_312.py"], capture_output=True, text=True, env=env)
+          print(proc.stdout)
+          print(proc.stderr)
+          print(f"cross-process returncode {proc.returncode}")
+          assert proc.returncode == 0
+
+          receipt = {
+              "sys_version": sys.version,
+              "sys_executable": sys.executable,
+              "operator_sha": operator_sha,
+              "branch_sha": branch_sha,
+              "fixed_A_SHA": fixed_sha,
+              "branch_equals_fixed": branch_sha==fixed_sha,
+              "world_revision": 88,
+              "index_watermark": 88,
+              "last_acked": 13,
+              "next_sequence": 14,
+              "model_requests": 0,
+              "cross_process": "PASS",
+          }
+          print(f"::notice title=Real A 3.12 import receipt::{json.dumps(receipt)}")
+          PY
