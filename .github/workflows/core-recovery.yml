@@ -127,3 +127,391 @@ jobs:
                   assert dict(attempts).get("in_doubt") == 1
                   assert meters == 1
           PY
+
+
+  acceptance-adversarial-probes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - name: Independent acceptance adversarial probes A-E plus fresh R1
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from __future__ import annotations
+
+          import hashlib
+          import multiprocessing
+          import os
+          import sqlite3
+          import tempfile
+          from datetime import datetime, timedelta, timezone
+          from pathlib import Path
+
+          from aios_core.contracts import ObjectType, Observation, OperationRequest, TemporalExtent
+          from aios_core.headless.core import (
+              HeadlessConfig,
+              HeadlessConfigurationError,
+              HeadlessCore,
+              HeadlessWriterBusy,
+          )
+          import aios_core.headless.recovery as recovery_module
+          from aios_core.headless.recovery import backup_world, rebuild_index, restore_world
+          from aios_core.query.search import WorldSearchIndex
+          from aios_core.runtime.cognitive_runtime import ModelDirective
+          from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
+
+          UTC = timezone.utc
+          T0 = datetime(2026, 9, 24, 12, 0, tzinfo=UTC)
+
+          def sha256(path: Path) -> str:
+              return hashlib.sha256(path.read_bytes()).hexdigest()
+
+          def make_obs(object_id: str, text: str):
+              return Observation(
+                  object_id=object_id,
+                  subject_id="user_1",
+                  revision=1,
+                  occurred=TemporalExtent.point(T0 - timedelta(minutes=1)),
+                  learned_at=T0,
+                  recorded_at=T0,
+                  created_by="independent-acceptance-probe",
+                  source_kind="chat",
+                  modality="text",
+                  value=text,
+              )
+
+          def make_op(world_revision: int, key: str):
+              return OperationRequest(
+                  operation_name="acceptance.probe",
+                  expected_world_revision=world_revision,
+                  reason="independent acceptance probe",
+                  idempotency_key=key,
+              )
+
+          class SuccessHandler:
+              def __init__(self, response="acceptance-ok"):
+                  self.response = response
+                  self.calls = 0
+              def __call__(self, _snapshot):
+                  self.calls += 1
+                  return ModelDirective(response=self.response)
+
+          class AmbiguousHandler:
+              def __init__(self):
+                  self.calls = 0
+              def __call__(self, _snapshot):
+                  self.calls += 1
+                  raise TimeoutError("independent ambiguous provider boundary")
+
+          def crash_uncommitted(path: str):
+              conn = sqlite3.connect(path)
+              conn.execute("PRAGMA journal_mode=WAL")
+              conn.execute("BEGIN IMMEDIATE")
+              conn.execute(
+                  "INSERT INTO world_commits(world_revision, committed_at, operation_id, session_id, reason, source_class) "
+                  "VALUES(1, ?, 'probe-uncommitted', NULL, 'probe', 'user')",
+                  (T0.isoformat(),),
+              )
+              conn.execute("UPDATE world_meta SET value='1' WHERE key='world_revision'")
+              os._exit(0)
+
+          def commit_then_crash(path: str):
+              store = SQLiteWorldStore(path)
+              store.commit(
+                  [make_obs("obs_acceptance_committed", "committed survives")],
+                  make_op(0, "probe-committed"),
+              )
+              os._exit(0)
+
+          def hold_writer(world: str, index: str, ready, stop):
+              with HeadlessCore(
+                  config=HeadlessConfig(world_path=Path(world), index_path=Path(index)),
+                  model_handler=SuccessHandler(),
+              ):
+                  ready.set()
+                  stop.wait(30)
+
+          def snapshot_tables(path: Path):
+              out = {}
+              with sqlite3.connect(path) as conn:
+                  names = [
+                      row[0]
+                      for row in conn.execute(
+                          "SELECT name FROM sqlite_master "
+                          "WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name"
+                      ).fetchall()
+                  ]
+                  for name in names:
+                      safe = name.replace('"', '""')
+                      rows = conn.execute(f'SELECT * FROM "{safe}"').fetchall()
+                      out[name] = sorted(repr(row) for row in rows)
+              return out
+
+          root = Path(tempfile.mkdtemp(prefix="core-recovery-independent-"))
+          print("PROBE_ROOT", root)
+
+          # Fresh R1: real child-process abrupt exits around SQLite WAL commit boundary.
+          r1a = root / "r1-uncommitted.sqlite"
+          SQLiteWorldStore(r1a)
+          ctx = multiprocessing.get_context("fork")
+          p = ctx.Process(target=crash_uncommitted, args=(str(r1a),))
+          p.start(); p.join(15)
+          assert p.exitcode == 0
+          reopened = SQLiteWorldStore(r1a)
+          assert reopened.current_world_revision() == 0
+          assert reopened.quick_check() == ("ok",)
+          with sqlite3.connect(r1a) as conn:
+              assert conn.execute(
+                  "SELECT COUNT(*) FROM world_commits WHERE operation_id='probe-uncommitted'"
+              ).fetchone()[0] == 0
+
+          r1b = root / "r1-committed.sqlite"
+          SQLiteWorldStore(r1b)
+          p = ctx.Process(target=commit_then_crash, args=(str(r1b),))
+          p.start(); p.join(15)
+          assert p.exitcode == 0
+          committed = SQLiteWorldStore(r1b)
+          assert committed.current_world_revision() == 1
+          assert committed.get_payload("obs_acceptance_committed", revision=1)["value"] == "committed survives"
+          assert committed.quick_check() == ("ok",)
+          print("FRESH_R1 PASS")
+
+          # Probe A: future schema must refuse before any writable/WAL mutation.
+          future = root / "future.sqlite"
+          with sqlite3.connect(future) as conn:
+              conn.execute("CREATE TABLE sentinel(value TEXT NOT NULL)")
+              conn.execute("INSERT INTO sentinel VALUES('immutable')")
+              conn.execute(f"PRAGMA user_version={SQLiteWorldStore.CURRENT_SCHEMA_VERSION + 77}")
+              conn.commit()
+          before_hash = sha256(future)
+          before_stat = (future.stat().st_size, future.stat().st_mtime_ns)
+          before_sidecars = {
+              suffix: Path(str(future) + suffix).exists() for suffix in ("-wal", "-shm")
+          }
+          try:
+              SQLiteWorldStore(future)
+              raise AssertionError("future schema unexpectedly opened")
+          except StoreError as exc:
+              assert exc.context["reason"] == "incompatible_future_schema"
+          assert sha256(future) == before_hash
+          assert (future.stat().st_size, future.stat().st_mtime_ns) == before_stat
+          after_sidecars = {
+              suffix: Path(str(future) + suffix).exists() for suffix in ("-wal", "-shm")
+          }
+          assert after_sidecars == before_sidecars
+          with sqlite3.connect(f"file:{future}?mode=ro", uri=True) as conn:
+              assert conn.execute("SELECT value FROM sentinel").fetchone()[0] == "immutable"
+              assert conn.execute("PRAGMA user_version").fetchone()[0] == SQLiteWorldStore.CURRENT_SCHEMA_VERSION + 77
+              assert conn.execute(
+                  "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='world_meta'"
+              ).fetchone()[0] == 0
+          print("PROBE_A_FUTURE_SCHEMA PASS", before_hash)
+
+          # Probe B: create successful metered turn + durable IN_DOUBT attempt, force a live WAL,
+          # online-backup, restore, rebuild, then compare every SQLite-resident table.
+          world = root / "live-wal.sqlite"
+          index = root / "live-wal.index.sqlite"
+          cfg = HeadlessConfig(world_path=world, index_path=index)
+          ok_handler = SuccessHandler()
+          with HeadlessCore(config=cfg, model_handler=ok_handler) as core:
+              result = core.submit_user_turn(
+                  session_id="probe-b", turn_index=1, user_input="meter me", occurred_at=T0
+              )
+              assert result.runtime.response == "acceptance-ok"
+          amb_handler = AmbiguousHandler()
+          try:
+              with HeadlessCore(config=cfg, model_handler=amb_handler) as core:
+                  core.submit_user_turn(
+                      session_id="probe-b",
+                      turn_index=2,
+                      user_input="ambiguous",
+                      occurred_at=T0 + timedelta(minutes=1),
+                  )
+              raise AssertionError("ambiguous provider boundary did not raise")
+          except TimeoutError:
+              pass
+          assert amb_handler.calls == 1
+
+          with sqlite3.connect(world) as conn:
+              states = dict(conn.execute(
+                  "SELECT state, COUNT(*) FROM background_model_attempts GROUP BY state"
+              ).fetchall())
+              assert states.get("in_doubt") == 1
+              assert conn.execute("SELECT COUNT(*) FROM metering_records").fetchone()[0] == 1
+              attempt_ids_before = tuple(
+                  row[0] for row in conn.execute(
+                      "SELECT attempt_id FROM background_model_attempts ORDER BY attempt_id"
+                  ).fetchall()
+              )
+
+          reader = sqlite3.connect(world)
+          reader.execute("PRAGMA journal_mode=WAL")
+          reader.execute("PRAGMA wal_autocheckpoint=0")
+          reader.execute("BEGIN")
+          reader.execute("SELECT value FROM world_meta WHERE key='world_revision'").fetchone()
+          writer = sqlite3.connect(world)
+          writer.execute("PRAGMA journal_mode=WAL")
+          writer.execute("CREATE TABLE IF NOT EXISTS acceptance_probe_wal(tag TEXT PRIMARY KEY)")
+          writer.execute("INSERT INTO acceptance_probe_wal(tag) VALUES('live-wal')")
+          writer.commit()
+          wal_path = Path(str(world) + "-wal")
+          assert wal_path.exists() and wal_path.stat().st_size > 0
+          wal_size_during_backup = wal_path.stat().st_size
+
+          backup = root / "live-wal.backup.sqlite"
+          backup_world(cfg, backup)
+          reader.rollback(); reader.close(); writer.close()
+          assert backup.exists()
+          backup_hash = sha256(backup)
+
+          restored_world = root / "live-wal.restored.sqlite"
+          restored_index = root / "live-wal.restored.index.sqlite"
+          restored_cfg = HeadlessConfig(world_path=restored_world, index_path=restored_index)
+          restore_world(restored_cfg, backup)
+          assert sha256(backup) == backup_hash
+          rebuild_index(restored_cfg)
+          assert sha256(backup) == backup_hash
+
+          source_snapshot = snapshot_tables(world)
+          restored_snapshot = snapshot_tables(restored_world)
+          assert source_snapshot == restored_snapshot
+          with sqlite3.connect(restored_world) as conn:
+              restored_states = dict(conn.execute(
+                  "SELECT state, COUNT(*) FROM background_model_attempts GROUP BY state"
+              ).fetchall())
+              assert restored_states.get("in_doubt") == 1
+              assert conn.execute("SELECT COUNT(*) FROM metering_records").fetchone()[0] == 1
+              attempt_ids_after = tuple(
+                  row[0] for row in conn.execute(
+                      "SELECT attempt_id FROM background_model_attempts ORDER BY attempt_id"
+                  ).fetchall()
+              )
+          assert attempt_ids_after == attempt_ids_before
+          print(
+              "PROBE_B_LIVE_WAL_BACKUP PASS",
+              "wal_bytes", wal_size_during_backup,
+              "tables", sorted(source_snapshot),
+              "attempt_ids", attempt_ids_before,
+              "backup_sha256", backup_hash,
+          )
+
+          # Probe C: fail exactly at index publication (os.replace), preserve old cache + World,
+          # then cleanly retry.
+          cworld = root / "c-world.sqlite"
+          cindex = root / "c-index.sqlite"
+          ccfg = HeadlessConfig(world_path=cworld, index_path=cindex)
+          cstore = SQLiteWorldStore(cworld)
+          cstore.commit(
+              [make_obs("obs_acceptance_index", "publication boundary searchable")],
+              make_op(0, "probe-index"),
+          )
+          rebuild_index(ccfg)
+          old_index_hash = sha256(cindex)
+          world_rev_before = cstore.current_world_revision()
+          original_replace = recovery_module.os.replace
+          def fail_replace(_src, _dst):
+              raise OSError("independent index publication interruption")
+          recovery_module.os.replace = fail_replace
+          try:
+              try:
+                  rebuild_index(ccfg)
+                  raise AssertionError("publication interruption unexpectedly succeeded")
+              except OSError as exc:
+                  assert "publication interruption" in str(exc)
+              assert cstore.current_world_revision() == world_rev_before
+              assert sha256(cindex) == old_index_hash
+              assert not Path(str(cindex) + ".rebuild.tmp").exists()
+          finally:
+              recovery_module.os.replace = original_replace
+          clean = rebuild_index(ccfg)
+          assert clean["index_watermark"] == world_rev_before
+          search = WorldSearchIndex(cindex, store=SQLiteWorldStore(cworld))
+          page = search.co_search(["publication"], subject="user_1", strict_freshness=True)
+          assert {hit.object_id for hit in page.hits} == {"obs_acceptance_index"}
+          print("PROBE_C_INTERRUPTED_INDEX_PUBLICATION PASS")
+
+          # Probe D: maintenance commands must contend on the exact canonical writer lease.
+          dworld = root / "d-world.sqlite"
+          dindex = root / "d-index.sqlite"
+          dcfg = HeadlessConfig(world_path=dworld, index_path=dindex)
+          SQLiteWorldStore(dworld)
+          ready = ctx.Event(); stop = ctx.Event()
+          holder = ctx.Process(target=hold_writer, args=(str(dworld), str(dindex), ready, stop))
+          holder.start()
+          assert ready.wait(15)
+          denied = 0
+          try:
+              backup_world(dcfg, root / "d-busy-backup.sqlite")
+          except HeadlessWriterBusy:
+              denied += 1
+          try:
+              rebuild_index(dcfg)
+          except HeadlessWriterBusy:
+              denied += 1
+          assert denied == 2
+          try:
+              HeadlessConfig(world_path=dworld, lock_path=root / "alternate.lock")
+              raise AssertionError("alternate lock_path bypass accepted")
+          except HeadlessConfigurationError:
+              pass
+          stop.set(); holder.join(15)
+          assert holder.exitcode == 0
+          backup_world(dcfg, root / "d-after-release.sqlite")
+          rebuild_index(dcfg)
+          print("PROBE_D_CANONICAL_WRITER_LEASE PASS")
+
+          # Probe E: inject a v0 -> v1 migration failure before version publication,
+          # confirm marker remains v0, then clean retry advances to current exactly once.
+          legacy = root / "legacy-v0.sqlite"
+          with sqlite3.connect(legacy) as conn:
+              conn.execute("CREATE TABLE legacy_sentinel(value TEXT)")
+              conn.execute("INSERT INTO legacy_sentinel VALUES('preserved')")
+              conn.commit()
+          original_revision_migration = SQLiteWorldStore._ensure_revision_kind_schema
+          def fail_migration(self, _conn):
+              raise RuntimeError("independent migration marker interruption")
+          SQLiteWorldStore._ensure_revision_kind_schema = fail_migration
+          try:
+              try:
+                  SQLiteWorldStore(legacy)
+                  raise AssertionError("injected migration failure unexpectedly succeeded")
+              except RuntimeError as exc:
+                  assert "marker interruption" in str(exc)
+          finally:
+              SQLiteWorldStore._ensure_revision_kind_schema = original_revision_migration
+          with sqlite3.connect(legacy) as conn:
+              assert conn.execute("PRAGMA user_version").fetchone()[0] == 0
+              assert conn.execute("SELECT value FROM legacy_sentinel").fetchone()[0] == "preserved"
+          upgraded = SQLiteWorldStore(legacy)
+          assert upgraded.schema_version() == SQLiteWorldStore.CURRENT_SCHEMA_VERSION
+          reopened = SQLiteWorldStore(legacy)
+          assert reopened.schema_version() == SQLiteWorldStore.CURRENT_SCHEMA_VERSION
+          with sqlite3.connect(legacy) as conn:
+              assert conn.execute("SELECT value FROM legacy_sentinel").fetchone()[0] == "preserved"
+          print("PROBE_E_MIGRATION_MARKER PASS")
+
+          print("INDEPENDENT_ACCEPTANCE_ADVERSARIAL_PROBES PASS 6/6")
+          PY
+
+  acceptance-retained-semantics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - name: Fresh retained FIX-001/FIX-002/FIX-003/recovery verification
+        run: |
+          pytest -q \
+            tests/runtime/test_turn_execution_recovery.py \
+            tests/integration/test_core_gap_fix_002_background_attempts.py \
+            tests/integration/test_core_headless.py \
+            tests/integration/test_core_recovery.py
