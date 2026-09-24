@@ -93,11 +93,11 @@ jobs:
             fi
             echo "Guard evaluated from merge base $merge_base"
           fi
-          if printf '%s\n' "$changed" | grep -q '^src/aios_core/'; then
+          if grep -q '^src/aios_core/' <<<"$changed"; then
             echo "::error::Invariant rejected: C14-SEM-REPAIR-FIX-001 must not modify src/aios_core/**"
             exit 1
           fi
-          if printf '%s\n' "$changed" | grep -q '^reviews/internal_habitation/c14-resident/v2/'; then
+          if grep -q '^reviews/internal_habitation/c14-resident/v2/' <<<"$changed"; then
             echo "::error::Invariant rejected: C14-SEM-REPAIR-FIX-001 must not modify frozen v2 fixture or Resident A/B evidence"
             exit 1
           fi
