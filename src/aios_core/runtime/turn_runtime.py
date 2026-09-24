@@ -78,7 +78,7 @@ from aios_core.summaries import (
 )
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
 from aios_core.contracts.refs import ObjectRef
-from aios_core.contracts.time import TemporalExtent, canonical_utc_iso
+from aios_core.contracts.time import TemporalExtent, as_utc, canonical_utc_iso
 from aios_core.contracts.enums import AttentionClass, ObjectType, PolicyClass, WakeSource
 from aios_core.wake import (
     AttentionRouter,
@@ -1130,6 +1130,7 @@ class FusedTurnRuntime:
         page = self.index.recall_candidates(
             str(query),
             subject=self.subject_id,
+            as_of=self._active_turn_time,
             limit=max(1, min(int(limit), 50)),
         )
         return [
@@ -1149,6 +1150,39 @@ class FusedTurnRuntime:
 
         return frozenset({self.subject_id, self.ai_world.ai_subject_id})
 
+    def _enforce_active_read_cutoff(
+        self,
+        payload: Mapping[str, Any],
+    ) -> None:
+        """Fail closed when a model-visible exact read crosses execution knowledge time."""
+
+        cutoff = self._active_turn_time
+        if cutoff is None:
+            return
+        raw_learned_at = payload.get("learned_at")
+        if not isinstance(raw_learned_at, str) or not raw_learned_at.strip():
+            raise ValueError(
+                "world object unavailable at active runtime read cutoff: "
+                "missing learned_at"
+            )
+        try:
+            learned_at = as_utc(
+                datetime.fromisoformat(raw_learned_at),
+                "learned_at",
+            )
+            active_cutoff = as_utc(cutoff, "active_runtime_read_cutoff")
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                "world object unavailable at active runtime read cutoff: "
+                "invalid learned_at"
+            ) from exc
+        if learned_at > active_cutoff:
+            raise ValueError(
+                "world object unavailable at active runtime read cutoff: "
+                f"learned_at {learned_at.isoformat()} is after "
+                f"{active_cutoff.isoformat()}"
+            )
+
     def _scoped_payload(
         self,
         object_id: str,
@@ -1161,6 +1195,7 @@ class FusedTurnRuntime:
                 "world object crosses the runtime private-world subject scope: "
                 f"{payload_subject!r}"
             )
+        self._enforce_active_read_cutoff(payload)
         return payload
 
     def _inspect_world_object(
