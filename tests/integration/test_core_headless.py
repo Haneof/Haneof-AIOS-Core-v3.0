@@ -13,6 +13,7 @@ from aios_core.headless import (
     HeadlessWriterBusy,
 )
 from aios_core.headless.testing import deterministic_model_handler
+from aios_core.headless.cli import main as headless_cli_main
 from aios_core.ingest.reality import RealityRecord, SourceAdapterSpec
 from aios_core.runtime.background_attempt import BackgroundModelExecutionInDoubt
 from aios_core.runtime.capabilities import CapabilityCall
@@ -213,6 +214,37 @@ def test_headless_symlinked_existing_world_shares_writer_identity(tmp_path):
     via_link = HeadlessConfig(world_path=link)
     assert via_link.world_path == cfg.world_path
     assert via_link.lock_path == cfg.lock_path
+
+
+def test_headless_cli_lock_override_is_validation_only(tmp_path):
+    world = tmp_path / "world.sqlite"
+    rc = headless_cli_main(
+        [
+            "--world",
+            str(world),
+            "--lock",
+            str(tmp_path / "alternate.lock"),
+            "--model-handler",
+            "aios_core.headless.testing:deterministic_model_handler",
+            "status",
+        ]
+    )
+    assert rc == 2
+
+
+def test_headless_env_lock_override_is_validation_only(tmp_path, monkeypatch):
+    world = tmp_path / "world.sqlite"
+    monkeypatch.setenv("AIOS_LOCK_PATH", str(tmp_path / "alternate-env.lock"))
+    rc = headless_cli_main(
+        [
+            "--world",
+            str(world),
+            "--model-handler",
+            "aios_core.headless.testing:deterministic_model_handler",
+            "status",
+        ]
+    )
+    assert rc == 2
 
 
 def test_headless_restart_preserves_fix003_pre_admission_and_requires_authorization(
