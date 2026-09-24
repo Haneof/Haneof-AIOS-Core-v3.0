@@ -1,17 +1,17 @@
 # AIOS v3.0 项目全流程总地图
 
-## 当前控制入口 — 2026-09-24 CORE-OPERATOR-001 accepted & integrated; S2 gap fixes active
+## 当前控制入口 — 2026-09-24 Core operator DONE; gap fixes S2 active
 
-- live main = `e72a63874ed2c28798b00cec51f191caf1594a00`；Core tree `src/aios_core = 7db4f72e7b3c29c74082f9984141159f8f1d6071`（集成 Core ZERO DIFF）。
-- `CORE-BASELINE-001 = DONE`（#117/#121/#125/#126 四个 pin 于 2026-09-24 集成时复核仍成立）。
+- `CORE-BASELINE-001 = DONE`。
 - `CORE-GAP-AUDIT-001 = DONE`：PR #132 accepted/merged at `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`；audited Core tree `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
-- `CORE-OPERATOR-001 = DONE`：独立验收 #135 ACCEPTANCE_PASS（0 blocker）→ PM 集成候选 #131 exact head `0e1d69eebc801278f93ccc1941b8f066a4ea09ef`，merge `e72a63874ed2c28798b00cec51f191caf1594a00`；收据 `governance/AIOS_CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`。PR #130 登记 SUPERSEDED BY #131，保留不关闭。
 - Audit disposition: 3 STILL_OPEN RC blockers / 14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE。
 - Active blockers: CG-001 runtime temporal read cut；CG-002 background model execution IN_DOUBT；CG-003 user-turn IN_DOUBT recovery。
-- 当前唯一可施工：`CORE-GAP-FIX-001`、`CORE-GAP-FIX-002`（两窗口并行、写入路径不冲突）。FIX-003 依赖 FIX-002 独立验收与集成，当前 BLOCKED。
-- 路线保持：operator acceptance(已完成) + three accepted gap fixes → headless → recovery → scale → RC freeze → fresh C15 A/B/C → C16 → P16 → P17 Core release closure。operator 集成只是 S1 出口，不是 SOFTWARE_RC，也不是 CORE_COMPLETE。
-- 历史实验与开发线继续分离：#117 historical A 不 hash-swap；#121 failed/non-canonical；Core 变化后只在 RC freeze 后新跑 fresh A。当前禁止任何 Resident 执行。
-- UI、数字人、Launcher、动画、硬件、ROM 不开发（PR #136 鹈鹕动画属排除范围）。
+- 当前可并行施工（待启动，尚无提交）：`CORE-GAP-FIX-001`、`CORE-GAP-FIX-002`。FIX-003 依赖 FIX-002 独立验收与集成，当前 BLOCKED。
+- `CORE-OPERATOR-001 = DONE`：#135 ACCEPTANCE_PASS → #131 exact head `0e1d69ee` merged at `e72a63874ed2c28798b00cec51f191caf1594a00`；Core ZERO DIFF；#130 SUPERSEDED。
+- 单一集成收据（两份 PM 写回已对账合并）：`governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`；含集成时 API 复核、本地 repro/修复复算（`3865da88` 三项失败 → accepted head `632 passed`）、合后 push gate run `35958610555` SUCCESS 及全部诚实限制。operator 集成不是 SOFTWARE_RC，也不是 CORE_COMPLETE。
+- 路线保持：operator acceptance + three accepted gap fixes → headless → recovery → scale → RC freeze → fresh C15 A/B/C → C16 → P16 → P17 Core release closure。
+- 历史实验与开发线继续分离：#117 historical A 不 hash-swap；#121 failed/non-canonical；Core 变化后只在 RC freeze 后新跑 fresh A。
+- UI、数字人、Launcher、动画、硬件、ROM 不开发。
 
 > 文件角色：项目级唯一“全流程地图”入口  
 > 用途：跨会话、跨模型、跨工程师断点续传；判断“现在做到哪、下一步做什么、哪些不能重做”  

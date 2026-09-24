@@ -36,7 +36,7 @@ New dispatch baseline: live `main` at or after `e72a63874ed2c28798b00cec51f191ca
 
 ### Closed since this dispatch was written
 
-- `CORE-OPERATOR-001 = DONE`. Independent acceptance PR #135 (`ACCEPTANCE_PASS`, 0 blockers) → PM integration of PR #131 exact head `0e1d69eebc801278f93ccc1941b8f066a4ea09ef` → merge `e72a63874ed2c28798b00cec51f191caf1594a00`. Receipt: `governance/AIOS_CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`.
+- `CORE-OPERATOR-001 = DONE`. Independent acceptance PR #135 (`ACCEPTANCE_PASS`, 0 blockers) → PM integration of PR #131 exact head `0e1d69eebc801278f93ccc1941b8f066a4ea09ef` → merge `e72a63874ed2c28798b00cec51f191caf1594a00`. Receipt: `governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`.
 - The operator/preflight surface (`tools/c15_preflight/**`, `tests/preflight/**`, `.github/workflows/c15-operator-preflight.yml`) is now on main and is the single operator bridge. Do not create a second bridge and do not re-port PR #125 assets again.
 - PR #130 = SUPERSEDED BY #131; left OPEN, must not be merged.
 

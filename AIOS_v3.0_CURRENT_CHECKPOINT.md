@@ -1,24 +1,11 @@
 # AIOS v3.0 当前工程断点
 
-## 当前控制入口 — 2026-09-24 CORE-OPERATOR-001 已独立验收并集成 / S0 已复核 / 唯一可施工 = FIX-001 + FIX-002
+## 当前控制入口 — 2026-09-24 PM TAKEOVER / OPERATOR DONE / FIX-001+002 待启动
 
-> **PM 写回对账**：本日有两个 PM 窗口并行写回同一状态。集成动作由本条目所属的集成 PM 窗口执行；PR #137 的接手复核（`governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`）结论一致，已并入本条目，不另立第二真相源。
-
-- 接任 PM live 复核：`governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`；`CORE-BASELINE-001 = DONE（re-verified）`。
-- PR #136（pelican 动画）= EXCLUDED，永不合入；分支保留不关闭不删除。
-- **live main = `e72a63874ed2c28798b00cec51f191caf1594a00`**；Core tree = `src/aios_core = 7db4f72e7b3c29c74082f9984141159f8f1d6071`，本次集成对 `src/` ZERO DIFF，语义 freeze 不受影响。
-- `CORE-OPERATOR-001 = DONE`：独立验收 PR #135 @ `50133c2a...` = **ACCEPTANCE_PASS / 0 blocker**（报告 `reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md`，merge `fe6f1740eb4e6ab4d1c562373ef5d3554bb2dc54`）；候选 PR #131 exact head `0e1d69eebc801278f93ccc1941b8f066a4ea09ef` 由 PM 复核后集成，merge `e72a63874ed2c28798b00cec51f191caf1594a00`。
-- PM 集成收据（含全部证据与限制）：`governance/AIOS_CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`。
-- 集成前 PM 复核要点：exact head 未漂移；4 条 CI（`35955458275`/`35955458266` 复现 FAILURE、`35955695487`/`35955695492` exact-head SUCCESS）经 API 复核；候选 26 文件 / `src/` 0 文件；本地在 repro `3865da88...` 实际复现三项失败，在 accepted head 与 merge 结果分别 `632 passed`，与 CI 计数一致。
-- 限制如实记录：本地复算用 CPython 3.11.2（低于 >=3.12 gate），只作佐证；`gh run rerun` 与 main `workflow_dispatch` 被平台 403 拒绝，未绕权限；作者与验收为不同窗口但同一 GitHub 账号，无跨账号 APPROVE，不宣称账号级独立。
-- 三个 RC blocker 未被触碰，仍是唯一 S2 工程缺口：CG-001 temporal read cut、CG-002 background model execution IN_DOUBT、CG-003 user-turn IN_DOUBT recovery。审计报告：`reviews/CORE_GAP_AUDIT_001_2026-09-24.md`。
-- `CORE-GAP-FIX-001 = READY / NOT_STARTED`；提示词 `governance/prompts/CORE_GAP_FIX_001_2026-09-24.md`；分支 `core-gap-fix-001-temporal-read-cut-20260924` 目前 0 commits。
-- `CORE-GAP-FIX-002 = READY / NOT_STARTED`；提示词 `governance/prompts/CORE_GAP_FIX_002_2026-09-24.md`；分支 `core-gap-fix-002-20260924` 目前 0 commits。
-- `CORE-GAP-FIX-003 = BLOCKED`，等待 FIX-002 独立验收并 PM 集成后再从当时 live main 开始。
-- PR #130 = **SUPERSEDED BY #131**，保留 OPEN、不关闭、不删除、不得合入。
-- PM dispatch / sequencing：`governance/AIOS_CORE_GAP_DISPATCH_2026-09-24.md`。
-- 本次集成 **不是** SOFTWARE_RC，**不是** CORE_COMPLETE。HEADLESS / RECOVERY / SCALE / RC-FREEZE 继续 BLOCKED；fresh Resident A/B/C 继续禁止；历史 #117/#121/#125/#126 保持 OPEN 不改（四个 pin 已于本次集成复核仍成立）。
-- UI/P18/P19 不进入本轮 Core completion（PR #136 鹈鹕动画属排除范围）。
+- 接任 PM live 复核：live main = `e72a63874ed2c28798b00cec51f191caf1594a00`，Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`；见 `governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
+- `CORE-OPERATOR-001 = DONE`：独立验收 #135（ACCEPTANCE_PASS）先合 `fe6f1740eb`，候选 #131 后合 `e72a63874e`；报告 `reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md`。
+- `CORE-BASELINE-001 = DONE（re-verified）`；PR #136 已去除 pelican 文件，改作本 PM 补充治理 PR（pelican 提交 `f8edb5d1` 仅留历史，不合入）。
+- 合后 p16 `35958610555` SUCCESS；PR #130 = SUPERSEDED / NOT INTEGRATED；FIX-001/002 待启动（分支零提交）；验收提示词 `governance/prompts/CORE_GAP_FIX_ACCEPTANCE_2026-09-24.md`。
 
 ## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / FIX-001+002 READY
 
