@@ -3025,6 +3025,19 @@ class FusedTurnRuntime:
             subject_id=self.subject_id, session_id=session, turn_index=turn_index,
             user_input=user_input, occurred_at=occurred_iso, assistant_id=assistant_id,
         )
+        # Establish the same durable provider-attempt boundary used by FIX-002
+        # before any user-turn pre-model work. If execution stops before
+        # mark_dispatching(), the admitted state is durable proof that provider
+        # submission did not begin; retry still requires explicit authorization.
+        self.background_model_attempts.admit(
+            subject_id=self.subject_id,
+            work_kind="user_turn",
+            work_id=execution_id,
+            wake_reason=WakeSource.USER_INTERACTION.value,
+            model_round_index=0,
+            world_revision=int(self.store.current_world_revision()),
+            admitted_at=occurred_at,
+        )
 
         self.attention_watches.expire_due(now=occurred_at)
 
