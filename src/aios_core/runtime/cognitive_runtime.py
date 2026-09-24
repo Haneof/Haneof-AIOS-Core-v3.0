@@ -8,7 +8,7 @@ executes calls, enforces budgets/authorization, records results, and terminates 
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any, Callable, Mapping, Sequence
 
 from .capabilities import (
@@ -113,6 +113,7 @@ class RuntimeSnapshot:
     capability_history: tuple[CapabilityResult, ...]
     round_index: int
     remaining_tool_rounds: int
+    model_attempt_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -128,8 +129,16 @@ class RuntimeTurnResult:
     model_usage_complete: bool = False
 
 
+class ModelDispatchNotSubmitted(RuntimeError):
+    """Provider adapter knows the request did not cross its submission boundary."""
+
+
 ModelHandler = Callable[[RuntimeSnapshot], ModelDirective]
 ModelUsageRecorder = Callable[[RuntimeSnapshot, ModelDirective], None]
+ModelAttemptAdmitter = Callable[[RuntimeSnapshot], str | None]
+ModelDispatchRecorder = Callable[[RuntimeSnapshot], None]
+ModelResponseRecorder = Callable[[RuntimeSnapshot, ModelDirective], None]
+ModelFailureRecorder = Callable[[RuntimeSnapshot, BaseException, bool], None]
 SideEffectAuthorizer = Callable[[CapabilitySpec, CapabilityCall, RuntimeSnapshot], bool]
 
 
@@ -146,6 +155,10 @@ class CognitiveRuntime:
         repeated_call_limit: int = 2,
         side_effect_authorizer: SideEffectAuthorizer | None = None,
         model_usage_recorder: ModelUsageRecorder | None = None,
+        model_attempt_admitter: ModelAttemptAdmitter | None = None,
+        model_dispatch_recorder: ModelDispatchRecorder | None = None,
+        model_response_recorder: ModelResponseRecorder | None = None,
+        model_failure_recorder: ModelFailureRecorder | None = None,
     ) -> None:
         if max_tool_rounds < 0:
             raise ValueError("max_tool_rounds must be >= 0")
@@ -160,6 +173,10 @@ class CognitiveRuntime:
         self.repeated_call_limit = repeated_call_limit
         self.side_effect_authorizer = side_effect_authorizer
         self.model_usage_recorder = model_usage_recorder
+        self.model_attempt_admitter = model_attempt_admitter
+        self.model_dispatch_recorder = model_dispatch_recorder
+        self.model_response_recorder = model_response_recorder
+        self.model_failure_recorder = model_failure_recorder
 
     def _snapshot(
         self,
@@ -170,6 +187,7 @@ class CognitiveRuntime:
         history: Sequence[CapabilityResult],
         round_index: int,
         effective_model_rounds: int,
+        model_round_offset: int,
     ) -> RuntimeSnapshot:
         return RuntimeSnapshot(
             user_input=user_input,
@@ -177,7 +195,7 @@ class CognitiveRuntime:
             cockpit=dict(cockpit),
             capability_catalog=tuple(self.registry.catalog()),
             capability_history=tuple(history),
-            round_index=round_index,
+            round_index=model_round_offset + round_index,
             remaining_tool_rounds=max(
                 0,
                 effective_model_rounds - round_index - 1,
@@ -191,9 +209,16 @@ class CognitiveRuntime:
         wake_reason: str = "user_interaction",
         cockpit: Mapping[str, Any] | None = None,
         max_model_rounds: int | None = None,
+        model_round_offset: int = 0,
     ) -> RuntimeTurnResult:
         if not isinstance(user_input, str) or not user_input.strip():
             raise ValueError("user_input must be non-blank")
+        if (
+            isinstance(model_round_offset, bool)
+            or not isinstance(model_round_offset, int)
+            or model_round_offset < 0
+        ):
+            raise ValueError("model_round_offset must be a non-negative integer")
 
         history: list[CapabilityResult] = []
         signature_counts: dict[tuple[str, tuple[tuple[str, str], ...]], int] = {}
@@ -251,10 +276,28 @@ class CognitiveRuntime:
                 history=history,
                 round_index=round_index,
                 effective_model_rounds=effective_model_rounds,
+                model_round_offset=model_round_offset,
             )
-            directive = self.model_handler(snapshot)
-            if not isinstance(directive, ModelDirective):
-                raise TypeError("model_handler must return ModelDirective")
+            if self.model_attempt_admitter is not None:
+                attempt_id = self.model_attempt_admitter(snapshot)
+                if attempt_id is not None:
+                    snapshot = replace(snapshot, model_attempt_id=attempt_id)
+            if self.model_dispatch_recorder is not None:
+                self.model_dispatch_recorder(snapshot)
+            try:
+                directive = self.model_handler(snapshot)
+                if not isinstance(directive, ModelDirective):
+                    raise TypeError("model_handler must return ModelDirective")
+            except ModelDispatchNotSubmitted as exc:
+                if self.model_failure_recorder is not None:
+                    self.model_failure_recorder(snapshot, exc, True)
+                raise
+            except Exception as exc:
+                if self.model_failure_recorder is not None:
+                    self.model_failure_recorder(snapshot, exc, False)
+                raise
+            if self.model_response_recorder is not None:
+                self.model_response_recorder(snapshot, directive)
             if directive.usage is None:
                 model_usage_complete = False
             else:
