@@ -6,7 +6,7 @@
 - `CORE-GAP-AUDIT-001 = DONE`：PR #132 accepted/merged at `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`；audited Core tree `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
 - Audit disposition: 3 STILL_OPEN RC blockers / 14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE。
 - Active blockers: CG-001 runtime temporal read cut；CG-002 background model execution IN_DOUBT；CG-003 user-turn IN_DOUBT recovery。
-- S2 当前已串行化：`CORE-GAP-FIX-002` draft PR #143 先完成→独立验收→PM 集成；`CORE-GAP-FIX-001` draft PR #145 保留为 FROZEN_WIP，待 FIX-002 集成后 rebase live main 继续；`CORE-GAP-FIX-003` 继续 BLOCKED。裁决：`governance/AIOS_CORE_S2_SERIALIZATION_RULING_2026-09-24.md`。CI-fix PR #144 已 REVIEW_READY，等待独立验收。
+- S2 当前已串行化：`CORE-GAP-FIX-002` draft PR #143 先完成→独立验收→PM 集成；`CORE-GAP-FIX-001` draft PR #145 保留为 FROZEN_WIP，待 FIX-002 集成后 rebase live main 继续；`CORE-GAP-FIX-003` 继续 BLOCKED。裁决：`governance/AIOS_CORE_S2_SERIALIZATION_RULING_2026-09-24.md`。CI-fix 唯一验收候选 PR #146 @ `1896b3e5...` 已 REVIEW_READY，等待独立验收；PR #144 = SUPERSEDED / NOT INTEGRATED。
 - `CORE-OPERATOR-001 = DONE`：#135 ACCEPTANCE_PASS → #131 exact head `0e1d69ee` merged at `e72a63874ed2c28798b00cec51f191caf1594a00`；Core ZERO DIFF；#130 SUPERSEDED。
 - 单一集成收据（两份 PM 写回已对账合并）：`governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`；含集成时 API 复核、本地 repro/修复复算（`3865da88` 三项失败 → accepted head `632 passed`）、合后 push gate run `35958610555` SUCCESS 及全部诚实限制。operator 集成不是 SOFTWARE_RC，也不是 CORE_COMPLETE。
 - 路线保持：operator acceptance + three accepted gap fixes → headless → recovery → scale → RC freeze → fresh C15 A/B/C → C16 → P16 → P17 Core release closure。
