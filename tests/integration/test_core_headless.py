@@ -393,7 +393,7 @@ def test_independent_probe_fix002_in_doubt_survives_headless_due_restart(tmp_pat
     handler = AmbiguousHandler()
     first = HeadlessCore(config=cfg, model_handler=handler).start()
     assert first.runtime is not None
-    first.runtime.wake_bus.emit(
+    receipt = first.runtime.wake_bus.emit(
         WakeSignalRequest(
             wake_source=WakeSource.SAFETY,
             rule_id="independent-due-restart-probe",
@@ -415,11 +415,25 @@ def test_independent_probe_fix002_in_doubt_survives_headless_due_restart(tmp_pat
 
     second = HeadlessCore(config=cfg, model_handler=handler).start()
     try:
+        # The wrapper must not blindly invoke the provider again.
+        due = second.process_due_work(
+            now=T2,
+            max_wakes=1,
+            include_periodic_review=False,
+        )
+        assert due.wakes == ()
+        assert handler.calls == 1
+
+        # The existing FIX-002 ledger still owns the durable truth: directly
+        # re-addressing the same Wake reports IN_DOUBT without a provider call.
+        assert second.runtime is not None
         with pytest.raises(BackgroundModelExecutionInDoubt):
-            second.process_due_work(
+            second.runtime.run_wake(
+                wake_ref=ObjectRef(
+                    object_id=receipt.wake_id,
+                    revision=receipt.revision,
+                ),
                 now=T2,
-                max_wakes=1,
-                include_periodic_review=False,
             )
         assert handler.calls == 1
     finally:
