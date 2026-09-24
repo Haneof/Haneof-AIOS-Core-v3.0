@@ -478,3 +478,164 @@ def test_headless_restart_keeps_fix001_historical_knowledge_cut(tmp_path):
         assert probe.calls == 2
     finally:
         restarted.stop()
+
+
+# ---------------------------------------------------------------------------
+# CORE-HEADLESS-001-CORRECTIVE-001 fresh independent acceptance probes.
+# Probe branch only; do not merge.
+# ---------------------------------------------------------------------------
+
+def test_independent_corrective_probe_historical_alt_lock_is_rejected_and_world_unchanged(
+    tmp_path,
+):
+    world = tmp_path / "world.sqlite"
+    canonical = HeadlessConfig(world_path=world)
+    alternate_lock = tmp_path / "historical-bypass-writer-b.lock"
+    writer_a = HeadlessCore(config=canonical, model_handler=CountingHandler()).start()
+    writer_b = HeadlessCore(
+        config=HeadlessConfig(world_path=world),
+        model_handler=CountingHandler(),
+    )
+    try:
+        before = writer_a.status()["world_revision"]
+        with pytest.raises(
+            HeadlessConfigurationError,
+            match="must equal the canonical World writer lease path",
+        ):
+            HeadlessConfig(world_path=world, lock_path=alternate_lock)
+        assert not alternate_lock.exists()
+        assert writer_a.status()["world_revision"] == before
+        with pytest.raises(HeadlessWriterBusy):
+            writer_b.start()
+        assert writer_a.status()["world_revision"] == before
+    finally:
+        writer_b.stop()
+        writer_a.stop()
+
+    writer_b.start()
+    try:
+        assert writer_b.status()["writer_lease_held"] is True
+        assert writer_b.status()["world_revision"] == before
+    finally:
+        writer_b.stop()
+
+
+def test_independent_corrective_probe_textual_world_aliases_share_one_lease(
+    tmp_path,
+):
+    alias_dir = tmp_path / "alias"
+    alias_dir.mkdir()
+    textual_alias = alias_dir / ".." / "world.sqlite"
+    absolute = (tmp_path / "world.sqlite").resolve()
+    cfg_alias = HeadlessConfig(world_path=textual_alias)
+    cfg_absolute = HeadlessConfig(world_path=absolute)
+    assert cfg_alias.world_path == cfg_absolute.world_path
+    assert cfg_alias.lock_path == cfg_absolute.lock_path
+
+    writer_a = HeadlessCore(config=cfg_alias, model_handler=CountingHandler()).start()
+    writer_b = HeadlessCore(config=cfg_absolute, model_handler=CountingHandler())
+    try:
+        before = writer_a.status()["world_revision"]
+        with pytest.raises(HeadlessWriterBusy):
+            writer_b.start()
+        assert writer_a.status()["world_revision"] == before
+    finally:
+        writer_b.stop()
+        writer_a.stop()
+
+
+def test_independent_corrective_probe_existing_world_symlink_cannot_split_lease(
+    tmp_path,
+):
+    target = tmp_path / "world.sqlite"
+    cfg_target = HeadlessConfig(world_path=target)
+    writer_a = HeadlessCore(config=cfg_target, model_handler=CountingHandler()).start()
+    link = tmp_path / "world-alias.sqlite"
+    try:
+        try:
+            link.symlink_to(target)
+        except OSError as exc:
+            pytest.skip(f"symlink unavailable: {exc}")
+        cfg_link = HeadlessConfig(world_path=link)
+        assert cfg_link.world_path == cfg_target.world_path
+        assert cfg_link.lock_path == cfg_target.lock_path
+        writer_b = HeadlessCore(config=cfg_link, model_handler=CountingHandler())
+        try:
+            before = writer_a.status()["world_revision"]
+            with pytest.raises(HeadlessWriterBusy):
+                writer_b.start()
+            assert writer_a.status()["world_revision"] == before
+        finally:
+            writer_b.stop()
+    finally:
+        writer_a.stop()
+
+
+def test_independent_corrective_probe_stale_metadata_is_not_liveness_truth(
+    tmp_path,
+):
+    cfg = HeadlessConfig(world_path=tmp_path / "world.sqlite")
+    writer_a = HeadlessCore(config=cfg, model_handler=CountingHandler()).start()
+    before = writer_a.status()["world_revision"]
+    writer_a.stop()
+    assert cfg.lock_path is not None
+    cfg.lock_path.write_text(
+        '{"kind":"stale-independent-corrective","pid":424242,"host":"stale"}\n',
+        encoding="utf-8",
+    )
+    writer_b = HeadlessCore(config=cfg, model_handler=CountingHandler()).start()
+    try:
+        assert writer_b.status()["writer_lease_held"] is True
+        assert writer_b.status()["world_revision"] == before
+        assert "424242" not in cfg.lock_path.read_text(encoding="utf-8")
+    finally:
+        writer_b.stop()
+
+
+def test_independent_corrective_probe_cli_and_env_lock_are_validation_only(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    world = tmp_path / "world.sqlite"
+    model = "aios_core.headless.testing:deterministic_model_handler"
+    alternate_cli = tmp_path / "cli-alternate.lock"
+    rc_cli = headless_cli_main(
+        [
+            "--world",
+            str(world),
+            "--lock",
+            str(alternate_cli),
+            "--model-handler",
+            model,
+            "status",
+        ]
+    )
+    assert rc_cli == 2
+    assert not alternate_cli.exists()
+    capsys.readouterr()
+
+    alternate_env = tmp_path / "env-alternate.lock"
+    monkeypatch.setenv("AIOS_WORLD_PATH", str(world))
+    monkeypatch.setenv("AIOS_MODEL_HANDLER", model)
+    monkeypatch.setenv("AIOS_LOCK_PATH", str(alternate_env))
+    rc_env = headless_cli_main(["status"])
+    assert rc_env == 2
+    assert not alternate_env.exists()
+    capsys.readouterr()
+
+    monkeypatch.delenv("AIOS_LOCK_PATH")
+    canonical_lock = HeadlessConfig(world_path=world).lock_path
+    assert canonical_lock is not None
+    rc_canonical = headless_cli_main(
+        [
+            "--world",
+            str(world),
+            "--lock",
+            str(canonical_lock),
+            "--model-handler",
+            model,
+            "status",
+        ]
+    )
+    assert rc_canonical == 0
