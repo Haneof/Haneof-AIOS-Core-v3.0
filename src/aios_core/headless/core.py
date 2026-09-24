@@ -93,11 +93,19 @@ class HeadlessConfig:
             if self.index_path is not None
             else Path(str(world) + ".search.sqlite")
         )
-        lock = (
-            Path(self.lock_path).expanduser().resolve()
-            if self.lock_path is not None
-            else Path(str(world) + ".writer.lock")
-        )
+        # Writer exclusion identity is derived exclusively from the canonical
+        # durable World identity. A diagnostic/configuration pathname must never
+        # be able to select a second OS lease for the same World.
+        lock = Path(str(world) + ".writer.lock")
+        if self.lock_path is not None:
+            requested_lock = Path(
+                os.path.abspath(os.path.expanduser(str(self.lock_path)))
+            )
+            if requested_lock != lock:
+                raise HeadlessConfigurationError(
+                    "lock_path is validation-only and must equal the canonical "
+                    f"World writer lease path: {lock}"
+                )
         if index == world:
             raise HeadlessConfigurationError("index_path must not equal world_path")
         if lock in {world, index}:
