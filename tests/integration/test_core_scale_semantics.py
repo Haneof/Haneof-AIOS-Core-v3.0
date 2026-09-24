@@ -9,7 +9,7 @@ from aios_core.ai_world import (
     AIWorldDomain,
 )
 from aios_core.contracts.enums import ObjectType, SourceClass
-from aios_core.contracts.models import Observation
+from aios_core.contracts.models import Dependency, Observation
 from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import TemporalExtent
@@ -428,3 +428,122 @@ def test_recall_batching_preserves_current_historical_subject_and_inactive_seman
     assert (b_claim.claim.claim_id, 2) not in historical_pairs
     assert (inactive.claim.claim_id, 1) in historical_pairs
     assert a_claim.claim.claim_id not in {hit.object_id for hit in historical_page.hits}
+
+
+def test_batched_world_lookup_preserves_evidence_and_dependency_visibility(tmp_path):
+    store = SQLiteWorldStore(tmp_path / "world.sqlite")
+    fact = _commit_fact(
+        store,
+        object_id="obs_batch_lineage",
+        subject_id="user_1",
+        text="batch lineage evidence",
+        at=T0,
+    )
+    index = WorldSearchIndex(tmp_path / "index.sqlite", store=store)
+    index.rebuild()
+    service = AIWorldCognitionService(store=store, index=index)
+    claim = _commit_ai_claim(
+        service,
+        domain=AIWorldDomain.USER_UNDERSTANDING,
+        fact=fact,
+        statement="batch-lineage claim",
+        at=T0 + timedelta(minutes=1),
+        scope="batch.lineage",
+    )
+    claim_ref = ObjectRef(object_id=claim.claim.claim_id, revision=1)
+    claim_payload = store.get_payload(claim_ref.object_id, revision=1)
+    support_refs = tuple(claim_payload.get("support_evidence_set_refs") or ())
+    assert support_refs, "AI-world Claim must keep its pinned support EvidenceSet"
+
+    dependency = Dependency(
+        object_id="dep_batch_lineage",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(T0 + timedelta(minutes=2)),
+        learned_at=T0 + timedelta(minutes=2),
+        recorded_at=T0 + timedelta(minutes=2),
+        created_by="core-scale-semantics",
+        dependent_ref=claim_ref,
+        dependency_ref=ObjectRef(object_id=fact.object_id, revision=1),
+        dependency_type="scale_semantic_equivalence",
+    )
+    store.commit(
+        [dependency],
+        OperationRequest(
+            operation_name="test.core_scale.dependency_visibility",
+            expected_world_revision=store.current_world_revision(),
+            reason="prove batched retrieval preserves evidence/dependency payloads",
+            idempotency_key="core-scale-dependency-visibility",
+            source_class=SourceClass.AI_COGNITION,
+        ),
+    )
+
+    evidence_id = str(support_refs[0]["object_id"])
+    batch = store.get_payloads_for_ids(
+        (claim_ref.object_id, evidence_id, dependency.object_id)
+    )
+    for object_id in (claim_ref.object_id, evidence_id, dependency.object_id):
+        assert batch[object_id] == store.get_payload(object_id)
+
+    assert batch[claim_ref.object_id]["support_evidence_set_refs"] == list(support_refs)
+    assert batch[dependency.object_id]["dependent_ref"] == {
+        "object_id": claim_ref.object_id,
+        "revision": 1,
+    }
+    assert batch[dependency.object_id]["dependency_ref"] == {
+        "object_id": fact.object_id,
+        "revision": 1,
+    }
+
+
+def test_recall_batching_preserves_exact_limit_order_and_watermark_catchup(tmp_path):
+    store = SQLiteWorldStore(tmp_path / "world.sqlite")
+    index = WorldSearchIndex(tmp_path / "index.sqlite", store=store)
+
+    observations = []
+    for offset in range(5):
+        at = T0 + timedelta(minutes=offset)
+        observation = Observation(
+            object_id=f"obs_scale_order_{offset}",
+            subject_id="user_1",
+            occurred=TemporalExtent.point(at),
+            learned_at=at,
+            recorded_at=at,
+            created_by="core-scale-semantics",
+            source_kind="conversation",
+            modality="text",
+            value=f"order-marker item {offset}",
+            metadata={"dimension": "dim:scale_order"},
+        )
+        store.commit(
+            [observation],
+            OperationRequest(
+                operation_name=f"test.core_scale.order.{offset}",
+                expected_world_revision=store.current_world_revision(),
+                reason="seed exact recall order and limit semantics",
+                idempotency_key=f"core-scale-order:{offset}",
+                source_class=SourceClass.USER,
+            ),
+        )
+        observations.append(observation)
+        if offset == 3:
+            index.rebuild()
+
+    assert index.watermark() < store.current_world_revision()
+    page = index.recall_candidates(
+        "order-marker",
+        subject="user_1",
+        dimension="dim:scale_order",
+        object_types=("observation",),
+        limit=3,
+    )
+
+    assert [hit.object_id for hit in page.hits] == [
+        observations[4].object_id,
+        observations[3].object_id,
+        observations[2].object_id,
+    ]
+    assert [hit.revision for hit in page.hits] == [1, 1, 1]
+    assert len(page.hits) == 3
+    assert page.world_revision == store.current_world_revision()
+    assert page.index_watermark == store.current_world_revision()
+    assert page.lag == 0
