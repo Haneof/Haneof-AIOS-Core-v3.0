@@ -27,7 +27,7 @@ remains an `ACCEPTANCE_FAIL` record for exact failed head
 
 ## 1. Review pins
 
-- review-time live `main`: `3d980fadf6beefcdd02ff4367ba834a5b013d871`
+- review-time live `main`: `f8eb271453b12c3896cd55381b8bdb8dc5da5632`
 - reviewed PR: **#146**
 - PR state at final pin: **OPEN**
 - merged: **false**
@@ -452,17 +452,18 @@ No guard was skipped and no guard failure was swallowed.
 
 The review began while main was moving and therefore repeatedly refreshed live state.
 
-Final review-time main pinned for this review branch:
+Final review-time main pinned for the completed acceptance:
 
-`3d980fadf6beefcdd02ff4367ba834a5b013d871`
+`f8eb271453b12c3896cd55381b8bdb8dc5da5632`
 
-Relative to corrective baseline `6018041972...`, live main had advanced by **9** commits.
+Relative to corrective baseline `6018041972...`, live main had advanced by **17** commits at the final compatibility check.
 
 Those main-side changes included:
 
 - task-board/checkpoint/master-map state changes;
 - independent FIX-002 acceptance evidence;
-- accepted/integrated CORE-GAP-FIX-002 Core/runtime and test changes.
+- accepted/integrated CORE-GAP-FIX-002 Core/runtime and test changes;
+- post-FIX-002 governance/writeback material through `f8eb2714...`.
 
 Critically, the baseline-to-current-main file survey found:
 
