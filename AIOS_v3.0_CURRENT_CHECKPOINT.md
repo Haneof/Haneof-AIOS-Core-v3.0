@@ -1,11 +1,11 @@
 # AIOS v3.0 当前工程断点
 
-## 当前控制入口 — 2026-09-24 FIX-001/002/003 DONE / HEADLESS DONE / RECOVERY DONE / SCALE DONE / RC-FREEZE REVIEW_READY / CI-FIX DONE
+## 当前控制入口 — 2026-09-24 FIX-001/002/003 DONE / HEADLESS DONE / RECOVERY DONE / SCALE DONE / RC-FREEZE DONE / FRESH-A-002 READY / CI-FIX DONE
 
 - 接任 PM live 复核：live main = `e72a63874ed2c28798b00cec51f191caf1594a00`，Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`；见 `governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
 - `CORE-OPERATOR-001 = DONE`：独立验收 #135（ACCEPTANCE_PASS）先合 `fe6f1740eb`，候选 #131 后合 `e72a63874e`；报告 `reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md`。
 - `CORE-BASELINE-001 = DONE（re-verified）`；PR #136 已去除 pelican 文件，改作本 PM 补充治理 PR（pelican 提交 `f8edb5d1` 仅留历史，不合入）。
-- 合后 p16 `35958610555` SUCCESS；PR #130 = SUPERSEDED / NOT INTEGRATED。当前 S2：FIX-001 = DONE（#145 merge `d97a1bfa...`）；FIX-002 = DONE（#143 merge `3d980fad...`）；FIX-003 = DONE（final review #178 ACCEPTANCE_PASS / 0 blockers；#157 exact `7c0c51a7...` merged `78c10332...`；receipt `governance/CORE_GAP_FIX_003_INTEGRATION_RECEIPT_2026-09-24.md`）。三项 audited Core gap 均 CLOSED。`CORE-HEADLESS-001 = DONE`；`CORE-RECOVERY-001 = DONE`；`CORE-SCALE-001 = DONE`：#200 ACCEPTANCE_PASS / 0 blockers；#197 tested exact `ba23767d...` + evidence-only `2c8f16fe...` merged `46c7cf97...`；receipt `governance/CORE_SCALE_001_INTEGRATION_RECEIPT_2026-09-24.md`。`CORE-RC-FREEZE-001 = GATE / REVIEW_READY`：PR #202；frozen software SHA `773876f92d5f8e53422f8f5a68cc651953d93052`，Core tree `fe77f8a0706acfaf369041d0882b6d0e6de39f22`；fresh software gates、non-editable clean install、backup/restore/index、writer/restart、FIX-001/002/003 spot checks 全绿；impact decision = `FRESH_A_REQUIRED`。fresh Resident 仍 BLOCKED，等待独立验收与 PM 集成。CI-FIX = DONE。
+- 合后 p16 `35958610555` SUCCESS；PR #130 = SUPERSEDED / NOT INTEGRATED。当前 S2：FIX-001/002/003、HEADLESS、RECOVERY、SCALE、CI-FIX 均 DONE。`CORE-RC-FREEZE-001 = DONE`：独立验收 #203 head `e622437489aac3de04570422043681ac731cf0a6` 先合为 `85c0aba5fed826e5058bc8af59180c3d04a96eaa`；RC packet #202 exact head `b392f73f53180620842a1c25575a8a7567cc8773` 后合为 `305aea162cfd53105179b63dd06704aa7bce3ccc`。frozen software = `773876f92d5f8e53422f8f5a68cc651953d93052`；Core tree = `fe77f8a0706acfaf369041d0882b6d0e6de39f22`；impact = `FRESH_A_REQUIRED`；receipt = `governance/CORE_RC_FREEZE_001_INTEGRATION_RECEIPT_2026-09-24.md`。唯一下一 READY = `C15-RCC-RES-A-RERUN-002`；必须 fresh private World/fresh session，禁止复用 #117；B/C/C16/broad P16/P17 继续 BLOCKED。CI-FIX = DONE。
 
 ## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / FIX-001+002 READY
 
