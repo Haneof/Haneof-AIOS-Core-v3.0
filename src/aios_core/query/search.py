@@ -1300,15 +1300,13 @@ class WorldSearchIndex:
             else:
                 if latest_index_revision.get(str(object_id)) != int(revision):
                     continue
-                if object_type != "reinterpretation":
+                if object_type != "reinterpretation" and not include_inactive:
                     current_payload = world_payloads.get(str(object_id))
                     if current_payload is None:
                         continue
                     if int(current_payload.get("revision", 0)) != int(revision):
                         continue
-                    if not include_inactive and not self._payload_visible(
-                        current_payload
-                    ):
+                    if not self._payload_visible(current_payload):
                         continue
 
             if subject is not None and str(row["subject_id"]) != subject:
