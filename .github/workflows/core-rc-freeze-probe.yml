@@ -24,6 +24,52 @@ jobs:
           mkdir -p dist rc-evidence
           python -m pip wheel . --no-deps -w dist
           python -m pip install dist/*.whl "pytest>=8,<9"
+      - name: Generate exact frozen source manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, os, subprocess
+          from pathlib import Path
+          BASE = "773876f92d5f8e53422f8f5a68cc651953d93052"
+          def git(*args):
+              return subprocess.check_output(["git", *args]).decode().strip()
+          def at(path):
+              return subprocess.check_output(["git","show",f"{BASE}:{path}"])
+          def rec(path):
+              data=at(path)
+              return {
+                  "path": path,
+                  "size": len(data),
+                  "git_blob_sha1": git("rev-parse", f"{BASE}:{path}"),
+                  "sha256": hashlib.sha256(data).hexdigest(),
+              }
+          core_files=sorted(p.as_posix() for p in Path("src/aios_core").rglob("*") if p.is_file())
+          workflow_files=sorted(p.as_posix() for p in Path(".github/workflows").glob("*.yml") if p.name != "core-rc-freeze-probe.yml")
+          manifest={
+              "schema": "CORE_RC_FREEZE_001_MANIFEST.v1",
+              "frozen_main_sha": BASE,
+              "probe_head": os.environ.get("GITHUB_SHA"),
+              "top_tree_sha1": git("rev-parse", f"{BASE}^{{tree}}"),
+              "core_tree_sha1": git("rev-parse", f"{BASE}:src/aios_core"),
+              "tests_tree_sha1": git("rev-parse", f"{BASE}:tests"),
+              "workflow_tree_sha1": git("rev-parse", f"{BASE}:.github/workflows"),
+              "core_files": [rec(p) for p in core_files],
+              "workflow_files": [rec(p) for p in workflow_files],
+              "package_metadata": rec("pyproject.toml"),
+              "constitution_registry": rec("docs/constitution/AIOS_v3.0_Fused_Baseline_Registry.md"),
+              "task_board": rec("governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md"),
+              "checkpoint": rec("AIOS_v3.0_CURRENT_CHECKPOINT.md"),
+              "notes": [
+                  "Hashes are generated mechanically from the exact frozen base commit, not from the transient probe workflow tree.",
+                  "Private Resident Worlds, run databases, credentials, and generated caches are excluded."
+              ]
+          }
+          Path("rc-evidence/source-manifest.json").write_text(json.dumps(manifest,indent=2,sort_keys=True)+"\\n")
+          print("===RC_SOURCE_MANIFEST_BEGIN===")
+          print(json.dumps(manifest,indent=2,sort_keys=True))
+          print("===RC_SOURCE_MANIFEST_END===")
+          PY
       - name: Record exact environment and wheel metadata
         shell: bash
         run: |
