@@ -7,7 +7,7 @@
 - `CORE-BASELINE-001 = DONE（re-verified）`：S0 裁决成立；dev 基线前移至 `e72a63874e...`；历史 pin #117/#121/#125/#126 不变；fresh A 仅在 RC-FREEZE 后。
 - `CORE-OPERATOR-001 = DONE`：独立验收 #135（ACCEPTANCE_PASS，0 blocker）`fe6f1740eb`（05:08:01Z）先合，候选 #131 `e72a63874e`（05:08:07Z）后合；报告 `reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md`。
 - `CORE-GAP-AUDIT-001 = DONE`（#132 合 `bc4bf735...`）；RC blockers = CG-001/002/003；14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE 不得无依据重开。
-- `CORE-GAP-FIX-001` / `CORE-GAP-FIX-002` = **READY / 待启动**：两个独立工程窗口可并行（不同 owner/分支/路径，无写入冲突）；`CORE-GAP-FIX-003` BLOCKED。
+- `CORE-GAP-FIX-001` / `CORE-GAP-FIX-002` = **READY / 待启动**：两个独立工程窗口可并行，但**并非路径不相交** —— 经对现行源码核对，两者都必须改 `src/aios_core/runtime/turn_runtime.py`（FIX-001 改 `_search_world`/`_inspect_world_object`/`_world_map_context`；FIX-002 改 `run_wake`/`run_periodic_review`）。并行条件、符号级归属、串行集成与 rebase 后重验要求见 **`governance/AIOS_CORE_S2_PARALLELISM_RULING_2026-09-24.md`**（binding）。`CORE-GAP-FIX-003` BLOCKED（同样写 turn_runtime.py / turn_execution.py，状态机须与 FIX-002 一致）。
 - PR #136（pelican 动画）= EXCLUDED，永不合入；分支保留，不作关闭/删除（计划未授权）。
 - PM 补充（`governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`）：合后 p16-convergence-gate run `35958610555` @ `e72a6387` SUCCESS；PR #130（`core/operator-001-20260924-sol` @ `16eb1d40`，同 Task 竞争候选、未经独立验收）= **SUPERSEDED / NOT INTEGRATED**，保留不合并；`core-gap-fix-001/002` 分支停在 `27135e39`、零提交，无施工现场。
 - Gap fix 独立验收统一提示词：`governance/prompts/CORE_GAP_FIX_ACCEPTANCE_2026-09-24.md`（每个候选另开不同 reviewer 窗口）。
