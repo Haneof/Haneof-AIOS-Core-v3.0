@@ -1,12 +1,12 @@
 # AIOS v3.0 项目全流程总地图
 
-## 当前控制入口 — 2026-09-24 Core operator DONE; gap fixes S2 active
+## 当前控制入口 — 2026-09-24 Core gap fixes DONE; HEADLESS READY
 
 - `CORE-BASELINE-001 = DONE`。
 - `CORE-GAP-AUDIT-001 = DONE`：PR #132 accepted/merged at `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`；audited Core tree `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
 - Audit disposition: 3 STILL_OPEN RC blockers / 14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE。
-- Active RC blocker now: CG-003 user-turn IN_DOUBT recovery。CG-001 and CG-002 are DONE.
-- S2 当前：`CORE-GAP-FIX-002 = DONE`；`CORE-GAP-FIX-001 = DONE`（#171 corrective ACCEPTANCE_PASS；#145 exact `a56f113a...` merged as `d97a1bfa...`）；`CORE-GAP-FIX-003` 历史 #162 ACCEPTANCE_FAIL 与 #174 rebase-required 裁决保留，#157 已吸收 FIX-001-integrated main 并形成 post-FIX001 exact `7c0c51a7...`，13/13 workflows SUCCESS，现 `GATE / REVIEW_READY` 等待 fresh independent acceptance。`CORE-CI-FIX-001 = DONE`。
+- Active audited Core gap blocker: none. CG-001 / CG-002 / CG-003 are DONE.
+- S2 当前：`CORE-GAP-FIX-001 = DONE`；`CORE-GAP-FIX-002 = DONE`；`CORE-GAP-FIX-003 = DONE`（#178 final ACCEPTANCE_PASS；#157 exact `7c0c51a7...` merged as `78c10332...`）；`CORE-CI-FIX-001 = DONE`。`CORE-HEADLESS-001 = READY`，RECOVERY / SCALE / RC-FREEZE 后置。
 - `CORE-OPERATOR-001 = DONE`：#135 ACCEPTANCE_PASS → #131 exact head `0e1d69ee` merged at `e72a63874ed2c28798b00cec51f191caf1594a00`；Core ZERO DIFF；#130 SUPERSEDED。
 - 单一集成收据（两份 PM 写回已对账合并）：`governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`；含集成时 API 复核、本地 repro/修复复算（`3865da88` 三项失败 → accepted head `632 passed`）、合后 push gate run `35958610555` SUCCESS 及全部诚实限制。operator 集成不是 SOFTWARE_RC，也不是 CORE_COMPLETE。
 - 路线保持：operator acceptance + three accepted gap fixes → headless → recovery → scale → RC freeze → fresh C15 A/B/C → C16 → P16 → P17 Core release closure。
