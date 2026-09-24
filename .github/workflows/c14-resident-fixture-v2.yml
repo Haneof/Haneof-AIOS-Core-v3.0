@@ -84,15 +84,15 @@ jobs:
             fi
             echo "Guard evaluated from merge base $merge_base"
           fi
-          if printf '%s\n' "$changed" | grep -q '^src/aios_core/'; then
+          if grep -q '^src/aios_core/' <<<"$changed"; then
             echo "::error::Invariant rejected: C14-RES-B-FIX-001 must not modify src/aios_core/**"
             exit 1
           fi
-          if printf '%s\n' "$changed" | grep -q '^reviews/internal_habitation/c14-resident/v2/runs/resident-a-restart-20260921/'; then
+          if grep -q '^reviews/internal_habitation/c14-resident/v2/runs/resident-a-restart-20260921/' <<<"$changed"; then
             echo "::error::Invariant rejected: C14-RES-B-FIX-001 must not modify frozen Resident-A evidence"
             exit 1
           fi
-          if printf '%s\n' "$changed" | grep -q '^reviews/internal_habitation/c14-resident/v2/fixture/sealed_fixture.json$'; then
+          if grep -q '^reviews/internal_habitation/c14-resident/v2/fixture/sealed_fixture.json$' <<<"$changed"; then
             echo "::error::Invariant rejected: C14-RES-B-FIX-001 must not modify sealed fixture bytes"
             exit 1
           fi
