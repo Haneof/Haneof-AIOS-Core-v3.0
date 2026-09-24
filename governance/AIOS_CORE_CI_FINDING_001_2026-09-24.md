@@ -3,7 +3,7 @@
 Date: 2026-09-24
 Raised by: Core Delivery PM (integrating PM window)
 Class: release / CI infrastructure defect. **Not** a Core semantic gap, **not** a new `CG-` audit item.
-Status: OPEN → dispatched as `CORE-CI-FIX-001`
+Status: CLOSED — `CORE-CI-FIX-001` integrated after independent corrective acceptance
 
 ## 1. Observation
 
@@ -61,3 +61,25 @@ Prompt: `governance/prompts/CORE_CI_FIX_001_2026-09-24.md`
 State: READY / NOT_STARTED
 Blocks: `CORE-RC-FREEZE-001`
 Does not block: `CORE-GAP-FIX-001`, `CORE-GAP-FIX-002`
+
+
+---
+
+## 6. Closure — 2026-09-24
+
+The finding is CLOSED.
+
+Historical sequence is preserved:
+- first PR #146 candidate `1896b3e5257bd0eaea990f2b7a656e9747d899ba` -> independent review #150 -> ACCEPTANCE_FAIL;
+- blocker `CORE-CI-FIX-001-ACCEPT-BLOCKER-001`: `pipefail + printf | grep -q` could fail open on a large changed list;
+- corrected PR #146 exact head `1eb24e101cdb1579c22c69b435cf9f79a3c359ad` -> independent corrective review #156 -> ACCEPTANCE_PASS / 0 blockers;
+- #156 evidence merged as `f3d20c2200d62313719e6cf76861005683256c5b`;
+- corrected candidate merged as `c3ec42214db57864f7951e28b75811b10db8be21`;
+- PR #144 remains SUPERSEDED / NOT INTEGRATED.
+
+The accepted guards now evaluate PR changes independently of shallow branch shape, keep evaluation failure distinct
+from policy rejection, and remove the SIGPIPE false-negative edge from all six protected-path predicates.
+
+Receipt: `governance/CORE_CI_FIX_001_INTEGRATION_RECEIPT_2026-09-24.md`.
+
+This closure satisfies the CI-trust prerequisite for CORE-RC-FREEZE-001. It does not release RC-FREEZE by itself.
