@@ -97,7 +97,7 @@ jobs:
             fi
             echo "Guard evaluated from merge base $merge_base"
           fi
-          if printf '%s\n' "$changed" | grep -q '^src/aios_core/'; then
+          if grep -q '^src/aios_core/' <<<"$changed"; then
             echo "::error::Invariant rejected: C15-RCC-FIXTURE-001 must not modify src/aios_core/**"
             exit 1
           fi
