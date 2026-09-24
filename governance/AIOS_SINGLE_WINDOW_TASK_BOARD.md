@@ -15,6 +15,8 @@
 - 诚实限制：本地复算用 CPython 3.11.2（低于 >=3.12 gate），仅佐证；`gh run rerun` 与 `workflow_dispatch` 被平台 403 拒绝（未绕权限），合后证据以 push run `35958610555` 为准；作者与验收为不同窗口但同一 GitHub 账号，无跨账号 APPROVE，不宣称账号级独立。
 - **PM 写回并发规则（新增，因本日出现两个 PM 窗口并行写回同一状态）**：同一时刻只保留**一个**集成 PM 写回入口。先合入者为准，后到窗口必须**对账合并**已合入内容，不得覆盖、不得新建同事件的第二份收据/第二条控制入口。本日 #137 / #136 / #138 三份 PM 写回已在此合并，单一收据 = `governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`。
 - S2 两个并行修复窗口的写入范围隔离与 operator 面禁改规则见 `governance/AIOS_CORE_GAP_DISPATCH_2026-09-24.md` 的 "Dispatch update — 2026-09-24"。
+- **新任务 `CORE-CI-FIX-001` = READY / 待启动**（release/CI 基础设施）：`c15-rcc-fixture-mechanical-gate` 与 `semantic-repair-mechanical-gate` 的 "prove zero Core diff" 步骤在浅克隆上 `git` 自身 exit 128，随分支形状时红时绿（#133 红 / #137 绿 / #138 #139 红），不是策略违规。发现与 PM 裁决：`governance/AIOS_CORE_CI_FINDING_001_2026-09-24.md`；提示词：`governance/prompts/CORE_CI_FIX_001_2026-09-24.md`。不阻塞 FIX-001/002，但 **必须在 `CORE-RC-FREEZE-001` 之前关闭**。
+- #138/#139 两条红检查登记为 **INFRASTRUCTURE_FAILURE**，不登记为通过、也不登记为已接受的违规；PM 已用直接证据独立验证不变式成立（`git diff e72a638..main -- src/` 为空，Core tree 仍 `7db4f72e`），未绕过分支保护（该两项非 required）。
 - HEADLESS/RECOVERY/SCALE/RC-FREEZE 与 Resident A/B/C 继续 BLOCKED；UI/P18/P19 排除。
 
 ## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / S1-S2 ACTIVE
@@ -36,6 +38,7 @@
 | CORE-GAP-AUDIT-001 | **DONE** | PR #132 已接受并合入；报告 `reviews/CORE_GAP_AUDIT_001_2026-09-24.md` |
 | CORE-GAP-FIX-001 | **READY / NOT_STARTED** | Runtime Temporal Read Cut；提示词 `governance/prompts/CORE_GAP_FIX_001_2026-09-24.md`；另开独立验收 |
 | CORE-GAP-FIX-002 | **READY / NOT_STARTED** | Background Model Execution IN_DOUBT；提示词 `governance/prompts/CORE_GAP_FIX_002_2026-09-24.md`；另开独立验收 |
+| CORE-CI-FIX-001 | **READY / NOT_STARTED** | Release/CI Infrastructure Engineer 单窗口；修复两条 mechanical gate 的 shallow-clone Core-diff 守卫（exit 128）；提示词 `governance/prompts/CORE_CI_FIX_001_2026-09-24.md`；不阻塞 FIX-001/002，阻塞 RC-FREEZE；另开独立验收 |
 | CORE-GAP-FIX-003 | **BLOCKED** | 依赖 FIX-002 独立验收 + PM integration；提示词 `governance/prompts/CORE_GAP_FIX_003_2026-09-24.md`，当前不得施工 |
 | CORE-HEADLESS-001 | **BLOCKED** | OPERATOR accepted + FIX-001/002/003 accepted/integrated |
 | CORE-RECOVERY-001 | **BLOCKED** | HEADLESS + 三项 gap 修复进入 S2 candidate |
