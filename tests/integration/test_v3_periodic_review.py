@@ -2,6 +2,12 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
+from aios_core.ai_world import (
+    AIWorldClaimRequest,
+    AIWorldCognitionService,
+    AIWorldDomain,
+)
+
 from aios_core.contracts.enums import ActionStatus, ObjectType, SourceClass, WakeState
 from aios_core.contracts.models import Action, Observation, Outcome, Wake
 from aios_core.contracts.operations import OperationRequest
@@ -792,11 +798,24 @@ def test_cg001_resumed_periodic_review_uses_original_start_as_read_cut(tmp_path)
             source_class=SourceClass.USER,
         ),
     )
+    late_cognition_marker = "cg001 periodic T2 cognition must not enter T1 cockpit"
+    AIWorldCognitionService(store=store, index=index).commit(
+        AIWorldClaimRequest(
+            domain=AIWorldDomain.USER_UNDERSTANDING,
+            statement=late_cognition_marker,
+            evidence_refs=(ObjectRef(object_id=late.object_id, revision=1),),
+            confidence=0.9,
+            scope_key="cg001.periodic.late",
+            tags=("core_context",),
+        ),
+        learned_at=t2,
+    )
     index.catch_up()
     seen = {}
 
     def resumed_model(snapshot):
         history = snapshot.capability_history
+        assert late_cognition_marker not in str(snapshot.cockpit["ai_identity"])
         if not history:
             return ModelDirective(
                 capability_calls=(
