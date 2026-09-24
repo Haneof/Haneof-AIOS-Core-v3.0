@@ -1,15 +1,15 @@
 # AIOS v3.0 项目全流程总地图
 
-## 当前控制入口 — 2026-09-24 Core gap fixes DONE; HEADLESS DONE; RECOVERY DONE; SCALE DONE; RC-FREEZE REVIEW_READY
+## 当前控制入口 — 2026-09-24 Core gap fixes DONE; HEADLESS DONE; RECOVERY DONE; SCALE DONE; RC-FREEZE DONE; FRESH-A-002 READY
 
 - `CORE-BASELINE-001 = DONE`。
 - `CORE-GAP-AUDIT-001 = DONE`：PR #132 accepted/merged at `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`；audited Core tree `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
 - Audit disposition: 3 STILL_OPEN RC blockers / 14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE。
 - Active audited Core gap blocker: none. CG-001 / CG-002 / CG-003 are DONE.
-- S2 当前：`CORE-GAP-FIX-001 = DONE`；`CORE-GAP-FIX-002 = DONE`；`CORE-GAP-FIX-003 = DONE`（#178 final ACCEPTANCE_PASS；#157 exact `7c0c51a7...` merged as `78c10332...`）；`CORE-CI-FIX-001 = DONE`。`CORE-HEADLESS-001 = DONE`（#189 corrective ACCEPTANCE_PASS；#181 merged as `6ccd79d9...`）；`CORE-RECOVERY-001 = DONE`（#195 ACCEPTANCE_PASS；#191 merged as `17e38070...`）；`CORE-SCALE-001 = DONE`（#200 ACCEPTANCE_PASS；#197 merged as `46c7cf97...`）；`CORE-RC-FREEZE-001 = GATE / REVIEW_READY`（PR #202；software SHA `773876f9...`；impact `FRESH_A_REQUIRED`；等待 fresh Independent Acceptance）。
+- S2 当前：`CORE-GAP-FIX-001/002/003 = DONE`；`CORE-CI-FIX-001 = DONE`；`CORE-HEADLESS-001 = DONE`；`CORE-RECOVERY-001 = DONE`；`CORE-SCALE-001 = DONE`；`CORE-RC-FREEZE-001 = DONE`。独立验收 #203 先合 `85c0aba5...`，candidate #202 后合 `305aea16...`；frozen software `773876f9...` / Core tree `fe77f8a0...`；impact `FRESH_A_REQUIRED`。唯一下一 READY = `C15-RCC-RES-A-RERUN-002`。
 - `CORE-OPERATOR-001 = DONE`：#135 ACCEPTANCE_PASS → #131 exact head `0e1d69ee` merged at `e72a63874ed2c28798b00cec51f191caf1594a00`；Core ZERO DIFF；#130 SUPERSEDED。
 - 单一集成收据（两份 PM 写回已对账合并）：`governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`；含集成时 API 复核、本地 repro/修复复算（`3865da88` 三项失败 → accepted head `632 passed`）、合后 push gate run `35958610555` SUCCESS 及全部诚实限制。operator 集成不是 SOFTWARE_RC，也不是 CORE_COMPLETE。
-- 路线保持：operator acceptance + three accepted gap fixes → headless → recovery → scale → RC freeze → fresh C15 A/B/C → C16 → P16 → P17 Core release closure。
+- 路线保持：operator acceptance + three accepted gap fixes → headless → recovery → scale → RC freeze ✅ → `C15-RCC-RES-A-RERUN-002` → A independent acceptance → B preflight/release/rerun/accept → attested C → C15 close → C16 → broad P16 → P17 Core release closure。
 - 历史实验与开发线继续分离：#117 historical A 不 hash-swap；#121 failed/non-canonical；Core 变化后只在 RC freeze 后新跑 fresh A。
 - UI、数字人、Launcher、动画、硬件、ROM 不开发。
 
@@ -38,9 +38,9 @@
 |---|---|
 | C13 / 历史 T34/T36/T28/T35/T33 修复 | 已有 task-board 完成证据；不因旧 Issue OPEN 重做 |
 | C14 持续认知派生 | 正式收口 PASS |
-| C15 Resident A | canonical #117，DONE / ACCEPTED |
+| C15 Resident A | historical #117 仅对 old Core 有效；新 RC 要求 `C15-RCC-RES-A-RERUN-002 = READY`，fresh World/session，完成后独立验收 |
 | C15 旧 B candidate | #121 NOT ACCEPTED；保留 immutable non-canonical evidence |
-| C15 B 恢复链 | 纠偏治理 DONE → operator preflight READY → 独立放行 → fresh B → 独立接受 |
+| C15 B 恢复链 | BLOCKED on new-RC A independent acceptance → operator preflight → 独立放行 → fresh B → 独立接受 |
 | C15 C 与终评 | B 接受 + 可信模型身份前置后才可启动 C；R1–R9 全 VALID 才收口 |
 | C16 系统改进反馈 | BLOCKED；Resident proposal 与用户 World 分离，独立复现/工程/Gate/再验证 |
 | 广泛 P16 | C15/C16 关闭后恢复有效分段 ledger、年度证据、多 provider/model、独立评估和红队 |
