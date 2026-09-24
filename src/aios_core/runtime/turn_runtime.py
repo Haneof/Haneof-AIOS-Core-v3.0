@@ -1486,6 +1486,7 @@ class FusedTurnRuntime:
                 session_id=active_session,
                 query=str(query),
                 limit=max(1, min(int(limit), 20)),
+                as_of=self._active_turn_time,
             )
         ]
 
@@ -1660,10 +1661,28 @@ class FusedTurnRuntime:
         return self._world_map_context(self._active_turn_time)
 
     def _list_attention_watches(self) -> list[dict[str, Any]]:
-        return [
-            item.model_dump(mode="json")
-            for item in self.attention_watches.current()
-        ]
+        watches: list[dict[str, Any]] = []
+        for payload in self._cutoff_store().list_payloads(
+            object_type=ObjectType.TASK,
+            subject_id=self.subject_id,
+        ):
+            if str(payload.get("task_type") or "") != "observation":
+                continue
+            if str(payload.get("task_state") or "") != "waiting_evidence":
+                continue
+            condition = payload.get("completion_condition")
+            if not isinstance(condition, Mapping):
+                continue
+            if condition.get("kind") != AttentionWatchService.CONDITION_KIND:
+                continue
+            watches.append(payload)
+        watches.sort(
+            key=lambda item: (
+                -int(item.get("priority") or 0),
+                str(item.get("object_id") or ""),
+            )
+        )
+        return watches
 
     def _read_background_budget(self) -> dict[str, Any]:
         if self._active_turn_time is None:
@@ -2094,6 +2113,7 @@ class FusedTurnRuntime:
             window_start=start,
             window_end=end,
             query=query,
+            as_of=self._active_turn_time,
         )
         return projection.model_dump(mode="json")
 
@@ -3081,6 +3101,7 @@ class FusedTurnRuntime:
             limit=effective_recommendation_limit,
             history_needed=topic_state.history_may_help,
             antecedent_fallback=topic_state.antecedent_recall_needed,
+            as_of=occurred_at,
         )
 
         continuity_context = (
