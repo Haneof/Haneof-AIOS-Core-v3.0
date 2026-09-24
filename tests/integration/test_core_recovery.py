@@ -368,7 +368,7 @@ def test_r9_interrupted_restore_does_not_mutate_backup_or_publish_partial_world(
         raise OSError("synthetic publish interruption")
 
     monkeypatch.setattr(recovery_module.os, "link", fail_publish)
-    with pytest.raises(OSError, match="publish interruption"):
+    with pytest.raises(RecoveryError, match="publish interruption"):
         restore_world(destination_cfg, backup)
     assert not destination_cfg.world_path.exists()
     assert _sha256(backup) == backup_hash
