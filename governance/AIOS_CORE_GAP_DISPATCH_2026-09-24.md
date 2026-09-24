@@ -54,7 +54,8 @@ To keep the two active windows conflict-free:
 
 - `CORE-GAP-FIX-001` (CG-001, temporal read cut) owns the model-visible read-cut surface: query/search read paths, exact-object reads and the time-pinned execution cut.
 - `CORE-GAP-FIX-002` (CG-002, background model execution IN_DOUBT) owns the background execution/outcome-durability surface.
-- If both need to modify the same file, the second window stops and reports to the PM; the PM serialises the two tasks rather than letting two windows write the same file.
+- **Verified 2026-09-24: both tasks do in fact write `src/aios_core/runtime/turn_runtime.py`.** Parallel work is same-file / different-region, not path-disjoint. The binding conditions (symbol-level ownership, no drive-by refactors, serialised integration, mandatory re-verification of the second candidate on its rebased head) are in `governance/AIOS_CORE_S2_PARALLELISM_RULING_2026-09-24.md`.
+- If a window needs to modify a symbol owned by the other task, it stops and reports to the PM; the PM serialises the two tasks rather than letting two windows edit the same region.
 - Neither window may modify: `governance/**`, `reviews/**`, `tools/c15_preflight/**`, `tests/preflight/**`, historical evidence, fixtures, or any private World.
 - Governance status writeback for a fix is performed by the PM at integration, not by the engineering author.
 
