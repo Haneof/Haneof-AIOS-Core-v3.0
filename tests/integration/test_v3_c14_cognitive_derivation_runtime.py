@@ -2765,6 +2765,29 @@ def test_cg001_corrective_resumed_c14_lineage_excludes_t2_dependency_and_leaf(
         dimension="dim:cg001:corrective",
         at=NOW + timedelta(minutes=10),
     )
+    t1_dependency_leaf = _observation(
+        store,
+        "obs_cg001_corrective_t1_dependency_leaf",
+        value="cg001 corrective T1 dependency-only leaf",
+        dimension="dim:cg001:corrective",
+        at=NOW + timedelta(minutes=15),
+    )
+    t1_dependency = Dependency(
+        object_id="dep_cg001_corrective_t1_support",
+        subject_id="user_1",
+        learned_at=NOW + timedelta(minutes=20),
+        recorded_at=NOW + timedelta(minutes=20),
+        created_by="test:cg001:corrective",
+        dependent_ref=summary_ref,
+        dependency_ref=t1_dependency_leaf,
+        dependency_type="summary_uses_source",
+    )
+    _commit(
+        store,
+        [t1_dependency],
+        source_class=SourceClass.MAINTENANCE,
+        tag="cg001-corrective-t1-dependency",
+    )
     scheduled = _schedule(store, index, summary_ref)
     t1 = NOW + timedelta(minutes=30)
     t2 = t1 + timedelta(minutes=5)
@@ -2832,6 +2855,7 @@ def test_cg001_corrective_resumed_c14_lineage_excludes_t2_dependency_and_leaf(
         assert late_dependency.object_id not in lineage_text
         assert late_leaf.object_id not in lineage_text
         assert t1_leaf.object_id in lineage_text
+        assert t1_dependency_leaf.object_id in lineage_text
         return ModelDirective(silence=True, **_usage(snapshot))
 
     resumed_runtime = FusedTurnRuntime(
@@ -2849,6 +2873,7 @@ def test_cg001_corrective_resumed_c14_lineage_excludes_t2_dependency_and_leaf(
 
     assert resumed.runtime is not None and resumed.runtime.silenced is True
     assert t1_leaf.object_id in str(observed["lineage"])
+    assert t1_dependency_leaf.object_id in str(observed["lineage"])
 
 
 def test_cg001_corrective_resumed_c14_bundle_lineage_excludes_t2_support(
@@ -2861,6 +2886,31 @@ def test_cg001_corrective_resumed_c14_bundle_lineage_excludes_t2_support(
         index,
         prefix="cg001_corrective_bundle",
     )
+    t1_leaf, target_summary, _scheduled = siblings[0]
+    t1_dependency_leaf = _observation(
+        store,
+        "obs_cg001_corrective_bundle_t1_dependency_leaf",
+        value="cg001 corrective bundle T1 dependency-only leaf",
+        dimension="dim:cg001:corrective:bundle",
+        at=NOW + timedelta(minutes=15),
+    )
+    t1_dependency = Dependency(
+        object_id="dep_cg001_corrective_bundle_t1_support",
+        subject_id="user_1",
+        learned_at=NOW + timedelta(minutes=20),
+        recorded_at=NOW + timedelta(minutes=20),
+        created_by="test:cg001:corrective:bundle",
+        dependent_ref=target_summary,
+        dependency_ref=t1_dependency_leaf,
+        dependency_type="summary_uses_source",
+    )
+    _commit(
+        store,
+        [t1_dependency],
+        source_class=SourceClass.MAINTENANCE,
+        tag="cg001-corrective-bundle-t1-dependency",
+    )
+    index.catch_up()
     t1 = NOW + timedelta(minutes=30)
     t2 = t1 + timedelta(minutes=5)
 
@@ -2893,7 +2943,6 @@ def test_cg001_corrective_resumed_c14_bundle_lineage_excludes_t2_support(
     assert first.runtime is not None
     assert first.runtime.termination_reason == "tool_round_budget_exhausted"
 
-    t1_leaf, target_summary, _scheduled = siblings[0]
     late_leaf = _observation(
         store,
         "obs_cg001_corrective_bundle_t2_leaf",
@@ -2934,6 +2983,7 @@ def test_cg001_corrective_resumed_c14_bundle_lineage_excludes_t2_support(
         assert late_dependency.object_id not in lineage_text
         assert late_leaf.object_id not in lineage_text
         assert t1_leaf.object_id in lineage_text
+        assert t1_dependency_leaf.object_id in lineage_text
         return ModelDirective(silence=True, **_usage(snapshot))
 
     resumed_runtime = FusedTurnRuntime(
@@ -2951,3 +3001,4 @@ def test_cg001_corrective_resumed_c14_bundle_lineage_excludes_t2_support(
 
     assert resumed.runtime is not None and resumed.runtime.silenced is True
     assert t1_leaf.object_id in str(observed["lineage"])
+    assert t1_dependency_leaf.object_id in str(observed["lineage"])
