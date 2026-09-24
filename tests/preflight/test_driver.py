@@ -156,9 +156,19 @@ def test_single_writer_and_interrupted_ack_never_implicitly_replayed(tmp_path):
     with pytest.raises(BlockingIOError):
         Driver(d.runtime,d.trace,d.port,d.directory,session='synthetic-session',clock=NOW,stop_sequence=3)
     d.transition('ACKING');d.close()
-    with pytest.raises(DriverBlocked,match='interrupted'):
+    with pytest.raises(DriverBlocked,match='REVIEW REQUIRED'):
         Driver(d.runtime,d.trace,d.port,d.directory,session='synthetic-session',clock=NOW,stop_sequence=3)
     d.trace.close()
+
+
+def test_interrupted_model_execution_is_in_doubt_and_requires_review(tmp_path):
+    d, _, _=setup(tmp_path)
+    d.transition('PROCESSING')
+    d.close();d.trace.close()
+    restart_trace=Trace(d.directory/'restart-trace.jsonl', d.runtime.store.current_world_revision)
+    with pytest.raises(DriverBlocked,match='REVIEW REQUIRED.*IN_DOUBT.*UNKNOWN'):
+        Driver(d.runtime,restart_trace,d.port,d.directory,session='synthetic-session',clock=NOW,stop_sequence=3)
+    restart_trace.close()
 
 
 def test_clean_freeze_restart_continues_no_transcript_replay(tmp_path):
