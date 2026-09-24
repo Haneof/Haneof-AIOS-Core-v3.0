@@ -1,6 +1,17 @@
 # AIOS v3.0 单窗口任务执行总表
 
-## 当前控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / S1-S2 ACTIVE
+## 当前控制入口 — 2026-09-24 PM TAKEOVER / S0 RE-VERIFIED / OPERATOR DONE / FIX-001+002 待启动
+
+- 接任 PM 依 #128 治理接手；接手与 live 复核：`governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
+- live main = `e72a63874ed2c28798b00cec51f191caf1594a00`；Core tree 仍 `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
+- `CORE-BASELINE-001 = DONE（re-verified）`：S0 裁决成立；dev 基线前移至 `e72a63874e...`；历史 pin #117/#121/#125/#126 不变；fresh A 仅在 RC-FREEZE 后。
+- `CORE-OPERATOR-001 = DONE`：独立验收 #135（ACCEPTANCE_PASS，0 blocker）`fe6f1740eb`（05:08:01Z）先合，候选 #131 `e72a63874e`（05:08:07Z）后合；报告 `reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md`。
+- `CORE-GAP-AUDIT-001 = DONE`（#132 合 `bc4bf735...`）；RC blockers = CG-001/002/003；14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE 不得无依据重开。
+- `CORE-GAP-FIX-001` / `CORE-GAP-FIX-002` = **READY / 待启动**：两个独立工程窗口可并行（不同 owner/分支/路径，无写入冲突）；`CORE-GAP-FIX-003` BLOCKED。
+- PR #136（pelican 动画）= EXCLUDED，永不合入；分支保留，不作关闭/删除（计划未授权）。
+- HEADLESS/RECOVERY/SCALE/RC-FREEZE 与 Resident A/B/C 继续 BLOCKED；UI/P18/P19 排除。
+
+## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / S1-S2 ACTIVE
 
 - 独立 Core gap audit PR #132 已由 PM 接受并正常合入；merge = `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`，审计 Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
 - 审计正式确认 3 个 RC blocker：`CG-001 RUNTIME_TEMPORAL_READ_CUT`、`CG-002 BACKGROUND_MODEL_EXECUTION_IN_DOUBT`、`CG-003 USER_TURN_IN_DOUBT_RECOVERY`。其余裁决：14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE，不得无依据重开。
@@ -14,8 +25,8 @@
 
 | Task ID | 状态 | Owner / 放行出口 |
 |---|---|---|
-| CORE-BASELINE-001 | **DONE** | S0 baseline / experiment impact ruling 已落 main |
-| CORE-OPERATOR-001 | **GATE / REVIEW_READY** | Candidate PR #131；等待不同 Independent Test Infrastructure Reviewer；未验收前禁止 merge |
+| CORE-BASELINE-001 | **DONE（re-verified）** | S0 ruling 已落 main；接任 PM 于 `e72a63874e...` 复核成立（governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md） |
+| CORE-OPERATOR-001 | **DONE** | 独立验收 #135 先合（fe6f1740eb）→ 候选 #131 后合（e72a63874e）；报告 reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md |
 | CORE-GAP-AUDIT-001 | **DONE** | PR #132 已接受并合入；报告 `reviews/CORE_GAP_AUDIT_001_2026-09-24.md` |
 | CORE-GAP-FIX-001 | **READY / NOT_STARTED** | Runtime Temporal Read Cut；提示词 `governance/prompts/CORE_GAP_FIX_001_2026-09-24.md`；另开独立验收 |
 | CORE-GAP-FIX-002 | **READY / NOT_STARTED** | Background Model Execution IN_DOUBT；提示词 `governance/prompts/CORE_GAP_FIX_002_2026-09-24.md`；另开独立验收 |

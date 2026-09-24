@@ -1,6 +1,12 @@
 # AIOS v3.0 当前工程断点
 
-## 当前控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / FIX-001+002 READY
+## 当前控制入口 — 2026-09-24 PM TAKEOVER / OPERATOR DONE / FIX-001+002 待启动
+
+- 接任 PM live 复核：live main = `e72a63874ed2c28798b00cec51f191caf1594a00`，Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`；见 `governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
+- `CORE-OPERATOR-001 = DONE`：独立验收 #135（ACCEPTANCE_PASS）先合 `fe6f1740eb`，候选 #131 后合 `e72a63874e`；报告 `reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md`。
+- `CORE-BASELINE-001 = DONE（re-verified）`；PR #136（pelican 动画）EXCLUDED 永不合入。
+
+## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / FIX-001+002 READY
 
 - 独立审计 PR #132 已合入；PM acceptance main = `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`，Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
 - 审计报告：`reviews/CORE_GAP_AUDIT_001_2026-09-24.md`。正式 RC blockers：CG-001 temporal read cut、CG-002 background model execution IN_DOUBT、CG-003 user-turn IN_DOUBT recovery。
