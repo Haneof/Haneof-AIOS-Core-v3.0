@@ -863,9 +863,16 @@ class WakeBus:
         requeued_at: datetime,
         termination_reason: str,
         model_rounds: int,
+        next_model_round_index: int,
         capability_names: tuple[str, ...] = (),
         step0_state: Step0State,
     ) -> WakeStateReceipt:
+        if (
+            isinstance(next_model_round_index, bool)
+            or not isinstance(next_model_round_index, int)
+            or next_model_round_index < 1
+        ):
+            raise ValueError("next_model_round_index must be a positive integer")
         moment = as_utc(requeued_at, "requeued_at")
         wake = self.current_wake(wake_id)
         if wake.wake_state is WakeState.QUEUED:
@@ -895,6 +902,9 @@ class WakeBus:
                 "runtime_incomplete_reason": str(termination_reason),
                 "runtime_incomplete_attempts": attempts + 1,
                 "runtime_incomplete_model_rounds": int(model_rounds),
+                "runtime_incomplete_next_model_round_index": int(
+                    next_model_round_index
+                ),
                 "runtime_incomplete_capability_names": list(capability_names),
                 "runtime_incomplete_step0_state": step0_state,
             }
@@ -920,6 +930,7 @@ class WakeBus:
                     "wake_id": wake.object_id,
                     "revision": revision,
                     "termination_reason": str(termination_reason),
+                    "next_model_round_index": int(next_model_round_index),
                 },
                 expected_world_revision=int(self.store.current_world_revision()),
                 reason="keep semantically unfinished Resident wake durable",

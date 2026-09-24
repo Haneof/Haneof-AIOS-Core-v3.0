@@ -155,3 +155,48 @@ def test_same_provider_response_id_replay_conflict_fails_closed(tmp_path):
             model_round_index=0,
             usage=usage,
         )
+
+
+def test_metering_schema_additively_upgrades_background_attempt_link(tmp_path):
+    store = SQLiteWorldStore(tmp_path / "world.db")
+    with store._connection() as conn:
+        conn.execute(
+            """
+            CREATE TABLE metering_records (
+                record_id TEXT PRIMARY KEY,
+                subject_id TEXT NOT NULL,
+                world_revision INTEGER NOT NULL,
+                recorded_at TEXT NOT NULL,
+                execution_class TEXT NOT NULL,
+                wake_id TEXT,
+                session_id TEXT,
+                wake_reason TEXT NOT NULL,
+                model_round_index INTEGER NOT NULL,
+                provider TEXT,
+                model TEXT,
+                provider_request_id TEXT,
+                usage_complete INTEGER NOT NULL,
+                input_tokens INTEGER,
+                output_tokens INTEGER,
+                total_tokens INTEGER
+            )
+            """
+        )
+        conn.commit()
+
+    before = int(store.current_world_revision())
+    ModelMeteringLedger(store)
+
+    with store._connection() as conn:
+        columns = {
+            str(row["name"])
+            for row in conn.execute("PRAGMA table_info(metering_records)").fetchall()
+        }
+        indexes = {
+            str(row["name"])
+            for row in conn.execute("PRAGMA index_list(metering_records)").fetchall()
+        }
+
+    assert "background_attempt_id" in columns
+    assert "idx_meter_background_attempt" in indexes
+    assert int(store.current_world_revision()) == before

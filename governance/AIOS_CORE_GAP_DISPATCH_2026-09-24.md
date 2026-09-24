@@ -69,3 +69,45 @@ Engineering author declares `REVIEW_READY` only. A different independent accepta
 4. state an explicit `ACCEPTANCE_PASS` / `ACCEPTANCE_FAIL` verdict with blocker count.
 
 PM integration additionally re-verifies pins and CI from the API and re-runs the decisive evidence locally before merging, as recorded for `CORE-OPERATOR-001`.
+
+
+---
+
+## Dispatch update — 2026-09-24, S2 serialization triggered by PR #145
+
+Binding successor ruling: `governance/AIOS_CORE_S2_SERIALIZATION_RULING_2026-09-24.md`.
+
+PR #145 established that CG-001 cannot be fully closed only inside the previously assigned read-path
+symbols: resumed C14/Periodic Review builds model-visible cockpit state before the historical T1 cut is
+established, so the minimal correct fix must touch `run_wake` / `run_periodic_review`.
+
+Per the original parallelism ruling's stop-and-report clause, development is now serialized:
+
+1. `CORE-GAP-FIX-002` continues first in draft PR #143 and owns the background entrypoints/state machine.
+2. `CORE-GAP-FIX-001` is preserved as FROZEN_WIP in draft PR #145 at head
+   `97a76e3b90db9ec7bf9873e87a9108d4457afc33`; do not restart, merge, or review it yet.
+3. After FIX-002 independent acceptance + PM integration, #145 rebases live main and resumes. At that
+   point FIX-001 receives a narrow exception to establish/pass the temporal read cutoff before
+   model-visible cockpit/snapshot construction, without changing FIX-002 provider-attempt semantics.
+4. `CORE-GAP-FIX-003` remains blocked behind FIX-002 integration.
+5. CI-fix candidate PR #144 is separate and may proceed to independent acceptance in parallel.
+
+
+---
+
+## Dispatch update — 2026-09-24, CORE-GAP-FIX-002 integrated
+
+- Independent acceptance PR #154: ACCEPTANCE_PASS / 0 blockers.
+- Accepted candidate PR #143 exact head: `c5382a1653b66654df23d0938d9d19a80a12619c`.
+- Review evidence merge: `32177fc38a0c8765d7dfb7a482faaeafcd027650`.
+- Candidate merge: `3d980fadf6beefcdd02ff4367ba834a5b013d871`.
+- Integration receipt: `governance/CORE_GAP_FIX_002_INTEGRATION_RECEIPT_2026-09-24.md`.
+
+Scheduling change:
+1. CORE-GAP-FIX-002 = DONE.
+2. CORE-GAP-FIX-001 = READY / RESUME_EXISTING_WIP. Continue existing PR #145; do not restart.
+3. CORE-GAP-FIX-003 = READY / NOT_STARTED; start only from live main containing FIX-002.
+4. FIX-001 and FIX-003 may develop in parallel only under
+   `governance/AIOS_CORE_S2_POST_FIX002_PARALLELISM_RULING_2026-09-24.md`; integration remains serialized.
+5. No Resident is authorized. HEADLESS/RECOVERY/SCALE/RC-FREEZE remain blocked until all required
+   predecessors close.

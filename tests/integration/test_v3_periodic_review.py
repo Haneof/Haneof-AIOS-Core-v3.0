@@ -15,6 +15,7 @@ from aios_core.review import (
 )
 from aios_core.runtime.capabilities import CapabilityCall
 from aios_core.runtime.cognitive_runtime import ModelDirective
+from aios_core.runtime import BackgroundModelExecutionInDoubt
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.writeback.cognition import ClaimWriteRequest, CognitionWritebackService
@@ -274,7 +275,7 @@ def test_completed_review_does_not_immediately_or_self_trigger_again(tmp_path):
     assert any(wake.wake_state is WakeState.SUPPRESSED for wake in review_wakes)
 
 
-def test_running_review_is_resumable_after_process_restart(tmp_path):
+def test_legacy_running_review_without_attempt_is_in_doubt_after_restart(tmp_path):
     store, index, _, _, _ = _seed_real_outcome(tmp_path)
     scheduler = PeriodicReviewService(store=store, index=index)
 
@@ -289,24 +290,27 @@ def test_running_review_is_resumable_after_process_restart(tmp_path):
     def model(snapshot):
         nonlocal calls
         calls += 1
-        assert snapshot.wake_reason == "periodic_review"
-        return ModelDirective(response="恢复未完成复盘并结束。")
+        return ModelDirective(response="不得在无 attempt 证据时盲重试。")
 
     restarted = FusedTurnRuntime(
         store=store,
         index=index,
         model_handler=model,
     )
-    result = restarted.run_periodic_review(
-        now=NOW + timedelta(minutes=5),
-        policy=ReviewSchedulePolicy(interval_hours=24),
-    )
+    with pytest.raises(BackgroundModelExecutionInDoubt) as blocked:
+        restarted.run_periodic_review(
+            now=NOW + timedelta(minutes=5),
+            policy=ReviewSchedulePolicy(interval_hours=24),
+        )
 
-    assert result is not None
-    assert calls == 1
-    assert result.request.wake_ref.revision == 2
-    assert result.wake.revision == 3
-    assert result.wake.state == "completed"
+    assert calls == 0
+    assert blocked.value.attempt.work_kind == "periodic_review"
+    assert blocked.value.attempt.work_id == running.wake_ref.object_id
+    assert blocked.value.attempt.state == "in_doubt"
+    assert (
+        blocked.value.attempt.failure_kind
+        == "legacy_running_without_attempt"
+    )
 
 
 def test_operation_experience_requires_pinned_real_case_refs():
@@ -733,7 +737,9 @@ def test_periodic_review_budget_exhaustion_stays_running_and_can_resume(tmp_path
     assert second.request.wake_ref.object_id == first.wake.wake_id
     assert second.runtime.termination_reason == "responded"
     assert second.wake.state == "completed"
-    assert second.wake.revision == 3
+    # FIX-002 persists one explicit RUNNING runtime-incomplete continuation
+    # revision before the restarted worker enters the next model round.
+    assert second.wake.revision == 4
 
 
 def test_cg001_resumed_periodic_review_uses_original_start_as_read_cut(tmp_path):
