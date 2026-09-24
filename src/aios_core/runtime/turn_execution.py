@@ -182,7 +182,9 @@ class TurnExecutionStore:
             return "retry_authorized"
         if row["attempt_protocol"] != TURN_MODEL_ATTEMPT_PROTOCOL:
             return "in_doubt"
-        if attempt_states and all(state == "not_submitted" for state in attempt_states):
+        if attempt_states and all(
+            state in {"admitted", "not_submitted"} for state in attempt_states
+        ):
             return "safe_to_retry"
         return "in_doubt"
 
@@ -358,7 +360,10 @@ class TurnExecutionStore:
             if (
                 row["attempt_protocol"] != TURN_MODEL_ATTEMPT_PROTOCOL
                 or not attempt_states
-                or not all(state == "not_submitted" for state in attempt_states)
+                or not all(
+                    state in {"admitted", "not_submitted"}
+                    for state in attempt_states
+                )
             ):
                 raise TurnExecutionInDoubt(
                     state="provider_execution_not_proven_absent",
