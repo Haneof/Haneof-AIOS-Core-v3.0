@@ -5,6 +5,9 @@ on:
     paths:
       - ".github/workflows/core-rc-freeze-probe.yml"
 
+permissions:
+  contents: write
+
 jobs:
   noneditable-release-probe:
     runs-on: ubuntu-latest
@@ -221,6 +224,47 @@ jobs:
       - name: Writer restart and FIX-001/002/003 spot checks
         run: |
           pytest -q             tests/integration/test_core_headless.py             tests/integration/test_core_recovery.py             tests/integration/test_core_scale_semantics.py             tests/integration/test_core_gap_fix_002_background_attempts.py             tests/runtime/test_turn_execution_recovery.py             tests/integration/test_v3_periodic_review.py             tests/integration/test_v3_c14_cognitive_derivation_runtime.py             tests/integration/test_v3_fused_turn_runtime.py
+      - name: Materialize machine-readable RC manifests on PR branch
+        if: success()
+        shell: bash
+        env:
+          RC_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          cp rc-evidence/source-manifest.json "$RUNNER_TEMP/CORE_RC_FREEZE_001_MANIFEST.json"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          src=json.loads(Path("rc-evidence/environment.json").read_text())
+          out={
+              "schema":"CORE_RC_FREEZE_001_DEPENDENCIES.v1",
+              "frozen_software_commit":"773876f92d5f8e53422f8f5a68cc651953d93052",
+              "clean_install_probe":src,
+              "repository_constraints":{
+                  "requires_python":">=3.12",
+                  "runtime":["pydantic>=2.10,<3"],
+                  "dev":["pytest>=8,<9"],
+                  "build_backend":"setuptools.build_meta",
+                  "build_requires":["setuptools>=75","wheel"]
+              },
+              "reproduction_note":"The repository has version ranges rather than a lockfile. This manifest pins the exact successful RC clean-install environment; no new lockfile is introduced by RC-FREEZE."
+          }
+          Path("$RUNNER_TEMP/CORE_RC_FREEZE_001_DEPENDENCIES.json").write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
+          PY
+          git fetch origin "$RC_BRANCH"
+          git checkout -B "$RC_BRANCH" "origin/$RC_BRANCH"
+          mkdir -p release/rc
+          cp "$RUNNER_TEMP/CORE_RC_FREEZE_001_MANIFEST.json" release/rc/CORE_RC_FREEZE_001_MANIFEST.json
+          cp "$RUNNER_TEMP/CORE_RC_FREEZE_001_DEPENDENCIES.json" release/rc/CORE_RC_FREEZE_001_DEPENDENCIES.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add release/rc/CORE_RC_FREEZE_001_MANIFEST.json release/rc/CORE_RC_FREEZE_001_DEPENDENCIES.json
+          if git diff --cached --quiet; then
+            echo "RC manifests already materialized"
+          else
+            git commit -m "release(rc): materialize CORE-RC-FREEZE-001 manifests"
+            git push origin HEAD:"$RC_BRANCH"
+          fi
       - name: Upload RC probe evidence
         if: always()
         uses: actions/upload-artifact@v4
