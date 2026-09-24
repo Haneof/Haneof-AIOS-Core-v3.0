@@ -190,7 +190,9 @@ jobs:
           from pathlib import Path
           a=json.loads(Path("rc-evidence/source-before.json").read_text())
           b=json.loads(Path("rc-evidence/source-after.json").read_text())
-          assert a == b, (a,b)
+          logical = lambda x: {k:v for k,v in x.items() if k != "sha256"}
+          assert logical(a) == logical(b), (a,b)
+          print("source logical state unchanged; physical SQLite bytes may change due to WAL/checkpoint", a["sha256"], b["sha256"])
           PY
           aios-core-headless --world "$RESTORED" restore --from-backup "$BACKUP"
           aios-core-headless --world "$RESTORED" rebuild-index
