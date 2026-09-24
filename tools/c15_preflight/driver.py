@@ -156,7 +156,15 @@ class Driver:
                 except (OSError, ValueError, TypeError, KeyError) as exc:
                     raise DriverBlocked("checkpoint unreadable/corrupt; no ACK inference or replay") from exc
                 if self.state["stage"] != "READY":
-                    raise DriverBlocked("interrupted/failed/frozen phase cannot automatically resume")
+                    stage = self.state["stage"]
+                    if stage == "PROCESSING":
+                        raise DriverBlocked(
+                            "REVIEW REQUIRED: persisted PROCESSING stage is IN_DOUBT; "
+                            "model execution outcome UNKNOWN; automatic replay forbidden"
+                        )
+                    raise DriverBlocked(
+                        f"REVIEW REQUIRED: persisted stage {stage} cannot automatically resume"
+                    )
                 if self.state["session"] != session or self.state["stop_sequence"] != stop_sequence:
                     raise DriverBlocked("restart routing changed")
                 if self.state["clock"] != clock.isoformat():
