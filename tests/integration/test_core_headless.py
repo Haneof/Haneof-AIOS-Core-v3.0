@@ -6,7 +6,12 @@ import pytest
 
 from aios_core.contracts.enums import SourceClass, WakeSource
 from aios_core.contracts.refs import ObjectRef
-from aios_core.headless import HeadlessConfig, HeadlessCore, HeadlessWriterBusy
+from aios_core.headless import (
+    HeadlessConfig,
+    HeadlessConfigurationError,
+    HeadlessCore,
+    HeadlessWriterBusy,
+)
 from aios_core.headless.testing import deterministic_model_handler
 from aios_core.ingest.reality import RealityRecord, SourceAdapterSpec
 from aios_core.runtime.background_attempt import BackgroundModelExecutionInDoubt
@@ -98,16 +103,116 @@ def test_headless_single_writer_fails_closed_and_releases_on_stop(tmp_path):
     second = HeadlessCore(config=cfg, model_handler=CountingHandler())
     first.start()
     try:
+        before = first.status()["world_revision"]
         with pytest.raises(HeadlessWriterBusy):
             second.start()
+        assert first.status()["world_revision"] == before
     finally:
         first.stop()
 
     try:
         second.start()
         assert second.status()["writer_lease_held"] is True
+        assert second.status()["world_revision"] == before
     finally:
         second.stop()
+
+
+def test_headless_writer_identity_is_canonical_and_non_overridable(tmp_path):
+    world = tmp_path / "world.sqlite"
+    canonical = HeadlessConfig(world_path=world)
+    assert str(canonical.lock_path) == str(world.resolve()) + ".writer.lock"
+
+    with pytest.raises(
+        HeadlessConfigurationError,
+        match="must equal the canonical World writer lease path",
+    ):
+        HeadlessConfig(
+            world_path=world,
+            lock_path=tmp_path / "writer-b.lock",
+        )
+
+    explicit_canonical = HeadlessConfig(
+        world_path=world,
+        lock_path=canonical.lock_path,
+    )
+    assert explicit_canonical.lock_path == canonical.lock_path
+
+
+def test_headless_alternate_lock_path_cannot_bypass_live_world_writer(tmp_path):
+    world = tmp_path / "world.sqlite"
+    cfg_a = HeadlessConfig(world_path=world)
+    writer_a = HeadlessCore(config=cfg_a, model_handler=CountingHandler()).start()
+    try:
+        before = writer_a.status()["world_revision"]
+        with pytest.raises(
+            HeadlessConfigurationError,
+            match="must equal the canonical World writer lease path",
+        ):
+            HeadlessConfig(
+                world_path=world,
+                lock_path=tmp_path / "alternate-writer.lock",
+            )
+        assert writer_a.status()["world_revision"] == before
+    finally:
+        writer_a.stop()
+
+    writer_b = HeadlessCore(
+        config=HeadlessConfig(world_path=world, lock_path=cfg_a.lock_path),
+        model_handler=CountingHandler(),
+    ).start()
+    try:
+        assert writer_b.status()["writer_lease_held"] is True
+        assert writer_b.status()["world_revision"] == before
+    finally:
+        writer_b.stop()
+
+
+def test_headless_stale_canonical_lock_file_without_os_lease_reopens(tmp_path):
+    cfg = config(tmp_path)
+    first = HeadlessCore(config=cfg, model_handler=CountingHandler()).start()
+    before = first.status()["world_revision"]
+    first.stop()
+
+    assert cfg.lock_path is not None
+    cfg.lock_path.write_text(
+        '{"kind":"stale-corrective-probe","pid":999999,"host":"stale"}\\n',
+        encoding="utf-8",
+    )
+
+    second = HeadlessCore(config=cfg, model_handler=CountingHandler()).start()
+    try:
+        assert second.status()["writer_lease_held"] is True
+        assert second.status()["world_revision"] == before
+    finally:
+        second.stop()
+
+
+def test_headless_relative_and_absolute_world_share_writer_identity(
+    tmp_path, monkeypatch
+):
+    monkeypatch.chdir(tmp_path)
+    relative = HeadlessConfig(world_path="world.sqlite")
+    absolute = HeadlessConfig(world_path=(tmp_path / "world.sqlite").resolve())
+    assert relative.world_path == absolute.world_path
+    assert relative.lock_path == absolute.lock_path
+
+
+def test_headless_symlinked_existing_world_shares_writer_identity(tmp_path):
+    target = tmp_path / "world.sqlite"
+    cfg = HeadlessConfig(world_path=target)
+    first = HeadlessCore(config=cfg, model_handler=CountingHandler()).start()
+    first.stop()
+
+    link = tmp_path / "world-link.sqlite"
+    try:
+        link.symlink_to(target)
+    except OSError as exc:
+        pytest.skip(f"symlink unavailable: {exc}")
+
+    via_link = HeadlessConfig(world_path=link)
+    assert via_link.world_path == cfg.world_path
+    assert via_link.lock_path == cfg.lock_path
 
 
 def test_headless_restart_preserves_fix003_pre_admission_and_requires_authorization(
