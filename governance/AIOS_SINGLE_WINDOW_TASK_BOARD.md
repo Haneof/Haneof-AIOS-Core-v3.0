@@ -1,33 +1,36 @@
 # AIOS v3.0 单窗口任务执行总表
 
-## 当前控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / S1-S2 ACTIVE
+## 当前控制入口 — 2026-09-24 CORE-OPERATOR-001 ACCEPTED & INTEGRATED / S2 GAP FIXES ARE THE ONLY READY WORK
 
-- 独立 Core gap audit PR #132 已由 PM 接受并正常合入；merge = `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`，审计 Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
-- 审计正式确认 3 个 RC blocker：`CG-001 RUNTIME_TEMPORAL_READ_CUT`、`CG-002 BACKGROUND_MODEL_EXECUTION_IN_DOUBT`、`CG-003 USER_TURN_IN_DOUBT_RECOVERY`。其余裁决：14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE，不得无依据重开。
-- `CORE-GAP-FIX-001` 与 `CORE-GAP-FIX-002` 可由两个独立工程窗口并行施工；`CORE-GAP-FIX-003` 先 BLOCKED，待 FIX-002 独立验收并集成后从当时 live main 开始。
-- `CORE-OPERATOR-001` 工程候选已在 PR #131 @ `0e1d69eebc801278f93ccc1941b8f066a4ea09ef` 进入 **GATE / REVIEW_READY**；仍必须由不同 Independent Reviewer 验收后才能 PM merge。
-- historical #117 A 仍仅是 frozen-Core accepted evidence；新 RC 的 fresh A/B/C 只能在所有 S2 工程独立验收并 `CORE-RC-FREEZE-001` 后开始。当前禁止 Resident。
+- **live main = `e72a63874ed2c28798b00cec51f191caf1594a00`**；Core tree 仍为 `src/aios_core = 7db4f72e7b3c29c74082f9984141159f8f1d6071`（与审计/基线登记一致，本次集成 Core ZERO DIFF）。
+- `CORE-OPERATOR-001 = DONE`。独立验收 PR #135 @ `50133c2a3348095abf520b4a645ad5a73ca18951` 判定 **ACCEPTANCE_PASS**（0 blocker），PM 复核后集成：候选 PR #131 exact head `0e1d69eebc801278f93ccc1941b8f066a4ea09ef` → merge `e72a63874ed2c28798b00cec51f191caf1594a00`；验收报告 merge `fe6f1740eb4e6ab4d1c562373ef5d3554bb2dc54`。
+- PM 集成前复核（不只读报告）：exact head 未变；CI `35955458275`/`35955458266` 复现 FAILURE、`35955695487`/`35955695492` exact-head SUCCESS 均经 API 复核；候选 26 文件、`src/` 0 文件；本地在 repro commit `3865da88...` 复现三项真实失败、在 accepted head 与 merge 结果各 `632 passed`。收据：`governance/AIOS_CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`。
+- 诚实限制：本地复算用 CPython 3.11.2（低于 >=3.12 gate），仅为佐证，权威 gate 证据仍是 3.12.14 的 CI；`gh run rerun` 与 main 上 `workflow_dispatch` 均被平台 403 拒绝，未绕过任何权限；作者窗口与验收窗口是不同上下文但同一 GitHub 账号身份，无跨账号 APPROVE 事件，不声称账号级独立。
+- PR #130 登记 **SUPERSEDED BY #131**，保留 OPEN 不关闭不删除，不得合入当前 operator 面。
+- 审计确认的 3 个 RC blocker 未被本次集成触碰：`CG-001 RUNTIME_TEMPORAL_READ_CUT`、`CG-002 BACKGROUND_MODEL_EXECUTION_IN_DOUBT`、`CG-003 USER_TURN_IN_DOUBT_RECOVERY`。其余 14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE 不得无依据重开。
+- **当前唯一可施工工作 = `CORE-GAP-FIX-001` 与 `CORE-GAP-FIX-002`**，两个独立工程窗口并行，写入路径不得冲突；`CORE-GAP-FIX-003` 仍 BLOCKED。
+- 本次集成不等于 SOFTWARE_RC，更不等于 CORE_COMPLETE。historical #117 A 仍仅是 frozen-Core accepted evidence；新 RC 的 fresh A/B/C 只能在所有 S2 工程独立验收并 `CORE-RC-FREEZE-001` 后开始。**当前禁止 Resident。**
 - PM dispatch：`governance/AIOS_CORE_GAP_DISPATCH_2026-09-24.md`。
-- UI / Launcher / 数字人 / 动画 / 硬件 / Android ROM 继续排除。
+- UI / Launcher / 数字人 / 动画 / 硬件 / Android ROM 继续排除（PR #136 鹈鹕动画属排除范围，不进入 Core 路线）。
 
 ### 当前优先队列（唯一正式派工表）
 
 | Task ID | 状态 | Owner / 放行出口 |
 |---|---|---|
-| CORE-BASELINE-001 | **DONE** | S0 baseline / experiment impact ruling 已落 main |
-| CORE-OPERATOR-001 | **GATE / REVIEW_READY** | Candidate PR #131；等待不同 Independent Test Infrastructure Reviewer；未验收前禁止 merge |
+| CORE-BASELINE-001 | **DONE** | S0 baseline / experiment impact ruling 已落 main；#117/#121/#125/#126 四个 pin 于 2026-09-24 集成时复核仍成立 |
 | CORE-GAP-AUDIT-001 | **DONE** | PR #132 已接受并合入；报告 `reviews/CORE_GAP_AUDIT_001_2026-09-24.md` |
-| CORE-GAP-FIX-001 | **READY / NOT_STARTED** | Runtime Temporal Read Cut；提示词 `governance/prompts/CORE_GAP_FIX_001_2026-09-24.md`；另开独立验收 |
-| CORE-GAP-FIX-002 | **READY / NOT_STARTED** | Background Model Execution IN_DOUBT；提示词 `governance/prompts/CORE_GAP_FIX_002_2026-09-24.md`；另开独立验收 |
+| CORE-OPERATOR-001 | **DONE** | 独立验收 #135 ACCEPTANCE_PASS → PM 集成 merge `e72a638...`；收据 `governance/AIOS_CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md` |
+| CORE-GAP-FIX-001 | **READY / NOT_STARTED** | Core Runtime Engineer 单窗口；Runtime Temporal Read Cut；提示词 `governance/prompts/CORE_GAP_FIX_001_2026-09-24.md`；作者只能报 REVIEW_READY，另开独立验收窗口 |
+| CORE-GAP-FIX-002 | **READY / NOT_STARTED** | Core Runtime Engineer 单窗口；Background Model Execution IN_DOUBT；提示词 `governance/prompts/CORE_GAP_FIX_002_2026-09-24.md`；作者只能报 REVIEW_READY，另开独立验收窗口 |
 | CORE-GAP-FIX-003 | **BLOCKED** | 依赖 FIX-002 独立验收 + PM integration；提示词 `governance/prompts/CORE_GAP_FIX_003_2026-09-24.md`，当前不得施工 |
-| CORE-HEADLESS-001 | **BLOCKED** | OPERATOR accepted + FIX-001/002/003 accepted/integrated |
+| CORE-HEADLESS-001 | **BLOCKED** | OPERATOR 已 accepted；仍需 FIX-001/002/003 全部 accepted/integrated |
 | CORE-RECOVERY-001 | **BLOCKED** | HEADLESS + 三项 gap 修复进入 S2 candidate |
 | CORE-SCALE-001 | **BLOCKED** | S2 功能候选 |
-| CORE-RC-FREEZE-001 | **BLOCKED** | OPERATOR + GAP fixes + HEADLESS + RECOVERY + SCALE 全部独立接受 |
+| CORE-RC-FREEZE-001 | **BLOCKED** | OPERATOR(已满足) + GAP fixes + HEADLESS + RECOVERY + SCALE 全部独立接受 |
 | 新 C15 fresh A → B → C / EVAL / CLOSE | **BLOCKED** | RC-FREEZE；旧 #117 A 不能 hash-swap 为新 RC A |
 | C16 → P16 → P17 | **BLOCKED** | 保留原逐项 Gate；只有 P17 PASS 才可称 Core complete |
 
-`CORE-GAP-FIX-001` 与 `CORE-GAP-FIX-002` 当前允许并行；`CORE-OPERATOR-001` 的独立验收也可并行。一个工程窗口只负责一个 Task ID；作者不得自验收。
+`CORE-GAP-FIX-001` 与 `CORE-GAP-FIX-002` 当前允许并行。一个工程窗口只负责一个 Task ID；作者不得自验收；每个候选必须由不同的独立验收窗口出具报告后才能由 PM 集成。
 
 > Status: ACTIVE  
 > Effective: 2026-09-21  

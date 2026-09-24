@@ -1,16 +1,20 @@
 # AIOS v3.0 当前工程断点
 
-## 当前控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / FIX-001+002 READY
+## 当前控制入口 — 2026-09-24 CORE-OPERATOR-001 已独立验收并集成 / 唯一可施工 = FIX-001 + FIX-002
 
-- 独立审计 PR #132 已合入；PM acceptance main = `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`，Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
-- 审计报告：`reviews/CORE_GAP_AUDIT_001_2026-09-24.md`。正式 RC blockers：CG-001 temporal read cut、CG-002 background model execution IN_DOUBT、CG-003 user-turn IN_DOUBT recovery。
-- `CORE-GAP-FIX-001 = READY / NOT_STARTED`；提示词 `governance/prompts/CORE_GAP_FIX_001_2026-09-24.md`。
-- `CORE-GAP-FIX-002 = READY / NOT_STARTED`；提示词 `governance/prompts/CORE_GAP_FIX_002_2026-09-24.md`。
-- `CORE-GAP-FIX-003 = BLOCKED`，等待 FIX-002 独立验收并 PM 集成后再从 live main 开始。
-- `CORE-OPERATOR-001` candidate PR #131 @ `0e1d69eebc801278f93ccc1941b8f066a4ea09ef` = GATE / REVIEW_READY；当前必须由不同 independent reviewer 验收，尚未 DONE、尚未 merge。
+- **live main = `e72a63874ed2c28798b00cec51f191caf1594a00`**；Core tree = `src/aios_core = 7db4f72e7b3c29c74082f9984141159f8f1d6071`，本次集成对 `src/` ZERO DIFF，语义 freeze 不受影响。
+- `CORE-OPERATOR-001 = DONE`：独立验收 PR #135 @ `50133c2a...` = **ACCEPTANCE_PASS / 0 blocker**（报告 `reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md`，merge `fe6f1740eb4e6ab4d1c562373ef5d3554bb2dc54`）；候选 PR #131 exact head `0e1d69eebc801278f93ccc1941b8f066a4ea09ef` 由 PM 复核后集成，merge `e72a63874ed2c28798b00cec51f191caf1594a00`。
+- PM 集成收据（含全部证据与限制）：`governance/AIOS_CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`。
+- 集成前 PM 复核要点：exact head 未漂移；4 条 CI（`35955458275`/`35955458266` 复现 FAILURE、`35955695487`/`35955695492` exact-head SUCCESS）经 API 复核；候选 26 文件 / `src/` 0 文件；本地在 repro `3865da88...` 实际复现三项失败，在 accepted head 与 merge 结果分别 `632 passed`，与 CI 计数一致。
+- 限制如实记录：本地复算用 CPython 3.11.2（低于 >=3.12 gate），只作佐证；`gh run rerun` 与 main `workflow_dispatch` 被平台 403 拒绝，未绕权限；作者与验收为不同窗口但同一 GitHub 账号，无跨账号 APPROVE，不宣称账号级独立。
+- 三个 RC blocker 未被触碰，仍是唯一 S2 工程缺口：CG-001 temporal read cut、CG-002 background model execution IN_DOUBT、CG-003 user-turn IN_DOUBT recovery。审计报告：`reviews/CORE_GAP_AUDIT_001_2026-09-24.md`。
+- `CORE-GAP-FIX-001 = READY / NOT_STARTED`；提示词 `governance/prompts/CORE_GAP_FIX_001_2026-09-24.md`；分支 `core-gap-fix-001-temporal-read-cut-20260924` 目前 0 commits。
+- `CORE-GAP-FIX-002 = READY / NOT_STARTED`；提示词 `governance/prompts/CORE_GAP_FIX_002_2026-09-24.md`；分支 `core-gap-fix-002-20260924` 目前 0 commits。
+- `CORE-GAP-FIX-003 = BLOCKED`，等待 FIX-002 独立验收并 PM 集成后再从当时 live main 开始。
+- PR #130 = **SUPERSEDED BY #131**，保留 OPEN、不关闭、不删除、不得合入。
 - PM dispatch / sequencing：`governance/AIOS_CORE_GAP_DISPATCH_2026-09-24.md`。
-- HEADLESS / RECOVERY / SCALE / RC-FREEZE 继续 BLOCKED；fresh Resident A/B/C 继续禁止，历史 #117/#121 不改。
-- UI/P18/P19 不进入本轮 Core completion。
+- 本次集成 **不是** SOFTWARE_RC，**不是** CORE_COMPLETE。HEADLESS / RECOVERY / SCALE / RC-FREEZE 继续 BLOCKED；fresh Resident A/B/C 继续禁止；历史 #117/#121/#125/#126 保持 OPEN 不改（四个 pin 已于本次集成复核仍成立）。
+- UI/P18/P19 不进入本轮 Core completion（PR #136 鹈鹕动画属排除范围）。
 
 > 用途：新会话 / 新模型 / 新工程师进入仓库后的第一现场状态文件  
 > 更新规则：每完成一个可验证节点立即更新；不得靠聊天记忆代替本文件  
