@@ -71,7 +71,10 @@ def _global_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--lock",
         default=os.getenv("AIOS_LOCK_PATH"),
-        help="Writer lease file; defaults beside World.",
+        help=(
+            "Validation-only writer lease path; if supplied it must equal "
+            "<canonical-world>.writer.lock (or AIOS_LOCK_PATH)."
+        ),
     )
     parser.add_argument(
         "--subject",
