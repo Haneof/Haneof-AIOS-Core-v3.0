@@ -43,7 +43,7 @@
 | CORE-HEADLESS-001 | **BLOCKED** | OPERATOR accepted + FIX-001/002/003 accepted/integrated |
 | CORE-RECOVERY-001 | **BLOCKED** | HEADLESS + 三项 gap 修复进入 S2 candidate |
 | CORE-SCALE-001 | **BLOCKED** | S2 功能候选 |
-| CORE-RC-FREEZE-001 | **BLOCKED** | OPERATOR + GAP fixes + HEADLESS + RECOVERY + SCALE 全部独立接受 |
+| CORE-RC-FREEZE-001 | **BLOCKED** | OPERATOR（已满足）+ GAP fixes + HEADLESS + RECOVERY + SCALE 全部独立接受，且 `CORE-CI-FIX-001` 已关闭（否则全 Gate 结论不可信） |
 | 新 C15 fresh A → B → C / EVAL / CLOSE | **BLOCKED** | RC-FREEZE；旧 #117 A 不能 hash-swap 为新 RC A |
 | C16 → P16 → P17 | **BLOCKED** | 保留原逐项 Gate；只有 P17 PASS 才可称 Core complete |
 
