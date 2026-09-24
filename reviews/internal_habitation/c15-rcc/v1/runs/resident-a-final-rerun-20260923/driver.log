@@ -1,0 +1,142 @@
+[2026-09-23T05:38:44.020400Z] driver start (canonical Phase A rerun on final anchor)
+[2026-09-23T05:38:44.020553Z] starting at cursor 1
+[2026-09-23T05:38:44.253936Z] cursor 1 ingested -> obs_conv_user_5a96a6b7f95ebb907cc8f292@1
+[2026-09-23T05:38:44.480499Z] cursor 1 acked
+[2026-09-23T05:38:44.484930Z] advance(init) -> 2026-11-02T17:05:00+00:00
+[2026-09-23T05:38:44.502986Z] AWAITING-DECISION kind=model_directive tag=dec-0001 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0001.json
+[2026-09-23T05:40:44.154795Z] DECISION-RECEIVED tag=dec-0001
+[2026-09-23T05:40:44.190569Z] AWAITING-DECISION kind=model_directive tag=dec-0002 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0002.json
+[2026-09-23T05:41:27.410652Z] DECISION-RECEIVED tag=dec-0002
+[2026-09-23T05:41:27.423413Z] cursor 1 turn done: term=responded caps=['commit_ai_world_claim', 'commit_ai_world_claim']
+[2026-09-23T05:41:27.438985Z] advance -> 2026-11-02T17:05:00+00:00 wr=4 cycles=0 reviews=0 summary_commits=0
+[2026-09-23T05:41:27.834400Z] cursor 2 ingested -> obs_c14_fixture_5248cdfd5a23b6ea88ce0a96@1
+[2026-09-23T05:41:28.019616Z] cursor 2 acked
+[2026-09-23T05:41:28.047514Z] advance -> 2026-11-02T17:14:00+00:00 wr=5 cycles=0 reviews=0 summary_commits=0
+[2026-09-23T05:41:28.446745Z] cursor 3 ingested -> obs_conv_user_00157f98462d7a1d7ff1a34a@1
+[2026-09-23T05:41:28.638268Z] cursor 3 acked
+[2026-09-23T05:41:28.668510Z] advance -> 2026-11-02T17:20:00+00:00 wr=6 cycles=0 reviews=0 summary_commits=0
+[2026-09-23T05:41:28.699010Z] AWAITING-DECISION kind=model_directive tag=dec-0003 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0003.json
+[2026-09-23T05:42:51.292662Z] DECISION-RECEIVED tag=dec-0003
+[2026-09-23T05:42:51.331621Z] AWAITING-DECISION kind=model_directive tag=dec-0004 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0004.json
+[2026-09-23T05:43:39.355772Z] DECISION-RECEIVED tag=dec-0004
+[2026-09-23T05:43:39.370200Z] cursor 3 turn done: term=responded caps=['revise_claim', 'revise_claim']
+[2026-09-23T05:43:39.399472Z] advance -> 2026-11-02T17:20:00+00:00 wr=9 cycles=0 reviews=0 summary_commits=0
+[2026-09-23T05:43:39.852710Z] cursor 4 ingested -> obs_c14_fixture_5d4dfcf42055c00135a78a54@1
+[2026-09-23T05:43:40.060413Z] cursor 4 acked
+[2026-09-23T05:43:40.104107Z] advance -> 2026-11-02T20:40:00+00:00 wr=10 cycles=0 reviews=0 summary_commits=0
+[2026-09-23T05:43:40.551997Z] cursor 5 ingested -> obs_conv_user_83b5da89c5b5751f2503919f@1
+[2026-09-23T05:43:40.811384Z] cursor 5 acked
+[2026-09-23T05:43:40.854942Z] advance -> 2026-11-02T20:52:00+00:00 wr=11 cycles=0 reviews=0 summary_commits=0
+[2026-09-23T05:43:40.895903Z] AWAITING-DECISION kind=model_directive tag=dec-0005 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0005.json
+[2026-09-23T05:45:23.451875Z] DECISION-RECEIVED tag=dec-0005
+[2026-09-23T05:45:23.544187Z] AWAITING-DECISION kind=model_directive tag=dec-0006 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0006.json
+[2026-09-23T05:46:02.564965Z] DECISION-RECEIVED tag=dec-0006
+[2026-09-23T05:46:02.577213Z] cursor 5 turn done: term=responded caps=['revise_claim', 'revise_claim', 'commit_ai_world_claim', 'record_communication_experience']
+[2026-09-23T05:46:02.639130Z] advance -> 2026-11-02T20:52:00+00:00 wr=16 cycles=0 reviews=0 summary_commits=0
+[2026-09-23T05:46:03.161618Z] cursor 6 ingested -> obs_conv_user_2c65e6bb5864bd57d4f0432f@1
+[2026-09-23T05:46:03.402527Z] cursor 6 acked
+[2026-09-23T05:46:03.453927Z] AWAITING-DECISION kind=model_directive tag=dec-0007 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0007.json
+[2026-09-23T05:49:58.659129Z] DECISION-RECEIVED tag=dec-0007
+[2026-09-23T05:49:58.665994Z] AWAITING-DECISION kind=model_directive tag=dec-0008 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0008.json
+[2026-09-23T05:50:46.690799Z] DECISION-RECEIVED tag=dec-0008
+[2026-09-23T05:50:46.712073Z] AWAITING-DECISION kind=dimension_summary tag=sum-0009 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/sum-0009.json
+[2026-09-23T05:51:20.729557Z] DECISION-RECEIVED tag=sum-0009
+[2026-09-23T05:51:20.759326Z] AWAITING-DECISION kind=dimension_summary tag=sum-0010 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/sum-0010.json
+[2026-09-23T05:52:05.782122Z] DECISION-RECEIVED tag=sum-0010
+[2026-09-23T05:52:05.821803Z] AWAITING-DECISION kind=dimension_summary tag=sum-0011 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/sum-0011.json
+[2026-09-23T05:52:46.344763Z] DECISION-RECEIVED tag=sum-0011
+[2026-09-23T05:52:46.379966Z] AWAITING-DECISION kind=dimension_summary tag=sum-0012 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/sum-0012.json
+[2026-09-23T05:53:22.897954Z] DECISION-RECEIVED tag=sum-0012
+[2026-09-23T05:53:22.942658Z] AWAITING-DECISION kind=dimension_summary tag=sum-0013 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/sum-0013.json
+[2026-09-23T05:53:57.459633Z] DECISION-RECEIVED tag=sum-0013
+[2026-09-23T05:53:57.490973Z] AWAITING-DECISION kind=dimension_summary tag=sum-0014 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/sum-0014.json
+[2026-09-23T05:54:30.007971Z] DECISION-RECEIVED tag=sum-0014
+[2026-09-23T05:54:30.034752Z] AWAITING-DECISION kind=dimension_summary tag=sum-0015 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/sum-0015.json
+[2026-09-23T05:54:57.049587Z] DECISION-RECEIVED tag=sum-0015
+[2026-09-23T05:54:57.177094Z] advance -> 2026-11-03T18:15:00+00:00 wr=34 cycles=1 reviews=1 summary_commits=7
+[2026-09-23T05:54:57.261147Z] AWAITING-DECISION kind=model_directive tag=dec-0016 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0016.json
+[2026-09-23T05:56:17.904070Z] DECISION-RECEIVED tag=dec-0016
+[2026-09-23T05:56:17.960619Z] AWAITING-DECISION kind=model_directive tag=dec-0017 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0017.json
+[2026-09-23T05:56:35.995867Z] DECISION-RECEIVED tag=dec-0017
+[2026-09-23T05:56:36.042049Z] cursor 6 turn done: term=responded caps=['revise_claim', 'revise_claim']
+[2026-09-23T05:56:36.111238Z] AWAITING-DECISION kind=dimension_summary tag=sum-0018 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/sum-0018.json
+[2026-09-23T05:57:14.633230Z] DECISION-RECEIVED tag=sum-0018
+[2026-09-23T05:57:14.685729Z] AWAITING-DECISION kind=dimension_summary tag=sum-0019 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/sum-0019.json
+[2026-09-23T05:57:53.744634Z] DECISION-RECEIVED tag=sum-0019
+[2026-09-23T05:57:53.913846Z] advance -> 2026-11-03T18:15:00+00:00 wr=41 cycles=0 reviews=0 summary_commits=2
+[2026-09-23T05:57:54.346085Z] cursor 7 ingested -> obs_c14_fixture_87474a7fb5036c38638a6c37@1
+[2026-09-23T05:57:54.600947Z] cursor 7 acked
+[2026-09-23T05:57:54.671556Z] AWAITING-DECISION kind=model_directive tag=dec-0020 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0020.json
+[2026-09-23T05:58:44.242188Z] DECISION-RECEIVED tag=dec-0020
+[2026-09-23T05:58:44.251182Z] AWAITING-DECISION kind=model_directive tag=dec-0021 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0021.json
+[2026-09-23T05:59:17.336646Z] DECISION-RECEIVED tag=dec-0021
+[2026-09-23T05:59:17.487277Z] AWAITING-DECISION kind=model_directive tag=dec-0022 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0022.json
+[2026-09-23T06:00:52.535590Z] DECISION-RECEIVED tag=dec-0022
+[2026-09-23T06:00:52.545995Z] AWAITING-DECISION kind=model_directive tag=dec-0023 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0023.json
+[2026-09-23T06:01:43.082339Z] DECISION-RECEIVED tag=dec-0023
+[2026-09-23T06:01:43.178945Z] AWAITING-DECISION kind=dimension_summary tag=sum-0024 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/sum-0024.json
+[2026-09-23T06:02:21.003900Z] DECISION-RECEIVED tag=sum-0024
+[2026-09-23T06:02:21.048021Z] AWAITING-DECISION kind=dimension_summary tag=sum-0025 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/sum-0025.json
+[2026-09-23T06:03:01.568828Z] DECISION-RECEIVED tag=sum-0025
+[2026-09-23T06:03:01.616593Z] AWAITING-DECISION kind=dimension_summary tag=sum-0026 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/sum-0026.json
+[2026-09-23T06:03:40.648562Z] DECISION-RECEIVED tag=sum-0026
+[2026-09-23T06:03:40.831692Z] advance -> 2026-11-04T21:30:00+00:00 wr=54 cycles=1 reviews=1 summary_commits=3
+[2026-09-23T06:03:41.343095Z] cursor 8 ingested -> obs_conv_user_0f2eaf76461c9c8293fb30a0@1
+[2026-09-23T06:03:41.576389Z] cursor 8 acked
+[2026-09-23T06:03:41.847967Z] advance -> 2026-11-04T21:42:00+00:00 wr=55 cycles=0 reviews=0 summary_commits=0
+[2026-09-23T06:03:41.919692Z] AWAITING-DECISION kind=model_directive tag=dec-0027 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0027.json
+[2026-09-23T06:04:26.443245Z] DECISION-RECEIVED tag=dec-0027
+[2026-09-23T06:04:26.453032Z] AWAITING-DECISION kind=model_directive tag=dec-0028 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0028.json
+[2026-09-23T06:05:00.051271Z] DECISION-RECEIVED tag=dec-0028
+[2026-09-23T06:05:00.070272Z] cursor 8 turn done: term=responded caps=['search_world']
+[2026-09-23T06:05:00.337860Z] advance -> 2026-11-04T21:42:00+00:00 wr=56 cycles=0 reviews=0 summary_commits=0
+[2026-09-23T06:05:00.773653Z] cursor 9 ingested -> obs_c14_fixture_b798e2dbd5b0fabdec6680a2@1
+[2026-09-23T06:05:00.997471Z] cursor 9 acked
+[2026-09-23T06:05:01.242652Z] advance -> 2026-11-04T22:17:00+00:00 wr=57 cycles=0 reviews=0 summary_commits=0
+[2026-09-23T06:05:01.671853Z] cursor 10 ingested -> obs_conv_user_88047ce5294340f597841c38@1
+[2026-09-23T06:05:01.893020Z] cursor 10 acked
+[2026-09-23T06:05:02.178915Z] advance -> 2026-11-04T22:24:00+00:00 wr=58 cycles=0 reviews=0 summary_commits=0
+[2026-09-23T06:05:02.297456Z] AWAITING-DECISION kind=model_directive tag=dec-0029 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0029.json
+[2026-09-23T06:06:14.464524Z] DECISION-RECEIVED tag=dec-0029
+[2026-09-23T06:06:14.524954Z] AWAITING-DECISION kind=model_directive tag=dec-0030 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0030.json
+[2026-09-23T06:06:36.595133Z] DECISION-RECEIVED tag=dec-0030
+[2026-09-23T06:06:36.610092Z] cursor 10 turn done: term=responded caps=['revise_claim', 'revise_claim']
+[2026-09-23T06:06:36.714543Z] AWAITING-DECISION kind=dimension_summary tag=sum-0031 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/sum-0031.json
+[2026-09-23T06:07:14.886705Z] DECISION-RECEIVED tag=sum-0031
+[2026-09-23T06:07:14.928830Z] AWAITING-DECISION kind=dimension_summary tag=sum-0032 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/sum-0032.json
+[2026-09-23T06:07:54.466780Z] DECISION-RECEIVED tag=sum-0032
+[2026-09-23T06:07:54.668877Z] advance -> 2026-11-04T22:24:00+00:00 wr=65 cycles=0 reviews=0 summary_commits=2
+[2026-09-23T06:07:55.077070Z] cursor 11 ingested -> obs_c14_fixture_291beec37165eb34a35f8f85@1
+[2026-09-23T06:07:55.309486Z] cursor 11 acked
+[2026-09-23T06:07:55.605437Z] advance -> 2026-11-04T23:02:00+00:00 wr=66 cycles=0 reviews=0 summary_commits=0
+[2026-09-23T06:07:55.987005Z] cursor 12 ingested -> obs_conv_user_1b8b15a865579a5b93d58460@1
+[2026-09-23T06:07:56.217911Z] cursor 12 acked
+[2026-09-23T06:07:56.503028Z] advance -> 2026-11-04T23:07:00+00:00 wr=67 cycles=0 reviews=0 summary_commits=0
+[2026-09-23T06:07:56.567455Z] AWAITING-DECISION kind=model_directive tag=dec-0033 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0033.json
+[2026-09-23T06:08:46.592657Z] DECISION-RECEIVED tag=dec-0033
+[2026-09-23T06:08:46.604853Z] cursor 12 turn done: term=responded caps=[]
+[2026-09-23T06:08:46.853588Z] advance -> 2026-11-04T23:07:00+00:00 wr=68 cycles=0 reviews=0 summary_commits=0
+[2026-09-23T06:08:47.226418Z] cursor 13 ingested -> obs_c14_fixture_e2c76be3450b6e9dc8316b9d@1
+[2026-09-23T06:08:47.427829Z] cursor 13 acked
+[2026-09-23T06:08:47.504210Z] AWAITING-DECISION kind=model_directive tag=dec-0034 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0034.json
+[2026-09-23T06:09:28.528294Z] DECISION-RECEIVED tag=dec-0034
+[2026-09-23T06:09:28.535451Z] AWAITING-DECISION kind=model_directive tag=dec-0035 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0035.json
+[2026-09-23T06:10:27.064287Z] DECISION-RECEIVED tag=dec-0035
+[2026-09-23T06:10:27.072802Z] AWAITING-DECISION kind=model_directive tag=dec-0036 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0036.json
+[2026-09-23T06:11:20.135310Z] DECISION-RECEIVED tag=dec-0036
+[2026-09-23T06:11:20.154091Z] AWAITING-DECISION kind=model_directive tag=dec-0037 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0037.json
+[2026-09-23T06:11:52.208407Z] DECISION-RECEIVED tag=dec-0037
+[2026-09-23T06:11:52.312763Z] AWAITING-DECISION kind=model_directive tag=dec-0038 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0038.json
+[2026-09-23T06:12:58.541503Z] DECISION-RECEIVED tag=dec-0038
+[2026-09-23T06:12:58.657236Z] AWAITING-DECISION kind=model_directive tag=dec-0039 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/dec-0039.json
+[2026-09-23T06:13:44.682420Z] DECISION-RECEIVED tag=dec-0039
+[2026-09-23T06:13:44.849402Z] AWAITING-DECISION kind=dimension_summary tag=sum-0040 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/sum-0040.json
+[2026-09-23T06:14:25.465725Z] DECISION-RECEIVED tag=sum-0040
+[2026-09-23T06:14:25.527539Z] AWAITING-DECISION kind=dimension_summary tag=sum-0041 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/sum-0041.json
+[2026-09-23T06:15:05.086852Z] DECISION-RECEIVED tag=sum-0041
+[2026-09-23T06:15:05.123894Z] AWAITING-DECISION kind=dimension_summary tag=sum-0042 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/sum-0042.json
+[2026-09-23T06:15:41.334442Z] DECISION-RECEIVED tag=sum-0042
+[2026-09-23T06:15:41.384014Z] AWAITING-DECISION kind=dimension_summary tag=sum-0043 ckpt=/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/runs/resident-a-final-rerun-20260923/checkpoints/sum-0043.json
+[2026-09-23T06:16:21.403617Z] DECISION-RECEIVED tag=sum-0043
+[2026-09-23T06:16:21.620354Z] advance -> 2026-11-06T19:10:00+00:00 wr=88 cycles=2 reviews=2 summary_commits=4
+[2026-09-23T06:16:21.622177Z] PHASE A COMPLETE: {'final_world_revision': 88, 'final_index_watermark': 88, 'done_at_cursor': 13}

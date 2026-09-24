@@ -1,0 +1,9 @@
+{
+ "note": "Third periodic review (tick 2026-11-05T17:05Z, inside the jump to cursor 13 / 11-06). The full registry episode (queued → rejected checksum mismatch → retry success) plus final user confirmation are now in scope. Inspect anchors first.",
+ "capability_calls": [
+  {
+   "name": "read_periodic_review_anchors",
+   "arguments": {}
+  }
+ ]
+}

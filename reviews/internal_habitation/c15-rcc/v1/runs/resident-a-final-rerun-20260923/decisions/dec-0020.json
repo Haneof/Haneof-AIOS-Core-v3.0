@@ -1,0 +1,9 @@
+{
+ "note": "Second periodic review (tick 2026-11-04T17:05Z, before the 21:30Z build event by virtual order). Inspect selected anchors first.",
+ "capability_calls": [
+  {
+   "name": "read_periodic_review_anchors",
+   "arguments": {}
+  }
+ ]
+}
