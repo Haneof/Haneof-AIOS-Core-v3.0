@@ -38,32 +38,33 @@ def find_dependency_cycle(
     stack: list[RefKey] = []
     stack_index: dict[RefKey, int] = {}
 
-    def visit(node: RefKey) -> tuple[ObjectRef, ...] | None:
+    # Explicit DFS frames preserve deterministic cycle paths without consuming
+    # the Python call stack for a valid long-lived proof graph.
+    for node in sorted(refs):
+        if state.get(node, 0) != 0:
+            continue
         state[node] = 1
         stack_index[node] = len(stack)
         stack.append(node)
-
-        for next_node in adjacency.get(node, ()):
+        frames = [(node, iter(adjacency.get(node, ())))]
+        while frames:
+            current, children = frames[-1]
+            next_node = next(children, None)
+            if next_node is None:
+                frames.pop()
+                stack.pop()
+                stack_index.pop(current)
+                state[current] = 2
+                continue
             next_state = state.get(next_node, 0)
-            if next_state == 0:
-                cycle = visit(next_node)
-                if cycle is not None:
-                    return cycle
-            elif next_state == 1:
-                start = stack_index[next_node]
-                cycle_keys = stack[start:] + [next_node]
+            if next_state == 1:
+                cycle_keys = stack[stack_index[next_node]:] + [next_node]
                 return tuple(refs[key] for key in cycle_keys)
-
-        stack.pop()
-        stack_index.pop(node, None)
-        state[node] = 2
-        return None
-
-    for node in sorted(refs):
-        if state.get(node, 0) == 0:
-            cycle = visit(node)
-            if cycle is not None:
-                return cycle
+            if next_state == 0:
+                state[next_node] = 1
+                stack_index[next_node] = len(stack)
+                stack.append(next_node)
+                frames.append((next_node, iter(adjacency.get(next_node, ()))))
     return None
 
 

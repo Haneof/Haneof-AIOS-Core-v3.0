@@ -1,0 +1,77 @@
+{
+  "source_commit": "d1466deaab8dc6d5795fcd7e4f6e5a8720727a63",
+  "parent_and_verified_main": "849bfd41c623fb336b392a3e6e933cfad93620e9",
+  "core_tree": "7db4f72e7b3c29c74082f9984141159f8f1d6071",
+  "regression_blob": "e4ce7c223452e04fa10f9cb0bbcf787fe4feb00e",
+  "runtime": {
+    "python": "3.12.11",
+    "pytest": "8.4.2",
+    "pydantic": "2.13.5",
+    "sqlite": "3.40.1",
+    "build": "CPython official v3.12.11 source; local build without optional SSL/ctypes modules; offline wheels"
+  },
+  "source_files": 132,
+  "default_collection": 501,
+  "software_executed": 492,
+  "excluded_fixture_cases": [
+    "tests/habitation/test_fixture_separation.py::test_resident_fixture_contains_only_deliverable_life_events",
+    "tests/habitation/test_fixture_separation.py::test_oracle_fixture_is_physically_separate_from_resident_stream",
+    "tests/habitation/test_fixture_separation.py::test_manifest_requires_fresh_world_and_evaluator_only_oracle",
+    "tests/habitation/test_fixture_separation.py::test_catalog_scenarios_have_separate_resident_and_oracle_files",
+    "tests/habitation/test_fixture_separation.py::test_catalog_focuses_on_behavior_not_expected_response_strings",
+    "tests/habitation/test_fixture_separation.py::test_resident_subject_ids_are_opaque_and_non_semantic",
+    "tests/habitation/test_fixture_separation.py::test_every_catalog_fixture_bundle_has_matching_resident_and_oracle_identity",
+    "tests/habitation/test_sol_manual_resident_replay.py::test_sol_manual_resident_replay_exposes_learned_custom_policies",
+    "tests/habitation/test_provider_evaluator.py::test_evaluator_cli_writes_report_for_matching_completed_run"
+  ],
+  "counts": {
+    "core": {
+      "tests": 409,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "bugs": {
+      "tests": 42,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "public": {
+      "tests": 492,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "per_bug": {
+    "A01": 4,
+    "A02": 1,
+    "A03": 3,
+    "A04": 9,
+    "A05": 4,
+    "A06": 2,
+    "A07": 13,
+    "A08": 1,
+    "A09": 5,
+    "A10": 2
+  },
+  "software_result": "PASS_WITH_EXPLICIT_SCOPE",
+  "full_default_execution": "NOT_RUN: 9 repository fixture-dependent cases excluded before execution",
+  "formal_isolation": "NOT_TESTED",
+  "real_A_B_C": "NOT_TESTED",
+  "resident": "BLOCKED",
+  "launchable": false,
+  "main_integrated": false,
+  "earlier_harness_attempt": "17 failures: verifier denied standard ZoneInfo data access; allow standard TZPATH then re-run; no Core/test changes",
+  "sha256": {
+    "bugs.xml": "cf3c8aa3a5bb3a0e5e214fc89ea32a51df175dffd4205ee1d9791e512d768996",
+    "collection.json": "fd1ffde7443592ff3fdbc5d6619cd1ecf8d7de665bb5eaaab46328e259007188",
+    "core.xml": "44bedcc7346de993b9ffa3bd6dd3b0334e90b0b303c2e7a52666fb141b25d03c",
+    "execution.json": "500ff863b4426ca6329d8383b856304b3bfeba505a85e3e89d93f079d7ca6137",
+    "harness-attempt-1.xml": "c49fa7212d073ecdfe7f7a87156d5d0f33111b15cdd3dc8c5947819aa0727449",
+    "public.xml": "d33da9c72a6c64f944206f823b2517fe61612357fb456c7603e23f3e8d29cac6",
+    "source-files.json": "8d22b6bef5cca0b38b11f2cfe4a397a21410e16273d7751b38fc9a017e0b3db2",
+    "verify_public.py": "ff14f33b90fba9220d1c91c41d3489cce078b56fd8b6a2ebea8d5e5197a1c389"
+  }
+}

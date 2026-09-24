@@ -147,6 +147,10 @@ class CognitivePolicyRegistry:
                     "policy evidence crosses the runtime subject scope: "
                     f"{ref.object_id}@{ref.revision} belongs to {ref_subject!r}"
                 )
+            latest = self.store.get_payload(ref.object_id)
+            if (int(latest["revision"]) != ref.revision
+                    or str(latest.get("status") or "active") != "active"):
+                raise ValueError("policy learning requires current, active real-result evidence")
             if not require_real_result:
                 continue
             object_type = str(payload.get("object_type") or "")
@@ -213,6 +217,7 @@ class CognitivePolicyRegistry:
         evidence: EvidenceSet | None,
         actor_is_ai: bool,
         operation_name: str,
+        expected_world_revision: int,
     ) -> PolicyReceipt:
         objects: list[Any] = [policy]
         policy_ref = ObjectRef(object_id=policy.object_id, revision=policy.revision)
@@ -254,7 +259,7 @@ class CognitivePolicyRegistry:
                 "scope": policy.scope,
                 "policy_class": policy.policy_class.value,
             },
-            expected_world_revision=int(self.store.current_world_revision()),
+            expected_world_revision=expected_world_revision,
             reason=policy.reason,
             idempotency_key=f"policy:{policy.object_id}:{policy.revision}",
             source_class=source_class,
@@ -279,6 +284,7 @@ class CognitivePolicyRegistry:
         changed_at: datetime,
         actor_is_ai: bool = False,
     ) -> PolicyReceipt:
+        expected_world_revision = int(self.store.current_world_revision())
         changed = as_utc(changed_at, "changed_at")
         if actor_is_ai:
             if (
@@ -350,6 +356,7 @@ class CognitivePolicyRegistry:
             evidence=evidence,
             actor_is_ai=actor_is_ai,
             operation_name="policy.register",
+            expected_world_revision=expected_world_revision,
         )
 
     def latest(self, policy_id: str) -> CognitivePolicy | None:
@@ -394,9 +401,24 @@ class CognitivePolicyRegistry:
         items.sort(key=lambda item: (item.scope, item.policy_id))
         return tuple(items)
 
+    def is_effective(self, policy: CognitivePolicy) -> bool:
+        valid = policy.status == "active"
+        if valid:
+            try:
+                self._validate_refs(policy.evidence_refs)
+            except (ValueError, StoreError):
+                valid = False
+        if not valid and policy.policy_class is not PolicyClass.COGNITIVE_POLICY:
+            raise PermissionError("non-cognitive policy requires independent review")
+        return valid
+
     def effective_value(self, policy_id: str, default: Any = None) -> Any:
         current = self.latest(policy_id)
-        return default if current is None else current.current_value
+        if current is None:
+            return default
+        if not self.is_effective(current):
+            return default
+        return current.current_value
 
     def due_for_evaluation(self, *, now: datetime) -> tuple[CognitivePolicy, ...]:
         moment = as_utc(now, "now")
@@ -429,6 +451,7 @@ class CognitivePolicyRegistry:
         changed_at: datetime,
         actor_is_ai: bool = True,
     ) -> PolicyReceipt:
+        expected_world_revision = int(self.store.current_world_revision())
         changed = as_utc(changed_at, "changed_at")
         current = self.latest(request.policy_id)
         if current is None:
@@ -487,6 +510,7 @@ class CognitivePolicyRegistry:
             evidence=evidence,
             actor_is_ai=actor_is_ai,
             operation_name="policy.update",
+            expected_world_revision=expected_world_revision,
         )
 
     def rollback(
@@ -500,6 +524,7 @@ class CognitivePolicyRegistry:
         changed_at: datetime,
         actor_is_ai: bool = True,
     ) -> PolicyReceipt:
+        expected_world_revision = int(self.store.current_world_revision())
         current = self.latest(policy_id)
         target = self.get(policy_id, target_version)
         if current is None or target is None:
@@ -562,4 +587,5 @@ class CognitivePolicyRegistry:
             evidence=evidence,
             actor_is_ai=actor_is_ai,
             operation_name="policy.rollback",
+            expected_world_revision=expected_world_revision,
         )
