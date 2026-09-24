@@ -341,3 +341,100 @@ def test_headless_restart_keeps_fix001_historical_knowledge_cut(tmp_path):
         assert probe.calls == 2
     finally:
         restarted.stop()
+
+
+# ---------------------------------------------------------------------------
+# CORE-HEADLESS-001 independent acceptance probes.
+# Probe branch only; not part of PR #181 and must remain unmerged.
+# ---------------------------------------------------------------------------
+
+def test_independent_probe_stale_lock_artifact_does_not_brick_world(tmp_path):
+    cfg = config(tmp_path)
+    first = HeadlessCore(config=cfg, model_handler=CountingHandler()).start()
+    before = first.status()["world_revision"]
+    first.stop()
+
+    assert cfg.lock_path is not None
+    cfg.lock_path.write_text(
+        '{"kind":"stale-independent-probe","pid":999999,"host":"stale"}\n',
+        encoding="utf-8",
+    )
+
+    second = HeadlessCore(config=cfg, model_handler=CountingHandler()).start()
+    try:
+        assert second.status()["writer_lease_held"] is True
+        assert second.status()["world_revision"] == before
+    finally:
+        second.stop()
+
+
+def test_independent_probe_competing_writer_fails_closed_without_world_mutation(tmp_path):
+    cfg = config(tmp_path)
+    first = HeadlessCore(config=cfg, model_handler=CountingHandler()).start()
+    second = HeadlessCore(config=cfg, model_handler=CountingHandler())
+    try:
+        before = first.status()["world_revision"]
+        with pytest.raises(HeadlessWriterBusy):
+            second.start()
+        assert first.status()["world_revision"] == before
+    finally:
+        first.stop()
+
+    second.start()
+    try:
+        assert second.status()["writer_lease_held"] is True
+        assert second.status()["world_revision"] == before
+    finally:
+        second.stop()
+
+
+def test_independent_probe_fix002_in_doubt_survives_headless_due_restart(tmp_path):
+    cfg = config(tmp_path)
+    handler = AmbiguousHandler()
+    first = HeadlessCore(config=cfg, model_handler=handler).start()
+    assert first.runtime is not None
+    first.runtime.wake_bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.SAFETY,
+            rule_id="independent-due-restart-probe",
+            observed_at=T1,
+            priority=100,
+            dedupe_key="independent-due-restart-probe",
+        )
+    )
+    try:
+        with pytest.raises(RuntimeError, match="ambiguous"):
+            first.process_due_work(
+                now=T1,
+                max_wakes=1,
+                include_periodic_review=False,
+            )
+        assert handler.calls == 1
+    finally:
+        first.stop()
+
+    second = HeadlessCore(config=cfg, model_handler=handler).start()
+    try:
+        with pytest.raises(BackgroundModelExecutionInDoubt):
+            second.process_due_work(
+                now=T2,
+                max_wakes=1,
+                include_periodic_review=False,
+            )
+        assert handler.calls == 1
+    finally:
+        second.stop()
+
+
+def test_independent_probe_same_world_cannot_bypass_writer_lease_with_alt_lock_path(tmp_path):
+    world = tmp_path / "world.sqlite"
+    cfg_a = HeadlessConfig(world_path=world, lock_path=tmp_path / "writer-a.lock")
+    cfg_b = HeadlessConfig(world_path=world, lock_path=tmp_path / "writer-b.lock")
+    first = HeadlessCore(config=cfg_a, model_handler=CountingHandler()).start()
+    second = HeadlessCore(config=cfg_b, model_handler=CountingHandler())
+    try:
+        with pytest.raises(HeadlessWriterBusy):
+            second.start()
+    finally:
+        second.stop()
+        first.stop()
