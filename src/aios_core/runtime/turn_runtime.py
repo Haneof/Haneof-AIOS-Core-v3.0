@@ -1352,6 +1352,19 @@ class FusedTurnRuntime:
             subject_id=self.subject_id,
         )
 
+    def _policy_reader(
+        self,
+        cutoff: datetime | None = None,
+    ) -> CognitivePolicyRegistry:
+        effective = self._active_turn_time if cutoff is None else cutoff
+        if effective is None:
+            return self.policies
+        return CognitivePolicyRegistry(
+            store=self._cutoff_store(effective),
+            index=self.index,
+            subject_id=self.subject_id,
+        )
+
     def _runtime_subject_scope(self) -> frozenset[str]:
         """Subjects that belong to this resident private user/AI world."""
 
@@ -2235,12 +2248,13 @@ class FusedTurnRuntime:
         self,
         policy_id: str | None = None,
     ) -> list[dict[str, Any]]:
+        reader = self._policy_reader()
         if policy_id is not None and str(policy_id).strip():
-            item = self.policies.latest(str(policy_id))
+            item = reader.latest(str(policy_id))
             return [] if item is None else [item.model_dump(mode="json")]
         return [
             item.model_dump(mode="json")
-            for item in self.policies.list_current()
+            for item in reader.list_current()
         ]
 
     def _propose_cognitive_policy(
@@ -2423,7 +2437,12 @@ class FusedTurnRuntime:
         )
         return asdict(receipt)
 
-    def _cognitive_policy_context(self, *, limit: int = 32) -> dict[str, Any]:
+    def _cognitive_policy_context(
+        self,
+        *,
+        limit: int = 32,
+        as_of: datetime | None = None,
+    ) -> dict[str, Any]:
         """Compact current policy view for every resident semantic entry point.
 
         Policies learned from direct evidence must become available to later cognition
@@ -2435,8 +2454,12 @@ class FusedTurnRuntime:
 
         if limit < 1:
             raise ValueError("policy context limit must be >= 1")
-        items = [item for item in self.policies.list_current()
-                 if self.policies.is_effective(item)]
+        reader = self._policy_reader(as_of)
+        items = [
+            item
+            for item in reader.list_current()
+            if reader.is_effective(item)
+        ]
         values: dict[str, Any] = {}
         records: list[dict[str, Any]] = []
         for item in items[:limit]:
@@ -3618,7 +3641,9 @@ class FusedTurnRuntime:
         }
         task_context: dict[str, Any] = {
             "wake": wake_context,
-            "cognitive_policy_context": self._cognitive_policy_context(),
+            "cognitive_policy_context": self._cognitive_policy_context(
+                as_of=active_write_time,
+            ),
         }
         wake_input = (
             "System Wake. Start from the supplied Wake Reason and pinned evidence. "
@@ -3774,7 +3799,10 @@ class FusedTurnRuntime:
                 "bundle_wake_ref": running_ref.model_dump(mode="json"),
                 "member_count": len(members),
                 "members": members,
-                "current_ai_world": self.ai_world.snapshot(per_domain=3),
+                "current_ai_world": self._ai_world_snapshot(
+                    active_write_time,
+                    per_domain=3,
+                ),
                 "capability_names": [
                     item["name"] for item in self.registry.catalog()
                 ],
@@ -4075,7 +4103,9 @@ class FusedTurnRuntime:
             world_map=self._world_map_context(review_write_time),
             task_context={
                 "periodic_review": review_context,
-                "cognitive_policy_context": self._cognitive_policy_context(),
+                "cognitive_policy_context": self._cognitive_policy_context(
+                    as_of=review_write_time,
+                ),
             },
             capability_catalog=self.registry.catalog(),
             token_budget=token_budget,
