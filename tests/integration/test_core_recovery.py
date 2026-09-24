@@ -122,7 +122,8 @@ def test_r1_wal_process_crash_distinguishes_uncommitted_and_committed(tmp_path):
 
     reopened = SQLiteWorldStore(uncommitted_path)
     assert reopened.current_world_revision() == 0
-    assert reopened.get_payload("obs_uncommitted_crash", revision=1) is None
+    with pytest.raises(StoreError):
+        reopened.get_payload("obs_uncommitted_crash", revision=1)
     assert reopened.quick_check() == ("ok",)
 
     committed_path = tmp_path / "committed.sqlite"
@@ -378,7 +379,7 @@ def test_r9_interrupted_restore_does_not_mutate_backup_or_publish_partial_world(
     assert _sha256(backup) == backup_hash
 
 
-def test_r10_recovery_cli_does_not_require_model_handler(tmp_path, capsys):
+def test_r10_recovery_cli_does_not_require_model_handler(tmp_path, capfd):
     cfg = HeadlessConfig(world_path=tmp_path / "world.sqlite")
     store = SQLiteWorldStore(cfg.world_path)
     oid = new_object_id(ObjectType.OBSERVATION)
@@ -386,7 +387,7 @@ def test_r10_recovery_cli_does_not_require_model_handler(tmp_path, capsys):
 
     rc = headless_cli_main(["--world", str(cfg.world_path), "recovery-status"])
     assert rc == 0
-    status = capsys.readouterr().out
+    status = capfd.readouterr().out
     assert '"status": "recovery_status"' in status
 
     backup = tmp_path / "cli-backup.sqlite"
