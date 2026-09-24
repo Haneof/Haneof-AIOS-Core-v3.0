@@ -163,6 +163,40 @@ def test_headless_restart_preserves_fix003_pre_admission_and_requires_authorizat
         second.stop()
 
 
+def test_headless_restart_keeps_pending_due_work_and_executes_after_reopen(tmp_path):
+    cfg = config(tmp_path)
+    handler = CountingHandler("wake-completed")
+    first = HeadlessCore(config=cfg, model_handler=handler).start()
+    assert first.runtime is not None
+    receipt = first.runtime.wake_bus.emit(
+        WakeSignalRequest(
+            wake_source=WakeSource.SAFETY,
+            rule_id="headless-pending-restart",
+            observed_at=T1,
+            priority=100,
+            dedupe_key="headless-pending-restart",
+        )
+    )
+    assert handler.calls == 0
+    first.stop()
+
+    second = HeadlessCore(config=cfg, model_handler=handler).start()
+    try:
+        due = second.process_due_work(
+            now=T2,
+            max_wakes=1,
+            include_periodic_review=False,
+        )
+        assert len(due.wakes) == 1
+        assert due.wakes[0].wake.wake_id == receipt.wake_id
+        assert due.wakes[0].wake.state == "completed"
+        assert due.wakes[0].runtime is not None
+        assert due.wakes[0].runtime.response == "wake-completed"
+        assert handler.calls == 1
+    finally:
+        second.stop()
+
+
 class AmbiguousHandler:
     def __init__(self) -> None:
         self.calls = 0
