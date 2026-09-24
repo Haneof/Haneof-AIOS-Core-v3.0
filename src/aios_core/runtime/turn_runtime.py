@@ -1365,6 +1365,26 @@ class FusedTurnRuntime:
             subject_id=self.subject_id,
         )
 
+    def _derive_c14_lineage_at_cutoff(
+        self,
+        summary_ref: ObjectRef,
+        cutoff: datetime,
+    ):
+        """Resolve model-visible C14 lineage from World as known at cutoff.
+
+        Reusing the existing cutoff Store view constrains both support Dependency
+        enumeration (list_payloads) and pinned leaf traversal (get_payload) without
+        introducing a second graph or lineage truth store.
+        """
+
+        evidence_reader = CognitionEvidencePolicy(
+            store=self._cutoff_store(cutoff),
+            index=self.index,
+            subject_id=self.subject_id,
+            allowed_subject_ids=(self.subject_id, AI_SELF_SUBJECT_ID),
+        )
+        return evidence_reader.derive_lineage_for_refs((summary_ref,))
+
     def _runtime_subject_scope(self) -> frozenset[str]:
         """Subjects that belong to this resident private user/AI world."""
 
@@ -3710,7 +3730,10 @@ class FusedTurnRuntime:
                 raise ValueError(
                     "COGNITIVE_DERIVATION summary_ref must point to a Summary"
                 )
-            runtime_lineage = self.cognitive_derivation.derive_lineage(summary_ref)
+            runtime_lineage = self._derive_c14_lineage_at_cutoff(
+                summary_ref,
+                active_write_time,
+            )
             scheduler_lineage = running.metadata.get("derived_lineage")
             if not isinstance(scheduler_lineage, Mapping):
                 scheduler_lineage = {}
@@ -3794,8 +3817,9 @@ class FusedTurnRuntime:
                 )
                 if summary_payload.get("object_type") != ObjectType.SUMMARY.value:
                     raise ValueError("C14 member summary_ref must point to a Summary")
-                runtime_lineage = self.cognitive_derivation.derive_lineage(
-                    summary_ref
+                runtime_lineage = self._derive_c14_lineage_at_cutoff(
+                    summary_ref,
+                    active_write_time,
                 )
                 scheduler_lineage = member_metadata.get("derived_lineage")
                 if not isinstance(scheduler_lineage, Mapping):
