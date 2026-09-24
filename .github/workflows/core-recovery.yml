@@ -78,9 +78,11 @@ jobs:
 
           # 3: one provider dispatch becomes mechanically ambiguous.
           set +e
-          RECOVERY_PROVIDER_MARKER="$ATTEMPTS"             aios-core-headless --world "$WORLD" --index "$INDEX"             --model-handler "recovery_fault_adapter:ambiguous_model_handler" turn             --session recovery-process --turn-index 2 --text "ambiguous durable turn"             --at "2026-09-24T12:01:00+00:00"             > "$ROOT/ambiguous.out" 2> "$ROOT/ambiguous.err"
+          PYTHONPATH="$GITHUB_WORKSPACE" RECOVERY_PROVIDER_MARKER="$ATTEMPTS"             aios-core-headless --world "$WORLD" --index "$INDEX"             --model-handler "recovery_fault_adapter:ambiguous_model_handler" turn             --session recovery-process --turn-index 2 --text "ambiguous durable turn"             --at "2026-09-24T12:01:00+00:00"             > "$ROOT/ambiguous.out" 2> "$ROOT/ambiguous.err"
           AMBIG_RC=$?
           set -e
+          cat "$ROOT/ambiguous.out"
+          cat "$ROOT/ambiguous.err"
           test "$AMBIG_RC" -eq 4
           test "$(wc -l < "$ATTEMPTS")" -eq 1
 
