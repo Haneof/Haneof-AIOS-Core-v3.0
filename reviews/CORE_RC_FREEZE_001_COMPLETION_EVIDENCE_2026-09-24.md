@@ -4,6 +4,8 @@ Status: **REVIEW_READY**
 Task: `CORE-RC-FREEZE-001`  
 Repository: `Haneof/Haneof-AIOS-Core-v3.0`  
 Engineering/release PR: **#202 — OPEN / UNMERGED**  
+Exact RC-freeze candidate: `11f4aed2eba055356730dc77922ced39b25a7d63`  
+Frozen software SHA inside candidate: `773876f92d5f8e53422f8f5a68cc651953d93052`  
 Resident runs performed by this task: **0**  
 Public release/tag performed: **NO**
 
