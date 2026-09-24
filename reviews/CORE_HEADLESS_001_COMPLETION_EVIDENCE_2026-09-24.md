@@ -1,5 +1,179 @@
 # CORE-HEADLESS-001 Completion Evidence — 2026-09-24
 
+## Corrective-001 final handoff
+
+**Author state: REVIEW_READY**
+
+This file now includes the engineering completion evidence for
+`CORE-HEADLESS-001-CORRECTIVE-001`. This is not independent acceptance,
+merge authorization, or a release receipt.
+
+### Historical pins preserved
+
+- Original engineering PR: #181
+- Historical tested implementation exact head:
+  `a43c2e9408e51ec8812e9f6ec808a71401bc2841`
+- Historical evidence-only handoff head:
+  `12928af4ffa40e70d9ae80124dab388a486f7097`
+- Independent acceptance PR #185: **ACCEPTANCE_FAIL**
+- Historical blocker:
+  `CORE-HEADLESS-001-ACCEPT-BLOCKER-001`
+- Independent probe PR #184: CLOSED / UNMERGED
+- Probe head:
+  `f36665541742badde3b7c20e24528668b5ba3f59`
+- Probe run/job:
+  `35992018738 / 107608100032`
+- Historical failure:
+  same canonical World could be opened by two writable HeadlessCore instances
+  when different caller-selected `lock_path` values produced different OS
+  lock-file inodes.
+
+The historical FAIL remains historical evidence and is not rewritten as PASS.
+
+### Corrective construction / live-main review
+
+Corrective work continued on the original branch:
+`core-headless-001-20260924-sol`.
+
+Corrective start/final recheck live `main`:
+`e7817b499856808e68490d8a2b07524f87a79da1`.
+
+Compared with the original construction base
+`8d724f96aa286549e4e12a2245d28ff5dce6f77b`, live-main drift remained
+governance/review-only: checkpoint, task board, project map, corrective/acceptance
+prompts, and independent review evidence. There was no relevant `src/**`,
+packaging-contract, test-contract, or workflow semantic drift, so no rebase was
+required by the corrective prompt.
+
+### New tested exact implementation head
+
+`16e983a536b124ddb600981fc16326d9db54358f`
+
+The corrective delta after the historical evidence head modifies only:
+
+1. `src/aios_core/headless/core.py`
+2. `src/aios_core/headless/cli.py`
+3. `tests/integration/test_core_headless.py`
+
+No `src/aios_core/runtime/**` implementation was changed.
+
+### Corrective mechanism
+
+The writer lease identity is now derived exclusively from the canonical resolved
+durable World path:
+
+`<canonical-world-path>.writer.lock`
+
+`HeadlessConfig.lock_path` no longer selects writer identity. If supplied, it is
+validation-only and must equal the canonical derived lease path; any differing
+path raises `HeadlessConfigurationError` before World startup.
+
+The CLI `--lock` option and `AIOS_LOCK_PATH` remain compatibility/validation
+inputs only. They cannot choose an alternate writer inode for the same World.
+
+The actual exclusion primitive remains the process-held OS advisory lock:
+
+- POSIX: `fcntl.flock(..., LOCK_EX | LOCK_NB)`
+- Windows: `msvcrt.locking(..., LK_NBLCK, 1)`
+
+Lock-file contents remain diagnostic metadata only. No PID-file or lock-file
+content is used as World truth or liveness truth.
+
+### Corrective regressions
+
+The permanent HEADLESS suite now additionally proves:
+
+- noncanonical explicit `lock_path` is rejected;
+- same World cannot create a second lease identity through alternate lock path;
+- failed competing startup does not advance/mutate World revision;
+- normal same-path competing writer remains fail-closed with
+  `HeadlessWriterBusy`;
+- writer B can acquire the lease after writer A cleanly stops;
+- stale canonical lock-file contents without an active OS lease do not brick the
+  World;
+- relative and absolute forms of the same World resolve to one canonical lease
+  identity;
+- a symlinked existing World resolves to the same canonical World and lease
+  identity;
+- CLI `--lock` override is validation-only and noncanonical input exits as a
+  configuration failure;
+- `AIOS_LOCK_PATH` is likewise validation-only.
+
+The original A-F restart/recovery tests remain in the same suite.
+
+### New exact-head Gate evidence
+
+All runs below are tied to tested implementation exact head
+`16e983a536b124ddb600981fc16326d9db54358f`.
+GitHub checkout logs show the PR merge-ref as:
+
+`Merge 16e983a536b124ddb600981fc16326d9db54358f into e7817b499856808e68490d8a2b07524f87a79da1`
+
+| Gate | Run ID | Job ID | Result |
+|---|---:|---:|---|
+| core-headless clean install / installed CLI / corrective + A-F / runtime compatibility | `35993796247` | `107613844756` | **SUCCESS** |
+| world-kernel | `35993796267` | `107613844605` | **SUCCESS** |
+| constitutional-cognition-closure + P16 harness | `35993796265` | `107613844757` | **SUCCESS** |
+| full P16 direct `pytest -q` | `35993796249` | `107613844795` | **SUCCESS** |
+
+Exact-head environment from raw logs:
+
+- CPython `3.12.14`
+- pytest `8.4.2`
+- pydantic `2.13.5`
+
+The `core-headless` job used clean non-editable
+`pip install ".[dev]"`, successfully executed the installed
+`aios-core-headless` CLI across separate processes, preserved
+`world_revision 0 -> 2 -> 2` and `index_watermark 0 -> 2`, and passed:
+
+- corrective/headless lifecycle suite: `............. [100%]` (13 tests);
+- existing HEADLESS runtime compatibility suite: `[100%]`.
+
+World-kernel: 24 passed.
+
+Constitutional cognition closure:
+- closure gate: 91 passed;
+- P16 harness regression: 92 passed.
+
+Full P16:
+- command: direct `pytest -q`;
+- reached `[100%]`;
+- independent raw-log count: **675 pass markers**;
+- 0 failed / 0 errors observed;
+- workflow/job conclusion: **SUCCESS**.
+
+### Preserved semantics
+
+The corrective does not redesign or modify:
+
+- `FusedTurnRuntime` / `CognitiveRuntime`;
+- FIX-001 temporal read cut;
+- FIX-002 background attempt / IN_DOUBT recovery;
+- FIX-003 user-turn recovery;
+- Wake / Periodic Review;
+- metering / budget;
+- World/index architecture;
+- provider-neutral `ModelHandler`.
+
+No second World, runtime, scheduler, cognition truth store, or recovery ledger was
+introduced.
+
+### Evidence-only handoff boundary
+
+The tested implementation exact head is
+`16e983a536b124ddb600981fc16326d9db54358f`.
+
+The commit that finalizes this evidence file is evidence-only and is not the
+tested implementation head. Its exact SHA is pinned separately in PR #181 body
+after this commit is created.
+
+Fresh independent acceptance is required. Do not merge from this engineering
+handoff.
+
+---
+
+
 ## Author state
 
 **REVIEW_READY**
