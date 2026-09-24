@@ -22,15 +22,15 @@
 
 ---
 
-## 0. 当前项目快照 — 2026-09-24 PM 治理已合入
+## 0. 当前项目快照 — 2026-09-24 RC-FREEZE DONE / fresh A-002 READY
 
 > **PM / 工程 / operator 导航，不是 Resident 盲测资料。** 盲测 Resident 不读地图/任务板/checkpoint，只接收独立放行的安全包。
 
 - 已验证治理 merge：`2a68df3f8901138fa3126a91063c430f69102049`（PR #122）；frozen Core：`bcd6bf353126318f9a97076b52ec1740d43f35a4`。
 - P0–P15：已形成 Core 机制与阶段 Gate；不等于真实设备产品集成或长期模型认知已全面通过。
-- C14：已正式 PASS；C15 hardening：已冻结；canonical A：#117 已接受。
+- C14：已正式 PASS；C15 hardening：已冻结。historical canonical A #117 仍对其 old Core 有效，但对新 RC 仅属历史证据；RC impact = `FRESH_A_REQUIRED`，新任务 `C15-RCC-RES-A-RERUN-002 = READY`。
 - B：#121 已提交但当前 candidate **NOT ACCEPTED**（执行证据不足、最终索引落后）；不是“尚无人执行”，也不是“报告写 PASS 所以完成”。
-- 纠偏治理：`C15-RCC-RES-B-CORRECTIVE-001 = DONE`；PR #122 已由原 PM 自审并正常合入，**不是独立语义评估**。本收据状态写回合入后，唯一下一 READY = `C15-RCC-RES-B-PREFLIGHT-001`；盲测 B/C 仍 BLOCKED，不能直接开跑。
+- 纠偏治理：`C15-RCC-RES-B-CORRECTIVE-001 = DONE`；PR #122 历史合入事实不变。其原先释放的 B preflight 已被后续 Core completion / RC-FREEZE 影响裁决重新阻塞；当前必须先完成 `C15-RCC-RES-A-RERUN-002` 及 fresh independent acceptance，之后才可重新释放 B preflight。
 - 纠偏裁决：`governance/C15_RCC_RES_B_CORRECTIVE_DECISION_2026-09-23.md`；审查证据：`reviews/C15_RCC_RES_B_001_PM_CORRECTIVE_REVIEW_2026-09-23.md`。
 - C15 C/EVAL/CLOSE、C16、广泛 P16 及 P17 均未放行。机械 CI SUCCESS、运行报告、自评 PASS、独立证据接受与语义 VALID 必须分开。
 
