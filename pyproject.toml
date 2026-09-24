@@ -17,6 +17,9 @@ dev = [
   "pytest>=8,<9",
 ]
 
+[project.scripts]
+aios-core-headless = "aios_core.headless.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
