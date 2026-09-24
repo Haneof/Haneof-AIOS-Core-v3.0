@@ -341,15 +341,9 @@ class AIWorldCognitionService:
         if max_items == 0 or not allowed:
             return ()
 
-        metadata_equals: dict[str, object] = {"ai_world": True}
-        if clean_scope is not None:
-            metadata_equals["scope_key"] = clean_scope
         stream = self.store.iter_latest_payloads(
             object_type=ObjectType.CLAIM,
-            payload_equals={"status": "active"},
-            metadata_equals=metadata_equals,
             metadata_in={"ai_domain": tuple(item.value for item in allowed)},
-            required_metadata_tags=clean_required_tags,
             order_by_metadata_key="ai_domain",
         )
         views: list[AIWorldClaimView] = []
@@ -400,10 +394,7 @@ class AIWorldCognitionService:
 
         stream = self.store.iter_latest_payloads(
             object_type=ObjectType.CLAIM,
-            payload_equals={"status": "active"},
-            metadata_equals={"ai_world": True},
             metadata_in={"ai_domain": tuple(item.value for item in allowed)},
-            required_metadata_tags=clean_required_tags,
         )
         try:
             for payload in stream:
