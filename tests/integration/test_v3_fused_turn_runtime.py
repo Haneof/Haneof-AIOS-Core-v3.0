@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
+import pytest
+
 from aios_core.ai_world import (
     AI_SELF_SUBJECT_ID,
     AIWorldClaimRequest,
@@ -1296,3 +1298,329 @@ def test_read_ai_world_runtime_capability_does_not_cross_user_subject(tmp_path):
     )
 
     assert result.runtime.response == "User B runtime remained subject-isolated."
+
+
+def test_cg001_historical_runtime_cut_excludes_late_search_and_exact_inspect(tmp_path):
+    """A T1 execution must not observe a fact first learned at T2 > T1."""
+    db = tmp_path / "cg001_historical_runtime_cut.db"
+    store = SQLiteWorldStore(db)
+    t1 = NOW
+    t2 = NOW + timedelta(hours=1)
+    late = Observation(
+        object_id="obs_cg001_late_historical_fact",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW - timedelta(days=2)),
+        learned_at=t2,
+        recorded_at=t2,
+        created_by="test:cg001",
+        source_kind="conversation",
+        modality="text",
+        value="cg001 late temporal marker alpha",
+        metadata={"dimension": "dim:cg001"},
+    )
+    store.commit(
+        [late],
+        OperationRequest(
+            operation_name="test.cg001.seed_late_historical_fact",
+            expected_world_revision=0,
+            reason="seed a fact learned after the historical execution cut",
+            idempotency_key="test-cg001-late-historical-fact",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    def model(snapshot):
+        history = snapshot.capability_history
+        if not history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="search_world",
+                        arguments={"query": "cg001 late temporal marker alpha", "limit": 5},
+                    ),
+                )
+            )
+        if len(history) == 1:
+            search = history[-1]
+            assert search.ok is True
+            assert late.object_id not in {
+                item["object_id"] for item in search.data
+            }
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="inspect_world_object",
+                        arguments={"object_id": late.object_id, "revision": 1},
+                    ),
+                )
+            )
+        exact = history[-1]
+        assert exact.ok is False
+        return ModelDirective(response="historical cut held")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    result = runtime.run_turn(
+        session_id="cg001-historical",
+        turn_index=1,
+        user_input="check historical state",
+        current_topic=None,
+        occurred_at=t1,
+    )
+
+    assert result.runtime.response == "historical cut held"
+
+
+def test_cg001_current_time_control_keeps_current_fact_visible(tmp_path):
+    """The read cut must not hide facts known at an ordinary current-time turn."""
+    db = tmp_path / "cg001_current_control.db"
+    store = SQLiteWorldStore(db)
+    now = NOW + timedelta(hours=2)
+    current = Observation(
+        object_id="obs_cg001_current_fact",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(now),
+        learned_at=now,
+        recorded_at=now,
+        created_by="test:cg001",
+        source_kind="conversation",
+        modality="text",
+        value="cg001 current temporal marker beta",
+        metadata={"dimension": "dim:cg001"},
+    )
+    store.commit(
+        [current],
+        OperationRequest(
+            operation_name="test.cg001.seed_current_fact",
+            expected_world_revision=0,
+            reason="seed a fact known at the current execution cut",
+            idempotency_key="test-cg001-current-fact",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+
+    def model(snapshot):
+        history = snapshot.capability_history
+        if not history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="search_world",
+                        arguments={"query": "cg001 current temporal marker beta", "limit": 5},
+                    ),
+                )
+            )
+        if len(history) == 1:
+            search = history[-1]
+            assert search.ok is True
+            assert current.object_id in {
+                item["object_id"] for item in search.data
+            }
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="inspect_world_object",
+                        arguments={"object_id": current.object_id, "revision": 1},
+                    ),
+                )
+            )
+        exact = history[-1]
+        assert exact.ok is True
+        assert exact.data["object_id"] == current.object_id
+        return ModelDirective(response="current cut held")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    result = runtime.run_turn(
+        session_id="cg001-current",
+        turn_index=1,
+        user_input="check current state",
+        current_topic=None,
+        occurred_at=now,
+    )
+
+    assert result.runtime.response == "current cut held"
+
+
+def test_cg001_exact_read_fails_closed_for_missing_or_corrupt_learned_at(
+    tmp_path,
+    monkeypatch,
+):
+    db = tmp_path / "cg001_corrupt_learned_at.db"
+    store = SQLiteWorldStore(db)
+    index = WorldSearchIndex(db, store=store)
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda snapshot: ModelDirective(silence=True),
+    )
+    runtime._active_turn_time = NOW
+
+    payloads = {
+        "missing": {
+            "object_id": "missing",
+            "revision": 1,
+            "object_type": "observation",
+            "subject_id": "user_1",
+        },
+        "corrupt": {
+            "object_id": "corrupt",
+            "revision": 1,
+            "object_type": "observation",
+            "subject_id": "user_1",
+            "learned_at": "not-a-timestamp",
+        },
+    }
+
+    monkeypatch.setattr(
+        store,
+        "get_payload",
+        lambda object_id, revision=None, **kwargs: dict(payloads[str(object_id)]),
+    )
+
+    with pytest.raises(ValueError):
+        runtime._inspect_world_object("missing", revision=1)
+    with pytest.raises(ValueError):
+        runtime._inspect_world_object("corrupt", revision=1)
+
+    runtime._active_turn_time = None
+
+
+def test_cg001_historical_ai_world_reads_preserve_latest_knowable_revision(tmp_path):
+    """Historical cognition reads expose rev1 known at T1, not the T2 replacement."""
+    db = tmp_path / "cg001_ai_world_revision_cut.db"
+    store = SQLiteWorldStore(db)
+    t1 = NOW
+    t2 = NOW + timedelta(hours=1)
+
+    initial_evidence = Observation(
+        object_id="obs_cg001_aiworld_initial",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(t1 - timedelta(hours=1)),
+        learned_at=t1 - timedelta(hours=1),
+        recorded_at=t1 - timedelta(hours=1),
+        created_by="test:cg001",
+        source_kind="conversation",
+        modality="text",
+        value="cg001 historical preference initially prefers tea",
+        metadata={"dimension": "dim:user_ai_interaction", "role": "user"},
+    )
+    correction = Observation(
+        object_id="obs_cg001_aiworld_correction",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(t1 - timedelta(days=1)),
+        learned_at=t2,
+        recorded_at=t2,
+        created_by="test:cg001",
+        source_kind="conversation",
+        modality="text",
+        value="cg001 late correction now prefers coffee",
+        metadata={"dimension": "dim:user_ai_interaction", "role": "user"},
+    )
+    store.commit(
+        [initial_evidence, correction],
+        OperationRequest(
+            operation_name="test.cg001.seed.aiworld.revision_cut",
+            expected_world_revision=0,
+            reason="seed early evidence and a later-learned correction",
+            idempotency_key="test-cg001-aiworld-revision-cut",
+            source_class=SourceClass.USER,
+        ),
+    )
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+    service = AIWorldCognitionService(store=store, index=index)
+    original = service.commit(
+        AIWorldClaimRequest(
+            domain=AIWorldDomain.USER_UNDERSTANDING,
+            statement="cg001 historical cognition rev1 prefers tea",
+            evidence_refs=(ObjectRef(object_id=initial_evidence.object_id, revision=1),),
+            confidence=0.9,
+            scope_key="cg001.temporal.preference",
+            tags=("core_context",),
+        ),
+        learned_at=t1 - timedelta(minutes=30),
+    )
+    claim_id = original.claim.claim_id
+    service.revise(
+        target_ref=ObjectRef(object_id=claim_id, revision=1),
+        evidence_refs=(ObjectRef(object_id=correction.object_id, revision=1),),
+        replacement_statement="cg001 late cognition rev2 prefers coffee",
+        reason="later evidence changed the preference",
+        changed_at=t2,
+    )
+    index.catch_up()
+
+    def model(snapshot):
+        history = snapshot.capability_history
+        identity = str(snapshot.cockpit["ai_identity"])
+        assert "historical cognition rev1 prefers tea" in identity
+        assert "late cognition rev2 prefers coffee" not in identity
+
+        if not history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="search_world",
+                        arguments={
+                            "query": "historical cognition rev1 prefers tea",
+                            "limit": 10,
+                        },
+                    ),
+                )
+            )
+        if len(history) == 1:
+            search = history[-1]
+            assert search.ok is True
+            historical_hit = next(
+                item for item in search.data
+                if item["object_id"] == claim_id
+            )
+            assert historical_hit["revision"] == 1
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="read_ai_world",
+                        arguments={
+                            "domains": ["user_understanding"],
+                            "scope_key": "cg001.temporal.preference",
+                            "limit": 10,
+                        },
+                    ),
+                )
+            )
+        if len(history) == 2:
+            read = history[-1]
+            assert read.ok is True
+            assert len(read.data) == 1
+            assert read.data[0]["object_id"] == claim_id
+            assert read.data[0]["revision"] == 1
+            assert "prefers tea" in read.data[0]["statement"]
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="inspect_world_object",
+                        arguments={"object_id": claim_id},
+                    ),
+                )
+            )
+
+        exact = history[-1]
+        assert exact.ok is True
+        assert exact.data["object_id"] == claim_id
+        assert exact.data["revision"] == 1
+        assert "prefers tea" in exact.data["content"]
+        return ModelDirective(response="historical cognition stayed on rev1")
+
+    runtime = FusedTurnRuntime(store=store, index=index, model_handler=model)
+    result = runtime.run_turn(
+        session_id="cg001-aiworld-history",
+        turn_index=1,
+        user_input="read the historical cognition cut",
+        current_topic=None,
+        occurred_at=t1,
+    )
+
+    assert result.runtime.response == "historical cognition stayed on rev1"

@@ -4,7 +4,11 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from aios_core.ai_world import AIWorldDomain
+from aios_core.ai_world import (
+    AIWorldClaimRequest,
+    AIWorldCognitionService,
+    AIWorldDomain,
+)
 from aios_core.contracts.enums import (
     ActionStatus,
     AttentionClass,
@@ -2605,3 +2609,396 @@ def test_loop_completed_retry_keeps_prior_attempt_model_calls_in_budget_status(
     assert status["used_wakes"] == 1
     assert status["used_model_calls"] == 2
     assert status["used_tokens"] == 24
+
+
+def test_cg001_resumed_c14_uses_first_start_as_model_visible_read_cut(tmp_path):
+    """A resumed C14 execution must not read T2 facts while writing cognition at T1."""
+    store, index = _world(tmp_path)
+    leaf = _observation(
+        store,
+        "obs_cg001_c14_t1_leaf",
+        value="cg001 c14 grounding leaf",
+        dimension="dim:cg001:c14",
+        at=NOW,
+    )
+    summary_ref = _summary(
+        store,
+        "sum_cg001_c14",
+        (leaf,),
+        dimension="dim:cg001:c14",
+        at=NOW + timedelta(minutes=10),
+    )
+    scheduled = _schedule(store, index, summary_ref)
+    t1 = NOW + timedelta(minutes=30)
+    t2 = t1 + timedelta(minutes=5)
+
+    def first_model(snapshot):
+        return ModelDirective(
+            capability_calls=(
+                CapabilityCall(
+                    name="search_world",
+                    arguments={"query": "cg001 c14 first pass", "limit": 1},
+                ),
+            ),
+            **_usage(snapshot),
+        )
+
+    first_runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=first_model,
+        max_tool_rounds=0,
+    )
+    first = first_runtime.run_wake(
+        wake_ref=ObjectRef(
+            object_id=scheduled.wake.wake_id,
+            revision=scheduled.wake.revision,
+        ),
+        now=t1,
+    )
+    assert first.runtime is not None
+    assert first.runtime.termination_reason == "tool_round_budget_exhausted"
+
+    late = _observation(
+        store,
+        "obs_cg001_c14_t2_late",
+        value="cg001 c14 late temporal marker gamma",
+        dimension="dim:cg001:c14",
+        at=t2,
+    )
+    late_cognition_marker = "cg001 c14 T2 cognition must not enter T1 cockpit"
+    AIWorldCognitionService(store=store, index=index).commit(
+        AIWorldClaimRequest(
+            domain=AIWorldDomain.USER_UNDERSTANDING,
+            statement=late_cognition_marker,
+            evidence_refs=(late,),
+            confidence=0.9,
+            scope_key="cg001.c14.late",
+            tags=("core_context",),
+        ),
+        learned_at=t2,
+    )
+    index.catch_up()
+    seen = {}
+
+    def resumed_model(snapshot):
+        history = snapshot.capability_history
+        assert late_cognition_marker not in str(snapshot.cockpit["ai_identity"])
+        derivation = snapshot.cockpit["task_context"]["cognitive_derivation"]
+        assert late_cognition_marker not in str(derivation["current_ai_world"])
+        if not history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="search_world",
+                        arguments={
+                            "query": "cg001 c14 late temporal marker gamma",
+                            "limit": 5,
+                        },
+                    ),
+                ),
+                **_usage(snapshot),
+            )
+        if len(history) == 1:
+            search = history[-1]
+            assert search.ok is True
+            assert late.object_id not in {
+                item["object_id"] for item in search.data
+            }
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="commit_claim",
+                        arguments={
+                            "content": "cg001 resumed C14 write remains pinned to T1",
+                            "evidence_refs": [leaf.model_dump(mode="json")],
+                            "confidence": 0.8,
+                            "dimension": "dim:cg001:cognition",
+                        },
+                    ),
+                ),
+                **_usage(snapshot),
+            )
+        written = history[-1]
+        assert written.ok is True
+        seen["claim_id"] = written.data["claim_id"]
+        return ModelDirective(silence=True, **_usage(snapshot))
+
+    resumed_runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=resumed_model,
+    )
+    resumed = resumed_runtime.run_wake(
+        wake_ref=ObjectRef(
+            object_id=first.wake.wake_id,
+            revision=first.wake.revision,
+        ),
+        now=t2,
+    )
+
+    assert resumed.runtime is not None
+    assert resumed.runtime.silenced is True
+    written_payload = store.get_payload(seen["claim_id"])
+    assert datetime.fromisoformat(
+        str(written_payload["learned_at"]).replace("Z", "+00:00")
+    ) == t1
+
+
+
+def test_cg001_corrective_resumed_c14_lineage_excludes_t2_dependency_and_leaf(
+    tmp_path,
+):
+    """Corrective blocker: resumed T1 C14 lineage must not traverse T2 support."""
+    store, index = _world(tmp_path)
+    t1_leaf = _observation(
+        store,
+        "obs_cg001_corrective_t1_leaf",
+        value="cg001 corrective T1 grounded leaf",
+        dimension="dim:cg001:corrective",
+        at=NOW,
+    )
+    summary_ref = _summary(
+        store,
+        "sum_cg001_corrective",
+        (t1_leaf,),
+        dimension="dim:cg001:corrective",
+        at=NOW + timedelta(minutes=10),
+    )
+    t1_dependency_leaf = _observation(
+        store,
+        "obs_cg001_corrective_t1_dependency_leaf",
+        value="cg001 corrective T1 dependency-only leaf",
+        dimension="dim:cg001:corrective",
+        at=NOW + timedelta(minutes=15),
+    )
+    t1_dependency = Dependency(
+        object_id="dep_cg001_corrective_t1_support",
+        subject_id="user_1",
+        learned_at=NOW + timedelta(minutes=20),
+        recorded_at=NOW + timedelta(minutes=20),
+        created_by="test:cg001:corrective",
+        dependent_ref=summary_ref,
+        dependency_ref=t1_dependency_leaf,
+        dependency_type="summary_uses_source",
+    )
+    _commit(
+        store,
+        [t1_dependency],
+        source_class=SourceClass.MAINTENANCE,
+        tag="cg001-corrective-t1-dependency",
+    )
+    scheduled = _schedule(store, index, summary_ref)
+    t1 = NOW + timedelta(minutes=30)
+    t2 = t1 + timedelta(minutes=5)
+
+    def first_model(snapshot):
+        return ModelDirective(
+            capability_calls=(
+                CapabilityCall(
+                    name="search_world",
+                    arguments={"query": "cg001 corrective first pass", "limit": 1},
+                ),
+            ),
+            **_usage(snapshot),
+        )
+
+    first_runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=first_model,
+        max_tool_rounds=0,
+    )
+    first = first_runtime.run_wake(
+        wake_ref=ObjectRef(
+            object_id=scheduled.wake.wake_id,
+            revision=scheduled.wake.revision,
+        ),
+        now=t1,
+    )
+    assert first.runtime is not None
+    assert first.runtime.termination_reason == "tool_round_budget_exhausted"
+
+    late_leaf = _observation(
+        store,
+        "obs_cg001_corrective_t2_leaf",
+        value="cg001 corrective T2-only support leaf",
+        dimension="dim:cg001:corrective",
+        at=t2,
+    )
+    late_dependency = Dependency(
+        object_id="dep_cg001_corrective_t2_support",
+        subject_id="user_1",
+        learned_at=t2,
+        recorded_at=t2,
+        created_by="test:cg001:corrective",
+        dependent_ref=summary_ref,
+        dependency_ref=late_leaf,
+        dependency_type="summary_uses_source",
+    )
+    _commit(
+        store,
+        [late_dependency],
+        source_class=SourceClass.MAINTENANCE,
+        tag="cg001-corrective-late-dependency",
+    )
+    index.catch_up()
+
+    observed = {}
+
+    def resumed_model(snapshot):
+        lineage = snapshot.cockpit["task_context"]["cognitive_derivation"][
+            "runtime_derived_lineage"
+        ]
+        observed["lineage"] = lineage
+        lineage_text = str(lineage)
+        assert late_dependency.object_id not in lineage_text
+        assert late_leaf.object_id not in lineage_text
+        assert t1_leaf.object_id in lineage_text
+        assert t1_dependency_leaf.object_id in lineage_text
+        return ModelDirective(silence=True, **_usage(snapshot))
+
+    resumed_runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=resumed_model,
+    )
+    resumed = resumed_runtime.run_wake(
+        wake_ref=ObjectRef(
+            object_id=first.wake.wake_id,
+            revision=first.wake.revision,
+        ),
+        now=t2,
+    )
+
+    assert resumed.runtime is not None and resumed.runtime.silenced is True
+    assert t1_leaf.object_id in str(observed["lineage"])
+    assert t1_dependency_leaf.object_id in str(observed["lineage"])
+
+
+def test_cg001_corrective_resumed_c14_bundle_lineage_excludes_t2_support(
+    tmp_path,
+):
+    """Bundle members use the same T1-cut lineage reader on resume."""
+    store, index = _world(tmp_path)
+    siblings = _two_c14_siblings(
+        store,
+        index,
+        prefix="cg001_corrective_bundle",
+    )
+    t1_leaf, target_summary, _scheduled = siblings[0]
+    t1_dependency_leaf = _observation(
+        store,
+        "obs_cg001_corrective_bundle_t1_dependency_leaf",
+        value="cg001 corrective bundle T1 dependency-only leaf",
+        dimension="dim:cg001:corrective:bundle",
+        at=NOW + timedelta(minutes=15),
+    )
+    t1_dependency = Dependency(
+        object_id="dep_cg001_corrective_bundle_t1_support",
+        subject_id="user_1",
+        learned_at=NOW + timedelta(minutes=20),
+        recorded_at=NOW + timedelta(minutes=20),
+        created_by="test:cg001:corrective:bundle",
+        dependent_ref=target_summary,
+        dependency_ref=t1_dependency_leaf,
+        dependency_type="summary_uses_source",
+    )
+    _commit(
+        store,
+        [t1_dependency],
+        source_class=SourceClass.MAINTENANCE,
+        tag="cg001-corrective-bundle-t1-dependency",
+    )
+    index.catch_up()
+    t1 = NOW + timedelta(minutes=30)
+    t2 = t1 + timedelta(minutes=5)
+
+    def first_model(snapshot):
+        bundle = snapshot.cockpit["task_context"]["cognitive_derivation_bundle"]
+        assert bundle["member_count"] == 2
+        return ModelDirective(
+            capability_calls=(
+                CapabilityCall(
+                    name="search_world",
+                    arguments={"query": "cg001 bundle first pass", "limit": 1},
+                ),
+            ),
+            **_usage(snapshot),
+        )
+
+    first_runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=first_model,
+        max_tool_rounds=0,
+    )
+    first = first_runtime.run_wake(
+        wake_ref=ObjectRef(
+            object_id=siblings[0][2].wake.wake_id,
+            revision=siblings[0][2].wake.revision,
+        ),
+        now=t1,
+    )
+    assert first.runtime is not None
+    assert first.runtime.termination_reason == "tool_round_budget_exhausted"
+
+    late_leaf = _observation(
+        store,
+        "obs_cg001_corrective_bundle_t2_leaf",
+        value="cg001 corrective bundle T2-only support leaf",
+        dimension="dim:cg001:corrective:bundle",
+        at=t2,
+    )
+    late_dependency = Dependency(
+        object_id="dep_cg001_corrective_bundle_t2_support",
+        subject_id="user_1",
+        learned_at=t2,
+        recorded_at=t2,
+        created_by="test:cg001:corrective:bundle",
+        dependent_ref=target_summary,
+        dependency_ref=late_leaf,
+        dependency_type="summary_uses_source",
+    )
+    _commit(
+        store,
+        [late_dependency],
+        source_class=SourceClass.MAINTENANCE,
+        tag="cg001-corrective-bundle-late-dependency",
+    )
+    index.catch_up()
+
+    observed = {}
+
+    def resumed_model(snapshot):
+        bundle = snapshot.cockpit["task_context"]["cognitive_derivation_bundle"]
+        target = next(
+            item
+            for item in bundle["members"]
+            if item["summary_ref"]["object_id"] == target_summary.object_id
+        )
+        lineage = target["runtime_derived_lineage"]
+        observed["lineage"] = lineage
+        lineage_text = str(lineage)
+        assert late_dependency.object_id not in lineage_text
+        assert late_leaf.object_id not in lineage_text
+        assert t1_leaf.object_id in lineage_text
+        assert t1_dependency_leaf.object_id in lineage_text
+        return ModelDirective(silence=True, **_usage(snapshot))
+
+    resumed_runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=resumed_model,
+    )
+    resumed = resumed_runtime.run_wake(
+        wake_ref=ObjectRef(
+            object_id=first.wake.wake_id,
+            revision=first.wake.revision,
+        ),
+        now=t2,
+    )
+
+    assert resumed.runtime is not None and resumed.runtime.silenced is True
+    assert t1_leaf.object_id in str(observed["lineage"])
+    assert t1_dependency_leaf.object_id in str(observed["lineage"])
