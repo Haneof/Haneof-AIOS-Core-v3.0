@@ -157,7 +157,30 @@ The drift from construction main consisted of CORE-CI-FIX-001 corrective accepta
 
 If FIX-001 is integrated before FIX-003 independent acceptance/integration, the active ruling still requires FIX-003 to be rebased/merged onto that newer main, all targeted/full gates rerun, and independent acceptance repeated on the rebased exact head.
 
-## 8. Handoff
+## 8. Corrective-001 — claim to initial-attempt crash gap
+
+Independent review #162 rejected exact head `81d626820cfa31e4f3f1aba0e892eb48cb11e46c` with one blocker:
+`CORE-GAP-FIX-003-ACCEPT-BLOCKER-001`.
+
+The corrective uses an explicit durable pre-attempt protocol. A fresh turn claim is now written as
+`model_attempt_pre_admission_v1`. Zero user-turn attempts are recoverable only for that exact marker,
+because provider dispatch is unreachable before deterministic round-0 attempt admission. Immediately
+after that shared `background_model_attempts` row is durable, the execution protocol is promoted to
+`model_attempt_v1`; from then on recovery disposition comes from the attempt ledger.
+
+Legacy rows with no protocol and old `model_attempt_v1` rows with zero attempts remain IN_DOUBT.
+No Wake/Periodic Review, metering, budget, background lifecycle, or FIX-001 temporal-read behavior is
+changed.
+
+New fault-injection coverage crashes twice at the claim -> initial-attempt boundary, requires a fresh
+one-shot authorization after each crash, then proves one provider execution, one deterministic round-0
+attempt row, and one assistant output. The existing ambiguous-dispatch, response-returned,
+ModelDispatchNotSubmitted, completion-recovery, conflicting-input, migration, and background compatibility
+coverage remains in place.
+
+Exact corrective CI/run IDs are recorded in PR #157 after GitHub Actions completes on the final head.
+
+## 9. Handoff
 
 Author status: REVIEW_READY
 

@@ -19,6 +19,7 @@ from aios_core.contracts.refs import ObjectRef
 from aios_core.storage.idempotency import canonical_json_dumps
 
 
+TURN_PRE_ATTEMPT_PROTOCOL = "model_attempt_pre_admission_v1"
 TURN_MODEL_ATTEMPT_PROTOCOL = "model_attempt_v1"
 TurnRecoveryDisposition = Literal[
     "not_started",
@@ -180,11 +181,24 @@ class TurnExecutionStore:
             return "completed"
         if bool(row["retry_authorized"]):
             return "retry_authorized"
-        if row["attempt_protocol"] != TURN_MODEL_ATTEMPT_PROTOCOL:
+        protocol = row["attempt_protocol"]
+        if attempt_states:
+            if protocol not in {
+                TURN_PRE_ATTEMPT_PROTOCOL,
+                TURN_MODEL_ATTEMPT_PROTOCOL,
+            }:
+                return "in_doubt"
+            if all(
+                state in {"admitted", "not_submitted"} for state in attempt_states
+            ):
+                return "safe_to_retry"
             return "in_doubt"
-        if attempt_states and all(
-            state in {"admitted", "not_submitted"} for state in attempt_states
-        ):
+        if protocol == TURN_PRE_ATTEMPT_PROTOCOL:
+            # Corrective invariant: this explicit protocol is written only by a
+            # new turn claim before round-0 attempt admission. Provider dispatch
+            # cannot occur before that attempt exists, so zero attempts is safe
+            # only for this marker. Legacy/old model_attempt_v1 zero-attempt rows
+            # remain fail-closed.
             return "safe_to_retry"
         return "in_doubt"
 
@@ -311,7 +325,80 @@ class TurnExecutionStore:
                 (subject_id, session_id, turn_index, input_hash, state,
                  attempt_protocol, retry_authorized, retry_count)
                 VALUES (?, ?, ?, ?, 'started', ?, 0, 0)
-            """, (*key, digest, TURN_MODEL_ATTEMPT_PROTOCOL))
+            """, (*key, digest, TURN_PRE_ATTEMPT_PROTOCOL))
+
+    def mark_initial_attempt_admitted(
+        self,
+        *,
+        subject_id: str,
+        session_id: str,
+        turn_index: int,
+        user_input: str,
+        occurred_at: str,
+        assistant_id: str,
+    ) -> None:
+        """Promote an explicit pre-attempt claim after round-0 admission is durable."""
+
+        digest = self._input_hash(user_input=user_input, occurred_at=occurred_at)
+        execution_id = self.execution_id_for(
+            subject_id=subject_id,
+            session_id=session_id,
+            turn_index=turn_index,
+        )
+        key = (subject_id, session_id, turn_index)
+        with self._connect() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            row = conn.execute("""
+                SELECT input_hash, state, attempt_protocol, retry_authorized,
+                       retry_count, reconciliation_evidence
+                FROM runtime_turn_executions
+                WHERE subject_id=? AND session_id=? AND turn_index=?
+            """, key).fetchone()
+            ref = self._assistant_ref(conn, assistant_id)
+            if row is None:
+                raise TurnExecutionInDoubt(
+                    state="no_durable_execution_claim",
+                    assistant_ref=ref,
+                )
+            self._validate_input(row, digest=digest, assistant_ref=ref)
+            if row["state"] == "completed" or ref is not None:
+                raise TurnAlreadyCompleted(
+                    state="completed_output_present",
+                    assistant_ref=ref,
+                )
+            if row["attempt_protocol"] == TURN_MODEL_ATTEMPT_PROTOCOL:
+                return
+            if row["attempt_protocol"] != TURN_PRE_ATTEMPT_PROTOCOL:
+                raise TurnExecutionInDoubt(
+                    state="unknown_attempt_protocol",
+                    assistant_ref=None,
+                )
+            attempt = conn.execute("""
+                SELECT attempt_id
+                FROM background_model_attempts
+                WHERE subject_id=? AND work_kind='user_turn' AND work_id=?
+                  AND model_round_index=0
+            """, (subject_id, execution_id)).fetchone()
+            if attempt is None:
+                raise TurnExecutionInDoubt(
+                    state="initial_attempt_not_durable",
+                    assistant_ref=None,
+                )
+            changed = conn.execute("""
+                UPDATE runtime_turn_executions
+                SET attempt_protocol=?
+                WHERE subject_id=? AND session_id=? AND turn_index=?
+                  AND state='started' AND attempt_protocol=?
+            """, (
+                TURN_MODEL_ATTEMPT_PROTOCOL,
+                *key,
+                TURN_PRE_ATTEMPT_PROTOCOL,
+            )).rowcount
+            if changed != 1:
+                raise TurnExecutionInDoubt(
+                    state="attempt_protocol_promotion_race",
+                    assistant_ref=None,
+                )
 
     def authorize_retry(
         self,
@@ -357,14 +444,22 @@ class TurnExecutionStore:
                 conn, subject_id=subject_id, execution_id=execution_id
             )
             attempt_states = tuple(str(item["state"]) for item in attempts)
-            if (
-                row["attempt_protocol"] != TURN_MODEL_ATTEMPT_PROTOCOL
-                or not attempt_states
-                or not all(
+            protocol = row["attempt_protocol"]
+            safe_pre_attempt = (
+                protocol == TURN_PRE_ATTEMPT_PROTOCOL and not attempt_states
+            )
+            safe_attempt_ledger = (
+                bool(attempt_states)
+                and protocol in {
+                    TURN_PRE_ATTEMPT_PROTOCOL,
+                    TURN_MODEL_ATTEMPT_PROTOCOL,
+                }
+                and all(
                     state in {"admitted", "not_submitted"}
                     for state in attempt_states
                 )
-            ):
+            )
+            if not (safe_pre_attempt or safe_attempt_ledger):
                 raise TurnExecutionInDoubt(
                     state="provider_execution_not_proven_absent",
                     assistant_ref=None,

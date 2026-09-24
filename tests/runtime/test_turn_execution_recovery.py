@@ -14,6 +14,7 @@ from aios_core.runtime import (
     TurnInputConflict,
 )
 from aios_core.runtime.background_attempt import BackgroundModelAttemptStore
+from aios_core.runtime.turn_execution import TURN_MODEL_ATTEMPT_PROTOCOL
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 
@@ -50,6 +51,166 @@ def successful_directive(request_id="cg003-ok"):
             request_id=request_id,
         ),
     )
+
+
+
+def test_cg003_claim_to_attempt_crash_is_repeatably_recoverable(tmp_path, monkeypatch):
+    store, index = world(tmp_path)
+    provider_calls = []
+
+    def model(_snapshot):
+        provider_calls.append("called")
+        return successful_directive("cg003-claim-attempt-recovery")
+
+    first = FusedTurnRuntime(store=store, index=index, model_handler=model)
+
+    def crash_before_initial_attempt(**_kwargs):
+        raise RuntimeError("SYNTHETIC crash before initial attempt admission")
+
+    monkeypatch.setattr(
+        first.background_model_attempts,
+        "admit",
+        crash_before_initial_attempt,
+    )
+    with pytest.raises(RuntimeError, match="before initial attempt admission"):
+        first.run_turn(**TURN)
+
+    inspected = first.inspect_turn_execution(**TURN)
+    assert inspected.recovery_disposition == "safe_to_retry"
+    assert inspected.model_attempts == ()
+    assert provider_calls == []
+
+    reopened_store = SQLiteWorldStore(store.db_path)
+    second = FusedTurnRuntime(
+        store=reopened_store,
+        index=WorldSearchIndex(index.db_path, store=reopened_store),
+        model_handler=model,
+    )
+    authorized = second.authorize_turn_retry(
+        **TURN,
+        evidence="explicit pre-attempt protocol proves dispatch was impossible",
+    )
+    assert authorized.recovery_disposition == "retry_authorized"
+
+    monkeypatch.setattr(
+        second.background_model_attempts,
+        "admit",
+        crash_before_initial_attempt,
+    )
+    with pytest.raises(RuntimeError, match="before initial attempt admission"):
+        second.run_turn(**TURN)
+
+    reopened_store = SQLiteWorldStore(store.db_path)
+    third = FusedTurnRuntime(
+        store=reopened_store,
+        index=WorldSearchIndex(index.db_path, store=reopened_store),
+        model_handler=model,
+    )
+    inspected_again = third.inspect_turn_execution(**TURN)
+    assert inspected_again.recovery_disposition == "safe_to_retry"
+    assert inspected_again.model_attempts == ()
+    assert inspected_again.retry_count == 1
+
+    # The first authorization was consumed by the crashed retry claim. A second
+    # ordinary run cannot reuse it; explicit authorization is one-shot.
+    with pytest.raises(TurnExecutionInDoubt):
+        third.run_turn(**TURN)
+
+    third.authorize_turn_retry(
+        **TURN,
+        evidence="second pre-attempt crash still proves dispatch was impossible",
+    )
+    result = third.run_turn(**TURN)
+    assert result.runtime.response == "SYNTHETIC recovered response"
+    assert provider_calls == ["called"]
+
+    final = third.inspect_turn_execution(**TURN)
+    assert final.recovery_disposition == "completed"
+    assert len(final.model_attempts) == 1
+    expected_attempt_id = BackgroundModelAttemptStore.attempt_id_for(
+        subject_id=third.subject_id,
+        work_kind="user_turn",
+        work_id=final.execution_id,
+        model_round_index=0,
+    )
+    assert final.model_attempts[0].attempt_id == expected_attempt_id
+
+    _, _, assistant_id = third.ingestor._turn_identity(
+        TURN["session_id"], TURN["turn_index"]
+    )
+    with sqlite3.connect(store.db_path) as conn:
+        assistant_rows = conn.execute(
+            "SELECT COUNT(*) FROM object_revisions WHERE object_id=?",
+            (assistant_id,),
+        ).fetchone()[0]
+        attempt_rows = conn.execute(
+            """
+            SELECT COUNT(*) FROM background_model_attempts
+            WHERE subject_id=? AND work_kind='user_turn' AND work_id=?
+              AND model_round_index=0
+            """,
+            (third.subject_id, final.execution_id),
+        ).fetchone()[0]
+    assert assistant_rows == 1
+    assert attempt_rows == 1
+
+
+def test_cg003_legacy_and_old_v1_zero_attempt_rows_remain_in_doubt(tmp_path):
+    store, index = world(tmp_path)
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=lambda _snapshot: successful_directive("must-not-run"),
+    )
+    occurred_iso = "2026-09-24T07:00:00Z"
+
+    def insert_started(*, session_id, turn_index, protocol):
+        digest = runtime.turn_executions._input_hash(
+            user_input=TURN["user_input"],
+            occurred_at=occurred_iso,
+        )
+        with sqlite3.connect(store.db_path) as conn:
+            conn.execute(
+                """
+                INSERT INTO runtime_turn_executions(
+                    subject_id, session_id, turn_index, input_hash, state,
+                    attempt_protocol, retry_authorized, retry_count
+                ) VALUES (?, ?, ?, ?, 'started', ?, 0, 0)
+                """,
+                (
+                    runtime.subject_id,
+                    session_id,
+                    turn_index,
+                    digest,
+                    protocol,
+                ),
+            )
+
+    insert_started(session_id="legacy-zero", turn_index=1, protocol=None)
+    legacy_turn = {**TURN, "session_id": "legacy-zero"}
+    legacy = runtime.inspect_turn_execution(**legacy_turn)
+    assert legacy.recovery_disposition == "in_doubt"
+    assert legacy.model_attempts == ()
+    with pytest.raises(TurnExecutionInDoubt):
+        runtime.authorize_turn_retry(
+            **legacy_turn,
+            evidence="legacy zero-attempt rows are not safe proof",
+        )
+
+    insert_started(
+        session_id="old-v1-zero",
+        turn_index=1,
+        protocol=TURN_MODEL_ATTEMPT_PROTOCOL,
+    )
+    old_v1_turn = {**TURN, "session_id": "old-v1-zero"}
+    old_v1 = runtime.inspect_turn_execution(**old_v1_turn)
+    assert old_v1.recovery_disposition == "in_doubt"
+    assert old_v1.model_attempts == ()
+    with pytest.raises(TurnExecutionInDoubt):
+        runtime.authorize_turn_retry(
+            **old_v1_turn,
+            evidence="old v1 zero-attempt rows remain fail-closed",
+        )
 
 
 def test_cg003_pre_model_failure_is_durably_proven_not_dispatched(tmp_path, monkeypatch):
@@ -271,6 +432,12 @@ def test_cg003_durable_assistant_output_recovers_completion_without_model_reinvo
     )
     assert recovered.recovery_disposition == "completed"
     assert recovered.assistant_ref == inspected.assistant_ref
+    recovered_again = restarted.recover_turn_completion(
+        **TURN,
+        evidence="repeated reconciliation is idempotent",
+    )
+    assert recovered_again.recovery_disposition == "completed"
+    assert recovered_again.assistant_ref == inspected.assistant_ref
 
     with pytest.raises(TurnAlreadyCompleted) as error:
         restarted.run_turn(**TURN)

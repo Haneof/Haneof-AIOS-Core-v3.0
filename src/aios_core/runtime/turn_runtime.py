@@ -3038,6 +3038,18 @@ class FusedTurnRuntime:
             world_revision=int(self.store.current_world_revision()),
             admitted_at=occurred_at,
         )
+        # Corrective-001: only after deterministic round-0 attempt admission is
+        # durable do we promote the turn out of the explicit pre-attempt protocol.
+        # A crash before this line is therefore mechanically recoverable; a crash
+        # after it delegates disposition to the shared attempt ledger.
+        self.turn_executions.mark_initial_attempt_admitted(
+            subject_id=self.subject_id,
+            session_id=session,
+            turn_index=turn_index,
+            user_input=user_input,
+            occurred_at=occurred_iso,
+            assistant_id=assistant_id,
+        )
 
         self.attention_watches.expire_due(now=occurred_at)
 
