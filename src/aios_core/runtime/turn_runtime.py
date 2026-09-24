@@ -136,6 +136,14 @@ class _KnowledgeCutoffStoreView:
         kwargs["knowledge_cutoff"] = self._cutoff
         return self._store.list_payloads(*args, **kwargs)
 
+    def iter_latest_payloads(self, *args: Any, **kwargs: Any):
+        kwargs["knowledge_cutoff"] = self._cutoff
+        return self._store.iter_latest_payloads(*args, **kwargs)
+
+    def get_payloads_for_ids(self, *args: Any, **kwargs: Any) -> dict[str, dict[str, Any]]:
+        kwargs["knowledge_cutoff"] = self._cutoff
+        return self._store.get_payloads_for_ids(*args, **kwargs)
+
     def __getattr__(self, name: str) -> Any:
         return getattr(self._store, name)
 

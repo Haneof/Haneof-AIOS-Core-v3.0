@@ -5,7 +5,7 @@ import sqlite3
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Iterable, Iterator, TypeVar
+from typing import Annotated, Iterable, Iterator, Sequence, TypeVar
 
 from pydantic import BaseModel, Field, JsonValue, TypeAdapter, ValidationError
 
@@ -1304,6 +1304,194 @@ class SQLiteWorldStore:
             )
             for row in rows
         ]
+
+    def iter_latest_payloads(
+        self,
+        *,
+        object_type: ObjectType | None = None,
+        subject_id: str | None = None,
+        as_of_world_revision: int | None = None,
+        knowledge_cutoff: datetime | None = None,
+        payload_equals: dict[str, object] | None = None,
+        metadata_equals: dict[str, object] | None = None,
+        metadata_in: dict[str, Sequence[object]] | None = None,
+        required_metadata_tags: Sequence[str] = (),
+        order_by_metadata_key: str | None = None,
+    ) -> Iterator[dict]:
+        """Stream newest visible payloads without materializing the whole World.
+
+        The latest visible revision is chosen before mutable payload/subject
+        filtering, preserving the same revision and historical-cut semantics as
+        list_payloads. Optional JSON predicates are mechanical pushdowns only;
+        callers must still perform their typed semantic validation.
+        """
+
+        visible_clauses: list[str] = []
+        params: list[object] = []
+        if as_of_world_revision is not None:
+            as_of_world_revision = _normalize_query_integer(
+                as_of_world_revision, "as_of_world_revision"
+            )
+            visible_clauses.append("world_revision<=?")
+            params.append(as_of_world_revision)
+        if knowledge_cutoff is not None:
+            visible_clauses.append("learned_at<=?")
+            params.append(_normalize_query_cutoff(knowledge_cutoff))
+
+        visible_where = (
+            ""
+            if not visible_clauses
+            else " WHERE " + " AND ".join(visible_clauses)
+        )
+        latest_sql = (
+            "SELECT object_id, MAX(revision) AS max_revision "
+            "FROM object_revisions"
+            + visible_where
+            + " GROUP BY object_id"
+        )
+
+        clauses = ["1=1"]
+        if object_type is not None:
+            clauses.append("o.object_type=?")
+            params.append(object_type.value)
+        if subject_id is not None:
+            clauses.append("o.subject_id=?")
+            params.append(subject_id)
+
+        for key, value in (payload_equals or {}).items():
+            if not isinstance(key, str) or not key.strip():
+                raise ValueError("payload_equals keys must be non-blank strings")
+            clauses.append("json_extract(o.payload_json, ?)=?")
+            params.extend((f"$.{key.strip()}", value))
+
+        for key, value in (metadata_equals or {}).items():
+            if not isinstance(key, str) or not key.strip():
+                raise ValueError("metadata_equals keys must be non-blank strings")
+            clauses.append("json_extract(o.payload_json, ?)=?")
+            params.extend((f"$.metadata.{key.strip()}", value))
+
+        for key, values in (metadata_in or {}).items():
+            if not isinstance(key, str) or not key.strip():
+                raise ValueError("metadata_in keys must be non-blank strings")
+            normalized = tuple(values)
+            if not normalized:
+                return
+            placeholders = ",".join("?" for _ in normalized)
+            clauses.append(
+                f"json_extract(o.payload_json, ?) IN ({placeholders})"
+            )
+            params.append(f"$.metadata.{key.strip()}")
+            params.extend(normalized)
+
+        for tag in required_metadata_tags:
+            clean_tag = str(tag).strip()
+            if not clean_tag:
+                raise ValueError(
+                    "required_metadata_tags must not contain blank values"
+                )
+            clauses.append(
+                "EXISTS ("
+                "SELECT 1 FROM json_each(o.payload_json, '$.metadata.tags') tag "
+                "WHERE CAST(tag.value AS TEXT)=?"
+                ")"
+            )
+            params.append(clean_tag)
+
+        order_parts = ["o.learned_at DESC"]
+        if order_by_metadata_key is not None:
+            key = str(order_by_metadata_key).strip()
+            if not key:
+                raise ValueError("order_by_metadata_key must not be blank")
+            order_parts.append("json_extract(o.payload_json, ?) ASC")
+            params.append(f"$.metadata.{key}")
+        order_parts.append("o.object_id ASC")
+
+        sql = (
+            "SELECT o.object_id, o.payload_json "
+            "FROM object_revisions o JOIN ("
+            + latest_sql
+            + ") latest ON latest.object_id=o.object_id "
+            "AND latest.max_revision=o.revision WHERE "
+            + " AND ".join(clauses)
+            + " ORDER BY "
+            + ", ".join(order_parts)
+        )
+
+        with self._connection() as conn:
+            cursor = conn.execute(sql, tuple(params))
+            for row in cursor:
+                object_id = str(row["object_id"])
+                yield _decode_durable_object_json(
+                    row["payload_json"],
+                    reason="corrupt_object_payload",
+                    object_id=object_id,
+                )
+
+    def get_payloads_for_ids(
+        self,
+        object_ids: Sequence[str],
+        *,
+        as_of_world_revision: int | None = None,
+        knowledge_cutoff: datetime | None = None,
+    ) -> dict[str, dict]:
+        """Return the newest visible payload for each requested object id.
+
+        This is the batch equivalent of repeated get_payload latest reads.
+        Chunking stays below SQLite variable limits while eliminating per-candidate
+        connection/query amplification.
+        """
+
+        ids = tuple(dict.fromkeys(str(item) for item in object_ids if str(item)))
+        if not ids:
+            return {}
+
+        cutoff_world = (
+            None
+            if as_of_world_revision is None
+            else _normalize_query_integer(
+                as_of_world_revision, "as_of_world_revision"
+            )
+        )
+        cutoff_knowledge = (
+            None
+            if knowledge_cutoff is None
+            else _normalize_query_cutoff(knowledge_cutoff)
+        )
+
+        selected: dict[str, dict] = {}
+        chunk_size = 400
+        with self._connection() as conn:
+            for start in range(0, len(ids), chunk_size):
+                chunk = ids[start : start + chunk_size]
+                clauses = [
+                    "object_id IN (" + ",".join("?" for _ in chunk) + ")"
+                ]
+                chunk_params: list[object] = list(chunk)
+                if cutoff_world is not None:
+                    clauses.append("world_revision<=?")
+                    chunk_params.append(cutoff_world)
+                if cutoff_knowledge is not None:
+                    clauses.append("learned_at<=?")
+                    chunk_params.append(cutoff_knowledge)
+                rows = conn.execute(
+                    "SELECT object_id, revision, payload_json "
+                    "FROM object_revisions WHERE "
+                    + " AND ".join(clauses)
+                    + " ORDER BY object_id ASC, revision DESC",
+                    tuple(chunk_params),
+                )
+                seen: set[str] = set()
+                for row in rows:
+                    object_id = str(row["object_id"])
+                    if object_id in seen:
+                        continue
+                    seen.add(object_id)
+                    selected[object_id] = _decode_durable_object_json(
+                        row["payload_json"],
+                        reason="corrupt_object_payload",
+                        object_id=object_id,
+                    )
+        return selected
 
     def _list_payloads_historical(
         self,

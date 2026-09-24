@@ -208,6 +208,113 @@ class AIWorldCognitionService:
             claim=receipt,
         )
 
+    def _view_from_payload(
+        self,
+        payload: Mapping[str, Any],
+        *,
+        allowed: set[AIWorldDomain],
+        clean_scope: str | None,
+        required_tag_set: frozenset[str],
+    ) -> AIWorldClaimView | None:
+        metadata = payload.get("metadata")
+        if not isinstance(metadata, dict) or not metadata.get("ai_world"):
+            return None
+        try:
+            domain = AIWorldDomain(str(metadata.get("ai_domain")))
+        except ValueError:
+            return None
+        if domain not in allowed:
+            return None
+        expected_subject = self._subject_for(domain)
+        if str(payload.get("subject_id") or "") != expected_subject:
+            return None
+        if str(payload.get("status") or "active") != "active":
+            return None
+        if clean_scope is not None and metadata.get("scope_key") != clean_scope:
+            return None
+        tags = tuple(str(tag) for tag in metadata.get("tags") or ())
+        if required_tag_set and not required_tag_set.issubset(tags):
+            return None
+
+        raw_valid_time = payload.get("valid_time")
+        valid_time = (
+            TemporalExtent.model_validate(raw_valid_time)
+            if isinstance(raw_valid_time, dict)
+            else TemporalExtent.unknown_time()
+        )
+        raw_unknown = payload.get("unknown_items")
+        unknown_items = tuple(str(x) for x in (raw_unknown or ()))
+
+        counter_set_refs = payload.get("counter_evidence_set_refs") or []
+        counter_refs_collected: list[dict[str, Any]] = []
+        seen_refs: set[tuple[str, int]] = set()
+        counter_set_ids: list[str] = []
+        for ref_item in counter_set_refs:
+            if isinstance(ref_item, dict):
+                s_id = str(ref_item.get("object_id") or "")
+                s_rev = int(ref_item.get("revision") or 1)
+            else:
+                s_id = str(getattr(ref_item, "object_id", ""))
+                s_rev = int(getattr(ref_item, "revision", 1) or 1)
+            if not s_id:
+                continue
+            counter_set_ids.append(f"{s_id}@{s_rev}")
+            try:
+                ev_payload = self.store.get_payload(s_id, revision=s_rev)
+                raw_refs = (
+                    ev_payload.get("counter_refs")
+                    or ev_payload.get("member_refs")
+                    or []
+                )
+                for c_ref in raw_refs:
+                    if isinstance(c_ref, dict):
+                        c_id = str(c_ref.get("object_id") or "")
+                        c_rev = int(c_ref.get("revision") or 1)
+                    else:
+                        c_id = str(getattr(c_ref, "object_id", ""))
+                        c_rev = int(getattr(c_ref, "revision", 1) or 1)
+                    if c_id and (c_id, c_rev) not in seen_refs:
+                        seen_refs.add((c_id, c_rev))
+                        counter_refs_collected.append(
+                            {"object_id": c_id, "revision": c_rev}
+                        )
+            except Exception:
+                pass
+
+        counter_evidence_summary = {
+            "count": len(counter_refs_collected),
+            "counter_evidence_set_refs": counter_set_ids,
+            "counter_refs": counter_refs_collected,
+        }
+
+        return AIWorldClaimView(
+            domain=domain,
+            dimension=DOMAIN_DIMENSIONS[domain],
+            object_id=str(payload["object_id"]),
+            revision=int(payload["revision"]),
+            subject_id=str(payload["subject_id"]),
+            statement=str(payload.get("content") or ""),
+            confidence=float(payload.get("confidence") or 0.0),
+            knowledge_state=KnowledgeState(str(payload["knowledge_state"])),
+            claim_type=ClaimType(str(payload["claim_type"])),
+            learned_at=datetime.fromisoformat(str(payload["learned_at"])),
+            scope_key=(
+                str(metadata["scope_key"])
+                if metadata.get("scope_key") is not None
+                else None
+            ),
+            tags=tags,
+            valid_time=valid_time,
+            unknown_items=unknown_items,
+            counter_evidence_summary=counter_evidence_summary,
+        )
+
+    @staticmethod
+    def _close_stream(stream: Any) -> None:
+        close = getattr(stream, "close", None)
+        if callable(close):
+            close()
+
     def current(
         self,
         *,
@@ -230,98 +337,34 @@ class AIWorldCognitionService:
         if any(not tag for tag in clean_required_tags):
             raise ValueError("required_tags must not contain blank values")
         required_tag_set = frozenset(clean_required_tags)
+        max_items = max(0, int(limit))
+        if max_items == 0 or not allowed:
+            return ()
 
+        stream = self.store.iter_latest_payloads(
+            object_type=ObjectType.CLAIM,
+            metadata_in={"ai_domain": tuple(item.value for item in allowed)},
+            order_by_metadata_key="ai_domain",
+        )
         views: list[AIWorldClaimView] = []
-        for payload in self.store.list_payloads(object_type=ObjectType.CLAIM):
-            metadata = payload.get("metadata")
-            if not isinstance(metadata, dict) or not metadata.get("ai_world"):
-                continue
-            try:
-                domain = AIWorldDomain(str(metadata.get("ai_domain")))
-            except ValueError:
-                continue
-            if domain not in allowed:
-                continue
-            expected_subject = self._subject_for(domain)
-            if str(payload.get("subject_id") or "") != expected_subject:
-                continue
-            if str(payload.get("status") or "active") != "active":
-                continue
-            if clean_scope is not None and metadata.get("scope_key") != clean_scope:
-                continue
-            tags = tuple(str(tag) for tag in metadata.get("tags") or ())
-            if required_tag_set and not required_tag_set.issubset(tags):
-                continue
-
-            raw_valid_time = payload.get("valid_time")
-            valid_time = (
-                TemporalExtent.model_validate(raw_valid_time)
-                if isinstance(raw_valid_time, dict)
-                else TemporalExtent.unknown_time()
-            )
-            raw_unknown = payload.get("unknown_items")
-            unknown_items = tuple(str(x) for x in (raw_unknown or ()))
-
-            counter_set_refs = payload.get("counter_evidence_set_refs") or []
-            counter_refs_collected: list[dict[str, Any]] = []
-            seen_refs: set[tuple[str, int]] = set()
-            counter_set_ids: list[str] = []
-            for ref_item in counter_set_refs:
-                if isinstance(ref_item, dict):
-                    s_id = str(ref_item.get("object_id") or "")
-                    s_rev = int(ref_item.get("revision") or 1)
-                else:
-                    s_id = str(getattr(ref_item, "object_id", ""))
-                    s_rev = int(getattr(ref_item, "revision", 1) or 1)
-                if not s_id:
-                    continue
-                counter_set_ids.append(f"{s_id}@{s_rev}")
-                try:
-                    ev_payload = self.store.get_payload(s_id, revision=s_rev)
-                    raw_refs = ev_payload.get("counter_refs") or ev_payload.get("member_refs") or []
-                    for c_ref in raw_refs:
-                        if isinstance(c_ref, dict):
-                            c_id = str(c_ref.get("object_id") or "")
-                            c_rev = int(c_ref.get("revision") or 1)
-                        else:
-                            c_id = str(getattr(c_ref, "object_id", ""))
-                            c_rev = int(getattr(c_ref, "revision", 1) or 1)
-                        if c_id and (c_id, c_rev) not in seen_refs:
-                            seen_refs.add((c_id, c_rev))
-                            counter_refs_collected.append({"object_id": c_id, "revision": c_rev})
-                except Exception:
-                    pass
-
-            counter_evidence_summary = {
-                "count": len(counter_refs_collected),
-                "counter_evidence_set_refs": counter_set_ids,
-                "counter_refs": counter_refs_collected,
-            }
-
-            views.append(
-                AIWorldClaimView(
-                    domain=domain,
-                    dimension=DOMAIN_DIMENSIONS[domain],
-                    object_id=str(payload["object_id"]),
-                    revision=int(payload["revision"]),
-                    subject_id=str(payload["subject_id"]),
-                    statement=str(payload.get("content") or ""),
-                    confidence=float(payload.get("confidence") or 0.0),
-                    knowledge_state=KnowledgeState(str(payload["knowledge_state"])),
-                    claim_type=ClaimType(str(payload["claim_type"])),
-                    learned_at=datetime.fromisoformat(str(payload["learned_at"])),
-                    scope_key=(
-                        str(metadata["scope_key"])
-                        if metadata.get("scope_key") is not None
-                        else None
-                    ),
-                    tags=tags,
-                    valid_time=valid_time,
-                    unknown_items=unknown_items,
-                    counter_evidence_summary=counter_evidence_summary,
+        try:
+            for payload in stream:
+                view = self._view_from_payload(
+                    payload,
+                    allowed=allowed,
+                    clean_scope=clean_scope,
+                    required_tag_set=required_tag_set,
                 )
-            )
+                if view is None:
+                    continue
+                views.append(view)
+                if len(views) >= max_items:
+                    break
+        finally:
+            self._close_stream(stream)
 
+        # The streaming query already uses the frozen ordering. Sort again here so
+        # the Python-level contract remains explicit and independently checkable.
         views.sort(
             key=lambda item: (
                 -item.learned_at.timestamp(),
@@ -329,7 +372,59 @@ class AIWorldCognitionService:
                 item.object_id,
             )
         )
-        return tuple(views[: max(0, int(limit))])
+        return tuple(views[:max_items])
+
+    def _current_partitioned(
+        self,
+        *,
+        domains: Sequence[AIWorldDomain],
+        required_tags: Sequence[str] = (),
+        per_domain: int,
+    ) -> dict[AIWorldDomain, tuple[AIWorldClaimView, ...]]:
+        allowed = {AIWorldDomain(item) for item in domains}
+        clean_required_tags = tuple(str(tag).strip() for tag in required_tags)
+        if any(not tag for tag in clean_required_tags):
+            raise ValueError("required_tags must not contain blank values")
+        required_tag_set = frozenset(clean_required_tags)
+        selected: dict[AIWorldDomain, list[AIWorldClaimView]] = {
+            domain: [] for domain in allowed
+        }
+        if not allowed:
+            return {}
+
+        stream = self.store.iter_latest_payloads(
+            object_type=ObjectType.CLAIM,
+            metadata_in={"ai_domain": tuple(item.value for item in allowed)},
+        )
+        try:
+            for payload in stream:
+                view = self._view_from_payload(
+                    payload,
+                    allowed=allowed,
+                    clean_scope=None,
+                    required_tag_set=required_tag_set,
+                )
+                if view is None:
+                    continue
+                bucket = selected[view.domain]
+                if len(bucket) < per_domain:
+                    bucket.append(view)
+                if all(len(items) >= per_domain for items in selected.values()):
+                    break
+        finally:
+            self._close_stream(stream)
+
+        for items in selected.values():
+            items.sort(
+                key=lambda item: (
+                    -item.learned_at.timestamp(),
+                    item.object_id,
+                )
+            )
+        return {
+            domain: tuple(items[:per_domain])
+            for domain, items in selected.items()
+        }
 
     def core_context(
         self,
@@ -345,17 +440,19 @@ class AIWorldCognitionService:
         if per_domain < 1:
             raise ValueError("per_domain must be >= 1")
 
-        result: dict[str, list[dict[str, Any]]] = {}
-        for domain in (
+        domains = (
             AIWorldDomain.USER_UNDERSTANDING,
             AIWorldDomain.RELATIONSHIP,
             AIWorldDomain.SELF,
-        ):
-            selected = self.current(
-                domains=[domain],
-                required_tags=("core_context",),
-                limit=per_domain,
-            )
+        )
+        partitioned = self._current_partitioned(
+            domains=domains,
+            required_tags=("core_context",),
+            per_domain=per_domain,
+        )
+        result: dict[str, list[dict[str, Any]]] = {}
+        for domain in domains:
+            selected = partitioned.get(domain, ())
             if selected:
                 result[domain.value] = [
                     item.model_dump(mode="json")
@@ -370,14 +467,18 @@ class AIWorldCognitionService:
     ) -> dict[str, list[dict[str, Any]]]:
         if per_domain < 1:
             raise ValueError("per_domain must be >= 1")
-        snapshot: dict[str, list[dict[str, Any]]] = {}
-        for domain in AIWorldDomain:
-            items = self.current(domains=[domain], limit=per_domain)
-            snapshot[domain.value] = [
+        domains = tuple(AIWorldDomain)
+        partitioned = self._current_partitioned(
+            domains=domains,
+            per_domain=per_domain,
+        )
+        return {
+            domain.value: [
                 item.model_dump(mode="json")
-                for item in items
+                for item in partitioned.get(domain, ())
             ]
-        return snapshot
+            for domain in domains
+        }
 
     def _authorized_target_subject(self, payload: Mapping[str, Any]) -> str:
         metadata = payload.get("metadata")
