@@ -27,6 +27,7 @@ jobs:
         run: |
           pytest -q \
             tests/integration/test_core_scale_semantics.py \
+            tests/integration/test_core_headless.py \
             tests/integration/test_v3_ai_world.py \
             tests/integration/test_v3_c14_cognitive_derivation_runtime.py \
             tests/integration/test_v3_periodic_review.py \
