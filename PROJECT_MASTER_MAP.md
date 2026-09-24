@@ -262,8 +262,9 @@ P14 Long Conversation Continuity  ✅
 P15 Periodic Review / AI Growth  ✅
                     ↓
 P16 主阶段
-  C14 PASS → C15 B corrective governance DONE / operator preflight READY
-           → fresh B acceptance → attested C → C15 close
+  C14 PASS → C15 B corrective governance DONE
+           → RC-FREEZE DONE → fresh Resident A-002 READY → A independent acceptance
+           → B operator preflight / release / fresh B acceptance → attested C → C15 close
            → C16 → broad long-term habitation
 ```
 
