@@ -1,9 +1,9 @@
 # AIOS v3.0 单窗口任务执行总表
 
-## 当前控制入口 — 2026-09-24 PM TAKEOVER / S0 RE-VERIFIED / OPERATOR DONE / FIX-001+002 待启动
+## 当前控制入口 — 2026-09-24 PM TAKEOVER / S0 RE-VERIFIED / OPERATOR DONE / 待启动 = FIX-001 + FIX-002 + CI-FIX-001
 
 - 接任 PM 依 #128 治理接手；接手与 live 复核：`governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
-- live main = `e72a63874ed2c28798b00cec51f191caf1594a00`；Core tree 仍 `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
+- **派工基线 = live main `079d7516f195cf6973933acc8cd057d59adc3a9f`**（其后仅治理/审查文档变更）；`CORE-OPERATOR-001` 集成点 = `e72a63874ed2c28798b00cec51f191caf1594a00`；Core tree 自审计以来始终 `7db4f72e7b3c29c74082f9984141159f8f1d6071`。每个新窗口仍须自行重取 live main，不得把本 SHA 当永久施工基线。
 - `CORE-BASELINE-001 = DONE（re-verified）`：S0 裁决成立；dev 基线前移至 `e72a63874e...`；历史 pin #117/#121/#125/#126 不变；fresh A 仅在 RC-FREEZE 后。
 - `CORE-OPERATOR-001 = DONE`：独立验收 #135（ACCEPTANCE_PASS，0 blocker）`fe6f1740eb`（05:08:01Z）先合，候选 #131 `e72a63874e`（05:08:07Z）后合；报告 `reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md`。
 - `CORE-GAP-AUDIT-001 = DONE`（#132 合 `bc4bf735...`）；RC blockers = CG-001/002/003；14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE 不得无依据重开。
