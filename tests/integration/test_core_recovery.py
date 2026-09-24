@@ -362,18 +362,18 @@ def test_r9_interrupted_restore_does_not_mutate_backup_or_publish_partial_world(
     destination_cfg = HeadlessConfig(world_path=tmp_path / "destination.sqlite")
     import aios_core.headless.recovery as recovery_module
 
-    original_replace = recovery_module.os.replace
+    original_link = recovery_module.os.link
 
     def fail_publish(_source, _target):
         raise OSError("synthetic publish interruption")
 
-    monkeypatch.setattr(recovery_module.os, "replace", fail_publish)
+    monkeypatch.setattr(recovery_module.os, "link", fail_publish)
     with pytest.raises(OSError, match="publish interruption"):
         restore_world(destination_cfg, backup)
     assert not destination_cfg.world_path.exists()
     assert _sha256(backup) == backup_hash
 
-    monkeypatch.setattr(recovery_module.os, "replace", original_replace)
+    monkeypatch.setattr(recovery_module.os, "link", original_link)
     done = restore_world(destination_cfg, backup)
     assert done["world_revision"] == store.current_world_revision()
     assert _sha256(backup) == backup_hash
