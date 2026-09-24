@@ -1,18 +1,18 @@
 # AIOS v3.0 当前工程断点
 
-## 当前控制入口 — 2026-09-24 Core completion PM handoff
+## 当前控制入口 — 2026-09-24 CORE-BASELINE-001 DONE
 
-所有者已要求：**先完成 Core，UI 不开发；接任 PM 负责安排其他 AI 执行和验收。**
-
-- 本次治理变更合入 main 后，本节取代下方旧的“当前快照/下一 READY”；下方旧冻结和 READY 描述为历史，不再独立授权。
-- 阶段范围及完成定义：`governance/AIOS_CORE_COMPLETION_PLAN_2026-09-24.md`。
-- 接任提示词：`governance/prompts/AIOS_CORE_PM_HANDOFF_2026-09-24.md`。
-- 开发 main 审查点 `6924d8b5` 已合 #127，Core 已不同于历史冻结 `bcd6bf3`；历史 A 身份保留，新候选的 A/实验使用必须单独裁决。
-- #125 已有施工和 B14 尝试陈述，但最新已审 head `b14b5d84` 的 3 项预检/回归失败；不是无人开始的 READY，也不是实验完成。
-- 唯一下一 READY：`CORE-BASELINE-001`（治理集成后）。原 `C15-RCC-RES-B-PREFLIGHT-001` 为已有 WIP / BLOCKED，恢复入口为新计划 `CORE-OPERATOR-001`，二者同一工程交付，不重复造桥。
-- C15 启动、C16、广泛 P16、P17 仍受各自 Gate 约束。UI/P18/P19 不派工。
-- 执行 AI 继续一窗口一任务；PM 可持续跨任务协调/验收，不冒充 fresh Resident。
-
+- PR #128 已合入，当前开发基线审查点：`main@33436565c109c2c47cf2c3150084fcce22810124`。
+- 当前 Core tree：`7db4f72e7b3c29c74082f9984141159f8f1d6071`；#127 已把十项 Core 修复正式带入 main。
+- #126 @ `8e31deca...` 与 main Core tree 相同，保持 OPEN/DRAFT 作为 CI/测试参考，不重复 merge Core。
+- #125 @ `b14b5d84...` 是 operator WIP 源，不是集成基线。其 Core 仍为旧 `eed27d58...`，exact-head 当前有 3 个已确认 regression：24h 中间 Review 缺失、旧 Wake 可见未来输入、预算 deferral 丢失。
+- canonical A #117 @ `3e51f728...` 继续作为历史 frozen-Core accepted evidence；旧 B #121 继续 FAILED / NON-CANONICAL。
+- 新 Core release 必须在 S2 完成并 `CORE-RC-FREEZE-001` 后重新 fresh A；现在不运行 A/B/C，不改历史 evidence。
+- 详细 baseline / impact ruling：`governance/AIOS_CORE_BASELINE_001_DECISION_2026-09-24.md`。
+- 当前两个并行 READY、均尚未启动：
+  - `CORE-OPERATOR-001` — 从 current main 定向收口 #125 operator；提示词 `governance/prompts/CORE_OPERATOR_001_2026-09-24.md`。
+  - `CORE-GAP-AUDIT-001` — 独立只读 Core 缺口审计；提示词 `governance/prompts/CORE_GAP_AUDIT_001_2026-09-24.md`。
+- HEADLESS / RECOVERY / SCALE / RC-FREEZE、C15 新实验、C16/P16/P17 继续按依赖 BLOCKED。UI/P18/P19 不进入本轮。
 
 > 用途：新会话 / 新模型 / 新工程师进入仓库后的第一现场状态文件  
 > 更新规则：每完成一个可验证节点立即更新；不得靠聊天记忆代替本文件  
