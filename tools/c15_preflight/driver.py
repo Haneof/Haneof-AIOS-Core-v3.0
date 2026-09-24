@@ -53,13 +53,14 @@ class ReleasePort:
     No fixture file is read by constructing this port. All release/receipt
     validation remains in the frozen infrastructure, not a replacement protocol.
     """
-    def __init__(self, operator, canonical, mechanical, state: Path, world: Path, phase: str):
-        if operator.FIXTURE_SHA256 == FIXTURE_HASH:
+    def __init__(self, operator, canonical, mechanical, state: Path, world: Path, phase: str, *, allow_real_fixture: bool = False):
+        if not allow_real_fixture and operator.FIXTURE_SHA256 == FIXTURE_HASH:
             raise DriverBlocked("real C15 release is disabled in preflight")
         if len({operator.FIXTURE_SHA256, canonical.FIXTURE_SHA256, mechanical.FIXTURE_SHA256}) != 1:
             raise DriverBlocked("inconsistent adapter pins")
         self.operator, self.canonical, self.mechanical = operator, canonical, mechanical
         self.state, self.world, self.phase = state, world, phase
+        self.allow_real_fixture = allow_real_fixture
 
     def read_state(self):
         return json.loads(self.state.read_text())
