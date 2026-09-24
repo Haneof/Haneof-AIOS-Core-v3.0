@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "/tmp/aios-venv/bin/python",
+    "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/release/release_operator.py",
+    "init",
+    "--phase",
+    "A",
+    "--state",
+    "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-A-RERUN-002/release_state.json"
+  ],
+  "parsed": {
+    "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+    "next_sequence": 1,
+    "phase": "A",
+    "status": "initialized"
+  },
+  "returncode": 0,
+  "stderr": "",
+  "stdout": "{\"fixture_sha256\":\"sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46\",\"next_sequence\":1,\"phase\":\"A\",\"status\":\"initialized\"}\n"
+}

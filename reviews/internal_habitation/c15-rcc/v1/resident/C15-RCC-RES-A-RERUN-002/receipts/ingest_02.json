@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "/tmp/aios-venv/bin/python",
+    "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/release/mechanical_ingest_adapter.py",
+    "--world-db",
+    "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-A-RERUN-002/private_world.sqlite",
+    "--event-file",
+    "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-A-RERUN-002/events/cursor_02.json"
+  ],
+  "parsed": {
+    "fixture_payload_sha256": "sha256:50b920768c8560cc4f60a0c51ef8477c6d4f47e85695b61e8b95e2e839963eb3",
+    "fixture_projection_sha256": "sha256:3babcd0246d3ba2395f85756fd42c5113979e1c268554d32157f5289c883df7a",
+    "ingest_ref": "obs_c14_fixture_5248cdfd5a23b6ea88ce0a96@1",
+    "object_id": "obs_c14_fixture_5248cdfd5a23b6ea88ce0a96",
+    "reused_existing": false,
+    "revision": 1,
+    "world_revision": 14
+  },
+  "path": "mechanical",
+  "returncode": 0,
+  "stderr": "",
+  "stdout": "{\"fixture_payload_sha256\":\"sha256:50b920768c8560cc4f60a0c51ef8477c6d4f47e85695b61e8b95e2e839963eb3\",\"fixture_projection_sha256\":\"sha256:3babcd0246d3ba2395f85756fd42c5113979e1c268554d32157f5289c883df7a\",\"ingest_ref\":\"obs_c14_fixture_5248cdfd5a23b6ea88ce0a96@1\",\"object_id\":\"obs_c14_fixture_5248cdfd5a23b6ea88ce0a96\",\"reused_existing\":false,\"revision\":1,\"world_revision\":14}\n"
+}

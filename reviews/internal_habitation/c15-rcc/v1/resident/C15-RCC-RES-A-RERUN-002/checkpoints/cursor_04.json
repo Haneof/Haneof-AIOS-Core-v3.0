@@ -1,0 +1,20 @@
+{
+  "at": "2026-09-24T17:01:09.741293+00:00",
+  "clock": "2026-11-02T20:40:00+00:00",
+  "cursor": 4,
+  "due": {
+    "periodic_review": null,
+    "post_summary_wakes": 0,
+    "wakes": 0
+  },
+  "event_id": "c15rcc-004",
+  "index_sha256": "723e7a177ac2aa97c5a2a51ac3a6c593b27b64f6f4fe5f397b862d0800c634de",
+  "index_watermark": 21,
+  "ingest_ref": "obs_c14_fixture_5d4dfcf42055c00135a78a54@1",
+  "next_turn": 3,
+  "release_sha256": "6a5f6f1dfa8c1df2f6c3e31296c943904da51f0385468078d0bad05455bad870",
+  "turn": null,
+  "user_conversation": false,
+  "world_revision": 21,
+  "world_sha256": "77473fdf02f0147a12afc636c52fa2acb4a358908947ff5539e0a746421ec33d"
+}
