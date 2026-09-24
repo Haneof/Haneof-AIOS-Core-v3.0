@@ -33,7 +33,12 @@ from .cognitive_runtime import (
     RuntimeTurnResult,
 )
 
-from .turn_runtime import FusedTurnResult, FusedTurnRuntime, WakeDispatchRunResult
+from .turn_runtime import (
+    FusedTurnResult,
+    FusedTurnRuntime,
+    TurnExecutionInspection,
+    WakeDispatchRunResult,
+)
 
 from .turn_execution import (
     TurnAlreadyCompleted, TurnExecutionInDoubt, TurnExecutionRefused, TurnInputConflict,
