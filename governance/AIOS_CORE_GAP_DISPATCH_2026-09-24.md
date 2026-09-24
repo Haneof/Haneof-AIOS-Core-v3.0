@@ -69,3 +69,25 @@ Engineering author declares `REVIEW_READY` only. A different independent accepta
 4. state an explicit `ACCEPTANCE_PASS` / `ACCEPTANCE_FAIL` verdict with blocker count.
 
 PM integration additionally re-verifies pins and CI from the API and re-runs the decisive evidence locally before merging, as recorded for `CORE-OPERATOR-001`.
+
+
+---
+
+## Dispatch update — 2026-09-24, S2 serialization triggered by PR #145
+
+Binding successor ruling: `governance/AIOS_CORE_S2_SERIALIZATION_RULING_2026-09-24.md`.
+
+PR #145 established that CG-001 cannot be fully closed only inside the previously assigned read-path
+symbols: resumed C14/Periodic Review builds model-visible cockpit state before the historical T1 cut is
+established, so the minimal correct fix must touch `run_wake` / `run_periodic_review`.
+
+Per the original parallelism ruling's stop-and-report clause, development is now serialized:
+
+1. `CORE-GAP-FIX-002` continues first in draft PR #143 and owns the background entrypoints/state machine.
+2. `CORE-GAP-FIX-001` is preserved as FROZEN_WIP in draft PR #145 at head
+   `97a76e3b90db9ec7bf9873e87a9108d4457afc33`; do not restart, merge, or review it yet.
+3. After FIX-002 independent acceptance + PM integration, #145 rebases live main and resumes. At that
+   point FIX-001 receives a narrow exception to establish/pass the temporal read cutoff before
+   model-visible cockpit/snapshot construction, without changing FIX-002 provider-attempt semantics.
+4. `CORE-GAP-FIX-003` remains blocked behind FIX-002 integration.
+5. CI-fix candidate PR #144 is separate and may proceed to independent acceptance in parallel.
