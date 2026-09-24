@@ -49,7 +49,7 @@ sys.path.insert(0, str(REPO_ROOT / "src"))
 sys.path.insert(0, str(REPO_ROOT))
 
 from tools.c15_preflight.transport import Trace, plain
-from tools.c15_preflight.arena_resident_file_bridge import FileExchangeBridge
+from tools.c15_preflight.arena_resident_file_bridge import FileExchangeBridge, FileExchangeBridgeWithSummary
 from tools.c15_preflight.driver import Driver, DriverBlocked, AcceptedAPort, ReleasePort
 from tools.c15_preflight.audit import digest
 from aios_core.storage.sqlite_store import SQLiteWorldStore
@@ -199,13 +199,15 @@ def run_with_accepted_a_driver(driver_run_dir: Path, packet_dir: Path, trace_pat
         assert int(store.current_world_revision()) == 88, f"wr expected 88, got {store.current_world_revision()}"
         assert index.watermark() == 88, f"iw expected 88, got {index.watermark()}"
 
-        # Trace must be new file for this session, not reuse old
+        # Trace must be new file for this session, not reuse old - revision must be callable, not int
         if trace_path.exists():
             trace_path.unlink()
-        trace = Trace(trace_path, store.current_world_revision())
+        trace = Trace(trace_path, store.current_world_revision)
 
-        bridge = FileExchangeBridge(packet_dir, timeout=timeout)
-        print(f"[Operator] FileExchangeBridge timeout={timeout}s (>=1800 required) - fail-closed on timeout", flush=True)
+        # For formal B, use WithSummary to prove dimension_summary/round_summary also via file exchange, not local stub
+        # Previously used lambda stub which makes run invalid per audit; now use real file exchange for all three kinds
+        bridge = FileExchangeBridgeWithSummary(packet_dir, timeout=timeout)
+        print(f"[Operator] FileExchangeBridgeWithSummary timeout={timeout}s (>=1800 required) - fail-closed on timeout", flush=True)
 
         runtime = FusedTurnRuntime(
             store=store,
