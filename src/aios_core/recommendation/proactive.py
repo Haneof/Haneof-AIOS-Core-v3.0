@@ -6,6 +6,8 @@ truth and never injects history when the current conversation has no valid topic
 
 from __future__ import annotations
 
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from aios_core.contracts.enums import ErrorCode, ObjectType
@@ -62,6 +64,7 @@ class ProactiveMemoryRecommender:
         limit: int | None = None,
         history_needed: bool | None = None,
         antecedent_fallback: bool = False,
+        as_of: datetime | None = None,
     ) -> RecommendationBundle:
         topic = (current_topic or "").strip()
         current_world_revision = int(self.store.current_world_revision())
@@ -90,6 +93,7 @@ class ProactiveMemoryRecommender:
         page = self.index.recall_candidates(
             topic,
             subject=subject_id,
+            as_of=as_of,
             limit=max(take * 4, take),
         )
 
@@ -147,6 +151,7 @@ class ProactiveMemoryRecommender:
             # do not choose which one the user means.
             recent = self.index.recent_candidates(
                 subject=subject_id,
+                as_of=as_of,
                 object_types=(
                     ObjectType.OBSERVATION.value,
                     ObjectType.EVENT.value,
