@@ -1,7 +1,11 @@
 # AIOS v3.0 单窗口任务执行总表
 
-## 当前控制入口 — 2026-09-24 CORE-OPERATOR-001 ACCEPTED & INTEGRATED / S2 GAP FIXES ARE THE ONLY READY WORK
+## 当前控制入口 — 2026-09-24 CORE-OPERATOR-001 已独立验收并集成 / S0 已复核 / 唯一可施工 = FIX-001 + FIX-002
 
+> **PM 写回对账（重要）**：2026-09-24 有两个 PM 窗口对同一状态并行写回。集成动作（`fe6f1740eb` → `e72a63874e`）由本条目所属的集成 PM 窗口执行；PR #137 的接手复核 `governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md` 为并行 PM 窗口所写，结论与本条目一致，已并入本条目，不另立第二真相源。此后同一时刻只保留一个集成 PM 写回入口：**先合入者为准，后到者对账合并而不是覆盖**。
+
+- 接任 PM 依 #128 治理接手；S0 接手复核：`governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`；集成收据：`governance/AIOS_CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`。
+- `CORE-BASELINE-001 = DONE（re-verified）`：S0 裁决成立；dev 基线前移至 `e72a63874e...`；历史 pin #117/#121/#125/#126 于本次集成时逐条复核仍成立（state/head/Core tree 全部未漂移）；fresh A 仅在 RC-FREEZE 后。
 - **live main = `e72a63874ed2c28798b00cec51f191caf1594a00`**；Core tree 仍为 `src/aios_core = 7db4f72e7b3c29c74082f9984141159f8f1d6071`（与审计/基线登记一致，本次集成 Core ZERO DIFF）。
 - `CORE-OPERATOR-001 = DONE`。独立验收 PR #135 @ `50133c2a3348095abf520b4a645ad5a73ca18951` 判定 **ACCEPTANCE_PASS**（0 blocker），PM 复核后集成：候选 PR #131 exact head `0e1d69eebc801278f93ccc1941b8f066a4ea09ef` → merge `e72a63874ed2c28798b00cec51f191caf1594a00`；验收报告 merge `fe6f1740eb4e6ab4d1c562373ef5d3554bb2dc54`。
 - PM 集成前复核（不只读报告）：exact head 未变；CI `35955458275`/`35955458266` 复现 FAILURE、`35955695487`/`35955695492` exact-head SUCCESS 均经 API 复核；候选 26 文件、`src/` 0 文件；本地在 repro commit `3865da88...` 复现三项真实失败、在 accepted head 与 merge 结果各 `632 passed`。收据：`governance/AIOS_CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`。
@@ -11,13 +15,23 @@
 - **当前唯一可施工工作 = `CORE-GAP-FIX-001` 与 `CORE-GAP-FIX-002`**，两个独立工程窗口并行，写入路径不得冲突；`CORE-GAP-FIX-003` 仍 BLOCKED。
 - 本次集成不等于 SOFTWARE_RC，更不等于 CORE_COMPLETE。historical #117 A 仍仅是 frozen-Core accepted evidence；新 RC 的 fresh A/B/C 只能在所有 S2 工程独立验收并 `CORE-RC-FREEZE-001` 后开始。**当前禁止 Resident。**
 - PM dispatch：`governance/AIOS_CORE_GAP_DISPATCH_2026-09-24.md`。
-- UI / Launcher / 数字人 / 动画 / 硬件 / Android ROM 继续排除（PR #136 鹈鹕动画属排除范围，不进入 Core 路线）。
+- UI / Launcher / 数字人 / 动画 / 硬件 / Android ROM 继续排除。PR #136（pelican 动画）= EXCLUDED，不进入 Core 路线、永不合入；分支保留，不关闭不删除（计划未授权）。
+
+## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / S1-S2 ACTIVE
+
+- 独立 Core gap audit PR #132 已由 PM 接受并正常合入；merge = `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`，审计 Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
+- 审计正式确认 3 个 RC blocker：`CG-001 RUNTIME_TEMPORAL_READ_CUT`、`CG-002 BACKGROUND_MODEL_EXECUTION_IN_DOUBT`、`CG-003 USER_TURN_IN_DOUBT_RECOVERY`。其余裁决：14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE，不得无依据重开。
+- `CORE-GAP-FIX-001` 与 `CORE-GAP-FIX-002` 可由两个独立工程窗口并行施工；`CORE-GAP-FIX-003` 先 BLOCKED，待 FIX-002 独立验收并集成后从当时 live main 开始。
+- `CORE-OPERATOR-001` 工程候选已在 PR #131 @ `0e1d69eebc801278f93ccc1941b8f066a4ea09ef` 进入 **GATE / REVIEW_READY**；仍必须由不同 Independent Reviewer 验收后才能 PM merge。
+- historical #117 A 仍仅是 frozen-Core accepted evidence；新 RC 的 fresh A/B/C 只能在所有 S2 工程独立验收并 `CORE-RC-FREEZE-001` 后开始。当前禁止 Resident。
+- PM dispatch：`governance/AIOS_CORE_GAP_DISPATCH_2026-09-24.md`。
+- UI / Launcher / 数字人 / 动画 / 硬件 / Android ROM 继续排除。
 
 ### 当前优先队列（唯一正式派工表）
 
 | Task ID | 状态 | Owner / 放行出口 |
 |---|---|---|
-| CORE-BASELINE-001 | **DONE** | S0 baseline / experiment impact ruling 已落 main；#117/#121/#125/#126 四个 pin 于 2026-09-24 集成时复核仍成立 |
+| CORE-BASELINE-001 | **DONE（re-verified）** | S0 ruling 已落 main；接任 PM 于 `e72a63874e...` 复核成立（`governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`）；#117/#121/#125/#126 四个 pin 集成时复核仍成立 |
 | CORE-GAP-AUDIT-001 | **DONE** | PR #132 已接受并合入；报告 `reviews/CORE_GAP_AUDIT_001_2026-09-24.md` |
 | CORE-OPERATOR-001 | **DONE** | 独立验收 #135 ACCEPTANCE_PASS → PM 集成 merge `e72a638...`；收据 `governance/AIOS_CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md` |
 | CORE-GAP-FIX-001 | **READY / NOT_STARTED** | Core Runtime Engineer 单窗口；Runtime Temporal Read Cut；提示词 `governance/prompts/CORE_GAP_FIX_001_2026-09-24.md`；作者只能报 REVIEW_READY，另开独立验收窗口 |
