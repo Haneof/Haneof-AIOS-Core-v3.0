@@ -1,18 +1,20 @@
 # AIOS v3.0 当前工程断点
 
-## 当前控制入口 — 2026-09-24 CORE-BASELINE-001 DONE
+## 当前控制入口 — 2026-09-24 GAP AUDIT ACCEPTED；FIX-001 READY
 
-- PR #128 已合入，当前开发基线审查点：`main@33436565c109c2c47cf2c3150084fcce22810124`。
-- 当前 Core tree：`7db4f72e7b3c29c74082f9984141159f8f1d6071`；#127 已把十项 Core 修复正式带入 main。
-- #126 @ `8e31deca...` 与 main Core tree 相同，保持 OPEN/DRAFT 作为 CI/测试参考，不重复 merge Core。
-- #125 @ `b14b5d84...` 是 operator WIP 源，不是集成基线。其 Core 仍为旧 `eed27d58...`，exact-head 当前有 3 个已确认 regression：24h 中间 Review 缺失、旧 Wake 可见未来输入、预算 deferral 丢失。
-- canonical A #117 @ `3e51f728...` 继续作为历史 frozen-Core accepted evidence；旧 B #121 继续 FAILED / NON-CANONICAL。
-- 新 Core release 必须在 S2 完成并 `CORE-RC-FREEZE-001` 后重新 fresh A；现在不运行 A/B/C，不改历史 evidence。
-- 详细 baseline / impact ruling：`governance/AIOS_CORE_BASELINE_001_DECISION_2026-09-24.md`。
-- 当前两个并行 READY、均尚未启动：
-  - `CORE-OPERATOR-001` — 从 current main 定向收口 #125 operator；提示词 `governance/prompts/CORE_OPERATOR_001_2026-09-24.md`。
-  - `CORE-GAP-AUDIT-001` — 独立只读 Core 缺口审计；提示词 `governance/prompts/CORE_GAP_AUDIT_001_2026-09-24.md`。
-- HEADLESS / RECOVERY / SCALE / RC-FREEZE、C15 新实验、C16/P16/P17 继续按依赖 BLOCKED。UI/P18/P19 不进入本轮。
+- `CORE-GAP-AUDIT-001 = DONE`。Independent audit PR #132 exact head `1700a3feab58959bba95eb3420625a8f32aef2fc` 已合入；merge `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`。
+- 审计对象 Core tree：`7db4f72e7b3c29c74082f9984141159f8f1d6071`；#132 为 review-only，无 Core diff。
+- PM 源码复核接受 3 个 RC blocker：
+  1. `CG-001 RUNTIME_TEMPORAL_READ_CUT` — time-pinned execution 的模型可见读没有统一 as-known cutoff；
+  2. `CG-002 BACKGROUND_MODEL_EXECUTION_IN_DOUBT` — Wake/Review provider 调用在 ModelDirective durable return 前没有 model-attempt uncertainty admission；
+  3. `CG-003 USER_TURN_IN_DOUBT_RECOVERY` — user turn 只有 started/completed，两态中 started 缺少支持的 reconciliation path。
+- 三项均阻塞 RC freeze。正式 PM dispatch：`governance/CORE_GAP_AUDIT_001_PM_DISPATCH_2026-09-24.md`。
+- 当前新 Core 唯一 READY：`CORE-GAP-FIX-001`。FIX-002 等 FIX-001 accepted+merged；FIX-003 等 FIX-002 accepted+merged。序列化原因是三项都可能改 `turn_runtime.py`，且 FIX-003 必须复用 FIX-002 的 model-attempt/recovery primitive。
+- `CORE-OPERATOR-001` candidate PR #131 @ `0e1d69eebc801278f93ccc1941b8f066a4ea09ef` 已到 `REVIEW_READY`，仍 OPEN/UNMERGED；等待独立验收，不能按 CI GREEN 直接算 DONE。
+- Operator 验收和 FIX-001 工程可并行；`CORE-HEADLESS-001` 在两条线全部满足依赖前保持 BLOCKED。
+- HEADLESS → RECOVERY → SCALE → RC-FREEZE 仍为 S2 后续；RC freeze 之前不运行新的 Resident A/B/C。
+- historical #117/#121 处置不变；不改旧 evidence，不用 hash-swap 代替 fresh experiment。
+- UI/P18/P19、Launcher、数字人、动画、硬件、Android ROM 不进入本轮 Core completion。
 
 > 用途：新会话 / 新模型 / 新工程师进入仓库后的第一现场状态文件  
 > 更新规则：每完成一个可验证节点立即更新；不得靠聊天记忆代替本文件  
