@@ -1,35 +1,32 @@
 # AIOS v3.0 单窗口任务执行总表
 
-## 当前控制入口 — 2026-09-24 Core completion PM handoff
+## 当前控制入口 — 2026-09-24 CORE-BASELINE-001 DONE
 
-所有者已要求：**先完成 Core，UI 不开发；接任 PM 负责安排其他 AI 执行和验收。**
+- 治理计划 PR #128 已正常合入；S0 审查时 live main / development baseline = `33436565c109c2c47cf2c3150084fcce22810124`。
+- live `src/aios_core` tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`。#127 已合；#126 exact head `8e31deca...` 的 Core tree 与 main 相同，不重复集成。
+- #125 exact head `b14b5d84...` 保持 OPEN / WIP；其 Core tree 仍为旧 `eed27d58...`，不得整包合入。当前 exact-head 两条 workflow 均因同 3 项 operator regression 失败：中间 24h Review 未触发、旧 Wake 看见未来输入、预算延迟未保留。
+- #117 canonical A 仅保留为 frozen Core `bcd6bf3...` 的历史 accepted evidence；#121 旧 B 保留 FAILED / NON-CANONICAL。
+- 由于 #127 已改变 revision / policy / search-index / summary / scheduler / turn-admission 等可影响 Resident 世界与认知链的机制，**新 release candidate 必须 fresh A**；但只在 `CORE-RC-FREEZE-001` 后执行，当前禁止 Resident。
+- S0 详细裁决：`governance/AIOS_CORE_BASELINE_001_DECISION_2026-09-24.md`。
+- 固定集成路线：所有前向工程从 live main 开始；#125 只定向提取 operator/test 资产；审计只读 main；发现 Core 缺口才新建最小 `CORE-GAP-FIX-NNN`；S2 收口后冻结 RC，再 fresh A → B → C。
+- UI / Launcher / 数字人 / 动画 / 硬件 / Android ROM 仍全部排除。
 
-- 本次治理变更合入 main 后，本节取代下方旧的“当前快照/下一 READY”；下方旧冻结和 READY 描述为历史，不再独立授权。
-- 阶段范围及完成定义：`governance/AIOS_CORE_COMPLETION_PLAN_2026-09-24.md`。
-- 接任提示词：`governance/prompts/AIOS_CORE_PM_HANDOFF_2026-09-24.md`。
-- 开发 main 审查点 `6924d8b5` 已合 #127，Core 已不同于历史冻结 `bcd6bf3`；历史 A 身份保留，新候选的 A/实验使用必须单独裁决。
-- #125 已有施工和 B14 尝试陈述，但最新已审 head `b14b5d84` 的 3 项预检/回归失败；不是无人开始的 READY，也不是实验完成。
-- 唯一下一 READY：`CORE-BASELINE-001`（治理集成后）。原 `C15-RCC-RES-B-PREFLIGHT-001` 为已有 WIP / BLOCKED，恢复入口为新计划 `CORE-OPERATOR-001`，二者同一工程交付，不重复造桥。
-- C15 启动、C16、广泛 P16、P17 仍受各自 Gate 约束。UI/P18/P19 不派工。
-- 执行 AI 继续一窗口一任务；PM 可持续跨任务协调/验收，不冒充 fresh Resident。
+### 当前优先队列（唯一正式派工表）
 
-### 当前优先队列（优先于下方历史队列）
-
-| Task ID | 状态 | 依赖 / 放行出口 |
+| Task ID | 状态 | Owner / 放行出口 |
 |---|---|---|
-| CORE-BASELINE-001 | READY（本治理合入后） | 基线/已有 WIP/实验影响裁决，同步三入口 |
-| CORE-OPERATOR-001 | BLOCKED | BASELINE；接续原 B-PREFLIGHT 成果，修复并验收 |
-| CORE-GAP-AUDIT-001 | BLOCKED | BASELINE；可与无冲突 operator 工作并行 |
-| CORE-GAP-FIX-NNN | BLOCKED / 条件任务 | 审计确认后逐项创建，未复现不施工 |
-| CORE-HEADLESS-001 | BLOCKED | BASELINE + GAP-AUDIT |
-| CORE-RECOVERY-001 | BLOCKED | S2 功能候选，含所有激活缺口及 headless |
+| CORE-BASELINE-001 | **DONE** | PM 自审治理；裁决与三入口同步落库 |
+| CORE-OPERATOR-001 | **READY / NOT_STARTED** | Test Infrastructure Engineer；从 main 定向移植 #125 operator，先复现 3 failures；提示词 `governance/prompts/CORE_OPERATOR_001_2026-09-24.md`；候选由不同 independent reviewer 验收 |
+| CORE-GAP-AUDIT-001 | **READY / NOT_STARTED** | Independent Core Architect；只读当前 main，输出 requirement→implementation→test→verdict 矩阵；提示词 `governance/prompts/CORE_GAP_AUDIT_001_2026-09-24.md` |
+| CORE-GAP-FIX-NNN | BLOCKED / 条件任务 | 仅由 GAP-AUDIT 或合法新复现激活；一缺口一任务 |
+| CORE-HEADLESS-001 | BLOCKED | GAP-AUDIT 接受 + 所有阻塞性 gap 裁决 |
+| CORE-RECOVERY-001 | BLOCKED | HEADLESS / 激活修复形成 S2 功能候选 |
 | CORE-SCALE-001 | BLOCKED | S2 功能候选 |
-| CORE-RC-FREEZE-001 | BLOCKED | OPERATOR + 所有激活修复 + HEADLESS + RECOVERY + SCALE |
-| 既有 C15 release / rerun / accept / attest / C / eval / close | BLOCKED | RC-FREEZE；必要 A/fixture 前置由 BASELINE 裁决后显式插入 |
-| 既有 C16 → P16 → P17 队列 | BLOCKED | 保留原逐项依赖及验收要求，UI 排除 |
+| CORE-RC-FREEZE-001 | BLOCKED | OPERATOR + GAP/FIX + HEADLESS + RECOVERY + SCALE 全部接受 |
+| 新 C15 fresh A → B → C / EVAL / CLOSE | BLOCKED | RC-FREEZE；旧 #117 A 不能 hash-swap 为新 RC A |
+| C16 → P16 → P17 | BLOCKED | 保留原逐项 Gate；只有 P17 PASS 才可称 Core complete |
 
-接任 PM 在本队列更新 READY/IN_PROGRESS/DONE；下方已完成历史记录保留。每次只释放依赖已完成且有明确 owner 的任务；并行任务逐项登记，不能把本计划变成未登记的第二队列。
-
+`CORE-OPERATOR-001` 与 `CORE-GAP-AUDIT-001` 可并行：前者仅写 operator/test/workflow 专用路径，后者只读 Core 并只写 audit report。当前平台未直接启动独立 AI 子窗口，因此二者状态明确为 NOT_STARTED；不得声称已经施工。
 
 > Status: ACTIVE  
 > Effective: 2026-09-21  
