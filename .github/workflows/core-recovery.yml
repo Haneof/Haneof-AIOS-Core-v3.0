@@ -1,0 +1,127 @@
+name: core-recovery
+
+on:
+  pull_request:
+    paths:
+      - "src/aios_core/storage/**"
+      - "src/aios_core/headless/**"
+      - "src/aios_core/query/**"
+      - "tests/integration/test_core_recovery.py"
+      - ".github/workflows/core-recovery.yml"
+
+jobs:
+  recovery-fault-injection:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - name: CORE-RECOVERY-001 R1-R10 focused fault injection
+        run: pytest -q tests/integration/test_core_recovery.py
+
+  retained-recovery-regressions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - name: Retain World HEADLESS FIX-002 FIX-003 Wake Review C14 cognition
+        run: |
+          pytest -q             tests/unit/test_store.py             tests/unit/test_world_revision_atomicity.py             tests/integration/test_core_headless.py             tests/integration/test_v3_fused_turn_runtime.py             tests/integration/test_v3_wake_dispatch.py             tests/integration/test_v3_periodic_review.py             tests/integration/test_v3_c14_cognitive_derivation_scheduler.py             tests/integration/test_v3_c14_cognitive_derivation_runtime.py             tests/integration/test_core_gap_fix_002_background_attempts.py             tests/runtime/test_turn_execution_recovery.py             tests/runtime/test_metering_ledger.py             tests/integration/test_v3_constitutional_cognition_closure.py             tests/integration/test_v3_completeness_closure.py
+
+  installed-clean-restart-proof:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - name: Clean install
+        run: pip install ".[dev]"
+      - name: Process-level restart recovery proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/core-recovery-process-proof"
+          WORLD="$ROOT/world.sqlite"
+          INDEX="$ROOT/world.index.sqlite"
+          BACKUP="$ROOT/world.backup.sqlite"
+          RESTORED="$ROOT/restored.sqlite"
+          ATTEMPTS="$ROOT/provider-attempts.log"
+          mkdir -p "$ROOT"
+
+          cat > recovery_fault_adapter.py <<'PY'
+          import os
+          from pathlib import Path
+
+          def ambiguous_model_handler(_snapshot):
+              marker = Path(os.environ["RECOVERY_PROVIDER_MARKER"])
+              marker.parent.mkdir(parents=True, exist_ok=True)
+              with marker.open("a", encoding="utf-8") as handle:
+                  handle.write("provider-dispatch\n")
+                  handle.flush()
+                  os.fsync(handle.fileno())
+              raise TimeoutError("synthetic ambiguous provider boundary")
+          PY
+
+          MODEL="aios_core.headless.testing:deterministic_model_handler"
+
+          # 1-2: installed Core creates durable normal state.
+          aios-core-headless --world "$WORLD" --index "$INDEX"             --model-handler "$MODEL" turn             --session recovery-process --turn-index 1 --text "normal durable turn"             --at "2026-09-24T12:00:00+00:00"
+
+          # 3: one provider dispatch becomes mechanically ambiguous.
+          set +e
+          RECOVERY_PROVIDER_MARKER="$ATTEMPTS"             aios-core-headless --world "$WORLD" --index "$INDEX"             --model-handler "recovery_fault_adapter:ambiguous_model_handler" turn             --session recovery-process --turn-index 2 --text "ambiguous durable turn"             --at "2026-09-24T12:01:00+00:00"             > "$ROOT/ambiguous.out" 2> "$ROOT/ambiguous.err"
+          AMBIG_RC=$?
+          set -e
+          test "$AMBIG_RC" -eq 4
+          test "$(wc -l < "$ATTEMPTS")" -eq 1
+
+          # 4-6: a fresh process sees IN_DOUBT and does not call the provider.
+          aios-core-headless --world "$WORLD" --index "$INDEX"             --model-handler "$MODEL" inspect-turn             --session recovery-process --turn-index 2 --text "ambiguous durable turn"             --at "2026-09-24T12:01:00+00:00"             | tee "$ROOT/inspect-1.json"
+          grep -q '"recovery_disposition": "in_doubt"' "$ROOT/inspect-1.json"
+          test "$(wc -l < "$ATTEMPTS")" -eq 1
+
+          # 7: only mechanical recovery is performed; ambiguous provider work is not retried.
+          aios-core-headless --world "$WORLD" --index "$INDEX"             backup --to "$BACKUP"
+          rm -f "$INDEX" "$INDEX-wal" "$INDEX-shm"
+          aios-core-headless --world "$WORLD" --index "$INDEX" rebuild-index
+          aios-core-headless --world "$RESTORED"             restore --from-backup "$BACKUP"
+          aios-core-headless --world "$RESTORED" rebuild-index
+
+          # 8-9: second restart retains the same IN_DOUBT identity and no duplicate provider call.
+          aios-core-headless --world "$RESTORED"             --model-handler "$MODEL" inspect-turn             --session recovery-process --turn-index 2 --text "ambiguous durable turn"             --at "2026-09-24T12:01:00+00:00"             | tee "$ROOT/inspect-2.json"
+          grep -q '"recovery_disposition": "in_doubt"' "$ROOT/inspect-2.json"
+          test "$(wc -l < "$ATTEMPTS")" -eq 1
+
+          python - <<'PY'
+          import os
+          import sqlite3
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "core-recovery-process-proof"
+          for name in ("world.sqlite", "restored.sqlite"):
+              path = root / name
+              with sqlite3.connect(path) as conn:
+                  attempts = conn.execute(
+                      "SELECT state, COUNT(*) FROM background_model_attempts "
+                      "GROUP BY state ORDER BY state"
+                  ).fetchall()
+                  meters = conn.execute(
+                      "SELECT COUNT(*) FROM metering_records"
+                  ).fetchone()[0]
+                  assistant_rows = conn.execute(
+                      "SELECT COUNT(*) FROM object_revisions "
+                      "WHERE object_type='observation' AND payload_json LIKE '%assistant%'"
+                  ).fetchone()[0]
+                  print(name, attempts, "metering", meters, "assistant_rows", assistant_rows)
+                  assert sum(count for _state, count in attempts) == 2
+                  assert dict(attempts).get("in_doubt") == 1
+                  assert meters == 1
+          PY
