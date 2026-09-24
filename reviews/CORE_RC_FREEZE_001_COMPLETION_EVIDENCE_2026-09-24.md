@@ -7,6 +7,26 @@ Engineering/release PR: **#202 — OPEN / UNMERGED**
 Resident runs performed by this task: **0**  
 Public release/tag performed: **NO**
 
+
+## 0. Candidate / handoff pins
+
+- Frozen software RC commit: `773876f92d5f8e53422f8f5a68cc651953d93052`.
+- Tested exact RC-freeze packet candidate: `11f4aed2eba055356730dc77922ced39b25a7d63`.
+- Candidate -> final PR handoff is evidence-only: the next commit changes only this completion-evidence report.
+- At exact candidate `11f4aed2...`, compare against frozen main changes exactly seven documentation/governance files:
+  - `AIOS_v3.0_CURRENT_CHECKPOINT.md`
+  - `PROJECT_MASTER_MAP.md`
+  - `governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md`
+  - `release/rc/CORE_RC_FREEZE_001_DEPENDENCIES.json`
+  - `release/rc/CORE_RC_FREEZE_001_MANIFEST.json`
+  - `release/rc/CORE_RC_FREEZE_001_OPERATOR_PACKET.md`
+  - `reviews/CORE_RC_FREEZE_001_COMPLETION_EVIDENCE_2026-09-24.md`
+- Candidate protected software delta is exactly zero:
+  - `src/aios_core/** = 0`
+  - `tests/** = 0`
+  - `.github/workflows/** = 0`
+  - `pyproject.toml = 0`
+
 ## 1. Exact freeze target
 
 RC-FREEZE started from and continued to observe live `main` at:
