@@ -547,3 +547,123 @@ def test_recall_batching_preserves_exact_limit_order_and_watermark_catchup(tmp_p
     assert page.world_revision == store.current_world_revision()
     assert page.index_watermark == store.current_world_revision()
     assert page.lag == 0
+
+def test_independent_acceptance_temporal_cutoff_and_subject_isolation(tmp_path):
+    """Reviewer-authored adversarial probe for CORE-SCALE-001 acceptance."""
+    store = SQLiteWorldStore(tmp_path / "world-independent-acceptance.sqlite")
+    index = WorldSearchIndex(tmp_path / "index-independent-acceptance.sqlite", store=store)
+
+    fact_a = _commit_fact(
+        store,
+        object_id="obs_accept_user_a",
+        subject_id="user_A",
+        text="independent-probe-token user A evidence",
+        at=T0,
+    )
+    fact_b = _commit_fact(
+        store,
+        object_id="obs_accept_user_b",
+        subject_id="user_B",
+        text="independent-probe-token user B evidence",
+        at=T0 + timedelta(minutes=1),
+    )
+    index.rebuild()
+
+    service_a = AIWorldCognitionService(store=store, index=index, user_id="user_A")
+    service_b = AIWorldCognitionService(store=store, index=index, user_id="user_B")
+    a_claim = _commit_ai_claim(
+        service_a,
+        domain=AIWorldDomain.USER_UNDERSTANDING,
+        fact=fact_a,
+        statement="independent-probe-token A private v1",
+        at=T0 + timedelta(minutes=2),
+        scope="acceptance.a",
+        tags=("core_context",),
+    )
+    b_claim = _commit_ai_claim(
+        service_b,
+        domain=AIWorldDomain.USER_UNDERSTANDING,
+        fact=fact_b,
+        statement="independent-probe-token B private v1",
+        at=T0 + timedelta(minutes=3),
+        scope="acceptance.b",
+        tags=("core_context",),
+    )
+    cutoff = T0 + timedelta(minutes=4)
+
+    revised = service_b.revise(
+        target_ref=ObjectRef(object_id=b_claim.claim.claim_id, revision=1),
+        evidence_refs=(ObjectRef(object_id=fact_b.object_id, revision=1),),
+        replacement_statement="independent-probe-token B private v2 after cutoff",
+        reason="reviewer adversarial temporal-cut probe",
+        changed_at=cutoff + timedelta(minutes=1),
+        confidence=0.97,
+    )
+    assert revised.new_revision == 2
+    index.catch_up()
+
+    current_b = service_b.current(
+        domains=(AIWorldDomain.USER_UNDERSTANDING,),
+        limit=20,
+    )
+    assert [(item.object_id, item.revision) for item in current_b] == [
+        (b_claim.claim.claim_id, 2)
+    ]
+    assert a_claim.claim.claim_id not in {item.object_id for item in current_b}
+
+    historical_b = AIWorldCognitionService(
+        store=_KnowledgeCutoffStoreView(store, cutoff),
+        index=index,
+        user_id="user_B",
+    )
+    historical_current = historical_b.current(
+        domains=(AIWorldDomain.USER_UNDERSTANDING,),
+        limit=20,
+    )
+    assert [(item.object_id, item.revision) for item in historical_current] == [
+        (b_claim.claim.claim_id, 1)
+    ]
+
+    historical_core = historical_b.core_context(per_domain=5)
+    assert [
+        (str(item["object_id"]), int(item["revision"]))
+        for item in historical_core["user_understanding"]
+    ] == [(b_claim.claim.claim_id, 1)]
+
+    historical_snapshot = historical_b.snapshot(per_domain=5)
+    assert [
+        (str(item["object_id"]), int(item["revision"]))
+        for item in historical_snapshot["user_understanding"]
+    ] == [(b_claim.claim.claim_id, 1)]
+
+    historical_recall = index.recall_candidates(
+        "independent-probe-token",
+        subject="user_B",
+        object_types=("claim",),
+        as_of=cutoff,
+        limit=20,
+    )
+    assert [(hit.object_id, hit.revision) for hit in historical_recall.hits] == [
+        (b_claim.claim.claim_id, 1)
+    ]
+
+    current_recall = index.recall_candidates(
+        "independent-probe-token",
+        subject="user_B",
+        object_types=("claim",),
+        limit=20,
+    )
+    assert [(hit.object_id, hit.revision) for hit in current_recall.hits] == [
+        (b_claim.claim.claim_id, 2)
+    ]
+
+    a_recall = index.recall_candidates(
+        "independent-probe-token",
+        subject="user_A",
+        object_types=("claim",),
+        limit=20,
+    )
+    assert [(hit.object_id, hit.revision) for hit in a_recall.hits] == [
+        (a_claim.claim.claim_id, 1)
+    ]
+
