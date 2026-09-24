@@ -20,7 +20,7 @@ from aios_core.storage.sqlite_store import SQLiteWorldStore
 from .cognitive_runtime import ModelDirective
 
 
-BackgroundAttemptWorkKind = Literal["wake", "periodic_review"]
+BackgroundAttemptWorkKind = Literal["wake", "periodic_review", "user_turn"]
 BackgroundAttemptState = Literal[
     "admitted",
     "dispatching",
@@ -88,48 +88,95 @@ class BackgroundModelAttemptStore:
         self._initialize()
 
     def _initialize(self) -> None:
+        create_table = """
+            CREATE TABLE background_model_attempts (
+                attempt_id TEXT PRIMARY KEY,
+                subject_id TEXT NOT NULL,
+                work_kind TEXT NOT NULL
+                    CHECK(work_kind IN ('wake', 'periodic_review', 'user_turn')),
+                work_id TEXT NOT NULL,
+                wake_reason TEXT NOT NULL,
+                model_round_index INTEGER NOT NULL
+                    CHECK(model_round_index >= 0),
+                admission_world_revision INTEGER NOT NULL
+                    CHECK(admission_world_revision >= 0),
+                state TEXT NOT NULL
+                    CHECK(state IN (
+                        'admitted',
+                        'dispatching',
+                        'not_submitted',
+                        'in_doubt',
+                        'response_returned',
+                        'metered'
+                    )),
+                admitted_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                provider TEXT,
+                model TEXT,
+                provider_request_id TEXT,
+                response_fingerprint TEXT,
+                meter_record_id TEXT,
+                failure_kind TEXT,
+                failure_detail TEXT,
+                reconciliation_evidence TEXT,
+                UNIQUE(subject_id, work_kind, work_id, model_round_index)
+            )
+        """
         with self.store._connection() as conn:
-            conn.executescript(
+            existing = conn.execute(
                 """
-                CREATE TABLE IF NOT EXISTS background_model_attempts (
-                    attempt_id TEXT PRIMARY KEY,
-                    subject_id TEXT NOT NULL,
-                    work_kind TEXT NOT NULL
-                        CHECK(work_kind IN ('wake', 'periodic_review')),
-                    work_id TEXT NOT NULL,
-                    wake_reason TEXT NOT NULL,
-                    model_round_index INTEGER NOT NULL
-                        CHECK(model_round_index >= 0),
-                    admission_world_revision INTEGER NOT NULL
-                        CHECK(admission_world_revision >= 0),
-                    state TEXT NOT NULL
-                        CHECK(state IN (
-                            'admitted',
-                            'dispatching',
-                            'not_submitted',
-                            'in_doubt',
-                            'response_returned',
-                            'metered'
-                        )),
-                    admitted_at TEXT NOT NULL,
-                    updated_at TEXT NOT NULL,
-                    provider TEXT,
-                    model TEXT,
-                    provider_request_id TEXT,
-                    response_fingerprint TEXT,
-                    meter_record_id TEXT,
-                    failure_kind TEXT,
-                    failure_detail TEXT,
-                    reconciliation_evidence TEXT,
-                    UNIQUE(subject_id, work_kind, work_id, model_round_index)
-                );
+                SELECT sql
+                FROM sqlite_master
+                WHERE type='table' AND name='background_model_attempts'
+                """
+            ).fetchone()
+            if existing is None:
+                conn.execute(create_table)
+            elif "'user_turn'" not in str(existing["sql"] or ""):
+                # FIX-003 extends the accepted FIX-002 attempt ledger rather than
+                # creating a second provider-attempt truth store. Rebuild the
+                # SQLite CHECK constraint in one transaction while preserving all
+                # existing Wake/Periodic Review rows byte-for-byte by column.
+                conn.execute("BEGIN IMMEDIATE")
+                conn.execute(
+                    "ALTER TABLE background_model_attempts "
+                    "RENAME TO background_model_attempts_fix002"
+                )
+                conn.execute(create_table)
+                conn.execute(
+                    """
+                    INSERT INTO background_model_attempts(
+                        attempt_id, subject_id, work_kind, work_id, wake_reason,
+                        model_round_index, admission_world_revision, state,
+                        admitted_at, updated_at, provider, model,
+                        provider_request_id, response_fingerprint,
+                        meter_record_id, failure_kind, failure_detail,
+                        reconciliation_evidence
+                    )
+                    SELECT
+                        attempt_id, subject_id, work_kind, work_id, wake_reason,
+                        model_round_index, admission_world_revision, state,
+                        admitted_at, updated_at, provider, model,
+                        provider_request_id, response_fingerprint,
+                        meter_record_id, failure_kind, failure_detail,
+                        reconciliation_evidence
+                    FROM background_model_attempts_fix002
+                    """
+                )
+                conn.execute("DROP TABLE background_model_attempts_fix002")
 
+            conn.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_background_attempt_work
                     ON background_model_attempts(
                         subject_id, work_kind, work_id, model_round_index
-                    );
+                    )
+                """
+            )
+            conn.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_background_attempt_state
-                    ON background_model_attempts(subject_id, state, updated_at);
+                    ON background_model_attempts(subject_id, state, updated_at)
                 """
             )
             conn.commit()
