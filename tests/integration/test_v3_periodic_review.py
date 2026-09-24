@@ -2,6 +2,12 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
+from aios_core.ai_world import (
+    AIWorldClaimRequest,
+    AIWorldCognitionService,
+    AIWorldDomain,
+)
+
 from aios_core.contracts.enums import ActionStatus, ObjectType, SourceClass, WakeState
 from aios_core.contracts.models import Action, Observation, Outcome, Wake
 from aios_core.contracts.operations import OperationRequest
@@ -740,3 +746,128 @@ def test_periodic_review_budget_exhaustion_stays_running_and_can_resume(tmp_path
     # FIX-002 persists one explicit RUNNING runtime-incomplete continuation
     # revision before the restarted worker enters the next model round.
     assert second.wake.revision == 4
+
+
+def test_cg001_resumed_periodic_review_uses_original_start_as_read_cut(tmp_path):
+    """A resumed review must not read T2 facts while model writeback remains at T1."""
+    store, index, original_observation, _, _ = _seed_real_outcome(tmp_path)
+    t1 = NOW
+    t2 = NOW + timedelta(minutes=5)
+
+    def first_model(snapshot):
+        return ModelDirective(
+            capability_calls=(
+                CapabilityCall(
+                    name="read_periodic_review_anchors",
+                    arguments={"offset": 0, "limit": 1},
+                ),
+            )
+        )
+
+    first_runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=first_model,
+        max_tool_rounds=0,
+    )
+    first = first_runtime.run_periodic_review(now=t1)
+    assert first is not None
+    assert first.runtime is not None
+    assert first.runtime.termination_reason == "tool_round_budget_exhausted"
+    assert first.wake.state == "running"
+
+    late = Observation(
+        object_id="obs_cg001_review_t2_late",
+        subject_id="user_1",
+        occurred=TemporalExtent.point(NOW - timedelta(days=1)),
+        learned_at=t2,
+        recorded_at=t2,
+        created_by="test:cg001",
+        source_kind="conversation",
+        modality="text",
+        value="cg001 periodic review late temporal marker delta",
+        metadata={"dimension": "dim:cg001"},
+    )
+    store.commit(
+        [late],
+        OperationRequest(
+            operation_name="test.cg001.periodic_review_late_fact",
+            expected_world_revision=int(store.current_world_revision()),
+            reason="seed a fact learned after the running review started",
+            idempotency_key="test-cg001-periodic-review-late-fact",
+            source_class=SourceClass.USER,
+        ),
+    )
+    late_cognition_marker = "cg001 periodic T2 cognition must not enter T1 cockpit"
+    AIWorldCognitionService(store=store, index=index).commit(
+        AIWorldClaimRequest(
+            domain=AIWorldDomain.USER_UNDERSTANDING,
+            statement=late_cognition_marker,
+            evidence_refs=(ObjectRef(object_id=late.object_id, revision=1),),
+            confidence=0.9,
+            scope_key="cg001.periodic.late",
+            tags=("core_context",),
+        ),
+        learned_at=t2,
+    )
+    index.catch_up()
+    seen = {}
+
+    def resumed_model(snapshot):
+        history = snapshot.capability_history
+        assert late_cognition_marker not in str(snapshot.cockpit["ai_identity"])
+        if not history:
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="search_world",
+                        arguments={
+                            "query": "cg001 periodic review late temporal marker delta",
+                            "limit": 5,
+                        },
+                    ),
+                )
+            )
+        if len(history) == 1:
+            search = history[-1]
+            assert search.ok is True
+            assert late.object_id not in {
+                item["object_id"] for item in search.data
+            }
+            return ModelDirective(
+                capability_calls=(
+                    CapabilityCall(
+                        name="commit_claim",
+                        arguments={
+                            "content": "cg001 resumed periodic review write stays at T1",
+                            "evidence_refs": [
+                                {
+                                    "object_id": original_observation.object_id,
+                                    "revision": 1,
+                                }
+                            ],
+                            "confidence": 0.8,
+                            "dimension": "dim:cg001:cognition",
+                        },
+                    ),
+                )
+            )
+        written = history[-1]
+        assert written.ok is True
+        seen["claim_id"] = written.data["claim_id"]
+        return ModelDirective(silence=True)
+
+    restarted = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=resumed_model,
+    )
+    second = restarted.run_periodic_review(now=t2)
+
+    assert second is not None
+    assert second.request.wake_ref.object_id == first.wake.wake_id
+    assert second.runtime is not None and second.runtime.silenced is True
+    written_payload = store.get_payload(seen["claim_id"])
+    assert datetime.fromisoformat(
+        str(written_payload["learned_at"]).replace("Z", "+00:00")
+    ) == t1

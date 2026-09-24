@@ -134,6 +134,7 @@ class AllDimensionsProjectionService:
         window_end: datetime,
         query: str | None = None,
         object_types: Sequence[str] = ("summary", "event", "claim", "observation"),
+        as_of: datetime | None = None,
     ) -> AllDimensionsProjection:
         start = as_utc(window_start, "window_start")
         end = as_utc(window_end, "window_end")
@@ -158,6 +159,7 @@ class AllDimensionsProjectionService:
                     dimension=dimension,
                     object_types=object_types,
                     time_range=(start, end),
+                    as_of=as_of,
                     limit=self.max_items_per_dimension * 4,
                 )
             else:
@@ -167,6 +169,7 @@ class AllDimensionsProjectionService:
                     object_types=object_types,
                     time_range=(start, end),
                     include_annotations=True,
+                    as_of=as_of,
                     limit=self.max_items_per_dimension * 4,
                 )
 

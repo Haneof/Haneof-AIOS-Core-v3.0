@@ -649,6 +649,7 @@ class ConversationContinuityService:
         session_id: str,
         query: str,
         limit: int = 8,
+        as_of: datetime | None = None,
     ) -> tuple[Mapping[str, Any], ...]:
         """Search summary indexes for one active session, then allow raw drill-down."""
         session = session_id.strip()
@@ -672,6 +673,7 @@ class ConversationContinuityService:
             subject=self.subject_id,
             dimension=INTERACTION_DIMENSION,
             object_types=[ObjectType.SUMMARY.value],
+            as_of=as_of,
             limit=min(100, bounded * 6),
         )
         result: list[Mapping[str, Any]] = []

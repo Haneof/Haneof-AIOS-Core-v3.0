@@ -36,9 +36,11 @@ from collections.abc import Iterator
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Optional, Sequence, Tuple
+from typing import Any, Mapping, Optional, Sequence, Tuple
 
+from aios_core.contracts.enums import ErrorCode
 from aios_core.contracts.time import as_utc
+from aios_core.storage.sqlite_store import StoreError
 
 _WORD_RE = re.compile(r"[a-z0-9_]+")
 _CJK_RUN_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]+")
@@ -592,33 +594,11 @@ class WorldSearchIndex:
             # 必须由 learned_at 截止。occurred_at 只描述世界何时发生，不能证明
             # AIOS 当时已经知道该事件。缺失/损坏 learned_at 时 fail closed，避免
             # 把后来获知的过去事件泄漏进历史视图。
-            cutoff = as_utc(as_of, "as_of")
-            valid_candidates: set[tuple[str, int]] = set()
-            for oid, rev in candidates:
-                learned_at: datetime | None = None
-                annotation = conn.execute(
-                    "SELECT created_at FROM search_annotations WHERE annotation_id=?",
-                    (oid,),
-                ).fetchone()
-                if annotation is not None:
-                    try:
-                        learned_at = as_utc(
-                            datetime.fromisoformat(str(annotation["created_at"])),
-                            "annotation_created_at",
-                        )
-                    except (TypeError, ValueError):
-                        learned_at = None
-                else:
-                    payload = self._store.get_payload(oid, revision=rev)
-                    raw_learned = payload.get("learned_at")
-                    if isinstance(raw_learned, str):
-                        learned_at = as_utc(
-                            datetime.fromisoformat(raw_learned),
-                            "learned_at",
-                        )
-                if learned_at is not None and learned_at <= cutoff:
-                    valid_candidates.add((oid, rev))
-            candidates = valid_candidates
+            candidates = {
+                (oid, rev)
+                for oid, rev in candidates
+                if self._known_at_cutoff(conn, oid, rev, as_of)
+            }
 
         pairs = sorted(candidates)
         # 50 万修订下的物理计划纪律（G-M1P/T2-I 禁扫描）：候选对经临时表
@@ -782,6 +762,46 @@ class WorldSearchIndex:
             # annotation table are index corruption and must not be hidden.
             raise RuntimeError("retrospective annotation projection failed") from exc
 
+    def _known_at_cutoff(
+        self,
+        conn: sqlite3.Connection,
+        object_id: str,
+        revision: int,
+        as_of: datetime,
+    ) -> bool:
+        """Return whether an indexed revision was knowable at the requested cutoff.
+
+        This is the shared AS_KNOWN primitive for runtime-facing query paths.
+        Knowledge time is learned_at for World objects and created_at for
+        projection-only retrospective annotations. Missing, malformed, or naive
+        timestamps fail closed.
+        """
+
+        cutoff = as_utc(as_of, "as_of")
+        annotation = conn.execute(
+            "SELECT created_at FROM search_annotations WHERE annotation_id=?",
+            (object_id,),
+        ).fetchone()
+        raw_known_at: Any
+        field_name: str
+        if annotation is not None:
+            raw_known_at = annotation["created_at"]
+            field_name = "annotation_created_at"
+        else:
+            payload = self._store.get_payload(object_id, revision=revision)
+            raw_known_at = payload.get("learned_at")
+            field_name = "learned_at"
+        if not isinstance(raw_known_at, str) or not raw_known_at.strip():
+            return False
+        try:
+            known_at = as_utc(
+                datetime.fromisoformat(raw_known_at),
+                field_name,
+            )
+        except (TypeError, ValueError):
+            return False
+        return known_at <= cutoff
+
     _INACTIVE_CURRENT_STATUSES = {
         "retracted",
         "superseded",
@@ -792,6 +812,45 @@ class WorldSearchIndex:
         "merged",
         "split",
     }
+
+    def _payload_visible(self, payload: Mapping[str, Any]) -> bool:
+        if bool(payload.get("pruned")):
+            return False
+        status = str(payload.get("status") or "active").strip().lower()
+        if status in self._INACTIVE_CURRENT_STATUSES:
+            return False
+        if str(payload.get("object_type") or "") == "summary":
+            if str(payload.get("summary_status") or "").strip().lower() == "stale":
+                return False
+        if str(payload.get("object_type") or "") == "evidence_set":
+            if bool(payload.get("stale")):
+                return False
+        return True
+
+    def _payload_at_cutoff(
+        self,
+        object_id: str,
+        as_of: datetime,
+    ) -> Mapping[str, Any] | None:
+        try:
+            payload = self._store.get_payload(
+                object_id,
+                knowledge_cutoff=as_utc(as_of, "as_of"),
+            )
+        except StoreError as exc:
+            if exc.code is ErrorCode.NOT_FOUND:
+                return None
+            raise
+        raw_learned = payload.get("learned_at")
+        if not isinstance(raw_learned, str) or not raw_learned.strip():
+            return None
+        try:
+            learned_at = as_utc(datetime.fromisoformat(raw_learned), "learned_at")
+        except (TypeError, ValueError):
+            return None
+        if learned_at > as_utc(as_of, "as_of"):
+            return None
+        return payload
 
     def _visible_in_current_view(
         self,
@@ -810,23 +869,9 @@ class WorldSearchIndex:
             # the rebuildable index and intentionally have no WorldStore payload.
             return True
         payload = self._store.get_payload(object_id)
-
         if int(payload.get("revision", 0)) != int(revision):
             return False
-
-        status = str(payload.get("status") or "active").strip().lower()
-        if status in self._INACTIVE_CURRENT_STATUSES:
-            return False
-
-        if str(payload.get("object_type") or "") == "summary":
-            if str(payload.get("summary_status") or "").strip().lower() == "stale":
-                return False
-
-        if str(payload.get("object_type") or "") == "evidence_set":
-            if bool(payload.get("stale")):
-                return False
-
-        return True
+        return self._payload_visible(payload)
 
     def search_mind(
         self,
@@ -841,6 +886,7 @@ class WorldSearchIndex:
         time_range: Optional[Tuple[datetime, datetime]] = None,
         include_annotations: bool = True,
         include_inactive: bool = False,
+        as_of: datetime | None = None,
         limit: int = 20,
     ) -> MindSearchPage:
         """宪法第二十章：多维心智联合感知检索入口。
@@ -936,11 +982,23 @@ class WorldSearchIndex:
             for r in rows:
                 oid = r["object_id"]
                 rev = int(r["revision"])
-                if oid in tombstones:
+                if as_of is None and oid in tombstones:
                     continue
                 if candidate_pairs is not None and (oid, rev) not in candidate_pairs:
                     continue
-                if not include_inactive and not self._visible_in_current_view(
+                if as_of is not None:
+                    if str(r["object_type"]) == "reinterpretation":
+                        if not self._known_at_cutoff(conn, str(oid), rev, as_of):
+                            continue
+                    else:
+                        historical = self._payload_at_cutoff(str(oid), as_of)
+                        if historical is None:
+                            continue
+                        if int(historical.get("revision", 0)) != rev:
+                            continue
+                        if not include_inactive and not self._payload_visible(historical):
+                            continue
+                elif not include_inactive and not self._visible_in_current_view(
                     str(oid),
                     rev,
                     str(r["object_type"]),
@@ -1021,6 +1079,13 @@ class WorldSearchIndex:
                 ).fetchall()
                 for ar in anno_rows:
                     aid = str(ar[0])
+                    if as_of is not None and not self._known_at_cutoff(
+                        conn,
+                        aid,
+                        1,
+                        as_of,
+                    ):
+                        continue
                     if aid not in retrieved_object_ids:
                         claim_txt = str(ar[3])
                         est_a_tok = max(10, len(claim_txt) // 3)
@@ -1074,6 +1139,7 @@ class WorldSearchIndex:
         object_types: Sequence[str] | None = None,
         time_range: Tuple[datetime, datetime] | None = None,
         include_inactive: bool = False,
+        as_of: datetime | None = None,
         limit: int = 20,
     ) -> MindSearchPage:
         """Broad lexical candidate generation for AI/system callers.
@@ -1125,7 +1191,7 @@ class WorldSearchIndex:
 
             rows: list[tuple[sqlite3.Row, int]] = []
             for (object_id, revision), score in hits_map.items():
-                if object_id in tombstones:
+                if as_of is None and object_id in tombstones:
                     continue
                 row = conn.execute(
                     """
@@ -1141,19 +1207,36 @@ class WorldSearchIndex:
                 ).fetchone()
                 if row is None:
                     continue
-
-                latest = conn.execute(
-                    "SELECT MAX(revision) FROM search_occurred WHERE object_id=?",
-                    (object_id,),
-                ).fetchone()
-                if latest is not None and int(latest[0]) != int(revision):
-                    continue
-                if not include_inactive and not self._visible_in_current_view(
-                    str(object_id),
-                    int(revision),
-                    str(row["object_type"]),
-                ):
-                    continue
+                if as_of is not None:
+                    if str(row["object_type"]) == "reinterpretation":
+                        if not self._known_at_cutoff(
+                            conn,
+                            str(object_id),
+                            int(revision),
+                            as_of,
+                        ):
+                            continue
+                    else:
+                        historical = self._payload_at_cutoff(str(object_id), as_of)
+                        if historical is None:
+                            continue
+                        if int(historical.get("revision", 0)) != int(revision):
+                            continue
+                        if not include_inactive and not self._payload_visible(historical):
+                            continue
+                else:
+                    latest = conn.execute(
+                        "SELECT MAX(revision) FROM search_occurred WHERE object_id=?",
+                        (object_id,),
+                    ).fetchone()
+                    if latest is not None and int(latest[0]) != int(revision):
+                        continue
+                    if not include_inactive and not self._visible_in_current_view(
+                        str(object_id),
+                        int(revision),
+                        str(row["object_type"]),
+                    ):
+                        continue
                 if subject is not None and str(row["subject_id"]) != subject:
                     continue
                 if dimension is not None and str(row["dimension"] or "") != dimension:
@@ -1255,11 +1338,10 @@ class WorldSearchIndex:
                     "SELECT object_id FROM search_tombstones"
                 ).fetchall()
             }
-            rows = conn.execute(
-                f"""
-                SELECT o.object_id, o.revision, o.object_type, o.subject_id,
-                       o.dimension, o.occurred_start_us
-                FROM search_occurred o
+            latest_join = (
+                ""
+                if reference is not None
+                else """
                 JOIN (
                     SELECT object_id, MAX(revision) AS max_revision
                     FROM search_occurred
@@ -1267,19 +1349,53 @@ class WorldSearchIndex:
                 ) latest
                   ON latest.object_id=o.object_id
                  AND latest.max_revision=o.revision
+                """
+            )
+            rows = conn.execute(
+                f"""
+                SELECT o.object_id, o.revision, o.object_type, o.subject_id,
+                       o.dimension, o.occurred_start_us
+                FROM search_occurred o
+                {latest_join}
                 WHERE {where_sql}
                 """,
                 params,
             ).fetchall()
+            if reference is not None:
+                historical_rows = []
+                for row in rows:
+                    object_id = str(row["object_id"])
+                    revision = int(row["revision"])
+                    if str(row["object_type"]) == "reinterpretation":
+                        if self._known_at_cutoff(
+                            conn,
+                            object_id,
+                            revision,
+                            reference,
+                        ):
+                            historical_rows.append(row)
+                        continue
+                    payload = self._payload_at_cutoff(object_id, reference)
+                    if payload is None:
+                        continue
+                    if int(payload.get("revision", 0)) == revision:
+                        historical_rows.append(row)
+                rows = historical_rows
 
         buckets: dict[str, dict[str, Any]] = {}
         for row in rows:
             object_id = str(row["object_id"])
             revision = int(row["revision"])
             object_type = str(row["object_type"])
-            if object_id in tombstones:
+            if reference is None and object_id in tombstones:
                 continue
-            if not include_inactive and not self._visible_in_current_view(
+            if reference is not None and object_type != "reinterpretation":
+                historical = self._payload_at_cutoff(object_id, reference)
+                if historical is None:
+                    continue
+                if not include_inactive and not self._payload_visible(historical):
+                    continue
+            elif not include_inactive and not self._visible_in_current_view(
                 object_id,
                 revision,
                 object_type,
@@ -1357,6 +1473,7 @@ class WorldSearchIndex:
         subject: str | None = None,
         object_types: Sequence[str] | None = None,
         include_inactive: bool = False,
+        as_of: datetime | None = None,
         limit: int = 20,
     ) -> MindSearchPage:
         """Return a bounded recent-current candidate set without semantic ranking.
@@ -1390,11 +1507,10 @@ class WorldSearchIndex:
                     "SELECT object_id FROM search_tombstones"
                 ).fetchall()
             }
-            rows = conn.execute(
-                f"""
-                SELECT o.object_id, o.revision, o.object_type, o.subject_id,
-                       o.dimension, o.occurred_start_us, d.excerpt
-                FROM search_occurred o
+            latest_join = (
+                ""
+                if as_of is not None
+                else """
                 JOIN (
                     SELECT object_id, MAX(revision) AS max_revision
                     FROM search_occurred
@@ -1402,6 +1518,14 @@ class WorldSearchIndex:
                 ) latest
                   ON latest.object_id=o.object_id
                  AND latest.max_revision=o.revision
+                """
+            )
+            rows = conn.execute(
+                f"""
+                SELECT o.object_id, o.revision, o.object_type, o.subject_id,
+                       o.dimension, o.occurred_start_us, d.excerpt
+                FROM search_occurred o
+                {latest_join}
                 JOIN search_doc d
                   ON d.object_id=o.object_id AND d.revision=o.revision
                 WHERE {where_sql}
@@ -1418,12 +1542,30 @@ class WorldSearchIndex:
             for row in rows:
                 object_id = str(row["object_id"])
                 revision = int(row["revision"])
-                if object_id in tombstones:
+                object_type = str(row["object_type"])
+                if as_of is None and object_id in tombstones:
                     continue
-                if not include_inactive and not self._visible_in_current_view(
+                if as_of is not None:
+                    if object_type == "reinterpretation":
+                        if not self._known_at_cutoff(
+                            conn,
+                            object_id,
+                            revision,
+                            as_of,
+                        ):
+                            continue
+                    else:
+                        historical = self._payload_at_cutoff(object_id, as_of)
+                        if historical is None:
+                            continue
+                        if int(historical.get("revision", 0)) != revision:
+                            continue
+                        if not include_inactive and not self._payload_visible(historical):
+                            continue
+                elif not include_inactive and not self._visible_in_current_view(
                     object_id,
                     revision,
-                    str(row["object_type"]),
+                    object_type,
                 ):
                     continue
                 excerpt = str(row["excerpt"] or "")
@@ -1471,12 +1613,14 @@ class WorldSearchIndex:
         limit: int = 20,
         *,
         subject: str | None = None,
+        as_of: datetime | None = None,
     ) -> MindSearchPage:
         """按实体关系网络检索，并可限定私有世界主体。"""
         return self.search_mind(
             keywords=keywords,
             subject=subject,
             entity_id=entity_id,
+            as_of=as_of,
             limit=limit,
         )
 
