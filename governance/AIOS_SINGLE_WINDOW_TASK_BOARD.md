@@ -1,33 +1,32 @@
 # AIOS v3.0 单窗口任务执行总表
 
-## 当前控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / S1-S2 ACTIVE
+## 当前控制入口 — 2026-09-24 CORE-OPERATOR-001 DONE / GAP-FIX-001+002 READY
 
-- 独立 Core gap audit PR #132 已由 PM 接受并正常合入；merge = `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`，审计 Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
-- 审计正式确认 3 个 RC blocker：`CG-001 RUNTIME_TEMPORAL_READ_CUT`、`CG-002 BACKGROUND_MODEL_EXECUTION_IN_DOUBT`、`CG-003 USER_TURN_IN_DOUBT_RECOVERY`。其余裁决：14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE，不得无依据重开。
-- `CORE-GAP-FIX-001` 与 `CORE-GAP-FIX-002` 可由两个独立工程窗口并行施工；`CORE-GAP-FIX-003` 先 BLOCKED，待 FIX-002 独立验收并集成后从当时 live main 开始。
-- `CORE-OPERATOR-001` 工程候选已在 PR #131 @ `0e1d69eebc801278f93ccc1941b8f066a4ea09ef` 进入 **GATE / REVIEW_READY**；仍必须由不同 Independent Reviewer 验收后才能 PM merge。
-- historical #117 A 仍仅是 frozen-Core accepted evidence；新 RC 的 fresh A/B/C 只能在所有 S2 工程独立验收并 `CORE-RC-FREEZE-001` 后开始。当前禁止 Resident。
-- PM dispatch：`governance/AIOS_CORE_GAP_DISPATCH_2026-09-24.md`。
-- UI / Launcher / 数字人 / 动画 / 硬件 / Android ROM 继续排除。
+- PM 接任核验（live main `e72a63874ed2c28798b00cec51f191caf1594a00`）：Core tree 仍为 `7db4f72e7b3c29c74082f9984141159f8f1d6071`，与 `6924d8b5` 无 `src/` diff；CORE-BASELINE-001 裁决 `governance/AIOS_CORE_BASELINE_001_DECISION_2026-09-24.md` 继续有效。
+- `CORE-OPERATOR-001 = DONE`：独立验收 PR #135 `ACCEPTANCE_PASS`（merge `fe6f1740eb4e6ab4d1c562373ef5d3554bb2dc54`），exact head `0e1d69eebc801278f93ccc1941b8f066a4ea09ef` 集成时未变，PM 经 PR #131 合入 `e72a63874ed2c28798b00cec51f191caf1594a00`；合后 p16-convergence-gate run `35958610555` SUCCESS；Core ZERO DIFF。收据：`governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`。
+- PR #130（`core/operator-001-20260924-sol` @ `16eb1d40c1013433166b4dd81669abbcc36b95a9`）为同一 Task 的竞争候选，未经独立验收，登记 **SUPERSEDED / NOT INTEGRATED**；保留、不合并、不删除。
+- 审计确认的 3 个 RC blocker 仍全部 OPEN：`CG-001`、`CG-002`、`CG-003`。`core-gap-fix-001-*` / `core-gap-fix-002-*` 分支存在但与 main 相同、零提交，**没有可验证的施工现场**；两项仍为 READY / NOT_STARTED（待启动）。
+- 当前禁止 Resident；fresh A/B/C 只在 `CORE-RC-FREEZE-001` 后。UI / Launcher / 数字人 / 动画 / 硬件 / Android ROM 继续排除。
+- PM dispatch：`governance/AIOS_CORE_GAP_DISPATCH_2026-09-24.md`；独立验收提示词：`governance/prompts/CORE_GAP_FIX_ACCEPTANCE_2026-09-24.md`。
 
 ### 当前优先队列（唯一正式派工表）
 
 | Task ID | 状态 | Owner / 放行出口 |
 |---|---|---|
-| CORE-BASELINE-001 | **DONE** | S0 baseline / experiment impact ruling 已落 main |
-| CORE-OPERATOR-001 | **GATE / REVIEW_READY** | Candidate PR #131；等待不同 Independent Test Infrastructure Reviewer；未验收前禁止 merge |
+| CORE-BASELINE-001 | **DONE** | S0 baseline / experiment impact ruling 已落 main；2026-09-24 PM 接任复核未发现漂移 |
+| CORE-OPERATOR-001 | **DONE** | #131 merge `e72a6387`；独立验收 #135 ACCEPTANCE_PASS；#130 SUPERSEDED |
 | CORE-GAP-AUDIT-001 | **DONE** | PR #132 已接受并合入；报告 `reviews/CORE_GAP_AUDIT_001_2026-09-24.md` |
-| CORE-GAP-FIX-001 | **READY / NOT_STARTED** | Runtime Temporal Read Cut；提示词 `governance/prompts/CORE_GAP_FIX_001_2026-09-24.md`；另开独立验收 |
-| CORE-GAP-FIX-002 | **READY / NOT_STARTED** | Background Model Execution IN_DOUBT；提示词 `governance/prompts/CORE_GAP_FIX_002_2026-09-24.md`；另开独立验收 |
-| CORE-GAP-FIX-003 | **BLOCKED** | 依赖 FIX-002 独立验收 + PM integration；提示词 `governance/prompts/CORE_GAP_FIX_003_2026-09-24.md`，当前不得施工 |
-| CORE-HEADLESS-001 | **BLOCKED** | OPERATOR accepted + FIX-001/002/003 accepted/integrated |
+| CORE-GAP-FIX-001 | **READY / NOT_STARTED（待启动）** | Core Runtime Engineer 窗口；提示词 `governance/prompts/CORE_GAP_FIX_001_2026-09-24.md`；作者只能 REVIEW_READY；验收用 `CORE_GAP_FIX_ACCEPTANCE_2026-09-24.md`，不同窗口 |
+| CORE-GAP-FIX-002 | **READY / NOT_STARTED（待启动）** | Core Runtime / Recovery Engineer 窗口；提示词 `governance/prompts/CORE_GAP_FIX_002_2026-09-24.md`；验收同上，不同窗口 |
+| CORE-GAP-FIX-003 | **BLOCKED** | 依赖 FIX-002 独立验收 + PM integration；提示词 `governance/prompts/CORE_GAP_FIX_003_2026-09-24.md` |
+| CORE-HEADLESS-001 | **BLOCKED** | OPERATOR 已满足；仍需 FIX-001/002/003 accepted/integrated |
 | CORE-RECOVERY-001 | **BLOCKED** | HEADLESS + 三项 gap 修复进入 S2 candidate |
 | CORE-SCALE-001 | **BLOCKED** | S2 功能候选 |
 | CORE-RC-FREEZE-001 | **BLOCKED** | OPERATOR + GAP fixes + HEADLESS + RECOVERY + SCALE 全部独立接受 |
-| 新 C15 fresh A → B → C / EVAL / CLOSE | **BLOCKED** | RC-FREEZE；旧 #117 A 不能 hash-swap 为新 RC A |
+| 新 C15 fresh A → B → C / EVAL / CLOSE | **BLOCKED** | RC-FREEZE；旧 #117 A 不能 hash-swap 为新 RC A；B preflight 须对 RC-FREEZE Core 重新绑定 |
 | C16 → P16 → P17 | **BLOCKED** | 保留原逐项 Gate；只有 P17 PASS 才可称 Core complete |
 
-`CORE-GAP-FIX-001` 与 `CORE-GAP-FIX-002` 当前允许并行；`CORE-OPERATOR-001` 的独立验收也可并行。一个工程窗口只负责一个 Task ID；作者不得自验收。
+`CORE-GAP-FIX-001` 与 `CORE-GAP-FIX-002` 允许两个工程窗口并行（路径冲突时以先获独立验收者先集成，后者 rebase 并重跑 Gate）。一个工程窗口只负责一个 Task ID；作者不得自验收。
 
 > Status: ACTIVE  
 > Effective: 2026-09-21  
@@ -146,7 +145,7 @@
 | 29.4 | `C15-RCC-RES-A-RERUN-001` | 在 frozen Core 上使用 frozen C15 fixture，从 fresh private World / fresh session 重新执行 Phase A cursor 1..13；必须由新的真实 Resident A 窗口逐事件生活 | **DONE** | C15-RCC-RES-A-REPAIR-DECISION-001 | PR #117 @ `3e51f728d7959048b75fea01d405bc837b0e8185` remains OPEN / UNMERGED / PINNED; canonical Core anchor `bcd6bf353126318f9a97076b52ec1740d43f35a4`; `governance/C15_FINAL_RELEASE_DECISION_2026-09-23.md` | Independent acceptance PASS: cursor 1..13 sealed, 13/13 durable ack, fresh World/session, cognition/revision lineage valid, UNKNOWN discipline preserved; World/index/release-state frozen for B. |
 | 30 | `C15-RCC-RES-B-001` | 原 fresh-context B 候选执行证据验收 | **FAILED** | C15-RCC-RES-A-RERUN-001 | PR #121 @ `b6e5ac939bef83615292bcf9b9099d76737d82b0`；本处置随纠偏治理集成生效；OPEN / UNMERGED / PINNED / NON-CANONICAL | 仅 9 条输入落库、无 B 模型计量/原始 Runtime 轨迹、World/index 97/88，当前 candidate 不可接受；不是 Core 认知能力失败裁决，不以新 Claim 数量评分 |
 | 30.1 | `C15-RCC-RES-B-CORRECTIVE-001` | PM 证据纠偏、地图/队列/检查点同步与隔离角色提示词 | **DONE** | C15-RCC-RES-B-001 candidate disposition | PR #122；accepted head `bbf45baf2e2a6314483d8355c1ee8badc09aa4a9`；merge `2a68df3f8901138fa3126a91063c430f69102049`；integration receipt 2026-09-24 | PM 自审明确记录；exact-head C15/C14 CI SUCCESS；无 Core/fixture/evidence 改动；仅释放 operator preflight，不是实验 PASS |
-| 30.2 | `C15-RCC-RES-B-PREFLIGHT-001` | 非盲 operator 准备正常 Runtime 传输桥、实时记录、合法 A 状态与实际隔离；不运行真实 B | **BLOCKED / WIP** | CORE-BASELINE-001；接续 CORE-OPERATOR-001 | 冻结 Core + #117 exact A；完成定义见纠偏裁决 §3；独立的新 operator 窗口 | 无语义规则/旧答案；合成数据机械检查；operator/safe-packet manifests、entry commands、hash/pin、隔离证据、身份盘点；不得自放行 |
+| 30.2 | `C15-RCC-RES-B-PREFLIGHT-001` | 非盲 operator 准备正常 Runtime 传输桥、实时记录、合法 A 状态与实际隔离；不运行真实 B | **BLOCKED** | CORE-OPERATOR-001 (DONE)；CORE-RC-FREEZE-001 | operator 资产已由 CORE-OPERATOR-001 合入 main `e72a6387`（机械复现与修复，非 B 放行）；最终 preflight 必须绑定 RC-FREEZE Core 与届时 A 裁决；完成定义见纠偏裁决 §3；独立的新 operator 窗口 | 无语义规则/旧答案；合成数据机械检查；operator/safe-packet manifests、entry commands、hash/pin、隔离证据、身份盘点；不得自放行 |
 | 30.3 | `C15-RCC-RES-B-RELEASE-001` | 独立 PM 审查 preflight 并放行唯一安全启动包 | **BLOCKED** | C15-RCC-RES-B-PREFLIGHT-001 | 已接受并合入的 operator exact source + 机械证据；新独立 PM | 冻结 Core/A bytes、正常 Runtime 与记录链、实际隔离均通过；pin packet/bridge、run/session；放行治理合入后才释放 rerun；不执行 Resident |
 | 30.4 | `C15-RCC-RES-B-RERUN-001` | 全新盲测 Resident 从 accepted A 执行唯一 B 段 cursor 14..22 | **BLOCKED** | C15-RCC-RES-B-RELEASE-001 | 仅批准的 Resident-safe packet / 正常 AIOS 接口；不读治理/旧证据 | 真实模型逐次选择；normal run_turn/due-work；Snapshot/directive/工具结果/计量/输出实时可审计；最终 World/index/restart/receipts/hash 冻结；仅报 RUN_COMPLETE 待独立验收 |
 | 30.5 | `C15-RCC-RES-B-ACCEPT-001` | 独立 PM 验收 fresh B 执行完整性与 provenance，不替代语义终评 | **BLOCKED** | C15-RCC-RES-B-RERUN-001 | exact evidence head + raw runtime trace + frozen state | receipt/World/index/计量/行为原始链匹配，无污染；认知可保留/沉默；private World 不合 main；通过并写回后释放身份预检 |

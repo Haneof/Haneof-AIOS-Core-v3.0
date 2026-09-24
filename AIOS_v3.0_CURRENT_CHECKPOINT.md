@@ -1,16 +1,14 @@
 # AIOS v3.0 当前工程断点
 
-## 当前控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / FIX-001+002 READY
+## 当前控制入口 — 2026-09-24 CORE-OPERATOR-001 DONE / FIX-001+002 READY（待启动）
 
-- 独立审计 PR #132 已合入；PM acceptance main = `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`，Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
-- 审计报告：`reviews/CORE_GAP_AUDIT_001_2026-09-24.md`。正式 RC blockers：CG-001 temporal read cut、CG-002 background model execution IN_DOUBT、CG-003 user-turn IN_DOUBT recovery。
-- `CORE-GAP-FIX-001 = READY / NOT_STARTED`；提示词 `governance/prompts/CORE_GAP_FIX_001_2026-09-24.md`。
-- `CORE-GAP-FIX-002 = READY / NOT_STARTED`；提示词 `governance/prompts/CORE_GAP_FIX_002_2026-09-24.md`。
-- `CORE-GAP-FIX-003 = BLOCKED`，等待 FIX-002 独立验收并 PM 集成后再从 live main 开始。
-- `CORE-OPERATOR-001` candidate PR #131 @ `0e1d69eebc801278f93ccc1941b8f066a4ea09ef` = GATE / REVIEW_READY；当前必须由不同 independent reviewer 验收，尚未 DONE、尚未 merge。
-- PM dispatch / sequencing：`governance/AIOS_CORE_GAP_DISPATCH_2026-09-24.md`。
-- HEADLESS / RECOVERY / SCALE / RC-FREEZE 继续 BLOCKED；fresh Resident A/B/C 继续禁止，历史 #117/#121 不改。
-- UI/P18/P19 不进入本轮 Core completion。
+- PM 接任核验 live main = `e72a63874ed2c28798b00cec51f191caf1594a00`；Core tree `7db4f72e7b3c29c74082f9984141159f8f1d6071` 不变；CORE-BASELINE-001 裁决仍有效。
+- `CORE-OPERATOR-001 = DONE`：#135 独立验收 ACCEPTANCE_PASS（merge `fe6f1740`）→ PM 集成 #131 exact head `0e1d69eebc801278f93ccc1941b8f066a4ea09ef` → merge `e72a6387`；合后 p16-convergence-gate `35958610555` SUCCESS；Core ZERO DIFF；收据 `governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`。
+- PR #130 @ `16eb1d40` = SUPERSEDED / NOT INTEGRATED（保留，不合并）。
+- 仍 OPEN 的 RC blockers：CG-001 temporal read cut、CG-002 background model execution IN_DOUBT、CG-003 user-turn IN_DOUBT recovery（审计 `reviews/CORE_GAP_AUDIT_001_2026-09-24.md`）。
+- `CORE-GAP-FIX-001` / `CORE-GAP-FIX-002` = READY / NOT_STARTED（待启动；同名分支零提交）。`CORE-GAP-FIX-003` = BLOCKED（等 FIX-002 独立验收并集成）。
+- 独立验收提示词：`governance/prompts/CORE_GAP_FIX_ACCEPTANCE_2026-09-24.md`。
+- HEADLESS / RECOVERY / SCALE / RC-FREEZE BLOCKED；Resident 禁止；#117/#121 不改；UI/P18/P19 不进入本轮。
 
 > 用途：新会话 / 新模型 / 新工程师进入仓库后的第一现场状态文件  
 > 更新规则：每完成一个可验证节点立即更新；不得靠聊天记忆代替本文件  
