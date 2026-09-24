@@ -348,6 +348,36 @@ def test_r9_interrupted_index_rebuild_leaves_canonical_projection_publish_safe(
     assert done["index_watermark"] == store.current_world_revision()
 
 
+def test_r9_interrupted_backup_does_not_publish_partial_snapshot(
+    tmp_path, monkeypatch
+):
+    cfg = HeadlessConfig(world_path=tmp_path / "source.sqlite")
+    store = SQLiteWorldStore(cfg.world_path)
+    oid = new_object_id(ObjectType.OBSERVATION)
+    store.commit([make_obs(oid, 1, "backup source")], op(0, "r9-backup"))
+    source_revision = store.current_world_revision()
+
+    import aios_core.headless.recovery as recovery_module
+
+    original_replace = recovery_module.os.replace
+
+    def fail_publish(_source, _target):
+        raise OSError("synthetic backup publish interruption")
+
+    backup = tmp_path / "interrupted-backup.sqlite"
+    monkeypatch.setattr(recovery_module.os, "replace", fail_publish)
+    with pytest.raises(OSError, match="backup publish interruption"):
+        backup_world(cfg, backup)
+    assert not backup.exists()
+    assert not Path(str(backup) + ".tmp").exists()
+    assert SQLiteWorldStore(cfg.world_path).current_world_revision() == source_revision
+
+    monkeypatch.setattr(recovery_module.os, "replace", original_replace)
+    done = backup_world(cfg, backup)
+    assert done["world_revision"] == source_revision
+    assert backup.exists()
+
+
 def test_r9_interrupted_restore_does_not_mutate_backup_or_publish_partial_world(
     tmp_path, monkeypatch
 ):
