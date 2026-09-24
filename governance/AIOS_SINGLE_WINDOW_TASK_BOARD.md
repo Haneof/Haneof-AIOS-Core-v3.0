@@ -1,6 +1,6 @@
 # AIOS v3.0 单窗口任务执行总表
 
-## 当前控制入口 — 2026-09-24 FIX-001 DONE / FIX-002 DONE / FIX-003 DONE / HEADLESS READY / CI-FIX DONE
+## 当前控制入口 — 2026-09-24 FIX-001/002/003 DONE / HEADLESS REVIEW_READY / CI-FIX DONE
 
 - 接任 PM 依 #128 治理接手；接手与 live 复核：`governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
 - **派工基线 = live main `079d7516f195cf6973933acc8cd057d59adc3a9f`**（其后仅治理/审查文档变更）；`CORE-OPERATOR-001` 集成点 = `e72a63874ed2c28798b00cec51f191caf1594a00`；Core tree 自审计以来始终 `7db4f72e7b3c29c74082f9984141159f8f1d6071`。每个新窗口仍须自行重取 live main，不得把本 SHA 当永久施工基线。
@@ -43,14 +43,14 @@
 | CORE-CI-FIX-001-CORRECTIVE-001 | **DONE** | blocker `CORE-CI-FIX-001-ACCEPT-BLOCKER-001` closed by the accepted corrective; historical fail evidence remains unchanged |
 | CORE-GAP-FIX-003 | **DONE** | 历史 #162 ACCEPTANCE_FAIL 与 #174 REBASE_REVALIDATION_REQUIRED 保留；post-FIX001 review #178 ACCEPTANCE_PASS / 0 blockers；#157 exact `7c0c51a7e9cda41a5aa61357ebba96955948a4a7` merged as `78c103322b14c60cabf92174b0b5a7385752d758`；receipt `governance/CORE_GAP_FIX_003_INTEGRATION_RECEIPT_2026-09-24.md` |
 | CORE-GAP-FIX-003-CORRECTIVE-001 | **DONE** | corrective pre-FIX001 `ac8d5a43...` → post-FIX001 exact `7c0c51a7...`；13/13 workflows SUCCESS，P16 662 pass markers；final review #178 ACCEPTANCE_PASS；candidate integrated in #157 merge `78c10332...` |
-| CORE-HEADLESS-001 | **READY** | OPERATOR + FIX-001/002/003 均已 accepted/integrated；唯一当前施工任务。提示词：`governance/prompts/CORE_HEADLESS_001_2026-09-24.md`；只做最小 headless install/start/stop/restart/runtime integration，不做 UI/Resident |
+| CORE-HEADLESS-001 | **GATE / REVIEW_READY** | PR #181；tested implementation exact `a43c2e9408e51ec8812e9f6ec808a71401bc2841`，evidence-only handoff `12928af4ffa40e70d9ae80124dab388a486f7097`；core-headless/world-kernel/constitutional/P16 四组 exact-head Gate SUCCESS，A–F restart matrix + clean install + single-writer evidence 已落；等待 Independent Acceptance。提示词：`governance/prompts/CORE_HEADLESS_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md` |
 | CORE-RECOVERY-001 | **BLOCKED** | HEADLESS + 三项 gap 修复进入 S2 candidate |
 | CORE-SCALE-001 | **BLOCKED** | S2 功能候选 |
 | CORE-RC-FREEZE-001 | **BLOCKED** | CI prerequisite `CORE-CI-FIX-001` **已满足**；仍等待 GAP fixes + HEADLESS + RECOVERY + SCALE 全部独立接受/集成 |
 | 新 C15 fresh A → B → C / EVAL / CLOSE | **BLOCKED** | RC-FREEZE；旧 #117 A 不能 hash-swap 为新 RC A |
 | C16 → P16 → P17 | **BLOCKED** | 保留原逐项 Gate；只有 P17 PASS 才可称 Core complete |
 
-FIX-001 / FIX-002 / FIX-003 三项 audited Core gap 已全部独立接受并集成；CG-001/002/003 均 CLOSED。当前唯一合法下一施工任务为 `CORE-HEADLESS-001 = READY`；RECOVERY、SCALE、RC-FREEZE、fresh Resident A/B/C 继续等待各自前置。CI corrective 已关闭。
+FIX-001 / FIX-002 / FIX-003 三项 audited Core gap 已全部独立接受并集成；CG-001/002/003 均 CLOSED。`CORE-HEADLESS-001` 已完成工程施工并进入 `GATE / REVIEW_READY`，当前唯一合法下一动作是独立验收；RECOVERY、SCALE、RC-FREEZE、fresh Resident A/B/C 继续等待各自前置。CI corrective 已关闭。
 
 > Status: ACTIVE  
 > Effective: 2026-09-21  
