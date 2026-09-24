@@ -1,32 +1,35 @@
 # AIOS v3.0 单窗口任务执行总表
 
-## 当前控制入口 — 2026-09-24 CORE-BASELINE-001 DONE
+## 当前控制入口 — 2026-09-24 CORE-GAP-AUDIT-001 ACCEPTED / FIX-001 READY
 
-- 治理计划 PR #128 已正常合入；S0 审查时 live main / development baseline = `33436565c109c2c47cf2c3150084fcce22810124`。
-- live `src/aios_core` tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`。#127 已合；#126 exact head `8e31deca...` 的 Core tree 与 main 相同，不重复集成。
-- #125 exact head `b14b5d84...` 保持 OPEN / WIP；其 Core tree 仍为旧 `eed27d58...`，不得整包合入。当前 exact-head 两条 workflow 均因同 3 项 operator regression 失败：中间 24h Review 未触发、旧 Wake 看见未来输入、预算延迟未保留。
-- #117 canonical A 仅保留为 frozen Core `bcd6bf3...` 的历史 accepted evidence；#121 旧 B 保留 FAILED / NON-CANONICAL。
-- 由于 #127 已改变 revision / policy / search-index / summary / scheduler / turn-admission 等可影响 Resident 世界与认知链的机制，**新 release candidate 必须 fresh A**；但只在 `CORE-RC-FREEZE-001` 后执行，当前禁止 Resident。
-- S0 详细裁决：`governance/AIOS_CORE_BASELINE_001_DECISION_2026-09-24.md`。
-- 固定集成路线：所有前向工程从 live main 开始；#125 只定向提取 operator/test 资产；审计只读 main；发现 Core 缺口才新建最小 `CORE-GAP-FIX-NNN`；S2 收口后冻结 RC，再 fresh A → B → C。
-- UI / Launcher / 数字人 / 动画 / 硬件 / Android ROM 仍全部排除。
+- Independent gap audit PR #132 已正常合入；audit merge main anchor = `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`。
+- #132 仅新增 `reviews/CORE_GAP_AUDIT_001_2026-09-24.md`，没有 Core/test/operator/fixture/Resident evidence 修改；审计 Core tree 仍为 `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
+- PM 对当前 main 源码再次抽查后接受 3 个 `STILL_OPEN` release blocker：`CG-001 RUNTIME_TEMPORAL_READ_CUT`、`CG-002 BACKGROUND_MODEL_EXECUTION_IN_DOUBT`、`CG-003 USER_TURN_IN_DOUBT_RECOVERY`。三项全部阻塞 RC freeze。
+- PM 接受/派工裁决：`governance/CORE_GAP_AUDIT_001_PM_DISPATCH_2026-09-24.md`。
+- 为避免三个修复同时改 `src/aios_core/runtime/turn_runtime.py` 并重复建立 recovery truth，修复顺序固定为 FIX-001 → FIX-002 → FIX-003；一缺口一工程窗口、一 candidate、一独立验收。
+- `CORE-GAP-FIX-001` 当前唯一新 Core 施工 READY；提示词 `governance/prompts/CORE_GAP_FIX_001_2026-09-24.md`。
+- `CORE-GAP-FIX-002` / `003` 已定义但按依赖 BLOCKED；提示词分别为 `CORE_GAP_FIX_002_2026-09-24.md` / `CORE_GAP_FIX_003_2026-09-24.md`。
+- `CORE-OPERATOR-001` 已有工程 candidate PR #131 @ `0e1d69eebc801278f93ccc1941b8f066a4ea09ef`，状态 `REVIEW_READY` / OPEN / UNMERGED，等待不同 Independent Reviewer 验收；不得提前写 DONE。
+- #131 与 gap-fix 链可独立推进，但 Headless 只在 operator 被接受集成且 3 个 gap fix 全部被接受集成后释放。
+- historical #117 A 仍仅是旧 frozen-Core evidence；新 RC 必须在 `CORE-RC-FREEZE-001` 后 fresh A。当前禁止 Resident A/B/C。
+- UI / Launcher / 数字人 / 动画 / 硬件 / Android ROM 全部继续排除。
 
 ### 当前优先队列（唯一正式派工表）
 
 | Task ID | 状态 | Owner / 放行出口 |
 |---|---|---|
-| CORE-BASELINE-001 | **DONE** | PM 自审治理；裁决与三入口同步落库 |
-| CORE-OPERATOR-001 | **READY / NOT_STARTED** | Test Infrastructure Engineer；从 main 定向移植 #125 operator，先复现 3 failures；提示词 `governance/prompts/CORE_OPERATOR_001_2026-09-24.md`；候选由不同 independent reviewer 验收 |
-| CORE-GAP-AUDIT-001 | **READY / NOT_STARTED** | Independent Core Architect；只读当前 main，输出 requirement→implementation→test→verdict 矩阵；提示词 `governance/prompts/CORE_GAP_AUDIT_001_2026-09-24.md` |
-| CORE-GAP-FIX-NNN | BLOCKED / 条件任务 | 仅由 GAP-AUDIT 或合法新复现激活；一缺口一任务 |
-| CORE-HEADLESS-001 | BLOCKED | GAP-AUDIT 接受 + 所有阻塞性 gap 裁决 |
-| CORE-RECOVERY-001 | BLOCKED | HEADLESS / 激活修复形成 S2 功能候选 |
-| CORE-SCALE-001 | BLOCKED | S2 功能候选 |
-| CORE-RC-FREEZE-001 | BLOCKED | OPERATOR + GAP/FIX + HEADLESS + RECOVERY + SCALE 全部接受 |
-| 新 C15 fresh A → B → C / EVAL / CLOSE | BLOCKED | RC-FREEZE；旧 #117 A 不能 hash-swap 为新 RC A |
-| C16 → P16 → P17 | BLOCKED | 保留原逐项 Gate；只有 P17 PASS 才可称 Core complete |
-
-`CORE-OPERATOR-001` 与 `CORE-GAP-AUDIT-001` 可并行：前者仅写 operator/test/workflow 专用路径，后者只读 Core 并只写 audit report。当前平台未直接启动独立 AI 子窗口，因此二者状态明确为 NOT_STARTED；不得声称已经施工。
+| CORE-BASELINE-001 | **DONE** | S0 baseline / impact ruling 已合入 |
+| CORE-OPERATOR-001 | **GATE / REVIEW_READY** | PR #131 exact candidate；等待不同 Independent Test Infrastructure Reviewer；未验收不得 merge |
+| CORE-GAP-AUDIT-001 | **DONE** | PR #132 / audit report 已由 PM 复核接受并合入 |
+| CORE-GAP-FIX-001 | **READY / NOT_STARTED** | Core Runtime Engineer；关闭 CG-001；提示词 `governance/prompts/CORE_GAP_FIX_001_2026-09-24.md`；作者不得自验收 |
+| CORE-GAP-FIX-002 | **BLOCKED** | 依赖 FIX-001 accepted + merged；关闭 CG-002；复用既有 Metering/runtime persistence |
+| CORE-GAP-FIX-003 | **BLOCKED** | 依赖 FIX-002 accepted + merged；关闭 CG-003；复用 FIX-002 model-attempt/recovery 机制 |
+| CORE-HEADLESS-001 | **BLOCKED** | 依赖 OPERATOR accepted+merged + FIX-001/002/003 accepted+merged |
+| CORE-RECOVERY-001 | **BLOCKED** | HEADLESS + gap-fix 集成后的 S2 candidate |
+| CORE-SCALE-001 | **BLOCKED** | RECOVERY / S2 功能候选 |
+| CORE-RC-FREEZE-001 | **BLOCKED** | OPERATOR + GAP/FIX + HEADLESS + RECOVERY + SCALE 全部接受 |
+| 新 C15 fresh A → B → C / EVAL / CLOSE | **BLOCKED** | RC-FREEZE；禁止 hash-swap 旧 #117 A |
+| C16 → P16 → P17 | **BLOCKED** | 保留原逐项 Gate；只有 P17 PASS 才可称 Core complete |
 
 > Status: ACTIVE  
 > Effective: 2026-09-21  
