@@ -99,6 +99,7 @@ from aios_core.world_graph import (
 )
 
 from .background_attempt import (
+    BackgroundModelAttempt,
     BackgroundModelAttemptStore,
     BackgroundModelExecutionInDoubt,
 )
@@ -158,6 +159,18 @@ class FusedTurnResult:
     conversation_commit: ConversationCommit
     continuity_summary_commits: tuple[RoundSummaryCommit, ...] = ()
     continuity_summary_error: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class TurnExecutionInspection:
+    execution_id: str
+    state: str
+    recovery_disposition: str
+    assistant_ref: ObjectRef | None
+    model_attempts: tuple[BackgroundModelAttempt, ...] = ()
+    retry_authorized: bool = False
+    retry_count: int = 0
+    reconciliation_evidence: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -352,6 +365,7 @@ class FusedTurnRuntime:
         self._active_wake_id: str | None = None
         self._active_wake_source: WakeSource | None = None
         self._active_review_request: PeriodicReviewRequest | None = None
+        self._active_user_turn_execution_id: str | None = None
 
         registry = CapabilityRegistry()
         registry.register(
@@ -1117,6 +1131,14 @@ class FusedTurnRuntime:
             self._active_wake_id,
         )
 
+    def _active_model_attempt_scope(self) -> tuple[str, str] | None:
+        background = self._active_background_attempt_scope()
+        if background is not None:
+            return background
+        if self._active_user_turn_execution_id is not None:
+            return ("user_turn", self._active_user_turn_execution_id)
+        return None
+
     def _background_model_round_offset(
         self,
         *,
@@ -1186,7 +1208,7 @@ class FusedTurnRuntime:
         self,
         snapshot: RuntimeSnapshot,
     ) -> str | None:
-        scope = self._active_background_attempt_scope()
+        scope = self._active_model_attempt_scope()
         if scope is None:
             return None
         if self._active_meter_time is None:
@@ -1278,7 +1300,11 @@ class FusedTurnRuntime:
             model_round_index=snapshot.round_index,
             usage=directive.usage,
             provenance=directive.provenance,
-            background_attempt_id=snapshot.model_attempt_id,
+            background_attempt_id=(
+                snapshot.model_attempt_id
+                if self._active_background_attempt_scope() is not None
+                else None
+            ),
         )
 
     def _cockpit_capability_catalog(self) -> tuple[dict[str, Any], ...]:
@@ -3004,6 +3030,164 @@ class FusedTurnRuntime:
 
         return False, None
 
+    def _turn_recovery_identity(
+        self,
+        *,
+        session_id: str,
+        turn_index: int,
+        user_input: str,
+        occurred_at: datetime,
+    ) -> tuple[str, str, str]:
+        session = session_id.strip()
+        if not session:
+            raise ValueError("session_id must not be blank")
+        if type(turn_index) is not int or turn_index < 1:
+            raise ValueError("turn_index must be a positive integer")
+        if not isinstance(user_input, str):
+            raise ValueError("user_input must be text")
+        occurred_iso = canonical_utc_iso(occurred_at, "occurred_at")
+        _, _, assistant_id = self.ingestor._turn_identity(session, turn_index)
+        return session, occurred_iso, assistant_id
+
+    def inspect_turn_execution(
+        self,
+        *,
+        session_id: str,
+        turn_index: int,
+        user_input: str,
+        occurred_at: datetime,
+    ) -> TurnExecutionInspection:
+        session, occurred_iso, assistant_id = self._turn_recovery_identity(
+            session_id=session_id,
+            turn_index=turn_index,
+            user_input=user_input,
+            occurred_at=occurred_at,
+        )
+        status = self.turn_executions.inspect(
+            subject_id=self.subject_id,
+            session_id=session,
+            turn_index=turn_index,
+            user_input=user_input,
+            occurred_at=occurred_iso,
+            assistant_id=assistant_id,
+        )
+        attempts = self.background_model_attempts.list_for_work(
+            subject_id=self.subject_id,
+            work_kind="user_turn",
+            work_id=status.execution_id,
+        )
+        return TurnExecutionInspection(
+            execution_id=status.execution_id,
+            state=status.state,
+            recovery_disposition=status.recovery_disposition,
+            assistant_ref=status.assistant_ref,
+            model_attempts=attempts,
+            retry_authorized=status.retry_authorized,
+            retry_count=status.retry_count,
+            reconciliation_evidence=status.reconciliation_evidence,
+        )
+
+    def authorize_turn_retry(
+        self,
+        *,
+        session_id: str,
+        turn_index: int,
+        user_input: str,
+        occurred_at: datetime,
+        evidence: str,
+    ) -> TurnExecutionInspection:
+        session, occurred_iso, assistant_id = self._turn_recovery_identity(
+            session_id=session_id,
+            turn_index=turn_index,
+            user_input=user_input,
+            occurred_at=occurred_at,
+        )
+        self.turn_executions.authorize_retry(
+            subject_id=self.subject_id,
+            session_id=session,
+            turn_index=turn_index,
+            user_input=user_input,
+            occurred_at=occurred_iso,
+            assistant_id=assistant_id,
+            evidence=evidence,
+        )
+        return self.inspect_turn_execution(
+            session_id=session,
+            turn_index=turn_index,
+            user_input=user_input,
+            occurred_at=occurred_at,
+        )
+
+    def reconcile_turn_model_not_submitted(
+        self,
+        *,
+        session_id: str,
+        turn_index: int,
+        user_input: str,
+        occurred_at: datetime,
+        model_round_index: int,
+        reconciled_at: datetime,
+        evidence: str,
+    ) -> TurnExecutionInspection:
+        inspected = self.inspect_turn_execution(
+            session_id=session_id,
+            turn_index=turn_index,
+            user_input=user_input,
+            occurred_at=occurred_at,
+        )
+        attempt = self.background_model_attempts.inspect(
+            subject_id=self.subject_id,
+            work_kind="user_turn",
+            work_id=inspected.execution_id,
+            model_round_index=model_round_index,
+        )
+        if attempt is None:
+            raise KeyError(
+                "user-turn model attempt does not exist for the requested round"
+            )
+        self.background_model_attempts.reconcile_not_submitted(
+            attempt.attempt_id,
+            reconciled_at=reconciled_at,
+            evidence=evidence,
+        )
+        return self.inspect_turn_execution(
+            session_id=session_id,
+            turn_index=turn_index,
+            user_input=user_input,
+            occurred_at=occurred_at,
+        )
+
+    def recover_turn_completion(
+        self,
+        *,
+        session_id: str,
+        turn_index: int,
+        user_input: str,
+        occurred_at: datetime,
+        evidence: str,
+    ) -> TurnExecutionInspection:
+        session, occurred_iso, assistant_id = self._turn_recovery_identity(
+            session_id=session_id,
+            turn_index=turn_index,
+            user_input=user_input,
+            occurred_at=occurred_at,
+        )
+        self.turn_executions.reconcile_completed(
+            subject_id=self.subject_id,
+            session_id=session,
+            turn_index=turn_index,
+            user_input=user_input,
+            occurred_at=occurred_iso,
+            assistant_id=assistant_id,
+            evidence=evidence,
+        )
+        return self.inspect_turn_execution(
+            session_id=session,
+            turn_index=turn_index,
+            user_input=user_input,
+            occurred_at=occurred_at,
+        )
+
     def run_turn(
         self,
         *,
@@ -3032,9 +3216,39 @@ class FusedTurnRuntime:
             raise ValueError("user_input must be text")
         occurred_iso = canonical_utc_iso(occurred_at, "occurred_at")
         _, _, assistant_id = self.ingestor._turn_identity(session, turn_index)
+        execution_id = self.turn_executions.execution_id_for(
+            subject_id=self.subject_id,
+            session_id=session,
+            turn_index=turn_index,
+        )
         self.turn_executions.claim(
             subject_id=self.subject_id, session_id=session, turn_index=turn_index,
             user_input=user_input, occurred_at=occurred_iso, assistant_id=assistant_id,
+        )
+        # Establish the same durable provider-attempt boundary used by FIX-002
+        # before any user-turn pre-model work. If execution stops before
+        # mark_dispatching(), the admitted state is durable proof that provider
+        # submission did not begin; retry still requires explicit authorization.
+        self.background_model_attempts.admit(
+            subject_id=self.subject_id,
+            work_kind="user_turn",
+            work_id=execution_id,
+            wake_reason=WakeSource.USER_INTERACTION.value,
+            model_round_index=0,
+            world_revision=int(self.store.current_world_revision()),
+            admitted_at=occurred_at,
+        )
+        # Corrective-001: only after deterministic round-0 attempt admission is
+        # durable do we promote the turn out of the explicit pre-attempt protocol.
+        # A crash before this line is therefore mechanically recoverable; a crash
+        # after it delegates disposition to the shared attempt ledger.
+        self.turn_executions.mark_initial_attempt_admitted(
+            subject_id=self.subject_id,
+            session_id=session,
+            turn_index=turn_index,
+            user_input=user_input,
+            occurred_at=occurred_iso,
+            assistant_id=assistant_id,
         )
 
         self.attention_watches.expire_due(now=occurred_at)
@@ -3194,6 +3408,7 @@ class FusedTurnRuntime:
         self._active_meter_time = occurred_at
         self._active_session_id = session
         self._active_wake_id = None
+        self._active_user_turn_execution_id = execution_id
         try:
             runtime_result = self.cognitive_runtime.run_turn(
                 user_input,
@@ -3205,6 +3420,7 @@ class FusedTurnRuntime:
             self._active_meter_time = None
             self._active_session_id = None
             self._active_wake_id = None
+            self._active_user_turn_execution_id = None
 
         assistant_text = runtime_result.response or ""
         assistant_commit = self.ingestor.commit_assistant_output(
