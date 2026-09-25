@@ -1,0 +1,29 @@
+=== sealed-path leak probe (categories from release_contract §2 / preflight §6) ===
+sealed:/repo/reviews/internal_habitation/c15-rcc/v1/fixture absent
+sealed:/repo/reviews/internal_habitation/c15-rcc/v1/evaluator absent
+sealed:/repo/reviews/internal_habitation/c15-rcc/v1/release absent
+sealed:/repo/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-A-RERUN-002 absent
+sealed:/repo/reviews/internal_habitation/c14-resident absent
+sealed:/repo/governance absent
+sealed:/repo/prompts absent
+sealed:/repo/.git absent
+sealed:/repo/AIOS_SINGLE_WINDOW_TASK_BOARD.md absent
+sealed:/repo/AIOS_v3.0_CURRENT_CHECKPOINT.md absent
+sealed:/repo/PROJECT_MASTER_MAP.md absent
+
+=== Expected-visible check ===
+visible:/repo/src present (expected)
+visible:/repo/src/aios_core present (expected)
+visible:/repo/reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md present (expected)
+
+=== privilege audit ===
+uid=65534(nobody) gid=65534(nogroup) groups=65534(nogroup)
+
+=== /proc/1/root readable? ===
+blocked: cannot read host /proc/1/root (expected)
+
+=== mount() syscall as unprivileged user ===
+mount() returned -1, errno=1 (EPERM=1)
+blocked: mount denied (expected)
+
+ISOLATION_PASS
