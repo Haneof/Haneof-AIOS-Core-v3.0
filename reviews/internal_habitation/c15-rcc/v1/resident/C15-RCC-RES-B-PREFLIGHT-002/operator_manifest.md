@@ -1,18 +1,18 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Operator Manifest (CORRECTIVE-013-FIXUP-001)
+# C15-RCC-RES-B-PREFLIGHT-002 — Operator Manifest (CORRECTIVE-014)
 
 Date: 2026-09-26
 Role: Release / Test Infrastructure Engineer (not Resident B/C, not evaluator)
-Task: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-013-FIXUP-001`
-Verdict: **FIXUP_001_HANDOFF_READY**; PM blocker review `5319913802`, task release `5835591147`. No B/C run, no merge, and no Independent Acceptance by the implementer.
+Task: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-014`
+Verdict: **CORRECTIVE-014 EXACT CANDIDATE — INDEPENDENT ACCEPTANCE REQUIRED BEFORE B RELEASE**. IA review `5320859635` is the source blocker. No B/C run or merge is authorized by this manifest.
 
-## Current authoritative manifest (CORRECTIVE-013-FIXUP-001)
+## Current authoritative manifest (CORRECTIVE-014)
 
-- **Current task**: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-013-FIXUP-001`
-- **Scope**: current evidence/canonical synchronization only; no Corrective-013 implementation changes.
-- **C013 implementation blobs**: lifecycle checker `bfb9b0135987ea262682f5f7eee192c762aaab22`; E2E probe `d8215562721ef3bca14eb1a24c419cbd5aa3af41`; final-freeze procedure `d77a25c11304d142d8e3fc816f5dde78a6fafbb6`.
+- **Current task**: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-014`
+- **Scope**: close IA-BLK-004 only: shell-dispatch-wrapped duplicate lifecycle operations must count toward exact executable cardinality.
+- **C014 lifecycle checker blob**: `259e53def41b4d71e68d6481c6cc8842fdd05bba`. The E2E probe and final-freeze procedure remain unchanged from C013.
 - **Current exact gate**: `EXPECTED_CHECKS=158`; required `ALL_CHECKS=158/158 FAILURES=0`.
-- **Required current markers**: `ENVIRONMENT_PASS`, `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `CANONICAL_RUNBOOK_EXECUTABLE_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5`, `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18`, `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=34`, final `CORRECTIVE_013_E2E_PASS`.
-- **Fresh run**: PASS, exit 0, Debian GNU/Linux 12 (bookworm), disposable rootfs outside the repository. Dual Python paths both report `3.11.2`; the five pinned package versions and exact `requirements.freeze.txt`/live `pip freeze` checks pass. Raw log `/tmp/CORRECTIVE_013_DEBIAN12/rootfs/tmp/c013-e2e-fresh-20260926-002/e2e.log`, SHA-256 `1352c0208a3feb5d435f59f41b57c40b3e61880f778710b9676512f396e321cf`; `isolation/e2e_probe_output.txt` is byte-identical with the same SHA-256. Cursor-14 exact-byte scan: raw `0` hits; committed evidence `0` hits. Self-test mutation-red counts: cross-document `5`, executable `18`, shell-semantics `34`.
+- **Required current markers**: `ENVIRONMENT_PASS`, `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `CANONICAL_RUNBOOK_EXECUTABLE_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5`, `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18`, `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=48`, final `CORRECTIVE_013_E2E_PASS`.
+- **Fresh-run rule**: CORRECTIVE-013 evidence is historical. C014 is qualified only by a fresh frozen Debian 12 / Python 3.11.2 run committed byte-exact into `isolation/e2e_probe_output.txt`, with cross-document `5`, executable `18`, shell-semantics `48`, `ALL_CHECKS=158/158 FAILURES=0`, and the zero cursor-14 payload-leak invariant.
 - **C012 history**: `corrective_012_report.md` remains unchanged historical `157/157` evidence; its count and old raw-log digest are not current.
 - **Local/remote ancestry**: local source `4ad5f980c2a041c88f9c0fdec62753d7f8b38fb4` has tree `a22f14753e0627a95b08cfb8e60ae3ad80304620`; remote parent is `86aafc1937b58071d4780c77cf2e8abe7fcbed5b` with that same tree. PM must build from the remote parent; local ancestry is different.
 
@@ -54,7 +54,7 @@ Canonical cross-document pins (must be identical in `operator_manifest.md`, `sou
 
 These are recomputed from the byte-exact lineage copy (`lineage_copy/`) and match the accepted A-002 evidence.
 
-## Historical deliverable index (CORRECTIVE-010 inventory; current gate is CORRECTIVE-013-FIXUP-001)
+## Historical deliverable index (CORRECTIVE-010 inventory; current gate is CORRECTIVE-014)
 
 ```
 reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/
@@ -112,7 +112,7 @@ Historical CORRECTIVE-003 (superseded):
 
 Per FIXUP-001 task §2, this historical block is explicitly labelled and does NOT represent the current release contract.
 
-## Frozen model-handling intent (current invariant, unchanged through CORRECTIVE-013)
+## Frozen model-handling intent (current invariant, unchanged through CORRECTIVE-014)
 
 **Separation:** `SyntheticProbeHandler` (mailbox bridge + inside-jail responder, `sandbox-bridge/synthetic-responder-v1/10 tokens`) vs **`ProductionResidentHandler`** (outside-jail `ProviderClient`, `contract text + envelope` only, real provenance).
 

@@ -1,4 +1,4 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Per-Cursor Interaction Procedure (CORRECTIVE-013-FIXUP-001 exact mirror)
+# C15-RCC-RES-B-PREFLIGHT-002 — Per-Cursor Interaction Procedure (CORRECTIVE-014 exact mirror)
 
 This document is an exact operational mirror/reference of `b_startup_procedure.md §7`; if any wording diverges, startup §7 is authoritative and execution must STOP until documents are resynchronized.
 **`b_startup_procedure.md §7` is the single authoritative Phase-B cursor lifecycle.**
@@ -237,7 +237,7 @@ Any provider exception, non-JSON, schema failure, binding failure, invalid capab
 - Do not run Resident B/C during preflight.
 - Do not merge PR #209 from this procedure.
 
-## Mechanical regression — current CORRECTIVE-013-FIXUP-001 gate
+## Mechanical regression — current CORRECTIVE-014 gate
 
 Before any later B release activity, run the lifecycle self-test and full frozen E2E from the B-preflight root. The E2E evidence file is valid only when copied byte-for-byte from that actual fresh run.
 
@@ -256,7 +256,7 @@ Required current gate: `EXPECTED_CHECKS=158`, `ALL_CHECKS=158/158 FAILURES=0`, a
 - `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`
 - `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5`
 - `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18`
-- `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=34`
+- `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=48`
 - `CORRECTIVE_013_E2E_PASS`
 
 Historical C012 `157/157` evidence is not a current gate.

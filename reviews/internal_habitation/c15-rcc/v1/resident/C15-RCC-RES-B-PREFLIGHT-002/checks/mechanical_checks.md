@@ -1,4 +1,4 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Mechanical Checks (historical through CORRECTIVE-012; CORRECTIVE-013-FIXUP-001 current)
+# C15-RCC-RES-B-PREFLIGHT-002 — Mechanical Checks (historical through CORRECTIVE-013; CORRECTIVE-014 current)
 
 Historical PASS statements below remain historical evidence. Canonical #205 evidence was read but not modified. Corrective-013 implementation is unchanged; this fixup synchronizes active evidence and canonical claims.
 
@@ -214,13 +214,13 @@ The production gate and the mutation self-test both call `check_canonical_pin_do
 - `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS`
 - `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS` from the same `check_runbook_lifecycle()` entrypoint
 
-The gate reads both active runbooks. Token block, step headings, and executable commands inside each step body must agree. A bare `.projection.json` substring is not proof. Fenced bash is parsed after comments, blank lines, and echo-only lines are removed, so a comment mentioning `current-event.json` cannot hide a later receipt-first `cp`/`install`. `b_startup_procedure.md §7` is the only authority. CORRECTIVE-011 added two counted checks. Historically, CORRECTIVE-012 added one executable mutation-red check; CORRECTIVE-013-FIXUP-001 requires the shell-semantics mutation-red gate as part of the current 158-check run.
+The gate reads both active runbooks. Token block, step headings, and executable commands inside each step body must agree. A bare `.projection.json` substring is not proof. Fenced bash is parsed after comments, blank lines, and echo-only lines are removed, so a comment mentioning `current-event.json` cannot hide a later receipt-first `cp`/`install`. `b_startup_procedure.md §7` is the only authority. CORRECTIVE-011 added two counted checks. Historically, CORRECTIVE-012 added one executable mutation-red check; CORRECTIVE-013 introduced the shell-semantics mutation-red gate; CORRECTIVE-014 extends that same production gate to count shell-dispatch-wrapped lifecycle duplicates.
 
 ### Historical CORRECTIVE-012 gate (superseded; retained only as history)
 
 The prior C012 gate used `EXPECTED_CHECKS=157`, `ALL_CHECKS=157/157 FAILURES=0`, and final `CORRECTIVE_012_E2E_PASS`. Its raw and committed-copy digests are historical and remain documented in the unchanged `corrective_012_report.md`; they are not current evidence.
 
-### Current CORRECTIVE-013-FIXUP-001 exact gate
+### Current CORRECTIVE-014 exact gate
 
 Required frozen-runtime gate: `EXPECTED_CHECKS=158`; final result `ALL_CHECKS=158/158 FAILURES=0`; final marker `CORRECTIVE_013_E2E_PASS`.
 
@@ -235,7 +235,7 @@ Required current markers and mutation counts:
 - `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`
 - `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5`
 - `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18`
-- `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=34`
+- `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=48`
 - `CORRECTIVE_013_E2E_PASS`
 
-Fresh frozen E2E passed with exit 0 in Debian GNU/Linux 12 (bookworm); exact final result `ALL_CHECKS=158/158 FAILURES=0`, final marker `CORRECTIVE_013_E2E_PASS`. Python dual paths both report `3.11.2`; the five frozen packages and exact requirements/live-freeze checks passed. Raw log `/tmp/CORRECTIVE_013_DEBIAN12/rootfs/tmp/c013-e2e-fresh-20260926-002/e2e.log` SHA-256 `1352c0208a3feb5d435f59f41b57c40b3e61880f778710b9676512f396e321cf`; `isolation/e2e_probe_output.txt` SHA-256 `1352c0208a3feb5d435f59f41b57c40b3e61880f778710b9676512f396e321cf` is byte-identical. Cursor-14 exact-byte scan: raw `0` hits, committed evidence `0` hits. Mutation-red self-test counts passed: cross-document `5`, executable `18`, shell-semantics `34`.
+The prior CORRECTIVE-013 frozen run is historical. CORRECTIVE-014 qualification requires a fresh frozen Debian 12 / Python 3.11.2 run whose exact committed `isolation/e2e_probe_output.txt` itself shows `ALL_CHECKS=158/158 FAILURES=0`, `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=48`, and `CORRECTIVE_013_E2E_PASS` (the cumulative probe marker name is intentionally retained). The fresh log must also preserve the zero cursor-14 payload-leak invariant.
