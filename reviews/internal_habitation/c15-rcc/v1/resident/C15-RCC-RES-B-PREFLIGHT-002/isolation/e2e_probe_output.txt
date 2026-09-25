@@ -1,16 +1,16 @@
-# C15-RCC-RES-B-PREFLIGHT-002 - CORRECTIVE-011 fresh E2E evidence (operator side).
+# C15-RCC-RES-B-PREFLIGHT-002 - CORRECTIVE-012 fresh E2E evidence (operator side).
 # Regenerated from a fresh disposable run of isolation/probe_e2e.sh.
-# Raw log: /tmp/b-preflight-e2e-c011b/e2e.log
-# Raw log SHA-256: 94f7388ced02512a61a3933648cb520de7cfe74e0ec778887cb7f00a78803ed8
+# Raw log: /tmp/b-preflight-e2e-c012/e2e.log
+# Raw log SHA-256: 38a414ac1f2600d11efa7eb9179c33bc8133bf06c8668092e032d5b0c86be5a2
 # Contains NO cursor-14 resident_visible_payload bytes.
 # Disposable reveal is NOT a Resident reveal; the projection was never presented to a Resident or model.
 
-[e2e] CURRENT_RUN_LOG=/tmp/b-preflight-e2e-c011b/e2e.log
+[e2e] CURRENT_RUN_LOG=/tmp/b-preflight-e2e-c012/e2e.log
 world.sqlite: OK
 index.sqlite: OK
 release_state.json: OK
 [e2e] lineage digests OK
-[e2e] EXPECTED_CHECKS=156
+[e2e] EXPECTED_CHECKS=157
 [e2e] step 0: exact environment
 py_ver=Python 3.11.2
 CHECK 1 PASS: exact Python 3.11.2
@@ -161,8 +161,8 @@ NORMAL_BINDING_PASS
 [test-responder] starting mode=normal rounds=2 uid=65534 pid=3 inbox=/work/inbox outbox=/work/outbox
 [test-responder] pid=3 proc1_comm=sandbox-init
 [test-responder] PASS PID1 is sandbox-init
-[test-responder] round 1 received request_id=5fa0f93b... digest=e0bc1fb8...
-[test-responder] round 2 received request_id=32459201... digest=b9bc5a43...
+[test-responder] round 1 received request_id=31bdd1a2... digest=9d8519dc...
+[test-responder] round 2 received request_id=a0a23bae... digest=fc59e4e3...
 [test-responder] OK mode=normal rounds=2 pid=3
 
 STALE_REJECTED_PASS
@@ -186,7 +186,7 @@ SYNTHETIC_GENUINE_PASS
 CHECK 27 PASS: synthetic genuine 2-round Atlas non-empty
 CHECK 28 PASS: current_event seq14 wiring
 [e2e] step 4b: production genuine via ExternalBrokerClient + FakeBrokerServer (transport)
-FakeBrokerServer at http://127.0.0.1:41401/v1/chat
+FakeBrokerServer at http://127.0.0.1:37943/v1/chat
 prod invocations=2 history=1
 last_provider=fake-broker usage={'total_tokens': 42, 'input_tokens': 20, 'output_tokens': 22}
 PRODUCTION_GENUINE_PASS
@@ -253,27 +253,27 @@ CHECK 49 PASS: privdrop dual
 [e2e] step 9: signal deterministic PID1 forwarding
 [signal] pid log:
 {
-  "outer_wrapper_host_pid": 2951,
-  "outer_wrapper_ns_pid": 2951,
-  "outer_wrapper_ppid": 2949,
-  "outer_wrapper_cmd": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/resident_jail.py --repo /home/user/Haneof-AIOS-Core-v3.0 --sandbox /tmp/b-sleep-test-2575 --world /tmp/b-preflight-e2e-c011b/runtime/world.sqlite --index /tmp/b-preflight-e2e-c011b/runtime/index.sqlite --state /tmp/b-preflight-e2e-c011b/runtime/release_state.json --lock /tmp/b-preflight-e2e-c011b/runtime/world.sqlite.writer.lock --mailbox-root /tmp/b-sleep-mb-2575 --inject-dir /tmp/b-preflight-e2e-c011b/inject -- /bin/sleep 30",
-  "unsharer_host_pid": 2952,
-  "unsharer_ns_pid": 2952,
-  "unsharer_ppid": 2951,
-  "pid1_host_pid": 2956,
+  "outer_wrapper_host_pid": 3497,
+  "outer_wrapper_ns_pid": 3497,
+  "outer_wrapper_ppid": 3495,
+  "outer_wrapper_cmd": "/home/user/acceptance-wt-95cffb57/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/resident_jail.py --repo /home/user/acceptance-wt-95cffb57 --sandbox /tmp/b-sleep-test-3120 --world /tmp/b-preflight-e2e-c012/runtime/world.sqlite --index /tmp/b-preflight-e2e-c012/runtime/index.sqlite --state /tmp/b-preflight-e2e-c012/runtime/release_state.json --lock /tmp/b-preflight-e2e-c012/runtime/world.sqlite.writer.lock --mailbox-root /tmp/b-sleep-mb-3120 --inject-dir /tmp/b-preflight-e2e-c012/inject -- /bin/sleep 30",
+  "unsharer_host_pid": 3498,
+  "unsharer_ns_pid": 3498,
+  "unsharer_ppid": 3497,
+  "pid1_host_pid": 3502,
   "pid1_ns_pid": 1,
   "pid1_ns_pid_actual": 1,
-  "pid1_host_pid_ns_view": 2956,
+  "pid1_host_pid_ns_view": 3502,
   "pid1_comm": "sandbox-init",
   "worker_fork_return_pid": 3,
   "worker_ns_pid_expected": 2,
-  "worker_host_pid": 2958,
+  "worker_host_pid": 3504,
   "worker_ns_pid_actual": 3,
   "worker_ns_ppid": 1,
   "worker_ppid_host": 1
-}outer=2951 unsharer=2952 pid1_host=2956 worker_host=2958 worker_ns=3
+}outer=3497 unsharer=3498 pid1_host=3502 worker_host=3504 worker_ns=3
 CHECK 50 PASS: PID map outer/unsharer/PID1/worker captured (host pids valid, distinct)
-[signal] sending TERM to PID1 host 2956 (jail PID1)
+[signal] sending TERM to PID1 host 3502 (jail PID1)
 [signal] jail exit code 143
 CHECK 51 PASS: signal TERM forwarded PID1->worker exit 143
 CHECK 52 PASS: worker reaped no zombie
@@ -515,9 +515,9 @@ RUN_ROOT2 init B failed
 }
 RUN_ROOT2 pending set
 binding receipt 9cba565c8bc5
-model_rounds=ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='ae229feb462c7d9bff76cd8da3db94d9'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='ae229feb462c7d9bff76cd8da3db94d9'))
+model_rounds=ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='d9280d4e72d608fa7285c933a0b3ac5b'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='d9280d4e72d608fa7285c933a0b3ac5b'))
 headless stub turn succeeded
-model_rounds 1 directive ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='ae229feb462c7d9bff76cd8da3db94d9'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='ae229feb462c7d9bff76cd8da3db94d9')) real-providerCHECK 59 PASS: headless CLI turn with ExternalBrokerClient succeeded (HTTPS stub)
+model_rounds 1 directive ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='d9280d4e72d608fa7285c933a0b3ac5b'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='d9280d4e72d608fa7285c933a0b3ac5b')) real-providerCHECK 59 PASS: headless CLI turn with ExternalBrokerClient succeeded (HTTPS stub)
 [e2e] step 14: hash mismatch
 PASS contract hash mismatch fail closed: contract SHA env mismatch: expected 28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef, got deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef (STOP)
 CHECK 60 PASS: contract hash mismatch fail closed
@@ -529,7 +529,7 @@ CHECK 62 PASS: disposable init B via canonical command
 DISPOSABLE_REVEAL seq=14 event_id=c15rcc-014 projection_sha256=c0e3e7d07d62e00c2394ae9e99032dd76aa74afd3960aae35a2ee1286c545f27 payload_sha256=89be96010d003f84b443c2b9482386e26d9d48690398fe948649df5365858eb7 field_count=8
 REVEAL_SHAPE_VALID_PASS
 CHECK 63 PASS: canonical reveal --phase B --state without --sequence (blocker7) produces 8-field projection
-using disp /tmp/b-disp-reveal-2575
+using disp /tmp/b-disp-reveal-3120
 baseline receipt created binding_version=c15-rcc-b-binding-v1 seq=14 sha=74fcbf4eaaae rs_sha=c7a735b2eca3
 BASELINE_VALID_PASS
 CHECK 64 PASS: baseline valid receipt PASS
@@ -542,7 +542,7 @@ PASS modified source_kind rejected for source_kind: current_event.source_kind 'f
 PASS modified source_class rejected for source_class: current_event.source_class 'FAKE' != receipt source_class 'PLATFORM' (modified source_class)
 PASS modified modality rejected for modality: current_event.modality 'fake_modality' != receipt modality 'structured_text' (modified modality)
 PASS wrong session rejected: binding receipt b_session_id 'b-adversarial-001' != 'b-wrong-session' (wrong session)
-PASS stale seq14 after ACK rejected: binding receipt release_state_path '/tmp/b-disp-reveal-2575/runtime/release_state.json' != current '/tmp/tmp4qtcvbt3/rs_stale.json' (path identity mismatch)
+PASS stale seq14 after ACK rejected: binding receipt release_state_path '/tmp/b-disp-reveal-3120/runtime/release_state.json' != current '/tmp/tmp2lymla09/rs_stale.json' (path identity mismatch)
 PASS missing receipt rejected: binding receipt missing at /tmp/nonexistent-binding.json (current-event binding must exist)
 PASS malformed receipt rejected: binding receipt malformed JSON: Expecting value: line 1 column 1 (char 0)
 BINDING_ADVERSARIAL_PASS
@@ -566,7 +566,7 @@ PASS handler _poisoned == True
 PASS same handler second call poisoned fail: handler poisoned: provider_transport_failure: provider invoke failed: simulated provider transport failure (new instance required)
 PASS _outstanding == None
 PASS release next_sequence not advanced
-PASS durable failure receipt exists /tmp/b-scheme-evidence-3173/failure-latest-1.json
+PASS durable failure receipt exists /tmp/b-scheme-evidence-3719/failure-latest-1.json
 PASS durable evidence session/cursor
 PASS non-JSON fail closed: provider content not JSON: Expecting value: line 1 column 1 (char 0)
 PASS non-JSON provider invoked
@@ -650,9 +650,9 @@ CHECK 108 PASS: wrong saved pending reveal FAIL
 CHECK 109 PASS: receipt schema 7 mutations PASS
 [e2e] step 17e2: live pending fixture triple-binding
 PASS pending_missing create correctly FAIL: release_state pending_reveal.fixture_sha256 missing (must be 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46')
-PASS pending_missing validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-2575/runtime/release_state.json' != current '/tmp/b-fixture-pending_missing-80sz3vza/release_state.json' (path identity mismatch)
+PASS pending_missing validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-3120/runtime/release_state.json' != current '/tmp/b-fixture-pending_missing-4tc57crp/release_state.json' (path identity mismatch)
 PASS pending_wrong create correctly FAIL: release_state pending_reveal.fixture_sha256 'sha256:deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef' != canonical 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46' (live fixture mismatch)
-PASS pending_wrong validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-2575/runtime/release_state.json' != current '/tmp/b-fixture-pending_wrong-nl3ujk67/release_state.json' (path identity mismatch)
+PASS pending_wrong validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-3120/runtime/release_state.json' != current '/tmp/b-fixture-pending_wrong-a0idi5t7/release_state.json' (path identity mismatch)
 PASS receipt fixture wrong correctly FAIL: binding receipt fixture_sha256 'sha256:deadbeef' != canonical 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46' (wrong fixture SHA)
 PASS exact fixture triple-binding PASS: sha256:7ccb3
 FIXTURE_TRIPLE_PASS
@@ -700,7 +700,7 @@ PASS canonical startup uses HTTPS
 CHECK 130 PASS: canonical startup HTTPS
 PASS canonical configuration block is configuration-only
 PASS canonical block contains all 12 envs
-PASS canonical startup reaches transport: ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='3ed609e9f0b02138dffcfb3bd4b98e67'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='3ed609e9f0b02138dffcfb3bd4b98e67'))
+PASS canonical startup reaches transport: ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='dabcfb950c473028228045583ac3000b'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='dabcfb950c473028228045583ac3000b'))
 CHECK 131 PASS: canonical startup execution reaches transport
 [e2e] step 17j: env manifest/gate consistency
 PASS manifest subset semantic
@@ -718,7 +718,7 @@ NO_FALSE_NO_REVEAL_PROSE_PASS
 CHECK 137 PASS: BLK-01 prose states disposable reveal only (no false no-reveal claim)
 [e2e] corrective-009 blk-02: portable checkout, no hardcoded absolute path
 CHECK 138 PASS: no hardcoded /home/user/ path in harness/isolation/procedure/checks
-RANDOM_CHECKOUT_REPO_ROOT /tmp/candidate-c2rd5mod5h
+RANDOM_CHECKOUT_REPO_ROOT /tmp/candidate-nhiyvr7m5q
 RANDOM_CHECKOUT_CONTRACT_SHA 28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef
 decoy_cwd_rc 0
 corrupt_contract_rc 1
@@ -730,18 +730,18 @@ CANONICAL_RUNBOOK_STATIC_PASS
 CHECK 141 PASS: BLK-03 runbook lock name / fence / canonical time / projection loop / provider docs consistent
 documented lock argument: --lock $RUN_ROOT/runtime/world.sqlite.writer.lock
 CHECK 142 PASS: documented --lock uses <world>.writer.lock
-{"index_lag": 0, "index_path": "/tmp/b-preflight-e2e-c011b/runbook_probe/runtime/index.sqlite", "index_status": "ready", "index_watermark": 98, "recovery_disposition": "AUTO_RECOVERABLE", "schema_version": 1, "status": "recovery_status", "supported_schema_version": 1, "world_path": "/tmp/b-preflight-e2e-c011b/runbook_probe/runtime/world.sqlite", "world_quick_check": ["ok"], "world_revision": 98}
+{"index_lag": 0, "index_path": "/tmp/b-preflight-e2e-c012/runbook_probe/runtime/index.sqlite", "index_status": "ready", "index_watermark": 98, "recovery_disposition": "AUTO_RECOVERABLE", "schema_version": 1, "status": "recovery_status", "supported_schema_version": 1, "world_path": "/tmp/b-preflight-e2e-c012/runbook_probe/runtime/world.sqlite", "world_quick_check": ["ok"], "world_revision": 98}
 CHECK 143 PASS: documented recovery-status executes: rev98/watermark98/lag0/AUTO_RECOVERABLE/ok
 CANONICAL_RUNBOOK_EXECUTABLE_PASS
 [e2e] corrective-009 blk-04..08: handler and jail adversarial regressions
 disposable reveal metadata: seq=14 event_id=c15rcc-014 field_count=8
-missing_release_state correctly FAIL: current-event binding failed: BLK-04: release_state missing at /tmp/b-preflight-e2e-c011b/c9/runtime/release_s
+missing_release_state correctly FAIL: current-event binding failed: BLK-04: release_state missing at /tmp/b-preflight-e2e-c012/c9/runtime/release_st
 MISSING_RELEASE_STATE_FAIL_CLOSED_PASS provider_calls=0 receipts=2
 NO_EVENT_NO_DISPATCH_PASS
 FAILURE_RECEIPT_COLLISION_PASS receipts=2 names_distinct=True
 PAYLOAD_RAN_OK
 INHERITED_FD_SEALED_PASS
-CONTRACT_PROVENANCE_PASS repo_root=/home/user/Haneof-AIOS-Core-v3.0 contract_sha=28d3262f56b7 adapter_sha=da74eb97a6d3
+CONTRACT_PROVENANCE_PASS repo_root=/home/user/acceptance-wt-95cffb57 contract_sha=28d3262f56b7 adapter_sha=da74eb97a6d3
 CHECK 144 PASS: BLK-04 missing live release state fails closed (no provider call, durable receipt)
 CHECK 145 PASS: BLK-05 no current-event -> no dispatch for every wake reason / round index
 CHECK 146 PASS: BLK-06 same-second same-round failures produce two distinct 0400 receipts, outstanding cleared
@@ -769,7 +769,7 @@ PIN_MUTATION_RED_PASS source_pins_and_digests.md:Release:one_hex via=check_canon
 PIN_MUTATION_RED_PASS procedure/b_startup_procedure.md:World:one_hex via=check_canonical_pin_docs: procedure/b_startup_procedure.md: contradictory authoritative World declaration(s): line 49 role=bare value=626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6a0; expected 626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa
 PIN_MUTATION_RED_PASS procedure/b_startup_procedure.md:Index:one_hex via=check_canonical_pin_docs: procedure/b_startup_procedure.md: contradictory authoritative Index declaration(s): line 50 role=bare value=ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f0; expected ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1
 PIN_MUTATION_RED_PASS procedure/b_startup_procedure.md:Release:one_hex via=check_canonical_pin_docs: procedure/b_startup_procedure.md: contradictory authoritative Release declaration(s): line 51 role=bare value=eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c0; expected eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8
-PIN_MUTATION_RED_PASS operator_manifest.md:World:duplicate_wrong via=check_canonical_pin_docs: operator_manifest.md: contradictory authoritative World declaration(s): line 213 role=bare value=626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6a0; expected 626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa
+PIN_MUTATION_RED_PASS operator_manifest.md:World:duplicate_wrong via=check_canonical_pin_docs: operator_manifest.md: contradictory authoritative World declaration(s): line 230 role=bare value=626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6a0; expected 626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa
 PIN_MUTATION_RED_PASS operator_manifest.md:World:missing_all via=check_canonical_pin_docs: operator_manifest.md: missing authoritative World declaration
 CANONICAL_PIN_MUTATION_RED_PASS cases=11
 CHECK 150 PASS: World pin declarations all canonical across 3 docs
@@ -777,18 +777,38 @@ CHECK 151 PASS: Index pin declarations all canonical across 3 docs
 CHECK 152 PASS: Release pin declarations all canonical across 3 docs
 CHECK 153 PASS: cross-document authoritative pin declarations have no missing/typo/duplicate contradiction
 CHECK 154 PASS: 11 disposable-file pin mutations all rejected by check_canonical_pin_docs
-[e2e] step 17l: startup/per-cursor lifecycle synchronization + mutation red
-RUNBOOK_CROSS_DOCUMENT_ORDER_PASS REVEAL>INSTALL_CURRENT_EVENT>PERSIST_PROJECTION_EVIDENCE>CREATE_BINDING_RECEIPT>VERIFY_BINDING>DERIVE_OCCURRED_AT>INGEST>MODEL_WORK>DURABLE_ACK>CLEAR_BINDING>NEXT_REVEAL sources=token_block,headings,anchors,chains finish_clause_between_model_work_and_ack=True
+[e2e] step 17l: startup/per-cursor lifecycle synchronization + executable mutation red
+RUNBOOK_CROSS_DOCUMENT_ORDER_PASS REVEAL>INSTALL_CURRENT_EVENT>PERSIST_PROJECTION_EVIDENCE>CREATE_BINDING_RECEIPT>VERIFY_BINDING>DERIVE_OCCURRED_AT>INGEST>MODEL_WORK>DURABLE_ACK>CLEAR_BINDING>NEXT_REVEAL sources=token_block,headings,step_body_executables,executable_chains finish_clause_between_model_work_and_ack=True authority=b_startup_procedure.md§7
 RUNBOOK_LIFECYCLE_MUTATION_RED_PASS per_cursor:receipt_before_current_event via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: operational heading tokens differ: got=('REVEAL', 'CREATE_BINDING_RECEIPT', 'PERSIST_PROJECTION_EVIDENCE', 'INSTALL_CURRENT_EVENT', 'VERIFY_BINDING', 'DERIVE_OCCURRED_AT', 'INGEST', 'MODEL_WORK', 'DURABLE_ACK', 'CLEAR_BINDING', 'NEXT_REVEAL') expected=('REVEAL', 'INSTALL_CURRENT_EVENT', 'PERSIST_PROJECTION_EVIDENCE', 'CREATE_BINDING_RECEIPT', 'VERIFY_BINDING', 'DERIVE_OCCURRED_AT', 'INGEST', 'MODEL_WORK', 'DURABLE_ACK', 'CLEAR_BINDING', 'NEXT_REVEAL')
 RUNBOOK_LIFECYCLE_MUTATION_RED_PASS per_cursor:missing_projection_evidence via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: operational heading tokens differ: got=('REVEAL', 'INSTALL_CURRENT_EVENT', 'CREATE_BINDING_RECEIPT', 'VERIFY_BINDING', 'DERIVE_OCCURRED_AT', 'INGEST', 'MODEL_WORK', 'DURABLE_ACK', 'CLEAR_BINDING', 'NEXT_REVEAL') expected=('REVEAL', 'INSTALL_CURRENT_EVENT', 'PERSIST_PROJECTION_EVIDENCE', 'CREATE_BINDING_RECEIPT', 'VERIFY_BINDING', 'DERIVE_OCCURRED_AT', 'INGEST', 'MODEL_WORK', 'DURABLE_ACK', 'CLEAR_BINDING', 'NEXT_REVEAL')
 RUNBOOK_LIFECYCLE_MUTATION_RED_PASS per_cursor:duplicate_projection_evidence via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: operational heading tokens differ: got=('REVEAL', 'INSTALL_CURRENT_EVENT', 'PERSIST_PROJECTION_EVIDENCE', 'PERSIST_PROJECTION_EVIDENCE', 'CREATE_BINDING_RECEIPT', 'VERIFY_BINDING', 'DERIVE_OCCURRED_AT', 'INGEST', 'MODEL_WORK', 'DURABLE_ACK', 'CLEAR_BINDING', 'NEXT_REVEAL') expected=('REVEAL', 'INSTALL_CURRENT_EVENT', 'PERSIST_PROJECTION_EVIDENCE', 'CREATE_BINDING_RECEIPT', 'VERIFY_BINDING', 'DERIVE_OCCURRED_AT', 'INGEST', 'MODEL_WORK', 'DURABLE_ACK', 'CLEAR_BINDING', 'NEXT_REVEAL')
-RUNBOOK_LIFECYCLE_MUTATION_RED_PASS per_cursor:old_receipt_before_current_event_chain via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: operational chain places binding-receipt creation before current-event.json
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS per_cursor:old_receipt_before_current_event_chain via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: executable arrow fence #13 creates the binding receipt before installing current-event.json: ['release_operator reveal', 'create_current_event_binding_receipt(...)', 'write_binding_receipt(...)', 'current-event.json']
 RUNBOOK_LIFECYCLE_MUTATION_RED_PASS per_cursor:token_block_only_reorder via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: token block differs: got=('REVEAL', 'CREATE_BINDING_RECEIPT', 'PERSIST_PROJECTION_EVIDENCE', 'INSTALL_CURRENT_EVENT', 'VERIFY_BINDING', 'DERIVE_OCCURRED_AT', 'INGEST', 'MODEL_WORK', 'DURABLE_ACK', 'CLEAR_BINDING', 'NEXT_REVEAL') expected=('REVEAL', 'INSTALL_CURRENT_EVENT', 'PERSIST_PROJECTION_EVIDENCE', 'CREATE_BINDING_RECEIPT', 'VERIFY_BINDING', 'DERIVE_OCCURRED_AT', 'INGEST', 'MODEL_WORK', 'DURABLE_ACK', 'CLEAR_BINDING', 'NEXT_REVEAL')
 RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5
-CHECK 155 PASS: startup §7 and per_cursor lifecycle sequences match across token block, headings, and executable anchors
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-A:delete_executable_persist:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE step body is missing executable contract: install current-event.json -> evidence/event-%03d.projection.json
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-A:delete_executable_persist:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE step body is missing executable contract: install current-event.json -> evidence/event-%03d.projection.json
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-B:persist_after_ack:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE step body is missing executable contract: install current-event.json -> evidence/event-%03d.projection.json
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-B:persist_after_ack:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE step body is missing executable contract: install current-event.json -> evidence/event-%03d.projection.json
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-C:comment_hidden_receipt_first:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: executable bash fence #22 creates the binding receipt before installing current-event.json: ['create_current_event_binding_receipt(...)', 'write_binding_receipt(...)', 'cp "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-C:comment_hidden_receipt_first:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: executable bash fence #13 creates the binding receipt before installing current-event.json: ['create_current_event_binding_receipt(...)', 'write_binding_receipt(...)', 'cp "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS delete_sha256_keep_install:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE step body is missing executable contract: sha256sum of that projection artifact appended to projection_digests.sha256
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS delete_install_keep_sha256:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE step body is missing executable contract: install current-event.json -> evidence/event-%03d.projection.json
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS wrong_persist_destination:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE step body is missing executable contract: install current-event.json -> evidence/event-%03d.projection.json
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS persist_source_reveal_not_current_event:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE step body is missing executable contract: install current-event.json -> evidence/event-%03d.projection.json
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS receipt_command_before_projection:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: CREATE_BINDING_RECEIPT step body is missing executable contract: write_binding_receipt
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS persist_command_also_in_ack_step:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: executable command projection persist install must appear only in PERSIST_PROJECTION_EVIDENCE step body, found in ['PERSIST_PROJECTION_EVIDENCE', 'DURABLE_ACK']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS delete_sha256_keep_install:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE step body is missing executable contract: sha256sum of that projection artifact appended to projection_digests.sha256
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS delete_install_keep_sha256:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE step body is missing executable contract: install current-event.json -> evidence/event-%03d.projection.json
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS wrong_persist_destination:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE step body is missing executable contract: install current-event.json -> evidence/event-%03d.projection.json
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS persist_source_reveal_not_current_event:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE step body is missing executable contract: install current-event.json -> evidence/event-%03d.projection.json
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS receipt_command_before_projection:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: CREATE_BINDING_RECEIPT step body is missing executable contract: write_binding_receipt
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS persist_command_also_in_ack_step:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: executable command projection persist install must appear only in PERSIST_PROJECTION_EVIDENCE step body, found in ['PERSIST_PROJECTION_EVIDENCE', 'DURABLE_ACK']
+RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18
+CHECK 155 PASS: startup §7 and per_cursor lifecycle sequences match across token block, headings, and per-step executable commands
 CHECK 156 PASS: per_cursor operational receipt-before-current-event/missing/duplicate/old-chain mutations all rejected by check_runbook_lifecycle
+CHECK 157 PASS: executable persist delete/move/comment-hidden receipt-first and extra command mutations all rejected by check_runbook_lifecycle
 
-ALL_CHECKS=156/156 FAILURES=0
+ALL_CHECKS=157/157 FAILURES=0
 MARKER PASS: ISOLATION_PASS in CURRENT_RUN_LOG
 MARKER PASS: SYNTHETIC_GENUINE_PASS in CURRENT_RUN_LOG
 MARKER PASS: PRODUCTION_GENUINE_PASS in CURRENT_RUN_LOG
@@ -821,8 +841,10 @@ MARKER PASS: CANONICAL_PIN_CONSISTENCY_PASS in CURRENT_RUN_LOG
 MARKER PASS: CANONICAL_PIN_MUTATION_RED_PASS in CURRENT_RUN_LOG
 MARKER PASS: RUNBOOK_CROSS_DOCUMENT_ORDER_PASS in CURRENT_RUN_LOG
 MARKER PASS: RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS in CURRENT_RUN_LOG
+MARKER PASS: RUNBOOK_EXECUTABLE_MUTATION_RED_PASS in CURRENT_RUN_LOG
 MARKER PASS: negative self-test (missing marker correctly not found)
 CORRECTIVE_010_E2E_PASS
 CORRECTIVE_010_FIXUP_001_E2E_PASS
 CORRECTIVE_011_E2E_PASS
-[e2e] done 2026-09-25T11:43:28Z
+CORRECTIVE_012_E2E_PASS
+[e2e] done 2026-09-25T12:33:41Z

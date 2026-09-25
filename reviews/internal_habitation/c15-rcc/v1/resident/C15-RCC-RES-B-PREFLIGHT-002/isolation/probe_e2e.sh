@@ -1,5 +1,5 @@
 #!/bin/bash
-# C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-011 — Full E2E probe (operator side, exact gate).
+# C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-012 — Full E2E probe (operator side, exact gate).
 # Must be run as root (sudo). Closes the 8 independent-acceptance blockers (BLK-01..BLK-08).
 # EXPECTED_CHECKS exact, 0 FAIL, mandatory markers, else non-zero.
 #
@@ -64,7 +64,7 @@ FAILURES=0
 pass_check() { CHECKS=$((CHECKS+1)); echo "CHECK $CHECKS PASS: $*"; }
 fail_check() { FAILURES=$((FAILURES+1)); echo "CHECK FAIL: $*"; }
 
-EXPECTED_CHECKS=156
+EXPECTED_CHECKS=157
 echo "[e2e] EXPECTED_CHECKS=$EXPECTED_CHECKS"
 
 # Step 0: exact environment (CORRECTIVE-005: freeze Python/Pydantic/wire/adapter/contract/freeze, not OS/kernel)
@@ -3176,12 +3176,12 @@ else
   exit 1
 fi
 
-# ---- CORRECTIVE-011 / IA-BLK-003: cross-document lifecycle gate + mutation-red -----------------
-echo "[e2e] step 17l: startup/per-cursor lifecycle synchronization + mutation red"
+# ---- CORRECTIVE-012 / IA-BLK-003: step-body executable lifecycle gate + mutation-red -----------
+echo "[e2e] step 17l: startup/per-cursor lifecycle synchronization + executable mutation red"
 runbook_out=$("$PY" "$B_PREP/checks/runbook_lifecycle_checker.py" --base "$B_PREP" --self-test)
 printf '%s\n' "$runbook_out"
 if grep -q "RUNBOOK_CROSS_DOCUMENT_ORDER_PASS" "$CURRENT_RUN_LOG"; then
-  pass_check "startup §7 and per_cursor lifecycle sequences match across token block, headings, and executable anchors"
+  pass_check "startup §7 and per_cursor lifecycle sequences match across token block, headings, and per-step executable commands"
 else
   fail_check "runbook cross-document lifecycle order"
   exit 1
@@ -3190,6 +3190,12 @@ if grep -q "RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS" "$CURRENT_RUN_LOG"; then
   pass_check "per_cursor operational receipt-before-current-event/missing/duplicate/old-chain mutations all rejected by check_runbook_lifecycle"
 else
   fail_check "runbook cross-document mutation-red self-test"
+  exit 1
+fi
+if grep -q "RUNBOOK_EXECUTABLE_MUTATION_RED_PASS" "$CURRENT_RUN_LOG"; then
+  pass_check "executable persist delete/move/comment-hidden receipt-first and extra command mutations all rejected by check_runbook_lifecycle"
+else
+  fail_check "runbook executable mutation-red self-test"
   exit 1
 fi
 
@@ -3214,7 +3220,8 @@ for m in ISOLATION_PASS SYNTHETIC_GENUINE_PASS PRODUCTION_GENUINE_PASS PRODUCTIO
          MISSING_RELEASE_STATE_FAIL_CLOSED_PASS NO_EVENT_NO_DISPATCH_PASS \
          FAILURE_RECEIPT_COLLISION_PASS INHERITED_FD_SEALED_PASS CONTRACT_PROVENANCE_PASS \
          RAW_USAGE_NO_SYNTHESIS_PASS CANONICAL_RUNBOOK_ORDER_PASS CANONICAL_PIN_CONSISTENCY_PASS \
-         CANONICAL_PIN_MUTATION_RED_PASS RUNBOOK_CROSS_DOCUMENT_ORDER_PASS RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS; do
+         CANONICAL_PIN_MUTATION_RED_PASS RUNBOOK_CROSS_DOCUMENT_ORDER_PASS RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS \
+         RUNBOOK_EXECUTABLE_MUTATION_RED_PASS; do
   if grep -q "$m" "$CURRENT_RUN_LOG" 2>/dev/null; then
     echo "MARKER PASS: $m in CURRENT_RUN_LOG"
   else
@@ -3236,4 +3243,5 @@ fi
 echo "CORRECTIVE_010_E2E_PASS"
 echo "CORRECTIVE_010_FIXUP_001_E2E_PASS"
 echo "CORRECTIVE_011_E2E_PASS"
+echo "CORRECTIVE_012_E2E_PASS"
 echo "[e2e] done $(date -u +%Y-%m-%dT%H:%M:%SZ)"

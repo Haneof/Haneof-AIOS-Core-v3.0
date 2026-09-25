@@ -107,11 +107,11 @@ If `ISOLATION_FAIL`, STOP.
 ## 4a. Run the E2E transport probe — genuine + production + adversarial (no cursor 14 reveal)
 
 ```bash
-# exact gate: EXPECTED_CHECKS=156, requires CHECKS==EXPECTED_CHECKS and zero FAIL (CORRECTIVE-011)
+# exact gate: EXPECTED_CHECKS=157, requires CHECKS==EXPECTED_CHECKS and zero FAIL (CORRECTIVE-012)
 bash reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/isolation/probe_e2e.sh
 ```
 
-Expected `CORRECTIVE_011_E2E_PASS` with `ALL_CHECKS=156/156 FAILURES=0`. The original 144 checks remain, plus CORRECTIVE-011 regressions for raw usage no-synthesis (full/missing-total/input-only/output-only/total-only/partial-with-total/inconsistent/invalid + source inspection), strict authoritative pin declarations with 11 mutation-red cases, and startup/per-cursor lifecycle synchronization with mutation-red checks. Required markers include `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, and `CORRECTIVE_011_E2E_PASS`.
+Expected `CORRECTIVE_012_E2E_PASS` with `ALL_CHECKS=157/157 FAILURES=0`. The previous 156 checks remain, plus one CORRECTIVE-012 regression that rejects executable lifecycle mutations through `check_runbook_lifecycle()`. Required markers include `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS`, and `CORRECTIVE_012_E2E_PASS`.
 
 Do NOT proceed if any check fails.
 

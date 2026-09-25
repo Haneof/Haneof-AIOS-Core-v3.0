@@ -1,6 +1,6 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Mechanical Checks (historical through CORRECTIVE-010; CORRECTIVE-011 target appended)
+# C15-RCC-RES-B-PREFLIGHT-002 — Mechanical Checks (historical through CORRECTIVE-011; CORRECTIVE-012 target appended)
 
-Historical PASS statements below are parent-candidate evidence and remain preserved. Canonical #205 evidence was read but not modified. CORRECTIVE-011 changes the adapter/probe and therefore requires a new exact frozen run; the final section defines the new checks without relabeling old output as fresh.
+Historical PASS statements below are parent-candidate evidence and remain preserved. Canonical #205 evidence was read but not modified. CORRECTIVE-012 changes only the lifecycle checker and the exact gate count; the final section defines the new check without relabeling old output as fresh.
 
 ## 1. Frozen Core tree identity
 
@@ -212,14 +212,17 @@ The production gate and the mutation self-test both call `check_canonical_pin_do
 - `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS` with the exact 11-token sequence `REVEAL > INSTALL_CURRENT_EVENT > PERSIST_PROJECTION_EVIDENCE > CREATE_BINDING_RECEIPT > VERIFY_BINDING > DERIVE_OCCURRED_AT > INGEST > MODEL_WORK > DURABLE_ACK > CLEAR_BINDING > NEXT_REVEAL`
 - red evidence that operational heading swap, missing projection evidence, duplicate projection evidence, the old receipt-before-current-event chain, and a token-block-only reorder all FAIL
 - `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS`
+- `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS` from the same `check_runbook_lifecycle()` entrypoint
 
-The gate reads both active runbooks. Token block, step headings, executable anchors, and fenced/arrow chains must agree. `b_startup_procedure.md §7` is the only authority. This adds two counted checks.
+The gate reads both active runbooks. Token block, step headings, and executable commands inside each step body must agree. A bare `.projection.json` substring is not proof. Fenced bash is parsed after comments, blank lines, and echo-only lines are removed, so a comment mentioning `current-event.json` cannot hide a later receipt-first `cp`/`install`. `b_startup_procedure.md §7` is the only authority. CORRECTIVE-011 added two counted checks. CORRECTIVE-012 adds one counted check for the executable mutation-red aggregate.
 
 ### New exact gate
 
-Parent: 144 checks. New additions: 9 + 1 + 2 = 12.  
-Required: `EXPECTED_CHECKS=156`, `ALL_CHECKS=156/156 FAILURES=0`, final
-`CORRECTIVE_011_E2E_PASS`.
+Parent CORRECTIVE-011 gate: 156 checks. CORRECTIVE-012 adds 1 executable mutation-red check.  
+Required: `EXPECTED_CHECKS=157`, `ALL_CHECKS=157/157 FAILURES=0`, final
+`CORRECTIVE_012_E2E_PASS`.
 
-Fresh exact run exists: `ALL_CHECKS=156/156 FAILURES=0`, final `CORRECTIVE_011_E2E_PASS`.
-State is `REVIEW_READY / AWAITING_PM_RE-REVIEW`. The historical 144/144 log is not relabeled.
+The CORRECTIVE-011 `ALL_CHECKS=156/156` log is historical parent evidence and is not relabeled.
+Fresh exact run exists: `ALL_CHECKS=157/157 FAILURES=0`, final `CORRECTIVE_012_E2E_PASS`,
+raw log SHA-256 `38a414ac1f2600d11efa7eb9179c33bc8133bf06c8668092e032d5b0c86be5a2`.
+State is `REVIEW_READY / AWAITING_PM_RE-REVIEW`.

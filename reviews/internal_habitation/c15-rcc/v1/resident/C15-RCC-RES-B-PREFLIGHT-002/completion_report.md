@@ -1,18 +1,17 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Completion Report (CORRECTIVE-011 implementation)
+# C15-RCC-RES-B-PREFLIGHT-002 — Completion Report (CORRECTIVE-012 implementation)
 
 Date: 2026-09-25  
-Task: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-011`  
+Task: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-012`  
 Role: Release / Test Infrastructure Engineer
 
 ## Current state: **REVIEW_READY / AWAITING_PM_RE-REVIEW**
 
-Independent Acceptance review `5316831911` failed exact candidate
-`a8576e8b60c400845ceeecc6b7145202e4d1f617` with three blockers. PM adjudication
-`5316852416` substantiated the same three and released CORRECTIVE-011.
+Independent Acceptance review `5317440556` failed exact candidate
+`95cffb57a4e94acdc5538dd163f1fb6710ecefc4` with one blocker, IA-BLK-003. PM adjudication
+`5317453195` substantiated that blocker and released CORRECTIVE-012. IA-BLK-001 and IA-BLK-002 stay closed.
 
-The old committed `144/144` evidence belongs to the parent candidate and is not reused as fresh evidence.
-A fresh frozen-environment run of `isolation/probe_e2e.sh` produced `ALL_CHECKS=156/156 FAILURES=0`
-and `CORRECTIVE_011_E2E_PASS`.
+The committed `156/156` / `CORRECTIVE_011_E2E_PASS` evidence belongs to the parent candidate and is not reused as fresh evidence.
+CORRECTIVE-012 recomputes the gate to `EXPECTED_CHECKS=157` and requires `CORRECTIVE_012_E2E_PASS`.
 
 The only preflight reveal is a disposable operator-side reveal on a copied release state. That projection
 was never presented to a Resident or model, and it is not a Resident B reveal.
@@ -95,34 +94,37 @@ evidence, and duplicates projection evidence; every mutation must red. Required 
 
 `isolation/probe_e2e.sh` has been recomputed to:
 
-- `EXPECTED_CHECKS=156`
+- `EXPECTED_CHECKS=157`
 - required `RAW_USAGE_NO_SYNTHESIS_PASS`
 - required `CANONICAL_PIN_CONSISTENCY_PASS`
 - required `CANONICAL_PIN_MUTATION_RED_PASS`
 - required `CANONICAL_RUNBOOK_ORDER_PASS`
 - required `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`
 - required `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS`
-- final marker `CORRECTIVE_011_E2E_PASS`
+- required `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS`
+- final marker `CORRECTIVE_012_E2E_PASS`
 
-The success condition is exactly `ALL_CHECKS=156/156 FAILURES=0`.
+The success condition is exactly `ALL_CHECKS=157/157 FAILURES=0`.
 
 ## Execution evidence status
 
-The previous `isolation/e2e_probe_output.txt` and FIXUP-001 raw log were historical evidence for the
-parent candidate only. They have been replaced by a fresh disposable run. They are not relabeled.
+The CORRECTIVE-011 raw log `/tmp/b-preflight-e2e-c011b/e2e.log` SHA-256
+`94f7388ced02512a61a3933648cb520de7cfe74e0ec778887cb7f00a78803ed8` and its committed copy SHA-256
+`6f860779c08d891bb02c83031e84054481954af3a419207b7063b6df5df34792` are historical parent evidence.
+They are not relabeled as CORRECTIVE-012.
 
-Fresh frozen run:
+Fresh disposable run:
 
 - Python `3.11.2`
-- raw log `/tmp/b-preflight-e2e-c011b/e2e.log`
-- raw log SHA-256 `94f7388ced02512a61a3933648cb520de7cfe74e0ec778887cb7f00a78803ed8`
-- committed copy `isolation/e2e_probe_output.txt` SHA-256 `6f860779c08d891bb02c83031e84054481954af3a419207b7063b6df5df34792`
-- result `ALL_CHECKS=156/156 FAILURES=0`
-- final marker `CORRECTIVE_011_E2E_PASS`
+- raw log `/tmp/b-preflight-e2e-c012/e2e.log`
+- raw log SHA-256 `38a414ac1f2600d11efa7eb9179c33bc8133bf06c8668092e032d5b0c86be5a2`
+- committed copy `isolation/e2e_probe_output.txt` SHA-256 `8af79734c8e5aebfb10a16c2cb19025f89ff52a1e85c62e60811bf16f91780c9`
+- result `ALL_CHECKS=157/157 FAILURES=0`
+- final marker `CORRECTIVE_012_E2E_PASS`
 
 Required markers observed in that raw log: `RAW_USAGE_NO_SYNTHESIS_PASS`,
-`CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`,
-`CANONICAL_RUNBOOK_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`.
+`CANONICAL_PIN_MUTATION_RED_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`,
+`RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS`.
 
 ## Invariants preserved
 

@@ -1,20 +1,20 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Operator Manifest (CORRECTIVE-011 implementation; prior evidence historical)
+# C15-RCC-RES-B-PREFLIGHT-002 — Operator Manifest (CORRECTIVE-012 implementation; prior evidence historical)
 
 Date: 2026-09-25
-Role: Release / Resident Infrastructure Engineer (not Resident B/C, not evaluator — per CORRECTIVE-011)
-Task: C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-011
+Role: Release / Resident Infrastructure Engineer (not Resident B/C, not evaluator — per CORRECTIVE-012)
+Task: C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-012
 Verdict: **REVIEW_READY / AWAITING_PM_RE-REVIEW** (no B or C run, no merge, no Independent Acceptance by the implementer)
 
-## Current authoritative manifest (CORRECTIVE-011) — exact implementation target
+## Current authoritative manifest (CORRECTIVE-012) — exact implementation target
 
-- **Current Task**: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-011`
+- **Current Task**: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-012`
 - **Current implementation state**: `REVIEW_READY / AWAITING_PM_RE-REVIEW`
-- **Exact gate**: `EXPECTED_CHECKS=156`, fresh result `ALL_CHECKS=156/156 FAILURES=0`
-- **Required current markers**: `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS`, final `CORRECTIVE_011_E2E_PASS`
+- **Exact gate**: `EXPECTED_CHECKS=157`, fresh result `ALL_CHECKS=157/157 FAILURES=0`
+- **Required current markers**: `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS`, `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS`, final `CORRECTIVE_012_E2E_PASS`
 - **Production adapter**: `bridged_model_handler:ExternalBrokerClient`, SHA-256 `da74eb97a6d35b535f298f52a72a32fc35dfbd1fca1ec4585aa1d7c090e92911`
 - **Usage rule**: provider `total_tokens` is never synthesized. Missing total → `usage=None`; valid provider total with optional input/output preserves only reported values; invalid/bool/string/negative or inconsistent usage → `usage=None`.
 - **Pin gate**: `checks/canonical_pin_checker.py` parses every authoritative World/Index/Release declaration in all three canonical docs. Every declaration must equal the frozen pin. The same checker executes 11 disposable mutation-red cases.
-- **Runbook authority**: `procedure/b_startup_procedure.md §7` is the single authoritative Phase-B cursor lifecycle. `per_cursor_interaction.md` is an exact operational mirror/reference of that section, not a second ONLY legal order. Both expose the same 11 mechanical tokens: `REVEAL INSTALL_CURRENT_EVENT PERSIST_PROJECTION_EVIDENCE CREATE_BINDING_RECEIPT VERIFY_BINDING DERIVE_OCCURRED_AT INGEST MODEL_WORK DURABLE_ACK CLEAR_BINDING NEXT_REVEAL`. Finish-all-cursor-model-work remains required prose between `MODEL_WORK` and `DURABLE_ACK`. `checks/runbook_lifecycle_checker.py` compares token block, headings, executable anchors, and chains, and mutation-tests the old receipt-before-current-event order.
+- **Runbook authority**: `procedure/b_startup_procedure.md §7` is the single authoritative Phase-B cursor lifecycle. `per_cursor_interaction.md` is an exact operational mirror/reference of that section, not a second ONLY legal order. Both expose the same 11 mechanical tokens: `REVEAL INSTALL_CURRENT_EVENT PERSIST_PROJECTION_EVIDENCE CREATE_BINDING_RECEIPT VERIFY_BINDING DERIVE_OCCURRED_AT INGEST MODEL_WORK DURABLE_ACK CLEAR_BINDING NEXT_REVEAL`. Finish-all-cursor-model-work remains required prose between `MODEL_WORK` and `DURABLE_ACK`. `checks/runbook_lifecycle_checker.py` compares token block, headings, and executable commands inside each step body. A bare `.projection.json` substring is not proof. Fenced commands are parsed after comments, blanks, and echo-only lines are removed. The same function mutation-tests the old receipt-before-current-event order and the IA-BLK-003 executable deletions, moves, and comment-hidden receipt-first chain.
 - **Section 6 remains configuration-only**: no model dispatch before reveal/current-event/receipt binding.
 - **Section 7 order remains**: reveal → install current-event → persist immutable projection evidence → create binding receipt → verify → derive occurred_at → ingest → model/capability/due/review work → finish cursor model work → durable ACK → clear event/receipt → next reveal.
 
@@ -210,9 +210,9 @@ The three second-acceptance blockers are addressed in code/docs:
 
 **Evidence rule:** the old committed 144/144 log is historical parent-candidate evidence and is not relabeled as CORRECTIVE-011.
 
-## CORRECTIVE-011 fresh frozen E2E
+## CORRECTIVE-011 frozen E2E (historical parent evidence, not relabeled)
 
-Fresh run of `isolation/probe_e2e.sh` after closing the residual false-green gaps (operational lifecycle gate, disposable-file pin mutations, synchronized mechanical chain):
+Parent-candidate run of `isolation/probe_e2e.sh`. The E2E file SHA below is the parent commit's copy, not the current file. The current `isolation/e2e_probe_output.txt` is the CORRECTIVE-012 copy recorded in the next section. Isolation bytes were not regenerated.
 
 | Role | Path | SHA-256 | Result |
 | --- | --- | --- | --- |
@@ -222,6 +222,19 @@ Fresh run of `isolation/probe_e2e.sh` after closing the residual false-green gap
 | committed isolation copy | `isolation/probe_output.txt` | `167b57e95f8240bca9c3cde7c03eee15fb177f73fc756ccb8b5aebb09858bfe4` | header + raw log |
 
 Markers present in the raw log: `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS`, `CORRECTIVE_011_E2E_PASS`.
+
+Python was `Python 3.11.2`. The disposable reveal printed mechanical metadata only and was never presented to a Resident or model.
+
+## CORRECTIVE-012 fresh frozen E2E
+
+Fresh disposable run after closing IA-BLK-003. The lifecycle checker now accepts a projection step only when that step body contains the executable persist commands. The same `check_runbook_lifecycle()` rejects the executable deletions, the post-ACK move, and the comment-hidden receipt-first chain.
+
+| Role | Path | SHA-256 | Result |
+| --- | --- | --- | --- |
+| raw E2E log | `/tmp/b-preflight-e2e-c012/e2e.log` | `38a414ac1f2600d11efa7eb9179c33bc8133bf06c8668092e032d5b0c86be5a2` | `ALL_CHECKS=157/157 FAILURES=0` |
+| committed E2E copy | `isolation/e2e_probe_output.txt` | `8af79734c8e5aebfb10a16c2cb19025f89ff52a1e85c62e60811bf16f91780c9` | header + raw log |
+
+Markers present in the raw log: `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS`, `CORRECTIVE_012_E2E_PASS`.
 
 Python was `Python 3.11.2`. The disposable reveal printed mechanical metadata only and was never presented to a Resident or model.
 

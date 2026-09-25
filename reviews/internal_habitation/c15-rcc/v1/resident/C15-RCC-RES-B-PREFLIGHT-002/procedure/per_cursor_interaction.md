@@ -1,4 +1,4 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Per-Cursor Interaction Procedure (CORRECTIVE-011 exact mirror)
+# C15-RCC-RES-B-PREFLIGHT-002 — Per-Cursor Interaction Procedure (CORRECTIVE-012 exact mirror)
 
 This document is an exact operational mirror/reference of `b_startup_procedure.md §7`; if any wording diverges, startup §7 is authoritative and execution must STOP until documents are resynchronized.
 **`b_startup_procedure.md §7` is the single authoritative Phase-B cursor lifecycle.**
@@ -250,5 +250,7 @@ Required markers include:
 - `CANONICAL_RUNBOOK_ORDER_PASS`
 - `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`
 - `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS`
+- `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS`
 - `RAW_USAGE_NO_SYNTHESIS_PASS`
-- `CORRECTIVE_011_E2E_PASS`
+- `CANONICAL_PIN_MUTATION_RED_PASS`
+- `CORRECTIVE_012_E2E_PASS`
