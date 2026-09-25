@@ -68,6 +68,12 @@ These identities are intentionally NOT reused for Resident B (fresh session/proc
 | lineage Index | `ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1` |
 | lineage Release state | `eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8` |
 | Resident B run contract | `28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef` |
+
+Authoritative pin declarations. Every World/Index/Release occurrence above must equal these values; a correct hash elsewhere does not excuse a wrong declaration:
+
+- World: `626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa`
+- Index: `ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1`
+- Release: `eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8`
 | resident wire protocol | `a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a` |
 
 CORRECTIVE-009 and CORRECTIVE-010 did not touch `src/aios_core/**`, the sealed fixture, the evaluator, the governance

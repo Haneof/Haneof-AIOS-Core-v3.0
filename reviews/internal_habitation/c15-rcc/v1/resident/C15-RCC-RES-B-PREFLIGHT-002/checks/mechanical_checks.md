@@ -200,20 +200,20 @@ Nine markers are counted as nine checks; the aggregate marker is mandatory but n
 `checks/canonical_pin_checker.py --base "$B_PREP" --self-test` must emit:
 
 - `CANONICAL_PIN_CONSISTENCY_PASS`
-- 11 individual `PIN_MUTATION_RED_PASS` lines covering 9 one-hex mutations + duplicate-wrong + missing-World
+- 11 individual `PIN_MUTATION_RED_PASS` lines covering 9 one-hex mutations + duplicate-wrong World + missing World
 - `CANONICAL_PIN_MUTATION_RED_PASS cases=11`
 
-The existing four pin-consistency checks remain counted; the mutation-red aggregate adds one new check.
+The production gate and the mutation self-test both call `check_canonical_pin_docs()` on real files. Mutations are applied to disposable copies. A correct hash remaining elsewhere does not mask a wrong authoritative declaration, including bare `World:` / `Index:` / `Release:` lines. The existing four pin-consistency checks remain counted; the mutation-red aggregate adds one new check.
 
 ### IA-BLK-003 lifecycle synchronization
 
 `checks/runbook_lifecycle_checker.py --base "$B_PREP" --self-test` must emit:
 
-- `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`
-- red evidence for receipt-before-current-event, missing projection evidence, duplicate projection evidence
-- `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=3`
+- `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS` with the exact 11-token sequence `REVEAL > INSTALL_CURRENT_EVENT > PERSIST_PROJECTION_EVIDENCE > CREATE_BINDING_RECEIPT > VERIFY_BINDING > DERIVE_OCCURRED_AT > INGEST > MODEL_WORK > DURABLE_ACK > CLEAR_BINDING > NEXT_REVEAL`
+- red evidence that operational heading swap, missing projection evidence, duplicate projection evidence, the old receipt-before-current-event chain, and a token-block-only reorder all FAIL
+- `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS`
 
-This adds two counted checks.
+The gate reads both active runbooks. Token block, step headings, executable anchors, and fenced/arrow chains must agree. `b_startup_procedure.md §7` is the only authority. This adds two counted checks.
 
 ### New exact gate
 
@@ -221,5 +221,5 @@ Parent: 144 checks. New additions: 9 + 1 + 2 = 12.
 Required: `EXPECTED_CHECKS=156`, `ALL_CHECKS=156/156 FAILURES=0`, final
 `CORRECTIVE_011_E2E_PASS`.
 
-Until that fresh exact run exists, CORRECTIVE-011 remains
-`IMPLEMENTATION_READY / FRESH_E2E_REQUIRED`, not review-ready.
+Fresh exact run exists: `ALL_CHECKS=156/156 FAILURES=0`, final `CORRECTIVE_011_E2E_PASS`.
+State is `REVIEW_READY / AWAITING_PM_RE-REVIEW`. The historical 144/144 log is not relabeled.

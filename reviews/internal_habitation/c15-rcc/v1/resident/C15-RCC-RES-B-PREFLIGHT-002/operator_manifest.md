@@ -3,18 +3,18 @@
 Date: 2026-09-25
 Role: Release / Resident Infrastructure Engineer (not Resident B/C, not evaluator — per CORRECTIVE-011)
 Task: C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-011
-Verdict: **IMPLEMENTATION_READY / FRESH_E2E_REQUIRED** (no B or C run, no merge; do not PM re-review until exact frozen E2E is attached)
+Verdict: **REVIEW_READY / AWAITING_PM_RE-REVIEW** (no B or C run, no merge, no Independent Acceptance by the implementer)
 
 ## Current authoritative manifest (CORRECTIVE-011) — exact implementation target
 
 - **Current Task**: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-011`
-- **Current implementation state**: `IMPLEMENTATION_READY / FRESH_E2E_REQUIRED`
-- **Exact gate target**: `EXPECTED_CHECKS=156`, requiring `ALL_CHECKS=156/156 FAILURES=0`
+- **Current implementation state**: `REVIEW_READY / AWAITING_PM_RE-REVIEW`
+- **Exact gate**: `EXPECTED_CHECKS=156`, fresh result `ALL_CHECKS=156/156 FAILURES=0`
 - **Required current markers**: `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS`, final `CORRECTIVE_011_E2E_PASS`
 - **Production adapter**: `bridged_model_handler:ExternalBrokerClient`, SHA-256 `da74eb97a6d35b535f298f52a72a32fc35dfbd1fca1ec4585aa1d7c090e92911`
 - **Usage rule**: provider `total_tokens` is never synthesized. Missing total → `usage=None`; valid provider total with optional input/output preserves only reported values; invalid/bool/string/negative or inconsistent usage → `usage=None`.
 - **Pin gate**: `checks/canonical_pin_checker.py` parses every authoritative World/Index/Release declaration in all three canonical docs. Every declaration must equal the frozen pin. The same checker executes 11 disposable mutation-red cases.
-- **Runbook authority**: `procedure/b_startup_procedure.md §7` is the single authoritative Phase-B cursor lifecycle. `per_cursor_interaction.md` is an exact mirror/reference and carries the same 12 machine-readable lifecycle tokens. `checks/runbook_lifecycle_checker.py` compares both and mutation-tests historical receipt-before-current-event, missing-projection, and duplicate-projection forms.
+- **Runbook authority**: `procedure/b_startup_procedure.md §7` is the single authoritative Phase-B cursor lifecycle. `per_cursor_interaction.md` is an exact operational mirror/reference of that section, not a second ONLY legal order. Both expose the same 11 mechanical tokens: `REVEAL INSTALL_CURRENT_EVENT PERSIST_PROJECTION_EVIDENCE CREATE_BINDING_RECEIPT VERIFY_BINDING DERIVE_OCCURRED_AT INGEST MODEL_WORK DURABLE_ACK CLEAR_BINDING NEXT_REVEAL`. Finish-all-cursor-model-work remains required prose between `MODEL_WORK` and `DURABLE_ACK`. `checks/runbook_lifecycle_checker.py` compares token block, headings, executable anchors, and chains, and mutation-tests the old receipt-before-current-event order.
 - **Section 6 remains configuration-only**: no model dispatch before reveal/current-event/receipt binding.
 - **Section 7 order remains**: reveal → install current-event → persist immutable projection evidence → create binding receipt → verify → derive occurred_at → ingest → model/capability/due/review work → finish cursor model work → durable ACK → clear event/receipt → next reveal.
 
@@ -208,4 +208,21 @@ The three second-acceptance blockers are addressed in code/docs:
 2. IA-BLK-002: strict declaration parser factored into `checks/canonical_pin_checker.py`; production gate and self-test invoke the same checker; 9 one-hex mutations plus duplicate-wrong and missing-World cases must all red. Target marker: `CANONICAL_PIN_MUTATION_RED_PASS`.
 3. IA-BLK-003: `per_cursor_interaction.md` is synchronized to startup §7, including projection evidence before receipt; both carry identical lifecycle tokens and are checked by `checks/runbook_lifecycle_checker.py`. Target marker: `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`.
 
-**Evidence rule:** the old committed 144/144 log must not be relabeled as CORRECTIVE-011. A new exact frozen-environment run of the modified `isolation/probe_e2e.sh` is mandatory before changing this manifest to `REVIEW_READY / AWAITING_PM_RE-REVIEW`.
+**Evidence rule:** the old committed 144/144 log is historical parent-candidate evidence and is not relabeled as CORRECTIVE-011.
+
+## CORRECTIVE-011 fresh frozen E2E
+
+Fresh run of `isolation/probe_e2e.sh` after closing the residual false-green gaps (operational lifecycle gate, disposable-file pin mutations, synchronized mechanical chain):
+
+| Role | Path | SHA-256 | Result |
+| --- | --- | --- | --- |
+| raw E2E log | `/tmp/b-preflight-e2e-c011b/e2e.log` | `94f7388ced02512a61a3933648cb520de7cfe74e0ec778887cb7f00a78803ed8` | `ALL_CHECKS=156/156 FAILURES=0` |
+| committed E2E copy | `isolation/e2e_probe_output.txt` | `6f860779c08d891bb02c83031e84054481954af3a419207b7063b6df5df34792` | header + raw log |
+| raw isolation log | `/tmp/b-preflight-e2e-c011b/isolation_probe.log` | `1bb3a16b97ca61c52a4b7b4a4e31518e7fd5ccfed5c2e146b96a5e73be283c74` | `ISOLATION_PASS` |
+| committed isolation copy | `isolation/probe_output.txt` | `167b57e95f8240bca9c3cde7c03eee15fb177f73fc756ccb8b5aebb09858bfe4` | header + raw log |
+
+Markers present in the raw log: `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS`, `CORRECTIVE_011_E2E_PASS`.
+
+Python was `Python 3.11.2`. The disposable reveal printed mechanical metadata only and was never presented to a Resident or model.
+
+State: `REVIEW_READY / AWAITING_PM_RE-REVIEW`. Do not merge #209. Do not start Independent Acceptance from this packet. Do not enter B release.

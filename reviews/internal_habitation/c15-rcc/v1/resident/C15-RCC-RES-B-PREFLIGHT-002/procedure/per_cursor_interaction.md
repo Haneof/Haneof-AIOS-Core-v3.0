@@ -1,15 +1,15 @@
 # C15-RCC-RES-B-PREFLIGHT-002 — Per-Cursor Interaction Procedure (CORRECTIVE-011 exact mirror)
 
-This document is an exact operational mirror/reference of `procedure/b_startup_procedure.md §7`.
+This document is an exact operational mirror/reference of `b_startup_procedure.md §7`; if any wording diverges, startup §7 is authoritative and execution must STOP until documents are resynchronized.
 **`b_startup_procedure.md §7` is the single authoritative Phase-B cursor lifecycle.**
-If any wording, executable snippet, or lifecycle token here diverges from startup §7, execution MUST STOP until the two documents are resynchronized. This file is not an independent second authority.
+This file is not an independent second authority and does not define another ONLY legal order.
 
 The frozen production path remains `ProductionResidentHandler + ExternalBrokerClient + resident_wire_protocol.json`.
 No Core, fixture, evaluator, governance, or Resident semantics are changed here.
 
 ## Machine-readable lifecycle contract
 
-Both active runbooks carry this exact token block. `checks/runbook_lifecycle_checker.py` parses both blocks, requires the exact ordered sequence, and mutation-tests the historical receipt-before-current-event ordering.
+Both active runbooks carry this exact token block. `checks/runbook_lifecycle_checker.py` is the only lifecycle gate. It calls `check_runbook_lifecycle()` on the real documents and on disposable copies. A matching token block is not enough: operational step headings, executable anchors, and fenced/arrow chains must carry the same order. Swapping receipt and current-event in the headings, or restoring the old receipt-before-current-event chain, must FAIL.
 
 <!-- C15_PHASE_B_LIFECYCLE_BEGIN -->
 REVEAL
@@ -20,7 +20,6 @@ VERIFY_BINDING
 DERIVE_OCCURRED_AT
 INGEST
 MODEL_WORK
-FINISH_CURSOR_MODEL_WORK
 DURABLE_ACK
 CLEAR_BINDING
 NEXT_REVEAL
@@ -32,6 +31,7 @@ NEXT_REVEAL
 - Only the current 8-field reveal projection may become `current-event.json`; future cursors, Phase C, sealed fixture internals, evaluator material, governance, and A transcript remain unavailable to the Resident/model.
 - Every production model invocation requires a live current event + immutable binding receipt. `event=None` is an unconditional STOP with zero provider calls for conversation, periodic review, background/mechanical wake, summary, and capability follow-up paths.
 - The writer lock is always `$RUN_ROOT/runtime/world.sqlite.writer.lock`.
+- `source_kind` is an opaque non-empty string from the exact frozen reveal projection; the value must exactly match the immutable binding receipt.
 - `provider/model/request_id` come from broker provenance or literal `UNKNOWN`.
 - Usage is never synthesized. A provider-reported `total_tokens` is required before a `ModelUsage` object can exist. Missing total, invalid values, or inconsistent `total < input + output` produce `usage=None`; missing input/output fields remain missing when total is valid.
 - Scheme A remains hard-stop: poison handler, clear outstanding state before evidence I/O, emit collision-safe durable evidence, reconstruct, and retry from the same durable cursor. No semantic repair hint is generated.
@@ -178,7 +178,7 @@ Production reply translation rules for usage are exact:
 - invalid negative/bool/string token values -> `usage=None`;
 - `total < input + output` -> `usage=None`.
 
-### 9. FINISH_CURSOR_MODEL_WORK
+### 9. Finish all cursor model work
 
 Do not ACK until every model round, capability follow-up, due unit, periodic review, background wake, and summary unit attributable to this cursor has completed successfully.
 

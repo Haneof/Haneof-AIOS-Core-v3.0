@@ -498,6 +498,8 @@ print("INVALID_USAGE_NONE_PASS")
 
 src = textwrap.dedent(inspect.getsource(_reply_to_directive_production))
 assert "sum_tot" not in src, "production translator still contains sum_tot synthesis"
+assert "(inp_i or 0)" not in src and "(out_i or 0)" not in src, "production translator still zero-fills partial usage"
+assert "input_tokens + output_tokens" not in src, "production translator still adds input_tokens + output_tokens into a total"
 tree = ast.parse(src)
 usage_calls = []
 for node in ast.walk(tree):
@@ -3143,11 +3145,12 @@ for _ev in _sealed["events"] if isinstance(_sealed, dict) and "events" in _seale
     _n = _pl if isinstance(_pl, str) else json.dumps(_pl, sort_keys=True, ensure_ascii=False)
     assert len(_n) < 8 or _n not in _logtxt, "cursor-14 payload leaked into the run log"
 
-print("CANONICAL_RUNBOOK_ORDER_PASS order=1-12 reveal_before_event=True receipt_from_reveal=True "
+print("CANONICAL_RUNBOOK_ORDER_PASS order=1-12 reveal_before_event=True "
+      "projection_before_receipt=True receipt_after_current_event=True "
       "occurred_at_derived_after_reveal=True transport_boundary_reached=True")
 PYEOF
 if grep -q "CANONICAL_RUNBOOK_ORDER_PASS" "$CURRENT_RUN_LOG" 2>/dev/null; then
-  pass_check "BLK-03 canonical runbook 1-12 order executes on a disposable Phase-B copy (reveal -> event -> receipt -> projection -> occurred_at -> production turn -> transport)"
+  pass_check "BLK-03 canonical runbook 1-12 order executes on a disposable Phase-B copy (reveal -> install current-event -> persist projection evidence -> receipt -> verify -> occurred_at -> production turn -> transport)"
 else
   fail_check "canonical runbook order regression"
   exit 1
@@ -3167,7 +3170,7 @@ else
   exit 1
 fi
 if grep -q "CANONICAL_PIN_MUTATION_RED_PASS" "$CURRENT_RUN_LOG"; then
-  pass_check "11 disposable pin mutations all rejected by the production checker"
+  pass_check "11 disposable-file pin mutations all rejected by check_canonical_pin_docs"
 else
   fail_check "canonical pin mutation-red self-test"
   exit 1
@@ -3178,13 +3181,13 @@ echo "[e2e] step 17l: startup/per-cursor lifecycle synchronization + mutation re
 runbook_out=$("$PY" "$B_PREP/checks/runbook_lifecycle_checker.py" --base "$B_PREP" --self-test)
 printf '%s\n' "$runbook_out"
 if grep -q "RUNBOOK_CROSS_DOCUMENT_ORDER_PASS" "$CURRENT_RUN_LOG"; then
-  pass_check "startup §7 and per_cursor lifecycle token sequences are identical and canonical"
+  pass_check "startup §7 and per_cursor lifecycle sequences match across token block, headings, and executable anchors"
 else
   fail_check "runbook cross-document lifecycle order"
   exit 1
 fi
 if grep -q "RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS" "$CURRENT_RUN_LOG"; then
-  pass_check "per_cursor old receipt-before-current-event/missing/duplicate mutations all rejected"
+  pass_check "per_cursor operational receipt-before-current-event/missing/duplicate/old-chain mutations all rejected by check_runbook_lifecycle"
 else
   fail_check "runbook cross-document mutation-red self-test"
   exit 1

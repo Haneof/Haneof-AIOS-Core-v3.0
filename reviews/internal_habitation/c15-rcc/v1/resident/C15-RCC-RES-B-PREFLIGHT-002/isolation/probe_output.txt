@@ -1,5 +1,7 @@
-# C15-RCC-RES-B-PREFLIGHT-002 - CORRECTIVE-010-FIXUP-001 fresh isolation evidence (inside the sandbox).
+# C15-RCC-RES-B-PREFLIGHT-002 - CORRECTIVE-011 fresh isolation evidence (inside the sandbox).
 # Regenerated from a fresh disposable run of isolation/probe_isolation.sh via resident_jail.py.
+# Raw log: /tmp/b-preflight-e2e-c011b/isolation_probe.log
+# Raw log SHA-256: 1bb3a16b97ca61c52a4b7b4a4e31518e7fd5ccfed5c2e146b96a5e73be283c74
 # Contains NO cursor-14 resident_visible_payload bytes.
 
 === identity ===

@@ -44,6 +44,12 @@ python3 --version # Python 3.11.2
 python3 -c "import pydantic; print(pydantic.__version__)" # 2.13.5
 ```
 
+Authoritative lineage pin declarations. Every occurrence in this document, including the digest comments above, must equal these values. A correct hash elsewhere does not excuse a wrong declaration:
+
+- World: `626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa`
+- Index: `ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1`
+- Release: `eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8`
+
 If any mismatch, STOP — no `pip install`, no upgrade.
 
 ## 2. Verify recovery status (no model invocation)
@@ -193,9 +199,9 @@ executable verbatim: steps 7.1–7.5 make the cursor legal, step 7.6 derives the
 **after** reveal, steps 7.7–7.9 do the model work, step 7.10 makes it durable, steps 7.11–7.12 close
 this cursor and open the next one.
 
-This §7 is the **single authoritative Phase-B cursor lifecycle**. `per_cursor_interaction.md` is an exact
-operational mirror/reference only; if its wording, executable snippets, or machine-readable lifecycle
-tokens diverge from this §7, execution MUST STOP until both documents are resynchronized.
+This `b_startup_procedure.md §7` is the **single authoritative Phase-B cursor lifecycle**.
+`per_cursor_interaction.md` is an exact operational mirror/reference of `b_startup_procedure.md §7`;
+if any wording diverges, startup §7 is authoritative and execution MUST STOP until both documents are resynchronized.
 
 <!-- C15_PHASE_B_LIFECYCLE_BEGIN -->
 REVEAL
@@ -206,7 +212,6 @@ VERIFY_BINDING
 DERIVE_OCCURRED_AT
 INGEST
 MODEL_WORK
-FINISH_CURSOR_MODEL_WORK
 DURABLE_ACK
 CLEAR_BINDING
 NEXT_REVEAL
@@ -216,7 +221,7 @@ The operator-side evidence loop is closed for every cursor: the exact reveal pro
 **twice** — once as the handler input (`current-event.json`) and once as an immutable per-cursor
 evidence artifact that `final_freeze_procedure.md` verifies.
 
-### 7.1 `release_operator reveal` (operator only, outside jail)
+### 7.1 REVEAL — `release_operator reveal` (operator only, outside jail)
 
 ```bash
 python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py \
@@ -227,7 +232,7 @@ Exactly one reveal per cursor. A second reveal before durable ACK is refused by 
 (`duplicate reveal before durable ack is forbidden`). The 8-field projection on stdout is the only
 legal source of `current-event.json`, the binding receipt and the projection evidence.
 
-### 7.2 Write `current-event.json` (install the revealed projection)
+### 7.2 INSTALL_CURRENT_EVENT — write `current-event.json`
 
 ```bash
 install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"
@@ -238,7 +243,7 @@ The handler reads `AIOS_CURRENT_EVENT_PATH` per call and validates `sequence==ne
 `event_id`, payload digest, `source_kind` and pending status; mismatch/stale/missing/malformed →
 fail closed, do not advance.
 
-### 7.3 Persist the immutable per-cursor projection evidence
+### 7.3 PERSIST_PROJECTION_EVIDENCE — immutable per-cursor projection
 
 ```bash
 SEQ="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])' "$RUN_ROOT/current-event.json")"
@@ -250,10 +255,11 @@ After cursors 14..22 this yields exactly `$RUN_ROOT/evidence/event-014.projectio
 `event-022.projection.json` (9 files, sequences 14..22 contiguous, unique `event_id`), plus a SHA
 manifest `projection_digests.sha256` that `final_freeze_procedure.md` verifies.
 
-### 7.4 Create the immutable binding receipt (exact canonical command)
+### 7.4 CREATE_BINDING_RECEIPT — immutable binding receipt
 
 The receipt creation command is part of this runbook — it is **not** deferred to another document.
-It must run immediately after reveal, capturing the exact projection bytes.
+It must run only after steps 7.1–7.3 (reveal, install current-event, persist projection evidence).
+Do not create a receipt before `current-event.json` exists.
 
 ```bash
 mkdir -p "$RUN_ROOT/binding"
@@ -279,11 +285,18 @@ chmod 0400 "$RUN_ROOT/binding/current-event-binding.json"
 The canonical mechanical chain for every cursor is exactly:
 
 ```
-release_operator reveal  →  reveal projection bytes
-                         →  create_current_event_binding_receipt(...)
-                         →  write_binding_receipt(receipt, AIOS_CURRENT_EVENT_BINDING_PATH)
-                         →  current-event.json
-                         →  handler
+release_operator reveal
+  → install current-event.json
+  → persist event-XXX.projection.json + digest
+  → create_current_event_binding_receipt(...)
+  → write_binding_receipt(receipt, AIOS_CURRENT_EVENT_BINDING_PATH)
+  → validate_current_event_binding
+  → derive CURRENT_OCCURRED_AT
+  → ingest
+  → model work
+  → durable ACK
+  → clear current-event.json + binding receipt
+  → next reveal before any later model invocation
 ```
 
 `create_current_event_binding_receipt` itself fails closed unless the live release state exists, is
@@ -292,7 +305,7 @@ readable, is valid JSON, has `next_sequence`, and carries a `pending_reveal` who
 
 Receipt contains: `phase B`, `b_session_id`, `sequence`, `event_id`, `occurred_at`, `source_kind/class/modality/dimension`, `canonical_projection_sha256`, `resident_visible_payload_sha256`, `release_state_path/sha/next_sequence/pending`, `fixture_sha256`, `reveal_timestamp`, `operator_request_id`, `binding_version`.
 
-### 7.5 Verify receipt / state / event binding
+### 7.5 VERIFY_BINDING — receipt / state / event binding
 
 ```bash
 PYTHONPATH="$PYTHONPATH" python3 - <<'PY'
@@ -315,7 +328,7 @@ every call; mismatches fail closed (11 negatives: seq15, wrong id, modified
 text/dimension/source_kind/modality/occurred_at, wrong session, stale after ACK,
 missing/malformed receipt).
 
-### 7.6 Derive `CURRENT_OCCURRED_AT` from the current projection (after reveal)
+### 7.6 DERIVE_OCCURRED_AT — from the current projection (after reveal)
 
 ```bash
 CURRENT_OCCURRED_AT="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["occurred_at"])' "$RUN_ROOT/current-event.json")"
@@ -326,7 +339,7 @@ echo "CURRENT_OCCURRED_AT=$CURRENT_OCCURRED_AT"
 `CURRENT_OCCURRED_AT` is the canonical ingest/run time of **this** cursor, read from the projection
 produced by reveal in 7.1. It is never hardcoded and never pre-read in Section 6.
 
-### 7.7 Ingest the current cursor
+### 7.7 INGEST — the current cursor
 
 ```bash
 SK="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["source_kind"])' "$RUN_ROOT/current-event.json")"
@@ -343,7 +356,7 @@ else
 fi
 ```
 
-### 7.8 Run the exact production headless turn / due / model rounds
+### 7.8 MODEL_WORK — production headless turn / due / model rounds
 
 ```bash
 python3 -m aios_core.headless.cli \
@@ -364,7 +377,7 @@ Do not ACK until every model round, capability follow-up and `due` unit associat
 has completed successfully. Any Scheme A hard-stop terminates/reconstructs the handler and re-enters
 from the same durable sequence/state with a new binding.
 
-### 7.10 Durable ACK
+### 7.10 DURABLE_ACK
 
 ```bash
 python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py \
@@ -377,7 +390,7 @@ python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py \
 
 After the ACK, `release_state.json.next_sequence` increments and `pending_reveal` returns to null.
 
-### 7.11 Clear current-event + binding (only now)
+### 7.11 CLEAR_BINDING — current-event + binding (only now)
 
 ```bash
 rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"
@@ -386,7 +399,7 @@ rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.js
 Only after durable ACK **and** `due` completion for this cursor may the operator clear
 `current-event.json` and the binding receipt.
 
-### 7.12 Reveal the next cursor before any later model invocation
+### 7.12 NEXT_REVEAL — next cursor before any later model invocation
 
 Before any further model invocation the next cursor MUST be revealed and the next binding receipt
 installed — i.e. loop back to 7.1. Clearing the event never opens a window in which a model wake can

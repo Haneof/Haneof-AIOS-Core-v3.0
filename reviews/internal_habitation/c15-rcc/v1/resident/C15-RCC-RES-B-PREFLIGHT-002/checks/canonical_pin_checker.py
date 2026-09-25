@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import argparse
 import re
+import shutil
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -143,42 +145,59 @@ def _remove_all_kind_declarations(text: str, kind: str) -> str:
     )
 
 
-def _expect_red(label: str, docs: dict[Path, str]) -> None:
+def _stage(base: Path, dest: Path, overrides: dict[Path, str] | None = None) -> None:
+    overrides = overrides or {}
+    for rel in DOC_RELS:
+        target = dest / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if rel in overrides:
+            target.write_text(overrides[rel], encoding="utf-8")
+        else:
+            shutil.copyfile(base / rel, target)
+
+
+def _expect_red(label: str, base: Path) -> None:
+    # Same production entrypoint the gate uses. In-memory helpers are not a second checker.
     try:
-        check_canonical_pin_docs_texts(docs)
+        check_canonical_pin_docs(base)
     except PinCheckError as exc:
-        print(f"PIN_MUTATION_RED_PASS {label}: {exc}")
+        print(f"PIN_MUTATION_RED_PASS {label} via=check_canonical_pin_docs: {exc}")
         return
     raise AssertionError(f"mutation false-green: {label}")
 
 
 def run_mutation_self_tests(base: Path) -> int:
+    check_canonical_pin_docs(base)
     docs = read_docs(base)
-    check_canonical_pin_docs_texts(docs)
     count = 0
-    for rel in DOC_RELS:
-        for kind in ("World", "Index", "Release"):
-            mutated = dict(docs)
-            mutated[rel] = _mutate_one(
-                docs[rel], kind, prefer_bare=(rel == Path("operator_manifest.md"))
-            )
-            _expect_red(f"{rel}:{kind}:one_hex", mutated)
-            count += 1
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        for rel in DOC_RELS:
+            for kind in ("World", "Index", "Release"):
+                mutated_text = _mutate_one(docs[rel], kind, prefer_bare=True)
+                # A correct hash remaining elsewhere must not mask the mutated declaration.
+                if CANONICAL[kind] not in mutated_text:
+                    raise AssertionError(
+                        f"{rel}:{kind} mutation deleted every correct hash; "
+                        "that would not prove the all-declarations rule"
+                    )
+                stage = root / f"case{count}"
+                _stage(base, stage, {rel: mutated_text})
+                _expect_red(f"{rel}:{kind}:one_hex", stage)
+                count += 1
 
-    wrong_world = _flip_last_hex(CANONICAL["World"])
-    duplicate = dict(docs)
-    duplicate[Path("operator_manifest.md")] = (
-        docs[Path("operator_manifest.md")] + f"\n- World: `{wrong_world}`\n"
-    )
-    _expect_red("operator_manifest.md:World:duplicate_wrong", duplicate)
-    count += 1
+        wrong_world = _flip_last_hex(CANONICAL["World"])
+        duplicate_text = docs[Path("operator_manifest.md")] + f"\n- World: `{wrong_world}`\n"
+        stage = root / "duplicate"
+        _stage(base, stage, {Path("operator_manifest.md"): duplicate_text})
+        _expect_red("operator_manifest.md:World:duplicate_wrong", stage)
+        count += 1
 
-    missing = dict(docs)
-    missing[Path("operator_manifest.md")] = _remove_all_kind_declarations(
-        docs[Path("operator_manifest.md")], "World"
-    )
-    _expect_red("operator_manifest.md:World:missing_all", missing)
-    count += 1
+        missing_text = _remove_all_kind_declarations(docs[Path("operator_manifest.md")], "World")
+        stage = root / "missing"
+        _stage(base, stage, {Path("operator_manifest.md"): missing_text})
+        _expect_red("operator_manifest.md:World:missing_all", stage)
+        count += 1
 
     print(f"CANONICAL_PIN_MUTATION_RED_PASS cases={count}")
     return count

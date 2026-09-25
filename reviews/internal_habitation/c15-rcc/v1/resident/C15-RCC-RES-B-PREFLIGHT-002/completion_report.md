@@ -4,16 +4,18 @@ Date: 2026-09-25
 Task: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-011`  
 Role: Release / Test Infrastructure Engineer
 
-## Current state: **IMPLEMENTATION_READY / FRESH_E2E_REQUIRED**
+## Current state: **REVIEW_READY / AWAITING_PM_RE-REVIEW**
 
 Independent Acceptance review `5316831911` failed exact candidate
 `a8576e8b60c400845ceeecc6b7145202e4d1f617` with three blockers. PM adjudication
 `5316852416` substantiated the same three and released CORRECTIVE-011.
 
-The implementation changes for all three blockers are present in this corrective candidate, but the old
-committed `144/144` evidence belongs to the parent candidate and MUST NOT be reused as fresh evidence.
-A new exact frozen-environment run of `isolation/probe_e2e.sh` is still required before this report may
-be changed to `REVIEW_READY / AWAITING_PM_RE-REVIEW`.
+The old committed `144/144` evidence belongs to the parent candidate and is not reused as fresh evidence.
+A fresh frozen-environment run of `isolation/probe_e2e.sh` produced `ALL_CHECKS=156/156 FAILURES=0`
+and `CORRECTIVE_011_E2E_PASS`.
+
+The only preflight reveal is a disposable operator-side reveal on a copied release state. That projection
+was never presented to a Resident or model, and it is not a Resident B reveal.
 
 ## IA-BLK-001 — production usage no synthesis
 
@@ -106,14 +108,21 @@ The success condition is exactly `ALL_CHECKS=156/156 FAILURES=0`.
 
 ## Execution evidence status
 
-The previous `isolation/e2e_probe_output.txt` and FIXUP-001 raw log are historical evidence for the
-parent candidate only. They are not CORRECTIVE-011 evidence.
+The previous `isolation/e2e_probe_output.txt` and FIXUP-001 raw log were historical evidence for the
+parent candidate only. They have been replaced by a fresh disposable run. They are not relabeled.
 
-This corrective session could execute targeted no-synthesis/checker mutation regressions, but its local
-runtime is Python 3.13.5 and the container denies `unshare(CLONE_NEWNS|CLONE_NEWPID|CLONE_NEWNET)`
-with `Operation not permitted`. The frozen probe requires Python 3.11.2 plus namespace privileges.
-Therefore no `CORRECTIVE_011_E2E_PASS` is claimed here and no synthetic/local targeted log is
-misrepresented as the frozen E2E.
+Fresh frozen run:
+
+- Python `3.11.2`
+- raw log `/tmp/b-preflight-e2e-c011b/e2e.log`
+- raw log SHA-256 `94f7388ced02512a61a3933648cb520de7cfe74e0ec778887cb7f00a78803ed8`
+- committed copy `isolation/e2e_probe_output.txt` SHA-256 `6f860779c08d891bb02c83031e84054481954af3a419207b7063b6df5df34792`
+- result `ALL_CHECKS=156/156 FAILURES=0`
+- final marker `CORRECTIVE_011_E2E_PASS`
+
+Required markers observed in that raw log: `RAW_USAGE_NO_SYNTHESIS_PASS`,
+`CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`,
+`CANONICAL_RUNBOOK_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`.
 
 ## Invariants preserved
 
@@ -127,7 +136,7 @@ misrepresented as the frozen E2E.
 
 ## Exit condition
 
-Do **not** request PM re-review yet. The next permitted action is a fresh execution of the modified
-`isolation/probe_e2e.sh` in the exact frozen environment. Only if it produces
-`ALL_CHECKS=156/156 FAILURES=0` and `CORRECTIVE_011_E2E_PASS` may the packet transition to
 `REVIEW_READY / AWAITING_PM_RE-REVIEW`.
+
+Do not merge #209. Do not start Independent Acceptance from this packet. Do not enter B release.
+Do not reveal cursor 14 to a Resident or model.
