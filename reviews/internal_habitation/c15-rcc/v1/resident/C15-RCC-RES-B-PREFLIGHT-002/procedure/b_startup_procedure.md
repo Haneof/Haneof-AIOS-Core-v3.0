@@ -101,11 +101,11 @@ If `ISOLATION_FAIL`, STOP.
 ## 4a. Run the E2E transport probe — genuine + production + adversarial (no cursor 14 reveal)
 
 ```bash
-# exact gate: EXPECTED_CHECKS=140, requires CHECKS==EXPECTED_CHECKS and zero FAIL (CORRECTIVE-010)
+# exact gate: EXPECTED_CHECKS=144, requires CHECKS==EXPECTED_CHECKS and zero FAIL (CORRECTIVE-010-FIXUP-001)
 bash reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/isolation/probe_e2e.sh
 ```
 
-Expected `CORRECTIVE_010_E2E_PASS` (140 checks: mailbox 15, isolation, binding 7, synthetic+production genuine, current-event 6, strict, Scheme A, MS_PRIVATE, /dev, signal deterministic with PID map, env exact, real-provider fail-closed, fake fallback fail, import path executable, wire protocol hash, catalog/adapter/wire/boundary/receipt/HTTP/evidence, plus the CORRECTIVE-009 regressions for BLK-01..BLK-08 and the CORRECTIVE-010 canonical runbook-order regression: no committed cursor-14 payload, portable random-checkout import, negative-jail exact-exit proof, executable canonical runbook, missing-release-state fail-closed, no-event-no-dispatch, collision-safe failure receipts, inherited-FD closure, contract provenance binding, canonical runbook 1-12 order executable).
+Expected `CORRECTIVE_010_FIXUP_001_E2E_PASS` (144 checks: mailbox 15, isolation, binding 7, synthetic+production genuine, current-event 6, strict, Scheme A, MS_PRIVATE, /dev, signal deterministic with PID map, env exact, real-provider fail-closed, fake fallback fail, import path executable, wire protocol hash, catalog/adapter/wire/boundary/receipt/HTTP/evidence, plus the CORRECTIVE-009 regressions for BLK-01..BLK-08 and the CORRECTIVE-010 canonical runbook-order regression and FIXUP-001 pin-consistency: no committed cursor-14 payload, portable random-checkout import, negative-jail exact-exit proof, executable canonical runbook, missing-release-state fail-closed, no-event-no-dispatch, collision-safe failure receipts, inherited-FD closure, contract provenance binding, canonical runbook 1-12 order executable, World/Index/Release pin consistency across operator_manifest, source_pins, b_startup_procedure).
 
 Do NOT proceed if any check fails.
 

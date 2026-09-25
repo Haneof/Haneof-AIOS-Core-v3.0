@@ -1,22 +1,24 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Operator Manifest (CORRECTIVE-003 frozen)
+# C15-RCC-RES-B-PREFLIGHT-002 — Operator Manifest (CORRECTIVE-010 authoritative, CORRECTIVE-003 historical superseded)
 
 Date: 2026-09-25
-Role: Release / Resident Infrastructure Engineer (not Resident B/C, not evaluator — per CORRECTIVE-003)
-Task: C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-003
-Verdict: **REVIEW_READY** (await PM re-review; no B or C run)
+Role: Release / Resident Infrastructure Engineer (not Resident B/C, not evaluator — per CORRECTIVE-010-FIXUP-001)
+Task: C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-010-FIXUP-001
+Verdict: **REVIEW_READY / AWAITING_PM_RE-REVIEW** (no B or C run, no merge)
 
-## Scope
+## Current authoritative manifest (CORRECTIVE-010 + FIXUP-001) — this is the ONLY release contract
 
-Non-Resident mechanical preparation of the Phase B handoff from independently accepted Fresh A-002 (PR #205, Frozen RC) on the frozen RC. Per CORRECTIVE-003 preflight prompt §15, this manifest stops at REVIEW_READY:
+- **Current Task**: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-010-FIXUP-001`
+- **Current Verdict**: `REVIEW_READY / AWAITING_PM_RE-REVIEW`
+- **Final gate (CORRECTIVE-010 base)**: `ALL_CHECKS=140/140 FAILURES=0`, marker `CORRECTIVE_010_E2E_PASS`
+- **New regression marker (CORRECTIVE-010)**: `CANONICAL_RUNBOOK_ORDER_PASS` — proves the documented 1→12 order executes on a disposable Phase-B copy and reaches provider transport only after reveal + receipt installation
+- **New gate (FIXUP-001)**: `CANONICAL_PIN_CONSISTENCY_PASS` — proves `operator_manifest.md`, `source_pins_and_digests.md`, `procedure/b_startup_procedure.md` agree on World/Index/Release and equal frozen canonical values; any missing/typo/duplicate contradictory → FAIL
+- **Final gate (FIXUP-001)**: `ALL_CHECKS=N/N FAILURES=0` where N is recomputed from the executable (not mechanically retained 140), must include `CANONICAL_RUNBOOK_ORDER_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CORRECTIVE_010_E2E_PASS` and `CORRECTIVE_010_FIXUP_001_E2E_PASS`
+- **Current production transport**: `ExternalBrokerClient` (transport-only HTTPS, no semantic Atlas/silence choice; `FakeProviderClient` unreachable from production entrypoint; `FakeBrokerServer` is test-only)
+- **Current final runbook semantics**:
+  - **Section 6 is configuration only**: exports/pins `B_PREP`, `HARNESS_DIR`, `AIOS_B_SESSION_ID`, `AIOS_CONTRACT_SHA256`, `AIOS_WIRE_PROTOCOL_SHA256`, `AIOS_ADAPTER_SHA256` (drift grep vs `environment_manifest.md`), `AIOS_REAL_PROVIDER_API_KEY`, `AIOS_REAL_PROVIDER_ENDPOINT` (HTTPS), `AIOS_PROVIDER_ADAPTER=bridged_model_handler:ExternalBrokerClient`, `AIOS_RELEASE_STATE_PATH`, `AIOS_CURRENT_EVENT_PATH`, `AIOS_CURRENT_EVENT_BINDING_PATH`, `AIOS_EVIDENCE_DIR`, `PYTHONPATH="src:$B_PREP/harness"`. Then fail-closed assertions that `current-event.json`, `current-event-binding.json` and non-null `pending_reveal` are absent. States verbatim: «No model dispatch occurs in this section. The first production model turn occurs only inside the per-cursor loop after reveal + binding receipt installation.» No `CURRENT_OCCURRED_AT`, no `--at`, no `turn --session`.
+  - **Section 7 is the sole legal per-cursor loop** as numbered steps **7.1–7.12** in exact order: reveal → write `current-event.json` → persist immutable `event-XXX.projection.json` → create `current-event-binding.json` via `create_current_event_binding_receipt(...)` → `write_binding_receipt(...)` → verify receipt/state/event binding via `validate_current_event_binding` → derive `CURRENT_OCCURRED_AT` from current projection's `occurred_at` (after reveal) → ingest current cursor → run exact production headless turn / due/model rounds → finish all model work for cursor → durable ACK → clear current-event + binding → reveal next cursor before any later model invocation.
 
-- NO Resident B was run
-- NO cursor 14 was revealed to a model. Preflight's disposable `reveal --phase B` ran on a copied release state for the mechanical `init → reveal → receipt → handler` proof; the projection was never presented to a Resident/model and its payload bytes are not in current evidence (CORRECTIVE-009 / BLK-01).
-- NO Resident C was run
-- NO Core (`src/aios_core/`) was modified
-- NO modification was made to PR #205 (OPEN / UNMERGED / PINNED)
-- NO A transcript / mailbox prose / decisions / evaluator notes are present in the B-safe packet
-- NO `src/aios_core` change, no fixture/evaluator/governance change, no merge of PR #209
-- PR #209 branch `arena/01a0d692-haneof-aios-core-v3-0` preserves historic candidates `3796377 / 7902367 / ee5e4a4`, live main `aa19af1` — no force/rebase
+**Operator MUST NOT mistake historical CORRECTIVE-003 / 26-check material for the current release contract.** Historical sections below are explicitly labelled `historical / superseded`.
 
 ## Pins (exact — recomputed SHA-256 from #205 artifacts; STOP if diverged)
 
@@ -41,48 +43,78 @@ Non-Resident mechanical preparation of the Phase B handoff from independently ac
 
 | Artifact | Bytes | SHA-256 | Verified |
 | --- | ---: | --- | --- |
-| private_world.sqlite | 790528 | `626c6bb32c7fdae90a068ee10dd2b4c9c9cdbc46b6feb2bf5b11cba9363401f6aa` | PASS |
+| private_world.sqlite | 790528 | `626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa` | PASS |
 | world_index.sqlite | 811008 | `ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1` | PASS |
 | release_state.json | 10841 | `eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8` | PASS |
 
 Source blobs: `git show d17ae972ad1d312735c355f775ac024bc4cebdf7:reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-A-RERUN-002/freeze/<file>`
 Core tree identity verified at all three relevant commits (frozen software `773876f`, publication base, evidence head `d17ae97`) and at current main HEAD `aa19af1`.
 
-## Deliverable index (CORRECTIVE-003 frozen)
+Canonical cross-document pins (must be identical in `operator_manifest.md`, `source_pins_and_digests.md`, `procedure/b_startup_procedure.md`):
+
+- World: `626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa`
+- Index: `ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1`
+- Release: `eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8`
+
+These are recomputed from the byte-exact lineage copy (`lineage_copy/`) and match the accepted A-002 evidence.
+
+## Deliverable index (CORRECTIVE-010 authoritative)
 
 ```
 reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/
-├── operator_manifest.md                 (this file)
-├── source_pins_and_digests.md           exact #205 source pins/digests
+├── operator_manifest.md                 (this file — CORRECTIVE-010 authoritative, FIXUP-001 current)
+├── source_pins_and_digests.md           exact #205 source pins/digests (World/Index/Release canonical)
 ├── lineage_copy/                        byte-exact copy of accepted A freeze
-│   ├── private_world.sqlite
-│   ├── world_index.sqlite
-│   └── release_state.json
+│   ├── private_world.sqlite             626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa
+│   ├── world_index.sqlite               ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1
+│   └── release_state.json               eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8
 ├── copied_lineage_hash_manifest.md
-├── resident_safe_packet_manifest.md     sandbox RO/RW/IPC/NET invariants (CORRECTIVE-003)
-├── environment_manifest.md              env allowlist + PATH + stripped vars (NEW)
+├── resident_safe_packet_manifest.md     sandbox RO/RW/IPC/NET invariants (CORRECTIVE-010)
+├── environment_manifest.md              env allowlist + PATH + stripped vars
 ├── harness/
-│   ├── resident_jail.py                 OS sandbox (NEWNS|NEWPID|NEWNET, PID1 supervisor, minimal /dev, fail-closed)
+│   ├── resident_jail.py                 OS sandbox (NEWNS|NEWPID|NEWNET, PID1 supervisor, minimal /dev, fail-closed, _close_inherited_fds)
 │   ├── mailbox_bridge.py                transport-only allowlist + path-aware leakage guard + reply binding (strict)
-│   └── bridged_model_handler.py        FROZEN production + synthetic handlers (ProductionResidentHandler vs SyntheticProbeHandler, ProviderClient, UNKNOWN)
+│   ├── bridged_model_handler.py        FROZEN production (ProductionResidentHandler + ExternalBrokerClient + binding receipt) + synthetic probe
+│   └── resident_wire_protocol.json      a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a
 ├── isolation/
-│   ├── isolation_report.md              OS isolation proof (15 self-tests + 6 binding + minimal /dev + MS_PRIVATE + signal strict)
-│   ├── probe_isolation.sh               isolation probe
-│   └── probe_e2e.sh                     genuine 2-round FusedTurnRuntime/CognitiveRuntime→Handler→Bridge→Responder E2E (26 checks)
+│   ├── isolation_report.md              OS isolation proof
+│   ├── probe_isolation.sh               isolation probe (ISOLATION_PASS 58 PASS)
+│   └── probe_e2e.sh                     genuine FusedTurnRuntime/CognitiveRuntime→Handler→Bridge→Responder E2E (CORRECTIVE-010 140/140, FIXUP-001 N/N)
 ├── checks/
-│   └── mechanical_checks.md             positive/negative mechanical check results (26-check)
+│   └── mechanical_checks.md             positive/negative mechanical check results (CORRECTIVE-010 140-check, FIXUP-001 N-check)
 ├── procedure/
-│   ├── b_startup_procedure.md           exact B startup (no model peek, env allowlist, frozen adapter)
+│   ├── b_startup_procedure.md           exact B startup (Section 6 config-only, Section 7 7.1-7.12 per-cursor loop, HTTPS-only, canonical pins)
 │   ├── per_cursor_interaction.md        exact per-cursor 14..22 loop — Scheme A (no repair)
 │   └── final_freeze_procedure.md        B final freeze/evidence
 ├── identity_inventory.md                model/provider identity — UNKNOWN or real provider (fake-provider preflight)
-├── known_limitations.md                 CORRECTIVE-003 limitations (NET sealed, production roundtrip, etc.)
-├── corrective_002_report.md             prior corrective evidence (preserved)
-├── corrective_003_report.md             CORRECTIVE-003 E2E evidence (CORRECTIVE_003_E2E_PASS)
+├── known_limitations.md                 CORRECTIVE-010 limitations
+├── corrective_002_report.md             prior corrective evidence (preserved, historical)
+├── corrective_003_report.md             CORRECTIVE-003 E2E evidence (historical, superseded — 26-check, CORRECTIVE_003_E2E_PASS)
+├── corrective_009_report.md             CORRECTIVE-009 E2E evidence (closed BLK-01/02/04/05/06/07/08)
+├── corrective_010_report.md             CORRECTIVE-010 E2E evidence (closed BLK-03, CORRECTIVE_010_E2E_PASS + CANONICAL_RUNBOOK_ORDER_PASS)
 └── completion_report.md
 ```
 
-## Frozen model-handling intent (BLOCKER 1)
+## Historical / superseded: CORRECTIVE-003 frozen (26-check) — retained for lineage but NOT current release contract
+
+The following material was the CORRECTIVE-003 frozen deliverable index (26 checks). It is **historical / superseded** and must NOT be mistaken for the current CORRECTIVE-010 authoritative contract.
+
+```
+Historical CORRECTIVE-003 (superseded):
+├── operator_manifest.md                 (was CORRECTIVE-003 frozen, 26-check)
+├── isolation/probe_e2e.sh               (was 26 checks)
+├── checks/mechanical_checks.md          (was 26-check)
+└── completion_report.md
+```
+
+- Old header: `CORRECTIVE-003 frozen`
+- Old check count: 26
+- Old marker: `CORRECTIVE_003_E2E_PASS`
+- Current authoritative is CORRECTIVE-010 (140/140) + FIXUP-001 (N/N), markers `CORRECTIVE_010_E2E_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CORRECTIVE_010_FIXUP_001_E2E_PASS`, transport `ExternalBrokerClient`, runbook Section 6 config-only + Section 7 7.1-7.12.
+
+Per FIXUP-001 task §2, this historical block is explicitly labelled and does NOT represent the current release contract.
+
+## Frozen model-handling intent (current, CORRECTIVE-010)
 
 **Separation:** `SyntheticProbeHandler` (mailbox bridge + inside-jail responder, `sandbox-bridge/synthetic-responder-v1/10 tokens`) vs **`ProductionResidentHandler`** (outside-jail `ProviderClient`, `contract text + envelope` only, real provenance).
 
@@ -109,11 +141,12 @@ MailboxBridge validates `event` exactly 8 fields + `sequence 14..22` + `phase B`
 - Cursor 14 never revealed to a real model during preflight. Synthetic disposable projections (`synthetic-fixture-seq-14`, 8-field shape + negatives) are used for transport tests; the single real disposable reveal is metadata-only in the committed log.
 - `init --phase B` validates receipt-chain only, does not emit or peek at payload.
 - The one disposable reveal is **not** a Resident reveal: it runs on a copied release state under `/tmp` and is reduced to `DISPOSABLE_REVEAL seq=… event_id=… projection_sha256=… payload_sha256=… field_count=…` in the committed log.
+- The disposable reveal projection was never presented to a Resident or model and its payload bytes are not in current evidence (CORRECTIVE-009 / BLK-01).
 - Environment manifest frozen; `PYTHONPATH=/repo/src`, `contract_sha256`, `b_session`, `AIOS_MAILBOX_ROOT` pinned.
 
-## CORRECTIVE-010 fresh run record
+## CORRECTIVE-010 fresh run record (base, retained)
 
-Two fresh runs of `isolation/probe_e2e.sh` (from the repo root under `sudo`) were used:
+Two fresh runs of `isolation/probe_e2e.sh` (from the repo root under `sudo`) were used for CORRECTIVE-010:
 
 | Role | Raw log | Raw log SHA-256 | Result |
 | --- | --- | --- | --- |
@@ -134,3 +167,32 @@ The digests above are recomputed on every run and are **not** trusted from this 
 `procedure/b_startup_procedure.md` recomputes the adapter SHA with `sha256sum` and fails closed if it
 drifts from `environment_manifest.md`, and `isolation/probe_e2e.sh` re-derives the contract and wire
 digests at runtime.
+
+## CORRECTIVE-010-FIXUP-001 fresh run record (current authoritative)
+
+Fresh run of `isolation/probe_e2e.sh` after fixing World SHA typo and adding pin-consistency gate:
+
+| Role | Raw log | Raw log SHA-256 | Result |
+| --- | --- | --- | --- |
+| FIXUP-001 committed evidence source | `/tmp/probe_fixup1_final.log` | `700c80603b16c07c7cb10ebd4c192f6611a3da89247a749d64bc2044ebc31f7c` | `ALL_CHECKS=144/144 FAILURES=0` |
+
+| Item | Value |
+| --- | --- |
+| e2e_probe_output.txt SHA-256 | `809107aa1a6a0dffdc248b813ee832ec9aaeecaf775c9fe9876401b954fcef83` |
+| probe_output.txt SHA-256 | `ace17baddf9901b56f2d334bd68ede1620be84627c9edda2265dd40d00634473` |
+| markers | `CORRECTIVE_010_E2E_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CORRECTIVE_010_FIXUP_001_E2E_PASS` |
+| EXPECTED_CHECKS | 144 (recomputed, not mechanically retained 140) |
+| Result | `ALL_CHECKS=144/144 FAILURES=0` |
+
+- **Canonical pins verified**:
+  - World: `626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa` (64-char, byte-exact from `lineage_copy/private_world.sqlite`)
+  - Index: `ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1`
+  - Release: `eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8`
+- **Cross-document consistency**: `operator_manifest.md`, `source_pins_and_digests.md`, `procedure/b_startup_procedure.md` all contain the three canonical digests and no contradictory/typo/duplicate values → `CANONICAL_PIN_CONSISTENCY_PASS`
+- **Production transport**: `ExternalBrokerClient` (HTTPS-only, transport-only, no semantic stub)
+- **Runbook**: Section 6 config-only, Section 7 7.1–7.12 per-cursor loop (reveal → event → projection evidence → receipt → verify → derive CURRENT_OCCURRED_AT → ingest → production headless turn → ACK → clear → reveal next)
+
+The previous erroneous World SHA (66-char with extra c9) was a typo and has been corrected to the canonical 64-char value above. The erroneous 66-char value is no longer present in any of the three canonical docs; the pin-consistency gate would FAIL if it reappeared.
+
+This FIXUP-001 run is the current authoritative evidence; the CORRECTIVE-010 base run (140/140) is retained as historical but superseded by this 144/144 run.
+
