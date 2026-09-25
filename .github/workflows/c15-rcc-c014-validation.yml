@@ -6,7 +6,7 @@ on:
       - validation/c15-rcc-b-preflight-c014
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   frozen-e2e:
@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: bfcb0b205e83b7fca7f0d406b03ea21a3b373363
+          ref: b85e6fb3b2142a187770fc17f4032e81ffe0cb3d
 
       - name: Run exact Debian 12 frozen gate
         shell: bash
@@ -75,9 +75,57 @@ jobs:
           grep -q '^ALL_CHECKS=158/158 FAILURES=0$' "$LOG"
           grep -q '^RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5$' "$LOG"
           grep -q '^RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18$' "$LOG"
-          grep -q '^RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=48$' "$LOG"
-          grep -q '^CORRECTIVE_013_E2E_PASS$' "$LOG"
+          grep -q '^RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=48
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c15-rcc-c014-frozen-evidence
+          path: c014-artifacts/
+          if-no-files-found: error
+          retention-days: 7
+ "$LOG"
+          grep -q '^NO_COMMITTED_CURSOR14_PAYLOAD_PASS ' "$LOG"
+          grep -q '^CANONICAL_RUNBOOK_ORDER_PASS ' "$LOG"
+          grep -q '^CORRECTIVE_013_E2E_PASS
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c15-rcc-c014-frozen-evidence
+          path: c014-artifacts/
+          if-no-files-found: error
+          retention-days: 7
+ "$LOG"
+          ! grep -q '^CHECK FAIL:' "$LOG"
           sha256sum "$LOG"
+
+      - name: Freeze exact E2E evidence onto PR branch
+        shell: bash
+        env:
+          EXPECTED_PR_HEAD: b85e6fb3b2142a187770fc17f4032e81ffe0cb3d
+          PR_BRANCH: arena/01a0d692-haneof-aios-core-v3-0
+        run: |
+          set -euo pipefail
+          cp "$GITHUB_WORKSPACE/c014-artifacts/e2e.log" /tmp/c014-e2e.log
+          TARGET="reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/isolation/e2e_probe_output.txt"
+          git fetch origin "$PR_BRANCH"
+          remote_before="$(git rev-parse "origin/$PR_BRANCH")"
+          test "$remote_before" = "$EXPECTED_PR_HEAD"
+          git checkout -B c014-evidence "origin/$PR_BRANCH"
+          test "$(git rev-parse HEAD)" = "$EXPECTED_PR_HEAD"
+          cp /tmp/c014-e2e.log "$TARGET"
+          cmp -s /tmp/c014-e2e.log "$TARGET"
+          git add -- "$TARGET"
+          test "$(git diff --cached --name-only)" = "$TARGET"
+          git config user.name "Arena.ai Agent"
+          git config user.email "arena-ai-agent@users.noreply.github.com"
+          git commit -m "CORRECTIVE-014: freeze exact wrapper-hardening E2E evidence"
+          test "$(git rev-parse HEAD^)" = "$EXPECTED_PR_HEAD"
+          remote_now="$(git ls-remote origin "refs/heads/$PR_BRANCH" | awk '{print $1}')"
+          test "$remote_now" = "$EXPECTED_PR_HEAD"
+          git push origin "HEAD:refs/heads/$PR_BRANCH"
+          echo "EVIDENCE_COMMIT=$(git rev-parse HEAD)"
+          echo "EVIDENCE_BLOB=$(git rev-parse HEAD:$TARGET)"
+          sha256sum "$TARGET"
 
       - name: Upload frozen evidence
         if: always()
