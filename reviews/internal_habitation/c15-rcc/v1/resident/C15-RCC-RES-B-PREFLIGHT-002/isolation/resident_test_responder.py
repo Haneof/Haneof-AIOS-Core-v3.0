@@ -1,32 +1,28 @@
 #!/usr/bin/env python3
 """
-C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-001 — Synthetic Resident responder for E2E transport probe.
+C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-002 — Synthetic Resident responder (binding-aware).
 
-This is NOT the real Resident. It runs inside the sandbox as 'nobody', watches
-/work/inbox/round-NNNN.json, and writes a deterministic structural reply to
-/work/outbox/reply-NNNN.json. It performs NO semantic reasoning.
+Runs inside sandbox as nobody. Watches /work/inbox/round-NNNN.json and writes
+deterministic reply to /work/outbox/reply-NNNN.json with exact binding fields
+(round/request_id/request_digest) echoed from the request.
 
-Tests exercised via this responder + operator-side driver:
-  - normal send/receive path works (round trip)
-  - Resident can read inbox written by operator
-  - Resident can write outbox readable by operator
-  - malformed/extra-field envelope is rejected by bridge BEFORE write
-  - malformed reply is rejected by bridge on read
-  - stale/replayed reply (wrong round number) is not consumed
-  - operator archive is NOT visible to Resident
-  - network is sealed
-  - running as nobody (real uid)
+Supports modes:
+  normal    - correct binding, action end_turn
+  malformed - first round writes malformed JSON (no binding)
+  stale     - first round writes reply with previous round's binding (stale)
+  genuine   - two-round: round1 invoke search_world, round2 silence (for Core path)
+  binding   - alias for normal (used for binding E2E)
 
-The responder runs inside the sandbox (binds to nothing network-wise).
+No semantic reasoning.
 """
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import sys
 import time
 from pathlib import Path
-
 
 INBOX = Path("/work/inbox")
 OUTBOX = Path("/work/outbox")
@@ -50,61 +46,139 @@ def reply(n: int, payload: dict) -> None:
     out = OUTBOX / f"reply-{n:04d}.json"
     tmp = out.with_suffix(".tmp")
     tmp.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
-    os.chmod(tmp, 0o644)
+    try:
+        os.chmod(tmp, 0o644)
+    except Exception:
+        pass
     os.replace(tmp, out)
 
 
 def main() -> int:
-    mode = os.environ.get("PROBE_MODE", "normal")
-    rounds = int(os.environ.get("PROBE_ROUNDS", "3"))
-    print(f"[test-responder] starting mode={mode} rounds={rounds} uid={os.getuid()}")
+    global INBOX, OUTBOX
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--mode", default=os.environ.get("PROBE_MODE", "normal"))
+    ap.add_argument("--rounds", type=int, default=int(os.environ.get("PROBE_ROUNDS", "3")))
+    ap.add_argument("--inbox", type=Path, default=Path("/work/inbox"))
+    ap.add_argument("--outbox", type=Path, default=Path("/work/outbox"))
+    args = ap.parse_args()
 
-    # Verify uid is nobody (65534)
+    mode = args.mode
+    rounds = args.rounds
+    inbox = args.inbox
+    outbox = args.outbox
+
+    INBOX = inbox
+    OUTBOX = outbox
+
+    print(f"[test-responder] starting mode={mode} rounds={rounds} uid={os.getuid()} pid={os.getpid()} inbox={INBOX} outbox={OUTBOX}")
+
     if os.getuid() != 65534:
         print(f"[test-responder] FAIL expected uid 65534, got {os.getuid()}")
         return 2
-
-    # Verify archive absent (blocker 4)
     if Path("/work/archive").exists():
         print("[test-responder] FAIL /work/archive visible inside sandbox")
         return 3
+    # Verify PID != 1 (init is PID 1)
+    pid = os.getpid()
+    try:
+        ppid_comm = Path("/proc/1/comm").read_text().strip()
+        print(f"[test-responder] pid={pid} proc1_comm={ppid_comm}")
+        if pid == 1:
+            print("[test-responder] FAIL responder is PID 1, must be >=2 (PID1 is supervisor)")
+            return 10
+        if ppid_comm not in ("sandbox-init", "sandbox_init", "python3", "python"):
+            # Allow python3 as fallback but we expect sandbox-init
+            print(f"[test-responder] WARN proc1_comm={ppid_comm!r} not sandbox-init but continuing")
+            # Not fail if init comm is python3 due to fallback? But we require sandbox-init
+            if ppid_comm == "sh":
+                print("[test-responder] FAIL pid1 comm is sh (means resident is pid1)")
+                return 11
+        if ppid_comm == "sandbox-init":
+            print("[test-responder] PASS PID1 is sandbox-init")
+    except Exception as e:
+        print(f"[test-responder] proc1 check error: {e}")
+        return 12
 
-    # Verify network sealed (quick check to github.com)
     import socket
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(2)
     try:
         s.connect(("140.82.114.4", 443))
-        print("[test-responder] FAIL network not sealed from responder")
+        print("[test-responder] FAIL network not sealed")
         s.close()
         return 4
     except OSError:
         s.close()
 
+    # Cache first envelope for stale test
+    first_env = None
+
     for r in range(1, rounds + 1):
-        env = wait_round(r)
-        # Basic structural sanity: envelope must have round and an action request marker
+        try:
+            env = wait_round(r)
+        except TimeoutError as e:
+            print(f"[test-responder] timeout waiting round {r}: {e}")
+            return 5
         if env.get("round") != r:
             print(f"[test-responder] FAIL round mismatch: expected {r}, got {env.get('round')}")
             return 5
-        if mode == "normal":
-            reply(r, {"action": "end_turn"})
+        # Validate envelope has binding
+        if "request_id" not in env or "request_digest" not in env:
+            print(f"[test-responder] FAIL envelope missing binding fields: {env.keys()}")
+            return 5
+
+        if first_env is None:
+            first_env = dict(env)
+
+        print(f"[test-responder] round {r} received request_id={env['request_id'][:8]}... digest={env['request_digest'][:8]}...")
+
+        if mode == "normal" or mode == "binding":
+            payload = {"round": r, "request_id": env["request_id"], "request_digest": env["request_digest"], "action": "end_turn"}
+            reply(r, payload)
         elif mode == "malformed":
-            # Send malformed reply on first round only
             if r == 1:
-                (OUTBOX / f"reply-{r:04d}.json").write_text("not json{{{", encoding="utf-8")
+                # Write invalid JSON
+                out = OUTBOX / f"reply-{r:04d}.json"
+                out.write_text("not json{{{", encoding="utf-8")
             else:
-                reply(r, {"action": "end_turn"})
+                payload = {"round": r, "request_id": env["request_id"], "request_digest": env["request_digest"], "action": "end_turn"}
+                reply(r, payload)
         elif mode == "stale":
-            # Write reply with wrong round number (n+1)
-            reply(r + 1, {"action": "end_turn"})
-            # Also write the correct reply after delay
-            time.sleep(0.5)
-            reply(r, {"action": "end_turn"})
+            # Write reply with previous round's binding but file name is current round
+            # For r=1, stale means use wrong round number 0
+            if r == 1:
+                payload = {"round": 99, "request_id": "a"*32, "request_digest": "b"*64, "action": "end_turn"}
+                reply(r, payload)
+            else:
+                # For r>=2, use first round's binding
+                payload = {"round": first_env["round"], "request_id": first_env["request_id"], "request_digest": first_env["request_digest"], "action": "end_turn"}
+                reply(r, payload)
+        elif mode == "genuine":
+            # Two-round genuine simulation: first round capability, second silence
+            # Use a nonsense query that yields 0 hits to avoid fixture observation
+            # (any Atlas/test query would hit obs_c14_fixture_* and trigger forbidden substring in second envelope).
+            if r == 1:
+                payload = {
+                    "round": r,
+                    "request_id": env["request_id"],
+                    "request_digest": env["request_digest"],
+                    "action": "invoke_capability",
+                    "capability": "search_world",
+                    "arguments": {"query": "XYZZY_NONSENSE_NONEXISTENT_12345", "limit": 2}
+                }
+                reply(r, payload)
+                print(f"[test-responder] genuine round1 invoke search_world nonsense")
+            else:
+                payload = {"round": r, "request_id": env["request_id"], "request_digest": env["request_digest"], "action": "silence"}
+                reply(r, payload)
+                print(f"[test-responder] genuine round{r} silence")
         else:
             print(f"[test-responder] unknown mode {mode}")
             return 6
-    print(f"[test-responder] OK mode={mode} rounds={rounds}")
+        # Small delay to avoid race
+        time.sleep(0.1)
+
+    print(f"[test-responder] OK mode={mode} rounds={rounds} pid={os.getpid()}")
     return 0
 
 

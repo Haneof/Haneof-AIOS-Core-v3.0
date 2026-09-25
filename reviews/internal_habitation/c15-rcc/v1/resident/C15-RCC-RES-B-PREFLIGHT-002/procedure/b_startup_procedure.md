@@ -115,25 +115,42 @@ echo "$B_PROCESS" > $RUN_ROOT/evidence/b_process_id
 
 B session MUST be freshly generated — no reuse of `c15-rcc-res-a-rerun-002-2079f64af49c`, of old B #121 session ids, or of the preflight session.
 
-## 6. Prepare the operator-side model handler (OUTSIDE the sandbox)
+## 6. Prepare the operator-side model handler (OUTSIDE the sandbox) — FROZEN
 
-The model handler is an adapter that:
+**Frozen adapter:** `harness/bridged_model_handler.py` (`MailboxModelHandler` + `build_envelope` + `reply_to_directive`) is the ONLY approved ModelHandler for Phase B. It is committed in this preflight PR (#209) and MUST NOT be substituted at release time. Any change invalidates the preflight pin.
 
-1. Is invoked by `FusedTurnRuntime` / `CognitiveRuntime` via Core's normal ModelHandler protocol.
-2. Serializes the RuntimeSnapshot + capability catalog/history/wake-reason to JSON.
-3. Hands it to the mailbox bridge, which writes it to `/work/inbox/round-NNNN.json` inside the sandbox.
+What the frozen adapter does (operator side, outside the sandbox):
+
+1. Is invoked by **genuine** `FusedTurnRuntime` / `CognitiveRuntime` via Core's normal `ModelHandler(RuntimeSnapshot) -> ModelDirective` protocol — the `RuntimeSnapshot` is mechanically assembled by Core (`ContextController`, `RecommendationBundle`, `world_map`, capability registry, `CapabilityResult` history, `wake_reason`, `round_index`, `remaining_tool_rounds`), not hand-written.
+2. Mechanically projects the snapshot to a Resident-safe envelope via `build_envelope()` (maps `cockpit` -> `runtime_snapshot`, `capability_catalog`, `capability_history` with `session_id==B`, `wake_reason`, `is_periodic_review`, `contract_sha256`, `phase=B`, `allowed_sequences=[14,22]`, `event=None` for synthetic probe / real reveal-provided projection in production).
+3. Generates a cryptographically random `request_id` (32 hex chars) and canonical `request_digest` (sha256 of sorted JSON without the digest field) inside `MailboxBridge.send()`, writes validated envelope to `$RUN_ROOT/mailbox/inbox/round-NNNN.json` (which appears as `/work/inbox/round-NNNN.json` inside the sandbox).
 4. Hands the *Resident-safe B run contract* as the system instruction (the literal text of `RESIDENT_B_RUN_CONTRACT.md`).
-5. Starts a **fresh model process/context** (new conversation; no prior A transcript, no prior B attempts, no chat history from any prior Resident run).
-6. Blocks until a JSON reply appears in `/work/outbox/reply-NNNN.json`.
-7. Returns the directive to Core for execution.
+5. Starts a **fresh model process/context** (new conversation; no prior A transcript, no prior B attempts, no chat history from any prior Resident run) — the model runs **inside** the sandbox (`resident_jail.py` + `/work/inbox` bind), operator handler runs **outside**.
+6. Blocks on `MailboxBridge.wait_for_reply()` which verifies the reply's `round`, `request_id`, `request_digest` exactly match the outstanding request. Stale prior-round, preplayed future-round, replayed consumed, wrong-id, wrong-digest all fail closed (`MailboxReplyError`) and are propagated as `ModelDispatchNotSubmitted` so Core fails closed without semantic default.
+7. Translates a verified reply to a Core `ModelDirective` (via `reply_to_directive()`: `silence`/`end_turn`/`invoke_capability`/`summary_response`) and returns it to `CognitiveRuntime`/`FusedTurnRuntime` for execution. Every subsequent model round after a capability result walks the **same** bridge (same inbox/outbox, new `request_id`/`request_digest`) — verified by the E2E probe that one `run_turn` triggers two bridge roundtrips.
 
-The model handler must NOT:
+The frozen handler MUST NOT:
 
 - include any A mailbox reply, A transcript, governance prose, fixture content, evaluator notes, or preflight report text in the model context;
 - pre-populate any expected answer, keyword hint, or pre-authored directive;
-- log or expose the model's hidden chain-of-thought (none is requested).
+- log or expose the model's hidden chain-of-thought (none is requested);
+- synthesize a semantic default on bridge timeout/malformed/stale (`wait_for_reply` timeout or `MailboxReplyError` is propagated, not swallowed).
 
-The exact model handler implementation is chosen at release time; preflight only requires that it conform to the shape above. See `identity_inventory.md` for attestation of the model/provider.
+Headless CLI wiring (alternative to direct `FusedTurnRuntime` construction):
+```bash
+export AIOS_MAILBOX_ROOT="$RUN_ROOT/mailbox"
+export AIOS_B_SESSION_ID="$B_SESSION"
+# contract sha auto-computed if not set
+export AIOS_CONTRACT_SHA256="$(sha256sum reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md | cut -d' ' -f1)"
+PYTHONPATH=src python3 -m aios_core.headless.cli \
+  --world "$RUN_ROOT/runtime/world.sqlite" \
+  --index "$RUN_ROOT/runtime/index.sqlite" \
+  --lock  "$RUN_ROOT/runtime/world.writer.lock" \
+  --model-handler harness.bridged_model_handler:headless_handler \
+  turn --session "$B_SESSION" --turn-index 1 --text "..." --at "2026-11-05T09:00:00-08:00"
+```
+
+See `harness/bridged_model_handler.py` for the frozen source, `isolation/probe_e2e.sh` Step 4 for the genuine-path E2E evidence (snapshot provenance, capability second-round via same bridge, fail-closed on malformed), and `identity_inventory.md` for model/provider attestation.
 
 ## 7. Start Core (operator side) and drive B cursors 14..22
 

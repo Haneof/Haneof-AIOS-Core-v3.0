@@ -129,17 +129,20 @@ This proves the World is self-contained truth; the index is a rebuildable projec
 
 **PASS.** See isolation/isolation_report.md for full results. Summary: 11 sealed-path categories are absent from the sandbox, privilege drop to nobody works, /proc/1/root is unreadable, mount() is denied, Core code imports cleanly.
 
-## 14. Mailbox/request bridge transport-only (no semantic default)
+## 14. Mailbox/request bridge transport-only + request/reply binding (no semantic default)
 
-**PASS by design and inspection.** `harness/mailbox_bridge.py`:
+**PASS by design, inspection, and 15-case self-test + 6-negative E2E.**
 
-- Sends RuntimeSnapshot + 8-field projection into the sandbox inbox as JSON.
-- Blocks for the Resident's reply; validates only that the reply is a JSON object with an `action` field.
-- NO keyword matching, NO default answer, NO suggestion, NO retry with hints. If the reply is structurally invalid, the same snapshot/projection is re-presented (Resident repairs its own output in a fresh round).
-- Operator-side archive preserves the raw reply for evidence; it is not injected back into the Resident context across rounds.
-- Does not expose A mailbox history; the first B round starts with empty B-session capability history.
+`harness/mailbox_bridge.py` (frozen, STRICT):
 
-This satisfies preflight §7: "Infrastructure may transport bytes and execute Resident-selected capabilities. It may not decide semantics."
+- Sends **validated** envelope (`round`/`request_id`/`request_digest` injected, allowlist, 8-field event, capability_history B-session-only, phase B, allowed_sequences [14,22], forbidden substrings, no pre-set binding, no double-send) into `$mailbox/inbox/round-NNNN.json` (bind-mounted as `/work/inbox`).
+- `request_id` = `secrets.token_hex(16)` (32 hex), `request_digest` = `sha256(sorted JSON without digest)` (64 hex), `round` = monotonic per-bridge counter; stored as `outstanding` + `consumed` set (forever) so replay never becomes valid later.
+- Blocks on `wait_for_reply(timeout)` which verifies reply's `round`/`request_id`/`request_digest` exactly equal `outstanding`; on mismatch raises `MailboxReplyError` (stale prior-round `round != outstanding`, preplayed future `aaaaaaaaaaaaaaaa…`, replayed consumed `consumed set`, wrong_id `ffffffff…`, wrong_digest `ffffffff…`, future-not-valid). On any `MailboxReplyError`/`Timeout` the adapter (`harness/bridged_model_handler.py:MailboxModelHandler`) raises `ModelDispatchNotSubmitted` so **Core fails closed without semantic default** (no keyword hint, no synthesized answer, no retry with suggestion).
+- `self-test` proves 15 cases: 1 minimal good + 14 negatives (extra top-level, extra event field, A-session, forbidden substring `fixture`, wrong phase, malformed reply JSON, correct exact-bound, stale, preplay, replay, wrong_id, wrong_digest, double-send, pre-set id) → `ALL SELF-TESTS PASS` (see `e2e_probe_output.txt` Step 1).
+- **Binding E2E** (`isolation/probe_e2e.sh` Step 3, `isolation/resident_test_responder.py` inside jail as `nobody` PID3, `sandbox-init` PID1): 2-round normal (id/digest echoed, `NORMAL_BINDING_PASS`), then 6 negatives `STALE_REJECTED_PASS` `PREPLAY_REJECTED_PASS` `REPLAY_REJECTED_PASS` `WRONG_ID_REJECTED_PASS` `WRONG_DIGEST_REJECTED_PASS` `FUTURE_NOT_VALID_PASS` plus `double-send`/`pre-set` in self-test; all fail closed with `rejected-reply-NNNN.json` archived and `consumed` never re-accepted.
+- Operator archive `mailbox/archive/{request,reply}-NNNN.json` preserves raw bytes for evidence; not injected back into Resident context.
+
+This satisfies preflight §7 and CORRECTIVE-002 binding: "Infrastructure may transport bytes and execute Resident-selected capabilities. It may not decide semantics; every outbound has cryptographically-bound reply, stale/replay/future/wrong-id/wrong-digest fail closed."
 
 ## 15. B freeze/evidence procedure defined BEFORE B runs
 
@@ -148,3 +151,27 @@ This satisfies preflight §7: "Infrastructure may transport bytes and execute Re
 ## 16. Cursor 14 not revealed
 
 **VERIFIED.** `grep -r 'reveal' checks/ harness/ procedure/` returns no invocation of the `reveal` subcommand in any preflight-executed code. The startup procedure (b_startup_procedure.md) reserves the first `reveal` for the B release task, not for preflight.
+
+## 17. Genuine Core ModelHandler path E2E (CORRECTIVE-002)
+
+**PASS.** `isolation/probe_e2e.sh` Step 4 drives a **genuine** `FusedTurnRuntime` (`store`=`world.sqlite` rev 98, `index` watermark 98, `subject_id=user_1`, `model_handler=MailboxModelHandler(bridge, b_session, contract_sha256)`) through `harness/bridged_model_handler.py:build_envelope` (mechanical `RuntimeSnapshot`→envelope, `cockpit`→`runtime_snapshot`, `capability_catalog` 43 entries, `capability_history` B-session-only, `wake_reason`, `contract_sha256`, `phase`/`allowed_sequences`) → `MailboxBridge.send()` (validated, id/digest injected) → isolated synthetic responder (`resident_test_responder.py --mode genuine --rounds 2` as `nobody` PID3, `sandbox-init` PID1) → exact-bound reply (`round`/`request_id`/`request_digest` echoed) → `MailboxModelHandler.wait_for_reply()` → `reply_to_directive()` → `ModelDirective` → `CognitiveRuntime`/`FusedTurnRuntime`. The probe proves:
+
+- `world_revision` before turn = 98, after synthetic ingest = 99, `watermark` 98→99, `contract_sha256` matches `RESIDENT_B_RUN_CONTRACT.md`.
+- `run_turn(session_id=probe-genuine-c15-b-001, turn_index=1, user_input=synthetic…, occurred_at=2026-11-05T09:00Z)` triggers **2 model invocations** (`handler.invocations==2`, `model_rounds==2`, `termination==silence`, `capability_history len==1` after second round, `capability_catalog size==43`, `runtime_snapshot` contains Core-generated `world_map` with `dimension_count`, `bridge.round==2` `consumed==2` `outstanding==None`, `silenced==True`).
+- **Next-round via same bridge:** first round `invoke search_world XYZZY_NONSENSE…` (nonsense query avoids fixture substring that would appear in `capability_history[0].data[1].object_id` for Atlas/test queries and cause forbidden rejection) → capability executed (empty hits, no fixture), second envelope's `capability_history[0].data` contains that result (empty list, no forbidden), second round `silence` still walks same `inbox`/`outbox` with fresh `request_id`/`request_digest`; archive contains `request-0001.json`+`reply-0001.json`+`request-0002.json`+`reply-0002.json`; `search_world` found in `result.runtime.capability_history`.
+- **No semantic default:** responder `mode=malformed` writes `not json{{{` → `wait_for_reply` raises `malformed reply JSON` → handler raises `ModelDispatchNotSubmitted` → `run_turn` fails closed (`MALFORMED_FAIL_CLOSED_PASS`), not swallowed.
+- Responder tail confirms inside-jail evidence: `[test-responder] pid=3 proc1_comm=sandbox-init PASS`, `genuine round1 invoke search_world nonsense`, `round2 silence`.
+
+## 18. PID1 supervisor hierarchy (CORRECTIVE-002)
+
+**PASS.** `harness/resident_jail.py` v3 fixed `ENOMEM` by moving `_mount("none","/",MS_PRIVATE)` from `_unsharer_main` before `fork` into `_worker_main` after fork (matching old jail's proven order). Verified: manual `resident_jail … -- /bin/sh -c 'cat /proc/1/comm; echo $$; id; ls /proc|wc'` shows `sandbox-init` PID1, worker `PID 3`, `PPid 3`, `uid nobody` (65534), 5 PIDs, `cat /proc/1/root` unreadable EACCES. `isolation/probe_isolation.sh` inside jail asserts `pid!=1`, `pid1 comm==sandbox-init`, `visible PIDs==5`, no host `systemd`, `/proc/1/root` unreadable, orphan `child reaped` no zombies. `probe_e2e.sh` Step 2 and Step 4 responder tail both assert `pid!=1` and `sandbox-init`. Signal test (Step 6): `jail … -- /bin/sleep 30` → `kill -TERM` → PID1 forwards to worker → wait 0 → `SIGNAL_TERMINATION_PASS`.
+
+## 19. Privilege-drop forced failure (CORRECTIVE-002)
+
+**PASS.** `resident_jail.py` has no `except Exception: pass`; every drop step (`setgroups`/`setgid`/`setuid`/`chroot`) raises `RuntimeError` on failure; post-drop verifies `setuid(0)` EPERM and `mount()` EPERM before `execvpe`; env allowlist filters `PROBE_MODE`/`PROBE_ROUNDS` and strips `_RESIDENT_JAIL_*`. Negative injection (`probe_e2e.sh` Step 5) proves fail-closed: `env _RESIDENT_JAIL_INJECT_PRIVDROP_FAIL=1` + `sudo --preserve-env=_RESIDENT_JAIL_INJECT_PRIVDROP_FAIL,_RESIDENT_JAIL_INJECT_FAIL_MODE` → worker raises `injected privdrop failure` before drop → `_init_main` prints `[jail] sandbox setup FAILED: RuntimeError: injected privdrop failure` and `os._exit(98)` without exec; `sentinel_wrapper.sh`'s `echo > /work/outbox/SENTINEL_OUTBOX` never runs, `outbox/SENTINEL_OUTBOX` absent, `outbox/*.json` empty, exit 98. Second mode `_RESIDENT_JAIL_INJECT_FAIL_MODE=setgid` also exits 98 → `PRIVDROP_NEGATIVE_PASS`/`PRIVDROP_ALL_PASS`.
+
+## 20. Mailbox IPC proven as nobody + env sanitization (CORRECTIVE-002)
+
+**PASS.** Isolation probe inside jail (as `nobody`) proves: `inbox` readable (`stat` 0755 root:nogroup, `ls`/`read` succeeds), `outbox` writable+searchable (`touch`/`python open write` succeeds, 01733 root:nogroup sticky prevents overwrite), can `write` to outbox (`created`), `archive` absent, `PROBE_MODE`/`PROBE_ROUNDS` only when operator explicitly sets with `sudo --preserve-env` and value allowlisted (`normal`/`malformed`/… plus digits); `LD_*`/`PYTHON*`/`SUDO*` stripped. E2E binding tests use `sudo -E python3 -` for bridge (host side) to handle 01733 `iterdir` PermissionError (which previously caused `iterdir /tmp/…/outbox` failure for user `user` not in `nogroup`); `clean_mailbox` fallback does `sudo rm` on `PermissionError`. Fix for `resident_test_responder.py` `SyntaxError: global INBOX used prior` was moving `global INBOX, OUTBOX` to top of `main()` before any `default=INBOX` reference, and installing `pydantic 2.13.5` via `sudo pip install --break-system-packages` so both `python3` and `sudo python3` can import (verified `python3 -c 'import pydantic; print(__version__)'` → 2.13.5). No prompt-only blindness; network is OS-enforced `CLONE_NEWNET`.
+
+

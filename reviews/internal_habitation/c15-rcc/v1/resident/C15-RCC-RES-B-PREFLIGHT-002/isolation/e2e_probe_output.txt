@@ -1,28 +1,44 @@
-[e2e] run_root = /tmp/b-preflight-e2e-2802
+[e2e] run_root = /tmp/b-preflight-e2e-3831
 world.sqlite: OK
 index.sqlite: OK
 release_state.json: OK
 [e2e] lineage copy digests OK
-[e2e] running mailbox_bridge self-tests
-self-test 1 PASS: minimal good envelope accepted
+[e2e] step 1: mailbox_bridge self-tests (including binding)
+self-test 1 PASS: minimal good envelope accepted with binding
 self-test 2 PASS: extra top-level key rejected
 self-test 3 PASS: extra event field rejected
 self-test 4 PASS: A session in capability_history rejected
 self-test 5 PASS: forbidden substring rejected
 self-test 6 PASS: wrong phase rejected
 self-test 7 PASS: malformed reply rejected
+self-test 8 PASS: correct exact-bound reply accepted
+self-test 9 PASS: stale prior-round reply rejected
+self-test 10 PASS: preplayed future-round reply rejected
+self-test 11 PASS: replayed consumed reply rejected
+self-test 12 PASS: wrong request_id rejected
+self-test 13 PASS: wrong request_digest rejected
+self-test 14 PASS: double send while outstanding rejected
+self-test 15 PASS: pre-set request_id rejected
 ALL SELF-TESTS PASS
-[e2e] running isolation probe inside sandbox
+[e2e] step 2: hardened isolation probe inside sandbox (PID1 supervisor)
 === identity ===
 uid=65534 gid=65534
 PASS: running as nobody (uid 65534)
 
-=== PID namespace ===
-my pid = 37
-pid 1 comm = 'sh'
-visible PIDs in /proc = 3 (should be a small number, not the host's 100+)
-PASS: only 3 PIDs visible (expected small count in new PID namespace)
+=== PID namespace (blocker 2 fixed) ===
+my pid = 39 (should be >=2)
+PASS: resident pid 39 != 1 (init is separate)
+pid 1 comm = 'sandbox-init'
+visible PIDs in /proc = 5 (should be small, not host's 100+)
+PASS: only 5 PIDs visible (expected small count in new PID namespace)
+PASS: PID1 is sandbox-init (correct supervisor)
 PASS: no host init (systemd/init) visible in new PID namespace
+PASS: /proc/1/root unreadable (also acceptable)
+
+=== Child/orphan reap check (PID1 supervisor) ===
+child reaped status=0
+PASS: no zombies after orphan test (PID1 reaped orphan)
+PASS: PID1 zombie reap works (orphan grandchild reaped)
 
 === Network seal (blocker 1) ===
 PASS: connect to github.com (140.82.114.4:443) blocked: errno=101 (Network is unreachable)
@@ -63,26 +79,99 @@ PASS: /work/archive absent (operator archive not mounted)
 PASS: setuid(0) denied: [Errno 1] Operation not permitted
 PASS: mount() denied (EPERM)
 
-=== Capability: cannot read host /proc/1/root ===
-PASS: /proc/1/root points to sandbox / (we are pid 1); no host proc leak
-
 
 ISOLATION_PASS
 [e2e] isolation probe PASS
-[e2e] E2E transport: normal rounds
-  round 1 OK: end_turn
-  round 2 OK: end_turn
-  round 3 OK: end_turn
-NORMAL_ROUNDS_PASS
----- responder stdout ----
-[test-responder] starting mode=normal rounds=3 uid=65534
-[test-responder] OK mode=normal rounds=3
+[e2e] PID1 supervisor evidence OK
+[e2e] step 3: mailbox binding E2E (normal + 6 negatives)
+[binding] test normal correct binding
+  round 1 correct binding OK: id=f0f797e3...
+  round 2 correct binding OK: id=6669195f...
+NORMAL_BINDING_PASS
+---- responder normal stdout ----
+[test-responder] starting mode=normal rounds=2 uid=65534 pid=3 inbox=/work/inbox outbox=/work/outbox
+[test-responder] pid=3 proc1_comm=sandbox-init
+[test-responder] PASS PID1 is sandbox-init
+[test-responder] round 1 received request_id=f0f797e3... digest=fdbf2044...
+[test-responder] round 2 received request_id=6669195f... digest=e98df7cf...
+[test-responder] OK mode=normal rounds=2 pid=3
 
-[e2e] normal rounds PASS
-[e2e] E2E negative: malformed envelope must fail closed
-  bad envelope rejected as expected: envelope.event has wrong field set: missing=[] extra=['fixture_secret']
-  inbox unchanged (0 files, round counter still at 0)
-MALFORMED_ENVELOPE_FAIL_CLOSED
-[e2e] malformed-envelope fail-closed PASS
+[binding] test stale prior-round rejected
+  round1 ok id=970e9ec0
+  stale rejected as expected: reply round 1 != outstanding 2 (stale/future)
+STALE_REJECTED_PASS
+[binding] test preplayed future-round rejected
+  preplay rejected as expected: reply request_id 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' != outstanding 'be54daf744f685cb5dc9219973beebeb' (wrong id)
+PREPLAY_REJECTED_PASS
+[binding] test replayed consumed rejected
+  round1 consumed id=c957f6f8
+  replay rejected as expected: reply request_id 'c957f6f8339da0b4f89f0407caee4e62' is replay of consumed id (replay rejected)
+REPLAY_REJECTED_PASS
+[binding] test wrong request_id rejected
+  wrong id rejected: reply request_id 'ffffffffffffffffffffffffffffffff' != outstanding '414d50441644dbb364ac4aa028487929' (wrong id)
+WRONG_ID_REJECTED_PASS
+[binding] test wrong request_digest rejected
+  wrong digest rejected: reply request_digest 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' != outstanding '6faeaad7346b28e45fcd79a3d49e22740b458fe2405644e3eb11ff78592b9858' (wrong digest)
+WRONG_DIGEST_REJECTED_PASS
+[binding] test future reply does not become valid later
+  round1 ok
+  future preplayed correctly rejected even after advancing: reply request_id 'cccccccccccccccccccccccccccccccc' != outstanding '13a00f73fdc1f7cead8b6b71bdddbacf' (wrong id)
+FUTURE_NOT_VALID_PASS
+ALL_BINDING_TESTS_PASS
+[e2e] binding tests PASS
+[e2e] step 4: genuine Core ModelHandler path E2E (FusedTurnRuntime -> bridge -> sandbox responder -> Core)
+[genuine] world_revision=98 watermark=98
+[genuine] contract_sha256=28d3262f56b7ef93...
+[genuine] invoking FusedTurnRuntime.run_turn with synthetic input
+[genuine] run_turn completed: model_rounds=2 termination=silence
+[genuine] capability_history len=1
+[genuine] handler invocations=2 (capability + follow-up)
+[genuine] runtime_snapshot contains world_map (Core-generated)
+[genuine] capability_catalog size=43 (genuine)
+[genuine] bridge round=2 consumed=2 outstanding=None
+[genuine] silenced=True response=None
+[genuine] archive evidence verified for both rounds
+[genuine] capability search_world executed and second round walked same bridge (verified)
+[genuine] testing malformed reply fail-closed on genuine path
+[genuine] malformed correctly fail-closed: ModelDispatchNotSubmitted: bridge reply binding failed: malformed reply JSON at round 1: Expecting value: line 1 column 1 (char 0)
+MALFORMED_FAIL_CLOSED_PASS
+--- responder tail ---
+[test-responder] starting mode=genuine rounds=2 uid=65534 pid=3 inbox=/work/inbox outbox=/work/outbox
+[test-responder] pid=3 proc1_comm=sandbox-init
+[test-responder] PASS PID1 is sandbox-init
+[test-responder] round 1 received request_id=1ea19a9a... digest=9d506021...
+[test-responder] genuine round1 invoke search_world nonsense
+[test-responder] round 2 received request_id=c7846db4... digest=21607a4f...
+[test-responder] genuine round2 silence
+[test-responder] OK mode=genuine rounds=2 pid=3
+
+--- responder tail ---
+[test-responder] starting mode=malformed rounds=1 uid=65534 pid=3 inbox=/work/inbox outbox=/work/outbox
+[test-responder] pid=3 proc1_comm=sandbox-init
+[test-responder] PASS PID1 is sandbox-init
+[test-responder] round 1 received request_id=2ad9e719... digest=ff847b8b...
+[test-responder] OK mode=malformed rounds=1 pid=3
+
+GENUINE_CORE_PATH_PASS
+[e2e] genuine Core path PASS
+[e2e] step 5: privdrop negative fail-closed test
+[privdrop] running jail with injected failure, expecting exit 98 and no sentinel
+stdout: 
+stderr: [jail] sandbox setup FAILED: RuntimeError: injected privdrop failure (test seam)
+
+exit code: 98
+PASS: sentinel not created in outbox
+PASS: no outbox reply after privdrop failure
+PRIVDROP_NEGATIVE_PASS
+[privdrop setgid] exit 98
+PASS setgid injected failure also fail-closed
+PRIVDROP_ALL_PASS
+[e2e] privdrop negative PASS
+[e2e] step 6: signal termination test (PID1 forwards TERM)
+[signal] jail sleep pid 4138 alive, sending TERM
+[signal] jail wait exit code 0
+PASS: termination signal correctly ended Resident worker (exit 0)
+SIGNAL_TERMINATION_PASS
 
 E2E_PROBE_PASS
+[e2e] all steps complete at 2026-09-25T05:02:48Z

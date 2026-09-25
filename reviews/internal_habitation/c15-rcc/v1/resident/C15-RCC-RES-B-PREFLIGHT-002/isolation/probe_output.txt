@@ -1,29 +1,60 @@
-=== sealed-path leak probe (categories from release_contract §2 / preflight §6) ===
-sealed:/repo/reviews/internal_habitation/c15-rcc/v1/fixture absent
-sealed:/repo/reviews/internal_habitation/c15-rcc/v1/evaluator absent
-sealed:/repo/reviews/internal_habitation/c15-rcc/v1/release absent
-sealed:/repo/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-A-RERUN-002 absent
-sealed:/repo/reviews/internal_habitation/c14-resident absent
-sealed:/repo/governance absent
-sealed:/repo/prompts absent
-sealed:/repo/.git absent
-sealed:/repo/AIOS_SINGLE_WINDOW_TASK_BOARD.md absent
-sealed:/repo/AIOS_v3.0_CURRENT_CHECKPOINT.md absent
-sealed:/repo/PROJECT_MASTER_MAP.md absent
+=== identity ===
+uid=65534 gid=65534
+PASS: running as nobody (uid 65534)
 
-=== Expected-visible check ===
-visible:/repo/src present (expected)
-visible:/repo/src/aios_core present (expected)
-visible:/repo/reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md present (expected)
+=== PID namespace (blocker 2 fixed) ===
+my pid = 39 (should be >=2)
+PASS: resident pid 39 != 1 (init is separate)
+pid 1 comm = 'sandbox-init'
+visible PIDs in /proc = 5 (should be small, not host's 100+)
+PASS: only 5 PIDs visible (expected small count in new PID namespace)
+PASS: PID1 is sandbox-init (correct supervisor)
+PASS: no host init (systemd/init) visible in new PID namespace
+PASS: /proc/1/root unreadable (also acceptable)
 
-=== privilege audit ===
-uid=65534(nobody) gid=65534(nogroup) groups=65534(nogroup)
+=== Child/orphan reap check (PID1 supervisor) ===
+child reaped status=0
+PASS: no zombies after orphan test (PID1 reaped orphan)
+PASS: PID1 zombie reap works (orphan grandchild reaped)
 
-=== /proc/1/root readable? ===
-blocked: cannot read host /proc/1/root (expected)
+=== Network seal (blocker 1) ===
+PASS: connect to github.com (140.82.114.4:443) blocked: errno=101 (Network is unreachable)
+PASS: connect to raw.githubusercontent.com (185.199.108.133:443) blocked: errno=101 (Network is unreachable)
+PASS: connect to api.github.com (140.82.114.6:443) blocked: errno=101 (Network is unreachable)
+PASS: connect to 8.8.8.8 (8.8.8.8:53) blocked: errno=101 (Network is unreachable)
+NETWORK_SEAL_PASS
+PASS: network sealed (external connect blocked)
 
-=== mount() syscall as unprivileged user ===
-mount() returned -1, errno=1 (EPERM=1)
-blocked: mount denied (expected)
+=== Filesystem sealed paths (blocker 1 / 4 / 6) ===
+PASS: sealed: /repo/fixture absent
+PASS: sealed: /repo/evaluator absent
+PASS: sealed: /repo/governance absent
+PASS: sealed: /repo/.git absent
+PASS: sealed: /repo/prompts absent
+PASS: sealed: /repo/reviews/internal_habitation/c15-rcc/v1/fixture absent
+PASS: sealed: /repo/reviews/internal_habitation/c15-rcc/v1/evaluator absent
+PASS: sealed: /repo/reviews/internal_habitation/c15-rcc/v1/release absent
+PASS: sealed: /repo/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-A-RERUN-002 absent
+PASS: sealed: /repo/reviews/internal_habitation/c14-resident absent
+PASS: sealed: /repo/AIOS_SINGLE_WINDOW_TASK_BOARD.md absent
+PASS: sealed: /repo/AIOS_v3.0_CURRENT_CHECKPOINT.md absent
+PASS: sealed: /repo/PROJECT_MASTER_MAP.md absent
+
+=== Read-only bind mounts actually read-only (blocker 6) ===
+PASS: Core src read-only (touch denied, exit=1)
+PASS: Resident contract read-only (touch denied)
+PASS: Core src file write blocked: [Errno 13] Permission denied: '/repo/src/aios_core/__init__.py'
+PASS: Resident contract write blocked: [Errno 13] Permission denied: '/repo/reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md'
+
+=== Mailbox permissions (blocker 4) ===
+PASS: /work/inbox readable
+PASS: /work/outbox writable + searchable
+PASS: can write to /work/outbox
+PASS: /work/archive absent (operator archive not mounted)
+
+=== Privilege re-escalation (blocker 3) ===
+PASS: setuid(0) denied: [Errno 1] Operation not permitted
+PASS: mount() denied (EPERM)
+
 
 ISOLATION_PASS
