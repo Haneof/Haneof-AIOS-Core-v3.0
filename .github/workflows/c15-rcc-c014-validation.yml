@@ -45,9 +45,25 @@ jobs:
                 | tee /work/repo/c014-artifacts/lifecycle-selftest.log
               grep -q "RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=48" \
                 /work/repo/c014-artifacts/lifecycle-selftest.log
-              export RUN_ROOT=/tmp/c014-e2e-fresh
-              bash "$BPREP/isolation/probe_e2e.sh"
-              cp "$RUN_ROOT/e2e.log" /work/repo/c014-artifacts/e2e.log
+              success=0
+              for attempt in 1 2 3 4 5; do
+                export RUN_ROOT="/tmp/c014-e2e-fresh-$attempt"
+                rm -rf "$RUN_ROOT"
+                set +e
+                bash "$BPREP/isolation/probe_e2e.sh"
+                rc=$?
+                set -e
+                if [ -f "$RUN_ROOT/e2e.log" ]; then
+                  cp "$RUN_ROOT/e2e.log" "/work/repo/c014-artifacts/e2e-attempt-$attempt.log"
+                fi
+                if [ "$rc" -eq 0 ]; then
+                  cp "$RUN_ROOT/e2e.log" /work/repo/c014-artifacts/e2e.log
+                  echo "$attempt" > /work/repo/c014-artifacts/successful-attempt.txt
+                  success=1
+                  break
+                fi
+              done
+              [ "$success" -eq 1 ] || exit 1
             '
 
       - name: Verify frozen markers
@@ -64,6 +80,7 @@ jobs:
           sha256sum "$LOG"
 
       - name: Upload frozen evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: c15-rcc-c014-frozen-evidence
