@@ -1,4 +1,4 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Environment Manifest (CORRECTIVE-005 exact, frozen)
+# C15-RCC-RES-B-PREFLIGHT-002 — Environment Manifest (CORRECTIVE-006 exact, frozen)
 
 This manifest freezes the exact environment the Resident B process will run under.
 Any deviation MUST STOP before B start (no pip install, no upgrade).
@@ -13,7 +13,7 @@ Any deviation MUST STOP before B start (no pip install, no upgrade).
 | Contract | `28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef` (exact bytes of RESIDENT_B_RUN_CONTRACT.md, `RESIDENT_B_RUN_CONTRACT.md` not truncated) | `echo "28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef  reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md" | sha256sum -c -` |
 | Core tree | `fe77f8a0706acfaf369041d0882b6d0e6de39f22` | `git ls-tree HEAD -- src/aios_core` |
 | Frozen software | `773876f92d5f8e53422f8f5a68cc651953d93052` | `git rev-parse HEAD` |
-| Adapter | `bridged_model_handler:ExternalBrokerClient` `1.0.0-frozen` `c15-rcc-b-wire-v1` sha `661e7c75dba93bb4d3e8149d4a40b280c37706b17ab8d5aca9398c4bb80896f6` | `sha256sum harness/bridged_model_handler.py` |
+| Adapter | `bridged_model_handler:ExternalBrokerClient` `1.0.0-frozen` `c15-rcc-b-wire-v1` sha `e1053dbd1ff39c4508a37314f6e625290118d6c23209d51375b3c4232f54b538` | `sha256sum harness/bridged_model_handler.py` |
 
 ## Dependency freeze
 
@@ -45,7 +45,7 @@ OS `Debian 12 (bookworm)` and kernel `Linux 6.1.158+` are **informational**, not
 | `AIOS_MAILBOX_ROOT` | `$RUN_ROOT/mailbox` | operator |
 | `AIOS_CONTRACT_SHA256` | `28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef` | operator |
 | `AIOS_WIRE_PROTOCOL_SHA256` | `a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a` | operator |
-| `AIOS_ADAPTER_SHA256` | `661e7c75dba93bb4d3e8149d4a40b280c37706b17ab8d5aca9398c4bb80896f6` | operator |
+| `AIOS_ADAPTER_SHA256` | `e1053dbd1ff39c4508a37314f6e625290118d6c23209d51375b3c4232f54b538` | operator |
 | `AIOS_REAL_PROVIDER_API_KEY` | `<redacted>` | operator (required for prod) |
 | `AIOS_REAL_PROVIDER_ENDPOINT` | `https://broker.example/...` or `http://127.0.0.1:<port>/v1/chat` (FakeBrokerServer for probe) | operator (required) |
 | `AIOS_PROVIDER_ADAPTER` | `bridged_model_handler:ExternalBrokerClient` (exact, pinned, no fake) | operator (pinned) |
@@ -68,7 +68,7 @@ Only `{ system: contract, wire_protocol: schema, wire_protocol_sha256: hash, mes
 - `python3 -c "import pydantic; print(pydantic.__version__)"` must equal `2.13.5`
 - `echo "a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a  harness/resident_wire_protocol.json" | sha256sum -c -`
 - `echo "28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef  reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md" | sha256sum -c -`
-- `echo "661e7c75dba93bb4d3e8149d4a40b280c37706b17ab8d5aca9398c4bb80896f6  harness/bridged_model_handler.py" | sha256sum -c -` (adapter pinned)
+- `echo "e1053dbd1ff39c4508a37314f6e625290118d6c23209d51375b3c4232f54b538  harness/bridged_model_handler.py" | sha256sum -c -` (adapter pinned)
 - `diff <(pip freeze | sort) <(sort harness/requirements.freeze.txt)` must be empty (or only pip/setuptools drift)
 - `git ls-tree HEAD -- src/aios_core` must equal `fe77f8a0706acfaf369041d0882b6d0e6de39f22`
 - Mismatch → STOP, do not run B (no `pip install` at release).
@@ -76,7 +76,7 @@ Only `{ system: contract, wire_protocol: schema, wire_protocol_sha256: hash, mes
 ## File manifest
 
 - `harness/resident_wire_protocol.json` + `.md` (pinned `a6bbeaef...` v1.0.1)
-- `harness/bridged_model_handler.py` (pinned `661e7c75...` `ExternalBrokerClient`)
+- `harness/bridged_model_handler.py` (pinned `e1053dbd1ff39c4508a37314f6e625290118d6c23209d51375b3c4232f54b538
 - `harness/requirements.freeze.txt` (full freeze `bd7a76d...`)
 - `harness/resident_jail.py` env allowlist
-- `isolation/probe_e2e.sh` asserts exact versions (step 0) `EXPECTED_CHECKS=58` (must match executable)
+- `isolation/probe_e2e.sh` asserts exact versions (step 0) `EXPECTED_CHECKS=77` (must match executable)

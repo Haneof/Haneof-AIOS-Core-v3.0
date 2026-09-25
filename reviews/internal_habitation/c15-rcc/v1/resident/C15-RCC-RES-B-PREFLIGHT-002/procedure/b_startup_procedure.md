@@ -1,4 +1,4 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Exact B Startup Procedure (CORRECTIVE-005 frozen)
+# C15-RCC-RES-B-PREFLIGHT-002 — Exact B Startup Procedure (CORRECTIVE-006 frozen)
 
 This procedure is prepared by preflight but NOT executed. It will be carried out by the independent release task `C15-RCC-RES-B-RELEASE-002` after this preflight is independently reviewed and accepted.
 
@@ -101,11 +101,11 @@ If `ISOLATION_FAIL`, STOP.
 ## 4a. Run the E2E transport probe — genuine + production + adversarial (no cursor 14 reveal)
 
 ```bash
-# 004 exact gate: EXPECTED_CHECKS=58, requires CHECKS==EXPECTED_CHECKS and zero FAIL
+# 006 exact gate: EXPECTED_CHECKS=77, requires CHECKS==EXPECTED_CHECKS and zero FAIL
 bash reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/isolation/probe_e2e.sh
 ```
 
-Expected `CORRECTIVE_004_E2E_PASS` (41 checks: mailbox 15, isolation, binding 7, synthetic+production genuine, current-event 6, strict, Scheme A, MS_PRIVATE, /dev, signal deterministic with PID map, env exact, real-provider fail-closed, fake fallback fail, import path executable, wire protocol hash, inconsistent telemetry, etc.).
+Expected `CORRECTIVE_006_E2E_PASS` (77 checks: mailbox 15, isolation, binding 7, synthetic+production genuine, current-event 6, strict, Scheme A, MS_PRIVATE, /dev, signal deterministic with PID map, env exact, real-provider fail-closed, fake fallback fail, import path executable, wire protocol hash, inconsistent telemetry, etc.).
 
 Do NOT proceed if any check fails.
 
@@ -128,7 +128,7 @@ Real B uses `ProductionResidentHandler` with `ExternalBrokerClient` (pinned `bri
 
 1. `FusedTurnRuntime` → `ProductionResidentHandler(snapshot)` (mechanical `world_map/cockpit/catalog/history/wake_reason`).
 2. `build_envelope(snapshot,b_session,contract_sha,current_event,release_state_path)` → envelope `event` is **exact** 8-field projection bound to current release cursor (sequence==next_sequence, event_id==expected, payload digest==expected, release-state `pending_reveal` or operator reveal file). `event=None` only for synthetic probe; real B always has `current_event` per cursor.
-3. `validate_current_event_binding` enforces `sequence 14..22`, `source_kind conversation|mechanical`, payload non-empty, and exact binding to `release_state.json` next/pending and `AIOS_CURRENT_EVENT_PATH` file digest. `seq15` when expected `14` → fail closed.
+3. `validate_current_event_binding` enforces `sequence 14..22`, `source_kind conversation|mechanical|monitoring`, payload non-empty, and exact binding to `release_state.json` next/pending and `AIOS_CURRENT_EVENT_PATH` file digest. `seq15` when expected `14` → fail closed.
 4. Binding `round/request_id/nonce/request_digest` (one-at-a-time, canonical digest).
 5. `build_model_request(contract_text,envelope,wire_protocol_text)` → **exact** provider request `{system: contract, wire_protocol: schema, wire_protocol_sha256: a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a…, messages: [{role:user, content: JSON(envelope)}]}` — provider sees `contract + envelope + mechanical reply schema`, never fixture.
 6. `ExternalBrokerClient.invoke(request)` outside jail (pinned adapter). **Fail closed if `AIOS_REAL_PROVIDER_API_KEY` or `AIOS_REAL_PROVIDER_ENDPOINT` missing, or adapter unresolvable, or `FakeProviderClient` selected from production entrypoint.**
@@ -161,7 +161,7 @@ python3 -m aios_core.headless.cli \
 
 `FakeProviderClient` is **never** reachable from this entrypoint; it is only instantiated explicitly by `probe_e2e.sh` for disposable tests.
 
-See `environment_manifest.md` for exact env, `per_cursor_interaction.md` for Scheme A and per-cursor event lifecycle, `probe_e2e.sh` for 41-check evidence.
+See `environment_manifest.md` for exact env, `per_cursor_interaction.md` for Scheme A and per-cursor event lifecycle, `probe_e2e.sh` for 77-check evidence.
 
 ## 7. Drive B cursors 14..22 (sequential, per procedure/per_cursor_interaction.md)
 

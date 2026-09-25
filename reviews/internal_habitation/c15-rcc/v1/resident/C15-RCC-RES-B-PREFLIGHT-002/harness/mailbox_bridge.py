@@ -171,17 +171,23 @@ def validate_envelope(envelope: dict[str, Any], b_session_id: str) -> None:
                 raise MailboxEnvelopeError(
                     f"envelope.event.sequence={seq!r} outside Phase B range 14..22"
                 )
-            # Mechanical validation for source_kind, payload etc. (BLOCKER 4)
+            # Mechanical validation for source_kind, payload etc. (BLOCKER 4) — allow monitoring for fixture_observation B events
             sk = ev.get("source_kind")
-            if sk not in ("conversation", "mechanical"):
-                raise MailboxEnvelopeError(f"envelope.event.source_kind={sk!r} must be conversation|mechanical")
+            if sk not in ("conversation", "mechanical", "monitoring"):
+                raise MailboxEnvelopeError(f"envelope.event.source_kind={sk!r} must be conversation|mechanical|monitoring")
             for f in ("source_class", "modality", "dimension", "event_id", "occurred_at"):
                 v = ev.get(f)
                 if not isinstance(v, str) or not v.strip():
                     raise MailboxEnvelopeError(f"envelope.event.{f} must be non-empty string")
             payload = ev.get("resident_visible_payload")
-            if not isinstance(payload, dict) or not payload:
-                raise MailboxEnvelopeError("envelope.event.resident_visible_payload must be non-empty object")
+            if isinstance(payload, dict):
+                if not payload:
+                    raise MailboxEnvelopeError("envelope.event.resident_visible_payload dict must be non-empty")
+            elif isinstance(payload, str):
+                if not payload.strip():
+                    raise MailboxEnvelopeError("envelope.event.resident_visible_payload string must be non-empty")
+            else:
+                raise MailboxEnvelopeError(f"envelope.event.resident_visible_payload must be string or object, got {type(payload).__name__}")
     if envelope.get("phase") not in (None, "B"):
         raise MailboxEnvelopeError(f"envelope.phase={envelope.get('phase')!r} invalid (expected B)")
     if "allowed_sequences" in envelope:

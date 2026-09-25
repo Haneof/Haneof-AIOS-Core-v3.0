@@ -1,4 +1,4 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Per-Cursor Interaction Procedure (CORRECTIVE-005 Scheme A-hard-stop (`_poisoned` + durable `$RUN_ROOT/evidence/failure-*.json`))
+# C15-RCC-RES-B-PREFLIGHT-002 — Per-Cursor Interaction Procedure (CORRECTIVE-006 Scheme A-hard-stop (`_poisoned` + durable `$RUN_ROOT/evidence/failure-*.json`))
 
 This is the exact per-cursor loop that B will run under the frozen `ProductionResidentHandler` + `ExternalBrokerClient` + `resident_wire_protocol.json` (`a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a…`).
 
@@ -58,15 +58,15 @@ Operator reads next sealed cursor outside jail and writes **only** 8-field proje
   sequence:             <seq>,
   occurred_at:          <fixture occurred_at>,
   dimension:            <fixture dimension>,
-  source_kind:          conversation|mechanical,  # validated
+  source_kind:          conversation|mechanical|monitoring,  # validated
   source_class:         <fixture>,
   modality:             <fixture>,
-  resident_visible_payload: { ... }  # non-empty object, validated
+  resident_visible_payload: { ... } or "text"  # non-empty object or string, validated
 }
 ```
 
 Validation before envelope (fail closed, no file written if envelope would fail, round not advanced):
-- Exactly 8 keys, `sequence 14..22`, `source_kind conversation|mechanical`, payload non-empty object, `event_id/occurred_at/dimension/source_class/modality` non-empty strings.
+- Exactly 8 keys, `sequence 14..22`, `source_kind conversation|mechanical|monitoring`, payload non-empty object, `event_id/occurred_at/dimension/source_class/modality` non-empty strings.
 - **Exact binding** to current release cursor (via `validate_current_event_binding`):
   - `current_event.sequence == release_state.next_sequence` (expected=14 → seq15 rejected)
   - `current_event.event_id == expected event_id` (at seq14, another id rejected)
