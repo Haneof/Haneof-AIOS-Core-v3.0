@@ -1,4 +1,4 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Environment Manifest (CORRECTIVE-009 exact, frozen)
+# C15-RCC-RES-B-PREFLIGHT-002 — Environment Manifest (CORRECTIVE-010 exact, frozen)
 
 This manifest freezes the exact environment the Resident B process will run under.
 Any deviation MUST STOP before B start (no pip install, no upgrade).
@@ -13,7 +13,7 @@ Any deviation MUST STOP before B start (no pip install, no upgrade).
 | Contract | `28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef` (exact bytes of RESIDENT_B_RUN_CONTRACT.md, `RESIDENT_B_RUN_CONTRACT.md` not truncated) | `echo "28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef  reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md" | sha256sum -c -` |
 | Core tree | `fe77f8a0706acfaf369041d0882b6d0e6de39f22` | `git ls-tree HEAD -- src/aios_core` |
 | Frozen software | `773876f92d5f8e53422f8f5a68cc651953d93052` | `git rev-parse HEAD` |
-| Adapter | `bridged_model_handler:ExternalBrokerClient` `1.0.0-frozen` `c15-rcc-b-wire-v1` sha `3c8f686bb537ed6258f4b8825b9976c63e8c4b00ebfa57c939a416b3dd666b9d` | `sha256sum harness/bridged_model_handler.py` |
+| Adapter | `bridged_model_handler:ExternalBrokerClient` `1.0.0-frozen` `c15-rcc-b-wire-v1` sha `3c8f686bb537ed6258f4b8825b9976c63e8c4b00ebfa57c939a416b3dd666b9d` (unchanged by CORRECTIVE-010) | `sha256sum harness/bridged_model_handler.py` |
 | Jail wrapper | `harness/resident_jail.py` sha `d766c1857163528cacf90e6b876466d099456062914747eab25dd1220e8615eb` | `sha256sum harness/resident_jail.py` |
 
 ## Dependency freeze — Frozen dependency subset, not entire pip environment.
@@ -87,4 +87,4 @@ Only `{ system: contract, wire_protocol: schema, wire_protocol_sha256: hash, mes
 - `harness/resident_jail.py` (pinned `d766c1857163528cacf90e6b876466d099456062914747eab25dd1220e8615eb`)
 - `harness/requirements.freeze.txt` (full freeze `bd7a76d...`)
 - `harness/resident_jail.py` env allowlist
-- `isolation/probe_e2e.sh` asserts exact versions (step 0) `EXPECTED_CHECKS=139` (must match executable)
+- `isolation/probe_e2e.sh` asserts exact versions (step 0) with a recomputed `EXPECTED_CHECKS` (must match the executable's own `pass_check` count exactly)

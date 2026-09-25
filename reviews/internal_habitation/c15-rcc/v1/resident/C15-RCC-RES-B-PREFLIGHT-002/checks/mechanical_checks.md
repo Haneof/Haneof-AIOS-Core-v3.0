@@ -136,7 +136,9 @@ All checks run against disposable copies of freeze artifacts. Canonical #205 evi
 
 Every check below is produced by a real test inside `isolation/probe_e2e.sh`, never echoed by the gate
 itself; the gate re-scans its own run log for each marker and also runs a negative self-test proving the
-marker search is non-vacuous. `EXPECTED_CHECKS=139`, success marker `CORRECTIVE_009_E2E_PASS`.
+marker search is non-vacuous. `EXPECTED_CHECKS` is recomputed from the executable's own
+`pass_check` count on every run; the CORRECTIVE-010 success marker is
+`CORRECTIVE_010_E2E_PASS`.
 
 | Check | Blocker | Result |
 | --- | --- | --- |
@@ -158,3 +160,14 @@ marker search is non-vacuous. `EXPECTED_CHECKS=139`, success marker `CORRECTIVE_
 `resident_safe_packet_manifest.md`, `known_limitations.md`, `source_pins_and_digests.md`,
 `identity_inventory.md` and `corrective_009_report.md` returns **0 hardcoded dependencies in code or
 execution paths** (the only permitted mentions are in prose that explicitly forbids them).
+
+## CORRECTIVE-010 gate — canonical runbook ORDER (BLK-03, the last remaining blocker)
+
+| Check | Result |
+| --- | --- |
+| `RUNBOOK_STATIC_ORDER_PASS` | Section 6 precedes Section 7; Section 6 states *No model dispatch occurs in this section*; Section 6 contains **no** `turn --session` and **no** `CURRENT_OCCURRED_AT=`; Section 7 contains the `CURRENT_OCCURRED_AT` derivation, the production `turn --session`, the exact `create_current_event_binding_receipt` chain, and numbered steps 7.1–7.12 in ascending order. |
+| `CANONICAL_RUNBOOK_ORDER_PASS` | On a fresh disposable Phase-B copy the documented order is executed verbatim: prepare runtime (byte-exact lineage) → `recovery-status` (rev98/lag0/AUTO_RECOVERABLE/ok, no model invocation) → `init --phase B` → apply the Section-6 configuration block → assert **no** `current-event.json`, **no** `current-event-binding.json`, `pending_reveal == null` and **no** model turn → prove through the real production handler that a dispatch at this point STOPs (`ModelDispatchNotSubmitted`, 0 provider invocations, poisoned, durable receipt) → exactly one disposable `release_operator reveal --phase B` → install `current-event.json` → persist `event-014.projection.json` + `projection_digests.sha256` → create the immutable 0400 binding receipt and prove its `canonical_projection_sha256` equals the SHA of the reveal bytes → `validate_current_event_binding` → derive `CURRENT_OCCURRED_AT` from `current-event.json` (after reveal, never the stale hardcode) → `FusedTurnRuntime.run_turn` through `ProductionResidentHandler` + `ExternalBrokerClient` + `FakeBrokerServer` → the provider transport boundary is genuinely reached (HTTP posts ≥ 2, `wire_protocol_sha256` bound, envelope `sequence` bound). |
+| Ordering prohibitions | The regression never pre-creates an event or receipt before the documented reveal, never mutates `release_state.pending_reveal` to make the test green, and never bypasses the production handler. The cursor-14 payload is re-scanned out of the run log. |
+
+`CANONICAL_RUNBOOK_EXECUTABLE_PASS` (recovery-status only) is retained but is **not** allowed to stand
+in for the full runbook order; both markers are mandatory.

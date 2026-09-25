@@ -64,7 +64,7 @@ FAILURES=0
 pass_check() { CHECKS=$((CHECKS+1)); echo "CHECK $CHECKS PASS: $*"; }
 fail_check() { FAILURES=$((FAILURES+1)); echo "CHECK FAIL: $*"; }
 
-EXPECTED_CHECKS=139
+EXPECTED_CHECKS=140
 echo "[e2e] EXPECTED_CHECKS=$EXPECTED_CHECKS"
 
 # Step 0: exact environment (CORRECTIVE-005: freeze Python/Pydantic/wire/adapter/contract/freeze, not OS/kernel)
@@ -2112,6 +2112,9 @@ if grep -R "CORRECTIVE_006_E2E_PASS" "$B_PREP" --exclude-dir=isolation 2>/dev/nu
 if grep -R "CORRECTIVE_007_E2E_PASS" "$B_PREP" --exclude-dir=isolation 2>/dev/null | grep -v "probe_e2e.sh" | grep -q "CORRECTIVE_007"; then echo "FAIL stale CORRECTIVE_007_E2E_PASS found"; grep -R "CORRECTIVE_007_E2E_PASS" "$B_PREP" --exclude-dir=isolation | grep -v "probe_e2e.sh" || true; stale_found=1; fi
 if grep -R "CORRECTIVE_008_E2E_PASS" "$B_PREP" --exclude-dir=isolation 2>/dev/null | grep -v "probe_e2e.sh" | grep -q "CORRECTIVE_008"; then echo "FAIL stale CORRECTIVE_008_E2E_PASS found"; grep -R "CORRECTIVE_008_E2E_PASS" "$B_PREP" --exclude-dir=isolation | grep -v "probe_e2e.sh" || true; stale_found=1; fi
 if grep -REn "EXPECTED_CHECKS=126|126 checks|126-check" "$B_PREP" --exclude-dir=isolation --include="*.md" 2>/dev/null | grep -q .; then echo "FAIL stale 126-check count found"; grep -REn "EXPECTED_CHECKS=126|126 checks|126-check" "$B_PREP" --exclude-dir=isolation --include="*.md" || true; stale_found=1; fi
+if grep -R "CORRECTIVE_009_E2E_PASS" "$B_PREP" --exclude-dir=isolation 2>/dev/null | grep -v "probe_e2e.sh" | grep -q "CORRECTIVE_009_E2E_PASS"; then echo "FAIL stale CORRECTIVE_009_E2E_PASS found"; grep -R "CORRECTIVE_009_E2E_PASS" "$B_PREP" --exclude-dir=isolation | grep -v "probe_e2e.sh" || true; stale_found=1; fi
+if grep -REn "EXPECTED_CHECKS=139|139 checks|139-check" "$B_PREP" --exclude-dir=isolation --include="*.md" 2>/dev/null | grep -q .; then echo "FAIL stale 139-check count found"; grep -REn "EXPECTED_CHECKS=139|139 checks|139-check" "$B_PREP" --exclude-dir=isolation --include="*.md" || true; stale_found=1; fi
+
 # Old source_kind enum must not appear in procedure (should be opaque)
 if grep -R "conversation|mechanical|monitoring" "$B_PREP/procedure/" 2>/dev/null | grep -v "probe_e2e.sh" | grep -q "conversation"; then
   # Allow the new opaque description which mentions the words but not as enum pipe; check for the exact enum pattern
@@ -2184,13 +2187,25 @@ from pathlib import Path
 startup = Path("reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/procedure/b_startup_procedure.md").read_text()
 # Find the bash block
 import re as _re
-m = _re.search(r"```bash\n(.*?export AIOS_B_SESSION_ID.*?headless_production_handler.*?```)", startup, _re.DOTALL)
+m = _re.search(r"```bash\n(.*?export AIOS_B_SESSION_ID.*?PYTHONPATH=.*?```)", startup, _re.DOTALL)
 if not m:
     print("FAIL canonical block not found")
     sys.exit(1)
 block = m.group(1)
 # Check that block contains all required exports
-required = ["AIOS_ADAPTER_SHA256", "AIOS_CURRENT_EVENT_BINDING_PATH", "AIOS_EVIDENCE_DIR", "AIOS_PROVIDER_ADAPTER", "AIOS_B_SESSION_ID", "AIOS_CONTRACT_SHA256", "AIOS_WIRE_PROTOCOL_SHA256", "AIOS_REAL_PROVIDER_API_KEY", "AIOS_REAL_PROVIDER_ENDPOINT", "AIOS_RELEASE_STATE_PATH", "AIOS_CURRENT_EVENT_PATH", "PYTHONPATH"]
+required = ["AIOS_ADAPTER_SHA256", "AIOS_CURRENT_EVENT_BINDING_PATH", "AIOS_EVIDENCE_DIR",
+           "AIOS_PROVIDER_ADAPTER", "AIOS_B_SESSION_ID", "AIOS_CONTRACT_SHA256",
+           "AIOS_WIRE_PROTOCOL_SHA256", "AIOS_REAL_PROVIDER_API_KEY",
+           "AIOS_REAL_PROVIDER_ENDPOINT", "AIOS_RELEASE_STATE_PATH",
+           "AIOS_CURRENT_EVENT_PATH", "PYTHONPATH"]
+# CORRECTIVE-010: the configuration block must be configuration ONLY - no model turn and no
+# pre-read occurred_at (CURRENT_OCCURRED_AT is derived in the per-cursor loop, after reveal).
+forbidden = ["turn --session", "CURRENT_OCCURRED_AT="]
+bad = [f for f in forbidden if f in block]
+if bad:
+    print("FAIL canonical configuration block is not configuration-only: %s" % bad)
+    sys.exit(1)
+print("PASS canonical configuration block is configuration-only")
 missing = [r for r in required if r not in block]
 if missing:
     print(f"FAIL canonical block missing {missing}")
@@ -2785,6 +2800,257 @@ pass_check "BLK-07 inherited FDs closed before exec; sealed material unreadable 
 pass_check "BLK-08 contract provenance mechanically bound to the accepted tree, no absolute fallback"
 
 
+# ---- CORRECTIVE-010 / BLK-03: the canonical runbook ORDER itself must be executable -------
+echo "[e2e] corrective-010 blk-03: canonical runbook 1->12 order executable"
+sudo -E "$PY" - "$RUN_ROOT" "$B_PREP" "$REPO_ROOT" <<'PYEOF'
+import hashlib, json, os, re, shutil, subprocess, sys, time
+from pathlib import Path
+
+run_root = Path(sys.argv[1]); b_prep = Path(sys.argv[2]); repo = Path(sys.argv[3])
+sys.path.insert(0, str(b_prep / "harness")); sys.path.insert(0, str(repo / "src"))
+from bridged_model_handler import (ProductionResidentHandler, ExternalBrokerClient,
+                                   FakeBrokerServer, get_contract_sha256, get_contract_text,
+                                   create_current_event_binding_receipt, write_binding_receipt)
+from aios_core.runtime.cognitive_runtime import ModelDispatchNotSubmitted, RuntimeSnapshot
+from aios_core.runtime.turn_runtime import FusedTurnRuntime
+from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.query.search import WorldSearchIndex
+
+CATALOG = ("search_world", "read_world_map", "world_map")
+HISTORY = ()
+
+def snap(wake="conversation", rnd=0):
+    return RuntimeSnapshot(user_input="runbook order hello", wake_reason=wake,
+                           cockpit={"world_revision": 98}, capability_catalog=CATALOG,
+                           capability_history=HISTORY, round_index=rnd, remaining_tool_rounds=3)
+
+class StubProvider:
+    """Pure transport stub: echoes the binding fields the handler assigned, like a real broker."""
+    def __init__(self):
+        self.calls = 0
+        self.last_request = None
+    def invoke(self, request):
+        self.calls += 1
+        self.last_request = request
+        env = json.loads(request["messages"][-1]["content"])
+        class R:
+            provider = "stub-provider"; model = "stub-model-v1"
+            request_id = "stub-req-" + env["request_id"][:8]
+            usage = {"prompt_tokens": 3, "completion_tokens": 4, "total_tokens": 7}
+            content = json.dumps({"round": env["round"], "request_id": env["request_id"],
+                                  "request_digest": env["request_digest"], "action": "silence"})
+        return R()
+
+startup = (b_prep / "procedure/b_startup_procedure.md").read_text(encoding="utf-8")
+i6 = startup.index("## 6."); i7 = startup.index("## 7.")
+sec6, sec7 = startup[i6:i7], startup[i7:]
+
+# ---- static: the documented order really is the documented order -------------------------
+order_bad = []
+if not (i6 < i7):
+    order_bad.append("Section 6 does not precede Section 7")
+if "No model dispatch occurs in this section" not in sec6:
+    order_bad.append("Section 6 does not state that no model dispatch occurs there")
+for banned in ("turn --session", "CURRENT_OCCURRED_AT=", "--at "):
+    if banned in sec6:
+        order_bad.append(f"Section 6 (configuration only) still contains {banned!r}")
+if "CURRENT_OCCURRED_AT" not in sec7:
+    order_bad.append("Section 7 does not derive CURRENT_OCCURRED_AT")
+if "turn --session" not in sec7:
+    order_bad.append("Section 7 does not contain the production headless turn")
+if "create_current_event_binding_receipt" not in sec7:
+    order_bad.append("Section 7 does not contain the exact receipt creation command")
+_nums = [int(m) for m in re.findall(r"^### 7\.(\d+)[ .]", sec7, re.MULTILINE)]
+if _nums != list(range(1, 13)):
+    order_bad.append("Section 7 numbered steps are missing/duplicated/out of order: %s" % _nums)
+assert not order_bad, "CORRECTIVE-010 FAIL: runbook order: %s" % order_bad
+print("RUNBOOK_STATIC_ORDER_PASS section6_config_only=True section7_steps=12")
+
+# ---- fresh disposable Phase-B run root ---------------------------------------------------
+O = run_root / "c10"
+if O.exists():
+    subprocess.run(["sudo", "rm", "-rf", str(O)], check=False)
+for d in ("runtime", "binding", "evidence", "sandbox", "inject", "scratch",
+          "mailbox/inbox", "mailbox/outbox", "mailbox/archive"):
+    (O / d).mkdir(parents=True, exist_ok=True)
+
+# Step 1 (runbook §1): prepare runtime, byte-exact A-002 lineage
+_SRC = {"private_world.sqlite": "world.sqlite", "world_index.sqlite": "index.sqlite",
+        "release_state.json": "release_state.json"}
+for src_name, dst_name in _SRC.items():
+    shutil.copyfile(b_prep / "lineage_copy" / src_name, O / "runtime" / dst_name)
+(O / "runtime" / "world.sqlite.writer.lock").touch()
+rs = O / "runtime" / "release_state.json"
+ev_path = O / "current-event.json"
+bind_path = O / "binding" / "current-event-binding.json"
+env = os.environ.copy()
+env["PYTHONPATH"] = "%s:%s" % (repo / "src", b_prep / "harness")
+_OP = "reviews/internal_habitation/c15-rcc/v1/release/release_operator.py"
+
+# Step 2 (runbook §2): recovery-status — no model invocation
+_rb = subprocess.run([sys.executable, "-m", "aios_core.headless.cli",
+                      "--world", str(O / "runtime" / "world.sqlite"),
+                      "--index", str(O / "runtime" / "index.sqlite"),
+                      "--lock", str(O / "runtime" / "world.sqlite.writer.lock"),
+                      "recovery-status"], env=env, capture_output=True, text=True)
+assert '"world_revision": 98' in _rb.stdout and '"index_lag": 0' in _rb.stdout, _rb.stdout[:200]
+assert "AUTO_RECOVERABLE" in _rb.stdout, _rb.stdout[:200]
+
+# Step 3 (runbook §3): Phase-B init (validates boundary, transitions active_phase to B)
+_in = subprocess.run([sys.executable, _OP, "init", "--phase", "B", "--state", str(rs)],
+                     env=env, capture_output=True, text=True)
+assert _in.returncode == 0, _in.stderr[:300]
+rs_now = json.loads(rs.read_text())
+assert rs_now["active_phase"] == "B" and rs_now["next_sequence"] == 14, rs_now
+
+# Step 4 (runbook §6): configuration ONLY — no event, no receipt, no model turn yet
+assert not ev_path.exists(), "current-event.json must not exist before reveal"
+assert not bind_path.exists(), "binding receipt must not exist before reveal"
+assert rs_now["pending_reveal"] is None, "pending_reveal must be null before the first reveal"
+print("BEFORE_REVEAL: no current-event.json, no binding receipt, pending_reveal=null")
+
+# Ordering proof through the REAL production handler: a dispatch attempted here must STOP.
+_pre = ProductionResidentHandler(b_session_id="b-runbook-order",
+                                 provider_client=StubProvider(), release_state_path=rs,
+                                 binding_receipt_path=bind_path,
+                                 evidence_dir=O / "evidence")
+_calls_before = _pre.provider_client.calls
+try:
+    _pre(snap(wake="periodic_review", rnd=1))
+    raise AssertionError("CORRECTIVE-010 FAIL: production dispatch succeeded before reveal")
+except ModelDispatchNotSubmitted as e:
+    assert "no current-event binding" in str(e), str(e)
+assert _pre.provider_client.calls == _calls_before, "provider invoked before reveal"
+assert _pre._poisoned and _pre._outstanding is None
+_pre_receipts = sorted((O / "evidence").glob("failure-*.json"))
+assert _pre_receipts, "no durable failure receipt for the pre-reveal STOP"
+print("PRE_REVEAL_STOP_OK provider_calls=%d receipts=%d"
+      % (_pre.provider_client.calls, len(_pre_receipts)))
+
+# Step 5 (runbook §7.1): exactly ONE disposable reveal (a second one is forbidden before ACK).
+_rev = subprocess.run([sys.executable, _OP, "reveal", "--phase", "B", "--state", str(rs)],
+                      env=env, capture_output=True, text=True)
+assert _rev.returncode == 0, _rev.stderr[:300]
+proj = json.loads(_rev.stdout)                       # never printed
+print("REVEALED_SEQ=%s EVENT_ID_VISIBLE=%s FIELDS=%d"
+      % (proj["sequence"], proj["event_id"].startswith("c15rcc-"), len(proj)))
+rs_after = json.loads(rs.read_text())
+assert rs_after["pending_reveal"] is not None, "reveal did not set pending_reveal"
+assert rs_after["pending_reveal"]["sequence"] == proj["sequence"]
+assert rs_after["pending_reveal"]["event_id"] == proj["event_id"]
+assert not ev_path.exists() and not bind_path.exists(), "event/receipt appeared without reveal"
+
+# Step 6 (runbook §7.2): install current-event.json
+ev_path.write_text(_rev.stdout, encoding="utf-8")
+ev_path.chmod(0o400)
+assert ev_path.exists() and bind_path.exists() is False
+
+# Step 7 (runbook §7.3): persist the immutable per-cursor projection evidence
+SEQ = proj["sequence"]
+proj_ev = O / "evidence" / ("event-%03d.projection.json" % SEQ)
+proj_ev.write_text(_rev.stdout, encoding="utf-8")
+proj_ev.chmod(0o400)
+with open(O / "evidence" / "projection_digests.sha256", "a", encoding="utf-8") as fh:
+    fh.write("%s  %s\n" % (hashlib.sha256(proj_ev.read_bytes()).hexdigest(), proj_ev.name))
+assert (O / "evidence" / "projection_digests.sha256").read_text().strip() != ""
+
+# Step 8 (runbook §7.4): create the immutable binding receipt (exact canonical command)
+receipt = create_current_event_binding_receipt(proj, b_session_id="b-runbook-order",
+                                               release_state_path=rs)
+write_binding_receipt(receipt, bind_path)
+bind_path.chmod(0o400)
+assert (bind_path.stat().st_mode & 0o777) == 0o400, "binding receipt is not 0400"
+# the receipt is derived from the reveal bytes, never hand-made
+_canon = json.dumps(proj, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+assert receipt["canonical_projection_sha256"] == hashlib.sha256(_canon).hexdigest(), "receipt sha mismatch"
+assert receipt["sequence"] == SEQ and receipt["event_id"] == proj["event_id"]
+assert receipt["release_state_pending_reveal"]["event_id"] == proj["event_id"]
+assert receipt["fixture_sha256"] == "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46"
+print("RECEIPT_CREATED_AFTER_REVEAL seq=%s mode=0400 sha_bound=True" % SEQ)
+
+# Step 9 (runbook §7.5): verify receipt / state / event binding
+from bridged_model_handler import validate_current_event_binding
+validate_current_event_binding(proj, "b-runbook-order", release_state_path=rs,
+                               binding_receipt_path=bind_path)
+print("BINDING_VERIFIED seq=%s" % SEQ)
+
+# Step 10 (runbook §7.6): derive CURRENT_OCCURRED_AT from the CURRENT projection (after reveal)
+CURRENT_OCCURRED_AT = json.loads(ev_path.read_text(encoding="utf-8"))["occurred_at"]
+assert CURRENT_OCCURRED_AT and CURRENT_OCCURRED_AT == proj["occurred_at"], CURRENT_OCCURRED_AT
+assert CURRENT_OCCURRED_AT != "2026-11-05T09:00:00-08:00", "occurred_at must not be the stale hardcode"
+print("DERIVED_CURRENT_OCCURRED_AT=%s (from current-event.json, after reveal)" % CURRENT_OCCURRED_AT)
+
+# Step 11 (runbook §7.8): run the exact production headless turn through the transport boundary
+server = FakeBrokerServer(host="127.0.0.1", port=0, mode="normal")
+endpoint = server.start()
+time.sleep(0.2)
+try:
+    os.environ["AIOS_B_SESSION_ID"] = "b-runbook-order"
+    os.environ["AIOS_RELEASE_STATE_PATH"] = str(rs)
+    os.environ["AIOS_CURRENT_EVENT_PATH"] = str(ev_path)
+    os.environ["AIOS_CURRENT_EVENT_BINDING_PATH"] = str(bind_path)
+    os.environ["AIOS_EVIDENCE_DIR"] = str(O / "evidence")
+    os.environ["AIOS_ADAPTER_SHA256"] = hashlib.sha256(
+        (b_prep / "harness/bridged_model_handler.py").read_bytes()).hexdigest()
+    os.environ["AIOS_CONTRACT_SHA256"] = get_contract_sha256(repo)
+    os.environ["AIOS_WIRE_PROTOCOL_SHA256"] = "a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a"
+    os.environ["AIOS_PROVIDER_ADAPTER"] = "bridged_model_handler:ExternalBrokerClient"
+    os.environ["AIOS_REAL_PROVIDER_API_KEY"] = "sk-test-123"
+    os.environ["AIOS_REAL_PROVIDER_ENDPOINT"] = endpoint
+    client = ExternalBrokerClient(api_key="sk-test-123", endpoint=endpoint,
+                                  model="real-model-v1", allow_test_loopback=True)
+    handler = ProductionResidentHandler(b_session_id="b-runbook-order", provider_client=client,
+                                        contract_sha256=get_contract_sha256(repo),
+                                        contract_text=get_contract_text(repo),
+                                        release_state_path=rs, binding_receipt_path=bind_path,
+                                        evidence_dir=O / "evidence")
+    handler.set_current_event(proj)
+    from datetime import datetime, timezone
+    store = SQLiteWorldStore(O / "runtime" / "world.sqlite")
+    idx = WorldSearchIndex(O / "runtime" / "index.sqlite", store=store)
+    runtime = FusedTurnRuntime(store=store, index=idx, subject_id="user_1",
+                               model_handler=handler, max_tool_rounds=4)
+    occurred = datetime.fromisoformat(CURRENT_OCCURRED_AT)
+    result = runtime.run_turn(session_id="b-runbook-order", turn_index=1,
+                              user_input="runbook order hello", occurred_at=occurred)
+    assert handler.invocations >= 2, handler.invocations
+    assert server.invocations >= 2, server.invocations          # real HTTP boundary crossed
+    assert client.last_request["wire_protocol_sha256"] == \
+        "a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a"
+    assert get_contract_text(repo) in client.last_request["system"] or \
+        client.last_request["system"] == get_contract_text(repo)
+    _env = json.loads(client.last_request["messages"][-1]["content"])
+    assert _env["event"]["sequence"] == SEQ, _env["event"].get("sequence")
+    assert _env["event"]["event_id"] == proj["event_id"], _env["event"].get("event_id")
+    assert _env["phase"] == "B" and _env["allowed_sequences"] == [14, 22], _env.get("phase")
+    print("PRODUCTION_TURN_REACHED_TRANSPORT invocations=%d http_posts=%d provider=%s"
+          % (handler.invocations, server.invocations,
+             handler.last_provider_response.provider))
+finally:
+    server.stop()
+
+# the transport evidence never carries the payload into the run log
+_logtxt = Path(os.environ.get("CURRENT_RUN_LOG", "/dev/null")).read_text(errors="replace") \
+    if os.environ.get("CURRENT_RUN_LOG") else ""
+_sealed = json.loads((repo / "reviews/internal_habitation/c15-rcc/v1/fixture/sealed_fixture.json").read_text())
+for _ev in _sealed["events"] if isinstance(_sealed, dict) and "events" in _sealed else _sealed:
+    if _ev.get("sequence") != SEQ:
+        continue
+    _pl = _ev.get("resident_visible_payload")
+    if _pl is None:
+        continue
+    _n = _pl if isinstance(_pl, str) else json.dumps(_pl, sort_keys=True, ensure_ascii=False)
+    assert len(_n) < 8 or _n not in _logtxt, "cursor-14 payload leaked into the run log"
+
+print("CANONICAL_RUNBOOK_ORDER_PASS order=1-12 reveal_before_event=True receipt_from_reveal=True "
+      "occurred_at_derived_after_reveal=True transport_boundary_reached=True")
+PYEOF
+if grep -q "CANONICAL_RUNBOOK_ORDER_PASS" "$CURRENT_RUN_LOG" 2>/dev/null; then
+  pass_check "BLK-03 canonical runbook 1-12 order executes on a disposable Phase-B copy (reveal -> event -> receipt -> projection -> occurred_at -> production turn -> transport)"
+else
+  fail_check "canonical runbook order regression"
+  exit 1
+fi
 # Final gate: exact check count
 echo
 echo "ALL_CHECKS=$CHECKS/$EXPECTED_CHECKS FAILURES=$FAILURES"
@@ -2803,7 +3069,8 @@ for m in ISOLATION_PASS SYNTHETIC_GENUINE_PASS PRODUCTION_GENUINE_PASS PRODUCTIO
          NO_COMMITTED_CURSOR14_PAYLOAD_PASS NO_FALSE_NO_REVEAL_PROSE_PASS PORTABLE_CHECKOUT_PASS \
          NEGATIVE_JAIL_ACTUALLY_EXECUTED_PASS CANONICAL_RUNBOOK_EXECUTABLE_PASS \
          MISSING_RELEASE_STATE_FAIL_CLOSED_PASS NO_EVENT_NO_DISPATCH_PASS \
-         FAILURE_RECEIPT_COLLISION_PASS INHERITED_FD_SEALED_PASS CONTRACT_PROVENANCE_PASS; do
+         FAILURE_RECEIPT_COLLISION_PASS INHERITED_FD_SEALED_PASS CONTRACT_PROVENANCE_PASS \
+         CANONICAL_RUNBOOK_ORDER_PASS; do
   if grep -q "$m" "$CURRENT_RUN_LOG" 2>/dev/null; then
     echo "MARKER PASS: $m in CURRENT_RUN_LOG"
   else
@@ -2822,5 +3089,5 @@ if [ "$FAILURES" -ne 0 ]; then
   echo "GATE FAIL: marker failures $FAILURES"
   exit 1
 fi
-echo "CORRECTIVE_009_E2E_PASS"
+echo "CORRECTIVE_010_E2E_PASS"
 echo "[e2e] done $(date -u +%Y-%m-%dT%H:%M:%SZ)"

@@ -70,16 +70,17 @@ These identities are intentionally NOT reused for Resident B (fresh session/proc
 | Resident B run contract | `28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef` |
 | resident wire protocol | `a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a` |
 
-CORRECTIVE-009 did not touch `src/aios_core/**`, the sealed fixture, the evaluator, the governance
+CORRECTIVE-009 and CORRECTIVE-010 did not touch `src/aios_core/**`, the sealed fixture, the evaluator, the governance
 directory, the run contract or PR #205. The runtime/Core/lineage pins above are re-asserted by the
 probe gate (`PIN_*` checks) on every run.
 
-## Harness digests at the CORRECTIVE-009 tip
+## Harness digests at the CORRECTIVE-010 tip
 
 | File | Role | Notes |
 | --- | --- | --- |
 | `harness/bridged_model_handler.py` | Phase B adapter | BLK-04/05/06/08 changes |
 | `harness/resident_jail.py` | sandbox wrapper | BLK-07 `_close_inherited_fds()` |
+| `harness/bridged_model_handler.py` | Phase B adapter | **byte-identical** across CORRECTIVE-009 and CORRECTIVE-010 (CORRECTIVE-010 changes no code path) |
 | `harness/mailbox_bridge.py` | transport binding | unchanged in CORRECTIVE-009 |
 
 Both digests are computed **mechanically** at probe runtime (they are not trusted from this document);

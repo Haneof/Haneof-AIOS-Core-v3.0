@@ -1,15 +1,17 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Completion Report (CORRECTIVE-009)
+# C15-RCC-RES-B-PREFLIGHT-002 — Completion Report (CORRECTIVE-010)
 
 Date: 2026-09-25
-Task: C15-RCC-RES-B-PREFLIGHT-002 (superseded by C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-009)
+Task: C15-RCC-RES-B-PREFLIGHT-002 → CORRECTIVE-009 → CORRECTIVE-010
 Role: Release / Test Infrastructure Engineer (Sealed Resident Infrastructure Designer)
 
 ## Verdict: **REVIEW_READY / AWAITING_PM_RE-REVIEW**
 
-All 15 mandatory mechanical checks from the preflight prompt §8 PASS, and all **8 blockers** from
-independent acceptance review `5315355377` are closed with fresh regressions — 139/139 checks,
-`FAILURES=0`, marker **`CORRECTIVE_009_E2E_PASS`**. See `corrective_009_report.md` for the
-per-blocker closure evidence.
+All 15 mandatory mechanical checks from the preflight prompt §8 PASS. Independent acceptance
+review `5315355377` found 8 blockers; CORRECTIVE-009 closed 7 of them and CORRECTIVE-010 closed
+the last one (`BLK-03 / CANONICAL_RUNBOOK_ORDER_NOT_EXECUTABLE`) by making the numbered runbook
+order itself executable. Final gate: recomputed `EXPECTED_CHECKS`, `FAILURES=0`, marker
+**`CORRECTIVE_010_E2E_PASS`**. See `corrective_009_report.md` (BLK-01/02/04..08) and
+`corrective_010_report.md` (BLK-03 ordering) for the per-blocker closure evidence.
 
 | Gate marker | Blocker |
 | --- | --- |
@@ -17,15 +19,16 @@ per-blocker closure evidence.
 | `NO_FALSE_NO_REVEAL_PROSE_PASS` | BLK-01 |
 | `PORTABLE_CHECKOUT_PASS` | BLK-02 |
 | `NEGATIVE_JAIL_ACTUALLY_EXECUTED_PASS` | BLK-02 |
-| `CANONICAL_RUNBOOK_STATIC_PASS` / `CANONICAL_RUNBOOK_EXECUTABLE_PASS` | BLK-03 |
+| `CANONICAL_RUNBOOK_STATIC_PASS` / `CANONICAL_RUNBOOK_EXECUTABLE_PASS` / `CANONICAL_RUNBOOK_ORDER_PASS` | BLK-03 |
 | `MISSING_RELEASE_STATE_FAIL_CLOSED_PASS` | BLK-04 |
 | `NO_EVENT_NO_DISPATCH_PASS` | BLK-05 |
 | `FAILURE_RECEIPT_COLLISION_PASS` | BLK-06 |
 | `INHERITED_FD_SEALED_PASS` | BLK-07 |
 | `CONTRACT_PROVENANCE_PASS` | BLK-08 |
 
-The only success marker is `CORRECTIVE_009_E2E_PASS`. The earlier CORRECTIVE-008 gate is retired
-and must not be reused; the stale-count and stale-marker greps in the probe assert this.
+The only success marker is `CORRECTIVE_010_E2E_PASS`. The earlier CORRECTIVE-008 gate and the
+CORRECTIVE-009 gate are retired and must not be reused; the stale-count and stale-marker greps
+in the probe assert this.
 
 ## Propositions to prove (per prompt)
 
@@ -90,7 +93,8 @@ reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/
 │   └── mailbox_bridge.py        (transport-only mailbox, no semantics)
 ├── checks/
 │   └── mechanical_checks.md     (15/15 PASS + CORRECTIVE-009 checks 125-139)
-├── corrective_009_report.md     (per-blocker closure evidence)
+├── corrective_009_report.md     (BLK-01/02/04..08 closure evidence)
+├── corrective_010_report.md     (BLK-03 canonical runbook ordering)
 └── procedure/
     ├── b_startup_procedure.md
     ├── per_cursor_interaction.md
@@ -106,5 +110,6 @@ reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/
 1. Verify this PR changes only files under `reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/` (plus any integration-receipt file at the reviewer's discretion).
 2. Re-run the isolation probe (procedure step 4) on the reviewer's machine to confirm the sandbox yields `ISOLATION_PASS`.
 3. Spot-check the three freeze SHA-256 values against PR #205 directly.
-4. Confirm every `reveal` invocation is confined to a **disposable** release-state copy, prints mechanical metadata only (sequence / event_id / projection SHA256 / payload SHA256 / field count), and never persists or tee's `resident_visible_payload` into a committed log. Historical commits `3796377`…`670c05b` are superseded leaked evidence and must never be read by any Resident.
-5. Approve / request changes. On approval, integration writes the receipt and moves `C15-RCC-RES-B-RELEASE-002` to READY.
+4. Confirm every `reveal` invocation is confined to a **disposable** release-state copy, prints mechanical metadata only (sequence / event_id / projection SHA256 / payload SHA256 / field count), and never persists or tee's `resident_visible_payload` into a committed log.
+5. Confirm Section 6 of `b_startup_procedure.md` is configuration-only (no `CURRENT_OCCURRED_AT`, no `turn`) and that the production turn lives in the per-cursor loop after reveal + receipt, then re-run the `CANONICAL_RUNBOOK_ORDER_PASS` regression. Historical commits `3796377`…`b57ed6b` are superseded leaked evidence and must never be read by any Resident.
+6. Approve / request changes. On approval, integration writes the receipt and moves `C15-RCC-RES-B-RELEASE-002` to READY.

@@ -111,17 +111,18 @@ MailboxBridge validates `event` exactly 8 fields + `sequence 14..22` + `phase B`
 - The one disposable reveal is **not** a Resident reveal: it runs on a copied release state under `/tmp` and is reduced to `DISPOSABLE_REVEAL seq=… event_id=… projection_sha256=… payload_sha256=… field_count=…` in the committed log.
 - Environment manifest frozen; `PYTHONPATH=/repo/src`, `contract_sha256`, `b_session`, `AIOS_MAILBOX_ROOT` pinned.
 
-## CORRECTIVE-009 fresh run record
+## CORRECTIVE-010 fresh run record
 
 | Item | Value |
 | --- | --- |
 | probe | `isolation/probe_e2e.sh` (run from the repo root under `sudo`) |
-| raw log | `/tmp/probe_run23.log` → copied to `isolation/e2e_probe_output.txt` |
-| raw log SHA-256 | `a80b9c83e40fb620a2283c7a02c113437ebe17368005bdc4d43237d641ba3250` |
-| e2e_probe_output.txt SHA-256 | `96b4868e83e30a975f0b218428ed0178698d0994ce04f2cee8fa1be9c0777713` |
-| probe_output.txt SHA-256 | `1cd3aa7a7ce5d12035a6860ab8de78c2b5a1964cfa91b2a25e38897856693b25` |
-| result | `ALL_CHECKS=139/139 FAILURES=0` |
-| marker | `CORRECTIVE_009_E2E_PASS` |
+| raw log | `/tmp/probe_c10_run8.log` -> copied to `isolation/e2e_probe_output.txt` |
+| raw log SHA-256 | `3d0308b6c19bdc2d502f37aca025e586238d61f7e848d817258ecf296147ffc2` |
+| e2e_probe_output.txt SHA-256 | `1e10d5392efc3c397061850462a2fb8861610fbdd3fe27984df8e13e14254760` |
+| probe_output.txt SHA-256 | `a1566ada961426eac1c451a107bd11e213fd8a77482bae5fd6172c77af466ff1` |
+| result | `ALL_CHECKS=140/140 FAILURES=0` |
+| marker | `CORRECTIVE_010_E2E_PASS` |
+| new regression marker | `CANONICAL_RUNBOOK_ORDER_PASS` |
 
 `isolation/probe_output.txt` is regenerated from a fresh in-sandbox run of
 `isolation/probe_isolation.sh` via `harness/resident_jail.py` (`ISOLATION_PASS`, 58 PASS / 0 FAIL).

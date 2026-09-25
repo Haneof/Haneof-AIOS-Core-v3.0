@@ -6,7 +6,9 @@ No architecture expansion: the frozen sandbox, mailbox binding and transport des
 Failed candidate `670c05b11fd3837c5c190baaf1f81d5464f57438` is preserved in history (no force-push,
 no rebase, no squash) and is explicitly **superseded leaked evidence** — see the last section.
 
-Success marker: **`CORRECTIVE_009_E2E_PASS`** with `EXPECTED_CHECKS=139` and `FAILURES=0`.
+Superseded by CORRECTIVE-010 (which closed the last BLK-03 ordering blocker). The CORRECTIVE-009
+gate marker and check count are retired and are asserted absent from the current tree by the
+probe's stale-text greps.
 
 ---
 
@@ -128,8 +130,8 @@ Success marker: **`CORRECTIVE_009_E2E_PASS`** with `EXPECTED_CHECKS=139` and `FA
 | Probe | `reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/isolation/probe_e2e.sh` |
 | Fresh raw log | `/tmp/probe_run18.log` (copied to `isolation/e2e_probe_output.txt`) |
 | Raw log SHA-256 | recorded in `operator_manifest.md` (recomputed at every run, not trusted) |
-| Result | `ALL_CHECKS=139/139 FAILURES=0` |
-| Marker | `CORRECTIVE_009_E2E_PASS` |
+| Result | `FAILURES=0` |
+| Marker | retired — superseded by `CORRECTIVE_010_E2E_PASS` |
 
 ## Superseded leaked evidence — mandatory notice to future Residents
 

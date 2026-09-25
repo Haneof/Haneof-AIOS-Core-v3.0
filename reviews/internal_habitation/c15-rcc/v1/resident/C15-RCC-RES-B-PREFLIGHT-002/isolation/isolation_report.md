@@ -1,4 +1,4 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Isolation Report (CORRECTIVE-009: hardened + binding + genuine + production + inherited-FD closure)
+# C15-RCC-RES-B-PREFLIGHT-002 — Isolation Report (CORRECTIVE-010: hardened + binding + genuine + production + inherited-FD closure + canonical runbook order)
 
 Isolation mechanism: **OS-enforced mount + PID + network namespaces, bind+remount RO (ro,nosuid,nodev), host bind-mounted mailbox IPC, minimal /dev (tmpfs + 4 nodes), chroot, privdrop to nobody (fail-closed), no sysfs**. NOT prompt-only.
 
@@ -122,3 +122,20 @@ surfaced as its own `evidence_persistence_failure` class rather than masking the
 `cd`s to the repo root; no absolute path is hardcoded anywhere in the executable path. `resident_jail.py`
 and `bridged_model_handler.py` resolve their repository root mechanically from `__file__` (unique
 ancestor containing `src/aios_core`), with a symlink-escape guard and **no** absolute fallback.
+
+## Canonical runbook order (CORRECTIVE-010 / BLK-03)
+
+Section 6 of `procedure/b_startup_procedure.md` is **configuration only**: it exports B session,
+provider endpoint/key/adapter, contract/wire/adapter hashes, the four canonical paths and
+`PYTHONPATH`, then asserts that `current-event.json`, `current-event-binding.json` and a non-null
+`pending_reveal` are all absent. It contains no `CURRENT_OCCURRED_AT` derivation and no model `turn`.
+
+Section 7 carries the production turn as numbered steps 7.1–7.12 in the only legal order
+(reveal → current-event.json → event-XXX.projection.json →
+current-event-binding.json → verify binding → derive `CURRENT_OCCURRED_AT` → ingest →
+headless turn / due / model rounds → finish model work → durable ACK → clear → reveal
+next), with the exact receipt-creation command written inline at step 7.4.
+
+`CANONICAL_RUNBOOK_ORDER_PASS` executes that order on a disposable Phase-B copy and reaches the
+provider transport boundary through `ExternalBrokerClient` + `FakeBrokerServer`; the pre-reveal STOP
+is proven through the real production handler (0 provider invocations, poisoned, durable receipt).
