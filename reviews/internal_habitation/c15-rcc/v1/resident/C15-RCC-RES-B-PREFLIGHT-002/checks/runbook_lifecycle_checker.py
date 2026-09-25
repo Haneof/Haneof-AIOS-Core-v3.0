@@ -5,12 +5,13 @@ Production entrypoint and every mutation self-test call check_runbook_lifecycle(
 The self-test writes disposable copies and invokes that same function; it does not
 reimplement the comparison.
 
-CORRECTIVE-013 / IA-BLK-003: a generic substring such as ".projection.json" and a
-document-wide first occurrence are not executable proof. Each lifecycle step is
-sliced from its own heading. Only explicit bash/sh/shell fences contribute shell
-commands; other fence languages and heredoc payloads do not. Required production
-operations have one unique owner-step occurrence, while Python heredoc call sites
-are inspected separately from shell commands.
+CORRECTIVE-014 / IA-BLK-004 retains the CORRECTIVE-013 shell-fence/heredoc rules
+and closes shell-dispatch wrapper false greens. Required lifecycle operations are
+recognized by their canonical executable signature even when a shell prefix such
+as "command", "exec", "env", or a control construct precedes that signature.
+Cardinality therefore counts embedded canonical operations, not only commands
+whose first token is the lifecycle executable. Python heredoc call sites remain
+inspected separately from shell commands.
 """
 from __future__ import annotations
 
@@ -270,15 +271,18 @@ def _bash_commands_in(text: str) -> list[str]:
 
 
 def _is_reveal_command(command: str) -> bool:
-    return command.startswith(REVEAL_CMD_PREFIX)
+    # Count the canonical executable signature anywhere in an active shell
+    # command. This intentionally catches wrappers such as "command", "exec",
+    # "env", and shell control prefixes instead of treating them as distinct.
+    return REVEAL_CMD_PREFIX in command
 
 
 def _is_ack_command(command: str) -> bool:
-    return command.startswith(ACK_CMD_PREFIX)
+    return ACK_CMD_PREFIX in command
 
 
 def _is_production_turn_command(command: str) -> bool:
-    return command.startswith("python3 -m aios_core.headless.cli ") and bool(
+    return "python3 -m aios_core.headless.cli " in command and bool(
         _PRODUCTION_TURN_RE.search(command)
     )
 
@@ -507,23 +511,26 @@ def assert_step_executable_contracts(name: str, text: str) -> None:
     )
     _require_exactly_one(
         name, "INSTALL_CURRENT_EVENT", by_token,
-        lambda c: c == INSTALL_CURRENT_EVENT_CMD,
+        lambda c: INSTALL_CURRENT_EVENT_CMD in c,
         INSTALL_CURRENT_EVENT_CMD,
+        lambda c: c.count(INSTALL_CURRENT_EVENT_CMD),
     )
     _require_exactly_one(
         name, "PERSIST_PROJECTION_EVIDENCE", by_token,
-        lambda c: c == PERSIST_INSTALL_CMD,
+        lambda c: PERSIST_INSTALL_CMD in c,
         "install current-event.json -> evidence/event-%03d.projection.json",
+        lambda c: c.count(PERSIST_INSTALL_CMD),
     )
     _require_exactly_one(
         name, "PERSIST_PROJECTION_EVIDENCE", by_token,
-        lambda c: c == PERSIST_SHA256_CMD,
+        lambda c: PERSIST_SHA256_CMD in c,
         "sha256sum of that projection artifact appended to projection_digests.sha256",
+        lambda c: c.count(PERSIST_SHA256_CMD),
     )
     _require_shell_command_order(
         name, "PERSIST_PROJECTION_EVIDENCE", by_token["PERSIST_PROJECTION_EVIDENCE"],
-        lambda c: c == PERSIST_INSTALL_CMD,
-        lambda c: c == PERSIST_SHA256_CMD,
+        lambda c: PERSIST_INSTALL_CMD in c,
+        lambda c: PERSIST_SHA256_CMD in c,
         "projection install then digest append",
     )
     _require_exactly_one_python_call(
@@ -576,8 +583,9 @@ def assert_step_executable_contracts(name: str, text: str) -> None:
     )
     _require_exactly_one(
         name, "CLEAR_BINDING", by_token,
-        lambda c: c == CLEAR_BINDING_CMD,
+        lambda c: CLEAR_BINDING_CMD in c,
         CLEAR_BINDING_CMD,
+        lambda c: c.count(CLEAR_BINDING_CMD),
     )
 
     # Owner-step checks above are not enough if a second active copy is placed
@@ -588,20 +596,20 @@ def assert_step_executable_contracts(name: str, text: str) -> None:
         (_is_reveal_command,
          REVEAL_CMD_PREFIX,
          lambda c: c.count(REVEAL_CMD_PREFIX)),
-        (lambda c: c == INSTALL_CURRENT_EVENT_CMD,
-         INSTALL_CURRENT_EVENT_CMD, None),
-        (lambda c: c == PERSIST_INSTALL_CMD,
-         "projection persist install", None),
-        (lambda c: c == PERSIST_SHA256_CMD,
-         "projection digest append", None),
+        (lambda c: INSTALL_CURRENT_EVENT_CMD in c,
+         INSTALL_CURRENT_EVENT_CMD, lambda c: c.count(INSTALL_CURRENT_EVENT_CMD)),
+        (lambda c: PERSIST_INSTALL_CMD in c,
+         "projection persist install", lambda c: c.count(PERSIST_INSTALL_CMD)),
+        (lambda c: PERSIST_SHA256_CMD in c,
+         "projection digest append", lambda c: c.count(PERSIST_SHA256_CMD)),
         (_is_production_turn_command,
          "production headless turn --session",
          lambda c: len(list(_PRODUCTION_TURN_RE.finditer(c)))),
         (_is_ack_command,
          ACK_CMD_PREFIX,
          lambda c: c.count(ACK_CMD_PREFIX)),
-        (lambda c: c == CLEAR_BINDING_CMD,
-         CLEAR_BINDING_CMD, None),
+        (lambda c: CLEAR_BINDING_CMD in c,
+         CLEAR_BINDING_CMD, lambda c: c.count(CLEAR_BINDING_CMD)),
     ):
         _require_document_shell_occurrence(
             name, all_commands, predicate, detail, occurrence_count,
@@ -848,6 +856,29 @@ def run_shell_semantics_mutation_tests(base: Path) -> int:
                 stage = root / f"F-{prefix}-duplicate-{label}"
                 _stage(base, stage, {doc_rel: mutated})
                 _expect_red(f"IA-BLK-003-F:duplicate_{label}:{doc_rel.name}", stage)
+                cases += 1
+
+            # IA-BLK-004: a shell dispatch prefix does not make a second
+            # lifecycle operation semantically different. The production gate
+            # must count the wrapped canonical signature and reject it.
+            for owner, predicate, label in duplicate_shell_specs:
+                body = _step_bodies(f"wrapper-mutation:{owner}", original)[owner]
+                commands = _bash_commands_in(body)
+                matches = [command for command in commands if predicate(command)]
+                if len(matches) != 1:
+                    raise AssertionError(
+                        f"{label}: expected one canonical source command for wrapper mutation, "
+                        f"found {matches!r}"
+                    )
+                wrapped = _insert_fence_in_step(
+                    original, owner, "command " + matches[0], "bash",
+                )
+                stage = root / f"G-{prefix}-command-wrapper-{label}"
+                _stage(base, stage, {doc_rel: wrapped})
+                _expect_red(
+                    f"IA-BLK-004-G:command_wrapper_duplicate_{label}:{doc_rel.name}",
+                    stage,
+                )
                 cases += 1
 
             receipt_line = 'write_binding_receipt(receipt, os.environ["AIOS_CURRENT_EVENT_BINDING_PATH"])'
