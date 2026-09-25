@@ -1,8 +1,8 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Per-Cursor Interaction Procedure (CORRECTIVE-004 Scheme A-hard-stop)
+# C15-RCC-RES-B-PREFLIGHT-002 — Per-Cursor Interaction Procedure (CORRECTIVE-005 Scheme A-hard-stop (`_poisoned` + durable `$RUN_ROOT/evidence/failure-*.json`))
 
-This is the exact per-cursor loop that B will run under the frozen `ProductionResidentHandler` + `RealProviderClient` + `resident_wire_protocol.json` (`5067701b…`).
+This is the exact per-cursor loop that B will run under the frozen `ProductionResidentHandler` + `ExternalBrokerClient` + `resident_wire_protocol.json` (`a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a…`).
 
-Scheme A-hard-stop — any provider transport, non-JSON, schema, binding failure → fail current runtime, do not advance cursor, save failure evidence, terminate/reconstruct handler, re-enter from same durable sequence/state with new binding, never generate semantic repair hint. No same-handler retry.
+Scheme A-hard-stop (`_poisoned` + durable `$RUN_ROOT/evidence/failure-*.json`) — any provider transport, non-JSON, schema, binding failure → fail current runtime, do not advance cursor, save failure evidence, terminate/reconstruct handler, re-enter from same durable sequence/state with new binding, never generate semantic repair hint. No same-handler retry.
 
 ## Invariants
 
@@ -10,8 +10,39 @@ Scheme A-hard-stop — any provider transport, non-JSON, schema, binding failure
 - Each iteration reveals **only** current 8-field projection to Resident. Future cursors, Phase C, fixture, evaluator, governance, A transcript remain sealed.
 - Resident model sees exactly `contract + envelope JSON + wire_protocol schema` (no file path).
 - Non-conversation cursors still go through same envelope→provider→validate chain (mechanical wake).
-- `PYTHONPATH` frozen `src:reviews/.../harness`, `AIOS_PROVIDER_ADAPTER=bridged_model_handler:RealProviderClient`, exact env pinned; mismatch → STOP.
+- `PYTHONPATH` frozen `src:reviews/.../harness`, `AIOS_PROVIDER_ADAPTER=bridged_model_handler:ExternalBrokerClient`, exact env pinned; mismatch → STOP.
 - Each cursor's `current_event` bound to **exact** release cursor (session, sequence, event_id, payload digest, pending state).
+
+
+### Binding receipt (operator side, immutable)
+
+Immediately after `release_operator reveal` (capturing exact stdout bytes), operator creates immutable binding receipt:
+
+```bash
+# Capture exact reveal stdout (8-field projection)
+python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --state $RUN_ROOT/runtime/release_state.json --sequence $SEQ > $RUN_ROOT/reveal.json
+
+# Compute canonical SHA and create receipt via harness helper
+python3 -c "
+from pathlib import Path
+import json, sys
+sys.path.insert(0, 'reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness')
+from bridged_model_handler import create_current_event_binding_receipt, write_binding_receipt
+proj = json.loads(Path('$RUN_ROOT/reveal.json').read_bytes())
+receipt = create_current_event_binding_receipt(proj, b_session_id='$B_SESSION', release_state_path='$RUN_ROOT/runtime/release_state.json')
+write_binding_receipt(receipt, '$RUN_ROOT/binding/current-event-binding.json')
+"
+
+# Also copy reveal to current-event.json for handler
+cp $RUN_ROOT/reveal.json $RUN_ROOT/current-event.json
+chmod 0400 $RUN_ROOT/binding/current-event-binding.json
+chmod 0400 $RUN_ROOT/current-event.json
+```
+
+Receipt contains: `phase B`, `b_session_id`, `sequence`, `event_id`, `occurred_at`, `source_kind/class/modality/dimension`, `canonical_projection_sha256`, `resident_visible_payload_sha256`, `release_state_path/sha/next_sequence/pending`, `fixture_sha256`, `reveal_timestamp`, `operator_request_id`, `binding_version`.
+
+Handler validates `current-event.json` against `current-event-binding.json` + `release_state` on every call; mismatches fail closed (11 negatives: seq15, wrong id, modified text/dimension/source_kind/modality/occurred_at, wrong session, stale after ACK, missing/malformed receipt).
+
 
 ## Per-cursor lifecycle (operator side, outside jail)
 
@@ -62,18 +93,18 @@ No other cursor read; no future `seq+1` buffered.
 
 ```
 request = build_model_request(contract_text,envelope,wire_protocol_text)
-        = {system: <RESIDENT_B_RUN_CONTRACT.md>, wire_protocol: <resident_wire_protocol.json>, wire_protocol_sha256: 5067701b…, messages: [{role:user, content: JSON(envelope)}]}
-provider_resp = RealProviderClient.invoke(request)  # requires AIOS_REAL_PROVIDER_API_KEY+ENDPOINT, adapter pinned, Fake forbidden
+        = {system: <RESIDENT_B_RUN_CONTRACT.md>, wire_protocol: <resident_wire_protocol.json>, wire_protocol_sha256: a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a…, messages: [{role:user, content: JSON(envelope)}]}
+provider_resp = ExternalBrokerClient.invoke(request)  # requires AIOS_REAL_PROVIDER_API_KEY+ENDPOINT, adapter pinned, Fake forbidden
 content = provider_resp.content  # JSON string/dict of reply with round/request_id/request_digest/action
 reply = JSON.parse(content)
 ```
 
-Provider sees `contract+envelope+wire_protocol` (proven via `RealProviderClient.last_request` contains all three, no `/repo/fixture`).
+Provider sees `contract+envelope+wire_protocol` (proven via `ExternalBrokerClient.last_request` contains all three, no `/repo/fixture`).
 
-### 4. Validate reply (fail closed, Scheme A-hard-stop)
+### 4. Validate reply (fail closed, Scheme A-hard-stop (`_poisoned` + durable `$RUN_ROOT/evidence/failure-*.json`))
 
 ```
-validate_reply(reply)  # strict per-action allowlist
+validate_reply(reply)  # capability string only, handler checks `capability in snapshot.capability_catalog`  # strict per-action allowlist
 verify_binding(reply)  # round/id/digest == outstanding; stale/preplay/replay/wrong fail
 ```
 

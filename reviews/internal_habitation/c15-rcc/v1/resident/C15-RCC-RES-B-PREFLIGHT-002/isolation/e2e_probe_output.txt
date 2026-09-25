@@ -1,4 +1,4 @@
-[e2e] run_root = /tmp/b-preflight-e2e-3292
+[e2e] run_root = /tmp/b-preflight-e2e-5930
 world.sqlite: OK
 index.sqlite: OK
 release_state.json: OK
@@ -9,7 +9,7 @@ py_ver=Python 3.11.2
 CHECK 1 PASS: exact Python 3.11.2
 pydantic=2.13.5
 CHECK 2 PASS: exact pydantic 2.13.5
-wire_sha=5067701b003f99c141ecef1874ae8195ea2faf1ef5caa87cae092b57cad38b38
+wire_sha=a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a
 CHECK 3 PASS: wire protocol hash 5067701b…
 contract_sha=28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef
 CHECK 4 PASS: contract present
@@ -144,8 +144,8 @@ NORMAL_BINDING_PASS
 [test-responder] starting mode=normal rounds=2 uid=65534 pid=3 inbox=/work/inbox outbox=/work/outbox
 [test-responder] pid=3 proc1_comm=sandbox-init
 [test-responder] PASS PID1 is sandbox-init
-[test-responder] round 1 received request_id=bf75ac1a... digest=04e89999...
-[test-responder] round 2 received request_id=399e713e... digest=d2a363a3...
+[test-responder] round 1 received request_id=4c87f828... digest=d1154c60...
+[test-responder] round 2 received request_id=6e1212fb... digest=2f5e8722...
 [test-responder] OK mode=normal rounds=2 pid=3
 
 STALE_REJECTED_PASS
@@ -168,12 +168,14 @@ found fixture=True
 SYNTHETIC_GENUINE_PASS
 CHECK 20 PASS: synthetic genuine 2-round Atlas non-empty
 CHECK 21 PASS: current_event seq14 wiring
-[e2e] step 4b: production genuine via RealProviderClient (mock)
+[e2e] step 4b: production genuine via ExternalBrokerClient + FakeBrokerServer (transport)
+FakeBrokerServer at http://127.0.0.1:38595/v1/chat
 prod invocations=2 history=1
-last_provider=real-provider usage={'total_tokens': 42, 'input_tokens': 20, 'output_tokens': 22}
+last_provider=fake-broker usage={'total_tokens': 42, 'input_tokens': 20, 'output_tokens': 22}
 PRODUCTION_GENUINE_PASS
+PRODUCTION_TRANSPORT_PASS
 UNKNOWN_PROVENANCE_PASS
-CHECK 22 PASS: production genuine via RealProviderClient (mock) REAL provenance
+CHECK 22 PASS: production genuine via ExternalBrokerClient (mock) REAL provenance
 CHECK 23 PASS: UNKNOWN handling
 [e2e] step 5: current-event / envelope negatives (6)
 PASS seq13
@@ -210,27 +212,27 @@ CHECK 33 PASS: privdrop dual
 [e2e] step 9: signal deterministic PID1 forwarding
 [signal] pid log:
 {
-  "outer_wrapper_host_pid": 3625,
-  "outer_wrapper_ns_pid": 3625,
-  "outer_wrapper_ppid": 3623,
-  "outer_wrapper_cmd": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/resident_jail.py --repo /home/user/Haneof-AIOS-Core-v3.0 --sandbox /tmp/b-sleep-test-3292 --world /tmp/b-preflight-e2e-3292/runtime/world.sqlite --index /tmp/b-preflight-e2e-3292/runtime/index.sqlite --state /tmp/b-preflight-e2e-3292/runtime/release_state.json --lock /tmp/b-preflight-e2e-3292/runtime/world.writer.lock --mailbox-root /tmp/b-sleep-mb-3292 --inject-dir /tmp/b-preflight-e2e-3292/inject -- /bin/sleep 30",
-  "unsharer_host_pid": 3626,
-  "unsharer_ns_pid": 3626,
-  "unsharer_ppid": 3625,
-  "pid1_host_pid": 3630,
+  "outer_wrapper_host_pid": 6264,
+  "outer_wrapper_ns_pid": 6264,
+  "outer_wrapper_ppid": 6262,
+  "outer_wrapper_cmd": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/resident_jail.py --repo /home/user/Haneof-AIOS-Core-v3.0 --sandbox /tmp/b-sleep-test-5930 --world /tmp/b-preflight-e2e-5930/runtime/world.sqlite --index /tmp/b-preflight-e2e-5930/runtime/index.sqlite --state /tmp/b-preflight-e2e-5930/runtime/release_state.json --lock /tmp/b-preflight-e2e-5930/runtime/world.writer.lock --mailbox-root /tmp/b-sleep-mb-5930 --inject-dir /tmp/b-preflight-e2e-5930/inject -- /bin/sleep 30",
+  "unsharer_host_pid": 6265,
+  "unsharer_ns_pid": 6265,
+  "unsharer_ppid": 6264,
+  "pid1_host_pid": 6269,
   "pid1_ns_pid": 1,
   "pid1_ns_pid_actual": 1,
-  "pid1_host_pid_ns_view": 3630,
+  "pid1_host_pid_ns_view": 6269,
   "pid1_comm": "sandbox-init",
   "worker_fork_return_pid": 3,
   "worker_ns_pid_expected": 2,
-  "worker_host_pid": 3632,
+  "worker_host_pid": 6271,
   "worker_ns_pid_actual": 3,
   "worker_ns_ppid": 1,
   "worker_ppid_host": 1
-}outer=3625 unsharer=3626 pid1_host=3630 worker_host=3632 worker_ns=3
+}outer=6264 unsharer=6265 pid1_host=6269 worker_host=6271 worker_ns=3
 CHECK 34 PASS: PID map outer/unsharer/PID1/worker captured (host pids valid, distinct)
-[signal] sending TERM to PID1 host 3630 (jail PID1)
+[signal] sending TERM to PID1 host 6269 (jail PID1)
 [signal] jail exit code 143
 CHECK 35 PASS: signal TERM forwarded PID1->worker exit 143
 CHECK 36 PASS: worker reaped no zombie
@@ -238,11 +240,11 @@ CHECK 37 PASS: PID1 reaped
 [e2e] step 10: env allowlist
 CHECK 38 PASS: env without allow PROBE not leaked
 CHECK 39 PASS: env with allow PROBE explicitly allowed
-[e2e] step 11: RealProviderClient fail closed
+[e2e] step 11: ExternalBrokerClient fail closed
 PASS real provider fail closed: real provider not configured: AIOS_REAL_PROVIDER_API_KEY and AIOS_REAL_PROVIDER_ENDPOINT must be set (no fake fallback)
-CHECK 40 PASS: RealProviderClient without config fail closed
+CHECK 40 PASS: ExternalBrokerClient without config fail closed
 [e2e] step 12: Fake via production entrypoint fail
-PASS fake via prod blocked: FakeProviderClient not allowed from production entrypoint (adapter='bridged_model_handler:FakeProviderClient')
+PASS fake via prod blocked: unapproved provider adapter 'bridged_model_handler:FakeProviderClient', expected 'bridged_model_handler:ExternalBrokerClient' (ModelDispatchNotSubmitted/STOP)
 CHECK 41 PASS: FakeProviderClient via production entrypoint blocked
 [e2e] step 13: exact documented headless import
 usage: aios-core-headless [-h] [--world WORLD] [--index INDEX] [--lock LOCK]
@@ -251,8 +253,10 @@ usage: aios-core-headless [-h] [--world WORLD] [--index INDEX] [--lock LOCK]
                           [--dimension-summary-handler DIMENSION_SUMMARY_HANDLER]
                           {status,recovery-status,rebuild-index,backup,restore,turn,ingest,due,inspect-turn}
 CHECK 42 PASS: headless CLI importable via documented PYTHONPATH
+binding receipt 9cba565c8bc5
+FakeBroker endpoint http://127.0.0.1:8765/v1/chat
 {"assistant_observation_id": "obs_conv_ai_3ccc3b4bf7dbf6f1c8b48600", "idempotent_replay": false, "model_rounds": 2, "response": null, "silenced": true, "status": "turn_completed", "summary_commits": 0, "summary_error": null, "termination_reason": "silence", "user_observation_id": "obs_conv_user_acea1101b6148d1f87c5e8a9", "world_revision": 100}
-CHECK 43 PASS: headless CLI turn with RealProviderClient succeeded
+CHECK 43 PASS: headless CLI turn with ExternalBrokerClient succeeded
 provider provenance not in log but ok
 [e2e] step 14: hash mismatch
 PASS contract hash mismatch fail closed: contract SHA mismatch
@@ -260,15 +264,15 @@ CHECK 44 PASS: contract hash mismatch fail closed
 PASS wire protocol hash mismatch: wire protocol hash mismatch
 CHECK 45 PASS: wire protocol hash mismatch fail closed
 [e2e] step 15: current-event binding adversarial
-PASS seq15 rejected: current_event.sequence 15 != release_state next_sequence 14 (future/stale event)
-PASS wrong event_id rejected: current_event event_id 'wrong-id-xyz' != file event_id 'synthetic-fixture-seq-14' (stale)
-PASS modified payload rejected: current_event payload digest != file payload digest (modified)
+PASS seq15 rejected: binding receipt missing at /tmp/binding/current-event-binding.json (must exist)
+PASS wrong event_id rejected: binding receipt missing at /tmp/binding/current-event-binding.json (must exist)
+PASS modified payload rejected: binding receipt missing at /tmp/binding/current-event-binding.json (must exist)
 BINDING_ADVERSARIAL_PASS
 CHECK 46 PASS: binding seq15 when expected 14 rejected
 CHECK 47 PASS: binding wrong event_id rejected
 CHECK 48 PASS: binding modified payload rejected
 [e2e] step 15b: stale/malformed/missing
-PASS stale rejected: current_event.sequence 14 != release_state next_sequence 15 (future/stale event)
+PASS stale rejected: binding receipt missing at /tmp/binding/current-event-binding.json (must exist)
 PASS malformed file rejected: current-event file malformed JSON: Expecting value: line 1 column 1 (char 0)
 _load returned None for missing file (should be None)
 PASS missing file detected as None (will be checked in handler)
@@ -277,14 +281,14 @@ CHECK 49 PASS: stale after ACK rejected
 CHECK 50 PASS: malformed current-event file rejected
 CHECK 51 PASS: missing current-event file detected
 [e2e] step 16: production failure retry Scheme A
-first call failed as expected: provider invoke failed: simulated provider transport failure
+first call failed as expected: current-event binding failed: binding receipt missing at /tmp/binding/current-event-binding.json (must exist)
 PASS outstanding cleared after failure
 PASS cursor not advanced
-old handler round 1, new handler round 0
+old handler round 0, new handler round 0
 PASS new handler can be reconstructed with new binding
-PASS non-JSON fail closed: provider content not JSON: Expecting value: line 1 column 1 (char 0)
+PASS non-JSON fail closed: current-event binding failed: binding receipt missing at /tmp/binding/current-event-binding.json (must exist)
 PASS outstanding cleared after non-JSON
-PASS wrong binding fail closed: reply binding failed: reply round 999 != outstanding 1
+PASS wrong binding fail closed: current-event binding failed: binding receipt missing at /tmp/binding/current-event-binding.json (must exist)
 PASS outstanding cleared after wrong binding
 SCHEME_A_PASS
 CHECK 52 PASS: provider exception Scheme A clear outstanding cursor not advanced new binding
@@ -303,6 +307,12 @@ CHECK 57 PASS: wire protocol hash exact match
 CHECK 58 PASS: pydantic exact version
 
 ALL_CHECKS=58/58 FAILURES=0
-checking markers in probe logs
-CORRECTIVE_004_E2E_PASS
-[e2e] done 2026-09-25T06:03:38Z
+MARKER PASS: ISOLATION_PASS
+MARKER PASS: SYNTHETIC_GENUINE_PASS
+MARKER PASS: PRODUCTION_GENUINE_PASS
+MARKER PASS: PRODUCTION_TRANSPORT_PASS
+MARKER PASS: REAL_PROVIDER_NO_SEMANTIC_DEFAULT_PASS
+MARKER PASS: SIGNAL_FORWARD_PASS
+MARKER PASS: ENVIRONMENT_PASS
+CORRECTIVE_005_E2E_PASS
+[e2e] done 2026-09-25T06:32:01Z

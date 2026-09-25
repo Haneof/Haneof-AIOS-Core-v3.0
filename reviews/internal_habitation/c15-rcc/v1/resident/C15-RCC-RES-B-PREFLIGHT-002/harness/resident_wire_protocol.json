@@ -42,14 +42,7 @@
           "type": "object"
         },
         "capability": {
-          "enum": [
-            "search_world",
-            "read_world",
-            "list_world_subjects",
-            "search_memory",
-            "read_artifact",
-            "query_world_graph"
-          ],
+          "description": "Capability name; legal values are exactly those in RuntimeSnapshot.capability_catalog (mechanical string, no hard-coded subset)",
           "type": "string"
         }
       },
@@ -119,7 +112,7 @@
     "future_cursor",
     "governance_prompt"
   ],
-  "notes": "This schema is purely mechanical. It does not contain fixture hints, expected answers, evaluator semantics, or cursor future knowledge. Resident semantic decision ownership remains unchanged. Contract RESIDENT_B_RUN_CONTRACT.md remains the sole semantic instruction.",
+  "notes": "This schema is purely mechanical. Capability is a free-form string; the only legal names are those in the current RuntimeSnapshot.capability_catalog. No hard-coded capability subset is maintained here.",
   "protocol_name": "C15-RCC-RES-B Resident Wire Protocol",
-  "version": "1.0.0"
+  "version": "1.0.1"
 }
