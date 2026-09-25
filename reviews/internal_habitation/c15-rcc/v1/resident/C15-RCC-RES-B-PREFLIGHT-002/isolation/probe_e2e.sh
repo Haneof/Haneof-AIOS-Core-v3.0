@@ -1,6 +1,6 @@
 #!/bin/bash
-# C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-012 — Full E2E probe (operator side, exact gate).
-# Must be run as root (sudo). Closes the 8 independent-acceptance blockers (BLK-01..BLK-08).
+# C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-013 — Full E2E probe (operator side, exact gate).
+# Must be run as root (sudo). IA-BLK-003 only: enforce executable-shell lifecycle semantics.
 # EXPECTED_CHECKS exact, 0 FAIL, mandatory markers, else non-zero.
 #
 # CORRECTIVE-009 / BLK-02: this probe is fully portable. REPO_ROOT / B_PREP / HARNESS_DIR are
@@ -64,7 +64,8 @@ FAILURES=0
 pass_check() { CHECKS=$((CHECKS+1)); echo "CHECK $CHECKS PASS: $*"; }
 fail_check() { FAILURES=$((FAILURES+1)); echo "CHECK FAIL: $*"; }
 
-EXPECTED_CHECKS=157
+# Recomputed from the retained 157 checks plus the Corrective-013 shell-semantics gate.
+EXPECTED_CHECKS=158
 echo "[e2e] EXPECTED_CHECKS=$EXPECTED_CHECKS"
 
 # Step 0: exact environment (CORRECTIVE-005: freeze Python/Pydantic/wire/adapter/contract/freeze, not OS/kernel)
@@ -3198,7 +3199,12 @@ else
   fail_check "runbook executable mutation-red self-test"
   exit 1
 fi
-
+if grep -q "RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS" "$CURRENT_RUN_LOG"; then
+  pass_check "non-shell fences, heredoc payloads, and same-owner duplicates rejected by check_runbook_lifecycle"
+else
+  fail_check "runbook shell-semantics mutation-red self-test"
+  exit 1
+fi
 
 # Final gate: exact check count
 echo
@@ -3221,7 +3227,7 @@ for m in ISOLATION_PASS SYNTHETIC_GENUINE_PASS PRODUCTION_GENUINE_PASS PRODUCTIO
          FAILURE_RECEIPT_COLLISION_PASS INHERITED_FD_SEALED_PASS CONTRACT_PROVENANCE_PASS \
          RAW_USAGE_NO_SYNTHESIS_PASS CANONICAL_RUNBOOK_ORDER_PASS CANONICAL_PIN_CONSISTENCY_PASS \
          CANONICAL_PIN_MUTATION_RED_PASS RUNBOOK_CROSS_DOCUMENT_ORDER_PASS RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS \
-         RUNBOOK_EXECUTABLE_MUTATION_RED_PASS; do
+         RUNBOOK_EXECUTABLE_MUTATION_RED_PASS RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS; do
   if grep -q "$m" "$CURRENT_RUN_LOG" 2>/dev/null; then
     echo "MARKER PASS: $m in CURRENT_RUN_LOG"
   else
@@ -3244,4 +3250,5 @@ echo "CORRECTIVE_010_E2E_PASS"
 echo "CORRECTIVE_010_FIXUP_001_E2E_PASS"
 echo "CORRECTIVE_011_E2E_PASS"
 echo "CORRECTIVE_012_E2E_PASS"
+echo "CORRECTIVE_013_E2E_PASS"
 echo "[e2e] done $(date -u +%Y-%m-%dT%H:%M:%SZ)"

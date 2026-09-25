@@ -69,7 +69,7 @@ Copy the mailbox request/reply archive and due-work ledger into `$RUN_ROOT/evide
 
 ## 8. Per-cursor projection receipts
 
-`b_startup_procedure.md` §7.2 persists one immutable operator-side projection artifact per cursor
+`b_startup_procedure.md` §7.3 persists one immutable operator-side projection artifact per cursor
 (`install -m 0400` of the exact reveal projection bytes) into `$RUN_ROOT/evidence/`.
 
 Verify mechanically, and STOP if any assertion fails:

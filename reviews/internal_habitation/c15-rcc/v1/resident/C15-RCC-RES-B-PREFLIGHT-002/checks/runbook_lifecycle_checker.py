@@ -5,16 +5,17 @@ Production entrypoint and every mutation self-test call check_runbook_lifecycle(
 The self-test writes disposable copies and invokes that same function; it does not
 reimplement the comparison.
 
-CORRECTIVE-012 / IA-BLK-003: a generic substring such as ".projection.json" and a
+CORRECTIVE-013 / IA-BLK-003: a generic substring such as ".projection.json" and a
 document-wide first occurrence are not executable proof. Each lifecycle step is
-sliced from its own heading, and only executable commands inside that step body
-satisfy that step. Fenced bash/arrow sequences are parsed after comments, blank
-lines, and echo-only lines are removed, so a comment that mentions
-current-event.json cannot hide a later receipt-first install.
+sliced from its own heading. Only explicit bash/sh/shell fences contribute shell
+commands; other fence languages and heredoc payloads do not. Required production
+operations have one unique owner-step occurrence, while Python heredoc call sites
+are inspected separately from shell commands.
 """
 from __future__ import annotations
 
 import argparse
+import ast
 import re
 import shutil
 import tempfile
@@ -60,7 +61,18 @@ PERSIST_SHA256_CMD = (
 CLEAR_BINDING_CMD = (
     'rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"'
 )
-_FENCE_LANG = re.compile(r"^(?:bash|sh|shell)\s*$", re.I)
+RELEASE_OPERATOR_PATH = "reviews/internal_habitation/c15-rcc/v1/release/release_operator.py"
+REVEAL_CMD_PREFIX = f"python3 {RELEASE_OPERATOR_PATH} reveal --phase B"
+ACK_CMD_PREFIX = f"python3 {RELEASE_OPERATOR_PATH} ack --phase B"
+_PRODUCTION_TURN_RE = re.compile(
+    r"--model-handler\s+bridged_model_handler:headless_production_handler\s+turn\s+--session\b"
+)
+_SHELL_LANGUAGES = frozenset({"bash", "sh", "shell"})
+_FENCE_OPEN_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
+_HEREDOC_RE = re.compile(
+    r"(?<!<)<<(?!<)(-?)\s*(?:'([^']+)'|\"([^\"]+)\"|([A-Za-z_][A-Za-z0-9_]*))"
+)
+_PYTHON_STDIN_RE = re.compile(r"(?:^|\s)python(?:3(?:\.\d+)?)?\s+-\s*(?:<<|$)")
 _ASSIGN_PREFIX = re.compile(r"^(?:[A-Za-z_][A-Za-z0-9_]*=(?:\"[^\"]*\"|'[^']*'|\S+)\s+)+")
 
 
@@ -120,71 +132,155 @@ def _step_bodies(name: str, text: str) -> dict[str, str]:
     return {tok: text[start:end] for tok, start, end in spans}
 
 
-def _join_continuations(lines: list[str]) -> list[str]:
-    joined: list[str] = []
-    buf = ""
-    for line in lines:
-        if line.rstrip().endswith("\\"):
-            buf += line.rstrip()[:-1].strip() + " "
-            continue
-        buf += line.strip() if buf else line
-        joined.append(buf)
-        buf = ""
-    if buf:
-        joined.append(buf.strip())
-    return joined
-
-
 def _is_echo_only(line: str) -> bool:
-    body = line.strip()
-    body = _ASSIGN_PREFIX.sub("", body)
-    return body == "echo" or body.startswith("echo ")
-
-
-def _executable_bash_commands(fence_body: str) -> list[str]:
-    lines = fence_body.splitlines()
-    if lines and _FENCE_LANG.match(lines[0].strip()):
-        lines = lines[1:]
-    commands: list[str] = []
-    for line in _join_continuations(lines):
-        stripped = line.strip()
-        if not stripped or stripped.startswith("#"):
-            continue
-        if _is_echo_only(stripped):
-            continue
-        commands.append(stripped)
-    return commands
-
-
-def _arrow_segments(fence_body: str) -> list[str]:
-    segments: list[str] = []
-    for part in fence_body.split("→"):
-        stripped = part.strip().strip("`")
-        if not stripped or stripped.startswith("#"):
-            continue
-        stripped = re.sub(r"^(?:bash|sh|shell)\s*", "", stripped, count=1, flags=re.I).strip()
-        if not stripped or stripped.startswith("#"):
-            continue
-        segments.append(stripped)
-    return segments
+    """Drop only a simple echo command, never a compound line after echo."""
+    raw = line.strip()
+    if "$(" in raw or "`" in raw:
+        return False
+    body = _ASSIGN_PREFIX.sub("", raw)
+    if not re.match(r"^echo(?:\s|$)", body):
+        return False
+    # A semicolon/pipeline/redirection/control operator means this is not
+    # echo-only. Be conservative around quoted operators: retaining a harmless
+    # echo line is safer than hiding a following executable command.
+    return not re.search(r"&&|\|\||[;|<>]", body)
 
 
 def _iter_fences(text: str) -> list[tuple[str, str]]:
-    """Return (kind, body) for every fenced block. kind is 'arrow' or 'bash'."""
-    parts = text.split("```")
+    """Return only explicit bash/sh/shell fenced blocks as (language, body).
+
+    Untagged fences and fences tagged text/json/python/etc. are intentionally
+    invisible to the executable-command gate. The small Markdown scanner handles
+    backtick and tilde fences; it does not interpret prose or execute shell.
+    """
+    lines = text.splitlines()
     fences: list[tuple[str, str]] = []
-    for body in parts[1::2]:
-        kind = "arrow" if "→" in body else "bash"
-        fences.append((kind, body))
+    i = 0
+    while i < len(lines):
+        opening = _FENCE_OPEN_RE.match(lines[i])
+        if not opening:
+            i += 1
+            continue
+        marker = opening.group(1)
+        info = opening.group(2).strip()
+        # CommonMark does not permit a backtick in the info string of a backtick fence.
+        if marker.startswith("`") and "`" in info:
+            i += 1
+            continue
+        language = info.split(None, 1)[0].lower() if info else ""
+        close_re = re.compile(
+            rf"^ {{0,3}}{re.escape(marker[0])}{{{len(marker)},}}[ \t]*$"
+        )
+        body_lines: list[str] = []
+        i += 1
+        closed = False
+        while i < len(lines):
+            if close_re.match(lines[i]):
+                closed = True
+                i += 1
+                break
+            body_lines.append(lines[i])
+            i += 1
+        if not closed:
+            raise LifecycleCheckError("unterminated Markdown fenced block")
+        if language in _SHELL_LANGUAGES:
+            fences.append((language, "\n".join(body_lines)))
     return fences
 
 
-def _bash_commands_in(text: str) -> list[str]:
+def _parse_shell_fence(fence_body: str) -> tuple[list[str], list[str]]:
+    """Extract shell logical commands and Python-stdin heredoc payloads.
+
+    Here-document bodies are consumed by a delimiter state machine and are never
+    added to the shell command list. For the two documented Python heredocs, the
+    payload is returned separately so the checker can validate the specific
+    Python call anchors without misclassifying them as shell commands.
+    """
+    lines = fence_body.splitlines()
     commands: list[str] = []
-    for kind, body in _iter_fences(text):
-        if kind == "bash":
-            commands.extend(_executable_bash_commands(body))
-    return commands
+    python_payloads: list[str] = []
+    i = 0
+    while i < len(lines):
+        raw = lines[i]
+        stripped = raw.strip()
+        if not stripped or stripped.startswith("#"):
+            i += 1
+            continue
+
+        pieces: list[str] = []
+        current = raw
+        while True:
+            rstripped = current.rstrip()
+            if rstripped.endswith("\\"):
+                pieces.append(rstripped[:-1].strip())
+                i += 1
+                if i >= len(lines):
+                    current = ""
+                    break
+                current = lines[i]
+                continue
+            pieces.append(current.strip())
+            i += 1
+            break
+        command = " ".join(piece for piece in pieces if piece).strip()
+        if not command:
+            continue
+
+        heredoc_matches = list(_HEREDOC_RE.finditer(command))
+        is_python_stdin = bool(_PYTHON_STDIN_RE.search(command))
+        for heredoc in heredoc_matches:
+            strip_tabs = heredoc.group(1) == "-"
+            delimiter = next(group for group in heredoc.groups()[1:] if group is not None)
+            payload: list[str] = []
+            found_delimiter = False
+            while i < len(lines):
+                candidate = lines[i].lstrip("\t") if strip_tabs else lines[i]
+                if candidate == delimiter:
+                    i += 1
+                    found_delimiter = True
+                    break
+                payload.append(lines[i])
+                i += 1
+            if not found_delimiter:
+                raise LifecycleCheckError(
+                    f"unterminated here-document delimiter {delimiter!r}"
+                )
+            if is_python_stdin:
+                python_payloads.append("\n".join(payload))
+
+        if not _is_echo_only(command):
+            commands.append(command)
+    return commands, python_payloads
+
+
+def _shell_contents_in(text: str) -> tuple[list[str], list[str]]:
+    commands: list[str] = []
+    python_payloads: list[str] = []
+    for _language, body in _iter_fences(text):
+        fence_commands, fence_python = _parse_shell_fence(body)
+        commands.extend(fence_commands)
+        python_payloads.extend(fence_python)
+    return commands, python_payloads
+
+
+def _bash_commands_in(text: str) -> list[str]:
+    """Compatibility helper: executable shell commands only, never heredoc data."""
+    return _shell_contents_in(text)[0]
+
+
+
+def _is_reveal_command(command: str) -> bool:
+    return command.startswith(REVEAL_CMD_PREFIX)
+
+
+def _is_ack_command(command: str) -> bool:
+    return command.startswith(ACK_CMD_PREFIX)
+
+
+def _is_production_turn_command(command: str) -> bool:
+    return command.startswith("python3 -m aios_core.headless.cli ") and bool(
+        _PRODUCTION_TURN_RE.search(command)
+    )
 
 
 def _is_receipt_command(text: str) -> bool:
@@ -229,19 +325,16 @@ def _sequence_is_receipt_before_install(commands: list[str]) -> bool:
 
 
 def assert_no_receipt_before_current_event(name: str, text: str) -> None:
-    """Fail when one executable fence/chain installs current-event after receipt.
+    """Fail when one explicit shell fence creates a receipt before an install.
 
-    Comments, blank lines, and echo-only lines are not commands. A comment that
-    mentions current-event.json therefore cannot mask a later cp/install.
+    Only bash/sh/shell fences are executable sources. Here-document payload is
+    inert with respect to shell ordering and is excluded by _parse_shell_fence.
     """
-    for index, (kind, body) in enumerate(_iter_fences(text), 1):
-        if kind == "arrow":
-            commands = _arrow_segments(body)
-        else:
-            commands = _executable_bash_commands(body)
+    for index, (language, body) in enumerate(_iter_fences(text), 1):
+        commands, _python_payloads = _parse_shell_fence(body)
         if _sequence_is_receipt_before_install(commands):
             raise LifecycleCheckError(
-                f"{name}: executable {kind} fence #{index} creates the binding receipt "
+                f"{name}: executable {language} fence #{index} creates the binding receipt "
                 f"before installing current-event.json: {commands!r}"
             )
 
@@ -261,49 +354,198 @@ def _forbid_command(name: str, token: str, commands: list[str], predicate, detai
         )
 
 
+def _require_exactly_one(
+    name: str,
+    owner: str,
+    by_token: dict[str, list[str]],
+    predicate,
+    detail: str,
+    occurrence_count=None,
+) -> None:
+    matches: list[tuple[str, str]] = []
+    for token, commands in by_token.items():
+        for command in commands:
+            if not predicate(command):
+                continue
+            count = occurrence_count(command) if occurrence_count else 1
+            matches.extend((token, command) for _ in range(max(0, count)))
+    if len(matches) != 1 or matches[0][0] != owner:
+        found = [(token, command) for token, command in matches]
+        raise LifecycleCheckError(
+            f"{name}: executable contract {detail} must appear exactly once in {owner}; "
+            f"found={found!r}"
+        )
+
+
+def _require_document_shell_occurrence(
+    name: str,
+    commands: list[str],
+    predicate,
+    detail: str,
+    occurrence_count=None,
+) -> None:
+    matches: list[str] = []
+    for command in commands:
+        if predicate(command):
+            count = occurrence_count(command) if occurrence_count else 1
+            matches.extend(command for _ in range(max(0, count)))
+    if len(matches) != 1:
+        raise LifecycleCheckError(
+            f"{name}: document-wide executable contract {detail} must appear exactly once; "
+            f"found={matches!r}"
+        )
+
+
+def _python_call_positions(payload: str, function_name: str) -> list[tuple[int, int]]:
+    """Locate actual AST calls in Python stdin, excluding comments and strings."""
+    try:
+        tree = ast.parse(payload)
+    except SyntaxError as exc:
+        raise LifecycleCheckError(f"invalid Python heredoc while checking {function_name}: {exc}") from exc
+    return sorted(
+        (node.lineno, node.col_offset)
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == function_name
+    )
+
+
+def _python_call_count(payload: str, function_name: str) -> int:
+    return len(_python_call_positions(payload, function_name))
+
+
+def _require_document_python_call_once(
+    name: str,
+    payloads: list[str],
+    function_name: str,
+) -> None:
+    matches = [
+        payload
+        for payload in payloads
+        for _ in range(_python_call_count(payload, function_name))
+    ]
+    if len(matches) != 1:
+        raise LifecycleCheckError(
+            f"{name}: document-wide Python call {function_name}( must appear exactly once; "
+            f"found={len(matches)}"
+        )
+
+
+def _require_exactly_one_python_call(
+    name: str,
+    owner: str,
+    python_by_token: dict[str, list[str]],
+    function_name: str,
+) -> None:
+    matches: list[tuple[str, str]] = []
+    # These named operations are Python API calls in the documented Python-
+    # stdin payloads, not shell command names or arbitrary text.
+    for token, payloads in python_by_token.items():
+        for payload in payloads:
+            matches.extend((token, payload) for _ in range(_python_call_count(payload, function_name)))
+    if len(matches) != 1 or matches[0][0] != owner:
+        raise LifecycleCheckError(
+            f"{name}: Python call {function_name}( must appear exactly once in {owner}; "
+            f"found={[(token, source[:180]) for token, source in matches]!r}"
+        )
+
+
+def _require_shell_command_order(
+    name: str,
+    token: str,
+    commands: list[str],
+    first_predicate,
+    second_predicate,
+    detail: str,
+) -> None:
+    first = [i for i, command in enumerate(commands) if first_predicate(command)]
+    second = [i for i, command in enumerate(commands) if second_predicate(command)]
+    if len(first) != 1 or len(second) != 1 or first[0] >= second[0]:
+        raise LifecycleCheckError(
+            f"{name}: {detail} must occur once in order inside {token}; "
+            f"first={first!r} second={second!r}"
+        )
+
+
+def _require_python_call_order(
+    name: str,
+    owner: str,
+    python_by_token: dict[str, list[str]],
+    first_function: str,
+    second_function: str,
+) -> None:
+    locations: dict[str, list[tuple[int, int, int]]] = {
+        first_function: [], second_function: [],
+    }
+    for payload_index, payload in enumerate(python_by_token[owner]):
+        for function_name in locations:
+            locations[function_name].extend(
+                (payload_index, line, column)
+                for line, column in _python_call_positions(payload, function_name)
+            )
+    first = locations[first_function]
+    second = locations[second_function]
+    if len(first) != 1 or len(second) != 1 or first[0] >= second[0]:
+        raise LifecycleCheckError(
+            f"{name}: Python calls {first_function} then {second_function} must occur once "
+            f"in order in {owner}; first={first!r} second={second!r}"
+        )
+
+
 def assert_step_executable_contracts(name: str, text: str) -> None:
     bodies = _step_bodies(name, text)
-    by_token = {token: _bash_commands_in(body) for token, body in bodies.items()}
+    parsed = {token: _shell_contents_in(body) for token, body in bodies.items()}
+    by_token = {token: parts[0] for token, parts in parsed.items()}
+    python_by_token = {token: parts[1] for token, parts in parsed.items()}
 
-    _require_command(
-        name, "REVEAL", by_token["REVEAL"],
-        lambda c: "release_operator.py reveal --phase B" in c,
-        "release_operator.py reveal --phase B",
+    _require_exactly_one(
+        name, "REVEAL", by_token,
+        _is_reveal_command,
+        REVEAL_CMD_PREFIX,
+        lambda c: c.count(REVEAL_CMD_PREFIX),
     )
-    _require_command(
-        name, "INSTALL_CURRENT_EVENT", by_token["INSTALL_CURRENT_EVENT"],
+    _require_exactly_one(
+        name, "INSTALL_CURRENT_EVENT", by_token,
         lambda c: c == INSTALL_CURRENT_EVENT_CMD,
         INSTALL_CURRENT_EVENT_CMD,
     )
-    _require_command(
-        name, "PERSIST_PROJECTION_EVIDENCE", by_token["PERSIST_PROJECTION_EVIDENCE"],
+    _require_exactly_one(
+        name, "PERSIST_PROJECTION_EVIDENCE", by_token,
         lambda c: c == PERSIST_INSTALL_CMD,
         "install current-event.json -> evidence/event-%03d.projection.json",
     )
-    _require_command(
-        name, "PERSIST_PROJECTION_EVIDENCE", by_token["PERSIST_PROJECTION_EVIDENCE"],
+    _require_exactly_one(
+        name, "PERSIST_PROJECTION_EVIDENCE", by_token,
         lambda c: c == PERSIST_SHA256_CMD,
         "sha256sum of that projection artifact appended to projection_digests.sha256",
     )
-    _require_command(
-        name, "CREATE_BINDING_RECEIPT", by_token["CREATE_BINDING_RECEIPT"],
-        lambda c: "create_current_event_binding_receipt" in c,
+    _require_shell_command_order(
+        name, "PERSIST_PROJECTION_EVIDENCE", by_token["PERSIST_PROJECTION_EVIDENCE"],
+        lambda c: c == PERSIST_INSTALL_CMD,
+        lambda c: c == PERSIST_SHA256_CMD,
+        "projection install then digest append",
+    )
+    _require_exactly_one_python_call(
+        name, "CREATE_BINDING_RECEIPT", python_by_token,
         "create_current_event_binding_receipt",
     )
-    _require_command(
-        name, "CREATE_BINDING_RECEIPT", by_token["CREATE_BINDING_RECEIPT"],
-        lambda c: "write_binding_receipt" in c,
+    _require_exactly_one_python_call(
+        name, "CREATE_BINDING_RECEIPT", python_by_token,
         "write_binding_receipt",
+    )
+    _require_python_call_order(
+        name, "CREATE_BINDING_RECEIPT", python_by_token,
+        "create_current_event_binding_receipt", "write_binding_receipt",
     )
     _forbid_command(
         name, "CREATE_BINDING_RECEIPT", by_token["CREATE_BINDING_RECEIPT"],
         _is_event_install_command,
         "install/cp of current-event.json belongs in INSTALL_CURRENT_EVENT, not after receipt creation",
     )
-    _require_command(
-        name, "VERIFY_BINDING", by_token["VERIFY_BINDING"],
-        lambda c: "validate_current_event_binding(" in c,
-        "validate_current_event_binding(",
+    _require_exactly_one_python_call(
+        name, "VERIFY_BINDING", python_by_token,
+        "validate_current_event_binding",
     )
     _require_command(
         name, "DERIVE_OCCURRED_AT", by_token["DERIVE_OCCURRED_AT"],
@@ -320,47 +562,56 @@ def assert_step_executable_contracts(name: str, text: str) -> None:
         lambda c: "mechanical_ingest_adapter.py" in c,
         "mechanical_ingest_adapter.py",
     )
-    _require_command(
-        name, "MODEL_WORK", by_token["MODEL_WORK"],
-        lambda c: "turn --session" in c,
+    _require_exactly_one(
+        name, "MODEL_WORK", by_token,
+        _is_production_turn_command,
         "production headless turn --session",
+        lambda c: len(list(_PRODUCTION_TURN_RE.finditer(c))),
     )
-    _require_command(
-        name, "MODEL_WORK", by_token["MODEL_WORK"],
-        lambda c: "headless_production_handler" in c,
-        "headless_production_handler",
+    _require_exactly_one(
+        name, "DURABLE_ACK", by_token,
+        _is_ack_command,
+        ACK_CMD_PREFIX,
+        lambda c: c.count(ACK_CMD_PREFIX),
     )
-    _require_command(
-        name, "DURABLE_ACK", by_token["DURABLE_ACK"],
-        lambda c: "release_operator.py ack --phase B" in c,
-        "release_operator.py ack --phase B",
-    )
-    _require_command(
-        name, "CLEAR_BINDING", by_token["CLEAR_BINDING"],
+    _require_exactly_one(
+        name, "CLEAR_BINDING", by_token,
         lambda c: c == CLEAR_BINDING_CMD,
         CLEAR_BINDING_CMD,
     )
 
-    # A command that still exists somewhere in the document does not satisfy the
-    # step it was moved out of, and must not satisfy a different step either.
-    exclusive = (
-        ("INSTALL_CURRENT_EVENT", lambda c: c == INSTALL_CURRENT_EVENT_CMD, "install reveal.json -> current-event.json"),
-        ("PERSIST_PROJECTION_EVIDENCE", lambda c: c == PERSIST_INSTALL_CMD, "projection persist install"),
-        ("PERSIST_PROJECTION_EVIDENCE", lambda c: c == PERSIST_SHA256_CMD, "projection sha256sum"),
-        ("CREATE_BINDING_RECEIPT", lambda c: "write_binding_receipt" in c, "write_binding_receipt"),
-        ("CREATE_BINDING_RECEIPT", lambda c: "create_current_event_binding_receipt" in c, "create_current_event_binding_receipt"),
-        ("VERIFY_BINDING", lambda c: "validate_current_event_binding(" in c, "validate_current_event_binding("),
-        ("MODEL_WORK", lambda c: "turn --session" in c, "turn --session"),
-        ("DURABLE_ACK", lambda c: "ack --phase B" in c, "ack --phase B"),
-        ("CLEAR_BINDING", lambda c: c == CLEAR_BINDING_CMD, "rm current-event.json binding"),
-        ("REVEAL", lambda c: "reveal --phase B" in c, "reveal --phase B"),
-    )
-    for owner, predicate, label in exclusive:
-        found = [token for token, commands in by_token.items() if any(predicate(c) for c in commands)]
-        if found != [owner]:
-            raise LifecycleCheckError(
-                f"{name}: executable command {label} must appear only in {owner} step body, found in {found!r}"
-            )
+    # Owner-step checks above are not enough if a second active copy is placed
+    # outside the operational headings. Require one document-wide shell/Python
+    # occurrence as well, while the per-step checks enforce its unique owner.
+    all_commands, all_python_payloads = _shell_contents_in(text)
+    for predicate, detail, occurrence_count in (
+        (_is_reveal_command,
+         REVEAL_CMD_PREFIX,
+         lambda c: c.count(REVEAL_CMD_PREFIX)),
+        (lambda c: c == INSTALL_CURRENT_EVENT_CMD,
+         INSTALL_CURRENT_EVENT_CMD, None),
+        (lambda c: c == PERSIST_INSTALL_CMD,
+         "projection persist install", None),
+        (lambda c: c == PERSIST_SHA256_CMD,
+         "projection digest append", None),
+        (_is_production_turn_command,
+         "production headless turn --session",
+         lambda c: len(list(_PRODUCTION_TURN_RE.finditer(c)))),
+        (_is_ack_command,
+         ACK_CMD_PREFIX,
+         lambda c: c.count(ACK_CMD_PREFIX)),
+        (lambda c: c == CLEAR_BINDING_CMD,
+         CLEAR_BINDING_CMD, None),
+    ):
+        _require_document_shell_occurrence(
+            name, all_commands, predicate, detail, occurrence_count,
+        )
+    for function_name in (
+        "create_current_event_binding_receipt",
+        "write_binding_receipt",
+        "validate_current_event_binding",
+    ):
+        _require_document_python_call_once(name, all_python_payloads, function_name)
 
 
 def assert_finish_clause(name: str, text: str) -> None:
@@ -496,6 +747,156 @@ def _token_block(text: str) -> str:
     return text.split(START, 1)[1].split(END, 1)[0]
 
 
+def _insert_fence_in_step(text: str, token: str, body: str, language: str) -> str:
+    spans = {tok: (start, end) for tok, start, end in _step_spans(text)}
+    if token not in spans:
+        raise AssertionError(f"cannot find step {token} for mutation")
+    _start, end = spans[token]
+    block = f"\n```{language}\n{body.rstrip()}\n```\n"
+    return text[:end] + block + text[end:]
+
+
+def _duplicate_shell_command(text: str, token: str, predicate, label: str) -> str:
+    body = _step_bodies(f"mutation:{token}", text)[token]
+    commands = _bash_commands_in(body)
+    matches = [command for command in commands if predicate(command)]
+    if len(matches) != 1:
+        raise AssertionError(f"{label}: expected one source command, found {matches!r}")
+    return _insert_fence_in_step(text, token, matches[0], "bash")
+
+
+def run_shell_semantics_mutation_tests(base: Path) -> int:
+    """Run D/E/F and exact-once mutations through the production gate."""
+    check_runbook_lifecycle(base)
+    docs = read_docs(base)
+    persist_commands = [PERSIST_INSTALL_CMD, PERSIST_SHA256_CMD]
+    cases = 0
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        for doc_rel in DOC_RELS:
+            original = docs[doc_rel]
+            prefix = doc_rel.stem
+
+            # Mutation D: command-looking text in non-shell, Python, and untagged
+            # fences is not evidence of an executable shell command.
+            for label, language in (
+                ("non_shell_text_fence", "text"),
+                ("python_fence", "python"),
+                ("untagged_fence", ""),
+            ):
+                deleted = _drop_exact_lines(original, persist_commands)
+                body = "\n".join(persist_commands)
+                mutated = _insert_fence_in_step(deleted, "PERSIST_PROJECTION_EVIDENCE", body, language)
+                stage = root / f"D-{prefix}-{label}"
+                _stage(base, stage, {doc_rel: mutated})
+                _expect_red(f"IA-BLK-003-D:{label}:{doc_rel.name}", stage)
+                cases += 1
+
+            # Mutation E: command-shaped heredoc payloads are data, including
+            # all required delimiter quoting/indentation forms.
+            heredoc_forms = (
+                ("quoted", "cat <<'EOF'", False),
+                ("double_quoted", 'cat <<"EOF"', False),
+                ("unquoted", "cat <<EOF", False),
+                ("dash_tabs", "cat <<-EOF", True),
+            )
+            for label, opener, strip_tabs in heredoc_forms:
+                deleted = _drop_exact_lines(original, persist_commands)
+                payload_lines = [
+                    "install -m 0400 current-event.json event-014.projection.json",
+                    "sha256sum event-014.projection.json >> projection_digests.sha256",
+                    "create_current_event_binding_receipt(...)",
+                    "write_binding_receipt(receipt, path)",
+                ]
+                if strip_tabs:
+                    heredoc_body = "\n".join("\t" + line for line in payload_lines + ["EOF"])
+                else:
+                    heredoc_body = "\n".join(payload_lines + ["EOF"])
+                heredoc_fence = opener + "\n" + heredoc_body
+                parsed_commands, parsed_python = _parse_shell_fence(heredoc_fence)
+                payload_markers = (
+                    "install -m 0400 current-event.json",
+                    "sha256sum event-014.projection.json",
+                    "create_current_event_binding_receipt(...)",
+                    "write_binding_receipt(receipt, path)",
+                )
+                if any(any(marker in command for marker in payload_markers) for command in parsed_commands):
+                    raise AssertionError(f"{doc_rel}: {label} heredoc payload leaked into shell commands")
+                if parsed_python:
+                    raise AssertionError(f"{doc_rel}: {label} cat heredoc was misclassified as Python stdin")
+                mutated = _insert_fence_in_step(
+                    deleted, "PERSIST_PROJECTION_EVIDENCE", heredoc_fence, "bash",
+                )
+                stage = root / f"E-{prefix}-{label}"
+                _stage(base, stage, {doc_rel: mutated})
+                _expect_red(f"IA-BLK-003-E:heredoc_{label}:{doc_rel.name}", stage)
+                cases += 1
+
+            # Mutation F: every required production operation must have one
+            # unique occurrence in its owner step; same-step duplicates are red.
+            duplicate_shell_specs = (
+                ("REVEAL", _is_reveal_command, "reveal"),
+                ("INSTALL_CURRENT_EVENT", lambda c: c == INSTALL_CURRENT_EVENT_CMD, "install_current_event"),
+                ("PERSIST_PROJECTION_EVIDENCE", lambda c: c == PERSIST_INSTALL_CMD, "projection_install"),
+                ("PERSIST_PROJECTION_EVIDENCE", lambda c: c == PERSIST_SHA256_CMD, "projection_sha256"),
+                ("MODEL_WORK", _is_production_turn_command, "production_turn"),
+                ("DURABLE_ACK", _is_ack_command, "ack"),
+                ("CLEAR_BINDING", lambda c: c == CLEAR_BINDING_CMD, "clear_binding"),
+            )
+            for owner, predicate, label in duplicate_shell_specs:
+                mutated = _duplicate_shell_command(original, owner, predicate, label)
+                stage = root / f"F-{prefix}-duplicate-{label}"
+                _stage(base, stage, {doc_rel: mutated})
+                _expect_red(f"IA-BLK-003-F:duplicate_{label}:{doc_rel.name}", stage)
+                cases += 1
+
+            receipt_line = 'write_binding_receipt(receipt, os.environ["AIOS_CURRENT_EVENT_BINDING_PATH"])'
+            if original.count(receipt_line) != 1:
+                raise AssertionError(f"{doc_rel}: expected one receipt-write anchor")
+            duplicated_write = original.replace(receipt_line, receipt_line + "\n" + receipt_line, 1)
+            stage = root / f"F-{prefix}-duplicate-receipt-write"
+            _stage(base, stage, {doc_rel: duplicated_write})
+            _expect_red(f"IA-BLK-003-F:duplicate_receipt_write:{doc_rel.name}", stage)
+            cases += 1
+
+            receipt_variable = "proj" if doc_rel.name == "b_startup_procedure.md" else "projection"
+            duplicate_create = (
+                "receipt_duplicate = create_current_event_binding_receipt(\n"
+                f"    {receipt_variable},\n"
+                '    b_session_id=os.environ["AIOS_B_SESSION_ID"],\n'
+                '    release_state_path=os.environ["AIOS_RELEASE_STATE_PATH"],\n'
+                ")\n"
+            )
+            if receipt_line not in original:
+                raise AssertionError(f"{doc_rel}: receipt-write anchor missing for create duplicate")
+            duplicated_create = original.replace(receipt_line, duplicate_create + receipt_line, 1)
+            stage = root / f"F-{prefix}-duplicate-receipt-create"
+            _stage(base, stage, {doc_rel: duplicated_create})
+            _expect_red(f"IA-BLK-003-F:duplicate_receipt_create:{doc_rel.name}", stage)
+            cases += 1
+
+            validate_anchor = 'print("CURRENT_EVENT_BINDING_VERIFIED'
+            validate_at = original.find(validate_anchor)
+            if validate_at < 0:
+                raise AssertionError(f"{doc_rel}: verification print anchor missing")
+            event_variable = "ev" if doc_rel.name == "b_startup_procedure.md" else "event"
+            duplicate_validate = (
+                "validate_current_event_binding(\n"
+                f"    {event_variable}, os.environ[\"AIOS_B_SESSION_ID\"],\n"
+                '    release_state_path=os.environ["AIOS_RELEASE_STATE_PATH"],\n'
+                '    binding_receipt_path=os.environ["AIOS_CURRENT_EVENT_BINDING_PATH"],\n'
+                ")\n"
+            )
+            duplicated_validate = original[:validate_at] + duplicate_validate + original[validate_at:]
+            stage = root / f"F-{prefix}-duplicate-binding-validate"
+            _stage(base, stage, {doc_rel: duplicated_validate})
+            _expect_red(f"IA-BLK-003-F:duplicate_binding_validate:{doc_rel.name}", stage)
+            cases += 1
+
+    print(f"RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases={cases}")
+    return cases
+
+
 def run_mutation_self_tests(base: Path) -> int:
     check_runbook_lifecycle(base)
     docs = read_docs(base)
@@ -533,10 +934,10 @@ def run_mutation_self_tests(base: Path) -> int:
         count += 1
 
         old_chain = original + (
-            "\n```\n"
-            "release_operator reveal → create_current_event_binding_receipt(...)\n"
-            "→ write_binding_receipt(...)\n"
-            "→ current-event.json\n"
+            "\n```bash\n"
+            "create_current_event_binding_receipt(...)\n"
+            "write_binding_receipt(...)\n"
+            "cp \"$RUN_ROOT/reveal.json\" \"$RUN_ROOT/current-event.json\"\n"
             "```\n"
         )
         stage = root / "old-chain"
@@ -657,7 +1058,8 @@ def run_mutation_self_tests(base: Path) -> int:
             executable_count += 1
 
     print(f"RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases={executable_count}")
-    return count + executable_count
+    shell_semantics_count = run_shell_semantics_mutation_tests(base)
+    return count + executable_count + shell_semantics_count
 
 
 def main() -> int:
