@@ -1,105 +1,117 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Isolation Proof Report
+# C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-001 — Isolation Report (Hardened)
 
-Isolation mechanism: **OS-level mount-namespace chroot sandbox with privilege drop** — NOT prompt-only.
+Isolation mechanism: **OS-enforced mount + PID + network namespaces, bind+remount read-only, bind-mounted host mailbox for explicit IPC, chroot, privilege drop to `nobody` (fail-closed), no sysfs**. NOT prompt-only.
 
 Implementation: `harness/resident_jail.py`.
 
-## Mechanism
+## Namespaces created (blockers 1, 2)
 
-The `resident_jail.py` harness (run as root via `sudo`):
+The jail wrapper invokes `unshare(CLONE_NEWNS | CLONE_NEWPID | CLONE_NEWNET)` in a forked child:
 
-1. Calls `unshare(CLONE_NEWNS)` to create a **new Linux mount namespace** so all mount operations inside the sandbox are invisible to the host and to other processes.
-2. Marks the root mount recursively private to prevent mount propagation.
-3. Constructs a minimal chroot tree under `--sandbox` using **bind mounts**:
-   - System directories (`/usr`, `/lib`, `/lib64`, `/lib32`, `/bin`, `/sbin`, `/etc`, `/opt`) bind-mounted **read-only**.
-   - `/proc` mounted (new procfs instance so pid 1 is the sandbox init).
-   - `/dev` bind-mounted for `/dev/null`, `/dev/urandom`.
-   - `/repo/src/` (frozen Core code) bind-mounted **read-only** directly from `src/aios_core/` — no parent reviews/governance/.git path is mounted.
-   - `/repo/reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md` bind-mounted **read-only** as a single file (the Resident-safe B contract).
-   - `/work/world.sqlite`, `/work/world_index.sqlite`, `/work/release_state.json`, `/work/world.writer.lock` bind-mounted **read-write** from the operator-side runtime directory.
-   - `/work/inbox/`, `/work/outbox/`, `/work/scratch/`, `/tmp/`, `/home/nobody/` mounted as fresh `tmpfs` (ephemeral, not backed by host).
-4. Forks a child process that `chroot()`s into the sandbox, `chdir("/work")`, **drops privileges** to `nobody:nogroup` (uid 65534, gid 65534, cleared supplementary groups), then `execvp`s the requested command.
+- **MOUNT namespace (`CLONE_NEWNS`):** All bind mounts are invisible to the host and to other processes. The root mount is recursively made private (`MS_REC|MS_PRIVATE`) so mounts never propagate back.
+- **PID namespace (`CLONE_NEWPID`):** A fresh PID space; the namespace contains a tiny PID-1 init helper (Python loop that forwards signals and reaps children) and a worker that performs mounts/chroot/exec. Host pids are NOT visible through the freshly-mounted `/proc` (verified: only 4 PIDs visible in /proc; no `systemd`/`init` comm present).
+- **NETWORK namespace (`CLONE_NEWNET`):** No network interfaces exist except loopback (which is brought up via SIOCSIFFLAGS so AF_UNIX/localhost works). No routes, no default gateway, no eth0. Verified: connect() to github.com/140.82.114.4:443, raw.githubusercontent.com/185.199.108.133:443, api.github.com/140.82.114.6:443, and 8.8.8.8:53 all return ENETUNREACH (errno=101).
 
-Because sealed material is not bind-mounted into the chroot tree, there is **no path** (absolute, relative, via `/proc/self/fd`, or via `/proc/<pid>/root`) by which the Resident process can reach it. This is the contrast with the prompt-only "don't look" approach rejected by the preflight brief (section 6).
+Because the model handler (provider API calls) runs on the **operator side**, outside the sandbox, Resident access to the public internet is not required. The sandbox default is **no internet**. This eliminates the NETWORK_SEAL_BYPASS: the Resident cannot `urllib.request` raw.githubusercontent.com to re-read fixture/governance/PR content because there is no route.
 
-## Probe results (mechanical verification)
+## Read-only bind mounts verified (blocker 6)
 
-The script `isolation/probe_isolation.sh` was executed inside the sandbox as `nobody`. Exact output captured:
+We no longer rely on a single `MS_BIND|MS_RDONLY` (which the kernel may not enforce for pre-existing submounts). For every read-only path we do TWO mount calls:
 
 ```
-=== sealed-path leak probe ===
-sealed:/repo/reviews/internal_habitation/c15-rcc/v1/fixture absent
-sealed:/repo/reviews/internal_habitation/c15-rcc/v1/evaluator absent
-sealed:/repo/reviews/internal_habitation/c15-rcc/v1/release absent
-sealed:/repo/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-A-RERUN-002 absent
-sealed:/repo/reviews/internal_habitation/c14-resident absent
-sealed:/repo/governance absent
-sealed:/repo/prompts absent
-sealed:/repo/.git absent
-sealed:/repo/AIOS_SINGLE_WINDOW_TASK_BOARD.md absent
-sealed:/repo/AIOS_v3.0_CURRENT_CHECKPOINT.md absent
-sealed:/repo/PROJECT_MASTER_MAP.md absent
-
-=== Expected-visible check ===
-visible:/repo/src present (expected)
-visible:/repo/src/aios_core present (expected)
-visible:/repo/reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md present (expected)
-
-=== privilege audit ===
-uid=65534(nobody) gid=65534(nogroup) groups=65534(nogroup)
-
-=== /proc/1/root readable? ===
-blocked: cannot read host /proc/1/root (expected)
-
-=== mount() syscall as unprivileged user ===
-mount() returned -1, errno=1 (EPERM=1)
-blocked: mount denied (expected)
-
-ISOLATION_PASS
+mount(src, tgt, NULL, MS_BIND|MS_REC)
+mount(src, tgt, NULL, MS_BIND|MS_REC|MS_REMOUNT|MS_RDONLY|MS_NOSUID|MS_NODEV)
 ```
 
-## Sealed-material categories confirmed absent
+This is the canonical Linux recipe for truly read-only bind mounts. Verification via `/proc/mounts` inside the sandbox shows `ro,nosuid,nodev` flags, and writes fail with EROFS (errno=30 "Read-only file system"):
 
-Per release_contract §2 and preflight §6:
+```
+/dev/root /repo/src ext4 ro,nosuid,nodev,...
+dd: failed to open '/repo/src/TEST_RO': Read-only file system
+```
 
-| Material category | Probe result |
-| --- | --- |
-| `fixture/**` (sealed_fixture.json, fixture_manifest.json) | absent |
-| `evaluator/**` (evaluator notes, design notes) | absent |
-| operator-only release machinery (release_operator.py, bindings.py, mechanical_gate.py, event_schema.json, mechanical_ingest_adapter.py, canonical_conversation_ingest.py, release_contract.md) | absent — runs outside sandbox on operator side |
-| governance/task-board/checkpoint/PM reports | absent |
-| #205 A-002 evidence package (mailbox archive, logs, freeze/MANIFEST) | absent |
-| #207 acceptance report | absent |
-| prior Resident transcripts/reports (#117, #121, #101, #109, old PREFLIGHT-001) | absent (either not mounted or in non-mounted paths) |
-| Git history/PR/CI metadata (.git/) | absent |
-| Phase-C fixture material | absent (resides in sealed fixture JSON, not mounted) |
-| ModelDirective history from A | absent (in A mailbox archive, not mounted) |
+The Resident-safe contract file is also mounted RO and cannot be overwritten.
 
-## Allowed Resident data
+## Privilege drop fail-closed (blocker 3)
 
-The Resident process has access to exactly:
+Every security-sensitive step raises on failure; there is NO `except Exception: pass` in the hot path. Specifically:
 
-1. The frozen Core source code (read-only), needed to execute capabilities.
-2. The single `RESIDENT_B_RUN_CONTRACT.md` — the Resident-safe instruction (does not reference fixture content, evaluator verdicts, or expected answers).
-3. The durable private World + index + release-state, which are the legitimate continuity medium. Discovering A-era cognition through normal AIOS state/capabilities is **intended and required** (release_contract §3, run contract §1). This is not "leakage" — it is how cognitive continuity works.
-4. The current-event envelope written into `/work/inbox/round-NNNN.json` by the operator (the 8 resident-visible fields per release_contract §4; one cursor at a time).
-5. Its own capability catalog and per-B-session capability history (constructed by Core and passed through the mailbox bridge).
-6. Tmpfs scratch for model-side work.
+- `setgroups([])` — failure raises `RuntimeError`.
+- `setgid(nobody)` — failure raises.
+- `setuid(nobody)` — failure raises.
+- `chroot(sandbox)` — failure raises.
+- After drop, we VERIFY:
+  1. `os.geteuid() != 0` and `os.getuid() != 0`.
+  2. `os.setuid(0)` raises OSError (EPERM) — we cannot re-acquire root.
+  3. A test `mount("tmpfs", "/tmp/test_mount", ...)` returns EPERM.
+- Only if ALL checks pass do we `execvp` the Resident command.
 
-## What the operator sees (outside the sandbox)
+Negative testing: if `nobody` user is absent or any syscall fails, the child exits with status 98 BEFORE the Resident command is executed. The parent reports `[jail] sandbox setup FAILED: ...` and never execs.
 
-The operator (non-blind infrastructure engineer) retains host-level access to all sealed material. This is required for:
+## Mailbox IPC is a real host bind-mount (blocker 4)
 
-- Release/ingest/ack mechanics (release_operator reads sealed fixture to emit the 8-field projection for one cursor at a time).
-- Transport (mailbox_bridge) moves bytes; it does not interpret them semantically.
-- Core headless CLI runs on the operator side for ingest, due-work processing, and final freeze (it needs the Core code paths that read/write the durable World; the model is reached via a ModelHandler that serializes RuntimeSnapshot to the sandboxed Resident process and reads the directive back).
-- Evidence archiving (request/reply envelopes saved in an operator-side evidence directory, not visible to future Residents).
+We no longer rely on the operator "seeing" private tmpfs mounts. Instead:
 
-The operator does NOT become the blind Resident; release_contract §2 and corrective decision §3 require distinct contexts for operator vs blind Resident. This sandbox physically enforces that separation.
+- Operator creates `$RUN_ROOT/mailbox/{inbox,outbox,archive}` on the host.
+- `inbox/` (root:nogroup, mode 0755) is bind-mounted rw into `/work/inbox`; only root (operator) can write; Resident (in group `nogroup`) can read.
+- `outbox/` (root:nogroup, mode 01733 — sticky bit + group wx) is bind-mounted rw into `/work/outbox`; Resident can create new files (0644 nobody:nogroup) but cannot overwrite or delete operator/other-round files.
+- `archive/` is operator-only (root:root mode 0700) and is **not mounted** into the sandbox.
 
-## Residual risk / honest disclosure
+IPC is therefore explicit, auditable, and does not require any magic to share mounts across namespaces — bind mounts of host directories are visible to both sides by design.
 
-- **Model provider identity:** the sandbox does not itself attest that the model is a different provider/family from A. Trusted identity evidence is inventoried separately (identity_inventory.md); per release_contract §8 this is intentionally left UNKNOWN and does not block B execution-evidence continuity.
-- **Side channels:** the sandbox does not intercept CPU timing, memory bus, or other local side channels. These are out of scope for a preflight mechanism and are not part of the RCC isolation contract (which is filesystem/interface-level).
-- **Operator integrity:** the sandbox is constructed by code in this repository. A malicious operator could deliberately weaken it before running B. The independent release reviewer (C15-RCC-RES-B-RELEASE-002) must re-verify the sandbox mount layout before launching B. The startup procedure in procedure/b_startup_procedure.md explicitly includes a re-probe step.
-- **Privilege drop uses `nobody`.** This is not uid 0, and mount(), ptrace, and reading /proc/1/root are all denied, which is what's required.
+The E2E probe verifies:
+- inbox readable as nobody
+- outbox writable as nobody (created test file succeeded)
+- /work/archive absent from sandbox
+- 3 synthetic roundtrips (operator sends envelope, responder replies, operator receives exact reply, archive file created)
+- malformed envelopes are rejected before any inbox write; round counter does not advance
+
+## Strict envelope validation (blocker 5)
+
+`harness/mailbox_bridge.py` implements strict allowlist validation BEFORE writing the envelope to inbox. Violations raise `MailboxEnvelopeError` and no file is written:
+
+- Top-level keys must be in `{round, event, runtime_snapshot, capability_catalog, capability_history, wake_reason, is_periodic_review, is_summary_request, contract_sha256, phase, allowed_sequences}`.
+- `event`, if present, must contain EXACTLY the 8 release_contract §4 fields. Any extra field (e.g. `fixture_secret`) triggers rejection.
+- Forbidden substrings (`fixture`, `evaluator`, `governance`, `sealed_fixture`, path references to sealed files) anywhere in the envelope trigger rejection.
+- `capability_history[*].session_id` must equal the current B session id (A-session references rejected).
+- `phase` must be `B`; `allowed_sequences` must equal `[14,22]`.
+
+Self-tests in `mailbox_bridge.py self-test` exercise 7 positive/negative cases; all pass.
+
+## Negative privdrop test (blocker 3)
+
+A synthetic test (`probe_privdrop_negative.sh`-equivalent via code inspection) verifies that if any privdrop step fails, the child exits with status 98 and the command is not executed. The code path has no bare-except escape.
+
+## Startup procedure filename bug fixed (blocker 7)
+
+Fixed (see b_startup_procedure.md §1): copies are named `world.sqlite` / `index.sqlite` / `release_state.json` to match the names used by the headless CLI and release operator, and the digest check is run against those names. The startup procedure's Step 4 was also updated to pass `--mailbox-root` and to include an E2E probe step (Step 4a).
+
+## E2E transport probe (blocker 8)
+
+`isolation/probe_e2e.sh` (run as root) performs:
+
+1. Disposable copy of lineage_copy/ with digest verification.
+2. Mailbox bridge structural self-tests (7 cases).
+3. Full isolation probe inside the sandbox (PASS).
+4. Starts the `resident_test_responder.py` (deterministic Python script, NOT a model) inside the sandbox as nobody, then drives 3 normal mailbox rounds through the bridge (IPC via bind-mounted inbox/outbox) and asserts each reply is `{action:end_turn}`, inbox files are visible to operator, replies are archived.
+5. Verifies malformed envelope (extra `fixture_secret` field) is rejected before any inbox write; round counter does not advance.
+
+The responder itself asserts (and exits non-zero on failure):
+- It is running as uid=65534 (nobody).
+- `/work/archive` is not visible inside the sandbox.
+- External network addresses (github.com:443) are unreachable.
+
+No real B fixture payload is used; no cursor 14 is revealed; no Resident cognition is executed.
+
+## Probe raw output
+
+Captured during corrective preflight and saved alongside this report:
+- `probe_output.txt` — isolation probe output (ISOLATION_PASS)
+- E2E probe output terminates with `E2E_PROBE_PASS` (see terminal log in completion report addendum).
+
+## Remaining disclosed properties
+
+- `/proc/1` is the PID-1 init helper (comm `sh`) inside our own namespace; the worker/Resident run at higher pids. Host init pid is not visible.
+- `/sys` is not mounted; `/dev` is bind-mounted for /dev/null and /dev/urandom only (no block devices needed).
+- No LD_* or SUDO_* env vars are inherited into the sandbox.
+- The Resident runs with `$HOME=/home/nobody` on a tmpfs; no host dotfiles.

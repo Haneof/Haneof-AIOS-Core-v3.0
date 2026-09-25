@@ -1,0 +1,88 @@
+[e2e] run_root = /tmp/b-preflight-e2e-2802
+world.sqlite: OK
+index.sqlite: OK
+release_state.json: OK
+[e2e] lineage copy digests OK
+[e2e] running mailbox_bridge self-tests
+self-test 1 PASS: minimal good envelope accepted
+self-test 2 PASS: extra top-level key rejected
+self-test 3 PASS: extra event field rejected
+self-test 4 PASS: A session in capability_history rejected
+self-test 5 PASS: forbidden substring rejected
+self-test 6 PASS: wrong phase rejected
+self-test 7 PASS: malformed reply rejected
+ALL SELF-TESTS PASS
+[e2e] running isolation probe inside sandbox
+=== identity ===
+uid=65534 gid=65534
+PASS: running as nobody (uid 65534)
+
+=== PID namespace ===
+my pid = 37
+pid 1 comm = 'sh'
+visible PIDs in /proc = 3 (should be a small number, not the host's 100+)
+PASS: only 3 PIDs visible (expected small count in new PID namespace)
+PASS: no host init (systemd/init) visible in new PID namespace
+
+=== Network seal (blocker 1) ===
+PASS: connect to github.com (140.82.114.4:443) blocked: errno=101 (Network is unreachable)
+PASS: connect to raw.githubusercontent.com (185.199.108.133:443) blocked: errno=101 (Network is unreachable)
+PASS: connect to api.github.com (140.82.114.6:443) blocked: errno=101 (Network is unreachable)
+PASS: connect to 8.8.8.8 (8.8.8.8:53) blocked: errno=101 (Network is unreachable)
+NETWORK_SEAL_PASS
+PASS: network sealed (external connect blocked)
+
+=== Filesystem sealed paths (blocker 1 / 4 / 6) ===
+PASS: sealed: /repo/fixture absent
+PASS: sealed: /repo/evaluator absent
+PASS: sealed: /repo/governance absent
+PASS: sealed: /repo/.git absent
+PASS: sealed: /repo/prompts absent
+PASS: sealed: /repo/reviews/internal_habitation/c15-rcc/v1/fixture absent
+PASS: sealed: /repo/reviews/internal_habitation/c15-rcc/v1/evaluator absent
+PASS: sealed: /repo/reviews/internal_habitation/c15-rcc/v1/release absent
+PASS: sealed: /repo/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-A-RERUN-002 absent
+PASS: sealed: /repo/reviews/internal_habitation/c14-resident absent
+PASS: sealed: /repo/AIOS_SINGLE_WINDOW_TASK_BOARD.md absent
+PASS: sealed: /repo/AIOS_v3.0_CURRENT_CHECKPOINT.md absent
+PASS: sealed: /repo/PROJECT_MASTER_MAP.md absent
+
+=== Read-only bind mounts actually read-only (blocker 6) ===
+PASS: Core src read-only (touch denied, exit=1)
+PASS: Resident contract read-only (touch denied)
+PASS: Core src file write blocked: [Errno 13] Permission denied: '/repo/src/aios_core/__init__.py'
+PASS: Resident contract write blocked: [Errno 13] Permission denied: '/repo/reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md'
+
+=== Mailbox permissions (blocker 4) ===
+PASS: /work/inbox readable
+PASS: /work/outbox writable + searchable
+PASS: can write to /work/outbox
+PASS: /work/archive absent (operator archive not mounted)
+
+=== Privilege re-escalation (blocker 3) ===
+PASS: setuid(0) denied: [Errno 1] Operation not permitted
+PASS: mount() denied (EPERM)
+
+=== Capability: cannot read host /proc/1/root ===
+PASS: /proc/1/root points to sandbox / (we are pid 1); no host proc leak
+
+
+ISOLATION_PASS
+[e2e] isolation probe PASS
+[e2e] E2E transport: normal rounds
+  round 1 OK: end_turn
+  round 2 OK: end_turn
+  round 3 OK: end_turn
+NORMAL_ROUNDS_PASS
+---- responder stdout ----
+[test-responder] starting mode=normal rounds=3 uid=65534
+[test-responder] OK mode=normal rounds=3
+
+[e2e] normal rounds PASS
+[e2e] E2E negative: malformed envelope must fail closed
+  bad envelope rejected as expected: envelope.event has wrong field set: missing=[] extra=['fixture_secret']
+  inbox unchanged (0 files, round counter still at 0)
+MALFORMED_ENVELOPE_FAIL_CLOSED
+[e2e] malformed-envelope fail-closed PASS
+
+E2E_PROBE_PASS

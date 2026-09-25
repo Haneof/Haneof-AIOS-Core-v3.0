@@ -16,9 +16,11 @@ This procedure does NOT reveal cursor 14. It prepares the runtime directory and 
 
 ```bash
 RUN_ROOT=/tmp/c15-rcc-res-b-002-$(date +%s)
-mkdir -p $RUN_ROOT/{runtime,sandbox,evidence/{mailbox,freeze},scratch}
+mkdir -p $RUN_ROOT/{runtime,sandbox,mailbox/{inbox,outbox,archive},evidence/{mailbox,freeze},scratch,inject}
 
-# Copy byte-exact A-002 lineage from this preflight (or from #205 directly)
+# Copy byte-exact A-002 lineage from this preflight (or from #205 directly).
+# IMPORTANT: copy to world.sqlite / index.sqlite / release_state.json (the names
+# the headless CLI and release operator expect), NOT private_world.sqlite etc.
 cp reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/lineage_copy/private_world.sqlite   $RUN_ROOT/runtime/world.sqlite
 cp reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/lineage_copy/world_index.sqlite     $RUN_ROOT/runtime/index.sqlite
 cp reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/lineage_copy/release_state.json    $RUN_ROOT/runtime/release_state.json
@@ -28,11 +30,11 @@ touch $RUN_ROOT/runtime/world.writer.lock
 Verify digests of the copy match the accepted freeze digests:
 ```bash
 cd $RUN_ROOT/runtime
-sha256sum private_world.sqlite world_index.sqlite release_state.json
+sha256sum world.sqlite index.sqlite release_state.json
 # Expect:
-# 626c6bb3...01f6aa  world.sqlite
-# ecfabf4...1e5f1   index.sqlite
-# eada20a...391c8   release_state.json
+# 626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa  world.sqlite
+# ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1  index.sqlite
+# eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8  release_state.json
 ```
 
 If any digest mismatches, STOP. The run would not be on the canonical lineage.
@@ -69,8 +71,8 @@ After init, `release_state.json.active_phase` is `"B"`, `next_sequence=14`, `pen
 
 ```bash
 # Copy isolation probe into an inject dir
-mkdir -p $RUN_ROOT/inject
 cp reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/isolation/probe_isolation.sh $RUN_ROOT/inject/probe.sh
+cp reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/isolation/resident_test_responder.py $RUN_ROOT/inject/responder.py
 chmod +x $RUN_ROOT/inject/probe.sh
 
 sudo python3 reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/resident_jail.py \
@@ -79,12 +81,28 @@ sudo python3 reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFL
   --index   $RUN_ROOT/runtime/index.sqlite \
   --state   $RUN_ROOT/runtime/release_state.json \
   --lock    $RUN_ROOT/runtime/world.writer.lock \
-  --scratch $RUN_ROOT/scratch \
+  --mailbox-root $RUN_ROOT/mailbox \
   --inject-dir $RUN_ROOT/inject \
   -- /bin/sh /work/inject/probe.sh
 ```
 
-Expected final line: `ISOLATION_PASS`, exit=0. If `ISOLATION_FAIL` or any `LEAK:` line appears, STOP. Isolation is not proven; do not start the Resident model.
+Expected final line: `ISOLATION_PASS`, exit=0. If `ISOLATION_FAIL` or any `FAIL:` line appears, STOP.
+
+## 4a. Run the synthetic E2E transport probe (no real model, no cursor 14 reveal)
+
+```bash
+# The probe creates its own disposable run root or can reuse $RUN_ROOT before init.
+# For release validation, re-run the probe_e2e.sh end-to-end:
+bash reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/isolation/probe_e2e.sh
+```
+
+Expected final line: `E2E_PROBE_PASS`. The probe exercises:
+- mailbox roundtrip through the bind-mounted inbox/outbox with a synthetic responder
+- strict envelope rejection (extra fields fail closed, no file written)
+- isolation verified under the same privileged-drop/network-seal conditions as a real run
+- malformed-reply rejection (validated by mailbox_bridge self-tests)
+
+Do NOT proceed to model startup if any probe fails.
 
 ## 5. Mint a fresh B session/process identity
 
