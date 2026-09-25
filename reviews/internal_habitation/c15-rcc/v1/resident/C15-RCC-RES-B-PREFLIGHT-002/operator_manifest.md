@@ -1,24 +1,20 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Operator Manifest (CORRECTIVE-012 implementation; prior evidence historical)
+# C15-RCC-RES-B-PREFLIGHT-002 — Operator Manifest (CORRECTIVE-013-FIXUP-001)
 
-Date: 2026-09-25
-Role: Release / Resident Infrastructure Engineer (not Resident B/C, not evaluator — per CORRECTIVE-012)
-Task: C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-012
-Verdict: **REVIEW_READY / AWAITING_PM_RE-REVIEW** (no B or C run, no merge, no Independent Acceptance by the implementer)
+Date: 2026-09-26
+Role: Release / Test Infrastructure Engineer (not Resident B/C, not evaluator)
+Task: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-013-FIXUP-001`
+Verdict: **FIXUP_001_HANDOFF_READY**; PM blocker review `5319913802`, task release `5835591147`. No B/C run, no merge, and no Independent Acceptance by the implementer.
 
-## Current authoritative manifest (CORRECTIVE-012) — exact implementation target
+## Current authoritative manifest (CORRECTIVE-013-FIXUP-001)
 
-- **Current Task**: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-012`
-- **Current implementation state**: `REVIEW_READY / AWAITING_PM_RE-REVIEW`
-- **Exact gate**: `EXPECTED_CHECKS=157`, fresh result `ALL_CHECKS=157/157 FAILURES=0`
-- **Required current markers**: `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS`, `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS`, final `CORRECTIVE_012_E2E_PASS`
-- **Production adapter**: `bridged_model_handler:ExternalBrokerClient`, SHA-256 `da74eb97a6d35b535f298f52a72a32fc35dfbd1fca1ec4585aa1d7c090e92911`
-- **Usage rule**: provider `total_tokens` is never synthesized. Missing total → `usage=None`; valid provider total with optional input/output preserves only reported values; invalid/bool/string/negative or inconsistent usage → `usage=None`.
-- **Pin gate**: `checks/canonical_pin_checker.py` parses every authoritative World/Index/Release declaration in all three canonical docs. Every declaration must equal the frozen pin. The same checker executes 11 disposable mutation-red cases.
-- **Runbook authority**: `procedure/b_startup_procedure.md §7` is the single authoritative Phase-B cursor lifecycle. `per_cursor_interaction.md` is an exact operational mirror/reference of that section, not a second ONLY legal order. Both expose the same 11 mechanical tokens: `REVEAL INSTALL_CURRENT_EVENT PERSIST_PROJECTION_EVIDENCE CREATE_BINDING_RECEIPT VERIFY_BINDING DERIVE_OCCURRED_AT INGEST MODEL_WORK DURABLE_ACK CLEAR_BINDING NEXT_REVEAL`. Finish-all-cursor-model-work remains required prose between `MODEL_WORK` and `DURABLE_ACK`. `checks/runbook_lifecycle_checker.py` compares token block, headings, and executable commands inside each step body. A bare `.projection.json` substring is not proof. Fenced commands are parsed after comments, blanks, and echo-only lines are removed. The same function mutation-tests the old receipt-before-current-event order and the IA-BLK-003 executable deletions, moves, and comment-hidden receipt-first chain.
-- **Section 6 remains configuration-only**: no model dispatch before reveal/current-event/receipt binding.
-- **Section 7 order remains**: reveal → install current-event → persist immutable projection evidence → create binding receipt → verify → derive occurred_at → ingest → model/capability/due/review work → finish cursor model work → durable ACK → clear event/receipt → next reveal.
-
-**Operator MUST NOT mistake historical CORRECTIVE-003 / 26-check material for the current release contract.** Historical sections below are explicitly labelled `historical / superseded`.
+- **Current task**: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-013-FIXUP-001`
+- **Scope**: current evidence/canonical synchronization only; no Corrective-013 implementation changes.
+- **C013 implementation blobs**: lifecycle checker `bfb9b0135987ea262682f5f7eee192c762aaab22`; E2E probe `d8215562721ef3bca14eb1a24c419cbd5aa3af41`; final-freeze procedure `d77a25c11304d142d8e3fc816f5dde78a6fafbb6`.
+- **Current exact gate**: `EXPECTED_CHECKS=158`; required `ALL_CHECKS=158/158 FAILURES=0`.
+- **Required current markers**: `ENVIRONMENT_PASS`, `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `CANONICAL_RUNBOOK_EXECUTABLE_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5`, `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18`, `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=34`, final `CORRECTIVE_013_E2E_PASS`.
+- **Fresh run**: PASS, exit 0, Debian GNU/Linux 12 (bookworm), disposable rootfs outside the repository. Dual Python paths both report `3.11.2`; the five pinned package versions and exact `requirements.freeze.txt`/live `pip freeze` checks pass. Raw log `/tmp/CORRECTIVE_013_DEBIAN12/rootfs/tmp/c013-e2e-fresh-20260926-002/e2e.log`, SHA-256 `1352c0208a3feb5d435f59f41b57c40b3e61880f778710b9676512f396e321cf`; `isolation/e2e_probe_output.txt` is byte-identical with the same SHA-256. Cursor-14 exact-byte scan: raw `0` hits; committed evidence `0` hits. Self-test mutation-red counts: cross-document `5`, executable `18`, shell-semantics `34`.
+- **C012 history**: `corrective_012_report.md` remains unchanged historical `157/157` evidence; its count and old raw-log digest are not current.
+- **Local/remote ancestry**: local source `4ad5f980c2a041c88f9c0fdec62753d7f8b38fb4` has tree `a22f14753e0627a95b08cfb8e60ae3ad80304620`; remote parent is `86aafc1937b58071d4780c77cf2e8abe7fcbed5b` with that same tree. PM must build from the remote parent; local ancestry is different.
 
 ## Pins (exact — recomputed SHA-256 from #205 artifacts; STOP if diverged)
 
@@ -58,7 +54,7 @@ Canonical cross-document pins (must be identical in `operator_manifest.md`, `sou
 
 These are recomputed from the byte-exact lineage copy (`lineage_copy/`) and match the accepted A-002 evidence.
 
-## Deliverable index (CORRECTIVE-010 authoritative)
+## Historical deliverable index (CORRECTIVE-010 inventory; current gate is CORRECTIVE-013-FIXUP-001)
 
 ```
 reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/
@@ -112,11 +108,11 @@ Historical CORRECTIVE-003 (superseded):
 - Old header: `CORRECTIVE-003 frozen`
 - Old check count: 26
 - Old marker: `CORRECTIVE_003_E2E_PASS`
-- Current authoritative is CORRECTIVE-010 (140/140) + FIXUP-001 (N/N), markers `CORRECTIVE_010_E2E_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CORRECTIVE_010_FIXUP_001_E2E_PASS`, transport `ExternalBrokerClient`, runbook Section 6 config-only + Section 7 7.1-7.12.
+- At that time, the CORRECTIVE-010/FIXUP-001 gate was recorded as 140/140 + N/N with markers `CORRECTIVE_010_E2E_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, and `CORRECTIVE_010_FIXUP_001_E2E_PASS`, transport `ExternalBrokerClient`, runbook Section 6 config-only + Section 7 7.1-7.12. This historical claim is not the current gate.
 
 Per FIXUP-001 task §2, this historical block is explicitly labelled and does NOT represent the current release contract.
 
-## Frozen model-handling intent (current, CORRECTIVE-011)
+## Frozen model-handling intent (current invariant, unchanged through CORRECTIVE-013)
 
 **Separation:** `SyntheticProbeHandler` (mailbox bridge + inside-jail responder, `sandbox-bridge/synthetic-responder-v1/10 tokens`) vs **`ProductionResidentHandler`** (outside-jail `ProviderClient`, `contract text + envelope` only, real provenance).
 
@@ -200,7 +196,7 @@ This FIXUP-001 144/144 run is retained as historical evidence for the parent can
 
 
 
-## CORRECTIVE-011 implementation delta / execution requirement
+## Historical CORRECTIVE-011 implementation delta (retained baseline; unchanged by this fixup)
 
 The three second-acceptance blockers are addressed in code/docs:
 
@@ -212,7 +208,7 @@ The three second-acceptance blockers are addressed in code/docs:
 
 ## CORRECTIVE-011 frozen E2E (historical parent evidence, not relabeled)
 
-Parent-candidate run of `isolation/probe_e2e.sh`. The E2E file SHA below is the parent commit's copy, not the current file. The current `isolation/e2e_probe_output.txt` is the CORRECTIVE-012 copy recorded in the next section. Isolation bytes were not regenerated.
+Parent-candidate run of `isolation/probe_e2e.sh`. The E2E file SHA below is the parent commit's copy, not the current file. The file was later replaced by the CORRECTIVE-012 copy and is now superseded by the fresh CORRECTIVE-013 output. Isolation bytes were not regenerated for this historical C011 record.
 
 | Role | Path | SHA-256 | Result |
 | --- | --- | --- | --- |
@@ -225,17 +221,17 @@ Markers present in the raw log: `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_PIN_CO
 
 Python was `Python 3.11.2`. The disposable reveal printed mechanical metadata only and was never presented to a Resident or model.
 
-## CORRECTIVE-012 fresh frozen E2E
+## Historical CORRECTIVE-012 fresh frozen E2E (superseded; not current)
 
 Fresh disposable run after closing IA-BLK-003. The lifecycle checker now accepts a projection step only when that step body contains the executable persist commands. The same `check_runbook_lifecycle()` rejects the executable deletions, the post-ACK move, and the comment-hidden receipt-first chain.
 
 | Role | Path | SHA-256 | Result |
 | --- | --- | --- | --- |
 | raw E2E log | `/tmp/b-preflight-e2e-c012/e2e.log` | `38a414ac1f2600d11efa7eb9179c33bc8133bf06c8668092e032d5b0c86be5a2` | `ALL_CHECKS=157/157 FAILURES=0` |
-| committed E2E copy | `isolation/e2e_probe_output.txt` | `8af79734c8e5aebfb10a16c2cb19025f89ff52a1e85c62e60811bf16f91780c9` | header + raw log |
+| historical committed C012 E2E copy (superseded by FIXUP-001) | `isolation/e2e_probe_output.txt` at that time | `8af79734c8e5aebfb10a16c2cb19025f89ff52a1e85c62e60811bf16f91780c9` | historical header + raw log |
 
 Markers present in the raw log: `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS`, `CORRECTIVE_012_E2E_PASS`.
 
 Python was `Python 3.11.2`. The disposable reveal printed mechanical metadata only and was never presented to a Resident or model.
 
-State: `REVIEW_READY / AWAITING_PM_RE-REVIEW`. Do not merge #209. Do not start Independent Acceptance from this packet. Do not enter B release.
+Historical state at the time of C012: `REVIEW_READY / AWAITING_PM_RE-REVIEW`. Current C013 fixup evidence is handoff-ready; PM must rebuild from the remote parent. Do not merge #209, start Independent Acceptance, or enter B release.

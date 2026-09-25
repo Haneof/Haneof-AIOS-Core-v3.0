@@ -1,4 +1,4 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Per-Cursor Interaction Procedure (CORRECTIVE-012 exact mirror)
+# C15-RCC-RES-B-PREFLIGHT-002 — Per-Cursor Interaction Procedure (CORRECTIVE-013-FIXUP-001 exact mirror)
 
 This document is an exact operational mirror/reference of `b_startup_procedure.md §7`; if any wording diverges, startup §7 is authoritative and execution must STOP until documents are resynchronized.
 **`b_startup_procedure.md §7` is the single authoritative Phase-B cursor lifecycle.**
@@ -237,20 +237,26 @@ Any provider exception, non-JSON, schema failure, binding failure, invalid capab
 - Do not run Resident B/C during preflight.
 - Do not merge PR #209 from this procedure.
 
-## Mechanical regression
+## Mechanical regression — current CORRECTIVE-013-FIXUP-001 gate
 
-Before B release, both of these must pass from the B-preflight root:
+Before any later B release activity, run the lifecycle self-test and full frozen E2E from the B-preflight root. The E2E evidence file is valid only when copied byte-for-byte from that actual fresh run.
 
 ```bash
 python3 checks/runbook_lifecycle_checker.py --base . --self-test
 bash isolation/probe_e2e.sh
 ```
 
-Required markers include:
+Required current gate: `EXPECTED_CHECKS=158`, `ALL_CHECKS=158/158 FAILURES=0`, and final `CORRECTIVE_013_E2E_PASS`. Required markers include:
+- `ENVIRONMENT_PASS`
+- `RAW_USAGE_NO_SYNTHESIS_PASS`
+- `CANONICAL_PIN_CONSISTENCY_PASS`
+- `CANONICAL_PIN_MUTATION_RED_PASS`
+- `CANONICAL_RUNBOOK_EXECUTABLE_PASS`
 - `CANONICAL_RUNBOOK_ORDER_PASS`
 - `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`
-- `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS`
-- `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS`
-- `RAW_USAGE_NO_SYNTHESIS_PASS`
-- `CANONICAL_PIN_MUTATION_RED_PASS`
-- `CORRECTIVE_012_E2E_PASS`
+- `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5`
+- `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18`
+- `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=34`
+- `CORRECTIVE_013_E2E_PASS`
+
+Historical C012 `157/157` evidence is not a current gate.

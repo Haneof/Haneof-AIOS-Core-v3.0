@@ -1,20 +1,28 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Completion Report (CORRECTIVE-012 implementation)
+# C15-RCC-RES-B-PREFLIGHT-002 — Completion Report (CORRECTIVE-013-FIXUP-001)
 
-Date: 2026-09-25  
-Task: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-012`  
+Date: 2026-09-26
+Task: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-013-FIXUP-001`
 Role: Release / Test Infrastructure Engineer
 
-## Current state: **REVIEW_READY / AWAITING_PM_RE-REVIEW**
+## Current state: **FIXUP_001_HANDOFF_READY**
 
-Independent Acceptance review `5317440556` failed exact candidate
-`95cffb57a4e94acdc5538dd163f1fb6710ecefc4` with one blocker, IA-BLK-003. PM adjudication
-`5317453195` substantiated that blocker and released CORRECTIVE-012. IA-BLK-001 and IA-BLK-002 stay closed.
+PM blocker review `5319913802` was released by task record `5835591147`. This fixup is limited to current evidence/canonical synchronization; no Corrective-013 implementation bytes are to change. `corrective_012_report.md` and earlier corrective reports remain historical.
 
-The committed `156/156` / `CORRECTIVE_011_E2E_PASS` evidence belongs to the parent candidate and is not reused as fresh evidence.
-CORRECTIVE-012 recomputes the gate to `EXPECTED_CHECKS=157` and requires `CORRECTIVE_012_E2E_PASS`.
+The only preflight reveal is a disposable operator-side reveal on a copied release state. Its projection is never presented to a Resident or model and is not a Resident B reveal.
 
-The only preflight reveal is a disposable operator-side reveal on a copied release state. That projection
-was never presented to a Resident or model, and it is not a Resident B reveal.
+Remote parent: `86aafc1937b58071d4780c77cf2e8abe7fcbed5b`; its tree is `a22f14753e0627a95b08cfb8e60ae3ad80304620`. Local source commit `4ad5f980c2a041c88f9c0fdec62753d7f8b38fb4` has that same tree but different ancestry. PM must rebuild from the remote parent.
+
+## Current CORRECTIVE-013 gate contract
+
+- `EXPECTED_CHECKS=158`
+- `ALL_CHECKS=158/158 FAILURES=0`
+- `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5`
+- `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18`
+- `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=34`
+- required markers also include `CANONICAL_PIN_CONSISTENCY_PASS` and `CANONICAL_RUNBOOK_EXECUTABLE_PASS`
+- final marker `CORRECTIVE_013_E2E_PASS`
+
+Fresh frozen E2E passed with exit 0. The actual raw log is `/tmp/CORRECTIVE_013_DEBIAN12/rootfs/tmp/c013-e2e-fresh-20260926-002/e2e.log` (SHA-256 `1352c0208a3feb5d435f59f41b57c40b3e61880f778710b9676512f396e321cf`); `isolation/e2e_probe_output.txt` is an exact byte-for-byte copy with the same SHA-256. No hand-assembled E2E output was used.
 
 ## IA-BLK-001 — production usage no synthesis
 
@@ -90,41 +98,15 @@ Its self-test reintroduces the historical receipt-before-current-event ordering,
 evidence, and duplicates projection evidence; every mutation must red. Required marker:
 `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`.
 
-## Fresh gate target
+## Current CORRECTIVE-013-FIXUP-001 gate and evidence
 
-`isolation/probe_e2e.sh` has been recomputed to:
+Active gate: `EXPECTED_CHECKS=158`; required result `ALL_CHECKS=158/158 FAILURES=0`; final marker `CORRECTIVE_013_E2E_PASS`. Required markers include `ENVIRONMENT_PASS`, `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `CANONICAL_RUNBOOK_EXECUTABLE_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5`, `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18`, and `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=34`.
 
-- `EXPECTED_CHECKS=157`
-- required `RAW_USAGE_NO_SYNTHESIS_PASS`
-- required `CANONICAL_PIN_CONSISTENCY_PASS`
-- required `CANONICAL_PIN_MUTATION_RED_PASS`
-- required `CANONICAL_RUNBOOK_ORDER_PASS`
-- required `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`
-- required `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS`
-- required `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS`
-- final marker `CORRECTIVE_012_E2E_PASS`
+Fresh frozen E2E: **PASS, exit 0**, Debian GNU/Linux 12 (bookworm) disposable runtime. Both `python3 --version` and `/usr/bin/python3 --version` were `Python 3.11.2`; package versions were Pydantic `2.13.5`, pydantic_core `2.46.5`, annotated-types `0.8.0`, typing-inspection `0.4.4`, and typing_extensions `4.16.0`. The exact `requirements.freeze.txt` SHA check and live `pip freeze` line check passed.
 
-The success condition is exactly `ALL_CHECKS=157/157 FAILURES=0`.
+Raw log `/tmp/CORRECTIVE_013_DEBIAN12/rootfs/tmp/c013-e2e-fresh-20260926-002/e2e.log`: SHA-256 `1352c0208a3feb5d435f59f41b57c40b3e61880f778710b9676512f396e321cf`. Committed evidence `isolation/e2e_probe_output.txt`: SHA-256 `1352c0208a3feb5d435f59f41b57c40b3e61880f778710b9676512f396e321cf`, byte-identical to the raw log. Cursor-14 exact-byte scan: raw hits `0`; committed evidence hits `0`. Required lifecycle self-test markers passed with mutation-red cases cross-document `5`, executable `18`, shell-semantics `34`.
 
-## Execution evidence status
-
-The CORRECTIVE-011 raw log `/tmp/b-preflight-e2e-c011b/e2e.log` SHA-256
-`94f7388ced02512a61a3933648cb520de7cfe74e0ec778887cb7f00a78803ed8` and its committed copy SHA-256
-`6f860779c08d891bb02c83031e84054481954af3a419207b7063b6df5df34792` are historical parent evidence.
-They are not relabeled as CORRECTIVE-012.
-
-Fresh disposable run:
-
-- Python `3.11.2`
-- raw log `/tmp/b-preflight-e2e-c012/e2e.log`
-- raw log SHA-256 `38a414ac1f2600d11efa7eb9179c33bc8133bf06c8668092e032d5b0c86be5a2`
-- committed copy `isolation/e2e_probe_output.txt` SHA-256 `8af79734c8e5aebfb10a16c2cb19025f89ff52a1e85c62e60811bf16f91780c9`
-- result `ALL_CHECKS=157/157 FAILURES=0`
-- final marker `CORRECTIVE_012_E2E_PASS`
-
-Required markers observed in that raw log: `RAW_USAGE_NO_SYNTHESIS_PASS`,
-`CANONICAL_PIN_MUTATION_RED_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`,
-`RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS`.
+Historical C012 `157/157` results and the old C012 raw-log digest are not current evidence; see the unchanged `corrective_012_report.md`.
 
 ## Invariants preserved
 
@@ -138,7 +120,7 @@ Required markers observed in that raw log: `RAW_USAGE_NO_SYNTHESIS_PASS`,
 
 ## Exit condition
 
-`REVIEW_READY / AWAITING_PM_RE-REVIEW`.
+After a passing fresh gate, stop at `FIXUP_001_HANDOFF_READY` for PM reconstruction from the remote parent. This local worktree does not have the remote parent ancestry.
 
 Do not merge #209. Do not start Independent Acceptance from this packet. Do not enter B release.
 Do not reveal cursor 14 to a Resident or model.

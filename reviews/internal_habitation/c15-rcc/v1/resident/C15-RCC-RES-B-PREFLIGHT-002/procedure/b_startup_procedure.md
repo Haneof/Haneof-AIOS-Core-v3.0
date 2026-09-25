@@ -107,11 +107,11 @@ If `ISOLATION_FAIL`, STOP.
 ## 4a. Run the E2E transport probe — genuine + production + adversarial (no cursor 14 reveal)
 
 ```bash
-# exact gate: EXPECTED_CHECKS=157, requires CHECKS==EXPECTED_CHECKS and zero FAIL (CORRECTIVE-012)
+# exact current gate: EXPECTED_CHECKS=158, requires CHECKS==EXPECTED_CHECKS and zero FAIL (CORRECTIVE-013-FIXUP-001)
 bash reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/isolation/probe_e2e.sh
 ```
 
-Expected `CORRECTIVE_012_E2E_PASS` with `ALL_CHECKS=157/157 FAILURES=0`. The previous 156 checks remain, plus one CORRECTIVE-012 regression that rejects executable lifecycle mutations through `check_runbook_lifecycle()`. Required markers include `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS`, and `CORRECTIVE_012_E2E_PASS`.
+Expected `CORRECTIVE_013_E2E_PASS` with `ALL_CHECKS=158/158 FAILURES=0`. Required current markers include `ENVIRONMENT_PASS`, `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `CANONICAL_RUNBOOK_EXECUTABLE_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5`, `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18`, `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=34`, and final `CORRECTIVE_013_E2E_PASS`. C012 `157/157` evidence is historical only.
 
 Do NOT proceed if any check fails.
 

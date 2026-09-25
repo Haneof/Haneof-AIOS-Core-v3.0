@@ -1,6 +1,6 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Mechanical Checks (historical through CORRECTIVE-011; CORRECTIVE-012 target appended)
+# C15-RCC-RES-B-PREFLIGHT-002 — Mechanical Checks (historical through CORRECTIVE-012; CORRECTIVE-013-FIXUP-001 current)
 
-Historical PASS statements below are parent-candidate evidence and remain preserved. Canonical #205 evidence was read but not modified. CORRECTIVE-012 changes only the lifecycle checker and the exact gate count; the final section defines the new check without relabeling old output as fresh.
+Historical PASS statements below remain historical evidence. Canonical #205 evidence was read but not modified. Corrective-013 implementation is unchanged; this fixup synchronizes active evidence and canonical claims.
 
 ## 1. Frozen Core tree identity
 
@@ -203,7 +203,7 @@ Nine markers are counted as nine checks; the aggregate marker is mandatory but n
 - 11 individual `PIN_MUTATION_RED_PASS` lines covering 9 one-hex mutations + duplicate-wrong World + missing World
 - `CANONICAL_PIN_MUTATION_RED_PASS cases=11`
 
-The production gate and the mutation self-test both call `check_canonical_pin_docs()` on real files. Mutations are applied to disposable copies. A correct hash remaining elsewhere does not mask a wrong authoritative declaration, including bare `World:` / `Index:` / `Release:` lines. The existing four pin-consistency checks remain counted; the mutation-red aggregate adds one new check.
+The production gate and the mutation self-test both call `check_canonical_pin_docs()` on real files. Mutations are applied to disposable copies. A correct hash remaining elsewhere does not mask a wrong authoritative declaration, including bare `World:` / `Index:` / `Release:` lines. Historically, the four pin-consistency checks and the C012 mutation-red aggregate were counted in the 157-check gate; both remain represented within the current 158-check gate.
 
 ### IA-BLK-003 lifecycle synchronization
 
@@ -214,15 +214,28 @@ The production gate and the mutation self-test both call `check_canonical_pin_do
 - `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS`
 - `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS` from the same `check_runbook_lifecycle()` entrypoint
 
-The gate reads both active runbooks. Token block, step headings, and executable commands inside each step body must agree. A bare `.projection.json` substring is not proof. Fenced bash is parsed after comments, blank lines, and echo-only lines are removed, so a comment mentioning `current-event.json` cannot hide a later receipt-first `cp`/`install`. `b_startup_procedure.md §7` is the only authority. CORRECTIVE-011 added two counted checks. CORRECTIVE-012 adds one counted check for the executable mutation-red aggregate.
+The gate reads both active runbooks. Token block, step headings, and executable commands inside each step body must agree. A bare `.projection.json` substring is not proof. Fenced bash is parsed after comments, blank lines, and echo-only lines are removed, so a comment mentioning `current-event.json` cannot hide a later receipt-first `cp`/`install`. `b_startup_procedure.md §7` is the only authority. CORRECTIVE-011 added two counted checks. Historically, CORRECTIVE-012 added one executable mutation-red check; CORRECTIVE-013-FIXUP-001 requires the shell-semantics mutation-red gate as part of the current 158-check run.
 
-### New exact gate
+### Historical CORRECTIVE-012 gate (superseded; retained only as history)
 
-Parent CORRECTIVE-011 gate: 156 checks. CORRECTIVE-012 adds 1 executable mutation-red check.  
-Required: `EXPECTED_CHECKS=157`, `ALL_CHECKS=157/157 FAILURES=0`, final
-`CORRECTIVE_012_E2E_PASS`.
+The prior C012 gate used `EXPECTED_CHECKS=157`, `ALL_CHECKS=157/157 FAILURES=0`, and final `CORRECTIVE_012_E2E_PASS`. Its raw and committed-copy digests are historical and remain documented in the unchanged `corrective_012_report.md`; they are not current evidence.
 
-The CORRECTIVE-011 `ALL_CHECKS=156/156` log is historical parent evidence and is not relabeled.
-Fresh exact run exists: `ALL_CHECKS=157/157 FAILURES=0`, final `CORRECTIVE_012_E2E_PASS`,
-raw log SHA-256 `38a414ac1f2600d11efa7eb9179c33bc8133bf06c8668092e032d5b0c86be5a2`.
-State is `REVIEW_READY / AWAITING_PM_RE-REVIEW`.
+### Current CORRECTIVE-013-FIXUP-001 exact gate
+
+Required frozen-runtime gate: `EXPECTED_CHECKS=158`; final result `ALL_CHECKS=158/158 FAILURES=0`; final marker `CORRECTIVE_013_E2E_PASS`.
+
+Required current markers and mutation counts:
+
+- `ENVIRONMENT_PASS`
+- `RAW_USAGE_NO_SYNTHESIS_PASS`
+- `CANONICAL_PIN_CONSISTENCY_PASS`
+- `CANONICAL_PIN_MUTATION_RED_PASS`
+- `CANONICAL_RUNBOOK_EXECUTABLE_PASS`
+- `CANONICAL_RUNBOOK_ORDER_PASS`
+- `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`
+- `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5`
+- `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18`
+- `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=34`
+- `CORRECTIVE_013_E2E_PASS`
+
+Fresh frozen E2E passed with exit 0 in Debian GNU/Linux 12 (bookworm); exact final result `ALL_CHECKS=158/158 FAILURES=0`, final marker `CORRECTIVE_013_E2E_PASS`. Python dual paths both report `3.11.2`; the five frozen packages and exact requirements/live-freeze checks passed. Raw log `/tmp/CORRECTIVE_013_DEBIAN12/rootfs/tmp/c013-e2e-fresh-20260926-002/e2e.log` SHA-256 `1352c0208a3feb5d435f59f41b57c40b3e61880f778710b9676512f396e321cf`; `isolation/e2e_probe_output.txt` SHA-256 `1352c0208a3feb5d435f59f41b57c40b3e61880f778710b9676512f396e321cf` is byte-identical. Cursor-14 exact-byte scan: raw `0` hits, committed evidence `0` hits. Mutation-red self-test counts passed: cross-document `5`, executable `18`, shell-semantics `34`.
