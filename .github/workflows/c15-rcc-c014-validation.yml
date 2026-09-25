@@ -75,27 +75,11 @@ jobs:
           grep -q '^ALL_CHECKS=158/158 FAILURES=0$' "$LOG"
           grep -q '^RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5$' "$LOG"
           grep -q '^RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18$' "$LOG"
-          grep -q '^RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=48
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: c15-rcc-c014-frozen-evidence
-          path: c014-artifacts/
-          if-no-files-found: error
-          retention-days: 7
- "$LOG"
+          grep -q '^RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=48$' "$LOG"
           grep -q '^NO_COMMITTED_CURSOR14_PAYLOAD_PASS ' "$LOG"
           grep -q '^CANONICAL_RUNBOOK_ORDER_PASS ' "$LOG"
-          grep -q '^CORRECTIVE_013_E2E_PASS
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: c15-rcc-c014-frozen-evidence
-          path: c014-artifacts/
-          if-no-files-found: error
-          retention-days: 7
- "$LOG"
-          ! grep -q '^CHECK FAIL:' "$LOG"
+          grep -q '^CORRECTIVE_013_E2E_PASS$' "$LOG"
+          if grep -q '^CHECK FAIL:' "$LOG"; then exit 1; fi
           sha256sum "$LOG"
 
       - name: Freeze exact E2E evidence onto PR branch
