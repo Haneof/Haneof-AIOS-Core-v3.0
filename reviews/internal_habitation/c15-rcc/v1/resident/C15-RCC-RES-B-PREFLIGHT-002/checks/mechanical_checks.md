@@ -1,6 +1,6 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Mechanical Check Results (CORRECTIVE-003, 26+ checks)
+# C15-RCC-RES-B-PREFLIGHT-002 — Mechanical Checks (historical through CORRECTIVE-010; CORRECTIVE-011 target appended)
 
-All checks run against disposable copies of freeze artifacts. Canonical #205 evidence read but not modified.
+Historical PASS statements below are parent-candidate evidence and remain preserved. Canonical #205 evidence was read but not modified. CORRECTIVE-011 changes the adapter/probe and therefore requires a new exact frozen run; the final section defines the new checks without relabeling old output as fresh.
 
 ## 1. Frozen Core tree identity
 
@@ -171,3 +171,55 @@ execution paths** (the only permitted mentions are in prose that explicitly forb
 
 `CANONICAL_RUNBOOK_EXECUTABLE_PASS` (recovery-status only) is retained but is **not** allowed to stand
 in for the full runbook order; both markers are mandatory.
+
+
+## CORRECTIVE-011 regression additions — exact frozen execution required
+
+These are the new counted regressions wired into the modified `isolation/probe_e2e.sh`.
+They are **not** satisfied by the historical 144/144 log.
+
+### IA-BLK-001 usage no-synthesis
+
+The E2E Python block must produce all of:
+
+- `FULL_USAGE_PRESERVED_PASS`
+- `MISSING_TOTAL_NO_SYNTHESIS_PASS`
+- `INPUT_ONLY_NO_SYNTHESIS_PASS`
+- `OUTPUT_ONLY_NO_SYNTHESIS_PASS`
+- `TOTAL_ONLY_PRESERVED_PASS`
+- `PARTIAL_WITH_TOTAL_PRESERVED_PASS`
+- `INCONSISTENT_USAGE_NONE_PASS`
+- `INVALID_USAGE_NONE_PASS`
+- `USAGE_SOURCE_NO_SYNTHESIS_PASS`
+- aggregate `RAW_USAGE_NO_SYNTHESIS_PASS`
+
+Nine markers are counted as nine checks; the aggregate marker is mandatory but not an extra count.
+
+### IA-BLK-002 pin declaration/mutation gate
+
+`checks/canonical_pin_checker.py --base "$B_PREP" --self-test` must emit:
+
+- `CANONICAL_PIN_CONSISTENCY_PASS`
+- 11 individual `PIN_MUTATION_RED_PASS` lines covering 9 one-hex mutations + duplicate-wrong + missing-World
+- `CANONICAL_PIN_MUTATION_RED_PASS cases=11`
+
+The existing four pin-consistency checks remain counted; the mutation-red aggregate adds one new check.
+
+### IA-BLK-003 lifecycle synchronization
+
+`checks/runbook_lifecycle_checker.py --base "$B_PREP" --self-test` must emit:
+
+- `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`
+- red evidence for receipt-before-current-event, missing projection evidence, duplicate projection evidence
+- `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=3`
+
+This adds two counted checks.
+
+### New exact gate
+
+Parent: 144 checks. New additions: 9 + 1 + 2 = 12.  
+Required: `EXPECTED_CHECKS=156`, `ALL_CHECKS=156/156 FAILURES=0`, final
+`CORRECTIVE_011_E2E_PASS`.
+
+Until that fresh exact run exists, CORRECTIVE-011 remains
+`IMPLEMENTATION_READY / FRESH_E2E_REQUIRED`, not review-ready.

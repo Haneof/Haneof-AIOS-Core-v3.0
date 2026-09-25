@@ -101,11 +101,11 @@ If `ISOLATION_FAIL`, STOP.
 ## 4a. Run the E2E transport probe — genuine + production + adversarial (no cursor 14 reveal)
 
 ```bash
-# exact gate: EXPECTED_CHECKS=144, requires CHECKS==EXPECTED_CHECKS and zero FAIL (CORRECTIVE-010-FIXUP-001)
+# exact gate: EXPECTED_CHECKS=156, requires CHECKS==EXPECTED_CHECKS and zero FAIL (CORRECTIVE-011)
 bash reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/isolation/probe_e2e.sh
 ```
 
-Expected `CORRECTIVE_010_FIXUP_001_E2E_PASS` (144 checks: mailbox 15, isolation, binding 7, synthetic+production genuine, current-event 6, strict, Scheme A, MS_PRIVATE, /dev, signal deterministic with PID map, env exact, real-provider fail-closed, fake fallback fail, import path executable, wire protocol hash, catalog/adapter/wire/boundary/receipt/HTTP/evidence, plus the CORRECTIVE-009 regressions for BLK-01..BLK-08 and the CORRECTIVE-010 canonical runbook-order regression and FIXUP-001 pin-consistency: no committed cursor-14 payload, portable random-checkout import, negative-jail exact-exit proof, executable canonical runbook, missing-release-state fail-closed, no-event-no-dispatch, collision-safe failure receipts, inherited-FD closure, contract provenance binding, canonical runbook 1-12 order executable, World/Index/Release pin consistency across operator_manifest, source_pins, b_startup_procedure).
+Expected `CORRECTIVE_011_E2E_PASS` with `ALL_CHECKS=156/156 FAILURES=0`. The original 144 checks remain, plus CORRECTIVE-011 regressions for raw usage no-synthesis (full/missing-total/input-only/output-only/total-only/partial-with-total/inconsistent/invalid + source inspection), strict authoritative pin declarations with 11 mutation-red cases, and startup/per-cursor lifecycle synchronization with mutation-red checks. Required markers include `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, and `CORRECTIVE_011_E2E_PASS`.
 
 Do NOT proceed if any check fails.
 
@@ -140,7 +140,7 @@ Real B uses `ProductionResidentHandler` with `ExternalBrokerClient` (pinned `bri
 4. Binding `round/request_id/nonce/request_digest` (one-at-a-time, canonical digest).
 5. `build_model_request(contract_text,envelope,wire_protocol_text)` → **exact** provider request `{system: contract, wire_protocol: schema, wire_protocol_sha256: a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a…, messages: [{role:user, content: JSON(envelope)}]}` — provider sees `contract + envelope + mechanical reply schema`, never fixture.
 6. `ExternalBrokerClient.invoke(request)` outside jail (pinned adapter). **Fail closed if `AIOS_REAL_PROVIDER_API_KEY` or `AIOS_REAL_PROVIDER_ENDPOINT` missing, or adapter unresolvable, or `FakeProviderClient` selected from production entrypoint.**
-7. Parse provider `content` JSON → `validate_reply` (per-action allowlist) + `verify_binding` (stale/preplay/replay/wrong-id/wrong-digest fail) → `reply_to_directive_production` with **RAW provenance** (`provider/model/request_id` actual or `UNKNOWN`, `usage` raw preserved, inconsistent `total<input+output` → `usage None` not rewritten).
+7. Parse provider `content` JSON → `validate_reply` (per-action allowlist) + `verify_binding` (stale/preplay/replay/wrong-id/wrong-digest fail) → `reply_to_directive_production` with **RAW provenance** (`provider/model/request_id` actual or `UNKNOWN`). Usage is never synthesized: without provider-reported `total_tokens`, `usage=None`; with a valid total, optional input/output fields are preserved exactly if present; invalid values or `total<input+output` → `usage=None`.
 8. On any `provider exception / non-JSON / schema invalid / binding invalid` → **Scheme A-hard-stop**: clear `_outstanding`, save failure evidence, terminate/reconstruct handler, do **not** advance cursor, next request has new binding, never generate semantic repair hint.
 9. Capability follow-up uses same `current_event` for same cursor, same adapter/binding round 2 (`capability_history` contains `Atlas` legal `obs_c14_fixture_*`).
 
@@ -192,6 +192,25 @@ For each `seq` 14..22 (exactly one at a time). The order below is the **only** l
 executable verbatim: steps 7.1–7.5 make the cursor legal, step 7.6 derives the canonical time
 **after** reveal, steps 7.7–7.9 do the model work, step 7.10 makes it durable, steps 7.11–7.12 close
 this cursor and open the next one.
+
+This §7 is the **single authoritative Phase-B cursor lifecycle**. `per_cursor_interaction.md` is an exact
+operational mirror/reference only; if its wording, executable snippets, or machine-readable lifecycle
+tokens diverge from this §7, execution MUST STOP until both documents are resynchronized.
+
+<!-- C15_PHASE_B_LIFECYCLE_BEGIN -->
+REVEAL
+INSTALL_CURRENT_EVENT
+PERSIST_PROJECTION_EVIDENCE
+CREATE_BINDING_RECEIPT
+VERIFY_BINDING
+DERIVE_OCCURRED_AT
+INGEST
+MODEL_WORK
+FINISH_CURSOR_MODEL_WORK
+DURABLE_ACK
+CLEAR_BINDING
+NEXT_REVEAL
+<!-- C15_PHASE_B_LIFECYCLE_END -->
 
 The operator-side evidence loop is closed for every cursor: the exact reveal projection is persisted
 **twice** — once as the handler input (`current-event.json`) and once as an immutable per-cursor

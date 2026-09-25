@@ -1,22 +1,22 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Operator Manifest (CORRECTIVE-010 authoritative, CORRECTIVE-003 historical superseded)
+# C15-RCC-RES-B-PREFLIGHT-002 — Operator Manifest (CORRECTIVE-011 implementation; prior evidence historical)
 
 Date: 2026-09-25
-Role: Release / Resident Infrastructure Engineer (not Resident B/C, not evaluator — per CORRECTIVE-010-FIXUP-001)
-Task: C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-010-FIXUP-001
-Verdict: **REVIEW_READY / AWAITING_PM_RE-REVIEW** (no B or C run, no merge)
+Role: Release / Resident Infrastructure Engineer (not Resident B/C, not evaluator — per CORRECTIVE-011)
+Task: C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-011
+Verdict: **IMPLEMENTATION_READY / FRESH_E2E_REQUIRED** (no B or C run, no merge; do not PM re-review until exact frozen E2E is attached)
 
-## Current authoritative manifest (CORRECTIVE-010 + FIXUP-001) — this is the ONLY release contract
+## Current authoritative manifest (CORRECTIVE-011) — exact implementation target
 
-- **Current Task**: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-010-FIXUP-001`
-- **Current Verdict**: `REVIEW_READY / AWAITING_PM_RE-REVIEW`
-- **Final gate (CORRECTIVE-010 base)**: `ALL_CHECKS=140/140 FAILURES=0`, marker `CORRECTIVE_010_E2E_PASS`
-- **New regression marker (CORRECTIVE-010)**: `CANONICAL_RUNBOOK_ORDER_PASS` — proves the documented 1→12 order executes on a disposable Phase-B copy and reaches provider transport only after reveal + receipt installation
-- **New gate (FIXUP-001)**: `CANONICAL_PIN_CONSISTENCY_PASS` — proves `operator_manifest.md`, `source_pins_and_digests.md`, `procedure/b_startup_procedure.md` agree on World/Index/Release and equal frozen canonical values; any missing/typo/duplicate contradictory → FAIL
-- **Final gate (FIXUP-001)**: `ALL_CHECKS=N/N FAILURES=0` where N is recomputed from the executable (not mechanically retained 140), must include `CANONICAL_RUNBOOK_ORDER_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CORRECTIVE_010_E2E_PASS` and `CORRECTIVE_010_FIXUP_001_E2E_PASS`
-- **Current production transport**: `ExternalBrokerClient` (transport-only HTTPS, no semantic Atlas/silence choice; `FakeProviderClient` unreachable from production entrypoint; `FakeBrokerServer` is test-only)
-- **Current final runbook semantics**:
-  - **Section 6 is configuration only**: exports/pins `B_PREP`, `HARNESS_DIR`, `AIOS_B_SESSION_ID`, `AIOS_CONTRACT_SHA256`, `AIOS_WIRE_PROTOCOL_SHA256`, `AIOS_ADAPTER_SHA256` (drift grep vs `environment_manifest.md`), `AIOS_REAL_PROVIDER_API_KEY`, `AIOS_REAL_PROVIDER_ENDPOINT` (HTTPS), `AIOS_PROVIDER_ADAPTER=bridged_model_handler:ExternalBrokerClient`, `AIOS_RELEASE_STATE_PATH`, `AIOS_CURRENT_EVENT_PATH`, `AIOS_CURRENT_EVENT_BINDING_PATH`, `AIOS_EVIDENCE_DIR`, `PYTHONPATH="src:$B_PREP/harness"`. Then fail-closed assertions that `current-event.json`, `current-event-binding.json` and non-null `pending_reveal` are absent. States verbatim: «No model dispatch occurs in this section. The first production model turn occurs only inside the per-cursor loop after reveal + binding receipt installation.» No `CURRENT_OCCURRED_AT`, no `--at`, no `turn --session`.
-  - **Section 7 is the sole legal per-cursor loop** as numbered steps **7.1–7.12** in exact order: reveal → write `current-event.json` → persist immutable `event-XXX.projection.json` → create `current-event-binding.json` via `create_current_event_binding_receipt(...)` → `write_binding_receipt(...)` → verify receipt/state/event binding via `validate_current_event_binding` → derive `CURRENT_OCCURRED_AT` from current projection's `occurred_at` (after reveal) → ingest current cursor → run exact production headless turn / due/model rounds → finish all model work for cursor → durable ACK → clear current-event + binding → reveal next cursor before any later model invocation.
+- **Current Task**: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-011`
+- **Current implementation state**: `IMPLEMENTATION_READY / FRESH_E2E_REQUIRED`
+- **Exact gate target**: `EXPECTED_CHECKS=156`, requiring `ALL_CHECKS=156/156 FAILURES=0`
+- **Required current markers**: `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS`, final `CORRECTIVE_011_E2E_PASS`
+- **Production adapter**: `bridged_model_handler:ExternalBrokerClient`, SHA-256 `da74eb97a6d35b535f298f52a72a32fc35dfbd1fca1ec4585aa1d7c090e92911`
+- **Usage rule**: provider `total_tokens` is never synthesized. Missing total → `usage=None`; valid provider total with optional input/output preserves only reported values; invalid/bool/string/negative or inconsistent usage → `usage=None`.
+- **Pin gate**: `checks/canonical_pin_checker.py` parses every authoritative World/Index/Release declaration in all three canonical docs. Every declaration must equal the frozen pin. The same checker executes 11 disposable mutation-red cases.
+- **Runbook authority**: `procedure/b_startup_procedure.md §7` is the single authoritative Phase-B cursor lifecycle. `per_cursor_interaction.md` is an exact mirror/reference and carries the same 12 machine-readable lifecycle tokens. `checks/runbook_lifecycle_checker.py` compares both and mutation-tests historical receipt-before-current-event, missing-projection, and duplicate-projection forms.
+- **Section 6 remains configuration-only**: no model dispatch before reveal/current-event/receipt binding.
+- **Section 7 order remains**: reveal → install current-event → persist immutable projection evidence → create binding receipt → verify → derive occurred_at → ingest → model/capability/due/review work → finish cursor model work → durable ACK → clear event/receipt → next reveal.
 
 **Operator MUST NOT mistake historical CORRECTIVE-003 / 26-check material for the current release contract.** Historical sections below are explicitly labelled `historical / superseded`.
 
@@ -81,7 +81,9 @@ reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/
 │   ├── probe_isolation.sh               isolation probe (ISOLATION_PASS 58 PASS)
 │   └── probe_e2e.sh                     genuine FusedTurnRuntime/CognitiveRuntime→Handler→Bridge→Responder E2E (CORRECTIVE-010 140/140, FIXUP-001 N/N)
 ├── checks/
-│   └── mechanical_checks.md             positive/negative mechanical check results (CORRECTIVE-010 140-check, FIXUP-001 N-check)
+│   ├── mechanical_checks.md             historical evidence + CORRECTIVE-011 exact target
+│   ├── canonical_pin_checker.py         strict declaration parser + 11 mutation-red self-tests
+│   └── runbook_lifecycle_checker.py     startup/per-cursor ordered-token gate + mutation-red self-tests
 ├── procedure/
 │   ├── b_startup_procedure.md           exact B startup (Section 6 config-only, Section 7 7.1-7.12 per-cursor loop, HTTPS-only, canonical pins)
 │   ├── per_cursor_interaction.md        exact per-cursor 14..22 loop — Scheme A (no repair)
@@ -114,11 +116,11 @@ Historical CORRECTIVE-003 (superseded):
 
 Per FIXUP-001 task §2, this historical block is explicitly labelled and does NOT represent the current release contract.
 
-## Frozen model-handling intent (current, CORRECTIVE-010)
+## Frozen model-handling intent (current, CORRECTIVE-011)
 
 **Separation:** `SyntheticProbeHandler` (mailbox bridge + inside-jail responder, `sandbox-bridge/synthetic-responder-v1/10 tokens`) vs **`ProductionResidentHandler`** (outside-jail `ProviderClient`, `contract text + envelope` only, real provenance).
 
-**Separation is in code** — not just documentation. Synthetic path is disposable probe; production path is frozen for real B and maps `provider/model/request_id` from the **actual** `ProviderResponse` (or `"UNKNOWN"` where credibly unavailable) and `usage` from actual `usage.total_tokens` (or `None`, never `10`). PR-approval-time choice phrase removed.
+**Separation is in code** — not just documentation. Synthetic path is disposable probe; production maps `provider/model/request_id` from the **actual** `ProviderResponse` (or `"UNKNOWN"` where credibly unavailable). Production usage requires provider-reported `total_tokens`; it never computes total from input/output. Missing total, invalid values, or inconsistent totals produce `usage=None`; valid total-only or partial optional fields are preserved exactly.
 
 **Phase B adapter is frozen** (`bridged_model_handler.py`) before B run. Operator cannot swap model logic at release. The only production transport is `ExternalBrokerClient`; there is no `RealProviderClient`, and `FakeProviderClient` cannot be instantiated at all (its `__init__` raises), so no fake path is reachable from the production entrypoint.
 
@@ -168,7 +170,7 @@ The digests above are recomputed on every run and are **not** trusted from this 
 drifts from `environment_manifest.md`, and `isolation/probe_e2e.sh` re-derives the contract and wire
 digests at runtime.
 
-## CORRECTIVE-010-FIXUP-001 fresh run record (current authoritative)
+## CORRECTIVE-010-FIXUP-001 fresh run record (historical pre-CORRECTIVE-011 evidence)
 
 Fresh run of `isolation/probe_e2e.sh` after fixing World SHA typo and adding pin-consistency gate:
 
@@ -194,5 +196,16 @@ Fresh run of `isolation/probe_e2e.sh` after fixing World SHA typo and adding pin
 
 The previous erroneous World SHA (66-char with extra c9) was a typo and has been corrected to the canonical 64-char value above. The erroneous 66-char value is no longer present in any of the three canonical docs; the pin-consistency gate would FAIL if it reappeared.
 
-This FIXUP-001 run is the current authoritative evidence; the CORRECTIVE-010 base run (140/140) is retained as historical but superseded by this 144/144 run.
+This FIXUP-001 144/144 run is retained as historical evidence for the parent candidate only. It is NOT fresh execution evidence for CORRECTIVE-011 because the production adapter and probe changed.
 
+
+
+## CORRECTIVE-011 implementation delta / execution requirement
+
+The three second-acceptance blockers are addressed in code/docs:
+
+1. IA-BLK-001: production usage no longer synthesizes `total_tokens`; `probe_e2e.sh` adds full, missing-total, input-only, output-only, total-only, partial-with-total, inconsistent, invalid-type, and AST source-inspection regressions. Target marker: `RAW_USAGE_NO_SYNTHESIS_PASS`.
+2. IA-BLK-002: strict declaration parser factored into `checks/canonical_pin_checker.py`; production gate and self-test invoke the same checker; 9 one-hex mutations plus duplicate-wrong and missing-World cases must all red. Target marker: `CANONICAL_PIN_MUTATION_RED_PASS`.
+3. IA-BLK-003: `per_cursor_interaction.md` is synchronized to startup §7, including projection evidence before receipt; both carry identical lifecycle tokens and are checked by `checks/runbook_lifecycle_checker.py`. Target marker: `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`.
+
+**Evidence rule:** the old committed 144/144 log must not be relabeled as CORRECTIVE-011. A new exact frozen-environment run of the modified `isolation/probe_e2e.sh` is mandatory before changing this manifest to `REVIEW_READY / AWAITING_PM_RE-REVIEW`.

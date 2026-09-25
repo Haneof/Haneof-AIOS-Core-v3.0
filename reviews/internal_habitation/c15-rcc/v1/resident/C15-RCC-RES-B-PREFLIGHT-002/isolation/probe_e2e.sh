@@ -1,5 +1,5 @@
 #!/bin/bash
-# C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-009 — Full E2E probe (operator side, exact gate).
+# C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-011 — Full E2E probe (operator side, exact gate).
 # Must be run as root (sudo). Closes the 8 independent-acceptance blockers (BLK-01..BLK-08).
 # EXPECTED_CHECKS exact, 0 FAIL, mandatory markers, else non-zero.
 #
@@ -64,7 +64,7 @@ FAILURES=0
 pass_check() { CHECKS=$((CHECKS+1)); echo "CHECK $CHECKS PASS: $*"; }
 fail_check() { FAILURES=$((FAILURES+1)); echo "CHECK FAIL: $*"; }
 
-EXPECTED_CHECKS=144
+EXPECTED_CHECKS=156
 echo "[e2e] EXPECTED_CHECKS=$EXPECTED_CHECKS"
 
 # Step 0: exact environment (CORRECTIVE-005: freeze Python/Pydantic/wire/adapter/contract/freeze, not OS/kernel)
@@ -420,6 +420,107 @@ print("UNKNOWN_PROVENANCE_PASS")
 PYEOF
 pass_check "production genuine via ExternalBrokerClient (mock) REAL provenance"
 pass_check "UNKNOWN handling"
+
+# CORRECTIVE-011 / IA-BLK-001: provider usage is raw telemetry; never synthesize total_tokens.
+echo "[e2e] step 4c: raw provider usage no-synthesis regression"
+"$PY" - <<'PYEOF'
+import ast, inspect, json, textwrap
+from bridged_model_handler import ProviderResponse, _reply_to_directive_production
+
+class DummySnap:
+    cockpit = {}
+    capability_catalog = []
+    capability_history = []
+    wake_reason = "usage-regression"
+    round_index = 0
+
+reply = {
+    "round": 1,
+    "request_id": "a" * 32,
+    "request_digest": "b" * 64,
+    "action": "silence",
+}
+
+def translate(raw_usage):
+    resp = ProviderResponse(
+        provider="broker-provider",
+        model="broker-model",
+        request_id="broker-request-id",
+        usage=raw_usage,
+        content=json.dumps(reply),
+    )
+    return _reply_to_directive_production(reply, DummySnap(), resp)
+
+d = translate({"total_tokens": 42, "input_tokens": 20, "output_tokens": 22})
+assert d.usage is not None
+assert d.usage.total_tokens == 42 and d.usage.input_tokens == 20 and d.usage.output_tokens == 22
+print("FULL_USAGE_PRESERVED_PASS")
+
+d = translate({"input_tokens": 20, "output_tokens": 22})
+assert d.usage is None
+assert d.provenance.provider == "broker-provider" and d.provenance.model == "broker-model"
+assert d.provenance.request_id == "broker-request-id"
+print("MISSING_TOTAL_NO_SYNTHESIS_PASS")
+
+assert translate({"input_tokens": 20}).usage is None
+print("INPUT_ONLY_NO_SYNTHESIS_PASS")
+
+assert translate({"output_tokens": 22}).usage is None
+print("OUTPUT_ONLY_NO_SYNTHESIS_PASS")
+
+d = translate({"total_tokens": 42})
+assert d.usage is not None and d.usage.total_tokens == 42
+assert d.usage.input_tokens is None and d.usage.output_tokens is None
+print("TOTAL_ONLY_PRESERVED_PASS")
+
+d = translate({"total_tokens": 42, "input_tokens": 20})
+assert d.usage is not None and d.usage.total_tokens == 42 and d.usage.input_tokens == 20
+assert d.usage.output_tokens is None
+print("PARTIAL_WITH_TOTAL_PRESERVED_PASS")
+
+assert translate({"total_tokens": 10, "input_tokens": 20, "output_tokens": 22}).usage is None
+print("INCONSISTENT_USAGE_NONE_PASS")
+
+invalid_shapes = (
+    {"total_tokens": -1},
+    {"total_tokens": True},
+    {"total_tokens": "42"},
+    {"total_tokens": 42, "input_tokens": -1},
+    {"total_tokens": 42, "input_tokens": True},
+    {"total_tokens": 42, "input_tokens": "20"},
+    {"total_tokens": 42, "output_tokens": -1},
+    {"total_tokens": 42, "output_tokens": False},
+    {"total_tokens": 42, "output_tokens": "22"},
+)
+for raw in invalid_shapes:
+    assert translate(raw).usage is None, raw
+print("INVALID_USAGE_NONE_PASS")
+
+src = textwrap.dedent(inspect.getsource(_reply_to_directive_production))
+assert "sum_tot" not in src, "production translator still contains sum_tot synthesis"
+tree = ast.parse(src)
+usage_calls = []
+for node in ast.walk(tree):
+    if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "ModelUsage":
+        usage_calls.append(node)
+assert usage_calls, "production translator has no ModelUsage construction"
+for call in usage_calls:
+    total_kw = next((kw for kw in call.keywords if kw.arg == "total_tokens"), None)
+    assert total_kw is not None, "ModelUsage call lacks total_tokens keyword"
+    assert isinstance(total_kw.value, ast.Name) and total_kw.value.id == "tot_i", (
+        "production translator total_tokens must come only from provider-reported tot_i; "
+        f"got {ast.dump(total_kw.value)}"
+    )
+print("USAGE_SOURCE_NO_SYNTHESIS_PASS")
+print("RAW_USAGE_NO_SYNTHESIS_PASS")
+PYEOF
+for marker in   FULL_USAGE_PRESERVED_PASS   MISSING_TOTAL_NO_SYNTHESIS_PASS   INPUT_ONLY_NO_SYNTHESIS_PASS   OUTPUT_ONLY_NO_SYNTHESIS_PASS   TOTAL_ONLY_PRESERVED_PASS   PARTIAL_WITH_TOTAL_PRESERVED_PASS   INCONSISTENT_USAGE_NONE_PASS   INVALID_USAGE_NONE_PASS   USAGE_SOURCE_NO_SYNTHESIS_PASS; do
+  if grep -q "$marker" "$CURRENT_RUN_LOG"; then
+    pass_check "CORRECTIVE-011 usage regression $marker"
+  else
+    fail_check "CORRECTIVE-011 usage regression missing $marker"
+  fi
+done
 
 # Step 5 current-event negatives (6)
 echo "[e2e] step 5: current-event / envelope negatives (6)"
@@ -3052,119 +3153,40 @@ else
   exit 1
 fi
 
-# ---- CORRECTIVE-010-FIXUP-001: canonical pin consistency across 3 docs -----------------
-echo "[e2e] step 17k: canonical pin consistency (operator_manifest, source_pins, b_startup_procedure)"
-sudo -E "$PY" - "$B_PREP" "$REPO_ROOT" <<'PYEOF'
-import re, sys
-from pathlib import Path
-import os
-b_prep = Path(sys.argv[1]) if len(sys.argv)>1 else Path(os.environ.get("B_PREP","."))
-repo = Path(sys.argv[2]) if len(sys.argv)>2 else Path(os.environ.get("REPO_ROOT","."))
-
-canonical_world = "626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa"
-canonical_index = "ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1"
-canonical_release = "eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8"
-# erroneous 66-char with extra c9
-erroneous_world = "626c6bb32c7fdae90a068ee10dd2b4c9c9cdbc46b6feb2bf5b11cba9363401f6aa"
-
-docs = [
-    b_prep / "operator_manifest.md",
-    b_prep / "source_pins_and_digests.md",
-    b_prep / "procedure/b_startup_procedure.md",
-]
-
-def extract_hashes(text):
-    return re.findall(r"[a-f0-9]{64}", text)
-
-def check_doc(p):
-    txt = p.read_text(encoding="utf-8", errors="replace")
-    # Check erroneous presence -> FAIL
-    if erroneous_world in txt:
-        print(f"FAIL {p.name} contains erroneous World SHA (66-char extra c9): {erroneous_world}")
-        sys.exit(1)
-    # Check canonical presence
-    missing = []
-    if canonical_world not in txt:
-        missing.append("World")
-    if canonical_index not in txt:
-        missing.append("Index")
-    if canonical_release not in txt:
-        missing.append("Release")
-    if missing:
-        print(f"FAIL {p.name} missing canonical pins: {missing}")
-        sys.exit(1)
-    # Check for contradictory values in context
-    # For each line containing world/index/release keywords, ensure hash equals canonical
-    for i,line in enumerate(txt.splitlines(),1):
-        low = line.lower()
-        # find all 64-hex in line
-        hashes = re.findall(r"[a-f0-9]{64}", line)
-        if not hashes:
-            continue
-        for h in hashes:
-            ctx = low
-            # World context
-            if ("world.sqlite" in ctx or "private_world" in ctx or ("world" in ctx and "lineage" in ctx) or ("world" in ctx and "freeze" in ctx) or ("world" in ctx and "digest" in ctx) or ("world" in ctx and "sha" in ctx and "world" in ctx)):
-                # But avoid contract/wire etc - those have their own names
-                # If line contains world and also contains contract/wire/adapter, skip? Actually those lines shouldn't contain world hash
-                # We'll be strict: if line contains "world" and hash is not canonical world and hash is not in allowed other list, then fail
-                # Allowed other hashes that may appear near world word? No, world lines should only have world hash
-                if h != canonical_world:
-                    # Check if h is one of the other canonical pins (index/release) appearing in same line that also mentions world - that would be okay if line mentions both? But our docs have separate lines
-                    # To avoid false positive, only fail if line contains world but not index/release keywords
-                    if "index" not in ctx and "release" not in ctx:
-                        # Also ensure h is not contract/wire (those are different lengths? but same 64)
-                        # We check if h is known other pins that are not world - if so, it's okay only if context also mentions that pin type
-                        # For simplicity, if h != canonical_world and h in [canonical_index, canonical_release]:
-                        # then it's okay if context mentions index/release
-                        # Otherwise fail
-                        if h not in (canonical_index, canonical_release):
-                            # Could be contract/wire etc - those have distinct values, not world/index/release
-                            # We should only enforce when line is clearly a world line: contains world.sqlite or private_world or lineage World
-                            if "world.sqlite" in ctx or "private_world" in ctx or "lineage world" in ctx:
-                                print(f"FAIL {p.name}:{i} world line has contradictory hash {h} != canonical {canonical_world} :: {line.strip()[:200]}")
-                                sys.exit(1)
-            # Index context
-            if ("index.sqlite" in ctx or "world_index" in ctx or ("index" in ctx and "lineage" in ctx)):
-                if h != canonical_index:
-                    if "world" not in ctx and "release" not in ctx:
-                        if h not in (canonical_world, canonical_release):
-                            if "index.sqlite" in ctx or "world_index" in ctx or "lineage index" in ctx:
-                                print(f"FAIL {p.name}:{i} index line has contradictory hash {h} != canonical {canonical_index} :: {line.strip()[:200]}")
-                                sys.exit(1)
-            # Release context
-            if ("release_state.json" in ctx or "release_state" in ctx or ("release" in ctx and "lineage" in ctx)):
-                if h != canonical_release:
-                    if "world" not in ctx and "index" not in ctx:
-                        if h not in (canonical_world, canonical_index):
-                            if "release_state.json" in ctx or "release_state" in ctx or "lineage release" in ctx:
-                                print(f"FAIL {p.name}:{i} release line has contradictory hash {h} != canonical {canonical_release} :: {line.strip()[:200]}")
-                                sys.exit(1)
-    # Also check for duplicate contradictory values: count distinct world hashes in doc that appear in world context
-    # We already checked per line, but also ensure all world-context hashes are canonical
-    print(f"PASS {p.name} contains canonical World/Index/Release and no contradictory")
-
-for doc in docs:
-    if not doc.is_file():
-        print(f"FAIL doc missing {doc}")
-        sys.exit(1)
-    check_doc(doc)
-
-# Cross-doc consistency: ensure all three docs have same values (already checked presence, but also ensure no doc has extra different value for same type)
-# Since we already ensured each doc's world lines are canonical, cross-doc is consistent
-print(f"World pin {canonical_world} consistent across 3 docs")
-print(f"Index pin {canonical_index} consistent across 3 docs")
-print(f"Release pin {canonical_release} consistent across 3 docs")
-print("CANONICAL_PIN_CONSISTENCY_PASS")
-PYEOF
-if grep -q "CANONICAL_PIN_CONSISTENCY_PASS" "$CURRENT_RUN_LOG" 2>/dev/null; then
-  pass_check "World pin consistent across operator_manifest, source_pins, b_startup_procedure"
-  pass_check "Index pin consistent across 3 docs"
-  pass_check "Release pin consistent across 3 docs"
-  pass_check "cross-document pin consistency no missing/typo/duplicate"
-  echo "CANONICAL_PIN_CONSISTENCY_PASS verified"
+# ---- CORRECTIVE-011 / IA-BLK-002: strict declaration checker + mutation-red self-test ---------
+echo "[e2e] step 17k: canonical pin declaration consistency + mutation red"
+pin_out=$("$PY" "$B_PREP/checks/canonical_pin_checker.py" --base "$B_PREP" --self-test)
+printf '%s\n' "$pin_out"
+if grep -q "CANONICAL_PIN_CONSISTENCY_PASS" "$CURRENT_RUN_LOG"; then
+  pass_check "World pin declarations all canonical across 3 docs"
+  pass_check "Index pin declarations all canonical across 3 docs"
+  pass_check "Release pin declarations all canonical across 3 docs"
+  pass_check "cross-document authoritative pin declarations have no missing/typo/duplicate contradiction"
 else
-  fail_check "canonical pin consistency"
+  fail_check "canonical pin declaration consistency"
+  exit 1
+fi
+if grep -q "CANONICAL_PIN_MUTATION_RED_PASS" "$CURRENT_RUN_LOG"; then
+  pass_check "11 disposable pin mutations all rejected by the production checker"
+else
+  fail_check "canonical pin mutation-red self-test"
+  exit 1
+fi
+
+# ---- CORRECTIVE-011 / IA-BLK-003: cross-document lifecycle gate + mutation-red -----------------
+echo "[e2e] step 17l: startup/per-cursor lifecycle synchronization + mutation red"
+runbook_out=$("$PY" "$B_PREP/checks/runbook_lifecycle_checker.py" --base "$B_PREP" --self-test)
+printf '%s\n' "$runbook_out"
+if grep -q "RUNBOOK_CROSS_DOCUMENT_ORDER_PASS" "$CURRENT_RUN_LOG"; then
+  pass_check "startup §7 and per_cursor lifecycle token sequences are identical and canonical"
+else
+  fail_check "runbook cross-document lifecycle order"
+  exit 1
+fi
+if grep -q "RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS" "$CURRENT_RUN_LOG"; then
+  pass_check "per_cursor old receipt-before-current-event/missing/duplicate mutations all rejected"
+else
+  fail_check "runbook cross-document mutation-red self-test"
   exit 1
 fi
 
@@ -3188,7 +3210,8 @@ for m in ISOLATION_PASS SYNTHETIC_GENUINE_PASS PRODUCTION_GENUINE_PASS PRODUCTIO
          NEGATIVE_JAIL_ACTUALLY_EXECUTED_PASS CANONICAL_RUNBOOK_EXECUTABLE_PASS \
          MISSING_RELEASE_STATE_FAIL_CLOSED_PASS NO_EVENT_NO_DISPATCH_PASS \
          FAILURE_RECEIPT_COLLISION_PASS INHERITED_FD_SEALED_PASS CONTRACT_PROVENANCE_PASS \
-         CANONICAL_RUNBOOK_ORDER_PASS CANONICAL_PIN_CONSISTENCY_PASS; do
+         RAW_USAGE_NO_SYNTHESIS_PASS CANONICAL_RUNBOOK_ORDER_PASS CANONICAL_PIN_CONSISTENCY_PASS \
+         CANONICAL_PIN_MUTATION_RED_PASS RUNBOOK_CROSS_DOCUMENT_ORDER_PASS RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS; do
   if grep -q "$m" "$CURRENT_RUN_LOG" 2>/dev/null; then
     echo "MARKER PASS: $m in CURRENT_RUN_LOG"
   else
@@ -3209,4 +3232,5 @@ if [ "$FAILURES" -ne 0 ]; then
 fi
 echo "CORRECTIVE_010_E2E_PASS"
 echo "CORRECTIVE_010_FIXUP_001_E2E_PASS"
+echo "CORRECTIVE_011_E2E_PASS"
 echo "[e2e] done $(date -u +%Y-%m-%dT%H:%M:%SZ)"

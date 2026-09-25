@@ -1,4 +1,4 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Environment Manifest (CORRECTIVE-010 exact, frozen)
+# C15-RCC-RES-B-PREFLIGHT-002 — Environment Manifest (CORRECTIVE-011 exact, frozen)
 
 This manifest freezes the exact environment the Resident B process will run under.
 Any deviation MUST STOP before B start (no pip install, no upgrade).
@@ -13,7 +13,7 @@ Any deviation MUST STOP before B start (no pip install, no upgrade).
 | Contract | `28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef` (exact bytes of RESIDENT_B_RUN_CONTRACT.md, `RESIDENT_B_RUN_CONTRACT.md` not truncated) | `echo "28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef  reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md" | sha256sum -c -` |
 | Core tree | `fe77f8a0706acfaf369041d0882b6d0e6de39f22` | `git ls-tree HEAD -- src/aios_core` |
 | Frozen software | `773876f92d5f8e53422f8f5a68cc651953d93052` | `git rev-parse HEAD` |
-| Adapter | `bridged_model_handler:ExternalBrokerClient` `1.0.0-frozen` `c15-rcc-b-wire-v1` sha `3c8f686bb537ed6258f4b8825b9976c63e8c4b00ebfa57c939a416b3dd666b9d` (unchanged by CORRECTIVE-010) | `sha256sum harness/bridged_model_handler.py` |
+| Adapter | `bridged_model_handler:ExternalBrokerClient` `1.0.0-frozen` `c15-rcc-b-wire-v1` sha `da74eb97a6d35b535f298f52a72a32fc35dfbd1fca1ec4585aa1d7c090e92911` (unchanged by CORRECTIVE-010) | `sha256sum harness/bridged_model_handler.py` |
 | Jail wrapper | `harness/resident_jail.py` sha `d766c1857163528cacf90e6b876466d099456062914747eab25dd1220e8615eb` | `sha256sum harness/resident_jail.py` |
 
 ## Dependency freeze — Frozen dependency subset, not entire pip environment.
@@ -51,7 +51,7 @@ OS `Debian 12 (bookworm)` and kernel `Linux 6.1.158+` are **informational**, not
 | `AIOS_MAILBOX_ROOT` | `$RUN_ROOT/mailbox` | operator |
 | `AIOS_CONTRACT_SHA256` | `28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef` | operator |
 | `AIOS_WIRE_PROTOCOL_SHA256` | `a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a` | operator |
-| `AIOS_ADAPTER_SHA256` | `3c8f686bb537ed6258f4b8825b9976c63e8c4b00ebfa57c939a416b3dd666b9d` | operator |
+| `AIOS_ADAPTER_SHA256` | `da74eb97a6d35b535f298f52a72a32fc35dfbd1fca1ec4585aa1d7c090e92911` | operator |
 | `AIOS_REAL_PROVIDER_API_KEY` | `<redacted>` | operator (required for prod) |
 | `AIOS_REAL_PROVIDER_ENDPOINT` | `https://broker.example/...` (production, HTTPS-only) — `http://127.0.0.1:<port>/v1/chat` only via direct `ExternalBrokerClient(..., allow_test_loopback=True)` probe-only, never via production `headless_production_handler` | operator (required) |
 | `AIOS_PROVIDER_ADAPTER` | `bridged_model_handler:ExternalBrokerClient` (exact, pinned, no fake) | operator (pinned) |
@@ -66,7 +66,7 @@ OS `Debian 12 (bookworm)` and kernel `Linux 6.1.158+` are **informational**, not
 
 ## Provider-visible
 
-Only `{ system: contract, wire_protocol: schema, wire_protocol_sha256: hash, messages: [{role:user, content: envelope_json}] }` — no env, no path. Transport is HTTP POST via `ExternalBrokerClient` (pure transport, no Atlas/silence decision).
+Only `{ system: contract, wire_protocol: schema, wire_protocol_sha256: hash, messages: [{role:user, content: envelope_json}] }` — no env, no path. Transport is HTTP POST via `ExternalBrokerClient` (pure transport, no Atlas/silence decision). Broker usage is mapped without synthesis: a missing `total_tokens` yields `usage=None`; input/output are never added to manufacture a total.
 
 ## Probe asserts (must pass before B)
 
@@ -74,7 +74,7 @@ Only `{ system: contract, wire_protocol: schema, wire_protocol_sha256: hash, mes
 - `python3 -c "import pydantic; print(pydantic.__version__)"` must equal `2.13.5`
 - `echo "a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a  harness/resident_wire_protocol.json" | sha256sum -c -`
 - `echo "28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef  reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md" | sha256sum -c -`
-- `echo "3c8f686bb537ed6258f4b8825b9976c63e8c4b00ebfa57c939a416b3dd666b9d  harness/bridged_model_handler.py" | sha256sum -c -` (adapter pinned)
+- `echo "da74eb97a6d35b535f298f52a72a32fc35dfbd1fca1ec4585aa1d7c090e92911  harness/bridged_model_handler.py" | sha256sum -c -` (adapter pinned)
 - `harness/resident_jail.py` resolves its default `--repo` mechanically from `__file__` (unique ancestor containing `src/aios_core`); no absolute path is hardcoded anywhere in the executable path (CORRECTIVE-009 / BLK-02, BLK-08).
 - `pip freeze` must contain every line from `harness/requirements.freeze.txt` exactly; extra packages allowed (Frozen dependency subset, not entire pip environment.) Freeze SHA `bd7a76d1171c137f9daee9c0a3dbff029b8cbbccef88f0a1aff7907710a82375` must be exact
 - `git ls-tree HEAD -- src/aios_core` must equal `fe77f8a0706acfaf369041d0882b6d0e6de39f22`
@@ -83,7 +83,7 @@ Only `{ system: contract, wire_protocol: schema, wire_protocol_sha256: hash, mes
 ## File manifest
 
 - `harness/resident_wire_protocol.json` + `.md` (pinned `a6bbeaef...` v1.0.1)
-- `harness/bridged_model_handler.py` (pinned `3c8f686bb537ed6258f4b8825b9976c63e8c4b00ebfa57c939a416b3dd666b9d`)
+- `harness/bridged_model_handler.py` (pinned `da74eb97a6d35b535f298f52a72a32fc35dfbd1fca1ec4585aa1d7c090e92911`)
 - `harness/resident_jail.py` (pinned `d766c1857163528cacf90e6b876466d099456062914747eab25dd1220e8615eb`)
 - `harness/requirements.freeze.txt` (full freeze `bd7a76d...`)
 - `harness/resident_jail.py` env allowlist

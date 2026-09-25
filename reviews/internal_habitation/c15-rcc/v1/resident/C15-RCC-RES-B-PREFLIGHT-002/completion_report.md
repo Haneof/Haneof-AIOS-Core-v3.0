@@ -1,115 +1,133 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Completion Report (CORRECTIVE-010)
+# C15-RCC-RES-B-PREFLIGHT-002 — Completion Report (CORRECTIVE-011 implementation)
 
-Date: 2026-09-25
-Task: C15-RCC-RES-B-PREFLIGHT-002 → CORRECTIVE-009 → CORRECTIVE-010
-Role: Release / Test Infrastructure Engineer (Sealed Resident Infrastructure Designer)
+Date: 2026-09-25  
+Task: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-011`  
+Role: Release / Test Infrastructure Engineer
 
-## Verdict: **REVIEW_READY / AWAITING_PM_RE-REVIEW**
+## Current state: **IMPLEMENTATION_READY / FRESH_E2E_REQUIRED**
 
-All 15 mandatory mechanical checks from the preflight prompt §8 PASS. Independent acceptance
-review `5315355377` found 8 blockers; CORRECTIVE-009 closed 7 of them and CORRECTIVE-010 closed
-the last one (`BLK-03 / CANONICAL_RUNBOOK_ORDER_NOT_EXECUTABLE`) by making the numbered runbook
-order itself executable. Final gate: recomputed `EXPECTED_CHECKS`, `FAILURES=0`, marker
-**`CORRECTIVE_010_E2E_PASS`**. See `corrective_009_report.md` (BLK-01/02/04..08) and
-`corrective_010_report.md` (BLK-03 ordering) for the per-blocker closure evidence.
+Independent Acceptance review `5316831911` failed exact candidate
+`a8576e8b60c400845ceeecc6b7145202e4d1f617` with three blockers. PM adjudication
+`5316852416` substantiated the same three and released CORRECTIVE-011.
 
-| Gate marker | Blocker |
-| --- | --- |
-| `NO_COMMITTED_CURSOR14_PAYLOAD_PASS` | BLK-01 |
-| `NO_FALSE_NO_REVEAL_PROSE_PASS` | BLK-01 |
-| `PORTABLE_CHECKOUT_PASS` | BLK-02 |
-| `NEGATIVE_JAIL_ACTUALLY_EXECUTED_PASS` | BLK-02 |
-| `CANONICAL_RUNBOOK_STATIC_PASS` / `CANONICAL_RUNBOOK_EXECUTABLE_PASS` / `CANONICAL_RUNBOOK_ORDER_PASS` | BLK-03 |
-| `MISSING_RELEASE_STATE_FAIL_CLOSED_PASS` | BLK-04 |
-| `NO_EVENT_NO_DISPATCH_PASS` | BLK-05 |
-| `FAILURE_RECEIPT_COLLISION_PASS` | BLK-06 |
-| `INHERITED_FD_SEALED_PASS` | BLK-07 |
-| `CONTRACT_PROVENANCE_PASS` | BLK-08 |
+The implementation changes for all three blockers are present in this corrective candidate, but the old
+committed `144/144` evidence belongs to the parent candidate and MUST NOT be reused as fresh evidence.
+A new exact frozen-environment run of `isolation/probe_e2e.sh` is still required before this report may
+be changed to `REVIEW_READY / AWAITING_PM_RE-REVIEW`.
 
-The only success marker is `CORRECTIVE_010_E2E_PASS`. The earlier CORRECTIVE-008 gate and the
-CORRECTIVE-009 gate are retired and must not be reused; the stale-count and stale-marker greps
-in the probe assert this.
+## IA-BLK-001 — production usage no synthesis
 
-## Propositions to prove (per prompt)
+`harness/bridged_model_handler.py::_reply_to_directive_production()` no longer derives a total from
+input/output counts.
 
-| Proposition | How proven | Result |
-| --- | --- | --- |
-| A durable World lineage can correctly continue to B | Copied World opens with AUTO_RECOVERABLE recovery, revision=98, index_lag=0; index rebuilds from World truth to watermark 98 / 245 rows; Phase-B init accepts the exact boundary. | PASS |
-| Phase A boundary is exactly at 13 → next 14 | `release_state.json` fields verified: last_acked=13, next=14, pending_reveal=null, 13 contiguous receipts; init --phase B transitions cleanly. | PASS |
-| B uses a fresh model context/process | Startup procedure mints new `$B_SESSION` and `$B_PROCESS` at run time; mailbox_bridge starts a fresh conversation; no A transcript or B-old #121 history is injected. | PASS |
-| B inherits durable World, not A chat record | lineage_copy contains only World + index + release_state; mailbox archive, operator logs, transcripts, and reports are explicitly excluded (documented in copied_lineage_hash_manifest.md §"What was NOT copied"). | PASS |
-| Resident-safe filesystem/interface truly isolates fixture/evaluator | OS-level mount-namespace + chroot + uid drop; probe confirmed 11 categories of sealed material are absent from the sandbox; runs as nobody; mount() denied; /proc/1/root unreadable. | PASS (not prompt-only — OS enforced) |
-| Operator only transports data; does not make semantic judgments | mailbox_bridge validates JSON structure only; no keyword defaults, no pre-authored directives, no answer-by-pattern; capability execution is Core-mediated. | PASS |
-| Malformed boundary fails closed | Three malformed + one double-init cases all returned non-zero exit with specific error messages; no state was written. | PASS |
-| Same-World restart works | recovery-status on copied World reports AUTO_RECOVERABLE at rev=98; index rebuild succeeds. | PASS |
-| B freeze/evidence procedure defined before B runs | procedure/final_freeze_procedure.md specifies exact commands, digest computation, evidence layout, and PR preparation; written before any B execution. | PASS |
+Frozen rule:
 
-## Forbidden actions NOT performed
+- complete `20/22/42` → preserve `42/20/22`;
+- missing `total_tokens` with input/output present → `usage=None`;
+- input-only or output-only without total → `usage=None`;
+- total-only → preserve the reported total, optional fields remain `None`;
+- valid total + one optional component → preserve only provider-reported values;
+- `total < input + output` → `usage=None`;
+- negative/bool/string token values → `usage=None`;
+- `provider/model/request_id` provenance remains available independently of usage.
 
-- ✅ Cursor 14 was NOT revealed to any model. Preflight invoked `release_operator reveal --phase B` **only on a disposable copy** of the release state, purely to obtain the mechanical `init → reveal → receipt → handler` proof. The projection was never presented to a Resident or model and its payload bytes were never committed into current evidence (CORRECTIVE-009 / BLK-01).
-- ✅ Resident B was NOT run (no genuine model inference; no model provider was invoked).
-- ✅ Resident C was NOT run.
-- ✅ PR #205 was NOT modified (fetched read-only; digests recomputed from its blobs; no push to pr205).
-- ✅ Core source was NOT modified (`src/aios_core/` tree hash unchanged `fe77f8a...`).
-- ✅ A transcript / mailbox / decisions / checkpoints were NOT copied into any B-visible packet (they were inspected by the preflight engineer for verification purposes but excluded from the Resident-visible sandbox).
-- ✅ fixture/evaluator/PM/governance materials are NOT in the Resident-visible sandbox (probe confirmed absent).
+The adapter SHA-256 after this correction is
+`da74eb97a6d35b535f298f52a72a32fc35dfbd1fca1ec4585aa1d7c090e92911`.
 
-## Exit boundary
+`probe_e2e.sh` adds nine counted regressions and emits
+`RAW_USAGE_NO_SYNTHESIS_PASS` only after all data-shape cases and AST source inspection pass.
 
-This preflight stops at REVIEW_READY. It does NOT:
-- run Resident B
-- release cursor 14
-- enter B acceptance
-- run Resident C
-- enter C15 semantic evaluation
-- enter C16 / broad P16 / P17
-- modify Core
-- do UI/hardware
+## IA-BLK-002 — strict canonical declaration checker
 
-The only next legal task after independent PM/release review is:
+New `checks/canonical_pin_checker.py` is the single checker implementation used by both the real pin
+gate and the mutation-red self-test.
 
-`C15-RCC-RES-B-RELEASE-002`
+For each of:
 
-## Evidence tree
+- `operator_manifest.md`
+- `source_pins_and_digests.md`
+- `procedure/b_startup_procedure.md`
 
-```
-reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/
-├── operator_manifest.md
-├── source_pins_and_digests.md
-├── copied_lineage_hash_manifest.md
-├── resident_safe_packet_manifest.md
-├── identity_inventory.md
-├── known_limitations.md
-├── completion_report.md
-├── lineage_copy/
-│   ├── private_world.sqlite     (sha256 matches accepted A freeze)
-│   ├── world_index.sqlite       (sha256 matches accepted A freeze)
-│   └── release_state.json       (active_phase=A, ack=13, next=14)
-├── isolation/
-│   ├── isolation_report.md
-│   └── probe_isolation.sh
-├── harness/
-│   ├── resident_jail.py         (mount-ns chroot sandbox builder)
-│   └── mailbox_bridge.py        (transport-only mailbox, no semantics)
-├── checks/
-│   └── mechanical_checks.md     (15/15 PASS + CORRECTIVE-009 checks 125-139)
-├── corrective_009_report.md     (BLK-01/02/04..08 closure evidence)
-├── corrective_010_report.md     (BLK-03 canonical runbook ordering)
-└── procedure/
-    ├── b_startup_procedure.md
-    ├── per_cursor_interaction.md
-    └── final_freeze_procedure.md
-```
+it collects authoritative World / Index / Release declarations, including bare `World:` / `Index:` /
+`Release:` labels, lineage labels, and `private_world.sqlite` / `world_index.sqlite` /
+`release_state.json` declaration lines. Every authoritative occurrence must equal the canonical pin;
+a correct occurrence elsewhere cannot mask a wrong declaration.
 
-## Blockers
+Self-test matrix: 9 one-hex mutations (3 pins × 3 docs), one duplicate wrong World declaration, and one
+missing-all-World declaration. All 11 must red before
+`CANONICAL_PIN_MUTATION_RED_PASS` is emitted.
 
-**None.**
+Canonical values remain:
 
-## Recommended next action for reviewer
+- World: `626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa`
+- Index: `ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1`
+- Release: `eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8`
 
-1. Verify this PR changes only files under `reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/` (plus any integration-receipt file at the reviewer's discretion).
-2. Re-run the isolation probe (procedure step 4) on the reviewer's machine to confirm the sandbox yields `ISOLATION_PASS`.
-3. Spot-check the three freeze SHA-256 values against PR #205 directly.
-4. Confirm every `reveal` invocation is confined to a **disposable** release-state copy, prints mechanical metadata only (sequence / event_id / projection SHA256 / payload SHA256 / field count), and never persists or tee's `resident_visible_payload` into a committed log.
-5. Confirm Section 6 of `b_startup_procedure.md` is configuration-only (no `CURRENT_OCCURRED_AT`, no `turn`) and that the production turn lives in the per-cursor loop after reveal + receipt, then re-run the `CANONICAL_RUNBOOK_ORDER_PASS` regression. Historical commits `3796377`…`b57ed6b` are superseded leaked evidence and must never be read by any Resident.
-6. Approve / request changes. On approval, integration writes the receipt and moves `C15-RCC-RES-B-RELEASE-002` to READY.
+## IA-BLK-003 — one active lifecycle
+
+`procedure/b_startup_procedure.md §7` is explicitly the single authoritative Phase-B cursor lifecycle.
+`procedure/per_cursor_interaction.md` is now an exact operational mirror/reference and no longer
+defines receipt-before-current-event ordering.
+
+Both documents carry the same machine-readable sequence:
+
+1. REVEAL
+2. INSTALL_CURRENT_EVENT
+3. PERSIST_PROJECTION_EVIDENCE
+4. CREATE_BINDING_RECEIPT
+5. VERIFY_BINDING
+6. DERIVE_OCCURRED_AT
+7. INGEST
+8. MODEL_WORK
+9. FINISH_CURSOR_MODEL_WORK
+10. DURABLE_ACK
+11. CLEAR_BINDING
+12. NEXT_REVEAL
+
+New `checks/runbook_lifecycle_checker.py` parses both documents and requires the exact same sequence.
+Its self-test reintroduces the historical receipt-before-current-event ordering, removes projection
+evidence, and duplicates projection evidence; every mutation must red. Required marker:
+`RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`.
+
+## Fresh gate target
+
+`isolation/probe_e2e.sh` has been recomputed to:
+
+- `EXPECTED_CHECKS=156`
+- required `RAW_USAGE_NO_SYNTHESIS_PASS`
+- required `CANONICAL_PIN_CONSISTENCY_PASS`
+- required `CANONICAL_PIN_MUTATION_RED_PASS`
+- required `CANONICAL_RUNBOOK_ORDER_PASS`
+- required `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`
+- required `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS`
+- final marker `CORRECTIVE_011_E2E_PASS`
+
+The success condition is exactly `ALL_CHECKS=156/156 FAILURES=0`.
+
+## Execution evidence status
+
+The previous `isolation/e2e_probe_output.txt` and FIXUP-001 raw log are historical evidence for the
+parent candidate only. They are not CORRECTIVE-011 evidence.
+
+This corrective session could execute targeted no-synthesis/checker mutation regressions, but its local
+runtime is Python 3.13.5 and the container denies `unshare(CLONE_NEWNS|CLONE_NEWPID|CLONE_NEWNET)`
+with `Operation not permitted`. The frozen probe requires Python 3.11.2 plus namespace privileges.
+Therefore no `CORRECTIVE_011_E2E_PASS` is claimed here and no synthetic/local targeted log is
+misrepresented as the frozen E2E.
+
+## Invariants preserved
+
+- frozen software remains `773876f92d5f8e53422f8f5a68cc651953d93052`;
+- frozen Core tree remains `fe77f8a0706acfaf369041d0882b6d0e6de39f22`;
+- PR #205 remains pinned at `d17ae972ad1d312735c355f775ac024bc4cebdf7`;
+- no `src/aios_core/**`, fixture, evaluator, governance, or #205 changes;
+- no real cursor-14 reveal to a Resident/model;
+- no Resident B/C;
+- no merge, force-push, rebase, or squash.
+
+## Exit condition
+
+Do **not** request PM re-review yet. The next permitted action is a fresh execution of the modified
+`isolation/probe_e2e.sh` in the exact frozen environment. Only if it produces
+`ALL_CHECKS=156/156 FAILURES=0` and `CORRECTIVE_011_E2E_PASS` may the packet transition to
+`REVIEW_READY / AWAITING_PM_RE-REVIEW`.

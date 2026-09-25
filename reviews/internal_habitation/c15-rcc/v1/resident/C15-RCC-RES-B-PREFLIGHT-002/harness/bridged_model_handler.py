@@ -890,27 +890,37 @@ def _reply_to_directive_production(reply: dict[str, Any], snapshot: RuntimeSnaps
     usage: ModelUsage | None = None
     raw_usage = provider_resp.usage
     if raw_usage is not None and isinstance(raw_usage, dict):
-        tot = raw_usage.get("total_tokens")
-        inp = raw_usage.get("input_tokens")
-        out = raw_usage.get("output_tokens")
-        def _int_or_none(v):
-            if v is None: return None
-            if isinstance(v, bool) or not isinstance(v, int) or v < 0: return None
-            return int(v)
-        tot_i = _int_or_none(tot)
-        inp_i = _int_or_none(inp)
-        out_i = _int_or_none(out)
-        if tot_i is not None and inp_i is not None and out_i is not None and tot_i < inp_i + out_i:
+        def _token_or_missing(key: str) -> tuple[int | None, bool]:
+            if key not in raw_usage or raw_usage.get(key) is None:
+                return None, True
+            value = raw_usage.get(key)
+            if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+                return None, False
+            return int(value), True
+
+        tot_i, tot_valid = _token_or_missing("total_tokens")
+        inp_i, inp_valid = _token_or_missing("input_tokens")
+        out_i, out_valid = _token_or_missing("output_tokens")
+        if not (tot_valid and inp_valid and out_valid):
             usage = None
-        elif tot_i is not None:
-            try: usage = ModelUsage(total_tokens=tot_i, input_tokens=inp_i, output_tokens=out_i, provider=prov if prov!="UNKNOWN" else None, model=mod if mod!="UNKNOWN" else None, request_id=req if req!="UNKNOWN" else None)
-            except: usage = None
-        elif inp_i is not None or out_i is not None:
-            sum_tot = (inp_i or 0) + (out_i or 0)
-            try: usage = ModelUsage(total_tokens=sum_tot, input_tokens=inp_i, output_tokens=out_i, provider=prov if prov!="UNKNOWN" else None, model=mod if mod!="UNKNOWN" else None, request_id=req if req!="UNKNOWN" else None)
-            except: usage = None
+        elif tot_i is None:
+            # ModelUsage requires provider-reported total_tokens. Never synthesize a total
+            # from partial input/output telemetry; preserve provenance but expose usage=None.
+            usage = None
+        elif inp_i is not None and out_i is not None and tot_i < inp_i + out_i:
+            usage = None
         else:
-            usage = None
+            try:
+                usage = ModelUsage(
+                    total_tokens=tot_i,
+                    input_tokens=inp_i,
+                    output_tokens=out_i,
+                    provider=prov if prov!="UNKNOWN" else None,
+                    model=mod if mod!="UNKNOWN" else None,
+                    request_id=req if req!="UNKNOWN" else None,
+                )
+            except (TypeError, ValueError):
+                usage = None
     else:
         usage = None
     provenance = ModelCallProvenance(provider=prov, model=mod, request_id=req)

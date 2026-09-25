@@ -1,173 +1,254 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Per-Cursor Interaction Procedure (CORRECTIVE-007 Scheme A-hard-stop (`_poisoned` + durable `$RUN_ROOT/evidence/failure-*.json`))
+# C15-RCC-RES-B-PREFLIGHT-002 — Per-Cursor Interaction Procedure (CORRECTIVE-011 exact mirror)
 
-This is the exact per-cursor loop that B will run under the frozen `ProductionResidentHandler` + `ExternalBrokerClient` + `resident_wire_protocol.json` (`a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a…`).
+This document is an exact operational mirror/reference of `procedure/b_startup_procedure.md §7`.
+**`b_startup_procedure.md §7` is the single authoritative Phase-B cursor lifecycle.**
+If any wording, executable snippet, or lifecycle token here diverges from startup §7, execution MUST STOP until the two documents are resynchronized. This file is not an independent second authority.
 
-**CORRECTIVE-009 / BLK-05 — no event, no dispatch.** Every Phase-B model invocation MUST be bound to a
-current, legally validated B event receipt. `current_event is None` is an unconditional STOP: the handler
-poisons itself, writes a durable failure receipt, and never calls the provider. There is **no**
-`wake_reason` or `round_index` exemption. See "Event lifecycle" below.
+The frozen production path remains `ProductionResidentHandler + ExternalBrokerClient + resident_wire_protocol.json`.
+No Core, fixture, evaluator, governance, or Resident semantics are changed here.
 
-Scheme A-hard-stop (`_poisoned` + durable `$RUN_ROOT/evidence/failure-*.json`) — any provider transport, non-JSON, schema, binding failure → fail current runtime, do not advance cursor, save failure evidence, terminate/reconstruct handler, re-enter from same durable sequence/state with new binding, never generate semantic repair hint. No same-handler retry.
+## Machine-readable lifecycle contract
 
-## Invariants
+Both active runbooks carry this exact token block. `checks/runbook_lifecycle_checker.py` parses both blocks, requires the exact ordered sequence, and mutation-tests the historical receipt-before-current-event ordering.
 
-- Phase B advances exactly one cursor per iteration (`14→22`, 9 steps).
-- Each iteration reveals **only** current 8-field projection to Resident. Future cursors, Phase C, fixture, evaluator, governance, A transcript remain sealed.
-- Resident model sees exactly `contract + envelope JSON + wire_protocol schema` (no file path).
-- Non-conversation cursors still go through same envelope→provider→validate chain (mechanical wake).
-- `PYTHONPATH` frozen `src:reviews/.../harness`, `AIOS_PROVIDER_ADAPTER=bridged_model_handler:ExternalBrokerClient`, exact env pinned; mismatch → STOP.
-- Each cursor's `current_event` bound to **exact** release cursor (session, sequence, event_id, payload digest, pending state).
+<!-- C15_PHASE_B_LIFECYCLE_BEGIN -->
+REVEAL
+INSTALL_CURRENT_EVENT
+PERSIST_PROJECTION_EVIDENCE
+CREATE_BINDING_RECEIPT
+VERIFY_BINDING
+DERIVE_OCCURRED_AT
+INGEST
+MODEL_WORK
+FINISH_CURSOR_MODEL_WORK
+DURABLE_ACK
+CLEAR_BINDING
+NEXT_REVEAL
+<!-- C15_PHASE_B_LIFECYCLE_END -->
 
+## Fixed invariants
 
-### Binding receipt (operator side, immutable)
+- Phase B advances exactly one cursor per iteration, sequences `14..22`.
+- Only the current 8-field reveal projection may become `current-event.json`; future cursors, Phase C, sealed fixture internals, evaluator material, governance, and A transcript remain unavailable to the Resident/model.
+- Every production model invocation requires a live current event + immutable binding receipt. `event=None` is an unconditional STOP with zero provider calls for conversation, periodic review, background/mechanical wake, summary, and capability follow-up paths.
+- The writer lock is always `$RUN_ROOT/runtime/world.sqlite.writer.lock`.
+- `provider/model/request_id` come from broker provenance or literal `UNKNOWN`.
+- Usage is never synthesized. A provider-reported `total_tokens` is required before a `ModelUsage` object can exist. Missing total, invalid values, or inconsistent `total < input + output` produce `usage=None`; missing input/output fields remain missing when total is valid.
+- Scheme A remains hard-stop: poison handler, clear outstanding state before evidence I/O, emit collision-safe durable evidence, reconstruct, and retry from the same durable cursor. No semantic repair hint is generated.
 
-Immediately after `release_operator reveal` (capturing exact stdout bytes), operator creates immutable binding receipt:
+## Exact 12-step mirror of startup §7
+
+For each cursor, perform these steps in this order only.
+
+### 1. REVEAL
+
+Operator-only, outside the Resident jail:
 
 ```bash
-# Capture exact reveal stdout (8-field projection) — canonical per-cursor command (CORRECTIVE-007, no sequence flag)
 python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py \
-  reveal \
-  --phase B \
-  --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal.json"
+  reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal.json"
+```
 
-# Compute canonical SHA and create receipt via harness helper
-python3 -c "
+Exactly one reveal is legal before ACK. `reveal.json` is the only source of the current projection.
+
+### 2. INSTALL_CURRENT_EVENT
+
+Install the exact reveal bytes before creating any binding receipt:
+
+```bash
+install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"
+```
+
+Set/retain:
+
+```bash
+export AIOS_CURRENT_EVENT_PATH="$RUN_ROOT/current-event.json"
+export AIOS_RELEASE_STATE_PATH="$RUN_ROOT/runtime/release_state.json"
+export AIOS_CURRENT_EVENT_BINDING_PATH="$RUN_ROOT/binding/current-event-binding.json"
+```
+
+The production handler refreshes this file on every call.
+
+### 3. PERSIST_PROJECTION_EVIDENCE
+
+Persist the immutable per-cursor projection and digest before receipt creation:
+
+```bash
+SEQ="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])' "$RUN_ROOT/current-event.json")"
+install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf '%03d' "$SEQ").projection.json"
+sha256sum "$RUN_ROOT/evidence/event-$(printf '%03d' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"
+```
+
+After Phase B this yields exactly `event-014.projection.json` through `event-022.projection.json`, with contiguous sequences and unique event IDs.
+
+### 4. CREATE_BINDING_RECEIPT
+
+Only after steps 1–3, create the immutable receipt from the exact installed projection and live release state:
+
+```bash
+mkdir -p "$RUN_ROOT/binding"
+PYTHONPATH="$PYTHONPATH" python3 - <<'PY'
+import json, os, sys
 from pathlib import Path
-import json, sys
-sys.path.insert(0, 'reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness')
+sys.path.insert(0, os.environ["PYTHONPATH"].split(":")[1])
 from bridged_model_handler import create_current_event_binding_receipt, write_binding_receipt
-proj = json.loads(Path('$RUN_ROOT/reveal.json').read_bytes())
-receipt = create_current_event_binding_receipt(proj, b_session_id='$B_SESSION', release_state_path='$RUN_ROOT/runtime/release_state.json')
-write_binding_receipt(receipt, '$RUN_ROOT/binding/current-event-binding.json')
-"
-
-# Also copy reveal to current-event.json for handler
-cp $RUN_ROOT/reveal.json $RUN_ROOT/current-event.json
-chmod 0400 $RUN_ROOT/binding/current-event-binding.json
-chmod 0400 $RUN_ROOT/current-event.json
+projection = json.loads(Path(os.environ["AIOS_CURRENT_EVENT_PATH"]).read_bytes())
+receipt = create_current_event_binding_receipt(
+    projection,
+    b_session_id=os.environ["AIOS_B_SESSION_ID"],
+    release_state_path=os.environ["AIOS_RELEASE_STATE_PATH"],
+)
+write_binding_receipt(receipt, os.environ["AIOS_CURRENT_EVENT_BINDING_PATH"])
+print("BINDING_RECEIPT_WRITTEN seq=%s event_id=%s" % (receipt["sequence"], receipt["event_id"]))
+PY
+chmod 0400 "$RUN_ROOT/binding/current-event-binding.json"
 ```
 
-Receipt contains: `phase B`, `b_session_id`, `sequence`, `event_id`, `occurred_at`, `source_kind/class/modality/dimension`, `canonical_projection_sha256`, `resident_visible_payload_sha256`, `release_state_path/sha/next_sequence/pending`, `fixture_sha256`, `reveal_timestamp`, `operator_request_id`, `binding_version`.
+Receipt creation fails closed unless the live release state and `pending_reveal` bind to the same sequence/event/fixture.
 
-Handler validates `current-event.json` against `current-event-binding.json` + `release_state` on every call; mismatches fail closed (11 negatives: seq15, wrong id, modified text/dimension/source_kind/modality/occurred_at, wrong session, stale after ACK, missing/malformed receipt).
+### 5. VERIFY_BINDING
 
-
-## Per-cursor lifecycle (operator side, outside jail)
-
-For `seq` from `14` to `22`:
-
-### 1. Reveal (operator only, outside jail)
-
-Operator reads next sealed cursor outside jail and writes **only** 8-field projection to `$RUN_ROOT/current-event.json` and sets `AIOS_CURRENT_EVENT_PATH=$RUN_ROOT/current-event.json` and `AIOS_RELEASE_STATE_PATH=$RUN_ROOT/runtime/release_state.json`:
-
-```
-{
-  event_id:             <fixture event_id for seq>,
-  sequence:             <seq>,
-  occurred_at:          <fixture occurred_at>,
-  dimension:            <fixture dimension>,
-  source_kind:          opaque non-empty string (exact frozen reveal projection, must equal binding receipt),  # validated
-  source_class:         <fixture>,
-  modality:             <fixture>,
-  resident_visible_payload: { ... } or "text"  # non-empty object or string, validated
-}
+```bash
+PYTHONPATH="$PYTHONPATH" python3 - <<'PY'
+import json, os, sys
+from pathlib import Path
+sys.path.insert(0, os.environ["PYTHONPATH"].split(":")[1])
+from bridged_model_handler import validate_current_event_binding
+event = json.loads(Path(os.environ["AIOS_CURRENT_EVENT_PATH"]).read_bytes())
+validate_current_event_binding(
+    event,
+    os.environ["AIOS_B_SESSION_ID"],
+    release_state_path=os.environ["AIOS_RELEASE_STATE_PATH"],
+    binding_receipt_path=os.environ["AIOS_CURRENT_EVENT_BINDING_PATH"],
+)
+print("CURRENT_EVENT_BINDING_VERIFIED", event["sequence"], event["event_id"])
+PY
 ```
 
-Validation before envelope (fail closed, no file written if envelope would fail, round not advanced):
-- Exactly 8 keys, `sequence 14..22`, `source_kind opaque non-empty string (exact frozen reveal projection, must equal binding receipt)`, payload non-empty object, `event_id/occurred_at/dimension/source_class/modality` non-empty strings.
-- **Exact binding** to current release cursor (via `validate_current_event_binding`):
-  - `current_event.sequence == release_state.next_sequence` (expected=14 → seq15 rejected)
-  - `current_event.event_id == expected event_id` (at seq14, another id rejected)
-  - `payload digest == expected digest` (`sha256(canonical JSON payload)`; modified payload rejected)
-  - `release_state pending_reveal` if present must match (stale previous event after ACK → pending null but next 15, so seq14 stale rejected)
-  - `B session` consistency (event is for this `b_session`)
-  - File digest must equal in-memory event (file vs object mismatch rejected)
-  - Missing file on event-driven turn → fail closed
-  - Malformed JSON → fail closed (`except Exception: pass` forbidden, must raise)
+Wrong sequence/event/payload/source metadata/session, stale post-ACK state, missing receipt, malformed receipt, missing release state, or modified event all STOP before provider invocation.
 
-No other cursor read; no future `seq+1` buffered.
+### 6. DERIVE_OCCURRED_AT
 
-### 2. Build envelope (mechanical, `build_envelope`)
+Derive time only after reveal and binding installation:
 
-- `snapshot = FusedTurnRuntime.capture()` (real Core).
-- `current_event =` file content at `AIOS_CURRENT_EVENT_PATH` (refreshed per call, not cached at handler init; `headless_production_handler` re-reads file on every `__call__` if handler already exists, and clears after cursor ACK).
-- `envelope = build_envelope(snapshot,b_session,contract_sha,current_event,release_state_path)` → `phase B`, `allowed_sequences [14,22]`, `runtime_snapshot`, `capability_catalog`, `capability_history` (B-session only), `wake_reason`, `contract_sha`, `wire_protocol_sha`.
-- Binding `round/request_id/request_digest` assigned (incremental, 32-hex nonce, canonical digest).
-- Envelope validated by `validate_envelope` (B-session only, path-aware guard, `source_kind` check).
-
-`AIOS_CURRENT_EVENT_PATH` missing/invalid → `ModelDispatchNotSubmitted` (fail closed).
-
-### 3. Invoke model (production, outside jail)
-
-```
-request = build_model_request(contract_text,envelope,wire_protocol_text)
-        = {system: <RESIDENT_B_RUN_CONTRACT.md>, wire_protocol: <resident_wire_protocol.json>, wire_protocol_sha256: a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a…, messages: [{role:user, content: JSON(envelope)}]}
-provider_resp = ExternalBrokerClient.invoke(request)  # requires AIOS_REAL_PROVIDER_API_KEY+ENDPOINT, adapter pinned, Fake forbidden
-content = provider_resp.content  # JSON string/dict of reply with round/request_id/request_digest/action
-reply = JSON.parse(content)
+```bash
+CURRENT_OCCURRED_AT="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["occurred_at"])' "$RUN_ROOT/current-event.json")"
+[ -n "$CURRENT_OCCURRED_AT" ] || { echo "STOP: cannot derive CURRENT_OCCURRED_AT"; exit 1; }
+export CURRENT_OCCURRED_AT
 ```
 
-Provider sees `contract+envelope+wire_protocol` (proven via `ExternalBrokerClient.last_request` contains all three, no `/repo/fixture`).
+Never pre-read or hardcode cursor time.
 
-### 4. Validate reply (fail closed, Scheme A-hard-stop (`_poisoned` + durable `$RUN_ROOT/evidence/failure-*.json`))
+### 7. INGEST
 
+```bash
+SK="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["source_kind"])' "$RUN_ROOT/current-event.json")"
+if [ "$SK" = "conversation" ]; then
+  python3 reviews/internal_habitation/c15-rcc/v1/release/canonical_conversation_ingest.py \
+    --world-db "$RUN_ROOT/runtime/world.sqlite" \
+    --session-id "$B_SESSION" \
+    --turn-index 1 \
+    --event-file "$RUN_ROOT/current-event.json"
+else
+  python3 reviews/internal_habitation/c15-rcc/v1/release/mechanical_ingest_adapter.py \
+    --world-db "$RUN_ROOT/runtime/world.sqlite" \
+    --event-file "$RUN_ROOT/current-event.json"
+fi
 ```
-validate_reply(reply)  # capability string only, handler checks `capability in snapshot.capability_catalog`  # strict per-action allowlist
-verify_binding(reply)  # round/id/digest == outstanding; stale/preplay/replay/wrong fail
+
+### 8. MODEL_WORK
+
+Run the production headless turn and all associated model/capability/due/review work while the same event + receipt remain live:
+
+```bash
+python3 -m aios_core.headless.cli \
+  --world "$RUN_ROOT/runtime/world.sqlite" \
+  --index "$RUN_ROOT/runtime/index.sqlite" \
+  --lock "$RUN_ROOT/runtime/world.sqlite.writer.lock" \
+  --model-handler bridged_model_handler:headless_production_handler \
+  turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"
 ```
 
-- `action` in `invoke_capability|end_turn|silence|summary_response`; `round_repair_request` unsupported → `ValueError` fail closed.
-- `silence` allowlist only `round,id,digest,action`; extra `capability` → fail.
-- On any `provider exception / non-JSON / schema invalid / binding invalid`:
-  1. `_poison_and_evidence(...)` poisons the handler, snapshots `_outstanding` into a local copy and **clears `self._outstanding` immediately** (protocol-state cleanup happens BEFORE any disk I/O);
-  2. Persist a **collision-safe** receipt named `failure-<session>-round-<round>-<time_ns>-<nonce>.json`, created with `O_CREAT|O_EXCL` at mode `0400` so a pre-existing receipt can never be overwritten and can never cause a `PermissionError`;
-  3. If the durable write itself fails, the handler is still poisoned, `_outstanding` is still `None`, the same instance is still unusable, and the error is surfaced explicitly as `evidence_persistence_failure` — it never masks the original failure class;
-  4. Terminate/reconstruct handler (`_reset_global()` + new `ProductionResidentHandler` with same `b_session` and `release_state_path`);
-  5. Re-enter from same `next_sequence`/durable state;
-  6. Next request has new `round/request_id/request_digest` (proven `new round != old`);
-  7. Never generate semantic repair hint.
+Periodic review rounds, background/mechanical wakes, summary rounds, and capability follow-ups are not exemptions. If the current event is absent, all of them STOP with zero provider calls.
 
-`_assign_binding` leaves `_outstanding` only on success; on failure it is cleared, so next call does **not** hit `cannot send while outstanding`.
+Production reply translation rules for usage are exact:
+- `20/22/42` -> `ModelUsage(total=42,input=20,output=22)`;
+- total 42 with only one optional component -> preserve the reported fields without filling the missing component;
+- missing `total_tokens`, even with input/output present -> `usage=None`;
+- invalid negative/bool/string token values -> `usage=None`;
+- `total < input + output` -> `usage=None`.
 
-### 5. Dispatch capability or end turn
+### 9. FINISH_CURSOR_MODEL_WORK
 
-- `directive = reply_to_directive_production(reply,snap,provider_resp)` maps `action` → `ModelDirective` with **RAW provenance** (`provider/model/request_id` actual or `UNKNOWN`, `usage` raw preserved: inconsistent `total<input+output` → `usage None` not rewritten).
-- `FusedTurnRuntime` executes `capability_calls`, appends to `capability_history`, then **same cursor** follow-up: next `__call__` re-uses **same** `current_event` (not next cursor) with updated `capability_history` (contains `Atlas` legal `obs_c14_fixture_*`), same adapter/binding new round, until `silence/end_turn`.
-- If first round `silence/end_turn`, cursor considered complete → operator ACKs via `release_operator.py ack`, `next_sequence` increments, **clear** `current-event.json` (unlink or overwrite) and set new `AIOS_CURRENT_EVENT_PATH` for next seq; handler's next call will load new event (stale seq14 file now rejected because `next_sequence` is 15).
+Do not ACK until every model round, capability follow-up, due unit, periodic review, background wake, and summary unit attributable to this cursor has completed successfully.
 
-### 5a. Event lifecycle (CORRECTIVE-009 / BLK-05 — mandatory ordering)
+On Scheme-A failure:
+1. handler is poisoned;
+2. `_outstanding` is cleared before evidence I/O;
+3. collision-safe `failure-*.json` evidence uses `time_ns + nonce + O_CREAT|O_EXCL`;
+4. evidence-write failure remains explicit and cannot leave outstanding protocol state;
+5. reconstruct the handler and re-enter from the same durable release cursor.
 
-For each cursor the ONLY legal order is:
+### 10. DURABLE_ACK
 
-1. `release_operator.py reveal --phase B` → exact 8-field projection;
-2. create the immutable binding receipt (`0400`);
-3. install the projection as `current-event.json` (present, `0400`);
-4. ingest (`canonical_conversation_ingest.py` / `mechanical_ingest_adapter.py`);
-5. model round(s) and capability follow-ups for **this** cursor;
-6. `due` / wake / review work associated with **this** cursor;
-7. all model work for this cursor complete;
-8. durable ACK via `release_operator.py ack`;
-9. **only then** clear `current-event.json` and the binding receipt;
-10. before any further model invocation, reveal the next cursor and install the next binding.
+```bash
+python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py \
+  ack --phase B --state "$RUN_ROOT/runtime/release_state.json" \
+  --world-db "$RUN_ROOT/runtime/world.sqlite" \
+  --sequence "$SEQ" \
+  --event-id "$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])' "$RUN_ROOT/current-event.json")" \
+  --ingest-ref "$RUN_ROOT/evidence/event-$(printf '%03d' "$SEQ").projection.json" \
+  --conversation-session-id "$B_SESSION" --conversation-turn-index 1
+```
 
-Clearing the event never opens a window in which a model wake can run unbound: any dispatch attempted
-while `current-event.json` is absent (for **any** `wake_reason`, at **any** `round_index`, including
-`periodic_review` at round 1 and round 3) fails closed with `ModelDispatchNotSubmitted`, poisons the
-handler, writes a durable receipt, and performs **zero** provider invocations. `periodic_review`,
-background wakes and summary cycles therefore always run inside a live cursor binding, never between
-cursors.
+ACK must advance `next_sequence` and return `pending_reveal` to null.
+
+### 11. CLEAR_BINDING
+
+Only after durable ACK and completion of cursor-associated model work:
+
+```bash
+rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"
+```
+
+### 12. NEXT_REVEAL
+
+Before any later model invocation, loop back to step 1 and reveal/install the next legal cursor. No unbound wake window exists: a model dispatch attempted between step 11 and the next completed step 2 must fail closed, poison the handler, write durable evidence, and perform zero provider invocations.
+
+## Provider boundary / reply validation
+
+The provider sees only `contract + wire protocol + Resident-safe envelope`. `ExternalBrokerClient` is transport-only and production HTTPS-only; loopback is direct-constructor test-only.
+
+Every provider reply must pass:
+- strict per-action schema;
+- exact round/request_id/request_digest binding;
+- capability membership in the current snapshot catalog;
+- broker provenance mapping;
+- raw usage no-synthesis rules above.
+
+Any provider exception, non-JSON, schema failure, binding failure, invalid capability, missing live release state, missing event, or evidence failure remains fail closed.
 
 ## Forbidden actions
 
-- Do not read `seq+1` or Phase C.
-- Do not modify `src/aios_core` (frozen `fe77f8a`).
-- Do not swap `bridged_model_handler.py` or `resident_wire_protocol.json` at runtime (hash pinned).
-- Do not expose `mailbox/archive`, A transcript, fixture, governance to Resident.
-- Do not advance cursor on failure; do not retry with same handler without reconstruction.
-- Do not swallow `except Exception: pass` after event file load — must fail closed.
+- Do not reveal or buffer `seq+1` before the current cursor is durably ACKed.
+- Do not expose fixture/evaluator/governance/A transcript/mailbox archive to Resident/model.
+- Do not modify `src/aios_core/**`, fixture, evaluator, governance, or PR #205.
+- Do not swap the pinned adapter/wire/contract at runtime.
+- Do not run Resident B/C during preflight.
+- Do not merge PR #209 from this procedure.
 
-## Probes (disposable, synthetic event `synthetic-fixture-seq-14` seq14 + adversarial)
+## Mechanical regression
 
-- Positive seq14 exact event → accept, second round `Atlas` non-empty legal survives.
-- Negatives: `seq13/23`, extra field, missing field, `phase A`, `source_kind` invalid, payload empty, seq15 when expected 14, wrong event_id, modified payload digest, stale after ACK, missing file, malformed JSON — all rejected.
-- Strict reply `silence{capability}` rejected, `round_repair_request` unsupported, provider exception→cursor not advanced + new binding, non-JSON→fail, wrong binding→fail, inconsistent tokens→`usage None`, env mismatch→STOP, PID1→worker signal chain proven, exact check count gate `CHECKS==EXPECTED`.
+Before B release, both of these must pass from the B-preflight root:
+
+```bash
+python3 checks/runbook_lifecycle_checker.py --base . --self-test
+bash isolation/probe_e2e.sh
+```
+
+Required markers include:
+- `CANONICAL_RUNBOOK_ORDER_PASS`
+- `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`
+- `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS`
+- `RAW_USAGE_NO_SYNTHESIS_PASS`
+- `CORRECTIVE_011_E2E_PASS`
