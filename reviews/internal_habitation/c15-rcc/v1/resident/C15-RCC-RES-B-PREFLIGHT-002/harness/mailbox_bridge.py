@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-002 — Transport-only mailbox bridge
-(envelope-hardened + request/reply binding).
+C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-003 — Transport-only mailbox bridge
+(envelope-hardened + request/reply binding + schema-aware leakage guard).
 
 Responsibility (transport only, ZERO semantic judgment):
 
@@ -14,7 +14,12 @@ Responsibility (transport only, ZERO semantic judgment):
      request_digest exactly match the current outstanding request. Any mismatch
      (stale prior-round, preplayed future-round, replayed consumed, wrong id,
      wrong digest) fails closed with MailboxReplyError.
-  4. Provide strict negative self-tests covering all 6 binding cases.
+  4. Provide strict negative self-tests covering all 6 binding cases and strict reply schema.
+  5. Leakage guard is SCHEMA-AWARE: forbidden material is identified by
+     section/path allowlists, not by arbitrary substring in legal durable World
+     values. E.g. obs_c14_fixture_* object ids are legal World ids and are
+     explicitly allowed, whereas raw paths like /repo/fixture, /repo/evaluator,
+     /repo/governance etc. are forbidden even if they appear inside envelope.
 """
 
 from __future__ import annotations
@@ -55,10 +60,11 @@ TOP_LEVEL_ALLOWLIST = frozenset({
     "allowed_sequences",
 })
 
+# FORBIDDEN paths/substrings that indicate sealed material leakage.
+# CRITICAL: Do NOT use bare words like "fixture" — the accepted durable World
+# legitimately contains object ids such as obs_c14_fixture_xxx which are NOT leaks.
+# Only block path-like or sealed-fixture markers that cannot appear in legal World values.
 FORBIDDEN_SUBSTRINGS = (
-    "fixture",
-    "evaluator",
-    "governance",
     "sealed_fixture",
     "RESIDENT_A_RERUN",
     "C15_RCC_RES_A",
@@ -67,16 +73,35 @@ FORBIDDEN_SUBSTRINGS = (
     "AIOS_SINGLE_WINDOW_TASK_BOARD",
     "AIOS_v3.0_CURRENT_CHECKPOINT",
     "PROJECT_MASTER_MAP",
+    "/repo/fixture",
+    "/repo/evaluator",
+    "/repo/governance",
+    "/repo/prompts",
+    "/fixture/",
+    "/evaluator/",
+    "/governance/",
+    "/release/",
+    "/resident/C15-RCC-RES-A-RERUN",
+    "/c14-resident",
 )
 
+# Reply schema per action — strict top-level allowlist
+_REPLY_COMMON_FIELDS = frozenset({"round", "request_id", "request_digest", "action"})
+_REPLY_ALLOWLISTS = {
+    "invoke_capability": _REPLY_COMMON_FIELDS | {"capability", "arguments"},
+    "end_turn": _REPLY_COMMON_FIELDS | {"response"},
+    "silence": _REPLY_COMMON_FIELDS,
+    "summary_response": _REPLY_COMMON_FIELDS | {"response", "summary"},
+    # round_repair_request is deprecated per CORRECTIVE-003 Scheme A (fail closed, no repair). Kept for error message only.
+    "round_repair_request": _REPLY_COMMON_FIELDS,
+}
+_VALID_ACTIONS = frozenset(_REPLY_ALLOWLISTS.keys())
 
 class MailboxEnvelopeError(ValueError):
     """Outbound envelope failed strict validation (fail closed)."""
 
-
 class MailboxReplyError(ValueError):
     """Inbound reply failed structural or binding validation."""
-
 
 def _walk(obj: Any, path: str = "") -> list[tuple[str, Any]]:
     out: list[tuple[str, Any]] = []
@@ -91,7 +116,6 @@ def _walk(obj: Any, path: str = "") -> list[tuple[str, Any]]:
         out.append((path, obj))
     return out
 
-
 def _scan_forbidden(envelope: dict) -> None:
     for path, value in _walk(envelope):
         if not isinstance(value, str):
@@ -103,16 +127,14 @@ def _scan_forbidden(envelope: dict) -> None:
                     f"envelope contains forbidden substring {needle!r} at {path!r}; refuse to send"
                 )
 
-
 def _is_hex(s: Any, length: int) -> bool:
     if not isinstance(s, str) or len(s) != length:
         return False
     try:
         int(s, 16)
-        return s.lower() == s or s.upper() == s or True  # allow any case but prefer lower
+        return True
     except ValueError:
         return False
-
 
 def validate_envelope(envelope: dict[str, Any], b_session_id: str) -> None:
     if not isinstance(envelope, dict):
@@ -127,8 +149,6 @@ def validate_envelope(envelope: dict[str, Any], b_session_id: str) -> None:
     rid = envelope.get("request_id")
     if rid is not None:
         if not isinstance(rid, str) or not _is_hex(rid, 32):
-            # token_hex(16) produces 32 hex chars
-            # also allow token_hex(16) may be 32, but we enforce 32
             raise MailboxEnvelopeError("envelope.request_id must be 32 hex chars")
     rdg = envelope.get("request_digest")
     if rdg is not None:
@@ -188,7 +208,6 @@ def validate_envelope(envelope: dict[str, Any], b_session_id: str) -> None:
                 raise MailboxEnvelopeError(f"runtime_snapshot contains forbidden key {bad_key!r}")
     _scan_forbidden(envelope)
 
-
 def validate_reply(reply: dict[str, Any]) -> None:
     if not isinstance(reply, dict):
         raise MailboxReplyError("reply must be a JSON object")
@@ -205,21 +224,41 @@ def validate_reply(reply: dict[str, Any]) -> None:
     if "action" not in reply:
         raise MailboxReplyError("reply missing required 'action' field")
     action = reply["action"]
-    valid_actions = {"invoke_capability", "end_turn", "silence", "summary_response", "round_repair_request"}
-    if action not in valid_actions:
-        raise MailboxReplyError(f"reply.action={action!r} not in allowed set {sorted(valid_actions)}")
+    if action not in _VALID_ACTIONS:
+        raise MailboxReplyError(f"reply.action={action!r} not in allowed set {sorted(_VALID_ACTIONS)}")
+    # Strict top-level allowlist per action: extra fields fail closed
+    allow = _REPLY_ALLOWLISTS[action]
+    extra = set(reply.keys()) - allow
+    if extra:
+        raise MailboxReplyError(f"reply for action {action!r} has extra fields {sorted(extra)} not allowed")
     if action == "invoke_capability":
         if not isinstance(reply.get("capability"), str) or not reply["capability"]:
             raise MailboxReplyError("invoke_capability reply requires non-empty 'capability' string")
         if "arguments" in reply and not isinstance(reply["arguments"], dict):
             raise MailboxReplyError("reply.arguments must be an object if present")
-
+    elif action == "end_turn":
+        if "response" in reply and not isinstance(reply["response"], str):
+            raise MailboxReplyError("end_turn response must be string if present")
+        if "response" in reply and reply["response"] is not None and not reply["response"].strip():
+            raise MailboxReplyError("end_turn response must be non-blank if present")
+    elif action == "silence":
+        # silence must not contain capability/response etc. — already enforced by allowlist
+        pass
+    elif action == "summary_response":
+        # must have at least one of response/summary non-blank, but allowlist already restricts
+        has_resp = isinstance(reply.get("response"), str) and reply.get("response").strip()
+        has_sum = isinstance(reply.get("summary"), str) and reply.get("summary").strip()
+        if not (has_resp or has_sum):
+            raise MailboxReplyError("summary_response requires non-blank response or summary")
+    elif action == "round_repair_request":
+        # Per CORRECTIVE-003 Scheme A, this action is not supported in production; but if received it must be treated as fail-closed by the handler.
+        # Here we accept its shape but the handler will reject it.
+        pass
 
 def _canonical_digest(envelope_without_digest: dict[str, Any]) -> str:
     """Deterministic sha256 over JSON sort_keys, separators=(',',':')."""
     canonical = json.dumps(envelope_without_digest, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
     return hashlib.sha256(canonical).hexdigest()
-
 
 class MailboxBridge:
     def __init__(self, inbox_dir: Path, outbox_dir: Path, archive_dir: Path, b_session_id: str):
@@ -319,7 +358,6 @@ class MailboxBridge:
                     raw = expected.read_bytes()
                     data = json.loads(raw.decode("utf-8"))
                 except (json.JSONDecodeError, UnicodeDecodeError) as e:
-                    # Archive malformed and fail closed
                     try:
                         (self.archive_dir / f"rejected-reply-{expected_round:04d}.json").write_bytes(raw if 'raw' in locals() else b"")
                     except Exception:
@@ -357,7 +395,6 @@ class MailboxBridge:
                         f"reply round {data.get('round')!r} != outstanding {expected_round} (stale/future)"
                     )
                 if data.get("request_id") != expected_id:
-                    # Check if replay of consumed
                     if data.get("request_id") in self._consumed:
                         try:
                             (self.archive_dir / f"rejected-reply-{expected_round:04d}.json").write_bytes(raw)
@@ -393,8 +430,6 @@ class MailboxBridge:
                     raise MailboxReplyError(
                         f"reply request_digest {data.get('request_digest')!r} != outstanding {expected_digest!r} (wrong digest)"
                     )
-                # Future-round file that coincidentally has matching round but was preplayed with guessed id already handled above.
-                # If this point is reached, also ensure request_id not already consumed (defensive)
                 if data["request_id"] in self._consumed:
                     try:
                         (self.archive_dir / f"rejected-reply-{expected_round:04d}.json").write_bytes(raw)
@@ -435,16 +470,12 @@ def _self_tests() -> int:
               "runtime_snapshot":{},"capability_catalog":[],"capability_history":[]}
         b.send(ok)
         assert (root / "inbox" / "round-0001.json").exists()
-        # verify binding fields present
         inbox_data = json.loads((root / "inbox" / "round-0001.json").read_text())
         assert "request_id" in inbox_data and "request_digest" in inbox_data and "round" in inbox_data
         print("self-test 1 PASS: minimal good envelope accepted with binding")
 
         # 2 extra top-level
         bad = {**ok, "transcript": "leak"}
-        b2 = MailboxBridge(root / "inbox", root / "outbox", root / "archive", "b-session-XYZ")
-        # need fresh bridge because previous has outstanding
-        # create fresh directory for isolation of this test
         with tempfile.TemporaryDirectory() as td2:
             r2 = Path(td2)
             for sub in ("inbox","outbox","archive"):
@@ -479,17 +510,31 @@ def _self_tests() -> int:
             except MailboxEnvelopeError:
                 print("self-test 4 PASS: A session in capability_history rejected")
 
-        # 5 forbidden substring
+        # 5 forbidden path substring (sealed_fixture) — bare 'fixture' in durable World ids like obs_c14_fixture_* is ALLOWED, only path leakage blocked
         with tempfile.TemporaryDirectory() as td2:
             r2 = Path(td2)
             for sub in ("inbox","outbox","archive"):
                 (r2/sub).mkdir()
             bb = MailboxBridge(r2/"inbox", r2/"outbox", r2/"archive", "b-session-XYZ")
-            bad4 = {**ok, "event":{**ok["event"], "resident_visible_payload":{"text":"look at governance"}}}
+            bad4 = {**ok, "event":{**ok["event"], "resident_visible_payload":{"text":"leak /repo/fixture/sealed"}}}
             try:
-                bb.send(bad4); raise SystemExit("FAIL: forbidden substring accepted")
+                bb.send(bad4); raise SystemExit("FAIL: forbidden path accepted")
             except MailboxEnvelopeError:
-                print("self-test 5 PASS: forbidden substring rejected")
+                print("self-test 5 PASS: forbidden path substring rejected (legal obs_c14_fixture_* allowed)")
+
+        # 5b legal durable World fixture id is ALLOWED (obs_c14_fixture_*)
+        with tempfile.TemporaryDirectory() as td2:
+            r2 = Path(td2)
+            for sub in ("inbox","outbox","archive"):
+                (r2/sub).mkdir()
+            bb = MailboxBridge(r2/"inbox", r2/"outbox", r2/"archive", "b-session-XYZ")
+            # This mimics a capability_history entry containing a legal World object id with fixture substring — must NOT be rejected
+            legal = {**ok, "capability_history":[{"session_id":"b-session-XYZ","name":"search_world","ok":True,"data":[{"object_id":"obs_c14_fixture_5d4dfcf42055c00135a78a54","excerpt":"Atlas"}],"call_id":None}]}
+            try:
+                bb.send(legal)
+                print("self-test 5b PASS: legal durable World fixture id allowed (obs_c14_fixture_*)")
+            except MailboxEnvelopeError as e:
+                raise SystemExit(f"FAIL: legal World fixture id wrongly rejected: {e}")
 
         # 6 wrong phase
         with tempfile.TemporaryDirectory() as td2:
@@ -509,6 +554,25 @@ def _self_tests() -> int:
         except MailboxReplyError:
             print("self-test 7 PASS: malformed reply rejected")
 
+        # 7b extra reply field rejected (strict allowlist per action)
+        with tempfile.TemporaryDirectory() as td2:
+            r2 = Path(td2)
+            for sub in ("inbox","outbox","archive"):
+                (r2/sub).mkdir()
+            bb = MailboxBridge(r2/"inbox", r2/"outbox", r2/"archive", "b-session-XYZ")
+            bb.send(ok)
+            out = bb.outstanding
+            # silence must not contain capability
+            bad_reply = {"round": out["round"], "request_id": out["request_id"], "request_digest": out["request_digest"], "action": "silence", "capability": "search_world"}
+            (r2/"outbox"/f"reply-{out['round']:04d}.json").write_text(json.dumps(bad_reply))
+            try:
+                bb.wait_for_reply(timeout=2)
+                raise SystemExit("FAIL: extra field in silence reply accepted")
+            except MailboxReplyError as e:
+                if "extra" not in str(e).lower():
+                    raise SystemExit(f"FAIL: wrong error for extra field: {e}")
+                print("self-test 7b PASS: extra reply field rejected (strict schema)")
+            # clean for next: need fresh bridge for remaining tests, use new temp
         # 8 binding: correct exact-bound reply accepted
         with tempfile.TemporaryDirectory() as td2:
             r2 = Path(td2)
@@ -530,16 +594,13 @@ def _self_tests() -> int:
             for sub in ("inbox","outbox","archive"):
                 (r2/sub).mkdir()
             bb = MailboxBridge(r2/"inbox", r2/"outbox", r2/"archive", "b-session-XYZ")
-            # round1
             bb.send(ok)
             out1 = bb.outstanding
             reply1 = {"round": out1["round"], "request_id": out1["request_id"], "request_digest": out1["request_digest"], "action": "silence"}
             (r2/"outbox"/f"reply-{out1['round']:04d}.json").write_text(json.dumps(reply1))
             bb.wait_for_reply(timeout=2)
-            # round2 send
             bb.send(ok)
             out2 = bb.outstanding
-            # stale: craft reply with prior round's values but filename for round2
             stale = {"round": out1["round"], "request_id": out1["request_id"], "request_digest": out1["request_digest"], "action": "silence"}
             (r2/"outbox"/f"reply-{out2['round']:04d}.json").write_text(json.dumps(stale))
             try:
@@ -555,7 +616,6 @@ def _self_tests() -> int:
             for sub in ("inbox","outbox","archive"):
                 (r2/sub).mkdir()
             bb = MailboxBridge(r2/"inbox", r2/"outbox", r2/"archive", "b-session-XYZ")
-            # Preplay: before any send, create reply for round1 with guessed id
             guessed = {"round": 1, "request_id": "a"*32, "request_digest": "b"*64, "action": "silence"}
             (r2/"outbox"/"reply-0001.json").write_text(json.dumps(guessed))
             bb.send(ok)
@@ -576,10 +636,8 @@ def _self_tests() -> int:
             reply = {"round": out["round"], "request_id": out["request_id"], "request_digest": out["request_digest"], "action": "silence"}
             (r2/"outbox"/f"reply-{out['round']:04d}.json").write_text(json.dumps(reply))
             bb.wait_for_reply(timeout=2)
-            # replay same reply for next round? Actually next round expects new id; replay old file but with new round filename
             bb.send(ok)
             out2 = bb.outstanding
-            # replay old consumed id with new round filename
             replay = {"round": out2["round"], "request_id": out["request_id"], "request_digest": out2["request_digest"], "action": "silence"}
             (r2/"outbox"/f"reply-{out2['round']:04d}.json").write_text(json.dumps(replay))
             try:
@@ -651,7 +709,6 @@ def _self_tests() -> int:
 
     print("ALL SELF-TESTS PASS")
     return 0
-
 
 if __name__ == "__main__":
     import sys

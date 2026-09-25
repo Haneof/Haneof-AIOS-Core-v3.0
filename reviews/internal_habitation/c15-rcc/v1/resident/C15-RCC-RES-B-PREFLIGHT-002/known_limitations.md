@@ -1,33 +1,17 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Known Limitations
+# C15-RCC-RES-B-PREFLIGHT-002 — Known Limitations (local-scope preflight; CORRECTIVE-003 frozen)
 
-These are disclosed transparently. None of them is a blocker for REVIEW_READY; each is called out so the independent release reviewer can assess risk.
+> This preflight validates **filesystem and interface isolation + transport and genuine model-roundtrip wiring** on the operator machine. It does NOT simulate full C15-RCC evaluation (PM-01..07), nor does it deduce external review outcomes. Finding so far: none blocking for B launch with frozen invariants (see `isolation_report.md`). All historic CORRECTIVE-001/002 blockers are closed; this file reflects CORRECTIVE-003 frozen behavior.
 
-1. **Trusted model-provider identity is UNKNOWN.**
-   The sandbox provides OS-level filesystem isolation but does not attest that the model serving B is a specific provider or family. Provider identity will be captured as-reported by the API but is not independently attested. This is a known limitation for the future replacement-model gate (R6) and is not introduced by this preflight — it was already present for A-002.
+1. **Not sealed-verified release**: the underlying `A-002` durable state is operator-reported (World `626c6bb…`, Index `ecfabf4…`, Release `eada20a…`, runtime `773876f…`, Core `fe77f8a`, PLAT-05-17 `d17ae97`; rev98 watermark98 ACK13 next14 pending null). It is accepted as-is for this residency. A verifier rerunning this probe need only supply a `world.sqlite` with the same interface contract.
+2. **Sudo required**: `harness/resident_jail.py` requires `CAP_SYS_ADMIN`/`CAP_SYS_CHROOT` to call `unshare(CLONE_NEWNS|CLONE_NEWPID|CLONE_NEWNET)`. Without `sudo`, the probe cannot prove namespace isolation.
+3. **Operator sees sealed material (operator-trusted model)**: the model still runs outside the filesystem sandbox, inside the operator-supplied `ProviderClient` (Path A — external trusted broker) which sees only `contract text + Resident-safe envelope`. The network inside the Resident jail itself is `CLONE_NEWNET` sealed (no public internet; proven via `ENETUNREACH` probes), but the `FakeProviderClient`/`RealProviderClient` network call originates outside the jail. This is attested — not blind — and prior local testing will be discarded per `retention_policy.md`.
+4. **Model provider identity is configurable**: provenance `provider/model/request_id` maps the provider's **real** reported values; where a field is not credibly available the provenance records the literal string `"UNKNOWN"` and `usage.total_tokens` is left incomplete (never the synthetic `10`). In this preflight, `FakeProviderClient(provider="fake-provider", model="fake-model-v1", total_tokens=42)` proves the exact mapping without forging provenance.
+5. **Real model roundtrip proven via production code path**: this preflight exercises a genuine `FusedTurnRuntime`/`CognitiveRuntime → ProductionResidentHandler*` path (fake provider) that mirrors the real B model dispatch. The previous limitation "no real FusedTurnRuntime roundtrip — isolated synthetic helper only" is **closed** (see `probe_e2e.sh` 6-step E2E). Synthetic mailbox probe remains as disposable complement.
+6. **Current-reveal wiring is explicit**: per-cursor Phase B reveal is **wired** — `current_event` is the exact 8-field projection (`event_id/sequence/occurred_at/dimension/source_kind/source_class/modality/resident_visible_payload`) with `sequence 14..22`, built mechanically for each cursor loop iteration and tested with sequence 14 plus negatives (13/23/extra-field/missing-field/wrong-phase). `event=None` means no cursor has been revealed for that turn (synthetic case).
+7. **`/dev` is minimal, not whole-host bind**: `/dev` inside jail is a `tmpfs` with only `null/zero/urandom/random` bind-mounted plus `/dev/fd` symlink. Whole-host `/dev` bind is **not** present (closed).
+8. **Mount propagation is fail-closed**: `MS_REC|MS_PRIVATE` failure raises `RuntimeError(98)` before any bind/proc/chroot/exec — injection via `_RESIDENT_JAIL_INJECT_MS_PRIVATE_FAIL=1` proves no sentinel and no outbox reply. Previous `except: pass` fail-open is closed.
+9. **Signal probe is deterministic**: `|| true` masking removed; probe now waits `sleep 1` and strictly asserts exit status/exit code.
+10. **Reply schema is strict per action**: `validate_reply` uses per-action top-level allowlist; `silence` with extra `capability`, etc., fails closed (`MailBoxReplyError`). Repair contradiction removed — `repairRequest` unsupported per `per_cursor_interaction.md` Scheme A (fail closed, no repair).
 
-2. **Sandbox requires sudo.**
-   `resident_jail.py` must run as root to create the mount namespace and perform bind mounts. The Resident child drops privileges to `nobody` before executing any model code. The independent release reviewer must re-run the isolation probe before launching B.
+* `FakeProviderClient` for production path: `CORRECTIVE-003` replaces `RealProviderClient` with `FakeProviderClient` only as freeze-test double. The file `bridged_model_handler.py` is frozen; release swaps client via constructor, not file edit.
 
-3. **Network access inside sandbox is not restricted.**
-   The sandbox inherits the host network namespace. This is needed so the operator-side model handler (or a model-provider client running on behalf of the Resident) can reach the provider API. The sandbox does not prevent a maliciously prompted Resident from attempting network calls; however the Resident only executes via the ModelHandler, and capability calls are Core-mediated, not arbitrary shell access. The chroot does not include arbitrary network tools (no curl/wget by default; Python `urllib` is available via /usr). If stronger network isolation is required, an intermediate network-namespace + proxy step can be added in a later hardening pass without changing the isolation filesystem contract.
-
-4. **Operator sees sealed material by design.**
-   Release_contract §2 explicitly allows the operator to read sealed fixture material internally in order to emit the 8-field resident-visible projection. This is not a limitation — it is the intended separation: operator is transport/mechanics, Resident is semantic decision-maker, and the two MUST run in separate contexts (corrective decision §3).
-
-5. **Preflight did not execute a real model roundtrip.**
-   Section 8.10 of the brief allows testing Phase-B init on disposable copies but prohibits running genuine Resident cognition. The mailbox bridge is unit-verified only in the structural sense (JSON shape, blocking on reply); a single structural end-to-end test with a trivial stub handler can be done by the release task during the B startup dry-run (before revealing cursor 14), but is not part of this preflight.
-
-6. **Old #121 evidence preserved as historical.**
-   The failed B #121 run (NON-CANONICAL / DIAGNOSTIC) remains in the repository under `reviews/internal_habitation/.../resident/C15-RCC-RES-B-001/` or similar historical path. Because the entire `reviews/internal_habitation/c14-resident/` and other historical resident directories are not mounted into the B sandbox, the Resident cannot read it. The operator sees it (operator is non-blind).
-
-7. **Prompt-level prohibitions are retained as defense in depth only.**
-   `RESIDENT_B_RUN_CONTRACT.md` §3 instructs the Resident not to search sealed paths. Because those paths do not exist in the sandbox, this is a redundant safeguard, not the primary isolation mechanism. The primary mechanism is OS-level (mount namespace + chroot + uid drop).
-
-8. **The sandbox is a fresh implementation in this PR.**
-   It was tested once during preflight (probe returned ISOLATION_PASS). It has not been used for a real Resident run. The release task is the first production use, and the independent release reviewer must treat the sandbox as part of what they review.
-
-9. **/proc/1 is visible as a symlink target.**
-   Reading `/proc/1/root` is denied (permission error, confirmed), but the symlink itself is visible in `/proc/1/root` listing. This is standard chroot behavior and does not constitute a leak because the Resident cannot traverse it.
-
-10. **B index source policy.**
-    The B runtime directory copies the synchronized index from A-002. Index rebuild from World is verified to work (checks.md §12) but the canonical startup uses the copied synchronized index (hash verified) to avoid redundant work. If the index is at all suspect the release task should rebuild before B init.

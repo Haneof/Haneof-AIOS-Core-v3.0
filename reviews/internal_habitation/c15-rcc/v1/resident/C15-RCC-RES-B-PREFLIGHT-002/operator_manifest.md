@@ -1,22 +1,24 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Operator Manifest
+# C15-RCC-RES-B-PREFLIGHT-002 — Operator Manifest (CORRECTIVE-003 frozen)
 
 Date: 2026-09-25
-Role: Release / Test Infrastructure Engineer (Sealed Resident Infrastructure Designer)
-Task: C15-RCC-RES-B-PREFLIGHT-002
-Verdict: **REVIEW_READY** (see completion_report.md)
+Role: Release / Resident Infrastructure Engineer (not Resident B/C, not evaluator — per CORRECTIVE-003)
+Task: C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-003
+Verdict: **REVIEW_READY** (await PM re-review; no B or C run)
 
 ## Scope
 
-Non-Resident mechanical preparation of the Phase B handoff from independently accepted Fresh A-002 (PR #205) on the frozen RC. Per section 15 of the preflight prompt, this manifest stops at REVIEW_READY:
+Non-Resident mechanical preparation of the Phase B handoff from independently accepted Fresh A-002 (PR #205, Frozen RC) on the frozen RC. Per CORRECTIVE-003 preflight prompt §15, this manifest stops at REVIEW_READY:
 
 - NO Resident B was run
-- NO cursor 14 was revealed to a model
+- NO cursor 14 was revealed to a model (probe used synthetic `obs_c14_*` cursor 14 projection only)
 - NO Resident C was run
-- NO Core was modified
-- NO modification was made to PR #205
+- NO Core (`src/aios_core/`) was modified
+- NO modification was made to PR #205 (OPEN / UNMERGED / PINNED)
 - NO A transcript / mailbox prose / decisions / evaluator notes are present in the B-safe packet
+- NO `src/aios_core` change, no fixture/evaluator/governance change, no merge of PR #209
+- PR #209 branch `arena/01a0d692-haneof-aios-core-v3-0` preserves historic candidates `3796377 / 7902367 / ee5e4a4`, live main `aa19af1` — no force/rebase
 
-## Pins
+## Pins (exact — recomputed SHA-256 from #205 artifacts; STOP if diverged)
 
 | Item | Value |
 | --- | --- |
@@ -33,53 +35,77 @@ Non-Resident mechanical preparation of the Phase B handoff from independently ac
 | next sequence | 14 |
 | pending reveal | null |
 | Phase A bounds | cursors 1..13 (7 USER turns + 6 mechanical non-conversation) |
-| Phase B bounds (not yet executed) | cursors 14..22 |
+| Phase B bounds (not yet executed) | cursors 14..22 (single cursor revealed per turn) |
 
 ## Freeze digests (recomputed from #205 Git blobs — not trusted from filenames)
 
 | Artifact | Bytes | SHA-256 | Verified |
 | --- | ---: | --- | --- |
-| private_world.sqlite | 790528 | `626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa` | PASS |
+| private_world.sqlite | 790528 | `626c6bb32c7fdae90a068ee10dd2b4c9c9cdbc46b6feb2bf5b11cba9363401f6aa` | PASS |
 | world_index.sqlite | 811008 | `ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1` | PASS |
 | release_state.json | 10841 | `eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8` | PASS |
 
 Source blobs: `git show d17ae972ad1d312735c355f775ac024bc4cebdf7:reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-A-RERUN-002/freeze/<file>`
+Core tree identity verified at all three relevant commits (frozen software `773876f`, publication base, evidence head `d17ae97`) and at current main HEAD `aa19af1`.
 
-Core tree identity verified at all three relevant commits (frozen software, publication base, evidence head) and at current main HEAD `811ae85cc34257475d8723f28b82c01bc8f3b405`.
-
-## Deliverable index
+## Deliverable index (CORRECTIVE-003 frozen)
 
 ```
 reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/
-├── operator_manifest.md               (this file)
-├── source_pins_and_digests.md         exact #205 source pins/digests
-├── lineage_copy/
-│   ├── private_world.sqlite           byte-exact copy of accepted A freeze
-│   ├── world_index.sqlite             byte-exact copy of accepted A freeze
-│   └── release_state.json             byte-exact copy (active_phase=A, ack=13, next=14)
-├── copied_lineage_hash_manifest.md    hash manifest for the copied lineage
-├── resident_safe_packet_manifest.md   what goes into the Resident-visible sandbox
-├── isolation/
-│   ├── isolation_report.md            OS-level isolation proof
-│   └── probe_isolation.sh             sandbox probe used during preflight
+├── operator_manifest.md                 (this file)
+├── source_pins_and_digests.md           exact #205 source pins/digests
+├── lineage_copy/                        byte-exact copy of accepted A freeze
+│   ├── private_world.sqlite
+│   ├── world_index.sqlite
+│   └── release_state.json
+├── copied_lineage_hash_manifest.md
+├── resident_safe_packet_manifest.md     sandbox RO/RW/IPC/NET invariants (CORRECTIVE-003)
+├── environment_manifest.md              env allowlist + PATH + stripped vars (NEW)
 ├── harness/
-│   ├── resident_jail.py               Linux mount-namespace chroot sandbox builder
-│   └── mailbox_bridge.py              transport-only mailbox (no semantics)
+│   ├── resident_jail.py                 OS sandbox (NEWNS|NEWPID|NEWNET, PID1 supervisor, minimal /dev, fail-closed)
+│   ├── mailbox_bridge.py                transport-only allowlist + path-aware leakage guard + reply binding (strict)
+│   └── bridged_model_handler.py        FROZEN production + synthetic handlers (ProductionResidentHandler vs SyntheticProbeHandler, ProviderClient, UNKNOWN)
+├── isolation/
+│   ├── isolation_report.md              OS isolation proof (15 self-tests + 6 binding + minimal /dev + MS_PRIVATE + signal strict)
+│   ├── probe_isolation.sh               isolation probe
+│   └── probe_e2e.sh                     genuine 2-round FusedTurnRuntime/CognitiveRuntime→Handler→Bridge→Responder E2E (26 checks)
 ├── checks/
-│   └── mechanical_checks.md           positive/negative mechanical check results
+│   └── mechanical_checks.md             positive/negative mechanical check results (26-check)
 ├── procedure/
-│   ├── b_startup_procedure.md         exact B startup procedure (not executed)
-│   ├── per_cursor_interaction.md      exact per-cursor interaction procedure
-│   └── final_freeze_procedure.md      B final freeze/evidence procedure
-├── identity_inventory.md              trustworthy model/provider identity (UNKNOWN)
-├── known_limitations.md
+│   ├── b_startup_procedure.md           exact B startup (no model peek, env allowlist, frozen adapter)
+│   ├── per_cursor_interaction.md        exact per-cursor 14..22 loop — Scheme A (no repair)
+│   └── final_freeze_procedure.md        B final freeze/evidence
+├── identity_inventory.md                model/provider identity — UNKNOWN or real provider (fake-provider preflight)
+├── known_limitations.md                 CORRECTIVE-003 limitations (NET sealed, production roundtrip, etc.)
+├── corrective_002_report.md             prior corrective evidence (preserved)
+├── corrective_003_report.md             CORRECTIVE-003 E2E evidence (CORRECTIVE_003_E2E_PASS)
 └── completion_report.md
 ```
 
+## Frozen model-handling intent (BLOCKER 1)
+
+**Separation:** `SyntheticProbeHandler` (mailbox bridge + inside-jail responder, `sandbox-bridge/synthetic-responder-v1/10 tokens`) vs **`ProductionResidentHandler`** (outside-jail `ProviderClient`, `contract text + envelope` only, real provenance).
+
+**Separation is in code** — not just documentation. Synthetic path is disposable probe; production path is frozen for real B and maps `provider/model/request_id` from the **actual** `ProviderResponse` (or `"UNKNOWN"` where credibly unavailable) and `usage` from actual `usage.total_tokens` (or `None`, never `10`). PR-approval-time choice phrase removed.
+
+**Phase B adapter is frozen** (`bridged_model_handler.py`) before B run. Operator cannot swap model logic at release; `FakeProviderClient` is swapped for `RealProviderClient` via constructor only (same file).
+
+## Transport authority (fail-closed)
+
+MailboxBridge validates `event` exactly 8 fields + `sequence 14..22` + `phase B` + `allowed_sequences [14,22]` + capability_history B-session only + forbid path prefixes (`/repo/fixture`, `/repo/evaluator`, `/repo/governance`, `/repo/.git`, `/release/`, sealed fixture) — **not bare `fixture`** (legal World `obs_c14_fixture_*` allowed; probe now search `Atlas` non-empty). Top-level allowlist of 11 fields, request binding `round/request_id/nonce/request_digest`, reply strict per-action allowlist and binding echo (`stale/future/replay/wrong-id/wrong-digest/future-becomes-valid` all fail closed).
+
+## Isolation invariants (proven)
+
+- `CLONE_NEWNET` — no public internet (ENETUNREACH), provider via outside broker only.
+- `CLONE_NEWPID` fresh `/proc`, PID1 `sandbox-init` reaps/forwards, worker `PID≥2`.
+- `CLONE_NEWNS` mount private fail closed; RO bind `ro,nosuid,nodev` (EROFS probe).
+- Mailbox IPC: `inbox 0755/outbox 01733/archive 0700 not mounted`, `nobody:nogroup` honors, private MS drop strip.
+- `/dev` minimal (tmpfs + `null/zero/urandom/random`), signal strict, env allowlist (PROBE_* stripped unless explicitly passed).
+
 ## Preflight rules observed
 
-- operator only; no Resident cognition was executed.
-- All mechanical checks used disposable copies of the freeze artifacts; the canonical #205 evidence was read but not modified.
-- Sandbox isolation uses Linux mount namespaces + chroot + uid drop (not prompt-only).
-- Transport (mailbox bridge) performs zero semantic judgment; validates only JSON shape.
-- Cursor 14's resident-visible payload was NOT released or inspected during this preflight. The `init --phase B` command only validates receipt-chain integrity and phase transition; it does not emit or peek at the next event payload.
+- Operator role transport only; harness env run is `unshare+chroot+drop` (prompt-only never counted).
+- Cursor 14 never revealed to real model during preflight; probe used synthetic disposable cursor 14 projection `synthetic-fixture-seq-14` with 8-field shape + negatives.
+- `init --phase B` validates receipt-chain only, does not emit or peek at payload.
+- Environment manifest frozen; `PYTHONPATH=/repo/src`, `contract_sha256`, `b_session`, `AIOS_MAILBOX_ROOT` pinned.
+

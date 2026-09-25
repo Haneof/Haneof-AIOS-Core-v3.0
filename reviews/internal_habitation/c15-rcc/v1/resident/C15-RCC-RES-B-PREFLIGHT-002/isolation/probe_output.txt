@@ -3,8 +3,8 @@ uid=65534 gid=65534
 PASS: running as nobody (uid 65534)
 
 === PID namespace (blocker 2 fixed) ===
-my pid = 39 (should be >=2)
-PASS: resident pid 39 != 1 (init is separate)
+my pid = 43 (should be >=2)
+PASS: resident pid 43 != 1 (init is separate)
 pid 1 comm = 'sandbox-init'
 visible PIDs in /proc = 5 (should be small, not host's 100+)
 PASS: only 5 PIDs visible (expected small count in new PID namespace)
@@ -46,15 +46,35 @@ PASS: Resident contract read-only (touch denied)
 PASS: Core src file write blocked: [Errno 13] Permission denied: '/repo/src/aios_core/__init__.py'
 PASS: Resident contract write blocked: [Errno 13] Permission denied: '/repo/reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md'
 
-=== Mailbox permissions (blocker 4) ===
-PASS: /work/inbox readable
-PASS: /work/outbox writable + searchable
-PASS: can write to /work/outbox
-PASS: /work/archive absent (operator archive not mounted)
+=== /dev minimal (BLOCKER 6: no whole-host bind) ===
+dev:fd
+dev:null
+dev:random
+dev:stderr
+dev:stdin
+dev:stdout
+dev:urandom
+dev:zero
+PASS: /dev/null present
+PASS: /dev/zero present
+PASS: /dev/urandom present
+PASS: /dev/random present
+PASS: /dev/fd symlink present
+PASS: sealed: /dev/sda absent as expected
+PASS: sealed: /dev/sda1 absent as expected
+PASS: sealed: /dev/nvme0n1 absent as expected
+PASS: sealed: /dev/mem absent as expected
+PASS: sealed: /dev/kmem absent as expected
+PASS: sealed: /dev/kvm absent as expected
+PASS: sealed: /dev/port absent as expected
+PASS: sealed: /dev/tty absent as expected
+PASS: sealed: /dev/tty0 absent as expected
+PASS: sealed: /dev/ptmx absent as expected
+PASS: sealed: /dev/pts absent as expected
+PASS: sealed: /dev/block absent as expected
+PASS: cannot open host-dangerous /dev nodes (ENOENT/EPERM)
 
-=== Privilege re-escalation (blocker 3) ===
-PASS: setuid(0) denied: [Errno 1] Operation not permitted
-PASS: mount() denied (EPERM)
+/dev/root /repo/src ext4 ro,nosuid,nodev,relatime,discard 0 0
+/dev/root /repo/reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md ext4 ro,nosuid,nodev,relatime,discard 0 0
+PASS: /proc/mounts shows ro,nosuid,nodev for /repo binds
 
-
-ISOLATION_PASS

@@ -154,9 +154,10 @@ def main() -> int:
                 payload = {"round": first_env["round"], "request_id": first_env["request_id"], "request_digest": first_env["request_digest"], "action": "end_turn"}
                 reply(r, payload)
         elif mode == "genuine":
-            # Two-round genuine simulation: first round capability, second silence
-            # Use a nonsense query that yields 0 hits to avoid fixture observation
-            # (any Atlas/test query would hit obs_c14_fixture_* and trigger forbidden substring in second envelope).
+            # Two-round genuine simulation: first round capability (Atlas), second silence.
+            # Atlas query returns 2 non-empty legal results including obs_c14_fixture_* which is
+            # explicitly LEGAL durable World data (BLOCKER 2 fix: path-aware guard, bare fixture allowed).
+            # The second envelope's capability_history will contain those ids and must NOT be rejected.
             if r == 1:
                 payload = {
                     "round": r,
@@ -164,10 +165,10 @@ def main() -> int:
                     "request_digest": env["request_digest"],
                     "action": "invoke_capability",
                     "capability": "search_world",
-                    "arguments": {"query": "XYZZY_NONSENSE_NONEXISTENT_12345", "limit": 2}
+                    "arguments": {"query": "Atlas", "limit": 2}
                 }
                 reply(r, payload)
-                print(f"[test-responder] genuine round1 invoke search_world nonsense")
+                print(f"[test-responder] genuine round1 invoke search_world Atlas limit2 (non-empty legal)")
             else:
                 payload = {"round": r, "request_id": env["request_id"], "request_digest": env["request_digest"], "action": "silence"}
                 reply(r, payload)

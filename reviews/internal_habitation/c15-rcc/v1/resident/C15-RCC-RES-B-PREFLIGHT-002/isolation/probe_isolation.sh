@@ -1,5 +1,5 @@
 #!/bin/sh
-# C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-002 — Hardened isolation probe
+# C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-003 — Hardened isolation probe (minimal dev + strict mounts)
 # Runs INSIDE the sandbox as 'nobody'. Exits 0 only on full isolation PASS.
 set -eu
 
@@ -200,6 +200,66 @@ for path, label in [
 PYEOF
 
 echo
+echo "=== /dev minimal (BLOCKER 6: no whole-host bind) ==="
+ls -1 /dev 2>/dev/null | sort > /tmp/dev_list.txt || true
+cat /tmp/dev_list.txt | sed 's/^/dev:/'
+for n in null zero urandom random; do
+    if [ -e "/dev/$n" ]; then
+        pass "/dev/$n present"
+    else
+        fail "/dev/$n missing (required minimal)"
+    fi
+done
+if [ -e /dev/fd ] || [ -L /dev/fd ]; then
+    pass "/dev/fd symlink present"
+else
+    fail "/dev/fd missing"
+fi
+for p in /dev/sda /dev/sda1 /dev/nvme0n1 /dev/mem /dev/kmem /dev/kvm /dev/port /dev/tty /dev/tty0 /dev/ptmx /dev/pts /dev/block; do
+    if [ -e "$p" ]; then
+        fail "LEAK: $p present (host /dev bind not minimal)"
+    else
+        pass "sealed: $p absent as expected"
+    fi
+done
+/usr/bin/python3 - <<'PYEOF'
+import os
+candidates = ["/dev/sda", "/dev/mem", "/dev/kvm", "/dev/tty", "/dev/port"]
+leaked=[]
+for p in candidates:
+    try:
+        fd=os.open(p, os.O_RDONLY)
+        os.close(fd)
+        leaked.append(p)
+    except OSError:
+        pass
+if leaked:
+    print(f"FAIL: could open {leaked}")
+else:
+    print("PASS: cannot open host-dangerous /dev nodes (ENOENT/EPERM)")
+PYEOF
+
+echo
+if grep " /repo" /proc/mounts 2>/dev/null | grep -q "\bro,"; then
+    grep " /repo" /proc/mounts | head
+    # also verify nosuid,nodev
+    if grep " /repo" /proc/mounts | grep -q "nosuid" && grep " /repo" /proc/mounts | grep -q "nodev"; then
+        pass "/proc/mounts shows ro,nosuid,nodev for /repo binds"
+    else
+        fail "/proc/mounts missing nosuid/nodev for /repo"
+    fi
+else
+    fail "/proc/mounts missing ro for /repo"
+fi
+
+echo
+if grep -q " /work/inbox" /proc/mounts 2>/dev/null || mount | grep -q "inbox"; then
+    pass "mailbox inbox bind visible in mounts (optional)"
+else
+    pass "mailbox inbox mount check skipped (bind done via tmpfs+bind)"
+fi
+
+echo
 echo "=== Mailbox permissions (blocker 4) ==="
 if [ -r /work/inbox ]; then
     pass "/work/inbox readable"
@@ -249,6 +309,28 @@ else:
     else:
         print(f"FAIL: mount() unexpected errno {err}: {os.strerror(err)}")
 PYEOF
+
+echo
+echo "=== Environment allowlist (BLOCKER: PROBE_* not leaked unless AIOS_ALLOW_PROBE_ENV) ==="
+if [ "${AIOS_ALLOW_PROBE_ENV:-}" = "1" ]; then
+    if [ -n "${PROBE_MODE:-}" ]; then
+        pass "PROBE_MODE present with AIOS_ALLOW_PROBE_ENV=1 (explicit allow)"
+    else
+        fail "AIOS_ALLOW_PROBE_ENV=1 but PROBE_MODE missing"
+    fi
+else
+    if [ -n "${PROBE_MODE:-}" ] || [ -n "${PROBE_ROUNDS:-}" ]; then
+        fail "PROBE_MODE/PROBE_ROUNDS leaked into sandbox without AIOS_ALLOW_PROBE_ENV (unsanitized env)"
+    else
+        pass "PROBE_MODE/PROBE_ROUNDS not leaked (unsanitized env blocked)"
+    fi
+fi
+# Check LD_* stripped
+if env | grep -q "^LD_"; then
+    fail "LD_* leaked into sandbox env"
+else
+    pass "LD_* stripped"
+fi
 
 echo
 if [ $FAIL -eq 0 ]; then

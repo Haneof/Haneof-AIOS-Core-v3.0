@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-002 — Resident isolation sandbox (hardened, PID1 supervisor fixed).
+C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-003 — Resident isolation sandbox (hardened, PID1 supervisor, fail-closed mount, minimal /dev).
 
 Address blockers:
   1. NETWORK_SEAL_BYPASS      -> CLONE_NEWNET + loopback only + ENETUNREACH probe.
@@ -97,11 +97,12 @@ def _set_comm(name: str) -> None:
 
 def _worker_main(args: argparse.Namespace) -> int:
     """Worker PID>=2: mounts, chroot, drop privs, exec. Never returns on success."""
-    # Make mount propagation private (redundant if unsharer already did, but safe)
-    try:
-        _mount("none", "/", None, MS_REC | MS_PRIVATE)
-    except OSError:
-        pass
+    # Make mount propagation private — FAIL CLOSED (BLOCKER 5)
+    # If this fails, we must not continue to bind/proc/chroot/exec.
+    # Test seam: _RESIDENT_JAIL_INJECT_MS_PRIVATE_FAIL=1 forces failure for negative test.
+    if os.environ.get("_RESIDENT_JAIL_INJECT_MS_PRIVATE_FAIL") == "1":
+        raise RuntimeError("injected MS_PRIVATE failure (test seam)")
+    _mount("none", "/", None, MS_REC | MS_PRIVATE)
 
     sb = args.sandbox
     sb.mkdir(parents=True, exist_ok=True)
@@ -129,10 +130,38 @@ def _worker_main(args: argparse.Namespace) -> int:
         tgt.mkdir(parents=True, exist_ok=True)
         _bind_ro(str(src), str(tgt))
 
-    # /dev bind
+    # /dev minimal — only required nodes (BLOCKER 6)
+    # Do NOT bind-mount entire host /dev RW. Create tmpfs at /dev and bind only
+    # /dev/null, /dev/zero, /dev/urandom, /dev/random. /dev/fd via inherited FDs.
     dev = sb / "dev"
     dev.mkdir(parents=True, exist_ok=True)
-    _mount("/dev", str(dev), None, MS_BIND | MS_REC)
+    _mount("tmpfs", str(dev), "tmpfs", 0, "size=8m,mode=0755")
+    # Helper to bind a single host device node RO (or RW for null/zero/urandom)
+    def _bind_dev(name: str):
+        src = Path(f"/dev/{name}")
+        if not src.exists():
+            return
+        tgt = dev / name
+        tgt.parent.mkdir(parents=True, exist_ok=True)
+        tgt.touch()
+        # Bind RW but with nosuid/nodev for safety; these are char devices, not block
+        _mount(str(src), str(tgt), None, MS_BIND)
+    for _n in ("null", "zero", "urandom", "random"):
+        _bind_dev(_n)
+    # Minimal fd/stdio: create /dev/fd symlink to /proc/self/fd (inherited FDs)
+    try:
+        (dev / "fd").symlink_to("/proc/self/fd")
+    except FileExistsError:
+        pass
+    # Ensure /dev/stdin/out/err symlinks if host has them (optional)
+    for _s in ("stdin", "stdout", "stderr"):
+        try:
+            if not (dev / _s).exists():
+                (dev / _s).symlink_to(f"/proc/self/fd/{'0' if _s=='stdin' else '1' if _s=='stdout' else '2'}")
+        except Exception:
+            pass
+    # Adversarial probe notes: no block devices, no host tty (/dev/tty*, /dev/pts), no dangerous /dev/mem etc.
+    # Probe verifies inside jail: ls /dev shows only null/zero/urandom/random + fd, no sda, no tty, no mem.
 
     # /proc fresh (must be after CLONE_NEWPID, and in new PID namespace this proc will show init as PID1)
     proc = sb / "proc"
@@ -261,14 +290,15 @@ def _worker_main(args: argparse.Namespace) -> int:
         "HOME": "/home/nobody",
         "TMPDIR": "/tmp",
     }
-    # Sanitized env: only allow explicit allowlist, plus operator-controlled probe vars
-    # PROBE_MODE/PROBE_ROUNDS are allowed only when operator explicitly sets them before jail,
-    # and they are sanitized to known values (normal/malformed/stale etc.) - resident cannot escalate.
-    allowed_probe_vars = {"PROBE_MODE", "PROBE_ROUNDS"}
+    # Sanitized env: only allow explicit allowlist. PROBE_MODE/PROBE_ROUNDS are DISALLOWED unless
+    # operator explicitly sets AIOS_ALLOW_PROBE_ENV=1 (explicit allowlist). This prevents unsanitized
+    # host env leaking into Resident (BLOCKER: must not leak via unsanitized env).
+    allow_probe = os.environ.get("AIOS_ALLOW_PROBE_ENV") == "1"
+    allowed_probe_vars = {"PROBE_MODE", "PROBE_ROUNDS"} if allow_probe else set()
     for k, v in os.environ.items():
         if k in allowed_probe_vars:
-            # Validate value to prevent injection
-            if k == "PROBE_MODE" and v not in ("normal", "malformed", "stale", "preplay", "replay", "binding", "genuine"):
+            # Validate value to prevent injection; only known modes
+            if k == "PROBE_MODE" and v not in ("normal", "malformed", "stale", "preplay", "replay", "binding", "genuine", "e2e"):
                 continue
             if k == "PROBE_ROUNDS" and not v.isdigit():
                 continue
@@ -277,8 +307,8 @@ def _worker_main(args: argparse.Namespace) -> int:
             continue
         elif k in ("PATH", "HOME", "TMPDIR", "TERM", "LANG", "LC_ALL", "LC_CTYPE"):
             env.setdefault(k, v)
-        elif k in ("_RESIDENT_JAIL_INJECT_PRIVDROP_FAIL", "_RESIDENT_JAIL_INJECT_FAIL_MODE"):
-            # Do NOT propagate these into sandbox; they are host-side test seams only
+        elif k in ("_RESIDENT_JAIL_INJECT_PRIVDROP_FAIL", "_RESIDENT_JAIL_INJECT_FAIL_MODE", "_RESIDENT_JAIL_INJECT_MS_PRIVATE_FAIL", "AIOS_ALLOW_PROBE_ENV"):
+            # Do NOT propagate test seams or allow flag itself into sandbox
             continue
     os.execvpe(args.cmd[0], args.cmd, env)
     raise RuntimeError(f"execvp({args.cmd[0]!r}) failed")

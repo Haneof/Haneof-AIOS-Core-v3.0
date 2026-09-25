@@ -1,16 +1,18 @@
-[e2e] run_root = /tmp/b-preflight-e2e-3831
+[e2e] run_root = /tmp/b-preflight-e2e-2942
 world.sqlite: OK
 index.sqlite: OK
 release_state.json: OK
-[e2e] lineage copy digests OK
-[e2e] step 1: mailbox_bridge self-tests (including binding)
+[e2e] lineage digests OK
+[e2e] step 1: mailbox_bridge self-tests (15)
 self-test 1 PASS: minimal good envelope accepted with binding
 self-test 2 PASS: extra top-level key rejected
 self-test 3 PASS: extra event field rejected
 self-test 4 PASS: A session in capability_history rejected
-self-test 5 PASS: forbidden substring rejected
+self-test 5 PASS: forbidden path substring rejected (legal obs_c14_fixture_* allowed)
+self-test 5b PASS: legal durable World fixture id allowed (obs_c14_fixture_*)
 self-test 6 PASS: wrong phase rejected
 self-test 7 PASS: malformed reply rejected
+self-test 7b PASS: extra reply field rejected (strict schema)
 self-test 8 PASS: correct exact-bound reply accepted
 self-test 9 PASS: stale prior-round reply rejected
 self-test 10 PASS: preplayed future-round reply rejected
@@ -20,14 +22,15 @@ self-test 13 PASS: wrong request_digest rejected
 self-test 14 PASS: double send while outstanding rejected
 self-test 15 PASS: pre-set request_id rejected
 ALL SELF-TESTS PASS
-[e2e] step 2: hardened isolation probe inside sandbox (PID1 supervisor)
+CHECK 1 PASS: mailbox self-tests (15)
+[e2e] step 2: hardened isolation probe inside sandbox
 === identity ===
 uid=65534 gid=65534
 PASS: running as nobody (uid 65534)
 
 === PID namespace (blocker 2 fixed) ===
-my pid = 39 (should be >=2)
-PASS: resident pid 39 != 1 (init is separate)
+my pid = 43 (should be >=2)
+PASS: resident pid 43 != 1 (init is separate)
 pid 1 comm = 'sandbox-init'
 visible PIDs in /proc = 5 (should be small, not host's 100+)
 PASS: only 5 PIDs visible (expected small count in new PID namespace)
@@ -69,6 +72,40 @@ PASS: Resident contract read-only (touch denied)
 PASS: Core src file write blocked: [Errno 13] Permission denied: '/repo/src/aios_core/__init__.py'
 PASS: Resident contract write blocked: [Errno 13] Permission denied: '/repo/reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md'
 
+=== /dev minimal (BLOCKER 6: no whole-host bind) ===
+dev:fd
+dev:null
+dev:random
+dev:stderr
+dev:stdin
+dev:stdout
+dev:urandom
+dev:zero
+PASS: /dev/null present
+PASS: /dev/zero present
+PASS: /dev/urandom present
+PASS: /dev/random present
+PASS: /dev/fd symlink present
+PASS: sealed: /dev/sda absent as expected
+PASS: sealed: /dev/sda1 absent as expected
+PASS: sealed: /dev/nvme0n1 absent as expected
+PASS: sealed: /dev/mem absent as expected
+PASS: sealed: /dev/kmem absent as expected
+PASS: sealed: /dev/kvm absent as expected
+PASS: sealed: /dev/port absent as expected
+PASS: sealed: /dev/tty absent as expected
+PASS: sealed: /dev/tty0 absent as expected
+PASS: sealed: /dev/ptmx absent as expected
+PASS: sealed: /dev/pts absent as expected
+PASS: sealed: /dev/block absent as expected
+PASS: cannot open host-dangerous /dev nodes (ENOENT/EPERM)
+
+/dev/root /repo/src ext4 ro,nosuid,nodev,relatime,discard 0 0
+/dev/root /repo/reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md ext4 ro,nosuid,nodev,relatime,discard 0 0
+PASS: /proc/mounts shows ro,nosuid,nodev for /repo binds
+
+PASS: mailbox inbox bind visible in mounts (optional)
+
 === Mailbox permissions (blocker 4) ===
 PASS: /work/inbox readable
 PASS: /work/outbox writable + searchable
@@ -79,99 +116,106 @@ PASS: /work/archive absent (operator archive not mounted)
 PASS: setuid(0) denied: [Errno 1] Operation not permitted
 PASS: mount() denied (EPERM)
 
+=== Environment allowlist (BLOCKER: PROBE_* not leaked unless AIOS_ALLOW_PROBE_ENV) ===
+PASS: PROBE_MODE/PROBE_ROUNDS not leaked (unsanitized env blocked)
+PASS: LD_* stripped
+
 
 ISOLATION_PASS
-[e2e] isolation probe PASS
-[e2e] PID1 supervisor evidence OK
-[e2e] step 3: mailbox binding E2E (normal + 6 negatives)
-[binding] test normal correct binding
-  round 1 correct binding OK: id=f0f797e3...
-  round 2 correct binding OK: id=6669195f...
+CHECK 2 PASS: isolation (PID1 sup + NET sealed + RO bind + mailbox IPC + /dev minimal + env)
+CHECK 3 PASS: PID1 supervisor (worker PID>=2, zombie reap)
+CHECK 4 PASS: REDACTED network sealed via CLONE_NEWNET (ENETUNREACH)
+CHECK 5 PASS: RO bind proven (EROFS + ro,nosuid,nodev)
+CHECK 6 PASS: mailbox IPC (inbox 0755/outbox 01733/archive not mounted + nobody perms)
+CHECK 7 PASS: /dev minimal (null/zero/urandom/random + fd only, no sda/mem/tty)
+CHECK 8 PASS: environment allowlist (PROBE_* stripped without AIOS_ALLOW_PROBE_ENV)
+[e2e] step 3: mailbox binding E2E (7 cases)
 NORMAL_BINDING_PASS
----- responder normal stdout ----
 [test-responder] starting mode=normal rounds=2 uid=65534 pid=3 inbox=/work/inbox outbox=/work/outbox
 [test-responder] pid=3 proc1_comm=sandbox-init
 [test-responder] PASS PID1 is sandbox-init
-[test-responder] round 1 received request_id=f0f797e3... digest=fdbf2044...
-[test-responder] round 2 received request_id=6669195f... digest=e98df7cf...
+[test-responder] round 1 received request_id=6543b18c... digest=c54b3445...
+[test-responder] round 2 received request_id=e95cc36a... digest=c66a4b97...
 [test-responder] OK mode=normal rounds=2 pid=3
 
-[binding] test stale prior-round rejected
-  round1 ok id=970e9ec0
-  stale rejected as expected: reply round 1 != outstanding 2 (stale/future)
 STALE_REJECTED_PASS
-[binding] test preplayed future-round rejected
-  preplay rejected as expected: reply request_id 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' != outstanding 'be54daf744f685cb5dc9219973beebeb' (wrong id)
 PREPLAY_REJECTED_PASS
-[binding] test replayed consumed rejected
-  round1 consumed id=c957f6f8
-  replay rejected as expected: reply request_id 'c957f6f8339da0b4f89f0407caee4e62' is replay of consumed id (replay rejected)
 REPLAY_REJECTED_PASS
-[binding] test wrong request_id rejected
-  wrong id rejected: reply request_id 'ffffffffffffffffffffffffffffffff' != outstanding '414d50441644dbb364ac4aa028487929' (wrong id)
 WRONG_ID_REJECTED_PASS
-[binding] test wrong request_digest rejected
-  wrong digest rejected: reply request_digest 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' != outstanding '6faeaad7346b28e45fcd79a3d49e22740b458fe2405644e3eb11ff78592b9858' (wrong digest)
 WRONG_DIGEST_REJECTED_PASS
-[binding] test future reply does not become valid later
-  round1 ok
-  future preplayed correctly rejected even after advancing: reply request_id 'cccccccccccccccccccccccccccccccc' != outstanding '13a00f73fdc1f7cead8b6b71bdddbacf' (wrong id)
 FUTURE_NOT_VALID_PASS
 ALL_BINDING_TESTS_PASS
-[e2e] binding tests PASS
-[e2e] step 4: genuine Core ModelHandler path E2E (FusedTurnRuntime -> bridge -> sandbox responder -> Core)
-[genuine] world_revision=98 watermark=98
-[genuine] contract_sha256=28d3262f56b7ef93...
-[genuine] invoking FusedTurnRuntime.run_turn with synthetic input
-[genuine] run_turn completed: model_rounds=2 termination=silence
-[genuine] capability_history len=1
-[genuine] handler invocations=2 (capability + follow-up)
-[genuine] runtime_snapshot contains world_map (Core-generated)
-[genuine] capability_catalog size=43 (genuine)
-[genuine] bridge round=2 consumed=2 outstanding=None
-[genuine] silenced=True response=None
-[genuine] archive evidence verified for both rounds
-[genuine] capability search_world executed and second round walked same bridge (verified)
-[genuine] testing malformed reply fail-closed on genuine path
-[genuine] malformed correctly fail-closed: ModelDispatchNotSubmitted: bridge reply binding failed: malformed reply JSON at round 1: Expecting value: line 1 column 1 (char 0)
-MALFORMED_FAIL_CLOSED_PASS
---- responder tail ---
+CHECK 9 PASS: binding normal correct echo
+CHECK 10 PASS: binding stale prior-round rejected
+CHECK 11 PASS: binding preplayed future rejected
+CHECK 12 PASS: binding replay consumed rejected
+CHECK 13 PASS: binding wrong request_id rejected
+CHECK 14 PASS: binding wrong request_digest rejected
+CHECK 15 PASS: binding future reply never becomes valid later
+[e2e] step 4a: synthetic genuine Core->MailboxBridge->responder (Atlas non-empty)
+model_rounds=2 invocations=2 termination=silence
+current_event wiring seq14 OK in envelope
+second envelope capability_history contains obs_c14_fixture_* legal ids: True
 [test-responder] starting mode=genuine rounds=2 uid=65534 pid=3 inbox=/work/inbox outbox=/work/outbox
 [test-responder] pid=3 proc1_comm=sandbox-init
 [test-responder] PASS PID1 is sandbox-init
-[test-responder] round 1 received request_id=1ea19a9a... digest=9d506021...
-[test-responder] genuine round1 invoke search_world nonsense
-[test-responder] round 2 received request_id=c7846db4... digest=21607a4f...
+[test-responder] round 1 received request_id=c817a677... digest=b24235cd...
+[test-responder] genuine round1 invoke search_world Atlas limit2 (non-empty legal)
+[test-responder] round 2 received request_id=317905f5... digest=a746183d...
 [test-responder] genuine round2 silence
 [test-responder] OK mode=genuine rounds=2 pid=3
 
---- responder tail ---
-[test-responder] starting mode=malformed rounds=1 uid=65534 pid=3 inbox=/work/inbox outbox=/work/outbox
-[test-responder] pid=3 proc1_comm=sandbox-init
-[test-responder] PASS PID1 is sandbox-init
-[test-responder] round 1 received request_id=2ad9e719... digest=ff847b8b...
-[test-responder] OK mode=malformed rounds=1 pid=3
+SYNTHETIC_GENUINE_PASS
+CHECK 16 PASS: synthetic genuine 2-round via MailboxBridge (FusedTurnRuntime->handler->bridge->responder, Atlas non-empty legal)
+CHECK 17 PASS: current_event 8-field seq14 wiring (envelope event validated, 14..22)
+[e2e] step 4b: production genuine via ProductionResidentHandler(FakeProviderClient)
+prod model_rounds=2 invoc=2 history=1
+last_provider=fake-provider model=fake-model-v1 req=fake-req-0002 usage={'total_tokens': 42, 'input_tokens': 20, 'output_tokens': 22}
+fake last request inbox check OK, envelope_round=2
+PRODUCTION_GENUINE_PASS
+UNKNOWN provenance test: UNKNOWN UNKNOWN usage=None
+UNKNOWN_PROVENANCE_PASS
+CHECK 18 PASS: production genuine 2-round via ProductionResidentHandler+FakeProviderClient (REAL provenance provider=fake-provider, tokens=42)
+CHECK 19 PASS: UNKNOWN handling (no credibly available provider -> provenance UNKNOWN, usage None not 10)
+[e2e] step 5: current_event / envelope negatives (5)
+PASS seq13 rejected
+PASS seq23 rejected
+PASS extra event field rejected
+PASS missing field rejected
+PASS phase A rejected
+ALL_NEGATIVES_PASS
+CHECK 20 PASS: current_event sequence 13 rejected (below 14..22)
+CHECK 21 PASS: current_event sequence 23 rejected (above 14..22)
+CHECK 22 PASS: current_event extra field rejected
+CHECK 23 PASS: current_event missing field rejected
+CHECK 24 PASS: envelope phase A rejected (must be B)
+[e2e] step 6: strict reply schema (extra field in silence)
+PASS strict extra field rejected: reply structural invalid: reply for action 'silence' has extra fields ['capability'] not allowed
+STRICT_REPLY_PASS
+CHECK 25 PASS: strict reply schema (silence with extra capability rejected)
+[e2e] step 7: repair Scheme A (round_repair_request unsupported)
+repair shape structurally allowed
+PASS repair unsupported fail-closed: unsupported reply action: 'round_repair_request'
+CHECK 26 PASS: repair Scheme A (round_repair_request not supported, fail closed, no repair turn)
+[e2e] step 8: MS_PRIVATE fail-closed + privdrop negatives
+MS_PRIVATE injected exit=98 stdout= stderr=[jail] sandbox setup FAILED: RuntimeError: injected MS_PRIVATE failure (test seam)
 
-GENUINE_CORE_PATH_PASS
-[e2e] genuine Core path PASS
-[e2e] step 5: privdrop negative fail-closed test
-[privdrop] running jail with injected failure, expecting exit 98 and no sentinel
-stdout: 
-stderr: [jail] sandbox setup FAILED: RuntimeError: injected privdrop failure (test seam)
+PASS MS_PRIVATE fail-closed (exit 98, no sentinel)
+privdrop generic exit=98
+PASS privdrop generic fail-closed
+privdrop setgid exit=98
+PASS privdrop setgid fail-closed
+PRIVDROP_DUAL_PASS
+CHECK 27 PASS: MS_PRIVATE fail-closed (injected -> exit 98, no sentinel, no outbox)
+CHECK 28 PASS: privdrop dual fail-closed (generic + setgid exit 98, no sentinel)
+[e2e] step 9: signal deterministic (no || true masking)
+[signal] jail exit code 143
+SIGNAL_TERMINATION_PASS (exit 143 deterministic)
+CHECK 29 PASS: signal deterministic (TERM forwarded PID1->worker, wait exit deterministic)
+[e2e] step 10: env allowlist (PROBE_* stripped)
+CHECK 30 PASS: env without allow: PROBE_* not leaked (production)
+CHECK 31 PASS: env with allow: PROBE_MODE explicitly allowed (AIOS_ALLOW_PROBE_ENV=1)
 
-exit code: 98
-PASS: sentinel not created in outbox
-PASS: no outbox reply after privdrop failure
-PRIVDROP_NEGATIVE_PASS
-[privdrop setgid] exit 98
-PASS setgid injected failure also fail-closed
-PRIVDROP_ALL_PASS
-[e2e] privdrop negative PASS
-[e2e] step 6: signal termination test (PID1 forwards TERM)
-[signal] jail sleep pid 4138 alive, sending TERM
-[signal] jail wait exit code 0
-PASS: termination signal correctly ended Resident worker (exit 0)
-SIGNAL_TERMINATION_PASS
-
-E2E_PROBE_PASS
-[e2e] all steps complete at 2026-09-25T05:02:48Z
+ALL_CHECKS=31/26+
+CORRECTIVE_003_E2E_PASS
+[e2e] done 2026-09-25T05:46:02Z
