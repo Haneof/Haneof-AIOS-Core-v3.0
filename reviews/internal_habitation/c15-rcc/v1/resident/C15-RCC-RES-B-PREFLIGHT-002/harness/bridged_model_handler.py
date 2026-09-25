@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-005 — Frozen Production Transport (ExternalBrokerClient) + Binding Receipt
+C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-007 — Frozen Production Transport (ExternalBrokerClient) + Binding Receipt
 
 Blockers closed:
 1. REAL_PROVIDER_CLIENT_IS_SEMANTIC_STUB -> ExternalBrokerClient is pure transport (HTTP POST), no semantic decision logic
@@ -315,8 +315,9 @@ def validate_current_event_binding(
         receipt = json.loads(bind_path.read_text(encoding="utf-8"))
     except Exception as e:
         raise ValueError(f"binding receipt malformed JSON: {e}")
-    # Validate receipt fields
-    for f in ("phase", "b_session_id", "sequence", "event_id", "canonical_projection_sha256"):
+    # Validate receipt fields — full schema (CORRECTIVE-007) : 18 required
+    required = ("binding_version","phase","b_session_id","sequence","event_id","occurred_at","dimension","source_kind","source_class","modality","canonical_projection_sha256","resident_visible_payload_sha256","fixture_sha256","release_state_path","release_state_sha256","release_state_next_sequence","release_state_pending_reveal","operator_request_id")
+    for f in required:
         if f not in receipt:
             raise ValueError(f"binding receipt missing {f}")
     if receipt.get("phase") != "B":
@@ -325,9 +326,12 @@ def validate_current_event_binding(
         raise ValueError(f"binding receipt binding_version {receipt.get('binding_version')!r} != c15-rcc-b-binding-v1 (wrong version)")
     if receipt.get("b_session_id") != b_session_id:
         raise ValueError(f"binding receipt b_session_id {receipt.get('b_session_id')!r} != {b_session_id!r} (wrong session)")
-    # Enforce fixture_sha256 present
+    # Enforce fixture_sha256 present and exact (must equal canonical C15 fixture SHA)
+    canon_fixture = "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46"
     if not receipt.get("fixture_sha256"):
         raise ValueError("binding receipt missing fixture_sha256")
+    if receipt.get("fixture_sha256") != canon_fixture:
+        raise ValueError(f"binding receipt fixture_sha256 {receipt.get('fixture_sha256')!r} != canonical {canon_fixture!r} (wrong fixture SHA)")
     # Enforce release_state_path identity matches current
     if receipt.get("release_state_path") and rs_path and str(receipt.get("release_state_path")) != str(rs_path):
         raise ValueError(f"binding receipt release_state_path {receipt.get('release_state_path')!r} != current {str(rs_path)!r} (path identity mismatch)")
@@ -340,6 +344,7 @@ def validate_current_event_binding(
         if f in receipt and receipt[f] != current_event.get(f):
             raise ValueError(f"current_event.{f} {current_event.get(f)!r} != receipt {f} {receipt[f]!r} (modified {f})")
     # Check canonical projection SHA
+    # canonical_projection_sha256 already validated as required above
     expected_sha = receipt.get("canonical_projection_sha256")
     actual_sha = _canonical_projection_sha256(current_event)
     if expected_sha != actual_sha:
@@ -350,6 +355,10 @@ def validate_current_event_binding(
         actual_payload_sha = _current_event_payload_digest(current_event)
         if exp_payload_sha != actual_payload_sha:
             raise ValueError(f"current_event payload digest mismatch (modified text)")
+    # Enforce release_state receipt fields are present and non-empty (already required) and will be validated against live state below
+    # Additional strict: operator_request_id must be non-empty hex-like
+    if not isinstance(receipt.get("operator_request_id"), str) or not receipt.get("operator_request_id").strip():
+        raise ValueError("binding receipt operator_request_id must be non-empty string")
     # Validate against release_state
     if rs_path and rs_path.exists():
         try:
@@ -359,14 +368,22 @@ def validate_current_event_binding(
         except Exception as e:
             raise ValueError(f"release_state JSON invalid: {e}")
         nxt = rs.get("next_sequence")
+        pending = rs.get("pending_reveal")
         if nxt is not None and current_event.get("sequence") != nxt:
             raise ValueError(f"current_event.sequence {current_event.get('sequence')} != release_state next_sequence {nxt} (future/stale)")
         # Enforce release_state SHA equality (reveal -> model -> ACK unchanged)
         receipt_rs_sha = receipt.get("release_state_sha256")
         if receipt_rs_sha and receipt_rs_sha != current_rs_sha:
             raise ValueError(f"release_state SHA mismatch: receipt {receipt_rs_sha[:12]}... != current {current_rs_sha[:12]}... (stale receipt or state mutated)")
+        # Enforce receipt's saved next_sequence matches live release_state
+        receipt_next = receipt.get("release_state_next_sequence")
+        if receipt_next != nxt:
+            raise ValueError(f"binding receipt release_state_next_sequence {receipt_next!r} != release_state next_sequence {nxt!r} (next_sequence mismatch)")
+        # Enforce receipt's saved pending_reveal matches live release_state
+        receipt_pending = receipt.get("release_state_pending_reveal")
+        if receipt_pending != pending:
+            raise ValueError(f"binding receipt release_state_pending_reveal {receipt_pending!r} != release_state pending_reveal {pending!r} (pending_reveal mismatch)")
         # Enforce pending_reveal matches receipt and current event
-        pending = rs.get("pending_reveal")
         if pending is not None:
             if pending.get("sequence") != receipt.get("sequence"):
                 raise ValueError(f"release_state pending_reveal.sequence {pending.get('sequence')!r} != receipt sequence {receipt.get('sequence')!r}")
@@ -483,21 +500,16 @@ class ExternalBrokerClient:
         # For preflight, we allow http://127.0.0.1:* for FakeBrokerServer, but still require transport
         if not (self.endpoint.startswith("http://") or self.endpoint.startswith("https://") or self.endpoint.startswith("fake://")):
             raise ValueError(f"endpoint must be http(s)://, got {self.endpoint!r}")
-        # Production HTTP plaintext forbidden: only https:// legal for production; http:// loopback only for test FakeBrokerServer
+        # Production HTTP plaintext forbidden: only https:// legal for production; http:// loopback only for explicit test-only switch
         if self.endpoint.startswith("http://"):
             is_loopback = self.endpoint.startswith("http://127.0.0.1:") or self.endpoint.startswith("http://localhost:")
             if not is_loopback:
                 raise ValueError(f"plaintext http:// not allowed for production endpoint {self.endpoint!r} (must be https:// or test-only http://127.0.0.1:<port>)")
             # Loopback is test-only: require explicit allow flag, otherwise production B would fail-closed
-            allow_loopback = os.getenv("AIOS_ALLOW_LOOPBACK_BROKER") == "1" or os.getenv("AIOS_TEST_MODE") == "1" or "b-test" in os.getenv("AIOS_B_SESSION_ID", "") or "b-headless" in os.getenv("AIOS_B_SESSION_ID", "") or "test" in os.getenv("AIOS_B_SESSION_ID", "")
-            # Also allow if this is invoked from SyntheticProbeHandler path (probe) - we check caller stack for test
+            # Session name MUST NOT affect security policy (CORRECTIVE-007)
+            allow_loopback = os.getenv("AIOS_ALLOW_LOOPBACK_BROKER") == "1" or os.getenv("AIOS_TEST_MODE") == "1"
             if not allow_loopback:
-                # In production real B session (e.g., b-session-XYZ without test), loopback must FAIL
-                # For preflight probe, the B session is b-headless-001, b-fail-test etc which contain test, so allowed
-                # If pure production session like b-session-14 without test marker, loopback is forbidden
-                b_sess = os.getenv("AIOS_B_SESSION_ID", "")
-                if b_sess and not any(x in b_sess for x in ("test", "headless", "synthetic")):
-                    raise ValueError(f"loopback http:// endpoint not allowed for production session {b_sess!r} (must be https://)")
+                raise ValueError(f"loopback http:// endpoint not allowed without AIOS_ALLOW_LOOPBACK_BROKER=1 (must be https://) got {self.endpoint!r}")
 
     def invoke(self, request: dict[str, Any]) -> ProviderResponse:
         self.invocations += 1
@@ -764,182 +776,6 @@ def load_provider_client(adapter: str, **kwargs) -> Any:
 
 # --- Reply translators ---
 
-
-def write_binding_receipt(receipt: dict[str, Any], dest_path: Path | str) -> None:
-    dest = Path(dest_path)
-    try:
-        dest.parent.mkdir(parents=True, exist_ok=True)
-    except Exception as e:
-        raise ValueError(f"binding receipt dest mkdir failed: {e}")
-    tmp = dest.with_suffix(".tmp")
-    try:
-        tmp.write_text(json.dumps(receipt, sort_keys=True, indent=2, ensure_ascii=False), encoding="utf-8")
-    except Exception as e:
-        raise ValueError(f"binding receipt write failed: {e}")
-    try:
-        tmp.chmod(0o400)
-    except Exception as e:
-        raise ValueError(f"binding receipt chmod tmp failed: {e}")
-    try:
-        tmp.replace(dest)
-    except Exception as e:
-        raise ValueError(f"binding receipt replace failed: {e}")
-    try:
-        dest.chmod(0o400)
-    except Exception as e:
-        raise ValueError(f"binding receipt chmod dest failed: {e}")
-    # Verify file exists and is 0400
-    if not dest.exists():
-        raise ValueError("binding receipt not written")
-    try:
-        mode = dest.stat().st_mode & 0o777
-        if mode != 0o400:
-            # enforce 0400; if not, fail-closed
-            raise ValueError(f"binding receipt permissions {oct(mode)} != 0o400")
-    except ValueError:
-        raise
-    except Exception as e:
-        raise ValueError(f"binding receipt permission check failed: {e}")
-
-def validate_current_event_binding(current_event: dict[str, Any] | None, b_session_id: str, release_state_path: Path | str | None = None, binding_receipt_path: Path | str | None = None) -> None:
-    rs_path = None
-    if release_state_path:
-        rs_path = Path(release_state_path)
-    else:
-        env_rs = os.getenv("AIOS_RELEASE_STATE_PATH")
-        if env_rs: rs_path = Path(env_rs)
-    bind_path = None
-    if binding_receipt_path:
-        bind_path = Path(binding_receipt_path)
-    else:
-        env_bind = os.getenv("AIOS_CURRENT_EVENT_BINDING_PATH")
-        if env_bind: bind_path = Path(env_bind)
-        else:
-            if rs_path:
-                # default: $RUN_ROOT/binding/current-event-binding.json
-                candidates = [rs_path.parent.parent / "binding" / "current-event-binding.json", rs_path.parent / "binding" / "current-event-binding.json", Path("/tmp") / "binding" / "current-event-binding.json"]
-                for c in candidates:
-                    if c.exists():
-                        bind_path = c
-                        break
-                if bind_path is None:
-                    bind_path = rs_path.parent.parent / "binding" / "current-event-binding.json"
-    if current_event is None:
-        if bind_path and bind_path.exists():
-            raise ValueError("current-event is None but binding receipt exists (missing event file)")
-        return
-    _validate_current_event_fields(current_event)
-    if bind_path is None or not bind_path.exists():
-        raise ValueError(f"binding receipt missing at {bind_path} (must exist)")
-    try:
-        receipt = json.loads(bind_path.read_text(encoding="utf-8"))
-    except Exception as e:
-        raise ValueError(f"binding receipt malformed JSON: {e}")
-    for f in ("phase", "b_session_id", "sequence", "event_id", "canonical_projection_sha256"):
-        if f not in receipt:
-            raise ValueError(f"binding receipt missing {f}")
-    if receipt.get("phase") != "B":
-        raise ValueError(f"binding receipt phase {receipt.get('phase')!r} != B")
-    if receipt.get("binding_version") != "c15-rcc-b-binding-v1":
-        raise ValueError(f"binding receipt binding_version {receipt.get('binding_version')!r} != c15-rcc-b-binding-v1 (wrong version)")
-    if receipt.get("b_session_id") != b_session_id:
-        raise ValueError(f"binding receipt b_session_id {receipt.get('b_session_id')!r} != {b_session_id!r} (wrong session)")
-    # Enforce fixture_sha256 present
-    if not receipt.get("fixture_sha256"):
-        raise ValueError("binding receipt missing fixture_sha256")
-    # Enforce release_state_path identity matches current
-    if receipt.get("release_state_path") and rs_path and str(receipt.get("release_state_path")) != str(rs_path):
-        raise ValueError(f"binding receipt release_state_path {receipt.get('release_state_path')!r} != current {str(rs_path)!r} (path identity mismatch)")
-    if receipt.get("sequence") != current_event.get("sequence"):
-        raise ValueError(f"current_event.sequence {current_event.get('sequence')} != receipt sequence {receipt.get('sequence')} (future/stale)")
-    if receipt.get("event_id") != current_event.get("event_id"):
-        raise ValueError(f"current_event event_id {current_event.get('event_id')!r} != receipt event_id {receipt.get('event_id')!r}")
-    for f in ("occurred_at", "dimension", "source_kind", "source_class", "modality"):
-        if f in receipt and receipt[f] != current_event.get(f):
-            raise ValueError(f"current_event.{f} {current_event.get(f)!r} != receipt {f} {receipt[f]!r} (modified {f})")
-    expected_sha = receipt.get("canonical_projection_sha256")
-    actual_sha = _canonical_projection_sha256(current_event)
-    if expected_sha != actual_sha:
-        raise ValueError(f"current_event canonical projection sha {actual_sha[:12]}... != receipt {expected_sha[:12]}... (modified payload/dimension)")
-    exp_payload_sha = receipt.get("resident_visible_payload_sha256")
-    if exp_payload_sha:
-        actual_payload_sha = _current_event_payload_digest(current_event)
-        if exp_payload_sha != actual_payload_sha:
-            raise ValueError(f"current_event payload digest mismatch (modified text)")
-    if rs_path and rs_path.exists():
-        try:
-            rs_text = rs_path.read_bytes()
-            rs = json.loads(rs_text.decode("utf-8"))
-            current_rs_sha = hashlib.sha256(rs_text).hexdigest()
-        except Exception as e:
-            raise ValueError(f"release_state JSON invalid: {e}")
-        nxt = rs.get("next_sequence")
-        if nxt is not None and current_event.get("sequence") != nxt:
-            raise ValueError(f"current_event.sequence {current_event.get('sequence')} != release_state next_sequence {nxt} (future/stale)")
-        # Enforce release_state SHA equality (reveal -> model -> ACK unchanged)
-        receipt_rs_sha = receipt.get("release_state_sha256")
-        if receipt_rs_sha and receipt_rs_sha != current_rs_sha:
-            raise ValueError(f"release_state SHA mismatch: receipt {receipt_rs_sha[:12]}... != current {current_rs_sha[:12]}... (stale receipt or state mutated)")
-        # Enforce pending_reveal matches receipt and current event
-        pending = rs.get("pending_reveal")
-        if pending is not None:
-            if pending.get("sequence") != receipt.get("sequence"):
-                raise ValueError(f"release_state pending_reveal.sequence {pending.get('sequence')!r} != receipt sequence {receipt.get('sequence')!r}")
-            if pending.get("event_id") != receipt.get("event_id"):
-                raise ValueError(f"release_state pending_reveal.event_id {pending.get('event_id')!r} != receipt event_id {receipt.get('event_id')!r}")
-            if pending.get("sequence") != current_event.get("sequence"):
-                raise ValueError(f"release_state pending_reveal.sequence {pending.get('sequence')!r} != current_event sequence {current_event.get('sequence')!r} (stale)")
-            # Also enforce next_sequence matches pending sequence
-            if nxt != pending.get("sequence"):
-                raise ValueError(f"release_state next_sequence {nxt!r} != pending_reveal.sequence {pending.get('sequence')!r} (state corrupted)")
-
-def build_envelope(snapshot: RuntimeSnapshot, b_session_id: str, contract_sha256: str | None = None, current_event: dict[str, Any] | None = None, release_state_path: Path | str | None = None, binding_receipt_path: Path | str | None = None) -> dict[str, Any]:
-    if contract_sha256 is None:
-        contract_sha256 = get_contract_sha256()
-    runtime_snapshot = dict(snapshot.cockpit) if isinstance(snapshot.cockpit, dict) else {"cockpit": str(snapshot.cockpit)}
-    cap_catalog = list(snapshot.capability_catalog) if snapshot.capability_catalog else []
-    cap_history = _serialize_capability_history(snapshot.capability_history, b_session_id)
-    event_field = None
-    if current_event is not None:
-        if not isinstance(current_event, dict):
-            raise ValueError("current_event must be dict or None")
-        validate_current_event_binding(current_event, b_session_id, release_state_path=release_state_path, binding_receipt_path=binding_receipt_path)
-        event_field = dict(current_event)
-    envelope: dict[str, Any] = {
-        "phase": "B",
-        "allowed_sequences": [14, 22],
-        "event": event_field,
-        "runtime_snapshot": runtime_snapshot,
-        "capability_catalog": cap_catalog,
-        "capability_history": cap_history,
-        "wake_reason": snapshot.wake_reason,
-        "is_periodic_review": snapshot.wake_reason == "periodic_review",
-        "is_summary_request": False,
-        "contract_sha256": contract_sha256,
-    }
-    return envelope
-
-def build_model_request(contract_text: str, envelope: dict[str, Any], wire_protocol_text: str | None = None) -> dict[str, Any]:
-    if not isinstance(contract_text, str) or not contract_text.strip():
-        raise ValueError("contract_text must be non-blank")
-    if not isinstance(envelope, dict):
-        raise ValueError("envelope must be dict")
-    if wire_protocol_text is None:
-        wire_protocol_text = get_wire_protocol_text()
-    wire_sha = get_wire_protocol_sha256()
-    if hashlib.sha256(wire_protocol_text.encode("utf-8")).hexdigest() != wire_sha:
-        if hashlib.sha256(wire_protocol_text.encode()).hexdigest() != wire_sha:
-            raise ValueError("wire protocol hash mismatch")
-    envelope_json = json.dumps(envelope, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-    return {
-        "system": contract_text,
-        "wire_protocol": wire_protocol_text,
-        "wire_protocol_sha256": wire_sha,
-        "messages": [{"role": "user", "content": envelope_json}],
-        "metadata": {"phase": envelope.get("phase"), "round": envelope.get("round"), "contract_sha256": envelope.get("contract_sha256"), "wire_protocol_sha256": wire_sha},
-    }
-
-# --- Reply translators ---
 
 def _reply_to_directive_synthetic(reply: dict[str, Any], snapshot: RuntimeSnapshot) -> ModelDirective:
     action = reply.get("action")
@@ -1241,12 +1077,42 @@ class ProductionResidentHandler:
             fname = f"failure-{self.b_session_id}-round-{self._round}-{int(time.time())}.json"
             fpath = self.evidence_dir / fname
             fpath.write_text(json.dumps(evidence, sort_keys=True, indent=2, ensure_ascii=False), encoding="utf-8")
-            (self.evidence_dir / f"failure-latest-{self._round}.json").write_text(json.dumps(evidence, sort_keys=True, indent=2, ensure_ascii=False), encoding="utf-8")
-            # Ensure durable: chmod 0400
+            # For latest, ensure we can overwrite even if existing 0400
+            latest = self.evidence_dir / f"failure-latest-{self._round}.json"
+            if latest.exists():
+                try:
+                    latest.chmod(0o600)
+                except Exception:
+                    try:
+                        latest.unlink()
+                    except Exception:
+                        pass
+            latest.write_text(json.dumps(evidence, sort_keys=True, indent=2, ensure_ascii=False), encoding="utf-8")
+            # Ensure durable: chmod 0400 — fail-closed (CORRECTIVE-007)
             try:
                 fpath.chmod(0o400)
-            except Exception:
-                pass
+            except Exception as e:
+                raise ModelDispatchNotSubmitted(f"evidence chmod failed: {e}") from e
+            try:
+                mode = fpath.stat().st_mode & 0o777
+                if mode != 0o400:
+                    raise ModelDispatchNotSubmitted(f"evidence permissions {oct(mode)} != 0o400")
+            except ModelDispatchNotSubmitted:
+                raise
+            except Exception as e:
+                raise ModelDispatchNotSubmitted(f"evidence permission check failed: {e}") from e
+            try:
+                latest.chmod(0o400)
+            except Exception as e:
+                raise ModelDispatchNotSubmitted(f"evidence latest chmod failed: {e}") from e
+            try:
+                mode2 = latest.stat().st_mode & 0o777
+                if mode2 != 0o400:
+                    raise ModelDispatchNotSubmitted(f"evidence latest permissions {oct(mode2)} != 0o400")
+            except ModelDispatchNotSubmitted:
+                raise
+            except Exception as e:
+                raise ModelDispatchNotSubmitted(f"evidence latest permission check failed: {e}") from e
         except Exception as e:
             # Surfacing write failure explicitly, not silent
             raise ModelDispatchNotSubmitted(f"durable failure receipt write failed: {e}") from e
@@ -1450,15 +1316,35 @@ def headless_production_handler(snapshot: RuntimeSnapshot) -> ModelDirective:
         raise ModelDispatchNotSubmitted(f"real provider adapter not resolvable: {e}") from e
     if client.__class__.__name__ == "FakeProviderClient" or "fake" in client.__class__.__name__.lower():
         raise ModelDispatchNotSubmitted("FakeProviderClient not allowed in production entrypoint")
-    contract_sha = os.getenv("AIOS_CONTRACT_SHA256") or get_contract_sha256()
+    # Contract and wire hash exact checks (CORRECTIVE-007): env must equal frozen expected and actual file
+    frozen_contract = "28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef"
+    frozen_wire = "a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a"
+    contract_sha = os.getenv("AIOS_CONTRACT_SHA256")
+    if not contract_sha:
+        raise ModelDispatchNotSubmitted("AIOS_CONTRACT_SHA256 missing (required)")
+    if contract_sha != frozen_contract:
+        raise ModelDispatchNotSubmitted(f"contract SHA env mismatch: expected {frozen_contract}, got {contract_sha} (STOP)")
     contract_text = get_contract_text()
+    if hashlib.sha256(contract_text.encode("utf-8")).hexdigest() != frozen_contract:
+        raise ModelDispatchNotSubmitted(f"contract file SHA mismatch: expected {frozen_contract}")
     if hashlib.sha256(contract_text.encode("utf-8")).hexdigest() != contract_sha:
         raise ModelDispatchNotSubmitted("contract SHA mismatch")
     try:
+        wire_sha_env = os.getenv("AIOS_WIRE_PROTOCOL_SHA256")
+        if not wire_sha_env:
+            raise ModelDispatchNotSubmitted("AIOS_WIRE_PROTOCOL_SHA256 missing (required)")
+        if wire_sha_env != frozen_wire:
+            raise ModelDispatchNotSubmitted(f"wire protocol SHA env mismatch: expected {frozen_wire}, got {wire_sha_env} (STOP)")
         wire_sha = get_wire_protocol_sha256()
+        if wire_sha != frozen_wire:
+            raise ModelDispatchNotSubmitted(f"wire protocol hash mismatch: expected {frozen_wire}, got {wire_sha}")
         wire_text = get_wire_protocol_text()
-        if hashlib.sha256(wire_text.encode("utf-8")).hexdigest() != wire_sha:
-            raise ModelDispatchNotSubmitted("wire protocol hash mismatch")
+        if hashlib.sha256(wire_text.encode("utf-8")).hexdigest() != frozen_wire:
+            raise ModelDispatchNotSubmitted("wire protocol file hash mismatch")
+        if wire_sha_env != wire_sha:
+            raise ModelDispatchNotSubmitted(f"wire protocol env {wire_sha_env} != actual {wire_sha} (STOP)")
+    except ModelDispatchNotSubmitted:
+        raise
     except Exception as e:
         raise ModelDispatchNotSubmitted(f"wire protocol not available: {e}") from e
     release_state_path = os.getenv("AIOS_RELEASE_STATE_PATH")

@@ -1,4 +1,4 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Exact B Startup Procedure (CORRECTIVE-006 frozen)
+# C15-RCC-RES-B-PREFLIGHT-002 — Exact B Startup Procedure (CORRECTIVE-007 frozen)
 
 This procedure is prepared by preflight but NOT executed. It will be carried out by the independent release task `C15-RCC-RES-B-RELEASE-002` after this preflight is independently reviewed and accepted.
 
@@ -101,11 +101,11 @@ If `ISOLATION_FAIL`, STOP.
 ## 4a. Run the E2E transport probe — genuine + production + adversarial (no cursor 14 reveal)
 
 ```bash
-# 006 exact gate: EXPECTED_CHECKS=77, requires CHECKS==EXPECTED_CHECKS and zero FAIL
+# 006 exact gate: EXPECTED_CHECKS=111, requires CHECKS==EXPECTED_CHECKS and zero FAIL
 bash reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/isolation/probe_e2e.sh
 ```
 
-Expected `CORRECTIVE_006_E2E_PASS` (77 checks: mailbox 15, isolation, binding 7, synthetic+production genuine, current-event 6, strict, Scheme A, MS_PRIVATE, /dev, signal deterministic with PID map, env exact, real-provider fail-closed, fake fallback fail, import path executable, wire protocol hash, inconsistent telemetry, etc.).
+Expected `CORRECTIVE_007_E2E_PASS` (111 checks: mailbox 15, isolation, binding 7, synthetic+production genuine, current-event 6, strict, Scheme A, MS_PRIVATE, /dev, signal deterministic with PID map, env exact, real-provider fail-closed, fake fallback fail, import path executable, wire protocol hash, inconsistent telemetry, etc.).
 
 Do NOT proceed if any check fails.
 
@@ -161,7 +161,7 @@ python3 -m aios_core.headless.cli \
 
 `FakeProviderClient` is **never** reachable from this entrypoint; it is only instantiated explicitly by `probe_e2e.sh` for disposable tests.
 
-See `environment_manifest.md` for exact env, `per_cursor_interaction.md` for Scheme A and per-cursor event lifecycle, `probe_e2e.sh` for 77-check evidence.
+See `environment_manifest.md` for exact env, `per_cursor_interaction.md` for Scheme A and per-cursor event lifecycle, `probe_e2e.sh` for 107-check evidence.
 
 ## 7. Drive B cursors 14..22 (sequential, per procedure/per_cursor_interaction.md)
 

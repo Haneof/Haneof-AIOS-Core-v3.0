@@ -1,10 +1,10 @@
-[e2e] run_root = /tmp/b-preflight-e2e-5785
-[e2e] CURRENT_RUN_LOG=/tmp/b-preflight-e2e-5785/e2e.log
+[e2e] run_root = /tmp/b-preflight-e2e-4824
+[e2e] CURRENT_RUN_LOG=/tmp/b-preflight-e2e-4824/e2e.log
 world.sqlite: OK
 index.sqlite: OK
 release_state.json: OK
 [e2e] lineage digests OK
-[e2e] EXPECTED_CHECKS=77
+[e2e] EXPECTED_CHECKS=111
 [e2e] step 0: exact environment
 py_ver=Python 3.11.2
 CHECK 1 PASS: exact Python 3.11.2
@@ -14,13 +14,16 @@ wire_sha=a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a
 CHECK 3 PASS: wire protocol hash 5067701b…
 contract_sha=28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef
 CHECK 4 PASS: contract exact
-adapter_sha=e1053dbd1ff39c4508a37314f6e625290118d6c23209d51375b3c4232f54b538
+adapter_sha=8351d582946b0bd9bbdcda468ed54c92ca1e2ebd597c39c0eaf6c2d94a0458b1
 CHECK 5 PASS: adapter sha exact matches manifest
 freeze_sha=bd7a76d1171c137f9daee9c0a3dbff029b8cbbccef88f0a1aff7907710a82375
-CHECK 6 PASS: requirements freeze present
-CHECK 7 PASS: live freeze contains pydantic 2.13.5
+CHECK 6 PASS: requirements freeze SHA exact bd7a76d1171c137f9daee9c0a3dbff029b8cbbccef88f0a1aff7907710a82375
+CHECK 7 PASS: live freeze contains pydantic 2.13.5 exact
+CHECK 8 PASS: live freeze contains pydantic_core 2.46.5 exact
+CHECK 9 PASS: live freeze contains typing_extensions exact
+CHECK 10 PASS: live freeze contains all pinned freeze lines
 ENVIRONMENT_PASS
-CHECK 8 PASS: environment exact PASS
+CHECK 11 PASS: environment exact PASS
 [e2e] step 1: mailbox_bridge self-tests (15)
 self-test 1 PASS: minimal good envelope accepted with binding
 self-test 2 PASS: extra top-level key rejected
@@ -40,7 +43,7 @@ self-test 13 PASS: wrong request_digest rejected
 self-test 14 PASS: double send while outstanding rejected
 self-test 15 PASS: pre-set request_id rejected
 ALL SELF-TESTS PASS
-CHECK 9 PASS: mailbox self-tests (15)
+CHECK 12 PASS: mailbox self-tests (15)
 [e2e] step 2: hardened isolation probe inside sandbox
 === identity ===
 uid=65534 gid=65534
@@ -140,20 +143,20 @@ PASS: LD_* stripped
 
 
 ISOLATION_PASS
-CHECK 10 PASS: isolation (PID1 sup + NET sealed + RO + mailbox IPC + /dev + env)
-CHECK 11 PASS: PID1 supervisor
-CHECK 12 PASS: NET sealed
-CHECK 13 PASS: RO bind ro,nosuid,nodev
-CHECK 14 PASS: mailbox IPC
-CHECK 15 PASS: /dev minimal
-CHECK 16 PASS: env allowlist
+CHECK 13 PASS: isolation (PID1 sup + NET sealed + RO + mailbox IPC + /dev + env)
+CHECK 14 PASS: PID1 supervisor
+CHECK 15 PASS: NET sealed
+CHECK 16 PASS: RO bind ro,nosuid,nodev
+CHECK 17 PASS: mailbox IPC
+CHECK 18 PASS: /dev minimal
+CHECK 19 PASS: env allowlist
 [e2e] step 3: mailbox binding E2E (7 cases)
 NORMAL_BINDING_PASS
 [test-responder] starting mode=normal rounds=2 uid=65534 pid=3 inbox=/work/inbox outbox=/work/outbox
 [test-responder] pid=3 proc1_comm=sandbox-init
 [test-responder] PASS PID1 is sandbox-init
-[test-responder] round 1 received request_id=707e9c86... digest=d1b40eb5...
-[test-responder] round 2 received request_id=d0637382... digest=2b5d8009...
+[test-responder] round 1 received request_id=e8944fb6... digest=65eda51f...
+[test-responder] round 2 received request_id=23137346... digest=ccd22933...
 [test-responder] OK mode=normal rounds=2 pid=3
 
 STALE_REJECTED_PASS
@@ -163,28 +166,28 @@ WRONG_ID_REJECTED_PASS
 WRONG_DIGEST_REJECTED_PASS
 FUTURE_NOT_VALID_PASS
 ALL_BINDING_TESTS_PASS
-CHECK 17 PASS: binding normal
-CHECK 18 PASS: binding stale
-CHECK 19 PASS: binding preplay
-CHECK 20 PASS: binding replay
-CHECK 21 PASS: binding wrong id
-CHECK 22 PASS: binding wrong digest
-CHECK 23 PASS: binding future not valid
+CHECK 20 PASS: binding normal
+CHECK 21 PASS: binding stale
+CHECK 22 PASS: binding preplay
+CHECK 23 PASS: binding replay
+CHECK 24 PASS: binding wrong id
+CHECK 25 PASS: binding wrong digest
+CHECK 26 PASS: binding future not valid
 [e2e] step 4a: synthetic genuine Core->MailboxBridge->responder (Atlas)
 model_rounds=2 invocations=2
 found fixture=True
 SYNTHETIC_GENUINE_PASS
-CHECK 24 PASS: synthetic genuine 2-round Atlas non-empty
-CHECK 25 PASS: current_event seq14 wiring
+CHECK 27 PASS: synthetic genuine 2-round Atlas non-empty
+CHECK 28 PASS: current_event seq14 wiring
 [e2e] step 4b: production genuine via ExternalBrokerClient + FakeBrokerServer (transport)
-FakeBrokerServer at http://127.0.0.1:36335/v1/chat
+FakeBrokerServer at http://127.0.0.1:37057/v1/chat
 prod invocations=2 history=1
 last_provider=fake-broker usage={'total_tokens': 42, 'input_tokens': 20, 'output_tokens': 22}
 PRODUCTION_GENUINE_PASS
 PRODUCTION_TRANSPORT_PASS
 UNKNOWN_PROVENANCE_PASS
-CHECK 26 PASS: production genuine via ExternalBrokerClient (mock) REAL provenance
-CHECK 27 PASS: UNKNOWN handling
+CHECK 29 PASS: production genuine via ExternalBrokerClient (mock) REAL provenance
+CHECK 30 PASS: UNKNOWN handling
 [e2e] step 5: current-event / envelope negatives (6)
 PASS seq13
 PASS seq23
@@ -193,20 +196,20 @@ PASS missing
 PASS phase A
 PASS source_kind
 ALL_NEGATIVES_PASS
-CHECK 28 PASS: current_event seq13 rejected
-CHECK 29 PASS: current_event seq23 rejected
-CHECK 30 PASS: current_event extra field
-CHECK 31 PASS: current_event missing field
-CHECK 32 PASS: envelope phase A rejected
-CHECK 33 PASS: source_kind invalid rejected
+CHECK 31 PASS: current_event seq13 rejected
+CHECK 32 PASS: current_event seq23 rejected
+CHECK 33 PASS: current_event extra field
+CHECK 34 PASS: current_event missing field
+CHECK 35 PASS: envelope phase A rejected
+CHECK 36 PASS: source_kind invalid rejected
 [e2e] step 6: strict reply schema
 PASS strict extra: reply structural invalid: reply for action 'silence' has extra fields ['capability'] not allowed
 STRICT_REPLY_PASS
-CHECK 34 PASS: strict reply silence{capability}
+CHECK 37 PASS: strict reply silence{capability}
 [e2e] step 7: repair Scheme A
 repair shape structurally allowed
 PASS repair unsupported: unsupported reply action: 'round_repair_request'
-CHECK 35 PASS: repair Scheme A
+CHECK 38 PASS: repair Scheme A
 [e2e] step 8: MS_PRIVATE fail-closed + privdrop
 MS_PRIVATE exit=98
 PASS MS_PRIVATE
@@ -215,52 +218,52 @@ PASS privdrop
 setgid exit=98
 PASS setgid
 PRIVDROP_DUAL_PASS
-CHECK 36 PASS: MS_PRIVATE fail-closed
-CHECK 37 PASS: privdrop dual
+CHECK 39 PASS: MS_PRIVATE fail-closed
+CHECK 40 PASS: privdrop dual
 [e2e] step 9: signal deterministic PID1 forwarding
 [signal] pid log:
 {
-  "outer_wrapper_host_pid": 6132,
-  "outer_wrapper_ns_pid": 6132,
-  "outer_wrapper_ppid": 6130,
-  "outer_wrapper_cmd": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/resident_jail.py --repo /home/user/Haneof-AIOS-Core-v3.0 --sandbox /tmp/b-sleep-test-5785 --world /tmp/b-preflight-e2e-5785/runtime/world.sqlite --index /tmp/b-preflight-e2e-5785/runtime/index.sqlite --state /tmp/b-preflight-e2e-5785/runtime/release_state.json --lock /tmp/b-preflight-e2e-5785/runtime/world.writer.lock --mailbox-root /tmp/b-sleep-mb-5785 --inject-dir /tmp/b-preflight-e2e-5785/inject -- /bin/sleep 30",
-  "unsharer_host_pid": 6133,
-  "unsharer_ns_pid": 6133,
-  "unsharer_ppid": 6132,
-  "pid1_host_pid": 6137,
+  "outer_wrapper_host_pid": 5185,
+  "outer_wrapper_ns_pid": 5185,
+  "outer_wrapper_ppid": 5183,
+  "outer_wrapper_cmd": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/resident_jail.py --repo /home/user/Haneof-AIOS-Core-v3.0 --sandbox /tmp/b-sleep-test-4824 --world /tmp/b-preflight-e2e-4824/runtime/world.sqlite --index /tmp/b-preflight-e2e-4824/runtime/index.sqlite --state /tmp/b-preflight-e2e-4824/runtime/release_state.json --lock /tmp/b-preflight-e2e-4824/runtime/world.writer.lock --mailbox-root /tmp/b-sleep-mb-4824 --inject-dir /tmp/b-preflight-e2e-4824/inject -- /bin/sleep 30",
+  "unsharer_host_pid": 5186,
+  "unsharer_ns_pid": 5186,
+  "unsharer_ppid": 5185,
+  "pid1_host_pid": 5190,
   "pid1_ns_pid": 1,
   "pid1_ns_pid_actual": 1,
-  "pid1_host_pid_ns_view": 6137,
+  "pid1_host_pid_ns_view": 5190,
   "pid1_comm": "sandbox-init",
   "worker_fork_return_pid": 3,
   "worker_ns_pid_expected": 2,
-  "worker_host_pid": 6139,
+  "worker_host_pid": 5192,
   "worker_ns_pid_actual": 3,
   "worker_ns_ppid": 1,
   "worker_ppid_host": 1
-}outer=6132 unsharer=6133 pid1_host=6137 worker_host=6139 worker_ns=3
-CHECK 38 PASS: PID map outer/unsharer/PID1/worker captured (host pids valid, distinct)
-[signal] sending TERM to PID1 host 6137 (jail PID1)
+}outer=5185 unsharer=5186 pid1_host=5190 worker_host=5192 worker_ns=3
+CHECK 41 PASS: PID map outer/unsharer/PID1/worker captured (host pids valid, distinct)
+[signal] sending TERM to PID1 host 5190 (jail PID1)
 [signal] jail exit code 143
-CHECK 39 PASS: signal TERM forwarded PID1->worker exit 143
-CHECK 40 PASS: worker reaped no zombie
-CHECK 41 PASS: PID1 reaped
+CHECK 42 PASS: signal TERM forwarded PID1->worker exit 143
+CHECK 43 PASS: worker reaped no zombie
+CHECK 44 PASS: PID1 reaped
 [e2e] step 10: env allowlist
-CHECK 42 PASS: env without allow PROBE not leaked
-CHECK 43 PASS: env with allow PROBE explicitly allowed
+CHECK 45 PASS: env without allow PROBE not leaked
+CHECK 46 PASS: env with allow PROBE explicitly allowed
 [e2e] step 11: ExternalBrokerClient fail closed
 PASS real provider fail closed: real provider not configured: AIOS_REAL_PROVIDER_API_KEY and AIOS_REAL_PROVIDER_ENDPOINT must be set (no fake fallback)
-CHECK 44 PASS: ExternalBrokerClient without config fail closed
+CHECK 47 PASS: ExternalBrokerClient without config fail closed
 [e2e] step 12: Fake via production entrypoint fail
 PASS fake via prod blocked: unapproved provider adapter 'bridged_model_handler:FakeProviderClient', expected 'bridged_model_handler:ExternalBrokerClient' (ModelDispatchNotSubmitted/STOP)
-CHECK 45 PASS: FakeProviderClient via production entrypoint blocked
+CHECK 48 PASS: FakeProviderClient via production entrypoint blocked
 [e2e] step 13: exact documented headless import
 usage: aios-core-headless [-h] [--world WORLD] [--index INDEX] [--lock LOCK]
                           [--subject SUBJECT] [--model-handler MODEL_HANDLER]
                           [--round-summary-handler ROUND_SUMMARY_HANDLER]
                           [--dimension-summary-handler DIMENSION_SUMMARY_HANDLER]
                           {status,recovery-status,rebuild-index,backup,restore,turn,ingest,due,inspect-turn}
-CHECK 46 PASS: headless CLI importable via documented PYTHONPATH
+CHECK 49 PASS: headless CLI importable via documented PYTHONPATH
 RUN_ROOT2 init B failed
 {
   "active_phase": "B",
@@ -484,23 +487,23 @@ RUN_ROOT2 pending set
 binding receipt 9cba565c8bc5
 FakeBroker endpoint http://127.0.0.1:8765/v1/chat
 {"assistant_observation_id": "obs_conv_ai_3ccc3b4bf7dbf6f1c8b48600", "idempotent_replay": false, "model_rounds": 2, "response": null, "silenced": true, "status": "turn_completed", "summary_commits": 0, "summary_error": null, "termination_reason": "silence", "user_observation_id": "obs_conv_user_acea1101b6148d1f87c5e8a9", "world_revision": 100}
-CHECK 47 PASS: headless CLI turn with ExternalBrokerClient succeeded
+CHECK 50 PASS: headless CLI turn with ExternalBrokerClient succeeded
 provider provenance not in log but ok
 [e2e] step 14: hash mismatch
-PASS contract hash mismatch fail closed: contract SHA mismatch
-CHECK 48 PASS: contract hash mismatch fail closed
+PASS contract hash mismatch fail closed: contract SHA env mismatch: expected 28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef, got deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef (STOP)
+CHECK 51 PASS: contract hash mismatch fail closed
 PASS wire protocol hash mismatch: wire protocol hash mismatch
-CHECK 49 PASS: wire protocol hash mismatch fail closed
+CHECK 52 PASS: wire protocol hash mismatch fail closed
 [e2e] step 15: current-event binding adversarial (baseline valid receipt + 12 negatives)
 {"fixture_sha256":"sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46","next_sequence":14,"phase":"B","status":"initialized"}
-CHECK 50 PASS: disposable init B via canonical command
+CHECK 53 PASS: disposable init B via canonical command
 {"dimension":"dim:work_state","event_id":"c15rcc-014","modality":"structured_text","occurred_at":"2026-11-09T09:03:00-08:00","resident_visible_payload":"staging 索引 orders-shadow 与昨夜测试残留名称冲突，回归任务被阻塞；production 索引未受影响。","sequence":14,"source_class":"PLATFORM","source_kind":"monitoring"}
 reveal 8-field ok 14 c15rcc-014
-CHECK 51 PASS: canonical reveal --phase B --state without --sequence (blocker7) produces 8-field projection
-using disp /tmp/b-disp-reveal-5785
+CHECK 54 PASS: canonical reveal --phase B --state without --sequence (blocker7) produces 8-field projection
+using disp /tmp/b-disp-reveal-4824
 baseline receipt created binding_version=c15-rcc-b-binding-v1 seq=14 sha=74fcbf4eaaae rs_sha=c7a735b2eca3
 BASELINE_VALID_PASS
-CHECK 52 PASS: baseline valid receipt PASS
+CHECK 55 PASS: baseline valid receipt PASS
 PASS seq15 rejected for sequence: current_event.sequence 15 != receipt sequence 14 (future/stale)
 PASS wrong event_id rejected for event_id: current_event event_id 'wrong-id-xyz' != receipt event_id 'c15rcc-014'
 PASS modified payload rejected for payload: current_event canonical projection sha dd9932baf2a1... != receipt 74fcbf4eaaae... (modified payload/dimension)
@@ -510,22 +513,22 @@ PASS modified source_kind rejected for source_kind: current_event.source_kind 'f
 PASS modified source_class rejected for source_class: current_event.source_class 'FAKE' != receipt source_class 'PLATFORM' (modified source_class)
 PASS modified modality rejected for modality: current_event.modality 'fake_modality' != receipt modality 'structured_text' (modified modality)
 PASS wrong session rejected: binding receipt b_session_id 'b-adversarial-001' != 'b-wrong-session' (wrong session)
-PASS stale seq14 after ACK rejected: binding receipt release_state_path '/tmp/b-disp-reveal-5785/runtime/release_state.json' != current '/tmp/tmpk7l94nlw/rs_stale.json' (path identity mismatch)
-PASS missing receipt rejected: binding receipt missing at /tmp/nonexistent-binding.json (must exist)
+PASS stale seq14 after ACK rejected: binding receipt release_state_path '/tmp/b-disp-reveal-4824/runtime/release_state.json' != current '/tmp/tmpuov8je8s/rs_stale.json' (path identity mismatch)
+PASS missing receipt rejected: binding receipt missing at /tmp/nonexistent-binding.json (current-event binding must exist)
 PASS malformed receipt rejected: binding receipt malformed JSON: Expecting value: line 1 column 1 (char 0)
 BINDING_ADVERSARIAL_PASS
-CHECK 53 PASS: binding adversarial 12 mutations PASS
-CHECK 54 PASS: seq15 rejected for sequence mismatch
-CHECK 55 PASS: wrong id rejected for event-id mismatch
-CHECK 56 PASS: modified payload rejected for projection digest
-CHECK 57 PASS: wrong session rejected
-CHECK 58 PASS: stale receipt rejected
-CHECK 59 PASS: missing receipt rejected
-CHECK 60 PASS: malformed receipt rejected
+CHECK 56 PASS: binding adversarial 12 mutations PASS
+CHECK 57 PASS: seq15 rejected for sequence mismatch
+CHECK 58 PASS: wrong id rejected for event-id mismatch
+CHECK 59 PASS: modified payload rejected for projection digest
+CHECK 60 PASS: wrong session rejected
+CHECK 61 PASS: stale receipt rejected
+CHECK 62 PASS: missing receipt rejected
+CHECK 63 PASS: malformed receipt rejected
 [e2e] step 15b: stale binding details already covered
-CHECK 61 PASS: stale after ACK rejected detail
-CHECK 62 PASS: malformed current-event file rejected detail
-CHECK 63 PASS: missing current-event file detected detail
+CHECK 64 PASS: stale after ACK rejected detail
+CHECK 65 PASS: malformed current-event file rejected detail
+CHECK 66 PASS: missing current-event file detected detail
 [e2e] step 16: production failure retry Scheme A (must reach provider, poison, durable)
 first call failed as expected: provider invoke failed: simulated provider transport failure
 PASS provider.invocations ==1 proof
@@ -534,7 +537,7 @@ PASS handler _poisoned == True
 PASS same handler second call poisoned fail: handler poisoned: provider_transport_failure: provider invoke failed: simulated provider transport failure (new instance required)
 PASS _outstanding == None
 PASS release next_sequence not advanced
-PASS durable failure receipt exists /tmp/b-scheme-evidence-6361/failure-latest-1.json
+PASS durable failure receipt exists /tmp/b-scheme-evidence-5414/failure-latest-1.json
 PASS durable evidence session/cursor
 PASS non-JSON fail closed: provider content not JSON: Expecting value: line 1 column 1 (char 0)
 PASS non-JSON provider invoked
@@ -551,23 +554,99 @@ PASS new handler fresh succeeded directive silenced=False
 PASS new handler can be reconstructed with fresh request_id/digest
 PASS durable failure receipt persists
 SCHEME_A_PASS
-CHECK 64 PASS: provider exception Scheme A clear outstanding cursor not advanced new binding with fresh request_id
-CHECK 65 PASS: transport failure provider invoked
-CHECK 66 PASS: transport failure class
-CHECK 67 PASS: handler poisoned
-CHECK 68 PASS: same instance retry poisoned fail
-CHECK 69 PASS: durable failure receipt exists
-CHECK 70 PASS: non-JSON provider actually invoked then fails
-CHECK 71 PASS: non-JSON failure class non_json
-CHECK 72 PASS: wrong-binding provider actually invoked then binding fails
-CHECK 73 PASS: wrong-binding failure class binding_failure
-CHECK 74 PASS: new instance succeeds with fresh request_id/digest
+CHECK 67 PASS: provider exception Scheme A clear outstanding cursor not advanced new binding with fresh request_id
+CHECK 68 PASS: transport failure provider invoked
+CHECK 69 PASS: transport failure class
+CHECK 70 PASS: handler poisoned
+CHECK 71 PASS: same instance retry poisoned fail
+CHECK 72 PASS: durable failure receipt exists
+CHECK 73 PASS: non-JSON provider actually invoked then fails
+CHECK 74 PASS: non-JSON failure class non_json
+CHECK 75 PASS: wrong-binding provider actually invoked then binding fails
+CHECK 76 PASS: wrong-binding failure class binding_failure
+CHECK 77 PASS: new instance succeeds with fresh request_id/digest
 [e2e] step 18: exact environment mismatch
-CHECK 75 PASS: env exact match would pass
-CHECK 76 PASS: wire protocol hash exact match
-CHECK 77 PASS: pydantic exact version
+CHECK 78 PASS: env exact match would pass
+CHECK 79 PASS: wire protocol hash exact match
+CHECK 80 PASS: pydantic exact version
+[e2e] step 17: capability catalog
+PASS catalog search_world allowed
+PASS catalog evil_cap correctly rejected: capability 'evil_cap' not in snapshot.capability_catalog ['search_world']... (fail closed)
+PASS empty catalog correctly rejected: capability 'search_world' not in snapshot.capability_catalog []... (fail closed)
+CATALOG_PASS
+CHECK 81 PASS: catalog search_world PASS
+CHECK 82 PASS: catalog evil_cap FAIL closed
+CHECK 83 PASS: empty catalog any capability FAIL
+[e2e] step 17b: adapter hash missing/wrong
+PASS missing adapter hash correctly FAIL: missing mandatory B boundary envs ['AIOS_ADAPTER_SHA256'] (ModelDispatchNotSubmitted/STOP)
+PASS wrong adapter hash correctly FAIL: adapter hash mismatch: expected deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef, got 8351d582946b0bd9bbdcda468ed54c92ca1e2ebd597c39c0eaf6c2d94a0458b1 (ModelDispatchNotSubmitted/STOP)
+ADAPTER_HASH_PASS
+CHECK 84 PASS: adapter missing hash FAIL closed
+CHECK 85 PASS: adapter wrong hash FAIL closed
+CHECK 86 PASS: adapter hash exact path exercised
+[e2e] step 17c: wire env hash wrong
+PASS wire wrong correctly FAIL: wire protocol SHA env mismatch: expected a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a, got deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef (STOP)
+WIRE_HASH_PASS
+CHECK 87 PASS: wire env wrong FAIL closed
+CHECK 88 PASS: wire hash exact exercised
+[e2e] step 17d: production boundary env missing
+PASS missing AIOS_RELEASE_STATE_PATH correctly FAIL: missing mandatory B boundary envs ['AIOS_RELEASE_STATE_PATH'] (ModelDispatchNotSubmitted/STOP)
+PASS missing AIOS_CURRENT_EVENT_PATH correctly FAIL: missing mandatory B boundary envs ['AIOS_CURRENT_EVENT_PATH'] (ModelDispatchNotSubmitted/STOP)
+PASS missing AIOS_CURRENT_EVENT_BINDING_PATH correctly FAIL: missing mandatory B boundary envs ['AIOS_CURRENT_EVENT_BINDING_PATH'] (ModelDispatchNotSubmitted/STOP)
+PASS missing AIOS_EVIDENCE_DIR correctly FAIL: missing mandatory B boundary envs ['AIOS_EVIDENCE_DIR'] (ModelDispatchNotSubmitted/STOP)
+PASS missing AIOS_ADAPTER_SHA256 correctly FAIL: missing mandatory B boundary envs ['AIOS_ADAPTER_SHA256'] (ModelDispatchNotSubmitted/STOP)
+PASS missing AIOS_CONTRACT_SHA256 correctly FAIL: missing mandatory B boundary envs ['AIOS_CONTRACT_SHA256'] (ModelDispatchNotSubmitted/STOP)
+PASS missing AIOS_WIRE_PROTOCOL_SHA256 correctly FAIL: missing mandatory B boundary envs ['AIOS_WIRE_PROTOCOL_SHA256'] (ModelDispatchNotSubmitted/STOP)
+BOUNDARY_PASS
+CHECK 89 PASS: production boundary 7 envs missing each FAIL closed
+CHECK 90 PASS: missing AIOS_RELEASE_STATE_PATH FAIL
+CHECK 91 PASS: missing AIOS_ADAPTER_SHA256 FAIL
+CHECK 92 PASS: missing AIOS_WIRE_PROTOCOL_SHA256 FAIL
+[e2e] step 17e: binding receipt schema mutations
+PASS missing_fixture correctly FAIL: binding receipt missing fixture_sha256
+PASS wrong_fixture correctly FAIL: binding receipt fixture_sha256 'sha256:deadbeef' != canonical 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46' (wrong fixture SHA)
+PASS missing_state_sha correctly FAIL: binding receipt missing release_state_sha256
+PASS wrong_state_sha correctly FAIL: release_state SHA mismatch: receipt deadbeefdead... != current c7a735b2eca3... (stale receipt or state mutated)
+PASS missing_state_path correctly FAIL: binding receipt missing release_state_path
+PASS wrong_next_seq correctly FAIL: binding receipt release_state_next_sequence 999 != release_state next_sequence 14 (next_sequence mismatch)
+PASS wrong_pending correctly FAIL: binding receipt release_state_pending_reveal {'sequence': 999, 'event_id': 'wrong'} != release_state pending_reveal {'event_id': 'c15rcc-014', 'fixture_sha256': 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46', 'occurred_at': '2026-11-09T09:03:00-08:00', 'sequence': 14} (pending_reveal mismatch)
+RECEIPT_SCHEMA_PASS
+CHECK 93 PASS: missing fixture SHA FAIL
+CHECK 94 PASS: wrong fixture SHA FAIL
+CHECK 95 PASS: missing state SHA FAIL
+CHECK 96 PASS: wrong state SHA FAIL
+CHECK 97 PASS: missing state path FAIL
+CHECK 98 PASS: wrong saved next sequence FAIL
+CHECK 99 PASS: wrong saved pending reveal FAIL
+CHECK 100 PASS: receipt schema 7 mutations PASS
+[e2e] step 17f: HTTP boundary
+PASS remote http correctly FAIL: plaintext http:// not allowed for production endpoint 'http://example.com/v1/chat' (must be https:// or test-only http://127.0.0.1:<port>)
+PASS loopback without flag correctly FAIL: loopback http:// endpoint not allowed without AIOS_ALLOW_LOOPBACK_BROKER=1 (must be https://) got 'http://127.0.0.1:8765/v1/chat'
+PASS explicit loopback with flag succeeded: http://127.0.0.1:8765/v1/chat
+PASS https correctly PASS: https://broker.example/v1/chat
+PASS session name does not bypass: loopback http:// endpoint not allowed without AIOS_ALLOW_LOOPBACK_BROKER=1 (must be https://) got 'http://127.0.0.1:8765/v1/chat'
+HTTP_BOUNDARY_PASS
+CHECK 101 PASS: remote http://example FAIL closed
+CHECK 102 PASS: production loopback without flag FAIL
+CHECK 103 PASS: explicit test-only loopback PASS
+CHECK 104 PASS: https structural PASS
+CHECK 105 PASS: session name does not affect policy
+CHECK 106 PASS: HTTP boundary 4 cases PASS
+[e2e] step 17g: durable failure evidence permission
+PASS evidence chmod check
+CHECK 107 PASS: evidence permission not silent pass
+PASS evidence permission readback exists
+CHECK 108 PASS: evidence permission readback enforced
+[e2e] step 17h: stale command grep and duplicate check
+PASS no stale reveal --sequence in procedure
+CHECK 109 PASS: stale reveal --sequence removed from canonical B procedure
+counts write=1 validate=1 envelope=1
+PASS duplicate definitions exactly 1 each
+CHECK 110 PASS: duplicate definitions exactly 1 each
+PASS build_model_request exactly 1
+CHECK 111 PASS: build_model_request exactly 1
 
-ALL_CHECKS=77/77 FAILURES=0
+ALL_CHECKS=111/111 FAILURES=0
 MARKER PASS: ISOLATION_PASS in CURRENT_RUN_LOG
 MARKER PASS: SYNTHETIC_GENUINE_PASS in CURRENT_RUN_LOG
 MARKER PASS: PRODUCTION_GENUINE_PASS in CURRENT_RUN_LOG
@@ -578,6 +657,12 @@ MARKER PASS: SCHEME_A_PASS in CURRENT_RUN_LOG
 MARKER PASS: BASELINE_VALID_PASS in CURRENT_RUN_LOG
 MARKER PASS: ALL_BINDING_TESTS_PASS in CURRENT_RUN_LOG
 MARKER PASS: UNKNOWN_PROVENANCE_PASS in CURRENT_RUN_LOG
+MARKER PASS: CATALOG_PASS in CURRENT_RUN_LOG
+MARKER PASS: ADAPTER_HASH_PASS in CURRENT_RUN_LOG
+MARKER PASS: WIRE_HASH_PASS in CURRENT_RUN_LOG
+MARKER PASS: BOUNDARY_PASS in CURRENT_RUN_LOG
+MARKER PASS: RECEIPT_SCHEMA_PASS in CURRENT_RUN_LOG
+MARKER PASS: HTTP_BOUNDARY_PASS in CURRENT_RUN_LOG
 MARKER PASS: negative self-test (missing marker correctly not found)
-CORRECTIVE_006_E2E_PASS
-[e2e] done 2026-09-25T07:04:46Z
+CORRECTIVE_007_E2E_PASS
+[e2e] done 2026-09-25T07:25:53Z

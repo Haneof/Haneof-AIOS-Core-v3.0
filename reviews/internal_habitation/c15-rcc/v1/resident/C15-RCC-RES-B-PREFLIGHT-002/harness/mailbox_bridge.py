@@ -171,10 +171,10 @@ def validate_envelope(envelope: dict[str, Any], b_session_id: str) -> None:
                 raise MailboxEnvelopeError(
                     f"envelope.event.sequence={seq!r} outside Phase B range 14..22"
                 )
-            # Mechanical validation for source_kind, payload etc. (BLOCKER 4) — allow monitoring for fixture_observation B events
+            # Opaque non-empty source_kind from exact frozen reveal projection (CORRECTIVE-007) — unified with handler, must equal binding receipt
             sk = ev.get("source_kind")
-            if sk not in ("conversation", "mechanical", "monitoring"):
-                raise MailboxEnvelopeError(f"envelope.event.source_kind={sk!r} must be conversation|mechanical|monitoring")
+            if not isinstance(sk, str) or not sk.strip():
+                raise MailboxEnvelopeError(f"envelope.event.source_kind must be non-empty string, got {sk!r}")
             for f in ("source_class", "modality", "dimension", "event_id", "occurred_at"):
                 v = ev.get(f)
                 if not isinstance(v, str) or not v.strip():
