@@ -201,6 +201,18 @@ def create_current_event_binding_receipt(
         raise ValueError(f"pending_reveal.event_id {rs_pending.get('event_id')!r} != projection event_id {projection.get('event_id')!r} (mismatch)")
     if rs_next != projection.get("sequence"):
         raise ValueError(f"release_state next_sequence {rs_next!r} != projection sequence {projection.get('sequence')!r} (mismatch)")
+    # CORRECTIVE-008: fixture triple-binding — pending fixture must exist and equal canonical, receipt must carry that exact
+    canon_fixture = "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46"
+    pending_fixture = rs_pending.get("fixture_sha256")
+    if not pending_fixture:
+        raise ValueError(f"release_state pending_reveal.fixture_sha256 missing (must be {canon_fixture!r})")
+    if pending_fixture != canon_fixture:
+        raise ValueError(f"release_state pending_reveal.fixture_sha256 {pending_fixture!r} != canonical {canon_fixture!r} (live fixture mismatch)")
+    # Also ensure the passed fixture_sha256 (if not default) matches canonical/pending, otherwise STOP
+    if fixture_sha256 != canon_fixture:
+        raise ValueError(f"fixture_sha256 {fixture_sha256!r} != canonical {canon_fixture!r} (must be canonical)")
+    if fixture_sha256 != pending_fixture:
+        raise ValueError(f"fixture_sha256 {fixture_sha256!r} != pending_reveal.fixture_sha256 {pending_fixture!r} (mismatch)")
     receipt = {
         "phase": "B",
         "b_session_id": b_session_id,
@@ -326,7 +338,7 @@ def validate_current_event_binding(
         raise ValueError(f"binding receipt binding_version {receipt.get('binding_version')!r} != c15-rcc-b-binding-v1 (wrong version)")
     if receipt.get("b_session_id") != b_session_id:
         raise ValueError(f"binding receipt b_session_id {receipt.get('b_session_id')!r} != {b_session_id!r} (wrong session)")
-    # Enforce fixture_sha256 present and exact (must equal canonical C15 fixture SHA)
+    # Enforce fixture_sha256 present and exact (must equal canonical C15 fixture SHA) — triple binding (CORRECTIVE-008)
     canon_fixture = "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46"
     if not receipt.get("fixture_sha256"):
         raise ValueError("binding receipt missing fixture_sha256")
@@ -383,6 +395,18 @@ def validate_current_event_binding(
         receipt_pending = receipt.get("release_state_pending_reveal")
         if receipt_pending != pending:
             raise ValueError(f"binding receipt release_state_pending_reveal {receipt_pending!r} != release_state pending_reveal {pending!r} (pending_reveal mismatch)")
+        # CORRECTIVE-008: live fixture triple-binding — pending fixture == receipt fixture == canonical
+        if pending is not None:
+            live_pending_fixture = pending.get("fixture_sha256")
+            if not live_pending_fixture:
+                raise ValueError(f"live release_state pending_reveal.fixture_sha256 missing (must be {canon_fixture!r})")
+            if live_pending_fixture != canon_fixture:
+                raise ValueError(f"live release_state pending_reveal.fixture_sha256 {live_pending_fixture!r} != canonical {canon_fixture!r} (live fixture mismatch)")
+            if live_pending_fixture != receipt.get("fixture_sha256"):
+                raise ValueError(f"live pending fixture {live_pending_fixture!r} != receipt fixture {receipt.get('fixture_sha256')!r} (fixture triple mismatch)")
+        else:
+            # If pending is None but receipt expects fixture, should have been caught earlier
+            pass
         # Enforce pending_reveal matches receipt and current event
         if pending is not None:
             if pending.get("sequence") != receipt.get("sequence"):
@@ -483,7 +507,7 @@ class ExternalBrokerClient:
         "version": "1.0.0-frozen",
         "protocol_version": "c15-rcc-b-wire-v1",
     }
-    def __init__(self, api_key: str | None = None, endpoint: str | None = None, timeout: int = 10, model: str | None = None, provider: str | None = None):
+    def __init__(self, api_key: str | None = None, endpoint: str | None = None, timeout: int = 10, model: str | None = None, provider: str | None = None, allow_test_loopback: bool = False):
         self.api_key = api_key or os.getenv("AIOS_REAL_PROVIDER_API_KEY")
         self.endpoint = endpoint or os.getenv("AIOS_REAL_PROVIDER_ENDPOINT")
         self.timeout = int(timeout)
@@ -492,24 +516,23 @@ class ExternalBrokerClient:
         self.version = "1.0.0-frozen"
         self.invocations = 0
         self.last_request: dict[str, Any] | None = None
+        # allow_test_loopback is test-only direct constructor, default False, never set by production entrypoint (CORRECTIVE-008)
+        self.allow_test_loopback = bool(allow_test_loopback)
         if not self.api_key or not self.endpoint:
             raise ValueError("ExternalBrokerClient requires AIOS_REAL_PROVIDER_API_KEY and AIOS_REAL_PROVIDER_ENDPOINT")
         if self.provider == "fake-provider" or self.model.startswith("fake-"):
             raise ValueError("ExternalBrokerClient cannot use fake provider/model")
         # Endpoint must look like HTTP(S) or fake:// for test (but fake:// is not allowed in prod; only real HTTP)
-        # For preflight, we allow http://127.0.0.1:* for FakeBrokerServer, but still require transport
         if not (self.endpoint.startswith("http://") or self.endpoint.startswith("https://") or self.endpoint.startswith("fake://")):
             raise ValueError(f"endpoint must be http(s)://, got {self.endpoint!r}")
-        # Production HTTP plaintext forbidden: only https:// legal for production; http:// loopback only for explicit test-only switch
+        # Production HTTP plaintext forbidden: only https:// legal for production; http:// loopback only for explicit test-only direct constructor
         if self.endpoint.startswith("http://"):
             is_loopback = self.endpoint.startswith("http://127.0.0.1:") or self.endpoint.startswith("http://localhost:")
             if not is_loopback:
-                raise ValueError(f"plaintext http:// not allowed for production endpoint {self.endpoint!r} (must be https:// or test-only http://127.0.0.1:<port>)")
-            # Loopback is test-only: require explicit allow flag, otherwise production B would fail-closed
-            # Session name MUST NOT affect security policy (CORRECTIVE-007)
-            allow_loopback = os.getenv("AIOS_ALLOW_LOOPBACK_BROKER") == "1" or os.getenv("AIOS_TEST_MODE") == "1"
-            if not allow_loopback:
-                raise ValueError(f"loopback http:// endpoint not allowed without AIOS_ALLOW_LOOPBACK_BROKER=1 (must be https://) got {self.endpoint!r}")
+                raise ValueError(f"plaintext http:// not allowed for production endpoint {self.endpoint!r} (must be https:// or test-only http://127.0.0.1:<port> with allow_test_loopback=True)")
+            # Loopback is test-only: require explicit allow_test_loopback=True, production entrypoint never sets it, env flags do not affect
+            if not self.allow_test_loopback:
+                raise ValueError(f"loopback http:// endpoint not allowed without allow_test_loopback=True (must be https://) got {self.endpoint!r} (production entrypoint is HTTPS-only)")
 
     def invoke(self, request: dict[str, Any]) -> ProviderResponse:
         self.invocations += 1

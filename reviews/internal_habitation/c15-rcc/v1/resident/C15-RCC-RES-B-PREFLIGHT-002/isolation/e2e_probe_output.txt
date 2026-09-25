@@ -1,10 +1,10 @@
-[e2e] run_root = /tmp/b-preflight-e2e-4824
-[e2e] CURRENT_RUN_LOG=/tmp/b-preflight-e2e-4824/e2e.log
+[e2e] run_root = /tmp/b-preflight-e2e-5887
+[e2e] CURRENT_RUN_LOG=/tmp/b-preflight-e2e-5887/e2e.log
 world.sqlite: OK
 index.sqlite: OK
 release_state.json: OK
 [e2e] lineage digests OK
-[e2e] EXPECTED_CHECKS=111
+[e2e] EXPECTED_CHECKS=126
 [e2e] step 0: exact environment
 py_ver=Python 3.11.2
 CHECK 1 PASS: exact Python 3.11.2
@@ -14,7 +14,7 @@ wire_sha=a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a
 CHECK 3 PASS: wire protocol hash 5067701b…
 contract_sha=28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef
 CHECK 4 PASS: contract exact
-adapter_sha=8351d582946b0bd9bbdcda468ed54c92ca1e2ebd597c39c0eaf6c2d94a0458b1
+adapter_sha=5f575ae4bbc9ab45fe8e49b4ef8c6266eb8a2a2bd43f8b025a892b83b43daae4
 CHECK 5 PASS: adapter sha exact matches manifest
 freeze_sha=bd7a76d1171c137f9daee9c0a3dbff029b8cbbccef88f0a1aff7907710a82375
 CHECK 6 PASS: requirements freeze SHA exact bd7a76d1171c137f9daee9c0a3dbff029b8cbbccef88f0a1aff7907710a82375
@@ -155,8 +155,8 @@ NORMAL_BINDING_PASS
 [test-responder] starting mode=normal rounds=2 uid=65534 pid=3 inbox=/work/inbox outbox=/work/outbox
 [test-responder] pid=3 proc1_comm=sandbox-init
 [test-responder] PASS PID1 is sandbox-init
-[test-responder] round 1 received request_id=e8944fb6... digest=65eda51f...
-[test-responder] round 2 received request_id=23137346... digest=ccd22933...
+[test-responder] round 1 received request_id=8ba18acf... digest=faadd971...
+[test-responder] round 2 received request_id=6897baf5... digest=b761ec02...
 [test-responder] OK mode=normal rounds=2 pid=3
 
 STALE_REJECTED_PASS
@@ -180,7 +180,7 @@ SYNTHETIC_GENUINE_PASS
 CHECK 27 PASS: synthetic genuine 2-round Atlas non-empty
 CHECK 28 PASS: current_event seq14 wiring
 [e2e] step 4b: production genuine via ExternalBrokerClient + FakeBrokerServer (transport)
-FakeBrokerServer at http://127.0.0.1:37057/v1/chat
+FakeBrokerServer at http://127.0.0.1:39491/v1/chat
 prod invocations=2 history=1
 last_provider=fake-broker usage={'total_tokens': 42, 'input_tokens': 20, 'output_tokens': 22}
 PRODUCTION_GENUINE_PASS
@@ -223,27 +223,27 @@ CHECK 40 PASS: privdrop dual
 [e2e] step 9: signal deterministic PID1 forwarding
 [signal] pid log:
 {
-  "outer_wrapper_host_pid": 5185,
-  "outer_wrapper_ns_pid": 5185,
-  "outer_wrapper_ppid": 5183,
-  "outer_wrapper_cmd": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/resident_jail.py --repo /home/user/Haneof-AIOS-Core-v3.0 --sandbox /tmp/b-sleep-test-4824 --world /tmp/b-preflight-e2e-4824/runtime/world.sqlite --index /tmp/b-preflight-e2e-4824/runtime/index.sqlite --state /tmp/b-preflight-e2e-4824/runtime/release_state.json --lock /tmp/b-preflight-e2e-4824/runtime/world.writer.lock --mailbox-root /tmp/b-sleep-mb-4824 --inject-dir /tmp/b-preflight-e2e-4824/inject -- /bin/sleep 30",
-  "unsharer_host_pid": 5186,
-  "unsharer_ns_pid": 5186,
-  "unsharer_ppid": 5185,
-  "pid1_host_pid": 5190,
+  "outer_wrapper_host_pid": 6248,
+  "outer_wrapper_ns_pid": 6248,
+  "outer_wrapper_ppid": 6246,
+  "outer_wrapper_cmd": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/resident_jail.py --repo /home/user/Haneof-AIOS-Core-v3.0 --sandbox /tmp/b-sleep-test-5887 --world /tmp/b-preflight-e2e-5887/runtime/world.sqlite --index /tmp/b-preflight-e2e-5887/runtime/index.sqlite --state /tmp/b-preflight-e2e-5887/runtime/release_state.json --lock /tmp/b-preflight-e2e-5887/runtime/world.writer.lock --mailbox-root /tmp/b-sleep-mb-5887 --inject-dir /tmp/b-preflight-e2e-5887/inject -- /bin/sleep 30",
+  "unsharer_host_pid": 6249,
+  "unsharer_ns_pid": 6249,
+  "unsharer_ppid": 6248,
+  "pid1_host_pid": 6253,
   "pid1_ns_pid": 1,
   "pid1_ns_pid_actual": 1,
-  "pid1_host_pid_ns_view": 5190,
+  "pid1_host_pid_ns_view": 6253,
   "pid1_comm": "sandbox-init",
   "worker_fork_return_pid": 3,
   "worker_ns_pid_expected": 2,
-  "worker_host_pid": 5192,
+  "worker_host_pid": 6255,
   "worker_ns_pid_actual": 3,
   "worker_ns_ppid": 1,
   "worker_ppid_host": 1
-}outer=5185 unsharer=5186 pid1_host=5190 worker_host=5192 worker_ns=3
+}outer=6248 unsharer=6249 pid1_host=6253 worker_host=6255 worker_ns=3
 CHECK 41 PASS: PID map outer/unsharer/PID1/worker captured (host pids valid, distinct)
-[signal] sending TERM to PID1 host 5190 (jail PID1)
+[signal] sending TERM to PID1 host 6253 (jail PID1)
 [signal] jail exit code 143
 CHECK 42 PASS: signal TERM forwarded PID1->worker exit 143
 CHECK 43 PASS: worker reaped no zombie
@@ -485,10 +485,9 @@ RUN_ROOT2 init B failed
 }
 RUN_ROOT2 pending set
 binding receipt 9cba565c8bc5
-FakeBroker endpoint http://127.0.0.1:8765/v1/chat
-{"assistant_observation_id": "obs_conv_ai_3ccc3b4bf7dbf6f1c8b48600", "idempotent_replay": false, "model_rounds": 2, "response": null, "silenced": true, "status": "turn_completed", "summary_commits": 0, "summary_error": null, "termination_reason": "silence", "user_observation_id": "obs_conv_user_acea1101b6148d1f87c5e8a9", "world_revision": 100}
-CHECK 50 PASS: headless CLI turn with ExternalBrokerClient succeeded
-provider provenance not in log but ok
+model_rounds=ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='448857a73379eb3292a10fad89e8e424'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='448857a73379eb3292a10fad89e8e424'))
+headless stub turn succeeded
+model_rounds 1 directive ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='448857a73379eb3292a10fad89e8e424'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='448857a73379eb3292a10fad89e8e424')) real-providerCHECK 50 PASS: headless CLI turn with ExternalBrokerClient succeeded (HTTPS stub)
 [e2e] step 14: hash mismatch
 PASS contract hash mismatch fail closed: contract SHA env mismatch: expected 28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef, got deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef (STOP)
 CHECK 51 PASS: contract hash mismatch fail closed
@@ -500,7 +499,7 @@ CHECK 53 PASS: disposable init B via canonical command
 {"dimension":"dim:work_state","event_id":"c15rcc-014","modality":"structured_text","occurred_at":"2026-11-09T09:03:00-08:00","resident_visible_payload":"staging 索引 orders-shadow 与昨夜测试残留名称冲突，回归任务被阻塞；production 索引未受影响。","sequence":14,"source_class":"PLATFORM","source_kind":"monitoring"}
 reveal 8-field ok 14 c15rcc-014
 CHECK 54 PASS: canonical reveal --phase B --state without --sequence (blocker7) produces 8-field projection
-using disp /tmp/b-disp-reveal-4824
+using disp /tmp/b-disp-reveal-5887
 baseline receipt created binding_version=c15-rcc-b-binding-v1 seq=14 sha=74fcbf4eaaae rs_sha=c7a735b2eca3
 BASELINE_VALID_PASS
 CHECK 55 PASS: baseline valid receipt PASS
@@ -513,7 +512,7 @@ PASS modified source_kind rejected for source_kind: current_event.source_kind 'f
 PASS modified source_class rejected for source_class: current_event.source_class 'FAKE' != receipt source_class 'PLATFORM' (modified source_class)
 PASS modified modality rejected for modality: current_event.modality 'fake_modality' != receipt modality 'structured_text' (modified modality)
 PASS wrong session rejected: binding receipt b_session_id 'b-adversarial-001' != 'b-wrong-session' (wrong session)
-PASS stale seq14 after ACK rejected: binding receipt release_state_path '/tmp/b-disp-reveal-4824/runtime/release_state.json' != current '/tmp/tmpuov8je8s/rs_stale.json' (path identity mismatch)
+PASS stale seq14 after ACK rejected: binding receipt release_state_path '/tmp/b-disp-reveal-5887/runtime/release_state.json' != current '/tmp/tmp2uwlkm_1/rs_stale.json' (path identity mismatch)
 PASS missing receipt rejected: binding receipt missing at /tmp/nonexistent-binding.json (current-event binding must exist)
 PASS malformed receipt rejected: binding receipt malformed JSON: Expecting value: line 1 column 1 (char 0)
 BINDING_ADVERSARIAL_PASS
@@ -537,7 +536,7 @@ PASS handler _poisoned == True
 PASS same handler second call poisoned fail: handler poisoned: provider_transport_failure: provider invoke failed: simulated provider transport failure (new instance required)
 PASS _outstanding == None
 PASS release next_sequence not advanced
-PASS durable failure receipt exists /tmp/b-scheme-evidence-5414/failure-latest-1.json
+PASS durable failure receipt exists /tmp/b-scheme-evidence-6471/failure-latest-1.json
 PASS durable evidence session/cursor
 PASS non-JSON fail closed: provider content not JSON: Expecting value: line 1 column 1 (char 0)
 PASS non-JSON provider invoked
@@ -579,7 +578,7 @@ CHECK 82 PASS: catalog evil_cap FAIL closed
 CHECK 83 PASS: empty catalog any capability FAIL
 [e2e] step 17b: adapter hash missing/wrong
 PASS missing adapter hash correctly FAIL: missing mandatory B boundary envs ['AIOS_ADAPTER_SHA256'] (ModelDispatchNotSubmitted/STOP)
-PASS wrong adapter hash correctly FAIL: adapter hash mismatch: expected deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef, got 8351d582946b0bd9bbdcda468ed54c92ca1e2ebd597c39c0eaf6c2d94a0458b1 (ModelDispatchNotSubmitted/STOP)
+PASS wrong adapter hash correctly FAIL: adapter hash mismatch: expected deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef, got 5f575ae4bbc9ab45fe8e49b4ef8c6266eb8a2a2bd43f8b025a892b83b43daae4 (ModelDispatchNotSubmitted/STOP)
 ADAPTER_HASH_PASS
 CHECK 84 PASS: adapter missing hash FAIL closed
 CHECK 85 PASS: adapter wrong hash FAIL closed
@@ -619,34 +618,70 @@ CHECK 97 PASS: missing state path FAIL
 CHECK 98 PASS: wrong saved next sequence FAIL
 CHECK 99 PASS: wrong saved pending reveal FAIL
 CHECK 100 PASS: receipt schema 7 mutations PASS
-[e2e] step 17f: HTTP boundary
-PASS remote http correctly FAIL: plaintext http:// not allowed for production endpoint 'http://example.com/v1/chat' (must be https:// or test-only http://127.0.0.1:<port>)
-PASS loopback without flag correctly FAIL: loopback http:// endpoint not allowed without AIOS_ALLOW_LOOPBACK_BROKER=1 (must be https://) got 'http://127.0.0.1:8765/v1/chat'
-PASS explicit loopback with flag succeeded: http://127.0.0.1:8765/v1/chat
+[e2e] step 17e2: live pending fixture triple-binding
+PASS pending_missing create correctly FAIL: release_state pending_reveal.fixture_sha256 missing (must be 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46')
+PASS pending_missing validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-5887/runtime/release_state.json' != current '/tmp/b-fixture-pending_missing-y9uw56tt/release_state.json' (path identity mismatch)
+PASS pending_wrong create correctly FAIL: release_state pending_reveal.fixture_sha256 'sha256:deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef' != canonical 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46' (live fixture mismatch)
+PASS pending_wrong validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-5887/runtime/release_state.json' != current '/tmp/b-fixture-pending_wrong-ajeckzpm/release_state.json' (path identity mismatch)
+PASS receipt fixture wrong correctly FAIL: binding receipt fixture_sha256 'sha256:deadbeef' != canonical 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46' (wrong fixture SHA)
+PASS exact fixture triple-binding PASS: sha256:7ccb3
+FIXTURE_TRIPLE_PASS
+CHECK 101 PASS: live pending fixture missing FAIL
+CHECK 102 PASS: live pending fixture wrong FAIL
+CHECK 103 PASS: receipt fixture wrong FAIL
+CHECK 104 PASS: exact fixture triple-binding PASS
+CHECK 105 PASS: fixture triple 4 cases PASS
+[e2e] step 17f: HTTP boundary (production vs probe-only)
+PASS remote http correctly FAIL: plaintext http:// not allowed for production endpoint 'http://example.com/v1/chat' (must be https:// or test-only http://127.0.0.1:<port> with allow_test_loopback=True)
+PASS production loopback without flag correctly FAIL: provider factory 'bridged_model_handler:ExternalBrokerClient' failed: loopback http:// endpoint not allowed without allow_test_loopback=True (must be https://) got 'http://127.0.0.1:8765/v1/chat' (production entrypoint is HTTPS-only)
+PASS production loopback with flag correctly FAIL (still loopback): provider factory 'bridged_model_handler:ExternalBrokerClient' failed: loopback http:// endpoint not allowed without allow_test_loopback=True (must be https://) got 'http://127.0.0.1:8765/v1/chat' (production entrypoint is HTTPS-only)
+PASS direct test constructor loopback with allow_test_loopback=True succeeded: http://127.0.0.1:8765/v1/chat
 PASS https correctly PASS: https://broker.example/v1/chat
-PASS session name does not bypass: loopback http:// endpoint not allowed without AIOS_ALLOW_LOOPBACK_BROKER=1 (must be https://) got 'http://127.0.0.1:8765/v1/chat'
+PASS session name does not bypass (direct): loopback http:// endpoint not allowed without allow_test_loopback=True (must be https://) got 'http://127.0.0.1:8765/v1/chat' (production entrypoint is HTTPS-only)
 HTTP_BOUNDARY_PASS
-CHECK 101 PASS: remote http://example FAIL closed
-CHECK 102 PASS: production loopback without flag FAIL
-CHECK 103 PASS: explicit test-only loopback PASS
-CHECK 104 PASS: https structural PASS
-CHECK 105 PASS: session name does not affect policy
-CHECK 106 PASS: HTTP boundary 4 cases PASS
+CHECK 106 PASS: remote http://example FAIL closed
+CHECK 107 PASS: production loopback without flag FAIL
+CHECK 108 PASS: production loopback with flag still FAIL
+CHECK 109 PASS: direct test-only loopback PASS
+CHECK 110 PASS: https structural PASS
+CHECK 111 PASS: session name does not affect policy
+CHECK 112 PASS: HTTP boundary 5 cases PASS
 [e2e] step 17g: durable failure evidence permission
 PASS evidence chmod check
-CHECK 107 PASS: evidence permission not silent pass
+CHECK 113 PASS: evidence permission not silent pass
 PASS evidence permission readback exists
-CHECK 108 PASS: evidence permission readback enforced
+CHECK 114 PASS: evidence permission readback enforced
 [e2e] step 17h: stale command grep and duplicate check
 PASS no stale reveal --sequence in procedure
-CHECK 109 PASS: stale reveal --sequence removed from canonical B procedure
+CHECK 115 PASS: stale reveal --sequence removed from canonical B procedure
+PASS no stale canonical text
+CHECK 116 PASS: stale canonical text grep = 0
+PASS source_kind unified opaque
+CHECK 117 PASS: source_kind unified
 counts write=1 validate=1 envelope=1
 PASS duplicate definitions exactly 1 each
-CHECK 110 PASS: duplicate definitions exactly 1 each
+CHECK 118 PASS: duplicate definitions exactly 1 each
 PASS build_model_request exactly 1
-CHECK 111 PASS: build_model_request exactly 1
+CHECK 119 PASS: build_model_request exactly 1
+[e2e] step 17i: canonical production startup env contract
+PASS canonical startup env contract complete
+CHECK 120 PASS: canonical startup env contract complete PASS
+PASS canonical startup uses HTTPS
+CHECK 121 PASS: canonical startup HTTPS
+PASS canonical block contains all 12 envs
+PASS canonical startup reaches transport: ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='d9f6e9e0db3b8091ecf894cfd196a3b0'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='d9f6e9e0db3b8091ecf894cfd196a3b0'))
+CHECK 122 PASS: canonical startup execution reaches transport
+[e2e] step 17j: env manifest/gate consistency
+PASS manifest subset semantic
+CHECK 123 PASS: environment manifest subset
+PASS manifest extra allowed
+CHECK 124 PASS: manifest extra allowed
+PASS probe subset check
+CHECK 125 PASS: probe subset gate
+PASS env manifest/gate consistency
+CHECK 126 PASS: environment manifest/gate semantic consistency PASS
 
-ALL_CHECKS=111/111 FAILURES=0
+ALL_CHECKS=126/126 FAILURES=0
 MARKER PASS: ISOLATION_PASS in CURRENT_RUN_LOG
 MARKER PASS: SYNTHETIC_GENUINE_PASS in CURRENT_RUN_LOG
 MARKER PASS: PRODUCTION_GENUINE_PASS in CURRENT_RUN_LOG
@@ -664,5 +699,5 @@ MARKER PASS: BOUNDARY_PASS in CURRENT_RUN_LOG
 MARKER PASS: RECEIPT_SCHEMA_PASS in CURRENT_RUN_LOG
 MARKER PASS: HTTP_BOUNDARY_PASS in CURRENT_RUN_LOG
 MARKER PASS: negative self-test (missing marker correctly not found)
-CORRECTIVE_007_E2E_PASS
-[e2e] done 2026-09-25T07:25:53Z
+CORRECTIVE_008_E2E_PASS
+[e2e] done 2026-09-25T07:40:20Z

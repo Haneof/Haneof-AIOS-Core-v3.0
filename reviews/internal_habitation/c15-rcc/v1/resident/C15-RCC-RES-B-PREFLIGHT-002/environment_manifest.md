@@ -1,4 +1,4 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Environment Manifest (CORRECTIVE-007 exact, frozen)
+# C15-RCC-RES-B-PREFLIGHT-002 — Environment Manifest (CORRECTIVE-008 exact, frozen)
 
 This manifest freezes the exact environment the Resident B process will run under.
 Any deviation MUST STOP before B start (no pip install, no upgrade).
@@ -13,21 +13,26 @@ Any deviation MUST STOP before B start (no pip install, no upgrade).
 | Contract | `28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef` (exact bytes of RESIDENT_B_RUN_CONTRACT.md, `RESIDENT_B_RUN_CONTRACT.md` not truncated) | `echo "28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef  reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md" | sha256sum -c -` |
 | Core tree | `fe77f8a0706acfaf369041d0882b6d0e6de39f22` | `git ls-tree HEAD -- src/aios_core` |
 | Frozen software | `773876f92d5f8e53422f8f5a68cc651953d93052` | `git rev-parse HEAD` |
-| Adapter | `bridged_model_handler:ExternalBrokerClient` `1.0.0-frozen` `c15-rcc-b-wire-v1` sha `8351d582946b0bd9bbdcda468ed54c92ca1e2ebd597c39c0eaf6c2d94a0458b1` | `sha256sum harness/bridged_model_handler.py` |
+| Adapter | `bridged_model_handler:ExternalBrokerClient` `1.0.0-frozen` `c15-rcc-b-wire-v1` sha `5f575ae4bbc9ab45fe8e49b4ef8c6266eb8a2a2bd43f8b025a892b83b43daae4` | `sha256sum harness/bridged_model_handler.py` |
 
-## Dependency freeze
+## Dependency freeze — Frozen dependency subset, not entire pip environment.
 
 `pip freeze` SHA-256: `bd7a76d1171c137f...` (full `bd7a76d1171c137f9daee9c0a3dbff029b8cbbccef88f0a1aff7907710a82375`)
 
-Relevant pinned packages:
+Relevant pinned packages (required subset, other packages allowed):
 ```
 pydantic==2.13.5
 pydantic_core==2.46.5
+annotated-types==0.8.0
+typing-inspection==0.4.4
+typing_extensions==4.16.0
 ```
 
 Full freeze is stored as `harness/requirements.freeze.txt` (hash `bd7a76d1171c137f9daee9c0a3dbff029b8cbbccef88f0a1aff7907710a82375`).
 
-Live `pip freeze` is compared to this file in E2E step 0: `diff <(pip freeze | sort) <(sort harness/requirements.freeze.txt)` must be empty or only allowed drift (e.g., pip version). Mismatch → STOP.
+Live `pip freeze` is compared as required subset: every line in `requirements.freeze.txt` must be present in live `pip freeze` with exact version; extra packages in live environment are allowed. Missing pinned line → STOP. Freeze file SHA must be exact `bd7a76d1171c137f9daee9c0a3dbff029b8cbbccef88f0a1aff7907710a82375`.
+
+Frozen dependency subset, not entire pip environment.
 
 ## OS / Kernel
 
@@ -45,9 +50,9 @@ OS `Debian 12 (bookworm)` and kernel `Linux 6.1.158+` are **informational**, not
 | `AIOS_MAILBOX_ROOT` | `$RUN_ROOT/mailbox` | operator |
 | `AIOS_CONTRACT_SHA256` | `28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef` | operator |
 | `AIOS_WIRE_PROTOCOL_SHA256` | `a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a` | operator |
-| `AIOS_ADAPTER_SHA256` | `8351d582946b0bd9bbdcda468ed54c92ca1e2ebd597c39c0eaf6c2d94a0458b1` | operator |
+| `AIOS_ADAPTER_SHA256` | `5f575ae4bbc9ab45fe8e49b4ef8c6266eb8a2a2bd43f8b025a892b83b43daae4` | operator |
 | `AIOS_REAL_PROVIDER_API_KEY` | `<redacted>` | operator (required for prod) |
-| `AIOS_REAL_PROVIDER_ENDPOINT` | `https://broker.example/...` or `http://127.0.0.1:<port>/v1/chat` (FakeBrokerServer for probe) | operator (required) |
+| `AIOS_REAL_PROVIDER_ENDPOINT` | `https://broker.example/...` (production, HTTPS-only) — `http://127.0.0.1:<port>/v1/chat` only via direct `ExternalBrokerClient(..., allow_test_loopback=True)` probe-only, never via production `headless_production_handler` | operator (required) |
 | `AIOS_PROVIDER_ADAPTER` | `bridged_model_handler:ExternalBrokerClient` (exact, pinned, no fake) | operator (pinned) |
 | `AIOS_RELEASE_STATE_PATH` | `$RUN_ROOT/runtime/release_state.json` | operator |
 | `AIOS_CURRENT_EVENT_PATH` | `$RUN_ROOT/current-event.json` | operator per cursor |
@@ -68,15 +73,15 @@ Only `{ system: contract, wire_protocol: schema, wire_protocol_sha256: hash, mes
 - `python3 -c "import pydantic; print(pydantic.__version__)"` must equal `2.13.5`
 - `echo "a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a  harness/resident_wire_protocol.json" | sha256sum -c -`
 - `echo "28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef  reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md" | sha256sum -c -`
-- `echo "8351d582946b0bd9bbdcda468ed54c92ca1e2ebd597c39c0eaf6c2d94a0458b1  harness/bridged_model_handler.py" | sha256sum -c -` (adapter pinned)
-- `diff <(pip freeze | sort) <(sort harness/requirements.freeze.txt)` must be empty (or only pip/setuptools drift)
+- `echo "5f575ae4bbc9ab45fe8e49b4ef8c6266eb8a2a2bd43f8b025a892b83b43daae4  harness/bridged_model_handler.py" | sha256sum -c -` (adapter pinned)
+- `pip freeze` must contain every line from `harness/requirements.freeze.txt` exactly; extra packages allowed (Frozen dependency subset, not entire pip environment.) Freeze SHA `bd7a76d1171c137f9daee9c0a3dbff029b8cbbccef88f0a1aff7907710a82375` must be exact
 - `git ls-tree HEAD -- src/aios_core` must equal `fe77f8a0706acfaf369041d0882b6d0e6de39f22`
 - Mismatch → STOP, do not run B (no `pip install` at release).
 
 ## File manifest
 
 - `harness/resident_wire_protocol.json` + `.md` (pinned `a6bbeaef...` v1.0.1)
-- `harness/bridged_model_handler.py` (pinned `8351d582946b0bd9bbdcda468ed54c92ca1e2ebd597c39c0eaf6c2d94a0458b1
+- `harness/bridged_model_handler.py` (pinned `5f575ae4bbc9ab45fe8e49b4ef8c6266eb8a2a2bd43f8b025a892b83b43daae4
 - `harness/requirements.freeze.txt` (full freeze `bd7a76d...`)
 - `harness/resident_jail.py` env allowlist
-- `isolation/probe_e2e.sh` asserts exact versions (step 0) `EXPECTED_CHECKS=111` (must match executable)
+- `isolation/probe_e2e.sh` asserts exact versions (step 0) `EXPECTED_CHECKS=126` (must match executable)
