@@ -10,7 +10,7 @@ Verdict: **REVIEW_READY** (await PM re-review; no B or C run)
 Non-Resident mechanical preparation of the Phase B handoff from independently accepted Fresh A-002 (PR #205, Frozen RC) on the frozen RC. Per CORRECTIVE-003 preflight prompt §15, this manifest stops at REVIEW_READY:
 
 - NO Resident B was run
-- NO cursor 14 was revealed to a model (probe used synthetic `obs_c14_*` cursor 14 projection only)
+- NO cursor 14 was revealed to a model. Preflight's disposable `reveal --phase B` ran on a copied release state for the mechanical `init → reveal → receipt → handler` proof; the projection was never presented to a Resident/model and its payload bytes are not in current evidence (CORRECTIVE-009 / BLK-01).
 - NO Resident C was run
 - NO Core (`src/aios_core/`) was modified
 - NO modification was made to PR #205 (OPEN / UNMERGED / PINNED)
@@ -88,7 +88,7 @@ reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/
 
 **Separation is in code** — not just documentation. Synthetic path is disposable probe; production path is frozen for real B and maps `provider/model/request_id` from the **actual** `ProviderResponse` (or `"UNKNOWN"` where credibly unavailable) and `usage` from actual `usage.total_tokens` (or `None`, never `10`). PR-approval-time choice phrase removed.
 
-**Phase B adapter is frozen** (`bridged_model_handler.py`) before B run. Operator cannot swap model logic at release; `FakeProviderClient` is swapped for `RealProviderClient` via constructor only (same file).
+**Phase B adapter is frozen** (`bridged_model_handler.py`) before B run. Operator cannot swap model logic at release. The only production transport is `ExternalBrokerClient`; there is no `RealProviderClient`, and `FakeProviderClient` cannot be instantiated at all (its `__init__` raises), so no fake path is reachable from the production entrypoint.
 
 ## Transport authority (fail-closed)
 
@@ -101,11 +101,32 @@ MailboxBridge validates `event` exactly 8 fields + `sequence 14..22` + `phase B`
 - `CLONE_NEWNS` mount private fail closed; RO bind `ro,nosuid,nodev` (EROFS probe).
 - Mailbox IPC: `inbox 0755/outbox 01733/archive 0700 not mounted`, `nobody:nogroup` honors, private MS drop strip.
 - `/dev` minimal (tmpfs + `null/zero/urandom/random`), signal strict, env allowlist (PROBE_* stripped unless explicitly passed).
+- **Inherited FDs closed** before `execvpe` (`_close_inherited_fds`): operator-held sealed-fixture / evaluator-only descriptors are not readable inside the jail via `/dev/fd/N` (gate `INHERITED_FD_SEALED_PASS`).
 
 ## Preflight rules observed
 
 - Operator role transport only; harness env run is `unshare+chroot+drop` (prompt-only never counted).
-- Cursor 14 never revealed to real model during preflight; probe used synthetic disposable cursor 14 projection `synthetic-fixture-seq-14` with 8-field shape + negatives.
+- Cursor 14 never revealed to a real model during preflight. Synthetic disposable projections (`synthetic-fixture-seq-14`, 8-field shape + negatives) are used for transport tests; the single real disposable reveal is metadata-only in the committed log.
 - `init --phase B` validates receipt-chain only, does not emit or peek at payload.
+- The one disposable reveal is **not** a Resident reveal: it runs on a copied release state under `/tmp` and is reduced to `DISPOSABLE_REVEAL seq=… event_id=… projection_sha256=… payload_sha256=… field_count=…` in the committed log.
 - Environment manifest frozen; `PYTHONPATH=/repo/src`, `contract_sha256`, `b_session`, `AIOS_MAILBOX_ROOT` pinned.
 
+## CORRECTIVE-009 fresh run record
+
+| Item | Value |
+| --- | --- |
+| probe | `isolation/probe_e2e.sh` (run from the repo root under `sudo`) |
+| raw log | `/tmp/probe_run23.log` → copied to `isolation/e2e_probe_output.txt` |
+| raw log SHA-256 | `a80b9c83e40fb620a2283c7a02c113437ebe17368005bdc4d43237d641ba3250` |
+| e2e_probe_output.txt SHA-256 | `96b4868e83e30a975f0b218428ed0178698d0994ce04f2cee8fa1be9c0777713` |
+| probe_output.txt SHA-256 | `1cd3aa7a7ce5d12035a6860ab8de78c2b5a1964cfa91b2a25e38897856693b25` |
+| result | `ALL_CHECKS=139/139 FAILURES=0` |
+| marker | `CORRECTIVE_009_E2E_PASS` |
+
+`isolation/probe_output.txt` is regenerated from a fresh in-sandbox run of
+`isolation/probe_isolation.sh` via `harness/resident_jail.py` (`ISOLATION_PASS`, 58 PASS / 0 FAIL).
+
+The digests above are recomputed on every run and are **not** trusted from this document;
+`procedure/b_startup_procedure.md` recomputes the adapter SHA with `sha256sum` and fails closed if it
+drifts from `environment_manifest.md`, and `isolation/probe_e2e.sh` re-derives the contract and wire
+digests at runtime.

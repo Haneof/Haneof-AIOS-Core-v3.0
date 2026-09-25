@@ -1,4 +1,4 @@
-# C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-003 — Isolation Report (Hardened + Binding + Genuine + Production)
+# C15-RCC-RES-B-PREFLIGHT-002 — Isolation Report (CORRECTIVE-009: hardened + binding + genuine + production + inherited-FD closure)
 
 Isolation mechanism: **OS-enforced mount + PID + network namespaces, bind+remount RO (ro,nosuid,nodev), host bind-mounted mailbox IPC, minimal /dev (tmpfs + 4 nodes), chroot, privdrop to nobody (fail-closed), no sysfs**. NOT prompt-only.
 
@@ -54,7 +54,7 @@ Binding: `send()` increments `round`, `secrets.token_hex(16)` 32-hex nonce, cano
 
 - **SyntheticProbeHandler** (disposable): `FusedTurnRuntime → build_envelope(snapshot,+current_event) → MailboxBridge.send → inbox → inside-jail responder (nobody) → outbox → wait_for_reply (binding) → reply_to_directive_synthetic (hard-coded provider=sandbox-bridge model=synthetic-responder-v1 tokens=10)` — never for real B.
 
-- **ProductionResidentHandler** (frozen for real B): `build_envelope(snapshot,+current_event wiring) → build_model_request(contract_text, envelope) = {system: exact RESIDENT_B_RUN_CONTRACT.md bytes, messages: [{role:user, content: JSON(envelope)}]}` → `provider_client.invoke(request)` **outside jail** → `ProviderResponse{provider,model,request_id,usage,content: reply JSON}` → `validate_reply + verify_binding` → `reply_to_directive_production(uses REAL provider/model/request_id or "UNKNOWN", usage.total_tokens from provider or None, provenance ModelCallProvenance(provider=actual or UNKNOWN))`. For preflight `FakeProviderClient(provider=fake-provider model=fake-model-v1 request_id_prefix=fake-req- total_tokens=42)` walks same path; real B swaps `RealProviderClient` via constructor only (file frozen).
+- **ProductionResidentHandler** (frozen for real B): `build_envelope(snapshot,+current_event wiring) → build_model_request(contract_text, envelope) = {system: exact RESIDENT_B_RUN_CONTRACT.md bytes, messages: [{role:user, content: JSON(envelope)}]}` → `provider_client.invoke(request)` **outside jail** → `ProviderResponse{provider,model,request_id,usage,content: reply JSON}` → `validate_reply + verify_binding` → `reply_to_directive_production(uses REAL provider/model/request_id or "UNKNOWN", usage.total_tokens from provider or None, provenance ModelCallProvenance(provider=actual or UNKNOWN))`. The **only** production transport is `ExternalBrokerClient` (pinned `bridged_model_handler:ExternalBrokerClient`, HTTPS-only, pure transport — no semantic default, no keyword→directive mapping, no timeout fallback answer). `FakeProviderClient` is **not** a drop-in: its `__init__` raises unconditionally, so the production entrypoint can never instantiate it. There is **no** `RealProviderClient`; real B supplies `AIOS_REAL_PROVIDER_API_KEY` + `AIOS_REAL_PROVIDER_ENDPOINT` and uses the same unchanged `ExternalBrokerClient`.
 
 Current-event wiring: `current_event` is exact 8-field projection (synthetic `synthetic-fixture-seq-14 sequence 14` for probe, real fixture projection for B). Validated before envelope; negatives `13/23/extra/missing/phase A` all fail closed before write.
 
@@ -85,3 +85,40 @@ All `CHECK 1..31 PASS` → `CORRECTIVE_003_E2E_PASS`.
 
 `PYTHONPATH=/repo/src` forced, `HOME=/home/nobody`, `TMPDIR=/tmp`, `LD_*/PYTHON*/SUDO*/PROXY*/GIT*/GH*` stripped, `PROBE_MODE/PROBE_ROUNDS` only when `AIOS_ALLOW_PROBE_ENV=1` explicitly, provider sees only `system+envelope`.
 
+## Inherited-FD closure (CORRECTIVE-009 / BLK-07)
+
+`/dev/fd → /proc/self/fd` is still provided, but `_close_inherited_fds()` now runs **immediately before
+`execvpe`** (after all mount/privdrop setup is complete) and closes every descriptor `>= 3`, with a
+second sweep over `/proc/self/fd` for anything the bulk close missed. Only `0/1/2` survive.
+
+Adversarial proof (probe gate `INHERITED_FD_SEALED_PASS`): the operator opens the sealed fixture, the
+evaluator-only design notes and an unrelated file, dups two of them to higher descriptor numbers, and
+passes all five descriptors through `sudo` into the jail. Inside the sandbox:
+
+- `/dev/fd/{0,1,2}` still resolve (the mechanism is alive),
+- `/dev/fd/3`, `/dev/fd/4`, `/dev/fd/5`, `/dev/fd/7`, `/dev/fd/9` and `/proc/self/fd/{3,4,5,7,9}` do **not** exist,
+- `head -c 32 /dev/fd/N` fails for every inherited number,
+- no surviving descriptor symlink points at `sealed_fixture.json` or `EVALUATOR_ONLY_design_notes.md`,
+- the payload still runs normally (`PAYLOAD_RAN_OK`).
+
+## Fail-closed live-state binding (CORRECTIVE-009 / BLK-04) and no-event-no-dispatch (BLK-05)
+
+`validate_current_event_binding()` treats the live `release_state.json` as **mandatory**: a missing,
+unreadable, malformed or non-object state file raises before any receipt-only shortcut. The production
+handler additionally refuses **every** dispatch whose `current_event is None` — for any `wake_reason`
+and any `round_index`, including `periodic_review` at rounds 1 and 3 — poisoning itself, writing a
+durable failure receipt, and performing zero provider invocations.
+
+## Scheme-A evidence collision safety (CORRECTIVE-009 / BLK-06)
+
+Failure receipts are named `failure-<session>-round-<round>-<time_ns>-<8-hex nonce>.json` and created
+with `O_CREAT|O_EXCL` at mode `0400`. `_poisoned` is set, `_outstanding` is snapshotted **and cleared**
+before any disk I/O, so an evidence-write failure can never leave stale outstanding state and is
+surfaced as its own `evidence_persistence_failure` class rather than masking the original failure.
+
+## Portability (CORRECTIVE-009 / BLK-02, BLK-08)
+
+`probe_e2e.sh` derives `REPO_ROOT` / `B_PREP` / `HARNESS_DIR` from its own location, exports them, and
+`cd`s to the repo root; no absolute path is hardcoded anywhere in the executable path. `resident_jail.py`
+and `bridged_model_handler.py` resolve their repository root mechanically from `__file__` (unique
+ancestor containing `src/aios_core`), with a symlink-escape guard and **no** absolute fallback.

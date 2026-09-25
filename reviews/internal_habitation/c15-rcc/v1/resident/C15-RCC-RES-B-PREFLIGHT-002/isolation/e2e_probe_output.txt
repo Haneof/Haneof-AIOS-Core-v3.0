@@ -1,10 +1,16 @@
-[e2e] run_root = /tmp/b-preflight-e2e-5887
-[e2e] CURRENT_RUN_LOG=/tmp/b-preflight-e2e-5887/e2e.log
+# C15-RCC-RES-B-PREFLIGHT-002 — CORRECTIVE-009 fresh E2E evidence (operator side).
+# Regenerated from a fresh disposable run of isolation/probe_e2e.sh (raw log /tmp/probe_run23.log).
+# Contains NO cursor-14 resident_visible_payload bytes (gate NO_COMMITTED_CURSOR14_PAYLOAD_PASS).
+# The single disposable reveal prints mechanical metadata only (DISPOSABLE_REVEAL ...).
+# Disposable reveal is NOT a Resident reveal; the projection is never sent to a model.
+
+[e2e] run_root = /tmp/b-preflight-e2e-17788
+[e2e] CURRENT_RUN_LOG=/tmp/b-preflight-e2e-17788/e2e.log
 world.sqlite: OK
 index.sqlite: OK
 release_state.json: OK
 [e2e] lineage digests OK
-[e2e] EXPECTED_CHECKS=126
+[e2e] EXPECTED_CHECKS=139
 [e2e] step 0: exact environment
 py_ver=Python 3.11.2
 CHECK 1 PASS: exact Python 3.11.2
@@ -14,7 +20,7 @@ wire_sha=a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a
 CHECK 3 PASS: wire protocol hash 5067701b…
 contract_sha=28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef
 CHECK 4 PASS: contract exact
-adapter_sha=5f575ae4bbc9ab45fe8e49b4ef8c6266eb8a2a2bd43f8b025a892b83b43daae4
+adapter_sha=3c8f686bb537ed6258f4b8825b9976c63e8c4b00ebfa57c939a416b3dd666b9d
 CHECK 5 PASS: adapter sha exact matches manifest
 freeze_sha=bd7a76d1171c137f9daee9c0a3dbff029b8cbbccef88f0a1aff7907710a82375
 CHECK 6 PASS: requirements freeze SHA exact bd7a76d1171c137f9daee9c0a3dbff029b8cbbccef88f0a1aff7907710a82375
@@ -155,8 +161,8 @@ NORMAL_BINDING_PASS
 [test-responder] starting mode=normal rounds=2 uid=65534 pid=3 inbox=/work/inbox outbox=/work/outbox
 [test-responder] pid=3 proc1_comm=sandbox-init
 [test-responder] PASS PID1 is sandbox-init
-[test-responder] round 1 received request_id=8ba18acf... digest=faadd971...
-[test-responder] round 2 received request_id=6897baf5... digest=b761ec02...
+[test-responder] round 1 received request_id=674fefdf... digest=5d6ef8f5...
+[test-responder] round 2 received request_id=6d253843... digest=a91ffb93...
 [test-responder] OK mode=normal rounds=2 pid=3
 
 STALE_REJECTED_PASS
@@ -180,7 +186,7 @@ SYNTHETIC_GENUINE_PASS
 CHECK 27 PASS: synthetic genuine 2-round Atlas non-empty
 CHECK 28 PASS: current_event seq14 wiring
 [e2e] step 4b: production genuine via ExternalBrokerClient + FakeBrokerServer (transport)
-FakeBrokerServer at http://127.0.0.1:39491/v1/chat
+FakeBrokerServer at http://127.0.0.1:37251/v1/chat
 prod invocations=2 history=1
 last_provider=fake-broker usage={'total_tokens': 42, 'input_tokens': 20, 'output_tokens': 22}
 PRODUCTION_GENUINE_PASS
@@ -212,38 +218,42 @@ PASS repair unsupported: unsupported reply action: 'round_repair_request'
 CHECK 38 PASS: repair Scheme A
 [e2e] step 8: MS_PRIVATE fail-closed + privdrop
 MS_PRIVATE exit=98
-PASS MS_PRIVATE
+PASS MS_PRIVATE: exact exit 98 + injected marker + jail executed + no payload
+NEGATIVE_JAIL_MS_PRIVATE_EXECUTED_PASS
 privdrop exit=98
+PASS privdrop: exact exit 98 + injected marker + jail executed + no payload
 PASS privdrop
 setgid exit=98
+PASS setgid: exact exit 98 + injected marker + jail executed + no payload
 PASS setgid
 PRIVDROP_DUAL_PASS
+NEGATIVE_JAIL_ACTUALLY_EXECUTED_PASS
 CHECK 39 PASS: MS_PRIVATE fail-closed
 CHECK 40 PASS: privdrop dual
 [e2e] step 9: signal deterministic PID1 forwarding
 [signal] pid log:
 {
-  "outer_wrapper_host_pid": 6248,
-  "outer_wrapper_ns_pid": 6248,
-  "outer_wrapper_ppid": 6246,
-  "outer_wrapper_cmd": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/resident_jail.py --repo /home/user/Haneof-AIOS-Core-v3.0 --sandbox /tmp/b-sleep-test-5887 --world /tmp/b-preflight-e2e-5887/runtime/world.sqlite --index /tmp/b-preflight-e2e-5887/runtime/index.sqlite --state /tmp/b-preflight-e2e-5887/runtime/release_state.json --lock /tmp/b-preflight-e2e-5887/runtime/world.writer.lock --mailbox-root /tmp/b-sleep-mb-5887 --inject-dir /tmp/b-preflight-e2e-5887/inject -- /bin/sleep 30",
-  "unsharer_host_pid": 6249,
-  "unsharer_ns_pid": 6249,
-  "unsharer_ppid": 6248,
-  "pid1_host_pid": 6253,
+  "outer_wrapper_host_pid": 18153,
+  "outer_wrapper_ns_pid": 18153,
+  "outer_wrapper_ppid": 18151,
+  "outer_wrapper_cmd": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/resident_jail.py --repo /home/user/Haneof-AIOS-Core-v3.0 --sandbox /tmp/b-sleep-test-17788 --world /tmp/b-preflight-e2e-17788/runtime/world.sqlite --index /tmp/b-preflight-e2e-17788/runtime/index.sqlite --state /tmp/b-preflight-e2e-17788/runtime/release_state.json --lock /tmp/b-preflight-e2e-17788/runtime/world.sqlite.writer.lock --mailbox-root /tmp/b-sleep-mb-17788 --inject-dir /tmp/b-preflight-e2e-17788/inject -- /bin/sleep 30",
+  "unsharer_host_pid": 18154,
+  "unsharer_ns_pid": 18154,
+  "unsharer_ppid": 18153,
+  "pid1_host_pid": 18158,
   "pid1_ns_pid": 1,
   "pid1_ns_pid_actual": 1,
-  "pid1_host_pid_ns_view": 6253,
+  "pid1_host_pid_ns_view": 18158,
   "pid1_comm": "sandbox-init",
   "worker_fork_return_pid": 3,
   "worker_ns_pid_expected": 2,
-  "worker_host_pid": 6255,
+  "worker_host_pid": 18160,
   "worker_ns_pid_actual": 3,
   "worker_ns_ppid": 1,
   "worker_ppid_host": 1
-}outer=6248 unsharer=6249 pid1_host=6253 worker_host=6255 worker_ns=3
+}outer=18153 unsharer=18154 pid1_host=18158 worker_host=18160 worker_ns=3
 CHECK 41 PASS: PID map outer/unsharer/PID1/worker captured (host pids valid, distinct)
-[signal] sending TERM to PID1 host 6253 (jail PID1)
+[signal] sending TERM to PID1 host 18158 (jail PID1)
 [signal] jail exit code 143
 CHECK 42 PASS: signal TERM forwarded PID1->worker exit 143
 CHECK 43 PASS: worker reaped no zombie
@@ -485,9 +495,9 @@ RUN_ROOT2 init B failed
 }
 RUN_ROOT2 pending set
 binding receipt 9cba565c8bc5
-model_rounds=ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='448857a73379eb3292a10fad89e8e424'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='448857a73379eb3292a10fad89e8e424'))
+model_rounds=ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='4fa32ef0949033c5e5bc2551b39ab1ae'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='4fa32ef0949033c5e5bc2551b39ab1ae'))
 headless stub turn succeeded
-model_rounds 1 directive ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='448857a73379eb3292a10fad89e8e424'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='448857a73379eb3292a10fad89e8e424')) real-providerCHECK 50 PASS: headless CLI turn with ExternalBrokerClient succeeded (HTTPS stub)
+model_rounds 1 directive ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='4fa32ef0949033c5e5bc2551b39ab1ae'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='4fa32ef0949033c5e5bc2551b39ab1ae')) real-providerCHECK 50 PASS: headless CLI turn with ExternalBrokerClient succeeded (HTTPS stub)
 [e2e] step 14: hash mismatch
 PASS contract hash mismatch fail closed: contract SHA env mismatch: expected 28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef, got deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef (STOP)
 CHECK 51 PASS: contract hash mismatch fail closed
@@ -496,10 +506,10 @@ CHECK 52 PASS: wire protocol hash mismatch fail closed
 [e2e] step 15: current-event binding adversarial (baseline valid receipt + 12 negatives)
 {"fixture_sha256":"sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46","next_sequence":14,"phase":"B","status":"initialized"}
 CHECK 53 PASS: disposable init B via canonical command
-{"dimension":"dim:work_state","event_id":"c15rcc-014","modality":"structured_text","occurred_at":"2026-11-09T09:03:00-08:00","resident_visible_payload":"staging 索引 orders-shadow 与昨夜测试残留名称冲突，回归任务被阻塞；production 索引未受影响。","sequence":14,"source_class":"PLATFORM","source_kind":"monitoring"}
-reveal 8-field ok 14 c15rcc-014
+DISPOSABLE_REVEAL seq=14 event_id=c15rcc-014 projection_sha256=c0e3e7d07d62e00c2394ae9e99032dd76aa74afd3960aae35a2ee1286c545f27 payload_sha256=89be96010d003f84b443c2b9482386e26d9d48690398fe948649df5365858eb7 field_count=8
+REVEAL_SHAPE_VALID_PASS
 CHECK 54 PASS: canonical reveal --phase B --state without --sequence (blocker7) produces 8-field projection
-using disp /tmp/b-disp-reveal-5887
+using disp /tmp/b-disp-reveal-9584
 baseline receipt created binding_version=c15-rcc-b-binding-v1 seq=14 sha=74fcbf4eaaae rs_sha=c7a735b2eca3
 BASELINE_VALID_PASS
 CHECK 55 PASS: baseline valid receipt PASS
@@ -512,7 +522,7 @@ PASS modified source_kind rejected for source_kind: current_event.source_kind 'f
 PASS modified source_class rejected for source_class: current_event.source_class 'FAKE' != receipt source_class 'PLATFORM' (modified source_class)
 PASS modified modality rejected for modality: current_event.modality 'fake_modality' != receipt modality 'structured_text' (modified modality)
 PASS wrong session rejected: binding receipt b_session_id 'b-adversarial-001' != 'b-wrong-session' (wrong session)
-PASS stale seq14 after ACK rejected: binding receipt release_state_path '/tmp/b-disp-reveal-5887/runtime/release_state.json' != current '/tmp/tmp2uwlkm_1/rs_stale.json' (path identity mismatch)
+PASS stale seq14 after ACK rejected: binding receipt release_state_path '/tmp/b-disp-reveal-9584/runtime/release_state.json' != current '/tmp/tmp413ufw0c/rs_stale.json' (path identity mismatch)
 PASS missing receipt rejected: binding receipt missing at /tmp/nonexistent-binding.json (current-event binding must exist)
 PASS malformed receipt rejected: binding receipt malformed JSON: Expecting value: line 1 column 1 (char 0)
 BINDING_ADVERSARIAL_PASS
@@ -536,7 +546,7 @@ PASS handler _poisoned == True
 PASS same handler second call poisoned fail: handler poisoned: provider_transport_failure: provider invoke failed: simulated provider transport failure (new instance required)
 PASS _outstanding == None
 PASS release next_sequence not advanced
-PASS durable failure receipt exists /tmp/b-scheme-evidence-6471/failure-latest-1.json
+PASS durable failure receipt exists /tmp/b-scheme-evidence-18375/failure-latest-1.json
 PASS durable evidence session/cursor
 PASS non-JSON fail closed: provider content not JSON: Expecting value: line 1 column 1 (char 0)
 PASS non-JSON provider invoked
@@ -578,7 +588,7 @@ CHECK 82 PASS: catalog evil_cap FAIL closed
 CHECK 83 PASS: empty catalog any capability FAIL
 [e2e] step 17b: adapter hash missing/wrong
 PASS missing adapter hash correctly FAIL: missing mandatory B boundary envs ['AIOS_ADAPTER_SHA256'] (ModelDispatchNotSubmitted/STOP)
-PASS wrong adapter hash correctly FAIL: adapter hash mismatch: expected deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef, got 5f575ae4bbc9ab45fe8e49b4ef8c6266eb8a2a2bd43f8b025a892b83b43daae4 (ModelDispatchNotSubmitted/STOP)
+PASS wrong adapter hash correctly FAIL: adapter hash mismatch: expected deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef, got 3c8f686bb537ed6258f4b8825b9976c63e8c4b00ebfa57c939a416b3dd666b9d (ModelDispatchNotSubmitted/STOP)
 ADAPTER_HASH_PASS
 CHECK 84 PASS: adapter missing hash FAIL closed
 CHECK 85 PASS: adapter wrong hash FAIL closed
@@ -620,9 +630,9 @@ CHECK 99 PASS: wrong saved pending reveal FAIL
 CHECK 100 PASS: receipt schema 7 mutations PASS
 [e2e] step 17e2: live pending fixture triple-binding
 PASS pending_missing create correctly FAIL: release_state pending_reveal.fixture_sha256 missing (must be 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46')
-PASS pending_missing validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-5887/runtime/release_state.json' != current '/tmp/b-fixture-pending_missing-y9uw56tt/release_state.json' (path identity mismatch)
+PASS pending_missing validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-9584/runtime/release_state.json' != current '/tmp/b-fixture-pending_missing-hw0oggy2/release_state.json' (path identity mismatch)
 PASS pending_wrong create correctly FAIL: release_state pending_reveal.fixture_sha256 'sha256:deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef' != canonical 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46' (live fixture mismatch)
-PASS pending_wrong validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-5887/runtime/release_state.json' != current '/tmp/b-fixture-pending_wrong-ajeckzpm/release_state.json' (path identity mismatch)
+PASS pending_wrong validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-9584/runtime/release_state.json' != current '/tmp/b-fixture-pending_wrong-clprpu7u/release_state.json' (path identity mismatch)
 PASS receipt fixture wrong correctly FAIL: binding receipt fixture_sha256 'sha256:deadbeef' != canonical 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46' (wrong fixture SHA)
 PASS exact fixture triple-binding PASS: sha256:7ccb3
 FIXTURE_TRIPLE_PASS
@@ -669,7 +679,7 @@ CHECK 120 PASS: canonical startup env contract complete PASS
 PASS canonical startup uses HTTPS
 CHECK 121 PASS: canonical startup HTTPS
 PASS canonical block contains all 12 envs
-PASS canonical startup reaches transport: ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='d9f6e9e0db3b8091ecf894cfd196a3b0'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='d9f6e9e0db3b8091ecf894cfd196a3b0'))
+PASS canonical startup reaches transport: ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='2075e37e8a32a43b1bb2f011a502dd10'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='2075e37e8a32a43b1bb2f011a502dd10'))
 CHECK 122 PASS: canonical startup execution reaches transport
 [e2e] step 17j: env manifest/gate consistency
 PASS manifest subset semantic
@@ -680,8 +690,44 @@ PASS probe subset check
 CHECK 125 PASS: probe subset gate
 PASS env manifest/gate consistency
 CHECK 126 PASS: environment manifest/gate semantic consistency PASS
+[e2e] corrective-009 blk-01: committed evidence contains no sealed cursor14 payload
+NO_COMMITTED_CURSOR14_PAYLOAD_PASS scanned=29 events=15 legal_event_id_visible=True
+CHECK 127 PASS: BLK-01 committed logs contain no sealed cursor14 payload
+NO_FALSE_NO_REVEAL_PROSE_PASS
+CHECK 128 PASS: BLK-01 prose states disposable reveal only (no false no-reveal claim)
+[e2e] corrective-009 blk-02: portable checkout, no hardcoded absolute path
+CHECK 129 PASS: no hardcoded /home/user/ path in harness/isolation/procedure/checks
+RANDOM_CHECKOUT_REPO_ROOT /tmp/candidate-lwvh1lclbf
+RANDOM_CHECKOUT_CONTRACT_SHA 28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef
+decoy_cwd_rc 0
+corrupt_contract_rc 1
+PORTABLE_CHECKOUT_PASS
+CHECK 130 PASS: BLK-02 candidate importable and contract-provenance-bound from a random /tmp checkout
+CHECK 131 PASS: BLK-02 negative isolation asserted exact exit 98 + injected marker + jail executed
+[e2e] corrective-009 blk-03: canonical runbook executable
+CANONICAL_RUNBOOK_STATIC_PASS
+CHECK 132 PASS: BLK-03 runbook lock name / fence / canonical time / projection loop / provider docs consistent
+documented lock argument: --lock $RUN_ROOT/runtime/world.sqlite.writer.lock
+CHECK 133 PASS: documented --lock uses <world>.writer.lock
+{"index_lag": 0, "index_path": "/tmp/b-preflight-e2e-17788/runbook_probe/runtime/index.sqlite", "index_status": "ready", "index_watermark": 98, "recovery_disposition": "AUTO_RECOVERABLE", "schema_version": 1, "status": "recovery_status", "supported_schema_version": 1, "world_path": "/tmp/b-preflight-e2e-17788/runbook_probe/runtime/world.sqlite", "world_quick_check": ["ok"], "world_revision": 98}
+CHECK 134 PASS: documented recovery-status executes: rev98/watermark98/lag0/AUTO_RECOVERABLE/ok
+CANONICAL_RUNBOOK_EXECUTABLE_PASS
+[e2e] corrective-009 blk-04..08: handler and jail adversarial regressions
+disposable reveal metadata: seq=14 event_id=c15rcc-014 field_count=8
+missing_release_state correctly FAIL: current-event binding failed: BLK-04: release_state missing at /tmp/b-preflight-e2e-17788/c9/runtime/release_s
+MISSING_RELEASE_STATE_FAIL_CLOSED_PASS provider_calls=0 receipts=2
+NO_EVENT_NO_DISPATCH_PASS
+FAILURE_RECEIPT_COLLISION_PASS receipts=2 names_distinct=True
+PAYLOAD_RAN_OK
+INHERITED_FD_SEALED_PASS
+CONTRACT_PROVENANCE_PASS repo_root=/home/user/Haneof-AIOS-Core-v3.0 contract_sha=28d3262f56b7 adapter_sha=3c8f686bb537
+CHECK 135 PASS: BLK-04 missing live release state fails closed (no provider call, durable receipt)
+CHECK 136 PASS: BLK-05 no current-event -> no dispatch for every wake reason / round index
+CHECK 137 PASS: BLK-06 same-second same-round failures produce two distinct 0400 receipts, outstanding cleared
+CHECK 138 PASS: BLK-07 inherited FDs closed before exec; sealed material unreadable inside the jail
+CHECK 139 PASS: BLK-08 contract provenance mechanically bound to the accepted tree, no absolute fallback
 
-ALL_CHECKS=126/126 FAILURES=0
+ALL_CHECKS=139/139 FAILURES=0
 MARKER PASS: ISOLATION_PASS in CURRENT_RUN_LOG
 MARKER PASS: SYNTHETIC_GENUINE_PASS in CURRENT_RUN_LOG
 MARKER PASS: PRODUCTION_GENUINE_PASS in CURRENT_RUN_LOG
@@ -698,6 +744,16 @@ MARKER PASS: WIRE_HASH_PASS in CURRENT_RUN_LOG
 MARKER PASS: BOUNDARY_PASS in CURRENT_RUN_LOG
 MARKER PASS: RECEIPT_SCHEMA_PASS in CURRENT_RUN_LOG
 MARKER PASS: HTTP_BOUNDARY_PASS in CURRENT_RUN_LOG
+MARKER PASS: NO_COMMITTED_CURSOR14_PAYLOAD_PASS in CURRENT_RUN_LOG
+MARKER PASS: NO_FALSE_NO_REVEAL_PROSE_PASS in CURRENT_RUN_LOG
+MARKER PASS: PORTABLE_CHECKOUT_PASS in CURRENT_RUN_LOG
+MARKER PASS: NEGATIVE_JAIL_ACTUALLY_EXECUTED_PASS in CURRENT_RUN_LOG
+MARKER PASS: CANONICAL_RUNBOOK_EXECUTABLE_PASS in CURRENT_RUN_LOG
+MARKER PASS: MISSING_RELEASE_STATE_FAIL_CLOSED_PASS in CURRENT_RUN_LOG
+MARKER PASS: NO_EVENT_NO_DISPATCH_PASS in CURRENT_RUN_LOG
+MARKER PASS: FAILURE_RECEIPT_COLLISION_PASS in CURRENT_RUN_LOG
+MARKER PASS: INHERITED_FD_SEALED_PASS in CURRENT_RUN_LOG
+MARKER PASS: CONTRACT_PROVENANCE_PASS in CURRENT_RUN_LOG
 MARKER PASS: negative self-test (missing marker correctly not found)
-CORRECTIVE_008_E2E_PASS
-[e2e] done 2026-09-25T07:40:20Z
+CORRECTIVE_009_E2E_PASS
+[e2e] done 2026-09-25T08:57:05Z

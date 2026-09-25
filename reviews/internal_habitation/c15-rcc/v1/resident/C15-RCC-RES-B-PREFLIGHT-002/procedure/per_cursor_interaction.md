@@ -2,6 +2,11 @@
 
 This is the exact per-cursor loop that B will run under the frozen `ProductionResidentHandler` + `ExternalBrokerClient` + `resident_wire_protocol.json` (`a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a…`).
 
+**CORRECTIVE-009 / BLK-05 — no event, no dispatch.** Every Phase-B model invocation MUST be bound to a
+current, legally validated B event receipt. `current_event is None` is an unconditional STOP: the handler
+poisons itself, writes a durable failure receipt, and never calls the provider. There is **no**
+`wake_reason` or `round_index` exemption. See "Event lifecycle" below.
+
 Scheme A-hard-stop (`_poisoned` + durable `$RUN_ROOT/evidence/failure-*.json`) — any provider transport, non-JSON, schema, binding failure → fail current runtime, do not advance cursor, save failure evidence, terminate/reconstruct handler, re-enter from same durable sequence/state with new binding, never generate semantic repair hint. No same-handler retry.
 
 ## Invariants
@@ -114,12 +119,13 @@ verify_binding(reply)  # round/id/digest == outstanding; stale/preplay/replay/wr
 - `action` in `invoke_capability|end_turn|silence|summary_response`; `round_repair_request` unsupported → `ValueError` fail closed.
 - `silence` allowlist only `round,id,digest,action`; extra `capability` → fail.
 - On any `provider exception / non-JSON / schema invalid / binding invalid`:
-  1. `ProductionResidentHandler._clear_outstanding_on_failure(reason)` clears `_outstanding`, appends to `_failure_evidence`, **do not** advance release cursor;
-  2. Save evidence to `$RUN_ROOT/evidence/failure-round-*.json`;
-  3. Terminate/reconstruct handler (`_reset_global()` + new `ProductionResidentHandler` with same `b_session` and `release_state_path`);
-  4. Re-enter from same `next_sequence`/durable state;
-  5. Next request has new `round/request_id/request_digest` (proven `new round != old`);
-  6. Never generate semantic repair hint.
+  1. `_poison_and_evidence(...)` poisons the handler, snapshots `_outstanding` into a local copy and **clears `self._outstanding` immediately** (protocol-state cleanup happens BEFORE any disk I/O);
+  2. Persist a **collision-safe** receipt named `failure-<session>-round-<round>-<time_ns>-<nonce>.json`, created with `O_CREAT|O_EXCL` at mode `0400` so a pre-existing receipt can never be overwritten and can never cause a `PermissionError`;
+  3. If the durable write itself fails, the handler is still poisoned, `_outstanding` is still `None`, the same instance is still unusable, and the error is surfaced explicitly as `evidence_persistence_failure` — it never masks the original failure class;
+  4. Terminate/reconstruct handler (`_reset_global()` + new `ProductionResidentHandler` with same `b_session` and `release_state_path`);
+  5. Re-enter from same `next_sequence`/durable state;
+  6. Next request has new `round/request_id/request_digest` (proven `new round != old`);
+  7. Never generate semantic repair hint.
 
 `_assign_binding` leaves `_outstanding` only on success; on failure it is cleared, so next call does **not** hit `cannot send while outstanding`.
 
@@ -128,6 +134,28 @@ verify_binding(reply)  # round/id/digest == outstanding; stale/preplay/replay/wr
 - `directive = reply_to_directive_production(reply,snap,provider_resp)` maps `action` → `ModelDirective` with **RAW provenance** (`provider/model/request_id` actual or `UNKNOWN`, `usage` raw preserved: inconsistent `total<input+output` → `usage None` not rewritten).
 - `FusedTurnRuntime` executes `capability_calls`, appends to `capability_history`, then **same cursor** follow-up: next `__call__` re-uses **same** `current_event` (not next cursor) with updated `capability_history` (contains `Atlas` legal `obs_c14_fixture_*`), same adapter/binding new round, until `silence/end_turn`.
 - If first round `silence/end_turn`, cursor considered complete → operator ACKs via `release_operator.py ack`, `next_sequence` increments, **clear** `current-event.json` (unlink or overwrite) and set new `AIOS_CURRENT_EVENT_PATH` for next seq; handler's next call will load new event (stale seq14 file now rejected because `next_sequence` is 15).
+
+### 5a. Event lifecycle (CORRECTIVE-009 / BLK-05 — mandatory ordering)
+
+For each cursor the ONLY legal order is:
+
+1. `release_operator.py reveal --phase B` → exact 8-field projection;
+2. create the immutable binding receipt (`0400`);
+3. install the projection as `current-event.json` (present, `0400`);
+4. ingest (`canonical_conversation_ingest.py` / `mechanical_ingest_adapter.py`);
+5. model round(s) and capability follow-ups for **this** cursor;
+6. `due` / wake / review work associated with **this** cursor;
+7. all model work for this cursor complete;
+8. durable ACK via `release_operator.py ack`;
+9. **only then** clear `current-event.json` and the binding receipt;
+10. before any further model invocation, reveal the next cursor and install the next binding.
+
+Clearing the event never opens a window in which a model wake can run unbound: any dispatch attempted
+while `current-event.json` is absent (for **any** `wake_reason`, at **any** `round_index`, including
+`periodic_review` at round 1 and round 3) fails closed with `ModelDispatchNotSubmitted`, poisons the
+handler, writes a durable receipt, and performs **zero** provider invocations. `periodic_review`,
+background wakes and summary cycles therefore always run inside a live cursor binding, never between
+cursors.
 
 ## Forbidden actions
 

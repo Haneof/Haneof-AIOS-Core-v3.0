@@ -24,9 +24,55 @@ try:
 except ImportError:
     from mailbox_bridge import MailboxBridge, MailboxEnvelopeError, MailboxReplyError  # type: ignore
 
-REPO_ROOT_DEFAULT = Path("/home/user/Haneof-AIOS-Core-v3.0")
+# CORRECTIVE-009 / BLK-08: repository root is resolved MECHANICALLY from this file.
+# There is deliberately NO hardcoded absolute path and NO parents[N] guess.
 CONTRACT_REL = Path("reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md")
 WIRE_PROTOCOL_REL = Path("reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/resident_wire_protocol.json")
+CORE_PKG_REL = Path("src") / "aios_core"
+
+
+def resolve_repo_root() -> Path:
+    """Resolve the unique accepted repository root that physically contains this harness.
+
+    Walks upward from ``__file__`` and accepts the single ancestor that simultaneously
+    contains ``src/aios_core`` (frozen Core tree) and the canonical B run contract.
+    No absolute fallback: if the ancestor cannot be determined uniquely we fail closed,
+    so the provider request can never be built from an unrelated checkout.
+    """
+    start = Path(__file__).resolve()
+    matches: list[Path] = []
+    for cand in (start.parent, *start.parent.parents):
+        if (cand / CORE_PKG_REL).is_dir() and (cand / CONTRACT_REL).is_file():
+            matches.append(cand)
+    if len(matches) == 1:
+        return matches[0].resolve()
+    if not matches:
+        raise ValueError(
+            f"BLK-08: cannot resolve repo root from {start}: no ancestor contains both "
+            f"{CORE_PKG_REL} and {CONTRACT_REL} (refusing to fall back to any absolute path)"
+        )
+    raise ValueError(
+        f"BLK-08: ambiguous repo root resolution from {start}: {[str(m) for m in matches]}"
+    )
+
+
+def _bound_repo_file(repo_root: Path | None, rel: Path) -> Path:
+    """Resolve ``rel`` inside ``repo_root`` and prove it cannot escape the accepted tree.
+
+    Enforces: regular file, resolved path stays inside the resolved repo root (symlink
+    escape rejected), and the resolved repo root is the mechanically resolved one when
+    no explicit root is supplied.
+    """
+    repo = (Path(repo_root) if repo_root else resolve_repo_root()).resolve()
+    if not repo.is_dir():
+        raise ValueError(f"BLK-08: resolved repo root {repo} is not a directory")
+    raw = repo / rel
+    resolved = raw.resolve()
+    if not resolved.is_relative_to(repo):
+        raise ValueError(f"BLK-08: {rel} resolves outside accepted repo root {repo} (symlink escape)")
+    if not resolved.is_file():
+        raise ValueError(f"BLK-08: required file missing inside accepted repo root: {rel}")
+    return resolved
 WIRE_PROTOCOL_SHA256 = "a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a"  # 1.0.1 mechanical
 WIRE_PROTOCOL_VERSION = "1.0.1"
 
@@ -55,49 +101,23 @@ def get_adapter_sha256() -> str:
     return "unknown"
 
 def get_contract_sha256(repo_root: Path | None = None) -> str:
-    repo = Path(repo_root) if repo_root else REPO_ROOT_DEFAULT
-    p = repo / CONTRACT_REL
-    if not p.exists():
-        alt = Path(__file__).resolve().parents[5] / CONTRACT_REL
-        if alt.exists():
-            p = alt
-    data = p.read_bytes()
-    return hashlib.sha256(data).hexdigest()
+    p = _bound_repo_file(repo_root, CONTRACT_REL)
+    return hashlib.sha256(p.read_bytes()).hexdigest()
 
 def get_contract_text(repo_root: Path | None = None) -> str:
-    repo = Path(repo_root) if repo_root else REPO_ROOT_DEFAULT
-    p = repo / CONTRACT_REL
-    if not p.exists():
-        alt = Path(__file__).resolve().parents[5] / CONTRACT_REL
-        if alt.exists():
-            p = alt
+    p = _bound_repo_file(repo_root, CONTRACT_REL)
     return p.read_text(encoding="utf-8")
 
 def get_wire_protocol_sha256(repo_root: Path | None = None) -> str:
-    repo = Path(repo_root) if repo_root else REPO_ROOT_DEFAULT
-    p = repo / WIRE_PROTOCOL_REL
-    if not p.exists():
-        alt = Path(__file__).resolve().parent / "resident_wire_protocol.json"
-        if alt.exists():
-            p = alt
-    if p.exists():
-        data = p.read_bytes()
-        actual = hashlib.sha256(data).hexdigest()
-        if actual != WIRE_PROTOCOL_SHA256:
-            raise ValueError(f"wire protocol hash mismatch: expected {WIRE_PROTOCOL_SHA256}, got {actual}")
-        return WIRE_PROTOCOL_SHA256
+    p = _bound_repo_file(repo_root, WIRE_PROTOCOL_REL)
+    actual = hashlib.sha256(p.read_bytes()).hexdigest()
+    if actual != WIRE_PROTOCOL_SHA256:
+        raise ValueError(f"wire protocol hash mismatch: expected {WIRE_PROTOCOL_SHA256}, got {actual}")
     return WIRE_PROTOCOL_SHA256
 
 def get_wire_protocol_text(repo_root: Path | None = None) -> str:
-    repo = Path(repo_root) if repo_root else REPO_ROOT_DEFAULT
-    p = repo / WIRE_PROTOCOL_REL
-    if not p.exists():
-        alt = Path(__file__).resolve().parent / "resident_wire_protocol.json"
-        if alt.exists():
-            p = alt
-    if p.exists():
-        return p.read_text(encoding="utf-8")
-    return json.dumps({"error": "wire protocol not found"}, sort_keys=True)
+    p = _bound_repo_file(repo_root, WIRE_PROTOCOL_REL)
+    return p.read_text(encoding="utf-8")
 
 def _serialize_capability_history(history: Any, b_session_id: str) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
@@ -305,19 +325,39 @@ def validate_current_event_binding(
                 alt = rs_path.parent / "binding" / "current-event-binding.json"
                 if alt.exists():
                     bind_path = alt
+    # CORRECTIVE-009 / BLK-04: the live release state is MANDATORY for a Phase-B binding.
+    # A missing / unreadable / malformed / non-object state file can never downgrade the
+    # validation to "receipt only". Fail closed before anything else is inspected.
+    if rs_path is None:
+        raise ValueError("BLK-04: release_state_path is mandatory for current-event binding (none supplied)")
+    if not rs_path.exists():
+        raise ValueError(f"BLK-04: release_state missing at {rs_path} (live state must exist)")
+    if not rs_path.is_file():
+        raise ValueError(f"BLK-04: release_state path is not a regular file: {rs_path}")
+    try:
+        rs_bytes = rs_path.read_bytes()
+    except Exception as e:
+        raise ValueError(f"BLK-04: release_state unreadable at {rs_path}: {e}")
+    try:
+        rs = json.loads(rs_bytes.decode("utf-8"))
+    except Exception as e:
+        raise ValueError(f"BLK-04: release_state malformed JSON at {rs_path}: {e}")
+    if not isinstance(rs, dict):
+        raise ValueError(f"BLK-04: release_state must be a JSON object at {rs_path}")
+    live_rs_sha = hashlib.sha256(rs_bytes).hexdigest()
+
     if current_event is None:
         # Check if event is required
-        if rs_path and rs_path.exists():
-            try:
-                rs = json.loads(rs_path.read_text())
-                nxt = rs.get("next_sequence")
-                # If nxt is not None and pending is None, we may be at a boundary where event is required for next turn
-                # For now, if binding receipt exists and expects an event, fail
-                if bind_path and bind_path.exists():
-                    raise ValueError("current-event is None but binding receipt exists (missing event file)")
-            except ValueError:
-                raise
-            except: pass
+        try:
+            nxt = rs.get("next_sequence")
+            # If nxt is not None and pending is None, we may be at a boundary where event is required for next turn
+            # For now, if binding receipt exists and expects an event, fail
+            if bind_path and bind_path.exists():
+                raise ValueError("current-event is None but binding receipt exists (missing event file)")
+        except ValueError:
+            raise
+        except Exception:
+            pass
         return
     _validate_current_event_fields(current_event)
     # Must have binding receipt
@@ -371,14 +411,10 @@ def validate_current_event_binding(
     # Additional strict: operator_request_id must be non-empty hex-like
     if not isinstance(receipt.get("operator_request_id"), str) or not receipt.get("operator_request_id").strip():
         raise ValueError("binding receipt operator_request_id must be non-empty string")
-    # Validate against release_state
-    if rs_path and rs_path.exists():
-        try:
-            rs_text = rs_path.read_bytes()
-            rs = json.loads(rs_text.decode("utf-8"))
-            current_rs_sha = hashlib.sha256(rs_text).hexdigest()
-        except Exception as e:
-            raise ValueError(f"release_state JSON invalid: {e}")
+    # Validate against release_state (BLK-04: unconditional — live state already proven readable)
+    if True:
+        rs_text = rs_bytes
+        current_rs_sha = live_rs_sha
         nxt = rs.get("next_sequence")
         pending = rs.get("pending_reveal")
         if nxt is not None and current_event.get("sequence") != nxt:
@@ -424,12 +460,8 @@ def validate_current_event_binding(
                 raise ValueError(f"current_event sequence {current_event.get('sequence')} != pending_reveal sequence {pending.get('sequence')}")
             if pending.get("event_id") and current_event.get("event_id") != pending.get("event_id"):
                 raise ValueError(f"current_event event_id {current_event.get('event_id')!r} != pending_reveal event_id {pending.get('event_id')!r}")
-        # Also check release_state sha if receipt has it
-        if receipt.get("release_state_sha256"):
-            actual_rs_sha = hashlib.sha256(rs_path.read_bytes()).hexdigest()
-            # If receipt's release_state_sha is from before reveal, it may differ after ack; we allow mismatch only if receipt's next_sequence matches current nxt?
-            # For strictness, if receipt was created before state transition, its rs sha may be old; we don't fail on rs sha mismatch alone, only on sequence/event_id
-            pass
+        # The live-state SHA is bound above (live_rs_sha / current_rs_sha); the receipt's
+        # release_state_sha256 is compared against it there. No silent re-read here.
 
 # --- Envelope / Request ---
 
@@ -1054,10 +1086,14 @@ class ProductionResidentHandler:
         self._outstanding = None
 
     def _poison_and_evidence(self, failure_class: str, reason: str, request_id: str | None = None, request_digest: str | None = None, provider_request_id: str | None = None) -> None:
+        # CORRECTIVE-009 / BLK-06 ordering: poison, snapshot outstanding, then CLEAR it,
+        # all before any evidence is built or written. A durable-write failure can therefore
+        # never leave a stale _outstanding behind, and never blocks protocol-state cleanup.
         self._poisoned = True
         self._poison_reason = f"{failure_class}: {reason}"
-        # Build evidence even without outstanding (pre-binding failures must still be durable)
         outstanding = self._outstanding
+        self._outstanding = None
+        # Build evidence even without outstanding (pre-binding failures must still be durable)
         evidence: dict[str, Any] = {}
         if outstanding is not None:
             evidence = dict(outstanding)
@@ -1097,20 +1133,33 @@ class ProductionResidentHandler:
         except Exception as e:
             raise ModelDispatchNotSubmitted(f"evidence dir creation failed: {e}") from e
         try:
-            fname = f"failure-{self.b_session_id}-round-{self._round}-{int(time.time())}.json"
+            # CORRECTIVE-009 / BLK-06: collision-safe, never-overwrite receipt name.
+            # time_ns() + an 8-hex nonce makes same-session/same-round/same-second retries
+            # impossible to collide; O_CREAT|O_EXCL guarantees an existing 0400 receipt can
+            # never be silently overwritten or cause a PermissionError.
+            nonce = secrets.token_hex(4)
+            fname = f"failure-{self.b_session_id}-round-{self._round}-{time.time_ns()}-{nonce}.json"
             fpath = self.evidence_dir / fname
-            fpath.write_text(json.dumps(evidence, sort_keys=True, indent=2, ensure_ascii=False), encoding="utf-8")
-            # For latest, ensure we can overwrite even if existing 0400
-            latest = self.evidence_dir / f"failure-latest-{self._round}.json"
-            if latest.exists():
+            evidence["receipt_path"] = str(fpath)
+            payload_text = json.dumps(evidence, sort_keys=True, indent=2, ensure_ascii=False)
+            fd = os.open(str(fpath), os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o400)
+            try:
+                with os.fdopen(fd, "w", encoding="utf-8") as fh:
+                    fh.write(payload_text)
+            except Exception:
                 try:
-                    latest.chmod(0o600)
-                except Exception:
-                    try:
-                        latest.unlink()
-                    except Exception:
-                        pass
-            latest.write_text(json.dumps(evidence, sort_keys=True, indent=2, ensure_ascii=False), encoding="utf-8")
+                    os.close(fd)
+                except OSError:
+                    pass
+                raise
+            # Latest pointer is derived from the unique receipt, never overwritten in place.
+            latest = self.evidence_dir / f"failure-latest-{self._round}.json"
+            try:
+                if latest.exists() or latest.is_symlink():
+                    latest.unlink()
+            except FileNotFoundError:
+                pass
+            latest.write_text(payload_text, encoding="utf-8")
             # Ensure durable: chmod 0400 — fail-closed (CORRECTIVE-007)
             try:
                 fpath.chmod(0o400)
@@ -1137,10 +1186,14 @@ class ProductionResidentHandler:
             except Exception as e:
                 raise ModelDispatchNotSubmitted(f"evidence latest permission check failed: {e}") from e
         except Exception as e:
-            # Surfacing write failure explicitly, not silent
-            raise ModelDispatchNotSubmitted(f"durable failure receipt write failed: {e}") from e
-        if self._outstanding is not None:
-            self._outstanding = None
+            # Surfacing write failure explicitly, not silent, and as its OWN failure class so
+            # it can never be confused with (or mask) the original failure semantics.
+            # _outstanding was already cleared above, so protocol state stays consistent.
+            evidence["evidence_persistence_failure"] = f"{type(e).__name__}: {e}"
+            self._failure_evidence.append(dict(evidence))
+            raise ModelDispatchNotSubmitted(
+                f"evidence_persistence_failure: durable failure receipt write failed: {e}"
+            ) from e
 
     def __call__(self, snapshot: RuntimeSnapshot) -> ModelDirective:
         if self._poisoned:
@@ -1150,26 +1203,28 @@ class ProductionResidentHandler:
         # Refresh current_event per call
         try:
             refreshed = self._load_current_event_from_file()
-            if refreshed is not None or os.getenv("AIOS_CURRENT_EVENT_PATH"):
-                if refreshed is not None:
-                    self.current_event = refreshed
-                else:
-                    if snapshot.wake_reason in ("user_input", "conversation", None) or getattr(snapshot, "round_index", 0) == 0:
-                        if os.getenv("AIOS_CURRENT_EVENT_PATH"):
-                            raise ModelDispatchNotSubmitted("current-event file missing on event-driven turn (fail closed)")
-                    self.current_event = None
         except ModelDispatchNotSubmitted:
             self._poison_and_evidence("binding_failure", "current-event refresh failed", provider_request_id=None)
             raise
         except Exception as e:
             self._poison_and_evidence("binding_failure", f"current-event refresh failed: {e}")
             raise ModelDispatchNotSubmitted(f"current-event refresh failed: {e}") from e
-        if self.current_event is not None:
-            try:
-                validate_current_event_binding(self.current_event, self.b_session_id, release_state_path=self.release_state_path, binding_receipt_path=self.binding_receipt_path)
-            except Exception as e:
-                self._poison_and_evidence("binding_failure", str(e))
-                raise ModelDispatchNotSubmitted(f"current-event binding failed: {e}") from e
+        self.current_event = refreshed
+        if self.current_event is None:
+            self._poison_and_evidence(
+                "binding_failure",
+                "no current-event binding: Phase-B model dispatch requires a current legal B event "
+                "(no event -> no dispatch, no wake_reason/round_index exemption)",
+            )
+            raise ModelDispatchNotSubmitted(
+                "no current-event binding: Phase-B model dispatch requires a current legal B event "
+                "(no event -> no dispatch)"
+            )
+        try:
+            validate_current_event_binding(self.current_event, self.b_session_id, release_state_path=self.release_state_path, binding_receipt_path=self.binding_receipt_path)
+        except Exception as e:
+            self._poison_and_evidence("binding_failure", str(e))
+            raise ModelDispatchNotSubmitted(f"current-event binding failed: {e}") from e
         # Build envelope
         try:
             envelope = build_envelope(snapshot, self.b_session_id, self.contract_sha256, current_event=self.current_event, release_state_path=self.release_state_path, binding_receipt_path=self.binding_receipt_path)

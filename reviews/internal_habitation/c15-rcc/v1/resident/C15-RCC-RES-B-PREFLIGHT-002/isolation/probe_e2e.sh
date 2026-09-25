@@ -1,12 +1,29 @@
 #!/bin/bash
-# C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-008 — Full E2E probe (operator side, exact gate).
-# Must be run as root (sudo). Proves 12 blockers CORRECTIVE-008 + adversarial (11 binding, transport, poison, catalog).
+# C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-009 — Full E2E probe (operator side, exact gate).
+# Must be run as root (sudo). Closes the 8 independent-acceptance blockers (BLK-01..BLK-08).
 # EXPECTED_CHECKS exact, 0 FAIL, mandatory markers, else non-zero.
+#
+# CORRECTIVE-009 / BLK-02: this probe is fully portable. REPO_ROOT / B_PREP / HARNESS_DIR are
+# derived mechanically from THIS script's location, are exported so every child process (including
+# the Python subprocesses that read os.getenv) sees them, and no absolute path is hardcoded
+# anywhere in the executable path. The probe may be run from any CWD and from any checkout path.
 set -euo pipefail
 
-REPO_ROOT="${REPO_ROOT:-/home/user/Haneof-AIOS-Core-v3.0}"
-B_PREP="$REPO_ROOT/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002"
+SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+B_PREP_DEFAULT="$(cd "$SELF_DIR/.." && pwd)"
+REPO_ROOT_DEFAULT="$(cd "$B_PREP_DEFAULT/../../../../../.." && pwd)"
+REPO_ROOT="${REPO_ROOT:-$REPO_ROOT_DEFAULT}"
+B_PREP="${B_PREP:-$B_PREP_DEFAULT}"
 HARNESS_DIR="$B_PREP/harness"
+
+# Portability preconditions: fail closed, never fall back to a hardcoded absolute path.
+[ -d "$REPO_ROOT/src/aios_core" ] || { echo "STOP: $REPO_ROOT/src/aios_core missing (REPO_ROOT=$REPO_ROOT)"; exit 97; }
+[ -f "$REPO_ROOT/reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md" ] || { echo "STOP: canonical B contract missing under $REPO_ROOT"; exit 97; }
+[ -f "$HARNESS_DIR/bridged_model_handler.py" ] || { echo "STOP: harness missing under $HARNESS_DIR"; exit 97; }
+export REPO_ROOT B_PREP HARNESS_DIR
+# All repo-relative paths inside the probe assume CWD == repo root; make that true regardless of
+# where the operator invoked the probe from.
+cd "$REPO_ROOT"
 
 RUN_ROOT="${RUN_ROOT:-/tmp/b-preflight-e2e-$$}"
 CURRENT_RUN_LOG="$RUN_ROOT/e2e.log"
@@ -20,7 +37,7 @@ echo "[e2e] CURRENT_RUN_LOG=$CURRENT_RUN_LOG"
 cp "$B_PREP/lineage_copy/private_world.sqlite" "$RUN_ROOT/runtime/world.sqlite"
 cp "$B_PREP/lineage_copy/world_index.sqlite" "$RUN_ROOT/runtime/index.sqlite"
 cp "$B_PREP/lineage_copy/release_state.json" "$RUN_ROOT/runtime/release_state.json"
-touch "$RUN_ROOT/runtime/world.writer.lock"
+touch "$RUN_ROOT/runtime/world.sqlite.writer.lock"
 
 (cd "$RUN_ROOT/runtime" && sha256sum -c - <<EOF
 626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa  world.sqlite
@@ -47,7 +64,7 @@ FAILURES=0
 pass_check() { CHECKS=$((CHECKS+1)); echo "CHECK $CHECKS PASS: $*"; }
 fail_check() { FAILURES=$((FAILURES+1)); echo "CHECK FAIL: $*"; }
 
-EXPECTED_CHECKS=126
+EXPECTED_CHECKS=139
 echo "[e2e] EXPECTED_CHECKS=$EXPECTED_CHECKS"
 
 # Step 0: exact environment (CORRECTIVE-005: freeze Python/Pydantic/wire/adapter/contract/freeze, not OS/kernel)
@@ -117,7 +134,7 @@ sudo "$PY" "$HARNESS_DIR/resident_jail.py" \
   --world     "$RUN_ROOT/runtime/world.sqlite" \
   --index     "$RUN_ROOT/runtime/index.sqlite" \
   --state     "$RUN_ROOT/runtime/release_state.json" \
-  --lock      "$RUN_ROOT/runtime/world.writer.lock" \
+  --lock      "$RUN_ROOT/runtime/world.sqlite.writer.lock" \
   --mailbox-root "$RUN_ROOT/mailbox" \
   --inject-dir "$RUN_ROOT/inject" \
   -- /bin/sh /work/inject/probe_isolation.sh 2>&1 | tee "$RUN_ROOT/isolation_probe.log"
@@ -152,7 +169,7 @@ b="probe-normal"
 bridge=MailboxBridge(run_root/"mailbox"/"inbox",run_root/"mailbox"/"outbox",run_root/"mailbox"/"archive",b)
 sb=run_root/"sandbox"
 if sb.exists(): os.system(f"sudo rm -rf '{sb}'")
-jail=["sudo","--preserve-env=PROBE_MODE,PROBE_ROUNDS,PATH","python3",str(b_prep/"harness"/"resident_jail.py"),"--repo",str(repo),"--sandbox",str(sb),"--world",str(run_root/"runtime"/"world.sqlite"),"--index",str(run_root/"runtime"/"index.sqlite"),"--state",str(run_root/"runtime"/"release_state.json"),"--lock",str(run_root/"runtime"/"world.writer.lock"),"--mailbox-root",str(run_root/"mailbox"),"--inject-dir",str(run_root/"inject"),"--","/usr/bin/python3","/work/inject/responder.py","--mode","normal","--rounds","2"]
+jail=["sudo","--preserve-env=PROBE_MODE,PROBE_ROUNDS,PATH","python3",str(b_prep/"harness"/"resident_jail.py"),"--repo",str(repo),"--sandbox",str(sb),"--world",str(run_root/"runtime"/"world.sqlite"),"--index",str(run_root/"runtime"/"index.sqlite"),"--state",str(run_root/"runtime"/"release_state.json"),"--lock",str(run_root/"runtime"/"world.sqlite.writer.lock"),"--mailbox-root",str(run_root/"mailbox"),"--inject-dir",str(run_root/"inject"),"--","/usr/bin/python3","/work/inject/responder.py","--mode","normal","--rounds","2"]
 env=os.environ.copy()
 proc=subprocess.Popen(jail,env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 time.sleep(1.2)
@@ -271,7 +288,7 @@ from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.query.search import WorldSearchIndex
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from datetime import datetime, timezone
-world=run_root/"runtime"/"world.sqlite"; index=run_root/"runtime"/"index.sqlite"; lock=run_root/"runtime"/"world.writer.lock"
+world=run_root/"runtime"/"world.sqlite"; index=run_root/"runtime"/"index.sqlite"; lock=run_root/"runtime"/"world.sqlite.writer.lock"
 store=SQLiteWorldStore(world); idx=WorldSearchIndex(index, store=store)
 b_session="probe-synth-genuine-001"
 contract_sha=get_contract_sha256(repo)
@@ -407,10 +424,12 @@ pass_check "UNKNOWN handling"
 # Step 5 current-event negatives (6)
 echo "[e2e] step 5: current-event / envelope negatives (6)"
 "$PY" - <<'PYEOF'
-import sys, json, tempfile
+import os, sys, json, tempfile
 from pathlib import Path
-sys.path.insert(0,"/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness")
-sys.path.insert(0,"/home/user/Haneof-AIOS-Core-v3.0/src")
+# BLK-02: paths arrive via argv/env only — no hardcoded absolute fallback anywhere.
+_h = os.environ["HARNESS_DIR"]; _r = os.environ["REPO_ROOT"]
+sys.path.insert(0, _h)
+sys.path.insert(0, os.path.join(_r, "src"))
 from mailbox_bridge import MailboxBridge, MailboxEnvelopeError
 import tempfile
 from pathlib import Path as P
@@ -460,9 +479,9 @@ pass_check "source_kind invalid rejected"
 # Step 6 strict reply
 echo "[e2e] step 6: strict reply schema"
 "$PY" - <<'PYEOF'
-import sys, json, tempfile
+import os, sys, json, tempfile
 from pathlib import Path
-sys.path.insert(0,"/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness")
+sys.path.insert(0, os.environ["HARNESS_DIR"])
 from mailbox_bridge import MailboxBridge, MailboxReplyError
 with tempfile.TemporaryDirectory() as td:
     r=Path(td)
@@ -485,9 +504,11 @@ pass_check "strict reply silence{capability}"
 # Step 7 repair Scheme A
 echo "[e2e] step 7: repair Scheme A"
 "$PY" - <<'PYEOF'
-import sys, json
-sys.path.insert(0,"/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness")
-sys.path.insert(0,"/home/user/Haneof-AIOS-Core-v3.0/src")
+import os, sys, json
+# BLK-02: paths arrive via argv/env only — no hardcoded absolute fallback anywhere.
+_h = os.environ["HARNESS_DIR"]; _r = os.environ["REPO_ROOT"]
+sys.path.insert(0, _h)
+sys.path.insert(0, os.path.join(_r, "src"))
 from bridged_model_handler import ProviderResponse, get_contract_sha256
 from pathlib import Path
 from bridged_model_handler import _reply_to_directive_production
@@ -512,9 +533,19 @@ echo "[e2e] step 8: MS_PRIVATE fail-closed + privdrop"
 sudo -E "$PY" - "$RUN_ROOT" "$B_PREP" "$REPO_ROOT" <<'PYEOF'
 import subprocess, sys, os
 from pathlib import Path
-run_root=Path(sys.argv[1]) if len(sys.argv)>1 else Path(os.getenv("RUN_ROOT"))
-b_prep=Path(os.getenv("B_PREP")) if os.getenv("B_PREP") else Path("/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002")
-repo=Path(os.getenv("REPO_ROOT")) if os.getenv("REPO_ROOT") else Path("/home/user/Haneof-AIOS-Core-v3.0")
+# BLK-02: resolve ONLY from argv / exported env, and fail closed. There is deliberately no
+# absolute fallback, so a misconfigured run can never silently test a different tree.
+def _need(k):
+    v = os.getenv(k)
+    if not v:
+        print(f"FAIL: required env {k} not set"); sys.exit(1)
+    return Path(v)
+run_root=Path(sys.argv[1]) if len(sys.argv)>1 else _need("RUN_ROOT")
+b_prep=_need("B_PREP")
+repo=_need("REPO_ROOT")
+jail_py = b_prep/"harness"/"resident_jail.py"
+if not jail_py.is_file():
+    print(f"FAIL: candidate jail not found at {jail_py}"); sys.exit(1)
 sb=run_root/"sandbox_msprivate"
 mb=run_root/"mailbox_msprivate"
 if sb.exists(): os.system(f"sudo rm -rf '{sb}'")
@@ -523,13 +554,35 @@ mb.mkdir(parents=True)
 for sub in ("inbox","outbox","archive"): (mb/sub).mkdir()
 env=os.environ.copy()
 env["_RESIDENT_JAIL_INJECT_MS_PRIVATE_FAIL"]="1"
-cmd=["sudo","--preserve-env=_RESIDENT_JAIL_INJECT_MS_PRIVATE_FAIL","python3",str(b_prep/"harness"/"resident_jail.py"),"--repo",str(repo),"--sandbox",str(sb),"--world",str(run_root/"runtime"/"world.sqlite"),"--index",str(run_root/"runtime"/"index.sqlite"),"--state",str(run_root/"runtime"/"release_state.json"),"--lock",str(run_root/"runtime"/"world.writer.lock"),"--mailbox-root",str(mb),"--inject-dir",str(run_root/"inject"),"--","/bin/sh","-c","echo SHOULD_NOT_RUN; exit 0"]
+cmd=["sudo","--preserve-env=_RESIDENT_JAIL_INJECT_MS_PRIVATE_FAIL","python3",str(jail_py),"--repo",str(repo),"--sandbox",str(sb),"--world",str(run_root/"runtime"/"world.sqlite"),"--index",str(run_root/"runtime"/"index.sqlite"),"--state",str(run_root/"runtime"/"release_state.json"),"--lock",str(run_root/"runtime"/"world.sqlite.writer.lock"),"--mailbox-root",str(mb),"--inject-dir",str(run_root/"inject"),"--","/bin/sh","-c","echo SHOULD_NOT_RUN; exit 0"]
 import subprocess
 result=subprocess.run(cmd,env=env,capture_output=True,text=True)
 print(f"MS_PRIVATE exit={result.returncode}")
-if result.returncode==0: print("FAIL MS_PRIVATE"); sys.exit(1)
+# BLK-02: "nonzero" is NOT a pass. Require the EXACT fail-closed exit code, the EXACT injected
+# failure marker on stderr, proof that the candidate jail actually executed, and proof that the
+# payload sentinel never ran.
+def _require_exact(name, r, expect_rc, marker, sentinel_dir):
+    ok = True
+    if r.returncode != expect_rc:
+        print(f"FAIL {name}: exit {r.returncode} != expected {expect_rc} (jail may not have run at all)"); ok = False
+    if marker not in (r.stderr or ""):
+        print(f"FAIL {name}: stderr missing injected failure marker {marker!r}; stderr={(r.stderr or '')[-300:]!r}"); ok = False
+    if "Traceback (most recent call last)" in (r.stderr or "") and "sandbox setup FAILED" not in (r.stderr or ""):
+        print(f"FAIL {name}: unexpected traceback rather than fail-closed setup error"); ok = False
+    for junk in ("can't open file", "No such file or directory"):
+        if junk in (r.stderr or ""):
+            print(f"FAIL {name}: candidate jail was NOT executed ({junk} in stderr)"); ok = False
+    if "SHOULD_NOT_RUN" in (r.stdout or ""):
+        print(f"FAIL {name}: payload sentinel executed"); ok = False
+    if sentinel_dir is not None and (sentinel_dir/"SENTINEL").exists():
+        print(f"FAIL {name}: payload sentinel file created"); ok = False
+    if not ok: sys.exit(1)
+    print(f"PASS {name}: exact exit {expect_rc} + injected marker + jail executed + no payload")
+    return True
+
+_require_exact("MS_PRIVATE", result, 98, "sandbox setup FAILED", None)
 if (mb/"outbox"/"SHOULD_NOT_RUN").exists(): print("FAIL sentinel"); sys.exit(1)
-print("PASS MS_PRIVATE")
+print("NEGATIVE_JAIL_MS_PRIVATE_EXECUTED_PASS")
 sb2=run_root/"sandbox_privdrop"
 mb2=run_root/"mailbox_privdrop"
 if sb2.exists(): os.system(f"sudo rm -rf '{sb2}'")
@@ -540,18 +593,19 @@ wrapper=run_root/"inject"/"sentinel_wrapper2.sh"
 wrapper.write_text("#!/bin/sh\necho sentinel > /work/outbox/SENTINEL\n")
 wrapper.chmod(0o755)
 env2=os.environ.copy(); env2["_RESIDENT_JAIL_INJECT_PRIVDROP_FAIL"]="1"
-cmd2=["sudo","--preserve-env=_RESIDENT_JAIL_INJECT_PRIVDROP_FAIL,_RESIDENT_JAIL_INJECT_FAIL_MODE","python3",str(b_prep/"harness"/"resident_jail.py"),"--repo",str(repo),"--sandbox",str(sb2),"--world",str(run_root/"runtime"/"world.sqlite"),"--index",str(run_root/"runtime"/"index.sqlite"),"--state",str(run_root/"runtime"/"release_state.json"),"--lock",str(run_root/"runtime"/"world.writer.lock"),"--mailbox-root",str(mb2),"--inject-dir",str(run_root/"inject"),"--","/bin/sh","/work/inject/sentinel_wrapper2.sh"]
+cmd2=["sudo","--preserve-env=_RESIDENT_JAIL_INJECT_PRIVDROP_FAIL,_RESIDENT_JAIL_INJECT_FAIL_MODE","python3",str(b_prep/"harness"/"resident_jail.py"),"--repo",str(repo),"--sandbox",str(sb2),"--world",str(run_root/"runtime"/"world.sqlite"),"--index",str(run_root/"runtime"/"index.sqlite"),"--state",str(run_root/"runtime"/"release_state.json"),"--lock",str(run_root/"runtime"/"world.sqlite.writer.lock"),"--mailbox-root",str(mb2),"--inject-dir",str(run_root/"inject"),"--","/bin/sh","/work/inject/sentinel_wrapper2.sh"]
 r2=subprocess.run(cmd2,env=env2,capture_output=True,text=True)
 print(f"privdrop exit={r2.returncode}")
-if r2.returncode==0: print("FAIL privdrop"); sys.exit(1)
+_require_exact("privdrop", r2, 98, "injected privdrop failure", mb2/"outbox")
 print("PASS privdrop")
 env3=os.environ.copy(); env3["_RESIDENT_JAIL_INJECT_FAIL_MODE"]="setgid"
 r3=subprocess.run(cmd2,env=env3,capture_output=True,text=True)
 print(f"setgid exit={r3.returncode}")
-if r3.returncode==0: print("FAIL setgid"); sys.exit(1)
+_require_exact("setgid", r3, 98, "injected setgid failure", mb2/"outbox")
 print("PASS setgid")
 if (mb2/"outbox"/"SENTINEL").exists(): print("FAIL sentinel after"); sys.exit(1)
 print("PRIVDROP_DUAL_PASS")
+print("NEGATIVE_JAIL_ACTUALLY_EXECUTED_PASS")
 PYEOF
 pass_check "MS_PRIVATE fail-closed"
 pass_check "privdrop dual"
@@ -571,7 +625,7 @@ AIOS_JAIL_PID_LOG="$PID_LOG" sudo -E python3 "$HARNESS_DIR/resident_jail.py" \
   --world "$RUN_ROOT/runtime/world.sqlite" \
   --index "$RUN_ROOT/runtime/index.sqlite" \
   --state "$RUN_ROOT/runtime/release_state.json" \
-  --lock "$RUN_ROOT/runtime/world.writer.lock" \
+  --lock "$RUN_ROOT/runtime/world.sqlite.writer.lock" \
   --mailbox-root "$SLEEP_MB" \
   --inject-dir "$RUN_ROOT/inject" \
   -- /bin/sleep 30 >"$SLEEP_JAIL_LOG" 2>&1 &
@@ -628,7 +682,7 @@ sudo "$PY" "$HARNESS_DIR/resident_jail.py" \
   --world "$RUN_ROOT/runtime/world.sqlite" \
   --index "$RUN_ROOT/runtime/index.sqlite" \
   --state "$RUN_ROOT/runtime/release_state.json" \
-  --lock "$RUN_ROOT/runtime/world.writer.lock" \
+  --lock "$RUN_ROOT/runtime/world.sqlite.writer.lock" \
   --mailbox-root "$RUN_ROOT/mailbox" \
   --inject-dir "$RUN_ROOT/inject" \
   -- /bin/sh -c 'env | sort' 2>&1 | grep -E "PROBE" && fail_check "PROBE leaked without allow" || pass_check "env without allow PROBE not leaked"
@@ -638,7 +692,7 @@ AIOS_ALLOW_PROBE_ENV=1 PROBE_MODE=genuine PROBE_ROUNDS=2 sudo --preserve-env=AIO
   --world "$RUN_ROOT/runtime/world.sqlite" \
   --index "$RUN_ROOT/runtime/index.sqlite" \
   --state "$RUN_ROOT/runtime/release_state.json" \
-  --lock "$RUN_ROOT/runtime/world.writer.lock" \
+  --lock "$RUN_ROOT/runtime/world.sqlite.writer.lock" \
   --mailbox-root "$RUN_ROOT/mailbox" \
   --inject-dir "$RUN_ROOT/inject" \
   -- /bin/sh -c 'env | sort' 2>&1 | grep -q "PROBE_MODE=genuine" && pass_check "env with allow PROBE explicitly allowed" || fail_check "PROBE not passed with allow"
@@ -655,7 +709,7 @@ os.environ.pop("AIOS_REAL_PROVIDER_API_KEY", None)
 os.environ.pop("AIOS_REAL_PROVIDER_ENDPOINT", None)
 os.environ["AIOS_B_SESSION_ID"]="test-b-session-001"
 # CORRECTIVE-006: set mandatory boundary envs so test reaches provider check
-import hashlib, pathlib as _pl, tempfile, json as _js
+import os, hashlib, pathlib as _pl, tempfile, json as _js
 _actual_sha = hashlib.sha256(_pl.Path("reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/bridged_model_handler.py").read_bytes()).hexdigest()
 os.environ["AIOS_ADAPTER_SHA256"]=_actual_sha
 os.environ["AIOS_CONTRACT_SHA256"]="28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef"
@@ -734,7 +788,7 @@ os.environ["AIOS_REAL_PROVIDER_API_KEY"]="sk-test"
 os.environ["AIOS_REAL_PROVIDER_ENDPOINT"]="https://example/v1"
 os.environ["AIOS_PROVIDER_ADAPTER"]="bridged_model_handler:FakeProviderClient"
 # CORRECTIVE-006: mandatory envs for prod entrypoint
-import hashlib, pathlib as _pl2, tempfile as _tf2, json as _js2
+import os, hashlib, pathlib as _pl2, tempfile as _tf2, json as _js2
 _actual_sha2 = hashlib.sha256(_pl2.Path("reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/bridged_model_handler.py").read_bytes()).hexdigest()
 os.environ["AIOS_ADAPTER_SHA256"]=_actual_sha2
 os.environ["AIOS_CONTRACT_SHA256"]="28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef"
@@ -785,7 +839,7 @@ mkdir -p "$RUN_ROOT2"/{runtime,mailbox/{inbox,outbox,archive}}
 cp "$B_PREP/lineage_copy/private_world.sqlite" "$RUN_ROOT2/runtime/world.sqlite"
 cp "$B_PREP/lineage_copy/world_index.sqlite" "$RUN_ROOT2/runtime/index.sqlite"
 cp "$B_PREP/lineage_copy/release_state.json" "$RUN_ROOT2/runtime/release_state.json"
-touch "$RUN_ROOT2/runtime/world.writer.lock"
+touch "$RUN_ROOT2/runtime/world.sqlite.writer.lock"
 touch "$RUN_ROOT2/runtime/world.sqlite.writer.lock"
 PYTHONPATH=src:reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness python3 -m aios_core.headless.cli --help 2>&1 | head -5
 # Now run init and then a turn with real provider mock
@@ -833,7 +887,7 @@ print('binding receipt', receipt['canonical_projection_sha256'][:12])
 # Production headless turn via HTTPS stub (CORRECTIVE-008: production is HTTPS-only, no loopback)
 # Monkeypatch urllib.request.urlopen to simulate broker without network
 python3 - <<'PYEOF'
-import json, sys, pathlib, hashlib, os, urllib.request
+import os, json, sys, pathlib, hashlib, urllib.request
 from pathlib import Path
 run_root2 = Path(os.environ.get("RUN_ROOT2", "/tmp/b-headless-test"))
 # Read binding to get expected digest etc. but we will stub transport below
@@ -958,7 +1012,7 @@ os.environ["AIOS_REAL_PROVIDER_API_KEY"]="sk-test"
 os.environ["AIOS_REAL_PROVIDER_ENDPOINT"]="https://example/v1"
 os.environ["AIOS_CONTRACT_SHA256"]="deadbeef"*8  # wrong
 # CORRECTIVE-006: need other mandatory envs to reach contract check
-import hashlib, pathlib as _plh, tempfile as _tfh, json as _jsh
+import os, hashlib, pathlib as _plh, tempfile as _tfh, json as _jsh
 _actual = hashlib.sha256(_plh.Path("reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/bridged_model_handler.py").read_bytes()).hexdigest()
 os.environ["AIOS_ADAPTER_SHA256"]=_actual
 os.environ["AIOS_WIRE_PROTOCOL_SHA256"]="a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a"
@@ -1026,7 +1080,7 @@ mkdir -p "$DISP_ROOT/runtime" "$DISP_ROOT/binding"
 cp "$B_PREP/lineage_copy/private_world.sqlite" "$DISP_ROOT/runtime/world.sqlite"
 cp "$B_PREP/lineage_copy/world_index.sqlite" "$DISP_ROOT/runtime/index.sqlite"
 cp "$B_PREP/lineage_copy/release_state.json" "$DISP_ROOT/runtime/release_state.json"
-touch "$DISP_ROOT/runtime/world.writer.lock"
+touch "$DISP_ROOT/runtime/world.sqlite.writer.lock"
 
 # Init Phase B on disposable
 PYTHONPATH=src python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py init --phase B --state "$DISP_ROOT/runtime/release_state.json" 2>&1 | tee "$DISP_ROOT/init.log"
@@ -1036,9 +1090,21 @@ pass_check "disposable init B via canonical command"
 # Canonical reveal: NO --sequence flag (blocker 7)
 PYTHONPATH=src python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B --state "$DISP_ROOT/runtime/release_state.json" > "$DISP_ROOT/reveal.json" 2> "$DISP_ROOT/reveal.err"
 if [ ! -s "$DISP_ROOT/reveal.json" ]; then echo "reveal failed no output"; cat "$DISP_ROOT/reveal.err"; fail_check "reveal returned empty"; exit 1; fi
-cat "$DISP_ROOT/reveal.json"
-# Verify reveal is 8-field projection (visible keys)
-python3 -c "import json; d=json.load(open('$DISP_ROOT/reveal.json')); assert set(d.keys())=={'event_id','sequence','occurred_at','dimension','source_kind','source_class','modality','resident_visible_payload'}, f\"reveal not 8-field: {d.keys()}\"; print('reveal 8-field ok', d['sequence'], d['event_id'])"
+# BLK-01: NEVER print or persist resident_visible_payload. Emit mechanical metadata only.
+python3 - "$DISP_ROOT/reveal.json" <<'PYMETA'
+import hashlib, json, sys
+from pathlib import Path
+raw = Path(sys.argv[1]).read_bytes()
+d = json.loads(raw.decode("utf-8"))
+assert set(d.keys()) == {"event_id","sequence","occurred_at","dimension","source_kind",
+                         "source_class","modality","resident_visible_payload"}, f"reveal not 8-field: {sorted(d.keys())}"
+payload = d["resident_visible_payload"]
+canon = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+print("DISPOSABLE_REVEAL seq=%s event_id=%s projection_sha256=%s payload_sha256=%s field_count=%d"
+      % (d["sequence"], d["event_id"], hashlib.sha256(raw).hexdigest(),
+         hashlib.sha256(canon).hexdigest(), len(d)))
+print("REVEAL_SHAPE_VALID_PASS")
+PYMETA
 pass_check "canonical reveal --phase B --state without --sequence (blocker7) produces 8-field projection"
 
 # Create binding receipt from EXACT reveal stdout bytes (capture digest)
@@ -1288,7 +1354,7 @@ class NonJSONProvider:
         self.invocations+=1
         return ProviderResponse(provider="real-provider", model="real-model-v1", request_id="real-req-001", usage={"total_tokens":42}, content="not json{{{", raw=None)
 client_nj=NonJSONProvider()
-import shutil as sh2, tempfile as tf2
+import os, shutil as sh2, tempfile as tf2
 rs_path_nj = Path(tf2.mktemp(suffix=".json"))
 sh2.copy(str(rs_path), str(rs_path_nj))
 binding_nj = Path(tf2.mktemp(suffix=".json"))
@@ -2044,6 +2110,8 @@ if grep -R "006 exact gate" "$B_PREP" --exclude-dir=isolation 2>/dev/null | grep
 if grep -R "107-check" "$B_PREP" --exclude-dir=isolation 2>/dev/null | grep -v "probe_e2e.sh" | grep -q "107-check"; then echo "FAIL stale 107-check found"; grep -R "107-check" "$B_PREP" | grep -v "probe_e2e.sh" || true; stale_found=1; fi
 if grep -R "CORRECTIVE_006_E2E_PASS" "$B_PREP" --exclude-dir=isolation 2>/dev/null | grep -v "probe_e2e.sh" | grep -q "CORRECTIVE_006"; then echo "FAIL stale CORRECTIVE_006_E2E_PASS found"; grep -R "CORRECTIVE_006_E2E_PASS" "$B_PREP" | grep -v "probe_e2e.sh" || true; stale_found=1; fi
 if grep -R "CORRECTIVE_007_E2E_PASS" "$B_PREP" --exclude-dir=isolation 2>/dev/null | grep -v "probe_e2e.sh" | grep -q "CORRECTIVE_007"; then echo "FAIL stale CORRECTIVE_007_E2E_PASS found"; grep -R "CORRECTIVE_007_E2E_PASS" "$B_PREP" --exclude-dir=isolation | grep -v "probe_e2e.sh" || true; stale_found=1; fi
+if grep -R "CORRECTIVE_008_E2E_PASS" "$B_PREP" --exclude-dir=isolation 2>/dev/null | grep -v "probe_e2e.sh" | grep -q "CORRECTIVE_008"; then echo "FAIL stale CORRECTIVE_008_E2E_PASS found"; grep -R "CORRECTIVE_008_E2E_PASS" "$B_PREP" --exclude-dir=isolation | grep -v "probe_e2e.sh" || true; stale_found=1; fi
+if grep -REn "EXPECTED_CHECKS=126|126 checks|126-check" "$B_PREP" --exclude-dir=isolation --include="*.md" 2>/dev/null | grep -q .; then echo "FAIL stale 126-check count found"; grep -REn "EXPECTED_CHECKS=126|126 checks|126-check" "$B_PREP" --exclude-dir=isolation --include="*.md" || true; stale_found=1; fi
 # Old source_kind enum must not appear in procedure (should be opaque)
 if grep -R "conversation|mechanical|monitoring" "$B_PREP/procedure/" 2>/dev/null | grep -v "probe_e2e.sh" | grep -q "conversation"; then
   # Allow the new opaque description which mentions the words but not as enum pipe; check for the exact enum pattern
@@ -2116,7 +2184,7 @@ from pathlib import Path
 startup = Path("reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/procedure/b_startup_procedure.md").read_text()
 # Find the bash block
 import re as _re
-m = _re.search(r"```bash\n(export AIOS_B_SESSION_ID.*?headless_production_handler.*?```)", startup, _re.DOTALL)
+m = _re.search(r"```bash\n(.*?export AIOS_B_SESSION_ID.*?headless_production_handler.*?```)", startup, _re.DOTALL)
 if not m:
     print("FAIL canonical block not found")
     sys.exit(1)
@@ -2146,7 +2214,7 @@ for f in ["private_world.sqlite", "world_index.sqlite"]:
     (tmp / "runtime").mkdir(parents=True, exist_ok=True)
     if src.exists():
         shutil.copy(src, tmp / "runtime" / "world.sqlite" if "private" in f else tmp / "runtime" / "index.sqlite")
-Path(tmp / "runtime" / "world.writer.lock").touch()
+Path(tmp / "runtime" / "world.sqlite.writer.lock").touch()
 Path(tmp / "binding").mkdir(parents=True, exist_ok=True)
 Path(tmp / "evidence").mkdir(parents=True, exist_ok=True)
 # Create a dummy current-event and binding that would be created by operator reveal (use same as probe)
@@ -2257,6 +2325,466 @@ else
 fi
 
 
+
+# =====================================================================================
+# CORRECTIVE-009 — regression gates for the 8 independent-acceptance blockers
+# Every marker below is produced by a real behavioural test, never echoed by the gate.
+# =====================================================================================
+
+# ---- BLK-01: committed evidence must contain no sealed cursor-14 payload ------------
+echo "[e2e] corrective-009 blk-01: committed evidence contains no sealed cursor14 payload"
+python3 - <<'PYEOF'
+import json, sys
+from pathlib import Path
+repo = Path(__import__("os").environ["REPO_ROOT"])
+b_prep = Path(__import__("os").environ["B_PREP"])
+fixture = repo / "reviews/internal_habitation/c15-rcc/v1/fixture/sealed_fixture.json"
+assert fixture.is_file(), f"sealed fixture missing at {fixture}"
+data = json.loads(fixture.read_text(encoding="utf-8"))
+events = data["events"] if isinstance(data, dict) and "events" in data else data
+targets = []
+for ev in events:
+    if not isinstance(ev, dict):
+        continue
+    seq = ev.get("sequence")
+    payload = ev.get("resident_visible_payload")
+    if seq is None or payload is None:
+        continue
+    if isinstance(payload, str):
+        targets.append((seq, payload))
+    else:
+        targets.append((seq, json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)))
+        targets.append((seq, json.dumps(payload, sort_keys=True, ensure_ascii=False)))
+scan = []
+for sub in ("isolation", "checks", "procedure", "harness", "lineage_copy"):
+    d = b_prep / sub
+    if d.is_dir():
+        scan += [p for p in d.rglob("*") if p.is_file() and p.suffix in (".txt", ".md", ".sh", ".py", ".json")]
+scan += [p for p in b_prep.glob("*.md") if p.is_file()]
+leaks = []
+for p in scan:
+    try:
+        txt = p.read_text(encoding="utf-8", errors="replace")
+    except Exception:
+        continue
+    for seq, needle in targets:
+        if len(needle) >= 8 and needle in txt:
+            leaks.append((str(p.relative_to(repo)), seq))
+assert not leaks, f"BLK-01 FAIL: sealed payload present in committed evidence: {sorted(set(leaks))}"
+# event_id / sequence / digests are ALLOWED; only payload bytes are forbidden.
+allowed_id = "c15rcc-014"
+found_id = any(allowed_id in p.read_text(encoding="utf-8", errors="replace") for p in scan)
+print(f"NO_COMMITTED_CURSOR14_PAYLOAD_PASS scanned={len(scan)} events={len(targets)//2} legal_event_id_visible={found_id}")
+PYEOF
+pass_check "BLK-01 committed logs contain no sealed cursor14 payload"
+
+python3 - <<'PYEOF'
+import os, re
+from pathlib import Path
+b_prep = Path(os.environ["B_PREP"])
+docs = [b_prep/"completion_report.md", b_prep/"checks"/"mechanical_checks.md", b_prep/"operator_manifest.md"]
+banned = ["reveal was never called", "no reveal called", "no preflight reveal", "grep no reveal"]
+bad = []
+for d in docs:
+    t = d.read_text(encoding="utf-8")
+    for b in banned:
+        if b.lower() in t.lower():
+            bad.append((d.name, b))
+required_token = "disposable"
+missing = [d.name for d in docs if required_token not in d.read_text(encoding="utf-8").lower()]
+never_presented = [d.name for d in docs
+                   if "never presented to a resident" not in d.read_text(encoding="utf-8").lower()]
+assert not bad, f"BLK-01 FAIL: false no-reveal prose remains: {bad}"
+assert not missing, f"BLK-01 FAIL: corrected disposable-reveal prose missing in {missing}"
+assert not never_presented, f"BLK-01 FAIL: 'never presented to a Resident' claim missing in {never_presented}"
+print("NO_FALSE_NO_REVEAL_PROSE_PASS")
+PYEOF
+pass_check "BLK-01 prose states disposable reveal only (no false no-reveal claim)"
+
+# ---- BLK-02: portable checkout + no hardcoded absolute dependency -------------------
+echo "[e2e] corrective-009 blk-02: portable checkout, no hardcoded absolute path"
+# The probe itself is excluded: it must not match its own gate text.
+_ABS_GREP=$(grep -Rn "/home/user/" "$B_PREP/harness" "$B_PREP/isolation" "$B_PREP/procedure" "$B_PREP/checks" \
+     --include="*.py" --include="*.sh" --include="*.md" --exclude="probe_e2e.sh" 2>/dev/null || true)
+if [ -n "$_ABS_GREP" ]; then
+  echo "FAIL: hardcoded /home/user/ path in executable path"
+  echo "$_ABS_GREP"
+  fail_check "no hardcoded absolute path in executable path"
+else
+  pass_check "no hardcoded /home/user/ path in harness/isolation/procedure/checks"
+fi
+python3 - <<'PYEOF'
+import os, random, shutil, string, subprocess, sys, tempfile
+from pathlib import Path
+repo = Path(os.environ["REPO_ROOT"]); b_prep = Path(os.environ["B_PREP"])
+rnd = "/tmp/candidate-" + "".join(random.choice(string.ascii_lowercase + string.digits) for _ in range(10))
+dst = Path(rnd)
+if dst.exists():
+    shutil.rmtree(dst)
+# Copy the candidate tree to a random path (only what the harness needs).
+for k in ("src", "reviews"):
+    shutil.copytree(repo / k, dst / k, symlinks=True)
+HARN = dst / "reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness"
+
+PROBE_SRC = """
+import sys
+sys.path.insert(0, %r)
+sys.path.insert(0, %r)
+import bridged_model_handler as H
+import resident_jail as J
+rr = H.resolve_repo_root(); jr = J.resolve_repo_root()
+assert str(rr) == %r, ('handler repo root', str(rr))
+assert str(jr) == %r, ('jail repo root', str(jr))
+assert '/home' + '/user' not in str(rr), ('hardcoded leak', str(rr))
+cs = H.get_contract_sha256()
+assert cs == '28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef', cs
+assert H.get_wire_protocol_sha256() == 'a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a'
+print('RANDOM_CHECKOUT_REPO_ROOT', rr)
+print('RANDOM_CHECKOUT_CONTRACT_SHA', cs)
+""" % (str(HARN), str(dst / "src"), str(dst.resolve()), str(dst.resolve()))
+probe_py = dst / "_c9_portability_probe.py"
+probe_py.write_text(PROBE_SRC, encoding="utf-8")
+env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
+# Run from cwd=/tmp: completely unrelated to the operator's checkout.
+r = subprocess.run([sys.executable, str(probe_py)], cwd="/tmp", capture_output=True, text=True, env=env)
+print(r.stdout.strip())
+if r.returncode != 0:
+    print(r.stderr[-2500:])
+    raise SystemExit("BLK-02 FAIL: handler not bound to the random checkout")
+
+# A decoy contract with the same relative name in an unrelated directory must NOT win.
+decoy_dir = Path(tempfile.mkdtemp(prefix="decoy-"))
+(decoy_dir / "RESIDENT_B_RUN_CONTRACT.md").write_text("# decoy\nnot the real contract\n", encoding="utf-8")
+r2 = subprocess.run([sys.executable, str(probe_py)], cwd=str(decoy_dir), capture_output=True, text=True, env=env)
+print("decoy_cwd_rc", r2.returncode)
+assert r2.returncode == 0, r2.stderr[-1500:]
+assert "RANDOM_CHECKOUT_CONTRACT_SHA 28d3262f" in r2.stdout, r2.stdout
+
+# A corrupted contract INSIDE the accepted tree must change the resolved SHA (fail closed upstream).
+corrupt = dst / "reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md"
+corrupt.write_text("# corrupted\n", encoding="utf-8")
+r3 = subprocess.run([sys.executable, str(probe_py)], cwd="/tmp", capture_output=True, text=True, env=env)
+print("corrupt_contract_rc", r3.returncode)
+assert r3.returncode != 0, "BLK-08 FAIL: corrupted contract still resolved to the frozen SHA"
+shutil.rmtree(dst, ignore_errors=True)
+shutil.rmtree(decoy_dir, ignore_errors=True)
+print("PORTABLE_CHECKOUT_PASS")
+PYEOF
+pass_check "BLK-02 candidate importable and contract-provenance-bound from a random /tmp checkout"
+pass_check "BLK-02 negative isolation asserted exact exit 98 + injected marker + jail executed"
+
+# ---- BLK-03: canonical runbook must be executable ----------------------------------
+echo "[e2e] corrective-009 blk-03: canonical runbook executable"
+python3 - <<'PYEOF'
+import os, re
+from pathlib import Path
+b_prep = Path(os.environ["B_PREP"]); repo = Path(os.environ["REPO_ROOT"])
+start = (b_prep / "procedure/b_startup_procedure.md").read_text(encoding="utf-8")
+freeze = (b_prep / "procedure/final_freeze_procedure.md").read_text(encoding="utf-8")
+bad = []
+if "world.writer.lock" in start or "world.writer.lock" in freeze:
+    bad.append("stale world.writer.lock remains")
+for name, txt in (("b_startup_procedure.md", start), ("final_freeze_procedure.md", freeze)):
+    fences = txt.count("\n```")
+    if fences % 2 != 0:
+        bad.append(f"{name} unbalanced code fence ({fences})")
+    if "\n```bash\n```bash\n" in txt:
+        bad.append(f"{name} doubled ```bash fence")
+if re.search(r'--at\s+"?2026-11-05T09:00:00-08:00"?', start):
+    bad.append("hardcoded non-canonical --at time")
+if "CURRENT_OCCURRED_AT" not in start:
+    bad.append("canonical occurred_at not derived from the current projection")
+if "event-%03d" not in start and "event-014.projection.json" not in start:
+    bad.append("per-cursor projection evidence loop missing")
+_man = (b_prep/"resident_safe_packet_manifest.md").read_text(encoding="utf-8")
+for _stale in ("replace with `RealProviderClient`", "RealProviderClient(", "walks the same code path",
+               "replace with RealProviderClient"):
+    if _stale in _man:
+        bad.append(f"stale provider wording remains: {_stale!r}")
+if "ExternalBrokerClient" not in _man:
+    bad.append("canonical production transport not documented")
+if "does not" not in _man.lower() or "production path" not in _man.lower():
+    bad.append("manifest does not state FakeProviderClient is unreachable from production")
+assert not bad, f"BLK-03 FAIL: {bad}"
+print("CANONICAL_RUNBOOK_STATIC_PASS")
+PYEOF
+pass_check "BLK-03 runbook lock name / fence / canonical time / projection loop / provider docs consistent"
+
+# Execute the EXACT documented recovery-status command from the runbook.
+RB_RUN_ROOT="$RUN_ROOT/runbook_probe"
+mkdir -p "$RB_RUN_ROOT/runtime"
+cp "$B_PREP/lineage_copy/private_world.sqlite" "$RB_RUN_ROOT/runtime/world.sqlite"
+cp "$B_PREP/lineage_copy/world_index.sqlite" "$RB_RUN_ROOT/runtime/index.sqlite"
+cp "$B_PREP/lineage_copy/release_state.json" "$RB_RUN_ROOT/runtime/release_state.json"
+touch "$RB_RUN_ROOT/runtime/world.sqlite.writer.lock"
+DOC_LOCK_CMD=$(grep -m1 -oE '\-\-lock[[:space:]]+[^\\]*world\.sqlite\.writer\.lock' "$B_PREP/procedure/b_startup_procedure.md" | sed 's/[[:space:]]\+/ /g')
+echo "documented lock argument: $DOC_LOCK_CMD"
+case "$DOC_LOCK_CMD" in
+  *world.sqlite.writer.lock*) pass_check "documented --lock uses <world>.writer.lock" ;;
+  *) fail_check "documented --lock still wrong" ;;
+esac
+RB_OUT=$(PYTHONPATH="$REPO_ROOT/src:$HARNESS_DIR" python3 -m aios_core.headless.cli \
+  --world "$RB_RUN_ROOT/runtime/world.sqlite" \
+  --index "$RB_RUN_ROOT/runtime/index.sqlite" \
+  --lock  "$RB_RUN_ROOT/runtime/world.sqlite.writer.lock" \
+  recovery-status 2>&1) || true
+echo "$RB_OUT" | head -3
+if echo "$RB_OUT" | grep -q '"world_revision": *98' && echo "$RB_OUT" | grep -q '"index_lag": *0' \
+   && echo "$RB_OUT" | grep -q 'AUTO_RECOVERABLE' && echo "$RB_OUT" | grep -q '"world_quick_check": *\["ok"\]'; then
+  pass_check "documented recovery-status executes: rev98/watermark98/lag0/AUTO_RECOVERABLE/ok"
+  echo "CANONICAL_RUNBOOK_EXECUTABLE_PASS"
+else
+  fail_check "documented recovery-status did not execute as documented"
+  exit 1
+fi
+
+# ---- BLK-04 / BLK-05 / BLK-06 / BLK-07 / BLK-08 handler + jail regressions ----------
+echo "[e2e] corrective-009 blk-04..08: handler and jail adversarial regressions"
+sudo -E "$PY" - "$RUN_ROOT" "$B_PREP" "$REPO_ROOT" <<'PYEOF'
+import json, os, shutil, subprocess, sys, time
+from pathlib import Path
+run_root = Path(sys.argv[1]); b_prep = Path(sys.argv[2]); repo = Path(sys.argv[3])
+sys.path.insert(0, str(b_prep / "harness")); sys.path.insert(0, str(repo / "src"))
+from bridged_model_handler import (ProductionResidentHandler, create_current_event_binding_receipt,
+                                   write_binding_receipt, validate_current_event_binding,
+                                   get_contract_sha256, get_adapter_sha256,
+                                   resolve_repo_root, _bound_repo_file, CONTRACT_REL)
+from aios_core.runtime.cognitive_runtime import ModelDispatchNotSubmitted, RuntimeSnapshot
+
+CATALOG = ("search_world", "read_world_map", "world_map")
+HISTORY = ()
+
+def snap(wake="conversation", rnd=0):
+    return RuntimeSnapshot(user_input="u", wake_reason=wake, cockpit={"world_revision": 98},
+                           capability_catalog=CATALOG, capability_history=HISTORY,
+                           round_index=rnd, remaining_tool_rounds=3)
+
+class StubProvider:
+    """Pure transport stub: echoes the binding fields the handler assigned, like a real broker."""
+    def __init__(self):
+        self.calls = 0
+        self.last_request = None
+    def invoke(self, request):
+        self.calls += 1
+        self.last_request = request
+        env = json.loads(request["messages"][-1]["content"])
+        class R:
+            provider = "stub-provider"; model = "stub-model-v1"
+            request_id = "stub-req-" + env["request_id"][:8]
+            usage = {"prompt_tokens": 3, "completion_tokens": 4, "total_tokens": 7}
+            content = json.dumps({"round": env["round"], "request_id": env["request_id"],
+                                  "request_digest": env["request_digest"], "action": "silence"})
+        return R()
+
+# fresh disposable Phase-B state
+W = run_root / "c9"
+if W.exists():
+    subprocess.run(["sudo", "rm", "-rf", str(W)], check=False)
+(W / "runtime").mkdir(parents=True); (W / "binding").mkdir(parents=True); (W / "evidence").mkdir(parents=True)
+_SRC = {"private_world.sqlite": "world.sqlite", "world_index.sqlite": "index.sqlite",
+        "release_state.json": "release_state.json"}
+for src_name, dst_name in _SRC.items():
+    shutil.copyfile(b_prep / "lineage_copy" / src_name, W / "runtime" / dst_name)
+rs = W / "runtime" / "release_state.json"
+(W / "runtime" / "world.sqlite.writer.lock").touch()
+env = os.environ.copy()
+env["PYTHONPATH"] = f"{repo/'src'}:{b_prep/'harness'}"
+_OP = "reviews/internal_habitation/c15-rcc/v1/release/release_operator.py"
+subprocess.run([sys.executable, _OP, "init", "--phase", "B", "--state", str(rs)],
+               env=env, check=True, capture_output=True, text=True)
+# Exactly ONE disposable reveal (a second one is forbidden before durable ACK). Its stdout is
+# captured in-process and never printed, so the sealed payload cannot reach the tee'd log.
+_rev = subprocess.run([sys.executable, _OP, "reveal", "--phase", "B", "--state", str(rs)],
+                      env=env, check=True, capture_output=True, text=True)
+proj = json.loads(_rev.stdout)
+print("disposable reveal metadata: seq=%s event_id=%s field_count=%d"
+      % (proj.get("sequence"), proj.get("event_id"), len(proj)))
+ev_path = W / "current-event.json"
+bind_path = W / "binding" / "current-event-binding.json"
+ev_path.write_text(json.dumps(proj), encoding="utf-8")
+SESS = "b-corrective-009"
+receipt = create_current_event_binding_receipt(proj, b_session_id=SESS, release_state_path=rs)
+write_binding_receipt(receipt, bind_path)
+
+def fresh_handler(provider=None, evidence=None):
+    os.environ["AIOS_CURRENT_EVENT_PATH"] = str(ev_path)
+    os.environ["AIOS_RELEASE_STATE_PATH"] = str(rs)
+    return ProductionResidentHandler(b_session_id=SESS, provider_client=provider or StubProvider(),
+                                     release_state_path=rs, binding_receipt_path=bind_path,
+                                     evidence_dir=evidence or (W / "evidence"))
+
+# ---- BLK-04: missing live release state must fail closed ---------------------------
+h = fresh_handler()
+ok_base = h(snap())
+assert ok_base is not None, "baseline handler call failed"
+base_calls = h.provider_client.calls
+rs_bytes = rs.read_bytes()
+rs.unlink()
+h2 = fresh_handler()
+calls_before = h2.provider_client.calls
+try:
+    h2(snap())
+    raise AssertionError("BLK-04 FAIL: dispatch succeeded with release_state deleted")
+except ModelDispatchNotSubmitted as e:
+    assert "BLK-04" in str(e) or "release_state" in str(e), str(e)
+    print("missing_release_state correctly FAIL:", str(e)[:110])
+assert h2.provider_client.calls == calls_before, "BLK-04 FAIL: provider invoked with release_state deleted"
+assert h2._poisoned, "BLK-04 FAIL: handler not poisoned"
+assert h2._outstanding is None, "BLK-04 FAIL: outstanding not cleared"
+receipts = sorted((W / "evidence").glob("failure-*.json"))
+assert receipts, "BLK-04 FAIL: no durable failure receipt"
+print("MISSING_RELEASE_STATE_FAIL_CLOSED_PASS provider_calls=%d receipts=%d" % (h2.provider_client.calls, len(receipts)))
+rs.write_bytes(rs_bytes)
+
+# ---- BLK-05: no current-event -> no dispatch, any wake reason / round ---------------
+for wake, rnd in (("user_input", 0), ("conversation", 0), (None, 0), ("periodic_review", 0),
+                  ("periodic_review", 1), ("periodic_review", 3), ("background_attempt", 5)):
+    ev_path.unlink()
+    hh = fresh_handler()
+    before = hh.provider_client.calls
+    try:
+        hh(snap(wake=wake, rnd=rnd))
+        raise AssertionError(f"BLK-05 FAIL: dispatched with no event (wake={wake!r} round={rnd})")
+    except ModelDispatchNotSubmitted as e:
+        assert "no current-event binding" in str(e), str(e)
+    assert hh.provider_client.calls == before, f"BLK-05 FAIL: provider invoked with no event (wake={wake!r} round={rnd})"
+    assert hh._poisoned and hh._outstanding is None
+    ev_path.write_text(json.dumps(proj), encoding="utf-8")
+print("NO_EVENT_NO_DISPATCH_PASS")
+# malformed event file must also fail closed
+ev_path.write_text("{ not json", encoding="utf-8")
+hm = fresh_handler()
+try:
+    hm(snap()); raise AssertionError("BLK-05 FAIL: malformed current-event accepted")
+except ModelDispatchNotSubmitted:
+    pass
+ev_path.write_text(json.dumps(proj), encoding="utf-8")
+
+# ---- BLK-06: same-session/same-round/same-second collision -------------------------
+ev_dir = W / "collision"
+ev_dir.mkdir(parents=True, exist_ok=True)
+seen = []
+for i in range(2):
+    hp = fresh_handler(evidence=ev_dir)
+    hp.provider_client.invoke = lambda req: (_ for _ in ()).throw(RuntimeError("transport exploded"))
+    try:
+        hp(snap())
+        raise AssertionError("BLK-06 FAIL: transport failure not raised")
+    except ModelDispatchNotSubmitted as e:
+        assert "provider invoke failed" in str(e), str(e)
+        assert "evidence_persistence_failure" not in str(e), str(e)
+        seen.append(str(e)[:60])
+    assert hp._poisoned, "BLK-06 FAIL: handler not poisoned"
+    assert hp._outstanding is None, "BLK-06 FAIL: outstanding not cleared"
+# `failure-latest-*.json` is a convenience pointer, not a failure receipt.
+files = sorted(p for p in ev_dir.glob("failure-*.json") if not p.name.startswith("failure-latest-"))
+assert len(files) == 2, f"BLK-06 FAIL: {len(files)} receipts for 2 failures (collision)"
+names = [f.name for f in files]
+assert len(set(names)) == 2, f"BLK-06 FAIL: duplicate receipt names {names}"
+for f in files:
+    assert (f.stat().st_mode & 0o777) == 0o400, f"BLK-06 FAIL: {f} not 0400"
+    d = json.loads(f.read_text())
+    assert d.get("failure_class") == "provider_transport_failure", d.get("failure_class")
+    assert "transport exploded" in d.get("failure_reason", ""), d.get("failure_reason")
+    _nonce = f.name[:-5].rsplit("-", 1)[-1]
+    _ns = f.name[:-5].rsplit("-", 2)[-2]
+    assert _ns.isdigit() and len(_ns) >= 19, f"receipt name not time_ns based: {f.name}"
+    assert len(_nonce) == 8 and all(c in "0123456789abcdef" for c in _nonce), f"receipt nonce weak: {f.name}"
+print("FAILURE_RECEIPT_COLLISION_PASS receipts=%d names_distinct=%s" % (len(files), len(set(names)) == 2))
+
+# ---- BLK-07: inherited FDs must not be readable inside the jail --------------------
+sealed = repo / "reviews/internal_habitation/c15-rcc/v1/fixture/sealed_fixture.json"
+notes = repo / "reviews/internal_habitation/c15-rcc/v1/evaluator/EVALUATOR_ONLY_design_notes.md"
+unrelated = Path("/etc/hostname")
+assert sealed.is_file() and notes.is_file() and unrelated.is_file()
+inj = W / "inject"; inj.mkdir(parents=True, exist_ok=True)
+fdtest = inj / "fdtest.sh"
+FD_SCRIPT = """#!/bin/sh
+fail=0
+# 0/1/2 must still work through /dev/fd (proves the mechanism is alive).
+for f in /dev/fd/0 /dev/fd/1 /dev/fd/2; do
+  if [ ! -e "$f" ]; then echo "STDIO_FD_MISSING $f"; fail=1; fi
+done
+# Every inherited descriptor must be gone.
+for f in 3 4 5 7 9; do
+  for base in /dev/fd /proc/self/fd; do
+    if [ -e "$base/$f" ]; then echo "FD_LEAK_VISIBLE $base/$f"; fail=1; fi
+  done
+done
+# And the sealed material must be unreadable by any route.
+if head -c 32 /dev/fd/3 >/dev/null 2>&1; then echo 'SEALED_READABLE_VIA_FD3'; fail=1; fi
+if head -c 32 /dev/fd/4 >/dev/null 2>&1; then echo 'NOTES_READABLE_VIA_FD4'; fail=1; fi
+if head -c 32 /dev/fd/7 >/dev/null 2>&1; then echo 'SEALED_READABLE_VIA_FD7'; fail=1; fi
+if head -c 32 /dev/fd/9 >/dev/null 2>&1; then echo 'NOTES_READABLE_VIA_FD9'; fail=1; fi
+if head -c 32 /dev/fd/5 >/dev/null 2>&1; then echo 'UNRELATED_READABLE_VIA_FD5'; fail=1; fi
+# No surviving descriptor may point at sealed material.
+for l in /proc/self/fd/*; do
+  t=$(readlink "$l" 2>/dev/null) || continue
+  case "$t" in
+    *sealed_fixture.json|*EVALUATOR_ONLY_design_notes.md)
+      echo "SEALED_TARGET_VISIBLE $l -> $t"; fail=1 ;;
+  esac
+done
+echo PAYLOAD_RAN_OK
+exit $fail
+"""
+fdtest.write_text(FD_SCRIPT, encoding="utf-8")
+fdtest.chmod(0o755)
+mb = W / "mailbox_fd"
+for sub in ("inbox", "outbox", "archive"):
+    (mb / sub).mkdir(parents=True, exist_ok=True)
+fd3 = os.open(str(sealed), os.O_RDONLY)
+fd4 = os.open(str(notes), os.O_RDONLY)
+fd5 = os.open(str(unrelated), os.O_RDONLY)
+fd7 = os.dup(fd3)   # same sealed fixture at a higher descriptor number
+fd9 = os.dup(fd4)   # same evaluator notes at a higher descriptor number
+try:
+    r = subprocess.run(["sudo", "--preserve-env=PATH", sys.executable, str(b_prep / "harness" / "resident_jail.py"),
+                        "--repo", str(repo), "--sandbox", str(W / "sandbox_fd"),
+                        "--world", str(W / "runtime" / "world.sqlite"), "--index", str(W / "runtime" / "index.sqlite"),
+                        "--state", str(rs), "--lock", str(W / "runtime" / "world.sqlite.writer.lock"),
+                        "--mailbox-root", str(mb), "--inject-dir", str(inj),
+                        "--", "/bin/sh", "/work/inject/fdtest.sh"],
+                       capture_output=True, text=True, pass_fds=(fd3, fd4, fd5, fd7, fd9))
+finally:
+    for _fd in (fd3, fd4, fd5, fd7, fd9):
+        try:
+            os.close(_fd)
+        except OSError:
+            pass
+out = (r.stdout or "") + (r.stderr or "")
+print(out.strip()[-800:])
+assert r.returncode == 0, f"BLK-07 FAIL: fd probe exit {r.returncode}"
+for marker in ("PAYLOAD_RAN_OK",):
+    assert marker in out, f"BLK-07 FAIL: payload did not run normally ({marker} missing)"
+for bad in ("FD_LEAK_VISIBLE", "SEALED_READABLE_VIA_FD3", "SEALED_READABLE_VIA_FD7",
+            "NOTES_READABLE_VIA_FD4", "NOTES_READABLE_VIA_FD9", "UNRELATED_READABLE_VIA_FD5",
+            "SEALED_TARGET_VISIBLE", "STDIO_FD_MISSING"):
+    assert bad not in out, f"BLK-07 FAIL: {bad}: {out[-300:]}"
+print("INHERITED_FD_SEALED_PASS")
+
+# ---- BLK-08: contract provenance bound to the accepted tree ------------------------
+sha = get_contract_sha256()
+assert sha == "28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef", sha
+rr = resolve_repo_root()
+assert str(rr) == str(repo.resolve()), (str(rr), str(repo.resolve()))
+p = _bound_repo_file(None, CONTRACT_REL)
+assert p.is_file() and str(p).startswith(str(rr))
+try:
+    _bound_repo_file(Path("/tmp"), CONTRACT_REL)
+    raise AssertionError("BLK-08 FAIL: contract resolved outside the accepted tree")
+except ValueError:
+    pass
+print("CONTRACT_PROVENANCE_PASS repo_root=%s contract_sha=%s adapter_sha=%s"
+      % (rr, sha[:12], get_adapter_sha256()[:12]))
+PYEOF
+pass_check "BLK-04 missing live release state fails closed (no provider call, durable receipt)"
+pass_check "BLK-05 no current-event -> no dispatch for every wake reason / round index"
+pass_check "BLK-06 same-second same-round failures produce two distinct 0400 receipts, outstanding cleared"
+pass_check "BLK-07 inherited FDs closed before exec; sealed material unreadable inside the jail"
+pass_check "BLK-08 contract provenance mechanically bound to the accepted tree, no absolute fallback"
+
+
 # Final gate: exact check count
 echo
 echo "ALL_CHECKS=$CHECKS/$EXPECTED_CHECKS FAILURES=$FAILURES"
@@ -2271,7 +2799,11 @@ fi
 # Also require mandatory markers via CURRENT_RUN_LOG (exec > >(tee) contract, blocker 3)
 # Mandatory markers must all be in CURRENT_RUN_LOG (not via separate echo)
 mkdir -p "$RUN_ROOT"
-for m in ISOLATION_PASS SYNTHETIC_GENUINE_PASS PRODUCTION_GENUINE_PASS PRODUCTION_TRANSPORT_PASS ENVIRONMENT_PASS BINDING_ADVERSARIAL_PASS SCHEME_A_PASS BASELINE_VALID_PASS ALL_BINDING_TESTS_PASS UNKNOWN_PROVENANCE_PASS CATALOG_PASS ADAPTER_HASH_PASS WIRE_HASH_PASS BOUNDARY_PASS RECEIPT_SCHEMA_PASS HTTP_BOUNDARY_PASS; do
+for m in ISOLATION_PASS SYNTHETIC_GENUINE_PASS PRODUCTION_GENUINE_PASS PRODUCTION_TRANSPORT_PASS ENVIRONMENT_PASS BINDING_ADVERSARIAL_PASS SCHEME_A_PASS BASELINE_VALID_PASS ALL_BINDING_TESTS_PASS UNKNOWN_PROVENANCE_PASS CATALOG_PASS ADAPTER_HASH_PASS WIRE_HASH_PASS BOUNDARY_PASS RECEIPT_SCHEMA_PASS HTTP_BOUNDARY_PASS \
+         NO_COMMITTED_CURSOR14_PAYLOAD_PASS NO_FALSE_NO_REVEAL_PROSE_PASS PORTABLE_CHECKOUT_PASS \
+         NEGATIVE_JAIL_ACTUALLY_EXECUTED_PASS CANONICAL_RUNBOOK_EXECUTABLE_PASS \
+         MISSING_RELEASE_STATE_FAIL_CLOSED_PASS NO_EVENT_NO_DISPATCH_PASS \
+         FAILURE_RECEIPT_COLLISION_PASS INHERITED_FD_SEALED_PASS CONTRACT_PROVENANCE_PASS; do
   if grep -q "$m" "$CURRENT_RUN_LOG" 2>/dev/null; then
     echo "MARKER PASS: $m in CURRENT_RUN_LOG"
   else
@@ -2290,5 +2822,5 @@ if [ "$FAILURES" -ne 0 ]; then
   echo "GATE FAIL: marker failures $FAILURES"
   exit 1
 fi
-echo "CORRECTIVE_008_E2E_PASS"
+echo "CORRECTIVE_009_E2E_PASS"
 echo "[e2e] done $(date -u +%Y-%m-%dT%H:%M:%SZ)"

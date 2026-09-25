@@ -1,4 +1,4 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Exact B Startup Procedure (CORRECTIVE-008 frozen)
+# C15-RCC-RES-B-PREFLIGHT-002 — Exact B Startup Procedure (CORRECTIVE-009 frozen)
 
 This procedure is prepared by preflight but NOT executed. It will be carried out by the independent release task `C15-RCC-RES-B-RELEASE-002` after this preflight is independently reviewed and accepted.
 
@@ -28,7 +28,7 @@ mkdir -p $RUN_ROOT/{runtime,sandbox,mailbox/{inbox,outbox,archive},evidence/{mai
 cp reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/lineage_copy/private_world.sqlite   $RUN_ROOT/runtime/world.sqlite
 cp reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/lineage_copy/world_index.sqlite     $RUN_ROOT/runtime/index.sqlite
 cp reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/lineage_copy/release_state.json    $RUN_ROOT/runtime/release_state.json
-touch $RUN_ROOT/runtime/world.writer.lock
+touch $RUN_ROOT/runtime/world.sqlite.writer.lock
 ```
 
 Verify digests:
@@ -52,7 +52,7 @@ If any mismatch, STOP — no `pip install`, no upgrade.
 PYTHONPATH=src:reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness python3 -m aios_core.headless.cli \
   --world $RUN_ROOT/runtime/world.sqlite \
   --index $RUN_ROOT/runtime/index.sqlite \
-  --lock  $RUN_ROOT/runtime/world.writer.lock \
+  --lock  $RUN_ROOT/runtime/world.sqlite.writer.lock \
   recovery-status
 ```
 
@@ -88,7 +88,7 @@ sudo python3 reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFL
   --world   $RUN_ROOT/runtime/world.sqlite \
   --index   $RUN_ROOT/runtime/index.sqlite \
   --state   $RUN_ROOT/runtime/release_state.json \
-  --lock    $RUN_ROOT/runtime/world.writer.lock \
+  --lock    $RUN_ROOT/runtime/world.sqlite.writer.lock \
   --mailbox-root $RUN_ROOT/mailbox \
   --inject-dir $RUN_ROOT/inject \
   -- /bin/sh /work/inject/probe.sh
@@ -101,11 +101,11 @@ If `ISOLATION_FAIL`, STOP.
 ## 4a. Run the E2E transport probe — genuine + production + adversarial (no cursor 14 reveal)
 
 ```bash
-# exact gate: EXPECTED_CHECKS=126, requires CHECKS==EXPECTED_CHECKS and zero FAIL (CORRECTIVE-008)
+# exact gate: EXPECTED_CHECKS=139, requires CHECKS==EXPECTED_CHECKS and zero FAIL (CORRECTIVE-009)
 bash reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/isolation/probe_e2e.sh
 ```
 
-Expected `CORRECTIVE-008_E2E_PASS` (126 checks: mailbox 15, isolation, binding 7, synthetic+production genuine, current-event 6, strict, Scheme A, MS_PRIVATE, /dev, signal deterministic with PID map, env exact, real-provider fail-closed, fake fallback fail, import path executable, wire protocol hash, plus CORRECTIVE-008 catalog/adapter/wire/boundary/receipt/HTTP/evidence).
+Expected `CORRECTIVE_009_E2E_PASS` (139 checks: mailbox 15, isolation, binding 7, synthetic+production genuine, current-event 6, strict, Scheme A, MS_PRIVATE, /dev, signal deterministic with PID map, env exact, real-provider fail-closed, fake fallback fail, import path executable, wire protocol hash, catalog/adapter/wire/boundary/receipt/HTTP/evidence, plus the CORRECTIVE-009 regressions for BLK-01..BLK-08: no committed cursor-14 payload, portable random-checkout import, negative-jail exact-exit proof, executable canonical runbook, missing-release-state fail-closed, no-event-no-dispatch, collision-safe failure receipts, inherited-FD closure, contract provenance binding).
 
 Do NOT proceed if any check fails.
 
@@ -141,11 +141,15 @@ The frozen handler MUST NOT: include A transcript/governance/fixture, pre-popula
 Headless wiring for production (exact documented command, must succeed via real import):
 
 ```bash
-```bash
+# Path constants (repo-root relative; the probe derives the same values mechanically).
+B_PREP="reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002"
+HARNESS_DIR="$B_PREP/harness"
 export AIOS_B_SESSION_ID="$B_SESSION"
 export AIOS_CONTRACT_SHA256="$(sha256sum reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md | cut -d' ' -f1)"
 export AIOS_WIRE_PROTOCOL_SHA256="a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a"
-export AIOS_ADAPTER_SHA256="5f575ae4bbc9ab45fe8e49b4ef8c6266eb8a2a2bd43f8b025a892b83b43daae4"
+export AIOS_ADAPTER_SHA256="$(sha256sum "$B_PREP/harness/bridged_model_handler.py" | cut -d' ' -f1)"
+# Adapter SHA is computed from the accepted tree and must match the pin in environment_manifest.md.
+grep -q "$AIOS_ADAPTER_SHA256" "$B_PREP/environment_manifest.md" || { echo "STOP: adapter SHA drift vs environment_manifest.md"; exit 1; }
 export AIOS_REAL_PROVIDER_API_KEY="sk-real-..."   # required, fail closed if missing
 export AIOS_REAL_PROVIDER_ENDPOINT="https://broker.trusted/..." # required, HTTPS-only (production)
 export AIOS_PROVIDER_ADAPTER="bridged_model_handler:ExternalBrokerClient" # pinned, exact
@@ -154,26 +158,48 @@ export AIOS_CURRENT_EVENT_PATH="$RUN_ROOT/current-event.json" # per cursor, refr
 export AIOS_CURRENT_EVENT_BINDING_PATH="$RUN_ROOT/binding/current-event-binding.json" # immutable 0400, per cursor
 export AIOS_EVIDENCE_DIR="$RUN_ROOT/evidence" # durable failure receipts
 export PYTHONPATH="src:reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness"
+# CURRENT_OCCURRED_AT is the canonical ingest/run time of the cursor being executed.
+# It is copied verbatim from the current reveal projection (step 7.1) and is NEVER hardcoded.
+CURRENT_OCCURRED_AT="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["occurred_at"])' "$RUN_ROOT/current-event.json")"
+echo "CURRENT_OCCURRED_AT=$CURRENT_OCCURRED_AT"
+[ -n "$CURRENT_OCCURRED_AT" ] || { echo "STOP: cannot derive canonical occurred_at from the current projection"; exit 1; }
+
 # Exact documented headless command (must be importable without sys.path.insert):
 python3 -m aios_core.headless.cli \
   --world "$RUN_ROOT/runtime/world.sqlite" \
   --index "$RUN_ROOT/runtime/index.sqlite" \
-  --lock  "$RUN_ROOT/runtime/world.writer.lock" \
+  --lock  "$RUN_ROOT/runtime/world.sqlite.writer.lock" \
   --model-handler bridged_model_handler:headless_production_handler \
-  turn --session "$B_SESSION" --turn-index 1 --text "..." --at "2026-11-05T09:00:00-08:00"
+  turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"
 ```
 
 `FakeProviderClient` is **never** reachable from this entrypoint; it is only instantiated explicitly by `probe_e2e.sh` for disposable tests.
 
-See `environment_manifest.md` for exact env, `per_cursor_interaction.md` for Scheme A and per-cursor event lifecycle, `probe_e2e.sh` for 126-check evidence.
+See `environment_manifest.md` for exact env, `per_cursor_interaction.md` for Scheme A and per-cursor event lifecycle, `probe_e2e.sh` for 139-check evidence.
 
 ## 7. Drive B cursors 14..22 (sequential, per procedure/per_cursor_interaction.md)
 
 For each `seq` 14..22 (exactly one at a time, per-cursor file binding):
 
+For every cursor the operator-side evidence loop is closed (CORRECTIVE-009 / BLK-03): the exact
+reveal projection is persisted **twice** — once as the handler input and once as an immutable
+per-cursor evidence artifact that `final_freeze_procedure.md` verifies.
+
 1. `release_operator.py reveal --phase B --state $RUN_ROOT/runtime/release_state.json > $RUN_ROOT/current-event.json` — operator only, emits 8-field projection; handler reads `AIOS_CURRENT_EVENT_PATH` per call, validates `sequence==next_sequence`, `event_id` and payload digest exact, source_kind, and pending status; mismatch/stale/missing/malformed → fail closed, do not advance.
-2. If `source_kind==conversation`: `canonical_conversation_ingest.py` then `headless turn` (via `ExternalBrokerClient`); if mechanical: `mechanical_ingest_adapter.py` then `due`.
-3. After durable ACK + `due` completion, **clear** `current-event.json` (or overwrite for next seq), reconstruct handler if Scheme A failure occurred (new binding), loop.
+2. Persist the operator-side projection evidence for this cursor (never the payload into any shared log):
+
+   ```bash
+   SEQ="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])' "$RUN_ROOT/current-event.json")"
+   install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf '%03d' "$SEQ").projection.json"
+   sha256sum "$RUN_ROOT/evidence/event-$(printf '%03d' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"
+   ```
+
+   After cursors 14..22 this yields exactly `$RUN_ROOT/evidence/event-014.projection.json` …
+   `event-022.projection.json` (9 files, sequences 14..22 contiguous, unique `event_id`).
+3. If `source_kind==conversation`: `canonical_conversation_ingest.py` then `headless turn` (via `ExternalBrokerClient`); if mechanical: `mechanical_ingest_adapter.py` then `due`.
+4. Model/capability rounds for this cursor reuse the **same** `current-event.json` and the same binding receipt.
+5. Only after durable ACK **and** `due` completion for this cursor may the operator clear `current-event.json`. Before any further model invocation the next cursor MUST be revealed and the next binding receipt installed — clearing the event never opens a window in which a model wake can run unbound (see `per_cursor_interaction.md`; `ProductionResidentHandler` refuses any dispatch with `current_event is None`).
+6. Reconstruct the handler if a Scheme A failure occurred (new binding), then loop.
 
 Resident context kept alive within B session (working memory) but fresh at B startup.
 

@@ -1,6 +1,6 @@
 # C15-RCC-RES-B-PREFLIGHT-002 — A-002 Source Pins & Digests
 
-Recomputed directly from Git blobs at exact evidence head `d17ae972ad1d312735c355f775ac024bc4cebdf7` (PR #205). Commands used:
+Recomputed directly from Git blobs at exact evidence head `d17ae972ad1d312735c355f775ac024bc4cebdf7` (PR #205), plus CORRECTIVE-009 harness digests from the current candidate tip. Commands used:
 
 ```
 git fetch origin pull/205/head:pr205
@@ -56,3 +56,32 @@ These identities are intentionally NOT reused for Resident B (fresh session/proc
 ## Software identity
 
 `freeze/software_identity.json` pins the frozen Core and execution adapter identity. This file is preserved but is not a trusted model-provider attestation (see identity_inventory.md).
+
+## Pinned external identities (unchanged by CORRECTIVE-009)
+
+| Object | SHA-256 |
+| --- | --- |
+| frozen software (runtime) | `773876f92d5f8e53422f8f5a68cc651953d93052` |
+| Core tree `src/aios_core` | `fe77f8a0706acfaf369041d0882b6d0e6de39f22` |
+| PR #205 head | `d17ae972ad1d312735c355f775ac024bc4cebdf7` |
+| lineage World | `626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa` |
+| lineage Index | `ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1` |
+| lineage Release state | `eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8` |
+| Resident B run contract | `28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef` |
+| resident wire protocol | `a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a` |
+
+CORRECTIVE-009 did not touch `src/aios_core/**`, the sealed fixture, the evaluator, the governance
+directory, the run contract or PR #205. The runtime/Core/lineage pins above are re-asserted by the
+probe gate (`PIN_*` checks) on every run.
+
+## Harness digests at the CORRECTIVE-009 tip
+
+| File | Role | Notes |
+| --- | --- | --- |
+| `harness/bridged_model_handler.py` | Phase B adapter | BLK-04/05/06/08 changes |
+| `harness/resident_jail.py` | sandbox wrapper | BLK-07 `_close_inherited_fds()` |
+| `harness/mailbox_bridge.py` | transport binding | unchanged in CORRECTIVE-009 |
+
+Both digests are computed **mechanically** at probe runtime (they are not trusted from this document);
+`procedure/b_startup_procedure.md` recomputes `AIOS_ADAPTER_SHA256` with `sha256sum` and fails closed if
+it drifts from `environment_manifest.md`.

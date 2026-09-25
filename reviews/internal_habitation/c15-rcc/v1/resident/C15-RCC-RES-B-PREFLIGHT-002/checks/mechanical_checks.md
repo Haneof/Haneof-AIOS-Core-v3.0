@@ -37,7 +37,7 @@ All checks run against disposable copies of freeze artifacts. Canonical #205 evi
 
 ## 9. No cursor 14 consumed
 
-**PASS.** No `reveal` called in preflight; `receipts` 13, `pending null`, `init --phase B` does not emit payload (verified grep no reveal).
+**PASS.** `receipts` 13, `pending null`, `init --phase B` does not emit a payload. A disposable `reveal --phase B` IS executed by the E2E probe on a throwaway release-state copy to prove the `init → reveal → receipt → handler` chain; it prints mechanical metadata only and its payload bytes are never committed (CORRECTIVE-009 / BLK-01, gate `NO_COMMITTED_CURSOR14_PAYLOAD_PASS`).
 
 ## 10. Legal Phase-B init
 
@@ -130,5 +130,31 @@ All checks run against disposable copies of freeze artifacts. Canonical #205 evi
 
 ## 28. Cursor14 not revealed
 
-**VERIFIED.** `grep -r reveal` no preflight reveal; startup reserves first reveal for B release.
+**VERIFIED.** No `reveal` output ever reaches a model. The preflight's disposable reveal runs on a copied release state inside `/tmp`; its stdout is reduced to `DISPOSABLE_REVEAL seq=… event_id=… projection_sha256=… payload_sha256=…` and the committed `e2e_probe_output.txt` / `probe_output.txt` are scanned for every sealed fixture payload before the gate passes. Disposable reveal ≠ Resident reveal; the projection was never presented to a Resident or model and is never sent to a model.
 
+## CORRECTIVE-009 gate (checks 125–139)
+
+Every check below is produced by a real test inside `isolation/probe_e2e.sh`, never echoed by the gate
+itself; the gate re-scans its own run log for each marker and also runs a negative self-test proving the
+marker search is non-vacuous. `EXPECTED_CHECKS=139`, success marker `CORRECTIVE_009_E2E_PASS`.
+
+| Check | Blocker | Result |
+| --- | --- | --- |
+| 125 | BLK-01 | `NO_COMMITTED_CURSOR14_PAYLOAD_PASS` — every `resident_visible_payload` of the sealed fixture is scanned out of `e2e_probe_output.txt`, `probe_output.txt`, the completion report, the mechanical checks, the operator manifest, the runbook and the probe script. 0 hits. Event ids / sequences / SHA digests remain visible. |
+| 126 | BLK-01 | `NO_FALSE_NO_REVEAL_PROSE_PASS` — the completion report, the mechanical checks and the operator manifest contain none of the banned no-reveal phrasings; the disposable-reveal wording and the "disposable reveal ≠ Resident reveal" / "projection never sent to a model" statements are all present. |
+| 127 | BLK-02 | `PORTABLE_CHECKOUT_PASS` — the probe re-runs from a random `/tmp/<random>/` checkout and still PASSes; `grep -R` for the operator's absolute path over harness/isolation/procedure/checks/`*.md` returns 0 in code or execution paths. |
+| 128 | BLK-02 | `NEGATIVE_JAIL_ACTUALLY_EXECUTED_PASS` — each injected failure (MS_PRIVATE, privdrop, setgid, setgroups, setuid) exits exactly `98`, prints the injected marker on stderr, leaves no `can't open file` / traceback, and does not execute the payload sentinel. "nonzero == PASS" is not accepted anywhere. |
+| 129 | BLK-03 | `CANONICAL_RUNBOOK_STATIC_PASS` — documented `--lock` uses `$RUN_ROOT/runtime/world.sqlite.writer.lock`, the code fences are balanced, the occurrence timestamp is derived mechanically, the projection loop and the production-transport wording are consistent. |
+| 130 | BLK-03 | `CANONICAL_RUNBOOK_EXECUTABLE_PASS` — the runbook is actually executed against a disposable lineage copy: rev 98, watermark 98, index lag 0, `AUTO_RECOVERABLE`, `quick_check ok`. |
+| 131 | BLK-04 | `MISSING_RELEASE_STATE_FAIL_CLOSED_PASS` — the handler is constructed normally, `release_state.json` is deleted, the same handler is invoked again: 0 provider invocations, handler poisoned, durable failure receipt written. |
+| 132 | BLK-05 | `NO_EVENT_NO_DISPATCH_PASS` — `periodic_review` at rounds 0/1/3 (and every other wake reason) with a missing current event fails closed with 0 provider invocations. |
+| 133 | BLK-06 | `FAILURE_RECEIPT_COLLISION_PASS` — two handlers, same session, same round, same second → two distinct mode-0400 receipts, no collision, both `outstanding is None`, original failure class preserved. |
+| 134 | BLK-07 | `INHERITED_FD_SEALED_PASS` — operator-held sealed-fixture, evaluator-only and unrelated FDs are inherited into the jail and are not visible in `/proc/self/fd` or readable via `/dev/fd/N`; the payload still runs. |
+| 135 | BLK-08 | `CONTRACT_PROVENANCE_PASS` — the handler resolves the repo root mechanically, binds the accepted contract with exact SHA, is copied to a random `/tmp/candidate-<random>/` and imported with `cwd=/tmp` where it still finds that candidate's contract, is unaffected by an external same-named contract, and fails closed on a candidate contract mismatch. |
+| 136–139 | — | Adversarial extensions of 131–135 (negative jail exit-98 / jail-executed proof for BLK-02, missing-state + no-event regression matrix, receipt-name shape assertion, and the same-checkout contract binding). |
+
+`grep -R` for the operator's absolute checkout path over `harness/`, `isolation/`, `procedure/`, `checks/`,
+`completion_report.md`, `checks/mechanical_checks.md`, `operator_manifest.md`, `environment_manifest.md`,
+`resident_safe_packet_manifest.md`, `known_limitations.md`, `source_pins_and_digests.md`,
+`identity_inventory.md` and `corrective_009_report.md` returns **0 hardcoded dependencies in code or
+execution paths** (the only permitted mentions are in prose that explicitly forbids them).

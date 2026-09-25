@@ -54,7 +54,25 @@ MS_NOSUID = 2
 MS_NODEV = 4
 MS_NOEXEC = 8
 
-REPO_ROOT_DEFAULT = Path("/home/user/Haneof-AIOS-Core-v3.0")
+# CORRECTIVE-009 / BLK-08: the jail's default --repo is resolved MECHANICALLY from this
+# file (unique ancestor containing src/aios_core). No hardcoded absolute path.
+CORE_PKG_REL = Path("src") / "aios_core"
+
+
+def resolve_repo_root() -> Path:
+    start = Path(__file__).resolve()
+    matches = [c for c in (start.parent, *start.parent.parents) if (c / CORE_PKG_REL).is_dir()]
+    if len(matches) == 1:
+        return matches[0].resolve()
+    if not matches:
+        raise RuntimeError(
+            f"cannot resolve repo root from {start}: no ancestor contains {CORE_PKG_REL} "
+            "(refusing to fall back to any absolute path)"
+        )
+    raise RuntimeError(f"ambiguous repo root resolution from {start}: {[str(m) for m in matches]}")
+
+
+REPO_ROOT_DEFAULT = resolve_repo_root()
 
 
 def _get_nspid():
@@ -236,7 +254,7 @@ def _worker_main(args: argparse.Namespace) -> int:
     _rw_file(args.world, "world.sqlite")
     _rw_file(args.index, "world_index.sqlite")
     _rw_file(args.state, "release_state.json")
-    _rw_file(args.lock, "world.writer.lock")
+    _rw_file(args.lock, "world.sqlite.writer.lock")
 
     inbox_tgt = work / "inbox"
     outbox_tgt = work / "outbox"
@@ -322,7 +340,7 @@ def _worker_main(args: argparse.Namespace) -> int:
     env = {
         "AIOS_WORLD_PATH": "/work/world.sqlite",
         "AIOS_INDEX_PATH": "/work/world_index.sqlite",
-        "AIOS_LOCK_PATH": "/work/world.writer.lock",
+        "AIOS_LOCK_PATH": "/work/world.sqlite.writer.lock",
         "AIOS_SUBJECT_ID": "user_1",
         "PYTHONPATH": "/repo/src",
         "PATH": "/usr/local/bin:/usr/bin:/bin",
@@ -349,8 +367,54 @@ def _worker_main(args: argparse.Namespace) -> int:
         elif k in ("_RESIDENT_JAIL_INJECT_PRIVDROP_FAIL", "_RESIDENT_JAIL_INJECT_FAIL_MODE", "_RESIDENT_JAIL_INJECT_MS_PRIVATE_FAIL", "AIOS_ALLOW_PROBE_ENV"):
             # Do NOT propagate test seams or allow flag itself into sandbox
             continue
+    # CORRECTIVE-009 / BLK-07: close EVERY inherited descriptor above stdin/stdout/stderr
+    # immediately before exec. Without this, an operator-held fd (e.g. an open handle on the
+    # sealed fixture or the evaluator-only notes) stays readable inside the sandbox via
+    # /dev/fd/N -> /proc/self/fd, which defeats the path-absence proofs. Only 0/1/2 survive.
+    _close_inherited_fds()
+
     os.execvpe(args.cmd[0], args.cmd, env)
     raise RuntimeError(f"execvp({args.cmd[0]!r}) failed")
+
+
+def _close_inherited_fds() -> None:
+    """Close every file descriptor >= 3 so the Resident payload inherits only 0/1/2.
+
+    Called immediately before ``execvpe`` (after all mount/privdrop setup is complete, so
+    no setup step loses a descriptor it still needs). Errors on individual descriptors are
+    ignored; a second sweep over ``/proc/self/fd`` catches anything the bulk close missed.
+    """
+    try:
+        max_fd = os.sysconf("SC_OPEN_MAX")
+    except (ValueError, OSError, AttributeError):
+        max_fd = 1024
+    if not isinstance(max_fd, int) or max_fd <= 0 or max_fd > (1 << 20):
+        max_fd = 4096
+    # Bulk close (os.closerange ignores per-fd errors, which is what we want here).
+    try:
+        os.closerange(3, max_fd)
+    except Exception:
+        for fd in range(3, max_fd):
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+    # Belt and braces: sweep whatever /proc/self/fd still reports above 2.
+    try:
+        names = os.listdir("/proc/self/fd")
+    except OSError:
+        return
+    for name in names:
+        try:
+            fd = int(name)
+        except ValueError:
+            continue
+        if fd <= 2:
+            continue
+        try:
+            os.close(fd)
+        except OSError:
+            pass
 
 
 def _init_main(args: argparse.Namespace) -> int:

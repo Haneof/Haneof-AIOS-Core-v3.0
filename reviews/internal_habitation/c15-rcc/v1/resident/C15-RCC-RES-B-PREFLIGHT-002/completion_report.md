@@ -1,12 +1,31 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Completion Report
+# C15-RCC-RES-B-PREFLIGHT-002 — Completion Report (CORRECTIVE-009)
 
 Date: 2026-09-25
-Task: C15-RCC-RES-B-PREFLIGHT-002
+Task: C15-RCC-RES-B-PREFLIGHT-002 (superseded by C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-009)
 Role: Release / Test Infrastructure Engineer (Sealed Resident Infrastructure Designer)
 
-## Verdict: **REVIEW_READY**
+## Verdict: **REVIEW_READY / AWAITING_PM_RE-REVIEW**
 
-All 15 mandatory mechanical checks from the preflight prompt §8 PASS. Zero blockers.
+All 15 mandatory mechanical checks from the preflight prompt §8 PASS, and all **8 blockers** from
+independent acceptance review `5315355377` are closed with fresh regressions — 139/139 checks,
+`FAILURES=0`, marker **`CORRECTIVE_009_E2E_PASS`**. See `corrective_009_report.md` for the
+per-blocker closure evidence.
+
+| Gate marker | Blocker |
+| --- | --- |
+| `NO_COMMITTED_CURSOR14_PAYLOAD_PASS` | BLK-01 |
+| `NO_FALSE_NO_REVEAL_PROSE_PASS` | BLK-01 |
+| `PORTABLE_CHECKOUT_PASS` | BLK-02 |
+| `NEGATIVE_JAIL_ACTUALLY_EXECUTED_PASS` | BLK-02 |
+| `CANONICAL_RUNBOOK_STATIC_PASS` / `CANONICAL_RUNBOOK_EXECUTABLE_PASS` | BLK-03 |
+| `MISSING_RELEASE_STATE_FAIL_CLOSED_PASS` | BLK-04 |
+| `NO_EVENT_NO_DISPATCH_PASS` | BLK-05 |
+| `FAILURE_RECEIPT_COLLISION_PASS` | BLK-06 |
+| `INHERITED_FD_SEALED_PASS` | BLK-07 |
+| `CONTRACT_PROVENANCE_PASS` | BLK-08 |
+
+The only success marker is `CORRECTIVE_009_E2E_PASS`. The earlier CORRECTIVE-008 gate is retired
+and must not be reused; the stale-count and stale-marker greps in the probe assert this.
 
 ## Propositions to prove (per prompt)
 
@@ -24,7 +43,7 @@ All 15 mandatory mechanical checks from the preflight prompt §8 PASS. Zero bloc
 
 ## Forbidden actions NOT performed
 
-- ✅ Cursor 14 was NOT revealed to any model (init --phase B validates boundary without reading/emitting the cursor-14 payload; reveal was never called).
+- ✅ Cursor 14 was NOT revealed to any model. Preflight invoked `release_operator reveal --phase B` **only on a disposable copy** of the release state, purely to obtain the mechanical `init → reveal → receipt → handler` proof. The projection was never presented to a Resident or model and its payload bytes were never committed into current evidence (CORRECTIVE-009 / BLK-01).
 - ✅ Resident B was NOT run (no genuine model inference; no model provider was invoked).
 - ✅ Resident C was NOT run.
 - ✅ PR #205 was NOT modified (fetched read-only; digests recomputed from its blobs; no push to pr205).
@@ -70,7 +89,8 @@ reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/
 │   ├── resident_jail.py         (mount-ns chroot sandbox builder)
 │   └── mailbox_bridge.py        (transport-only mailbox, no semantics)
 ├── checks/
-│   └── mechanical_checks.md     (15/15 PASS)
+│   └── mechanical_checks.md     (15/15 PASS + CORRECTIVE-009 checks 125-139)
+├── corrective_009_report.md     (per-blocker closure evidence)
 └── procedure/
     ├── b_startup_procedure.md
     ├── per_cursor_interaction.md
@@ -86,5 +106,5 @@ reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/
 1. Verify this PR changes only files under `reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/` (plus any integration-receipt file at the reviewer's discretion).
 2. Re-run the isolation probe (procedure step 4) on the reviewer's machine to confirm the sandbox yields `ISOLATION_PASS`.
 3. Spot-check the three freeze SHA-256 values against PR #205 directly.
-4. Confirm no `reveal` invocation exists in the preflight code.
+4. Confirm every `reveal` invocation is confined to a **disposable** release-state copy, prints mechanical metadata only (sequence / event_id / projection SHA256 / payload SHA256 / field count), and never persists or tee's `resident_visible_payload` into a committed log. Historical commits `3796377`…`670c05b` are superseded leaked evidence and must never be read by any Resident.
 5. Approve / request changes. On approval, integration writes the receipt and moves `C15-RCC-RES-B-RELEASE-002` to READY.

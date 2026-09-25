@@ -17,7 +17,7 @@ Use the existing Core backup path to produce coherent snapshots (WAL-safe):
 PYTHONPATH=src python3 -m aios_core.headless.cli \
   --world $RUN_ROOT/runtime/world.sqlite \
   --index $RUN_ROOT/runtime/index.sqlite \
-  --lock  $RUN_ROOT/runtime/world.writer.lock \
+  --lock  $RUN_ROOT/runtime/world.sqlite.writer.lock \
   backup --to $RUN_ROOT/evidence/freeze/private_world.sqlite
 ```
 
@@ -69,7 +69,41 @@ Copy the mailbox request/reply archive and due-work ledger into `$RUN_ROOT/evide
 
 ## 8. Per-cursor projection receipts
 
-All 9 B event projections (cursors 14..22) should already be in `$RUN_ROOT/evidence/event-*.projection.json`; verify count = 9, sequences 14..22 contiguous.
+`b_startup_procedure.md` §7.2 persists one immutable operator-side projection artifact per cursor
+(`install -m 0400` of the exact reveal projection bytes) into `$RUN_ROOT/evidence/`.
+
+Verify mechanically, and STOP if any assertion fails:
+
+```bash
+python3 - "$RUN_ROOT/evidence" <<'PY'
+import json, sys
+from pathlib import Path
+ev = Path(sys.argv[1])
+files = sorted(ev.glob("event-*.projection.json"))
+assert len(files) == 9, f"projection count {len(files)} != 9"
+seqs, ids = [], set()
+for f in files:
+    assert (f.stat().st_mode & 0o777) == 0o400, f"{f} not mode 0400"
+    d = json.loads(f.read_text(encoding="utf-8"))
+    assert set(d.keys()) == {"event_id","sequence","occurred_at","dimension","source_kind",
+                             "source_class","modality","resident_visible_payload"}, f"{f} not 8-field"
+    seqs.append(d["sequence"]); ids.add(d["event_id"])
+assert seqs == list(range(14, 23)), f"sequences {seqs} != 14..22"
+assert len(ids) == 9, f"duplicate event_id across projections: {sorted(ids)}"
+print("PER_CURSOR_PROJECTION_EVIDENCE_PASS", seqs)
+PY
+```
+
+These files are operator-side evidence. They are **never** copied into any shared or model-visible log,
+and `resident_visible_payload` is never printed to stdout that is tee'd into a committed log
+(CORRECTIVE-009 / BLK-01).
+
+Then append their digests to the freeze manifest:
+
+```bash
+cd "$RUN_ROOT/evidence"
+sha256sum event-*.projection.json > freeze/event_projections.sha256
+```
 
 ## 9. Hash manifest
 
