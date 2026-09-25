@@ -43,8 +43,9 @@
 | C15 B 恢复链 | `C15-RCC-RES-B-PREFLIGHT-002 = READY` → 独立 release review → fresh B-002 → independent acceptance；当前禁止 reveal cursor 14 |
 | C15 C 与终评 | B 接受 + 可信模型身份前置后才可启动 C；R1–R9 全 VALID 才收口 |
 | C16 系统改进反馈 | BLOCKED；Resident proposal 与用户 World 分离，独立复现/工程/Gate/再验证 |
+| Post-C15 issue reconciliation | `POST-C15-ISSUE-RECONCILIATION-001`：C15 CLOSE 后 fresh 对账 #23/#28/#33/#34/#35；已修历史项不得重复施工，只有 current-main 可复现才派生新工程任务 |
 | 广泛 P16 | C15/C16 关闭后恢复有效分段 ledger、年度证据、多 provider/model、独立评估和红队 |
-| P17 / P18 / P19 | 发布 Gate / 平台 / 产品依次后置 |
+| P17 / P18 / P19 | 发布 Gate → `P18-REALITY-HELP-INTEGRATION-001` → `P19-HELP-EXPERIENCE-001`，依次后置 |
 
 合入证据见 `governance/C15_RCC_RES_B_CORRECTIVE_INTEGRATION_RECEIPT_2026-09-24.md`。普通治理集成无需另开 AI 窗口；盲测及明确要求的独立评估仍保留隔离。
 
@@ -127,8 +128,8 @@ Evidence + Dependency + Revision
 | P15 周期 Review / AI 成长 | AI 定期回看世界、修正理解、沉淀 Operation/Communication Experience，并可基于真实反馈调整 Cognitive Policy | periodic review、OperationExperience、CommunicationExperience、CognitivePolicy | 不以固定模板替代模型判断；经验/策略必须有真实证据且可回滚 | ✅ 已通过并收口 |
 | P16 多 Agent 长期入住测试 | 用真实模型和隐藏人生测试是否真的“活在世界中” | habitation harness / hidden-life / Current-Core target / run artifacts | C14 已收口；C15/C16 专项门后恢复长期多模型入住、独立评估和红队 | 🔵 当前主阶段；下一步 B operator preflight |
 | P17 Core Release Gate | 形成第一个稳定可运行 AIOS Core | reproducible build、full CI、migration report | 世界闭环、认知闭环、任务闭环均稳定 | ⏳ 待做 |
-| P18 平台适配 | 把同一套 Core 放到真实运行环境 | Android/Linux service、device adapters | Core 语义不因平台重写 | ⏳ 后置 |
-| P19 产品层 | AIOS UI、数字人、系统入口、设备体验 | Launcher/UI/Voice/Digital Human | 产品层不得反向污染 Core 世界语义 | ⏳ 后置 |
+| P18 平台适配 / `P18-REALITY-HELP-INTEGRATION-001` | 把同一套 Core 放到真实运行环境，并把“AI 判断该帮什么”接到真实可授权执行 | Android/Linux service、calendar/email/device/app adapters、Action dispatch、typed Outcome return | 不复制第二套任务/认知真相；外部副作用必须授权；真实结果回写同一 World；Core 语义不因平台重写 | ⏳ P17 PASS 后 |
+| P19 产品层 / `P19-HELP-EXPERIENCE-001` | 把持续帮助做成用户可理解、可撤销、可纠正的体验 | Authorization UI、proactive notification、Launcher/UI/Voice/Digital Human、result/correction UX | prepared/queued ≠ actually completed；用户可看见原因与结果并纠正；产品层不得反向污染 Core 世界语义 | ⏳ P18 后置 |
 
 ---
 

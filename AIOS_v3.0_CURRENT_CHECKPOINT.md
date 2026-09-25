@@ -22,6 +22,13 @@
 > 用途：新会话 / 新模型 / 新工程师进入仓库后的第一现场状态文件  
 > 更新规则：每完成一个可验证节点立即更新；不得靠聊天记忆代替本文件  
 > 仓库：`Haneof/Haneof-AIOS-Core-v3.0`  
+
+## 2026-09-25 PM durable follow-up plan — 不得靠聊天记忆丢失
+
+- 当前主线优先级**不变**：继续 `C15-RCC-RES-B-PREFLIGHT-002`；B/C/C15 closure 未完成前不得插队做下述 follow-up。
+- 新增 `POST-C15-ISSUE-RECONCILIATION-001 = BLOCKED on C15-RCC-CLOSE-001`：C15 CLOSE 后，必须对 #23/#28/#33/#34/#35 在届时 live main 做 fresh current-state revalidation。2026-09-25 PM 已确认对应修复 PR #24/#49/#51/#54/#55 均已进入当前 main；因此默认不是新 Core 修复任务。届时若仍可复现，只能创建新的单窗口工程 Task，不得在 reconciliation 窗口顺手修改 Core。
+- “AI 持续了解用户并真正帮上忙”的后续产品化入口已显式冻结为：`P18-REALITY-HELP-INTEGRATION-001`（真实平台 Action→Outcome 闭环）→ `P19-HELP-EXPERIENCE-001`（授权/提醒/解释/纠正/Launcher/Voice/Digital Human 产品体验）。两者均 BLOCKED until P17 release gate，通过前不得提前另造平行执行系统。
+- 这三项已同步写入 `governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md` / `PROJECT_MASTER_MAP.md`，以后新 PM 窗口必须从仓库恢复，不得依赖本次聊天。
 > 分支：`main`
 
 ## 2026-09-21 单窗口执行控制
