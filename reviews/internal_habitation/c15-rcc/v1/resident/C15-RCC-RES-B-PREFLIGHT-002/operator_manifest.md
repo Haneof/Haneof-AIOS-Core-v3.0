@@ -113,14 +113,17 @@ MailboxBridge validates `event` exactly 8 fields + `sequence 14..22` + `phase B`
 
 ## CORRECTIVE-010 fresh run record
 
+Two fresh runs of `isolation/probe_e2e.sh` (from the repo root under `sudo`) were used:
+
+| Role | Raw log | Raw log SHA-256 | Result |
+| --- | --- | --- | --- |
+| committed evidence source | `/tmp/probe_c10_run8.log` | `3d0308b6c19bdc2d502f37aca025e586238d61f7e848d817258ecf296147ffc2` | `ALL_CHECKS=140/140 FAILURES=0` |
+| final confirmation (with the committed evidence + all docs in place) | `/tmp/probe_c10_run9.log` | `b48fcad7a9869f1708396d1230f70c4e9dc6fc937bd50cb64f11657ab81a5c45` | `ALL_CHECKS=140/140 FAILURES=0` |
+
 | Item | Value |
 | --- | --- |
-| probe | `isolation/probe_e2e.sh` (run from the repo root under `sudo`) |
-| raw log | `/tmp/probe_c10_run8.log` -> copied to `isolation/e2e_probe_output.txt` |
-| raw log SHA-256 | `3d0308b6c19bdc2d502f37aca025e586238d61f7e848d817258ecf296147ffc2` |
 | e2e_probe_output.txt SHA-256 | `1e10d5392efc3c397061850462a2fb8861610fbdd3fe27984df8e13e14254760` |
 | probe_output.txt SHA-256 | `a1566ada961426eac1c451a107bd11e213fd8a77482bae5fd6172c77af466ff1` |
-| result | `ALL_CHECKS=140/140 FAILURES=0` |
 | marker | `CORRECTIVE_010_E2E_PASS` |
 | new regression marker | `CANONICAL_RUNBOOK_ORDER_PASS` |
 
