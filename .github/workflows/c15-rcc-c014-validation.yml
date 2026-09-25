@@ -23,7 +23,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p "$GITHUB_WORKSPACE/.c014-artifacts"
+          mkdir -p "$GITHUB_WORKSPACE/c014-artifacts"
           docker run --privileged --rm \
             --security-opt seccomp=unconfined \
             -v "$GITHUB_WORKSPACE:/work/repo" \
@@ -42,19 +42,19 @@ jobs:
                 -r reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/requirements.freeze.txt
               BPREP=/work/repo/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002
               python3 "$BPREP/checks/runbook_lifecycle_checker.py" --base "$BPREP" --self-test \
-                | tee /work/repo/.c014-artifacts/lifecycle-selftest.log
+                | tee /work/repo/c014-artifacts/lifecycle-selftest.log
               grep -q "RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=48" \
-                /work/repo/.c014-artifacts/lifecycle-selftest.log
+                /work/repo/c014-artifacts/lifecycle-selftest.log
               export RUN_ROOT=/tmp/c014-e2e-fresh
               bash "$BPREP/isolation/probe_e2e.sh"
-              cp "$RUN_ROOT/e2e.log" /work/repo/.c014-artifacts/e2e.log
+              cp "$RUN_ROOT/e2e.log" /work/repo/c014-artifacts/e2e.log
             '
 
       - name: Verify frozen markers
         shell: bash
         run: |
           set -euo pipefail
-          LOG="$GITHUB_WORKSPACE/.c014-artifacts/e2e.log"
+          LOG="$GITHUB_WORKSPACE/c014-artifacts/e2e.log"
           grep -q '^ENVIRONMENT_PASS$' "$LOG"
           grep -q '^ALL_CHECKS=158/158 FAILURES=0$' "$LOG"
           grep -q '^RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5$' "$LOG"
@@ -67,6 +67,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: c15-rcc-c014-frozen-evidence
-          path: .c014-artifacts/
+          path: c014-artifacts/
           if-no-files-found: error
           retention-days: 7
