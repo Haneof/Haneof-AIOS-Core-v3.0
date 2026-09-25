@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-003 — Transport-only mailbox bridge
+C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-004 — Transport-only mailbox bridge
 (envelope-hardened + request/reply binding + schema-aware leakage guard).
 
 Responsibility (transport only, ZERO semantic judgment):
@@ -171,6 +171,17 @@ def validate_envelope(envelope: dict[str, Any], b_session_id: str) -> None:
                 raise MailboxEnvelopeError(
                     f"envelope.event.sequence={seq!r} outside Phase B range 14..22"
                 )
+            # Mechanical validation for source_kind, payload etc. (BLOCKER 4)
+            sk = ev.get("source_kind")
+            if sk not in ("conversation", "mechanical"):
+                raise MailboxEnvelopeError(f"envelope.event.source_kind={sk!r} must be conversation|mechanical")
+            for f in ("source_class", "modality", "dimension", "event_id", "occurred_at"):
+                v = ev.get(f)
+                if not isinstance(v, str) or not v.strip():
+                    raise MailboxEnvelopeError(f"envelope.event.{f} must be non-empty string")
+            payload = ev.get("resident_visible_payload")
+            if not isinstance(payload, dict) or not payload:
+                raise MailboxEnvelopeError("envelope.event.resident_visible_payload must be non-empty object")
     if envelope.get("phase") not in (None, "B"):
         raise MailboxEnvelopeError(f"envelope.phase={envelope.get('phase')!r} invalid (expected B)")
     if "allowed_sequences" in envelope:

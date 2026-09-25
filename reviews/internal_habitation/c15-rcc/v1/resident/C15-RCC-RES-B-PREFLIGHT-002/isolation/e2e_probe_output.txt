@@ -1,8 +1,18 @@
-[e2e] run_root = /tmp/b-preflight-e2e-2942
+[e2e] run_root = /tmp/b-preflight-e2e-3292
 world.sqlite: OK
 index.sqlite: OK
 release_state.json: OK
 [e2e] lineage digests OK
+[e2e] EXPECTED_CHECKS=58
+[e2e] step 0: exact environment
+py_ver=Python 3.11.2
+CHECK 1 PASS: exact Python 3.11.2
+pydantic=2.13.5
+CHECK 2 PASS: exact pydantic 2.13.5
+wire_sha=5067701b003f99c141ecef1874ae8195ea2faf1ef5caa87cae092b57cad38b38
+CHECK 3 PASS: wire protocol hash 5067701b…
+contract_sha=28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef
+CHECK 4 PASS: contract present
 [e2e] step 1: mailbox_bridge self-tests (15)
 self-test 1 PASS: minimal good envelope accepted with binding
 self-test 2 PASS: extra top-level key rejected
@@ -22,7 +32,7 @@ self-test 13 PASS: wrong request_digest rejected
 self-test 14 PASS: double send while outstanding rejected
 self-test 15 PASS: pre-set request_id rejected
 ALL SELF-TESTS PASS
-CHECK 1 PASS: mailbox self-tests (15)
+CHECK 5 PASS: mailbox self-tests (15)
 [e2e] step 2: hardened isolation probe inside sandbox
 === identity ===
 uid=65534 gid=65534
@@ -122,20 +132,20 @@ PASS: LD_* stripped
 
 
 ISOLATION_PASS
-CHECK 2 PASS: isolation (PID1 sup + NET sealed + RO bind + mailbox IPC + /dev minimal + env)
-CHECK 3 PASS: PID1 supervisor (worker PID>=2, zombie reap)
-CHECK 4 PASS: REDACTED network sealed via CLONE_NEWNET (ENETUNREACH)
-CHECK 5 PASS: RO bind proven (EROFS + ro,nosuid,nodev)
-CHECK 6 PASS: mailbox IPC (inbox 0755/outbox 01733/archive not mounted + nobody perms)
-CHECK 7 PASS: /dev minimal (null/zero/urandom/random + fd only, no sda/mem/tty)
-CHECK 8 PASS: environment allowlist (PROBE_* stripped without AIOS_ALLOW_PROBE_ENV)
+CHECK 6 PASS: isolation (PID1 sup + NET sealed + RO + mailbox IPC + /dev + env)
+CHECK 7 PASS: PID1 supervisor
+CHECK 8 PASS: NET sealed
+CHECK 9 PASS: RO bind ro,nosuid,nodev
+CHECK 10 PASS: mailbox IPC
+CHECK 11 PASS: /dev minimal
+CHECK 12 PASS: env allowlist
 [e2e] step 3: mailbox binding E2E (7 cases)
 NORMAL_BINDING_PASS
 [test-responder] starting mode=normal rounds=2 uid=65534 pid=3 inbox=/work/inbox outbox=/work/outbox
 [test-responder] pid=3 proc1_comm=sandbox-init
 [test-responder] PASS PID1 is sandbox-init
-[test-responder] round 1 received request_id=6543b18c... digest=c54b3445...
-[test-responder] round 2 received request_id=e95cc36a... digest=c66a4b97...
+[test-responder] round 1 received request_id=bf75ac1a... digest=04e89999...
+[test-responder] round 2 received request_id=399e713e... digest=d2a363a3...
 [test-responder] OK mode=normal rounds=2 pid=3
 
 STALE_REJECTED_PASS
@@ -145,77 +155,154 @@ WRONG_ID_REJECTED_PASS
 WRONG_DIGEST_REJECTED_PASS
 FUTURE_NOT_VALID_PASS
 ALL_BINDING_TESTS_PASS
-CHECK 9 PASS: binding normal correct echo
-CHECK 10 PASS: binding stale prior-round rejected
-CHECK 11 PASS: binding preplayed future rejected
-CHECK 12 PASS: binding replay consumed rejected
-CHECK 13 PASS: binding wrong request_id rejected
-CHECK 14 PASS: binding wrong request_digest rejected
-CHECK 15 PASS: binding future reply never becomes valid later
-[e2e] step 4a: synthetic genuine Core->MailboxBridge->responder (Atlas non-empty)
-model_rounds=2 invocations=2 termination=silence
-current_event wiring seq14 OK in envelope
-second envelope capability_history contains obs_c14_fixture_* legal ids: True
-[test-responder] starting mode=genuine rounds=2 uid=65534 pid=3 inbox=/work/inbox outbox=/work/outbox
-[test-responder] pid=3 proc1_comm=sandbox-init
-[test-responder] PASS PID1 is sandbox-init
-[test-responder] round 1 received request_id=c817a677... digest=b24235cd...
-[test-responder] genuine round1 invoke search_world Atlas limit2 (non-empty legal)
-[test-responder] round 2 received request_id=317905f5... digest=a746183d...
-[test-responder] genuine round2 silence
-[test-responder] OK mode=genuine rounds=2 pid=3
-
+CHECK 13 PASS: binding normal
+CHECK 14 PASS: binding stale
+CHECK 15 PASS: binding preplay
+CHECK 16 PASS: binding replay
+CHECK 17 PASS: binding wrong id
+CHECK 18 PASS: binding wrong digest
+CHECK 19 PASS: binding future not valid
+[e2e] step 4a: synthetic genuine Core->MailboxBridge->responder (Atlas)
+model_rounds=2 invocations=2
+found fixture=True
 SYNTHETIC_GENUINE_PASS
-CHECK 16 PASS: synthetic genuine 2-round via MailboxBridge (FusedTurnRuntime->handler->bridge->responder, Atlas non-empty legal)
-CHECK 17 PASS: current_event 8-field seq14 wiring (envelope event validated, 14..22)
-[e2e] step 4b: production genuine via ProductionResidentHandler(FakeProviderClient)
-prod model_rounds=2 invoc=2 history=1
-last_provider=fake-provider model=fake-model-v1 req=fake-req-0002 usage={'total_tokens': 42, 'input_tokens': 20, 'output_tokens': 22}
-fake last request inbox check OK, envelope_round=2
+CHECK 20 PASS: synthetic genuine 2-round Atlas non-empty
+CHECK 21 PASS: current_event seq14 wiring
+[e2e] step 4b: production genuine via RealProviderClient (mock)
+prod invocations=2 history=1
+last_provider=real-provider usage={'total_tokens': 42, 'input_tokens': 20, 'output_tokens': 22}
 PRODUCTION_GENUINE_PASS
-UNKNOWN provenance test: UNKNOWN UNKNOWN usage=None
 UNKNOWN_PROVENANCE_PASS
-CHECK 18 PASS: production genuine 2-round via ProductionResidentHandler+FakeProviderClient (REAL provenance provider=fake-provider, tokens=42)
-CHECK 19 PASS: UNKNOWN handling (no credibly available provider -> provenance UNKNOWN, usage None not 10)
-[e2e] step 5: current_event / envelope negatives (5)
-PASS seq13 rejected
-PASS seq23 rejected
-PASS extra event field rejected
-PASS missing field rejected
-PASS phase A rejected
+CHECK 22 PASS: production genuine via RealProviderClient (mock) REAL provenance
+CHECK 23 PASS: UNKNOWN handling
+[e2e] step 5: current-event / envelope negatives (6)
+PASS seq13
+PASS seq23
+PASS extra
+PASS missing
+PASS phase A
+PASS source_kind
 ALL_NEGATIVES_PASS
-CHECK 20 PASS: current_event sequence 13 rejected (below 14..22)
-CHECK 21 PASS: current_event sequence 23 rejected (above 14..22)
-CHECK 22 PASS: current_event extra field rejected
-CHECK 23 PASS: current_event missing field rejected
-CHECK 24 PASS: envelope phase A rejected (must be B)
-[e2e] step 6: strict reply schema (extra field in silence)
-PASS strict extra field rejected: reply structural invalid: reply for action 'silence' has extra fields ['capability'] not allowed
+CHECK 24 PASS: current_event seq13 rejected
+CHECK 25 PASS: current_event seq23 rejected
+CHECK 26 PASS: current_event extra field
+CHECK 27 PASS: current_event missing field
+CHECK 28 PASS: envelope phase A rejected
+CHECK 29 PASS: source_kind invalid rejected
+[e2e] step 6: strict reply schema
+PASS strict extra: reply structural invalid: reply for action 'silence' has extra fields ['capability'] not allowed
 STRICT_REPLY_PASS
-CHECK 25 PASS: strict reply schema (silence with extra capability rejected)
-[e2e] step 7: repair Scheme A (round_repair_request unsupported)
+CHECK 30 PASS: strict reply silence{capability}
+[e2e] step 7: repair Scheme A
 repair shape structurally allowed
-PASS repair unsupported fail-closed: unsupported reply action: 'round_repair_request'
-CHECK 26 PASS: repair Scheme A (round_repair_request not supported, fail closed, no repair turn)
-[e2e] step 8: MS_PRIVATE fail-closed + privdrop negatives
-MS_PRIVATE injected exit=98 stdout= stderr=[jail] sandbox setup FAILED: RuntimeError: injected MS_PRIVATE failure (test seam)
-
-PASS MS_PRIVATE fail-closed (exit 98, no sentinel)
-privdrop generic exit=98
-PASS privdrop generic fail-closed
-privdrop setgid exit=98
-PASS privdrop setgid fail-closed
+PASS repair unsupported: unsupported reply action: 'round_repair_request'
+CHECK 31 PASS: repair Scheme A
+[e2e] step 8: MS_PRIVATE fail-closed + privdrop
+MS_PRIVATE exit=98
+PASS MS_PRIVATE
+privdrop exit=98
+PASS privdrop
+setgid exit=98
+PASS setgid
 PRIVDROP_DUAL_PASS
-CHECK 27 PASS: MS_PRIVATE fail-closed (injected -> exit 98, no sentinel, no outbox)
-CHECK 28 PASS: privdrop dual fail-closed (generic + setgid exit 98, no sentinel)
-[e2e] step 9: signal deterministic (no || true masking)
+CHECK 32 PASS: MS_PRIVATE fail-closed
+CHECK 33 PASS: privdrop dual
+[e2e] step 9: signal deterministic PID1 forwarding
+[signal] pid log:
+{
+  "outer_wrapper_host_pid": 3625,
+  "outer_wrapper_ns_pid": 3625,
+  "outer_wrapper_ppid": 3623,
+  "outer_wrapper_cmd": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/resident_jail.py --repo /home/user/Haneof-AIOS-Core-v3.0 --sandbox /tmp/b-sleep-test-3292 --world /tmp/b-preflight-e2e-3292/runtime/world.sqlite --index /tmp/b-preflight-e2e-3292/runtime/index.sqlite --state /tmp/b-preflight-e2e-3292/runtime/release_state.json --lock /tmp/b-preflight-e2e-3292/runtime/world.writer.lock --mailbox-root /tmp/b-sleep-mb-3292 --inject-dir /tmp/b-preflight-e2e-3292/inject -- /bin/sleep 30",
+  "unsharer_host_pid": 3626,
+  "unsharer_ns_pid": 3626,
+  "unsharer_ppid": 3625,
+  "pid1_host_pid": 3630,
+  "pid1_ns_pid": 1,
+  "pid1_ns_pid_actual": 1,
+  "pid1_host_pid_ns_view": 3630,
+  "pid1_comm": "sandbox-init",
+  "worker_fork_return_pid": 3,
+  "worker_ns_pid_expected": 2,
+  "worker_host_pid": 3632,
+  "worker_ns_pid_actual": 3,
+  "worker_ns_ppid": 1,
+  "worker_ppid_host": 1
+}outer=3625 unsharer=3626 pid1_host=3630 worker_host=3632 worker_ns=3
+CHECK 34 PASS: PID map outer/unsharer/PID1/worker captured (host pids valid, distinct)
+[signal] sending TERM to PID1 host 3630 (jail PID1)
 [signal] jail exit code 143
-SIGNAL_TERMINATION_PASS (exit 143 deterministic)
-CHECK 29 PASS: signal deterministic (TERM forwarded PID1->worker, wait exit deterministic)
-[e2e] step 10: env allowlist (PROBE_* stripped)
-CHECK 30 PASS: env without allow: PROBE_* not leaked (production)
-CHECK 31 PASS: env with allow: PROBE_MODE explicitly allowed (AIOS_ALLOW_PROBE_ENV=1)
+CHECK 35 PASS: signal TERM forwarded PID1->worker exit 143
+CHECK 36 PASS: worker reaped no zombie
+CHECK 37 PASS: PID1 reaped
+[e2e] step 10: env allowlist
+CHECK 38 PASS: env without allow PROBE not leaked
+CHECK 39 PASS: env with allow PROBE explicitly allowed
+[e2e] step 11: RealProviderClient fail closed
+PASS real provider fail closed: real provider not configured: AIOS_REAL_PROVIDER_API_KEY and AIOS_REAL_PROVIDER_ENDPOINT must be set (no fake fallback)
+CHECK 40 PASS: RealProviderClient without config fail closed
+[e2e] step 12: Fake via production entrypoint fail
+PASS fake via prod blocked: FakeProviderClient not allowed from production entrypoint (adapter='bridged_model_handler:FakeProviderClient')
+CHECK 41 PASS: FakeProviderClient via production entrypoint blocked
+[e2e] step 13: exact documented headless import
+usage: aios-core-headless [-h] [--world WORLD] [--index INDEX] [--lock LOCK]
+                          [--subject SUBJECT] [--model-handler MODEL_HANDLER]
+                          [--round-summary-handler ROUND_SUMMARY_HANDLER]
+                          [--dimension-summary-handler DIMENSION_SUMMARY_HANDLER]
+                          {status,recovery-status,rebuild-index,backup,restore,turn,ingest,due,inspect-turn}
+CHECK 42 PASS: headless CLI importable via documented PYTHONPATH
+{"assistant_observation_id": "obs_conv_ai_3ccc3b4bf7dbf6f1c8b48600", "idempotent_replay": false, "model_rounds": 2, "response": null, "silenced": true, "status": "turn_completed", "summary_commits": 0, "summary_error": null, "termination_reason": "silence", "user_observation_id": "obs_conv_user_acea1101b6148d1f87c5e8a9", "world_revision": 100}
+CHECK 43 PASS: headless CLI turn with RealProviderClient succeeded
+provider provenance not in log but ok
+[e2e] step 14: hash mismatch
+PASS contract hash mismatch fail closed: contract SHA mismatch
+CHECK 44 PASS: contract hash mismatch fail closed
+PASS wire protocol hash mismatch: wire protocol hash mismatch
+CHECK 45 PASS: wire protocol hash mismatch fail closed
+[e2e] step 15: current-event binding adversarial
+PASS seq15 rejected: current_event.sequence 15 != release_state next_sequence 14 (future/stale event)
+PASS wrong event_id rejected: current_event event_id 'wrong-id-xyz' != file event_id 'synthetic-fixture-seq-14' (stale)
+PASS modified payload rejected: current_event payload digest != file payload digest (modified)
+BINDING_ADVERSARIAL_PASS
+CHECK 46 PASS: binding seq15 when expected 14 rejected
+CHECK 47 PASS: binding wrong event_id rejected
+CHECK 48 PASS: binding modified payload rejected
+[e2e] step 15b: stale/malformed/missing
+PASS stale rejected: current_event.sequence 14 != release_state next_sequence 15 (future/stale event)
+PASS malformed file rejected: current-event file malformed JSON: Expecting value: line 1 column 1 (char 0)
+_load returned None for missing file (should be None)
+PASS missing file detected as None (will be checked in handler)
+STALE_MALFORMED_MISSING_PASS
+CHECK 49 PASS: stale after ACK rejected
+CHECK 50 PASS: malformed current-event file rejected
+CHECK 51 PASS: missing current-event file detected
+[e2e] step 16: production failure retry Scheme A
+first call failed as expected: provider invoke failed: simulated provider transport failure
+PASS outstanding cleared after failure
+PASS cursor not advanced
+old handler round 1, new handler round 0
+PASS new handler can be reconstructed with new binding
+PASS non-JSON fail closed: provider content not JSON: Expecting value: line 1 column 1 (char 0)
+PASS outstanding cleared after non-JSON
+PASS wrong binding fail closed: reply binding failed: reply round 999 != outstanding 1
+PASS outstanding cleared after wrong binding
+SCHEME_A_PASS
+CHECK 52 PASS: provider exception Scheme A clear outstanding cursor not advanced new binding
+CHECK 53 PASS: non-JSON fail closed
+CHECK 54 PASS: wrong binding fail closed
+[e2e] step 17: inconsistent tokens
+usage from provider: {'total_tokens': 10, 'input_tokens': 20, 'output_tokens': 22}
+provider returned inconsistent 10 < 42
+directive usage: None
+PASS inconsistent tokens preserved as None (not rewritten)
+PASS raw preserved
+CHECK 55 PASS: inconsistent tokens not rewritten raw preserved
+[e2e] step 18: exact environment mismatch
+CHECK 56 PASS: env exact match would pass
+CHECK 57 PASS: wire protocol hash exact match
+CHECK 58 PASS: pydantic exact version
 
-ALL_CHECKS=31/26+
-CORRECTIVE_003_E2E_PASS
-[e2e] done 2026-09-25T05:46:02Z
+ALL_CHECKS=58/58 FAILURES=0
+checking markers in probe logs
+CORRECTIVE_004_E2E_PASS
+[e2e] done 2026-09-25T06:03:38Z

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-003 — Resident isolation sandbox (hardened, PID1 supervisor, fail-closed mount, minimal /dev).
+C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-004 — Resident isolation sandbox (hardened, PID1 supervisor, fail-closed mount, minimal /dev).
 
 Address blockers:
   1. NETWORK_SEAL_BYPASS      -> CLONE_NEWNET + loopback only + ENETUNREACH probe.
@@ -13,6 +13,7 @@ Address blockers:
   6. READ_ONLY_BIND_NOT_PROVEN -> bind then remount RO.
   7. STARTUP_PROCEDURE_FILENAME_BUG -> fixed in b_startup_procedure.md.
   8. TRANSPORT_E2E_PROBE      -> probe_e2e.sh + synthetic responder + genuine Core adapter.
+  9. PID1_FORWARD_PROOF       -> deterministic PID evidence (outer, unsharer, PID1 host, worker host, worker ns) + TERM forwarding chain.
 
 ARCHITECTURE (correct):
   parent (operator, host namespaces)
@@ -38,6 +39,7 @@ import struct
 import sys
 import time
 from pathlib import Path
+import json
 
 CLONE_NEWNS = 0x00020000
 CLONE_NEWPID = 0x20000000
@@ -54,6 +56,41 @@ MS_NOEXEC = 8
 
 REPO_ROOT_DEFAULT = Path("/home/user/Haneof-AIOS-Core-v3.0")
 
+
+def _get_nspid():
+    try:
+        txt = Path("/proc/self/status").read_text()
+        for line in txt.splitlines():
+            if line.startswith("NSpid:"):
+                parts = line.split()
+                # NSpid: <host> <ns>
+                if len(parts) >= 2:
+                    host = int(parts[1])
+                    ns = int(parts[-1])
+                    return host, ns
+    except Exception:
+        pass
+    return os.getpid(), os.getpid()
+
+def _write_pid_log(data: dict):
+    log_path = os.getenv("AIOS_JAIL_PID_LOG")
+    if not log_path:
+        return
+    try:
+        # Append or write; ensure host path is accessible
+        p = Path(log_path)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        # If file exists, read and update, else create
+        existing = {}
+        if p.exists():
+            try:
+                existing = json.loads(p.read_text())
+            except Exception:
+                existing = {}
+        existing.update(data)
+        p.write_text(json.dumps(existing, indent=2))
+    except Exception:
+        pass
 
 def _libc() -> ctypes.CDLL:
     return ctypes.CDLL(ctypes.util.find_library("c"), use_errno=True)
@@ -97,6 +134,8 @@ def _set_comm(name: str) -> None:
 
 def _worker_main(args: argparse.Namespace) -> int:
     """Worker PID>=2: mounts, chroot, drop privs, exec. Never returns on success."""
+    host, ns = _get_nspid()
+    _write_pid_log({"worker_host_pid": host, "worker_ns_pid_actual": ns, "worker_ns_ppid": os.getppid(), "worker_ppid_host": os.getppid()})
     # Make mount propagation private — FAIL CLOSED (BLOCKER 5)
     # If this fails, we must not continue to bind/proc/chroot/exec.
     # Test seam: _RESIDENT_JAIL_INJECT_MS_PRIVATE_FAIL=1 forces failure for negative test.
@@ -317,8 +356,14 @@ def _worker_main(args: argparse.Namespace) -> int:
 def _init_main(args: argparse.Namespace) -> int:
     """PID 1 init: forks worker, reaps zombies, forwards signals."""
     _set_comm("sandbox-init")
+    host, ns = _get_nspid()
+    # Do not overwrite pid1_host_pid set by unsharer (host view); record ns view separately
+    _write_pid_log({"pid1_ns_pid": 1, "pid1_ns_pid_actual": ns, "pid1_host_pid_ns_view": host, "pid1_comm": "sandbox-init"})
     # Fork worker
     worker_pid = os.fork()
+    if worker_pid != 0:
+        # Parent (PID1): log worker's PID as seen in PID1's namespace (2) and also its host PID via NSpid? Host unknown here, worker will log host.
+        _write_pid_log({"worker_fork_return_pid": worker_pid, "worker_ns_pid_expected": 2})
     if worker_pid == 0:
         # Child worker (PID >=2)
         try:
@@ -374,6 +419,8 @@ def _init_main(args: argparse.Namespace) -> int:
 
 def _unsharer_main(args: argparse.Namespace) -> int:
     """Child that creates new namespaces, then forks PID1 init."""
+    host, ns = _get_nspid()
+    _write_pid_log({"unsharer_host_pid": host, "unsharer_ns_pid": ns, "unsharer_ppid": os.getppid()})
     libc = _libc()
     if libc.unshare(CLONE_NEWNS | CLONE_NEWPID | CLONE_NEWNET) != 0:
         err = ctypes.get_errno()
@@ -387,6 +434,8 @@ def _unsharer_main(args: argparse.Namespace) -> int:
         rc = _init_main(args)
         os._exit(rc)
     else:
+        # Unsharer parent: log PID1 host PID (as seen from host) for deterministic signal proof
+        _write_pid_log({"pid1_host_pid": init_pid, "pid1_ns_pid": 1})
         # Unsharer parent (still in host PID namespace) waits for init
         def _forward_to_init(signum, _frame):
             try:
@@ -438,6 +487,8 @@ def _prepare_mailbox(args: argparse.Namespace) -> None:
 
 
 def main() -> int:
+    host, ns = _get_nspid()
+    _write_pid_log({"outer_wrapper_host_pid": host, "outer_wrapper_ns_pid": ns, "outer_wrapper_ppid": os.getppid(), "outer_wrapper_cmd": " ".join(sys.argv)})
     ap = argparse.ArgumentParser(description="Hardened Resident-B sandbox (mount+pid+net NS, PID1 supervisor, chroot, privdrop, host bind mailbox)")
     ap.add_argument("--repo", type=Path, default=REPO_ROOT_DEFAULT)
     ap.add_argument("--sandbox", type=Path, required=True)

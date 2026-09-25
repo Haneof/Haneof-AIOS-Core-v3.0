@@ -1,51 +1,72 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Environment Manifest (CORRECTIVE-003 frozen)
+# C15-RCC-RES-B-PREFLIGHT-002 — Environment Manifest (CORRECTIVE-004 exact, frozen)
 
 This manifest freezes the exact environment the Resident B process will run under.
-The probe E2E proves that no probe variable leaks into the Resident via unsanitized `env`.
+Any deviation MUST STOP before B start (no pip install, no upgrade).
 
-## Frozen allowed env (operator pass-through, verified at sandbox entry)
+## Frozen runtime (exact, verified at probe)
 
-| Variable | Value / Pattern | How set | Verified |
-| --- | --- | --- | --- |
-| `PYTHONPATH` | `/repo/src` (forced, not inherited) | `resident_jail` sets | `env | grep PYTHONPATH` inside jail shows only `/repo/src` |
-| `HOME` | `/home/nobody` | jail sets | `echo $HOME` → `/home/nobody` |
-| `TMPDIR` | `/tmp` | jail sets | `echo $TMPDIR` → `/tmp` |
-| `PATH` | `/usr/local/bin:/usr/bin:/bin` (host minimal) | inherited but scrubbed of `LD_*` | `env | grep -E LD_/` none |
-| `AIOS_B_SESSION_ID` | `b-session-XYZ` (runtime) | operator args `--run-root` / env | handler reads, not leaked to provider beyond envelope |
-| `AIOS_MAILBOX_ROOT` | `$RUN_ROOT/mailbox` | operator env | handler reads |
-| `AIOS_CONTRACT_SHA256` | `28d3262f…` (contract) | operator env | envelope field |
-| `AIOS_PHASE` | `B` | operator env | envelope `phase B` |
-| `FAKE_PROVIDER`/`FAKE_MODEL` | `fake-provider`/`fake-model-v1` (preflight only) | operator env | FakeProvider constructs provenance |
+| Component | Exact Version / Hash | Verification |
+| --- | --- | --- |
+| Python | `Python 3.11.2` (3.11.2) | `python3 --version` |
+| Pydantic | `2.13.5` | `python3 -c "import pydantic; print(pydantic.__version__)"` |
+| OS | `Debian GNU/Linux 12 (bookworm)` | `/etc/os-release` |
+| Kernel | `Linux e2b.local 6.1.158+ #1 SMP PREEMPT_DYNAMIC Mon May 11 18:48:24 UTC 2026 x86_64 GNU/Linux` | `uname -a` |
+| Wire protocol | `5067701b003f99c141ecef1874ae8195ea2faf1ef5caa87cae092b57cad38b38` | `sha256sum harness/resident_wire_protocol.json` |
+| Contract | `28d3262f…` (exact bytes of RESIDENT_B_RUN_CONTRACT.md) | `sha256sum reviews/.../RESIDENT_B_RUN_CONTRACT.md` |
+| Core tree | `fe77f8a0706acfaf369041d0882b6d0e6de39f22` | `git ls-tree` |
+| Frozen software | `773876f92d5f8e53422f8f5a68cc651953d93052` | `git rev-parse` |
 
-## Explicitly stripped (never reaches Resident)
+## Dependency freeze
 
-These are removed by `resident_jail` before `drop privs + chroot`:
+`pip freeze` SHA-256: `bd7a76d1171c137f...` (full `bd7a76d1171c137f9daee9c0a3dbff029b8cbbccef88f0a1aff7907710a82375`)
 
-- `LD_LIBRARY_PATH`, `LD_PRELOAD`, `LD_AUDIT`, `LD_DEBUG` (all `LD_*`)
-- `PYTHONPATH` (re-set, not inherited), `PYTHONHOME`, `PYTHONINSERTPATH`, `PYTHONSTARTUP`, `PYTHONDEBUG`, `PYTHONINSPECT`
-- `SUDO_*`, `SUDO_COMMAND`, `SUDO_USER`, `SUDO_UID`, `SUDO_GID`
-- `SSH_*`, `http_proxy`, `https_proxy`, `HTTP_PROXY`, `HTTPS_PROXY`, `no_proxy`
-- `GIT_*`, `GITHUB_*`, `GH_`
-- `_RESIDENT_JAIL_INJECT_*` (test seams stripped, not propagated)
-- `PROBE_MODE`, `PROBE_ROUNDS` **unless** `AIOS_ALLOW_PROBE_ENV=1` explicitly (see below)
-
-## Probe env handling (BLOCKER: must not leak via unsanitized env)
-
-- Probe E2E originally set `PROBE_MODE`/`PROBE_ROUNDS` in host env and they were inherited unsanitized → **violation**.
-- Corrective-003: `resident_jail` **drops** `PROBE_MODE`/`PROBE_ROUNDS` by default. Only when `AIOS_ALLOW_PROBE_ENV=1` is exported by the operator **explicitly** for the probe are they allowlisted and passed as `{"PROBE_MODE": ..., "PROBE_ROUNDS": ...}` into the sandbox. The E2E proves both paths:
-  - `without AIOS_ALLOW_PROBE_ENV` → `env | grep PROBE` inside jail is empty.
-  - `with AIOS_ALLOW_PROBE_ENV=1 PROBE_MODE=e2e PROBE_ROUNDS=2` → inside `PROBE_MODE=e2e` (same value operator set) — no blind unsanitized pass.
-- Production B **never** sets `AIOS_ALLOW_PROBE_ENV`; so probe vars never leak into B.
-
-## Provider-visible env
-
-The provider side (`FakeProviderClient`/`RealProviderClient`) receives **only**:
+Relevant pinned packages:
 ```
-{ system: <contract bytes>, messages: [{role:"user", content: envelope_json}], metadata: {phase, round} }
+pydantic==2.13.5
+pydantic_core==2.46.5
 ```
-No host env, no `PROBE_*`, no `/repo/*` path, no leak.
 
-## File manifest for re-verification
+Full freeze is stored as `harness/requirements.freeze.txt` (hash `bd7a76d1171c137f9daee9c0a3dbff029b8cbbccef88f0a1aff7907710a82375`).
 
-- `harness/resident_jail.py` — env allowlist at line ~309 (span including stripped list).
-- `isolation/probe_e2e.sh` — sets `AIOS_ALLOW_PROBE_ENV` for the two PROBE leak checks (steps 7a/b).
+## Allowed env (operator pass-through)
+
+| Variable | Value | How set |
+| --- | --- | --- |
+| `PYTHONPATH` | `src:reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness` (operator must set) | operator |
+| `HOME` | `/home/nobody` | jail |
+| `TMPDIR` | `/tmp` | jail |
+| `PATH` | `/usr/local/bin:/usr/bin:/bin` | sanitized |
+| `AIOS_B_SESSION_ID` | `b-session-XYZ` | operator |
+| `AIOS_MAILBOX_ROOT` | `$RUN_ROOT/mailbox` | operator |
+| `AIOS_CONTRACT_SHA256` | `28d3262f…` | operator |
+| `AIOS_WIRE_PROTOCOL_SHA256` | `5067701b003f99c141ecef1874ae8195ea2faf1ef5caa87cae092b57cad38b38` | operator |
+| `AIOS_REAL_PROVIDER_API_KEY` | `<redacted>` | operator (required for prod) |
+| `AIOS_REAL_PROVIDER_ENDPOINT` | `https://broker.example/...` | operator (required) |
+| `AIOS_PROVIDER_ADAPTER` | `bridged_model_handler:RealProviderClient` | operator (pinned) |
+| `AIOS_RELEASE_STATE_PATH` | `$RUN_ROOT/runtime/release_state.json` | operator |
+| `AIOS_CURRENT_EVENT_PATH` | `$RUN_ROOT/current-event.json` | operator per cursor |
+| `AIOS_EXPECTED_EVENT_PATH` | (same as current for binding) | operator |
+
+## Explicitly stripped
+
+`LD_*`, `PYTHON*`, `SUDO*`, `SSH_*`, `http_proxy`, `GIT_*`, `GH_*`, `_RESIDENT_JAIL_*`, `PROBE_*` unless `AIOS_ALLOW_PROBE_ENV=1`.
+
+## Provider-visible
+
+Only `{ system: contract, wire_protocol: schema, wire_protocol_sha256: hash, messages: [{role:user, content: envelope_json}] }` — no env, no path.
+
+## Probe asserts (must pass before B)
+
+- `python3 --version` must equal `Python 3.11.2`
+- `python3 -c "import pydantic; print(pydantic.__version__)"` must equal `2.13.5`
+- `sha256sum harness/resident_wire_protocol.json` must equal `5067701b003f99c141ecef1874ae8195ea2faf1ef5caa87cae092b57cad38b38`
+- `sha256sum RESIDENT_B_RUN_CONTRACT.md` must equal `28d3262f…`
+- `pip freeze` must contain `pydantic==2.13.5` (or hash must match)
+- Mismatch → STOP, do not run B (no `pip install` at release).
+
+## File manifest
+
+- `harness/resident_wire_protocol.json` + `.md` (pinned)
+- `harness/requirements.freeze.txt` (full freeze)
+- `harness/resident_jail.py` env allowlist
+- `isolation/probe_e2e.sh` asserts exact versions (step 0)

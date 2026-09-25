@@ -1,16 +1,22 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Exact B Startup Procedure (CORRECTIVE-003 frozen)
+# C15-RCC-RES-B-PREFLIGHT-002 — Exact B Startup Procedure (CORRECTIVE-004 frozen)
 
 This procedure is prepared by preflight but NOT executed. It will be carried out by the independent release task `C15-RCC-RES-B-RELEASE-002` after this preflight is independently reviewed and accepted.
 
-This procedure does NOT reveal cursor 14. It prepares the runtime directory, frozen harness, and isolation evidence. Cursor 14 reveal is the first act of the B release task (fresh model process, one cursor at a time).
+This procedure does NOT reveal cursor 14. It prepares the runtime directory, frozen harness, wire protocol, and isolation evidence. Cursor 14 reveal is the first act of the B release task (fresh model process, one cursor at a time).
 
-## 0. Prerequisites
+## 0. Prerequisites (exact, fail closed)
 
 - Live main pinned to the commit that merges this preflight PR (or to a release-review-approved descendant). Current `main HEAD aa19af1` with `software 773876f92d5f8e53422f8f5a68cc651953d93052`, `Core fe77f8a0706acfaf369041d0882b6d0e6de39f22` unchanged.
 - #205 still at exact head `d17ae972ad1d312735c355f775ac024bc4cebdf7`; verify with `git fetch origin pull/205/head:pr205 && git rev-parse pr205` before starting.
-- Python 3.11+ with `pydantic` available.
-- `sudo` for mount-namespace sandbox construction (sandbox drops to `nobody` before Resident runs; `CAP_SYS_ADMIN|CAP_SYS_CHROOT|CAP_SYS_RESOURCE` required for `unshare`+`mount`+`chroot`).
+- **Exact environment** per `environment_manifest.md` — no `pip install` at release:
+  - `Python 3.11.2` (`python3 --version` must equal `Python 3.11.2`)
+  - `pydantic 2.13.5` (`python3 -c "import pydantic; print(pydantic.__version__)"` must equal `2.13.5`)
+  - `harness/resident_wire_protocol.json` sha256 `5067701b003f99c141ecef1874ae8195ea2faf1ef5caa87cae092b57cad38b38`
+  - `RESIDENT_B_RUN_CONTRACT.md` `sha256 28d3262f…`
+  - `pip freeze` must contain `pydantic==2.13.5` and hash `bd7a76d1171c137f9daee9c0a3dbff029b8cbbccef88f0a1aff7907710a82375`; full freeze at `harness/requirements.freeze.txt`. Mismatch → STOP.
+- `sudo` for mount-namespace sandbox (`CAP_SYS_ADMIN|CAP_SYS_CHROOT|CAP_SYS_RESOURCE` for `unshare+mount+chroot`).
 - `environment_manifest.md` pinned; `PROBE_MODE/PROBE_ROUNDS` not set in production.
+- Real provider adapter pinned: `bridged_model_handler:RealProviderClient` `v1.0.0-frozen`, `provider real-provider` `model real-model-v1`, `wire_protocol 5067701b…`.
 
 ## 1. Prepare a fresh B runtime directory (operator side, outside jail)
 
@@ -18,31 +24,32 @@ This procedure does NOT reveal cursor 14. It prepares the runtime directory, fro
 RUN_ROOT=/tmp/c15-rcc-res-b-002-$(date +%s)
 mkdir -p $RUN_ROOT/{runtime,sandbox,mailbox/{inbox,outbox,archive},evidence/{mailbox,freeze},scratch,inject}
 
-# Copy byte-exact A-002 lineage from this preflight (or from #205 directly).
-# IMPORTANT: copy to world.sqlite / index.sqlite / release_state.json (names headless CLI expects), NOT private_world.sqlite etc.
+# Copy byte-exact A-002 lineage
 cp reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/lineage_copy/private_world.sqlite   $RUN_ROOT/runtime/world.sqlite
 cp reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/lineage_copy/world_index.sqlite     $RUN_ROOT/runtime/index.sqlite
 cp reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/lineage_copy/release_state.json    $RUN_ROOT/runtime/release_state.json
 touch $RUN_ROOT/runtime/world.writer.lock
 ```
 
-Verify digests of the copy match accepted freeze digests:
+Verify digests:
 
 ```bash
 cd $RUN_ROOT/runtime
 sha256sum world.sqlite index.sqlite release_state.json
-# Expect:
 # 626c6bb32c7fdae90a068ee10dd2b4c9c9cdbc46b6feb2bf5b11cba9363401f6aa  world.sqlite
 # ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1  index.sqlite
 # eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8  release_state.json
+sha256sum ../harness/resident_wire_protocol.json 5067701b003f99c141ecef1874ae8195ea2faf1ef5caa87cae092b57cad38b38
+python3 --version # Python 3.11.2
+python3 -c "import pydantic; print(pydantic.__version__)" # 2.13.5
 ```
 
-If any digest mismatches, STOP.
+If any mismatch, STOP — no `pip install`, no upgrade.
 
 ## 2. Verify recovery status (no model invocation)
 
 ```bash
-PYTHONPATH=src python3 -m aios_core.headless.cli \
+PYTHONPATH=src:reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness python3 -m aios_core.headless.cli \
   --world $RUN_ROOT/runtime/world.sqlite \
   --index $RUN_ROOT/runtime/index.sqlite \
   --lock  $RUN_ROOT/runtime/world.writer.lock \
@@ -51,10 +58,12 @@ PYTHONPATH=src python3 -m aios_core.headless.cli \
 
 Expect `world_revision=98`, `index_watermark=98`, `index_lag=0`, `recovery_disposition=AUTO_RECOVERABLE`, `world_quick_check=["ok"]`. If not, STOP.
 
+Note: `PYTHONPATH` **must** include `src` **and** the nested harness directory (`reviews/.../harness`) so that `bridged_model_handler` is importable as `import bridged_model_handler` (frozen import contract for `load_model_handler()` which does `importlib.import_module(module_name)` without adding paths).
+
 ## 3. Phase-B init (operator side; validates boundary, transitions active_phase to B)
 
 ```bash
-PYTHONPATH=src python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py \
+PYTHONPATH=src:reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py \
   init --phase B --state $RUN_ROOT/runtime/release_state.json
 ```
 
@@ -64,12 +73,11 @@ Expect:
 {"fixture_sha256":"sha256:7ccb309d...","next_sequence":14,"phase":"B","status":"initialized"}
 ```
 
-If error, STOP — boundary malformed. After init, `release_state.json.active_phase == "B"`, `next_sequence==14`, `pending_reveal==null`, receipts unchanged.
+After init, `release_state.json.active_phase == "B"`, `next_sequence==14`, `pending_reveal==null`.
 
 ## 4. Build and verify the sandbox BEFORE the model starts
 
 ```bash
-# Copy probes into inject dir
 cp reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/isolation/probe_isolation.sh $RUN_ROOT/inject/probe.sh
 cp reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/isolation/resident_test_responder.py $RUN_ROOT/inject/responder.py
 cp reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/mailbox_bridge.py $RUN_ROOT/inject/mailbox_bridge.py
@@ -86,35 +94,18 @@ sudo python3 reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFL
   -- /bin/sh /work/inject/probe.sh
 ```
 
-Expected final line: `ISOLATION_PASS`, exit 0. This validates:
+Expected `ISOLATION_PASS` (`CLONE_NEWNET` ENETUNREACH, `sandbox-init` PID1 → worker ≥2, `MS_PRIVATE` fail-closed, RO `ro,nosuid,nodev`, `/dev` minimal, mailbox `0755/01733`, privdrop, env allowlist).
 
-- `CLONE_NEWNET` ENETUNREACH (github/raw/api/8.8.8.8 blocked, loopback only)
-- `CLONE_NEWPID` fresh `/proc`, `sandbox-init` PID1 → worker `PID≥2`, reap
-- `CLONE_NEWNS` mount private fail-closed (MS_PRIVATE injection → exit 98), RO bind `ro,nosuid,nodev` + `EROFS`
-- Mailbox IPC: `inbox 0755/outbox 01733/archive 0700 not mounted`, `nobody` read/write/no-archive
-- `/dev` minimal (`null/zero/urandom/random` + `fd` only, no `sda/tty/mem`)
-- Privdrop dual injection (`exit 98` no sentinel), signal strict, env allowlist (PROBE_* stripped)
-- Forbidden path guard (`/repo/fixture` blocked, bare `obs_c14_fixture_*` allowed)
+If `ISOLATION_FAIL`, STOP.
 
-If `ISOLATION_FAIL` or any `FAIL:` line appears, STOP.
-
-## 4a. Run the E2E transport probe — genuine + synthetic (no cursor 14 reveal to real model)
+## 4a. Run the E2E transport probe — genuine + production + adversarial (no cursor 14 reveal)
 
 ```bash
-# Disposable E2E (26 checks)
+# 004 exact gate: EXPECTED_CHECKS=41, requires CHECKS==EXPECTED_CHECKS and zero FAIL
 bash reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/isolation/probe_e2e.sh
 ```
 
-Expected final line: `CORRECTIVE_003_E2E_PASS` (or `E2E_PROBE_PASS` for legacy step header, plus 6 explicit binding failure lines).
-
-- Mailbox self-tests (15 including extra reply field)
-- Binding negatives (stale/preplay/replay/wrong-id/wrong-digest + future-not-valid-later)
-- **Synthetic 2-round:** `FusedTurnRuntime → SyntheticProbeHandler → MailboxBridge → inside-jail responder (nobody)` → `invoke search_world Atlas limit2 (non-empty legal)` → capability OK → second envelope carries `capability_history` with `obs_c14_fixture_*` → `silence`
-- **Production 2-round:** `FusedTurnRuntime → ProductionResidentHandler(FakeProviderClient fake-provider/fake-model-v1/42 tokens) → build_model_request(contract+envelope) → FakeProvider invoke → reply validate/binding → ModelDirective with REAL provenance` → `Atlas` non-empty → `silence`
-- **Current-event wiring:** `current_event` 8-field seq14 positive + negatives (13/23/extra/missing/phase A) fail closed before write
-- **Strict reply:** `silence{capability}` extra field rejected
-- **Scheme A:** `round_repair_request` unsupported → fail closed
-- **Environment:** `PROBE_MODE` stripped unless `AIOS_ALLOW_PROBE_ENV=1`
+Expected `CORRECTIVE_004_E2E_PASS` (41 checks: mailbox 15, isolation, binding 7, synthetic+production genuine, current-event 6, strict, Scheme A, MS_PRIVATE, /dev, signal deterministic with PID map, env exact, real-provider fail-closed, fake fallback fail, import path executable, wire protocol hash, inconsistent telemetry, etc.).
 
 Do NOT proceed if any check fails.
 
@@ -129,63 +120,59 @@ echo "$B_PROCESS" > $RUN_ROOT/evidence/b_process_id
 
 Must be fresh — no reuse of `c15-rcc-res-a-rerun-002-2079f64af49c`.
 
-## 6. Prepare the operator-side model handler (OUTSIDE the jail) — FROZEN (BLOCKER 1 + 3)
+## 6. Prepare the operator-side model handler (OUTSIDE the jail) — FROZEN (RealProviderClient)
 
-**Frozen file:** `harness/bridged_model_handler.py` — contains both `ProductionResidentHandler` (real B) and `SyntheticProbeHandler` (disposable probe). **MUST NOT be edited at release.** Only the `ProviderClient` ctor is swapped.
+**Frozen file:** `harness/bridged_model_handler.py` + `harness/resident_wire_protocol.json` (`5067701b…`). **MUST NOT be edited at release.** Only `AIOS_REAL_PROVIDER_*` env selects real broker.
 
-Real B uses `ProductionResidentHandler` (frozen intent, per `isolation/isolation_report.md`):
+Real B uses `ProductionResidentHandler` with `RealProviderClient` (pinned `bridged_model_handler:RealProviderClient` `v1.0.0-frozen`):
 
-1. Core's `FusedTurnRuntime`/`CognitiveRuntime` calls `ProductionResidentHandler(snapshot)` via `ModelHandler` protocol — snapshot is mechanically assembled (`world_map/cockpit/capability_catalog/history/wake_reason/round_index`), not hand-written.
-2. `build_envelope(snapshot, b_session, contract_sha256, current_event)` projects to Resident-safe envelope (11-field allowlist, `event` is **exact** 8-field projection `event_id/sequence/occurred_at/dimension/source_kind/source_class/modality/resident_visible_payload` with `14..22`, `phase B`, `allowed_sequences [14,22]`, no extra keys). `event=None` only in synthetic probe; real B always has `current_event` for the revealed cursor.
-3. Binding assigns `round/request_id/nonce/request_digest` (one-at-a-time, canonical digest).
-4. `build_model_request(contract_text, envelope)` builds the **exact** provider request `{system: <RESIDENT_B_RUN_CONTRACT.md bytes>, messages: [{role:"user", content: JSON(envelope)}]}` — no other file.
-5. `provider_client.invoke(request)` executes **outside** the jail (broker sees only `contract+envelope`; `CLONE_NEWNET` remains sealed inside). Preflight uses `FakeProviderClient(provider="fake-provider", model="fake-model-v1", total_tokens=42)`; real B uses `RealProviderClient` (same interface, same file, constructor-only swap).
-6. `wait` verifies `round/request_id/request_digest` exactly; stale/preplay/replay/wrong-id/wrong-digest fail closed → `ModelDispatchNotSubmitted` (no semantic default).
-7. `reply_to_directive_production(reply, snap, provider_resp)` maps `action` → `ModelDirective` with **REAL** provenance (`provider/model/request_id` from provider, or `"UNKNOWN"` where credibly unavailable; `usage.total_tokens` from provider or `None`, never `10`).
-8. Capability follow-up uses **same adapter/binding** for round 2 (`capability_history` now contains `search_world Atlas` legal result `obs_c14_fixture_*`) — proven that one `run_turn` → two handler invocations.
+1. `FusedTurnRuntime` → `ProductionResidentHandler(snapshot)` (mechanical `world_map/cockpit/catalog/history/wake_reason`).
+2. `build_envelope(snapshot,b_session,contract_sha,current_event,release_state_path)` → envelope `event` is **exact** 8-field projection bound to current release cursor (sequence==next_sequence, event_id==expected, payload digest==expected, release-state `pending_reveal` or operator reveal file). `event=None` only for synthetic probe; real B always has `current_event` per cursor.
+3. `validate_current_event_binding` enforces `sequence 14..22`, `source_kind conversation|mechanical`, payload non-empty, and exact binding to `release_state.json` next/pending and `AIOS_CURRENT_EVENT_PATH` file digest. `seq15` when expected `14` → fail closed.
+4. Binding `round/request_id/nonce/request_digest` (one-at-a-time, canonical digest).
+5. `build_model_request(contract_text,envelope,wire_protocol_text)` → **exact** provider request `{system: contract, wire_protocol: schema, wire_protocol_sha256: 5067701b…, messages: [{role:user, content: JSON(envelope)}]}` — provider sees `contract + envelope + mechanical reply schema`, never fixture.
+6. `RealProviderClient.invoke(request)` outside jail (pinned adapter). **Fail closed if `AIOS_REAL_PROVIDER_API_KEY` or `AIOS_REAL_PROVIDER_ENDPOINT` missing, or adapter unresolvable, or `FakeProviderClient` selected from production entrypoint.**
+7. Parse provider `content` JSON → `validate_reply` (per-action allowlist) + `verify_binding` (stale/preplay/replay/wrong-id/wrong-digest fail) → `reply_to_directive_production` with **RAW provenance** (`provider/model/request_id` actual or `UNKNOWN`, `usage` raw preserved, inconsistent `total<input+output` → `usage None` not rewritten).
+8. On any `provider exception / non-JSON / schema invalid / binding invalid` → **Scheme A-hard-stop**: clear `_outstanding`, save failure evidence, terminate/reconstruct handler, do **not** advance cursor, next request has new binding, never generate semantic repair hint.
+9. Capability follow-up uses same `current_event` for same cursor, same adapter/binding round 2 (`capability_history` contains `Atlas` legal `obs_c14_fixture_*`).
 
-The frozen handler MUST NOT:
+The frozen handler MUST NOT: include A transcript/governance/fixture, pre-populate answer, log chain-of-thought, synthesize default on timeout, fabricate `sandbox-bridge/10` for real B, or rewrite `total_tokens`.
 
-- include A mailbox, A transcript, governance, fixture, evaluator, PM report in context;
-- pre-populate answer/hint;
-- log chain-of-thought;
-- synthesize default on timeout/malformed (fail closed);
-- fabricate `total_tokens=10` / `sandbox-bridge` for real B.
-
-Headless wiring for production (fake shown, real swaps client):
+Headless wiring for production (exact documented command, must succeed via real import):
 
 ```bash
 export AIOS_B_SESSION_ID="$B_SESSION"
 export AIOS_CONTRACT_SHA256="$(sha256sum reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md | cut -d' ' -f1)"
-# Fake preflight:
-export FAKE_PROVIDER="fake-provider"
-export FAKE_MODEL="fake-model-v1"
-# Resident still jailed; model runs outside jail via broker:
-PYTHONPATH=src python3 -m aios_core.headless.cli \
+export AIOS_WIRE_PROTOCOL_SHA256="5067701b003f99c141ecef1874ae8195ea2faf1ef5caa87cae092b57cad38b38"
+export AIOS_REAL_PROVIDER_API_KEY="sk-real-..."   # required, fail closed if missing
+export AIOS_REAL_PROVIDER_ENDPOINT="https://broker.trusted/..." # required
+export AIOS_PROVIDER_ADAPTER="bridged_model_handler:RealProviderClient" # pinned
+export AIOS_RELEASE_STATE_PATH="$RUN_ROOT/runtime/release_state.json"
+export AIOS_CURRENT_EVENT_PATH="$RUN_ROOT/current-event.json" # per cursor, refreshed each turn
+export PYTHONPATH="src:reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness"
+# Exact documented headless command (must be importable without sys.path.insert):
+python3 -m aios_core.headless.cli \
   --world "$RUN_ROOT/runtime/world.sqlite" \
   --index "$RUN_ROOT/runtime/index.sqlite" \
   --lock  "$RUN_ROOT/runtime/world.writer.lock" \
-  --model-handler harness.bridged_model_handler:headless_production_handler \
+  --model-handler bridged_model_handler:headless_production_handler \
   turn --session "$B_SESSION" --turn-index 1 --text "..." --at "2026-11-05T09:00:00-08:00"
 ```
 
-Alternative synthetic headless (`headless_handler` → `SyntheticProbeHandler` + mailbox) remains for disposable tests only.
+`FakeProviderClient` is **never** reachable from this entrypoint; it is only instantiated explicitly by `probe_e2e.sh` for disposable tests.
 
-See `environment_manifest.md` for env allowlist, `procedure/per_cursor_interaction.md` for the exact 14..22 loop (Scheme A, no repair), and `probe_e2e.sh` for the 26-check genuine evidence.
+See `environment_manifest.md` for exact env, `per_cursor_interaction.md` for Scheme A and per-cursor event lifecycle, `probe_e2e.sh` for 41-check evidence.
 
 ## 7. Drive B cursors 14..22 (sequential, per procedure/per_cursor_interaction.md)
 
-For each `seq` 14..22 (exactly one at a time):
+For each `seq` 14..22 (exactly one at a time, per-cursor file binding):
 
-1. `release_operator.py reveal --phase B --state $RUN_ROOT/runtime/release_state.json > /tmp/current-event-$seq.json` — operator only, reads sealed fixture outside jail, emits only the 8-field projection (validated before envelope build).
-2. If `source_kind==conversation`: `canonical_conversation_ingest.py` then `aios-core-headless turn` (which calls `ProductionResidentHandler` with `current_event` set); if mechanical: `mechanical_ingest_adapter.py` then `due`. Blocks on `MailboxBridge.wait_for_reply`-equiv binding verification inside production handler.
-3. After durable ACK + `due` completion, loop.
+1. `release_operator.py reveal --phase B --state $RUN_ROOT/runtime/release_state.json > $RUN_ROOT/current-event.json` — operator only, emits 8-field projection; handler reads `AIOS_CURRENT_EVENT_PATH` per call, validates `sequence==next_sequence`, `event_id` and payload digest exact, source_kind, and pending status; mismatch/stale/missing/malformed → fail closed, do not advance.
+2. If `source_kind==conversation`: `canonical_conversation_ingest.py` then `headless turn` (via `RealProviderClient`); if mechanical: `mechanical_ingest_adapter.py` then `due`.
+3. After durable ACK + `due` completion, **clear** `current-event.json` (or overwrite for next seq), reconstruct handler if Scheme A failure occurred (new binding), loop.
 
-Resident model context is kept alive across rounds **within** B session (working-memory continuity) but fresh at B startup (zero prior history).
+Resident context kept alive within B session (working memory) but fresh at B startup.
 
 ## 8. Stop condition + freeze
 
-After `seq 22` durably ACKed and due work completed at that timestamp, run `procedure/final_freeze_procedure.md` (freeze World/Index/Release + evidence), terminate model process and sandbox. Do not proceed to `seq 23`.
-
-```
-
+After `seq 22` ACKed and due work completed, run `final_freeze_procedure.md`, terminate sandbox. Do not proceed to `seq 23`.
