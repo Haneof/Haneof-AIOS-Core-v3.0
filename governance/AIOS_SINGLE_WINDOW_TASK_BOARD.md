@@ -1,6 +1,6 @@
 # AIOS v3.0 单窗口任务执行总表
 
-## 当前控制入口 — 2026-09-26 FRESH-A-002 ACCEPTED / B-PREFLIGHT-002 DONE+ACCEPTED / B-RELEASE-002 READY
+## 当前控制入口 — 2026-09-26 FRESH-A-002 ACCEPTED / B-PREFLIGHT-002 DONE+ACCEPTED / B-RELEASE-002 DONE+RELEASED / B-RERUN-002 READY
 
 - 接任 PM 依 #128 治理接手；接手与 live 复核：`governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
 - **派工基线 = live main `079d7516f195cf6973933acc8cd057d59adc3a9f`**（其后仅治理/审查文档变更）；`CORE-OPERATOR-001` 集成点 = `e72a63874ed2c28798b00cec51f191caf1594a00`；Core tree 自审计以来始终 `7db4f72e7b3c29c74082f9984141159f8f1d6071`。每个新窗口仍须自行重取 live main，不得把本 SHA 当永久施工基线。
@@ -17,7 +17,7 @@
 - S2 两个并行修复窗口的写入范围隔离与 operator 面禁改规则见 `governance/AIOS_CORE_GAP_DISPATCH_2026-09-24.md` 的 "Dispatch update — 2026-09-24"。
 - **`CORE-CI-FIX-001 = DONE`**：首轮 review #150 对 head `1896b3e5...` 正确给出 ACCEPTANCE_FAIL（历史 blocker 保留）；corrective review #156 对 exact head `1eb24e101cdb1579c22c69b435cf9f79a3c359ad` 给出 ACCEPTANCE_PASS / 0 blockers；#156 先合 `f3d20c22...`，随后 #146 以 pinned head 合入 `c3ec42214db57864f7951e28b75811b10db8be21`。收据：`governance/CORE_CI_FIX_001_INTEGRATION_RECEIPT_2026-09-24.md`。PR #144 继续 SUPERSEDED / NOT INTEGRATED。历史派工说明：**（release/CI 基础设施）：`c15-rcc-fixture-mechanical-gate` 与 `semantic-repair-mechanical-gate` 的 "prove zero Core diff" 步骤在浅克隆上 `git` 自身 exit 128，随分支形状时红时绿（#133 红 / #137 绿 / #138 #139 红），不是策略违规。发现与 PM 裁决：`governance/AIOS_CORE_CI_FINDING_001_2026-09-24.md`；提示词：`governance/prompts/CORE_CI_FIX_001_2026-09-24.md`。不阻塞 FIX-001/002，但 **必须在 `CORE-RC-FREEZE-001` 之前关闭**。
 - #138/#139 两条红检查登记为 **INFRASTRUCTURE_FAILURE**，不登记为通过、也不登记为已接受的违规；PM 已用直接证据独立验证不变式成立（`git diff e72a638..main -- src/` 为空，Core tree 仍 `7db4f72e`），未绕过分支保护（该两项非 required）。
-- `CORE-HEADLESS-001 = DONE`；`CORE-RECOVERY-001 = DONE`；`CORE-SCALE-001 = DONE`；`CORE-RC-FREEZE-001 = DONE`。frozen software `773876f92d5f8e53422f8f5a68cc651953d93052` / Core tree `fe77f8a0706acfaf369041d0882b6d0e6de39f22`。`C15-RCC-RES-A-RERUN-002 = DONE / ACCEPTED`，canonical A evidence PR #205 @ `d17ae972ad1d312735c355f775ac024bc4cebdf7` 保持 OPEN / UNMERGED / PINNED。`C15-RCC-RES-B-PREFLIGHT-002 = DONE / ACCEPTED`：PR #209 exact `aab3a30cc48e8c7041ef4b37e0e5f379c3060c93`，PM review `5323959000`，Independent Acceptance `5323972504` = PASS / blocker=0，merge `65e6e8266bb0541d624eb8e5bba825b91145564f`。唯一下一 READY = `C15-RCC-RES-B-RELEASE-002`；真实 B / B-ACCEPT / C / C16 / broad P16 / P17 / UI / P18 / P19 继续 BLOCKED。
+- `CORE-HEADLESS-001 = DONE`；`CORE-RECOVERY-001 = DONE`；`CORE-SCALE-001 = DONE`；`CORE-RC-FREEZE-001 = DONE`。frozen software `773876f92d5f8e53422f8f5a68cc651953d93052` / Core tree `fe77f8a0706acfaf369041d0882b6d0e6de39f22`。`C15-RCC-RES-A-RERUN-002 = DONE / ACCEPTED`，canonical A evidence PR #205 @ `d17ae972ad1d312735c355f775ac024bc4cebdf7` 保持 OPEN / UNMERGED / PINNED。`C15-RCC-RES-B-PREFLIGHT-002 = DONE / ACCEPTED`：PR #209 exact `aab3a30cc48e8c7041ef4b37e0e5f379c3060c93`，Independent Acceptance `5323972504` = PASS / blocker=0，merge `65e6e8266bb0541d624eb8e5bba825b91145564f`。`C15-RCC-RES-B-RELEASE-002 = DONE / RELEASED`：release record `governance/C15_RCC_RES_B_RELEASE_002_RELEASE_RECORD_2026-09-26.md`，fresh validation run `36216433668` attempt 2 SUCCESS；唯一 B run/session = `c15-rcc-res-b-rerun-002-65e6e826` / `c15-rcc-res-b-session-002-65e6e826`。唯一下一 READY = `C15-RCC-RES-B-RERUN-002`；B-ACCEPT / C / C16 / broad P16 / P17 / UI / P18 / P19 继续 BLOCKED。
 
 ## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / S1-S2 ACTIVE
 
@@ -51,12 +51,13 @@
 | C15-RCC-RES-A-RERUN-002 | **DONE / ACCEPTED** | PR #207 ACCEPTANCE_PASS / blocker=0 merged `c1236bf2fd6ea259fe7d487c5ac0e96abd072141`；canonical evidence PR #205 exact `d17ae972ad1d312735c355f775ac024bc4cebdf7` remains OPEN / UNMERGED / PINNED；receipt `governance/C15_RCC_RES_A_RERUN_002_ACCEPTANCE_INTEGRATION_RECEIPT_2026-09-25.md` |
 | C15-RCC-RES-A-RERUN-002-ACCEPT-001 | **DONE** | review-only PR #207 merged；report `reviews/C15_RCC_RES_A_RERUN_002_INDEPENDENT_ACCEPTANCE_2026-09-25.md` |
 | C15-RCC-RES-B-PREFLIGHT-002 | **DONE / ACCEPTED** | PR #209 exact `aab3a30cc48e8c7041ef4b37e0e5f379c3060c93`；PM review `5323959000`；Independent Acceptance `5323972504` = PASS / blocker=0；merge `65e6e8266bb0541d624eb8e5bba825b91145564f`；receipt `governance/C15_RCC_RES_B_PREFLIGHT_002_ACCEPTANCE_INTEGRATION_RECEIPT_2026-09-26.md` |
-| C15-RCC-RES-B-RELEASE-002 | **READY** | 独立 non-Resident release review；重新 pin #209 merged preflight / #205 A-002 / frozen RC / Resident-safe isolation，冻结唯一 B run+session+safe packet；禁止 reveal cursor 14；prompt `governance/prompts/C15_RCC_RES_B_RELEASE_002_2026-09-26.md` |
-| C15-RCC-RES-B-RERUN-002 → B-ACCEPT-002 → C / EVAL / CLOSE | **BLOCKED** | 等 `C15-RCC-RES-B-RELEASE-002` 完成并将唯一 B-RERUN-002 放行；旧 #117/#121 与旧 B-PREFLIGHT-001 仅历史链，不得初始化新 RC B |
+| C15-RCC-RES-B-RELEASE-002 | **DONE / RELEASED** | release record `governance/C15_RCC_RES_B_RELEASE_002_RELEASE_RECORD_2026-09-26.md`；fresh release validation `36216433668` attempt 2 SUCCESS；exact run/session `c15-rcc-res-b-rerun-002-65e6e826` / `c15-rcc-res-b-session-002-65e6e826`；release review 未运行真实 Resident B、未向 Resident/model 暴露真实 cursor14 payload |
+| C15-RCC-RES-B-RERUN-002 | **READY** | 唯一合法下一任务；使用 exact run/session `c15-rcc-res-b-rerun-002-65e6e826` / `c15-rcc-res-b-session-002-65e6e826` 与 Resident-safe launch `reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-RELEASE-002/RESIDENT_SAFE_LAUNCH.md`；真实 Resident B fresh-context 仅运行 cursor 14..22，RUN_COMPLETE 后停 |
+| C15-RCC-RES-B-ACCEPT-002 → C / EVAL / CLOSE | **BLOCKED** | 等 B-RERUN-002 `RUN_COMPLETE / AWAITING_INDEPENDENT_ACCEPTANCE`；验收通过前不得进入 C / evaluator / close |
 | POST-C15-ISSUE-RECONCILIATION-001 | **BLOCKED** | C15 CLOSE 后先 fresh 对账 #23/#28/#33/#34/#35 与当时 live main；已合入修复不得重复实现；仅当最新 main 可复现时另开新工程 Task |
 | C16 → P16 → P17 | **BLOCKED** | `POST-C15-ISSUE-RECONCILIATION-001` 完成后继续原逐项 Gate；只有 P17 PASS 才可进入 P18 平台帮助闭环 |
 
-FIX-001 / FIX-002 / FIX-003 三项 audited Core gap 已全部独立接受并集成；CG-001/002/003 均 CLOSED。`CORE-HEADLESS-001`、`CORE-RECOVERY-001`、`CORE-SCALE-001`、`CORE-RC-FREEZE-001` 均已独立接受并集成。A-002 已接受且 #205 保持 canonical evidence；B-PREFLIGHT-002 已由 #209 fresh Independent Acceptance 接受并合入。当前唯一合法下一任务为 `C15-RCC-RES-B-RELEASE-002 = READY`；release review 不得 reveal cursor 14 / 不得运行 Resident。B-RERUN-002 仅在 release record 集成 main 后才可 READY。
+FIX-001 / FIX-002 / FIX-003 三项 audited Core gap 已全部独立接受并集成；CG-001/002/003 均 CLOSED。`CORE-HEADLESS-001`、`CORE-RECOVERY-001`、`CORE-SCALE-001`、`CORE-RC-FREEZE-001` 均已独立接受并集成。A-002 已接受且 #205 保持 canonical evidence；B-PREFLIGHT-002 已接受并合入；`C15-RCC-RES-B-RELEASE-002 = DONE / RELEASED`。当前唯一合法下一任务为 `C15-RCC-RES-B-RERUN-002 = READY`；它必须使用已冻结唯一 run/session 与 Resident-safe launch，只运行真实 B cursor 14..22。B-ACCEPT / C / evaluator / close 继续等待。
 
 > Status: ACTIVE  
 > Effective: 2026-09-21  

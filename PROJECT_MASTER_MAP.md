@@ -1,12 +1,12 @@
 # AIOS v3.0 项目全流程总地图
 
-## 当前控制入口 — 2026-09-26 RC-FREEZE DONE; FRESH-A-002 ACCEPTED; B-PREFLIGHT-002 DONE+ACCEPTED; B-RELEASE-002 READY
+## 当前控制入口 — 2026-09-26 RC-FREEZE DONE; FRESH-A-002 ACCEPTED; B-PREFLIGHT-002 DONE+ACCEPTED; B-RELEASE-002 DONE+RELEASED; B-RERUN-002 READY
 
 - `CORE-BASELINE-001 = DONE`。
 - `CORE-GAP-AUDIT-001 = DONE`：PR #132 accepted/merged at `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`；audited Core tree `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
 - Audit disposition: 3 STILL_OPEN RC blockers / 14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE。
 - Active audited Core gap blocker: none. CG-001 / CG-002 / CG-003 are DONE.
-- S2 当前：Core gap / CI / HEADLESS / RECOVERY / SCALE / RC-FREEZE 均 DONE。frozen software `773876f9...` / Core tree `fe77f8a0...`。A-002 已由 #207 独立接受；canonical evidence = PR #205 @ `d17ae972...` OPEN / UNMERGED / PINNED。B-PREFLIGHT-002 已由 PR #209 fresh Independent Acceptance PASS 并合入 `65e6e826...`。唯一下一 READY = `C15-RCC-RES-B-RELEASE-002`。
+- S2 当前：Core gap / CI / HEADLESS / RECOVERY / SCALE / RC-FREEZE 均 DONE。frozen software `773876f9...` / Core tree `fe77f8a0...`。A-002 已由 #207 独立接受；canonical evidence = PR #205 @ `d17ae972...` OPEN / UNMERGED / PINNED。B-PREFLIGHT-002 已由 PR #209 fresh Independent Acceptance PASS 并合入 `65e6e826...`。`C15-RCC-RES-B-RELEASE-002 = DONE / RELEASED`，exact run/session 已冻结；唯一下一 READY = `C15-RCC-RES-B-RERUN-002`。
 - `CORE-OPERATOR-001 = DONE`：#135 ACCEPTANCE_PASS → #131 exact head `0e1d69ee` merged at `e72a63874ed2c28798b00cec51f191caf1594a00`；Core ZERO DIFF；#130 SUPERSEDED。
 - 单一集成收据（两份 PM 写回已对账合并）：`governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`；含集成时 API 复核、本地 repro/修复复算（`3865da88` 三项失败 → accepted head `632 passed`）、合后 push gate run `35958610555` SUCCESS 及全部诚实限制。operator 集成不是 SOFTWARE_RC，也不是 CORE_COMPLETE。
 - 路线保持：operator acceptance + three accepted gap fixes → headless → recovery → scale → RC freeze ✅ → `C15-RCC-RES-A-RERUN-002` → A independent acceptance → B preflight/release/rerun/accept → attested C → C15 close → C16 → broad P16 → P17 Core release closure。
@@ -30,7 +30,7 @@
 - P0–P15：已形成 Core 机制与阶段 Gate；不等于真实设备产品集成或长期模型认知已全面通过。
 - C14：已正式 PASS；C15 hardening：已冻结。historical canonical A #117 仍对其 old Core 有效，但对新 RC 仅属历史证据；RC impact = `FRESH_A_REQUIRED`；新 RC Fresh A-002 已通过独立验收：#207 ACCEPTANCE_PASS / blocker=0，PR #205 @ `d17ae972...` 现为 canonical Phase-A evidence，保持 OPEN / UNMERGED / PINNED。
 - B：#121 已提交但当前 candidate **NOT ACCEPTED**（执行证据不足、最终索引落后）；不是“尚无人执行”，也不是“报告写 PASS 所以完成”。
-- B preflight：`C15-RCC-RES-B-PREFLIGHT-002 = DONE / ACCEPTED`；PR #209 exact `aab3a30c...` 经 fresh Independent Acceptance `5323972504` PASS 后合入 main `65e6e826...`。当前只释放 non-Resident `C15-RCC-RES-B-RELEASE-002`；真实 B 仍未开始。
+- B preflight：`C15-RCC-RES-B-PREFLIGHT-002 = DONE / ACCEPTED`；PR #209 exact `aab3a30c...` 经 fresh Independent Acceptance `5323972504` PASS 后合入 main `65e6e826...`。B release：`C15-RCC-RES-B-RELEASE-002 = DONE / RELEASED`；fresh validation run `36216433668` attempt 2 SUCCESS；唯一 run/session = `c15-rcc-res-b-rerun-002-65e6e826` / `c15-rcc-res-b-session-002-65e6e826`。真实 B 仍未开始；下一唯一 READY = `C15-RCC-RES-B-RERUN-002`。
 - 纠偏裁决：`governance/C15_RCC_RES_B_CORRECTIVE_DECISION_2026-09-23.md`；审查证据：`reviews/C15_RCC_RES_B_001_PM_CORRECTIVE_REVIEW_2026-09-23.md`。
 - C15 C/EVAL/CLOSE、C16、广泛 P16 及 P17 均未放行。机械 CI SUCCESS、运行报告、自评 PASS、独立证据接受与语义 VALID 必须分开。
 
