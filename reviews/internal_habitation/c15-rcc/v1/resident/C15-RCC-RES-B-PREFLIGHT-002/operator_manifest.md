@@ -1,17 +1,17 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Operator Manifest (CORRECTIVE-014-FIXUP-004)
+# C15-RCC-RES-B-PREFLIGHT-002 — Operator Manifest (CORRECTIVE-014-FIXUP-005)
 
 Date: 2026-09-26
 Role: Release / Test Infrastructure Engineer (not Resident B/C, not evaluator)
-Task: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-014-FIXUP-004`
-Verdict: **CORRECTIVE-014-FIXUP-004 EXACT CANDIDATE — INDEPENDENT ACCEPTANCE REQUIRED BEFORE B RELEASE**. IA review `5320859635` is the source blocker. No B/C run or merge is authorized by this manifest.
+Task: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-014-FIXUP-005`
+Verdict: **CORRECTIVE-014-FIXUP-005 EXACT CANDIDATE — INDEPENDENT ACCEPTANCE REQUIRED BEFORE B RELEASE**. IA review `5320859635` is the source blocker. No B/C run or merge is authorized by this manifest.
 
-## Current authoritative manifest (CORRECTIVE-014-FIXUP-004)
+## Current authoritative manifest (CORRECTIVE-014-FIXUP-005)
 
-- **Current task**: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-014-FIXUP-004`
+- **Current task**: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-014-FIXUP-005`
 - **Scope**: close IA-BLK-004 only: shell-dispatch-wrapped duplicate lifecycle operations must count toward exact executable cardinality.
 - **C014-FIXUP-002 lifecycle checker blob**: `69c1fcb6cc5ba8f4fa5629c5943dc43233c5084f`. The E2E probe and final-freeze procedure remain unchanged from C013.
 - **Current exact gate**: `EXPECTED_CHECKS=158`; required `ALL_CHECKS=158/158 FAILURES=0`.
-- **Required current markers**: `ENVIRONMENT_PASS`, `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `CANONICAL_RUNBOOK_EXECUTABLE_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5`, `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18`, `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=68`, final `CORRECTIVE_013_E2E_PASS`.
+- **Required current markers**: `ENVIRONMENT_PASS`, `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `CANONICAL_RUNBOOK_EXECUTABLE_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5`, `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18`, `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=82`, final `CORRECTIVE_013_E2E_PASS`.
 - **Fresh-run rule**: CORRECTIVE-013 evidence is historical. C014-FIXUP-001 is qualified only by a fresh frozen Debian 12 / Python 3.11.2 run committed byte-exact into `isolation/e2e_probe_output.txt`, with cross-document `5`, executable `18`, shell-semantics `48`, `ALL_CHECKS=158/158 FAILURES=0`, and the zero cursor-14 payload-leak invariant.
 - **C012 history**: `corrective_012_report.md` remains unchanged historical `157/157` evidence; its count and old raw-log digest are not current.
 - **Local/remote ancestry**: local source `4ad5f980c2a041c88f9c0fdec62753d7f8b38fb4` has tree `a22f14753e0627a95b08cfb8e60ae3ad80304620`; remote parent is `86aafc1937b58071d4780c77cf2e8abe7fcbed5b` with that same tree. PM must build from the remote parent; local ancestry is different.
@@ -54,7 +54,7 @@ Canonical cross-document pins (must be identical in `operator_manifest.md`, `sou
 
 These are recomputed from the byte-exact lineage copy (`lineage_copy/`) and match the accepted A-002 evidence.
 
-## Historical deliverable index (CORRECTIVE-010 inventory; current gate is CORRECTIVE-014-FIXUP-004)
+## Historical deliverable index (CORRECTIVE-010 inventory; current gate is CORRECTIVE-014-FIXUP-005)
 
 ```
 reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/
@@ -112,7 +112,7 @@ Historical CORRECTIVE-003 (superseded):
 
 Per FIXUP-001 task §2, this historical block is explicitly labelled and does NOT represent the current release contract.
 
-## Frozen model-handling intent (current invariant, unchanged through CORRECTIVE-014-FIXUP-004)
+## Frozen model-handling intent (current invariant, unchanged through CORRECTIVE-014-FIXUP-005)
 
 **Separation:** `SyntheticProbeHandler` (mailbox bridge + inside-jail responder, `sandbox-bridge/synthetic-responder-v1/10 tokens`) vs **`ProductionResidentHandler`** (outside-jail `ProviderClient`, `contract text + envelope` only, real provenance).
 

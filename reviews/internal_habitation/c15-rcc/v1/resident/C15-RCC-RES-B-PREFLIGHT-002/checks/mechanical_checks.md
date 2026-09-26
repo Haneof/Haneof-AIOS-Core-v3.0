@@ -1,4 +1,4 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Mechanical Checks (historical through CORRECTIVE-013; CORRECTIVE-014-FIXUP-004 current)
+# C15-RCC-RES-B-PREFLIGHT-002 — Mechanical Checks (historical through CORRECTIVE-013; CORRECTIVE-014-FIXUP-005 current)
 
 Historical PASS statements below remain historical evidence. Canonical #205 evidence was read but not modified. Corrective-013 implementation is unchanged; this fixup synchronizes active evidence and canonical claims.
 
@@ -214,13 +214,13 @@ The production gate and the mutation self-test both call `check_canonical_pin_do
 - `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS`
 - `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS` from the same `check_runbook_lifecycle()` entrypoint
 
-The gate reads both active runbooks. Token block, step headings, and executable commands inside each step body must agree. A bare `.projection.json` substring is not proof. Fenced bash is parsed after comments, blank lines, and echo-only lines are removed, so a comment mentioning `current-event.json` cannot hide a later receipt-first `cp`/`install`. `b_startup_procedure.md §7` is the only authority. CORRECTIVE-011 added two counted checks. Historically, CORRECTIVE-012 added one executable mutation-red check; CORRECTIVE-013 introduced the shell-semantics mutation-red gate; CORRECTIVE-014-FIXUP-004 extends that production gate with fail-closed semantic guards plus frozen per-step shell-command counts: wrapped duplicates are extra semantic occurrences, inert lookalikes cannot replace the direct canonical form, and command-name/split variable indirection cannot add a hidden lifecycle operation.
+The gate reads both active runbooks. Token block, step headings, and executable commands inside each step body must agree. A bare `.projection.json` substring is not proof. Fenced bash is parsed after comments, blank lines, and echo-only lines are removed, so a comment mentioning `current-event.json` cannot hide a later receipt-first `cp`/`install`. `b_startup_procedure.md §7` is the only authority. CORRECTIVE-011 added two counted checks. Historically, CORRECTIVE-012 added one executable mutation-red check; CORRECTIVE-013 introduced the shell-semantics mutation-red gate; CORRECTIVE-014-FIXUP-005 extends that production gate with fail-closed semantic guards plus frozen per-step shell-command counts: wrapped duplicates are extra semantic occurrences, inert lookalikes cannot replace the direct canonical form, and command-name/split variable indirection cannot add a hidden lifecycle operation.
 
 ### Historical CORRECTIVE-012 gate (superseded; retained only as history)
 
 The prior C012 gate used `EXPECTED_CHECKS=157`, `ALL_CHECKS=157/157 FAILURES=0`, and final `CORRECTIVE_012_E2E_PASS`. Its raw and committed-copy digests are historical and remain documented in the unchanged `corrective_012_report.md`; they are not current evidence.
 
-### Current CORRECTIVE-014-FIXUP-004 exact gate
+### Current CORRECTIVE-014-FIXUP-005 exact gate
 
 Required frozen-runtime gate: `EXPECTED_CHECKS=158`; final result `ALL_CHECKS=158/158 FAILURES=0`; final marker `CORRECTIVE_013_E2E_PASS`.
 
@@ -235,7 +235,7 @@ Required current markers and mutation counts:
 - `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`
 - `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5`
 - `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18`
-- `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=68`
+- `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=82`
 - `CORRECTIVE_013_E2E_PASS`
 
-The prior CORRECTIVE-013 frozen run is historical. CORRECTIVE-014-FIXUP-004 qualification requires a fresh frozen Debian 12 / Python 3.11.2 run whose exact committed `isolation/e2e_probe_output.txt` itself shows `ALL_CHECKS=158/158 FAILURES=0`, `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=68`, and `CORRECTIVE_013_E2E_PASS` (the cumulative probe marker name is intentionally retained). The fresh log must also preserve the zero cursor-14 payload-leak invariant.
+The prior CORRECTIVE-013 frozen run is historical. CORRECTIVE-014-FIXUP-005 qualification requires a fresh frozen Debian 12 / Python 3.11.2 run whose exact committed `isolation/e2e_probe_output.txt` itself shows `ALL_CHECKS=158/158 FAILURES=0`, `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=82`, and `CORRECTIVE_013_E2E_PASS` (the cumulative probe marker name is intentionally retained). The fresh log must also preserve the zero cursor-14 payload-leak invariant.

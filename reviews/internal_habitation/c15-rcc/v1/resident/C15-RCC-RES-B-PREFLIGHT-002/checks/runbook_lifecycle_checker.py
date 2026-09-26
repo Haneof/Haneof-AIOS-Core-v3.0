@@ -5,7 +5,7 @@ Production entrypoint and every mutation self-test call check_runbook_lifecycle(
 The self-test writes disposable copies and invokes that same function; it does not
 reimplement the comparison.
 
-CORRECTIVE-014-FIXUP-004 / IA-BLK-004 retains the CORRECTIVE-013
+CORRECTIVE-014-FIXUP-005 / IA-BLK-004 retains the CORRECTIVE-013
 shell-fence/heredoc rules and fails closed on disguised lifecycle operations.
 Artifact-bound operations are recognized from their lifecycle path signature,
 not merely a literal executable word, and every operational step has a frozen
@@ -423,6 +423,26 @@ def _require_unique_semantic_operation(
         )
 
 
+def _require_document_semantic_operation(
+    name: str,
+    commands: list[str],
+    semantic_predicate,
+    canonical_predicate,
+    detail: str,
+) -> None:
+    matches = [command for command in commands if semantic_predicate(command)]
+    if len(matches) != 1:
+        raise LifecycleCheckError(
+            f"{name}: document-wide semantic lifecycle operation {detail} must "
+            f"occur exactly once; found={matches!r}"
+        )
+    if not canonical_predicate(matches[0]):
+        raise LifecycleCheckError(
+            f"{name}: document-wide semantic lifecycle operation {detail} must "
+            f"use the direct canonical shell form; found={matches[0]!r}"
+        )
+
+
 def _require_operational_shell_shape(
     name: str,
     by_token: dict[str, list[str]],
@@ -813,6 +833,30 @@ def assert_step_executable_contracts(name: str, text: str) -> None:
     # outside the operational headings. Require one document-wide shell/Python
     # occurrence as well, while the per-step checks enforce its unique owner.
     all_commands, all_python_payloads = _shell_contents_in(text)
+
+    for semantic_predicate, canonical_predicate, detail in (
+        (_semantic_reveal, _is_reveal_command, REVEAL_CMD_PREFIX),
+        (_semantic_install_current_event,
+         lambda c: c == INSTALL_CURRENT_EVENT_CMD,
+         INSTALL_CURRENT_EVENT_CMD),
+        (_semantic_projection_install,
+         lambda c: c == PERSIST_INSTALL_CMD,
+         "projection persist install"),
+        (_semantic_projection_sha256,
+         lambda c: c == PERSIST_SHA256_CMD,
+         "projection digest append"),
+        (_semantic_production_turn,
+         _is_production_turn_command,
+         "production headless turn --session"),
+        (_semantic_ack, _is_ack_command, ACK_CMD_PREFIX),
+        (_semantic_clear_binding,
+         lambda c: c == CLEAR_BINDING_CMD,
+         CLEAR_BINDING_CMD),
+    ):
+        _require_document_semantic_operation(
+            name, all_commands, semantic_predicate, canonical_predicate, detail,
+        )
+
     for predicate, detail, occurrence_count in (
         (_is_reveal_command,
          REVEAL_CMD_PREFIX,
@@ -1002,6 +1046,15 @@ def _append_to_unique_line(text: str, exact_line: str, suffix: str, label: str) 
     return text.replace(exact_line, exact_line + suffix, 1)
 
 
+def _insert_shell_fence_before_first_step(text: str, command: str) -> str:
+    spans = _step_spans(text)
+    if not spans:
+        raise AssertionError("no lifecycle step found for outside-step mutation")
+    insert_at = spans[0][1]
+    block = "```bash\n" + command.rstrip() + "\n```\n\n"
+    return text[:insert_at] + block + text[insert_at:]
+
+
 def run_shell_semantics_mutation_tests(base: Path) -> int:
     """Run D/E/F and exact-once mutations through the production gate."""
     check_runbook_lifecycle(base)
@@ -1106,6 +1159,28 @@ def run_shell_semantics_mutation_tests(base: Path) -> int:
                 _stage(base, stage, {doc_rel: wrapped})
                 _expect_red(
                     f"IA-BLK-004-G:command_wrapper_duplicate_{label}:{doc_rel.name}",
+                    stage,
+                )
+                cases += 1
+
+            # FIXUP-005: document-wide cardinality must include executable
+            # duplicates outside all lifecycle owner headings, not only step bodies.
+            for owner, predicate, label in duplicate_shell_specs:
+                body = _step_bodies(f"outside-wrapper:{owner}", original)[owner]
+                commands = _bash_commands_in(body)
+                matches = [command for command in commands if predicate(command)]
+                if len(matches) != 1:
+                    raise AssertionError(
+                        f"{label}: expected one source command for outside-step mutation, "
+                        f"found {matches!r}"
+                    )
+                mutated = _insert_shell_fence_before_first_step(
+                    original, "command " + matches[0],
+                )
+                stage = root / f"L-{prefix}-outside-wrapper-{label}"
+                _stage(base, stage, {doc_rel: mutated})
+                _expect_red(
+                    f"IA-BLK-004-L:outside_wrapper_duplicate_{label}:{doc_rel.name}",
                     stage,
                 )
                 cases += 1
