@@ -7,6 +7,14 @@
 - `CORE-BASELINE-001 = DONE（re-verified）`；PR #136 已去除 pelican 文件，改作本 PM 补充治理 PR（pelican 提交 `f8edb5d1` 仅留历史，不合入）。
 - S2 / HEADLESS / RECOVERY / SCALE / CI-FIX / RC-FREEZE 均 DONE。frozen software = `773876f92d5f8e53422f8f5a68cc651953d93052`；Core tree = `fe77f8a0706acfaf369041d0882b6d0e6de39f22`。A-002 / PR #205 继续 canonical。B-PREFLIGHT-002 / RELEASE-002 历史 PASS 保留，但其唯一 RERUN-002 已真实消费 cursor14 至 reveal+ingest+production dispatch 后遭平台 `/tmp` state loss；无 Resident semantic reply/capability/ACK，不能 continuation/replay。`C15-RCC-RES-B-RERUN-002 = FAILED / INFRASTRUCTURE_STATE_LOSS / NON-CANONICAL`；旧 run/session 永久退休。PM 裁决：`governance/C15_RCC_RES_B_RERUN_002_STATE_LOSS_ADJUDICATION_2026-09-26.md`。唯一下一 READY = `C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001`；Independent Acceptance / RELEASE-003 / RERUN-003 / C / evaluator / close 全部后置。
 
+## 2026-09-26 CORE-BACKGROUND-RESPONSE-RECOVERY-001 = GATE / REVIEW_READY（未 DONE、未合入、未自验）
+
+- 工程候选已交付并停在上表规定出口：branch `arena/01a0dcf6-haneof-aios-core-v3-0`；**tested exact candidate = `3f9ec00d0fa283bc5294574d6da1e84d654d6645`**（其后仅 evidence-only 文档/日志提交）；候选 PR 由该分支开启。
+- 交付内容：exact-response staging（严格 encode/decode、fingerprint + provider/model/request_id + payload-hash 校验）、`RecoveredModelResponse` 恢复消费点（绝不重新 dispatch provider）、wake/review/user-turn 三路 resume 同一 attempt/round、recovered round 写时间钉住保证 capability 副作用 exactly-once、`exact_response_ready` disposition 与 attempt 绑定的 metering。
+- Gate 证据：全量 `717 passed`（exit 0 / junit failures=0 errors=0 skipped=0）；聚焦子集 `93 passed`；十点 fault matrix 全绿；6 组红突变逐条回滚并保留日志。报告与红证据：`reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001/`。
+- 未做且不得由此窗口做：独立验收（self-acceptance）、`CORE-RC-REFREEZE-002`、B persistence corrective 恢复、任何 Resident 运行。
+- 下一步唯一入口 = `CORE-BACKGROUND-RESPONSE-RECOVERY-001-INDEPENDENT-ACCEPTANCE`（必须攻击上述 exact candidate）；IA PASS 前不得进入 `CORE-RC-REFREEZE-002`。B persistence corrective 继续 `FROZEN_WIP`；PR #216 冻结 WIP 未被修改。
+
 ## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / FIX-001+002 READY
 
 - 独立审计 PR #132 已合入；PM acceptance main = `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`，Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`。

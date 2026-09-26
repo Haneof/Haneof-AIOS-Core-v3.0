@@ -1,6 +1,6 @@
 # AIOS v3.0 单窗口任务执行总表
 
-## 当前控制入口 — 2026-09-26 B-PERSISTENCE-CORRECTIVE-001 FROZEN_WIP / CORE-BACKGROUND-RESPONSE-RECOVERY-001 READY
+## 当前控制入口 — 2026-09-26 CORE-BACKGROUND-RESPONSE-RECOVERY-001 GATE / REVIEW_READY（B-PERSISTENCE-CORRECTIVE-001 FROZEN_WIP）
 
 - 接任 PM 依 #128 治理接手；接手与 live 复核：`governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
 - **派工基线 = live main `079d7516f195cf6973933acc8cd057d59adc3a9f`**（其后仅治理/审查文档变更）；`CORE-OPERATOR-001` 集成点 = `e72a63874ed2c28798b00cec51f191caf1594a00`；Core tree 自审计以来始终 `7db4f72e7b3c29c74082f9984141159f8f1d6071`。每个新窗口仍须自行重取 live main，不得把本 SHA 当永久施工基线。
@@ -17,7 +17,8 @@
 - S2 两个并行修复窗口的写入范围隔离与 operator 面禁改规则见 `governance/AIOS_CORE_GAP_DISPATCH_2026-09-24.md` 的 "Dispatch update — 2026-09-24"。
 - **`CORE-CI-FIX-001 = DONE`**：首轮 review #150 对 head `1896b3e5...` 正确给出 ACCEPTANCE_FAIL（历史 blocker 保留）；corrective review #156 对 exact head `1eb24e101cdb1579c22c69b435cf9f79a3c359ad` 给出 ACCEPTANCE_PASS / 0 blockers；#156 先合 `f3d20c22...`，随后 #146 以 pinned head 合入 `c3ec42214db57864f7951e28b75811b10db8be21`。收据：`governance/CORE_CI_FIX_001_INTEGRATION_RECEIPT_2026-09-24.md`。PR #144 继续 SUPERSEDED / NOT INTEGRATED。历史派工说明：**（release/CI 基础设施）：`c15-rcc-fixture-mechanical-gate` 与 `semantic-repair-mechanical-gate` 的 "prove zero Core diff" 步骤在浅克隆上 `git` 自身 exit 128，随分支形状时红时绿（#133 红 / #137 绿 / #138 #139 红），不是策略违规。发现与 PM 裁决：`governance/AIOS_CORE_CI_FINDING_001_2026-09-24.md`；提示词：`governance/prompts/CORE_CI_FIX_001_2026-09-24.md`。不阻塞 FIX-001/002，但 **必须在 `CORE-RC-FREEZE-001` 之前关闭**。
 - #138/#139 两条红检查登记为 **INFRASTRUCTURE_FAILURE**，不登记为通过、也不登记为已接受的违规；PM 已用直接证据独立验证不变式成立（`git diff e72a638..main -- src/` 为空，Core tree 仍 `7db4f72e`），未绕过分支保护（该两项非 required）。
-- `CORE-HEADLESS-001 = DONE`；`CORE-RECOVERY-001 = DONE`；`CORE-SCALE-001 = DONE`；旧 RC freeze / A-002 / B preflight/release 历史证据均保留。RERUN-002 因 ephemeral `/tmp` state loss 为 `FAILED / INFRASTRUCTURE_STATE_LOSS / NON-CANONICAL`，旧 identity 永久退休。Persistence corrective 的 reply-staged crash 红证据已冻结在 draft PR #216，当前状态为 `FROZEN_WIP / BLOCKED_ON_CORE_RESPONSE_RECOVERY`。#214 的 post-red Gate 放宽仅保留为历史并已被 gate-integrity correction supersede。唯一下一 READY = `CORE-BACKGROUND-RESPONSE-RECOVERY-001`；后续必须 IA → RC-REFREEZE-002 → fresh A-RERUN-003/accept → resume persistence corrective/IA → RELEASE-003 → RERUN-003 → B-ACCEPT-003。
+- `CORE-HEADLESS-001 = DONE`；`CORE-RECOVERY-001 = DONE`；`CORE-SCALE-001 = DONE`；旧 RC freeze / A-002 / B preflight/release 历史证据均保留。RERUN-002 因 ephemeral `/tmp` state loss 为 `FAILED / INFRASTRUCTURE_STATE_LOSS / NON-CANONICAL`，旧 identity 永久退休。Persistence corrective 的 reply-staged crash 红证据已冻结在 draft PR #216，当前状态为 `FROZEN_WIP / BLOCKED_ON_CORE_RESPONSE_RECOVERY`。#214 的 post-red Gate 放宽仅保留为历史并已被 gate-integrity correction supersede。
+- **2026-09-26 工程窗口写回（本任务尚未 DONE）**：`CORE-BACKGROUND-RESPONSE-RECOVERY-001` 已达 `GATE / REVIEW_READY`，**未自验、未合入**。branch `arena/01a0dcf6-haneof-aios-core-v3-0`；tested exact candidate `3f9ec00d0fa283bc5294574d6da1e84d654d6645`（其后仅 evidence-only 文档/日志提交）；候选 PR 由该分支开启。完整证据与红证据：`reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CANDIDATE_REPORT_2026-09-26.md` + `reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001/red/`。下一步 = `CORE-BACKGROUND-RESPONSE-RECOVERY-001-INDEPENDENT-ACCEPTANCE`（必须由独立窗口攻击该 exact candidate）；IA PASS 之前不得进入 `CORE-RC-REFREEZE-002`，B persistence corrective 继续 FROZEN_WIP。后续顺序不变：IA → RC-REFREEZE-002 → fresh A-RERUN-003/accept → resume persistence corrective/IA → RELEASE-003 → RERUN-003 → B-ACCEPT-003。
 
 ## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / S1-S2 ACTIVE
 
@@ -54,7 +55,7 @@
 | C15-RCC-RES-B-RELEASE-002 | **DONE / RELEASED** | release record `governance/C15_RCC_RES_B_RELEASE_002_RELEASE_RECORD_2026-09-26.md`；fresh release validation `36216433668` attempt 2 SUCCESS；exact run/session `c15-rcc-res-b-rerun-002-65e6e826` / `c15-rcc-res-b-session-002-65e6e826`；release review 未运行真实 Resident B、未向 Resident/model 暴露真实 cursor14 payload |
 | C15-RCC-RES-B-RERUN-002 | **FAILED / INFRASTRUCTURE_STATE_LOSS / NON-CANONICAL** | cursor14 已 reveal+ingest+production dispatch；无 Resident semantic reply/capability/ACK；canonical /tmp run root 被平台重启销毁。旧 run/session 永久退休，禁止 replay/rewind 冒充原 run。incident + PM ruling 已落库。 |
 | C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001 | **FROZEN_WIP / BLOCKED_ON_CORE_RESPONSE_RECOVERY** | #214 scope amendment is preserved but superseded for active execution because it relaxed the frozen five-kill-point convergence gate after red evidence. Preserve current WIP/red evidence; resume only after Core response recovery IA + RC-REFREEZE-002 + fresh A-003 acceptance. Active correction: `governance/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_GATE_INTEGRITY_CORRECTION_2026-09-26.md` |
-| CORE-BACKGROUND-RESPONSE-RECOVERY-001 | **READY** | unique next task; add minimal exact-response recovery inside normal Core runtime, no provider redispatch, exactly-once downstream application. Prompt: `governance/prompts/CORE_BACKGROUND_RESPONSE_RECOVERY_001_2026-09-26.md` |
+| CORE-BACKGROUND-RESPONSE-RECOVERY-001 | **GATE / REVIEW_READY** | 工程候选已交付，等待独立验收；未自验、未合入。branch `arena/01a0dcf6-haneof-aios-core-v3-0`；tested exact `3f9ec00d0fa283bc5294574d6da1e84d654d6645` + evidence-only commits；证据 `reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CANDIDATE_REPORT_2026-09-26.md`；prompt: `governance/prompts/CORE_BACKGROUND_RESPONSE_RECOVERY_001_2026-09-26.md` |
 | CORE-BACKGROUND-RESPONSE-RECOVERY-001-INDEPENDENT-ACCEPTANCE | **BLOCKED** | fresh reviewer must attack exact candidate; no author self-acceptance |
 | CORE-RC-REFREEZE-002 | **BLOCKED** | required after accepted Core change before any new Resident evidence |
 | C15-RCC-RES-A-RERUN-003 | **BLOCKED** | fresh A on re-frozen Core; historical PR #205 remains prior-Core evidence only |
@@ -67,7 +68,7 @@
 | POST-C15-ISSUE-RECONCILIATION-001 | **BLOCKED** | C15 CLOSE 后先 fresh 对账 #23/#28/#33/#34/#35 与当时 live main；已合入修复不得重复实现；仅当最新 main 可复现时另开新工程 Task |
 | C16 → P16 → P17 | **BLOCKED** | `POST-C15-ISSUE-RECONCILIATION-001` 完成后继续原逐项 Gate；只有 P17 PASS 才可进入 P18 平台帮助闭环 |
 
-FIX-001 / FIX-002 / FIX-003 三项 audited Core gap 已全部独立接受并集成；CG-001/002/003 均 CLOSED。`CORE-HEADLESS-001`、`CORE-RECOVERY-001`、`CORE-SCALE-001`、`CORE-RC-FREEZE-001` 均已独立接受并集成。A-002 已接受且 #205 保持 canonical evidence；B-PREFLIGHT-002 已接受并合入；`C15-RCC-RES-B-RELEASE-002 = DONE / RELEASED`。当前唯一合法下一任务为 `CORE-BACKGROUND-RESPONSE-RECOVERY-001 = READY`。B persistence corrective 已冻结；不得用 #214 的 post-red scope relaxation 把 terminal in_doubt 记作 recovery PASS。Core fix → IA → RC re-freeze → fresh A-003 后再恢复 B persistence WIP。
+FIX-001 / FIX-002 / FIX-003 三项 audited Core gap 已全部独立接受并集成；CG-001/002/003 均 CLOSED。`CORE-HEADLESS-001`、`CORE-RECOVERY-001`、`CORE-SCALE-001`、`CORE-RC-FREEZE-001` 均已独立接受并集成。A-002 已接受且 #205 保持 canonical evidence；B-PREFLIGHT-002 已接受并合入；`C15-RCC-RES-B-RELEASE-002 = DONE / RELEASED`。当前唯一施工任务 `CORE-BACKGROUND-RESPONSE-RECOVERY-001` 的工程候选已进入 `GATE / REVIEW_READY`（tested exact `3f9ec00d...`，未自验、未合入）；下一步唯一入口 = `CORE-BACKGROUND-RESPONSE-RECOVERY-001-INDEPENDENT-ACCEPTANCE`，IA PASS 前不得进入 `CORE-RC-REFREEZE-002`。B persistence corrective 已冻结；不得用 #214 的 post-red scope relaxation 把 terminal in_doubt 记作 recovery PASS。Core fix → IA → RC re-freeze → fresh A-003 后再恢复 B persistence WIP。
 
 > Status: ACTIVE  
 > Effective: 2026-09-21  
@@ -1536,3 +1537,27 @@ Next READY task: C15-RCC-PREFLIGHT-001 — new window only; this window must not
 - Source/evidence scope: zero Core/tests/workflows/sealed-fixture/historical-evidence modification; #117/#121 exact heads unchanged.
 - Receipt: `governance/C15_RCC_RES_B_CORRECTIVE_INTEGRATION_RECEIPT_2026-09-24.md`.
 - Next unique READY after this state-writeback PR is merged: **C15-RCC-RES-B-PREFLIGHT-001**. No Resident experiment is released.
+## 2026-09-26 — CORE-BACKGROUND-RESPONSE-RECOVERY-001 candidate at REVIEW_READY
+
+Task ID: CORE-BACKGROUND-RESPONSE-RECOVERY-001
+Status: GATE / REVIEW_READY（candidate delivered; NOT self-accepted, NOT DONE, not merged）
+Started from main: a310bf1202bf41644c2f3e25798053a6636e14be
+Work branch: arena/01a0dcf6-haneof-aios-core-v3-0
+Candidate SHA: 3f9ec00d0fa283bc5294574d6da1e84d654d6645（tested exact; 其后仅 evidence-only 文档/日志提交）
+PR: opened from the work branch（head = evidence-only commit；独立验收必须攻击上面的 tested exact SHA）
+Merge SHA: none（未合并，未自验）
+Required gates: 全量 pytest + 本任务十点 fault matrix + 既有 FIX-002 / headless / runtime / recovery 回归
+Gate run IDs / conclusions:
+- 本地全量：`717 passed in 199.02s`，exit 0；`full_suite_junit.xml` = tests 717 / failures 0 / errors 0 / skipped 0
+- 随机顺序重跑：全绿（`full_suite_randomized.txt`）
+- 聚焦子集（runtime + FIX-002 + headless + core recovery + fault matrix）：`93 passed in 6.93s`
+- 红证据：6 组临时突变 / 逐条回滚（hook disabled、write-time unpinned、fingerprint check、identity check、staging-state guard、payload-hash guard），日志保留于 `reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001/red/`
+Evidence/report paths:
+- `reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CANDIDATE_REPORT_2026-09-26.md`
+- `reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001/full_suite.txt`、`full_suite_junit.xml`、`full_suite_randomized.txt`、`gate_subset.txt`
+- `reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001/red/red_[A-F]_*.txt`
+Bugs found: none new in Core behaviour; 交付前发现并修复一类 exactly-once 风险——recovered round 若沿用新的 `now` 会重复 capability 副作用（红证据 red_B）
+Deferred issues:
+- 独立验收（`CORE-BACKGROUND-RESPONSE-RECOVERY-001-INDEPENDENT-ACCEPTANCE`）必须由不同窗口执行；本窗口不做 self-acceptance
+- 本地解释器为 CPython 3.11.2（仓库要求 >=3.12），CI 为权威解释器证据
+Next READY task: CORE-BACKGROUND-RESPONSE-RECOVERY-001-INDEPENDENT-ACCEPTANCE（IA PASS 前不得进入 CORE-RC-REFREEZE-002；B persistence corrective 继续 FROZEN_WIP）

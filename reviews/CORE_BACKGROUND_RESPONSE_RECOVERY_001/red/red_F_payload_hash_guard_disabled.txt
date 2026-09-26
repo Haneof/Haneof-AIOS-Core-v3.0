@@ -1,0 +1,152 @@
+................F...                                                     [100%]
+=================================== FAILURES ===================================
+__________ test_tampered_staged_bytes_fail_closed_before_application ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-23/test_tampered_staged_bytes_fai0')
+
+    def test_tampered_staged_bytes_fail_closed_before_application(tmp_path):
+        """A locally altered staged payload can never reach the application path."""
+    
+        store, index, db, runtime, signal, attempt_id, calls = _crash_wake_into_in_doubt(
+            tmp_path, key="tampered-bytes"
+        )
+        _stage(
+            runtime,
+            work_kind="wake",
+            work_id=signal.wake_id,
+            model_round_index=0,
+            directive=_directive("req-tampered"),
+        )
+        with store._connection() as conn:
+            conn.execute(
+                """
+                UPDATE background_model_responses
+                SET directive_payload=?
+                WHERE attempt_id=?
+                """,
+                (
+                    encode_model_directive(_directive("req-tampered-other")),
+                    attempt_id,
+                ),
+            )
+            conn.commit()
+    
+        reopened_store, reopened_index = _reopen(db)
+        restarted = FusedTurnRuntime(
+            store=reopened_store,
+            index=reopened_index,
+            model_handler=_must_not_call,
+        )
+        with pytest.raises(BackgroundModelResponseConflict, match="payload hash"):
+>           restarted.run_wake(wake_ref=_wake_ref(signal), now=NOW + timedelta(minutes=16))
+
+tests/integration/test_core_background_response_recovery_001.py:995: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/aios_core/runtime/turn_runtime.py:4267: in run_wake
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:312: in run_turn
+    recovered = self.model_response_recovery(snapshot)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/aios_core/runtime/turn_runtime.py:1363: in _recover_exact_model_response
+    directive = self.background_model_attempts.exact_response_directive(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <aios_core.runtime.background_attempt.BackgroundModelAttemptStore object at 0x7fad477ab850>
+attempt_id = 'bgattempt_092bc47273a9eb0e9ac54ce3c2d1e892'
+
+    def exact_response_directive(self, attempt_id: str) -> ModelDirective:
+        """Re-verify and return the exact directive for one durable attempt."""
+    
+        attempt = self.get(attempt_id)
+        if attempt is None:
+            raise KeyError(f"unknown background model attempt: {attempt_id}")
+        staged = self.staged_response(attempt_id)
+        if staged is None:
+            raise BackgroundModelResponsePending(attempt)
+        if attempt.state not in {"response_returned", "metered"}:
+            raise BackgroundModelResponseConflict(
+                attempt,
+                "staged exact provider response is not durably reconciled with "
+                "the attempt",
+            )
+        if (
+            attempt.provider,
+            attempt.model,
+            attempt.provider_request_id,
+            attempt.response_fingerprint,
+        ) != (
+            staged.provider,
+            staged.model,
+            staged.provider_request_id,
+            staged.response_fingerprint,
+        ):
+            raise BackgroundModelResponseConflict(
+                attempt,
+                "staged exact provider response does not match durable attempt "
+                "provenance",
+            )
+        if False and (  # RED MUTATION F
+            hashlib.sha256(staged.directive_payload.encode("utf-8")).hexdigest()
+            != staged.payload_sha256
+        ):
+            raise BackgroundModelResponseConflict(
+                attempt,
+                "staged exact provider response bytes do not match their durable "
+                "payload hash",
+            )
+        directive = decode_model_directive(staged.directive_payload)
+        if self._response_fingerprint(directive) != attempt.response_fingerprint:
+>           raise BackgroundModelResponseConflict(
+                attempt,
+                "staged directive does not reproduce the durable response "
+                "fingerprint",
+            )
+E           aios_core.runtime.background_attempt.BackgroundModelResponseConflict: exact provider response rejected: staged directive does not reproduce the durable response fingerprint; attempt bgattempt_092bc47273a9eb0e9ac54ce3c2d1e892 is response_returned
+
+src/aios_core/runtime/background_attempt.py:1224: BackgroundModelResponseConflict
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-23/test_tampered_staged_bytes_fai0')
+
+    def test_tampered_staged_bytes_fail_closed_before_application(tmp_path):
+        """A locally altered staged payload can never reach the application path."""
+    
+        store, index, db, runtime, signal, attempt_id, calls = _crash_wake_into_in_doubt(
+            tmp_path, key="tampered-bytes"
+        )
+        _stage(
+            runtime,
+            work_kind="wake",
+            work_id=signal.wake_id,
+            model_round_index=0,
+            directive=_directive("req-tampered"),
+        )
+        with store._connection() as conn:
+            conn.execute(
+                """
+                UPDATE background_model_responses
+                SET directive_payload=?
+                WHERE attempt_id=?
+                """,
+                (
+                    encode_model_directive(_directive("req-tampered-other")),
+                    attempt_id,
+                ),
+            )
+            conn.commit()
+    
+        reopened_store, reopened_index = _reopen(db)
+        restarted = FusedTurnRuntime(
+            store=reopened_store,
+            index=reopened_index,
+            model_handler=_must_not_call,
+        )
+>       with pytest.raises(BackgroundModelResponseConflict, match="payload hash"):
+E       AssertionError: Regex pattern did not match.
+E        Regex: 'payload hash'
+E        Input: 'exact provider response rejected: staged directive does not reproduce the durable response fingerprint; attempt bgattempt_092bc47273a9eb0e9ac54ce3c2d1e892 is response_returned'
+
+tests/integration/test_core_background_response_recovery_001.py:994: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_core_background_response_recovery_001.py::test_tampered_staged_bytes_fail_closed_before_application

@@ -1,0 +1,236 @@
+...............F...                                                      [100%]
+=================================== FAILURES ===================================
+_ test_no_exact_response_can_be_staged_for_a_call_that_never_reached_provider __
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-16/test_no_exact_response_can_be_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7fac70ded0>
+
+    def test_no_exact_response_can_be_staged_for_a_call_that_never_reached_provider(
+        tmp_path, monkeypatch
+    ):
+        """Staging is refused where the attempt proves the provider boundary was not
+        crossed, so no operator-supplied reply can turn a safe retry into a lie."""
+    
+        # (a) crash before dispatch: durable attempt is still `admitted`.
+        store, index, db = _world(tmp_path, name="admitted.db")
+        runtime = FusedTurnRuntime(store=store, index=index, model_handler=_must_not_call)
+        signal = _emit_wake(runtime, key="never-dispatched")
+    
+        def crash_before_dispatch(_attempt_id, *, dispatched_at):
+            raise RuntimeError("simulated crash before provider dispatch")
+    
+        monkeypatch.setattr(
+            runtime.background_model_attempts, "mark_dispatching", crash_before_dispatch
+        )
+        with pytest.raises(RuntimeError, match="before provider dispatch"):
+            runtime.run_wake(wake_ref=_wake_ref(signal), now=NOW)
+        admitted = _wake_attempt(runtime, signal.wake_id, 0)
+        assert admitted.state == "admitted"
+        assert admitted.recovery_disposition == "safe_to_retry"
+    
+        monkeypatch.undo()
+        with pytest.raises(BackgroundModelResponseConflict, match="provider boundary"):
+>           _stage(
+                runtime,
+                work_kind="wake",
+                work_id=signal.wake_id,
+                model_round_index=0,
+                directive=_directive("req-never-dispatched"),
+            )
+
+tests/integration/test_core_background_response_recovery_001.py:928: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_core_background_response_recovery_001.py:138: in _stage
+    return runtime.stage_exact_background_response(
+src/aios_core/runtime/turn_runtime.py:1315: in stage_exact_background_response
+    return self.background_model_attempts.stage_exact_response(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <aios_core.runtime.background_attempt.BackgroundModelAttemptStore object at 0x7f7fac6c4ad0>
+attempt_id = 'bgattempt_a47e57e0af53a1aff83b4c91467fde2b'
+
+    def stage_exact_response(
+        self,
+        attempt_id: str,
+        *,
+        staged_at: datetime,
+        provider: str,
+        model: str,
+        provider_request_id: str,
+        response_fingerprint: str,
+        directive_payload: str,
+        evidence: str,
+    ) -> BackgroundModelResponseStaging:
+        """Durably bind one exact externally preserved provider reply to an attempt.
+    
+        Verification is exact and fail-closed: the payload must strictly decode to
+        a ModelDirective, must carry a full provider/model/request_id identity that
+        matches both the caller-supplied identity and its own usage/provenance, and
+        must reproduce the supplied response fingerprint. Staging is refused for an
+        attempt that provably never crossed the provider boundary.
+        """
+    
+        moment = as_utc(staged_at, "staged_at")
+        for field_name, value in (
+            ("provider", provider),
+            ("model", model),
+            ("provider_request_id", provider_request_id),
+            ("response_fingerprint", response_fingerprint),
+            ("directive_payload", directive_payload),
+            ("evidence", evidence),
+        ):
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(
+                    f"exact provider response {field_name} must be non-blank"
+                )
+        supplied_provider = provider.strip()
+        supplied_model = model.strip()
+        supplied_request_id = provider_request_id.strip()
+        supplied_fingerprint = response_fingerprint.strip()
+    
+        directive = decode_model_directive(directive_payload)
+        fingerprint = self._response_fingerprint(directive)
+        if fingerprint != supplied_fingerprint:
+            raise ValueError(
+                "exact provider response fingerprint does not match the supplied directive"
+            )
+        directive_provider, directive_model, directive_request_id = (
+            self._provider_identity(directive)
+        )
+        if (
+            directive_provider is None
+            or directive_model is None
+            or directive_request_id is None
+        ):
+            raise ValueError(
+                "exact provider response must carry a full provider/model/request_id identity"
+            )
+        if (
+            directive_provider,
+            directive_model,
+            directive_request_id,
+        ) != (supplied_provider, supplied_model, supplied_request_id):
+            raise ValueError(
+                "exact provider response identity conflicts with its own directive identity"
+            )
+        payload_sha256 = hashlib.sha256(
+            directive_payload.encode("utf-8")
+        ).hexdigest()
+    
+        with self.store._connection() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if row is None:
+                conn.rollback()
+                raise KeyError(f"unknown background model attempt: {attempt_id}")
+            current = self._from_row(row)
+            if False and current.state not in self._STAGABLE_STATES:  # RED MUTATION E
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    current,
+                    "a durable exact provider response cannot be staged for an "
+                    "attempt that provably did not cross the provider boundary",
+                )
+            if current.state in {"response_returned", "metered"} and (
+                current.provider,
+                current.model,
+                current.provider_request_id,
+                current.response_fingerprint,
+            ) != (
+                supplied_provider,
+                supplied_model,
+                supplied_request_id,
+                supplied_fingerprint,
+            ):
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    current,
+                    "supplied exact provider identity conflicts with durable "
+                    "attempt provenance",
+                )
+    
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO background_model_responses(
+                    attempt_id, provider, model, provider_request_id,
+                    response_fingerprint, directive_payload, payload_sha256,
+                    staged_at, evidence
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    attempt_id,
+                    supplied_provider,
+                    supplied_model,
+                    supplied_request_id,
+                    supplied_fingerprint,
+                    directive_payload,
+                    payload_sha256,
+                    canonical_utc_iso(moment, "staged_at"),
+                    evidence.strip(),
+                ),
+            )
+            staged_row = conn.execute(
+                "SELECT * FROM background_model_responses WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if staged_row is None:
+                conn.rollback()
+                raise RuntimeError("exact provider response staging was not durable")
+            staged = self._staging_from_row(staged_row)
+            if (
+                staged.provider,
+                staged.model,
+                staged.provider_request_id,
+                staged.response_fingerprint,
+                staged.directive_payload,
+            ) != (
+                supplied_provider,
+                supplied_model,
+                supplied_request_id,
+                supplied_fingerprint,
+                directive_payload,
+            ):
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    current,
+                    "durable exact provider response conflicts with the staged replay",
+                )
+    
+            if current.state in {"dispatching", "in_doubt"}:
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='response_returned', updated_at=?, provider=?,
+                        model=?, provider_request_id=?, response_fingerprint=?,
+                        reconciliation_evidence=?, failure_kind=NULL,
+                        failure_detail=NULL
+                    WHERE attempt_id=? AND state IN ('dispatching', 'in_doubt')
+                    """,
+                    (
+                        canonical_utc_iso(moment, "updated_at"),
+                        supplied_provider,
+                        supplied_model,
+                        supplied_request_id,
+                        supplied_fingerprint,
+                        evidence.strip(),
+                        attempt_id,
+                    ),
+                )
+            row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            conn.commit()
+        if row is None:
+            raise RuntimeError("background attempt disappeared during exact-response staging")
+        attempt = self._from_row(row)
+        if attempt.state not in {"response_returned", "metered"}:
+>           raise BackgroundModelAttemptBlocked(attempt)
+E           aios_core.runtime.background_attempt.BackgroundModelAttemptBlocked: background model attempt blocked: bgattempt_a47e57e0af53a1aff83b4c91467fde2b is admitted; inspect/reconcile the durable attempt instead of reinvoking the provider
+
+src/aios_core/runtime/background_attempt.py:1147: BackgroundModelAttemptBlocked
+=========================== short test summary info ============================
+FAILED tests/integration/test_core_background_response_recovery_001.py::test_no_exact_response_can_be_staged_for_a_call_that_never_reached_provider
