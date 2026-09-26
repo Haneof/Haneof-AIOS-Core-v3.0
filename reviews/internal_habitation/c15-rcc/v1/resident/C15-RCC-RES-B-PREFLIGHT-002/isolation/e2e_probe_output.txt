@@ -154,8 +154,8 @@ NORMAL_BINDING_PASS
 [test-responder] starting mode=normal rounds=2 uid=65534 pid=3 inbox=/work/inbox outbox=/work/outbox
 [test-responder] pid=3 proc1_comm=sandbox-init
 [test-responder] PASS PID1 is sandbox-init
-[test-responder] round 1 received request_id=c266f97b... digest=3614dcb0...
-[test-responder] round 2 received request_id=c80e04eb... digest=1b32dcd5...
+[test-responder] round 1 received request_id=038ec801... digest=2f5bb7e2...
+[test-responder] round 2 received request_id=f34ded40... digest=1231053a...
 [test-responder] OK mode=normal rounds=2 pid=3
 
 STALE_REJECTED_PASS
@@ -179,7 +179,7 @@ SYNTHETIC_GENUINE_PASS
 CHECK 27 PASS: synthetic genuine 2-round Atlas non-empty
 CHECK 28 PASS: current_event seq14 wiring
 [e2e] step 4b: production genuine via ExternalBrokerClient + FakeBrokerServer (transport)
-FakeBrokerServer at http://127.0.0.1:40653/v1/chat
+FakeBrokerServer at http://127.0.0.1:35341/v1/chat
 prod invocations=2 history=1
 last_provider=fake-broker usage={'total_tokens': 42, 'input_tokens': 20, 'output_tokens': 22}
 PRODUCTION_GENUINE_PASS
@@ -506,9 +506,9 @@ RUN_ROOT2 init B failed
 }
 RUN_ROOT2 pending set
 binding receipt 9cba565c8bc5
-model_rounds=ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='9f60ee5f3450f71edbcbc735d76e344c'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='9f60ee5f3450f71edbcbc735d76e344c'))
+model_rounds=ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='b40bc32d127bb75ce4a8e28a38c2a27d'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='b40bc32d127bb75ce4a8e28a38c2a27d'))
 headless stub turn succeeded
-model_rounds 1 directive ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='9f60ee5f3450f71edbcbc735d76e344c'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='9f60ee5f3450f71edbcbc735d76e344c')) real-providerCHECK 59 PASS: headless CLI turn with ExternalBrokerClient succeeded (HTTPS stub)
+model_rounds 1 directive ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='b40bc32d127bb75ce4a8e28a38c2a27d'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='b40bc32d127bb75ce4a8e28a38c2a27d')) real-providerCHECK 59 PASS: headless CLI turn with ExternalBrokerClient succeeded (HTTPS stub)
 [e2e] step 14: hash mismatch
 PASS contract hash mismatch fail closed: contract SHA env mismatch: expected 28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef, got deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef (STOP)
 CHECK 60 PASS: contract hash mismatch fail closed
@@ -533,7 +533,7 @@ PASS modified source_kind rejected for source_kind: current_event.source_kind 'f
 PASS modified source_class rejected for source_class: current_event.source_class 'FAKE' != receipt source_class 'PLATFORM' (modified source_class)
 PASS modified modality rejected for modality: current_event.modality 'fake_modality' != receipt modality 'structured_text' (modified modality)
 PASS wrong session rejected: binding receipt b_session_id 'b-adversarial-001' != 'b-wrong-session' (wrong session)
-PASS stale seq14 after ACK rejected: binding receipt release_state_path '/tmp/b-disp-reveal-3367/runtime/release_state.json' != current '/tmp/tmpeciubt95/rs_stale.json' (path identity mismatch)
+PASS stale seq14 after ACK rejected: binding receipt release_state_path '/tmp/b-disp-reveal-3367/runtime/release_state.json' != current '/tmp/tmpz478fuey/rs_stale.json' (path identity mismatch)
 PASS missing receipt rejected: binding receipt missing at /tmp/nonexistent-binding.json (current-event binding must exist)
 PASS malformed receipt rejected: binding receipt malformed JSON: Expecting value: line 1 column 1 (char 0)
 BINDING_ADVERSARIAL_PASS
@@ -641,9 +641,9 @@ CHECK 108 PASS: wrong saved pending reveal FAIL
 CHECK 109 PASS: receipt schema 7 mutations PASS
 [e2e] step 17e2: live pending fixture triple-binding
 PASS pending_missing create correctly FAIL: release_state pending_reveal.fixture_sha256 missing (must be 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46')
-PASS pending_missing validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-3367/runtime/release_state.json' != current '/tmp/b-fixture-pending_missing-_ifqtd0n/release_state.json' (path identity mismatch)
+PASS pending_missing validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-3367/runtime/release_state.json' != current '/tmp/b-fixture-pending_missing-02bvczbi/release_state.json' (path identity mismatch)
 PASS pending_wrong create correctly FAIL: release_state pending_reveal.fixture_sha256 'sha256:deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef' != canonical 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46' (live fixture mismatch)
-PASS pending_wrong validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-3367/runtime/release_state.json' != current '/tmp/b-fixture-pending_wrong-m24x9dn8/release_state.json' (path identity mismatch)
+PASS pending_wrong validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-3367/runtime/release_state.json' != current '/tmp/b-fixture-pending_wrong-1s23djlp/release_state.json' (path identity mismatch)
 PASS receipt fixture wrong correctly FAIL: binding receipt fixture_sha256 'sha256:deadbeef' != canonical 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46' (wrong fixture SHA)
 PASS exact fixture triple-binding PASS: sha256:7ccb3
 FIXTURE_TRIPLE_PASS
@@ -691,7 +691,7 @@ PASS canonical startup uses HTTPS
 CHECK 130 PASS: canonical startup HTTPS
 PASS canonical configuration block is configuration-only
 PASS canonical block contains all 12 envs
-PASS canonical startup reaches transport: ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='1513edc27eba503f3da772d519017d02'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='1513edc27eba503f3da772d519017d02'))
+PASS canonical startup reaches transport: ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='bb3da961fe29530170e64b62b51afcd4'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='bb3da961fe29530170e64b62b51afcd4'))
 CHECK 131 PASS: canonical startup execution reaches transport
 [e2e] step 17j: env manifest/gate consistency
 PASS manifest subset semantic
@@ -709,7 +709,7 @@ NO_FALSE_NO_REVEAL_PROSE_PASS
 CHECK 137 PASS: BLK-01 prose states disposable reveal only (no false no-reveal claim)
 [e2e] corrective-009 blk-02: portable checkout, no hardcoded absolute path
 CHECK 138 PASS: no hardcoded /home/user/ path in harness/isolation/procedure/checks
-RANDOM_CHECKOUT_REPO_ROOT /tmp/candidate-97j884z3tt
+RANDOM_CHECKOUT_REPO_ROOT /tmp/candidate-kpg5vpfupt
 RANDOM_CHECKOUT_CONTRACT_SHA 28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef
 decoy_cwd_rc 0
 corrupt_contract_rc 1
@@ -924,4 +924,4 @@ CORRECTIVE_010_FIXUP_001_E2E_PASS
 CORRECTIVE_011_E2E_PASS
 CORRECTIVE_012_E2E_PASS
 CORRECTIVE_013_E2E_PASS
-[e2e] done 2026-09-26T01:10:23Z
+[e2e] done 2026-09-26T01:13:35Z
