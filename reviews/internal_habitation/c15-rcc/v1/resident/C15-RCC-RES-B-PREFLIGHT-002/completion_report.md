@@ -104,7 +104,7 @@ Active gate: `EXPECTED_CHECKS=158`; required result `ALL_CHECKS=158/158 FAILURES
 
 Fresh frozen E2E: **PASS, exit 0**, Debian GNU/Linux 12 (bookworm) disposable runtime. Both `python3 --version` and `/usr/bin/python3 --version` were `Python 3.11.2`; package versions were Pydantic `2.13.5`, pydantic_core `2.46.5`, annotated-types `0.8.0`, typing-inspection `0.4.4`, and typing_extensions `4.16.0`. The exact `requirements.freeze.txt` SHA check and live `pip freeze` line check passed.
 
-The CORRECTIVE-013 log/hash above is historical and is not C014 qualification. For CORRECTIVE-014-FIXUP-005, the committed fresh E2E log must itself prove: frozen Python/dependency environment, cursor-14 payload-leak protection, cross-document cases `5`, executable cases `18`, shell-semantics cases `48`, and `ALL_CHECKS=158/158 FAILURES=0`.
+The CORRECTIVE-013 log/hash above is historical and is not C014 qualification. For CORRECTIVE-014-FIXUP-005, the committed fresh E2E log must itself prove: frozen Python/dependency environment, cursor-14 payload-leak protection, cross-document cases `5`, executable cases `18`, shell-semantics cases `82`, and `ALL_CHECKS=158/158 FAILURES=0`.
 
 Historical C012 `157/157` results and the old C012 raw-log digest are not current evidence; see the unchanged `corrective_012_report.md`.
 
