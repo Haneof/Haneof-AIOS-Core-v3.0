@@ -1,0 +1,931 @@
+[e2e] run_root = /home/user/c15-persistence-probes/frozen-attempt-02
+[e2e] CURRENT_RUN_LOG=/home/user/c15-persistence-probes/frozen-attempt-02/e2e.log
+world.sqlite: OK
+index.sqlite: OK
+release_state.json: OK
+[e2e] lineage digests OK
+[e2e] EXPECTED_CHECKS=158
+[e2e] step 0: exact environment
+py_ver=Python 3.11.2
+CHECK 1 PASS: exact Python 3.11.2
+pydantic=2.13.5
+CHECK 2 PASS: exact pydantic 2.13.5
+wire_sha=a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a
+CHECK 3 PASS: wire protocol hash 5067701b…
+contract_sha=28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef
+CHECK 4 PASS: contract exact
+adapter_sha=da74eb97a6d35b535f298f52a72a32fc35dfbd1fca1ec4585aa1d7c090e92911
+CHECK 5 PASS: adapter sha exact matches manifest
+freeze_sha=bd7a76d1171c137f9daee9c0a3dbff029b8cbbccef88f0a1aff7907710a82375
+CHECK 6 PASS: requirements freeze SHA exact bd7a76d1171c137f9daee9c0a3dbff029b8cbbccef88f0a1aff7907710a82375
+CHECK 7 PASS: live freeze contains pydantic 2.13.5 exact
+CHECK 8 PASS: live freeze contains pydantic_core 2.46.5 exact
+CHECK 9 PASS: live freeze contains typing_extensions exact
+CHECK 10 PASS: live freeze contains all pinned freeze lines
+ENVIRONMENT_PASS
+CHECK 11 PASS: environment exact PASS
+[e2e] step 1: mailbox_bridge self-tests (15)
+self-test 1 PASS: minimal good envelope accepted with binding
+self-test 2 PASS: extra top-level key rejected
+self-test 3 PASS: extra event field rejected
+self-test 4 PASS: A session in capability_history rejected
+self-test 5 PASS: forbidden path substring rejected (legal obs_c14_fixture_* allowed)
+self-test 5b PASS: legal durable World fixture id allowed (obs_c14_fixture_*)
+self-test 6 PASS: wrong phase rejected
+self-test 7 PASS: malformed reply rejected
+self-test 7b PASS: extra reply field rejected (strict schema)
+self-test 8 PASS: correct exact-bound reply accepted
+self-test 9 PASS: stale prior-round reply rejected
+self-test 10 PASS: preplayed future-round reply rejected
+self-test 11 PASS: replayed consumed reply rejected
+self-test 12 PASS: wrong request_id rejected
+self-test 13 PASS: wrong request_digest rejected
+self-test 14 PASS: double send while outstanding rejected
+self-test 15 PASS: pre-set request_id rejected
+ALL SELF-TESTS PASS
+CHECK 12 PASS: mailbox self-tests (15)
+[e2e] step 2: hardened isolation probe inside sandbox
+=== identity ===
+uid=65534 gid=65534
+PASS: running as nobody (uid 65534)
+
+=== PID namespace (blocker 2 fixed) ===
+my pid = 43 (should be >=2)
+PASS: resident pid 43 != 1 (init is separate)
+pid 1 comm = 'sandbox-init'
+visible PIDs in /proc = 5 (should be small, not host's 100+)
+PASS: only 5 PIDs visible (expected small count in new PID namespace)
+PASS: PID1 is sandbox-init (correct supervisor)
+PASS: no host init (systemd/init) visible in new PID namespace
+PASS: /proc/1/root unreadable (also acceptable)
+
+=== Child/orphan reap check (PID1 supervisor) ===
+child reaped status=0
+PASS: no zombies after orphan test (PID1 reaped orphan)
+PASS: PID1 zombie reap works (orphan grandchild reaped)
+
+=== Network seal (blocker 1) ===
+PASS: connect to github.com (140.82.114.4:443) blocked: errno=101 (Network is unreachable)
+PASS: connect to raw.githubusercontent.com (185.199.108.133:443) blocked: errno=101 (Network is unreachable)
+PASS: connect to api.github.com (140.82.114.6:443) blocked: errno=101 (Network is unreachable)
+PASS: connect to 8.8.8.8 (8.8.8.8:53) blocked: errno=101 (Network is unreachable)
+NETWORK_SEAL_PASS
+PASS: network sealed (external connect blocked)
+
+=== Filesystem sealed paths (blocker 1 / 4 / 6) ===
+PASS: sealed: /repo/fixture absent
+PASS: sealed: /repo/evaluator absent
+PASS: sealed: /repo/governance absent
+PASS: sealed: /repo/.git absent
+PASS: sealed: /repo/prompts absent
+PASS: sealed: /repo/reviews/internal_habitation/c15-rcc/v1/fixture absent
+PASS: sealed: /repo/reviews/internal_habitation/c15-rcc/v1/evaluator absent
+PASS: sealed: /repo/reviews/internal_habitation/c15-rcc/v1/release absent
+PASS: sealed: /repo/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-A-RERUN-002 absent
+PASS: sealed: /repo/reviews/internal_habitation/c14-resident absent
+PASS: sealed: /repo/AIOS_SINGLE_WINDOW_TASK_BOARD.md absent
+PASS: sealed: /repo/AIOS_v3.0_CURRENT_CHECKPOINT.md absent
+PASS: sealed: /repo/PROJECT_MASTER_MAP.md absent
+
+=== Read-only bind mounts actually read-only (blocker 6) ===
+PASS: Core src read-only (touch denied, exit=1)
+PASS: Resident contract read-only (touch denied)
+PASS: Core src file write blocked: [Errno 13] Permission denied: '/repo/src/aios_core/__init__.py'
+PASS: Resident contract write blocked: [Errno 13] Permission denied: '/repo/reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md'
+
+=== /dev minimal (BLOCKER 6: no whole-host bind) ===
+dev:fd
+dev:null
+dev:random
+dev:stderr
+dev:stdin
+dev:stdout
+dev:urandom
+dev:zero
+PASS: /dev/null present
+PASS: /dev/zero present
+PASS: /dev/urandom present
+PASS: /dev/random present
+PASS: /dev/fd symlink present
+PASS: sealed: /dev/sda absent as expected
+PASS: sealed: /dev/sda1 absent as expected
+PASS: sealed: /dev/nvme0n1 absent as expected
+PASS: sealed: /dev/mem absent as expected
+PASS: sealed: /dev/kmem absent as expected
+PASS: sealed: /dev/kvm absent as expected
+PASS: sealed: /dev/port absent as expected
+PASS: sealed: /dev/tty absent as expected
+PASS: sealed: /dev/tty0 absent as expected
+PASS: sealed: /dev/ptmx absent as expected
+PASS: sealed: /dev/pts absent as expected
+PASS: sealed: /dev/block absent as expected
+PASS: cannot open host-dangerous /dev nodes (ENOENT/EPERM)
+
+/dev/root /repo/src ext4 ro,nosuid,nodev,relatime,discard 0 0
+/dev/root /repo/reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md ext4 ro,nosuid,nodev,relatime,discard 0 0
+PASS: /proc/mounts shows ro,nosuid,nodev for /repo binds
+
+PASS: mailbox inbox bind visible in mounts (optional)
+
+=== Mailbox permissions (blocker 4) ===
+PASS: /work/inbox readable
+PASS: /work/outbox writable + searchable
+PASS: can write to /work/outbox
+PASS: /work/archive absent (operator archive not mounted)
+
+=== Privilege re-escalation (blocker 3) ===
+PASS: setuid(0) denied: [Errno 1] Operation not permitted
+PASS: mount() denied (EPERM)
+
+=== Environment allowlist (BLOCKER: PROBE_* not leaked unless AIOS_ALLOW_PROBE_ENV) ===
+PASS: PROBE_MODE/PROBE_ROUNDS not leaked (unsanitized env blocked)
+PASS: LD_* stripped
+
+
+ISOLATION_PASS
+CHECK 13 PASS: isolation (PID1 sup + NET sealed + RO + mailbox IPC + /dev + env)
+CHECK 14 PASS: PID1 supervisor
+CHECK 15 PASS: NET sealed
+CHECK 16 PASS: RO bind ro,nosuid,nodev
+CHECK 17 PASS: mailbox IPC
+CHECK 18 PASS: /dev minimal
+CHECK 19 PASS: env allowlist
+[e2e] step 3: mailbox binding E2E (7 cases)
+NORMAL_BINDING_PASS
+[test-responder] starting mode=normal rounds=2 uid=65534 pid=3 inbox=/work/inbox outbox=/work/outbox
+[test-responder] pid=3 proc1_comm=sandbox-init
+[test-responder] PASS PID1 is sandbox-init
+[test-responder] round 1 received request_id=0bea19dc... digest=15e6eb40...
+[test-responder] round 2 received request_id=bcb43ed2... digest=ca9bd0c4...
+[test-responder] OK mode=normal rounds=2 pid=3
+
+STALE_REJECTED_PASS
+PREPLAY_REJECTED_PASS
+REPLAY_REJECTED_PASS
+WRONG_ID_REJECTED_PASS
+WRONG_DIGEST_REJECTED_PASS
+FUTURE_NOT_VALID_PASS
+ALL_BINDING_TESTS_PASS
+CHECK 20 PASS: binding normal
+CHECK 21 PASS: binding stale
+CHECK 22 PASS: binding preplay
+CHECK 23 PASS: binding replay
+CHECK 24 PASS: binding wrong id
+CHECK 25 PASS: binding wrong digest
+CHECK 26 PASS: binding future not valid
+[e2e] step 4a: synthetic genuine Core->MailboxBridge->responder (Atlas)
+model_rounds=2 invocations=2
+found fixture=True
+SYNTHETIC_GENUINE_PASS
+CHECK 27 PASS: synthetic genuine 2-round Atlas non-empty
+CHECK 28 PASS: current_event seq14 wiring
+[e2e] step 4b: production genuine via ExternalBrokerClient + FakeBrokerServer (transport)
+FakeBrokerServer at http://127.0.0.1:45421/v1/chat
+prod invocations=2 history=1
+last_provider=fake-broker usage={'total_tokens': 42, 'input_tokens': 20, 'output_tokens': 22}
+PRODUCTION_GENUINE_PASS
+PRODUCTION_TRANSPORT_PASS
+UNKNOWN_PROVENANCE_PASS
+CHECK 29 PASS: production genuine via ExternalBrokerClient (mock) REAL provenance
+CHECK 30 PASS: UNKNOWN handling
+[e2e] step 4c: raw provider usage no-synthesis regression
+FULL_USAGE_PRESERVED_PASS
+MISSING_TOTAL_NO_SYNTHESIS_PASS
+INPUT_ONLY_NO_SYNTHESIS_PASS
+OUTPUT_ONLY_NO_SYNTHESIS_PASS
+TOTAL_ONLY_PRESERVED_PASS
+PARTIAL_WITH_TOTAL_PRESERVED_PASS
+INCONSISTENT_USAGE_NONE_PASS
+INVALID_USAGE_NONE_PASS
+USAGE_SOURCE_NO_SYNTHESIS_PASS
+RAW_USAGE_NO_SYNTHESIS_PASS
+CHECK 31 PASS: CORRECTIVE-011 usage regression FULL_USAGE_PRESERVED_PASS
+CHECK 32 PASS: CORRECTIVE-011 usage regression MISSING_TOTAL_NO_SYNTHESIS_PASS
+CHECK 33 PASS: CORRECTIVE-011 usage regression INPUT_ONLY_NO_SYNTHESIS_PASS
+CHECK 34 PASS: CORRECTIVE-011 usage regression OUTPUT_ONLY_NO_SYNTHESIS_PASS
+CHECK 35 PASS: CORRECTIVE-011 usage regression TOTAL_ONLY_PRESERVED_PASS
+CHECK 36 PASS: CORRECTIVE-011 usage regression PARTIAL_WITH_TOTAL_PRESERVED_PASS
+CHECK 37 PASS: CORRECTIVE-011 usage regression INCONSISTENT_USAGE_NONE_PASS
+CHECK 38 PASS: CORRECTIVE-011 usage regression INVALID_USAGE_NONE_PASS
+CHECK 39 PASS: CORRECTIVE-011 usage regression USAGE_SOURCE_NO_SYNTHESIS_PASS
+[e2e] step 5: current-event / envelope negatives (6)
+PASS seq13
+PASS seq23
+PASS extra
+PASS missing
+PASS phase A
+PASS source_kind
+ALL_NEGATIVES_PASS
+CHECK 40 PASS: current_event seq13 rejected
+CHECK 41 PASS: current_event seq23 rejected
+CHECK 42 PASS: current_event extra field
+CHECK 43 PASS: current_event missing field
+CHECK 44 PASS: envelope phase A rejected
+CHECK 45 PASS: source_kind invalid rejected
+[e2e] step 6: strict reply schema
+PASS strict extra: reply structural invalid: reply for action 'silence' has extra fields ['capability'] not allowed
+STRICT_REPLY_PASS
+CHECK 46 PASS: strict reply silence{capability}
+[e2e] step 7: repair Scheme A
+repair shape structurally allowed
+PASS repair unsupported: unsupported reply action: 'round_repair_request'
+CHECK 47 PASS: repair Scheme A
+[e2e] step 8: MS_PRIVATE fail-closed + privdrop
+MS_PRIVATE exit=98
+PASS MS_PRIVATE: exact exit 98 + injected marker + jail executed + no payload
+NEGATIVE_JAIL_MS_PRIVATE_EXECUTED_PASS
+privdrop exit=98
+PASS privdrop: exact exit 98 + injected marker + jail executed + no payload
+PASS privdrop
+setgid exit=98
+PASS setgid: exact exit 98 + injected marker + jail executed + no payload
+PASS setgid
+PRIVDROP_DUAL_PASS
+NEGATIVE_JAIL_ACTUALLY_EXECUTED_PASS
+CHECK 48 PASS: MS_PRIVATE fail-closed
+CHECK 49 PASS: privdrop dual
+[e2e] step 9: signal deterministic PID1 forwarding
+[signal] pid log:
+{
+  "outer_wrapper_host_pid": 1831,
+  "outer_wrapper_ns_pid": 1831,
+  "outer_wrapper_ppid": 1829,
+  "outer_wrapper_cmd": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/resident_jail.py --repo /home/user/Haneof-AIOS-Core-v3.0 --sandbox /tmp/b-sleep-test-1456 --world /home/user/c15-persistence-probes/frozen-attempt-02/runtime/world.sqlite --index /home/user/c15-persistence-probes/frozen-attempt-02/runtime/index.sqlite --state /home/user/c15-persistence-probes/frozen-attempt-02/runtime/release_state.json --lock /home/user/c15-persistence-probes/frozen-attempt-02/runtime/world.sqlite.writer.lock --mailbox-root /tmp/b-sleep-mb-1456 --inject-dir /home/user/c15-persistence-probes/frozen-attempt-02/inject -- /bin/sleep 30",
+  "unsharer_host_pid": 1832,
+  "unsharer_ns_pid": 1832,
+  "unsharer_ppid": 1831,
+  "pid1_host_pid": 1836,
+  "pid1_ns_pid": 1,
+  "pid1_ns_pid_actual": 1,
+  "pid1_host_pid_ns_view": 1836,
+  "pid1_comm": "sandbox-init",
+  "worker_fork_return_pid": 3,
+  "worker_ns_pid_expected": 2,
+  "worker_host_pid": 1838,
+  "worker_ns_pid_actual": 3,
+  "worker_ns_ppid": 1,
+  "worker_ppid_host": 1
+}outer=1831 unsharer=1832 pid1_host=1836 worker_host=1838 worker_ns=3
+CHECK 50 PASS: PID map outer/unsharer/PID1/worker captured (host pids valid, distinct)
+[signal] sending TERM to PID1 host 1836 (jail PID1)
+[signal] jail exit code 143
+CHECK 51 PASS: signal TERM forwarded PID1->worker exit 143
+CHECK 52 PASS: worker reaped no zombie
+CHECK 53 PASS: PID1 reaped
+[e2e] step 10: env allowlist
+CHECK 54 PASS: env without allow PROBE not leaked
+CHECK 55 PASS: env with allow PROBE explicitly allowed
+[e2e] step 11: ExternalBrokerClient fail closed
+PASS real provider fail closed: real provider not configured: AIOS_REAL_PROVIDER_API_KEY and AIOS_REAL_PROVIDER_ENDPOINT must be set (no fake fallback)
+CHECK 56 PASS: ExternalBrokerClient without config fail closed
+[e2e] step 12: Fake via production entrypoint fail
+PASS fake via prod blocked: unapproved provider adapter 'bridged_model_handler:FakeProviderClient', expected 'bridged_model_handler:ExternalBrokerClient' (ModelDispatchNotSubmitted/STOP)
+CHECK 57 PASS: FakeProviderClient via production entrypoint blocked
+[e2e] step 13: exact documented headless import
+usage: aios-core-headless [-h] [--world WORLD] [--index INDEX] [--lock LOCK]
+                          [--subject SUBJECT] [--model-handler MODEL_HANDLER]
+                          [--round-summary-handler ROUND_SUMMARY_HANDLER]
+                          [--dimension-summary-handler DIMENSION_SUMMARY_HANDLER]
+                          {status,recovery-status,rebuild-index,backup,restore,turn,ingest,due,inspect-turn}
+CHECK 58 PASS: headless CLI importable via documented PYTHONPATH
+RUN_ROOT2 init B failed
+{
+  "active_phase": "B",
+  "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+  "fixture_version": "c15-rcc-fixture-v1",
+  "last_acked_event_id": "c15rcc-013",
+  "last_acked_sequence": 13,
+  "next_sequence": 14,
+  "pending_reveal": null,
+  "receipts": [
+    {
+      "binding_mode": "canonical_user_turn",
+      "binding_version": "c15-rcc-canonical-conversation-binding-v1",
+      "event_id": "c15rcc-001",
+      "fixture_payload_sha256": "sha256:c112985216562be688032d01fef07456cc053de4e2417910c6085fd3b4e4827e",
+      "fixture_projection_sha256": "sha256:d872923394071ff19619aeaffc05f7f617a853feede7196b99e1b4c224ad7a4e",
+      "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+      "ingest_object_id": "obs_conv_user_e3f254f5a3f691c9f1ae5870",
+      "ingest_ref": "obs_conv_user_e3f254f5a3f691c9f1ae5870@1",
+      "ingest_revision": 1,
+      "ingest_source_class": "user",
+      "ingest_world_revision": 1,
+      "occurred_at": "2026-11-02T09:05:00-08:00",
+      "sequence": 1,
+      "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+      "turn_index": 1
+    },
+    {
+      "binding_mode": "fixture_observation",
+      "event_id": "c15rcc-002",
+      "fixture_payload_sha256": "sha256:50b920768c8560cc4f60a0c51ef8477c6d4f47e85695b61e8b95e2e839963eb3",
+      "fixture_projection_sha256": "sha256:3babcd0246d3ba2395f85756fd42c5113979e1c268554d32157f5289c883df7a",
+      "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+      "ingest_object_id": "obs_c14_fixture_5248cdfd5a23b6ea88ce0a96",
+      "ingest_ref": "obs_c14_fixture_5248cdfd5a23b6ea88ce0a96@1",
+      "ingest_revision": 1,
+      "ingest_source_class": "platform",
+      "ingest_world_revision": 14,
+      "occurred_at": "2026-11-02T09:14:00-08:00",
+      "sequence": 2
+    },
+    {
+      "binding_mode": "canonical_user_turn",
+      "binding_version": "c15-rcc-canonical-conversation-binding-v1",
+      "event_id": "c15rcc-003",
+      "fixture_payload_sha256": "sha256:69af3eb96d665e71f8704928f37672b7fbabac82d18b34b101f4f1f4d1697303",
+      "fixture_projection_sha256": "sha256:f3f236e66f87fbaedeb2b5c4ba222f58c7eab5532fdd085b898cfb188a845593",
+      "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+      "ingest_object_id": "obs_conv_user_c4bef35968765b7f621c3ab2",
+      "ingest_ref": "obs_conv_user_c4bef35968765b7f621c3ab2@1",
+      "ingest_revision": 1,
+      "ingest_source_class": "user",
+      "ingest_world_revision": 15,
+      "occurred_at": "2026-11-02T09:20:00-08:00",
+      "sequence": 3,
+      "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+      "turn_index": 2
+    },
+    {
+      "binding_mode": "fixture_observation",
+      "event_id": "c15rcc-004",
+      "fixture_payload_sha256": "sha256:6a31f70d43b4d1e296d08fca670a0f3de92ca58b8f0de73b71c62d0cdb54357c",
+      "fixture_projection_sha256": "sha256:7f13690d0a934cf007dd16908b6586ad6533d6d12a7ca171b9c60d321baab4ec",
+      "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+      "ingest_object_id": "obs_c14_fixture_5d4dfcf42055c00135a78a54",
+      "ingest_ref": "obs_c14_fixture_5d4dfcf42055c00135a78a54@1",
+      "ingest_revision": 1,
+      "ingest_source_class": "platform",
+      "ingest_world_revision": 21,
+      "occurred_at": "2026-11-02T12:40:00-08:00",
+      "sequence": 4
+    },
+    {
+      "binding_mode": "canonical_user_turn",
+      "binding_version": "c15-rcc-canonical-conversation-binding-v1",
+      "event_id": "c15rcc-005",
+      "fixture_payload_sha256": "sha256:4a7f6712a8ba8cd2133ea1d742cdad489db23508e98f903c0faa9070c1a71356",
+      "fixture_projection_sha256": "sha256:ebd83881d55ac750b70f2561d6bba4106edcb9a8d53cdcb3088ad7775b66a0ca",
+      "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+      "ingest_object_id": "obs_conv_user_d4953379e0fd7ae84b9a27ee",
+      "ingest_ref": "obs_conv_user_d4953379e0fd7ae84b9a27ee@1",
+      "ingest_revision": 1,
+      "ingest_source_class": "user",
+      "ingest_world_revision": 22,
+      "occurred_at": "2026-11-02T12:52:00-08:00",
+      "sequence": 5,
+      "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+      "turn_index": 3
+    },
+    {
+      "binding_mode": "canonical_user_turn",
+      "binding_version": "c15-rcc-canonical-conversation-binding-v1",
+      "event_id": "c15rcc-006",
+      "fixture_payload_sha256": "sha256:bbc17affa31401eab9f9e57acd053ecfee39411f900dce06b700dec6f0f03c32",
+      "fixture_projection_sha256": "sha256:d2ecb3ce17f510ad17b36959fea9cedbefe0d87a93a54957cbe385c9423f161d",
+      "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+      "ingest_object_id": "obs_conv_user_76b4c03c31db54c18b1f02ee",
+      "ingest_ref": "obs_conv_user_76b4c03c31db54c18b1f02ee@1",
+      "ingest_revision": 1,
+      "ingest_source_class": "user",
+      "ingest_world_revision": 49,
+      "occurred_at": "2026-11-03T10:15:00-08:00",
+      "sequence": 6,
+      "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+      "turn_index": 4
+    },
+    {
+      "binding_mode": "fixture_observation",
+      "event_id": "c15rcc-007",
+      "fixture_payload_sha256": "sha256:776d871786f1329dc91173570ae20c7a15ffb9aabd3163045734969b4d596879",
+      "fixture_projection_sha256": "sha256:b5c631acba34d26fc1e4cd1ad3bd2b25e8619a6d5738f34a8d00cf33ec9e8752",
+      "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+      "ingest_object_id": "obs_c14_fixture_87474a7fb5036c38638a6c37",
+      "ingest_ref": "obs_c14_fixture_87474a7fb5036c38638a6c37@1",
+      "ingest_revision": 1,
+      "ingest_source_class": "platform",
+      "ingest_world_revision": 69,
+      "occurred_at": "2026-11-04T13:30:00-08:00",
+      "sequence": 7
+    },
+    {
+      "binding_mode": "canonical_user_turn",
+      "binding_version": "c15-rcc-canonical-conversation-binding-v1",
+      "event_id": "c15rcc-008",
+      "fixture_payload_sha256": "sha256:78fbf4639454b1be169ed9dcfc5b54f4d1bba04fdd3f4703aa7d84fe1a851a84",
+      "fixture_projection_sha256": "sha256:1461927270af0539ab10a36e86141cbf00bef4742131c45ba2c3bf809a8986e9",
+      "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+      "ingest_object_id": "obs_conv_user_10c0bcfb2f7bf80aa9b324b8",
+      "ingest_ref": "obs_conv_user_10c0bcfb2f7bf80aa9b324b8@1",
+      "ingest_revision": 1,
+      "ingest_source_class": "user",
+      "ingest_world_revision": 73,
+      "occurred_at": "2026-11-04T13:42:00-08:00",
+      "sequence": 8,
+      "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+      "turn_index": 5
+    },
+    {
+      "binding_mode": "fixture_observation",
+      "event_id": "c15rcc-009",
+      "fixture_payload_sha256": "sha256:75fe7cf480226ac2cf456e9a07e26fe062aa5f42c1c3d6d661559ed2fd4aa0f5",
+      "fixture_projection_sha256": "sha256:e744a4993fcc7e7c036a0f4c07b4a76fffcccf15f4e079f55de82e84384271ce",
+      "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+      "ingest_object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+      "ingest_ref": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2@1",
+      "ingest_revision": 1,
+      "ingest_source_class": "platform",
+      "ingest_world_revision": 76,
+      "occurred_at": "2026-11-04T14:17:00-08:00",
+      "sequence": 9
+    },
+    {
+      "binding_mode": "canonical_user_turn",
+      "binding_version": "c15-rcc-canonical-conversation-binding-v1",
+      "event_id": "c15rcc-010",
+      "fixture_payload_sha256": "sha256:34d367eeca5085707af82690ad4a140fc1280cd86be6cb2c0a333dab29c2024a",
+      "fixture_projection_sha256": "sha256:1612296d1367a2433cbd4173a4d600c9b6e17f54d208caeb24af8db8d9ebe01c",
+      "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+      "ingest_object_id": "obs_conv_user_fbe20407ffd68ca6f1bc5f5c",
+      "ingest_ref": "obs_conv_user_fbe20407ffd68ca6f1bc5f5c@1",
+      "ingest_revision": 1,
+      "ingest_source_class": "user",
+      "ingest_world_revision": 77,
+      "occurred_at": "2026-11-04T14:24:00-08:00",
+      "sequence": 10,
+      "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+      "turn_index": 6
+    },
+    {
+      "binding_mode": "fixture_observation",
+      "event_id": "c15rcc-011",
+      "fixture_payload_sha256": "sha256:1e8dcb94f2615049a6d9e1980055176ab708bcb271fa8d131113a9ed8dddad35",
+      "fixture_projection_sha256": "sha256:b76eee334205d2a3e63bb0311d18b35fa03d6e6b55af2de280c9aed7b4d2d3c4",
+      "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+      "ingest_object_id": "obs_c14_fixture_291beec37165eb34a35f8f85",
+      "ingest_ref": "obs_c14_fixture_291beec37165eb34a35f8f85@1",
+      "ingest_revision": 1,
+      "ingest_source_class": "platform",
+      "ingest_world_revision": 85,
+      "occurred_at": "2026-11-04T15:02:00-08:00",
+      "sequence": 11
+    },
+    {
+      "binding_mode": "canonical_user_turn",
+      "binding_version": "c15-rcc-canonical-conversation-binding-v1",
+      "event_id": "c15rcc-012",
+      "fixture_payload_sha256": "sha256:700a3de330b2a7fbc06c762661ba6091e431ab06ea19caa98ef3f748230ce87b",
+      "fixture_projection_sha256": "sha256:30a22ee06c2bf9ea781acfa9e8d3adc6353f66b6333b0c3337c2917b1d301412",
+      "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+      "ingest_object_id": "obs_conv_user_e0dbe4b6cc248f47e013943c",
+      "ingest_ref": "obs_conv_user_e0dbe4b6cc248f47e013943c@1",
+      "ingest_revision": 1,
+      "ingest_source_class": "user",
+      "ingest_world_revision": 86,
+      "occurred_at": "2026-11-04T15:07:00-08:00",
+      "sequence": 12,
+      "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+      "turn_index": 7
+    },
+    {
+      "binding_mode": "fixture_observation",
+      "event_id": "c15rcc-013",
+      "fixture_payload_sha256": "sha256:98b48726adcaccbda0e4ec913a86e93ed1a4ef1e787165d9c036e2da87beb703",
+      "fixture_projection_sha256": "sha256:ff41d6c313e3f76a098daa9aaa7bc1d1c1984091778f33a022c559da722058e9",
+      "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+      "ingest_object_id": "obs_c14_fixture_e2c76be3450b6e9dc8316b9d",
+      "ingest_ref": "obs_c14_fixture_e2c76be3450b6e9dc8316b9d@1",
+      "ingest_revision": 1,
+      "ingest_source_class": "platform",
+      "ingest_world_revision": 98,
+      "occurred_at": "2026-11-06T11:10:00-08:00",
+      "sequence": 13
+    }
+  ],
+  "release_contract_version": "c15-rcc-sequential-release-v1",
+  "release_operator_version": "c15-rcc-three-phase-release-v1",
+  "schema_version": "c15-rcc-event-v1",
+  "state_version": "c15-rcc-release-state-v1"
+}
+RUN_ROOT2 pending set
+binding receipt 9cba565c8bc5
+model_rounds=ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='41929c9b014a8f0e97763c3f76fd5fa3'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='41929c9b014a8f0e97763c3f76fd5fa3'))
+headless stub turn succeeded
+model_rounds 1 directive ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='41929c9b014a8f0e97763c3f76fd5fa3'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='41929c9b014a8f0e97763c3f76fd5fa3')) real-providerCHECK 59 PASS: headless CLI turn with ExternalBrokerClient succeeded (HTTPS stub)
+[e2e] step 14: hash mismatch
+PASS contract hash mismatch fail closed: contract SHA env mismatch: expected 28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef, got deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef (STOP)
+CHECK 60 PASS: contract hash mismatch fail closed
+PASS wire protocol hash mismatch: wire protocol hash mismatch
+CHECK 61 PASS: wire protocol hash mismatch fail closed
+[e2e] step 15: current-event binding adversarial (baseline valid receipt + 12 negatives)
+{"fixture_sha256":"sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46","next_sequence":14,"phase":"B","status":"initialized"}
+CHECK 62 PASS: disposable init B via canonical command
+DISPOSABLE_REVEAL seq=14 event_id=c15rcc-014 projection_sha256=c0e3e7d07d62e00c2394ae9e99032dd76aa74afd3960aae35a2ee1286c545f27 payload_sha256=89be96010d003f84b443c2b9482386e26d9d48690398fe948649df5365858eb7 field_count=8
+REVEAL_SHAPE_VALID_PASS
+CHECK 63 PASS: canonical reveal --phase B --state without --sequence (blocker7) produces 8-field projection
+using disp /tmp/b-disp-reveal-1456
+baseline receipt created binding_version=c15-rcc-b-binding-v1 seq=14 sha=74fcbf4eaaae rs_sha=c7a735b2eca3
+BASELINE_VALID_PASS
+CHECK 64 PASS: baseline valid receipt PASS
+PASS seq15 rejected for sequence: current_event.sequence 15 != receipt sequence 14 (future/stale)
+PASS wrong event_id rejected for event_id: current_event event_id 'wrong-id-xyz' != receipt event_id 'c15rcc-014'
+PASS modified payload rejected for payload: current_event canonical projection sha dd9932baf2a1... != receipt 74fcbf4eaaae... (modified payload/dimension)
+PASS modified occurred_at rejected for occurred_at: current_event.occurred_at '2026-11-10T00:00:00-08:00' != receipt occurred_at '2026-11-09T09:03:00-08:00' (modified occurred_at)
+PASS modified dimension rejected for dimension: current_event.dimension 'dim:fake' != receipt dimension 'dim:work_state' (modified dimension)
+PASS modified source_kind rejected for source_kind: current_event.source_kind 'fake_kind' != receipt source_kind 'monitoring' (modified source_kind)
+PASS modified source_class rejected for source_class: current_event.source_class 'FAKE' != receipt source_class 'PLATFORM' (modified source_class)
+PASS modified modality rejected for modality: current_event.modality 'fake_modality' != receipt modality 'structured_text' (modified modality)
+PASS wrong session rejected: binding receipt b_session_id 'b-adversarial-001' != 'b-wrong-session' (wrong session)
+PASS stale seq14 after ACK rejected: binding receipt release_state_path '/tmp/b-disp-reveal-1456/runtime/release_state.json' != current '/tmp/tmpbiboc97v/rs_stale.json' (path identity mismatch)
+PASS missing receipt rejected: binding receipt missing at /tmp/nonexistent-binding.json (current-event binding must exist)
+PASS malformed receipt rejected: binding receipt malformed JSON: Expecting value: line 1 column 1 (char 0)
+BINDING_ADVERSARIAL_PASS
+CHECK 65 PASS: binding adversarial 12 mutations PASS
+CHECK 66 PASS: seq15 rejected for sequence mismatch
+CHECK 67 PASS: wrong id rejected for event-id mismatch
+CHECK 68 PASS: modified payload rejected for projection digest
+CHECK 69 PASS: wrong session rejected
+CHECK 70 PASS: stale receipt rejected
+CHECK 71 PASS: missing receipt rejected
+CHECK 72 PASS: malformed receipt rejected
+[e2e] step 15b: stale binding details already covered
+CHECK 73 PASS: stale after ACK rejected detail
+CHECK 74 PASS: malformed current-event file rejected detail
+CHECK 75 PASS: missing current-event file detected detail
+[e2e] step 16: production failure retry Scheme A (must reach provider, poison, durable)
+first call failed as expected: provider invoke failed: simulated provider transport failure
+PASS provider.invocations ==1 proof
+PASS failure_class provider_transport_failure
+PASS handler _poisoned == True
+PASS same handler second call poisoned fail: handler poisoned: provider_transport_failure: provider invoke failed: simulated provider transport failure (new instance required)
+PASS _outstanding == None
+PASS release next_sequence not advanced
+PASS durable failure receipt exists /tmp/b-scheme-evidence-2053/failure-latest-1.json
+PASS durable evidence session/cursor
+PASS non-JSON fail closed: provider content not JSON: Expecting value: line 1 column 1 (char 0)
+PASS non-JSON provider invoked
+PASS non-JSON poisoned
+PASS non-JSON failure_class non_json
+PASS outstanding cleared after non-JSON
+PASS durable after non-JSON
+PASS wrong binding fail closed: reply binding failed: reply round 999 != outstanding 1
+PASS wrong binding provider invoked
+PASS wrong binding failure_class binding_failure
+PASS wrong binding poisoned
+PASS outstanding cleared after wrong binding
+PASS new handler fresh succeeded directive silenced=False
+PASS new handler can be reconstructed with fresh request_id/digest
+PASS durable failure receipt persists
+SCHEME_A_PASS
+CHECK 76 PASS: provider exception Scheme A clear outstanding cursor not advanced new binding with fresh request_id
+CHECK 77 PASS: transport failure provider invoked
+CHECK 78 PASS: transport failure class
+CHECK 79 PASS: handler poisoned
+CHECK 80 PASS: same instance retry poisoned fail
+CHECK 81 PASS: durable failure receipt exists
+CHECK 82 PASS: non-JSON provider actually invoked then fails
+CHECK 83 PASS: non-JSON failure class non_json
+CHECK 84 PASS: wrong-binding provider actually invoked then binding fails
+CHECK 85 PASS: wrong-binding failure class binding_failure
+CHECK 86 PASS: new instance succeeds with fresh request_id/digest
+[e2e] step 18: exact environment mismatch
+CHECK 87 PASS: env exact match would pass
+CHECK 88 PASS: wire protocol hash exact match
+CHECK 89 PASS: pydantic exact version
+[e2e] step 17: capability catalog
+PASS catalog search_world allowed
+PASS catalog evil_cap correctly rejected: capability 'evil_cap' not in snapshot.capability_catalog ['search_world']... (fail closed)
+PASS empty catalog correctly rejected: capability 'search_world' not in snapshot.capability_catalog []... (fail closed)
+CATALOG_PASS
+CHECK 90 PASS: catalog search_world PASS
+CHECK 91 PASS: catalog evil_cap FAIL closed
+CHECK 92 PASS: empty catalog any capability FAIL
+[e2e] step 17b: adapter hash missing/wrong
+PASS missing adapter hash correctly FAIL: missing mandatory B boundary envs ['AIOS_ADAPTER_SHA256'] (ModelDispatchNotSubmitted/STOP)
+PASS wrong adapter hash correctly FAIL: adapter hash mismatch: expected deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef, got da74eb97a6d35b535f298f52a72a32fc35dfbd1fca1ec4585aa1d7c090e92911 (ModelDispatchNotSubmitted/STOP)
+ADAPTER_HASH_PASS
+CHECK 93 PASS: adapter missing hash FAIL closed
+CHECK 94 PASS: adapter wrong hash FAIL closed
+CHECK 95 PASS: adapter hash exact path exercised
+[e2e] step 17c: wire env hash wrong
+PASS wire wrong correctly FAIL: wire protocol SHA env mismatch: expected a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a, got deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef (STOP)
+WIRE_HASH_PASS
+CHECK 96 PASS: wire env wrong FAIL closed
+CHECK 97 PASS: wire hash exact exercised
+[e2e] step 17d: production boundary env missing
+PASS missing AIOS_RELEASE_STATE_PATH correctly FAIL: missing mandatory B boundary envs ['AIOS_RELEASE_STATE_PATH'] (ModelDispatchNotSubmitted/STOP)
+PASS missing AIOS_CURRENT_EVENT_PATH correctly FAIL: missing mandatory B boundary envs ['AIOS_CURRENT_EVENT_PATH'] (ModelDispatchNotSubmitted/STOP)
+PASS missing AIOS_CURRENT_EVENT_BINDING_PATH correctly FAIL: missing mandatory B boundary envs ['AIOS_CURRENT_EVENT_BINDING_PATH'] (ModelDispatchNotSubmitted/STOP)
+PASS missing AIOS_EVIDENCE_DIR correctly FAIL: missing mandatory B boundary envs ['AIOS_EVIDENCE_DIR'] (ModelDispatchNotSubmitted/STOP)
+PASS missing AIOS_ADAPTER_SHA256 correctly FAIL: missing mandatory B boundary envs ['AIOS_ADAPTER_SHA256'] (ModelDispatchNotSubmitted/STOP)
+PASS missing AIOS_CONTRACT_SHA256 correctly FAIL: missing mandatory B boundary envs ['AIOS_CONTRACT_SHA256'] (ModelDispatchNotSubmitted/STOP)
+PASS missing AIOS_WIRE_PROTOCOL_SHA256 correctly FAIL: missing mandatory B boundary envs ['AIOS_WIRE_PROTOCOL_SHA256'] (ModelDispatchNotSubmitted/STOP)
+BOUNDARY_PASS
+CHECK 98 PASS: production boundary 7 envs missing each FAIL closed
+CHECK 99 PASS: missing AIOS_RELEASE_STATE_PATH FAIL
+CHECK 100 PASS: missing AIOS_ADAPTER_SHA256 FAIL
+CHECK 101 PASS: missing AIOS_WIRE_PROTOCOL_SHA256 FAIL
+[e2e] step 17e: binding receipt schema mutations
+PASS missing_fixture correctly FAIL: binding receipt missing fixture_sha256
+PASS wrong_fixture correctly FAIL: binding receipt fixture_sha256 'sha256:deadbeef' != canonical 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46' (wrong fixture SHA)
+PASS missing_state_sha correctly FAIL: binding receipt missing release_state_sha256
+PASS wrong_state_sha correctly FAIL: release_state SHA mismatch: receipt deadbeefdead... != current c7a735b2eca3... (stale receipt or state mutated)
+PASS missing_state_path correctly FAIL: binding receipt missing release_state_path
+PASS wrong_next_seq correctly FAIL: binding receipt release_state_next_sequence 999 != release_state next_sequence 14 (next_sequence mismatch)
+PASS wrong_pending correctly FAIL: binding receipt release_state_pending_reveal {'sequence': 999, 'event_id': 'wrong'} != release_state pending_reveal {'event_id': 'c15rcc-014', 'fixture_sha256': 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46', 'occurred_at': '2026-11-09T09:03:00-08:00', 'sequence': 14} (pending_reveal mismatch)
+RECEIPT_SCHEMA_PASS
+CHECK 102 PASS: missing fixture SHA FAIL
+CHECK 103 PASS: wrong fixture SHA FAIL
+CHECK 104 PASS: missing state SHA FAIL
+CHECK 105 PASS: wrong state SHA FAIL
+CHECK 106 PASS: missing state path FAIL
+CHECK 107 PASS: wrong saved next sequence FAIL
+CHECK 108 PASS: wrong saved pending reveal FAIL
+CHECK 109 PASS: receipt schema 7 mutations PASS
+[e2e] step 17e2: live pending fixture triple-binding
+PASS pending_missing create correctly FAIL: release_state pending_reveal.fixture_sha256 missing (must be 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46')
+PASS pending_missing validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-1456/runtime/release_state.json' != current '/tmp/b-fixture-pending_missing-5qpo_pxn/release_state.json' (path identity mismatch)
+PASS pending_wrong create correctly FAIL: release_state pending_reveal.fixture_sha256 'sha256:deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef' != canonical 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46' (live fixture mismatch)
+PASS pending_wrong validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-1456/runtime/release_state.json' != current '/tmp/b-fixture-pending_wrong-q1735qlq/release_state.json' (path identity mismatch)
+PASS receipt fixture wrong correctly FAIL: binding receipt fixture_sha256 'sha256:deadbeef' != canonical 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46' (wrong fixture SHA)
+PASS exact fixture triple-binding PASS: sha256:7ccb3
+FIXTURE_TRIPLE_PASS
+CHECK 110 PASS: live pending fixture missing FAIL
+CHECK 111 PASS: live pending fixture wrong FAIL
+CHECK 112 PASS: receipt fixture wrong FAIL
+CHECK 113 PASS: exact fixture triple-binding PASS
+CHECK 114 PASS: fixture triple 4 cases PASS
+[e2e] step 17f: HTTP boundary (production vs probe-only)
+PASS remote http correctly FAIL: plaintext http:// not allowed for production endpoint 'http://example.com/v1/chat' (must be https:// or test-only http://127.0.0.1:<port> with allow_test_loopback=True)
+PASS production loopback without flag correctly FAIL: provider factory 'bridged_model_handler:ExternalBrokerClient' failed: loopback http:// endpoint not allowed without allow_test_loopback=True (must be https://) got 'http://127.0.0.1:8765/v1/chat' (production entrypoint is HTTPS-only)
+PASS production loopback with flag correctly FAIL (still loopback): provider factory 'bridged_model_handler:ExternalBrokerClient' failed: loopback http:// endpoint not allowed without allow_test_loopback=True (must be https://) got 'http://127.0.0.1:8765/v1/chat' (production entrypoint is HTTPS-only)
+PASS direct test constructor loopback with allow_test_loopback=True succeeded: http://127.0.0.1:8765/v1/chat
+PASS https correctly PASS: https://broker.example/v1/chat
+PASS session name does not bypass (direct): loopback http:// endpoint not allowed without allow_test_loopback=True (must be https://) got 'http://127.0.0.1:8765/v1/chat' (production entrypoint is HTTPS-only)
+HTTP_BOUNDARY_PASS
+CHECK 115 PASS: remote http://example FAIL closed
+CHECK 116 PASS: production loopback without flag FAIL
+CHECK 117 PASS: production loopback with flag still FAIL
+CHECK 118 PASS: direct test-only loopback PASS
+CHECK 119 PASS: https structural PASS
+CHECK 120 PASS: session name does not affect policy
+CHECK 121 PASS: HTTP boundary 5 cases PASS
+[e2e] step 17g: durable failure evidence permission
+PASS evidence chmod check
+CHECK 122 PASS: evidence permission not silent pass
+PASS evidence permission readback exists
+CHECK 123 PASS: evidence permission readback enforced
+[e2e] step 17h: stale command grep and duplicate check
+PASS no stale reveal --sequence in procedure
+CHECK 124 PASS: stale reveal --sequence removed from canonical B procedure
+PASS no stale canonical text
+CHECK 125 PASS: stale canonical text grep = 0
+PASS source_kind unified opaque
+CHECK 126 PASS: source_kind unified
+counts write=1 validate=1 envelope=1
+PASS duplicate definitions exactly 1 each
+CHECK 127 PASS: duplicate definitions exactly 1 each
+PASS build_model_request exactly 1
+CHECK 128 PASS: build_model_request exactly 1
+[e2e] step 17i: canonical production startup env contract
+PASS canonical startup env contract complete
+CHECK 129 PASS: canonical startup env contract complete PASS
+PASS canonical startup uses HTTPS
+CHECK 130 PASS: canonical startup HTTPS
+PASS canonical configuration block is configuration-only
+PASS canonical block contains all 12 envs
+PASS canonical startup reaches transport: ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='b1e9285481b3b9f17223f8ff63d0f40f'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='b1e9285481b3b9f17223f8ff63d0f40f'))
+CHECK 131 PASS: canonical startup execution reaches transport
+[e2e] step 17j: env manifest/gate consistency
+PASS manifest subset semantic
+CHECK 132 PASS: environment manifest subset
+PASS manifest extra allowed
+CHECK 133 PASS: manifest extra allowed
+PASS probe subset check
+CHECK 134 PASS: probe subset gate
+PASS env manifest/gate consistency
+CHECK 135 PASS: environment manifest/gate semantic consistency PASS
+[e2e] corrective-009 blk-01: committed evidence contains no sealed cursor14 payload
+NO_COMMITTED_CURSOR14_PAYLOAD_PASS scanned=36 events=15 legal_event_id_visible=True
+CHECK 136 PASS: BLK-01 committed logs contain no sealed cursor14 payload
+NO_FALSE_NO_REVEAL_PROSE_PASS
+CHECK 137 PASS: BLK-01 prose states disposable reveal only (no false no-reveal claim)
+[e2e] corrective-009 blk-02: portable checkout, no hardcoded absolute path
+CHECK 138 PASS: no hardcoded /home/user/ path in harness/isolation/procedure/checks
+RANDOM_CHECKOUT_REPO_ROOT /tmp/candidate-3pikgl5yvi
+RANDOM_CHECKOUT_CONTRACT_SHA 28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef
+decoy_cwd_rc 0
+corrupt_contract_rc 1
+PORTABLE_CHECKOUT_PASS
+CHECK 139 PASS: BLK-02 candidate importable and contract-provenance-bound from a random /tmp checkout
+CHECK 140 PASS: BLK-02 negative isolation asserted exact exit 98 + injected marker + jail executed
+[e2e] corrective-009 blk-03: canonical runbook executable
+CANONICAL_RUNBOOK_STATIC_PASS
+CHECK 141 PASS: BLK-03 runbook lock name / fence / canonical time / projection loop / provider docs consistent
+documented lock argument: --lock $RUN_ROOT/runtime/world.sqlite.writer.lock
+CHECK 142 PASS: documented --lock uses <world>.writer.lock
+{"index_lag": 0, "index_path": "/home/user/c15-persistence-probes/frozen-attempt-02/runbook_probe/runtime/index.sqlite", "index_status": "ready", "index_watermark": 98, "recovery_disposition": "AUTO_RECOVERABLE", "schema_version": 1, "status": "recovery_status", "supported_schema_version": 1, "world_path": "/home/user/c15-persistence-probes/frozen-attempt-02/runbook_probe/runtime/world.sqlite", "world_quick_check": ["ok"], "world_revision": 98}
+CHECK 143 PASS: documented recovery-status executes: rev98/watermark98/lag0/AUTO_RECOVERABLE/ok
+CANONICAL_RUNBOOK_EXECUTABLE_PASS
+[e2e] corrective-009 blk-04..08: handler and jail adversarial regressions
+disposable reveal metadata: seq=14 event_id=c15rcc-014 field_count=8
+missing_release_state correctly FAIL: current-event binding failed: BLK-04: release_state missing at /home/user/c15-persistence-probes/frozen-attemp
+MISSING_RELEASE_STATE_FAIL_CLOSED_PASS provider_calls=0 receipts=2
+NO_EVENT_NO_DISPATCH_PASS
+FAILURE_RECEIPT_COLLISION_PASS receipts=2 names_distinct=True
+PAYLOAD_RAN_OK
+INHERITED_FD_SEALED_PASS
+CONTRACT_PROVENANCE_PASS repo_root=/home/user/Haneof-AIOS-Core-v3.0 contract_sha=28d3262f56b7 adapter_sha=da74eb97a6d3
+CHECK 144 PASS: BLK-04 missing live release state fails closed (no provider call, durable receipt)
+CHECK 145 PASS: BLK-05 no current-event -> no dispatch for every wake reason / round index
+CHECK 146 PASS: BLK-06 same-second same-round failures produce two distinct 0400 receipts, outstanding cleared
+CHECK 147 PASS: BLK-07 inherited FDs closed before exec; sealed material unreadable inside the jail
+CHECK 148 PASS: BLK-08 contract provenance mechanically bound to the accepted tree, no absolute fallback
+[e2e] corrective-010 blk-03: canonical runbook 1->12 order executable
+RUNBOOK_STATIC_ORDER_PASS section6_config_only=True section7_steps=12
+BEFORE_REVEAL: no current-event.json, no binding receipt, pending_reveal=null
+PRE_REVEAL_STOP_OK provider_calls=0 receipts=2
+REVEALED_SEQ=14 EVENT_ID_VISIBLE=True FIELDS=8
+RECEIPT_CREATED_AFTER_REVEAL seq=14 mode=0400 sha_bound=True
+BINDING_VERIFIED seq=14
+DERIVED_CURRENT_OCCURRED_AT=2026-11-09T09:03:00-08:00 (from current-event.json, after reveal)
+PRODUCTION_TURN_REACHED_TRANSPORT invocations=2 http_posts=2 provider=fake-broker
+CANONICAL_RUNBOOK_ORDER_PASS order=1-12 reveal_before_event=True projection_before_receipt=True receipt_after_current_event=True occurred_at_derived_after_reveal=True transport_boundary_reached=True
+CHECK 149 PASS: BLK-03 canonical runbook 1-12 order executes on a disposable Phase-B copy (reveal -> install current-event -> persist projection evidence -> receipt -> verify -> occurred_at -> production turn -> transport)
+[e2e] step 17k: canonical pin declaration consistency + mutation red
+CANONICAL_PIN_CONSISTENCY_PASS operator_manifest.md:W4/I4/R4, source_pins_and_digests.md:W3/I3/R3, b_startup_procedure.md:W2/I2/R2
+PIN_MUTATION_RED_PASS operator_manifest.md:World:one_hex via=check_canonical_pin_docs: operator_manifest.md: contradictory authoritative World declaration(s): line 51 role=bare value=626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6a0; expected 626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa
+PIN_MUTATION_RED_PASS operator_manifest.md:Index:one_hex via=check_canonical_pin_docs: operator_manifest.md: contradictory authoritative Index declaration(s): line 52 role=bare value=ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f0; expected ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1
+PIN_MUTATION_RED_PASS operator_manifest.md:Release:one_hex via=check_canonical_pin_docs: operator_manifest.md: contradictory authoritative Release declaration(s): line 53 role=bare value=eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c0; expected eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8
+PIN_MUTATION_RED_PASS source_pins_and_digests.md:World:one_hex via=check_canonical_pin_docs: source_pins_and_digests.md: contradictory authoritative World declaration(s): line 74 role=bare value=626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6a0; expected 626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa
+PIN_MUTATION_RED_PASS source_pins_and_digests.md:Index:one_hex via=check_canonical_pin_docs: source_pins_and_digests.md: contradictory authoritative Index declaration(s): line 75 role=bare value=ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f0; expected ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1
+PIN_MUTATION_RED_PASS source_pins_and_digests.md:Release:one_hex via=check_canonical_pin_docs: source_pins_and_digests.md: contradictory authoritative Release declaration(s): line 76 role=bare value=eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c0; expected eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8
+PIN_MUTATION_RED_PASS procedure/b_startup_procedure.md:World:one_hex via=check_canonical_pin_docs: procedure/b_startup_procedure.md: contradictory authoritative World declaration(s): line 49 role=bare value=626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6a0; expected 626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa
+PIN_MUTATION_RED_PASS procedure/b_startup_procedure.md:Index:one_hex via=check_canonical_pin_docs: procedure/b_startup_procedure.md: contradictory authoritative Index declaration(s): line 50 role=bare value=ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f0; expected ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1
+PIN_MUTATION_RED_PASS procedure/b_startup_procedure.md:Release:one_hex via=check_canonical_pin_docs: procedure/b_startup_procedure.md: contradictory authoritative Release declaration(s): line 51 role=bare value=eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c0; expected eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8
+PIN_MUTATION_RED_PASS operator_manifest.md:World:duplicate_wrong via=check_canonical_pin_docs: operator_manifest.md: contradictory authoritative World declaration(s): line 241 role=bare value=626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6a0; expected 626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa
+PIN_MUTATION_RED_PASS operator_manifest.md:World:missing_all via=check_canonical_pin_docs: operator_manifest.md: missing authoritative World declaration
+CANONICAL_PIN_MUTATION_RED_PASS cases=11
+CHECK 150 PASS: World pin declarations all canonical across 3 docs
+CHECK 151 PASS: Index pin declarations all canonical across 3 docs
+CHECK 152 PASS: Release pin declarations all canonical across 3 docs
+CHECK 153 PASS: cross-document authoritative pin declarations have no missing/typo/duplicate contradiction
+CHECK 154 PASS: 11 disposable-file pin mutations all rejected by check_canonical_pin_docs
+[e2e] step 17l: startup/per-cursor lifecycle synchronization + executable mutation red
+RUNBOOK_CROSS_DOCUMENT_ORDER_PASS REVEAL>INSTALL_CURRENT_EVENT>PERSIST_PROJECTION_EVIDENCE>CREATE_BINDING_RECEIPT>VERIFY_BINDING>DERIVE_OCCURRED_AT>INGEST>MODEL_WORK>DURABLE_ACK>CLEAR_BINDING>NEXT_REVEAL sources=token_block,headings,step_body_executables,executable_chains finish_clause_between_model_work_and_ack=True authority=b_startup_procedure.md§7
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS per_cursor:receipt_before_current_event via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: operational heading tokens differ: got=('REVEAL', 'CREATE_BINDING_RECEIPT', 'PERSIST_PROJECTION_EVIDENCE', 'INSTALL_CURRENT_EVENT', 'VERIFY_BINDING', 'DERIVE_OCCURRED_AT', 'INGEST', 'MODEL_WORK', 'DURABLE_ACK', 'CLEAR_BINDING', 'NEXT_REVEAL') expected=('REVEAL', 'INSTALL_CURRENT_EVENT', 'PERSIST_PROJECTION_EVIDENCE', 'CREATE_BINDING_RECEIPT', 'VERIFY_BINDING', 'DERIVE_OCCURRED_AT', 'INGEST', 'MODEL_WORK', 'DURABLE_ACK', 'CLEAR_BINDING', 'NEXT_REVEAL')
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS per_cursor:missing_projection_evidence via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: operational heading tokens differ: got=('REVEAL', 'INSTALL_CURRENT_EVENT', 'CREATE_BINDING_RECEIPT', 'VERIFY_BINDING', 'DERIVE_OCCURRED_AT', 'INGEST', 'MODEL_WORK', 'DURABLE_ACK', 'CLEAR_BINDING', 'NEXT_REVEAL') expected=('REVEAL', 'INSTALL_CURRENT_EVENT', 'PERSIST_PROJECTION_EVIDENCE', 'CREATE_BINDING_RECEIPT', 'VERIFY_BINDING', 'DERIVE_OCCURRED_AT', 'INGEST', 'MODEL_WORK', 'DURABLE_ACK', 'CLEAR_BINDING', 'NEXT_REVEAL')
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS per_cursor:duplicate_projection_evidence via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: operational heading tokens differ: got=('REVEAL', 'INSTALL_CURRENT_EVENT', 'PERSIST_PROJECTION_EVIDENCE', 'PERSIST_PROJECTION_EVIDENCE', 'CREATE_BINDING_RECEIPT', 'VERIFY_BINDING', 'DERIVE_OCCURRED_AT', 'INGEST', 'MODEL_WORK', 'DURABLE_ACK', 'CLEAR_BINDING', 'NEXT_REVEAL') expected=('REVEAL', 'INSTALL_CURRENT_EVENT', 'PERSIST_PROJECTION_EVIDENCE', 'CREATE_BINDING_RECEIPT', 'VERIFY_BINDING', 'DERIVE_OCCURRED_AT', 'INGEST', 'MODEL_WORK', 'DURABLE_ACK', 'CLEAR_BINDING', 'NEXT_REVEAL')
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS per_cursor:old_receipt_before_current_event_chain via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: document-wide semantic lifecycle operation install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json" must occur exactly once; found=['install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"', 'cp "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS per_cursor:token_block_only_reorder via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: token block differs: got=('REVEAL', 'CREATE_BINDING_RECEIPT', 'PERSIST_PROJECTION_EVIDENCE', 'INSTALL_CURRENT_EVENT', 'VERIFY_BINDING', 'DERIVE_OCCURRED_AT', 'INGEST', 'MODEL_WORK', 'DURABLE_ACK', 'CLEAR_BINDING', 'NEXT_REVEAL') expected=('REVEAL', 'INSTALL_CURRENT_EVENT', 'PERSIST_PROJECTION_EVIDENCE', 'CREATE_BINDING_RECEIPT', 'VERIFY_BINDING', 'DERIVE_OCCURRED_AT', 'INGEST', 'MODEL_WORK', 'DURABLE_ACK', 'CLEAR_BINDING', 'NEXT_REVEAL')
+RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-A:delete_executable_persist:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=1 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-A:delete_executable_persist:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=1 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-B:persist_after_ack:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=1 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-B:persist_after_ack:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=1 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-C:comment_hidden_receipt_first:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: document-wide semantic lifecycle operation install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json" must occur exactly once; found=['install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"', 'cp "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-C:comment_hidden_receipt_first:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: document-wide semantic lifecycle operation install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json" must occur exactly once; found=['install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"', 'cp "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS delete_sha256_keep_install:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=2 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS delete_install_keep_sha256:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=2 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS wrong_persist_destination:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: semantic lifecycle operation projection persist install must occur exactly once in PERSIST_PROJECTION_EVIDENCE; found=[]
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS persist_source_reveal_not_current_event:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: semantic lifecycle operation projection persist install must occur exactly once in PERSIST_PROJECTION_EVIDENCE; found=[]
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS receipt_command_before_projection:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=4 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'write_binding_receipt(receipt, os.environ["AIOS_CURRENT_EVENT_BINDING_PATH"])', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS persist_command_also_in_ack_step:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: DURABLE_ACK shell-command cardinality must be exactly 1; found=2 commands=['python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B --state "$RUN_ROOT/runtime/release_state.json" --world-db "$RUN_ROOT/runtime/world.sqlite" --sequence "$SEQ" --event-id "$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])\' "$RUN_ROOT/current-event.json")" --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" --conversation-session-id "$B_SESSION" --conversation-turn-index 1', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS delete_sha256_keep_install:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=2 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS delete_install_keep_sha256:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=2 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS wrong_persist_destination:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: semantic lifecycle operation projection persist install must occur exactly once in PERSIST_PROJECTION_EVIDENCE; found=[]
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS persist_source_reveal_not_current_event:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: semantic lifecycle operation projection persist install must occur exactly once in PERSIST_PROJECTION_EVIDENCE; found=[]
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS receipt_command_before_projection:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=4 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'write_binding_receipt(receipt, os.environ["AIOS_CURRENT_EVENT_BINDING_PATH"])', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS persist_command_also_in_ack_step:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: DURABLE_ACK shell-command cardinality must be exactly 1; found=2 commands=['python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B --state "$RUN_ROOT/runtime/release_state.json" --world-db "$RUN_ROOT/runtime/world.sqlite" --sequence "$SEQ" --event-id "$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])\' "$RUN_ROOT/current-event.json")" --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" --conversation-session-id "$B_SESSION" --conversation-turn-index 1', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"']
+RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-D:non_shell_text_fence:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=1 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-D:python_fence:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=1 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-D:untagged_fence:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=1 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-E:heredoc_quoted:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=2 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', "cat <<'EOF'"]
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-E:heredoc_double_quoted:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=2 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'cat <<"EOF"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-E:heredoc_unquoted:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=2 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'cat <<EOF']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-E:heredoc_dash_tabs:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=2 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'cat <<-EOF']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_reveal:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: REVEAL shell-command cardinality must be exactly 1; found=2 commands=['python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal.json"', 'python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_install_current_event:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: INSTALL_CURRENT_EVENT shell-command cardinality must be exactly 1; found=2 commands=['install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"', 'install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_projection_install:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=4 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_projection_sha256:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=4 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_production_turn:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: MODEL_WORK shell-command cardinality must be exactly 1; found=2 commands=['python3 -m aios_core.headless.cli --world "$RUN_ROOT/runtime/world.sqlite" --index "$RUN_ROOT/runtime/index.sqlite" --lock  "$RUN_ROOT/runtime/world.sqlite.writer.lock" --model-handler bridged_model_handler:headless_production_handler turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"', 'python3 -m aios_core.headless.cli --world "$RUN_ROOT/runtime/world.sqlite" --index "$RUN_ROOT/runtime/index.sqlite" --lock  "$RUN_ROOT/runtime/world.sqlite.writer.lock" --model-handler bridged_model_handler:headless_production_handler turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_ack:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: DURABLE_ACK shell-command cardinality must be exactly 1; found=2 commands=['python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B --state "$RUN_ROOT/runtime/release_state.json" --world-db "$RUN_ROOT/runtime/world.sqlite" --sequence "$SEQ" --event-id "$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])\' "$RUN_ROOT/current-event.json")" --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" --conversation-session-id "$B_SESSION" --conversation-turn-index 1', 'python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B --state "$RUN_ROOT/runtime/release_state.json" --world-db "$RUN_ROOT/runtime/world.sqlite" --sequence "$SEQ" --event-id "$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])\' "$RUN_ROOT/current-event.json")" --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" --conversation-session-id "$B_SESSION" --conversation-turn-index 1']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_clear_binding:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: CLEAR_BINDING shell-command cardinality must be exactly 1; found=2 commands=['rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"', 'rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-G:command_wrapper_duplicate_reveal:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: REVEAL shell-command cardinality must be exactly 1; found=2 commands=['python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal.json"', 'command python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-G:command_wrapper_duplicate_install_current_event:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: INSTALL_CURRENT_EVENT shell-command cardinality must be exactly 1; found=2 commands=['install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"', 'command install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-G:command_wrapper_duplicate_projection_install:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=4 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"', 'command install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-G:command_wrapper_duplicate_projection_sha256:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=4 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"', 'command sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-G:command_wrapper_duplicate_production_turn:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: MODEL_WORK shell-command cardinality must be exactly 1; found=2 commands=['python3 -m aios_core.headless.cli --world "$RUN_ROOT/runtime/world.sqlite" --index "$RUN_ROOT/runtime/index.sqlite" --lock  "$RUN_ROOT/runtime/world.sqlite.writer.lock" --model-handler bridged_model_handler:headless_production_handler turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"', 'command python3 -m aios_core.headless.cli --world "$RUN_ROOT/runtime/world.sqlite" --index "$RUN_ROOT/runtime/index.sqlite" --lock  "$RUN_ROOT/runtime/world.sqlite.writer.lock" --model-handler bridged_model_handler:headless_production_handler turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-G:command_wrapper_duplicate_ack:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: DURABLE_ACK shell-command cardinality must be exactly 1; found=2 commands=['python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B --state "$RUN_ROOT/runtime/release_state.json" --world-db "$RUN_ROOT/runtime/world.sqlite" --sequence "$SEQ" --event-id "$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])\' "$RUN_ROOT/current-event.json")" --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" --conversation-session-id "$B_SESSION" --conversation-turn-index 1', 'command python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B --state "$RUN_ROOT/runtime/release_state.json" --world-db "$RUN_ROOT/runtime/world.sqlite" --sequence "$SEQ" --event-id "$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])\' "$RUN_ROOT/current-event.json")" --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" --conversation-session-id "$B_SESSION" --conversation-turn-index 1']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-G:command_wrapper_duplicate_clear_binding:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: CLEAR_BINDING shell-command cardinality must be exactly 1; found=2 commands=['rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"', 'command rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-L:outside_wrapper_duplicate_reveal:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: document-wide semantic lifecycle operation python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B must occur exactly once; found=['command python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal.json"', 'python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-L:outside_wrapper_duplicate_install_current_event:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: document-wide semantic lifecycle operation install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json" must occur exactly once; found=['command install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"', 'install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-L:outside_wrapper_duplicate_projection_install:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: document-wide semantic lifecycle operation projection persist install must occur exactly once; found=['command install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-L:outside_wrapper_duplicate_projection_sha256:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: document-wide semantic lifecycle operation projection digest append must occur exactly once; found=['command sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-L:outside_wrapper_duplicate_production_turn:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: document-wide semantic lifecycle operation production headless turn --session must occur exactly once; found=['command python3 -m aios_core.headless.cli --world "$RUN_ROOT/runtime/world.sqlite" --index "$RUN_ROOT/runtime/index.sqlite" --lock  "$RUN_ROOT/runtime/world.sqlite.writer.lock" --model-handler bridged_model_handler:headless_production_handler turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"', 'python3 -m aios_core.headless.cli --world "$RUN_ROOT/runtime/world.sqlite" --index "$RUN_ROOT/runtime/index.sqlite" --lock  "$RUN_ROOT/runtime/world.sqlite.writer.lock" --model-handler bridged_model_handler:headless_production_handler turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-L:outside_wrapper_duplicate_ack:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: document-wide semantic lifecycle operation python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B must occur exactly once; found=['command python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B --state "$RUN_ROOT/runtime/release_state.json" --world-db "$RUN_ROOT/runtime/world.sqlite" --sequence "$SEQ" --event-id "$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])\' "$RUN_ROOT/current-event.json")" --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" --conversation-session-id "$B_SESSION" --conversation-turn-index 1', 'python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B --state "$RUN_ROOT/runtime/release_state.json" --world-db "$RUN_ROOT/runtime/world.sqlite" --sequence "$SEQ" --event-id "$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])\' "$RUN_ROOT/current-event.json")" --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" --conversation-session-id "$B_SESSION" --conversation-turn-index 1']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-L:outside_wrapper_duplicate_clear_binding:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: document-wide semantic lifecycle operation rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json" must occur exactly once; found=['command rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"', 'rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-H:false_and_inert_install:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: semantic lifecycle operation install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json" must use the direct canonical shell form in INSTALL_CURRENT_EVENT; found='false && install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"'
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-H:true_or_inert_install:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: semantic lifecycle operation install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json" must use the direct canonical shell form in INSTALL_CURRENT_EVENT; found='true || install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"'
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-I:indirect_install_current_event:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: INSTALL_CURRENT_EVENT shell-command cardinality must be exactly 1; found=2 commands=['install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"', 'cmd=install; "$cmd" -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-I:indirect_projection_install:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=4 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"', 'cmd=install; "$cmd" -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-I:indirect_projection_sha256:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=4 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"', 'cmd=sha256sum; "$cmd" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-I:indirect_clear_binding:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: CLEAR_BINDING shell-command cardinality must be exactly 1; found=2 commands=['rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"', 'cmd=rm; "$cmd" -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-J:split_indirect_install:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: INSTALL_CURRENT_EVENT shell-command cardinality must be exactly 1; found=5 commands=['install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"', 'src="$RUN_ROOT/reveal.json"', 'dst="$RUN_ROOT/current-event.json"', 'cmd=install', '"$cmd" -m 0400 "$src" "$dst"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-K:same_line_duplicate_reveal:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: semantic lifecycle operation python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B must use the direct canonical shell form in REVEAL; found='python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal.json"; command pyth""on3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal-duplicate.json"'
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-K:same_line_duplicate_production_turn:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: semantic lifecycle operation production headless turn --session must use the direct canonical shell form in MODEL_WORK; found='python3 -m aios_core.headless.cli --world "$RUN_ROOT/runtime/world.sqlite" --index "$RUN_ROOT/runtime/index.sqlite" --lock  "$RUN_ROOT/runtime/world.sqlite.writer.lock" --model-handler bridged_model_handler:headless_production_handler turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"; command pyth""on3 -m aios_core.headless.cli --world "$RUN_ROOT/runtime/world.sqlite" --index "$RUN_ROOT/runtime/index.sqlite" --lock "$RUN_ROOT/runtime/world.sqlite.writer.lock" --model-handler bridged_model_handler:headless_production_handler turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"'
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-K:same_line_duplicate_ack:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: semantic lifecycle operation python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B must use the direct canonical shell form in DURABLE_ACK; found='python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B --state "$RUN_ROOT/runtime/release_state.json" --world-db "$RUN_ROOT/runtime/world.sqlite" --sequence "$SEQ" --event-id "$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])\' "$RUN_ROOT/current-event.json")" --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" --conversation-session-id "$B_SESSION" --conversation-turn-index 1; command pyth""on3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B --state "$RUN_ROOT/runtime/release_state.json" --world-db "$RUN_ROOT/runtime/world.sqlite" --sequence "$SEQ" --event-id "$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])\' "$RUN_ROOT/current-event.json")" --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" --conversation-session-id "$B_SESSION" --conversation-turn-index 1'
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_receipt_write:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: Python call write_binding_receipt( must appear exactly once in CREATE_BINDING_RECEIPT; found=[('CREATE_BINDING_RECEIPT', 'import json, os, sys\nfrom pathlib import Path\nharness = os.environ["PYTHONPATH"].split(":")[1]\nsys.path.insert(0, harness)\nfrom bridged_model_handler import create_current_event_bi'), ('CREATE_BINDING_RECEIPT', 'import json, os, sys\nfrom pathlib import Path\nharness = os.environ["PYTHONPATH"].split(":")[1]\nsys.path.insert(0, harness)\nfrom bridged_model_handler import create_current_event_bi')]
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_receipt_create:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: Python call create_current_event_binding_receipt( must appear exactly once in CREATE_BINDING_RECEIPT; found=[('CREATE_BINDING_RECEIPT', 'import json, os, sys\nfrom pathlib import Path\nharness = os.environ["PYTHONPATH"].split(":")[1]\nsys.path.insert(0, harness)\nfrom bridged_model_handler import create_current_event_bi'), ('CREATE_BINDING_RECEIPT', 'import json, os, sys\nfrom pathlib import Path\nharness = os.environ["PYTHONPATH"].split(":")[1]\nsys.path.insert(0, harness)\nfrom bridged_model_handler import create_current_event_bi')]
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_binding_validate:b_startup_procedure.md via=check_runbook_lifecycle: procedure/b_startup_procedure.md: Python call validate_current_event_binding( must appear exactly once in VERIFY_BINDING; found=[('VERIFY_BINDING', 'import json, os, sys\nfrom pathlib import Path\nsys.path.insert(0, os.environ["PYTHONPATH"].split(":")[1])\nfrom bridged_model_handler import validate_current_event_binding\nev = json.'), ('VERIFY_BINDING', 'import json, os, sys\nfrom pathlib import Path\nsys.path.insert(0, os.environ["PYTHONPATH"].split(":")[1])\nfrom bridged_model_handler import validate_current_event_binding\nev = json.')]
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-D:non_shell_text_fence:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=1 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-D:python_fence:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=1 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-D:untagged_fence:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=1 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-E:heredoc_quoted:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=2 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', "cat <<'EOF'"]
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-E:heredoc_double_quoted:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=2 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'cat <<"EOF"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-E:heredoc_unquoted:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=2 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'cat <<EOF']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-E:heredoc_dash_tabs:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=2 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'cat <<-EOF']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_reveal:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: REVEAL shell-command cardinality must be exactly 1; found=2 commands=['python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal.json"', 'python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_install_current_event:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: INSTALL_CURRENT_EVENT shell-command cardinality must be exactly 4; found=5 commands=['install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"', 'export AIOS_CURRENT_EVENT_PATH="$RUN_ROOT/current-event.json"', 'export AIOS_RELEASE_STATE_PATH="$RUN_ROOT/runtime/release_state.json"', 'export AIOS_CURRENT_EVENT_BINDING_PATH="$RUN_ROOT/binding/current-event-binding.json"', 'install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_projection_install:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=4 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_projection_sha256:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=4 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_production_turn:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: MODEL_WORK shell-command cardinality must be exactly 1; found=2 commands=['python3 -m aios_core.headless.cli --world "$RUN_ROOT/runtime/world.sqlite" --index "$RUN_ROOT/runtime/index.sqlite" --lock "$RUN_ROOT/runtime/world.sqlite.writer.lock" --model-handler bridged_model_handler:headless_production_handler turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"', 'python3 -m aios_core.headless.cli --world "$RUN_ROOT/runtime/world.sqlite" --index "$RUN_ROOT/runtime/index.sqlite" --lock "$RUN_ROOT/runtime/world.sqlite.writer.lock" --model-handler bridged_model_handler:headless_production_handler turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_ack:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: DURABLE_ACK shell-command cardinality must be exactly 1; found=2 commands=['python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B --state "$RUN_ROOT/runtime/release_state.json" --world-db "$RUN_ROOT/runtime/world.sqlite" --sequence "$SEQ" --event-id "$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])\' "$RUN_ROOT/current-event.json")" --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" --conversation-session-id "$B_SESSION" --conversation-turn-index 1', 'python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B --state "$RUN_ROOT/runtime/release_state.json" --world-db "$RUN_ROOT/runtime/world.sqlite" --sequence "$SEQ" --event-id "$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])\' "$RUN_ROOT/current-event.json")" --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" --conversation-session-id "$B_SESSION" --conversation-turn-index 1']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_clear_binding:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: CLEAR_BINDING shell-command cardinality must be exactly 1; found=2 commands=['rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"', 'rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-G:command_wrapper_duplicate_reveal:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: REVEAL shell-command cardinality must be exactly 1; found=2 commands=['python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal.json"', 'command python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-G:command_wrapper_duplicate_install_current_event:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: INSTALL_CURRENT_EVENT shell-command cardinality must be exactly 4; found=5 commands=['install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"', 'export AIOS_CURRENT_EVENT_PATH="$RUN_ROOT/current-event.json"', 'export AIOS_RELEASE_STATE_PATH="$RUN_ROOT/runtime/release_state.json"', 'export AIOS_CURRENT_EVENT_BINDING_PATH="$RUN_ROOT/binding/current-event-binding.json"', 'command install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-G:command_wrapper_duplicate_projection_install:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=4 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"', 'command install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-G:command_wrapper_duplicate_projection_sha256:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=4 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"', 'command sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-G:command_wrapper_duplicate_production_turn:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: MODEL_WORK shell-command cardinality must be exactly 1; found=2 commands=['python3 -m aios_core.headless.cli --world "$RUN_ROOT/runtime/world.sqlite" --index "$RUN_ROOT/runtime/index.sqlite" --lock "$RUN_ROOT/runtime/world.sqlite.writer.lock" --model-handler bridged_model_handler:headless_production_handler turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"', 'command python3 -m aios_core.headless.cli --world "$RUN_ROOT/runtime/world.sqlite" --index "$RUN_ROOT/runtime/index.sqlite" --lock "$RUN_ROOT/runtime/world.sqlite.writer.lock" --model-handler bridged_model_handler:headless_production_handler turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-G:command_wrapper_duplicate_ack:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: DURABLE_ACK shell-command cardinality must be exactly 1; found=2 commands=['python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B --state "$RUN_ROOT/runtime/release_state.json" --world-db "$RUN_ROOT/runtime/world.sqlite" --sequence "$SEQ" --event-id "$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])\' "$RUN_ROOT/current-event.json")" --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" --conversation-session-id "$B_SESSION" --conversation-turn-index 1', 'command python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B --state "$RUN_ROOT/runtime/release_state.json" --world-db "$RUN_ROOT/runtime/world.sqlite" --sequence "$SEQ" --event-id "$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])\' "$RUN_ROOT/current-event.json")" --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" --conversation-session-id "$B_SESSION" --conversation-turn-index 1']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-G:command_wrapper_duplicate_clear_binding:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: CLEAR_BINDING shell-command cardinality must be exactly 1; found=2 commands=['rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"', 'command rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-L:outside_wrapper_duplicate_reveal:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: document-wide semantic lifecycle operation python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B must occur exactly once; found=['command python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal.json"', 'python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-L:outside_wrapper_duplicate_install_current_event:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: document-wide semantic lifecycle operation install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json" must occur exactly once; found=['command install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"', 'install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-L:outside_wrapper_duplicate_projection_install:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: document-wide semantic lifecycle operation projection persist install must occur exactly once; found=['command install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-L:outside_wrapper_duplicate_projection_sha256:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: document-wide semantic lifecycle operation projection digest append must occur exactly once; found=['command sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-L:outside_wrapper_duplicate_production_turn:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: document-wide semantic lifecycle operation production headless turn --session must occur exactly once; found=['command python3 -m aios_core.headless.cli --world "$RUN_ROOT/runtime/world.sqlite" --index "$RUN_ROOT/runtime/index.sqlite" --lock "$RUN_ROOT/runtime/world.sqlite.writer.lock" --model-handler bridged_model_handler:headless_production_handler turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"', 'python3 -m aios_core.headless.cli --world "$RUN_ROOT/runtime/world.sqlite" --index "$RUN_ROOT/runtime/index.sqlite" --lock "$RUN_ROOT/runtime/world.sqlite.writer.lock" --model-handler bridged_model_handler:headless_production_handler turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-L:outside_wrapper_duplicate_ack:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: document-wide semantic lifecycle operation python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B must occur exactly once; found=['command python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B --state "$RUN_ROOT/runtime/release_state.json" --world-db "$RUN_ROOT/runtime/world.sqlite" --sequence "$SEQ" --event-id "$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])\' "$RUN_ROOT/current-event.json")" --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" --conversation-session-id "$B_SESSION" --conversation-turn-index 1', 'python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B --state "$RUN_ROOT/runtime/release_state.json" --world-db "$RUN_ROOT/runtime/world.sqlite" --sequence "$SEQ" --event-id "$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])\' "$RUN_ROOT/current-event.json")" --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" --conversation-session-id "$B_SESSION" --conversation-turn-index 1']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-L:outside_wrapper_duplicate_clear_binding:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: document-wide semantic lifecycle operation rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json" must occur exactly once; found=['command rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"', 'rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-H:false_and_inert_install:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: semantic lifecycle operation install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json" must use the direct canonical shell form in INSTALL_CURRENT_EVENT; found='false && install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"'
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-H:true_or_inert_install:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: semantic lifecycle operation install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json" must use the direct canonical shell form in INSTALL_CURRENT_EVENT; found='true || install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"'
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-I:indirect_install_current_event:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: INSTALL_CURRENT_EVENT shell-command cardinality must be exactly 4; found=5 commands=['install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"', 'export AIOS_CURRENT_EVENT_PATH="$RUN_ROOT/current-event.json"', 'export AIOS_RELEASE_STATE_PATH="$RUN_ROOT/runtime/release_state.json"', 'export AIOS_CURRENT_EVENT_BINDING_PATH="$RUN_ROOT/binding/current-event-binding.json"', 'cmd=install; "$cmd" -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-I:indirect_projection_install:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=4 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"', 'cmd=install; "$cmd" -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-I:indirect_projection_sha256:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: PERSIST_PROJECTION_EVIDENCE shell-command cardinality must be exactly 3; found=4 commands=['SEQ="$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["sequence"])\' "$RUN_ROOT/current-event.json")"', 'install -m 0400 "$RUN_ROOT/current-event.json" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"', 'sha256sum "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"', 'cmd=sha256sum; "$cmd" "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" >> "$RUN_ROOT/evidence/projection_digests.sha256"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-I:indirect_clear_binding:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: CLEAR_BINDING shell-command cardinality must be exactly 1; found=2 commands=['rm -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"', 'cmd=rm; "$cmd" -f "$RUN_ROOT/current-event.json" "$RUN_ROOT/binding/current-event-binding.json"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-J:split_indirect_install:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: INSTALL_CURRENT_EVENT shell-command cardinality must be exactly 4; found=8 commands=['install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"', 'export AIOS_CURRENT_EVENT_PATH="$RUN_ROOT/current-event.json"', 'export AIOS_RELEASE_STATE_PATH="$RUN_ROOT/runtime/release_state.json"', 'export AIOS_CURRENT_EVENT_BINDING_PATH="$RUN_ROOT/binding/current-event-binding.json"', 'src="$RUN_ROOT/reveal.json"', 'dst="$RUN_ROOT/current-event.json"', 'cmd=install', '"$cmd" -m 0400 "$src" "$dst"']
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-K:same_line_duplicate_reveal:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: semantic lifecycle operation python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B must use the direct canonical shell form in REVEAL; found='python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal.json"; command pyth""on3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal-duplicate.json"'
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-K:same_line_duplicate_production_turn:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: semantic lifecycle operation production headless turn --session must use the direct canonical shell form in MODEL_WORK; found='python3 -m aios_core.headless.cli --world "$RUN_ROOT/runtime/world.sqlite" --index "$RUN_ROOT/runtime/index.sqlite" --lock "$RUN_ROOT/runtime/world.sqlite.writer.lock" --model-handler bridged_model_handler:headless_production_handler turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"; command pyth""on3 -m aios_core.headless.cli --world "$RUN_ROOT/runtime/world.sqlite" --index "$RUN_ROOT/runtime/index.sqlite" --lock "$RUN_ROOT/runtime/world.sqlite.writer.lock" --model-handler bridged_model_handler:headless_production_handler turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"'
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-004-K:same_line_duplicate_ack:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: semantic lifecycle operation python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B must use the direct canonical shell form in DURABLE_ACK; found='python3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B --state "$RUN_ROOT/runtime/release_state.json" --world-db "$RUN_ROOT/runtime/world.sqlite" --sequence "$SEQ" --event-id "$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])\' "$RUN_ROOT/current-event.json")" --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" --conversation-session-id "$B_SESSION" --conversation-turn-index 1; command pyth""on3 reviews/internal_habitation/c15-rcc/v1/release/release_operator.py ack --phase B --state "$RUN_ROOT/runtime/release_state.json" --world-db "$RUN_ROOT/runtime/world.sqlite" --sequence "$SEQ" --event-id "$(python3 -c \'import json,sys; print(json.load(open(sys.argv[1]))["event_id"])\' "$RUN_ROOT/current-event.json")" --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" --conversation-session-id "$B_SESSION" --conversation-turn-index 1'
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_receipt_write:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: Python call write_binding_receipt( must appear exactly once in CREATE_BINDING_RECEIPT; found=[('CREATE_BINDING_RECEIPT', 'import json, os, sys\nfrom pathlib import Path\nsys.path.insert(0, os.environ["PYTHONPATH"].split(":")[1])\nfrom bridged_model_handler import create_current_event_binding_receipt, wri'), ('CREATE_BINDING_RECEIPT', 'import json, os, sys\nfrom pathlib import Path\nsys.path.insert(0, os.environ["PYTHONPATH"].split(":")[1])\nfrom bridged_model_handler import create_current_event_binding_receipt, wri')]
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_receipt_create:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: Python call create_current_event_binding_receipt( must appear exactly once in CREATE_BINDING_RECEIPT; found=[('CREATE_BINDING_RECEIPT', 'import json, os, sys\nfrom pathlib import Path\nsys.path.insert(0, os.environ["PYTHONPATH"].split(":")[1])\nfrom bridged_model_handler import create_current_event_binding_receipt, wri'), ('CREATE_BINDING_RECEIPT', 'import json, os, sys\nfrom pathlib import Path\nsys.path.insert(0, os.environ["PYTHONPATH"].split(":")[1])\nfrom bridged_model_handler import create_current_event_binding_receipt, wri')]
+RUNBOOK_LIFECYCLE_MUTATION_RED_PASS IA-BLK-003-F:duplicate_binding_validate:per_cursor_interaction.md via=check_runbook_lifecycle: procedure/per_cursor_interaction.md: Python call validate_current_event_binding( must appear exactly once in VERIFY_BINDING; found=[('VERIFY_BINDING', 'import json, os, sys\nfrom pathlib import Path\nsys.path.insert(0, os.environ["PYTHONPATH"].split(":")[1])\nfrom bridged_model_handler import validate_current_event_binding\nevent = js'), ('VERIFY_BINDING', 'import json, os, sys\nfrom pathlib import Path\nsys.path.insert(0, os.environ["PYTHONPATH"].split(":")[1])\nfrom bridged_model_handler import validate_current_event_binding\nevent = js')]
+RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=82
+CHECK 155 PASS: startup §7 and per_cursor lifecycle sequences match across token block, headings, and per-step executable commands
+CHECK 156 PASS: per_cursor operational receipt-before-current-event/missing/duplicate/old-chain mutations all rejected by check_runbook_lifecycle
+CHECK 157 PASS: executable persist delete/move/comment-hidden receipt-first and extra command mutations all rejected by check_runbook_lifecycle
+CHECK 158 PASS: non-shell fences, heredoc payloads, and same-owner duplicates rejected by check_runbook_lifecycle
+
+ALL_CHECKS=158/158 FAILURES=0
+MARKER PASS: ISOLATION_PASS in CURRENT_RUN_LOG
+MARKER PASS: SYNTHETIC_GENUINE_PASS in CURRENT_RUN_LOG
+MARKER PASS: PRODUCTION_GENUINE_PASS in CURRENT_RUN_LOG
+MARKER PASS: PRODUCTION_TRANSPORT_PASS in CURRENT_RUN_LOG
+MARKER PASS: ENVIRONMENT_PASS in CURRENT_RUN_LOG
+MARKER PASS: BINDING_ADVERSARIAL_PASS in CURRENT_RUN_LOG
+MARKER PASS: SCHEME_A_PASS in CURRENT_RUN_LOG
+MARKER PASS: BASELINE_VALID_PASS in CURRENT_RUN_LOG
+MARKER PASS: ALL_BINDING_TESTS_PASS in CURRENT_RUN_LOG
+MARKER PASS: UNKNOWN_PROVENANCE_PASS in CURRENT_RUN_LOG
+MARKER PASS: CATALOG_PASS in CURRENT_RUN_LOG
+MARKER PASS: ADAPTER_HASH_PASS in CURRENT_RUN_LOG
+MARKER PASS: WIRE_HASH_PASS in CURRENT_RUN_LOG
+MARKER PASS: BOUNDARY_PASS in CURRENT_RUN_LOG
+MARKER PASS: RECEIPT_SCHEMA_PASS in CURRENT_RUN_LOG
+MARKER PASS: HTTP_BOUNDARY_PASS in CURRENT_RUN_LOG
+MARKER PASS: NO_COMMITTED_CURSOR14_PAYLOAD_PASS in CURRENT_RUN_LOG
+MARKER PASS: NO_FALSE_NO_REVEAL_PROSE_PASS in CURRENT_RUN_LOG
+MARKER PASS: PORTABLE_CHECKOUT_PASS in CURRENT_RUN_LOG
+MARKER PASS: NEGATIVE_JAIL_ACTUALLY_EXECUTED_PASS in CURRENT_RUN_LOG
+MARKER PASS: CANONICAL_RUNBOOK_EXECUTABLE_PASS in CURRENT_RUN_LOG
+MARKER PASS: MISSING_RELEASE_STATE_FAIL_CLOSED_PASS in CURRENT_RUN_LOG
+MARKER PASS: NO_EVENT_NO_DISPATCH_PASS in CURRENT_RUN_LOG
+MARKER PASS: FAILURE_RECEIPT_COLLISION_PASS in CURRENT_RUN_LOG
+MARKER PASS: INHERITED_FD_SEALED_PASS in CURRENT_RUN_LOG
+MARKER PASS: CONTRACT_PROVENANCE_PASS in CURRENT_RUN_LOG
+MARKER PASS: RAW_USAGE_NO_SYNTHESIS_PASS in CURRENT_RUN_LOG
+MARKER PASS: CANONICAL_RUNBOOK_ORDER_PASS in CURRENT_RUN_LOG
+MARKER PASS: CANONICAL_PIN_CONSISTENCY_PASS in CURRENT_RUN_LOG
+MARKER PASS: CANONICAL_PIN_MUTATION_RED_PASS in CURRENT_RUN_LOG
+MARKER PASS: RUNBOOK_CROSS_DOCUMENT_ORDER_PASS in CURRENT_RUN_LOG
+MARKER PASS: RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS in CURRENT_RUN_LOG
+MARKER PASS: RUNBOOK_EXECUTABLE_MUTATION_RED_PASS in CURRENT_RUN_LOG
+MARKER PASS: RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS in CURRENT_RUN_LOG
+MARKER PASS: negative self-test (missing marker correctly not found)
+CORRECTIVE_010_E2E_PASS
+CORRECTIVE_010_FIXUP_001_E2E_PASS
+CORRECTIVE_011_E2E_PASS
+CORRECTIVE_012_E2E_PASS
+CORRECTIVE_013_E2E_PASS
+[e2e] done 2026-09-26T08:48:27Z
+EXIT_CODE=0

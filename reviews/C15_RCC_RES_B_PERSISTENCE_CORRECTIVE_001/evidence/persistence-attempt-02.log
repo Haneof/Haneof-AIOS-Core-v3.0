@@ -1,0 +1,19 @@
+test_application_gap_is_in_doubt_not_exactly_once_claim (test_journal.JournalTests.test_application_gap_is_in_doubt_not_exactly_once_claim) ... ok
+test_bad_paths (test_journal.JournalTests.test_bad_paths) ... ok
+test_concurrent_exposure_one_winner (test_journal.JournalTests.test_concurrent_exposure_one_winner) ... ok
+test_corrupt_artifact_blocks_exposure (test_journal.JournalTests.test_corrupt_artifact_blocks_exposure) ... ok
+test_exact_checkpoint_and_required_evidence_survive_reopen (test_journal.JournalTests.test_exact_checkpoint_and_required_evidence_survive_reopen) ... ok
+test_exposed_kill_reopen_wait_no_resend (test_journal.JournalTests.test_exposed_kill_reopen_wait_no_resend) ... ok
+test_missing_barrier_wrong_binding_and_outstanding (test_journal.JournalTests.test_missing_barrier_wrong_binding_and_outstanding) ... ok
+test_no_production_or_retired_identity_entrypoint (test_journal.JournalTests.test_no_production_or_retired_identity_entrypoint) ... ok
+test_receipt_recording_does_not_claim_core_verification (test_journal.JournalTests.test_receipt_recording_does_not_claim_core_verification) ... ok
+test_reply_staged_kill_reopen_no_byte_rewriting (test_journal.JournalTests.test_reply_staged_kill_reopen_no_byte_rewriting) ... ok
+test_request_staged_kill_reopen_exact_bytes (test_journal.JournalTests.test_request_staged_kill_reopen_exact_bytes) ... ok
+test_uncommitted_transaction_kill_preserves_old_checkpoint (test_journal.JournalTests.test_uncommitted_transaction_kill_preserves_old_checkpoint) ... ok
+test_wrong_identity_missing_backend_no_recreation (test_journal.JournalTests.test_wrong_identity_missing_backend_no_recreation) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.536s
+
+OK
+EXIT_CODE=0

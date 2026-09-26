@@ -19,6 +19,12 @@
 - #138/#139 两条红检查登记为 **INFRASTRUCTURE_FAILURE**，不登记为通过、也不登记为已接受的违规；PM 已用直接证据独立验证不变式成立（`git diff e72a638..main -- src/` 为空，Core tree 仍 `7db4f72e`），未绕过分支保护（该两项非 required）。
 - `CORE-HEADLESS-001 = DONE`；`CORE-RECOVERY-001 = DONE`；`CORE-SCALE-001 = DONE`；`CORE-RC-FREEZE-001 = DONE`。frozen software `773876f92d5f8e53422f8f5a68cc651953d93052` / Core tree `fe77f8a0706acfaf369041d0882b6d0e6de39f22`。`C15-RCC-RES-A-RERUN-002 = DONE / ACCEPTED`，canonical A evidence PR #205 @ `d17ae972ad1d312735c355f775ac024bc4cebdf7` 保持 OPEN / UNMERGED / PINNED。`C15-RCC-RES-B-PREFLIGHT-002 = DONE / ACCEPTED`：PR #209 exact `aab3a30cc48e8c7041ef4b37e0e5f379c3060c93`，Independent Acceptance `5323972504` = PASS / blocker=0，merge `65e6e8266bb0541d624eb8e5bba825b91145564f`。`C15-RCC-RES-B-RELEASE-002 = DONE / RELEASED`；其唯一 released run/session 已在 cursor14 reveal+ingest+production dispatch 后因 ephemeral `/tmp` state loss 失败，且无 Resident semantic reply / capability / ACK。`C15-RCC-RES-B-RERUN-002 = FAILED / INFRASTRUCTURE_STATE_LOSS / NON-CANONICAL`，旧 identity 永久退休，禁止 replay 冒充续跑。PM 裁决：`governance/C15_RCC_RES_B_RERUN_002_STATE_LOSS_ADJUDICATION_2026-09-26.md`。唯一下一 READY = `C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001`；其 Independent Acceptance → RELEASE-003 → RERUN-003 → B-ACCEPT-003 / C / C16 / broad P16 / P17 / UI / P18 / P19 继续 BLOCKED。
 
+### 2026-09-26 persistence corrective — 未完成执行现场（非验收/非放行）
+
+- `C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001` 已在 live main `f0f2eb8a7030b9b56cbec43c09574e056b2f7c61` 确认 READY 后施工；本分支工程现场为 **WIP / BLOCKED，尚未 REVIEW_READY**。不改变 PM 派工裁决，不放行后续任务。
+- 冻结 E2E fresh `158/158`、lifecycle mutation-red 通过；synthetic journal 13 tests 通过。但 synthetic Core staged-reply 后 SIGKILL 恢复仍 `in_doubt`，端到端 exactly-once 收敛与平台 reattachment 证明尚未完成。全部红证据保留。
+- 续工必须先读 `reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/ENGINEERING_STATUS.md`；原型 synthetic-only，不得用于真实 B。未改 Core/fixture/A evidence，未进入 Independent Acceptance / RELEASE-003 / RERUN-003。
+
 ## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / S1-S2 ACTIVE
 
 - 独立 Core gap audit PR #132 已由 PM 接受并正常合入；merge = `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`，审计 Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`。

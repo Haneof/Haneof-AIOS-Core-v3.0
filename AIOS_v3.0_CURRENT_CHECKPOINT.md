@@ -7,6 +7,12 @@
 - `CORE-BASELINE-001 = DONE（re-verified）`；PR #136 已去除 pelican 文件，改作本 PM 补充治理 PR（pelican 提交 `f8edb5d1` 仅留历史，不合入）。
 - S2 / HEADLESS / RECOVERY / SCALE / CI-FIX / RC-FREEZE 均 DONE。frozen software = `773876f92d5f8e53422f8f5a68cc651953d93052`；Core tree = `fe77f8a0706acfaf369041d0882b6d0e6de39f22`。A-002 / PR #205 继续 canonical。B-PREFLIGHT-002 / RELEASE-002 历史 PASS 保留，但其唯一 RERUN-002 已真实消费 cursor14 至 reveal+ingest+production dispatch 后遭平台 `/tmp` state loss；无 Resident semantic reply/capability/ACK，不能 continuation/replay。`C15-RCC-RES-B-RERUN-002 = FAILED / INFRASTRUCTURE_STATE_LOSS / NON-CANONICAL`；旧 run/session 永久退休。PM 裁决：`governance/C15_RCC_RES_B_RERUN_002_STATE_LOSS_ADJUDICATION_2026-09-26.md`。唯一下一 READY = `C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001`；Independent Acceptance / RELEASE-003 / RERUN-003 / C / evaluator / close 全部后置。
 
+### 2026-09-26 persistence corrective — 未完成执行现场（非验收/非放行）
+
+- `C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001` 已在 live main `f0f2eb8a7030b9b56cbec43c09574e056b2f7c61` 确认 READY 后施工；本分支工程现场为 **WIP / BLOCKED，尚未 REVIEW_READY**。不改变 PM 派工裁决，不放行后续任务。
+- 冻结 E2E fresh `158/158`、lifecycle mutation-red 通过；synthetic journal 13 tests 通过。但 synthetic Core staged-reply 后 SIGKILL 恢复仍 `in_doubt`，端到端 exactly-once 收敛与平台 reattachment 证明尚未完成。全部红证据保留。
+- 续工必须先读 `reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/ENGINEERING_STATUS.md`；原型 synthetic-only，不得用于真实 B。未改 Core/fixture/A evidence，未进入 Independent Acceptance / RELEASE-003 / RERUN-003。
+
 ## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / FIX-001+002 READY
 
 - 独立审计 PR #132 已合入；PM acceptance main = `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`，Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
