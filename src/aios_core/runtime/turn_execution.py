@@ -27,6 +27,7 @@ TurnRecoveryDisposition = Literal[
     "safe_to_retry",
     "retry_authorized",
     "in_doubt",
+    "exact_response_ready",
 ]
 
 
@@ -158,6 +159,37 @@ class TurnExecutionStore:
         return tuple(rows)
 
     @staticmethod
+    def _staged_exact_response_attempt_id(
+        conn: sqlite3.Connection,
+        *,
+        subject_id: str,
+        execution_id: str,
+    ) -> str | None:
+        """Return the attempt id of a durably staged exact provider reply, if any."""
+
+        try:
+            row = conn.execute("""
+                SELECT attempts.attempt_id, attempts.state
+                FROM background_model_attempts AS attempts
+                JOIN background_model_responses AS responses
+                  ON responses.attempt_id = attempts.attempt_id
+                WHERE attempts.subject_id=?
+                  AND attempts.work_kind='user_turn'
+                  AND attempts.work_id=?
+                ORDER BY attempts.model_round_index DESC
+                LIMIT 1
+            """, (subject_id, execution_id)).fetchone()
+        except sqlite3.OperationalError as exc:
+            if "no such table" not in str(exc):
+                raise
+            return None
+        if row is None:
+            return None
+        if str(row["state"]) not in {"response_returned", "metered"}:
+            return None
+        return str(row["attempt_id"])
+
+    @staticmethod
     def _validate_input(
         row: sqlite3.Row,
         *,
@@ -176,6 +208,7 @@ class TurnExecutionStore:
         row: sqlite3.Row,
         assistant_ref: ObjectRef | None,
         attempt_states: tuple[str, ...],
+        exact_response_attempt_id: str | None = None,
     ) -> TurnRecoveryDisposition:
         if row["state"] == "completed" or assistant_ref is not None:
             return "completed"
@@ -192,6 +225,11 @@ class TurnExecutionStore:
                 state in {"admitted", "not_submitted"} for state in attempt_states
             ):
                 return "safe_to_retry"
+            if exact_response_attempt_id is not None:
+                # The exact provider reply already crossed the provider boundary and
+                # is durable under this attempt identity. The ordinary entrypoint may
+                # resume that attempt without a provider call.
+                return "exact_response_ready"
             return "in_doubt"
         if protocol == TURN_PRE_ATTEMPT_PROTOCOL:
             # Corrective invariant: this explicit protocol is written only by a
@@ -254,6 +292,13 @@ class TurnExecutionStore:
                     row=row,
                     assistant_ref=ref,
                     attempt_states=attempt_states,
+                    exact_response_attempt_id=(
+                        self._staged_exact_response_attempt_id(
+                            conn,
+                            subject_id=subject_id,
+                            execution_id=execution_id,
+                        )
+                    ),
                 ),
                 assistant_ref=ref,
                 attempt_ids=attempt_ids,
@@ -399,6 +444,91 @@ class TurnExecutionStore:
                     state="attempt_protocol_promotion_race",
                     assistant_ref=None,
                 )
+
+    def authorize_exact_response_recovery(
+        self,
+        *,
+        subject_id: str,
+        session_id: str,
+        turn_index: int,
+        user_input: str,
+        occurred_at: str,
+        assistant_id: str,
+        evidence: str,
+    ) -> TurnExecutionStatus:
+        """Authorize resuming one turn's own attempt from exact provider bytes.
+
+        This is deliberately not a retry: it never sets retry_authorized and never
+        increments retry_count. It only proves that the durable execution claim
+        still exists in ``started`` state with the same claimed input and no
+        assistant output, and that the shared attempt ledger already holds a
+        durably staged exact provider response for this execution.
+        """
+
+        if not isinstance(evidence, str) or not evidence.strip():
+            raise ValueError("exact-response recovery evidence must be non-blank")
+        digest = self._input_hash(user_input=user_input, occurred_at=occurred_at)
+        execution_id = self.execution_id_for(
+            subject_id=subject_id,
+            session_id=session_id,
+            turn_index=turn_index,
+        )
+        key = (subject_id, session_id, turn_index)
+        with self._connect() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            row = conn.execute("""
+                SELECT input_hash, state, attempt_protocol, retry_authorized,
+                       retry_count, reconciliation_evidence
+                FROM runtime_turn_executions
+                WHERE subject_id=? AND session_id=? AND turn_index=?
+            """, key).fetchone()
+            ref = self._assistant_ref(conn, assistant_id)
+            if row is None:
+                raise TurnExecutionInDoubt(
+                    state="no_durable_execution_claim",
+                    assistant_ref=ref,
+                )
+            self._validate_input(row, digest=digest, assistant_ref=ref)
+            if row["state"] == "completed" or ref is not None:
+                raise TurnAlreadyCompleted(
+                    state="completed_output_present",
+                    assistant_ref=ref,
+                )
+            if bool(row["retry_authorized"]):
+                raise TurnExecutionInDoubt(
+                    state="retry_authorization_conflicts_with_exact_recovery",
+                    assistant_ref=None,
+                )
+            staged_attempt_id = self._staged_exact_response_attempt_id(
+                conn,
+                subject_id=subject_id,
+                execution_id=execution_id,
+            )
+            if staged_attempt_id is None:
+                raise TurnExecutionInDoubt(
+                    state="no_durable_exact_provider_response",
+                    assistant_ref=None,
+                )
+            changed = conn.execute("""
+                UPDATE runtime_turn_executions
+                SET reconciliation_evidence=?
+                WHERE subject_id=? AND session_id=? AND turn_index=?
+                  AND state='started'
+            """, (evidence.strip(), *key)).rowcount
+            if changed != 1:
+                raise TurnExecutionInDoubt(
+                    state="exact_response_recovery_race",
+                    assistant_ref=None,
+                )
+
+        return self.inspect(
+            subject_id=subject_id,
+            session_id=session_id,
+            turn_index=turn_index,
+            user_input=user_input,
+            occurred_at=occurred_at,
+            assistant_id=assistant_id,
+        )
 
     def authorize_retry(
         self,

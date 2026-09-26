@@ -105,6 +105,25 @@ class ModelDirective:
 
 
 @dataclass(frozen=True)
+class RecoveredModelResponse:
+    """An exact provider response durably owned by one background model attempt.
+
+    This is not a new semantic source: the directive is byte-for-byte the provider
+    reply that already crossed the provider boundary, re-verified by Core against
+    the durable attempt identity and response fingerprint before application.
+    """
+
+    attempt_id: str
+    directive: ModelDirective
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.attempt_id, str) or not self.attempt_id.strip():
+            raise ValueError("attempt_id must be non-blank")
+        if not isinstance(self.directive, ModelDirective):
+            raise TypeError("directive must be ModelDirective")
+
+
+@dataclass(frozen=True)
 class RuntimeSnapshot:
     user_input: str
     wake_reason: str
@@ -131,6 +150,7 @@ class RuntimeTurnResult:
     model_output_tokens: int | None = None
     model_total_tokens: int | None = None
     model_usage_complete: bool = False
+    recovered_response_attempts: tuple[str, ...] = ()
 
 
 class ModelDispatchNotSubmitted(RuntimeError):
@@ -144,6 +164,7 @@ ModelDispatchRecorder = Callable[[RuntimeSnapshot], None]
 ModelResponseRecorder = Callable[[RuntimeSnapshot, ModelDirective], None]
 ModelFailureRecorder = Callable[[RuntimeSnapshot, BaseException, bool], None]
 SideEffectAuthorizer = Callable[[CapabilitySpec, CapabilityCall, RuntimeSnapshot], bool]
+ModelResponseRecovery = Callable[[RuntimeSnapshot], RecoveredModelResponse | None]
 
 
 class CognitiveRuntime:
@@ -163,6 +184,7 @@ class CognitiveRuntime:
         model_dispatch_recorder: ModelDispatchRecorder | None = None,
         model_response_recorder: ModelResponseRecorder | None = None,
         model_failure_recorder: ModelFailureRecorder | None = None,
+        model_response_recovery: ModelResponseRecovery | None = None,
     ) -> None:
         if max_tool_rounds < 0:
             raise ValueError("max_tool_rounds must be >= 0")
@@ -181,6 +203,7 @@ class CognitiveRuntime:
         self.model_dispatch_recorder = model_dispatch_recorder
         self.model_response_recorder = model_response_recorder
         self.model_failure_recorder = model_failure_recorder
+        self.model_response_recovery = model_response_recovery
 
     def _snapshot(
         self,
@@ -230,6 +253,7 @@ class CognitiveRuntime:
         cockpit_data = dict(cockpit or {})
         model_usages: list[ModelUsage] = []
         model_usage_complete = True
+        recovered_attempt_ids: list[str] = []
 
         def _result(**kwargs: Any) -> RuntimeTurnResult:
             rounds = int(kwargs["model_rounds"])
@@ -242,6 +266,7 @@ class CognitiveRuntime:
             )
             return RuntimeTurnResult(
                 **kwargs,
+                recovered_response_attempts=tuple(recovered_attempt_ids),
                 model_input_tokens=(
                     sum(int(item.input_tokens or 0) for item in model_usages)
                     if input_complete
@@ -282,28 +307,47 @@ class CognitiveRuntime:
                 effective_model_rounds=effective_model_rounds,
                 model_round_offset=model_round_offset,
             )
-            if self.model_attempt_admitter is not None:
-                attempt_id = self.model_attempt_admitter(snapshot)
-                if attempt_id is not None:
-                    # Provider-attempt correlation is runtime-private metadata, not
-                    # part of the serialized Resident RuntimeSnapshot contract.
-                    object.__setattr__(snapshot, "_model_attempt_id", attempt_id)
-            if self.model_dispatch_recorder is not None:
-                self.model_dispatch_recorder(snapshot)
-            try:
-                directive = self.model_handler(snapshot)
-                if not isinstance(directive, ModelDirective):
-                    raise TypeError("model_handler must return ModelDirective")
-            except ModelDispatchNotSubmitted as exc:
-                if self.model_failure_recorder is not None:
-                    self.model_failure_recorder(snapshot, exc, True)
-                raise
-            except Exception as exc:
-                if self.model_failure_recorder is not None:
-                    self.model_failure_recorder(snapshot, exc, False)
-                raise
-            if self.model_response_recorder is not None:
-                self.model_response_recorder(snapshot, directive)
+            recovered: RecoveredModelResponse | None = None
+            if self.model_response_recovery is not None:
+                recovered = self.model_response_recovery(snapshot)
+                if recovered is not None and not isinstance(
+                    recovered, RecoveredModelResponse
+                ):
+                    raise TypeError(
+                        "model_response_recovery must return RecoveredModelResponse"
+                    )
+            if recovered is not None:
+                # The exact provider reply already crossed the provider boundary and
+                # is durable under this attempt identity. Reapplying it is the normal
+                # downstream application path: no admission transition, no dispatch
+                # boundary and no provider call happen for this round, and every
+                # downstream effect below stays idempotent under retry.
+                object.__setattr__(snapshot, "_model_attempt_id", recovered.attempt_id)
+                recovered_attempt_ids.append(recovered.attempt_id)
+                directive = recovered.directive
+            else:
+                if self.model_attempt_admitter is not None:
+                    attempt_id = self.model_attempt_admitter(snapshot)
+                    if attempt_id is not None:
+                        # Provider-attempt correlation is runtime-private metadata, not
+                        # part of the serialized Resident RuntimeSnapshot contract.
+                        object.__setattr__(snapshot, "_model_attempt_id", attempt_id)
+                if self.model_dispatch_recorder is not None:
+                    self.model_dispatch_recorder(snapshot)
+                try:
+                    directive = self.model_handler(snapshot)
+                    if not isinstance(directive, ModelDirective):
+                        raise TypeError("model_handler must return ModelDirective")
+                except ModelDispatchNotSubmitted as exc:
+                    if self.model_failure_recorder is not None:
+                        self.model_failure_recorder(snapshot, exc, True)
+                    raise
+                except Exception as exc:
+                    if self.model_failure_recorder is not None:
+                        self.model_failure_recorder(snapshot, exc, False)
+                    raise
+                if self.model_response_recorder is not None:
+                    self.model_response_recorder(snapshot, directive)
             if directive.usage is None:
                 model_usage_complete = False
             else:
