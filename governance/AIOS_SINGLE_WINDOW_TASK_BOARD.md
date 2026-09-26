@@ -1,6 +1,6 @@
 # AIOS v3.0 单窗口任务执行总表
 
-## 当前控制入口 — 2026-09-26 B-RERUN-002 INFRASTRUCTURE_FAIL / B-PERSISTENCE-CORRECTIVE-001 READY
+## 当前控制入口 — 2026-09-26 B-PERSISTENCE-CORRECTIVE-001 FROZEN_WIP / CORE-BACKGROUND-RESPONSE-RECOVERY-001 READY
 
 - 接任 PM 依 #128 治理接手；接手与 live 复核：`governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
 - **派工基线 = live main `079d7516f195cf6973933acc8cd057d59adc3a9f`**（其后仅治理/审查文档变更）；`CORE-OPERATOR-001` 集成点 = `e72a63874ed2c28798b00cec51f191caf1594a00`；Core tree 自审计以来始终 `7db4f72e7b3c29c74082f9984141159f8f1d6071`。每个新窗口仍须自行重取 live main，不得把本 SHA 当永久施工基线。
@@ -53,8 +53,13 @@
 | C15-RCC-RES-B-PREFLIGHT-002 | **DONE / ACCEPTED** | PR #209 exact `aab3a30cc48e8c7041ef4b37e0e5f379c3060c93`；PM review `5323959000`；Independent Acceptance `5323972504` = PASS / blocker=0；merge `65e6e8266bb0541d624eb8e5bba825b91145564f`；receipt `governance/C15_RCC_RES_B_PREFLIGHT_002_ACCEPTANCE_INTEGRATION_RECEIPT_2026-09-26.md` |
 | C15-RCC-RES-B-RELEASE-002 | **DONE / RELEASED** | release record `governance/C15_RCC_RES_B_RELEASE_002_RELEASE_RECORD_2026-09-26.md`；fresh release validation `36216433668` attempt 2 SUCCESS；exact run/session `c15-rcc-res-b-rerun-002-65e6e826` / `c15-rcc-res-b-session-002-65e6e826`；release review 未运行真实 Resident B、未向 Resident/model 暴露真实 cursor14 payload |
 | C15-RCC-RES-B-RERUN-002 | **FAILED / INFRASTRUCTURE_STATE_LOSS / NON-CANONICAL** | cursor14 已 reveal+ingest+production dispatch；无 Resident semantic reply/capability/ACK；canonical /tmp run root 被平台重启销毁。旧 run/session 永久退休，禁止 replay/rewind 冒充原 run。incident + PM ruling 已落库。 |
-| C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001 | **READY** | 唯一合法下一任务；只修 operator/release persistence + relay journal + crash-safe exactly-once recovery；不得运行真实 Resident / 真实 cursor14；不得改 Core/fixture/A evidence。提示词：`governance/prompts/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_2026-09-26.md` |
-| C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001-INDEPENDENT-ACCEPTANCE | **BLOCKED** | 等 corrective candidate REVIEW_READY；由新独立窗口专门尝试打红 persistence/recovery 边界 |
+| C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001 | **FROZEN_WIP / BLOCKED_ON_CORE_RESPONSE_RECOVERY** | partial operator persistence/journal work + red evidence must be preserved, not accepted. Current Core cannot resume exact `response_returned` through normal CognitiveRuntime without redispatch/semantic duplication. Resume only after new Core acceptance + RC-REFREEZE-002 + fresh A-RERUN-003 acceptance. |
+| CORE-BACKGROUND-RESPONSE-RECOVERY-001 | **READY** | unique next task; add minimal exact-response crash recovery in Core, no provider redispatch, normal CognitiveRuntime downstream semantics, exactly-once capability/response/metering. Prompt: `governance/prompts/CORE_BACKGROUND_RESPONSE_RECOVERY_001_2026-09-26.md` |
+| CORE-BACKGROUND-RESPONSE-RECOVERY-001-INDEPENDENT-ACCEPTANCE | **BLOCKED** | fresh independent reviewer must attack exact candidate recovery boundaries |
+| CORE-RC-REFREEZE-002 | **BLOCKED** | required because Core changes after prior RC freeze; re-freeze exact software/tree/environment before new Resident evidence |
+| C15-RCC-RES-A-RERUN-003 | **BLOCKED** | fresh A on re-frozen Core; old #205 remains historical/canonical only for prior frozen Core |
+| C15-RCC-RES-A-RERUN-003-INDEPENDENT-ACCEPTANCE | **BLOCKED** | required before B persistence corrective can resume |
+| C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001-INDEPENDENT-ACCEPTANCE | **BLOCKED** | waits for resumed corrective candidate after new Core + RC re-freeze + fresh A acceptance |
 | C15-RCC-RES-B-RELEASE-003 | **BLOCKED** | 仅 corrective 独立验收 PASS 后 release；重新验证 frozen Core/A lineage，并 mint 全新 exact run/session；不得复用 RERUN-002 identity |
 | C15-RCC-RES-B-RERUN-003 | **BLOCKED** | 等 RELEASE-003；新的 fresh Resident B 仅运行 cursor14..22 |
 | C15-RCC-RES-B-ACCEPT-003 → C / EVAL / CLOSE | **BLOCKED** | 等 B-RERUN-003 RUN_COMPLETE / AWAITING_INDEPENDENT_ACCEPTANCE |
