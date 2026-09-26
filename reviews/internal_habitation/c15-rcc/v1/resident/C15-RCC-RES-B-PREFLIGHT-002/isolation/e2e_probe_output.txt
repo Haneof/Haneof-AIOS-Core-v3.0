@@ -1,4 +1,4 @@
-[e2e] CURRENT_RUN_LOG=/tmp/c014-e2e-fresh-5/e2e.log
+[e2e] CURRENT_RUN_LOG=/tmp/c014-e2e-fresh-1/e2e.log
 world.sqlite: OK
 index.sqlite: OK
 release_state.json: OK
@@ -52,8 +52,8 @@ PASS: running as nobody (uid 65534)
 my pid = 43 (should be >=2)
 PASS: resident pid 43 != 1 (init is separate)
 pid 1 comm = 'sandbox-init'
-visible PIDs in /proc = 5 (should be small, not host's 100+)
-PASS: only 5 PIDs visible (expected small count in new PID namespace)
+visible PIDs in /proc = 4 (should be small, not host's 100+)
+PASS: only 4 PIDs visible (expected small count in new PID namespace)
 PASS: PID1 is sandbox-init (correct supervisor)
 PASS: no host init (systemd/init) visible in new PID namespace
 PASS: /proc/1/root unreadable (also acceptable)
@@ -154,8 +154,8 @@ NORMAL_BINDING_PASS
 [test-responder] starting mode=normal rounds=2 uid=65534 pid=3 inbox=/work/inbox outbox=/work/outbox
 [test-responder] pid=3 proc1_comm=sandbox-init
 [test-responder] PASS PID1 is sandbox-init
-[test-responder] round 1 received request_id=5721bbb4... digest=b22402cd...
-[test-responder] round 2 received request_id=f3240b32... digest=d1df52f2...
+[test-responder] round 1 received request_id=191a2952... digest=753a09fb...
+[test-responder] round 2 received request_id=80f5fbff... digest=d556b455...
 [test-responder] OK mode=normal rounds=2 pid=3
 
 STALE_REJECTED_PASS
@@ -179,7 +179,7 @@ SYNTHETIC_GENUINE_PASS
 CHECK 27 PASS: synthetic genuine 2-round Atlas non-empty
 CHECK 28 PASS: current_event seq14 wiring
 [e2e] step 4b: production genuine via ExternalBrokerClient + FakeBrokerServer (transport)
-FakeBrokerServer at http://127.0.0.1:46147/v1/chat
+FakeBrokerServer at http://127.0.0.1:40053/v1/chat
 prod invocations=2 history=1
 last_provider=fake-broker usage={'total_tokens': 42, 'input_tokens': 20, 'output_tokens': 22}
 PRODUCTION_GENUINE_PASS
@@ -246,25 +246,25 @@ CHECK 49 PASS: privdrop dual
 [e2e] step 9: signal deterministic PID1 forwarding
 [signal] pid log:
 {
-  "outer_wrapper_host_pid": 6942,
-  "outer_wrapper_ns_pid": 6942,
-  "outer_wrapper_ppid": 6940,
-  "outer_wrapper_cmd": "/work/repo/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/resident_jail.py --repo /work/repo --sandbox /tmp/b-sleep-test-6580 --world /tmp/c014-e2e-fresh-5/runtime/world.sqlite --index /tmp/c014-e2e-fresh-5/runtime/index.sqlite --state /tmp/c014-e2e-fresh-5/runtime/release_state.json --lock /tmp/c014-e2e-fresh-5/runtime/world.sqlite.writer.lock --mailbox-root /tmp/b-sleep-mb-6580 --inject-dir /tmp/c014-e2e-fresh-5/inject -- /bin/sleep 30",
-  "unsharer_host_pid": 6943,
-  "unsharer_ns_pid": 6943,
-  "unsharer_ppid": 6942,
-  "pid1_host_pid": 6945,
+  "outer_wrapper_host_pid": 3730,
+  "outer_wrapper_ns_pid": 3730,
+  "outer_wrapper_ppid": 3728,
+  "outer_wrapper_cmd": "/work/repo/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/resident_jail.py --repo /work/repo --sandbox /tmp/b-sleep-test-3368 --world /tmp/c014-e2e-fresh-1/runtime/world.sqlite --index /tmp/c014-e2e-fresh-1/runtime/index.sqlite --state /tmp/c014-e2e-fresh-1/runtime/release_state.json --lock /tmp/c014-e2e-fresh-1/runtime/world.sqlite.writer.lock --mailbox-root /tmp/b-sleep-mb-3368 --inject-dir /tmp/c014-e2e-fresh-1/inject -- /bin/sleep 30",
+  "unsharer_host_pid": 3731,
+  "unsharer_ns_pid": 3731,
+  "unsharer_ppid": 3730,
+  "pid1_host_pid": 3733,
   "pid1_ns_pid": 1,
   "pid1_ns_pid_actual": 1,
-  "pid1_host_pid_ns_view": 6945,
+  "pid1_host_pid_ns_view": 3733,
   "pid1_comm": "sandbox-init",
-  "worker_host_pid": 6947,
+  "worker_host_pid": 3735,
   "worker_ns_pid_actual": 3,
   "worker_ns_ppid": 1,
   "worker_ppid_host": 1
-}outer=6942 unsharer=6943 pid1_host=6945 worker_host=6947 worker_ns=3
+}outer=3730 unsharer=3731 pid1_host=3733 worker_host=3735 worker_ns=3
 CHECK 50 PASS: PID map outer/unsharer/PID1/worker captured (host pids valid, distinct)
-[signal] sending TERM to PID1 host 6945 (jail PID1)
+[signal] sending TERM to PID1 host 3733 (jail PID1)
 [signal] jail exit code 143
 CHECK 51 PASS: signal TERM forwarded PID1->worker exit 143
 CHECK 52 PASS: worker reaped no zombie
@@ -506,9 +506,9 @@ RUN_ROOT2 init B failed
 }
 RUN_ROOT2 pending set
 binding receipt 9cba565c8bc5
-model_rounds=ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='06b485aa2dda6b29ce4ad45e2d1317ab'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='06b485aa2dda6b29ce4ad45e2d1317ab'))
+model_rounds=ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='401901399541e34d734e31e29149147d'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='401901399541e34d734e31e29149147d'))
 headless stub turn succeeded
-model_rounds 1 directive ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='06b485aa2dda6b29ce4ad45e2d1317ab'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='06b485aa2dda6b29ce4ad45e2d1317ab')) real-providerCHECK 59 PASS: headless CLI turn with ExternalBrokerClient succeeded (HTTPS stub)
+model_rounds 1 directive ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='401901399541e34d734e31e29149147d'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='401901399541e34d734e31e29149147d')) real-providerCHECK 59 PASS: headless CLI turn with ExternalBrokerClient succeeded (HTTPS stub)
 [e2e] step 14: hash mismatch
 PASS contract hash mismatch fail closed: contract SHA env mismatch: expected 28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef, got deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef (STOP)
 CHECK 60 PASS: contract hash mismatch fail closed
@@ -520,7 +520,7 @@ CHECK 62 PASS: disposable init B via canonical command
 DISPOSABLE_REVEAL seq=14 event_id=c15rcc-014 projection_sha256=c0e3e7d07d62e00c2394ae9e99032dd76aa74afd3960aae35a2ee1286c545f27 payload_sha256=89be96010d003f84b443c2b9482386e26d9d48690398fe948649df5365858eb7 field_count=8
 REVEAL_SHAPE_VALID_PASS
 CHECK 63 PASS: canonical reveal --phase B --state without --sequence (blocker7) produces 8-field projection
-using disp /tmp/b-disp-reveal-6580
+using disp /tmp/b-disp-reveal-3368
 baseline receipt created binding_version=c15-rcc-b-binding-v1 seq=14 sha=74fcbf4eaaae rs_sha=c7a735b2eca3
 BASELINE_VALID_PASS
 CHECK 64 PASS: baseline valid receipt PASS
@@ -533,7 +533,7 @@ PASS modified source_kind rejected for source_kind: current_event.source_kind 'f
 PASS modified source_class rejected for source_class: current_event.source_class 'FAKE' != receipt source_class 'PLATFORM' (modified source_class)
 PASS modified modality rejected for modality: current_event.modality 'fake_modality' != receipt modality 'structured_text' (modified modality)
 PASS wrong session rejected: binding receipt b_session_id 'b-adversarial-001' != 'b-wrong-session' (wrong session)
-PASS stale seq14 after ACK rejected: binding receipt release_state_path '/tmp/b-disp-reveal-6580/runtime/release_state.json' != current '/tmp/tmpad7s795r/rs_stale.json' (path identity mismatch)
+PASS stale seq14 after ACK rejected: binding receipt release_state_path '/tmp/b-disp-reveal-3368/runtime/release_state.json' != current '/tmp/tmpkvmhqlbe/rs_stale.json' (path identity mismatch)
 PASS missing receipt rejected: binding receipt missing at /tmp/nonexistent-binding.json (current-event binding must exist)
 PASS malformed receipt rejected: binding receipt malformed JSON: Expecting value: line 1 column 1 (char 0)
 BINDING_ADVERSARIAL_PASS
@@ -557,7 +557,7 @@ PASS handler _poisoned == True
 PASS same handler second call poisoned fail: handler poisoned: provider_transport_failure: provider invoke failed: simulated provider transport failure (new instance required)
 PASS _outstanding == None
 PASS release next_sequence not advanced
-PASS durable failure receipt exists /tmp/b-scheme-evidence-7158/failure-b-scheme-test-001-round-1-1790384379719256160-b4e01690.json
+PASS durable failure receipt exists /tmp/b-scheme-evidence-3946/failure-latest-1.json
 PASS durable evidence session/cursor
 PASS non-JSON fail closed: provider content not JSON: Expecting value: line 1 column 1 (char 0)
 PASS non-JSON provider invoked
@@ -641,9 +641,9 @@ CHECK 108 PASS: wrong saved pending reveal FAIL
 CHECK 109 PASS: receipt schema 7 mutations PASS
 [e2e] step 17e2: live pending fixture triple-binding
 PASS pending_missing create correctly FAIL: release_state pending_reveal.fixture_sha256 missing (must be 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46')
-PASS pending_missing validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-6580/runtime/release_state.json' != current '/tmp/b-fixture-pending_missing-t73mkx6m/release_state.json' (path identity mismatch)
+PASS pending_missing validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-3368/runtime/release_state.json' != current '/tmp/b-fixture-pending_missing-19wj_anm/release_state.json' (path identity mismatch)
 PASS pending_wrong create correctly FAIL: release_state pending_reveal.fixture_sha256 'sha256:deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef' != canonical 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46' (live fixture mismatch)
-PASS pending_wrong validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-6580/runtime/release_state.json' != current '/tmp/b-fixture-pending_wrong-ok29d3u7/release_state.json' (path identity mismatch)
+PASS pending_wrong validate correctly FAIL: binding receipt release_state_path '/tmp/b-disp-reveal-3368/runtime/release_state.json' != current '/tmp/b-fixture-pending_wrong-_kyhp7lh/release_state.json' (path identity mismatch)
 PASS receipt fixture wrong correctly FAIL: binding receipt fixture_sha256 'sha256:deadbeef' != canonical 'sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46' (wrong fixture SHA)
 PASS exact fixture triple-binding PASS: sha256:7ccb3
 FIXTURE_TRIPLE_PASS
@@ -691,7 +691,7 @@ PASS canonical startup uses HTTPS
 CHECK 130 PASS: canonical startup HTTPS
 PASS canonical configuration block is configuration-only
 PASS canonical block contains all 12 envs
-PASS canonical startup reaches transport: ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='a478167c48b6be91c1e4f88ee892cf13'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='a478167c48b6be91c1e4f88ee892cf13'))
+PASS canonical startup reaches transport: ModelDirective(capability_calls=(), response=None, silence=True, usage=ModelUsage(total_tokens=42, input_tokens=None, output_tokens=None, provider='real-provider', model='real-model-v1', request_id='d66da12d9e7fa95f8849823152af7ba7'), provenance=ModelCallProvenance(provider='real-provider', model='real-model-v1', request_id='d66da12d9e7fa95f8849823152af7ba7'))
 CHECK 131 PASS: canonical startup execution reaches transport
 [e2e] step 17j: env manifest/gate consistency
 PASS manifest subset semantic
@@ -709,7 +709,7 @@ NO_FALSE_NO_REVEAL_PROSE_PASS
 CHECK 137 PASS: BLK-01 prose states disposable reveal only (no false no-reveal claim)
 [e2e] corrective-009 blk-02: portable checkout, no hardcoded absolute path
 CHECK 138 PASS: no hardcoded /home/user/ path in harness/isolation/procedure/checks
-RANDOM_CHECKOUT_REPO_ROOT /tmp/candidate-ahpqrbrp7t
+RANDOM_CHECKOUT_REPO_ROOT /tmp/candidate-do5m1sizew
 RANDOM_CHECKOUT_CONTRACT_SHA 28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef
 decoy_cwd_rc 0
 corrupt_contract_rc 1
@@ -721,12 +721,12 @@ CANONICAL_RUNBOOK_STATIC_PASS
 CHECK 141 PASS: BLK-03 runbook lock name / fence / canonical time / projection loop / provider docs consistent
 documented lock argument: --lock $RUN_ROOT/runtime/world.sqlite.writer.lock
 CHECK 142 PASS: documented --lock uses <world>.writer.lock
-{"index_lag": 0, "index_path": "/tmp/c014-e2e-fresh-5/runbook_probe/runtime/index.sqlite", "index_status": "ready", "index_watermark": 98, "recovery_disposition": "AUTO_RECOVERABLE", "schema_version": 1, "status": "recovery_status", "supported_schema_version": 1, "world_path": "/tmp/c014-e2e-fresh-5/runbook_probe/runtime/world.sqlite", "world_quick_check": ["ok"], "world_revision": 98}
+{"index_lag": 0, "index_path": "/tmp/c014-e2e-fresh-1/runbook_probe/runtime/index.sqlite", "index_status": "ready", "index_watermark": 98, "recovery_disposition": "AUTO_RECOVERABLE", "schema_version": 1, "status": "recovery_status", "supported_schema_version": 1, "world_path": "/tmp/c014-e2e-fresh-1/runbook_probe/runtime/world.sqlite", "world_quick_check": ["ok"], "world_revision": 98}
 CHECK 143 PASS: documented recovery-status executes: rev98/watermark98/lag0/AUTO_RECOVERABLE/ok
 CANONICAL_RUNBOOK_EXECUTABLE_PASS
 [e2e] corrective-009 blk-04..08: handler and jail adversarial regressions
 disposable reveal metadata: seq=14 event_id=c15rcc-014 field_count=8
-missing_release_state correctly FAIL: current-event binding failed: BLK-04: release_state missing at /tmp/c014-e2e-fresh-5/c9/runtime/release_state.
+missing_release_state correctly FAIL: current-event binding failed: BLK-04: release_state missing at /tmp/c014-e2e-fresh-1/c9/runtime/release_state.
 MISSING_RELEASE_STATE_FAIL_CLOSED_PASS provider_calls=0 receipts=2
 NO_EVENT_NO_DISPATCH_PASS
 FAILURE_RECEIPT_COLLISION_PASS receipts=2 names_distinct=True
@@ -924,4 +924,4 @@ CORRECTIVE_010_FIXUP_001_E2E_PASS
 CORRECTIVE_011_E2E_PASS
 CORRECTIVE_012_E2E_PASS
 CORRECTIVE_013_E2E_PASS
-[e2e] done 2026-09-26T00:59:49Z
+[e2e] done 2026-09-26T01:04:48Z
