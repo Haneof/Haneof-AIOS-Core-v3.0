@@ -1,12 +1,12 @@
 # AIOS v3.0 项目全流程总地图
 
-## 当前控制入口 — 2026-09-25 Core gap fixes DONE; HEADLESS DONE; RECOVERY DONE; SCALE DONE; RC-FREEZE DONE; FRESH-A-002 ACCEPTED; B-PREFLIGHT-002 READY
+## 当前控制入口 — 2026-09-26 RC-FREEZE DONE; FRESH-A-002 ACCEPTED; B-PREFLIGHT-002 DONE+ACCEPTED; B-RELEASE-002 READY
 
 - `CORE-BASELINE-001 = DONE`。
 - `CORE-GAP-AUDIT-001 = DONE`：PR #132 accepted/merged at `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`；audited Core tree `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
 - Audit disposition: 3 STILL_OPEN RC blockers / 14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE。
 - Active audited Core gap blocker: none. CG-001 / CG-002 / CG-003 are DONE.
-- S2 当前：`CORE-GAP-FIX-001/002/003 = DONE`；`CORE-CI-FIX-001 = DONE`；`CORE-HEADLESS-001 = DONE`；`CORE-RECOVERY-001 = DONE`；`CORE-SCALE-001 = DONE`；`CORE-RC-FREEZE-001 = DONE`。独立验收 #203 先合 `85c0aba5...`，candidate #202 后合 `305aea16...`；frozen software `773876f9...` / Core tree `fe77f8a0...`；impact `FRESH_A_REQUIRED`。`C15-RCC-RES-A-RERUN-002` 已由 #207 独立接受；canonical evidence = PR #205 @ `d17ae972...` OPEN / UNMERGED / PINNED。唯一下一 READY = `C15-RCC-RES-B-PREFLIGHT-002`。
+- S2 当前：Core gap / CI / HEADLESS / RECOVERY / SCALE / RC-FREEZE 均 DONE。frozen software `773876f9...` / Core tree `fe77f8a0...`。A-002 已由 #207 独立接受；canonical evidence = PR #205 @ `d17ae972...` OPEN / UNMERGED / PINNED。B-PREFLIGHT-002 已由 PR #209 fresh Independent Acceptance PASS 并合入 `65e6e826...`。唯一下一 READY = `C15-RCC-RES-B-RELEASE-002`。
 - `CORE-OPERATOR-001 = DONE`：#135 ACCEPTANCE_PASS → #131 exact head `0e1d69ee` merged at `e72a63874ed2c28798b00cec51f191caf1594a00`；Core ZERO DIFF；#130 SUPERSEDED。
 - 单一集成收据（两份 PM 写回已对账合并）：`governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`；含集成时 API 复核、本地 repro/修复复算（`3865da88` 三项失败 → accepted head `632 passed`）、合后 push gate run `35958610555` SUCCESS 及全部诚实限制。operator 集成不是 SOFTWARE_RC，也不是 CORE_COMPLETE。
 - 路线保持：operator acceptance + three accepted gap fixes → headless → recovery → scale → RC freeze ✅ → `C15-RCC-RES-A-RERUN-002` → A independent acceptance → B preflight/release/rerun/accept → attested C → C15 close → C16 → broad P16 → P17 Core release closure。
@@ -22,7 +22,7 @@
 
 ---
 
-## 0. 当前项目快照 — 2026-09-25 RC-FREEZE DONE / fresh A-002 ACCEPTED / B-PREFLIGHT-002 READY
+## 0. 当前项目快照 — 2026-09-26 RC-FREEZE DONE / fresh A-002 ACCEPTED / B-PREFLIGHT-002 ACCEPTED / B-RELEASE-002 READY
 
 > **PM / 工程 / operator 导航，不是 Resident 盲测资料。** 盲测 Resident 不读地图/任务板/checkpoint，只接收独立放行的安全包。
 
@@ -30,7 +30,7 @@
 - P0–P15：已形成 Core 机制与阶段 Gate；不等于真实设备产品集成或长期模型认知已全面通过。
 - C14：已正式 PASS；C15 hardening：已冻结。historical canonical A #117 仍对其 old Core 有效，但对新 RC 仅属历史证据；RC impact = `FRESH_A_REQUIRED`；新 RC Fresh A-002 已通过独立验收：#207 ACCEPTANCE_PASS / blocker=0，PR #205 @ `d17ae972...` 现为 canonical Phase-A evidence，保持 OPEN / UNMERGED / PINNED。
 - B：#121 已提交但当前 candidate **NOT ACCEPTED**（执行证据不足、最终索引落后）；不是“尚无人执行”，也不是“报告写 PASS 所以完成”。
-- 纠偏治理：`C15-RCC-RES-B-CORRECTIVE-001 = DONE`；PR #122 历史合入事实不变。其原先释放的 B preflight 已被后续 Core completion / RC-FREEZE 影响裁决重新阻塞；当前必须先完成 `C15-RCC-RES-A-RERUN-002` 及 fresh independent acceptance，之后才可重新释放 B preflight。
+- B preflight：`C15-RCC-RES-B-PREFLIGHT-002 = DONE / ACCEPTED`；PR #209 exact `aab3a30c...` 经 fresh Independent Acceptance `5323972504` PASS 后合入 main `65e6e826...`。当前只释放 non-Resident `C15-RCC-RES-B-RELEASE-002`；真实 B 仍未开始。
 - 纠偏裁决：`governance/C15_RCC_RES_B_CORRECTIVE_DECISION_2026-09-23.md`；审查证据：`reviews/C15_RCC_RES_B_001_PM_CORRECTIVE_REVIEW_2026-09-23.md`。
 - C15 C/EVAL/CLOSE、C16、广泛 P16 及 P17 均未放行。机械 CI SUCCESS、运行报告、自评 PASS、独立证据接受与语义 VALID 必须分开。
 
@@ -40,7 +40,7 @@
 | C14 持续认知派生 | 正式收口 PASS |
 | C15 Resident A | historical #117 仅对 old Core 有效；新 RC A-002 已由 #207 独立接受，canonical evidence PR #205 @ `d17ae972...` / World-index `98/98` |
 | C15 旧 B candidate | #121 NOT ACCEPTED；保留 immutable non-canonical evidence |
-| C15 B 恢复链 | `C15-RCC-RES-B-PREFLIGHT-002 = READY` → 独立 release review → fresh B-002 → independent acceptance；当前禁止 reveal cursor 14 |
+| C15 B 恢复链 | `B-PREFLIGHT-002 = DONE / ACCEPTED` → `B-RELEASE-002 = READY` → B-RERUN-002 → B-ACCEPT-002；release record 合入前仍禁止 reveal cursor 14 |
 | C15 C 与终评 | B 接受 + 可信模型身份前置后才可启动 C；R1–R9 全 VALID 才收口 |
 | C16 系统改进反馈 | BLOCKED；Resident proposal 与用户 World 分离，独立复现/工程/Gate/再验证 |
 | Post-C15 issue reconciliation | `POST-C15-ISSUE-RECONCILIATION-001`：C15 CLOSE 后 fresh 对账 #23/#28/#33/#34/#35；已修历史项不得重复施工，只有 current-main 可复现才派生新工程任务 |
