@@ -56,3 +56,23 @@ Exactly-once **safety** remains mandatory at every kill point. Same-run forward 
 Do not modify Core to weaken `in_doubt`.
 Do not mark an ambiguous provider response `not_submitted`.
 Resume the existing WIP rather than restarting it.
+
+
+---
+
+## ACTIVE EXECUTION OVERRIDE — Gate integrity correction
+
+The prior PM scope amendment that allowed ambiguous late kill points to terminate permanently in-doubt and still satisfy the persistence corrective is now historical only and SUPERSEDED for active execution.
+
+Do not resume this task now.
+
+Read:
+`governance/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_GATE_INTEGRITY_CORRECTION_2026-09-26.md`
+
+Current status:
+`FROZEN_WIP / BLOCKED_ON_CORE_RESPONSE_RECOVERY`
+
+Resume only after:
+1. CORE-BACKGROUND-RESPONSE-RECOVERY-001 accepted;
+2. CORE-RC-REFREEZE-002 complete;
+3. fresh C15-RCC-RES-A-RERUN-003 independently accepted.
