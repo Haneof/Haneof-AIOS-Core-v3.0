@@ -19,6 +19,24 @@ jobs:
           fetch-depth: 0
           ref: 92a201a38c77595ed01ced00e2e7dc53c5dd6421
 
+      - name: Print canonical shell transcript digests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, importlib.util
+          from pathlib import Path
+          p = Path("reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/checks/runbook_lifecycle_checker.py").resolve()
+          spec = importlib.util.spec_from_file_location("lc", p)
+          lc = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(lc)
+          base = p.parent.parent
+          for rel, text in lc.read_docs(base).items():
+              commands, _ = lc._shell_contents_in(text)
+              payload = "\\0".join(lc._normalize_shell_ws(c) for c in commands).encode("utf-8")
+              print(f"SHELL_TRANSCRIPT_SHA256 {rel} {len(commands)} {hashlib.sha256(payload).hexdigest()}")
+          PY
+
       - name: Run exact Debian 12 frozen gate
         shell: bash
         run: |
@@ -43,19 +61,6 @@ jobs:
               BPREP=/work/repo/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002
               python3 "$BPREP/checks/runbook_lifecycle_checker.py" --base "$BPREP" --self-test \
                 | tee /work/repo/c014-artifacts/lifecycle-selftest.log
-              python3 - <<'PY'
-              import hashlib, importlib.util
-              from pathlib import Path
-              p = Path("/work/repo/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/checks/runbook_lifecycle_checker.py")
-              spec = importlib.util.spec_from_file_location("lc", p)
-              lc = importlib.util.module_from_spec(spec)
-              spec.loader.exec_module(lc)
-              base = p.parent.parent
-              for rel, text in lc.read_docs(base).items():
-                  commands, _ = lc._shell_contents_in(text)
-                  payload = "\\0".join(lc._normalize_shell_ws(c) for c in commands).encode("utf-8")
-                  print(f"SHELL_TRANSCRIPT_SHA256 {rel} {len(commands)} {hashlib.sha256(payload).hexdigest()}")
-              PY
               grep -q "RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=82" \
                 /work/repo/c014-artifacts/lifecycle-selftest.log
               success=0
