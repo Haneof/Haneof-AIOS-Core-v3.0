@@ -35,6 +35,10 @@ jobs:
               commands, _ = lc._shell_contents_in(text)
               payload = "\\0".join(lc._normalize_shell_ws(c) for c in commands).encode("utf-8")
               print(f"SHELL_TRANSCRIPT_SHA256 {rel} {len(commands)} {hashlib.sha256(payload).hexdigest()}")
+              fences = lc._iter_fences(text)
+              fence_payload = "\\0".join(lang + "\\0" + body for lang, body in fences).encode("utf-8")
+              print(f"EXECUTABLE_FENCE_SHA256 {rel} {len(fences)} {hashlib.sha256(fence_payload).hexdigest()}")
+              print(f"RUNBOOK_TEXT_SHA256 {rel} {hashlib.sha256(text.encode('utf-8')).hexdigest()}")
           PY
 
       - name: Run exact Debian 12 frozen gate
