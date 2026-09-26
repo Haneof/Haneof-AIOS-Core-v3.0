@@ -1,0 +1,104 @@
+# C15-RCC-RES-B-PREFLIGHT-002 - CORRECTIVE-011 fresh isolation evidence (inside the sandbox).
+# Regenerated from a fresh disposable run of isolation/probe_isolation.sh via resident_jail.py.
+# Raw log: /tmp/b-preflight-e2e-c011b/isolation_probe.log
+# Raw log SHA-256: 1bb3a16b97ca61c52a4b7b4a4e31518e7fd5ccfed5c2e146b96a5e73be283c74
+# Contains NO cursor-14 resident_visible_payload bytes.
+
+=== identity ===
+uid=65534 gid=65534
+PASS: running as nobody (uid 65534)
+
+=== PID namespace (blocker 2 fixed) ===
+my pid = 43 (should be >=2)
+PASS: resident pid 43 != 1 (init is separate)
+pid 1 comm = 'sandbox-init'
+visible PIDs in /proc = 5 (should be small, not host's 100+)
+PASS: only 5 PIDs visible (expected small count in new PID namespace)
+PASS: PID1 is sandbox-init (correct supervisor)
+PASS: no host init (systemd/init) visible in new PID namespace
+PASS: /proc/1/root unreadable (also acceptable)
+
+=== Child/orphan reap check (PID1 supervisor) ===
+child reaped status=0
+PASS: no zombies after orphan test (PID1 reaped orphan)
+PASS: PID1 zombie reap works (orphan grandchild reaped)
+
+=== Network seal (blocker 1) ===
+PASS: connect to github.com (140.82.114.4:443) blocked: errno=101 (Network is unreachable)
+PASS: connect to raw.githubusercontent.com (185.199.108.133:443) blocked: errno=101 (Network is unreachable)
+PASS: connect to api.github.com (140.82.114.6:443) blocked: errno=101 (Network is unreachable)
+PASS: connect to 8.8.8.8 (8.8.8.8:53) blocked: errno=101 (Network is unreachable)
+NETWORK_SEAL_PASS
+PASS: network sealed (external connect blocked)
+
+=== Filesystem sealed paths (blocker 1 / 4 / 6) ===
+PASS: sealed: /repo/fixture absent
+PASS: sealed: /repo/evaluator absent
+PASS: sealed: /repo/governance absent
+PASS: sealed: /repo/.git absent
+PASS: sealed: /repo/prompts absent
+PASS: sealed: /repo/reviews/internal_habitation/c15-rcc/v1/fixture absent
+PASS: sealed: /repo/reviews/internal_habitation/c15-rcc/v1/evaluator absent
+PASS: sealed: /repo/reviews/internal_habitation/c15-rcc/v1/release absent
+PASS: sealed: /repo/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-A-RERUN-002 absent
+PASS: sealed: /repo/reviews/internal_habitation/c14-resident absent
+PASS: sealed: /repo/AIOS_SINGLE_WINDOW_TASK_BOARD.md absent
+PASS: sealed: /repo/AIOS_v3.0_CURRENT_CHECKPOINT.md absent
+PASS: sealed: /repo/PROJECT_MASTER_MAP.md absent
+
+=== Read-only bind mounts actually read-only (blocker 6) ===
+PASS: Core src read-only (touch denied, exit=1)
+PASS: Resident contract read-only (touch denied)
+PASS: Core src file write blocked: [Errno 13] Permission denied: '/repo/src/aios_core/__init__.py'
+PASS: Resident contract write blocked: [Errno 13] Permission denied: '/repo/reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md'
+
+=== /dev minimal (BLOCKER 6: no whole-host bind) ===
+dev:fd
+dev:null
+dev:random
+dev:stderr
+dev:stdin
+dev:stdout
+dev:urandom
+dev:zero
+PASS: /dev/null present
+PASS: /dev/zero present
+PASS: /dev/urandom present
+PASS: /dev/random present
+PASS: /dev/fd symlink present
+PASS: sealed: /dev/sda absent as expected
+PASS: sealed: /dev/sda1 absent as expected
+PASS: sealed: /dev/nvme0n1 absent as expected
+PASS: sealed: /dev/mem absent as expected
+PASS: sealed: /dev/kmem absent as expected
+PASS: sealed: /dev/kvm absent as expected
+PASS: sealed: /dev/port absent as expected
+PASS: sealed: /dev/tty absent as expected
+PASS: sealed: /dev/tty0 absent as expected
+PASS: sealed: /dev/ptmx absent as expected
+PASS: sealed: /dev/pts absent as expected
+PASS: sealed: /dev/block absent as expected
+PASS: cannot open host-dangerous /dev nodes (ENOENT/EPERM)
+
+/dev/root /repo/src ext4 ro,nosuid,nodev,relatime,discard 0 0
+/dev/root /repo/reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_B_RUN_CONTRACT.md ext4 ro,nosuid,nodev,relatime,discard 0 0
+PASS: /proc/mounts shows ro,nosuid,nodev for /repo binds
+
+PASS: mailbox inbox bind visible in mounts (optional)
+
+=== Mailbox permissions (blocker 4) ===
+PASS: /work/inbox readable
+PASS: /work/outbox writable + searchable
+PASS: can write to /work/outbox
+PASS: /work/archive absent (operator archive not mounted)
+
+=== Privilege re-escalation (blocker 3) ===
+PASS: setuid(0) denied: [Errno 1] Operation not permitted
+PASS: mount() denied (EPERM)
+
+=== Environment allowlist (BLOCKER: PROBE_* not leaked unless AIOS_ALLOW_PROBE_ENV) ===
+PASS: PROBE_MODE/PROBE_ROUNDS not leaked (unsanitized env blocked)
+PASS: LD_* stripped
+
+
+ISOLATION_PASS

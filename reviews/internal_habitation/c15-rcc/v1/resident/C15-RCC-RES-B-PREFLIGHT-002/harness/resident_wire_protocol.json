@@ -1,0 +1,118 @@
+{
+  "action_enum": [
+    "invoke_capability",
+    "end_turn",
+    "silence",
+    "summary_response"
+  ],
+  "actions": {
+    "end_turn": {
+      "allowlist": [
+        "round",
+        "request_id",
+        "request_digest",
+        "action",
+        "response"
+      ],
+      "fields": {
+        "response": {
+          "description": "Non-empty resident response if present",
+          "type": "string"
+        }
+      },
+      "required": [
+        "round",
+        "request_id",
+        "request_digest",
+        "action"
+      ]
+    },
+    "invoke_capability": {
+      "allowlist": [
+        "round",
+        "request_id",
+        "request_digest",
+        "action",
+        "capability",
+        "arguments"
+      ],
+      "fields": {
+        "arguments": {
+          "description": "Capability arguments, validated by Core capability registry",
+          "type": "object"
+        },
+        "capability": {
+          "description": "Capability name; legal values are exactly those in RuntimeSnapshot.capability_catalog (mechanical string, no hard-coded subset)",
+          "type": "string"
+        }
+      },
+      "required": [
+        "round",
+        "request_id",
+        "request_digest",
+        "action",
+        "capability",
+        "arguments"
+      ]
+    },
+    "silence": {
+      "allowlist": [
+        "round",
+        "request_id",
+        "request_digest",
+        "action"
+      ],
+      "required": [
+        "round",
+        "request_id",
+        "request_digest",
+        "action"
+      ]
+    },
+    "summary_response": {
+      "allowlist": [
+        "round",
+        "request_id",
+        "request_digest",
+        "action",
+        "response",
+        "summary"
+      ],
+      "required": [
+        "round",
+        "request_id",
+        "request_digest",
+        "action"
+      ]
+    }
+  },
+  "binding_fields": {
+    "request_digest": {
+      "description": "SHA-256 canonical digest of envelope without digest, must be echoed exactly",
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "request_id": {
+      "description": "32 hex nonce assigned by operator, must be echoed exactly",
+      "pattern": "^[0-9a-f]{32}$",
+      "type": "string"
+    },
+    "round": {
+      "description": "Must exactly equal outstanding round assigned by operator",
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "description": "Purely mechanical JSON schema for Resident B model output. No semantic hints, no expected answer, no fixture knowledge.",
+  "forbidden": [
+    "fixture",
+    "evaluator",
+    "expected_answer",
+    "keyword_hint",
+    "future_cursor",
+    "governance_prompt"
+  ],
+  "notes": "This schema is purely mechanical. Capability is a free-form string; the only legal names are those in the current RuntimeSnapshot.capability_catalog. No hard-coded capability subset is maintained here.",
+  "protocol_name": "C15-RCC-RES-B Resident Wire Protocol",
+  "version": "1.0.1"
+}
