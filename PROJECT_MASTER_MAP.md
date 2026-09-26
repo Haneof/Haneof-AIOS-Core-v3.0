@@ -1,12 +1,15 @@
 # AIOS v3.0 项目全流程总地图
 
-## 当前控制入口 — 2026-09-26 B-PERSISTENCE-CORRECTIVE-001 FROZEN_WIP; CORE-BACKGROUND-RESPONSE-RECOVERY-001 READY
+## 当前控制入口 — 2026-09-26 CORE-BACKGROUND-RESPONSE-RECOVERY-001 REVIEW_READY; INDEPENDENT-ACCEPTANCE READY
+
+- Remote authoritative engineering candidate: PR #219, tested exact `3f9ec00d0fa283bc5294574d6da1e84d654d6645`, evidence-only head `b82ae25bcbef0d1d81cc3b7e5f303d75a4f0b507`. Earlier local-only `2b8242f...` is unpublished and non-authoritative for acceptance.
+- Current chain: Independent Acceptance → PM integration → `CORE-RC-REFREEZE-002` → fresh A-003 + IA → resume B persistence corrective + IA → RELEASE-003 → fresh B-RERUN-003.
 
 - `CORE-BASELINE-001 = DONE`。
 - `CORE-GAP-AUDIT-001 = DONE`：PR #132 accepted/merged at `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`；audited Core tree `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
 - Audit disposition: 3 STILL_OPEN RC blockers / 14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE。
 - Active audited Core gap blocker: none. CG-001 / CG-002 / CG-003 are DONE.
-- S2 当前：Core gap / CI / HEADLESS / RECOVERY / SCALE / RC-FREEZE 均 DONE。frozen software `773876f9...` / Core tree `fe77f8a0...`。A-002 / PR #205 继续 canonical。B-PREFLIGHT-002 与 RELEASE-002 历史 PASS 保留；但其唯一 RERUN-002 在 cursor14 reveal+ingest+production dispatch 后发生 ephemeral `/tmp` state loss，且无 Resident semantic reply/capability/ACK，因此 `FAILED / INFRASTRUCTURE_STATE_LOSS / NON-CANONICAL`。旧 identity 永久退休。唯一下一 READY = `C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001`。
+- S2 当前：Core gap / CI / HEADLESS / RECOVERY / SCALE / original RC-FREEZE 均 DONE。RERUN-002 remains `FAILED / INFRASTRUCTURE_STATE_LOSS / NON-CANONICAL`; B persistence WIP is frozen. Core exact-response recovery engineering PR #219 is REVIEW_READY; unique next READY = `CORE-BACKGROUND-RESPONSE-RECOVERY-001-INDEPENDENT-ACCEPTANCE`.
 - `CORE-OPERATOR-001 = DONE`：#135 ACCEPTANCE_PASS → #131 exact head `0e1d69ee` merged at `e72a63874ed2c28798b00cec51f191caf1594a00`；Core ZERO DIFF；#130 SUPERSEDED。
 - 单一集成收据（两份 PM 写回已对账合并）：`governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`；含集成时 API 复核、本地 repro/修复复算（`3865da88` 三项失败 → accepted head `632 passed`）、合后 push gate run `35958610555` SUCCESS 及全部诚实限制。operator 集成不是 SOFTWARE_RC，也不是 CORE_COMPLETE。
 - 路线保持：operator acceptance + three accepted gap fixes → headless → recovery → scale → RC freeze ✅ → `C15-RCC-RES-A-RERUN-002` → A independent acceptance → B preflight/release/rerun/accept → attested C → C15 close → C16 → broad P16 → P17 Core release closure。
@@ -40,7 +43,7 @@
 | C14 持续认知派生 | 正式收口 PASS |
 | C15 Resident A | historical #117 仅对 old Core 有效；新 RC A-002 已由 #207 独立接受，canonical evidence PR #205 @ `d17ae972...` / World-index `98/98` |
 | C15 旧 B candidate | #121 NOT ACCEPTED；保留 immutable non-canonical evidence |
-| C15 B 恢复链 | RERUN-002 infra-fail preserved；persistence WIP frozen on exact-response Core recovery. #214 safety-only relaxation superseded. Current chain: CORE-BACKGROUND-RESPONSE-RECOVERY-001 → IA → RC-REFREEZE-002 → fresh A-003/IA → resume B persistence/IA → RELEASE-003 → fresh RERUN-003 → B-ACCEPT-003 |
+| C15 B 恢复链 | RERUN-002 infra-fail preserved；persistence WIP frozen. Core recovery PR #219 exact `3f9ec00d...` is REVIEW_READY. Current chain: CORE-BACKGROUND-RESPONSE-RECOVERY-001-INDEPENDENT-ACCEPTANCE → PM integration → RC-REFREEZE-002 → fresh A-003/IA → resume B persistence/IA → RELEASE-003 → fresh RERUN-003 → B-ACCEPT-003 |
 | C15 C 与终评 | B 接受 + 可信模型身份前置后才可启动 C；R1–R9 全 VALID 才收口 |
 | C16 系统改进反馈 | BLOCKED；Resident proposal 与用户 World 分离，独立复现/工程/Gate/再验证 |
 | Post-C15 issue reconciliation | `POST-C15-ISSUE-RECONCILIATION-001`：C15 CLOSE 后 fresh 对账 #23/#28/#33/#34/#35；已修历史项不得重复施工，只有 current-main 可复现才派生新工程任务 |
