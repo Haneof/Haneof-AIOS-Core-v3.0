@@ -1,4 +1,4 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Mechanical Checks (historical through CORRECTIVE-013; CORRECTIVE-014-FIXUP-005 current)
+# C15-RCC-RES-B-PREFLIGHT-002 — Mechanical Checks (historical through CORRECTIVE-013; CORRECTIVE-014-FIXUP-006 current)
 
 Historical PASS statements below remain historical evidence. Canonical #205 evidence was read but not modified. Corrective-013 implementation is unchanged; this fixup synchronizes active evidence and canonical claims.
 
@@ -127,6 +127,10 @@ Historical PASS statements below remain historical evidence. Canonical #205 evid
 ## 27. B freeze/evidence procedure defined before B
 
 **PASS.** `procedure/final_freeze_procedure.md` enumerates hashes to capture at B completion.
+
+## 27a. CORRECTIVE-014-FIXUP-006 exact active-runbook freeze
+
+**PASS by production checker.** After semantic lifecycle validation, `check_runbook_lifecycle()` requires the exact Git-blob identity of both active runbooks: startup `c56f528f4ea181ae002ed22d3e810ab6022ddb17` and per-cursor `17f27956152f4edd49b57f72c7546eef668406fa`. The current checker blob is `72f674b2d430262a5eff9cb66c7004917c0f4ae4`. Any unforeseen executable-shell/heredoc or other byte drift in either active runbook fails closed after the semantic checks.
 
 ## 28. Cursor14 not revealed
 
