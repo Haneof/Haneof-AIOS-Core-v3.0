@@ -39,3 +39,20 @@ Required implementation/verification:
 9. produce a narrow candidate and evidence package, then stop at `REVIEW_READY`.
 
 Do not independently accept your own candidate.
+
+
+---
+
+## Binding PM scope amendment
+
+Before continuing this task, read and obey:
+
+`governance/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_PM_SCOPE_AMENDMENT_2026-09-26.md`
+
+This amendment supersedes the original wording that implied every kill point must automatically converge in the same run.
+
+Exactly-once **safety** remains mandatory at every kill point. Same-run forward continuation is required only where the frozen Core and durable evidence mechanically prove replay/continuation safe. Ambiguous post-dispatch or partially-applied semantic work may terminate durably/fail-closed instead of being blindly replayed.
+
+Do not modify Core to weaken `in_doubt`.
+Do not mark an ambiguous provider response `not_submitted`.
+Resume the existing WIP rather than restarting it.
