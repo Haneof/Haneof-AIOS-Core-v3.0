@@ -1,13 +1,13 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Operator Manifest (CORRECTIVE-014-FIXUP-005)
+# C15-RCC-RES-B-PREFLIGHT-002 — Operator Manifest (CORRECTIVE-014-FIXUP-006)
 
 Date: 2026-09-26
 Role: Release / Test Infrastructure Engineer (not Resident B/C, not evaluator)
-Task: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-014-FIXUP-005`
-Verdict: **CORRECTIVE-014-FIXUP-005 EXACT CANDIDATE — INDEPENDENT ACCEPTANCE REQUIRED BEFORE B RELEASE**. IA review `5320859635` is the source blocker. No B/C run or merge is authorized by this manifest.
+Task: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-014-FIXUP-006`
+Verdict: **CORRECTIVE-014-FIXUP-006 EXACT CANDIDATE — INDEPENDENT ACCEPTANCE REQUIRED BEFORE B RELEASE**. IA review `5320859635` is the source blocker. No B/C run or merge is authorized by this manifest.
 
-## Current authoritative manifest (CORRECTIVE-014-FIXUP-005)
+## Current authoritative manifest (CORRECTIVE-014-FIXUP-006)
 
-- **Current task**: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-014-FIXUP-005`
+- **Current task**: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-014-FIXUP-006`
 - **Scope**: close IA-BLK-004 only: shell-dispatch-wrapped duplicate lifecycle operations must count toward exact executable cardinality.
 - **C014-FIXUP-005 lifecycle checker blob**: `e031b924db2fa1fd59cda5a2ea52b58b8a86e92b`. The E2E probe and final-freeze procedure remain unchanged from C013.
 - **Current exact gate**: `EXPECTED_CHECKS=158`; required `ALL_CHECKS=158/158 FAILURES=0`.
@@ -54,7 +54,7 @@ Canonical cross-document pins (must be identical in `operator_manifest.md`, `sou
 
 These are recomputed from the byte-exact lineage copy (`lineage_copy/`) and match the accepted A-002 evidence.
 
-## Historical deliverable index (CORRECTIVE-010 inventory; current gate is CORRECTIVE-014-FIXUP-005)
+## Historical deliverable index (CORRECTIVE-010 inventory; current gate is CORRECTIVE-014-FIXUP-006)
 
 ```
 reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/
@@ -112,7 +112,7 @@ Historical CORRECTIVE-003 (superseded):
 
 Per FIXUP-001 task §2, this historical block is explicitly labelled and does NOT represent the current release contract.
 
-## Frozen model-handling intent (current invariant, unchanged through CORRECTIVE-014-FIXUP-005)
+## Frozen model-handling intent (current invariant, unchanged through CORRECTIVE-014-FIXUP-006)
 
 **Separation:** `SyntheticProbeHandler` (mailbox bridge + inside-jail responder, `sandbox-bridge/synthetic-responder-v1/10 tokens`) vs **`ProductionResidentHandler`** (outside-jail `ProviderClient`, `contract text + envelope` only, real provenance).
 
@@ -235,3 +235,5 @@ Markers present in the raw log: `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_PIN_MU
 Python was `Python 3.11.2`. The disposable reveal printed mechanical metadata only and was never presented to a Resident or model.
 
 Historical state at the time of C012: `REVIEW_READY / AWAITING_PM_RE-REVIEW`. Current C013 fixup evidence is handoff-ready; PM must rebuild from the remote parent. Do not merge #209, start Independent Acceptance, or enter B release.
+
+- **Frozen active runbook blobs (FIXUP-006 backstop)**: startup `c56f528f4ea181ae002ed22d3e810ab6022ddb17`; per-cursor `17f27956152f4edd49b57f72c7546eef668406fa`.

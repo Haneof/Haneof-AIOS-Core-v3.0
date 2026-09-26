@@ -237,7 +237,7 @@ Any provider exception, non-JSON, schema failure, binding failure, invalid capab
 - Do not run Resident B/C during preflight.
 - Do not merge PR #209 from this procedure.
 
-## Mechanical regression — current CORRECTIVE-014-FIXUP-005 gate
+## Mechanical regression — current CORRECTIVE-014-FIXUP-006 gate
 
 Before any later B release activity, run the lifecycle self-test and full frozen E2E from the B-preflight root. The E2E evidence file is valid only when copied byte-for-byte from that actual fresh run.
 

@@ -5,7 +5,7 @@ Production entrypoint and every mutation self-test call check_runbook_lifecycle(
 The self-test writes disposable copies and invokes that same function; it does not
 reimplement the comparison.
 
-CORRECTIVE-014-FIXUP-005 / IA-BLK-004 retains the CORRECTIVE-013
+CORRECTIVE-014-FIXUP-006 / IA-BLK-004 retains the CORRECTIVE-013
 shell-fence/heredoc rules and fails closed on disguised lifecycle operations.
 Artifact-bound operations are recognized from their lifecycle path signature,
 not merely a literal executable word, and every operational step has a frozen
@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import hashlib
 import re
 import shutil
 import tempfile
@@ -99,6 +100,29 @@ _HEREDOC_RE = re.compile(
 )
 _PYTHON_STDIN_RE = re.compile(r"(?:^|\s)python(?:3(?:\.\d+)?)?\s+-\s*(?:<<|$)")
 _ASSIGN_PREFIX = re.compile(r"^(?:[A-Za-z_][A-Za-z0-9_]*=(?:\"[^\"]*\"|'[^']*'|\S+)\s+)+")
+
+
+FROZEN_RUNBOOK_BLOBS = {
+    "procedure/b_startup_procedure.md": "c56f528f4ea181ae002ed22d3e810ab6022ddb17",
+    "procedure/per_cursor_interaction.md": "17f27956152f4edd49b57f72c7546eef668406fa",
+}
+
+
+def _git_blob_sha(text: str) -> str:
+    payload = text.encode("utf-8")
+    header = f"blob {len(payload)}\0".encode("ascii")
+    return hashlib.sha1(header + payload).hexdigest()
+
+
+def _assert_frozen_runbook_blob(name: str, text: str) -> None:
+    expected = FROZEN_RUNBOOK_BLOBS.get(name)
+    if expected is None:
+        raise LifecycleCheckError(f"{name}: no frozen runbook blob identity")
+    actual = _git_blob_sha(text)
+    if actual != expected:
+        raise LifecycleCheckError(
+            f"{name}: frozen runbook blob mismatch expected={expected} actual={actual}"
+        )
 
 
 class LifecycleCheckError(RuntimeError):
@@ -908,6 +932,9 @@ def check_one(name: str, text: str) -> tuple[str, ...]:
     assert_no_receipt_before_current_event(name, text)
     if "b_startup_procedure.md §7" not in text and "b_startup_procedure.md §7" not in text.replace("`", ""):
         raise LifecycleCheckError(f"{name}: missing startup §7 authority reference")
+    # Semantic checks run first. This byte-exact identity check is a final
+    # fail-closed release backstop against unforeseen shell-equivalent drift.
+    _assert_frozen_runbook_blob(name, text)
     return tokens
 
 
