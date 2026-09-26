@@ -1,13 +1,13 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Operator Manifest (CORRECTIVE-014-FIXUP-002)
+# C15-RCC-RES-B-PREFLIGHT-002 — Operator Manifest (CORRECTIVE-014-FIXUP-003)
 
 Date: 2026-09-26
 Role: Release / Test Infrastructure Engineer (not Resident B/C, not evaluator)
-Task: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-014-FIXUP-002`
-Verdict: **CORRECTIVE-014-FIXUP-002 EXACT CANDIDATE — INDEPENDENT ACCEPTANCE REQUIRED BEFORE B RELEASE**. IA review `5320859635` is the source blocker. No B/C run or merge is authorized by this manifest.
+Task: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-014-FIXUP-003`
+Verdict: **CORRECTIVE-014-FIXUP-003 EXACT CANDIDATE — INDEPENDENT ACCEPTANCE REQUIRED BEFORE B RELEASE**. IA review `5320859635` is the source blocker. No B/C run or merge is authorized by this manifest.
 
-## Current authoritative manifest (CORRECTIVE-014-FIXUP-002)
+## Current authoritative manifest (CORRECTIVE-014-FIXUP-003)
 
-- **Current task**: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-014-FIXUP-002`
+- **Current task**: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-014-FIXUP-003`
 - **Scope**: close IA-BLK-004 only: shell-dispatch-wrapped duplicate lifecycle operations must count toward exact executable cardinality.
 - **C014-FIXUP-002 lifecycle checker blob**: `69c1fcb6cc5ba8f4fa5629c5943dc43233c5084f`. The E2E probe and final-freeze procedure remain unchanged from C013.
 - **Current exact gate**: `EXPECTED_CHECKS=158`; required `ALL_CHECKS=158/158 FAILURES=0`.
@@ -54,7 +54,7 @@ Canonical cross-document pins (must be identical in `operator_manifest.md`, `sou
 
 These are recomputed from the byte-exact lineage copy (`lineage_copy/`) and match the accepted A-002 evidence.
 
-## Historical deliverable index (CORRECTIVE-010 inventory; current gate is CORRECTIVE-014-FIXUP-002)
+## Historical deliverable index (CORRECTIVE-010 inventory; current gate is CORRECTIVE-014-FIXUP-003)
 
 ```
 reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/
@@ -112,7 +112,7 @@ Historical CORRECTIVE-003 (superseded):
 
 Per FIXUP-001 task §2, this historical block is explicitly labelled and does NOT represent the current release contract.
 
-## Frozen model-handling intent (current invariant, unchanged through CORRECTIVE-014-FIXUP-002)
+## Frozen model-handling intent (current invariant, unchanged through CORRECTIVE-014-FIXUP-003)
 
 **Separation:** `SyntheticProbeHandler` (mailbox bridge + inside-jail responder, `sandbox-bridge/synthetic-responder-v1/10 tokens`) vs **`ProductionResidentHandler`** (outside-jail `ProviderClient`, `contract text + envelope` only, real provenance).
 

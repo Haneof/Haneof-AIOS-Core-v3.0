@@ -5,7 +5,7 @@ Production entrypoint and every mutation self-test call check_runbook_lifecycle(
 The self-test writes disposable copies and invokes that same function; it does not
 reimplement the comparison.
 
-CORRECTIVE-014-FIXUP-002 / IA-BLK-004 retains the CORRECTIVE-013
+CORRECTIVE-014-FIXUP-003 / IA-BLK-004 retains the CORRECTIVE-013
 shell-fence/heredoc rules and fails closed on disguised lifecycle operations.
 Artifact-bound operations are recognized from their lifecycle path signature,
 not merely a literal executable word, and every operational step has a frozen
@@ -312,29 +312,60 @@ def _semantic_production_turn(command: str) -> bool:
     )
 
 
+def _has_command_assignment(command: str, executable: str) -> bool:
+    return bool(re.search(
+        rf"(?:^|[\s;&|()])(?:[A-Za-z_][A-Za-z0-9_]*)="
+        rf"{re.escape(executable)}(?=\s|;|&|\||$)",
+        command,
+    ))
+
+
 def _semantic_install_current_event(command: str) -> bool:
-    # Path identity, not the spelling of the executable, is the fail-closed
-    # semantic anchor. This catches command-name indirection such as
-    # cmd=install; "$cmd" ... as long as it targets the lifecycle artifacts.
     return (
         "reveal.json" in command
         and "current-event.json" in command
         and ".projection.json" not in command
+        and (
+            _has_shell_command_word(command, "install")
+            or _has_shell_command_word(command, "cp")
+            or _has_command_assignment(command, "install")
+            or _has_command_assignment(command, "cp")
+        )
     )
 
 
 def _semantic_projection_install(command: str) -> bool:
-    return "current-event.json" in command and ".projection.json" in command
+    return (
+        "current-event.json" in command
+        and ".projection.json" in command
+        and (
+            _has_shell_command_word(command, "install")
+            or _has_shell_command_word(command, "cp")
+            or _has_command_assignment(command, "install")
+            or _has_command_assignment(command, "cp")
+        )
+    )
 
 
 def _semantic_projection_sha256(command: str) -> bool:
-    return ".projection.json" in command and "projection_digests.sha256" in command
+    return (
+        ".projection.json" in command
+        and "projection_digests.sha256" in command
+        and (
+            _has_shell_command_word(command, "sha256sum")
+            or _has_command_assignment(command, "sha256sum")
+        )
+    )
 
 
 def _semantic_clear_binding(command: str) -> bool:
     return (
         "current-event.json" in command
         and "binding/current-event-binding.json" in command
+        and (
+            _has_shell_command_word(command, "rm")
+            or _has_command_assignment(command, "rm")
+        )
     )
 
 

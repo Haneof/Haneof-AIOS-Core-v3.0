@@ -1,4 +1,4 @@
-# CORRECTIVE-014-FIXUP-002 evidence contract
+# CORRECTIVE-014-FIXUP-003 evidence contract
 
 Status: **EXACT CANDIDATE — INDEPENDENT ACCEPTANCE REQUIRED BEFORE B RELEASE**
 
@@ -6,11 +6,11 @@ Source blocker: Independent Acceptance review `5320859635` / IA-BLK-004.
 
 ## Narrow corrective scope
 
-CORRECTIVE-014-FIXUP-002 keeps the lifecycle scope narrow and hardens the production checker against both executable wrapper duplicates and inert shell-control lookalikes. Artifact-bound semantic guards now key on the lifecycle path signature rather than a literal executable word, and every operational step has a frozen shell-command count. Thus `command <canonical>` duplicates, short-circuit lookalikes, command-name indirection (`cmd=install; "$cmd" ...`), and split variable-indirection attempts cannot satisfy or evade exact owner/document cardinality.
+CORRECTIVE-014-FIXUP-003 keeps the lifecycle scope narrow and hardens the production checker against both executable wrapper duplicates and inert shell-control lookalikes. Artifact-bound semantic guards accept either the direct executable word or an explicit command-name assignment (`cmd=install`, `cmd=rm`, `cmd=sha256sum`) together with the lifecycle artifact signature, while every operational step has a frozen shell-command count. Thus `command <canonical>` duplicates, short-circuit lookalikes, command-name indirection (`cmd=install; "$cmd" ...`), and split variable-indirection attempts cannot satisfy or evade exact owner/document cardinality.
 
 The production checker also adds frozen mutation-red probes for `command <canonical lifecycle operation>` duplicates for both active runbooks.
 
-- lifecycle checker blob: `69c1fcb6cc5ba8f4fa5629c5943dc43233c5084f`
+- lifecycle checker blob: `802ae399b224ad82062fae6633bbf85cc847022f`
 - E2E probe: unchanged from CORRECTIVE-013
 - final-freeze procedure: unchanged from CORRECTIVE-013
 - Core / handler / jail / binding / Scheme-A / usage / fixture / evaluator / PR #205: unchanged

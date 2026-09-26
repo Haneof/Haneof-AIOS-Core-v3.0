@@ -107,7 +107,7 @@ If `ISOLATION_FAIL`, STOP.
 ## 4a. Run the E2E transport probe — genuine + production + adversarial (no cursor 14 reveal)
 
 ```bash
-# exact current gate: EXPECTED_CHECKS=158, requires CHECKS==EXPECTED_CHECKS and zero FAIL (CORRECTIVE-014-FIXUP-002)
+# exact current gate: EXPECTED_CHECKS=158, requires CHECKS==EXPECTED_CHECKS and zero FAIL (CORRECTIVE-014-FIXUP-003)
 bash reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/isolation/probe_e2e.sh
 ```
 
