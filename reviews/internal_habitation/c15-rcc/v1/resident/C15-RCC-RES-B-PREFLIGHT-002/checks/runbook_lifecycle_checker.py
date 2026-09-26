@@ -5,13 +5,13 @@ Production entrypoint and every mutation self-test call check_runbook_lifecycle(
 The self-test writes disposable copies and invokes that same function; it does not
 reimplement the comparison.
 
-CORRECTIVE-014-FIXUP-001 / IA-BLK-004 retains the CORRECTIVE-013
+CORRECTIVE-014-FIXUP-002 / IA-BLK-004 retains the CORRECTIVE-013
 shell-fence/heredoc rules and fails closed on disguised lifecycle operations.
-Each required shell operation has a broad semantic detector plus one direct
-canonical form. A wrapper/compound/control line that still names the lifecycle
-operation is therefore either an extra semantic occurrence or a non-canonical
-sole occurrence; both are rejected. Python heredoc call sites remain inspected
-separately from shell commands.
+Artifact-bound operations are recognized from their lifecycle path signature,
+not merely a literal executable word, and every operational step has a frozen
+shell-command cardinality. This closes wrapper, short-circuit, command-variable,
+and split-indirection duplicate paths while still requiring one direct canonical
+operation. Python heredoc call sites remain inspected separately from shell commands.
 """
 from __future__ import annotations
 
@@ -313,40 +313,27 @@ def _semantic_production_turn(command: str) -> bool:
 
 
 def _semantic_install_current_event(command: str) -> bool:
+    # Path identity, not the spelling of the executable, is the fail-closed
+    # semantic anchor. This catches command-name indirection such as
+    # cmd=install; "$cmd" ... as long as it targets the lifecycle artifacts.
     return (
-        ("reveal.json" in command)
-        and ("current-event.json" in command)
+        "reveal.json" in command
+        and "current-event.json" in command
         and ".projection.json" not in command
-        and (
-            _has_shell_command_word(command, "install")
-            or _has_shell_command_word(command, "cp")
-        )
     )
 
 
 def _semantic_projection_install(command: str) -> bool:
-    return (
-        "current-event.json" in command
-        and ".projection.json" in command
-        and (
-            _has_shell_command_word(command, "install")
-            or _has_shell_command_word(command, "cp")
-        )
-    )
+    return "current-event.json" in command and ".projection.json" in command
 
 
 def _semantic_projection_sha256(command: str) -> bool:
-    return (
-        _has_shell_command_word(command, "sha256sum")
-        and ".projection.json" in command
-        and "projection_digests.sha256" in command
-    )
+    return ".projection.json" in command and "projection_digests.sha256" in command
 
 
 def _semantic_clear_binding(command: str) -> bool:
     return (
-        _has_shell_command_word(command, "rm")
-        and "current-event.json" in command
+        "current-event.json" in command
         and "binding/current-event-binding.json" in command
     )
 
@@ -375,6 +362,55 @@ def _require_unique_semantic_operation(
             f"{name}: semantic lifecycle operation {detail} must use the direct "
             f"canonical shell form in {owner}; found={matches[0][1]!r}"
         )
+
+
+def _require_operational_shell_shape(
+    name: str,
+    by_token: dict[str, list[str]],
+) -> None:
+    """Freeze executable-command cardinality for every operational owner step.
+
+    The two canonical runbooks intentionally differ only where per_cursor keeps
+    three exported binding paths in INSTALL_CURRENT_EVENT and exports
+    CURRENT_OCCURRED_AT in DERIVE_OCCURRED_AT. Any additional shell command in
+    these steps is fail-closed, including split variable-indirection attempts.
+    """
+    if name.endswith("b_startup_procedure.md"):
+        expected = {
+            "REVEAL": 1,
+            "INSTALL_CURRENT_EVENT": 1,
+            "PERSIST_PROJECTION_EVIDENCE": 3,
+            "CREATE_BINDING_RECEIPT": 3,
+            "VERIFY_BINDING": 1,
+            "DERIVE_OCCURRED_AT": 2,
+            "INGEST": 6,
+            "MODEL_WORK": 1,
+            "DURABLE_ACK": 1,
+            "CLEAR_BINDING": 1,
+        }
+    elif name.endswith("per_cursor_interaction.md"):
+        expected = {
+            "REVEAL": 1,
+            "INSTALL_CURRENT_EVENT": 4,
+            "PERSIST_PROJECTION_EVIDENCE": 3,
+            "CREATE_BINDING_RECEIPT": 3,
+            "VERIFY_BINDING": 1,
+            "DERIVE_OCCURRED_AT": 3,
+            "INGEST": 6,
+            "MODEL_WORK": 1,
+            "DURABLE_ACK": 1,
+            "CLEAR_BINDING": 1,
+        }
+    else:
+        raise LifecycleCheckError(f"{name}: unknown canonical runbook identity")
+
+    for token, expected_count in expected.items():
+        actual = len(by_token[token])
+        if actual != expected_count:
+            raise LifecycleCheckError(
+                f"{name}: {token} shell-command cardinality must be exactly "
+                f"{expected_count}; found={actual} commands={by_token[token]!r}"
+            )
 
 
 def _is_receipt_command(text: str) -> bool:
@@ -592,6 +628,8 @@ def assert_step_executable_contracts(name: str, text: str) -> None:
     parsed = {token: _shell_contents_in(body) for token, body in bodies.items()}
     by_token = {token: parts[0] for token, parts in parsed.items()}
     python_by_token = {token: parts[1] for token, parts in parsed.items()}
+
+    _require_operational_shell_shape(name, by_token)
 
     _require_unique_semantic_operation(
         name, "REVEAL", by_token,
@@ -1026,6 +1064,65 @@ def run_shell_semantics_mutation_tests(base: Path) -> int:
                     stage,
                 )
                 cases += 1
+
+            # FIXUP-002: direct artifact signatures and step command counts
+            # must also reject command-name and split variable indirection.
+            indirect_specs = (
+                (
+                    "INSTALL_CURRENT_EVENT",
+                    INSTALL_CURRENT_EVENT_CMD,
+                    'cmd=install; "$cmd"' + INSTALL_CURRENT_EVENT_CMD[len("install"):],
+                    "indirect_install_current_event",
+                ),
+                (
+                    "PERSIST_PROJECTION_EVIDENCE",
+                    PERSIST_INSTALL_CMD,
+                    'cmd=install; "$cmd"' + PERSIST_INSTALL_CMD[len("install"):],
+                    "indirect_projection_install",
+                ),
+                (
+                    "PERSIST_PROJECTION_EVIDENCE",
+                    PERSIST_SHA256_CMD,
+                    'cmd=sha256sum; "$cmd"' + PERSIST_SHA256_CMD[len("sha256sum"):],
+                    "indirect_projection_sha256",
+                ),
+                (
+                    "CLEAR_BINDING",
+                    CLEAR_BINDING_CMD,
+                    'cmd=rm; "$cmd"' + CLEAR_BINDING_CMD[len("rm"):],
+                    "indirect_clear_binding",
+                ),
+            )
+            for owner, _canonical, indirect_command, label in indirect_specs:
+                mutated = _insert_fence_in_step(
+                    original, owner, indirect_command, "bash",
+                )
+                stage = root / f"I-{prefix}-{label}"
+                _stage(base, stage, {doc_rel: mutated})
+                _expect_red(
+                    f"IA-BLK-004-I:{label}:{doc_rel.name}",
+                    stage,
+                )
+                cases += 1
+
+            split_indirect = _insert_fence_in_step(
+                original,
+                "INSTALL_CURRENT_EVENT",
+                '\n'.join((
+                    'src="$RUN_ROOT/reveal.json"',
+                    'dst="$RUN_ROOT/current-event.json"',
+                    'cmd=install',
+                    '"$cmd" -m 0400 "$src" "$dst"',
+                )),
+                "bash",
+            )
+            stage = root / f"J-{prefix}-split-indirect-install"
+            _stage(base, stage, {doc_rel: split_indirect})
+            _expect_red(
+                f"IA-BLK-004-J:split_indirect_install:{doc_rel.name}",
+                stage,
+            )
+            cases += 1
 
             receipt_line = 'write_binding_receipt(receipt, os.environ["AIOS_CURRENT_EVENT_BINDING_PATH"])'
             if original.count(receipt_line) != 1:

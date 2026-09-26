@@ -1,10 +1,10 @@
-# C15-RCC-RES-B-PREFLIGHT-002 — Completion Report (CORRECTIVE-014-FIXUP-001)
+# C15-RCC-RES-B-PREFLIGHT-002 — Completion Report (CORRECTIVE-014-FIXUP-002)
 
 Date: 2026-09-26
-Task: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-014-FIXUP-001`
+Task: `C15-RCC-RES-B-PREFLIGHT-002-CORRECTIVE-014-FIXUP-002`
 Role: Release / Test Infrastructure Engineer
 
-## Current state: **CORRECTIVE-014-FIXUP-001 EXACT CANDIDATE — INDEPENDENT ACCEPTANCE REQUIRED BEFORE B RELEASE**
+## Current state: **CORRECTIVE-014-FIXUP-002 EXACT CANDIDATE — INDEPENDENT ACCEPTANCE REQUIRED BEFORE B RELEASE**
 
 PM blocker review `5319913802` was released by task record `5835591147`. This fixup is limited to current evidence/canonical synchronization; no Corrective-013 implementation bytes are to change. `corrective_012_report.md` and earlier corrective reports remain historical.
 
@@ -12,17 +12,17 @@ The only preflight reveal is a disposable operator-side reveal on a copied relea
 
 Remote parent: `86aafc1937b58071d4780c77cf2e8abe7fcbed5b`; its tree is `a22f14753e0627a95b08cfb8e60ae3ad80304620`. Local source commit `4ad5f980c2a041c88f9c0fdec62753d7f8b38fb4` has that same tree but different ancestry. PM must rebuild from the remote parent.
 
-## Current CORRECTIVE-014-FIXUP-001 gate contract
+## Current CORRECTIVE-014-FIXUP-002 gate contract
 
 - `EXPECTED_CHECKS=158`
 - `ALL_CHECKS=158/158 FAILURES=0`
 - `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5`
 - `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18`
-- `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=52`
+- `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=62`
 - required markers also include `CANONICAL_PIN_CONSISTENCY_PASS` and `CANONICAL_RUNBOOK_EXECUTABLE_PASS`
 - final marker `CORRECTIVE_013_E2E_PASS`
 
-IA review `5320859635` identified IA-BLK-004: shell dispatch wrappers could execute duplicate lifecycle operations while the checker counted only bare command starts/exact strings. CORRECTIVE-014-FIXUP-001 fixes that production checker with a semantic-operation guard, preserves direct canonical-form qualification, and adds wrapper plus inert short-circuit mutation-red coverage. Fresh frozen evidence is authoritative only when the committed `isolation/e2e_probe_output.txt` itself shows shell-semantics `cases=52` and `ALL_CHECKS=158/158 FAILURES=0`; no hand-assembled E2E output is valid.
+IA review `5320859635` identified IA-BLK-004: shell dispatch wrappers could execute duplicate lifecycle operations while the checker counted only bare command starts/exact strings. CORRECTIVE-014-FIXUP-002 fixes that production checker with a artifact-path semantic guards, preserves direct canonical-form qualification, freezes operational shell-command counts, and covers wrappers, inert short-circuits, command-name indirection, and split variable indirection. Fresh frozen evidence is authoritative only when the committed `isolation/e2e_probe_output.txt` itself shows shell-semantics `cases=62` and `ALL_CHECKS=158/158 FAILURES=0`; no hand-assembled E2E output is valid.
 
 ## IA-BLK-001 — production usage no synthesis
 
@@ -98,13 +98,13 @@ Its self-test reintroduces the historical receipt-before-current-event ordering,
 evidence, and duplicates projection evidence; every mutation must red. Required marker:
 `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`.
 
-## Current CORRECTIVE-014-FIXUP-001 gate and evidence
+## Current CORRECTIVE-014-FIXUP-002 gate and evidence
 
-Active gate: `EXPECTED_CHECKS=158`; required result `ALL_CHECKS=158/158 FAILURES=0`; final marker `CORRECTIVE_013_E2E_PASS`. Required markers include `ENVIRONMENT_PASS`, `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `CANONICAL_RUNBOOK_EXECUTABLE_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5`, `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18`, and `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=52`.
+Active gate: `EXPECTED_CHECKS=158`; required result `ALL_CHECKS=158/158 FAILURES=0`; final marker `CORRECTIVE_013_E2E_PASS`. Required markers include `ENVIRONMENT_PASS`, `RAW_USAGE_NO_SYNTHESIS_PASS`, `CANONICAL_PIN_CONSISTENCY_PASS`, `CANONICAL_PIN_MUTATION_RED_PASS`, `CANONICAL_RUNBOOK_EXECUTABLE_PASS`, `CANONICAL_RUNBOOK_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`, `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5`, `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18`, and `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=62`.
 
 Fresh frozen E2E: **PASS, exit 0**, Debian GNU/Linux 12 (bookworm) disposable runtime. Both `python3 --version` and `/usr/bin/python3 --version` were `Python 3.11.2`; package versions were Pydantic `2.13.5`, pydantic_core `2.46.5`, annotated-types `0.8.0`, typing-inspection `0.4.4`, and typing_extensions `4.16.0`. The exact `requirements.freeze.txt` SHA check and live `pip freeze` line check passed.
 
-The CORRECTIVE-013 log/hash above is historical and is not C014 qualification. For CORRECTIVE-014-FIXUP-001, the committed fresh E2E log must itself prove: frozen Python/dependency environment, cursor-14 payload-leak protection, cross-document cases `5`, executable cases `18`, shell-semantics cases `48`, and `ALL_CHECKS=158/158 FAILURES=0`.
+The CORRECTIVE-013 log/hash above is historical and is not C014 qualification. For CORRECTIVE-014-FIXUP-002, the committed fresh E2E log must itself prove: frozen Python/dependency environment, cursor-14 payload-leak protection, cross-document cases `5`, executable cases `18`, shell-semantics cases `48`, and `ALL_CHECKS=158/158 FAILURES=0`.
 
 Historical C012 `157/157` results and the old C012 raw-log digest are not current evidence; see the unchanged `corrective_012_report.md`.
 
