@@ -1,11 +1,11 @@
 # AIOS v3.0 当前工程断点
 
-## 当前控制入口 — 2026-09-25 FIX-001/002/003 DONE / HEADLESS DONE / RECOVERY DONE / SCALE DONE / RC-FREEZE DONE / FRESH-A-002 ACCEPTED / B-PREFLIGHT-002 READY / CI-FIX DONE
+## 当前控制入口 — 2026-09-26 B-PREFLIGHT-002 DONE / ACCEPTED / B-RELEASE-002 READY
 
 - 接任 PM live 复核：live main = `e72a63874ed2c28798b00cec51f191caf1594a00`，Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`；见 `governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
 - `CORE-OPERATOR-001 = DONE`：独立验收 #135（ACCEPTANCE_PASS）先合 `fe6f1740eb`，候选 #131 后合 `e72a63874e`；报告 `reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md`。
 - `CORE-BASELINE-001 = DONE（re-verified）`；PR #136 已去除 pelican 文件，改作本 PM 补充治理 PR（pelican 提交 `f8edb5d1` 仅留历史，不合入）。
-- 合后 p16 `35958610555` SUCCESS；PR #130 = SUPERSEDED / NOT INTEGRATED。当前 S2：FIX-001/002/003、HEADLESS、RECOVERY、SCALE、CI-FIX 均 DONE。`CORE-RC-FREEZE-001 = DONE`：独立验收 #203 head `e622437489aac3de04570422043681ac731cf0a6` 先合为 `85c0aba5fed826e5058bc8af59180c3d04a96eaa`；RC packet #202 exact head `b392f73f53180620842a1c25575a8a7567cc8773` 后合为 `305aea162cfd53105179b63dd06704aa7bce3ccc`。frozen software = `773876f92d5f8e53422f8f5a68cc651953d93052`；Core tree = `fe77f8a0706acfaf369041d0882b6d0e6de39f22`；impact = `FRESH_A_REQUIRED`；receipt = `governance/CORE_RC_FREEZE_001_INTEGRATION_RECEIPT_2026-09-24.md`。`C15-RCC-RES-A-RERUN-002 = DONE / ACCEPTED`：review-only PR #207 `ACCEPTANCE_PASS / blocker=0` merged `c1236bf2fd6ea259fe7d487c5ac0e96abd072141`；canonical evidence PR #205 exact `d17ae972ad1d312735c355f775ac024bc4cebdf7` 保持 OPEN / UNMERGED / PINNED；receipt `governance/C15_RCC_RES_A_RERUN_002_ACCEPTANCE_INTEGRATION_RECEIPT_2026-09-25.md`。唯一下一 READY = `C15-RCC-RES-B-PREFLIGHT-002`；prompt `governance/prompts/C15_RCC_RES_B_PREFLIGHT_002_2026-09-25.md`；B Resident/C/C16/broad P16/P17 继续 BLOCKED。CI-FIX = DONE。
+- S2 / HEADLESS / RECOVERY / SCALE / CI-FIX / RC-FREEZE 均 DONE。frozen software = `773876f92d5f8e53422f8f5a68cc651953d93052`；Core tree = `fe77f8a0706acfaf369041d0882b6d0e6de39f22`。A-002 已由 #207 接受；PR #205 exact `d17ae972ad1d312735c355f775ac024bc4cebdf7` 继续 OPEN / UNMERGED / PINNED。B-PREFLIGHT-002 已完成 fresh independent acceptance：PR #209 exact `aab3a30cc48e8c7041ef4b37e0e5f379c3060c93`，review `5323972504` = ACCEPTANCE_PASS / blocker=0，merge `65e6e8266bb0541d624eb8e5bba825b91145564f`。唯一下一 READY = `C15-RCC-RES-B-RELEASE-002`；prompt `governance/prompts/C15_RCC_RES_B_RELEASE_002_2026-09-26.md`；release record 集成 main 前不得 reveal cursor 14、不得运行 Resident B/C。
 
 ## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / FIX-001+002 READY
 
@@ -25,7 +25,7 @@
 
 ## 2026-09-25 PM durable follow-up plan — 不得靠聊天记忆丢失
 
-- 当前主线优先级**不变**：继续 `C15-RCC-RES-B-PREFLIGHT-002`；B/C/C15 closure 未完成前不得插队做下述 follow-up。
+- 当前主线优先级：`C15-RCC-RES-B-RELEASE-002` 为唯一 READY；B-RERUN-002 仍 BLOCKED，直到 release record 集成 main。B/C/C15 closure 未完成前不得插队做后续 follow-up。
 - 新增 `POST-C15-ISSUE-RECONCILIATION-001 = BLOCKED on C15-RCC-CLOSE-001`：C15 CLOSE 后，必须对 #23/#28/#33/#34/#35 在届时 live main 做 fresh current-state revalidation。2026-09-25 PM 已确认对应修复 PR #24/#49/#51/#54/#55 均已进入当前 main；因此默认不是新 Core 修复任务。届时若仍可复现，只能创建新的单窗口工程 Task，不得在 reconciliation 窗口顺手修改 Core。
 - “AI 持续了解用户并真正帮上忙”的后续产品化入口已显式冻结为：`P18-REALITY-HELP-INTEGRATION-001`（真实平台 Action→Outcome 闭环）→ `P19-HELP-EXPERIENCE-001`（授权/提醒/解释/纠正/Launcher/Voice/Digital Human 产品体验）。两者均 BLOCKED until P17 release gate，通过前不得提前另造平行执行系统。
 - 这三项已同步写入 `governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md` / `PROJECT_MASTER_MAP.md`，以后新 PM 窗口必须从仓库恢复，不得依赖本次聊天。
