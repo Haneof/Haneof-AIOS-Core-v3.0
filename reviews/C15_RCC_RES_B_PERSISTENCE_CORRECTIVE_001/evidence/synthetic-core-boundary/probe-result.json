@@ -1,0 +1,12 @@
+{
+  "status": "CORRECTIVE_CONVERGENCE_BLOCKED",
+  "synthetic": true,
+  "root": "/home/user/c15-persistence-unit-probes/synthetic-core-gap-b73e207209dd4cb59756298f643ea098",
+  "killed_returncode": -9,
+  "disposition": "in_doubt",
+  "ordinary_retry_refused": true,
+  "explicit_retry_refused": true,
+  "redispatches": 0,
+  "reply_sha256": "5cfc42b2f36aba93f32045d8a40022ec8b9f99a669b51eab0d8b725cef10421f",
+  "note": "Expected Core fail-closed behavior; not exactly-once convergence or a Core regression."
+}

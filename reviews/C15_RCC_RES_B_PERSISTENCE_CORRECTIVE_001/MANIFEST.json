@@ -1,0 +1,24 @@
+{
+  "format": "c15-persistence-wip-evidence-v1",
+  "status": "WIP_BLOCKED_NOT_REVIEW_READY",
+  "sha256": {
+    "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/ENGINEERING_STATUS.md": "36dc1eb6de4b420f75ac1c1fd801eed575d4b05d2743bcd15ac5a32ba5c54150",
+    "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/evidence/core-boundary-attempt-01.log": "b50d7e150c8e297e1f55f312637955fa156322d0af8ae6f5706dd1da8c9c7340",
+    "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/evidence/environment-install.log": "7d46b2692e9cb7e67cc2f3c966d37410ca8325c53a376eea601af8b224bbffee",
+    "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/evidence/frozen-attempt-01.log": "af14e2bd447c40845927f770733d7c7d969cc7de7ae529cecc240cd44ec98a18",
+    "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/evidence/frozen-attempt-02.log": "44ca765dd63f4119fdb91f1df0d25c8e6b27d90a57d39e0cb12a5ab1cf2cef42",
+    "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/evidence/lifecycle-attempt-01.log": "0dfc9e440be3d361d8453c9fca3344ef6599d8fa55ea6473ea3307786f41fdde",
+    "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/evidence/persistence-attempt-01.log": "a3fbc0a9ebbfa0ce509dcedbebbbc356a006344eaba39ae8212d61a17d39a91a",
+    "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/evidence/persistence-attempt-02.log": "8c7fb62d913313b230a7e1a14c6d157226dc130c70602eab87a5f320c548ad2f",
+    "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/evidence/persistence-final.log": "9b10c2121142d53a6e433677fd09272de0db1b7e8f46c510df4cc5d4d7269efc",
+    "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/evidence/scope-check.json": "bc9aaa935fff9bccccc385029a4ceae9777b80fd742b5c4c50836e53e89cd7a5",
+    "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/evidence/synthetic-core-boundary/index.sqlite": "abd6fb1c3a18ccef8e559836d921bfa5a9cd782df1b1fab6f7415aaf1b6cb216",
+    "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/evidence/synthetic-core-boundary/probe-result.json": "5e26a4b695c1c91eff4db506c57aad10fd46d2c68867079ee5b0a98090d24198",
+    "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/evidence/synthetic-core-boundary/reply.raw": "5cfc42b2f36aba93f32045d8a40022ec8b9f99a669b51eab0d8b725cef10421f",
+    "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/evidence/synthetic-core-boundary/world.sqlite": "779c32899d59768f78749c48831bb1960cd6f73da70b7d286b61331b551999e1",
+    "tests/c15_persistence/probe_core_boundary.py": "7aeb8b72bd273d02b0861e2753c22f2910a15527cd39b3ad11903aefe964e5a7",
+    "tests/c15_persistence/test_journal.py": "c4887a947a7a4ae3c99efdb1fac3330da5716815c3f93e45169aa976f5dda804",
+    "tools/c15_persistence/__init__.py": "442b53b92b0906af264d056cc77b898489858a81427fcce28120ecbbc28e8bb2",
+    "tools/c15_persistence/journal.py": "4f7c6dacf8baca95c2b812351bbbe4bf03209a2a8ddce3f9ea79f2fe97dd6b1b"
+  }
+}
