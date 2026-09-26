@@ -1,0 +1,178 @@
+name: c15-rcc-c014-independent-acceptance
+
+on:
+  push:
+    branches:
+      - validation/c15-rcc-b-preflight-ia-c014
+
+permissions:
+  contents: read
+
+jobs:
+  independent-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout exact acceptance candidate
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: aab3a30cc48e8c7041ef4b37e0e5f379c3060c93
+
+      - name: Fresh ground truth and scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "aab3a30cc48e8c7041ef4b37e0e5f379c3060c93"
+          git fetch origin main
+          git fetch origin pull/205/head:refs/remotes/origin/pr205
+          LIVE_MAIN="$(git rev-parse origin/main)"
+          PR205="$(git rev-parse origin/pr205)"
+          echo "LIVE_MAIN=$LIVE_MAIN"
+          echo "PR205=$PR205"
+          test "$PR205" = "d17ae972ad1d312735c355f775ac024bc4cebdf7"
+          test "$(git rev-parse HEAD:src/aios_core)" = "fe77f8a0706acfaf369041d0882b6d0e6de39f22"
+          MB="$(git merge-base origin/main HEAD)"
+          git diff --name-only "$MB"..HEAD | tee /tmp/c014-ia-files.txt
+          test -s /tmp/c014-ia-files.txt
+          if grep -v '^reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/' /tmp/c014-ia-files.txt; then
+            echo "OUT_OF_SCOPE_FILE"
+            exit 1
+          fi
+          echo "GROUND_TRUTH_SCOPE_PASS"
+
+      - name: Independent lifecycle adversarial probes
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002"
+          python3 - <<'PY' | tee /tmp/c014-ia-adversarial.log
+          from __future__ import annotations
+          import importlib.util
+          import inspect
+          import re
+          import shutil
+          import tempfile
+          from pathlib import Path
+
+          root = Path("reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002").resolve()
+          checker = root / "checks/runbook_lifecycle_checker.py"
+          spec = importlib.util.spec_from_file_location("c014_lifecycle", checker)
+          lc = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(lc)
+
+          docs = lc.read_docs(root)
+          lc.check_runbook_lifecycle(root)
+
+          expected = {
+              "procedure/b_startup_procedure.md": "c56f528f4ea181ae002ed22d3e810ab6022ddb17",
+              "procedure/per_cursor_interaction.md": "17f27956152f4edd49b57f72c7546eef668406fa",
+          }
+          for rel, text in docs.items():
+              got = lc._git_blob_sha(text)
+              assert got == expected[str(rel)], (rel, got)
+          source = inspect.getsource(lc.check_one)
+          assert source.index("assert_step_executable_contracts") < source.index("_assert_frozen_runbook_blob")
+          assert source.index("assert_no_receipt_before_current_event") < source.index("_assert_frozen_runbook_blob")
+          print("SEMANTIC_BEFORE_BLOB_BACKSTOP_PASS")
+
+          def expect_red(label: str, rel: Path, mutated: str) -> None:
+              with tempfile.TemporaryDirectory() as td:
+                  stage = Path(td)
+                  for doc_rel, text in docs.items():
+                      out = stage / doc_rel
+                      out.parent.mkdir(parents=True, exist_ok=True)
+                      out.write_text(mutated if doc_rel == rel else text, encoding="utf-8")
+                  try:
+                      lc.check_runbook_lifecycle(stage)
+                  except lc.LifecycleCheckError as exc:
+                      print("IA_EXTERNAL_MUTATION_RED_PASS", label, "via", str(exc)[:300])
+                      return
+                  raise AssertionError(f"false green: {label}")
+
+          def before_first_reveal(text: str, command: str) -> str:
+              m = re.search(r"^###\s+(?:7\.)?1\.?\s+REVEAL\b.*$", text, re.M)
+              assert m, "REVEAL heading missing"
+              block = "~~~bash\n" + command + "\n~~~\n\n"
+              return text[:m.start()] + block + text[m.start():]
+
+          rop = "reviews/internal_habitation/c15-rcc/v1/release/release_operator.py"
+          install = 'install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"'
+          wrapped_install = "command " + install
+          quoted_install = 'ins""tall -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"'
+          wrapped_reveal = (
+              "env python3 " + rop +
+              ' reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal-extra.json"'
+          )
+
+          cases = 0
+          for rel, text in docs.items():
+              expect_red(f"{rel}:outside_command_wrapper_install", rel, before_first_reveal(text, wrapped_install)); cases += 1
+              expect_red(f"{rel}:outside_quote_concat_install", rel, before_first_reveal(text, quoted_install)); cases += 1
+              expect_red(f"{rel}:outside_env_reveal", rel, before_first_reveal(text, wrapped_reveal)); cases += 1
+
+              changed_lang = text.replace("~~~bash", "~~~text", 1) if "~~~bash" in text else text.replace("```bash", "```text", 1)
+              assert changed_lang != text
+              expect_red(f"{rel}:shell_fence_language_drift", rel, changed_lang); cases += 1
+
+              anchor = "from bridged_model_handler import create_current_event_binding_receipt"
+              assert anchor in text
+              heredoc_drift = text.replace(anchor, "import subprocess\n" + anchor, 1)
+              expect_red(f"{rel}:python_heredoc_payload_drift", rel, heredoc_drift); cases += 1
+
+              write = 'write_binding_receipt(receipt, os.environ["AIOS_CURRENT_EVENT_BINDING_PATH"])'
+              assert text.count(write) == 1
+              dup_write = text.replace(write, write + "\n" + write, 1)
+              expect_red(f"{rel}:duplicate_python_receipt_write", rel, dup_write); cases += 1
+
+          print(f"EXTERNAL_ADVERSARIAL_PASS cases={cases}")
+          PY
+          grep -q '^SEMANTIC_BEFORE_BLOB_BACKSTOP_PASS$' /tmp/c014-ia-adversarial.log
+          grep -q '^EXTERNAL_ADVERSARIAL_PASS cases=12$' /tmp/c014-ia-adversarial.log
+
+          python3 "$ROOT/checks/runbook_lifecycle_checker.py" --base "$ROOT" --self-test | tee /tmp/c014-ia-selftest.log
+          grep -q '^RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5$' /tmp/c014-ia-selftest.log
+          grep -q '^RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18$' /tmp/c014-ia-selftest.log
+          grep -q '^RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=82$' /tmp/c014-ia-selftest.log
+          echo "INDEPENDENT_LIFECYCLE_PROBES_PASS"
+
+      - name: Frozen Debian 12 E2E acceptance
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/c014-ia-artifacts"
+          cp /tmp/c014-ia-adversarial.log "$GITHUB_WORKSPACE/c014-ia-artifacts/"
+          cp /tmp/c014-ia-selftest.log "$GITHUB_WORKSPACE/c014-ia-artifacts/"
+          docker run --privileged --rm             --security-opt seccomp=unconfined             -v "$GITHUB_WORKSPACE:/work/repo"             -w /work/repo             debian:12             bash -lc '
+              set -euo pipefail
+              export DEBIAN_FRONTEND=noninteractive
+              apt-get update >/dev/null
+              apt-get install -y --no-install-recommends                 python3 python3-pip sudo util-linux iproute2 procps                 coreutils findutils grep sed gawk openssl ca-certificates >/dev/null
+              test "$(python3 --version)" = "Python 3.11.2"
+              test "$(/usr/bin/python3 --version)" = "Python 3.11.2"
+              python3 -m pip install --break-system-packages                 -r reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/requirements.freeze.txt >/dev/null
+              ROOT=/work/repo/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002
+              export RUN_ROOT=/tmp/c014-ia-e2e
+              rm -rf "$RUN_ROOT"
+              bash "$ROOT/isolation/probe_e2e.sh"
+              cp "$RUN_ROOT/e2e.log" /work/repo/c014-ia-artifacts/e2e.log
+            '
+          LOG="$GITHUB_WORKSPACE/c014-ia-artifacts/e2e.log"
+          grep -q '^ENVIRONMENT_PASS$' "$LOG"
+          grep -q '^ALL_CHECKS=158/158 FAILURES=0$' "$LOG"
+          grep -q '^RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5$' "$LOG"
+          grep -q '^RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18$' "$LOG"
+          grep -q '^RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=82$' "$LOG"
+          grep -q '^NO_COMMITTED_CURSOR14_PAYLOAD_PASS ' "$LOG"
+          grep -q '^CORRECTIVE_013_E2E_PASS$' "$LOG"
+          if grep -q '^CHECK FAIL:' "$LOG"; then exit 1; fi
+          sha256sum "$LOG" | tee "$GITHUB_WORKSPACE/c014-ia-artifacts/e2e.sha256"
+          echo "INDEPENDENT_FROZEN_E2E_PASS"
+
+      - name: Upload independent acceptance evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: c15-rcc-c014-independent-acceptance
+          path: c014-ia-artifacts/
+          if-no-files-found: error
+          retention-days: 7
