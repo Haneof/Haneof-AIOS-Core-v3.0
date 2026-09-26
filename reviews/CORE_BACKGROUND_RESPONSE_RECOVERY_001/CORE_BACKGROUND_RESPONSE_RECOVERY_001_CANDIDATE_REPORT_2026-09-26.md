@@ -7,8 +7,8 @@ Status: **GATE / REVIEW_READY** (candidate only; NOT self-accepted, NOT DONE, no
 - Work branch: `arena/01a0dcf6-haneof-aios-core-v3-0`
 - Tested exact candidate SHA: `3f9ec00d0fa283bc5294574d6da1e84d654d6645`
 - Evidence-only commits that follow the tested SHA touch documentation/logs only.
-- Candidate PR: opened from the work branch; the PR head is the evidence-only commit and the tested
-  exact SHA is the one named above. Independent acceptance must evaluate that exact SHA.
+- Candidate PR: **#219** (`arena/01a0dcf6-haneof-aios-core-v3-0` → `main`). Its head is the
+  evidence-only commit; the tested exact SHA is the one named above. Independent acceptance must evaluate that exact SHA.
 - Independent acceptance task (`CORE-BACKGROUND-RESPONSE-RECOVERY-001-INDEPENDENT-ACCEPTANCE`) is
   not performed here. No RC re-freeze, no Resident run, no operator-persistence work happened.
 

@@ -9,7 +9,7 @@
 
 ## 2026-09-26 CORE-BACKGROUND-RESPONSE-RECOVERY-001 = GATE / REVIEW_READY（未 DONE、未合入、未自验）
 
-- 工程候选已交付并停在上表规定出口：branch `arena/01a0dcf6-haneof-aios-core-v3-0`；**tested exact candidate = `3f9ec00d0fa283bc5294574d6da1e84d654d6645`**（其后仅 evidence-only 文档/日志提交）；候选 PR 由该分支开启。
+- 工程候选已交付并停在上表规定出口：branch `arena/01a0dcf6-haneof-aios-core-v3-0`；**tested exact candidate = `3f9ec00d0fa283bc5294574d6da1e84d654d6645`**（其后仅 evidence-only 文档/日志提交）；候选 PR = #219。
 - 交付内容：exact-response staging（严格 encode/decode、fingerprint + provider/model/request_id + payload-hash 校验）、`RecoveredModelResponse` 恢复消费点（绝不重新 dispatch provider）、wake/review/user-turn 三路 resume 同一 attempt/round、recovered round 写时间钉住保证 capability 副作用 exactly-once、`exact_response_ready` disposition 与 attempt 绑定的 metering。
 - Gate 证据：全量 `717 passed`（exit 0 / junit failures=0 errors=0 skipped=0）；聚焦子集 `93 passed`；十点 fault matrix 全绿；6 组红突变逐条回滚并保留日志。报告与红证据：`reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001/`。
 - 未做且不得由此窗口做：独立验收（self-acceptance）、`CORE-RC-REFREEZE-002`、B persistence corrective 恢复、任何 Resident 运行。

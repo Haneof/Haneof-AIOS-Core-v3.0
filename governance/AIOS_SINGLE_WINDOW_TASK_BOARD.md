@@ -18,7 +18,7 @@
 - **`CORE-CI-FIX-001 = DONE`**：首轮 review #150 对 head `1896b3e5...` 正确给出 ACCEPTANCE_FAIL（历史 blocker 保留）；corrective review #156 对 exact head `1eb24e101cdb1579c22c69b435cf9f79a3c359ad` 给出 ACCEPTANCE_PASS / 0 blockers；#156 先合 `f3d20c22...`，随后 #146 以 pinned head 合入 `c3ec42214db57864f7951e28b75811b10db8be21`。收据：`governance/CORE_CI_FIX_001_INTEGRATION_RECEIPT_2026-09-24.md`。PR #144 继续 SUPERSEDED / NOT INTEGRATED。历史派工说明：**（release/CI 基础设施）：`c15-rcc-fixture-mechanical-gate` 与 `semantic-repair-mechanical-gate` 的 "prove zero Core diff" 步骤在浅克隆上 `git` 自身 exit 128，随分支形状时红时绿（#133 红 / #137 绿 / #138 #139 红），不是策略违规。发现与 PM 裁决：`governance/AIOS_CORE_CI_FINDING_001_2026-09-24.md`；提示词：`governance/prompts/CORE_CI_FIX_001_2026-09-24.md`。不阻塞 FIX-001/002，但 **必须在 `CORE-RC-FREEZE-001` 之前关闭**。
 - #138/#139 两条红检查登记为 **INFRASTRUCTURE_FAILURE**，不登记为通过、也不登记为已接受的违规；PM 已用直接证据独立验证不变式成立（`git diff e72a638..main -- src/` 为空，Core tree 仍 `7db4f72e`），未绕过分支保护（该两项非 required）。
 - `CORE-HEADLESS-001 = DONE`；`CORE-RECOVERY-001 = DONE`；`CORE-SCALE-001 = DONE`；旧 RC freeze / A-002 / B preflight/release 历史证据均保留。RERUN-002 因 ephemeral `/tmp` state loss 为 `FAILED / INFRASTRUCTURE_STATE_LOSS / NON-CANONICAL`，旧 identity 永久退休。Persistence corrective 的 reply-staged crash 红证据已冻结在 draft PR #216，当前状态为 `FROZEN_WIP / BLOCKED_ON_CORE_RESPONSE_RECOVERY`。#214 的 post-red Gate 放宽仅保留为历史并已被 gate-integrity correction supersede。
-- **2026-09-26 工程窗口写回（本任务尚未 DONE）**：`CORE-BACKGROUND-RESPONSE-RECOVERY-001` 已达 `GATE / REVIEW_READY`，**未自验、未合入**。branch `arena/01a0dcf6-haneof-aios-core-v3-0`；tested exact candidate `3f9ec00d0fa283bc5294574d6da1e84d654d6645`（其后仅 evidence-only 文档/日志提交）；候选 PR 由该分支开启。完整证据与红证据：`reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CANDIDATE_REPORT_2026-09-26.md` + `reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001/red/`。下一步 = `CORE-BACKGROUND-RESPONSE-RECOVERY-001-INDEPENDENT-ACCEPTANCE`（必须由独立窗口攻击该 exact candidate）；IA PASS 之前不得进入 `CORE-RC-REFREEZE-002`，B persistence corrective 继续 FROZEN_WIP。后续顺序不变：IA → RC-REFREEZE-002 → fresh A-RERUN-003/accept → resume persistence corrective/IA → RELEASE-003 → RERUN-003 → B-ACCEPT-003。
+- **2026-09-26 工程窗口写回（本任务尚未 DONE）**：`CORE-BACKGROUND-RESPONSE-RECOVERY-001` 已达 `GATE / REVIEW_READY`，**未自验、未合入**。branch `arena/01a0dcf6-haneof-aios-core-v3-0`；tested exact candidate `3f9ec00d0fa283bc5294574d6da1e84d654d6645`（其后仅 evidence-only 文档/日志提交）；候选 PR = #219。完整证据与红证据：`reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CANDIDATE_REPORT_2026-09-26.md` + `reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001/red/`。下一步 = `CORE-BACKGROUND-RESPONSE-RECOVERY-001-INDEPENDENT-ACCEPTANCE`（必须由独立窗口攻击该 exact candidate）；IA PASS 之前不得进入 `CORE-RC-REFREEZE-002`，B persistence corrective 继续 FROZEN_WIP。后续顺序不变：IA → RC-REFREEZE-002 → fresh A-RERUN-003/accept → resume persistence corrective/IA → RELEASE-003 → RERUN-003 → B-ACCEPT-003。
 
 ## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / S1-S2 ACTIVE
 
@@ -1544,7 +1544,7 @@ Status: GATE / REVIEW_READY（candidate delivered; NOT self-accepted, NOT DONE, 
 Started from main: a310bf1202bf41644c2f3e25798053a6636e14be
 Work branch: arena/01a0dcf6-haneof-aios-core-v3-0
 Candidate SHA: 3f9ec00d0fa283bc5294574d6da1e84d654d6645（tested exact; 其后仅 evidence-only 文档/日志提交）
-PR: opened from the work branch（head = evidence-only commit；独立验收必须攻击上面的 tested exact SHA）
+PR: #219（head = evidence-only commit；独立验收必须攻击上面的 tested exact SHA）
 Merge SHA: none（未合并，未自验）
 Required gates: 全量 pytest + 本任务十点 fault matrix + 既有 FIX-002 / headless / runtime / recovery 回归
 Gate run IDs / conclusions:
