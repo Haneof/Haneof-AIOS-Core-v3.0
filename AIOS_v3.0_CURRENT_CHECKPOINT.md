@@ -1,11 +1,11 @@
 # AIOS v3.0 当前工程断点
 
-## 当前控制入口 — 2026-09-26 B-RERUN-002 INFRASTRUCTURE_STATE_LOSS / B-PERSISTENCE-CORRECTIVE-001 READY
+## 当前控制入口 — 2026-09-26 B-PERSISTENCE-CORRECTIVE-001 FROZEN_WIP / CORE-BACKGROUND-RESPONSE-RECOVERY-001 READY
 
 - 接任 PM live 复核：live main = `e72a63874ed2c28798b00cec51f191caf1594a00`，Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`；见 `governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
 - `CORE-OPERATOR-001 = DONE`：独立验收 #135（ACCEPTANCE_PASS）先合 `fe6f1740eb`，候选 #131 后合 `e72a63874e`；报告 `reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md`。
 - `CORE-BASELINE-001 = DONE（re-verified）`；PR #136 已去除 pelican 文件，改作本 PM 补充治理 PR（pelican 提交 `f8edb5d1` 仅留历史，不合入）。
-- S2 / HEADLESS / RECOVERY / SCALE / CI-FIX / RC-FREEZE 均 DONE。frozen software = `773876f92d5f8e53422f8f5a68cc651953d93052`；Core tree = `fe77f8a0706acfaf369041d0882b6d0e6de39f22`。A-002 / PR #205 继续 canonical。B-PREFLIGHT-002 / RELEASE-002 历史 PASS 保留，但其唯一 RERUN-002 已真实消费 cursor14 至 reveal+ingest+production dispatch 后遭平台 `/tmp` state loss；无 Resident semantic reply/capability/ACK，不能 continuation/replay。`C15-RCC-RES-B-RERUN-002 = FAILED / INFRASTRUCTURE_STATE_LOSS / NON-CANONICAL`；旧 run/session 永久退休。PM 裁决：`governance/C15_RCC_RES_B_RERUN_002_STATE_LOSS_ADJUDICATION_2026-09-26.md`。唯一下一 READY = `C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001`；Independent Acceptance / RELEASE-003 / RERUN-003 / C / evaluator / close 全部后置。
+- 旧 RC freeze / A-002 / B preflight/release 历史证据保留。RERUN-002 已基础设施失败并退休。Persistence corrective 的 synthetic crash probe 又证明：exact provider reply 已落 durable journal 后，current frozen Core 仍只能把 attempt 保持/协调为 `in_doubt`/`response_returned`，普通 runtime/headless 无不重调 provider 的安全 semantic continuation。`C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001 = FROZEN_WIP / BLOCKED_ON_CORE_RESPONSE_RECOVERY`。唯一下一 READY = `CORE-BACKGROUND-RESPONSE-RECOVERY-001`；其后必须 Independent Acceptance → RC-REFREEZE-002 → fresh A-RERUN-003/accept，再恢复 persistence corrective。
 
 ## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / FIX-001+002 READY
 
@@ -25,7 +25,7 @@
 
 ## 2026-09-25 PM durable follow-up plan — 不得靠聊天记忆丢失
 
-- 当前主线优先级：`C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001` 为唯一 READY。RERUN-002 已基础设施失败且旧 identity 永久退休；禁止 deterministic replay 冒充续跑。corrective 只修持久化/恢复/relay journal，独立验收 PASS 后才允许 RELEASE-003 mint 新 run/session。
+- 当前主线优先级：`CORE-BACKGROUND-RESPONSE-RECOVERY-001` 为唯一 READY。Persistence corrective WIP 冻结；不得在 operator 层复制 CognitiveRuntime semantics。Core fix 独立验收后必须重新 RC freeze 并 fresh A-003，再恢复原 persistence corrective WIP。
 - 新增 `POST-C15-ISSUE-RECONCILIATION-001 = BLOCKED on C15-RCC-CLOSE-001`：C15 CLOSE 后，必须对 #23/#28/#33/#34/#35 在届时 live main 做 fresh current-state revalidation。2026-09-25 PM 已确认对应修复 PR #24/#49/#51/#54/#55 均已进入当前 main；因此默认不是新 Core 修复任务。届时若仍可复现，只能创建新的单窗口工程 Task，不得在 reconciliation 窗口顺手修改 Core。
 - “AI 持续了解用户并真正帮上忙”的后续产品化入口已显式冻结为：`P18-REALITY-HELP-INTEGRATION-001`（真实平台 Action→Outcome 闭环）→ `P19-HELP-EXPERIENCE-001`（授权/提醒/解释/纠正/Launcher/Voice/Digital Human 产品体验）。两者均 BLOCKED until P17 release gate，通过前不得提前另造平行执行系统。
 - 这三项已同步写入 `governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md` / `PROJECT_MASTER_MAP.md`，以后新 PM 窗口必须从仓库恢复，不得依赖本次聊天。
