@@ -1,0 +1,37 @@
+{
+  "argv": [
+    "/tmp/aios-venv/bin/python",
+    "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/release/canonical_conversation_ingest.py",
+    "--world-db",
+    "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-A-RERUN-002/private_world.sqlite",
+    "--session-id",
+    "c15-rcc-res-a-rerun-002-2079f64af49c",
+    "--turn-index",
+    "5",
+    "--event-file",
+    "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-A-RERUN-002/events/cursor_08.json"
+  ],
+  "parsed": {
+    "binding_mode": "canonical_user_turn",
+    "binding_version": "c15-rcc-canonical-conversation-binding-v1",
+    "durable_source_class": "user",
+    "fixture_event_id": "c15rcc-008",
+    "fixture_payload_sha256": "sha256:78fbf4639454b1be169ed9dcfc5b54f4d1bba04fdd3f4703aa7d84fe1a851a84",
+    "fixture_projection_sha256": "sha256:1461927270af0539ab10a36e86141cbf00bef4742131c45ba2c3bf809a8986e9",
+    "fixture_sequence": 8,
+    "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+    "fixture_version": "c15-rcc-fixture-v1",
+    "idempotent_replay": false,
+    "ingest_ref": "obs_conv_user_10c0bcfb2f7bf80aa9b324b8@1",
+    "object_id": "obs_conv_user_10c0bcfb2f7bf80aa9b324b8",
+    "revision": 1,
+    "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+    "turn_index": 5,
+    "world_revision": 73
+  },
+  "path": "canonical_conversation",
+  "returncode": 0,
+  "stderr": "",
+  "stdout": "{\"binding_mode\":\"canonical_user_turn\",\"binding_version\":\"c15-rcc-canonical-conversation-binding-v1\",\"durable_source_class\":\"user\",\"fixture_event_id\":\"c15rcc-008\",\"fixture_payload_sha256\":\"sha256:78fbf4639454b1be169ed9dcfc5b54f4d1bba04fdd3f4703aa7d84fe1a851a84\",\"fixture_projection_sha256\":\"sha256:1461927270af0539ab10a36e86141cbf00bef4742131c45ba2c3bf809a8986e9\",\"fixture_sequence\":8,\"fixture_sha256\":\"sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46\",\"fixture_version\":\"c15-rcc-fixture-v1\",\"idempotent_replay\":false,\"ingest_ref\":\"obs_conv_user_10c0bcfb2f7bf80aa9b324b8@1\",\"object_id\":\"obs_conv_user_10c0bcfb2f7bf80aa9b324b8\",\"revision\":1,\"session_id\":\"c15-rcc-res-a-rerun-002-2079f64af49c\",\"turn_index\":5,\"world_revision\":73}\n",
+  "turn_index": 5
+}

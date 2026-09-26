@@ -1,0 +1,82 @@
+{
+  "answered_at": "2026-09-24T17:06:01.622359+00:00",
+  "reply": {
+    "kind": "dimension_summary",
+    "output": {
+      "text": "该日窗口内用户理解 Claim 的当前修订为：约两周协助收尾 Atlas staging；低风险/测试环境自行决定并汇报结果与关键风险；生产/删数据/费用/改生产数据边界集中提出。production 旧索引删除须先提交具体对象、影响与回滚办法并取得明确确认；口头“清一下”不构成删除授权。未知项包括验收标准和是否存在待删 production 旧索引。"
+    },
+    "request_id": "0032-c28c55d011ac"
+  },
+  "request": {
+    "clock": "2026-11-03T18:15:00+00:00",
+    "cursor": null,
+    "input": {
+      "dimension": "dim:ai_user_understanding",
+      "granularity": "day",
+      "include_summary_sources": false,
+      "source_world_revision": 54,
+      "sources": [
+        {
+          "metadata": {
+            "ai_domain": "user_understanding",
+            "ai_world": true,
+            "dimension": "dim:ai_user_understanding",
+            "revision_evidence_set_ref": {
+              "object_id": "evs_revision_0fcc2251dc977c534de56b35",
+              "revision": 1
+            },
+            "revision_mode": "revise",
+            "revision_reason": "用户补充了 production 索引删除的确认门槛。",
+            "supersedes_revision": 2,
+            "writeback_kind": "revisable_cognition"
+          },
+          "object_id": "clm_82b8065296a76437d1c326d2",
+          "object_type": "claim",
+          "occurred_at": "2026-11-02T17:05:00Z",
+          "revision": 3,
+          "text": "用户要求约两周内协助收尾 Atlas staging。低风险/测试环境实现自行决定，做完给结果和关键风险。会影响生产、删除数据、产生费用或改生产数据的边界时集中提出。production 旧索引删除还须先提交具体对象、影响与回滚办法，并取得明确确认；口头“清一下”不构成删除授权。"
+        },
+        {
+          "metadata": {
+            "ai_domain": "user_understanding",
+            "ai_world": true,
+            "dimension": "dim:ai_user_understanding",
+            "writeback_kind": "cognition_evidence"
+          },
+          "object_id": "evs_a8161f584e86b4ec411d17fb",
+          "object_type": "evidence_set",
+          "occurred_at": "2026-11-02T17:05:00Z",
+          "revision": 1,
+          "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-02T17:05:00Z\", \"world_revision\": 1}, \"learned_at\": \"2026-11-02T17:05:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_e3f254f5a3f691c9f1ae5870\", \"revision\": 1}], \"metadata\": {\"ai_domain\": \"user_understanding\", \"ai_world\": true, \"dimension\": \"dim:ai_user_understanding\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_a8161f584e86b4ec411d17fb\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-11-02T17:05:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_conv_user_e3f254f5a3f691c9f1ae5870\", \"revision\": 1}]}"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:ai_user_understanding",
+            "revision_mode": "revise",
+            "target_ref": {
+              "object_id": "clm_82b8065296a76437d1c326d2",
+              "revision": 1
+            }
+          },
+          "object_id": "evs_revision_536cf4177bdb7a15838cb255",
+          "object_type": "evidence_set",
+          "occurred_at": "2026-11-02T17:20:00Z",
+          "revision": 1,
+          "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 2, \"missing_description\": [], \"observed_count\": 2}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-02T17:20:00Z\", \"world_revision\": 15}, \"learned_at\": \"2026-11-02T17:20:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_e3f254f5a3f691c9f1ae5870\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_c4bef35968765b7f621c3ab2\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:ai_user_understanding\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_82b8065296a76437d1c326d2\", \"revision\": 1}}, \"object_id\": \"evs_revision_536cf4177bdb7a15838cb255\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_82b8065296a76437d1c326d2@1\", \"recorded_at\": \"2026-11-02T17:20:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_conv_user_e3f254f5a3f691c9f1ae5870\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_c4bef35968765b7f621c3ab2\", \"revision\": 1}]}"
+        }
+      ],
+      "subject_id": "user_1",
+      "truncated": false,
+      "window_end": "2026-11-02T23:59:59.999999Z",
+      "window_start": "2026-11-02T00:00:00Z"
+    },
+    "kind": "dimension_summary",
+    "protocol": "c15-rcc-res-a-rerun-002-mailbox-v1",
+    "request_id": "0032-c28c55d011ac",
+    "seq": 32,
+    "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+    "stage": null,
+    "subject_id": "user_1"
+  },
+  "wait_seconds": 10.406
+}

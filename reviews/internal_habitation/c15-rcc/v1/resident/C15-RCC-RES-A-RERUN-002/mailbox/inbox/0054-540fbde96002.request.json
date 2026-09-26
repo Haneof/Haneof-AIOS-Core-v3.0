@@ -1,0 +1,107 @@
+{
+  "clock": "2026-11-04T23:07:00+00:00",
+  "cursor": null,
+  "input": {
+    "dimension": "dim:user_ai_interaction",
+    "granularity": "day",
+    "include_summary_sources": false,
+    "source_world_revision": 92,
+    "sources": [
+      {
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "assistant",
+          "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+          "turn_index": 5,
+          "turn_key": "6c80af4314b4c15cb5499b09"
+        },
+        "object_id": "obs_conv_ai_7265f599ee2f7bdcf0f29300",
+        "object_type": "observation",
+        "occurred_at": "2026-11-04T21:42:00Z",
+        "revision": 1,
+        "text": "还不能通知门店。\n\n现有记录只到：edge-2026.11.4 构建完成，状态 READY_FOR_UPLOAD；上传任务排队，计划 14:00 开始。没有 registry tag、digest，也没有 upload-complete。按目前证据，镜像还没推到 registry。"
+      },
+      {
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "user",
+          "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+          "turn_index": 5,
+          "turn_key": "6c80af4314b4c15cb5499b09"
+        },
+        "object_id": "obs_conv_user_10c0bcfb2f7bf80aa9b324b8",
+        "object_type": "observation",
+        "occurred_at": "2026-11-04T21:42:00Z",
+        "revision": 1,
+        "text": "我刚开完会，那个镜像已经推到 registry 了吗？如果好了我就通知门店开始测。"
+      },
+      {
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "assistant",
+          "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+          "turn_index": 6,
+          "turn_key": "9bf2f76da8165ef0d7c6a584"
+        },
+        "object_id": "obs_conv_ai_dc791bce8f952fb6dcd6649d",
+        "object_type": "observation",
+        "occurred_at": "2026-11-04T22:24:00Z",
+        "revision": 1,
+        "text": "记下了：排队或 READY_FOR_UPLOAD 只算准备，没有完成记录就按没确认完成处理。\n\n这次 registry 上传在 14:16 被 checksum mismatch 拒绝。edge-2026.11.4 未发布，tag 没创建，registry 里没有对应 digest。不要通知门店开始测。"
+      },
+      {
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "user",
+          "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+          "turn_index": 6,
+          "turn_key": "9bf2f76da8165ef0d7c6a584"
+        },
+        "object_id": "obs_conv_user_fbe20407ffd68ca6f1bc5f5c",
+        "object_type": "observation",
+        "occurred_at": "2026-11-04T22:24:00Z",
+        "revision": 1,
+        "text": "我后台也看到 tag 还没出来。以后这种“准备提交、已排队”和“确实完成”要分开说；没有完成记录时就按没确认完成处理。"
+      },
+      {
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "assistant",
+          "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+          "turn_index": 7,
+          "turn_key": "df7cad86450c4ba7609b6eca"
+        },
+        "object_id": "obs_conv_ai_8e1f9d24b6c21174ec60e973",
+        "object_type": "observation",
+        "occurred_at": "2026-11-04T23:07:00Z",
+        "revision": 1,
+        "text": "对上了。edge-2026.11.4 第二次上传有完成记录：tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED。门店测试通知你已经发出，我记下。"
+      },
+      {
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "user",
+          "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+          "turn_index": 7,
+          "turn_key": "df7cad86450c4ba7609b6eca"
+        },
+        "object_id": "obs_conv_user_e0dbe4b6cc248f47e013943c",
+        "object_type": "observation",
+        "occurred_at": "2026-11-04T23:07:00Z",
+        "revision": 1,
+        "text": "现在状态对上了。门店测试通知我已经发出去了。"
+      }
+    ],
+    "subject_id": "user_1",
+    "truncated": false,
+    "window_end": "2026-11-04T23:59:59.999999Z",
+    "window_start": "2026-11-04T00:00:00Z"
+  },
+  "kind": "dimension_summary",
+  "protocol": "c15-rcc-res-a-rerun-002-mailbox-v1",
+  "request_id": "0054-540fbde96002",
+  "seq": 54,
+  "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+  "stage": null,
+  "subject_id": "user_1"
+}

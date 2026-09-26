@@ -1,0 +1,17 @@
+{
+  "task": "C15-RCC-RES-A-RERUN-002",
+  "role": "Real Resident AI — Fresh Resident A",
+  "phase": "A",
+  "allowed_cursors": [1, 13],
+  "frozen_software_sha": "773876f92d5f8e53422f8f5a68cc651953d93052",
+  "expected_core_tree": "fe77f8a0706acfaf369041d0882b6d0e6de39f22",
+  "subject_id": "user_1",
+  "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+  "process_identity": "2079f64af49c406895541da042bf2192",
+  "fresh_private_world": true,
+  "fresh_search_index": true,
+  "fresh_release_state": true,
+  "fresh_resident_session": true,
+  "cognition_policy": "All semantic judgments are made personally by the Resident from RuntimeSnapshot and legal capability results. This operator only transports bytes.",
+  "python_note": "Execution uses a local venv with pydantic; Core tree bytes match the frozen SHA."
+}
