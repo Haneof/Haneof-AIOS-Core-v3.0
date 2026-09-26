@@ -5,7 +5,7 @@ Production entrypoint and every mutation self-test call check_runbook_lifecycle(
 The self-test writes disposable copies and invokes that same function; it does not
 reimplement the comparison.
 
-CORRECTIVE-014-FIXUP-003 / IA-BLK-004 retains the CORRECTIVE-013
+CORRECTIVE-014-FIXUP-004 / IA-BLK-004 retains the CORRECTIVE-013
 shell-fence/heredoc rules and fails closed on disguised lifecycle operations.
 Artifact-bound operations are recognized from their lifecycle path signature,
 not merely a literal executable word, and every operational step has a frozen
@@ -67,6 +67,30 @@ REVEAL_CMD_PREFIX = f"python3 {RELEASE_OPERATOR_PATH} reveal --phase B"
 ACK_CMD_PREFIX = f"python3 {RELEASE_OPERATOR_PATH} ack --phase B"
 _PRODUCTION_TURN_RE = re.compile(
     r"--model-handler\s+bridged_model_handler:headless_production_handler\s+turn\s+--session\b"
+)
+REVEAL_CANONICAL_CMD = (
+    f'python3 {RELEASE_OPERATOR_PATH} reveal --phase B '
+    '--state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal.json"'
+)
+ACK_CANONICAL_CMD = (
+    f'python3 {RELEASE_OPERATOR_PATH} ack --phase B '
+    '--state "$RUN_ROOT/runtime/release_state.json" '
+    '--world-db "$RUN_ROOT/runtime/world.sqlite" '
+    '--sequence "$SEQ" '
+    '--event-id "$(python3 -c \'import json,sys; '
+    'print(json.load(open(sys.argv[1]))["event_id"])\' '
+    '"$RUN_ROOT/current-event.json")" '
+    '--ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json" '
+    '--conversation-session-id "$B_SESSION" --conversation-turn-index 1'
+)
+PRODUCTION_TURN_CANONICAL_CMD = (
+    'python3 -m aios_core.headless.cli '
+    '--world "$RUN_ROOT/runtime/world.sqlite" '
+    '--index "$RUN_ROOT/runtime/index.sqlite" '
+    '--lock "$RUN_ROOT/runtime/world.sqlite.writer.lock" '
+    '--model-handler bridged_model_handler:headless_production_handler '
+    'turn --session "$B_SESSION" --turn-index 1 --text "..." '
+    '--at "$CURRENT_OCCURRED_AT"'
 )
 _SHELL_LANGUAGES = frozenset({"bash", "sh", "shell"})
 _FENCE_OPEN_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
@@ -270,17 +294,21 @@ def _bash_commands_in(text: str) -> list[str]:
 
 
 
+def _normalize_shell_ws(command: str) -> str:
+    return re.sub(r"\s+", " ", command.strip())
+
+
 def _is_reveal_command(command: str) -> bool:
-    return command.startswith(REVEAL_CMD_PREFIX)
+    return _normalize_shell_ws(command) == _normalize_shell_ws(REVEAL_CANONICAL_CMD)
 
 
 def _is_ack_command(command: str) -> bool:
-    return command.startswith(ACK_CMD_PREFIX)
+    return _normalize_shell_ws(command) == _normalize_shell_ws(ACK_CANONICAL_CMD)
 
 
 def _is_production_turn_command(command: str) -> bool:
-    return command.startswith("python3 -m aios_core.headless.cli ") and bool(
-        _PRODUCTION_TURN_RE.search(command)
+    return _normalize_shell_ws(command) == _normalize_shell_ws(
+        PRODUCTION_TURN_CANONICAL_CMD
     )
 
 
@@ -966,6 +994,14 @@ def _duplicate_shell_command(text: str, token: str, predicate, label: str) -> st
     return _insert_fence_in_step(text, token, matches[0], "bash")
 
 
+def _append_to_unique_line(text: str, exact_line: str, suffix: str, label: str) -> str:
+    if text.count(exact_line) != 1:
+        raise AssertionError(
+            f"{label}: expected one physical command tail, got {text.count(exact_line)}"
+        )
+    return text.replace(exact_line, exact_line + suffix, 1)
+
+
 def run_shell_semantics_mutation_tests(base: Path) -> int:
     """Run D/E/F and exact-once mutations through the production gate."""
     check_runbook_lifecycle(base)
@@ -1154,6 +1190,55 @@ def run_shell_semantics_mutation_tests(base: Path) -> int:
                 stage,
             )
             cases += 1
+
+            # FIXUP-004: a second operation appended to the same logical shell
+            # command must not hide behind a canonical prefix. The duplicate
+            # executable token is quote-concatenated so prefix counting alone
+            # cannot detect it.
+            same_line_specs = (
+                (
+                    "reveal",
+                    '  reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal.json"',
+                    '; command pyth""on3 ' + RELEASE_OPERATOR_PATH
+                    + ' reveal --phase B --state "$RUN_ROOT/runtime/release_state.json"'
+                    + ' > "$RUN_ROOT/reveal-duplicate.json"',
+                ),
+                (
+                    "production_turn",
+                    '  turn --session "$B_SESSION" --turn-index 1 --text "..." --at "$CURRENT_OCCURRED_AT"',
+                    '; command pyth""on3 -m aios_core.headless.cli'
+                    + ' --world "$RUN_ROOT/runtime/world.sqlite"'
+                    + ' --index "$RUN_ROOT/runtime/index.sqlite"'
+                    + ' --lock "$RUN_ROOT/runtime/world.sqlite.writer.lock"'
+                    + ' --model-handler bridged_model_handler:headless_production_handler'
+                    + ' turn --session "$B_SESSION" --turn-index 1 --text "..."'
+                    + ' --at "$CURRENT_OCCURRED_AT"',
+                ),
+                (
+                    "ack",
+                    '  --conversation-session-id "$B_SESSION" --conversation-turn-index 1',
+                    '; command pyth""on3 ' + RELEASE_OPERATOR_PATH
+                    + ' ack --phase B --state "$RUN_ROOT/runtime/release_state.json"'
+                    + ' --world-db "$RUN_ROOT/runtime/world.sqlite"'
+                    + ' --sequence "$SEQ"'
+                    + ' --event-id "$(python3 -c \'import json,sys; '
+                    + 'print(json.load(open(sys.argv[1]))["event_id"])\' '
+                    + '"$RUN_ROOT/current-event.json")"'
+                    + ' --ingest-ref "$RUN_ROOT/evidence/event-$(printf \'%03d\' "$SEQ").projection.json"'
+                    + ' --conversation-session-id "$B_SESSION" --conversation-turn-index 1',
+                ),
+            )
+            for label, line_tail, suffix in same_line_specs:
+                mutated = _append_to_unique_line(
+                    original, line_tail, suffix, label,
+                )
+                stage = root / f"K-{prefix}-same-line-{label}"
+                _stage(base, stage, {doc_rel: mutated})
+                _expect_red(
+                    f"IA-BLK-004-K:same_line_duplicate_{label}:{doc_rel.name}",
+                    stage,
+                )
+                cases += 1
 
             receipt_line = 'write_binding_receipt(receipt, os.environ["AIOS_CURRENT_EVENT_BINDING_PATH"])'
             if original.count(receipt_line) != 1:
