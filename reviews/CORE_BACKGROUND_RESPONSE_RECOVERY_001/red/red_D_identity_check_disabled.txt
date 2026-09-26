@@ -1,0 +1,93 @@
+...FFF............                                                       [100%]
+=================================== FAILURES ===================================
+_ test_case_04_supplied_identity_must_match_the_exact_directive[provider-other-provider] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-13/test_case_04_supplied_identity0')
+field = 'provider', value = 'other-provider'
+
+    @pytest.mark.parametrize(
+        "field,value",
+        (
+            ("provider", "other-provider"),
+            ("model", "other-model"),
+            ("provider_request_id", "other-request-id"),
+        ),
+    )
+    def test_case_04_supplied_identity_must_match_the_exact_directive(tmp_path, field, value):
+        store, index, db, runtime, signal, attempt_id, _calls = _crash_wake_into_in_doubt(
+            tmp_path, key=f"case-04-{field}"
+        )
+        directive = _directive("req-case-04")
+        payload, fingerprint = _payload_and_fingerprint(runtime, directive)
+        supplied = {
+            "provider": PROVIDER,
+            "model": MODEL,
+            "provider_request_id": "req-case-04",
+        }
+        supplied[field] = value
+>       with pytest.raises(ValueError, match="identity"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/integration/test_core_background_response_recovery_001.py:409: Failed
+_ test_case_04_supplied_identity_must_match_the_exact_directive[model-other-model] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-13/test_case_04_supplied_identity1')
+field = 'model', value = 'other-model'
+
+    @pytest.mark.parametrize(
+        "field,value",
+        (
+            ("provider", "other-provider"),
+            ("model", "other-model"),
+            ("provider_request_id", "other-request-id"),
+        ),
+    )
+    def test_case_04_supplied_identity_must_match_the_exact_directive(tmp_path, field, value):
+        store, index, db, runtime, signal, attempt_id, _calls = _crash_wake_into_in_doubt(
+            tmp_path, key=f"case-04-{field}"
+        )
+        directive = _directive("req-case-04")
+        payload, fingerprint = _payload_and_fingerprint(runtime, directive)
+        supplied = {
+            "provider": PROVIDER,
+            "model": MODEL,
+            "provider_request_id": "req-case-04",
+        }
+        supplied[field] = value
+>       with pytest.raises(ValueError, match="identity"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/integration/test_core_background_response_recovery_001.py:409: Failed
+_ test_case_04_supplied_identity_must_match_the_exact_directive[provider_request_id-other-request-id] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-13/test_case_04_supplied_identity2')
+field = 'provider_request_id', value = 'other-request-id'
+
+    @pytest.mark.parametrize(
+        "field,value",
+        (
+            ("provider", "other-provider"),
+            ("model", "other-model"),
+            ("provider_request_id", "other-request-id"),
+        ),
+    )
+    def test_case_04_supplied_identity_must_match_the_exact_directive(tmp_path, field, value):
+        store, index, db, runtime, signal, attempt_id, _calls = _crash_wake_into_in_doubt(
+            tmp_path, key=f"case-04-{field}"
+        )
+        directive = _directive("req-case-04")
+        payload, fingerprint = _payload_and_fingerprint(runtime, directive)
+        supplied = {
+            "provider": PROVIDER,
+            "model": MODEL,
+            "provider_request_id": "req-case-04",
+        }
+        supplied[field] = value
+>       with pytest.raises(ValueError, match="identity"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/integration/test_core_background_response_recovery_001.py:409: Failed
+=========================== short test summary info ============================
+FAILED tests/integration/test_core_background_response_recovery_001.py::test_case_04_supplied_identity_must_match_the_exact_directive[provider-other-provider]
+FAILED tests/integration/test_core_background_response_recovery_001.py::test_case_04_supplied_identity_must_match_the_exact_directive[model-other-model]
+FAILED tests/integration/test_core_background_response_recovery_001.py::test_case_04_supplied_identity_must_match_the_exact_directive[provider_request_id-other-request-id]

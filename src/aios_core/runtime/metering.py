@@ -238,9 +238,18 @@ class ModelMeteringLedger:
                     raise RuntimeError(
                         "metering references an unknown background model attempt"
                     )
+                # A Wake/Review meter record carries its work id directly. A user-turn
+                # meter record cannot: the attempt work id is the derived turn
+                # execution identity, which is not part of the non-world meter row.
+                # Those rounds are still bound by subject + exact model round.
+                same_work_identity = (
+                    True
+                    if str(attempt_row["work_kind"]) == "user_turn"
+                    else str(attempt_row["work_id"]) == str(record.wake_id or "")
+                )
                 if (
                     str(attempt_row["subject_id"]) != record.subject_id
-                    or str(attempt_row["work_id"]) != str(record.wake_id or "")
+                    or not same_work_identity
                     or int(attempt_row["model_round_index"]) != record.model_round_index
                 ):
                     conn.rollback()
