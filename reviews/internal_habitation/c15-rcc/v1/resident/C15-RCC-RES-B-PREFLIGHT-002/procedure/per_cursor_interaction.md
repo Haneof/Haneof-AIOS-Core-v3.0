@@ -237,7 +237,7 @@ Any provider exception, non-JSON, schema failure, binding failure, invalid capab
 - Do not run Resident B/C during preflight.
 - Do not merge PR #209 from this procedure.
 
-## Mechanical regression — current CORRECTIVE-014 gate
+## Mechanical regression — current CORRECTIVE-014-FIXUP-001 gate
 
 Before any later B release activity, run the lifecycle self-test and full frozen E2E from the B-preflight root. The E2E evidence file is valid only when copied byte-for-byte from that actual fresh run.
 
@@ -256,7 +256,7 @@ Required current gate: `EXPECTED_CHECKS=158`, `ALL_CHECKS=158/158 FAILURES=0`, a
 - `RUNBOOK_CROSS_DOCUMENT_ORDER_PASS`
 - `RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5`
 - `RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18`
-- `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=48`
+- `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=52`
 - `CORRECTIVE_013_E2E_PASS`
 
 Historical C012 `157/157` evidence is not a current gate.

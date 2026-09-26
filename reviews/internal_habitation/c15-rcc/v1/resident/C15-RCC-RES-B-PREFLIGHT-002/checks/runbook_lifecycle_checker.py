@@ -5,13 +5,13 @@ Production entrypoint and every mutation self-test call check_runbook_lifecycle(
 The self-test writes disposable copies and invokes that same function; it does not
 reimplement the comparison.
 
-CORRECTIVE-014 / IA-BLK-004 retains the CORRECTIVE-013 shell-fence/heredoc rules
-and closes shell-dispatch wrapper false greens. Required lifecycle operations are
-recognized by their canonical executable signature even when a shell prefix such
-as "command", "exec", "env", or a control construct precedes that signature.
-Cardinality therefore counts embedded canonical operations, not only commands
-whose first token is the lifecycle executable. Python heredoc call sites remain
-inspected separately from shell commands.
+CORRECTIVE-014-FIXUP-001 / IA-BLK-004 retains the CORRECTIVE-013
+shell-fence/heredoc rules and fails closed on disguised lifecycle operations.
+Each required shell operation has a broad semantic detector plus one direct
+canonical form. A wrapper/compound/control line that still names the lifecycle
+operation is therefore either an extra semantic occurrence or a non-canonical
+sole occurrence; both are rejected. Python heredoc call sites remain inspected
+separately from shell commands.
 """
 from __future__ import annotations
 
@@ -271,20 +271,110 @@ def _bash_commands_in(text: str) -> list[str]:
 
 
 def _is_reveal_command(command: str) -> bool:
-    # Count the canonical executable signature anywhere in an active shell
-    # command. This intentionally catches wrappers such as "command", "exec",
-    # "env", and shell control prefixes instead of treating them as distinct.
-    return REVEAL_CMD_PREFIX in command
+    return command.startswith(REVEAL_CMD_PREFIX)
 
 
 def _is_ack_command(command: str) -> bool:
-    return ACK_CMD_PREFIX in command
+    return command.startswith(ACK_CMD_PREFIX)
 
 
 def _is_production_turn_command(command: str) -> bool:
-    return "python3 -m aios_core.headless.cli " in command and bool(
+    return command.startswith("python3 -m aios_core.headless.cli ") and bool(
         _PRODUCTION_TURN_RE.search(command)
     )
+
+
+def _has_shell_command_word(command: str, word: str) -> bool:
+    """Conservative executable-word detector used only for fail-closed guards."""
+    return bool(re.search(
+        rf"(?:^|[\s;&|()])(?:/[^\s;&|()]+/)?{re.escape(word)}(?=\s|$)",
+        command,
+    ))
+
+
+def _semantic_reveal(command: str) -> bool:
+    return RELEASE_OPERATOR_PATH in command and bool(
+        re.search(r"(?:^|\s)reveal\s+--phase\s+B(?:\s|$)", command)
+    )
+
+
+def _semantic_ack(command: str) -> bool:
+    return RELEASE_OPERATOR_PATH in command and bool(
+        re.search(r"(?:^|\s)ack\s+--phase\s+B(?:\s|$)", command)
+    )
+
+
+def _semantic_production_turn(command: str) -> bool:
+    return (
+        "aios_core.headless.cli" in command
+        and "headless_production_handler" in command
+        and bool(re.search(r"(?:^|\s)turn\s+--session(?:\s|$)", command))
+    )
+
+
+def _semantic_install_current_event(command: str) -> bool:
+    return (
+        ("reveal.json" in command)
+        and ("current-event.json" in command)
+        and ".projection.json" not in command
+        and (
+            _has_shell_command_word(command, "install")
+            or _has_shell_command_word(command, "cp")
+        )
+    )
+
+
+def _semantic_projection_install(command: str) -> bool:
+    return (
+        "current-event.json" in command
+        and ".projection.json" in command
+        and (
+            _has_shell_command_word(command, "install")
+            or _has_shell_command_word(command, "cp")
+        )
+    )
+
+
+def _semantic_projection_sha256(command: str) -> bool:
+    return (
+        _has_shell_command_word(command, "sha256sum")
+        and ".projection.json" in command
+        and "projection_digests.sha256" in command
+    )
+
+
+def _semantic_clear_binding(command: str) -> bool:
+    return (
+        _has_shell_command_word(command, "rm")
+        and "current-event.json" in command
+        and "binding/current-event-binding.json" in command
+    )
+
+
+def _require_unique_semantic_operation(
+    name: str,
+    owner: str,
+    by_token: dict[str, list[str]],
+    semantic_predicate,
+    canonical_predicate,
+    detail: str,
+) -> None:
+    matches = [
+        (token, command)
+        for token, commands in by_token.items()
+        for command in commands
+        if semantic_predicate(command)
+    ]
+    if len(matches) != 1 or matches[0][0] != owner:
+        raise LifecycleCheckError(
+            f"{name}: semantic lifecycle operation {detail} must occur exactly once "
+            f"in {owner}; found={matches!r}"
+        )
+    if not canonical_predicate(matches[0][1]):
+        raise LifecycleCheckError(
+            f"{name}: semantic lifecycle operation {detail} must use the direct "
+            f"canonical shell form in {owner}; found={matches[0][1]!r}"
+        )
 
 
 def _is_receipt_command(text: str) -> bool:
@@ -503,6 +593,44 @@ def assert_step_executable_contracts(name: str, text: str) -> None:
     by_token = {token: parts[0] for token, parts in parsed.items()}
     python_by_token = {token: parts[1] for token, parts in parsed.items()}
 
+    _require_unique_semantic_operation(
+        name, "REVEAL", by_token,
+        _semantic_reveal, _is_reveal_command, REVEAL_CMD_PREFIX,
+    )
+    _require_unique_semantic_operation(
+        name, "INSTALL_CURRENT_EVENT", by_token,
+        _semantic_install_current_event,
+        lambda c: c == INSTALL_CURRENT_EVENT_CMD,
+        INSTALL_CURRENT_EVENT_CMD,
+    )
+    _require_unique_semantic_operation(
+        name, "PERSIST_PROJECTION_EVIDENCE", by_token,
+        _semantic_projection_install,
+        lambda c: c == PERSIST_INSTALL_CMD,
+        "projection persist install",
+    )
+    _require_unique_semantic_operation(
+        name, "PERSIST_PROJECTION_EVIDENCE", by_token,
+        _semantic_projection_sha256,
+        lambda c: c == PERSIST_SHA256_CMD,
+        "projection digest append",
+    )
+    _require_unique_semantic_operation(
+        name, "MODEL_WORK", by_token,
+        _semantic_production_turn, _is_production_turn_command,
+        "production headless turn --session",
+    )
+    _require_unique_semantic_operation(
+        name, "DURABLE_ACK", by_token,
+        _semantic_ack, _is_ack_command, ACK_CMD_PREFIX,
+    )
+    _require_unique_semantic_operation(
+        name, "CLEAR_BINDING", by_token,
+        _semantic_clear_binding,
+        lambda c: c == CLEAR_BINDING_CMD,
+        CLEAR_BINDING_CMD,
+    )
+
     _require_exactly_one(
         name, "REVEAL", by_token,
         _is_reveal_command,
@@ -511,26 +639,23 @@ def assert_step_executable_contracts(name: str, text: str) -> None:
     )
     _require_exactly_one(
         name, "INSTALL_CURRENT_EVENT", by_token,
-        lambda c: INSTALL_CURRENT_EVENT_CMD in c,
+        lambda c: c == INSTALL_CURRENT_EVENT_CMD,
         INSTALL_CURRENT_EVENT_CMD,
-        lambda c: c.count(INSTALL_CURRENT_EVENT_CMD),
     )
     _require_exactly_one(
         name, "PERSIST_PROJECTION_EVIDENCE", by_token,
-        lambda c: PERSIST_INSTALL_CMD in c,
+        lambda c: c == PERSIST_INSTALL_CMD,
         "install current-event.json -> evidence/event-%03d.projection.json",
-        lambda c: c.count(PERSIST_INSTALL_CMD),
     )
     _require_exactly_one(
         name, "PERSIST_PROJECTION_EVIDENCE", by_token,
-        lambda c: PERSIST_SHA256_CMD in c,
+        lambda c: c == PERSIST_SHA256_CMD,
         "sha256sum of that projection artifact appended to projection_digests.sha256",
-        lambda c: c.count(PERSIST_SHA256_CMD),
     )
     _require_shell_command_order(
         name, "PERSIST_PROJECTION_EVIDENCE", by_token["PERSIST_PROJECTION_EVIDENCE"],
-        lambda c: PERSIST_INSTALL_CMD in c,
-        lambda c: PERSIST_SHA256_CMD in c,
+        lambda c: c == PERSIST_INSTALL_CMD,
+        lambda c: c == PERSIST_SHA256_CMD,
         "projection install then digest append",
     )
     _require_exactly_one_python_call(
@@ -583,9 +708,8 @@ def assert_step_executable_contracts(name: str, text: str) -> None:
     )
     _require_exactly_one(
         name, "CLEAR_BINDING", by_token,
-        lambda c: CLEAR_BINDING_CMD in c,
+        lambda c: c == CLEAR_BINDING_CMD,
         CLEAR_BINDING_CMD,
-        lambda c: c.count(CLEAR_BINDING_CMD),
     )
 
     # Owner-step checks above are not enough if a second active copy is placed
@@ -596,20 +720,20 @@ def assert_step_executable_contracts(name: str, text: str) -> None:
         (_is_reveal_command,
          REVEAL_CMD_PREFIX,
          lambda c: c.count(REVEAL_CMD_PREFIX)),
-        (lambda c: INSTALL_CURRENT_EVENT_CMD in c,
-         INSTALL_CURRENT_EVENT_CMD, lambda c: c.count(INSTALL_CURRENT_EVENT_CMD)),
-        (lambda c: PERSIST_INSTALL_CMD in c,
-         "projection persist install", lambda c: c.count(PERSIST_INSTALL_CMD)),
-        (lambda c: PERSIST_SHA256_CMD in c,
-         "projection digest append", lambda c: c.count(PERSIST_SHA256_CMD)),
+        (lambda c: c == INSTALL_CURRENT_EVENT_CMD,
+         INSTALL_CURRENT_EVENT_CMD, None),
+        (lambda c: c == PERSIST_INSTALL_CMD,
+         "projection persist install", None),
+        (lambda c: c == PERSIST_SHA256_CMD,
+         "projection digest append", None),
         (_is_production_turn_command,
          "production headless turn --session",
          lambda c: len(list(_PRODUCTION_TURN_RE.finditer(c)))),
         (_is_ack_command,
          ACK_CMD_PREFIX,
          lambda c: c.count(ACK_CMD_PREFIX)),
-        (lambda c: CLEAR_BINDING_CMD in c,
-         CLEAR_BINDING_CMD, lambda c: c.count(CLEAR_BINDING_CMD)),
+        (lambda c: c == CLEAR_BINDING_CMD,
+         CLEAR_BINDING_CMD, None),
     ):
         _require_document_shell_occurrence(
             name, all_commands, predicate, detail, occurrence_count,
@@ -877,6 +1001,28 @@ def run_shell_semantics_mutation_tests(base: Path) -> int:
                 _stage(base, stage, {doc_rel: wrapped})
                 _expect_red(
                     f"IA-BLK-004-G:command_wrapper_duplicate_{label}:{doc_rel.name}",
+                    stage,
+                )
+                cases += 1
+
+            # FIXUP-001: command text behind a short-circuit control operator is
+            # not executable evidence. Replace the sole canonical current-event
+            # install with inert lookalikes and require the production gate red.
+            for label, inert_prefix in (
+                ("false_and", "false && "),
+                ("true_or", "true || "),
+            ):
+                deleted = _drop_exact_lines(original, [INSTALL_CURRENT_EVENT_CMD])
+                inert = _insert_fence_in_step(
+                    deleted,
+                    "INSTALL_CURRENT_EVENT",
+                    inert_prefix + INSTALL_CURRENT_EVENT_CMD,
+                    "bash",
+                )
+                stage = root / f"H-{prefix}-{label}-inert-install"
+                _stage(base, stage, {doc_rel: inert})
+                _expect_red(
+                    f"IA-BLK-004-H:{label}_inert_install:{doc_rel.name}",
                     stage,
                 )
                 cases += 1
