@@ -100,7 +100,35 @@ Historical red attempts from the predecessor work are untouched: PR #216 frozen 
 | no second World/cognition store | staging table + identity index are created inside the existing runtime store; no new database, no semantic fields |
 | no operator-owned semantic engine | staging accepts only raw exact bytes plus mechanical identity; all decisions are fingerprint/identity comparisons |
 
-## 6. Honest limitations for the reviewer to attack
+## 6. CI status on candidate PR #219 (head `b82ae25bcbef0d1d81cc3b7e5f303d75a4f0b507`)
+
+32 of 34 checks PASS, including `full-core-regression` (4m40s), `p16-convergence`,
+`p16-habitation-harness`, `constitutional-cognition-closure`, all C14/C15 cognition/runtime gates,
+`scale-s1m`/`s100k`/`s10k`, `semantic-equivalence`, `p9`-`p15` gates and every `test` job.
+
+Two checks FAIL, both fixture-task invariants that assert a Core diff is *absent*:
+
+| Check | Failing step | Why it is red here |
+|---|---|---|
+| `semantic-repair-mechanical-gate` (`c14-semantic-repair-fixture`, run `36234237680`) | `Prove fixture task did not modify Core or historical C14 evidence` | the step's explicit rule is `if grep -q '^src/aios_core/' <<<"$changed"; then exit 1` — a Core task necessarily trips it |
+| `c15-rcc-fixture-mechanical-gate` (`c15-rcc-fixture`, run `36234237724`) | `Prove fixture task has zero Core diff` | identical rule in the C15 fixture workflow |
+
+These two workflows are the ones `governance/AIOS_CORE_CI_FINDING_001_2026-09-24.md` already
+classifies as infrastructure/branch-shape artefacts, not policy violations. Their asserted invariant
+("this *fixture* change must not modify `src/aios_core/**`") cannot hold for a Core recovery task.
+
+Direct local proof that the invariants these guards exist to protect still hold:
+
+- `git diff --name-only a310bf1202bf41644c2f3e25798053a6636e14be HEAD` = the five
+  `src/aios_core/runtime/*` files, the new fault-matrix test and this evidence directory only;
+- `git diff --name-only ... -- reviews/internal_habitation/` = 0 files (frozen v2 fixture and every
+  historical Resident/C14 evidence file untouched);
+- `sha256sum reviews/internal_habitation/c14-resident/semantic-repair-v1/fixture/sealed_fixture.json`
+  = `1095d5aef52061753db7d9dab558af1361b92976f2ded0e6956d70afe3e6527f`, the frozen expected value.
+
+No workflow file was changed by this candidate, so the checks were not waived or edited.
+
+## 7. Honest limitations for the reviewer to attack
 
 1. The relay/operator must supply the exact bytes and their identity; Core can only verify them against
    the durable attempt. For an attempt that died before any response was recorded (`dispatching` /

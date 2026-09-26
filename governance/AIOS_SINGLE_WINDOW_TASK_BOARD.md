@@ -1552,6 +1552,7 @@ Gate run IDs / conclusions:
 - 随机顺序重跑：全绿（`full_suite_randomized.txt`）
 - 聚焦子集（runtime + FIX-002 + headless + core recovery + fault matrix）：`93 passed in 6.93s`
 - 红证据：6 组临时突变 / 逐条回滚（hook disabled、write-time unpinned、fingerprint check、identity check、staging-state guard、payload-hash guard），日志保留于 `reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001/red/`
+- CI（PR #219 @ `b82ae25b`）：34 条中 32 PASS（含 `full-core-regression`、p16、cognition、scale、semantic-equivalence）；2 条 FAIL = `semantic-repair-mechanical-gate` / `c15-rcc-fixture-mechanical-gate` 的 fixture-task “zero Core diff” 守卫——该两条 workflow 的规则是“任何改动 `src/aios_core/**` 即 exit 1”，对 Core 任务结构性不适用（`governance/AIOS_CORE_CI_FINDING_001_2026-09-24.md` 已登记为基础设施/分支形状 artefact）。直接证据：`reviews/internal_habitation/**` 零改动，C14 sealed fixture SHA256 仍为 `1095d5ae…`；本候选未改任何 workflow。
 Evidence/report paths:
 - `reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CANDIDATE_REPORT_2026-09-26.md`
 - `reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001/full_suite.txt`、`full_suite_junit.xml`、`full_suite_randomized.txt`、`gate_subset.txt`
