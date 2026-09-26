@@ -1,0 +1,193 @@
+name: c15-rcc-b-release-002-validation
+
+on:
+  push:
+    branches:
+      - validation/c15-rcc-b-release-002-20260926
+
+permissions:
+  contents: read
+
+jobs:
+  b-release-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout exact release-reviewed main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: 5db649fdd34ae49303e18e5a224720e9a3a82fe3
+
+      - name: Post-merge ground truth and pins
+        shell: bash
+        run: |
+          set -euo pipefail
+          REPO=reviews/internal_habitation/c15-rcc/v1/resident
+          ROOT="$REPO/C15-RCC-RES-B-PREFLIGHT-002"
+          test "$(git rev-parse HEAD)" = "5db649fdd34ae49303e18e5a224720e9a3a82fe3"
+          git fetch origin pull/205/head:refs/remotes/origin/pr205
+          test "$(git rev-parse origin/pr205)" = "d17ae972ad1d312735c355f775ac024bc4cebdf7"
+          git merge-base --is-ancestor 65e6e8266bb0541d624eb8e5bba825b91145564f HEAD
+          git merge-base --is-ancestor aab3a30cc48e8c7041ef4b37e0e5f379c3060c93 65e6e8266bb0541d624eb8e5bba825b91145564f
+
+          test "$(git rev-parse HEAD:src/aios_core)" = "fe77f8a0706acfaf369041d0882b6d0e6de39f22"
+          test "$(git rev-parse 773876f92d5f8e53422f8f5a68cc651953d93052:src/aios_core)" = "fe77f8a0706acfaf369041d0882b6d0e6de39f22"
+          test -z "$(git diff --name-only 773876f92d5f8e53422f8f5a68cc651953d93052..HEAD -- src/aios_core)"
+
+          test "$(git rev-parse HEAD:$ROOT/checks/runbook_lifecycle_checker.py)" = "72f674b2d430262a5eff9cb66c7004917c0f4ae4"
+          test "$(git rev-parse HEAD:$ROOT/procedure/b_startup_procedure.md)" = "c56f528f4ea181ae002ed22d3e810ab6022ddb17"
+          test "$(git rev-parse HEAD:$ROOT/procedure/per_cursor_interaction.md)" = "17f27956152f4edd49b57f72c7546eef668406fa"
+          test "$(git rev-parse HEAD:$ROOT/resident_safe_packet_manifest.md)" = "ac3da8b204b93fc47b32a7d5a98ae6a2a89e0d7c"
+          test "$(git rev-parse HEAD:$REPO/RESIDENT_B_RUN_CONTRACT.md)" = "32d2dc99c2a9d391fad1a4c84824ebce8ca46d79"
+          test "$(git rev-parse HEAD:$ROOT/environment_manifest.md)" = "c6ce70a78a413510f8ae52ff21616c1638c81f7d"
+          test "$(git rev-parse HEAD:$ROOT/procedure/final_freeze_procedure.md)" = "d77a25c11304d142d8e3fc816f5dde78a6fafbb6"
+          test "$(git rev-parse HEAD:$ROOT/isolation/e2e_probe_output.txt)" = "52da0673309781ab9f9a98aa9b59b4748d9bd225"
+
+          test "$(git rev-parse HEAD:$ROOT/lineage_copy/private_world.sqlite)" = "$(git rev-parse origin/pr205:$REPO/C15-RCC-RES-A-RERUN-002/freeze/private_world.sqlite)"
+          test "$(git rev-parse HEAD:$ROOT/lineage_copy/world_index.sqlite)" = "$(git rev-parse origin/pr205:$REPO/C15-RCC-RES-A-RERUN-002/freeze/world_index.sqlite)"
+          test "$(git rev-parse HEAD:$ROOT/lineage_copy/release_state.json)" = "$(git rev-parse origin/pr205:$REPO/C15-RCC-RES-A-RERUN-002/freeze/release_state.json)"
+
+          echo "626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa  $ROOT/lineage_copy/private_world.sqlite" | sha256sum -c -
+          echo "ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1  $ROOT/lineage_copy/world_index.sqlite" | sha256sum -c -
+          echo "eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8  $ROOT/lineage_copy/release_state.json" | sha256sum -c -
+          echo "28d3262f56b7ef93a32a842f1d4d66f99748f2b07adcece43e815eb9d5cd18ef  $REPO/RESIDENT_B_RUN_CONTRACT.md" | sha256sum -c -
+          echo "bd7a76d1171c137f9daee9c0a3dbff029b8cbbccef88f0a1aff7907710a82375  $ROOT/harness/requirements.freeze.txt" | sha256sum -c -
+          echo "a6bbeaef4aab369ef23659a1ce46df24b970fd48176edc8feb78b9f62228ff3a  $ROOT/harness/resident_wire_protocol.json" | sha256sum -c -
+          echo "da74eb97a6d35b535f298f52a72a32fc35dfbd1fca1ec4585aa1d7c090e92911  $ROOT/harness/bridged_model_handler.py" | sha256sum -c -
+          echo "d766c1857163528cacf90e6b876466d099456062914747eab25dd1220e8615eb  $ROOT/harness/resident_jail.py" | sha256sum -c -
+
+          python3 - "$ROOT/lineage_copy/release_state.json" <<'PY'
+          import json,sys
+          s=json.load(open(sys.argv[1]))
+          assert s["active_phase"] == "A"
+          assert s["last_acked_sequence"] == 13
+          assert s["next_sequence"] == 14
+          assert s["pending_reveal"] is None
+          print("A_TO_B_BOUNDARY_PASS")
+          PY
+          echo "POST_MERGE_GROUND_TRUTH_PASS"
+
+      - name: Release lifecycle adversarial probes
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002"
+          python3 - <<'PY' | tee /tmp/b-release-002-adversarial.log
+          from __future__ import annotations
+          import importlib.util, inspect, re, tempfile
+          from pathlib import Path
+
+          root = Path("reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002").resolve()
+          checker = root / "checks/runbook_lifecycle_checker.py"
+          spec = importlib.util.spec_from_file_location("b_release_lifecycle", checker)
+          lc = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(lc)
+          docs = lc.read_docs(root)
+          lc.check_runbook_lifecycle(root)
+
+          expected = {
+              "procedure/b_startup_procedure.md": "c56f528f4ea181ae002ed22d3e810ab6022ddb17",
+              "procedure/per_cursor_interaction.md": "17f27956152f4edd49b57f72c7546eef668406fa",
+          }
+          for rel, text in docs.items():
+              assert lc._git_blob_sha(text) == expected[str(rel)]
+          source = inspect.getsource(lc.check_one)
+          assert source.index("assert_step_executable_contracts") < source.index("_assert_frozen_runbook_blob")
+          assert source.index("assert_no_receipt_before_current_event") < source.index("_assert_frozen_runbook_blob")
+          print("SEMANTIC_BEFORE_BLOB_BACKSTOP_PASS")
+
+          def expect_red(label: str, rel: Path, mutated: str) -> None:
+              with tempfile.TemporaryDirectory() as td:
+                  stage = Path(td)
+                  for doc_rel, text in docs.items():
+                      out = stage / doc_rel
+                      out.parent.mkdir(parents=True, exist_ok=True)
+                      out.write_text(mutated if doc_rel == rel else text, encoding="utf-8")
+                  try:
+                      lc.check_runbook_lifecycle(stage)
+                  except lc.LifecycleCheckError as exc:
+                      print("RELEASE_EXTERNAL_MUTATION_RED_PASS", label, "via", str(exc)[:250])
+                      return
+                  raise AssertionError(f"false green: {label}")
+
+          def before_first_reveal(text: str, command: str) -> str:
+              m = re.search(r"^###\s+(?:7\.)?1\.?\s+REVEAL\b.*$", text, re.M)
+              assert m
+              return text[:m.start()] + "~~~bash\n" + command + "\n~~~\n\n" + text[m.start():]
+
+          rop = "reviews/internal_habitation/c15-rcc/v1/release/release_operator.py"
+          install = 'install -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"'
+          cases = 0
+          for rel, text in docs.items():
+              mutations = [
+                  ("outside_command_wrapper_install", before_first_reveal(text, "command " + install)),
+                  ("outside_quote_concat_install", before_first_reveal(text, 'ins""tall -m 0400 "$RUN_ROOT/reveal.json" "$RUN_ROOT/current-event.json"')),
+                  ("outside_env_reveal", before_first_reveal(text, "env python3 " + rop + ' reveal --phase B --state "$RUN_ROOT/runtime/release_state.json" > "$RUN_ROOT/reveal-extra.json"')),
+              ]
+              changed_lang = text.replace("~~~bash", "~~~text", 1) if "~~~bash" in text else text.replace("~~~bash", "~~~text", 1)
+              if changed_lang == text:
+                  changed_lang = text.replace("~~~sh", "~~~text", 1)
+              if changed_lang == text:
+                  changed_lang = text.replace("```bash", "```text", 1)
+              assert changed_lang != text
+              mutations.append(("shell_fence_language_drift", changed_lang))
+              anchor = "from bridged_model_handler import create_current_event_binding_receipt"
+              assert anchor in text
+              mutations.append(("python_heredoc_payload_drift", text.replace(anchor, "import subprocess\n" + anchor, 1)))
+              write = 'write_binding_receipt(receipt, os.environ["AIOS_CURRENT_EVENT_BINDING_PATH"])'
+              assert text.count(write) == 1
+              mutations.append(("duplicate_python_receipt_write", text.replace(write, write + "\n" + write, 1)))
+              for label, mutated in mutations:
+                  expect_red(f"{rel}:{label}", rel, mutated)
+                  cases += 1
+          print(f"RELEASE_EXTERNAL_ADVERSARIAL_PASS cases={cases}")
+          PY
+          grep -q '^SEMANTIC_BEFORE_BLOB_BACKSTOP_PASS$' /tmp/b-release-002-adversarial.log
+          grep -q '^RELEASE_EXTERNAL_ADVERSARIAL_PASS cases=12$' /tmp/b-release-002-adversarial.log
+          python3 "$ROOT/checks/runbook_lifecycle_checker.py" --base "$ROOT" --self-test | tee /tmp/b-release-002-selftest.log
+          grep -q '^RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5$' /tmp/b-release-002-selftest.log
+          grep -q '^RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18$' /tmp/b-release-002-selftest.log
+          grep -q '^RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=82$' /tmp/b-release-002-selftest.log
+          echo "B_RELEASE_002_LIFECYCLE_PASS"
+
+      - name: Frozen Debian 12 release E2E
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/b-release-002-artifacts"
+          cp /tmp/b-release-002-adversarial.log "$GITHUB_WORKSPACE/b-release-002-artifacts/"
+          cp /tmp/b-release-002-selftest.log "$GITHUB_WORKSPACE/b-release-002-artifacts/"
+          docker run --privileged --rm             --security-opt seccomp=unconfined             -v "$GITHUB_WORKSPACE:/work/repo"             -w /work/repo             debian:12             bash -lc '
+              set -euo pipefail
+              export DEBIAN_FRONTEND=noninteractive
+              apt-get update >/dev/null
+              apt-get install -y --no-install-recommends                 python3 python3-pip sudo util-linux iproute2 procps                 coreutils findutils grep sed gawk openssl ca-certificates >/dev/null
+              test "$(python3 --version)" = "Python 3.11.2"
+              test "$(/usr/bin/python3 --version)" = "Python 3.11.2"
+              python3 -m pip install --break-system-packages                 -r reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/requirements.freeze.txt >/dev/null
+              ROOT=/work/repo/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002
+              export RUN_ROOT=/tmp/b-release-002-e2e
+              rm -rf "$RUN_ROOT"
+              bash "$ROOT/isolation/probe_e2e.sh"
+              cp "$RUN_ROOT/e2e.log" /work/repo/b-release-002-artifacts/e2e.log
+            '
+          LOG="$GITHUB_WORKSPACE/b-release-002-artifacts/e2e.log"
+          grep -q '^ENVIRONMENT_PASS$' "$LOG"
+          grep -q '^ALL_CHECKS=158/158 FAILURES=0$' "$LOG"
+          grep -q '^RUNBOOK_CROSS_DOCUMENT_MUTATION_RED_PASS cases=5$' "$LOG"
+          grep -q '^RUNBOOK_EXECUTABLE_MUTATION_RED_PASS cases=18$' "$LOG"
+          grep -q '^RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=82$' "$LOG"
+          grep -q '^NO_COMMITTED_CURSOR14_PAYLOAD_PASS ' "$LOG"
+          grep -q '^CORRECTIVE_013_E2E_PASS$' "$LOG"
+          if grep -q '^CHECK FAIL:' "$LOG"; then exit 1; fi
+          sha256sum "$LOG" | tee "$GITHUB_WORKSPACE/b-release-002-artifacts/e2e.sha256"
+          echo "B_RELEASE_002_FROZEN_E2E_PASS"
+
+      - name: Upload release validation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: c15-rcc-b-release-002-validation
+          path: b-release-002-artifacts/
+          if-no-files-found: error
+          retention-days: 7
