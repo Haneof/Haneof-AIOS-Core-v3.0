@@ -116,7 +116,6 @@ def measure_baseline() -> dict[str, Any]:
     run_id = f"synthetic-run-baseline-{uuid.uuid4().hex[:8]}"
     session_id = f"synthetic-session-baseline-{uuid.uuid4().hex[:8]}"
     try:
-        (root / "backend").parent.mkdir(parents=True, exist_ok=True)
         completed = run_clip(root, run_id, session_id, ["--mode", "create"])
         outcome = parse(completed)
     finally:
@@ -142,7 +141,6 @@ def run_kill_point(kill_point: str) -> dict[str, Any]:
     run_id = f"synthetic-run-{kill_point.lower()}-{uuid.uuid4().hex[:8]}"
     session_id = f"synthetic-session-{kill_point.lower()}-{uuid.uuid4().hex[:8]}"
     try:
-        (root / "backend").mkdir(parents=True, exist_ok=True)
         killed = run_clip(
             root,
             run_id,

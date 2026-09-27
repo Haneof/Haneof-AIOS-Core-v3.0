@@ -152,5 +152,7 @@
       "invariant": "recovery converges to the same durable cursor without second reveal, duplicate ingest, duplicate semantic application, duplicate output/capability, duplicate ACK, or skipped cursor; a terminal/in_doubt outcome is not convergence",
       "kill_point": "K5_AFTER_APPLIED_BEFORE_ACK"
     }
-  ]
+  ],
+  "revision": 2,
+  "revision_note": "rev1 was frozen and executed first; it failed on a harness bug (harness pre-created <root>/backend, which creation must refuse). The rev1 run and its log are preserved; rev2 fixes the harness only, with no change to probe semantics or expected outcomes."
 }

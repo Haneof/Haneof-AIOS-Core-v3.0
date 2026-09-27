@@ -119,6 +119,13 @@ def main() -> int:
     )
     manifest = {
         "manifest_version": "c15-killpoint-probe-manifest-v1",
+        "revision": 2,
+        "revision_note": (
+            "rev1 was frozen and executed first; it failed on a harness bug "
+            "(harness pre-created <root>/backend, which creation must refuse). "
+            "The rev1 run and its log are preserved; rev2 fixes the harness only, "
+            "with no change to probe semantics or expected outcomes."
+        ),
         "invariant": INVARIANT,
         "probes": PROBES,
         "collection": {
