@@ -23,7 +23,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
+  pull-requests: write
 
 env:
   CANDIDATE: "63ca592359c7e3fd71d6cc4ba349949e4f0b80e3"
@@ -81,6 +81,27 @@ jobs:
           echo "--- enumeration ---"
           cat "review/$IA_DIR/probe_enumeration.txt" || true
           exit $rc
+      - name: Publish freeze diagnostics to the PR
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          {
+            echo "## IA freeze diagnostics (run ${{ github.run_id }})"
+            echo
+            echo '```'
+            echo "### collect_only.txt"
+            cat "review/$IA_DIR/collect_only.txt" 2>/dev/null || echo "(missing)"
+            echo
+            echo "### probe_enumeration.txt"
+            cat "review/$IA_DIR/probe_enumeration.txt" 2>/dev/null || echo "(missing)"
+            echo
+            echo "### PROBE_MANIFEST.sha256"
+            cat "review/$IA_DIR/PROBE_MANIFEST.sha256" 2>/dev/null || echo "(missing)"
+            echo '```'
+          } > /tmp/freeze-diag.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/freeze-diag.md || true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -161,6 +182,24 @@ jobs:
           rc=${PIPESTATUS[0]}
           echo "FIRST_RUN pytest exit: $rc" | tee -a FIRST_RUN.log
           exit $rc
+      - name: Publish first-run evidence to the PR
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          {
+            echo "## IA FIRST RUN (frozen probes)"
+            echo
+            echo "- run: \`${{ github.run_id }}\`"
+            echo "- tested exact candidate: \`63ca592359c7e3fd71d6cc4ba349949e4f0b80e3\`"
+            echo "- canonical Stage B: \`15c75ac3e97c57a5fa1f3085c282a852994d9acf\`"
+            echo
+            echo '```'
+            tail -120 "review/$IA_DIR/FIRST_RUN.log" 2>/dev/null || echo "(no log)"
+            echo '```'
+          } > /tmp/firstrun.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/firstrun.md || true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -204,8 +243,15 @@ jobs:
         run: python -m pytest -v -rs --timeout=1800 tests/c15_persistence/test_environment_reattach.py
       - name: 4. resident-visible surface
         run: python -m pytest -v --timeout=1800 tests/c15_persistence/test_resident_surface.py
-      - name: 5. historical persistence journal
-        run: python -m pytest -v --timeout=1800 tests/c15_persistence/test_journal.py
+      - name: 5. historical persistence journal (frozen unittest contract)
+        run: |
+          set -euo pipefail
+          # The frozen historical journal/test pair pins /home/user as its
+          # original workspace contract. Recreate that host path in CI rather
+          # than rewriting the historical bytes.
+          sudo install -d -m 0755 /home/user
+          sudo install -d -m 0700 -o "$(id -u)" -g "$(id -g)" /home/user/c15-persistence-unit-probes
+          python -m unittest discover -s tests/c15_persistence -p "test_journal.py" -v
       - name: 6. src/aios_core/** zero diff
         run: |
           set -euo pipefail
