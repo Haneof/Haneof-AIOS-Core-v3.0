@@ -88,8 +88,9 @@ def test_authoritative_path_rejects_symlink_alias_to_tmp() -> None:
 
 def test_default_runs_root_is_under_the_persisted_workspace() -> None:
     root = runs_root()
-    assert str(root).startswith("/home/user/")
-    assert root != Path("/home/user")
+    workspace = Path(os.environ.get("C15_PERSISTED_WORKSPACE") or "/home/user").resolve()
+    assert root == workspace / "c15-persistence-runs"
+    assert root != workspace
 
 
 # ------------------------------------------------------- create / reopen / lock
