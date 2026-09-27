@@ -1,9 +1,9 @@
 # AIOS v3.0 当前工程断点
 
-## 当前控制入口 — 2026-09-27 CORE-BACKGROUND-RESPONSE-RECOVERY-001 CORRECTIVE-001 REVIEW_READY / INDEPENDENT-ACCEPTANCE READY
+## 当前控制入口 — 2026-09-27 CORE-BACKGROUND-RESPONSE-RECOVERY-001 CORRECTIVE-001 ACCEPTANCE_FAIL / CORRECTIVE-002 READY
 
 - Engineering PR #219 is OPEN / UNMERGED. Tested exact candidate: `3f9ec00d0fa283bc5294574d6da1e84d654d6645`; evidence-only head: `b82ae25bcbef0d1d81cc3b7e5f303d75a4f0b507`; parent/live base: `a310bf1202bf41644c2f3e25798053a6636e14be`; exact tree: `4e9e3a5685373f46ba56d51259f39af710a3cf53`.
-- Historical PR #219 tested exact `3f9ec00d0fa283bc5294574d6da1e84d654d6645` remains `ACCEPTANCE_FAIL / blocker=2`. Corrective tested exact `030acbfe2d935dfc166ff7a9a1760b6ddd46d42d` is now remotely published as the original Git object; exact parent `b8bc7b32497dc0fdc0a15194256795a7c6771048`, exact tree `b1c39039db6c48e2aa6fb111b03394eb5d0b8f9c`, evidence-only/current PR head `a1c6e74de71f783951f2772e2f065880d7146ec5`. Publication workflow `36300226068` succeeded with non-force fast-forward. Current unique READY = `CORE-BACKGROUND-RESPONSE-RECOVERY-001-CORRECTIVE-001-INDEPENDENT-ACCEPTANCE`; prompt `governance/prompts/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27.md`. `CORE-RC-REFREEZE-002` remains BLOCKED.
+- Historical PR #219 tested exact `3f9ec00d0fa283bc5294574d6da1e84d654d6645` remains `ACCEPTANCE_FAIL / blocker=2`. Corrective-001 tested exact `030acbfe2d935dfc166ff7a9a1760b6ddd46d42d` is remotely published as the original Git object; evidence-only/current PR head `a1c6e74de71f783951f2772e2f065880d7146ec5`. Fresh Independent Acceptance = `ACCEPTANCE_FAIL / blocker=1`: relay/request binding proves target routing but not authenticity of provider-returned bytes; a caller with target relay id can fabricate a different directive and self-computed fingerprint. Reviewer artifact is local-only/unpublished and used Python 3.11.2; PM independently source-confirmed the defect on the remote exact. Current unique READY = `CORE-BACKGROUND-RESPONSE-RECOVERY-001-CORRECTIVE-002`; prompt `governance/prompts/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CORRECTIVE_002_2026-09-27.md`. `CORE-RC-REFREEZE-002` remains BLOCKED.
 - Earlier local-only `2b8242f7834fb34a0ce90a585f847bfa7505fe1e` was never published and is not the pinned acceptance candidate.
 
 - 接任 PM live 复核：live main = `e72a63874ed2c28798b00cec51f191caf1594a00`，Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`；见 `governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
@@ -29,7 +29,7 @@
 
 ## 2026-09-25 PM durable follow-up plan — 不得靠聊天记忆丢失
 
-- 当前主线优先级：`CORE-BACKGROUND-RESPONSE-RECOVERY-001-CORRECTIVE-001-INDEPENDENT-ACCEPTANCE = READY` against PR #219 tested exact `030acbfe...`. #214 的 scope amendment 属历史记录但已被 gate-integrity correction supersede；B persistence corrective 继续 FROZEN_WIP。当前 `a1c6e74d...` 的 17 条 PR workflow 均处于 `action_required` / zero jobs，不能作为 PASS/FAIL。只有 fresh corrective IA PASS + PM integration 后才可进入 `CORE-RC-REFREEZE-002`，随后 fresh A-003 acceptance，之后再恢复 B persistence。
+- 当前主线优先级：`CORE-BACKGROUND-RESPONSE-RECOVERY-001-CORRECTIVE-002 = READY`，继续使用 PR #219，严格只修 fresh authenticity blocker；前两项历史 blocker closure 必须保持。#214 的 scope amendment 属历史记录但已被 gate-integrity correction supersede；B persistence corrective 继续 FROZEN_WIP。只有 corrective-002 fresh IA PASS + PM integration 后才可进入 `CORE-RC-REFREEZE-002`，随后 fresh A-003 acceptance，之后再恢复 B persistence。
 - 新增 `POST-C15-ISSUE-RECONCILIATION-001 = BLOCKED on C15-RCC-CLOSE-001`：C15 CLOSE 后，必须对 #23/#28/#33/#34/#35 在届时 live main 做 fresh current-state revalidation。2026-09-25 PM 已确认对应修复 PR #24/#49/#51/#54/#55 均已进入当前 main；因此默认不是新 Core 修复任务。届时若仍可复现，只能创建新的单窗口工程 Task，不得在 reconciliation 窗口顺手修改 Core。
 - “AI 持续了解用户并真正帮上忙”的后续产品化入口已显式冻结为：`P18-REALITY-HELP-INTEGRATION-001`（真实平台 Action→Outcome 闭环）→ `P19-HELP-EXPERIENCE-001`（授权/提醒/解释/纠正/Launcher/Voice/Digital Human 产品体验）。两者均 BLOCKED until P17 release gate，通过前不得提前另造平行执行系统。
 - 这三项已同步写入 `governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md` / `PROJECT_MASTER_MAP.md`，以后新 PM 窗口必须从仓库恢复，不得依赖本次聊天。
