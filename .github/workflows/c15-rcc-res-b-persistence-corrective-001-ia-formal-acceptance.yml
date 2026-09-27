@@ -76,19 +76,19 @@ jobs:
           IA_CANDIDATE_REPO: /__w/${{ github.workspace }}/cand
         run: |
           set -uo pipefail
-          python "review/$IA_DIR/freeze_ia_probe_manifest.py" > review/freeze.log 2>&1
+          python "review/$IA_DIR/freeze_ia_probe_manifest.py" > "review/$IA_DIR/freeze.log" 2>&1
           rc=$?
           # Surface diagnostics as check-run annotations (the Actions blob/artifact
           # channel is not reachable from the independent reviewer's sandbox).
           {
             echo "freeze_rc=$rc"
-            tail -60 review/freeze.log
+            tail -60 "review/$IA_DIR/freeze.log"
             echo "--- collect_only ---"
             tail -30 "review/$IA_DIR/collect_only.txt" 2>/dev/null || echo "(absent)"
           } | grep -v '^$' | head -80 | while IFS= read -r l; do
             echo "::error title=IA-FREEZE::$l"
           done
-          cat review/freeze.log
+          cat "review/$IA_DIR/freeze.log"
           exit $rc
       - name: Publish freeze diagnostics to the PR
         if: always()
@@ -116,13 +116,13 @@ jobs:
         with:
           name: ia-frozen-probe-manifest
           path: |
-            review/$IA_DIR/PROBE_MANIFEST.json
-            review/$IA_DIR/PROBE_MANIFEST.sha256
-            review/$IA_DIR/probe_enumeration.txt
-            review/$IA_DIR/collect_only.txt
-            review/$IA_DIR/ia_probes.py
-            review/$IA_DIR/ia_child.py
-            review/freeze.log
+            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/PROBE_MANIFEST.json
+            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/PROBE_MANIFEST.sha256
+            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/probe_enumeration.txt
+            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/collect_only.txt
+            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/ia_probes.py
+            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/ia_child.py
+            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/freeze.log
 
   execute:
     name: independent-adversarial-probes
@@ -169,7 +169,11 @@ jobs:
             echo "probe frozen OK: $f $a"
           done
           # 2. the frozen manifest must verify against its own recorded digest
-          ( cd "$GITHUB_WORKSPACE/frozen" && sha256sum -c PROBE_MANIFEST.sha256 )
+          if ! ( cd "$GITHUB_WORKSPACE/frozen" && sha256sum -c PROBE_MANIFEST.sha256 ); then
+            ls -la "$GITHUB_WORKSPACE/frozen" | while IFS= read -r l; do echo "::error title=IA-FROZEN-VERIFY::$(basename "$l")"; done
+            echo "::error title=IA-FROZEN-VERIFY::frozen manifest digest check FAILED"
+            exit 1
+          fi
           # 3. install the frozen manifest/enumeration/collect-only as the
           #    authoritative ones for this execution
           for f in PROBE_MANIFEST.json PROBE_MANIFEST.sha256 probe_enumeration.txt collect_only.txt; do
@@ -221,8 +225,10 @@ jobs:
         with:
           name: ia-first-run-evidence
           path: |
-            review/$IA_DIR/FIRST_RUN.log
-            review/$IA_DIR/PROBE_MANIFEST.json
+            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/FIRST_RUN.log
+            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/PROBE_MANIFEST.json
+            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/PROBE_MANIFEST.sha256
+            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/probe_enumeration.txt
 
   author-gates:
     name: independent-rerun-of-author-gates
@@ -277,10 +283,22 @@ jobs:
       - name: 7. full regression
         run: |
           set -uo pipefail
-          python -m pytest -q -rs --timeout=3600 tests/ 2>&1 | tail -80 | tee full-regression.log
-          exit ${PIPESTATUS[0]}
+          python -m pytest -q -rs -o addopts= -p no:cacheprovider \
+            --timeout=3600 tests/ > full-regression.raw.log 2>&1
+          rc=$?
+          tail -100 full-regression.raw.log | tee full-regression.log
+          {
+            echo "full_regression_exit=$rc"
+            grep -E "^(FAILED|ERROR)" full-regression.raw.log | head -30
+            tail -3 full-regression.raw.log
+          } | while IFS= read -r l; do
+            echo "::error title=IA-FULL-REGRESSION::$l"
+          done
+          exit $rc
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: ia-author-gates
-          path: full-regression.log
+          path: |
+            full-regression.log
+            full-regression.raw.log
