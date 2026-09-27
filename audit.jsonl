@@ -1,0 +1,8 @@
+{"at_epoch": 1790527036.203194, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"run_id": "c15-persistence-synthetic-run-4691c772366e", "session_id": "c15-persistence-synthetic-session-4691c772366e"}, "event": "backend_created", "pid": 2839}
+{"at_epoch": 1790527036.2710488, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"artifacts": 9, "generation": 1, "label": "initial"}, "event": "generation_sealed", "pid": 2839}
+{"at_epoch": 1790527036.3251243, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"artifacts": 9, "generation": 2, "label": "ingested"}, "event": "generation_sealed", "pid": 2839}
+{"at_epoch": 1790527036.4155016, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"request_id": "synthetic-request-666d49c2834afba90121c94a", "round": 0}, "event": "request_represented", "pid": 2839}
+{"at_epoch": 1790527036.480215, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"action": "applied", "request_id": "synthetic-request-666d49c2834afba90121c94a"}, "event": "request_finalised", "pid": 2839}
+{"at_epoch": 1790527036.4809675, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"action": "applied", "request_id": "synthetic-request-7cfbbf807b9f9840c6f396c9"}, "event": "request_finalised", "pid": 2839}
+{"at_epoch": 1790527036.5006573, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"artifacts": 11, "generation": 3, "label": "applied"}, "event": "generation_sealed", "pid": 2839}
+{"at_epoch": 1790527036.5243282, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"artifacts": 11, "generation": 4, "label": "acked"}, "event": "generation_sealed", "pid": 2839}

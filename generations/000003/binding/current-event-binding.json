@@ -1,0 +1,12 @@
+{
+  "event_id": "synthetic-evt-0001",
+  "fixture_sha256": "sha256:d3e7c566a602f7db22a5d02220ac61e38eaffc79e239e6eea62f4e0222e6a494",
+  "ingest_ref": "obs_c14_fixture_b7b915178ffef570f4f5141a@1",
+  "object_id": "obs_c14_fixture_b7b915178ffef570f4f5141a",
+  "payload_sha256": "sha256:0386fe877bf70476a604f5a9d11b3c0d25f197ab8458af913cbd27e82d3334a8",
+  "projection_sha256": "sha256:910ece6f12bc2815ccea258cb01d46526ae7a52c250979053778775ff984b5fb",
+  "reused_existing": false,
+  "revision": 1,
+  "sequence": 1,
+  "world_revision": 1
+}

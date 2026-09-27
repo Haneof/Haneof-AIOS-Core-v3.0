@@ -1,0 +1,26 @@
+{
+  "artifacts": {
+    "binding/current-event-binding.json": "6794c15cb84093f2a99512372e3a087eb4baae32abd2925b5c53061207abd0a9",
+    "current-event.json": "c5424b3e3f4f5fccc4af1a456a54d6190754299e3ccdc8c68f7d10f3b742d736",
+    "evidence/failures.jsonl": "2990b63698fcefa836e38636d6ef217a68b9d682d11aec492cfa7b344162e725",
+    "evidence/projection.json": "c5424b3e3f4f5fccc4af1a456a54d6190754299e3ccdc8c68f7d10f3b742d736",
+    "journal.sqlite": "8a2d9bb124a6f592822dc61444fc937c3ca471c0738a5b9a51ec1ed4934f8127",
+    "mailbox/archive.jsonl": "ee8e76de8393fe253557ace8afc83b22b9dc99685991c7ef7b03449a76a1382d",
+    "mailbox/inbox/current.reply": "e16e839d12bb3a08949953de375ad6985c6b011520773e6fc659e344237c1c3b",
+    "mailbox/outbox/current.request": "da1657d9a78e0ad3b7e0f6a8fc030874a2da123e6d4d2c87c809950d1ab00a49",
+    "runtime/index.sqlite": "cbedd598efa29879cce8e2a4b098020df7f8aa5162bb6450d06ac9cabccff39d",
+    "runtime/release_state.json": "628377039b6baf444408478404a59cf3f4c6ab4299bc492bf1efb6fcc0a53d88",
+    "runtime/world.sqlite": "8dfda29c8525dbcf586810f1abd17251fc0a16a41b6db0f3693a4a1fcaba8058"
+  },
+  "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045",
+  "captured_at_epoch": 1790527036.5283973,
+  "cursor": 1,
+  "event_id": "synthetic-evt-0001",
+  "extra": {},
+  "manifest_sha256": "c63a781b5874aa219f3bc0c7bd8894b1abc87f11fd374bf9a3d20f71db8923ea",
+  "manifest_version": "c15-run-state-manifest-v1",
+  "phase": "A",
+  "run_id": "c15-persistence-synthetic-run-4691c772366e",
+  "session_id": "c15-persistence-synthetic-session-4691c772366e",
+  "subject_id": "user_1"
+}
