@@ -1,0 +1,11 @@
+[e2e] run_root = /home/user/c15-persistence-probes/frozen-attempt-01
+[e2e] CURRENT_RUN_LOG=/home/user/c15-persistence-probes/frozen-attempt-01/e2e.log
+world.sqlite: OK
+index.sqlite: OK
+release_state.json: OK
+[e2e] lineage digests OK
+[e2e] EXPECTED_CHECKS=158
+[e2e] step 0: exact environment
+py_ver=Python 3.11.2
+CHECK 1 PASS: exact Python 3.11.2
+EXIT_CODE=1

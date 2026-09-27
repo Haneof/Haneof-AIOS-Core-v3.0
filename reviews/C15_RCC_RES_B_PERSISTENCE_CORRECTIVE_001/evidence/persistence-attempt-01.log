@@ -1,0 +1,162 @@
+test_application_gap_is_in_doubt_not_exactly_once_claim (test_journal.JournalTests.test_application_gap_is_in_doubt_not_exactly_once_claim) ... ERROR
+test_bad_paths (test_journal.JournalTests.test_bad_paths) ... ERROR
+test_concurrent_exposure_one_winner (test_journal.JournalTests.test_concurrent_exposure_one_winner) ... ERROR
+test_corrupt_artifact_blocks_exposure (test_journal.JournalTests.test_corrupt_artifact_blocks_exposure) ... ERROR
+test_exact_checkpoint_and_required_evidence_survive_reopen (test_journal.JournalTests.test_exact_checkpoint_and_required_evidence_survive_reopen) ... ERROR
+test_exposed_kill_reopen_wait_no_resend (test_journal.JournalTests.test_exposed_kill_reopen_wait_no_resend) ... ERROR
+test_missing_barrier_wrong_binding_and_outstanding (test_journal.JournalTests.test_missing_barrier_wrong_binding_and_outstanding) ... ERROR
+test_no_production_or_retired_identity_entrypoint (test_journal.JournalTests.test_no_production_or_retired_identity_entrypoint) ... ERROR
+test_receipt_recording_does_not_claim_core_verification (test_journal.JournalTests.test_receipt_recording_does_not_claim_core_verification) ... ERROR
+test_reply_staged_kill_reopen_no_byte_rewriting (test_journal.JournalTests.test_reply_staged_kill_reopen_no_byte_rewriting) ... ERROR
+test_request_staged_kill_reopen_exact_bytes (test_journal.JournalTests.test_request_staged_kill_reopen_exact_bytes) ... ERROR
+test_uncommitted_transaction_kill_preserves_old_checkpoint (test_journal.JournalTests.test_uncommitted_transaction_kill_preserves_old_checkpoint) ... ERROR
+test_wrong_identity_missing_backend_no_recreation (test_journal.JournalTests.test_wrong_identity_missing_backend_no_recreation) ... ERROR
+
+======================================================================
+ERROR: test_application_gap_is_in_doubt_not_exactly_once_claim (test_journal.JournalTests.test_application_gap_is_in_doubt_not_exactly_once_claim)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_journal.py", line 21, in setUp
+    self.parent = Path(tempfile.mkdtemp(prefix='synthetic-unit-', dir=base))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/tempfile.py", line 523, in mkdtemp
+    _os.mkdir(file, 0o700)
+PermissionError: [Errno 13] Permission denied: '/home/user/c15-persistence-probes/synthetic-unit-3nulau18'
+
+======================================================================
+ERROR: test_bad_paths (test_journal.JournalTests.test_bad_paths)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_journal.py", line 21, in setUp
+    self.parent = Path(tempfile.mkdtemp(prefix='synthetic-unit-', dir=base))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/tempfile.py", line 523, in mkdtemp
+    _os.mkdir(file, 0o700)
+PermissionError: [Errno 13] Permission denied: '/home/user/c15-persistence-probes/synthetic-unit-3anxo573'
+
+======================================================================
+ERROR: test_concurrent_exposure_one_winner (test_journal.JournalTests.test_concurrent_exposure_one_winner)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_journal.py", line 21, in setUp
+    self.parent = Path(tempfile.mkdtemp(prefix='synthetic-unit-', dir=base))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/tempfile.py", line 523, in mkdtemp
+    _os.mkdir(file, 0o700)
+PermissionError: [Errno 13] Permission denied: '/home/user/c15-persistence-probes/synthetic-unit-5ttwoki1'
+
+======================================================================
+ERROR: test_corrupt_artifact_blocks_exposure (test_journal.JournalTests.test_corrupt_artifact_blocks_exposure)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_journal.py", line 21, in setUp
+    self.parent = Path(tempfile.mkdtemp(prefix='synthetic-unit-', dir=base))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/tempfile.py", line 523, in mkdtemp
+    _os.mkdir(file, 0o700)
+PermissionError: [Errno 13] Permission denied: '/home/user/c15-persistence-probes/synthetic-unit-2tag2smx'
+
+======================================================================
+ERROR: test_exact_checkpoint_and_required_evidence_survive_reopen (test_journal.JournalTests.test_exact_checkpoint_and_required_evidence_survive_reopen)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_journal.py", line 21, in setUp
+    self.parent = Path(tempfile.mkdtemp(prefix='synthetic-unit-', dir=base))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/tempfile.py", line 523, in mkdtemp
+    _os.mkdir(file, 0o700)
+PermissionError: [Errno 13] Permission denied: '/home/user/c15-persistence-probes/synthetic-unit-hgbtap6b'
+
+======================================================================
+ERROR: test_exposed_kill_reopen_wait_no_resend (test_journal.JournalTests.test_exposed_kill_reopen_wait_no_resend)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_journal.py", line 21, in setUp
+    self.parent = Path(tempfile.mkdtemp(prefix='synthetic-unit-', dir=base))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/tempfile.py", line 523, in mkdtemp
+    _os.mkdir(file, 0o700)
+PermissionError: [Errno 13] Permission denied: '/home/user/c15-persistence-probes/synthetic-unit-1v_ztcqp'
+
+======================================================================
+ERROR: test_missing_barrier_wrong_binding_and_outstanding (test_journal.JournalTests.test_missing_barrier_wrong_binding_and_outstanding)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_journal.py", line 21, in setUp
+    self.parent = Path(tempfile.mkdtemp(prefix='synthetic-unit-', dir=base))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/tempfile.py", line 523, in mkdtemp
+    _os.mkdir(file, 0o700)
+PermissionError: [Errno 13] Permission denied: '/home/user/c15-persistence-probes/synthetic-unit-2vcu7rov'
+
+======================================================================
+ERROR: test_no_production_or_retired_identity_entrypoint (test_journal.JournalTests.test_no_production_or_retired_identity_entrypoint)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_journal.py", line 21, in setUp
+    self.parent = Path(tempfile.mkdtemp(prefix='synthetic-unit-', dir=base))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/tempfile.py", line 523, in mkdtemp
+    _os.mkdir(file, 0o700)
+PermissionError: [Errno 13] Permission denied: '/home/user/c15-persistence-probes/synthetic-unit-gvicu4sl'
+
+======================================================================
+ERROR: test_receipt_recording_does_not_claim_core_verification (test_journal.JournalTests.test_receipt_recording_does_not_claim_core_verification)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_journal.py", line 21, in setUp
+    self.parent = Path(tempfile.mkdtemp(prefix='synthetic-unit-', dir=base))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/tempfile.py", line 523, in mkdtemp
+    _os.mkdir(file, 0o700)
+PermissionError: [Errno 13] Permission denied: '/home/user/c15-persistence-probes/synthetic-unit-s1uc5s_3'
+
+======================================================================
+ERROR: test_reply_staged_kill_reopen_no_byte_rewriting (test_journal.JournalTests.test_reply_staged_kill_reopen_no_byte_rewriting)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_journal.py", line 21, in setUp
+    self.parent = Path(tempfile.mkdtemp(prefix='synthetic-unit-', dir=base))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/tempfile.py", line 523, in mkdtemp
+    _os.mkdir(file, 0o700)
+PermissionError: [Errno 13] Permission denied: '/home/user/c15-persistence-probes/synthetic-unit-lhzzh260'
+
+======================================================================
+ERROR: test_request_staged_kill_reopen_exact_bytes (test_journal.JournalTests.test_request_staged_kill_reopen_exact_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_journal.py", line 21, in setUp
+    self.parent = Path(tempfile.mkdtemp(prefix='synthetic-unit-', dir=base))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/tempfile.py", line 523, in mkdtemp
+    _os.mkdir(file, 0o700)
+PermissionError: [Errno 13] Permission denied: '/home/user/c15-persistence-probes/synthetic-unit-9vwtjeim'
+
+======================================================================
+ERROR: test_uncommitted_transaction_kill_preserves_old_checkpoint (test_journal.JournalTests.test_uncommitted_transaction_kill_preserves_old_checkpoint)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_journal.py", line 21, in setUp
+    self.parent = Path(tempfile.mkdtemp(prefix='synthetic-unit-', dir=base))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/tempfile.py", line 523, in mkdtemp
+    _os.mkdir(file, 0o700)
+PermissionError: [Errno 13] Permission denied: '/home/user/c15-persistence-probes/synthetic-unit-_lcrsilp'
+
+======================================================================
+ERROR: test_wrong_identity_missing_backend_no_recreation (test_journal.JournalTests.test_wrong_identity_missing_backend_no_recreation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_journal.py", line 21, in setUp
+    self.parent = Path(tempfile.mkdtemp(prefix='synthetic-unit-', dir=base))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/tempfile.py", line 523, in mkdtemp
+    _os.mkdir(file, 0o700)
+PermissionError: [Errno 13] Permission denied: '/home/user/c15-persistence-probes/synthetic-unit-x2lup72n'
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.004s
+
+FAILED (errors=13)
+EXIT_CODE=1
