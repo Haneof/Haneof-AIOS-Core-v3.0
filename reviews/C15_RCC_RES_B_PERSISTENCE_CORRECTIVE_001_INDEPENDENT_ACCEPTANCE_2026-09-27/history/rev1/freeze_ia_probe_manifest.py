@@ -39,18 +39,13 @@ def main() -> int:
 
     collect = subprocess.run(
         [sys.executable, "-m", "pytest", "--collect-only", "-q",
-         "-o", "addopts=", "-p", "no:cacheprovider",
          "--timeout=600", str(HERE / "ia_probes.py")],
         cwd=str(HERE), env=env, capture_output=True, text=True, timeout=1800,
     )
-    (HERE / "collect_only.txt").write_text(
-        f"returncode={collect.returncode}\n--- stdout ---\n{collect.stdout}\n"
-        f"--- stderr ---\n{collect.stderr}\n")
-    if collect.returncode != 0 or "::" not in collect.stdout:
-        print("COLLECT-ONLY FAILED -- full output follows", flush=True)
-        print(collect.stdout, flush=True)
-        print(collect.stderr, flush=True)
-        return 1
+    (HERE / "collect_only.txt").write_text(collect.stdout + "\n" + collect.stderr)
+    if collect.returncode != 0:
+        sys.stderr.write(collect.stdout + collect.stderr)
+        return collect.returncode
 
     enum_lines = [l for l in collect.stdout.splitlines()
                   if "::" in l and not l.startswith(" ")]

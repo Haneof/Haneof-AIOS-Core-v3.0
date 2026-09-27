@@ -73,11 +73,16 @@ jobs:
           PYTHONPATH: /__w/${{ github.workspace }}/cand/src:/__w/${{ github.workspace }}/cand
           IA_CANDIDATE_REPO: /__w/${{ github.workspace }}/cand
         run: |
-          set -euo pipefail
-          python "review/$IA_DIR/freeze_ia_probe_manifest.py" | tee review/freeze.log
-          cat "review/$IA_DIR/PROBE_MANIFEST.sha256"
-          cat "review/$IA_DIR/probe_enumeration.txt"
+          set -uo pipefail
+          python "review/$IA_DIR/freeze_ia_probe_manifest.py" 2>&1 | tee review/freeze.log
+          rc=${PIPESTATUS[0]}
+          echo "--- collect-only output ---"
+          cat "review/$IA_DIR/collect_only.txt" || true
+          echo "--- enumeration ---"
+          cat "review/$IA_DIR/probe_enumeration.txt" || true
+          exit $rc
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: ia-frozen-probe-manifest
           path: |
@@ -87,6 +92,7 @@ jobs:
             review/$IA_DIR/collect_only.txt
             review/$IA_DIR/ia_probes.py
             review/$IA_DIR/ia_child.py
+            review/freeze.log
 
   execute:
     name: independent-adversarial-probes
@@ -124,17 +130,23 @@ jobs:
       - name: Verify frozen manifest + probe hashes before first execution
         run: |
           set -euo pipefail
-          cd "review/$IA_DIR"
-          test "$(sha256sum PROBE_MANIFEST.json | cut -d' ' -f1)" \
-               = "$(cut -d' ' -f1 "$GITHUB_WORKSPACE/frozen/PROBE_MANIFEST.sha256")"
+          set -euo pipefail
+          # 1. the probe CODE must be byte-identical to what was frozen
           for f in ia_probes.py ia_child.py; do
-            a=$(sha256sum "$f" | cut -d' ' -f1)
+            a=$(sha256sum "review/$IA_DIR/$f" | cut -d' ' -f1)
             b=$(sha256sum "$GITHUB_WORKSPACE/frozen/$f" | cut -d' ' -f1)
-            test "$a" = "$b" || { echo "PROBE TAMPERED BEFORE EXECUTION: $f"; exit 1; }
+            test "$a" = "$b" || { echo "PROBE TAMPERED BETWEEN FREEZE AND EXECUTION: $f ($a != $b)"; exit 1; }
             echo "probe frozen OK: $f $a"
           done
+          # 2. the frozen manifest must verify against its own recorded digest
+          ( cd "$GITHUB_WORKSPACE/frozen" && sha256sum -c PROBE_MANIFEST.sha256 )
+          # 3. install the frozen manifest/enumeration/collect-only as the
+          #    authoritative ones for this execution
+          for f in PROBE_MANIFEST.json PROBE_MANIFEST.sha256 probe_enumeration.txt collect_only.txt; do
+            cp "$GITHUB_WORKSPACE/frozen/$f" "review/$IA_DIR/$f"
+          done
           echo "--- frozen enumeration ---"
-          cat "$GITHUB_WORKSPACE/frozen/probe_enumeration.txt"
+          cat "review/$IA_DIR/probe_enumeration.txt"
       - name: FIRST EXECUTION of the frozen adversarial probes
         env:
           PYTHONPATH: /__w/${{ github.workspace }}/cand/src:/__w/${{ github.workspace }}/cand
@@ -143,7 +155,8 @@ jobs:
           set -uo pipefail
           cd "review/$IA_DIR"
           python -c "import sys,pydantic,pytest,sqlite3; print('python',sys.version); print('pydantic',pydantic.VERSION); print('pytest',pytest.__version__); print('sqlite',sqlite3.sqlite_version)"
-          python -m pytest -v -rA --timeout=1800 --tb=short \
+          python -m pytest -v -rA -o addopts= -p no:cacheprovider \
+            --timeout=1800 --tb=short \
             ia_probes.py 2>&1 | tee FIRST_RUN.log
           rc=${PIPESTATUS[0]}
           echo "FIRST_RUN pytest exit: $rc" | tee -a FIRST_RUN.log
@@ -161,8 +174,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
+      # NOTE: C15_PERSISTENCE_RUNS_ROOT is deliberately NOT set here. The
+      # candidate's own test_operator_wiring.py asserts the *default* runs root
+      # is <workspace>/c15-persistence-runs; overriding it would be a reviewer
+      # environment bug, not a candidate defect.
       C15_PERSISTED_WORKSPACE: /home/runner/ia-workspace
-      C15_PERSISTENCE_RUNS_ROOT: /home/runner/ia-workspace/runs
       PYTHONDONTWRITEBYTECODE: "1"
     steps:
       - uses: actions/checkout@v4

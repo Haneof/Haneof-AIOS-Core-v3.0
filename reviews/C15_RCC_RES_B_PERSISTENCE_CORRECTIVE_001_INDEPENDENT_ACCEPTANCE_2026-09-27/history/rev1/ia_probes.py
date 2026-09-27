@@ -340,7 +340,7 @@ def _tamper_and_recover(ctx, mutate, *, commit_sha=None, target=None):
     out = {}
     fresh = _WS / "runs" / f"{ctx['run_id']}-t{uuid.uuid4().hex[:6]}"
     try:
-        snap = run_child(["--mode", "stage-b-verify", "--root", str(fresh),
+        snap = run_child(["--mode", "materialize-report", "--root", str(fresh),
                           "--run-id", ctx["run_id"], "--session-id", ctx["session_id"],
                           "--remote", str(ctx["bare"]), "--remote-ref", new_ref,
                           "--commit-sha", commit_sha or new_sha,
@@ -386,15 +386,11 @@ def _tamper_and_recover(ctx, mutate, *, commit_sha=None, target=None):
      .write_text(json.dumps({"last_acked_sequence": 99, "next_sequence": 100}))),
 ])
 def test_groupB_tampered_remote_state_fails_closed(label, mutate):
-    """The REAL cross-attachment reattach gate (platform_reattach.run_stage_b
-    steps 1-2: materialize -> read_manifest -> verify_reattach) must reject
-    every tampered remote state.  This is the path the candidate actually runs
-    for Stage B, not a synthetic re-implementation of it."""
     ctx = _stage_remote("B" + label)
     res = _tamper_and_recover(ctx, mutate)
     assert not res["opened"], (
-        f"FAIL-OPEN: the Stage B reattach gate ACCEPTED remote state tampered "
-        f"({label}). verify_reattach result = {res.get('snap')}"
+        f"FAIL-OPEN: remote state tampered ({label}) was ACCEPTED and opened. "
+        f"snapshot={res.get('snap')}"
     )
 
 
@@ -471,7 +467,8 @@ def test_groupB_newer_remote_generation_beats_stale_local_cache():
     subprocess.run(["git", "clone", "-q", str(bare), str(work)],
                    capture_output=True, text=True, check=True)
     git(["checkout", "-q", sha], cwd=work)
-    session = OperatorSession.attach(work, run_id=run_id, session_id=session_id)
+    session = OperatorSession.attach(work / "backend", run_id=run_id,
+                                     session_id=session_id)
     session.resume()
     session.backend.release()
     _, sha2 = remote_backend.push_run_state(
@@ -498,12 +495,7 @@ def test_groupB_newer_remote_generation_beats_stale_local_cache():
 # GROUP C -- concurrent writer / remote CAS
 # ==========================================================================
 def test_groupC_stale_writer_cannot_overwrite_and_never_forces():
-    """A genuine stale-parent race: writer B builds its next commit on top of
-    the OLD generation N after writer A has already published N+1.
-
-    Uses the candidate's own ``commit_backend_tree`` and the exact same plain
-    ``git push <sha>:<ref>`` that ``push_run_state`` performs, so this measures
-    the candidate's real CAS property and not a re-implementation."""
+    """Two writers read the same remote generation; the second must fail."""
     assert_no_force_push()
     run_id, session_id = new_identity("C")
     bare = make_bare_remote()
@@ -518,7 +510,7 @@ def test_groupC_stale_writer_cannot_overwrite_and_never_forces():
                                               repo_dir=CANDIDATE_REPO,
                                               message="C base N")
 
-    # writer A and writer B both materialize the SAME generation N
+    # writer A and writer B both materialize generation N
     wa = _WS / "runs" / f"{run_id}-A"
     wb = _WS / "runs" / f"{run_id}-B"
     for w in (wa, wb):
@@ -527,7 +519,7 @@ def test_groupC_stale_writer_cannot_overwrite_and_never_forces():
             remote_ref=ref, commit_sha=gen_n, remote=str(bare),
             repo_dir=CANDIDATE_REPO).release()
 
-    # writer A advances and publishes N+1
+    # writer A advances and pushes N+1
     sa = OperatorSession.attach(wa, run_id=run_id, session_id=session_id)
     sa.resume()
     sa.backend.release()
@@ -536,24 +528,23 @@ def test_groupC_stale_writer_cannot_overwrite_and_never_forces():
     a_sha = remote_head(bare, ref)
     assert a_sha != gen_n, "writer A did not advance the remote"
 
-    # writer B advances from its stale N and tries to publish, pinned to the
-    # stale parent -- this is the stale-writer race the contract must reject.
+    # writer B is still based on the stale N and must be REJECTED
     sb = OperatorSession.attach(wb, run_id=run_id, session_id=session_id)
     sb.resume()
     sb.backend.release()
-    _, b_sha = remote_backend.commit_backend_tree(
-        sb.backend.root, message="C writer B stale N+1", parent_sha=gen_n,
-        repo_dir=CANDIDATE_REPO)
-    p = subprocess.run(["git", "push", str(bare), f"{b_sha}:{ref}"],
-                       cwd=str(CANDIDATE_REPO), capture_output=True, text=True)
+    rejected = False
+    try:
+        remote_backend.push_run_state(sb.backend, remote_ref=ref, remote=str(bare),
+                                      repo_dir=CANDIDATE_REPO, message="C writer B stale")
+    except Exception:
+        rejected = True
     head = remote_head(bare, ref)
-    assert p.returncode != 0, (
-        f"CONCURRENT-WRITER VIOLATION: stale writer B's commit {b_sha[:12]} "
-        f"(parent {gen_n[:12]}, stale) was ACCEPTED on top of writer A's "
-        f"{a_sha[:12]}. push rc=0; remote head is now {head[:12]}"
+    assert rejected, (
+        f"CONCURRENT-WRITER VIOLATION: stale writer B pushed on top of generation N "
+        f"and was accepted. remote head moved {a_sha[:12]} -> {head[:12]}"
     )
     assert head == a_sha, (
-        f"SILENT FORK: remote ref moved off writer A's commit "
+        f"SILENT FORK: remote ref no longer points at writer A's commit "
         f"({head[:12]} != {a_sha[:12]})"
     )
     for w in (wa, wb, base):
@@ -561,7 +552,6 @@ def test_groupC_stale_writer_cannot_overwrite_and_never_forces():
 
 
 def test_groupC_same_generation_duplicate_commit_is_monotonic():
-    """Two writers publishing the same generation must not create a fork."""
     run_id, session_id = new_identity("Cdup")
     bare = make_bare_remote()
     ref = f"refs/heads/persistence/{run_id}"
@@ -573,24 +563,19 @@ def test_groupC_same_generation_duplicate_commit_is_monotonic():
     _, s1 = remote_backend.push_run_state(session.backend, remote_ref=ref,
                                           remote=str(bare), repo_dir=CANDIDATE_REPO,
                                           message="dup 1")
-    # a second, independent commit over the SAME parent generation
-    _, s2 = remote_backend.commit_backend_tree(
-        local, message="dup 2", parent_sha=s1, repo_dir=CANDIDATE_REPO)
-    p = subprocess.run(["git", "push", str(bare), f"{s2}:{ref}"],
-                       cwd=str(CANDIDATE_REPO), capture_output=True, text=True)
+    rejected = False
+    try:
+        session2 = RunBackend.open(local, run_id=run_id, session_id=session_id,
+                                   adopt_stale_owner=True)
+        remote_backend.push_run_state(session2, remote_ref=ref, remote=str(bare),
+                                      repo_dir=CANDIDATE_REPO, message="dup 2")
+        session2.release()
+    except Exception:
+        rejected = True
     head = remote_head(bare, ref)
-    assert p.returncode == 0 and head == s2, (
-        f"linear advance rejected or ref did not move: rc={p.returncode} "
-        f"head={head} s2={s2}"
-    )
-    # now a competing commit off the OLD parent must be rejected
-    _, s3 = remote_backend.commit_backend_tree(
-        local, message="dup 3 competing", parent_sha=s1, repo_dir=CANDIDATE_REPO)
-    p2 = subprocess.run(["git", "push", str(bare), f"{s3}:{ref}"],
-                        cwd=str(CANDIDATE_REPO), capture_output=True, text=True)
-    assert p2.returncode != 0 and remote_head(bare, ref) == s2, (
-        f"competing generation fork accepted: rc={p2.returncode} "
-        f"head={remote_head(bare, ref)}"
+    assert rejected and head == s1, (
+        f"duplicate-generation push was accepted or forked the ref "
+        f"(rejected={rejected}, head={head[:12]}, s1={s1[:12]})"
     )
     shutil.rmtree(local, ignore_errors=True)
 
@@ -717,7 +702,6 @@ def test_groupE_repeated_ack_is_idempotent():
                                      event_count=30)
     session.process_one_cursor()
     before = session.counters()
-    session.backend.release()   # a retry must be a genuinely separate writer
     # replay the same cursor in a fresh attached session (retry semantics)
     s2 = OperatorSession.attach(local, run_id=run_id, session_id=session_id)
     s2.process_one_cursor()

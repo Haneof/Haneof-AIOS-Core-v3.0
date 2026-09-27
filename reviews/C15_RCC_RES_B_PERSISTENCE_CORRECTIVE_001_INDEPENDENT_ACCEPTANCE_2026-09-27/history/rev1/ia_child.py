@@ -16,8 +16,7 @@ from pathlib import Path
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", required=True,
-                    choices=("materialize-report", "resume-report", "push-report",
-                             "stage-b-verify"))
+                    choices=("materialize-report", "resume-report", "push-report"))
     ap.add_argument("--root", required=True)
     ap.add_argument("--run-id", required=True)
     ap.add_argument("--session-id", required=True)
@@ -29,8 +28,6 @@ def main(argv: list[str] | None = None) -> int:
 
     from tools.c15_persistence.backend import RunBackend
     from tools.c15_persistence.operator_session import OperatorSession
-    from tools.c15_persistence.remote_backend import materialize_run_state
-    from tools.c15_persistence.runstate import read_manifest, verify_reattach
 
     def snapshot(session):
         root = Path(session.backend.root)
@@ -70,22 +67,6 @@ def main(argv: list[str] | None = None) -> int:
         session = OperatorSession.attach(args.root, run_id=args.run_id,
                                          session_id=args.session_id)
         out = dict(snapshot(session), mode=args.mode)
-    elif args.mode == "stage-b-verify":
-        # Mirrors tools/c15_persistence/platform_reattach.py run_stage_b steps 1-2
-        # EXACTLY: materialize_run_state -> read_manifest -> verify_reattach.
-        # This is the real cross-attachment reattach gate under test.
-        from pathlib import Path as _P
-        backend = materialize_run_state(
-            run_id=args.run_id, session_id=args.session_id,
-            target_dir=args.root, remote_ref=args.remote_ref,
-            commit_sha=args.commit_sha, remote=args.remote,
-            repo_dir=_P(args.repo_dir) if args.repo_dir else None)
-        manifest = read_manifest(_P(args.root) / "run-state-manifest.json")
-        report = verify_reattach(backend, manifest)
-        backend.release()
-        out = {"mode": args.mode, "reattached": report.get("reattached"),
-               "checked": report.get("checked"),
-               "failures": report.get("failures")}
     else:  # push-report
         backend = RunBackend.open(args.root, run_id=args.run_id,
                                   session_id=args.session_id,
