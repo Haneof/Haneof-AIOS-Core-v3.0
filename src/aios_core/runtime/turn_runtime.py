@@ -8,9 +8,12 @@ vertical slice stays green.
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 from typing import Any, Callable, Mapping, Sequence
+
+from aios_core.storage.idempotency import canonical_json_dumps
 
 from .turn_execution import TurnExecutionStore
 
@@ -1236,15 +1239,66 @@ class FusedTurnRuntime:
         )
         return attempt.attempt_id
 
+    def _outbound_request_fingerprint(
+        self,
+        snapshot: RuntimeSnapshot,
+        *,
+        work_kind: str,
+        work_id: str,
+    ) -> str:
+        """Canonical fingerprint of the exact request about to cross the provider boundary."""
+
+        payload = {
+            "attempt_id": snapshot.model_attempt_id,
+            "capability_catalog": [dict(item) for item in snapshot.capability_catalog],
+            "capability_history": [
+                {
+                    "call_id": item.call_id,
+                    "data": item.data,
+                    "error_code": item.error_code,
+                    "error_message": item.error_message,
+                    "name": item.name,
+                    "ok": bool(item.ok),
+                }
+                for item in snapshot.capability_history
+            ],
+            "cockpit": dict(snapshot.cockpit),
+            "remaining_tool_rounds": int(snapshot.remaining_tool_rounds),
+            "round_index": int(snapshot.round_index),
+            "subject_id": self.subject_id,
+            "user_input": snapshot.user_input,
+            "wake_reason": snapshot.wake_reason,
+            "work_id": work_id,
+            "work_kind": work_kind,
+        }
+        raw = canonical_json_dumps(payload).encode("utf-8")
+        return hashlib.sha256(raw).hexdigest()
+
     def _mark_background_model_dispatch(self, snapshot: RuntimeSnapshot) -> None:
         if snapshot.model_attempt_id is None:
             return
         if self._active_meter_time is None:
             raise RuntimeError("background model dispatch is missing execution time")
+        scope = self._active_model_attempt_scope()
+        if scope is None:
+            raise RuntimeError("background model dispatch is missing work scope")
+        work_kind, work_id = scope
+        fingerprint = self._outbound_request_fingerprint(
+            snapshot, work_kind=work_kind, work_id=work_id
+        )
         self.background_model_attempts.mark_dispatching(
             snapshot.model_attempt_id,
             dispatched_at=self._active_meter_time,
+            outbound_request_fingerprint=fingerprint,
         )
+        binding = self.background_model_attempts.outbound_request_binding(
+            snapshot.model_attempt_id
+        )
+        if binding is None:
+            raise RuntimeError(
+                "originating request binding was not durable before provider dispatch"
+            )
+        object.__setattr__(snapshot, "_outbound_relay_id", binding.relay_id)
 
     def _record_background_model_response(
         self,

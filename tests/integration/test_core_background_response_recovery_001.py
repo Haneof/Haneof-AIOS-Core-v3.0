@@ -134,6 +134,44 @@ def _stage(
     staged_at: datetime = NOW + timedelta(minutes=2),
     evidence: str = "operator relay journal",
 ):
+    attempt = runtime.background_model_attempts.inspect(
+        subject_id=runtime.subject_id,
+        work_kind=work_kind,
+        work_id=work_id,
+        model_round_index=model_round_index,
+    )
+    binding = (
+        None
+        if attempt is None
+        else runtime.background_model_attempts.outbound_request_binding(
+            attempt.attempt_id
+        )
+    )
+    # An in-doubt attempt has no recorded provider provenance yet. The exact
+    # response must echo the relay id Core stored before dispatch. Once that
+    # echo has been adopted, restaging the same bytes keeps using it. An
+    # in-process response_returned/metered attempt keeps its own provider
+    # request id and must be restaged byte-for-byte.
+    if binding is not None and (
+        attempt.provider_request_id is None
+        or attempt.provider_request_id == binding.relay_id
+    ):
+        directive = _directive(
+            binding.relay_id,
+            silence=directive.silence,
+            response=directive.response,
+            capability_calls=directive.capability_calls,
+            provider=(
+                directive.provenance.provider
+                if directive.provenance is not None
+                else PROVIDER
+            ),
+            model=(
+                directive.provenance.model
+                if directive.provenance is not None
+                else MODEL
+            ),
+        )
     payload, fingerprint = _payload_and_fingerprint(runtime, directive)
     return runtime.stage_exact_background_response(
         work_kind=work_kind,
@@ -322,10 +360,15 @@ def test_case_02_exact_response_recovery_never_redispatches_the_provider(tmp_pat
         directive=_directive("req-case-02"),
     )
     reconciled = runtime.background_model_attempts.get(attempt_id)
+    binding = runtime.background_model_attempts.outbound_request_binding(attempt_id)
+    assert binding is not None
     assert reconciled.state == "response_returned"
     assert reconciled.provider == PROVIDER
     assert reconciled.model == MODEL
-    assert reconciled.provider_request_id == "req-case-02"
+    # The staged reply must echo the pre-dispatch relay id, not an unbound
+    # caller-chosen request id.
+    assert reconciled.provider_request_id == binding.relay_id
+    assert staging.provider_request_id == binding.relay_id
     assert staging.response_fingerprint == reconciled.response_fingerprint
 
     restarted = FusedTurnRuntime(
@@ -911,7 +954,7 @@ def test_no_exact_response_can_be_staged_for_a_call_that_never_reached_provider(
     runtime = FusedTurnRuntime(store=store, index=index, model_handler=_must_not_call)
     signal = _emit_wake(runtime, key="never-dispatched")
 
-    def crash_before_dispatch(_attempt_id, *, dispatched_at):
+    def crash_before_dispatch(_attempt_id, *, dispatched_at, **_kwargs):
         raise RuntimeError("simulated crash before provider dispatch")
 
     monkeypatch.setattr(

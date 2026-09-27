@@ -95,13 +95,33 @@ def encode_model_directive(directive: ModelDirective) -> str:
     return canonical_json_dumps(payload)
 
 
+def _strict_json_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    """Reject duplicate object keys before any last-key-wins normalization.
+
+    ``json.loads`` calls this hook for every object, including nested usage,
+    provenance, capability-call and capability-argument objects. Raising here
+    happens before a dict is returned, so semantic construction never sees a
+    silently overwritten field.
+    """
+
+    parsed: dict[str, object] = {}
+    for key, value in pairs:
+        if key in parsed:
+            raise ValueError(
+                "exact provider response payload contains a duplicate JSON key: "
+                f"{key}"
+            )
+        parsed[key] = value
+    return parsed
+
+
 def decode_model_directive(payload: str) -> ModelDirective:
     """Strictly decode an exact provider directive; no defaults, no fallback."""
 
     if not isinstance(payload, str) or not payload.strip():
         raise ValueError("exact provider response payload must be non-blank text")
     try:
-        raw = json.loads(payload)
+        raw = json.loads(payload, object_pairs_hook=_strict_json_object)
     except json.JSONDecodeError as exc:
         raise ValueError(
             "exact provider response payload is not valid JSON"
@@ -249,6 +269,25 @@ class BackgroundModelResponseConflict(BackgroundModelAttemptBlocked):
             "exact provider response rejected: "
             f"{detail}; attempt {attempt.attempt_id} is {attempt.state}",
         )
+
+
+class BackgroundModelRequestBinding(BaseModel):
+    """Durable originating-request binding for one background model attempt.
+
+    Established before provider dispatch. Recovery verifies a response against
+    this row; it is not a token the recovery caller is allowed to fill in.
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    attempt_id: str = Field(min_length=1)
+    subject_id: str = Field(min_length=1)
+    work_kind: BackgroundAttemptWorkKind
+    work_id: str = Field(min_length=1)
+    model_round_index: int = Field(ge=0)
+    outbound_request_fingerprint: str = Field(min_length=1)
+    relay_id: str = Field(min_length=1)
+    bound_at: datetime
 
 
 class BackgroundModelResponseStaging(BaseModel):
@@ -400,6 +439,24 @@ class BackgroundModelAttemptStore:
                     )
                 """
             )
+            # Same runtime database, not a second World or cognition store.
+            # Written atomically with the dispatch transition, before the
+            # provider handler runs, and never supplied by the recovery caller.
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS background_model_request_bindings (
+                    attempt_id TEXT PRIMARY KEY,
+                    subject_id TEXT NOT NULL,
+                    work_kind TEXT NOT NULL,
+                    work_id TEXT NOT NULL,
+                    model_round_index INTEGER NOT NULL
+                        CHECK(model_round_index >= 0),
+                    outbound_request_fingerprint TEXT NOT NULL,
+                    relay_id TEXT NOT NULL,
+                    bound_at TEXT NOT NULL
+                )
+                """
+            )
             conn.commit()
 
     @staticmethod
@@ -414,6 +471,34 @@ class BackgroundModelAttemptStore:
             [subject_id, work_kind, work_id, int(model_round_index)]
         ).encode("utf-8")
         return f"bgattempt_{hashlib.sha256(raw).hexdigest()[:32]}"
+
+    @staticmethod
+    def relay_id_for(
+        *,
+        subject_id: str,
+        work_kind: str,
+        work_id: str,
+        model_round_index: int,
+        attempt_id: str,
+        outbound_request_fingerprint: str,
+    ) -> str:
+        """Mechanical relay identity for one exact outbound request.
+
+        Derived only from the durable attempt identity and the outbound request
+        fingerprint recorded at dispatch. A recovery caller cannot mint this.
+        """
+
+        raw = canonical_json_dumps(
+            {
+                "attempt_id": attempt_id,
+                "model_round_index": int(model_round_index),
+                "outbound_request_fingerprint": outbound_request_fingerprint,
+                "subject_id": subject_id,
+                "work_id": work_id,
+                "work_kind": work_kind,
+            }
+        ).encode("utf-8")
+        return f"relay_{hashlib.sha256(raw).hexdigest()}"
 
     @staticmethod
     def _response_fingerprint(directive: ModelDirective) -> str:
@@ -660,18 +745,95 @@ class BackgroundModelAttemptStore:
         attempt_id: str,
         *,
         dispatched_at: datetime,
+        outbound_request_fingerprint: str,
     ) -> BackgroundModelAttempt:
+        """Cross the provider boundary and durably bind the outbound request.
+
+        The binding is committed in the same transaction as the dispatching
+        transition, before the provider handler is invoked. A later exact-response
+        recovery must match this pre-existing binding; it cannot supply a
+        substitute token.
+        """
+
+        if (
+            not isinstance(outbound_request_fingerprint, str)
+            or not outbound_request_fingerprint.strip()
+        ):
+            raise ValueError(
+                "outbound request fingerprint must be non-blank before provider dispatch"
+            )
+        fingerprint = outbound_request_fingerprint.strip()
         moment = as_utc(dispatched_at, "dispatched_at")
         with self.store._connection() as conn:
             conn.execute("BEGIN IMMEDIATE")
+            row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if row is None:
+                conn.rollback()
+                raise KeyError(f"unknown background model attempt: {attempt_id}")
+            current = self._from_row(row)
+            if current.state != "admitted":
+                conn.rollback()
+                if current.state in {"dispatching", "in_doubt"}:
+                    raise BackgroundModelExecutionInDoubt(current)
+                if current.state == "response_returned":
+                    raise BackgroundModelResponsePending(current)
+                raise BackgroundModelAttemptBlocked(current)
+            relay_id = self.relay_id_for(
+                subject_id=current.subject_id,
+                work_kind=current.work_kind,
+                work_id=current.work_id,
+                model_round_index=current.model_round_index,
+                attempt_id=current.attempt_id,
+                outbound_request_fingerprint=fingerprint,
+            )
+            bound_at = canonical_utc_iso(moment, "bound_at")
+            updated_at = canonical_utc_iso(moment, "updated_at")
             changed = conn.execute(
                 """
                 UPDATE background_model_attempts
                 SET state='dispatching', updated_at=?
                 WHERE attempt_id=? AND state='admitted'
                 """,
-                (canonical_utc_iso(moment, "updated_at"), attempt_id),
+                (updated_at, attempt_id),
             ).rowcount
+            if changed != 1:
+                conn.rollback()
+                raise RuntimeError(
+                    "background model attempt did not enter dispatching"
+                )
+            # A not_submitted retry dispatches a new outbound request. Replace
+            # the previous binding only inside this admitted→dispatching
+            # transition; an in-doubt attempt's binding is never rewritten here.
+            conn.execute(
+                """
+                INSERT INTO background_model_request_bindings(
+                    attempt_id, subject_id, work_kind, work_id,
+                    model_round_index, outbound_request_fingerprint,
+                    relay_id, bound_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(attempt_id) DO UPDATE SET
+                    subject_id=excluded.subject_id,
+                    work_kind=excluded.work_kind,
+                    work_id=excluded.work_id,
+                    model_round_index=excluded.model_round_index,
+                    outbound_request_fingerprint=excluded.outbound_request_fingerprint,
+                    relay_id=excluded.relay_id,
+                    bound_at=excluded.bound_at
+                """,
+                (
+                    current.attempt_id,
+                    current.subject_id,
+                    current.work_kind,
+                    current.work_id,
+                    int(current.model_round_index),
+                    fingerprint,
+                    relay_id,
+                    bound_at,
+                ),
+            )
             row = conn.execute(
                 "SELECT * FROM background_model_attempts WHERE attempt_id=?",
                 (attempt_id,),
@@ -679,14 +841,7 @@ class BackgroundModelAttemptStore:
             conn.commit()
         if row is None:
             raise KeyError(f"unknown background model attempt: {attempt_id}")
-        attempt = self._from_row(row)
-        if changed == 1:
-            return attempt
-        if attempt.state in {"dispatching", "in_doubt"}:
-            raise BackgroundModelExecutionInDoubt(attempt)
-        if attempt.state == "response_returned":
-            raise BackgroundModelResponsePending(attempt)
-        raise BackgroundModelAttemptBlocked(attempt)
+        return self._from_row(row)
 
     def adopt_legacy_in_doubt(
         self,
@@ -952,6 +1107,93 @@ class BackgroundModelAttemptStore:
             evidence=row["evidence"],
         )
 
+    @staticmethod
+    def _binding_from_row(row: object) -> BackgroundModelRequestBinding:
+        return BackgroundModelRequestBinding(
+            attempt_id=row["attempt_id"],
+            subject_id=row["subject_id"],
+            work_kind=row["work_kind"],
+            work_id=row["work_id"],
+            model_round_index=int(row["model_round_index"]),
+            outbound_request_fingerprint=row["outbound_request_fingerprint"],
+            relay_id=row["relay_id"],
+            bound_at=datetime.fromisoformat(
+                str(row["bound_at"]).replace("Z", "+00:00")
+            ),
+        )
+
+    def outbound_request_binding(
+        self,
+        attempt_id: str,
+    ) -> BackgroundModelRequestBinding | None:
+        """Read the pre-dispatch originating-request binding. Never mints one."""
+
+        with self.store._connection() as conn:
+            row = conn.execute(
+                """
+                SELECT * FROM background_model_request_bindings
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+        return None if row is None else self._binding_from_row(row)
+
+    def _require_origin_binding(
+        self,
+        attempt: BackgroundModelAttempt,
+        binding: BackgroundModelRequestBinding | None,
+        *,
+        supplied_request_id: str,
+        require_relay_echo: bool,
+    ) -> BackgroundModelRequestBinding:
+        """Verify a response against the binding written before dispatch.
+
+        The supplied request id is compared to the stored relay id. A caller
+        who copies another attempt's request id together with that attempt's
+        response still fails, because this method never trusts a caller-supplied
+        token in place of the pre-existing row.
+        """
+
+        if binding is None:
+            raise BackgroundModelResponseConflict(
+                attempt,
+                "durable originating request binding is missing; exact response "
+                "adoption cannot prove which outbound request this attempt made",
+            )
+        if (
+            binding.attempt_id != attempt.attempt_id
+            or binding.subject_id != attempt.subject_id
+            or binding.work_kind != attempt.work_kind
+            or binding.work_id != attempt.work_id
+            or binding.model_round_index != attempt.model_round_index
+        ):
+            raise BackgroundModelResponseConflict(
+                attempt,
+                "durable originating request binding does not match the attempt "
+                "subject, work kind, work id, model round, or attempt id",
+            )
+        expected_relay = self.relay_id_for(
+            subject_id=binding.subject_id,
+            work_kind=binding.work_kind,
+            work_id=binding.work_id,
+            model_round_index=binding.model_round_index,
+            attempt_id=binding.attempt_id,
+            outbound_request_fingerprint=binding.outbound_request_fingerprint,
+        )
+        if binding.relay_id != expected_relay:
+            raise BackgroundModelResponseConflict(
+                attempt,
+                "durable originating request binding is internally inconsistent "
+                "with the recorded outbound request",
+            )
+        if require_relay_echo and supplied_request_id != binding.relay_id:
+            raise BackgroundModelResponseConflict(
+                attempt,
+                "exact response is not bound to this attempt's durable "
+                "originating request",
+            )
+        return binding
+
     def staged_response(
         self,
         attempt_id: str,
@@ -1067,6 +1309,31 @@ class BackgroundModelAttemptStore:
                     "supplied exact provider identity conflicts with durable "
                     "attempt provenance",
                 )
+            binding_row = conn.execute(
+                """
+                SELECT * FROM background_model_request_bindings
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+            binding = (
+                None if binding_row is None else self._binding_from_row(binding_row)
+            )
+            try:
+                # dispatching/in_doubt have no prior provider provenance. The
+                # response must echo the relay id stored before dispatch.
+                # response_returned/metered already recorded that provenance
+                # in-process; the binding must still exist and stay consistent,
+                # but the provider's own request id is not rewritten.
+                self._require_origin_binding(
+                    current,
+                    binding,
+                    supplied_request_id=supplied_request_id,
+                    require_relay_echo=current.state in {"dispatching", "in_doubt"},
+                )
+            except BackgroundModelResponseConflict:
+                conn.rollback()
+                raise
 
             conn.execute(
                 """
@@ -1226,4 +1493,13 @@ class BackgroundModelAttemptStore:
                 "staged directive does not reproduce the durable response "
                 "fingerprint",
             )
+        binding = self.outbound_request_binding(attempt_id)
+        self._require_origin_binding(
+            attempt,
+            binding,
+            supplied_request_id=staged.provider_request_id,
+            require_relay_echo=staged.provider_request_id == (
+                None if binding is None else binding.relay_id
+            ),
+        )
         return directive

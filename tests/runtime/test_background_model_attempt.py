@@ -28,7 +28,11 @@ def test_background_attempt_reconciliation_keeps_same_identity_and_non_world_rev
         world_revision=before,
         admitted_at=NOW,
     )
-    attempts.mark_dispatching(admitted.attempt_id, dispatched_at=NOW)
+    attempts.mark_dispatching(
+        admitted.attempt_id,
+        dispatched_at=NOW,
+        outbound_request_fingerprint="unit-outbound-request",
+    )
     in_doubt = attempts.mark_failure(
         admitted.attempt_id,
         failed_at=NOW,
@@ -54,7 +58,11 @@ def test_background_attempt_reconciliation_keeps_same_identity_and_non_world_rev
         admitted_at=NOW,
     )
     assert retry.attempt_id == admitted.attempt_id
-    attempts.mark_dispatching(retry.attempt_id, dispatched_at=NOW)
+    attempts.mark_dispatching(
+        retry.attempt_id,
+        dispatched_at=NOW,
+        outbound_request_fingerprint="unit-outbound-request-retry",
+    )
 
     directive = ModelDirective(
         silence=True,

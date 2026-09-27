@@ -138,6 +138,18 @@ class RuntimeSnapshot:
         value = getattr(self, "_model_attempt_id", None)
         return value if isinstance(value, str) else None
 
+    @property
+    def outbound_relay_id(self) -> str | None:
+        """Core-minted relay identity for the outbound request of this round.
+
+        Set only after the durable originating-request binding is committed and
+        before the provider handler runs. A recoverable exact response must echo
+        this value; it is not a caller-supplied recovery token.
+        """
+
+        value = getattr(self, "_outbound_relay_id", None)
+        return value if isinstance(value, str) else None
+
 
 @dataclass(frozen=True)
 class RuntimeTurnResult:
