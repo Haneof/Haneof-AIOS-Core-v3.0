@@ -1,0 +1,156 @@
+{
+  "collection": {
+    "command": "pytest --collect-only -q tests/c15_persistence/killpoints/test_killpoints.py",
+    "returncode": 0,
+    "stdout": "tests/c15_persistence/killpoints/test_killpoints.py: 5"
+  },
+  "invariant": "recovery converges to the same durable cursor without second reveal, duplicate ingest, duplicate semantic application, duplicate output/capability, duplicate ACK, or skipped cursor; a terminal/in_doubt outcome is not convergence",
+  "manifest_version": "c15-killpoint-probe-manifest-v1",
+  "probes": [
+    {
+      "barrier": "release state pending_reveal is durable; ingest has not started",
+      "expected": {
+        "acks": {
+          "relation": "eq_baseline"
+        },
+        "assistant_outputs": {
+          "relation": "eq_baseline"
+        },
+        "capability_side_effects": {
+          "relation": "eq_baseline"
+        },
+        "dispatch_ledger": {
+          "relation": "eq_baseline"
+        },
+        "ingests": {
+          "relation": "eq_baseline"
+        },
+        "metering_rows": {
+          "relation": "eq_baseline"
+        },
+        "reveals": {
+          "relation": "eq_baseline"
+        }
+      },
+      "id": "K1",
+      "invariant": "recovery converges to the same durable cursor without second reveal, duplicate ingest, duplicate semantic application, duplicate output/capability, duplicate ACK, or skipped cursor; a terminal/in_doubt outcome is not convergence",
+      "kill_point": "K1_AFTER_REVEAL"
+    },
+    {
+      "barrier": "event is durably ingested into World; provider dispatch has not started",
+      "expected": {
+        "acks": {
+          "relation": "eq_baseline"
+        },
+        "assistant_outputs": {
+          "relation": "eq_baseline"
+        },
+        "capability_side_effects": {
+          "relation": "eq_baseline"
+        },
+        "dispatch_ledger": {
+          "relation": "eq_baseline"
+        },
+        "ingests": {
+          "relation": "eq_baseline"
+        },
+        "metering_rows": {
+          "relation": "eq_baseline"
+        },
+        "reveals": {
+          "relation": "eq_baseline"
+        }
+      },
+      "id": "K2",
+      "invariant": "recovery converges to the same durable cursor without second reveal, duplicate ingest, duplicate semantic application, duplicate output/capability, duplicate ACK, or skipped cursor; a terminal/in_doubt outcome is not convergence",
+      "kill_point": "K2_AFTER_INGEST"
+    },
+    {
+      "barrier": "exact provider request is durably staged/exposed/dispatched; no reply yet",
+      "expected": {
+        "acks": {
+          "relation": "eq_baseline"
+        },
+        "assistant_outputs": {
+          "relation": "eq_baseline"
+        },
+        "capability_side_effects": {
+          "relation": "eq_baseline"
+        },
+        "dispatch_ledger": {
+          "relation": "eq_baseline"
+        },
+        "ingests": {
+          "relation": "eq_baseline"
+        },
+        "metering_rows": {
+          "relation": "eq_baseline"
+        },
+        "reveals": {
+          "relation": "eq_baseline"
+        }
+      },
+      "id": "K3",
+      "invariant": "recovery converges to the same durable cursor without second reveal, duplicate ingest, duplicate semantic application, duplicate output/capability, duplicate ACK, or skipped cursor; a terminal/in_doubt outcome is not convergence",
+      "kill_point": "K3_AFTER_REQUEST_DISPATCH"
+    },
+    {
+      "barrier": "Core trusted-return receipt is durable for the exact reply; downstream application (remaining capability work, final round, assistant output) is not complete",
+      "expected": {
+        "acks": {
+          "relation": "eq_baseline"
+        },
+        "assistant_outputs": {
+          "relation": "eq_baseline"
+        },
+        "capability_side_effects": {
+          "relation": "eq_baseline"
+        },
+        "dispatch_ledger": {
+          "relation": "eq_baseline"
+        },
+        "ingests": {
+          "relation": "eq_baseline"
+        },
+        "metering_rows": {
+          "relation": "eq_baseline"
+        },
+        "reveals": {
+          "relation": "eq_baseline"
+        }
+      },
+      "id": "K4",
+      "invariant": "recovery converges to the same durable cursor without second reveal, duplicate ingest, duplicate semantic application, duplicate output/capability, duplicate ACK, or skipped cursor; a terminal/in_doubt outcome is not convergence",
+      "kill_point": "K4_AFTER_REPLY_AUTHENTICATED"
+    },
+    {
+      "barrier": "model/capability work is durably applied in Core; cursor ACK not yet issued",
+      "expected": {
+        "acks": {
+          "relation": "eq_baseline"
+        },
+        "assistant_outputs": {
+          "relation": "eq_baseline"
+        },
+        "capability_side_effects": {
+          "relation": "eq_baseline"
+        },
+        "dispatch_ledger": {
+          "relation": "eq_baseline"
+        },
+        "ingests": {
+          "relation": "eq_baseline"
+        },
+        "metering_rows": {
+          "relation": "eq_baseline"
+        },
+        "reveals": {
+          "relation": "eq_baseline"
+        }
+      },
+      "id": "K5",
+      "invariant": "recovery converges to the same durable cursor without second reveal, duplicate ingest, duplicate semantic application, duplicate output/capability, duplicate ACK, or skipped cursor; a terminal/in_doubt outcome is not convergence",
+      "kill_point": "K5_AFTER_APPLIED_BEFORE_ACK"
+    }
+  ]
+}
