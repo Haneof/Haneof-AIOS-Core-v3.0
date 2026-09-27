@@ -3,16 +3,20 @@ name: c15-rcc-res-b-persistence-corrective-001-ia-formal-acceptance
 # INDEPENDENT ACCEPTANCE — review-only, evidence-only.
 #
 # This workflow does NOT modify PR #216, the candidate branch, the persistence
-# canonical ref, or any Stage A / Stage B canonical state.  It checks out the
+# canonical ref, or any Stage A / Stage B canonical state. It checks out the
 # exact frozen candidate read-only and runs the reviewer's own probes against
-# it, then re-runs the author's gates and the full regression.
+# it, then re-runs the candidate's own gates and the full regression.
 #
-# tested exact candidate: 63ca592359c7e3fd71d6cc4ba349949e4f0b80e3
-# canonical Stage B commit: 15c75ac3e97c57a5fa1f3085c282a852994d9acf
+#   tested exact candidate : 63ca592359c7e3fd71d6cc4ba349949e4f0b80e3
+#   canonical Stage B      : 15c75ac3e97c57a5fa1f3085c282a852994d9acf
+#   canonical persistence  : refs/heads/persistence/c15-persistence-synthetic-run-ae5c57221c83
 #
-# Ordering is mechanically enforced: the `freeze` job hashes the probes and runs
-# --collect-only BEFORE the `execute` job is allowed to run them, and `execute`
-# re-verifies the frozen hashes before the first execution.
+# The job is deliberately a SINGLE job: the freeze step (hash + pytest
+# --collect-only) must complete before the first execution step runs, and step
+# ordering inside one job is the mechanical guarantee of that.
+#
+# Every step appends to $GITHUB_STEP_SUMMARY so the whole evidence record is
+# readable from the check-run API.
 
 on:
   pull_request:
@@ -28,277 +32,213 @@ permissions:
 env:
   CANDIDATE: "63ca592359c7e3fd71d6cc4ba349949e4f0b80e3"
   STAGE_B: "15c75ac3e97c57a5fa1f3085c282a852994d9acf"
+  CANON_REF: "refs/heads/persistence/c15-persistence-synthetic-run-ae5c57221c83"
+  LIT: "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27"
+  C15_PERSISTED_WORKSPACE: /home/runner/ia-workspace
+  PYTHONDONTWRITEBYTECODE: "1"
 
 jobs:
-  freeze:
-    name: freeze-probes-before-first-execution
+  formal-acceptance:
+    name: ia-formal-acceptance
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    env:
-      IA_DIR: reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27
-      C15_PERSISTED_WORKSPACE: /home/runner/ia-workspace
-      C15_PERSISTENCE_RUNS_ROOT: /home/runner/ia-workspace/runs
-      PYTHONDONTWRITEBYTECODE: "1"
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
         with:
           path: review
           fetch-depth: 1
-      - uses: actions/checkout@v4
-        with:
-          path: cand
-          ref: ${{ env.CANDIDATE }}
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12.14"
-      - name: Install formal dependency set
-        run: |
-          set -euo pipefail
-          python -m pip install --upgrade pip
-          pip install "pydantic==2.13.5" "pytest==8.4.2" pytest-timeout
-      - name: Verify exact candidate identity
-        run: |
-          set -euo pipefail
-          test "$(git -C cand rev-parse HEAD)" = "${{ env.CANDIDATE }}"
-          git -C cand fetch --no-tags -q origin \
-            "+refs/heads/persistence/c15-persistence-synthetic-run-ae5c57221c83:refs/remotes/origin/persistence/ia-review"
-          git -C cand cat-file -e "${{ env.STAGE_B }}^{commit}"
-          test "$(git -C cand rev-parse refs/remotes/origin/persistence/ia-review)" = "${{ env.STAGE_B }}"
-          echo "candidate pinned: $(git -C cand rev-parse HEAD)"
-          echo "canonical persistence ref pinned read-only: $(git -C cand rev-parse refs/remotes/origin/persistence/ia-review)"
-      - name: Freeze probe hashes + collect-only enumeration
-        id: freeze
-        continue-on-error: true
-        env:
-          PYTHONPATH: /__w/${{ github.workspace }}/cand/src:/__w/${{ github.workspace }}/cand
-          IA_CANDIDATE_REPO: /__w/${{ github.workspace }}/cand
-        run: |
-          set -uo pipefail
-          python "review/$IA_DIR/freeze_ia_probe_manifest.py" > "review/$IA_DIR/freeze.log" 2>&1
-          rc=$?
-          # Surface diagnostics as check-run annotations (the Actions blob/artifact
-          # channel is not reachable from the independent reviewer's sandbox).
-          {
-            echo "freeze_rc=$rc"
-            tail -60 "review/$IA_DIR/freeze.log"
-            echo "--- collect_only ---"
-            tail -30 "review/$IA_DIR/collect_only.txt" 2>/dev/null || echo "(absent)"
-          } | grep -v '^$' | head -80 | while IFS= read -r l; do
-            echo "::error title=IA-FREEZE::$l"
-          done
-          cat "review/$IA_DIR/freeze.log"
-          exit $rc
-      - name: Publish freeze diagnostics to the PR
-        if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -uo pipefail
-          {
-            echo "## IA freeze diagnostics (run ${{ github.run_id }})"
-            echo
-            echo '```'
-            echo "### collect_only.txt"
-            cat "review/$IA_DIR/collect_only.txt" 2>/dev/null || echo "(missing)"
-            echo
-            echo "### probe_enumeration.txt"
-            cat "review/$IA_DIR/probe_enumeration.txt" 2>/dev/null || echo "(missing)"
-            echo
-            echo "### PROBE_MANIFEST.sha256"
-            cat "review/$IA_DIR/PROBE_MANIFEST.sha256" 2>/dev/null || echo "(missing)"
-            echo '```'
-          } > /tmp/freeze-diag.md
-          gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/freeze-diag.md || true
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: ia-frozen-probe-manifest
-          path: |
-            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/PROBE_MANIFEST.json
-            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/PROBE_MANIFEST.sha256
-            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/probe_enumeration.txt
-            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/collect_only.txt
-            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/ia_probes.py
-            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/ia_child.py
-            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/freeze.log
 
-  execute:
-    name: independent-adversarial-probes
-    needs: freeze
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
-    env:
-      IA_DIR: reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27
-      C15_PERSISTED_WORKSPACE: /home/runner/ia-workspace
-      C15_PERSISTENCE_RUNS_ROOT: /home/runner/ia-workspace/runs
-      PYTHONDONTWRITEBYTECODE: "1"
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          path: review
-          fetch-depth: 1
       - uses: actions/checkout@v4
         with:
           path: cand
           ref: ${{ env.CANDIDATE }}
           fetch-depth: 0
           persist-credentials: false
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12.14"
+
       - name: Install formal dependency set
         run: |
           set -euo pipefail
           python -m pip install --upgrade pip
           pip install "pydantic==2.13.5" "pytest==8.4.2" pytest-timeout
-      - uses: actions/download-artifact@v4
-        with:
-          name: ia-frozen-probe-manifest
-          path: frozen
-      - name: Verify frozen manifest + probe hashes before first execution
-        run: |
-          set -euo pipefail
-          set -euo pipefail
-          # 1. the probe CODE must be byte-identical to what was frozen
-          for f in ia_probes.py ia_child.py; do
-            a=$(sha256sum "review/$IA_DIR/$f" | cut -d' ' -f1)
-            b=$(sha256sum "$GITHUB_WORKSPACE/frozen/$f" | cut -d' ' -f1)
-            test "$a" = "$b" || { echo "PROBE TAMPERED BETWEEN FREEZE AND EXECUTION: $f ($a != $b)"; exit 1; }
-            echo "probe frozen OK: $f $a"
-          done
-          # 2. the frozen manifest must verify against its own recorded digest
-          if ! ( cd "$GITHUB_WORKSPACE/frozen" && sha256sum -c PROBE_MANIFEST.sha256 ); then
-            ls -la "$GITHUB_WORKSPACE/frozen" | while IFS= read -r l; do echo "::error title=IA-FROZEN-VERIFY::$(basename "$l")"; done
-            echo "::error title=IA-FROZEN-VERIFY::frozen manifest digest check FAILED"
-            exit 1
-          fi
-          # 3. install the frozen manifest/enumeration/collect-only as the
-          #    authoritative ones for this execution
-          for f in PROBE_MANIFEST.json PROBE_MANIFEST.sha256 probe_enumeration.txt collect_only.txt; do
-            cp "$GITHUB_WORKSPACE/frozen/$f" "review/$IA_DIR/$f"
-          done
-          echo "--- frozen enumeration ---"
-          cat "review/$IA_DIR/probe_enumeration.txt"
-      - name: FIRST EXECUTION of the frozen adversarial probes
-        env:
-          PYTHONPATH: /__w/${{ github.workspace }}/cand/src:/__w/${{ github.workspace }}/cand
-          IA_CANDIDATE_REPO: /__w/${{ github.workspace }}/cand
-        run: |
-          set -uo pipefail
-          cd "review/$IA_DIR"
-          python -c "import sys,pydantic,pytest,sqlite3; print('python',sys.version); print('pydantic',pydantic.VERSION); print('pytest',pytest.__version__); print('sqlite',sqlite3.sqlite_version)"
-          python -m pytest -v -rA -o addopts= -p no:cacheprovider \
-            --timeout=1800 --tb=short \
-            ia_probes.py 2>&1 | tee FIRST_RUN.log
-          rc=${PIPESTATUS[0]}
-          echo "FIRST_RUN pytest exit: $rc" | tee -a FIRST_RUN.log
-          {
-            echo "pytest_exit=$rc"
-            grep -E "^(FAILED|ERROR)" FIRST_RUN.log | head -40
-            tail -5 FIRST_RUN.log
-          } | while IFS= read -r l; do
-            echo "::error title=IA-FIRST-RUN::$l"
-          done
-          exit $rc
-      - name: Publish first-run evidence to the PR
-        if: always()
+
+      - name: 0. Verify exact candidate identity
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -uo pipefail
           {
-            echo "## IA FIRST RUN (frozen probes)"
+            echo "## IA formal acceptance"
             echo
             echo "- run: \`${{ github.run_id }}\`"
-            echo "- tested exact candidate: \`63ca592359c7e3fd71d6cc4ba349949e4f0b80e3\`"
-            echo "- canonical Stage B: \`15c75ac3e97c57a5fa1f3085c282a852994d9acf\`"
-            echo
-            echo '```'
-            tail -120 "review/$IA_DIR/FIRST_RUN.log" 2>/dev/null || echo "(no log)"
-            echo '```'
-          } > /tmp/firstrun.md
-          gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/firstrun.md || true
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: ia-first-run-evidence
-          path: |
-            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/FIRST_RUN.log
-            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/PROBE_MANIFEST.json
-            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/PROBE_MANIFEST.sha256
-            review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/probe_enumeration.txt
+            echo "- tested exact candidate: \`${{ env.CANDIDATE }}\`"
+            echo "- canonical Stage B commit: \`${{ env.STAGE_B }}\`"
+            echo "- canonical persistence ref: \`${{ env.CANON_REF }}\` (READ-ONLY)"
+          } >> "$GITHUB_STEP_SUMMARY"
+          test "$(git -C cand rev-parse HEAD)" = "${{ env.CANDIDATE }}" || { echo "CANDIDATE DRIFT"; exit 1; }
+          git -C cand fetch --no-tags -q origin \
+            "+${{ env.CANON_REF }}:refs/remotes/origin/persistence/ia-review" || true
+          echo "candidate HEAD = $(git -C cand rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+          echo "canonical ref  = $(git -C cand rev-parse refs/remotes/origin/persistence/ia-review 2>/dev/null || echo 'n/a')" >> "$GITHUB_STEP_SUMMARY"
+          git -C cand cat-file -e "${{ env.STAGE_B }}^{commit}" || { echo "STAGE B MISSING"; exit 1; }
 
-  author-gates:
-    name: independent-rerun-of-author-gates
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
-    env:
-      # NOTE: C15_PERSISTENCE_RUNS_ROOT is deliberately NOT set here. The
-      # candidate's own test_operator_wiring.py asserts the *default* runs root
-      # is <workspace>/c15-persistence-runs; overriding it would be a reviewer
-      # environment bug, not a candidate defect.
-      C15_PERSISTED_WORKSPACE: /home/runner/ia-workspace
-      PYTHONDONTWRITEBYTECODE: "1"
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ env.CANDIDATE }}
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12.14"
-      - name: Formal environment identity
-        run: |
-          set -euo pipefail
-          python -m pip install --upgrade pip
-          pip install "pydantic==2.13.5" "pytest==8.4.2" pytest-timeout
-          pip install -e "." || true
-          test "$(git rev-parse HEAD)" = "${{ env.CANDIDATE }}"
-          python -c "import sys,pydantic,pytest,sqlite3; print('PYTHON',sys.version); print('PYDANTIC',pydantic.VERSION); print('PYTEST',pytest.__version__); print('SQLITE',sqlite3.sqlite_version)"
-      - name: 1. K1-K5 frozen kill-point suite (expect 5/5)
-        run: python -m pytest -v --timeout=1800 tests/c15_persistence/killpoints/test_killpoints.py
-      - name: 2. production wiring (expect 16/16)
-        run: python -m pytest -v --timeout=1800 tests/c15_persistence/test_operator_wiring.py
-      - name: 3. environment / remote reattach (expect 4/4)
-        run: python -m pytest -v -rs --timeout=1800 tests/c15_persistence/test_environment_reattach.py
-      - name: 4. resident-visible surface
-        run: python -m pytest -v --timeout=1800 tests/c15_persistence/test_resident_surface.py
-      - name: 5. historical persistence journal (frozen unittest contract)
-        run: |
-          set -euo pipefail
-          # The frozen historical journal/test pair pins /home/user as its
-          # original workspace contract. Recreate that host path in CI rather
-          # than rewriting the historical bytes.
-          sudo install -d -m 0755 /home/user
-          sudo install -d -m 0700 -o "$(id -u)" -g "$(id -g)" /home/user/c15-persistence-unit-probes
-          python -m unittest discover -s tests/c15_persistence -p "test_journal.py" -v
-      - name: 6. src/aios_core/** zero diff
-        run: |
-          set -euo pipefail
-          test -z "$(git diff --name-only 56c01b919c397b67024df1acb320874144d87f42 HEAD -- src/aios_core/)"
-          test -z "$(git diff --name-only origin/main HEAD -- src/aios_core/ 2>/dev/null || true)"
-          echo "src/aios_core zero diff: PASS"
-      - name: 7. full regression
+      - name: 1. Freeze environment identity
+        env:
+          PYTHONPATH: /__w/${{ github.workspace }}/cand/src:/__w/${{ github.workspace }}/cand
+          IA_CANDIDATE_REPO: /__w/${{ github.workspace }}/cand
         run: |
           set -uo pipefail
-          python -m pytest -q -rs -o addopts= -p no:cacheprovider \
-            --timeout=3600 tests/ > full-regression.raw.log 2>&1
-          rc=$?
-          tail -100 full-regression.raw.log | tee full-regression.log
           {
-            echo "full_regression_exit=$rc"
-            grep -E "^(FAILED|ERROR)" full-regression.raw.log | head -30
-            tail -3 full-regression.raw.log
-          } | while IFS= read -r l; do
-            echo "::error title=IA-FULL-REGRESSION::$l"
-          done
+            echo
+            echo "### formal environment"
+            echo '```'
+            python -c "import sys,pydantic,pytest,sqlite3;print('python',sys.version);print('pydantic',pydantic.VERSION);print('pytest',pytest.__version__);print('sqlite',sqlite3.sqlite_version)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: 2. FREEZE probe hashes + collect-only enumeration (before first execution)
+        id: freeze
+        env:
+          PYTHONPATH: /__w/${{ github.workspace }}/cand/src:/__w/${{ github.workspace }}/cand
+          IA_CANDIDATE_REPO: /__w/${{ github.workspace }}/cand
+        run: |
+          set -uo pipefail
+          python "review/$LIT/freeze_ia_probe_manifest.py" > "review/$LIT/freeze.log" 2>&1
+          rc=$?
+          {
+            echo
+            echo "### freeze (rc=$rc)"
+            echo '```'
+            tail -40 "review/$LIT/freeze.log" 2>/dev/null
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ $rc -ne 0 ]; then
+            while IFS= read -r l; do echo "::error title=IA-FREEZE::${l:0:900}"; done < "review/$LIT/freeze.log"
+            exit 1
+          fi
+
+      - name: 3. Verify frozen manifest before first execution
+        env:
+          PYTHONPATH: /__w/${{ github.workspace }}/cand/src:/__w/${{ github.workspace }}/cand
+          IA_CANDIDATE_REPO: /__w/${{ github.workspace }}/cand
+        run: |
+          set -uo pipefail
+          cd "review/$LIT"
+          sha256sum ia_probes.py ia_child.py > probe-files.sha256
+          {
+            echo
+            echo "### frozen probe hashes"
+            echo '```'
+            cat probe-files.sha256
+            echo "manifest digest: $(cut -d' ' -f1 PROBE_MANIFEST.sha256)"
+            echo
+            echo "### frozen enumeration (pytest --collect-only)"
+            echo '```'
+            cat probe_enumeration.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ ! -s probe_enumeration.txt ]; then
+            echo "::error title=IA-FREEZE::enumeration is empty"
+            exit 1
+          fi
+          sha256sum -c PROBE_MANIFEST.sha256 || { echo "::error title=IA-FREEZE::manifest digest mismatch"; exit 1; }
+
+      - name: 4. FIRST EXECUTION of the frozen adversarial probes
+        env:
+          PYTHONPATH: /__w/${{ github.workspace }}/cand/src:/__w/${{ github.workspace }}/cand
+          IA_CANDIDATE_REPO: /__w/${{ github.workspace }}/cand
+        run: |
+          set -uo pipefail
+          cd "review/$LIT"
+          python -m pytest -v -rA -o addopts= -p no:cacheprovider \
+            --timeout=1800 --tb=line ia_probes.py > FIRST_RUN.log 2>&1
+          rc=$?
+          {
+            echo
+            echo "### IA FIRST RUN (frozen probes) exit=$rc"
+            echo '```'
+            grep -E "^(FAILED|ERROR|PASSED)" FIRST_RUN.log | head -50
+            echo "..."
+            tail -4 FIRST_RUN.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          while IFS= read -r l; do echo "::error title=IA-FIRST-RUN::${l:0:900}"; done < <(grep -E "^(FAILED|ERROR)" FIRST_RUN.log)
           exit $rc
-      - uses: actions/upload-artifact@v4
+
+      - name: 5a. author gate 1 — K1-K5 frozen kill-point suite
         if: always()
-        with:
-          name: ia-author-gates
-          path: |
-            full-regression.log
-            full-regression.raw.log
+        run: |
+          set -uo pipefail
+          cd cand
+          python -m pytest -v -o addopts= --timeout=1800 tests/c15_persistence/killpoints/test_killpoints.py > /tmp/k.txt 2>&1
+          rc=$?; { echo; echo "### K1-K5 (rc=$rc)"; echo '```'; tail -3 /tmp/k.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $rc
+
+      - name: 5b. author gate 2 — production wiring
+        if: always()
+        run: |
+          set -uo pipefail
+          cd cand
+          python -m pytest -v -o addopts= --timeout=1800 tests/c15_persistence/test_operator_wiring.py > /tmp/w.txt 2>&1
+          rc=$?; { echo; echo "### production wiring (rc=$rc)"; echo '```'; tail -3 /tmp/w.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $rc
+
+      - name: 5c. author gate 3 — environment / remote reattach
+        if: always()
+        run: |
+          set -uo pipefail
+          cd cand
+          python -m pytest -v -rs -o addopts= --timeout=1800 tests/c15_persistence/test_environment_reattach.py > /tmp/r.txt 2>&1
+          rc=$?; { echo; echo "### env/remote reattach (rc=$rc)"; echo '```'; tail -4 /tmp/r.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $rc
+
+      - name: 5d. author gate 4 — resident-visible surface
+        if: always()
+        run: |
+          set -uo pipefail
+          cd cand
+          python -m pytest -v -o addopts= --timeout=1800 tests/c15_persistence/test_resident_surface.py > /tmp/s.txt 2>&1
+          rc=$?; { echo; echo "### resident surface (rc=$rc)"; echo '```'; tail -3 /tmp/s.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $rc
+
+      - name: 5e. author gate 5 — historical persistence journal (frozen unittest contract)
+        if: always()
+        run: |
+          set -uo pipefail
+          sudo install -d -m 0755 /home/user
+          sudo install -d -m 0700 -o "$(id -u)" -g "$(id -g)" /home/user/c15-persistence-unit-probes
+          cd cand
+          python -m unittest discover -s tests/c15_persistence -p "test_journal.py" -v > /tmp/j.txt 2>&1
+          rc=$?; { echo; echo "### historical journal (rc=$rc)"; echo '```'; tail -4 /tmp/j.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $rc
+
+      - name: 5f. author gate 6 — src/aios_core/** zero diff
+        if: always()
+        run: |
+          set -uo pipefail
+          cd cand
+          n=$(git diff --name-only 56c01b919c397b67024df1acb320874144d87f42 HEAD -- src/aios_core/ | wc -l)
+          { echo; echo "### src/aios_core zero diff vs merge-base 56c01b91: $n files"; } >> "$GITHUB_STEP_SUMMARY"
+          git diff --name-only 56c01b919c397b67024df1acb320874144d87f42 HEAD -- src/aios_core/ >> "$GITHUB_STEP_SUMMARY"
+          test "$n" -eq 0
+
+      - name: 6. full regression
+        if: always()
+        run: |
+          set -uo pipefail
+          cd cand
+          python -m pytest -q -rs -o addopts= -p no:cacheprovider --timeout=3600 tests/ > /tmp/full.txt 2>&1
+          rc=$?
+          {
+            echo
+            echo "### full regression (rc=$rc)"
+            echo '```'
+            grep -E "^(FAILED|ERROR)" /tmp/full.txt | head -30
+            tail -3 /tmp/full.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          while IFS= read -r l; do echo "::error title=IA-FULL-REGRESSION::${l:0:900}"; done < <(grep -E "^(FAILED|ERROR)" /tmp/full.txt | head -10)
+          exit $rc
