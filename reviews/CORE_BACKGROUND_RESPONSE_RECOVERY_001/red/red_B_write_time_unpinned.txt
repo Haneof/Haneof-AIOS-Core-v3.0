@@ -1,0 +1,80 @@
+..........F.......                                                       [100%]
+=================================== FAILURES ===================================
+____ test_case_06_crash_during_capability_application_replays_exactly_once _____
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-9/test_case_06_crash_during_capa0')
+
+    def test_case_06_crash_during_capability_application_replays_exactly_once(tmp_path):
+        store, index, db = _world(tmp_path)
+        anchor = _seed_observation(store)
+        index.catch_up()
+        capability_directive = _directive(
+            "req-case-06-r0",
+            silence=False,
+            capability_calls=(_watch_call(anchor),),
+        )
+    
+        def scripted(snapshot):
+            if snapshot.round_index == 0:
+                return capability_directive
+            raise AssertionError("the first process must die during capability application")
+    
+        runtime = FusedTurnRuntime(store=store, index=index, model_handler=scripted)
+        signal = _emit_wake(runtime, key="case-06")
+    
+        real_spec = runtime.registry.get_spec("create_attention_watch")
+        real_handler = runtime._create_attention_watch
+        runtime.registry.unregister("create_attention_watch")
+    
+        def crash_after_commit(**kwargs):
+            real_handler(**kwargs)
+            raise _SimulatedCrash("simulated process death during capability application")
+    
+        runtime.registry.register(real_spec, crash_after_commit)
+    
+        with pytest.raises(_SimulatedCrash):
+            runtime.run_wake(wake_ref=_wake_ref(signal), now=NOW)
+    
+        attempt = _wake_attempt(runtime, signal.wake_id, 0)
+        assert attempt is not None
+        assert attempt.state == "metered"
+        assert len(_watch_tasks(store)) == 1
+        assert len(runtime.metering.list_model_calls(subject_id="user_1", wake_id=signal.wake_id)) == 1
+    
+        reopened_store, reopened_index = _reopen(db)
+        calls: list[tuple[int, str | None]] = []
+    
+        def provider(snapshot):
+            calls.append((snapshot.round_index, snapshot.model_attempt_id))
+            return _directive("req-case-06-r1")
+    
+        restarted = FusedTurnRuntime(
+            store=reopened_store,
+            index=reopened_index,
+            model_handler=provider,
+        )
+        _stage(
+            restarted,
+            work_kind="wake",
+            work_id=signal.wake_id,
+            model_round_index=0,
+            directive=capability_directive,
+        )
+        result = restarted.run_wake(wake_ref=_wake_ref(signal), now=NOW + timedelta(minutes=8))
+    
+        assert result.wake.state == "completed"
+        assert result.runtime.termination_reason == "silence"
+        assert result.runtime.recovered_response_attempts == (attempt.attempt_id,)
+        # The recovered round never reached the provider; only the fresh next round did.
+        assert len(calls) == 1
+        assert calls[0][0] == 1
+        assert calls[0][1] != attempt.attempt_id
+    
+        tasks = _watch_tasks(reopened_store)
+>       assert len(tasks) == 1
+E       AssertionError: assert 2 == 1
+E        +  where 2 = len([{'app_id': None, 'attempts': 0, 'cancel_condition': {}, 'completion_condition': {'attention_class': 'background', 'co...ion_class': 'background', 'cooldown_seconds': 60, 'dimensions': ['dim:cbrr'], 'kind': 'attention_watch_v1', ...}, ...}])
+
+tests/integration/test_core_background_response_recovery_001.py:688: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_core_background_response_recovery_001.py::test_case_06_crash_during_capability_application_replays_exactly_once

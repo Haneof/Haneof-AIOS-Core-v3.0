@@ -8,9 +8,12 @@ vertical slice stays green.
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 from typing import Any, Callable, Mapping, Sequence
+
+from aios_core.storage.idempotency import canonical_json_dumps
 
 from .turn_execution import TurnExecutionStore
 
@@ -102,6 +105,7 @@ from .background_attempt import (
     BackgroundModelAttempt,
     BackgroundModelAttemptStore,
     BackgroundModelExecutionInDoubt,
+    BackgroundModelResponseStaging,
 )
 from .budget_gate import BackgroundBudgetDecision, BackgroundBudgetGate
 from .capabilities import CapabilityKind, CapabilityRegistry, CapabilitySpec
@@ -109,6 +113,7 @@ from .cognitive_runtime import (
     CognitiveRuntime,
     ModelDirective,
     ModelHandler,
+    RecoveredModelResponse,
     RuntimeSnapshot,
     RuntimeTurnResult,
 )
@@ -1123,8 +1128,10 @@ class FusedTurnRuntime:
             model_usage_recorder=self._record_model_usage,
             model_attempt_admitter=self._admit_background_model_attempt,
             model_dispatch_recorder=self._mark_background_model_dispatch,
+            model_response_authenticator=self._authenticate_background_model_response,
             model_response_recorder=self._record_background_model_response,
             model_failure_recorder=self._record_background_model_failure,
+            model_response_recovery=self._recover_exact_model_response,
         )
 
     def _active_background_attempt_scope(self) -> tuple[str, str] | None:
@@ -1233,14 +1240,89 @@ class FusedTurnRuntime:
         )
         return attempt.attempt_id
 
+    def _outbound_request_fingerprint(
+        self,
+        snapshot: RuntimeSnapshot,
+        *,
+        work_kind: str,
+        work_id: str,
+    ) -> str:
+        """Canonical fingerprint of the exact request about to cross the provider boundary."""
+
+        payload = {
+            "attempt_id": snapshot.model_attempt_id,
+            "capability_catalog": [dict(item) for item in snapshot.capability_catalog],
+            "capability_history": [
+                {
+                    "call_id": item.call_id,
+                    "data": item.data,
+                    "error_code": item.error_code,
+                    "error_message": item.error_message,
+                    "name": item.name,
+                    "ok": bool(item.ok),
+                }
+                for item in snapshot.capability_history
+            ],
+            "cockpit": dict(snapshot.cockpit),
+            "remaining_tool_rounds": int(snapshot.remaining_tool_rounds),
+            "round_index": int(snapshot.round_index),
+            "subject_id": self.subject_id,
+            "user_input": snapshot.user_input,
+            "wake_reason": snapshot.wake_reason,
+            "work_id": work_id,
+            "work_kind": work_kind,
+        }
+        raw = canonical_json_dumps(payload).encode("utf-8")
+        return hashlib.sha256(raw).hexdigest()
+
     def _mark_background_model_dispatch(self, snapshot: RuntimeSnapshot) -> None:
         if snapshot.model_attempt_id is None:
             return
         if self._active_meter_time is None:
             raise RuntimeError("background model dispatch is missing execution time")
+        scope = self._active_model_attempt_scope()
+        if scope is None:
+            raise RuntimeError("background model dispatch is missing work scope")
+        work_kind, work_id = scope
+        fingerprint = self._outbound_request_fingerprint(
+            snapshot, work_kind=work_kind, work_id=work_id
+        )
         self.background_model_attempts.mark_dispatching(
             snapshot.model_attempt_id,
             dispatched_at=self._active_meter_time,
+            outbound_request_fingerprint=fingerprint,
+        )
+        binding = self.background_model_attempts.outbound_request_binding(
+            snapshot.model_attempt_id
+        )
+        if binding is None:
+            raise RuntimeError(
+                "originating request binding was not durable before provider dispatch"
+            )
+        object.__setattr__(snapshot, "_outbound_relay_id", binding.relay_id)
+
+    def _authenticate_background_model_response(
+        self,
+        snapshot: RuntimeSnapshot,
+        directive: ModelDirective,
+    ) -> None:
+        """Capture a non-forgeable receipt at the trusted model-return boundary."""
+
+        if snapshot.model_attempt_id is None:
+            return
+        if self._active_meter_time is None:
+            raise RuntimeError("background model response is missing execution time")
+        # Anonymous/local handlers remain valid but cannot participate in exact
+        # external-response recovery because there is no provider identity to bind.
+        if any(
+            value is None
+            for value in self.background_model_attempts._provider_identity(directive)
+        ):
+            return
+        self.background_model_attempts._capture_trusted_response_return(
+            snapshot.model_attempt_id,
+            captured_at=self._active_meter_time,
+            directive=directive,
         )
 
     def _record_background_model_response(
@@ -1273,6 +1355,98 @@ class FusedTurnRuntime:
             failed_at=self._active_meter_time,
             definitely_not_submitted=definitely_not_submitted,
             error=error,
+        )
+
+    def stage_exact_background_response(
+        self,
+        *,
+        work_kind: str,
+        work_id: str,
+        model_round_index: int,
+        provider: str,
+        model: str,
+        provider_request_id: str,
+        response_fingerprint: str,
+        directive_payload: str,
+        staged_at: datetime,
+        evidence: str,
+        authenticity_proof: str | None = None,
+    ) -> BackgroundModelResponseStaging:
+        """Durably bind one exact externally preserved provider reply to an attempt.
+
+        This is the only Core entry point allowed to carry a provider reply from an
+        external durable journal back into a background attempt/round. The exact
+        directive, its response fingerprint and the exact provider/model/request_id
+        are verified against the durable attempt before anything is staged; missing
+        or mismatched identity stays fail-closed.
+        """
+
+        attempt = self.background_model_attempts.inspect(
+            subject_id=self.subject_id,
+            work_kind=work_kind,
+            work_id=work_id,
+            model_round_index=model_round_index,
+        )
+        if attempt is None:
+            raise KeyError(
+                "no durable background model attempt exists for the requested "
+                "work identity and round"
+            )
+        return self.background_model_attempts.stage_exact_response(
+            attempt.attempt_id,
+            staged_at=staged_at,
+            provider=provider,
+            model=model,
+            provider_request_id=provider_request_id,
+            response_fingerprint=response_fingerprint,
+            directive_payload=directive_payload,
+            authenticity_proof=authenticity_proof,
+            evidence=evidence,
+        )
+
+    def _pending_exact_response(
+        self,
+        *,
+        work_kind: str,
+        work_id: str,
+    ) -> tuple[BackgroundModelAttempt, BackgroundModelResponseStaging] | None:
+        return self.background_model_attempts.pending_exact_response(
+            subject_id=self.subject_id,
+            work_kind=work_kind,
+            work_id=work_id,
+        )
+
+    def _recover_exact_model_response(
+        self,
+        snapshot: RuntimeSnapshot,
+    ) -> RecoveredModelResponse | None:
+        """Serve a durable exact provider reply for the current attempt/round.
+
+        The model handler is never invoked for a recovered round. Returned None for
+        every other round keeps the ordinary provider path untouched, and any
+        unresolved attempt without exact durable bytes keeps failing closed through
+        the existing admission guards.
+        """
+
+        scope = self._active_model_attempt_scope()
+        if scope is None:
+            return None
+        work_kind, work_id = scope
+        pending = self._pending_exact_response(
+            work_kind=work_kind,
+            work_id=work_id,
+        )
+        if pending is None:
+            return None
+        attempt, _staged = pending
+        if attempt.model_round_index != snapshot.round_index:
+            return None
+        directive = self.background_model_attempts.exact_response_directive(
+            attempt.attempt_id
+        )
+        return RecoveredModelResponse(
+            attempt_id=attempt.attempt_id,
+            directive=directive,
         )
 
     def _record_model_usage(
@@ -1308,11 +1482,11 @@ class FusedTurnRuntime:
             model_round_index=snapshot.round_index,
             usage=directive.usage,
             provenance=directive.provenance,
-            background_attempt_id=(
-                snapshot.model_attempt_id
-                if self._active_background_attempt_scope() is not None
-                else None
-            ),
+            # Every durable model-attempt round is metered against its exact attempt
+            # identity, including user turns. This keeps one uniform reason truth for
+            # "provider response returned, round applied" and makes metering replay
+            # idempotent per attempt/round instead of inventing a new record.
+            background_attempt_id=snapshot.model_attempt_id,
         )
 
     def _cockpit_capability_catalog(self) -> tuple[dict[str, Any], ...]:
@@ -3229,23 +3403,49 @@ class FusedTurnRuntime:
             session_id=session,
             turn_index=turn_index,
         )
-        self.turn_executions.claim(
-            subject_id=self.subject_id, session_id=session, turn_index=turn_index,
-            user_input=user_input, occurred_at=occurred_iso, assistant_id=assistant_id,
-        )
-        # Establish the same durable provider-attempt boundary used by FIX-002
-        # before any user-turn pre-model work. If execution stops before
-        # mark_dispatching(), the admitted state is durable proof that provider
-        # submission did not begin; retry still requires explicit authorization.
-        self.background_model_attempts.admit(
-            subject_id=self.subject_id,
+        exact_response = self._pending_exact_response(
             work_kind="user_turn",
             work_id=execution_id,
-            wake_reason=WakeSource.USER_INTERACTION.value,
-            model_round_index=0,
-            world_revision=int(self.store.current_world_revision()),
-            admitted_at=occurred_at,
         )
+        model_round_offset = 0
+        if exact_response is None:
+            self.turn_executions.claim(
+                subject_id=self.subject_id, session_id=session, turn_index=turn_index,
+                user_input=user_input, occurred_at=occurred_iso, assistant_id=assistant_id,
+            )
+            # Establish the same durable provider-attempt boundary used by FIX-002
+            # before any user-turn pre-model work. If execution stops before
+            # mark_dispatching(), the admitted state is durable proof that provider
+            # submission did not begin; retry still requires explicit authorization.
+            self.background_model_attempts.admit(
+                subject_id=self.subject_id,
+                work_kind="user_turn",
+                work_id=execution_id,
+                wake_reason=WakeSource.USER_INTERACTION.value,
+                model_round_index=0,
+                world_revision=int(self.store.current_world_revision()),
+                admitted_at=occurred_at,
+            )
+        else:
+            # Durable exact provider bytes exist for this turn's attempt/round, so the
+            # ordinary entrypoint may resume that same attempt without any provider
+            # call. This is mechanically authorized by the exact-response journal, not
+            # by an operator semantic decision, and it never authorizes a retry.
+            model_round_offset = exact_response[0].model_round_index
+            self.turn_executions.authorize_exact_response_recovery(
+                subject_id=self.subject_id,
+                session_id=session,
+                turn_index=turn_index,
+                user_input=user_input,
+                occurred_at=occurred_iso,
+                assistant_id=assistant_id,
+                evidence=(
+                    "exact provider response durably staged for attempt "
+                    f"{exact_response[0].attempt_id} round "
+                    f"{exact_response[0].model_round_index} with fingerprint "
+                    f"{exact_response[1].response_fingerprint}"
+                ),
+            )
         # Corrective-001: only after deterministic round-0 attempt admission is
         # durable do we promote the turn out of the explicit pre-attempt protocol.
         # A crash before this line is therefore mechanically recoverable; a crash
@@ -3422,6 +3622,7 @@ class FusedTurnRuntime:
                 user_input,
                 wake_reason="user_interaction",
                 cockpit=context.as_cockpit(),
+                model_round_offset=model_round_offset,
             )
         finally:
             self._active_turn_time = None
@@ -3758,6 +3959,20 @@ class FusedTurnRuntime:
             wake_id=wake.object_id,
             metadata=wake.metadata,
         )
+        exact_response = self._pending_exact_response(
+            work_kind="wake",
+            work_id=wake.object_id,
+        )
+        recovered_attempt: BackgroundModelAttempt | None = None
+        if exact_response is not None:
+            # An externally durable exact reply exists for the round where execution
+            # stopped. Resume that exact attempt/round instead of dispatching the
+            # provider again; rounds whose provider reply was never durably preserved
+            # keep failing closed through the ordinary admission guards.
+            recovered_attempt = exact_response[0]
+            model_round_offset = max(
+                model_round_offset, recovered_attempt.model_round_index
+            )
         self._protect_legacy_running_background_work(
             wake=wake,
             work_kind="wake",
@@ -3866,6 +4081,13 @@ class FusedTurnRuntime:
         )
 
         active_write_time = now
+        if recovered_attempt is not None:
+            # The recovered round re-applies the exact directive that already ran, so
+            # its capability writebacks must keep the original execution write time.
+            # Durable object identity for cognition, task and writeback commits is
+            # derived from that time; a fresh `now` would create a second side effect
+            # instead of replaying the same durable operation idempotently.
+            active_write_time = recovered_attempt.admitted_at
         if effective_wake_source is WakeSource.COGNITIVE_DERIVATION:
             raw_first_started_at = (
                 running.metadata.get("runtime_first_started_at")
@@ -4303,6 +4525,16 @@ class FusedTurnRuntime:
             wake_id=review_wake.object_id,
             metadata=review_wake.metadata,
         )
+        exact_response = self._pending_exact_response(
+            work_kind="periodic_review",
+            work_id=review_wake.object_id,
+        )
+        recovered_attempt: BackgroundModelAttempt | None = None
+        if exact_response is not None:
+            recovered_attempt = exact_response[0]
+            model_round_offset = max(
+                model_round_offset, recovered_attempt.model_round_index
+            )
         self._protect_legacy_running_background_work(
             wake=review_wake,
             work_kind="periodic_review",
@@ -4343,6 +4575,11 @@ class FusedTurnRuntime:
             if raw_started_at is not None
             else now
         )
+        if recovered_attempt is not None:
+            # Same rule as the Wake path: a recovered round must reproduce the
+            # original execution write time so replayed capability writebacks stay
+            # idempotent instead of becoming a second side effect.
+            review_write_time = recovered_attempt.admitted_at
 
         empty_recommendation = RecommendationBundle(
             current_topic=None,

@@ -1,0 +1,85 @@
+........................................................................ [  9%]
+........................................................................ [ 19%]
+........................................................................ [ 29%]
+........................................................................ [ 39%]
+........................................................................ [ 48%]
+........................................................................ [ 58%]
+........................................................................ [ 68%]
+........................................................................ [ 78%]
+........................................................................ [ 88%]
+........................F............................................... [ 97%]
+...............                                                          [100%]
+=================================== FAILURES ===================================
+_________ test_isolation_exception_classification_namespace_permission _________
+
+    def test_isolation_exception_classification_namespace_permission():
+        """Explicit namespace permission insufficient -> NOT_TESTED/INCONCLUSIVE, not FAIL."""
+        from tools.c15_preflight.isolation_probe import probe
+        # Simulate permission error by patching subprocess.run to raise PermissionError
+        with patch("tools.c15_preflight.isolation_probe.subprocess.run", side_effect=PermissionError("unshare: Operation not permitted")):
+            try:
+>               probe()
+
+tests/preflight/test_round5_fixes.py:546: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = None, private_a = None
+
+    def probe(repo: Path | None = None, private_a: Path | None = None) -> dict:
+        # Deprecated positional arguments are deliberately NOT dereferenced. All
+        # resources used for this proof are generated in this private temporary dir.
+        with tempfile.TemporaryDirectory(prefix="c15-isolation-") as tmp:
+            base = Path(tmp)
+            root = base / "root"
+            root.mkdir()
+            paths, hashes = create_canaries(base)
+            before = outside_checks(paths, hashes)
+            if any(v != "VERIFIED" for v in before.values()):
+                return assess(before, {}, outside_checks(paths, hashes))
+            packet = base / "packet"
+            packet.mkdir()
+            allowed = packet / "request.json"
+            allowed.write_text(json.dumps({"synthetic": True, "nonce": os.urandom(16).hex()}))
+            allowed_sha256 = hashlib.sha256(allowed.read_bytes()).hexdigest()
+            script = base / "probe.py"
+            script.write_text(PROBE)
+            # Interpreter selection: try 3.11, then 3, 3.12, 3.10
+            interpreter_candidates = [Path('/usr/bin/python3.11'), Path('/usr/bin/python3'), Path('/usr/bin/python3.12'), Path('/usr/bin/python3.10')]
+            interpreter = None
+            for cand in interpreter_candidates:
+                if cand.is_file() and not cand.is_symlink():
+                    interpreter = cand
+                    break
+            if interpreter is None:
+>               raise RuntimeError("isolation probe INCONCLUSIVE: no suitable python interpreter found")
+E               RuntimeError: isolation probe INCONCLUSIVE: no suitable python interpreter found
+
+tools/c15_preflight/isolation_probe.py:133: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+    def test_isolation_exception_classification_namespace_permission():
+        """Explicit namespace permission insufficient -> NOT_TESTED/INCONCLUSIVE, not FAIL."""
+        from tools.c15_preflight.isolation_probe import probe
+        # Simulate permission error by patching subprocess.run to raise PermissionError
+        with patch("tools.c15_preflight.isolation_probe.subprocess.run", side_effect=PermissionError("unshare: Operation not permitted")):
+            try:
+                probe()
+            except RuntimeError as e:
+                # Should be INCONCLUSIVE with explicit message
+                assert "INCONCLUSIVE" in str(e)
+>               assert "unshare" in str(e) or "permission" in str(e).lower() or "not permitted" in str(e).lower()
+E               AssertionError: assert ('unshare' in 'isolation probe INCONCLUSIVE: no suitable python interpreter found' or 'permission' in 'isolation probe inconclusive: no suitable python interpreter found' or 'not permitted' in 'isolation probe inconclusive: no suitable python interpreter found')
+E                +  where 'isolation probe INCONCLUSIVE: no suitable python interpreter found' = str(RuntimeError('isolation probe INCONCLUSIVE: no suitable python interpreter found'))
+E                +  and   'isolation probe inconclusive: no suitable python interpreter found' = <built-in method lower of str object at 0x7f9d6e9b5450>()
+E                +    where <built-in method lower of str object at 0x7f9d6e9b5450> = 'isolation probe INCONCLUSIVE: no suitable python interpreter found'.lower
+E                +      where 'isolation probe INCONCLUSIVE: no suitable python interpreter found' = str(RuntimeError('isolation probe INCONCLUSIVE: no suitable python interpreter found'))
+E                +  and   'isolation probe inconclusive: no suitable python interpreter found' = <built-in method lower of str object at 0x7f9d6e9b5450>()
+E                +    where <built-in method lower of str object at 0x7f9d6e9b5450> = 'isolation probe INCONCLUSIVE: no suitable python interpreter found'.lower
+E                +      where 'isolation probe INCONCLUSIVE: no suitable python interpreter found' = str(RuntimeError('isolation probe INCONCLUSIVE: no suitable python interpreter found'))
+
+tests/preflight/test_round5_fixes.py:550: AssertionError
+- generated xml file: /home/user/Haneof-AIOS-Core-v3.0/reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CORRECTIVE_001/full_suite_junit.xml -
+=========================== short test summary info ============================
+FAILED tests/preflight/test_round5_fixes.py::test_isolation_exception_classification_namespace_permission
+1 failed, 734 passed in 168.07s (0:02:48)

@@ -1,0 +1,9 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_blk001_cross_round_transplant_rejected __________________
+tests/integration/test_core_background_response_recovery_001_corrective_001.py:379: in test_blk001_cross_round_transplant_rejected
+    with pytest.raises(Exception, match="originating request"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE <class 'Exception'>
+=========================== short test summary info ============================
+FAILED tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_blk001_cross_round_transplant_rejected

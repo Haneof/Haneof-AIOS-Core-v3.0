@@ -248,7 +248,7 @@ def test_crash_before_dispatch_keeps_admitted_attempt_safe_to_retry_on_restart(
     )
     signal = _emit_wake(first_runtime, key="crash-before-dispatch")
 
-    def crash_before_dispatch(_attempt_id, *, dispatched_at):
+    def crash_before_dispatch(_attempt_id, *, dispatched_at, **_kwargs):
         raise RuntimeError("simulated crash before provider dispatch")
 
     monkeypatch.setattr(

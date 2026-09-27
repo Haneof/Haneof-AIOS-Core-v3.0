@@ -1,0 +1,1754 @@
+.F.....FFFFFFF.FF.                                                       [100%]
+=================================== FAILURES ===================================
+_____ test_case_02_exact_response_recovery_never_redispatches_the_provider _____
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-7/test_case_02_exact_response_re0')
+
+    def test_case_02_exact_response_recovery_never_redispatches_the_provider(tmp_path):
+        store, index, db, runtime, signal, attempt_id, calls = _crash_wake_into_in_doubt(
+            tmp_path, key="case-02"
+        )
+        staging = _stage(
+            runtime,
+            work_kind="wake",
+            work_id=signal.wake_id,
+            model_round_index=0,
+            directive=_directive("req-case-02"),
+        )
+        reconciled = runtime.background_model_attempts.get(attempt_id)
+        assert reconciled.state == "response_returned"
+        assert reconciled.provider == PROVIDER
+        assert reconciled.model == MODEL
+        assert reconciled.provider_request_id == "req-case-02"
+        assert staging.response_fingerprint == reconciled.response_fingerprint
+    
+        restarted = FusedTurnRuntime(
+            store=store,
+            index=index,
+            model_handler=_must_not_call,
+        )
+>       result = restarted.run_wake(wake_ref=_wake_ref(signal), now=NOW + timedelta(minutes=3))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_response_recovery_001.py:336: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/aios_core/runtime/turn_runtime.py:4268: in run_wake
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:330: in run_turn
+    attempt_id = self.model_attempt_admitter(snapshot)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/aios_core/runtime/turn_runtime.py:1228: in _admit_background_model_attempt
+    attempt = self.background_model_attempts.admit(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <aios_core.runtime.background_attempt.BackgroundModelAttemptStore object at 0x7f52f9271a50>
+
+    def admit(
+        self,
+        *,
+        subject_id: str,
+        work_kind: BackgroundAttemptWorkKind,
+        work_id: str,
+        wake_reason: str,
+        model_round_index: int,
+        world_revision: int,
+        admitted_at: datetime,
+    ) -> BackgroundModelAttempt:
+        moment = as_utc(admitted_at, "admitted_at")
+        attempt_id = self.attempt_id_for(
+            subject_id=subject_id,
+            work_kind=work_kind,
+            work_id=work_id,
+            model_round_index=model_round_index,
+        )
+        with self.store._connection() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO background_model_attempts(
+                    attempt_id, subject_id, work_kind, work_id, wake_reason,
+                    model_round_index, admission_world_revision, state,
+                    admitted_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'admitted', ?, ?)
+                """,
+                (
+                    attempt_id,
+                    subject_id,
+                    work_kind,
+                    work_id,
+                    wake_reason,
+                    int(model_round_index),
+                    int(world_revision),
+                    canonical_utc_iso(moment, "admitted_at"),
+                    canonical_utc_iso(moment, "updated_at"),
+                ),
+            )
+            row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if row is None:
+                conn.rollback()
+                raise RuntimeError("background model attempt admission was not durable")
+            current = self._from_row(row)
+            immutable = (
+                current.subject_id == subject_id
+                and current.work_kind == work_kind
+                and current.work_id == work_id
+                and current.wake_reason == wake_reason
+                and current.model_round_index == int(model_round_index)
+            )
+            if not immutable:
+                conn.rollback()
+                raise RuntimeError(
+                    "background model attempt identity conflicts with durable work identity"
+                )
+    
+            if current.state == "not_submitted":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='admitted', updated_at=?, failure_kind=NULL,
+                        failure_detail=NULL
+                    WHERE attempt_id=? AND state='not_submitted'
+                    """,
+                    (canonical_utc_iso(moment, "updated_at"), attempt_id),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during retry admission")
+                return self._from_row(row)
+    
+            if current.state == "admitted":
+                conn.commit()
+                return current
+    
+            if current.state == "dispatching":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='in_doubt', updated_at=?,
+                        failure_kind='restart_after_dispatch_boundary',
+                        failure_detail=?
+                    WHERE attempt_id=? AND state='dispatching'
+                    """,
+                    (
+                        canonical_utc_iso(moment, "updated_at"),
+                        "provider dispatch boundary was crossed without a durable response",
+                        attempt_id,
+                    ),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during recovery")
+                raise BackgroundModelExecutionInDoubt(self._from_row(row))
+    
+            conn.commit()
+            if current.state == "in_doubt":
+                raise BackgroundModelExecutionInDoubt(current)
+            if current.state == "response_returned":
+>               raise BackgroundModelResponsePending(current)
+E               aios_core.runtime.background_attempt.BackgroundModelResponsePending: background model attempt blocked: bgattempt_f18613124269dff9d6d6844a21f5e325 is response_returned; inspect/reconcile the durable attempt instead of reinvoking the provider
+
+src/aios_core/runtime/background_attempt.py:655: BackgroundModelResponsePending
+_______ test_case_04c_staged_bytes_must_match_durable_attempt_provenance _______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-7/test_case_04c_staged_bytes_mus0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f52fa4ec550>
+
+    def test_case_04c_staged_bytes_must_match_durable_attempt_provenance(
+        tmp_path, monkeypatch
+    ):
+        store, index, db = _world(tmp_path)
+        exact = _directive("req-case-04c")
+        other = _directive("req-case-other")
+    
+        runtime = FusedTurnRuntime(
+            store=store,
+            index=index,
+            model_handler=lambda _snapshot: exact,
+        )
+        signal = _emit_wake(runtime, key="case-04c")
+    
+        def fail_meter(**_kwargs):
+            raise RuntimeError("simulated crash before meter commit")
+    
+        monkeypatch.setattr(runtime.metering, "record_model_call", fail_meter)
+        with pytest.raises(RuntimeError, match="before meter commit"):
+            runtime.run_wake(wake_ref=_wake_ref(signal), now=NOW)
+        attempt = _wake_attempt(runtime, signal.wake_id, 0)
+        assert attempt.state == "response_returned"
+        assert attempt.provider_request_id == "req-case-04c"
+        durable_fingerprint = attempt.response_fingerprint
+    
+        monkeypatch.undo()
+        other_payload, other_fingerprint = _payload_and_fingerprint(runtime, other)
+        with pytest.raises(BackgroundModelResponseConflict):
+            runtime.stage_exact_background_response(
+                work_kind="wake",
+                work_id=signal.wake_id,
+                model_round_index=0,
+                provider=other.provenance.provider,
+                model=other.provenance.model,
+                provider_request_id=other.provenance.request_id,
+                response_fingerprint=other_fingerprint,
+                directive_payload=other_payload,
+                staged_at=NOW + timedelta(minutes=2),
+                evidence="different bytes must never overwrite durable provenance",
+            )
+        assert runtime.background_model_attempts.staged_response(attempt.attempt_id) is None
+    
+        # The same exact bytes that the runtime already fingerprinted are re-verifiable.
+        exact_payload, exact_fingerprint = _payload_and_fingerprint(runtime, exact)
+        assert exact_fingerprint == durable_fingerprint
+        runtime.stage_exact_background_response(
+            work_kind="wake",
+            work_id=signal.wake_id,
+            model_round_index=0,
+            provider=PROVIDER,
+            model=MODEL,
+            provider_request_id="req-case-04c",
+            response_fingerprint=exact_fingerprint,
+            directive_payload=exact_payload,
+            staged_at=NOW + timedelta(minutes=2),
+            evidence="relay journal req-case-04c",
+        )
+        restarted = FusedTurnRuntime(
+            store=store,
+            index=index,
+            model_handler=_must_not_call,
+        )
+>       result = restarted.run_wake(wake_ref=_wake_ref(signal), now=NOW + timedelta(minutes=4))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_response_recovery_001.py:510: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/aios_core/runtime/turn_runtime.py:4268: in run_wake
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:330: in run_turn
+    attempt_id = self.model_attempt_admitter(snapshot)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/aios_core/runtime/turn_runtime.py:1228: in _admit_background_model_attempt
+    attempt = self.background_model_attempts.admit(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <aios_core.runtime.background_attempt.BackgroundModelAttemptStore object at 0x7f52f92575d0>
+
+    def admit(
+        self,
+        *,
+        subject_id: str,
+        work_kind: BackgroundAttemptWorkKind,
+        work_id: str,
+        wake_reason: str,
+        model_round_index: int,
+        world_revision: int,
+        admitted_at: datetime,
+    ) -> BackgroundModelAttempt:
+        moment = as_utc(admitted_at, "admitted_at")
+        attempt_id = self.attempt_id_for(
+            subject_id=subject_id,
+            work_kind=work_kind,
+            work_id=work_id,
+            model_round_index=model_round_index,
+        )
+        with self.store._connection() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO background_model_attempts(
+                    attempt_id, subject_id, work_kind, work_id, wake_reason,
+                    model_round_index, admission_world_revision, state,
+                    admitted_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'admitted', ?, ?)
+                """,
+                (
+                    attempt_id,
+                    subject_id,
+                    work_kind,
+                    work_id,
+                    wake_reason,
+                    int(model_round_index),
+                    int(world_revision),
+                    canonical_utc_iso(moment, "admitted_at"),
+                    canonical_utc_iso(moment, "updated_at"),
+                ),
+            )
+            row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if row is None:
+                conn.rollback()
+                raise RuntimeError("background model attempt admission was not durable")
+            current = self._from_row(row)
+            immutable = (
+                current.subject_id == subject_id
+                and current.work_kind == work_kind
+                and current.work_id == work_id
+                and current.wake_reason == wake_reason
+                and current.model_round_index == int(model_round_index)
+            )
+            if not immutable:
+                conn.rollback()
+                raise RuntimeError(
+                    "background model attempt identity conflicts with durable work identity"
+                )
+    
+            if current.state == "not_submitted":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='admitted', updated_at=?, failure_kind=NULL,
+                        failure_detail=NULL
+                    WHERE attempt_id=? AND state='not_submitted'
+                    """,
+                    (canonical_utc_iso(moment, "updated_at"), attempt_id),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during retry admission")
+                return self._from_row(row)
+    
+            if current.state == "admitted":
+                conn.commit()
+                return current
+    
+            if current.state == "dispatching":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='in_doubt', updated_at=?,
+                        failure_kind='restart_after_dispatch_boundary',
+                        failure_detail=?
+                    WHERE attempt_id=? AND state='dispatching'
+                    """,
+                    (
+                        canonical_utc_iso(moment, "updated_at"),
+                        "provider dispatch boundary was crossed without a durable response",
+                        attempt_id,
+                    ),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during recovery")
+                raise BackgroundModelExecutionInDoubt(self._from_row(row))
+    
+            conn.commit()
+            if current.state == "in_doubt":
+                raise BackgroundModelExecutionInDoubt(current)
+            if current.state == "response_returned":
+>               raise BackgroundModelResponsePending(current)
+E               aios_core.runtime.background_attempt.BackgroundModelResponsePending: background model attempt blocked: bgattempt_3b6949237e092fafb72d16511db0c431 is response_returned; inspect/reconcile the durable attempt instead of reinvoking the provider
+
+src/aios_core/runtime/background_attempt.py:655: BackgroundModelResponsePending
+__ test_case_05_reconciled_response_survives_process_death_before_application __
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-7/test_case_05_reconciled_respon0')
+
+    def test_case_05_reconciled_response_survives_process_death_before_application(tmp_path):
+        store, index, db, runtime, signal, attempt_id, calls = _crash_wake_into_in_doubt(
+            tmp_path, key="case-05"
+        )
+        _stage(
+            runtime,
+            work_kind="wake",
+            work_id=signal.wake_id,
+            model_round_index=0,
+            directive=_directive("req-case-05"),
+        )
+    
+        reopened_store, reopened_index = _reopen(db)
+        restarted = FusedTurnRuntime(
+            store=reopened_store,
+            index=reopened_index,
+            model_handler=_must_not_call,
+        )
+        inspection = restarted.background_model_attempts.inspect(
+            subject_id="user_1",
+            work_kind="wake",
+            work_id=signal.wake_id,
+            model_round_index=0,
+        )
+        assert inspection.state == "response_returned"
+    
+>       result = restarted.run_wake(wake_ref=_wake_ref(signal), now=NOW + timedelta(minutes=6))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_response_recovery_001.py:554: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/aios_core/runtime/turn_runtime.py:4268: in run_wake
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:330: in run_turn
+    attempt_id = self.model_attempt_admitter(snapshot)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/aios_core/runtime/turn_runtime.py:1228: in _admit_background_model_attempt
+    attempt = self.background_model_attempts.admit(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <aios_core.runtime.background_attempt.BackgroundModelAttemptStore object at 0x7f52f9227910>
+
+    def admit(
+        self,
+        *,
+        subject_id: str,
+        work_kind: BackgroundAttemptWorkKind,
+        work_id: str,
+        wake_reason: str,
+        model_round_index: int,
+        world_revision: int,
+        admitted_at: datetime,
+    ) -> BackgroundModelAttempt:
+        moment = as_utc(admitted_at, "admitted_at")
+        attempt_id = self.attempt_id_for(
+            subject_id=subject_id,
+            work_kind=work_kind,
+            work_id=work_id,
+            model_round_index=model_round_index,
+        )
+        with self.store._connection() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO background_model_attempts(
+                    attempt_id, subject_id, work_kind, work_id, wake_reason,
+                    model_round_index, admission_world_revision, state,
+                    admitted_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'admitted', ?, ?)
+                """,
+                (
+                    attempt_id,
+                    subject_id,
+                    work_kind,
+                    work_id,
+                    wake_reason,
+                    int(model_round_index),
+                    int(world_revision),
+                    canonical_utc_iso(moment, "admitted_at"),
+                    canonical_utc_iso(moment, "updated_at"),
+                ),
+            )
+            row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if row is None:
+                conn.rollback()
+                raise RuntimeError("background model attempt admission was not durable")
+            current = self._from_row(row)
+            immutable = (
+                current.subject_id == subject_id
+                and current.work_kind == work_kind
+                and current.work_id == work_id
+                and current.wake_reason == wake_reason
+                and current.model_round_index == int(model_round_index)
+            )
+            if not immutable:
+                conn.rollback()
+                raise RuntimeError(
+                    "background model attempt identity conflicts with durable work identity"
+                )
+    
+            if current.state == "not_submitted":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='admitted', updated_at=?, failure_kind=NULL,
+                        failure_detail=NULL
+                    WHERE attempt_id=? AND state='not_submitted'
+                    """,
+                    (canonical_utc_iso(moment, "updated_at"), attempt_id),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during retry admission")
+                return self._from_row(row)
+    
+            if current.state == "admitted":
+                conn.commit()
+                return current
+    
+            if current.state == "dispatching":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='in_doubt', updated_at=?,
+                        failure_kind='restart_after_dispatch_boundary',
+                        failure_detail=?
+                    WHERE attempt_id=? AND state='dispatching'
+                    """,
+                    (
+                        canonical_utc_iso(moment, "updated_at"),
+                        "provider dispatch boundary was crossed without a durable response",
+                        attempt_id,
+                    ),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during recovery")
+                raise BackgroundModelExecutionInDoubt(self._from_row(row))
+    
+            conn.commit()
+            if current.state == "in_doubt":
+                raise BackgroundModelExecutionInDoubt(current)
+            if current.state == "response_returned":
+>               raise BackgroundModelResponsePending(current)
+E               aios_core.runtime.background_attempt.BackgroundModelResponsePending: background model attempt blocked: bgattempt_85fd1e7911cf89da2a8c9ac45b18edab is response_returned; inspect/reconcile the durable attempt instead of reinvoking the provider
+
+src/aios_core/runtime/background_attempt.py:655: BackgroundModelResponsePending
+____ test_case_05b_response_recorded_before_meter_resumes_from_exact_bytes _____
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-7/test_case_05b_response_recorde0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f52fa81b1d0>
+
+    def test_case_05b_response_recorded_before_meter_resumes_from_exact_bytes(
+        tmp_path, monkeypatch
+    ):
+        store, index, db = _world(tmp_path)
+        exact = _directive("req-case-05b")
+        runtime = FusedTurnRuntime(
+            store=store, index=index, model_handler=lambda _snapshot: exact
+        )
+        signal = _emit_wake(runtime, key="case-05b")
+    
+        def fail_meter(**_kwargs):
+            raise RuntimeError("simulated crash before meter commit")
+    
+        monkeypatch.setattr(runtime.metering, "record_model_call", fail_meter)
+        with pytest.raises(RuntimeError, match="before meter commit"):
+            runtime.run_wake(wake_ref=_wake_ref(signal), now=NOW)
+        attempt = _wake_attempt(runtime, signal.wake_id, 0)
+        assert attempt.state == "response_returned"
+    
+        monkeypatch.undo()
+        _stage(
+            runtime,
+            work_kind="wake",
+            work_id=signal.wake_id,
+            model_round_index=0,
+            directive=exact,
+        )
+        reopened_store, reopened_index = _reopen(db)
+        restarted = FusedTurnRuntime(
+            store=reopened_store,
+            index=reopened_index,
+            model_handler=_must_not_call,
+        )
+>       result = restarted.run_wake(wake_ref=_wake_ref(signal), now=NOW + timedelta(minutes=7))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_response_recovery_001.py:601: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/aios_core/runtime/turn_runtime.py:4268: in run_wake
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:330: in run_turn
+    attempt_id = self.model_attempt_admitter(snapshot)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/aios_core/runtime/turn_runtime.py:1228: in _admit_background_model_attempt
+    attempt = self.background_model_attempts.admit(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <aios_core.runtime.background_attempt.BackgroundModelAttemptStore object at 0x7f52f90c5b10>
+
+    def admit(
+        self,
+        *,
+        subject_id: str,
+        work_kind: BackgroundAttemptWorkKind,
+        work_id: str,
+        wake_reason: str,
+        model_round_index: int,
+        world_revision: int,
+        admitted_at: datetime,
+    ) -> BackgroundModelAttempt:
+        moment = as_utc(admitted_at, "admitted_at")
+        attempt_id = self.attempt_id_for(
+            subject_id=subject_id,
+            work_kind=work_kind,
+            work_id=work_id,
+            model_round_index=model_round_index,
+        )
+        with self.store._connection() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO background_model_attempts(
+                    attempt_id, subject_id, work_kind, work_id, wake_reason,
+                    model_round_index, admission_world_revision, state,
+                    admitted_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'admitted', ?, ?)
+                """,
+                (
+                    attempt_id,
+                    subject_id,
+                    work_kind,
+                    work_id,
+                    wake_reason,
+                    int(model_round_index),
+                    int(world_revision),
+                    canonical_utc_iso(moment, "admitted_at"),
+                    canonical_utc_iso(moment, "updated_at"),
+                ),
+            )
+            row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if row is None:
+                conn.rollback()
+                raise RuntimeError("background model attempt admission was not durable")
+            current = self._from_row(row)
+            immutable = (
+                current.subject_id == subject_id
+                and current.work_kind == work_kind
+                and current.work_id == work_id
+                and current.wake_reason == wake_reason
+                and current.model_round_index == int(model_round_index)
+            )
+            if not immutable:
+                conn.rollback()
+                raise RuntimeError(
+                    "background model attempt identity conflicts with durable work identity"
+                )
+    
+            if current.state == "not_submitted":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='admitted', updated_at=?, failure_kind=NULL,
+                        failure_detail=NULL
+                    WHERE attempt_id=? AND state='not_submitted'
+                    """,
+                    (canonical_utc_iso(moment, "updated_at"), attempt_id),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during retry admission")
+                return self._from_row(row)
+    
+            if current.state == "admitted":
+                conn.commit()
+                return current
+    
+            if current.state == "dispatching":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='in_doubt', updated_at=?,
+                        failure_kind='restart_after_dispatch_boundary',
+                        failure_detail=?
+                    WHERE attempt_id=? AND state='dispatching'
+                    """,
+                    (
+                        canonical_utc_iso(moment, "updated_at"),
+                        "provider dispatch boundary was crossed without a durable response",
+                        attempt_id,
+                    ),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during recovery")
+                raise BackgroundModelExecutionInDoubt(self._from_row(row))
+    
+            conn.commit()
+            if current.state == "in_doubt":
+                raise BackgroundModelExecutionInDoubt(current)
+            if current.state == "response_returned":
+>               raise BackgroundModelResponsePending(current)
+E               aios_core.runtime.background_attempt.BackgroundModelResponsePending: background model attempt blocked: bgattempt_75edfb7d466f6ba2dc577d54b2d81eb4 is response_returned; inspect/reconcile the durable attempt instead of reinvoking the provider
+
+src/aios_core/runtime/background_attempt.py:655: BackgroundModelResponsePending
+____ test_case_06_crash_during_capability_application_replays_exactly_once _____
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-7/test_case_06_crash_during_capa0')
+
+    def test_case_06_crash_during_capability_application_replays_exactly_once(tmp_path):
+        store, index, db = _world(tmp_path)
+        anchor = _seed_observation(store)
+        index.catch_up()
+        capability_directive = _directive(
+            "req-case-06-r0",
+            silence=False,
+            capability_calls=(_watch_call(anchor),),
+        )
+    
+        def scripted(snapshot):
+            if snapshot.round_index == 0:
+                return capability_directive
+            raise AssertionError("the first process must die during capability application")
+    
+        runtime = FusedTurnRuntime(store=store, index=index, model_handler=scripted)
+        signal = _emit_wake(runtime, key="case-06")
+    
+        real_spec = runtime.registry.get_spec("create_attention_watch")
+        real_handler = runtime._create_attention_watch
+        runtime.registry.unregister("create_attention_watch")
+    
+        def crash_after_commit(**kwargs):
+            real_handler(**kwargs)
+            raise _SimulatedCrash("simulated process death during capability application")
+    
+        runtime.registry.register(real_spec, crash_after_commit)
+    
+        with pytest.raises(_SimulatedCrash):
+            runtime.run_wake(wake_ref=_wake_ref(signal), now=NOW)
+    
+        attempt = _wake_attempt(runtime, signal.wake_id, 0)
+        assert attempt is not None
+        assert attempt.state == "metered"
+        assert len(_watch_tasks(store)) == 1
+        assert len(runtime.metering.list_model_calls(subject_id="user_1", wake_id=signal.wake_id)) == 1
+    
+        reopened_store, reopened_index = _reopen(db)
+        calls: list[tuple[int, str | None]] = []
+    
+        def provider(snapshot):
+            calls.append((snapshot.round_index, snapshot.model_attempt_id))
+            return _directive("req-case-06-r1")
+    
+        restarted = FusedTurnRuntime(
+            store=reopened_store,
+            index=reopened_index,
+            model_handler=provider,
+        )
+        _stage(
+            restarted,
+            work_kind="wake",
+            work_id=signal.wake_id,
+            model_round_index=0,
+            directive=capability_directive,
+        )
+>       result = restarted.run_wake(wake_ref=_wake_ref(signal), now=NOW + timedelta(minutes=8))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_response_recovery_001.py:677: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/aios_core/runtime/turn_runtime.py:4268: in run_wake
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:330: in run_turn
+    attempt_id = self.model_attempt_admitter(snapshot)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/aios_core/runtime/turn_runtime.py:1228: in _admit_background_model_attempt
+    attempt = self.background_model_attempts.admit(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <aios_core.runtime.background_attempt.BackgroundModelAttemptStore object at 0x7f52fa636f90>
+
+    def admit(
+        self,
+        *,
+        subject_id: str,
+        work_kind: BackgroundAttemptWorkKind,
+        work_id: str,
+        wake_reason: str,
+        model_round_index: int,
+        world_revision: int,
+        admitted_at: datetime,
+    ) -> BackgroundModelAttempt:
+        moment = as_utc(admitted_at, "admitted_at")
+        attempt_id = self.attempt_id_for(
+            subject_id=subject_id,
+            work_kind=work_kind,
+            work_id=work_id,
+            model_round_index=model_round_index,
+        )
+        with self.store._connection() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO background_model_attempts(
+                    attempt_id, subject_id, work_kind, work_id, wake_reason,
+                    model_round_index, admission_world_revision, state,
+                    admitted_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'admitted', ?, ?)
+                """,
+                (
+                    attempt_id,
+                    subject_id,
+                    work_kind,
+                    work_id,
+                    wake_reason,
+                    int(model_round_index),
+                    int(world_revision),
+                    canonical_utc_iso(moment, "admitted_at"),
+                    canonical_utc_iso(moment, "updated_at"),
+                ),
+            )
+            row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if row is None:
+                conn.rollback()
+                raise RuntimeError("background model attempt admission was not durable")
+            current = self._from_row(row)
+            immutable = (
+                current.subject_id == subject_id
+                and current.work_kind == work_kind
+                and current.work_id == work_id
+                and current.wake_reason == wake_reason
+                and current.model_round_index == int(model_round_index)
+            )
+            if not immutable:
+                conn.rollback()
+                raise RuntimeError(
+                    "background model attempt identity conflicts with durable work identity"
+                )
+    
+            if current.state == "not_submitted":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='admitted', updated_at=?, failure_kind=NULL,
+                        failure_detail=NULL
+                    WHERE attempt_id=? AND state='not_submitted'
+                    """,
+                    (canonical_utc_iso(moment, "updated_at"), attempt_id),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during retry admission")
+                return self._from_row(row)
+    
+            if current.state == "admitted":
+                conn.commit()
+                return current
+    
+            if current.state == "dispatching":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='in_doubt', updated_at=?,
+                        failure_kind='restart_after_dispatch_boundary',
+                        failure_detail=?
+                    WHERE attempt_id=? AND state='dispatching'
+                    """,
+                    (
+                        canonical_utc_iso(moment, "updated_at"),
+                        "provider dispatch boundary was crossed without a durable response",
+                        attempt_id,
+                    ),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during recovery")
+                raise BackgroundModelExecutionInDoubt(self._from_row(row))
+    
+            conn.commit()
+            if current.state == "in_doubt":
+                raise BackgroundModelExecutionInDoubt(current)
+            if current.state == "response_returned":
+                raise BackgroundModelResponsePending(current)
+>           raise BackgroundModelAttemptBlocked(current)
+E           aios_core.runtime.background_attempt.BackgroundModelAttemptBlocked: background model attempt blocked: bgattempt_b4a376c18ab18258756b841522a0d6a4 is metered; inspect/reconcile the durable attempt instead of reinvoking the provider
+
+src/aios_core/runtime/background_attempt.py:656: BackgroundModelAttemptBlocked
+_ test_case_07_crash_after_capability_before_next_round_resumes_only_that_round _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-7/test_case_07_crash_after_capab0')
+
+    def test_case_07_crash_after_capability_before_next_round_resumes_only_that_round(tmp_path):
+        store, index, db = _world(tmp_path)
+        anchor = _seed_observation(store)
+        index.catch_up()
+        capability_directive = _directive(
+            "req-case-07-r0",
+            silence=False,
+            capability_calls=(_watch_call(anchor),),
+        )
+    
+        def scripted(snapshot):
+            if snapshot.round_index == 0:
+                return capability_directive
+            raise TimeoutError("round 1 died after provider dispatch")
+    
+        runtime = FusedTurnRuntime(store=store, index=index, model_handler=scripted)
+        signal = _emit_wake(runtime, key="case-07")
+        with pytest.raises(TimeoutError, match="round 1 died"):
+            runtime.run_wake(wake_ref=_wake_ref(signal), now=NOW)
+    
+        round_0 = _wake_attempt(runtime, signal.wake_id, 0)
+        round_1 = _wake_attempt(runtime, signal.wake_id, 1)
+        assert round_0.state == "metered"
+        assert round_1 is not None and round_1.state == "in_doubt"
+        assert len(_watch_tasks(store)) == 1
+    
+        reopened_store, reopened_index = _reopen(db)
+        restarted = FusedTurnRuntime(
+            store=reopened_store,
+            index=reopened_index,
+            model_handler=_must_not_call,
+        )
+        _stage(
+            restarted,
+            work_kind="wake",
+            work_id=signal.wake_id,
+            model_round_index=1,
+            directive=_directive("req-case-07-r1"),
+        )
+>       result = restarted.run_wake(wake_ref=_wake_ref(signal), now=NOW + timedelta(minutes=9))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_response_recovery_001.py:741: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/aios_core/runtime/turn_runtime.py:4268: in run_wake
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:330: in run_turn
+    attempt_id = self.model_attempt_admitter(snapshot)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/aios_core/runtime/turn_runtime.py:1228: in _admit_background_model_attempt
+    attempt = self.background_model_attempts.admit(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <aios_core.runtime.background_attempt.BackgroundModelAttemptStore object at 0x7f52f9281e50>
+
+    def admit(
+        self,
+        *,
+        subject_id: str,
+        work_kind: BackgroundAttemptWorkKind,
+        work_id: str,
+        wake_reason: str,
+        model_round_index: int,
+        world_revision: int,
+        admitted_at: datetime,
+    ) -> BackgroundModelAttempt:
+        moment = as_utc(admitted_at, "admitted_at")
+        attempt_id = self.attempt_id_for(
+            subject_id=subject_id,
+            work_kind=work_kind,
+            work_id=work_id,
+            model_round_index=model_round_index,
+        )
+        with self.store._connection() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO background_model_attempts(
+                    attempt_id, subject_id, work_kind, work_id, wake_reason,
+                    model_round_index, admission_world_revision, state,
+                    admitted_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'admitted', ?, ?)
+                """,
+                (
+                    attempt_id,
+                    subject_id,
+                    work_kind,
+                    work_id,
+                    wake_reason,
+                    int(model_round_index),
+                    int(world_revision),
+                    canonical_utc_iso(moment, "admitted_at"),
+                    canonical_utc_iso(moment, "updated_at"),
+                ),
+            )
+            row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if row is None:
+                conn.rollback()
+                raise RuntimeError("background model attempt admission was not durable")
+            current = self._from_row(row)
+            immutable = (
+                current.subject_id == subject_id
+                and current.work_kind == work_kind
+                and current.work_id == work_id
+                and current.wake_reason == wake_reason
+                and current.model_round_index == int(model_round_index)
+            )
+            if not immutable:
+                conn.rollback()
+                raise RuntimeError(
+                    "background model attempt identity conflicts with durable work identity"
+                )
+    
+            if current.state == "not_submitted":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='admitted', updated_at=?, failure_kind=NULL,
+                        failure_detail=NULL
+                    WHERE attempt_id=? AND state='not_submitted'
+                    """,
+                    (canonical_utc_iso(moment, "updated_at"), attempt_id),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during retry admission")
+                return self._from_row(row)
+    
+            if current.state == "admitted":
+                conn.commit()
+                return current
+    
+            if current.state == "dispatching":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='in_doubt', updated_at=?,
+                        failure_kind='restart_after_dispatch_boundary',
+                        failure_detail=?
+                    WHERE attempt_id=? AND state='dispatching'
+                    """,
+                    (
+                        canonical_utc_iso(moment, "updated_at"),
+                        "provider dispatch boundary was crossed without a durable response",
+                        attempt_id,
+                    ),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during recovery")
+                raise BackgroundModelExecutionInDoubt(self._from_row(row))
+    
+            conn.commit()
+            if current.state == "in_doubt":
+                raise BackgroundModelExecutionInDoubt(current)
+            if current.state == "response_returned":
+>               raise BackgroundModelResponsePending(current)
+E               aios_core.runtime.background_attempt.BackgroundModelResponsePending: background model attempt blocked: bgattempt_cb9971d95c4ca0284853354700833b3e is response_returned; inspect/reconcile the durable attempt instead of reinvoking the provider
+
+src/aios_core/runtime/background_attempt.py:655: BackgroundModelResponsePending
+______ test_case_08_crash_after_terminal_silence_before_completion_marker ______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-7/test_case_08_crash_after_termi0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f52f9377050>
+
+    def test_case_08_crash_after_terminal_silence_before_completion_marker(
+        tmp_path, monkeypatch
+    ):
+        store, index, db = _world(tmp_path)
+        exact = _directive("req-case-08")
+        runtime = FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: exact)
+        signal = _emit_wake(runtime, key="case-08")
+    
+        monkeypatch.setattr(
+            runtime.wake_bus,
+            "complete",
+            lambda *args, **kwargs: (_ for _ in ()).throw(
+                _SimulatedCrash("simulated process death before Wake completion marker")
+            ),
+        )
+        with pytest.raises(_SimulatedCrash):
+            runtime.run_wake(wake_ref=_wake_ref(signal), now=NOW)
+    
+        attempt = _wake_attempt(runtime, signal.wake_id, 0)
+        assert attempt is not None
+        assert attempt.state == "metered"
+        assert runtime.wake_bus.current_wake(signal.wake_id).wake_state.value == "running"
+        assert len(runtime.metering.list_model_calls(subject_id="user_1", wake_id=signal.wake_id)) == 1
+    
+        monkeypatch.undo()
+        reopened_store, reopened_index = _reopen(db)
+        restarted = FusedTurnRuntime(
+            store=reopened_store,
+            index=reopened_index,
+            model_handler=_must_not_call,
+        )
+        _stage(
+            restarted,
+            work_kind="wake",
+            work_id=signal.wake_id,
+            model_round_index=0,
+            directive=exact,
+        )
+>       result = restarted.run_wake(wake_ref=_wake_ref(signal), now=NOW + timedelta(minutes=10))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_response_recovery_001.py:800: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/aios_core/runtime/turn_runtime.py:4268: in run_wake
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:330: in run_turn
+    attempt_id = self.model_attempt_admitter(snapshot)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/aios_core/runtime/turn_runtime.py:1228: in _admit_background_model_attempt
+    attempt = self.background_model_attempts.admit(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <aios_core.runtime.background_attempt.BackgroundModelAttemptStore object at 0x7f52f8913750>
+
+    def admit(
+        self,
+        *,
+        subject_id: str,
+        work_kind: BackgroundAttemptWorkKind,
+        work_id: str,
+        wake_reason: str,
+        model_round_index: int,
+        world_revision: int,
+        admitted_at: datetime,
+    ) -> BackgroundModelAttempt:
+        moment = as_utc(admitted_at, "admitted_at")
+        attempt_id = self.attempt_id_for(
+            subject_id=subject_id,
+            work_kind=work_kind,
+            work_id=work_id,
+            model_round_index=model_round_index,
+        )
+        with self.store._connection() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO background_model_attempts(
+                    attempt_id, subject_id, work_kind, work_id, wake_reason,
+                    model_round_index, admission_world_revision, state,
+                    admitted_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'admitted', ?, ?)
+                """,
+                (
+                    attempt_id,
+                    subject_id,
+                    work_kind,
+                    work_id,
+                    wake_reason,
+                    int(model_round_index),
+                    int(world_revision),
+                    canonical_utc_iso(moment, "admitted_at"),
+                    canonical_utc_iso(moment, "updated_at"),
+                ),
+            )
+            row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if row is None:
+                conn.rollback()
+                raise RuntimeError("background model attempt admission was not durable")
+            current = self._from_row(row)
+            immutable = (
+                current.subject_id == subject_id
+                and current.work_kind == work_kind
+                and current.work_id == work_id
+                and current.wake_reason == wake_reason
+                and current.model_round_index == int(model_round_index)
+            )
+            if not immutable:
+                conn.rollback()
+                raise RuntimeError(
+                    "background model attempt identity conflicts with durable work identity"
+                )
+    
+            if current.state == "not_submitted":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='admitted', updated_at=?, failure_kind=NULL,
+                        failure_detail=NULL
+                    WHERE attempt_id=? AND state='not_submitted'
+                    """,
+                    (canonical_utc_iso(moment, "updated_at"), attempt_id),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during retry admission")
+                return self._from_row(row)
+    
+            if current.state == "admitted":
+                conn.commit()
+                return current
+    
+            if current.state == "dispatching":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='in_doubt', updated_at=?,
+                        failure_kind='restart_after_dispatch_boundary',
+                        failure_detail=?
+                    WHERE attempt_id=? AND state='dispatching'
+                    """,
+                    (
+                        canonical_utc_iso(moment, "updated_at"),
+                        "provider dispatch boundary was crossed without a durable response",
+                        attempt_id,
+                    ),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during recovery")
+                raise BackgroundModelExecutionInDoubt(self._from_row(row))
+    
+            conn.commit()
+            if current.state == "in_doubt":
+                raise BackgroundModelExecutionInDoubt(current)
+            if current.state == "response_returned":
+                raise BackgroundModelResponsePending(current)
+>           raise BackgroundModelAttemptBlocked(current)
+E           aios_core.runtime.background_attempt.BackgroundModelAttemptBlocked: background model attempt blocked: bgattempt_43d03e421b9f1e8ba0f70733b397abc2 is metered; inspect/reconcile the durable attempt instead of reinvoking the provider
+
+src/aios_core/runtime/background_attempt.py:656: BackgroundModelAttemptBlocked
+____________ test_case_09_repeated_recovery_never_duplicates_state _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-7/test_case_09_repeated_recovery0')
+
+    def test_case_09_repeated_recovery_never_duplicates_state(tmp_path):
+        store, index, db, runtime, signal, attempt_id, calls = _crash_wake_into_in_doubt(
+            tmp_path, key="case-09"
+        )
+        exact = _directive("req-case-09")
+        _stage(
+            runtime,
+            work_kind="wake",
+            work_id=signal.wake_id,
+            model_round_index=0,
+            directive=exact,
+        )
+        restarted = FusedTurnRuntime(store=store, index=index, model_handler=_must_not_call)
+>       first = restarted.run_wake(wake_ref=_wake_ref(signal), now=NOW + timedelta(minutes=11))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_response_recovery_001.py:830: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/aios_core/runtime/turn_runtime.py:4268: in run_wake
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:330: in run_turn
+    attempt_id = self.model_attempt_admitter(snapshot)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/aios_core/runtime/turn_runtime.py:1228: in _admit_background_model_attempt
+    attempt = self.background_model_attempts.admit(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <aios_core.runtime.background_attempt.BackgroundModelAttemptStore object at 0x7f52f9078c10>
+
+    def admit(
+        self,
+        *,
+        subject_id: str,
+        work_kind: BackgroundAttemptWorkKind,
+        work_id: str,
+        wake_reason: str,
+        model_round_index: int,
+        world_revision: int,
+        admitted_at: datetime,
+    ) -> BackgroundModelAttempt:
+        moment = as_utc(admitted_at, "admitted_at")
+        attempt_id = self.attempt_id_for(
+            subject_id=subject_id,
+            work_kind=work_kind,
+            work_id=work_id,
+            model_round_index=model_round_index,
+        )
+        with self.store._connection() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO background_model_attempts(
+                    attempt_id, subject_id, work_kind, work_id, wake_reason,
+                    model_round_index, admission_world_revision, state,
+                    admitted_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'admitted', ?, ?)
+                """,
+                (
+                    attempt_id,
+                    subject_id,
+                    work_kind,
+                    work_id,
+                    wake_reason,
+                    int(model_round_index),
+                    int(world_revision),
+                    canonical_utc_iso(moment, "admitted_at"),
+                    canonical_utc_iso(moment, "updated_at"),
+                ),
+            )
+            row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if row is None:
+                conn.rollback()
+                raise RuntimeError("background model attempt admission was not durable")
+            current = self._from_row(row)
+            immutable = (
+                current.subject_id == subject_id
+                and current.work_kind == work_kind
+                and current.work_id == work_id
+                and current.wake_reason == wake_reason
+                and current.model_round_index == int(model_round_index)
+            )
+            if not immutable:
+                conn.rollback()
+                raise RuntimeError(
+                    "background model attempt identity conflicts with durable work identity"
+                )
+    
+            if current.state == "not_submitted":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='admitted', updated_at=?, failure_kind=NULL,
+                        failure_detail=NULL
+                    WHERE attempt_id=? AND state='not_submitted'
+                    """,
+                    (canonical_utc_iso(moment, "updated_at"), attempt_id),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during retry admission")
+                return self._from_row(row)
+    
+            if current.state == "admitted":
+                conn.commit()
+                return current
+    
+            if current.state == "dispatching":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='in_doubt', updated_at=?,
+                        failure_kind='restart_after_dispatch_boundary',
+                        failure_detail=?
+                    WHERE attempt_id=? AND state='dispatching'
+                    """,
+                    (
+                        canonical_utc_iso(moment, "updated_at"),
+                        "provider dispatch boundary was crossed without a durable response",
+                        attempt_id,
+                    ),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during recovery")
+                raise BackgroundModelExecutionInDoubt(self._from_row(row))
+    
+            conn.commit()
+            if current.state == "in_doubt":
+                raise BackgroundModelExecutionInDoubt(current)
+            if current.state == "response_returned":
+>               raise BackgroundModelResponsePending(current)
+E               aios_core.runtime.background_attempt.BackgroundModelResponsePending: background model attempt blocked: bgattempt_cfd2efcf29f1258faf5a5b9313b45205 is response_returned; inspect/reconcile the durable attempt instead of reinvoking the provider
+
+src/aios_core/runtime/background_attempt.py:655: BackgroundModelResponsePending
+______ test_periodic_review_exact_response_recovery_is_zero_provider_call ______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-7/test_periodic_review_exact_res0')
+
+    def test_periodic_review_exact_response_recovery_is_zero_provider_call(tmp_path):
+        store, index, db = _world(tmp_path)
+        _seed_review_fact(store)
+        index.catch_up()
+        calls: list[int] = []
+    
+        def ambiguous(_snapshot):
+            calls.append(0)
+            raise TimeoutError("review provider may already have accepted the request")
+    
+        runtime = FusedTurnRuntime(store=store, index=index, model_handler=ambiguous)
+        with pytest.raises(TimeoutError, match="may already have accepted"):
+            runtime.run_periodic_review(now=NOW)
+        wake_id = _running_periodic_review_id(store)
+        attempt = runtime.background_model_attempts.inspect(
+            subject_id="user_1",
+            work_kind="periodic_review",
+            work_id=wake_id,
+            model_round_index=0,
+        )
+        assert attempt is not None
+        assert attempt.state == "in_doubt"
+    
+        reopened_store, reopened_index = _reopen(db)
+        restarted = FusedTurnRuntime(
+            store=reopened_store,
+            index=reopened_index,
+            model_handler=_must_not_call,
+        )
+        _stage(
+            restarted,
+            work_kind="periodic_review",
+            work_id=wake_id,
+            model_round_index=0,
+            directive=_directive("req-review-recovery"),
+        )
+>       result = restarted.run_periodic_review(now=NOW + timedelta(minutes=15))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_response_recovery_001.py:944: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/aios_core/runtime/turn_runtime.py:4559: in run_periodic_review
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:330: in run_turn
+    attempt_id = self.model_attempt_admitter(snapshot)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/aios_core/runtime/turn_runtime.py:1228: in _admit_background_model_attempt
+    attempt = self.background_model_attempts.admit(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <aios_core.runtime.background_attempt.BackgroundModelAttemptStore object at 0x7f52f89b0410>
+
+    def admit(
+        self,
+        *,
+        subject_id: str,
+        work_kind: BackgroundAttemptWorkKind,
+        work_id: str,
+        wake_reason: str,
+        model_round_index: int,
+        world_revision: int,
+        admitted_at: datetime,
+    ) -> BackgroundModelAttempt:
+        moment = as_utc(admitted_at, "admitted_at")
+        attempt_id = self.attempt_id_for(
+            subject_id=subject_id,
+            work_kind=work_kind,
+            work_id=work_id,
+            model_round_index=model_round_index,
+        )
+        with self.store._connection() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO background_model_attempts(
+                    attempt_id, subject_id, work_kind, work_id, wake_reason,
+                    model_round_index, admission_world_revision, state,
+                    admitted_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'admitted', ?, ?)
+                """,
+                (
+                    attempt_id,
+                    subject_id,
+                    work_kind,
+                    work_id,
+                    wake_reason,
+                    int(model_round_index),
+                    int(world_revision),
+                    canonical_utc_iso(moment, "admitted_at"),
+                    canonical_utc_iso(moment, "updated_at"),
+                ),
+            )
+            row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if row is None:
+                conn.rollback()
+                raise RuntimeError("background model attempt admission was not durable")
+            current = self._from_row(row)
+            immutable = (
+                current.subject_id == subject_id
+                and current.work_kind == work_kind
+                and current.work_id == work_id
+                and current.wake_reason == wake_reason
+                and current.model_round_index == int(model_round_index)
+            )
+            if not immutable:
+                conn.rollback()
+                raise RuntimeError(
+                    "background model attempt identity conflicts with durable work identity"
+                )
+    
+            if current.state == "not_submitted":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='admitted', updated_at=?, failure_kind=NULL,
+                        failure_detail=NULL
+                    WHERE attempt_id=? AND state='not_submitted'
+                    """,
+                    (canonical_utc_iso(moment, "updated_at"), attempt_id),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during retry admission")
+                return self._from_row(row)
+    
+            if current.state == "admitted":
+                conn.commit()
+                return current
+    
+            if current.state == "dispatching":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='in_doubt', updated_at=?,
+                        failure_kind='restart_after_dispatch_boundary',
+                        failure_detail=?
+                    WHERE attempt_id=? AND state='dispatching'
+                    """,
+                    (
+                        canonical_utc_iso(moment, "updated_at"),
+                        "provider dispatch boundary was crossed without a durable response",
+                        attempt_id,
+                    ),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during recovery")
+                raise BackgroundModelExecutionInDoubt(self._from_row(row))
+    
+            conn.commit()
+            if current.state == "in_doubt":
+                raise BackgroundModelExecutionInDoubt(current)
+            if current.state == "response_returned":
+>               raise BackgroundModelResponsePending(current)
+E               aios_core.runtime.background_attempt.BackgroundModelResponsePending: background model attempt blocked: bgattempt_7431ab5ae29f5fd5fb8774874bdb9a09 is response_returned; inspect/reconcile the durable attempt instead of reinvoking the provider
+
+src/aios_core/runtime/background_attempt.py:655: BackgroundModelResponsePending
+____________ test_user_turn_exact_response_recovery_is_exactly_once ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-7/test_user_turn_exact_response_0')
+
+    def test_user_turn_exact_response_recovery_is_exactly_once(tmp_path):
+        store, index, db = _world(tmp_path)
+        calls: list[int] = []
+    
+        def ambiguous(snapshot):
+            calls.append(snapshot.round_index)
+            raise TimeoutError("turn provider may already have accepted the request")
+    
+        first = FusedTurnRuntime(store=store, index=index, model_handler=ambiguous)
+        turn = dict(
+            session_id="cbrr-session",
+            turn_index=1,
+            user_input="SYNTHETIC cbrr user turn",
+            occurred_at=NOW,
+        )
+        with pytest.raises(TimeoutError, match="may already have accepted"):
+            first.run_turn(**turn)
+    
+        inspection = first.inspect_turn_execution(**turn)
+        assert inspection.state == "started"
+        assert inspection.recovery_disposition == "in_doubt"
+        assert [attempt.state for attempt in inspection.model_attempts] == ["in_doubt"]
+        attempt_id = inspection.model_attempts[0].attempt_id
+    
+        # Ordinary retry stays refused: no exact bytes were staged yet.
+        with pytest.raises(TurnExecutionInDoubt):
+            first.run_turn(**turn)
+        assert calls == [0]
+    
+        reopened_store, reopened_index = _reopen(db)
+        restarted = FusedTurnRuntime(
+            store=reopened_store,
+            index=reopened_index,
+            model_handler=_must_not_call,
+        )
+        exact = _directive(
+            "req-turn-recovery",
+            silence=False,
+            response="Exact staged reply for the synthetic turn.",
+        )
+        _stage(
+            restarted,
+            work_kind="user_turn",
+            work_id=inspection.execution_id,
+            model_round_index=0,
+            directive=exact,
+        )
+        ready = restarted.inspect_turn_execution(**turn)
+        assert ready.recovery_disposition == "exact_response_ready"
+    
+>       result = restarted.run_turn(**turn)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_response_recovery_001.py:1007: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/aios_core/runtime/turn_runtime.py:3541: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:330: in run_turn
+    attempt_id = self.model_attempt_admitter(snapshot)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/aios_core/runtime/turn_runtime.py:1228: in _admit_background_model_attempt
+    attempt = self.background_model_attempts.admit(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <aios_core.runtime.background_attempt.BackgroundModelAttemptStore object at 0x7f52f8a64890>
+
+    def admit(
+        self,
+        *,
+        subject_id: str,
+        work_kind: BackgroundAttemptWorkKind,
+        work_id: str,
+        wake_reason: str,
+        model_round_index: int,
+        world_revision: int,
+        admitted_at: datetime,
+    ) -> BackgroundModelAttempt:
+        moment = as_utc(admitted_at, "admitted_at")
+        attempt_id = self.attempt_id_for(
+            subject_id=subject_id,
+            work_kind=work_kind,
+            work_id=work_id,
+            model_round_index=model_round_index,
+        )
+        with self.store._connection() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO background_model_attempts(
+                    attempt_id, subject_id, work_kind, work_id, wake_reason,
+                    model_round_index, admission_world_revision, state,
+                    admitted_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'admitted', ?, ?)
+                """,
+                (
+                    attempt_id,
+                    subject_id,
+                    work_kind,
+                    work_id,
+                    wake_reason,
+                    int(model_round_index),
+                    int(world_revision),
+                    canonical_utc_iso(moment, "admitted_at"),
+                    canonical_utc_iso(moment, "updated_at"),
+                ),
+            )
+            row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if row is None:
+                conn.rollback()
+                raise RuntimeError("background model attempt admission was not durable")
+            current = self._from_row(row)
+            immutable = (
+                current.subject_id == subject_id
+                and current.work_kind == work_kind
+                and current.work_id == work_id
+                and current.wake_reason == wake_reason
+                and current.model_round_index == int(model_round_index)
+            )
+            if not immutable:
+                conn.rollback()
+                raise RuntimeError(
+                    "background model attempt identity conflicts with durable work identity"
+                )
+    
+            if current.state == "not_submitted":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='admitted', updated_at=?, failure_kind=NULL,
+                        failure_detail=NULL
+                    WHERE attempt_id=? AND state='not_submitted'
+                    """,
+                    (canonical_utc_iso(moment, "updated_at"), attempt_id),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during retry admission")
+                return self._from_row(row)
+    
+            if current.state == "admitted":
+                conn.commit()
+                return current
+    
+            if current.state == "dispatching":
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET state='in_doubt', updated_at=?,
+                        failure_kind='restart_after_dispatch_boundary',
+                        failure_detail=?
+                    WHERE attempt_id=? AND state='dispatching'
+                    """,
+                    (
+                        canonical_utc_iso(moment, "updated_at"),
+                        "provider dispatch boundary was crossed without a durable response",
+                        attempt_id,
+                    ),
+                )
+                row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if row is None:
+                    raise RuntimeError("background attempt disappeared during recovery")
+                raise BackgroundModelExecutionInDoubt(self._from_row(row))
+    
+            conn.commit()
+            if current.state == "in_doubt":
+                raise BackgroundModelExecutionInDoubt(current)
+            if current.state == "response_returned":
+>               raise BackgroundModelResponsePending(current)
+E               aios_core.runtime.background_attempt.BackgroundModelResponsePending: background model attempt blocked: bgattempt_4058b9f7a62376cd76f72cbc9e8021e3 is response_returned; inspect/reconcile the durable attempt instead of reinvoking the provider
+
+src/aios_core/runtime/background_attempt.py:655: BackgroundModelResponsePending
+=========================== short test summary info ============================
+FAILED tests/integration/test_core_background_response_recovery_001.py::test_case_02_exact_response_recovery_never_redispatches_the_provider
+FAILED tests/integration/test_core_background_response_recovery_001.py::test_case_04c_staged_bytes_must_match_durable_attempt_provenance
+FAILED tests/integration/test_core_background_response_recovery_001.py::test_case_05_reconciled_response_survives_process_death_before_application
+FAILED tests/integration/test_core_background_response_recovery_001.py::test_case_05b_response_recorded_before_meter_resumes_from_exact_bytes
+FAILED tests/integration/test_core_background_response_recovery_001.py::test_case_06_crash_during_capability_application_replays_exactly_once
+FAILED tests/integration/test_core_background_response_recovery_001.py::test_case_07_crash_after_capability_before_next_round_resumes_only_that_round
+FAILED tests/integration/test_core_background_response_recovery_001.py::test_case_08_crash_after_terminal_silence_before_completion_marker
+FAILED tests/integration/test_core_background_response_recovery_001.py::test_case_09_repeated_recovery_never_duplicates_state
+FAILED tests/integration/test_core_background_response_recovery_001.py::test_periodic_review_exact_response_recovery_is_zero_provider_call
+FAILED tests/integration/test_core_background_response_recovery_001.py::test_user_turn_exact_response_recovery_is_exactly_once

@@ -1,0 +1,6 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+/tmp/aios-main-control/tests/preflight/test_round5_fixes.py:550: AssertionError: assert ('unshare' in 'isolation probe INCONCLUSIVE: no suitable python interpreter found' or 'permission' in 'isolation probe inconclusive: no suitable python interpreter found' or 'not permitted' in 'isolation probe inconclusive: no suitable python interpreter found')
+=========================== short test summary info ============================
+FAILED tests/preflight/test_round5_fixes.py::test_isolation_exception_classification_namespace_permission
+1 failed in 0.68s

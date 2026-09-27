@@ -1,0 +1,7 @@
+STATUS: LOCAL_SUPPORTING_RED / NOT_FORMAL_CORE_GATE
+COMMAND: .venv/bin/python -m pytest --collect-only -q tests/integration/test_core_background_response_recovery_001_corrective_002_authenticity.py
+--- RAW OUTPUT ---
+tests/integration/test_core_background_response_recovery_001_corrective_002_authenticity.py: 12
+
+--- END RAW OUTPUT ---
+EXIT_CODE: 0

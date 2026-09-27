@@ -1,0 +1,17 @@
+..F...............                                                       [100%]
+=================================== FAILURES ===================================
+_______ test_case_03_wrong_fingerprint_is_rejected_and_stays_fail_closed _______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-11/test_case_03_wrong_fingerprint0')
+
+    def test_case_03_wrong_fingerprint_is_rejected_and_stays_fail_closed(tmp_path):
+        store, index, db, runtime, signal, attempt_id, calls = _crash_wake_into_in_doubt(
+            tmp_path, key="case-03"
+        )
+        payload, _fingerprint = _payload_and_fingerprint(runtime, _directive("req-case-03"))
+>       with pytest.raises(ValueError, match="fingerprint"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/integration/test_core_background_response_recovery_001.py:363: Failed
+=========================== short test summary info ============================
+FAILED tests/integration/test_core_background_response_recovery_001.py::test_case_03_wrong_fingerprint_is_rejected_and_stays_fail_closed

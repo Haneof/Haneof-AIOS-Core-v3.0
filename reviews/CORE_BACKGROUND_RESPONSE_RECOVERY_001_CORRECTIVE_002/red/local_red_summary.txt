@@ -1,0 +1,36 @@
+CORE-BACKGROUND-RESPONSE-RECOVERY-001-CORRECTIVE-002 AUTHENTICITY RED
+
+STATUS: LOCAL_SUPPORTING_RED / NOT_FORMAL_CORE_GATE
+FORMAL_GATE: GitHub Actions p16-convergence-gate / Python 3.12
+CURRENT_EXACT_HEAD: a1c6e74de71f783951f2772e2f065880d7146ec5
+CURRENT_EXACT_TREE: 3d155c37f4094260246604028213c6674d4b4b76
+PROBE: tests/integration/test_core_background_response_recovery_001_corrective_002_authenticity.py
+PROBE_SHA256: 35cba59f318b752ed872821961296f35810443c61db6fd98c8c8f5eee4215225
+
+LOCAL_PYTHON: Python 3.11.2
+LOCAL_PYTEST: 8.4.2
+LOCAL_PYDANTIC: 2.13.5
+COLLECT_ONLY: 12 tests collected; exit 0
+RED_COMMAND: .venv/bin/python -m pytest -vv --tb=short tests/integration/test_core_background_response_recovery_001_corrective_002_authenticity.py
+RED_RESULT: 12 failed in 1.87s
+RED_EXIT_CODE: 1
+
+FAILING PROBES:
+1. no provider response + known relay id -> forged capability applied and World Task created
+2. no provider response + known relay id -> forged assistant response became durable output
+3. no provider response + known relay id -> forged silence completed the Wake
+4. real response modified + ordinary fingerprint recomputed -> accepted
+5. corrective-001 proof bundle A -> attempt B -> accepted
+6. copied proof bundle across work kind -> accepted
+7. copied proof bundle across subject -> accepted
+8. copied proof bundle round N -> M -> accepted
+9. copied proof bundle + provider metadata tamper -> accepted
+10. copied proof bundle + model metadata tamper -> accepted
+11. copied proof bundle + request metadata tamper -> accepted
+12. missing authenticity proof -> accepted
+
+RAW LOG: reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CORRECTIVE_002/red/local_supporting_red.txt
+COLLECT LOG: reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CORRECTIVE_002/red/pytest_collect_only.txt
+PRE-EXECUTION FREEZE: reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CORRECTIVE_002/red/pre_execution_freeze.txt
+
+No src/** file was changed. No Python 3.12 installation, source compilation, or replacement was attempted. The local result is supporting RED only and is not formal Core gate evidence.

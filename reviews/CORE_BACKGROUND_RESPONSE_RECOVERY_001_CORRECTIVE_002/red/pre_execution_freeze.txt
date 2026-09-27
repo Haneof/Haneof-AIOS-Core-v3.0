@@ -1,0 +1,30 @@
+# CORRECTIVE-002 authenticity probes: pre-execution freeze
+
+STATUS: LOCAL_SUPPORTING_RED / NOT_FORMAL_CORE_GATE
+FORMAL_GATE_RUNTIME: GitHub Actions p16-convergence-gate / Python 3.12
+IMPLEMENTATION_CHANGED_BEFORE_FREEZE: NO
+LOCAL_ENVIRONMENT: disposable Python 3.11 virtual environment; dependency wheels only; no Python 3.12 installation/source compilation/replacement
+
+CURRENT_EXACT_HEAD: a1c6e74de71f783951f2772e2f065880d7146ec5
+CURRENT_EXACT_TREE: 3d155c37f4094260246604028213c6674d4b4b76
+WORKING_BRANCH: arena/01a0e1d7-haneof-aios-core-v3-0
+PROBE_PATH: tests/integration/test_core_background_response_recovery_001_corrective_002_authenticity.py
+PROBE_SHA256: 35cba59f318b752ed872821961296f35810443c61db6fd98c8c8f5eee4215225
+
+LOCAL_PYTHON: Python 3.11.2
+LOCAL_PYTEST: 8.4.2
+LOCAL_PYDANTIC: 2.13.5
+
+COLLECT_ONLY_COMMAND: .venv/bin/python -m pytest --collect-only -q tests/integration/test_core_background_response_recovery_001_corrective_002_authenticity.py
+COLLECT_ONLY_EXIT_CODE: 0
+COLLECT_ONLY_LOG: reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CORRECTIVE_002/red/pytest_collect_only.txt
+
+SCOPE_GUARD_HEAD_VS_WORKTREE_SRC_DIFF_BEGIN
+SCOPE_GUARD_HEAD_VS_WORKTREE_SRC_DIFF_END
+
+GIT_STATUS_AT_FREEZE_BEGIN
+?? .venv/
+?? reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CORRECTIVE_002/
+?? src/aios_core/__pycache__/
+?? tests/integration/test_core_background_response_recovery_001_corrective_002_authenticity.py
+GIT_STATUS_AT_FREEZE_END
