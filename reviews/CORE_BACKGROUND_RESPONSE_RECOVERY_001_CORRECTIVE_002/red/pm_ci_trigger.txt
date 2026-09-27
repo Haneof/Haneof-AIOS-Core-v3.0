@@ -1,0 +1,5 @@
+Purpose: PM-only no-code/no-test CI trigger after RED-only commit publication.
+Pinned RED-only commit: a7678f9b81f4a46e91199c996e2a8091c56a2a4d
+This file adds no implementation or test change.
+Expected invariant: a7678f9b... -> this evidence-only head has zero src/** and zero tests/** changes.
+Formal Python 3.12 RED, if a workflow is created, must test the same src/tests tree as a7678f9b....
