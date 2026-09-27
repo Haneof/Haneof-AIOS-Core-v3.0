@@ -6,3 +6,16 @@
 {"at_epoch": 1790527596.4492984, "boot_id": "8a96e464-5667-4aa5-a5d0-4203f1efa281", "detail": {"action": "applied", "request_id": "synthetic-request-4cd623ea55d59c4e9fad61eb"}, "event": "request_finalised", "pid": 2289}
 {"at_epoch": 1790527596.5316133, "boot_id": "8a96e464-5667-4aa5-a5d0-4203f1efa281", "detail": {"artifacts": 11, "generation": 3, "label": "applied"}, "event": "generation_sealed", "pid": 2289}
 {"at_epoch": 1790527596.5746455, "boot_id": "8a96e464-5667-4aa5-a5d0-4203f1efa281", "detail": {"artifacts": 11, "generation": 4, "label": "acked"}, "event": "generation_sealed", "pid": 2289}
+{"at_epoch": 1790528033.8878796, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"pid": 1758}, "event": "owner_reclaimed", "pid": 1758}
+{"at_epoch": 1790528033.8886514, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"run_id": "c15-persistence-synthetic-run-ae5c57221c83", "session_id": "c15-persistence-synthetic-session-ae5c57221c83"}, "event": "backend_reopened", "pid": 1758}
+{"at_epoch": 1790528033.8892546, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"commit_sha": "914c960cade8830d4d0c80925bcfe03f803c3ceb", "remote": "origin", "remote_ref": "refs/heads/persistence/c15-persistence-synthetic-run-ae5c57221c83"}, "event": "materialized_from_remote", "pid": 1758}
+{"at_epoch": 1790528033.8940976, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"pid": 1758}, "event": "owner_reclaimed", "pid": 1758}
+{"at_epoch": 1790528033.8947053, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"run_id": "c15-persistence-synthetic-run-ae5c57221c83", "session_id": "c15-persistence-synthetic-session-ae5c57221c83"}, "event": "backend_reopened", "pid": 1758}
+{"at_epoch": 1790528033.9036875, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"phase": "resume"}, "event": "session_attached", "pid": 1758}
+{"at_epoch": 1790528033.9044836, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"kill_at": "none"}, "event": "resume_started", "pid": 1758}
+{"at_epoch": 1790528033.9670644, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"artifacts": 11, "generation": 5, "label": "ingested"}, "event": "generation_sealed", "pid": 1758}
+{"at_epoch": 1790528034.0512743, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"request_id": "synthetic-request-2a0800227e305d3f03cfb5ac", "round": 0}, "event": "request_represented", "pid": 1758}
+{"at_epoch": 1790528034.1136096, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"action": "applied", "request_id": "synthetic-request-2a0800227e305d3f03cfb5ac"}, "event": "request_finalised", "pid": 1758}
+{"at_epoch": 1790528034.1142778, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"action": "applied", "request_id": "synthetic-request-af3e36aa98bbe62a3dff7bd9"}, "event": "request_finalised", "pid": 1758}
+{"at_epoch": 1790528034.1350305, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"artifacts": 11, "generation": 6, "label": "applied"}, "event": "generation_sealed", "pid": 1758}
+{"at_epoch": 1790528034.1629105, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"artifacts": 11, "generation": 7, "label": "acked"}, "event": "generation_sealed", "pid": 1758}

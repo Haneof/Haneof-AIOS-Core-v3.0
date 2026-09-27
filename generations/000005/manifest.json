@@ -1,0 +1,19 @@
+{
+  "artifacts": {
+    "binding/current-event-binding.json": "1de43083be67614a53ebae49ba9435af393d4e6c052e063241899e6cbabc4505",
+    "current-event.json": "1834b3a5d4d4a75cb428d5d47791e8869dca527a456f284479c64fcee3763081",
+    "evidence/failures.jsonl": "2990b63698fcefa836e38636d6ef217a68b9d682d11aec492cfa7b344162e725",
+    "evidence/projection.json": "1834b3a5d4d4a75cb428d5d47791e8869dca527a456f284479c64fcee3763081",
+    "journal.sqlite": "ee55eb5e56757513e1591c0a160a025f1cb0fc1defb22ce17ff1e429bfd1137f",
+    "mailbox/archive.jsonl": "735d999ca2304af5d78cdf4c2249b665c96acf1b8ae3af67d67e0284739c8e26",
+    "mailbox/inbox/current.reply": "12b747f057397f6d92805b924b0d7d3be391ddfbe1a3078ce1a91dad2d7b5f43",
+    "mailbox/outbox/current.request": "d6c7103e3e1a717a07167bf31c2f7f7200faa3a1bc3a08678c57d2552d55254a",
+    "runtime/index.sqlite": "629b718aea4678d0e68d8d99c45ebf2c6885cee03b350d2baaa0c4e94476a666",
+    "runtime/release_state.json": "29c8c5ebf891cf0be1fb952c9d4bb77dd5c4c400e1e1eaf54da9f99576ee50f7",
+    "runtime/world.sqlite": "629b718aea4678d0e68d8d99c45ebf2c6885cee03b350d2baaa0c4e94476a666"
+  },
+  "generation": 5,
+  "label": "ingested",
+  "manifest_sha256": "4d9748fe50902f5c5d1b718c39c3ceb3e846e74f5113a16d1719cd3a9a472dd3",
+  "sealed_at_epoch": 1790528033.9649255
+}

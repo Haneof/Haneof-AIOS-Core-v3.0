@@ -1,10 +1,10 @@
 {
-  "acks": 1,
-  "capability_side_effects": 1,
-  "dispatches": 2,
-  "ingests": 1,
-  "provider_dispatches": 2,
-  "provider_reattachments": 1,
-  "reveals": 1,
-  "turns_completed": 1
+  "acks": 2,
+  "capability_side_effects": 2,
+  "dispatches": 4,
+  "ingests": 2,
+  "provider_dispatches": 4,
+  "provider_reattachments": 2,
+  "reveals": 2,
+  "turns_completed": 2
 }

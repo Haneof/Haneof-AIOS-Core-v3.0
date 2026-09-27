@@ -1,10 +1,10 @@
 {
   "dimension": "dim:observation",
-  "event_id": "synthetic-evt-0001",
+  "event_id": "synthetic-evt-0002",
   "modality": "text",
-  "occurred_at": "2026-09-27T00:01:00+00:00",
-  "resident_visible_payload": "[synthetic] observation 1 (d096ae5e941a) - no real resident content",
-  "sequence": 1,
-  "source_class": "SENSOR",
-  "source_kind": "sensor"
+  "occurred_at": "2026-09-27T00:02:00+00:00",
+  "resident_visible_payload": "[synthetic] observation 2 (96f167d6b336) - no real resident content",
+  "sequence": 2,
+  "source_class": "PLATFORM",
+  "source_kind": "platform"
 }

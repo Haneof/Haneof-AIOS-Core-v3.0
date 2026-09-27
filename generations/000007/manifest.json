@@ -4,23 +4,16 @@
     "current-event.json": "1834b3a5d4d4a75cb428d5d47791e8869dca527a456f284479c64fcee3763081",
     "evidence/failures.jsonl": "2990b63698fcefa836e38636d6ef217a68b9d682d11aec492cfa7b344162e725",
     "evidence/projection.json": "1834b3a5d4d4a75cb428d5d47791e8869dca527a456f284479c64fcee3763081",
-    "journal.sqlite": "12c0f0d3f24f5bd9c5f95ffd8bfce5ab88baa1f8b2b844632348a11d0027639e",
+    "journal.sqlite": "b346ff8bd8ea44e2e040bcf1ced705e880b14ac0573a10e8d939b65a3d8f1640",
     "mailbox/archive.jsonl": "03c0a5dc78c75efca7728e29e420a02421138cd8dfea62df3f9abff55805114c",
     "mailbox/inbox/current.reply": "d166f9776cd7b930368afa6fafd2b11405ea7ddade3b6ebfc2e081ae931bc148",
     "mailbox/outbox/current.request": "6ca57d7480a7670ce8494a9b65889e1ff1b6f10407092ba0af7fc370e9606b08",
-    "runtime/index.sqlite": "a3d112b1b7fc9dec292820f5263dcaa4689c4d6915d1dd2bcd9330366f668ff9",
+    "runtime/index.sqlite": "d2d6b83ff43b4c5d2a74820ca05acc98911920e757d57fea44bbabac0b785060",
     "runtime/release_state.json": "3ca68252f7d31e665d569938584ee68f530969cdde0ad6e3da0523c77e6f4b1f",
-    "runtime/world.sqlite": "87b5c8c518ff644c4a0c9690d45c1bc2c261b4f49273e29ee8495f614826eff4"
+    "runtime/world.sqlite": "d2d6b83ff43b4c5d2a74820ca05acc98911920e757d57fea44bbabac0b785060"
   },
-  "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045",
-  "captured_at_epoch": 1790528034.1677885,
-  "cursor": 2,
-  "event_id": "synthetic-evt-0002",
-  "extra": {},
-  "manifest_sha256": "2c9accf2221c22f00c89d9f8e40a855c3e658d11806fb3c2bb9b2ef0f7110236",
-  "manifest_version": "c15-run-state-manifest-v1",
-  "phase": "A",
-  "run_id": "c15-persistence-synthetic-run-ae5c57221c83",
-  "session_id": "c15-persistence-synthetic-session-ae5c57221c83",
-  "subject_id": "user_1"
+  "generation": 7,
+  "label": "acked",
+  "manifest_sha256": "d5229ebea5aceb7ee9a98f6dcb53285f65eb9f217903e03e022ebe50c9c58e7d",
+  "sealed_at_epoch": 1790528034.160851
 }
