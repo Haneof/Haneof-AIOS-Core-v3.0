@@ -26,7 +26,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   checks: write
   pull-requests: write
 
@@ -36,6 +36,8 @@ env:
   CANON_REF: "refs/heads/persistence/c15-persistence-synthetic-run-ae5c57221c83"
   LIT: "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27"
   C15_PERSISTED_WORKSPACE: /home/runner/ia-workspace
+  EV: reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/evidence-run
+  EVBRANCH: ia/c15-persistence-corrective-001-evidence
   PYTHONDONTWRITEBYTECODE: "1"
 
 jobs:
@@ -107,6 +109,7 @@ jobs:
           IA_CANDIDATE_REPO: /__w/${{ github.workspace }}/cand
         run: |
           set -uo pipefail
+          mkdir -p "review/$EV"
           python "review/$LIT/freeze_ia_probe_manifest.py" > "review/$LIT/freeze.log" 2>&1
           rc=$?
           {
@@ -116,6 +119,11 @@ jobs:
             tail -40 "review/$LIT/freeze.log" 2>/dev/null
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          cp "review/$LIT/freeze.log" "review/$EV/00-freeze.log" 2>/dev/null || true
+          cp "review/$LIT/PROBE_MANIFEST.json" "review/$EV/00-PROBE_MANIFEST.json" 2>/dev/null || true
+          cp "review/$LIT/PROBE_MANIFEST.sha256" "review/$EV/00-PROBE_MANIFEST.sha256" 2>/dev/null || true
+          cp "review/$LIT/probe_enumeration.txt" "review/$EV/00-probe_enumeration.txt" 2>/dev/null || true
+          cp "review/$LIT/collect_only.txt" "review/$EV/00-collect_only.txt" 2>/dev/null || true
           if [ $rc -ne 0 ]; then
             while IFS= read -r l; do echo "::error title=IA-FREEZE::${l:0:900}"; done < "review/$LIT/freeze.log"
             exit 1
@@ -141,6 +149,8 @@ jobs:
             cat probe_enumeration.txt
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          cp probe_enumeration.txt "review/$EV/00-probe_enumeration.txt" 2>/dev/null || true
+          cp probe-files.sha256 "review/$EV/00-probe-files.sha256" 2>/dev/null || true
           if [ ! -s probe_enumeration.txt ]; then
             echo "::error title=IA-FREEZE::enumeration is empty"
             exit 1
@@ -166,6 +176,7 @@ jobs:
             tail -4 FIRST_RUN.log
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          cp FIRST_RUN.log "$GITHUB_WORKSPACE/review/$EV/01-ia-first-run.log" 2>/dev/null || true
           while IFS= read -r l; do echo "::error title=IA-FIRST-RUN::${l:0:900}"; done < <(grep -E "^(FAILED|ERROR)" FIRST_RUN.log)
           exit $rc
 
@@ -175,7 +186,8 @@ jobs:
           set -uo pipefail
           cd cand
           python -m pytest -v -o addopts= --timeout=1800 tests/c15_persistence/killpoints/test_killpoints.py > /tmp/k.txt 2>&1
-          rc=$?; { echo; echo "### K1-K5 (rc=$rc)"; echo '```'; tail -3 /tmp/k.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          rc=$?; cp /tmp/k.txt "$GITHUB_WORKSPACE/review/$EV/02-k1-k5.log" || true
+          { echo; echo "### K1-K5 (rc=$rc)"; echo '```'; tail -3 /tmp/k.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           exit $rc
 
       - name: 5b. author gate 2 — production wiring
@@ -184,7 +196,8 @@ jobs:
           set -uo pipefail
           cd cand
           python -m pytest -v -o addopts= --timeout=1800 tests/c15_persistence/test_operator_wiring.py > /tmp/w.txt 2>&1
-          rc=$?; { echo; echo "### production wiring (rc=$rc)"; echo '```'; tail -3 /tmp/w.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          rc=$?; cp /tmp/w.txt "$GITHUB_WORKSPACE/review/$EV/03-production-wiring.log" || true
+          { echo; echo "### production wiring (rc=$rc)"; echo '```'; tail -3 /tmp/w.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           exit $rc
 
       - name: 5c. author gate 3 — environment / remote reattach
@@ -193,7 +206,8 @@ jobs:
           set -uo pipefail
           cd cand
           python -m pytest -v -rs -o addopts= --timeout=1800 tests/c15_persistence/test_environment_reattach.py > /tmp/r.txt 2>&1
-          rc=$?; { echo; echo "### env/remote reattach (rc=$rc)"; echo '```'; tail -4 /tmp/r.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          rc=$?; cp /tmp/r.txt "$GITHUB_WORKSPACE/review/$EV/04-env-remote-reattach.log" || true
+          { echo; echo "### env/remote reattach (rc=$rc)"; echo '```'; tail -4 /tmp/r.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           exit $rc
 
       - name: 5d. author gate 4 — resident-visible surface
@@ -202,7 +216,8 @@ jobs:
           set -uo pipefail
           cd cand
           python -m pytest -v -o addopts= --timeout=1800 tests/c15_persistence/test_resident_surface.py > /tmp/s.txt 2>&1
-          rc=$?; { echo; echo "### resident surface (rc=$rc)"; echo '```'; tail -3 /tmp/s.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          rc=$?; cp /tmp/s.txt "$GITHUB_WORKSPACE/review/$EV/05-resident-surface.log" || true
+          { echo; echo "### resident surface (rc=$rc)"; echo '```'; tail -3 /tmp/s.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           exit $rc
 
       - name: 5e. author gate 5 — historical persistence journal (frozen unittest contract)
@@ -213,7 +228,8 @@ jobs:
           sudo install -d -m 0700 -o "$(id -u)" -g "$(id -g)" /home/user/c15-persistence-unit-probes
           cd cand
           python -m unittest discover -s tests/c15_persistence -p "test_journal.py" -v > /tmp/j.txt 2>&1
-          rc=$?; { echo; echo "### historical journal (rc=$rc)"; echo '```'; tail -4 /tmp/j.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          rc=$?; cp /tmp/j.txt "$GITHUB_WORKSPACE/review/$EV/06-historical-journal.log" || true
+          { echo; echo "### historical journal (rc=$rc)"; echo '```'; tail -4 /tmp/j.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           exit $rc
 
       - name: 5f. author gate 6 — src/aios_core/** zero diff
@@ -241,5 +257,38 @@ jobs:
             tail -3 /tmp/full.txt
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          cp /tmp/full.txt "$GITHUB_WORKSPACE/review/$EV/07-full-regression.log" || true
           while IFS= read -r l; do echo "::error title=IA-FULL-REGRESSION::${l:0:900}"; done < <(grep -E "^(FAILED|ERROR)" /tmp/full.txt | head -10)
           exit $rc
+
+      - name: 7. publish durable review evidence to the IA evidence branch
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          cd review
+          mkdir -p "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/evidence-run"
+          {
+            echo "run_id: ${{ github.run_id }}"
+            echo "run_attempt: ${{ github.run_attempt }}"
+            echo "head_sha: ${{ github.sha }}"
+            echo "tested_exact_candidate: ${{ env.CANDIDATE }}"
+            echo "canonical_stage_b: ${{ env.STAGE_B }}"
+            echo "generated_utc: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo
+            echo "--- formal environment ---"
+            python -c "import sys,pydantic,pytest,sqlite3;print('python',sys.version);print('pydantic',pydantic.VERSION);print('pytest',pytest.__version__);print('sqlite',sqlite3.sqlite_version)"
+            echo
+            echo "--- files ---"
+            find "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/evidence-run" -type f -exec sha256sum {} \;
+          } > "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/evidence-run/99-MANIFEST.txt"
+          git config user.name "AIOS IA Reviewer"
+          git config user.email "ia-reviewer@invalid.local"
+          git add -A "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27"
+          if git diff --cached --quiet; then
+            echo "no evidence change"
+          else
+            git commit -q -m "IA evidence run ${{ github.run_id }} @ ${{ github.sha }}"
+            git push -q "https://x-access-token:${GH_TOKEN}@github.com/Haneof/Haneof-AIOS-Core-v3.0.git"               "HEAD:refs/heads/${{ env.EVBRANCH }}" || echo "EVIDENCE PUSH FAILED"
+          fi
