@@ -143,8 +143,8 @@ class RuntimeSnapshot:
         """Core-minted relay identity for the outbound request of this round.
 
         Set only after the durable originating-request binding is committed and
-        before the provider handler runs. A recoverable exact response must echo
-        this value; it is not a caller-supplied recovery token.
+        before the provider handler runs. It may be conveyed to a trusted relay,
+        but it is routing metadata rather than response-authenticity authority.
         """
 
         value = getattr(self, "_outbound_relay_id", None)
@@ -173,6 +173,7 @@ ModelHandler = Callable[[RuntimeSnapshot], ModelDirective]
 ModelUsageRecorder = Callable[[RuntimeSnapshot, ModelDirective], None]
 ModelAttemptAdmitter = Callable[[RuntimeSnapshot], str | None]
 ModelDispatchRecorder = Callable[[RuntimeSnapshot], None]
+ModelResponseAuthenticator = Callable[[RuntimeSnapshot, ModelDirective], None]
 ModelResponseRecorder = Callable[[RuntimeSnapshot, ModelDirective], None]
 ModelFailureRecorder = Callable[[RuntimeSnapshot, BaseException, bool], None]
 SideEffectAuthorizer = Callable[[CapabilitySpec, CapabilityCall, RuntimeSnapshot], bool]
@@ -194,6 +195,7 @@ class CognitiveRuntime:
         model_usage_recorder: ModelUsageRecorder | None = None,
         model_attempt_admitter: ModelAttemptAdmitter | None = None,
         model_dispatch_recorder: ModelDispatchRecorder | None = None,
+        model_response_authenticator: ModelResponseAuthenticator | None = None,
         model_response_recorder: ModelResponseRecorder | None = None,
         model_failure_recorder: ModelFailureRecorder | None = None,
         model_response_recovery: ModelResponseRecovery | None = None,
@@ -213,6 +215,7 @@ class CognitiveRuntime:
         self.model_usage_recorder = model_usage_recorder
         self.model_attempt_admitter = model_attempt_admitter
         self.model_dispatch_recorder = model_dispatch_recorder
+        self.model_response_authenticator = model_response_authenticator
         self.model_response_recorder = model_response_recorder
         self.model_failure_recorder = model_failure_recorder
         self.model_response_recovery = model_response_recovery
@@ -358,6 +361,11 @@ class CognitiveRuntime:
                     if self.model_failure_recorder is not None:
                         self.model_failure_recorder(snapshot, exc, False)
                     raise
+                if self.model_response_authenticator is not None:
+                    # This callback is the trusted provider/relay return boundary.
+                    # It durably authenticates exact bytes before provenance,
+                    # metering, capability execution, output, or any World effect.
+                    self.model_response_authenticator(snapshot, directive)
                 if self.model_response_recorder is not None:
                     self.model_response_recorder(snapshot, directive)
             if directive.usage is None:

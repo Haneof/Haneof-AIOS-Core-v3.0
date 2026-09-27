@@ -1,6 +1,12 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
-from aios_core.runtime.background_attempt import BackgroundModelAttemptStore
+import pytest
+
+from aios_core.runtime.background_attempt import (
+    BackgroundModelAttemptStore,
+    BackgroundModelResponseConflict,
+    encode_model_directive,
+)
 from aios_core.runtime.cognitive_runtime import (
     ModelCallProvenance,
     ModelDirective,
@@ -80,6 +86,12 @@ def test_background_attempt_reconciliation_keeps_same_identity_and_non_world_rev
             request_id="request-unit",
         ),
     )
+    receipt = attempts._capture_trusted_response_return(
+        retry.attempt_id,
+        captured_at=NOW,
+        directive=directive,
+    )
+    assert receipt.attempt_id == retry.attempt_id
     returned = attempts.record_response(
         retry.attempt_id,
         returned_at=NOW,
@@ -119,3 +131,147 @@ def test_background_attempt_reconciliation_keeps_same_identity_and_non_world_rev
     assert durable.attempt_id == retry.attempt_id
     assert durable.state == "metered"
     assert durable.provider_request_id == "request-unit"
+
+
+def _trusted_attempt(
+    attempts: BackgroundModelAttemptStore,
+    *,
+    subject_id: str,
+    work_kind: str,
+    work_id: str,
+    round_index: int,
+    request_id: str,
+):
+    attempt = attempts.admit(
+        subject_id=subject_id,
+        work_kind=work_kind,
+        work_id=work_id,
+        wake_reason="trusted-return-unit",
+        model_round_index=round_index,
+        world_revision=0,
+        admitted_at=NOW,
+    )
+    attempts.mark_dispatching(
+        attempt.attempt_id,
+        dispatched_at=NOW,
+        outbound_request_fingerprint=(
+            f"outbound:{subject_id}:{work_kind}:{work_id}:{round_index}"
+        ),
+    )
+    directive = ModelDirective(
+        response=f"response for {request_id}",
+        usage=ModelUsage(
+            input_tokens=2,
+            output_tokens=2,
+            total_tokens=4,
+            provider="provider",
+            model="model",
+            request_id=request_id,
+        ),
+        provenance=ModelCallProvenance(
+            provider="provider",
+            model="model",
+            request_id=request_id,
+        ),
+    )
+    receipt = attempts._capture_trusted_response_return(
+        attempt.attempt_id,
+        captured_at=NOW + timedelta(seconds=1),
+        directive=directive,
+    )
+    return attempt, directive, receipt
+
+
+@pytest.mark.parametrize(
+    "target_identity",
+    (
+        pytest.param(
+            ("subject-a", "wake", "work-b", 0), id="cross-work-and-attempt"
+        ),
+        pytest.param(
+            ("subject-a", "periodic_review", "work-a", 0), id="cross-work-kind"
+        ),
+        pytest.param(("subject-b", "wake", "work-a", 0), id="cross-subject"),
+        pytest.param(("subject-a", "wake", "work-a", 1), id="cross-round"),
+    ),
+)
+def test_trusted_receipt_proof_cannot_replay_across_bound_identity(
+    tmp_path, target_identity
+):
+    store = SQLiteWorldStore(tmp_path / "world.db")
+    attempts = BackgroundModelAttemptStore(store)
+    _source, _source_directive, source_receipt = _trusted_attempt(
+        attempts,
+        subject_id="subject-a",
+        work_kind="wake",
+        work_id="work-a",
+        round_index=0,
+        request_id="source-request",
+    )
+    target, target_directive, _target_receipt = _trusted_attempt(
+        attempts,
+        subject_id=target_identity[0],
+        work_kind=target_identity[1],
+        work_id=target_identity[2],
+        round_index=target_identity[3],
+        request_id="target-request",
+    )
+    payload = encode_model_directive(target_directive)
+
+    with pytest.raises(BackgroundModelResponseConflict, match="proof is invalid"):
+        attempts.stage_exact_response(
+            target.attempt_id,
+            staged_at=NOW + timedelta(seconds=2),
+            provider="provider",
+            model="model",
+            provider_request_id="target-request",
+            response_fingerprint=attempts._response_fingerprint(target_directive),
+            directive_payload=payload,
+            authenticity_proof=source_receipt.authenticity_proof,
+            evidence="attempted cross-identity receipt replay",
+        )
+
+    unchanged = attempts.get(target.attempt_id)
+    assert unchanged is not None
+    assert unchanged.state == "dispatching"
+    assert unchanged.provider is None
+    assert unchanged.model is None
+    assert unchanged.provider_request_id is None
+    assert unchanged.response_fingerprint is None
+    assert attempts.staged_response(target.attempt_id) is None
+
+
+def test_metadata_only_reconciliation_cannot_bypass_authenticity(tmp_path):
+    store = SQLiteWorldStore(tmp_path / "world.db")
+    attempts = BackgroundModelAttemptStore(store)
+    attempt = attempts.admit(
+        subject_id="subject-a",
+        work_kind="wake",
+        work_id="metadata-only",
+        wake_reason="trusted-return-unit",
+        model_round_index=0,
+        world_revision=0,
+        admitted_at=NOW,
+    )
+    attempts.mark_dispatching(
+        attempt.attempt_id,
+        dispatched_at=NOW,
+        outbound_request_fingerprint="metadata-only-outbound",
+    )
+
+    with pytest.raises(BackgroundModelResponseConflict, match="metadata-only"):
+        attempts.reconcile_response(
+            attempt.attempt_id,
+            reconciled_at=NOW + timedelta(seconds=1),
+            provider="provider",
+            model="model",
+            provider_request_id="caller-request",
+            response_fingerprint="caller-computable-fingerprint",
+            evidence="caller-controlled evidence",
+        )
+
+    unchanged = attempts.get(attempt.attempt_id)
+    assert unchanged is not None
+    assert unchanged.state == "dispatching"
+    assert unchanged.provider is None
+    assert unchanged.response_fingerprint is None

@@ -121,8 +121,33 @@ def _attempt(runtime, *, work_kind: str, work_id: str, round_index: int = 0):
     )
 
 
-def _stage(runtime, *, work_kind, work_id, round_index, directive, payload=None):
+def _stage(
+    runtime,
+    *,
+    work_kind,
+    work_id,
+    round_index,
+    directive,
+    payload=None,
+    trusted_return=False,
+):
     raw = encode_model_directive(directive) if payload is None else payload
+    authenticity_proof = None
+    if trusted_return:
+        attempt = _attempt(
+            runtime,
+            work_kind=work_kind,
+            work_id=work_id,
+            round_index=round_index,
+        )
+        assert attempt is not None
+        # Test-only simulation of the trusted provider/relay return boundary.
+        receipt = runtime.background_model_attempts._capture_trusted_response_return(
+            attempt.attempt_id,
+            captured_at=NOW + timedelta(minutes=1),
+            directive=directive,
+        )
+        authenticity_proof = receipt.authenticity_proof
     return runtime.stage_exact_background_response(
         work_kind=work_kind,
         work_id=work_id,
@@ -134,6 +159,7 @@ def _stage(runtime, *, work_kind, work_id, round_index, directive, payload=None)
         directive_payload=raw,
         staged_at=NOW + timedelta(minutes=2),
         evidence="copied exact response from another originating request",
+        authenticity_proof=authenticity_proof,
     )
 
 
@@ -646,6 +672,7 @@ def test_blk001_same_attempt_correct_binding_recovers_with_zero_provider_calls(t
         work_id=signal.wake_id,
         round_index=0,
         directive=exact,
+        trusted_return=True,
     )
     recovery_calls: list[int] = []
 
@@ -699,6 +726,7 @@ def _child_stage_exact_then_sigkill(db_path: str) -> None:
         work_id=signal.wake_id,
         round_index=0,
         directive=exact,
+        trusted_return=True,
     )
     os.kill(os.getpid(), posix_signal.SIGKILL)
 
@@ -884,6 +912,7 @@ def test_process_sigkill_after_capability_side_effect_replays_exactly_once(tmp_p
         work_id=wake_id,
         round_index=0,
         directive=exact,
+        trusted_return=True,
     )
     result = runtime.run_wake(
         wake_ref=ObjectRef(object_id=wake_id, revision=int(running[0]["revision"])),

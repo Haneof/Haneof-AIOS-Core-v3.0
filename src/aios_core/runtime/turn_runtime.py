@@ -1128,6 +1128,7 @@ class FusedTurnRuntime:
             model_usage_recorder=self._record_model_usage,
             model_attempt_admitter=self._admit_background_model_attempt,
             model_dispatch_recorder=self._mark_background_model_dispatch,
+            model_response_authenticator=self._authenticate_background_model_response,
             model_response_recorder=self._record_background_model_response,
             model_failure_recorder=self._record_background_model_failure,
             model_response_recovery=self._recover_exact_model_response,
@@ -1300,6 +1301,30 @@ class FusedTurnRuntime:
             )
         object.__setattr__(snapshot, "_outbound_relay_id", binding.relay_id)
 
+    def _authenticate_background_model_response(
+        self,
+        snapshot: RuntimeSnapshot,
+        directive: ModelDirective,
+    ) -> None:
+        """Capture a non-forgeable receipt at the trusted model-return boundary."""
+
+        if snapshot.model_attempt_id is None:
+            return
+        if self._active_meter_time is None:
+            raise RuntimeError("background model response is missing execution time")
+        # Anonymous/local handlers remain valid but cannot participate in exact
+        # external-response recovery because there is no provider identity to bind.
+        if any(
+            value is None
+            for value in self.background_model_attempts._provider_identity(directive)
+        ):
+            return
+        self.background_model_attempts._capture_trusted_response_return(
+            snapshot.model_attempt_id,
+            captured_at=self._active_meter_time,
+            directive=directive,
+        )
+
     def _record_background_model_response(
         self,
         snapshot: RuntimeSnapshot,
@@ -1345,6 +1370,7 @@ class FusedTurnRuntime:
         directive_payload: str,
         staged_at: datetime,
         evidence: str,
+        authenticity_proof: str | None = None,
     ) -> BackgroundModelResponseStaging:
         """Durably bind one exact externally preserved provider reply to an attempt.
 
@@ -1374,6 +1400,7 @@ class FusedTurnRuntime:
             provider_request_id=provider_request_id,
             response_fingerprint=response_fingerprint,
             directive_payload=directive_payload,
+            authenticity_proof=authenticity_proof,
             evidence=evidence,
         )
 

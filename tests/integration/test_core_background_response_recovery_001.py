@@ -173,6 +173,18 @@ def _stage(
             ),
         )
     payload, fingerprint = _payload_and_fingerprint(runtime, directive)
+    assert attempt is not None
+    authenticity_proof = None
+    if attempt.state in {"dispatching", "in_doubt", "response_returned", "metered"}:
+        # Test-only simulation of the trusted relay return callback.  The
+        # recovery caller can read/copy the resulting receipt but cannot invoke
+        # its private HMAC authority through the public staging API.
+        receipt = runtime.background_model_attempts._capture_trusted_response_return(
+            attempt.attempt_id,
+            captured_at=staged_at - timedelta(seconds=1),
+            directive=directive,
+        )
+        authenticity_proof = receipt.authenticity_proof
     return runtime.stage_exact_background_response(
         work_kind=work_kind,
         work_id=work_id,
@@ -184,6 +196,7 @@ def _stage(
         directive_payload=payload,
         staged_at=staged_at,
         evidence=evidence,
+        authenticity_proof=authenticity_proof,
     )
 
 
@@ -533,6 +546,10 @@ def test_case_04c_staged_bytes_must_match_durable_attempt_provenance(
     # The same exact bytes that the runtime already fingerprinted are re-verifiable.
     exact_payload, exact_fingerprint = _payload_and_fingerprint(runtime, exact)
     assert exact_fingerprint == durable_fingerprint
+    receipt = runtime.background_model_attempts.response_authenticity_receipt(
+        attempt.attempt_id
+    )
+    assert receipt is not None
     runtime.stage_exact_background_response(
         work_kind="wake",
         work_id=signal.wake_id,
@@ -544,6 +561,7 @@ def test_case_04c_staged_bytes_must_match_durable_attempt_provenance(
         directive_payload=exact_payload,
         staged_at=NOW + timedelta(minutes=2),
         evidence="relay journal req-case-04c",
+        authenticity_proof=receipt.authenticity_proof,
     )
     restarted = FusedTurnRuntime(
         store=store,

@@ -8,7 +8,9 @@ remains in ModelMeteringLedger.
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
+import secrets
 from datetime import datetime
 from typing import Literal
 
@@ -290,6 +292,32 @@ class BackgroundModelRequestBinding(BaseModel):
     bound_at: datetime
 
 
+class BackgroundModelResponseReceipt(BaseModel):
+    """Trusted return-path receipt for exact provider response bytes.
+
+    The HMAC key never leaves the runtime store.  This public receipt may be copied
+    into an external response journal: replay is harmless because the authenticator
+    binds it to one exact attempt, request binding, provider identity, and payload.
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    attempt_id: str = Field(min_length=1)
+    subject_id: str = Field(min_length=1)
+    work_kind: BackgroundAttemptWorkKind
+    work_id: str = Field(min_length=1)
+    model_round_index: int = Field(ge=0)
+    outbound_request_fingerprint: str = Field(min_length=1)
+    relay_id: str = Field(min_length=1)
+    provider: str = Field(min_length=1)
+    model: str = Field(min_length=1)
+    provider_request_id: str = Field(min_length=1)
+    response_fingerprint: str = Field(min_length=1)
+    payload_sha256: str = Field(min_length=1)
+    authenticity_proof: str = Field(min_length=1)
+    captured_at: datetime
+
+
 class BackgroundModelResponseStaging(BaseModel):
     """Exact provider response bytes durably bound to one model attempt/round."""
 
@@ -302,6 +330,7 @@ class BackgroundModelResponseStaging(BaseModel):
     response_fingerprint: str = Field(min_length=1)
     directive_payload: str = Field(min_length=1)
     payload_sha256: str = Field(min_length=1)
+    authenticity_proof: str | None = None
     staged_at: datetime
     evidence: str = Field(min_length=1)
 
@@ -426,11 +455,26 @@ class BackgroundModelAttemptStore:
                     response_fingerprint TEXT NOT NULL,
                     directive_payload TEXT NOT NULL,
                     payload_sha256 TEXT NOT NULL,
+                    authenticity_proof TEXT NOT NULL,
                     staged_at TEXT NOT NULL,
                     evidence TEXT NOT NULL
                 )
                 """
             )
+            response_columns = {
+                str(row["name"])
+                for row in conn.execute(
+                    "PRAGMA table_info(background_model_responses)"
+                ).fetchall()
+            }
+            if "authenticity_proof" not in response_columns:
+                # Historical staged rows have no authenticity authority and stay
+                # unusable until they are re-established through the trusted return
+                # path. NULL is deliberately fail-closed in every read path.
+                conn.execute(
+                    "ALTER TABLE background_model_responses "
+                    "ADD COLUMN authenticity_proof TEXT"
+                )
             conn.execute(
                 """
                 CREATE INDEX IF NOT EXISTS idx_background_response_identity
@@ -454,6 +498,49 @@ class BackgroundModelAttemptStore:
                     outbound_request_fingerprint TEXT NOT NULL,
                     relay_id TEXT NOT NULL,
                     bound_at TEXT NOT NULL
+                )
+                """
+            )
+            # A single store-private authority key authenticates return receipts.
+            # It is never returned by an API, attached to RuntimeSnapshot, written
+            # to evidence, or accepted from the recovery caller.
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS background_model_authenticity_authority (
+                    authority_id TEXT PRIMARY KEY,
+                    secret_hex TEXT NOT NULL
+                )
+                """
+            )
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO background_model_authenticity_authority(
+                    authority_id, secret_hex
+                ) VALUES ('trusted-return-v1', ?)
+                """,
+                (secrets.token_hex(32),),
+            )
+            # This is non-World runtime provenance in the existing database.  Rows
+            # can only be minted by the trusted provider-return callback; staging
+            # can read and verify them but cannot create or rewrite them.
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS background_model_response_receipts (
+                    attempt_id TEXT PRIMARY KEY,
+                    subject_id TEXT NOT NULL,
+                    work_kind TEXT NOT NULL,
+                    work_id TEXT NOT NULL,
+                    model_round_index INTEGER NOT NULL
+                        CHECK(model_round_index >= 0),
+                    outbound_request_fingerprint TEXT NOT NULL,
+                    relay_id TEXT NOT NULL,
+                    provider TEXT NOT NULL,
+                    model TEXT NOT NULL,
+                    provider_request_id TEXT NOT NULL,
+                    response_fingerprint TEXT NOT NULL,
+                    payload_sha256 TEXT NOT NULL,
+                    authenticity_proof TEXT NOT NULL UNIQUE,
+                    captured_at TEXT NOT NULL
                 )
                 """
             )
@@ -554,6 +641,91 @@ class BackgroundModelAttemptStore:
             model = directive.usage.model or model
             request_id = directive.usage.request_id or request_id
         return provider, model, request_id
+
+    @staticmethod
+    def _receipt_message(
+        *,
+        attempt_id: str,
+        subject_id: str,
+        work_kind: str,
+        work_id: str,
+        model_round_index: int,
+        outbound_request_fingerprint: str,
+        relay_id: str,
+        provider: str,
+        model: str,
+        provider_request_id: str,
+        response_fingerprint: str,
+        payload_sha256: str,
+    ) -> bytes:
+        return canonical_json_dumps(
+            {
+                "attempt_id": attempt_id,
+                "model": model,
+                "model_round_index": int(model_round_index),
+                "outbound_request_fingerprint": outbound_request_fingerprint,
+                "payload_sha256": payload_sha256,
+                "provider": provider,
+                "provider_request_id": provider_request_id,
+                "relay_id": relay_id,
+                "response_fingerprint": response_fingerprint,
+                "schema": "aios.background-model-response-receipt.v1",
+                "subject_id": subject_id,
+                "work_id": work_id,
+                "work_kind": work_kind,
+            }
+        ).encode("utf-8")
+
+    @staticmethod
+    def _authority_key(conn: object) -> bytes:
+        row = conn.execute(
+            """
+            SELECT secret_hex
+            FROM background_model_authenticity_authority
+            WHERE authority_id='trusted-return-v1'
+            """
+        ).fetchone()
+        if row is None:
+            raise RuntimeError("trusted response authenticity authority is missing")
+        try:
+            key = bytes.fromhex(str(row["secret_hex"]))
+        except ValueError as exc:
+            raise RuntimeError(
+                "trusted response authenticity authority is invalid"
+            ) from exc
+        if len(key) != 32:
+            raise RuntimeError("trusted response authenticity authority is invalid")
+        return key
+
+    @classmethod
+    def _receipt_proof(cls, conn: object, **fields: object) -> str:
+        digest = hmac.new(
+            cls._authority_key(conn),
+            cls._receipt_message(**fields),
+            hashlib.sha256,
+        ).hexdigest()
+        return f"bgresponse_v1_{digest}"
+
+    @staticmethod
+    def _receipt_from_row(row: object) -> BackgroundModelResponseReceipt:
+        return BackgroundModelResponseReceipt(
+            attempt_id=row["attempt_id"],
+            subject_id=row["subject_id"],
+            work_kind=row["work_kind"],
+            work_id=row["work_id"],
+            model_round_index=int(row["model_round_index"]),
+            outbound_request_fingerprint=row["outbound_request_fingerprint"],
+            relay_id=row["relay_id"],
+            provider=row["provider"],
+            model=row["model"],
+            provider_request_id=row["provider_request_id"],
+            response_fingerprint=row["response_fingerprint"],
+            payload_sha256=row["payload_sha256"],
+            authenticity_proof=row["authenticity_proof"],
+            captured_at=datetime.fromisoformat(
+                str(row["captured_at"]).replace("Z", "+00:00")
+            ),
+        )
 
     @staticmethod
     def _from_row(row: object) -> BackgroundModelAttempt:
@@ -910,6 +1082,28 @@ class BackgroundModelAttemptStore:
         detail = str(error)[:1000]
         with self.store._connection() as conn:
             conn.execute("BEGIN IMMEDIATE")
+            if definitely_not_submitted:
+                receipt_row = conn.execute(
+                    """
+                    SELECT 1 FROM background_model_response_receipts
+                    WHERE attempt_id=?
+                    """,
+                    (attempt_id,),
+                ).fetchone()
+                if receipt_row is not None:
+                    attempt_row = conn.execute(
+                        "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                        (attempt_id,),
+                    ).fetchone()
+                    conn.rollback()
+                    if attempt_row is None:
+                        raise KeyError(
+                            f"unknown background model attempt: {attempt_id}"
+                        )
+                    raise BackgroundModelResponseConflict(
+                        self._from_row(attempt_row),
+                        "an authenticated provider return cannot be marked not submitted",
+                    )
             conn.execute(
                 """
                 UPDATE background_model_attempts
@@ -945,9 +1139,74 @@ class BackgroundModelAttemptStore:
     ) -> BackgroundModelAttempt:
         moment = as_utc(returned_at, "returned_at")
         provider, model, request_id = self._provider_identity(directive)
+        has_recoverable_identity = all(
+            value is not None for value in (provider, model, request_id)
+        )
         fingerprint = self._response_fingerprint(directive)
+        payload_sha256 = (
+            hashlib.sha256(encode_model_directive(directive).encode("utf-8")).hexdigest()
+            if has_recoverable_identity
+            else None
+        )
         with self.store._connection() as conn:
             conn.execute("BEGIN IMMEDIATE")
+            current_row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if current_row is None:
+                conn.rollback()
+                raise KeyError(f"unknown background model attempt: {attempt_id}")
+            current = self._from_row(current_row)
+            if has_recoverable_identity:
+                binding_row = conn.execute(
+                    """
+                    SELECT * FROM background_model_request_bindings
+                    WHERE attempt_id=?
+                    """,
+                    (attempt_id,),
+                ).fetchone()
+                binding = (
+                    None
+                    if binding_row is None
+                    else self._binding_from_row(binding_row)
+                )
+                receipt_row = conn.execute(
+                    """
+                    SELECT * FROM background_model_response_receipts
+                    WHERE attempt_id=?
+                    """,
+                    (attempt_id,),
+                ).fetchone()
+                if receipt_row is None:
+                    conn.rollback()
+                    raise BackgroundModelResponseConflict(
+                        current,
+                        "provider response reached Core without a trusted "
+                        "return-path receipt",
+                    )
+                receipt = self._receipt_from_row(receipt_row)
+                try:
+                    binding = self._require_origin_binding(
+                        current,
+                        binding,
+                        supplied_request_id=request_id,
+                        require_relay_echo=False,
+                    )
+                    self._verify_response_authenticity(
+                        conn,
+                        attempt=current,
+                        binding=binding,
+                        provider=provider,
+                        model=model,
+                        provider_request_id=request_id,
+                        response_fingerprint=fingerprint,
+                        payload_sha256=payload_sha256,
+                        authenticity_proof=receipt.authenticity_proof,
+                    )
+                except BackgroundModelResponseConflict:
+                    conn.rollback()
+                    raise
             conn.execute(
                 """
                 UPDATE background_model_attempts
@@ -970,8 +1229,6 @@ class BackgroundModelAttemptStore:
                 (attempt_id,),
             ).fetchone()
             conn.commit()
-        if row is None:
-            raise KeyError(f"unknown background model attempt: {attempt_id}")
         attempt = self._from_row(row)
         if attempt.state in {"response_returned", "metered"}:
             if (
@@ -998,6 +1255,26 @@ class BackgroundModelAttemptStore:
         moment = as_utc(reconciled_at, "reconciled_at")
         with self.store._connection() as conn:
             conn.execute("BEGIN IMMEDIATE")
+            receipt_row = conn.execute(
+                """
+                SELECT 1 FROM background_model_response_receipts
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+            if receipt_row is not None:
+                attempt_row = conn.execute(
+                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                    (attempt_id,),
+                ).fetchone()
+                conn.rollback()
+                if attempt_row is None:
+                    raise KeyError(f"unknown background model attempt: {attempt_id}")
+                raise BackgroundModelResponseConflict(
+                    self._from_row(attempt_row),
+                    "an authenticated provider return cannot be reconciled as "
+                    "not submitted",
+                )
             conn.execute(
                 """
                 UPDATE background_model_attempts
@@ -1035,48 +1312,24 @@ class BackgroundModelAttemptStore:
         response_fingerprint: str,
         evidence: str,
     ) -> BackgroundModelAttempt:
-        values = {
-            "provider": provider,
-            "model": model,
-            "provider_request_id": provider_request_id,
-            "response_fingerprint": response_fingerprint,
-            "evidence": evidence,
-        }
-        if any(not isinstance(value, str) or not value.strip() for value in values.values()):
-            raise ValueError("response reconciliation fields must be non-blank")
-        moment = as_utc(reconciled_at, "reconciled_at")
-        with self.store._connection() as conn:
-            conn.execute("BEGIN IMMEDIATE")
-            conn.execute(
-                """
-                UPDATE background_model_attempts
-                SET state='response_returned', updated_at=?, provider=?, model=?,
-                    provider_request_id=?, response_fingerprint=?,
-                    reconciliation_evidence=?, failure_kind=NULL,
-                    failure_detail=NULL
-                WHERE attempt_id=? AND state IN ('dispatching', 'in_doubt')
-                """,
-                (
-                    canonical_utc_iso(moment, "updated_at"),
-                    provider.strip(),
-                    model.strip(),
-                    provider_request_id.strip(),
-                    response_fingerprint.strip(),
-                    evidence.strip(),
-                    attempt_id,
-                ),
-            )
-            row = conn.execute(
-                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
-                (attempt_id,),
-            ).fetchone()
-            conn.commit()
-        if row is None:
+        """Reject the obsolete metadata-only response-reconciliation path.
+
+        Metadata and a caller-computable fingerprint cannot authenticate provider
+        bytes.  Keeping this method fail-closed avoids a compatibility-shaped path
+        that could mutate attempt provenance before trusted receipt verification;
+        callers must use ``stage_exact_response`` with exact bytes and proof.
+        """
+
+        del reconciled_at, provider, model, provider_request_id, response_fingerprint
+        del evidence
+        attempt = self.get(attempt_id)
+        if attempt is None:
             raise KeyError(f"unknown background model attempt: {attempt_id}")
-        attempt = self._from_row(row)
-        if attempt.state != "response_returned":
-            raise BackgroundModelAttemptBlocked(attempt)
-        return attempt
+        raise BackgroundModelResponseConflict(
+            attempt,
+            "metadata-only response reconciliation is disabled; exact provider "
+            "bytes and a trusted return-path proof are required",
+        )
 
     # -- exact provider response recovery -------------------------------------
     #
@@ -1101,6 +1354,7 @@ class BackgroundModelAttemptStore:
             response_fingerprint=row["response_fingerprint"],
             directive_payload=row["directive_payload"],
             payload_sha256=row["payload_sha256"],
+            authenticity_proof=row["authenticity_proof"],
             staged_at=datetime.fromisoformat(
                 str(row["staged_at"]).replace("Z", "+00:00")
             ),
@@ -1194,6 +1448,258 @@ class BackgroundModelAttemptStore:
             )
         return binding
 
+    def _capture_trusted_response_return(
+        self,
+        attempt_id: str,
+        *,
+        captured_at: datetime,
+        directive: ModelDirective,
+    ) -> BackgroundModelResponseReceipt:
+        """Mint a receipt at the internal provider/relay return boundary.
+
+        This method is intentionally private and is wired only as CognitiveRuntime's
+        trusted return callback.  Recovery staging has no path to this authority and
+        receives neither the HMAC key nor a signing callable.
+        """
+
+        moment = as_utc(captured_at, "captured_at")
+        provider, model, request_id = self._provider_identity(directive)
+        if provider is None or model is None or request_id is None:
+            raise ValueError(
+                "trusted provider response must carry full provider/model/request_id identity"
+            )
+        directive_payload = encode_model_directive(directive)
+        response_fingerprint = self._response_fingerprint(directive)
+        payload_sha256 = hashlib.sha256(
+            directive_payload.encode("utf-8")
+        ).hexdigest()
+
+        with self.store._connection() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            attempt_row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if attempt_row is None:
+                conn.rollback()
+                raise KeyError(f"unknown background model attempt: {attempt_id}")
+            attempt = self._from_row(attempt_row)
+            if attempt.state not in {
+                "dispatching",
+                "in_doubt",
+                "response_returned",
+                "metered",
+            }:
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt,
+                    "trusted return receipt cannot be captured before the provider boundary",
+                )
+            if attempt.state in {"response_returned", "metered"} and (
+                attempt.provider,
+                attempt.model,
+                attempt.provider_request_id,
+                attempt.response_fingerprint,
+            ) != (provider, model, request_id, response_fingerprint):
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt,
+                    "trusted return bytes conflict with durable attempt provenance",
+                )
+            binding_row = conn.execute(
+                """
+                SELECT * FROM background_model_request_bindings
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+            binding = (
+                None if binding_row is None else self._binding_from_row(binding_row)
+            )
+            try:
+                binding = self._require_origin_binding(
+                    attempt,
+                    binding,
+                    supplied_request_id=request_id,
+                    require_relay_echo=False,
+                )
+            except BackgroundModelResponseConflict:
+                conn.rollback()
+                raise
+
+            receipt_fields = {
+                "attempt_id": attempt.attempt_id,
+                "subject_id": attempt.subject_id,
+                "work_kind": attempt.work_kind,
+                "work_id": attempt.work_id,
+                "model_round_index": attempt.model_round_index,
+                "outbound_request_fingerprint": binding.outbound_request_fingerprint,
+                "relay_id": binding.relay_id,
+                "provider": provider,
+                "model": model,
+                "provider_request_id": request_id,
+                "response_fingerprint": response_fingerprint,
+                "payload_sha256": payload_sha256,
+            }
+            proof = self._receipt_proof(conn, **receipt_fields)
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO background_model_response_receipts(
+                    attempt_id, subject_id, work_kind, work_id,
+                    model_round_index, outbound_request_fingerprint, relay_id,
+                    provider, model, provider_request_id, response_fingerprint,
+                    payload_sha256, authenticity_proof, captured_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    *receipt_fields.values(),
+                    proof,
+                    canonical_utc_iso(moment, "captured_at"),
+                ),
+            )
+            receipt_row = conn.execute(
+                """
+                SELECT * FROM background_model_response_receipts
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+            if receipt_row is None:
+                conn.rollback()
+                raise RuntimeError("trusted response receipt was not durable")
+            receipt = self._receipt_from_row(receipt_row)
+            expected = (
+                *receipt_fields.values(),
+                proof,
+            )
+            actual = (
+                receipt.attempt_id,
+                receipt.subject_id,
+                receipt.work_kind,
+                receipt.work_id,
+                receipt.model_round_index,
+                receipt.outbound_request_fingerprint,
+                receipt.relay_id,
+                receipt.provider,
+                receipt.model,
+                receipt.provider_request_id,
+                receipt.response_fingerprint,
+                receipt.payload_sha256,
+                receipt.authenticity_proof,
+            )
+            if actual != expected:
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt,
+                    "trusted return bytes conflict with the receipt already captured "
+                    "for this attempt",
+                )
+            conn.commit()
+        return receipt
+
+    def response_authenticity_receipt(
+        self,
+        attempt_id: str,
+    ) -> BackgroundModelResponseReceipt | None:
+        """Read a public receipt; never exposes or invokes the signing authority."""
+
+        with self.store._connection() as conn:
+            row = conn.execute(
+                """
+                SELECT * FROM background_model_response_receipts
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+        return None if row is None else self._receipt_from_row(row)
+
+    def _verify_response_authenticity(
+        self,
+        conn: object,
+        *,
+        attempt: BackgroundModelAttempt,
+        binding: BackgroundModelRequestBinding,
+        provider: str,
+        model: str,
+        provider_request_id: str,
+        response_fingerprint: str,
+        payload_sha256: str,
+        authenticity_proof: str,
+    ) -> BackgroundModelResponseReceipt:
+        row = conn.execute(
+            """
+            SELECT * FROM background_model_response_receipts
+            WHERE attempt_id=?
+            """,
+            (attempt.attempt_id,),
+        ).fetchone()
+        if row is None:
+            raise BackgroundModelResponseConflict(
+                attempt,
+                "trusted provider-return authenticity receipt is missing",
+            )
+        receipt = self._receipt_from_row(row)
+        receipt_fields = {
+            "attempt_id": receipt.attempt_id,
+            "subject_id": receipt.subject_id,
+            "work_kind": receipt.work_kind,
+            "work_id": receipt.work_id,
+            "model_round_index": receipt.model_round_index,
+            "outbound_request_fingerprint": receipt.outbound_request_fingerprint,
+            "relay_id": receipt.relay_id,
+            "provider": receipt.provider,
+            "model": receipt.model,
+            "provider_request_id": receipt.provider_request_id,
+            "response_fingerprint": receipt.response_fingerprint,
+            "payload_sha256": receipt.payload_sha256,
+        }
+        expected_proof = self._receipt_proof(conn, **receipt_fields)
+        if not hmac.compare_digest(receipt.authenticity_proof, expected_proof):
+            raise BackgroundModelResponseConflict(
+                attempt,
+                "trusted provider-return receipt authenticator is invalid",
+            )
+        if not hmac.compare_digest(authenticity_proof, receipt.authenticity_proof):
+            raise BackgroundModelResponseConflict(
+                attempt,
+                "supplied provider-return authenticity proof is invalid",
+            )
+        expected_identity = (
+            attempt.attempt_id,
+            attempt.subject_id,
+            attempt.work_kind,
+            attempt.work_id,
+            attempt.model_round_index,
+            binding.outbound_request_fingerprint,
+            binding.relay_id,
+            provider,
+            model,
+            provider_request_id,
+            response_fingerprint,
+            payload_sha256,
+        )
+        actual_identity = (
+            receipt.attempt_id,
+            receipt.subject_id,
+            receipt.work_kind,
+            receipt.work_id,
+            receipt.model_round_index,
+            receipt.outbound_request_fingerprint,
+            receipt.relay_id,
+            receipt.provider,
+            receipt.model,
+            receipt.provider_request_id,
+            receipt.response_fingerprint,
+            receipt.payload_sha256,
+        )
+        if actual_identity != expected_identity:
+            raise BackgroundModelResponseConflict(
+                attempt,
+                "trusted provider-return receipt does not bind the exact attempt, "
+                "request, provider identity, and response bytes",
+            )
+        return receipt
+
     def staged_response(
         self,
         attempt_id: str,
@@ -1217,6 +1723,7 @@ class BackgroundModelAttemptStore:
         provider_request_id: str,
         response_fingerprint: str,
         directive_payload: str,
+        authenticity_proof: str | None = None,
         evidence: str,
     ) -> BackgroundModelResponseStaging:
         """Durably bind one exact externally preserved provider reply to an attempt.
@@ -1245,6 +1752,11 @@ class BackgroundModelAttemptStore:
         supplied_model = model.strip()
         supplied_request_id = provider_request_id.strip()
         supplied_fingerprint = response_fingerprint.strip()
+        supplied_authenticity_proof = (
+            authenticity_proof.strip()
+            if isinstance(authenticity_proof, str) and authenticity_proof.strip()
+            else None
+        )
 
         directive = decode_model_directive(directive_payload)
         fingerprint = self._response_fingerprint(directive)
@@ -1320,16 +1832,33 @@ class BackgroundModelAttemptStore:
                 None if binding_row is None else self._binding_from_row(binding_row)
             )
             try:
-                # dispatching/in_doubt have no prior provider provenance. The
-                # response must echo the relay id stored before dispatch.
-                # response_returned/metered already recorded that provenance
-                # in-process; the binding must still exist and stay consistent,
-                # but the provider's own request id is not rewritten.
-                self._require_origin_binding(
+                # The pre-dispatch binding proves routing.  The trusted receipt
+                # below proves the actual returned provider bytes, so recovery no
+                # longer treats a caller-visible relay echo as authenticity.
+                binding = self._require_origin_binding(
                     current,
                     binding,
                     supplied_request_id=supplied_request_id,
-                    require_relay_echo=current.state in {"dispatching", "in_doubt"},
+                    require_relay_echo=(
+                        supplied_authenticity_proof is None
+                        and current.state in {"dispatching", "in_doubt"}
+                    ),
+                )
+                if supplied_authenticity_proof is None:
+                    raise BackgroundModelResponseConflict(
+                        current,
+                        "trusted provider-return authenticity proof is missing",
+                    )
+                self._verify_response_authenticity(
+                    conn,
+                    attempt=current,
+                    binding=binding,
+                    provider=supplied_provider,
+                    model=supplied_model,
+                    provider_request_id=supplied_request_id,
+                    response_fingerprint=supplied_fingerprint,
+                    payload_sha256=payload_sha256,
+                    authenticity_proof=supplied_authenticity_proof,
                 )
             except BackgroundModelResponseConflict:
                 conn.rollback()
@@ -1340,8 +1869,8 @@ class BackgroundModelAttemptStore:
                 INSERT OR IGNORE INTO background_model_responses(
                     attempt_id, provider, model, provider_request_id,
                     response_fingerprint, directive_payload, payload_sha256,
-                    staged_at, evidence
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    authenticity_proof, staged_at, evidence
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     attempt_id,
@@ -1351,6 +1880,7 @@ class BackgroundModelAttemptStore:
                     supplied_fingerprint,
                     directive_payload,
                     payload_sha256,
+                    supplied_authenticity_proof,
                     canonical_utc_iso(moment, "staged_at"),
                     evidence.strip(),
                 ),
@@ -1369,12 +1899,14 @@ class BackgroundModelAttemptStore:
                 staged.provider_request_id,
                 staged.response_fingerprint,
                 staged.directive_payload,
+                staged.authenticity_proof,
             ) != (
                 supplied_provider,
                 supplied_model,
                 supplied_request_id,
                 supplied_fingerprint,
                 directive_payload,
+                supplied_authenticity_proof,
             ):
                 conn.rollback()
                 raise BackgroundModelResponseConflict(
@@ -1494,12 +2026,27 @@ class BackgroundModelAttemptStore:
                 "fingerprint",
             )
         binding = self.outbound_request_binding(attempt_id)
-        self._require_origin_binding(
+        binding = self._require_origin_binding(
             attempt,
             binding,
             supplied_request_id=staged.provider_request_id,
-            require_relay_echo=staged.provider_request_id == (
-                None if binding is None else binding.relay_id
-            ),
+            require_relay_echo=False,
         )
+        if staged.authenticity_proof is None:
+            raise BackgroundModelResponseConflict(
+                attempt,
+                "staged exact response has no trusted provider-return authenticity proof",
+            )
+        with self.store._connection() as conn:
+            self._verify_response_authenticity(
+                conn,
+                attempt=attempt,
+                binding=binding,
+                provider=staged.provider,
+                model=staged.model,
+                provider_request_id=staged.provider_request_id,
+                response_fingerprint=staged.response_fingerprint,
+                payload_sha256=staged.payload_sha256,
+                authenticity_proof=staged.authenticity_proof,
+            )
         return directive
