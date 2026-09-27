@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
   checks: write
 
@@ -34,6 +34,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - uses: actions/setup-python@v5
         with:
@@ -165,6 +166,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Run exact accepted Debian 12 frozen preflight gate
         run: |
@@ -214,4 +216,67 @@ jobs:
           grep -q '^ENVIRONMENT_PASS$' c015-frozen-e2e-artifacts/e2e.log
           grep -q '^ALL_CHECKS=158/158 FAILURES=0$' c015-frozen-e2e-artifacts/e2e.log
           grep -q 'RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=82' c015-frozen-e2e-artifacts/lifecycle-selftest.log
+  platform-reattach-stage-a:
+    if: github.event_name == 'pull_request' && github.head_ref == 'arena/01a0dce5-haneof-aios-core-v3-0'
+    needs:
+      - formal-python312-persistence-gate
+      - frozen-preflight-e2e-debian12
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      C15_PERSISTED_WORKSPACE: /home/runner
+      PYTHONPATH: src:.
+    steps:
+      - name: Checkout exact PR candidate
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: true
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.14"
+
+      - name: Install runtime dependency
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install "pydantic==2.13.5"
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+          test -z "$(git status --porcelain)"
+
+      - name: Execute fresh Platform Reattach Stage A
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python -m tools.c15_persistence.platform_reattach stage-a | tee /tmp/platform-stage-a.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path("/tmp/platform-stage-a.json")
+          data = json.loads(p.read_text())
+          assert data["status"] == "PLATFORM_REATTACH_STAGE_A_READY", data
+          assert data["candidate_sha"] == "${{ github.event.pull_request.head.sha }}", data
+          for key in ("remote_ref", "remote_commit_sha", "run_id", "session_id", "generation", "manifest_sha256"):
+              assert data.get(key), (key, data)
+          print("PLATFORM_REATTACH_STAGE_A_READY")
+          PY
+          test -z "$(git status --porcelain)"
+
+      - name: Publish Stage A pin to PR #216
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          {
+            echo "## C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001 — Platform Reattach Stage A"
+            echo
+            echo '```json'
+            cat /tmp/platform-stage-a.json
+            echo '```'
+            echo
+            echo "Stage B must run in a fresh Arena execution environment. No Independent Acceptance, RELEASE-003, or Resident B run is authorized by this Stage A result."
+          } > /tmp/platform-stage-a-comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/platform-stage-a-comment.md
