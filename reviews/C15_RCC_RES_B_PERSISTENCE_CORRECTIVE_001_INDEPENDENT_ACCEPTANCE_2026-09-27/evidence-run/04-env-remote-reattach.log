@@ -1,0 +1,17 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /opt/hostedtoolcache/Python/3.12.14/x64/bin/python
+cachedir: .pytest_cache
+rootdir: /home/runner/work/Haneof-AIOS-Core-v3.0/Haneof-AIOS-Core-v3.0/cand
+configfile: pyproject.toml
+plugins: timeout-2.4.0
+timeout: 1800.0s
+timeout method: signal
+timeout func_only: False
+collecting ... collected 4 items
+
+tests/c15_persistence/test_environment_reattach.py::test_environment_detach_and_reattach PASSED [ 25%]
+tests/c15_persistence/test_environment_reattach.py::test_platform_level_reattach_is_not_claimable_from_inside PASSED [ 50%]
+tests/c15_persistence/test_environment_reattach.py::test_remote_backend_roundtrip_with_wiped_local_cache PASSED [ 75%]
+tests/c15_persistence/test_environment_reattach.py::test_remote_backend_rejects_corrupted_manifest PASSED [100%]
+
+============================== 4 passed in 4.46s ===============================

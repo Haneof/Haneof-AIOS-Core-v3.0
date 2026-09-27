@@ -1,0 +1,20 @@
+COLLECT-ONLY FAILED -- full output follows
+
+==================================== ERRORS ====================================
+_ ERROR collecting reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/ia_probes.py _
+ImportError while importing test module '/home/runner/work/Haneof-AIOS-Core-v3.0/Haneof-AIOS-Core-v3.0/review/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/ia_probes.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ia_probes.py:79: in <module>
+    from tools.c15_persistence.backend import BackendError, RunBackend  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ModuleNotFoundError: No module named 'tools'
+=========================== short test summary info ============================
+ERROR ia_probes.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+no tests collected, 1 error in 0.16s
+
+

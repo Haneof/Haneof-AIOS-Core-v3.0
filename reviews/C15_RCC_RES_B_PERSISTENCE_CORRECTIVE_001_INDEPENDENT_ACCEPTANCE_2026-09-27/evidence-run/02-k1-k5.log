@@ -1,0 +1,18 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /opt/hostedtoolcache/Python/3.12.14/x64/bin/python
+cachedir: .pytest_cache
+rootdir: /home/runner/work/Haneof-AIOS-Core-v3.0/Haneof-AIOS-Core-v3.0/cand
+configfile: pyproject.toml
+plugins: timeout-2.4.0
+timeout: 1800.0s
+timeout method: signal
+timeout func_only: False
+collecting ... collected 5 items
+
+tests/c15_persistence/killpoints/test_killpoints.py::test_kill_point_converges[K1] PASSED [ 20%]
+tests/c15_persistence/killpoints/test_killpoints.py::test_kill_point_converges[K2] PASSED [ 40%]
+tests/c15_persistence/killpoints/test_killpoints.py::test_kill_point_converges[K3] PASSED [ 60%]
+tests/c15_persistence/killpoints/test_killpoints.py::test_kill_point_converges[K4] PASSED [ 80%]
+tests/c15_persistence/killpoints/test_killpoints.py::test_kill_point_converges[K5] PASSED [100%]
+
+============================== 5 passed in 8.71s ===============================

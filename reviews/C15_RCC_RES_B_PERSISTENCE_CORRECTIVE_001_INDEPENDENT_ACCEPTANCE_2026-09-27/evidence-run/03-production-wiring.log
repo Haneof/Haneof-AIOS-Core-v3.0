@@ -1,0 +1,29 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /opt/hostedtoolcache/Python/3.12.14/x64/bin/python
+cachedir: .pytest_cache
+rootdir: /home/runner/work/Haneof-AIOS-Core-v3.0/Haneof-AIOS-Core-v3.0/cand
+configfile: pyproject.toml
+plugins: timeout-2.4.0
+timeout: 1800.0s
+timeout method: signal
+timeout func_only: False
+collecting ... collected 16 items
+
+tests/c15_persistence/test_operator_wiring.py::test_authoritative_path_rejects_every_ephemeral_location PASSED [  6%]
+tests/c15_persistence/test_operator_wiring.py::test_authoritative_path_rejects_symlink_alias_to_tmp PASSED [ 12%]
+tests/c15_persistence/test_operator_wiring.py::test_default_runs_root_is_under_the_persisted_workspace PASSED [ 18%]
+tests/c15_persistence/test_operator_wiring.py::test_creation_is_exclusive_and_reopen_never_rebuilds PASSED [ 25%]
+tests/c15_persistence/test_operator_wiring.py::test_reopen_rejects_identity_mismatch_and_missing_state PASSED [ 31%]
+tests/c15_persistence/test_operator_wiring.py::test_retired_rerun002_identities_are_permanently_forbidden PASSED [ 37%]
+tests/c15_persistence/test_operator_wiring.py::test_lock_is_exclusive_across_live_processes PASSED [ 43%]
+tests/c15_persistence/test_operator_wiring.py::test_relay_journal_preserves_exact_bytes_and_detects_tampering PASSED [ 50%]
+tests/c15_persistence/test_operator_wiring.py::test_conflicting_reply_bytes_are_refused_not_rewritten PASSED [ 56%]
+tests/c15_persistence/test_operator_wiring.py::test_interrupted_transaction_rolls_back PASSED [ 62%]
+tests/c15_persistence/test_operator_wiring.py::test_real_operator_integration_path_reaches_ack PASSED [ 68%]
+tests/c15_persistence/test_operator_wiring.py::test_core_receipt_revalidation_rejects_an_operator_invented_receipt PASSED [ 75%]
+tests/c15_persistence/test_operator_wiring.py::test_no_second_semantic_engine_properties PASSED [ 81%]
+tests/c15_persistence/test_operator_wiring.py::test_state_machine_cannot_skip_or_rewrite_states PASSED [ 87%]
+tests/c15_persistence/test_operator_wiring.py::test_sealed_generations_are_immutable_and_reverify PASSED [ 93%]
+tests/c15_persistence/test_operator_wiring.py::test_run_state_manifest_detects_a_vanished_slot PASSED [100%]
+
+============================== 16 passed in 4.26s ==============================
