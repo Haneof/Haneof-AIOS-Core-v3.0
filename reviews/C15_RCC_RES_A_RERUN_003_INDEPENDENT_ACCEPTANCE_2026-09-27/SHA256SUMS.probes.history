@@ -1,0 +1,7 @@
+Pre-execution freeze (H0 harness + frozen expectations), superseded by SHA256SUMS.probes:
+  5130acc5d49ffe111a56fbe380b52a10154007f8707da1c8efc750858809d589  ia_a003_probes.py   (H0, never executed)
+  682c3a14bf0cdb11c5a46e1fc7ffd6d065a70c9f970c8767207997ac8620a1f2  probe_enumeration.txt (unchanged through every run)
+Executed versions:
+  ad7a6a34ba9c80edbdccb2dbead68be86f08b0bdda228bcbf3e4ee7bf665cde1  ia_a003_probes.py   (H1 -> 0/14, harness bug)
+  0857d096fb800884a85146c3c916075454b40d5fe1fd66b7e7dbd0c91722ce8a  ia_a003_probes.py   (H2 -> 6/14)
+  8c0033a5619f7eeaec8826562fc43bc248359be02aaa4539ca04189333485b40  ia_a003_probes.py   (H4 -> 14/14 PASS)

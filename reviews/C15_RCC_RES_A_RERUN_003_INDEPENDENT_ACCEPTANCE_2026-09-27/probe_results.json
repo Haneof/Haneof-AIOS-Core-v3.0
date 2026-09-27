@@ -1,0 +1,102 @@
+{
+  "executed_at_utc": "2026-09-27",
+  "harness": "ia_a003_probes.py",
+  "harness_sha256": "8c0033a5619f7eeaec8826562fc43bc248359be02aaa4539ca04189333485b40",
+  "independent_of_author_claims": true,
+  "mode": "read-only over exact Git blobs of the PR #235 head; scratch copies under tempfile.mkdtemp; nothing written into the repository",
+  "probes": [
+    {
+      "detail": "tree=6402fff8b0c8c834e7b3f6b5d7c7427d0f846933 parent=7549322681ada61ab6d3c6eee5082acc00a658d6 files=122 outside=0 nonadd=0 forbidden=0 core=a9618abe0b3d4ac3b08bd23dbd58f3e3f97e05d6 tests=92fcbcc5876833735fb3cb7c73a98c4a8a4a3541 frozen_ancestor=True head..main=0 pr={'headRefOid': '5b6367406c13ea9450b7b2598a5813a64129cbd7', 'isDraft': True, 'mergedAt': None, 'state': 'OPEN'}",
+      "expectation": "exact candidate identity + evidence-only scope + frozen tree identity + live PR #235 state",
+      "id": "P00",
+      "result": "PASS"
+    },
+    {
+      "detail": "entries=120 mismatch=0 dupes=0 unhashed=['A003_RESIDENT_RUN_REPORT.md', 'SHA256SUMS']",
+      "expectation": "SHA256SUMS verified from exact Git blob bytes",
+      "id": "P01",
+      "result": "PASS"
+    },
+    {
+      "detail": "receipts=13 acks=13 problems=[]",
+      "expectation": "receipts 1..13 recomputed from sealed fixture + ack refs match",
+      "id": "P02",
+      "result": "PASS"
+    },
+    {
+      "detail": "later_cursor_files=[] cursor14_markers={'event_id': False, 'payload': False, 'timestamp': False, 'digest': False} reveal_guard='ReleaseError: Phase A sealed boundary reached' scratch_state_untouched=True",
+      "expectation": "cursor 14 never revealed; frozen Phase-A sealed boundary refuses it",
+      "id": "P03",
+      "result": "PASS"
+    },
+    {
+      "detail": "counts={'user_obs': 7, 'ai_obs': 7, 'turns': 7, 'turn_idx': [1, 2, 3, 4, 5, 6, 7]} first_ingest_replay_flags_ok=True problems=[]",
+      "expectation": "canonical USER ingest reused idempotently in run_turn; no duplicate USER observation; turns 1..7 stable session",
+      "id": "P04",
+      "result": "PASS"
+    },
+    {
+      "detail": "request_hits=0 [] leaked_unreleased=[] contamination={'A002_session': False, 'A002_digests': False, 'prior_rc_software': False, 'C15_PR117_ids': False, 'historical_pr_refs': False, 'evaluator_wording': False, 'b_c_phase_material': False, 'prior_evidence_paths': False, 'other_subjects': False} rerun002_mentions=1 unqualified=0 self_dir_excluded=True",
+      "expectation": "0 future-event matches in 25 requests; no unreleased marker or historical contamination anywhere in exact evidence",
+      "id": "P05",
+      "result": "PASS"
+    },
+    {
+      "detail": "requests=25 decisions=25 problems=[]",
+      "expectation": "25 request/decision pairs contiguous, durable-attempt bound, causally chained",
+      "id": "P06",
+      "result": "PASS"
+    },
+    {
+      "detail": "counts={'metering_records': 25, 'background_model_attempts': 25, 'background_model_request_bindings': 25, 'background_model_response_receipts': 25, 'background_model_responses': 0, 'cold_archive': 0} classes={'periodic_review': 10, 'user_interaction': 15} meter_join=25 receipt_join=25 dup_request_ids=0 fabricated_usage=0 orphan_receipts=0 unmetered=0 dup_meter=0",
+      "expectation": "25/25/25/25 metering-attempt-binding-receipt, 15+10 classes, no fabricated usage, no orphan receipt, all attempts metered",
+      "id": "P07",
+      "result": "PASS"
+    },
+    {
+      "detail": "bad_identity=0 turn1=completed/rc=2/auth=0 inspect1=in_doubt inspect2_rc=1 receipts_a0=1 bindings_a0=1 meters_a0=1 turn1_rounds=5 out_rounds=5",
+      "expectation": "cursor-1 double pre-submission recovery: Core-derived attempt ids, honest in_doubt before reconcile, single durable attempt/receipt/meter row, retry 2",
+      "id": "P08",
+      "result": "PASS"
+    },
+    {
+      "detail": "commits=(42, 1, 42) rev=42 maxobj=42 schema=1 wcq=ok icq=ok watermark=42 doc_delta=0 docs=76 chain_gap=0 ops=42 idem=42 orphan_ops=0 claim=[1, 2, 3, 4, 5, 6] task=[1, 2, 3, 4] wakes=4 backup_rev=42 bquick=ok logical={'world_commits': True, 'object_revisions': True, 'operations': True, 'idempotency': True, 'metering': True, 'attempts': True, 'bindings': True, 'receipts': True, 'authority': True, 'turn_exec': True} bytes_identical=False",
+      "expectation": "World 42 / index watermark 42 / lag 0 / 76-doc parity / chain and backup logical identity (byte identity not required)",
+      "id": "P09",
+      "result": "PASS"
+    },
+    {
+      "detail": "counters={'req_fp': 25, 'relay': 25, 'payload': 25, 'respfp': 25, 'hmac_ok': 25} problems=[]",
+      "expectation": "bridge pinned transport-only: 25/25 outbound request fingerprints, relay ids, directive re-encode digests, response fingerprints and HMAC receipts",
+      "id": "P10",
+      "result": "PASS"
+    },
+    {
+      "detail": "sqlite_pinned_in_rc=False workflow_python_pin=True pyproject_range_based=True run_env={'python': 'CPython 3.12.14 (source build, sqlite3 amalgamation 3.53.4 static)', 'pydantic': '2.13.5'} frozen_identity_ok=True pydantic_2_13_marker_in_traces=True declared_sqlite=None",
+      "expectation": "RC contract pins CPython/pydantic/pytest only; SQLite is NOT a frozen execution identity, so 3.53.4 is a compatible runtime detail, not drift",
+      "id": "P11",
+      "result": "PASS"
+    },
+    {
+      "detail": "problems=[] task_states=['draft', 'ready', 'running', 'waiting_user'] anchors=25 claim6_after_cursor10=True deletion_rev=[5, 6] discipline_rev=[6] queued_only=True published_confirmed=True",
+      "expectation": "cognition temporal cut: refs never future/dangling, anchors within released window, boundary cognition appears only after its cursor, no promotion",
+      "id": "P12",
+      "result": "PASS"
+    },
+    {
+      "detail": "controls={'A': 'BLOCKED-AS-EXPECTED: an authenticated provider return cannot be reconciled as not submitted', 'B': 'BLOCKED-AS-EXPECTED: provider_execution_not_proven_absent', 'C': 'DETECTED-AS-EXPECTED: tampered payload digest differs from durable receipt'}",
+      "expectation": "negative controls prove the frozen recovery/authenticity machinery is fail-closed (forgery paths refused)",
+      "id": "P13",
+      "result": "PASS"
+    }
+  ],
+  "python": "/home/user/work/ia-venv/bin/python (CPython 3.12.14 family used by the reviewer; sys.path <- <repo>/src, live main = frozen tree)",
+  "role": "Independent Fresh Resident A-003 Evidence Acceptance Reviewer",
+  "summary": {
+    "candidate": "5b6367406c13ea9450b7b2598a5813a64129cbd7",
+    "passed": 14,
+    "total": 14,
+    "tree": "6402fff8b0c8c834e7b3f6b5d7c7427d0f846933"
+  },
+  "task": "C15-RCC-RES-A-RERUN-003-INDEPENDENT-ACCEPTANCE"
+}

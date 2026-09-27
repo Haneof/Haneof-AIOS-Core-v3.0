@@ -1,0 +1,26 @@
+C15-RCC-RES-A-RERUN-003 INDEPENDENT ACCEPTANCE - FROZEN PROBE ENUMERATION
+==========================================================================
+Frozen BEFORE execution. Expected outcomes below were written before the first run
+of ia_a003_probes.py and must not be moved afterwards. Harness bugs, if any, are
+preserved and classified in probe_run.md instead of being hidden by editing this file.
+
+Harness      : ia_a003_probes.py  (standalone; no pytest collection required)
+Mode         : read-only over exact Git blobs of PR #235 head; scratch copies in
+               tempfile only; 14 probes total
+Evidence pin : 5b6367406c13ea9450b7b2598a5813a64129cbd7 / tree 6402fff8b0c8c834e7b3f6b5d7c7427d0f846933
+
+#   probe                          expected
+P00 identity + scope + frozen tree PASS  (122 files, all evidence-only, 0 drift)
+P01 SHA256SUMS vs exact Git blobs  PASS  (120/120, only report+SUMS unhashed)
+P02 receipt chain vs fixture       PASS  (13/13 digests+order+projection bytes)
+P03 cursor-14 absence + guard      PASS  (0 markers; frozen Phase-A seal refuses reveal)
+P04 canonical USER idempotency     PASS  (7/7 reuse, single revision, no duplicate)
+P05 future leakage                 PASS  (0 shingle hits in 25 requests; 0 markers)
+P06 request/decision pairing       PASS  (25 contiguous pairs, causal chain, no orphan)
+P07 metering/attempt/receipt       PASS  (25/25/25/25, 15+10, 0 fabricated usage)
+P08 cursor-1 recovery              PASS  (in_doubt first, retry_count=2, single row)
+P09 World/index/backup             PASS  (42/42/0, 76 docs, logical backup identity)
+P10 bridge provenance              PASS  (25/25 fingerprints, digests, HMAC proofs)
+P11 environment contract           PASS  (SQLite not a frozen pin; py 3.12.14 pinned)
+P12 cognition temporal cut         PASS  (no future/dangling refs, no promotion)
+P13 negative controls              PASS  (forgery paths refused by frozen Core)
