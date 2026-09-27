@@ -52,7 +52,10 @@ from tools.c15_persistence.runstate import (  # noqa: E402
     write_manifest,
 )
 
-UNSHARE = ["sudo", "-n", "unshare", "--mount", "--uts", "--ipc", "--pid", "--fork", "--mount-proc"]
+_SUDO = ["sudo", "-n"]
+if os.environ.get("C15_PERSISTED_WORKSPACE"):
+    _SUDO.append("--preserve-env=C15_PERSISTED_WORKSPACE")
+UNSHARE = _SUDO + ["unshare", "--mount", "--uts", "--ipc", "--pid", "--fork", "--mount-proc"]
 
 
 def _unshare_probe() -> tuple[bool, str]:
