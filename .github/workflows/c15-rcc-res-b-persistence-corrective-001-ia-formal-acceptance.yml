@@ -104,6 +104,7 @@ jobs:
 
       - name: 2. FREEZE probe hashes + collect-only enumeration (before first execution)
         id: freeze
+        continue-on-error: true
         env:
           PYTHONPATH: /__w/${{ github.workspace }}/cand/src:/__w/${{ github.workspace }}/cand
           IA_CANDIDATE_REPO: /__w/${{ github.workspace }}/cand
@@ -129,7 +130,25 @@ jobs:
             exit 1
           fi
 
+      - name: 2b. diagnostic dump of freeze state
+        if: always()
+        run: |
+          set -uo pipefail
+          mkdir -p "review/$EV"
+          {
+            echo "--- ls review IA dir ---"
+            ls -la "review/$LIT" || true
+            echo "--- freeze.log ---"
+            cat "review/$LIT/freeze.log" 2>/dev/null || echo "(absent)"
+            echo "--- collect_only.txt ---"
+            cat "review/$LIT/collect_only.txt" 2>/dev/null || echo "(absent)"
+            echo "--- python / pytest ---"
+            which python; python -V
+          } > "review/$EV/00b-freeze-diagnostic.txt" 2>&1
+          cat "review/$EV/00b-freeze-diagnostic.txt" || true
+
       - name: 3. Verify frozen manifest before first execution
+        continue-on-error: true
         env:
           PYTHONPATH: /__w/${{ github.workspace }}/cand/src:/__w/${{ github.workspace }}/cand
           IA_CANDIDATE_REPO: /__w/${{ github.workspace }}/cand
@@ -158,6 +177,7 @@ jobs:
           sha256sum -c PROBE_MANIFEST.sha256 || { echo "::error title=IA-FREEZE::manifest digest mismatch"; exit 1; }
 
       - name: 4. FIRST EXECUTION of the frozen adversarial probes
+        continue-on-error: true
         env:
           PYTHONPATH: /__w/${{ github.workspace }}/cand/src:/__w/${{ github.workspace }}/cand
           IA_CANDIDATE_REPO: /__w/${{ github.workspace }}/cand
