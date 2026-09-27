@@ -1,5 +1,4 @@
 name: c14-cognitive-derivation-scheduler
-# CORE-RC-REFREEZE-002 probe trigger (transient; not part of frozen software)
 
 on:
   pull_request:

@@ -1,5 +1,4 @@
 name: world-kernel
-# CORE-RC-REFREEZE-002 probe trigger (transient; not part of frozen software)
 
 on:
   push:

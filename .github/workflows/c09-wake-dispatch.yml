@@ -1,5 +1,4 @@
 name: c09-wake-dispatch
-# CORE-RC-REFREEZE-002 probe trigger (transient; not part of frozen software)
 
 on:
   push:

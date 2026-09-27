@@ -1,5 +1,4 @@
 name: constitutional-cognition-closure
-# CORE-RC-REFREEZE-002 probe trigger (transient; not part of frozen software)
 
 on:
   pull_request:

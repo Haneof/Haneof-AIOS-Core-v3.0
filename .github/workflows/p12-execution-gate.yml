@@ -1,5 +1,4 @@
 name: p12-execution-gate
-# CORE-RC-REFREEZE-002 probe trigger (transient; not part of frozen software)
 
 on:
   push:

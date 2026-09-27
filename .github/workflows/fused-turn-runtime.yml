@@ -1,5 +1,4 @@
 name: fused-turn-runtime
-# CORE-RC-REFREEZE-002 probe trigger (transient; not part of frozen software)
 
 on:
   push:

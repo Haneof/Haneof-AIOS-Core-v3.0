@@ -1,5 +1,4 @@
 name: p11-dimension-gate
-# CORE-RC-REFREEZE-002 probe trigger (transient; not part of frozen software)
 
 on:
   push:
