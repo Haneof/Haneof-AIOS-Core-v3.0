@@ -1,0 +1,8 @@
+{"at_epoch": 1790527595.917328, "boot_id": "8a96e464-5667-4aa5-a5d0-4203f1efa281", "detail": {"run_id": "c15-persistence-synthetic-run-ae5c57221c83", "session_id": "c15-persistence-synthetic-session-ae5c57221c83"}, "event": "backend_created", "pid": 2289}
+{"at_epoch": 1790527596.0055175, "boot_id": "8a96e464-5667-4aa5-a5d0-4203f1efa281", "detail": {"artifacts": 9, "generation": 1, "label": "initial"}, "event": "generation_sealed", "pid": 2289}
+{"at_epoch": 1790527596.0624566, "boot_id": "8a96e464-5667-4aa5-a5d0-4203f1efa281", "detail": {"artifacts": 9, "generation": 2, "label": "ingested"}, "event": "generation_sealed", "pid": 2289}
+{"at_epoch": 1790527596.3544986, "boot_id": "8a96e464-5667-4aa5-a5d0-4203f1efa281", "detail": {"request_id": "synthetic-request-ff015799b5735468687b3ff8", "round": 0}, "event": "request_represented", "pid": 2289}
+{"at_epoch": 1790527596.4488735, "boot_id": "8a96e464-5667-4aa5-a5d0-4203f1efa281", "detail": {"action": "applied", "request_id": "synthetic-request-ff015799b5735468687b3ff8"}, "event": "request_finalised", "pid": 2289}
+{"at_epoch": 1790527596.4492984, "boot_id": "8a96e464-5667-4aa5-a5d0-4203f1efa281", "detail": {"action": "applied", "request_id": "synthetic-request-4cd623ea55d59c4e9fad61eb"}, "event": "request_finalised", "pid": 2289}
+{"at_epoch": 1790527596.5316133, "boot_id": "8a96e464-5667-4aa5-a5d0-4203f1efa281", "detail": {"artifacts": 11, "generation": 3, "label": "applied"}, "event": "generation_sealed", "pid": 2289}
+{"at_epoch": 1790527596.5746455, "boot_id": "8a96e464-5667-4aa5-a5d0-4203f1efa281", "detail": {"artifacts": 11, "generation": 4, "label": "acked"}, "event": "generation_sealed", "pid": 2289}

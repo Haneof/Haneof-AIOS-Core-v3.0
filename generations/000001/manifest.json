@@ -1,0 +1,17 @@
+{
+  "artifacts": {
+    "binding/current-event-binding.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "current-event.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "evidence/failures.jsonl": "2990b63698fcefa836e38636d6ef217a68b9d682d11aec492cfa7b344162e725",
+    "evidence/projection.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "journal.sqlite": "dd9dc831d567857dbeae72284049eac59e9d260263d9b774c4e8e7713d4332bc",
+    "mailbox/archive.jsonl": "99bfffe366440d1500f9a3afaf0557642d11a74e7f9529f9008196b9bc381129",
+    "runtime/index.sqlite": "a3d112b1b7fc9dec292820f5263dcaa4689c4d6915d1dd2bcd9330366f668ff9",
+    "runtime/release_state.json": "e2e17b496abdfaacd21c263643fcda440b08c3b94d87a03b0d2892f6edb78c95",
+    "runtime/world.sqlite": "a3d112b1b7fc9dec292820f5263dcaa4689c4d6915d1dd2bcd9330366f668ff9"
+  },
+  "generation": 1,
+  "label": "initial",
+  "manifest_sha256": "7d878eb53983eb6347a48cf98b149e90c46dfa1af03cb933587f68dc75f03de5",
+  "sealed_at_epoch": 1790527596.0037634
+}
