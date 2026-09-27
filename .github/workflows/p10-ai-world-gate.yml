@@ -1,4 +1,5 @@
 name: p10-ai-world-gate
+# CORE-RC-REFREEZE-002 probe trigger (transient; not part of frozen software)
 
 on:
   push:

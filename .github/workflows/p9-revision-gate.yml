@@ -1,4 +1,5 @@
 name: p9-revision-gate
+# CORE-RC-REFREEZE-002 probe trigger (transient; not part of frozen software)
 
 on:
   push:
