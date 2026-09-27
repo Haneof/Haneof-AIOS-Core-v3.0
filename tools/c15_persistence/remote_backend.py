@@ -90,6 +90,13 @@ def commit_backend_tree(
     temp_index = Path(tempfile.mktemp(prefix="persistence_git_idx_"))
     try:
         env = dict(os.environ, GIT_INDEX_FILE=str(temp_index))
+        # git commit-tree is plumbing and must not depend on ambient per-runner
+        # user.name/user.email configuration. Use a fixed operator identity so
+        # the remote durability layer behaves identically in Arena and CI.
+        env.setdefault("GIT_AUTHOR_NAME", "AIOS Persistence Operator")
+        env.setdefault("GIT_AUTHOR_EMAIL", "aios-persistence@invalid.local")
+        env.setdefault("GIT_COMMITTER_NAME", "AIOS Persistence Operator")
+        env.setdefault("GIT_COMMITTER_EMAIL", "aios-persistence@invalid.local")
         # Add all backend files, excluding advisory flock files, temporary snapshots,
         # and SQLite WAL/SHM artifacts (checkpointed above).
         add_cmd = [
