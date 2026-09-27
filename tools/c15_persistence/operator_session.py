@@ -94,6 +94,54 @@ from aios_core.runtime.turn_runtime import FusedTurnRuntime  # noqa: E402
 from aios_core.storage.sqlite_store import SQLiteWorldStore  # noqa: E402
 
 
+def request_envelope(
+    *,
+    run_id: str,
+    session_id: str,
+    attempt_id: str,
+    request_id: str,
+    round_index: int,
+    cursor: int,
+    event_id: str,
+    payload: str,
+    nonce: str,
+    binding_digest: str,
+) -> tuple[bytes, dict[str, Any]]:
+    """Pure builder for the exact provider request bytes.
+
+    Lives at module level so the resident-surface check can build the *same*
+    envelope without any durability layer and compare the two byte-for-byte.
+    """
+    envelope = {
+        "run_id": run_id,
+        "session_id": session_id,
+        "provider": PROVIDER_NAME,
+        "model": MODEL_NAME,
+        "model_request_id": request_id,
+        "attempt_id": attempt_id,
+        "round": round_index,
+        "cursor": cursor,
+        "event_id": event_id,
+        "resident_visible_payload": payload,
+        "nonce": nonce,
+    }
+    metadata = {
+        "run_id": run_id,
+        "session_id": session_id,
+        "provider": PROVIDER_NAME,
+        "model": MODEL_NAME,
+        "model_request_id": request_id,
+        "attempt_id": attempt_id,
+        "nonce": nonce,
+        "event_id": event_id,
+        "cursor": int(cursor),
+        "round": int(round_index),
+        "request_fingerprint": digest(canonical_json(envelope)),
+        "binding_digest": binding_digest,
+    }
+    return canonical_json(envelope), metadata
+
+
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -232,6 +280,13 @@ class OperatorSession:
         self.world_path.parent.mkdir(parents=True, exist_ok=True)
         SQLiteWorldStore(self.world_path)
         self._open_store()
+        # The search index lives inside the World database in this Core version;
+        # the live `runtime/index.sqlite` slot holds a coherent backup copy so a
+        # re-attach can open and hash it independently of the writer.
+        self.index_path.parent.mkdir(parents=True, exist_ok=True)
+        with sqlite3.connect(self.index_path) as target:
+            with sqlite3.connect(self.world_path.as_uri() + "?mode=ro", uri=True) as source:
+                source.backup(target)
         if not self.failures_path.is_file():
             _append_jsonl(self.failures_path, {"synthetic": True, "note": "failure evidence slot initialised"})
         if not self.mailbox_archive_path.is_file():
@@ -311,10 +366,13 @@ class OperatorSession:
         before = self.release_state_path.read_bytes() if self.release_state_path.is_file() else b""
         projection = self.release.reveal(self.release_state_path)
         after = self.release_state_path.read_bytes()
-        already = self.journal.ledger_get("revealed_sequence")
+        sequence = int(projection["sequence"])
+        already = self.journal.ledger_get(f"revealed_sequence_{sequence}")
         if already is None:
             self.bump("reveals")
-            self.journal.ledger_set("revealed_sequence", str(projection["sequence"]))
+            self.journal.ledger_set(f"revealed_sequence_{sequence}", str(sequence))
+            self.journal.ledger_set(f"revealed_event_id_{sequence}", str(projection["event_id"]))
+            self.journal.ledger_set("revealed_sequence", str(sequence))
             self.journal.ledger_set("revealed_event_id", str(projection["event_id"]))
             _write_json(self.current_event_path, projection)
             _write_json(self.projection_path, projection)
@@ -322,7 +380,8 @@ class OperatorSession:
             # A second reveal must be a pure re-read of the same durable cursor.
             require(
                 already == str(projection["sequence"])
-                and self.journal.ledger_get("revealed_event_id") == str(projection["event_id"]),
+                and self.journal.ledger_get(f"revealed_event_id_{sequence}")
+                == str(projection["event_id"]),
                 "resumed reveal produced a different cursor",
             )
             require(before == after, "resumed reveal mutated the durable release state")
@@ -333,14 +392,18 @@ class OperatorSession:
     # ------------------------------------------------------------- step 2
 
     def ingest(self, projection: Mapping[str, Any]) -> dict[str, Any]:
-        stored = self.journal.ledger_get("ingest_ref")
+        sequence = int(projection["sequence"])
+        stored = self.journal.ledger_get(f"ingest_ref_{sequence}")
         store, _index = self._open_store()
         world_revision_before = int(store.current_world_revision())
         receipt = self.release.ingest(self.world_path, dict(projection))
         if stored is None:
             self.bump("ingests")
+            self.journal.ledger_set(f"ingest_ref_{sequence}", str(receipt["ingest_ref"]))
+            self.journal.ledger_set(
+                f"ingest_world_revision_{sequence}", str(receipt["world_revision"])
+            )
             self.journal.ledger_set("ingest_ref", str(receipt["ingest_ref"]))
-            self.journal.ledger_set("ingest_world_revision", str(receipt["world_revision"]))
             _write_json(
                 self.binding_path,
                 {
@@ -362,7 +425,8 @@ class OperatorSession:
                 "resumed ingest produced a different durable object identity",
             )
             require(
-                self.journal.ledger_get("ingest_world_revision") == str(receipt["world_revision"]),
+                self.journal.ledger_get(f"ingest_world_revision_{sequence}")
+                == str(receipt["world_revision"]),
                 "resumed ingest moved the durable world revision",
             )
             require(
@@ -404,35 +468,19 @@ class OperatorSession:
         payload: str,
         nonce: str,
         binding_digest: str,
-    ) -> bytes:
-        envelope = {
-            "run_id": self.backend.owner["run_id"],
-            "session_id": self.backend.owner["session_id"],
-            "provider": PROVIDER_NAME,
-            "model": MODEL_NAME,
-            "model_request_id": request_id,
-            "attempt_id": attempt_id,
-            "round": round_index,
-            "cursor": cursor,
-            "event_id": event_id,
-            "resident_visible_payload": payload,
-            "nonce": nonce,
-        }
-        metadata = {
-            "run_id": str(envelope["run_id"]),
-            "session_id": str(envelope["session_id"]),
-            "provider": str(envelope["provider"]),
-            "model": str(envelope["model"]),
-            "model_request_id": request_id,
-            "attempt_id": attempt_id,
-            "nonce": nonce,
-            "event_id": event_id,
-            "cursor": int(cursor),
-            "round": int(round_index),
-            "request_fingerprint": digest(canonical_json(envelope)),
-            "binding_digest": binding_digest,
-        }
-        return canonical_json(envelope), metadata
+    ) -> tuple[bytes, dict[str, Any]]:
+        return request_envelope(
+            run_id=str(self.backend.owner["run_id"]),
+            session_id=str(self.backend.owner["session_id"]),
+            attempt_id=attempt_id,
+            request_id=request_id,
+            round_index=round_index,
+            cursor=cursor,
+            event_id=event_id,
+            payload=payload,
+            nonce=nonce,
+            binding_digest=binding_digest,
+        )
 
     def _binding_digest(self) -> str:
         raw = self.binding_path.read_bytes() if self.binding_path.is_file() else b"{}"
@@ -597,7 +645,7 @@ class OperatorSession:
         """
         actions: list[dict[str, Any]] = []
         attempts = self.runtime.background_model_attempts
-        for request_id in self.journal.request_ids():
+        for request_id in self.journal.request_ids(cursor=int(projection["sequence"])):
             record = self.journal.recovery(request_id)
             if record["state"] in {"staged", "exposed", "applied", "acked"}:
                 continue
@@ -678,11 +726,11 @@ class OperatorSession:
                 )
         return actions
 
-    def _finalise_requests(self) -> list[dict[str, Any]]:
+    def _finalise_requests(self, cursor: int | None = None) -> list[dict[str, Any]]:
         """Record Core's receipt and the completed application for every round."""
         attempts = self.runtime.background_model_attempts
         actions: list[dict[str, Any]] = []
-        for request_id in self.journal.request_ids():
+        for request_id in self.journal.request_ids(cursor=cursor):
             record = self.journal.recovery(request_id)
             if record["state"] in {"applied", "acked"}:
                 continue
@@ -709,14 +757,14 @@ class OperatorSession:
         return actions
 
     def run_turn(self, projection: Mapping[str, Any]) -> dict[str, Any]:
-        if self.journal.ledger_get("applied") is not None:
+        turn_index = int(projection["sequence"])
+        if self.journal.ledger_get(f"applied_{turn_index}") is not None:
             # K5 resume: model/capability work is already durable in Core.
             self.backend.audit("turn_not_rerun", {"reason": "already applied"})
             return {"skipped": True, "reason": "already_applied", "recovery_actions": []}
 
         self.runtime = self._build_runtime()
         self._session_id = f"{self.backend.owner['run_id']}-conv"
-        turn_index = int(projection["sequence"])
         recovery_actions = self._recover_with_core(projection)
         for action in recovery_actions:
             self.backend.audit("core_recovery", action)
@@ -739,14 +787,14 @@ class OperatorSession:
             user_input=str(projection["resident_visible_payload"]),
             occurred_at=occurred_at,
         )
-        self.journal.ledger_set("applied", _now())
-        for action in self._finalise_requests():
+        self.journal.ledger_set(f"applied_{turn_index}", _now())
+        for action in self._finalise_requests(cursor=turn_index):
             self.backend.audit("request_finalised", action)
         self.journal.ledger_set(
-            "recovered_attempts",
+            f"recovered_attempts_{turn_index}",
             json.dumps([str(a) for a in result.runtime.recovered_response_attempts]),
         )
-        self.journal.ledger_set("assistant_output", str(result.runtime.response))
+        self.journal.ledger_set(f"assistant_output_{turn_index}", str(result.runtime.response))
         self.bump("turns_completed")
         self.seal("applied")
         self.maybe_kill("K5_AFTER_APPLIED_BEFORE_ACK")
@@ -770,7 +818,7 @@ class OperatorSession:
     # ------------------------------------------------------------- step 5
 
     def ack(self, projection: Mapping[str, Any], ingest_receipt: Mapping[str, Any]) -> dict[str, Any]:
-        stored = self.journal.ledger_get("ack_receipt")
+        stored = self.journal.ledger_get(f"ack_receipt_{int(projection['sequence'])}")
         if stored is not None:
             self.backend.audit("ack_not_repeated", {"sequence": projection["sequence"]})
             return json.loads(stored)
@@ -782,8 +830,10 @@ class OperatorSession:
             ingest_ref=str(ingest_receipt["ingest_ref"]),
         )
         self.bump("acks")
-        self.journal.ledger_set("ack_receipt", json.dumps(report, sort_keys=True))
-        request_id = self.journal.terminal_request_id()
+        self.journal.ledger_set(
+            f"ack_receipt_{int(projection['sequence'])}", json.dumps(report, sort_keys=True)
+        )
+        request_id = self.journal.terminal_request_id(cursor=int(projection["sequence"]))
         if request_id is not None:
             self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
         self.seal("acked")

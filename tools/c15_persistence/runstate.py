@@ -66,6 +66,8 @@ REQUIRED_SLOTS: frozenset[str] = frozenset(
 def _slot_path(backend: RunBackend, relative: str) -> Path:
     if relative.startswith("journal.sqlite"):
         return backend.root / relative
+    if relative.split("/")[0] == "mailbox":
+        return backend.mailbox_dir / relative[len("mailbox/") :]
     return backend.state_dir / relative
 
 

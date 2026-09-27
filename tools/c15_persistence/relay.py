@@ -465,18 +465,43 @@ class RelayJournal:
                 "dispatches": int(row["dispatches"]),
             }
 
-    def terminal_request_id(self) -> str | None:
-        """Highest-round request: the one whose directive produced the output."""
-        with self._connect() as db:
-            row = db.execute(
-                "SELECT request_id FROM relay ORDER BY round_index DESC, rowid DESC LIMIT 1"
-            ).fetchone()
-            return None if row is None else str(row[0])
+    @staticmethod
+    def _cursor_of(metadata: Any) -> int | None:
+        try:
+            payload = json.loads(metadata) if isinstance(metadata, (bytes, str)) else metadata
+        except (TypeError, ValueError):
+            return None
+        if not isinstance(payload, dict) or "cursor" not in payload:
+            return None
+        try:
+            return int(payload["cursor"])
+        except (TypeError, ValueError):
+            return None
 
-    def request_ids(self) -> list[str]:
+    def terminal_request_id(self, cursor: int | None = None) -> str | None:
+        """Highest-round request: the one whose directive produced the output.
+
+        ``cursor`` scopes the lookup to a single revealed event so a later
+        cursor can never mistake an earlier cursor's request for its own.
+        """
         with self._connect() as db:
-            return [str(r[0]) for r in db.execute(
-                "SELECT request_id FROM relay ORDER BY round_index, rowid").fetchall()]
+            rows = db.execute(
+                "SELECT request_id, metadata FROM relay "
+                "ORDER BY round_index DESC, rowid DESC"
+            ).fetchall()
+        for request_id, metadata in rows:
+            if cursor is None or self._cursor_of(metadata) == int(cursor):
+                return str(request_id)
+        return None
+
+    def request_ids(self, cursor: int | None = None) -> list[str]:
+        with self._connect() as db:
+            rows = db.execute(
+                "SELECT request_id, metadata FROM relay ORDER BY round_index, rowid"
+            ).fetchall()
+        if cursor is None:
+            return [str(r[0]) for r in rows]
+        return [str(r[0]) for r in rows if self._cursor_of(r[1]) == int(cursor)]
 
     def current_request_id(self) -> str | None:
         with self._connect() as db:

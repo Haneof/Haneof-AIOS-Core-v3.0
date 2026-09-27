@@ -1,0 +1,163 @@
+name: c15-rcc-res-b-persistence-corrective-001-formal-gate
+
+# Formal environment gate for the C15 RES-B persistence corrective.
+#
+# The local engineering sandbox runs CPython 3.11.2, so any local result is
+# engineering evidence only.  This workflow is the formal gate:
+# CPython 3.12.14 + Pydantic 2.13.5 + pytest 8.x, exactly as the task defines.
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/c15-rcc-res-b-persistence-corrective-001-formal-gate.yml"
+      - "tools/c15_persistence/**"
+      - "tests/c15_persistence/**"
+      - "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/**"
+      - "pyproject.toml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  formal-python312-persistence-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      # The persisted workspace on a GitHub runner is the runner home.  The
+      # durability contract still rejects /tmp, /var/tmp, tmpfs and ramfs.
+      C15_PERSISTED_WORKSPACE: /home/runner
+      PYTHONPATH: src:.
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.14"
+
+      - name: Pin the formal dependency set
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install "pydantic==2.13.5" "pytest==8.4.2" pytest-timeout
+          pip install -e ".[dev]" || pip install -e "."
+
+      - name: Freeze environment identity
+        run: |
+          set -euo pipefail
+          python -c "import sys,platform; print('python', sys.version); print('platform', platform.platform())"
+          python -c "import pip,pydantic,pytest; print('pip', pip.__version__); print('pydantic', pydantic.VERSION); print('pytest', pytest.__version__)"
+          python -c "import sys; assert sys.version_info[:3] == (3,12,14), sys.version"
+          python -c "import pydantic; assert pydantic.VERSION == '2.13.5', pydantic.VERSION"
+          python -c "import pytest; assert pytest.__version__.startswith('8.'), pytest.__version__"
+          python -m pip freeze | tee /tmp/env-freeze.txt
+
+      - name: K1-K5 frozen kill-point probe suite (revision verified by the test)
+        run: |
+          set -euo pipefail
+          python -m pytest -v --tb=short tests/c15_persistence/killpoints/test_killpoints.py \
+            | tee /tmp/killpoints.txt
+          echo "::notice title=K1-K5::$(tail -1 /tmp/killpoints.txt)"
+
+      - name: Production-wiring tests (real operator + real Core runtime)
+        run: |
+          set -euo pipefail
+          python -m pytest -v --tb=short tests/c15_persistence/test_operator_wiring.py \
+            | tee /tmp/wiring.txt
+          echo "::notice title=operator wiring::$(tail -1 /tmp/wiring.txt)"
+
+      - name: Environment detach / re-attach
+        run: |
+          set -euo pipefail
+          python -m pytest -v --tb=short -rs tests/c15_persistence/test_environment_reattach.py \
+            | tee /tmp/reattach.txt
+          echo "::notice title=env reattach::$(tail -1 /tmp/reattach.txt)"
+          if grep -q "1 skipped" /tmp/reattach.txt; then
+            echo "::warning title=env reattach::namespace detach/reattach was SKIPPED - not proven in this environment"
+          fi
+
+      - name: Resident-visible surface unchanged
+        run: |
+          set -euo pipefail
+          python -m pytest -v --tb=short tests/c15_persistence/test_resident_surface.py \
+            | tee /tmp/surface.txt
+          echo "::notice title=resident surface::$(tail -1 /tmp/surface.txt)"
+          cat reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/resumed/evidence/resident-surface-no-change.json
+
+      - name: Historical persistence journal tests (frozen WIP, must stay green)
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests/c15_persistence -p "test_journal.py" -v \
+            | tee /tmp/journal.txt
+
+      - name: Frozen E2E probe (expect 158/158)
+        run: |
+          set -euo pipefail
+          cd reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/isolation
+          bash ./probe_e2e.sh 2>&1 | tee /tmp/e2e.txt
+          grep -qE "^ALL_CHECKS=158/158 FAILURES=0$" /tmp/e2e.txt
+
+      - name: Runbook lifecycle checker self-test
+        run: |
+          set -euo pipefail
+          python3 reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/checks/runbook_lifecycle_checker.py \
+            --base reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002 \
+            --self-test > /tmp/runbook.txt 2>&1
+          tail -2 /tmp/runbook.txt
+
+      - name: src/aios_core must be untouched by this corrective
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "${{ github.base_ref }}"
+          if git diff --name-only "origin/${{ github.base_ref }}...HEAD" -- src/aios_core | grep .; then
+            echo "::error title=core diff::src/aios_core must have zero diff"
+            exit 1
+          fi
+          echo "src/aios_core diff: 0 files"
+
+      - name: Publish formal gate summary as PR comment
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          {
+            echo "## C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001 formal CPython 3.12.14 gate"
+            echo
+            echo "- run: \`${{ github.run_id }}\`"
+            echo "- sha: \`${{ github.sha }}\`"
+            echo "- python: \`$(python -c 'import sys; print(sys.version.split()[0])')\`"
+            echo "- pydantic: \`$(python -c 'import pydantic; print(pydantic.VERSION)')\`"
+            echo "- pytest: \`$(python -c 'import pytest; print(pytest.__version__)')\`"
+            echo
+            echo "### K1-K5 frozen probe suite"
+            echo '```'
+            tail -3 /tmp/killpoints.txt
+            echo '```'
+            echo
+            echo "### production wiring"
+            echo '```'
+            tail -3 /tmp/wiring.txt
+            echo '```'
+            echo
+            echo "### environment detach / re-attach"
+            echo '```'
+            tail -3 /tmp/reattach.txt
+            echo '```'
+            echo
+            echo "### resident-visible surface"
+            echo '```'
+            tail -3 /tmp/surface.txt
+            echo '```'
+            echo
+            echo "### frozen E2E"
+            echo '```'
+            grep -E "^ALL_CHECKS=" /tmp/e2e.txt || tail -3 /tmp/e2e.txt
+            echo '```'
+          } > /tmp/comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/comment.md

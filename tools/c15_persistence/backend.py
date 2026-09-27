@@ -52,7 +52,11 @@ from contextlib import contextmanager
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterator, Mapping, Sequence
 
-WORKSPACE = Path("/home/user")
+#: Root of the *authoritative, non-ephemeral* workspace.  Overridable so the
+#: formal CI gate can run on a machine whose home directory differs; the value
+#: is still a persisted workspace root and every ephemeral path (``/tmp``,
+#: ``/var/tmp``, tmpfs, ramfs, ...) stays rejected.
+WORKSPACE = Path(os.environ.get("C15_PERSISTED_WORKSPACE") or "/home/user").resolve()
 
 #: Path components the platform excludes from persistence.  A backend under any
 #: of these can vanish with the execution environment.
