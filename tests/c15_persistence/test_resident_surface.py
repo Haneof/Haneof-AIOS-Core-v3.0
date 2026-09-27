@@ -25,8 +25,11 @@ EVIDENCE_DIR = (
 )
 
 
-def test_resident_visible_surface_is_unchanged_by_the_durability_layer() -> None:
-    out = EVIDENCE_DIR / "resident-surface-no-change.json"
+def test_resident_visible_surface_is_unchanged_by_the_durability_layer(tmp_path: Path) -> None:
+    # The checked-in evidence file is produced by an explicit, logged invocation
+    # of the checker so that the suite never rewrites reviewed evidence; this
+    # test writes to a scratch path and asserts on that.
+    out = tmp_path / "resident-surface-no-change.json"
     work_root = new_root("resident-surface")
     env = dict(repo_python_env())
     env["C15_SURFACE_BASE"] = os.environ.get("C15_SURFACE_BASE", "main")
@@ -68,3 +71,9 @@ def test_resident_visible_surface_is_unchanged_by_the_durability_layer() -> None
     # The audit is only meaningful if the surface was actually exercised.
     assert len(evidence["control"]["calls"]) >= 2, evidence["control"]["calls"]
     assert evidence["control"]["catalog"], "empty capability catalog"
+
+    # The committed evidence artifact must be present and must itself report the
+    # same verdict.  The evidence manifest hashes it, so any drift is caught.
+    committed = EVIDENCE_DIR / "resident-surface-no-change.json"
+    assert committed.is_file(), f"missing committed evidence: {committed}"
+    assert json.loads(committed.read_text())["result"] == "RESIDENT_SURFACE_UNCHANGED"
