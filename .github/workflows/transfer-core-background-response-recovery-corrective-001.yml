@@ -1,0 +1,120 @@
+name: transfer-core-background-response-recovery-corrective-001
+
+on:
+  push:
+    branches:
+      - transfer/core-background-response-recovery-001-corrective-001-030acbfe
+
+permissions:
+  contents: write
+
+jobs:
+  exact-object-fast-forward:
+    runs-on: ubuntu-latest
+    env:
+      TARGET_BRANCH: arena/01a0dcf6-haneof-aios-core-v3-0
+      OLD_HEAD: 2ea8dd03827eda8eb10513967caa7d354afdc0eb
+      CONSTRUCTION_MAIN: acf8ac3ea3e8da2b5c77e81534ba62d5166879f2
+      EXACT: 030acbfe2d935dfc166ff7a9a1760b6ddd46d42d
+      EXACT_PARENT: b8bc7b32497dc0fdc0a15194256795a7c6771048
+      EXACT_TREE: b1c39039db6c48e2aa6fb111b03394eb5d0b8f9c
+      EVIDENCE_HEAD: a1c6e74de71f783951f2772e2f065880d7146ec5
+      B64_SHA256: 0a05c490870dff329f62c853dd5f2dddbefd2c280f016a078994ecea5734d79a
+      BUNDLE_SHA256: 4cd1ba2882db766a52b7feb76386a56f68222e8c48d28afe82605d8b3abfab66
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Verify target has not drifted
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "refs/heads/$TARGET_BRANCH:refs/remotes/origin/$TARGET_BRANCH" main
+          current="$(git rev-parse "refs/remotes/origin/$TARGET_BRANCH")"
+          test "$current" = "$OLD_HEAD"
+          git cat-file -e "$CONSTRUCTION_MAIN^{commit}"
+
+      - name: Reconstruct exact transfer bundle from verified Git blobs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64
+          import json
+          import os
+          import urllib.request
+
+          repo = os.environ["GITHUB_REPOSITORY"]
+          token = os.environ["GH_TOKEN"]
+          blobs = [
+              "b0444ba8e73da213c9eac715d662df84d7f5f46b",
+              "45f7d63c8ae357feab7e9e3ec9b70b13684dde27",
+              "dd3aa1f4bd0d8dc9be2e2e638067e91c1e7d44bd",
+              "a4fa4017a5e7d7aa190f0677e9c4f933ff8dcf5d",
+              "0a7c85b45da895e9474f15ca7aff5fdaf298e6b8",
+              "037a025d5c41ab15f2875bbaa26ed162abc76ea0",
+              "9af1c7c535f535a02b90c2d30d34d00a1eb5211b",
+              "c5a4b01d7a2a2ffcf8faa88d11edebdc85d968d0",
+              "cc51d584960b8a4418bcce7af59907c8e443d6d7",
+              "554c895e562c1fb18551bc49c8e1f2f37d56c8cc",
+              "e1c7036c762889e7e32e1ecfaf99e151c2df9a3d",
+              "4cec547a2969ea2546af8876585530786cb6dae1",
+              "351e0c75d0d119ee3e179db90215c4d1de0a0318",
+              "749e1ce7a2371542799fc8cfba89a5acbb3fc205",
+              "9cdac6bd0215b86313944034e1616059eb9f65a1",
+              "adf5aa4740aed222f4a4ce765be86029cde0069d",
+              "56c90b73ccb6d36c235cb643e7bcf83b5f37bddb",
+              "178e306481bf28348e9e260535800e90ff55e70d",
+              "b691e4ca5bb57230f71029435a6e0becca5fd64f",
+              "b8092e3a55d4edb21b76a1497da530ee0b302d05",
+          ]
+          out = bytearray()
+          for sha in blobs:
+              req = urllib.request.Request(
+                  f"https://api.github.com/repos/{repo}/git/blobs/{sha}",
+                  headers={
+                      "Authorization": f"Bearer {token}",
+                      "Accept": "application/vnd.github+json",
+                      "X-GitHub-Api-Version": "2022-11-28",
+                  },
+              )
+              with urllib.request.urlopen(req) as response:
+                  obj = json.load(response)
+              if obj.get("sha") != sha or obj.get("encoding") != "base64":
+                  raise SystemExit(f"unexpected blob response for {sha}")
+              chunk = base64.b64decode(obj["content"])
+              out.extend(chunk)
+          if len(out) != 55144:
+              raise SystemExit(f"unexpected reconstructed base64 length: {len(out)}")
+          open("/tmp/transfer.b64", "wb").write(out)
+          PY
+          echo "$B64_SHA256  /tmp/transfer.b64" | sha256sum -c -
+          base64 -d /tmp/transfer.b64 > /tmp/transfer.bundle
+          echo "$BUNDLE_SHA256  /tmp/transfer.bundle" | sha256sum -c -
+          test "$(wc -c < /tmp/transfer.bundle)" -eq 41357
+
+      - name: Verify exact Git object graph and evidence-only boundary
+        run: |
+          set -euo pipefail
+          git bundle verify /tmp/transfer.bundle
+          git fetch /tmp/transfer.bundle "refs/heads/engineering:refs/heads/candidate-import"
+          test "$(git rev-parse candidate-import)" = "$EVIDENCE_HEAD"
+          test "$(git rev-parse "$EXACT^")" = "$EXACT_PARENT"
+          test "$(git rev-parse "$EXACT^{tree}")" = "$EXACT_TREE"
+          test "$(git rev-parse "$EVIDENCE_HEAD^")" = "$EXACT"
+          parents="$(git rev-list --parents -n 1 "$EXACT_PARENT")"
+          test "$parents" = "$EXACT_PARENT $OLD_HEAD $CONSTRUCTION_MAIN"
+          git merge-base --is-ancestor "$OLD_HEAD" "$EVIDENCE_HEAD"
+          test -z "$(git diff --name-only "$EXACT" "$EVIDENCE_HEAD" -- src tests)"
+
+      - name: Fast-forward PR 219 branch without force
+        run: |
+          set -euo pipefail
+          before="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
+          test "$before" = "$OLD_HEAD"
+          git push origin "$EVIDENCE_HEAD:refs/heads/$TARGET_BRANCH"
+          after="$(git ls-remote origin "refs/heads/$TARGET_BRANCH" | awk '{print $1}')"
+          test "$after" = "$EVIDENCE_HEAD"
+          echo "REMOTE_CANDIDATE_PUBLISHED exact=$EXACT evidence=$EVIDENCE_HEAD force=NO"
