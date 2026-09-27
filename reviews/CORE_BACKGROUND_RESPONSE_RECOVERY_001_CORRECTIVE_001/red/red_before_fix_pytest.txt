@@ -1,0 +1,31 @@
+FFFFFFFFFFFFFF                                                           [100%]
+=================================== FAILURES ===================================
+/home/user/Haneof-AIOS-Core-v3.0/tests/integration/test_core_background_response_recovery_001_corrective_001.py:197: Failed: DID NOT RAISE <class 'Exception'>
+/home/user/Haneof-AIOS-Core-v3.0/tests/integration/test_core_background_response_recovery_001_corrective_001.py:224: Failed: DID NOT RAISE <class 'Exception'>
+/home/user/Haneof-AIOS-Core-v3.0/tests/integration/test_core_background_response_recovery_001_corrective_001.py:256: Failed: DID NOT RAISE <class 'Exception'>
+/home/user/Haneof-AIOS-Core-v3.0/tests/integration/test_core_background_response_recovery_001_corrective_001.py:295: Failed: DID NOT RAISE <class 'Exception'>
+/home/user/Haneof-AIOS-Core-v3.0/tests/integration/test_core_background_response_recovery_001_corrective_001.py:328: Failed: DID NOT RAISE <class 'Exception'>
+/home/user/Haneof-AIOS-Core-v3.0/tests/integration/test_core_background_response_recovery_001_corrective_001.py:360: Failed: DID NOT RAISE <class 'TimeoutError'>
+/home/user/Haneof-AIOS-Core-v3.0/tests/integration/test_core_background_response_recovery_001_corrective_001.py:400: Failed: DID NOT RAISE <class 'Exception'>
+/home/user/Haneof-AIOS-Core-v3.0/tests/integration/test_core_background_response_recovery_001_corrective_001.py:547: Failed: DID NOT RAISE <class 'ValueError'>
+/home/user/Haneof-AIOS-Core-v3.0/tests/integration/test_core_background_response_recovery_001_corrective_001.py:547: Failed: DID NOT RAISE <class 'ValueError'>
+/home/user/Haneof-AIOS-Core-v3.0/tests/integration/test_core_background_response_recovery_001_corrective_001.py:547: Failed: DID NOT RAISE <class 'ValueError'>
+/home/user/Haneof-AIOS-Core-v3.0/tests/integration/test_core_background_response_recovery_001_corrective_001.py:547: Failed: DID NOT RAISE <class 'ValueError'>
+/home/user/Haneof-AIOS-Core-v3.0/tests/integration/test_core_background_response_recovery_001_corrective_001.py:547: Failed: DID NOT RAISE <class 'ValueError'>
+/home/user/Haneof-AIOS-Core-v3.0/tests/integration/test_core_background_response_recovery_001_corrective_001.py:547: Failed: DID NOT RAISE <class 'ValueError'>
+/home/user/Haneof-AIOS-Core-v3.0/tests/integration/test_core_background_response_recovery_001_corrective_001.py:547: Failed: DID NOT RAISE <class 'ValueError'>
+=========================== short test summary info ============================
+FAILED tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_blk001_cross_work_transplant_rejected_before_provenance_rewrite
+FAILED tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_blk001_copied_token_with_copied_response_still_rejected
+FAILED tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_blk001_wake_to_periodic_review_transplant_rejected
+FAILED tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_blk001_periodic_review_to_user_turn_transplant_rejected
+FAILED tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_blk001_cross_subject_transplant_rejected
+FAILED tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_blk001_cross_round_transplant_rejected
+FAILED tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_blk001_identical_provider_model_transplant_rejected
+FAILED tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_blk002_duplicate_json_keys_rejected_before_semantic_construction[top-level-response-<lambda>-req-dup]
+FAILED tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_blk002_duplicate_json_keys_rejected_before_semantic_construction[top-level-silence-<lambda>-req-dup]
+FAILED tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_blk002_duplicate_json_keys_rejected_before_semantic_construction[top-level-capability-calls-<lambda>-req-dup]
+FAILED tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_blk002_duplicate_json_keys_rejected_before_semantic_construction[nested-usage-request-id-<lambda>-req-dup]
+FAILED tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_blk002_duplicate_json_keys_rejected_before_semantic_construction[nested-provenance-provider-<lambda>-req-dup]
+FAILED tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_blk002_duplicate_json_keys_rejected_before_semantic_construction[capability-call-name-<lambda>-req-dup]
+FAILED tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_blk002_duplicate_json_keys_rejected_before_semantic_construction[nested-capability-arguments-<lambda>-req-dup]
