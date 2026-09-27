@@ -69,17 +69,26 @@ jobs:
           echo "candidate pinned: $(git -C cand rev-parse HEAD)"
           echo "canonical persistence ref pinned read-only: $(git -C cand rev-parse refs/remotes/origin/persistence/ia-review)"
       - name: Freeze probe hashes + collect-only enumeration
+        id: freeze
+        continue-on-error: true
         env:
           PYTHONPATH: /__w/${{ github.workspace }}/cand/src:/__w/${{ github.workspace }}/cand
           IA_CANDIDATE_REPO: /__w/${{ github.workspace }}/cand
         run: |
           set -uo pipefail
-          python "review/$IA_DIR/freeze_ia_probe_manifest.py" 2>&1 | tee review/freeze.log
-          rc=${PIPESTATUS[0]}
-          echo "--- collect-only output ---"
-          cat "review/$IA_DIR/collect_only.txt" || true
-          echo "--- enumeration ---"
-          cat "review/$IA_DIR/probe_enumeration.txt" || true
+          python "review/$IA_DIR/freeze_ia_probe_manifest.py" > review/freeze.log 2>&1
+          rc=$?
+          # Surface diagnostics as check-run annotations (the Actions blob/artifact
+          # channel is not reachable from the independent reviewer's sandbox).
+          {
+            echo "freeze_rc=$rc"
+            tail -60 review/freeze.log
+            echo "--- collect_only ---"
+            tail -30 "review/$IA_DIR/collect_only.txt" 2>/dev/null || echo "(absent)"
+          } | grep -v '^$' | head -80 | while IFS= read -r l; do
+            echo "::error title=IA-FREEZE::$l"
+          done
+          cat review/freeze.log
           exit $rc
       - name: Publish freeze diagnostics to the PR
         if: always()
@@ -181,6 +190,13 @@ jobs:
             ia_probes.py 2>&1 | tee FIRST_RUN.log
           rc=${PIPESTATUS[0]}
           echo "FIRST_RUN pytest exit: $rc" | tee -a FIRST_RUN.log
+          {
+            echo "pytest_exit=$rc"
+            grep -E "^(FAILED|ERROR)" FIRST_RUN.log | head -40
+            tail -5 FIRST_RUN.log
+          } | while IFS= read -r l; do
+            echo "::error title=IA-FIRST-RUN::$l"
+          done
           exit $rc
       - name: Publish first-run evidence to the PR
         if: always()
