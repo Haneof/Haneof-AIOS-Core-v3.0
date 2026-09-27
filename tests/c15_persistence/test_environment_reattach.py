@@ -34,7 +34,9 @@ import shutil
 import subprocess
 import sys
 import uuid
+from contextlib import contextmanager
 from pathlib import Path
+from typing import Iterator
 
 import pytest
 
@@ -265,3 +267,199 @@ def test_platform_level_reattach_is_not_claimable_from_inside() -> None:
     }
     assert payload["platform_sandbox_reattach"].startswith("NOT_PROVEN")
     assert payload["namespace_detach_reattach"].startswith("PROVEN")
+
+
+@contextmanager
+def _temp_bare_remote(tmp_path: Path) -> Iterator[str]:
+    bare = tmp_path / f"test_remote_{uuid.uuid4().hex[:8]}.git"
+    subprocess.run(["git", "init", "--bare", str(bare)], check=True, cwd=str(REPO_ROOT), capture_output=True)
+    remote_name = f"test-remote-{uuid.uuid4().hex[:8]}"
+    subprocess.run(["git", "remote", "add", remote_name, str(bare)], check=True, cwd=str(REPO_ROOT), capture_output=True)
+    try:
+        yield remote_name
+    finally:
+        subprocess.run(["git", "remote", "remove", remote_name], cwd=str(REPO_ROOT), capture_output=True)
+
+
+def test_remote_backend_roundtrip_with_wiped_local_cache(tmp_path: Path) -> None:
+    """Proves full cross-attachment durability over Git remote storage.
+
+    1. Local run is created and driven to cursor 1;
+    2. Pre-detach run-state manifest is pinned;
+    3. State is pushed to the remote Git backend;
+    4. The local cache is COMPLETELY WIPED (simulating container destruction);
+    5. A fresh local directory materializes state from the remote Git ref;
+    6. Byte-for-byte re-attach fidelity is proven via verify_reattach();
+    7. Work resumes in the materialized backend and advances to cursor 2;
+    8. Updated state is pushed back to the remote backend.
+    """
+    from tools.c15_persistence.remote_backend import (
+        materialize_run_state,
+        push_run_state,
+        verify_remote_state,
+    )
+
+    with _temp_bare_remote(tmp_path) as remote_name:
+        root = new_root("remote-roundtrip")
+        run_id = f"synthetic-run-remote-{uuid.uuid4().hex[:8]}"
+        session_id = f"synthetic-session-remote-{uuid.uuid4().hex[:8]}"
+        remote_ref = f"refs/heads/persistence/{run_id}"
+
+        try:
+            # 1. Create and drive cursor 1
+            session = OperatorSession.create(root / "backend", run_id=run_id, session_id=session_id)
+            first = session.process_one_cursor()
+            assert first["ack"]["status"] == "acked"
+            first_event = str(first["projection"]["event_id"])
+
+            # 2. Pin manifest
+            manifest = capture_manifest(
+                session.backend, cursor=1, event_id=first_event, phase="A"
+            )
+            write_manifest(session.backend, manifest, name="run-state-manifest.json")
+            manifest_sha256 = manifest["manifest_sha256"]
+            session.backend.release()
+
+            # 3. Push to remote backend
+            pushed_ref, commit_sha = push_run_state(
+                session.backend,
+                remote_ref=remote_ref,
+                remote=remote_name,
+                repo_dir=REPO_ROOT,
+            )
+            assert pushed_ref == remote_ref
+            assert bool(commit_sha)
+
+            # Verify remote state on remote
+            check = verify_remote_state(
+                remote_ref=remote_ref,
+                commit_sha=commit_sha,
+                expected_manifest_sha256=manifest_sha256,
+                remote=remote_name,
+                repo_dir=REPO_ROOT,
+            )
+            assert check["verified"] is True
+
+            # 4. COMPLETELY WIPE LOCAL CACHE (destroying the execution environment)
+            wipe(root)
+            assert not (root / "backend").exists(), "local cache must be wiped"
+
+            # 5. Materialize into a brand-new local cache directory
+            fresh_root = new_root("remote-materialized")
+            try:
+                materialized_backend = materialize_run_state(
+                    run_id=run_id,
+                    session_id=session_id,
+                    target_dir=fresh_root / "backend",
+                    remote_ref=remote_ref,
+                    commit_sha=commit_sha,
+                    remote=remote_name,
+                    repo_dir=REPO_ROOT,
+                )
+
+                # 6. Prove byte-for-byte re-attach fidelity
+                materialized_manifest = read_manifest(fresh_root / "backend" / "run-state-manifest.json")
+                assert materialized_manifest["manifest_sha256"] == manifest_sha256
+                report = verify_reattach(materialized_backend, materialized_manifest)
+                assert report["reattached"] is True
+                assert report["cursor"] == 1
+                assert report["event_id"] == first_event
+                for name, detail in report["slots"].items():
+                    if detail.get("required"):
+                        assert detail["status"] == "OK", f"slot {name}: {detail}"
+                materialized_backend.release()
+
+                # 7. Resume and advance to cursor 2
+                resumed_session = OperatorSession.attach(
+                    fresh_root / "backend", run_id=run_id, session_id=session_id
+                )
+                second = resumed_session.resume()
+                assert second["ack"]["status"] == "acked"
+                assert second["projection"]["sequence"] == 2
+                second_event = str(second["projection"]["event_id"])
+
+                second_manifest = capture_manifest(
+                    resumed_session.backend, cursor=2, event_id=second_event, phase="A"
+                )
+                write_manifest(resumed_session.backend, second_manifest, name="run-state-manifest.json")
+                resumed_session.backend.release()
+
+                # 8. Push updated state back to remote backend
+                new_ref, new_commit_sha = push_run_state(
+                    resumed_session.backend,
+                    remote_ref=remote_ref,
+                    remote=remote_name,
+                    repo_dir=REPO_ROOT,
+                )
+                assert new_ref == remote_ref
+                assert new_commit_sha != commit_sha
+
+                # Verify remote updated to cursor 2
+                check2 = verify_remote_state(
+                    remote_ref=remote_ref,
+                    commit_sha=new_commit_sha,
+                    expected_manifest_sha256=second_manifest["manifest_sha256"],
+                    remote=remote_name,
+                    repo_dir=REPO_ROOT,
+                )
+                assert check2["verified"] is True
+                assert check2["manifest"]["cursor"] == 2
+            finally:
+                wipe(fresh_root)
+        finally:
+            wipe(root)
+
+
+def test_remote_backend_rejects_corrupted_manifest(tmp_path: Path) -> None:
+    """If remote state has corrupted or missing slot, reattach fails closed."""
+    from tools.c15_persistence.backend import BackendError
+    from tools.c15_persistence.remote_backend import (
+        materialize_run_state,
+        push_run_state,
+    )
+
+    with _temp_bare_remote(tmp_path) as remote_name:
+        root = new_root("remote-corrupt")
+        run_id = f"synthetic-run-corrupt-{uuid.uuid4().hex[:8]}"
+        session_id = f"synthetic-session-corrupt-{uuid.uuid4().hex[:8]}"
+        remote_ref = f"refs/heads/persistence/{run_id}"
+
+        try:
+            session = OperatorSession.create(root / "backend", run_id=run_id, session_id=session_id)
+            first = session.process_one_cursor()
+            manifest = capture_manifest(
+                session.backend, cursor=1, event_id=str(first["projection"]["event_id"]), phase="A"
+            )
+            write_manifest(session.backend, manifest, name="run-state-manifest.json")
+            session.backend.release()
+
+            _pushed_ref, commit_sha = push_run_state(
+                session.backend,
+                remote_ref=remote_ref,
+                remote=remote_name,
+                repo_dir=REPO_ROOT,
+            )
+
+            fresh_root = new_root("remote-tampered")
+            try:
+                materialized = materialize_run_state(
+                    run_id=run_id,
+                    session_id=session_id,
+                    target_dir=fresh_root / "backend",
+                    remote_ref=remote_ref,
+                    commit_sha=commit_sha,
+                    remote=remote_name,
+                    repo_dir=REPO_ROOT,
+                )
+                tampered_manifest = dict(manifest)
+                tampered_manifest["artifacts"] = dict(manifest["artifacts"])
+                # Tamper with an artifact hash
+                tampered_manifest["artifacts"]["runtime/world.sqlite"] = "0" * 64
+                with pytest.raises(BackendError):
+                    verify_reattach(materialized, tampered_manifest)
+                materialized.release()
+            finally:
+                wipe(fresh_root)
+        finally:
+            wipe(root)
+

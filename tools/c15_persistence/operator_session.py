@@ -226,6 +226,47 @@ class OperatorSession:
         backend.audit("session_attached", {"phase": "resume"})
         return session
 
+    @classmethod
+    def materialize_and_attach(
+        cls,
+        root: str | Path,
+        *,
+        run_id: str,
+        session_id: str,
+        remote_ref: str | None = None,
+        commit_sha: str | None = None,
+        remote: str = "origin",
+        repo_dir: Path | None = None,
+    ) -> "OperatorSession":
+        """Materialize remote run state into local cache and attach."""
+        backend = RunBackend.materialize_from_remote(
+            run_id=run_id,
+            session_id=session_id,
+            target_dir=root,
+            remote_ref=remote_ref,
+            commit_sha=commit_sha,
+            remote=remote,
+            repo_dir=repo_dir,
+        )
+        backend.release()
+        return cls.attach(root, run_id=run_id, session_id=session_id)
+
+    def push_to_remote(
+        self,
+        *,
+        remote_ref: str | None = None,
+        remote: str = "origin",
+        repo_dir: Path | None = None,
+        message: str | None = None,
+    ) -> tuple[str, str]:
+        """Persist authoritative run state to remote Git storage."""
+        return self.backend.push_to_remote(
+            remote_ref=remote_ref,
+            remote=remote,
+            repo_dir=repo_dir,
+            message=message,
+        )
+
     # ------------------------------------------------------------- locations
 
     @property

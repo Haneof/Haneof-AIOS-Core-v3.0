@@ -87,6 +87,19 @@ def capture_manifest(
     extra: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Hash every existing slot and pin the run identity. Call before detach."""
+    # Ensure SQLite databases have WAL pages checkpointed so disk bytes are coherent.
+    for relative in ("runtime/world.sqlite", "runtime/index.sqlite", "journal.sqlite"):
+        p = _slot_path(backend, relative)
+        if p.is_file():
+            try:
+                conn = sqlite3.connect(str(p), timeout=10)
+                try:
+                    conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+                finally:
+                    conn.close()
+            except sqlite3.Error:
+                pass
+
     artifacts: dict[str, str] = {}
     for name, relative in SLOTS:
         raw = slot_bytes(backend, relative)

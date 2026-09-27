@@ -47,7 +47,9 @@ result `CORRECTIVE_CONVERGENCE_BLOCKED`. New runs use new filenames under
 * Authoritative non-ephemeral state only: the backend rejects `/tmp`,
   `/var/tmp`, `/dev/shm`, `/run`, tmpfs/ramfs backing mounts (checked against
   `/proc/self/mountinfo`), excluded snapshot components and symlink aliases that
-  resolve outside the persisted workspace.
+  resolve outside the persisted workspace. Local `/home/user` is degraded to a
+  disposable local cache/materialization target; the authoritative backend across
+  Arena attachments is durable remote storage on GitHub (`origin`).
 
 ## 3. Frozen K1-K5 probe suite
 
@@ -96,18 +98,21 @@ ledger is unchanged.
 
 ## 4. Gates the frozen WIP did not have
 
-1. **Environment detach / re-attach**
-   (`tests/c15_persistence/test_environment_reattach.py`).
+1. **Environment detach / re-attach and remote persistence**
+   (`tests/c15_persistence/test_environment_reattach.py`,
+   `tools/c15_persistence/remote_backend.py`).
    The WIP only proved process restart; the original incident was an
-   *environment* loss. This test destroys the execution environment: the run is
-   driven inside a fresh `unshare --mount --uts --ipc --pid --fork --mount-proc`
-   namespace with `/tmp` and `/var/tmp` shadowed by a private tmpfs, the
-   namespace dies with the child, and a **different** namespace re-opens the
-   same run and re-verifies the pre-detach manifest byte-for-byte. All pinned
-   slots (World, search index, release state, current event, binding,
-   projection, provider request, provider reply, mailbox, failure evidence,
-   persistence journal) must report `OK` with identical hashes and identity.
-   Work then continues to the next cursor and a second cycle re-verifies.
+   *environment* loss. Furthermore, local `/home/user` is confirmed not to
+   persist across new Arena execution environments. Therefore:
+   - `/home/user` is degraded to a disposable local cache/materialization target.
+   - The authoritative backend is durable remote storage on GitHub (`origin`),
+     persisted under `refs/heads/persistence/<run_id>`.
+   - The test proves both namespace-level detach/reattach AND remote backend
+     round-trip durability where local cache is completely wiped, materialized
+     from the Git ref, verified byte-for-byte (`verify_reattach`), and advanced
+     to the next cursor. All pinned slots (World, search index, release state,
+     current event, binding, projection, provider request, provider reply,
+     mailbox, failure evidence, persistence journal) report `OK`.
 2. **Production-wiring tests**
    (`tests/c15_persistence/test_operator_wiring.py`, 16 tests) over the real
    release operator and the real Core `FusedTurnRuntime` - durable path policy,
@@ -129,6 +134,9 @@ ledger is unchanged.
    `resumed/evidence/resident-surface-no-change.json`.
 4. **Formal CPython 3.12.14 gate**
    (`.github/workflows/c15-rcc-res-b-persistence-corrective-001-formal-gate.yml`).
+5. **Platform Reattach Stage A / Stage B Runner**
+   (`tools/c15_persistence/platform_reattach.py`). Separates execution into Stage A
+   (durable remote push and parameter pinning) and Stage B (independent window reattach).
 
 ## 5. Environment identity
 
@@ -159,23 +167,30 @@ claimed as a formal `REVIEW_READY` result.**
 * `runbook_lifecycle_checker.py --self-test` -> green,
   `RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=82`
   (log: `resumed/evidence/runbook-lifecycle-checker-self-test-candidate-pin.log`)
-* persistence test suites -> 5/5 K1-K5, 16 wiring, 2 reattach, 1 resident
+* persistence test suites -> 5/5 K1-K5, 16 wiring, 4 reattach, 1 resident
   surface, 13 historical journal tests
   (log: `resumed/evidence/persistence-tests-candidate-pin.log`)
 
-## 7. Explicitly NOT claimed
+## 7. Platform Reattach Stage A / Stage B Architecture
 
-* **Platform-level** sandbox detach/re-attach is **not** proven: a session
-  running inside the platform cannot destroy and re-create its own sandbox.
-  What is proven is namespace-level environment detach/re-attach plus
-  independence from every transient path. This limitation is asserted by a test
-  rather than skipped silently.
-* No self-acceptance. This candidate is **not** accepted by its author.
+* **Stage A (this session):**
+  - Creates a fresh synthetic run in disposable local cache;
+  - Advances at least one synthetic cursor through the fully wired pipeline;
+  - Seals the generation and pins the run-state manifest;
+  - Persists the complete authoritative run state to the remote backend (`refs/heads/persistence/<run_id>`);
+  - Verifies that remote state exists and is readable;
+  - Asserts that local worktree in the repository remains clean;
+  - Fixes and outputs the 7 parameters;
+  - Stops at `PLATFORM_REATTACH_STAGE_A_READY`.
+* **Stage B (new independent window):**
+  - Executed exclusively in a new Arena AI session;
+  - Re-attaches to the run directly from the remote Git ref;
+  - Proves true cross-attachment durability across execution environment destruction.
 
 ## 8. Status
 
-`AWAITING_FORMAL_CPYTHON_3_12_14_GATE` and
-`AWAITING_C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001-INDEPENDENT-ACCEPTANCE`.
+`PLATFORM_REATTACH_STAGE_A_READY`
 
 PR #216 remains a **draft** until the formal gate is green. Nothing here may be
+merged or treated as self-accepted. Stage B must be executed in a separate Arena AI window.
 read as Independent Acceptance, and no gate was relaxed to reach this state.

@@ -8,10 +8,30 @@ execution environment was torn down.  A process restart inside the same
 environment is therefore NOT the same boundary, and proving the former requires a
 backend whose durability contract is explicit and mechanically testable.
 
+Local Cache vs Authoritative Remote Backend (Cross-Attachment Durability)
+------------------------------------------------------------------------
+Empirical testing confirmed that local ``/home/user`` is NOT preserved across
+distinct Arena execution environments / attachment sessions. Therefore:
+
+* Local ``/home/user`` is **degraded** from "authoritative backend" to a
+  disposable local cache and materialization target.
+* The truly **authoritative** backend for run state is durable remote storage
+  hosted on GitHub (``origin``), committed and pushed to dedicated persistence
+  refs (``refs/heads/persistence/<run_id>``).
+* Ephemeral locations (``/tmp``, ``/var/tmp``, ``/dev/shm``, tmpfs/ramfs) remain
+  forbidden even for the local cache. The local cache must live under a canonical
+  workspace directory.
+* Operations provide full round-trip durability:
+  - ``push_to_remote``: stages all run state, sealed generations, journal,
+    mailbox, and manifests into a Git commit and pushes it to GitHub.
+  - ``materialize_from_remote``: fetches the Git ref from GitHub, materializes
+    the exact byte tree into a fresh local directory, and verifies byte-for-byte
+    manifest integrity.
+
 This module defines that contract:
 
-* **exact authoritative backend/path** - a private child directory of the
-  platform-persisted workspace ``/home/user``.  ``/tmp``, ``/var/tmp``,
+* **exact local cache backend/path** - a private child directory of the
+  workspace ``/home/user``.  ``/tmp``, ``/var/tmp``,
   ``/dev/shm``, ``/run``, any tmpfs/ramfs-backed mount and any path component
   excluded from platform persistence are rejected.  Symlink aliases are
   rejected because a symlink can quietly redirect a "persisted" path onto an
@@ -417,6 +437,50 @@ class RunBackend:
     @property
     def journal_path(self) -> Path:
         return self.root / "journal.sqlite"
+
+    def push_to_remote(
+        self,
+        *,
+        remote_ref: str | None = None,
+        remote: str = "origin",
+        repo_dir: Path | None = None,
+        message: str | None = None,
+    ) -> tuple[str, str]:
+        """Push full authoritative run state to durable remote Git storage."""
+        from .remote_backend import push_run_state
+
+        return push_run_state(
+            self,
+            remote_ref=remote_ref,
+            remote=remote,
+            repo_dir=repo_dir,
+            message=message,
+        )
+
+    @classmethod
+    def materialize_from_remote(
+        cls,
+        *,
+        run_id: str,
+        session_id: str,
+        target_dir: Path | str,
+        remote_ref: str | None = None,
+        commit_sha: str | None = None,
+        remote: str = "origin",
+        repo_dir: Path | None = None,
+    ) -> "RunBackend":
+        """Materialize run state from remote Git storage into local disposable cache."""
+        from .remote_backend import materialize_run_state
+
+        return materialize_run_state(
+            run_id=run_id,
+            session_id=session_id,
+            target_dir=target_dir,
+            remote_ref=remote_ref,
+            commit_sha=commit_sha,
+            remote=remote,
+            repo_dir=repo_dir,
+        )
 
     def __repr__(self) -> str:  # pragma: no cover - debugging aid
         return f"RunBackend({str(self.root)!r})"

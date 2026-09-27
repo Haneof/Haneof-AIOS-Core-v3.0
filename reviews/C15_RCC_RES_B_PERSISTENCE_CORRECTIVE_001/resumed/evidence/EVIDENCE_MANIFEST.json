@@ -4,6 +4,7 @@
       ".github/workflows/c15-rcc-res-b-persistence-corrective-001-formal-gate.yml",
       "AIOS_v3.0_CURRENT_CHECKPOINT.md",
       "governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md",
+      "pyproject.toml",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/ENGINEERING_STATUS.md",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/MANIFEST.json",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/WIP_DURABLE_FREEZE.md",
@@ -61,9 +62,11 @@
       "tools/c15_persistence/freeze_probe_manifest.py",
       "tools/c15_persistence/journal.py",
       "tools/c15_persistence/operator_session.py",
+      "tools/c15_persistence/platform_reattach.py",
       "tools/c15_persistence/probe_cli.py",
       "tools/c15_persistence/provider.py",
       "tools/c15_persistence/relay.py",
+      "tools/c15_persistence/remote_backend.py",
       "tools/c15_persistence/resident_surface_check.py",
       "tools/c15_persistence/runstate.py",
       "tools/c15_persistence/synthetic_release.py"
@@ -73,14 +76,14 @@
     "resume_base": "56c01b919c397b67024df1acb320874144d87f42",
     "src_aios_core_diff_is_zero": true,
     "src_aios_core_diff_vs_base": [],
-    "staged_against_head": "d044d2ce5cc03662298c13a64d1cbb957721cfaf"
+    "staged_against_head": "a33fd5b732a59948acec519500dc4d1bb19bbd01"
   },
   "environment_identity": {
     "grade": "ENGINEERING",
     "note": "Local sandbox is CPython 3.11.2; the formal CPython 3.12.14 + pydantic 2.13.5 + pytest 8.x result comes from the c15-rcc-res-b-persistence-corrective-001-formal-gate workflow.",
     "platform": "Linux-6.1.158+-x86_64-with-glibc2.36",
     "pydantic": "2.13.5",
-    "pytest": "8.4.2",
+    "pytest": "9.1.1",
     "python": "3.11.2",
     "python_implementation": "CPython"
   },
@@ -113,9 +116,9 @@
   ],
   "frozen_probe_suite": {
     "manifest_path": "tests/c15_persistence/killpoints/PROBE_MANIFEST.json",
-    "manifest_sha256": "dea5c179a78949bcb1380dd78f1806784b4f8d54ac2a05c1e8dbbb0a242619eb",
-    "manifest_sha256_file": "dea5c179a78949bcb1380dd78f1806784b4f8d54ac2a05c1e8dbbb0a242619eb",
-    "revision": 2
+    "manifest_sha256": "a3c2a7c983a21a62624361a256fd8dcdfea4a2b5ddcc8167311378fa0f71dbdb",
+    "manifest_sha256_file": "a3c2a7c983a21a62624361a256fd8dcdfea4a2b5ddcc8167311378fa0f71dbdb",
+    "revision": 3
   },
   "kind": "C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001-RESUMED-EVIDENCE-MANIFEST",
   "note": "A file cannot contain the hash of the commit that contains it, so the candidate commit SHA and tree are published externally (PR #216 comment and the branch tip). Every proof below is computed from the staged index."
