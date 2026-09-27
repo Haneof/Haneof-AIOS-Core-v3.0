@@ -1,19 +1,23 @@
 # AIOS v3.0 当前工程断点
 
-## 当前控制入口 — 2026-09-26 B-PERSISTENCE-CORRECTIVE-001 FROZEN_WIP / CORE-BACKGROUND-RESPONSE-RECOVERY-001 READY
+## 当前控制入口 — 2026-09-26 CORE-BACKGROUND-RESPONSE-RECOVERY-001 ACCEPTANCE_FAIL / CORRECTIVE-001 READY
+
+- Engineering PR #219 is OPEN / UNMERGED. Tested exact candidate: `3f9ec00d0fa283bc5294574d6da1e84d654d6645`; evidence-only head: `b82ae25bcbef0d1d81cc3b7e5f303d75a4f0b507`; parent/live base: `a310bf1202bf41644c2f3e25798053a6636e14be`; exact tree: `4e9e3a5685373f46ba56d51259f39af710a3cf53`.
+- Independent Acceptance of PR #219 tested exact `3f9ec00d0fa283bc5294574d6da1e84d654d6645` = `ACCEPTANCE_FAIL`, blocker=2. IA-BLK-001: exact response can be transplanted across work/work-kind/subject because in-doubt staging lacks durable originating-request binding. IA-BLK-002: duplicate JSON semantic keys are accepted by default `json.loads()` last-key-wins parsing. Reviewer-local evidence commit `5c59f17658524c0ad23f409a8c108402cea34452` could not be pushed; PM source revalidation independently confirmed both root causes. Current unique READY = `CORE-BACKGROUND-RESPONSE-RECOVERY-001-CORRECTIVE-001`; prompt `governance/prompts/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CORRECTIVE_001_2026-09-26.md`. `CORE-RC-REFREEZE-002` remains BLOCKED.
+- Earlier local-only `2b8242f7834fb34a0ce90a585f847bfa7505fe1e` was never published and is not the pinned acceptance candidate.
 
 - 接任 PM live 复核：live main = `e72a63874ed2c28798b00cec51f191caf1594a00`，Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`；见 `governance/AIOS_CORE_PM_TAKEOVER_S0_REVERIFICATION_2026-09-24.md`。
 - `CORE-OPERATOR-001 = DONE`：独立验收 #135（ACCEPTANCE_PASS）先合 `fe6f1740eb`，候选 #131 后合 `e72a63874e`；报告 `reviews/CORE_OPERATOR_001_INDEPENDENT_ACCEPTANCE_2026-09-24.md`。
 - `CORE-BASELINE-001 = DONE（re-verified）`；PR #136 已去除 pelican 文件，改作本 PM 补充治理 PR（pelican 提交 `f8edb5d1` 仅留历史，不合入）。
-- S2 / HEADLESS / RECOVERY / SCALE / CI-FIX / RC-FREEZE 均 DONE。frozen software = `773876f92d5f8e53422f8f5a68cc651953d93052`；Core tree = `fe77f8a0706acfaf369041d0882b6d0e6de39f22`。A-002 / PR #205 继续 canonical。B-PREFLIGHT-002 / RELEASE-002 历史 PASS 保留，但其唯一 RERUN-002 已真实消费 cursor14 至 reveal+ingest+production dispatch 后遭平台 `/tmp` state loss；无 Resident semantic reply/capability/ACK，不能 continuation/replay。`C15-RCC-RES-B-RERUN-002 = FAILED / INFRASTRUCTURE_STATE_LOSS / NON-CANONICAL`；旧 run/session 永久退休。PM 裁决：`governance/C15_RCC_RES_B_RERUN_002_STATE_LOSS_ADJUDICATION_2026-09-26.md`。唯一下一 READY = `C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001`；Independent Acceptance / RELEASE-003 / RERUN-003 / C / evaluator / close 全部后置。
+- S2 / HEADLESS / RECOVERY / SCALE / CI-FIX / RC-FREEZE 均 DONE。frozen software = `773876f92d5f8e53422f8f5a68cc651953d93052`；Core tree = `fe77f8a0706acfaf369041d0882b6d0e6de39f22`。A-002 / PR #205 继续 historical canonical for the prior RC. RERUN-002 remains `FAILED / INFRASTRUCTURE_STATE_LOSS / NON-CANONICAL`; persistence corrective remains FROZEN_WIP on #216. PR #219 tested exact `3f9ec00d...` is ACCEPTANCE_FAIL / blocker=2; unique next READY is `CORE-BACKGROUND-RESPONSE-RECOVERY-001-CORRECTIVE-001`. No Resident/release work is authorized.
 
-## 2026-09-26 CORE-BACKGROUND-RESPONSE-RECOVERY-001 = GATE / REVIEW_READY（未 DONE、未合入、未自验）
+## 历史工程写回 — 2026-09-26 CORE-BACKGROUND-RESPONSE-RECOVERY-001 author GATE / REVIEW_READY（已被 ACCEPTANCE_FAIL supersede，不得改写成 PASS）
 
 - 工程候选已交付并停在上表规定出口：branch `arena/01a0dcf6-haneof-aios-core-v3-0`；**tested exact candidate = `3f9ec00d0fa283bc5294574d6da1e84d654d6645`**（其后仅 evidence-only 文档/日志提交）；候选 PR = #219。
 - 交付内容：exact-response staging（严格 encode/decode、fingerprint + provider/model/request_id + payload-hash 校验）、`RecoveredModelResponse` 恢复消费点（绝不重新 dispatch provider）、wake/review/user-turn 三路 resume 同一 attempt/round、recovered round 写时间钉住保证 capability 副作用 exactly-once、`exact_response_ready` disposition 与 attempt 绑定的 metering。
 - Gate 证据：全量 `717 passed`（exit 0 / junit failures=0 errors=0 skipped=0）；聚焦子集 `93 passed`；十点 fault matrix 全绿；6 组红突变逐条回滚并保留日志。报告与红证据：`reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001/`。
 - 未做且不得由此窗口做：独立验收（self-acceptance）、`CORE-RC-REFREEZE-002`、B persistence corrective 恢复、任何 Resident 运行。
-- 下一步唯一入口 = `CORE-BACKGROUND-RESPONSE-RECOVERY-001-INDEPENDENT-ACCEPTANCE`（必须攻击上述 exact candidate）；IA PASS 前不得进入 `CORE-RC-REFREEZE-002`。B persistence corrective 继续 `FROZEN_WIP`；PR #216 冻结 WIP 未被修改。
+- 当时写回的下一步曾是 `CORE-BACKGROUND-RESPONSE-RECOVERY-001-INDEPENDENT-ACCEPTANCE`。该验收已完成且为 `ACCEPTANCE_FAIL / blocker=2`；本段只保留作者当时的 GATE 记录，不是当前控制入口。B persistence corrective 继续 `FROZEN_WIP`；PR #216 冻结 WIP 未被修改。
 
 ## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / FIX-001+002 READY
 
@@ -33,7 +37,7 @@
 
 ## 2026-09-25 PM durable follow-up plan — 不得靠聊天记忆丢失
 
-- 当前主线优先级：`CORE-BACKGROUND-RESPONSE-RECOVERY-001 = READY`。#214 的 scope amendment 属历史记录但已被 gate-integrity correction supersede：原 state-loss adjudication 在工程前已冻结五个 kill point 的 recovery convergence，不能在 reply-staged 红证据出现后把 permanent in_doubt 改记为 PASS。B persistence corrective 现为 FROZEN_WIP，等待 Core recovery IA → RC-REFREEZE-002 → fresh A-003 acceptance 后恢复。
+- 当前主线优先级：`CORE-BACKGROUND-RESPONSE-RECOVERY-001-CORRECTIVE-001 = READY`，继续使用 PR #219，严格只修两个 IA blocker。#214 的 scope amendment 属历史记录但已被 gate-integrity correction supersede；B persistence corrective 继续 FROZEN_WIP。只有 corrective fresh IA PASS + PM integration 后才可进入 `CORE-RC-REFREEZE-002`，随后 fresh A-003 acceptance，之后再恢复 B persistence。
 - 新增 `POST-C15-ISSUE-RECONCILIATION-001 = BLOCKED on C15-RCC-CLOSE-001`：C15 CLOSE 后，必须对 #23/#28/#33/#34/#35 在届时 live main 做 fresh current-state revalidation。2026-09-25 PM 已确认对应修复 PR #24/#49/#51/#54/#55 均已进入当前 main；因此默认不是新 Core 修复任务。届时若仍可复现，只能创建新的单窗口工程 Task，不得在 reconciliation 窗口顺手修改 Core。
 - “AI 持续了解用户并真正帮上忙”的后续产品化入口已显式冻结为：`P18-REALITY-HELP-INTEGRATION-001`（真实平台 Action→Outcome 闭环）→ `P19-HELP-EXPERIENCE-001`（授权/提醒/解释/纠正/Launcher/Voice/Digital Human 产品体验）。两者均 BLOCKED until P17 release gate，通过前不得提前另造平行执行系统。
 - 这三项已同步写入 `governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md` / `PROJECT_MASTER_MAP.md`，以后新 PM 窗口必须从仓库恢复，不得依赖本次聊天。
