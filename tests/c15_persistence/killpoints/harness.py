@@ -38,7 +38,16 @@ from pathlib import Path
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-RUNS_ROOT = Path(os.environ.get("C15_PERSISTENCE_RUNS_ROOT", "/home/user/c15-persistence-runs"))
+# Use the configured persisted workspace when provided (CI and operators),
+# otherwise use the current account's home directory. Never assume a specific
+# username or host filesystem layout.
+_PERSISTED_WORKSPACE = Path(
+    os.environ.get("C15_PERSISTED_WORKSPACE") or Path.home()
+).expanduser().resolve()
+RUNS_ROOT = Path(
+    os.environ.get("C15_PERSISTENCE_RUNS_ROOT")
+    or (_PERSISTED_WORKSPACE / "c15-persistence-runs")
+).expanduser().resolve()
 PY = sys.executable
 
 

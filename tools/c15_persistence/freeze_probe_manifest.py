@@ -119,12 +119,15 @@ def main() -> int:
     )
     manifest = {
         "manifest_version": "c15-killpoint-probe-manifest-v1",
-        "revision": 2,
+        "revision": 3,
         "revision_note": (
-            "rev1 was frozen and executed first; it failed on a harness bug "
-            "(harness pre-created <root>/backend, which creation must refuse). "
-            "The rev1 run and its log are preserved; rev2 fixes the harness only, "
-            "with no change to probe semantics or expected outcomes."
+            "rev1 and rev2 are preserved with their original hashes and execution "
+            "logs. The formal run on candidate dca2a220 failed because the harness "
+            "hard-coded /home/user for disposable probe roots. Rev3 derives its "
+            "root from C15_PERSISTED_WORKSPACE or Path.home(), and pyproject adds "
+            "the repository root to pytest's configured import path so tools.* is "
+            "importable during ordinary pytest invocations. Probe semantics and "
+            "expected outcomes are unchanged."
         ),
         "invariant": INVARIANT,
         "probes": PROBES,
