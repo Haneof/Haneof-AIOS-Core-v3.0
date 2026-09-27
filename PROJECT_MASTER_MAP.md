@@ -1,15 +1,15 @@
 # AIOS v3.0 项目全流程总地图
 
-## 当前控制入口 — 2026-09-27 CORE-BACKGROUND-RESPONSE-RECOVERY-001 CORRECTIVE-002 IMPLEMENTATION_COMPLETE; PY312 GATE BLOCKED
+## 当前控制入口 — 2026-09-27 CORE-BACKGROUND-RESPONSE-RECOVERY-001 CORRECTIVE-002 REVIEW_READY; INDEPENDENT-ACCEPTANCE READY
 
 - Remote authoritative engineering candidate: PR #219, tested exact `3f9ec00d0fa283bc5294574d6da1e84d654d6645`, evidence-only head `b82ae25bcbef0d1d81cc3b7e5f303d75a4f0b507`. Earlier local-only `2b8242f...` is unpublished and non-authoritative for acceptance.
-- Current chain: exact `227327c...` Python 3.12 frozen-probe/focused/full gate → fresh Corrective-002 IA → PM integration → `CORE-RC-REFREEZE-002` → fresh A-003 + IA → resume B persistence corrective + IA → RELEASE-003 → fresh B-RERUN-003.
+- Current chain: fresh Corrective-002 IA on exact `227327c...` → PM integration → `CORE-RC-REFREEZE-002` → fresh A-003 + IA → resume B persistence corrective + IA → RELEASE-003 → fresh B-RERUN-003.
 
 - `CORE-BASELINE-001 = DONE`。
 - `CORE-GAP-AUDIT-001 = DONE`：PR #132 accepted/merged at `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`；audited Core tree `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
 - Audit disposition: 3 STILL_OPEN RC blockers / 14 ALREADY_FIXED / 7 NOT_REPRODUCED / 6 OUT_OF_SCOPE。
 - Active audited Core gap blocker: none. CG-001 / CG-002 / CG-003 are DONE.
-- S2 当前：Core gap / CI / HEADLESS / RECOVERY / SCALE / original RC-FREEZE 均 DONE。RERUN-002 remains `FAILED / INFRASTRUCTURE_STATE_LOSS / NON-CANONICAL`; B persistence WIP is frozen. Historical PR #219 exact `3f9ec00d...` remains ACCEPTANCE_FAIL / blocker=2; Corrective-001 exact `030acbfe...` remains ACCEPTANCE_FAIL / blocker=1. Corrective-002 implementation exact `227327c...` is remotely published and source-reviewed, but remains `GATE_BLOCKED_ON_PY312_ENVIRONMENT`; fresh IA is not READY.
+- S2 当前：Core gap / CI / HEADLESS / RECOVERY / SCALE / original RC-FREEZE 均 DONE。RERUN-002 remains `FAILED / INFRASTRUCTURE_STATE_LOSS / NON-CANONICAL`; B persistence WIP is frozen. Historical PR #219 exact `3f9ec00d...` remains ACCEPTANCE_FAIL / blocker=2; Corrective-001 exact `030acbfe...` remains ACCEPTANCE_FAIL / blocker=1. Corrective-002 exact `227327c...` has passed formal GitHub-hosted Python 3.12 gate and is `GATE / REVIEW_READY`; unique next legal task is fresh Corrective-002 Independent Acceptance.
 - `CORE-OPERATOR-001 = DONE`：#135 ACCEPTANCE_PASS → #131 exact head `0e1d69ee` merged at `e72a63874ed2c28798b00cec51f191caf1594a00`；Core ZERO DIFF；#130 SUPERSEDED。
 - 单一集成收据（两份 PM 写回已对账合并）：`governance/CORE_OPERATOR_001_INTEGRATION_RECEIPT_2026-09-24.md`；含集成时 API 复核、本地 repro/修复复算（`3865da88` 三项失败 → accepted head `632 passed`）、合后 push gate run `35958610555` SUCCESS 及全部诚实限制。operator 集成不是 SOFTWARE_RC，也不是 CORE_COMPLETE。
 - 路线保持：operator acceptance + three accepted gap fixes → headless → recovery → scale → RC freeze ✅ → `C15-RCC-RES-A-RERUN-002` → A independent acceptance → B preflight/release/rerun/accept → attested C → C15 close → C16 → broad P16 → P17 Core release closure。
