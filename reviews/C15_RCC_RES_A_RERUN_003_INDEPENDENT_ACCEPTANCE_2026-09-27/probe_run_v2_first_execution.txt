@@ -1,0 +1,36 @@
+PASS P00 | exact candidate identity + evidence-only scope + frozen tree identity + live PR #235 state
+      tree=6402fff8b0c8c834e7b3f6b5d7c7427d0f846933 parent=7549322681ada61ab6d3c6eee5082acc00a658d6 files=122 outside=0 nonadd=0 forbidden=0 core=a9618abe0b3d4ac3b08bd23dbd58f3e3f97e05d6 tests=92fcbcc5876833735fb3cb7c73a98c4a8a4a3541 frozen_ancestor=True head..main=0 pr={'headRefOid': '5b6367406c13ea9450b7b2598a5813a64129cbd7', 'isDraft': True, 'mergedAt': None, 'state': 'OPEN'}
+PASS P01 | SHA256SUMS verified from exact Git blob bytes
+      entries=120 mismatch=0 dupes=0 unhashed=['A003_RESIDENT_RUN_REPORT.md', 'SHA256SUMS']
+FAIL P02 | receipts 1..13 recomputed from sealed fixture + ack refs match
+      receipts=13 acks=13 problems=['keyset@1', 'keyset@2', 'keyset@3', 'keyset@4', 'keyset@5', 'keyset@6', 'keyset@7', 'keyset@8']
+PASS P03 | cursor 14 never revealed; frozen Phase-A sealed boundary refuses it
+      later_cursor_files=[] cursor14_markers={'event_id': False, 'payload': False, 'timestamp': False, 'digest': False} reveal_guard='ReleaseError: Phase A sealed boundary reached' scratch_state_untouched=True
+FAIL p04 | harness error
+      KeyError: 'reused_existing'
+FAIL p05 | harness error
+      ValueError: too many values to unpack (expected 2)
+PASS P06 | 25 request/decision pairs contiguous, durable-attempt bound, causally chained
+      requests=25 decisions=25 problems=[]
+FAIL p07 | harness error
+      OperationalError: no such column: subject_id
+FAIL P08 | cursor-1 double pre-submission recovery: Core-derived attempt ids, honest in_doubt before reconcile, single durable attempt/receipt/meter row, retry 2
+      bad_identity=0 turn1=completed/rc=2/auth=0 inspect1=in_doubt inspect2_rc=1 receipts_a0=1 bindings_a0=1 meters_a0=1 turn1_rounds=5 out_rounds=5
+FAIL p09 | harness error
+      TypeError: '<' not supported between instances of 'sqlite3.Row' and 'sqlite3.Row'
+PASS P10 | bridge pinned transport-only: 25/25 outbound request fingerprints, relay ids, directive re-encode digests, response fingerprints and HMAC receipts
+      counters={'req_fp': 25, 'relay': 25, 'payload': 25, 'respfp': 25, 'hmac_ok': 25} problems=[]
+FAIL P11 | RC contract pins CPython/pydantic/pytest only; SQLite is NOT a frozen execution identity, so 3.53.4 is a compatible runtime detail, not drift
+      sqlite_pinned_in_rc=True workflow_python_pin=True pyproject_range_based=True run_env={'python': 'CPython 3.12.14 (source build, sqlite3 amalgamation 3.53.4 static)', 'pydantic': '2.13.5'} frozen_identity_ok=True pydantic_2_13_marker_in_traces=True
+FAIL P12 | cognition temporal cut: refs never future/dangling, anchors within released window, boundary cognition appears only after its cursor, no promotion
+      problems=["future-ref:clm_d5f6cb68fdb74636f46360e7#1->('evs_5e0504bbb3e4d6060362af3a', 1)", "future-ref:clm_d5f6cb68fdb74636f46360e7#2->('evs_revision_9b4f3ef55f61cd2fddd1e8c8', 1)", "future-ref:clm_d5f6cb68fdb74636f46360e7#2->('evs_revision_9b4f3ef55f61cd2fddd1e8c8', 1)", "future-ref:clm_d5f6cb68fdb74636f46360e7#3->('evs_revision_e3517783faa80857ce4838f3', 1)", "future-ref:clm_d5f6cb68fdb74636f46360e7#3->('evs_revision_e3517783faa80857ce4838f3', 1)", "future-ref:clm_d5f6cb68fdb74636f46360e7#4->('evs_revision_c031a6f0700efc15017053a2', 1)"] task_states=['draft', 'ready', 'running', 'waiting_user'] anchors=25 claim6_after_cursor10=True deletion_rev=[5, 6] discipline_rev=[6] queued_only=True published_confirmed=True
+PASS P13 | negative controls prove the frozen recovery/authenticity machinery is fail-closed (forgery paths refused)
+      controls={'A': 'BLOCKED-AS-EXPECTED: an authenticated provider return cannot be reconciled as not submitted', 'B': 'BLOCKED-AS-EXPECTED: provider_execution_not_proven_absent', 'C': 'DETECTED-AS-EXPECTED: tampered payload digest differs from durable receipt'}
+
+TOTAL 6/14 PROBES PASS
+{
+ "candidate": "5b6367406c13ea9450b7b2598a5813a64129cbd7",
+ "tree": "6402fff8b0c8c834e7b3f6b5d7c7427d0f846933",
+ "passed": 6,
+ "total": 14
+}

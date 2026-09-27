@@ -1,0 +1,36 @@
+FAIL p00 | harness error
+      CalledProcessError: Command '['git', '-C', '/home/user', 'cat-file', '-p', '5b6367406c13ea9450b7b2598a5813a64129cbd7']' returned non-zero exit status 128.
+FAIL p01 | harness error
+      RuntimeError: missing git blob at exact head: reviews/internal_habitation/c15-rcc/v1/resident/a003/SHA256SUMS
+FAIL p02 | harness error
+      RuntimeError: missing git blob at exact head: reviews/internal_habitation/c15-rcc/v1/fixture/sealed_fixture.json
+FAIL p03 | harness error
+      RuntimeError: missing git blob at exact head: reviews/internal_habitation/c15-rcc/v1/fixture/sealed_fixture.json
+FAIL p04 | harness error
+      RuntimeError: missing git blob at exact head: reviews/internal_habitation/c15-rcc/v1/fixture/sealed_fixture.json
+FAIL p05 | harness error
+      RuntimeError: missing git blob at exact head: reviews/internal_habitation/c15-rcc/v1/fixture/sealed_fixture.json
+FAIL p06 | harness error
+      CalledProcessError: Command '['git', '-C', '/home/user', 'ls-tree', '-r', '--name-only', '5b6367406c13ea9450b7b2598a5813a64129cbd7:reviews/internal_habitation/c15-rcc/v1/resident/a003']' returned non-zero exit status 128.
+FAIL p07 | harness error
+      RuntimeError: missing git blob at exact head: reviews/internal_habitation/c15-rcc/v1/resident/a003/world/resident_a003_world.db
+FAIL p08 | harness error
+      ModuleNotFoundError: No module named 'aios_core'
+FAIL p09 | harness error
+      RuntimeError: missing git blob at exact head: reviews/internal_habitation/c15-rcc/v1/resident/a003/world/resident_a003_world.db
+FAIL p10 | harness error
+      ModuleNotFoundError: No module named 'aios_core'
+FAIL p11 | harness error
+      RuntimeError: missing git blob at exact head: reviews/CORE_RC_REFREEZE_002/environment_manifest.txt
+FAIL p12 | harness error
+      RuntimeError: missing git blob at exact head: reviews/internal_habitation/c15-rcc/v1/fixture/sealed_fixture.json
+FAIL p13 | harness error
+      ModuleNotFoundError: No module named 'aios_core'
+
+TOTAL 0/14 PROBES PASS
+{
+ "candidate": "5b6367406c13ea9450b7b2598a5813a64129cbd7",
+ "tree": "6402fff8b0c8c834e7b3f6b5d7c7427d0f846933",
+ "passed": 0,
+ "total": 14
+}
