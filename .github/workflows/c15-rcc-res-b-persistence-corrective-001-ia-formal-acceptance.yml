@@ -73,6 +73,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -uo pipefail
+          set +e
           {
             echo "## IA formal acceptance"
             echo
@@ -94,6 +95,7 @@ jobs:
           IA_CANDIDATE_REPO: /__w/${{ github.workspace }}/cand
         run: |
           set -uo pipefail
+          set +e
           {
             echo
             echo "### formal environment"
@@ -110,6 +112,7 @@ jobs:
           IA_CANDIDATE_REPO: /__w/${{ github.workspace }}/cand
         run: |
           set -uo pipefail
+          set +e
           mkdir -p "review/$EV"
           python "review/$LIT/freeze_ia_probe_manifest.py" > "review/$LIT/freeze.log" 2>&1
           rc=$?
@@ -134,6 +137,7 @@ jobs:
         if: always()
         run: |
           set -uo pipefail
+          set +e
           mkdir -p "review/$EV"
           {
             echo "--- ls review IA dir ---"
@@ -154,6 +158,7 @@ jobs:
           IA_CANDIDATE_REPO: /__w/${{ github.workspace }}/cand
         run: |
           set -uo pipefail
+          set +e
           cd "review/$LIT"
           sha256sum ia_probes.py ia_child.py > probe-files.sha256
           {
@@ -183,6 +188,7 @@ jobs:
           IA_CANDIDATE_REPO: /__w/${{ github.workspace }}/cand
         run: |
           set -uo pipefail
+          set +e
           cd "review/$LIT"
           python -m pytest -v -rA -o addopts= -p no:cacheprovider \
             --timeout=1800 --tb=line ia_probes.py > FIRST_RUN.log 2>&1
@@ -204,6 +210,7 @@ jobs:
         if: always()
         run: |
           set -uo pipefail
+          set +e
           cd cand
           python -m pytest -v -o addopts= --timeout=1800 tests/c15_persistence/killpoints/test_killpoints.py > /tmp/k.txt 2>&1
           rc=$?; cp /tmp/k.txt "$GITHUB_WORKSPACE/review/$EV/02-k1-k5.log" || true
@@ -214,6 +221,7 @@ jobs:
         if: always()
         run: |
           set -uo pipefail
+          set +e
           cd cand
           python -m pytest -v -o addopts= --timeout=1800 tests/c15_persistence/test_operator_wiring.py > /tmp/w.txt 2>&1
           rc=$?; cp /tmp/w.txt "$GITHUB_WORKSPACE/review/$EV/03-production-wiring.log" || true
@@ -224,6 +232,7 @@ jobs:
         if: always()
         run: |
           set -uo pipefail
+          set +e
           cd cand
           python -m pytest -v -rs -o addopts= --timeout=1800 tests/c15_persistence/test_environment_reattach.py > /tmp/r.txt 2>&1
           rc=$?; cp /tmp/r.txt "$GITHUB_WORKSPACE/review/$EV/04-env-remote-reattach.log" || true
@@ -234,6 +243,7 @@ jobs:
         if: always()
         run: |
           set -uo pipefail
+          set +e
           cd cand
           python -m pytest -v -o addopts= --timeout=1800 tests/c15_persistence/test_resident_surface.py > /tmp/s.txt 2>&1
           rc=$?; cp /tmp/s.txt "$GITHUB_WORKSPACE/review/$EV/05-resident-surface.log" || true
@@ -244,6 +254,7 @@ jobs:
         if: always()
         run: |
           set -uo pipefail
+          set +e
           sudo install -d -m 0755 /home/user
           sudo install -d -m 0700 -o "$(id -u)" -g "$(id -g)" /home/user/c15-persistence-unit-probes
           cd cand
@@ -256,6 +267,7 @@ jobs:
         if: always()
         run: |
           set -uo pipefail
+          set +e
           cd cand
           n=$(git diff --name-only 56c01b919c397b67024df1acb320874144d87f42 HEAD -- src/aios_core/ | wc -l)
           { echo; echo "### src/aios_core zero diff vs merge-base 56c01b91: $n files"; } >> "$GITHUB_STEP_SUMMARY"
@@ -266,6 +278,7 @@ jobs:
         if: always()
         run: |
           set -uo pipefail
+          set +e
           cd cand
           python -m pytest -q -rs -o addopts= -p no:cacheprovider --timeout=3600 tests/ > /tmp/full.txt 2>&1
           rc=$?
@@ -287,6 +300,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -uo pipefail
+          set +e
           cd review
           mkdir -p "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/evidence-run"
           {
