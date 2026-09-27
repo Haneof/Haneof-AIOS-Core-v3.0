@@ -218,6 +218,9 @@ Use real process death/restart where practical.
 
 ## 10. Test environment
 
+PM environment amendment: read `governance/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CORRECTIVE_002_PY312_ENVIRONMENT_RULING_2026-09-27.md`. The frozen RED suite and source-confirmed blocker are sufficient to begin implementation when Python 3.12 is temporarily unavailable. This does not waive the Python 3.12 gate: do not declare `REVIEW_READY` until the unchanged frozen probes, required focused regressions, and full `pytest -q` are actually GREEN under Python 3.12. If implementation finishes first, stop at `IMPLEMENTATION_COMPLETE / GATE_BLOCKED_ON_PY312_ENVIRONMENT`.
+
+
 The prior failed Independent Acceptance used Python 3.11.2, below the repository-declared Core minimum. Its fresh red exploit remains valid because PM independently source-confirmed the defect, but its 735-pass full-suite run is not formal Core gate evidence.
 
 For Corrective-002 use the repository's Python 3.12 Core gate environment.
