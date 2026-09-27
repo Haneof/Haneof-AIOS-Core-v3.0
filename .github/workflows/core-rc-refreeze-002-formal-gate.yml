@@ -10,6 +10,11 @@ on:
       - "reviews/CORE_RC_REFREEZE_002/**"
       - "release/rc/CORE_RC_REFREEZE_002*"
 
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
 jobs:
   formal-python312-full-suite:
     runs-on: ubuntu-latest
@@ -32,6 +37,7 @@ jobs:
           set -euo pipefail
           pytest -q --tb=no | tee /tmp/full-pytest.txt
           tail -20 /tmp/full-pytest.txt
+          echo "::notice title=full pytest::$(tail -1 /tmp/full-pytest.txt)"
       - name: Focused authenticity / recovery / headless / scale / writer
         run: |
           set -euo pipefail
@@ -46,8 +52,12 @@ jobs:
             tests/integration/test_core_gap_fix_002_background_attempts.py \
             tests/runtime/test_turn_execution_recovery.py \
             | tee /tmp/focused-pytest.txt
+          echo "::notice title=focused pytest::$(tail -1 /tmp/focused-pytest.txt)"
+          python -c "import sys,pydantic,pytest; print('ENV', sys.version.split()[0], pydantic.VERSION, pytest.__version__)" | tee /tmp/env.txt
+          echo "::notice title=formal env::$(cat /tmp/env.txt)"
       - name: Publish freeze gate summary as PR comment
         if: github.event_name == 'pull_request'
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
