@@ -1,0 +1,19 @@
+{
+  "task": "CORE-RC-REFREEZE-002",
+  "frozen_software_sha": "27a21db5b656d441248b9240020910b66a223830",
+  "parents": [
+    "89200c55e63ce2251ecc236e25d16c57d998f93c",
+    "f65186e754d545129d0f720008be1afb331fcd73"
+  ],
+  "root_tree": "a2e6b03b306413a2d82ca4ca8c9fc7099c0dc065",
+  "core_tree": "a9618abe0b3d4ac3b08bd23dbd58f3e3f97e05d6",
+  "tests_tree": "92fcbcc5876833735fb3cb7c73a98c4a8a4a3541",
+  "historical_workflows_tree": "8d1ea1cbb9993f9ff29155e4d04833bd53b45272",
+  "source_manifest": "reviews/CORE_RC_REFREEZE_002/source_manifest.json",
+  "source_manifest_sha256": "34b3d8adfad376a9cd7170ebec3e6093d40444b03ffd61130ed79602e63e3883",
+  "authenticity_probe_blob": "6f0c3850368475e166d28d0a6df4b86b610d2c60",
+  "authenticity_probe_sha256": "35cba59f318b752ed872821961296f35810443c61db6fd98c8c8f5eee4215225",
+  "python": "3.12.14",
+  "pydantic": "2.13.5",
+  "pytest": "8.4.2"
+}
