@@ -99,3 +99,29 @@ Still prohibited:
 - enter RC-REFREEZE-002;
 - resume B persistence;
 - run Resident.
+
+
+## Amendment — conflict-free CI base
+
+The first CI-only validation PR (#228) was opened with exact head `227327c657788efb1b5de1bc26e69c35c900a85e` against live `main`, but GitHub reported `mergeable_state=dirty` because the candidate lineage and current main have governance/documentation conflicts. No Actions run was created.
+
+PM independently rechecked the candidate mandatory parent `72aed7eddf22d0d7f05e53bb3bd46ed28554f7fc` against current live main and confirmed that the drift contains:
+
+- zero `src/**` files;
+- zero `tests/**` files;
+- zero `.github/workflows/**` files.
+
+Therefore the same CI-only PR may be retargeted to a temporary validation base branch pinned exactly at the candidate mandatory parent:
+
+`ci-base/corrective-002-parent-72aed7ed-20260927 @ 72aed7eddf22d0d7f05e53bb3bd46ed28554f7fc`
+
+This amendment is valid only if:
+
+1. PR head remains exactly `227327c657788efb1b5de1bc26e69c35c900a85e`;
+2. temporary base remains exactly `72aed7eddf22d0d7f05e53bb3bd46ed28554f7fc`;
+3. the repository workflow files used for validation are unchanged between that base and current live main;
+4. no workflow/gate modification is introduced;
+5. the validation PR remains CI-only / DO NOT MERGE and is closed after evidence collection;
+6. PR #219 remains the sole integration candidate.
+
+This retargeting is only to obtain a conflict-free GitHub merge/test ref for the exact candidate; it grants no merge authority and does not change the implementation lineage.
