@@ -1,0 +1,33 @@
+CORE-RC-REFREEZE-002 environment manifest
+==========================================
+
+Formal gate (GitHub-hosted, required):
+- CPython 3.12.14
+- Pydantic 2.13.5
+- pytest 8.4.2
+- package install mode: pip install -e ".[dev]"
+- workflow: .github/workflows/core-rc-refreeze-002-formal-gate.yml
+- python-version pin: "3.12.14"
+- first successful formal-gate run: 36314420939
+- first successful formal-gate job: 108606307712
+- first successful formal-gate head: 91c93c4c (see git)
+- durable PR comment: 5855273999
+- ENV notice: ENV 3.12.14 2.13.5 8.4.2
+
+Supporting full-suite (un-pinned 3.12.x via actions/setup-python "3.12"):
+- p16-convergence-gate run 36313973884 SUCCESS in 3m19s
+- job 108605062773
+- probe head 16bfdda (workflow comments only; src/tests/pyproject identical to frozen software)
+
+Local engineer workstation:
+- CPython 3.11.2 — NOT used as formal RC evidence
+- apt/python.org/standalone 3.12.14 not available in this sandbox
+
+Relevant environment variables for operator:
+- AIOS_WORLD_PATH
+- AIOS_LOCK_PATH (validation-only; cannot select a second writer identity)
+- AIOS_MODEL_HANDLER
+- AIOS_SUBJECT_ID
+
+pyproject.toml remains range-based (pydantic>=2.10,<3 ; pytest>=8,<9 ; requires-python>=3.12).
+RC does not add a lockfile. Exact formal versions above are freeze-gate observed.

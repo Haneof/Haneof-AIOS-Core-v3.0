@@ -1,6 +1,6 @@
 # AIOS v3.0 项目全流程总地图
 
-## 当前控制入口 — 2026-09-27 CORE-BACKGROUND-RESPONSE-RECOVERY-001 CORRECTIVE-002 INTEGRATED / CORE-RC-REFREEZE-002 READY
+## 当前控制入口 — 2026-09-27 CORE-RC-REFREEZE-002 GATE / REVIEW_READY
 
 - `CORE-BACKGROUND-RESPONSE-RECOVERY-001 = DONE`；`CORE-BACKGROUND-RESPONSE-RECOVERY-001-CORRECTIVE-002 = DONE / ACCEPTED / INTEGRATED`。
 - 候选 PR #219 已正式完成 PM integration，通过标准 merge commit 合入 `main`：merge SHA = `89200c55e63ce2251ecc236e25d16c57d998f93c`。Pre-merge live main = `e1b10d86969ada6dd35598bee21cc75579aa92a1`；post-merge live main = `89200c55e63ce2251ecc236e25d16c57d998f93c`。
@@ -10,7 +10,7 @@
 - Durable Fresh IA 证据链：review-only PR #230 @ `2c846baa53c113aef7c9be88da27099c6926b2fb` ＋ PR #219 comment `5854998774`；正式报告 `reviews/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CORRECTIVE_002_INDEPENDENT_ACCEPTANCE_2026-09-27.md`；frozen 12/12 GREEN，adversarial rev2 49/49 GREEN（manifest `8ebdce5dbe8bb10e3cc6210399279cc679393d9f70e5b5fd878f0f91f028874e`），全量 `763 passed in 252.50s`（CPython 3.12.14 / Pydantic 2.13.5 / pytest 8.4.2）。Residual trust-root limitation 判定保持 `NON_BLOCKING TRUST-ROOT LIMITATION`。
 - CI 诚实裁决：PR #219 上的 15 项 workflow SUCCESS（含 `p16-convergence-gate` run `36312752392` full-core-regression 3m20s PASS）；2 项历史 fixture zero-Core-diff guard RED 诚实保留并判定为 `KNOWN FIXTURE-SCOPE / BRANCH-SHAPE NON-BLOCKING RED`（`c15-rcc-fixture` run `36312752129` 与 `c14-semantic-repair-fixture` run `36312752208`，其实体测试与回归全部 SUCCESS，仅因真实 Core 修改触发 fixture 任务的 zero Core diff 断言）。
 - 集成收据：`governance/CORE_BACKGROUND_RESPONSE_RECOVERY_001_CORRECTIVE_002_INTEGRATION_RECEIPT_2026-09-27.md`。
-- **当前唯一下一 READY 任务：`CORE-RC-REFREEZE-002 = READY`**。本窗口不执行 `CORE-RC-REFREEZE-002`，不执行 Resident A/B/C，不恢复 B persistence corrective。
+- **`CORE-RC-REFREEZE-002 = GATE / REVIEW_READY`**. PR #232. Frozen software `27a21db5b656d441248b9240020910b66a223830`; Core tree `a9618abe0b3d4ac3b08bd23dbd58f3e3f97e05d6`. Next = `CORE-RC-REFREEZE-002-INDEPENDENT-ACCEPTANCE`.
 
 - `CORE-BASELINE-001 = DONE`。
 - `CORE-GAP-AUDIT-001 = DONE`：PR #132 accepted/merged at `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`；audited Core tree `7db4f72e7b3c29c74082f9984141159f8f1d6071`。
