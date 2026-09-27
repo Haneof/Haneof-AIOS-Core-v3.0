@@ -1,0 +1,3 @@
+BRIDGE_DECISION_REQUEST /home/user/a003_run/decisions/pending/dec-00025.json
+BRIDGE_DECISION_ACCEPTED dec-00025 kind=response
+{"assistant_observation_id": "obs_conv_ai_d3bdb15c478ea4703e053cdc", "idempotent_replay": false, "model_rounds": 1, "response": "对上了。我这边的完整时间线：14:16 第一次上传被 registry 拒绝（checksum mismatch，未发布）→ 15:02 第二次上传成功，tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED——完成记录齐全之后才对你说的『已发布』。你通知门店的时机是对的。staging 收尾协作我会继续挂着，有新工作项或者发布链路上再出现任何异常，我按老规矩汇报。", "silenced": false, "status": "turn_completed", "summary_commits": 0, "summary_error": null, "termination_reason": "responded", "user_observation_id": "obs_conv_user_23578647b968e2d6b956c99f", "world_revision": 38}

@@ -1,0 +1,5 @@
+BRIDGE_DECISION_REQUEST /home/user/a003_run/decisions/pending/dec-00020.json
+BRIDGE_DECISION_ACCEPTED dec-00020 kind=capability_calls
+BRIDGE_DECISION_REQUEST /home/user/a003_run/decisions/pending/dec-00021.json
+BRIDGE_DECISION_ACCEPTED dec-00021 kind=response
+{"index_watermark": 29, "periodic_review": {"review_id": "wake_review_8901873e11f00a82016be2a8", "revision": 3, "state": "completed", "termination_reason": "responded", "wake_id": "wake_review_8901873e11f00a82016be2a8"}, "status": "due_processed", "wakes": [], "world_revision": 29}

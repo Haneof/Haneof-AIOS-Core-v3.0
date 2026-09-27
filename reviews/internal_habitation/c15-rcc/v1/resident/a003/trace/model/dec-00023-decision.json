@@ -1,0 +1,45 @@
+{
+  "kind": "capability_calls",
+  "capability_calls": [
+    {
+      "name": "revise_claim",
+      "call_id": "a003-dec00023-c1",
+      "arguments": {
+        "target_ref": {
+          "object_id": "clm_d5f6cb68fdb74636f46360e7",
+          "revision": 5
+        },
+        "reason": "用户确立常设证据纪律：准备/排队状态与确实完成必须分开表述，无完成记录一律按未确认完成处理",
+        "evidence_refs": [
+          {
+            "object_id": "obs_conv_user_4c8e9b2b461d49d54a6b9b2c",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_conv_user_927ee5cc74d44361ae250a13",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_conv_user_f7b830f25b3697bd8bca5e04",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_conv_user_d146b3307019a9d0e5da24d2",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_conv_user_454b687321cebbc7608323de",
+            "revision": 1
+          }
+        ],
+        "replacement_content": "用户与我的协作协议（2026-11-02 起确立，用户已表示对低风险实现节奏长期保持）：(1) 日常工程细节与测试环境等低风险实现细节由我自行决定，不逐步确认或汇报；(2) 完成时给出可直接使用的结果，按节点汇报结果与关键风险；(3) 影响生产、删除数据或产生费用的事项必须单独提出；触及修改生产数据的边界时一次性集中列出决策点；(4) 生产删除有硬边界：必须先给出具体对象、影响范围与回滚办法并获用户明确确认，随口语语不构成删除授权；(5) 证据纪律（常设）：『准备提交/已排队』与『确实完成』必须分开表述；没有完成记录时一律按未确认完成处理，不向用户或第三方传递完成暗示。",
+        "confidence": 0.98
+      }
+    }
+  ],
+  "provenance": {
+    "provider": "arena-agent-mode",
+    "model": "resident-a-fresh-instance",
+    "request_id": "a003run-01c3a44b-dec00023"
+  }
+}
