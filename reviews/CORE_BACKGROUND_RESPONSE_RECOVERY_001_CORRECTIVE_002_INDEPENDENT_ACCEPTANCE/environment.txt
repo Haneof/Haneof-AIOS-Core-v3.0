@@ -1,0 +1,25 @@
+# Fresh Independent Acceptance - exact execution environment (publication copy)
+
+Recorded during CORE-BACKGROUND-RESPONSE-RECOVERY-001-CORRECTIVE-002-INDEPENDENT-ACCEPTANCE
+on 2026-09-27. This was the reviewer's OWN formal execution environment for the fresh
+Independent Acceptance (not merely a citation of the PM CI gate):
+
+  Python:   CPython 3.12.14 (built from CPython v3.12.14 source tag in the review
+            sandbox; runtime reported: "3.12.14 (main, Sep 27 2026, 09:12:17)")
+  Pydantic: 2.13.5   (pydantic-core 2.46.5)
+  pytest:   8.4.2
+
+Supporting build components of the same interpreter used for all runs:
+  sqlite3:  3.38.2 (vendored amalgamation, static)
+  OpenSSL:  3.0.20
+  zlib:     1.3.1
+
+All published test outputs in this evidence directory were produced under exactly
+this environment on exactly the tested implementation identity:
+
+  tested exact candidate: 227327c657788efb1b5de1bc26e69c35c900a85e
+  parent:                 72aed7eddf22d0d7f05e53bb3bd46ed28554f7fc
+  tree:                   01dfa445414543aab41e1b74b813bbff80b21c5c
+
+Invocation pattern (from the review workspace):
+  PYTHONPATH=<repo>/src /home/user/py312/bin/python3.12 -m pytest ...
