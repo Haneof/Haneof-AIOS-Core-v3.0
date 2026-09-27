@@ -91,6 +91,11 @@ jobs:
       - name: Historical persistence journal tests (frozen WIP, must stay green)
         run: |
           set -euo pipefail
+          # The frozen historical journal/test pair intentionally pins /home/user
+          # as its original workspace contract. Recreate that host path in CI so
+          # the historical bytes execute unchanged rather than rewriting them.
+          sudo install -d -m 0755 /home/user
+          sudo install -d -m 0700 -o "$(id -u)" -g "$(id -g)" /home/user/c15-persistence-unit-probes
           python -m unittest discover -s tests/c15_persistence -p "test_journal.py" -v \
             | tee /tmp/journal.txt
 
