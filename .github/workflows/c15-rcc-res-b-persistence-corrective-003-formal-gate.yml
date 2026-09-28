@@ -83,8 +83,9 @@ jobs:
           git fetch --no-tags origin "${{ github.base_ref }}"
           mapfile -t core_files < <(git diff --name-only "origin/${{ github.base_ref }}...HEAD" -- src/aios_core)
           printf 'Core diff files:\n%s\n' "${core_files[*]:-<none>}"
-          [ "${#core_files[@]}" -eq 1 ]
-          [ "${core_files[0]}" = "src/aios_core/runtime/turn_runtime.py" ]
+          [ "${#core_files[@]}" -eq 2 ]
+          [ "${core_files[0]}" = "src/aios_core/runtime/background_attempt.py" ]
+          [ "${core_files[1]}" = "src/aios_core/runtime/turn_runtime.py" ]
 
       - name: Publish formal summary
         if: always() && github.event_name == 'pull_request'
