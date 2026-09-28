@@ -1,0 +1,153 @@
+{
+  "schema": "aios-core-release-candidate-manifest-v1",
+  "task": "CORE-RC-REFREEZE-003",
+  "repository": "Haneof/Haneof-AIOS-Core-v3.0",
+  "status": "REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE",
+  "exit_target": "REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE",
+  "frozen_software": {
+    "sha": "f20f2edfa7af00d0286493fd15196ca9503bc315",
+    "parents": [
+      "0df757e9666c2c75571df7a7a3dedf27d44e5b7f",
+      "a73e186d40688f5dc181b1128a62eff37a974409"
+    ],
+    "repository_tree": "1ac3a675b884167d3a29aa432e7ef3eaff94d404",
+    "src_aios_core_tree": "9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623",
+    "tests_tree": "7e33b5ef8432370234965d3ccd61248c703c4019",
+    "release_workflows_tree": "fb168f8540070ff7b0c521e5990b03c7f3c56bf4",
+    "pyproject_blob": "b38833c7537fa60d5c2f02ed4bb19158d8995a11",
+    "pyproject_sha256": "993a6e9dd821d8d5885f4cc1f2da0aa34d40284618097a1de507e885f2eaab30",
+    "source_manifest": "reviews/CORE_RC_REFREEZE_003/source_manifest.json",
+    "source_manifest_sha256": "837bba36ef5ff84640e66a662a213f3c4f763f2412b94495e8c9bec35c3ddf84"
+  },
+  "live_main_at_fresh_fetch": {
+    "ref": "origin/main",
+    "sha": "c532b9fe3dfff594ee0b68bcac4fff6160f8b4b5",
+    "observed_utc": "2026-09-28T14:34:40Z",
+    "note": "Point-in-time governance/source audit only; not a permanent baseline.",
+    "commits_after_frozen_software": 7,
+    "protected_implementation_drift_count": 0,
+    "post_target_delta": [
+      "AIOS_v3.0_CURRENT_CHECKPOINT.md",
+      "governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md",
+      "governance/CORE_BACKGROUND_TRUSTED_RETURN_RECOVERY_001_CORRECTIVE_001_IA2_SUPPLEMENTAL_EVIDENCE_ADJUDICATION_2026-09-28.md",
+      "governance/CORE_BACKGROUND_TRUSTED_RETURN_RECOVERY_001_CORRECTIVE_001_INTEGRATION_RECEIPT_2026-09-28.md",
+      "governance/prompts/CORE_RC_REFREEZE_003_2026-09-28.md"
+    ]
+  },
+  "accepted_core_integration": {
+    "implementation_pr": 264,
+    "accepted_exact": "a73e186d40688f5dc181b1128a62eff37a974409",
+    "independent_acceptance_evidence": "eeda251e057e98b15a919694af4689786faf8c55",
+    "independent_verdict": "ACCEPTANCE_PASS / blocker=0",
+    "post_merge_software_point": "f20f2edfa7af00d0286493fd15196ca9503bc315",
+    "integration_receipt": "governance/CORE_BACKGROUND_TRUSTED_RETURN_RECOVERY_001_CORRECTIVE_001_INTEGRATION_RECEIPT_2026-09-28.md"
+  },
+  "prior_rc": {
+    "task": "CORE-RC-REFREEZE-002",
+    "frozen_software_sha": "27a21db5b656d441248b9240020910b66a223830",
+    "core_tree": "a9618abe0b3d4ac3b08bd23dbd58f3e3f97e05d6",
+    "status": "HISTORICAL_FOR_PRIOR_RC_ONLY"
+  },
+  "rc_impact": {
+    "disposition": "FRESH_A_REQUIRED",
+    "a003": "HISTORICAL_FOR_PRIOR_RC_ONLY",
+    "hash_swap_a003_allowed": false,
+    "fresh_a_task_after_independent_acceptance_and_integration": "C15-RCC-RES-A-RERUN-004",
+    "a004_run_in_this_task": false
+  },
+  "open_pr_contamination_review": {
+    "report": "reviews/CORE_RC_REFREEZE_003/open_pr_contamination_review.md",
+    "paginated_snapshot": "reviews/CORE_RC_REFREEZE_003/open_pr_snapshot.json",
+    "snapshot_utc": "2026-09-28T13:43:50Z",
+    "open_pr_count": 31,
+    "all_file_pages_drained": true,
+    "candidate_pr_not_yet_open_at_snapshot": true,
+    "content_imported_from_open_prs": false
+  },
+  "formal_environment": {
+    "python": "CPython 3.12.14",
+    "pydantic": "2.13.5",
+    "pytest": "8.4.2",
+    "sqlite": "3.45.1",
+    "os_release": "Ubuntu 24.04.5 LTS",
+    "kernel": "Linux runnervmtr4k5 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+    "architecture": "x86_64",
+    "environment_manifest": "reviews/CORE_RC_REFREEZE_003/environment_manifest.txt",
+    "dependency_lockfile_present": false,
+    "formal_workflow": ".github/workflows/core-rc-refreeze-003-formal-gate.yml",
+    "python_sys_version": "3.12.14 (main, Aug 13 2026, 02:47:42) [GCC 13.3.0]",
+    "primary_run_id": 36436264055,
+    "primary_job_id": 108974868566,
+    "primary_candidate_head": "f2ef4886cbd7253543e82debbaa14ea387417f03",
+    "primary_run_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/actions/runs/36436264055",
+    "formal_pip_freeze_artifact_file": "formal-pip-freeze.txt",
+    "clean_install_pip_freeze_artifact_file": "clean-install-pip-freeze.txt"
+  },
+  "fresh_regression": {
+    "target_sha": "f20f2edfa7af00d0286493fd15196ca9503bc315",
+    "complete_pytest": "PASS: 919 tests; 0 failures; 0 errors; 0 skipped; JUnit case-time sum 202.963s",
+    "trusted_return_r1_r5_and_22_capability_matrix": "PASS: 248 focused tests; 0 failures/errors/skips; registry 43 total / 22 side-effecting; exact 22-row match",
+    "world_wake_review_c14_cognition_headless_recovery_scale": "PASS: 356 focused tests; 0 failures/errors/skips",
+    "clean_wheel_install_headless": "PASS: HEADLESS_CLEAN_INSTALL_PASS; five processes; deterministic adapter only",
+    "backup_restore_index_rebuild_trusted_return": "PASS: BACKUP_RESTORE_TRUSTED_RETURN_PASS; immutable backup; no provider redispatch; no duplicate capability effect",
+    "writer_restart_and_no_duplicate_dispatch_meter_effect": "PASS in complete and focused headless/recovery regressions; backup probe confirms redispatch=0, two meter rows and one capability effect",
+    "real_software_blocker": "NONE_OBSERVED_IN_FORMAL_GATE",
+    "run_id": 36436264055,
+    "job_id": 108974868566,
+    "junit_paths": [
+      "hosted-artifact/ci-output/full-regression-junit.xml",
+      "hosted-artifact/ci-output/trusted-return-junit.xml",
+      "hosted-artifact/ci-output/core-systems-junit.xml"
+    ],
+    "candidate_head": "f2ef4886cbd7253543e82debbaa14ea387417f03",
+    "candidate_parent": "32be415d8dbb8c20fd8d8278db9399d29494844d",
+    "candidate_tree": "ae4bb3fee7de74f894bc64b790c4a7d114e4be13",
+    "run_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/actions/runs/36436264055",
+    "run_conclusion": "success"
+  },
+  "evidence": {
+    "source_manifest": "reviews/CORE_RC_REFREEZE_003/source_manifest.json",
+    "open_pr_contamination_review": "reviews/CORE_RC_REFREEZE_003/open_pr_contamination_review.md",
+    "full_regression": "reviews/CORE_RC_REFREEZE_003/full_regression.md",
+    "focused_regressions": "reviews/CORE_RC_REFREEZE_003/focused_regressions.md",
+    "headless_smoke": "reviews/CORE_RC_REFREEZE_003/headless_smoke.md",
+    "backup_restore_rebuild": "reviews/CORE_RC_REFREEZE_003/backup_restore_rebuild_smoke.md",
+    "writer_restart": "reviews/CORE_RC_REFREEZE_003/writer_restart_smoke.md",
+    "trusted_return_spot_checks": "reviews/CORE_RC_REFREEZE_003/trusted_return_authenticity_spot_checks.md",
+    "legacy_fix_spot_checks": "reviews/CORE_RC_REFREEZE_003/legacy_fix_spot_checks.md",
+    "no_second_truth_store": "reviews/CORE_RC_REFREEZE_003/no_second_truth_store.md",
+    "known_limitations": "reviews/CORE_RC_REFREEZE_003/known_limitations.md",
+    "rc_impact_adjudication": "reviews/CORE_RC_REFREEZE_003/rc_impact_adjudication.md",
+    "sha256_checksums": "reviews/CORE_RC_REFREEZE_003/SHA256SUMS",
+    "formal_gate_run": "reviews/CORE_RC_REFREEZE_003/formal_gate_run.json",
+    "environment_manifest": "reviews/CORE_RC_REFREEZE_003/environment_manifest.txt"
+  },
+  "candidate_pin": {
+    "pr_number": 269,
+    "head_sha": null,
+    "parent_sha": null,
+    "tree_sha": null,
+    "pin_location": "Non-self-referential PR description/comment after the final evidence-only candidate receives its fresh head check.",
+    "public_tag_or_release_authorized": false
+  },
+  "independent_acceptance": {
+    "required": true,
+    "performed_by_candidate_author": false,
+    "status": "PENDING_NOT_PERFORMED",
+    "merge_authorized": false
+  },
+  "scope_exclusions": {
+    "resident_a_b_c_run": false,
+    "persistence_corrective_003_resumed": false,
+    "c15_evaluator_or_close_entered": false,
+    "pr_263_or_pr_265_modified_or_merged": false
+  },
+  "actions_artifact": {
+    "name": "core-rc-refreeze-003-36436264055",
+    "artifact_id": 10976116271,
+    "size_bytes": 46758,
+    "server_reported_sha256": "783b04438acbb982b584c3b6457727604d45695558a46f7d12a3574399bacb71",
+    "downloaded_to_sandbox": false,
+    "provenance_record": "reviews/CORE_RC_REFREEZE_003/formal_gate_run.json"
+  }
+}

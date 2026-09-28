@@ -1,0 +1,379 @@
+name: core-rc-refreeze-003-formal-gate
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/core-rc-refreeze-003-formal-gate.yml"
+      - "release/rc/CORE_RC_REFREEZE_003*"
+      - "reviews/CORE_RC_REFREEZE_003/**"
+      - "governance/CORE_RC_REFREEZE_003*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: core-rc-refreeze-003-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  frozen-software-regression:
+    name: frozen f20f2ed software / CPython 3.12.14
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout exact candidate evidence head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Select formal CPython
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.14"
+
+      - name: Pin and verify exact frozen software tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          target="f20f2edfa7af00d0286493fd15196ca9503bc315"
+          target_dir="$RUNNER_TEMP/aios-rc003-frozen-software"
+          mkdir -p "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_003/ci-output"
+          git cat-file -e "$target^{commit}"
+          git worktree add --detach "$target_dir" "$target"
+          test "$(git -C "$target_dir" rev-parse HEAD)" = "$target"
+          test "$(git -C "$target_dir" rev-parse HEAD^{tree})" = "1ac3a675b884167d3a29aa432e7ef3eaff94d404"
+          test "$(git -C "$target_dir" rev-parse HEAD:src/aios_core)" = "9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623"
+          test "$(git -C "$target_dir" rev-parse HEAD:tests)" = "7e33b5ef8432370234965d3ccd61248c703c4019"
+          test "$(git -C "$target_dir" rev-parse HEAD:.github/workflows)" = "fb168f8540070ff7b0c521e5990b03c7f3c56bf4"
+          printf 'target=%s\nrepo_tree=%s\ncore_tree=%s\ntests_tree=%s\nworkflow_tree=%s\n' \
+            "$target" \
+            "$(git -C "$target_dir" rev-parse HEAD^{tree})" \
+            "$(git -C "$target_dir" rev-parse HEAD:src/aios_core)" \
+            "$(git -C "$target_dir" rev-parse HEAD:tests)" \
+            "$(git -C "$target_dir" rev-parse HEAD:.github/workflows)" \
+            | tee "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_003/ci-output/frozen_identity.txt"
+          echo "AIOS_RC_TARGET_ROOT=$target_dir" >> "$GITHUB_ENV"
+          echo "RC003_OUTPUT=$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_003/ci-output" >> "$GITHUB_ENV"
+
+
+      - name: Create isolated formal environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m venv "$RUNNER_TEMP/rc003-formal-venv"
+          "$RUNNER_TEMP/rc003-formal-venv/bin/python" -m pip install --upgrade pip
+          "$RUNNER_TEMP/rc003-formal-venv/bin/python" -m pip install \
+            -e "$AIOS_RC_TARGET_ROOT" \
+            "pydantic==2.13.5" \
+            "pytest==8.4.2"
+
+      - name: Record exact formal environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RC003_OUTPUT"
+          {
+            echo "task=CORE-RC-REFREEZE-003"
+            echo "software_sha=f20f2edfa7af00d0286493fd15196ca9503bc315"
+            echo "python=$("$RUNNER_TEMP/rc003-formal-venv/bin/python" -c 'import sys; print(sys.version.replace("\n", " "))')"
+            echo "implementation=$("$RUNNER_TEMP/rc003-formal-venv/bin/python" -c 'import platform; print(platform.python_implementation())')"
+            echo "pydantic=$("$RUNNER_TEMP/rc003-formal-venv/bin/python" -c 'import pydantic; print(pydantic.__version__)')"
+            echo "pytest=$("$RUNNER_TEMP/rc003-formal-venv/bin/python" -c 'import pytest; print(pytest.__version__)')"
+            echo "sqlite=$("$RUNNER_TEMP/rc003-formal-venv/bin/python" -c 'import sqlite3; print(sqlite3.sqlite_version)')"
+            echo "platform=$("$RUNNER_TEMP/rc003-formal-venv/bin/python" -c 'import platform; print(platform.platform())')"
+            echo "system=$(uname -a)"
+            echo "architecture=$(uname -m)"
+            echo "os_release=$(grep '^PRETTY_NAME=' /etc/os-release | cut -d= -f2- | tr -d '\"')"
+            echo "candidate_head=${{ github.event.pull_request.head.sha || github.sha }}"
+            echo "workflow_run_id=${{ github.run_id }}"
+          } | tee "$RC003_OUTPUT/environment_manifest.txt"
+          "$RUNNER_TEMP/rc003-formal-venv/bin/python" -m pip freeze \
+            | tee "$RC003_OUTPUT/formal-pip-freeze.txt"
+          "$RUNNER_TEMP/rc003-formal-venv/bin/python" -c \
+            'import aios_core; print("formal_import=" + aios_core.__file__)' \
+            | tee "$RC003_OUTPUT/formal-import.txt"
+
+      - name: Complete repository pytest on exact frozen software
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$AIOS_RC_TARGET_ROOT"
+          "$RUNNER_TEMP/rc003-formal-venv/bin/python" -m pytest \
+            -o addopts='' -q --tb=no \
+            --junitxml="$RC003_OUTPUT/full-regression-junit.xml" \
+            | tee "$RC003_OUTPUT/full-regression.txt"
+
+      - name: Trusted-return R1-R5 / replay / authenticity / process-loss / recovery matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$AIOS_RC_TARGET_ROOT"
+          "$RUNNER_TEMP/rc003-formal-venv/bin/python" -m pytest \
+            -o addopts='' -q --tb=short \
+            --junitxml="$RC003_OUTPUT/trusted-return-junit.xml" \
+            tests/integration/test_core_background_trusted_return_recovery_001.py \
+            tests/integration/test_core_background_trusted_return_adversarial_001.py \
+            tests/integration/test_core_background_trusted_return_r5_001.py \
+            tests/integration/test_core_background_trusted_return_r5_conflicts_001.py \
+            tests/integration/test_core_background_trusted_return_corrective_001_capability_replay.py \
+            tests/integration/test_core_background_trusted_return_corrective_001_store_fail_closed.py \
+            tests/integration/test_core_background_trusted_return_corrective_001_process_loss.py \
+            tests/integration/test_core_background_response_recovery_001.py \
+            tests/integration/test_core_background_response_recovery_001_corrective_001.py \
+            tests/integration/test_core_background_response_recovery_001_corrective_002_authenticity.py \
+            tests/integration/test_core_background_response_recovery_001_corrective_002_recovery.py \
+            tests/integration/test_core_gap_fix_002_background_attempts.py \
+            tests/runtime/test_background_model_attempt.py \
+            tests/runtime/test_cognitive_runtime_trusted_return.py \
+            tests/runtime/test_turn_execution_recovery.py \
+            | tee "$RC003_OUTPUT/trusted-return-regression.txt"
+          AIOS_RC_TARGET_ROOT="$AIOS_RC_TARGET_ROOT" \
+          PYTHONPATH="$AIOS_RC_TARGET_ROOT/src:$AIOS_RC_TARGET_ROOT/tests/integration" \
+            "$RUNNER_TEMP/rc003-formal-venv/bin/python" \
+            "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_003/probes/trusted_return_registry_inventory.py" \
+            | tee "$RC003_OUTPUT/trusted-return-registry-inventory.txt"
+
+      - name: World / index / Wake / Review / C14 / cognition / headless / recovery / SCALE
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$AIOS_RC_TARGET_ROOT"
+          "$RUNNER_TEMP/rc003-formal-venv/bin/python" -m pytest \
+            -o addopts='' -q --tb=short \
+            --junitxml="$RC003_OUTPUT/core-systems-junit.xml" \
+            tests/unit/test_observation.py \
+            tests/unit/test_store.py \
+            tests/unit/test_world_revision_atomicity.py \
+            tests/integration/test_m0_prime_store_delta_and_search.py \
+            tests/integration/test_v3_world_map_cockpit.py \
+            tests/integration/test_v3_wake_dispatch.py \
+            tests/integration/test_v3_attention_watch.py \
+            tests/integration/test_v3_execution_world.py \
+            tests/integration/test_v3_periodic_review.py \
+            tests/integration/test_v3_fused_turn_runtime.py \
+            tests/integration/test_v3_ai_world.py \
+            tests/integration/test_v3_cognition_revision.py \
+            tests/integration/test_v3_cognition_writeback.py \
+            tests/integration/test_v3_c15_cognition_evidence_policy.py \
+            tests/integration/test_v3_c15_cognition_fields.py \
+            tests/integration/test_v3_constitutional_cognition_closure.py \
+            tests/integration/test_v3_c14_cognitive_derivation_runtime.py \
+            tests/integration/test_v3_c14_cognitive_derivation_scheduler.py \
+            tests/integration/test_v3_completeness_closure.py \
+            tests/integration/test_v3_background_budget_gate.py \
+            tests/integration/test_v3_dimension_summary.py \
+            tests/integration/test_v3_summary_hierarchy.py \
+            tests/integration/test_v3_long_context_continuity.py \
+            tests/integration/test_v3_memory_recommendation.py \
+            tests/runtime/test_cognitive_runtime.py \
+            tests/runtime/test_metering_ledger.py \
+            tests/habitation/test_t28_proactive_memory_boundary.py \
+            tests/integration/test_core_headless.py \
+            tests/integration/test_core_recovery.py \
+            tests/integration/test_core_scale_semantics.py \
+            tests/habitation \
+            | tee "$RC003_OUTPUT/core-systems-regression.txt"
+
+      - name: Clean wheel install and headless lifecycle smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          wheel_dir="$RUNNER_TEMP/rc003-wheel"
+          smoke_venv="$RUNNER_TEMP/rc003-clean-install-venv"
+          mkdir -p "$wheel_dir"
+          "$RUNNER_TEMP/rc003-formal-venv/bin/python" -m pip wheel \
+            --no-deps "$AIOS_RC_TARGET_ROOT" -w "$wheel_dir" \
+            | tee "$RC003_OUTPUT/wheel-build.txt"
+          wheel="$(find "$wheel_dir" -maxdepth 1 -type f -name 'aios_core-*.whl' -print -quit)"
+          test -n "$wheel"
+          python -m venv "$smoke_venv"
+          "$smoke_venv/bin/python" -m pip install --upgrade pip \
+            | tee "$RC003_OUTPUT/clean-install-pip.txt"
+          "$smoke_venv/bin/python" -m pip install \
+            "pydantic==2.13.5" "$wheel" \
+            | tee -a "$RC003_OUTPUT/clean-install-pip.txt"
+          "$smoke_venv/bin/python" -m pip freeze \
+            | tee "$RC003_OUTPUT/clean-install-pip-freeze.txt"
+          "$smoke_venv/bin/python" \
+            "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_003/probes/clean_install_headless_smoke.py" \
+            "$smoke_venv/bin/aios-core-headless" \
+            | tee "$RC003_OUTPUT/clean-install-headless-smoke.txt"
+
+      - name: Backup / restore / index rebuild / writer recovery proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$AIOS_RC_TARGET_ROOT"
+          PYTHONPATH="$AIOS_RC_TARGET_ROOT/src" \
+          AIOS_RC_TARGET_ROOT="$AIOS_RC_TARGET_ROOT" \
+            "$RUNNER_TEMP/rc003-formal-venv/bin/python" \
+            "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_003/probes/backup_restore_trusted_return.py" \
+            | tee "$RC003_OUTPUT/backup-restore-trusted-return.txt"
+
+      - name: Publish compact evidence summary in check annotations
+        if: always()
+        shell: bash
+        env:
+          JOB_STATUS: ${{ job.status }}
+          CANDIDATE_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          output_dir="${RC003_OUTPUT:-$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_003/ci-output}"
+          summary_path="$output_dir/rc003_gate_summary.md"
+          json_path="$output_dir/rc003_gate_summary.json"
+          mkdir -p "$output_dir"
+          python - "$output_dir" "$summary_path" "$json_path" <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import sys
+          import xml.etree.ElementTree as ET
+
+          out = Path(sys.argv[1])
+          markdown_path = Path(sys.argv[2])
+          json_path = Path(sys.argv[3])
+          target = "f20f2edfa7af00d0286493fd15196ca9503bc315"
+
+          def junit(name):
+              path = out / name
+              if not path.exists():
+                  return {"status": "NOT_RUN", "tests": None, "failures": None, "errors": None, "skipped": None, "time": None}
+              root = ET.parse(path).getroot()
+              cases = root.findall(".//testcase")
+              elapsed = root.attrib.get("time")
+              if not elapsed:
+                  elapsed = f"{sum(float(case.attrib.get('time', '0')) for case in cases):.3f}"
+              return {
+                  "status": "RECORDED",
+                  "tests": int(root.attrib.get("tests", len(cases))),
+                  "failures": int(root.attrib.get("failures", sum(bool(c.findall("failure")) for c in cases))),
+                  "errors": int(root.attrib.get("errors", sum(bool(c.findall("error")) for c in cases))),
+                  "skipped": int(root.attrib.get("skipped", sum(bool(c.findall("skipped")) for c in cases))),
+                  "time": elapsed,
+              }
+
+          def marker(path):
+              if not path.exists():
+                  return None
+              for line in reversed(path.read_text(encoding="utf-8", errors="replace").splitlines()):
+                  if line.startswith("RESULT="):
+                      try:
+                          return json.loads(line.removeprefix("RESULT="))
+                      except json.JSONDecodeError:
+                          return {"status": "UNPARSEABLE_RESULT_MARKER"}
+              return None
+
+          env_path = out / "environment_manifest.txt"
+          env = {}
+          if env_path.exists():
+              env = dict(line.split("=", 1) for line in env_path.read_text().splitlines() if "=" in line)
+          evidence_sha256 = {
+              path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+              for path in sorted(out.iterdir())
+              if path.is_file()
+          }
+          results = {
+              "job_status": os.environ.get("JOB_STATUS", "unknown"),
+              "run_id": os.environ.get("GITHUB_RUN_ID"),
+              "candidate_head": os.environ.get("CANDIDATE_HEAD"),
+              "event_sha": os.environ.get("GITHUB_SHA"),
+              "target_sha": target,
+              "formal_environment": env,
+              "full_pytest": junit("full-regression-junit.xml"),
+              "trusted_return_pytest": junit("trusted-return-junit.xml"),
+              "core_systems_pytest": junit("core-systems-junit.xml"),
+              "registry": marker(out / "trusted-return-registry-inventory.txt"),
+              "clean_install_headless": marker(out / "clean-install-headless-smoke.txt"),
+              "backup_restore_trusted_return": marker(out / "backup-restore-trusted-return.txt"),
+              "evidence_file_sha256": evidence_sha256,
+          }
+          json_path.write_text(json.dumps(results, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          def short_test(name, result):
+              if result["status"] != "RECORDED":
+                  return f"{name}: {result['status']}"
+              return (f"{name}: tests={result['tests']} failures={result['failures']} "
+                      f"errors={result['errors']} skipped={result['skipped']} "
+                      f"junit_case_time_sum={result['time']}s")
+          lines = [
+              "# CORE-RC-REFREEZE-003 formal run summary",
+              "",
+              f"- Job status: **{results['job_status']}**",
+              f"- GitHub run: `{results['run_id']}`; candidate head: `{results['candidate_head']}`",
+              f"- Pull-request event SHA (GITHUB_SHA): `{results['event_sha']}`",
+              f"- Frozen software: `{target}`",
+              f"- Environment: Python `{env.get('python','unknown')}`; Pydantic `{env.get('pydantic','unknown')}`; pytest `{env.get('pytest','unknown')}`; SQLite `{env.get('sqlite','unknown')}`; OS `{env.get('os_release','unknown')}`; architecture `{env.get('architecture','unknown')}`",
+              f"- Kernel: `{env.get('system','unknown')}`",
+              f"- {short_test('Full repository pytest', results['full_pytest'])}",
+              f"- {short_test('Trusted-return/recovery focused pytest', results['trusted_return_pytest'])}",
+              f"- {short_test('Core systems focused pytest', results['core_systems_pytest'])}",
+              f"- Registry: `{(results['registry'] or {}).get('status','NOT_RUN')}`; total `{(results['registry'] or {}).get('total_reachable_capabilities','unknown')}`; side-effecting `{(results['registry'] or {}).get('side_effecting_capabilities','unknown')}`",
+              f"- Clean install/headless: `{(results['clean_install_headless'] or {}).get('status','NOT_RUN')}`",
+              f"- Backup/restore/rebuild: `{(results['backup_restore_trusted_return'] or {}).get('status','NOT_RUN')}`; backup immutable `{(results['backup_restore_trusted_return'] or {}).get('source_backup_immutable','unknown')}`; provider redispatch `{(results['backup_restore_trusted_return'] or {}).get('provider_redispatch_count_after_restore','unknown')}`",
+          ]
+          lines.append(
+              "- Registry exact side-effecting capability matrix: `"
+              + json.dumps(results["registry"] or {}, sort_keys=True, separators=(",", ":"))
+              + "`"
+          )
+          lines.append(
+              "- Clean-install/headless lifecycle record: `"
+              + json.dumps(results["clean_install_headless"] or {}, sort_keys=True, separators=(",", ":"))
+              + "`"
+          )
+          lines.append(
+              "- Backup/restore/index-rebuild record: `"
+              + json.dumps(results["backup_restore_trusted_return"] or {}, sort_keys=True, separators=(",", ":"))
+              + "`"
+          )
+          lines.extend(
+              f"- Artifact SHA-256 `{name}`: `{digest}`"
+              for name, digest in sorted(evidence_sha256.items())
+          )
+          lines.append(
+              f"- Gate JSON summary SHA-256: `{hashlib.sha256(json_path.read_bytes()).hexdigest()}`"
+          )
+          markdown_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+          PY
+          cat "$summary_path" >> "$GITHUB_STEP_SUMMARY"
+          python - "$summary_path" <<'PY2'
+          from pathlib import Path
+          import sys
+          lines = Path(sys.argv[1]).read_text(encoding="utf-8").splitlines()
+          section_starts = (
+              "- Registry exact side-effecting capability matrix:",
+              "- Clean-install/headless lifecycle record:",
+              "- Backup/restore/index-rebuild record:",
+          )
+          sections = []
+          current = []
+          in_artifact_hashes = False
+          for line in lines:
+              is_artifact_hash = line.startswith("- Artifact SHA-256")
+              if (line.startswith(section_starts) or (is_artifact_hash and not in_artifact_hashes)) and current:
+                  sections.append("\n".join(current))
+                  current = []
+              if line.startswith(section_starts):
+                  in_artifact_hashes = False
+              elif is_artifact_hash:
+                  in_artifact_hashes = True
+              current.append(line)
+          if current:
+              sections.append("\n".join(current))
+          messages = []
+          for section in sections:
+              messages.extend(section[offset:offset + 3000] for offset in range(0, len(section), 3000))
+          for index, section in enumerate(messages, start=1):
+              message = f"[RC003 evidence section {index}/{len(messages)}]\n{section}"
+              message = message.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+              print(f"::notice file=.github/workflows/core-rc-refreeze-003-formal-gate.yml,line=1,title=RC003 formal evidence::{message}")
+          PY2
+
+      - name: Upload reproducible RC regression and smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-rc-refreeze-003-${{ github.run_id }}
+          if-no-files-found: warn
+          path: reviews/CORE_RC_REFREEZE_003/ci-output/

@@ -1,0 +1,54 @@
+CORE-RC-REFREEZE-003 formal environment manifest
+================================================
+
+Status: FORMAL GATE PASS. This is evidence for independent acceptance, not an acceptance verdict.
+Repository: Haneof/Haneof-AIOS-Core-v3.0
+Frozen software SHA: f20f2edfa7af00d0286493fd15196ca9503bc315
+Frozen repository tree: 1ac3a675b884167d3a29aa432e7ef3eaff94d404
+Frozen src/aios_core tree: 9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623
+Frozen tests tree: 7e33b5ef8432370234965d3ccd61248c703c4019
+Frozen .github/workflows tree: fb168f8540070ff7b0c521e5990b03c7f3c56bf4
+
+Formal interpreter: CPython 3.12.14
+Python sys.version: 3.12.14 (main, Aug 13 2026, 02:47:42) [GCC 13.3.0]
+Pydantic: 2.13.5
+pytest: 8.4.2
+SQLite runtime version: 3.45.1
+OS release: Ubuntu 24.04.5 LTS
+Kernel: Linux runnervmtr4k5 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+Architecture: x86_64
+
+Formal workflow: .github/workflows/core-rc-refreeze-003-formal-gate.yml
+Primary evidence run: 36436264055
+Run URL: https://github.com/Haneof/Haneof-AIOS-Core-v3.0/actions/runs/36436264055
+Job/check ID: 108974868566
+Candidate head used by that run: f2ef4886cbd7253543e82debbaa14ea387417f03
+Candidate parent: 32be415d8dbb8c20fd8d8278db9399d29494844d
+Candidate tree: ae4bb3fee7de74f894bc64b790c4a7d114e4be13
+Pull-request event SHA (synthetic merge SHA, not the candidate head): b7846defd4e0f70a34b91ece2f1b5b7a8eb60ed1
+Run created: 2026-09-28T14:28:39Z
+Job started: 2026-09-28T14:28:42Z
+Job completed: 2026-09-28T14:33:49Z (5m 07s)
+All formal-gate steps: success, including evidence publication and artifact upload.
+
+Full repository pytest: 919 tests; 0 failures; 0 errors; 0 skipped.
+Trusted-return/recovery focused pytest: 248 tests; 0 failures; 0 errors; 0 skipped.
+Core-systems focused pytest: 356 tests; 0 failures; 0 errors; 0 skipped.
+The reported JUnit case-time sums are 202.963s, 23.220s and 34.539s respectively; these are summed testcase durations, not job wall-clock time. Focused invocations supplement, and are not added to, the 919-test full-suite count.
+
+GitHub Actions artifact:
+  name=core-rc-refreeze-003-36436264055
+  artifact_id=10976116271
+  size_bytes=46758
+  server_reported_sha256=783b04438acbb982b584c3b6457727604d45695558a46f7d12a3574399bacb71
+  per-file hashes=formal_gate_run.json
+
+Formal editable-install pip freeze: ci-output/formal-pip-freeze.txt (inside the hosted artifact; SHA-256 in formal_gate_run.json)
+Clean-wheel-install pip freeze: ci-output/clean-install-pip-freeze.txt (inside the hosted artifact; SHA-256 in formal_gate_run.json)
+No dependency lockfile exists at the frozen target. Required Python/Pydantic/pytest versions were pinned for the run; complete pip-freeze outputs were uploaded.
+
+Live main observation: origin/main = c532b9fe3dfff594ee0b68bcac4fff6160f8b4b5, freshly fetched at 2026-09-28T14:34:40Z. This is a point-in-time governance/source audit, not a permanent baseline. The source manifest records seven post-target governance/evidence commits and zero protected implementation drift.
+Source-manifest SHA-256: 837bba36ef5ff84640e66a662a213f3c4f763f2412b94495e8c9bec35c3ddf84
+
+The sandbox could not retrieve the GitHub artifact archive in earlier attempts because the Actions Blob download failed with EOF / SSL_ERROR_SYSCALL. No local copy of that archive is claimed. The artifact remains hosted by GitHub; the server-reported archive digest and runner-produced per-file SHA-256 values are recorded for an independent reviewer to verify after download.
+Local sandbox CPython 3.11.2 was not used as formal RC evidence.
