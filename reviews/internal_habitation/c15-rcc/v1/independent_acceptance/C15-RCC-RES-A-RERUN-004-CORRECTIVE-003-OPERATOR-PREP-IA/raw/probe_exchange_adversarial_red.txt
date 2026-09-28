@@ -1,0 +1,11 @@
+{
+  "published-overwrite": "FAIL: accepted idempotent replay over tampered file",
+  "tampered-consume": "PASS: ExchangeContractError",
+  "orphan-request-integrity": true,
+  "tail-truncation-classification": true
+}
+Traceback (most recent call last):
+  File "/tmp/ia-review/probes/probe_exchange_adversarial.py", line 22, in <module>
+    print(json.dumps(results,indent=2)); assert all(v is True or (isinstance(v,str) and v.startswith('PASS')) for v in results.values())
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
