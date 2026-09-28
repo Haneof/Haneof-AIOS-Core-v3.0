@@ -350,6 +350,10 @@ class RunBackend:
         elif adopt_stale_owner:
             backend.audit("owner_reclaimed", {"pid": os.getpid()})
         backend._owner = owner
+        # Reopen is an admission boundary, not merely a path/owner check.
+        # Every previously sealed generation must still exist, be contiguous,
+        # and hash-verify before the caller is allowed to resume mutable work.
+        GenerationStore(backend).verify_all()
         backend.audit("backend_reopened", {"run_id": run_id, "session_id": session_id})
         return backend
 
@@ -604,11 +608,56 @@ class GenerationStore:
         )
         return sealed[-1] if sealed else None
 
+    def _expected_generation_from_journal(self) -> int | None:
+        """Return the durable generation ledger value when this is an operator run.
+
+        Raw backend unit tests may legitimately have no relay journal yet.  Once
+        a journal exists, however, its generation ledger is the authoritative
+        expectation for the sealed chain.  Losing the latest generation (or all
+        generations) must therefore fail closed instead of silently accepting a
+        shorter surviving prefix.
+        """
+        path = self.backend.journal_path
+        if not path.is_file():
+            return None
+        try:
+            db = sqlite3.connect(path.as_uri() + "?mode=ro", uri=True, timeout=10)
+            try:
+                row = db.execute(
+                    "SELECT value FROM ledger WHERE name='generation'"
+                ).fetchone()
+            finally:
+                db.close()
+        except sqlite3.Error as exc:
+            raise BackendError(f"generation ledger unreadable: {exc}") from exc
+        if row is None:
+            return None
+        try:
+            expected = int(row[0])
+        except (TypeError, ValueError) as exc:
+            raise BackendError("generation ledger is not an integer") from exc
+        require(expected >= 0, "generation ledger is negative")
+        return expected
+
     def verify_all(self) -> list[int]:
-        verified = []
-        for generation in sorted(
+        """Verify the complete immutable generation chain, including continuity."""
+        generations = sorted(
             int(p.name) for p in self.root.glob("[0-9]" * 6) if p.is_dir()
-        ):
+        )
+        if generations:
+            require(
+                generations == list(range(1, generations[-1] + 1)),
+                f"sealed generation chain has a gap: {generations}",
+            )
+        expected = self._expected_generation_from_journal()
+        if expected is not None:
+            require(
+                generations == list(range(1, expected + 1)),
+                "sealed generation chain does not match durable generation ledger "
+                f"(expected 1..{expected}, found {generations})",
+            )
+        verified: list[int] = []
+        for generation in generations:
             self.verify(generation)
             verified.append(generation)
         return verified
