@@ -1372,18 +1372,33 @@ class GoalTaskActionService:
                 )
             )
 
+        key = f"task-create:{task_id}:1"
+        previous = self.store.operation_for_idempotency_key(key)
+        # Reuse both original operation id and revision. SQLiteWorldStore's exact
+        # request fingerprint still rejects changed task fields, dependencies,
+        # arguments or key; only an identical durable effect may replay.
+        replay_fields = (
+            {}
+            if previous is None
+            else {
+                "operation_id": str(previous["operation_id"]),
+                "expected_world_revision": int(previous["expected_world_revision"]),
+            }
+        )
         result = self.store.commit(
             [task, *dependencies],
             OperationRequest(
+                **replay_fields,
                 operation_name="execution.task.create",
                 arguments={
                     "task_id": task_id,
                     "title": task.title,
                     "initial_state": task.task_state.value,
                 },
-                expected_world_revision=int(self.store.current_world_revision()),
+                **({"expected_world_revision": int(self.store.current_world_revision())}
+                   if previous is None else {}),
                 reason="create evidence-grounded task",
-                idempotency_key=f"task-create:{task_id}:1",
+                idempotency_key=key,
                 source_class=SourceClass.AI_COGNITION,
             ),
         )

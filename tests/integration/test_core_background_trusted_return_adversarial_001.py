@@ -199,7 +199,11 @@ def test_real_sigkill_after_later_round_trusted_handoff(tmp_path):
     import multiprocessing
     import signal
     db = tmp_path / "world.db"
-    world(db)
+    # Initialize the World before fork, but leave FTS/index projection creation
+    # to the child. Forking an open SQLite FTS connection can yield intermittent
+    # disk I/O errors before the tested trusted-return boundary is reached.
+    from aios_core.storage.sqlite_store import SQLiteWorldStore
+    SQLiteWorldStore(db)
     child = multiprocessing.get_context("fork").Process(
         target=_child_kill_after_round_one, args=(str(db),))
     child.start()

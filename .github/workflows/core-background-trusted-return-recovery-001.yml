@@ -28,6 +28,11 @@ jobs:
           PY
           pytest -o addopts='' --collect-only -q > collected.txt
           tail -n 4 collected.txt
+      - name: R5-A/B/C/D durable identity and conflict gate
+        run: |
+          pytest -o addopts='' -q --junitxml=r5.xml \
+            tests/integration/test_core_background_trusted_return_r5_001.py \
+            tests/integration/test_core_background_trusted_return_r5_conflicts_001.py
       - name: Focused trusted-return and accepted authenticity gate
         run: |
           pytest -o addopts='' -q --junitxml=focused.xml \
@@ -61,7 +66,7 @@ jobs:
           import sqlite3, sys, xml.etree.ElementTree as ET
           import pydantic, pytest
           print(f"::notice title=Formal environment::Python {sys.version.split()[0]} / Pydantic {pydantic.__version__} / pytest {pytest.__version__} / SQLite {sqlite3.sqlite_version}")
-          for name in ('focused', 'full'):
+          for name in ('r5', 'focused', 'full'):
               try:
                   suite = ET.parse(name + '.xml').getroot().find('testsuite')
                   fields = ', '.join(f"{key}={suite.get(key)}" for key in ('tests', 'failures', 'errors', 'skipped', 'time'))
@@ -75,5 +80,6 @@ jobs:
           name: core-trusted-return-formal-results
           path: |
             collected.txt
+            r5.xml
             focused.xml
             full.xml

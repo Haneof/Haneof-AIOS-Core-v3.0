@@ -1550,6 +1550,19 @@ class SQLiteWorldStore:
         selected.sort(key=lambda item: item[0])
         return [payload for _, payload in selected]
 
+    def operation_for_idempotency_key(self, idempotency_key: str) -> dict | None:
+        """Read an existing operation identity; commit still verifies exact payload.
+
+        A replay must reuse the original operation id and expected revision.
+        This lookup never authorizes a write or weakens request fingerprints.
+        """
+        with self._connection() as conn:
+            row = conn.execute(
+                "SELECT * FROM operations WHERE idempotency_key=?",
+                (idempotency_key,),
+            ).fetchone()
+            return None if row is None else dict(row)
+
     def operation_record(self, operation_id: str) -> dict:
         with self._connection() as conn:
             row = conn.execute(
