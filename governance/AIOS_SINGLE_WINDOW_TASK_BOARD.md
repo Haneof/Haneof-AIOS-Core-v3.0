@@ -1,5 +1,17 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 当前控制入口 — 2026-09-28 CORRECTIVE-001 REVIEW_READY / FRESH IA READY
+
+- **`CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001-CORRECTIVE-001 = REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE`**. Engineering PR #264 remains **OPEN / UNMERGED** at exact head `a73e186d40688f5dc181b1128a62eff37a974409` (parent `71f6d106a697b0c61410d42114545f2645e12510`, tree `352f47ac4e3098b10b1b78e4757543477371548d`). Live main at PM release remained `5288822e751df185f3abab79f969609f31859617`.
+- Author evidence: dynamic registry 43 model-callable / 22 side-effecting, all 22 probed; baseline rev5 against failed exact #258 = 20 FAILED / 44 passed; candidate rev7 = 83 passed; store fail-closed = 17 passed; real SIGKILL process-loss = 3 passed; focused = 111 passed; full local = 919 passed. Exact-head fetched PR workflows: **23/23 completed SUCCESS**. These are author/CI evidence only, not acceptance.
+- PM mechanically confirmed key trusted-return carry-forward blobs (`background_attempt.py`, `turn_runtime.py`, historical R5 test) are byte-identical to failed #258 exact. PR #258 / #261 remain untouched historical failure evidence.
+- **Binding Independent-Acceptance adjudication:** frozen rev5 classified changed-field cases for `upsert_relation`, `update_cognitive_policy`, `rollback_cognitive_policy` as same-key fail-closed conflicts; post-implementation rev6 reclassified them as `identity_shifts`. IA must independently decide whether this is a legitimate correction of an over-specified synthetic expectation or prohibited post-implementation weakening. PM does not pre-approve the reclassification.
+- **唯一下一 READY：`CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001-CORRECTIVE-001-INDEPENDENT-ACCEPTANCE = READY`**. Prompt: `governance/prompts/CORE_BACKGROUND_TRUSTED_RETURN_RECOVERY_001_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-28.md`.
+- PM readiness: `governance/CORE_BACKGROUND_TRUSTED_RETURN_RECOVERY_001_CORRECTIVE_001_PM_REVIEW_READY_2026-09-28.md`.
+- Until fresh IA PASS + separate PM integration: PR #264 merge, `CORE-RC-REFREEZE-003`, A-RERUN-004, persistence Corrective-003 resume, B release/run, Resident C, evaluator and C15 close remain **BLOCKED**.
+- Historical failed exact #258 `1ebf51c4...` and review-only IA fail #261 `b9d692dd...` remain immutable; no hash-swap.
+
+
 ## 当前控制入口 — 2026-09-28 TRUSTED-RETURN IA FAIL / CORRECTIVE-001 READY
 
 - **`C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 = FROZEN_WIP / BLOCKED_ON_CORE_TRUSTED_RETURN_RECOVERY`**。PR #254 已 **CLOSED / DRAFT / UNMERGED / FROZEN**。First scope-violating WIP `f7848952b6519fc40f50806f4a4d8d350ac0f38a` 修改了 `src/aios_core/runtime/turn_runtime.py`，违反 merged PM scope #255（persistence corrective 不得修改 Core），因此该 SHA = **SCOPE_VIOLATION / NOT_A_CANDIDATE**。历史 WIP/red/green CI 全部保留，不得 rewrite。
