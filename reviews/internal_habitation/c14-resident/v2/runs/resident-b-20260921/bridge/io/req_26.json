@@ -1,0 +1,120 @@
+{
+  "io_id": 26,
+  "kind": "dimension_summary",
+  "context": {
+    "job_id": "j028_summaries",
+    "job_type": "summaries",
+    "args": {
+      "now": "2026-10-29T08:07:00-07:00"
+    }
+  },
+  "summary_input": {
+    "dimension": "dim:schedule",
+    "granularity": "week",
+    "window_start": "2026-10-19T00:00:00Z",
+    "window_end": "2026-10-25T23:59:59.999999Z",
+    "source_world_revision": 210,
+    "sources": [
+      {
+        "object_id": "sum_7ae8788a8e00c3bdfb1f9e02",
+        "revision": 1,
+        "object_type": "summary",
+        "occurred_at": "2026-10-19T00:00:00Z",
+        "text": "2026-10-19 日程：当天 11:30 前没有日历安排。",
+        "metadata": {
+          "dimension": "dim:schedule",
+          "summary_kind": "single_dimension_temporal"
+        }
+      },
+      {
+        "object_id": "obs_c14_fixture_e72bc48cd34bac898ca91029",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-10-19T15:41:00Z",
+        "text": "今天 11:30 前没有日历安排。",
+        "metadata": {
+          "dimension": "dim:schedule",
+          "external_record_id": "c14resv2-021",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-fixture-event-binding-v1",
+          "fixture_event_id": "c14resv2-021",
+          "fixture_payload_sha256": "sha256:6e66292b64dd29bef93fdb50fbf00ee1fb9c3be46f5410ef6a311896add51117",
+          "fixture_projection_sha256": "sha256:2d21566cdf342e5a6135835b36e967e6a471f787bc9584a084c4d7fde8fc5fea",
+          "fixture_sequence": 21,
+          "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+          "fixture_version": "c14-resident-fixture-v2",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-10-19T08:41:00-07:00",
+          "source_class": "platform"
+        }
+      },
+      {
+        "object_id": "sum_a0ebbd1cb04b29e5c83d0f63",
+        "revision": 1,
+        "object_type": "summary",
+        "occurred_at": "2026-10-21T00:00:00Z",
+        "text": "2026-10-21 日程维度当日小结：日程表当天记录两个时间段——08:30–10:00 客户共创工作坊，10:20–11:50 安排“方案修改”。当天无其他日程记录。",
+        "metadata": {
+          "dimension": "dim:schedule",
+          "summary_kind": "single_dimension_temporal"
+        }
+      },
+      {
+        "object_id": "obs_c14_fixture_2ef7e5aea9885147e524e1c8",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-10-21T15:04:00Z",
+        "text": "今天 08:30–10:00 是客户共创工作坊；10:20–11:50 安排“方案修改”。",
+        "metadata": {
+          "dimension": "dim:schedule",
+          "external_record_id": "c14resv2-022",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-fixture-event-binding-v1",
+          "fixture_event_id": "c14resv2-022",
+          "fixture_payload_sha256": "sha256:2f9b86a56931a4f59b3304845a52113778ff617186cc20cd7db86e74865ef640",
+          "fixture_projection_sha256": "sha256:ba60969b17d1b880fcb6642baf6815022d4004d04ce8911bb8d8c3337794e007",
+          "fixture_sequence": 22,
+          "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+          "fixture_version": "c14-resident-fixture-v2",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-10-21T08:04:00-07:00",
+          "source_class": "platform"
+        }
+      },
+      {
+        "object_id": "sum_ec2d82a7e1647df74381fd85",
+        "revision": 1,
+        "object_type": "summary",
+        "occurred_at": "2026-10-23T00:00:00Z",
+        "text": "2026-10-23 日程维度当日小结：当天一条日程查询记录——10月29日 08:00–14:00 当前无其他固定会议，14:30 有发布评审。当日无其他日程记录。",
+        "metadata": {
+          "dimension": "dim:schedule",
+          "summary_kind": "single_dimension_temporal"
+        }
+      },
+      {
+        "object_id": "obs_c14_fixture_2207720973263e409bd2cef2",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-10-23T15:04:00Z",
+        "text": "10月29日 08:00–14:00 当前没有其他固定会议；14:30 有发布评审。",
+        "metadata": {
+          "dimension": "dim:schedule",
+          "external_record_id": "c14resv2-027",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-fixture-event-binding-v1",
+          "fixture_event_id": "c14resv2-027",
+          "fixture_payload_sha256": "sha256:d2852a5efc1ee793ad12003905991cd56bc7b4f148f94a83f4e8111d413632e7",
+          "fixture_projection_sha256": "sha256:12050cbee79e9e9b083ec2bcb29a664583c33dfbcee2a8e6e6db378cf002ea39",
+          "fixture_sequence": 27,
+          "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+          "fixture_version": "c14-resident-fixture-v2",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-10-23T08:04:00-07:00",
+          "source_class": "platform"
+        }
+      }
+    ],
+    "truncated": false
+  }
+}

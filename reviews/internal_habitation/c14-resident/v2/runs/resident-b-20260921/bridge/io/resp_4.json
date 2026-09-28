@@ -1,0 +1,1 @@
+{"capability_calls": [{"name": "search_world", "arguments": {"query": "工作坊 需求 方案", "limit": 8}}, {"name": "search_world", "arguments": {"query": "睡眠 睡眠评分", "limit": 8}}]}

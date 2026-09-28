@@ -1,0 +1,60 @@
+{
+  "io_id": 28,
+  "kind": "dimension_summary",
+  "context": {
+    "job_id": "j028_summaries",
+    "job_type": "summaries",
+    "args": {
+      "now": "2026-10-29T08:07:00-07:00"
+    }
+  },
+  "summary_input": {
+    "dimension": "dim:user_ai_interaction",
+    "granularity": "week",
+    "window_start": "2026-10-19T00:00:00Z",
+    "window_end": "2026-10-25T23:59:59.999999Z",
+    "source_world_revision": 214,
+    "sources": [
+      {
+        "object_id": "sum_e6c3131ad726f09cd59f4366",
+        "revision": 1,
+        "object_type": "summary",
+        "occurred_at": "2026-10-23T00:00:00Z",
+        "text": "2026-10-23 用户-AI 交互当日小结：一次会话轮（session resb-20260921-282770 turn 1）。用户要求在设计师 9:00/11:00 两个可选时间里选一个并安排周四上午（在家写发布说明，13:30 前出第一版，14:30 评审）。AI 依据既有写作块观察（受保护块按期交付、被打断块 65% 顺延）建议选 9:00：9:00–9:30 设计师沟通（顺带定两处版式问题），9:40–13:30 整块保护写作，13:30 第一版；并说明不选 11:00 的原因（打断写作、重启成本）。AI 同时建立了周四截止任务（task_5029111ade74171bc3758e98）。",
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "summary_kind": "single_dimension_temporal"
+        }
+      },
+      {
+        "object_id": "obs_conv_ai_30e47e67b81efdb7e5c54efe",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-10-23T15:02:00Z",
+        "text": "建议把设计师约在 9:00。我翻了下你之前的写作块记录：不被会议插入的两次——10-01 架构备忘录、10-08 设计评审稿——都在计划区间内交了；而被 stand-up 和供应商电话打断的 10-05 定价说明，拖到 15:00 只完成约 65%，续写时还多花了十几分钟重新找材料。所以把“可能打断的事”放在写作前面更稳。\n\n周四上午这样排：\n• 9:00–9:30 设计师沟通\n• 9:40–13:30 发布说明写作块，整块不开会（按你受保护块的习惯开专注模式、静音通知）\n• 13:30 第一版完成，留一小时缓冲\n• 14:30 评审\n\n11:00 那档不推荐：9:00 开写、11:00 被打断，重启还要重新进入状态，赶 13:30 第一版的风险更大。\n这个安排我已经记进任务里，周四早上会再跟你确认一遍。",
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "assistant",
+          "session_id": "resb-20260921-282770",
+          "turn_index": 1,
+          "turn_key": "7b3f7e89f725735db6c0d623"
+        }
+      },
+      {
+        "object_id": "obs_conv_user_68c898d46eb08fe87b18c45c",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-10-23T15:02:00Z",
+        "text": "用户说：“下周四我在家写发布说明。设计师 9:00 或 11:00 都能聊，你帮我在两个时间里选一个，再把上午顺一下。下午 2:30 评审，1:30 前有第一版就行。”",
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "user",
+          "session_id": "resb-20260921-282770",
+          "turn_index": 1,
+          "turn_key": "7b3f7e89f725735db6c0d623"
+        }
+      }
+    ],
+    "truncated": false
+  }
+}

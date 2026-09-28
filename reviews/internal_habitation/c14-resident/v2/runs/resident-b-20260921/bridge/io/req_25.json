@@ -1,0 +1,54 @@
+{
+  "io_id": 25,
+  "kind": "dimension_summary",
+  "context": {
+    "job_id": "j028_summaries",
+    "job_type": "summaries",
+    "args": {
+      "now": "2026-10-29T08:07:00-07:00"
+    }
+  },
+  "summary_input": {
+    "dimension": "dim:collaboration_outcome",
+    "granularity": "week",
+    "window_start": "2026-10-19T00:00:00Z",
+    "window_end": "2026-10-25T23:59:59.999999Z",
+    "source_world_revision": 208,
+    "sources": [
+      {
+        "object_id": "sum_5534c324a5361a915587f8d3",
+        "revision": 1,
+        "object_type": "summary",
+        "occurred_at": "2026-10-21T00:00:00Z",
+        "text": "2026-10-21 协作结果维度当日小结：当天该维度仅有一条记录。共创工作坊收尾时，两项此前悬而未决的需求边界已由客户当场确认，会议记录写明了这两项决议内容。当日无其他协作结果类事实。",
+        "metadata": {
+          "dimension": "dim:collaboration_outcome",
+          "summary_kind": "single_dimension_temporal"
+        }
+      },
+      {
+        "object_id": "obs_c14_fixture_2378863986aaed4f3c5b2d30",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-10-21T17:06:00Z",
+        "text": "共创工作坊结束时，两项原本未定的需求边界已由客户确认；会议记录列出明确决议。",
+        "metadata": {
+          "dimension": "dim:collaboration_outcome",
+          "external_record_id": "c14resv2-023",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-fixture-event-binding-v1",
+          "fixture_event_id": "c14resv2-023",
+          "fixture_payload_sha256": "sha256:26ca8cabc54b82ed62f2d16381e482479185b750eff3216b4b83818c4c9866bc",
+          "fixture_projection_sha256": "sha256:18ef69e70248fe6b2d463cfd4a06911e6d8adb9fa1fdfdf224243265e444cd74",
+          "fixture_sequence": 23,
+          "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+          "fixture_version": "c14-resident-fixture-v2",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-10-21T10:06:00-07:00",
+          "source_class": "platform"
+        }
+      }
+    ],
+    "truncated": false
+  }
+}

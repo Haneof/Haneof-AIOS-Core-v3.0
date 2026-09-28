@@ -1,0 +1,43 @@
+{
+  "io_id": 2,
+  "kind": "dimension_summary",
+  "context": {
+    "job_id": "j003_summaries",
+    "job_type": "summaries",
+    "args": {
+      "now": "2026-10-23T07:08:00-07:00"
+    }
+  },
+  "summary_input": {
+    "dimension": "dim:schedule",
+    "granularity": "day",
+    "window_start": "2026-10-21T00:00:00Z",
+    "window_end": "2026-10-21T23:59:59.999999Z",
+    "source_world_revision": 169,
+    "sources": [
+      {
+        "object_id": "obs_c14_fixture_2ef7e5aea9885147e524e1c8",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-10-21T15:04:00Z",
+        "text": "今天 08:30–10:00 是客户共创工作坊；10:20–11:50 安排“方案修改”。",
+        "metadata": {
+          "dimension": "dim:schedule",
+          "external_record_id": "c14resv2-022",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-fixture-event-binding-v1",
+          "fixture_event_id": "c14resv2-022",
+          "fixture_payload_sha256": "sha256:2f9b86a56931a4f59b3304845a52113778ff617186cc20cd7db86e74865ef640",
+          "fixture_projection_sha256": "sha256:ba60969b17d1b880fcb6642baf6815022d4004d04ce8911bb8d8c3337794e007",
+          "fixture_sequence": 22,
+          "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+          "fixture_version": "c14-resident-fixture-v2",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-10-21T08:04:00-07:00",
+          "source_class": "platform"
+        }
+      }
+    ],
+    "truncated": false
+  }
+}

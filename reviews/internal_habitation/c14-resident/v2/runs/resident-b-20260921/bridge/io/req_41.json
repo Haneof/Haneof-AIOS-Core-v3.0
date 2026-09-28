@@ -1,0 +1,49 @@
+{
+  "io_id": 41,
+  "kind": "dimension_summary",
+  "context": {
+    "job_id": "j046_summaries",
+    "job_type": "summaries",
+    "args": {
+      "now": "2026-10-31T08:37:00-07:00"
+    }
+  },
+  "summary_input": {
+    "dimension": "dim:user_ai_interaction",
+    "granularity": "day",
+    "window_start": "2026-10-29T00:00:00Z",
+    "window_end": "2026-10-29T23:59:59.999999Z",
+    "source_world_revision": 246,
+    "sources": [
+      {
+        "object_id": "obs_conv_ai_317d3ffead372f9e92101083",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-10-29T19:26:00Z",
+        "text": "是啊，你说到点子上了——“不两头切”正是关键。之前 10-05 那次被 stand-up 和供应商电话切碎的写作，到 15:00 只完成约 65%，续写时光重新找材料就花了十几分钟；今天 9:00 先把设计师那边定掉，之后一整块不受打扰，12:08 出第一版就是顺理成章的事。\n\n这种“打断前置 + 整块写作”的排法，以后写作日都可以照用。14:30 评审加油！",
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "assistant",
+          "session_id": "resb-20260921-282770",
+          "turn_index": 2,
+          "turn_key": "9fb14834e8b41a8796fdd554"
+        }
+      },
+      {
+        "object_id": "obs_conv_user_dea25617f685204d460139b9",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-10-29T19:26:00Z",
+        "text": "用户说：“今天这个安排没让我一直在两头切，第一版也按计划出来了。”",
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "user",
+          "session_id": "resb-20260921-282770",
+          "turn_index": 2,
+          "turn_key": "9fb14834e8b41a8796fdd554"
+        }
+      }
+    ],
+    "truncated": false
+  }
+}

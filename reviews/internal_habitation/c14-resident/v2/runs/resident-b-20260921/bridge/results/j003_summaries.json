@@ -1,0 +1,1064 @@
+{
+  "status": "ok",
+  "result": {
+    "commits": [
+      {
+        "object_id": "sum_5534c324a5361a915587f8d3",
+        "revision": 1,
+        "world_revision": 168,
+        "reused_existing": false
+      },
+      {
+        "object_id": "sum_a0ebbd1cb04b29e5c83d0f63",
+        "revision": 1,
+        "world_revision": 170,
+        "reused_existing": false
+      },
+      {
+        "object_id": "sum_e03606ba01ac07943749a4b8",
+        "revision": 1,
+        "world_revision": 172,
+        "reused_existing": false
+      }
+    ],
+    "attempted_job_count": 75,
+    "attempted_jobs": [
+      {
+        "dimension": "dim:collaboration_outcome",
+        "scale": "day",
+        "window_start": "2026-10-21T00:00:00+00:00",
+        "window_end": "2026-10-21T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:conversation",
+        "scale": "day",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-05T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:conversation",
+        "scale": "day",
+        "window_start": "2026-10-06T00:00:00+00:00",
+        "window_end": "2026-10-06T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:conversation",
+        "scale": "day",
+        "window_start": "2026-10-09T00:00:00+00:00",
+        "window_end": "2026-10-09T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "day",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-07-01T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "day",
+        "window_start": "2026-09-01T00:00:00+00:00",
+        "window_end": "2026-09-01T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "day",
+        "window_start": "2026-09-28T00:00:00+00:00",
+        "window_end": "2026-09-28T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "day",
+        "window_start": "2026-10-01T00:00:00+00:00",
+        "window_end": "2026-10-01T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "day",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-05T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "day",
+        "window_start": "2026-10-08T00:00:00+00:00",
+        "window_end": "2026-10-08T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:environment",
+        "scale": "day",
+        "window_start": "2026-10-12T00:00:00+00:00",
+        "window_end": "2026-10-12T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:environment",
+        "scale": "day",
+        "window_start": "2026-10-14T00:00:00+00:00",
+        "window_end": "2026-10-14T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-07-01T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-09-01T00:00:00+00:00",
+        "window_end": "2026-09-01T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-09-28T00:00:00+00:00",
+        "window_end": "2026-09-28T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-10-01T00:00:00+00:00",
+        "window_end": "2026-10-01T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-05T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-10-08T00:00:00+00:00",
+        "window_end": "2026-10-08T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-10-11T00:00:00+00:00",
+        "window_end": "2026-10-11T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-10-12T00:00:00+00:00",
+        "window_end": "2026-10-12T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-10-17T00:00:00+00:00",
+        "window_end": "2026-10-17T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-10-19T00:00:00+00:00",
+        "window_end": "2026-10-19T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-10-21T00:00:00+00:00",
+        "window_end": "2026-10-21T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-07-01T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-09-01T00:00:00+00:00",
+        "window_end": "2026-09-01T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-09-28T00:00:00+00:00",
+        "window_end": "2026-09-28T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-10-01T00:00:00+00:00",
+        "window_end": "2026-10-01T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-05T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-10-08T00:00:00+00:00",
+        "window_end": "2026-10-08T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-10-11T00:00:00+00:00",
+        "window_end": "2026-10-11T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-10-12T00:00:00+00:00",
+        "window_end": "2026-10-12T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-10-14T00:00:00+00:00",
+        "window_end": "2026-10-14T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-10-17T00:00:00+00:00",
+        "window_end": "2026-10-17T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-10-19T00:00:00+00:00",
+        "window_end": "2026-10-19T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-07-01T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-09-01T00:00:00+00:00",
+        "window_end": "2026-09-01T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-09-28T00:00:00+00:00",
+        "window_end": "2026-09-28T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-10-01T00:00:00+00:00",
+        "window_end": "2026-10-01T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-05T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-10-08T00:00:00+00:00",
+        "window_end": "2026-10-08T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-10-09T00:00:00+00:00",
+        "window_end": "2026-10-09T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-10-11T00:00:00+00:00",
+        "window_end": "2026-10-11T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-10-21T00:00:00+00:00",
+        "window_end": "2026-10-21T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:conversation",
+        "scale": "week",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-11T23:59:59.999999+00:00",
+        "source_count": 4
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "week",
+        "window_start": "2026-06-29T00:00:00+00:00",
+        "window_end": "2026-07-05T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "week",
+        "window_start": "2026-08-31T00:00:00+00:00",
+        "window_end": "2026-09-06T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "week",
+        "window_start": "2026-09-28T00:00:00+00:00",
+        "window_end": "2026-10-04T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "week",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-11T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:environment",
+        "scale": "week",
+        "window_start": "2026-10-12T00:00:00+00:00",
+        "window_end": "2026-10-18T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "week",
+        "window_start": "2026-06-29T00:00:00+00:00",
+        "window_end": "2026-07-05T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "week",
+        "window_start": "2026-08-31T00:00:00+00:00",
+        "window_end": "2026-09-06T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "week",
+        "window_start": "2026-09-28T00:00:00+00:00",
+        "window_end": "2026-10-04T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "week",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-11T23:59:59.999999+00:00",
+        "source_count": 6
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "week",
+        "window_start": "2026-10-12T00:00:00+00:00",
+        "window_end": "2026-10-18T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "week",
+        "window_start": "2026-06-29T00:00:00+00:00",
+        "window_end": "2026-07-05T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "week",
+        "window_start": "2026-08-31T00:00:00+00:00",
+        "window_end": "2026-09-06T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "week",
+        "window_start": "2026-09-28T00:00:00+00:00",
+        "window_end": "2026-10-04T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "week",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-11T23:59:59.999999+00:00",
+        "source_count": 6
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "week",
+        "window_start": "2026-10-12T00:00:00+00:00",
+        "window_end": "2026-10-18T23:59:59.999999+00:00",
+        "source_count": 4
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "week",
+        "window_start": "2026-06-29T00:00:00+00:00",
+        "window_end": "2026-07-05T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "week",
+        "window_start": "2026-08-31T00:00:00+00:00",
+        "window_end": "2026-09-06T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "week",
+        "window_start": "2026-09-28T00:00:00+00:00",
+        "window_end": "2026-10-04T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "week",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-11T23:59:59.999999+00:00",
+        "source_count": 9
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "month",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-07-31T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "month",
+        "window_start": "2026-09-01T00:00:00+00:00",
+        "window_end": "2026-09-30T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "month",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-07-31T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "month",
+        "window_start": "2026-09-01T00:00:00+00:00",
+        "window_end": "2026-09-30T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "month",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-07-31T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "month",
+        "window_start": "2026-09-01T00:00:00+00:00",
+        "window_end": "2026-09-30T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "month",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-07-31T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "month",
+        "window_start": "2026-09-01T00:00:00+00:00",
+        "window_end": "2026-09-30T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "quarter",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-09-30T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "quarter",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-09-30T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "quarter",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-09-30T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "quarter",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-09-30T23:59:59.999999+00:00",
+        "source_count": 2
+      }
+    ],
+    "skipped_unchanged": [
+      {
+        "dimension": "dim:conversation",
+        "scale": "day",
+        "window_start": "2026-10-06T00:00:00+00:00",
+        "window_end": "2026-10-06T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:conversation",
+        "scale": "day",
+        "window_start": "2026-10-09T00:00:00+00:00",
+        "window_end": "2026-10-09T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "day",
+        "window_start": "2026-10-01T00:00:00+00:00",
+        "window_end": "2026-10-01T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "day",
+        "window_start": "2026-10-08T00:00:00+00:00",
+        "window_end": "2026-10-08T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:environment",
+        "scale": "day",
+        "window_start": "2026-10-14T00:00:00+00:00",
+        "window_end": "2026-10-14T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-10-01T00:00:00+00:00",
+        "window_end": "2026-10-01T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-05T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-10-08T00:00:00+00:00",
+        "window_end": "2026-10-08T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-10-11T00:00:00+00:00",
+        "window_end": "2026-10-11T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-10-17T00:00:00+00:00",
+        "window_end": "2026-10-17T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-10-19T00:00:00+00:00",
+        "window_end": "2026-10-19T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-10-01T00:00:00+00:00",
+        "window_end": "2026-10-01T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-05T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-10-08T00:00:00+00:00",
+        "window_end": "2026-10-08T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-10-11T00:00:00+00:00",
+        "window_end": "2026-10-11T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-10-14T00:00:00+00:00",
+        "window_end": "2026-10-14T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-10-17T00:00:00+00:00",
+        "window_end": "2026-10-17T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-10-19T00:00:00+00:00",
+        "window_end": "2026-10-19T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-10-01T00:00:00+00:00",
+        "window_end": "2026-10-01T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-05T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-10-08T00:00:00+00:00",
+        "window_end": "2026-10-08T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-10-09T00:00:00+00:00",
+        "window_end": "2026-10-09T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-10-11T00:00:00+00:00",
+        "window_end": "2026-10-11T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:conversation",
+        "scale": "week",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-11T23:59:59.999999+00:00",
+        "source_count": 4
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "week",
+        "window_start": "2026-09-28T00:00:00+00:00",
+        "window_end": "2026-10-04T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "week",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-11T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:environment",
+        "scale": "week",
+        "window_start": "2026-10-12T00:00:00+00:00",
+        "window_end": "2026-10-18T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "week",
+        "window_start": "2026-09-28T00:00:00+00:00",
+        "window_end": "2026-10-04T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "week",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-11T23:59:59.999999+00:00",
+        "source_count": 6
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "week",
+        "window_start": "2026-10-12T00:00:00+00:00",
+        "window_end": "2026-10-18T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "week",
+        "window_start": "2026-09-28T00:00:00+00:00",
+        "window_end": "2026-10-04T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "week",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-11T23:59:59.999999+00:00",
+        "source_count": 6
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "week",
+        "window_start": "2026-10-12T00:00:00+00:00",
+        "window_end": "2026-10-18T23:59:59.999999+00:00",
+        "source_count": 4
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "week",
+        "window_start": "2026-09-28T00:00:00+00:00",
+        "window_end": "2026-10-04T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "week",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-11T23:59:59.999999+00:00",
+        "source_count": 9
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "month",
+        "window_start": "2026-09-01T00:00:00+00:00",
+        "window_end": "2026-09-30T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "month",
+        "window_start": "2026-09-01T00:00:00+00:00",
+        "window_end": "2026-09-30T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "month",
+        "window_start": "2026-09-01T00:00:00+00:00",
+        "window_end": "2026-09-30T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "month",
+        "window_start": "2026-09-01T00:00:00+00:00",
+        "window_end": "2026-09-30T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "quarter",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-09-30T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "quarter",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-09-30T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "quarter",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-09-30T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "quarter",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-09-30T23:59:59.999999+00:00",
+        "source_count": 2
+      }
+    ],
+    "skipped_empty": [
+      {
+        "dimension": "dim:conversation",
+        "scale": "day",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-05T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "day",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-07-01T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "day",
+        "window_start": "2026-09-01T00:00:00+00:00",
+        "window_end": "2026-09-01T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "day",
+        "window_start": "2026-09-28T00:00:00+00:00",
+        "window_end": "2026-09-28T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "day",
+        "window_start": "2026-10-05T00:00:00+00:00",
+        "window_end": "2026-10-05T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:environment",
+        "scale": "day",
+        "window_start": "2026-10-12T00:00:00+00:00",
+        "window_end": "2026-10-12T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-07-01T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-09-01T00:00:00+00:00",
+        "window_end": "2026-09-01T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-09-28T00:00:00+00:00",
+        "window_end": "2026-09-28T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "day",
+        "window_start": "2026-10-12T00:00:00+00:00",
+        "window_end": "2026-10-12T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-07-01T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-09-01T00:00:00+00:00",
+        "window_end": "2026-09-01T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-09-28T00:00:00+00:00",
+        "window_end": "2026-09-28T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "day",
+        "window_start": "2026-10-12T00:00:00+00:00",
+        "window_end": "2026-10-12T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-07-01T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-09-01T00:00:00+00:00",
+        "window_end": "2026-09-01T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-09-28T00:00:00+00:00",
+        "window_end": "2026-09-28T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "week",
+        "window_start": "2026-06-29T00:00:00+00:00",
+        "window_end": "2026-07-05T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "week",
+        "window_start": "2026-08-31T00:00:00+00:00",
+        "window_end": "2026-09-06T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "week",
+        "window_start": "2026-06-29T00:00:00+00:00",
+        "window_end": "2026-07-05T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "week",
+        "window_start": "2026-08-31T00:00:00+00:00",
+        "window_end": "2026-09-06T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "week",
+        "window_start": "2026-06-29T00:00:00+00:00",
+        "window_end": "2026-07-05T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "week",
+        "window_start": "2026-08-31T00:00:00+00:00",
+        "window_end": "2026-09-06T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "week",
+        "window_start": "2026-06-29T00:00:00+00:00",
+        "window_end": "2026-07-05T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "week",
+        "window_start": "2026-08-31T00:00:00+00:00",
+        "window_end": "2026-09-06T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:device_activity",
+        "scale": "month",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-07-31T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:schedule",
+        "scale": "month",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-07-31T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:sleep",
+        "scale": "month",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-07-31T23:59:59.999999+00:00",
+        "source_count": 0
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "month",
+        "window_start": "2026-07-01T00:00:00+00:00",
+        "window_end": "2026-07-31T23:59:59.999999+00:00",
+        "source_count": 0
+      }
+    ],
+    "truncated": false,
+    "world_revision": 173,
+    "index_watermark": 173
+  }
+}

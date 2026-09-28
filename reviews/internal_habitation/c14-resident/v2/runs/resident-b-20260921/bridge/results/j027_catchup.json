@@ -1,0 +1,8 @@
+{
+  "status": "ok",
+  "result": {
+    "catch_up_rows": 1,
+    "world_revision": 194,
+    "index_watermark": 194
+  }
+}

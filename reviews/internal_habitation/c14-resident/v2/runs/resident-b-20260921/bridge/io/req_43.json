@@ -1,0 +1,58 @@
+{
+  "io_id": 43,
+  "kind": "dimension_summary",
+  "context": {
+    "job_id": "j046_summaries",
+    "job_type": "summaries",
+    "args": {
+      "now": "2026-10-31T08:37:00-07:00"
+    }
+  },
+  "summary_input": {
+    "dimension": "dim:work_outcome",
+    "granularity": "day",
+    "window_start": "2026-10-29T00:00:00Z",
+    "window_end": "2026-10-29T23:59:59.999999Z",
+    "source_world_revision": 250,
+    "sources": [
+      {
+        "object_id": "evs_revision_0e05b5ab8b79d4c807e198b8",
+        "revision": 1,
+        "object_type": "evidence_set",
+        "occurred_at": "2026-10-29T19:14:00Z",
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 3, \"missing_description\": [], \"observed_count\": 3}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-10-29T19:14:00Z\", \"world_revision\": 231}, \"learned_at\": \"2026-10-29T19:14:00Z\", \"member_refs\": [{\"object_id\": \"obs_c14_fixture_3257a682fdb79b091e7d1027\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_a2532add6d81bd551775e8d3\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_2207720973263e409bd2cef2\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:work_outcome\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_79df61916b8bb4c10cb3faa3\", \"revision\": 3}}, \"object_id\": \"evs_revision_0e05b5ab8b79d4c807e198b8\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_79df61916b8bb4c10cb3faa3@3\", \"recorded_at\": \"2026-10-29T19:14:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_c14_fixture_3257a682fdb79b091e7d1027\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_a2532add6d81bd551775e8d3\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_2207720973263e409bd2cef2\", \"revision\": 1}]}",
+        "metadata": {
+          "dimension": "dim:work_outcome",
+          "revision_mode": "revise",
+          "target_ref": {
+            "object_id": "clm_79df61916b8bb4c10cb3faa3",
+            "revision": 3
+          }
+        }
+      },
+      {
+        "object_id": "obs_c14_fixture_a2532add6d81bd551775e8d3",
+        "revision": 1,
+        "object_type": "observation",
+        "occurred_at": "2026-10-29T19:14:00Z",
+        "text": "“发布说明”第一版于 12:08 完成并进入评审准备；核心结构无需重写。",
+        "metadata": {
+          "dimension": "dim:work_outcome",
+          "external_record_id": "c14resv2-031",
+          "external_revision": "1",
+          "fixture_binding_version": "c14-fixture-event-binding-v1",
+          "fixture_event_id": "c14resv2-031",
+          "fixture_payload_sha256": "sha256:6be1c22f38a73e830ac632c99b8156a476d6ab0ac1b9d10515879056bb81e13d",
+          "fixture_projection_sha256": "sha256:d35f294a90cb1735ae02d4bc8a324bf9acdb9c8a7b1eafda2000f9bf61b3efb1",
+          "fixture_sequence": 31,
+          "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+          "fixture_version": "c14-resident-fixture-v2",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-10-29T12:14:00-07:00",
+          "source_class": "platform"
+        }
+      }
+    ],
+    "truncated": false
+  }
+}
