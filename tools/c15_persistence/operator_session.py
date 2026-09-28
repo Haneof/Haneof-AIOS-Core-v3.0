@@ -413,6 +413,16 @@ class OperatorSession:
             )
         elif bool(session.backend.owner.get("remote_authoritative")):
             require(loaded, "remote-authoritative attach did not load its binding")
+        if bool(session.backend.owner.get("remote_authoritative")):
+            from .remote_backend import verify_local_remote_authority
+
+            require(session._remote_ref is not None, "remote-authoritative attach has no remote ref")
+            verify_local_remote_authority(
+                session.backend,
+                remote_ref=session._remote_ref,
+                remote=session._remote,
+                repo_dir=session._remote_repo_dir,
+            )
         backend.audit("session_attached", {"phase": "resume"})
         return session
 
