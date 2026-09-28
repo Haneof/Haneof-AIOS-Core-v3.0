@@ -1,0 +1,20 @@
+==============================================================================
+IA-BLK-TRUSTED-RETURN-001  reproduce: propose_goal R5-C replay failure
+==============================================================================
+
+[PRE-CRASH] propose_goal ok=True data={'goal_id': 'goal_524378a4a79bc75381a50fcd', 'revision': 1, 'status': 'proposed', 'world_revision': 3}
+
+[CRASH STATE] world_revision = 3
+  OP   {'operation_name': 'execution.goal.propose', 'operation_id': 'op_a247e5cec7824a5a9e4ef5015ebf92cc', 'idempotency_key': 'goal-propose:goal_524378a4a79bc75381a50fcd:1', 'expected_world_revision': 2, 'result_world_revision': 3}
+  IDEM {'idempotency_key': 'goal-propose:goal_524378a4a79bc75381a50fcd:1', 'operation_id': 'op_a247e5cec7824a5a9e4ef5015ebf92cc', 'world_revision': 3}
+  GOALS before replay: [('goal_524378a4a79bc75381a50fcd', 1)]
+
+[FRESH RECOVERY] replaying the same durable handoff, provider allowed only new rounds
+  REPLAY call_id=ia-propose_goal-0 ok=False error_code=CAPABILITY_EXECUTION_ERROR
+         error_message=StoreError: idempotency key was already used for a different request
+  GOALS after replay: [('goal_524378a4a79bc75381a50fcd', 1)]
+
+  turn status: completed
+
+VERDICT: legitimate exact replay of an already-durable side effect FAILS the turn's
+         capability application (StoreError -> CAPABILITY_EXECUTION_ERROR).

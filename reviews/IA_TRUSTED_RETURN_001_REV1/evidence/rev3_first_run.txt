@@ -1,0 +1,61 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0
+rootdir: /home/user/ia-review
+configfile: pyproject.toml
+collected 60 items
+
+tests/independent_acceptance/test_ia_authenticity.py ...FFF............. [ 31%]
+.                                                                        [ 33%]
+tests/independent_acceptance/test_ia_capability_breadth.py .FFFFFFFFFF   [ 51%]
+tests/independent_acceptance/test_ia_operation_replay.py F........F...F. [ 76%]
+....                                                                     [ 83%]
+tests/independent_acceptance/test_ia_r1_r4.py F.FF..FF                   [ 96%]
+tests/independent_acceptance/test_ia_sigkill.py F.                       [100%]
+
+=================================== FAILURES ===================================
+/home/user/ia-review/tests/independent_acceptance/test_ia_authenticity.py:122: Failed: DID NOT RAISE <class 'aios_core.runtime.background_attempt.BackgroundModelResponseConflict'>
+/home/user/ia-review/tests/independent_acceptance/test_ia_authenticity.py:136: Failed: DID NOT RAISE <class 'aios_core.runtime.background_attempt.BackgroundModelResponseConflict'>
+/home/user/ia-review/tests/independent_acceptance/test_ia_authenticity.py:150: Failed: DID NOT RAISE <class 'aios_core.runtime.background_attempt.BackgroundModelResponseConflict'>
+/home/user/ia-review/tests/independent_acceptance/test_ia_capability_breadth.py:79: NameError: name 'work_id' is not defined
+/home/user/ia-review/tests/independent_acceptance/test_ia_capability_breadth.py:79: NameError: name 'work_id' is not defined
+/home/user/ia-review/tests/independent_acceptance/test_ia_capability_breadth.py:79: NameError: name 'work_id' is not defined
+/home/user/ia-review/tests/independent_acceptance/test_ia_capability_breadth.py:79: NameError: name 'work_id' is not defined
+/home/user/ia-review/tests/independent_acceptance/test_ia_capability_breadth.py:79: NameError: name 'work_id' is not defined
+/home/user/ia-review/tests/independent_acceptance/test_ia_capability_breadth.py:79: NameError: name 'work_id' is not defined
+/home/user/ia-review/tests/independent_acceptance/test_ia_capability_breadth.py:79: NameError: name 'work_id' is not defined
+/home/user/ia-review/tests/independent_acceptance/test_ia_capability_breadth.py:79: NameError: name 'work_id' is not defined
+/home/user/ia-review/tests/independent_acceptance/test_ia_capability_breadth.py:79: NameError: name 'work_id' is not defined
+/home/user/ia-review/tests/independent_acceptance/test_ia_capability_breadth.py:67: AssertionError: PRE-CRASH upsert_relation FAILED: CAPABILITY_EXECUTION_ERROR ValidationError: 1 validation error for RelationUpsertRequest
+/home/user/ia-review/src/aios_core/storage/sqlite_store.py:764: aios_core.storage.sqlite_store.StoreError: idempotency key was already used for a different request
+/home/user/ia-review/tests/independent_acceptance/test_ia_operation_replay.py:145: AssertionError: assert <ErrorCode.VE...ION_CONFLICT'> == <ErrorCode.ID...NCY_CONFLICT'>
+/home/user/ia-review/src/aios_core/storage/sqlite_store.py:764: aios_core.storage.sqlite_store.StoreError: idempotency key was already used for a different request
+/home/user/ia-review/src/aios_core/runtime/turn_execution.py:357: aios_core.runtime.turn_execution.TurnExecutionInDoubt: turn execution refused: started_or_interrupted; inspect existing receipts, do not rerun
+/home/user/ia-review/tests/independent_acceptance/test_ia_r1_r4.py:140: Failed: DID NOT RAISE <class 'ia_harness.ProcessDeath'>
+/home/user/ia-review/tests/independent_acceptance/test_ia_r1_r4.py:170: Failed: DID NOT RAISE <class 'Exception'>
+/home/user/ia-review/tests/independent_acceptance/test_ia_r1_r4.py:290: AssertionError: REDISPATCH: recovered round reached provider: []
+/home/user/ia-review/tests/independent_acceptance/test_ia_r1_r4.py:290: AssertionError: REDISPATCH: recovered round reached provider: []
+/home/user/ia-review/tests/independent_acceptance/test_ia_sigkill.py:144: assert (None)
+=========================== short test summary info ============================
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth04_wrong_provider_fails_closed
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth05_wrong_model_fails_closed
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth06_wrong_provider_request_id_fails_closed
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[commit_ai_world_claim]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[commit_claim]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[create_attention_watch]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[create_task]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[form_event]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[propose_cognitive_policy]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[propose_dimension]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[propose_entity]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[propose_goal]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[upsert_relation]
+FAILED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op01_exact_retry_is_idempotent_replay
+FAILED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op09_missing_idempotency_record_fails_closed
+FAILED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op12_exact_replay_after_unrelated_revisions
+FAILED tests/independent_acceptance/test_ia_r1_r4.py::test_ia_r1_crash_before_submission_allows_exactly_one_retry
+FAILED tests/independent_acceptance/test_ia_r1_r4.py::test_ia_r2_submitted_without_trusted_return_never_blind_redispatches
+FAILED tests/independent_acceptance/test_ia_r1_r4.py::test_ia_r3_handoff_and_receipt_commit_atomically
+FAILED tests/independent_acceptance/test_ia_r1_r4.py::test_ia_r4_later_round_exact_recovery[1]
+FAILED tests/independent_acceptance/test_ia_r1_r4.py::test_ia_r4_later_round_exact_recovery[2]
+FAILED tests/independent_acceptance/test_ia_sigkill.py::test_ia_kill1_sigkill_after_trusted_handoff_boundary
+======================== 22 failed, 38 passed in 8.32s =========================

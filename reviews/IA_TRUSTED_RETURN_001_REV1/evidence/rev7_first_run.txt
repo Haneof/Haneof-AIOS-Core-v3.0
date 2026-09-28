@@ -1,0 +1,27 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0
+rootdir: /home/user/ia-review
+configfile: pyproject.toml
+collected 59 items
+
+tests/independent_acceptance/test_ia_authenticity.py ...xxx............. [ 32%]
+.                                                                        [ 33%]
+tests/independent_acceptance/test_ia_capability_breadth.py .....FFFFF    [ 50%]
+tests/independent_acceptance/test_ia_operation_replay.py ............... [ 76%]
+....                                                                     [ 83%]
+tests/independent_acceptance/test_ia_r1_r4.py ........                   [ 96%]
+tests/independent_acceptance/test_ia_sigkill.py ..                       [100%]
+
+=================================== FAILURES ===================================
+/home/user/ia-review/tests/independent_acceptance/test_ia_capability_breadth.py:181: AssertionError: [form_event] R5-C REPLAY FAILED: form_event CAPABILITY_EXECUTION_ERROR / StoreError: idempotency key was already used for a different request
+/home/user/ia-review/tests/independent_acceptance/test_ia_capability_breadth.py:181: AssertionError: [propose_cognitive_policy] R5-C REPLAY FAILED: propose_cognitive_policy CAPABILITY_EXECUTION_ERROR / ValueError: policy already registered: ia.policy.0
+/home/user/ia-review/tests/independent_acceptance/test_ia_capability_breadth.py:181: AssertionError: [propose_dimension] R5-C REPLAY FAILED: propose_dimension CAPABILITY_EXECUTION_ERROR / ValueError: dimension_key already exists: dim:iax0
+/home/user/ia-review/tests/independent_acceptance/test_ia_capability_breadth.py:181: AssertionError: [propose_entity] R5-C REPLAY FAILED: propose_entity CAPABILITY_EXECUTION_ERROR / ValueError: entity_key already exists: entity:ia0
+/home/user/ia-review/tests/independent_acceptance/test_ia_capability_breadth.py:181: AssertionError: [propose_goal] R5-C REPLAY FAILED: propose_goal CAPABILITY_EXECUTION_ERROR / StoreError: idempotency key was already used for a different request
+=========================== short test summary info ============================
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[form_event]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[propose_cognitive_policy]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[propose_dimension]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[propose_entity]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[propose_goal]
+=================== 5 failed, 51 passed, 3 xfailed in 7.83s ====================

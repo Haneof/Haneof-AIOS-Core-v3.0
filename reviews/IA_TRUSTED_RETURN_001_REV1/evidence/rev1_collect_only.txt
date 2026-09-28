@@ -1,0 +1,6 @@
+tests/independent_acceptance/test_ia_authenticity.py: 20
+tests/independent_acceptance/test_ia_capability_breadth.py: 10
+tests/independent_acceptance/test_ia_operation_replay.py: 19
+tests/independent_acceptance/test_ia_r1_r4.py: 8
+tests/independent_acceptance/test_ia_sigkill.py: 2
+
