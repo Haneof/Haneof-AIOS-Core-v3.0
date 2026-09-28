@@ -1,0 +1,10 @@
+{
+  "candidate_head": "63c972ad7a19671cbdf809177f7a552aa2c2ecc6",
+  "candidate_parent": "8e34fba00edf4fdb5b80f04d7a648f6b5bb8c40e",
+  "candidate_tree": "8cd4a2d8b4cdf1f85699c5d78166f774741b420b",
+  "harness_manifest_sha256": "e3b9ca6cd502bc27f22bff59a09ff6024bed17ea0865d46018d1ab70a77d7632",
+  "harness_manifest_file_sha256": "85cb2cb38ab5c3b8b6825a64f43d18ae973a4d057855011df5f5bc2dabb05393",
+  "relocated_h2_evidence_files_exact": 71,
+  "frozen_rc": "f20f2edfa7af00d0286493fd15196ca9503bc315",
+  "scope_drift_from_frozen_rc": ""
+}

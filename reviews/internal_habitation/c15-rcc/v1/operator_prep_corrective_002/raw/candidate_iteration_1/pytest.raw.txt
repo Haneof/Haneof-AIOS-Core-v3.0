@@ -1,0 +1,153 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /home/user/.cache/c002/baseline-runtime/runtime/3.12.14/venv/bin/python
+rootdir: /home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2
+configfile: ../../../../../../pyproject.toml
+collecting ... collected 103 items
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c4_different_snapshot[open] PASSED [  0%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c4_different_snapshot[durable] PASSED [  1%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c4_ambiguous[open] PASSED [  2%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c4_ambiguous[durable] PASSED [  3%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c4_ambiguous[mixed] PASSED [  4%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c4_matching_resume[open] PASSED [  5%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c4_matching_resume[durable] PASSED [  6%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c4_durable_request_file_binding[missing] PASSED [  7%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c4_durable_request_file_binding[tamper] PASSED [  8%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-mutation] PASSED [  9%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-deletion] PASSED [ 10%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-duplicate_request] PASSED [ 11%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-duplicate_response] PASSED [ 12%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-duplicate_consumed] PASSED [ 13%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-illegal_order] PASSED [ 14%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-request_digest] PASSED [ 15%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-response_digest] PASSED [ 16%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-torn] PASSED [ 17%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-invalid_json] PASSED [ 18%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-sequence] PASSED [ 19%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-mutation] PASSED [ 20%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-deletion] PASSED [ 21%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-duplicate_request] PASSED [ 22%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-duplicate_response] PASSED [ 23%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-duplicate_consumed] PASSED [ 24%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-illegal_order] PASSED [ 25%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-request_digest] PASSED [ 26%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-response_digest] PASSED [ 27%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-torn] PASSED [ 28%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-invalid_json] PASSED [ 29%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-sequence] PASSED [ 30%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[append-mutation] PASSED [ 31%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[append-deletion] PASSED [ 32%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[append-duplicate_request] PASSED [ 33%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[append-duplicate_response] PASSED [ 33%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[append-duplicate_consumed] PASSED [ 34%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[append-illegal_order] PASSED [ 35%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[append-request_digest] PASSED [ 36%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[append-response_digest] PASSED [ 37%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[append-torn] PASSED [ 38%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[append-invalid_json] PASSED [ 39%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[append-sequence] PASSED [ 40%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-mutation] PASSED [ 41%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-deletion] PASSED [ 42%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-duplicate_request] PASSED [ 43%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-duplicate_response] PASSED [ 44%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-duplicate_consumed] PASSED [ 45%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-illegal_order] PASSED [ 46%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-request_digest] PASSED [ 47%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-response_digest] PASSED [ 48%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-torn] PASSED [ 49%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-invalid_json] PASSED [ 50%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-sequence] PASSED [ 51%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-mutation] PASSED [ 52%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-deletion] PASSED [ 53%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-duplicate_request] PASSED [ 54%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-duplicate_response] PASSED [ 55%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-duplicate_consumed] PASSED [ 56%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-illegal_order] PASSED [ 57%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-request_digest] PASSED [ 58%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-response_digest] PASSED [ 59%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-torn] PASSED [ 60%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-invalid_json] PASSED [ 61%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-sequence] PASSED [ 62%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-mutation] PASSED [ 63%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-deletion] PASSED [ 64%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-duplicate_request] PASSED [ 65%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-duplicate_response] PASSED [ 66%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-duplicate_consumed] PASSED [ 66%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-illegal_order] PASSED [ 67%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-request_digest] PASSED [ 68%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-response_digest] PASSED [ 69%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-torn] PASSED [ 70%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-invalid_json] PASSED [ 71%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-sequence] PASSED [ 72%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_valid_chain PASSED [ 73%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_duplicate_append_refused[request_published] PASSED [ 74%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_duplicate_append_refused[response_published] PASSED [ 75%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c4_c5.py::test_c5_duplicate_append_refused[response_consumed] PASSED [ 76%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c6_c7.py::test_c6_bootstrap_identity[none] PASSED [ 77%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c6_c7.py::test_c6_bootstrap_identity[wrong_root] PASSED [ 78%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c6_c7.py::test_c6_bootstrap_identity[missing_git] PASSED [ 79%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c6_c7.py::test_c6_bootstrap_identity[missing_object] PASSED [ 80%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c6_c7.py::test_c6_bootstrap_identity[core_byte] PASSED [ 81%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c6_c7.py::test_c6_bootstrap_identity[tests_byte] PASSED [ 82%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c6_c7.py::test_c6_bootstrap_identity[foreign_import] PASSED [ 83%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c6_c7.py::test_c6_shared_canonical_manifest FAILED [ 84%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c6_c7.py::test_c7_exact_runtime_pin[sqlite-3.45.1-True] PASSED [ 85%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c6_c7.py::test_c7_exact_runtime_pin[sqlite-3.40.1-False] PASSED [ 86%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c6_c7.py::test_c7_exact_runtime_pin[openssl-OpenSSL 3.0.13 30 Jan 2024-True] PASSED [ 87%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c6_c7.py::test_c7_exact_runtime_pin[openssl-OpenSSL 3.0.14 4 Jun 2024-False] PASSED [ 88%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c6_c7.py::test_c7_real_system_sqlite_fallback PASSED [ 89%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c8_c9.py::test_c8_packet_exact_startup FAILED [ 90%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c8_c9.py::test_c8_audit_startup[none] PASSED [ 91%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c8_c9.py::test_c8_audit_startup[omit_clean] PASSED [ 92%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c8_c9.py::test_c8_audit_startup[omit_canonical] PASSED [ 93%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c8_c9.py::test_c8_audit_startup[board] PASSED [ 94%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c8_c9.py::test_c8_audit_startup[adjudication] PASSED [ 95%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c8_c9.py::test_c8_audit_startup[history] PASSED [ 96%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c8_c9.py::test_c9_due_work_entrypoint PASSED [ 97%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c8_c9.py::test_c9_due_requires_aware_time PASSED [ 98%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c8_c9.py::test_c9_synthetic_due_wake_exchange PASSED [ 99%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c8_c9.py::test_c9_no_semantic_callback PASSED [100%]
+
+=================================== FAILURES ===================================
+______________________ test_c6_shared_canonical_manifest _______________________
+
+package = PosixPath('/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP')
+repo_copy = PosixPath('/tmp/pytest-of-user/pytest-2/test_c6_shared_canonical_manif0/repo')
+
+    def test_c6_shared_canonical_manifest(package, repo_copy):
+        from operator_tools import rc_identity
+        from aios_exchange.verify import core_content_manifest
+        first = core_content_manifest(repo_copy / 'src/aios_core')
+        second = core_content_manifest(repo_copy / 'src/aios_core')
+        assert first == second
+        assert [r['path'] for r in first['files']] == sorted(r['path'] for r in first['files'])
+        report = rc_identity.verify(repo_copy)
+        assert report['ok']
+        packet = json.loads((package / 'RESIDENT_SAFE_LAUNCH_PACKET.json').read_text())
+>       assert first['manifest_sha256'] == packet['frozen_core_content_manifest_sha256']
+E       AssertionError: assert '220718d6b5a2650b5e4263bbe8b7e661444cb33b486a7ecd7b5ad3d7d3399caa' == '3ca61cf1a34aff504d6df4fe3696e3f6d521e39de3adac96a0898789b54f885a'
+E         
+E         - 3ca61cf1a34aff504d6df4fe3696e3f6d521e39de3adac96a0898789b54f885a
+E         + 220718d6b5a2650b5e4263bbe8b7e661444cb33b486a7ecd7b5ad3d7d3399caa
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c6_c7.py:85: AssertionError
+_________________________ test_c8_packet_exact_startup _________________________
+
+package = PosixPath('/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP')
+
+    def test_c8_packet_exact_startup(package):
+        packet = json.loads((package / 'RESIDENT_SAFE_LAUNCH_PACKET.json').read_text())
+>       assert len(packet['allowed_startup_inputs']) == 4
+E       AssertionError: assert 3 == 4
+E        +  where 3 = len(['RESIDENT_SAFE_LAUNCH_PACKET.json (this file)', 'reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_RUN_CONTRACT.md', 'mechanical environment/harness status emitted by the approved launch tools'])
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c8_c9.py:15: AssertionError
+- generated xml file: /home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/candidate_iteration_1/results.xml -
+=========================== short test summary info ============================
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c6_c7.py::test_c6_shared_canonical_manifest - AssertionError: assert '220718d6b5a2650b5e4263bbe8b7e661444cb33b486a7ecd7b5ad3d7d3399caa' == '3ca61cf1a34aff504d6df4fe3696e3f6d521e39de3adac96a0898789b54f885a'
+  
+  - 3ca61cf1a34aff504d6df4fe3696e3f6d521e39de3adac96a0898789b54f885a
+  + 220718d6b5a2650b5e4263bbe8b7e661444cb33b486a7ecd7b5ad3d7d3399caa
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/tests/test_c8_c9.py::test_c8_packet_exact_startup - AssertionError: assert 3 == 4
+ +  where 3 = len(['RESIDENT_SAFE_LAUNCH_PACKET.json (this file)', 'reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_RUN_CONTRACT.md', 'mechanical environment/harness status emitted by the approved launch tools'])
+======================== 2 failed, 101 passed in 8.39s =========================

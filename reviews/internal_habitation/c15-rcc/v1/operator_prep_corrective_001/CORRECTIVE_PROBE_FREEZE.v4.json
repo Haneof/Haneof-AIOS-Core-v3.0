@@ -1,0 +1,49 @@
+{
+  "C1_invariants": [
+    "tampered publish replay fails immediately",
+    "missing published file replay fails immediately",
+    "intact replay stays idempotent",
+    "changed replay bytes fail",
+    "tampered consume remains fail closed"
+  ],
+  "C2_invariants": [
+    "10-distribution CPython 3.12.14 x86_64 Linux closed dependency set",
+    "pre-download project/version/filename/tags/SHA-256 lock",
+    "wrong bytes/hash rejected",
+    "unexpected/missing wheel rejected",
+    "offline installation without resolver"
+  ],
+  "C3_invariants": [
+    "collect-only return code zero",
+    "parse exact pytest node IDs",
+    "parsed IDs equal reported collected total",
+    "result test_count equals len(test_ids)",
+    "execution outcomes sum to test_count",
+    "malformed output/nonzero return/empty IDs with nonzero collected total/count mismatch fail closed"
+  ],
+  "corrected_candidate_expected_counts": {
+    "A": 24,
+    "B": 7,
+    "C": 2,
+    "D": 5
+  },
+  "correction_reason": "Expected candidate enumeration now explicitly accounts for the five authorized Gate A regression tests while preserving historical 19/7/2/5 counts for the exact failed baseline. No candidate probe results were inspected.",
+  "count_delta_rationale": "Gate A adds exactly five IA-OP-001 regression test IDs covering tampered replay, missing file replay, intact exact replay, changed replay bytes, and tampered consume fail-closed. Existing 19 Gate A checks are retained; B/C/D remain unchanged.",
+  "expected_blocker_outcomes": {
+    "IA-OP-001": "historical RED, corrected GREEN",
+    "IA-OP-002": "historical RED, corrected GREEN",
+    "IA-OP-003": "historical RED, corrected GREEN"
+  },
+  "expected_outcomes_frozen_before_v4_baseline_execution": true,
+  "historical_expected_counts": {
+    "A": 19,
+    "B": 7,
+    "C": 2,
+    "D": 5
+  },
+  "prior_revision_sha256": "f855486bcd06fe67a9d9576db36276dbdf98a297d91c278d44d1650c91c9b518",
+  "probe_revision": "v4",
+  "probe_source_path": "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_001/probes/corrective_probes_v4.py",
+  "probe_source_sha256": "13c40de486e5dc20675d7e227a05bc24105855db6e0a2b85b6bf8771833b7331",
+  "supersedes": "v3"
+}

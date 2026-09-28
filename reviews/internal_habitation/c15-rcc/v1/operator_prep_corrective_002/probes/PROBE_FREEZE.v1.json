@@ -1,0 +1,18 @@
+{
+  "revision": 1,
+  "frozen_utc": "2026-09-28T21:01:46.592001+00:00",
+  "first_candidate_execution_not_started": true,
+  "candidate_expected_count": 103,
+  "baseline_exact": "c32e544b747cb1f1d9b7418e2163a65ac55ee39c",
+  "files": {
+    "COLLECT_ONLY.txt": "e3e4af0056995a7c489370835042eed929aab71e446188c4df3befb7fe06f997",
+    "EXPECTED_OUTCOMES.json": "555c888e36e9a5f2b4bb61a1a648e4a49f0aef450a3b1a849cf3cd80c2f31be3",
+    "PLAN.md": "8ce62f468741299b0c3472e3b887577e85a23c5fbc25866068cb59966f32cf3d",
+    "tests/conftest.py": "095af5259d946f76d708d8c759b8050c13833785b6fa95eec5493a6c642da57e",
+    "tests/synthetic/__init__.py": "25b57be13f8ddccf1d90e3f42d408c500e6ec2efdcde9b29984176fe3fc92ece",
+    "tests/synthetic/support.py": "bceec7c9e50a224c6fcf6c29fc18a67aba61c29e6181c8a6e12bac0455491970",
+    "tests/test_c4_c5.py": "4d247e649c0ab7d09495f17cd143911a59dde1b9b44b666d6d7ba47f17784036",
+    "tests/test_c6_c7.py": "4f9144005a66e85ec87a437b2a45ece35141f8dc66211f88e39f6e84f630e0d4",
+    "tests/test_c8_c9.py": "cf15726bc0c481b3a4dd2f6d4d1be039ba2b86adcf85ae0e1c726d8b8fa77e7a"
+  }
+}
