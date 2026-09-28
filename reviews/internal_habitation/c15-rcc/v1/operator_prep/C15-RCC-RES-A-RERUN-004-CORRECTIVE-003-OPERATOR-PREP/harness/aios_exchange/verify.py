@@ -123,28 +123,7 @@ def verify_exchange_integrity(exchange_root: str | pathlib.Path) -> dict[str, An
     }
 
 
-def core_content_manifest(core_root: str | pathlib.Path) -> dict[str, Any]:
-    """Deterministic content manifest (path -> sha256) of a Core source tree."""
-
-    root = pathlib.Path(core_root)
-    if not root.is_dir():
-        raise FileNotFoundError(f"core root not found: {root}")
-    files: list[dict[str, Any]] = []
-    for path in sorted(root.rglob("*")):
-        if not path.is_file():
-            continue
-        if "__pycache__" in path.parts:
-            continue
-        relative = path.relative_to(root).as_posix()
-        files.append(
-            {
-                "path": relative,
-                "sha256": sha256_hex(read_bytes(path)),
-                "size": path.stat().st_size,
-            }
-        )
-    combined = sha256_hex(canonical_json_bytes(files))
-    return {"core_root": str(root), "file_count": len(files), "files": files, "manifest_sha256": combined}
+from .content_manifest import core_content_manifest
 
 
 def verify_core_content_manifest(

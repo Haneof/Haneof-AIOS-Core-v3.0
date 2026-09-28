@@ -1,6 +1,6 @@
 """Operator tooling: frozen RC identity and Core content verification.
 
-Uses git object ids only; it never prints or inspects commit content. This tool
+Validates frozen Git identities and canonical working-tree Core/tests bytes. This tool
 is deliberately outside the run package so the run package needs no
 ``subprocess``.
 
@@ -17,6 +17,10 @@ import pathlib
 import subprocess
 import sys
 from typing import Any
+import hashlib
+import os
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
+from aios_exchange.content_manifest import core_content_manifest, FROZEN_CORE_MANIFEST
 
 FROZEN_SOFTWARE_SHA = "f20f2edfa7af00d0286493fd15196ca9503bc315"
 FROZEN_REPOSITORY_TREE = "1ac3a675b884167d3a29aa432e7ef3eaff94d404"
@@ -32,7 +36,7 @@ def _git(repo_root: pathlib.Path, *args: str) -> str | None:
 
 
 def verify(repo_root: str | pathlib.Path) -> dict[str, Any]:
-    repo = pathlib.Path(repo_root)
+    repo = pathlib.Path(repo_root).resolve()
     observed = {
         "software_object_type": _git(repo, "cat-file", "-t", FROZEN_SOFTWARE_SHA),
         "repository_tree": _git(repo, "rev-parse", f"{FROZEN_SOFTWARE_SHA}^{{tree}}"),
@@ -54,6 +58,27 @@ def verify(repo_root: str | pathlib.Path) -> dict[str, Any]:
         "no_src_drift_from_frozen_software": observed["src_drift"] == "",
         "no_tests_drift_from_frozen_software": observed["tests_drift"] == "",
     }
+    checks["git_metadata_readable"] = (repo / ".git").exists() and os.access(repo / ".git", os.R_OK)
+    checks["repo_is_exact_toplevel"] = _git(repo, "rev-parse", "--show-toplevel") == str(repo)
+    try:
+        manifest = core_content_manifest(repo / "src/aios_core")
+        observed["core_content_manifest_sha256"] = manifest["manifest_sha256"]
+        checks["core_working_bytes_match"] = manifest["manifest_sha256"] == FROZEN_CORE_MANIFEST
+        # Test-tree comparison uses the same path/SHA/size algorithm and exact Git blobs.
+        tests = core_content_manifest(repo / "tests")
+        names = _git(repo, "ls-tree", "-r", "--name-only", FROZEN_SOFTWARE_SHA, "--", "tests")
+        if names is None:
+            raise ValueError("frozen tests not readable")
+        expected = []
+        for name in names.splitlines():
+            raw = subprocess.check_output(["git", "-C", str(repo), "show", f"{FROZEN_SOFTWARE_SHA}:{name}"])
+            expected.append({"path": name.removeprefix("tests/"),
+                "sha256": hashlib.sha256(raw).hexdigest(), "size": len(raw)})
+        checks["tests_working_bytes_match"] = tests["files"] == sorted(expected, key=lambda row: row["path"])
+        observed["tests_content_manifest_sha256"] = tests["manifest_sha256"]
+    except Exception as exc:
+        checks["working_bytes_verified"] = False
+        observed["content_error"] = str(exc)
     return {
         "ok": all(checks.values()),
         "repo_root": str(repo),

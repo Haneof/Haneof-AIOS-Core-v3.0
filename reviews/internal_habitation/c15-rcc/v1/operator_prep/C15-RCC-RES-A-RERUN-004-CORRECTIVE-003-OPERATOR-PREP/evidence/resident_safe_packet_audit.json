@@ -2,11 +2,11 @@
   "clean_room_inputs": [
     {
       "file": "reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_CORRECTIVE_003_CLEAN_ROOM_CONTRACT.md",
-      "frozen_control_plane_blob": "bca3715f9aaff1f3e6f813cf6d1b9f23b0945bef",
-      "observed_blob": "bca3715f9aaff1f3e6f813cf6d1b9f23b0945bef",
-      "packet_sha256": "1da3ed6685e434cdc6dceae707d255fb5f2110ff4d05bb1c69615f0b792662f1",
+      "frozen_control_plane_blob": "430a75e0a20b0256672eb430617ae5a1d14c142f",
+      "observed_blob": "430a75e0a20b0256672eb430617ae5a1d14c142f",
+      "packet_sha256": "ed5140bd9719d028744f50e23737b4185c1f4d6efb1234f7d0da857783c7973b",
       "result": "PASS",
-      "sha256": "1da3ed6685e434cdc6dceae707d255fb5f2110ff4d05bb1c69615f0b792662f1"
+      "sha256": "ed5140bd9719d028744f50e23737b4185c1f4d6efb1234f7d0da857783c7973b"
     },
     {
       "file": "reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_RUN_CONTRACT.md",
@@ -68,10 +68,10 @@
       "result": "PASS"
     }
   },
-  "frozen_control_plane": "026810533679d749d9a33b9c11a06585ae28d9f6",
-  "generated_utc": "2026-09-28T20:33:08.242969+00:00",
+  "frozen_control_plane": "b7c9e85014806637f7a01c8fd6695bc9f57672ba",
+  "generated_utc": "2026-09-28T21:28:00.276628+00:00",
   "packet": "RESIDENT_SAFE_LAUNCH_PACKET.json",
-  "packet_sha256": "c1ddfa6b2fe89be2a2b9533f2483251f7423eb961755c7777bbab044da8a6f12",
+  "packet_sha256": "8d009995bb1ae5895736b6e19b88b3ca847918ff3eeee821e568ae4766b64894",
   "packet_structure": {
     "checked_keys": [
       "allowed_cursor_end",
@@ -80,13 +80,16 @@
       "bootstrap_path",
       "bootstrap_sha256",
       "bootstrap_verify_command",
+      "c1_c3_regression_sha256",
       "clean_bootstrap_evidence_path",
       "clean_bootstrap_evidence_sha256",
       "clean_room_contract_path",
       "clean_room_contract_sha256",
+      "content_manifest_algorithm",
       "corrective_parent_rule",
       "corrective_probe_freeze_sha256",
       "corrective_starting_main_sha",
+      "due_work_entrypoint",
       "environment_record_path",
       "environment_record_sha256",
       "forbidden_startup_categories",
@@ -115,9 +118,14 @@
       "harness_manifest_sha256",
       "harness_root",
       "harness_runner_module",
+      "historical_additional_ia_exact",
       "historical_failed_candidate_exact",
       "historical_failed_ia_exact",
+      "historical_review_blocked_h1b",
+      "historical_review_blocked_h2",
+      "initial_carry_and_probe_freeze_commit",
       "ledger_module",
+      "openssl_version",
       "operator_prep_exact_head",
       "operator_prep_exact_parent",
       "operator_prep_head_rule",
@@ -125,6 +133,7 @@
       "pydantic_version",
       "pytest_version",
       "python_version",
+      "rc_identity_evidence_sha256",
       "real_response_mode",
       "request_publisher_module",
       "resident_run_contract_path",
@@ -137,6 +146,7 @@
       "targeted_baseline_red_result_sha256",
       "targeted_candidate_green_result_sha256",
       "task_id",
+      "tests_content_manifest_sha256",
       "wheel_lock_path",
       "wheel_lock_sha256",
       "wheel_lock_verification_sha256"
@@ -146,12 +156,12 @@
     "problems": [],
     "value_findings": []
   },
-  "pin_check_count": 15,
+  "pin_check_count": 49,
   "pin_checks": [
     {
-      "expected_sha256": "09c655d35a0c1b9be28a210e9ac2d681e964628eb24ce34b5db0ca894772e3b0",
+      "expected_sha256": "e98965d8b55f5e8202c9470af2a3ca175ccde9f93427de5d6cf717921c3ea497",
       "label": "bootstrap",
-      "observed_sha256": "09c655d35a0c1b9be28a210e9ac2d681e964628eb24ce34b5db0ca894772e3b0",
+      "observed_sha256": "e98965d8b55f5e8202c9470af2a3ca175ccde9f93427de5d6cf717921c3ea497",
       "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/bootstrap/bootstrap_runtime.sh",
       "result": "PASS"
     },
@@ -163,37 +173,37 @@
       "result": "PASS"
     },
     {
-      "expected_sha256": "f0667af956a9242a1f5317210c5e022ca1133e15fd84b01c3558466e65114d59",
+      "expected_sha256": "4ee4531c1333ce6e2cf205bdd8a4137a3d76b35721b3f1303eb1db4fe6359cfd",
       "label": "wheel_lock_verification",
-      "observed_sha256": "f0667af956a9242a1f5317210c5e022ca1133e15fd84b01c3558466e65114d59",
+      "observed_sha256": "4ee4531c1333ce6e2cf205bdd8a4137a3d76b35721b3f1303eb1db4fe6359cfd",
       "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/wheel_lock_verification.json",
       "result": "PASS"
     },
     {
-      "expected_sha256": "39e028da524990cdef7ee38efcd1646cffa38305d871ac843afe4221d10a7c03",
+      "expected_sha256": "42aae623209378417dc17d8d72b02d5e2a32238236ea477d45a4f0d8552f7422",
       "label": "clean_bootstrap_evidence",
-      "observed_sha256": "39e028da524990cdef7ee38efcd1646cffa38305d871ac843afe4221d10a7c03",
+      "observed_sha256": "42aae623209378417dc17d8d72b02d5e2a32238236ea477d45a4f0d8552f7422",
       "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/clean_bootstrap_manifest.json",
       "result": "PASS"
     },
     {
-      "expected_sha256": "4f75e002f3bd5698b53dd3594ac5c76701bd8420b39e2fdb72b1600e80bb3d5b",
+      "expected_sha256": "85cb2cb38ab5c3b8b6825a64f43d18ae973a4d057855011df5f5bc2dabb05393",
       "label": "harness_manifest_file",
-      "observed_sha256": "4f75e002f3bd5698b53dd3594ac5c76701bd8420b39e2fdb72b1600e80bb3d5b",
+      "observed_sha256": "85cb2cb38ab5c3b8b6825a64f43d18ae973a4d057855011df5f5bc2dabb05393",
       "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/harness_manifest.json",
       "result": "PASS"
     },
     {
-      "expected_sha256": "6ebd6a8e438340a686c6345a01d84680b9130a0c82208d9cf68c5cb18afa71f9",
+      "expected_sha256": "25313404c6f853b4e6f312925058756728382ae199de3d257edbb5f070b3444a",
       "label": "environment_record",
-      "observed_sha256": "6ebd6a8e438340a686c6345a01d84680b9130a0c82208d9cf68c5cb18afa71f9",
+      "observed_sha256": "25313404c6f853b4e6f312925058756728382ae199de3d257edbb5f070b3444a",
       "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/environment_record.json",
       "result": "PASS"
     },
     {
-      "expected_sha256": "1da3ed6685e434cdc6dceae707d255fb5f2110ff4d05bb1c69615f0b792662f1",
+      "expected_sha256": "ed5140bd9719d028744f50e23737b4185c1f4d6efb1234f7d0da857783c7973b",
       "label": "clean_room_contract",
-      "observed_sha256": "1da3ed6685e434cdc6dceae707d255fb5f2110ff4d05bb1c69615f0b792662f1",
+      "observed_sha256": "ed5140bd9719d028744f50e23737b4185c1f4d6efb1234f7d0da857783c7973b",
       "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_CORRECTIVE_003_CLEAN_ROOM_CONTRACT.md",
       "result": "PASS"
     },
@@ -205,29 +215,261 @@
       "result": "PASS"
     },
     {
-      "expected_sha256": "93833b83548dd5b448d049ffe725bf1ac268a8a2946e9ad17268a53123d2cbc4",
+      "expected_sha256": "a0813c69f588db67e0c78f9d44dc74834990926038d5a0c0a03b097aa8d6c460",
       "label": "corrective_probe_freeze",
-      "observed_sha256": "93833b83548dd5b448d049ffe725bf1ac268a8a2946e9ad17268a53123d2cbc4",
-      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_001/CORRECTIVE_PROBE_FREEZE.v6.json",
+      "observed_sha256": "a0813c69f588db67e0c78f9d44dc74834990926038d5a0c0a03b097aa8d6c460",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/PROBE_FREEZE.v2.json",
       "result": "PASS"
     },
     {
-      "expected_sha256": "3498aa4599a1446807808f28bcbc0edc496be09f828b9920b3ac1e77a1429531",
+      "expected_sha256": "f33f472b1b40cff1d1fd2d69d301b1d2cee6ca88c2fcfcf03a84debc697e3781",
       "label": "targeted_baseline_red",
-      "observed_sha256": "3498aa4599a1446807808f28bcbc0edc496be09f828b9920b3ac1e77a1429531",
-      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_001/BASELINE_RED_RUN.v6.json",
+      "observed_sha256": "f33f472b1b40cff1d1fd2d69d301b1d2cee6ca88c2fcfcf03a84debc697e3781",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/BASELINE_RED.v2.json",
       "result": "PASS"
     },
     {
-      "expected_sha256": "6b9793ebf63b50a468607e1f7f381594b4a9ca0031e897b15e5526b87a7c441a",
+      "expected_sha256": "9a28d9700a5a4c7cb002a6048f0f83e06e2816692f29517ba53073e27adb3e70",
       "label": "targeted_candidate_green",
-      "observed_sha256": "6b9793ebf63b50a468607e1f7f381594b4a9ca0031e897b15e5526b87a7c441a",
+      "observed_sha256": "9a28d9700a5a4c7cb002a6048f0f83e06e2816692f29517ba53073e27adb3e70",
       "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/corrective_candidate_green.json",
       "result": "PASS"
     },
     {
+      "expected_sha256": "416ebb9f51a128c8818fa6a4ef7400689ae1717629316b55a4c81248907ff299",
+      "label": "c1_c3_regression",
+      "observed_sha256": "416ebb9f51a128c8818fa6a4ef7400689ae1717629316b55a4c81248907ff299",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/c1_c3_regression.json",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "f5c5d798bdd98f610bdb27c703ee7311ca9514d20baf50802b337e57ce78ad27",
+      "label": "rc_identity",
+      "observed_sha256": "f5c5d798bdd98f610bdb27c703ee7311ca9514d20baf50802b337e57ce78ad27",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/rc_identity.json",
+      "result": "PASS"
+    },
+    {
+      "label": "current_frozen_working_bytes",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe",
+      "label": "harness_content",
+      "observed_sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/bootstrap/PYTHON_WHEEL_LOCK.json",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "e98965d8b55f5e8202c9470af2a3ca175ccde9f93427de5d6cf717921c3ea497",
+      "label": "harness_content",
+      "observed_sha256": "e98965d8b55f5e8202c9470af2a3ca175ccde9f93427de5d6cf717921c3ea497",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/bootstrap/bootstrap_runtime.sh",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "565c7e1e560f0e5394caf85ff1e16f61b53468884aea561de3cbfc61a863e765",
+      "label": "harness_content",
+      "observed_sha256": "565c7e1e560f0e5394caf85ff1e16f61b53468884aea561de3cbfc61a863e765",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/bootstrap/wheel_lock.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "7900d69b069ca6440302895c4e82531bc776757648511aef25a0133efd7a465b",
+      "label": "harness_content",
+      "observed_sha256": "7900d69b069ca6440302895c4e82531bc776757648511aef25a0133efd7a465b",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/__init__.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "1dcf79d443dee0279ada264f5c4de890a78834f964b502bfb19b10d1d59c395e",
+      "label": "harness_content",
+      "observed_sha256": "1dcf79d443dee0279ada264f5c4de890a78834f964b502bfb19b10d1d59c395e",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/atomic.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "8a37b82a56958162aa92825fa8908e9637870b2110f221f44b8ec957f7cbc772",
+      "label": "harness_content",
+      "observed_sha256": "8a37b82a56958162aa92825fa8908e9637870b2110f221f44b8ec957f7cbc772",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/bridge.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "d1ae3e5a46bced68bedb455bf4e6ce6c6783391c9f319b3317bf0bff83800ac1",
+      "label": "harness_content",
+      "observed_sha256": "d1ae3e5a46bced68bedb455bf4e6ce6c6783391c9f319b3317bf0bff83800ac1",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/canonical.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "4f8cdd3f0b957c2958d897765dfcaed05b698582ddb652faa838fe564d1e0a5b",
+      "label": "harness_content",
+      "observed_sha256": "4f8cdd3f0b957c2958d897765dfcaed05b698582ddb652faa838fe564d1e0a5b",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/content_manifest.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "02f71bc71e756f80413cc827a38a3eace44b078650b873f20dcec5a58f3cc8cd",
+      "label": "harness_content",
+      "observed_sha256": "02f71bc71e756f80413cc827a38a3eace44b078650b873f20dcec5a58f3cc8cd",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/ledger.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "18597a915bf3d948c1ae8d599b9f3d787aa06eab998c363989d9454e2c51829f",
+      "label": "harness_content",
+      "observed_sha256": "18597a915bf3d948c1ae8d599b9f3d787aa06eab998c363989d9454e2c51829f",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/requests.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "7d1a657b97747e0dd277f420ba4c935cb706b30e028e1324d11993f8aca0d23b",
+      "label": "harness_content",
+      "observed_sha256": "7d1a657b97747e0dd277f420ba4c935cb706b30e028e1324d11993f8aca0d23b",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/responses.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "a3a8c103715979c57c0ef4959786dafb73176244a1c1cec301e1363d78990849",
+      "label": "harness_content",
+      "observed_sha256": "a3a8c103715979c57c0ef4959786dafb73176244a1c1cec301e1363d78990849",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/runner.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "8278ba82f1fbdee637be20f409a13ce5489d9c04bf88bf727a486760605cb45b",
+      "label": "harness_content",
+      "observed_sha256": "8278ba82f1fbdee637be20f409a13ce5489d9c04bf88bf727a486760605cb45b",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/schema.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "aafea0b78e4b19ee4b4a64845529f2a2de78d8b0fe4dbfd875ae6890729312e5",
+      "label": "harness_content",
+      "observed_sha256": "aafea0b78e4b19ee4b4a64845529f2a2de78d8b0fe4dbfd875ae6890729312e5",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/verify.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "3bcce93757d916f24e01dd9c595019b70a46d522e891fa7dab73e9d8dc5309f2",
+      "label": "harness_content",
+      "observed_sha256": "3bcce93757d916f24e01dd9c595019b70a46d522e891fa7dab73e9d8dc5309f2",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/operator_tools/__init__.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "10140d363b67c2e68880d3f2ee26d449afbefe5af0317c2ced0467ed1fbf70ee",
+      "label": "harness_content",
+      "observed_sha256": "10140d363b67c2e68880d3f2ee26d449afbefe5af0317c2ced0467ed1fbf70ee",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/operator_tools/build_launch_packet.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "4b0588adb4128a67fa3a2c7b02a5d636880f4bd8434baf8acceb8e9acd279e0e",
+      "label": "harness_content",
+      "observed_sha256": "4b0588adb4128a67fa3a2c7b02a5d636880f4bd8434baf8acceb8e9acd279e0e",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/operator_tools/freeze.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "ff4316ad278ee861f926bb52aeaf47f0d4d482adff1def9145b66a4287fda619",
+      "label": "harness_content",
+      "observed_sha256": "ff4316ad278ee861f926bb52aeaf47f0d4d482adff1def9145b66a4287fda619",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/operator_tools/gate_runner.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "adb973d40ce924af913258049963f2e86912cdc54f825f33fbfd5ba40d864ac0",
+      "label": "harness_content",
+      "observed_sha256": "adb973d40ce924af913258049963f2e86912cdc54f825f33fbfd5ba40d864ac0",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/operator_tools/no_semantic_scan.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "69389299e3979e1ac52056d04e47aa40f6e432af5d163e8ec21b2064b923f65d",
+      "label": "harness_content",
+      "observed_sha256": "69389299e3979e1ac52056d04e47aa40f6e432af5d163e8ec21b2064b923f65d",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/operator_tools/packet_audit.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "4f6e030ba9876f37221b7f77f58fd9e7c3b7ac3561dab8a1ab2c66a71ef4834f",
+      "label": "harness_content",
+      "observed_sha256": "4f6e030ba9876f37221b7f77f58fd9e7c3b7ac3561dab8a1ab2c66a71ef4834f",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/operator_tools/rc_identity.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "6b0e3b5699f7541135cd58e67dfa3f91a1cd83fcfdc093bc230b884657ee924f",
+      "label": "harness_content",
+      "observed_sha256": "6b0e3b5699f7541135cd58e67dfa3f91a1cd83fcfdc093bc230b884657ee924f",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/conftest.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "90596a4ea141313e283098d990a559893b372a566a5cc0e3f3a74fd1dcabc7db",
+      "label": "harness_content",
+      "observed_sha256": "90596a4ea141313e283098d990a559893b372a566a5cc0e3f3a74fd1dcabc7db",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/synthetic/__init__.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "7b399225fead98324c13214dfdad4af3025e9a3cb2ff9dfbb3a6edc921c47240",
+      "label": "harness_content",
+      "observed_sha256": "7b399225fead98324c13214dfdad4af3025e9a3cb2ff9dfbb3a6edc921c47240",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/synthetic/crash_worker.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "298e8e5ef8ebd1a52da711cbf8c021e79209b7d55cdd469f256478d8ce76d846",
+      "label": "harness_content",
+      "observed_sha256": "298e8e5ef8ebd1a52da711cbf8c021e79209b7d55cdd469f256478d8ce76d846",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/synthetic/deterministic_resident.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "d482a4b2536c50a7405887fcc2c0d79033eb3a8acfa7c2a863a39f4d3a131e39",
+      "label": "harness_content",
+      "observed_sha256": "d482a4b2536c50a7405887fcc2c0d79033eb3a8acfa7c2a863a39f4d3a131e39",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/synthetic/gate_env.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "1d2f6f4141a25a9db222ba95e210a6cc712c00cc67a536d6f99bff9f9985fde9",
+      "label": "harness_content",
+      "observed_sha256": "1d2f6f4141a25a9db222ba95e210a6cc712c00cc67a536d6f99bff9f9985fde9",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "6916e4b42b41d90d8c4ac1c27b8d9fb6249bc6f6e5c46f298e0033db311a45de",
+      "label": "harness_content",
+      "observed_sha256": "6916e4b42b41d90d8c4ac1c27b8d9fb6249bc6f6e5c46f298e0033db311a45de",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "78216b27e20830b72b137081a0e43d18a21aeb7aa45552c990e4c52eee61fb96",
+      "label": "harness_content",
+      "observed_sha256": "78216b27e20830b72b137081a0e43d18a21aeb7aa45552c990e4c52eee61fb96",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_c_two_round_integration.py",
+      "result": "PASS"
+    },
+    {
+      "expected_sha256": "3116f7669c408dc0adda2abf478ef3a32e9e62de587db31480fb7038fd548d19",
+      "label": "harness_content",
+      "observed_sha256": "3116f7669c408dc0adda2abf478ef3a32e9e62de587db31480fb7038fd548d19",
+      "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py",
+      "result": "PASS"
+    },
+    {
+      "label": "candidate_and_initial_carry_parent_identities",
+      "result": "PASS"
+    },
+    {
       "execution_total": 24,
-      "gate_result_sha256": "50b798551a00888a0c0c17b67d6c46bf24ddbadb6be16cf5becca9a9b4188671",
+      "gate_result_sha256": "3939c804580781c459c8ff0ea1c1185a2195b8afae77ab115bdd1694a83817fb",
       "label": "gate_a_enumeration_execution_and_result",
       "result": "PASS",
       "test_count": 24,
@@ -235,7 +477,7 @@
     },
     {
       "execution_total": 7,
-      "gate_result_sha256": "dd4c09b52e7d64768fe7637130386ce83f4a840c91d5629b7e3af00a4a49150a",
+      "gate_result_sha256": "b24f8a7c6c3ed576d907d949f6a8e46370c85943e1f6a7ee822e876f7f41eca2",
       "label": "gate_b_enumeration_execution_and_result",
       "result": "PASS",
       "test_count": 7,
@@ -243,7 +485,7 @@
     },
     {
       "execution_total": 2,
-      "gate_result_sha256": "71dfc76042e694ffb29d0d5928ba8f6fa79c70253e2f818a88bf464632b59864",
+      "gate_result_sha256": "fe92a840633c0eda5c48a88b9a26ae261cc95b131255c0cbfc1a80a59c085e7f",
       "label": "gate_c_enumeration_execution_and_result",
       "result": "PASS",
       "test_count": 2,
@@ -251,7 +493,7 @@
     },
     {
       "execution_total": 5,
-      "gate_result_sha256": "affafd93cb6c227ceb2bd73eccd635353e088d9230ee7609943992879b974aaf",
+      "gate_result_sha256": "5bf45d66949f09171c6010f98c1e60a46dfb36e97fdadd348587ed87bb843105",
       "label": "gate_d_enumeration_execution_and_result",
       "result": "PASS",
       "test_count": 5,
@@ -266,7 +508,7 @@
       "findings": [],
       "mode": "packet-structure+values",
       "result": "PASS",
-      "sha256": "c1ddfa6b2fe89be2a2b9533f2483251f7423eb961755c7777bbab044da8a6f12"
+      "sha256": "8d009995bb1ae5895736b6e19b88b3ca847918ff3eeee821e568ae4766b64894"
     },
     {
       "file": "harness/aios_exchange/**",
@@ -274,7 +516,7 @@
       "mode": "gate D code-only scan (frozen)",
       "result": "PASS",
       "scanner": "harness/operator_tools/no_semantic_scan.py",
-      "sha256": "d5f15f1e7de26981ecae7935bdc400239363aad46af6fe4c4b8671ae6754ef72"
+      "sha256": "e3b9ca6cd502bc27f22bff59a09ff6024bed17ea0865d46018d1ab70a77d7632"
     },
     {
       "file": "bootstrap/bootstrap_runtime.sh",
@@ -290,7 +532,7 @@
         }
       ],
       "result": "PASS",
-      "sha256": "09c655d35a0c1b9be28a210e9ac2d681e964628eb24ce34b5db0ca894772e3b0"
+      "sha256": "e98965d8b55f5e8202c9470af2a3ca175ccde9f93427de5d6cf717921c3ea497"
     },
     {
       "file": "bootstrap/PYTHON_WHEEL_LOCK.json",

@@ -16,17 +16,23 @@ import signal
 import sys
 from pathlib import Path
 
-HARNESS_ROOT = Path(__file__).resolve().parents[1]
+HARNESS_ROOT = Path(__file__).resolve().parents[2]
 if str(HARNESS_ROOT) not in sys.path:
     sys.path.insert(0, str(HARNESS_ROOT))
 
 from aios_exchange.bridge import ExchangeBridge  # noqa: E402
 from aios_exchange.canonical import canonical_json_bytes  # noqa: E402
 
-SYNTHETIC_BODY = {
-    "synthetic_probe": "operator-prep durable exchange crash probe",
-    "synthetic_subject": "synthetic_subject_operator_prep",
-}
+# The recovery gate must publish the exact snapshot it later resumes. The old
+# unrelated dictionary implicitly exercised the now-forbidden S1 -> S2 reuse.
+from aios_core.runtime.cognitive_runtime import RuntimeSnapshot
+from aios_exchange.runner import serialize_runtime_snapshot
+
+SYNTHETIC_BODY = serialize_runtime_snapshot(RuntimeSnapshot(
+    user_input="synthetic recovery probe", wake_reason="synthetic", cockpit={},
+    capability_catalog=(), capability_history=(), round_index=0,
+    remaining_tool_rounds=0,
+))
 
 
 def suicide() -> None:

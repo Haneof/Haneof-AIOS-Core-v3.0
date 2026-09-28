@@ -35,7 +35,7 @@ from .bridge import (
     ExchangeBridge,
     ExchangeContractError,
 )
-from .canonical import canonical_json_bytes
+from .canonical import canonical_json_bytes, sha256_hex
 from .schema import parse_model_directive, serialize_runtime_snapshot
 
 __all__ = [
@@ -46,6 +46,7 @@ __all__ = [
     "ExternalSessionModelHandler",
     "open_bridge",
     "run_user_turn",
+    "run_due_work",
 ]
 
 
@@ -80,17 +81,24 @@ class ExternalSessionModelHandler:
     # -- model boundary --------------------------------------------------
     def __call__(self, snapshot: RuntimeSnapshot) -> ModelDirective:
         body = serialize_runtime_snapshot(snapshot)
+        body_bytes = canonical_json_bytes(body)
+        body_digest = sha256_hex(body_bytes)
         state = self.bridge.recovery_state()
-
-        durable_unconsumed = list(state.get("durable_unconsumed") or [])
-        if durable_unconsumed:
-            request_id = durable_unconsumed[0]
-            return self._resolve(request_id, body_digest=None, path="recovered_durable_response")
-
+        durable = list(state.get("durable_unconsumed") or [])
         outstanding = list(state.get("open_dispatched") or [])
-        if outstanding:
-            request_id = outstanding[0]
-            return self._resolve(request_id, body_digest=None, path="resumed_dispatched_request")
+        identities = set(durable + outstanding)
+        if len(durable) > 1 or len(outstanding) > 1 or len(identities) > 1:
+            raise ExchangeContractError("ambiguous recovery state")
+        if identities:
+            request_id = next(iter(identities))
+            # payload() validates the exact file against the ledger full-file SHA.
+            # Body SHA has a distinct domain from the timestamped envelope SHA.
+            durable_body = self.bridge.request_body(request_id)
+            durable_bytes = canonical_json_bytes(durable_body)
+            if sha256_hex(durable_bytes) != body_digest or durable_bytes != body_bytes:
+                raise ExchangeContractError("recovery snapshot binding mismatch")
+            return self._resolve(request_id, body_digest=self.bridge.request_sha256(request_id),
+                path="recovered_durable_response" if durable else "resumed_dispatched_request")
 
         published = self.bridge.publish_request(kind=self.config.kind, body=body)
         return self._resolve(
@@ -137,10 +145,7 @@ class ExternalSessionModelHandler:
 def durable_request_digest(request_id: str, bridge: ExchangeBridge) -> str | None:
     """Digest of the durable request for a request id (mechanical helper)."""
 
-    try:
-        return bridge.request_sha256(request_id)
-    except Exception:
-        return None
+    return bridge.request_sha256(request_id)
 
 
 def open_bridge(exchange_root: str | pathlib.Path) -> ExchangeBridge:
@@ -182,6 +187,7 @@ def run_user_turn(
         poll_interval_s=poll_interval_s,
     )
     handler = ExternalSessionModelHandler(config)
+    handler.bridge.recovery_state()
     headless_config = HeadlessConfig(
         world_path=pathlib.Path(world_path),
         index_path=pathlib.Path(index_path) if index_path is not None else None,
@@ -217,3 +223,38 @@ def run_user_turn(
         },
         "response_mode": REAL_RESPONSE_MODE,
     }
+
+
+def run_due_work(
+    *, world_path: str | pathlib.Path, index_path: str | pathlib.Path | None = None,
+    subject_id: str, exchange_root: str | pathlib.Path, now: _dt.datetime,
+    response_timeout_s: float = 1800.0, poll_interval_s: float = 0.05,
+    max_wakes: int = 8, include_periodic_review: bool = True,
+    token_budget: int | None = None,
+) -> dict[str, Any]:
+    """Drive only frozen Core's normally due work at the caller's exact time."""
+    from aios_core.headless.core import HeadlessConfig, HeadlessCore
+    if not isinstance(now, _dt.datetime) or now.tzinfo is None or now.utcoffset() is None:
+        raise ValueError("now must be timezone-aware")
+    handler = ExternalSessionModelHandler(ExternalSessionConfig(
+        exchange_root=pathlib.Path(exchange_root), response_timeout_s=response_timeout_s,
+        poll_interval_s=poll_interval_s))
+    handler.bridge.recovery_state()
+    config = HeadlessConfig(world_path=pathlib.Path(world_path),
+        index_path=pathlib.Path(index_path) if index_path is not None else None,
+        subject_id=subject_id)
+    core = HeadlessCore(config=config, model_handler=handler)
+    core.start()
+    try:
+        status_before = core.status()
+        result = core.process_due_work(now=now, max_wakes=max_wakes,
+            include_periodic_review=include_periodic_review, token_budget=token_budget)
+        status_after = core.status()
+    finally:
+        core.stop()
+    return {"status_before": status_before, "status_after": status_after,
+        "due_work_result": json.loads(canonical_json_bytes(result)),
+        "handoffs": handler.handoff_records(),
+        "exchange": {"recovery_state": handler.bridge.recovery_state(),
+                     "integrity": handler.bridge.integrity()},
+        "response_mode": REAL_RESPONSE_MODE}

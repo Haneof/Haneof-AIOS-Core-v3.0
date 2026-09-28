@@ -1,0 +1,41 @@
+{
+  "legal_fields": [
+    "name",
+    "ok",
+    "data",
+    "error_code",
+    "error_message",
+    "call_id"
+  ],
+  "expected_fields": [
+    "name",
+    "ok",
+    "data",
+    "error_code",
+    "error_message",
+    "call_id"
+  ],
+  "forbidden_fields_absent": [
+    "arguments",
+    "result",
+    "error",
+    "duration_seconds"
+  ],
+  "contract": {
+    "fields": [
+      "name",
+      "ok",
+      "data",
+      "error_code",
+      "error_message",
+      "call_id"
+    ],
+    "forbidden_fields_absent": [
+      "arguments",
+      "result",
+      "error",
+      "duration_seconds"
+    ],
+    "signature": "(Field(name='name',type='str',default=<dataclasses._MISSING_TYPE object at 0x7f8e29918200>,default_factory=<dataclasses._MISSING_TYPE object at 0x7f8e29918200>,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),kw_only=False,_field_type=_FIELD), Field(name='ok',type='bool',default=<dataclasses._MISSING_TYPE object at 0x7f8e29918200>,default_factory=<dataclasses._MISSING_TYPE object at 0x7f8e29918200>,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),kw_only=False,_field_type=_FIELD), Field(name='data',type='Any',default=None,default_factory=<dataclasses._MISSING_TYPE object at 0x7f8e29918200>,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),kw_only=False,_field_type=_FIELD), Field(name='error_code',type='str | None',default=None,default_factory=<dataclasses._MISSING_TYPE object at 0x7f8e29918200>,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),kw_only=False,_field_type=_FIELD), Field(name='error_message',type='str | None',default=None,default_factory=<dataclasses._MISSING_TYPE object at 0x7f8e29918200>,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),kw_only=False,_field_type=_FIELD), Field(name='call_id',type='str | None',default=None,default_factory=<dataclasses._MISSING_TYPE object at 0x7f8e29918200>,init=True,repr=True,hash=None,compare=True,metadata=mappingproxy({}),kw_only=False,_field_type=_FIELD))"
+  }
+}

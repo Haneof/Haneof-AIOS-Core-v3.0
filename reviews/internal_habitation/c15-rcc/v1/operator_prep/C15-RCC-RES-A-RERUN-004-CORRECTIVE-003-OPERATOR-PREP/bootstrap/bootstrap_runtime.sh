@@ -82,7 +82,7 @@ RC_TESTS_TREE="7e33b5ef8432370234965d3ccd61248c703c4019"
 # 1. Paths / mode
 # ---------------------------------------------------------------------------
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-REPO_ROOT_DEFAULT="$(cd -- "$SCRIPT_DIR/../../../../../.." && pwd -P)"
+REPO_ROOT_DEFAULT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null || true)"
 
 MODE="build"
 case "${1:-}" in
@@ -119,6 +119,8 @@ if [ "$MODE" = "print-paths" ]; then json_paths; exit 0; fi
 
 log() { printf '[bootstrap] %s\n' "$*" >&2; }
 blocked() { printf '[bootstrap] BLOCKED: %s\n' "$*" >&2; exit 2; }
+
+[ -n "$AIOS_REPO_ROOT" ] && [ -r "$AIOS_REPO_ROOT/.git" ] || blocked "AIOS_REPO_ROOT must identify a readable Git repository"
 
 mkdir -p "$SRC_DIR" "$BUILD_DIR" "$RUNTIME_DIR" "$DEPS_DIR" "$EVIDENCE_DIR"
 
@@ -318,6 +320,10 @@ probe_json() {
 import importlib.metadata, json, os, platform, sqlite3, sys, sysconfig
 sys.path.insert(0, os.path.join(os.environ["AIOS_REPO_ROOT"], "src"))
 import aios_core
+from pathlib import Path
+expected_import = (Path(os.environ["AIOS_REPO_ROOT"]) / "src/aios_core/__init__.py").resolve()
+if Path(aios_core.__file__).resolve() != expected_import:
+    raise RuntimeError("BLOCKED: aios_core import is outside the verified source root")
 out = {
     "python_version": platform.python_version(),
     "python_version_info": list(sys.version_info[:3]),
@@ -364,7 +370,10 @@ verify_runtime() {
     --lock "$SCRIPT_DIR/PYTHON_WHEEL_LOCK.json" --wheelhouse "$WHEELHOUSE_DIR" \
     > "$EVIDENCE_DIR/wheel_lock_verification.json" \
     || blocked "pre-frozen wheel trust root verification failed"
-  local out pyv pyd yt sq
+  "$VENV_PY" "$SCRIPT_DIR/../harness/operator_tools/rc_identity.py" --repo-root "$AIOS_REPO_ROOT" \
+    --json "$EVIDENCE_DIR/rc_identity.json" > "$EVIDENCE_DIR/rc_identity.raw.json" \
+    || blocked "frozen RC or working-tree content identity verification failed"
+  local out pyv pyd yt sq ossl
   out="$(probe_json)" || blocked "python self-check failed"
   printf '%s\n' "$out" > "$EVIDENCE_DIR/environment_probe.json"
   pyv="$(printf '%s' "$out" | python3 -c 'import json,sys;print(json.load(sys.stdin)["python_version"])')"
@@ -376,20 +385,12 @@ verify_runtime() {
   [ "$yt" = "$PYTEST_VERSION" ] || blocked "pytest version mismatch: want $PYTEST_VERSION got $yt"
   "$VENV_PY" -c 'import sqlite3, hashlib, ssl; sqlite3.connect(":memory:").execute("select 1"); hashlib.sha256(b"x").hexdigest(); assert ssl.OPENSSL_VERSION' \
     || blocked "sqlite3/hashlib/ssl functional check failed"
+  [ "$sq" = "$SQLITE_VERSION" ] || blocked "SQLite version mismatch: want $SQLITE_VERSION got $sq"
+  ossl="$(printf '%s' "$out" | python3 -c 'import json,sys;print(json.load(sys.stdin)["openssl_runtime_version"].split()[1])')"
+  [ "$ossl" = "$OPENSSL_VERSION" ] || blocked "OpenSSL version mismatch: want $OPENSSL_VERSION got $ossl"
   log "version triple OK: python=$pyv pydantic=$pyd pytest=$yt sqlite=$sq"
 
-  if [ -d "$AIOS_REPO_ROOT/.git" ] && command -v git >/dev/null 2>&1; then
-    local core_tree tests_tree sw_tree
-    core_tree="$(git -C "$AIOS_REPO_ROOT" rev-parse "$RC_SOFTWARE_COMMIT:src/aios_core" 2>/dev/null || echo MISSING)"
-    tests_tree="$(git -C "$AIOS_REPO_ROOT" rev-parse "$RC_SOFTWARE_COMMIT:tests" 2>/dev/null || echo MISSING)"
-    sw_tree="$(git -C "$AIOS_REPO_ROOT" rev-parse "$RC_SOFTWARE_COMMIT^{tree}" 2>/dev/null || echo MISSING)"
-    [ "$core_tree" = "$RC_CORE_TREE" ] || blocked "frozen Core tree mismatch ($core_tree)"
-    [ "$tests_tree" = "$RC_TESTS_TREE" ] || blocked "frozen tests tree mismatch ($tests_tree)"
-    [ "$sw_tree" = "$RC_REPO_TREE" ] || blocked "frozen repository tree mismatch ($sw_tree)"
-    log "frozen RC identity OK: software=$RC_SOFTWARE_COMMIT core=$core_tree tests=$tests_tree"
-  else
-    log "WARNING: repo git metadata unavailable; frozen RC identity not machine-verified here"
-  fi
+
 }
 
 # ---------------------------------------------------------------------------
@@ -412,7 +413,7 @@ emit_environment_record() {
   AIOS_RUNTIME_ROOT="$AIOS_RUNTIME_ROOT" AIOS_REPO_ROOT="$AIOS_REPO_ROOT" \
   RUNTIME_DIR="$RUNTIME_DIR" DEPS_DIR="$DEPS_DIR" PY_PREFIX="$PY_PREFIX" VENV_DIR="$VENV_DIR" \
   WHEELHOUSE_DIR="$WHEELHOUSE_DIR" VENV_PY="$VENV_PY" DEPS_FINGERPRINT="$(deps_fingerprint)" \
-  python3 - "$record" <<'PY'
+  AIOS_HARNESS_ROOT="$SCRIPT_DIR/../harness" python3 - "$record" <<'PY'
 import datetime, hashlib, json, os, platform, subprocess, sys
 
 def sha256_file(path):
@@ -453,15 +454,11 @@ if os.path.isdir(wheelhouse):
             wheels.append({"wheel": name, "sha256": sha256_file(path), "size": os.path.getsize(path)})
 
 core_root = os.path.join(e["AIOS_REPO_ROOT"], "src", "aios_core")
-core_files = []
-if os.path.isdir(core_root):
-    for root, dirs, files in os.walk(core_root):
-        dirs[:] = [d for d in dirs if d != "__pycache__"]
-        for name in sorted(files):
-            path = os.path.join(root, name)
-            core_files.append({"path": os.path.relpath(path, core_root).replace(os.sep, "/"),
-                               "sha256": sha256_file(path)})
-core_manifest_sha256 = hashlib.sha256(json.dumps(core_files, sort_keys=True, separators=(",", ":")).encode()).hexdigest() if core_files else None
+sys.path.insert(0, os.environ["AIOS_HARNESS_ROOT"])
+from aios_exchange.content_manifest import core_content_manifest
+manifest = core_content_manifest(core_root)
+core_files = manifest["files"]
+core_manifest_sha256 = manifest["manifest_sha256"]
 
 record = {
     "record_version": 1,

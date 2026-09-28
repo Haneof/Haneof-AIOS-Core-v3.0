@@ -48,7 +48,7 @@ from aios_exchange.bridge import (
 from aios_exchange.canonical import canonical_json_bytes, sha256_hex
 from aios_exchange.responses import ResponsePublishError
 
-CRASH_WORKER = pathlib.Path(__file__).resolve().parent / "_crash_worker.py"
+CRASH_WORKER = pathlib.Path(__file__).resolve().parent / "synthetic" / "crash_worker.py"
 
 
 # ---------------------------------------------------------------------------

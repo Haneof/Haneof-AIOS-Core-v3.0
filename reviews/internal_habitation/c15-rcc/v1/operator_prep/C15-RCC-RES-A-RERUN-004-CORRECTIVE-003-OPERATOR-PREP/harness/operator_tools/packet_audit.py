@@ -36,9 +36,16 @@ import re
 import subprocess
 from typing import Any
 
-FROZEN_CONTROL_PLANE = "026810533679d749d9a33b9c11a06585ae28d9f6"
+FROZEN_CONTROL_PLANE = "b7c9e85014806637f7a01c8fd6695bc9f57672ba"
+
+import sys
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
 PACKET_ALLOWED_KEYS = {
+    "openssl_version", "content_manifest_algorithm", "rc_identity_evidence_sha256",
+    "tests_content_manifest_sha256", "c1_c3_regression_sha256", "due_work_entrypoint",
+    "initial_carry_and_probe_freeze_commit", "historical_review_blocked_h2",
+    "historical_review_blocked_h1b", "historical_additional_ia_exact",
     "packet_version", "task_id", "status", "frozen_software_sha",
     "frozen_repository_tree", "frozen_core_tree", "frozen_tests_tree",
     "python_version", "pydantic_version", "pytest_version", "sqlite_version",
@@ -170,6 +177,10 @@ def scan_text(text: str) -> list[dict[str, Any]]:
 
 def audit_packet(packet: dict[str, Any]) -> dict[str, Any]:
     problems: list[str] = []
+    from operator_tools.build_launch_packet import ALLOWED_STARTUP_INPUTS
+    inputs = packet.get("allowed_startup_inputs")
+    if not isinstance(inputs, list) or not all(isinstance(item, str) for item in inputs) or len(inputs) != 4 or set(inputs) != set(ALLOWED_STARTUP_INPUTS):
+        problems.append("allowed_startup_inputs must equal the exact approved four-item set")
     unknown = sorted(set(packet) - PACKET_ALLOWED_KEYS)
     missing_keys = sorted(REQUIRED_PACKET_KEYS - set(packet))
     if unknown:
@@ -182,7 +193,7 @@ def audit_packet(packet: dict[str, Any]) -> dict[str, Any]:
         problems.append("real response mode is not the approved external-session mode")
     if packet.get("operator_prep_head_rule") != "final_freeze_commit_parent_equals_corrected_candidate_exact_head":
         problems.append("corrected exact-head/parent rule is missing or incorrect")
-    if packet.get("corrective_parent_rule") != "corrective_package_commit_parent_equals_live_main_at_task_start":
+    if packet.get("corrective_parent_rule") != "initial_carry_and_probe_freeze_commit_parent_equals_live_main_at_task_start":
         problems.append("corrective candidate does not pin its live-main parent rule")
     if packet.get("historical_failed_candidate_exact") != "10901d467679b70437ae112747eab81f889fd5cb" or packet.get("historical_failed_ia_exact") != "e3394da5d607e34c0286c16a11837ac7ea173a56":
         problems.append("historical immutable failed exact identities are not pinned")
@@ -191,6 +202,15 @@ def audit_packet(packet: dict[str, Any]) -> dict[str, Any]:
             problems.append(f"{key} is not an exact 40-character commit identity")
     if packet.get("python_version") != "3.12.14" or packet.get("pydantic_version") != "2.13.5" or packet.get("pytest_version") != "8.4.2" or packet.get("sqlite_version") != "3.45.1":
         problems.append("packet does not pin the qualified runtime versions")
+    if packet.get("openssl_version") != "OpenSSL 3.0.13 30 Jan 2024":
+        problems.append("packet does not pin exact OpenSSL runtime")
+    if packet.get("due_work_entrypoint") != "aios_exchange.runner:run_due_work":
+        problems.append("approved due-work entrypoint missing")
+    if packet.get("content_manifest_algorithm") != "sorted-path-sha256-size-json-v1":
+        problems.append("canonical content algorithm mismatch")
+    from aios_exchange.content_manifest import FROZEN_CORE_MANIFEST
+    if packet.get("frozen_core_content_manifest_sha256") != FROZEN_CORE_MANIFEST:
+        problems.append("canonical Core manifest mismatch")
     for gate in "abcd":
         if packet.get(f"gate_{gate}_status") != "PASS":
             problems.append(f"Gate {gate.upper()} is not PASS in launch packet")
@@ -385,11 +405,23 @@ def main() -> int:
     check_pin("environment_record", root / "evidence/environment_record.json", packet.get("environment_record_sha256", ""))
     check_pin("clean_room_contract", repo / packet.get("clean_room_contract_path", ""), packet.get("clean_room_contract_sha256", ""))
     check_pin("resident_run_contract", repo / packet.get("resident_run_contract_path", ""), packet.get("resident_run_contract_sha256", ""))
-    corrective_evidence = repo / "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_001"
-    check_pin("corrective_probe_freeze", corrective_evidence / "CORRECTIVE_PROBE_FREEZE.v6.json", packet.get("corrective_probe_freeze_sha256", ""))
-    check_pin("targeted_baseline_red", corrective_evidence / "BASELINE_RED_RUN.v6.json", packet.get("targeted_baseline_red_result_sha256", ""))
+    corrective_evidence = repo / "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002"
+    check_pin("corrective_probe_freeze", corrective_evidence / "probes_v2/PROBE_FREEZE.v2.json", packet.get("corrective_probe_freeze_sha256", ""))
+    check_pin("targeted_baseline_red", corrective_evidence / "BASELINE_RED.v2.json", packet.get("targeted_baseline_red_result_sha256", ""))
     check_pin("targeted_candidate_green", root / "evidence/corrective_candidate_green.json", packet.get("targeted_candidate_green_result_sha256", ""))
 
+    check_pin("c1_c3_regression", root / "evidence/c1_c3_regression.json", packet.get("c1_c3_regression_sha256", ""))
+    check_pin("rc_identity", root / "evidence/rc_identity.json", packet.get("rc_identity_evidence_sha256", ""))
+    from operator_tools.rc_identity import verify
+    rc = verify(repo)
+    pin_checks.append({"label": "current_frozen_working_bytes",
+        "result": "PASS" if rc["ok"] and rc["observed"]["core_content_manifest_sha256"] == packet["frozen_core_content_manifest_sha256"] and rc["observed"]["tests_content_manifest_sha256"] == packet["tests_content_manifest_sha256"] else "FAIL"})
+    current_manifest = json.loads((root / "evidence/harness_manifest.json").read_text())
+    for entry in current_manifest["files"]:
+        check_pin("harness_content", root / entry["path"], entry["sha256"])
+    parent = subprocess.check_output(["git", "-C", str(repo), "rev-parse", packet["operator_prep_exact_head"] + "^"], text=True).strip()
+    initial_parent = subprocess.check_output(["git", "-C", str(repo), "rev-parse", packet["initial_carry_and_probe_freeze_commit"] + "^"], text=True).strip()
+    pin_checks.append({"label": "candidate_and_initial_carry_parent_identities", "result": "PASS" if parent == packet["operator_prep_exact_parent"] and initial_parent == packet["corrective_starting_main_sha"] else "FAIL"})
     for gate in "abcd":
         gate_root = root / "evidence/gates"
         result_path = gate_root / f"gate_{gate}_result.json"

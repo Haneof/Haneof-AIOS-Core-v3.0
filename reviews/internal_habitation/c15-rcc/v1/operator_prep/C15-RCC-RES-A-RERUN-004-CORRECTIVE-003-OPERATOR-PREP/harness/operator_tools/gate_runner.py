@@ -21,6 +21,7 @@ import os
 import pathlib
 import platform
 import sqlite3
+import ssl
 import subprocess
 import sys
 import time
@@ -52,6 +53,7 @@ def environment_snapshot() -> dict[str, Any]:
         "pydantic_version": pydantic.VERSION,
         "pytest_version": pytest.__version__,
         "sqlite_version": sqlite3.sqlite_version,
+        "openssl_version": ssl.OPENSSL_VERSION,
         "executable": sys.executable,
     }
 
@@ -65,6 +67,10 @@ def assert_qualified_environment() -> dict[str, Any]:
         problems.append(f"pydantic {snapshot['pydantic_version']} != {EXPECTED_PYDANTIC}")
     if snapshot["pytest_version"] != EXPECTED_PYTEST:
         problems.append(f"pytest {snapshot['pytest_version']} != {EXPECTED_PYTEST}")
+    if snapshot["sqlite_version"] != "3.45.1":
+        problems.append("SQLite exact runtime pin mismatch")
+    if snapshot["openssl_version"].split()[1] != "3.0.13":
+        problems.append("OpenSSL exact runtime pin mismatch")
     if problems:
         print("BLOCKED: gate runner is not running in the qualified environment:", file=sys.stderr)
         for problem in problems:

@@ -6,7 +6,9 @@ chains to its predecessor:
 ``record_sha256 = sha256(canonical_json(record_without_record_sha256))``
 
 with ``prev_sha256`` inside the hashed body. Any insertion, deletion, reordering
-or edit of a record breaks the chain and is detected.
+or edit of an interior record breaks the chain and is detected. Complete-record
+tail deletion cannot be distinguished from a valid prefix without an external
+head anchor; this ledger does not claim to detect it.
 
 Recorded events (at minimum):
 
@@ -20,6 +22,7 @@ from __future__ import annotations
 import json
 import os
 import pathlib
+import re
 from typing import Any, Iterable
 
 from .canonical import canonical_json_bytes, sha256_hex, utc_now_iso
@@ -59,7 +62,7 @@ class ExchangeLedger:
         self.path.parent.mkdir(parents=True, exist_ok=True)
 
     # -- reading ---------------------------------------------------------
-    def read_records(self) -> list[dict[str, Any]]:
+    def _read_raw_records(self) -> list[dict[str, Any]]:
         if not self.path.exists():
             return []
         raw = self.path.read_bytes()
@@ -77,6 +80,57 @@ class ExchangeLedger:
                 raise LedgerError(f"ledger line {lineno} is not an object")
             records.append(record)
         return records
+
+    @staticmethod
+    def _validate_records(records: list[dict[str, Any]]) -> None:
+        """Non-recursive operational precondition; no lookup or append calls."""
+        previous = GENESIS_SHA256
+        states: dict[str, list[dict[str, Any]]] = {}
+        def digest(value: Any) -> bool:
+            return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value) is not None
+        for seq, record in enumerate(records, 1):
+            required = {"seq", "event", "request_id", "request_sha256", "response_sha256",
+                        "wall_clock", "prev_sha256", "record_sha256"}
+            if not required <= record.keys():
+                raise LedgerError(f"missing ledger fields at seq {seq}")
+            if type(record["seq"]) is not int or record["seq"] != seq:
+                raise LedgerError(f"non-monotonic sequence at seq {seq}")
+            if record["prev_sha256"] != previous:
+                raise LedgerError(f"broken hash chain at seq {seq}")
+            body = {k: v for k, v in record.items() if k != "record_sha256"}
+            if record["record_sha256"] != sha256_hex(canonical_json_bytes(body)):
+                raise LedgerError(f"record digest mismatch at seq {seq}")
+            event, rid = record["event"], record["request_id"]
+            if event not in LEDGER_EVENTS or not isinstance(rid, str) or not rid.strip():
+                raise LedgerError(f"illegal event or request identity at seq {seq}")
+            if not isinstance(record["wall_clock"], str) or not record["wall_clock"].strip():
+                raise LedgerError(f"missing wall clock at seq {seq}")
+            history = states.setdefault(rid, [])
+            if len(history) >= 3 or event != LEDGER_EVENTS[len(history)]:
+                raise LedgerError(f"duplicate event or illegal event order at seq {seq}")
+            if not digest(record["request_sha256"]):
+                raise LedgerError(f"invalid request digest at seq {seq}")
+            if history and record["request_sha256"] != history[0]["request_sha256"]:
+                raise LedgerError(f"request digest discontinuity at seq {seq}")
+            if not history:
+                if record["response_sha256"] is not None:
+                    raise LedgerError(f"response before publication at seq {seq}")
+            elif not digest(record["response_sha256"]):
+                raise LedgerError(f"invalid response digest at seq {seq}")
+            elif len(history) == 2 and record["response_sha256"] != history[1]["response_sha256"]:
+                raise LedgerError(f"response digest discontinuity at seq {seq}")
+            history.append(record)
+            previous = record["record_sha256"]
+
+    def read_records(self) -> list[dict[str, Any]]:
+        try:
+            records = self._read_raw_records()
+            self._validate_records(records)
+            return records
+        except LedgerError:
+            raise
+        except (OSError, ValueError, TypeError) as exc:
+            raise LedgerError(f"ledger integrity validation failed: {exc}") from exc
 
     def last_record(self) -> dict[str, Any] | None:
         records = self.read_records()
@@ -148,6 +202,7 @@ class ExchangeLedger:
         record = dict(body)
         record["record_sha256"] = sha256_hex(canonical_json_bytes(body))
 
+        self._validate_records(records + [record])
         line = canonical_json_bytes(record) + b"\n"
         existed = self.path.exists()
         with open(self.path, "ab") as handle:
@@ -165,55 +220,14 @@ class ExchangeLedger:
         try:
             records = self.read_records()
         except LedgerError as exc:
-            return {"ok": False, "records": None, "error": str(exc), "first_bad_seq": None}
+            match = re.search(r"(?:seq|line) (\d+)", str(exc))
+            return {"ok": False, "records": None, "error": str(exc),
+                    "first_bad_seq": int(match.group(1)) if match else None}
 
-        expected_prev = GENESIS_SHA256
-        for index, record in enumerate(records, start=1):
-            for required in ("seq", "event", "request_id", "wall_clock", "prev_sha256", "record_sha256"):
-                if required not in record:
-                    return {
-                        "ok": False,
-                        "records": len(records),
-                        "error": f"record {index} missing field {required}",
-                        "first_bad_seq": index,
-                    }
-            if int(record["seq"]) != index:
-                return {
-                    "ok": False,
-                    "records": len(records),
-                    "error": f"non-monotonic sequence at index {index}: {record['seq']}",
-                    "first_bad_seq": index,
-                }
-            if record["event"] not in LEDGER_EVENTS:
-                return {
-                    "ok": False,
-                    "records": len(records),
-                    "error": f"unknown event at seq {record['seq']}: {record['event']}",
-                    "first_bad_seq": index,
-                }
-            if record["prev_sha256"] != expected_prev:
-                return {
-                    "ok": False,
-                    "records": len(records),
-                    "error": f"broken hash chain at seq {record['seq']}",
-                    "first_bad_seq": index,
-                }
-            body = {k: v for k, v in record.items() if k != "record_sha256"}
-            recomputed = sha256_hex(canonical_json_bytes(body))
-            if recomputed != record["record_sha256"]:
-                return {
-                    "ok": False,
-                    "records": len(records),
-                    "error": f"record digest mismatch at seq {record['seq']}",
-                    "first_bad_seq": index,
-                }
-            expected_prev = record["record_sha256"]
         return {
-            "ok": True,
-            "records": len(records),
-            "head_sha256": expected_prev,
-            "error": None,
-            "first_bad_seq": None,
+            "ok": True, "records": len(records),
+            "head_sha256": records[-1]["record_sha256"] if records else GENESIS_SHA256,
+            "error": None, "first_bad_seq": None,
         }
 
     def iter_records(self) -> Iterable[dict[str, Any]]:

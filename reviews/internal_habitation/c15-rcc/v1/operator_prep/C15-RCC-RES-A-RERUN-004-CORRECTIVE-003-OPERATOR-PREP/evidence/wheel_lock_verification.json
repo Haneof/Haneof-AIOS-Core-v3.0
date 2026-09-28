@@ -71,5 +71,5 @@
   "lock_path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/bootstrap/PYTHON_WHEEL_LOCK.json",
   "lock_sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe",
   "status": "PASS",
-  "wheelhouse": "/tmp/aios-c15-op-prep-corrective-clean-20260928-final/runtime/3.12.14/wheelhouse"
+  "wheelhouse": "/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/wheelhouse"
 }

@@ -1,153 +1,42 @@
 {
-  "candidate_identity": {
-    "expected_historical_baseline": "10901d467679b70437ae112747eab81f889fd5cb",
-    "head": "candidate-pinned-in-report"
+  "artifacts": {
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/candidate_iteration_2/c1_c3.raw.txt": "416ebb9f51a128c8818fa6a4ef7400689ae1717629316b55a4c81248907ff299",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/candidate_iteration_2/c1_c3_regression.json": "416ebb9f51a128c8818fa6a4ef7400689ae1717629316b55a4c81248907ff299",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/candidate_iteration_2/due_work_ledger.jsonl": "1eb835e7c4450945987afe689ceff2d91d4d2a4b3625b8eab30ca8c10d2d472f",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/candidate_iteration_2/due_work_request.json": "2c96270aea14d9d6eb31e0ac9be817740997d9f683e470b3f1727085e811d2d7",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/candidate_iteration_2/due_work_result.json": "37ea6782f76ca2f4ce44acb0466a359d2d4a1007c97caa8f967e32eb7016c585",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/candidate_iteration_2/pytest.exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/candidate_iteration_2/pytest.raw.txt": "6ecaa0ad32df7939ef47259dab43e323237ebcd399a176d24db2db6374fbfc46",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/candidate_iteration_2/results.xml": "f28b3ec48eb2bb291bee67d59e8be413fd9ffde826a1a433b62781756ae06345"
   },
-  "candidate_root": "/tmp/aios-op-prep-corrective-candidate-99af8e268a1f9e8944b163d8087005e0e3698620/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
-  "probe_mode": "candidate",
-  "probes": {
-    "C1_IA_OP_001": {
-      "expected": {
-        "changed_replay": "fail closed",
-        "intact_exact_replay": "idempotent_replay=true",
-        "missing_publish": "fail closed",
-        "tampered_consume": "fail closed",
-        "tampered_publish": "fail closed"
-      },
-      "observed": {
-        "changed_replay_fail_closed": true,
-        "intact_idempotent_replay": true,
-        "missing_publish_fail_closed": true,
-        "tampered_consume_fail_closed": true,
-        "tampered_publish_fail_closed": true
-      },
-      "status": "GREEN"
+  "counts": {
+    "C4": {
+      "failed": 0,
+      "passed": 9
     },
-    "C2_IA_OP_002": {
-      "bootstrap_avoids_top_level_live_resolution": true,
-      "bootstrap_uses_pre_download_lock": true,
-      "install_is_offline_and_no_resolver": true,
-      "lock_error": null,
-      "lock_present": true,
-      "lock_sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe",
-      "missing_wheel_rejected": true,
-      "required_distributions": {
-        "annotated-types": "0.8.0",
-        "iniconfig": "2.3.0",
-        "packaging": "26.3",
-        "pip": "25.0.1",
-        "pluggy": "1.6.0",
-        "pydantic": "2.13.5",
-        "pydantic-core": "2.46.5",
-        "pygments": "2.21.0",
-        "pytest": "8.4.2",
-        "typing-extensions": "4.16.0",
-        "typing-inspection": "0.4.4"
-      },
-      "status": "GREEN",
-      "unexpected_wheel_rejected": true,
-      "verifier_api_present": true,
-      "wrong_bytes_rejected": true,
-      "wrong_hash_rejected": true
+    "C5": {
+      "failed": 0,
+      "passed": 70
     },
-    "C3_IA_OP_003": {
-      "gates": {
-        "A": {
-          "collect_and_result_consistent": true,
-          "execution_total": 24,
-          "expected_count": 24,
-          "frozen_expected_node_ids_match": true,
-          "node_ids": [
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a01_request_id_roundtrip",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a02_request_sha256_binding",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a03_response_sha256_binding",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a04_atomic_request_publication",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a05_atomic_response_publication",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a06_temp_write_and_file_fsync",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a07_os_replace_used",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a08_directory_fsync_supported",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a09_reader_never_observes_partial_response",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a10_monotonic_ledger_sequence",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a11_hash_chain_tamper_detection",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a12_crash_before_request_publication",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a13_crash_after_request_publication",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a14_torn_response_write_fails_closed",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a15_response_published_before_consume_is_recovered",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a16_request_id_mismatch_fails_closed",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a17_digest_mismatch_fails_closed",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a18_missing_ledger_publication_record_fails_closed",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a19_not_submitted_classification_requires_absence_of_dispatch",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a20_tampered_published_response_replay_fails_at_publish",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a21_missing_published_response_replay_fails_at_publish",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a22_intact_exact_replay_remains_idempotent",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a23_changed_replay_bytes_fail_closed",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a24_consume_tampered_published_response_still_fails_closed"
-          ],
-          "parsed_node_count": 24,
-          "reported_collected_total": 24,
-          "result_id_count": 24,
-          "result_test_count": 24
-        },
-        "B": {
-          "collect_and_result_consistent": true,
-          "execution_total": 7,
-          "expected_count": 7,
-          "frozen_expected_node_ids_match": true,
-          "node_ids": [
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b1_runtime_snapshot_with_empty_capability_history",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b2_successful_capability_result_serializes",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b3_failed_capability_result_serializes",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b4_multiple_capability_results_distinct_fields",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b5_no_nonexistent_fields_are_referenced",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b6_frozen_capability_result_surface_is_exactly_six_fields",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b7_runner_serializer_round_trips_real_directive"
-          ],
-          "parsed_node_count": 7,
-          "reported_collected_total": 7,
-          "result_id_count": 7,
-          "result_test_count": 7
-        },
-        "C": {
-          "collect_and_result_consistent": true,
-          "execution_total": 2,
-          "expected_count": 2,
-          "frozen_expected_node_ids_match": true,
-          "node_ids": [
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_c_two_round_integration.py::test_gate_c_two_round_integration",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_c_two_round_integration.py::test_gate_c_second_turn_reuses_durable_exchange"
-          ],
-          "parsed_node_count": 2,
-          "reported_collected_total": 2,
-          "result_id_count": 2,
-          "result_test_count": 2
-        },
-        "D": {
-          "collect_and_result_consistent": true,
-          "execution_total": 5,
-          "expected_count": 5,
-          "frozen_expected_node_ids_match": true,
-          "node_ids": [
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_scan_passes",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_individual_checks",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_response_mode_is_external_session",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_package_does_not_import_tests",
-            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_test_only_responder_is_outside_package"
-          ],
-          "parsed_node_count": 5,
-          "reported_collected_total": 5,
-          "result_id_count": 5,
-          "result_test_count": 5
-        }
-      },
-      "negative_cases": {
-        "count_mismatch": "BLOCKED",
-        "empty_ids_nonempty_total": "BLOCKED",
-        "malformed_collection": "BLOCKED",
-        "nonzero_returncode": "BLOCKED"
-      },
-      "parser_api_present": true,
-      "status": "GREEN"
+    "C6": {
+      "failed": 0,
+      "passed": 8
+    },
+    "C7": {
+      "failed": 0,
+      "passed": 5
+    },
+    "C8": {
+      "failed": 0,
+      "passed": 7
+    },
+    "C9": {
+      "failed": 0,
+      "passed": 4
     }
   },
-  "status": "GREEN"
+  "provisional": true,
+  "raw_revision": "candidate_iteration_2",
+  "status": "GREEN",
+  "total": 103
 }

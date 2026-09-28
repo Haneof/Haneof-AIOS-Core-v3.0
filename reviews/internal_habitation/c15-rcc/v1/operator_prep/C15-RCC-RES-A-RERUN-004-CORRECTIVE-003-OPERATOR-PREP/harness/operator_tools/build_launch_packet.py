@@ -57,6 +57,7 @@ FORBIDDEN_STARTUP_PATHS = [
 ]
 
 ALLOWED_STARTUP_INPUTS = [
+    CLEAN_ROOM_CONTRACT,
     "RESIDENT_SAFE_LAUNCH_PACKET.json (this file)",
     RUN_CONTRACT,
     "mechanical environment/harness status emitted by the approved launch tools",
@@ -93,9 +94,9 @@ def build(
     wheel_lock = operator_prep_root / "bootstrap" / "PYTHON_WHEEL_LOCK.json"
     wheel_evidence = evidence / "wheel_lock_verification.json"
     clean_bootstrap = evidence / "clean_bootstrap_manifest.json"
-    probe_root = repo_root / "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_001"
-    probe_freeze = probe_root / "CORRECTIVE_PROBE_FREEZE.v6.json"
-    baseline_red = probe_root / "BASELINE_RED_RUN.v6.json"
+    probe_root = repo_root / "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002"
+    probe_freeze = probe_root / "probes_v2/PROBE_FREEZE.v2.json"
+    baseline_red = probe_root / "BASELINE_RED.v2.json"
     candidate_green = evidence / "corrective_candidate_green.json"
     clean_room = repo_root / CLEAN_ROOM_CONTRACT
     run_contract = repo_root / RUN_CONTRACT
@@ -115,6 +116,11 @@ def build(
         "pydantic_version": observed["pydantic_version"],
         "pytest_version": observed["pytest_version"],
         "sqlite_version": observed["sqlite_version"],
+        "openssl_version": observed["openssl_runtime_version"],
+        "content_manifest_algorithm": "sorted-path-sha256-size-json-v1",
+        "rc_identity_evidence_sha256": sha256_file(evidence / "rc_identity.json"),
+        "tests_content_manifest_sha256": json.loads((evidence / "rc_identity.json").read_text())["observed"]["tests_content_manifest_sha256"],
+        "c1_c3_regression_sha256": sha256_file(evidence / "c1_c3_regression.json"),
         "bootstrap_path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/"
         "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/bootstrap/bootstrap_runtime.sh",
         "bootstrap_sha256": sha256_file(bootstrap),
@@ -133,6 +139,7 @@ def build(
         "harness_manifest_file_sha256": sha256_file(evidence / "harness_manifest.json"),
         "harness_file_count": manifest["harness_file_count"],
         "harness_runner_module": "aios_exchange.runner",
+        "due_work_entrypoint": "aios_exchange.runner:run_due_work",
         "harness_entrypoint": "aios_exchange.runner:run_user_turn",
         "request_publisher_module": "aios_exchange.requests:RequestPublisher",
         "response_publisher_module": "aios_exchange.responses:ResponsePublisher",
@@ -160,7 +167,11 @@ def build(
         "operator_prep_exact_parent": parent,
         "operator_prep_head_rule": "final_freeze_commit_parent_equals_corrected_candidate_exact_head",
         "corrective_starting_main_sha": starting_main_sha,
-        "corrective_parent_rule": "corrective_package_commit_parent_equals_live_main_at_task_start",
+        "corrective_parent_rule": "initial_carry_and_probe_freeze_commit_parent_equals_live_main_at_task_start",
+        "initial_carry_and_probe_freeze_commit": "4b7afc6f5bff1deb7407eb2f1470a3b68c0aa79a",
+        "historical_review_blocked_h2": "c32e544b747cb1f1d9b7418e2163a65ac55ee39c",
+        "historical_review_blocked_h1b": "99af8e268a1f9e8944b163d8087005e0e3698620",
+        "historical_additional_ia_exact": "dce47c0d8f3ac7e34efb47e22c63c6f9acbea1a6",
         "historical_failed_candidate_exact": "10901d467679b70437ae112747eab81f889fd5cb",
         "historical_failed_ia_exact": "e3394da5d607e34c0286c16a11837ac7ea173a56",
         "corrective_probe_freeze_sha256": sha256_file(probe_freeze),
