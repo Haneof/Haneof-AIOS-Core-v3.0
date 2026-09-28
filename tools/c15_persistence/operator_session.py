@@ -372,11 +372,15 @@ class OperatorSession:
             repo_dir=repo_dir,
         )
         backend.release()
+        effective_ref = remote_ref
+        if effective_ref is None:
+            from .remote_backend import remote_ref_for_run
+            effective_ref = remote_ref_for_run(run_id)
         return cls.attach(
             root,
             run_id=run_id,
             session_id=session_id,
-            remote_ref=remote_ref,
+            remote_ref=effective_ref,
             remote=remote,
             repo_dir=repo_dir,
         )
