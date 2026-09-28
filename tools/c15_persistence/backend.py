@@ -353,7 +353,11 @@ class RunBackend:
         # Reopen is an admission boundary, not merely a path/owner check.
         # Every previously sealed generation must still exist, be contiguous,
         # and hash-verify before the caller is allowed to resume mutable work.
-        GenerationStore(backend).verify_all()
+        try:
+            GenerationStore(backend).verify_all()
+        except BaseException:
+            backend.release()
+            raise
         backend.audit("backend_reopened", {"run_id": run_id, "session_id": session_id})
         return backend
 
