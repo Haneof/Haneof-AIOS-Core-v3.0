@@ -1,0 +1,70 @@
+{
+  "capability_calls": [
+    {
+      "arguments": {
+        "applicable_conditions": {
+          "project": "Atlas",
+          "scope": "staging_wrapup"
+        },
+        "evidence_refs": [
+          {
+            "object_id": "obs_conv_user_14e34586d49f26417bc0528f",
+            "revision": 1
+          }
+        ],
+        "scenario": "project_progress_reporting",
+        "style": "concise_results_and_critical_risks_only",
+        "tone": "concise",
+        "user_reaction": "accepted"
+      },
+      "call_id": "req-0002-model_directive-3c99d45b-call-comm",
+      "name": "record_communication_experience"
+    },
+    {
+      "arguments": {
+        "allowed_range_or_choices": [
+          "detailed",
+          "result_or_critical_risk_only"
+        ],
+        "current_value": "result_or_critical_risk_only",
+        "default_value": "detailed",
+        "evaluation_window": "14d",
+        "evidence_refs": [
+          {
+            "object_id": "obs_conv_user_14e34586d49f26417bc0528f",
+            "revision": 1
+          }
+        ],
+        "policy_id": "communication.progress_reporting_mode",
+        "reason": "User explicitly requested only outcomes and key risks for Atlas staging, escalating only production impact, data deletion, or cost risks.",
+        "scope": "per-user:user_1"
+      },
+      "call_id": "req-0002-model_directive-3c99d45b-call-pol",
+      "name": "propose_cognitive_policy"
+    },
+    {
+      "arguments": {
+        "confidence": 1.0,
+        "description": "在未来两周内协助推进 Atlas staging 收尾，日常自主推进并汇报关键结果与风险，重大变更提前确认。",
+        "evidence_refs": [
+          {
+            "object_id": "obs_conv_user_14e34586d49f26417bc0528f",
+            "revision": 1
+          }
+        ],
+        "source_type": "user_explicit",
+        "success_criteria": [
+          "完成 Atlas staging 收尾",
+          "关键风险及时同步",
+          "高危操作提前确认"
+        ],
+        "title": "Atlas staging 收尾"
+      },
+      "call_id": "req-0002-model_directive-3c99d45b-call-goal",
+      "name": "propose_goal"
+    }
+  ],
+  "request_id": "req-0002-model_directive-3c99d45b",
+  "response": null,
+  "silence": false
+}
