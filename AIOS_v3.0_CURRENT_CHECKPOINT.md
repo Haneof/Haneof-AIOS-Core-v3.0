@@ -1,5 +1,15 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-09-28 CORE-RC-REFREEZE-003 — engineering complete, fresh IA next
+
+- PR #269 exact head: `6f95431036dd0304947d67ec4a8de7229d1d3ba9`; first parent `f2ef4886...`; tree `a43a761a...`.
+- Frozen software target: `f20f2edfa7af00d0286493fd15196ca9503bc315`.
+- Candidate scope: release/freeze evidence + formal gate workflow only; no src/tests/package implementation drift.
+- Exact-head formal gate run `36437699641` SUCCESS.
+- Unique next READY: `CORE-RC-REFREEZE-003-INDEPENDENT-ACCEPTANCE`.
+- A-004 and all persistence/B/C/evaluator work remain blocked until fresh IA PASS and PM integration.
+
+
 ## 2026-09-28 trusted-return Corrective-001 — ACCEPTED / INTEGRATED; RC-REFREEZE-003 next
 
 - Accepted implementation exact: `a73e186d40688f5dc181b1128a62eff37a974409`.
