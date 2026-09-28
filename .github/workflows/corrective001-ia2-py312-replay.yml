@@ -1,0 +1,96 @@
+name: corrective001-ia2-py312-replay
+
+on:
+  push:
+    branches:
+      - governance/corrective001-ia2-py312-replay-20260928
+
+jobs:
+  reviewer-probes-py312:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact implementation candidate
+        uses: actions/checkout@v4
+        with:
+          ref: a73e186d40688f5dc181b1128a62eff37a974409
+          path: candidate
+
+      - name: Checkout exact reviewer evidence
+        uses: actions/checkout@v4
+        with:
+          ref: eeda251e057e98b15a919694af4689786faf8c55
+          path: review
+
+      - name: Set up CPython 3.12.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12.14
+          check-latest: false
+
+      - name: Install exact formal dependencies
+        run: |
+          python -m pip install -e ./candidate pydantic==2.13.5 pytest==8.4.2
+
+      - name: Record environment
+        run: |
+          python - <<'PY'
+          import sys, sqlite3, pydantic, pytest
+          print("Python:", sys.version)
+          print("Pydantic:", pydantic.__version__)
+          print("pytest:", pytest.__version__)
+          print("SQLite:", sqlite3.sqlite_version)
+          PY
+
+      - name: Verify frozen reviewer probe hashes
+        run: |
+          set -euo pipefail
+          cd review/reviews/CORRECTIVE_001_IA2
+          sha256sum -c evidence/SHA256SUMS.probes
+
+      - name: Materialize exact reviewer probes into candidate tree
+        run: |
+          set -euo pipefail
+          mkdir -p candidate/tests/reviewer_ia2
+          cp review/reviews/CORRECTIVE_001_IA2/reviewer/test_ia2_*.py candidate/tests/reviewer_ia2/
+          : > candidate/tests/reviewer_ia2/__init__.py
+          python - <<'PY'
+          from pathlib import Path
+          p = Path("candidate/tests/reviewer_ia2/test_ia2_inventory_and_replay.py")
+          s = p.read_text()
+          marker = str((Path.cwd() / "candidate" / "src").resolve())
+          import re
+          s = re.sub(r'^TARGET_SRC_MARKER = .*$', f'TARGET_SRC_MARKER = "{marker}"', s, flags=re.M)
+          p.write_text(s)
+          print("TARGET_SRC_MARKER =", marker)
+          PY
+
+      - name: Frozen reviewer collect-only
+        working-directory: candidate
+        run: |
+          python -m pytest -p no:cacheprovider -o addopts='' --collect-only -q tests/reviewer_ia2 | tee reviewer_collect_py312.txt
+          grep -q "86 tests collected" reviewer_collect_py312.txt
+
+      - name: Run frozen 86-probe Independent Acceptance suite on CPython 3.12.14
+        working-directory: candidate
+        run: |
+          python -m pytest -p no:cacheprovider -o addopts='' -q --junitxml=reviewer_ia2_py312.xml tests/reviewer_ia2
+
+      - name: Assert exact JUnit count
+        working-directory: candidate
+        run: |
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse("reviewer_ia2_py312.xml").getroot()
+          suite = root if root.tag == "testsuite" else root.find("testsuite")
+          values = {k: int(float(suite.get(k, "0"))) for k in ("tests","failures","errors","skipped")}
+          print(values)
+          assert values == {"tests": 86, "failures": 0, "errors": 0, "skipped": 0}, values
+          PY
+
+      - name: Upload PM environment-replay evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: corrective001-ia2-py312-replay
+          path: |
+            candidate/reviewer_collect_py312.txt
+            candidate/reviewer_ia2_py312.xml
