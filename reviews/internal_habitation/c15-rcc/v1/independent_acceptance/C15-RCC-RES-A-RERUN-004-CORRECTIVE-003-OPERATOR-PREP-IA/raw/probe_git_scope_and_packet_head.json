@@ -1,0 +1,16 @@
+{
+  "paths": [
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/RESIDENT_SAFE_LAUNCH_PACKET.json",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/FREEZE_MANIFEST.json",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/SHA256SUMS",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/resident_safe_packet_audit.json"
+  ],
+  "checks": {
+    "head": true,
+    "parent": true,
+    "tree": true,
+    "scope": true,
+    "packet_parent": true,
+    "packet_absent_parent": true
+  }
+}
