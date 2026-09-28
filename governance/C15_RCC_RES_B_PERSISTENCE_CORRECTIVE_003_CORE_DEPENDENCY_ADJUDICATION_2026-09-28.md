@@ -62,7 +62,7 @@ Binding prompt:
 
 `governance/prompts/CORE_BACKGROUND_TRUSTED_RETURN_RECOVERY_001_2026-09-28.md`
 
-After that Core task receives fresh Independent Acceptance and integration, governance must adjudicate the required RC re-freeze / lineage revalidation before Corrective-003 may resume.
+After that Core task receives fresh Independent Acceptance and PM integration, a new Core RC freeze and fresh Resident-A lineage are mandatory before Corrective-003 may resume.
 
 ## Downstream status
 
@@ -75,3 +75,22 @@ BLOCKED:
 - Resident C
 - evaluator
 - closure
+
+## Mandatory downstream sequence
+
+Because this task changes accepted Core runtime/recovery semantics, the prior RC/A lineage cannot be silently reused.
+
+Required order:
+
+1. `CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001`
+2. `CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001-INDEPENDENT-ACCEPTANCE`
+3. PM integration of the accepted Core exact candidate
+4. `CORE-RC-REFREEZE-003`
+5. `CORE-RC-REFREEZE-003-INDEPENDENT-ACCEPTANCE`
+6. fresh `C15-RCC-RES-A-RERUN-004`
+7. `C15-RCC-RES-A-RERUN-004-INDEPENDENT-ACCEPTANCE`
+8. governance re-release / resume of frozen `C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003`
+9. fresh persistence Independent Acceptance
+10. only then may `C15-RCC-RES-B-RELEASE-003` become eligible
+
+A-003 remains immutable historical evidence for the pre-fix Core/RC; it is never rewritten or hash-swapped into the new lineage.
