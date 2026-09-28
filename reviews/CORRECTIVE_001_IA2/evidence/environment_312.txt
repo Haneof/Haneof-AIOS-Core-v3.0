@@ -1,0 +1,58 @@
+# Formal-environment gate: CPython 3.12.14
+# captured: 2026-09-28T12:57:45Z
+
+## How this interpreter was provisioned
+The earlier report claimed 3.12.14 was unobtainable. That was FALSE and is retracted:
+codeload.github.com is reachable.  Prebuilt-binary routes (astral.sh/uv,
+release-assets.githubusercontent.com, conda, deb.debian.org) are blocked, but the
+CPython source tarball is not.
+
+  curl https://codeload.github.com/python/cpython/tar.gz/refs/tags/v3.12.14 -> HTTP 200, 27777501 bytes
+
+The real blocker was missing C headers: sqlite3.h and ffi.h exist nowhere on this
+filesystem, and only versioned runtime .so files were present (no -dev packages,
+no apt mirror).  Resolved by building a dependency prefix from source:
+
+  SQLite amalgamation  3.38.2  -> /home/user/py312deps/lib/libsqlite3.so.0.8.6
+      (azadkuh/sqlite-amalgamation master; its newest tag is 3.38.2)
+      built shared, not static: configure's bare '-lsqlite3' link test FAILS
+      against a static archive lacking -lm/-ldl/-lpthread, and _sqlite3 is then
+      silently omitted.  Self-check program printed: sqlite compile=3.38.2 lib=3.38.2
+  zlib                 1.3.1   -> /home/user/py312deps/lib/libz.so.1.3.1
+  pkg-config           absent  -> a 20-line shell stub answering sqlite3/zlib only
+                                   (real variable expansion of prefix/includedir/libdir)
+  autoconf             absent  -> not needed; the GitHub tag tarball ships a
+                                   pregenerated ./configure (872895 bytes)
+
+  ./configure --prefix=/home/user/py312 --with-ensurepip=install \
+      CPPFLAGS=-I/home/user/py312deps/include \
+      LDFLAGS='-L/home/user/py312deps/lib -Wl,-rpath,/home/user/py312deps/lib'
+  configure reported: 'checking for sqlite3_bind_double in -lsqlite3... yes'
+                      'checking for stdlib extension module _sqlite3... yes'
+                      'checking for stdlib extension module zlib... yes'
+  make -j2 exit=0 ; make install exit=0
+
+  14 optional modules were NOT built (no headers): _bz2 _ctypes _ctypes_test
+  _curses _curses_panel _dbm _gdbm _hashlib _lzma _ssl _tkinter _uuid nis readline
+  _ssl absent means no TLS, so wheels were fetched with the 3.11 venv's pip
+  (--python-version 312 --only-binary=:all:) and installed with --no-index.
+
+## Measured interpreter / library versions
+CPython        : 3.12.14
+implementation : CPython
+executable     : /home/user/venv312/bin/python
+SQLite         : 3.38.2 (pysqlite module 2.6.0)
+zlib           : 1.3.1
+pydantic       : 2.13.5
+pytest         : 8.4.2
+uname          : Linux-6.1.158+-x86_64-with-glibc2.36
+
+## Comparison with the previously reported environment
+  previous (evidence/environment.txt): CPython 3.11.2, SQLite 3.40.1
+  author's declared formal gate      : CPython 3.12.14, SQLite 3.49.1
+  this gate                          : CPython 3.12.14 (matches), SQLite 3.38.2 (older than both)
+
+  pyproject.toml declares requires-python = ">=3.12", so 3.11.2 was out of
+  contract while 3.12.14 is in contract.  SQLite 3.38.2 is OLDER than the
+  author's 3.49.1 and older than this host's system libsqlite3, which makes this
+  a strictly harder target, not an easier one.

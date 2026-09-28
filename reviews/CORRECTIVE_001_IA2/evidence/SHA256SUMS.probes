@@ -14,3 +14,6 @@ a066e7b3ad455d06adfc91c4b69668c1e5fa7bcba1357b4ce6475527822a8ae4  rev5_inventory
 f8da354cf548ed7385c2c85299a2173273fbfabaf1b0168a0c5ff6c60db82e6c  rev8_inventory_and_replay.py.frozen
 6992e523c6d4703764b8cd6134692f7ffe07621e3bdf5135e8860b6696ae3b56  rev9_inventory_and_replay.py.frozen
 3229bbb6bf5afb3809c2148f38415bea0f426d1659090a7f9256499c3a048546  runner.sh.frozen
+
+# --- runner rev2 (harness correction: interpreter overridable, added for the formal 3.12.14 gate) ---
+88fba3e514d86c59d364b09c6f7b5830ec0666d8f0f8080db023f76c09e84f83  runner.sh.rev2

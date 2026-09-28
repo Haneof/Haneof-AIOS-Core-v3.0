@@ -1,0 +1,34 @@
+# CPython 3.12.14 build log excerpts (substantiates REPORT §13.2-§13.3)
+
+## 1. Source tarball is reachable (retracts the 'unobtainable' claim)
+   curl -sSL https://codeload.github.com/python/cpython/tar.gz/refs/tags/v3.12.14
+   -> HTTP 200, 27777501 bytes
+   tarball ships a pregenerated ./configure (872895 bytes), so the
+   missing autoconf is not a blocker.
+
+## 2. FIRST configure, static libsqlite3.a -> link test fails, _sqlite3 silently dropped
+   checking for sqlite3_bind_double in -lsqlite3... no
+
+## 3. SECOND configure, shared libsqlite3.so -> all three checks pass
+   checking for sqlite3_bind_double in -lsqlite3... yes
+   checking for stdlib extension module _sqlite3... yes
+   checking for stdlib extension module zlib... yes
+
+## 4. Standalone link self-check against the built prefix
+   gcc -I$P/include t.c -L$P/lib -lsqlite3 -Wl,-rpath,$P/lib && ./t
+   -> sqlite compile=3.38.2 lib=3.38.2
+
+## 5. make -j2 exit=0; optional modules not built
+   The necessary bits to build these optional modules were not found:
+   _bz2                  _ctypes               _ctypes_test       
+   _curses               _curses_panel         _dbm               
+   _gdbm                 _hashlib              _lzma              
+   _ssl                  _tkinter              _uuid              
+   nis                   readline                                 
+   To find the necessary bits, look in configure.ac and config.log.
+   Could not build the ssl module!
+   Checked 111 modules (31 built-in, 65 shared, 1 n/a on linux-x86_64, 0 disabled, 14 missing, 0 failed on import)
+
+## 6. Installed interpreter
+   CPython : 3.12.14 | SQLite 3.38.2 | zlib 1.3.1
+   pydantic: 2.13.5 | pytest 8.4.2

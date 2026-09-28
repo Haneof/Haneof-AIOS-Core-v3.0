@@ -28,6 +28,11 @@ live main = 0df757e9666c2c75571df7a7a3dedf27d44e5b7f
 
 This matches the PM-dispatched value, but was re-derived, not inherited.
 
+> **Superseded after the verdict.** Main has since advanced to
+> `ba85170958386fa4169b1332b9cada8521dd2a0f` because #264 was merged. See §17 for
+> the re-measured state and for the proof that merged `src/` is byte-identical to
+> the accepted candidate.
+
 **Note on the initial fetch:** the sandbox clone was **shallow** — `.git/shallow`
 contained `0df757e`. The first `git merge-base <candidate> origin/main` returned
 *empty*, which would have looked like a broken lineage. It was a clone artifact.
@@ -381,7 +386,9 @@ combined               : 1005 passed in 267.34s
 111 / 83 / 17 / 3 / 23-CI figures were treated as historical context only; every
 number above is this reviewer's own execution.
 
-## 13. Environment — including a real deviation
+## 13. Environment — including a real deviation, and its later retraction
+
+### 13.1 The initial (3.11.2) run
 
 ```
 python        : 3.11.2  | CPython        <-- NOT the formal 3.12.14
@@ -392,29 +399,110 @@ sqlite3 module: 2.6.0
 platform      : Linux-6.1.158+-x86_64-with-glibc2.36
 ```
 
-**The formal CPython 3.12.14 gate was NOT reproduced.** The sandbox provides
-only CPython 3.11.2, and 3.12.14 could not be provisioned: `python.org`,
-`astral.sh`, `release-assets.githubusercontent.com`, `objects.githubusercontent.com`,
-`raw.githubusercontent.com`, `deb.debian.org` and the conda hosts are all
-network-blocked (TLS handshake EOF / SSL_ERROR_SYSCALL / DNS 000). Debian 12
-bookworm ships no `python3.12`, and PyPI publishes no standalone CPython.
-`uv` was installed and reached the download step, failing only at
-`release-assets.githubusercontent.com`.
+### 13.2 RETRACTED CLAIM
 
-`pyproject.toml` declares `requires-python = ">=3.12"`, yet the entire suite
-executes green on 3.11.2. SQLite is recorded as actually measured (3.40.1), not
-aligned to any prior run.
+This section originally stated that **the formal CPython 3.12.14 gate could not
+be reproduced because 3.12.14 could not be provisioned.** That claim is
+**false** and is withdrawn.
+
+What was true was narrower: the *prebuilt-binary* distribution routes are
+blocked — `python.org`, `astral.sh`, `release-assets.githubusercontent.com`,
+`objects.githubusercontent.com`, `raw.githubusercontent.com`,
+`deb.debian.org` and the conda hosts. The report generalized from "the binary
+mirrors are unreachable" to "the interpreter is unobtainable", and never tested
+the source route.
+
+`codeload.github.com` **is** reachable:
+
+```
+curl -sSL https://codeload.github.com/python/cpython/tar.gz/refs/tags/v3.12.14
+  -> HTTP 200, 27777501 bytes
+tarball PY_VERSION -> "3.12.14"
+```
+
+The genuine blocker was **missing C headers**, not a missing interpreter:
+`sqlite3.h` and `ffi.h` exist nowhere on this filesystem, only versioned runtime
+`.so` files were present, there are no `-dev` packages, and there is no apt
+mirror. Building a dependency prefix from source resolved it.
+
+### 13.3 The formal 3.12.14 gate, as actually executed
+
+Dependency prefix `/home/user/py312deps`, built from source:
+
+| component | version | note |
+|---|---|---|
+| SQLite amalgamation | **3.38.2** | newest tag of `azadkuh/sqlite-amalgamation`; built **shared**, not static |
+| zlib | 1.3.1 | `madler/zlib` tag |
+| pkg-config | absent | 20-line shell stub answering `sqlite3`/`zlib` only |
+| autoconf | absent | not needed — the tag tarball ships a pregenerated `./configure` |
+
+Two build traps worth recording, because both fail *silently*:
+
+* A **static** `libsqlite3.a` makes `configure` report
+  `checking for sqlite3_bind_double in -lsqlite3... no` — the archive lacks
+  `-lm -ldl -lpthread` and configure's bare `-lsqlite3` link test fails, after
+  which `_sqlite3` is quietly omitted. Rebuilding as a shared library flips it
+  to `yes`, alongside `checking for stdlib extension module _sqlite3... yes`.
+  A standalone self-check program confirmed `sqlite compile=3.38.2 lib=3.38.2`.
+* `_ssl` was **not** built (no OpenSSL headers), so the new interpreter has no
+  TLS. Wheels were therefore fetched with the 3.11 venv's pip
+  (`--python-version 312 --only-binary=:all:`) and installed with
+  `--no-index --find-links`. The cp312 `pydantic_core-2.46.5` wheel was used.
+
+```
+CPython        : 3.12.14          <-- formal gate, MATCHES the declared requirement
+implementation : CPython
+executable     : /home/user/venv312/bin/python
+SQLite         : 3.38.2 (pysqlite module 2.6.0)
+zlib           : 1.3.1
+pydantic       : 2.13.5
+pytest         : 8.4.2
+```
+
+14 optional modules were not built (no headers): `_bz2 _ctypes _ctypes_test
+_curses _curses_panel _dbm _gdbm _hashlib _lzma _ssl _tkinter _uuid nis
+readline`. `hashlib` still imports via its pure-Python fallback. None of these
+are needed by the suite.
+
+### 13.4 Results on 3.12.14
+
+| run | target | 3.11.2 (original) | **3.12.14 (formal gate)** |
+|---|---|---|---|
+| 86 reviewer probes | candidate `a73e186d` | 86 passed | **86 passed in 10.16s, exit=0** |
+| 86 reviewer probes | `1ebf51c4` (#258) | 50 failed | **50 failed, 36 passed in 10.59s, exit=1** |
+| full repo pytest (919 author + 86 reviewer) | candidate | 1005 passed | **1005 passed in 224.09s, exit=0** |
+
+Raw output: `evidence/FORMAL_312_candidate_probes.txt`,
+`evidence/FORMAL_312_baseline_258_probes.txt`,
+`evidence/FORMAL_312_full_regression.txt`, `evidence/environment_312.txt`.
+
+The 50-failure baseline identity set is unchanged between the two interpreters.
+SQLite 3.38.2 is **older** than both the author's 3.49.1 and this host's system
+`libsqlite3`, so this is a strictly harder target than the original run, not an
+easier one. The verdict is unchanged: `ACCEPTANCE_PASS / blocker=0`.
+
+Harness correction recorded for this gate: `run_reviewer_probes.sh` rev2 makes
+the interpreter overridable via `REVIEWER_PY` (default unchanged, so the frozen
+3.11 runs stay byte-reproducible). rev1 is preserved at
+`evidence/probe_revisions/runner.sh.frozen`, rev2 at `runner.sh.rev2`, both in
+`SHA256SUMS.probes`. **No probe expectation was altered** — the probe files are
+the same rev10/rev2/rev1 blobs.
+
 
 ## 14. Limitations
 
-1. **Interpreter deviation (material).** All results are CPython **3.11.2**, not
-   the formal **3.12.14**. The 1005-test regression, the 86 reviewer probes, and
-   the #258 baseline RED are all valid on 3.11.2 but do not constitute a
-   formal-gate reproduction. PM should require a 3.12.14 CI confirmation before
-   integration; the GitHub checks on #264 head are all `pass`, which is the
-   closest available formal-gate evidence and is **not** this reviewer's own run.
-2. **SQLite 3.40.1**, older than both the author's 3.49.1 and the prior
-   reviewer's 3.51.1. No version-dependent behaviour was observed.
+1. ~~**Interpreter deviation (material).**~~ **CLOSED.** The formal CPython
+   **3.12.14** gate has now been executed on this reviewer's own build, with
+   results in §13.4: 86/86 reviewer probes pass on the candidate, the #258
+   baseline still yields exactly 50 failures, and the full 1005-test regression
+   passes. The original 3.11.2 limitation and the accompanying "3.12.14 cannot
+   be provisioned" claim are both retracted — see §13.2.
+2. **SQLite 3.38.2 on the formal gate**, older than both the author's 3.49.1 and
+   the original run's 3.40.1. No version-dependent behaviour was observed, and
+   running older than the author is a stronger test than running newer. The
+   interpreter was built without `_ssl`, `_ctypes`, `_lzma`, `_bz2`, `_hashlib`
+   and `_curses` (no headers on this host); none are required by the suite, but
+   this build is therefore not byte-equivalent to a stock 3.12.14 distribution.
 3. **Process loss is real but fork-based.** Children are `fork`ed and
    `SIGKILL`ed; this is genuine process death with a genuinely new runtime in
    the parent, but it is not a container/OS-level restart.
@@ -464,9 +552,61 @@ carry-forward was verified at **blob** level rather than inferred from SHAs.
 | transplant / corruption attacks fail closed | §9, §10 |
 | real process loss converges exactly once | §11; RED on #258 with a duplicate revision |
 | full regression green | 1005 passed, §12 |
+| formal CPython 3.12.14 gate executed | 86/86 + 1005 passed, §13.3–§13.4 |
 
-**`READY_FOR_PM_INTEGRATION`** — subject to limitation §14.1: this reviewer could
-not execute the formal CPython 3.12.14 gate.
+**`READY_FOR_PM_INTEGRATION`** — limitation §14.1 is now **closed**: this
+reviewer built and ran the formal CPython 3.12.14 gate. No caveat remains on the
+verdict.
 
 Review-only artifacts are under `reviews/CORRECTIVE_001_IA2/`. Nothing was
 written into PR #264, #258, or #261. Independent Acceptance stops here.
+
+---
+
+## 17. Post-verdict addendum — repository state moved after the verdict
+
+Recorded because it changes facts the verdict was rendered against, and because
+the governing prompt forbids treating any live-main value as permanent.
+
+The verdict above was issued while `live main = 0df757e9…` and PR #264 was
+`OPEN / mergedAt=null`. Re-querying GitHub during the 3.12.14 work returned a
+different state:
+
+| object | at verdict time | re-measured |
+|---|---|---|
+| live main | `0df757e9666c2c75571df7a7a3dedf27d44e5b7f` | **`ba85170958386fa4169b1332b9cada8521dd2a0f`** |
+| #264 | `OPEN`, `mergedAt=null` | **`MERGED`**, `mergedAt=2026-09-28T12:46:22Z` |
+| #264 head | `a73e186d…` | `a73e186d…` — **unchanged** |
+| #258 | `1ebf51c4…` OPEN | `1ebf51c4cb905e2a2578a09b64007b50bca0d4ac` OPEN — unchanged |
+| #261 | `b9d692dd…` OPEN | `b9d692ddca055b13fb29e646186e929a08bf8955` OPEN — unchanged |
+
+**This is integration happening *after* the acceptance, not drift.** `a73e186`
+is now an ancestor of main, reached through merge commit `f20f2ed`
+("merge: trusted-return recovery Corrective-001 accepted (#264)"), followed by
+five governance commits (`860ac76`, `988e5ee`, `47afc82`, `818737d`, `ba85170`)
+advancing `CORE-RC-REFREEZE-003` via PR #267.
+
+The decisive check — was the merged production code the code this reviewer
+accepted?
+
+```
+git diff --stat a73e186d… f20f2ed -- src/     -> (empty)
+git diff --stat a73e186d… ba85170 -- src/     -> (empty)
+git diff --name-only a73e186d… ba85170        -> 5 governance/ files
+                                                 + AIOS_v3.0_CURRENT_CHECKPOINT.md
+```
+
+**`src/` is byte-identical between the accepted candidate and current main.**
+The integration introduced no production-code change, so the `ACCEPTANCE_PASS /
+blocker=0` verdict still describes what is on main. `REVALIDATION_REQUIRED` is
+**not** triggered: that condition is head drift on #264, and the head is
+unchanged.
+
+One record-keeping note. This reviewer's working notes at one point quoted the
+#258 SHA as `1ebf51c4cb90851518934d8b69a72776b266e705`, which is **not a valid
+object** in this repository (`git worktree add` rejects it:
+`fatal: invalid reference`). The correct value is
+`1ebf51c4cb905e2a2578a09b64007b50bca0d4ac`. The committed report body and all
+four baseline evidence files always carried the correct value — verified by
+`grep`, whose only hit for the bad string is this paragraph — so no published
+result was affected. The bad value never left the reviewer's scratch notes.
