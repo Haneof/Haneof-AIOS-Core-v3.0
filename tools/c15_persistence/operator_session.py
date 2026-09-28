@@ -68,6 +68,7 @@ KILL_POINTS: tuple[str, ...] = (
 
 STATE_VERSION = "c15-operator-session-v1"
 JOURNAL_VERSION = "c15-relay-journal-v1"
+REMOTE_DURABILITY_CONFIG = "remote-durability.json"
 
 
 def _bootstrap_src() -> None:
@@ -190,6 +191,92 @@ class OperatorSession:
         self.runtime: FusedTurnRuntime | None = None
         self._kill_at: str | None = None
         self._handler_rounds: list[int] = []
+        self._remote_ref: str | None = None
+        self._remote: str = "origin"
+        self._remote_repo_dir: Path | None = None
+
+    # ------------------------------------------------------ remote durability
+
+    @property
+    def remote_config_path(self) -> Path:
+        return self.backend.root / REMOTE_DURABILITY_CONFIG
+
+    @property
+    def remote_durability_enabled(self) -> bool:
+        return self._remote_ref is not None
+
+    def _configure_remote_durability(
+        self,
+        *,
+        remote_ref: str,
+        remote: str,
+        repo_dir: Path | None,
+        persist: bool,
+    ) -> None:
+        require(bool(remote_ref), "remote durability requires a non-blank remote ref")
+        require(bool(remote), "remote durability requires a non-blank remote")
+        if self.remote_config_path.is_file():
+            stored = json.loads(self.remote_config_path.read_text(encoding="utf-8"))
+            require(stored.get("remote_ref") == remote_ref, "remote durability ref mismatch")
+            require(stored.get("remote") == remote, "remote durability remote mismatch")
+        elif persist:
+            _write_json(
+                self.remote_config_path,
+                {
+                    "version": "c15-remote-durability-v1",
+                    "remote_ref": remote_ref,
+                    "remote": remote,
+                },
+            )
+        self._remote_ref = remote_ref
+        self._remote = remote
+        self._remote_repo_dir = repo_dir
+
+    def _load_remote_durability(self, *, repo_dir: Path | None = None) -> bool:
+        if not self.remote_config_path.is_file():
+            return False
+        payload = json.loads(self.remote_config_path.read_text(encoding="utf-8"))
+        require(payload.get("version") == "c15-remote-durability-v1", "unknown remote durability config")
+        self._configure_remote_durability(
+            remote_ref=str(payload["remote_ref"]),
+            remote=str(payload["remote"]),
+            repo_dir=repo_dir,
+            persist=False,
+        )
+        return True
+
+    def _persist_remote_barrier(self, point: str, *, seal_label: str | None = None) -> tuple[str, str] | None:
+        """Synchronously commit the current recoverable barrier to remote storage.
+
+        This method is called by the normal operator loop *before* a frozen kill
+        point may fire.  A failed remote write raises and prevents the loop from
+        crossing the barrier.
+        """
+        if not self.remote_durability_enabled:
+            return None
+        if seal_label is not None:
+            self.seal(seal_label)
+        cursor = int(self.journal.ledger_get("revealed_sequence") or 0)
+        event_id = str(self.journal.ledger_get("revealed_event_id") or "")
+        generation = int(self.journal.ledger_get("generation") or 0)
+        _write_json(
+            self.state / "remote-barrier.json",
+            {
+                "point": point,
+                "cursor": cursor,
+                "event_id": event_id,
+                "generation": generation,
+            },
+        )
+        return self.backend.push_to_remote(
+            remote_ref=self._remote_ref,
+            remote=self._remote,
+            repo_dir=self._remote_repo_dir,
+            message=(
+                f"operator durability barrier: run_id={self.backend.owner['run_id']} "
+                f"point={point} cursor={cursor} generation={generation}"
+            ),
+        )
 
     # ------------------------------------------------------------ lifecycle
 
@@ -202,6 +289,10 @@ class OperatorSession:
         session_id: str,
         event_count: int = 30,
         seed: str = "c15-synthetic",
+        remote_ref: str | None = None,
+        remote: str = "origin",
+        repo_dir: Path | None = None,
+        require_remote_durability: bool = False,
     ) -> "OperatorSession":
         backend = RunBackend.create(
             root, run_id=run_id, session_id=session_id, subject_id=SUBJECT_ID, phase="A"
@@ -209,20 +300,52 @@ class OperatorSession:
         journal = RelayJournal(backend, create=True)
         release = SyntheticRelease(backend.state_dir / "synthetic-release", event_count=event_count, seed=seed)
         session = cls(backend, journal, release)
+        if require_remote_durability or remote_ref is not None:
+            if remote_ref is None:
+                from .remote_backend import remote_ref_for_run
+                remote_ref = remote_ref_for_run(run_id)
+            session._configure_remote_durability(
+                remote_ref=remote_ref,
+                remote=remote,
+                repo_dir=repo_dir,
+                persist=True,
+            )
         session.journal.ledger_set("session_version", STATE_VERSION)
         session.journal.ledger_set("journal_version", JOURNAL_VERSION)
         session.journal.ledger_set("created_at", _now())
         session.prepare_world()
         session.ensure_release_initialized()
         session.seal("initial")
+        if session.remote_durability_enabled:
+            session._persist_remote_barrier("INITIAL")
         return session
 
     @classmethod
-    def attach(cls, root: str | Path, *, run_id: str, session_id: str) -> "OperatorSession":
+    def attach(
+        cls,
+        root: str | Path,
+        *,
+        run_id: str,
+        session_id: str,
+        remote_ref: str | None = None,
+        remote: str | None = None,
+        repo_dir: Path | None = None,
+    ) -> "OperatorSession":
         backend = RunBackend.open(root, run_id=run_id, session_id=session_id, adopt_stale_owner=True)
         journal = RelayJournal(backend)
         release = SyntheticRelease(backend.state_dir / "synthetic-release")
         session = cls(backend, journal, release)
+        loaded = session._load_remote_durability(repo_dir=repo_dir)
+        if remote_ref is not None or remote is not None:
+            requested_ref = remote_ref or session._remote_ref
+            requested_remote = remote or session._remote
+            require(requested_ref is not None, "remote ref required when enabling remote durability on attach")
+            session._configure_remote_durability(
+                remote_ref=requested_ref,
+                remote=requested_remote,
+                repo_dir=repo_dir,
+                persist=not loaded,
+            )
         backend.audit("session_attached", {"phase": "resume"})
         return session
 
@@ -249,7 +372,14 @@ class OperatorSession:
             repo_dir=repo_dir,
         )
         backend.release()
-        return cls.attach(root, run_id=run_id, session_id=session_id)
+        return cls.attach(
+            root,
+            run_id=run_id,
+            session_id=session_id,
+            remote_ref=remote_ref,
+            remote=remote,
+            repo_dir=repo_dir,
+        )
 
     def push_to_remote(
         self,
@@ -427,6 +557,8 @@ class OperatorSession:
             )
             require(before == after, "resumed reveal mutated the durable release state")
             self.backend.audit("reveal_replayed_without_state_change", {"sequence": projection["sequence"]})
+        if self.remote_durability_enabled:
+            self._persist_remote_barrier("K1_AFTER_REVEAL", seal_label="remote-revealed")
         self.maybe_kill("K1_AFTER_REVEAL")
         return projection
 
@@ -477,6 +609,7 @@ class OperatorSession:
             require(bool(receipt.get("reused_existing")), "resumed ingest created a new observation")
             self.backend.audit("ingest_replayed_without_duplicate", {"ingest_ref": stored})
         self.seal("ingested")
+        self._persist_remote_barrier("K2_AFTER_INGEST")
         self.maybe_kill("K2_AFTER_INGEST")
         return receipt
 
@@ -559,6 +692,11 @@ class OperatorSession:
             self.journal.ledger_set("round_hint", str(round_index))
             self._write_outbox(request_id, raw, round_index=round_index)
             self.bump("dispatches")
+            if self.remote_durability_enabled:
+                self._persist_remote_barrier(
+                    "K3_AFTER_REQUEST_DISPATCH",
+                    seal_label="remote-request-exposed",
+                )
             self.maybe_kill("K3_AFTER_REQUEST_DISPATCH")
         else:
             # Re-presenting the outstanding request after a restart.  The bytes
@@ -625,9 +763,14 @@ class OperatorSession:
         result = {"executed": key, "round": round}
         _append_jsonl(self.capability_ledger_path, {"key": key, "result": result, "at": _now()})
         self.bump("capability_side_effects")
-        # K4 lives here: Core has already durably authenticated the exact reply
-        # for this round (trusted-return receipt committed) and is now executing
-        # the directive's capability.  Downstream application is not complete.
+        # K4 lives here: the idempotency/result ledger is durable before the
+        # runtime may continue beyond the capability boundary.  In remote mode
+        # that exact recovery point is synchronously published before kill.
+        if self.remote_durability_enabled:
+            self._persist_remote_barrier(
+                "K4_AFTER_REPLY_AUTHENTICATED",
+                seal_label="remote-capability-boundary",
+            )
         self.maybe_kill("K4_AFTER_REPLY_AUTHENTICATED")
         return {"result": result, "duplicate_suppressed": False}
 
@@ -838,6 +981,7 @@ class OperatorSession:
         self.journal.ledger_set(f"assistant_output_{turn_index}", str(result.runtime.response))
         self.bump("turns_completed")
         self.seal("applied")
+        self._persist_remote_barrier("K5_AFTER_APPLIED_BEFORE_ACK")
         self.maybe_kill("K5_AFTER_APPLIED_BEFORE_ACK")
         return {
             "skipped": False,
@@ -878,6 +1022,7 @@ class OperatorSession:
         if request_id is not None:
             self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
         self.seal("acked")
+        self._persist_remote_barrier("ACKED")
         return report
 
     # ------------------------------------------------------------ the loop
