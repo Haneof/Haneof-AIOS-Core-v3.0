@@ -13,8 +13,15 @@ Reviewer suite: `reviews/CORRECTIVE_001_IA2/` (review-only; nothing added to PR 
 
 # `READY_FOR_PM_INTEGRATION`
 
-PR #264 was **not** merged, repaired, or integrated. No RC-REFREEZE, A-004,
-persistence Corrective-003, Resident B/C, evaluator, or release work was started.
+**This reviewer** did not merge, repair, or integrate PR #264, and started no
+RC-REFREEZE, A-004, persistence Corrective-003, Resident B/C, evaluator, or
+release work. Every prohibited action remained untouched.
+
+> **State has since moved.** PM integrated #264 *after* this verdict was issued;
+> it is now `MERGED` and main advanced to `ba85170958386fa4169b1332b9cada8521dd2a0f`.
+> That integration was performed by PM, not by this review. §17 records the
+> re-measured state and proves merged `src/` is byte-identical to the accepted
+> candidate `a73e186d…`.
 
 ---
 
@@ -527,7 +534,7 @@ the same rev10/rev2/rev1 blobs.
 | #261 not modified / no implementation merged | #258 head **is** an ancestor of #261; all four src blobs **byte-identical** to #258's; #261's two extra commits are both `review(core): …` |
 | #258 trusted-return carry-forward complete | `background_attempt.py` = `f6617aad47dd0b339dd954d9e0e430b733bef2ee` and `turn_runtime.py` = `062f7d8af03e599a39f962c29566a654a1963a13` on **both** #258 and #264 — identical to the PM-observed values, freshly re-derived. `sqlite_store.py` 178 insertions / **0** deletions; `execution/service.py` deletions are the state-derived `goal-transition:{id}:{revision}:{target}` key only — no trusted-return code removed |
 | #261 review-only artifacts not imported | `reviews/IA_TRUSTED_RETURN_001_REV1/**` → 0 files in #264; `tests/independent_acceptance/**` → 0 files in #264 |
-| no competing candidate | #264 is the only open PR at `a73e186d`; #258 and #261 remain at their historical heads |
+| no competing candidate | #264 was the only open PR at `a73e186d` at review time; #258 and #261 remain at their historical heads (re-measured in §17, still `OPEN` and unchanged). #264 has since been merged by PM — see §17 |
 
 One observation, not a defect: #264's first seven commits carry the same
 messages and authored timestamps as #258's but different SHAs (all committed at
