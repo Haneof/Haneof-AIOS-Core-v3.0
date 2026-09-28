@@ -9,6 +9,7 @@
 - **当前唯一下一 READY：`CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001 = READY`**。只修 trusted provider-return crash handoff/recovery；不得把 recovery caller 变成签名 oracle，不得弱化 #219 accepted authenticity invariants。任务 prompt：`governance/prompts/CORE_BACKGROUND_TRUSTED_RETURN_RECOVERY_001_2026-09-28.md`。
 - 以下继续 **BLOCKED**：Corrective-003 resume、Core RC re-freeze/lineage follow-up、`C15-RCC-RES-B-RELEASE-003`、`RERUN-003`、`ACCEPT-003`、Resident C、evaluator、closure。
 - PR #254 PM STOP comment：`5863009559`。
+- **Mandatory post-Core sequence**：`CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001` engineering -> fresh Independent Acceptance -> PM integration -> `CORE-RC-REFREEZE-003` -> fresh Independent Acceptance -> fresh `C15-RCC-RES-A-RERUN-004` on the new RC -> fresh Independent Acceptance -> governance re-release of frozen `C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003`. Once the new Core is integrated, A-003 remains historical evidence for the prior Core/RC only and MUST NOT be reused as the B launch lineage.
 - #254 在 PM STOP 后仍被并行工程窗口继续推进；关闭时 branch head = `a2d815c9f5154d87a56b152ed7cf5d1eb1baaaae`，该 head 仍含 `src/aios_core/**` diff，全部视为 **unauthorized WIP / NOT_A_CANDIDATE**。关闭 PR 仅停止 active PR/CI flood，不删除 branch/history。
 
 ## 历史控制入口 — 2026-09-27 C15-RCC-RES-A-RERUN-003 INTEGRATED / C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001 READY_TO_RESUME（已被上方 REVIEW_READY writeback supersede）
