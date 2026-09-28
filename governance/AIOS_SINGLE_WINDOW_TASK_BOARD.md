@@ -1,5 +1,15 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## Parallel preparation lane — 2026-09-28 C15 EXIT READINESS
+
+- **`C15-EXIT-READINESS-001 = REVIEW_READY / GOVERNANCE PREPARATION ONLY`**.
+- This lane prepares downstream sequencing, evidence disposition, and blocked prompt templates while the current Core corrective is running.
+- It **does not create another READY engineering task**. The sole engineering READY remains `CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001-CORRECTIVE-001`.
+- Prepared reference: `governance/C15_EXIT_READINESS_2026-09-28.md`.
+- Historical evidence matrix: `governance/C15_HISTORICAL_EVIDENCE_DISPOSITION_MATRIX_2026-09-28.md`.
+- Blocked drafts prepared for RC-REFREEZE-003, A-RERUN-004, persona preflight, R10-aware Resident C, and final evaluator. None may execute until their prerequisites are explicitly released on live main.
+
+
 ## 当前控制入口 — 2026-09-28 TRUSTED-RETURN IA FAIL / CORRECTIVE-001 READY
 
 - **`C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 = FROZEN_WIP / BLOCKED_ON_CORE_TRUSTED_RETURN_RECOVERY`**。PR #254 已 **CLOSED / DRAFT / UNMERGED / FROZEN**。First scope-violating WIP `f7848952b6519fc40f50806f4a4d8d350ac0f38a` 修改了 `src/aios_core/runtime/turn_runtime.py`，违反 merged PM scope #255（persistence corrective 不得修改 Core），因此该 SHA = **SCOPE_VIOLATION / NOT_A_CANDIDATE**。历史 WIP/red/green CI 全部保留，不得 rewrite。
