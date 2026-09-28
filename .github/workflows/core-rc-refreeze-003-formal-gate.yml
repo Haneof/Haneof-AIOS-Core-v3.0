@@ -4,11 +4,9 @@ on:
   pull_request:
     paths:
       - ".github/workflows/core-rc-refreeze-003-formal-gate.yml"
-      - "reviews/CORE_RC_REFREEZE_003/generate_source_manifest.py"
-      - "reviews/CORE_RC_REFREEZE_003/source_manifest.json"
-      - "reviews/CORE_RC_REFREEZE_003/open_pr_snapshot.json"
-      - "reviews/CORE_RC_REFREEZE_003/open_pr_contamination_review.md"
-      - "reviews/CORE_RC_REFREEZE_003/probes/**"
+      - "release/rc/CORE_RC_REFREEZE_003*"
+      - "reviews/CORE_RC_REFREEZE_003/**"
+      - "governance/CORE_RC_REFREEZE_003*"
 
 permissions:
   contents: read
@@ -296,12 +294,14 @@ jobs:
               if result["status"] != "RECORDED":
                   return f"{name}: {result['status']}"
               return (f"{name}: tests={result['tests']} failures={result['failures']} "
-                      f"errors={result['errors']} skipped={result['skipped']} time={result['time']}s")
+                      f"errors={result['errors']} skipped={result['skipped']} "
+                      f"junit_case_time_sum={result['time']}s")
           lines = [
               "# CORE-RC-REFREEZE-003 formal run summary",
               "",
               f"- Job status: **{results['job_status']}**",
               f"- GitHub run: `{results['run_id']}`; candidate head: `{results['candidate_head']}`",
+              f"- Pull-request event SHA (GITHUB_SHA): `{results['event_sha']}`",
               f"- Frozen software: `{target}`",
               f"- Environment: Python `{env.get('python','unknown')}`; Pydantic `{env.get('pydantic','unknown')}`; pytest `{env.get('pytest','unknown')}`; SQLite `{env.get('sqlite','unknown')}`; OS `{env.get('os_release','unknown')}`; architecture `{env.get('architecture','unknown')}`",
               f"- Kernel: `{env.get('system','unknown')}`",
@@ -312,6 +312,21 @@ jobs:
               f"- Clean install/headless: `{(results['clean_install_headless'] or {}).get('status','NOT_RUN')}`",
               f"- Backup/restore/rebuild: `{(results['backup_restore_trusted_return'] or {}).get('status','NOT_RUN')}`; backup immutable `{(results['backup_restore_trusted_return'] or {}).get('source_backup_immutable','unknown')}`; provider redispatch `{(results['backup_restore_trusted_return'] or {}).get('provider_redispatch_count_after_restore','unknown')}`",
           ]
+          lines.append(
+              "- Registry exact side-effecting capability matrix: `"
+              + json.dumps(results["registry"] or {}, sort_keys=True, separators=(",", ":"))
+              + "`"
+          )
+          lines.append(
+              "- Clean-install/headless lifecycle record: `"
+              + json.dumps(results["clean_install_headless"] or {}, sort_keys=True, separators=(",", ":"))
+              + "`"
+          )
+          lines.append(
+              "- Backup/restore/index-rebuild record: `"
+              + json.dumps(results["backup_restore_trusted_return"] or {}, sort_keys=True, separators=(",", ":"))
+              + "`"
+          )
           lines.extend(
               f"- Artifact SHA-256 `{name}`: `{digest}`"
               for name, digest in sorted(evidence_sha256.items())
