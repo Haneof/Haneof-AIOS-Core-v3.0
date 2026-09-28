@@ -1,5 +1,16 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 当前控制入口 — 2026-09-28 RC-REFREEZE-003 INTEGRATED / A-RERUN-004 READY
+
+- **`CORE-RC-REFREEZE-003 = DONE / ACCEPTED / INTEGRATED`**. Frozen software = `f20f2edfa7af00d0286493fd15196ca9503bc315`; frozen Core tree = `9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623`; frozen tests tree = `7e33b5ef8432370234965d3ccd61248c703c4019`.
+- Accepted RC candidate PR #269 exact head = `6f95431036dd0304947d67ec4a8de7229d1d3ba9`; fresh Independent Acceptance PR #271 exact = `6eaf91822c39398c610a80c6985d28b4cab48eed` with `ACCEPTANCE_PASS / blocker=0`; #269 merged as `79ee5161491fb6a9215700f6391281083661b8ca`.
+- Independent review verified merge-ref equivalence, 23/23 RC checksums, full 919 regression, 248 trusted-return/recovery tests, 356 Core-systems tests, 5/5 reviewer probes, real SIGKILL recovery, clean-wheel headless, backup/restore/index rebuild and writer/restart.
+- Binding RC impact remains **`FRESH_A_REQUIRED`**. A-003 is **`HISTORICAL_FOR_PRIOR_RC_ONLY`** and MUST NOT seed or substitute for A-004.
+- **唯一下一 READY：`C15-RCC-RES-A-RERUN-004 = READY`**. Prompt: `governance/prompts/C15_RCC_RES_A_RERUN_004_2026-09-28.md`.
+- A-004 must use a fresh private World/index/release-state/session/process on exact frozen software `f20f2ed...`, run only Phase A cursor 1..13, reveal no cursor 14, and create evidence-only output.
+- `C15-RCC-RES-A-RERUN-004-INDEPENDENT-ACCEPTANCE`, persistence Corrective-003 resume, Resident B/C, evaluator and C15 close remain **BLOCKED** until their prerequisites pass.
+
+
 ## 当前控制入口 — 2026-09-28 RC-REFREEZE-003 REVIEW_READY / FRESH IA READY
 
 - **`CORE-RC-REFREEZE-003 = REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE`**. Candidate PR #269 remains **OPEN / UNMERGED** at exact head `6f95431036dd0304947d67ec4a8de7229d1d3ba9` (first parent `f2ef4886cbd7253543e82debbaa14ea387417f03`, tree `a43a761ac3570dfc4aab296818310068f877e881`).
