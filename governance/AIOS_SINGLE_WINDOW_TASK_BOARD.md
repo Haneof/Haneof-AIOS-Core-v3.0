@@ -1,5 +1,17 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 当前控制入口 — 2026-09-28 CORRECTIVE-002 PRE-REVEAL CONTAMINATED / CORRECTIVE-003 OPERATOR-PREP READY
+
+- **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-002 = BLOCKED / CONTAMINATED_BEFORE_RUN / PRE-REVEAL / HISTORICAL_BLOCKED_EXACT`**. Evidence PR #279 exact head = `8e5c1ec76ea973c849c33923ccc818fe1dad49e8` (direct parent `aa13733ae393ec70e0cfc923ad3fb59a4e1ad97a`, tree `af5f7dd273e98f8502ea70556fe80f71e542f37c`). No World/index/release-state/session/ledger/cursor was created.
+- Root dispatch defect: the fresh Resident was required to read global task-board/checkpoint/PM adjudication material that preserves historical Resident/review semantics. Those files are **not Resident-safe inputs**. The Resident correctly stopped before run start.
+- Environment precondition also failed: no qualified CPython 3.12.14 / Pydantic 2.13.5 environment was established. No A/B/C/D gate ran.
+- **唯一下一 READY：`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP = READY`**. Prompt: `governance/prompts/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_2026-09-28.md`.
+- Operator Prep is **NOT Resident**. It must pre-provision/reproduce CPython 3.12.14 + Pydantic 2.13.5, build/test/freeze the mechanical harness against real frozen Core, and produce a semantic-free `RESIDENT_SAFE_LAUNCH_PACKET.json`.
+- Clean-room Resident contract: `reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_CORRECTIVE_003_CLEAN_ROOM_CONTRACT.md`.
+- `C15-RCC-RES-A-RERUN-004-CORRECTIVE-003` remains **BLOCKED_ON_OPERATOR_PREP**. It must not read board/checkpoint/adjudications when eventually released.
+- Until Operator Prep fresh IA PASS + PM integration + fresh Corrective-003 Resident PASS + PM integration: persistence Corrective-003, Resident B/C, evaluator and C15 close remain **BLOCKED**.
+
+
 ## 当前控制入口 — 2026-09-28 A-004 CORRECTIVE-001 BLOCKED / CORRECTIVE-002 READY
 
 - **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-001 = BLOCKED / HISTORICAL_BLOCKED_EXACT`**. Evidence PR #277 exact head = `2968299beea5fe5ec2dc93418d0fa7f3e035ec40` (parent `c90b585141864f0687f210b05cde8523e00607e6`, tree `e474cd5a3a55959b97c4c3b69400ab258d25f083`). The run correctly refused post-reveal harness patching and stopped after cursor 1.
