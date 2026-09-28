@@ -422,17 +422,21 @@ def materialize_run_state(
         session_id=session_id,
         adopt_stale_owner=True,
     )
-    _validate_backend_remote_binding(backend, remote=remote, ref=ref)
-    _write_expected_remote_head(backend, resolved_commit)
-    backend.audit(
-        "materialized_from_remote",
-        {
-            "remote": remote,
-            "remote_ref": ref,
-            "commit_sha": resolved_commit,
-        },
-    )
-    return backend
+    try:
+        _validate_backend_remote_binding(backend, remote=remote, ref=ref)
+        _write_expected_remote_head(backend, resolved_commit)
+        backend.audit(
+            "materialized_from_remote",
+            {
+                "remote": remote,
+                "remote_ref": ref,
+                "commit_sha": resolved_commit,
+            },
+        )
+        return backend
+    except BaseException:
+        backend.release()
+        raise
 
 
 def verify_remote_state(
