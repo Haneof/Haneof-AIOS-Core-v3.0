@@ -39,3 +39,7 @@ The software delta is not limited to governance or evidence; reuse has not been 
 Only after this candidate receives independent acceptance and separate PM integration may a new `C15-RCC-RES-A-RERUN-004` be authorized in a later task window. Its own independent acceptance and the governance re-release of frozen persistence work are later gates. This task does not start those windows.
 
 **Not authorized here:** A-004, resuming persistence Corrective-003, B release/run, Resident C, C15 evaluator, or C15 close.
+
+## RC-003 formal gate result
+
+The fresh exact-target formal run [36436264055](https://github.com/Haneof/Haneof-AIOS-Core-v3.0/actions/runs/36436264055) passed: full pytest 919/919, trusted-return/recovery 248/248, Core systems 356/356, exact runtime registry 43 total / 22 side-effecting, clean-wheel headless PASS, and backup/restore/index-rebuild PASS. No software blocker was observed by this gate. This result does **not** alter `FRESH_A_REQUIRED`, waive the later fresh A requirement, or constitute independent acceptance. See `formal_gate_run.json` and `environment_manifest.txt` for run and artifact provenance.
