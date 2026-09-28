@@ -1,0 +1,10 @@
+{
+  "dimension": "dim:conversation",
+  "event_id": "c15rcc-008",
+  "modality": "text",
+  "occurred_at": "2026-11-04T13:42:00-08:00",
+  "resident_visible_payload": "我刚开完会，那个镜像已经推到 registry 了吗？如果好了我就通知门店开始测。",
+  "sequence": 8,
+  "source_class": "USER",
+  "source_kind": "conversation"
+}

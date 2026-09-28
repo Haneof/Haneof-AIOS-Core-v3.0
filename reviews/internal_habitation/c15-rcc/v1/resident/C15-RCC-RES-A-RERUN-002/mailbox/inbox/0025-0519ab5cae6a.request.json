@@ -1,0 +1,89 @@
+{
+  "clock": "2026-11-02T20:52:00+00:00",
+  "cursor": null,
+  "input": {
+    "dimension": "dim:work_state",
+    "granularity": "day",
+    "include_summary_sources": false,
+    "source_world_revision": 43,
+    "sources": [
+      {
+        "metadata": {
+          "dimension": "dim:work_state",
+          "external_record_id": "c15rcc-002",
+          "external_revision": "1",
+          "fixture_binding_version": "c15-rcc-fixture-event-binding-v1",
+          "fixture_event_id": "c15rcc-002",
+          "fixture_payload_sha256": "sha256:50b920768c8560cc4f60a0c51ef8477c6d4f47e85695b61e8b95e2e839963eb3",
+          "fixture_projection_sha256": "sha256:3babcd0246d3ba2395f85756fd42c5113979e1c268554d32157f5289c883df7a",
+          "fixture_sequence": 2,
+          "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+          "fixture_version": "c15-rcc-fixture-v1",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-11-02T09:14:00-08:00",
+          "source_class": "platform"
+        },
+        "object_id": "obs_c14_fixture_5248cdfd5a23b6ea88ce0a96",
+        "object_type": "observation",
+        "occurred_at": "2026-11-02T17:14:00Z",
+        "revision": 1,
+        "text": "Atlas staging 当前有两处待处理：测试索引命名冲突、日志保留时长仍为默认值。两项均标记为 non-production；没有生产写入、删除或付费动作。"
+      },
+      {
+        "metadata": {
+          "dimension": "dim:work_state",
+          "revision_evidence_set_ref": {
+            "object_id": "evs_revision_e68cdfcc51127e6151e2da87",
+            "revision": 1
+          },
+          "revision_mode": "revise",
+          "revision_reason": "CI/平台结果已覆盖原先两处待处理项，待处理陈述不再成立。",
+          "supersedes_revision": 1,
+          "writeback_kind": "revisable_cognition"
+        },
+        "object_id": "clm_e11e590722fc9b146e940147",
+        "object_type": "claim",
+        "occurred_at": "2026-11-02T17:20:00Z",
+        "revision": 2,
+        "text": "Atlas staging 先前两处待处理（测试索引命名冲突、日志保留默认值）已由 2026-11-02T20:40:00Z 的 CI/平台结果覆盖：冲突解除、日志保留调整完成，CI 48/48 通过，staging smoke test 通过；该次没有 production 变更，验收未要求返工。整个 Atlas staging 是否已全部收尾，世界证据仍不足。"
+      },
+      {
+        "metadata": {
+          "dimension": "dim:work_state",
+          "writeback_kind": "cognition_evidence"
+        },
+        "object_id": "evs_cf54803073f0a854398185a8",
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-02T17:20:00Z",
+        "revision": 1,
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-02T17:20:00Z\", \"world_revision\": 17}, \"learned_at\": \"2026-11-02T17:20:00Z\", \"member_refs\": [{\"object_id\": \"obs_c14_fixture_5248cdfd5a23b6ea88ce0a96\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:work_state\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_cf54803073f0a854398185a8\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-11-02T17:20:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_c14_fixture_5248cdfd5a23b6ea88ce0a96\", \"revision\": 1}]}"
+      },
+      {
+        "metadata": {
+          "dimension": "dim:work_state",
+          "revision_mode": "revise",
+          "target_ref": {
+            "object_id": "clm_e11e590722fc9b146e940147",
+            "revision": 1
+          }
+        },
+        "object_id": "evs_revision_e68cdfcc51127e6151e2da87",
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-02T20:52:00Z",
+        "revision": 1,
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 2, \"missing_description\": [], \"observed_count\": 2}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-02T20:52:00Z\", \"world_revision\": 22}, \"learned_at\": \"2026-11-02T20:52:00Z\", \"member_refs\": [{\"object_id\": \"obs_c14_fixture_5248cdfd5a23b6ea88ce0a96\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_5d4dfcf42055c00135a78a54\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:work_state\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_e11e590722fc9b146e940147\", \"revision\": 1}}, \"object_id\": \"evs_revision_e68cdfcc51127e6151e2da87\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_e11e590722fc9b146e940147@1\", \"recorded_at\": \"2026-11-02T20:52:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_c14_fixture_5248cdfd5a23b6ea88ce0a96\", \"revision\": 1}, {\"object_id\": \"obs_c14_fixture_5d4dfcf42055c00135a78a54\", \"revision\": 1}]}"
+      }
+    ],
+    "subject_id": "user_1",
+    "truncated": false,
+    "window_end": "2026-11-02T23:59:59.999999Z",
+    "window_start": "2026-11-02T00:00:00Z"
+  },
+  "kind": "dimension_summary",
+  "protocol": "c15-rcc-res-a-rerun-002-mailbox-v1",
+  "request_id": "0025-0519ab5cae6a",
+  "seq": 25,
+  "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+  "stage": null,
+  "subject_id": "user_1"
+}

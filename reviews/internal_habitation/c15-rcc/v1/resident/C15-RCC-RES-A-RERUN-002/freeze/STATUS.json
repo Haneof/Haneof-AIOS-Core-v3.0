@@ -1,0 +1,16 @@
+{
+  "clock": "2026-11-06T19:10:00+00:00",
+  "cursor": 13,
+  "freeze_manifest": "freeze/MANIFEST.json",
+  "index_watermark": 98,
+  "next_task": "C15-RCC-RES-A-RERUN-002-ACCEPT-001",
+  "next_turn": 8,
+  "pid": null,
+  "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+  "stage": "frozen",
+  "state": "RUN_COMPLETE / AWAITING_INDEPENDENT_ACCEPTANCE",
+  "subject_id": "user_1",
+  "task": "C15-RCC-RES-A-RERUN-002",
+  "updated_at": "2026-09-24T17:14:34.326901+00:00",
+  "world_revision": 98
+}

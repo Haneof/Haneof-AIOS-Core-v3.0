@@ -1,0 +1,59 @@
+{
+  "answered_at": "2026-09-24T17:03:48.246561+00:00",
+  "reply": {
+    "kind": "dimension_summary",
+    "output": {
+      "text": "2026-11-02 建立了 workstream 实体 Atlas staging（entity:atlas_staging），别名含「Atlas staging 收尾」。身份证据来自用户第一轮 Observation，当日有对应 EvidenceSet。"
+    },
+    "request_id": "0022-8f20ed36746c"
+  },
+  "request": {
+    "clock": "2026-11-02T20:52:00+00:00",
+    "cursor": null,
+    "input": {
+      "dimension": "dim:entities",
+      "granularity": "day",
+      "include_summary_sources": false,
+      "source_world_revision": 37,
+      "sources": [
+        {
+          "metadata": {
+            "dimension": "dim:entities",
+            "entity_key": "entity:atlas_staging",
+            "evidence_set_ref": {
+              "object_id": "evs_graph_d87148a9a61827445c133bee",
+              "revision": 1
+            }
+          },
+          "object_id": "entity_8bf39f59489bcc5f734a98b1",
+          "object_type": "entity",
+          "occurred_at": "2026-11-02T17:05:00Z",
+          "revision": 1,
+          "text": "Atlas staging / Atlas staging 收尾"
+        },
+        {
+          "metadata": {
+            "dimension": "dim:entities"
+          },
+          "object_id": "evs_graph_d87148a9a61827445c133bee",
+          "object_type": "evidence_set",
+          "occurred_at": "2026-11-02T17:05:00Z",
+          "revision": 1,
+          "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"world_graph:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-02T17:05:00Z\", \"world_revision\": 5}, \"learned_at\": \"2026-11-02T17:05:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_e3f254f5a3f691c9f1ae5870\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:entities\"}, \"object_id\": \"evs_graph_d87148a9a61827445c133bee\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": \"2026-11-02T17:05:00Z\", \"precision\": \"second\", \"start\": \"2026-11-02T17:05:00Z\", \"timezone_name\": null, \"unknown\": false}, \"purpose\": \"support entity proposal entity:atlas_staging\", \"recorded_at\": \"2026-11-02T17:05:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_graph_evidence\", \"selector\": null, \"source_refs\": [{\"object_id\": \"obs_conv_user_e3f254f5a3f691c9f1ae5870\", \"revision\": 1, \"source_locator\": null}], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_conv_user_e3f254f5a3f691c9f1ae5870\", \"revision\": 1}]}"
+        }
+      ],
+      "subject_id": "user_1",
+      "truncated": false,
+      "window_end": "2026-11-02T23:59:59.999999Z",
+      "window_start": "2026-11-02T00:00:00Z"
+    },
+    "kind": "dimension_summary",
+    "protocol": "c15-rcc-res-a-rerun-002-mailbox-v1",
+    "request_id": "0022-8f20ed36746c",
+    "seq": 22,
+    "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+    "stage": null,
+    "subject_id": "user_1"
+  },
+  "wait_seconds": 11.607
+}

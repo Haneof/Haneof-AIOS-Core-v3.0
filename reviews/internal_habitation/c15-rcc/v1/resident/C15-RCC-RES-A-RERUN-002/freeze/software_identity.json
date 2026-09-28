@@ -1,0 +1,8 @@
+{
+  "task": "C15-RCC-RES-A-RERUN-002",
+  "frozen_software_sha": "773876f92d5f8e53422f8f5a68cc651953d93052",
+  "expected_core_tree": "fe77f8a0706acfaf369041d0882b6d0e6de39f22",
+  "measured_core_tree_at_start": "fe77f8a0706acfaf369041d0882b6d0e6de39f22",
+  "working_copy_head_at_start": "4d9f04711769737219d921c8187fc8f52e7d0d6a",
+  "note": "src/aios_core tree at HEAD equals the frozen software Core tree. Execution uses those Core bytes; post-freeze main commits are review/release/governance records only."
+}

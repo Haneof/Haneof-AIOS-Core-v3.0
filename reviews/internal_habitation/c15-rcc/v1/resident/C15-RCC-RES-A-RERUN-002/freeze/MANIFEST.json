@@ -1,0 +1,232 @@
+{
+  "acks": [
+    {
+      "binding_mode": "canonical_user_turn",
+      "event_id": "c15rcc-001",
+      "ingest_ref": "obs_conv_user_e3f254f5a3f691c9f1ae5870@1",
+      "ingest_world_revision": 1,
+      "occurred_at": "2026-11-02T09:05:00-08:00",
+      "sequence": 1,
+      "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+      "status": "acked",
+      "turn_index": 1
+    },
+    {
+      "binding_mode": "fixture_observation",
+      "event_id": "c15rcc-002",
+      "ingest_ref": "obs_c14_fixture_5248cdfd5a23b6ea88ce0a96@1",
+      "ingest_world_revision": 14,
+      "occurred_at": "2026-11-02T09:14:00-08:00",
+      "sequence": 2,
+      "session_id": null,
+      "status": "acked",
+      "turn_index": null
+    },
+    {
+      "binding_mode": "canonical_user_turn",
+      "event_id": "c15rcc-003",
+      "ingest_ref": "obs_conv_user_c4bef35968765b7f621c3ab2@1",
+      "ingest_world_revision": 15,
+      "occurred_at": "2026-11-02T09:20:00-08:00",
+      "sequence": 3,
+      "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+      "status": "acked",
+      "turn_index": 2
+    },
+    {
+      "binding_mode": "fixture_observation",
+      "event_id": "c15rcc-004",
+      "ingest_ref": "obs_c14_fixture_5d4dfcf42055c00135a78a54@1",
+      "ingest_world_revision": 21,
+      "occurred_at": "2026-11-02T12:40:00-08:00",
+      "sequence": 4,
+      "session_id": null,
+      "status": "acked",
+      "turn_index": null
+    },
+    {
+      "binding_mode": "canonical_user_turn",
+      "event_id": "c15rcc-005",
+      "ingest_ref": "obs_conv_user_d4953379e0fd7ae84b9a27ee@1",
+      "ingest_world_revision": 22,
+      "occurred_at": "2026-11-02T12:52:00-08:00",
+      "sequence": 5,
+      "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+      "status": "acked",
+      "turn_index": 3
+    },
+    {
+      "binding_mode": "canonical_user_turn",
+      "event_id": "c15rcc-006",
+      "ingest_ref": "obs_conv_user_76b4c03c31db54c18b1f02ee@1",
+      "ingest_world_revision": 49,
+      "occurred_at": "2026-11-03T10:15:00-08:00",
+      "sequence": 6,
+      "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+      "status": "acked",
+      "turn_index": 4
+    },
+    {
+      "binding_mode": "fixture_observation",
+      "event_id": "c15rcc-007",
+      "ingest_ref": "obs_c14_fixture_87474a7fb5036c38638a6c37@1",
+      "ingest_world_revision": 69,
+      "occurred_at": "2026-11-04T13:30:00-08:00",
+      "sequence": 7,
+      "session_id": null,
+      "status": "acked",
+      "turn_index": null
+    },
+    {
+      "binding_mode": "canonical_user_turn",
+      "event_id": "c15rcc-008",
+      "ingest_ref": "obs_conv_user_10c0bcfb2f7bf80aa9b324b8@1",
+      "ingest_world_revision": 73,
+      "occurred_at": "2026-11-04T13:42:00-08:00",
+      "sequence": 8,
+      "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+      "status": "acked",
+      "turn_index": 5
+    },
+    {
+      "binding_mode": "fixture_observation",
+      "event_id": "c15rcc-009",
+      "ingest_ref": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2@1",
+      "ingest_world_revision": 76,
+      "occurred_at": "2026-11-04T14:17:00-08:00",
+      "sequence": 9,
+      "session_id": null,
+      "status": "acked",
+      "turn_index": null
+    },
+    {
+      "binding_mode": "canonical_user_turn",
+      "event_id": "c15rcc-010",
+      "ingest_ref": "obs_conv_user_fbe20407ffd68ca6f1bc5f5c@1",
+      "ingest_world_revision": 77,
+      "occurred_at": "2026-11-04T14:24:00-08:00",
+      "sequence": 10,
+      "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+      "status": "acked",
+      "turn_index": 6
+    },
+    {
+      "binding_mode": "fixture_observation",
+      "event_id": "c15rcc-011",
+      "ingest_ref": "obs_c14_fixture_291beec37165eb34a35f8f85@1",
+      "ingest_world_revision": 85,
+      "occurred_at": "2026-11-04T15:02:00-08:00",
+      "sequence": 11,
+      "session_id": null,
+      "status": "acked",
+      "turn_index": null
+    },
+    {
+      "binding_mode": "canonical_user_turn",
+      "event_id": "c15rcc-012",
+      "ingest_ref": "obs_conv_user_e0dbe4b6cc248f47e013943c@1",
+      "ingest_world_revision": 86,
+      "occurred_at": "2026-11-04T15:07:00-08:00",
+      "sequence": 12,
+      "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+      "status": "acked",
+      "turn_index": 7
+    },
+    {
+      "binding_mode": "fixture_observation",
+      "event_id": "c15rcc-013",
+      "ingest_ref": "obs_c14_fixture_e2c76be3450b6e9dc8316b9d@1",
+      "ingest_world_revision": 98,
+      "occurred_at": "2026-11-06T11:10:00-08:00",
+      "sequence": 13,
+      "session_id": null,
+      "status": "acked",
+      "turn_index": null
+    }
+  ],
+  "allowed_cursors": [
+    1,
+    13
+  ],
+  "backup_method": "aios_core.headless.recovery.backup_world",
+  "core_modified": false,
+  "cursor_14_plus_revealed": false,
+  "digests": {
+    "freeze/identity.json": {
+      "bytes": 813,
+      "sha256": "0544b022a6d4c6c93897be7f0f5afac82db28f84d30c2bd34d0d269515c4f975"
+    },
+    "freeze/private_world.sqlite": {
+      "bytes": 790528,
+      "sha256": "626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa"
+    },
+    "freeze/release_state.json": {
+      "bytes": 10841,
+      "sha256": "eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8"
+    },
+    "freeze/software_identity.json": {
+      "bytes": 510,
+      "sha256": "c6a9c6babe6723567a6fb9d346a320204f516f690da91eed85031bcf523129c7"
+    },
+    "freeze/world_index.sqlite": {
+      "bytes": 811008,
+      "sha256": "ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1"
+    },
+    "identity.json": {
+      "bytes": 813,
+      "sha256": "0544b022a6d4c6c93897be7f0f5afac82db28f84d30c2bd34d0d269515c4f975"
+    },
+    "logs/operator.jsonl": {
+      "bytes": 46032,
+      "sha256": "61b7f56e47f9f6c879d361456033d46da0fdceae5c210527775b35610768f4e3"
+    },
+    "private_world.sqlite": {
+      "bytes": 790528,
+      "sha256": "6c366e4f60edf7256e73469364701f6b1da24cb46700d5e9e43f8838f07b79b3"
+    },
+    "release_state.json": {
+      "bytes": 10841,
+      "sha256": "eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8"
+    },
+    "software_identity.json": {
+      "bytes": 510,
+      "sha256": "c6a9c6babe6723567a6fb9d346a320204f516f690da91eed85031bcf523129c7"
+    },
+    "world_index.sqlite": {
+      "bytes": 811008,
+      "sha256": "a12c0909f4318d4e7e1a4af642d389cd6a91e66ab4c4b838ea9d55bad2a011c3"
+    }
+  },
+  "expected_core_tree": "fe77f8a0706acfaf369041d0882b6d0e6de39f22",
+  "frozen_at": "2026-09-24T17:14:34.326197+00:00",
+  "frozen_software_sha": "773876f92d5f8e53422f8f5a68cc651953d93052",
+  "historical_117_copied": false,
+  "index_copy_method": "sqlite_online_backup_after_catch_up",
+  "index_lag": 0,
+  "index_watermark": 98,
+  "measured_core_tree_at_freeze": "fe77f8a0706acfaf369041d0882b6d0e6de39f22",
+  "next_task": "C15-RCC-RES-A-RERUN-002-ACCEPT-001",
+  "note": "Immutable snapshot after cursor 13 ACK and normally due work. No cursor beyond 13 was revealed. Semantic judgments were made by the Resident from RuntimeSnapshot and legal capabilities. This freeze does not modify Core, tests, workflows, constitution, or the RC packet.",
+  "object_revision_count": 245,
+  "phase": "A",
+  "process_identity": "2079f64af49c406895541da042bf2192",
+  "quick_check": {
+    "index": [
+      "ok"
+    ],
+    "world": [
+      "ok"
+    ]
+  },
+  "resident_b_run": false,
+  "role": "Real Resident AI — Fresh Resident A",
+  "schema_version": 1,
+  "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+  "state": "RUN_COMPLETE / AWAITING_INDEPENDENT_ACCEPTANCE",
+  "stop_sequence": 13,
+  "subject_id": "user_1",
+  "task": "C15-RCC-RES-A-RERUN-002",
+  "user_turns": 7,
+  "working_copy_head_at_freeze": "4d9f04711769737219d921c8187fc8f52e7d0d6a",
+  "world_revision": 98
+}

@@ -1,0 +1,180 @@
+{
+  "assistant_observation_id": "obs_conv_ai_7265f599ee2f7bdcf0f29300",
+  "capability_history": [
+    {
+      "call_id": null,
+      "data": {
+        "created_by": "c14_fixture_ingest:c15-rcc-mechanical-ingest-adapter-v1",
+        "data_quality": {
+          "fixture_release": true
+        },
+        "learned_at": "2026-11-04T21:30:00Z",
+        "metadata": {
+          "dimension": "dim:release_state",
+          "external_record_id": "c15rcc-007",
+          "external_revision": "1",
+          "fixture_binding_version": "c15-rcc-fixture-event-binding-v1",
+          "fixture_event_id": "c15rcc-007",
+          "fixture_payload_sha256": "sha256:776d871786f1329dc91173570ae20c7a15ffb9aabd3163045734969b4d596879",
+          "fixture_projection_sha256": "sha256:b5c631acba34d26fc1e4cd1ad3bd2b25e8619a6d5738f34a8d00cf33ec9e8752",
+          "fixture_sequence": 7,
+          "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+          "fixture_version": "c15-rcc-fixture-v1",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-11-04T13:30:00-08:00",
+          "source_class": "platform"
+        },
+        "modality": "structured_text",
+        "object_id": "obs_c14_fixture_87474a7fb5036c38638a6c37",
+        "object_type": "observation",
+        "occurred": {
+          "end": "2026-11-04T21:30:00Z",
+          "precision": "second",
+          "start": "2026-11-04T21:30:00Z",
+          "timezone_name": "UTC",
+          "unknown": false
+        },
+        "raw_locator": "fixture://c15-rcc-fixture-v1/c15rcc-007",
+        "recorded_at": "2026-11-04T21:30:00Z",
+        "revision": 1,
+        "source_kind": "build_platform",
+        "source_refs": [],
+        "status": "active",
+        "subject_id": "user_1",
+        "unit": null,
+        "value": "镜像 edge-2026.11.4 构建完成，当前状态 READY_FOR_UPLOAD；registry 上传任务已排队，计划 14:00 开始。当前记录中没有 registry tag、digest 或 upload-complete 事件。"
+      },
+      "error_code": null,
+      "error_message": null,
+      "name": "inspect_world_object",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": [
+        {
+          "dimension": "dim:release_state",
+          "excerpt": "镜像 edge-2026.11.4 构建完成，当前状态 READY_FOR_UPLOAD；registry 上传任务已排队，计划 14:00 开始。当前记录中没有 registry tag、digest 或 upload-complete 事件。",
+          "object_id": "obs_c14_fixture_87474a7fb5036c38638a6c37",
+          "object_type": "observation",
+          "retrieval_score": 5,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:user_ai_interaction",
+          "excerpt": "我刚开完会，那个镜像已经推到 registry 了吗？如果好了我就通知门店开始测。",
+          "object_id": "obs_conv_user_10c0bcfb2f7bf80aa9b324b8",
+          "object_type": "observation",
+          "retrieval_score": 1,
+          "revision": 1
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "name": "search_world",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": [
+        {
+          "dimension": "dim:release_state",
+          "excerpt": "镜像 edge-2026.11.4 构建完成，当前状态 READY_FOR_UPLOAD；registry 上传任务已排队，计划 14:00 开始。当前记录中没有 registry tag、digest 或 upload-complete 事件。",
+          "object_id": "obs_c14_fixture_87474a7fb5036c38638a6c37",
+          "object_type": "observation",
+          "retrieval_score": 4,
+          "revision": 1
+        },
+        {
+          "dimension": "dim_unclassified",
+          "excerpt": "periodic_review.interval\nperiodic-review:user_1:2026-11-04T21:29:59.999999+00:00",
+          "object_id": "wake_review_4d9a2f69180311f57ead3c11",
+          "object_type": "wake",
+          "retrieval_score": 2,
+          "revision": 3
+        },
+        {
+          "dimension": "dim_unclassified",
+          "excerpt": "periodic_review.interval\nperiodic-review:user_1:2026-11-03T18:14:59.999999+00:00",
+          "object_id": "wake_review_98f0830328665d6c86beb1a9",
+          "object_type": "wake",
+          "retrieval_score": 2,
+          "revision": 3
+        },
+        {
+          "dimension": "dim:user_ai_interaction",
+          "excerpt": "2026-11-03 一轮对话：用户规定 production 旧索引删除须先给出具体对象、影响和回滚办法并明确确认，口头“清一下”不是授权。assistant 复述该门槛，并说明当时世界里没有待执行的 production 删除项。",
+          "object_id": "sum_9e0841c51e34b095d1964131",
+          "object_type": "summary",
+          "retrieval_score": 2,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:ai_user_understanding",
+          "excerpt": "2026-11-03 该维度窗口只有修订 EvidenceSet：用于把用户理解 Claim clm_82b8065296a76437d1c326d2 向前修订，覆盖四条用户 Observation（含低风险节奏与 production 删除确认门槛）。窗口内没有新的独立理解陈述对象。",
+          "object_id": "sum_aac1ac806ce622c7f0589463",
+          "object_type": "summary",
+          "retrieval_score": 2,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:ai_cognitive_boundary",
+          "excerpt": "2026-11-03 该维度窗口只有修订 EvidenceSet：用于把认知边界 Claim clm_bb53233b009cf1f4d81f50c6 从 revision 2 向前修订，钉住三轮用户 Observation（含 production 旧索引删除确认规则）。窗口内没有新的独立边界陈述对象。",
+          "object_id": "sum_f69d48a9c337f173cb840c70",
+          "object_type": "summary",
+          "retrieval_score": 2,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:work_state",
+          "excerpt": "Atlas staging 先前两处待处理（测试索引命名冲突、日志保留默认值）已由 2026-11-02T20:40:00Z 的 CI/平台结果覆盖：冲突解除、日志保留调整完成，CI 48/48 通过，staging smoke test 通过；该次没有 production 变更，验收未要求返工。整个 Atlas staging 是否已全部收尾，世界证据仍不足。",
+          "object_id": "clm_e11e590722fc9b146e940147",
+          "object_type": "claim",
+          "retrieval_score": 2,
+          "revision": 2
+        },
+        {
+          "dimension": "dim_unclassified",
+          "excerpt": "periodic_review.interval\nperiodic-review:user_1:2026-11-02T17:05:00+00:00",
+          "object_id": "wake_review_634d9b01f6fa5d63ffb2e68c",
+          "object_type": "wake",
+          "retrieval_score": 2,
+          "revision": 3
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "name": "search_world",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": {
+        "claim_id": "clm_7e2bced9acc9eea1f6cab675",
+        "dependency_ids": [
+          "dep_927e49a0a69a2785df4d3de5",
+          "dep_576d7874a2e9ec190ef7cd78",
+          "dep_4a720ce238d73d241bd7299a"
+        ],
+        "evidence_set_id": "evs_b6f7caf2157498d800484476",
+        "reused_existing": false,
+        "world_revision": 74
+      },
+      "error_code": null,
+      "error_message": null,
+      "name": "commit_claim",
+      "ok": true
+    }
+  ],
+  "idempotent_replay": false,
+  "model_rounds": 3,
+  "occurred_at": "2026-11-04T21:42:00+00:00",
+  "response": "还不能通知门店。\n\n现有记录只到：edge-2026.11.4 构建完成，状态 READY_FOR_UPLOAD；上传任务排队，计划 14:00 开始。没有 registry tag、digest，也没有 upload-complete。按目前证据，镜像还没推到 registry。",
+  "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+  "silenced": false,
+  "summary_error": null,
+  "termination_reason": "responded",
+  "turn_index": 5,
+  "user_observation_id": "obs_conv_user_10c0bcfb2f7bf80aa9b324b8",
+  "world_revision": 75
+}

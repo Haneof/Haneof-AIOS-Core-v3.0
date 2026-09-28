@@ -1,0 +1,46 @@
+{
+  "freeze/identity.json": {
+    "bytes": 813,
+    "sha256": "0544b022a6d4c6c93897be7f0f5afac82db28f84d30c2bd34d0d269515c4f975"
+  },
+  "freeze/private_world.sqlite": {
+    "bytes": 790528,
+    "sha256": "626c6bb32c7fdae90a068ee10dd2b4c9cdbc46b6feb2bf5b11cba9363401f6aa"
+  },
+  "freeze/release_state.json": {
+    "bytes": 10841,
+    "sha256": "eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8"
+  },
+  "freeze/software_identity.json": {
+    "bytes": 510,
+    "sha256": "c6a9c6babe6723567a6fb9d346a320204f516f690da91eed85031bcf523129c7"
+  },
+  "freeze/world_index.sqlite": {
+    "bytes": 811008,
+    "sha256": "ecfabf4eb8261f306b5c9f8a59dae2ef8a1629ddc2823b4311d6adffc3c1e5f1"
+  },
+  "identity.json": {
+    "bytes": 813,
+    "sha256": "0544b022a6d4c6c93897be7f0f5afac82db28f84d30c2bd34d0d269515c4f975"
+  },
+  "logs/operator.jsonl": {
+    "bytes": 46032,
+    "sha256": "61b7f56e47f9f6c879d361456033d46da0fdceae5c210527775b35610768f4e3"
+  },
+  "private_world.sqlite": {
+    "bytes": 790528,
+    "sha256": "6c366e4f60edf7256e73469364701f6b1da24cb46700d5e9e43f8838f07b79b3"
+  },
+  "release_state.json": {
+    "bytes": 10841,
+    "sha256": "eada20a0bf59d1cf25446c0153d1dc719b280627d9e0170364e690e1523391c8"
+  },
+  "software_identity.json": {
+    "bytes": 510,
+    "sha256": "c6a9c6babe6723567a6fb9d346a320204f516f690da91eed85031bcf523129c7"
+  },
+  "world_index.sqlite": {
+    "bytes": 811008,
+    "sha256": "a12c0909f4318d4e7e1a4af642d389cd6a91e66ab4c4b838ea9d55bad2a011c3"
+  }
+}

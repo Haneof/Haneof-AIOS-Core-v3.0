@@ -1,0 +1,56 @@
+{
+  "answered_at": "2026-09-24T17:04:09.185827+00:00",
+  "reply": {
+    "kind": "dimension_summary",
+    "output": {
+      "text": "2026-11-02 平台 CI 观察：Atlas staging 变更已合入，测试索引冲突解除，日志保留调整完成；CI 48/48 通过，staging smoke test 通过；该次没有 production 变更，验收未要求返工。"
+    },
+    "request_id": "0024-f3698bc53c4e"
+  },
+  "request": {
+    "clock": "2026-11-02T20:52:00+00:00",
+    "cursor": null,
+    "input": {
+      "dimension": "dim:work_outcome",
+      "granularity": "day",
+      "include_summary_sources": false,
+      "source_world_revision": 41,
+      "sources": [
+        {
+          "metadata": {
+            "dimension": "dim:work_outcome",
+            "external_record_id": "c15rcc-004",
+            "external_revision": "1",
+            "fixture_binding_version": "c15-rcc-fixture-event-binding-v1",
+            "fixture_event_id": "c15rcc-004",
+            "fixture_payload_sha256": "sha256:6a31f70d43b4d1e296d08fca670a0f3de92ca58b8f0de73b71c62d0cdb54357c",
+            "fixture_projection_sha256": "sha256:7f13690d0a934cf007dd16908b6586ad6533d6d12a7ca171b9c60d321baab4ec",
+            "fixture_sequence": 4,
+            "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+            "fixture_version": "c15-rcc-fixture-v1",
+            "mechanical_ingest": true,
+            "occurred_at_original": "2026-11-02T12:40:00-08:00",
+            "source_class": "platform"
+          },
+          "object_id": "obs_c14_fixture_5d4dfcf42055c00135a78a54",
+          "object_type": "observation",
+          "occurred_at": "2026-11-02T20:40:00Z",
+          "revision": 1,
+          "text": "Atlas staging 变更已合入：测试索引冲突解除，日志保留调整完成；CI 48/48 通过，staging smoke test 通过；本次没有 production 变更，验收未要求返工。"
+        }
+      ],
+      "subject_id": "user_1",
+      "truncated": false,
+      "window_end": "2026-11-02T23:59:59.999999Z",
+      "window_start": "2026-11-02T00:00:00Z"
+    },
+    "kind": "dimension_summary",
+    "protocol": "c15-rcc-res-a-rerun-002-mailbox-v1",
+    "request_id": "0024-f3698bc53c4e",
+    "seq": 24,
+    "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+    "stage": null,
+    "subject_id": "user_1"
+  },
+  "wait_seconds": 10.006
+}
