@@ -27,21 +27,61 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--root", required=True)
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--session-id", required=True)
-    parser.add_argument("--mode", choices=("create", "resume", "report"), required=True)
+    parser.add_argument(
+        "--mode",
+        choices=("create", "resume", "materialize-resume", "report"),
+        required=True,
+    )
     parser.add_argument("--kill-at", choices=list(KILL_POINTS), default=None)
     parser.add_argument("--event-count", type=int, default=30)
+    parser.add_argument("--remote-ref", default=None)
+    parser.add_argument("--remote", default="origin")
+    parser.add_argument("--repo-dir", default=None)
+    parser.add_argument("--commit-sha", default=None)
+    parser.add_argument("--require-remote-durability", action="store_true")
     args = parser.parse_args(argv)
 
+    repo_dir = Path(args.repo_dir).resolve() if args.repo_dir else None
     if args.mode == "create":
         session = OperatorSession.create(
-            args.root, run_id=args.run_id, session_id=args.session_id, event_count=args.event_count
+            args.root,
+            run_id=args.run_id,
+            session_id=args.session_id,
+            event_count=args.event_count,
+            remote_ref=args.remote_ref,
+            remote=args.remote,
+            repo_dir=repo_dir,
+            require_remote_durability=args.require_remote_durability,
         )
         outcome = session.process_one_cursor(kill_at=args.kill_at)
     elif args.mode == "resume":
-        session = OperatorSession.attach(args.root, run_id=args.run_id, session_id=args.session_id)
+        session = OperatorSession.attach(
+            args.root,
+            run_id=args.run_id,
+            session_id=args.session_id,
+            remote_ref=args.remote_ref,
+            remote=args.remote if args.remote_ref is not None else None,
+            repo_dir=repo_dir,
+        )
+        outcome = session.resume(kill_at=args.kill_at)
+    elif args.mode == "materialize-resume":
+        session = OperatorSession.materialize_and_attach(
+            args.root,
+            run_id=args.run_id,
+            session_id=args.session_id,
+            remote_ref=args.remote_ref,
+            commit_sha=args.commit_sha,
+            remote=args.remote,
+            repo_dir=repo_dir,
+        )
         outcome = session.resume(kill_at=args.kill_at)
     else:
-        session = OperatorSession.attach(args.root, run_id=args.run_id, session_id=args.session_id)
+        session = OperatorSession.attach(
+            args.root,
+            run_id=args.run_id,
+            session_id=args.session_id,
+            repo_dir=repo_dir,
+        )
         print(json.dumps(session.report(), ensure_ascii=False, indent=2, sort_keys=True))
         return 0
 
