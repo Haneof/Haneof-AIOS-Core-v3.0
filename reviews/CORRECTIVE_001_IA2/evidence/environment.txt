@@ -1,0 +1,6 @@
+python        : 3.11.2 | CPython
+pydantic      : 2.13.5
+pytest        : 8.4.2
+sqlite3 lib   : 3.40.1
+sqlite3 module: 2.6.0
+platform      : Linux-6.1.158+-x86_64-with-glibc2.36

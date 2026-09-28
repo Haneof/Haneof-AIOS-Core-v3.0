@@ -1,0 +1,530 @@
+"""INDEPENDENT ACCEPTANCE reviewer probes -- IA2 part 2.
+
+Trusted-return trust boundary + storage replay fail-closed matrix.
+
+Reviewer-authored.  Does not import or reuse the author's adversarial or
+store_fail_closed suites.
+"""
+from __future__ import annotations
+
+import hashlib
+import inspect
+import json
+import pathlib
+import sqlite3
+from datetime import datetime, timedelta, timezone
+
+import pytest
+
+from aios_core.contracts.enums import ObjectType, SourceClass, WakeSource
+from aios_core.contracts.models import Observation
+from aios_core.contracts.operations import CommitResult, OperationRequest
+from aios_core.contracts.refs import ObjectRef
+from aios_core.contracts.time import TemporalExtent
+from aios_core.query.search import WorldSearchIndex
+from aios_core.runtime.capabilities import CapabilityCall
+from aios_core.runtime.turn_runtime import FusedTurnRuntime
+from aios_core.storage.idempotency import request_fingerprint
+from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
+from aios_core.wake import WakeSignalRequest
+
+NT = datetime(2026, 9, 28, 12, tzinfo=timezone.utc)
+PROVIDER = "ia2-relay-provider"
+MODEL = "ia2-relay-model"
+
+
+# --------------------------------------------------------------------------
+# helpers
+# --------------------------------------------------------------------------
+def _open(db):
+    store = SQLiteWorldStore(db)
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+    return store, index
+
+
+def _runtime(db, handler=None):
+    store, index = _open(db)
+    return FusedTurnRuntime(store=store, index=index,
+                            model_handler=handler or (lambda _s: None))
+
+
+def _conn(db):
+    c = sqlite3.connect(db)
+    c.row_factory = sqlite3.Row
+    return c
+
+
+def _directive(request_id, *, silence=True, response=None, capability_calls=()):
+    from aios_core.runtime.cognitive_runtime import (
+        ModelCallProvenance, ModelDirective, ModelUsage,
+    )
+    return ModelDirective(
+        response=response,
+        silence=silence,
+        capability_calls=tuple(capability_calls),
+        usage=ModelUsage(input_tokens=4, output_tokens=1, total_tokens=5,
+                         provider=PROVIDER, model=MODEL, request_id=request_id),
+        provenance=ModelCallProvenance(provider=PROVIDER, model=MODEL,
+                                       request_id=request_id),
+    )
+
+
+def _crash_wake(runtime, *, key):
+    """Drive a wake whose provider round becomes ambiguous (in-doubt)."""
+    calls = []
+
+    def ambiguous(snapshot):
+        calls.append(snapshot.round_index)
+        raise TimeoutError("provider may already have accepted the request")
+
+    runtime.model_handler = ambiguous
+    runtime.cognitive_runtime.model_handler = ambiguous
+    signal = runtime.wake_bus.emit(WakeSignalRequest(
+        wake_source=WakeSource.SAFETY, rule_id=f"ia2.{key}",
+        observed_at=NT, dedupe_key=f"ia2:{key}"))
+    with pytest.raises(TimeoutError, match="may already have accepted"):
+        runtime.run_wake(
+            wake_ref=ObjectRef(object_id=signal.wake_id, revision=signal.revision),
+            now=NT)
+    return signal, calls
+
+
+def _attempt(runtime, *, work_kind, work_id, round_index=0):
+    return runtime.background_model_attempts.inspect(
+        subject_id=runtime.subject_id, work_kind=work_kind,
+        work_id=work_id, model_round_index=round_index)
+
+
+def _capture_trusted(runtime, attempt, directive, *, at=None):
+    return runtime.background_model_attempts._capture_trusted_response_return(
+        attempt.attempt_id,
+        captured_at=at or (NT + timedelta(minutes=1)),
+        directive=directive)
+
+
+def _stage(runtime, *, work_kind, work_id, round_index, directive,
+           payload=None, proof=None):
+    from aios_core.runtime.background_attempt import encode_model_directive
+    raw = encode_model_directive(directive) if payload is None else payload
+    return runtime.stage_exact_background_response(
+        work_kind=work_kind, work_id=work_id, model_round_index=round_index,
+        staged_at=NT + timedelta(minutes=2),
+        provider=PROVIDER, model=MODEL,
+        provider_request_id=directive.usage.request_id,
+        response_fingerprint=runtime.background_model_attempts._response_fingerprint(
+            directive),
+        directive_payload=raw,
+        authenticity_proof=proof,
+        evidence="ia2 reviewer staging")
+
+
+# ==========================================================================
+# D. TRUSTED-RETURN TRUST BOUNDARY
+# ==========================================================================
+def test_d0_recovery_entry_point_accepts_no_caller_supplied_bytes():
+    """The recovery caller must not be able to hand Core arbitrary directive
+    bytes and obtain a trusted receipt."""
+    sig = inspect.signature(
+        _runtime.__globals__["FusedTurnRuntime"]._pending_exact_response)
+    params = set(sig.parameters)
+    assert params <= {"self", "work_kind", "work_id"}, (
+        f"recovery entry point takes more than work identity: {sorted(params)}")
+
+    store_sig = inspect.signature(
+        __import__("aios_core.runtime.background_attempt",
+                   fromlist=["BackgroundModelAttemptStore"]
+                   ).BackgroundModelAttemptStore.recover_trusted_handoff)
+    store_params = set(store_sig.parameters)
+    assert store_params <= {"self", "subject_id", "work_kind", "work_id"}, (
+        f"recover_trusted_handoff takes more than work identity: "
+        f"{sorted(store_params)}")
+    for banned in ("directive", "payload", "bytes", "proof", "response"):
+        assert not any(banned in p for p in store_params), (
+            f"recover_trusted_handoff accepts caller-supplied {banned!r}")
+
+
+def test_d1_tampered_handoff_payload_fails_closed(tmp_path):
+    """Change the directive arguments in the durable handoff row.  The HMAC
+    receipt binds payload_sha256, so recovery must refuse -- before any
+    capability application."""
+    db = tmp_path / "world.db"
+    rt = _runtime(db)
+    signal, _ = _crash_wake(rt, key="d1")
+    attempt = _attempt(rt, work_kind="wake", work_id=signal.wake_id)
+
+    original = _directive("ia2-req-d1", silence=False, capability_calls=(
+        CapabilityCall(name="create_task", call_id="d1-call",
+                       arguments={"title": "ORIGINAL", "task_type": "immediate",
+                                  "reason_refs": []}),))
+    receipt = _capture_trusted(rt, attempt, original)
+    assert receipt.authenticity_proof
+
+    # Tamper: same attempt, changed capability arguments.
+    from aios_core.runtime.background_attempt import encode_model_directive
+    tampered = _directive("ia2-req-d1", silence=False, capability_calls=(
+        CapabilityCall(name="create_task", call_id="d1-call",
+                       arguments={"title": "SMUGGLED", "task_type": "immediate",
+                                  "reason_refs": []}),))
+    tampered_raw = encode_model_directive(tampered)
+    with _conn(db) as conn:
+        conn.execute(
+            "UPDATE background_model_return_handoffs SET directive_payload=?, "
+            "payload_sha256=? WHERE attempt_id=?",
+            (tampered_raw,
+             hashlib.sha256(tampered_raw.encode()).hexdigest(),
+             attempt.attempt_id))
+        conn.commit()
+
+    reopened = _runtime(db)
+    with pytest.raises(Exception) as exc:
+        reopened.background_model_attempts.recover_trusted_handoff(
+            subject_id=reopened.subject_id, work_kind="wake",
+            work_id=signal.wake_id)
+    assert "conflict" in str(exc.value).lower() or "invalid" in str(exc.value).lower(), (
+        f"tampered handoff was not rejected as a conflict: {exc.value!r}")
+
+
+def test_d2_tampered_handoff_digest_alone_fails_closed(tmp_path):
+    """Corrupt only payload_sha256: the digest check must fail closed."""
+    db = tmp_path / "world.db"
+    rt = _runtime(db)
+    signal, _ = _crash_wake(rt, key="d2")
+    attempt = _attempt(rt, work_kind="wake", work_id=signal.wake_id)
+    _capture_trusted(rt, attempt, _directive("ia2-req-d2"))
+
+    with _conn(db) as conn:
+        conn.execute(
+            "UPDATE background_model_return_handoffs SET payload_sha256=? "
+            "WHERE attempt_id=?",
+            ("0" * 64, attempt.attempt_id))
+        conn.commit()
+
+    reopened = _runtime(db)
+    with pytest.raises(Exception, match="(?i)corrupt|conflict|invalid"):
+        reopened.background_model_attempts.recover_trusted_handoff(
+            subject_id=reopened.subject_id, work_kind="wake",
+            work_id=signal.wake_id)
+
+
+def test_d3_cross_work_transplant_fails(tmp_path):
+    """A receipt minted for work A must not authenticate work B."""
+    db = tmp_path / "world.db"
+    rt = _runtime(db)
+    sig_a, _ = _crash_wake(rt, key="d3a")
+    attempt_a = _attempt(rt, work_kind="wake", work_id=sig_a.wake_id)
+    directive = _directive("ia2-req-d3")
+    receipt_a = _capture_trusted(rt, attempt_a, directive)
+
+    sig_b, _ = _crash_wake(rt, key="d3b")
+    with pytest.raises(Exception):
+        _stage(rt, work_kind="wake", work_id=sig_b.wake_id, round_index=0,
+               directive=directive, proof=receipt_a.authenticity_proof)
+
+
+def test_d4_provider_identity_transplant_fails(tmp_path):
+    """A directive whose own provider identity contradicts the supplied
+    identity must be refused."""
+    db = tmp_path / "world.db"
+    rt = _runtime(db)
+    signal, _ = _crash_wake(rt, key="d4")
+    attempt = _attempt(rt, work_kind="wake", work_id=signal.wake_id)
+    directive = _directive("ia2-req-d4")
+    receipt = _capture_trusted(rt, attempt, directive)
+
+    with pytest.raises(Exception):
+        rt.stage_exact_background_response(
+            work_kind="wake", work_id=signal.wake_id, model_round_index=0,
+            staged_at=NT + timedelta(minutes=2),
+            provider="OTHER-PROVIDER", model=MODEL,
+            provider_request_id="ia2-req-d4",
+            response_fingerprint=rt.background_model_attempts._response_fingerprint(
+                directive),
+            directive_payload=__import__(
+                "aios_core.runtime.background_attempt",
+                fromlist=["encode_model_directive"]).encode_model_directive(directive),
+            authenticity_proof=receipt.authenticity_proof,
+            evidence="ia2 provider transplant")
+
+
+def test_d5_missing_proof_fails_closed(tmp_path):
+    """No authenticity proof => no trusted staging."""
+    db = tmp_path / "world.db"
+    rt = _runtime(db)
+    signal, _ = _crash_wake(rt, key="d5")
+    with pytest.raises(Exception):
+        _stage(rt, work_kind="wake", work_id=signal.wake_id, round_index=0,
+               directive=_directive("ia2-req-d5"), proof=None)
+
+
+def test_d6_receipt_is_hmac_bound_to_payload_and_attempt(tmp_path):
+    """Independently verify the receipt really binds attempt + payload digest,
+    i.e. changing either invalidates the proof."""
+    db = tmp_path / "world.db"
+    rt = _runtime(db)
+    signal, _ = _crash_wake(rt, key="d6")
+    attempt = _attempt(rt, work_kind="wake", work_id=signal.wake_id)
+    d1 = _directive("ia2-req-d6")
+    r1 = _capture_trusted(rt, attempt, d1)
+    d2 = _directive("ia2-req-d6-other")
+    # Re-capturing different bytes for the same attempt must conflict, proving
+    # the receipt is bound to the exact returned bytes.
+    with pytest.raises(Exception):
+        _capture_trusted(rt, attempt, d2, at=NT + timedelta(minutes=3))
+    # and the original proof is unchanged
+    again = rt.background_model_attempts.response_authenticity_receipt(
+        attempt.attempt_id)
+    assert again is not None
+    assert again.authenticity_proof == r1.authenticity_proof
+    from aios_core.runtime.background_attempt import encode_model_directive
+    assert again.payload_sha256 != hashlib.sha256(
+        encode_model_directive(d2).encode()).hexdigest()
+
+
+# ==========================================================================
+# E. STORAGE REPLAY FAIL-CLOSED MATRIX
+# ==========================================================================
+def _obs(oid, value, *, subject="user_1"):
+    moment = NT - timedelta(hours=1)
+    return Observation(
+        object_id=oid, subject_id=subject,
+        occurred=TemporalExtent.point(moment), learned_at=moment,
+        recorded_at=moment, created_by="ia2:e", source_kind="conversation",
+        modality="text", value=value, metadata={"dimension": "dim:ia2"})
+
+
+def _op(key, *, args=None, name="ia2.e", reason="e"):
+    return OperationRequest(
+        operation_name=name, arguments=args or {"request": "original"},
+        expected_world_revision=0, reason=reason,
+        idempotency_key=key, source_class=SourceClass.USER)
+
+
+def test_e1_identical_exact_request_replays_with_zero_new_writes(tmp_path):
+    db = tmp_path / "w.db"
+    store, _ = _open(db)
+    op = _op("ia2-e1").model_copy(
+        update={"expected_world_revision": int(store.current_world_revision())})
+    first = store.commit([_obs("ia2_e1", "v1")], op)
+    assert not first.idempotent_replay
+
+    def snapshot():
+        with _conn(db) as c:
+            return (
+                [tuple(r) for r in c.execute("SELECT * FROM object_revisions")],
+                [tuple(r) for r in c.execute("SELECT * FROM operations")],
+                [tuple(r) for r in c.execute("SELECT * FROM idempotency_records")],
+                int(store.current_world_revision()),
+            )
+
+    before = snapshot()
+    replay = store.commit_or_replay([_obs("ia2_e1", "v1")], op)
+    assert replay.idempotent_replay is True
+    assert replay.world_revision == first.world_revision
+    assert replay.object_refs == first.object_refs
+    assert snapshot() == before, "an exact replay wrote something"
+
+
+def test_e2_same_key_changed_request_fails_closed(tmp_path):
+    db = tmp_path / "w.db"
+    store, _ = _open(db)
+    op = _op("ia2-e2").model_copy(
+        update={"expected_world_revision": int(store.current_world_revision())})
+    store.commit([_obs("ia2_e2", "v1")], op)
+    with _conn(db) as c:
+        n_obj = c.execute("SELECT COUNT(*) FROM object_revisions").fetchone()[0]
+
+    changed = op.model_copy(update={"arguments": {"request": "CHANGED"}})
+    with pytest.raises(StoreError) as exc:
+        store.commit_or_replay([_obs("ia2_e2", "v1")], changed)
+    assert exc.value.code.name == "IDEMPOTENCY_CONFLICT"
+    with _conn(db) as c:
+        assert c.execute("SELECT COUNT(*) FROM object_revisions").fetchone()[0] == n_obj
+
+
+def test_e3_changed_objects_under_same_key(tmp_path):
+    """Two distinct contracts, asserted separately.
+
+    (a) ``commit()`` compares objects through request_fingerprint, so changed
+        objects under an existing key MUST fail closed.
+    (b) ``commit_or_replay()`` deliberately ignores caller objects and replays
+        the ORIGINALLY committed ones -- that is what lets an identical recovered
+        replay converge after the world advanced.  It must therefore write
+        nothing and must never leak the caller's differing bytes durably.
+    """
+    db = tmp_path / "w.db"
+    store, _ = _open(db)
+    op = _op("ia2-e3").model_copy(
+        update={"expected_world_revision": int(store.current_world_revision())})
+    first = store.commit([_obs("ia2_e3", "v1")], op)
+
+    def digest():
+        with _conn(db) as c:
+            return ([tuple(r) for r in c.execute("SELECT * FROM object_revisions")],
+                    [tuple(r) for r in c.execute("SELECT * FROM operations")],
+                    [tuple(r) for r in c.execute("SELECT * FROM idempotency_records")])
+
+    before = digest()
+
+    # (a) commit() must fail closed on changed objects
+    with pytest.raises(StoreError) as exc:
+        store.commit([_obs("ia2_e3", "DIFFERENT")], op)
+    assert exc.value.code.name == "IDEMPOTENCY_CONFLICT"
+    assert exc.value.context.get("reason") == "request_fingerprint_mismatch"
+    assert digest() == before, "commit() wrote despite a fingerprint mismatch"
+
+    # (b) commit_or_replay() replays the original, writes nothing, leaks nothing
+    replay = store.commit_or_replay([_obs("ia2_e3", "DIFFERENT")], op)
+    assert replay.idempotent_replay is True
+    assert replay.world_revision == first.world_revision
+    assert digest() == before, "commit_or_replay() wrote during a replay"
+    with _conn(db) as c:
+        leaked = [r[0] for r in c.execute(
+            "SELECT payload_json FROM object_revisions") if "DIFFERENT" in r[0]]
+    assert not leaked, "caller-supplied object bytes leaked into durable state"
+
+
+def test_e4_unused_key_lookup_is_read_only(tmp_path):
+    db = tmp_path / "w.db"
+    store, _ = _open(db)
+    with _conn(db) as c:
+        before = [tuple(r) for r in c.execute("SELECT * FROM operations")]
+    assert store.replay_exact_operation(_op("ia2-never-used")) is None
+    with _conn(db) as c:
+        assert [tuple(r) for r in c.execute("SELECT * FROM operations")] == before
+
+
+def test_e5_missing_committed_object_revision_fails_closed(tmp_path):
+    db = tmp_path / "w.db"
+    store, _ = _open(db)
+    op = _op("ia2-e5").model_copy(
+        update={"expected_world_revision": int(store.current_world_revision())})
+    store.commit([_obs("ia2_e5", "v1")], op)
+    with _conn(db) as c:
+        c.execute("DELETE FROM object_revisions WHERE object_id='ia2_e5'")
+        c.commit()
+    with pytest.raises(StoreError) as exc:
+        store.replay_exact_operation(op)
+    assert exc.value.context.get("reason") == "replay_object_missing"
+
+
+def test_e6_corrupt_committed_payload_fails_closed(tmp_path):
+    db = tmp_path / "w.db"
+    store, _ = _open(db)
+    op = _op("ia2-e6").model_copy(
+        update={"expected_world_revision": int(store.current_world_revision())})
+    store.commit([_obs("ia2_e6", "v1")], op)
+    with _conn(db) as c:
+        c.execute("UPDATE object_revisions SET payload_json='{not json' "
+                  "WHERE object_id='ia2_e6'")
+        c.commit()
+    with pytest.raises(StoreError):
+        store.replay_exact_operation(op)
+
+
+def test_e7_corrupt_idempotency_result_fails_closed(tmp_path):
+    db = tmp_path / "w.db"
+    store, _ = _open(db)
+    op = _op("ia2-e7").model_copy(
+        update={"expected_world_revision": int(store.current_world_revision())})
+    store.commit([_obs("ia2_e7", "v1")], op)
+    with _conn(db) as c:
+        c.execute("UPDATE idempotency_records SET result_json='{broken' "
+                  "WHERE idempotency_key='ia2-e7'")
+        c.commit()
+    with pytest.raises(StoreError) as exc:
+        store.replay_exact_operation(op)
+    assert exc.value.context.get("reason") == "corrupt_idempotency_result"
+
+
+def test_e8_operation_idempotency_row_skew_fails_closed(tmp_path):
+    db = tmp_path / "w.db"
+    store, _ = _open(db)
+    op = _op("ia2-e8").model_copy(
+        update={"expected_world_revision": int(store.current_world_revision())})
+    store.commit([_obs("ia2_e8", "v1")], op)
+    with _conn(db) as c:
+        c.execute("UPDATE idempotency_records SET operation_id='op_other' "
+                  "WHERE idempotency_key='ia2-e8'")
+        c.commit()
+    with pytest.raises(StoreError) as exc:
+        store.replay_exact_operation(op)
+    assert exc.value.context.get("reason") == "operation_idempotency_skew"
+
+
+def test_e9_missing_idempotency_record_fails_closed(tmp_path):
+    db = tmp_path / "w.db"
+    store, _ = _open(db)
+    op = _op("ia2-e9").model_copy(
+        update={"expected_world_revision": int(store.current_world_revision())})
+    store.commit([_obs("ia2_e9", "v1")], op)
+    with _conn(db) as c:
+        c.execute("DELETE FROM idempotency_records WHERE idempotency_key='ia2-e9'")
+        c.commit()
+    with pytest.raises(StoreError) as exc:
+        store.replay_exact_operation(op)
+    assert exc.value.context.get("reason") == "operation_idempotency_skew"
+
+
+def test_e10_reused_operation_identity_under_another_key_fails_closed(tmp_path):
+    db = tmp_path / "w.db"
+    store, _ = _open(db)
+    op = _op("ia2-e10").model_copy(
+        update={"expected_world_revision": int(store.current_world_revision())})
+    first = store.commit([_obs("ia2_e10", "v1")], op)
+    other = _op("ia2-e10-other").model_copy(update={
+        "operation_id": first.operation_id,
+        "expected_world_revision": int(store.current_world_revision()),
+    })
+    with pytest.raises(StoreError):
+        store.commit_or_replay([_obs("ia2_e10_other", "v2")], other)
+
+
+def test_e11_expected_world_revision_is_still_part_of_request_identity():
+    """The corrective must not have dropped expected_world_revision from the
+    fingerprint contract."""
+    src = pathlib.Path(inspect.getsourcefile(request_fingerprint)).read_text()
+    body = src[src.index("def request_fingerprint("):]
+    body = body[:body.index("\ndef ")]
+    assert "expected_world_revision" in body, (
+        "expected_world_revision was removed from request_fingerprint")
+    for field in ("operation_id", "session_id", "operation_name", "arguments",
+                  "reason", "idempotency_key", "objects"):
+        assert field in body, f"{field} was dropped from request_fingerprint"
+
+
+def test_e12_replay_never_persists_caller_supplied_objects(tmp_path):
+    """A replay rebuilds objects from durable state; caller bytes must not leak
+    into the durable payload even though the request is identical."""
+    db = tmp_path / "w.db"
+    store, _ = _open(db)
+    op = _op("ia2-e12").model_copy(
+        update={"expected_world_revision": int(store.current_world_revision())})
+    store.commit([_obs("ia2_e12", "ORIGINAL")], op)
+
+    tampered = _obs("ia2_e12", "SMUGGLED-BY-CALLER")
+    replay = store.commit_or_replay([tampered], op)
+    assert replay.idempotent_replay is True
+    with _conn(db) as c:
+        rows = [r[0] for r in c.execute(
+            "SELECT payload_json FROM object_revisions WHERE object_id='ia2_e12'")]
+    assert all("SMUGGLED-BY-CALLER" not in r for r in rows), (
+        "a replay persisted caller-supplied object bytes")
+    assert any("ORIGINAL" in r for r in rows)
+
+
+def test_e13_unrelated_later_world_revision_does_not_break_exact_replay(tmp_path):
+    db = tmp_path / "w.db"
+    store, _ = _open(db)
+    op = _op("ia2-e13").model_copy(
+        update={"expected_world_revision": int(store.current_world_revision())})
+    first = store.commit([_obs("ia2_e13", "v1")], op)
+    later = _op("ia2-e13-unrelated", args={"request": "unrelated"},
+                reason="unrelated").model_copy(
+        update={"expected_world_revision": int(store.current_world_revision())})
+    store.commit([_obs("ia2_e13_unrelated", "noise")], later)
+
+    replay = store.commit_or_replay([_obs("ia2_e13", "v1")], op)
+    assert replay.idempotent_replay is True
+    assert replay.world_revision == first.world_revision
+    assert replay.operation_id == first.operation_id

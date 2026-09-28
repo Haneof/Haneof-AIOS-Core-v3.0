@@ -1,0 +1,811 @@
+{
+  "authorize_allowlist": [
+    "commit_ai_world_claim",
+    "commit_claim",
+    "commit_operation_experience",
+    "create_attention_watch",
+    "create_task",
+    "form_event",
+    "propose_action",
+    "propose_cognitive_policy",
+    "propose_dimension",
+    "propose_entity",
+    "propose_goal",
+    "record_communication_experience",
+    "retract_claim",
+    "revise_claim",
+    "revise_entity",
+    "rollback_cognitive_policy",
+    "transition_dimension",
+    "transition_event",
+    "transition_goal",
+    "transition_task",
+    "update_cognitive_policy",
+    "upsert_relation"
+  ],
+  "catalog": [
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._commit_ai_world_claim",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "commit_ai_world_claim",
+      "parameters": [
+        "domain",
+        "statement",
+        "evidence_refs",
+        "confidence",
+        "knowledge_state",
+        "claim_type",
+        "scope_key",
+        "tags",
+        "valid_time",
+        "unknown_items",
+        "counter_evidence_refs"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._commit_claim",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "commit_claim",
+      "parameters": [
+        "content",
+        "evidence_refs",
+        "confidence",
+        "dimension",
+        "claim_type",
+        "knowledge_state",
+        "valid_time",
+        "unknown_items",
+        "counter_evidence_refs"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._commit_operation_experience",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "commit_operation_experience",
+      "parameters": [
+        "problem_type",
+        "method_path",
+        "result_summary",
+        "positive_case_refs",
+        "negative_case_refs",
+        "applicability",
+        "cost",
+        "misses",
+        "experience_state"
+      ]
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._compare_claims",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "compare_claims",
+      "parameters": [
+        "claim_refs"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._create_attention_watch",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "create_attention_watch",
+      "parameters": [
+        "title",
+        "dimensions",
+        "reason_refs",
+        "goal_ref",
+        "source_kind",
+        "modality",
+        "metadata_equals",
+        "numeric",
+        "priority",
+        "cooldown_seconds",
+        "attention_class",
+        "mode",
+        "expires_at"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._create_task",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "create_task",
+      "parameters": [
+        "title",
+        "task_type",
+        "reason_refs",
+        "goal_ref",
+        "initial_state",
+        "priority",
+        "next_wake_at",
+        "deadline",
+        "timezone_name",
+        "next_step",
+        "completion_condition"
+      ]
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._drill_down_conversation",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "drill_down_conversation",
+      "parameters": [
+        "summary_id",
+        "revision",
+        "session_id",
+        "turn_start",
+        "turn_end"
+      ]
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._expand_recall",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "expand_recall",
+      "parameters": [
+        "query",
+        "dimension",
+        "limit"
+      ]
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._focus_entity",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "focus_entity",
+      "parameters": [
+        "entity_id",
+        "query",
+        "limit"
+      ]
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._follow_relation",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "follow_relation",
+      "parameters": [
+        "object_id",
+        "limit"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._form_event",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "form_event",
+      "parameters": [
+        "title",
+        "interpretation",
+        "event_time",
+        "evidence_refs",
+        "confidence",
+        "participant_refs",
+        "primary_claim_refs",
+        "dimension"
+      ]
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._inspect_outcome",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "inspect_outcome",
+      "parameters": [
+        "outcome_ref"
+      ]
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._inspect_world_object",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "inspect_world_object",
+      "parameters": [
+        "object_id",
+        "revision"
+      ]
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._list_attention_watches",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "list_attention_watches",
+      "parameters": []
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._list_conversation_summaries",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "list_conversation_summaries",
+      "parameters": [
+        "session_id",
+        "limit"
+      ]
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._list_dimensions",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "list_dimensions",
+      "parameters": [
+        "include_terminal"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._propose_action",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "propose_action",
+      "parameters": [
+        "task_ref",
+        "action_type",
+        "payload",
+        "evidence_refs",
+        "expected_outcome"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._propose_cognitive_policy",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "propose_cognitive_policy",
+      "parameters": [
+        "policy_id",
+        "scope",
+        "default_value",
+        "current_value",
+        "reason",
+        "evidence_refs",
+        "evaluation_window",
+        "allowed_range_or_choices"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._propose_dimension",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "propose_dimension",
+      "parameters": [
+        "dimension_key",
+        "name",
+        "description",
+        "data_shape",
+        "evidence_refs",
+        "why_existing_dimensions_are_insufficient",
+        "continuity_rationale",
+        "user_value_rationale",
+        "maintenance_cost_rationale",
+        "confidence",
+        "update_method",
+        "expected_value"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._propose_entity",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "propose_entity",
+      "parameters": [
+        "entity_key",
+        "entity_kind",
+        "evidence_refs",
+        "canonical_name",
+        "aliases",
+        "identity_claim_refs"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._propose_goal",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "propose_goal",
+      "parameters": [
+        "source_type",
+        "title",
+        "description",
+        "evidence_refs",
+        "confidence",
+        "success_criteria"
+      ]
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._read_ai_world",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "read_ai_world",
+      "parameters": [
+        "domains",
+        "scope_key",
+        "limit"
+      ]
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._read_background_budget",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "read_background_budget",
+      "parameters": []
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._read_cognitive_policies",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "read_cognitive_policies",
+      "parameters": [
+        "policy_id"
+      ]
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._read_execution_world",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "read_execution_world",
+      "parameters": []
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._read_periodic_review_anchors",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": false,
+      "kind": "read",
+      "name": "read_periodic_review_anchors",
+      "parameters": [
+        "offset",
+        "limit"
+      ]
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._read_world_map",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "read_world_map",
+      "parameters": []
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._record_communication_experience",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "record_communication_experience",
+      "parameters": [
+        "scenario",
+        "style",
+        "user_reaction",
+        "evidence_refs",
+        "tone",
+        "action_ref",
+        "applicable_conditions",
+        "counterexample_refs"
+      ]
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._request_all_dimensions_projection",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "request_all_dimensions_projection",
+      "parameters": [
+        "dimensions",
+        "window_start",
+        "window_end",
+        "query"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._retract_claim",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "retract_claim",
+      "parameters": [
+        "target_ref",
+        "reason",
+        "evidence_refs"
+      ]
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._retrieve_original_observation",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "retrieve_original_observation",
+      "parameters": [
+        "object_id",
+        "revision"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._revise_claim",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "revise_claim",
+      "parameters": [
+        "target_ref",
+        "reason",
+        "evidence_refs",
+        "replacement_content",
+        "confidence",
+        "valid_time",
+        "unknown_items",
+        "counter_evidence_refs"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._revise_entity",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "revise_entity",
+      "parameters": [
+        "entity_ref",
+        "reason",
+        "evidence_refs",
+        "canonical_name",
+        "aliases",
+        "identity_claim_refs"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._rollback_cognitive_policy",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "rollback_cognitive_policy",
+      "parameters": [
+        "policy_id",
+        "target_version",
+        "reason",
+        "evidence_refs"
+      ]
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._search_conversation_summaries",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "search_conversation_summaries",
+      "parameters": [
+        "query",
+        "session_id",
+        "limit"
+      ]
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._search_timeline",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "search_timeline",
+      "parameters": [
+        "window_start",
+        "window_end",
+        "dimension",
+        "object_types",
+        "query",
+        "limit"
+      ]
+    },
+    {
+      "declared_side_effecting": false,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._search_world",
+      "hard_boundary": false,
+      "in_authorize_allowlist": false,
+      "independent_reaches_durable_write": true,
+      "kind": "read",
+      "name": "search_world",
+      "parameters": [
+        "query",
+        "limit"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._transition_dimension",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "transition_dimension",
+      "parameters": [
+        "dimension_ref",
+        "new_lifecycle",
+        "reason",
+        "evidence_refs",
+        "related_dimension_refs"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._transition_event",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "transition_event",
+      "parameters": [
+        "event_ref",
+        "new_status",
+        "reason",
+        "evidence_refs",
+        "replacement_title",
+        "replacement_interpretation",
+        "confidence",
+        "related_event_refs"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._transition_goal",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "transition_goal",
+      "parameters": [
+        "goal_ref",
+        "new_status",
+        "reason",
+        "evidence_refs"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._transition_task",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "transition_task",
+      "parameters": [
+        "task_ref",
+        "new_state",
+        "reason",
+        "evidence_refs",
+        "execution_refs",
+        "outcome_refs",
+        "next_wake_at",
+        "next_step"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._update_cognitive_policy",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "update_cognitive_policy",
+      "parameters": [
+        "policy_id",
+        "current_value",
+        "reason",
+        "evidence_refs",
+        "evaluation_window"
+      ]
+    },
+    {
+      "declared_side_effecting": true,
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._upsert_relation",
+      "hard_boundary": false,
+      "in_authorize_allowlist": true,
+      "independent_reaches_durable_write": true,
+      "kind": "write",
+      "name": "upsert_relation",
+      "parameters": [
+        "left_ref",
+        "relation_type",
+        "right_ref",
+        "evidence_refs",
+        "confidence",
+        "reason",
+        "valid_time"
+      ]
+    }
+  ],
+  "counts": {
+    "allowlist": 22,
+    "declared": 22,
+    "independent": 42,
+    "model_callable": 43
+  },
+  "declared_minus_independent": [],
+  "declared_side_effecting": [
+    "commit_ai_world_claim",
+    "commit_claim",
+    "commit_operation_experience",
+    "create_attention_watch",
+    "create_task",
+    "form_event",
+    "propose_action",
+    "propose_cognitive_policy",
+    "propose_dimension",
+    "propose_entity",
+    "propose_goal",
+    "record_communication_experience",
+    "retract_claim",
+    "revise_claim",
+    "revise_entity",
+    "rollback_cognitive_policy",
+    "transition_dimension",
+    "transition_event",
+    "transition_goal",
+    "transition_task",
+    "update_cognitive_policy",
+    "upsert_relation"
+  ],
+  "declared_xor_allowlist": [],
+  "environment": {
+    "python": "3.11.2",
+    "sqlite": "3.40.1"
+  },
+  "graph": {
+    "functions_parsed": 761,
+    "functions_reaching_durable": 459
+  },
+  "independent_minus_declared": [
+    "compare_claims",
+    "drill_down_conversation",
+    "expand_recall",
+    "focus_entity",
+    "follow_relation",
+    "inspect_outcome",
+    "inspect_world_object",
+    "list_attention_watches",
+    "list_conversation_summaries",
+    "list_dimensions",
+    "read_ai_world",
+    "read_background_budget",
+    "read_cognitive_policies",
+    "read_execution_world",
+    "read_world_map",
+    "request_all_dimensions_projection",
+    "retrieve_original_observation",
+    "search_conversation_summaries",
+    "search_timeline",
+    "search_world"
+  ],
+  "independent_reaches_durable_write": [
+    "commit_ai_world_claim",
+    "commit_claim",
+    "commit_operation_experience",
+    "compare_claims",
+    "create_attention_watch",
+    "create_task",
+    "drill_down_conversation",
+    "expand_recall",
+    "focus_entity",
+    "follow_relation",
+    "form_event",
+    "inspect_outcome",
+    "inspect_world_object",
+    "list_attention_watches",
+    "list_conversation_summaries",
+    "list_dimensions",
+    "propose_action",
+    "propose_cognitive_policy",
+    "propose_dimension",
+    "propose_entity",
+    "propose_goal",
+    "read_ai_world",
+    "read_background_budget",
+    "read_cognitive_policies",
+    "read_execution_world",
+    "read_world_map",
+    "record_communication_experience",
+    "request_all_dimensions_projection",
+    "retract_claim",
+    "retrieve_original_observation",
+    "revise_claim",
+    "revise_entity",
+    "rollback_cognitive_policy",
+    "search_conversation_summaries",
+    "search_timeline",
+    "search_world",
+    "transition_dimension",
+    "transition_event",
+    "transition_goal",
+    "transition_task",
+    "update_cognitive_policy",
+    "upsert_relation"
+  ],
+  "model_callable": 43
+}

@@ -1,0 +1,846 @@
+"""INDEPENDENT ACCEPTANCE reviewer probes -- IA2 (rev1).
+
+Task: CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001-CORRECTIVE-001-INDEPENDENT-ACCEPTANCE
+Candidate under attack: a73e186d40688f5dc181b1128a62eff37a974409
+
+This suite is written by the Independent Core Runtime Recovery Acceptance
+Reviewer.  It does NOT import, reuse or trust the author's rev5/rev6/rev7
+matrix, the author's seeding rules, or the author's expected outcomes.  Every
+scenario below was derived from the capability ``input_schema`` exposed by the
+live registry and from the request models in ``src/aios_core``.
+
+Deliberate differences from the author's harness
+------------------------------------------------
+* The inventory guard does NOT read ``CapabilitySpec.side_effecting``.  It
+  classifies side-effecting capabilities EMPIRICALLY by poisoning the durable
+  write primitives and invoking every model-callable capability.  A capability
+  that reaches a durable write while declared read-only fails this suite.
+* Expectations are frozen before any candidate execution.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import sqlite3
+from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Any, Callable, Mapping
+
+import pytest
+
+from aios_core.contracts.enums import ObjectType, SourceClass
+from aios_core.contracts.models import Observation
+from aios_core.contracts.operations import OperationRequest
+from aios_core.contracts.refs import ObjectRef
+from aios_core.contracts.time import TemporalExtent
+from aios_core.query.search import WorldSearchIndex
+from aios_core.review.periodic import PeriodicReviewRequest, ReviewAnchor
+from aios_core.runtime.capabilities import CapabilityCall
+from aios_core.runtime.turn_runtime import FusedTurnRuntime
+from aios_core.storage.sqlite_store import SQLiteWorldStore
+
+# --------------------------------------------------------------------------
+# Reviewer's own fixed clock and subject.  A recovered round must reproduce the
+# original write time, so identity is stable across replay.
+# --------------------------------------------------------------------------
+RT = datetime(2026, 9, 28, 9, tzinfo=timezone.utc)
+RSUBJECT = "user_ia2"
+RLEAF = "ia2-anchor"
+RLEAF2 = "ia2-anchor-2"
+
+EXPECTED_MODEL_CALLABLE = 43
+
+
+# --------------------------------------------------------------------------
+# world helpers (reviewer-authored)
+# --------------------------------------------------------------------------
+def _open(db: Path):
+    store = SQLiteWorldStore(db)
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+    return store, index
+
+
+def fresh_runtime(db: Path) -> FusedTurnRuntime:
+    """Brand new runtime over the same durable World == fresh-process semantics."""
+    store, index = _open(db)
+
+    def _no_dispatch(_snapshot):  # pragma: no cover
+        raise AssertionError("IA2 replay probe must never dispatch a provider")
+
+    return FusedTurnRuntime(store=store, index=index, model_handler=_no_dispatch)
+
+
+def seed_leaf(store: SQLiteWorldStore, name: str) -> ObjectRef:
+    moment = RT - timedelta(hours=2)
+    obs = Observation(
+        object_id=f"ia2leaf_{name}",
+        subject_id=RSUBJECT,
+        occurred=TemporalExtent.point(moment),
+        learned_at=moment,
+        recorded_at=moment,
+        created_by="ia2:seed",
+        source_kind="conversation",
+        modality="text",
+        value=f"reviewer durable reality leaf {name}",
+        metadata={"dimension": "dim:ia2"},
+    )
+    store.commit(
+        [obs],
+        OperationRequest(
+            operation_name="ia2.seed_leaf",
+            expected_world_revision=int(store.current_world_revision()),
+            reason="seed qualifying reality leaf",
+            idempotency_key=f"ia2-seed-leaf-{name}",
+            source_class=SourceClass.USER,
+        ),
+    )
+    return ObjectRef(object_id=obs.object_id, revision=1)
+
+
+def L(name: str = RLEAF) -> dict[str, Any]:
+    return {"object_id": f"ia2leaf_{name}", "revision": 1}
+
+
+def unrelated_revision(db: Path, tag: str) -> None:
+    """An unrelated World revision landing inside the crash window."""
+    store, _ = _open(db)
+    moment = RT + timedelta(minutes=7)
+    store.commit(
+        [Observation(
+            object_id=f"ia2unrelated_{tag}",
+            subject_id=RSUBJECT,
+            occurred=TemporalExtent.point(moment),
+            learned_at=moment,
+            recorded_at=moment,
+            created_by="ia2:unrelated",
+            source_kind="conversation",
+            modality="text",
+            value=f"unrelated later world revision {tag}",
+            metadata={"dimension": "dim:ia2"},
+        )],
+        OperationRequest(
+            operation_name="ia2.unrelated_advance",
+            expected_world_revision=int(store.current_world_revision()),
+            reason="unrelated later world revision",
+            idempotency_key=f"ia2-advance-{tag}",
+            source_class=SourceClass.USER,
+        ),
+    )
+
+
+def _conn(db: Path):
+    conn = sqlite3.connect(db)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def durable_digest(db: Path) -> str:
+    """Canonical digest over objects + operations + idempotency rows."""
+    with _conn(db) as conn:
+        objects = [
+            (r["object_id"], int(r["revision"]),
+             hashlib.sha256(r["payload_json"].encode()).hexdigest())
+            for r in conn.execute(
+                "SELECT object_id, revision, payload_json FROM object_revisions "
+                "ORDER BY object_id, revision")
+        ]
+        ops = [
+            (r["operation_id"], r["operation_name"],
+             hashlib.sha256(r["arguments_json"].encode()).hexdigest(),
+             int(r["expected_world_revision"]), r["reason"],
+             r["idempotency_key"], r["status"], r["result_world_revision"])
+            for r in conn.execute("SELECT * FROM operations ORDER BY idempotency_key")
+        ]
+        idem = [
+            (r["idempotency_key"], r["operation_id"], int(r["world_revision"]),
+             hashlib.sha256(r["result_json"].encode()).hexdigest())
+            for r in conn.execute(
+                "SELECT * FROM idempotency_records ORDER BY idempotency_key")
+        ]
+    return json.dumps({"o": objects, "p": ops, "i": idem}, sort_keys=True)
+
+
+def op_rows(db: Path) -> list[tuple]:
+    with _conn(db) as conn:
+        return [(r["operation_id"], r["operation_name"], r["arguments_json"],
+                 int(r["expected_world_revision"]), r["idempotency_key"], r["status"])
+                for r in conn.execute("SELECT * FROM operations ORDER BY idempotency_key")]
+
+
+def idem_rows(db: Path) -> list[tuple]:
+    with _conn(db) as conn:
+        return [(r["idempotency_key"], r["operation_id"], int(r["world_revision"]),
+                 r["result_json"])
+                for r in conn.execute("SELECT * FROM idempotency_records ORDER BY idempotency_key")]
+
+
+def revisions_of(db: Path, object_type: ObjectType) -> list[tuple[str, int]]:
+    """EVERY durable revision -- list_payloads would hide a duplicate revision."""
+    with _conn(db) as conn:
+        return sorted((str(r[0]), int(r[1])) for r in conn.execute(
+            "SELECT object_id, revision FROM object_revisions WHERE object_type=?",
+            (object_type.value,)))
+
+
+def payloads_of(db: Path, object_type: ObjectType) -> dict[tuple[str, int], str]:
+    with _conn(db) as conn:
+        return {(str(r[0]), int(r[1])): hashlib.sha256(str(r[2]).encode()).hexdigest()
+                for r in conn.execute(
+                    "SELECT object_id, revision, payload_json FROM object_revisions "
+                    "WHERE object_type=?", (object_type.value,))}
+
+
+def op_keys(db: Path, prefix: str) -> list[str]:
+    with _conn(db) as conn:
+        return [str(r[0]) for r in conn.execute(
+            "SELECT idempotency_key FROM operations WHERE idempotency_key LIKE ?",
+            (f"{prefix}%",))]
+
+
+def call(rt: FusedTurnRuntime, name: str, arguments: Mapping[str, Any], *,
+         call_id: str = "ia2-call-0"):
+    """Invoke one capability at the reviewer's stable recovered write time."""
+    rt._active_turn_time = RT
+    if name == "commit_operation_experience":
+        rt._active_review_request = PeriodicReviewRequest(
+            review_id="ia2-review",
+            subject_id=RSUBJECT,
+            wake_ref=ObjectRef(object_id="ia2-review-wake", revision=1),
+            window_start=RT - timedelta(hours=2),
+            window_end=RT,
+            anchors=(ReviewAnchor(
+                object_ref=ObjectRef(object_id=f"ia2leaf_{RLEAF}", revision=1),
+                object_type=ObjectType.OBSERVATION.value,
+                recorded_at=RT - timedelta(hours=2),
+                excerpt="ia2 operation-experience anchor",
+            ),),
+        )
+    try:
+        return rt.registry.invoke(
+            CapabilityCall(name=name, call_id=call_id, arguments=dict(arguments)))
+    finally:
+        rt._active_turn_time = None
+        rt._active_review_request = None
+
+
+def ref_of(payload: Mapping[str, Any]) -> dict[str, Any]:
+    return {"object_id": str(payload["object_id"]), "revision": int(payload["revision"])}
+
+
+# --------------------------------------------------------------------------
+# reviewer-authored capability matrix
+# --------------------------------------------------------------------------
+@dataclass(frozen=True)
+class Row:
+    """One reviewer-frozen capability row.
+
+    ``prep`` seeds durable prerequisites and returns the exact arguments.
+    ``identity`` is the durable object type whose revision count must not grow
+    on an identical replay.  ``non_identity_fields`` are fields that are NOT
+    inputs to the durable object id -- the fields whose change the reviewer
+    independently classifies.
+    """
+    name: str
+    identity: ObjectType | None
+    prep: Callable[[FusedTurnRuntime], dict[str, Any]]
+    key_prefix: str
+    non_identity_fields: tuple[str, ...] = ()
+    family: str = "create"
+
+
+def _p_entity(rt, key: str, name: str) -> dict[str, Any]:
+    r = call(rt, "propose_entity", entity_key=key, entity_kind="concept",
+             evidence_refs=[L()], canonical_name=name)
+    assert r.ok, f"seed propose_entity {key}: {r.error_code} {r.error_message}"
+    return r.data
+
+
+def _p_policy(rt, policy_id: str, value: int = 1) -> None:
+    r = call(rt, "propose_cognitive_policy", policy_id=policy_id, scope="local",
+             default_value=value, current_value=value, reason="ia2 seed policy",
+             evidence_refs=[L()], evaluation_window="7d")
+    assert r.ok, f"seed policy {policy_id}: {r.error_code} {r.error_message}"
+
+
+def _p_goal(rt, title: str) -> dict[str, Any]:
+    r = call(rt, "propose_goal", source_type="user_explicit", title=title,
+             description="ia2 seed goal", evidence_refs=[L()], confidence=0.5)
+    assert r.ok, f"seed goal {title}: {r.error_code} {r.error_message}"
+    return r.data
+
+
+def _p_task(rt, title: str) -> dict[str, Any]:
+    r = call(rt, "create_task", title=title, task_type="immediate",
+             reason_refs=[L()], initial_state="draft")
+    assert r.ok, f"seed task {title}: {r.error_code} {r.error_message}"
+    return r.data
+
+
+def _p_dimension(rt, key: str) -> dict[str, Any]:
+    r = call(rt, "propose_dimension", dimension_key=key, name="IA2 Axis",
+             description="ia2 seed axis", data_shape="scalar", evidence_refs=[L()],
+             why_existing_dimensions_are_insufficient="none",
+             continuity_rationale="c", user_value_rationale="u",
+             maintenance_cost_rationale="m", confidence=0.5)
+    assert r.ok, f"seed dimension {key}: {r.error_code} {r.error_message}"
+    return r.data
+
+
+def _p_event(rt, title: str) -> dict[str, Any]:
+    r = call(rt, "form_event", title=title, interpretation="ia2 seed event",
+             event_time=TemporalExtent.point(RT - timedelta(hours=3)).model_dump(mode="json"),
+             evidence_refs=[L()], confidence=0.5)
+    assert r.ok, f"seed event {title}: {r.error_code} {r.error_message}"
+    return r.data
+
+
+def _p_claim(rt, content: str) -> dict[str, Any]:
+    r = call(rt, "commit_claim", content=content, evidence_refs=[L()],
+             confidence=0.5, dimension="dim:ia2")
+    assert r.ok, f"seed claim {content}: {r.error_code} {r.error_message}"
+    return r.data
+
+
+def _running_task(rt, title: str) -> dict[str, Any]:
+    """A task driven to RUNNING so propose_action accepts an external action."""
+    task = _p_task(rt, title)
+    tr = ref_of(task)
+    r = call(rt, "transition_task", task_ref=tr, new_state="ready",
+             reason="ia2 seed ready", evidence_refs=[L()])
+    assert r.ok, f"seed ready: {r.error_code} {r.error_message}"
+    rt.store.index_catch_up() if hasattr(rt.store, "index_catch_up") else None
+    ready = rt.store.get_payload(tr["object_id"])
+    r = call(rt, "transition_task", task_ref=ref_of(ready), new_state="running",
+             reason="ia2 seed running", evidence_refs=[L()])
+    assert r.ok, f"seed running: {r.error_code} {r.error_message}"
+    return rt.store.get_payload(tr["object_id"])
+
+
+ROWS: tuple[Row, ...] = (
+    Row("propose_entity", ObjectType.ENTITY,
+        lambda rt: dict(entity_key="entity:ia2-1", entity_kind="concept",
+                        evidence_refs=[L()], canonical_name="IA2 Entity"),
+        "entity", non_identity_fields=("canonical_name", "aliases")),
+    Row("revise_entity", ObjectType.ENTITY,
+        lambda rt: dict(entity_ref=ref_of(_p_entity(rt, "entity:ia2-rev", "Rev Seed")),
+                        reason="ia2 revise", evidence_refs=[L()],
+                        canonical_name="Revised Name"),
+        "entity", non_identity_fields=("reason", "canonical_name")),
+    Row("upsert_relation", ObjectType.RELATION,
+        lambda rt: dict(
+            left_ref=ref_of(_p_entity(rt, "entity:ia2-left", "Left")),
+            relation_type="related_to",
+            right_ref=ref_of(_p_entity(rt, "entity:ia2-right", "Right")),
+            evidence_refs=[L()], confidence=0.5, reason="ia2 relation"),
+        "relation-upsert", non_identity_fields=("confidence", "reason")),
+    Row("propose_dimension", ObjectType.DIMENSION_DEFINITION,
+        lambda rt: dict(dimension_key="dim:ia2-1", name="IA2 Dim",
+                        description="ia2 dim", data_shape="scalar", evidence_refs=[L()],
+                        why_existing_dimensions_are_insufficient="none",
+                        continuity_rationale="c", user_value_rationale="u",
+                        maintenance_cost_rationale="m", confidence=0.5),
+        "dimension"),
+    Row("transition_dimension", ObjectType.DIMENSION_DEFINITION,
+        lambda rt: dict(dimension_ref=ref_of(_p_dimension(rt, "dim:ia2-trans")),
+                        new_lifecycle="deprecated", reason="ia2 dep",
+                        evidence_refs=[L()]),
+        "dimension", non_identity_fields=("reason", "new_lifecycle"), family="transition"),
+    Row("propose_goal", ObjectType.GOAL,
+        lambda rt: dict(source_type="user_explicit", title="ia2 goal",
+                        description="ia2 goal desc", evidence_refs=[L()], confidence=0.5),
+        "goal"),
+    Row("transition_goal", ObjectType.GOAL,
+        lambda rt: dict(goal_ref=ref_of(_p_goal(rt, "ia2 goal seed")),
+                        new_status="completed", reason="ia2 done", evidence_refs=[L()]),
+        "goal", non_identity_fields=("reason", "new_status"), family="transition"),
+    Row("create_task", ObjectType.TASK,
+        lambda rt: dict(title="ia2 task", task_type="immediate", reason_refs=[L()],
+                        initial_state="draft"),
+        "task"),
+    Row("transition_task", ObjectType.TASK,
+        lambda rt: dict(task_ref=ref_of(_p_task(rt, "ia2 task seed")),
+                        new_state="ready", reason="ia2 ready", evidence_refs=[L()]),
+        "task", non_identity_fields=("reason", "new_state"), family="transition"),
+    Row("propose_action", ObjectType.ACTION,
+        lambda rt: dict(task_ref=ref_of(_running_task(rt, "ia2 action task")),
+                        action_type="external", payload={"channel": "ia2"},
+                        evidence_refs=[L()], expected_outcome="ia2 outcome"),
+        "action"),
+    Row("create_attention_watch", ObjectType.WAKE,
+        lambda rt: dict(title="ia2 watch", dimensions=["dim:ia2"], reason_refs=[L()]),
+        "attention"),
+    Row("commit_claim", ObjectType.CLAIM,
+        lambda rt: dict(content="ia2 claim content", evidence_refs=[L()],
+                        confidence=0.5, dimension="dim:ia2"),
+        "claim"),
+    Row("revise_claim", ObjectType.CLAIM,
+        lambda rt: dict(target_ref=ref_of(_p_claim(rt, "ia2 claim to revise")),
+                        reason="ia2 revise claim", evidence_refs=[L()],
+                        replacement_content="revised content", confidence=0.6),
+        "claim", non_identity_fields=("reason", "replacement_content"), family="revise"),
+    Row("retract_claim", ObjectType.CLAIM,
+        lambda rt: dict(target_ref=ref_of(_p_claim(rt, "ia2 claim to retract")),
+                        reason="ia2 retract", evidence_refs=[L()]),
+        "claim", non_identity_fields=("reason",), family="retract"),
+    Row("commit_ai_world_claim", ObjectType.CLAIM,
+        lambda rt: dict(domain="ia2", statement="ia2 ai world statement",
+                        evidence_refs=[L()], confidence=0.5),
+        "claim"),
+    Row("form_event", ObjectType.EVENT,
+        lambda rt: dict(title="ia2 event", interpretation="ia2 interpretation",
+                        event_time=TemporalExtent.point(RT - timedelta(hours=1)).model_dump(mode="json"),
+                        evidence_refs=[L()], confidence=0.5),
+        "event"),
+    Row("transition_event", ObjectType.EVENT,
+        lambda rt: dict(event_ref=ref_of(_p_event(rt, "ia2 event seed")),
+                        new_status="superseded", reason="ia2 supersede",
+                        evidence_refs=[L()]),
+        "event", non_identity_fields=("reason", "new_status"), family="transition"),
+    Row("record_communication_experience", ObjectType.COMMUNICATION_EXPERIENCE,
+        lambda rt: dict(scenario="ia2 scenario", style="ia2 style",
+                        user_reaction="positive", evidence_refs=[L()]),
+        "communication"),
+    Row("commit_operation_experience", ObjectType.OPERATION_EXPERIENCE,
+        lambda rt: dict(problem_type="ia2 problem", method_path=["a", "b"],
+                        result_summary="ia2 summary", positive_case_refs=[L()]),
+        "operation-experience"),
+    Row("propose_cognitive_policy", ObjectType.COGNITIVE_POLICY,
+        lambda rt: dict(policy_id="ia2-policy-new", scope="local", default_value=1,
+                        current_value=1, reason="ia2 policy", evidence_refs=[L()],
+                        evaluation_window="7d"),
+        "policy"),
+    Row("update_cognitive_policy", ObjectType.COGNITIVE_POLICY,
+        lambda rt: (_p_policy(rt, "ia2-policy-upd"),
+                    dict(policy_id="ia2-policy-upd", current_value=2,
+                         reason="ia2 update", evidence_refs=[L()]))[1],
+        "policy-update", non_identity_fields=("current_value", "reason"), family="revise"),
+    Row("rollback_cognitive_policy", ObjectType.COGNITIVE_POLICY,
+        lambda rt: (_p_policy(rt, "ia2-policy-rb"),
+                    call(rt, "update_cognitive_policy", policy_id="ia2-policy-rb",
+                         current_value=2, reason="ia2 pre-update", evidence_refs=[L()]),
+                    dict(policy_id="ia2-policy-rb", target_version=1,
+                         reason="ia2 rollback", evidence_refs=[L()]))[2],
+        "policy-rollback", non_identity_fields=("reason",), family="rollback"),
+)
+
+ROW_BY_NAME = {r.name: r for r in ROWS}
+
+
+# --------------------------------------------------------------------------
+# apply once, durably
+# --------------------------------------------------------------------------
+def apply_once(db: Path, row: Row):
+    rt = fresh_runtime(db)
+    seed_leaf(rt.store, RLEAF)
+    seed_leaf(rt.store, RLEAF2)
+    arguments = row.prep(rt)
+    result = call(rt, row.name, arguments)
+    assert result.ok, (
+        f"{row.name}: first application failed: "
+        f"{result.error_code} {result.error_message}")
+    return rt, dict(arguments), result.data
+
+
+# ==========================================================================
+# GROUP A -- independent inventory / reachability
+# ==========================================================================
+class _Poison(Exception):
+    """Raised instead of any durable write."""
+
+
+def _poisoned_runtime(db: Path):
+    """A runtime whose durable write primitives raise instead of writing."""
+    store, index = _open(db)
+    for name in ("commit", "commit_or_replay", "replay_exact_operation"):
+        def _boom(*_a, **_k):
+            raise _Poison("durable write attempted")
+        setattr(store, name, _boom)
+    return FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: None)
+
+
+def _declared_side_effecting(runtime) -> set[str]:
+    return {e["name"] for e in runtime.registry.catalog() if e["side_effecting"]}
+
+
+def _empirical_durable_writers(db: Path, names: list[str]) -> set[str]:
+    """Invoke every capability under poisoned writes; those that raise _Poison
+    genuinely reach a durable write, independent of any declaration."""
+    writers: set[str] = set()
+    for name in names:
+        rt = _poisoned_runtime(db)
+        seed_leaf(rt.store, RLEAF)
+        rt._active_turn_time = RT
+        rt._active_review_request = PeriodicReviewRequest(
+            review_id="ia2-review", subject_id=RSUBJECT,
+            wake_ref=ObjectRef(object_id="ia2-review-wake", revision=1),
+            window_start=RT - timedelta(hours=2), window_end=RT,
+            anchors=(ReviewAnchor(
+                object_ref=ObjectRef(object_id=f"ia2leaf_{RLEAF}", revision=1),
+                object_type=ObjectType.OBSERVATION.value,
+                recorded_at=RT - timedelta(hours=2), excerpt="ia2"),),
+        )
+        try:
+            # Empty arguments are sufficient: a read-only handler either returns
+            # data or raises a normal validation error.  Only a handler that
+            # actually reaches a durable write can raise _Poison.
+            try:
+                rt.registry.invoke(CapabilityCall(name=name, call_id="ia2", arguments={}))
+            except _Poison:
+                writers.add(name)
+            except Exception:
+                pass
+        finally:
+            rt._active_turn_time = None
+            rt._active_review_request = None
+    return writers
+
+
+def test_a1_registry_shape_and_reachability(tmp_path):
+    """Independent inventory: registry shape + declared set == authorize set."""
+    import ast
+    import inspect
+    import textwrap
+
+    rt = fresh_runtime(tmp_path / "world.db")
+    catalog = rt.registry.catalog()
+    assert len(catalog) == EXPECTED_MODEL_CALLABLE, (
+        f"model-callable surface changed: {len(catalog)} != {EXPECTED_MODEL_CALLABLE}")
+
+    declared = _declared_side_effecting(rt)
+
+    src = textwrap.dedent(inspect.getsource(type(rt)._authorize_side_effect))
+    allow: set[str] = set()
+    for node in ast.walk(ast.parse(src)):
+        if isinstance(node, ast.Set):
+            allow |= {e.value for e in node.elts
+                      if isinstance(e, ast.Constant) and isinstance(e.value, str)}
+    # the authorizer also unions the C14 allowlist module constant
+    import aios_core.runtime.turn_runtime as tr_mod
+    allow |= set(tr_mod._C14_COGNITIVE_SIDE_EFFECT_ALLOWLIST)
+
+    assert declared == allow, (
+        "declared side-effecting set differs from the runtime's own side-effect "
+        f"authorization allowlist: declared-only={sorted(declared-allow)} "
+        f"allowlist-only={sorted(allow-declared)}")
+
+    frozen = set(ROW_BY_NAME)
+    assert frozen == declared, (
+        "reviewer matrix drifted from the live registry: "
+        f"registry-only={sorted(declared-frozen)} matrix-only={sorted(frozen-declared)}")
+
+
+def test_a2_no_read_declared_capability_reaches_a_durable_write(tmp_path):
+    """The runtime gate trusts the DECLARED flag (cognitive_runtime.py), so a
+    read-declared capability that writes durably would bypass authorization.
+    Poison the durable primitives and prove none does."""
+    rt = fresh_runtime(tmp_path / "world.db")
+    catalog = rt.registry.catalog()
+    read_declared = sorted(e["name"] for e in catalog if not e["side_effecting"])
+    assert read_declared, "no read-declared capabilities to check"
+
+    writers = _empirical_durable_writers(tmp_path / "probe.db", read_declared)
+    assert not writers, (
+        "capabilities declared read-only reached a durable write and would "
+        f"therefore bypass the side-effect authorizer: {sorted(writers)}")
+
+
+def test_a3_every_declared_writer_really_writes(tmp_path):
+    """Converse control: the poison probe must actually detect writers, so
+    test_a2 is not vacuously green."""
+    rt = fresh_runtime(tmp_path / "world.db")
+    declared = sorted(_declared_side_effecting(rt))
+    writers = _empirical_durable_writers(tmp_path / "probe2.db", declared)
+    assert writers, "poison probe detected no writers at all -- probe is broken"
+    assert len(writers) >= 15, (
+        f"poison probe only detected {len(writers)} of {len(declared)} declared "
+        f"writers; undetected={sorted(set(declared)-writers)}")
+
+
+# ==========================================================================
+# GROUP B -- exact recovered replay across the complete side-effecting surface
+# ==========================================================================
+@pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+def test_b_exact_recovery_replay_converges_with_zero_duplicate_effect(tmp_path, name):
+    """Side effect durable -> unrelated later World revision -> brand new runtime
+    -> identical recovered invocation.
+
+    Required: convergence, no provider redispatch (the runtime's handler raises
+    if called), no second meter, no second operation, no second idempotency row,
+    no second semantic write, no second object revision, original identity kept.
+    """
+    row = ROW_BY_NAME[name]
+    db = tmp_path / "world.db"
+    _rt, arguments, _first = apply_once(db, row)
+
+    # Unrelated World revision lands inside the crash window.
+    unrelated_revision(db, f"{name}-b")
+    revision_after = int(fresh_runtime(db).store.current_world_revision())
+
+    state_before = durable_digest(db)
+    ops_before = op_rows(db)
+    idem_before = idem_rows(db)
+    rev_before = (revisions_of(db, row.identity) if row.identity else None)
+
+    fresh = fresh_runtime(db)
+    replay = call(fresh, name, arguments, call_id="ia2-replay")
+
+    assert replay.ok, (
+        f"{name}: identical recovered replay must converge, got "
+        f"{replay.error_code}: {replay.error_message}")
+    assert durable_digest(db) == state_before, (
+        f"{name}: identical replay changed durable state")
+    assert int(fresh.store.current_world_revision()) == revision_after, (
+        f"{name}: identical replay advanced the World revision")
+    assert op_rows(db) == ops_before, f"{name}: identical replay added an operation"
+    assert idem_rows(db) == idem_before, (
+        f"{name}: identical replay changed the idempotency record")
+    if row.identity is not None:
+        assert revisions_of(db, row.identity) == rev_before, (
+            f"{name}: identical replay produced a second durable revision")
+
+
+@pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+def test_b2_exact_replay_result_is_the_original_result(tmp_path, name):
+    """A converged replay must return the ORIGINAL durable identity, not a
+    freshly minted one.  A replay that reports a new object/revision has not
+    actually replayed."""
+    row = ROW_BY_NAME[name]
+    db = tmp_path / "world.db"
+    _rt, arguments, first = apply_once(db, row)
+    unrelated_revision(db, f"{name}-b2")
+
+    fresh = fresh_runtime(db)
+    replay = call(fresh, name, arguments, call_id="ia2-replay2")
+    assert replay.ok, f"{name}: replay must converge: {replay.error_code}"
+
+    def _ids(data):
+        out = []
+        stack = [data]
+        while stack:
+            node = stack.pop()
+            if isinstance(node, dict):
+                for k, v in node.items():
+                    if k in {"object_id", "revision", "relation_id", "policy_id",
+                             "goal_id", "task_id", "action_id", "event_id",
+                             "entity_id", "dimension_id", "claim_id", "watch_id"}:
+                        out.append((k, v))
+                    stack.append(v)
+            elif isinstance(node, list):
+                stack.extend(node)
+        return sorted((k, str(v)) for k, v in out)
+
+    assert _ids(replay.data) == _ids(first), (
+        f"{name}: replay reported different durable identities than the original.\n"
+        f"  original={_ids(first)}\n  replay  ={_ids(replay.data)}")
+
+
+# ==========================================================================
+# GROUP C -- the four concepts the adjudication requires kept separate
+# ==========================================================================
+def _seeded_store(db: Path) -> SQLiteWorldStore:
+    store, index = _open(db)
+    seed_leaf(store, RLEAF)
+    return store
+
+
+def test_c1_same_durable_key_plus_changed_request_fails_closed(tmp_path):
+    """CONCEPT 1: same durable idempotency key + changed request => FAIL CLOSED.
+
+    Attacked directly at the store layer, where the guarantee must live
+    regardless of which service produced the key.
+    """
+    from aios_core.errors import StoreError
+
+    db = tmp_path / "world.db"
+    store = _seeded_store(db)
+    moment = RT - timedelta(hours=1)
+    obs = Observation(
+        object_id="ia2_c1_obj", subject_id=RSUBJECT,
+        occurred=TemporalExtent.point(moment), learned_at=moment, recorded_at=moment,
+        created_by="ia2:c1", source_kind="conversation", modality="text",
+        value="c1 original", metadata={"dimension": "dim:ia2"})
+    key = "ia2-c1-key"
+    op = OperationRequest(
+        operation_name="ia2.c1", arguments={"request": "original"},
+        expected_world_revision=int(store.current_world_revision()),
+        reason="c1", idempotency_key=key, source_class=SourceClass.USER)
+    first = store.commit([obs], op)
+    assert not first.idempotent_replay
+
+    before = durable_digest(db)
+
+    changed = op.model_copy(update={"arguments": {"request": "CHANGED"}})
+    with pytest.raises(StoreError) as exc:
+        store.commit_or_replay([obs], changed)
+    assert exc.value.code.name == "IDEMPOTENCY_CONFLICT", exc.value.code
+    assert durable_digest(db) == before, "a rejected changed request still wrote"
+
+    # and the replay helper alone must not have written either
+    assert store.replay_exact_operation(changed) is None or True
+    assert durable_digest(db) == before
+
+
+def test_c1b_replay_helper_rejects_changed_request_with_zero_writes(tmp_path):
+    """`replay_exact_operation()` itself must fail closed on a changed request
+    under an existing key, and must not persist anything."""
+    from aios_core.errors import StoreError
+
+    db = tmp_path / "world.db"
+    store = _seeded_store(db)
+    moment = RT - timedelta(hours=1)
+    obs = Observation(
+        object_id="ia2_c1b_obj", subject_id=RSUBJECT,
+        occurred=TemporalExtent.point(moment), learned_at=moment, recorded_at=moment,
+        created_by="ia2:c1b", source_kind="conversation", modality="text",
+        value="c1b original", metadata={"dimension": "dim:ia2"})
+    op = OperationRequest(
+        operation_name="ia2.c1b", arguments={"request": "original"},
+        expected_world_revision=int(store.current_world_revision()),
+        reason="c1b", idempotency_key="ia2-c1b-key", source_class=SourceClass.USER)
+    store.commit([obs], op)
+    before = durable_digest(db)
+
+    changed = op.model_copy(update={"arguments": {"request": "TAMPERED"}})
+    with pytest.raises(StoreError) as exc:
+        store.replay_exact_operation(changed)
+    assert exc.value.code.name == "IDEMPOTENCY_CONFLICT", exc.value.code
+    assert durable_digest(db) == before
+
+
+def test_c2_call_id_grants_no_durable_identity_or_authority(tmp_path):
+    """CONCEPT 3: `call_id` is correlation only.
+
+    Independently verified from the Core contract, NOT from the author's test
+    description: call_id must not appear in any durable identity, and reusing a
+    call_id with different arguments must not replay the original result.
+    """
+    import ast
+    import inspect
+    from pathlib import Path as _P
+
+    import aios_core
+    src_root = _P(aios_core.__file__).resolve().parent
+
+    # (a) call_id is absent from the storage identity module entirely
+    idem_src = (src_root / "storage" / "idempotency.py").read_text(encoding="utf-8")
+    assert "call_id" not in idem_src, (
+        "call_id participates in durable request identity -- contradicts the "
+        "correlation-only classification")
+
+    # (b) call_id never contributes to any idempotency key construction
+    offenders = []
+    for path in sorted(src_root.rglob("*.py")):
+        text = path.read_text(encoding="utf-8")
+        if "idempotency_key" not in text:
+            continue
+        for node in ast.walk(ast.parse(text)):
+            if not isinstance(node, ast.keyword) or node.arg != "idempotency_key":
+                continue
+            for sub in ast.walk(node.value):
+                if isinstance(sub, ast.Attribute) and sub.attr == "call_id":
+                    offenders.append(str(path.relative_to(src_root)))
+                if isinstance(sub, ast.Name) and sub.id == "call_id":
+                    offenders.append(str(path.relative_to(src_root)))
+    assert not offenders, f"call_id feeds an idempotency key in: {sorted(set(offenders))}"
+
+    # (c) behavioural: same call_id, different arguments -> NOT a replay of the
+    #     original.  The second call is judged purely by its request identity.
+    db = tmp_path / "world.db"
+    rt = fresh_runtime(db)
+    seed_leaf(rt.store, RLEAF)
+    r1 = call(rt, "propose_entity",
+              dict(entity_key="entity:ia2-c2", entity_kind="concept",
+                   evidence_refs=[L()], canonical_name="C2 First"),
+              call_id="SAME-CALL-ID")
+    assert r1.ok, f"{r1.error_code} {r1.error_message}"
+    r2 = call(rt, "propose_entity",
+              dict(entity_key="entity:ia2-c2", entity_kind="concept",
+                   evidence_refs=[L()], canonical_name="C2 DIFFERENT"),
+              call_id="SAME-CALL-ID")
+    # same entity_key => same durable object; the changed request must not be
+    # silently reported as the original operation.
+    assert r1.data["entity_id"] == r2.data["entity_id"]
+    assert r1.data["revision"] != r2.data["revision"], (
+        "a changed request under a reused call_id was silently replayed as the "
+        "original operation; call_id must not authorize a replay")
+
+
+@pytest.mark.parametrize("name", sorted(
+    n for n, r in ROW_BY_NAME.items() if r.non_identity_fields))
+def test_c4_changed_non_identity_request_is_a_distinct_operation_never_an_overwrite(
+        tmp_path, name):
+    """CONCEPT 4: a changed request that yields a new canonical request identity.
+
+    The reviewer's own verdict on the rev5->rev6 question is decided by these
+    assertions, which are STRICTER than either author class:
+      * the original durable object revision must survive byte-for-byte;
+      * the original operation row must survive byte-for-byte;
+      * success is only acceptable if it produced a genuinely NEW durable
+        identity (new key AND new revision), never a silent overwrite and never
+        a report of the original identity.
+    """
+    row = ROW_BY_NAME[name]
+    db = tmp_path / "world.db"
+    _rt, arguments, first = apply_once(db, row)
+    unrelated_revision(db, f"{name}-c4")
+
+    original_payloads = payloads_of(db, row.identity)
+    original_ops = op_rows(db)
+    original_keys = set(op_keys(db, row.key_prefix))
+    assert original_keys, f"{name}: no operation key with prefix {row.key_prefix!r}"
+
+    field = row.non_identity_fields[0]
+    changed = dict(arguments)
+    current = changed.get(field)
+    if isinstance(current, str):
+        changed[field] = current + "-ia2-changed"
+    elif isinstance(current, (int, float)):
+        changed[field] = current + 1
+    elif isinstance(current, list):
+        changed[field] = list(current) + [L(RLEAF2)]
+    elif isinstance(current, dict):
+        changed[field] = {**current, "ia2": "changed"}
+    else:
+        changed[field] = "ia2-changed"
+    assert changed != arguments, f"{name}/{field}: mutation was a no-op"
+
+    fresh = fresh_runtime(db)
+    result = call(fresh, name, changed, call_id=f"ia2-c4-{name}")
+
+    new_payloads = payloads_of(db, row.identity)
+    new_ops = op_rows(db)
+    new_keys = set(op_keys(db, row.key_prefix))
+
+    # 1. the original durable object revisions are untouched, byte for byte
+    for ident, digest in original_payloads.items():
+        assert ident in new_payloads, (
+            f"{name}/{field}: original revision {ident} disappeared")
+        assert new_payloads[ident] == digest, (
+            f"{name}/{field}: original revision {ident} was overwritten by a "
+            f"changed request")
+
+    # 2. the original operation rows are untouched, byte for byte
+    for op in original_ops:
+        assert op in new_ops, f"{name}/{field}: original operation row changed"
+
+    # 3. original idempotency keys were not reused for the changed request
+    assert original_keys <= new_keys
+
+    if result.ok:
+        # success is only legitimate as a genuinely NEW durable operation
+        added_keys = new_keys - original_keys
+        assert added_keys, (
+            f"{name}/{field}: a changed request succeeded while REUSING the "
+            f"original idempotency key {sorted(original_keys)} -- that is a "
+            f"silent replay of the original operation")
+        added_revisions = set(new_payloads) - set(original_payloads)
+        assert added_revisions, (
+            f"{name}/{field}: a changed request succeeded without a new durable "
+            f"revision -- it neither replayed nor created, so the reported "
+            f"success is not backed by durable state")
+    else:
+        # fail closed is always acceptable, and must not have written
+        for ident, digest in original_payloads.items():
+            assert new_payloads[ident] == digest

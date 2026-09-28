@@ -1,0 +1,31 @@
+# Reviewer measurement: changed NON-identity field per capability (candidate a73e186d)
+
+capability                         field                  outcome                      key_reuse  new_revision
+----------------------------------------------------------------------------------------------------------------
+propose_entity                     canonical_name         FAIL CLOSED (CAPABILITY_EXECUTION_ERROR) no         0
+retract_claim                      reason                 FAIL CLOSED (CAPABILITY_EXECUTION_ERROR) no         0
+revise_claim                       reason                 FAIL CLOSED (CAPABILITY_EXECUTION_ERROR) no         0
+revise_entity                      reason                 FAIL CLOSED (CAPABILITY_EXECUTION_ERROR) no         0
+rollback_cognitive_policy          reason                 ok -> new operation          no         1
+transition_dimension               reason                 FAIL CLOSED (CAPABILITY_EXECUTION_ERROR) no         0
+transition_event                   reason                 FAIL CLOSED (CAPABILITY_EXECUTION_ERROR) no         0
+transition_goal                    reason                 FAIL CLOSED (CAPABILITY_EXECUTION_ERROR) no         0
+transition_task                    reason                 FAIL CLOSED (CAPABILITY_EXECUTION_ERROR) no         0
+update_cognitive_policy            current_value          ok -> new operation          no         1
+upsert_relation                    confidence             FAIL CLOSED (CAPABILITY_EXECUTION_ERROR) no         0
+
+# upsert_relation re-measured with IN-RANGE mutations (the first run mutated
+# confidence 0.5 -> 1.5, which is out of range and failed validation, not conflict):
+
+changed 'confidence' -> ok=True err=-
+   created keys        : ['relation-upsert:relation_5a76779997ebcf2fb9b06261:7c7b08ed6d2e239d342445b3']
+   key reuse (must be empty): []
+   original revs intact: True
+   new revisions       : [('relation_5a76779997ebcf2fb9b06261', 2)]
+   reused_existing flag: False
+changed 'reason'     -> ok=True err=-
+   created keys        : ['relation-upsert:relation_5a76779997ebcf2fb9b06261:7c7b08ed6d2e239d342445b3']
+   key reuse (must be empty): []
+   original revs intact: True
+   new revisions       : [('relation_5a76779997ebcf2fb9b06261', 2)]
+   reused_existing flag: False

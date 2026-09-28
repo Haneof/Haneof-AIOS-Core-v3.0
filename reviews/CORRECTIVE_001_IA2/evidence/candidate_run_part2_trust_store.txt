@@ -1,0 +1,6 @@
+# target worktree : /home/user/wt/candidate
+# target HEAD     : a73e186d40688f5dc181b1128a62eff37a974409
+# probes copied   : __init__.py __pycache__ test_ia2_inventory_and_replay.py test_ia2_trust_and_store.py 
+........................................................................ [ 86%]
+...........                                                              [100%]
+# exit=0

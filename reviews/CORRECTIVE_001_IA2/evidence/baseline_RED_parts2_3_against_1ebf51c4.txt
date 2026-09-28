@@ -1,0 +1,1573 @@
+# target worktree : /home/user/wt/failed258
+# target HEAD     : 1ebf51c4cb905e2a2578a09b64007b50bca0d4ac
+# probes copied   : __init__.py __pycache__ test_ia2_inventory_and_replay.py test_ia2_process_loss.py test_ia2_trust_and_store.py 
+........FFFFFFFFFFFFFFFFF.....FFFFFFFFFFFFFFFFFFF.............FF........ [ 83%]
+.FFFFFFFFFF.FF                                                           [100%]
+=================================== FAILURES ===================================
+_ test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[form_event] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b_exact_recovery_replay_c5')
+name = 'form_event'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b_exact_recovery_replay_converges_with_zero_duplicate_effect(tmp_path, name):
+        """Side effect durable -> unrelated later World revision -> brand new runtime
+        -> identical recovered invocation.
+    
+        Required: convergence, no provider redispatch (the runtime's handler raises
+        if called), no second meter, no second operation, no second idempotency row,
+        no second semantic write, no second object revision, original identity kept.
+        """
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, _first, _created, _kb = apply_once(db, row)
+    
+        # Unrelated World revision lands inside the crash window.
+        unrelated_revision(db, f"{name}-b")
+        revision_after = int(fresh_runtime(db).store.current_world_revision())
+    
+        state_before = durable_digest(db)
+        ops_before = op_rows(db)
+        idem_before = idem_rows(db)
+        rev_before = (revisions_of(db, row.identity) if row.identity else None)
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay")
+    
+>       assert replay.ok, (
+            f"{name}: identical recovered replay must converge, got "
+            f"{replay.error_code}: {replay.error_message}")
+E       AssertionError: form_event: identical recovered replay must converge, got CAPABILITY_EXECUTION_ERROR: StoreError: idempotency key was already used for a different request
+E       assert False
+E        +  where False = CapabilityResult(name='form_event', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='StoreError: idempotency key was already used for a different request', call_id='ia2-replay').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:646: AssertionError
+_ test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[propose_action] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b_exact_recovery_replay_c6')
+name = 'propose_action'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b_exact_recovery_replay_converges_with_zero_duplicate_effect(tmp_path, name):
+        """Side effect durable -> unrelated later World revision -> brand new runtime
+        -> identical recovered invocation.
+    
+        Required: convergence, no provider redispatch (the runtime's handler raises
+        if called), no second meter, no second operation, no second idempotency row,
+        no second semantic write, no second object revision, original identity kept.
+        """
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, _first, _created, _kb = apply_once(db, row)
+    
+        # Unrelated World revision lands inside the crash window.
+        unrelated_revision(db, f"{name}-b")
+        revision_after = int(fresh_runtime(db).store.current_world_revision())
+    
+        state_before = durable_digest(db)
+        ops_before = op_rows(db)
+        idem_before = idem_rows(db)
+        rev_before = (revisions_of(db, row.identity) if row.identity else None)
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay")
+    
+>       assert replay.ok, (
+            f"{name}: identical recovered replay must converge, got "
+            f"{replay.error_code}: {replay.error_message}")
+E       AssertionError: propose_action: identical recovered replay must converge, got CAPABILITY_EXECUTION_ERROR: StoreError: idempotency key was already used for a different request
+E       assert False
+E        +  where False = CapabilityResult(name='propose_action', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='StoreError: idempotency key was already used for a different request', call_id='ia2-replay').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:646: AssertionError
+_ test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[propose_cognitive_policy] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b_exact_recovery_replay_c7')
+name = 'propose_cognitive_policy'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b_exact_recovery_replay_converges_with_zero_duplicate_effect(tmp_path, name):
+        """Side effect durable -> unrelated later World revision -> brand new runtime
+        -> identical recovered invocation.
+    
+        Required: convergence, no provider redispatch (the runtime's handler raises
+        if called), no second meter, no second operation, no second idempotency row,
+        no second semantic write, no second object revision, original identity kept.
+        """
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, _first, _created, _kb = apply_once(db, row)
+    
+        # Unrelated World revision lands inside the crash window.
+        unrelated_revision(db, f"{name}-b")
+        revision_after = int(fresh_runtime(db).store.current_world_revision())
+    
+        state_before = durable_digest(db)
+        ops_before = op_rows(db)
+        idem_before = idem_rows(db)
+        rev_before = (revisions_of(db, row.identity) if row.identity else None)
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay")
+    
+>       assert replay.ok, (
+            f"{name}: identical recovered replay must converge, got "
+            f"{replay.error_code}: {replay.error_message}")
+E       AssertionError: propose_cognitive_policy: identical recovered replay must converge, got CAPABILITY_EXECUTION_ERROR: ValueError: policy already registered: ia2-policy-new
+E       assert False
+E        +  where False = CapabilityResult(name='propose_cognitive_policy', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: policy already registered: ia2-policy-new', call_id='ia2-replay').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:646: AssertionError
+_ test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[propose_dimension] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b_exact_recovery_replay_c8')
+name = 'propose_dimension'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b_exact_recovery_replay_converges_with_zero_duplicate_effect(tmp_path, name):
+        """Side effect durable -> unrelated later World revision -> brand new runtime
+        -> identical recovered invocation.
+    
+        Required: convergence, no provider redispatch (the runtime's handler raises
+        if called), no second meter, no second operation, no second idempotency row,
+        no second semantic write, no second object revision, original identity kept.
+        """
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, _first, _created, _kb = apply_once(db, row)
+    
+        # Unrelated World revision lands inside the crash window.
+        unrelated_revision(db, f"{name}-b")
+        revision_after = int(fresh_runtime(db).store.current_world_revision())
+    
+        state_before = durable_digest(db)
+        ops_before = op_rows(db)
+        idem_before = idem_rows(db)
+        rev_before = (revisions_of(db, row.identity) if row.identity else None)
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay")
+    
+>       assert replay.ok, (
+            f"{name}: identical recovered replay must converge, got "
+            f"{replay.error_code}: {replay.error_message}")
+E       AssertionError: propose_dimension: identical recovered replay must converge, got CAPABILITY_EXECUTION_ERROR: ValueError: dimension_key already exists: dim:ia2-1
+E       assert False
+E        +  where False = CapabilityResult(name='propose_dimension', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: dimension_key already exists: dim:ia2-1', call_id='ia2-replay').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:646: AssertionError
+_ test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[propose_entity] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b_exact_recovery_replay_c9')
+name = 'propose_entity'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b_exact_recovery_replay_converges_with_zero_duplicate_effect(tmp_path, name):
+        """Side effect durable -> unrelated later World revision -> brand new runtime
+        -> identical recovered invocation.
+    
+        Required: convergence, no provider redispatch (the runtime's handler raises
+        if called), no second meter, no second operation, no second idempotency row,
+        no second semantic write, no second object revision, original identity kept.
+        """
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, _first, _created, _kb = apply_once(db, row)
+    
+        # Unrelated World revision lands inside the crash window.
+        unrelated_revision(db, f"{name}-b")
+        revision_after = int(fresh_runtime(db).store.current_world_revision())
+    
+        state_before = durable_digest(db)
+        ops_before = op_rows(db)
+        idem_before = idem_rows(db)
+        rev_before = (revisions_of(db, row.identity) if row.identity else None)
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay")
+    
+>       assert replay.ok, (
+            f"{name}: identical recovered replay must converge, got "
+            f"{replay.error_code}: {replay.error_message}")
+E       AssertionError: propose_entity: identical recovered replay must converge, got CAPABILITY_EXECUTION_ERROR: ValueError: entity_key already exists: entity:ia2-1
+E       assert False
+E        +  where False = CapabilityResult(name='propose_entity', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: entity_key already exists: entity:ia2-1', call_id='ia2-replay').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:646: AssertionError
+_ test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[propose_goal] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b_exact_recovery_replay_c10')
+name = 'propose_goal'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b_exact_recovery_replay_converges_with_zero_duplicate_effect(tmp_path, name):
+        """Side effect durable -> unrelated later World revision -> brand new runtime
+        -> identical recovered invocation.
+    
+        Required: convergence, no provider redispatch (the runtime's handler raises
+        if called), no second meter, no second operation, no second idempotency row,
+        no second semantic write, no second object revision, original identity kept.
+        """
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, _first, _created, _kb = apply_once(db, row)
+    
+        # Unrelated World revision lands inside the crash window.
+        unrelated_revision(db, f"{name}-b")
+        revision_after = int(fresh_runtime(db).store.current_world_revision())
+    
+        state_before = durable_digest(db)
+        ops_before = op_rows(db)
+        idem_before = idem_rows(db)
+        rev_before = (revisions_of(db, row.identity) if row.identity else None)
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay")
+    
+>       assert replay.ok, (
+            f"{name}: identical recovered replay must converge, got "
+            f"{replay.error_code}: {replay.error_message}")
+E       AssertionError: propose_goal: identical recovered replay must converge, got CAPABILITY_EXECUTION_ERROR: StoreError: idempotency key was already used for a different request
+E       assert False
+E        +  where False = CapabilityResult(name='propose_goal', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='StoreError: idempotency key was already used for a different request', call_id='ia2-replay').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:646: AssertionError
+_ test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[record_communication_experience] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b_exact_recovery_replay_c11')
+name = 'record_communication_experience'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b_exact_recovery_replay_converges_with_zero_duplicate_effect(tmp_path, name):
+        """Side effect durable -> unrelated later World revision -> brand new runtime
+        -> identical recovered invocation.
+    
+        Required: convergence, no provider redispatch (the runtime's handler raises
+        if called), no second meter, no second operation, no second idempotency row,
+        no second semantic write, no second object revision, original identity kept.
+        """
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, _first, _created, _kb = apply_once(db, row)
+    
+        # Unrelated World revision lands inside the crash window.
+        unrelated_revision(db, f"{name}-b")
+        revision_after = int(fresh_runtime(db).store.current_world_revision())
+    
+        state_before = durable_digest(db)
+        ops_before = op_rows(db)
+        idem_before = idem_rows(db)
+        rev_before = (revisions_of(db, row.identity) if row.identity else None)
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay")
+    
+>       assert replay.ok, (
+            f"{name}: identical recovered replay must converge, got "
+            f"{replay.error_code}: {replay.error_message}")
+E       AssertionError: record_communication_experience: identical recovered replay must converge, got CAPABILITY_EXECUTION_ERROR: StoreError: idempotency key was already used for a different request
+E       assert False
+E        +  where False = CapabilityResult(name='record_communication_experience', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='StoreError: idempotency key was already used for a different request', call_id='ia2-replay').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:646: AssertionError
+_ test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[retract_claim] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b_exact_recovery_replay_c12')
+name = 'retract_claim'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b_exact_recovery_replay_converges_with_zero_duplicate_effect(tmp_path, name):
+        """Side effect durable -> unrelated later World revision -> brand new runtime
+        -> identical recovered invocation.
+    
+        Required: convergence, no provider redispatch (the runtime's handler raises
+        if called), no second meter, no second operation, no second idempotency row,
+        no second semantic write, no second object revision, original identity kept.
+        """
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, _first, _created, _kb = apply_once(db, row)
+    
+        # Unrelated World revision lands inside the crash window.
+        unrelated_revision(db, f"{name}-b")
+        revision_after = int(fresh_runtime(db).store.current_world_revision())
+    
+        state_before = durable_digest(db)
+        ops_before = op_rows(db)
+        idem_before = idem_rows(db)
+        rev_before = (revisions_of(db, row.identity) if row.identity else None)
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay")
+    
+>       assert replay.ok, (
+            f"{name}: identical recovered replay must converge, got "
+            f"{replay.error_code}: {replay.error_message}")
+E       AssertionError: retract_claim: identical recovered replay must converge, got CAPABILITY_EXECUTION_ERROR: ValueError: only the current Claim revision may be revised/retracted; inspect the latest revision first
+E       assert False
+E        +  where False = CapabilityResult(name='retract_claim', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='Va...or: only the current Claim revision may be revised/retracted; inspect the latest revision first', call_id='ia2-replay').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:646: AssertionError
+_ test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[revise_claim] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b_exact_recovery_replay_c13')
+name = 'revise_claim'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b_exact_recovery_replay_converges_with_zero_duplicate_effect(tmp_path, name):
+        """Side effect durable -> unrelated later World revision -> brand new runtime
+        -> identical recovered invocation.
+    
+        Required: convergence, no provider redispatch (the runtime's handler raises
+        if called), no second meter, no second operation, no second idempotency row,
+        no second semantic write, no second object revision, original identity kept.
+        """
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, _first, _created, _kb = apply_once(db, row)
+    
+        # Unrelated World revision lands inside the crash window.
+        unrelated_revision(db, f"{name}-b")
+        revision_after = int(fresh_runtime(db).store.current_world_revision())
+    
+        state_before = durable_digest(db)
+        ops_before = op_rows(db)
+        idem_before = idem_rows(db)
+        rev_before = (revisions_of(db, row.identity) if row.identity else None)
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay")
+    
+>       assert replay.ok, (
+            f"{name}: identical recovered replay must converge, got "
+            f"{replay.error_code}: {replay.error_message}")
+E       AssertionError: revise_claim: identical recovered replay must converge, got CAPABILITY_EXECUTION_ERROR: ValueError: only the current Claim revision may be revised/retracted; inspect the latest revision first
+E       assert False
+E        +  where False = CapabilityResult(name='revise_claim', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='Val...or: only the current Claim revision may be revised/retracted; inspect the latest revision first', call_id='ia2-replay').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:646: AssertionError
+_ test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[revise_entity] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b_exact_recovery_replay_c14')
+name = 'revise_entity'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b_exact_recovery_replay_converges_with_zero_duplicate_effect(tmp_path, name):
+        """Side effect durable -> unrelated later World revision -> brand new runtime
+        -> identical recovered invocation.
+    
+        Required: convergence, no provider redispatch (the runtime's handler raises
+        if called), no second meter, no second operation, no second idempotency row,
+        no second semantic write, no second object revision, original identity kept.
+        """
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, _first, _created, _kb = apply_once(db, row)
+    
+        # Unrelated World revision lands inside the crash window.
+        unrelated_revision(db, f"{name}-b")
+        revision_after = int(fresh_runtime(db).store.current_world_revision())
+    
+        state_before = durable_digest(db)
+        ops_before = op_rows(db)
+        idem_before = idem_rows(db)
+        rev_before = (revisions_of(db, row.identity) if row.identity else None)
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay")
+    
+>       assert replay.ok, (
+            f"{name}: identical recovered replay must converge, got "
+            f"{replay.error_code}: {replay.error_message}")
+E       AssertionError: revise_entity: identical recovered replay must converge, got CAPABILITY_EXECUTION_ERROR: ValueError: entity_10af2c44f8c7f83486de0a08@1 is not the current revision
+E       assert False
+E        +  where False = CapabilityResult(name='revise_entity', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: entity_10af2c44f8c7f83486de0a08@1 is not the current revision', call_id='ia2-replay').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:646: AssertionError
+_ test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[rollback_cognitive_policy] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b_exact_recovery_replay_c15')
+name = 'rollback_cognitive_policy'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b_exact_recovery_replay_converges_with_zero_duplicate_effect(tmp_path, name):
+        """Side effect durable -> unrelated later World revision -> brand new runtime
+        -> identical recovered invocation.
+    
+        Required: convergence, no provider redispatch (the runtime's handler raises
+        if called), no second meter, no second operation, no second idempotency row,
+        no second semantic write, no second object revision, original identity kept.
+        """
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, _first, _created, _kb = apply_once(db, row)
+    
+        # Unrelated World revision lands inside the crash window.
+        unrelated_revision(db, f"{name}-b")
+        revision_after = int(fresh_runtime(db).store.current_world_revision())
+    
+        state_before = durable_digest(db)
+        ops_before = op_rows(db)
+        idem_before = idem_rows(db)
+        rev_before = (revisions_of(db, row.identity) if row.identity else None)
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay")
+    
+        assert replay.ok, (
+            f"{name}: identical recovered replay must converge, got "
+            f"{replay.error_code}: {replay.error_message}")
+>       assert durable_digest(db) == state_before, (
+            f"{name}: identical replay changed durable state")
+E       AssertionError: rollback_cognitive_policy: identical replay changed durable state
+E       assert '{"i": [["ia2...mitted", 7]]}' == '{"i": [["ia2...mitted", 5]]}'
+E         
+E         Skipping 900 identical leading characters in diff, use -v to show
+E         - ba43515a"]], "o": [["dep_03c153a8500d74de07860d2e", 1, "30a0b70568db7503ca9e270da74ada57d78b953dd9957e40c8bf4f647892d727"], ["dep_1e3170542a215db6c537ddea", 1, "a33b90af9a747336e003b5cab205b5132d13d1d3508070013a98956024fe1af7"], ["dep_365a760bbaf9203973d425f5", 1, "8e5fd5711dad9611295cb6e73c557b34d1a3163aa011ef7e986691b176293dad"], ["dep_8cb5f64cadd9668addd26b90", 1, "a274078bd370627c3e1b5af27497120e98c94e2d29fffca849aa0087b98754cc"], ["dep_90cdc05048fa5935277dc3b9", 1, "d0d04c09ab044d982d147e2de4ce21a4d...
+E         
+E         ...Full output truncated (2 lines hidden), use '-vv' to show
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:649: AssertionError
+_ test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[transition_dimension] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b_exact_recovery_replay_c16')
+name = 'transition_dimension'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b_exact_recovery_replay_converges_with_zero_duplicate_effect(tmp_path, name):
+        """Side effect durable -> unrelated later World revision -> brand new runtime
+        -> identical recovered invocation.
+    
+        Required: convergence, no provider redispatch (the runtime's handler raises
+        if called), no second meter, no second operation, no second idempotency row,
+        no second semantic write, no second object revision, original identity kept.
+        """
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, _first, _created, _kb = apply_once(db, row)
+    
+        # Unrelated World revision lands inside the crash window.
+        unrelated_revision(db, f"{name}-b")
+        revision_after = int(fresh_runtime(db).store.current_world_revision())
+    
+        state_before = durable_digest(db)
+        ops_before = op_rows(db)
+        idem_before = idem_rows(db)
+        rev_before = (revisions_of(db, row.identity) if row.identity else None)
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay")
+    
+>       assert replay.ok, (
+            f"{name}: identical recovered replay must converge, got "
+            f"{replay.error_code}: {replay.error_message}")
+E       AssertionError: transition_dimension: identical recovered replay must converge, got CAPABILITY_EXECUTION_ERROR: ValueError: only the current DimensionDefinition revision may transition
+E       assert False
+E        +  where False = CapabilityResult(name='transition_dimension', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: only the current DimensionDefinition revision may transition', call_id='ia2-replay').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:646: AssertionError
+_ test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[transition_event] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b_exact_recovery_replay_c17')
+name = 'transition_event'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b_exact_recovery_replay_converges_with_zero_duplicate_effect(tmp_path, name):
+        """Side effect durable -> unrelated later World revision -> brand new runtime
+        -> identical recovered invocation.
+    
+        Required: convergence, no provider redispatch (the runtime's handler raises
+        if called), no second meter, no second operation, no second idempotency row,
+        no second semantic write, no second object revision, original identity kept.
+        """
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, _first, _created, _kb = apply_once(db, row)
+    
+        # Unrelated World revision lands inside the crash window.
+        unrelated_revision(db, f"{name}-b")
+        revision_after = int(fresh_runtime(db).store.current_world_revision())
+    
+        state_before = durable_digest(db)
+        ops_before = op_rows(db)
+        idem_before = idem_rows(db)
+        rev_before = (revisions_of(db, row.identity) if row.identity else None)
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay")
+    
+>       assert replay.ok, (
+            f"{name}: identical recovered replay must converge, got "
+            f"{replay.error_code}: {replay.error_message}")
+E       AssertionError: transition_event: identical recovered replay must converge, got CAPABILITY_EXECUTION_ERROR: ValueError: only the current Event revision may transition
+E       assert False
+E        +  where False = CapabilityResult(name='transition_event', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: only the current Event revision may transition', call_id='ia2-replay').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:646: AssertionError
+_ test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[transition_goal] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b_exact_recovery_replay_c18')
+name = 'transition_goal'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b_exact_recovery_replay_converges_with_zero_duplicate_effect(tmp_path, name):
+        """Side effect durable -> unrelated later World revision -> brand new runtime
+        -> identical recovered invocation.
+    
+        Required: convergence, no provider redispatch (the runtime's handler raises
+        if called), no second meter, no second operation, no second idempotency row,
+        no second semantic write, no second object revision, original identity kept.
+        """
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, _first, _created, _kb = apply_once(db, row)
+    
+        # Unrelated World revision lands inside the crash window.
+        unrelated_revision(db, f"{name}-b")
+        revision_after = int(fresh_runtime(db).store.current_world_revision())
+    
+        state_before = durable_digest(db)
+        ops_before = op_rows(db)
+        idem_before = idem_rows(db)
+        rev_before = (revisions_of(db, row.identity) if row.identity else None)
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay")
+    
+>       assert replay.ok, (
+            f"{name}: identical recovered replay must converge, got "
+            f"{replay.error_code}: {replay.error_message}")
+E       AssertionError: transition_goal: identical recovered replay must converge, got CAPABILITY_EXECUTION_ERROR: ValueError: goal reference is not current: goal_50631f28a74bbf99640be2a0@1
+E       assert False
+E        +  where False = CapabilityResult(name='transition_goal', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: goal reference is not current: goal_50631f28a74bbf99640be2a0@1', call_id='ia2-replay').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:646: AssertionError
+_ test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[transition_task] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b_exact_recovery_replay_c19')
+name = 'transition_task'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b_exact_recovery_replay_converges_with_zero_duplicate_effect(tmp_path, name):
+        """Side effect durable -> unrelated later World revision -> brand new runtime
+        -> identical recovered invocation.
+    
+        Required: convergence, no provider redispatch (the runtime's handler raises
+        if called), no second meter, no second operation, no second idempotency row,
+        no second semantic write, no second object revision, original identity kept.
+        """
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, _first, _created, _kb = apply_once(db, row)
+    
+        # Unrelated World revision lands inside the crash window.
+        unrelated_revision(db, f"{name}-b")
+        revision_after = int(fresh_runtime(db).store.current_world_revision())
+    
+        state_before = durable_digest(db)
+        ops_before = op_rows(db)
+        idem_before = idem_rows(db)
+        rev_before = (revisions_of(db, row.identity) if row.identity else None)
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay")
+    
+>       assert replay.ok, (
+            f"{name}: identical recovered replay must converge, got "
+            f"{replay.error_code}: {replay.error_message}")
+E       AssertionError: transition_task: identical recovered replay must converge, got CAPABILITY_EXECUTION_ERROR: ValueError: task reference is not current: task_59c6dbe8b26a7cb39d0de000@1
+E       assert False
+E        +  where False = CapabilityResult(name='transition_task', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: task reference is not current: task_59c6dbe8b26a7cb39d0de000@1', call_id='ia2-replay').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:646: AssertionError
+_ test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[update_cognitive_policy] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b_exact_recovery_replay_c20')
+name = 'update_cognitive_policy'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b_exact_recovery_replay_converges_with_zero_duplicate_effect(tmp_path, name):
+        """Side effect durable -> unrelated later World revision -> brand new runtime
+        -> identical recovered invocation.
+    
+        Required: convergence, no provider redispatch (the runtime's handler raises
+        if called), no second meter, no second operation, no second idempotency row,
+        no second semantic write, no second object revision, original identity kept.
+        """
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, _first, _created, _kb = apply_once(db, row)
+    
+        # Unrelated World revision lands inside the crash window.
+        unrelated_revision(db, f"{name}-b")
+        revision_after = int(fresh_runtime(db).store.current_world_revision())
+    
+        state_before = durable_digest(db)
+        ops_before = op_rows(db)
+        idem_before = idem_rows(db)
+        rev_before = (revisions_of(db, row.identity) if row.identity else None)
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay")
+    
+        assert replay.ok, (
+            f"{name}: identical recovered replay must converge, got "
+            f"{replay.error_code}: {replay.error_message}")
+>       assert durable_digest(db) == state_before, (
+            f"{name}: identical replay changed durable state")
+E       AssertionError: update_cognitive_policy: identical replay changed durable state
+E       assert '{"i": [["ia2...mitted", 6]]}' == '{"i": [["ia2...mitted", 4]]}'
+E         
+E         Skipping 742 identical leading characters in diff, use -v to show
+E         - c0ff82a2"]], "o": [["dep_b486647643235ceacde6210b", 1, "ea4424074bf2fb9168552e2971954333bcf4e18f59fe87848cc1376109c0e929"], ["dep_eef01c79b51c11373150ca06", 1, "235a4e7be0c264b0c8334fc5f273b4c4dd183fcd7c363a2140c5b46ab2c4cfec"], ["dep_f0fac36ca7d951c32f162578", 1, "2cacf246ea2b59ceb36c646d835805c7f0b87747470f23931fb037462ad24ea9"], ["dep_f419e7d5a8e6a9b6db66153f", 1, "c47efd8fbf8b32d43d22dcbf1f4360020a8eb9043fcde94c31203883a03fb6e7"], ["evs_policy_b94ac7ad1305f1a4aa114d9b", 1, "4581420c4544248c11de83ab58...
+E         
+E         ...Full output truncated (2 lines hidden), use '-vv' to show
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:649: AssertionError
+_ test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[upsert_relation] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b_exact_recovery_replay_c21')
+name = 'upsert_relation'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b_exact_recovery_replay_converges_with_zero_duplicate_effect(tmp_path, name):
+        """Side effect durable -> unrelated later World revision -> brand new runtime
+        -> identical recovered invocation.
+    
+        Required: convergence, no provider redispatch (the runtime's handler raises
+        if called), no second meter, no second operation, no second idempotency row,
+        no second semantic write, no second object revision, original identity kept.
+        """
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, _first, _created, _kb = apply_once(db, row)
+    
+        # Unrelated World revision lands inside the crash window.
+        unrelated_revision(db, f"{name}-b")
+        revision_after = int(fresh_runtime(db).store.current_world_revision())
+    
+        state_before = durable_digest(db)
+        ops_before = op_rows(db)
+        idem_before = idem_rows(db)
+        rev_before = (revisions_of(db, row.identity) if row.identity else None)
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay")
+    
+        assert replay.ok, (
+            f"{name}: identical recovered replay must converge, got "
+            f"{replay.error_code}: {replay.error_message}")
+>       assert durable_digest(db) == state_before, (
+            f"{name}: identical replay changed durable state")
+E       AssertionError: upsert_relation: identical replay changed durable state
+E       assert '{"i": [["ent...mitted", 7]]}' == '{"i": [["ent...mitted", 5]]}'
+E         
+E         Skipping 917 identical leading characters in diff, use -v to show
+E         - dcd3db6d"]], "o": [["dep_543805f3628da735efedb791", 1, "3fd8fe5b833abd9b05162d382ee0ff2d0b1fb5f727d3e9c9eba46f5ac7e50191"], ["dep_63e908131bd20dd9dc5dedae", 1, "a033d16ea309107ae2960d19513fd46d965bef948269a10dcbefdcd21931be2e"], ["dep_659eb7e46dd1297d8fbf6855", 1, "32e1754eba7d45793e34f5de58c9b1b8b851472f09f72a083be79a37a83e6c92"], ["dep_7b02c88b8453f2e243e572c3", 1, "f27af0b6cf8d4de6efe84fe8b4f42ec187ba6780964e3492613139c23a8a1fc6"], ["dep_7dca026b05f9dfe7e4ce8189", 1, "d3e88bfb9005f857f48b03233eba95591...
+E         
+E         ...Full output truncated (2 lines hidden), use '-vv' to show
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:649: AssertionError
+________ test_b2_exact_replay_result_is_the_original_result[form_event] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b2_exact_replay_result_is5')
+name = 'form_event'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b2_exact_replay_result_is_the_original_result(tmp_path, name):
+        """A converged replay must return the ORIGINAL durable identity, not a
+        freshly minted one.  A replay that reports a new object/revision has not
+        actually replayed."""
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, first, _created, _kb = apply_once(db, row)
+        unrelated_revision(db, f"{name}-b2")
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay2")
+>       assert replay.ok, f"{name}: replay must converge: {replay.error_code}"
+E       AssertionError: form_event: replay must converge: CAPABILITY_EXECUTION_ERROR
+E       assert False
+E        +  where False = CapabilityResult(name='form_event', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='StoreError: idempotency key was already used for a different request', call_id='ia2-replay2').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:673: AssertionError
+______ test_b2_exact_replay_result_is_the_original_result[propose_action] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b2_exact_replay_result_is6')
+name = 'propose_action'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b2_exact_replay_result_is_the_original_result(tmp_path, name):
+        """A converged replay must return the ORIGINAL durable identity, not a
+        freshly minted one.  A replay that reports a new object/revision has not
+        actually replayed."""
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, first, _created, _kb = apply_once(db, row)
+        unrelated_revision(db, f"{name}-b2")
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay2")
+>       assert replay.ok, f"{name}: replay must converge: {replay.error_code}"
+E       AssertionError: propose_action: replay must converge: CAPABILITY_EXECUTION_ERROR
+E       assert False
+E        +  where False = CapabilityResult(name='propose_action', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='StoreError: idempotency key was already used for a different request', call_id='ia2-replay2').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:673: AssertionError
+_ test_b2_exact_replay_result_is_the_original_result[propose_cognitive_policy] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b2_exact_replay_result_is7')
+name = 'propose_cognitive_policy'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b2_exact_replay_result_is_the_original_result(tmp_path, name):
+        """A converged replay must return the ORIGINAL durable identity, not a
+        freshly minted one.  A replay that reports a new object/revision has not
+        actually replayed."""
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, first, _created, _kb = apply_once(db, row)
+        unrelated_revision(db, f"{name}-b2")
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay2")
+>       assert replay.ok, f"{name}: replay must converge: {replay.error_code}"
+E       AssertionError: propose_cognitive_policy: replay must converge: CAPABILITY_EXECUTION_ERROR
+E       assert False
+E        +  where False = CapabilityResult(name='propose_cognitive_policy', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: policy already registered: ia2-policy-new', call_id='ia2-replay2').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:673: AssertionError
+____ test_b2_exact_replay_result_is_the_original_result[propose_dimension] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b2_exact_replay_result_is8')
+name = 'propose_dimension'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b2_exact_replay_result_is_the_original_result(tmp_path, name):
+        """A converged replay must return the ORIGINAL durable identity, not a
+        freshly minted one.  A replay that reports a new object/revision has not
+        actually replayed."""
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, first, _created, _kb = apply_once(db, row)
+        unrelated_revision(db, f"{name}-b2")
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay2")
+>       assert replay.ok, f"{name}: replay must converge: {replay.error_code}"
+E       AssertionError: propose_dimension: replay must converge: CAPABILITY_EXECUTION_ERROR
+E       assert False
+E        +  where False = CapabilityResult(name='propose_dimension', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: dimension_key already exists: dim:ia2-1', call_id='ia2-replay2').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:673: AssertionError
+______ test_b2_exact_replay_result_is_the_original_result[propose_entity] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b2_exact_replay_result_is9')
+name = 'propose_entity'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b2_exact_replay_result_is_the_original_result(tmp_path, name):
+        """A converged replay must return the ORIGINAL durable identity, not a
+        freshly minted one.  A replay that reports a new object/revision has not
+        actually replayed."""
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, first, _created, _kb = apply_once(db, row)
+        unrelated_revision(db, f"{name}-b2")
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay2")
+>       assert replay.ok, f"{name}: replay must converge: {replay.error_code}"
+E       AssertionError: propose_entity: replay must converge: CAPABILITY_EXECUTION_ERROR
+E       assert False
+E        +  where False = CapabilityResult(name='propose_entity', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: entity_key already exists: entity:ia2-1', call_id='ia2-replay2').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:673: AssertionError
+_______ test_b2_exact_replay_result_is_the_original_result[propose_goal] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b2_exact_replay_result_is10')
+name = 'propose_goal'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b2_exact_replay_result_is_the_original_result(tmp_path, name):
+        """A converged replay must return the ORIGINAL durable identity, not a
+        freshly minted one.  A replay that reports a new object/revision has not
+        actually replayed."""
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, first, _created, _kb = apply_once(db, row)
+        unrelated_revision(db, f"{name}-b2")
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay2")
+>       assert replay.ok, f"{name}: replay must converge: {replay.error_code}"
+E       AssertionError: propose_goal: replay must converge: CAPABILITY_EXECUTION_ERROR
+E       assert False
+E        +  where False = CapabilityResult(name='propose_goal', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='StoreError: idempotency key was already used for a different request', call_id='ia2-replay2').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:673: AssertionError
+_ test_b2_exact_replay_result_is_the_original_result[record_communication_experience] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b2_exact_replay_result_is11')
+name = 'record_communication_experience'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b2_exact_replay_result_is_the_original_result(tmp_path, name):
+        """A converged replay must return the ORIGINAL durable identity, not a
+        freshly minted one.  A replay that reports a new object/revision has not
+        actually replayed."""
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, first, _created, _kb = apply_once(db, row)
+        unrelated_revision(db, f"{name}-b2")
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay2")
+>       assert replay.ok, f"{name}: replay must converge: {replay.error_code}"
+E       AssertionError: record_communication_experience: replay must converge: CAPABILITY_EXECUTION_ERROR
+E       assert False
+E        +  where False = CapabilityResult(name='record_communication_experience', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='StoreError: idempotency key was already used for a different request', call_id='ia2-replay2').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:673: AssertionError
+______ test_b2_exact_replay_result_is_the_original_result[retract_claim] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b2_exact_replay_result_is12')
+name = 'retract_claim'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b2_exact_replay_result_is_the_original_result(tmp_path, name):
+        """A converged replay must return the ORIGINAL durable identity, not a
+        freshly minted one.  A replay that reports a new object/revision has not
+        actually replayed."""
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, first, _created, _kb = apply_once(db, row)
+        unrelated_revision(db, f"{name}-b2")
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay2")
+>       assert replay.ok, f"{name}: replay must converge: {replay.error_code}"
+E       AssertionError: retract_claim: replay must converge: CAPABILITY_EXECUTION_ERROR
+E       assert False
+E        +  where False = CapabilityResult(name='retract_claim', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='Va...r: only the current Claim revision may be revised/retracted; inspect the latest revision first', call_id='ia2-replay2').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:673: AssertionError
+_______ test_b2_exact_replay_result_is_the_original_result[revise_claim] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b2_exact_replay_result_is13')
+name = 'revise_claim'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b2_exact_replay_result_is_the_original_result(tmp_path, name):
+        """A converged replay must return the ORIGINAL durable identity, not a
+        freshly minted one.  A replay that reports a new object/revision has not
+        actually replayed."""
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, first, _created, _kb = apply_once(db, row)
+        unrelated_revision(db, f"{name}-b2")
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay2")
+>       assert replay.ok, f"{name}: replay must converge: {replay.error_code}"
+E       AssertionError: revise_claim: replay must converge: CAPABILITY_EXECUTION_ERROR
+E       assert False
+E        +  where False = CapabilityResult(name='revise_claim', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='Val...r: only the current Claim revision may be revised/retracted; inspect the latest revision first', call_id='ia2-replay2').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:673: AssertionError
+______ test_b2_exact_replay_result_is_the_original_result[revise_entity] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b2_exact_replay_result_is14')
+name = 'revise_entity'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b2_exact_replay_result_is_the_original_result(tmp_path, name):
+        """A converged replay must return the ORIGINAL durable identity, not a
+        freshly minted one.  A replay that reports a new object/revision has not
+        actually replayed."""
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, first, _created, _kb = apply_once(db, row)
+        unrelated_revision(db, f"{name}-b2")
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay2")
+>       assert replay.ok, f"{name}: replay must converge: {replay.error_code}"
+E       AssertionError: revise_entity: replay must converge: CAPABILITY_EXECUTION_ERROR
+E       assert False
+E        +  where False = CapabilityResult(name='revise_entity', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: entity_10af2c44f8c7f83486de0a08@1 is not the current revision', call_id='ia2-replay2').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:673: AssertionError
+_ test_b2_exact_replay_result_is_the_original_result[rollback_cognitive_policy] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b2_exact_replay_result_is15')
+name = 'rollback_cognitive_policy'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b2_exact_replay_result_is_the_original_result(tmp_path, name):
+        """A converged replay must return the ORIGINAL durable identity, not a
+        freshly minted one.  A replay that reports a new object/revision has not
+        actually replayed."""
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, first, _created, _kb = apply_once(db, row)
+        unrelated_revision(db, f"{name}-b2")
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay2")
+        assert replay.ok, f"{name}: replay must converge: {replay.error_code}"
+    
+        def _ids(data):
+            out = []
+            stack = [data]
+            while stack:
+                node = stack.pop()
+                if isinstance(node, dict):
+                    for k, v in node.items():
+                        if k in {"object_id", "revision", "relation_id", "policy_id",
+                                 "goal_id", "task_id", "action_id", "event_id",
+                                 "entity_id", "dimension_id", "claim_id", "watch_id"}:
+                            out.append((k, v))
+                        stack.append(v)
+                elif isinstance(node, list):
+                    stack.extend(node)
+            return sorted((k, str(v)) for k, v in out)
+    
+>       assert _ids(replay.data) == _ids(first), (
+            f"{name}: replay reported different durable identities than the original.\n"
+            f"  original={_ids(first)}\n  replay  ={_ids(replay.data)}")
+E       AssertionError: rollback_cognitive_policy: replay reported different durable identities than the original.
+E           original=[('object_id', 'policy_f1c50a4ba54379a3c4046983'), ('policy_id', 'ia2-policy-rb'), ('revision', '3')]
+E           replay  =[('object_id', 'policy_f1c50a4ba54379a3c4046983'), ('policy_id', 'ia2-policy-rb'), ('revision', '4')]
+E       assert [('object_id'...vision', '4')] == [('object_id'...vision', '3')]
+E         
+E         At index 2 diff: ('revision', '4') != ('revision', '3')
+E         Use -v to get more diff
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:691: AssertionError
+___ test_b2_exact_replay_result_is_the_original_result[transition_dimension] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b2_exact_replay_result_is16')
+name = 'transition_dimension'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b2_exact_replay_result_is_the_original_result(tmp_path, name):
+        """A converged replay must return the ORIGINAL durable identity, not a
+        freshly minted one.  A replay that reports a new object/revision has not
+        actually replayed."""
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, first, _created, _kb = apply_once(db, row)
+        unrelated_revision(db, f"{name}-b2")
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay2")
+>       assert replay.ok, f"{name}: replay must converge: {replay.error_code}"
+E       AssertionError: transition_dimension: replay must converge: CAPABILITY_EXECUTION_ERROR
+E       assert False
+E        +  where False = CapabilityResult(name='transition_dimension', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: only the current DimensionDefinition revision may transition', call_id='ia2-replay2').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:673: AssertionError
+_____ test_b2_exact_replay_result_is_the_original_result[transition_event] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b2_exact_replay_result_is17')
+name = 'transition_event'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b2_exact_replay_result_is_the_original_result(tmp_path, name):
+        """A converged replay must return the ORIGINAL durable identity, not a
+        freshly minted one.  A replay that reports a new object/revision has not
+        actually replayed."""
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, first, _created, _kb = apply_once(db, row)
+        unrelated_revision(db, f"{name}-b2")
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay2")
+>       assert replay.ok, f"{name}: replay must converge: {replay.error_code}"
+E       AssertionError: transition_event: replay must converge: CAPABILITY_EXECUTION_ERROR
+E       assert False
+E        +  where False = CapabilityResult(name='transition_event', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: only the current Event revision may transition', call_id='ia2-replay2').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:673: AssertionError
+_____ test_b2_exact_replay_result_is_the_original_result[transition_goal] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b2_exact_replay_result_is18')
+name = 'transition_goal'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b2_exact_replay_result_is_the_original_result(tmp_path, name):
+        """A converged replay must return the ORIGINAL durable identity, not a
+        freshly minted one.  A replay that reports a new object/revision has not
+        actually replayed."""
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, first, _created, _kb = apply_once(db, row)
+        unrelated_revision(db, f"{name}-b2")
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay2")
+>       assert replay.ok, f"{name}: replay must converge: {replay.error_code}"
+E       AssertionError: transition_goal: replay must converge: CAPABILITY_EXECUTION_ERROR
+E       assert False
+E        +  where False = CapabilityResult(name='transition_goal', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: goal reference is not current: goal_50631f28a74bbf99640be2a0@1', call_id='ia2-replay2').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:673: AssertionError
+_____ test_b2_exact_replay_result_is_the_original_result[transition_task] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b2_exact_replay_result_is19')
+name = 'transition_task'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b2_exact_replay_result_is_the_original_result(tmp_path, name):
+        """A converged replay must return the ORIGINAL durable identity, not a
+        freshly minted one.  A replay that reports a new object/revision has not
+        actually replayed."""
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, first, _created, _kb = apply_once(db, row)
+        unrelated_revision(db, f"{name}-b2")
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay2")
+>       assert replay.ok, f"{name}: replay must converge: {replay.error_code}"
+E       AssertionError: transition_task: replay must converge: CAPABILITY_EXECUTION_ERROR
+E       assert False
+E        +  where False = CapabilityResult(name='transition_task', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: task reference is not current: task_59c6dbe8b26a7cb39d0de000@1', call_id='ia2-replay2').ok
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:673: AssertionError
+_ test_b2_exact_replay_result_is_the_original_result[update_cognitive_policy] __
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b2_exact_replay_result_is20')
+name = 'update_cognitive_policy'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b2_exact_replay_result_is_the_original_result(tmp_path, name):
+        """A converged replay must return the ORIGINAL durable identity, not a
+        freshly minted one.  A replay that reports a new object/revision has not
+        actually replayed."""
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, first, _created, _kb = apply_once(db, row)
+        unrelated_revision(db, f"{name}-b2")
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay2")
+        assert replay.ok, f"{name}: replay must converge: {replay.error_code}"
+    
+        def _ids(data):
+            out = []
+            stack = [data]
+            while stack:
+                node = stack.pop()
+                if isinstance(node, dict):
+                    for k, v in node.items():
+                        if k in {"object_id", "revision", "relation_id", "policy_id",
+                                 "goal_id", "task_id", "action_id", "event_id",
+                                 "entity_id", "dimension_id", "claim_id", "watch_id"}:
+                            out.append((k, v))
+                        stack.append(v)
+                elif isinstance(node, list):
+                    stack.extend(node)
+            return sorted((k, str(v)) for k, v in out)
+    
+>       assert _ids(replay.data) == _ids(first), (
+            f"{name}: replay reported different durable identities than the original.\n"
+            f"  original={_ids(first)}\n  replay  ={_ids(replay.data)}")
+E       AssertionError: update_cognitive_policy: replay reported different durable identities than the original.
+E           original=[('object_id', 'policy_fccbb73e8b5e124f2ae91eb4'), ('policy_id', 'ia2-policy-upd'), ('revision', '2')]
+E           replay  =[('object_id', 'policy_fccbb73e8b5e124f2ae91eb4'), ('policy_id', 'ia2-policy-upd'), ('revision', '3')]
+E       assert [('object_id'...vision', '3')] == [('object_id'...vision', '2')]
+E         
+E         At index 2 diff: ('revision', '3') != ('revision', '2')
+E         Use -v to get more diff
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:691: AssertionError
+_____ test_b2_exact_replay_result_is_the_original_result[upsert_relation] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_b2_exact_replay_result_is21')
+name = 'upsert_relation'
+
+    @pytest.mark.parametrize("name", sorted(ROW_BY_NAME))
+    def test_b2_exact_replay_result_is_the_original_result(tmp_path, name):
+        """A converged replay must return the ORIGINAL durable identity, not a
+        freshly minted one.  A replay that reports a new object/revision has not
+        actually replayed."""
+        row = ROW_BY_NAME[name]
+        db = tmp_path / "world.db"
+        _rt, arguments, first, _created, _kb = apply_once(db, row)
+        unrelated_revision(db, f"{name}-b2")
+    
+        fresh = fresh_runtime(db)
+        replay = call(fresh, name, arguments, call_id="ia2-replay2")
+        assert replay.ok, f"{name}: replay must converge: {replay.error_code}"
+    
+        def _ids(data):
+            out = []
+            stack = [data]
+            while stack:
+                node = stack.pop()
+                if isinstance(node, dict):
+                    for k, v in node.items():
+                        if k in {"object_id", "revision", "relation_id", "policy_id",
+                                 "goal_id", "task_id", "action_id", "event_id",
+                                 "entity_id", "dimension_id", "claim_id", "watch_id"}:
+                            out.append((k, v))
+                        stack.append(v)
+                elif isinstance(node, list):
+                    stack.extend(node)
+            return sorted((k, str(v)) for k, v in out)
+    
+>       assert _ids(replay.data) == _ids(first), (
+            f"{name}: replay reported different durable identities than the original.\n"
+            f"  original={_ids(first)}\n  replay  ={_ids(replay.data)}")
+E       AssertionError: upsert_relation: replay reported different durable identities than the original.
+E           original=[('relation_id', 'relation_5a76779997ebcf2fb9b06261'), ('revision', '1')]
+E           replay  =[('relation_id', 'relation_5a76779997ebcf2fb9b06261'), ('revision', '2')]
+E       assert [('relation_i...vision', '2')] == [('relation_i...vision', '1')]
+E         
+E         At index 1 diff: ('revision', '2') != ('revision', '1')
+E         Use -v to get more diff
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:691: AssertionError
+__________ test_c1_same_durable_key_plus_changed_request_fails_closed __________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_c1_same_durable_key_plus_0')
+
+    def test_c1_same_durable_key_plus_changed_request_fails_closed(tmp_path):
+        """CONCEPT 1: same durable idempotency key + changed request => FAIL CLOSED.
+    
+        Attacked directly at the store layer, where the guarantee must live
+        regardless of which service produced the key.
+        """
+        from aios_core.storage.sqlite_store import StoreError
+    
+        db = tmp_path / "world.db"
+        store = _seeded_store(db)
+        moment = RT - timedelta(hours=1)
+        obs = Observation(
+            object_id="ia2_c1_obj", subject_id=RSUBJECT,
+            occurred=TemporalExtent.point(moment), learned_at=moment, recorded_at=moment,
+            created_by="ia2:c1", source_kind="conversation", modality="text",
+            value="c1 original", metadata={"dimension": "dim:ia2"})
+        key = "ia2-c1-key"
+        op = OperationRequest(
+            operation_name="ia2.c1", arguments={"request": "original"},
+            expected_world_revision=int(store.current_world_revision()),
+            reason="c1", idempotency_key=key, source_class=SourceClass.USER)
+        first = store.commit([obs], op)
+        assert not first.idempotent_replay
+    
+        before = durable_digest(db)
+    
+        changed = op.model_copy(update={"arguments": {"request": "CHANGED"}})
+        with pytest.raises(StoreError) as exc:
+>           store.commit_or_replay([obs], changed)
+            ^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'SQLiteWorldStore' object has no attribute 'commit_or_replay'
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:733: AttributeError
+_______ test_c1b_replay_helper_rejects_changed_request_with_zero_writes ________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_c1b_replay_helper_rejects0')
+
+    def test_c1b_replay_helper_rejects_changed_request_with_zero_writes(tmp_path):
+        """`replay_exact_operation()` itself must fail closed on a changed request
+        under an existing key, and must not persist anything."""
+        from aios_core.storage.sqlite_store import StoreError
+    
+        db = tmp_path / "world.db"
+        store = _seeded_store(db)
+        moment = RT - timedelta(hours=1)
+        obs = Observation(
+            object_id="ia2_c1b_obj", subject_id=RSUBJECT,
+            occurred=TemporalExtent.point(moment), learned_at=moment, recorded_at=moment,
+            created_by="ia2:c1b", source_kind="conversation", modality="text",
+            value="c1b original", metadata={"dimension": "dim:ia2"})
+        op = OperationRequest(
+            operation_name="ia2.c1b", arguments={"request": "original"},
+            expected_world_revision=int(store.current_world_revision()),
+            reason="c1b", idempotency_key="ia2-c1b-key", source_class=SourceClass.USER)
+        store.commit([obs], op)
+        before = durable_digest(db)
+    
+        changed = op.model_copy(update={"arguments": {"request": "TAMPERED"}})
+        with pytest.raises(StoreError) as exc:
+>           store.replay_exact_operation(changed)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'SQLiteWorldStore' object has no attribute 'replay_exact_operation'
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:763: AttributeError
+_______________ test_z01_loaded_tree_is_the_corrective_candidate _______________
+
+    def test_z01_loaded_tree_is_the_corrective_candidate():
+        """Expected RED on the failed historical exact 1ebf51c4 (it lacks the fix)."""
+        import aios_core.world_graph as wg
+    
+>       assert hasattr(SQLiteWorldStore, "replay_exact_operation"), (
+            "loaded tree lacks SQLiteWorldStore.replay_exact_operation")
+E       AssertionError: loaded tree lacks SQLiteWorldStore.replay_exact_operation
+E       assert False
+E        +  where False = hasattr(SQLiteWorldStore, 'replay_exact_operation')
+
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py:941: AssertionError
+_________ test_process_loss_wake_upsert_relation_replays_exactly_once __________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_process_loss_wake_upsert_0')
+
+    def test_process_loss_wake_upsert_relation_replays_exactly_once(tmp_path):
+        db = tmp_path / "pl-wake-relation.db"
+        ctx = multiprocessing.get_context("fork")
+        proc = ctx.Process(target=_child_wake_upsert_relation, args=(str(db),))
+        proc.start()
+        proc.join(120)
+        assert proc.exitcode == -posix_signal.SIGKILL, (
+            f"child must die to a real SIGKILL, exitcode={proc.exitcode}")
+    
+        relation_before = _revisions(db, ObjectType.RELATION)
+        assert relation_before, "the child never made the relation durable"
+        ops_before = _ops(db)
+    
+        restarted = _runtime(db)
+        wake = [p for p in restarted.store.list_payloads(
+            object_type=ObjectType.WAKE, subject_id=SUBJECT)][-1]
+        wake_ref = ObjectRef(object_id=str(wake["object_id"]),
+                             revision=int(wake["revision"]))
+    
+        dispatches = []
+    
+        def counting(snapshot):
+            dispatches.append(snapshot.round_index)
+            return ModelDirective(
+                response=None, silence=True, capability_calls=(),
+                usage=ModelUsage(input_tokens=1, output_tokens=1, total_tokens=2,
+                                 provider=PROVIDER, model=MODEL,
+                                 request_id=f"req-recover-{snapshot.round_index}"),
+                provenance=ModelCallProvenance(provider=PROVIDER, model=MODEL,
+                                               request_id=f"req-recover-{snapshot.round_index}"))
+    
+        restarted.model_handler = counting
+        restarted.cognitive_runtime.model_handler = counting
+        restarted.run_wake(wake_ref=wake_ref, now=PT)
+    
+>       assert _revisions(db, ObjectType.RELATION) == relation_before, (
+            "recovery produced a SECOND durable relation revision")
+E       AssertionError: recovery produced a SECOND durable relation revision
+E       assert [('relation_b...a0a64ba1', 2)] == [('relation_b...a0a64ba1', 1)]
+E         
+E         Left contains one more item: ('relation_b03afb5d939f3f3ea0a64ba1', 2)
+E         Use -v to get more diff
+
+tests/reviewer_ia2/test_ia2_process_loss.py:270: AssertionError
+_________ test_e1_identical_exact_request_replays_with_zero_new_writes _________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_e1_identical_exact_reques0')
+
+    def test_e1_identical_exact_request_replays_with_zero_new_writes(tmp_path):
+        db = tmp_path / "w.db"
+        store, _ = _open(db)
+        op = _op("ia2-e1").model_copy(
+            update={"expected_world_revision": int(store.current_world_revision())})
+        first = store.commit([_obs("ia2_e1", "v1")], op)
+        assert not first.idempotent_replay
+    
+        def snapshot():
+            with _conn(db) as c:
+                return (
+                    [tuple(r) for r in c.execute("SELECT * FROM object_revisions")],
+                    [tuple(r) for r in c.execute("SELECT * FROM operations")],
+                    [tuple(r) for r in c.execute("SELECT * FROM idempotency_records")],
+                    int(store.current_world_revision()),
+                )
+    
+        before = snapshot()
+>       replay = store.commit_or_replay([_obs("ia2_e1", "v1")], op)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'SQLiteWorldStore' object has no attribute 'commit_or_replay'
+
+tests/reviewer_ia2/test_ia2_trust_and_store.py:327: AttributeError
+________________ test_e2_same_key_changed_request_fails_closed _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_e2_same_key_changed_reque0')
+
+    def test_e2_same_key_changed_request_fails_closed(tmp_path):
+        db = tmp_path / "w.db"
+        store, _ = _open(db)
+        op = _op("ia2-e2").model_copy(
+            update={"expected_world_revision": int(store.current_world_revision())})
+        store.commit([_obs("ia2_e2", "v1")], op)
+        with _conn(db) as c:
+            n_obj = c.execute("SELECT COUNT(*) FROM object_revisions").fetchone()[0]
+    
+        changed = op.model_copy(update={"arguments": {"request": "CHANGED"}})
+        with pytest.raises(StoreError) as exc:
+>           store.commit_or_replay([_obs("ia2_e2", "v1")], changed)
+            ^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'SQLiteWorldStore' object has no attribute 'commit_or_replay'
+
+tests/reviewer_ia2/test_ia2_trust_and_store.py:345: AttributeError
+____________________ test_e3_changed_objects_under_same_key ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_e3_changed_objects_under_0')
+
+    def test_e3_changed_objects_under_same_key(tmp_path):
+        """Two distinct contracts, asserted separately.
+    
+        (a) ``commit()`` compares objects through request_fingerprint, so changed
+            objects under an existing key MUST fail closed.
+        (b) ``commit_or_replay()`` deliberately ignores caller objects and replays
+            the ORIGINALLY committed ones -- that is what lets an identical recovered
+            replay converge after the world advanced.  It must therefore write
+            nothing and must never leak the caller's differing bytes durably.
+        """
+        db = tmp_path / "w.db"
+        store, _ = _open(db)
+        op = _op("ia2-e3").model_copy(
+            update={"expected_world_revision": int(store.current_world_revision())})
+        first = store.commit([_obs("ia2_e3", "v1")], op)
+    
+        def digest():
+            with _conn(db) as c:
+                return ([tuple(r) for r in c.execute("SELECT * FROM object_revisions")],
+                        [tuple(r) for r in c.execute("SELECT * FROM operations")],
+                        [tuple(r) for r in c.execute("SELECT * FROM idempotency_records")])
+    
+        before = digest()
+    
+        # (a) commit() must fail closed on changed objects
+        with pytest.raises(StoreError) as exc:
+            store.commit([_obs("ia2_e3", "DIFFERENT")], op)
+        assert exc.value.code.name == "IDEMPOTENCY_CONFLICT"
+        assert exc.value.context.get("reason") == "request_fingerprint_mismatch"
+        assert digest() == before, "commit() wrote despite a fingerprint mismatch"
+    
+        # (b) commit_or_replay() replays the original, writes nothing, leaks nothing
+>       replay = store.commit_or_replay([_obs("ia2_e3", "DIFFERENT")], op)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'SQLiteWorldStore' object has no attribute 'commit_or_replay'
+
+tests/reviewer_ia2/test_ia2_trust_and_store.py:383: AttributeError
+____________________ test_e4_unused_key_lookup_is_read_only ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_e4_unused_key_lookup_is_r0')
+
+    def test_e4_unused_key_lookup_is_read_only(tmp_path):
+        db = tmp_path / "w.db"
+        store, _ = _open(db)
+        with _conn(db) as c:
+            before = [tuple(r) for r in c.execute("SELECT * FROM operations")]
+>       assert store.replay_exact_operation(_op("ia2-never-used")) is None
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'SQLiteWorldStore' object has no attribute 'replay_exact_operation'
+
+tests/reviewer_ia2/test_ia2_trust_and_store.py:398: AttributeError
+____________ test_e5_missing_committed_object_revision_fails_closed ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_e5_missing_committed_obje0')
+
+    def test_e5_missing_committed_object_revision_fails_closed(tmp_path):
+        db = tmp_path / "w.db"
+        store, _ = _open(db)
+        op = _op("ia2-e5").model_copy(
+            update={"expected_world_revision": int(store.current_world_revision())})
+        store.commit([_obs("ia2_e5", "v1")], op)
+        with _conn(db) as c:
+            c.execute("DELETE FROM object_revisions WHERE object_id='ia2_e5'")
+            c.commit()
+        with pytest.raises(StoreError) as exc:
+>           store.replay_exact_operation(op)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'SQLiteWorldStore' object has no attribute 'replay_exact_operation'
+
+tests/reviewer_ia2/test_ia2_trust_and_store.py:413: AttributeError
+________________ test_e6_corrupt_committed_payload_fails_closed ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_e6_corrupt_committed_payl0')
+
+    def test_e6_corrupt_committed_payload_fails_closed(tmp_path):
+        db = tmp_path / "w.db"
+        store, _ = _open(db)
+        op = _op("ia2-e6").model_copy(
+            update={"expected_world_revision": int(store.current_world_revision())})
+        store.commit([_obs("ia2_e6", "v1")], op)
+        with _conn(db) as c:
+            c.execute("UPDATE object_revisions SET payload_json='{not json' "
+                      "WHERE object_id='ia2_e6'")
+            c.commit()
+        with pytest.raises(StoreError):
+>           store.replay_exact_operation(op)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'SQLiteWorldStore' object has no attribute 'replay_exact_operation'
+
+tests/reviewer_ia2/test_ia2_trust_and_store.py:428: AttributeError
+_______________ test_e7_corrupt_idempotency_result_fails_closed ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_e7_corrupt_idempotency_re0')
+
+    def test_e7_corrupt_idempotency_result_fails_closed(tmp_path):
+        db = tmp_path / "w.db"
+        store, _ = _open(db)
+        op = _op("ia2-e7").model_copy(
+            update={"expected_world_revision": int(store.current_world_revision())})
+        store.commit([_obs("ia2_e7", "v1")], op)
+        with _conn(db) as c:
+            c.execute("UPDATE idempotency_records SET result_json='{broken' "
+                      "WHERE idempotency_key='ia2-e7'")
+            c.commit()
+        with pytest.raises(StoreError) as exc:
+>           store.replay_exact_operation(op)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'SQLiteWorldStore' object has no attribute 'replay_exact_operation'
+
+tests/reviewer_ia2/test_ia2_trust_and_store.py:442: AttributeError
+_____________ test_e8_operation_idempotency_row_skew_fails_closed ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_e8_operation_idempotency_0')
+
+    def test_e8_operation_idempotency_row_skew_fails_closed(tmp_path):
+        db = tmp_path / "w.db"
+        store, _ = _open(db)
+        op = _op("ia2-e8").model_copy(
+            update={"expected_world_revision": int(store.current_world_revision())})
+        store.commit([_obs("ia2_e8", "v1")], op)
+        with _conn(db) as c:
+            c.execute("UPDATE idempotency_records SET operation_id='op_other' "
+                      "WHERE idempotency_key='ia2-e8'")
+            c.commit()
+        with pytest.raises(StoreError) as exc:
+>           store.replay_exact_operation(op)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'SQLiteWorldStore' object has no attribute 'replay_exact_operation'
+
+tests/reviewer_ia2/test_ia2_trust_and_store.py:457: AttributeError
+_______________ test_e9_missing_idempotency_record_fails_closed ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_e9_missing_idempotency_re0')
+
+    def test_e9_missing_idempotency_record_fails_closed(tmp_path):
+        db = tmp_path / "w.db"
+        store, _ = _open(db)
+        op = _op("ia2-e9").model_copy(
+            update={"expected_world_revision": int(store.current_world_revision())})
+        store.commit([_obs("ia2_e9", "v1")], op)
+        with _conn(db) as c:
+            c.execute("DELETE FROM idempotency_records WHERE idempotency_key='ia2-e9'")
+            c.commit()
+        with pytest.raises(StoreError) as exc:
+>           store.replay_exact_operation(op)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'SQLiteWorldStore' object has no attribute 'replay_exact_operation'
+
+tests/reviewer_ia2/test_ia2_trust_and_store.py:471: AttributeError
+______ test_e10_reused_operation_identity_under_another_key_fails_closed _______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_e10_reused_operation_iden0')
+
+    def test_e10_reused_operation_identity_under_another_key_fails_closed(tmp_path):
+        db = tmp_path / "w.db"
+        store, _ = _open(db)
+        op = _op("ia2-e10").model_copy(
+            update={"expected_world_revision": int(store.current_world_revision())})
+        first = store.commit([_obs("ia2_e10", "v1")], op)
+        other = _op("ia2-e10-other").model_copy(update={
+            "operation_id": first.operation_id,
+            "expected_world_revision": int(store.current_world_revision()),
+        })
+        with pytest.raises(StoreError):
+>           store.commit_or_replay([_obs("ia2_e10_other", "v2")], other)
+            ^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: 'SQLiteWorldStore' object has no attribute 'commit_or_replay'
+
+tests/reviewer_ia2/test_ia2_trust_and_store.py:486: AttributeError
+____________ test_e12_replay_never_persists_caller_supplied_objects ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_e12_replay_never_persists0')
+
+    def test_e12_replay_never_persists_caller_supplied_objects(tmp_path):
+        """A replay rebuilds objects from durable state; caller bytes must not leak
+        into the durable payload even though the request is identical."""
+        db = tmp_path / "w.db"
+        store, _ = _open(db)
+        op = _op("ia2-e12").model_copy(
+            update={"expected_world_revision": int(store.current_world_revision())})
+        store.commit([_obs("ia2_e12", "ORIGINAL")], op)
+    
+        tampered = _obs("ia2_e12", "SMUGGLED-BY-CALLER")
+>       replay = store.commit_or_replay([tampered], op)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'SQLiteWorldStore' object has no attribute 'commit_or_replay'
+
+tests/reviewer_ia2/test_ia2_trust_and_store.py:512: AttributeError
+_____ test_e13_unrelated_later_world_revision_does_not_break_exact_replay ______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-35/test_e13_unrelated_later_world0')
+
+    def test_e13_unrelated_later_world_revision_does_not_break_exact_replay(tmp_path):
+        db = tmp_path / "w.db"
+        store, _ = _open(db)
+        op = _op("ia2-e13").model_copy(
+            update={"expected_world_revision": int(store.current_world_revision())})
+        first = store.commit([_obs("ia2_e13", "v1")], op)
+        later = _op("ia2-e13-unrelated", args={"request": "unrelated"},
+                    reason="unrelated").model_copy(
+            update={"expected_world_revision": int(store.current_world_revision())})
+        store.commit([_obs("ia2_e13_unrelated", "noise")], later)
+    
+>       replay = store.commit_or_replay([_obs("ia2_e13", "v1")], op)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'SQLiteWorldStore' object has no attribute 'commit_or_replay'
+
+tests/reviewer_ia2/test_ia2_trust_and_store.py:533: AttributeError
+=========================== short test summary info ============================
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[form_event]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[propose_action]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[propose_cognitive_policy]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[propose_dimension]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[propose_entity]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[propose_goal]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[record_communication_experience]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[retract_claim]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[revise_claim]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[revise_entity]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[rollback_cognitive_policy]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[transition_dimension]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[transition_event]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[transition_goal]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[transition_task]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[update_cognitive_policy]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b_exact_recovery_replay_converges_with_zero_duplicate_effect[upsert_relation]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b2_exact_replay_result_is_the_original_result[form_event]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b2_exact_replay_result_is_the_original_result[propose_action]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b2_exact_replay_result_is_the_original_result[propose_cognitive_policy]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b2_exact_replay_result_is_the_original_result[propose_dimension]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b2_exact_replay_result_is_the_original_result[propose_entity]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b2_exact_replay_result_is_the_original_result[propose_goal]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b2_exact_replay_result_is_the_original_result[record_communication_experience]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b2_exact_replay_result_is_the_original_result[retract_claim]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b2_exact_replay_result_is_the_original_result[revise_claim]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b2_exact_replay_result_is_the_original_result[revise_entity]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b2_exact_replay_result_is_the_original_result[rollback_cognitive_policy]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b2_exact_replay_result_is_the_original_result[transition_dimension]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b2_exact_replay_result_is_the_original_result[transition_event]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b2_exact_replay_result_is_the_original_result[transition_goal]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b2_exact_replay_result_is_the_original_result[transition_task]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b2_exact_replay_result_is_the_original_result[update_cognitive_policy]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_b2_exact_replay_result_is_the_original_result[upsert_relation]
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_c1_same_durable_key_plus_changed_request_fails_closed
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_c1b_replay_helper_rejects_changed_request_with_zero_writes
+FAILED tests/reviewer_ia2/test_ia2_inventory_and_replay.py::test_z01_loaded_tree_is_the_corrective_candidate
+FAILED tests/reviewer_ia2/test_ia2_process_loss.py::test_process_loss_wake_upsert_relation_replays_exactly_once
+FAILED tests/reviewer_ia2/test_ia2_trust_and_store.py::test_e1_identical_exact_request_replays_with_zero_new_writes
+FAILED tests/reviewer_ia2/test_ia2_trust_and_store.py::test_e2_same_key_changed_request_fails_closed
+FAILED tests/reviewer_ia2/test_ia2_trust_and_store.py::test_e3_changed_objects_under_same_key
+FAILED tests/reviewer_ia2/test_ia2_trust_and_store.py::test_e4_unused_key_lookup_is_read_only
+FAILED tests/reviewer_ia2/test_ia2_trust_and_store.py::test_e5_missing_committed_object_revision_fails_closed
+FAILED tests/reviewer_ia2/test_ia2_trust_and_store.py::test_e6_corrupt_committed_payload_fails_closed
+FAILED tests/reviewer_ia2/test_ia2_trust_and_store.py::test_e7_corrupt_idempotency_result_fails_closed
+FAILED tests/reviewer_ia2/test_ia2_trust_and_store.py::test_e8_operation_idempotency_row_skew_fails_closed
+FAILED tests/reviewer_ia2/test_ia2_trust_and_store.py::test_e9_missing_idempotency_record_fails_closed
+FAILED tests/reviewer_ia2/test_ia2_trust_and_store.py::test_e10_reused_operation_identity_under_another_key_fails_closed
+FAILED tests/reviewer_ia2/test_ia2_trust_and_store.py::test_e12_replay_never_persists_caller_supplied_objects
+FAILED tests/reviewer_ia2/test_ia2_trust_and_store.py::test_e13_unrelated_later_world_revision_does_not_break_exact_replay
+# exit=1

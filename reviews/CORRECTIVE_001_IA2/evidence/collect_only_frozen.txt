@@ -1,0 +1,4 @@
+tests/reviewer_ia2/test_ia2_inventory_and_replay.py: 63
+tests/reviewer_ia2/test_ia2_process_loss.py: 3
+tests/reviewer_ia2/test_ia2_trust_and_store.py: 20
+
