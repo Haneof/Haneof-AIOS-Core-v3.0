@@ -22,7 +22,10 @@ from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import KnowledgeWindow, TemporalExtent, as_utc
 from aios_core.query.search import WorldSearchIndex
-from aios_core.storage.idempotency import canonical_json_dumps
+from aios_core.storage.idempotency import (
+    canonical_json_dumps,
+    canonical_request_identity,
+)
 from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
 POLICY_DIMENSION = "dim:ai_cognitive_policy"
@@ -55,6 +58,38 @@ def evaluation_due_at(changed_at: datetime, evaluation_window: str) -> datetime:
         "w": timedelta(weeks=value),
     }[unit]
     return changed + delta
+
+
+def _policy_arguments(
+    policy_id: str,
+    version: int,
+    scope: str,
+    policy_class: str,
+    canonical_request_sha256: str | None,
+) -> dict[str, Any]:
+    """Single source of truth for the durable policy operation arguments.
+
+    A policy update/rollback idempotency key is derived from the complete
+    canonical request, so this digest is what separates an identical recovered
+    replay from a changed change under the same key. ``version`` and ``scope``
+    are left out of the fingerprinted arguments whenever a canonical digest is
+    present: for an update or a rollback they are read from the *current* policy
+    revision, so embedding them would make a mechanically identical recovered
+    replay fingerprint differently from the original application.
+    """
+
+    if canonical_request_sha256 is not None:
+        return {
+            "policy_id": policy_id,
+            "policy_class": policy_class,
+            "canonical_request_sha256": canonical_request_sha256,
+        }
+    return {
+        "policy_id": policy_id,
+        "version": version,
+        "scope": scope,
+        "policy_class": policy_class,
+    }
 
 
 def _stable_id(prefix: str, *parts: object) -> str:
@@ -218,6 +253,8 @@ class CognitivePolicyRegistry:
         actor_is_ai: bool,
         operation_name: str,
         expected_world_revision: int,
+        idempotency_key: str | None = None,
+        canonical_request_sha256: str | None = None,
     ) -> PolicyReceipt:
         objects: list[Any] = [policy]
         policy_ref = ObjectRef(object_id=policy.object_id, revision=policy.revision)
@@ -253,27 +290,105 @@ class CognitivePolicyRegistry:
         source_class = SourceClass.AI_COGNITION if actor_is_ai else SourceClass.MAINTENANCE
         op = OperationRequest(
             operation_name=operation_name,
-            arguments={
-                "policy_id": policy.policy_id,
-                "version": policy.version,
-                "scope": policy.scope,
-                "policy_class": policy.policy_class.value,
-            },
+            arguments=_policy_arguments(
+                policy.policy_id,
+                policy.version,
+                policy.scope,
+                policy.policy_class.value,
+                canonical_request_sha256,
+            ),
             expected_world_revision=expected_world_revision,
             reason=policy.reason,
-            idempotency_key=f"policy:{policy.object_id}:{policy.revision}",
+            idempotency_key=idempotency_key
+            or f"policy:{policy.object_id}:{policy.revision}",
             source_class=source_class,
             maintenance_class=(None if actor_is_ai else MaintenanceClass.POLICY_SYNC),
         )
-        result = self.store.commit(objects, op)
+        result = self.store.commit_or_replay(objects, op)
         if self.index is not None:
             self.index.catch_up()
+        receipt_policy = policy
+        if result.idempotent_replay:
+            # An exact recovered replay reports the ORIGINAL durable identity,
+            # never the freshly computed next version.
+            replayed = next(
+                (
+                    int(revision)
+                    for object_id, revision in result.object_refs
+                    if str(object_id) == policy.object_id
+                ),
+                None,
+            )
+            if replayed is not None:
+                receipt_policy = CognitivePolicy.model_validate(
+                    self.store.get_payload(policy.object_id, revision=replayed)
+                )
         return PolicyReceipt(
-            policy_id=policy.policy_id,
-            object_id=policy.object_id,
-            revision=policy.revision,
-            previous_version=policy.previous_version,
-            rollback_pointer=policy.rollback_pointer,
+            policy_id=receipt_policy.policy_id,
+            object_id=receipt_policy.object_id,
+            revision=receipt_policy.revision,
+            previous_version=receipt_policy.previous_version,
+            rollback_pointer=receipt_policy.rollback_pointer,
+            world_revision=result.world_revision,
+        )
+
+    def _exact_replay_receipt(
+        self,
+        *,
+        object_id: str,
+        revision: int,
+        operation_name: str,
+        idempotency_key: str,
+        actor_is_ai: bool,
+        request_identity: str,
+        scope: str,
+        policy_class: str,
+        reason: str,
+    ) -> PolicyReceipt | None:
+        """Return the original receipt when ``idempotency_key`` already holds this
+        exact request.
+
+        The durable store verifies the unchanged request fingerprint before any
+        receipt is returned, so a changed request under the same key stays a hard
+        conflict and ``None`` is returned instead.
+        """
+        probe = OperationRequest(
+            operation_name=operation_name,
+            arguments=_policy_arguments(
+                str(self.store.get_payload(object_id).get("policy_id") or ""),
+                revision,
+                scope,
+                policy_class,
+                request_identity,
+            ),
+            expected_world_revision=int(self.store.current_world_revision()),
+            reason=reason,
+            idempotency_key=idempotency_key,
+            source_class=(
+                SourceClass.AI_COGNITION if actor_is_ai else SourceClass.MAINTENANCE
+            ),
+        )
+        try:
+            result = self.store.replay_exact_operation(probe)
+        except StoreError as exc:
+            # A different registration of an existing policy_id keeps raising the
+            # domain error in `register`; corrupt or skewed durable state does not.
+            if exc.code is not ErrorCode.IDEMPOTENCY_CONFLICT:
+                raise
+            return None
+        if result is None:
+            return None
+        if self.index is not None:
+            self.index.catch_up()
+        durable = CognitivePolicy.model_validate(
+            self.store.get_payload(object_id, revision=revision)
+        )
+        return PolicyReceipt(
+            policy_id=durable.policy_id,
+            object_id=durable.object_id,
+            revision=durable.revision,
+            previous_version=durable.previous_version,
+            rollback_pointer=durable.rollback_pointer,
             world_revision=result.world_revision,
         )
 
@@ -300,13 +415,31 @@ class CognitivePolicyRegistry:
                 )
         policy_id = request.policy_id.strip()
         object_id = self._object_id(policy_id)
+        register_identity = canonical_request_identity(
+            "policy.register",
+            request.model_dump(mode="json"),
+            changed.isoformat(),
+        )
         try:
             self.store.get_payload(object_id)
         except StoreError as exc:
             if exc.code is not ErrorCode.NOT_FOUND:
                 raise
         else:
-            raise ValueError(f"policy already registered: {policy_id}")
+            replay = self._exact_replay_receipt(
+                object_id=object_id,
+                revision=1,
+                operation_name="policy.register",
+                idempotency_key=f"policy:{object_id}:1",
+                actor_is_ai=actor_is_ai,
+                request_identity=register_identity,
+                scope=request.scope.strip(),
+                policy_class=request.policy_class.value,
+                reason=request.reason.strip(),
+            )
+            if replay is None:
+                raise ValueError(f"policy already registered: {policy_id}")
+            return replay
         self._validate_refs(
             request.evidence_refs,
             require_real_result=actor_is_ai,
@@ -357,6 +490,7 @@ class CognitivePolicyRegistry:
             actor_is_ai=actor_is_ai,
             operation_name="policy.register",
             expected_world_revision=expected_world_revision,
+            canonical_request_sha256=register_identity,
         )
 
     def latest(self, policy_id: str) -> CognitivePolicy | None:
@@ -466,6 +600,12 @@ class CognitivePolicyRegistry:
             require_real_result=actor_is_ai,
         )
         version = current.revision + 1
+        object_id = self._object_id(request.policy_id)
+        update_identity = canonical_request_identity(
+            "policy.update",
+            request.model_dump(mode="json"),
+            changed.isoformat(),
+        )
         evaluation_window = (
             request.evaluation_window.strip()
             if request.evaluation_window is not None and request.evaluation_window.strip()
@@ -511,6 +651,12 @@ class CognitivePolicyRegistry:
             actor_is_ai=actor_is_ai,
             operation_name="policy.update",
             expected_world_revision=expected_world_revision,
+            # The old key pinned the state-derived next revision, which made an
+            # identical recovered replay mint a second policy version. Keying on
+            # the complete canonical request keeps the key stable across replay
+            # while a changed change under the same key still fails closed.
+            idempotency_key=f"policy-update:{object_id}:{update_identity[:24]}",
+            canonical_request_sha256=update_identity,
         )
 
     def rollback(
@@ -542,6 +688,24 @@ class CognitivePolicyRegistry:
         self._validate_refs(refs, require_real_result=actor_is_ai)
         changed = as_utc(changed_at, "changed_at")
         version = current.revision + 1
+        object_id = self._object_id(policy_id)
+        # Keyed on the complete canonical request instead of the state-derived
+        # next revision, so an identical recovered replay cannot mint a second
+        # rollback version while a changed rollback still fails closed.
+        rollback_identity = canonical_request_identity(
+            "policy.rollback",
+            {
+                "policy_id": policy_id,
+                "target_version": int(target_version),
+                "reason": reason.strip(),
+                "evidence_refs": [
+                    {"object_id": r.object_id, "revision": r.revision} for r in refs
+                ],
+                "changed_by": changed_by.strip(),
+                "actor_is_ai": bool(actor_is_ai),
+            },
+            changed.isoformat(),
+        )
         next_evaluation_at = evaluation_due_at(
             changed,
             current.evaluation_window,
@@ -588,4 +752,6 @@ class CognitivePolicyRegistry:
             actor_is_ai=actor_is_ai,
             operation_name="policy.rollback",
             expected_world_revision=expected_world_revision,
+            idempotency_key=f"policy-rollback:{object_id}:{rollback_identity[:24]}",
+            canonical_request_sha256=rollback_identity,
         )

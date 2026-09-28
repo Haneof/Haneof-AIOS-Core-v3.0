@@ -43,7 +43,10 @@ from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import KnowledgeWindow, TemporalExtent, as_utc
 from aios_core.query.search import WorldSearchIndex
-from aios_core.storage.idempotency import canonical_json_dumps
+from aios_core.storage.idempotency import (
+    canonical_json_dumps,
+    canonical_request_identity,
+)
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 
 
@@ -1122,11 +1125,22 @@ class GoalTaskActionService:
         ]
 
         current = int(self.store.current_world_revision())
-        result = self.store.commit(
+        result = self.store.commit_or_replay(
             [evidence, goal, *dependencies],
             OperationRequest(
                 operation_name="execution.goal.propose",
-                arguments={"goal_id": goal_id, "title": goal.title},
+                arguments={
+                    "goal_id": goal_id,
+                    "title": goal.title,
+                    # goal_id embeds only part of the request, so the complete
+                    # canonical request identity is what makes an identical
+                    # recovered replay distinguishable from a changed one.
+                    "canonical_request_sha256": canonical_request_identity(
+                        "execution.goal.propose",
+                        request.model_dump(mode="json"),
+                        created.isoformat(),
+                    ),
+                },
                 expected_world_revision=current,
                 reason="create evidence-grounded goal proposal",
                 idempotency_key=f"goal-propose:{goal_id}:1",
@@ -1148,12 +1162,53 @@ class GoalTaskActionService:
         changed_at: datetime,
     ) -> GoalReceipt:
         changed = as_utc(changed_at, "changed_at")
+        # Resolve the durable operation identity from the PINNED target revision
+        # only. A recovered identical replay must keep that identity even though
+        # the first application already advanced the current revision.
+        pinned = self.store.get_payload(
+            request.goal_ref.object_id,
+            revision=request.goal_ref.revision,
+        )
+        if pinned.get("object_type") != ObjectType.GOAL.value:
+            raise ValueError(
+                f"{request.goal_ref.object_id}@{request.goal_ref.revision} is not goal"
+            )
+        target = GoalStatus(request.new_status)
+        replay_revision = int(pinned["revision"]) + 1
+        operation = OperationRequest(
+            operation_name="execution.goal.transition",
+            arguments={
+                "goal_id": request.goal_ref.object_id,
+                "from": str(pinned.get("goal_status") or ""),
+                "to": target.value,
+                "canonical_request_sha256": canonical_request_identity(
+                    "execution.goal.transition",
+                    request.model_dump(mode="json"),
+                    changed.isoformat(),
+                ),
+            },
+            expected_world_revision=int(self.store.current_world_revision()),
+            reason=request.reason.strip(),
+            idempotency_key=(
+                f"goal-transition:{request.goal_ref.object_id}:"
+                f"{replay_revision}:{target.value}"
+            ),
+            source_class=SourceClass.AI_COGNITION,
+        )
+        replay = self.store.replay_exact_operation(operation)
+        if replay is not None:
+            self._catch_up()
+            return GoalReceipt(
+                goal_id=request.goal_ref.object_id,
+                revision=replay_revision,
+                status=target.value,
+                world_revision=replay.world_revision,
+            )
         current_payload = self._current_exact(
             request.goal_ref,
             object_type=ObjectType.GOAL,
         )
         current = Goal.model_validate(current_payload)
-        target = GoalStatus(request.new_status)
         if target not in _GOAL_TRANSITIONS[current.goal_status]:
             raise ValueError(
                 f"illegal goal transition: {current.goal_status.value} -> {target.value}"
@@ -1228,23 +1283,7 @@ class GoalTaskActionService:
                 dependency_type="goal_transition_evidence_contains_source",
             ),
         ]
-        result = self.store.commit(
-            [evidence, new_goal, *dependencies],
-            OperationRequest(
-                operation_name="execution.goal.transition",
-                arguments={
-                    "goal_id": current.object_id,
-                    "from": current.goal_status.value,
-                    "to": target.value,
-                },
-                expected_world_revision=int(self.store.current_world_revision()),
-                reason=request.reason.strip(),
-                idempotency_key=(
-                    f"goal-transition:{current.object_id}:{new_revision}:{target.value}"
-                ),
-                source_class=SourceClass.AI_COGNITION,
-            ),
-        )
+        result = self.store.commit([evidence, new_goal, *dependencies], operation)
         self._catch_up()
         return GoalReceipt(
             goal_id=new_goal.object_id,
@@ -1372,18 +1411,33 @@ class GoalTaskActionService:
                 )
             )
 
+        key = f"task-create:{task_id}:1"
+        previous = self.store.operation_for_idempotency_key(key)
+        # Reuse both original operation id and revision. SQLiteWorldStore's exact
+        # request fingerprint still rejects changed task fields, dependencies,
+        # arguments or key; only an identical durable effect may replay.
+        replay_fields = (
+            {}
+            if previous is None
+            else {
+                "operation_id": str(previous["operation_id"]),
+                "expected_world_revision": int(previous["expected_world_revision"]),
+            }
+        )
         result = self.store.commit(
             [task, *dependencies],
             OperationRequest(
+                **replay_fields,
                 operation_name="execution.task.create",
                 arguments={
                     "task_id": task_id,
                     "title": task.title,
                     "initial_state": task.task_state.value,
                 },
-                expected_world_revision=int(self.store.current_world_revision()),
+                **({"expected_world_revision": int(self.store.current_world_revision())}
+                   if previous is None else {}),
                 reason="create evidence-grounded task",
-                idempotency_key=f"task-create:{task_id}:1",
+                idempotency_key=key,
                 source_class=SourceClass.AI_COGNITION,
             ),
         )
@@ -1405,12 +1459,53 @@ class GoalTaskActionService:
         retry_receipt = self._terminal_retry_receipt(request)
         if retry_receipt is not None:
             return retry_receipt
+        # Resolve the durable operation identity from the PINNED target revision
+        # only, so an identical recovered replay keeps the original identity even
+        # though the first application already advanced the current revision.
+        pinned_task = self.store.get_payload(
+            request.task_ref.object_id,
+            revision=request.task_ref.revision,
+        )
+        if pinned_task.get("object_type") != ObjectType.TASK.value:
+            raise ValueError(
+                f"{request.task_ref.object_id}@{request.task_ref.revision} is not task"
+            )
+        target = TaskState(request.new_state)
+        replay_revision = int(pinned_task["revision"]) + 1
+        operation = OperationRequest(
+            operation_name="execution.task.transition",
+            arguments={
+                "task_id": request.task_ref.object_id,
+                "from": str(pinned_task.get("task_state") or ""),
+                "to": target.value,
+                "canonical_request_sha256": canonical_request_identity(
+                    "execution.task.transition",
+                    request.model_dump(mode="json"),
+                    changed.isoformat(),
+                ),
+            },
+            expected_world_revision=int(self.store.current_world_revision()),
+            reason=request.reason.strip(),
+            idempotency_key=(
+                f"task-transition:{request.task_ref.object_id}:"
+                f"{replay_revision}:{target.value}"
+            ),
+            source_class=SourceClass.AI_COGNITION,
+        )
+        replay = self.store.replay_exact_operation(operation)
+        if replay is not None:
+            self._catch_up()
+            return TaskReceipt(
+                task_id=request.task_ref.object_id,
+                revision=replay_revision,
+                state=target.value,
+                world_revision=replay.world_revision,
+            )
         payload = self._current_exact(
             request.task_ref,
             object_type=ObjectType.TASK,
         )
         current = Task.model_validate(payload)
-        target = TaskState(request.new_state)
         if target not in _TASK_TRANSITIONS[current.task_state]:
             raise ValueError(
                 f"illegal task transition: {current.task_state.value} -> {target.value}"
@@ -1633,20 +1728,7 @@ class GoalTaskActionService:
 
         result = self.store.commit(
             [new_task, *invalidated_actions, *dependencies],
-            OperationRequest(
-                operation_name="execution.task.transition",
-                arguments={
-                    "task_id": current.object_id,
-                    "from": current.task_state.value,
-                    "to": target.value,
-                },
-                expected_world_revision=int(self.store.current_world_revision()),
-                reason=request.reason.strip(),
-                idempotency_key=(
-                    f"task-transition:{current.object_id}:{new_revision}:{target.value}"
-                ),
-                source_class=SourceClass.AI_COGNITION,
-            ),
+            operation,
         )
         self._catch_up()
         return TaskReceipt(
@@ -1902,7 +1984,7 @@ class GoalTaskActionService:
                 dependency_type="action_evidence_set_contains_source",
             ),
         ]
-        result = self.store.commit(
+        result = self.store.commit_or_replay(
             [evidence, action, *dependencies],
             OperationRequest(
                 operation_name="execution.action.propose",
@@ -1910,6 +1992,11 @@ class GoalTaskActionService:
                     "action_id": action_id,
                     "action_type": action.action_type,
                     "task_id": request.task_ref.object_id,
+                    "canonical_request_sha256": canonical_request_identity(
+                        "execution.action.propose",
+                        request.model_dump(mode="json"),
+                        proposed.isoformat(),
+                    ),
                 },
                 expected_world_revision=int(self.store.current_world_revision()),
                 reason="resident AI proposed external side effect",

@@ -1,0 +1,25 @@
+
+# model_callable=43 side_effecting=22
+# side-effecting inventory:
+#    1. commit_ai_world_claim  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._commit_ai_world_claim @ turn_runtime.py:2856
+#    2. commit_claim  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._commit_claim @ turn_runtime.py:2913
+#    3. commit_operation_experience  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._commit_operation_experience @ turn_runtime.py:2809
+#    4. create_attention_watch  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._create_attention_watch @ turn_runtime.py:1922
+#    5. create_task  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._create_task @ turn_runtime.py:2066
+#    6. form_event  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._form_event @ turn_runtime.py:2543
+#    7. propose_action  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._propose_action @ turn_runtime.py:2139
+#    8. propose_cognitive_policy  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._propose_cognitive_policy @ turn_runtime.py:2508
+#    9. propose_dimension  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._propose_dimension @ turn_runtime.py:2260
+#   10. propose_entity  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._propose_entity @ turn_runtime.py:2165
+#   11. propose_goal  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._propose_goal @ turn_runtime.py:2019
+#   12. record_communication_experience  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._record_communication_experience @ turn_runtime.py:2602
+#   13. retract_claim  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._retract_claim @ turn_runtime.py:3046
+#   14. revise_claim  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._revise_claim @ turn_runtime.py:2971
+#   15. revise_entity  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._revise_entity @ turn_runtime.py:2189
+#   16. rollback_cognitive_policy  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._rollback_cognitive_policy @ turn_runtime.py:2666
+#   17. transition_dimension  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._transition_dimension @ turn_runtime.py:2296
+#   18. transition_event  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._transition_event @ turn_runtime.py:2571
+#   19. transition_goal  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._transition_goal @ turn_runtime.py:2043
+#   20. transition_task  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._transition_task @ turn_runtime.py:2108
+#   21. update_cognitive_policy  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._update_cognitive_policy @ turn_runtime.py:2640
+#   22. upsert_relation  -> aios_core.runtime.turn_runtime.FusedTurnRuntime._upsert_relation @ turn_runtime.py:2224

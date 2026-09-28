@@ -1,0 +1,1215 @@
+"""CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001-CORRECTIVE-001 frozen probes.
+
+Binding blocker under correction: ``IA-BLK-TRUSTED-RETURN-001``.
+
+R5-C requires EXACTLY-ONCE DURABLE EFFECT for an identical recovered capability
+invocation. The frozen contract probed here, for every actually reachable
+side-effecting capability enumerated from the live runtime registry:
+
+  1. capability side effect is durable;
+  2. the outer model round / logical turn completion is NOT durable;
+  3. an unrelated later World revision is committed (so ``current_world_revision``
+     has advanced exactly as it does in a real crash window);
+  4. a brand new runtime replays the identical capability call at the identical
+     recovered write time.
+
+Expected corrective result:
+
+  * the replay reports success;
+  * no second durable object revision anywhere in the World;
+  * no second operation row and no changed idempotency record;
+  * the stable object/revision identity is unchanged;
+  * the World revision is unchanged by the replay.
+
+Expected result for a CHANGED/conflicting replay: fail closed, with no durable
+write. Nothing here weakens ``request_fingerprint``.
+
+The capability inventory is enumerated from ``FusedTurnRuntime.registry.catalog()``;
+the matrix guard test fails if the registry and this frozen matrix ever diverge.
+
+rev6 reclassification (three scenarios only)
+--------------------------------------------
+rev5 classified ``upsert_relation``, ``update_cognitive_policy`` and
+``rollback_cognitive_policy`` changed-field mutations as *same-key conflicts*.
+That expectation was derived from the pre-corrective key schemes, which embedded
+state-derived values: ``relation-upsert:{relation_id}:{revision}`` and
+``policy:{object_id}:{revision}``. Those schemes are themselves the blocker: a
+mechanically identical recovered replay derives a *different* revision after the
+first application, so it cannot share a key with the original and cannot converge.
+
+None of the three request contracts pins the revision being written
+(``RelationUpsertRequest``, ``CognitivePolicyUpdateRequest`` and the
+``rollback_cognitive_policy`` signature carry no pin for it -- verified against
+``src/aios_core/world_graph.py`` and ``src/aios_core/policy/service.py``). The
+corrective therefore keys these three operations on a SHA-256 digest of the
+complete canonical request. Consequence, proven mechanically and asserted below:
+
+  * an identical recovered replay reuses the original key, the original
+    ``operation_id`` and the original object revision -- R5-C convergence;
+  * a changed request yields a *different* key, so it is a distinct auditable
+    operation: the original operation row, idempotency record and object
+    revision stay untouched (identity-shift assertions). That is the
+    upsert / policy-version contract these capabilities already documented via
+    ``RelationReceipt.reused_existing`` and ``CognitivePolicy.previous_version``.
+
+A shared key holding a different request therefore cannot arise from these three
+capabilities. It remains a hard failure at the layer that owns it, and
+``test_core_background_trusted_return_corrective_001_store_fail_closed.py``
+proves it directly: changed request under an existing key, corrupt operation or
+idempotency rows, operation/idempotency skew, and reused operation identity all
+still fail closed. rev5 is preserved verbatim at
+``reviews/CORRECTIVE_001/evidence/probe_revisions/rev5_capability_replay.py.FROZEN_FINAL``;
+no other expectation in this matrix was altered.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import sqlite3
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Any, Callable, Mapping, Sequence
+
+import pytest
+
+from aios_core.contracts.enums import ObjectType, SourceClass
+from aios_core.contracts.models import Observation
+from aios_core.contracts.operations import OperationRequest
+from aios_core.contracts.refs import ObjectRef
+from aios_core.contracts.time import TemporalExtent
+from aios_core.query.search import WorldSearchIndex
+from aios_core.review.periodic import PeriodicReviewRequest, ReviewAnchor
+from aios_core.runtime.capabilities import CapabilityCall
+from aios_core.runtime.turn_runtime import FusedTurnRuntime
+from aios_core.storage.sqlite_store import SQLiteWorldStore
+
+# The recovered write time. run_turn uses ``occurred_at``; run_wake /
+# run_periodic_review use ``recovered_attempt.admitted_at``. All three modes
+# therefore reproduce the original write time for a recovered round, which is what
+# makes durable object identity and the canonical request identity stable.
+T = datetime(2026, 9, 28, 6, tzinfo=timezone.utc)
+SUBJECT = "user_1"
+# One canonical qualifying reality leaf per probe World. A second leaf exists
+# only so the changed-evidence attack can cite different (but real) evidence.
+LEAF = "corrective001-anchor"
+OTHER_LEAF = "corrective001-other-anchor"
+
+
+# --------------------------------------------------------------------------- #
+# world / runtime helpers
+# --------------------------------------------------------------------------- #
+def world(db: Path):
+    store = SQLiteWorldStore(db)
+    index = WorldSearchIndex(db, store=store)
+    index.rebuild()
+    return store, index
+
+
+def new_runtime(db: Path) -> FusedTurnRuntime:
+    """A brand new runtime over the same durable World (fresh-process semantics)."""
+    store, index = world(db)
+
+    def provider(_snapshot):  # pragma: no cover - matrix probes never dispatch
+        raise AssertionError("capability matrix probe must not dispatch a provider")
+
+    return FusedTurnRuntime(store=store, index=index, model_handler=provider)
+
+
+def seed_reality_leaf(store: SQLiteWorldStore, name: str, *, at: datetime = T) -> ObjectRef:
+    """Commit a qualifying reality Observation (USER source class, non-assistant)."""
+    moment = at - timedelta(hours=2)
+    observation = Observation(
+        object_id=f"leaf_{name}",
+        subject_id=SUBJECT,
+        occurred=TemporalExtent.point(moment),
+        learned_at=moment,
+        recorded_at=moment,
+        created_by="corrective001:seed",
+        source_kind="conversation",
+        modality="text",
+        value=f"durable reality leaf for {name}",
+        metadata={"dimension": "dim:corrective001"},
+    )
+    store.commit(
+        [observation],
+        OperationRequest(
+            operation_name="corrective001.seed_leaf",
+            expected_world_revision=int(store.current_world_revision()),
+            reason="seed qualifying reality leaf",
+            idempotency_key=f"corrective001-seed-leaf-{name}",
+            source_class=SourceClass.USER,
+        ),
+    )
+    return ObjectRef(object_id=observation.object_id, revision=1)
+
+
+def leaf_ref(name: str) -> dict[str, Any]:
+    return {"object_id": f"leaf_{name}", "revision": 1}
+
+
+def advance_world(db: Path, tag: str) -> None:
+    """Commit an unrelated World revision inside the crash window."""
+    store, _index = world(db)
+    moment = T + timedelta(minutes=5)
+    store.commit(
+        [
+            Observation(
+                object_id=f"unrelated_{tag}",
+                subject_id=SUBJECT,
+                occurred=TemporalExtent.point(moment),
+                learned_at=moment,
+                recorded_at=moment,
+                created_by="corrective001:unrelated",
+                source_kind="conversation",
+                modality="text",
+                value=f"unrelated later world revision {tag}",
+                metadata={"dimension": "dim:corrective001"},
+            )
+        ],
+        OperationRequest(
+            operation_name="corrective001.unrelated_advance",
+            expected_world_revision=int(store.current_world_revision()),
+            reason="unrelated later world revision",
+            idempotency_key=f"corrective001-advance-{tag}",
+            source_class=SourceClass.USER,
+        ),
+    )
+
+
+def durable_state(db: Path) -> str:
+    """Canonical digest of every durable World/operation/idempotency row."""
+    with sqlite3.connect(db) as conn:
+        conn.row_factory = sqlite3.Row
+        objects = [
+            (r["object_id"], int(r["revision"]), hashlib.sha256(r["payload_json"].encode()).hexdigest())
+            for r in conn.execute(
+                "SELECT object_id, revision, payload_json FROM object_revisions "
+                "ORDER BY object_id, revision"
+            )
+        ]
+        operations = [
+            (
+                r["operation_id"],
+                r["operation_name"],
+                hashlib.sha256(r["arguments_json"].encode()).hexdigest(),
+                int(r["expected_world_revision"]),
+                r["reason"],
+                r["idempotency_key"],
+                r["status"],
+                r["result_world_revision"],
+            )
+            for r in conn.execute(
+                "SELECT * FROM operations ORDER BY idempotency_key"
+            )
+        ]
+        idem = [
+            (
+                r["idempotency_key"],
+                r["operation_id"],
+                int(r["world_revision"]),
+                hashlib.sha256(r["result_json"].encode()).hexdigest(),
+            )
+            for r in conn.execute(
+                "SELECT * FROM idempotency_records ORDER BY idempotency_key"
+            )
+        ]
+    return json.dumps(
+        {"objects": objects, "operations": operations, "idempotency": idem},
+        sort_keys=True,
+    )
+
+
+def operation_rows(db: Path) -> list[tuple]:
+    with sqlite3.connect(db) as conn:
+        conn.row_factory = sqlite3.Row
+        return [
+            (
+                r["operation_id"],
+                r["operation_name"],
+                r["arguments_json"],
+                int(r["expected_world_revision"]),
+                r["reason"],
+                r["idempotency_key"],
+                r["status"],
+                r["result_world_revision"],
+            )
+            for r in conn.execute("SELECT * FROM operations ORDER BY idempotency_key")
+        ]
+
+
+def idempotency_rows(db: Path) -> list[tuple]:
+    with sqlite3.connect(db) as conn:
+        conn.row_factory = sqlite3.Row
+        return [
+            (r["idempotency_key"], r["operation_id"], int(r["world_revision"]), r["result_json"])
+            for r in conn.execute("SELECT * FROM idempotency_records ORDER BY idempotency_key")
+        ]
+
+
+def object_revisions(db: Path, object_type: ObjectType) -> list[tuple[str, int]]:
+    """EVERY durable revision of a type, read from the revision table directly.
+
+    ``list_payloads`` only returns the newest revision per object, which would
+    hide exactly the duplicate-revision defect these probes exist to catch.
+    """
+    with sqlite3.connect(db) as conn:
+        return sorted(
+            (str(r[0]), int(r[1]))
+            for r in conn.execute(
+                "SELECT object_id, revision FROM object_revisions WHERE object_type=?",
+                (object_type.value,),
+            )
+        )
+
+
+def object_digests(db: Path, object_type: ObjectType) -> dict[tuple[str, int], str]:
+    """(object_id, revision) -> payload digest for every durable revision."""
+    with sqlite3.connect(db) as conn:
+        return {
+            (str(r[0]), int(r[1])): hashlib.sha256(str(r[2]).encode()).hexdigest()
+            for r in conn.execute(
+                "SELECT object_id, revision, payload_json FROM object_revisions "
+                "WHERE object_type=?",
+                (object_type.value,),
+            )
+        }
+
+
+def invoke(rt: FusedTurnRuntime, name: str, arguments: Mapping[str, Any], *, call_id: str = "corrective-0"):
+    """Invoke a capability at the stable recovered write time."""
+    rt._active_turn_time = T
+    if name == "commit_operation_experience":
+        rt._active_review_request = PeriodicReviewRequest(
+            review_id="corrective001-review",
+            subject_id=SUBJECT,
+            wake_ref=ObjectRef(object_id="corrective001-review-wake", revision=1),
+            window_start=T - timedelta(hours=2),
+            window_end=T,
+            anchors=(
+                ReviewAnchor(
+                    object_ref=ObjectRef(object_id=f"leaf_{LEAF}", revision=1),
+                    object_type=ObjectType.OBSERVATION.value,
+                    recorded_at=T - timedelta(hours=2),
+                    excerpt="corrective operation-experience anchor",
+                ),
+            ),
+        )
+    try:
+        return rt.registry.invoke(CapabilityCall(name=name, call_id=call_id, arguments=dict(arguments)))
+    finally:
+        rt._active_turn_time = None
+        rt._active_review_request = None
+
+
+def ref(payload: Mapping[str, Any]) -> dict[str, Any]:
+    return {"object_id": str(payload["object_id"]), "revision": int(payload["revision"])}
+
+
+# --------------------------------------------------------------------------- #
+# frozen capability replay matrix
+# --------------------------------------------------------------------------- #
+@dataclass(frozen=True)
+class Scenario:
+    """One frozen row of the capability replay matrix.
+
+    ``prepare`` runs once on the applying runtime and returns the exact capability
+    arguments. ``identity`` names the durable object type whose object/revision
+    identity must be preserved by an identical replay. ``primary`` is the path
+    into the capability result data that holds the primary durable object id.
+
+    Two conflict classes are frozen, because they are genuinely different
+    contracts and conflating them produces a false RED:
+
+    ``conflicts``
+        Mutations of fields that are NOT part of the stable object identity, so
+        the durable idempotency key is unchanged. A changed request under an
+        existing key MUST fail closed.
+    ``identity_shifts``
+        Mutations of fields that ARE inputs to the deterministic object id, so
+        the request is a different logical object with a different key. It must
+        never be conflated with, or silently overwrite, the original object.
+    """
+
+    name: str
+    prepare: Callable[[FusedTurnRuntime], dict[str, Any]]
+    identity: ObjectType
+    family: str
+    primary: tuple[str, ...]
+    conflicts: tuple[tuple[str, Callable[[dict[str, Any]], dict[str, Any]]], ...] = ()
+    identity_shifts: tuple[tuple[str, Callable[[dict[str, Any]], dict[str, Any]]], ...] = ()
+    notes: str = ""
+
+
+def _mutate(key: str, value: Any) -> Callable[[dict[str, Any]], dict[str, Any]]:
+    def apply(arguments: dict[str, Any]) -> dict[str, Any]:
+        changed = dict(arguments)
+        changed[key] = value
+        return changed
+
+    return apply
+
+
+def _mutate_evidence() -> Callable[[dict[str, Any]], dict[str, Any]]:
+    """Cite different but equally real evidence (same key for identity-open objects)."""
+
+    def apply(arguments: dict[str, Any]) -> dict[str, Any]:
+        changed = dict(arguments)
+        changed["evidence_refs"] = [leaf_ref(OTHER_LEAF)]
+        return changed
+
+    return apply
+
+
+def _mutate_ref_revision(key: str) -> Callable[[dict[str, Any]], dict[str, Any]]:
+    def apply(arguments: dict[str, Any]) -> dict[str, Any]:
+        changed = dict(arguments)
+        target = dict(changed[key])
+        target["revision"] = int(target["revision"]) + 1
+        changed[key] = target
+        return changed
+
+    return apply
+
+
+def _mutate_ref_identity(key: str) -> Callable[[dict[str, Any]], dict[str, Any]]:
+    def apply(arguments: dict[str, Any]) -> dict[str, Any]:
+        changed = dict(arguments)
+        target = dict(changed[key])
+        target["object_id"] = str(target["object_id"])[:-4] + "dead"
+        changed[key] = target
+        return changed
+
+    return apply
+
+
+def _mutate_first_evidence_revision() -> Callable[[dict[str, Any]], dict[str, Any]]:
+    def apply(arguments: dict[str, Any]) -> dict[str, Any]:
+        changed = dict(arguments)
+        refs = [dict(item) for item in changed["evidence_refs"]]
+        refs[0]["revision"] = int(refs[0]["revision"]) + 1
+        changed["evidence_refs"] = refs
+        return changed
+
+    return apply
+
+
+# --- prepare functions ----------------------------------------------------- #
+def prep_create_attention_watch(rt: FusedTurnRuntime) -> dict[str, Any]:
+    return {
+        "title": "corrective watch",
+        "dimensions": ["dim:corrective001"],
+        "reason_refs": [leaf_ref(LEAF)],
+        "source_kind": "conversation",
+        "modality": "text",
+        "priority": 40,
+        "cooldown_seconds": 60,
+    }
+
+
+def prep_create_task(rt: FusedTurnRuntime) -> dict[str, Any]:
+    return {
+        "title": "corrective task",
+        "task_type": "immediate",
+        "reason_refs": [leaf_ref(LEAF)],
+    }
+
+
+def prep_commit_claim(rt: FusedTurnRuntime) -> dict[str, Any]:
+    return {
+        "content": "corrective claim content",
+        "evidence_refs": [leaf_ref(LEAF)],
+        "confidence": 0.7,
+        "dimension": "dim:corrective001",
+    }
+
+
+def prep_commit_ai_world_claim(rt: FusedTurnRuntime) -> dict[str, Any]:
+    return {
+        "domain": "user_understanding",
+        "statement": "corrective ai world statement",
+        "evidence_refs": [leaf_ref(LEAF)],
+        "confidence": 0.6,
+    }
+
+
+def prep_propose_entity(rt: FusedTurnRuntime) -> dict[str, Any]:
+    return {
+        "entity_key": "entity:corrective001",
+        "entity_kind": "concept",
+        "evidence_refs": [leaf_ref(LEAF)],
+        "canonical_name": "Corrective Entity",
+    }
+
+
+def prep_revise_entity(rt: FusedTurnRuntime) -> dict[str, Any]:
+    entity = rt.store.get_payload(
+        [
+            p["object_id"]
+            for p in rt.store.list_payloads(object_type=ObjectType.ENTITY, subject_id=SUBJECT)
+            if p.get("metadata", {}).get("entity_key") == "entity:revise-seed"
+        ][0]
+    )
+    return {
+        "entity_ref": ref(entity),
+        "reason": "corrective entity revision reason",
+        "evidence_refs": [leaf_ref(LEAF)],
+        "canonical_name": "Revised Corrective Entity",
+    }
+
+
+def prep_upsert_relation(rt: FusedTurnRuntime) -> dict[str, Any]:
+    entities = {
+        str(p.get("metadata", {}).get("entity_key")): p
+        for p in rt.store.list_payloads(object_type=ObjectType.ENTITY, subject_id=SUBJECT)
+    }
+    left = entities["entity:relation-left"]
+    right = entities["entity:relation-right"]
+    return {
+        "left_ref": ref(left),
+        "relation_type": "related_to",
+        "right_ref": ref(right),
+        "evidence_refs": [leaf_ref(LEAF)],
+        "confidence": 0.8,
+        "reason": "corrective relation reason",
+    }
+
+
+def prep_propose_dimension(rt: FusedTurnRuntime) -> dict[str, Any]:
+    return {
+        "dimension_key": "dim:corrective001_axis",
+        "name": "Corrective Axis",
+        "description": "A corrective observation axis",
+        "data_shape": "scalar",
+        "evidence_refs": [leaf_ref(LEAF)],
+        "why_existing_dimensions_are_insufficient": "no existing axis covers it",
+        "continuity_rationale": "keeps continuity",
+        "user_value_rationale": "serves the user",
+        "maintenance_cost_rationale": "cheap to maintain",
+        "confidence": 0.7,
+    }
+
+
+def prep_transition_dimension(rt: FusedTurnRuntime) -> dict[str, Any]:
+    definition = [
+        p
+        for p in rt.store.list_payloads(object_type=ObjectType.DIMENSION_DEFINITION, subject_id=SUBJECT)
+        if p.get("metadata", {}).get("dimension_key") == "dim:transition_seed"
+    ][0]
+    return {
+        "dimension_ref": ref(definition),
+        "new_lifecycle": "trial",
+        "reason": "corrective dimension transition reason",
+        "evidence_refs": [leaf_ref(LEAF)],
+    }
+
+
+def prep_propose_goal(rt: FusedTurnRuntime) -> dict[str, Any]:
+    return {
+        "source_type": "user_explicit",
+        "title": "corrective goal",
+        "description": "corrective goal description",
+        "evidence_refs": [leaf_ref(LEAF)],
+        "confidence": 0.75,
+        "success_criteria": ["criterion-a"],
+    }
+
+
+def prep_transition_goal(rt: FusedTurnRuntime) -> dict[str, Any]:
+    goal = [
+        p
+        for p in rt.store.list_payloads(object_type=ObjectType.GOAL, subject_id=SUBJECT)
+        if p.get("title") == "transition-goal-seed"
+    ][0]
+    return {
+        "goal_ref": ref(goal),
+        "new_status": "active",
+        "reason": "corrective goal transition reason",
+        "evidence_refs": [leaf_ref(LEAF)],
+    }
+
+
+def prep_transition_task(rt: FusedTurnRuntime) -> dict[str, Any]:
+    task = [
+        p
+        for p in rt.store.list_payloads(object_type=ObjectType.TASK, subject_id=SUBJECT)
+        if p.get("title") == "transition-task-seed"
+    ][0]
+    return {
+        "task_ref": ref(task),
+        "new_state": "ready",
+        "reason": "corrective task transition reason",
+        "evidence_refs": [leaf_ref(LEAF)],
+    }
+
+
+def prep_propose_action(rt: FusedTurnRuntime) -> dict[str, Any]:
+    task = [
+        p
+        for p in rt.store.list_payloads(object_type=ObjectType.TASK, subject_id=SUBJECT)
+        if p.get("title") == "action-task-seed"
+    ][0]
+    return {
+        "task_ref": ref(task),
+        "action_type": "notify",
+        "payload": {"channel": "corrective"},
+        "evidence_refs": [leaf_ref(LEAF)],
+    }
+
+
+def prep_commit_operation_experience(rt: FusedTurnRuntime) -> dict[str, Any]:
+    return {
+        "problem_type": "corrective-problem",
+        "method_path": ["step-a", "step-b"],
+        "result_summary": "corrective operation outcome",
+        "positive_case_refs": [leaf_ref(LEAF)],
+    }
+
+
+def prep_revise_claim(rt: FusedTurnRuntime) -> dict[str, Any]:
+    claim = [
+        p
+        for p in rt.store.list_payloads(object_type=ObjectType.CLAIM, subject_id=SUBJECT)
+        if p.get("content") == "revise_claim-seed"
+    ][0]
+    return {
+        "target_ref": ref(claim),
+        "reason": "corrective claim revision reason",
+        "evidence_refs": [leaf_ref(LEAF)],
+        "replacement_content": "corrective replacement content",
+    }
+
+
+def prep_retract_claim(rt: FusedTurnRuntime) -> dict[str, Any]:
+    claim = [
+        p
+        for p in rt.store.list_payloads(object_type=ObjectType.CLAIM, subject_id=SUBJECT)
+        if p.get("content") == "retract_claim-seed"
+    ][0]
+    return {
+        "target_ref": ref(claim),
+        "reason": "corrective claim retraction reason",
+        "evidence_refs": [leaf_ref(LEAF)],
+    }
+
+
+def prep_propose_cognitive_policy(rt: FusedTurnRuntime) -> dict[str, Any]:
+    return {
+        "policy_id": "corrective-policy",
+        "scope": "local",
+        "default_value": 3,
+        "current_value": 3,
+        "reason": "corrective policy registration reason",
+        "evidence_refs": [leaf_ref(LEAF)],
+        "evaluation_window": "7d",
+    }
+
+
+def prep_form_event(rt: FusedTurnRuntime) -> dict[str, Any]:
+    return {
+        "title": "corrective event",
+        "interpretation": "corrective interpretation",
+        "event_time": TemporalExtent.point(T - timedelta(hours=1)).model_dump(mode="json"),
+        "evidence_refs": [leaf_ref(LEAF)],
+        "confidence": 0.7,
+    }
+
+
+def prep_transition_event(rt: FusedTurnRuntime) -> dict[str, Any]:
+    event = [
+        p
+        for p in rt.store.list_payloads(object_type=ObjectType.EVENT, subject_id=SUBJECT)
+        if p.get("title") == "transition-event-seed"
+    ][0]
+    return {
+        "event_ref": ref(event),
+        "new_status": "active",
+        "reason": "corrective event transition reason",
+        "evidence_refs": [leaf_ref(LEAF)],
+    }
+
+
+def prep_record_communication_experience(rt: FusedTurnRuntime) -> dict[str, Any]:
+    return {
+        "scenario": "corrective scenario",
+        "style": "concise",
+        "user_reaction": "accepted",
+        "evidence_refs": [leaf_ref(LEAF)],
+    }
+
+
+def prep_update_cognitive_policy(rt: FusedTurnRuntime) -> dict[str, Any]:
+    return {
+        "policy_id": "update-policy-seed",
+        "current_value": 9,
+        "reason": "corrective policy update reason",
+        "evidence_refs": [leaf_ref(LEAF)],
+    }
+
+
+def prep_rollback_cognitive_policy(rt: FusedTurnRuntime) -> dict[str, Any]:
+    return {
+        "policy_id": "rollback-policy-seed",
+        "target_version": 1,
+        "reason": "corrective policy rollback reason",
+        "evidence_refs": [leaf_ref(LEAF)],
+    }
+
+
+SCENARIOS: tuple[Scenario, ...] = (
+    Scenario(
+        name="create_attention_watch",
+        prepare=prep_create_attention_watch,
+        identity=ObjectType.TASK,
+        family="create",
+        primary=("task_id",),
+        conflicts=(
+            ("changed priority", _mutate("priority", 77)),
+            ("changed cooldown", _mutate("cooldown_seconds", 600)),
+            ("changed dimensions", _mutate("dimensions", ["dim:corrective001-other"])),
+        ),
+        identity_shifts=(("changed title", _mutate("title", "changed watch")),),
+    ),
+    Scenario(
+        name="create_task",
+        prepare=prep_create_task,
+        identity=ObjectType.TASK,
+        family="create",
+        primary=("task_id",),
+        conflicts=(
+            ("changed priority", _mutate("priority", 77)),
+            ("changed next_step", _mutate("next_step", "changed next step")),
+        ),
+        identity_shifts=(("changed title", _mutate("title", "changed task")),),
+    ),
+    Scenario(
+        name="commit_claim",
+        prepare=prep_commit_claim,
+        identity=ObjectType.CLAIM,
+        family="create",
+        primary=("claim_id",),
+        # claim_id is a hash of the complete canonical request, so no changed
+        # field can reuse the same idempotency key. Identity shifts only.
+        identity_shifts=(
+            ("changed content", _mutate("content", "changed claim")),
+            ("changed confidence", _mutate("confidence", 0.11)),
+            ("changed evidence", _mutate_evidence()),
+        ),
+        notes="identity-complete object id; same-key changed request unreachable",
+    ),
+    Scenario(
+        name="commit_ai_world_claim",
+        prepare=prep_commit_ai_world_claim,
+        identity=ObjectType.CLAIM,
+        family="create",
+        primary=("claim", "claim_id"),
+        identity_shifts=(
+            ("changed statement", _mutate("statement", "changed statement")),
+            ("changed confidence", _mutate("confidence", 0.11)),
+        ),
+        notes="identity-complete object id; same-key changed request unreachable",
+    ),
+    Scenario(
+        name="propose_entity",
+        prepare=prep_propose_entity,
+        identity=ObjectType.ENTITY,
+        family="create",
+        primary=("entity_id",),
+        conflicts=(
+            ("changed canonical name", _mutate("canonical_name", "Different Entity")),
+            ("changed entity kind", _mutate("entity_kind", "organization")),
+            ("changed evidence", _mutate_evidence()),
+        ),
+        identity_shifts=(("changed entity key", _mutate("entity_key", "entity:other")),),
+    ),
+    Scenario(
+        name="revise_entity",
+        prepare=prep_revise_entity,
+        identity=ObjectType.ENTITY,
+        family="revise",
+        primary=("entity_id",),
+        conflicts=(
+            ("changed reason", _mutate("reason", "different revision reason")),
+            ("changed canonical name", _mutate("canonical_name", "Another Revision")),
+            ("changed evidence", _mutate_evidence()),
+        ),
+        identity_shifts=(("changed target revision", _mutate_ref_revision("entity_ref")),),
+    ),
+    Scenario(
+        name="upsert_relation",
+        prepare=prep_upsert_relation,
+        identity=ObjectType.RELATION,
+        family="revise",
+        primary=("relation_id",),
+        # RECLASSIFIED in rev6 -- see "rev6 reclassification" in the module
+        # docstring. `upsert_relation` takes no pinned relation revision, so its
+        # durable operation identity is the complete canonical request. A changed
+        # upsert is therefore a distinct operation with its own key, proven here by
+        # the identity-shift assertions (original never overwritten, new durable
+        # identity required). The shared-key fail-closed guarantee is proven
+        # directly at the store layer by
+        # test_core_background_trusted_return_corrective_001_store_fail_closed.py.
+        identity_shifts=(
+            ("changed confidence", _mutate("confidence", 0.11)),
+            ("changed reason", _mutate("reason", "different relation reason")),
+            ("changed evidence", _mutate_evidence()),
+            ("changed relation type", _mutate("relation_type", "part_of")),
+            ("changed left endpoint", _mutate_ref_identity("left_ref")),
+        ),
+    ),
+    Scenario(
+        name="propose_dimension",
+        prepare=prep_propose_dimension,
+        identity=ObjectType.DIMENSION_DEFINITION,
+        family="create",
+        primary=("dimension_id",),
+        conflicts=(
+            ("changed description", _mutate("description", "changed description")),
+            ("changed data shape", _mutate("data_shape", "series")),
+            ("changed evidence", _mutate_evidence()),
+        ),
+        identity_shifts=(
+            ("changed dimension key", _mutate("dimension_key", "dim:corrective001_other")),
+        ),
+    ),
+    Scenario(
+        name="transition_dimension",
+        prepare=prep_transition_dimension,
+        identity=ObjectType.DIMENSION_DEFINITION,
+        family="transition",
+        primary=("dimension_id",),
+        conflicts=(
+            ("changed reason", _mutate("reason", "different dimension reason")),
+            ("changed evidence", _mutate_evidence()),
+        ),
+        identity_shifts=(("changed target", _mutate("new_lifecycle", "rejected")),),
+    ),
+    Scenario(
+        name="propose_goal",
+        prepare=prep_propose_goal,
+        identity=ObjectType.GOAL,
+        family="create",
+        primary=("goal_id",),
+        conflicts=(
+            ("changed confidence", _mutate("confidence", 0.11)),
+            ("changed criteria", _mutate("success_criteria", ["criterion-b"])),
+        ),
+        identity_shifts=(
+            ("changed description", _mutate("description", "changed goal description")),
+            ("changed evidence", _mutate_evidence()),
+        ),
+    ),
+    Scenario(
+        name="transition_goal",
+        prepare=prep_transition_goal,
+        identity=ObjectType.GOAL,
+        family="transition",
+        primary=("goal_id",),
+        conflicts=(
+            ("changed reason", _mutate("reason", "different goal reason")),
+            ("changed evidence", _mutate_evidence()),
+        ),
+        identity_shifts=(("changed target", _mutate("new_status", "abandoned")),),
+    ),
+    Scenario(
+        name="transition_task",
+        prepare=prep_transition_task,
+        identity=ObjectType.TASK,
+        family="transition",
+        primary=("task_id",),
+        conflicts=(
+            ("changed reason", _mutate("reason", "different task reason")),
+            ("changed next_step", _mutate("next_step", "changed next step")),
+            ("changed evidence", _mutate_evidence()),
+        ),
+        identity_shifts=(("changed target", _mutate("new_state", "waiting_user")),),
+    ),
+    Scenario(
+        name="propose_action",
+        prepare=prep_propose_action,
+        identity=ObjectType.ACTION,
+        family="create",
+        primary=("action_id",),
+        conflicts=(
+            ("changed evidence", _mutate_evidence()),
+            ("changed expected outcome", _mutate("expected_outcome", "changed outcome")),
+        ),
+        identity_shifts=(("changed payload", _mutate("payload", {"channel": "changed"})),),
+    ),
+    Scenario(
+        name="commit_operation_experience",
+        prepare=prep_commit_operation_experience,
+        identity=ObjectType.OPERATION_EXPERIENCE,
+        family="create",
+        primary=("experience_id",),
+        identity_shifts=(
+            ("changed summary", _mutate("result_summary", "changed summary")),
+            ("changed problem type", _mutate("problem_type", "other-problem")),
+        ),
+        notes="identity-complete object id; same-key changed request unreachable",
+    ),
+    Scenario(
+        name="revise_claim",
+        prepare=prep_revise_claim,
+        identity=ObjectType.CLAIM,
+        family="revise",
+        primary=("claim_id",),
+        conflicts=(
+            ("changed replacement", _mutate("replacement_content", "different replacement")),
+            ("changed reason", _mutate("reason", "different revision reason")),
+            ("changed confidence", _mutate("confidence", 0.11)),
+            ("changed evidence", _mutate_evidence()),
+        ),
+        identity_shifts=(("changed target revision", _mutate_ref_revision("target_ref")),),
+    ),
+    Scenario(
+        name="retract_claim",
+        prepare=prep_retract_claim,
+        identity=ObjectType.CLAIM,
+        family="retract",
+        primary=("claim_id",),
+        conflicts=(
+            ("changed reason", _mutate("reason", "different retraction reason")),
+            ("changed evidence", _mutate_evidence()),
+        ),
+        identity_shifts=(("changed target revision", _mutate_ref_revision("target_ref")),),
+    ),
+    Scenario(
+        name="propose_cognitive_policy",
+        prepare=prep_propose_cognitive_policy,
+        identity=ObjectType.COGNITIVE_POLICY,
+        family="register",
+        primary=("object_id",),
+        conflicts=(
+            ("changed value", _mutate("current_value", 42)),
+            ("changed default", _mutate("default_value", 42)),
+            ("changed reason", _mutate("reason", "different policy reason")),
+            ("changed evidence", _mutate_evidence()),
+        ),
+        identity_shifts=(("changed policy id", _mutate("policy_id", "other-policy")),),
+    ),
+    Scenario(
+        name="form_event",
+        prepare=prep_form_event,
+        identity=ObjectType.EVENT,
+        family="create",
+        primary=("event_id",),
+        conflicts=(
+            ("changed interpretation", _mutate("interpretation", "changed interpretation")),
+            ("changed confidence", _mutate("confidence", 0.11)),
+        ),
+        identity_shifts=(
+            ("changed title", _mutate("title", "changed event")),
+            ("changed evidence", _mutate_evidence()),
+        ),
+    ),
+    Scenario(
+        name="transition_event",
+        prepare=prep_transition_event,
+        identity=ObjectType.EVENT,
+        family="transition",
+        primary=("event_id",),
+        conflicts=(
+            ("changed reason", _mutate("reason", "different event reason")),
+            ("changed evidence", _mutate_evidence()),
+        ),
+        identity_shifts=(("changed target", _mutate("new_status", "rejected")),),
+    ),
+    Scenario(
+        name="record_communication_experience",
+        prepare=prep_record_communication_experience,
+        identity=ObjectType.COMMUNICATION_EXPERIENCE,
+        family="create",
+        primary=("experience_id",),
+        conflicts=(
+            ("changed tone", _mutate("tone", "warm")),
+            ("changed conditions", _mutate("applicable_conditions", {"scope": "changed"})),
+        ),
+        identity_shifts=(("changed style", _mutate("style", "verbose")),),
+    ),
+    Scenario(
+        name="update_cognitive_policy",
+        prepare=prep_update_cognitive_policy,
+        identity=ObjectType.COGNITIVE_POLICY,
+        family="revise",
+        primary=("object_id",),
+        # RECLASSIFIED in rev6 -- `CognitivePolicyUpdateRequest` carries no pinned
+        # version (verified: policy_id / current_value / reason / evidence_refs /
+        # changed_by / evaluation_window only), so the state-derived
+        # `policy:{object_id}:{revision}` key was the defect that made an identical
+        # recovered replay mint a second policy version.
+        identity_shifts=(
+            ("changed value", _mutate("current_value", 11)),
+            ("changed reason", _mutate("reason", "different update reason")),
+            ("changed evidence", _mutate_evidence()),
+            ("changed policy id", _mutate("policy_id", "other-policy")),
+        ),
+    ),
+    Scenario(
+        name="rollback_cognitive_policy",
+        prepare=prep_rollback_cognitive_policy,
+        identity=ObjectType.COGNITIVE_POLICY,
+        family="rollback",
+        primary=("object_id",),
+        # RECLASSIFIED in rev6 -- `target_version` pins the rollback TARGET, not the
+        # position of the new version, so the new version's revision could only be
+        # read from mutable state. Same defect and same proof as
+        # update_cognitive_policy above.
+        identity_shifts=(
+            ("changed reason", _mutate("reason", "different rollback reason")),
+            ("changed evidence", _mutate_evidence()),
+            ("changed policy id", _mutate("policy_id", "other-policy")),
+        ),
+    ),
+)
+
+SCENARIO_BY_NAME = {scenario.name: scenario for scenario in SCENARIOS}
+
+
+# --------------------------------------------------------------------------- #
+# dynamic inventory guard
+# --------------------------------------------------------------------------- #
+def test_side_effecting_capability_inventory_is_fully_enumerated(tmp_path):
+    """The registry is the authoritative source; the matrix must cover all of it."""
+    runtime = new_runtime(tmp_path / "world.db")
+    catalog = runtime.registry.catalog()
+    reachable = sorted(item["name"] for item in catalog if item["side_effecting"])
+    frozen = sorted(SCENARIO_BY_NAME)
+    assert reachable == frozen, (
+        "capability replay matrix drifted from the live registry; "
+        f"registry-only={sorted(set(reachable) - set(frozen))} "
+        f"matrix-only={sorted(set(frozen) - set(reachable))}"
+    )
+    assert len(reachable) >= 20, "unexpectedly small side-effecting surface"
+
+
+# --------------------------------------------------------------------------- #
+# seeding
+# --------------------------------------------------------------------------- #
+def _seed(rt: FusedTurnRuntime, leaf: str, **kwargs) -> None:
+    """Apply a prerequisite side effect durably at the same stable write time."""
+    result = invoke(rt, leaf, kwargs)
+    assert result.ok, f"seed {leaf} failed: {result.error_code} {result.error_message}"
+
+
+def seed_for(scenario_name: str, rt: FusedTurnRuntime) -> None:
+    """Seed the durable prerequisites that ``scenario_name`` mutates."""
+    if scenario_name in {"create_attention_watch", "create_task", "commit_claim",
+                         "commit_ai_world_claim", "propose_entity", "propose_dimension",
+                         "propose_goal", "form_event", "propose_cognitive_policy",
+                         "commit_operation_experience", "record_communication_experience"}:
+        return
+
+    leaf = LEAF
+
+    if scenario_name == "revise_entity":
+        _seed(rt, "propose_entity", entity_key="entity:revise-seed", entity_kind="concept",
+              evidence_refs=[leaf_ref(leaf)], canonical_name="Seed Entity")
+    elif scenario_name == "upsert_relation":
+        _seed(rt, "propose_entity", entity_key="entity:relation-left", entity_kind="concept",
+              evidence_refs=[leaf_ref(leaf)], canonical_name="Left Entity")
+        _seed(rt, "propose_entity", entity_key="entity:relation-right", entity_kind="concept",
+              evidence_refs=[leaf_ref(leaf)], canonical_name="Right Entity")
+    elif scenario_name == "transition_dimension":
+        _seed(rt, "propose_dimension", dimension_key="dim:transition_seed", name="Seed Axis",
+              description="seed axis", data_shape="scalar", evidence_refs=[leaf_ref(leaf)],
+              why_existing_dimensions_are_insufficient="none", continuity_rationale="c",
+              user_value_rationale="u", maintenance_cost_rationale="m", confidence=0.5)
+    elif scenario_name == "transition_goal":
+        _seed(rt, "propose_goal", source_type="user_explicit", title="transition-goal-seed",
+              description="seed goal", evidence_refs=[leaf_ref(leaf)], confidence=0.5)
+    elif scenario_name == "transition_task":
+        _seed(rt, "create_task", title="transition-task-seed", task_type="immediate",
+              reason_refs=[leaf_ref(leaf)], initial_state="draft")
+    elif scenario_name == "propose_action":
+        _seed(rt, "create_task", title="action-task-seed", task_type="immediate",
+              reason_refs=[leaf_ref(leaf)], initial_state="draft")
+        task = [
+            p for p in rt.store.list_payloads(object_type=ObjectType.TASK, subject_id=SUBJECT)
+            if p.get("title") == "action-task-seed"
+        ][0]
+        task_ref = ref(task)
+        # Propose an external Action only for a RUNNING, non-world-evidence Task.
+        _seed(rt, "transition_task", task_ref=task_ref, new_state="ready",
+              reason="seed ready", evidence_refs=[leaf_ref(leaf)])
+        ready = rt.store.get_payload(task_ref["object_id"])
+        _seed(rt, "transition_task", task_ref=ref(ready), new_state="running",
+              reason="seed running", evidence_refs=[leaf_ref(leaf)])
+    elif scenario_name in {"revise_claim", "retract_claim"}:
+        content = f"{scenario_name}-seed"
+        _seed(rt, "commit_claim", content=content, evidence_refs=[leaf_ref(leaf)],
+              confidence=0.5, dimension="dim:corrective001")
+    elif scenario_name == "transition_event":
+        _seed(rt, "form_event", title="transition-event-seed", interpretation="seed event",
+              event_time=TemporalExtent.point(T - timedelta(hours=3)).model_dump(mode="json"),
+              evidence_refs=[leaf_ref(leaf)], confidence=0.5)
+    elif scenario_name in {"update_cognitive_policy", "rollback_cognitive_policy"}:
+        policy_id = f"{scenario_name.split('_')[0]}-policy-seed"
+        _seed(rt, "propose_cognitive_policy", policy_id=policy_id, scope="local",
+              default_value=1, current_value=1, reason="seed policy",
+              evidence_refs=[leaf_ref(leaf)], evaluation_window="7d")
+        if scenario_name == "rollback_cognitive_policy":
+            _seed(rt, "update_cognitive_policy", policy_id=policy_id, current_value=2,
+                  reason="seed policy update", evidence_refs=[leaf_ref(leaf)])
+    else:  # pragma: no cover - guard against an unseeded new scenario
+        raise AssertionError(f"no seeding rule for capability {scenario_name!r}")
+
+
+def apply_scenario(
+    db: Path, scenario: Scenario
+) -> tuple[FusedTurnRuntime, dict[str, Any], Any]:
+    """Seed prerequisites and apply the capability once, durably."""
+    rt = new_runtime(db)
+    seed_reality_leaf(rt.store, LEAF)
+    seed_reality_leaf(rt.store, OTHER_LEAF)
+    seed_for(scenario.name, rt)
+    arguments = scenario.prepare(rt)
+    result = invoke(rt, scenario.name, arguments)
+    assert result.ok, (
+        f"{scenario.name} first application failed: "
+        f"{result.error_code} {result.error_message}"
+    )
+    return rt, arguments, result.data
+
+
+# --------------------------------------------------------------------------- #
+# exact identical recovery replay
+# --------------------------------------------------------------------------- #
+@pytest.mark.parametrize("scenario_name", sorted(SCENARIO_BY_NAME))
+def test_exact_recovery_replay_converges_without_duplicate_durable_effect(tmp_path, scenario_name):
+    scenario = SCENARIO_BY_NAME[scenario_name]
+    db = tmp_path / "world.db"
+    rt, arguments, _first = apply_scenario(db, scenario)
+
+    # The crash window: an unrelated World revision lands after the side effect.
+    advance_world(db, scenario_name)
+    revision_after_advance = int(world(db)[0].current_world_revision())
+    state_after_advance = durable_state(db)
+
+    # Baselines are taken AFTER the unrelated advance so that only the replay
+    # itself can account for any difference.
+    identity_before = (
+        object_revisions(db, scenario.identity) if scenario.identity is not None else None
+    )
+    operations_before = operation_rows(db)
+    idempotency_before = idempotency_rows(db)
+
+    # Fresh process, identical recovered capability call, identical write time.
+    fresh = new_runtime(db)
+    replay = invoke(fresh, scenario_name, arguments, call_id="corrective-replay")
+
+    assert replay.ok, (
+        f"{scenario_name}: identical recovered replay must converge, got "
+        f"{replay.error_code}: {replay.error_message}"
+    )
+    assert durable_state(db) == state_after_advance, (
+        f"{scenario_name}: identical replay created or mutated durable state"
+    )
+    assert int(fresh.store.current_world_revision()) == revision_after_advance, (
+        f"{scenario_name}: identical replay advanced the World revision"
+    )
+    assert operation_rows(db) == operations_before, (
+        f"{scenario_name}: identical replay added or changed an operation row"
+    )
+    assert idempotency_rows(db) == idempotency_before, (
+        f"{scenario_name}: identical replay changed the idempotency record"
+    )
+    if scenario.identity is not None:
+        assert object_revisions(db, scenario.identity) == identity_before, (
+            f"{scenario_name}: identical replay produced a second durable revision"
+        )
+
+
+# --------------------------------------------------------------------------- #
+# changed / conflicting replay must stay fail closed
+# --------------------------------------------------------------------------- #
+def _primary_id(data: Any, path: Sequence[str]) -> str:
+    node = data
+    for part in path:
+        node = node[part]
+    return str(node)
+
+
+@pytest.mark.parametrize(
+    "scenario_name",
+    sorted(name for name in SCENARIO_BY_NAME if SCENARIO_BY_NAME[name].conflicts),
+)
+def test_changed_request_under_same_key_fails_closed(tmp_path, scenario_name):
+    """Same durable idempotency key + changed request => fail closed, no write."""
+    scenario = SCENARIO_BY_NAME[scenario_name]
+    db = tmp_path / "world.db"
+    _rt, arguments, _first = apply_scenario(db, scenario)
+    advance_world(db, f"{scenario_name}-conflict")
+    state_before = durable_state(db)
+
+    for label, mutation in scenario.conflicts:
+        changed = mutation(dict(arguments))
+        assert changed != arguments, f"{scenario_name}/{label}: mutation is a no-op"
+        fresh = new_runtime(db)
+        result = invoke(fresh, scenario_name, changed, call_id=f"conflict-{label}")
+        assert not result.ok, (
+            f"{scenario_name}/{label}: a changed request under the same idempotency "
+            f"key must fail closed, but reported success {result.data!r}"
+        )
+        assert durable_state(db) == state_before, (
+            f"{scenario_name}/{label}: a rejected replay still wrote durable state"
+        )
+
+
+@pytest.mark.parametrize(
+    "scenario_name",
+    sorted(name for name in SCENARIO_BY_NAME if SCENARIO_BY_NAME[name].identity_shifts),
+)
+def test_identity_changing_request_is_never_conflated_with_the_original(tmp_path, scenario_name):
+    """A request that changes the deterministic object id is a different object.
+
+    It must never be reported as, or silently overwrite, the original durable
+    object produced by the first application.
+    """
+    scenario = SCENARIO_BY_NAME[scenario_name]
+    db = tmp_path / "world.db"
+    _rt, arguments, first_data = apply_scenario(db, scenario)
+    original_id = _primary_id(first_data, scenario.primary)
+    original_digests = object_digests(db, scenario.identity)
+
+    advance_world(db, f"{scenario_name}-identity")
+
+    for label, mutation in scenario.identity_shifts:
+        changed = mutation(dict(arguments))
+        assert changed != arguments, f"{scenario_name}/{label}: mutation is a no-op"
+        # Captured per iteration: an earlier identity shift legitimately creates
+        # its own distinct durable object, which must not be attributed to this one.
+        state_before_attempt = durable_state(db)
+        digests_before_attempt = object_digests(db, scenario.identity)
+        fresh = new_runtime(db)
+        result = invoke(fresh, scenario_name, changed, call_id=f"identity-{label}")
+        digests_after = object_digests(db, scenario.identity)
+        overwritten = {
+            key: (before, digests_after.get(key))
+            for key, before in original_digests.items()
+            if digests_after.get(key) != before
+        }
+        assert not overwritten, (
+            f"{scenario_name}/{label}: the original durable object was overwritten: "
+            f"{sorted(overwritten)[:2]}"
+        )
+        if result.ok:
+            new_identity = set(digests_after) - set(digests_before_attempt)
+            assert new_identity, (
+                f"{scenario_name}/{label}: success was reported without any new "
+                "durable identity, i.e. the original object was silently reused"
+            )
+            returned_id = _primary_id(result.data, scenario.primary)
+            if returned_id == original_id:
+                # Revise/upsert families legitimately keep the object id and add
+                # a revision; what must never happen is reusing the original
+                # revision as if the changed request had already been applied.
+                assert any(oid == original_id for oid, _rev in new_identity), (
+                    f"{scenario_name}/{label}: a changed request was reported as the "
+                    f"original durable object {original_id} without a new revision"
+                )
+        else:
+            # A rejection is acceptable here; silently reusing the original is not.
+            assert durable_state(db) == state_before_attempt, (
+                f"{scenario_name}/{label}: a rejected request still wrote durable state"
+            )

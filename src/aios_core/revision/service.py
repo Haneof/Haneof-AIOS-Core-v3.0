@@ -27,8 +27,11 @@ from aios_core.contracts.refs import ObjectRef
 from aios_core.contracts.time import KnowledgeWindow, TemporalExtent, as_utc
 from aios_core.policy.evidence import CognitionEvidencePolicy
 from aios_core.query.search import WorldSearchIndex
-from aios_core.storage.idempotency import canonical_json_dumps
-from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.storage.idempotency import (
+    canonical_json_dumps,
+    canonical_request_identity,
+)
+from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
 from .propagation import plan_invalidation
 
@@ -144,6 +147,83 @@ class CognitionRevisionService:
         )
         if old_payload.get("object_type") != ObjectType.CLAIM.value:
             raise ValueError("target_ref must point to a Claim")
+
+        # The operation identity is derived from the PINNED target revision only,
+        # so an identical recovered replay keeps the original durable identity even
+        # though the first application already advanced the current revision. This
+        # probe must run before the "only the current revision" guard below, which
+        # is exactly the guard a legitimate replay would otherwise trip.
+        operation_key = _stable_id(
+            "revision",
+            target.object_id,
+            target.revision,
+            request.mode,
+            changed.isoformat(),
+        )
+        operation = OperationRequest(
+            operation_id=f"op_{operation_key}",
+            operation_name=f"cognition.{request.mode}_claim",
+            arguments={
+                "target": {
+                    "object_id": target.object_id,
+                    "revision": target.revision,
+                },
+                "mode": request.mode,
+                "reason": request.reason,
+                # `stale_count` is derived from the CURRENT dependency graph, so it
+                # must not enter the fingerprinted arguments: the complete
+                # canonical request carries request identity instead.
+                "canonical_request_sha256": canonical_request_identity(
+                    f"cognition.{request.mode}_claim",
+                    request.model_dump(mode="json"),
+                    changed.isoformat(),
+                ),
+            },
+            expected_world_revision=current_world_revision,
+            reason=(
+                f"forward-only Claim {request.mode} with dependency propagation"
+            ),
+            idempotency_key=f"cognition-revision:{operation_key}",
+            source_class=SourceClass.AI_COGNITION,
+        )
+        replay = self.store.replay_exact_operation(operation)
+        if replay is not None:
+            if self.index is not None:
+                self.index.catch_up()
+            marker = target.model_dump(mode="json")
+            replayed_stale: list[tuple[str, int]] = []
+            for object_id, revision in replay.object_refs:
+                if str(object_id) == target.object_id or int(revision) < 2:
+                    continue
+                try:
+                    raw = self.store.get_payload(str(object_id), revision=int(revision))
+                except StoreError:
+                    continue
+                markers = list((raw.get("metadata") or {}).get("stale_due_to_refs") or [])
+                if marker in markers:
+                    replayed_stale.append((str(object_id), int(revision) - 1))
+            # `skipped_already_advanced_refs` reports refs the propagation planner
+            # deliberately did NOT write, so there is no durable trace of it. An
+            # exact replay performs no planning and reports none.
+            return ClaimRevisionReceipt(
+                claim_id=target.object_id,
+                previous_revision=int(target.revision),
+                new_revision=int(target.revision) + 1,
+                mode=request.mode,
+                evidence_set_id=_stable_id(
+                    "evs_revision",
+                    target.object_id,
+                    target.revision,
+                    request.mode,
+                    tuple(
+                        (ref.object_id, ref.revision) for ref in request.evidence_refs
+                    ),
+                    changed.isoformat(),
+                ),
+                stale_refs=tuple(replayed_stale),
+                skipped_already_advanced_refs=(),
+                world_revision=replay.world_revision,
+            )
 
         latest_payload = self.store.get_payload(target.object_id)
         if int(latest_payload["revision"]) != int(target.revision):
@@ -438,35 +518,7 @@ class CognitionRevisionService:
         stale_refs = invalidation.stale_refs
         skipped = invalidation.skipped_refs
 
-        operation_key = _stable_id(
-            "revision",
-            target.object_id,
-            target.revision,
-            request.mode,
-            changed.isoformat(),
-        )
-        result = self.store.commit(
-            objects,
-            OperationRequest(
-                operation_id=f"op_{operation_key}",
-                operation_name=f"cognition.{request.mode}_claim",
-                arguments={
-                    "target": {
-                        "object_id": target.object_id,
-                        "revision": target.revision,
-                    },
-                    "mode": request.mode,
-                    "reason": request.reason,
-                    "stale_count": len(stale_refs),
-                },
-                expected_world_revision=current_world_revision,
-                reason=(
-                    f"forward-only Claim {request.mode} with dependency propagation"
-                ),
-                idempotency_key=f"cognition-revision:{operation_key}",
-                source_class=SourceClass.AI_COGNITION,
-            ),
-        )
+        result = self.store.commit(objects, operation)
         if self.index is not None:
             self.index.catch_up()
 
