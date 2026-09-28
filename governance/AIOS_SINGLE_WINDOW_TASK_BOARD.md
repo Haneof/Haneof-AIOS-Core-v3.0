@@ -3,7 +3,7 @@
 ## Governance review lane — 2026-09-28 RESIDENT PERSONA CONTINUITY
 
 - **`C15-RCC-RESIDENT-PERSONA-CONTINUITY-RULE-001 = REVIEW_READY / GOVERNANCE-ONLY`**. Product invariant: the user-facing AI is the long-lived Resident, not the provider/model. Any legal provider/model/API-key route must present the same Resident identity/persona; model replacement alone may not reset attitude, relationship posture, communication style, boundaries, or stable behavioral habits.
-- Candidate ruling: `governance/C15_RCC_RESIDENT_PERSONA_CONTINUITY_RULING_2026-09-28.md`.
+- Governance candidate: **PR #263** (`governance/c15-resident-persona-continuity-20260928`, DRAFT / OPEN / UNMERGED). Ruling: `governance/C15_RCC_RESIDENT_PERSONA_CONTINUITY_RULING_2026-09-28.md`.
 - Independent review prompt: `governance/prompts/C15_RCC_RESIDENT_PERSONA_CONTINUITY_INDEPENDENT_REVIEW_2026-09-28.md`.
 - This lane **does not interrupt** the unique engineering READY task `CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001-CORRECTIVE-001` and authorizes **no Core changes**.
 - Before Resident C / `C15-RCC-EVAL-001` / `C15-RCC-CLOSE-001`, this governance clarification must be independently accepted and integrated. Then a read-only `C15-RCC-PERSONA-CONTINUITY-PREFLIGHT-001` must classify current-main mechanisms as `ALREADY_IMPLEMENTED` / `MECHANISM_GAP` / `INSUFFICIENT_EVIDENCE` before any implementation task is created.
