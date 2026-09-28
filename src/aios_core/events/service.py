@@ -21,7 +21,10 @@ from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import KnowledgeWindow, TemporalExtent, as_utc
 from aios_core.revision.propagation import plan_invalidation
 from aios_core.query.search import WorldSearchIndex
-from aios_core.storage.idempotency import canonical_json_dumps
+from aios_core.storage.idempotency import (
+    canonical_json_dumps,
+    canonical_request_identity,
+)
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 
 EVENT_DIMENSION = "dim:events"
@@ -280,11 +283,23 @@ class EventDimensionService:
         )
         event_ref = ObjectRef(object_id=event_id, revision=1)
         objects = [evidence, event, *self._deps(event_ref=event_ref, evidence=evidence, source_refs=refs, at=learned)]
-        result = self.store.commit(
+        result = self.store.commit_or_replay(
             objects,
             OperationRequest(
                 operation_name="event.form",
-                arguments={"event_id": event_id, "title": event.title, "dimension": request.dimension},
+                arguments={
+                    "event_id": event_id,
+                    "title": event.title,
+                    "dimension": request.dimension,
+                    # event_id derives from title/time/evidence only, so the
+                    # complete canonical request is what separates an identical
+                    # recovered replay from a changed event with the same title.
+                    "canonical_request_sha256": canonical_request_identity(
+                        "event.form",
+                        request.model_dump(mode="json"),
+                        learned.isoformat(),
+                    ),
+                },
                 expected_world_revision=int(self.store.current_world_revision()),
                 reason="resident AI formed evidence-grounded Event candidate",
                 idempotency_key=f"event-form:{event_id}:1",
@@ -299,6 +314,49 @@ class EventDimensionService:
         changed = as_utc(changed_at, "changed_at")
         expected_world_revision = int(self.store.current_world_revision())
         payload = self.store.get_payload(request.event_ref.object_id, revision=request.event_ref.revision)
+        # Resolve the durable operation identity from the PINNED revision only, so
+        # an identical recovered replay keeps the original identity even though the
+        # first application already advanced the current revision.
+        replay_revision = int(payload["revision"]) + 1
+        replay_target = EventStatus(request.new_status)
+        operation = OperationRequest(
+            operation_name="event.transition",
+            arguments={
+                "event_id": request.event_ref.object_id,
+                "from": str(payload.get("event_status") or ""),
+                "to": replay_target.value,
+                "canonical_request_sha256": canonical_request_identity(
+                    "event.transition",
+                    request.model_dump(mode="json"),
+                    changed.isoformat(),
+                ),
+            },
+            expected_world_revision=expected_world_revision,
+            reason=request.reason.strip(),
+            idempotency_key=(
+                f"event-transition:{request.event_ref.object_id}:"
+                f"{replay_revision}:{replay_target.value}"
+            ),
+            source_class=SourceClass.AI_COGNITION,
+        )
+        replay = self.store.replay_exact_operation(operation)
+        if replay is not None:
+            if self.index is not None:
+                self.index.catch_up()
+            replay_refs = tuple(request.evidence_refs)
+            return EventTransitionReceipt(
+                event_id=request.event_ref.object_id,
+                previous_revision=int(payload["revision"]),
+                new_revision=replay_revision,
+                previous_status=str(payload.get("event_status") or ""),
+                new_status=replay_target.value,
+                evidence_set_id=_stable_id(
+                    "evs_event", request.event_ref.object_id, replay_revision,
+                    tuple((r.object_id, r.revision) for r in replay_refs),
+                    changed.isoformat(),
+                ),
+                world_revision=replay.world_revision,
+            )
         latest = self.store.get_payload(request.event_ref.object_id)
         if int(latest["revision"]) != int(request.event_ref.revision or 0):
             raise ValueError("only the current Event revision may transition")
@@ -368,21 +426,7 @@ class EventDimensionService:
             reason=f"Event {current.object_id}@{current.revision} transitioned to {request.new_status.value}: {request.reason.strip()}",
             subject_ids=self.propagation_subject_ids,
         )
-        result = self.store.commit(
-            [evidence, new_event, *deps, *invalidation.objects],
-            OperationRequest(
-                operation_name="event.transition",
-                arguments={
-                    "event_id": current.object_id,
-                    "from": current.event_status.value,
-                    "to": request.new_status.value,
-                },
-                expected_world_revision=expected_world_revision,
-                reason=request.reason.strip(),
-                idempotency_key=f"event-transition:{current.object_id}:{new_revision}:{request.new_status.value}",
-                source_class=SourceClass.AI_COGNITION,
-            ),
-        )
+        result = self.store.commit([evidence, new_event, *deps, *invalidation.objects], operation)
         if self.index is not None:
             self.index.catch_up()
         return EventTransitionReceipt(

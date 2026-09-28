@@ -16,6 +16,7 @@ from typing import Any, Mapping, Sequence
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from aios_core.contracts.enums import (
+    ErrorCode,
     DimensionLifecycle,
     MaintenanceClass,
     ObjectType,
@@ -32,8 +33,11 @@ from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import KnowledgeWindow, TemporalExtent, as_utc
 from aios_core.query.search import WorldSearchIndex
-from aios_core.storage.idempotency import canonical_json_dumps
-from aios_core.storage.sqlite_store import SQLiteWorldStore
+from aios_core.storage.idempotency import (
+    canonical_json_dumps,
+    canonical_request_identity,
+)
+from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
 
 _TERMINAL = {
@@ -293,12 +297,59 @@ class DimensionRegistryService:
     ) -> DimensionProposalReceipt:
         proposed = as_utc(proposed_at, "proposed_at")
         key = request.dimension_key.strip()
+        dimension_id = _stable_id("dimdef", self.subject_id, key)
+        operation = OperationRequest(
+            operation_name="dimension.propose",
+            arguments={
+                "dimension_key": key,
+                "lifecycle": DimensionLifecycle.CANDIDATE.value,
+                # dimension_id derives from the dimension key alone, so the
+                # complete canonical request is what separates an identical
+                # recovered replay from a changed proposal of the same key.
+                "canonical_request_sha256": canonical_request_identity(
+                    "dimension.propose",
+                    request.model_dump(mode="json"),
+                    proposed.isoformat(),
+                ),
+            },
+            expected_world_revision=int(self.store.current_world_revision()),
+            reason="resident AI proposed a new evidence-grounded observation axis",
+            idempotency_key=f"dimension-proposal:{dimension_id}:1",
+            source_class=SourceClass.AI_COGNITION,
+        )
+        # A different proposal of a dimension key that already exists keeps
+        # raising the domain error below rather than the storage-level conflict,
+        # so the proposal contract is unchanged. Only a genuine request conflict
+        # is swallowed here; corrupt or skewed durable state still fails closed.
+        try:
+            replay = self.store.replay_exact_operation(operation)
+        except StoreError as exc:
+            if exc.code is not ErrorCode.IDEMPOTENCY_CONFLICT:
+                raise
+            replay = None
+        if replay is not None:
+            if self.index is not None:
+                self.index.catch_up()
+            return DimensionProposalReceipt(
+                dimension_id=dimension_id,
+                dimension_key=key,
+                lifecycle=DimensionLifecycle.CANDIDATE.value,
+                evidence_set_id=_stable_id(
+                    "evs_dim",
+                    f"support dimension proposal {key}",
+                    tuple(
+                        (r.object_id, r.revision) for r in request.evidence_refs
+                    ),
+                    proposed.isoformat(),
+                ),
+                derivation_id=_stable_id("dimder", dimension_id, 1),
+                world_revision=replay.world_revision,
+            )
         if self.find_by_key(key) is not None:
             raise ValueError(f"dimension_key already exists: {key}")
 
         self._validate_refs_exist(request.evidence_refs)
 
-        dimension_id = _stable_id("dimdef", self.subject_id, key)
         evidence = self._evidence_set(
             purpose=f"support dimension proposal {key}",
             refs=request.evidence_refs,
@@ -411,20 +462,9 @@ class DimensionRegistryService:
                 )
             )
 
-        current = int(self.store.current_world_revision())
         result = self.store.commit(
             [evidence, definition, derivation, *dependencies],
-            OperationRequest(
-                operation_name="dimension.propose",
-                arguments={
-                    "dimension_key": key,
-                    "lifecycle": DimensionLifecycle.CANDIDATE.value,
-                },
-                expected_world_revision=current,
-                reason="resident AI proposed a new evidence-grounded observation axis",
-                idempotency_key=f"dimension-proposal:{dimension_id}:1",
-                source_class=SourceClass.AI_COGNITION,
-            ),
+            operation,
         )
         if self.index is not None:
             self.index.catch_up()
@@ -452,6 +492,60 @@ class DimensionRegistryService:
         if payload.get("object_type") != ObjectType.DIMENSION_DEFINITION.value:
             raise ValueError("dimension_ref must point to DimensionDefinition")
 
+        # Resolve the durable operation identity from the PINNED revision only,
+        # so an identical recovered replay keeps the original identity even
+        # though the first application already advanced the current revision.
+        replay_revision = int(payload["revision"]) + 1
+        replay_target = DimensionLifecycle(request.new_lifecycle)
+        operation = OperationRequest(
+            operation_name="dimension.transition",
+            arguments={
+                "dimension_key": str(
+                    (payload.get("metadata") or {}).get("dimension_key") or ""
+                ),
+                "from": str(payload.get("lifecycle") or ""),
+                "to": replay_target.value,
+                "canonical_request_sha256": canonical_request_identity(
+                    "dimension.transition",
+                    request.model_dump(mode="json"),
+                    changed.isoformat(),
+                ),
+            },
+            expected_world_revision=int(self.store.current_world_revision()),
+            reason=request.reason.strip(),
+            idempotency_key=(
+                f"dimension-transition:{request.dimension_ref.object_id}:"
+                f"{replay_revision}:{replay_target.value}"
+            ),
+            source_class=SourceClass.AI_COGNITION,
+        )
+        replay = self.store.replay_exact_operation(operation)
+        if replay is not None:
+            if self.index is not None:
+                self.index.catch_up()
+            replay_key = str(
+                (payload.get("metadata") or {}).get("dimension_key") or ""
+            )
+            replay_from = str(payload.get("lifecycle") or "")
+            return DimensionTransitionReceipt(
+                dimension_id=request.dimension_ref.object_id,
+                previous_revision=int(payload["revision"]),
+                new_revision=replay_revision,
+                previous_lifecycle=replay_from,
+                new_lifecycle=replay_target.value,
+                evidence_set_id=_stable_id(
+                    "evs_dim",
+                    (
+                        f"support dimension transition {replay_key}: "
+                        f"{replay_from}->{replay_target.value}"
+                    ),
+                    tuple(
+                        (r.object_id, r.revision) for r in request.evidence_refs
+                    ),
+                    changed.isoformat(),
+                ),
+                world_revision=replay.world_revision,
+            )
         current_payload = self.store.get_payload(request.dimension_ref.object_id)
         if int(current_payload["revision"]) != int(request.dimension_ref.revision):
             raise ValueError("only the current DimensionDefinition revision may transition")
@@ -573,24 +667,9 @@ class DimensionRegistryService:
                 )
             )
 
-        current_world_revision = int(self.store.current_world_revision())
         result = self.store.commit(
             [evidence, new_definition, *dependencies],
-            OperationRequest(
-                operation_name="dimension.transition",
-                arguments={
-                    "dimension_key": key,
-                    "from": current.lifecycle.value,
-                    "to": target.value,
-                },
-                expected_world_revision=current_world_revision,
-                reason=request.reason.strip(),
-                idempotency_key=(
-                    f"dimension-transition:{new_definition.object_id}:"
-                    f"{new_revision}:{target.value}"
-                ),
-                source_class=SourceClass.AI_COGNITION,
-            ),
+            operation,
         )
         if self.index is not None:
             self.index.catch_up()

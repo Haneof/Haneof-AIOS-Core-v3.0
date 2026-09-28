@@ -26,7 +26,10 @@ from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import KnowledgeWindow, TemporalExtent, as_utc
 from aios_core.query.search import WorldSearchIndex
-from aios_core.storage.idempotency import canonical_json_dumps
+from aios_core.storage.idempotency import (
+    canonical_json_dumps,
+    canonical_request_identity,
+)
 from aios_core.storage.sqlite_store import SQLiteWorldStore, StoreError
 
 ENTITY_DIMENSION = "dim:entities"
@@ -304,6 +307,40 @@ class EntityRelationService:
     ) -> EntityReceipt:
         proposed = as_utc(proposed_at, "proposed_at")
         key = request.entity_key.strip()
+        entity_id = _stable_id("entity", self.subject_id, key)
+        operation = OperationRequest(
+            operation_name="world_graph.propose_entity",
+            arguments={
+                "entity_id": entity_id,
+                "entity_key": key,
+                # entity_id derives from the entity key alone, so the complete
+                # canonical request is what separates an identical recovered
+                # replay from a changed proposal of the same key.
+                "canonical_request_sha256": canonical_request_identity(
+                    "world_graph.propose_entity",
+                    request.model_dump(mode="json"),
+                    proposed.isoformat(),
+                ),
+            },
+            expected_world_revision=int(self.store.current_world_revision()),
+            reason=f"resident AI proposed entity {key}",
+            idempotency_key=f"entity-propose:{entity_id}:1",
+            source_class=SourceClass.AI_COGNITION,
+        )
+        # A different proposal of an entity key that already exists keeps raising
+        # the domain error below rather than the storage-level conflict, so the
+        # proposal contract is unchanged. Only a genuine request conflict is
+        # swallowed here; corrupt or skewed durable state still fails closed.
+        try:
+            replay = self.store.replay_exact_operation(operation)
+        except StoreError as exc:
+            if exc.code is not ErrorCode.IDEMPOTENCY_CONFLICT:
+                raise
+            replay = None
+        if replay is not None:
+            if self.index is not None:
+                self.index.catch_up()
+            return EntityReceipt(entity_id, 1, key, replay.world_revision)
         if self.find_entity_by_key(key) is not None:
             raise ValueError(f"entity_key already exists: {key}")
         self._validate_evidence(
@@ -312,7 +349,6 @@ class EntityRelationService:
         for ref in request.identity_claim_refs:
             self._validate_ref(ref, object_type=ObjectType.CLAIM)
 
-        entity_id = _stable_id("entity", self.subject_id, key)
         evidence = self._evidence_set(
             purpose=f"support entity proposal {key}",
             refs=request.evidence_refs,
@@ -361,17 +397,7 @@ class EntityRelationService:
                 prefix="entity",
             ),
         ]
-        result = self.store.commit(
-            objects,
-            OperationRequest(
-                operation_name="world_graph.propose_entity",
-                arguments={"entity_id": entity_id, "entity_key": key},
-                expected_world_revision=int(self.store.current_world_revision()),
-                reason=f"resident AI proposed entity {key}",
-                idempotency_key=f"entity-propose:{entity_id}:1",
-                source_class=SourceClass.AI_COGNITION,
-            ),
-        )
+        result = self.store.commit(objects, operation)
         if self.index is not None:
             self.index.catch_up()
         return EntityReceipt(entity_id, 1, key, result.world_revision)
@@ -383,6 +409,44 @@ class EntityRelationService:
         changed_at: datetime,
     ) -> EntityReceipt:
         changed = as_utc(changed_at, "changed_at")
+        # Resolve the durable operation identity from the PINNED entity revision
+        # only, so an identical recovered replay keeps the original identity even
+        # though the first application already advanced the current revision.
+        pinned = self.store.get_payload(
+            request.entity_ref.object_id,
+            revision=request.entity_ref.revision,
+        )
+        if pinned.get("object_type") != ObjectType.ENTITY.value:
+            raise ValueError("entity_ref must point to an Entity")
+        replay_revision = int(pinned["revision"]) + 1
+        operation = OperationRequest(
+            operation_name="world_graph.revise_entity",
+            arguments={
+                "entity_id": request.entity_ref.object_id,
+                "revision": replay_revision,
+                "canonical_request_sha256": canonical_request_identity(
+                    "world_graph.revise_entity",
+                    request.model_dump(mode="json"),
+                    changed.isoformat(),
+                ),
+            },
+            expected_world_revision=int(self.store.current_world_revision()),
+            reason=request.reason.strip(),
+            idempotency_key=(
+                f"entity-revise:{request.entity_ref.object_id}:{replay_revision}"
+            ),
+            source_class=SourceClass.AI_COGNITION,
+        )
+        replay = self.store.replay_exact_operation(operation)
+        if replay is not None:
+            if self.index is not None:
+                self.index.catch_up()
+            return EntityReceipt(
+                request.entity_ref.object_id,
+                replay_revision,
+                str(pinned.get("metadata", {}).get("entity_key") or ""),
+                replay.world_revision,
+            )
         payload = self._validate_ref(
             request.entity_ref,
             object_type=ObjectType.ENTITY,
@@ -459,17 +523,7 @@ class EntityRelationService:
                     prefix="entity_revision",
                 ),
             ],
-            OperationRequest(
-                operation_name="world_graph.revise_entity",
-                arguments={
-                    "entity_id": revised.object_id,
-                    "revision": revision,
-                },
-                expected_world_revision=int(self.store.current_world_revision()),
-                reason=request.reason.strip(),
-                idempotency_key=f"entity-revise:{revised.object_id}:{revision}",
-                source_class=SourceClass.AI_COGNITION,
-            ),
+            operation,
         )
         if self.index is not None:
             self.index.catch_up()
@@ -519,6 +573,44 @@ class EntityRelationService:
                 raise ValueError("relation identity collides across subject scope")
 
         revision = 1 if current is None else current.revision + 1
+        # An upsert has no request-independent operation identity: the target
+        # revision is derived from mutable world state, so an identical recovered
+        # replay would otherwise compute the NEXT revision and silently write a
+        # second durable relation revision. The durable operation identity is
+        # therefore derived from the canonical request itself.
+        operation = OperationRequest(
+            operation_name="world_graph.upsert_relation",
+            arguments={
+                "relation_id": relation_id,
+                "relation_type": relation_type,
+                # The target revision is deliberately absent: it is derived from
+                # mutable world state, so including it would make an identical
+                # recovered replay look like a different request.
+                "canonical_request_sha256": canonical_request_identity(
+                    "world_graph.upsert_relation",
+                    request.model_dump(mode="json"),
+                    changed.isoformat(),
+                ),
+            },
+            expected_world_revision=int(self.store.current_world_revision()),
+            reason=request.reason.strip(),
+            idempotency_key=(
+                f"relation-upsert:{relation_id}:"
+                f"{canonical_request_identity(relation_id, request.model_dump(mode='json'), changed.isoformat())[:24]}"
+            ),
+            source_class=SourceClass.AI_COGNITION,
+        )
+        replay = self.store.replay_exact_operation(operation)
+        if replay is not None:
+            if self.index is not None:
+                self.index.catch_up()
+            replayed = self.store.get_payload(relation_id)
+            return RelationReceipt(
+                relation_id,
+                int(replayed["revision"]),
+                replay.world_revision,
+                reused_existing=True,
+            )
         evidence = self._evidence_set(
             purpose=f"support relation {relation_id}@{revision}",
             refs=request.evidence_refs,
@@ -585,21 +677,7 @@ class EntityRelationService:
                 )
             )
 
-        result = self.store.commit(
-            [evidence, relation, *deps],
-            OperationRequest(
-                operation_name="world_graph.upsert_relation",
-                arguments={
-                    "relation_id": relation_id,
-                    "revision": revision,
-                    "relation_type": relation_type,
-                },
-                expected_world_revision=int(self.store.current_world_revision()),
-                reason=request.reason.strip(),
-                idempotency_key=f"relation-upsert:{relation_id}:{revision}",
-                source_class=SourceClass.AI_COGNITION,
-            ),
-        )
+        result = self.store.commit([evidence, relation, *deps], operation)
         if self.index is not None:
             self.index.catch_up()
         return RelationReceipt(

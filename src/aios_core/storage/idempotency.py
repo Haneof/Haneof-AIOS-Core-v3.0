@@ -549,6 +549,25 @@ def _semantic_object_entries(objects: Iterable[WorldObject]) -> list[dict[str, A
     return entries
 
 
+def canonical_request_identity(*parts: Any) -> str:
+    """Deterministic SHA-256 identity of one logical durable service request.
+
+    Durable object ids are frequently derived from only *part* of a request (for
+    example an entity id derives from the entity key alone), and some operation
+    keys are derived from mutable world state. Either way the idempotency key
+    alone cannot prove that a recovered invocation carries the same request.
+
+    Services therefore fold the complete canonical request into this digest and
+    publish it inside ``OperationRequest.arguments``, so the existing exact
+    ``request_fingerprint`` verifier compares the whole logical request without
+    any component of that fingerprint being weakened or removed.
+    """
+
+    return hashlib.sha256(
+        canonical_json_dumps(list(parts)).encode("utf-8")
+    ).hexdigest()
+
+
 def request_fingerprint(
     operation: OperationRequest,
     objects: Iterable[WorldObject],

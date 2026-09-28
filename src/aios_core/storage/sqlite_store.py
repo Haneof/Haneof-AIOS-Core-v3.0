@@ -13,6 +13,7 @@ from aios_core.contracts.base import WorldObject
 from aios_core.contracts.enums import ErrorCode, ObjectType
 from aios_core.contracts.models import Dependency, EvidenceSet
 from aios_core.contracts.operations import CommitResult, OperationRequest
+from aios_core.contracts.registry import canonical_model_for_object_type
 from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import as_utc, canonical_utc_iso, utc_now
 from aios_core.dependency import validate_dependency_graph_acyclic
@@ -1562,6 +1563,183 @@ class SQLiteWorldStore:
                 (idempotency_key,),
             ).fetchone()
             return None if row is None else dict(row)
+
+    def _replay_failure(
+        self,
+        *,
+        idempotency_key: str,
+        reason: str,
+        message: str,
+        operation_id: str,
+    ) -> StoreError:
+        return StoreError(
+            ErrorCode.STORAGE_FAILURE,
+            message,
+            context={
+                "idempotency_key": idempotency_key,
+                "operation_id": operation_id,
+                "reason": reason,
+            },
+        )
+
+    def _replay_objects(
+        self,
+        *,
+        idempotency_key: str,
+        operation_id: str,
+        object_refs: Sequence[tuple[str, int]],
+    ) -> list[WorldObject]:
+        """Reload the exact objects one durable operation originally committed."""
+
+        objects: list[WorldObject] = []
+        for object_id, revision in object_refs:
+            with self._connection() as conn:
+                row = conn.execute(
+                    "SELECT object_type, payload_json FROM object_revisions "
+                    "WHERE object_id=? AND revision=?",
+                    (object_id, int(revision)),
+                ).fetchone()
+            if row is None:
+                raise self._replay_failure(
+                    idempotency_key=idempotency_key,
+                    operation_id=operation_id,
+                    reason="replay_object_missing",
+                    message=(
+                        "durable replay state is incomplete: a committed object "
+                        f"revision is missing: {object_id}@{revision}"
+                    ),
+                )
+            payload = _decode_durable_object_json(
+                row["payload_json"],
+                reason="corrupt_replay_object_payload",
+            )
+            try:
+                model = canonical_model_for_object_type(
+                    ObjectType(str(row["object_type"]))
+                ).model_validate(payload)
+                objects.append(normalize_world_object_for_persistence(model))
+            except (ValidationError, ValueError, TypeError, KeyError) as exc:
+                raise self._replay_failure(
+                    idempotency_key=idempotency_key,
+                    operation_id=operation_id,
+                    reason="corrupt_replay_object",
+                    message=(
+                        "durable replay state is inconsistent: a committed object "
+                        f"revision cannot be revalidated: {object_id}@{revision}"
+                    ),
+                ) from exc
+        return objects
+
+    def replay_exact_operation(self, operation: OperationRequest) -> CommitResult | None:
+        """Return the durable result of an already-applied identical request.
+
+        ``None`` means no durable operation exists for this idempotency key, so the
+        caller proceeds with the ordinary first-application commit.
+
+        When a durable operation does exist, this restores the original operation
+        id and the original ``expected_world_revision`` and replays the *originally
+        committed* objects through the unchanged ``commit()`` request-fingerprint
+        verifier. Consequences:
+
+        * an identical logical request returns the original durable result with
+          ``idempotent_replay=True`` and writes nothing;
+        * any changed request produces a different fingerprint and raises
+          ``StoreError(IDEMPOTENCY_CONFLICT)`` -- fail closed;
+        * corrupt or skewed durable state raises ``StoreError`` -- fail closed.
+
+        Rebuilding the derived objects from *current* world state is deliberately
+        avoided: after the original effect advanced the world, a mechanically
+        identical request would otherwise derive a different durable identity and
+        be rejected. Request identity is instead carried by the caller in
+        ``operation.arguments`` and is compared by the existing verifier.
+
+        This lookup never authorizes a write and never widens ``commit()``.
+        """
+
+        try:
+            lookup_key = _normalize_idempotency_lookup_key(operation.idempotency_key)
+        except (ValidationError, ValueError, TypeError) as exc:
+            raise StoreError(
+                ErrorCode.INVALID_ARGUMENT,
+                "idempotency key failed persistence validation",
+                context={
+                    "operation_id": str(operation.operation_id),
+                    "reason": "idempotency_key_revalidation_failed",
+                },
+            ) from exc
+
+        with self._connection() as conn:
+            op_row = conn.execute(
+                "SELECT operation_id, expected_world_revision "
+                "FROM operations WHERE idempotency_key=?",
+                (lookup_key,),
+            ).fetchone()
+            if op_row is None:
+                return None
+            original_operation_id = str(op_row["operation_id"])
+            original_expected_revision = int(op_row["expected_world_revision"])
+            idem_row = conn.execute(
+                "SELECT operation_id, result_json FROM idempotency_records "
+                "WHERE idempotency_key=?",
+                (lookup_key,),
+            ).fetchone()
+
+        if idem_row is None or str(idem_row["operation_id"]) != original_operation_id:
+            raise self._replay_failure(
+                idempotency_key=lookup_key,
+                operation_id=original_operation_id,
+                reason="operation_idempotency_skew",
+                message=(
+                    "durable operation and idempotency records disagree; refusing "
+                    "to replay"
+                ),
+            )
+
+        data = _decode_durable_object_json(
+            idem_row["result_json"],
+            reason="corrupt_idempotency_result",
+        )
+        data.pop(_REQUEST_FINGERPRINT_KEY, None)
+        try:
+            original = CommitResult.model_validate(data)
+        except (ValidationError, TypeError, ValueError) as exc:
+            raise self._replay_failure(
+                idempotency_key=lookup_key,
+                operation_id=original_operation_id,
+                reason="corrupt_idempotency_result",
+                message="durable idempotency result cannot be revalidated",
+            ) from exc
+
+        replay_objects = self._replay_objects(
+            idempotency_key=lookup_key,
+            operation_id=original_operation_id,
+            object_refs=[(str(oid), int(rev)) for oid, rev in original.object_refs],
+        )
+        replay_operation = operation.model_copy(
+            update={
+                "operation_id": original_operation_id,
+                "expected_world_revision": original_expected_revision,
+            }
+        )
+        return self.commit(replay_objects, replay_operation)
+
+    def commit_or_replay(
+        self,
+        objects: Iterable[WorldObject],
+        operation: OperationRequest,
+    ) -> CommitResult:
+        """Commit, or replay the durable result of the identical prior request.
+
+        A narrow helper for durable services whose replay identity contract is the
+        durable operation record plus the exact request fingerprint: first
+        application commits normally, an identical recovered request replays the
+        original durable effect, and a changed request fails closed.
+        """
+
+        replay = self.replay_exact_operation(operation)
+        if replay is not None:
+            return replay
+        return self.commit(objects, operation)
 
     def operation_record(self, operation_id: str) -> dict:
         with self._connection() as conn:

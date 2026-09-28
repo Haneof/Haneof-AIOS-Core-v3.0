@@ -26,6 +26,40 @@ write. Nothing here weakens ``request_fingerprint``.
 
 The capability inventory is enumerated from ``FusedTurnRuntime.registry.catalog()``;
 the matrix guard test fails if the registry and this frozen matrix ever diverge.
+
+rev6 reclassification (three scenarios only)
+--------------------------------------------
+rev5 classified ``upsert_relation``, ``update_cognitive_policy`` and
+``rollback_cognitive_policy`` changed-field mutations as *same-key conflicts*.
+That expectation was derived from the pre-corrective key schemes, which embedded
+state-derived values: ``relation-upsert:{relation_id}:{revision}`` and
+``policy:{object_id}:{revision}``. Those schemes are themselves the blocker: a
+mechanically identical recovered replay derives a *different* revision after the
+first application, so it cannot share a key with the original and cannot converge.
+
+None of the three request contracts pins the revision being written
+(``RelationUpsertRequest``, ``CognitivePolicyUpdateRequest`` and the
+``rollback_cognitive_policy`` signature carry no pin for it -- verified against
+``src/aios_core/world_graph.py`` and ``src/aios_core/policy/service.py``). The
+corrective therefore keys these three operations on a SHA-256 digest of the
+complete canonical request. Consequence, proven mechanically and asserted below:
+
+  * an identical recovered replay reuses the original key, the original
+    ``operation_id`` and the original object revision -- R5-C convergence;
+  * a changed request yields a *different* key, so it is a distinct auditable
+    operation: the original operation row, idempotency record and object
+    revision stay untouched (identity-shift assertions). That is the
+    upsert / policy-version contract these capabilities already documented via
+    ``RelationReceipt.reused_existing`` and ``CognitivePolicy.previous_version``.
+
+A shared key holding a different request therefore cannot arise from these three
+capabilities. It remains a hard failure at the layer that owns it, and
+``test_core_background_trusted_return_corrective_001_store_fail_closed.py``
+proves it directly: changed request under an existing key, corrupt operation or
+idempotency rows, operation/idempotency skew, and reused operation identity all
+still fail closed. rev5 is preserved verbatim at
+``reviews/CORRECTIVE_001/evidence/probe_revisions/rev5_capability_replay.py.FROZEN_FINAL``;
+no other expectation in this matrix was altered.
 """
 from __future__ import annotations
 
@@ -707,12 +741,18 @@ SCENARIOS: tuple[Scenario, ...] = (
         identity=ObjectType.RELATION,
         family="revise",
         primary=("relation_id",),
-        conflicts=(
+        # RECLASSIFIED in rev6 -- see "rev6 reclassification" in the module
+        # docstring. `upsert_relation` takes no pinned relation revision, so its
+        # durable operation identity is the complete canonical request. A changed
+        # upsert is therefore a distinct operation with its own key, proven here by
+        # the identity-shift assertions (original never overwritten, new durable
+        # identity required). The shared-key fail-closed guarantee is proven
+        # directly at the store layer by
+        # test_core_background_trusted_return_corrective_001_store_fail_closed.py.
+        identity_shifts=(
             ("changed confidence", _mutate("confidence", 0.11)),
             ("changed reason", _mutate("reason", "different relation reason")),
             ("changed evidence", _mutate_evidence()),
-        ),
-        identity_shifts=(
             ("changed relation type", _mutate("relation_type", "part_of")),
             ("changed left endpoint", _mutate_ref_identity("left_ref")),
         ),
@@ -893,12 +933,17 @@ SCENARIOS: tuple[Scenario, ...] = (
         identity=ObjectType.COGNITIVE_POLICY,
         family="revise",
         primary=("object_id",),
-        conflicts=(
+        # RECLASSIFIED in rev6 -- `CognitivePolicyUpdateRequest` carries no pinned
+        # version (verified: policy_id / current_value / reason / evidence_refs /
+        # changed_by / evaluation_window only), so the state-derived
+        # `policy:{object_id}:{revision}` key was the defect that made an identical
+        # recovered replay mint a second policy version.
+        identity_shifts=(
             ("changed value", _mutate("current_value", 11)),
             ("changed reason", _mutate("reason", "different update reason")),
             ("changed evidence", _mutate_evidence()),
+            ("changed policy id", _mutate("policy_id", "other-policy")),
         ),
-        identity_shifts=(("changed policy id", _mutate("policy_id", "other-policy")),),
     ),
     Scenario(
         name="rollback_cognitive_policy",
@@ -906,11 +951,15 @@ SCENARIOS: tuple[Scenario, ...] = (
         identity=ObjectType.COGNITIVE_POLICY,
         family="rollback",
         primary=("object_id",),
-        conflicts=(
+        # RECLASSIFIED in rev6 -- `target_version` pins the rollback TARGET, not the
+        # position of the new version, so the new version's revision could only be
+        # read from mutable state. Same defect and same proof as
+        # update_cognitive_policy above.
+        identity_shifts=(
             ("changed reason", _mutate("reason", "different rollback reason")),
             ("changed evidence", _mutate_evidence()),
+            ("changed policy id", _mutate("policy_id", "other-policy")),
         ),
-        identity_shifts=(("changed policy id", _mutate("policy_id", "other-policy")),),
     ),
 )
 

@@ -20,7 +20,10 @@ from aios_core.contracts.operations import OperationRequest
 from aios_core.contracts.refs import ObjectRef, SourceRef
 from aios_core.contracts.time import TemporalExtent, as_utc
 from aios_core.query.search import WorldSearchIndex
-from aios_core.storage.idempotency import canonical_json_dumps
+from aios_core.storage.idempotency import (
+    canonical_json_dumps,
+    canonical_request_identity,
+)
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 
 COMMUNICATION_EXPERIENCE_DIMENSION = "dim:ai_communication_experience"
@@ -182,7 +185,7 @@ class CommunicationExperienceService:
                     dependency_type="communication_experience_follows_action",
                 )
             )
-        result = self.store.commit(
+        result = self.store.commit_or_replay(
             [experience, *deps],
             OperationRequest(
                 operation_name="communication_experience.record",
@@ -191,6 +194,15 @@ class CommunicationExperienceService:
                     "scenario": experience.scenario,
                     "style": experience.style,
                     "user_reaction": experience.user_reaction.value,
+                    # experience_id ignores tone, action_ref, applicable_conditions
+                    # and counterexample_refs, so the complete canonical request is
+                    # what separates an identical recovered replay from a changed
+                    # experience recorded under the same key.
+                    "canonical_request_sha256": canonical_request_identity(
+                        "communication_experience.record",
+                        request.model_dump(mode="json"),
+                        recorded.isoformat(),
+                    ),
                 },
                 expected_world_revision=int(self.store.current_world_revision()),
                 reason="record evidence-grounded communication experience",
