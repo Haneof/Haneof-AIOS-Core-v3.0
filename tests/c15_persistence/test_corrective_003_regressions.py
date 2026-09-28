@@ -428,13 +428,13 @@ def test_k5_commit_tree_before_push_crash_recovers_from_prior_remote_k3(
         outcome = recovered.resume()
         assert outcome["ack"]["status"] == "acked"
         assert outcome["ack"]["sequence"] == 1
-        observed = outcome["observed"]
-        assert observed["counters"]["reveals"] == 1
-        assert observed["counters"]["ingests"] == 1
-        assert observed["counters"]["capability_side_effects"] == 1
-        assert observed["counters"]["acks"] == 1
-        assert len(observed["dispatch_ledger"]) == 2
-        assert observed["metering_rows"] == 2
+        counters = recovered.counters()
+        assert counters["reveals"] == 1
+        assert counters["ingests"] == 1
+        assert counters["capability_side_effects"] == 1
+        assert counters["acks"] == 1
+        assert len(provider_module.read_ledger(recovered.mailbox)) == 2
+        assert recovered.metering_rows() == 2
         recovered.backend.release()
     finally:
         session.backend.release()
