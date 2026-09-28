@@ -960,14 +960,24 @@ class OperatorSession:
                         seal_label="remote-provider-return-staged",
                     )
                 continue
+            work_id = self.runtime.turn_executions.execution_id_for(
+                subject_id=self.runtime.subject_id,
+                session_id=self._session_id,
+                turn_index=int(projection["sequence"]),
+            )
             receipt = attempts.response_authenticity_receipt(attempt_id)
             if receipt is None:
-                receipt = attempts._capture_trusted_response_return(
-                    attempt_id,
-                    captured_at=datetime.now(timezone.utc),
-                    directive=directive,
+                self.runtime.stage_trusted_returned_background_response(
+                    work_kind="user_turn",
+                    work_id=work_id,
+                    model_round_index=int(record["metadata"]["round"]),
+                    directive_payload=payload,
+                    returned_at=datetime.now(timezone.utc),
+                    evidence="operator relay reattached exact provider-return bytes",
                 )
-                actions.append({"request_id": request_id, "action": "trusted_return_recaptured"})
+                receipt = attempts.response_authenticity_receipt(attempt_id)
+                require(receipt is not None, "Core trusted-return recovery produced no receipt")
+                actions.append({"request_id": request_id, "action": "core_trusted_return_staged"})
             fingerprint = hashlib.sha256(payload.encode("utf-8")).hexdigest()
             require(
                 fingerprint == attempts._response_fingerprint(directive),
@@ -990,25 +1000,10 @@ class OperatorSession:
                         seal_label="remote-provider-return-recovered",
                     )
             if attempts.staged_response(attempt_id) is None:
-                if attempt.state in {"dispatching", "in_doubt", "response_returned", "metered"}:
-                    self.runtime.stage_exact_background_response(
-                        work_kind="user_turn",
-                        work_id=self.runtime.turn_executions.execution_id_for(
-                            subject_id=self.runtime.subject_id,
-                            session_id=self._session_id,
-                            turn_index=int(projection["sequence"]),
-                        ),
-                        model_round_index=int(record["metadata"]["round"]),
-                        provider=str(receipt.provider),
-                        model=str(receipt.model),
-                        provider_request_id=str(receipt.provider_request_id),
-                        response_fingerprint=fingerprint,
-                        directive_payload=payload,
-                        staged_at=datetime.now(timezone.utc),
-                        evidence="operator relay journal exact bytes + Core trusted receipt",
-                        authenticity_proof=str(receipt.authenticity_proof),
-                    )
-                    actions.append({"request_id": request_id, "action": "staged_into_core"})
+                raise BackendError(
+                    "Core trusted-return recovery did not stage the exact provider response"
+                )
+            actions.append({"request_id": request_id, "action": "staged_into_core"})
             if self.journal.recovery(request_id)["state"] == "authenticated":
                 self.journal.begin_applying(request_id)
                 actions.append({"request_id": request_id, "action": "applying"})
