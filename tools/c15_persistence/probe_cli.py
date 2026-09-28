@@ -33,6 +33,7 @@ def main(argv: list[str] | None = None) -> int:
         required=True,
     )
     parser.add_argument("--kill-at", choices=list(KILL_POINTS), default=None)
+    parser.add_argument("--kill-round", type=int, default=None)
     parser.add_argument("--event-count", type=int, default=30)
     parser.add_argument("--remote-ref", default=None)
     parser.add_argument("--remote", default="origin")
@@ -53,7 +54,7 @@ def main(argv: list[str] | None = None) -> int:
             repo_dir=repo_dir,
             require_remote_durability=args.require_remote_durability,
         )
-        outcome = session.process_one_cursor(kill_at=args.kill_at)
+        outcome = session.process_one_cursor(kill_at=args.kill_at, kill_round=args.kill_round)
     elif args.mode == "resume":
         session = OperatorSession.attach(
             args.root,
@@ -63,7 +64,7 @@ def main(argv: list[str] | None = None) -> int:
             remote=args.remote if args.remote_ref is not None else None,
             repo_dir=repo_dir,
         )
-        outcome = session.resume(kill_at=args.kill_at)
+        outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)
     elif args.mode == "materialize-resume":
         session = OperatorSession.materialize_and_attach(
             args.root,
@@ -74,7 +75,7 @@ def main(argv: list[str] | None = None) -> int:
             remote=args.remote,
             repo_dir=repo_dir,
         )
-        outcome = session.resume(kill_at=args.kill_at)
+        outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)
     else:
         session = OperatorSession.attach(
             args.root,
