@@ -313,7 +313,15 @@ def test_remote_backend_roundtrip_with_wiped_local_cache(tmp_path: Path) -> None
 
         try:
             # 1. Create and drive cursor 1
-            session = OperatorSession.create(root / "backend", run_id=run_id, session_id=session_id)
+            session = OperatorSession.create(
+                root / "backend",
+                run_id=run_id,
+                session_id=session_id,
+                remote_ref=remote_ref,
+                remote=remote_name,
+                repo_dir=REPO_ROOT,
+                require_remote_durability=True,
+            )
             first = session.process_one_cursor()
             assert first["ack"]["status"] == "acked"
             first_event = str(first["projection"]["event_id"])
@@ -431,7 +439,15 @@ def test_remote_backend_rejects_corrupted_manifest(tmp_path: Path) -> None:
         remote_ref = f"refs/heads/persistence/{run_id}"
 
         try:
-            session = OperatorSession.create(root / "backend", run_id=run_id, session_id=session_id)
+            session = OperatorSession.create(
+                root / "backend",
+                run_id=run_id,
+                session_id=session_id,
+                remote_ref=remote_ref,
+                remote=remote_name,
+                repo_dir=REPO_ROOT,
+                require_remote_durability=True,
+            )
             first = session.process_one_cursor()
             manifest = capture_manifest(
                 session.backend, cursor=1, event_id=str(first["projection"]["event_id"]), phase="A"
