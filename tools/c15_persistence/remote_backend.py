@@ -40,6 +40,7 @@ from .backend import BackendError, GenerationStore, RunBackend, digest, require,
 
 DEFAULT_REMOTE = "origin"
 DEFAULT_REF_PREFIX = "refs/heads/persistence"
+LOCAL_EXPECTED_HEAD = ".remote-head"
 
 
 def default_repo_dir() -> Path:
@@ -54,6 +55,55 @@ def remote_ref_for_run(run_id: str, *, prefix: str = DEFAULT_REF_PREFIX) -> str:
     """Construct canonical remote ref name for a given run_id."""
     require(bool(run_id), "run_id is required to construct remote ref")
     return f"{prefix}/{run_id}"
+
+
+def _remote_head(repo: Path, remote: str, ref: str) -> str | None:
+    completed = subprocess.run(
+        ["git", "ls-remote", remote, ref],
+        cwd=str(repo),
+        capture_output=True,
+        text=True,
+    )
+    require(
+        completed.returncode == 0,
+        f"failed to read remote head {remote} {ref}:\n{completed.stderr}",
+    )
+    if not completed.stdout.strip():
+        return None
+    return completed.stdout.strip().split()[0]
+
+
+def _expected_head_path(backend: RunBackend) -> Path:
+    return backend.root / LOCAL_EXPECTED_HEAD
+
+
+def _read_expected_remote_head(backend: RunBackend) -> str | None:
+    path = _expected_head_path(backend)
+    if not path.is_file():
+        return None
+    value = path.read_text(encoding="utf-8").strip()
+    require(bool(value), "local expected remote head is empty")
+    return value
+
+
+def _write_expected_remote_head(backend: RunBackend, commit_sha: str) -> None:
+    path = _expected_head_path(backend)
+    temp = path.with_name(path.name + ".tmp")
+    fd = os.open(temp, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as stream:
+            stream.write(commit_sha + "\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temp, path)
+        dir_fd = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(dir_fd)
+        finally:
+            os.close(dir_fd)
+    finally:
+        if temp.exists():
+            temp.unlink(missing_ok=True)
 
 
 def checkpoint_sqlite_databases(root: Path) -> None:
@@ -107,6 +157,7 @@ def commit_backend_tree(
             "--",
             ".",
             ":!.owner.lock",
+            ":!.remote-head",
             ":!*.tmp",
             ":!*.snapshot",
             ":!*-shm",
@@ -156,16 +207,24 @@ def push_run_state(
     run_id = str(backend.owner["run_id"])
     ref = remote_ref or remote_ref_for_run(run_id)
 
-    # Check whether the ref already exists on remote to maintain lineage.
-    parent_sha: str | None = None
-    ls_out = subprocess.run(
-        ["git", "ls-remote", remote, ref],
-        cwd=str(repo),
-        capture_output=True,
-        text=True,
-    )
-    if ls_out.returncode == 0 and ls_out.stdout.strip():
-        parent_sha = ls_out.stdout.strip().split()[0]
+    # Compare-and-swap discipline: a writer may advance only the remote head
+    # it explicitly materialized or previously pushed.  Never "adopt" a newer
+    # remote head as parent for a stale local tree: that would be a fast-forward
+    # Git push while still semantically overwriting another writer's state.
+    actual_head = _remote_head(repo, remote, ref)
+    expected_head = _read_expected_remote_head(backend)
+    if expected_head is None:
+        require(
+            actual_head is None,
+            "remote ref already exists but local writer has no expected head; "
+            "materialize the authoritative remote state before writing",
+        )
+    else:
+        require(
+            actual_head == expected_head,
+            f"remote CAS conflict for {ref}: expected {expected_head}, observed {actual_head}",
+        )
+    parent_sha = expected_head
 
     gen = GenerationStore(backend).latest() or 0
     msg = message or f"persisted run state: run_id={run_id} generation={gen}"
@@ -193,6 +252,7 @@ def push_run_state(
         f"remote ref {ref} on {remote} does not point to pushed commit {commit_sha}",
     )
 
+    _write_expected_remote_head(backend, commit_sha)
     backend.audit(
         "remote_persisted",
         {
@@ -200,6 +260,7 @@ def push_run_state(
             "remote_ref": ref,
             "commit_sha": commit_sha,
             "tree_sha": tree_sha,
+            "parent_sha": parent_sha,
         },
     )
     return ref, commit_sha
@@ -222,6 +283,15 @@ def materialize_run_state(
     repo = repo_dir or default_repo_dir()
     ref = remote_ref or remote_ref_for_run(run_id)
     target = Path(target_dir).resolve()
+
+    remote_head = _remote_head(repo, remote, ref)
+    require(remote_head is not None, f"remote ref {ref} not found on {remote}")
+    if commit_sha is not None:
+        require(
+            remote_head == commit_sha,
+            f"remote ref {ref} head {remote_head} != pinned commit {commit_sha}",
+        )
+    resolved_commit = commit_sha or remote_head
 
     if target.exists():
         require(target.is_dir(), f"target path is not a directory: {target}")
@@ -247,13 +317,9 @@ def materialize_run_state(
             f"failed to fetch {ref} from remote {remote}:\n{fetched.stderr}\n{fallback.stderr}",
         )
 
-    resolved_commit = commit_sha
-    if not resolved_commit:
-        resolved_commit = subprocess.check_output(
-            ["git", "rev-parse", "FETCH_HEAD"], cwd=str(repo), text=True
-        ).strip()
-
-    # Extract all files from the commit archive into target.
+    # Extract all files from the exact commit currently pinned by the remote
+    # ref.  The ref/commit equality check above prevents a stale pin from
+    # silently materializing a different generation.
     p1 = subprocess.Popen(
         ["git", "archive", resolved_commit], cwd=str(repo), stdout=subprocess.PIPE
     )
@@ -279,6 +345,7 @@ def materialize_run_state(
         session_id=session_id,
         adopt_stale_owner=True,
     )
+    _write_expected_remote_head(backend, resolved_commit)
     backend.audit(
         "materialized_from_remote",
         {
