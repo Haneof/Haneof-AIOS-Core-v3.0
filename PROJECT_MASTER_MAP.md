@@ -1,6 +1,17 @@
 # AIOS v3.0 项目全流程总地图
 
-## 当前控制入口 — 2026-09-27 C15-RCC-RES-A-RERUN-003 INTEGRATED / C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001 READY_TO_RESUME
+## 当前控制入口 — 2026-09-28 PERSISTENCE-CORRECTIVE-003 SCOPE CORRECTED / PR #254 IN PROGRESS
+
+- **基础设施定位已裁决**：`tools/c15_persistence/**` 是 C15 Resident-B 的 **release/test runtime operator infrastructure**，不是 `src/aios_core/**` 产品 Core。它必须保证真实 B 实验在冻结的 process/environment-loss failure model 下可恢复且证据可信，但不需要被升级成通用生产级多 writer / anti-tamper 分布式存储。
+- **`C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-002-INDEPENDENT-ACCEPTANCE = DONE / ACCEPTANCE_FAIL`**。Reviewer 报告的 6 个 findings 全部历史保留；经对照 2026-09-26 工程前冻结的 state-loss contract，当前 gate 分类为 **CONTRACT_BLOCKERS=4 / NON_BLOCKING_HARDENING_FINDINGS=2**。
+- Binding blockers：`IA-BLK-PERSIST-C002-001`（K4 durability failure 必须 hard-stop）、`002`（later-round K3/K5 remote-only exactly-once recovery）、`004`（remote-authoritative run 不得因 config 丢失静默降级 local-only）、`005`（仅要求最小 canonical run/session/ref identity binding，防 accidental cross-run write）。
+- Non-blocking hardening：`003`（malicious coordinated generation-history tamper）与 `006`（multi-writer / external ref rollback-delete atomic CAS race）。二者超出冻结的单 operator / 单 writer / process-environment-loss threat model；不得据此扩 architecture、创建第二 truth store 或把 C15 harness 变成通用分布式事务系统。
+- **`C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 = IN_PROGRESS / SCOPE_CORRECTED`**。工程 PR #254（branch `arena/c15-rcc-res-b-persistence-corrective-003-sol-20260928`）已在旧 6-blocker scope 下开始；最终 REVIEW_READY candidate 必须按本修正收敛。当前观察 WIP head `c9b7db880435e206928cf9d5b7086597b0701235` 仅是 WIP，不是冻结 candidate。
+- PR #254 若已为 003/006 加入 strictly-local、behavior-preserving、无新 authority/state/protocol 的防御性检查，可作为 incidental hardening 保留；但不得作为 acceptance 必需条件。为 003/006 引入的额外架构必须从最终 candidate 移除。
+- **以下继续 BLOCKED**：`C15-RCC-RES-B-RELEASE-003`、`C15-RCC-RES-B-RERUN-003`、`C15-RCC-RES-B-ACCEPT-003`、Resident C、evaluator、closure。
+- Binding scope correction：`governance/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003_SCOPE_CORRECTION_2026-09-28.md`。
+
+## 历史控制入口 — 2026-09-27 C15-RCC-RES-A-RERUN-003 INTEGRATED / C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001 READY_TO_RESUME
 
 - `CORE-RC-REFREEZE-002 = DONE / ACCEPTED / INTEGRATED`（PM integration `PM_ACCEPTED / INTEGRATED`）。工程 PR #232 已通过标准 merge commit 合入 `main`：merge SHA = `4cadc1a8d7952363e213958c71a63ae7da93f615`（2026-09-27T11:45:35Z）。Pre-merge live main = `27a21db5b656d441248b9240020910b66a223830`；post-merge live main = `4cadc1a8d7952363e213958c71a63ae7da93f615`。
 - Accepted exact RC candidate = `a93972c95356f46d20f5e9e7be82026fe84c0687`（parent `91c93c4eb818960f16b89ca74d16e8ede72fa797`，tree `66d89a0344b68520b840690c43aead629e9f7957`；pin comment `5855296310`；PM acceptance comment `5855536367`）。正式 frozen software 仍是 `27a21db5b656d441248b9240020910b66a223830`（不是 merge commit）；frozen Core tree `src/aios_core` = `a9618abe0b3d4ac3b08bd23dbd58f3e3f97e05d6`；frozen tests tree = `92fcbcc5876833735fb3cb7c73a98c4a8a4a3541`；source manifest SHA256 = `34b3d8adfad376a9cd7170ebec3e6093d40444b03ffd61130ed79602e63e3883`；environment manifest SHA256 = `d52ba5458014f5828c432bfb2c8a8d28e36b38b9138236d2d178ea8b02904f53`。`27a21db -> a93972c` 与 `27a21db -> 4cadc1a8` 均为 `src/**` / `tests/**` / `pyproject.toml` ZERO DIFF；候选仅含 freeze evidence + governance + release packet + formal gate workflow。
