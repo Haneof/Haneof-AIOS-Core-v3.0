@@ -38,7 +38,21 @@ jobs:
             tests/integration/test_core_background_response_recovery_001_corrective_002_authenticity.py \
             tests/integration/test_core_background_response_recovery_001_corrective_002_recovery.py \
             tests/runtime/test_background_model_attempt.py
+      - name: Annotate focused failure identities
+        if: failure()
+        run: |
+          python - <<'PYTEST'
+          import os, xml.etree.ElementTree as ET
+          if os.path.isfile('focused.xml'):
+              root = ET.parse('focused.xml').getroot()
+              for case in root.iter('testcase'):
+                  for error in (*case.findall('failure'), *case.findall('error')):
+                      text = (error.text or '').strip().splitlines()
+                      message = (text[-1] if text else error.attrib.get('message', 'unknown failure'))
+                      print(f"::error file=.github/workflows/core-background-trusted-return-recovery-001.yml::FAILED {case.get('classname')}::{case.get('name')}: {message}")
+          PYTEST
       - name: Complete Core regression
+        if: always()
         run: pytest -o addopts='' -q --junitxml=full.xml
       - uses: actions/upload-artifact@v4
         if: always()
