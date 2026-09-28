@@ -38,7 +38,7 @@ Accepted Core currently has:
 
 ## Historical evidence / prohibited WIP
 
-Persistence PR #254 is frozen.
+Persistence PR #254 is CLOSED / FROZEN; its branch and all historical commits remain preserved.
 
 Observed invalid WIP:
 
