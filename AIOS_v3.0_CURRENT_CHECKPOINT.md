@@ -1,21 +1,16 @@
 # AIOS v3.0 当前工程断点
 
-## 当前控制入口 — 2026-09-28 C15 PERSISTENCE SCOPE ADJUDICATION / CORRECTIVE-003 NARROWED READY
+## 当前控制入口 — 2026-09-28 CORRECTIVE-003 FROZEN / CORE TRUSTED-RETURN RECOVERY READY
 
-- **架构定位已裁定**：`tools/c15_persistence/**` 是为 C15 Resident B habitation / release 验收建立的 operator-state persistence harness，不是 AIOS Core 产品实现。它当前不在 live `main`，且 `pyproject.toml` 只从 `src/` 打包 `aios-core`，正式 console entrypoint 只有 `aios-core-headless`。真实 B 执行 operator 位于 main 的 `tools/c15_preflight/arena_resident_operator.py`，直接连接 real `FusedTurnRuntime` / C15 release；persistence corrective 的原始任务明确限定 `no src/aios_core/** changes`、`Use only disposable/synthetic state for probes`，目标是修复 RERUN-002 因 ephemeral `/tmp` 被平台重启清空而导致的验收基础设施状态丢失。
-- Historical Independent Acceptance 结论原样保留：`C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-002-INDEPENDENT-ACCEPTANCE = DONE / ACCEPTANCE_FAIL / reviewer blocker=6`，failed exact candidate `7b2556e738d9c9386ec21c13fec39400c87d0916` / PR #251 继续 OPEN / DRAFT / UNMERGED / PINNED；reviewer local-only commit `fe881094fe13ee4420ffdf64a038e6aef77e85fe` 仍为 NOT PUSHED。
-- **PM binding blocker reclassification = 3**：`IA-BLK-PERSIST-C002-001`、`002`、`004` 直接违反 frozen state-loss corrective contract，继续阻塞 B release。
-  - `001` K4 remote persistence failure 被 capability result wrapping 吞掉，可能在权威 checkpoint 失败后继续 turn/ACK，违反 authoritative durability + exactly-once fail-closed。
-  - `002` later-round K3 / K5 fallback remote-only recovery 无法可靠收敛，直接违反原始 kill/restart matrix 对 provider-staged 与 model/capability-before-ACK 的 convergence 要求。
-  - `004` remote binding metadata 缺失后正常 attach/resume 可静默降级 local-only，直接违反“authoritative live run state must not exist only on ephemeral storage”。
-- **PM NON-BLOCKING HARDENING = 3**：`IA-BLK-PERSIST-C002-003`、`005`、`006` 不再作为 C15 release gate blocker。
-  - `003` 中针对 malicious/coordinated ledger lowering + historical-tail deletion、seal-content tamper、unexpected-artifact injection 的攻击超出原 frozen failure model；原 contract 要求 durability/digest/recovery，不要求把 synthetic harness 做成对拥有存储修改能力的恶意方防篡改账本。普通 missing/modified/incomplete generation fail-closed 仍应保留现有回归。
-  - `005` cross-run config + expected-head transplantation 是恶意/人工重写 operator metadata 的 hardening 场景；frozen contract 要求 RELEASE mint fresh exact run/session 并禁止 identity reuse，但没有要求 synthetic harness 对主动复制另一 run 的内部配置提供安全隔离。
-  - `006` ref check 后 concurrent rollback/delete 属于多 writer / hostile ref mutation；C15 operator contract 是单执行 owner 的 crash/restart recovery，不是分布式多 writer Git transaction system。Core 本身已用 canonical World OS lease保证 same-World single writer；C15 persistence harness 不需要额外升级为通用 distributed CAS service。
-- **当前唯一下一 READY：`C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 = READY / NARROWED_SCOPE`**。只修 `001 + 002 + 004`。不得把 `003/005/006` 重新升级为 release blocker，不得借此新增 production storage architecture，不得把 `tools/c15_persistence` 升格进 `src/aios_core/**` 或正式 package。
-- Corrective-003 的目标不是“让 Git backend 对所有 adversarial mutation 都安全”，而是机械证明：真实 B 所需的 authoritative operator state 不再依赖 ephemeral local root；K1-K5 尤其 later-round provider/capability crash 能从远端权威 checkpoint 按 frozen contract 收敛；remote-authoritative run 不能因 binding metadata 丢失而静默 local-only。
-- 以下继续 **BLOCKED**：`C15-RCC-RES-B-RELEASE-003`、`C15-RCC-RES-B-RERUN-003`、`C15-RCC-RES-B-ACCEPT-003`、Resident C、evaluator、closure。
-- Superseding scope ruling：`governance/C15_RCC_RES_B_PERSISTENCE_SCOPE_ADJUDICATION_2026-09-28.md`。它纠正 blocker 对 frozen contract 的归类，不删除、不改写任何历史 RED 或 reviewer verdict。
+- **`C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 = FROZEN_WIP / BLOCKED_ON_CORE_TRUSTED_RETURN_RECOVERY`**。PR #254 已 **CLOSED / DRAFT / UNMERGED / FROZEN**。First scope-violating WIP `f7848952b6519fc40f50806f4a4d8d350ac0f38a` 修改了 `src/aios_core/runtime/turn_runtime.py`，违反 merged PM scope #255（persistence corrective 不得修改 Core），因此该 SHA = **SCOPE_VIOLATION / NOT_A_CANDIDATE**。历史 WIP/red/green CI 全部保留，不得 rewrite。
+- #255 的 narrowed scope 继续有效：C002 reviewer 六 findings 历史保留；C15 release gate binding blockers 为 `001/002/004`，`003/005/006` 为 non-blocking hardening。当前新问题只来自 binding `002` 的合法闭合路径。
+- **Core gap**：accepted Core 可 `stage_exact_background_response(...)`，但只接受已经存在 trusted-return authenticity proof 的 exact response；私有 `_capture_trusted_response_return(...)` 明确只属于正常 trusted provider-return callback，recovery caller 不得调用签名 authority。Later-round provider 已提交/返回但 crash 发生在 trusted-return receipt 持久化前时，当前 Core 没有既避免 provider redispatch、又保持 non-forgeable authenticity 的合法 continuation path。
+- `f784...` 新增 public `stage_trusted_returned_background_response(...)` 允许 recovery API 接收外部 directive bytes 后调用私有 receipt minting authority；这会改变已接受的 provider-return trust boundary，不允许作为 persistence harness 修复。
+- **当前唯一下一 READY：`CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001 = READY`**。只修 trusted provider-return crash handoff/recovery；不得把 recovery caller 变成签名 oracle，不得弱化 #219 accepted authenticity invariants。任务 prompt：`governance/prompts/CORE_BACKGROUND_TRUSTED_RETURN_RECOVERY_001_2026-09-28.md`。
+- 以下继续 **BLOCKED**：Corrective-003 resume、Core RC re-freeze/lineage follow-up、`C15-RCC-RES-B-RELEASE-003`、`RERUN-003`、`ACCEPT-003`、Resident C、evaluator、closure。
+- PR #254 PM STOP comment：`5863009559`。
+- **Mandatory post-Core sequence**：`CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001` engineering -> fresh Independent Acceptance -> PM integration -> `CORE-RC-REFREEZE-003` -> fresh Independent Acceptance -> fresh `C15-RCC-RES-A-RERUN-004` on the new RC -> fresh Independent Acceptance -> governance re-release of frozen `C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003`. Once the new Core is integrated, A-003 remains historical evidence for the prior Core/RC only and MUST NOT be reused as the B launch lineage.
+- #254 在 PM STOP 后仍被并行工程窗口继续推进；关闭时 branch head = `a2d815c9f5154d87a56b152ed7cf5d1eb1baaaae`，该 head 仍含 `src/aios_core/**` diff，全部视为 **unauthorized WIP / NOT_A_CANDIDATE**。关闭 PR 仅停止 active PR/CI flood，不删除 branch/history。
 
 ## 历史控制入口 — 2026-09-27 C15-RCC-RES-A-RERUN-003 INTEGRATED / C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001 READY_TO_RESUME（已被上方 REVIEW_READY writeback supersede）
 
