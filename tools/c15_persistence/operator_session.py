@@ -938,6 +938,28 @@ class OperatorSession:
             attempt_id = str(record["metadata"]["attempt_id"])
             payload = bytes(record["reply"]).decode("utf-8")
             directive = decode_model_directive(payload)
+            attempt = attempts.get(attempt_id)
+            if attempt is None:
+                # K3 can fire after provider submission while the Core attempt
+                # transaction is not present in the surviving/restored runtime DB.
+                # Do not fabricate an attempt or an authenticity receipt. Keep the
+                # exact provider reply durable, then let the normal run_turn path
+                # re-admit the deterministic attempt identity. When model_handler
+                # is reached again, _relay_exchange returns these exact staged bytes
+                # without a second provider dispatch and Core's ordinary trusted
+                # return callback mints the receipt.
+                actions.append(
+                    {
+                        "request_id": request_id,
+                        "action": "core_attempt_missing_safe_readmit",
+                    }
+                )
+                if self.remote_durability_enabled:
+                    self._persist_remote_barrier(
+                        "K3_PROVIDER_RETURN_STAGED_CORE_READMIT_PENDING",
+                        seal_label="remote-provider-return-staged",
+                    )
+                continue
             receipt = attempts.response_authenticity_receipt(attempt_id)
             if receipt is None:
                 receipt = attempts._capture_trusted_response_return(
@@ -967,8 +989,7 @@ class OperatorSession:
                         "K3_RECOVERED_PROVIDER_RETURN",
                         seal_label="remote-provider-return-recovered",
                     )
-            attempt = attempts.get(attempt_id)
-            if attempt is not None and attempts.staged_response(attempt_id) is None:
+            if attempts.staged_response(attempt_id) is None:
                 if attempt.state in {"dispatching", "in_doubt", "response_returned", "metered"}:
                     self.runtime.stage_exact_background_response(
                         work_kind="user_turn",
