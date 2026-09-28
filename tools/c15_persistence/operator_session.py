@@ -389,15 +389,18 @@ class OperatorSession:
         self,
         *,
         remote_ref: str | None = None,
-        remote: str = "origin",
+        remote: str | None = None,
         repo_dir: Path | None = None,
         message: str | None = None,
     ) -> tuple[str, str]:
-        """Persist authoritative run state to remote Git storage."""
+        """Persist authoritative run state to the configured remote Git storage."""
+        effective_ref = remote_ref or self._remote_ref
+        effective_remote = remote or self._remote
+        effective_repo = repo_dir or self._remote_repo_dir
         return self.backend.push_to_remote(
-            remote_ref=remote_ref,
-            remote=remote,
-            repo_dir=repo_dir,
+            remote_ref=effective_ref,
+            remote=effective_remote,
+            repo_dir=effective_repo,
             message=message,
         )
 
