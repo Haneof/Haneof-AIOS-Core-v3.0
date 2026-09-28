@@ -46,7 +46,7 @@ PACKET_ALLOWED_KEYS = {
     "wheel_lock_path", "wheel_lock_sha256", "wheel_lock_verification_sha256",
     "clean_bootstrap_evidence_path", "clean_bootstrap_evidence_sha256",
     "runtime_root_default", "runtime_venv_python_default", "harness_root",
-    "harness_manifest_sha256", "harness_file_count", "harness_runner_module",
+    "harness_manifest_sha256", "harness_manifest_file_sha256", "harness_file_count", "harness_runner_module",
     "harness_entrypoint", "request_publisher_module", "response_publisher_module",
     "ledger_module", "gate_a_status", "gate_a_hash", "gate_a_test_count", "gate_b_status",
     "gate_b_hash", "gate_b_test_count", "gate_c_status", "gate_c_hash", "gate_c_test_count", "gate_d_status",
@@ -381,7 +381,7 @@ def main() -> int:
     check_pin("wheel_lock", root / "bootstrap/PYTHON_WHEEL_LOCK.json", packet.get("wheel_lock_sha256", ""))
     check_pin("wheel_lock_verification", root / "evidence/wheel_lock_verification.json", packet.get("wheel_lock_verification_sha256", ""))
     check_pin("clean_bootstrap_evidence", root / "evidence/clean_bootstrap_manifest.json", packet.get("clean_bootstrap_evidence_sha256", ""))
-    check_pin("harness_manifest", root / "evidence/harness_manifest.json", packet.get("harness_manifest_sha256", ""))
+    check_pin("harness_manifest_file", root / "evidence/harness_manifest.json", packet.get("harness_manifest_file_sha256", ""))
     check_pin("environment_record", root / "evidence/environment_record.json", packet.get("environment_record_sha256", ""))
     check_pin("clean_room_contract", repo / packet.get("clean_room_contract_path", ""), packet.get("clean_room_contract_sha256", ""))
     check_pin("resident_run_contract", repo / packet.get("resident_run_contract_path", ""), packet.get("resident_run_contract_sha256", ""))

@@ -130,6 +130,7 @@ def build(
         "harness_root": "reviews/internal_habitation/c15-rcc/v1/operator_prep/"
         "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness",
         "harness_manifest_sha256": manifest["manifest_sha256"],
+        "harness_manifest_file_sha256": sha256_file(evidence / "harness_manifest.json"),
         "harness_file_count": manifest["harness_file_count"],
         "harness_runner_module": "aios_exchange.runner",
         "harness_entrypoint": "aios_exchange.runner:run_user_turn",

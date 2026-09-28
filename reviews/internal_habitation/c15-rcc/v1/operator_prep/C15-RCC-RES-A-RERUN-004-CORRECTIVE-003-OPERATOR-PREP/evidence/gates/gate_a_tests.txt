@@ -23,4 +23,4 @@ reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-COR
 reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a23_changed_replay_bytes_fail_closed
 reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a24_consume_tampered_published_response_still_fails_closed
 
-24 tests collected in 0.39s
+24 tests collected in 0.54s

@@ -1,4 +1,4 @@
 reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_c_two_round_integration.py::test_gate_c_two_round_integration
 reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_c_two_round_integration.py::test_gate_c_second_turn_reuses_durable_exchange
 
-2 tests collected in 0.36s
+2 tests collected in 0.50s

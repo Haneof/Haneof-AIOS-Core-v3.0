@@ -1,3 +1,7 @@
+gate A: PASS ({'passed': 24, 'failed': 0, 'error': 0, 'skipped': 0}, total=24/24) -> gate_a_result.json
+gate B: PASS ({'passed': 7, 'failed': 0, 'error': 0, 'skipped': 0}, total=7/7) -> gate_b_result.json
+gate C: PASS ({'passed': 2, 'failed': 0, 'error': 0, 'skipped': 0}, total=2/2) -> gate_c_result.json
+gate D: PASS ({'passed': 5, 'failed': 0, 'error': 0, 'skipped': 0}, total=5/5) -> gate_d_result.json
 {
   "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
   "status": "PASS",

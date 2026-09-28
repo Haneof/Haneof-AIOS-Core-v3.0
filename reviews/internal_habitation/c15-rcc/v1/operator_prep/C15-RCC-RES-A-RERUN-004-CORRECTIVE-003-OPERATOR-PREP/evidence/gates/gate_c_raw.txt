@@ -11,4 +11,4 @@ reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-COR
 =========================== short test summary info ============================
 PASSED reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_c_two_round_integration.py::test_gate_c_two_round_integration
 PASSED reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_c_two_round_integration.py::test_gate_c_second_turn_reuses_durable_exchange
-============================== 2 passed in 0.94s ===============================
+============================== 2 passed in 1.02s ===============================

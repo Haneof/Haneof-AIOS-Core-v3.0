@@ -18,10 +18,10 @@
     "error": 0,
     "skipped": 0
   },
-  "duration_s": 1.186,
+  "duration_s": 1.271,
   "raw_output": "gate_c_raw.txt",
-  "raw_output_sha256": "e656da8f97abef033fbbf984b3f8e648ff921b35ea63387e710eef0b2fc57883",
-  "enumeration_sha256": "812256fa9407dd816e00c1376ee0ad611662b25f7be662c694752006c54512f2",
+  "raw_output_sha256": "2264cbd7805719c7929168b65650798498f77653cbfafeb0d60e1c920363aa0f",
+  "enumeration_sha256": "fbc7d0bf4601845c1da86f90aa2305dc0efdb778d7525f3dec0103b1a8af2ae3",
   "environment": {
     "python_version": "3.12.14",
     "python_version_info": [
@@ -34,5 +34,5 @@
     "sqlite_version": "3.45.1",
     "executable": "/tmp/aios-c15-op-prep-corrective-clean-20260928-final/runtime/3.12.14/venv/bin/python"
   },
-  "generated_utc": "2026-09-28T20:28:27.139030+00:00"
+  "generated_utc": "2026-09-28T20:32:11.828246+00:00"
 }

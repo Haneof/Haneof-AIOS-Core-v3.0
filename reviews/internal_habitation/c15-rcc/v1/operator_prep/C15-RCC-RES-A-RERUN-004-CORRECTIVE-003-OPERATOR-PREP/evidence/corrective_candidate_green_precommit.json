@@ -3,7 +3,7 @@
     "expected_historical_baseline": "10901d467679b70437ae112747eab81f889fd5cb",
     "head": "candidate-pinned-in-report"
   },
-  "candidate_root": "/tmp/aios-op-prep-corrective-candidate-08e85f037c8d39196ae5b6040ff19ba9750ebc3a/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "candidate_root": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
   "probe_mode": "candidate",
   "probes": {
     "C1_IA_OP_001": {

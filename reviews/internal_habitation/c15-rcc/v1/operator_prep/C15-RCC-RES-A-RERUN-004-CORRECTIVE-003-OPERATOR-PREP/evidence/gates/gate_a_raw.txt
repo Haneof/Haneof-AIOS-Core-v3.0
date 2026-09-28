@@ -55,4 +55,4 @@ PASSED reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-
 PASSED reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a22_intact_exact_replay_remains_idempotent
 PASSED reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a23_changed_replay_bytes_fail_closed
 PASSED reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a24_consume_tampered_published_response_still_fails_closed
-============================== 24 passed in 1.67s ==============================
+============================== 24 passed in 2.37s ==============================
