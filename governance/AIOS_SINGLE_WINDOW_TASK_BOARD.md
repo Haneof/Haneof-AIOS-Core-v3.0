@@ -1,5 +1,16 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 当前控制入口 — 2026-09-28 A-004 IA FAIL / CORRECTIVE-001 READY
+
+- **`C15-RCC-RES-A-RERUN-004 = ACCEPTANCE_FAIL / blocker=2 / HISTORICAL_FAILED_EXACT`**. Failed evidence PR #273 exact head = `f251e9c0026a0f97fdee20397936cb5e3b18c61c`; failed Independent Acceptance PR #275 exact = `ccd5f539714604f5ff5912b90024f28b82618511`. Both remain immutable historical evidence; no hash-swap or post-hoc repair.
+- Binding blocker `IA-A004-01`: cursor-1 `not_submitted` reconciliation is not proven because the Resident semantic request had already been published and a semantic response existed; null anonymous-provider fields do not prove non-dispatch.
+- Binding blocker `IA-A004-02`: cursor-10 final response/reply hashes agree, but no durable ordered record proves those exact response bytes existed before reconciliation; final consistency is not historical chronology.
+- PM adjudication: both findings are **run-harness/recovery-proof defects, not demonstrated Core exactly-once regressions and not demonstrated fabricated cognition**. No Core change is authorized.
+- **唯一下一 READY：`C15-RCC-RES-A-RERUN-004-CORRECTIVE-001 = READY`**. Prompt: `governance/prompts/C15_RCC_RES_A_RERUN_004_CORRECTIVE_001_2026-09-28.md`.
+- Corrective is a **new fresh Phase-A run**, not an amendment to #273. Before cursor 1, the new run-local exchange bridge must pass synthetic plumbing tests, provide atomic response publication + fsynced ordered exchange ledger, and be frozen by SHA-256; after cursor 1 starts, harness mutation is forbidden.
+- Until corrective run + fresh IA PASS + PM integration: persistence Corrective-003, Resident B/C, evaluator and C15 close remain **BLOCKED**.
+
+
 ## 当前控制入口 — 2026-09-28 A-RERUN-004 REVIEW_READY / FRESH IA READY
 
 - **`C15-RCC-RES-A-RERUN-004 = PHASE_A_COMPLETE / REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE`**. Evidence PR #273 remains **OPEN / UNMERGED / EVIDENCE-ONLY** at exact head `f251e9c0026a0f97fdee20397936cb5e3b18c61c` (parent `0b17c7f35697dc4a24b731185868d29967efcf58`, tree `fd312286b7b83cd550ecc49d72b78656e6e91b71`).

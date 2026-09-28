@@ -1,5 +1,18 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-09-28 A-RERUN-004 — Independent Acceptance FAIL; fresh corrective rerun required
+
+- Failed A-004 evidence: PR #273 @ `f251e9c0026a0f97fdee20397936cb5e3b18c61c`.
+- Failed IA evidence: PR #275 @ `ccd5f539714604f5ff5912b90024f28b82618511` → `ACCEPTANCE_FAIL / blocker=2`.
+- IA-A004-01: no proof cursor-1 first semantic request was unsubmitted; a semantic response existed before retry.
+- IA-A004-02: no contemporaneous durable ordering proof that cursor-10 exact reply bytes predated reconciliation.
+- Both are valid binding recovery-proof blockers. Historical A-004 cannot be repaired retrospectively.
+- No Core corrective is authorized.
+- Unique next READY: `C15-RCC-RES-A-RERUN-004-CORRECTIVE-001`.
+- Corrective must be a fresh World/index/release/session/process and must freeze/test the mechanical exchange bridge before cursor 1.
+- Persistence/B/C/evaluator remain blocked.
+
+
 ## 2026-09-28 C15-RCC-RES-A-RERUN-004 — Phase A complete, fresh IA next
 
 - Evidence PR #273 exact head: `f251e9c0026a0f97fdee20397936cb5e3b18c61c`; parent `0b17c7f35697dc4a24b731185868d29967efcf58`; tree `fd312286b7b83cd550ecc49d72b78656e6e91b71`.
