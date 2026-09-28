@@ -32,6 +32,15 @@ jobs:
           python -c "import sys,platform; print('python', sys.version); print('platform', platform.platform())"
           python -c "import pip,pydantic,pytest; print('pip', pip.__version__); print('pydantic', pydantic.VERSION); print('pytest', pytest.__version__)"
           python -m pip freeze
+      - name: Prepare historical persistence compatibility path
+        run: |
+          set -euo pipefail
+          # test_journal.py is frozen historical evidence and intentionally
+          # retains its original /home/user path.  Create that host directory
+          # rather than rewriting the historical test.
+          sudo install -d -m 0755 /home/user
+          sudo install -d -m 0700 -o "$(id -u)" -g "$(id -g)" /home/user/c15-persistence-unit-probes
+
       - name: Fresh full pytest -q
         run: |
           set -euo pipefail
