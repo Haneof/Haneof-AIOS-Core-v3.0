@@ -1,5 +1,16 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-09-28 trusted-return Corrective-001 — engineering complete, fresh IA next
+
+- PR #264 exact candidate: `a73e186d40688f5dc181b1128a62eff37a974409`; parent `71f6d106...`; tree `352f47ac...`.
+- Engineering state: `REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE`; not accepted, not merged.
+- Exact-head fetched PR workflows: 23/23 SUCCESS; formal CPython 3.12.14 gate full JUnit 919/0/0/0.
+- PM verified trusted-return carry-forward key blobs are byte-identical to #258 exact.
+- Fresh IA must independently attack all reachable side-effecting capabilities and explicitly adjudicate the frozen rev5 -> post-implementation rev6 reclassification for relation/policy changed-request cases.
+- Unique next READY: `CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001-CORRECTIVE-001-INDEPENDENT-ACCEPTANCE`.
+- RC-REFREEZE-003 and all Resident/persistence downstream work remain blocked until IA PASS and PM integration.
+
+
 ## 当前控制入口 — 2026-09-28 TRUSTED-RETURN IA FAIL / CORRECTIVE-001 READY
 
 - **`C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 = FROZEN_WIP / BLOCKED_ON_CORE_TRUSTED_RETURN_RECOVERY`**。PR #254 已 **CLOSED / DRAFT / UNMERGED / FROZEN**。First scope-violating WIP `f7848952b6519fc40f50806f4a4d8d350ac0f38a` 修改了 `src/aios_core/runtime/turn_runtime.py`，违反 merged PM scope #255（persistence corrective 不得修改 Core），因此该 SHA = **SCOPE_VIOLATION / NOT_A_CANDIDATE**。历史 WIP/red/green CI 全部保留，不得 rewrite。
