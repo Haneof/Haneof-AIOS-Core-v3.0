@@ -26,7 +26,7 @@ import time
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from .backend import BackendError, RunBackend, digest, require
+from .backend import BackendError, GenerationStore, RunBackend, digest, require
 
 MANIFEST_NAME = "run-state-manifest.json"
 MANIFEST_VERSION = "c15-run-state-manifest-v1"
@@ -174,6 +174,11 @@ def verify_reattach(backend: RunBackend, manifest: Mapping[str, Any]) -> dict[st
         "run-state manifest corruption",
     )
 
+    # Re-attach admission must verify immutable history, not only the current
+    # mutable slots. A missing, modified or incomplete sealed generation is a
+    # hard failure even when the current run-state manifest still hashes cleanly.
+    verified_generations = GenerationStore(backend).verify_all()
+
     checked: dict[str, dict[str, Any]] = {}
     failures: list[str] = []
     for name, relative in SLOTS:
@@ -243,6 +248,7 @@ def verify_reattach(backend: RunBackend, manifest: Mapping[str, Any]) -> dict[st
         "detach_boot_id": manifest.get("boot_id"),
         "attach_boot_id": _boot_id(),
         "slots": checked,
+        "verified_generations": verified_generations,
         "failures": failures,
         "reattached": not failures,
     }
