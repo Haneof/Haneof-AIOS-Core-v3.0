@@ -1,0 +1,65 @@
+{
+  "c1_observed": {
+    "changed_replay_fail_closed": true,
+    "intact_idempotent_replay": true,
+    "missing_publish_fail_closed": false,
+    "tampered_consume_fail_closed": true,
+    "tampered_publish_fail_closed": false
+  },
+  "c3_gate_totals": {
+    "A": {
+      "execution_total": 19,
+      "frozen_result_test_count": 0,
+      "parsed_node_ids": 19,
+      "pytest_collected": 19
+    },
+    "B": {
+      "execution_total": 7,
+      "frozen_result_test_count": 0,
+      "parsed_node_ids": 7,
+      "pytest_collected": 7
+    },
+    "C": {
+      "execution_total": 2,
+      "frozen_result_test_count": 0,
+      "parsed_node_ids": 2,
+      "pytest_collected": 2
+    },
+    "D": {
+      "execution_total": 5,
+      "frozen_result_test_count": 0,
+      "parsed_node_ids": 5,
+      "pytest_collected": 5
+    }
+  },
+  "candidate": {
+    "classification": "HISTORICAL_FAILED_EXACT / IMMUTABLE",
+    "head": "10901d467679b70437ae112747eab81f889fd5cb",
+    "parent": "abb8b435e5187c7c6c2f4332aea37cd805b4a53c",
+    "pr": 281,
+    "tree": "db79761216529cf83f217ab00c937bc79806a510"
+  },
+  "exit_code": 1,
+  "exit_code_file_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+  "notes": "All three targeted blockers reproduced RED on an immutable extracted copy of exact #281. Existing published/tampered response fails at consume but is accepted at publish replay. Wheel lock is absent and bootstrap creates hashes after download. Frozen collect-only and execution totals are 19/7/2/5 while result count/IDs are 0/empty.",
+  "overall_status": "RED",
+  "probe_freeze_path": "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_001/CORRECTIVE_PROBE_FREEZE.v3.json",
+  "probe_freeze_sha256": "f2d32c783df4b020dec969184d615f75979a2cb7d9561a313de7e0350204b101",
+  "probe_revision": "v3",
+  "probe_source_sha256": "f855486bcd06fe67a9d9576db36276dbdf98a297d91c278d44d1650c91c9b518",
+  "probe_statuses": {
+    "C1_IA_OP_001": "RED",
+    "C2_IA_OP_002": "RED",
+    "C3_IA_OP_003": "RED"
+  },
+  "raw_output_path": "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_001/raw/baseline_red_v3_10901d467679b70437ae112747eab81f889fd5cb.stdout.txt",
+  "raw_output_sha256": "5a23a35ad122d6ee734df7f618fefc075418e4b850be90deb61c45c1adbbadb8",
+  "result_json_path": "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_001/baseline_red_v3_10901d467679b70437ae112747eab81f889fd5cb.json",
+  "result_json_sha256": "5a23a35ad122d6ee734df7f618fefc075418e4b850be90deb61c45c1adbbadb8",
+  "review": {
+    "head": "e3394da5d607e34c0286c16a11837ac7ea173a56",
+    "pr": 283,
+    "verdict": "ACCEPTANCE_FAIL / blocker=3"
+  },
+  "run_id": "baseline-red-v3-10901d467679b70437ae112747eab81f889fd5cb"
+}

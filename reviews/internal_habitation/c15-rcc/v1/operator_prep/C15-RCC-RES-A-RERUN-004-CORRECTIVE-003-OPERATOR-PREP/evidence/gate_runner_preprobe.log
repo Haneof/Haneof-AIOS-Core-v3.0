@@ -1,0 +1,43 @@
+gate A: PASS ({'passed': 24, 'failed': 0, 'error': 0, 'skipped': 0}, total=24/24) -> gate_a_result.json
+gate B: PASS ({'passed': 7, 'failed': 0, 'error': 0, 'skipped': 0}, total=7/7) -> gate_b_result.json
+gate C: PASS ({'passed': 2, 'failed': 0, 'error': 0, 'skipped': 0}, total=2/2) -> gate_c_result.json
+gate D: PASS ({'passed': 5, 'failed': 0, 'error': 0, 'skipped': 0}, total=5/5) -> gate_d_result.json
+{
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "status": "PASS",
+  "gates": {
+    "A": {
+      "status": "PASS",
+      "result_file": "gate_a_result.json",
+      "result_sha256": "df058d5509f3b6a07e5232e75e59054c86798eb64d2316a37c908f090a8b0778"
+    },
+    "B": {
+      "status": "PASS",
+      "result_file": "gate_b_result.json",
+      "result_sha256": "7ed723ad94dcb7108cf810fc3accdc589928e6d50a65526b8b62e1e3327fdaa5"
+    },
+    "C": {
+      "status": "PASS",
+      "result_file": "gate_c_result.json",
+      "result_sha256": "00380a20665d1f3a12cde84fc9df5633be228f053d6411cfb0416f20b7a975a9"
+    },
+    "D": {
+      "status": "PASS",
+      "result_file": "gate_d_result.json",
+      "result_sha256": "f9ea7878c87e57881852c0e704810e9d69997078d4340f0b35d364076cd9850e"
+    }
+  },
+  "environment": {
+    "python_version": "3.12.14",
+    "python_version_info": [
+      3,
+      12,
+      14
+    ],
+    "pydantic_version": "2.13.5",
+    "pytest_version": "8.4.2",
+    "sqlite_version": "3.45.1",
+    "executable": "/tmp/aios-c15-op-prep-corrective-clean-20260928-final/runtime/3.12.14/venv/bin/python"
+  },
+  "generated_utc": "2026-09-28T20:27:44.218881+00:00"
+}

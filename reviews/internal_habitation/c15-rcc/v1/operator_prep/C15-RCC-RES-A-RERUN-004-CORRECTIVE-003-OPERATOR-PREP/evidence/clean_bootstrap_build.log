@@ -1,0 +1,104 @@
+[bootstrap] fetch https://codeload.github.com/python/cpython/tar.gz/refs/tags/v3.12.14
+[bootstrap] fetch https://codeload.github.com/madler/zlib/tar.gz/refs/tags/v1.3.1
+[bootstrap] fetch https://codeload.github.com/openssl/openssl/tar.gz/refs/tags/openssl-3.0.13
+[bootstrap] fetch https://registry.npmjs.org/better-sqlite3/-/better-sqlite3-9.4.1.tgz
+[bootstrap] npm SRI sha512 verified for better-sqlite3@9.4.1
+[bootstrap] sqlite amalgamation verified: 3.45.1 c=a760118a161b77a79dd9acdd16af324ed059e70d1e7571c504966fc2e40712cc
+[bootstrap] build zlib 1.3.1
+[bootstrap] build sqlite 3.45.1
+[bootstrap] build openssl 3.0.13 (several minutes)
+[bootstrap] deps prefix ready: /tmp/aios-c15-op-prep-corrective-clean-20260928-final/runtime/3.12.14/deps (fingerprint c2aad06c27a188d5)
+[bootstrap] building cpython 3.12.14 against deps fingerprint c2aad06c27a188d5
+[bootstrap] make -j2 (several minutes)
+[bootstrap] cpython installed at /tmp/aios-c15-op-prep-corrective-clean-20260928-final/runtime/3.12.14/python
+[bootstrap] create venv at /tmp/aios-c15-op-prep-corrective-clean-20260928-final/runtime/3.12.14/venv
+{
+  "artifact_count": 11,
+  "artifacts": [
+    {
+      "filename": "annotated_types-0.8.0-py3-none-any.whl",
+      "project": "annotated-types",
+      "sha256": "f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0",
+      "version": "0.8.0"
+    },
+    {
+      "filename": "iniconfig-2.3.0-py3-none-any.whl",
+      "project": "iniconfig",
+      "sha256": "f631c04d2c48c52b84d0d0549c99ff3859c98df65b3101406327ecc7d53fbf12",
+      "version": "2.3.0"
+    },
+    {
+      "filename": "packaging-26.3-py3-none-any.whl",
+      "project": "packaging",
+      "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+      "version": "26.3"
+    },
+    {
+      "filename": "pip-25.0.1-py3-none-any.whl",
+      "project": "pip",
+      "sha256": "c46efd13b6aa8279f33f2864459c8ce587ea6a1a59ee20de055868d8f7688f7f",
+      "version": "25.0.1"
+    },
+    {
+      "filename": "pluggy-1.6.0-py3-none-any.whl",
+      "project": "pluggy",
+      "sha256": "e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746",
+      "version": "1.6.0"
+    },
+    {
+      "filename": "pydantic-2.13.5-py3-none-any.whl",
+      "project": "pydantic",
+      "sha256": "346a034f080da3755d8e9cb5e00e8b07de1d39e4f6e2c87d8ab7cafa0b269a73",
+      "version": "2.13.5"
+    },
+    {
+      "filename": "pydantic_core-2.46.5-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "project": "pydantic-core",
+      "sha256": "0fc5be0abd4a407e200d844b404e33639a554e7bd0d448e7b9ae181be4789ac2",
+      "version": "2.46.5"
+    },
+    {
+      "filename": "pygments-2.21.0-py3-none-any.whl",
+      "project": "pygments",
+      "sha256": "2363c69b61c4a97c838da3b130dcd6468f4848992b21a82f2a63ec34377137d9",
+      "version": "2.21.0"
+    },
+    {
+      "filename": "pytest-8.4.2-py3-none-any.whl",
+      "project": "pytest",
+      "sha256": "872f880de3fc3a5bdc88a11b39c9710c3497a547cfa9320bc3c5e62fbf272e79",
+      "version": "8.4.2"
+    },
+    {
+      "filename": "typing_extensions-4.16.0-py3-none-any.whl",
+      "project": "typing-extensions",
+      "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+      "version": "4.16.0"
+    },
+    {
+      "filename": "typing_inspection-0.4.4-py3-none-any.whl",
+      "project": "typing-inspection",
+      "sha256": "65b8397ba37ccbce054456aaccddfc91e6e3083c92824df348d96ca832f3f147",
+      "version": "0.4.4"
+    }
+  ],
+  "lock_path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/bootstrap/PYTHON_WHEEL_LOCK.json",
+  "lock_sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe",
+  "status": "PASS",
+  "wheelhouse": "/tmp/aios-c15-op-prep-corrective-clean-20260928-final/runtime/3.12.14/wheelhouse"
+}
+[bootstrap] pre-frozen wheel lock verified: 11 exact wheels
+[bootstrap] venv ready from prelocked local wheel files only: /tmp/aios-c15-op-prep-corrective-clean-20260928-final/runtime/3.12.14/venv
+<stdin>:14: DeprecationWarning: version is deprecated and will be removed in Python 3.14
+[bootstrap] version triple OK: python=3.12.14 pydantic=2.13.5 pytest=8.4.2 sqlite=3.45.1
+[bootstrap] frozen RC identity OK: software=f20f2edfa7af00d0286493fd15196ca9503bc315 core=9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623 tests=7e33b5ef8432370234965d3ccd61248c703c4019
+{
+  "environment_record": "/tmp/aios-c15-op-prep-corrective-clean-20260928-final/evidence/environment_record.json",
+  "python": "3.12.14",
+  "pydantic": "2.13.5",
+  "pytest": "8.4.2",
+  "sqlite": "3.45.1",
+  "core_content_manifest_sha256": "3ca61cf1a34aff504d6df4fe3696e3f6d521e39de3adac96a0898789b54f885a"
+}
+[bootstrap] BUILD OK — qualified runtime at /tmp/aios-c15-op-prep-corrective-clean-20260928-final/runtime/3.12.14
+{"aios_runtime_root":"/tmp/aios-c15-op-prep-corrective-clean-20260928-final","aios_repo_root":"/home/user/Haneof-AIOS-Core-v3.0","runtime_dir":"/tmp/aios-c15-op-prep-corrective-clean-20260928-final/runtime/3.12.14","deps_dir":"/tmp/aios-c15-op-prep-corrective-clean-20260928-final/runtime/3.12.14/deps","python_prefix":"/tmp/aios-c15-op-prep-corrective-clean-20260928-final/runtime/3.12.14/python","python_bin":"/tmp/aios-c15-op-prep-corrective-clean-20260928-final/runtime/3.12.14/python/bin/python3.12","venv_dir":"/tmp/aios-c15-op-prep-corrective-clean-20260928-final/runtime/3.12.14/venv","venv_python":"/tmp/aios-c15-op-prep-corrective-clean-20260928-final/runtime/3.12.14/venv/bin/python","wheelhouse_dir":"/tmp/aios-c15-op-prep-corrective-clean-20260928-final/runtime/3.12.14/wheelhouse","evidence_dir":"/tmp/aios-c15-op-prep-corrective-clean-20260928-final/evidence"}
