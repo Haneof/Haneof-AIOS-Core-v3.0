@@ -245,13 +245,16 @@ jobs:
                   return {"status": "NOT_RUN", "tests": None, "failures": None, "errors": None, "skipped": None, "time": None}
               root = ET.parse(path).getroot()
               cases = root.findall(".//testcase")
+              elapsed = root.attrib.get("time")
+              if not elapsed:
+                  elapsed = f"{sum(float(case.attrib.get('time', '0')) for case in cases):.3f}"
               return {
                   "status": "RECORDED",
                   "tests": int(root.attrib.get("tests", len(cases))),
                   "failures": int(root.attrib.get("failures", sum(bool(c.findall("failure")) for c in cases))),
                   "errors": int(root.attrib.get("errors", sum(bool(c.findall("error")) for c in cases))),
                   "skipped": int(root.attrib.get("skipped", sum(bool(c.findall("skipped")) for c in cases))),
-                  "time": root.attrib.get("time"),
+                  "time": elapsed,
               }
 
           def marker(path):
@@ -319,10 +322,13 @@ jobs:
           markdown_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
           PY
           cat "$summary_path" >> "$GITHUB_STEP_SUMMARY"
-          while IFS= read -r line; do
-            test -n "$line" || continue
-            echo "::notice file=.github/workflows/core-rc-refreeze-003-formal-gate.yml,line=1,title=RC003 formal evidence::$line"
-          done < "$summary_path"
+          python - "$summary_path" <<'PY2'
+          from pathlib import Path
+          import sys
+          message = Path(sys.argv[1]).read_text(encoding="utf-8")
+          message = message.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+          print(f"::notice file=.github/workflows/core-rc-refreeze-003-formal-gate.yml,line=1,title=RC003 formal evidence::{message}")
+          PY2
 
       - name: Upload reproducible RC regression and smoke evidence
         if: always()
