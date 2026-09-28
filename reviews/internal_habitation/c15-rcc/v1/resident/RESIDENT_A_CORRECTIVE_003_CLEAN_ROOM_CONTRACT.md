@@ -18,8 +18,11 @@ Programs may not decide cognition for you.
 Before the first event, you may read only:
 
 1. this clean-room contract;
-2. the exact PM-approved Resident-safe launch packet for this run;
-3. the mechanical environment/harness status emitted by the approved launch tools.
+2. the canonical safe mechanical contract `reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_RUN_CONTRACT.md`;
+3. the exact PM-approved Resident-safe launch packet for this run;
+4. the mechanical environment/harness status emitted by the approved launch tools.
+
+For Corrective-003, this clean-room contract and the canonical `RESIDENT_A_RUN_CONTRACT.md` are a paired PM-approved contract set. The phrase "any other Resident run contract" in the canonical contract does not refer to this exact clean-room wrapper; it continues to forbid historical, alternate, or run-specific Resident contracts.
 
 After the run begins, you may additionally use:
 
