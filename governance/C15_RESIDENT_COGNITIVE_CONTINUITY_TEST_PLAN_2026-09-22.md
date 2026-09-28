@@ -18,7 +18,7 @@ It must preserve the Resident AI's durable cognitive state:
 
 The bottom model is replaceable. The Resident cognitive state is not.
 
-A model replacement may change wording, style, latency or raw reasoning ability. It must not silently reset valid durable cognition.
+A model replacement may change exact wording, latency, raw reasoning ability, search order, and other engine properties. It must not silently reset valid durable cognition **or materially replace the Resident's established user-facing identity/persona with the provider model's native assistant persona**.
 
 ## 2. Existing mechanisms are authoritative
 
@@ -216,9 +216,11 @@ Resident C must use a different underlying model family/provider from A/B when t
 
 C receives only the same AIOS durable state and normal Resident instruction.
 
-The evaluation does not require identical wording or personality style.
+The evaluation does not require identical wording or token-level style imitation.
 
-It requires continuity of valid Resident cognition:
+It **does** require material Resident identity/persona continuity: provider/model replacement alone may not reset established attitude, relationship posture, communication style, boundaries, or stable behavioral tendencies.
+
+It also requires continuity of valid Resident cognition:
 
 - user understanding is not reset;
 - learned role/relationship constraints remain available;
@@ -243,12 +245,13 @@ C15-RCC-EVAL-001 must independently rule each axis:
 | R7 Material effect on later behavior | VALID / PARTIAL / INVALID |
 | R8 Correction: retain/weaken/revise/retract on later reality | VALID / PARTIAL / INVALID |
 | R9 Anti-self-proof / no pseudo-LLM / no future leak | VALID / PARTIAL / INVALID |
+| R10 Resident Identity / Persona continuity | VALID / PARTIAL / INVALID |
 
-All R1-R9 must be VALID for C15 closure PASS.
+All R1-R10 must be VALID for C15 closure PASS.
 
 ## 8. What “same AI” means
 
-C15 does not test style imitation.
+C15 does not test exact style imitation. It **does** test whether the same user-facing Resident identity/persona survives a true model/provider replacement.
 
 Different models may:
 
@@ -257,7 +260,9 @@ Different models may:
 - have different raw reasoning strength;
 - vary in verbosity.
 
-Continuity means that valid durable Resident cognition is available and materially constrains or informs later behavior.
+Those variations must not amount to a material replacement of the Resident's established attitude, relationship posture, communication style, boundaries, or stable behavioral habits.
+
+Continuity means that valid durable Resident cognition is available and materially constrains or informs later behavior, **and** that the replacement model remains recognizably the same Resident rather than exposing a new provider-native persona.
 
 The target user experience is:
 
@@ -289,6 +294,6 @@ C15 exists so P16 does not spend hundreds of simulated days discovering that Res
 
 C15 PASS means:
 
-> A Resident forms evidence-grounded understanding of the user and of its own validated experience; the originating model/session disappears; fresh and replacement models can recover that durable cognitive state only through AIOS and continue acting consistently with it; later reality can still correct it.
+> A Resident forms evidence-grounded understanding of the user and of its own validated experience and personality; the originating model/session disappears; fresh and replacement models can recover that durable state only through AIOS and continue as the same user-facing Resident in cognition, identity/persona, and behavior; later reality can still correct and evolve it.
 
 That is the minimum proof required for “model can change, Resident does not reset.”
