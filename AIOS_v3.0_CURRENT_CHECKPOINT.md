@@ -52,6 +52,12 @@
 - 未做且不得由此窗口做：独立验收（self-acceptance）、`CORE-RC-REFREEZE-002`、B persistence corrective 恢复、任何 Resident 运行。
 - 当时写回的下一步曾是 `CORE-BACKGROUND-RESPONSE-RECOVERY-001-INDEPENDENT-ACCEPTANCE`。该验收已完成且为 `ACCEPTANCE_FAIL / blocker=2`；本段只保留作者当时的 GATE 记录，不是当前控制入口。B persistence corrective 继续 `FROZEN_WIP`；PR #216 冻结 WIP 未被修改。
 
+### 2026-09-26 persistence corrective — 未完成执行现场（非验收/非放行）
+
+- `C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001` 已在 live main `f0f2eb8a7030b9b56cbec43c09574e056b2f7c61` 确认 READY 后施工；本分支工程现场为 **WIP / BLOCKED，尚未 REVIEW_READY**。不改变 PM 派工裁决，不放行后续任务。
+- 冻结 E2E fresh `158/158`、lifecycle mutation-red 通过；synthetic journal 13 tests 通过。但 synthetic Core staged-reply 后 SIGKILL 恢复仍 `in_doubt`，端到端 exactly-once 收敛与平台 reattachment 证明尚未完成。全部红证据保留。
+- 续工必须先读 `reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/ENGINEERING_STATUS.md`；原型 synthetic-only，不得用于真实 B。未改 Core/fixture/A evidence，未进入 Independent Acceptance / RELEASE-003 / RERUN-003。
+
 ## 历史控制入口 — 2026-09-24 CORE-GAP-AUDIT ACCEPTED / FIX-001+002 READY
 
 - 独立审计 PR #132 已合入；PM acceptance main = `bc4bf735e15c5c0787fdc533fe3f10d0e17fdac3`，Core tree = `7db4f72e7b3c29c74082f9984141159f8f1d6071`。

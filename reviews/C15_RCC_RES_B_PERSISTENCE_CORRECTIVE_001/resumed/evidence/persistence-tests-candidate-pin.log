@@ -1,0 +1,51 @@
+# env: Python 3.11.2 (main, Apr  8 2026, 01:58:00) [GCC 12.2.0] pydantic 2.13.5 pytest 8.4.2
+# date: 2026-09-27T15:32:17Z
+
+## K1-K5 frozen probe suite (rev2)
+============================= test session starts ==============================
+platform linux -- Python 3.11.2, pytest-8.4.2, pluggy-1.6.0
+rootdir: /home/user/Haneof-AIOS-Core-v3.0
+configfile: pyproject.toml
+collected 5 items
+
+tests/c15_persistence/killpoints/test_killpoints.py .....                [100%]
+
+============================== 5 passed in 7.18s ===============================
+
+## production wiring
+============================= test session starts ==============================
+platform linux -- Python 3.11.2, pytest-8.4.2, pluggy-1.6.0
+rootdir: /home/user/Haneof-AIOS-Core-v3.0
+configfile: pyproject.toml
+collected 16 items
+
+tests/c15_persistence/test_operator_wiring.py ................           [100%]
+
+============================== 16 passed in 3.58s ==============================
+
+## environment detach / re-attach
+============================= test session starts ==============================
+platform linux -- Python 3.11.2, pytest-8.4.2, pluggy-1.6.0
+rootdir: /home/user/Haneof-AIOS-Core-v3.0
+configfile: pyproject.toml
+collected 2 items
+
+tests/c15_persistence/test_environment_reattach.py ..                    [100%]
+
+============================== 2 passed in 2.96s ===============================
+
+## resident surface
+platform linux -- Python 3.11.2, pytest-8.4.2, pluggy-1.6.0
+rootdir: /home/user/Haneof-AIOS-Core-v3.0
+configfile: pyproject.toml
+collected 1 item
+
+tests/c15_persistence/test_resident_surface.py .                         [100%]
+
+============================== 1 passed in 0.87s ===============================
+
+## historical journal tests
+----------------------------------------------------------------------
+Ran 13 tests in 0.484s
+
+OK

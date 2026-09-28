@@ -1,0 +1,17 @@
+Collecting annotated-types==0.8.0
+  Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+Collecting pydantic==2.13.5
+  Downloading pydantic-2.13.5-py3-none-any.whl (472 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 472.6/472.6 kB 14.9 MB/s eta 0:00:00
+Collecting pydantic_core==2.46.5
+  Downloading pydantic_core-2.46.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 57.5 MB/s eta 0:00:00
+Collecting typing-inspection==0.4.4
+  Downloading typing_inspection-0.4.4-py3-none-any.whl (14 kB)
+Collecting typing_extensions==4.16.0
+  Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 45.6/45.6 kB 16.1 MB/s eta 0:00:00
+Installing collected packages: typing_extensions, annotated-types, typing-inspection, pydantic_core, pydantic
+Successfully installed annotated-types-0.8.0 pydantic-2.13.5 pydantic_core-2.46.5 typing-inspection-0.4.4 typing_extensions-4.16.0
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+EXIT_CODE=0
