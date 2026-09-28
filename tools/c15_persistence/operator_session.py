@@ -194,6 +194,7 @@ class OperatorSession:
         self.mailbox = backend.mailbox_dir
         self.runtime: FusedTurnRuntime | None = None
         self._kill_at: str | None = None
+        self._kill_round: int | None = None
         self._handler_rounds: list[int] = []
         self._remote_ref: str | None = None
         self._remote: str = "origin"
@@ -596,10 +597,12 @@ class OperatorSession:
 
     # --------------------------------------------------------- kill barrier
 
-    def maybe_kill(self, point: str) -> None:
+    def maybe_kill(self, point: str, *, round_index: int | None = None) -> None:
         if self._kill_at != point:
             return
-        self.backend.audit("kill_barrier", {"point": point})
+        if self._kill_round is not None and round_index != self._kill_round:
+            return
+        self.backend.audit("kill_barrier", {"point": point, "round_index": round_index})
         sys.stdout.flush()
         sys.stderr.flush()
         os.kill(os.getpid(), signal.SIGKILL)
@@ -775,7 +778,7 @@ class OperatorSession:
                     "K3_AFTER_REQUEST_DISPATCH",
                     seal_label="remote-request-dispatched",
                 )
-            self.maybe_kill("K3_AFTER_REQUEST_DISPATCH")
+            self.maybe_kill("K3_AFTER_REQUEST_DISPATCH", round_index=round_index)
         else:
             raw = self.journal.outstanding_request(request_id)
             self.backend.audit("request_represented", {"request_id": request_id, "round": round_index})
@@ -1135,8 +1138,14 @@ class OperatorSession:
 
     # ------------------------------------------------------------ the loop
 
-    def process_one_cursor(self, *, kill_at: str | None = None) -> dict[str, Any]:
+    def process_one_cursor(
+        self, *, kill_at: str | None = None, kill_round: int | None = None
+    ) -> dict[str, Any]:
         self._kill_at = kill_at
+        self._kill_round = kill_round
+        if kill_round is not None:
+            require(kill_at == "K3_AFTER_REQUEST_DISPATCH", "kill_round is only valid for K3")
+            require(kill_round >= 0, "kill_round must be non-negative")
         if kill_at is not None and kill_at not in KILL_POINTS:
             raise BackendError(f"unknown kill point: {kill_at}")
         projection = self.reveal()
@@ -1145,10 +1154,12 @@ class OperatorSession:
         ack = self.ack(projection, receipt)
         return {"projection": projection, "ingest": receipt, "turn": turn, "ack": ack}
 
-    def resume(self, *, kill_at: str | None = None) -> dict[str, Any]:
+    def resume(
+        self, *, kill_at: str | None = None, kill_round: int | None = None
+    ) -> dict[str, Any]:
         """Re-enter the same loop in a fresh process. Every step re-derives."""
-        self.backend.audit("resume_started", {"kill_at": kill_at or "none"})
-        return self.process_one_cursor(kill_at=kill_at)
+        self.backend.audit("resume_started", {"kill_at": kill_at or "none", "kill_round": kill_round})
+        return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)
 
     # ---------------------------------------------------------- observation
 
