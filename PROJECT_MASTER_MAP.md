@@ -134,6 +134,7 @@ Evidence + Dependency + Revision
 10. 程序负责确定性基础设施；高阶意义、因果、用户理解、自我理解由真实模型判断。
 11. AI认知必须以 Claim 等可修正对象进入统一世界，不得建立第二真相库。
 12. 认知翻案必须向前修正并传播，不能删除过去来伪装“从未犯错”。
+13. Resident 身份/人格属于 AIOS，而不是底层 provider/model。底层模型可替换，能力与精确措辞可变化，但模型切换本身不得造成用户可见的 Resident 人格、态度、关系姿态、沟通风格或稳定行为习惯重置；人格变化必须来自长期真实 Evidence 并通过统一 Revision / Retraction 向前演化。
 
 根原则解释权以 `AIOS_v3.0_Fused_Baseline_Registry.md` 为准。
 
@@ -341,7 +342,7 @@ P9 认知翻案传播 ✅
 → P14 长会话连续完整接线 ✅
 → P15 周期Review与AI经验成长 ✅
 → P16 内部专项：C14 PASS → C15 B纠偏/预检/独立放行/重跑/验收
-→ C15 可信模型身份 → Resident C → 独立语义终评 → 收口
+→ C15 Resident identity/persona continuity 治理 + read-only preflight → 可信模型身份 → Resident C → R1–R10 独立语义终评 → 收口
 → C16 Resident系统改进反馈闭环
 → 恢复 P16 分段/年度 + 多provider独立入住 + evaluator/red-team
 → P16正式收口
@@ -443,6 +444,7 @@ AIOS Core v3.0 只有同时满足以下事实才进入 Release Gate：
 - Goal / Task / Action / Outcome 形成可审计闭环；
 - 多 Agent 长期入住测试能证明跨天/跨月连续性；
 - 不依赖某个特定模型厂商、手机、ROM 或 UI；
-- 换模型之后，世界、经验和关系仍然继续存在。
+- 换模型之后，世界、经验和关系仍然继续存在；
+- 换 provider/model/API key 后，用户面对的仍是同一个 Resident：当前有效人格、态度、关系姿态、沟通风格和稳定行为习惯不因引擎切换而重置；人格只能沿 durable Evidence/Revision lineage 演化。
 
 这才是 AIOS v3.0 的 Core 完成，而不是“代码文件很多”或“单元测试数量很多”。
