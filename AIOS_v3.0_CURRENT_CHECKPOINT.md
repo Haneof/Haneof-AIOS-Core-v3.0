@@ -1,5 +1,18 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-09-28 Corrective-003 Operator Prep — IA FAIL; Operator Prep Corrective-001 required
+
+- Failed Operator Prep PR #281 exact `10901d467679b70437ae112747eab81f889fd5cb`.
+- Fresh IA PR #283 exact `e3394da5d607e34c0286c16a11837ac7ea173a56` → `ACCEPTANCE_FAIL / blocker=3`.
+- IA-OP-001: published-response idempotent path does not verify current on-disk bytes against durable digest before returning success.
+- IA-OP-002: Python wheel hashes are derived after live download rather than fixed as a pre-download trust root.
+- IA-OP-003: gate collect-only parser records zero test IDs/count despite real collections 19/7/2/5.
+- These are Operator Prep defects only; no Core or Resident change is authorized.
+- Unique next READY: `C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-001`.
+- Corrective must preserve baseline RED against failed exact #281, fix only the three blockers, rerun clean bootstrap + targeted probes + full A/B/C/D, and produce a new evidence-only candidate/launch packet.
+- Real Corrective-003 Resident remains blocked until corrective Operator Prep fresh IA PASS + PM integration.
+
+
 ## 2026-09-28 CORRECTIVE-003 Operator Prep — REVIEW_READY; fresh IA next
 
 - Operator Prep PR #281 exact head `10901d467679b70437ae112747eab81f889fd5cb`; parent `abb8b435e5187c7c6c2f4332aea37cd805b4a53c`; tree `db79761216529cf83f217ab00c937bc79806a510`.
