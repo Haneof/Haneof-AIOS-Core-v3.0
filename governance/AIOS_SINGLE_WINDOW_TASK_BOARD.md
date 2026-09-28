@@ -1,5 +1,18 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 当前控制入口 — 2026-09-28 OPERATOR-PREP CORRECTIVE-001 REVIEW_BLOCKED / CORRECTIVE-002 READY
+
+- **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-001 = OPERATOR_PREP_CORRECTIVE_COMPLETE / REVIEW_READY / PM_REVIEW_BLOCKED / KNOWN_UNRESOLVED_FINDINGS`**. PR #286 final freeze H2 = `c32e544b747cb1f1d9b7418e2163a65ac55ee39c`, parent/corrected candidate H1b = `99af8e268a1f9e8944b163d8087005e0e3698620`. No fresh IA was released for #286.
+- Corrective-001 successfully closed the three #283 blockers: response replay on-disk verification, pre-download wheel trust root, and gate enumeration/result consistency.
+- During fresh PM readiness, PM discovered a second historical independent review of the same failed #281 exact: review PR #284 @ `dce47c0d8f3ac7e34efb47e22c63c6f9acbea1a6`, verdict `ACCEPTANCE_FAIL / blocker=6`. Its findings were not included in the earlier #283-based adjudication.
+- PM independently checked #284 against #286. Remaining valid defects include: recovery request↔snapshot binding/ambiguity; operational ledger chain+uniqueness enforcement; bootstrap frozen-RC verify fail-open / working-tree identity; SQLite exact version verification; launch packet startup-input mismatch; missing due-work model-exchange entrypoint. The wheel-closure portion of historical IA284-OP-04 is already closed by Corrective-001.
+- PM ruling for future Resident startup inputs is now exact: clean-room contract + canonical `RESIDENT_A_RUN_CONTRACT.md` + exact PM-approved launch packet + approved mechanical environment/harness status. All historical/alternate Resident contracts/control-plane material remain forbidden.
+- **唯一下一 READY：`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-002 = READY`**. Prompt: `governance/prompts/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_002_2026-09-28.md`.
+- Corrective-002 must preserve all Corrective-001 GREEN fixes, freeze targeted probes against exact #286 before implementation, close only the remaining #284 findings, then rebuild/refreeze Operator Prep evidence.
+- `C15-RCC-RES-A-RERUN-004-CORRECTIVE-003` remains **BLOCKED_ON_OPERATOR_PREP**. No real Resident run is authorized.
+- Persistence Corrective-003, Resident B/C, evaluator and C15 close remain **BLOCKED**.
+
+
 ## 当前控制入口 — 2026-09-28 OPERATOR-PREP IA FAIL / CORRECTIVE-001 READY
 
 - **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP = ACCEPTANCE_FAIL / blocker=3 / HISTORICAL_FAILED_EXACT`**. Failed candidate PR #281 exact head = `10901d467679b70437ae112747eab81f889fd5cb` (parent `abb8b435e5187c7c6c2f4332aea37cd805b4a53c`, tree `db79761216529cf83f217ab00c937bc79806a510`). Fresh IA PR #283 exact review = `e3394da5d607e34c0286c16a11837ac7ea173a56`, verdict `ACCEPTANCE_FAIL / blocker=3`.

@@ -1,5 +1,16 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-09-28 Operator Prep Corrective-001 — PM REVIEW_BLOCKED by previously unadjudicated review #284
+
+- Corrective-001 candidate: PR #286 H2 `c32e544b747cb1f1d9b7418e2163a65ac55ee39c`; H1b `99af8e268a1f9e8944b163d8087005e0e3698620`.
+- The #283-derived three blockers are closed and must remain GREEN.
+- Previously unadjudicated review PR #284 @ `dce47c0d8f3ac7e34efb47e22c63c6f9acbea1a6` contains six additional findings against failed #281. Fresh PM comparison shows binding gaps still present in #286: recovery snapshot binding, operational ledger integrity, frozen-RC verification, SQLite pin enforcement, startup contract alignment, and due-work harness coverage.
+- #286 is therefore `PM_REVIEW_BLOCKED / KNOWN_UNRESOLVED_FINDINGS`, not `ACCEPTANCE_FAIL`; fresh IA for #286 was never released.
+- Clean-room startup ruling is clarified: allowed startup set = clean-room contract + canonical Resident A run contract + exact launch packet + mechanical environment/harness status.
+- Unique next READY: `C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-002`.
+- Real Corrective-003 Resident and all downstream persistence/B/C/evaluator work remain blocked.
+
+
 ## 2026-09-28 Corrective-003 Operator Prep — IA FAIL; Operator Prep Corrective-001 required
 
 - Failed Operator Prep PR #281 exact `10901d467679b70437ae112747eab81f889fd5cb`.
