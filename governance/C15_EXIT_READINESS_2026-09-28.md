@@ -172,6 +172,13 @@ Prepared but blocked:
 - `governance/prompts/C15_RCC_PERSONA_CONTINUITY_PREFLIGHT_001_DRAFT_2026-09-28.md`
 - `governance/prompts/C15_RCC_RES_C_001_R10_DRAFT_2026-09-28.md`
 - `governance/prompts/C15_RCC_EVAL_001_R10_DRAFT_2026-09-28.md`
+- `governance/prompts/CORE_RC_REFREEZE_003_INDEPENDENT_ACCEPTANCE_DRAFT_2026-09-28.md`
+- `governance/prompts/C15_RCC_RES_A_RERUN_004_INDEPENDENT_ACCEPTANCE_DRAFT_2026-09-28.md`
+- `governance/prompts/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_DRAFT_2026-09-28.md`
+- `governance/prompts/C15_RCC_RES_B_RELEASE_003_DRAFT_2026-09-28.md`
+- `governance/prompts/C15_RCC_RES_B_RERUN_003_DRAFT_2026-09-28.md`
+- `governance/prompts/C15_RCC_RES_B_ACCEPT_003_DRAFT_2026-09-28.md`
+- `governance/prompts/C15_RCC_CLOSE_001_DRAFT_2026-09-28.md`
 
 They are templates, not READY authorizations.
 
