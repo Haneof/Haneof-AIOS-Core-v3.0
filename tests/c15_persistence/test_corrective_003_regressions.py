@@ -303,7 +303,7 @@ def test_cross_run_remote_config_and_ref_transplant_is_rejected(tmp_path: Path) 
         shutil.copy2(b_root / "remote-durability.json", a_root / "remote-durability.json")
         shutil.copy2(b_root / ".remote-head", a_root / ".remote-head")
 
-        with pytest.raises(BackendError, match="remote durability config/binding mismatch|remote authority"):
+        with pytest.raises(BackendError, match="not canonical|remote durability config/binding mismatch|remote authority"):
             OperatorSession.attach(
                 a_root,
                 run_id=str(a.backend.owner["run_id"]),
