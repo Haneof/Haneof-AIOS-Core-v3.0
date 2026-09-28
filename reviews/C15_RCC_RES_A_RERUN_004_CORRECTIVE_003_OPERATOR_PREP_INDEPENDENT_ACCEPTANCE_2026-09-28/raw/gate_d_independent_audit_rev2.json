@@ -1,0 +1,12 @@
+{
+  "branch_hits": [],
+  "semantic_field_reads": [
+    "schema.py:211",
+    "schema.py:212",
+    "schema.py:213",
+    "schema.py:215"
+  ],
+  "literal_constructions": [
+    "schema.py:126: CapabilityResult(name='contract-probe', ok=True, data=None)"
+  ]
+}

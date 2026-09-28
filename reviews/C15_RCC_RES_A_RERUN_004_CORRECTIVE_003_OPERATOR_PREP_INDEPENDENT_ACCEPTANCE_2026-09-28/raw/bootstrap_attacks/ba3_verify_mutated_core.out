@@ -1,0 +1,12 @@
+<stdin>:12: DeprecationWarning: version is deprecated and will be removed in Python 3.14
+[bootstrap] version triple OK: python=3.12.14 pydantic=2.13.5 pytest=8.4.2 sqlite=3.45.1
+[bootstrap] frozen RC identity OK: software=f20f2edfa7af00d0286493fd15196ca9503bc315 core=9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623 tests=7e33b5ef8432370234965d3ccd61248c703c4019
+{
+  "environment_record": "/tmp/ia/rt/evidence/environment_record.json",
+  "python": "3.12.14",
+  "pydantic": "2.13.5",
+  "pytest": "8.4.2",
+  "sqlite": "3.45.1",
+  "core_content_manifest_sha256": "32a93963f81e7619450ee91a84efbdfbb5ec7d2643e2ac7224d399873373887c"
+}
+[bootstrap] VERIFY OK

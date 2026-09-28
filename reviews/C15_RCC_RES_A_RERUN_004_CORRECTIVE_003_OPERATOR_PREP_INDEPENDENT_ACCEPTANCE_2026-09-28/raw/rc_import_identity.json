@@ -1,0 +1,9 @@
+{
+  "aios_core__file__": "/tmp/ia/clone/src/aios_core/__init__.py",
+  "loaded_modules": 68,
+  "mismatches": [],
+  "worktree_diff_vs_frozen_rc": 0,
+  "frozen_core_tree": "9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623",
+  "frozen_tests_tree": "7e33b5ef8432370234965d3ccd61248c703c4019",
+  "frozen_repo_tree": "1ac3a675b884167d3a29aa432e7ef3eaff94d404"
+}

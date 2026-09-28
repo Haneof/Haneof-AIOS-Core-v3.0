@@ -1,0 +1,32 @@
+{
+  "gate": "B",
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "status": "PASS",
+  "returncode": 0,
+  "test_file": "tests/test_gate_b_frozen_core_contract.py",
+  "test_count": 0,
+  "test_ids": [],
+  "outcomes": {
+    "passed": 7,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "duration_s": 0.68,
+  "raw_output": "gate_b_raw.txt",
+  "raw_output_sha256": "df1f4dc063de8cf183468ad1cacf6d86da207e4a03b5ff3842159fbabdd1e836",
+  "enumeration_sha256": "b109aab6365aebc87fc75a260de3894cf4ba5a509fdc096ba407ee8d9737ab18",
+  "environment": {
+    "python_version": "3.12.14",
+    "python_version_info": [
+      3,
+      12,
+      14
+    ],
+    "pydantic_version": "2.13.5",
+    "pytest_version": "8.4.2",
+    "sqlite_version": "3.45.1",
+    "executable": "/tmp/ia/rt/runtime/3.12.14/venv/bin/python"
+  },
+  "generated_utc": "2026-09-28T18:57:03.361078+00:00"
+}
