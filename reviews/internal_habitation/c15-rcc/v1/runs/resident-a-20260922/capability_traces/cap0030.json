@@ -1,0 +1,89 @@
+{
+  "trace_id": "cap0030",
+  "checkpoint_id": "cp0030",
+  "cursor": 9,
+  "directive": {
+    "capability_calls": [
+      {
+        "name": "commit_ai_world_claim",
+        "arguments": {
+          "domain": "cognitive_boundary",
+          "statement": "2026-11-04 14:16 的 registry 记录说 edge-2026.11.4 上传尝试被拒绝，原因是 checksum mismatch；镜像未发布，tag 未创建，registry 中没有对应 digest。这不是上传成功，也不能当作门店可以开始测试的依据。",
+          "evidence_refs": [
+            {
+              "object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_24843998506b575cc3f98915",
+              "revision": 1
+            }
+          ],
+          "confidence": 0.88,
+          "knowledge_state": "observed",
+          "claim_type": "fact",
+          "scope_key": "edge-2026.11.4-upload",
+          "tags": [
+            "release",
+            "edge-2026.11.4",
+            "rejected",
+            "not-published"
+          ]
+        },
+        "call_id": "cp0030-reject-boundary"
+      }
+    ],
+    "response": null,
+    "silence": false
+  },
+  "history_before": [
+    {
+      "name": "inspect_world_object",
+      "ok": true,
+      "data": {
+        "created_by": "c14_fixture_ingest:c15-rcc-mechanical-ingest-adapter-v1",
+        "data_quality": {
+          "fixture_release": true
+        },
+        "learned_at": "2026-11-04T22:17:00Z",
+        "metadata": {
+          "dimension": "dim:release_state",
+          "external_record_id": "c15rcc-009",
+          "external_revision": "1",
+          "fixture_binding_version": "c15-rcc-fixture-event-binding-v1",
+          "fixture_event_id": "c15rcc-009",
+          "fixture_payload_sha256": "sha256:75fe7cf480226ac2cf456e9a07e26fe062aa5f42c1c3d6d661559ed2fd4aa0f5",
+          "fixture_projection_sha256": "sha256:e744a4993fcc7e7c036a0f4c07b4a76fffcccf15f4e079f55de82e84384271ce",
+          "fixture_sequence": 9,
+          "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+          "fixture_version": "c15-rcc-fixture-v1",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-11-04T14:17:00-08:00",
+          "source_class": "platform"
+        },
+        "modality": "structured_text",
+        "object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+        "object_type": "observation",
+        "occurred": {
+          "end": "2026-11-04T22:17:00Z",
+          "precision": "second",
+          "start": "2026-11-04T22:17:00Z",
+          "timezone_name": "UTC",
+          "unknown": false
+        },
+        "raw_locator": "fixture://c15-rcc-fixture-v1/c15rcc-009",
+        "recorded_at": "2026-11-04T22:17:00Z",
+        "revision": 1,
+        "source_kind": "registry",
+        "source_refs": [],
+        "status": "active",
+        "subject_id": "user_1",
+        "unit": null,
+        "value": "registry 上传尝试在 14:16 被拒绝：checksum mismatch。edge-2026.11.4 未发布，tag 未创建，registry 中没有对应 digest。"
+      },
+      "error_code": null,
+      "error_message": null,
+      "call_id": "cp0029-inspect-reject"
+    }
+  ]
+}

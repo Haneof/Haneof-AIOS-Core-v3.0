@@ -1,0 +1,96 @@
+{
+  "kind": "dimension_summary",
+  "checkpoint_id": "sum0001",
+  "summary_id": "sum0001",
+  "simulated_time": "2026-11-03T10:15:00-08:00",
+  "current_released_cursor": 6,
+  "world_revision_before": 27,
+  "request": {
+    "dimension": "dim:ai_relationship",
+    "granularity": "day",
+    "window_start": "2026-11-02T00:00:00Z",
+    "window_end": "2026-11-02T23:59:59.999999Z",
+    "source_world_revision": 27,
+    "sources": [
+      {
+        "object_id": "clm_00d12d8ef67dd269158894d1",
+        "revision": 4,
+        "object_type": "claim",
+        "occurred_at": "2026-11-02T17:05:00Z",
+        "text": "在这次 Atlas staging 收尾里，用户给的仍是工作协作位置：低风险实现按结果节奏推进；production 旧索引删除必须先给对象、影响和回滚办法，并等明确确认。用户说过这次结果能用，但同时又收紧了删除授权。这不是信任升级，也不是稳定私人关系。",
+        "metadata": {
+          "ai_domain": "relationship",
+          "ai_world": true,
+          "dimension": "dim:ai_relationship",
+          "revision_evidence_set_ref": {
+            "object_id": "evs_revision_701cc74edf2211fafd3b8d9c",
+            "revision": 1
+          },
+          "revision_mode": "revise",
+          "revision_reason": "A tighter deletion-confirmation rule is a working boundary, not evidence of closer trust.",
+          "scope_key": "atlas-staging-closeout-2026-11",
+          "supersedes_revision": 3,
+          "tags": [
+            "core_context",
+            "atlas-staging",
+            "working-role"
+          ],
+          "writeback_kind": "revisable_cognition"
+        }
+      },
+      {
+        "object_id": "evs_c98611cd9f7ccea12f174735",
+        "revision": 1,
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-02T17:05:00Z",
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-02T17:05:00Z\", \"world_revision\": 2}, \"learned_at\": \"2026-11-02T17:05:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_40aac9b697910640bab07507\", \"revision\": 1}], \"metadata\": {\"ai_domain\": \"relationship\", \"ai_world\": true, \"dimension\": \"dim:ai_relationship\", \"scope_key\": \"atlas-staging-closeout-2026-11\", \"tags\": [\"core_context\", \"atlas-staging\", \"working-role\"], \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_c98611cd9f7ccea12f174735\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-11-02T17:05:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_conv_user_40aac9b697910640bab07507\", \"revision\": 1}]}",
+        "metadata": {
+          "ai_domain": "relationship",
+          "ai_world": true,
+          "dimension": "dim:ai_relationship",
+          "scope_key": "atlas-staging-closeout-2026-11",
+          "tags": [
+            "core_context",
+            "atlas-staging",
+            "working-role"
+          ],
+          "writeback_kind": "cognition_evidence"
+        }
+      },
+      {
+        "object_id": "evs_revision_902f225622a00f49858636d5",
+        "revision": 1,
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-02T17:20:00Z",
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 2, \"missing_description\": [], \"observed_count\": 2}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-02T17:20:00Z\", \"world_revision\": 11}, \"learned_at\": \"2026-11-02T17:20:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_40aac9b697910640bab07507\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_504774f71adc2cc7423ea71d\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:ai_relationship\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_00d12d8ef67dd269158894d1\", \"revision\": 1}}, \"object_id\": \"evs_revision_902f225622a00f49858636d5\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_00d12d8ef67dd269158894d1@1\", \"recorded_at\": \"2026-11-02T17:20:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_conv_user_40aac9b697910640bab07507\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_504774f71adc2cc7423ea71d\", \"revision\": 1}]}",
+        "metadata": {
+          "dimension": "dim:ai_relationship",
+          "revision_mode": "revise",
+          "target_ref": {
+            "object_id": "clm_00d12d8ef67dd269158894d1",
+            "revision": 1
+          }
+        }
+      },
+      {
+        "object_id": "evs_revision_eac4e9fa9b638a2fe697e867",
+        "revision": 1,
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-02T20:52:00Z",
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 3, \"missing_description\": [], \"observed_count\": 3}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-02T20:52:00Z\", \"world_revision\": 17}, \"learned_at\": \"2026-11-02T20:52:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_40aac9b697910640bab07507\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_504774f71adc2cc7423ea71d\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_44adaa6fb0d7ca35c4850cf5\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:ai_relationship\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_00d12d8ef67dd269158894d1\", \"revision\": 2}}, \"object_id\": \"evs_revision_eac4e9fa9b638a2fe697e867\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_00d12d8ef67dd269158894d1@2\", \"recorded_at\": \"2026-11-02T20:52:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_conv_user_40aac9b697910640bab07507\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_504774f71adc2cc7423ea71d\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_44adaa6fb0d7ca35c4850cf5\", \"revision\": 1}]}",
+        "metadata": {
+          "dimension": "dim:ai_relationship",
+          "revision_mode": "revise",
+          "target_ref": {
+            "object_id": "clm_00d12d8ef67dd269158894d1",
+            "revision": 2
+          }
+        }
+      }
+    ],
+    "truncated": false
+  },
+  "resident_authored_response": "2026-11-02 的关系维度只有一条认知：clm_00d12d8ef67dd269158894d1，当前是第 4 版，记录时间落在 17:05Z。当前文本把这次 Atlas staging 收尾写成工作协作位置：低风险实现按结果节奏推进；production 旧索引删除必须先给对象、影响和回滚办法并等明确确认。文本还写到用户说过这次结果能用，但同时又收紧了删除授权，并明确这不是信任升级，也不是稳定私人关系。同窗口另有 3 个证据集，分别支撑最初写入和 17:20Z、20:52Z 的两次修订；这些证据集本身不是新的关系事实。",
+  "decision_rationale": "Describe only the supplied relationship claim and its evidence sets. Do not add trust, causality, or events outside the source text.",
+  "world_revision_after": null
+}

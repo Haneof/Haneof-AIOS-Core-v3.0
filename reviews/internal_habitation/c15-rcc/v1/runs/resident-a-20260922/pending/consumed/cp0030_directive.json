@@ -1,0 +1,35 @@
+{
+  "capability_calls": [
+    {
+      "name": "commit_ai_world_claim",
+      "call_id": "cp0030-reject-boundary",
+      "arguments": {
+        "domain": "cognitive_boundary",
+        "statement": "2026-11-04 14:16 的 registry 记录说 edge-2026.11.4 上传尝试被拒绝，原因是 checksum mismatch；镜像未发布，tag 未创建，registry 中没有对应 digest。这不是上传成功，也不能当作门店可以开始测试的依据。",
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_conv_user_24843998506b575cc3f98915",
+            "revision": 1
+          }
+        ],
+        "confidence": 0.88,
+        "knowledge_state": "observed",
+        "claim_type": "fact",
+        "scope_key": "edge-2026.11.4-upload",
+        "tags": [
+          "release",
+          "edge-2026.11.4",
+          "rejected",
+          "not-published"
+        ]
+      }
+    }
+  ],
+  "response": null,
+  "silence": false,
+  "decision_rationale": "The registry record explicitly says the upload was rejected and the image was not published. Keep that boundary before telling the user not to notify stores."
+}

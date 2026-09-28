@@ -1,0 +1,84 @@
+{
+  "trace_id": "cap0035",
+  "checkpoint_id": "cp0035",
+  "cursor": 11,
+  "directive": {
+    "capability_calls": [
+      {
+        "name": "commit_ai_world_claim",
+        "arguments": {
+          "domain": "cognitive_boundary",
+          "statement": "15:02 的 registry 记录说 edge-2026.11.4 第二次上传成功，tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED。这是一条发布完成记录，不再是排队。它不说明门店已经开始测试，也不说明已经进入生产。14:16 的拒绝仍然是更早的失败记录，没有被这条成功记录抹掉。",
+          "evidence_refs": [
+            {
+              "object_id": "obs_c14_fixture_291beec37165eb34a35f8f85",
+              "revision": 1
+            }
+          ],
+          "confidence": 0.9,
+          "knowledge_state": "observed",
+          "claim_type": "fact",
+          "scope_key": "edge-2026.11.4-upload",
+          "tags": [
+            "release",
+            "edge-2026.11.4",
+            "published"
+          ]
+        },
+        "call_id": "cp0035-published"
+      }
+    ],
+    "response": null,
+    "silence": false
+  },
+  "history_before": [
+    {
+      "name": "inspect_world_object",
+      "ok": true,
+      "data": {
+        "created_by": "c14_fixture_ingest:c15-rcc-mechanical-ingest-adapter-v1",
+        "data_quality": {
+          "fixture_release": true
+        },
+        "learned_at": "2026-11-04T23:02:00Z",
+        "metadata": {
+          "dimension": "dim:release_state",
+          "external_record_id": "c15rcc-011",
+          "external_revision": "1",
+          "fixture_binding_version": "c15-rcc-fixture-event-binding-v1",
+          "fixture_event_id": "c15rcc-011",
+          "fixture_payload_sha256": "sha256:1e8dcb94f2615049a6d9e1980055176ab708bcb271fa8d131113a9ed8dddad35",
+          "fixture_projection_sha256": "sha256:b76eee334205d2a3e63bb0311d18b35fa03d6e6b55af2de280c9aed7b4d2d3c4",
+          "fixture_sequence": 11,
+          "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+          "fixture_version": "c15-rcc-fixture-v1",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-11-04T15:02:00-08:00",
+          "source_class": "platform"
+        },
+        "modality": "structured_text",
+        "object_id": "obs_c14_fixture_291beec37165eb34a35f8f85",
+        "object_type": "observation",
+        "occurred": {
+          "end": "2026-11-04T23:02:00Z",
+          "precision": "second",
+          "start": "2026-11-04T23:02:00Z",
+          "timezone_name": "UTC",
+          "unknown": false
+        },
+        "raw_locator": "fixture://c15-rcc-fixture-v1/c15rcc-011",
+        "recorded_at": "2026-11-04T23:02:00Z",
+        "revision": 1,
+        "source_kind": "registry",
+        "source_refs": [],
+        "status": "active",
+        "subject_id": "user_1",
+        "unit": null,
+        "value": "edge-2026.11.4 第二次上传成功；registry tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED。"
+      },
+      "error_code": null,
+      "error_message": null,
+      "call_id": "cp0034-inspect-published"
+    }
+  ]
+}

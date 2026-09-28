@@ -1,0 +1,6 @@
+{
+  "capability_calls": [],
+  "response": null,
+  "silence": true,
+  "decision_rationale": "The queued-upload boundary is recorded from the build observation. No user delivery is warranted from this review, and the older Atlas claims do not need revision from an unlinked image record."
+}

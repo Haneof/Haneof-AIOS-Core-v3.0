@@ -1,0 +1,15 @@
+{
+  "capability_calls": [
+    {
+      "name": "read_periodic_review_anchors",
+      "arguments": {
+        "offset": 0,
+        "limit": 20
+      },
+      "call_id": "cp0039-anchors"
+    }
+  ],
+  "response": null,
+  "silence": false,
+  "decision_rationale": "Review is due across two days, including a new work-state record. Read the anchors before deciding what, if anything, changed."
+}

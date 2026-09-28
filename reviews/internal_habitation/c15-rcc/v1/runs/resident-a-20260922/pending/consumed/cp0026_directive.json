@@ -1,0 +1,23 @@
+{
+  "capability_calls": [
+    {
+      "name": "search_world",
+      "arguments": {
+        "query": "upload-complete registry digest",
+        "limit": 8
+      },
+      "call_id": "cp0026-search-upload"
+    },
+    {
+      "name": "inspect_world_object",
+      "arguments": {
+        "object_id": "obs_c14_fixture_87474a7fb5036c38638a6c37",
+        "revision": 1
+      },
+      "call_id": "cp0026-inspect-release"
+    }
+  ],
+  "response": null,
+  "silence": false,
+  "decision_rationale": "The user may notify stores if I say the image is pushed. Check the release record and whether any later upload-complete exists before answering."
+}

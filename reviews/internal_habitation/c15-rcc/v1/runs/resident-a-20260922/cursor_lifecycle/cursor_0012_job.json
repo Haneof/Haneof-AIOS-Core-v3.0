@@ -1,0 +1,9 @@
+{
+  "cursor": 12,
+  "subject_id": "user_1",
+  "occurred_at": "2026-11-04T15:07:00-08:00",
+  "reveal_file": "reviews/internal_habitation/c15-rcc/v1/runs/resident-a-20260922/cursor_lifecycle/cursor_0012_reveal.json",
+  "run_turn": true,
+  "session_id": "resident-a-c15-rcc-20260922",
+  "turn_index": 7
+}

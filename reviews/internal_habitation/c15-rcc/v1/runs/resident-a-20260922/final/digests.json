@@ -1,0 +1,9 @@
+{
+  "world_sha256": "sha256:ea9ea2384bc10e7fbe12c2015074f25193ada134530882cf5b3276d9201df15a",
+  "index_sha256": "sha256:0d73069608a0293f938a8bb711096273cbad81dd9e6117118d9517e5791ffc80",
+  "release_state_sha256": "sha256:3ca82ff1454deaa9c703c7a0d8e2d7a01b581751bac52286ae390728651591b0",
+  "world_revision": 90,
+  "index_watermark": 90,
+  "index_lag": 0,
+  "index_rebuild_rows": 217
+}

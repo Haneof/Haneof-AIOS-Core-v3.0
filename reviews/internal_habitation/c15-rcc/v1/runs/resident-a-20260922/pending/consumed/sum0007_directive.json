@@ -1,0 +1,4 @@
+{
+  "summary_text": "2026-11-03 的用户理解维度新增一条认知 clm_3caae78c9c70ebb46a6cb483：production 旧索引如果要删，必须先给出具体对象、影响和回滚办法，并等用户明确确认后才能执行；随口“清一下”不是删除授权。文本写明这是确认规则，不是已经提出的删除请求，也不自动变成测试环境非生产改动的规则。同日还有两条既有认知的修订证据：clm_38ad6d12fe669e009a9aa3ea 第 2 版、clm_ca5a8933b8e86d1a4df0cdf2 第 2 版，修订后的正文不在这批来源里。",
+  "decision_rationale": "Restate the new claim that is actually in the window, and only name the two revision evidence sets without inventing their resulting text."
+}

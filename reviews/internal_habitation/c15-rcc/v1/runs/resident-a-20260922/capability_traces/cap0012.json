@@ -1,0 +1,46 @@
+{
+  "trace_id": "cap0012",
+  "checkpoint_id": "cp0012",
+  "cursor": 5,
+  "directive": {
+    "capability_calls": [
+      {
+        "name": "inspect_world_object",
+        "arguments": {
+          "object_id": "obs_c14_fixture_5d4dfcf42055c00135a78a54",
+          "revision": 1
+        },
+        "call_id": "cp0012-inspect-outcome"
+      }
+    ],
+    "response": null,
+    "silence": false
+  },
+  "history_before": [
+    {
+      "name": "search_world",
+      "ok": false,
+      "data": null,
+      "error_code": "CAPABILITY_ARGUMENT_ERROR",
+      "error_message": "FusedTurnRuntime._search_world() got an unexpected keyword argument 'dimensions'",
+      "call_id": "cp0010-search-outcome"
+    },
+    {
+      "name": "search_world",
+      "ok": true,
+      "data": [
+        {
+          "object_id": "obs_c14_fixture_5d4dfcf42055c00135a78a54",
+          "revision": 1,
+          "object_type": "observation",
+          "dimension": "dim:work_outcome",
+          "excerpt": "Atlas staging 变更已合入：测试索引冲突解除，日志保留调整完成；CI 48/48 通过，staging smoke test 通过；本次没有 production 变更，验收未要求返工。",
+          "retrieval_score": 2
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "call_id": "cp0011-search-outcome"
+    }
+  ]
+}

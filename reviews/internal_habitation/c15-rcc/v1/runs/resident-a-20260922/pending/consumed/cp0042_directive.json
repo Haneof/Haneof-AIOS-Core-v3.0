@@ -1,0 +1,6 @@
+{
+  "capability_calls": [],
+  "response": null,
+  "silence": true,
+  "decision_rationale": "The draft boundary is recorded from the tracker observation. The earlier release claims already match the Nov 4 records. No review delivery, and no operation experience: I did not execute the runbook or the upload."
+}

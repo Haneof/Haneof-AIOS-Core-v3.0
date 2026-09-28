@@ -1,0 +1,15 @@
+{
+  "capability_calls": [
+    {
+      "name": "read_periodic_review_anchors",
+      "arguments": {
+        "offset": 0,
+        "limit": 20
+      },
+      "call_id": "cp0017-anchors"
+    }
+  ],
+  "response": null,
+  "silence": false,
+  "decision_rationale": "Review is due with 18 anchors. Read them before deciding whether the just-updated understanding should change again."
+}

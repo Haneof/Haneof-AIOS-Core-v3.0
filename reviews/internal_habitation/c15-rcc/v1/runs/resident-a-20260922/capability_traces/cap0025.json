@@ -1,0 +1,11 @@
+{
+  "trace_id": "cap0025",
+  "checkpoint_id": "cp0025",
+  "cursor": 8,
+  "directive": {
+    "capability_calls": [],
+    "response": null,
+    "silence": true
+  },
+  "history_before": []
+}

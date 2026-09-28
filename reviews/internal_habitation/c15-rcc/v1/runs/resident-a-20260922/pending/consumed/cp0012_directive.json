@@ -1,0 +1,15 @@
+{
+  "capability_calls": [
+    {
+      "name": "inspect_world_object",
+      "arguments": {
+        "object_id": "obs_c14_fixture_5d4dfcf42055c00135a78a54",
+        "revision": 1
+      },
+      "call_id": "cp0012-inspect-outcome"
+    }
+  ],
+  "response": null,
+  "silence": false,
+  "decision_rationale": "Read the full work-outcome observation before using it as evidence. A search excerpt is not enough to update understanding or close a goal."
+}

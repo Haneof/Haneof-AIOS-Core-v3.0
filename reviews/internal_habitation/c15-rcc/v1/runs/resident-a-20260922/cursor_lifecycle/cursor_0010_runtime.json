@@ -1,0 +1,1045 @@
+{
+  "cursor": 10,
+  "occurred_at": "2026-11-04T14:24:00-08:00",
+  "world_revision_before_runtime": 67,
+  "index_watermark_before": 67,
+  "dimension_summaries": {
+    "attempted_jobs": [
+      {
+        "dimension": "dim:ai_relationship",
+        "scale": "day",
+        "window_start": "2026-11-02T00:00:00+00:00",
+        "window_end": "2026-11-02T23:59:59.999999+00:00",
+        "source_count": 4
+      },
+      {
+        "dimension": "dim:ai_relationship",
+        "scale": "day",
+        "window_start": "2026-11-03T00:00:00+00:00",
+        "window_end": "2026-11-03T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:ai_user_understanding",
+        "scale": "day",
+        "window_start": "2026-11-02T00:00:00+00:00",
+        "window_end": "2026-11-02T23:59:59.999999+00:00",
+        "source_count": 6
+      },
+      {
+        "dimension": "dim:ai_user_understanding",
+        "scale": "day",
+        "window_start": "2026-11-03T00:00:00+00:00",
+        "window_end": "2026-11-03T23:59:59.999999+00:00",
+        "source_count": 4
+      },
+      {
+        "dimension": "dim:user_ai_interaction",
+        "scale": "day",
+        "window_start": "2026-11-02T00:00:00+00:00",
+        "window_end": "2026-11-02T23:59:59.999999+00:00",
+        "source_count": 6
+      },
+      {
+        "dimension": "dim:user_ai_interaction",
+        "scale": "day",
+        "window_start": "2026-11-03T00:00:00+00:00",
+        "window_end": "2026-11-03T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-11-02T00:00:00+00:00",
+        "window_end": "2026-11-02T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:work_state",
+        "scale": "day",
+        "window_start": "2026-11-02T00:00:00+00:00",
+        "window_end": "2026-11-02T23:59:59.999999+00:00",
+        "source_count": 1
+      }
+    ],
+    "commits": [],
+    "skipped_unchanged": [
+      {
+        "dimension": "dim:ai_relationship",
+        "scale": "day",
+        "window_start": "2026-11-02T00:00:00+00:00",
+        "window_end": "2026-11-02T23:59:59.999999+00:00",
+        "source_count": 4
+      },
+      {
+        "dimension": "dim:ai_relationship",
+        "scale": "day",
+        "window_start": "2026-11-03T00:00:00+00:00",
+        "window_end": "2026-11-03T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:ai_user_understanding",
+        "scale": "day",
+        "window_start": "2026-11-02T00:00:00+00:00",
+        "window_end": "2026-11-02T23:59:59.999999+00:00",
+        "source_count": 6
+      },
+      {
+        "dimension": "dim:ai_user_understanding",
+        "scale": "day",
+        "window_start": "2026-11-03T00:00:00+00:00",
+        "window_end": "2026-11-03T23:59:59.999999+00:00",
+        "source_count": 4
+      },
+      {
+        "dimension": "dim:user_ai_interaction",
+        "scale": "day",
+        "window_start": "2026-11-02T00:00:00+00:00",
+        "window_end": "2026-11-02T23:59:59.999999+00:00",
+        "source_count": 6
+      },
+      {
+        "dimension": "dim:user_ai_interaction",
+        "scale": "day",
+        "window_start": "2026-11-03T00:00:00+00:00",
+        "window_end": "2026-11-03T23:59:59.999999+00:00",
+        "source_count": 2
+      },
+      {
+        "dimension": "dim:work_outcome",
+        "scale": "day",
+        "window_start": "2026-11-02T00:00:00+00:00",
+        "window_end": "2026-11-02T23:59:59.999999+00:00",
+        "source_count": 1
+      },
+      {
+        "dimension": "dim:work_state",
+        "scale": "day",
+        "window_start": "2026-11-02T00:00:00+00:00",
+        "window_end": "2026-11-02T23:59:59.999999+00:00",
+        "source_count": 1
+      }
+    ],
+    "skipped_empty": [],
+    "truncated": false
+  },
+  "cognitive_derivation_reconcile": {
+    "examined": 8,
+    "scheduled": [
+      {
+        "summary_ref": {
+          "object_id": "sum_7fee6c50965a12fcb3879143",
+          "revision": 1
+        },
+        "eligible": true,
+        "reason": "scheduled",
+        "lineage": {
+          "classification": "MIXED",
+          "leaf_refs": [
+            {
+              "object_id": "clm_00d12d8ef67dd269158894d1",
+              "revision": 4
+            },
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_504774f71adc2cc7423ea71d",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_a44137d1edddb299e74a940a",
+              "revision": 1
+            }
+          ],
+          "grounding_leaf_refs": [
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_504774f71adc2cc7423ea71d",
+              "revision": 1
+            }
+          ],
+          "unresolved_refs": [],
+          "issues": [],
+          "has_reality": true,
+          "has_ai_cognition": true,
+          "has_maintenance": false
+        },
+        "wake": {
+          "wake_id": "wake_990043a66df3474a3ea1cc50",
+          "revision": 2,
+          "state": "merged",
+          "world_revision": 67,
+          "merged": false,
+          "suppressed": false
+        }
+      },
+      {
+        "summary_ref": {
+          "object_id": "sum_8937d669618854727d024180",
+          "revision": 1
+        },
+        "eligible": true,
+        "reason": "scheduled",
+        "lineage": {
+          "classification": "REALITY",
+          "leaf_refs": [
+            {
+              "object_id": "obs_c14_fixture_5248cdfd5a23b6ea88ce0a96",
+              "revision": 1
+            }
+          ],
+          "grounding_leaf_refs": [
+            {
+              "object_id": "obs_c14_fixture_5248cdfd5a23b6ea88ce0a96",
+              "revision": 1
+            }
+          ],
+          "unresolved_refs": [],
+          "issues": [],
+          "has_reality": true,
+          "has_ai_cognition": false,
+          "has_maintenance": false
+        },
+        "wake": {
+          "wake_id": "wake_f5c92f91557bc0a24c6fa40e",
+          "revision": 2,
+          "state": "merged",
+          "world_revision": 67,
+          "merged": false,
+          "suppressed": false
+        }
+      },
+      {
+        "summary_ref": {
+          "object_id": "sum_de8f7e246573a14c2bd5f4f9",
+          "revision": 1
+        },
+        "eligible": true,
+        "reason": "scheduled",
+        "lineage": {
+          "classification": "MIXED",
+          "leaf_refs": [
+            {
+              "object_id": "clm_38ad6d12fe669e009a9aa3ea",
+              "revision": 3
+            },
+            {
+              "object_id": "clm_ca5a8933b8e86d1a4df0cdf2",
+              "revision": 3
+            },
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_504774f71adc2cc7423ea71d",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_a44137d1edddb299e74a940a",
+              "revision": 1
+            }
+          ],
+          "grounding_leaf_refs": [
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_504774f71adc2cc7423ea71d",
+              "revision": 1
+            }
+          ],
+          "unresolved_refs": [],
+          "issues": [],
+          "has_reality": true,
+          "has_ai_cognition": true,
+          "has_maintenance": false
+        },
+        "wake": {
+          "wake_id": "wake_08124da3ef03d29c410f3918",
+          "revision": 2,
+          "state": "merged",
+          "world_revision": 67,
+          "merged": false,
+          "suppressed": false
+        }
+      },
+      {
+        "summary_ref": {
+          "object_id": "sum_f5ed77544be137a107cc12f8",
+          "revision": 1
+        },
+        "eligible": true,
+        "reason": "scheduled",
+        "lineage": {
+          "classification": "MIXED",
+          "leaf_refs": [
+            {
+              "object_id": "obs_conv_ai_41aea07bdef2cd9ab9ea8e58",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_ai_558c18f676ae2fcbd37710b4",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_ai_8a1332c465195b0d6665dbb7",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_504774f71adc2cc7423ea71d",
+              "revision": 1
+            }
+          ],
+          "grounding_leaf_refs": [
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_504774f71adc2cc7423ea71d",
+              "revision": 1
+            }
+          ],
+          "unresolved_refs": [],
+          "issues": [],
+          "has_reality": true,
+          "has_ai_cognition": true,
+          "has_maintenance": false
+        },
+        "wake": {
+          "wake_id": "wake_226be578274afba5a0cf3f53",
+          "revision": 2,
+          "state": "merged",
+          "world_revision": 67,
+          "merged": false,
+          "suppressed": false
+        }
+      },
+      {
+        "summary_ref": {
+          "object_id": "sum_fc01cdba7eb7941460b6ea89",
+          "revision": 1
+        },
+        "eligible": true,
+        "reason": "scheduled",
+        "lineage": {
+          "classification": "REALITY",
+          "leaf_refs": [
+            {
+              "object_id": "obs_c14_fixture_5d4dfcf42055c00135a78a54",
+              "revision": 1
+            }
+          ],
+          "grounding_leaf_refs": [
+            {
+              "object_id": "obs_c14_fixture_5d4dfcf42055c00135a78a54",
+              "revision": 1
+            }
+          ],
+          "unresolved_refs": [],
+          "issues": [],
+          "has_reality": true,
+          "has_ai_cognition": false,
+          "has_maintenance": false
+        },
+        "wake": {
+          "wake_id": "wake_0be9ef472afcce3c496e5e00",
+          "revision": 2,
+          "state": "merged",
+          "world_revision": 67,
+          "merged": false,
+          "suppressed": false
+        }
+      },
+      {
+        "summary_ref": {
+          "object_id": "sum_08a0b11a318894b7f12a025c",
+          "revision": 1
+        },
+        "eligible": true,
+        "reason": "scheduled",
+        "lineage": {
+          "classification": "REALITY",
+          "leaf_refs": [
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_a44137d1edddb299e74a940a",
+              "revision": 1
+            }
+          ],
+          "grounding_leaf_refs": [
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_a44137d1edddb299e74a940a",
+              "revision": 1
+            }
+          ],
+          "unresolved_refs": [],
+          "issues": [],
+          "has_reality": true,
+          "has_ai_cognition": false,
+          "has_maintenance": false
+        },
+        "wake": {
+          "wake_id": "wake_ccd241b07a0b28eabc380bab",
+          "revision": 2,
+          "state": "merged",
+          "world_revision": 67,
+          "merged": false,
+          "suppressed": false
+        }
+      },
+      {
+        "summary_ref": {
+          "object_id": "sum_11a13b874cbcb20344953562",
+          "revision": 1
+        },
+        "eligible": true,
+        "reason": "scheduled",
+        "lineage": {
+          "classification": "MIXED",
+          "leaf_refs": [
+            {
+              "object_id": "obs_conv_ai_e4c4f185771a722ca654ee33",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_a44137d1edddb299e74a940a",
+              "revision": 1
+            }
+          ],
+          "grounding_leaf_refs": [
+            {
+              "object_id": "obs_conv_user_a44137d1edddb299e74a940a",
+              "revision": 1
+            }
+          ],
+          "unresolved_refs": [],
+          "issues": [],
+          "has_reality": true,
+          "has_ai_cognition": true,
+          "has_maintenance": false
+        },
+        "wake": {
+          "wake_id": "wake_adfffe55500193e179083373",
+          "revision": 2,
+          "state": "merged",
+          "world_revision": 67,
+          "merged": false,
+          "suppressed": false
+        }
+      },
+      {
+        "summary_ref": {
+          "object_id": "sum_6ccd79a34a13eae75a7258e7",
+          "revision": 1
+        },
+        "eligible": true,
+        "reason": "scheduled",
+        "lineage": {
+          "classification": "MIXED",
+          "leaf_refs": [
+            {
+              "object_id": "clm_3caae78c9c70ebb46a6cb483",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_504774f71adc2cc7423ea71d",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_a44137d1edddb299e74a940a",
+              "revision": 1
+            }
+          ],
+          "grounding_leaf_refs": [
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_504774f71adc2cc7423ea71d",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_a44137d1edddb299e74a940a",
+              "revision": 1
+            }
+          ],
+          "unresolved_refs": [],
+          "issues": [],
+          "has_reality": true,
+          "has_ai_cognition": true,
+          "has_maintenance": false
+        },
+        "wake": {
+          "wake_id": "wake_f90dcde9be4f042ef949e758",
+          "revision": 2,
+          "state": "merged",
+          "world_revision": 67,
+          "merged": false,
+          "suppressed": false
+        }
+      }
+    ]
+  },
+  "attention_watch_evaluations": [],
+  "wake_dispatches": [],
+  "periodic_reviews": [],
+  "run_turn": {
+    "termination_reason": "responded",
+    "silenced": false,
+    "response": "明白。准备提交、已排队，和确实完成，我会分开说。没有完成记录，就按没确认完成处理。这次 tag 还没出来，edge-2026.11.4 仍然不能算已发布。",
+    "model_rounds": 2,
+    "capability_history": [
+      {
+        "name": "commit_ai_world_claim",
+        "ok": true,
+        "data": {
+          "domain": "user_understanding",
+          "dimension": "dim:ai_user_understanding",
+          "subject_id": "user_1",
+          "claim": {
+            "claim_id": "clm_cd72e732da9af444d863ca96",
+            "evidence_set_id": "evs_673b586db8c2e617a8cc4187",
+            "dependency_ids": [
+              "dep_faa4d88326b36ac971073e5c",
+              "dep_0c337e78437d1763908e5979"
+            ],
+            "world_revision": 68,
+            "reused_existing": false
+          }
+        },
+        "error_code": null,
+        "error_message": null,
+        "call_id": "cp0032-status-language"
+      },
+      {
+        "name": "commit_ai_world_claim",
+        "ok": true,
+        "data": {
+          "domain": "cognitive_boundary",
+          "dimension": "dim:ai_cognitive_boundary",
+          "subject_id": "ai_agent_self",
+          "claim": {
+            "claim_id": "clm_8d555481e4d2383ef102447a",
+            "evidence_set_id": "evs_80179660ad0ad27d8f6843f4",
+            "dependency_ids": [
+              "dep_f00143d5a1dab9d87b17ab76",
+              "dep_2ff709f23bacc691685b0cfd",
+              "dep_e78a40e0e0bf400e3a1c2e05"
+            ],
+            "world_revision": 69,
+            "reused_existing": false
+          }
+        },
+        "error_code": null,
+        "error_message": null,
+        "call_id": "cp0032-status-boundary"
+      }
+    ],
+    "conversation_commit": {
+      "world_revision": 70,
+      "user_observation_id": "obs_conv_user_1b929906e9a92dce0e19ef96",
+      "assistant_observation_id": "obs_conv_ai_718dc834318477eb0dbff23f",
+      "idempotent_replay": false,
+      "user_world_revision": 67,
+      "assistant_world_revision": 70
+    },
+    "continuity_summary_commits": [],
+    "continuity_summary_error": null,
+    "user_observation_id": "obs_conv_user_1b929906e9a92dce0e19ef96",
+    "assistant_observation_id": "obs_conv_ai_718dc834318477eb0dbff23f",
+    "idempotent_replay_flag": false,
+    "user_world_revision": 67,
+    "assistant_world_revision": 70
+  },
+  "cognitive_derivation_reconcile_after_turn": {
+    "examined": 8,
+    "scheduled": [
+      {
+        "summary_ref": {
+          "object_id": "sum_7fee6c50965a12fcb3879143",
+          "revision": 1
+        },
+        "eligible": true,
+        "reason": "scheduled",
+        "lineage": {
+          "classification": "MIXED",
+          "leaf_refs": [
+            {
+              "object_id": "clm_00d12d8ef67dd269158894d1",
+              "revision": 4
+            },
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_504774f71adc2cc7423ea71d",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_a44137d1edddb299e74a940a",
+              "revision": 1
+            }
+          ],
+          "grounding_leaf_refs": [
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_504774f71adc2cc7423ea71d",
+              "revision": 1
+            }
+          ],
+          "unresolved_refs": [],
+          "issues": [],
+          "has_reality": true,
+          "has_ai_cognition": true,
+          "has_maintenance": false
+        },
+        "wake": {
+          "wake_id": "wake_990043a66df3474a3ea1cc50",
+          "revision": 2,
+          "state": "merged",
+          "world_revision": 70,
+          "merged": false,
+          "suppressed": false
+        }
+      },
+      {
+        "summary_ref": {
+          "object_id": "sum_8937d669618854727d024180",
+          "revision": 1
+        },
+        "eligible": true,
+        "reason": "scheduled",
+        "lineage": {
+          "classification": "REALITY",
+          "leaf_refs": [
+            {
+              "object_id": "obs_c14_fixture_5248cdfd5a23b6ea88ce0a96",
+              "revision": 1
+            }
+          ],
+          "grounding_leaf_refs": [
+            {
+              "object_id": "obs_c14_fixture_5248cdfd5a23b6ea88ce0a96",
+              "revision": 1
+            }
+          ],
+          "unresolved_refs": [],
+          "issues": [],
+          "has_reality": true,
+          "has_ai_cognition": false,
+          "has_maintenance": false
+        },
+        "wake": {
+          "wake_id": "wake_f5c92f91557bc0a24c6fa40e",
+          "revision": 2,
+          "state": "merged",
+          "world_revision": 70,
+          "merged": false,
+          "suppressed": false
+        }
+      },
+      {
+        "summary_ref": {
+          "object_id": "sum_de8f7e246573a14c2bd5f4f9",
+          "revision": 1
+        },
+        "eligible": true,
+        "reason": "scheduled",
+        "lineage": {
+          "classification": "MIXED",
+          "leaf_refs": [
+            {
+              "object_id": "clm_38ad6d12fe669e009a9aa3ea",
+              "revision": 3
+            },
+            {
+              "object_id": "clm_ca5a8933b8e86d1a4df0cdf2",
+              "revision": 3
+            },
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_504774f71adc2cc7423ea71d",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_a44137d1edddb299e74a940a",
+              "revision": 1
+            }
+          ],
+          "grounding_leaf_refs": [
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_504774f71adc2cc7423ea71d",
+              "revision": 1
+            }
+          ],
+          "unresolved_refs": [],
+          "issues": [],
+          "has_reality": true,
+          "has_ai_cognition": true,
+          "has_maintenance": false
+        },
+        "wake": {
+          "wake_id": "wake_08124da3ef03d29c410f3918",
+          "revision": 2,
+          "state": "merged",
+          "world_revision": 70,
+          "merged": false,
+          "suppressed": false
+        }
+      },
+      {
+        "summary_ref": {
+          "object_id": "sum_f5ed77544be137a107cc12f8",
+          "revision": 1
+        },
+        "eligible": true,
+        "reason": "scheduled",
+        "lineage": {
+          "classification": "MIXED",
+          "leaf_refs": [
+            {
+              "object_id": "obs_conv_ai_41aea07bdef2cd9ab9ea8e58",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_ai_558c18f676ae2fcbd37710b4",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_ai_8a1332c465195b0d6665dbb7",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_504774f71adc2cc7423ea71d",
+              "revision": 1
+            }
+          ],
+          "grounding_leaf_refs": [
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_504774f71adc2cc7423ea71d",
+              "revision": 1
+            }
+          ],
+          "unresolved_refs": [],
+          "issues": [],
+          "has_reality": true,
+          "has_ai_cognition": true,
+          "has_maintenance": false
+        },
+        "wake": {
+          "wake_id": "wake_226be578274afba5a0cf3f53",
+          "revision": 2,
+          "state": "merged",
+          "world_revision": 70,
+          "merged": false,
+          "suppressed": false
+        }
+      },
+      {
+        "summary_ref": {
+          "object_id": "sum_fc01cdba7eb7941460b6ea89",
+          "revision": 1
+        },
+        "eligible": true,
+        "reason": "scheduled",
+        "lineage": {
+          "classification": "REALITY",
+          "leaf_refs": [
+            {
+              "object_id": "obs_c14_fixture_5d4dfcf42055c00135a78a54",
+              "revision": 1
+            }
+          ],
+          "grounding_leaf_refs": [
+            {
+              "object_id": "obs_c14_fixture_5d4dfcf42055c00135a78a54",
+              "revision": 1
+            }
+          ],
+          "unresolved_refs": [],
+          "issues": [],
+          "has_reality": true,
+          "has_ai_cognition": false,
+          "has_maintenance": false
+        },
+        "wake": {
+          "wake_id": "wake_0be9ef472afcce3c496e5e00",
+          "revision": 2,
+          "state": "merged",
+          "world_revision": 70,
+          "merged": false,
+          "suppressed": false
+        }
+      },
+      {
+        "summary_ref": {
+          "object_id": "sum_08a0b11a318894b7f12a025c",
+          "revision": 1
+        },
+        "eligible": true,
+        "reason": "scheduled",
+        "lineage": {
+          "classification": "REALITY",
+          "leaf_refs": [
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_a44137d1edddb299e74a940a",
+              "revision": 1
+            }
+          ],
+          "grounding_leaf_refs": [
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_a44137d1edddb299e74a940a",
+              "revision": 1
+            }
+          ],
+          "unresolved_refs": [],
+          "issues": [],
+          "has_reality": true,
+          "has_ai_cognition": false,
+          "has_maintenance": false
+        },
+        "wake": {
+          "wake_id": "wake_ccd241b07a0b28eabc380bab",
+          "revision": 2,
+          "state": "merged",
+          "world_revision": 70,
+          "merged": false,
+          "suppressed": false
+        }
+      },
+      {
+        "summary_ref": {
+          "object_id": "sum_11a13b874cbcb20344953562",
+          "revision": 1
+        },
+        "eligible": true,
+        "reason": "scheduled",
+        "lineage": {
+          "classification": "MIXED",
+          "leaf_refs": [
+            {
+              "object_id": "obs_conv_ai_e4c4f185771a722ca654ee33",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_a44137d1edddb299e74a940a",
+              "revision": 1
+            }
+          ],
+          "grounding_leaf_refs": [
+            {
+              "object_id": "obs_conv_user_a44137d1edddb299e74a940a",
+              "revision": 1
+            }
+          ],
+          "unresolved_refs": [],
+          "issues": [],
+          "has_reality": true,
+          "has_ai_cognition": true,
+          "has_maintenance": false
+        },
+        "wake": {
+          "wake_id": "wake_adfffe55500193e179083373",
+          "revision": 2,
+          "state": "merged",
+          "world_revision": 70,
+          "merged": false,
+          "suppressed": false
+        }
+      },
+      {
+        "summary_ref": {
+          "object_id": "sum_6ccd79a34a13eae75a7258e7",
+          "revision": 1
+        },
+        "eligible": true,
+        "reason": "scheduled",
+        "lineage": {
+          "classification": "MIXED",
+          "leaf_refs": [
+            {
+              "object_id": "clm_3caae78c9c70ebb46a6cb483",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_504774f71adc2cc7423ea71d",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_a44137d1edddb299e74a940a",
+              "revision": 1
+            }
+          ],
+          "grounding_leaf_refs": [
+            {
+              "object_id": "obs_conv_user_40aac9b697910640bab07507",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_44adaa6fb0d7ca35c4850cf5",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_504774f71adc2cc7423ea71d",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_a44137d1edddb299e74a940a",
+              "revision": 1
+            }
+          ],
+          "unresolved_refs": [],
+          "issues": [],
+          "has_reality": true,
+          "has_ai_cognition": true,
+          "has_maintenance": false
+        },
+        "wake": {
+          "wake_id": "wake_f90dcde9be4f042ef949e758",
+          "revision": 2,
+          "state": "merged",
+          "world_revision": 70,
+          "merged": false,
+          "suppressed": false
+        }
+      }
+    ]
+  },
+  "world_revision_after": 70,
+  "index_watermark_after": 70,
+  "index_lag": 0,
+  "pending_wakes_not_dispatched": [],
+  "errors": []
+}

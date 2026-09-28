@@ -1,0 +1,4 @@
+{
+  "summary_text": "2026-11-02 的关系维度只有一条认知：clm_00d12d8ef67dd269158894d1，当前是第 4 版，记录时间落在 17:05Z。当前文本把这次 Atlas staging 收尾写成工作协作位置：低风险实现按结果节奏推进；production 旧索引删除必须先给对象、影响和回滚办法并等明确确认。文本还写到用户说过这次结果能用，但同时又收紧了删除授权，并明确这不是信任升级，也不是稳定私人关系。同窗口另有 3 个证据集，分别支撑最初写入和 17:20Z、20:52Z 的两次修订；这些证据集本身不是新的关系事实。",
+  "decision_rationale": "Describe only the supplied relationship claim and its evidence sets. Do not add trust, causality, or events outside the source text."
+}

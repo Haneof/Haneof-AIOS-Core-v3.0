@@ -1,0 +1,15 @@
+{
+  "capability_calls": [
+    {
+      "name": "search_world",
+      "arguments": {
+        "query": "Atlas staging",
+        "limit": 8
+      },
+      "call_id": "cp0006-search-atlas"
+    }
+  ],
+  "response": null,
+  "silence": false,
+  "decision_rationale": "The user is narrowing how test-environment work should be decided. The world map shows a work_state dimension that is not in the pinned turn; search before treating chat memory of that fact as evidence."
+}

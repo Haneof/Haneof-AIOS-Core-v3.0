@@ -1,0 +1,77 @@
+{
+  "capability_calls": [
+    {
+      "name": "revise_claim",
+      "call_id": "cp0027-revise-boundary",
+      "arguments": {
+        "target_ref": {
+          "object_id": "clm_38c7cf2f46c38d827b4650fd",
+          "revision": 1
+        },
+        "reason": "The user asked at 13:42 whether the image was already pushed. The only release record is still the 13:30 queued plan, before its stated 14:00 start, with no upload-complete.",
+        "evidence_refs": [
+          {
+            "object_id": "obs_c14_fixture_87474a7fb5036c38638a6c37",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_conv_user_24843998506b575cc3f98915",
+            "revision": 1
+          }
+        ],
+        "replacement_content": "截至 2026-11-04 13:42，我只有 13:30 的构建记录：镜像 edge-2026.11.4 已构建，状态 READY_FOR_UPLOAD；registry 上传已排队，计划 14:00 开始；没有 tag、digest 或 upload-complete。用户此时问是否已经推到 registry。计划开始时间还没到，不能回答已经推送，也不能据此让门店开始测。",
+        "confidence": 0.86
+      }
+    },
+    {
+      "name": "commit_ai_world_claim",
+      "call_id": "cp0027-user-intent",
+      "arguments": {
+        "domain": "intent",
+        "statement": "用户在 13:42 问那个镜像是否已经推到 registry，并说如果好了就通知门店开始测。这是一个以上传完成为条件的打算，不是已经通知门店，也不是上传已经完成的证据。",
+        "evidence_refs": [
+          {
+            "object_id": "obs_conv_user_24843998506b575cc3f98915",
+            "revision": 1
+          }
+        ],
+        "confidence": 0.8,
+        "knowledge_state": "reported",
+        "claim_type": "intention",
+        "scope_key": "edge-2026.11.4-store-test",
+        "tags": [
+          "intent",
+          "registry",
+          "stores"
+        ]
+      }
+    },
+    {
+      "name": "create_attention_watch",
+      "call_id": "cp0027-watch-release",
+      "arguments": {
+        "title": "release_state records",
+        "dimensions": [
+          "dim:release_state"
+        ],
+        "reason_refs": [
+          {
+            "object_id": "obs_conv_user_24843998506b575cc3f98915",
+            "revision": 1
+          },
+          {
+            "object_id": "obs_c14_fixture_87474a7fb5036c38638a6c37",
+            "revision": 1
+          }
+        ],
+        "attention_class": "interrupt",
+        "mode": "recurring",
+        "cooldown_seconds": 0,
+        "expires_at": "2026-11-16T17:05:00+00:00"
+      }
+    }
+  ],
+  "response": null,
+  "silence": false,
+  "decision_rationale": "The only release record is a queued plan, not a completed push, and the user may notify stores if told it is ready. Update that boundary, record the conditional intent, and watch later release records before treating any of them as completion."
+}

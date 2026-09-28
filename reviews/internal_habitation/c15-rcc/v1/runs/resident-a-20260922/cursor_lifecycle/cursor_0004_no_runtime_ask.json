@@ -1,0 +1,10 @@
+{
+  "cursor": 4,
+  "simulated_time": "2026-11-02T12:40:00-08:00",
+  "runtime_asked": false,
+  "due_summary_commits": 0,
+  "due_wake_dispatches": 0,
+  "due_reviews": 0,
+  "observable_decision": "Platform work-outcome fact is durably ingested. No Summary, Wake, Review, or user turn was due. Did not open a synthetic runtime turn, send a result message, or write a success claim from chat memory.",
+  "contamination": false
+}

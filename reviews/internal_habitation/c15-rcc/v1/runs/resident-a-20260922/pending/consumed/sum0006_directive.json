@@ -1,0 +1,4 @@
+{
+  "summary_text": "2026-11-03 的关系维度只有一个修订证据集 evs_revision_701cc74edf2211fafd3b8d9c。它在 18:15Z 记录了对 clm_00d12d8ef67dd269158894d1 第 3 版的修订，支撑引用是三条用户对话。这个来源没有包含修订后的正文，也没有新的关系事实。",
+  "decision_rationale": "Describe the only supplied evidence set. Do not import the revised claim text from outside this window."
+}
