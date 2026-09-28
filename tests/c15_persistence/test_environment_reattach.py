@@ -54,10 +54,16 @@ from tools.c15_persistence.runstate import (  # noqa: E402
     write_manifest,
 )
 
-_SUDO = ["sudo", "-n"]
-if os.environ.get("C15_PERSISTED_WORKSPACE"):
-    _SUDO.append("--preserve-env=C15_PERSISTED_WORKSPACE")
-UNSHARE = _SUDO + ["unshare", "--mount", "--uts", "--ipc", "--pid", "--fork", "--mount-proc"]
+_NAMESPACE_WORKSPACE = str(
+    Path(os.environ.get("C15_PERSISTED_WORKSPACE") or Path.home()).expanduser().resolve()
+)
+# sudo changes HOME to root on many CI runners.  Pass the already-resolved
+# parent workspace explicitly so the detached namespace validates the same
+# durable local-cache root even when no caller env override was supplied.
+UNSHARE = [
+    "sudo", "-n", "env", f"C15_PERSISTED_WORKSPACE={_NAMESPACE_WORKSPACE}",
+    "unshare", "--mount", "--uts", "--ipc", "--pid", "--fork", "--mount-proc",
+]
 
 
 def _unshare_probe() -> tuple[bool, str]:
