@@ -1,0 +1,85 @@
+{
+ "dimension": "dim:ai_user_understanding",
+ "granularity": "day",
+ "window_start": "2026-11-02T00:00:00Z",
+ "window_end": "2026-11-02T23:59:59.999999Z",
+ "source_world_revision": 26,
+ "sources": [
+  {
+   "object_id": "clm_d95e2508b26a0292b94a7a59",
+   "revision": 3,
+   "object_type": "claim",
+   "occurred_at": "2026-11-02T17:05:00Z",
+   "text": "针对 Atlas staging 收尾及这类低风险实现：用户要求我自主推进实现细节、不逐步确认，完成后汇报结果与关键风险；碰到会改生产数据的边界时一次性集中列出待决定项；影响生产、删除、费用的事项单独提出。该偏好在第一次 staging 收尾中得到用户明确肯定（称没跟过程、结果能用、省事），但目前仅此一次实例验证，仍主要覆盖这类低风险实现，暂不视为用户对其它类型工作的一般授权。",
+   "metadata": {
+    "ai_domain": "user_understanding",
+    "ai_world": true,
+    "dimension": "dim:ai_user_understanding",
+    "revision_evidence_set_ref": {
+     "object_id": "evs_revision_18008a10aeb60acc83d9b185",
+     "revision": 1
+    },
+    "revision_mode": "revise",
+    "revision_reason": "用户对第一次按该节奏完成的 staging 收尾给出明确肯定，并把该偏好表述扩展到“这类低风险实现”。",
+    "scope_key": "atlas_staging_closeout",
+    "supersedes_revision": 2,
+    "tags": [
+     "atlas",
+     "staging",
+     "reporting-boundary"
+    ],
+    "writeback_kind": "revisable_cognition"
+   }
+  },
+  {
+   "object_id": "evs_b8fc48039bb81ac73c7d6215",
+   "revision": 1,
+   "object_type": "evidence_set",
+   "occurred_at": "2026-11-02T17:05:00Z",
+   "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 1, \"missing_description\": [], \"observed_count\": 1}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-02T17:05:00Z\", \"world_revision\": 1}, \"learned_at\": \"2026-11-02T17:05:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_5a96a6b7f95ebb907cc8f292\", \"revision\": 1}], \"metadata\": {\"ai_domain\": \"user_understanding\", \"ai_world\": true, \"dimension\": \"dim:ai_user_understanding\", \"scope_key\": \"atlas_staging_closeout\", \"tags\": [\"atlas\", \"staging\", \"reporting-boundary\"], \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_b8fc48039bb81ac73c7d6215\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-11-02T17:05:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_conv_user_5a96a6b7f95ebb907cc8f292\", \"revision\": 1}]}",
+   "metadata": {
+    "ai_domain": "user_understanding",
+    "ai_world": true,
+    "dimension": "dim:ai_user_understanding",
+    "scope_key": "atlas_staging_closeout",
+    "tags": [
+     "atlas",
+     "staging",
+     "reporting-boundary"
+    ],
+    "writeback_kind": "cognition_evidence"
+   }
+  },
+  {
+   "object_id": "evs_revision_c54e57c7167554cdbc99be3c",
+   "revision": 1,
+   "object_type": "evidence_set",
+   "occurred_at": "2026-11-02T17:20:00Z",
+   "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 2, \"missing_description\": [], \"observed_count\": 2}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-02T17:20:00Z\", \"world_revision\": 6}, \"learned_at\": \"2026-11-02T17:20:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_5a96a6b7f95ebb907cc8f292\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_00157f98462d7a1d7ff1a34a\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:ai_user_understanding\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_d95e2508b26a0292b94a7a59\", \"revision\": 1}}, \"object_id\": \"evs_revision_c54e57c7167554cdbc99be3c\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_d95e2508b26a0292b94a7a59@1\", \"recorded_at\": \"2026-11-02T17:20:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_conv_user_5a96a6b7f95ebb907cc8f292\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_00157f98462d7a1d7ff1a34a\", \"revision\": 1}]}",
+   "metadata": {
+    "dimension": "dim:ai_user_understanding",
+    "revision_mode": "revise",
+    "target_ref": {
+     "object_id": "clm_d95e2508b26a0292b94a7a59",
+     "revision": 1
+    }
+   }
+  },
+  {
+   "object_id": "evs_revision_18008a10aeb60acc83d9b185",
+   "revision": 1,
+   "object_type": "evidence_set",
+   "occurred_at": "2026-11-02T20:52:00Z",
+   "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 2, \"missing_description\": [], \"observed_count\": 2}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-02T20:52:00Z\", \"world_revision\": 11}, \"learned_at\": \"2026-11-02T20:52:00Z\", \"member_refs\": [{\"object_id\": \"obs_c14_fixture_5d4dfcf42055c00135a78a54\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_83b5da89c5b5751f2503919f\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:ai_user_understanding\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_d95e2508b26a0292b94a7a59\", \"revision\": 2}}, \"object_id\": \"evs_revision_18008a10aeb60acc83d9b185\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_d95e2508b26a0292b94a7a59@2\", \"recorded_at\": \"2026-11-02T20:52:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_c14_fixture_5d4dfcf42055c00135a78a54\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_83b5da89c5b5751f2503919f\", \"revision\": 1}]}",
+   "metadata": {
+    "dimension": "dim:ai_user_understanding",
+    "revision_mode": "revise",
+    "target_ref": {
+     "object_id": "clm_d95e2508b26a0292b94a7a59",
+     "revision": 2
+    }
+   }
+  }
+ ],
+ "truncated": false
+}

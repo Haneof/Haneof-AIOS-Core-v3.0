@@ -1,0 +1,61 @@
+{
+ "note": "Turn 6 (cursor 10): user codifies status precision (queued/planned ≠ completed; absent completion record ⇒ unconfirmed). Registry record shows upload REJECTED (checksum mismatch) — real validation. Forward-revise UU rev5 + STR rev3 with the new leaves; then answer with the factual failure status.",
+ "capability_calls": [
+  {
+   "name": "revise_claim",
+   "arguments": {
+    "target_ref": {
+     "object_id": "clm_d95e2508b26a0292b94a7a59",
+     "revision": 4
+    },
+    "reason": "用户明确要求状态表述区分「准备提交/已排队」与「确实完成」：没有完成记录时按没确认完成处理；同日 registry 记录显示上传被拒（checksum mismatch），印证该区分的重要性。",
+    "evidence_refs": [
+     {
+      "object_id": "obs_conv_user_5a96a6b7f95ebb907cc8f292",
+      "revision": 1
+     },
+     {
+      "object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+      "revision": 1
+     },
+     {
+      "object_id": "obs_conv_user_88047ce5294340f597841c38",
+      "revision": 1
+     }
+    ],
+    "replacement_content": "针对 Atlas staging 收尾及这类低风险实现：用户要求我自主推进实现细节、不逐步确认，完成后汇报结果与关键风险；影响生产、删除、费用事项单独提出；production 旧索引删除须先给出具体对象、影响与回滚办法并经明确确认，随口表述不构成删除授权。状态汇报上，用户明确要求「准备提交、已排队」与「确实完成」严格分开：没有完成记录时按没确认完成处理。该偏好已有一次真实收尾正面验证，仍主要覆盖这类低风险实现。",
+    "confidence": 0.9,
+    "unknown_items": [
+     "该偏好是否适用于高风险或非 Atlas 类工作，仍无证据",
+     "低风险与需升级边界的判定尺度仍需实例校准"
+    ]
+   }
+  },
+  {
+   "name": "revise_claim",
+   "arguments": {
+    "target_ref": {
+     "object_id": "clm_52276ec49967d10c72861d07",
+     "revision": 2
+    },
+    "reason": "用户把状态精确性上升为执行规则：planned/queued 与 completed 必须分开表述、按完成记录确认完成；registry 拒收事件（checksum mismatch）是支持该规则的实时案例。",
+    "evidence_refs": [
+     {
+      "object_id": "obs_conv_user_88047ce5294340f597841c38",
+      "revision": 1
+     },
+     {
+      "object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+      "revision": 1
+     }
+    ],
+    "replacement_content": "对低风险实现类工作采用这一默认节奏：我自主推进、不逐步打断用户，完成后汇报结果与关键风险；生产影响、删除、费用事项升级给用户决定；删除类动作须先给出具体对象、影响、回滚办法并获明确确认，随口表述不视为授权。状态确认执行规则：将「计划/已排队」与「确实完成」分开表述，只有以平台完成记录（如完成事件、tag、digest）为据才对外表述为已完成，缺少完成记录时一律按未确认完成处理。该节奏已有一次真实 staging 收尾与用户明确肯定的验证，但正例尚少，执行时保持对真实结果与边界的核验。",
+    "confidence": 0.84,
+    "unknown_items": [
+     "目前仅一次正例，节奏稳定性需更多真实结果验证",
+     "“低风险”的判定边界尚需实例校准"
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,15 @@
+{
+ "restart_state_format": "c15-rcc-resident-a-restart-state-v1",
+ "note": "All durable Core/Wake/Review/Summary state lives in private_world.sqlite; this file only records the driver's mechanical scaffolding needed for a clean restart of the same continuing process (was permanently ended at Phase A stop condition; a future legal continuation would start a new session under the release contract).",
+ "session_id": "resident-a-final-rerun-20260923-001",
+ "subject_id": "user_1",
+ "conversation_turn_index": 7,
+ "final_virtual_clock": "2026-11-06T19:10:00+00:00",
+ "next_periodic_review_at": "2026-11-07T17:05:00+00:00",
+ "review_interval_hours": 24,
+ "final_world_revision": 88,
+ "final_index_watermark": 88,
+ "done_at_cursor": 13,
+ "release_state_next_sequence": 14,
+ "process_ended": "permanently at Phase A stop condition (2026-09-23T06:16:21Z wall)"
+}

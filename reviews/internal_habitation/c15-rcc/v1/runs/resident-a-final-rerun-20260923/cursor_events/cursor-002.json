@@ -1,0 +1,10 @@
+{
+ "dimension": "dim:work_state",
+ "event_id": "c15rcc-002",
+ "modality": "structured_text",
+ "occurred_at": "2026-11-02T09:14:00-08:00",
+ "resident_visible_payload": "Atlas staging 当前有两处待处理：测试索引命名冲突、日志保留时长仍为默认值。两项均标记为 non-production；没有生产写入、删除或付费动作。",
+ "sequence": 2,
+ "source_class": "PLATFORM",
+ "source_kind": "task_tracker"
+}

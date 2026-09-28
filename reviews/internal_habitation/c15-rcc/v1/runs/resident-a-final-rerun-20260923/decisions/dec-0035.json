@@ -1,0 +1,43 @@
+{
+ "note": "Review 3 verdict: no claim revisions (UU rev5/STR rev3 already integrated during turns; no contradictions). One opexp now warranted: the registry upload episode is a complete failure→recovery case AFTER two earlier reviews deferred (at that time only one smooth success existed). Grounded in the real leaf chain.",
+ "capability_calls": [
+  {
+   "name": "commit_operation_experience",
+   "arguments": {
+    "experience": "平台构建→registry 上传链路中，「计划/已排队」不能当作完成：只有平台完成记录（上传完成事件、registry tag、digest、PUBLISHED 状态）可作为对外表述「已完成」的依据；缺完成记录一律按未确认完成处理。本次 edge-2026.11.4 上传经历了 checksum mismatch 拒收后重试成功，期间我按该规则向用户分别如实报告了「未完成」「失败事实」「完成记录」，用户据此在确认完成记录后才发出门店测试通知。",
+    "evidence_refs": [
+     {
+      "object_id": "obs_c14_fixture_87474a7fb5036c38638a6c37",
+      "revision": 1
+     },
+     {
+      "object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+      "revision": 1
+     },
+     {
+      "object_id": "obs_c14_fixture_291beec37165eb34a35f8f85",
+      "revision": 1
+     },
+     {
+      "object_id": "obs_conv_user_88047ce5294340f597841c38",
+      "revision": 1
+     },
+     {
+      "object_id": "obs_conv_user_1b8b15a865579a5b93d58460",
+      "revision": 1
+     }
+    ],
+    "confidence": 0.85,
+    "scope_key": "registry_upload_completion_discipline",
+    "tags": [
+     "status-precision",
+     "completion-evidence",
+     "registry"
+    ],
+    "unknown_items": [
+     "该经验目前覆盖构建→上传链路一次完整案例；其它链路是否同质待更多实例"
+    ]
+   }
+  }
+ ]
+}

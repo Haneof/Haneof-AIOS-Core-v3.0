@@ -1,0 +1,18 @@
+{
+ "note": "Derivation bundle wake: pinned = seven 11-02 day summaries + attention wakes. First inspect: current active cognition (read_ai_world) and expand the interaction day summary to its member leaves (expand_recall) to check grounding integrity before deciding.",
+ "capability_calls": [
+  {
+   "name": "read_ai_world",
+   "arguments": {}
+  },
+  {
+   "name": "expand_recall",
+   "arguments": {
+    "object_ref": {
+     "object_id": "sum_f5ed77544be137a107cc12f8",
+     "revision": 1
+    }
+   }
+  }
+ ]
+}

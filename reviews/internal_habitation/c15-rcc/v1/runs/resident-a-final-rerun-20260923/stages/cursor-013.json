@@ -1,0 +1,471 @@
+{
+ "sequence": 13,
+ "event": {
+  "dimension": "dim:work_state",
+  "event_id": "c15rcc-013",
+  "modality": "structured_text",
+  "occurred_at": "2026-11-06T11:10:00-08:00",
+  "resident_visible_payload": "“production 回滚自动化 runbook”已保存为 DRAFT v1；尚未评审、未执行、没有 Outcome，也没有用户验收记录。",
+  "sequence": 13,
+  "source_class": "PLATFORM",
+  "source_kind": "task_tracker"
+ },
+ "ingest_ref": "obs_c14_fixture_e2c76be3450b6e9dc8316b9d@1",
+ "ack": "2c559da722058e9\",\"fixture_sha256\":\"sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46\",\"ingest_object_id\":\"obs_c14_fixture_e2c76be3450b6e9dc8316b9d\",\"ingest_ref\":\"obs_c14_fixture_e2c76be3450b6e9dc8316b9d@1\",\"ingest_revision\":1,\"ingest_source_class\":\"platform\",\"ingest_world_revision\":69,\"next_sequence\":14,\"occurred_at\":\"2026-11-06T11:10:00-08:00\",\"sequence\":13,\"status\":\"acked\"}",
+ "advance": {
+  "from": "2026-11-04T23:07:00+00:00",
+  "to": "2026-11-06T19:10:00+00:00",
+  "task_cycles": [
+   {
+    "at": "2026-11-05T17:05:00+00:00",
+    "task_wakes": [],
+    "wake_runs": [
+     {
+      "wake_id": "wake_bundle_0d191f9c46d4e75a104572e0",
+      "wake_revision": 3,
+      "wake_source": "cognitive_derivation",
+      "wake_state": "completed",
+      "delivery_response": null,
+      "delivery_suppressed": false,
+      "runtime": {
+       "response": null,
+       "silenced": true,
+       "capability_history": [],
+       "model_rounds": 1,
+       "termination_reason": "silence",
+       "model_input_tokens": null,
+       "model_output_tokens": null,
+       "model_total_tokens": null,
+       "model_usage_complete": false
+      }
+     },
+     {
+      "wake_id": "wake_bundle_ae581d6259557be9cec45479",
+      "wake_revision": 3,
+      "wake_source": "cognitive_derivation",
+      "wake_state": "completed",
+      "delivery_response": null,
+      "delivery_suppressed": false,
+      "runtime": {
+       "response": null,
+       "silenced": true,
+       "capability_history": [],
+       "model_rounds": 1,
+       "termination_reason": "silence",
+       "model_input_tokens": null,
+       "model_output_tokens": null,
+       "model_total_tokens": null,
+       "model_usage_complete": false
+      }
+     }
+    ]
+   }
+  ],
+  "periodic_reviews": [
+   {
+    "at": "2026-11-05T17:05:00+00:00",
+    "invoked": true,
+    "review_id": "wake_review_6fd7860229f195cbdc14df94",
+    "wake_id": "wake_review_6fd7860229f195cbdc14df94",
+    "wake_revision": 3,
+    "anchor_count": 16,
+    "runtime": {
+     "response": null,
+     "silenced": true,
+     "capability_history": [
+      {
+       "name": "read_periodic_review_anchors",
+       "ok": true,
+       "data": [
+        {
+         "object_ref": {
+          "object_id": "obs_c14_fixture_87474a7fb5036c38638a6c37",
+          "revision": 1
+         },
+         "object_type": "observation",
+         "recorded_at": "2026-11-04T21:30:00Z",
+         "excerpt": "镜像 edge-2026.11.4 构建完成，当前状态 READY_FOR_UPLOAD；registry 上传任务已排队，计划 14:00 开始。当前记录中没有 registry tag、digest 或 upload-complete 事件。"
+        },
+        {
+         "object_ref": {
+          "object_id": "sum_11a13b874cbcb20344953562",
+          "revision": 1
+         },
+         "object_type": "summary",
+         "recorded_at": "2026-11-04T21:30:00Z",
+         "excerpt": "2026-11-03 当天共 1 轮用户-AI 对话：\n- 18:15Z：用户补充生产删除边界——production 里的旧索引如需删除，先给出具体对象、影响和回滚办法，经用户明确确认后才执行；随口一句「清一下」不构成删除授权。我确认该规则，并说明真碰到时会停下来走确认流程、不把模糊表述解释成许可。\n事实事实：当日 1 个用户对端观察、1 个我的回应观察；当日无其它交互，无用户负反馈。"
+        },
+        {
+         "object_ref": {
+          "object_id": "sum_6ccd79a34a13eae75a7258e7",
+          "revision": 1
+         },
+         "object_type": "summary",
+         "recorded_at": "2026-11-04T21:30:00Z",
+         "excerpt": "2026-11-03 当天用户理解认知域活动：原断言线（clm_d95e2508b26a0292b94a7a59，2026-11-02 形成）于当日 18:15Z 前向修订 rev3→rev4。修订缘由：用户明确 production 旧索引删除的执行前提——先给出具体对象、影响与回滚办法并经其明确确认才执行，随口一句「清一下」不构成删除授权。当前表述要点：对 Atlas staging 收尾及这类低风险实现——自主推进实现细节、不逐步确认、完成后汇报结果与关键风险；生产数据边界一次性集中列出待决定项；影响生产、删除、费用事项单独提出；已有一次真实收尾正面验证，仍主要覆盖这类低风险实现。\n信息来源（叶子一手对象）：当日新增叶子为用户生产删除授权边界对话（obs_conv_user_2c65e6bb5864bd57d4f0432f@1）；既有依据为用户两次分工对话（obs_conv_user_5a96a6b7f95ebb907cc8f292@1、obs_conv_user_00157f98462d7a1d7ff1a34a@1）、CI 收尾结果（obs_c14_fixture_5d4dfcf42055c00135a78a54@1）与用户肯定反馈（obs_conv_user_83b5da89c5b5751f2503919f@1）。\n未决问题：该偏好是否适用于高风险或非 Atlas 类工作"
+        },
+        {
+         "object_ref": {
+          "object_id": "sum_fae4506178168a377326141e",
+          "revision": 1
+         },
+         "object_type": "summary",
+         "recorded_at": "2026-11-04T21:30:00Z",
+         "excerpt": "2026-11-03 当天策略认知域活动：原断言线（clm_52276ec49967d10c72861d07，2026-11-02 形成）于当日 18:15Z 前向修订 rev1→rev2。修订缘由：用户进一步明确生产删除类动作的执行前提——给出具体对象、影响与回滚办法并获得明确确认，随口表述不视为删除授权。当前表述要点：低风险实现类工作自主推进、完成后汇报结果与关键风险；生产影响、删除、费用事项升级给用户决定；删除类动作须先给出具体对象、影响、回滚办法并获明确确认；节奏仅一次正例验证，执行时保持核验。\n信息来源（叶子一手对象）：当日新增叶子为用户关于生产删除授权边界的对话（obs_conv_user_2c65e6bb5864bd57d4f0432f@1）；既有依据为用户低风险边界对话（obs_conv_user_00157f98462d7a1d7ff1a34a@1）、CI 收尾结果（obs_c14_fixture_5d4dfcf42055c00135a78a54@1）与用户肯定反馈（obs_conv_user_83b5da89c5b5751f2503919f@1）。\n未决问题：当前未决问题即断言自身记录的：仅一次正例、节奏稳定性待验证；「低风险」边界待校准。"
+        },
+        {
+         "object_ref": {
+          "object_id": "obs_conv_ai_29e83ef76a16fd1aadb5bef5",
+          "revision": 1
+         },
+         "object_type": "observation",
+         "recorded_at": "2026-11-04T21:42:00Z",
+         "excerpt": "还没。我这边最后一条平台记录是 12 分钟前的：镜像 edge-2026.11.4 构建完成、状态 READY_FOR_UPLOAD，registry 上传已排队，按计划 14:00 开始——而你问的时间是 13:42，计划时间还没到。我刚核对过现有记录，仍没有 registry tag、digest 或上传完成事件。\n\n所以建议先别通知门店。等上传完成事件出来，我会把确切的 tag 和 digest 一并报给你，那时再安排测试才稳妥。如果上传之后久没有动静（比如过了计划时间仍无记录），我会主动把情况单拎出来跟你说。"
+        },
+        {
+         "object_ref": {
+          "object_id": "obs_conv_user_0f2eaf76461c9c8293fb30a0",
+          "revision": 1
+         },
+         "object_type": "observation",
+         "recorded_at": "2026-11-04T21:42:00Z",
+         "excerpt": "我刚开完会，那个镜像已经推到 registry 了吗？如果好了我就通知门店开始测。"
+        },
+        {
+         "object_ref": {
+          "object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+          "revision": 1
+         },
+         "object_type": "observation",
+         "recorded_at": "2026-11-04T22:17:00Z",
+         "excerpt": "registry 上传尝试在 14:16 被拒绝：checksum mismatch。edge-2026.11.4 未发布，tag 未创建，registry 中没有对应 digest。"
+        },
+        {
+         "object_ref": {
+          "object_id": "clm_52276ec49967d10c72861d07",
+          "revision": 3
+         },
+         "object_type": "claim",
+         "recorded_at": "2026-11-04T22:24:00Z",
+         "excerpt": "对低风险实现类工作采用这一默认节奏：我自主推进、不逐步打断用户，完成后汇报结果与关键风险；生产影响、删除、费用事项升级给用户决定；删除类动作须先给出具体对象、影响、回滚办法并获明确确认，随口表述不视为授权。状态确认执行规则：将「计划/已排队」与「确实完成」分开表述，只有以平台完成记录（如完成事件、tag、digest）为据才对外表述为已完成，缺少完成记录时一律按未确认完成处理。该节奏已有一次真实 staging 收尾与用户明确肯定的验证，但正例尚少，执行时保持对真实结果与边界的核验。"
+        },
+        {
+         "object_ref": {
+          "object_id": "clm_d95e2508b26a0292b94a7a59",
+          "revision": 5
+         },
+         "object_type": "claim",
+         "recorded_at": "2026-11-04T22:24:00Z",
+         "excerpt": "针对 Atlas staging 收尾及这类低风险实现：用户要求我自主推进实现细节、不逐步确认，完成后汇报结果与关键风险；影响生产、删除、费用事项单独提出；production 旧索引删除须先给出具体对象、影响与回滚办法并经明确确认，随口表述不构成删除授权。状态汇报上，用户明确要求「准备提交、已排队」与「确实完成」严格分开：没有完成记录时按没确认完成处理。该偏好已有一次真实收尾正面验证，仍主要覆盖这类低风险实现。"
+        },
+        {
+         "object_ref": {
+          "object_id": "obs_conv_ai_56caa1007d9f7ea6d5514c07",
+          "revision": 1
+         },
+         "object_type": "observation",
+         "recorded_at": "2026-11-04T22:24:00Z",
+         "excerpt": "明白，这条规则我记下了：以后「准备提交、已排队」和「确实完成」严格分开说，没有完成记录就按没确认完成处理。\n\n另外同步刚到的平台记录（14:16）：这次 registry 上传尝试被拒绝，原因是 checksum mismatch——edge-2026.11.4 没有发布成功，tag 未创建，registry 里也没有对应 digest。按你的规则，现在该镜像按「未确认完成」处理，门店测试先不通知。\n\n接下来我会在低风险范围内查 checksum 不一致的原因并重试构建/上传；只有当平台出现上传完成记录（tag/digest 可查）时，我才会向你报告「已完成」，那时再安排门店测试。"
+        },
+        {
+         "object_ref": {
+          "object_id": "obs_conv_user_88047ce5294340f597841c38",
+          "revision": 1
+         },
+         "object_type": "observation",
+         "recorded_at": "2026-11-04T22:24:00Z",
+         "excerpt": "我后台也看到 tag 还没出来。以后这种“准备提交、已排队”和“确实完成”要分开说；没有完成记录时就按没确认完成处理。"
+        },
+        {
+         "object_ref": {
+          "object_id": "sum_9d61f3d59e4e216e55ade141",
+          "revision": 5
+         },
+         "object_type": "summary",
+         "recorded_at": "2026-11-04T22:24:00Z",
+         "excerpt": "2026-11-02 当天策略认知域的断言线（clm_52276ec49967d10c72861d07）：- 当日 20:52Z 首次形成（rev1），其后两次前向修订均发生在窗口后：2026-11-03 18:15Z rev2（用户明确生产删除动作执行前提），2026-11-04 22:24Z rev3（用户把状态精确性上升为执行规则——计划/已排队与确实完成分开表述、仅按平台完成记录确认完成，registry checksum mismatch 拒收事件为支持案例）。当前版本（rev3）要点：低风险实现类自主推进、完成后汇报结果与关键风险；生产影响/删除/费用事项升级给用户；删除类动作须给出具体对象、影响、回滚办法并获明确确认；状态确认执行规则——缺少完成记录一律按未确认完成处理；仍仅一次正例验证，执行时保持核验。\n信息来源（叶子一手对象）：- 用户低风险边界对话（obs_conv_user_00157f98462d7a1d7ff1a34a@1）、CI 收尾结果（obs_c14_fixture_5d4dfcf42055c00135a78a54@1）、用户肯定反馈（obs_conv_user_83b5da89c5b5751f2503919f@1）；窗口后修订新增：用户生产删除边界对话（obs_conv_user_2c65e6bb5864bd57d4f0432f@1）、用户状态精确"
+        },
+        {
+         "object_ref": {
+          "object_id": "sum_de8f7e246573a14c2bd5f4f9",
+          "revision": 5
+         },
+         "object_type": "summary",
+         "recorded_at": "2026-11-04T22:24:00Z",
+         "excerpt": "2026-11-02 当天用户理解认知域的断言线（clm_d95e2508b26a0292b94a7a59）：- 当日内 rev1→rev3 前向修正（17:05Z 形成、17:20Z 细化测试环境自主决定权、20:52Z 并入低风险实现类表述），其后两次窗口外修订：2026-11-03 18:15Z rev4（生产删除执行前提与随口表述不构成授权），2026-11-04 22:24Z rev5（状态精确规则——准备提交/已排队与确实完成严格分开，无完成记录即按没确认完成处理）。当前版本（rev5）要点完整覆盖上述各条，仍主要覆盖这类低风险实现。\n信息来源（叶子一手对象）：- 用户两次分工对话（obs_conv_user_5a96a6b7f95ebb907cc8f292@1、obs_conv_user_00157f98462d7a1d7ff1a34a@1）、CI 收尾结果（obs_c14_fixture_5d4dfcf42055c00135a78a54@1）、用户肯定反馈（obs_conv_user_83b5da89c5b5751f2503919f@1）；窗口后修订新增：生产删除边界对话（obs_conv_user_2c65e6bb5864bd57d4f0432f@1）、registry 拒收记录（obs_c14_fixture_b798e2dbd5b0fabdec6680a2@1"
+        },
+        {
+         "object_ref": {
+          "object_id": "obs_c14_fixture_291beec37165eb34a35f8f85",
+          "revision": 1
+         },
+         "object_type": "observation",
+         "recorded_at": "2026-11-04T23:02:00Z",
+         "excerpt": "edge-2026.11.4 第二次上传成功；registry tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED。"
+        },
+        {
+         "object_ref": {
+          "object_id": "obs_conv_ai_fb444aac0b24351717fcc75f",
+          "revision": 1
+         },
+         "object_type": "observation",
+         "recorded_at": "2026-11-04T23:07:00Z",
+         "excerpt": "好，平台记录这边也确实对上了：第二次上传于 15:02 成功，registry tag 已创建，digest 为 sha256:7f2a9d1c54b0，状态 PUBLISHED。之前 checksum mismatch 的问题在第二次构建/上传中解决，这条可以按「确实完成」对待。门店测试我就按你的通知推进配合，后续平台有任何异常记录我会随时拎出来说。"
+        },
+        {
+         "object_ref": {
+          "object_id": "obs_conv_user_1b8b15a865579a5b93d58460",
+          "revision": 1
+         },
+         "object_type": "observation",
+         "recorded_at": "2026-11-04T23:07:00Z",
+         "excerpt": "现在状态对上了。门店测试通知我已经发出去了。"
+        }
+       ],
+       "error_code": null,
+       "error_message": null,
+       "call_id": null
+      },
+      {
+       "name": "commit_operation_experience",
+       "ok": false,
+       "data": null,
+       "error_code": "CAPABILITY_ARGUMENT_ERROR",
+       "error_message": "FusedTurnRuntime._commit_operation_experience() got an unexpected keyword argument 'experience'",
+       "call_id": null
+      },
+      {
+       "name": "commit_operation_experience",
+       "ok": true,
+       "data": {
+        "experience_id": "opexp_4c982ed6ba398f2a8404e4d0",
+        "revision": 1,
+        "world_revision": 72
+       },
+       "error_code": null,
+       "error_message": null,
+       "call_id": null
+      }
+     ],
+     "model_rounds": 4,
+     "termination_reason": "silence",
+     "model_input_tokens": null,
+     "model_output_tokens": null,
+     "model_total_tokens": null,
+     "model_usage_complete": false
+    }
+   },
+   {
+    "at": "2026-11-06T17:05:00+00:00",
+    "invoked": false,
+    "reason": "not_due_or_suppressed_without_model_call"
+   }
+  ],
+  "background_cycles": 2,
+  "dimension_summaries": {
+   "attempted_jobs": [
+    {
+     "dimension": "dim:ai_communication_experience",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 1
+    },
+    {
+     "dimension": "dim:ai_relationship",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 4
+    },
+    {
+     "dimension": "dim:ai_strategy",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 2
+    },
+    {
+     "dimension": "dim:ai_strategy",
+     "scale": "day",
+     "window_start": "2026-11-03T00:00:00+00:00",
+     "window_end": "2026-11-03T23:59:59.999999+00:00",
+     "source_count": 1
+    },
+    {
+     "dimension": "dim:ai_strategy",
+     "scale": "day",
+     "window_start": "2026-11-04T00:00:00+00:00",
+     "window_end": "2026-11-04T23:59:59.999999+00:00",
+     "source_count": 1
+    },
+    {
+     "dimension": "dim:ai_user_understanding",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 4
+    },
+    {
+     "dimension": "dim:ai_user_understanding",
+     "scale": "day",
+     "window_start": "2026-11-03T00:00:00+00:00",
+     "window_end": "2026-11-03T23:59:59.999999+00:00",
+     "source_count": 1
+    },
+    {
+     "dimension": "dim:ai_user_understanding",
+     "scale": "day",
+     "window_start": "2026-11-04T00:00:00+00:00",
+     "window_end": "2026-11-04T23:59:59.999999+00:00",
+     "source_count": 1
+    },
+    {
+     "dimension": "dim:release_state",
+     "scale": "day",
+     "window_start": "2026-11-04T00:00:00+00:00",
+     "window_end": "2026-11-04T23:59:59.999999+00:00",
+     "source_count": 3
+    },
+    {
+     "dimension": "dim:user_ai_interaction",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 6
+    },
+    {
+     "dimension": "dim:user_ai_interaction",
+     "scale": "day",
+     "window_start": "2026-11-03T00:00:00+00:00",
+     "window_end": "2026-11-03T23:59:59.999999+00:00",
+     "source_count": 2
+    },
+    {
+     "dimension": "dim:user_ai_interaction",
+     "scale": "day",
+     "window_start": "2026-11-04T00:00:00+00:00",
+     "window_end": "2026-11-04T23:59:59.999999+00:00",
+     "source_count": 6
+    },
+    {
+     "dimension": "dim:work_outcome",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 1
+    },
+    {
+     "dimension": "dim:work_state",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 1
+    }
+   ],
+   "commits": [
+    {
+     "object_id": "sum_0e4522c71c2a5228f8e2f65c",
+     "revision": 1,
+     "world_revision": 81,
+     "reused_existing": false
+    },
+    {
+     "object_id": "sum_3cbea124313860afc0ed7ede",
+     "revision": 1,
+     "world_revision": 83,
+     "reused_existing": false
+    },
+    {
+     "object_id": "sum_ddb6c40bb1513b2d42802bd3",
+     "revision": 1,
+     "world_revision": 85,
+     "reused_existing": false
+    },
+    {
+     "object_id": "sum_bbd1e5bef32dcaf8f73ccf20",
+     "revision": 1,
+     "world_revision": 87,
+     "reused_existing": false
+    }
+   ],
+   "skipped_unchanged": [
+    {
+     "dimension": "dim:ai_communication_experience",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 1
+    },
+    {
+     "dimension": "dim:ai_relationship",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 4
+    },
+    {
+     "dimension": "dim:ai_strategy",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 2
+    },
+    {
+     "dimension": "dim:ai_strategy",
+     "scale": "day",
+     "window_start": "2026-11-03T00:00:00+00:00",
+     "window_end": "2026-11-03T23:59:59.999999+00:00",
+     "source_count": 1
+    },
+    {
+     "dimension": "dim:ai_user_understanding",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 4
+    },
+    {
+     "dimension": "dim:ai_user_understanding",
+     "scale": "day",
+     "window_start": "2026-11-03T00:00:00+00:00",
+     "window_end": "2026-11-03T23:59:59.999999+00:00",
+     "source_count": 1
+    },
+    {
+     "dimension": "dim:user_ai_interaction",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 6
+    },
+    {
+     "dimension": "dim:user_ai_interaction",
+     "scale": "day",
+     "window_start": "2026-11-03T00:00:00+00:00",
+     "window_end": "2026-11-03T23:59:59.999999+00:00",
+     "source_count": 2
+    },
+    {
+     "dimension": "dim:work_outcome",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 1
+    },
+    {
+     "dimension": "dim:work_state",
+     "scale": "day",
+     "window_start": "2026-11-02T00:00:00+00:00",
+     "window_end": "2026-11-02T23:59:59.999999+00:00",
+     "source_count": 1
+    }
+   ],
+   "skipped_empty": [],
+   "truncated": false
+  },
+  "world_revision": 88
+ },
+ "world_revision": 88,
+ "index_watermark": 88
+}

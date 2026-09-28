@@ -1,0 +1,32 @@
+{
+ "sequence": 2,
+ "event": {
+  "dimension": "dim:work_state",
+  "event_id": "c15rcc-002",
+  "modality": "structured_text",
+  "occurred_at": "2026-11-02T09:14:00-08:00",
+  "resident_visible_payload": "Atlas staging 当前有两处待处理：测试索引命名冲突、日志保留时长仍为默认值。两项均标记为 non-production；没有生产写入、删除或付费动作。",
+  "sequence": 2,
+  "source_class": "PLATFORM",
+  "source_kind": "task_tracker"
+ },
+ "ingest_ref": "obs_c14_fixture_5248cdfd5a23b6ea88ce0a96@1",
+ "ack": "32157f5289c883df7a\",\"fixture_sha256\":\"sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46\",\"ingest_object_id\":\"obs_c14_fixture_5248cdfd5a23b6ea88ce0a96\",\"ingest_ref\":\"obs_c14_fixture_5248cdfd5a23b6ea88ce0a96@1\",\"ingest_revision\":1,\"ingest_source_class\":\"platform\",\"ingest_world_revision\":5,\"next_sequence\":3,\"occurred_at\":\"2026-11-02T09:14:00-08:00\",\"sequence\":2,\"status\":\"acked\"}",
+ "advance": {
+  "from": "2026-11-02T17:05:00+00:00",
+  "to": "2026-11-02T17:14:00+00:00",
+  "task_cycles": [],
+  "periodic_reviews": [],
+  "background_cycles": 0,
+  "dimension_summaries": {
+   "attempted_jobs": [],
+   "commits": [],
+   "skipped_unchanged": [],
+   "skipped_empty": [],
+   "truncated": false
+  },
+  "world_revision": 5
+ },
+ "world_revision": 5,
+ "index_watermark": 5
+}

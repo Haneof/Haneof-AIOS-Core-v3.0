@@ -1,0 +1,57 @@
+{
+ "dimension": "dim:ai_strategy",
+ "granularity": "day",
+ "window_start": "2026-11-02T00:00:00Z",
+ "window_end": "2026-11-02T23:59:59.999999Z",
+ "source_world_revision": 37,
+ "sources": [
+  {
+   "object_id": "clm_52276ec49967d10c72861d07",
+   "revision": 2,
+   "object_type": "claim",
+   "occurred_at": "2026-11-02T20:52:00Z",
+   "text": "对低风险实现类工作采用这一默认节奏：我自主推进、不逐步打断用户，完成后汇报结果与关键风险；生产影响、删除、费用事项升级给用户决定。升级到删除类动作时（如 production 旧索引），执行前提是给出具体对象、影响与回滚办法并获得用户明确确认；用户的随口表述不视为删除授权。该节奏已有一次真实 staging 收尾与用户明确肯定的验证，但正例尚少，执行时保持对真实结果与边界的核验。",
+   "metadata": {
+    "ai_domain": "strategy",
+    "ai_world": true,
+    "dimension": "dim:ai_strategy",
+    "revision_evidence_set_ref": {
+     "object_id": "evs_revision_7e9868aae1355a9cbef94a97",
+     "revision": 1
+    },
+    "revision_mode": "revise",
+    "revision_reason": "用户明确生产删除的执行前提：具体对象、影响、回滚办法与明确确认；非正式口语不构成授权——这细化了我应执行的升级协议。",
+    "scope_key": "low_risk_implementation_cadence",
+    "supersedes_revision": 1,
+    "tags": [
+     "autonomy",
+     "risk-escalation",
+     "low-risk",
+     "reporting"
+    ],
+    "writeback_kind": "revisable_cognition"
+   }
+  },
+  {
+   "object_id": "evs_ff6e750c5628bdfd53949569",
+   "revision": 1,
+   "object_type": "evidence_set",
+   "occurred_at": "2026-11-02T20:52:00Z",
+   "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 3, \"missing_description\": [], \"observed_count\": 3}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-02T20:52:00Z\", \"world_revision\": 13}, \"learned_at\": \"2026-11-02T20:52:00Z\", \"member_refs\": [{\"object_id\": \"obs_c14_fixture_5d4dfcf42055c00135a78a54\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_00157f98462d7a1d7ff1a34a\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_83b5da89c5b5751f2503919f\", \"revision\": 1}], \"metadata\": {\"ai_domain\": \"strategy\", \"ai_world\": true, \"dimension\": \"dim:ai_strategy\", \"scope_key\": \"low_risk_implementation_cadence\", \"tags\": [\"autonomy\", \"risk-escalation\", \"low-risk\", \"reporting\"], \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_ff6e750c5628bdfd53949569\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-11-02T20:52:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"user_1\", \"support_refs\": [{\"object_id\": \"obs_c14_fixture_5d4dfcf42055c00135a78a54\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_00157f98462d7a1d7ff1a34a\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_83b5da89c5b5751f2503919f\", \"revision\": 1}]}",
+   "metadata": {
+    "ai_domain": "strategy",
+    "ai_world": true,
+    "dimension": "dim:ai_strategy",
+    "scope_key": "low_risk_implementation_cadence",
+    "tags": [
+     "autonomy",
+     "risk-escalation",
+     "low-risk",
+     "reporting"
+    ],
+    "writeback_kind": "cognition_evidence"
+   }
+  }
+ ],
+ "truncated": false
+}

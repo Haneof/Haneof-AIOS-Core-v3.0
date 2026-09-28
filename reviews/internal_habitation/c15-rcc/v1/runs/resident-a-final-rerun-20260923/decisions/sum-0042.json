@@ -1,0 +1,3 @@
+{
+ "text": "2026-11-04 当天 release_state 域按时间三条平台记录：\n- 21:30Z：镜像 edge-2026.11.4 构建完成，状态 READY_FOR_UPLOAD，registry 上传已排队、计划 14:00 开始；当时无 registry tag、digest 或上传完成事件。\n- 22:17Z：14:16 的上传尝试被拒绝（checksum mismatch），edge-2026.11.4 未发布、tag 未创建、registry 中无对应 digest。\n- 23:02Z：第二次上传成功；registry tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED。\n事实事实：三条均为 platform registry/build 侧记录；当日域内无其它事件。"
+}

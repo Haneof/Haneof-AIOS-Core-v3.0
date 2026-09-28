@@ -1,0 +1,9 @@
+{
+ "note": "First periodic review (tick 2026-11-03T17:05Z). Step 1: inspect the selected world anchors before deciding any cognition/opexp changes.",
+ "capability_calls": [
+  {
+   "name": "read_periodic_review_anchors",
+   "arguments": {}
+  }
+ ]
+}

@@ -1,0 +1,76 @@
+{
+ "dimension": "dim:release_state",
+ "granularity": "day",
+ "window_start": "2026-11-04T00:00:00Z",
+ "window_end": "2026-11-04T23:59:59.999999Z",
+ "source_world_revision": 84,
+ "sources": [
+  {
+   "object_id": "obs_c14_fixture_87474a7fb5036c38638a6c37",
+   "revision": 1,
+   "object_type": "observation",
+   "occurred_at": "2026-11-04T21:30:00Z",
+   "text": "镜像 edge-2026.11.4 构建完成，当前状态 READY_FOR_UPLOAD；registry 上传任务已排队，计划 14:00 开始。当前记录中没有 registry tag、digest 或 upload-complete 事件。",
+   "metadata": {
+    "dimension": "dim:release_state",
+    "external_record_id": "c15rcc-007",
+    "external_revision": "1",
+    "fixture_binding_version": "c15-rcc-fixture-event-binding-v1",
+    "fixture_event_id": "c15rcc-007",
+    "fixture_payload_sha256": "sha256:776d871786f1329dc91173570ae20c7a15ffb9aabd3163045734969b4d596879",
+    "fixture_projection_sha256": "sha256:b5c631acba34d26fc1e4cd1ad3bd2b25e8619a6d5738f34a8d00cf33ec9e8752",
+    "fixture_sequence": 7,
+    "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+    "fixture_version": "c15-rcc-fixture-v1",
+    "mechanical_ingest": true,
+    "occurred_at_original": "2026-11-04T13:30:00-08:00",
+    "source_class": "platform"
+   }
+  },
+  {
+   "object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+   "revision": 1,
+   "object_type": "observation",
+   "occurred_at": "2026-11-04T22:17:00Z",
+   "text": "registry 上传尝试在 14:16 被拒绝：checksum mismatch。edge-2026.11.4 未发布，tag 未创建，registry 中没有对应 digest。",
+   "metadata": {
+    "dimension": "dim:release_state",
+    "external_record_id": "c15rcc-009",
+    "external_revision": "1",
+    "fixture_binding_version": "c15-rcc-fixture-event-binding-v1",
+    "fixture_event_id": "c15rcc-009",
+    "fixture_payload_sha256": "sha256:75fe7cf480226ac2cf456e9a07e26fe062aa5f42c1c3d6d661559ed2fd4aa0f5",
+    "fixture_projection_sha256": "sha256:e744a4993fcc7e7c036a0f4c07b4a76fffcccf15f4e079f55de82e84384271ce",
+    "fixture_sequence": 9,
+    "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+    "fixture_version": "c15-rcc-fixture-v1",
+    "mechanical_ingest": true,
+    "occurred_at_original": "2026-11-04T14:17:00-08:00",
+    "source_class": "platform"
+   }
+  },
+  {
+   "object_id": "obs_c14_fixture_291beec37165eb34a35f8f85",
+   "revision": 1,
+   "object_type": "observation",
+   "occurred_at": "2026-11-04T23:02:00Z",
+   "text": "edge-2026.11.4 第二次上传成功；registry tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED。",
+   "metadata": {
+    "dimension": "dim:release_state",
+    "external_record_id": "c15rcc-011",
+    "external_revision": "1",
+    "fixture_binding_version": "c15-rcc-fixture-event-binding-v1",
+    "fixture_event_id": "c15rcc-011",
+    "fixture_payload_sha256": "sha256:1e8dcb94f2615049a6d9e1980055176ab708bcb271fa8d131113a9ed8dddad35",
+    "fixture_projection_sha256": "sha256:b76eee334205d2a3e63bb0311d18b35fa03d6e6b55af2de280c9aed7b4d2d3c4",
+    "fixture_sequence": 11,
+    "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+    "fixture_version": "c15-rcc-fixture-v1",
+    "mechanical_ingest": true,
+    "occurred_at_original": "2026-11-04T15:02:00-08:00",
+    "source_class": "platform"
+   }
+  }
+ ],
+ "truncated": false
+}
