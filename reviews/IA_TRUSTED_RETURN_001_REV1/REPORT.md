@@ -249,6 +249,27 @@ Candidate-owned trusted-return and recovery suites, reviewer-executed:
 * Reviewer branch adds only `reviews/IA_TRUSTED_RETURN_001_REV1/` and
   `tests/independent_acceptance/`.
 
+### Publication topology (stated precisely to avoid a misleading claim)
+
+The candidate-integrity claims above are asserted **on the review branch**, which is
+created *from the exact candidate* and therefore shares the candidate's entire tree.
+
+Two branches carry the evidence:
+
+| branch | base | `src/aios_core` vs its own base | role |
+|---|---|---|---|
+| `ia/independent-acceptance-trusted-return-001-rev1` | the exact candidate `1ebf51c4…` | **EMPTY** | authoritative candidate-integrity proof; review-only PR #261 |
+| `arena/01a0e711-haneof-aios-core-v3-0` (session) | live main `a3dab8bc` | **EMPTY** (vs main) | mirrors the same review artifacts so this window is tracked |
+
+The session branch is main-based, so it naturally does **not** contain PR #258's
+candidate changes. Comparing the session branch against the candidate would therefore
+show all of PR #258's own diff — that is main lagging the candidate, **not** reviewer
+modification. The two independent checks that matter are both green:
+
+* review branch vs exact candidate: `src/aios_core` **EMPTY**, candidate tests/CI
+  **byte-identical** (additions only, in a new directory);
+* session branch vs live main: `src/aios_core` **EMPTY**, tests **additions only**.
+
 ---
 
 ## 10. Residual limitations
