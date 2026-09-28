@@ -1,5 +1,15 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 当前控制入口 — 2026-09-28 RC-REFREEZE-003 REVIEW_READY / FRESH IA READY
+
+- **`CORE-RC-REFREEZE-003 = REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE`**. Candidate PR #269 remains **OPEN / UNMERGED** at exact head `6f95431036dd0304947d67ec4a8de7229d1d3ba9` (first parent `f2ef4886cbd7253543e82debbaa14ea387417f03`, tree `a43a761ac3570dfc4aab296818310068f877e881`).
+- Frozen software target remains `f20f2edfa7af00d0286493fd15196ca9503bc315`. PR #269 changes freeze evidence/release metadata/formal-gate workflow only; **zero src/tests/package implementation drift** relative to live main at PM review.
+- Exact-head formal gate run `36437699641` = **SUCCESS**. Author evidence includes 919 full pytest PASS, 248 trusted-return/recovery PASS, 356 Core systems PASS, registry 43 total / 22 side-effecting, clean-wheel/headless PASS, backup/restore/index rebuild PASS. These are not acceptance proof.
+- **唯一下一 READY：`CORE-RC-REFREEZE-003-INDEPENDENT-ACCEPTANCE = READY`**. Prompt: `governance/prompts/CORE_RC_REFREEZE_003_INDEPENDENT_ACCEPTANCE_2026-09-28.md`.
+- Fresh IA must independently verify freeze/merge-ref equivalence, manifests/checksums, clean install, backup/restore/rebuild, writer/restart, trusted-return invariants, real recovery/process-loss, open-PR contamination and `FRESH_A_REQUIRED`.
+- Until fresh IA PASS + PM integration: PR #269 merge, `C15-RCC-RES-A-RERUN-004`, persistence Corrective-003 resume, Resident B/C, evaluator and C15 close remain **BLOCKED**.
+
+
 ## 当前控制入口 — 2026-09-28 TRUSTED-RETURN CORRECTIVE-001 INTEGRATED / RC-REFREEZE-003 READY
 
 - **`CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001-CORRECTIVE-001 = DONE / ACCEPTED / INTEGRATED`**. Accepted exact candidate = `a73e186d40688f5dc181b1128a62eff37a974409`; fresh IA evidence = `eeda251e057e98b15a919694af4689786faf8c55` with `ACCEPTANCE_PASS / blocker=0`; implementation PR #264 merged as `f20f2edfa7af00d0286493fd15196ca9503bc315`.
