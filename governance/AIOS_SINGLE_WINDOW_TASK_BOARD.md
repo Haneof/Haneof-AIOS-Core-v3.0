@@ -1,5 +1,16 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 当前控制入口 — 2026-09-28 A-004 CORRECTIVE-001 BLOCKED / CORRECTIVE-002 READY
+
+- **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-001 = BLOCKED / HISTORICAL_BLOCKED_EXACT`**. Evidence PR #277 exact head = `2968299beea5fe5ec2dc93418d0fa7f3e035ec40` (parent `c90b585141864f0687f210b05cde8523e00607e6`, tree `e474cd5a3a55959b97c4c3b69400ab258d25f083`). The run correctly refused post-reveal harness patching and stopped after cursor 1.
+- Binding defect `CORR001-BLK-001`: frozen runner expected nonexistent `CapabilityResult.arguments/result/error/duration_seconds`; accepted Core exposes only `name/ok/data/error_code/error_message/call_id`. The 14 pre-run tests covered bridge mechanics but not runner↔frozen-Core contract.
+- Binding defect `CORR001-BLK-002`: #277's `resident_agent.py` contains keyword/text-driven hard-coded cognition calls and final replies. That is a scripted semantic policy, not Real Resident decision-making, and independently invalidates the run as Resident evidence.
+- Additional gate hardening: Corrective-001 pre-run tests ran under CPython 3.11.2; Corrective-002 binding pre-reveal tests must run under the same CPython 3.12.14 / Pydantic 2.13.5 environment used for the real Resident.
+- **唯一下一 READY：`C15-RCC-RES-A-RERUN-004-CORRECTIVE-002 = READY`**. Prompt: `governance/prompts/C15_RCC_RES_A_RERUN_004_CORRECTIVE_002_2026-09-28.md`.
+- Corrective-002 must be a completely fresh Phase-A rerun. Before cursor 1 it must pass/freeze: exchange bridge tests, real frozen-Core `RuntimeSnapshot/CapabilityResult` serialization tests, an integrated two-round synthetic runtime test with non-empty capability history, and a no-semantic-script guard. Real execution must use the current Resident session to decide each request through a mechanical publisher only.
+- Until Corrective-002 + fresh IA PASS + PM integration: persistence Corrective-003, Resident B/C, evaluator and C15 close remain **BLOCKED**.
+
+
 ## 当前控制入口 — 2026-09-28 A-004 IA FAIL / CORRECTIVE-001 READY
 
 - **`C15-RCC-RES-A-RERUN-004 = ACCEPTANCE_FAIL / blocker=2 / HISTORICAL_FAILED_EXACT`**. Failed evidence PR #273 exact head = `f251e9c0026a0f97fdee20397936cb5e3b18c61c`; failed Independent Acceptance PR #275 exact = `ccd5f539714604f5ff5912b90024f28b82618511`. Both remain immutable historical evidence; no hash-swap or post-hoc repair.
