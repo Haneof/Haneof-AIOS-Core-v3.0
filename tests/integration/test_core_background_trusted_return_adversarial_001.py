@@ -186,7 +186,13 @@ def _child_kill_after_round_one(db_path):
             os.kill(os.getpid(), signal.SIGKILL)
         original(snapshot, returned)
     runtime.cognitive_runtime.model_response_recorder = recorder
-    resume(runtime)
+    try:
+        resume(runtime)
+    except BaseException:
+        import traceback
+        with open(db_path + ".child-trace", "w") as trace:
+            traceback.print_exc(file=trace)
+        raise
 
 
 def test_real_sigkill_after_later_round_trusted_handoff(tmp_path):
@@ -198,7 +204,10 @@ def test_real_sigkill_after_later_round_trusted_handoff(tmp_path):
         target=_child_kill_after_round_one, args=(str(db),))
     child.start()
     child.join(30)
-    assert child.exitcode == -signal.SIGKILL
+    trace = db.with_suffix(".db.child-trace")
+    assert child.exitcode == -signal.SIGKILL, (
+        f"child exit={child.exitcode} trace={trace.read_text() if trace.exists() else 'none'}"
+    )
     fresh = restart(db)
     result = resume(fresh)
     assert result.runtime.response == "finished once"
