@@ -1,0 +1,14 @@
+{
+  "probe_revision": "v1",
+  "probe_sha256": "237d82faffd06caaffcf0ebc8838c45ae43741ba6dbe21c0604761c1c7bc709c",
+  "candidate_exact": "10901d467679b70437ae112747eab81f889fd5cb",
+  "exit_code": 1,
+  "classification": "PROBE_EXECUTION_INCOMPLETE_NOT_VALID_BASELINE_RED",
+  "observed_probe_defects": [
+    "C1 could not import frozen aios_core because source path was not passed",
+    "C3 summary parser did not accept pytest duration suffix"
+  ],
+  "raw_output_path": "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_001/raw/baseline_red_10901d467679b70437ae112747eab81f889fd5cb.stdout.txt",
+  "raw_output_sha256": "fbf6602a2a70abb113669cd23d0db88e780831b9cd83839831e3bd1df4eaa399",
+  "action": "Preserved unchanged. Corrected probe revision v2 keeps the frozen expected outcomes and adds only missing environment plumbing and pytest summary parsing."
+}

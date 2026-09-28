@@ -1,0 +1,22 @@
+{
+  "environment": {
+    "python_version": "3.12.14",
+    "python_version_info": [
+      3,
+      12,
+      14
+    ],
+    "pydantic_version": "2.13.5",
+    "pytest_version": "8.4.2",
+    "sqlite_version": "3.45.1",
+    "executable": "/tmp/aios-c15-op-prep-corrective-clean-20260928-final/runtime/3.12.14/venv/bin/python"
+  },
+  "repo_root": "/home/user/Haneof-AIOS-Core-v3.0",
+  "harness_root": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness",
+  "expected": {
+    "python": "3.12.14",
+    "pydantic": "2.13.5",
+    "pytest": "8.4.2"
+  },
+  "generated_utc": "2026-09-28T20:28:21.552149+00:00"
+}

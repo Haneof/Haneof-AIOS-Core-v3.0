@@ -1,0 +1,167 @@
+{
+  "clean_room_inputs": [
+    {
+      "file": "reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_CORRECTIVE_003_CLEAN_ROOM_CONTRACT.md",
+      "frozen_control_plane_blob": "bca3715f9aaff1f3e6f813cf6d1b9f23b0945bef",
+      "observed_blob": "bca3715f9aaff1f3e6f813cf6d1b9f23b0945bef",
+      "packet_sha256": "1da3ed6685e434cdc6dceae707d255fb5f2110ff4d05bb1c69615f0b792662f1",
+      "result": "PASS",
+      "sha256": "1da3ed6685e434cdc6dceae707d255fb5f2110ff4d05bb1c69615f0b792662f1"
+    },
+    {
+      "file": "reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_RUN_CONTRACT.md",
+      "frozen_control_plane_blob": "1b45ca7fa441855d927b610ca2a93ef50b5eee66",
+      "observed_blob": "1b45ca7fa441855d927b610ca2a93ef50b5eee66",
+      "packet_sha256": "9b8a6cc5641710bef88943279eedc3c8c88959bece0f7a47d4bba08ead470dab",
+      "result": "PASS",
+      "sha256": "9b8a6cc5641710bef88943279eedc3c8c88959bece0f7a47d4bba08ead470dab"
+    }
+  ],
+  "excluded_from_raw_scan": [
+    {
+      "file": "harness/operator_tools/no_semantic_scan.py",
+      "reason": "gate D scanner: embeds the prohibited-vocabulary patterns",
+      "resident_readable": false
+    },
+    {
+      "file": "harness/operator_tools/packet_audit.py",
+      "reason": "audit tool: embeds the marker patterns",
+      "resident_readable": false
+    },
+    {
+      "file": "harness/tests/test_gate_d_no_semantic_script.py",
+      "reason": "gate D test: asserts the prohibited-vocabulary behaviour",
+      "resident_readable": false
+    }
+  ],
+  "forbidden_category_checks": {
+    "evaluator_language": {
+      "findings": [],
+      "result": "PASS"
+    },
+    "expected_answer_or_cognition": {
+      "findings": [],
+      "result": "PASS"
+    },
+    "prior_assistant_text": {
+      "findings": [],
+      "result": "PASS"
+    },
+    "prior_claims_or_summaries": {
+      "findings": [],
+      "result": "PASS"
+    },
+    "prior_cursor_semantic_decisions": {
+      "findings": [],
+      "result": "PASS"
+    },
+    "prior_user_payload": {
+      "findings": [],
+      "result": "PASS"
+    },
+    "run_lineage_semantic_detail": {
+      "findings": [],
+      "result": "PASS"
+    },
+    "unmodified_clean_room_inputs": {
+      "findings": [],
+      "result": "PASS"
+    }
+  },
+  "frozen_control_plane": "026810533679d749d9a33b9c11a06585ae28d9f6",
+  "generated_utc": "2026-09-28T18:37:16.538328+00:00",
+  "packet": "RESIDENT_SAFE_LAUNCH_PACKET.json",
+  "packet_sha256": "dfab9270f811836f1aad77641a1ec007eb741d1c6ce1acb68f51763eb00bad73",
+  "packet_structure": {
+    "checked_keys": [
+      "allowed_cursor_end",
+      "allowed_cursor_start",
+      "allowed_startup_inputs",
+      "bootstrap_path",
+      "bootstrap_sha256",
+      "bootstrap_verify_command",
+      "clean_room_contract_path",
+      "clean_room_contract_sha256",
+      "environment_record_path",
+      "environment_record_sha256",
+      "forbidden_startup_categories",
+      "forbidden_startup_paths",
+      "frozen_core_content_manifest_sha256",
+      "frozen_core_tree",
+      "frozen_repository_tree",
+      "frozen_software_sha",
+      "frozen_tests_tree",
+      "gate_a_hash",
+      "gate_a_status",
+      "gate_b_hash",
+      "gate_b_status",
+      "gate_c_hash",
+      "gate_c_status",
+      "gate_d_hash",
+      "gate_d_status",
+      "generated_utc",
+      "harness_entrypoint",
+      "harness_file_count",
+      "harness_manifest_sha256",
+      "harness_root",
+      "harness_runner_module",
+      "ledger_module",
+      "operator_prep_exact_head",
+      "operator_prep_head_rule",
+      "packet_version",
+      "pydantic_version",
+      "pytest_version",
+      "python_version",
+      "real_response_mode",
+      "request_publisher_module",
+      "resident_run_contract_path",
+      "resident_run_contract_sha256",
+      "response_publisher_module",
+      "runtime_root_default",
+      "runtime_venv_python_default",
+      "sqlite_version",
+      "status",
+      "task_id"
+    ],
+    "negated_matches": [],
+    "ok": true,
+    "problems": [],
+    "value_findings": []
+  },
+  "result": "PASS",
+  "scanned_file_count": 3,
+  "scanned_files": [
+    {
+      "file": "RESIDENT_SAFE_LAUNCH_PACKET.json",
+      "findings": [],
+      "mode": "packet-structure+values",
+      "result": "PASS",
+      "sha256": "dfab9270f811836f1aad77641a1ec007eb741d1c6ce1acb68f51763eb00bad73"
+    },
+    {
+      "file": "harness/aios_exchange/**",
+      "findings": [],
+      "mode": "gate D code-only scan (frozen)",
+      "result": "PASS",
+      "scanner": "harness/operator_tools/no_semantic_scan.py",
+      "sha256": "a26f76162b197cdc473b7c985f3be7c234cbd16141a5cd735a685fe6664235a1"
+    },
+    {
+      "file": "bootstrap/bootstrap_runtime.sh",
+      "findings": [],
+      "mode": "raw marker scan",
+      "negated_matches": [
+        {
+          "category": "evaluator_language",
+          "line": 11,
+          "match": "evaluator expectation",
+          "negated": true,
+          "pattern": "evaluator (answer|expectation|semantic|rubric)"
+        }
+      ],
+      "result": "PASS",
+      "sha256": "b496080238d732cf5e90c4e385769a7689214e5bf8901765926cb925e02e4823"
+    }
+  ],
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003"
+}
