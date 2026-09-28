@@ -160,34 +160,22 @@ def _mirror(mailbox: Path, source: Path, target: Path) -> None:
         _atomic_write(target, source.read_bytes())
 
 
-def serve(mailbox: Path, request_id: str) -> dict[str, object]:
-    """Answer one request id exactly once. Returns an operator-visible report."""
+def dispatch(mailbox: Path, request_id: str) -> dict[str, object]:
+    """Cross the provider submission boundary exactly once, without returning a reply."""
     mailbox = Path(mailbox)
     request_file = outbox_path(mailbox, request_id)
     if not request_file.is_file():
         raise SystemExit(f"provider: no durable request for {request_id}")
     request = request_file.read_bytes()
     request_sha = digest(request)
-
-    ledger = read_ledger(mailbox)
-    previous = [row for row in ledger if row.get("request_id") == request_id]
-    reply_file = inbox_path(mailbox, request_id)
-
+    previous = [row for row in read_ledger(mailbox) if row.get("request_id") == request_id]
     if previous:
-        # An outstanding request is being re-presented after a restart.  This is
-        # resumption, never a second dispatch.
-        if not reply_file.is_file():
-            reply = build_reply(request)
-            _atomic_write(reply_file, reply)
-            _mirror(mailbox, reply_file, current_reply_path(mailbox))
         return {
             "request_id": request_id,
             "request_sha256": request_sha,
             "dispatch": "reattached",
             "dispatch_count": len(previous),
-            "reply_sha256": digest(reply_file.read_bytes()),
         }
-
     append_ledger(
         mailbox,
         {
@@ -197,15 +185,47 @@ def serve(mailbox: Path, request_id: str) -> dict[str, object]:
             "provider_pid": os.getpid(),
         },
     )
-    reply = build_reply(request)
-    _atomic_write(reply_file, reply)
-    _mirror(mailbox, reply_file, current_reply_path(mailbox))
     return {
         "request_id": request_id,
         "request_sha256": request_sha,
         "dispatch": "dispatched",
         "dispatch_count": 1,
-        "reply_sha256": digest(reply),
+    }
+
+
+def collect(mailbox: Path, request_id: str) -> dict[str, object]:
+    """Collect the exact reply for an already-dispatched request without redispatch."""
+    mailbox = Path(mailbox)
+    request_file = outbox_path(mailbox, request_id)
+    if not request_file.is_file():
+        raise SystemExit(f"provider: no durable request for {request_id}")
+    request = request_file.read_bytes()
+    request_sha = digest(request)
+    previous = [row for row in read_ledger(mailbox) if row.get("request_id") == request_id]
+    if not previous:
+        raise SystemExit(f"provider: request {request_id} was never dispatched")
+    reply_file = inbox_path(mailbox, request_id)
+    if not reply_file.is_file():
+        reply = build_reply(request)
+        _atomic_write(reply_file, reply)
+        _mirror(mailbox, reply_file, current_reply_path(mailbox))
+    return {
+        "request_id": request_id,
+        "request_sha256": request_sha,
+        "dispatch": "reattached",
+        "dispatch_count": len(previous),
+        "reply_sha256": digest(reply_file.read_bytes()),
+    }
+
+
+def serve(mailbox: Path, request_id: str) -> dict[str, object]:
+    """Compatibility helper: dispatch once, then collect the exact reply."""
+    dispatch_report = dispatch(mailbox, request_id)
+    reply_report = collect(mailbox, request_id)
+    return {
+        **reply_report,
+        "dispatch": dispatch_report["dispatch"],
+        "dispatch_count": dispatch_report["dispatch_count"],
     }
 
 
