@@ -1,22 +1,25 @@
-# Corrective-002 candidate-code checkpoint — NOT FINAL REVIEW READY
+# Corrective-002 final evidence status
 
-This checkpoint precedes the final candidate-tier rerun and final-packet audit tier.
+OPERATOR_PREP_CORRECTIVE_002_COMPLETE / REVIEW_READY
+READY_FOR_INDEPENDENT_ACCEPTANCE
 
-- Historical #286 H2 and all frozen C4–C9 v1/v2 probe sources/results are preserved.
-- Genuine v2 H2 baseline: 80 failed / 23 passed (all six groups RED).
-- Candidate iteration 2: unchanged v2 probes 103/103 PASS.
-- Initial C1–C3 regression GREEN; initial full gates 24/7/2/5 PASS.
-- New empty-root build `/home/user/.cache/c002/clean-runtime-002` exited 0.
-- Repairs and packet tooling complete; final identity-bound reruns remain pending.
-- Earlier H2 evidence was relocated unchanged to `historical_h2/package_evidence`;
-  its packet is preserved alongside it. Those are not current candidate results.
-- Candidate iteration 1 (101 PASS / 2 FAIL) and Gate iteration 1 (A:22/24)
-  are retained, not overwritten. Gate A's diagnostic seq regression was fixed.
-- A15's old worker published an unrelated dictionary and then resumed a different
-  snapshot: forbidden by C4. The worker now publishes that test's exact snapshot;
-  assertion and node IDs are unchanged. Worker is isolated in harness/tests/synthetic.
-- No frozen probe/expected outcome, Core, product tests, fixture/evaluator/release,
-  governance or real Resident state has been modified.
+Author engineering evidence only; no self-acceptance or merge. The final freeze
+commit has sole parent candidate H1 63c972ad7a19671cbdf809177f7a552aa2c2ecc6.
+Final exact head/tree are pinned externally in the new PR to avoid self-reference.
 
-Final packet remains PREP_REVIEW_READY, never launch authorization. No real
-Resident, World/session, cursor reveal, release-state or Phase-A run was created.
+- Genuine frozen H2 baseline RED: 80 failed / 23 passed.
+- Same frozen 103-node v2 probes: 103 PASS under final new runtime.
+- C1/C2/C3 GREEN; full A/B/C/D PASS (24/7/2/5).
+- A synthetic actually due SAFETY Wake crossed Core → external durable request →
+  test response → consumed → completed, with intact ledger.
+- New absent-root final bootstrap and default/explicit-root verify PASS.
+- CPython 3.12.14 / Pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.45.1 /
+  OpenSSL 3.0.13; pre-download 11-wheel lock unchanged.
+- Final packet audit PASS and final packet-tier unchanged probes 103 PASS.
+- Packet status PREP_REVIEW_READY; no Resident authorization.
+- Immutable v1/v2 probes, expectations, genuine RED and failed candidate/gate
+  iterations retained. Historical H2 evidence preserved byte-for-byte separately.
+- No Core/product-test, governance, fixture/evaluator/release-source edits.
+- No real Resident, World/session, release-state, cursor reveal or Phase-A event.
+
+Stop for fresh independent acceptance. Persistence/B/C/evaluator remain blocked.

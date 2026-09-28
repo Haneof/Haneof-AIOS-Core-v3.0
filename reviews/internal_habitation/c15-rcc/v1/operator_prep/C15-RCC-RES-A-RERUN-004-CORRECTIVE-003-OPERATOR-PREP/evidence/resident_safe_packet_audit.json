@@ -69,9 +69,9 @@
     }
   },
   "frozen_control_plane": "b7c9e85014806637f7a01c8fd6695bc9f57672ba",
-  "generated_utc": "2026-09-28T21:28:00.276628+00:00",
+  "generated_utc": "2026-09-28T21:38:08.978771+00:00",
   "packet": "RESIDENT_SAFE_LAUNCH_PACKET.json",
-  "packet_sha256": "8d009995bb1ae5895736b6e19b88b3ca847918ff3eeee821e568ae4766b64894",
+  "packet_sha256": "f6b61c33dc41d20438ab1b56bd1c8f2e46fcf6593532f3793c3c51ee7fbf7cdc",
   "packet_structure": {
     "checked_keys": [
       "allowed_cursor_end",
@@ -173,16 +173,16 @@
       "result": "PASS"
     },
     {
-      "expected_sha256": "4ee4531c1333ce6e2cf205bdd8a4137a3d76b35721b3f1303eb1db4fe6359cfd",
+      "expected_sha256": "f92adadde79e6395e3bfdb75af170c77c99dd754d4c5f4f786e14125c918940d",
       "label": "wheel_lock_verification",
-      "observed_sha256": "4ee4531c1333ce6e2cf205bdd8a4137a3d76b35721b3f1303eb1db4fe6359cfd",
+      "observed_sha256": "f92adadde79e6395e3bfdb75af170c77c99dd754d4c5f4f786e14125c918940d",
       "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/wheel_lock_verification.json",
       "result": "PASS"
     },
     {
-      "expected_sha256": "42aae623209378417dc17d8d72b02d5e2a32238236ea477d45a4f0d8552f7422",
+      "expected_sha256": "190c76e01d13edc1165c68b9c705bcc8f1ca0a14ecedba098b1c03ba10990c85",
       "label": "clean_bootstrap_evidence",
-      "observed_sha256": "42aae623209378417dc17d8d72b02d5e2a32238236ea477d45a4f0d8552f7422",
+      "observed_sha256": "190c76e01d13edc1165c68b9c705bcc8f1ca0a14ecedba098b1c03ba10990c85",
       "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/clean_bootstrap_manifest.json",
       "result": "PASS"
     },
@@ -194,9 +194,9 @@
       "result": "PASS"
     },
     {
-      "expected_sha256": "25313404c6f853b4e6f312925058756728382ae199de3d257edbb5f070b3444a",
+      "expected_sha256": "286f67f4f18a14987e3c02f1ed80e4a7da78831840f2558d45ea65b6bbaafbed",
       "label": "environment_record",
-      "observed_sha256": "25313404c6f853b4e6f312925058756728382ae199de3d257edbb5f070b3444a",
+      "observed_sha256": "286f67f4f18a14987e3c02f1ed80e4a7da78831840f2558d45ea65b6bbaafbed",
       "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/environment_record.json",
       "result": "PASS"
     },
@@ -229,9 +229,9 @@
       "result": "PASS"
     },
     {
-      "expected_sha256": "9a28d9700a5a4c7cb002a6048f0f83e06e2816692f29517ba53073e27adb3e70",
+      "expected_sha256": "a949e2b1144ddd4d74995a55bfb7daa9891b64e045b85eab188a989e506865a0",
       "label": "targeted_candidate_green",
-      "observed_sha256": "9a28d9700a5a4c7cb002a6048f0f83e06e2816692f29517ba53073e27adb3e70",
+      "observed_sha256": "a949e2b1144ddd4d74995a55bfb7daa9891b64e045b85eab188a989e506865a0",
       "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/corrective_candidate_green.json",
       "result": "PASS"
     },
@@ -243,9 +243,9 @@
       "result": "PASS"
     },
     {
-      "expected_sha256": "f5c5d798bdd98f610bdb27c703ee7311ca9514d20baf50802b337e57ce78ad27",
+      "expected_sha256": "7771ddff09022d1b51b880ac2d2641aa0242f9810fc4c622a8cd6a323743286a",
       "label": "rc_identity",
-      "observed_sha256": "f5c5d798bdd98f610bdb27c703ee7311ca9514d20baf50802b337e57ce78ad27",
+      "observed_sha256": "7771ddff09022d1b51b880ac2d2641aa0242f9810fc4c622a8cd6a323743286a",
       "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/rc_identity.json",
       "result": "PASS"
     },
@@ -469,7 +469,7 @@
     },
     {
       "execution_total": 24,
-      "gate_result_sha256": "3939c804580781c459c8ff0ea1c1185a2195b8afae77ab115bdd1694a83817fb",
+      "gate_result_sha256": "b317b158af71be9a8a4848ff240b1bf9f8a7d8db6146afa9afc46d2378e65a7f",
       "label": "gate_a_enumeration_execution_and_result",
       "result": "PASS",
       "test_count": 24,
@@ -477,7 +477,7 @@
     },
     {
       "execution_total": 7,
-      "gate_result_sha256": "b24f8a7c6c3ed576d907d949f6a8e46370c85943e1f6a7ee822e876f7f41eca2",
+      "gate_result_sha256": "c35820fbbc8172f034e1045995a3c0241954905113ee4c2893133476e8447d3e",
       "label": "gate_b_enumeration_execution_and_result",
       "result": "PASS",
       "test_count": 7,
@@ -485,7 +485,7 @@
     },
     {
       "execution_total": 2,
-      "gate_result_sha256": "fe92a840633c0eda5c48a88b9a26ae261cc95b131255c0cbfc1a80a59c085e7f",
+      "gate_result_sha256": "df5397c25d5bb154af2368da652b7baadaf09e25772f74d56285880ca618de38",
       "label": "gate_c_enumeration_execution_and_result",
       "result": "PASS",
       "test_count": 2,
@@ -493,7 +493,7 @@
     },
     {
       "execution_total": 5,
-      "gate_result_sha256": "5bf45d66949f09171c6010f98c1e60a46dfb36e97fdadd348587ed87bb843105",
+      "gate_result_sha256": "493080a7a57fa05317cced8c8f7c73fa61f5ec7e789fc8a139fd4a5f6c7e51c3",
       "label": "gate_d_enumeration_execution_and_result",
       "result": "PASS",
       "test_count": 5,
@@ -508,7 +508,7 @@
       "findings": [],
       "mode": "packet-structure+values",
       "result": "PASS",
-      "sha256": "8d009995bb1ae5895736b6e19b88b3ca847918ff3eeee821e568ae4766b64894"
+      "sha256": "f6b61c33dc41d20438ab1b56bd1c8f2e46fcf6593532f3793c3c51ee7fbf7cdc"
     },
     {
       "file": "harness/aios_exchange/**",

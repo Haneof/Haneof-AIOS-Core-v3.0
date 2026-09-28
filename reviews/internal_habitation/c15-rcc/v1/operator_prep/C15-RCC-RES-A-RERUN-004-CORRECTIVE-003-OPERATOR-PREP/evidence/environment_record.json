@@ -2,15 +2,15 @@
   "record_version": 1,
   "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
   "role": "Resident Launch / Test Infrastructure Operator (non-Resident)",
-  "generated_utc": "2026-09-28T21:23:38.404740+00:00",
-  "runtime_root": "/home/user/.cache/c002/clean-runtime-002",
+  "generated_utc": "2026-09-28T21:37:45.706479+00:00",
+  "runtime_root": "/home/user/.cache/c002/final-runtime-003",
   "repo_root": "/home/user/Haneof-AIOS-Core-v3.0",
   "paths": {
-    "deps": "/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/deps",
-    "python_prefix": "/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/python",
-    "venv": "/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/venv",
-    "wheelhouse": "/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/wheelhouse",
-    "venv_python": "/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/venv/bin/python"
+    "deps": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/deps",
+    "python_prefix": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/python",
+    "venv": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv",
+    "wheelhouse": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/wheelhouse",
+    "venv_python": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python"
   },
   "deps_fingerprint": "c2aad06c27a188d5",
   "pins": {
@@ -75,7 +75,7 @@
     "python_version": "3.12.14",
     "python_full_version": "3.12.14",
     "implementation": "CPython",
-    "config_args": "'--prefix=/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/python' '--with-openssl=/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/deps' '--with-ensurepip=install' '--enable-loadable-sqlite-extensions' 'LDFLAGS=-L/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/deps/lib -Wl,-rpath,/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/deps/lib -Wl,-rpath-link,/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/deps/lib' 'CPPFLAGS=-I/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/deps/include'",
+    "config_args": "'--prefix=/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/python' '--with-openssl=/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/deps' '--with-ensurepip=install' '--enable-loadable-sqlite-extensions' 'LDFLAGS=-L/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/deps/lib -Wl,-rpath,/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/deps/lib -Wl,-rpath-link,/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/deps/lib' 'CPPFLAGS=-I/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/deps/include'",
     "pydantic_version": "2.13.5",
     "pytest_version": "8.4.2",
     "sqlite_version": "3.45.1",
@@ -99,9 +99,9 @@
       "lzma": "unavailable:ModuleNotFoundError",
       "decimal": "ok"
     },
-    "venv_prefix": "/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/venv",
-    "venv_base_prefix": "/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/python",
-    "executable": "/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/venv/bin/python",
+    "venv_prefix": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv",
+    "venv_base_prefix": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/python",
+    "executable": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
     "aios_core_file": "/home/user/Haneof-AIOS-Core-v3.0/src/aios_core/__init__.py",
     "installed_distributions": [
       "annotated-types==0.8.0",
@@ -139,23 +139,23 @@
   },
   "artifacts": {
     "venv_python": {
-      "path": "/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/venv/bin/python",
-      "sha256": "fc830e863a630f174a63eddc3859a01809881c7dadd1961c7bebea5a24571a6b",
+      "path": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+      "sha256": "5fead05c5054c6b0e53e353ccb460e05f270c784c545873a9ecb722f7943f453",
       "size": 31463504
     },
     "sqlite_shared_lib": {
-      "path": "/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/deps/lib/libsqlite3.so.3.45.1",
+      "path": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/deps/lib/libsqlite3.so.3.45.1",
       "sha256": "98b5159d60c3fbec78a1c7857c1e5a8a669a8283546b28075de60374da7daa00",
       "size": 1502512
     },
     "openssl_libssl": {
-      "path": "/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/deps/lib/libssl.so.3",
+      "path": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/deps/lib/libssl.so.3",
       "sha256": "e088f6c2218066c59ef1c69046a555e140f86ec4f5992ea599c14ee099625a9b",
       "size": 788808
     },
     "requirements_lock": {
-      "path": "/home/user/.cache/c002/clean-runtime-002/runtime/3.12.14/requirements.lock.txt",
-      "sha256": "347accd237e48009c77ab05b420940983e3045190368a67ed60f8c48774599a5",
+      "path": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/requirements.lock.txt",
+      "sha256": "30e887d2b40e93cbc3fc701a4d304eb16644566509a01360cd4490664052974c",
       "size": 2013
     }
   },
