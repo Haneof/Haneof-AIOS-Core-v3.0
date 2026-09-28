@@ -2,7 +2,7 @@
 
 ## 2026-09-28 product-governance clarification — Resident persona continuity
 
-A new governance-only candidate is REVIEW_READY: `C15-RCC-RESIDENT-PERSONA-CONTINUITY-RULE-001`.
+A new governance-only candidate is REVIEW_READY: `C15-RCC-RESIDENT-PERSONA-CONTINUITY-RULE-001`, PR #263 (`governance/c15-resident-persona-continuity-20260928`, DRAFT / OPEN / UNMERGED).
 
 Binding product intent: provider/model/API-key routing is an implementation detail. The user must continue interacting with the same Resident AI. Exact wording and raw capability may vary by engine; material attitude/persona/relationship posture/communication style/behavioral-habit drift caused solely by model replacement is not allowed.
 
