@@ -20,7 +20,13 @@ from harness import REPO_ROOT, new_root, repo_python_env, wipe  # noqa: E402
 
 from tools.c15_persistence import provider as provider_module  # noqa: E402
 from tools.c15_persistence import remote_backend  # noqa: E402
-from tools.c15_persistence.backend import BackendError, RunBackend  # noqa: E402
+from tools.c15_persistence.backend import (  # noqa: E402
+    BackendError,
+    GenerationStore,
+    RunBackend,
+    canonical_json,
+    digest,
+)
 from tools.c15_persistence.operator_session import (  # noqa: E402
     OperatorSession,
     RemoteDurabilityAbort,
@@ -322,6 +328,120 @@ def test_cross_run_remote_config_and_ref_transplant_is_rejected(tmp_path: Path) 
             session.backend.release()
         for parent in parents:
             wipe(parent)
+
+
+def test_remote_authority_rejects_coordinated_short_history_even_if_local_head_is_rehashed(
+    tmp_path: Path,
+) -> None:
+    session, remote, run_id, session_id, remote_ref, parent = _remote_session(
+        tmp_path, "coordinated-history"
+    )
+    try:
+        outcome = session.process_one_cursor()
+        assert outcome["ack"]["status"] == "acked"
+        authoritative_head = _remote_head(remote, remote_ref)
+        assert authoritative_head is not None
+        session.backend.release()
+
+        root = parent / "backend"
+        generations = sorted(p for p in (root / "generations").iterdir() if p.is_dir())
+        assert len(generations) >= 2
+        victim = generations[-1]
+        shortened_to = int(generations[-2].name)
+        os.chmod(victim, 0o700)
+        shutil.rmtree(victim)
+        with sqlite3.connect(root / "journal.sqlite") as db:
+            db.execute(
+                "UPDATE ledger SET value=? WHERE name='generation'",
+                (str(shortened_to),),
+            )
+            db.commit()
+
+        # Rebuild the local self-hash so purely local checks see a coherent
+        # shortened history. Remote exact-head admission must still reject it.
+        manifest = root / "generations" / f"{shortened_to:06d}" / "manifest.json"
+        head_path = root / GenerationStore.HEAD_NAME
+        old_head = json.loads(head_path.read_text(encoding="utf-8"))
+        base = {
+            "generation": shortened_to,
+            "manifest_file_sha256": digest(manifest.read_bytes()),
+            "previous_head_sha256": old_head.get("previous_head_sha256"),
+            "version": GenerationStore.HEAD_VERSION,
+        }
+        forged = {**base, "head_sha256": digest(canonical_json(base))}
+        head_path.write_text(json.dumps(forged, sort_keys=True) + "\n", encoding="utf-8")
+
+        with pytest.raises(
+            BackendError,
+            match="immutable generation head differs from authoritative remote commit",
+        ):
+            OperatorSession.attach(
+                root,
+                run_id=run_id,
+                session_id=session_id,
+                repo_dir=REPO_ROOT,
+            )
+        assert _remote_head(remote, remote_ref) == authoritative_head
+    finally:
+        session.backend.release()
+        wipe(parent)
+
+
+def test_k5_commit_tree_before_push_crash_recovers_from_prior_remote_k3(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    session, remote, run_id, session_id, remote_ref, parent = _remote_session(
+        tmp_path, "k5-prepush"
+    )
+    original_commit = remote_backend.commit_backend_tree
+    tripped = {"value": False}
+
+    def crash_after_commit_tree(*args, **kwargs):
+        result = original_commit(*args, **kwargs)
+        message = str(kwargs.get("message") or "")
+        if "point=K5_AFTER_APPLIED_BEFORE_ACK" in message:
+            tripped["value"] = True
+            raise BackendError("synthetic crash after commit-tree before remote push")
+        return result
+
+    monkeypatch.setattr(remote_backend, "commit_backend_tree", crash_after_commit_tree)
+    fresh_parent: Path | None = None
+    try:
+        with pytest.raises(BackendError, match="commit-tree before remote push"):
+            session.process_one_cursor()
+        assert tripped["value"], "K5 pre-push crash hook was not reached"
+        prior_remote = _remote_head(remote, remote_ref)
+        assert prior_remote is not None
+        session.backend.release()
+
+        wipe(parent)
+        fresh_parent = new_root("c003-k5-prepush-fresh")
+        recovered = OperatorSession.materialize_and_attach(
+            fresh_parent / "backend",
+            run_id=run_id,
+            session_id=session_id,
+            remote_ref=remote_ref,
+            commit_sha=prior_remote,
+            remote=str(remote),
+            repo_dir=REPO_ROOT,
+        )
+        outcome = recovered.resume()
+        assert outcome["ack"]["status"] == "acked"
+        assert outcome["ack"]["sequence"] == 1
+        observed = outcome["observed"]
+        assert observed["counters"]["reveals"] == 1
+        assert observed["counters"]["ingests"] == 1
+        assert observed["counters"]["capability_side_effects"] == 1
+        assert observed["counters"]["acks"] == 1
+        assert len(observed["dispatch_ledger"]) == 2
+        assert observed["metering_rows"] == 2
+        recovered.backend.release()
+    finally:
+        session.backend.release()
+        if parent.exists():
+            wipe(parent)
+        if fresh_parent is not None:
+            wipe(fresh_parent)
 
 
 def test_atomic_lease_rejects_ref_delete_between_check_and_push(
