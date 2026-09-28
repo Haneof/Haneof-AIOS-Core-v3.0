@@ -2,13 +2,14 @@
 
 ## 当前控制入口 — 2026-09-28 CORRECTIVE-003 FROZEN / CORE TRUSTED-RETURN RECOVERY READY
 
-- **`C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 = FROZEN_WIP / BLOCKED_ON_CORE_TRUSTED_RETURN_RECOVERY`**。PR #254 保持 **OPEN / DRAFT / UNMERGED**。Observed WIP head `f7848952b6519fc40f50806f4a4d8d350ac0f38a` 修改了 `src/aios_core/runtime/turn_runtime.py`，违反 merged PM scope #255（persistence corrective 不得修改 Core），因此该 SHA = **SCOPE_VIOLATION / NOT_A_CANDIDATE**。历史 WIP/red/green CI 全部保留，不得 rewrite。
+- **`C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 = FROZEN_WIP / BLOCKED_ON_CORE_TRUSTED_RETURN_RECOVERY`**。PR #254 已 **CLOSED / DRAFT / UNMERGED / FROZEN**。First scope-violating WIP `f7848952b6519fc40f50806f4a4d8d350ac0f38a` 修改了 `src/aios_core/runtime/turn_runtime.py`，违反 merged PM scope #255（persistence corrective 不得修改 Core），因此该 SHA = **SCOPE_VIOLATION / NOT_A_CANDIDATE**。历史 WIP/red/green CI 全部保留，不得 rewrite。
 - #255 的 narrowed scope 继续有效：C002 reviewer 六 findings 历史保留；C15 release gate binding blockers 为 `001/002/004`，`003/005/006` 为 non-blocking hardening。当前新问题只来自 binding `002` 的合法闭合路径。
 - **Core gap**：accepted Core 可 `stage_exact_background_response(...)`，但只接受已经存在 trusted-return authenticity proof 的 exact response；私有 `_capture_trusted_response_return(...)` 明确只属于正常 trusted provider-return callback，recovery caller 不得调用签名 authority。Later-round provider 已提交/返回但 crash 发生在 trusted-return receipt 持久化前时，当前 Core 没有既避免 provider redispatch、又保持 non-forgeable authenticity 的合法 continuation path。
 - `f784...` 新增 public `stage_trusted_returned_background_response(...)` 允许 recovery API 接收外部 directive bytes 后调用私有 receipt minting authority；这会改变已接受的 provider-return trust boundary，不允许作为 persistence harness 修复。
 - **当前唯一下一 READY：`CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001 = READY`**。只修 trusted provider-return crash handoff/recovery；不得把 recovery caller 变成签名 oracle，不得弱化 #219 accepted authenticity invariants。任务 prompt：`governance/prompts/CORE_BACKGROUND_TRUSTED_RETURN_RECOVERY_001_2026-09-28.md`。
 - 以下继续 **BLOCKED**：Corrective-003 resume、Core RC re-freeze/lineage follow-up、`C15-RCC-RES-B-RELEASE-003`、`RERUN-003`、`ACCEPT-003`、Resident C、evaluator、closure。
 - PR #254 PM STOP comment：`5863009559`。
+- #254 在 PM STOP 后仍被并行工程窗口继续推进；关闭时 branch head = `a2d815c9f5154d87a56b152ed7cf5d1eb1baaaae`，该 head 仍含 `src/aios_core/**` diff，全部视为 **unauthorized WIP / NOT_A_CANDIDATE**。关闭 PR 仅停止 active PR/CI flood，不删除 branch/history。
 
 ## 历史控制入口 — 2026-09-27 C15-RCC-RES-A-RERUN-003 INTEGRATED / C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-001 READY_TO_RESUME
 
