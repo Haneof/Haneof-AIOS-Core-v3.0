@@ -1,5 +1,17 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-09-28 CORRECTIVE-003 Operator Prep — REVIEW_READY; fresh IA next
+
+- Operator Prep PR #281 exact head `10901d467679b70437ae112747eab81f889fd5cb`; parent `abb8b435e5187c7c6c2f4332aea37cd805b4a53c`; tree `db79761216529cf83f217ab00c937bc79806a510`.
+- Candidate scope: 56/56 files under operator-prep package; zero Core/tests/workflow/fixture/evaluator/release-source drift.
+- Launch packet: `PREP_REVIEW_READY`, SHA-256 `dfab9270f811836f1aad77641a1ec007eb741d1c6ce1acb68f51763eb00bad73`.
+- Operator-reported qualified environment: CPython 3.12.14 / Pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.45.1.
+- Gates A/B/C/D = PASS; Gate C includes real frozen-Core round-1 non-empty `CapabilityResult` history; Gate D reports no real-run semantic callback/router.
+- Unique next READY: `C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-INDEPENDENT-ACCEPTANCE`.
+- Corrective-003 Resident remains blocked until fresh Operator Prep IA PASS + PM integration.
+- Persistence/B/C/evaluator remain blocked.
+
+
 ## 2026-09-28 A-RERUN-004-CORRECTIVE-002 — contaminated before run; clean-room operator prep next
 
 - Blocked evidence: PR #279 @ `8e5c1ec76ea973c849c33923ccc818fe1dad49e8`.
