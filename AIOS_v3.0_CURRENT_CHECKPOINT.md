@@ -1,5 +1,17 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-09-28 A-RERUN-004-CORRECTIVE-001 — BLOCKED; Corrective-002 required
+
+- Blocked evidence: PR #277 @ `2968299beea5fe5ec2dc93418d0fa7f3e035ec40`.
+- Correct rule-14 behavior was observed: cursor 1 had already been revealed, so runner was not patched after the `CapabilityResult.arguments` AttributeError.
+- Root harness defect: pre-run synthetic coverage tested exchange bridge only; it never drove the frozen runner against real frozen Core `CapabilityResult` history.
+- Independent PM inspection also found `resident_agent.py` contains keyword/text-driven scripted cognition and hard-coded replies; this violates Real Resident semantic-authenticity rules.
+- No Core change is authorized. Frozen RC remains `f20f2edfa7af00d0286493fd15196ca9503bc315`.
+- Unique next READY: `C15-RCC-RES-A-RERUN-004-CORRECTIVE-002`.
+- Corrective-002 must use same CPython 3.12.14 environment for pre-run gates and real execution, freeze real-Core compatibility tests before cursor 1, and use no semantic decision script in the real run.
+- Persistence/B/C/evaluator remain blocked.
+
+
 ## 2026-09-28 A-RERUN-004 — Independent Acceptance FAIL; fresh corrective rerun required
 
 - Failed A-004 evidence: PR #273 @ `f251e9c0026a0f97fdee20397936cb5e3b18c61c`.
