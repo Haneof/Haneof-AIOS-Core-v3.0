@@ -393,38 +393,42 @@ class OperatorSession:
         repo_dir: Path | None = None,
     ) -> "OperatorSession":
         backend = RunBackend.open(root, run_id=run_id, session_id=session_id, adopt_stale_owner=True)
-        journal = RelayJournal(backend)
-        release = SyntheticRelease(backend.state_dir / "synthetic-release")
-        session = cls(backend, journal, release)
-        loaded = session._load_remote_durability(repo_dir=repo_dir)
-        if remote_ref is not None or remote is not None:
-            require(
-                bool(session.backend.owner.get("remote_authoritative")),
-                "local-only backend cannot be promoted to remote-authoritative on attach",
-            )
-            requested_ref = remote_ref or session._remote_ref
-            requested_remote = remote or session._remote
-            require(requested_ref is not None, "remote ref required for remote-authoritative attach")
-            session._configure_remote_durability(
-                remote_ref=requested_ref,
-                remote=requested_remote,
-                repo_dir=repo_dir,
-                persist=False,
-            )
-        elif bool(session.backend.owner.get("remote_authoritative")):
-            require(loaded, "remote-authoritative attach did not load its binding")
-        if bool(session.backend.owner.get("remote_authoritative")):
-            from .remote_backend import verify_local_remote_authority
+        try:
+            journal = RelayJournal(backend)
+            release = SyntheticRelease(backend.state_dir / "synthetic-release")
+            session = cls(backend, journal, release)
+            loaded = session._load_remote_durability(repo_dir=repo_dir)
+            if remote_ref is not None or remote is not None:
+                require(
+                    bool(session.backend.owner.get("remote_authoritative")),
+                    "local-only backend cannot be promoted to remote-authoritative on attach",
+                )
+                requested_ref = remote_ref or session._remote_ref
+                requested_remote = remote or session._remote
+                require(requested_ref is not None, "remote ref required for remote-authoritative attach")
+                session._configure_remote_durability(
+                    remote_ref=requested_ref,
+                    remote=requested_remote,
+                    repo_dir=repo_dir,
+                    persist=False,
+                )
+            elif bool(session.backend.owner.get("remote_authoritative")):
+                require(loaded, "remote-authoritative attach did not load its binding")
+            if bool(session.backend.owner.get("remote_authoritative")):
+                from .remote_backend import verify_local_remote_authority
 
-            require(session._remote_ref is not None, "remote-authoritative attach has no remote ref")
-            verify_local_remote_authority(
-                session.backend,
-                remote_ref=session._remote_ref,
-                remote=session._remote,
-                repo_dir=session._remote_repo_dir,
-            )
-        backend.audit("session_attached", {"phase": "resume"})
-        return session
+                require(session._remote_ref is not None, "remote-authoritative attach has no remote ref")
+                verify_local_remote_authority(
+                    session.backend,
+                    remote_ref=session._remote_ref,
+                    remote=session._remote,
+                    repo_dir=session._remote_repo_dir,
+                )
+            backend.audit("session_attached", {"phase": "resume"})
+            return session
+        except BaseException:
+            backend.release()
+            raise
 
     @classmethod
     def materialize_and_attach(
