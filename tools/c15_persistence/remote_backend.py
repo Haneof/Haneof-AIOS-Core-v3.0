@@ -57,6 +57,28 @@ def remote_ref_for_run(run_id: str, *, prefix: str = DEFAULT_REF_PREFIX) -> str:
     return f"{prefix}/{run_id}"
 
 
+def _validate_backend_remote_binding(
+    backend: RunBackend,
+    *,
+    remote: str,
+    ref: str,
+) -> None:
+    run_id = str(backend.owner["run_id"])
+    session_id = str(backend.owner["session_id"])
+    canonical_ref = remote_ref_for_run(run_id)
+    require(
+        ref == canonical_ref,
+        f"remote ref is not canonical for run {run_id}: {ref}",
+    )
+    if bool(backend.owner.get("remote_authoritative")):
+        authority = backend.owner.get("remote_authority")
+        require(isinstance(authority, dict), "remote authority binding is missing")
+        require(authority.get("run_id") == run_id, "remote authority run mismatch")
+        require(authority.get("session_id") == session_id, "remote authority session mismatch")
+        require(authority.get("remote_ref") == ref, "remote authority ref mismatch")
+        require(authority.get("remote") == remote, "remote authority remote mismatch")
+
+
 def _remote_head(repo: Path, remote: str, ref: str) -> str | None:
     completed = subprocess.run(
         ["git", "ls-remote", remote, ref],
@@ -206,6 +228,7 @@ def push_run_state(
     repo = repo_dir or default_repo_dir()
     run_id = str(backend.owner["run_id"])
     ref = remote_ref or remote_ref_for_run(run_id)
+    _validate_backend_remote_binding(backend, remote=remote, ref=ref)
 
     # Compare-and-swap discipline: a writer may advance only the remote head
     # it explicitly materialized or previously pushed.  Never "adopt" a newer
@@ -233,11 +256,19 @@ def push_run_state(
         backend.root, message=msg, parent_sha=parent_sha, repo_dir=repo
     )
 
-    push_cmd = ["git", "push", remote, f"{commit_sha}:{ref}"]
+    # The server must enforce the expected old value atomically.  The
+    # earlier ls-remote is only an early diagnostic; it is not the CAS.
+    lease = (
+        f"--force-with-lease={ref}:{expected_head}"
+        if expected_head is not None
+        else f"--force-with-lease={ref}:"
+    )
+    push_cmd = ["git", "push", lease, remote, f"{commit_sha}:{ref}"]
     pushed = subprocess.run(push_cmd, cwd=str(repo), capture_output=True, text=True)
     require(
         pushed.returncode == 0,
-        f"failed to push run state to {remote} {ref}:\n{pushed.stderr}",
+        "remote atomic CAS/lease rejected persistence update "
+        f"for {remote} {ref}:\n{pushed.stderr}",
     )
 
     # Verify remote ref was updated to commit_sha.
@@ -282,6 +313,10 @@ def materialize_run_state(
     """
     repo = repo_dir or default_repo_dir()
     ref = remote_ref or remote_ref_for_run(run_id)
+    require(
+        ref == remote_ref_for_run(run_id),
+        f"remote ref is not canonical for run {run_id}: {ref}",
+    )
     target = Path(target_dir).resolve()
 
     remote_head = _remote_head(repo, remote, ref)
@@ -345,6 +380,7 @@ def materialize_run_state(
         session_id=session_id,
         adopt_stale_owner=True,
     )
+    _validate_backend_remote_binding(backend, remote=remote, ref=ref)
     _write_expected_remote_head(backend, resolved_commit)
     backend.audit(
         "materialized_from_remote",
