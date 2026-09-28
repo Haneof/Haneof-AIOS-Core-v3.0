@@ -1,5 +1,17 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-09-28 trusted-return Corrective-001 — ACCEPTED / INTEGRATED; RC-REFREEZE-003 next
+
+- Accepted implementation exact: `a73e186d40688f5dc181b1128a62eff37a974409`.
+- Fresh IA exact evidence: `eeda251e057e98b15a919694af4689786faf8c55` → `ACCEPTANCE_PASS / blocker=0`.
+- PM formal-environment closure run: `36423849252` → CPython 3.12.14, frozen reviewer hashes OK, 86 collected, 86/86 PASS.
+- PR #264 merged as `f20f2edfa7af00d0286493fd15196ca9503bc315`.
+- Post-merge source/test semantics match the accepted exact; only governance files differ.
+- A-003 is now historical for the prior RC and cannot seed the next B lineage.
+- Unique next READY: `CORE-RC-REFREEZE-003`.
+- A-004 and all B/C downstream work remain blocked.
+
+
 ## 2026-09-28 trusted-return Corrective-001 — engineering complete, fresh IA next
 
 - PR #264 exact candidate: `a73e186d40688f5dc181b1128a62eff37a974409`; parent `71f6d106...`; tree `352f47ac...`.
