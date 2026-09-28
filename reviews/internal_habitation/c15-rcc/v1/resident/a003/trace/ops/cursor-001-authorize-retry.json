@@ -1,0 +1,18 @@
+{
+ "stage": "attempt_reconciled_not_submitted",
+ "state": "started",
+ "attempts": [
+  {
+   "attempt_id": "bgattempt_e70cedf7b64cf6f18d78253ac8382df0",
+   "state": "not_submitted",
+   "recovery_disposition": "safe_to_retry"
+  }
+ ]
+}
+{
+ "stage": "retry_authorized",
+ "state": "started",
+ "retry_authorized": true,
+ "retry_count": 0,
+ "reconciliation_evidence": "Retry authorized after attempt-level reconciliation to not_submitted. The first process failure was a local bridge configuration defect (missing counter file), fixed by initializing the counter; runtime inputs (subject user_1, session, turn 1, canonical text, occurred_at 2026-11-02T17:05:00Z) are unchanged and the canonical USER observation obs_conv_user_4c8e9b2b461d49d54a6b9b2c@1 remains the same durable input. Resident authorizes one mechanical retry."
+}

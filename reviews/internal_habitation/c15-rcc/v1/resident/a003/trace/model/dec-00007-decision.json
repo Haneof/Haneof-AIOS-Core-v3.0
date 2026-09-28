@@ -1,0 +1,9 @@
+{
+  "kind": "response",
+  "response": "收到，两周的 Atlas staging 收尾我来跟。我们的协作方式我确认一下：日常的工程细节我不会拿来烦你，我按节点给你两样东西——结果（进展到哪、完成了什么）和关键风险（有什么可能卡住或出问题）。如果有会影响生产、删除数据、或产生费用的事情，我会单独提出来找你确认，不会混在例行汇报里。现在任务我已经立好并处于就绪状态，你随时把 staging 相关的工作项、现状或需要我接手的部分发过来即可。",
+  "provenance": {
+    "provider": "arena-agent-mode",
+    "model": "resident-a-fresh-instance",
+    "request_id": "a003run-01c3a44b-dec00007"
+  }
+}

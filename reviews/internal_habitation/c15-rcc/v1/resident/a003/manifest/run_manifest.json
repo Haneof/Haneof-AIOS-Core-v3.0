@@ -1,0 +1,25 @@
+{
+  "task": "C15-RCC-RES-A-RERUN-003",
+  "role": "Real Resident AI - Fresh Resident A",
+  "run_id": "a003run-01c3a44b-35b2-4344-a62c-9bd772913308",
+  "resident_session_id": "resident-a003-0f5ffeff-3d67-4e06-be86-aa83bbea6ad0",
+  "started_utc": "2026-09-27",
+  "freshness": {
+    "world_path": "/home/user/a003_run/world/resident_a003_world.db",
+    "index_path": "/home/user/a003_run/world/resident_a003_world.db.search.sqlite",
+    "release_state_path": "/home/user/a003_run/release/a003_release_state.json",
+    "note": "All paths newly created for A-003; no prior Resident World/index/release-state/runtime state reused or truncated."
+  },
+  "execution_software": {
+    "frozen_commit": "27a21db5b656d441248b9240020910b66a223830",
+    "frozen_core_tree": "a9618abe0b3d4ac3b08bd23dbd58f3e3f97e05d6",
+    "frozen_tests_tree": "92fcbcc5876833735fb3cb7c73a98c4a8a4a3541",
+    "worktree": "/home/user/a003_exec"
+  },
+  "runtime_environment": {
+    "python": "CPython 3.12.14 (source build, sqlite3 amalgamation 3.53.4 static)",
+    "pydantic": "2.13.5"
+  },
+  "cursor_range": [1, 13],
+  "forbidden_cursor": 14
+}
