@@ -272,6 +272,7 @@ class RunBackend:
         session_id: str,
         subject_id: str,
         phase: str,
+        remote_authority: Mapping[str, str] | None = None,
     ) -> "RunBackend":
         root = durable_root(root)
         require(bool(run_id) and bool(session_id), "run/session identity required")
@@ -302,7 +303,25 @@ class RunBackend:
             "creator_pid": os.getpid(),
             "boot_id": _boot_id(),
             "backend_version": "c15-persistence-backend-v1",
+            "remote_authoritative": bool(remote_authority),
         }
+        if remote_authority is not None:
+            required_remote_fields = {"remote", "remote_ref"}
+            require(
+                set(remote_authority) == required_remote_fields,
+                "remote authority requires exactly remote and remote_ref",
+            )
+            binding = {
+                "run_id": run_id,
+                "session_id": session_id,
+                "remote": str(remote_authority["remote"]),
+                "remote_ref": str(remote_authority["remote_ref"]),
+                "schema": "c15-remote-authority-v1",
+            }
+            require(bool(binding["remote"]), "remote authority remote must be non-blank")
+            require(bool(binding["remote_ref"]), "remote authority ref must be non-blank")
+            owner["remote_authority"] = binding
+            owner["remote_authority_sha256"] = digest(canonical_json(binding))
         owner_path = root / cls.OWNER_NAME
         fd = os.open(owner_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
         with os.fdopen(fd, "w", encoding="utf-8") as stream:
@@ -334,6 +353,20 @@ class RunBackend:
         owner = json.loads(owner_path.read_text(encoding="utf-8"))
         require(owner.get("run_id") == run_id, "backend run identity mismatch")
         require(owner.get("session_id") == session_id, "backend session identity mismatch")
+        if bool(owner.get("remote_authoritative")):
+            authority = owner.get("remote_authority")
+            require(isinstance(authority, dict), "remote authority binding is missing")
+            require(
+                set(authority) == {"run_id", "session_id", "remote", "remote_ref", "schema"},
+                "remote authority binding has unexpected fields",
+            )
+            require(authority.get("schema") == "c15-remote-authority-v1", "unknown remote authority schema")
+            require(authority.get("run_id") == run_id, "remote authority run identity mismatch")
+            require(authority.get("session_id") == session_id, "remote authority session identity mismatch")
+            require(
+                owner.get("remote_authority_sha256") == digest(canonical_json(authority)),
+                "remote authority binding digest mismatch",
+            )
 
         backend = cls(root)
         live = backend._try_lock()
@@ -508,6 +541,8 @@ class GenerationStore:
 
     MANIFEST_NAME = "manifest.json"
     SEAL_NAME = ".sealed"
+    HEAD_NAME = "generation-head.json"
+    HEAD_VERSION = "c15-generation-head-v1"
 
     def __init__(self, backend: RunBackend) -> None:
         self.backend = backend
@@ -515,6 +550,73 @@ class GenerationStore:
 
     def _generation_dir(self, generation: int) -> Path:
         return self.root / f"{generation:06d}"
+
+    @property
+    def head_path(self) -> Path:
+        return self.backend.root / self.HEAD_NAME
+
+    def _read_head(self) -> dict[str, Any] | None:
+        if not self.head_path.is_file():
+            return None
+        try:
+            payload = json.loads(self.head_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise BackendError(f"generation head is unreadable: {exc}") from exc
+        require(
+            isinstance(payload, dict)
+            and set(payload)
+            == {
+                "generation",
+                "head_sha256",
+                "manifest_file_sha256",
+                "previous_head_sha256",
+                "version",
+            },
+            "generation head has unexpected fields",
+        )
+        require(payload.get("version") == self.HEAD_VERSION, "unknown generation head version")
+        base = {
+            "generation": payload["generation"],
+            "manifest_file_sha256": payload["manifest_file_sha256"],
+            "previous_head_sha256": payload["previous_head_sha256"],
+            "version": payload["version"],
+        }
+        require(
+            payload.get("head_sha256") == digest(canonical_json(base)),
+            "generation head digest mismatch",
+        )
+        return payload
+
+    def _write_head(self, generation: int, manifest_path: Path) -> None:
+        previous = self._read_head()
+        if previous is None:
+            require(generation == 1, "first generation head must be generation 1")
+            previous_sha = None
+        else:
+            require(
+                int(previous["generation"]) == generation - 1,
+                "generation head advancement is not contiguous",
+            )
+            previous_sha = str(previous["head_sha256"])
+        base = {
+            "generation": int(generation),
+            "manifest_file_sha256": digest(manifest_path.read_bytes()),
+            "previous_head_sha256": previous_sha,
+            "version": self.HEAD_VERSION,
+        }
+        payload = {**base, "head_sha256": digest(canonical_json(base))}
+        temp = self.head_path.with_name(self.head_path.name + ".tmp")
+        fd = os.open(temp, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as stream:
+                stream.write(json.dumps(payload, sort_keys=True) + "\n")
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.replace(temp, self.head_path)
+            fsync_dir(self.backend.root)
+        finally:
+            if temp.exists():
+                temp.unlink(missing_ok=True)
 
     def next_generation(self) -> int:
         existing = sorted(p.name for p in self.root.glob("[0-9]" * 6) if p.is_dir())
@@ -572,6 +674,7 @@ class GenerationStore:
             fsync_dir(directory)
         os.chmod(target, 0o500)
         fsync_dir(self.root)
+        self._write_head(generation, manifest_path)
         self.backend.audit(
             "generation_sealed",
             {"generation": generation, "label": label, "artifacts": len(manifest)},
@@ -584,15 +687,35 @@ class GenerationStore:
         return json.loads(path.read_text(encoding="utf-8"))
 
     def verify(self, generation: int) -> dict[str, Any]:
-        """Recompute every artifact hash. Raises on any mismatch."""
+        """Recompute the exact sealed generation byte set. Raises on any mismatch."""
         target = self._generation_dir(generation)
         require(target.is_dir(), "generation missing")
-        require((target / self.SEAL_NAME).is_file(), "generation is not sealed")
+        seal_path = target / self.SEAL_NAME
+        require(seal_path.is_file(), "generation is not sealed")
+        require(
+            seal_path.read_text(encoding="utf-8") == f"{generation}\n",
+            "generation seal content mismatch",
+        )
         manifest = self.manifest(generation)
         artifacts: dict[str, str] = manifest["artifacts"]
         require(
+            manifest.get("generation") == generation,
+            "generation manifest identity mismatch",
+        )
+        require(
             manifest.get("manifest_sha256") == digest(canonical_json(artifacts)),
             "generation manifest corruption",
+        )
+        expected_files = set(artifacts) | {self.MANIFEST_NAME, self.SEAL_NAME}
+        actual_files = {
+            str(path.relative_to(target).as_posix())
+            for path in target.rglob("*")
+            if path.is_file()
+        }
+        require(
+            actual_files == expected_files,
+            "generation artifact set mismatch "
+            f"(expected={sorted(expected_files)}, actual={sorted(actual_files)})",
         )
         for name, expected in artifacts.items():
             child = target / name
@@ -637,7 +760,7 @@ class GenerationStore:
         except sqlite3.Error as exc:
             raise BackendError(f"generation ledger unreadable: {exc}") from exc
         if row is None:
-            return None
+            raise BackendError("generation ledger is missing from existing relay journal")
         try:
             expected = int(row[0])
         except (TypeError, ValueError) as exc:
@@ -646,25 +769,44 @@ class GenerationStore:
         return expected
 
     def verify_all(self) -> list[int]:
-        """Verify the complete immutable generation chain, including continuity."""
+        """Verify exact immutable history against an independent durable high-water."""
         generations = sorted(
             int(p.name) for p in self.root.glob("[0-9]" * 6) if p.is_dir()
         )
+        head = self._read_head()
         if generations:
+            require(head is not None, "generation history head is missing")
+            expected_head = int(head["generation"])
             require(
-                generations == list(range(1, generations[-1] + 1)),
-                f"sealed generation chain has a gap: {generations}",
+                generations == list(range(1, expected_head + 1)),
+                "sealed generation chain does not match immutable history head "
+                f"(expected 1..{expected_head}, found {generations})",
             )
-        expected = self._expected_generation_from_journal()
-        if expected is not None:
+            latest_manifest = self._generation_dir(expected_head) / self.MANIFEST_NAME
             require(
-                generations == list(range(1, expected + 1)),
-                "sealed generation chain does not match durable generation ledger "
-                f"(expected 1..{expected}, found {generations})",
+                latest_manifest.is_file()
+                and digest(latest_manifest.read_bytes())
+                == str(head["manifest_file_sha256"]),
+                "generation history head does not bind the latest manifest",
             )
+        else:
+            require(head is None, "generation history head exists without generations")
+            expected_head = 0
+
+        expected_ledger = self._expected_generation_from_journal()
+        if expected_ledger is not None:
+            require(
+                expected_ledger == expected_head,
+                "mutable generation ledger disagrees with immutable history head "
+                f"(ledger={expected_ledger}, head={expected_head})",
+            )
+
         verified: list[int] = []
+        previous_head_sha: str | None = None
         for generation in generations:
             self.verify(generation)
+            # The top-level head is the independently durable high-water. Earlier
+            # generations remain byte-sealed; continuity is enforced by 1..N.
             verified.append(generation)
         return verified
 
