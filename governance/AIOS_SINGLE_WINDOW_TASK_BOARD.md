@@ -1,5 +1,18 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 当前控制入口 — 2026-09-28 OPERATOR-PREP IA FAIL / CORRECTIVE-001 READY
+
+- **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP = ACCEPTANCE_FAIL / blocker=3 / HISTORICAL_FAILED_EXACT`**. Failed candidate PR #281 exact head = `10901d467679b70437ae112747eab81f889fd5cb` (parent `abb8b435e5187c7c6c2f4332aea37cd805b4a53c`, tree `db79761216529cf83f217ab00c937bc79806a510`). Fresh IA PR #283 exact review = `e3394da5d607e34c0286c16a11837ac7ea173a56`, verdict `ACCEPTANCE_FAIL / blocker=3`.
+- Binding blocker `IA-OP-001`: `ResponsePublisher.publish_bytes()` can return idempotent replay success when a durable response ledger record exists but the already-published response file has been tampered; fail-closed verification must occur at publish time.
+- Binding blocker `IA-OP-002`: bootstrap pins package versions but computes Python wheel hashes only after live download; the complete wheel/dependency trust root must be source-controlled and verified before acquisition/use.
+- Binding blocker `IA-OP-003`: frozen gate results report `test_count=0/test_ids=[]` despite actual collect-only counts 19/7/2/5; gate enumeration/result evidence is internally inconsistent.
+- PM independently verified PR #281 PR-wide scope = 56/56 files under the Operator Prep package and zero Core/tests/workflow/fixture/evaluator/release-source drift. Historical #281/#283 remain immutable; no post-hoc rewrite/hash-swap.
+- **唯一下一 READY：`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-001 = READY`**. Prompt: `governance/prompts/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_001_2026-09-28.md`.
+- Corrective scope is strictly IA-OP-001/002/003. Before modifying the carried-forward package, freeze targeted corrective probes and reproduce RED against exact failed #281. Then apply the smallest Operator Prep-only corrections, rebuild from clean scratch, rerun full A/B/C/D, regenerate freeze evidence and a new `PREP_REVIEW_READY` launch packet.
+- `C15-RCC-RES-A-RERUN-004-CORRECTIVE-003` remains **BLOCKED_ON_OPERATOR_PREP**. No Resident launch is authorized.
+- Persistence Corrective-003, Resident B/C, evaluator and C15 close remain **BLOCKED**.
+
+
 ## 当前控制入口 — 2026-09-28 CORRECTIVE-003 OPERATOR-PREP REVIEW_READY / FRESH IA READY
 
 - **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP = OPERATOR_PREP_COMPLETE / REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE`**. Candidate PR #281 remains **OPEN / UNMERGED / EVIDENCE-ONLY** at exact head `10901d467679b70437ae112747eab81f889fd5cb` (parent `abb8b435e5187c7c6c2f4332aea37cd805b4a53c`, tree `db79761216529cf83f217ab00c937bc79806a510`).
