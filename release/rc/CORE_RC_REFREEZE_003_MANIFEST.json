@@ -17,12 +17,12 @@
     "pyproject_blob": "b38833c7537fa60d5c2f02ed4bb19158d8995a11",
     "pyproject_sha256": "993a6e9dd821d8d5885f4cc1f2da0aa34d40284618097a1de507e885f2eaab30",
     "source_manifest": "reviews/CORE_RC_REFREEZE_003/source_manifest.json",
-    "source_manifest_sha256": "8147ccc611d192f8ae7f6ba17a581064bc2ca53f0409cb1efcac9d83007f5d02"
+    "source_manifest_sha256": "94f91e4e4343ae8673abee6ab69b04da6950d081627d1d8f8344d0232da29f29"
   },
   "live_main_at_fresh_fetch": {
     "ref": "origin/main",
     "sha": "c532b9fe3dfff594ee0b68bcac4fff6160f8b4b5",
-    "observed_utc": "2026-09-28T13:43:43Z",
+    "observed_utc": "2026-09-28T14:07:18Z",
     "note": "Point-in-time governance/source audit only; not a permanent baseline.",
     "commits_after_frozen_software": 7,
     "protected_implementation_drift_count": 0,

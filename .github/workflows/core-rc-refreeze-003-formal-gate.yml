@@ -4,13 +4,11 @@ on:
   pull_request:
     paths:
       - ".github/workflows/core-rc-refreeze-003-formal-gate.yml"
-      - "release/rc/CORE_RC_REFREEZE_003*"
-      - "reviews/CORE_RC_REFREEZE_003/**"
-      - "governance/CORE_RC_REFREEZE_003*"
-  push:
-    branches:
-      - "arena/01a0e829-haneof-aios-core-v3-0"
-  workflow_dispatch:
+      - "reviews/CORE_RC_REFREEZE_003/generate_source_manifest.py"
+      - "reviews/CORE_RC_REFREEZE_003/source_manifest.json"
+      - "reviews/CORE_RC_REFREEZE_003/open_pr_snapshot.json"
+      - "reviews/CORE_RC_REFREEZE_003/open_pr_contamination_review.md"
+      - "reviews/CORE_RC_REFREEZE_003/probes/**"
 
 permissions:
   contents: read
@@ -220,6 +218,7 @@ jobs:
         shell: bash
         env:
           JOB_STATUS: ${{ job.status }}
+          CANDIDATE_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           set -euo pipefail
           output_dir="${RC003_OUTPUT:-$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_003/ci-output}"
@@ -280,7 +279,8 @@ jobs:
           results = {
               "job_status": os.environ.get("JOB_STATUS", "unknown"),
               "run_id": os.environ.get("GITHUB_RUN_ID"),
-              "candidate_head": os.environ.get("GITHUB_SHA"),
+              "candidate_head": os.environ.get("CANDIDATE_HEAD"),
+              "event_sha": os.environ.get("GITHUB_SHA"),
               "target_sha": target,
               "formal_environment": env,
               "full_pytest": junit("full-regression-junit.xml"),
