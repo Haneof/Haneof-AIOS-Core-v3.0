@@ -2,10 +2,10 @@
 
 **Disposition:** `BLOCKED / CONTAMINATED_BEFORE_RUN / PRE-REVEAL`
 
-**Run ID:** `a92eec3a-04b6-4cff-8b12-b83d73b2074c`  
-**Observed at:** `2026-09-28T18:11:11Z`  
-**Repository:** `Haneof/Haneof-AIOS-Core-v3.0`  
-**Session branch:** `arena/01a0e933-haneof-aios-core-v3-0`  
+**Run ID:** `a92eec3a-04b6-4cff-8b12-b83d73b2074c`
+**Observed at:** `2026-09-28T18:11:11Z`
+**Repository:** `Haneof/Haneof-AIOS-Core-v3.0`
+**Session branch:** `arena/01a0e933-haneof-aios-core-v3-0`
 **Live main at start:** `1c4fdb19a51b6c7fc520dd6a9f09cd9064a99502`
 
 ## Binding stop reason
