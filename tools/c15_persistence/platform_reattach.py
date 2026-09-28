@@ -70,12 +70,20 @@ def run_stage_a(args: argparse.Namespace) -> dict[str, Any]:
     local_dir = runs_dir / run_id
     require(not local_dir.exists(), f"run cache already exists: {local_dir}")
 
-    # 5. Create synthetic session and process at least one cursor
+    # 5. Establish the authoritative remote binding at creation time, then
+    # process at least one cursor.  Remote-authoritative runs may never be
+    # promoted later from a local-only owner record.
+    remote_ref = args.remote_ref or remote_ref_for_run(run_id)
+    remote = args.remote or DEFAULT_REMOTE
     session = OperatorSession.create(
         local_dir,
         run_id=run_id,
         session_id=session_id,
         event_count=args.event_count,
+        remote_ref=remote_ref,
+        remote=remote,
+        repo_dir=repo,
+        require_remote_durability=True,
     )
     outcome = session.process_one_cursor()
     require(outcome["ack"]["status"] == "acked", "Cursor 1 was not acked")
@@ -93,9 +101,7 @@ def run_stage_a(args: argparse.Namespace) -> dict[str, Any]:
     # Release backend flock before Git commit
     session.backend.release()
 
-    # 7. Push authoritative run state to durable remote backend
-    remote_ref = args.remote_ref or remote_ref_for_run(run_id)
-    remote = args.remote or DEFAULT_REMOTE
+    # 7. Push the manifest-bearing authoritative run state to durable remote backend
     pushed_ref, commit_sha = push_run_state(
         session.backend,
         remote_ref=remote_ref,
