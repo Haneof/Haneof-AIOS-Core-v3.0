@@ -1,0 +1,11 @@
+# CORRECTIVE-001 execution environment (recorded, not faked)
+date_utc: 2026-09-28T11:16:59Z
+commit: (updated in final commit)
+python_implementation: CPython 3.12.14
+python_full: 3.12.14 (main, Sep 28 2026, 10:05:30) [GCC 12.2.0]
+pydantic: 2.13.5
+pytest: 8.4.2
+sqlite_library: 3.49.1
+sqlite_module: 2.6.0
+os: Linux 6.1.158+ x86_64
+collect_only_count: 919 tests collected in 0.53s

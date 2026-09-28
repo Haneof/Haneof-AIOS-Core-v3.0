@@ -1,0 +1,887 @@
+{
+  "catalog": [
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._commit_ai_world_claim @ turn_runtime.py:2856",
+      "hard_boundary": false,
+      "input_schema": {
+        "claim_type": "string?",
+        "confidence": "number[0,1]",
+        "counter_evidence_refs": "array[{object_id:string,revision:integer}]?",
+        "domain": "user_understanding|relationship|self|intent|strategy|cognitive_boundary|personality|calibration",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "knowledge_state": "string?",
+        "scope_key": "string?",
+        "statement": "string",
+        "tags": "array[string]?",
+        "unknown_items": "array[string]?",
+        "valid_time": "TemporalExtent object?"
+      },
+      "kind": "write",
+      "name": "commit_ai_world_claim",
+      "parameters": [
+        "domain",
+        "statement",
+        "evidence_refs",
+        "confidence",
+        "knowledge_state",
+        "claim_type",
+        "scope_key",
+        "tags",
+        "valid_time",
+        "unknown_items",
+        "counter_evidence_refs"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._commit_claim @ turn_runtime.py:2913",
+      "hard_boundary": false,
+      "input_schema": {
+        "claim_type": "string?",
+        "confidence": "number[0,1]",
+        "content": "string",
+        "counter_evidence_refs": "array[{object_id:string,revision:integer}]?",
+        "dimension": "string",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "knowledge_state": "string?",
+        "unknown_items": "array[string]?",
+        "valid_time": "TemporalExtent object?"
+      },
+      "kind": "write",
+      "name": "commit_claim",
+      "parameters": [
+        "content",
+        "evidence_refs",
+        "confidence",
+        "dimension",
+        "claim_type",
+        "knowledge_state",
+        "valid_time",
+        "unknown_items",
+        "counter_evidence_refs"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._commit_operation_experience @ turn_runtime.py:2809",
+      "hard_boundary": false,
+      "input_schema": {
+        "applicability": "object?",
+        "cost": "object[number]?",
+        "experience_state": "string?",
+        "method_path": "array[string]",
+        "misses": "array[string]?",
+        "negative_case_refs": "array[{object_id:string,revision:integer}]?",
+        "positive_case_refs": "array[{object_id:string,revision:integer}]?",
+        "problem_type": "string",
+        "result_summary": "string"
+      },
+      "kind": "write",
+      "name": "commit_operation_experience",
+      "parameters": [
+        "problem_type",
+        "method_path",
+        "result_summary",
+        "positive_case_refs",
+        "negative_case_refs",
+        "applicability",
+        "cost",
+        "misses",
+        "experience_state"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._compare_claims @ turn_runtime.py:2416",
+      "hard_boundary": false,
+      "input_schema": {
+        "claim_refs": "array[{object_id:string,revision:integer}]"
+      },
+      "kind": "read",
+      "name": "compare_claims",
+      "parameters": [
+        "claim_refs"
+      ],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._create_attention_watch @ turn_runtime.py:1922",
+      "hard_boundary": false,
+      "input_schema": {
+        "attention_class": "interrupt|background|review_queue?",
+        "cooldown_seconds": "integer?",
+        "dimensions": "array[string]",
+        "expires_at": "ISO-8601 datetime?",
+        "goal_ref": "{object_id:string,revision:integer}?",
+        "metadata_equals": "object?",
+        "modality": "string?",
+        "mode": "recurring|one_shot?",
+        "numeric": "{operator:gt|gte|lt|lte|eq|ne,threshold:number,path:array[string]?}?",
+        "priority": "integer?",
+        "reason_refs": "array[{object_id:string,revision:integer}]",
+        "source_kind": "string?",
+        "title": "string"
+      },
+      "kind": "write",
+      "name": "create_attention_watch",
+      "parameters": [
+        "title",
+        "dimensions",
+        "reason_refs",
+        "goal_ref",
+        "source_kind",
+        "modality",
+        "metadata_equals",
+        "numeric",
+        "priority",
+        "cooldown_seconds",
+        "attention_class",
+        "mode",
+        "expires_at"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._create_task @ turn_runtime.py:2066",
+      "hard_boundary": false,
+      "input_schema": {
+        "completion_condition": "object?; use mode=world_evidence|action_outcome|mixed; optional result_object_types=array[string]",
+        "deadline": "ISO-8601 datetime?",
+        "goal_ref": "{object_id:string,revision:integer}?",
+        "initial_state": "string?",
+        "next_step": "string?",
+        "next_wake_at": "ISO-8601 datetime?",
+        "priority": "integer?",
+        "reason_refs": "array[{object_id:string,revision:integer}]",
+        "task_type": "string",
+        "timezone_name": "string?",
+        "title": "string"
+      },
+      "kind": "write",
+      "name": "create_task",
+      "parameters": [
+        "title",
+        "task_type",
+        "reason_refs",
+        "goal_ref",
+        "initial_state",
+        "priority",
+        "next_wake_at",
+        "deadline",
+        "timezone_name",
+        "next_step",
+        "completion_condition"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._drill_down_conversation @ turn_runtime.py:1721",
+      "hard_boundary": false,
+      "input_schema": {
+        "revision": "integer?",
+        "session_id": "string?",
+        "summary_id": "string?",
+        "turn_end": "integer?",
+        "turn_start": "integer?"
+      },
+      "kind": "read",
+      "name": "drill_down_conversation",
+      "parameters": [
+        "summary_id",
+        "revision",
+        "session_id",
+        "turn_start",
+        "turn_end"
+      ],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._expand_recall @ turn_runtime.py:2459",
+      "hard_boundary": false,
+      "input_schema": {
+        "dimension": "string?",
+        "limit": "integer?",
+        "query": "string"
+      },
+      "kind": "read",
+      "name": "expand_recall",
+      "parameters": [
+        "query",
+        "dimension",
+        "limit"
+      ],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._focus_entity @ turn_runtime.py:2359",
+      "hard_boundary": false,
+      "input_schema": {
+        "entity_id": "string",
+        "limit": "integer?",
+        "query": "string?"
+      },
+      "kind": "read",
+      "name": "focus_entity",
+      "parameters": [
+        "entity_id",
+        "query",
+        "limit"
+      ],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._follow_relation @ turn_runtime.py:2396",
+      "hard_boundary": false,
+      "input_schema": {
+        "limit": "integer?",
+        "object_id": "string"
+      },
+      "kind": "read",
+      "name": "follow_relation",
+      "parameters": [
+        "object_id",
+        "limit"
+      ],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._form_event @ turn_runtime.py:2543",
+      "hard_boundary": false,
+      "input_schema": {
+        "confidence": "number[0,1]",
+        "dimension": "string?",
+        "event_time": "TemporalExtent object",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "interpretation": "string",
+        "participant_refs": "array[{object_id:string,revision:integer}]?",
+        "primary_claim_refs": "array[{object_id:string,revision:integer}]?",
+        "title": "string"
+      },
+      "kind": "write",
+      "name": "form_event",
+      "parameters": [
+        "title",
+        "interpretation",
+        "event_time",
+        "evidence_refs",
+        "confidence",
+        "participant_refs",
+        "primary_claim_refs",
+        "dimension"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._inspect_outcome @ turn_runtime.py:2474",
+      "hard_boundary": false,
+      "input_schema": {
+        "outcome_ref": "{object_id:string,revision:integer}"
+      },
+      "kind": "read",
+      "name": "inspect_outcome",
+      "parameters": [
+        "outcome_ref"
+      ],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._inspect_world_object @ turn_runtime.py:1652",
+      "hard_boundary": false,
+      "input_schema": {
+        "object_id": "string",
+        "revision": "integer?"
+      },
+      "kind": "read",
+      "name": "inspect_world_object",
+      "parameters": [
+        "object_id",
+        "revision"
+      ],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._list_attention_watches @ turn_runtime.py:1891",
+      "hard_boundary": false,
+      "input_schema": {},
+      "kind": "read",
+      "name": "list_attention_watches",
+      "parameters": [],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._list_conversation_summaries @ turn_runtime.py:1676",
+      "hard_boundary": false,
+      "input_schema": {
+        "limit": "integer?",
+        "session_id": "string?"
+      },
+      "kind": "read",
+      "name": "list_conversation_summaries",
+      "parameters": [
+        "session_id",
+        "limit"
+      ],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._list_dimensions @ turn_runtime.py:1981",
+      "hard_boundary": false,
+      "input_schema": {
+        "include_terminal": "boolean?"
+      },
+      "kind": "read",
+      "name": "list_dimensions",
+      "parameters": [
+        "include_terminal"
+      ],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._propose_action @ turn_runtime.py:2139",
+      "hard_boundary": false,
+      "input_schema": {
+        "action_type": "string",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "expected_outcome": "string?",
+        "payload": "object",
+        "task_ref": "{object_id:string,revision:integer}"
+      },
+      "kind": "write",
+      "name": "propose_action",
+      "parameters": [
+        "task_ref",
+        "action_type",
+        "payload",
+        "evidence_refs",
+        "expected_outcome"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._propose_cognitive_policy @ turn_runtime.py:2508",
+      "hard_boundary": false,
+      "input_schema": {
+        "allowed_range_or_choices": "json value?",
+        "current_value": "json value",
+        "default_value": "json value",
+        "evaluation_window": "string",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "policy_id": "string",
+        "reason": "string",
+        "scope": "string"
+      },
+      "kind": "write",
+      "name": "propose_cognitive_policy",
+      "parameters": [
+        "policy_id",
+        "scope",
+        "default_value",
+        "current_value",
+        "reason",
+        "evidence_refs",
+        "evaluation_window",
+        "allowed_range_or_choices"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._propose_dimension @ turn_runtime.py:2260",
+      "hard_boundary": false,
+      "input_schema": {
+        "confidence": "number[0,1]",
+        "continuity_rationale": "string",
+        "data_shape": "string",
+        "description": "string",
+        "dimension_key": "string starting dim:",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "expected_value": "string?",
+        "maintenance_cost_rationale": "string",
+        "name": "string",
+        "update_method": "string?",
+        "user_value_rationale": "string",
+        "why_existing_dimensions_are_insufficient": "string"
+      },
+      "kind": "write",
+      "name": "propose_dimension",
+      "parameters": [
+        "dimension_key",
+        "name",
+        "description",
+        "data_shape",
+        "evidence_refs",
+        "why_existing_dimensions_are_insufficient",
+        "continuity_rationale",
+        "user_value_rationale",
+        "maintenance_cost_rationale",
+        "confidence",
+        "update_method",
+        "expected_value"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._propose_entity @ turn_runtime.py:2165",
+      "hard_boundary": false,
+      "input_schema": {
+        "aliases": "array[string]?",
+        "canonical_name": "string?",
+        "entity_key": "string",
+        "entity_kind": "string",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "identity_claim_refs": "array[{object_id:string,revision:integer}]?"
+      },
+      "kind": "write",
+      "name": "propose_entity",
+      "parameters": [
+        "entity_key",
+        "entity_kind",
+        "evidence_refs",
+        "canonical_name",
+        "aliases",
+        "identity_claim_refs"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._propose_goal @ turn_runtime.py:2019",
+      "hard_boundary": false,
+      "input_schema": {
+        "confidence": "number[0,1]",
+        "description": "string",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "source_type": "user_explicit|user_inferred|ai_self|app|external",
+        "success_criteria": "array[string]?",
+        "title": "string"
+      },
+      "kind": "write",
+      "name": "propose_goal",
+      "parameters": [
+        "source_type",
+        "title",
+        "description",
+        "evidence_refs",
+        "confidence",
+        "success_criteria"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._read_ai_world @ turn_runtime.py:1760",
+      "hard_boundary": false,
+      "input_schema": {
+        "domains": "array[string]?",
+        "limit": "integer?",
+        "scope_key": "string?"
+      },
+      "kind": "read",
+      "name": "read_ai_world",
+      "parameters": [
+        "domains",
+        "scope_key",
+        "limit"
+      ],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._read_background_budget @ turn_runtime.py:1915",
+      "hard_boundary": false,
+      "input_schema": {},
+      "kind": "read",
+      "name": "read_background_budget",
+      "parameters": [],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._read_cognitive_policies @ turn_runtime.py:2495",
+      "hard_boundary": false,
+      "input_schema": {
+        "policy_id": "string?"
+      },
+      "kind": "read",
+      "name": "read_cognitive_policies",
+      "parameters": [
+        "policy_id"
+      ],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._read_execution_world @ turn_runtime.py:1996",
+      "hard_boundary": false,
+      "input_schema": {},
+      "kind": "read",
+      "name": "read_execution_world",
+      "parameters": [],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._read_periodic_review_anchors @ turn_runtime.py:1659",
+      "hard_boundary": false,
+      "input_schema": {
+        "limit": "integer?",
+        "offset": "integer?"
+      },
+      "kind": "read",
+      "name": "read_periodic_review_anchors",
+      "parameters": [
+        "offset",
+        "limit"
+      ],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._read_world_map @ turn_runtime.py:1886",
+      "hard_boundary": false,
+      "input_schema": {},
+      "kind": "read",
+      "name": "read_world_map",
+      "parameters": [],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._record_communication_experience @ turn_runtime.py:2602",
+      "hard_boundary": false,
+      "input_schema": {
+        "action_ref": "{object_id:string,revision:integer}?",
+        "applicable_conditions": "object?",
+        "counterexample_refs": "array[{object_id:string,revision:integer}]?",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "scenario": "string",
+        "style": "string",
+        "tone": "string?",
+        "user_reaction": "accepted|resisted|ignored|unknown"
+      },
+      "kind": "write",
+      "name": "record_communication_experience",
+      "parameters": [
+        "scenario",
+        "style",
+        "user_reaction",
+        "evidence_refs",
+        "tone",
+        "action_ref",
+        "applicable_conditions",
+        "counterexample_refs"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._request_all_dimensions_projection @ turn_runtime.py:2324",
+      "hard_boundary": false,
+      "input_schema": {
+        "dimensions": "array[string]",
+        "query": "string?",
+        "window_end": "ISO-8601 datetime",
+        "window_start": "ISO-8601 datetime"
+      },
+      "kind": "read",
+      "name": "request_all_dimensions_projection",
+      "parameters": [
+        "dimensions",
+        "window_start",
+        "window_end",
+        "query"
+      ],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._retract_claim @ turn_runtime.py:3046",
+      "hard_boundary": false,
+      "input_schema": {
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "reason": "string",
+        "target_ref": "{object_id:string,revision:integer}"
+      },
+      "kind": "write",
+      "name": "retract_claim",
+      "parameters": [
+        "target_ref",
+        "reason",
+        "evidence_refs"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._retrieve_original_observation @ turn_runtime.py:2449",
+      "hard_boundary": false,
+      "input_schema": {
+        "object_id": "string",
+        "revision": "integer?"
+      },
+      "kind": "read",
+      "name": "retrieve_original_observation",
+      "parameters": [
+        "object_id",
+        "revision"
+      ],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._revise_claim @ turn_runtime.py:2971",
+      "hard_boundary": false,
+      "input_schema": {
+        "confidence": "number[0,1]?",
+        "counter_evidence_refs": "array[{object_id:string,revision:integer}]?",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "reason": "string",
+        "replacement_content": "string",
+        "target_ref": "{object_id:string,revision:integer}",
+        "unknown_items": "array[string]?",
+        "valid_time": "TemporalExtent object?"
+      },
+      "kind": "write",
+      "name": "revise_claim",
+      "parameters": [
+        "target_ref",
+        "reason",
+        "evidence_refs",
+        "replacement_content",
+        "confidence",
+        "valid_time",
+        "unknown_items",
+        "counter_evidence_refs"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._revise_entity @ turn_runtime.py:2189",
+      "hard_boundary": false,
+      "input_schema": {
+        "aliases": "array[string]?",
+        "canonical_name": "string?",
+        "entity_ref": "{object_id:string,revision:integer}",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "identity_claim_refs": "array[{object_id:string,revision:integer}]?",
+        "reason": "string"
+      },
+      "kind": "write",
+      "name": "revise_entity",
+      "parameters": [
+        "entity_ref",
+        "reason",
+        "evidence_refs",
+        "canonical_name",
+        "aliases",
+        "identity_claim_refs"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._rollback_cognitive_policy @ turn_runtime.py:2666",
+      "hard_boundary": false,
+      "input_schema": {
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "policy_id": "string",
+        "reason": "string",
+        "target_version": "integer"
+      },
+      "kind": "write",
+      "name": "rollback_cognitive_policy",
+      "parameters": [
+        "policy_id",
+        "target_version",
+        "reason",
+        "evidence_refs"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._search_conversation_summaries @ turn_runtime.py:1696",
+      "hard_boundary": false,
+      "input_schema": {
+        "limit": "integer?",
+        "query": "string",
+        "session_id": "string?"
+      },
+      "kind": "read",
+      "name": "search_conversation_summaries",
+      "parameters": [
+        "query",
+        "session_id",
+        "limit"
+      ],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._search_timeline @ turn_runtime.py:2374",
+      "hard_boundary": false,
+      "input_schema": {
+        "dimension": "string?",
+        "limit": "integer?",
+        "object_types": "array[string]?",
+        "query": "string?",
+        "window_end": "ISO-8601 datetime",
+        "window_start": "ISO-8601 datetime"
+      },
+      "kind": "read",
+      "name": "search_timeline",
+      "parameters": [
+        "window_start",
+        "window_end",
+        "dimension",
+        "object_types",
+        "query",
+        "limit"
+      ],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._search_world @ turn_runtime.py:1510",
+      "hard_boundary": false,
+      "input_schema": {
+        "limit": "integer?",
+        "query": "string"
+      },
+      "kind": "read",
+      "name": "search_world",
+      "parameters": [
+        "query",
+        "limit"
+      ],
+      "side_effecting": false
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._transition_dimension @ turn_runtime.py:2296",
+      "hard_boundary": false,
+      "input_schema": {
+        "dimension_ref": "{object_id:string,revision:integer}",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "new_lifecycle": "candidate|trial|active|low_activity|dormant|merged|split|revised|rejected|reactivated|archived",
+        "reason": "string",
+        "related_dimension_refs": "array[{object_id:string,revision:integer}]?"
+      },
+      "kind": "write",
+      "name": "transition_dimension",
+      "parameters": [
+        "dimension_ref",
+        "new_lifecycle",
+        "reason",
+        "evidence_refs",
+        "related_dimension_refs"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._transition_event @ turn_runtime.py:2571",
+      "hard_boundary": false,
+      "input_schema": {
+        "confidence": "number[0,1]?",
+        "event_ref": "{object_id:string,revision:integer}",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "new_status": "candidate|active|resolved|revised|rejected|merged|split",
+        "reason": "string",
+        "related_event_refs": "array[{object_id:string,revision:integer}]?",
+        "replacement_interpretation": "string?",
+        "replacement_title": "string?"
+      },
+      "kind": "write",
+      "name": "transition_event",
+      "parameters": [
+        "event_ref",
+        "new_status",
+        "reason",
+        "evidence_refs",
+        "replacement_title",
+        "replacement_interpretation",
+        "confidence",
+        "related_event_refs"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._transition_goal @ turn_runtime.py:2043",
+      "hard_boundary": false,
+      "input_schema": {
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "goal_ref": "{object_id:string,revision:integer}",
+        "new_status": "proposed|active|paused|achieved|abandoned|unknown",
+        "reason": "string"
+      },
+      "kind": "write",
+      "name": "transition_goal",
+      "parameters": [
+        "goal_ref",
+        "new_status",
+        "reason",
+        "evidence_refs"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._transition_task @ turn_runtime.py:2108",
+      "hard_boundary": false,
+      "input_schema": {
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "execution_refs": "array[{object_id:string,revision:integer}]?",
+        "new_state": "string",
+        "next_step": "string?",
+        "next_wake_at": "ISO-8601 datetime?",
+        "outcome_refs": "array[{object_id:string,revision:integer}]?",
+        "reason": "string",
+        "task_ref": "{object_id:string,revision:integer}"
+      },
+      "kind": "write",
+      "name": "transition_task",
+      "parameters": [
+        "task_ref",
+        "new_state",
+        "reason",
+        "evidence_refs",
+        "execution_refs",
+        "outcome_refs",
+        "next_wake_at",
+        "next_step"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._update_cognitive_policy @ turn_runtime.py:2640",
+      "hard_boundary": false,
+      "input_schema": {
+        "current_value": "json value",
+        "evaluation_window": "string?",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "policy_id": "string",
+        "reason": "string"
+      },
+      "kind": "write",
+      "name": "update_cognitive_policy",
+      "parameters": [
+        "policy_id",
+        "current_value",
+        "reason",
+        "evidence_refs",
+        "evaluation_window"
+      ],
+      "side_effecting": true
+    },
+    {
+      "handler": "aios_core.runtime.turn_runtime.FusedTurnRuntime._upsert_relation @ turn_runtime.py:2224",
+      "hard_boundary": false,
+      "input_schema": {
+        "confidence": "number[0,1]",
+        "evidence_refs": "array[{object_id:string,revision:integer}]",
+        "left_ref": "{object_id:string,revision:integer}",
+        "reason": "string",
+        "relation_type": "string",
+        "right_ref": "{object_id:string,revision:integer}",
+        "valid_time": "TemporalExtent object?"
+      },
+      "kind": "write",
+      "name": "upsert_relation",
+      "parameters": [
+        "left_ref",
+        "relation_type",
+        "right_ref",
+        "evidence_refs",
+        "confidence",
+        "reason",
+        "valid_time"
+      ],
+      "side_effecting": true
+    }
+  ],
+  "model_callable_capabilities": 43,
+  "python": "3.12.14",
+  "side_effecting_capabilities": 22,
+  "sqlite_version": "3.49.1"
+}
