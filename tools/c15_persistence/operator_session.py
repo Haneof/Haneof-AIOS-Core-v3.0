@@ -917,15 +917,32 @@ class OperatorSession:
         attempts = self.runtime.background_model_attempts
         for request_id in self.journal.request_ids(cursor=int(projection["sequence"])):
             record = self.journal.recovery(request_id)
-            if record["state"] in {"staged", "exposed", "applied", "acked"}:
+            if record["state"] == "staged":
+                continue
+            if record["state"] == "exposed":
+                dispatch_report = provider_module.dispatch(self.mailbox, request_id)
+                require(
+                    dispatch_report["dispatch"] == "reattached",
+                    "K3 recovery attempted a second provider dispatch",
+                )
+                self.bump("provider_reattachments")
+                reply = self._collect_reply(request_id)
+                self.journal.stage_reply(request_id, reply)
+                record = self.journal.recovery(request_id)
+                actions.append({"request_id": request_id, "action": "provider_reply_reattached"})
+            if record["state"] in {"applied", "acked"}:
                 continue
             attempt_id = str(record["metadata"]["attempt_id"])
-            receipt = attempts.response_authenticity_receipt(attempt_id)
-            if receipt is None:
-                actions.append({"request_id": request_id, "action": "no_core_receipt"})
-                continue
             payload = bytes(record["reply"]).decode("utf-8")
             directive = decode_model_directive(payload)
+            receipt = attempts.response_authenticity_receipt(attempt_id)
+            if receipt is None:
+                receipt = attempts._capture_trusted_response_return(
+                    attempt_id,
+                    captured_at=datetime.now(timezone.utc),
+                    directive=directive,
+                )
+                actions.append({"request_id": request_id, "action": "trusted_return_recaptured"})
             fingerprint = hashlib.sha256(payload.encode("utf-8")).hexdigest()
             require(
                 fingerprint == attempts._response_fingerprint(directive),
@@ -942,6 +959,11 @@ class OperatorSession:
             }
             if record["state"] == "reply-staged":
                 self.journal.mark_authenticated(request_id, proof)
+                if self.remote_durability_enabled:
+                    self._persist_remote_barrier(
+                        "K3_RECOVERED_PROVIDER_RETURN",
+                        seal_label="remote-provider-return-recovered",
+                    )
             attempt = attempts.get(attempt_id)
             if attempt is not None and attempts.staged_response(attempt_id) is None:
                 if attempt.state in {"dispatching", "in_doubt", "response_returned", "metered"}:
