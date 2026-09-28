@@ -1404,68 +1404,6 @@ class FusedTurnRuntime:
             evidence=evidence,
         )
 
-    def stage_trusted_returned_background_response(
-        self,
-        *,
-        work_kind: str,
-        work_id: str,
-        model_round_index: int,
-        directive_payload: str,
-        returned_at: datetime,
-        evidence: str,
-    ) -> BackgroundModelResponseStaging:
-        """Reattach one exact provider return to an already-dispatched attempt.
-
-        This is the Core-owned recovery counterpart of the normal trusted-return
-        callback. The caller supplies exact provider-return bytes plus durable work
-        identity; Core resolves the attempt, strictly decodes the directive,
-        verifies the originating request binding, mints the trusted-return receipt
-        with its private authority, and stages the exact response with that proof.
-
-        The signing authority never leaves Core and callers cannot supply or
-        override an authenticity proof.
-        """
-
-        attempt = self.background_model_attempts.inspect(
-            subject_id=self.subject_id,
-            work_kind=work_kind,
-            work_id=work_id,
-            model_round_index=model_round_index,
-        )
-        if attempt is None:
-            raise KeyError(
-                "no durable background model attempt exists for the requested "
-                "trusted-return work identity and round"
-            )
-        directive = decode_model_directive(directive_payload)
-        receipt = self.background_model_attempts._capture_trusted_response_return(
-            attempt.attempt_id,
-            captured_at=returned_at,
-            directive=directive,
-        )
-        provider, model, provider_request_id = (
-            self.background_model_attempts._provider_identity(directive)
-        )
-        if provider is None or model is None or provider_request_id is None:
-            raise ValueError(
-                "trusted returned response must carry full provider/model/request_id identity"
-            )
-        response_fingerprint = self.background_model_attempts._response_fingerprint(
-            directive
-        )
-        return self.stage_exact_background_response(
-            work_kind=work_kind,
-            work_id=work_id,
-            model_round_index=model_round_index,
-            provider=provider,
-            model=model,
-            provider_request_id=provider_request_id,
-            response_fingerprint=response_fingerprint,
-            directive_payload=directive_payload,
-            staged_at=returned_at,
-            evidence=evidence,
-            authenticity_proof=receipt.authenticity_proof,
-        )
     def _pending_exact_response(
         self,
         *,
