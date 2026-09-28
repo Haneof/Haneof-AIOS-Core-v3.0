@@ -56,3 +56,17 @@ uname          : Linux-6.1.158+-x86_64-with-glibc2.36
   contract while 3.12.14 is in contract.  SQLite 3.38.2 is OLDER than the
   author's 3.49.1 and older than this host's system libsqlite3, which makes this
   a strictly harder target, not an easier one.
+
+## 7. Post-trim re-verification
+The installed prefix was 372 MB. It was trimmed to 64 MB by removing
+lib/python3.12/test, idlelib, tkinter, turtledemo, ensurepip/_bundled, include/,
+share/, the static libpython3.12.a, config-3.12-*/, and all __pycache__/*.pyc.
+Trimming an interpreter invalidates any run recorded against it, so the whole
+formal gate was re-executed on the trimmed build:
+
+    86 reviewer probes vs candidate a73e186d : 86 passed in 10.24s, exit=0
+    full repo pytest                         : 1005 passed in 216.83s (0:03:36), exit=0
+
+Both match the pre-trim runs in sections 1-6 and in FORMAL_312_*.txt.
+Interrogated again after the trim:
+    CPython 3.12.14 | SQLite 3.38.2 | pydantic 2.13.5 | pytest 8.4.2
