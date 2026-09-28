@@ -44,8 +44,8 @@ jobs:
       - name: Verify frozen reviewer probe hashes
         run: |
           set -euo pipefail
-          cd review/reviews/CORRECTIVE_001_IA2
-          sha256sum -c evidence/SHA256SUMS.probes
+          cd review/reviews/CORRECTIVE_001_IA2/evidence/probe_revisions
+          sha256sum -c ../SHA256SUMS.probes
 
       - name: Materialize exact reviewer probes into candidate tree
         run: |
