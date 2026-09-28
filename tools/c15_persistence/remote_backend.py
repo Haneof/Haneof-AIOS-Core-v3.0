@@ -128,6 +128,48 @@ def _write_expected_remote_head(backend: RunBackend, commit_sha: str) -> None:
             temp.unlink(missing_ok=True)
 
 
+def verify_local_remote_authority(
+    backend: RunBackend,
+    *,
+    remote_ref: str,
+    remote: str = DEFAULT_REMOTE,
+    repo_dir: Path | None = None,
+) -> str:
+    """Verify a local remote-authoritative cache against the exact remote head.
+
+    Local self-hashes are not an external history anchor.  A resumed authoritative
+    cache must still correspond to the remote ref/commit it previously persisted:
+    the expected-head marker must equal the current server ref and the immutable
+    generation high-water bytes must match that exact commit.
+    """
+
+    repo = repo_dir or default_repo_dir()
+    _validate_backend_remote_binding(backend, remote=remote, ref=remote_ref)
+    expected = _read_expected_remote_head(backend)
+    require(expected is not None, "remote-authoritative cache has no expected remote head")
+    actual = _remote_head(repo, remote, remote_ref)
+    require(
+        actual == expected,
+        f"remote authority head mismatch: expected {expected}, observed {actual}",
+    )
+    local_head = backend.root / GenerationStore.HEAD_NAME
+    require(local_head.is_file(), "local immutable generation head is missing")
+    shown = subprocess.run(
+        ["git", "show", f"{actual}:{GenerationStore.HEAD_NAME}"],
+        cwd=str(repo),
+        capture_output=True,
+    )
+    require(
+        shown.returncode == 0,
+        "remote authoritative commit is missing the immutable generation head",
+    )
+    require(
+        local_head.read_bytes() == shown.stdout,
+        "local immutable generation head differs from authoritative remote commit",
+    )
+    return actual
+
+
 def checkpoint_sqlite_databases(root: Path) -> None:
     """Flush and truncate WALs for all SQLite databases under root before archiving."""
     for db_path in sorted(root.rglob("*.sqlite")):
