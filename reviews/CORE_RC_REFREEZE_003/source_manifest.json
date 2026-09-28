@@ -26,7 +26,7 @@
     },
     {
       "path": ".github/workflows/core-rc-refreeze-003-formal-gate.yml",
-      "sha256": "63c7da739b630e7e9d2d690a1c2661fa1d5cd085163577c47b904cc23dba5990"
+      "sha256": "3f6425498ae61f7e5a0308c450bb88827b67907ea0345084c739e6d1fa42c2c7"
     }
   ],
   "constitution_baseline_files": [

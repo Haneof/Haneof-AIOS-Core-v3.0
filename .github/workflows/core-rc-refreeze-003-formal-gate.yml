@@ -80,7 +80,7 @@ jobs:
           {
             echo "task=CORE-RC-REFREEZE-003"
             echo "software_sha=f20f2edfa7af00d0286493fd15196ca9503bc315"
-            echo "python=$("$RUNNER_TEMP/rc003-formal-venv/bin/python" -c 'import sys; print(sys.version.replace("\\n", " "))')"
+            echo "python=$("$RUNNER_TEMP/rc003-formal-venv/bin/python" -c 'import sys; print(sys.version.replace("\n", " "))')"
             echo "implementation=$("$RUNNER_TEMP/rc003-formal-venv/bin/python" -c 'import platform; print(platform.python_implementation())')"
             echo "pydantic=$("$RUNNER_TEMP/rc003-formal-venv/bin/python" -c 'import pydantic; print(pydantic.__version__)')"
             echo "pytest=$("$RUNNER_TEMP/rc003-formal-venv/bin/python" -c 'import pytest; print(pytest.__version__)')"
@@ -214,6 +214,115 @@ jobs:
             "$RUNNER_TEMP/rc003-formal-venv/bin/python" \
             "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_003/probes/backup_restore_trusted_return.py" \
             | tee "$RC003_OUTPUT/backup-restore-trusted-return.txt"
+
+      - name: Publish compact evidence summary in check annotations
+        if: always()
+        shell: bash
+        env:
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          output_dir="${RC003_OUTPUT:-$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_003/ci-output}"
+          summary_path="$output_dir/rc003_gate_summary.md"
+          json_path="$output_dir/rc003_gate_summary.json"
+          mkdir -p "$output_dir"
+          python - "$output_dir" "$summary_path" "$json_path" <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import sys
+          import xml.etree.ElementTree as ET
+
+          out = Path(sys.argv[1])
+          markdown_path = Path(sys.argv[2])
+          json_path = Path(sys.argv[3])
+          target = "f20f2edfa7af00d0286493fd15196ca9503bc315"
+
+          def junit(name):
+              path = out / name
+              if not path.exists():
+                  return {"status": "NOT_RUN", "tests": None, "failures": None, "errors": None, "skipped": None, "time": None}
+              root = ET.parse(path).getroot()
+              cases = root.findall(".//testcase")
+              return {
+                  "status": "RECORDED",
+                  "tests": int(root.attrib.get("tests", len(cases))),
+                  "failures": int(root.attrib.get("failures", sum(bool(c.findall("failure")) for c in cases))),
+                  "errors": int(root.attrib.get("errors", sum(bool(c.findall("error")) for c in cases))),
+                  "skipped": int(root.attrib.get("skipped", sum(bool(c.findall("skipped")) for c in cases))),
+                  "time": root.attrib.get("time"),
+              }
+
+          def marker(path):
+              if not path.exists():
+                  return None
+              for line in reversed(path.read_text(encoding="utf-8", errors="replace").splitlines()):
+                  if line.startswith("RESULT="):
+                      try:
+                          return json.loads(line.removeprefix("RESULT="))
+                      except json.JSONDecodeError:
+                          return {"status": "UNPARSEABLE_RESULT_MARKER"}
+              return None
+
+          env_path = out / "environment_manifest.txt"
+          env = {}
+          if env_path.exists():
+              env = dict(line.split("=", 1) for line in env_path.read_text().splitlines() if "=" in line)
+          evidence_sha256 = {
+              path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+              for path in sorted(out.iterdir())
+              if path.is_file()
+          }
+          results = {
+              "job_status": os.environ.get("JOB_STATUS", "unknown"),
+              "run_id": os.environ.get("GITHUB_RUN_ID"),
+              "candidate_head": os.environ.get("GITHUB_SHA"),
+              "target_sha": target,
+              "formal_environment": env,
+              "full_pytest": junit("full-regression-junit.xml"),
+              "trusted_return_pytest": junit("trusted-return-junit.xml"),
+              "core_systems_pytest": junit("core-systems-junit.xml"),
+              "registry": marker(out / "trusted-return-registry-inventory.txt"),
+              "clean_install_headless": marker(out / "clean-install-headless-smoke.txt"),
+              "backup_restore_trusted_return": marker(out / "backup-restore-trusted-return.txt"),
+              "evidence_file_sha256": evidence_sha256,
+          }
+          json_path.write_text(json.dumps(results, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          def short_test(name, result):
+              if result["status"] != "RECORDED":
+                  return f"{name}: {result['status']}"
+              return (f"{name}: tests={result['tests']} failures={result['failures']} "
+                      f"errors={result['errors']} skipped={result['skipped']} time={result['time']}s")
+          lines = [
+              "# CORE-RC-REFREEZE-003 formal run summary",
+              "",
+              f"- Job status: **{results['job_status']}**",
+              f"- GitHub run: `{results['run_id']}`; candidate head: `{results['candidate_head']}`",
+              f"- Frozen software: `{target}`",
+              f"- Environment: Python `{env.get('python','unknown')}`; Pydantic `{env.get('pydantic','unknown')}`; pytest `{env.get('pytest','unknown')}`; SQLite `{env.get('sqlite','unknown')}`; OS `{env.get('os_release','unknown')}`; architecture `{env.get('architecture','unknown')}`",
+              f"- Kernel: `{env.get('system','unknown')}`",
+              f"- {short_test('Full repository pytest', results['full_pytest'])}",
+              f"- {short_test('Trusted-return/recovery focused pytest', results['trusted_return_pytest'])}",
+              f"- {short_test('Core systems focused pytest', results['core_systems_pytest'])}",
+              f"- Registry: `{(results['registry'] or {}).get('status','NOT_RUN')}`; total `{(results['registry'] or {}).get('total_reachable_capabilities','unknown')}`; side-effecting `{(results['registry'] or {}).get('side_effecting_capabilities','unknown')}`",
+              f"- Clean install/headless: `{(results['clean_install_headless'] or {}).get('status','NOT_RUN')}`",
+              f"- Backup/restore/rebuild: `{(results['backup_restore_trusted_return'] or {}).get('status','NOT_RUN')}`; backup immutable `{(results['backup_restore_trusted_return'] or {}).get('source_backup_immutable','unknown')}`; provider redispatch `{(results['backup_restore_trusted_return'] or {}).get('provider_redispatch_count_after_restore','unknown')}`",
+          ]
+          lines.extend(
+              f"- Artifact SHA-256 `{name}`: `{digest}`"
+              for name, digest in sorted(evidence_sha256.items())
+          )
+          lines.append(
+              f"- Gate JSON summary SHA-256: `{hashlib.sha256(json_path.read_bytes()).hexdigest()}`"
+          )
+          markdown_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+          PY
+          cat "$summary_path" >> "$GITHUB_STEP_SUMMARY"
+          while IFS= read -r line; do
+            test -n "$line" || continue
+            echo "::notice file=.github/workflows/core-rc-refreeze-003-formal-gate.yml,line=1,title=RC003 formal evidence::$line"
+          done < "$summary_path"
 
       - name: Upload reproducible RC regression and smoke evidence
         if: always()

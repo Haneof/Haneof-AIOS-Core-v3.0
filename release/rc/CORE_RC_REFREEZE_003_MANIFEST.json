@@ -17,7 +17,7 @@
     "pyproject_blob": "b38833c7537fa60d5c2f02ed4bb19158d8995a11",
     "pyproject_sha256": "993a6e9dd821d8d5885f4cc1f2da0aa34d40284618097a1de507e885f2eaab30",
     "source_manifest": "reviews/CORE_RC_REFREEZE_003/source_manifest.json",
-    "source_manifest_sha256": "0b5726031a18c5981006dfa5cd8d5f957aed44a456c9cd07f81e09515c534389"
+    "source_manifest_sha256": "87e04b5ef1d756c40290737c22d82e4cc88c839d6fab0e3818fb40c306fa292e"
   },
   "live_main_at_fresh_fetch": {
     "ref": "origin/main",
