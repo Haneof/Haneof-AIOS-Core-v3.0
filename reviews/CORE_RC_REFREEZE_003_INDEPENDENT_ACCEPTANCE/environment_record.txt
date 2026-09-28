@@ -1,0 +1,18 @@
+CORE-RC-REFREEZE-003 Independent Acceptance Environment Record
+==============================================================
+target_python: CPython 3.12.14 (formal gate hosted run)
+target_pydantic: 2.13.5
+target_pytest: 8.4.2
+target_sqlite: 3.45.1
+
+actual_local_python: 3.11.2 (main, Apr  8 2026, 01:58:00) [GCC 12.2.0]
+actual_local_pydantic: 2.13.5
+actual_local_pytest: 8.4.2
+actual_local_sqlite: 3.40.1
+actual_local_platform: Linux-6.1.158+-x86_64-with-glibc2.36
+actual_local_architecture: x86_64
+actual_local_kernel: uname_result(system='Linux', node='e2b.local', release='6.1.158+', version='#1 SMP PREEMPT_DYNAMIC Mon May 11 18:48:24 UTC 2026', machine='x86_64')
+
+Environment disclosure: Local sandbox runs CPython 3.11.2 / SQLite 3.40.1.
+Pydantic 2.13.5 and pytest 8.4.2 match formal target exactly.
+Formal CPython 3.12.14 / SQLite 3.45.1 execution was verified via Actions run 36437699641 (919/919 passed).

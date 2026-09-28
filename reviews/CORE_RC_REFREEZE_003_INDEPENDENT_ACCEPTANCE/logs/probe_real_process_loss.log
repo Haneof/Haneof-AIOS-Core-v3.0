@@ -1,0 +1,1 @@
+RESULT={"probe": "probe_real_process_loss_restart", "sigkill_probe": {"child_exitcode": -9, "converged": true, "died_to_sigkill": true, "operation_duplicate_count": 0, "provider_redispatch_count": 0, "round0_meters_count": 1, "scenario": "user_turn_create_task_sigkill", "task_duplicate_count": 0}, "status": "PASS"}

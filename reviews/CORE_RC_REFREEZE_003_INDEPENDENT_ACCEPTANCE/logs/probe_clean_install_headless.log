@@ -1,0 +1,1 @@
+RESULT={"final_world_revision": 2, "initial_world_revision": 0, "probe": "probe_clean_install_headless", "real_provider_used": false, "resident_fixture_used": false, "restart_continuity": true, "safe_recovery_status": "recovery_status", "separate_cli_processes_invoked": 5, "status": "PASS", "turn_status": "turn_completed", "wheel_built": "aios_core-0.3.0.dev0-py3-none-any.whl"}
