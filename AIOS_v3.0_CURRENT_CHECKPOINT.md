@@ -1,5 +1,14 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-09-28 parallel governance preparation — C15 exit readiness
+
+`C15-EXIT-READINESS-001 = REVIEW_READY / NON-EXECUTABLE PREPARATION`.
+
+Prepared downstream route and blocked prompt templates so that completion of the current trusted-return corrective can transition directly into RC-REFREEZE-003 → A-RERUN-004 → B persistence/release/run → C → evaluator/close without rediscovering the control path.
+
+This preparation changes no Core/tests/workflows and does not alter the unique engineering READY task.
+
+
 ## 当前控制入口 — 2026-09-28 TRUSTED-RETURN IA FAIL / CORRECTIVE-001 READY
 
 - **`C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 = FROZEN_WIP / BLOCKED_ON_CORE_TRUSTED_RETURN_RECOVERY`**。PR #254 已 **CLOSED / DRAFT / UNMERGED / FROZEN**。First scope-violating WIP `f7848952b6519fc40f50806f4a4d8d350ac0f38a` 修改了 `src/aios_core/runtime/turn_runtime.py`，违反 merged PM scope #255（persistence corrective 不得修改 Core），因此该 SHA = **SCOPE_VIOLATION / NOT_A_CANDIDATE**。历史 WIP/red/green CI 全部保留，不得 rewrite。
