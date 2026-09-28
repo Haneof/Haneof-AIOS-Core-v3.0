@@ -1,5 +1,14 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-09-28 product-governance clarification — Resident persona continuity
+
+A new governance-only candidate is REVIEW_READY: `C15-RCC-RESIDENT-PERSONA-CONTINUITY-RULE-001`, PR #263 (`governance/c15-resident-persona-continuity-20260928`, DRAFT / OPEN / UNMERGED).
+
+Binding product intent: provider/model/API-key routing is an implementation detail. The user must continue interacting with the same Resident AI. Exact wording and raw capability may vary by engine; material attitude/persona/relationship posture/communication style/behavioral-habit drift caused solely by model replacement is not allowed.
+
+This does not change the current engineering control point: `CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001-CORRECTIVE-001` remains the unique engineering READY task. Persona continuity governance must be independently accepted before Resident C / final C15 evaluation / close, followed by a read-only mechanism preflight.
+
+
 ## 当前控制入口 — 2026-09-28 TRUSTED-RETURN IA FAIL / CORRECTIVE-001 READY
 
 - **`C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 = FROZEN_WIP / BLOCKED_ON_CORE_TRUSTED_RETURN_RECOVERY`**。PR #254 已 **CLOSED / DRAFT / UNMERGED / FROZEN**。First scope-violating WIP `f7848952b6519fc40f50806f4a4d8d350ac0f38a` 修改了 `src/aios_core/runtime/turn_runtime.py`，违反 merged PM scope #255（persistence corrective 不得修改 Core），因此该 SHA = **SCOPE_VIOLATION / NOT_A_CANDIDATE**。历史 WIP/red/green CI 全部保留，不得 rewrite。

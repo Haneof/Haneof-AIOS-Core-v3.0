@@ -1,5 +1,15 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## Governance review lane — 2026-09-28 RESIDENT PERSONA CONTINUITY
+
+- **`C15-RCC-RESIDENT-PERSONA-CONTINUITY-RULE-001 = REVIEW_READY / GOVERNANCE-ONLY`**. Product invariant: the user-facing AI is the long-lived Resident, not the provider/model. Any legal provider/model/API-key route must present the same Resident identity/persona; model replacement alone may not reset attitude, relationship posture, communication style, boundaries, or stable behavioral habits.
+- Governance candidate: **PR #263** (`governance/c15-resident-persona-continuity-20260928`, DRAFT / OPEN / UNMERGED). Ruling: `governance/C15_RCC_RESIDENT_PERSONA_CONTINUITY_RULING_2026-09-28.md`.
+- Independent review prompt: `governance/prompts/C15_RCC_RESIDENT_PERSONA_CONTINUITY_INDEPENDENT_REVIEW_2026-09-28.md`.
+- This lane **does not interrupt** the unique engineering READY task `CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001-CORRECTIVE-001` and authorizes **no Core changes**.
+- Before Resident C / `C15-RCC-EVAL-001` / `C15-RCC-CLOSE-001`, this governance clarification must be independently accepted and integrated. Then a read-only `C15-RCC-PERSONA-CONTINUITY-PREFLIGHT-001` must classify current-main mechanisms as `ALREADY_IMPLEMENTED` / `MECHANISM_GAP` / `INSUFFICIENT_EVIDENCE` before any implementation task is created.
+- Proposed final C15 evaluator contract becomes **R1–R10 all VALID**, with R10 = Resident Identity / Persona Continuity.
+
+
 ## 当前控制入口 — 2026-09-28 TRUSTED-RETURN IA FAIL / CORRECTIVE-001 READY
 
 - **`C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 = FROZEN_WIP / BLOCKED_ON_CORE_TRUSTED_RETURN_RECOVERY`**。PR #254 已 **CLOSED / DRAFT / UNMERGED / FROZEN**。First scope-violating WIP `f7848952b6519fc40f50806f4a4d8d350ac0f38a` 修改了 `src/aios_core/runtime/turn_runtime.py`，违反 merged PM scope #255（persistence corrective 不得修改 Core），因此该 SHA = **SCOPE_VIOLATION / NOT_A_CANDIDATE**。历史 WIP/red/green CI 全部保留，不得 rewrite。

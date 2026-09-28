@@ -66,7 +66,7 @@ The current law already supplies the controlling principles. C15 requires an aut
 
 No exact contradiction requiring a constitution rewrite was found.
 
-Interpretive clarification, not a rewrite: the Personality constitution lists “AI自我总结” among possible *sources* of a personality Claim. Under this ruling, a self-summary may participate as context or as a candidate; it **cannot terminate proof**. Final support must still close to legal reality Evidence. Personality/Intent remain lawful AI dimensions, but they are **not** C15 acceptance axes. Style and personality wording are explicitly not Resident identity.
+Interpretive clarification, not a rewrite: the Personality constitution lists “AI自我总结” among possible *sources* of a personality Claim. Under this ruling, a self-summary may participate as context or as a candidate; it **cannot terminate proof**. Final support must still close to legal reality Evidence. Personality/Intent remain lawful AI dimensions. Intent is not a separate C15 acceptance axis. **Personality continuity is now a binding C15 acceptance axis under the 2026-09-28 Resident Identity / Persona Continuity clarification.** Exact wording is not Resident identity, but durable user-facing personality, attitude, relationship posture, communication style, and stable behavioral tendencies are part of Resident identity and may not reset merely because the underlying model/provider changes.
 
 C15 therefore freezes an authoritative governance ruling only.
 
@@ -223,7 +223,9 @@ Therefore “同一个 Resident” does **not** require:
 - the same search order
 - the same verbosity
 
-It **does** require that currently valid durable cognition of the four families does not disappear without Evidence.
+Those allowances cover exact expression, not material persona drift. A replacement model may phrase the Resident differently, but it must not substitute its own native assistant persona for the Resident's durable identity.
+
+It **does** require that currently valid durable cognition of the four families does not disappear without Evidence, and that currently valid Resident Personality/identity tendencies remain materially continuous across the model boundary.
 
 A Claim that still exists in SQLite but is never retrieved, never used, and never allowed to be revised is **not** continuity of the same Resident. It is an unused archive.
 
@@ -252,7 +254,7 @@ The target user-facing meaning is:
 
 > the engine changed, but this is still the Resident that has lived through the same relationship, learned the same validated lessons, and can continue revising them.
 
-Style imitation is irrelevant. Silent amnesia is a fail.
+Exact style imitation is irrelevant. **Material persona continuity is required.** Silent amnesia or model-induced persona replacement is a fail.
 
 ---
 
@@ -569,7 +571,7 @@ The reason code is `INSUFFICIENT_EVIDENCE`.
 
 `INSUFFICIENT_EVIDENCE` is a reason, not a fourth axis verdict. Axis verdicts remain only `VALID` / `PARTIAL` / `INVALID`.
 
-Because C15 PASS requires R1–R9 all `VALID`, an unproven replacement-model identity means C15 cannot PASS. That is intended. It is not an invitation to treat same-chat continuation as R6.
+Because C15 PASS requires R1–R10 all `VALID`, an unproven replacement-model identity means C15 cannot PASS. That is intended. It is not an invitation to treat same-chat continuation as R6.
 
 ---
 
@@ -638,7 +640,7 @@ Matched-negative silence remains legal. Fixture design may be rejected later if 
 
 ---
 
-## 16. R1–R9 evaluator matrix
+## 16. R1–R10 evaluator matrix
 
 `C15-RCC-EVAL-001` independently rules each axis. Each axis may receive only:
 
@@ -661,6 +663,9 @@ No “the model looks smart” impression.
 | **R7** | Prior cognition materially affects later behavior | Claim displayed but unused; SQLite existence only |
 | **R8** | Later correction: retain / weaken / revise / retract | freeze against contrary Evidence; revise with no Evidence; UNKNOWN promoted to FACT |
 | **R9** | Anti-self-proof / no pseudo-LLM / no future leak | self-summary as proof; keyword→Claim; expected Claim; hidden handoff; future event leak |
+| **R10** | Resident Identity / Persona continuity across model/provider replacement | provider-native persona replaces Resident; material attitude/style/behavior reset on model swap; static hidden persona script fakes continuity; exact-text imitation substituted for durable identity |
+
+R10 binding: exact wording may differ, but model/provider replacement alone may not materially alter the Resident's established user-facing personality. Persona evolution remains legal only through evidence-grounded durable revision.
 
 R6 additional binding: unproven different-model identity → `PARTIAL` (reason `INSUFFICIENT_EVIDENCE`), never `VALID`.
 
@@ -670,7 +675,7 @@ R6 additional binding: unproven different-model identity → `PARTIAL` (reason `
 
 C15 PASS if and only if:
 
-> **R1–R9 are all `VALID`.**
+> **R1–R10 are all `VALID`.**
 
 C15 does **not** PASS by:
 
@@ -748,7 +753,7 @@ Real Resident windows. Model itself decides search/inspect/write/revise/retract/
 
 ### 19.4 C15-RCC-EVAL-001 / CLOSE-001
 
-Independent semantic audit of R1–R9, then PM closure. No Core repair in those windows.
+Independent semantic audit of R1–R10, then PM closure. No Core repair in those windows.
 
 ---
 

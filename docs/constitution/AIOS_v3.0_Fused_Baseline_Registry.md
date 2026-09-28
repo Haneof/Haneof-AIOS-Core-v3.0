@@ -255,6 +255,23 @@ Core 首先在可重复的软件环境中跑通，再逐步接入真实设备。
 
 ---
 
+
+### 2.18 Resident 身份与人格独立于底层模型
+
+AIOS 的用户可见身份属于长期 Resident，不属于 provider/model。
+
+- 用户可以接入任意数量的合法 model/provider/API key；底层路由变化不得把用户带到“另一个 AI”。
+- provider/model 是可替换执行引擎；能力、延迟、推理路径、精确措辞可以变化。
+- Resident 的当前有效 cognition、Self、Relationship、Personality、Strategy/Experience lineage 属于统一 World，并继续约束后续 Runtime。
+- 模型原生 assistant persona 没有 Resident 身份主权，不得覆盖已形成的人格、态度、关系姿态、沟通风格和稳定行为习惯。
+- exact wording 不要求一致；但可比较情境下的实质性人格/行为漂移不能仅由模型切换触发。
+- 人格允许长期演化，但必须由真实 Evidence 支持并通过统一 Revision / Retraction 向前变化；model/provider/API key 切换本身不是人格变化证据。
+- 禁止第二人格数据库、provider-specific persona memory、隐藏模型交接人格摘要，或把静态 persona prompt 当作真相源。
+
+冻结产品语义：
+
+> **模型可以换，用户面对的仍是同一个 Resident；换引擎不能等于换人格。**
+
 ## 三、机制级择优结果
 
 | 机制 | 主要来源 | 融合结论 |
