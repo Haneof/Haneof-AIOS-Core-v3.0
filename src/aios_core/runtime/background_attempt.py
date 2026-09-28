@@ -1457,9 +1457,11 @@ class BackgroundModelAttemptStore:
     ) -> BackgroundModelResponseReceipt:
         """Mint a receipt at the internal provider/relay return boundary.
 
-        This method is intentionally private and is wired only as CognitiveRuntime's
-        trusted return callback.  Recovery staging has no path to this authority and
-        receives neither the HMAC key nor a signing callable.
+        This method is intentionally private and is invoked only by Core-owned
+        trusted-return surfaces: CognitiveRuntime's normal return callback and
+        FusedTurnRuntime's exact returned-response recovery API. External staging
+        receives neither the HMAC key nor a signing callable and cannot supply or
+        override a proof.
         """
 
         moment = as_utc(captured_at, "captured_at")
