@@ -1,5 +1,16 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 当前控制入口 — 2026-09-28 CORRECTIVE-003 OPERATOR-PREP REVIEW_READY / FRESH IA READY
+
+- **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP = OPERATOR_PREP_COMPLETE / REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE`**. Candidate PR #281 remains **OPEN / UNMERGED / EVIDENCE-ONLY** at exact head `10901d467679b70437ae112747eab81f889fd5cb` (parent `abb8b435e5187c7c6c2f4332aea37cd805b4a53c`, tree `db79761216529cf83f217ab00c937bc79806a510`).
+- All 56 candidate files are confined to `reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/**`; zero Core/tests/workflow/fixture/evaluator/release-source drift.
+- Launch packet SHA-256 = `dfab9270f811836f1aad77641a1ec007eb741d1c6ce1acb68f51763eb00bad73`, status `PREP_REVIEW_READY`; packet audit PASS. Candidate head's sole parent matches packet `operator_prep_exact_head = abb8b435...`.
+- Operator evidence reports unified CPython 3.12.14 / Pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.45.1 and A/B/C/D gates PASS. PM spot-check confirmed Gate C contains a real second-round frozen-Core `CapabilityResult` history and real runner has no semantic callback. These remain author/readiness evidence pending fresh IA.
+- **唯一下一 READY：`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-INDEPENDENT-ACCEPTANCE = READY`**. Prompt: `governance/prompts/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_INDEPENDENT_ACCEPTANCE_2026-09-28.md`.
+- `C15-RCC-RES-A-RERUN-004-CORRECTIVE-003` remains **BLOCKED_ON_OPERATOR_PREP**. No real Resident release/run is authorized.
+- Persistence Corrective-003, Resident B/C, evaluator and C15 close remain **BLOCKED**.
+
+
 ## 当前控制入口 — 2026-09-28 CORRECTIVE-002 PRE-REVEAL CONTAMINATED / CORRECTIVE-003 OPERATOR-PREP READY
 
 - **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-002 = BLOCKED / CONTAMINATED_BEFORE_RUN / PRE-REVEAL / HISTORICAL_BLOCKED_EXACT`**. Evidence PR #279 exact head = `8e5c1ec76ea973c849c33923ccc818fe1dad49e8` (direct parent `aa13733ae393ec70e0cfc923ad3fb59a4e1ad97a`, tree `af5f7dd273e98f8502ea70556fe80f71e542f37c`). No World/index/release-state/session/ledger/cursor was created.
