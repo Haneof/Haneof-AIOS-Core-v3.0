@@ -1,0 +1,9 @@
+{
+  "capability_calls": [
+    {"name": "read_ai_world", "arguments": {"limit": 50}},
+    {"name": "search_timeline", "arguments": {"dimension": "dim:sleep", "window_start": "2026-10-01T00:00:00Z", "window_end": "2026-10-15T00:00:00Z", "limit": 20}},
+    {"name": "search_timeline", "arguments": {"dimension": "dim:work_outcome", "window_start": "2026-10-01T00:00:00Z", "window_end": "2026-10-15T00:00:00Z", "limit": 20}},
+    {"name": "search_timeline", "arguments": {"dimension": "dim:schedule", "window_start": "2026-10-05T00:00:00Z", "window_end": "2026-10-15T00:00:00Z", "limit": 20}}
+  ],
+  "rationale": "8 成员 bundle（本轮新写的 day/week 摘要：schedule/sleep/work_outcome 各 1 日 + 1 周，conversation 周摘要，device 周摘要）。摘要只是导航锚点：先读既有 AI 世界认知，再核对睡眠/工作产出/日程三条线的真实叶子证据（含刚入库的 10-14 睡眠观测），判断是否达到可闭合的持久模式门槛，或需要修订既有 Claim。"
+}

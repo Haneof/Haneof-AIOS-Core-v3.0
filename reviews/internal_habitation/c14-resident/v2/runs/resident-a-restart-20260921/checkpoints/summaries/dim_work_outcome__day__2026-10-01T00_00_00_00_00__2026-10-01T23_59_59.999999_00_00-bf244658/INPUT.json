@@ -1,0 +1,33 @@
+{
+  "dimension": "dim:work_outcome",
+  "granularity": "day",
+  "source_world_revision": 14,
+  "sources": [
+    {
+      "metadata": {
+        "dimension": "dim:work_outcome",
+        "external_record_id": "c14resv2-004",
+        "external_revision": "1",
+        "fixture_binding_version": "c14-fixture-event-binding-v1",
+        "fixture_event_id": "c14resv2-004",
+        "fixture_payload_sha256": "sha256:2f24bfb773de2ac7b74b85ba16b7eafc22f7370ed0601268cf35d5d9c611a5c5",
+        "fixture_projection_sha256": "sha256:1a8d5ee753df815c12755164ff6403a6983d3719a45a71ed525b9af2f1831581",
+        "fixture_sequence": 4,
+        "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+        "fixture_version": "c14-resident-fixture-v2",
+        "mechanical_ingest": true,
+        "occurred_at_original": "2026-10-01T10:28:00-07:00",
+        "source_class": "platform"
+      },
+      "object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43",
+      "object_type": "observation",
+      "occurred_at": "2026-10-01T17:28:00Z",
+      "revision": 1,
+      "text": "“架构备忘录”第一版于 10:16 提交；原计划工作块结束时间为 10:20。"
+    }
+  ],
+  "summary_key": "dim:work_outcome__day__2026-10-01T00:00:00+00:00__2026-10-01T23:59:59.999999+00:00",
+  "truncated": false,
+  "window_end": "2026-10-01T23:59:59.999999+00:00",
+  "window_start": "2026-10-01T00:00:00+00:00"
+}

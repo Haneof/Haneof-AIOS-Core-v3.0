@@ -1,0 +1,136 @@
+{
+  "capability_history": [
+    {
+      "call_id": null,
+      "data": [
+        {
+          "excerpt": "今天 06:25 航班；日历标记 05:52 出门。",
+          "object_ref": {
+            "object_id": "obs_c14_fixture_979fd7bab5a31f3239b61e0b",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-10-11T12:48:00Z"
+        },
+        {
+          "excerpt": "2026-10-09 工作产出（AI 认知记录，非现实观测）：本窗口仅含本 Resident 于 10-09T01:11Z 写入的一条 hypothesis 级 Claim「写作块交付与日程保护程度相关（截至 10-08 的 3 次观察）」及其证据集（9 条观测）；窗口内无新的现实工作产出观测。",
+          "object_ref": {
+            "object_id": "sum_9e81acf33a4abc28c291e3af",
+            "revision": 3
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-11T12:48:00Z"
+        },
+        {
+          "excerpt": "attention=background | source=cognitive_derivation | state=completed | priority=50 | hits=1 | termination=silence | rounds=2 | delivery=False | step0=background | capabilities=['read_ai_world', 'inspect_world_object', 'search_timeline', 'search_timeline']",
+          "object_ref": {
+            "object_id": "wake_7a5808cbfef6321783bf0cb3",
+            "revision": 3
+          },
+          "object_type": "wake",
+          "recorded_at": "2026-10-11T12:49:01Z"
+        },
+        {
+          "excerpt": "昨晚 23:18 入睡；05:53 醒来。",
+          "object_ref": {
+            "object_id": "obs_c14_fixture_8ae7dbd1147c788bb9a61bac",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-10-14T12:57:00Z"
+        },
+        {
+          "excerpt": "2026-10-05–10-11 当周会话：两次用户自述——10-06“下午接着写时，我先花了十来分钟重新找上午引用的那几张表”；10-09“今天上午人有点困，不过那份稿子没拖到下午”。",
+          "object_ref": {
+            "object_id": "sum_4be1eaf3e66c653974bfcad5",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-14T12:57:00Z"
+        },
+        {
+          "excerpt": "2026-10-05–10-11 当周设备活动：本周仅 10-08 有一条记录——08:13–10:34 处于专注模式，期间主动解锁 2 次、29 条通知被静音。",
+          "object_ref": {
+            "object_id": "sum_4e6bac8888303d595a2e4369",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-14T12:57:00Z"
+        },
+        {
+          "excerpt": "2026-10-11 睡眠：昨晚 22:57 入睡、05:39 醒来（约 6小时42分，按时钟推算）；本条记录未给睡眠评分。",
+          "object_ref": {
+            "object_id": "sum_873a0367c5fc243cc0805516",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-14T12:57:00Z"
+        },
+        {
+          "excerpt": "2026-10-11 日程：当天 06:25 有航班；日历把 05:52 标记为出门时间。",
+          "object_ref": {
+            "object_id": "sum_92ec74771acfa333332bf060",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-14T12:57:00Z"
+        },
+        {
+          "excerpt": "2026-10-11 工作产出（AI 认知记录，非现实观测）：本窗口只含本 Resident 对既有 hypothesis 级 Claim「写作块交付与日程保护程度相关」的修订（rev 2，证据集扩为 10 条观测，其中新增 10-09 会话自述）；窗口内无新的现实工作产出观测。",
+          "object_ref": {
+            "object_id": "sum_a2ec590b3d03001a606c1d72",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-14T12:57:00Z"
+        },
+        {
+          "excerpt": "2026-10-05–10-11 当周睡眠：三条记录——10-05 睡眠 7小时39分、评分 82/100、07:01 醒来；10-08 睡眠 5小时48分、评分 60/100、06:46 醒来；10-11 22:57 入睡、05:39 醒来（约 6小时42分，按时钟推算，本夜未给评分）。",
+          "object_ref": {
+            "object_id": "sum_bd425210f7a8c2f7e5842e39",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-14T12:57:00Z"
+        },
+        {
+          "excerpt": "2026-10-05–10-11 当周日程：三条记录——10-05 原定 08:30–10:45 的“定价说明起草”被 09:05 stand-up 与 09:50 供应商电话打断，剩余写作重排到 13:40–15:00；10-08 安排 08:15–10:35“设计评审稿”，11:20 前没有会议；10-11 为出行日，06:25 航班、日历标记 05:52 出门。",
+          "object_ref": {
+            "object_id": "sum_dd848bc286b3bd6c365f15b5",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-14T12:57:00Z"
+        },
+        {
+          "excerpt": "2026-10-05–10-11 当周工作产出：两条现实记录——10-05“定价说明”到 15:00 完成约 65%、余量移到次日上午；10-08“设计评审稿”于 10:31 完成、三个待决问题已在文档中给出处理方案。本周另含 AI 认知记录（非现实观测）：我 10-09 写入的 hypothesis 级 Claim「写作块交付与日程保护程度相关」及其 10-11 的 rev 2 修订（证据集扩至 10 条观测）。",
+          "object_ref": {
+            "object_id": "sum_dfa35021e2aa10da82941c27",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-14T12:57:00Z"
+        },
+        {
+          "excerpt": "attention=background | source=attention_bundle | state=completed | priority=50 | hits=8 | termination=silence | rounds=2 | delivery=False | step0=background | capabilities=['read_ai_world', 'search_timeline', 'search_timeline', 'search_timeline']",
+          "object_ref": {
+            "object_id": "wake_bundle_95f22e790bc266e0a4a5f5ee",
+            "revision": 3
+          },
+          "object_type": "wake",
+          "recorded_at": "2026-10-14T12:58:01Z"
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "name": "read_periodic_review_anchors",
+      "ok": true
+    }
+  ],
+  "directive": {
+    "rationale": "13 锚点复核（窗口 10-11T12:44Z→10-14T12:58Z）：既有认知只有 1 条 Claim（clm_79df61916b8bb4c10cb3faa3 rev2，写作块—日程保护假设），其现实证据（10-01/10-05/10-08 三次写作块 + 10-09 会话自述）在本窗口内没有新增同类观察，也没有出现反例，因此不修订、不确认、不回滚。窗口内新增的现实观测只有两条：10-11 出行日日程（06:25 航班/05:52 出门）与 10-14 睡眠（23:18 入睡、05:53 醒，约 6h35m，无评分）——都与该 Claim 的机制无关，不构成对其的检验。睡眠线仍是开放问题：5 个样本（7h44/84、7h39/82、5h48/60、~6h42 无评分、~6h35 无评分）继续发散且最近两夜缺评分、10-11 早班机为混淆因素，门槛未到，维持“暂不形成睡眠 Claim”。本轮我也没有可登记的“方法—后果”型操作经验：本窗口内我的操作（搜索/检视/修订）都已有明确记录，且没有出现需要据此调整方法的失败或代价。保持沉默。",
+    "silence": true
+  },
+  "round_index": 1,
+  "unit_key": "periodic-review-20261014T125801Z"
+}

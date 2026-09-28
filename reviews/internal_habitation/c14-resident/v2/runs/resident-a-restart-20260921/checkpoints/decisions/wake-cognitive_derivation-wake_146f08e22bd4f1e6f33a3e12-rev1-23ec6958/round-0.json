@@ -1,0 +1,10 @@
+{
+  "capability_calls": [
+    {"name": "read_ai_world", "arguments": {"limit": 50}},
+    {"name": "search_timeline", "arguments": {"dimension": "dim:work_outcome", "window_start": "2026-10-01T00:00:00Z", "window_end": "2026-10-09T12:00:00Z", "limit": 20}},
+    {"name": "search_timeline", "arguments": {"dimension": "dim:schedule", "window_start": "2026-10-01T00:00:00Z", "window_end": "2026-10-09T12:00:00Z", "limit": 20}},
+    {"name": "search_timeline", "arguments": {"dimension": "dim:device_activity", "window_start": "2026-10-01T00:00:00Z", "window_end": "2026-10-09T12:00:00Z", "limit": 20}},
+    {"name": "search_timeline", "arguments": {"dimension": "dim:conversation", "window_start": "2026-10-01T00:00:00Z", "window_end": "2026-10-09T12:00:00Z", "limit": 20}}
+  ],
+  "rationale": "10-08 日摘要 4 成员（REALITY）。跨日核对：写作块—专注模式—按时交付 vs 被会议打断—顺延，是否构成可支撑的持久模式，并确认无既存认知与反证。"
+}

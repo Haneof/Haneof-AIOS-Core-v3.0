@@ -1,0 +1,10 @@
+{
+  "capability_calls": [
+    {"name": "read_ai_world", "arguments": {"limit": 50}},
+    {"name": "retrieve_original_observation", "arguments": {"object_id": "obs_c14_fixture_b32d3cded992194438f114a9", "revision": 1}},
+    {"name": "retrieve_original_observation", "arguments": {"object_id": "obs_c14_fixture_3195efa3abad26d259380073", "revision": 1}},
+    {"name": "retrieve_original_observation", "arguments": {"object_id": "obs_c14_fixture_7422eaba53dc07eb87572e67", "revision": 1}},
+    {"name": "retrieve_original_observation", "arguments": {"object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43", "revision": 1}}
+  ],
+  "rationale": "C14 bundle(16 摘要)全部闭合到 2026-10-01 的 4 条 REALITY 观测。先核对现有 AI-world 认知与四条原始事实，再判断是否足以形成可修订的持久认知。"
+}

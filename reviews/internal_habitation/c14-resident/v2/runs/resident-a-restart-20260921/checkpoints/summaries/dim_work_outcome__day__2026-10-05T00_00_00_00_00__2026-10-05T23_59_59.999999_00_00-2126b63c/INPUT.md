@@ -1,0 +1,19 @@
+# DimensionSummaryInput — dim:work_outcome__day__2026-10-05T00:00:00+00:00__2026-10-05T23:59:59.999999+00:00
+
+- dimension: dim:work_outcome
+- granularity: day
+- window: 2026-10-05T00:00:00+00:00 .. 2026-10-05T23:59:59.999999+00:00
+- source_world_revision: 53
+- source_count: 1
+- truncated: False
+
+## sources (exact pinned material)
+
+### 1. obs_c14_fixture_35f8ca5c3abafa4ba5c8650a@1 (observation)
+
+- occurred_at: 2026-10-05T22:12:00Z
+- metadata: {"dimension": "dim:work_outcome", "external_record_id": "c14resv2-007", "external_revision": "1", "fixture_binding_version": "c14-fixture-event-binding-v1", "fixture_event_id": "c14resv2-007", "fixture_payload_sha256": "sha256:32f094bff092fbb61d30c09a4d0f078d7a1efdf7939c8dc1a91590f2e72bf926", "fixture_projection_sha256": "sha256:f4abbf49e37c209b749403008004e87e0533728999c8b0970836609499ae3167", "fixture_sequence": 7, "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253", "fixture_version": "c14-resident-fixture-v2", "mechanical_ingest": true, "occurred_at_original": "2026-10-05T15:12:00-07:00", "source_class": "platform"}
+
+```text
+“定价说明”到 15:00 完成约 65%；剩余部分移到次日上午继续。
+```

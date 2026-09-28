@@ -1,0 +1,71 @@
+{
+  "background_now": "2026-10-09T01:11:01+00:00",
+  "dispatches": [
+    {
+      "capability_calls": [
+        {
+          "error_code": null,
+          "name": "read_ai_world",
+          "ok": true
+        },
+        {
+          "error_code": null,
+          "name": "search_timeline",
+          "ok": true
+        },
+        {
+          "error_code": null,
+          "name": "search_timeline",
+          "ok": true
+        },
+        {
+          "error_code": null,
+          "name": "search_timeline",
+          "ok": true
+        },
+        {
+          "error_code": null,
+          "name": "search_timeline",
+          "ok": true
+        },
+        {
+          "error_code": null,
+          "name": "commit_claim",
+          "ok": true
+        }
+      ],
+      "delivery_suppressed": false,
+      "dispatched_wake_ref": "wake_bundle_71c8cb5b630bcdc3161fa4df@3",
+      "model_rounds": 3,
+      "response": null,
+      "silenced": true,
+      "step0_state": "background",
+      "termination_reason": "silence",
+      "unit": "wake-cognitive_derivation-wake_146f08e22bd4f1e6f33a3e12-rev1",
+      "wake_state": "completed"
+    }
+  ],
+  "index_watermark": 82,
+  "now": "2026-10-09T01:10:00+00:00",
+  "periodic_review": null,
+  "status": "processed",
+  "summary_commits": [
+    {
+      "object_id": "sum_5d6e8d21ef5837c282e05308",
+      "revision": 1
+    },
+    {
+      "object_id": "sum_9d7d45f32dfdab461b21eabe",
+      "revision": 1
+    },
+    {
+      "object_id": "sum_f25eb0e55e8258fb59baf085",
+      "revision": 1
+    },
+    {
+      "object_id": "sum_4c759aebb39172f506fd747e",
+      "revision": 1
+    }
+  ],
+  "world_revision": 82
+}

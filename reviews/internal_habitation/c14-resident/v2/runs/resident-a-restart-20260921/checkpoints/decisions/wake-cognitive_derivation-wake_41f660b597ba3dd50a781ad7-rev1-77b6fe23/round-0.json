@@ -1,0 +1,10 @@
+{
+  "capability_calls": [
+    {"name": "read_ai_world", "arguments": {"limit": 20}},
+    {"name": "search_timeline", "arguments": {"dimension": "dim:work_outcome", "window_start": "2026-10-01T00:00:00Z", "window_end": "2026-10-22T00:00:00Z", "limit": 25}},
+    {"name": "search_timeline", "arguments": {"dimension": "dim:schedule", "window_start": "2026-10-01T00:00:00Z", "window_end": "2026-10-22T00:00:00Z", "limit": 25}},
+    {"name": "search_timeline", "arguments": {"dimension": "dim:device_activity", "window_start": "2026-10-01T00:00:00Z", "window_end": "2026-10-22T00:00:00Z", "limit": 25}},
+    {"name": "search_timeline", "arguments": {"dimension": "dim:conversation", "window_start": "2026-10-01T00:00:00Z", "window_end": "2026-10-22T00:00:00Z", "limit": 25}}
+  ],
+  "rationale": "2 成员（10-19 日程与睡眠日摘要，REALITY）。摘要只是锚点：本 run 已累积三次写作块观察（10-01/10-05/10-08），其中两次受保护、一次被会议插入，我需要用四个维度的全序列重新核对条件—结果结构、是否存在反例（例如被插入仍按时交付、或受保护仍顺延），再判断本 run 是否应首次形成持久 Claim（以及证据 refs 的准确 id/revision）。"
+}

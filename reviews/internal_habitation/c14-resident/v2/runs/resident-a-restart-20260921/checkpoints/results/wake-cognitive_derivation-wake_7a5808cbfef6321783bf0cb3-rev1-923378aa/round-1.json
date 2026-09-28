@@ -1,0 +1,135 @@
+{
+  "capability_history": [
+    {
+      "call_id": null,
+      "data": [],
+      "error_code": null,
+      "error_message": null,
+      "name": "read_ai_world",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": {
+        "claim_refs": [],
+        "content": "2026-10-09 工作产出（AI 认知记录，非现实观测）：本窗口仅含本 Resident 于 10-09T01:11Z 写入的一条 hypothesis 级 Claim「写作块交付与日程保护程度相关（截至 10-08 的 3 次观察）」及其证据集（9 条观测）；窗口内无新的现实工作产出观测。",
+        "coverage": {
+          "dimension": "dim:work_outcome",
+          "source_count": 2,
+          "truncated": false
+        },
+        "created_by": "dimension_summary:model",
+        "dimension_ref": null,
+        "evidence_set_ref": null,
+        "granularity": "day",
+        "learned_at": "2026-10-11T12:48:00Z",
+        "metadata": {
+          "dimension": "dim:work_outcome",
+          "summary_kind": "single_dimension_temporal"
+        },
+        "object_id": "sum_9e81acf33a4abc28c291e3af",
+        "object_type": "summary",
+        "occurred": {
+          "end": "2026-10-09T23:59:59.999999Z",
+          "precision": "day",
+          "start": "2026-10-09T00:00:00Z",
+          "timezone_name": null,
+          "unknown": false
+        },
+        "recorded_at": "2026-10-11T12:48:00Z",
+        "revision": 3,
+        "source_refs": [
+          {
+            "object_id": "clm_79df61916b8bb4c10cb3faa3",
+            "revision": 2,
+            "source_locator": null
+          },
+          {
+            "object_id": "evs_fc254abd76b116a56bb77c04",
+            "revision": 1,
+            "source_locator": null
+          }
+        ],
+        "source_world_revision": 95,
+        "status": "active",
+        "subject_id": "user_1",
+        "summary_status": "current",
+        "summary_time": {
+          "end": "2026-10-09T23:59:59.999999Z",
+          "precision": "day",
+          "start": "2026-10-09T00:00:00Z",
+          "timezone_name": null,
+          "unknown": false
+        }
+      },
+      "error_code": null,
+      "error_message": null,
+      "name": "inspect_world_object",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": [
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "2026-10-09 工作产出（AI 认知记录，非现实观测）：本窗口仅含本 Resident 于 10-09T01:11Z 写入的一条 hypothesis 级 Claim「写作块交付与日程保护程度相关（截至 10-08 的 3 次观察）」及其证据集（9 条观测）；窗口内无新的现实工作产出观测。",
+          "object_id": "sum_9e81acf33a4abc28c291e3af",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 3
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "写作块交付与日程保护程度相关（截至 10-09 的 3 次观察）：未被会议插入的写作块——10-01“架构备忘录起草”08:00–10:20、10-08“设计评审稿”08:15–10:35——都在计划区间内完成（10:16 / 10:31 提交），且整块处于专注模式（主动解锁 3 / 2 次，静音通知 26 / 29 条）；被会议插入的一次——10-05“定价说明起草”08:30–10:45 期间",
+          "object_id": "clm_79df61916b8bb4c10cb3faa3",
+          "object_type": "claim",
+          "retrieval_score": 0,
+          "revision": 2
+        },
+        {
+          "dimension": "dim:work_outcome",
+          "excerpt": "",
+          "object_id": "evs_fc254abd76b116a56bb77c04",
+          "object_type": "evidence_set",
+          "retrieval_score": 0,
+          "revision": 1
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "name": "search_timeline",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": [
+        {
+          "dimension": "dim:conversation",
+          "excerpt": "用户说：“今天上午人有点困，不过那份稿子没拖到下午。”",
+          "object_id": "obs_c14_fixture_f3557413048807b17b9487bc",
+          "object_type": "observation",
+          "retrieval_score": 0,
+          "revision": 1
+        },
+        {
+          "dimension": "dim:conversation",
+          "excerpt": "2026-10-09 会话：用户自述“今天上午人有点困，不过那份稿子没拖到下午”。",
+          "object_id": "sum_eb6c6e069e53ce16d9e3c4d4",
+          "object_type": "summary",
+          "retrieval_score": 0,
+          "revision": 1
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "name": "search_timeline",
+      "ok": true
+    }
+  ],
+  "directive": {
+    "rationale": "本轮 wake 由 10-09 work_outcome 摘要重写（rev3）触发，但该 rev3 只是我 10-09 claim 修订的派生：inspect 显示其 source_refs=clm_79df61916b8bb4c10cb3faa3@2 + evs_fc254abd76b116a56bb77c04@1，文本仍是 S14 我按当时 claim rev1 写的旧文（“截至 10-08 的 3 次观察…9 条观测”），属导航锚点而非结论证据；当前认知以 claim rev2 自身内容为准（截至 10-09、10 条观测、已含“……困……仍按计划交付”），我不以摘要文本为据改认知。窗口核查：dim:work_outcome 的 10-09 只有摘要 rev3 + 我的 claim rev2 + 证据集，无新的现实工作产出观测；dim:conversation 的 10-09 只有用户自述观测与其会话摘要，该自述早在 S14 已折入 claim rev2 的证据集；read_ai_world 为空（无其它 AI 世界认知）。既无新增可闭合的非摘要现实证据，也无反证，故不形成、不修订、不撤回认知，本轮保持沉默。",
+    "silence": true
+  },
+  "round_index": 1,
+  "unit_key": "wake-cognitive_derivation-wake_7a5808cbfef6321783bf0cb3-rev1"
+}

@@ -1,0 +1,109 @@
+{
+  "capability_history": [
+    {
+      "call_id": null,
+      "data": [
+        {
+          "excerpt": "原定 08:30–10:45 的“定价说明起草”中间新增 09:05 stand-up 和 09:50 供应商电话；剩余写作时间分到 13:40–15:00。",
+          "object_ref": {
+            "object_id": "obs_c14_fixture_8a41a59c20d2aac5789bf0f1",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-10-05T15:18:00Z"
+        },
+        {
+          "excerpt": "“定价说明”到 15:00 完成约 65%；剩余部分移到次日上午继续。",
+          "object_ref": {
+            "object_id": "obs_c14_fixture_35f8ca5c3abafa4ba5c8650a",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-10-05T22:12:00Z"
+        },
+        {
+          "excerpt": "用户说：“下午接着写时，我先花了十来分钟重新找上午引用的那几张表。”",
+          "object_ref": {
+            "object_id": "obs_c14_fixture_0ca259ffc10ff4a9218561d0",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-10-06T01:35:00Z"
+        },
+        {
+          "excerpt": "2026-10-05 睡眠：昨夜睡眠 7小时39分；睡眠评分 82/100；07:01 醒来。",
+          "object_ref": {
+            "object_id": "sum_19956149ea838d569521c7da",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-06T01:35:00Z"
+        },
+        {
+          "excerpt": "2026-10-05 日程：原定 08:30–10:45 的“定价说明起草”被 09:05 stand-up 与 09:50 供应商电话打断；剩余写作时间被重排到 13:40–15:00。",
+          "object_ref": {
+            "object_id": "sum_4aa1c0fba96ed70142807f77",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-06T01:35:00Z"
+        },
+        {
+          "excerpt": "2026-10-05 工作产出：“定价说明”到 15:00 完成约 65%；剩余部分移到次日上午继续。",
+          "object_ref": {
+            "object_id": "sum_612659baec6788b7aef2647d",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-06T01:35:00Z"
+        },
+        {
+          "excerpt": "attention=background | source=attention_bundle | state=completed | priority=50 | hits=3 | termination=silence | rounds=2 | delivery=False | step0=background | capabilities=['read_ai_world']",
+          "object_ref": {
+            "object_id": "wake_bundle_cf33cc336ac0040cebfee9d9",
+            "revision": 3
+          },
+          "object_type": "wake",
+          "recorded_at": "2026-10-06T01:36:01Z"
+        },
+        {
+          "excerpt": "昨晚睡眠 5小时48分；睡眠评分 60/100；06:46 醒来。",
+          "object_ref": {
+            "object_id": "obs_c14_fixture_056dddd04850d813437e8532",
+            "revision": 1
+          },
+          "object_type": "observation",
+          "recorded_at": "2026-10-08T13:52:00Z"
+        },
+        {
+          "excerpt": "2026-10-06 会话：用户自述“下午接着写时，我先花了十来分钟重新找上午引用的那几张表”。",
+          "object_ref": {
+            "object_id": "sum_1e132e64b28b81ce5c303291",
+            "revision": 1
+          },
+          "object_type": "summary",
+          "recorded_at": "2026-10-08T13:52:00Z"
+        },
+        {
+          "excerpt": "attention=background | source=cognitive_derivation | state=completed | priority=50 | hits=1 | termination=silence | rounds=1 | delivery=False | step0=background | capabilities=[]",
+          "object_ref": {
+            "object_id": "wake_400ea8877e999e1c3902995d",
+            "revision": 3
+          },
+          "object_type": "wake",
+          "recorded_at": "2026-10-08T13:53:01Z"
+        }
+      ],
+      "error_code": null,
+      "error_message": null,
+      "name": "read_periodic_review_anchors",
+      "ok": true
+    }
+  ],
+  "directive": {
+    "rationale": "锚点复核（10 条）：无既存认知可修订/确认/回滚。新证据=10-05 三条日摘要、会话自述（续写重找表格十余分钟）、10-08 短睡（5h48m/60，第三个睡眠样本）。三点判断：(1) 睡眠三次样本发散（7h44/84、7h39/82、5h48/60），不支持“稳定模式”Claim，仅可得到近乎复述的范围描述，价值低；(2) 打断—恢复摩擦仅有用户一次自述，缺方法—结果对应，不足以按真实结果引用登记操作经验；(3) 未注册 attention watch：Periodic Review 已把会话观测作为锚点带入，重复登记只增机械噪声。保持沉默；若第 4 个睡眠样本继续落在 7h40/83 区间，将用跨观测 evidence_refs 形成有界基线 Claim。",
+    "silence": true
+  },
+  "round_index": 1,
+  "unit_key": "periodic-review-20261008T135301Z"
+}

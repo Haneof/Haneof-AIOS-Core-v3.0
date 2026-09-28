@@ -1,0 +1,33 @@
+{
+  "dimension": "dim:sleep",
+  "granularity": "day",
+  "source_world_revision": 156,
+  "sources": [
+    {
+      "metadata": {
+        "dimension": "dim:sleep",
+        "external_record_id": "c14resv2-020",
+        "external_revision": "1",
+        "fixture_binding_version": "c14-fixture-event-binding-v1",
+        "fixture_event_id": "c14resv2-020",
+        "fixture_payload_sha256": "sha256:aaa9232dffd94b88dfb6054c9758f3448b2a20ea084915e5c3eb0f4c53d9170c",
+        "fixture_projection_sha256": "sha256:3c422ca36ecd955fea23e26812d42de8d0ca6a9a625dcfd19735ce6d1b3a5bf4",
+        "fixture_sequence": 20,
+        "fixture_sha256": "sha256:1fb973499664d0d71d94a7b94071e3d7210395ea6a54ec4dcbb1ba115d069253",
+        "fixture_version": "c14-resident-fixture-v2",
+        "mechanical_ingest": true,
+        "occurred_at_original": "2026-10-19T08:38:00-07:00",
+        "source_class": "sensor"
+      },
+      "object_id": "obs_c14_fixture_76d93e859e7e0873ed9ba7e4",
+      "object_type": "observation",
+      "occurred_at": "2026-10-19T15:38:00Z",
+      "revision": 1,
+      "text": "昨晚睡眠 8小时09分；08:34 醒来。"
+    }
+  ],
+  "summary_key": "dim:sleep__day__2026-10-19T00:00:00+00:00__2026-10-19T23:59:59.999999+00:00",
+  "truncated": false,
+  "window_end": "2026-10-19T23:59:59.999999+00:00",
+  "window_start": "2026-10-19T00:00:00+00:00"
+}

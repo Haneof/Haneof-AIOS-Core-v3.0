@@ -1,0 +1,1202 @@
+{
+  "claims_ai_self": [],
+  "claims_user": [],
+  "dimensions": [],
+  "entities": [],
+  "events": [],
+  "goals": [],
+  "index_lag": 0,
+  "index_watermark": 47,
+  "observations": [
+    {
+      "content": null,
+      "object_id": "obs_c14_fixture_b32d3cded992194438f114a9",
+      "recorded_at": "2026-10-01T14:12:00Z",
+      "revision": 1,
+      "status": null
+    },
+    {
+      "content": null,
+      "object_id": "obs_c14_fixture_3195efa3abad26d259380073",
+      "recorded_at": "2026-10-01T14:48:00Z",
+      "revision": 1,
+      "status": null
+    },
+    {
+      "content": null,
+      "object_id": "obs_c14_fixture_7422eaba53dc07eb87572e67",
+      "recorded_at": "2026-10-01T17:22:00Z",
+      "revision": 1,
+      "status": null
+    },
+    {
+      "content": null,
+      "object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43",
+      "recorded_at": "2026-10-01T17:28:00Z",
+      "revision": 1,
+      "status": null
+    },
+    {
+      "content": null,
+      "object_id": "obs_c14_fixture_27ab6246ef0865debe1b49af",
+      "recorded_at": "2026-10-05T14:06:00Z",
+      "revision": 1,
+      "status": null
+    },
+    {
+      "content": null,
+      "object_id": "obs_c14_fixture_8a41a59c20d2aac5789bf0f1",
+      "recorded_at": "2026-10-05T15:18:00Z",
+      "revision": 1,
+      "status": null
+    }
+  ],
+  "operation_experiences": [],
+  "pending_wakes": 0,
+  "policies": [],
+  "summaries": [
+    {
+      "content": "2026-10-01 工作产出：“架构备忘录”第一版于 10:16 提交；原计划工作块结束时间为 10:20。",
+      "object_id": "sum_03a94f689d069e0bbb5c1eb4",
+      "recorded_at": "2026-10-05T14:06:00Z",
+      "revision": 1,
+      "status": "current"
+    },
+    {
+      "content": "2026-09-28–10-04 当周日程：本周仅 10-01 有一条日程记录——08:00–10:20 为“架构备忘录起草”工作块，当天第一场会议在 10:45。",
+      "object_id": "sum_468fbdd51f43bbb37ed8a3ad",
+      "recorded_at": "2026-10-05T14:06:00Z",
+      "revision": 1,
+      "status": "current"
+    },
+    {
+      "content": "2026-Q3（07-01–09-30）设备活动：本季度窗口内仅含一份下级摘要（09-28–10-04 周摘要）：该周唯一记录为 10-01 的 08:02–10:18 专注模式（主动解锁 3 次、26 条通知被静音）。",
+      "object_id": "sum_505a097545911c054e48720a",
+      "recorded_at": "2026-10-05T14:06:00Z",
+      "revision": 1,
+      "status": "current"
+    },
+    {
+      "content": "2026-10-01 设备活动：08:02–10:18 处于专注模式；该时段内主动解锁设备 3 次，26 条通知被静音。",
+      "object_id": "sum_53d509d86786bde8d0e84da3",
+      "recorded_at": "2026-10-05T14:06:00Z",
+      "revision": 1,
+      "status": "current"
+    },
+    {
+      "content": "2026-09 设备活动：本月窗口内仅含一份下级摘要（09-28–10-04 周摘要）：该周唯一记录为 10-01 的 08:02–10:18 专注模式，期间主动解锁设备 3 次、26 条通知被静音。",
+      "object_id": "sum_621dbad73aff86b121ff5f4d",
+      "recorded_at": "2026-10-05T14:06:00Z",
+      "revision": 1,
+      "status": "current"
+    },
+    {
+      "content": "2026-09 工作产出：本月窗口内仅含一份下级摘要（09-28–10-04 周摘要）：该周唯一记录为 10-01 的“架构备忘录”第一版 10:16 提交、原计划工作块结束时间 10:20。",
+      "object_id": "sum_66e44044c780170d4b893177",
+      "recorded_at": "2026-10-05T14:06:00Z",
+      "revision": 1,
+      "status": "current"
+    },
+    {
+      "content": "2026-Q3（07-01–09-30）睡眠：本季度窗口内仅含一份下级摘要（09-28–10-04 周摘要）：该周唯一睡眠记录为 10-01 的 7小时44分、评分 84/100、07:08 醒来。",
+      "object_id": "sum_739da506a4c4d81ac3de0421",
+      "recorded_at": "2026-10-05T14:06:00Z",
+      "revision": 1,
+      "status": "current"
+    },
+    {
+      "content": "2026-09-28–10-04 当周睡眠：本周仅 10-01 有一条睡眠记录——睡眠 7小时44分，评分 84/100，07:08 醒来。",
+      "object_id": "sum_7f9c1dda2a76a9f3e2a5f087",
+      "recorded_at": "2026-10-05T14:06:00Z",
+      "revision": 1,
+      "status": "current"
+    },
+    {
+      "content": "2026-Q3（07-01–09-30）日程：本季度窗口内仅含一份下级摘要（09-28–10-04 周摘要）：该周唯一日程记录为 10-01 的 08:00–10:20“架构备忘录起草”工作块、首场会议 10:45。",
+      "object_id": "sum_97e12742d2d5a6bb6fced32b",
+      "recorded_at": "2026-10-05T14:06:00Z",
+      "revision": 1,
+      "status": "current"
+    },
+    {
+      "content": "2026-09-28–10-04 当周工作产出：本周仅 10-01 有一条记录——“架构备忘录”第一版于 10:16 提交，原计划工作块结束时间为 10:20。",
+      "object_id": "sum_a5cfe5e5f052c7b9969486ad",
+      "recorded_at": "2026-10-05T14:06:00Z",
+      "revision": 1,
+      "status": "current"
+    },
+    {
+      "content": "2026-09 日程：本月窗口内仅含一份下级摘要（09-28–10-04 周摘要）：该周唯一日程记录为 10-01 的 08:00–10:20“架构备忘录起草”工作块，当天首场会议 10:45。",
+      "object_id": "sum_c4e7d293d66b59d87731d65d",
+      "recorded_at": "2026-10-05T14:06:00Z",
+      "revision": 1,
+      "status": "current"
+    },
+    {
+      "content": "2026-Q3（07-01–09-30）工作产出：本季度窗口内仅含一份下级摘要（09-28–10-04 周摘要）：该周唯一记录为 10-01 的“架构备忘录”第一版 10:16 提交、原计划工作块结束 10:20。",
+      "object_id": "sum_dec542116cba49b459db613c",
+      "recorded_at": "2026-10-05T14:06:00Z",
+      "revision": 1,
+      "status": "current"
+    },
+    {
+      "content": "2026-10-01 睡眠：昨夜睡眠 7小时44分；睡眠评分 84/100；07:08 醒来。",
+      "object_id": "sum_e4577fa411beaabd5bb78300",
+      "recorded_at": "2026-10-05T14:06:00Z",
+      "revision": 1,
+      "status": "current"
+    },
+    {
+      "content": "2026-10-01 日程：08:00–10:20 为“架构备忘录起草”工作块；当天第一场会议安排在 10:45。",
+      "object_id": "sum_eceb678add8634ee26b63e49",
+      "recorded_at": "2026-10-05T14:06:00Z",
+      "revision": 1,
+      "status": "current"
+    },
+    {
+      "content": "2026-09 睡眠：本月窗口内仅含一份下级摘要（09-28–10-04 周摘要）：该周唯一睡眠记录为 10-01 的睡眠 7小时44分、评分 84/100、07:08 醒来。",
+      "object_id": "sum_f222693ff55566369177b6e8",
+      "recorded_at": "2026-10-05T14:06:00Z",
+      "revision": 1,
+      "status": "current"
+    },
+    {
+      "content": "2026-09-28–10-04 当周设备活动：本周仅 10-01 有一条记录——08:02–10:18 处于专注模式，期间主动解锁设备 3 次、26 条通知被静音。",
+      "object_id": "sum_fa279a5040c9a67efcae4f10",
+      "recorded_at": "2026-10-05T14:06:00Z",
+      "revision": 1,
+      "status": "current"
+    }
+  ],
+  "tasks": [],
+  "wakes": [
+    {
+      "attention_bundle": null,
+      "dedupe_key": "periodic-review:user_1:2026-10-01T14:13:01+00:00",
+      "first_hit_at": "2026-10-01T14:13:01Z",
+      "hit_count": 3,
+      "last_hit_at": "2026-10-01T14:13:01Z",
+      "priority": 10,
+      "revision": 3,
+      "runtime_incomplete_attempts": null,
+      "state": "completed",
+      "summary_ref": null,
+      "termination_reason": "silence",
+      "wake_id": "wake_review_13b06fe40c7f02ff9937095e",
+      "wake_source": "periodic_review"
+    },
+    {
+      "attention_bundle": null,
+      "dedupe_key": "c14:cognitive-derivation:sum_dec542116cba49b459db613c:1",
+      "first_hit_at": "2026-10-05T14:06:00Z",
+      "hit_count": 1,
+      "last_hit_at": "2026-10-05T14:06:00Z",
+      "priority": 50,
+      "revision": 2,
+      "runtime_incomplete_attempts": null,
+      "state": "merged",
+      "summary_ref": {
+        "object_id": "sum_dec542116cba49b459db613c",
+        "revision": 1
+      },
+      "termination_reason": null,
+      "wake_id": "wake_1cf110c3441735516a8f1266",
+      "wake_source": "cognitive_derivation"
+    },
+    {
+      "attention_bundle": null,
+      "dedupe_key": "c14:cognitive-derivation:sum_f222693ff55566369177b6e8:1",
+      "first_hit_at": "2026-10-05T14:06:00Z",
+      "hit_count": 1,
+      "last_hit_at": "2026-10-05T14:06:00Z",
+      "priority": 50,
+      "revision": 2,
+      "runtime_incomplete_attempts": null,
+      "state": "merged",
+      "summary_ref": {
+        "object_id": "sum_f222693ff55566369177b6e8",
+        "revision": 1
+      },
+      "termination_reason": null,
+      "wake_id": "wake_1dac3b813663d671f9bfffc0",
+      "wake_source": "cognitive_derivation"
+    },
+    {
+      "attention_bundle": null,
+      "dedupe_key": "c14:cognitive-derivation:sum_e4577fa411beaabd5bb78300:1",
+      "first_hit_at": "2026-10-05T14:06:00Z",
+      "hit_count": 1,
+      "last_hit_at": "2026-10-05T14:06:00Z",
+      "priority": 50,
+      "revision": 2,
+      "runtime_incomplete_attempts": null,
+      "state": "merged",
+      "summary_ref": {
+        "object_id": "sum_e4577fa411beaabd5bb78300",
+        "revision": 1
+      },
+      "termination_reason": null,
+      "wake_id": "wake_2ca47c209c21344189035d9b",
+      "wake_source": "cognitive_derivation"
+    },
+    {
+      "attention_bundle": null,
+      "dedupe_key": "c14:cognitive-derivation:sum_7f9c1dda2a76a9f3e2a5f087:1",
+      "first_hit_at": "2026-10-05T14:06:00Z",
+      "hit_count": 1,
+      "last_hit_at": "2026-10-05T14:06:00Z",
+      "priority": 50,
+      "revision": 2,
+      "runtime_incomplete_attempts": null,
+      "state": "merged",
+      "summary_ref": {
+        "object_id": "sum_7f9c1dda2a76a9f3e2a5f087",
+        "revision": 1
+      },
+      "termination_reason": null,
+      "wake_id": "wake_31ce5cce61a634f4b44e8c03",
+      "wake_source": "cognitive_derivation"
+    },
+    {
+      "attention_bundle": null,
+      "dedupe_key": "c14:cognitive-derivation:sum_97e12742d2d5a6bb6fced32b:1",
+      "first_hit_at": "2026-10-05T14:06:00Z",
+      "hit_count": 1,
+      "last_hit_at": "2026-10-05T14:06:00Z",
+      "priority": 50,
+      "revision": 2,
+      "runtime_incomplete_attempts": null,
+      "state": "merged",
+      "summary_ref": {
+        "object_id": "sum_97e12742d2d5a6bb6fced32b",
+        "revision": 1
+      },
+      "termination_reason": null,
+      "wake_id": "wake_40fbe5c5feb965984b4905e4",
+      "wake_source": "cognitive_derivation"
+    },
+    {
+      "attention_bundle": null,
+      "dedupe_key": "c14:cognitive-derivation:sum_53d509d86786bde8d0e84da3:1",
+      "first_hit_at": "2026-10-05T14:06:00Z",
+      "hit_count": 1,
+      "last_hit_at": "2026-10-05T14:06:00Z",
+      "priority": 50,
+      "revision": 2,
+      "runtime_incomplete_attempts": null,
+      "state": "merged",
+      "summary_ref": {
+        "object_id": "sum_53d509d86786bde8d0e84da3",
+        "revision": 1
+      },
+      "termination_reason": null,
+      "wake_id": "wake_44319538fd0ba163f5fefa8b",
+      "wake_source": "cognitive_derivation"
+    },
+    {
+      "attention_bundle": null,
+      "dedupe_key": "c14:cognitive-derivation:sum_eceb678add8634ee26b63e49:1",
+      "first_hit_at": "2026-10-05T14:06:00Z",
+      "hit_count": 1,
+      "last_hit_at": "2026-10-05T14:06:00Z",
+      "priority": 50,
+      "revision": 2,
+      "runtime_incomplete_attempts": null,
+      "state": "merged",
+      "summary_ref": {
+        "object_id": "sum_eceb678add8634ee26b63e49",
+        "revision": 1
+      },
+      "termination_reason": null,
+      "wake_id": "wake_4509ff1ef84b6e572ee2d2eb",
+      "wake_source": "cognitive_derivation"
+    },
+    {
+      "attention_bundle": null,
+      "dedupe_key": "c14:cognitive-derivation:sum_fa279a5040c9a67efcae4f10:1",
+      "first_hit_at": "2026-10-05T14:06:00Z",
+      "hit_count": 1,
+      "last_hit_at": "2026-10-05T14:06:00Z",
+      "priority": 50,
+      "revision": 2,
+      "runtime_incomplete_attempts": null,
+      "state": "merged",
+      "summary_ref": {
+        "object_id": "sum_fa279a5040c9a67efcae4f10",
+        "revision": 1
+      },
+      "termination_reason": null,
+      "wake_id": "wake_4c26be6bfe6a8376dd9a7400",
+      "wake_source": "cognitive_derivation"
+    },
+    {
+      "attention_bundle": null,
+      "dedupe_key": "c14:cognitive-derivation:sum_a5cfe5e5f052c7b9969486ad:1",
+      "first_hit_at": "2026-10-05T14:06:00Z",
+      "hit_count": 1,
+      "last_hit_at": "2026-10-05T14:06:00Z",
+      "priority": 50,
+      "revision": 2,
+      "runtime_incomplete_attempts": null,
+      "state": "merged",
+      "summary_ref": {
+        "object_id": "sum_a5cfe5e5f052c7b9969486ad",
+        "revision": 1
+      },
+      "termination_reason": null,
+      "wake_id": "wake_5e175b582adf2670b8640067",
+      "wake_source": "cognitive_derivation"
+    },
+    {
+      "attention_bundle": null,
+      "dedupe_key": "c14:cognitive-derivation:sum_c4e7d293d66b59d87731d65d:1",
+      "first_hit_at": "2026-10-05T14:06:00Z",
+      "hit_count": 1,
+      "last_hit_at": "2026-10-05T14:06:00Z",
+      "priority": 50,
+      "revision": 2,
+      "runtime_incomplete_attempts": null,
+      "state": "merged",
+      "summary_ref": {
+        "object_id": "sum_c4e7d293d66b59d87731d65d",
+        "revision": 1
+      },
+      "termination_reason": null,
+      "wake_id": "wake_8484ca9e8d0cf8ebb2fc76cc",
+      "wake_source": "cognitive_derivation"
+    },
+    {
+      "attention_bundle": null,
+      "dedupe_key": "c14:cognitive-derivation:sum_468fbdd51f43bbb37ed8a3ad:1",
+      "first_hit_at": "2026-10-05T14:06:00Z",
+      "hit_count": 1,
+      "last_hit_at": "2026-10-05T14:06:00Z",
+      "priority": 50,
+      "revision": 2,
+      "runtime_incomplete_attempts": null,
+      "state": "merged",
+      "summary_ref": {
+        "object_id": "sum_468fbdd51f43bbb37ed8a3ad",
+        "revision": 1
+      },
+      "termination_reason": null,
+      "wake_id": "wake_96326dd0c6fdcb898e09c81e",
+      "wake_source": "cognitive_derivation"
+    },
+    {
+      "attention_bundle": null,
+      "dedupe_key": "c14:cognitive-derivation:sum_621dbad73aff86b121ff5f4d:1",
+      "first_hit_at": "2026-10-05T14:06:00Z",
+      "hit_count": 1,
+      "last_hit_at": "2026-10-05T14:06:00Z",
+      "priority": 50,
+      "revision": 2,
+      "runtime_incomplete_attempts": null,
+      "state": "merged",
+      "summary_ref": {
+        "object_id": "sum_621dbad73aff86b121ff5f4d",
+        "revision": 1
+      },
+      "termination_reason": null,
+      "wake_id": "wake_a8c1c1c8cd9f9c73210594bb",
+      "wake_source": "cognitive_derivation"
+    },
+    {
+      "attention_bundle": null,
+      "dedupe_key": "c14:cognitive-derivation:sum_739da506a4c4d81ac3de0421:1",
+      "first_hit_at": "2026-10-05T14:06:00Z",
+      "hit_count": 1,
+      "last_hit_at": "2026-10-05T14:06:00Z",
+      "priority": 50,
+      "revision": 2,
+      "runtime_incomplete_attempts": null,
+      "state": "merged",
+      "summary_ref": {
+        "object_id": "sum_739da506a4c4d81ac3de0421",
+        "revision": 1
+      },
+      "termination_reason": null,
+      "wake_id": "wake_bfa9f60137a17b054ac3a879",
+      "wake_source": "cognitive_derivation"
+    },
+    {
+      "attention_bundle": {
+        "execution_contract": "c14_cognitive_derivation",
+        "member_count": 16,
+        "members": [
+          {
+            "derived_lineage": {
+              "classification": "REALITY",
+              "grounding_leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43",
+                  "revision": 1
+                }
+              ],
+              "has_ai_cognition": false,
+              "has_maintenance": false,
+              "has_reality": true,
+              "issues": [],
+              "leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43",
+                  "revision": 1
+                }
+              ],
+              "unresolved_refs": []
+            },
+            "granularity": "quarter",
+            "hit_count": 1,
+            "priority": 50,
+            "rule_id": "c14.summary_revision.cognitive_derivation",
+            "summary_dimension": "dim:work_outcome",
+            "summary_ref": {
+              "object_id": "sum_dec542116cba49b459db613c",
+              "revision": 1
+            },
+            "summary_window": {
+              "end": "2026-09-30T23:59:59.999999Z",
+              "precision": "quarter",
+              "start": "2026-07-01T00:00:00Z",
+              "timezone_name": null,
+              "unknown": false
+            },
+            "wake_ref": {
+              "object_id": "wake_1cf110c3441735516a8f1266",
+              "revision": 1
+            },
+            "wake_source": "cognitive_derivation"
+          },
+          {
+            "derived_lineage": {
+              "classification": "REALITY",
+              "grounding_leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_b32d3cded992194438f114a9",
+                  "revision": 1
+                }
+              ],
+              "has_ai_cognition": false,
+              "has_maintenance": false,
+              "has_reality": true,
+              "issues": [],
+              "leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_b32d3cded992194438f114a9",
+                  "revision": 1
+                }
+              ],
+              "unresolved_refs": []
+            },
+            "granularity": "month",
+            "hit_count": 1,
+            "priority": 50,
+            "rule_id": "c14.summary_revision.cognitive_derivation",
+            "summary_dimension": "dim:sleep",
+            "summary_ref": {
+              "object_id": "sum_f222693ff55566369177b6e8",
+              "revision": 1
+            },
+            "summary_window": {
+              "end": "2026-09-30T23:59:59.999999Z",
+              "precision": "month",
+              "start": "2026-09-01T00:00:00Z",
+              "timezone_name": null,
+              "unknown": false
+            },
+            "wake_ref": {
+              "object_id": "wake_1dac3b813663d671f9bfffc0",
+              "revision": 1
+            },
+            "wake_source": "cognitive_derivation"
+          },
+          {
+            "derived_lineage": {
+              "classification": "REALITY",
+              "grounding_leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_b32d3cded992194438f114a9",
+                  "revision": 1
+                }
+              ],
+              "has_ai_cognition": false,
+              "has_maintenance": false,
+              "has_reality": true,
+              "issues": [],
+              "leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_b32d3cded992194438f114a9",
+                  "revision": 1
+                }
+              ],
+              "unresolved_refs": []
+            },
+            "granularity": "day",
+            "hit_count": 1,
+            "priority": 50,
+            "rule_id": "c14.summary_revision.cognitive_derivation",
+            "summary_dimension": "dim:sleep",
+            "summary_ref": {
+              "object_id": "sum_e4577fa411beaabd5bb78300",
+              "revision": 1
+            },
+            "summary_window": {
+              "end": "2026-10-01T23:59:59.999999Z",
+              "precision": "day",
+              "start": "2026-10-01T00:00:00Z",
+              "timezone_name": null,
+              "unknown": false
+            },
+            "wake_ref": {
+              "object_id": "wake_2ca47c209c21344189035d9b",
+              "revision": 1
+            },
+            "wake_source": "cognitive_derivation"
+          },
+          {
+            "derived_lineage": {
+              "classification": "REALITY",
+              "grounding_leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_b32d3cded992194438f114a9",
+                  "revision": 1
+                }
+              ],
+              "has_ai_cognition": false,
+              "has_maintenance": false,
+              "has_reality": true,
+              "issues": [],
+              "leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_b32d3cded992194438f114a9",
+                  "revision": 1
+                }
+              ],
+              "unresolved_refs": []
+            },
+            "granularity": "week",
+            "hit_count": 1,
+            "priority": 50,
+            "rule_id": "c14.summary_revision.cognitive_derivation",
+            "summary_dimension": "dim:sleep",
+            "summary_ref": {
+              "object_id": "sum_7f9c1dda2a76a9f3e2a5f087",
+              "revision": 1
+            },
+            "summary_window": {
+              "end": "2026-10-04T23:59:59.999999Z",
+              "precision": "week",
+              "start": "2026-09-28T00:00:00Z",
+              "timezone_name": null,
+              "unknown": false
+            },
+            "wake_ref": {
+              "object_id": "wake_31ce5cce61a634f4b44e8c03",
+              "revision": 1
+            },
+            "wake_source": "cognitive_derivation"
+          },
+          {
+            "derived_lineage": {
+              "classification": "REALITY",
+              "grounding_leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_3195efa3abad26d259380073",
+                  "revision": 1
+                }
+              ],
+              "has_ai_cognition": false,
+              "has_maintenance": false,
+              "has_reality": true,
+              "issues": [],
+              "leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_3195efa3abad26d259380073",
+                  "revision": 1
+                }
+              ],
+              "unresolved_refs": []
+            },
+            "granularity": "quarter",
+            "hit_count": 1,
+            "priority": 50,
+            "rule_id": "c14.summary_revision.cognitive_derivation",
+            "summary_dimension": "dim:schedule",
+            "summary_ref": {
+              "object_id": "sum_97e12742d2d5a6bb6fced32b",
+              "revision": 1
+            },
+            "summary_window": {
+              "end": "2026-09-30T23:59:59.999999Z",
+              "precision": "quarter",
+              "start": "2026-07-01T00:00:00Z",
+              "timezone_name": null,
+              "unknown": false
+            },
+            "wake_ref": {
+              "object_id": "wake_40fbe5c5feb965984b4905e4",
+              "revision": 1
+            },
+            "wake_source": "cognitive_derivation"
+          },
+          {
+            "derived_lineage": {
+              "classification": "REALITY",
+              "grounding_leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_7422eaba53dc07eb87572e67",
+                  "revision": 1
+                }
+              ],
+              "has_ai_cognition": false,
+              "has_maintenance": false,
+              "has_reality": true,
+              "issues": [],
+              "leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_7422eaba53dc07eb87572e67",
+                  "revision": 1
+                }
+              ],
+              "unresolved_refs": []
+            },
+            "granularity": "day",
+            "hit_count": 1,
+            "priority": 50,
+            "rule_id": "c14.summary_revision.cognitive_derivation",
+            "summary_dimension": "dim:device_activity",
+            "summary_ref": {
+              "object_id": "sum_53d509d86786bde8d0e84da3",
+              "revision": 1
+            },
+            "summary_window": {
+              "end": "2026-10-01T23:59:59.999999Z",
+              "precision": "day",
+              "start": "2026-10-01T00:00:00Z",
+              "timezone_name": null,
+              "unknown": false
+            },
+            "wake_ref": {
+              "object_id": "wake_44319538fd0ba163f5fefa8b",
+              "revision": 1
+            },
+            "wake_source": "cognitive_derivation"
+          },
+          {
+            "derived_lineage": {
+              "classification": "REALITY",
+              "grounding_leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_3195efa3abad26d259380073",
+                  "revision": 1
+                }
+              ],
+              "has_ai_cognition": false,
+              "has_maintenance": false,
+              "has_reality": true,
+              "issues": [],
+              "leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_3195efa3abad26d259380073",
+                  "revision": 1
+                }
+              ],
+              "unresolved_refs": []
+            },
+            "granularity": "day",
+            "hit_count": 1,
+            "priority": 50,
+            "rule_id": "c14.summary_revision.cognitive_derivation",
+            "summary_dimension": "dim:schedule",
+            "summary_ref": {
+              "object_id": "sum_eceb678add8634ee26b63e49",
+              "revision": 1
+            },
+            "summary_window": {
+              "end": "2026-10-01T23:59:59.999999Z",
+              "precision": "day",
+              "start": "2026-10-01T00:00:00Z",
+              "timezone_name": null,
+              "unknown": false
+            },
+            "wake_ref": {
+              "object_id": "wake_4509ff1ef84b6e572ee2d2eb",
+              "revision": 1
+            },
+            "wake_source": "cognitive_derivation"
+          },
+          {
+            "derived_lineage": {
+              "classification": "REALITY",
+              "grounding_leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_7422eaba53dc07eb87572e67",
+                  "revision": 1
+                }
+              ],
+              "has_ai_cognition": false,
+              "has_maintenance": false,
+              "has_reality": true,
+              "issues": [],
+              "leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_7422eaba53dc07eb87572e67",
+                  "revision": 1
+                }
+              ],
+              "unresolved_refs": []
+            },
+            "granularity": "week",
+            "hit_count": 1,
+            "priority": 50,
+            "rule_id": "c14.summary_revision.cognitive_derivation",
+            "summary_dimension": "dim:device_activity",
+            "summary_ref": {
+              "object_id": "sum_fa279a5040c9a67efcae4f10",
+              "revision": 1
+            },
+            "summary_window": {
+              "end": "2026-10-04T23:59:59.999999Z",
+              "precision": "week",
+              "start": "2026-09-28T00:00:00Z",
+              "timezone_name": null,
+              "unknown": false
+            },
+            "wake_ref": {
+              "object_id": "wake_4c26be6bfe6a8376dd9a7400",
+              "revision": 1
+            },
+            "wake_source": "cognitive_derivation"
+          },
+          {
+            "derived_lineage": {
+              "classification": "REALITY",
+              "grounding_leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43",
+                  "revision": 1
+                }
+              ],
+              "has_ai_cognition": false,
+              "has_maintenance": false,
+              "has_reality": true,
+              "issues": [],
+              "leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43",
+                  "revision": 1
+                }
+              ],
+              "unresolved_refs": []
+            },
+            "granularity": "week",
+            "hit_count": 1,
+            "priority": 50,
+            "rule_id": "c14.summary_revision.cognitive_derivation",
+            "summary_dimension": "dim:work_outcome",
+            "summary_ref": {
+              "object_id": "sum_a5cfe5e5f052c7b9969486ad",
+              "revision": 1
+            },
+            "summary_window": {
+              "end": "2026-10-04T23:59:59.999999Z",
+              "precision": "week",
+              "start": "2026-09-28T00:00:00Z",
+              "timezone_name": null,
+              "unknown": false
+            },
+            "wake_ref": {
+              "object_id": "wake_5e175b582adf2670b8640067",
+              "revision": 1
+            },
+            "wake_source": "cognitive_derivation"
+          },
+          {
+            "derived_lineage": {
+              "classification": "REALITY",
+              "grounding_leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_3195efa3abad26d259380073",
+                  "revision": 1
+                }
+              ],
+              "has_ai_cognition": false,
+              "has_maintenance": false,
+              "has_reality": true,
+              "issues": [],
+              "leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_3195efa3abad26d259380073",
+                  "revision": 1
+                }
+              ],
+              "unresolved_refs": []
+            },
+            "granularity": "month",
+            "hit_count": 1,
+            "priority": 50,
+            "rule_id": "c14.summary_revision.cognitive_derivation",
+            "summary_dimension": "dim:schedule",
+            "summary_ref": {
+              "object_id": "sum_c4e7d293d66b59d87731d65d",
+              "revision": 1
+            },
+            "summary_window": {
+              "end": "2026-09-30T23:59:59.999999Z",
+              "precision": "month",
+              "start": "2026-09-01T00:00:00Z",
+              "timezone_name": null,
+              "unknown": false
+            },
+            "wake_ref": {
+              "object_id": "wake_8484ca9e8d0cf8ebb2fc76cc",
+              "revision": 1
+            },
+            "wake_source": "cognitive_derivation"
+          },
+          {
+            "derived_lineage": {
+              "classification": "REALITY",
+              "grounding_leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_3195efa3abad26d259380073",
+                  "revision": 1
+                }
+              ],
+              "has_ai_cognition": false,
+              "has_maintenance": false,
+              "has_reality": true,
+              "issues": [],
+              "leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_3195efa3abad26d259380073",
+                  "revision": 1
+                }
+              ],
+              "unresolved_refs": []
+            },
+            "granularity": "week",
+            "hit_count": 1,
+            "priority": 50,
+            "rule_id": "c14.summary_revision.cognitive_derivation",
+            "summary_dimension": "dim:schedule",
+            "summary_ref": {
+              "object_id": "sum_468fbdd51f43bbb37ed8a3ad",
+              "revision": 1
+            },
+            "summary_window": {
+              "end": "2026-10-04T23:59:59.999999Z",
+              "precision": "week",
+              "start": "2026-09-28T00:00:00Z",
+              "timezone_name": null,
+              "unknown": false
+            },
+            "wake_ref": {
+              "object_id": "wake_96326dd0c6fdcb898e09c81e",
+              "revision": 1
+            },
+            "wake_source": "cognitive_derivation"
+          },
+          {
+            "derived_lineage": {
+              "classification": "REALITY",
+              "grounding_leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_7422eaba53dc07eb87572e67",
+                  "revision": 1
+                }
+              ],
+              "has_ai_cognition": false,
+              "has_maintenance": false,
+              "has_reality": true,
+              "issues": [],
+              "leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_7422eaba53dc07eb87572e67",
+                  "revision": 1
+                }
+              ],
+              "unresolved_refs": []
+            },
+            "granularity": "month",
+            "hit_count": 1,
+            "priority": 50,
+            "rule_id": "c14.summary_revision.cognitive_derivation",
+            "summary_dimension": "dim:device_activity",
+            "summary_ref": {
+              "object_id": "sum_621dbad73aff86b121ff5f4d",
+              "revision": 1
+            },
+            "summary_window": {
+              "end": "2026-09-30T23:59:59.999999Z",
+              "precision": "month",
+              "start": "2026-09-01T00:00:00Z",
+              "timezone_name": null,
+              "unknown": false
+            },
+            "wake_ref": {
+              "object_id": "wake_a8c1c1c8cd9f9c73210594bb",
+              "revision": 1
+            },
+            "wake_source": "cognitive_derivation"
+          },
+          {
+            "derived_lineage": {
+              "classification": "REALITY",
+              "grounding_leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_b32d3cded992194438f114a9",
+                  "revision": 1
+                }
+              ],
+              "has_ai_cognition": false,
+              "has_maintenance": false,
+              "has_reality": true,
+              "issues": [],
+              "leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_b32d3cded992194438f114a9",
+                  "revision": 1
+                }
+              ],
+              "unresolved_refs": []
+            },
+            "granularity": "quarter",
+            "hit_count": 1,
+            "priority": 50,
+            "rule_id": "c14.summary_revision.cognitive_derivation",
+            "summary_dimension": "dim:sleep",
+            "summary_ref": {
+              "object_id": "sum_739da506a4c4d81ac3de0421",
+              "revision": 1
+            },
+            "summary_window": {
+              "end": "2026-09-30T23:59:59.999999Z",
+              "precision": "quarter",
+              "start": "2026-07-01T00:00:00Z",
+              "timezone_name": null,
+              "unknown": false
+            },
+            "wake_ref": {
+              "object_id": "wake_bfa9f60137a17b054ac3a879",
+              "revision": 1
+            },
+            "wake_source": "cognitive_derivation"
+          },
+          {
+            "derived_lineage": {
+              "classification": "REALITY",
+              "grounding_leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43",
+                  "revision": 1
+                }
+              ],
+              "has_ai_cognition": false,
+              "has_maintenance": false,
+              "has_reality": true,
+              "issues": [],
+              "leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43",
+                  "revision": 1
+                }
+              ],
+              "unresolved_refs": []
+            },
+            "granularity": "day",
+            "hit_count": 1,
+            "priority": 50,
+            "rule_id": "c14.summary_revision.cognitive_derivation",
+            "summary_dimension": "dim:work_outcome",
+            "summary_ref": {
+              "object_id": "sum_03a94f689d069e0bbb5c1eb4",
+              "revision": 1
+            },
+            "summary_window": {
+              "end": "2026-10-01T23:59:59.999999Z",
+              "precision": "day",
+              "start": "2026-10-01T00:00:00Z",
+              "timezone_name": null,
+              "unknown": false
+            },
+            "wake_ref": {
+              "object_id": "wake_d5708562799e6413184f3dea",
+              "revision": 1
+            },
+            "wake_source": "cognitive_derivation"
+          },
+          {
+            "derived_lineage": {
+              "classification": "REALITY",
+              "grounding_leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_7422eaba53dc07eb87572e67",
+                  "revision": 1
+                }
+              ],
+              "has_ai_cognition": false,
+              "has_maintenance": false,
+              "has_reality": true,
+              "issues": [],
+              "leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_7422eaba53dc07eb87572e67",
+                  "revision": 1
+                }
+              ],
+              "unresolved_refs": []
+            },
+            "granularity": "quarter",
+            "hit_count": 1,
+            "priority": 50,
+            "rule_id": "c14.summary_revision.cognitive_derivation",
+            "summary_dimension": "dim:device_activity",
+            "summary_ref": {
+              "object_id": "sum_505a097545911c054e48720a",
+              "revision": 1
+            },
+            "summary_window": {
+              "end": "2026-09-30T23:59:59.999999Z",
+              "precision": "quarter",
+              "start": "2026-07-01T00:00:00Z",
+              "timezone_name": null,
+              "unknown": false
+            },
+            "wake_ref": {
+              "object_id": "wake_e57c59e2a17f50a9db5705b5",
+              "revision": 1
+            },
+            "wake_source": "cognitive_derivation"
+          },
+          {
+            "derived_lineage": {
+              "classification": "REALITY",
+              "grounding_leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43",
+                  "revision": 1
+                }
+              ],
+              "has_ai_cognition": false,
+              "has_maintenance": false,
+              "has_reality": true,
+              "issues": [],
+              "leaf_refs": [
+                {
+                  "object_id": "obs_c14_fixture_660bfde404b5e63e3c52db43",
+                  "revision": 1
+                }
+              ],
+              "unresolved_refs": []
+            },
+            "granularity": "month",
+            "hit_count": 1,
+            "priority": 50,
+            "rule_id": "c14.summary_revision.cognitive_derivation",
+            "summary_dimension": "dim:work_outcome",
+            "summary_ref": {
+              "object_id": "sum_66e44044c780170d4b893177",
+              "revision": 1
+            },
+            "summary_window": {
+              "end": "2026-09-30T23:59:59.999999Z",
+              "precision": "month",
+              "start": "2026-09-01T00:00:00Z",
+              "timezone_name": null,
+              "unknown": false
+            },
+            "wake_ref": {
+              "object_id": "wake_e7bd300cb6a45687c62ba9d9",
+              "revision": 1
+            },
+            "wake_source": "cognitive_derivation"
+          }
+        ]
+      },
+      "dedupe_key": "attention_bundle:wake_bundle_b730ca1a7fefcee2ec36e955",
+      "first_hit_at": "2026-10-05T14:06:00Z",
+      "hit_count": 16,
+      "last_hit_at": "2026-10-05T14:06:00Z",
+      "priority": 50,
+      "revision": 3,
+      "runtime_incomplete_attempts": null,
+      "state": "completed",
+      "summary_ref": null,
+      "termination_reason": "silence",
+      "wake_id": "wake_bundle_b730ca1a7fefcee2ec36e955",
+      "wake_source": "attention_bundle"
+    },
+    {
+      "attention_bundle": null,
+      "dedupe_key": "c14:cognitive-derivation:sum_03a94f689d069e0bbb5c1eb4:1",
+      "first_hit_at": "2026-10-05T14:06:00Z",
+      "hit_count": 1,
+      "last_hit_at": "2026-10-05T14:06:00Z",
+      "priority": 50,
+      "revision": 2,
+      "runtime_incomplete_attempts": null,
+      "state": "merged",
+      "summary_ref": {
+        "object_id": "sum_03a94f689d069e0bbb5c1eb4",
+        "revision": 1
+      },
+      "termination_reason": null,
+      "wake_id": "wake_d5708562799e6413184f3dea",
+      "wake_source": "cognitive_derivation"
+    },
+    {
+      "attention_bundle": null,
+      "dedupe_key": "c14:cognitive-derivation:sum_505a097545911c054e48720a:1",
+      "first_hit_at": "2026-10-05T14:06:00Z",
+      "hit_count": 1,
+      "last_hit_at": "2026-10-05T14:06:00Z",
+      "priority": 50,
+      "revision": 2,
+      "runtime_incomplete_attempts": null,
+      "state": "merged",
+      "summary_ref": {
+        "object_id": "sum_505a097545911c054e48720a",
+        "revision": 1
+      },
+      "termination_reason": null,
+      "wake_id": "wake_e57c59e2a17f50a9db5705b5",
+      "wake_source": "cognitive_derivation"
+    },
+    {
+      "attention_bundle": null,
+      "dedupe_key": "c14:cognitive-derivation:sum_66e44044c780170d4b893177:1",
+      "first_hit_at": "2026-10-05T14:06:00Z",
+      "hit_count": 1,
+      "last_hit_at": "2026-10-05T14:06:00Z",
+      "priority": 50,
+      "revision": 2,
+      "runtime_incomplete_attempts": null,
+      "state": "merged",
+      "summary_ref": {
+        "object_id": "sum_66e44044c780170d4b893177",
+        "revision": 1
+      },
+      "termination_reason": null,
+      "wake_id": "wake_e7bd300cb6a45687c62ba9d9",
+      "wake_source": "cognitive_derivation"
+    },
+    {
+      "attention_bundle": null,
+      "dedupe_key": "periodic-review:user_1:2026-10-05T14:07:01+00:00",
+      "first_hit_at": "2026-10-05T14:07:01Z",
+      "hit_count": 3,
+      "last_hit_at": "2026-10-05T14:07:01Z",
+      "priority": 10,
+      "revision": 3,
+      "runtime_incomplete_attempts": null,
+      "state": "completed",
+      "summary_ref": null,
+      "termination_reason": "silence",
+      "wake_id": "wake_review_6504931e301a63a3e7f5ef9e",
+      "wake_source": "periodic_review"
+    }
+  ],
+  "world_db": "reviews/internal_habitation/c14-resident/v2/runs/resident-a-restart-20260921/world/aios_world.db",
+  "world_revision": 47
+}

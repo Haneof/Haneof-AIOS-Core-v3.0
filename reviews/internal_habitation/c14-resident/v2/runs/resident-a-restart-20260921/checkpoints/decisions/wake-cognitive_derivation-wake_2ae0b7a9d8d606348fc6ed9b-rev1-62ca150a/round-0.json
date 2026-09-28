@@ -1,0 +1,6 @@
+{
+  "capability_calls": [
+    {"name": "read_ai_world", "arguments": {"limit": 50}}
+  ],
+  "rationale": "本轮 bundle=3 条 10-05 日摘要（schedule/sleep/work_outcome，全 REALITY）。先确认 AI-world 认知面（防止任何程序侧自动写入），再判断是否形成认知。"
+}
