@@ -340,9 +340,29 @@ jobs:
           python - "$summary_path" <<'PY2'
           from pathlib import Path
           import sys
-          message = Path(sys.argv[1]).read_text(encoding="utf-8")
-          message = message.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
-          print(f"::notice file=.github/workflows/core-rc-refreeze-003-formal-gate.yml,line=1,title=RC003 formal evidence::{message}")
+          lines = Path(sys.argv[1]).read_text(encoding="utf-8").splitlines()
+          section_starts = (
+              "- Registry exact side-effecting capability matrix:",
+              "- Clean-install/headless lifecycle record:",
+              "- Backup/restore/index-rebuild record:",
+              "- Artifact SHA-256",
+          )
+          sections = []
+          current = []
+          for line in lines:
+              if line.startswith(section_starts) and current:
+                  sections.append("\n".join(current))
+                  current = []
+              current.append(line)
+          if current:
+              sections.append("\n".join(current))
+          messages = []
+          for section in sections:
+              messages.extend(section[offset:offset + 3000] for offset in range(0, len(section), 3000))
+          for index, section in enumerate(messages, start=1):
+              message = f"[RC003 evidence section {index}/{len(messages)}]\n{section}"
+              message = message.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+              print(f"::notice file=.github/workflows/core-rc-refreeze-003-formal-gate.yml,line=1,title=RC003 formal evidence::{message}")
           PY2
 
       - name: Upload reproducible RC regression and smoke evidence
