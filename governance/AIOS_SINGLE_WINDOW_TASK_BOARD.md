@@ -1,5 +1,16 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 当前控制入口 — 2026-09-28 TRUSTED-RETURN CORRECTIVE-001 INTEGRATED / RC-REFREEZE-003 READY
+
+- **`CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001-CORRECTIVE-001 = DONE / ACCEPTED / INTEGRATED`**. Accepted exact candidate = `a73e186d40688f5dc181b1128a62eff37a974409`; fresh IA evidence = `eeda251e057e98b15a919694af4689786faf8c55` with `ACCEPTANCE_PASS / blocker=0`; implementation PR #264 merged as `f20f2edfa7af00d0286493fd15196ca9503bc315`.
+- Independent reviewer evidence: 86/86 reviewer probes PASS on candidate, 50 RED on failed exact #258, all five historical IA RED families reproduced, complete 22-side-effect replay convergence, store fail-closed PASS, real SIGKILL PASS, rev5→rev6 = `LEGITIMATE_HARNESS_CORRECTION`.
+- Reviewer-local Python 3.12.14 limitation is **CLOSED / NON_BLOCKING** by PM-owned exact replay run **36423849252**: frozen probe SHA manifest all OK, CPython 3.12.14 / Pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.45.1, collect-only 86, **86 passed / 0 failed / 0 errors / 0 skipped**. Earlier PM run 36423769257 is preserved as harness-path failure before probe execution.
+- Post-merge equivalence: accepted exact `a73e186d...` → post-merge main `f20f2edf...` differs only in pre-existing governance files; **ZERO src/tests implementation drift**.
+- **A-003 = HISTORICAL_FOR_PRIOR_RC_ONLY** for the next lineage. It must not be reused to launch B after this Core integration.
+- **唯一下一 READY：`CORE-RC-REFREEZE-003 = READY`**. Formal prompt: `governance/prompts/CORE_RC_REFREEZE_003_2026-09-28.md`. Freeze software boundary begins from accepted post-integration software `f20f2edfa7af00d0286493fd15196ca9503bc315`.
+- `CORE-RC-REFREEZE-003-INDEPENDENT-ACCEPTANCE`, `C15-RCC-RES-A-RERUN-004`, persistence Corrective-003 resume, B release/run, Resident C, evaluator and C15 close remain **BLOCKED** until their prerequisites pass.
+
+
 ## 当前控制入口 — 2026-09-28 CORRECTIVE-001 REVIEW_READY / FRESH IA READY
 
 - **`CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001-CORRECTIVE-001 = REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE`**. Engineering PR #264 remains **OPEN / UNMERGED** at exact head `a73e186d40688f5dc181b1128a62eff37a974409` (parent `71f6d106a697b0c61410d42114545f2645e12510`, tree `352f47ac4e3098b10b1b78e4757543477371548d`). Live main at PM release remained `5288822e751df185f3abab79f969609f31859617`.
