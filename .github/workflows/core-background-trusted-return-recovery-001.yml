@@ -54,6 +54,21 @@ jobs:
       - name: Complete Core regression
         if: always()
         run: pytest -o addopts='' -q --junitxml=full.xml
+      - name: Publish formal environment and exact JUnit counts
+        if: always()
+        run: |
+          python - <<'PYGATE'
+          import sqlite3, sys, xml.etree.ElementTree as ET
+          import pydantic, pytest
+          print(f"::notice title=Formal environment::Python {sys.version.split()[0]} / Pydantic {pydantic.__version__} / pytest {pytest.__version__} / SQLite {sqlite3.sqlite_version}")
+          for name in ('focused', 'full'):
+              try:
+                  suite = ET.parse(name + '.xml').getroot().find('testsuite')
+                  fields = ', '.join(f"{key}={suite.get(key)}" for key in ('tests', 'failures', 'errors', 'skipped', 'time'))
+                  print(f"::notice title={name} exact JUnit::{fields}")
+              except (FileNotFoundError, AttributeError) as exc:
+                  print(f"::warning title={name} JUnit unavailable::{exc}")
+          PYGATE
       - uses: actions/upload-artifact@v4
         if: always()
         with:
