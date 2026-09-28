@@ -1,0 +1,146 @@
+name: c15-rcc-res-b-persistence-corrective-003-formal-gate
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/c15-rcc-res-b-persistence-corrective-003-formal-gate.yml"
+      - "tools/c15_persistence/**"
+      - "tests/c15_persistence/**"
+      - "pyproject.toml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  formal-python312-corrective-003:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      C15_PERSISTED_WORKSPACE: /home/runner
+      PYTHONPATH: src:.
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.14"
+
+      - name: Pin formal dependency set
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install "pydantic==2.13.5" "pytest==8.4.2" pytest-timeout
+          pip install -e ".[dev]" || pip install -e "."
+          python -c "import sys,pydantic,pytest,sqlite3; print('PYTHON',sys.version); print('PYDANTIC',pydantic.VERSION); print('PYTEST',pytest.__version__); print('SQLITE',sqlite3.sqlite_version); assert sys.version_info[:3] == (3,12,14); assert pydantic.VERSION == '2.13.5'; assert pytest.__version__ == '8.4.2'"
+
+      - name: Corrective-003 six-blocker regression suite
+        run: |
+          set -euo pipefail
+          python -m pytest -v --tb=short --timeout=1800 tests/c15_persistence/test_corrective_003_regressions.py | tee /tmp/c003.txt
+
+      - name: Corrective-002 regression remains green
+        run: |
+          set -euo pipefail
+          python -m pytest -v --tb=short --timeout=1800 tests/c15_persistence/test_corrective_002_remote_durability.py | tee /tmp/c002.txt
+
+      - name: Historical K1-K5 remains green
+        run: |
+          set -euo pipefail
+          python -m pytest -v --tb=short --timeout=1800 tests/c15_persistence/killpoints/test_killpoints.py | tee /tmp/killpoints.txt
+
+      - name: Production wiring remains green
+        run: |
+          set -euo pipefail
+          python -m pytest -v --tb=short --timeout=1800 tests/c15_persistence/test_operator_wiring.py | tee /tmp/wiring.txt
+
+      - name: Environment and remote reattach remains green
+        run: |
+          set -euo pipefail
+          python -m pytest -v --tb=short -rs --timeout=1800 tests/c15_persistence/test_environment_reattach.py | tee /tmp/reattach.txt
+
+      - name: Resident-visible surface unchanged
+        run: |
+          set -euo pipefail
+          python -m pytest -v --tb=short --timeout=1800 tests/c15_persistence/test_resident_surface.py | tee /tmp/surface.txt
+
+      - name: Historical journal remains green
+        run: |
+          set -euo pipefail
+          sudo install -d -m 0755 /home/user
+          sudo install -d -m 0700 -o "$(id -u)" -g "$(id -g)" /home/user/c15-persistence-unit-probes
+          python -m unittest discover -s tests/c15_persistence -p "test_journal.py" -v | tee /tmp/journal.txt
+
+      - name: src/aios_core remains untouched
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "${{ github.base_ref }}"
+          if git diff --name-only "origin/${{ github.base_ref }}...HEAD" -- src/aios_core | grep .; then
+            echo "::error title=core diff::src/aios_core must have zero diff"
+            exit 1
+          fi
+          echo "src/aios_core diff: 0 files"
+
+      - name: Publish formal summary
+        if: always() && github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "## C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 formal gate"
+            echo "- run: ${{ github.run_id }}"
+            echo "- candidate: $(git rev-parse HEAD)"
+            echo "- Python: $(python -c 'import sys; print(sys.version.split()[0])')"
+            echo "- Pydantic: $(python -c 'import pydantic; print(pydantic.VERSION)')"
+            echo "- pytest: $(python -c 'import pytest; print(pytest.__version__)')"
+            echo "Corrective-003 focused tail:"
+            tail -8 /tmp/c003.txt 2>/dev/null || true
+          } > /tmp/c003-comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/c003-comment.md
+
+  frozen-preflight-e2e-debian12:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Run exact accepted Debian 12 frozen preflight gate
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/c015-c003-frozen-e2e"
+          docker run --privileged --rm --security-opt seccomp=unconfined \
+            -v "$GITHUB_WORKSPACE:/work/repo" -w /work/repo debian:12 bash -lc '
+              set -euo pipefail
+              export DEBIAN_FRONTEND=noninteractive
+              apt-get update
+              apt-get install -y --no-install-recommends python3 python3-pip sudo util-linux iproute2 procps coreutils findutils grep sed gawk openssl ca-certificates
+              python3 -m pip install --break-system-packages -r reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002/harness/requirements.freeze.txt
+              BPREP=/work/repo/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-B-PREFLIGHT-002
+              python3 "$BPREP/checks/runbook_lifecycle_checker.py" --base "$BPREP" --self-test | tee /work/repo/c015-c003-frozen-e2e/lifecycle.log
+              grep -q "RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=82" /work/repo/c015-c003-frozen-e2e/lifecycle.log
+              success=0
+              for attempt in 1 2 3 4 5; do
+                export RUN_ROOT="/tmp/c015-c003-e2e-$attempt"
+                rm -rf "$RUN_ROOT"
+                set +e
+                bash "$BPREP/isolation/probe_e2e.sh"
+                rc=$?
+                set -e
+                if [ -f "$RUN_ROOT/e2e.log" ]; then cp "$RUN_ROOT/e2e.log" "/work/repo/c015-c003-frozen-e2e/e2e-$attempt.log"; fi
+                if [ "$rc" -eq 0 ]; then cp "$RUN_ROOT/e2e.log" /work/repo/c015-c003-frozen-e2e/e2e.log; success=1; break; fi
+              done
+              [ "$success" -eq 1 ] || exit 1
+            '
+          grep -q '^ENVIRONMENT_PASS$' c015-c003-frozen-e2e/e2e.log
+          grep -q '^ALL_CHECKS=158/158 FAILURES=0$' c015-c003-frozen-e2e/e2e.log
+          grep -q 'RUNBOOK_SHELL_SEMANTICS_MUTATION_RED_PASS cases=82' c015-c003-frozen-e2e/lifecycle.log
