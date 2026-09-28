@@ -1,0 +1,8 @@
+Mon Sep 28 17:16:45 UTC 2026
+589e0347b646ade6eeb7f09cfa6f511fba99c1ef
+860649824e5403ff91c6abccfd8ee42ce72cc9347571388d7a598a2e73766178  reviews/independent/c15-a004-acceptance/probe.py
+Enumeration: probe.py / static read-only exact-package audit v1; frozen before first invocation
+Mon Sep 28 17:18:21 UTC 2026
+589e0347b646ade6eeb7f09cfa6f511fba99c1ef
+ab0ba0ba0c9d530745c8061b2988b9c896c3675105c68c36d6a6f173ccaa7af1  reviews/independent/c15-a004-acceptance/probe_followup.py
+Enumeration: probe_followup.py / additive v2, before first invocation; v1 retained
