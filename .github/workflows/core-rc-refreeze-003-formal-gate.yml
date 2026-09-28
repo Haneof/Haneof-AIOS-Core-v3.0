@@ -345,14 +345,19 @@ jobs:
               "- Registry exact side-effecting capability matrix:",
               "- Clean-install/headless lifecycle record:",
               "- Backup/restore/index-rebuild record:",
-              "- Artifact SHA-256",
           )
           sections = []
           current = []
+          in_artifact_hashes = False
           for line in lines:
-              if line.startswith(section_starts) and current:
+              is_artifact_hash = line.startswith("- Artifact SHA-256")
+              if (line.startswith(section_starts) or (is_artifact_hash and not in_artifact_hashes)) and current:
                   sections.append("\n".join(current))
                   current = []
+              if line.startswith(section_starts):
+                  in_artifact_hashes = False
+              elif is_artifact_hash:
+                  in_artifact_hashes = True
               current.append(line)
           if current:
               sections.append("\n".join(current))
