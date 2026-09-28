@@ -5,15 +5,27 @@
     "C2_IA_OP_002": "GREEN",
     "C3_IA_OP_003": "GREEN"
   },
-  "candidate_archive_path": "/tmp/aios-op-prep-corrective-candidate-99af8e268a1f9e8944b163d8087005e0e3698620/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "candidate_archive_path": "/tmp/aios-op-prep-corrective-candidate-08e85f037c8d39196ae5b6040ff19ba9750ebc3a/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
   "candidate_exact": {
     "classification": "CORRECTED_OPERATOR_PREP_SOURCE_AND_TEST_CANDIDATE",
-    "head": "99af8e268a1f9e8944b163d8087005e0e3698620",
-    "operator_prep_package_tree": "795e775479cbe7d300ead0624071da1c64776405",
-    "parent": "08e85f037c8d39196ae5b6040ff19ba9750ebc3a",
-    "tree": "2d9fdf0b4108ec6cca0233c62c5fa94af0ba635b"
+    "head": "08e85f037c8d39196ae5b6040ff19ba9750ebc3a",
+    "operator_prep_package_tree": "21989e90a0659b4752897fdebfa8e9eab788a66c",
+    "parent": "30db1cc49910e37694123460755747f57bf47889",
+    "tree": "f02fe869df6de1bad7c848cbf5d4bd5efc04f5dd"
   },
-  "checks": {
+  "exit_code": 0,
+  "frozen_rc": {
+    "core_tree": "9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623",
+    "software": "f20f2edfa7af00d0286493fd15196ca9503bc315",
+    "tests_tree": "7e33b5ef8432370234965d3ccd61248c703c4019"
+  },
+  "no_real_resident_executed": true,
+  "probe_freeze_sha256": "93833b83548dd5b448d049ffe725bf1ac268a8a2946e9ad17268a53123d2cbc4",
+  "probe_revision": "v6",
+  "probe_source_sha256": "05b2f7ecb022f5a7f5563e5fed975bb8d2db350cd8960d1c9143fe30a67241f9",
+  "probe_status": "GREEN",
+  "raw_output_sha256": "4587875eb3b4fc1d0de72b0f0aabc21a8e366191b56658e25e06d2860a52ab39",
+  "result_checks": {
     "C1": {
       "changed_replay_fail_closed": true,
       "intact_idempotent_replay": true,
@@ -89,18 +101,6 @@
       "nonzero_returncode": "BLOCKED"
     }
   },
-  "exit_code": 0,
-  "frozen_rc": {
-    "core_tree": "9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623",
-    "software": "f20f2edfa7af00d0286493fd15196ca9503bc315",
-    "tests_tree": "7e33b5ef8432370234965d3ccd61248c703c4019"
-  },
-  "no_real_resident_executed": true,
-  "probe_freeze_sha256": "93833b83548dd5b448d049ffe725bf1ac268a8a2946e9ad17268a53123d2cbc4",
-  "probe_revision": "v6",
-  "probe_source_sha256": "05b2f7ecb022f5a7f5563e5fed975bb8d2db350cd8960d1c9143fe30a67241f9",
-  "probe_status": "GREEN",
-  "raw_output_sha256": "6b9793ebf63b50a468607e1f7f381594b4a9ca0031e897b15e5526b87a7c441a",
-  "result_sha256": "6b9793ebf63b50a468607e1f7f381594b4a9ca0031e897b15e5526b87a7c441a",
+  "result_sha256": "4587875eb3b4fc1d0de72b0f0aabc21a8e366191b56658e25e06d2860a52ab39",
   "task": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-001"
 }

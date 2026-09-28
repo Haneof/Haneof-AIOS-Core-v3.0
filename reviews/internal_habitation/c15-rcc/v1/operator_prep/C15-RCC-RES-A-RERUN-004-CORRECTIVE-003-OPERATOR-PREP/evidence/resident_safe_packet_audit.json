@@ -69,9 +69,9 @@
     }
   },
   "frozen_control_plane": "026810533679d749d9a33b9c11a06585ae28d9f6",
-  "generated_utc": "2026-09-28T20:31:09.733169+00:00",
+  "generated_utc": "2026-09-28T20:33:08.242969+00:00",
   "packet": "RESIDENT_SAFE_LAUNCH_PACKET.json",
-  "packet_sha256": "8caee40bfd6cdc54d761221e4d732d7601ecf23bd6a2d991be4746b83f8fee53",
+  "packet_sha256": "c1ddfa6b2fe89be2a2b9533f2483251f7423eb961755c7777bbab044da8a6f12",
   "packet_structure": {
     "checked_keys": [
       "allowed_cursor_end",
@@ -111,6 +111,7 @@
       "generated_utc",
       "harness_entrypoint",
       "harness_file_count",
+      "harness_manifest_file_sha256",
       "harness_manifest_sha256",
       "harness_root",
       "harness_runner_module",
@@ -176,11 +177,11 @@
       "result": "PASS"
     },
     {
-      "expected_sha256": "ca6597e64859cf6fe6ebab597e9fb32d8afd9ea6af65c2489378de8875cc19a7",
-      "label": "harness_manifest",
-      "observed_sha256": "0bb3d147a2bb6df11270493bade9f71b0045a13888d51312a05613a34083133c",
+      "expected_sha256": "4f75e002f3bd5698b53dd3594ac5c76701bd8420b39e2fdb72b1600e80bb3d5b",
+      "label": "harness_manifest_file",
+      "observed_sha256": "4f75e002f3bd5698b53dd3594ac5c76701bd8420b39e2fdb72b1600e80bb3d5b",
       "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/harness_manifest.json",
-      "result": "FAIL"
+      "result": "PASS"
     },
     {
       "expected_sha256": "6ebd6a8e438340a686c6345a01d84680b9130a0c82208d9cf68c5cb18afa71f9",
@@ -218,15 +219,15 @@
       "result": "PASS"
     },
     {
-      "expected_sha256": "4587875eb3b4fc1d0de72b0f0aabc21a8e366191b56658e25e06d2860a52ab39",
+      "expected_sha256": "6b9793ebf63b50a468607e1f7f381594b4a9ca0031e897b15e5526b87a7c441a",
       "label": "targeted_candidate_green",
-      "observed_sha256": "4587875eb3b4fc1d0de72b0f0aabc21a8e366191b56658e25e06d2860a52ab39",
+      "observed_sha256": "6b9793ebf63b50a468607e1f7f381594b4a9ca0031e897b15e5526b87a7c441a",
       "path": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/corrective_candidate_green.json",
       "result": "PASS"
     },
     {
       "execution_total": 24,
-      "gate_result_sha256": "738dd0be1b859599c5bc41e43f02357ee1a5658a813d86d790c148e5219a6061",
+      "gate_result_sha256": "50b798551a00888a0c0c17b67d6c46bf24ddbadb6be16cf5becca9a9b4188671",
       "label": "gate_a_enumeration_execution_and_result",
       "result": "PASS",
       "test_count": 24,
@@ -234,7 +235,7 @@
     },
     {
       "execution_total": 7,
-      "gate_result_sha256": "2d81dbbffb81a51db4f3eae4a55425bf128c614a9d7e48f1cb8e682f8f188325",
+      "gate_result_sha256": "dd4c09b52e7d64768fe7637130386ce83f4a840c91d5629b7e3af00a4a49150a",
       "label": "gate_b_enumeration_execution_and_result",
       "result": "PASS",
       "test_count": 7,
@@ -242,7 +243,7 @@
     },
     {
       "execution_total": 2,
-      "gate_result_sha256": "eea7c1b278315f40ca52313a207dfb03cb5a0f33c87d4e23f4b1d5e3923c7dba",
+      "gate_result_sha256": "71dfc76042e694ffb29d0d5928ba8f6fa79c70253e2f818a88bf464632b59864",
       "label": "gate_c_enumeration_execution_and_result",
       "result": "PASS",
       "test_count": 2,
@@ -250,14 +251,14 @@
     },
     {
       "execution_total": 5,
-      "gate_result_sha256": "d5b510934671627d00ab750c1f4cfb97e5523b0116f1431f6b645496fb0fb89c",
+      "gate_result_sha256": "affafd93cb6c227ceb2bd73eccd635353e088d9230ee7609943992879b974aaf",
       "label": "gate_d_enumeration_execution_and_result",
       "result": "PASS",
       "test_count": 5,
       "test_ids_count": 5
     }
   ],
-  "result": "FAIL",
+  "result": "PASS",
   "scanned_file_count": 5,
   "scanned_files": [
     {
@@ -265,7 +266,7 @@
       "findings": [],
       "mode": "packet-structure+values",
       "result": "PASS",
-      "sha256": "8caee40bfd6cdc54d761221e4d732d7601ecf23bd6a2d991be4746b83f8fee53"
+      "sha256": "c1ddfa6b2fe89be2a2b9533f2483251f7423eb961755c7777bbab044da8a6f12"
     },
     {
       "file": "harness/aios_exchange/**",
@@ -273,7 +274,7 @@
       "mode": "gate D code-only scan (frozen)",
       "result": "PASS",
       "scanner": "harness/operator_tools/no_semantic_scan.py",
-      "sha256": "ca6597e64859cf6fe6ebab597e9fb32d8afd9ea6af65c2489378de8875cc19a7"
+      "sha256": "d5f15f1e7de26981ecae7935bdc400239363aad46af6fe4c4b8671ae6754ef72"
     },
     {
       "file": "bootstrap/bootstrap_runtime.sh",
