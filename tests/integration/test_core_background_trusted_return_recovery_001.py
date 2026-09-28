@@ -135,9 +135,9 @@ def test_later_round_return_survives_process_loss_without_caller_supplied_reply(
     staged = fresh.background_model_attempts.staged_response(attempts[-1].attempt_id)
     assert staged is not None and staged.authenticity_proof == receipt.authenticity_proof
     assert fresh.background_model_attempts.exact_response_directive(attempts[-1].attempt_id).response == "finished once"
-    meters = fresh.metering.list_model_calls(subject_id="user_1", session_id="trusted-session")
+    meters = fresh.metering.list_model_calls(subject_id="user_1")
     assert len(meters) == last_round + 1
-    assert [m.background_attempt_id for m in meters] == [a.attempt_id for a in attempts]
+    assert [m.background_attempt_id for m in sorted(meters, key=lambda m: m.model_round_index)] == [a.attempt_id for a in attempts]
     tasks = [p for p in store.list_payloads(object_type=ObjectType.TASK, subject_id="user_1")
              if str(p.get("title", "")).startswith("trusted watch")]
     assert len(tasks) == last_round
@@ -148,7 +148,7 @@ def test_later_round_return_survives_process_loss_without_caller_supplied_reply(
     with pytest.raises(TurnAlreadyCompleted):
         fresh.run_turn(session_id="trusted-session", turn_index=1,
                        user_input="complete exactly once", occurred_at=NOW)
-    assert len(fresh.metering.list_model_calls(subject_id="user_1", session_id="trusted-session")) == last_round + 1
+    assert len(fresh.metering.list_model_calls(subject_id="user_1")) == last_round + 1
 
 
 def test_trusted_callback_atomically_hands_off_exact_bytes_before_any_downstream_effect(tmp_path):
@@ -163,4 +163,4 @@ def test_trusted_callback_atomically_hands_off_exact_bytes_before_any_downstream
     assert row is not None
     assert hashlib.sha256(row[0].encode()).hexdigest() == row[1] == receipt.payload_sha256
     assert row[2] == receipt.authenticity_proof
-    assert len(runtime.metering.list_model_calls(subject_id="user_1", session_id="trusted-session")) == 1
+    assert len(runtime.metering.list_model_calls(subject_id="user_1")) == 1

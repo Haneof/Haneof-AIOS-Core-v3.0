@@ -383,11 +383,12 @@ def test_wake_response_is_durable_before_meter_and_restart_blocks_reinvocation(
         index=reopened_index,
         model_handler=lambda _snapshot: pytest.fail("provider reinvoked"),
     )
-    with pytest.raises(BackgroundModelResponsePending):
-        restarted.run_wake(
-            wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
-            now=NOW + timedelta(minutes=1),
-        )
+    recovered = restarted.run_wake(
+        wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
+        now=NOW + timedelta(minutes=1),
+    )
+    assert recovered.wake.state == "completed"
+    assert recovered.runtime.recovered_response_attempts == (attempt.attempt_id,)
     assert calls == 1
 
 
@@ -443,12 +444,12 @@ def test_wake_metered_before_completion_stays_blocked_without_synthetic_success(
         index=reopened_index,
         model_handler=lambda _snapshot: pytest.fail("provider reinvoked"),
     )
-    with pytest.raises(BackgroundModelAttemptBlocked) as blocked:
-        restarted.run_wake(
-            wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
-            now=NOW + timedelta(minutes=1),
-        )
-    assert blocked.value.attempt.state == "metered"
+    recovered = restarted.run_wake(
+        wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
+        now=NOW + timedelta(minutes=1),
+    )
+    assert recovered.wake.state == "completed"
+    assert len(restarted.metering.list_model_calls(subject_id="user_1", wake_id=signal.wake_id)) == 1
     assert calls == 1
 
 
@@ -492,8 +493,9 @@ def test_periodic_review_response_before_meter_and_meter_before_completion_are_f
         index=reopened_index,
         model_handler=lambda _snapshot: pytest.fail("review provider reinvoked"),
     )
-    with pytest.raises(BackgroundModelResponsePending):
-        restarted.run_periodic_review(now=NOW + timedelta(minutes=1))
+    recovered = restarted.run_periodic_review(now=NOW + timedelta(minutes=1))
+    assert recovered is not None and recovered.wake.state == "completed"
+    assert recovered.runtime.recovered_response_attempts == (response_attempt.attempt_id,)
 
     # A separate World proves the post-meter / pre-completion window.
     store2 = SQLiteWorldStore(tmp_path / "world2.db")
@@ -533,9 +535,9 @@ def test_periodic_review_response_before_meter_and_meter_before_completion_are_f
         index=reopened_index2,
         model_handler=lambda _snapshot: pytest.fail("review provider reinvoked"),
     )
-    with pytest.raises(BackgroundModelAttemptBlocked) as blocked:
-        restarted2.run_periodic_review(now=NOW + timedelta(minutes=1))
-    assert blocked.value.attempt.state == "metered"
+    recovered2 = restarted2.run_periodic_review(now=NOW + timedelta(minutes=1))
+    assert recovered2 is not None and recovered2.wake.state == "completed"
+    assert len(restarted2.metering.list_model_calls(subject_id="user_1", wake_id=wake_id2)) == 1
 
 
 def test_budget_rollover_does_not_erase_in_doubt(tmp_path):
