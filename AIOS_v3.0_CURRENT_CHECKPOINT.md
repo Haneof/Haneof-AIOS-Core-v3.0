@@ -1,5 +1,15 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-09-28 C15-RCC-RES-A-RERUN-004 — Phase A complete, fresh IA next
+
+- Evidence PR #273 exact head: `f251e9c0026a0f97fdee20397936cb5e3b18c61c`; parent `0b17c7f35697dc4a24b731185868d29967efcf58`; tree `fd312286b7b83cd550ecc49d72b78656e6e91b71`.
+- Run directory: `reviews/internal_habitation/c15-rcc/v1/resident/runs/a004-27bb1fb3da404f4d/`.
+- Frozen RC: software `f20f2edfa7af00d0286493fd15196ca9503bc315`; Core `9adcbe07...`; tests `7e33b5ef...`.
+- Mechanical evidence: 13/13 cursor ACKs; cursor 14 not revealed; World/index 89/89; evidence-only scope.
+- Unique next READY: `C15-RCC-RES-A-RERUN-004-INDEPENDENT-ACCEPTANCE`.
+- Persistence Corrective-003 and all Resident B/C/evaluator work remain blocked.
+
+
 ## 2026-09-28 CORE-RC-REFREEZE-003 — ACCEPTED / INTEGRATED; fresh A-004 next
 
 - Frozen software: `f20f2edfa7af00d0286493fd15196ca9503bc315`.
