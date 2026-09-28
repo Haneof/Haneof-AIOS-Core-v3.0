@@ -1,0 +1,116 @@
+{
+  "disposition": "BLOCKED",
+  "file_count": 26,
+  "files": {
+    "FAILURE_ADJUDICATION.md": {
+      "sha256": "518ae74aaea568acbfb70a8360a1fc75aa9873d860fc8f79eb7cfec5360e7aeb",
+      "size_bytes": 5557
+    },
+    "README.md": {
+      "sha256": "0b37c1137da6110dad9730b16b48135d68a7c9166238723ffeea6eba112741fe",
+      "size_bytes": 3279
+    },
+    "decision_requests/req-0001-model_directive-6510beb0.json": {
+      "sha256": "4b7fc39eea01083120d92b899618781bce07a9b23d59aa4865c4d5308c60f650",
+      "size_bytes": 51776
+    },
+    "decision_requests/req-0002-model_directive-3c99d45b.json": {
+      "sha256": "948b5a8a70c8ef4e414c7e79a498d2376aa973e8ea16e69793b25004bd4a54bd",
+      "size_bytes": 32191
+    },
+    "decision_responses/req-0001-model_directive-6510beb0.json": {
+      "sha256": "8901a1f03054b208620336af9cb19e01db2e7523eb86eca8c07673715b2645f5",
+      "size_bytes": 120
+    },
+    "decision_responses/req-0002-model_directive-3c99d45b.json": {
+      "sha256": "c061e580ca0cdbebc9232adc9e54f368348b3290158bfb8f5af1b90b2ccac5fc",
+      "size_bytes": 2232
+    },
+    "events/cursor_01_event.json": {
+      "sha256": "e9b764642cfc8b1c0090d72ddbd1ec20726b24546224f75af775b7c2ad6d20c7",
+      "size_bytes": 430
+    },
+    "exchange_ledger.jsonl": {
+      "sha256": "42d7b162e7c3eae0acbcf7202f8b77f4b4bc5eeeb0c92bf2f23da0d126c15b0e",
+      "size_bytes": 2842
+    },
+    "exports/background_model_attempts.jsonl": {
+      "sha256": "648accb8cf6fb86f5cc226f83a3c528233c75a42b0f95ecd6a29041d71734f15",
+      "size_bytes": 1983
+    },
+    "exports/metering_records.jsonl": {
+      "sha256": "d499dc7d3105e2dc4c7f047c1eb7daca3988a535c86d89d131482999d74e7681",
+      "size_bytes": 1067
+    },
+    "exports/turn_executions.jsonl": {
+      "sha256": "46da97142743c28d6288b42500caa872a6d207d13d532ec24687b54f42b96205",
+      "size_bytes": 297
+    },
+    "exports/world_object_index.jsonl": {
+      "sha256": "342c865728085012624f872618b2feec8bccae586351d669a4df44ca2198e221",
+      "size_bytes": 16309
+    },
+    "harness/ENVIRONMENT_RECORD.json": {
+      "sha256": "676ae27b6a248db83941ef13e788e5b9e1e9414e21776ceb2a8903da7b42ded1",
+      "size_bytes": 302
+    },
+    "harness/EXCHANGE_LEDGER_SCHEMA.json": {
+      "sha256": "68326a38eb22d1810fcb62c72450b583715543101fbebc93b4cbb8c6d89a443f",
+      "size_bytes": 1854
+    },
+    "harness/SHA256SUMS": {
+      "sha256": "55c429424a7adaf9509387eb2fe54088efc78bb019cba78600b316c292bc739a",
+      "size_bytes": 527
+    },
+    "harness/SYNTHETIC_TEST_OUTPUT.txt": {
+      "sha256": "748095a1fbba93f302710fad7c15226a8782f058283ae43df3340a37d1eeac1b",
+      "size_bytes": 525
+    },
+    "harness/exchange_bridge.py": {
+      "sha256": "3a0ed26c1c508462a8581b4be95170230729da2583215ea437cf9a6a443034d9",
+      "size_bytes": 16796
+    },
+    "harness/harness_freeze.json": {
+      "sha256": "38aa02751aaa9a42d4a9498a98c9065df8da76f0ff5f2f106aa4ad04f64a2c45",
+      "size_bytes": 572
+    },
+    "harness/runner.py": {
+      "sha256": "2fc08f366145f84e7a8b9d607e28fff4f4ad09105ab318147b701bb04a20b7ab",
+      "size_bytes": 23142
+    },
+    "harness/test_exchange_bridge.py": {
+      "sha256": "91eef4091e071e74ff282bc22820d50779005e6366239cd88c06b04e5de5c428",
+      "size_bytes": 10000
+    },
+    "identity.json": {
+      "sha256": "9489e671ae6727784cc79d48b3513803ab5f97798424adfd9c56f724b35989f5",
+      "size_bytes": 576
+    },
+    "receipts/cursor_01_ack_stdout.json": {
+      "sha256": "e305dbb3cb1a22fe30a27353e1e2dc97765393007de94b182087fd9c09d3a9b0",
+      "size_bytes": 750
+    },
+    "receipts/cursor_01_ingest_stdout.json": {
+      "sha256": "cb354c0c3dc1e82dd2a593c9f42977eb2e272383a93a7fc1209824759ce4c3e0",
+      "size_bytes": 734
+    },
+    "release-state.json": {
+      "sha256": "7091e44d6ce75042a5d1596e8e329c44518e61b2280c0a284721b5f25781eb29",
+      "size_bytes": 1358
+    },
+    "resident_agent.py": {
+      "sha256": "05e88f251c32c616c89fbbd860614072ce47c42ab2a9be6a327052b6c14ab3ef",
+      "size_bytes": 6051
+    },
+    "world.db": {
+      "sha256": "210e7f45347fbc042895b686e3c2a69418ad395f454cc850bf85840b9e6839c2",
+      "size_bytes": 294912
+    }
+  },
+  "frozen_core_tree": "9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623",
+  "frozen_rc_software": "f20f2edfa7af00d0286493fd15196ca9503bc315",
+  "frozen_tests_tree": "7e33b5ef8432370234965d3ccd61248c703c4019",
+  "reason": "Harness serialization defect post-reveal; mid-run harness mutation refused per Rule 14",
+  "run_id": "c15-rcc-res-a-rerun-004-corrective-001",
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-001"
+}
