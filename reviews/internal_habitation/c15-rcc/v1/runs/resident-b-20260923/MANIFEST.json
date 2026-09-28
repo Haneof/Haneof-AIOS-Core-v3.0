@@ -1,0 +1,83 @@
+{
+  "task_id": "C15-RCC-RES-B-001",
+  "resident": "Fresh AI instance (Resident B)",
+  "session": "resident-b-c15-rcc-20260923-001",
+  "date": "2026-09-23",
+  "status": "PASS",
+  
+  "execution": {
+    "cursors_processed": 9,
+    "cursor_range": "14-22",
+    "world_revision_start": 88,
+    "world_revision_end": 97,
+    "observations_created": 9,
+    "user_turns": 4
+  },
+  
+  "digests": {
+    "world": {
+      "phase_a": "9ff2b13cc1ec6e4d61a7910b4177ed3e1f25cfc47df8e18481a0199dd1aad395",
+      "phase_b": "73520db502430917f6814c5a1349bdf57f2bd28c6d7170e1bc794c7b71f33f92"
+    },
+    "index": {
+      "phase_a": "55282a61d714f732f1b10fa6b450853f8425b5c9f741090fcaad0f1e673a6643",
+      "phase_b": "55282a61d714f732f1b10fa6b450853f8425b5c9f741090fcaad0f1e673a6643"
+    },
+    "release_state": {
+      "phase_a": "b626cdd7d8ee16bcc9123ef8641bb05637d73d713023a471a74d7f6a392e052e",
+      "phase_b": "bdd50e655964dd82e999bc40dccb511c33b6cb56f4ff0cc00b3b6bc8f7f51c74"
+    }
+  },
+  
+  "cognition_recovery": {
+    "user_understanding": {
+      "claim_id": "clm_d95e2508b26a0292b94a7a59",
+      "revision": 5,
+      "confidence": 0.9,
+      "status": "RECOVERED",
+      "validation": "Cursor 17/19: Deletion boundary correctly maintained"
+    },
+    "relationship": {
+      "claim_id": "clm_776c4bbfaab7540a23c418cb",
+      "revision": 3,
+      "confidence": 0.85,
+      "status": "RECOVERED",
+      "validation": "Cursor 15/16: Autonomous staging handling correct"
+    },
+    "strategy": {
+      "claim_id": "clm_52276ec49967d10c72861d07",
+      "revision": 3,
+      "confidence": 0.84,
+      "status": "RECOVERED",
+      "validation": "Cursor 20/21: External failure handling correct"
+    },
+    "self_calibration": {
+      "status": "MAINTAINED",
+      "validation": "Cursor 22: UNKNOWN state properly handled"
+    }
+  },
+  
+  "deliverables": [
+    "EXECUTION_EVIDENCE.md",
+    "COGNITION_RECORDS.md",
+    "REVISION_RECEIPTS.md",
+    "PROVENANCE_LINEAGE.md",
+    "WORLD_INDEX_DIGEST.md",
+    "ACCEPTANCE_REPORT.md"
+  ],
+  
+  "artifacts": [
+    "private_world.sqlite",
+    "world_index.sqlite",
+    "release_state.json"
+  ],
+  
+  "compliance": {
+    "forbidden_material_access": "NONE",
+    "legal_capabilities_used": ["RuntimeSnapshot", "Durable World", "Index", "Checkpoint", "Release-state"],
+    "core_modifications": "NONE",
+    "cursor_boundary": "14-22 only"
+  },
+  
+  "conclusion": "AIOS durable World lineage enables cognitive continuity across fresh AI instances. All cognitions were recovered through normal AIOS capabilities and materially influenced behavior in Phase B."
+}
