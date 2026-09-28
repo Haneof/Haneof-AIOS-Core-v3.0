@@ -71,6 +71,10 @@ JOURNAL_VERSION = "c15-relay-journal-v1"
 REMOTE_DURABILITY_CONFIG = "remote-durability.json"
 
 
+class RemoteDurabilityAbort(BaseException):
+    """Remote-authoritative persistence failed; ordinary capability wrapping must not swallow it."""
+
+
 def _bootstrap_src() -> None:
     here = Path(__file__).resolve()
     for parent in here.parents:
@@ -205,6 +209,25 @@ class OperatorSession:
     def remote_durability_enabled(self) -> bool:
         return self._remote_ref is not None
 
+    def _remote_binding_payload(self, *, remote_ref: str, remote: str) -> dict[str, str]:
+        from .remote_backend import remote_ref_for_run
+
+        run_id = str(self.backend.owner["run_id"])
+        session_id = str(self.backend.owner["session_id"])
+        require(bool(remote_ref), "remote durability requires a non-blank remote ref")
+        require(bool(remote), "remote durability requires a non-blank remote")
+        require(
+            remote_ref == remote_ref_for_run(run_id),
+            f"remote durability ref is not canonical for run {run_id}: {remote_ref}",
+        )
+        return {
+            "run_id": run_id,
+            "session_id": session_id,
+            "remote_ref": remote_ref,
+            "remote": remote,
+            "version": "c15-remote-durability-v2",
+        }
+
     def _configure_remote_durability(
         self,
         *,
@@ -213,30 +236,54 @@ class OperatorSession:
         repo_dir: Path | None,
         persist: bool,
     ) -> None:
-        require(bool(remote_ref), "remote durability requires a non-blank remote ref")
-        require(bool(remote), "remote durability requires a non-blank remote")
+        binding = self._remote_binding_payload(remote_ref=remote_ref, remote=remote)
+        require(
+            bool(self.backend.owner.get("remote_authoritative")),
+            "backend was not created as remote-authoritative; refusing late promotion",
+        )
+        authority = self.backend.owner.get("remote_authority")
+        require(isinstance(authority, dict), "backend remote authority binding is missing")
+        require(authority.get("run_id") == binding["run_id"], "remote authority run mismatch")
+        require(authority.get("session_id") == binding["session_id"], "remote authority session mismatch")
+        require(authority.get("remote_ref") == remote_ref, "remote authority ref mismatch")
+        require(authority.get("remote") == remote, "remote authority remote mismatch")
+        payload = {**binding, "binding_sha256": digest(canonical_json(binding))}
         if self.remote_config_path.is_file():
-            stored = json.loads(self.remote_config_path.read_text(encoding="utf-8"))
-            require(stored.get("remote_ref") == remote_ref, "remote durability ref mismatch")
-            require(stored.get("remote") == remote, "remote durability remote mismatch")
+            try:
+                stored = json.loads(self.remote_config_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as exc:
+                raise BackendError(f"remote durability config is unreadable: {exc}") from exc
+            require(stored == payload, "remote durability config/binding mismatch")
         elif persist:
-            _write_json(
-                self.remote_config_path,
-                {
-                    "version": "c15-remote-durability-v1",
-                    "remote_ref": remote_ref,
-                    "remote": remote,
-                },
-            )
+            _write_json(self.remote_config_path, payload)
+        else:
+            raise BackendError("remote-authoritative backend is missing remote durability config")
         self._remote_ref = remote_ref
         self._remote = remote
         self._remote_repo_dir = repo_dir
 
     def _load_remote_durability(self, *, repo_dir: Path | None = None) -> bool:
         if not self.remote_config_path.is_file():
+            require(
+                not bool(self.backend.owner.get("remote_authoritative")),
+                "remote-authoritative backend is missing remote durability config",
+            )
             return False
-        payload = json.loads(self.remote_config_path.read_text(encoding="utf-8"))
-        require(payload.get("version") == "c15-remote-durability-v1", "unknown remote durability config")
+        try:
+            payload = json.loads(self.remote_config_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise BackendError(f"remote durability config is unreadable: {exc}") from exc
+        require(
+            isinstance(payload, dict)
+            and set(payload)
+            == {"binding_sha256", "remote", "remote_ref", "run_id", "session_id", "version"},
+            "remote durability config has unexpected fields",
+        )
+        base = {k: payload[k] for k in ("run_id", "session_id", "remote_ref", "remote", "version")}
+        require(
+            payload.get("binding_sha256") == digest(canonical_json(base)),
+            "remote durability config binding digest mismatch",
+        )
         self._configure_remote_durability(
             remote_ref=str(payload["remote_ref"]),
             remote=str(payload["remote"]),
@@ -244,7 +291,6 @@ class OperatorSession:
             persist=False,
         )
         return True
-
     def _persist_remote_barrier(self, point: str, *, seal_label: str | None = None) -> tuple[str, str] | None:
         """Synchronously commit the current recoverable barrier to remote storage.
 
@@ -294,18 +340,32 @@ class OperatorSession:
         repo_dir: Path | None = None,
         require_remote_durability: bool = False,
     ) -> "OperatorSession":
+        remote_enabled = require_remote_durability or remote_ref is not None
+        effective_ref = remote_ref
+        if remote_enabled:
+            from .remote_backend import remote_ref_for_run
+            effective_ref = effective_ref or remote_ref_for_run(run_id)
+            require(
+                effective_ref == remote_ref_for_run(run_id),
+                f"remote durability ref is not canonical for run {run_id}: {effective_ref}",
+            )
         backend = RunBackend.create(
-            root, run_id=run_id, session_id=session_id, subject_id=SUBJECT_ID, phase="A"
+            root,
+            run_id=run_id,
+            session_id=session_id,
+            subject_id=SUBJECT_ID,
+            phase="A",
+            remote_authority=(
+                None if not remote_enabled else {"remote": remote, "remote_ref": str(effective_ref)}
+            ),
         )
         journal = RelayJournal(backend, create=True)
         release = SyntheticRelease(backend.state_dir / "synthetic-release", event_count=event_count, seed=seed)
         session = cls(backend, journal, release)
-        if require_remote_durability or remote_ref is not None:
-            if remote_ref is None:
-                from .remote_backend import remote_ref_for_run
-                remote_ref = remote_ref_for_run(run_id)
+        if remote_enabled:
+            require(effective_ref is not None, "remote durability ref was not resolved")
             session._configure_remote_durability(
-                remote_ref=remote_ref,
+                remote_ref=effective_ref,
                 remote=remote,
                 repo_dir=repo_dir,
                 persist=True,
@@ -337,15 +397,21 @@ class OperatorSession:
         session = cls(backend, journal, release)
         loaded = session._load_remote_durability(repo_dir=repo_dir)
         if remote_ref is not None or remote is not None:
+            require(
+                bool(session.backend.owner.get("remote_authoritative")),
+                "local-only backend cannot be promoted to remote-authoritative on attach",
+            )
             requested_ref = remote_ref or session._remote_ref
             requested_remote = remote or session._remote
-            require(requested_ref is not None, "remote ref required when enabling remote durability on attach")
+            require(requested_ref is not None, "remote ref required for remote-authoritative attach")
             session._configure_remote_durability(
                 remote_ref=requested_ref,
                 remote=requested_remote,
                 repo_dir=repo_dir,
-                persist=not loaded,
+                persist=False,
             )
+        elif bool(session.backend.owner.get("remote_authoritative")):
+            require(loaded, "remote-authoritative attach did not load its binding")
         backend.audit("session_attached", {"phase": "resume"})
         return session
 
@@ -699,18 +765,30 @@ class OperatorSession:
             self.journal.ledger_set("round_hint", str(round_index))
             self._write_outbox(request_id, raw, round_index=round_index)
             self.bump("dispatches")
+            dispatch_report = provider_module.dispatch(self.mailbox, request_id)
+            if dispatch_report["dispatch"] == "dispatched":
+                self.bump("provider_dispatches")
+            else:
+                self.bump("provider_reattachments")
             if self.remote_durability_enabled:
                 self._persist_remote_barrier(
                     "K3_AFTER_REQUEST_DISPATCH",
-                    seal_label="remote-request-exposed",
+                    seal_label="remote-request-dispatched",
                 )
             self.maybe_kill("K3_AFTER_REQUEST_DISPATCH")
         else:
-            # Re-presenting the outstanding request after a restart.  The bytes
-            # come from the journal and the outbox is left untouched, so the
-            # provider dispatch ledger keeps exactly one entry.
             raw = self.journal.outstanding_request(request_id)
             self.backend.audit("request_represented", {"request_id": request_id, "round": round_index})
+            record = self.journal.recovery(request_id)
+            if record["state"] == "exposed":
+                dispatch_report = provider_module.dispatch(self.mailbox, request_id)
+                require(
+                    dispatch_report["dispatch"] == "reattached",
+                    "recovery attempted a second provider dispatch",
+                )
+                self.bump("provider_reattachments")
+            elif record["state"] in {"reply-staged", "authenticated", "applying", "applied", "acked"}:
+                return request_id, bytes(record["reply"])
         reply = self._collect_reply(request_id)
         self.journal.stage_reply(request_id, reply)
         return request_id, reply
@@ -745,15 +823,11 @@ class OperatorSession:
         )
 
     def _collect_reply(self, request_id: str) -> bytes:
-        report = provider_module.serve(self.mailbox, request_id)
+        report = provider_module.collect(self.mailbox, request_id)
         _append_jsonl(
             self.mailbox_archive_path,
             {"direction": "inbox", "request_id": request_id, "report": report, "at": _now()},
         )
-        if report["dispatch"] == "dispatched":
-            self.bump("provider_dispatches")
-        else:
-            self.bump("provider_reattachments")
         reply = provider_module.inbox_path(self.mailbox, request_id).read_bytes()
         require(digest(reply) == report["reply_sha256"], "provider reply bytes changed after delivery")
         return reply
@@ -774,10 +848,15 @@ class OperatorSession:
         # runtime may continue beyond the capability boundary.  In remote mode
         # that exact recovery point is synchronously published before kill.
         if self.remote_durability_enabled:
-            self._persist_remote_barrier(
-                "K4_AFTER_REPLY_AUTHENTICATED",
-                seal_label="remote-capability-boundary",
-            )
+            try:
+                self._persist_remote_barrier(
+                    "K4_AFTER_REPLY_AUTHENTICATED",
+                    seal_label="remote-capability-boundary",
+                )
+            except Exception as exc:
+                raise RemoteDurabilityAbort(
+                    f"K4 remote-authoritative persistence failed: {type(exc).__name__}: {exc}"
+                ) from exc
         self.maybe_kill("K4_AFTER_REPLY_AUTHENTICATED")
         return {"result": result, "duplicate_suppressed": False}
 
