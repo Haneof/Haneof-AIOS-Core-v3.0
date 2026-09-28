@@ -1410,7 +1410,7 @@ class FusedTurnRuntime:
         work_kind: str,
         work_id: str,
     ) -> tuple[BackgroundModelAttempt, BackgroundModelResponseStaging] | None:
-        return self.background_model_attempts.pending_exact_response(
+        return self.background_model_attempts.recover_trusted_handoff(
             subject_id=self.subject_id,
             work_kind=work_kind,
             work_id=work_id,
@@ -3403,6 +3403,18 @@ class FusedTurnRuntime:
             session_id=session,
             turn_index=turn_index,
         )
+        # A durable assistant output is the terminal application receipt. Finish
+        # the existing claim's mechanical ACK before considering any handoff:
+        # never stage or reapply a metered directive after output was committed.
+        status = self.turn_executions.inspect(
+            subject_id=self.subject_id, session_id=session, turn_index=turn_index,
+            user_input=user_input, occurred_at=occurred_iso, assistant_id=assistant_id,
+        )
+        if status.assistant_ref is not None or status.state == "completed":
+            self.turn_executions.claim(
+                subject_id=self.subject_id, session_id=session, turn_index=turn_index,
+                user_input=user_input, occurred_at=occurred_iso, assistant_id=assistant_id,
+            )
         exact_response = self._pending_exact_response(
             work_kind="user_turn",
             work_id=execution_id,

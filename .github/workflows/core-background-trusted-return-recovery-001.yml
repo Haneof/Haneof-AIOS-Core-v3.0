@@ -1,0 +1,85 @@
+name: core-background-trusted-return-recovery-001
+
+on:
+  pull_request:
+    paths:
+      - "src/aios_core/**"
+      - "tests/**"
+      - ".github/workflows/core-background-trusted-return-recovery-001.yml"
+  workflow_dispatch:
+
+jobs:
+  formal-core-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.14"
+      - run: python -m pip install -e . pydantic==2.13.5 pytest==8.4.2
+      - name: Record exact formal environment and enumeration
+        run: |
+          python - <<'PY'
+          import sys, sqlite3, pydantic, pytest
+          print('Python:', sys.version)
+          print('Pydantic:', pydantic.__version__)
+          print('pytest:', pytest.__version__)
+          print('SQLite:', sqlite3.sqlite_version)
+          PY
+          pytest -o addopts='' --collect-only -q > collected.txt
+          tail -n 4 collected.txt
+      - name: R5-A/B/C/D durable identity and conflict gate
+        run: |
+          pytest -o addopts='' -q --junitxml=r5.xml \
+            tests/integration/test_core_background_trusted_return_r5_001.py \
+            tests/integration/test_core_background_trusted_return_r5_conflicts_001.py
+      - name: Focused trusted-return and accepted authenticity gate
+        run: |
+          pytest -o addopts='' -q --junitxml=focused.xml \
+            tests/integration/test_core_background_trusted_return_recovery_001.py \
+            tests/integration/test_core_background_trusted_return_adversarial_001.py \
+            tests/integration/test_core_background_response_recovery_001.py \
+            tests/integration/test_core_background_response_recovery_001_corrective_001.py \
+            tests/integration/test_core_background_response_recovery_001_corrective_002_authenticity.py \
+            tests/integration/test_core_background_response_recovery_001_corrective_002_recovery.py \
+            tests/runtime/test_background_model_attempt.py
+      - name: Annotate focused failure identities
+        if: failure()
+        run: |
+          python - <<'PYTEST'
+          import os, xml.etree.ElementTree as ET
+          if os.path.isfile('focused.xml'):
+              root = ET.parse('focused.xml').getroot()
+              for case in root.iter('testcase'):
+                  for error in (*case.findall('failure'), *case.findall('error')):
+                      text = (error.text or '').strip().splitlines()
+                      message = (' | '.join(text[-14:]) if text else error.attrib.get('message', 'unknown failure'))
+                      print(f"::error file=.github/workflows/core-background-trusted-return-recovery-001.yml::FAILED {case.get('classname')}::{case.get('name')}: {message}")
+          PYTEST
+      - name: Complete Core regression
+        if: always()
+        run: pytest -o addopts='' -q --junitxml=full.xml
+      - name: Publish formal environment and exact JUnit counts
+        if: always()
+        run: |
+          python - <<'PYGATE'
+          import sqlite3, sys, xml.etree.ElementTree as ET
+          import pydantic, pytest
+          print(f"::notice title=Formal environment::Python {sys.version.split()[0]} / Pydantic {pydantic.__version__} / pytest {pytest.__version__} / SQLite {sqlite3.sqlite_version}")
+          for name in ('r5', 'focused', 'full'):
+              try:
+                  suite = ET.parse(name + '.xml').getroot().find('testsuite')
+                  fields = ', '.join(f"{key}={suite.get(key)}" for key in ('tests', 'failures', 'errors', 'skipped', 'time'))
+                  print(f"::notice title={name} exact JUnit::{fields}")
+              except (FileNotFoundError, AttributeError) as exc:
+                  print(f"::warning title={name} JUnit unavailable::{exc}")
+          PYGATE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: core-trusted-return-formal-results
+          path: |
+            collected.txt
+            r5.xml
+            focused.xml
+            full.xml

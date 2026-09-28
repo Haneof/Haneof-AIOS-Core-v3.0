@@ -544,6 +544,17 @@ class BackgroundModelAttemptStore:
                 )
                 """
             )
+            # The receipt alone authenticates a digest, not the bytes needed after
+            # process loss. Both rows must commit in the SAME transaction at the
+            # trusted provider-return callback, before downstream application.
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS background_model_return_handoffs (
+                    attempt_id TEXT PRIMARY KEY,
+                    directive_payload TEXT NOT NULL,
+                    payload_sha256 TEXT NOT NULL,
+                    authenticity_proof TEXT NOT NULL
+                )
+            """)
             conn.commit()
 
     @staticmethod
@@ -1594,6 +1605,26 @@ class BackgroundModelAttemptStore:
                     "trusted return bytes conflict with the receipt already captured "
                     "for this attempt",
                 )
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO background_model_return_handoffs(
+                    attempt_id, directive_payload, payload_sha256, authenticity_proof
+                ) VALUES (?, ?, ?, ?)
+                """,
+                (attempt_id, directive_payload, payload_sha256, proof),
+            )
+            handoff = conn.execute(
+                "SELECT * FROM background_model_return_handoffs WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if handoff is None or (
+                handoff["directive_payload"], handoff["payload_sha256"],
+                handoff["authenticity_proof"],
+            ) != (directive_payload, payload_sha256, proof):
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt, "trusted return conflicts with durable exact handoff",
+                )
             conn.commit()
         return receipt
 
@@ -1945,6 +1976,81 @@ class BackgroundModelAttemptStore:
         if attempt.state not in {"response_returned", "metered"}:
             raise BackgroundModelAttemptBlocked(attempt)
         return staged
+
+    def recover_trusted_handoff(
+        self,
+        *,
+        subject_id: str,
+        work_kind: BackgroundAttemptWorkKind,
+        work_id: str,
+    ) -> tuple[BackgroundModelAttempt, BackgroundModelResponseStaging] | None:
+        """Promote only Core-owned, trusted-callback bytes for the latest round.
+
+        No caller supplies response bytes or receives a signing capability. An
+        absent handoff never licenses provider redispatch; ordinary admission
+        guards remain responsible for unresolved dispatching attempts.
+        """
+        attempts = self.list_for_work(
+            subject_id=subject_id, work_kind=work_kind, work_id=work_id,
+        )
+        if not attempts:
+            return None
+        latest = attempts[-1]
+        if any(previous.state != "metered" for previous in attempts[:-1]):
+            return None
+        with self.store._connection() as conn:
+            handoff = conn.execute(
+                "SELECT * FROM background_model_return_handoffs WHERE attempt_id=?",
+                (latest.attempt_id,),
+            ).fetchone()
+        if handoff is None:
+            return self.pending_exact_response(
+                subject_id=subject_id, work_kind=work_kind, work_id=work_id,
+            )
+        payload = handoff["directive_payload"]
+        digest = handoff["payload_sha256"]
+        proof = handoff["authenticity_proof"]
+        if (
+            not isinstance(payload, str)
+            or not isinstance(digest, str)
+            or hashlib.sha256(payload.encode("utf-8")).hexdigest() != digest
+            or not isinstance(proof, str)
+        ):
+            raise BackgroundModelResponseConflict(
+                latest, "trusted return handoff payload or digest is corrupt",
+            )
+        # The existing strict decoder rejects duplicate semantic JSON keys at
+        # every nesting level. stage_exact_response verifies the signed receipt,
+        # originating request, complete attempt scope and exact payload digest.
+        directive = decode_model_directive(payload)
+        provider, model, request_id = self._provider_identity(directive)
+        if provider is None or model is None or request_id is None:
+            raise BackgroundModelResponseConflict(
+                latest, "trusted return handoff has no provider identity",
+            )
+        existing = self.staged_response(latest.attempt_id)
+        if existing is not None:
+            # Verify the already-staged bytes first (including the legacy payload
+            # hash error) before comparing them with the callback's handoff.
+            self.exact_response_directive(latest.attempt_id)
+            if (existing.directive_payload, existing.payload_sha256,
+                existing.authenticity_proof) != (payload, digest, proof):
+                raise BackgroundModelResponseConflict(
+                    latest, "staged response conflicts with trusted return handoff",
+                )
+            return latest, existing
+        staged = self.stage_exact_response(
+            latest.attempt_id,
+            staged_at=latest.admitted_at,
+            provider=provider,
+            model=model,
+            provider_request_id=request_id,
+            response_fingerprint=self._response_fingerprint(directive),
+            directive_payload=payload,
+            authenticity_proof=proof,
+            evidence="Core trusted provider-return handoff",
+        )
+        return latest, staged
 
     def pending_exact_response(
         self,

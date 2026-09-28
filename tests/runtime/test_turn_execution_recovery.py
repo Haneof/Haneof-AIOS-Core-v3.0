@@ -389,12 +389,12 @@ def test_cg003_assistant_output_persistence_failure_remains_in_doubt(tmp_path, m
 
     inspected = runtime.inspect_turn_execution(**TURN)
     assert inspected.recovery_disposition == "in_doubt"
-    with pytest.raises(TurnExecutionInDoubt):
-        FusedTurnRuntime(
-            store=SQLiteWorldStore(store.db_path),
-            index=WorldSearchIndex(index.db_path, store=SQLiteWorldStore(store.db_path)),
-            model_handler=model,
-        ).run_turn(**TURN)
+    recovered = FusedTurnRuntime(
+        store=SQLiteWorldStore(store.db_path),
+        index=WorldSearchIndex(index.db_path, store=SQLiteWorldStore(store.db_path)),
+        model_handler=model,
+    ).run_turn(**TURN)
+    assert recovered.runtime.response == "SYNTHETIC recovered response"
     assert calls == ["called"]
 
 

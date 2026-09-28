@@ -948,6 +948,13 @@ def test_metered_attempt_without_exact_bytes_stays_blocked(tmp_path, monkeypatch
         runtime.run_wake(wake_ref=_wake_ref(signal), now=NOW)
     attempt = _wake_attempt(runtime, signal.wake_id, 0)
     assert attempt.state == "metered"
+    # A real missing-bytes case must lack the new Core-owned handoff too.
+    # The trusted callback now atomically preserves exact bytes with its receipt;
+    # deleting them here models a legacy/lost journal, not a normal return.
+    with store._connection() as conn:
+        conn.execute("DELETE FROM background_model_return_handoffs WHERE attempt_id=?",
+                     (attempt.attempt_id,))
+        conn.commit()
 
     reopened_store, reopened_index = _reopen(db)
     restarted = FusedTurnRuntime(
