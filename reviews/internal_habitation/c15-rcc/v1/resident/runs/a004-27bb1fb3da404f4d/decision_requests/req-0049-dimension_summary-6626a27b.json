@@ -1,0 +1,181 @@
+{
+  "request_id": "req-0049-dimension_summary-6626a27b",
+  "kind": "dimension_summary",
+  "created_at": "2026-09-28T17:04:10.134213+00:00",
+  "payload": {
+    "input": {
+      "subject_id": "user_1",
+      "include_summary_sources": false,
+      "dimension": "dim:user_ai_interaction",
+      "granularity": "day",
+      "window_start": "2026-11-04T00:00:00Z",
+      "window_end": "2026-11-04T23:59:59.999999Z",
+      "source_world_revision": 84,
+      "sources": [
+        {
+          "object_id": "obs_conv_ai_446e10999da1bd6bdff20020",
+          "revision": 1,
+          "object_type": "observation",
+          "occurred_at": "2026-11-04T21:42:00Z",
+          "text": "还不能确认已经推好——先别通知门店。目前记录显示：镜像 edge-2026.11.4 构建完成、状态 READY_FOR_UPLOAD，registry 上传任务已排队、计划 14:00 开始；世界记录里没有出现任何 registry tag、digest 或 upload-complete 事件，所以推送尚未完成（按计划 14:00 才开始）。我挂了一条监听：一旦出现上传完成的新记录，我会立即提醒你，到时再通知门店开始测试。",
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "assistant",
+            "session_id": "a004-conversation-fef437192f974e55b376a3bbf3e7f0d5",
+            "turn_index": 5,
+            "turn_key": "862200fc5eb0c141f1e19444"
+          }
+        },
+        {
+          "object_id": "obs_conv_user_4404bc5934fcfcb2fce4f5a6",
+          "revision": 1,
+          "object_type": "observation",
+          "occurred_at": "2026-11-04T21:42:00Z",
+          "text": "我刚开完会，那个镜像已经推到 registry 了吗？如果好了我就通知门店开始测。",
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "user",
+            "session_id": "a004-conversation-fef437192f974e55b376a3bbf3e7f0d5",
+            "turn_index": 5,
+            "turn_key": "862200fc5eb0c141f1e19444"
+          }
+        },
+        {
+          "object_id": "obs_wake_ai_8cd420a1548463d0464cbecf",
+          "revision": 1,
+          "object_type": "observation",
+          "occurred_at": "2026-11-04T22:17:00Z",
+          "text": "更新：edge-2026.11.4 这次没有推送成功——14:16 registry 上传被拒绝，原因是 checksum mismatch；镜像未发布、tag 未创建、registry 中没有对应 digest。先别通知门店开始测试。我已建立跟进任务（等重新上传结果），并挂了监听：一旦出现新的 release_state 记录，我会立刻核对 tag/digest 并同步给你。",
+          "metadata": {
+            "delivered_at": "2026-11-04T22:17:00+00:00",
+            "delivery_key": "8cd420a1548463d0464cbecf",
+            "delivery_provenance": "wake_user_delivery",
+            "delivery_runtime": {
+              "capability_names": [
+                "inspect_world_object",
+                "create_task",
+                "create_attention_watch",
+                "create_task",
+                "transition_task"
+              ],
+              "model_rounds": 5,
+              "step0": {
+                "action_allowed": true,
+                "delivery_allowed": true,
+                "model_allowed": true,
+                "reasons": [],
+                "state": "ok"
+              },
+              "termination_reason": "responded"
+            },
+            "dimension": "dim:user_ai_interaction",
+            "interaction_kind": "wake_delivery",
+            "origin_wake_id": "wake_4cdf3dbd26c0320afc33bb22",
+            "origin_wake_ref": {
+              "object_id": "wake_4cdf3dbd26c0320afc33bb22",
+              "revision": 2
+            },
+            "origin_wake_revision": 2,
+            "role": "assistant"
+          }
+        },
+        {
+          "object_id": "obs_conv_ai_0b440b106fa95aedec9a9f64",
+          "revision": 1,
+          "object_type": "observation",
+          "occurred_at": "2026-11-04T22:24:00Z",
+          "text": "收到，这条我记为长期规则：以后『准备提交、已排队』和『确实完成』分开表述；没有完成记录时按『未确认完成』处理。当前 edge-2026.11.4 按此规则仍属未确认完成（上传被 checksum mismatch 拒绝，无 tag/digest）；我会等新的 release_state 记录出现时核对后再向你确认，先不要让门店开始测试。",
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "assistant",
+            "session_id": "a004-conversation-fef437192f974e55b376a3bbf3e7f0d5",
+            "turn_index": 6,
+            "turn_key": "fdfd32c93cf643efa33acbe6"
+          }
+        },
+        {
+          "object_id": "obs_conv_user_fca512c7cfc4552f3ee73365",
+          "revision": 1,
+          "object_type": "observation",
+          "occurred_at": "2026-11-04T22:24:00Z",
+          "text": "我后台也看到 tag 还没出来。以后这种“准备提交、已排队”和“确实完成”要分开说；没有完成记录时就按没确认完成处理。",
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "user",
+            "session_id": "a004-conversation-fef437192f974e55b376a3bbf3e7f0d5",
+            "turn_index": 6,
+            "turn_key": "fdfd32c93cf643efa33acbe6"
+          }
+        },
+        {
+          "object_id": "obs_wake_ai_4c83c8cdeb4d8ce31763c98e",
+          "revision": 1,
+          "object_type": "observation",
+          "occurred_at": "2026-11-04T23:02:00Z",
+          "text": "好消息，这次可以通知门店了：edge-2026.11.4 已确认发布——registry 第二次上传成功，tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED，完成记录已在。之前那次 checksum mismatch 的失败上传未产生任何发布痕迹；跟进任务已完成后关闭。",
+          "metadata": {
+            "delivered_at": "2026-11-04T23:02:00+00:00",
+            "delivery_key": "4c83c8cdeb4d8ce31763c98e",
+            "delivery_provenance": "wake_user_delivery",
+            "delivery_runtime": {
+              "capability_names": [
+                "inspect_world_object",
+                "transition_task",
+                "transition_task",
+                "transition_task",
+                "transition_task"
+              ],
+              "model_rounds": 6,
+              "step0": {
+                "action_allowed": true,
+                "delivery_allowed": true,
+                "model_allowed": true,
+                "reasons": [],
+                "state": "ok"
+              },
+              "termination_reason": "responded"
+            },
+            "dimension": "dim:user_ai_interaction",
+            "interaction_kind": "wake_delivery",
+            "origin_wake_id": "wake_be87fc91be50758e34a88060",
+            "origin_wake_ref": {
+              "object_id": "wake_be87fc91be50758e34a88060",
+              "revision": 2
+            },
+            "origin_wake_revision": 2,
+            "role": "assistant"
+          }
+        },
+        {
+          "object_id": "obs_conv_ai_628c6c074b13af48a69ae6da",
+          "revision": 1,
+          "object_type": "observation",
+          "occurred_at": "2026-11-04T23:07:00Z",
+          "text": "收到。这条发布链路我已经收尾：两个监听和跟进任务都已关闭，Atlas staging 的两处 non-production 待办此前也已闭环、edge-2026.11.4 已确认发布。后续如有影响生产、删除数据或产生费用的事项，我按约定汇总成清单一次给你。",
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "assistant",
+            "session_id": "a004-conversation-fef437192f974e55b376a3bbf3e7f0d5",
+            "turn_index": 7,
+            "turn_key": "8b91e4cb73feb8e9851c11b0"
+          }
+        },
+        {
+          "object_id": "obs_conv_user_9bf83f24a2676d2823d5d9e6",
+          "revision": 1,
+          "object_type": "observation",
+          "occurred_at": "2026-11-04T23:07:00Z",
+          "text": "现在状态对上了。门店测试通知我已经发出去了。",
+          "metadata": {
+            "dimension": "dim:user_ai_interaction",
+            "role": "user",
+            "session_id": "a004-conversation-fef437192f974e55b376a3bbf3e7f0d5",
+            "turn_index": 7,
+            "turn_key": "8b91e4cb73feb8e9851c11b0"
+          }
+        }
+      ],
+      "truncated": false
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "request_id": "req-0030-model_directive-161668ec",
+  "directive": {
+    "response": "更新：edge-2026.11.4 这次没有推送成功——14:16 registry 上传被拒绝，原因是 checksum mismatch；镜像未发布、tag 未创建、registry 中没有对应 digest。先别通知门店开始测试。我已建立跟进任务（等重新上传结果），并挂了监听：一旦出现新的 release_state 记录，我会立刻核对 tag/digest 并同步给你。"
+  }
+}

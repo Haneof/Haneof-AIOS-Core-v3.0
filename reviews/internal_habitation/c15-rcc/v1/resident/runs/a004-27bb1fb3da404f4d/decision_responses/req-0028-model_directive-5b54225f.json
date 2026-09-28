@@ -1,0 +1,22 @@
+{
+  "request_id": "req-0028-model_directive-5b54225f",
+  "directive": {
+    "capability_calls": [
+      {
+        "name": "create_task",
+        "arguments": {
+          "title": "edge-2026.11.4 registry 发布跟进：修复 checksum mismatch 后重新上传并确认 tag/digest",
+          "task_type": "follow_up",
+          "reason_refs": [
+            {"object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2", "revision": 1},
+            {"object_id": "obs_conv_user_4404bc5934fcfcb2fce4f5a6", "revision": 1},
+            {"object_id": "task_261791ea89d614bafec71a9d", "revision": 1}
+          ],
+          "priority": 70,
+          "next_step": "等待 registry 重新上传结果（checksum 修复后）；出现新的 release_state 记录时核对 tag/digest，确认发布后再通知用户与门店。",
+          "completion_condition": {"mode": "world_evidence", "result_object_types": ["observation"]}
+        }
+      }
+    ]
+  }
+}

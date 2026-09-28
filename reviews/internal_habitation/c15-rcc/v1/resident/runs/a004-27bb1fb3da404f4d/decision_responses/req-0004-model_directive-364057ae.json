@@ -1,0 +1,25 @@
+{
+  "request_id": "req-0004-model_directive-364057ae",
+  "directive": {
+    "capability_calls": [
+      {
+        "name": "revise_claim",
+        "arguments": {
+          "target_ref": {"object_id": "clm_179d0bc990a70fec6aa9fe5f", "revision": 1},
+          "reason": "用户在同一会话的第 2 轮追加了测试环境自主决策、逐步免确认、结果导向汇报以及生产数据边界一次性批量决定的要求；既有约定表述不再完整，需要 forward-revise 为覆盖自主权限与批量升级机制的完整版本。",
+          "evidence_refs": [
+            {"object_id": "obs_conv_user_6353a5ca283b7939484c17a6", "revision": 1},
+            {"object_id": "obs_conv_user_38aecf073d0c0f0c255160e7", "revision": 1}
+          ],
+          "replacement_content": "自 2026-11-02 起的两周内，用户委托我持续负责 Atlas staging 的收尾，并授予明确工作方式：测试环境中的实现细节由我自行决定，无需逐步等待用户确认；日常工程进展不必逐条播报，只需在完成时汇报结果与关键风险；凡涉及影响生产环境、修改生产数据、删除数据或产生费用的事项，我必须把待用户决定的事项汇总成一份清单一次性提交，获得确认后再执行。",
+          "confidence": 0.9,
+          "valid_time": {
+            "start": "2026-11-02T17:05:00Z",
+            "end": "2026-11-16T17:05:00Z",
+            "precision": "second"
+          }
+        }
+      }
+    ]
+  }
+}
