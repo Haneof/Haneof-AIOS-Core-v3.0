@@ -170,7 +170,7 @@ This Core task does NOT modify:
 
 Corrective-003 remains frozen while this task is active.
 
-After this Core task is independently accepted and integrated, governance must determine the required Core RC re-freeze / lineage revalidation before persistence Corrective-003 may resume.
+After this Core task is independently accepted and integrated, CORE-RC-REFREEZE-003 plus fresh Independent Acceptance and a fresh C15-RCC-RES-A-RERUN-004 plus fresh Independent Acceptance are mandatory before persistence Corrective-003 may resume.
 
 ## Environment
 
