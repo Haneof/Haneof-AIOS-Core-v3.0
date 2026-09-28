@@ -1,5 +1,16 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 当前控制入口 — 2026-09-28 A-RERUN-004 REVIEW_READY / FRESH IA READY
+
+- **`C15-RCC-RES-A-RERUN-004 = PHASE_A_COMPLETE / REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE`**. Evidence PR #273 remains **OPEN / UNMERGED / EVIDENCE-ONLY** at exact head `f251e9c0026a0f97fdee20397936cb5e3b18c61c` (parent `0b17c7f35697dc4a24b731185868d29967efcf58`, tree `fd312286b7b83cd550ecc49d72b78656e6e91b71`).
+- Frozen RC execution pins: software `f20f2edfa7af00d0286493fd15196ca9503bc315`; Core tree `9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623`; tests tree `7e33b5ef8432370234965d3ccd61248c703c4019`.
+- PR #273 contains 189 evidence files, all under `reviews/internal_habitation/c15-rcc/v1/resident/runs/a004-27bb1fb3da404f4d/**`; **zero src/tests/tools/governance drift**.
+- Mechanical run evidence records 13/13 ACK, last ACK c15rcc-013, `next_sequence=14`, `pending_reveal=null`, final World revision 89 and index watermark 89. These remain author/run evidence pending independent verification.
+- Fresh IA must attack Resident decision authenticity, future contamination, cursor-1/cursor-10 recovery legality, anonymous local-handler provenance truthfulness, attention-watch step-boundary replay legality, Wake/Review/Summary completeness, World/index coherence and freeze hashes.
+- **唯一下一 READY：`C15-RCC-RES-A-RERUN-004-INDEPENDENT-ACCEPTANCE = READY`**. Prompt: `governance/prompts/C15_RCC_RES_A_RERUN_004_INDEPENDENT_ACCEPTANCE_2026-09-28.md`.
+- Until fresh IA PASS + separate PM integration: persistence Corrective-003 resume, Resident B/C, evaluator and C15 close remain **BLOCKED**.
+
+
 ## 当前控制入口 — 2026-09-28 RC-REFREEZE-003 INTEGRATED / A-RERUN-004 READY
 
 - **`CORE-RC-REFREEZE-003 = DONE / ACCEPTED / INTEGRATED`**. Frozen software = `f20f2edfa7af00d0286493fd15196ca9503bc315`; frozen Core tree = `9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623`; frozen tests tree = `7e33b5ef8432370234965d3ccd61248c703c4019`.
