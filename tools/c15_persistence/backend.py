@@ -760,7 +760,7 @@ class GenerationStore:
         except sqlite3.Error as exc:
             raise BackendError(f"generation ledger unreadable: {exc}") from exc
         if row is None:
-            raise BackendError("generation ledger is missing from existing relay journal")
+            return None
         try:
             expected = int(row[0])
         except (TypeError, ValueError) as exc:
@@ -794,6 +794,11 @@ class GenerationStore:
             expected_head = 0
 
         expected_ledger = self._expected_generation_from_journal()
+        if expected_head > 0 and self.backend.journal_path.is_file():
+            require(
+                expected_ledger is not None,
+                "generation ledger is missing for non-empty immutable history",
+            )
         if expected_ledger is not None:
             require(
                 expected_ledger == expected_head,
