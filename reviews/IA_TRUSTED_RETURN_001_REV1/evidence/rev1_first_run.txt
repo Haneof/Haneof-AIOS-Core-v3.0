@@ -1,0 +1,587 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0
+rootdir: /home/user/ia-review
+configfile: pyproject.toml
+collected 59 items
+
+tests/independent_acceptance/test_ia_authenticity.py FFFFFFFFFFFFFFFFFFF [ 32%]
+F                                                                        [ 33%]
+tests/independent_acceptance/test_ia_capability_breadth.py .FFFFFFFFF    [ 50%]
+tests/independent_acceptance/test_ia_operation_replay.py F........F...F. [ 76%]
+..F.                                                                     [ 83%]
+tests/independent_acceptance/test_ia_r1_r4.py FFFFFFFF                   [ 96%]
+tests/independent_acceptance/test_ia_sigkill.py FF                       [100%]
+
+=================================== FAILURES ===================================
+__________________ test_ia_auth01_forged_payload_fails_closed __________________
+tests/independent_acceptance/test_ia_authenticity.py:78: in test_ia_auth01_forged_payload_fails_closed
+    work_id = _admit_and_return(rt)
+              ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+_______________ test_ia_auth02_changed_payload_sha_fails_closed ________________
+tests/independent_acceptance/test_ia_authenticity.py:89: in test_ia_auth02_changed_payload_sha_fails_closed
+    work_id = _admit_and_return(rt)
+              ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+___________ test_ia_auth03_changed_response_fingerprint_fails_closed ___________
+tests/independent_acceptance/test_ia_authenticity.py:100: in test_ia_auth03_changed_response_fingerprint_fails_closed
+    work_id = _admit_and_return(rt)
+              ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+__________________ test_ia_auth04_wrong_provider_fails_closed __________________
+tests/independent_acceptance/test_ia_authenticity.py:116: in test_ia_auth04_wrong_provider_fails_closed
+    work_id = _admit_and_return(rt)
+              ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+___________________ test_ia_auth05_wrong_model_fails_closed ____________________
+tests/independent_acceptance/test_ia_authenticity.py:130: in test_ia_auth05_wrong_model_fails_closed
+    work_id = _admit_and_return(rt)
+              ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+____________ test_ia_auth06_wrong_provider_request_id_fails_closed _____________
+tests/independent_acceptance/test_ia_authenticity.py:144: in test_ia_auth06_wrong_provider_request_id_fails_closed
+    work_id = _admit_and_return(rt)
+              ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+_______________ test_ia_auth07_wrong_relay_identity_fails_closed _______________
+tests/independent_acceptance/test_ia_authenticity.py:158: in test_ia_auth07_wrong_relay_identity_fails_closed
+    work_id = _admit_and_return(rt)
+              ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+________ test_ia_auth08_wrong_outbound_request_fingerprint_fails_closed ________
+tests/independent_acceptance/test_ia_authenticity.py:172: in test_ia_auth08_wrong_outbound_request_fingerprint_fails_closed
+    work_id = _admit_and_return(rt)
+              ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+_________ test_ia_auth18_return_before_provider_boundary_fails_closed __________
+tests/independent_acceptance/test_ia_authenticity.py:186: in test_ia_auth18_return_before_provider_boundary_fails_closed
+    work_id = _admit_and_return(rt)
+              ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+_____________ test_ia_auth09_cross_attempt_transplant_fails_closed _____________
+tests/independent_acceptance/test_ia_authenticity.py:222: in test_ia_auth09_cross_attempt_transplant_fails_closed
+    rt, w1, a1, w2, a2 = _two_attempts(db, tmp_path)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:203: in _two_attempts
+    w1 = _admit_and_return(rt)
+         ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+______________ test_ia_auth10_cross_work_transplant_fails_closed _______________
+tests/independent_acceptance/test_ia_authenticity.py:234: in test_ia_auth10_cross_work_transplant_fails_closed
+    rt, w1, a1, w2, a2 = _two_attempts(db, tmp_path)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:203: in _two_attempts
+    w1 = _admit_and_return(rt)
+         ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+____________ test_ia_auth11_cross_work_kind_transplant_fails_closed ____________
+tests/independent_acceptance/test_ia_authenticity.py:247: in test_ia_auth11_cross_work_kind_transplant_fails_closed
+    work_id = _admit_and_return(rt)
+              ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+_____________ test_ia_auth12_cross_subject_transplant_fails_closed _____________
+tests/independent_acceptance/test_ia_authenticity.py:256: in test_ia_auth12_cross_subject_transplant_fails_closed
+    work_id = _admit_and_return(rt)
+              ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+_______________ test_ia_auth13_unknown_attempt_handoff_is_absent _______________
+tests/independent_acceptance/test_ia_authenticity.py:264: in test_ia_auth13_unknown_attempt_handoff_is_absent
+    work_id = _admit_and_return(rt)
+              ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+____________ test_ia_auth14_conflicting_second_return_fails_closed _____________
+tests/independent_acceptance/test_ia_authenticity.py:277: in test_ia_auth14_conflicting_second_return_fails_closed
+    work_id = _admit_and_return(rt)
+              ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+__________ test_ia_auth15_exact_duplicate_second_return_is_idempotent __________
+tests/independent_acceptance/test_ia_authenticity.py:292: in test_ia_auth15_exact_duplicate_second_return_is_idempotent
+    work_id = _admit_and_return(rt)
+              ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+___________ test_ia_auth21_duplicate_json_semantic_keys_fails_closed ___________
+tests/independent_acceptance/test_ia_authenticity.py:305: in test_ia_auth21_duplicate_json_semantic_keys_fails_closed
+    work_id = _admit_and_return(rt)
+              ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+____________ test_ia_auth22_truncated_corrupt_handoff_fails_closed _____________
+tests/independent_acceptance/test_ia_authenticity.py:318: in test_ia_auth22_truncated_corrupt_handoff_fails_closed
+    work_id = _admit_and_return(rt)
+              ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+___________________ test_ia_auth_no_public_receipt_mint_api ____________________
+tests/independent_acceptance/test_ia_authenticity.py:333: in test_ia_auth_no_public_receipt_mint_api
+    work_id = _admit_and_return(rt)
+              ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+___________ test_ia_auth_receipt_read_never_exposes_key_or_callable ____________
+tests/independent_acceptance/test_ia_authenticity.py:349: in test_ia_auth_receipt_read_never_exposes_key_or_callable
+    work_id = _admit_and_return(rt)
+              ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_authenticity.py:51: in _admit_and_return
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA auth",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_authenticity.py:45: in die
+    if snapshot.model_round_index == subject_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+______ test_ia_capability_family_r5c_exactly_once[commit_ai_world_claim] _______
+tests/independent_acceptance/test_ia_capability_breadth.py:190: in test_ia_capability_family_r5c_exactly_once
+    assert len(before) == 1, f"[{family}] expected 1 durable effect pre-replay, got {len(before)}"
+E   AssertionError: [commit_ai_world_claim] expected 1 durable effect pre-replay, got 0
+E   assert 0 == 1
+E    +  where 0 = len([])
+___________ test_ia_capability_family_r5c_exactly_once[commit_claim] ___________
+tests/independent_acceptance/test_ia_capability_breadth.py:210: in test_ia_capability_family_r5c_exactly_once
+    assert q(db, "SELECT operation_id, idempotency_key, expected_world_revision "
+E   AssertionError: [commit_claim] new operation row appeared on replay
+E   assert [{'expected_w...e0b4bcd81f9'}] == [{'expected_w...dd4cf6b2318'}]
+E     
+E     Left contains one more item: {'expected_world_revision': 3, 'idempotency_key': 'conversation-assistant:user_1:ia-cap-session:1', 'operation_id': 'op_conv_ai_15ef42cdb2e60e0b4bcd81f9'}
+E     Use -v to get more diff
+___________ test_ia_capability_family_r5c_exactly_once[create_task] ____________
+tests/independent_acceptance/test_ia_capability_breadth.py:210: in test_ia_capability_family_r5c_exactly_once
+    assert q(db, "SELECT operation_id, idempotency_key, expected_world_revision "
+E   AssertionError: [create_task] new operation row appeared on replay
+E   assert [{'expected_w...e0b4bcd81f9'}] == [{'expected_w...c982a49e945'}]
+E     
+E     Left contains one more item: {'expected_world_revision': 3, 'idempotency_key': 'conversation-assistant:user_1:ia-cap-session:1', 'operation_id': 'op_conv_ai_15ef42cdb2e60e0b4bcd81f9'}
+E     Use -v to get more diff
+____________ test_ia_capability_family_r5c_exactly_once[form_event] ____________
+tests/independent_acceptance/test_ia_capability_breadth.py:187: in test_ia_capability_family_r5c_exactly_once
+    db, initial, work_id, served = _crash_after_effect(tmp_path, plan, builder(0).call_id)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_capability_breadth.py:56: in _crash_after_effect
+    initial.run_turn(session_id=SESSION, turn_index=1,
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:467: in run_turn
+    history.append(self.registry.invoke(call))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_capability_breadth.py:50: in boundary
+    assert res.ok, f"PRE-CRASH {c.name} FAILED: {res.error_code} {res.error_message}"
+E   AssertionError: PRE-CRASH form_event FAILED: CAPABILITY_EXECUTION_ERROR ValidationError: 2 validation errors for EventWriteRequest
+E     event_time.kind
+E       Extra inputs are not permitted [type=extra_forbidden, input_value='point', input_type=str]
+E         For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E     event_time.value
+E       Extra inputs are not permitted [type=extra_forbidden, input_value='2026-09-27T00:00:00Z', input_type=str]
+E         For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden
+E   assert False
+E    +  where False = CapabilityResult(name='form_event', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message="Valid...type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden", call_id='ia-event-0').ok
+_____ test_ia_capability_family_r5c_exactly_once[propose_cognitive_policy] _____
+tests/independent_acceptance/test_ia_capability_breadth.py:202: in test_ia_capability_family_r5c_exactly_once
+    assert h.ok, (f"[{family}] R5-C REPLAY FAILED: {h.name} "
+E   AssertionError: [propose_cognitive_policy] R5-C REPLAY FAILED: propose_cognitive_policy CAPABILITY_EXECUTION_ERROR / ValueError: policy already registered: ia.policy.0
+E   assert False
+E    +  where False = CapabilityResult(name='propose_cognitive_policy', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: policy already registered: ia.policy.0', call_id='ia-policy-0').ok
+________ test_ia_capability_family_r5c_exactly_once[propose_dimension] _________
+tests/independent_acceptance/test_ia_capability_breadth.py:186: in test_ia_capability_family_r5c_exactly_once
+    plan = {0: builder(0)}
+               ^^^^^^^^^^
+tests/independent_acceptance/test_ia_capability_breadth.py:104: in c_propose_dimension
+    return call("propose_dimension", f"ia-dim-{r}", dimension_key=f"dim:iax{r}",
+E   TypeError: call() got multiple values for argument 'name'
+__________ test_ia_capability_family_r5c_exactly_once[propose_entity] __________
+tests/independent_acceptance/test_ia_capability_breadth.py:187: in test_ia_capability_family_r5c_exactly_once
+    db, initial, work_id, served = _crash_after_effect(tmp_path, plan, builder(0).call_id)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_capability_breadth.py:56: in _crash_after_effect
+    initial.run_turn(session_id=SESSION, turn_index=1,
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:467: in run_turn
+    history.append(self.registry.invoke(call))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_capability_breadth.py:50: in boundary
+    assert res.ok, f"PRE-CRASH {c.name} FAILED: {res.error_code} {res.error_message}"
+E   AssertionError: PRE-CRASH propose_entity FAILED: CAPABILITY_EXECUTION_ERROR ValidationError: 1 validation error for EntityProposalRequest
+E       Value error, entity_key must start with 'entity:' [type=value_error, input_value={'entity_key': 'ent:ia0',...dentity_claim_refs': ()}, input_type=dict]
+E         For further information visit https://errors.pydantic.dev/2.13/v/value_error
+E   assert False
+E    +  where False = CapabilityResult(name='propose_entity', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message="V...t_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error", call_id='ia-entity-0').ok
+___________ test_ia_capability_family_r5c_exactly_once[propose_goal] ___________
+tests/independent_acceptance/test_ia_capability_breadth.py:202: in test_ia_capability_family_r5c_exactly_once
+    assert h.ok, (f"[{family}] R5-C REPLAY FAILED: {h.name} "
+E   AssertionError: [propose_goal] R5-C REPLAY FAILED: propose_goal CAPABILITY_EXECUTION_ERROR / StoreError: idempotency key was already used for a different request
+E   assert False
+E    +  where False = CapabilityResult(name='propose_goal', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='StoreError: idempotency key was already used for a different request', call_id='ia-goal-0').ok
+_________ test_ia_capability_family_r5c_exactly_once[upsert_relation] __________
+tests/independent_acceptance/test_ia_capability_breadth.py:187: in test_ia_capability_family_r5c_exactly_once
+    db, initial, work_id, served = _crash_after_effect(tmp_path, plan, builder(0).call_id)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_capability_breadth.py:56: in _crash_after_effect
+    initial.run_turn(session_id=SESSION, turn_index=1,
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:467: in run_turn
+    history.append(self.registry.invoke(call))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_capability_breadth.py:50: in boundary
+    assert res.ok, f"PRE-CRASH {c.name} FAILED: {res.error_code} {res.error_message}"
+E   AssertionError: PRE-CRASH upsert_relation FAILED: CAPABILITY_EXECUTION_ERROR ValidationError: 1 validation error for RelationUpsertRequest
+E       Value error, relation endpoints must be distinct entities [type=value_error, input_value={'left_ref': ObjectRef(ob...7, 'reason': 'IA probe'}, input_type=dict]
+E         For further information visit https://errors.pydantic.dev/2.13/v/value_error
+E   assert False
+E    +  where False = CapabilityResult(name='upsert_relation', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message="...nput_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error", call_id='ia-rel-0').ok
+________________ test_ia_op01_exact_retry_is_idempotent_replay _________________
+tests/independent_acceptance/test_ia_operation_replay.py:64: in test_ia_op01_exact_retry_is_idempotent_replay
+    second = store.commit([_obs("o1")], _op())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/aios_core/storage/sqlite_store.py:957: in commit
+    replay = self._get_idempotent_result(conn, operation, object_list)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/aios_core/storage/sqlite_store.py:764: in _get_idempotent_result
+    raise StoreError(
+E   aios_core.storage.sqlite_store.StoreError: idempotency key was already used for a different request
+_____________ test_ia_op09_missing_idempotency_record_fails_closed _____________
+tests/independent_acceptance/test_ia_operation_replay.py:136: in test_ia_op09_missing_idempotency_record_fails_closed
+    assert exc.value.code == ErrorCode.IDEMPOTENCY_CONFLICT
+E   AssertionError: assert <ErrorCode.VE...ION_CONFLICT'> == <ErrorCode.ID...NCY_CONFLICT'>
+E     
+E     - IDEMPOTENCY_CONFLICT
+E     + VERSION_CONFLICT
+_____________ test_ia_op12_exact_replay_after_unrelated_revisions ______________
+tests/independent_acceptance/test_ia_operation_replay.py:193: in test_ia_op12_exact_replay_after_unrelated_revisions
+    replay = store.commit([_obs("o1")], _op())         # stale expected revision, same key
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/aios_core/storage/sqlite_store.py:957: in commit
+    replay = self._get_idempotent_result(conn, operation, object_list)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/aios_core/storage/sqlite_store.py:764: in _get_idempotent_result
+    raise StoreError(
+E   aios_core.storage.sqlite_store.StoreError: idempotency key was already used for a different request
+______________ test_ia_service_task_create_replay_is_exactly_once ______________
+tests/independent_acceptance/test_ia_operation_replay.py:274: in test_ia_service_task_create_replay_is_exactly_once
+    assert len(q(store.db_path, "SELECT * FROM idempotency_records")) == 1
+E   assert 2 == 1
+E    +  where 2 = len([{'idempotency_key': 'ia-anchor', 'operation_id': 'op_2426d6d0266e4b2d826cc309b020a950', 'result_json': '{"_request_fi...a14108548e4f1f205",1]],"operation_id":"op_2970dbc7d50c44219d82e8bfbaa7c5df","world_revision":2}', 'world_revision': 2}])
+E    +    where [{'idempotency_key': 'ia-anchor', 'operation_id': 'op_2426d6d0266e4b2d826cc309b020a950', 'result_json': '{"_request_fi...a14108548e4f1f205",1]],"operation_id":"op_2970dbc7d50c44219d82e8bfbaa7c5df","world_revision":2}', 'world_revision': 2}] = q('/tmp/pytest-of-user/pytest-1/test_ia_service_task_create_re0/w.db', 'SELECT * FROM idempotency_records')
+E    +      where '/tmp/pytest-of-user/pytest-1/test_ia_service_task_create_re0/w.db' = <aios_core.storage.sqlite_store.SQLiteWorldStore object at 0x7f209b8c6de0>.db_path
+_________ test_ia_r1_crash_before_submission_allows_exactly_one_retry __________
+tests/independent_acceptance/test_ia_r1_r4.py:85: in test_ia_r1_crash_before_submission_allows_exactly_one_retry
+    before = _counts(db)
+             ^^^^^^^^^^^
+tests/independent_acceptance/test_ia_r1_r4.py:54: in _counts
+    "attempts": len(attempt_rows(db)),
+                    ^^^^^^^^^^^^^^^^
+tests/independent_acceptance/ia_harness.py:110: in attempt_rows
+    return q(db, "SELECT * FROM background_model_attempts ORDER BY created_at, attempt_id")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/ia_harness.py:85: in q
+    return [dict(r) for r in conn.execute(sql, args).fetchall()]
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+E   pysqlite3.dbapi2.OperationalError: no such column: created_at
+_____ test_ia_r1_stale_admitted_attempt_state_is_not_treated_as_submitted ______
+tests/independent_acceptance/test_ia_r1_r4.py:110: in test_ia_r1_stale_admitted_attempt_state_is_not_treated_as_submitted
+    with pytest.raises(Exception):
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE <class 'Exception'>
+_____ test_ia_r2_submitted_without_trusted_return_never_blind_redispatches _____
+tests/independent_acceptance/test_ia_r1_r4.py:142: in test_ia_r2_submitted_without_trusted_return_never_blind_redispatches
+    assert served == [0]
+E   assert [] == [0]
+E     
+E     Right contains one more item: 0
+E     Use -v to get more diff
+_______________ test_ia_r3_handoff_and_receipt_commit_atomically _______________
+tests/independent_acceptance/test_ia_r1_r4.py:170: in test_ia_r3_handoff_and_receipt_commit_atomically
+    with pytest.raises(Exception):
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE <class 'Exception'>
+___________ test_ia_r3_partial_handoff_is_never_accepted_as_trusted ____________
+tests/independent_acceptance/test_ia_r1_r4.py:200: in test_ia_r3_partial_handoff_is_never_accepted_as_trusted
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA R3b", occurred_at=NOW)
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_r1_r4.py:193: in die
+    if snapshot.model_round_index == 0:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+____________ test_ia_r3_mismatched_receipt_and_handoff_fails_closed ____________
+tests/independent_acceptance/test_ia_r1_r4.py:225: in test_ia_r3_mismatched_receipt_and_handoff_fails_closed
+    rt.run_turn(session_id=SESSION, turn_index=1, user_input="IA R3c", occurred_at=NOW)
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_r1_r4.py:218: in die
+    if snapshot.model_round_index == 0:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+___________________ test_ia_r4_later_round_exact_recovery[1] ___________________
+tests/independent_acceptance/test_ia_r1_r4.py:265: in test_ia_r4_later_round_exact_recovery
+    initial.run_turn(session_id=SESSION, turn_index=1, user_input="IA R4",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_r1_r4.py:259: in die
+    if snapshot.model_round_index == last_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+___________________ test_ia_r4_later_round_exact_recovery[2] ___________________
+tests/independent_acceptance/test_ia_r1_r4.py:265: in test_ia_r4_later_round_exact_recovery
+    initial.run_turn(session_id=SESSION, turn_index=1, user_input="IA R4",
+src/aios_core/runtime/turn_runtime.py:3633: in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+src/aios_core/runtime/cognitive_runtime.py:370: in run_turn
+    self.model_response_recorder(snapshot, directive)
+tests/independent_acceptance/test_ia_r1_r4.py:259: in die
+    if snapshot.model_round_index == last_round:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'RuntimeSnapshot' object has no attribute 'model_round_index'
+_____________ test_ia_kill1_sigkill_after_trusted_handoff_boundary _____________
+tests/independent_acceptance/test_ia_sigkill.py:134: in test_ia_kill1_sigkill_after_trusted_handoff_boundary
+    proc = _spawn(db, "handoff")
+           ^^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_sigkill.py:120: in _spawn
+    src = CHILD.format(repo=REPO, anchor=anchor)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'r'
+___________ test_ia_kill2_sigkill_after_real_capability_side_effect ____________
+tests/independent_acceptance/test_ia_sigkill.py:171: in test_ia_kill2_sigkill_after_real_capability_side_effect
+    proc = _spawn(db, "effect")
+           ^^^^^^^^^^^^^^^^^^^^
+tests/independent_acceptance/test_ia_sigkill.py:120: in _spawn
+    src = CHILD.format(repo=REPO, anchor=anchor)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'r'
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_registry_side_effecting_inventory
+PASSED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op02_same_key_changed_request_fails_closed[arguments]
+PASSED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op02_same_key_changed_request_fails_closed[operation_name]
+PASSED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op02_same_key_changed_request_fails_closed[reason]
+PASSED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op02_same_key_changed_request_fails_closed[objects]
+PASSED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op02_same_key_changed_request_fails_closed[object_value]
+PASSED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op02_same_key_changed_request_fails_closed[operation_id]
+PASSED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op07_altered_key_creates_distinct_durable_object
+PASSED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op08_missing_operation_row_does_not_fake_replay
+PASSED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op09b_corrupt_idempotency_record_fails_closed
+PASSED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op10_operation_vs_idempotency_skew_fails_closed
+PASSED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op11_reused_operation_id_other_key_fails_closed
+PASSED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op13_near_simultaneous_identical_retry_single_commit
+PASSED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op19_lookup_is_read_only_and_grants_no_write
+PASSED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op19b_reused_revision_cannot_smuggle_changed_request
+PASSED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_service_task_create_changed_payload_is_a_distinct_task
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth01_forged_payload_fails_closed
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth02_changed_payload_sha_fails_closed
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth03_changed_response_fingerprint_fails_closed
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth04_wrong_provider_fails_closed
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth05_wrong_model_fails_closed
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth06_wrong_provider_request_id_fails_closed
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth07_wrong_relay_identity_fails_closed
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth08_wrong_outbound_request_fingerprint_fails_closed
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth18_return_before_provider_boundary_fails_closed
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth09_cross_attempt_transplant_fails_closed
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth10_cross_work_transplant_fails_closed
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth11_cross_work_kind_transplant_fails_closed
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth12_cross_subject_transplant_fails_closed
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth13_unknown_attempt_handoff_is_absent
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth14_conflicting_second_return_fails_closed
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth15_exact_duplicate_second_return_is_idempotent
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth21_duplicate_json_semantic_keys_fails_closed
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth22_truncated_corrupt_handoff_fails_closed
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth_no_public_receipt_mint_api
+FAILED tests/independent_acceptance/test_ia_authenticity.py::test_ia_auth_receipt_read_never_exposes_key_or_callable
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[commit_ai_world_claim]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[commit_claim]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[create_task]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[form_event]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[propose_cognitive_policy]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[propose_dimension]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[propose_entity]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[propose_goal]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[upsert_relation]
+FAILED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op01_exact_retry_is_idempotent_replay
+FAILED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op09_missing_idempotency_record_fails_closed
+FAILED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_op12_exact_replay_after_unrelated_revisions
+FAILED tests/independent_acceptance/test_ia_operation_replay.py::test_ia_service_task_create_replay_is_exactly_once
+FAILED tests/independent_acceptance/test_ia_r1_r4.py::test_ia_r1_crash_before_submission_allows_exactly_one_retry
+FAILED tests/independent_acceptance/test_ia_r1_r4.py::test_ia_r1_stale_admitted_attempt_state_is_not_treated_as_submitted
+FAILED tests/independent_acceptance/test_ia_r1_r4.py::test_ia_r2_submitted_without_trusted_return_never_blind_redispatches
+FAILED tests/independent_acceptance/test_ia_r1_r4.py::test_ia_r3_handoff_and_receipt_commit_atomically
+FAILED tests/independent_acceptance/test_ia_r1_r4.py::test_ia_r3_partial_handoff_is_never_accepted_as_trusted
+FAILED tests/independent_acceptance/test_ia_r1_r4.py::test_ia_r3_mismatched_receipt_and_handoff_fails_closed
+FAILED tests/independent_acceptance/test_ia_r1_r4.py::test_ia_r4_later_round_exact_recovery[1]
+FAILED tests/independent_acceptance/test_ia_r1_r4.py::test_ia_r4_later_round_exact_recovery[2]
+FAILED tests/independent_acceptance/test_ia_sigkill.py::test_ia_kill1_sigkill_after_trusted_handoff_boundary
+FAILED tests/independent_acceptance/test_ia_sigkill.py::test_ia_kill2_sigkill_after_real_capability_side_effect
+======================== 43 failed, 16 passed in 8.08s =========================
