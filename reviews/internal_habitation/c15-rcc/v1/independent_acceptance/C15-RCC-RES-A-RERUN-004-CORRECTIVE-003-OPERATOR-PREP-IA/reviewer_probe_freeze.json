@@ -1,0 +1,15 @@
+{
+  "candidate_head": "10901d467679b70437ae112747eab81f889fd5cb",
+  "probe_source_sha256": {
+    "probe_git_scope_and_packet_head.py": "4f9c9a19e739522ac9fcae9f3ce715d81309b4c9a57158bdb2b04310272dce98",
+    "probe_exchange_adversarial.py": "69a5f31fe40e45506da7837e3a41354c1ae91084c763b498099d65475f1c584f"
+  },
+  "expected_outcomes_frozen": {
+    "git_scope_and_packet_head": "all identity, scope, packet-parent checks pass",
+    "published_response_overwrite": "fail closed",
+    "tampered_response_consume": "fail closed",
+    "orphan_request_integrity": "fail closed",
+    "ledger_tail_truncation": "not NOT_SUBMITTED"
+  },
+  "freeze_note": "Probe source hashes were recorded before adversarial execution; the adversarial probe preserves its RED assertion history and was not edited after the observed failure."
+}
