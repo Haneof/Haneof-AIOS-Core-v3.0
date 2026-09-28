@@ -1,0 +1,21 @@
+CORE-RC-REFREEZE-003 formal environment manifest
+================================================
+
+Status: FORMAL GATE PENDING. Values must be captured from the fresh exact-target run; no local CPython 3.11.2 values are substituted.
+
+Repository: Haneof/Haneof-AIOS-Core-v3.0
+Frozen software SHA: f20f2edfa7af00d0286493fd15196ca9503bc315
+Frozen repository tree: 1ac3a675b884167d3a29aa432e7ef3eaff94d404
+Formal CPython: 3.12.14 (required)
+Pydantic: 2.13.5 (required)
+pytest: 8.4.2 (required)
+SQLite runtime version: pending exact runner observation
+OS release: pending exact runner observation
+Kernel: pending exact runner observation
+Architecture: pending exact runner observation
+Formal workflow / run / job / candidate head: pending
+Formal editable-install pip freeze: pending `ci-output/formal-pip-freeze.txt`
+Clean-wheel-install pip freeze: pending `ci-output/clean-install-pip-freeze.txt`
+
+Local sandbox: CPython 3.11.2; **not used as formal RC evidence**.
+Dependency lockfile: none at frozen target; `pyproject.toml` uses declared version ranges. The formal gate pins the required runtime versions explicitly.
