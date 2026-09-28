@@ -1,0 +1,67 @@
+........................................................................ [  8%]
+.......................xxx...................FFFFF...................... [ 16%]
+........................................................................ [ 24%]
+........................................................................ [ 32%]
+........................................................................ [ 41%]
+........................................................................ [ 49%]
+........................................................................ [ 57%]
+........................................................................ [ 65%]
+........................................................................ [ 74%]
+........................................................................ [ 82%]
+........................................................................ [ 90%]
+........................................................................ [ 98%]
+...........                                                              [100%]
+=================================== FAILURES ===================================
+____________ test_ia_capability_family_r5c_exactly_once[form_event] ____________
+tests/independent_acceptance/test_ia_capability_breadth.py:181: in test_ia_capability_family_r5c_exactly_once
+    assert h.ok, (f"[{family}] R5-C REPLAY FAILED: {h.name} "
+E   AssertionError: [form_event] R5-C REPLAY FAILED: form_event CAPABILITY_EXECUTION_ERROR / StoreError: idempotency key was already used for a different request
+E   assert False
+E    +  where False = CapabilityResult(name='form_event', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='StoreError: idempotency key was already used for a different request', call_id='ia-form_event-0').ok
+_____ test_ia_capability_family_r5c_exactly_once[propose_cognitive_policy] _____
+tests/independent_acceptance/test_ia_capability_breadth.py:181: in test_ia_capability_family_r5c_exactly_once
+    assert h.ok, (f"[{family}] R5-C REPLAY FAILED: {h.name} "
+E   AssertionError: [propose_cognitive_policy] R5-C REPLAY FAILED: propose_cognitive_policy CAPABILITY_EXECUTION_ERROR / ValueError: policy already registered: ia.policy.0
+E   assert False
+E    +  where False = CapabilityResult(name='propose_cognitive_policy', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: policy already registered: ia.policy.0', call_id='ia-propose_cognitive_policy-0').ok
+________ test_ia_capability_family_r5c_exactly_once[propose_dimension] _________
+tests/independent_acceptance/test_ia_capability_breadth.py:181: in test_ia_capability_family_r5c_exactly_once
+    assert h.ok, (f"[{family}] R5-C REPLAY FAILED: {h.name} "
+E   AssertionError: [propose_dimension] R5-C REPLAY FAILED: propose_dimension CAPABILITY_EXECUTION_ERROR / ValueError: dimension_key already exists: dim:iax0
+E   assert False
+E    +  where False = CapabilityResult(name='propose_dimension', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: dimension_key already exists: dim:iax0', call_id='ia-propose_dimension-0').ok
+__________ test_ia_capability_family_r5c_exactly_once[propose_entity] __________
+tests/independent_acceptance/test_ia_capability_breadth.py:181: in test_ia_capability_family_r5c_exactly_once
+    assert h.ok, (f"[{family}] R5-C REPLAY FAILED: {h.name} "
+E   AssertionError: [propose_entity] R5-C REPLAY FAILED: propose_entity CAPABILITY_EXECUTION_ERROR / ValueError: entity_key already exists: entity:ia0
+E   assert False
+E    +  where False = CapabilityResult(name='propose_entity', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='ValueError: entity_key already exists: entity:ia0', call_id='ia-propose_entity-0').ok
+___________ test_ia_capability_family_r5c_exactly_once[propose_goal] ___________
+tests/independent_acceptance/test_ia_capability_breadth.py:181: in test_ia_capability_family_r5c_exactly_once
+    assert h.ok, (f"[{family}] R5-C REPLAY FAILED: {h.name} "
+E   AssertionError: [propose_goal] R5-C REPLAY FAILED: propose_goal CAPABILITY_EXECUTION_ERROR / StoreError: idempotency key was already used for a different request
+E   assert False
+E    +  where False = CapabilityResult(name='propose_goal', ok=False, data=None, error_code='CAPABILITY_EXECUTION_ERROR', error_message='StoreError: idempotency key was already used for a different request', call_id='ia-propose_goal-0').ok
+============================= slowest 15 durations =============================
+109.08s call     tests/habitation/test_sol_manual_resident_replay.py::test_sol_manual_resident_replay_exposes_learned_custom_policies
+20.52s call     tests/integration/test_v3_audit_bugfixes.py::test_a05_whole_commit_indexing_and_rebuild[50001-50000]
+4.98s call     tests/integration/test_v3_ai_world.py::test_core_context_filters_core_tag_before_domain_limit
+4.70s call     tests/integration/test_v3_c14_cognitive_derivation_scheduler.py::test_loop_repro_reconcile_builds_support_dependency_graph_once_per_pass
+2.61s call     tests/integration/test_m0_prime_store_delta_and_search.py::test_scale_smoke_reduced_g_m1p
+2.05s call     tests/integration/test_v3_long_context_continuity.py::test_long_session_rolls_forward_in_order_without_replacing_raw_dialogue
+2.00s call     tests/preflight/test_resident_broker.py::test_broker_no_default_silence
+2.00s call     tests/preflight/test_resident_broker.py::test_broker_timeout_fail_closed
+1.31s call     tests/preflight/test_round4_fixes.py::test_successful_freeze_cross_process_restore
+0.86s call     tests/preflight/test_round5_fixes.py::test_checkpoint_loss_cannot_bypass_via_accepted_a_import
+0.81s call     tests/independent_acceptance/test_ia_sigkill.py::test_ia_kill1_sigkill_after_trusted_handoff_boundary
+0.73s call     tests/integration/test_v3_long_context_continuity.py::test_model_can_search_same_session_summary_before_raw_drilldown
+0.60s call     tests/independent_acceptance/test_ia_sigkill.py::test_ia_kill2_sigkill_after_real_capability_side_effect
+0.57s call     tests/integration/test_v3_long_context_continuity.py::test_token_truncation_keeps_on_demand_summary_to_raw_recovery_path
+0.57s call     tests/integration/test_v3_audit_bugfixes.py::test_a10_long_dag_commits_and_long_cycle_rejects_atomically
+=========================== short test summary info ============================
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[form_event]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[propose_cognitive_policy]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[propose_dimension]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[propose_entity]
+FAILED tests/independent_acceptance/test_ia_capability_breadth.py::test_ia_capability_family_r5c_exactly_once[propose_goal]
+5 failed, 867 passed, 3 xfailed in 237.95s (0:03:57)
