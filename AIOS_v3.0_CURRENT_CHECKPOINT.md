@@ -1,5 +1,18 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-09-28 A-RERUN-004-CORRECTIVE-002 — contaminated before run; clean-room operator prep next
+
+- Blocked evidence: PR #279 @ `8e5c1ec76ea973c849c33923ccc818fe1dad49e8`.
+- No Resident run began: no harness, World, index, release-state, runtime/session, exchange ledger or cursor reveal.
+- Dispatch defect: global board/checkpoint/PM adjudications are control-plane documents with historical Resident/review semantics and must not be Resident startup inputs.
+- Environment precondition also failed: CPython 3.12.14 / Pydantic 2.13.5 was not established.
+- Unique next READY: `C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP`.
+- Operator Prep must create/freeze a qualified environment + mechanical harness + A/B/C/D gates + semantic-free Resident-safe launch packet; it must not run the real Resident.
+- Fresh Corrective-003 Resident remains blocked until Operator Prep independent acceptance + PM integration.
+- Future Resident startup inputs are limited to the clean-room contract + exact accepted safe launch packet; global governance/checkpoint/history are forbidden.
+- Persistence/B/C/evaluator remain blocked.
+
+
 ## 2026-09-28 A-RERUN-004-CORRECTIVE-001 — BLOCKED; Corrective-002 required
 
 - Blocked evidence: PR #277 @ `2968299beea5fe5ec2dc93418d0fa7f3e035ec40`.
