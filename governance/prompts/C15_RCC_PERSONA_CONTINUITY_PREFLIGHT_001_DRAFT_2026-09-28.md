@@ -4,7 +4,7 @@ Repository:
 `Haneof/Haneof-AIOS-Core-v3.0`
 
 Status:
-`DRAFT / NOT READY / READ-ONLY WHEN ACTIVATED`
+`DRAFT / NOT READY / DO NOT EXECUTE UNTIL ACTIVATED / READ-ONLY WHEN ACTIVATED`
 
 Activation prerequisites:
 - PR #263 or its corrected successor receives independent governance ACCEPTANCE_PASS;
