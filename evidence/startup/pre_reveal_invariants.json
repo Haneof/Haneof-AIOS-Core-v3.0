@@ -1,0 +1,12 @@
+{
+  "active_phase": "B",
+  "binding_absent": true,
+  "current_event_absent": true,
+  "exchange_ok": true,
+  "index_watermark": 38,
+  "initial_generation_remotely_durable": true,
+  "next_sequence": 14,
+  "pending_reveal": null,
+  "remote_head_matches": true,
+  "world_revision": 38
+}

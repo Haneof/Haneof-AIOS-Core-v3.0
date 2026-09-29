@@ -1,0 +1,13 @@
+{
+  "compared_artifacts": 5,
+  "materialized_from": {
+    "commit": "6ef7a1cb715bc69a0eb4f8529ffae51874fae7b7",
+    "ref": "refs/heads/persistence/c15-rcc-res-b-rerun-003-60997e04",
+    "remote": "origin"
+  },
+  "mismatched": [],
+  "remote_authority_binding": "PASS",
+  "sealed_generations_verified": [
+    1
+  ]
+}

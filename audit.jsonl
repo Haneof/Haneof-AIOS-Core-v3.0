@@ -20,3 +20,8 @@
 {"at_epoch": 1790710564.324537, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"pid": 32605}, "event": "owner_reclaimed", "pid": 32605}
 {"at_epoch": 1790710564.3253822, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"run_id": "c15-rcc-res-b-rerun-003-60997e04", "session_id": "c15-rcc-res-b-session-003-60997e04"}, "event": "backend_reopened", "pid": 32605}
 {"at_epoch": 1790710564.3687737, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"artifacts": 5, "generation": 1, "label": "INITIAL"}, "event": "generation_sealed", "pid": 32605}
+{"at_epoch": 1790710567.0162935, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"commit_sha": "6ef7a1cb715bc69a0eb4f8529ffae51874fae7b7", "parent_sha": null, "remote": "origin", "remote_ref": "refs/heads/persistence/c15-rcc-res-b-rerun-003-60997e04", "tree_sha": "5ac1920c2eb59f1635b5ae4b74d5a6af9ae9ce37"}, "event": "remote_persisted", "pid": 32605}
+{"at_epoch": 1790710582.8143423, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"pid": 32655}, "event": "owner_reclaimed", "pid": 32655}
+{"at_epoch": 1790710582.817662, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"run_id": "c15-rcc-res-b-rerun-003-60997e04", "session_id": "c15-rcc-res-b-session-003-60997e04"}, "event": "backend_reopened", "pid": 32655}
+{"at_epoch": 1790710582.818366, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"event_id": "c15rcc-014", "sequence": 14}, "event": "cursor_revealed", "pid": 32655}
+{"at_epoch": 1790710582.8331034, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"artifacts": 4, "generation": 2, "label": "K1_AFTER_REVEAL"}, "event": "generation_sealed", "pid": 32655}
