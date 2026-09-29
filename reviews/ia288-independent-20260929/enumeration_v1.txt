@@ -1,0 +1,6 @@
+Probes.test_concurrent_append_preserves_validity
+Probes.test_duplicate_rejected
+Probes.test_interior_mutation
+Probes.test_legal_chain
+Probes.test_request_mutation_before_consume
+Probes.test_valid_tail_boundary
