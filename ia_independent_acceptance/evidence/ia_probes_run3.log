@@ -1,0 +1,9 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.2, pytest-8.4.2, pluggy-1.6.0
+rootdir: /home/user/Haneof-AIOS-Core-v3.0
+configfile: pyproject.toml
+collected 15 items
+
+ia_independent_acceptance/ia_probes.py ...............                   [100%]
+
+============================= 15 passed in 21.38s ==============================

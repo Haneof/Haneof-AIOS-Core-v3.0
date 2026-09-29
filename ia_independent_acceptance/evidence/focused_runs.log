@@ -1,0 +1,22 @@
+=== [1] persistence suite (expect 78) ===
+......                                                                   [100%]
+78 passed in 73.75s (0:01:13)
+=== [2] journal frozen unittest contract (expect 13) ===
+Ran 13 tests in 0.796s
+
+OK
+=== [3] killpoints (expect 5) ===
+.....                                                                    [100%]
+5 passed in 6.85s
+=== [4] binding matrix (expect 23 collected) ===
+.......................                                                  [100%]
+23 passed in 39.40s
+=== [5] non-binding regressions (expect 6) ===
+......                                                                   [100%]
+6 passed in 3.37s
+=== [6] trusted-return focused (expect 99) ===
+..........................                                               [100%]
+98 passed in 9.96s
+=== [7] C15 preflight/operator (expect 131) ===
+...........................................................              [100%]
+131 passed in 19.21s
