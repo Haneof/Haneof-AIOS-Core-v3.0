@@ -38,6 +38,7 @@ from tools.c15_persistence.backend import (  # noqa: E402
     durable_root,
     runs_root,
 )
+from tools.c15_persistence.journal import WORKSPACE  # noqa: E402
 from tools.c15_persistence.operator_session import OperatorSession  # noqa: E402
 from tools.c15_persistence.relay import RelayJournal  # noqa: E402
 from tools.c15_persistence.runstate import (  # noqa: E402
@@ -56,20 +57,25 @@ def _ids(prefix: str = "wiring") -> tuple[str, str]:
 
 
 def test_authoritative_path_rejects_every_ephemeral_location() -> None:
+    # Corrective-003 portability correction: workspace-relative cases are derived
+    # from the resolved workspace, so the probe keeps testing the workspace root
+    # itself and the excluded locations (.cache/.venv/node_modules/build/dist/
+    # out/target/.git) on every account, instead of silently degrading to
+    # "outside the workspace" on the formal CI account.
     for bad in (
         "/tmp/x",
         "/var/tmp/x",
         "/dev/shm/x",
         "/run/user/1000/x",
-        "/home/user",
-        "/home/user/.cache/x",
-        "/home/user/.venv/x",
-        "/home/user/node_modules/x",
-        "/home/user/build/x",
-        "/home/user/dist/x",
-        "/home/user/out/x",
-        "/home/user/target/x",
-        "/home/user/.git/x",
+        str(WORKSPACE),
+        str(WORKSPACE / ".cache" / "x"),
+        str(WORKSPACE / ".venv" / "x"),
+        str(WORKSPACE / "node_modules" / "x"),
+        str(WORKSPACE / "build" / "x"),
+        str(WORKSPACE / "dist" / "x"),
+        str(WORKSPACE / "out" / "x"),
+        str(WORKSPACE / "target" / "x"),
+        str(WORKSPACE / ".git" / "x"),
     ):
         with pytest.raises(BackendError):
             durable_root(bad)

@@ -11,13 +11,24 @@ import tempfile
 import unittest
 import uuid
 
-from tools.c15_persistence.journal import Journal, PersistenceError, REQUIRED, digest, durable_path
+from tools.c15_persistence.journal import (
+    Journal,
+    PersistenceError,
+    REQUIRED,
+    WORKSPACE,
+    digest,
+    durable_path,
+)
 
 
 class JournalTests(unittest.TestCase):
     def setUp(self):
-        base = Path('/home/user/c15-persistence-unit-probes')
-        base.mkdir(exist_ok=True, mode=0o700)
+        # Corrective-003 portability correction: the disposable probe root is
+        # derived from the resolved workspace instead of a hard-coded account
+        # path, so the journal contract is exercised on every account (the
+        # formal CI account is ``runner``, not ``user``).
+        base = WORKSPACE / 'c15-persistence-unit-probes'
+        base.mkdir(parents=True, exist_ok=True, mode=0o700)
         self.parent = Path(tempfile.mkdtemp(prefix='synthetic-unit-', dir=base))
         self.root = self.parent / 'backend'
         self.run = 'synthetic-run-' + uuid.uuid4().hex
@@ -169,9 +180,14 @@ os.kill(os.getpid(), signal.SIGKILL)
             Journal(self.root, run_id=self.run, session_id=self.session, create=True)
 
     def test_bad_paths(self):
+        # Corrective-003 portability correction: the excluded-directory cases are
+        # derived from the resolved workspace, so this probe keeps testing
+        # *excluded workspace directories* on every account instead of silently
+        # degrading to "outside the workspace".
         for p in ('/tmp/synthetic', '/var/tmp/synthetic', '/dev/shm/synthetic',
-                  '/home/user/.cache/synthetic', '/home/user/dist/synthetic',
-                  '/home/user/.git/synthetic'):
+                  str(WORKSPACE / '.cache' / 'synthetic'),
+                  str(WORKSPACE / 'dist' / 'synthetic'),
+                  str(WORKSPACE / '.git' / 'synthetic')):
             with self.subTest(path=p), self.assertRaises(PersistenceError):
                 durable_path(Path(p))
         link = self.parent / 'link'

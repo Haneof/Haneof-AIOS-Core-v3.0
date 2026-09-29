@@ -37,15 +37,31 @@
 * `tests/c15_persistence/**` — new frozen binding-blocker matrix (21 probe ids), retained non-blocking
   probes, probe-mechanics corrections (documented in the manifest `freeze_history` / `freeze_reason`), and
   `conftest.py`, the CI-parity corrective (see below).
-* **CI-parity corrective** — the first pushed head made three repository formal gates red (`formal-core-gate`,
-  `formal-python312-full-suite`, `full-core-regression`): those gates call a *bare* `pytest`, which does not put
-  the repository root on `sys.path`, so the probes' `from tools.c15_persistence import ...` aborted collection
-  (`ModuleNotFoundError: No module named 'tools'`, exit `2`). `tests/c15_persistence/conftest.py` adds the
-  repository root/`src` for that directory only. No root `conftest.py`, no global pytest config change, no
-  packaging change, no harness installation, no `src/aios_core/**` change, and **no frozen probe source
-  touched** (matrix still `d4afe24b...`, no re-freeze). Verified under a CI-style history-less checkout:
-  997 collected, persistence subset 78 passed, whole repository 997 tests / 0 failures / 0 errors
-  (`reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/`).
+* **CI-parity corrective A (formal-gate import parity)** — the first pushed head made three repository formal
+  gates red (`formal-core-gate`, `formal-python312-full-suite`, `full-core-regression`): those gates call a *bare*
+  `pytest`, which does not put the repository root on `sys.path`, so the probes' `from tools.c15_persistence
+  import ...` aborted collection (`ModuleNotFoundError: No module named 'tools'`, exit `2`).
+  `tests/c15_persistence/conftest.py` adds the repository root/`src` for that directory only. No root
+  `conftest.py`, no global pytest config change, no packaging change, no harness installation, no
+  `src/aios_core/**` change.
+* **CI-parity corrective B (portable persisted workspace)** — on CPython 3.12.14 the gates then ran the whole
+  suite and reported `tests=997, failures=13`: the 13 failures were **all of `test_journal.py::JournalTests**,
+  every one of them `FileNotFoundError: '/home/user/c15-persistence-unit-probes'`. `journal.py` hard-coded
+  `WORKSPACE = Path('/home/user')`, which exists only on this sandbox's account (`user`); the formal CI account is
+  `runner` (`HOME=/home/runner`), so the whole frozen journal contract died in `setUp`. The workspace is now
+  resolved exactly like `backend.py` already did (`C15_PERSISTED_WORKSPACE`, else the account home), and
+  `test_journal.py` / `test_operator_wiring.py` / `probe_core_boundary.py` (plus the `resident_surface_check.py`
+  default scratch root) derive from it. The durability contract is unchanged, and on non-`user` accounts the
+  excluded-location cases are now *stronger* (they test real workspace-excluded paths instead of degrading to
+  "outside the workspace"). Because two frozen probe sources changed, the matrix was re-frozen with a documented
+  reason: **21 probe ids and all `EXPECT:` entries are byte-identical**, only those sources' hashes changed
+  (matrix now `d5641f8fdab934a41ed0658ceb3c7a5d9d1c1f3ed88f64984876c9ad4ac22c9c`, `freeze_history` 3 entries).
+* **Verification** — CI-style history-less checkout, and a simulated foreign account
+  (`HOME=/home/user/c15-ci-home-sim`, repository outside `HOME`): 997 collected, persistence subset 78 passed,
+  journal contract 13 passed under both pytest and the frozen `unittest` invocation, whole repository
+  `tests=997 failures=0 errors=0 skipped=0`. Evidence in
+  `reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/` (incl. the captured CI RED annotations,
+  `RED_ci_journal_workspace_hardcode.log`).
 * `reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/**` — report, baseline RED logs, GREEN logs, environment
   identity, resident-surface artifact, evidence manifest + scope gate, PR body.
 
@@ -59,7 +75,7 @@
 | historical journal suite (frozen `unittest` contract) | 13 passed |
 | trusted-return focused Core regression | 231 passed |
 | full repository suite | 997 passed |
-| CI-parity: bare `pytest` on a history-less checkout | collected 997; persistence subset 78 passed; repository 997 tests / 0 failures / 0 errors |
+| CI-parity: bare `pytest`, history-less checkout, foreign `HOME` | collected 997; persistence subset 78 passed; journal 13 passed; repository 997 tests / 0 failures / 0 errors |
 | `src/aios_core/**` diff | ZERO |
 | scope violations | none |
 

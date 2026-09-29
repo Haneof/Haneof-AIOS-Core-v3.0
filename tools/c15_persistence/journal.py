@@ -19,7 +19,17 @@ import sqlite3
 import stat
 from typing import Iterator, Mapping
 
-WORKSPACE = Path('/home/user')
+# The platform-persisted workspace this journal may live under.  Resolved exactly
+# like ``backend.py`` (and ``killpoints/harness.py``): an explicitly configured
+# ``C15_PERSISTED_WORKSPACE`` first, otherwise the current account's home
+# directory.  The historical revision hard-coded ``/home/user``, which is only
+# correct for the one sandbox whose account happens to be ``user``; on the formal
+# CI account (``runner``) that path does not exist, so the journal probes died in
+# setup with ``FileNotFoundError`` instead of exercising the durability contract.
+# This is a path-resolution repair only - the contract enforced by
+# ``durable_path`` below (a private, non-excluded child of the persisted
+# workspace with no ephemeral backing) is unchanged.
+WORKSPACE = Path(os.environ.get('C15_PERSISTED_WORKSPACE') or Path.home())
 EXCLUDED = frozenset({'.arena', '.cache', '.local', '.mypy_cache', '.next',
     '.nox', '.npm', '.nuxt', '.output', '.parcel-cache', '.pytest_cache',
     '.ruff_cache', '.svelte-kit', '.tox', '.turbo', '.venv', '.vite',
@@ -60,10 +70,10 @@ def durable_path(root: Path) -> Path:
     root = root.absolute()
     require(root == root.resolve(), 'symlink/non-canonical backend path')
     require(root.is_relative_to(WORKSPACE) and root != WORKSPACE,
-            'backend must be a private child of /home/user')
+            'backend must be a private child of the persisted workspace')
     require(not (set(root.relative_to(WORKSPACE).parts) & EXCLUDED),
             'backend path excluded from platform persistence')
-    # Longest matching Linux mount entry; nested tmpfs under /home/user rejected.
+    # Longest matching Linux mount entry; nested tmpfs under the workspace rejected.
     mounts = []
     for line in Path('/proc/self/mountinfo').read_text().splitlines():
         fields = line.split()

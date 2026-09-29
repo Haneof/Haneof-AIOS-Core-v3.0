@@ -48,16 +48,25 @@ def worker(root, session):
     runtime(root, staged_reply).run_turn(**turn(session))
 
 
+def _probe_base() -> Path:
+    """Disposable probe root under the resolved persisted workspace.
+
+    Mirrors ``backend.py``/``journal.py`` so the probe is not bound to one
+    account name (the historical revision hard-coded ``/home/user``).
+    """
+    return Path(os.environ.get('C15_PERSISTED_WORKSPACE') or Path.home()) / 'c15-persistence-unit-probes'
+
+
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == '--worker':
         root = Path(sys.argv[2])
-        if not root.is_relative_to('/home/user/c15-persistence-unit-probes'):
+        if not root.is_relative_to(_probe_base()):
             raise RuntimeError('synthetic workspace only')
         if not sys.argv[3].startswith('synthetic-'):
             raise RuntimeError('synthetic identity only')
         worker(root, sys.argv[3])
         raise RuntimeError('kill point was not reached')
-    base = Path('/home/user/c15-persistence-unit-probes')
+    base = _probe_base()
     base.mkdir(exist_ok=True, mode=0o700)
     identity = 'synthetic-core-gap-' + uuid.uuid4().hex
     root = base / identity

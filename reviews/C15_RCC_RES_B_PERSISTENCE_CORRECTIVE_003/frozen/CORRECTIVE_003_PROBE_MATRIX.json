@@ -14,11 +14,16 @@
       "frozen_at_utc": "2026-09-29T15:12:39Z",
       "head": "852e0831cb23db46766890573e7f61c9512e55e7",
       "reason": "initial freeze"
+    },
+    {
+      "frozen_at_utc": "2026-09-29T15:19:20Z",
+      "head": "852e0831cb23db46766890573e7f61c9512e55e7",
+      "reason": "initial freeze"
     }
   ],
-  "freeze_reason": "Final freeze after documented probe corrections (all recorded before the GREEN run): (1) C002-002-E restores the one-shot crash fault before the recovery phase instead of leaving the fault armed in the recovery process; (2) C002-001-B / C002-001-C / C002-002-E assert the surviving authoritative barrier is the per-round authenticated provider-return barrier introduced by the harness repair; (3) C002-002-F targets the latest round's trusted-return handoff row; (4) test_journal tearDown detects failures under both unittest and pytest (mechanics fix; the frozen unittest contract is unchanged); (5) test_operator_wiring stores the operator-invented receipt in the journal before asserting Core refuses it, because accepted Core legitimately stages its own trusted-return handoff during an ordinary multi-round turn; (6) test_resident_surface re-anchors its committed evidence artifact to this corrective's evidence root. No probe expectation was relaxed and no blocker semantics were weakened.",
-  "frozen_at_utc": "2026-09-29T15:19:20Z",
-  "head": "852e0831cb23db46766890573e7f61c9512e55e7",
+  "freeze_reason": "Portability re-freeze after the CI_COLLECTION_BLOCKER repair (no expectation changed): (1) tests/c15_persistence/conftest.py puts the repository root and src on sys.path so the formal CI invocation (a bare pytest) can import tools.c15_persistence; (2) the persisted-workspace path is resolved from C15_PERSISTED_WORKSPACE or the account home directory - exactly like backend.py - instead of the hard-coded /home/user, in journal.py (WORKSPACE), test_journal.py (probe root and excluded-directory cases) and test_operator_wiring.py (workspace-root and excluded-location rejection cases). The hard-coded path only exists on the sandbox account 'user'; on the formal CI account 'runner' it made the whole frozen journal contract fail in setup with FileNotFoundError (13 failures, captured in evidence/ci_parity/RED_ci_journal_workspace_hardcode.log). No PROBE:/EXPECT: text, no probe id and no blocker semantics were changed or relaxed.",
+  "frozen_at_utc": "2026-09-29T16:22:27Z",
+  "head": "2d01ee2a8fe7f74fb8c3f3bf5fe5a94685907260",
   "manifest_version": "c15-corrective-003-probe-matrix-v2",
   "probe_count": 21,
   "probe_ids": [
@@ -180,8 +185,8 @@
     "tests/c15_persistence/test_corrective_003_binding_blockers.py": "15e137861b9821c200074a3ed5c51dfdfd243b7a6da0fea73e86e51c490f7e6a",
     "tests/c15_persistence/test_corrective_003_regressions.py": "54531b052533477d66c76a7c9b982031b0e9eb5c16b9513bd8eca9fcb0f01065",
     "tests/c15_persistence/test_environment_reattach.py": "f2bf60b3cd4b6371a968cb3f30a7c1e3ad2a6051964877f52e7b9a8367cd4285",
-    "tests/c15_persistence/test_journal.py": "c8ec2ca0a94318106e1195e5aefda14192b37e370845dbb42b436015b12861d6",
-    "tests/c15_persistence/test_operator_wiring.py": "64199f3a569d63a441aa9ca429e7e06713d409a42989f3840bf5c6b942269984",
+    "tests/c15_persistence/test_journal.py": "426b7336a0a8ed3fac9bfcab96676e4b0340f0ae5b960e7412edf2a987a436e9",
+    "tests/c15_persistence/test_operator_wiring.py": "1d48d73502beba89027587b401b6029a028372599e78c2a99ba5e4b40a836bd6",
     "tests/c15_persistence/test_resident_surface.py": "951cbc4e4ba954ee47db3e04b8737f6bce494c7bd953507277a5646bc7451884",
     "tools/c15_persistence/operator_session.py": "4cac3e1f5d12e3fc8b821948cacb364dd8e69552feebcdb62596d8ed386e5906",
     "tools/c15_persistence/probe_cli.py": "86b3413e5f060265b3ad17fdaf6a54510140b66afd89989e7dea1d9311c5f0e6"

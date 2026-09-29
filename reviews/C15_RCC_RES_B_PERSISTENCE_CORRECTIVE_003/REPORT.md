@@ -197,7 +197,7 @@ generic distributed CAS subsystem and no new security architecture was built.
   `evidence/ci_parity/GREEN_bare_pytest_full_suite.log`, 997 tests / 0 failures / 0 errors (see §11)
 * Core was **not** modified to make any of this pass; no Core test was touched.
 
-## 11. CI-parity corrective (formal-gate import parity)
+## 11. CI-parity correctives (formal-gate import parity and portable workspace)
 
 **Defect found after publication.** Three repository formal gates ran red on the first pushed head
 `d49f513131d73d208bea0b5da601f435c7386d92`: `formal-core-gate` (job `109486347554`),
@@ -210,11 +210,10 @@ generic distributed CAS subsystem and no new security architecture was built.
   Every local GREEN run had used `python -m pytest`, which masked the defect. The same defect is inherited from
   the frozen WIP (PR #254's formal gates were red as well). **No probe semantics, expectation or blocker
   conclusion is involved.**
-* **Fix (harness-side and additive)** — `tests/c15_persistence/conftest.py` prepends the repository root and
+* **Fix A (harness-side and additive)** — `tests/c15_persistence/conftest.py` prepends the repository root and
   `src` to `sys.path` for that directory only. No root `conftest.py`, no global pytest-config change, no
-  packaging change, no `.pth` file, **no harness installation**, no `src/aios_core/**` change. The frozen probe
-  sources are byte-identical, so the matrix `sources` hashes still verify and **no re-freeze was needed**
-  (the freeze remains exactly `d4afe24b...`).
+  packaging change, no `.pth` file, **no harness installation**, no `src/aios_core/**` change. This fix touched
+  no frozen probe source.
 * **CI-parity verification** (`evidence/ci_parity/`, procedure in `evidence/ci_parity/PROCEDURE.md`) — a fresh
   single-commit checkout of the candidate tree outside `/tmp` was executed exactly as CI does:
 
@@ -225,16 +224,48 @@ generic distributed CAS subsystem and no new security architecture was built.
 | `pytest -o addopts='' -q tests/c15_persistence` | exit `0`; **78 passed** |
 | `pytest -q --tb=no --junitxml=...` (repository) | exit `0`; **tests=997 failures=0 errors=0 skipped=0** |
 
-* The three gates above are re-executed by GitHub on the corrective head to confirm the fix end to end.
-* **Post-fix CI re-run (candidate `c73a447...`, CPython 3.12.14 / SQLite 3.45.1):** the gates now *collect and
-  run* the whole suite (997 tests, 269 s — no longer aborting at collection), and the remaining red is
-  `tests=997, failures=13, errors=0` on the CPython 3.12.14 formal environment; the CPython 3.11.2 sandbox
-  cannot reproduce it. Because GitHub check-run logs and artifacts are unreachable from this sandbox (the
-  object-storage host is blocked; only the checks/annotations API is readable), the conftest now emits one
-  `::error` annotation per failing test under GitHub Actions (`GREEN_ci_annotation_hook_selftest.log`), so the
-  failing identities are readable through the checks API. Diagnosis and repair of those 13 failures are
-  in progress; the PM hold `REVIEW_BLOCKED / CI_COLLECTION_BLOCKER` stays in force until the 3.12.14 gates
-  are green.
+* **Post-fix CI re-run (candidate `c73a447...`, CPython 3.12.14 / SQLite 3.45.1):** the gates then *collected and
+  ran* the whole suite (997 tests, 269 s — no longer aborting at collection), and exposed the second defect:
+  `tests=997, failures=13, errors=0`, the 13 failures being **all of `test_journal.py::JournalTests`**. Because
+  GitHub check-run logs and artifacts are unreachable from this sandbox (the object-storage host is blocked; only
+  the checks/annotations API is readable), the conftest additionally emits one `::error` annotation per failing
+  test under GitHub Actions (`GREEN_ci_annotation_hook_selftest.log`), which made the identities and the failure
+  text readable through the checks API and turned a blind red gate into an actionable one.
+
+**Defect B — the persisted workspace was hard-coded to one account.** The captured CI annotations
+(`evidence/ci_parity/RED_ci_journal_workspace_hardcode.log`) show every failure as
+`FileNotFoundError: [Errno 2] No such file or directory: '/home/user/c15-persistence-unit-probes'`: `journal.py`
+declared `WORKSPACE = Path('/home/user')` and the journal probes derived their disposable root from that literal.
+`/home/user` exists only on this sandbox's account (`user`); the formal CI account is `runner`
+(`HOME=/home/runner`), so the entire frozen journal contract died in `setUp` — 13 of 13 — before a single
+assertion ran. The CPython 3.11.2 sandbox could not reproduce it because there `/home/user` *is* the workspace.
+
+* **Fix B (harness-side, semantics-preserving)** — `journal.py` now resolves the workspace exactly like
+  `backend.py`/`killpoints/harness.py` already do (`C15_PERSISTED_WORKSPACE`, else the account home), and
+  `test_journal.py`, `test_operator_wiring.py` and `probe_core_boundary.py` derive their probe roots and their
+  excluded-location cases from that resolved workspace (as does the `resident_surface_check.py` default scratch
+  root). The durability contract itself is untouched: the backend must still be a private, non-excluded child of
+  the persisted workspace with no ephemeral backing. This is **stronger** than before on non-`user` accounts:
+  the excluded-directory cases now exercise real workspace-excluded locations instead of silently degrading to
+  "outside the workspace".
+* **Re-freeze (documented, third freeze):** two frozen probe sources changed, so the matrix was re-frozen with
+  an explicit reason — `frozen/CORRECTIVE_003_PROBE_MATRIX.json` is now
+  `d5641f8fdab934a41ed0658ceb3c7a5d9d1c1f3ed88f64984876c9ad4ac22c9c`, and the diff against the previous freeze is
+  mechanically verified to be **only** those sources: 21 probe ids identical, 21 `test_function`/`EXPECT:`
+  entries identical, zero changed probe entries, `freeze_history` now 3 entries.
+* **Portability verification** (`evidence/ci_parity/GREEN_portable_workspace_foreign_home.log`) — executed with a
+  simulated foreign account (`HOME=/home/user/c15-ci-home-sim`, repository outside `HOME`, CI-style history-less
+  checkout for the full-suite run):
+
+| check | result |
+| --- | --- |
+| `pytest -q tests/c15_persistence/test_journal.py` under the foreign `HOME` | exit `0`; **13 passed** (13/13 failed before the repair) |
+| frozen `unittest` journal contract | exit `0`; `Ran 13 tests … OK` |
+| `pytest -q tests/c15_persistence` under the foreign `HOME` | exit `0`; **78 passed** |
+| whole repository, CI-style checkout, foreign `HOME` | exit `0`; **tests=997 failures=0 errors=0 skipped=0** |
+
+The three formal gates are re-executed by GitHub on the repaired head; the PM hold
+`REVIEW_BLOCKED / CI_COLLECTION_BLOCKER` remains in force until they are green.
 
 ## 12. Candidate freeze
 
@@ -254,9 +285,10 @@ generic distributed CAS subsystem and no new security architecture was built.
 * Re-verification on the exact committed head: the frozen probe matrix (`C002-001/002/004` ids plus the
   retained non-blocking probes) passes 29/29 against `af3404b...`, and the scope gate reports
   `src_aios_core_diff_is_zero = true` with zero scope violations.
-* Re-verification after the CI-parity corrective: candidate frozen again on fresh `main` (`016a2f7...`), scope
-  gate re-computed from the staged index (see §11 for the CI evidence; `frozen/CORRECTIVE_003_PROBE_MATRIX.json`
-  unchanged at `d4afe24b559fb000987a823f0f7cefafa99fedfa55d1ed782cbd742dc6f6fc33`).
+* Re-verification after the CI-parity correctives: candidate frozen again on fresh `main` (`016a2f7...`), scope
+  gate re-computed from the staged index, and the probe matrix re-frozen at
+  `d5641f8fdab934a41ed0658ceb3c7a5d9d1c1f3ed88f64984876c9ad4ac22c9c` (third freeze, reason recorded; probe ids
+  and expectations byte-identical to the previous freeze — see §11).
 
 ## 13. Status
 

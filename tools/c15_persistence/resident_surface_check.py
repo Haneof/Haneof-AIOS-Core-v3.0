@@ -29,6 +29,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -326,12 +327,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--base", default="main", help="git ref to diff the pinned trees against")
     parser.add_argument(
         "--work-root",
-        default="/home/user/c15-persistence-runs/resident-surface",
+        default=None,
         help="durable (non-ephemeral) scratch root for the two runs",
     )
     args = parser.parse_args(argv)
 
-    work_root = Path(args.work_root)
+    work_root = Path(
+        args.work_root
+        or Path(os.environ.get("C15_PERSISTED_WORKSPACE") or Path.home())
+        / "c15-persistence-runs"
+        / "resident-surface"
+    )
     if work_root.exists():
         shutil.rmtree(work_root, ignore_errors=True)
     work_root.mkdir(parents=True, exist_ok=True)
