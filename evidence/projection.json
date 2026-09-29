@@ -1,1 +1,1 @@
-{"dimension":"dim:conversation","event_id":"c15rcc-015","modality":"text","occurred_at":"2026-11-09T09:10:00-08:00","resident_visible_payload":"晚上的回归前把这个 staging 冲突处理掉。","sequence":15,"source_class":"USER","source_kind":"conversation"}
+{"dimension":"dim:work_outcome","event_id":"c15rcc-016","modality":"structured_text","occurred_at":"2026-11-09T10:02:00-08:00","resident_visible_payload":"staging 冲突已解除；索引名更新为 orders-shadow-v2，CI 48/48 通过，回归队列恢复；production 未发生变更。","sequence":16,"source_class":"PLATFORM","source_kind":"ci_platform"}
