@@ -1,0 +1,16 @@
+{
+  "binding_mode": "fixture_observation",
+  "event_id": "c15rcc-018",
+  "fixture_payload_sha256": "sha256:2e80821a6567af3665638dada5d700c184faaaf97b163c37a6c6f989d34b8c83",
+  "fixture_projection_sha256": "sha256:f860aa0bccee8ad8b28f19a126865c01499e5fda331edf0a32b5183cbfc27377",
+  "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+  "ingest_object_id": "obs_c14_fixture_3fd30a3cca0f01f839fc0c46",
+  "ingest_ref": "obs_c14_fixture_3fd30a3cca0f01f839fc0c46@1",
+  "ingest_revision": 1,
+  "ingest_source_class": "platform",
+  "ingest_world_revision": 55,
+  "next_sequence": 19,
+  "occurred_at": "2026-11-10T14:31:00-08:00",
+  "sequence": 18,
+  "status": "acked"
+}
