@@ -1,0 +1,66 @@
+@@REQUEST_PUBLISHED@@ req-0001-model_directive-390c8d84
+@@REQUEST_PUBLISHED@@ req-0002-model_directive-925a5644
+@@REQUEST_PUBLISHED@@ req-0003-model_directive-8f03e29e
+@@REQUEST_PUBLISHED@@ req-0004-model_directive-8cf4c8c3
+@@REQUEST_PUBLISHED@@ req-0005-model_directive-9dd1b76a
+@@REQUEST_PUBLISHED@@ req-0006-model_directive-54616907
+@@REQUEST_PUBLISHED@@ req-0007-model_directive-b7b915a7
+@@REQUEST_PUBLISHED@@ req-0008-model_directive-1ac91e3b
+@@REQUEST_PUBLISHED@@ req-0009-model_directive-915add57
+@@REQUEST_PUBLISHED@@ req-0010-model_directive-4c46f757
+@@REQUEST_PUBLISHED@@ req-0011-model_directive-1d972520
+@@REQUEST_PUBLISHED@@ req-0012-model_directive-ac8b88ac
+@@REQUEST_PUBLISHED@@ req-0013-model_directive-845d3947
+@@REQUEST_PUBLISHED@@ req-0014-model_directive-138e18f1
+@@REQUEST_PUBLISHED@@ req-0015-model_directive-e13b24e6
+@@REQUEST_PUBLISHED@@ req-0016-model_directive-8fcbb7e5
+@@REQUEST_PUBLISHED@@ req-0017-model_directive-4be42e67
+@@REQUEST_PUBLISHED@@ req-0018-model_directive-92b562be
+@@REQUEST_PUBLISHED@@ req-0019-model_directive-0312b173
+@@REQUEST_PUBLISHED@@ req-0020-model_directive-60593f77
+@@REQUEST_PUBLISHED@@ req-0021-model_directive-99f1ebf2
+@@REQUEST_PUBLISHED@@ req-0022-model_directive-22a9c3fe
+@@REQUEST_PUBLISHED@@ req-0023-model_directive-889b4352
+@@REQUEST_PUBLISHED@@ req-0024-model_directive-289492d2
+@@REQUEST_PUBLISHED@@ req-0025-model_directive-8361b43c
+@@REQUEST_PUBLISHED@@ req-0026-model_directive-bc95247a
+@@REQUEST_PUBLISHED@@ req-0027-model_directive-81efb624
+@@REQUEST_PUBLISHED@@ req-0028-model_directive-8fb2c6f1
+@@REQUEST_PUBLISHED@@ req-0029-model_directive-7370a88e
+@@REQUEST_PUBLISHED@@ req-0030-model_directive-87c50b81
+@@REQUEST_PUBLISHED@@ req-0031-model_directive-41c4c3fa
+@@REQUEST_PUBLISHED@@ req-0032-model_directive-f42478d4
+@@REQUEST_PUBLISHED@@ req-0033-model_directive-8d81bf85
+@@REQUEST_PUBLISHED@@ req-0034-model_directive-738244f7
+@@REQUEST_PUBLISHED@@ req-0035-model_directive-a6ab4776
+@@REQUEST_PUBLISHED@@ req-0036-model_directive-27c8c20c
+@@REQUEST_PUBLISHED@@ req-0037-model_directive-20a4b9e3
+@@REQUEST_PUBLISHED@@ req-0038-model_directive-ad281ac7
+@@REQUEST_PUBLISHED@@ req-0039-model_directive-ed097a32
+Traceback (most recent call last):
+  File "/home/user/c15-w08/driver/w08_cursor.py", line 388, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/user/c15-w08/driver/w08_cursor.py", line 376, in main
+    return cmd_due(seq, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/c15-w08/driver/w08_cursor.py", line 246, in cmd_due
+    result = run_due_work(
+             ^^^^^^^^^^^^^
+  File "/home/user/c15-w08/operator-prep/harness/aios_exchange/runner.py", line 254, in run_due_work
+    result = core.process_due_work(now=now, max_wakes=max_wakes,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/c15-w08/rc-f20f2edf/src/aios_core/headless/core.py", line 352, in process_due_work
+    runtime.run_periodic_review(now=moment, token_budget=token_budget)
+  File "/home/user/c15-w08/rc-f20f2edf/src/aios_core/runtime/turn_runtime.py", line 4651, in run_periodic_review
+    runtime_result = self.cognitive_runtime.run_turn(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/c15-w08/rc-f20f2edf/src/aios_core/runtime/cognitive_runtime.py", line 345, in run_turn
+    attempt_id = self.model_attempt_admitter(snapshot)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/c15-w08/rc-f20f2edf/src/aios_core/runtime/turn_runtime.py", line 1232, in _admit_background_model_attempt
+    attempt = self.background_model_attempts.admit(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/c15-w08/rc-f20f2edf/src/aios_core/runtime/background_attempt.py", line 921, in admit
+    raise BackgroundModelExecutionInDoubt(current)
+aios_core.runtime.background_attempt.BackgroundModelExecutionInDoubt: background model attempt blocked: bgattempt_1d6735f46f05508149948ea5a7de5b01 is in_doubt; inspect/reconcile the durable attempt instead of reinvoking the provider

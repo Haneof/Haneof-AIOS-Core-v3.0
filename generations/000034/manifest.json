@@ -1,0 +1,15 @@
+{
+  "artifacts": {
+    "binding/current-event-binding.json": "59bec07e12e1d30925945f75c1979b8593aa564a1c45b5e99107ad7b74a7fcf8",
+    "current-event.json": "cd40e8b0dcdc0c0250a9e296d63c13a188d53787de3378dbd9c32e426e78938d",
+    "exchange/ledger.jsonl": "6b1efae67b39fd78c840f043b2e5e4847f5fb3a3f733c67a9d1532a7f08e8556",
+    "release-state.json": "2bbe79081d770598204033410504600650d4d295b875e49124f95d79532d43b7",
+    "run/RUN_IDENTITY.json": "c95a230f4f32dad7982391c4d983f298f8975dc61d420165ed7aa61f39e8ffa6",
+    "world/c15-res-b-003.world.search.sqlite": "97fa7f8fadc66723ac568a4950b6eb257078ef745c872b57007106c5a55ad91d",
+    "world/c15-res-b-003.world.sqlite": "8610726e423d1708c2e66c2a10b4c2710c96998c5c37caaa236c6cfce0fdd31c"
+  },
+  "generation": 34,
+  "label": "OPERATOR_RECOVERY_RECONCILE_NOT_SUBMITTED_PM_AUTHORIZED_2026-09-30",
+  "manifest_sha256": "44a19676ef32f9330a9bdb6195cce0aac8dd926f77e8cad312b647d0b064bd53",
+  "sealed_at_epoch": 1790714716.3078218
+}
