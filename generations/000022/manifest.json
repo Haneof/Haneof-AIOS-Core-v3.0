@@ -1,0 +1,12 @@
+{
+  "artifacts": {
+    "current-event.json": "567c3c089b9ceef2e1fdbb2a33ba2a43083c4f61279a19e783eb38419af3bb3d",
+    "exchange/ledger.jsonl": "c6972feef97b7157c2b0a154ae9bd7eff4ed8f92e38cbeaafe01912791ccd134",
+    "release-state.json": "0bf8a5a6ec8295120fcd7e8f419ffed6a006f6e101043183954276e90ff36e08",
+    "run/RUN_IDENTITY.json": "c95a230f4f32dad7982391c4d983f298f8975dc61d420165ed7aa61f39e8ffa6"
+  },
+  "generation": 22,
+  "label": "K1_AFTER_REVEAL",
+  "manifest_sha256": "73e0cd50d4d911b2e362b3f2cca275952d23bd19b99c815e28753ad73cb16e95",
+  "sealed_at_epoch": 1790712057.1168585
+}
