@@ -1,0 +1,129 @@
+{
+  "C10": {
+    "failed": 8,
+    "passed": 0
+  },
+  "C11": {
+    "failed": 10,
+    "passed": 0
+  },
+  "baseline_commit": "771b200c33dbd6055b1d209935f8e1552f13090f",
+  "baseline_tree": "071b51c5fb37dc59fc8941dee2182637b9f87daa",
+  "cases": [
+    {
+      "message": "aios_exchange.ledger.LedgerError: non-monotonic sequence at seq 2",
+      "status": "FAIL",
+      "test_id": "tests/test_c10_concurrency.py::test_c10_independent_ledgers_same_valid_prefix"
+    },
+    {
+      "message": "AssertionError: two successful mutations may not corrupt the ledger\nassert False",
+      "status": "FAIL",
+      "test_id": "tests/test_c10_concurrency.py::test_c10_independent_publishers_distinct_identities"
+    },
+    {
+      "message": "AssertionError: assert 'd2c6829e0da139a17f033cc3c33f4c8861949e520bfd5590d29a4271bd28f5c7' == '086f5dee026004cf548eed42ce95865eabdfd43e6feb679a133c136bd6448568'\n  \n  - 086f5dee026004cf548eed42ce95865eabdfd43e6feb679a133c136bd6448568\n  + d2c6829e0da139a17f033cc3c33f4c8861949e520bfd5590d29a4271bd28f5c7",
+      "status": "FAIL",
+      "test_id": "tests/test_c10_concurrency.py::test_c10_duplicate_explicit_request_id_single_dispatch"
+    },
+    {
+      "message": "AssertionError: two successful mutations may not corrupt the ledger\nassert False",
+      "status": "FAIL",
+      "test_id": "tests/test_c10_concurrency.py::test_c10_response_races_new_request"
+    },
+    {
+      "message": "AssertionError: two successful mutations may not corrupt the ledger\nassert False",
+      "status": "FAIL",
+      "test_id": "tests/test_c10_concurrency.py::test_c10_consume_races_new_request"
+    },
+    {
+      "message": "AssertionError: two successful mutations may not corrupt the ledger\nassert False",
+      "status": "FAIL",
+      "test_id": "tests/test_c10_concurrency.py::test_c10_concurrent_duplicate_response_is_idempotent"
+    },
+    {
+      "message": "AssertionError: two successful mutations may not corrupt the ledger\nassert False",
+      "status": "FAIL",
+      "test_id": "tests/test_c10_concurrency.py::test_c10_concurrent_duplicate_consume_is_idempotent"
+    },
+    {
+      "message": "AssertionError: two successful mutations may not corrupt the ledger\nassert False",
+      "status": "FAIL",
+      "test_id": "tests/test_c10_concurrency.py::test_c10_independent_subprocess_publishers"
+    },
+    {
+      "message": "Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)",
+      "status": "FAIL",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_request_artifact_fsync_failure_is_not_dispatch"
+    },
+    {
+      "message": "Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)",
+      "status": "FAIL",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_response_artifact_fsync_failure_is_not_published"
+    },
+    {
+      "message": "Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)",
+      "status": "FAIL",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_first_ledger_entry_fsync_failure_and_retry"
+    },
+    {
+      "message": "Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)",
+      "status": "FAIL",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_request_directory_open_failure_is_not_dispatch"
+    },
+    {
+      "message": "Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)",
+      "status": "FAIL",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_response_directory_open_failure_is_not_published"
+    },
+    {
+      "message": "Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)",
+      "status": "FAIL",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_ledger_creation_directory_open_failure_is_not_dispatch"
+    },
+    {
+      "message": "Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)",
+      "status": "FAIL",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_request_artifact_sync"
+    },
+    {
+      "message": "Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)",
+      "status": "FAIL",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_response_artifact_sync"
+    },
+    {
+      "message": "Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)",
+      "status": "FAIL",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_mutated_unproven_request_file_is_not_adopted"
+    },
+    {
+      "message": "Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)",
+      "status": "FAIL",
+      "test_id": "tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_first_ledger_creation"
+    }
+  ],
+  "collected_and_enumerated": 18,
+  "core_matches_frozen_rc": true,
+  "environment_qualified": true,
+  "failed": 18,
+  "fresh_live_main": "c8e9e42f8ae6e6724c0c7e9eb9dbb21b100f4487",
+  "frozen_probe_commit": "4b2ca9fd48da2f1f44789c664de66bd471a39ee9",
+  "passed": 0,
+  "probe_freeze_sha256": "573a55d1b4f437122e9f9fc1359465adf5a8d5def573fea8eabb8b7deef43045",
+  "raw_files": {
+    "bootstrap_build.exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "bootstrap_build.raw.txt": "656a1dcc5fe194132b53a61680788f32fea6fa700c9f2bb17c0f5435d847daf0",
+    "environment_probe.json": "1b5aa592ac551d659ccb1bd669fc6f89754bfb32d63ee02c7083aedc82a848a3",
+    "environment_record.json": "0f2184b485024ef6c1ada6ef1f803f2c47e077b360450e844bd65fea19b64118",
+    "exact_h2_archive_identity.json": "3a11f442b07312bd53aceb520a14f9a63c253fc56fa969c1ef1f73e9cdc6dc65",
+    "probe_checksums.raw.txt": "c03ad0974819f1e55be7f1911c5d5145afe84519a31164727db92be8fbeb41ec",
+    "probe_collect.raw.txt": "a3e509b938eac968294e5dd05539ec176cf4bedb319f007f51f39071eb5301f7",
+    "pytest.exit_code": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "pytest.raw.txt": "3930d4ba28cb06eaed03d305adaad3e1ee56e0ce2ee6dbcb7df36b9daab92b15",
+    "rc_identity.json": "76d664d26bf6efb8d7e508c202ee3efb5fee08bf90e2e8cb4dabcf2e16ce0cf2",
+    "results.xml": "f28076133c2818f7d5646c245ae6efe9f2a60fd9489f63e748c0c772719d14bd",
+    "wheel_lock_verification.json": "69a9525f4caf8023f8b88457e8f16c18e8708eaa2491badc887be944c26b362b"
+  },
+  "run_exit_code": 1,
+  "source_matches_h2": true,
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-003"
+}
