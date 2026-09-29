@@ -1,1 +1,1 @@
-{"dimension":"dim:work_state","event_id":"c15rcc-014","modality":"structured_text","occurred_at":"2026-11-09T09:03:00-08:00","resident_visible_payload":"staging 索引 orders-shadow 与昨夜测试残留名称冲突，回归任务被阻塞；production 索引未受影响。","sequence":14,"source_class":"PLATFORM","source_kind":"monitoring"}
+{"dimension":"dim:conversation","event_id":"c15rcc-015","modality":"text","occurred_at":"2026-11-09T09:10:00-08:00","resident_visible_payload":"晚上的回归前把这个 staging 冲突处理掉。","sequence":15,"source_class":"USER","source_kind":"conversation"}
