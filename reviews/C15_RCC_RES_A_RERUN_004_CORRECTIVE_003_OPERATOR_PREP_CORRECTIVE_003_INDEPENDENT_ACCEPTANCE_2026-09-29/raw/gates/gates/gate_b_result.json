@@ -1,0 +1,44 @@
+{
+  "gate": "B",
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "status": "PASS",
+  "returncode": 0,
+  "collection_returncode": 0,
+  "reported_collected_count": 7,
+  "execution_total": 7,
+  "test_file": "tests/test_gate_b_frozen_core_contract.py",
+  "test_count": 7,
+  "test_ids": [
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b1_runtime_snapshot_with_empty_capability_history",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b2_successful_capability_result_serializes",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b3_failed_capability_result_serializes",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b4_multiple_capability_results_distinct_fields",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b5_no_nonexistent_fields_are_referenced",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b6_frozen_capability_result_surface_is_exactly_six_fields",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b7_runner_serializer_round_trips_real_directive"
+  ],
+  "outcomes": {
+    "passed": 7,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "duration_s": 1.12,
+  "raw_output": "gate_b_raw.txt",
+  "raw_output_sha256": "666ab4d858eb43461fb2cb4544e6b7c61e33b3a5f6ac9efb0b43027236b4f257",
+  "enumeration_sha256": "b4d99aa42d7d2e640a204c85fd38327fef7092db773945a25089380f0d7c4f07",
+  "environment": {
+    "python_version": "3.12.14",
+    "python_version_info": [
+      3,
+      12,
+      14
+    ],
+    "pydantic_version": "2.13.5",
+    "pytest_version": "8.4.2",
+    "sqlite_version": "3.45.1",
+    "openssl_version": "OpenSSL 3.0.13 30 Jan 2024",
+    "executable": "/home/user/ia_review/runtime/runtime/3.12.14/venv/bin/python"
+  },
+  "generated_utc": "2026-09-29T10:34:15.725617+00:00"
+}

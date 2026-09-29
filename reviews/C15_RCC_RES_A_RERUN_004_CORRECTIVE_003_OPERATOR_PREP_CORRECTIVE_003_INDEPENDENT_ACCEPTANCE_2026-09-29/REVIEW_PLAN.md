@@ -46,6 +46,11 @@ concluded from them. Revision 1 sources, freeze and raw results are preserved un
 | --- | --- | --- | --- |
 | 1 (`probes/`) | `778d48e0e6cf9e0c6c04057eab1684e5d4dd0d4b22e621611cf1e0a9b060ae2f` | `cc2d805c22a6ffc2683252d6a1b5183d53fceec81275e4f35d0b88be5ae9fab1` | 39/48 passed |
 | 2 (`probes_v2/`) | `a4e8b0e58b9636ba4e41124507da39c2c235b58761111d0c1e4a12ac1f22f47d` | `83d2ab281d6e046e9175437e087f624434d6f5de1d1dc80559b0ec69958d4231` | 49/49 passed |
+| 3 (`probes_v3/`, final) | `0d299c288169e27a9068c15e9cbd3a2e8da372f6c815e640b84695c235c1db29` | `fdad15300e65e069eea365dfdd3af8e3a2f0a3fe3fdc2d43ef5ddef440730ad9` | **50/50 passed** |
+
+Revision 3 adds one probe (§7(c) stale-prefix identity outside the lock) and changes no
+revision-2 expectation; `REVISION_NOTES_v3.md` records the freeze/commit ordering for all
+revisions transparently.
 
 Rules honored in this review:
 
