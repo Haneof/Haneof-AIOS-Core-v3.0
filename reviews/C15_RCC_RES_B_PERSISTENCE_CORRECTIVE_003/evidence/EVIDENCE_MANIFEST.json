@@ -101,7 +101,7 @@
     "scope_violations": [],
     "src_aios_core_diff_is_zero": true,
     "src_aios_core_diff_vs_base": [],
-    "staged_against_head": "4178cbd5b764b521eb4344851b131b5936d00e5d"
+    "staged_against_head": "af3404b7f6b7ac4ea1f28e8e6702ce6179523a89"
   },
   "environment_identity": {
     "disclosed_delta": "This sandbox cannot obtain CPython 3.12.14 (GitHub release-asset and python.org downloads are blocked; Debian 12 ships CPython 3.11). The candidate was executed on CPython 3.11.2 / Pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.40.1 and the delta is disclosed rather than hidden.",

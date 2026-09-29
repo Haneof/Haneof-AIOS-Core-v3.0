@@ -14,7 +14,10 @@ Status: **REVIEW_READY** (fresh Independent Acceptance is the next step; this wi
 | Starting live `main` | `016a2f7db5ed01b41fc614701079c507d2c2c02e` (equals the PM re-release post-integration baseline; **no main drift**) |
 | Baseline restore commit | `852e0831cb23db46766890573e7f61c9512e55e7` (restores the scope-compliant harness from the frozen WIP onto fresh main) |
 | Work branch | `arena/01a0ed87-haneof-aios-core-v3-0` (session-fixed branch; no other branch is created or pushed) |
-| Candidate head / PR | published externally (branch tip + PR thread) — a commit cannot contain its own SHA |
+| Candidate continuation commit | `4178cbd5b764b521eb4344851b131b5936d00e5d` (repair) |
+| Candidate final head (this report) | `af3404b7f6b7ac4ea1f28e8e6702ce6179523a89` — parent `4178cbd5b764b521eb4344851b131b5936d00e5d`, tree `19f04f6446a75497921efc79fd116917228ffd17` |
+| Candidate merge-base with `main` | `016a2f7db5ed01b41fc614701079c507d2c2c02e` (exact latest-main base) |
+| PR | publication blocked in this sandbox: GitHub credentials return `401 Bad credentials` (see §12) |
 | Governance state confirmed | `C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 = READY`; `RESIDENT_B = BLOCKED`, `RESIDENT_C = BLOCKED`, `EVALUATOR = BLOCKED`, `C15_CLOSE = BLOCKED` |
 | Governance drift | none: the fresh main is exactly the PM re-release baseline and the task board still lists this task as the unique next READY |
 
@@ -207,12 +210,22 @@ generic distributed CAS subsystem and no new security architecture was built.
   executed locally with the exact commands recorded in the evidence logs (the frozen WIP's corrective-003
   workflow is deliberately **not** restored because it had been changed to require the scope-violating Core
   diff).
+* Re-verification on the exact committed head: the frozen probe matrix (`C002-001/002/004` ids plus the
+  retained non-blocking probes) passes 29/29 against `af3404b...`, and the scope gate reports
+  `src_aios_core_diff_is_zero = true` with zero scope violations.
 
 ## 12. Status
 
 ```text
-C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 = REVIEW_READY
+C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 = REVIEW_READY (engineering complete, candidate frozen)
 NEXT = FRESH_INDEPENDENT_ACCEPTANCE
 ```
+
+**Publication blocker (infrastructure, not engineering):** this sandbox's GitHub credentials are invalid
+(`401 Bad credentials`), so the continuation branch could not be pushed and the PR could not be opened from
+this window. Everything an Independent Acceptance needs is committed on
+`arena/01a0ed87-haneof-aios-core-v3-0` at the exact head above, with the PR declaration already recorded in
+`reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/PR_BODY.md`. GitHub access needs to be reconnected in
+Arena; the push + PR creation are the only remaining mechanical steps.
 
 Not entered: Resident B, RELEASE-003, RERUN-003, ACCEPT-003, Resident C, evaluator, C15 close.
