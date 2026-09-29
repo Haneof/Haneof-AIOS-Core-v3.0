@@ -1,0 +1,22 @@
+# CI RED on the pre-fix head 2d01ee2 (CPython 3.12.14 / SQLite 3.45.1) — captured from the checks API
+# because the sandbox cannot reach the GitHub log/artifact object store.
+# Source: check-run annotations of run 36594465996 job 109495689480 (formal-core-gate)
+
+[failure] pytest failure :: tests/c15_persistence/test_journal.py::JournalTests::test_reply_staged_kill_reopen_no_byte_rewriting :: E   FileNotFoundError: [Errno 2] No such file or directory: '/home/user/c15-persistence-unit-probes'
+[failure] pytest failure :: tests/c15_persistence/test_journal.py::JournalTests::test_receipt_recording_does_not_claim_core_verification :: E   FileNotFoundError: [Errno 2] No such file or directory: '/home/user/c15-persistence-unit-probes'
+[failure] pytest failure :: tests/c15_persistence/test_journal.py::JournalTests::test_no_production_or_retired_identity_entrypoint :: E   FileNotFoundError: [Errno 2] No such file or directory: '/home/user/c15-persistence-unit-probes'
+[failure] pytest failure :: tests/c15_persistence/test_journal.py::JournalTests::test_missing_barrier_wrong_binding_and_outstanding :: E   FileNotFoundError: [Errno 2] No such file or directory: '/home/user/c15-persistence-unit-probes'
+[failure] pytest failure :: tests/c15_persistence/test_journal.py::JournalTests::test_exposed_kill_reopen_wait_no_resend :: E   FileNotFoundError: [Errno 2] No such file or directory: '/home/user/c15-persistence-unit-probes'
+[failure] pytest failure :: tests/c15_persistence/test_journal.py::JournalTests::test_exact_checkpoint_and_required_evidence_survive_reopen :: E   FileNotFoundError: [Errno 2] No such file or directory: '/home/user/c15-persistence-unit-probes'
+[failure] pytest failure :: tests/c15_persistence/test_journal.py::JournalTests::test_corrupt_artifact_blocks_exposure :: E   FileNotFoundError: [Errno 2] No such file or directory: '/home/user/c15-persistence-unit-probes'
+[failure] pytest failure :: tests/c15_persistence/test_journal.py::JournalTests::test_concurrent_exposure_one_winner :: E   FileNotFoundError: [Errno 2] No such file or directory: '/home/user/c15-persistence-unit-probes'
+[failure] pytest failure :: tests/c15_persistence/test_journal.py::JournalTests::test_bad_paths :: E   FileNotFoundError: [Errno 2] No such file or directory: '/home/user/c15-persistence-unit-probes'
+[failure] pytest failure :: tests/c15_persistence/test_journal.py::JournalTests::test_application_gap_is_in_doubt_not_exactly_once_claim :: E   FileNotFoundError: [Errno 2] No such file or directory: '/home/user/c15-persistence-unit-probes'
+
+# Formal JUnit summary for the same pre-fix run (from the 'Publish formal environment' notice annotations):
+[notice] full exact JUnit :: tests=997, failures=13, errors=0, skipped=0, time=277.610
+[notice] focused exact JUnit :: tests=99, failures=0, errors=0, skipped=0, time=10.143
+[notice] r5 exact JUnit :: tests=24, failures=0, errors=0, skipped=0, time=3.461
+[notice] Formal environment :: Python 3.12.14 / Pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.45.1
+# -> all 13 failures are tests/c15_persistence/test_journal.py::JournalTests, i.e. the whole frozen journal
+#    contract could not even reach setup on the CI account.

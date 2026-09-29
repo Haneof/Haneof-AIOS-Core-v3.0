@@ -1,0 +1,21 @@
+# Portability repair verification — 2026-09-29T16:21:10Z
+# Simulated foreign account: HOME=/home/user/c15-ci-home-sim (the CI account is 'runner' with HOME=/home/runner),
+# repository outside HOME, CI-style history-less checkout for the full-suite run.
+
+$ HOME=<sim> pytest -o addopts='' -q tests/c15_persistence/test_journal.py
+.............                                                            [100%]
+13 passed in 0.45s
+
+$ (cd tests/c15_persistence && PYTHONPATH=.:<repo>/src python -m unittest -v test_journal)   # frozen unittest contract, local HOME
+Ran 13 tests in 0.437s
+
+OK
+
+$ HOME=<sim> pytest -o addopts='' -q tests/c15_persistence   # whole persistence subset
+......                                                                   [100%]
+78 passed in 67.33s (0:01:07)
+
+$ HOME=<sim> PYTHONPATH=<sim>/src pytest -q --tb=no --junitxml=...   # CI-style checkout, whole repository
+.............................................................            [100%]
+--------------- generated xml file: /home/user/c15-sim-junit.xml ---------------
+JUNIT tests=997 failures=0 errors=0 skipped=0

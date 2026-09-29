@@ -1,0 +1,14 @@
+C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 environment identity
+captured_at_utc: 2026-09-29T15:05:57Z
+repository: /home/user/Haneof-AIOS-Core-v3.0
+starting_main: 016a2f7db5ed01b41fc614701079c507d2c2c02e
+baseline_restore_commit: 852e0831cb23db46766890573e7f61c9512e55e7
+python: 3.11.2 3.11.2 (main, Apr  8 2026, 01:58:00) [GCC 12.2.0]
+executable: /home/user/Haneof-AIOS-Core-v3.0/.venv/bin/python
+pydantic: 2.13.5
+pytest: 8.4.2
+sqlite: 3.40.1
+platform: Linux-6.1.158+-x86_64-with-glibc2.36
+formal_gate_pin: CPython 3.12.14 / Pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.45.1
+interpreter_delta: sandbox cannot obtain CPython 3.12.14 (GitHub release-asset and python.org downloads are blocked; Debian 12 ships only 3.11); disclosed, not silently substituted
+git version 2.39.5

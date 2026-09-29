@@ -1,0 +1,14 @@
+/usr/lib/python3.11/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/c15_persistence/test_operator_wiring.py:32: in <module>
+    from tools.c15_persistence.backend import (  # noqa: E402
+E   ModuleNotFoundError: No module named 'tools'
+=========================== short test summary info ============================
+ERROR tests/c15_persistence/test_corrective_002_remote_durability.py
+ERROR tests/c15_persistence/test_corrective_003_binding_blockers.py
+ERROR tests/c15_persistence/test_corrective_003_regressions.py
+ERROR tests/c15_persistence/test_environment_reattach.py
+ERROR tests/c15_persistence/test_journal.py
+ERROR tests/c15_persistence/test_operator_wiring.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 6 errors during collection !!!!!!!!!!!!!!!!!!!!
