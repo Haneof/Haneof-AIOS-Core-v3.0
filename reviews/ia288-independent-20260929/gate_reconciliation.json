@@ -1,0 +1,56 @@
+{
+  "a": {
+    "count": 24,
+    "ids_len": 24,
+    "execution_total": 24,
+    "status": "PASS",
+    "same_node_ids_normalized": true,
+    "collection_rc": 0
+  },
+  "b": {
+    "count": 7,
+    "ids_len": 7,
+    "execution_total": 7,
+    "status": "PASS",
+    "same_node_ids_normalized": true,
+    "collection_rc": 0
+  },
+  "c": {
+    "count": 2,
+    "ids_len": 2,
+    "execution_total": 2,
+    "status": "PASS",
+    "same_node_ids_normalized": true,
+    "collection_rc": 0
+  },
+  "d": {
+    "count": 5,
+    "ids_len": 5,
+    "execution_total": 5,
+    "status": "PASS",
+    "same_node_ids_normalized": true,
+    "collection_rc": 0
+  },
+  "gate_c": {
+    "round0_history": [],
+    "round1_history": [
+      {
+        "call_id": "synthetic-call-0001",
+        "data": [
+          {
+            "dimension": "dim:user_ai_interaction",
+            "excerpt": "SYNTHETIC operator-prep two-round liveness probe",
+            "object_id": "obs_conv_user_a7e71d6fb43c0cf04bffec80",
+            "object_type": "observation",
+            "retrieval_score": 4,
+            "revision": 1
+          }
+        ],
+        "error_code": null,
+        "error_message": null,
+        "name": "search_world",
+        "ok": true
+      }
+    ]
+  }
+}

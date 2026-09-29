@@ -1,0 +1,39 @@
+{
+  "gate": "C",
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "status": "PASS",
+  "returncode": 0,
+  "collection_returncode": 0,
+  "reported_collected_count": 2,
+  "execution_total": 2,
+  "test_file": "tests/test_gate_c_two_round_integration.py",
+  "test_count": 2,
+  "test_ids": [
+    ".cache/ia288/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_c_two_round_integration.py::test_gate_c_two_round_integration",
+    ".cache/ia288/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_c_two_round_integration.py::test_gate_c_second_turn_reuses_durable_exchange"
+  ],
+  "outcomes": {
+    "passed": 2,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "duration_s": 1.342,
+  "raw_output": "gate_c_raw.txt",
+  "raw_output_sha256": "16b8045cc0cbdbff4b58694b93347c6ee640027a827fac1d62765e9805c43717",
+  "enumeration_sha256": "e8e897a4bb7086a724f61cfa72f205bab826f884c95ce052a0de6cb201ce0c5e",
+  "environment": {
+    "python_version": "3.12.14",
+    "python_version_info": [
+      3,
+      12,
+      14
+    ],
+    "pydantic_version": "2.13.5",
+    "pytest_version": "8.4.2",
+    "sqlite_version": "3.45.1",
+    "openssl_version": "OpenSSL 3.0.13 30 Jan 2024",
+    "executable": "/home/user/.cache/ia288/runtime/runtime/3.12.14/venv/bin/python"
+  },
+  "generated_utc": "2026-09-29T05:56:27.323279+00:00"
+}
