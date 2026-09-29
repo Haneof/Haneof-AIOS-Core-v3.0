@@ -161,3 +161,9 @@ continuation → due work → K5 → durable ack → ACKED barriers, with genera
 
 - verify_local_remote_authority PASS; remote head == FINAL_FREEZE commit 5692a329…; exchange integrity ok, 43/43 COMPLETE, nothing open/unconsumed; release state B/22/next23/pending-none; freeze digests zero drift; bg attempts 43/43 metered (zero residual in_doubt); wakes 7/7 completed (0 non-terminal); turn executions 11/11 completed; no model-work processes alive. Evidence: run evidence/freeze/TERMINAL_VERIFICATION.json.
 - Window closed. Remaining steps (independent acceptance, evaluator, Resident C, C15 closure) belong to the PM/review process and are explicitly OUT OF SCOPE for this window; cursor 23+ remains unrevealed.
+
+## INDEPENDENT VERIFICATION 2026-09-30 (fresh remote clone, no local trust)
+
+- Fresh --depth 1 clone of the persistence ref: HEAD == 5692a329 (expected FINAL_FREEZE). generation-head.json + gen48 manifest byte-identical to local cache; 48 generations present; ledger sha fa7895c5 / 129 records; freeze digests 10/10 recomputed PASS; boundary B/22/next23/pending-none; world rev 66; commit message binds run_id+generation=48; committed audit tail = final_freeze, generation_sealed. PR #296 lineage still OPEN @ exact 317316299; live main unchanged e25ec95.
+- Ordering nuance documented: committed freeze MANIFEST lacks final_barrier (barrier seals pre-barrier state); closure = commit message + generation-head sha-pin + audit records. Post-freeze audit artifacts live outside sealed generations by design.
+- Record: run evidence/freeze/W08_INDEPENDENT_VERIFY.json + PR evidence/w08/.
