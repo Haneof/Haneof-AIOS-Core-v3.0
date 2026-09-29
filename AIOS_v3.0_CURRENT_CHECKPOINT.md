@@ -1,5 +1,15 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-09-29 Operator Prep Corrective-002 — REVIEW_READY; fresh IA released
+
+- PR #288 final freeze H2 `771b200c33dbd6055b1d209935f8e1552f13090f`, tree `071b51c5fb37dc59fc8941dee2182637b9f87daa`; sole parent/corrected H1 `63c972ad7a19671cbdf809177f7a552aa2c2ecc6`, tree `8cd4a2d8b4cdf1f85699c5d78166f774741b420b`; H1 parent RED freeze `8e34fba00edf4fdb5b80f04d7a648f6b5bb8c40e`.
+- PM readiness: 372 changed paths, all confined to internal Operator Prep/Corrective evidence; no Core/product-tests/governance/fixture/evaluator/release-source drift; no real Resident artifacts.
+- Author evidence: #286 baseline C4-C9 23 PASS / 80 FAIL; candidate same frozen probes 103 PASS; C1-C3 GREEN; A/B/C/D 24/7/2/5 PASS; clean runtime 3.12.14/2.13.5/8.4.2/SQLite 3.45.1/OpenSSL 3.0.13.
+- Packet remains `PREP_REVIEW_READY`, SHA `f6b61c33dc41d20438ab1b56bd1c8f2e46fcf6593532f3793c3c51ee7fbf7cdc`.
+- Unique next READY: `C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-002-INDEPENDENT-ACCEPTANCE`.
+- Real Corrective-003 Resident remains blocked until fresh IA PASS plus PM integration/release adjudication.
+
+
 ## 2026-09-28 Operator Prep Corrective-001 — PM REVIEW_BLOCKED by previously unadjudicated review #284
 
 - Corrective-001 candidate: PR #286 H2 `c32e544b747cb1f1d9b7418e2163a65ac55ee39c`; H1b `99af8e268a1f9e8944b163d8087005e0e3698620`.

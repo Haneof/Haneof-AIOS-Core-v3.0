@@ -1,5 +1,17 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 当前控制入口 — 2026-09-29 OPERATOR-PREP CORRECTIVE-002 REVIEW_READY / FRESH IA READY
+
+- **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-002 = OPERATOR_PREP_CORRECTIVE_002_COMPLETE / REVIEW_READY`**. Candidate PR #288 remains **OPEN / UNMERGED / EVIDENCE-ONLY** at final freeze H2 `771b200c33dbd6055b1d209935f8e1552f13090f` (tree `071b51c5fb37dc59fc8941dee2182637b9f87daa`), sole parent/corrected H1 `63c972ad7a19671cbdf809177f7a552aa2c2ecc6` (tree `8cd4a2d8b4cdf1f85699c5d78166f774741b420b`), H1 parent genuine RED freeze `8e34fba00edf4fdb5b80f04d7a648f6b5bb8c40e`.
+- Fresh PM readiness verified 372 PR paths are confined to internal Operator Prep/Corrective evidence trees; zero Core/product-tests/governance/fixture/evaluator/release-source drift and no real World/release-state/resident-run DB artifacts. H2 check `c15-rcc-fixture-mechanical-gate` is green.
+- Author evidence reports exact #286 H2 baseline C4-C9 = 23 PASS / 80 FAIL, same frozen v2 candidate probes = 103 PASS; Corrective-001 C1-C3 remains GREEN; Gates A/B/C/D = 24/7/2/5 PASS; clean scratch runtime = CPython 3.12.14 / Pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.45.1 / OpenSSL 3.0.13. These remain author evidence pending fresh IA.
+- Launch packet SHA-256 = `f6b61c33dc41d20438ab1b56bd1c8f2e46fcf6593532f3793c3c51ee7fbf7cdc`, status `PREP_REVIEW_READY`; packet pins the exact four-input startup set, user-turn and due-work entrypoints, canonical RC manifests, wheel trust root and full gates.
+- **唯一下一 READY：`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-002-INDEPENDENT-ACCEPTANCE = READY`**. Binding prompt: `governance/prompts/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_002_INDEPENDENT_ACCEPTANCE_2026-09-29.md`.
+- Fresh IA must independently re-attack every #283/#284 historical blocker, C1-C9 regressions, clean bootstrap/RC identity, operational ledger/recovery, due-work exchange, packet startup boundary and freeze integrity. Author GREEN is not transferable acceptance.
+- `C15-RCC-RES-A-RERUN-004-CORRECTIVE-003` remains **BLOCKED_ON_OPERATOR_PREP**. No real Resident release/run is authorized.
+- Persistence Corrective-003, Resident B/C, evaluator and C15 close remain **BLOCKED**.
+
+
 ## 当前控制入口 — 2026-09-28 OPERATOR-PREP CORRECTIVE-001 REVIEW_BLOCKED / CORRECTIVE-002 READY
 
 - **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-001 = OPERATOR_PREP_CORRECTIVE_COMPLETE / REVIEW_READY / PM_REVIEW_BLOCKED / KNOWN_UNRESOLVED_FINDINGS`**. PR #286 final freeze H2 = `c32e544b747cb1f1d9b7418e2163a65ac55ee39c`, parent/corrected candidate H1b = `99af8e268a1f9e8944b163d8087005e0e3698620`. No fresh IA was released for #286.
