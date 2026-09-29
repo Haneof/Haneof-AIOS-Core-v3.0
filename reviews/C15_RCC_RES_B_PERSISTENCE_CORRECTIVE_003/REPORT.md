@@ -226,6 +226,15 @@ generic distributed CAS subsystem and no new security architecture was built.
 | `pytest -q --tb=no --junitxml=...` (repository) | exit `0`; **tests=997 failures=0 errors=0 skipped=0** |
 
 * The three gates above are re-executed by GitHub on the corrective head to confirm the fix end to end.
+* **Post-fix CI re-run (candidate `c73a447...`, CPython 3.12.14 / SQLite 3.45.1):** the gates now *collect and
+  run* the whole suite (997 tests, 269 s — no longer aborting at collection), and the remaining red is
+  `tests=997, failures=13, errors=0` on the CPython 3.12.14 formal environment; the CPython 3.11.2 sandbox
+  cannot reproduce it. Because GitHub check-run logs and artifacts are unreachable from this sandbox (the
+  object-storage host is blocked; only the checks/annotations API is readable), the conftest now emits one
+  `::error` annotation per failing test under GitHub Actions (`GREEN_ci_annotation_hook_selftest.log`), so the
+  failing identities are readable through the checks API. Diagnosis and repair of those 13 failures are
+  in progress; the PM hold `REVIEW_BLOCKED / CI_COLLECTION_BLOCKER` stays in force until the 3.12.14 gates
+  are green.
 
 ## 12. Candidate freeze
 

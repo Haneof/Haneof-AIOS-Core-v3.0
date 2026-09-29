@@ -16,6 +16,7 @@
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_bare_pytest_c15_subset.log",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_bare_pytest_full_suite.log",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_bare_pytest_full_suite_summary.txt",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_ci_annotation_hook_selftest.log",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_formal_gate_enumerations.log",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/PROCEDURE.md",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/RED_bare_pytest_collection_error.log",
@@ -71,6 +72,7 @@
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_bare_pytest_c15_subset.log": "ALLOWED",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_bare_pytest_full_suite.log": "ALLOWED",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_bare_pytest_full_suite_summary.txt": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_ci_annotation_hook_selftest.log": "ALLOWED",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_formal_gate_enumerations.log": "ALLOWED",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/PROCEDURE.md": "ALLOWED",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/RED_bare_pytest_collection_error.log": "ALLOWED",
@@ -115,7 +117,7 @@
     "scope_violations": [],
     "src_aios_core_diff_is_zero": true,
     "src_aios_core_diff_vs_base": [],
-    "staged_against_head": "d49f513131d73d208bea0b5da601f435c7386d92"
+    "staged_against_head": "c73a44713d0df1613e3faa082bd69591db5fe255"
   },
   "environment_identity": {
     "disclosed_delta": "This sandbox cannot obtain CPython 3.12.14 (GitHub release-asset and python.org downloads are blocked; Debian 12 ships CPython 3.11). The candidate was executed on CPython 3.11.2 / Pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.40.1 and the delta is disclosed rather than hidden.",
@@ -180,6 +182,11 @@
       "bytes": 64,
       "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_bare_pytest_full_suite_summary.txt",
       "sha256": "d8ab1054c2c627ad76983106b8fd053c057e0c7bb964d307b655d36d10e01535"
+    },
+    {
+      "bytes": 527,
+      "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_ci_annotation_hook_selftest.log",
+      "sha256": "dc1c6644a00138728d8e5be48c87e90b315f6e32cd390715dc09de88cae4c05e"
     },
     {
       "bytes": 256,
