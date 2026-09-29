@@ -19,11 +19,15 @@ Recorded events (at minimum):
 
 from __future__ import annotations
 
+from contextlib import contextmanager
+import fcntl
 import json
 import os
 import pathlib
 import re
-from typing import Any, Iterable
+import stat
+import threading
+from typing import Any, Iterable, Iterator
 
 from .canonical import canonical_json_bytes, sha256_hex, utc_now_iso
 from .atomic import fsync_dir
@@ -49,17 +53,92 @@ LEDGER_EVENTS = (
 
 GENESIS_SHA256 = "0" * 64
 
+# The Python mutex only makes same-process threads reentrant. Every outermost
+# transaction ALSO owns an exclusive flock on the same dedicated inode, shared
+# by independent Python objects and OS processes. Neither is a state store.
+_MUTEX_GUARD = threading.Lock()
+_MUTEXES: dict[str, threading.RLock] = {}
+_HELD = threading.local()
+
+
+def _mutex_for(key: str) -> threading.RLock:
+    with _MUTEX_GUARD:
+        return _MUTEXES.setdefault(key, threading.RLock())
+
 
 class LedgerError(RuntimeError):
-    """The ledger is unreadable, non-monotonic or tamper-evident."""
+    """The ledger/lock is unreadable, non-monotonic or cannot be made durable."""
 
 
 class ExchangeLedger:
-    """Append-only hash-chained JSON-lines ledger."""
+    """Append-only hash-chained JSON-lines ledger with a shared writer boundary."""
 
     def __init__(self, path: str | pathlib.Path) -> None:
         self.path = pathlib.Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
+        # Never lock the ledger itself: its entry is absent before creation and
+        # its inode could change. The dedicated lock file is never unlinked.
+        self.lock_path = self.path.with_name(self.path.name + ".lock")
+        self._lock_key = str(self.lock_path.resolve())
+
+    def _acquire_os_lock(self) -> int:
+        fd: int | None = None
+        try:
+            fd = os.open(str(self.lock_path), os.O_RDWR | os.O_CREAT | os.O_CLOEXEC | os.O_NOFOLLOW, 0o600)
+            opened = os.fstat(fd)
+            if not stat.S_ISREG(opened.st_mode) or opened.st_nlink != 1:
+                raise LedgerError("exchange lock path is not a single regular file")
+            fcntl.flock(fd, fcntl.LOCK_EX)
+            named = os.stat(self.lock_path, follow_symlinks=False)
+            if (opened.st_dev, opened.st_ino) != (named.st_dev, named.st_ino):
+                raise LedgerError("exchange lock path changed during acquisition")
+            return fd
+        except (OSError, LedgerError) as exc:
+            if fd is not None:
+                os.close(fd)
+            raise LedgerError(f"cannot acquire exchange mutation lock: {exc}") from exc
+
+    def _release_os_lock(self, fd: int) -> None:
+        try:
+            named = os.stat(self.lock_path, follow_symlinks=False)
+            opened = os.fstat(fd)
+            if (opened.st_dev, opened.st_ino) != (named.st_dev, named.st_ino):
+                raise LedgerError("exchange mutation lock ownership changed")
+            fcntl.flock(fd, fcntl.LOCK_UN)
+        except OSError as exc:
+            raise LedgerError(f"cannot release exchange mutation lock: {exc}") from exc
+        finally:
+            os.close(fd)
+
+    @contextmanager
+    def mutation(self) -> Iterator[None]:
+        """One read/validate/decide/publish/append/durability transaction.
+
+        Callers use this outer boundary around *all* prefix-derived decisions.
+        Direct ledger append/read also use it. A thread reentering through a
+        nested caller or another ExchangeLedger for this path reuses its owned
+        OS lock instead of taking a non-reentrant flock twice. Other threads
+        and other processes must acquire their own exclusive OS lock.
+        """
+        with _mutex_for(self._lock_key):
+            held = getattr(_HELD, "files", None)
+            if held is None:
+                held = {}
+                _HELD.files = held
+            if self._lock_key in held:
+                held[self._lock_key] += 1
+                try:
+                    yield
+                finally:
+                    held[self._lock_key] -= 1
+                return
+            fd = self._acquire_os_lock()
+            held[self._lock_key] = 1
+            try:
+                yield
+            finally:
+                del held[self._lock_key]
+                self._release_os_lock(fd)
 
     # -- reading ---------------------------------------------------------
     def _read_raw_records(self) -> list[dict[str, Any]]:
@@ -123,14 +202,23 @@ class ExchangeLedger:
             previous = record["record_sha256"]
 
     def read_records(self) -> list[dict[str, Any]]:
-        try:
-            records = self._read_raw_records()
-            self._validate_records(records)
-            return records
-        except LedgerError:
-            raise
-        except (OSError, ValueError, TypeError) as exc:
-            raise LedgerError(f"ledger integrity validation failed: {exc}") from exc
+        # A failed fsync can leave a valid-looking record visible. Under the
+        # shared lock, reestablish file AND directory durability before any
+        # reader is allowed to treat that prefix as an exchange fact. This also
+        # handles an empty ledger entry left by failed initial creation.
+        with self.mutation():
+            try:
+                if self.path.exists():
+                    with open(self.path, "rb") as handle:
+                        os.fsync(handle.fileno())
+                    fsync_dir(self.path.parent)
+                records = self._read_raw_records()
+                self._validate_records(records)
+                return records
+            except LedgerError:
+                raise
+            except (OSError, ValueError, TypeError) as exc:
+                raise LedgerError(f"ledger integrity validation/durability failed: {exc}") from exc
 
     def last_record(self) -> dict[str, Any] | None:
         records = self.read_records()
@@ -173,6 +261,24 @@ class ExchangeLedger:
         wall_clock: str | None = None,
         extra: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
+        with self.mutation():
+            return self._append_locked(event, request_id=request_id,
+                request_sha256=request_sha256, response_sha256=response_sha256,
+                wall_clock=wall_clock, extra=extra)
+
+    def _append_locked(
+        self,
+        event: str,
+        *,
+        request_id: str,
+        request_sha256: str | None = None,
+        response_sha256: str | None = None,
+        wall_clock: str | None = None,
+        extra: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Only invoked while the caller owns the exchange mutation boundary."""
+        if not getattr(_HELD, "files", {}).get(self._lock_key):
+            raise LedgerError("ledger append requires the exchange mutation lock")
         if event not in LEDGER_EVENTS:
             raise LedgerError(f"unknown ledger event: {event!r}")
         if not isinstance(request_id, str) or not request_id.strip():
@@ -204,13 +310,28 @@ class ExchangeLedger:
 
         self._validate_records(records + [record])
         line = canonical_json_bytes(record) + b"\n"
-        existed = self.path.exists()
-        with open(self.path, "ab") as handle:
-            handle.write(line)
-            handle.flush()
-            os.fsync(handle.fileno())
-        if not existed:
-            fsync_dir(self.path.parent)
+        if not self.path.exists():
+            # Creating the ledger is itself a new directory entry. Make the
+            # *empty* entry durable before writing any dispatch fact, so a
+            # failed initial directory fsync cannot leave an apparently valid
+            # first request_published record. An empty visible file left by a
+            # failed fsync is re-synced by read_records() on retry.
+            try:
+                fd = os.open(str(self.path), os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
+                try:
+                    os.fsync(fd)
+                finally:
+                    os.close(fd)
+                fsync_dir(self.path.parent)
+            except OSError as exc:
+                raise LedgerError(f"ledger creation durability failed: {exc}") from exc
+        try:
+            with open(self.path, "ab") as handle:
+                handle.write(line)
+                handle.flush()
+                os.fsync(handle.fileno())
+        except OSError as exc:
+            raise LedgerError(f"ledger append durability failed: {exc}") from exc
         return record
 
     # -- verification ----------------------------------------------------

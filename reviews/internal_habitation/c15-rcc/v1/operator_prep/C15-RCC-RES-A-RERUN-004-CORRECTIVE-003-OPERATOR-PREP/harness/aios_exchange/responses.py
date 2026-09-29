@@ -18,7 +18,7 @@ import json
 import pathlib
 from typing import Any, Mapping
 
-from .atomic import atomic_write_bytes, read_bytes
+from .atomic import atomic_write_bytes, read_bytes, sync_existing_bytes
 from .canonical import sha256_hex
 from .ledger import (
     LEDGER_EVENT_REQUEST_PUBLISHED,
@@ -70,6 +70,15 @@ class ResponsePublisher:
             raise ResponsePublishError("response_bytes must be bytes")
 
         data = bytes(response_bytes)
+        # Hold the shared OS lock across every prefix-derived decision, exact
+        # byte publication, ledger append and required durability primitive.
+        with self.ledger.mutation():
+            return self._publish_bytes_locked(request_id=request_id, data=data,
+                                              adopt_existing=adopt_existing)
+
+    def _publish_bytes_locked(
+        self, *, request_id: str, data: bytes, adopt_existing: bool,
+    ) -> dict[str, Any]:
         request_record = self._request_record(request_id)
 
         try:
@@ -113,10 +122,10 @@ class ResponsePublisher:
                     f"published response is missing from disk: {path} (fail closed)"
                 )
             try:
-                on_disk = read_bytes(path)
+                on_disk = sync_existing_bytes(path)
             except OSError as exc:
                 raise ResponsePublishError(
-                    f"cannot read durable published response {path}: {exc} (fail closed)"
+                    f"cannot re-prove published response durability {path}: {exc} (fail closed)"
                 ) from exc
             on_disk_digest = sha256_hex(on_disk)
             if on_disk_digest != durable_digest:
@@ -140,13 +149,17 @@ class ResponsePublisher:
 
         adopted = False
         if path.exists():
-            on_disk = read_bytes(path)
             if not adopt_existing:
                 raise ResponsePublishError(
                     "response file already exists without a ledger record; "
                     "adoption disabled (fail closed)"
                 )
-            if sha256_hex(on_disk) != digest:
+            # A failed directory fsync after rename leaves the exact response
+            # visible but NOT dispatched. Re-fsync its file and directory while
+            # holding the transaction lock, then compare the exact submitted
+            # bytes before a response_published event can be appended.
+            on_disk = sync_existing_bytes(path)
+            if on_disk != data or sha256_hex(on_disk) != digest:
                 raise ResponsePublishError(
                     "response file exists with different bytes and has no ledger record"
                 )
@@ -154,7 +167,7 @@ class ResponsePublisher:
         else:
             atomic_write_bytes(path, data)
 
-        record = self.ledger.append(
+        record = self.ledger._append_locked(
             LEDGER_EVENT_RESPONSE_PUBLISHED,
             request_id=request_id,
             request_sha256=request_record.get("request_sha256"),

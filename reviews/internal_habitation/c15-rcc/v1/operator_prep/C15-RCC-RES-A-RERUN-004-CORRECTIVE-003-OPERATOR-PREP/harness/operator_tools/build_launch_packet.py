@@ -98,6 +98,14 @@ def build(
     probe_freeze = probe_root / "probes_v2/PROBE_FREEZE.v2.json"
     baseline_red = probe_root / "BASELINE_RED.v2.json"
     candidate_green = evidence / "corrective_candidate_green.json"
+    corrective_003 = repo_root / "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003"
+    c10_c11_freeze = corrective_003 / "probes/PROBE_FREEZE.json"
+    c10_c11_enumeration = corrective_003 / "probes/probe_collection.txt"
+    c10_c11_hashes = corrective_003 / "probes/PROBE_SHA256SUMS"
+    c10_c11_baseline = corrective_003 / "raw/baseline/BASELINE_RED.json"
+    c10_c11_green = evidence / "c10_c11_candidate_green.json"
+    concurrency_integration = evidence / "concurrency_integration.json"
+    durability_faults = evidence / "durability_fault_evidence.json"
     clean_room = repo_root / CLEAN_ROOM_CONTRACT
     run_contract = repo_root / RUN_CONTRACT
 
@@ -124,6 +132,8 @@ def build(
         "bootstrap_path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/"
         "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/bootstrap/bootstrap_runtime.sh",
         "bootstrap_sha256": sha256_file(bootstrap),
+        "atomic_publication_sha256": sha256_file(operator_prep_root / "harness/aios_exchange/atomic.py"),
+        "ledger_mutation_sha256": sha256_file(operator_prep_root / "harness/aios_exchange/ledger.py"),
         "bootstrap_verify_command": "bash <bootstrap_path> --verify",
         "wheel_lock_path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/"
         "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/bootstrap/PYTHON_WHEEL_LOCK.json",
@@ -167,16 +177,28 @@ def build(
         "operator_prep_exact_parent": parent,
         "operator_prep_head_rule": "final_freeze_commit_parent_equals_corrected_candidate_exact_head",
         "corrective_starting_main_sha": starting_main_sha,
-        "corrective_parent_rule": "initial_carry_and_probe_freeze_commit_parent_equals_live_main_at_task_start",
-        "initial_carry_and_probe_freeze_commit": "4b7afc6f5bff1deb7407eb2f1470a3b68c0aa79a",
+        "corrective_parent_rule": "corrective_003_exact_carry_commit_parent_equals_task_start_live_main",
+        "corrective_003_carry_commit": "41de3f6698146661e73f6e43c00143fb63516ef1",
+        "corrective_003_probe_freeze_commit": "4b2ca9fd48da2f1f44789c664de66bd471a39ee9",
+        "corrective_003_baseline_red_commit": "083dd9506f01ade04d4cbe805f58bf80d40607b0",
         "historical_review_blocked_h2": "c32e544b747cb1f1d9b7418e2163a65ac55ee39c",
         "historical_review_blocked_h1b": "99af8e268a1f9e8944b163d8087005e0e3698620",
         "historical_additional_ia_exact": "dce47c0d8f3ac7e34efb47e22c63c6f9acbea1a6",
         "historical_failed_candidate_exact": "10901d467679b70437ae112747eab81f889fd5cb",
         "historical_failed_ia_exact": "e3394da5d607e34c0286c16a11837ac7ea173a56",
+        "historical_corrective_002_h1_exact": "63c972ad7a19671cbdf809177f7a552aa2c2ecc6",
+        "historical_corrective_002_h2_exact": "771b200c33dbd6055b1d209935f8e1552f13090f",
+        "historical_corrective_002_ia_exact": "39408137edf77976d0c4833fcde551891d5d081a",
         "corrective_probe_freeze_sha256": sha256_file(probe_freeze),
         "targeted_baseline_red_result_sha256": sha256_file(baseline_red),
         "targeted_candidate_green_result_sha256": sha256_file(candidate_green),
+        "c10_c11_probe_freeze_sha256": sha256_file(c10_c11_freeze),
+        "c10_c11_probe_enumeration_sha256": sha256_file(c10_c11_enumeration),
+        "c10_c11_probe_source_hashes_sha256": sha256_file(c10_c11_hashes),
+        "c10_c11_baseline_red_result_sha256": sha256_file(c10_c11_baseline),
+        "c10_c11_candidate_green_result_sha256": sha256_file(c10_c11_green),
+        "concurrency_integration_sha256": sha256_file(concurrency_integration),
+        "durability_fault_evidence_sha256": sha256_file(durability_faults),
         "environment_record_path": "evidence/environment_record.json",
         "environment_record_sha256": sha256_file(evidence / "environment_record.json"),
         "frozen_core_content_manifest_sha256": environment.get("frozen_core_content_manifest_sha256"),

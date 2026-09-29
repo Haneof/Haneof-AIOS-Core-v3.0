@@ -5,10 +5,12 @@ Sequence for every published artifact (request, response, ledger record):
 1. write the complete bytes to a temporary file in the *same* directory;
 2. ``flush`` + ``os.fsync`` the temporary file descriptor;
 3. atomically move it into place with ``os.replace``;
-4. ``fsync`` the containing directory where the platform supports it.
+4. ``fsync`` the containing directory (required on the qualified Linux runtime).
 
 A reader therefore observes either no file or the complete file; partially
-written content is never observable under the published name.
+written content is never observable under the published name. A rename that is
+visible but whose directory fsync fails is NOT a successful publication. A retry
+must verify/resync those bytes or replace them durably before recording dispatch.
 """
 
 from __future__ import annotations
@@ -28,6 +30,7 @@ __all__ = [
     "atomic_write_bytes",
     "atomic_write_json",
     "fsync_dir",
+    "sync_existing_bytes",
     "read_bytes",
     "reset_counters",
 ]
@@ -55,23 +58,42 @@ def _temp_path(path: pathlib.Path) -> pathlib.Path:
 
 
 def fsync_dir(directory: pathlib.Path) -> bool:
-    """Fsync a directory entry list. Returns True when the fsync happened."""
+    """Require directory durability; never turn an open/fsync error into a receipt.
 
-    flags = os.O_RDONLY
-    if hasattr(os, "O_DIRECTORY"):
-        flags |= os.O_DIRECTORY
-    try:
-        fd = os.open(str(directory), flags)
-    except OSError:
-        return False
+    Directory fsync is supported and required on the qualified Linux runtime.
+    Keep the bool return only for the existing receipt shape (always True on
+    success); an OSError at either required primitive propagates to the caller.
+    """
+
+    flags = os.O_RDONLY | os.O_DIRECTORY
+    fd = os.open(str(directory), flags)
     try:
         os.fsync(fd)
-    except OSError:
-        return False
     finally:
         os.close(fd)
     COUNTERS["dir_fsync"] += 1
     return True
+
+
+def sync_existing_bytes(path: str | pathlib.Path) -> bytes:
+    """Re-prove durability of a visible orphan/replay before trusting its bytes.
+
+    Required when a prior failed publication may have left bytes visible after
+    replace, and before a ledger fact can describe those bytes as durable. The
+    inode check prevents a different file at the published name from being
+    silently substituted between reading/fsyncing and the directory fsync.
+    """
+
+    target = pathlib.Path(path)
+    with open(target, "rb") as handle:
+        data = handle.read()
+        os.fsync(handle.fileno())
+        opened = os.fstat(handle.fileno())
+        named = os.stat(target, follow_symlinks=False)
+        if (opened.st_dev, opened.st_ino) != (named.st_dev, named.st_ino):
+            raise AtomicPublishError("published file changed while durability was being verified")
+        fsync_dir(target.parent)
+    return data
 
 
 def atomic_write_bytes(

@@ -19,8 +19,8 @@ import pathlib
 from typing import Any, Mapping
 
 from . import REAL_RESPONSE_MODE
-from .atomic import atomic_write_json, read_bytes
-from .canonical import canonical_json_bytes, sha256_hex, utc_now_iso
+from .atomic import atomic_write_json, read_bytes, sync_existing_bytes
+from .canonical import canonical_json_bytes, parse_utc_iso, sha256_hex, utc_now_iso
 from .ledger import (
     LEDGER_EVENT_REQUEST_PUBLISHED,
     ExchangeLedger,
@@ -67,6 +67,32 @@ class RequestPublisher:
         return self.requests_dir / f"{request_id}.json"
 
     # -- publication -----------------------------------------------------
+    def _validate_same_request(
+        self, raw: bytes, *, request_id: str, kind: str,
+        body: Mapping[str, Any], sequence: int | None,
+    ) -> None:
+        """Validate a visible request byte-for-byte before retry or replay."""
+        try:
+            payload = json.loads(raw.decode("utf-8"))
+            if not isinstance(payload, dict) or raw != canonical_json_bytes(payload) + b"\n":
+                raise ValueError("non-canonical request bytes")
+            if set(payload) != {"request_version", "request_id", "kind", "sequence",
+                                "wall_clock", "response_mode", "body", "response_contract"}:
+                raise ValueError("wrong request envelope fields")
+            ordinal = payload["sequence"]
+            if type(ordinal) is not int or ordinal < 1 or (sequence is not None and ordinal != sequence):
+                raise ValueError("stale request sequence")
+            if (payload["request_id"] != request_id or payload["kind"] != kind or
+                    request_id != self.request_id_for(kind, body, ordinal) or
+                    payload["request_version"] != REQUEST_VERSION or
+                    payload["response_mode"] != REAL_RESPONSE_MODE or
+                    payload["response_contract"] != response_envelope_contract() or
+                    canonical_json_bytes(payload["body"]) != canonical_json_bytes(dict(body))):
+                raise ValueError("request identity/body/contract mismatch")
+            parse_utc_iso(payload["wall_clock"])
+        except (KeyError, TypeError, ValueError, UnicodeDecodeError) as exc:
+            raise RequestPublishError(f"visible request does not match this transaction: {exc}") from exc
+
     def publish(
         self,
         *,
@@ -76,17 +102,45 @@ class RequestPublisher:
     ) -> dict[str, Any]:
         if not isinstance(body, Mapping):
             raise RequestPublishError("request body must be a mapping")
+        # The sequence/id decision, any replay/orphan decision, artifact
+        # publication AND durable ledger append share one cross-process lock.
+        with self.ledger.mutation():
+            return self._publish_locked(kind=kind, body=body, request_id=request_id)
+
+    def _publish_locked(
+        self, *, kind: str, body: Mapping[str, Any], request_id: str | None,
+    ) -> dict[str, Any]:
+        if request_id is not None:
+            existing = self.ledger.latest_event(request_id, LEDGER_EVENT_REQUEST_PUBLISHED)
+            if existing is not None:
+                path = self.path_for(request_id)
+                # A failed ledger file fsync may have left the record visible.
+                # read_records() first re-proves the ledger; this re-proves its
+                # artifact before reporting a prior durable dispatch.
+                try:
+                    on_disk = sync_existing_bytes(path)
+                except OSError as exc:
+                    raise RequestPublishError(f"cannot prove request replay durability: {exc}") from exc
+                if sha256_hex(on_disk) != existing.get("request_sha256"):
+                    raise RequestPublishError("published request bytes do not match the durable ledger")
+                self._validate_same_request(on_disk, request_id=request_id,
+                                            kind=kind, body=body, sequence=None)
+                return {
+                    "request_id": request_id, "sequence": int(existing["seq"]),
+                    "path": str(path), "request_sha256": existing["request_sha256"],
+                    "bytes": len(on_disk), "wall_clock": existing["wall_clock"],
+                    "kind": kind, "idempotent_replay": True,
+                }
 
         sequence = self.next_sequence()
-        if request_id is None:
-            request_id = self.request_id_for(kind, body, sequence)
         expected_id = self.request_id_for(kind, body, sequence)
+        if request_id is None:
+            request_id = expected_id
         if request_id != expected_id:
             raise RequestPublishError(
                 f"request_id does not match the deterministic identity rule: "
                 f"{request_id!r} != {expected_id!r}"
             )
-
         payload = {
             "request_version": REQUEST_VERSION,
             "request_id": request_id,
@@ -96,49 +150,27 @@ class RequestPublisher:
             "response_mode": REAL_RESPONSE_MODE,
             "body": dict(body),
             "response_contract": response_envelope_contract(),
-                    }
+        }
         data = canonical_json_bytes(payload) + b"\n"
         digest = sha256_hex(data)
         path = self.path_for(request_id)
-
-        existing_record = self.ledger.latest_event(request_id, LEDGER_EVENT_REQUEST_PUBLISHED)
-        if existing_record is not None:
-            if existing_record.get("request_sha256") != digest:
-                raise RequestPublishError(
-                    "request already published with a different digest; refusing to rewrite"
-                )
-            return {
-                "request_id": request_id,
-                "sequence": int(existing_record["seq"]),
-                "path": str(path),
-                "request_sha256": digest,
-                "bytes": len(data),
-                "wall_clock": existing_record["wall_clock"],
-                "kind": kind,
-                "idempotent_replay": True,
-            }
-
         if path.exists():
-            on_disk = read_bytes(path)
-            if sha256_hex(on_disk) != digest:
-                raise RequestPublishError(
-                    "request file exists with different bytes and has no ledger record"
-                )
-
+            # A prior failed directory fsync may have left the renamed file
+            # visible without ANY dispatch record. Do not adopt it as a prior
+            # dispatch: verify its full envelope, replace it with this new
+            # transaction's bytes, and require a successful directory fsync.
+            self._validate_same_request(read_bytes(path), request_id=request_id,
+                                        kind=kind, body=body, sequence=sequence)
         atomic_write_json(path, payload)
-        record = self.ledger.append(
+        record = self.ledger._append_locked(
             LEDGER_EVENT_REQUEST_PUBLISHED,
             request_id=request_id,
             request_sha256=digest,
         )
         return {
-            "request_id": request_id,
-            "sequence": int(record["seq"]),
-            "path": str(path),
-            "request_sha256": digest,
-            "bytes": len(data),
-            "wall_clock": record["wall_clock"],
-            "kind": kind,
+            "request_id": request_id, "sequence": int(record["seq"]),
+            "path": str(path), "request_sha256": digest, "bytes": len(data),
+            "wall_clock": record["wall_clock"], "kind": kind,
             "idempotent_replay": False,
         }
 

@@ -44,12 +44,16 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 PACKET_ALLOWED_KEYS = {
     "openssl_version", "content_manifest_algorithm", "rc_identity_evidence_sha256",
     "tests_content_manifest_sha256", "c1_c3_regression_sha256", "due_work_entrypoint",
-    "initial_carry_and_probe_freeze_commit", "historical_review_blocked_h2",
+    "corrective_003_carry_commit", "corrective_003_probe_freeze_commit",
+    "corrective_003_baseline_red_commit", "historical_review_blocked_h2",
     "historical_review_blocked_h1b", "historical_additional_ia_exact",
+    "historical_corrective_002_h1_exact", "historical_corrective_002_h2_exact",
+    "historical_corrective_002_ia_exact",
     "packet_version", "task_id", "status", "frozen_software_sha",
     "frozen_repository_tree", "frozen_core_tree", "frozen_tests_tree",
     "python_version", "pydantic_version", "pytest_version", "sqlite_version",
     "bootstrap_path", "bootstrap_sha256", "bootstrap_verify_command",
+    "atomic_publication_sha256", "ledger_mutation_sha256",
     "wheel_lock_path", "wheel_lock_sha256", "wheel_lock_verification_sha256",
     "clean_bootstrap_evidence_path", "clean_bootstrap_evidence_sha256",
     "runtime_root_default", "runtime_venv_python_default", "harness_root",
@@ -65,6 +69,10 @@ PACKET_ALLOWED_KEYS = {
     "historical_failed_candidate_exact", "historical_failed_ia_exact",
     "corrective_probe_freeze_sha256", "targeted_baseline_red_result_sha256",
     "targeted_candidate_green_result_sha256",
+    "c10_c11_probe_freeze_sha256", "c10_c11_probe_enumeration_sha256",
+    "c10_c11_probe_source_hashes_sha256", "c10_c11_baseline_red_result_sha256",
+    "c10_c11_candidate_green_result_sha256", "concurrency_integration_sha256",
+    "durability_fault_evidence_sha256",
     "environment_record_path", "environment_record_sha256",
     "frozen_core_content_manifest_sha256", "forbidden_startup_categories",
     "forbidden_startup_paths", "allowed_startup_inputs", "generated_utc",
@@ -193,11 +201,19 @@ def audit_packet(packet: dict[str, Any]) -> dict[str, Any]:
         problems.append("real response mode is not the approved external-session mode")
     if packet.get("operator_prep_head_rule") != "final_freeze_commit_parent_equals_corrected_candidate_exact_head":
         problems.append("corrected exact-head/parent rule is missing or incorrect")
-    if packet.get("corrective_parent_rule") != "initial_carry_and_probe_freeze_commit_parent_equals_live_main_at_task_start":
-        problems.append("corrective candidate does not pin its live-main parent rule")
-    if packet.get("historical_failed_candidate_exact") != "10901d467679b70437ae112747eab81f889fd5cb" or packet.get("historical_failed_ia_exact") != "e3394da5d607e34c0286c16a11837ac7ea173a56":
+    if packet.get("corrective_parent_rule") != "corrective_003_exact_carry_commit_parent_equals_task_start_live_main":
+        problems.append("corrective-003 carry does not pin its live-main parent rule")
+    historical = {
+        "historical_failed_candidate_exact": "10901d467679b70437ae112747eab81f889fd5cb",
+        "historical_failed_ia_exact": "e3394da5d607e34c0286c16a11837ac7ea173a56",
+        "historical_corrective_002_h1_exact": "63c972ad7a19671cbdf809177f7a552aa2c2ecc6",
+        "historical_corrective_002_h2_exact": "771b200c33dbd6055b1d209935f8e1552f13090f",
+        "historical_corrective_002_ia_exact": "39408137edf77976d0c4833fcde551891d5d081a",
+    }
+    if any(packet.get(key) != value for key, value in historical.items()):
         problems.append("historical immutable failed exact identities are not pinned")
-    for key in ("operator_prep_exact_head", "operator_prep_exact_parent", "corrective_starting_main_sha"):
+    for key in ("operator_prep_exact_head", "operator_prep_exact_parent", "corrective_starting_main_sha",
+                "corrective_003_carry_commit", "corrective_003_probe_freeze_commit", "corrective_003_baseline_red_commit"):
         if not re.fullmatch(r"[0-9a-f]{40}", str(packet.get(key, ""))):
             problems.append(f"{key} is not an exact 40-character commit identity")
     if packet.get("python_version") != "3.12.14" or packet.get("pydantic_version") != "2.13.5" or packet.get("pytest_version") != "8.4.2" or packet.get("sqlite_version") != "3.45.1":
@@ -398,6 +414,8 @@ def main() -> int:
         })
 
     check_pin("bootstrap", root / "bootstrap/bootstrap_runtime.sh", packet.get("bootstrap_sha256", ""))
+    check_pin("atomic_publication", root / "harness/aios_exchange/atomic.py", packet.get("atomic_publication_sha256", ""))
+    check_pin("ledger_mutation", root / "harness/aios_exchange/ledger.py", packet.get("ledger_mutation_sha256", ""))
     check_pin("wheel_lock", root / "bootstrap/PYTHON_WHEEL_LOCK.json", packet.get("wheel_lock_sha256", ""))
     check_pin("wheel_lock_verification", root / "evidence/wheel_lock_verification.json", packet.get("wheel_lock_verification_sha256", ""))
     check_pin("clean_bootstrap_evidence", root / "evidence/clean_bootstrap_manifest.json", packet.get("clean_bootstrap_evidence_sha256", ""))
@@ -409,6 +427,37 @@ def main() -> int:
     check_pin("corrective_probe_freeze", corrective_evidence / "probes_v2/PROBE_FREEZE.v2.json", packet.get("corrective_probe_freeze_sha256", ""))
     check_pin("targeted_baseline_red", corrective_evidence / "BASELINE_RED.v2.json", packet.get("targeted_baseline_red_result_sha256", ""))
     check_pin("targeted_candidate_green", root / "evidence/corrective_candidate_green.json", packet.get("targeted_candidate_green_result_sha256", ""))
+    corrective_003 = repo / "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003"
+    check_pin("c10_c11_probe_freeze", corrective_003 / "probes/PROBE_FREEZE.json", packet.get("c10_c11_probe_freeze_sha256", ""))
+    check_pin("c10_c11_probe_enumeration", corrective_003 / "probes/probe_collection.txt", packet.get("c10_c11_probe_enumeration_sha256", ""))
+    check_pin("c10_c11_probe_source_hashes", corrective_003 / "probes/PROBE_SHA256SUMS", packet.get("c10_c11_probe_source_hashes_sha256", ""))
+    check_pin("c10_c11_baseline_red", corrective_003 / "raw/baseline/BASELINE_RED.json", packet.get("c10_c11_baseline_red_result_sha256", ""))
+    check_pin("c10_c11_candidate_green", root / "evidence/c10_c11_candidate_green.json", packet.get("c10_c11_candidate_green_result_sha256", ""))
+    check_pin("concurrency_integration", root / "evidence/concurrency_integration.json", packet.get("concurrency_integration_sha256", ""))
+    check_pin("durability_fault_evidence", root / "evidence/durability_fault_evidence.json", packet.get("durability_fault_evidence_sha256", ""))
+    try:
+        freeze = json.loads((corrective_003 / "probes/PROBE_FREEZE.json").read_text())
+        expected_ids = (corrective_003 / "probes/probe_collection.txt").read_text().splitlines()
+        source_ok = all(sha256_file(corrective_003 / "probes" / relative) == digest
+                        for relative, digest in freeze["source_sha256"].items())
+        green = json.loads((root / "evidence/c10_c11_candidate_green.json").read_text())
+        baseline = json.loads((corrective_003 / "raw/baseline/BASELINE_RED.json").read_text())
+        proof_ok = (source_ok and freeze["enumeration_sha256"] == sha256_file(corrective_003 / "probes/probe_collection.txt")
+                    and [row["test_id"] for row in freeze["expected_outcomes"]] == expected_ids
+                    and len(expected_ids) == 18
+                    and baseline["failed"] == 18 and baseline["passed"] == 0
+                    and green["status"] == "GREEN" and green["passed"] == 18 and green["failed"] == 0
+                    and green["collected_and_enumerated"] == 18
+                    and [row["test_id"] for row in green["cases"]] == expected_ids
+                    and all(row["status"] == "PASS" for row in green["cases"]))
+        integration = json.loads((root / "evidence/concurrency_integration.json").read_text())
+        durability = json.loads((root / "evidence/durability_fault_evidence.json").read_text())
+        proof_ok = proof_ok and integration["status"] == "PASS" and integration["ledger_chain_ok"] is True
+        proof_ok = proof_ok and durability["status"] == "PASS" and durability["verified_c11_cases"] == 10
+    except (OSError, KeyError, ValueError, TypeError) as exc:
+        proof_ok = False
+    pin_checks.append({"label": "c10_c11_frozen_enumeration_red_green_and_integration",
+                       "result": "PASS" if proof_ok else "FAIL"})
 
     check_pin("c1_c3_regression", root / "evidence/c1_c3_regression.json", packet.get("c1_c3_regression_sha256", ""))
     check_pin("rc_identity", root / "evidence/rc_identity.json", packet.get("rc_identity_evidence_sha256", ""))
@@ -420,8 +469,16 @@ def main() -> int:
     for entry in current_manifest["files"]:
         check_pin("harness_content", root / entry["path"], entry["sha256"])
     parent = subprocess.check_output(["git", "-C", str(repo), "rev-parse", packet["operator_prep_exact_head"] + "^"], text=True).strip()
-    initial_parent = subprocess.check_output(["git", "-C", str(repo), "rev-parse", packet["initial_carry_and_probe_freeze_commit"] + "^"], text=True).strip()
-    pin_checks.append({"label": "candidate_and_initial_carry_parent_identities", "result": "PASS" if parent == packet["operator_prep_exact_parent"] and initial_parent == packet["corrective_starting_main_sha"] else "FAIL"})
+    initial_parent = subprocess.check_output(["git", "-C", str(repo), "rev-parse", packet["corrective_003_carry_commit"] + "^"], text=True).strip()
+    probe_parent = subprocess.check_output(["git", "-C", str(repo), "rev-parse", packet["corrective_003_probe_freeze_commit"] + "^"], text=True).strip()
+    red_parent = subprocess.check_output(["git", "-C", str(repo), "rev-parse", packet["corrective_003_baseline_red_commit"] + "^"], text=True).strip()
+    ancestry_ok = (parent == packet["operator_prep_exact_parent"]
+                   and initial_parent == packet["corrective_starting_main_sha"]
+                   and probe_parent == packet["corrective_003_carry_commit"]
+                   and red_parent == packet["corrective_003_probe_freeze_commit"]
+                   and packet["operator_prep_exact_parent"] == packet["corrective_003_baseline_red_commit"])
+    pin_checks.append({"label": "candidate_carry_probe_freeze_and_red_parent_identities",
+                       "result": "PASS" if ancestry_ok else "FAIL"})
     for gate in "abcd":
         gate_root = root / "evidence/gates"
         result_path = gate_root / f"gate_{gate}_result.json"

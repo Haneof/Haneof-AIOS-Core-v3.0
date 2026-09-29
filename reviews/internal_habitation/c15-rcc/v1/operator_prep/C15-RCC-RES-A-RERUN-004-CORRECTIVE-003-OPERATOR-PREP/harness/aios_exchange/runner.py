@@ -83,29 +83,33 @@ class ExternalSessionModelHandler:
         body = serialize_runtime_snapshot(snapshot)
         body_bytes = canonical_json_bytes(body)
         body_digest = sha256_hex(body_bytes)
-        state = self.bridge.recovery_state()
-        durable = list(state.get("durable_unconsumed") or [])
-        outstanding = list(state.get("open_dispatched") or [])
-        identities = set(durable + outstanding)
-        if len(durable) > 1 or len(outstanding) > 1 or len(identities) > 1:
-            raise ExchangeContractError("ambiguous recovery state")
-        if identities:
-            request_id = next(iter(identities))
-            # payload() validates the exact file against the ledger full-file SHA.
-            # Body SHA has a distinct domain from the timestamped envelope SHA.
-            durable_body = self.bridge.request_body(request_id)
-            durable_bytes = canonical_json_bytes(durable_body)
-            if sha256_hex(durable_bytes) != body_digest or durable_bytes != body_bytes:
-                raise ExchangeContractError("recovery snapshot binding mismatch")
-            return self._resolve(request_id, body_digest=self.bridge.request_sha256(request_id),
-                path="recovered_durable_response" if durable else "resumed_dispatched_request")
-
-        published = self.bridge.publish_request(kind=self.config.kind, body=body)
-        return self._resolve(
-            published["request_id"],
-            body_digest=published["request_sha256"],
-            path="published_new_request",
-        )
+        # Recovery classification and a potential NEW semantic dispatch are
+        # one transaction. Two runners cannot both observe an empty prefix and
+        # publish the same model boundary twice. Never hold this lock while
+        # waiting for the external response: that publisher needs the lock.
+        with self.bridge.ledger.mutation():
+            state = self.bridge.recovery_state()
+            durable = list(state.get("durable_unconsumed") or [])
+            outstanding = list(state.get("open_dispatched") or [])
+            identities = set(durable + outstanding)
+            if len(durable) > 1 or len(outstanding) > 1 or len(identities) > 1:
+                raise ExchangeContractError("ambiguous recovery state")
+            if identities:
+                request_id = next(iter(identities))
+                # payload() validates the exact file against the ledger full-file SHA.
+                # Body SHA has a distinct domain from the timestamped envelope SHA.
+                durable_body = self.bridge.request_body(request_id)
+                durable_bytes = canonical_json_bytes(durable_body)
+                if sha256_hex(durable_bytes) != body_digest or durable_bytes != body_bytes:
+                    raise ExchangeContractError("recovery snapshot binding mismatch")
+                request_digest = self.bridge.request_sha256(request_id)
+                route = "recovered_durable_response" if durable else "resumed_dispatched_request"
+            else:
+                published = self.bridge.publish_request(kind=self.config.kind, body=body)
+                request_id = published["request_id"]
+                request_digest = published["request_sha256"]
+                route = "published_new_request"
+        return self._resolve(request_id, body_digest=request_digest, path=route)
 
     def _resolve(
         self,

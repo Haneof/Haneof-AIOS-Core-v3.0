@@ -152,6 +152,10 @@ class ExchangeBridge:
     def consume_response(self, request_id: str, *, allow_replay: bool = True) -> bytes:
         """Verify and record consumption of a durably published response."""
 
+        with self.ledger.mutation():
+            return self._consume_locked(request_id, allow_replay=allow_replay)
+
+    def _consume_locked(self, request_id: str, *, allow_replay: bool) -> bytes:
         request_record = self.ledger.latest_event(request_id, LEDGER_EVENT_REQUEST_PUBLISHED)
         if request_record is None:
             raise ExchangeContractError(
@@ -195,7 +199,7 @@ class ExchangeBridge:
                 f"published response request digest does not match the durable request for {request_id!r}"
             )
 
-        self.ledger.append(
+        self.ledger._append_locked(
             LEDGER_EVENT_RESPONSE_CONSUMED,
             request_id=request_id,
             request_sha256=request_record.get("request_sha256"),
@@ -269,6 +273,12 @@ class ExchangeBridge:
         return CLASSIFICATION_DISPATCHED_AWAITING_RESPONSE
 
     def recovery_state(self, request_id: str | None = None) -> dict[str, Any]:
+        # The multi-read classification must describe one validated prefix,
+        # not a mixture of states across another writer's publication.
+        with self.ledger.mutation():
+            return self._recovery_state_locked(request_id)
+
+    def _recovery_state_locked(self, request_id: str | None) -> dict[str, Any]:
         ids = [request_id] if request_id is not None else self.ledger.request_ids()
         classified = [self._classify(item) for item in ids]
         chain = self.ledger.verify_chain()

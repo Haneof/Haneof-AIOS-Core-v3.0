@@ -20,7 +20,7 @@ import platform
 import sys
 from typing import Any
 
-TASK_ID = "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-002"
+TASK_ID = "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-003"
 EXCLUDE_DIRS = {"__pycache__", ".pytest_cache", ".mypy_cache"}
 FREEZE_EXCLUDE_NAMES = {"SHA256SUMS"}
 
@@ -133,6 +133,9 @@ def write_freeze_manifest(operator_prep_root: pathlib.Path, head: str | None) ->
     wheel_verification = evidence / "wheel_lock_verification.json"
     clean_bootstrap = evidence / "clean_bootstrap_manifest.json"
     green_probe = evidence / "corrective_candidate_green.json"
+    c10_c11_green = evidence / "c10_c11_candidate_green.json"
+    concurrency = evidence / "concurrency_integration.json"
+    durability = evidence / "durability_fault_evidence.json"
     gate_results = {}
     for gate in "abcd":
         result_path = evidence / "gates" / f"gate_{gate}_result.json"
@@ -155,6 +158,12 @@ def write_freeze_manifest(operator_prep_root: pathlib.Path, head: str | None) ->
         "wheel_lock_sha256": sha256_file(wheel_lock),
         "wheel_lock_verification_sha256": sha256_file(wheel_verification) if wheel_verification.exists() else None,
         "clean_bootstrap_evidence_sha256": sha256_file(clean_bootstrap) if clean_bootstrap.exists() else None,
+        "c1_c3_regression_sha256": sha256_file(evidence / "c1_c3_regression.json"),
+        "c4_c9_regression_sha256": sha256_file(green_probe) if green_probe.exists() else None,
+        "c10_c11_candidate_green_sha256": sha256_file(c10_c11_green) if c10_c11_green.exists() else None,
+        "concurrency_integration_sha256": sha256_file(concurrency) if concurrency.exists() else None,
+        "durability_fault_evidence_sha256": sha256_file(durability) if durability.exists() else None,
+        "c10_c11_baseline_red_sha256": sha256_file(operator_prep_root.parent.parent / "operator_prep_corrective_003/raw/baseline/BASELINE_RED.json") if (operator_prep_root.parent.parent / "operator_prep_corrective_003/raw/baseline/BASELINE_RED.json").exists() else None,
         "corrective_candidate_green_sha256": sha256_file(green_probe) if green_probe.exists() else None,
         "gate_results": gate_results,
         "gate_summary": summary.get("gates", {}),
