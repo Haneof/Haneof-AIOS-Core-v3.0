@@ -1,5 +1,5 @@
 {
-  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-002",
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-003",
   "root": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
   "scope": "harness + bootstrap + pre-frozen Python wheel trust root",
   "harness_file_count": 27,
@@ -28,13 +28,13 @@
     },
     {
       "path": "harness/aios_exchange/atomic.py",
-      "sha256": "1dcf79d443dee0279ada264f5c4de890a78834f964b502bfb19b10d1d59c395e",
-      "bytes": 3631
+      "sha256": "b2f8df9258045fbb72a966d9b2b0fc72b23476655ff9c9c9ab390dc7634a4683",
+      "bytes": 4870
     },
     {
       "path": "harness/aios_exchange/bridge.py",
-      "sha256": "8a37b82a56958162aa92825fa8908e9637870b2110f221f44b8ec957f7cbc772",
-      "bytes": 13399
+      "sha256": "c482e289d2e2e7f1d2ae49f5996aaa1766d2dfdaba0749fbf62b1c3d0b5cbeef",
+      "bytes": 13928
     },
     {
       "path": "harness/aios_exchange/canonical.py",
@@ -48,23 +48,23 @@
     },
     {
       "path": "harness/aios_exchange/ledger.py",
-      "sha256": "02f71bc71e756f80413cc827a38a3eace44b078650b873f20dcec5a58f3cc8cd",
-      "bytes": 9876
+      "sha256": "31356e9d42e068d52bccd152487321d43a09861d8af68aeef693d34f6e55b217",
+      "bytes": 15468
     },
     {
       "path": "harness/aios_exchange/requests.py",
-      "sha256": "18597a915bf3d948c1ae8d599b9f3d787aa06eab998c363989d9454e2c51829f",
-      "bytes": 6329
+      "sha256": "ece7fa0aaeb91eecb1596a8c0febd70e1c7973398318b827b0c684519965f830",
+      "bytes": 9231
     },
     {
       "path": "harness/aios_exchange/responses.py",
-      "sha256": "7d1a657b97747e0dd277f420ba4c935cb706b30e028e1324d11993f8aca0d23b",
-      "bytes": 8379
+      "sha256": "89e062dfd597333cb5033e4b7523c53c70bbe05e656a36aefdd59cee35cc9f37",
+      "bytes": 9233
     },
     {
       "path": "harness/aios_exchange/runner.py",
-      "sha256": "a3a8c103715979c57c0ef4959786dafb73176244a1c1cec301e1363d78990849",
-      "bytes": 9947
+      "sha256": "31464505b762c0bee5c1716689525297a4cf15f067fa385ceae61d3eb8c12626",
+      "bytes": 10427
     },
     {
       "path": "harness/aios_exchange/schema.py",
@@ -83,13 +83,13 @@
     },
     {
       "path": "harness/operator_tools/build_launch_packet.py",
-      "sha256": "10140d363b67c2e68880d3f2ee26d449afbefe5af0317c2ced0467ed1fbf70ee",
-      "bytes": 10517
+      "sha256": "4560924ec8f07872371f58113ec4471c099e14c05fa97b4fadd0e56b368e6795",
+      "bytes": 12270
     },
     {
       "path": "harness/operator_tools/freeze.py",
-      "sha256": "4b0588adb4128a67fa3a2c7b02a5d636880f4bd8434baf8acceb8e9acd279e0e",
-      "bytes": 8066
+      "sha256": "109a5fcc1e47a67a9887cb50e29653e17b17481683a32e700f4f44afec15b134",
+      "bytes": 9009
     },
     {
       "path": "harness/operator_tools/gate_runner.py",
@@ -103,8 +103,8 @@
     },
     {
       "path": "harness/operator_tools/packet_audit.py",
-      "sha256": "69389299e3979e1ac52056d04e47aa40f6e432af5d163e8ec21b2064b923f65d",
-      "bytes": 25246
+      "sha256": "f3546d6a01f9672ecacade5dcc56d34ad38525c503c69f869623e6b49f8433e9",
+      "bytes": 30066
     },
     {
       "path": "harness/operator_tools/rc_identity.py",
@@ -160,5 +160,5 @@
   "bootstrap_sha256": "e98965d8b55f5e8202c9470af2a3ca175ccde9f93427de5d6cf717921c3ea497",
   "wheel_lock_sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe",
   "wheel_lock_verifier_sha256": "565c7e1e560f0e5394caf85ff1e16f61b53468884aea561de3cbfc61a863e765",
-  "manifest_sha256": "e3b9ca6cd502bc27f22bff59a09ff6024bed17ea0865d46018d1ab70a77d7632"
+  "manifest_sha256": "f3fbd788e3adb2ee600359e791273f87b444bc1991c7506d2683a643fd55a256"
 }

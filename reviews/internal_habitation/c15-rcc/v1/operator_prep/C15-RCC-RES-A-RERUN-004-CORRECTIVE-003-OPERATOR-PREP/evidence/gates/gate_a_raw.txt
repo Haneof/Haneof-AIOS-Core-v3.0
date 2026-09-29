@@ -1,5 +1,5 @@
 ============================= test session starts ==============================
-platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /home/user/.cache/c003/final-runtime-001/runtime/3.12.14/venv/bin/python
 rootdir: /home/user/Haneof-AIOS-Core-v3.0
 configfile: pyproject.toml
 collecting ... collected 24 items
@@ -55,4 +55,4 @@ PASSED reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-
 PASSED reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a22_intact_exact_replay_remains_idempotent
 PASSED reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a23_changed_replay_bytes_fail_closed
 PASSED reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a24_consume_tampered_published_response_still_fails_closed
-============================== 24 passed in 2.55s ==============================
+============================== 24 passed in 2.79s ==============================

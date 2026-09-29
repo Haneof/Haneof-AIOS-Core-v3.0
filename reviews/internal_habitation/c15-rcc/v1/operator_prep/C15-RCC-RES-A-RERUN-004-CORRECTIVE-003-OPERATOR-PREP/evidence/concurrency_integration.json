@@ -1,0 +1,40 @@
+{
+  "candidate_head": "77dac70e0cf054c3f0fb7d94a66dba221fe7d5de",
+  "candidate_tree": "52aa366bc6548e86e805585baddbc0470cb69660",
+  "concurrent_publication_successes": 2,
+  "concurrent_runner_chain_ok": true,
+  "concurrent_runner_dispatches": 1,
+  "concurrent_runner_handoffs": 2,
+  "consumptions": 2,
+  "core_import": "/home/user/Haneof-AIOS-Core-v3.0/src/aios_core/__init__.py",
+  "due_work_handoffs": 1,
+  "exchange_integrity_ok": true,
+  "integration_source_sha256": "0dac457621fc66afe3a52d90799869bf4da899f0680bf8cd5856014f894cdf07",
+  "ledger_chain_ok": true,
+  "ledger_head_sha256": "00e201ce804d6db5cda99b885ef57ec51ca7f41cedefb6a9ef78f7047c656a10",
+  "ledger_record_count": 9,
+  "publisher_objects": 2,
+  "raw_run_sha256": "788baccbd3a320fd341e30558bff6fb58440006b68c3cecffb44787c3f64b78f",
+  "raw_sha256": {
+    "concurrent_handler_ledger.jsonl": "ec7a134a846fb478a6672121cfbf19e312fb9b0d845baadf10e10fc3753d3610",
+    "concurrent_request_receipts.json": "3b086d36a95d0edf9a7a3747d32c3d4f73f09a24f57cf354287df39975a08b1b",
+    "due_work_result.json": "2e6b234e9d9c2b83c27f31ae4ec90ce06a305e0336ebbd8948a9518c4d965a1a",
+    "exchange_ledger.jsonl": "e083de947ef048fcb5b7b8bd26f9baff049e7b44902b6500a801b203344635fc"
+  },
+  "raw_summary_path": "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/raw/final_candidate/integration/integration_summary.json",
+  "raw_summary_sha256": "788baccbd3a320fd341e30558bff6fb58440006b68c3cecffb44787c3f64b78f",
+  "request_ids": [
+    "req-0001-model_directive-a01674b2",
+    "req-0002-model_directive-86fc4849",
+    "req-0003-model_directive-06a5af76"
+  ],
+  "request_payload_sequences": [
+    1,
+    2,
+    3
+  ],
+  "response_publications": 2,
+  "status": "PASS",
+  "synthetic_due_work_completed": true,
+  "synthetic_only": true
+}

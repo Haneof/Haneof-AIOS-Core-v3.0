@@ -23,10 +23,10 @@
     "error": 0,
     "skipped": 0
   },
-  "duration_s": 0.897,
+  "duration_s": 1.096,
   "raw_output": "gate_b_raw.txt",
-  "raw_output_sha256": "e0201bd1aa189a3221ac2a9762638a5b222d5749da6a87db02d3b9f7d401201a",
-  "enumeration_sha256": "bc47230ac3deedc53e6336e68cfcf35d2e21e0e9ffc1e97895c87161cf28accf",
+  "raw_output_sha256": "4a600de252b05021d936589efd45c30c7b92abddd7a0e0160777535bd6a7d1db",
+  "enumeration_sha256": "52fa3ff6d7614c7a87d5d69a8673485442fa63302035d3c4a3a0ba4024ea4c75",
   "environment": {
     "python_version": "3.12.14",
     "python_version_info": [
@@ -38,7 +38,7 @@
     "pytest_version": "8.4.2",
     "sqlite_version": "3.45.1",
     "openssl_version": "OpenSSL 3.0.13 30 Jan 2024",
-    "executable": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python"
+    "executable": "/home/user/.cache/c003/final-runtime-001/runtime/3.12.14/venv/bin/python"
   },
-  "generated_utc": "2026-09-28T21:37:39.219388+00:00"
+  "generated_utc": "2026-09-29T09:37:57.675586+00:00"
 }

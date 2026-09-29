@@ -1,196 +1,442 @@
 {
-  "artifacts": {
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/after_run_identity.json": "35d95ef4715d878002d2ad8fa289ac16276177addf6f54d7e0fcd6f31e4093da",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/before_run_identity.json": "757245b05e10d46192240ca9f01769a61f51c84d1a60edb5e4c88ca1e4c8fdef",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/c1_c3.exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/c1_c3.raw.txt": "416ebb9f51a128c8818fa6a4ef7400689ae1717629316b55a4c81248907ff299",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/c1_c3_before_gates.exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/c1_c3_before_gates.json": "416ebb9f51a128c8818fa6a4ef7400689ae1717629316b55a4c81248907ff299",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/c1_c3_before_gates.raw.txt": "416ebb9f51a128c8818fa6a4ef7400689ae1717629316b55a4c81248907ff299",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/collect.exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/collect.raw.txt": "da519619ff8d1c74e1603c765a3aa53615d0720a5b587541b11b711bcd1465fb",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/due_work_ledger.jsonl": "87390bbac1298bf55a493a20b4c806c62a1be4b43def833b7e9f348235f97048",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/due_work_request.json": "7e0c6ded079be2d6bce1cf65e2f8f383245091091fe6b946160437e20c6b5ee2",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/due_work_result.json": "c82b6fefff2076f62577a781c3faf646d130380c1d7da26328619c3631ed7f14",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates.exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates.raw.txt": "e19a28d2b081047d68f0f0bab61d33433e010f950b728ddbc182324bd19d8411",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/gate_a_raw.txt": "b26df7e9df9e1b38acaffcc20ccd6e7b4ade5633896041869deffc93dc7b7dd5",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/gate_a_result.json": "b317b158af71be9a8a4848ff240b1bf9f8a7d8db6146afa9afc46d2378e65a7f",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/gate_a_tests.txt": "01e9753cfe1655855e4e98320ce6846ed1e6c265479e54eac4931c30264af69b",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/gate_b_raw.txt": "e0201bd1aa189a3221ac2a9762638a5b222d5749da6a87db02d3b9f7d401201a",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/gate_b_result.json": "c35820fbbc8172f034e1045995a3c0241954905113ee4c2893133476e8447d3e",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/gate_b_tests.txt": "bc47230ac3deedc53e6336e68cfcf35d2e21e0e9ffc1e97895c87161cf28accf",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/gate_c_raw.txt": "acb447bff3d5afccc199337e74a11fb438b6fc2fcacd1281bcb4c0695d4bd698",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/gate_c_result.json": "df5397c25d5bb154af2368da652b7baadaf09e25772f74d56285880ca618de38",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/gate_c_tests.txt": "b4c82907b0c65584f3125ea73c389a1f823977c57fd76226218c8eeddf83f788",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/gate_d_raw.txt": "4763a5f9c939640809506df6b637138f4780e91ba6ced5fc120707567ca33bac",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/gate_d_result.json": "493080a7a57fa05317cced8c8f7c73fa61f5ec7e789fc8a139fd4a5f6c7e51c3",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/gate_d_tests.txt": "4530fd3dba01ea49936792fdc8acb8c3bbb301e1c16f48063b1894164384e419",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/gate_summary.json": "1969b05e83ad85b5a0608cd9f34b62a7a4f7679fd430919d3116026dd07ed6ed",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/preflight.json": "a3c8d39c18a2fb1d30fb0c3f7dd102950a948bd3eba9c61083d59df10597cec0",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/test_evidence/gate_b/capability_result_surface.json": "1a2bbb91fa86104baf32a178740b539b87f07b5b0ac8cf8978345ac32dfddf82",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/test_evidence/gate_b/runtime_snapshot_signature.json": "fcac9e37171f41d95d9c396eea7e131e897cd5448ed70873bc15a0f923e6f6a8",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/test_evidence/gate_c/exchange_ledger.jsonl": "a3525d06a7f45e6fba7a7d56c81441e9d3e15a42e9003cee4606e626ca18ac49",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/test_evidence/gate_c/round_requests.json": "c6ea867ded50af8f93d69ad5afd8836c4083df86fed60819477749484ed461da",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/test_evidence/gate_c/turn_result.json": "0241752deea1a76fcf86b0f98d3d69ded76f0202cdfa44541d20ce81b733b644",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/test_evidence/gate_d/no_semantic_scan_report.json": "741e3d96c4bc0e58695ebf7c5bc2ef0b09db4492e61757dfdf16b5b52ba81c9f",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/gates/test_evidence/gate_d/no_semantic_scan_report.txt": "df84d3833a8532d07318c8b23e0b860f74d91890574284b587ddc5f790843de4",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/packet_under_test.json": "8d009995bb1ae5895736b6e19b88b3ca847918ff3eeee821e568ae4766b64894",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/probe_checksums.txt": "853a787e591a5424ae8d37000c30b652aa21ab87d44f518cf4c9752034d8cbfd",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/pytest.exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/pytest.raw.txt": "6518543c4131cf2b9131f85f9ceec8ddc2199c3bd6693d8055413aff570472d8",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/results.xml": "fa00ecb8092132435a5028809ab93d3e5e197feb883ddb3fd2c9c05f519da9e8",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/verify_default.exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/verify_default.raw.txt": "78760dc5ecb057b7828249e87b3e086140cf1c30df12e4c53124ff3fb64b2345",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/verify_explicit.exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/verify_explicit.raw.txt": "78760dc5ecb057b7828249e87b3e086140cf1c30df12e4c53124ff3fb64b2345"
-  },
-  "baseline_red_sha256": "f33f472b1b40cff1d1fd2d69d301b1d2cee6ca88c2fcfcf03a84debc697e3781",
-  "candidate_identity": {
-    "candidate_head": "63c972ad7a19671cbdf809177f7a552aa2c2ecc6",
-    "candidate_parent": "8e34fba00edf4fdb5b80f04d7a648f6b5bb8c40e",
-    "candidate_tree": "8cd4a2d8b4cdf1f85699c5d78166f774741b420b",
-    "frozen_rc": "f20f2edfa7af00d0286493fd15196ca9503bc315",
-    "harness_manifest_file_sha256": "85cb2cb38ab5c3b8b6825a64f43d18ae973a4d057855011df5f5bc2dabb05393",
-    "harness_manifest_sha256": "e3b9ca6cd502bc27f22bff59a09ff6024bed17ea0865d46018d1ab70a77d7632",
-    "relocated_h2_evidence_files_exact": 71,
-    "scope_drift_from_frozen_rc": ""
-  },
-  "counts": {
-    "C4": {
-      "failed": 0,
-      "passed": 9
+  "candidate_head": "77dac70e0cf054c3f0fb7d94a66dba221fe7d5de",
+  "candidate_parent": "083dd9506f01ade04d4cbe805f58bf80d40607b0",
+  "cases": [
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c4_different_snapshot[open]"
     },
-    "C5": {
-      "failed": 0,
-      "passed": 70
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c4_different_snapshot[durable]"
     },
-    "C6": {
-      "failed": 0,
-      "passed": 8
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c4_ambiguous[open]"
     },
-    "C7": {
-      "failed": 0,
-      "passed": 5
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c4_ambiguous[durable]"
     },
-    "C8": {
-      "failed": 0,
-      "passed": 7
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c4_ambiguous[mixed]"
     },
-    "C9": {
-      "failed": 0,
-      "passed": 4
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c4_matching_resume[open]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c4_matching_resume[durable]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c4_durable_request_file_binding[missing]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c4_durable_request_file_binding[tamper]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-mutation]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-deletion]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-duplicate_request]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-duplicate_response]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-duplicate_consumed]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-illegal_order]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-request_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-response_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-torn]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-invalid_json]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-sequence]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-mutation]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-deletion]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-duplicate_request]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-duplicate_response]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-duplicate_consumed]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-illegal_order]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-request_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-response_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-torn]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-invalid_json]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-sequence]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-mutation]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-deletion]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-duplicate_request]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-duplicate_response]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-duplicate_consumed]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-illegal_order]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-request_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-response_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-torn]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-invalid_json]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-sequence]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-mutation]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-deletion]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-duplicate_request]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-duplicate_response]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-duplicate_consumed]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-illegal_order]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-request_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-response_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-torn]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-invalid_json]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-sequence]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-mutation]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-deletion]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-duplicate_request]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-duplicate_response]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-duplicate_consumed]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-illegal_order]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-request_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-response_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-torn]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-invalid_json]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-sequence]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-mutation]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-deletion]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-duplicate_request]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-duplicate_response]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-duplicate_consumed]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-illegal_order]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-request_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-response_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-torn]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-invalid_json]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-sequence]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_valid_chain"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_duplicate_append_refused[request_published]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_duplicate_append_refused[response_published]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_duplicate_append_refused[response_consumed]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c6_bootstrap_identity[none]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c6_bootstrap_identity[wrong_root]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c6_bootstrap_identity[missing_git]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c6_bootstrap_identity[missing_object]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c6_bootstrap_identity[core_byte]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c6_bootstrap_identity[tests_byte]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c6_bootstrap_identity[foreign_import]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c6_shared_canonical_manifest"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c7_exact_runtime_pin[sqlite-3.45.1-True]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c7_exact_runtime_pin[sqlite-3.40.1-False]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c7_exact_runtime_pin[openssl-OpenSSL 3.0.13 30 Jan 2024-True]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c7_exact_runtime_pin[openssl-OpenSSL 3.0.14 4 Jun 2024-False]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c7_real_system_sqlite_fallback"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c8_packet_exact_startup"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c8_audit_startup[none]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c8_audit_startup[omit_clean]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c8_audit_startup[omit_canonical]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c8_audit_startup[board]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c8_audit_startup[adjudication]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c8_audit_startup[history]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c9_due_work_entrypoint"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c9_due_requires_aware_time"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c9_synthetic_due_wake_exchange"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c9_no_semantic_callback"
     }
+  ],
+  "collected_and_enumerated": 103,
+  "failed": 0,
+  "group_counts": {
+    "C4": 9,
+    "C5": 70,
+    "C6": 8,
+    "C7": 5,
+    "C8": 7,
+    "C9": 4
   },
-  "enumeration_matches_frozen_expected": true,
-  "executed_outcomes": {
-    "tests/test_c4_c5.py::test_c4_ambiguous[durable]": "PASS",
-    "tests/test_c4_c5.py::test_c4_ambiguous[mixed]": "PASS",
-    "tests/test_c4_c5.py::test_c4_ambiguous[open]": "PASS",
-    "tests/test_c4_c5.py::test_c4_different_snapshot[durable]": "PASS",
-    "tests/test_c4_c5.py::test_c4_different_snapshot[open]": "PASS",
-    "tests/test_c4_c5.py::test_c4_durable_request_file_binding[missing]": "PASS",
-    "tests/test_c4_c5.py::test_c4_durable_request_file_binding[tamper]": "PASS",
-    "tests/test_c4_c5.py::test_c4_matching_resume[durable]": "PASS",
-    "tests/test_c4_c5.py::test_c4_matching_resume[open]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-deletion]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-duplicate_consumed]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-duplicate_request]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-duplicate_response]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-illegal_order]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-invalid_json]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-mutation]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-request_digest]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-response_digest]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-sequence]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-torn]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-deletion]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-duplicate_consumed]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-duplicate_request]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-duplicate_response]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-illegal_order]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-invalid_json]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-mutation]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-request_digest]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-response_digest]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-sequence]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-torn]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-deletion]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-duplicate_consumed]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-duplicate_request]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-duplicate_response]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-illegal_order]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-invalid_json]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-mutation]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-request_digest]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-response_digest]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-sequence]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-torn]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-deletion]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-duplicate_consumed]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-duplicate_request]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-duplicate_response]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-illegal_order]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-invalid_json]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-mutation]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-request_digest]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-response_digest]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-sequence]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-torn]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-deletion]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-duplicate_consumed]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-duplicate_request]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-duplicate_response]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-illegal_order]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-invalid_json]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-mutation]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-request_digest]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-response_digest]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-sequence]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-torn]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-deletion]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-duplicate_consumed]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-duplicate_request]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-duplicate_response]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-illegal_order]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-invalid_json]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-mutation]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-request_digest]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-response_digest]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-sequence]": "PASS",
-    "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-torn]": "PASS",
-    "tests/test_c4_c5.py::test_c5_duplicate_append_refused[request_published]": "PASS",
-    "tests/test_c4_c5.py::test_c5_duplicate_append_refused[response_consumed]": "PASS",
-    "tests/test_c4_c5.py::test_c5_duplicate_append_refused[response_published]": "PASS",
-    "tests/test_c4_c5.py::test_c5_valid_chain": "PASS",
-    "tests/test_c6_c7.py::test_c6_bootstrap_identity[core_byte]": "PASS",
-    "tests/test_c6_c7.py::test_c6_bootstrap_identity[foreign_import]": "PASS",
-    "tests/test_c6_c7.py::test_c6_bootstrap_identity[missing_git]": "PASS",
-    "tests/test_c6_c7.py::test_c6_bootstrap_identity[missing_object]": "PASS",
-    "tests/test_c6_c7.py::test_c6_bootstrap_identity[none]": "PASS",
-    "tests/test_c6_c7.py::test_c6_bootstrap_identity[tests_byte]": "PASS",
-    "tests/test_c6_c7.py::test_c6_bootstrap_identity[wrong_root]": "PASS",
-    "tests/test_c6_c7.py::test_c6_shared_canonical_manifest": "PASS",
-    "tests/test_c6_c7.py::test_c7_exact_runtime_pin[openssl-OpenSSL 3.0.13 30 Jan 2024-True]": "PASS",
-    "tests/test_c6_c7.py::test_c7_exact_runtime_pin[openssl-OpenSSL 3.0.14 4 Jun 2024-False]": "PASS",
-    "tests/test_c6_c7.py::test_c7_exact_runtime_pin[sqlite-3.40.1-False]": "PASS",
-    "tests/test_c6_c7.py::test_c7_exact_runtime_pin[sqlite-3.45.1-True]": "PASS",
-    "tests/test_c6_c7.py::test_c7_real_system_sqlite_fallback": "PASS",
-    "tests/test_c8_c9.py::test_c8_audit_startup[adjudication]": "PASS",
-    "tests/test_c8_c9.py::test_c8_audit_startup[board]": "PASS",
-    "tests/test_c8_c9.py::test_c8_audit_startup[history]": "PASS",
-    "tests/test_c8_c9.py::test_c8_audit_startup[none]": "PASS",
-    "tests/test_c8_c9.py::test_c8_audit_startup[omit_canonical]": "PASS",
-    "tests/test_c8_c9.py::test_c8_audit_startup[omit_clean]": "PASS",
-    "tests/test_c8_c9.py::test_c8_packet_exact_startup": "PASS",
-    "tests/test_c8_c9.py::test_c9_due_requires_aware_time": "PASS",
-    "tests/test_c8_c9.py::test_c9_due_work_entrypoint": "PASS",
-    "tests/test_c8_c9.py::test_c9_no_semantic_callback": "PASS",
-    "tests/test_c8_c9.py::test_c9_synthetic_due_wake_exchange": "PASS"
-  },
-  "packet_under_test_sha256": "8d009995bb1ae5895736b6e19b88b3ca847918ff3eeee821e568ae4766b64894",
+  "method": "candidate-tier after structural packet regeneration; exact frozen C4-C9; final packet-tier rerun outside pin graph",
+  "passed": 103,
   "probe_freeze_sha256": "a0813c69f588db67e0c78f9d44dc74834990926038d5a0c0a03b097aa8d6c460",
-  "runtime_root": "/home/user/.cache/c002/final-runtime-003",
+  "probe_sha256sums_sha256": "f49f6ab99718281f13fc66779c1ab4a4749f99d74517aaf75c4b24bafbecacc1",
+  "provisional_packet_sha256": "4d0d361e9f47987168b587031524ec2ebeb13e3aa4a2bf57bb23ab19afb8e74b",
+  "raw_sha256": {
+    "c4_c9_candidate_tier.exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "c4_c9_candidate_tier.raw.txt": "d6714b5be773904882e8a7c99d87a8ab66ada2c243c9df0c37aebd3cc0d2191b",
+    "c4_c9_candidate_tier.xml": "c39239f827848002120ed45ce650fbc19603433f19a2571d87bc77b92a192daf",
+    "pre_packet/c4_c9_collect.raw.txt": "7898caf433d50427b7245dc3bbf2276733389fc89fc83439f4a8643b5c95b735"
+  },
+  "run_exit_code": 0,
   "status": "GREEN",
-  "total": 103
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-003"
 }

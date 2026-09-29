@@ -4,11 +4,11 @@
       "chain": {
         "error": null,
         "first_bad_seq": null,
-        "head_sha256": "c9d720b4a730745f665cf3aff5f8db45bde8e04eb2056410fdfc2c37c46b39e6",
+        "head_sha256": "872408abcac3076802f9de1da0f959197a4ea724715fea1f0b634e178cb2d272",
         "ok": true,
         "records": 6
       },
-      "exchange_root": "/tmp/pytest-of-user/pytest-13/test_gate_c_two_round_integrat0/exchange",
+      "exchange_root": "/tmp/pytest-of-user/pytest-8/test_gate_c_two_round_integrat0/exchange",
       "ok": true,
       "problems": [],
       "requests": {
@@ -19,8 +19,8 @@
             "response_consumed"
           ],
           "first_seq": 1,
-          "request_sha256": "f8ef4419e8f183107552ceb0d1e0e7b78f82e34ce734a2a1de29cbf4cd676657",
-          "response_sha256": "1936071b31ea34f71871ba1f8bab6c3459f4574bd64e5a59a5880bacc467f23c"
+          "request_sha256": "8612261651e8792d47bd7a972e55dee2e9611a12d599d9e0f5f0ad9c183e59ae",
+          "response_sha256": "6f9c3726b17d87ca841e80e611cfb8ae870ebd3c0b196e26142224fd6743f88d"
         },
         "req-0002-model_directive-1822126c": {
           "events": [
@@ -29,8 +29,8 @@
             "response_consumed"
           ],
           "first_seq": 4,
-          "request_sha256": "fc79cb071dc4f6ec00c3767cdc38f965f42767ce80a3397c7c8df238b3ead0af",
-          "response_sha256": "5863aa1ec5260159861f61674b8548f4df6b9cd94630f6cda6b729fc11cb2d66"
+          "request_sha256": "f19eba7c9db78543b251b3f42bb5c50b7bfc81f6114d149f5b742a3bbcf5a5b2",
+          "response_sha256": "aea53ea7f97fe4c20d1249cc81a8c107f8298dcec3e03bffec424d2a9b567a84"
         }
       }
     },
@@ -46,7 +46,7 @@
       "ledger": {
         "error": null,
         "first_bad_seq": null,
-        "head_sha256": "c9d720b4a730745f665cf3aff5f8db45bde8e04eb2056410fdfc2c37c46b39e6",
+        "head_sha256": "872408abcac3076802f9de1da0f959197a4ea724715fea1f0b634e178cb2d272",
         "ok": true,
         "records": 6
       },
@@ -76,8 +76,8 @@
           ],
           "not_submitted_allowed": false,
           "request_id": "req-0001-model_directive-699b33c1",
-          "request_sha256": "f8ef4419e8f183107552ceb0d1e0e7b78f82e34ce734a2a1de29cbf4cd676657",
-          "response_sha256": "1936071b31ea34f71871ba1f8bab6c3459f4574bd64e5a59a5880bacc467f23c",
+          "request_sha256": "8612261651e8792d47bd7a972e55dee2e9611a12d599d9e0f5f0ad9c183e59ae",
+          "response_sha256": "6f9c3726b17d87ca841e80e611cfb8ae870ebd3c0b196e26142224fd6743f88d",
           "semantic_dispatch_occurred": true
         },
         {
@@ -103,8 +103,8 @@
           ],
           "not_submitted_allowed": false,
           "request_id": "req-0002-model_directive-1822126c",
-          "request_sha256": "fc79cb071dc4f6ec00c3767cdc38f965f42767ce80a3397c7c8df238b3ead0af",
-          "response_sha256": "5863aa1ec5260159861f61674b8548f4df6b9cd94630f6cda6b729fc11cb2d66",
+          "request_sha256": "f19eba7c9db78543b251b3f42bb5c50b7bfc81f6114d149f5b742a3bbcf5a5b2",
+          "response_sha256": "aea53ea7f97fe4c20d1249cc81a8c107f8298dcec3e03bffec424d2a9b567a84",
           "semantic_dispatch_occurred": true
         }
       ],
@@ -113,41 +113,41 @@
   },
   "handoffs": [
     {
-      "declared_request_sha256": "f8ef4419e8f183107552ceb0d1e0e7b78f82e34ce734a2a1de29cbf4cd676657",
+      "declared_request_sha256": "8612261651e8792d47bd7a972e55dee2e9611a12d599d9e0f5f0ad9c183e59ae",
       "path": "published_new_request",
       "request_id": "req-0001-model_directive-699b33c1",
-      "request_sha256": "f8ef4419e8f183107552ceb0d1e0e7b78f82e34ce734a2a1de29cbf4cd676657",
+      "request_sha256": "8612261651e8792d47bd7a972e55dee2e9611a12d599d9e0f5f0ad9c183e59ae",
       "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION",
-      "response_sha256": "1936071b31ea34f71871ba1f8bab6c3459f4574bd64e5a59a5880bacc467f23c"
+      "response_sha256": "6f9c3726b17d87ca841e80e611cfb8ae870ebd3c0b196e26142224fd6743f88d"
     },
     {
-      "declared_request_sha256": "fc79cb071dc4f6ec00c3767cdc38f965f42767ce80a3397c7c8df238b3ead0af",
+      "declared_request_sha256": "f19eba7c9db78543b251b3f42bb5c50b7bfc81f6114d149f5b742a3bbcf5a5b2",
       "path": "published_new_request",
       "request_id": "req-0002-model_directive-1822126c",
-      "request_sha256": "fc79cb071dc4f6ec00c3767cdc38f965f42767ce80a3397c7c8df238b3ead0af",
+      "request_sha256": "f19eba7c9db78543b251b3f42bb5c50b7bfc81f6114d149f5b742a3bbcf5a5b2",
       "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION",
-      "response_sha256": "5863aa1ec5260159861f61674b8548f4df6b9cd94630f6cda6b729fc11cb2d66"
+      "response_sha256": "aea53ea7f97fe4c20d1249cc81a8c107f8298dcec3e03bffec424d2a9b567a84"
     }
   ],
   "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION",
   "session_id": "synthetic-session-operator-prep",
   "status_after": {
     "index_lag": 0,
-    "index_path": "/tmp/pytest-of-user/pytest-13/test_gate_c_two_round_integrat0/synthetic_world.search.sqlite",
+    "index_path": "/tmp/pytest-of-user/pytest-8/test_gate_c_two_round_integrat0/synthetic_world.search.sqlite",
     "index_watermark": 2,
     "status": "ready",
     "subject_id": "synthetic_subject_operator_prep",
-    "world_path": "/tmp/pytest-of-user/pytest-13/test_gate_c_two_round_integrat0/synthetic_world.sqlite",
+    "world_path": "/tmp/pytest-of-user/pytest-8/test_gate_c_two_round_integrat0/synthetic_world.sqlite",
     "world_revision": 2,
     "writer_lease_held": true
   },
   "status_before": {
     "index_lag": 0,
-    "index_path": "/tmp/pytest-of-user/pytest-13/test_gate_c_two_round_integrat0/synthetic_world.search.sqlite",
+    "index_path": "/tmp/pytest-of-user/pytest-8/test_gate_c_two_round_integrat0/synthetic_world.search.sqlite",
     "index_watermark": 0,
     "status": "ready",
     "subject_id": "synthetic_subject_operator_prep",
-    "world_path": "/tmp/pytest-of-user/pytest-13/test_gate_c_two_round_integrat0/synthetic_world.sqlite",
+    "world_path": "/tmp/pytest-of-user/pytest-8/test_gate_c_two_round_integrat0/synthetic_world.sqlite",
     "world_revision": 0,
     "writer_lease_held": true
   },
@@ -502,5 +502,5 @@
       "termination_reason": "responded"
     }
   },
-  "world_path": "/tmp/pytest-of-user/pytest-13/test_gate_c_two_round_integrat0/synthetic_world.sqlite"
+  "world_path": "/tmp/pytest-of-user/pytest-8/test_gate_c_two_round_integrat0/synthetic_world.sqlite"
 }

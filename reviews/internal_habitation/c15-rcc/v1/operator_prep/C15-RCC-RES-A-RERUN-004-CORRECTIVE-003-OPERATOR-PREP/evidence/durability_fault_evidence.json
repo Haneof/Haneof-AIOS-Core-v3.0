@@ -1,0 +1,36 @@
+{
+  "candidate_head": "77dac70e0cf054c3f0fb7d94a66dba221fe7d5de",
+  "directory_open_failure_fails_closed": true,
+  "file_fsync_success_under_injected_dir_failure": true,
+  "frozen_c11_ids": [
+    "tests/test_c11_directory_durability.py::test_c11_request_artifact_fsync_failure_is_not_dispatch",
+    "tests/test_c11_directory_durability.py::test_c11_response_artifact_fsync_failure_is_not_published",
+    "tests/test_c11_directory_durability.py::test_c11_first_ledger_entry_fsync_failure_and_retry",
+    "tests/test_c11_directory_durability.py::test_c11_request_directory_open_failure_is_not_dispatch",
+    "tests/test_c11_directory_durability.py::test_c11_response_directory_open_failure_is_not_published",
+    "tests/test_c11_directory_durability.py::test_c11_ledger_creation_directory_open_failure_is_not_dispatch",
+    "tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_request_artifact_sync",
+    "tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_response_artifact_sync",
+    "tests/test_c11_directory_durability.py::test_c11_mutated_unproven_request_file_is_not_adopted",
+    "tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_first_ledger_creation"
+  ],
+  "ledger_dir_fsync_failure_blocks_initial_append": true,
+  "lock_acquisition_faults": {
+    "faults": {
+      "flock": "LedgerError",
+      "open": "LedgerError"
+    },
+    "no_dispatch_during_lock_failure": true,
+    "recovery_record_count": 1,
+    "status": "PASS",
+    "synthetic_only": true
+  },
+  "lock_fault_raw_sha256": "ef25148ed1b2ec055017d4b46c69508f474e41725bee45e3e6ba79fb677415c1",
+  "lock_fault_source_sha256": "1a69accd0455a6fb93296ad75eee1be03f3bcf7096f9c3af86c7e8078f565029",
+  "raw_c11_test_sha256": "c07e426034894a543348da1e4859554cd512ab5ecc94f7f33058876a9168ca6f",
+  "request_dir_fsync_failure_blocks_dispatch": true,
+  "response_dir_fsync_failure_blocks_publication": true,
+  "retry_reestablishes_durability_once": true,
+  "status": "PASS",
+  "verified_c11_cases": 10
+}

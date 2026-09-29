@@ -1,34 +1,34 @@
 {
-  "artifacts": {
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/final_clean_bootstrap/build.exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/final_clean_bootstrap/build.raw.txt": "62f6bc041c7a8e282093094f2a9aba47aba60c6e60bdda0a9455103d09d38772",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/final_clean_bootstrap/precondition.txt": "f0945f9509e2a5bf1277136e0e39cc65d37802c89dffdbc1b9080fbaf3c71609"
-  },
+  "absent_root_precondition_observed": true,
+  "absent_scratch_runtime_root": "/home/user/.cache/c003/final-runtime-001",
   "bootstrap_sha256": "e98965d8b55f5e8202c9470af2a3ca175ccde9f93427de5d6cf717921c3ea497",
   "build_exit_code": 0,
-  "candidate_identity": {
-    "candidate_head": "63c972ad7a19671cbdf809177f7a552aa2c2ecc6",
-    "candidate_parent": "8e34fba00edf4fdb5b80f04d7a648f6b5bb8c40e",
-    "candidate_tree": "8cd4a2d8b4cdf1f85699c5d78166f774741b420b",
-    "frozen_rc": "f20f2edfa7af00d0286493fd15196ca9503bc315",
-    "harness_manifest_file_sha256": "85cb2cb38ab5c3b8b6825a64f43d18ae973a4d057855011df5f5bc2dabb05393",
-    "harness_manifest_sha256": "e3b9ca6cd502bc27f22bff59a09ff6024bed17ea0865d46018d1ab70a77d7632",
-    "relocated_h2_evidence_files_exact": 71,
-    "scope_drift_from_frozen_rc": ""
-  },
   "canonical_core_manifest_sha256": "220718d6b5a2650b5e4263bbe8b7e661444cb33b486a7ecd7b5ad3d7d3399caa",
   "canonical_tests_manifest_sha256": "84b922ba0dfe1e80e0854d5edf94907b785baba851ef4528e669b95cf6526929",
   "default_repo_verify_exit_code": 0,
-  "empty_runtime_root": "/home/user/.cache/c002/final-runtime-003",
-  "environment_record_sha256": "286f67f4f18a14987e3c02f1ed80e4a7da78831840f2558d45ea65b6bbaafbed",
+  "environment_record_sha256": "a43ceea3bcd98a4583f10940eb591aca1a0b7268e1397c7943e894ffcdb426af",
   "explicit_verify_exit_code": 0,
-  "pre_download_wheel_lock_sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe",
-  "rc_identity_sha256": "7771ddff09022d1b51b880ac2d2641aa0242f9810fc4c622a8cd6a323743286a",
+  "harness_manifest_file_sha256": "2bc303cdc09ea7fff91dd2340d9be2ac4abc810a01ffacf5f39d6d313e8388e8",
+  "harness_manifest_sha256": "f3fbd788e3adb2ee600359e791273f87b444bc1991c7506d2683a643fd55a256",
+  "import_path": "/home/user/Haneof-AIOS-Core-v3.0/src/aios_core/__init__.py",
+  "raw_artifacts": {
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/raw/final_clean_bootstrap/absent_root_precondition.txt": "a28c8e94b9861fca22a5abb3b403bac41901aa0e49bbd4974e4b441db5ee16a3",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/raw/final_clean_bootstrap/build.exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/raw/final_clean_bootstrap/build.raw.txt": "fb8d10826d1443458a0b941a524c24aca7740adf262706d6153e2f776f19f339",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/raw/final_clean_bootstrap/environment_probe.json": "ea1e37159a51e8d373a02dda40adde06c0000d9baf48f0d423ebb1115433d1ce",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/raw/final_clean_bootstrap/environment_record.json": "a43ceea3bcd98a4583f10940eb591aca1a0b7268e1397c7943e894ffcdb426af",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/raw/final_clean_bootstrap/rc_identity.json": "11c985fe7f9854a74536cc7e72acdc4dc0afb69c70e23a90087168c4178f7d83",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/raw/final_clean_bootstrap/verify_default.exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/raw/final_clean_bootstrap/verify_default.raw.txt": "b959aa7159bcc336742fb2fc1c4831475ecfcb8f0d613cb23d681846a5c9e207",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/raw/final_clean_bootstrap/verify_explicit.exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/raw/final_clean_bootstrap/verify_explicit.raw.txt": "b959aa7159bcc336742fb2fc1c4831475ecfcb8f0d613cb23d681846a5c9e207",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/raw/final_clean_bootstrap/wheel_lock_verification.json": "095493485b2d79d70a7c22f233ec32cefaaaadc7477821a019654e9749595f37"
+  },
+  "rc_identity_sha256": "11c985fe7f9854a74536cc7e72acdc4dc0afb69c70e23a90087168c4178f7d83",
+  "source_candidate_head": "77dac70e0cf054c3f0fb7d94a66dba221fe7d5de",
+  "source_candidate_parent": "083dd9506f01ade04d4cbe805f58bf80d40607b0",
+  "source_candidate_tree": "52aa366bc6548e86e805585baddbc0470cb69660",
   "status": "PASS",
-  "verification_artifacts": {
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/verify_default.exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/verify_default.raw.txt": "78760dc5ecb057b7828249e87b3e086140cf1c30df12e4c53124ff3fb64b2345",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/verify_explicit.exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
-    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/raw/h1_final_runtime/verify_explicit.raw.txt": "78760dc5ecb057b7828249e87b3e086140cf1c30df12e4c53124ff3fb64b2345"
-  }
+  "wheel_lock_verification_sha256": "095493485b2d79d70a7c22f233ec32cefaaaadc7477821a019654e9749595f37",
+  "wheel_trust_root_sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe"
 }
