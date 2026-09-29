@@ -1,0 +1,11 @@
+{
+  "authored_by": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+  "directive": {
+    "capability_calls": [],
+    "response": "两件事分别说：\n1) production 旧 orders-v1 索引：按你之前定的边界——口头的\"清一下\"不当作删除授权。我还没动 production。已建任务 task_a0ca302bccbccb5c04f8b4e2，产出物是删除三件套：确切对象（大小/写入方/消费方）、影响评估、回滚方案；给你逐项确认后才会执行，在那之前 production 不做任何变更。\n2) staging 冲突：已按 CI 记录解除（索引名更新为 orders-shadow-v2，CI 48/48，回归队列恢复）。跟踪任务 task_ad50fd6fb9fbd3de189b1d77 的\"completed\"终态要求挂接真实 Outcome 对象，而这次清理是外部直接执行、没有产生对应 Outcome 记录——我不伪造完成证据，先保留任务原状并在下次同步时一并处理。",
+    "silence": false
+  },
+  "request_id": "req-0034-model_directive-738244f7",
+  "request_sha256": "ec1206c031fff7bc17f0c69082371e65e5cc1c98c71c2631ff1256b5fcd283da",
+  "response_version": 1
+}
