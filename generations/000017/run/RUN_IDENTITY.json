@@ -1,0 +1,12 @@
+{
+  "conversation_session_id": "sess-resident-b-003-8f7f1f11f568",
+  "freshness": "NEW: minted for this run only; no prior run state reused",
+  "minted_utc": "2026-09-29T19:36:04.342115+00:00",
+  "released_by": "C15-RCC-RES-B-RELEASE-003 (governance/C15_RCC_RES_B_RELEASE_003_RELEASE_RECORD_2026-09-30.md)",
+  "resident_process_id": "8887ab32-f693-44b7-ba25-5b32fc4dc864",
+  "resident_session_id": "resident-b-003-12da5a13261e4c0d",
+  "run_id": "c15-rcc-res-b-rerun-003-60997e04",
+  "subject_id": "user_1",
+  "task_id": "C15-RCC-RES-B-RERUN-003",
+  "window": "08"
+}
