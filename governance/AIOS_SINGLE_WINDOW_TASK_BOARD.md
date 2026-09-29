@@ -1,5 +1,18 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 当前控制入口 — 2026-09-29 OPERATOR-PREP CORRECTIVE-003 REVIEW_READY / FRESH IA READY
+
+- **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-003 = OPERATOR_PREP_CORRECTIVE_003_COMPLETE / REVIEW_READY`**. Candidate PR #292 remains **OPEN / UNMERGED / EVIDENCE-ONLY** at final H2 `42a63ed4416585fc0a02045e0bd5190f32a01a2b` (tree `80440bdd70aa658053bc5bf33a902c46cd7138e0`), sole parent/corrected H1 `77dac70e0cf054c3f0fb7d94a66dba221fe7d5de` (tree `52aa366bc6548e86e805585baddbc0470cb69660`), H1 parent genuine RED freeze `083dd9506f01ade04d4cbe805f58bf80d40607b0`.
+- Fresh PM readiness verified 546 PR paths remain confined to Operator Prep/Corrective evidence trees; zero Core/product-tests/fixture/evaluator/release-source/real Resident state paths. H1→H2 changes only packet/evidence/raw freeze artifacts; no covered harness/bootstrap/probe-source implementation changed after H1.
+- Author evidence reports frozen C10/C11 = 18/18 RED on exact #288 H2 and 18/18 GREEN on H1/final packet; C1-C3 GREEN; C4-C9 103/103 GREEN; Gates A/B/C/D = 24/7/2/5 PASS; packet audit 59/59 PASS; clean runtime exact pins PASS. These remain author evidence pending fresh IA.
+- PM spot-check confirms cross-process authority uses dedicated `fcntl.flock` plus reentrant same-process protection, and required directory durability failures are propagated rather than silently returned as successful publication.
+- Launch packet SHA-256 = `3c2d04c2de8557c3cb7329df4350c40b2ccc07520a7d3d51db206174b33266cc`, status `PREP_REVIEW_READY`.
+- **唯一下一 READY：`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-003-INDEPENDENT-ACCEPTANCE = READY`**. Binding prompt: `governance/prompts/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29.md`.
+- Fresh IA must independently attack concurrency/lock/durability/retry/crash boundaries, then re-attack every historical C1-C9 guarantee and full A/B/C/D. Author GREEN is not transferable acceptance.
+- `C15-RCC-RES-A-RERUN-004-CORRECTIVE-003` remains **BLOCKED_ON_OPERATOR_PREP**. No real Resident release/run is authorized.
+- Persistence Corrective-003, Resident B/C, evaluator and C15 close remain **BLOCKED**.
+
+
 ## 当前控制入口 — 2026-09-29 OPERATOR-PREP CORRECTIVE-002 IA FAIL / CORRECTIVE-003 READY
 
 - **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-002 = ACCEPTANCE_FAIL / blocker=2 / HISTORICAL_FAILED_EXACT`**. Failed candidate PR #288 final freeze H2 = `771b200c33dbd6055b1d209935f8e1552f13090f` (tree `071b51c5fb37dc59fc8941dee2182637b9f87daa`), corrected H1 = `63c972ad7a19671cbdf809177f7a552aa2c2ecc6`. Fresh IA review-only PR #290 exact = `39408137edf77976d0c4833fcde551891d5d081a`, verdict `ACCEPTANCE_FAIL / blocker=2`.
