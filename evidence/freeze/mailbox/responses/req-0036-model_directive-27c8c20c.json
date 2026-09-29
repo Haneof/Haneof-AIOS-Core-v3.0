@@ -1,0 +1,11 @@
+{
+  "authored_by": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+  "directive": {
+    "capability_calls": [],
+    "response": "Periodic review complete. Anchors covered the staging-conflict cycle: tracking task task_ad50fd6fb9fbd3de189b1d77 (still running, terminal completion awaits a real Outcome-object linkage from the externally executed fix), the CI work_outcome confirming resolution (orders-shadow-v2, CI 48/48, production untouched), and the open production-deletion-package task task_a0ca302bccbccb5c04f8b4e2 awaiting explicit user confirmation. No cognition contradicts current evidence; no user reaction data yet for communication experience. Decision: leave existing cognition unchanged; both open items remain durably tracked.",
+    "silence": false
+  },
+  "request_id": "req-0036-model_directive-27c8c20c",
+  "request_sha256": "b107f0b75ec7784aa4eea524854cb074be41a676bce38d553dd324779e96b38b",
+  "response_version": 1
+}

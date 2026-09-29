@@ -1,0 +1,11 @@
+{
+  "authored_by": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+  "directive": {
+    "capability_calls": [],
+    "response": "Periodic review complete. Findings: the only new anchor is a work-state observation from 2026-11-09 - the staging index name orders-shadow collides with leftover test data, blocking the regression job; production is unaffected. Action taken: created tracking task task_ad50fd6fb9fbd3de189b1d77 (deadline 2026-11-11) to clean up/rename the stale index, re-run the blocked regression and report per the results-and-key-risks policy. Existing registry-publish watch task remains waiting_evidence, unchanged. No other cognition or operation experience required revision.",
+    "silence": false
+  },
+  "request_id": "req-0026-model_directive-bc95247a",
+  "request_sha256": "cd6ad99effc5b8dd4929370d54ac5d477268eaebddd3ba8c2b980f5db7c903c2",
+  "response_version": 1
+}

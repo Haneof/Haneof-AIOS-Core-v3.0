@@ -1,0 +1,46 @@
+{
+  "authored_by": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+  "directive": {
+    "capability_calls": [
+      {
+        "arguments": {
+          "experience_state": "applied",
+          "method_path": [
+            "Pin the durable boundary observation (casual request != deletion authorization) before acting",
+            "Deliver object/impact/rollback package with evidence gaps explicitly marked, no invented numbers",
+            "Sequence: audit window closes -> inventory + impact + rollback snapshot -> itemized user confirmation -> only then execute",
+            "Track as durable follow_up task (task_a0ca302bccbccb5c04f8b4e2, ready) so continuity survives sessions"
+          ],
+          "misses": [
+            "No rollback snapshot completion record exists yet; deletion must not proceed until one does",
+            "Third-party registry.example.net 503 incident (since 19:05) unresolved upstream; local staging healthy, no local action taken"
+          ],
+          "negative_case_refs": [
+            {
+              "object_id": "obs_c14_fixture_3fd30a3cca0f01f839fc0c46",
+              "revision": 1
+            }
+          ],
+          "positive_case_refs": [
+            {
+              "object_id": "obs_conv_user_79b1c0582c81a10fd8eb4e20",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_60c22d4d53e0a963aa67ce1e",
+              "revision": 1
+            }
+          ],
+          "problem_type": "production_deletion_gate_under_external_audit",
+          "result_summary": "Production orders-v1 deletion paused by explicit user directive ahead of the 09:00 audit read of orders-v1 history. Deletion package (exact object / impact / rollback) delivered with evidence gaps marked 待核实 rather than fabricated; explicit itemized user confirmation is the hard gate before any production mutation. Casual 'clean it up' phrasing is not deletion authorization."
+        },
+        "call_id": "req-0041:c0",
+        "name": "commit_operation_experience"
+      }
+    ],
+    "silence": false
+  },
+  "request_id": "req-0041-model_directive-0051e77d",
+  "request_sha256": "c0bd266696b1eabd6dd38e33b5062876788084d28985484299040fab474677c2",
+  "response_version": 1
+}

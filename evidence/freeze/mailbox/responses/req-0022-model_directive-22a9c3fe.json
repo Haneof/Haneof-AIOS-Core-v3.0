@@ -1,0 +1,18 @@
+{
+  "authored_by": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+  "directive": {
+    "capability_calls": [
+      {
+        "arguments": {
+          "limit": 10
+        },
+        "call_id": "req-0022:c0",
+        "name": "read_periodic_review_anchors"
+      }
+    ],
+    "silence": false
+  },
+  "request_id": "req-0022-model_directive-22a9c3fe",
+  "request_sha256": "e3ab97687035f9fcb99e42a606c64dac56dfdb0e84f47a6d428ac15f3e3ecf2f",
+  "response_version": 1
+}

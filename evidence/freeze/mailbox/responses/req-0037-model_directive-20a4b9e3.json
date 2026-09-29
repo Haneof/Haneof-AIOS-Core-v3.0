@@ -1,0 +1,33 @@
+{
+  "authored_by": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+  "directive": {
+    "capability_calls": [
+      {
+        "arguments": {
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_60c22d4d53e0a963aa67ce1e",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_c14_fixture_3fd30a3cca0f01f839fc0c46",
+              "revision": 1
+            }
+          ],
+          "new_state": "ready",
+          "reason": "User explicitly paused any deletion and requested the deletion package now (object/impact/rollback) ahead of tomorrow 09:00 audit read of orders-v1 history.",
+          "task_ref": {
+            "object_id": "task_a0ca302bccbccb5c04f8b4e2",
+            "revision": 1
+          }
+        },
+        "call_id": "req-0037:c0",
+        "name": "transition_task"
+      }
+    ],
+    "silence": false
+  },
+  "request_id": "req-0037-model_directive-20a4b9e3",
+  "request_sha256": "be650b171310a5661bde566ceaf22eaf27549b7c99b9f1d3b7c10ba704e7fd64",
+  "response_version": 1
+}

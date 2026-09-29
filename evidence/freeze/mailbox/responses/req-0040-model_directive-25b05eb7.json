@@ -1,0 +1,32 @@
+{
+  "authored_by": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+  "directive": {
+    "capability_calls": [
+      {
+        "arguments": {
+          "evidence_refs": [
+            {
+              "object_id": "obs_c14_fixture_b6d15e908fa07010154b86e0",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_user_60c22d4d53e0a963aa67ce1e",
+              "revision": 1
+            },
+            {
+              "object_id": "task_a0ca302bccbccb5c04f8b4e2",
+              "revision": 2
+            }
+          ],
+          "summary": "Ops window experience: (1) third-party dependency registry.example.net returning large-scale 503 since 19:05, official status INVESTIGATING; local staging health checks normal - treat upstream dependency calls as unreliable until the incident closes, no local action taken. (2) production orders-v1 deletion is PAUSED by user directive ahead of the 09:00 audit read; the deletion package (object/impact/rollback) has been delivered with evidence gaps marked; explicit user confirmation remains the gate - no production mutation until then. (3) staging orders-shadow conflict stays resolved per CI work_outcome (orders-shadow-v2, CI 48/48)."
+        },
+        "call_id": "req-0040:c0",
+        "name": "commit_operation_experience"
+      }
+    ],
+    "silence": false
+  },
+  "request_id": "req-0040-model_directive-25b05eb7",
+  "request_sha256": "71876d0fd7e48a3d59d11ae91d410521e1f27ce08853bed7d3018d3102aece5f",
+  "response_version": 1
+}

@@ -1,0 +1,13 @@
+{
+  "artifacts": {
+    "exchange/ledger.jsonl": "fa7895c5103eebf3a2d8b7e635b80b54f7118d02d37065908cbbc0d930320ff8",
+    "release-state.json": "9023813585016b3cbccec92ccc800cab06a774fb299ecb0203987043ecf853c3",
+    "run/RUN_IDENTITY.json": "c95a230f4f32dad7982391c4d983f298f8975dc61d420165ed7aa61f39e8ffa6",
+    "world/c15-res-b-003.world.search.sqlite": "0581a4ee4b8db5479edf8273591924a71ca7693a5474a15cf453be217876214e",
+    "world/c15-res-b-003.world.sqlite": "f863051a37b1fc71dfb0152fd5b76c258812aaba21cc95b1d4fcd98945bda8dc"
+  },
+  "generation": 48,
+  "label": "FINAL_FREEZE",
+  "manifest_sha256": "5efd42645a06b8e2e0736472d0657fb785cfb69888cdf20b44140c7f2d80306b",
+  "sealed_at_epoch": 1790715070.1816254
+}

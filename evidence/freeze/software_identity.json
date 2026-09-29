@@ -1,0 +1,14 @@
+{
+  "b_process_id": "8887ab32-f693-44b7-ba25-5b32fc4dc864",
+  "b_session_id": "resident-b-003-12da5a13261e4c0d",
+  "conversation_session_id": "sess-resident-b-003-8f7f1f11f568",
+  "core_tree": "9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623",
+  "frozen_software_commit": "f20f2edfa7af00d0286493fd15196ca9503bc315",
+  "model_handler_module": "aios_exchange.runner:ExternalSessionModelHandler",
+  "operator_prep_exact_head": "77dac70e0cf054c3f0fb7d94a66dba221fe7d5de",
+  "persistence_implementation": "tools/c15_persistence @ main e25ec95bbe38c9127dd7234117466b429f8bfef6",
+  "qualified_runtime": "CPython 3.12.14 / Pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.45.1 / OpenSSL 3.0.13",
+  "remote_authoritative_ref": "refs/heads/persistence/c15-rcc-res-b-rerun-003-60997e04",
+  "run_id": "c15-rcc-res-b-rerun-003-60997e04",
+  "session_id": "c15-rcc-res-b-session-003-60997e04"
+}

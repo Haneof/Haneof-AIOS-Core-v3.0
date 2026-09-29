@@ -1,0 +1,52 @@
+{
+  "cursor_chronology": [
+    "cursor_14.ack_receipt.json",
+    "cursor_15.ack_receipt.json",
+    "cursor_16.ack_receipt.json",
+    "cursor_17.ack_receipt.json",
+    "cursor_18.ack_receipt.json",
+    "cursor_19.ack_receipt.json",
+    "cursor_20.ack_receipt.json",
+    "cursor_21.ack_receipt.json",
+    "cursor_22.ack_receipt.json"
+  ],
+  "digests": {
+    "b_process_id.txt": "969c8014479d3fa5905e104969889181621ec701c023c3a6d9be62344c62dbe5",
+    "b_session_id.txt": "8acd901eefd2238bb0ca8b3787f7542ddae1a201aceb65f2ea68723477036113",
+    "event_projections.sha256": "8ebf6f7e58a4585079118ad048e62a1602d6fc746be842b2960de10782b44ac7",
+    "exchange_final.json": "4f595ae77d7879d9df77a7cf3a162da911541aed8579e2044c0378e808ed242f",
+    "freeze_time.txt": "91b525c2baeac44b2ded49df6afb6c7aef6960d754c4e53a6f5d1b09f9911219",
+    "private_world.sqlite": "f863051a37b1fc71dfb0152fd5b76c258812aaba21cc95b1d4fcd98945bda8dc",
+    "provider_identity.json": "908ff9a73ab294081775e8091764dcfa3e21835108e96d575463ad3c8e73041a",
+    "release_state.json": "9023813585016b3cbccec92ccc800cab06a774fb299ecb0203987043ecf853c3",
+    "software_identity.json": "41bcbe4956d101b11cce14473c5c7dca3b95244dedfc6605d602724f7becd5c9",
+    "world_index.sqlite": "0581a4ee4b8db5479edf8273591924a71ca7693a5474a15cf453be217876214e"
+  },
+  "exchange_final": {
+    "classification": "COMPLETE",
+    "records": 129,
+    "requests": 43,
+    "requests_complete": 43
+  },
+  "final_index_watermark": 66,
+  "final_world_revision": 66,
+  "freeze_utc": "2026-09-29T20:51:10.041221+00:00",
+  "index_lag": 0,
+  "release_boundary": {
+    "active_phase": "B",
+    "last_acked_event_id": "c15rcc-022",
+    "last_acked_sequence": 22,
+    "next_sequence": 23,
+    "pending_reveal": null
+  },
+  "run_id": "c15-rcc-res-b-rerun-003-60997e04",
+  "session_id": "c15-rcc-res-b-session-003-60997e04",
+  "starting_fresh_a_hashes": {
+    "exchange_ledger": "3b2b9e902133c31cc583491aae55834ee9cb71a9bea9ca50a36fd7e8b81da021",
+    "index": "79c877a4bf75091fa90ae81076a6bdb2e265cf6376b657c3f195e9e91f9844e5",
+    "release_state": "6b90fc7a09bce7d575dbcb783dcbe838cab81c2e358515adbb5dca9731f57c37",
+    "world": "0d6970ed99367a456e4baa29092bde8f15bc7544496095cc87ad9f029e2603b2"
+  },
+  "task_id": "C15-RCC-RES-B-RERUN-003",
+  "window": "08"
+}

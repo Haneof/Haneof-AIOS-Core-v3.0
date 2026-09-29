@@ -1,0 +1,5 @@
+{
+  "note": "Exchange-transport run: the exact request/response bytes, envelope digests, ledger chain and Core metering are preserved verbatim in run evidence. No API config or self-description was upgraded into a trusted attestation.",
+  "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+  "trusted_model_identity": "UNKNOWN"
+}
