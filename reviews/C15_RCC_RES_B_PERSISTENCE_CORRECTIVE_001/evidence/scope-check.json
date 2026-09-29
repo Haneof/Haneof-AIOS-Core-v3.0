@@ -1,0 +1,9 @@
+{
+  "baseline": "f0f2eb8a7030b9b56cbec43c09574e056b2f7c61",
+  "branch": "arena/01a0dce5-haneof-aios-core-v3-0",
+  "core_tree": "fe77f8a0706acfaf369041d0882b6d0e6de39f22",
+  "protected_tracked_diff": "",
+  "diff_check_exit": 0,
+  "status": "WIP_BLOCKED_NOT_REVIEW_READY",
+  "production_enabled": false
+}

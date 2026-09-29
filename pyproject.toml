@@ -24,7 +24,9 @@ aios-core-headless = "aios_core.headless.cli:main"
 where = ["src"]
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
+# Expose both the src-layout application package and repository-local tooling
+# packages (for example tools.c15_persistence) to ordinary pytest invocations.
+pythonpath = ["src", "."]
 testpaths = ["tests"]
 addopts = "-q"
 

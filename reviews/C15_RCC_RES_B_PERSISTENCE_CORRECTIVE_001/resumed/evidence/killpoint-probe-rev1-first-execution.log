@@ -1,0 +1,278 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+________________________ test_kill_point_converges[K1] _________________________
+
+entry = {'barrier': 'release state pending_reveal is durable; ingest has not started', 'expected': {'acks': {'relation': 'eq_b...n, duplicate output/capability, duplicate ACK, or skipped cursor; a terminal/in_doubt outcome is not convergence', ...}
+
+    @pytest.mark.parametrize("entry", MANIFEST["probes"], ids=[p["id"] for p in MANIFEST["probes"]])
+    def test_kill_point_converges(entry: dict) -> None:
+>       outcome = run_kill_point(entry["kill_point"])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/killpoints/test_killpoints.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+kill_point = 'K1_AFTER_REVEAL'
+
+    def run_kill_point(kill_point: str) -> dict[str, Any]:
+        """Kill at ``kill_point``, resume in a fresh process, return observations."""
+        root = new_root(kill_point.lower())
+        run_id = f"synthetic-run-{kill_point.lower()}-{uuid.uuid4().hex[:8]}"
+        session_id = f"synthetic-session-{kill_point.lower()}-{uuid.uuid4().hex[:8]}"
+        try:
+            (root / "backend").mkdir(parents=True, exist_ok=True)
+            killed = run_clip(
+                root,
+                run_id,
+                session_id,
+                ["--mode", "create", "--kill-at", kill_point],
+            )
+            if killed.returncode != -signal.SIGKILL:
+>               raise AssertionError(
+                    f"{kill_point}: child did not die at the kill barrier "
+                    f"(returncode={killed.returncode}, expected {-signal.SIGKILL})\n"
+                    f"stderr:\n{killed.stderr}"
+                )
+E               AssertionError: K1_AFTER_REVEAL: child did not die at the kill barrier (returncode=1, expected -9)
+E               stderr:
+E               Traceback (most recent call last):
+E                 File "<frozen runpy>", line 198, in _run_module_as_main
+E                 File "<frozen runpy>", line 88, in _run_code
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 76, in <module>
+E                   raise SystemExit(main())
+E                                    ^^^^^^
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 36, in main
+E                   session = OperatorSession.create(
+E                             ^^^^^^^^^^^^^^^^^^^^^^^
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 158, in create
+E                   backend = RunBackend.create(
+E                             ^^^^^^^^^^^^^^^^^^
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 261, in create
+E                   require(not root.exists(), "backend already exists; creation never adopts")
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 106, in require
+E                   raise BackendError(reason)
+E               tools.c15_persistence.backend.BackendError: backend already exists; creation never adopts
+
+tests/c15_persistence/killpoints/harness.py:153: AssertionError
+________________________ test_kill_point_converges[K2] _________________________
+
+entry = {'barrier': 'event is durably ingested into World; provider dispatch has not started', 'expected': {'acks': {'relation...n, duplicate output/capability, duplicate ACK, or skipped cursor; a terminal/in_doubt outcome is not convergence', ...}
+
+    @pytest.mark.parametrize("entry", MANIFEST["probes"], ids=[p["id"] for p in MANIFEST["probes"]])
+    def test_kill_point_converges(entry: dict) -> None:
+>       outcome = run_kill_point(entry["kill_point"])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/killpoints/test_killpoints.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+kill_point = 'K2_AFTER_INGEST'
+
+    def run_kill_point(kill_point: str) -> dict[str, Any]:
+        """Kill at ``kill_point``, resume in a fresh process, return observations."""
+        root = new_root(kill_point.lower())
+        run_id = f"synthetic-run-{kill_point.lower()}-{uuid.uuid4().hex[:8]}"
+        session_id = f"synthetic-session-{kill_point.lower()}-{uuid.uuid4().hex[:8]}"
+        try:
+            (root / "backend").mkdir(parents=True, exist_ok=True)
+            killed = run_clip(
+                root,
+                run_id,
+                session_id,
+                ["--mode", "create", "--kill-at", kill_point],
+            )
+            if killed.returncode != -signal.SIGKILL:
+>               raise AssertionError(
+                    f"{kill_point}: child did not die at the kill barrier "
+                    f"(returncode={killed.returncode}, expected {-signal.SIGKILL})\n"
+                    f"stderr:\n{killed.stderr}"
+                )
+E               AssertionError: K2_AFTER_INGEST: child did not die at the kill barrier (returncode=1, expected -9)
+E               stderr:
+E               Traceback (most recent call last):
+E                 File "<frozen runpy>", line 198, in _run_module_as_main
+E                 File "<frozen runpy>", line 88, in _run_code
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 76, in <module>
+E                   raise SystemExit(main())
+E                                    ^^^^^^
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 36, in main
+E                   session = OperatorSession.create(
+E                             ^^^^^^^^^^^^^^^^^^^^^^^
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 158, in create
+E                   backend = RunBackend.create(
+E                             ^^^^^^^^^^^^^^^^^^
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 261, in create
+E                   require(not root.exists(), "backend already exists; creation never adopts")
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 106, in require
+E                   raise BackendError(reason)
+E               tools.c15_persistence.backend.BackendError: backend already exists; creation never adopts
+
+tests/c15_persistence/killpoints/harness.py:153: AssertionError
+________________________ test_kill_point_converges[K3] _________________________
+
+entry = {'barrier': 'exact provider request is durably staged/exposed/dispatched; no reply yet', 'expected': {'acks': {'relati...n, duplicate output/capability, duplicate ACK, or skipped cursor; a terminal/in_doubt outcome is not convergence', ...}
+
+    @pytest.mark.parametrize("entry", MANIFEST["probes"], ids=[p["id"] for p in MANIFEST["probes"]])
+    def test_kill_point_converges(entry: dict) -> None:
+>       outcome = run_kill_point(entry["kill_point"])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/killpoints/test_killpoints.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+kill_point = 'K3_AFTER_REQUEST_DISPATCH'
+
+    def run_kill_point(kill_point: str) -> dict[str, Any]:
+        """Kill at ``kill_point``, resume in a fresh process, return observations."""
+        root = new_root(kill_point.lower())
+        run_id = f"synthetic-run-{kill_point.lower()}-{uuid.uuid4().hex[:8]}"
+        session_id = f"synthetic-session-{kill_point.lower()}-{uuid.uuid4().hex[:8]}"
+        try:
+            (root / "backend").mkdir(parents=True, exist_ok=True)
+            killed = run_clip(
+                root,
+                run_id,
+                session_id,
+                ["--mode", "create", "--kill-at", kill_point],
+            )
+            if killed.returncode != -signal.SIGKILL:
+>               raise AssertionError(
+                    f"{kill_point}: child did not die at the kill barrier "
+                    f"(returncode={killed.returncode}, expected {-signal.SIGKILL})\n"
+                    f"stderr:\n{killed.stderr}"
+                )
+E               AssertionError: K3_AFTER_REQUEST_DISPATCH: child did not die at the kill barrier (returncode=1, expected -9)
+E               stderr:
+E               Traceback (most recent call last):
+E                 File "<frozen runpy>", line 198, in _run_module_as_main
+E                 File "<frozen runpy>", line 88, in _run_code
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 76, in <module>
+E                   raise SystemExit(main())
+E                                    ^^^^^^
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 36, in main
+E                   session = OperatorSession.create(
+E                             ^^^^^^^^^^^^^^^^^^^^^^^
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 158, in create
+E                   backend = RunBackend.create(
+E                             ^^^^^^^^^^^^^^^^^^
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 261, in create
+E                   require(not root.exists(), "backend already exists; creation never adopts")
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 106, in require
+E                   raise BackendError(reason)
+E               tools.c15_persistence.backend.BackendError: backend already exists; creation never adopts
+
+tests/c15_persistence/killpoints/harness.py:153: AssertionError
+________________________ test_kill_point_converges[K4] _________________________
+
+entry = {'barrier': 'Core trusted-return receipt is durable for the exact reply; downstream application (remaining capability ...n, duplicate output/capability, duplicate ACK, or skipped cursor; a terminal/in_doubt outcome is not convergence', ...}
+
+    @pytest.mark.parametrize("entry", MANIFEST["probes"], ids=[p["id"] for p in MANIFEST["probes"]])
+    def test_kill_point_converges(entry: dict) -> None:
+>       outcome = run_kill_point(entry["kill_point"])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/killpoints/test_killpoints.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+kill_point = 'K4_AFTER_REPLY_AUTHENTICATED'
+
+    def run_kill_point(kill_point: str) -> dict[str, Any]:
+        """Kill at ``kill_point``, resume in a fresh process, return observations."""
+        root = new_root(kill_point.lower())
+        run_id = f"synthetic-run-{kill_point.lower()}-{uuid.uuid4().hex[:8]}"
+        session_id = f"synthetic-session-{kill_point.lower()}-{uuid.uuid4().hex[:8]}"
+        try:
+            (root / "backend").mkdir(parents=True, exist_ok=True)
+            killed = run_clip(
+                root,
+                run_id,
+                session_id,
+                ["--mode", "create", "--kill-at", kill_point],
+            )
+            if killed.returncode != -signal.SIGKILL:
+>               raise AssertionError(
+                    f"{kill_point}: child did not die at the kill barrier "
+                    f"(returncode={killed.returncode}, expected {-signal.SIGKILL})\n"
+                    f"stderr:\n{killed.stderr}"
+                )
+E               AssertionError: K4_AFTER_REPLY_AUTHENTICATED: child did not die at the kill barrier (returncode=1, expected -9)
+E               stderr:
+E               Traceback (most recent call last):
+E                 File "<frozen runpy>", line 198, in _run_module_as_main
+E                 File "<frozen runpy>", line 88, in _run_code
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 76, in <module>
+E                   raise SystemExit(main())
+E                                    ^^^^^^
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 36, in main
+E                   session = OperatorSession.create(
+E                             ^^^^^^^^^^^^^^^^^^^^^^^
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 158, in create
+E                   backend = RunBackend.create(
+E                             ^^^^^^^^^^^^^^^^^^
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 261, in create
+E                   require(not root.exists(), "backend already exists; creation never adopts")
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 106, in require
+E                   raise BackendError(reason)
+E               tools.c15_persistence.backend.BackendError: backend already exists; creation never adopts
+
+tests/c15_persistence/killpoints/harness.py:153: AssertionError
+________________________ test_kill_point_converges[K5] _________________________
+
+entry = {'barrier': 'model/capability work is durably applied in Core; cursor ACK not yet issued', 'expected': {'acks': {'rela...n, duplicate output/capability, duplicate ACK, or skipped cursor; a terminal/in_doubt outcome is not convergence', ...}
+
+    @pytest.mark.parametrize("entry", MANIFEST["probes"], ids=[p["id"] for p in MANIFEST["probes"]])
+    def test_kill_point_converges(entry: dict) -> None:
+>       outcome = run_kill_point(entry["kill_point"])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/killpoints/test_killpoints.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+kill_point = 'K5_AFTER_APPLIED_BEFORE_ACK'
+
+    def run_kill_point(kill_point: str) -> dict[str, Any]:
+        """Kill at ``kill_point``, resume in a fresh process, return observations."""
+        root = new_root(kill_point.lower())
+        run_id = f"synthetic-run-{kill_point.lower()}-{uuid.uuid4().hex[:8]}"
+        session_id = f"synthetic-session-{kill_point.lower()}-{uuid.uuid4().hex[:8]}"
+        try:
+            (root / "backend").mkdir(parents=True, exist_ok=True)
+            killed = run_clip(
+                root,
+                run_id,
+                session_id,
+                ["--mode", "create", "--kill-at", kill_point],
+            )
+            if killed.returncode != -signal.SIGKILL:
+>               raise AssertionError(
+                    f"{kill_point}: child did not die at the kill barrier "
+                    f"(returncode={killed.returncode}, expected {-signal.SIGKILL})\n"
+                    f"stderr:\n{killed.stderr}"
+                )
+E               AssertionError: K5_AFTER_APPLIED_BEFORE_ACK: child did not die at the kill barrier (returncode=1, expected -9)
+E               stderr:
+E               Traceback (most recent call last):
+E                 File "<frozen runpy>", line 198, in _run_module_as_main
+E                 File "<frozen runpy>", line 88, in _run_code
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 76, in <module>
+E                   raise SystemExit(main())
+E                                    ^^^^^^
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 36, in main
+E                   session = OperatorSession.create(
+E                             ^^^^^^^^^^^^^^^^^^^^^^^
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 158, in create
+E                   backend = RunBackend.create(
+E                             ^^^^^^^^^^^^^^^^^^
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 261, in create
+E                   require(not root.exists(), "backend already exists; creation never adopts")
+E                 File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 106, in require
+E                   raise BackendError(reason)
+E               tools.c15_persistence.backend.BackendError: backend already exists; creation never adopts
+
+tests/c15_persistence/killpoints/harness.py:153: AssertionError
+=========================== short test summary info ============================
+FAILED tests/c15_persistence/killpoints/test_killpoints.py::test_kill_point_converges[K1]
+FAILED tests/c15_persistence/killpoints/test_killpoints.py::test_kill_point_converges[K2]
+FAILED tests/c15_persistence/killpoints/test_killpoints.py::test_kill_point_converges[K3]
+FAILED tests/c15_persistence/killpoints/test_killpoints.py::test_kill_point_converges[K4]
+FAILED tests/c15_persistence/killpoints/test_killpoints.py::test_kill_point_converges[K5]

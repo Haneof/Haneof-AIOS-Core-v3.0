@@ -32,11 +32,24 @@ jobs:
           python -c "import sys,platform; print('python', sys.version); print('platform', platform.platform())"
           python -c "import pip,pydantic,pytest; print('pip', pip.__version__); print('pydantic', pydantic.VERSION); print('pytest', pytest.__version__)"
           python -m pip freeze
+      - name: Prepare historical persistence compatibility path
+        run: |
+          set -euo pipefail
+          # test_journal.py is frozen historical evidence and intentionally
+          # retains its original /home/user path.  Create that host directory
+          # rather than rewriting the historical test.
+          sudo install -d -m 0755 /home/user
+          sudo install -d -m 0700 -o "$(id -u)" -g "$(id -g)" /home/user/c15-persistence-unit-probes
+
       - name: Fresh full pytest -q
         run: |
           set -euo pipefail
-          pytest -q --tb=no --junitxml=/tmp/full-junit.xml | tee /tmp/full-pytest.txt
+          # test_journal.py is a frozen unittest.TestCase suite whose historical
+          # tearDown intentionally expects unittest's result object.  Do not
+          # rewrite it to satisfy pytest collection; run it separately below.
+          pytest -q --tb=no --ignore=tests/c15_persistence/test_journal.py --junitxml=/tmp/full-junit.xml | tee /tmp/full-pytest.txt
           python -c 'import xml.etree.ElementTree as ET; r=ET.parse("/tmp/full-junit.xml").getroot(); ss=[r] if r.tag=="testsuite" else list(r); tests=sum(int(s.attrib.get("tests",0)) for s in ss); fails=sum(int(s.attrib.get("failures",0)) for s in ss); errors=sum(int(s.attrib.get("errors",0)) for s in ss); skipped=sum(int(s.attrib.get("skipped",0)) for s in ss); t=sum(float(s.attrib.get("time",0)) for s in ss); line=f"JUNIT full tests={tests} failures={fails} errors={errors} skipped={skipped} time={t:.2f}s"; print(line); open("/tmp/full-junit-summary.txt","w").write(line+"\n"); print("::notice title=full junit::"+line)'
+          python -m unittest discover -s tests/c15_persistence -p "test_journal.py" -v | tee /tmp/historical-journal-unittest.txt
       - name: Focused authenticity / recovery / headless / scale / writer
         run: |
           set -euo pipefail
