@@ -1,5 +1,16 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 当前控制入口 — 2026-09-29 OPERATOR-PREP CORRECTIVE-003 IA PASS / FRESH RESIDENT A READY
+
+- **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-003 = ACCEPTANCE_PASS / blocker=0 / ACCEPTED_EXACT`**. Accepted candidate PR #292 final H2 = `42a63ed4416585fc0a02045e0bd5190f32a01a2b` (tree `80440bdd70aa658053bc5bf33a902c46cd7138e0`), corrected harness H1 = `77dac70e0cf054c3f0fb7d94a66dba221fe7d5de` (tree `52aa366bc6548e86e805585baddbc0470cb69660`). Fresh IA review-only PR #294 exact = `30955cc7065d0d66cf4de43f833f1b1f9162b635` → `ACCEPTANCE_PASS / blocker=0`.
+- Fresh IA independently reproduced reviewer rev3 probes 50/50, C10/C11 18/18, C1-C3 GREEN, C4-C9 103/103, Gates A/B/C/D 24/7/2/5, exact runtime pins and full packet/freeze/checksum integrity. No real Resident was run during Operator Prep acceptance.
+- PM-approved Resident-safe launch packet = `RESIDENT_SAFE_LAUNCH_PACKET.json` SHA-256 `3c2d04c2de8557c3cb7329df4350c40b2ccc07520a7d3d51db206174b33266cc`, status remains `PREP_REVIEW_READY`; PM approval is external and does not mutate the accepted artifact.
+- **唯一下一 READY：`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003 = READY`** — Real Resident AI / Fresh Corrective Resident A, cursor 1..13 only.
+- **Clean-room rule is binding:** the Resident itself MUST NOT read this task board, checkpoint, governance adjudications, #292/#294 metadata/comments, historical Resident runs/reviews, fixture/evaluator/release source, future events, or Git history concerning prior Resident runs. Resident startup input is exactly: clean-room contract + canonical Resident run contract + exact PM-approved launch packet + mechanical environment/harness status.
+- The Resident must use the accepted Operator Prep harness and frozen RC, create all-new World/index/release-state/session/process/runtime/exchange state, personally make every semantic decision, never patch harness after cursor 1, stop after cursor 13, and publish evidence-only `PHASE_A_COMPLETE / REVIEW_READY`.
+- Persistence Corrective-003, Resident B/C, evaluator and C15 close remain **BLOCKED_ON_FRESH_RESIDENT_A**.
+
+
 ## 当前控制入口 — 2026-09-29 OPERATOR-PREP CORRECTIVE-003 REVIEW_READY / FRESH IA READY
 
 - **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-003 = OPERATOR_PREP_CORRECTIVE_003_COMPLETE / REVIEW_READY`**. Candidate PR #292 remains **OPEN / UNMERGED / EVIDENCE-ONLY** at final H2 `42a63ed4416585fc0a02045e0bd5190f32a01a2b` (tree `80440bdd70aa658053bc5bf33a902c46cd7138e0`), sole parent/corrected H1 `77dac70e0cf054c3f0fb7d94a66dba221fe7d5de` (tree `52aa366bc6548e86e805585baddbc0470cb69660`), H1 parent genuine RED freeze `083dd9506f01ade04d4cbe805f58bf80d40607b0`.
