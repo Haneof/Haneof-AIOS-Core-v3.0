@@ -1,0 +1,234 @@
+{
+  "candidate": {
+    "changed_files_vs_base": [
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/REPORT.md",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/EVIDENCE_MANIFEST.json",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/EVIDENCE_MANIFEST.json.sha256",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/GREEN_core_trusted_return_focused.log",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/GREEN_full_repository_pytest.log",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/GREEN_persistence_pytest.log",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/GREEN_probe_matrix_v2.log",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/GREEN_unittest_journal.log",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/RED_probe_matrix_v2_baseline.log",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/baseline/baseline_pytest_restored_harness.log",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/baseline/baseline_unittest_journal.log",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/environment.txt",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/resident-surface-no-change.json",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/resident_surface_check.log",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/frozen/CORRECTIVE_003_PROBE_MATRIX.json",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/frozen/CORRECTIVE_003_PROBE_MATRIX.sha256",
+      "tests/c15_persistence/killpoints/PROBE_MANIFEST.json",
+      "tests/c15_persistence/killpoints/PROBE_MANIFEST.sha256",
+      "tests/c15_persistence/killpoints/__init__.py",
+      "tests/c15_persistence/killpoints/harness.py",
+      "tests/c15_persistence/killpoints/test_killpoints.py",
+      "tests/c15_persistence/probe_core_boundary.py",
+      "tests/c15_persistence/test_corrective_002_remote_durability.py",
+      "tests/c15_persistence/test_corrective_003_binding_blockers.py",
+      "tests/c15_persistence/test_corrective_003_regressions.py",
+      "tests/c15_persistence/test_environment_reattach.py",
+      "tests/c15_persistence/test_journal.py",
+      "tests/c15_persistence/test_operator_wiring.py",
+      "tests/c15_persistence/test_resident_surface.py",
+      "tools/c15_persistence/__init__.py",
+      "tools/c15_persistence/backend.py",
+      "tools/c15_persistence/freeze_corrective_003_evidence.py",
+      "tools/c15_persistence/freeze_corrective_003_matrix.py",
+      "tools/c15_persistence/freeze_evidence_manifest.py",
+      "tools/c15_persistence/freeze_probe_manifest.py",
+      "tools/c15_persistence/journal.py",
+      "tools/c15_persistence/operator_session.py",
+      "tools/c15_persistence/platform_reattach.py",
+      "tools/c15_persistence/probe_cli.py",
+      "tools/c15_persistence/provider.py",
+      "tools/c15_persistence/relay.py",
+      "tools/c15_persistence/remote_backend.py",
+      "tools/c15_persistence/resident_surface_check.py",
+      "tools/c15_persistence/runstate.py",
+      "tools/c15_persistence/synthetic_release.py"
+    ],
+    "path_classification": {
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/REPORT.md": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/EVIDENCE_MANIFEST.json": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/EVIDENCE_MANIFEST.json.sha256": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/GREEN_core_trusted_return_focused.log": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/GREEN_full_repository_pytest.log": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/GREEN_persistence_pytest.log": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/GREEN_probe_matrix_v2.log": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/GREEN_unittest_journal.log": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/RED_probe_matrix_v2_baseline.log": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/baseline/baseline_pytest_restored_harness.log": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/baseline/baseline_unittest_journal.log": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/environment.txt": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/resident-surface-no-change.json": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/resident_surface_check.log": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/frozen/CORRECTIVE_003_PROBE_MATRIX.json": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/frozen/CORRECTIVE_003_PROBE_MATRIX.sha256": "ALLOWED",
+      "tests/c15_persistence/killpoints/PROBE_MANIFEST.json": "ALLOWED",
+      "tests/c15_persistence/killpoints/PROBE_MANIFEST.sha256": "ALLOWED",
+      "tests/c15_persistence/killpoints/__init__.py": "ALLOWED",
+      "tests/c15_persistence/killpoints/harness.py": "ALLOWED",
+      "tests/c15_persistence/killpoints/test_killpoints.py": "ALLOWED",
+      "tests/c15_persistence/probe_core_boundary.py": "ALLOWED",
+      "tests/c15_persistence/test_corrective_002_remote_durability.py": "ALLOWED",
+      "tests/c15_persistence/test_corrective_003_binding_blockers.py": "ALLOWED",
+      "tests/c15_persistence/test_corrective_003_regressions.py": "ALLOWED",
+      "tests/c15_persistence/test_environment_reattach.py": "ALLOWED",
+      "tests/c15_persistence/test_journal.py": "ALLOWED",
+      "tests/c15_persistence/test_operator_wiring.py": "ALLOWED",
+      "tests/c15_persistence/test_resident_surface.py": "ALLOWED",
+      "tools/c15_persistence/__init__.py": "ALLOWED",
+      "tools/c15_persistence/backend.py": "ALLOWED",
+      "tools/c15_persistence/freeze_corrective_003_evidence.py": "ALLOWED",
+      "tools/c15_persistence/freeze_corrective_003_matrix.py": "ALLOWED",
+      "tools/c15_persistence/freeze_evidence_manifest.py": "ALLOWED",
+      "tools/c15_persistence/freeze_probe_manifest.py": "ALLOWED",
+      "tools/c15_persistence/journal.py": "ALLOWED",
+      "tools/c15_persistence/operator_session.py": "ALLOWED",
+      "tools/c15_persistence/platform_reattach.py": "ALLOWED",
+      "tools/c15_persistence/probe_cli.py": "ALLOWED",
+      "tools/c15_persistence/provider.py": "ALLOWED",
+      "tools/c15_persistence/relay.py": "ALLOWED",
+      "tools/c15_persistence/remote_backend.py": "ALLOWED",
+      "tools/c15_persistence/resident_surface_check.py": "ALLOWED",
+      "tools/c15_persistence/runstate.py": "ALLOWED",
+      "tools/c15_persistence/synthetic_release.py": "ALLOWED"
+    },
+    "product_packaging_touched": false,
+    "resume_base_live_main": "016a2f7db5ed01b41fc614701079c507d2c2c02e",
+    "scope_violations": [],
+    "src_aios_core_diff_is_zero": true,
+    "src_aios_core_diff_vs_base": [],
+    "staged_against_head": "852e0831cb23db46766890573e7f61c9512e55e7"
+  },
+  "environment_identity": {
+    "disclosed_delta": "This sandbox cannot obtain CPython 3.12.14 (GitHub release-asset and python.org downloads are blocked; Debian 12 ships CPython 3.11). The candidate was executed on CPython 3.11.2 / Pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.40.1 and the delta is disclosed rather than hidden.",
+    "formal_gate_pin": "CPython 3.12.14 / Pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.45.1",
+    "platform": "Linux-6.1.158+-x86_64-with-glibc2.36",
+    "python": "3.11.2",
+    "python_implementation": "CPython",
+    "sqlite": "3.40.1"
+  },
+  "evidence": [
+    {
+      "bytes": 348,
+      "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/GREEN_core_trusted_return_focused.log",
+      "sha256": "bad7eac7433df4ce1a4c1347e7f5374daa5f5c31459f5da73a30c86db79fb25c"
+    },
+    {
+      "bytes": 1159,
+      "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/GREEN_full_repository_pytest.log",
+      "sha256": "1a5b175f3954ae0f252e8afb37380960b286e63ac20fc49870328bc2e3f1ccd8"
+    },
+    {
+      "bytes": 204,
+      "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/GREEN_persistence_pytest.log",
+      "sha256": "7e774ba0d8c188b0d319c9bc6a29651348d83cb9ecebaa0d17802bc519a3a8b1"
+    },
+    {
+      "bytes": 486,
+      "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/GREEN_probe_matrix_v2.log",
+      "sha256": "b5af40a37d88a753372e47fd66bf1fbfd83afbc9bd3a324bd805e0b8d5c705b8"
+    },
+    {
+      "bytes": 1774,
+      "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/GREEN_unittest_journal.log",
+      "sha256": "551899b5ce94a71fac179076811a18ec0b48ffc8ee458c2ccf136a029697b3d6"
+    },
+    {
+      "bytes": 3003,
+      "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/RED_probe_matrix_v2_baseline.log",
+      "sha256": "4bf454f992c14164a1f7c3574bf7f9296abb351b49ab275c8f90bc40b8fe2f05"
+    },
+    {
+      "bytes": 15642,
+      "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/baseline/baseline_pytest_restored_harness.log",
+      "sha256": "150cced27d62818514fc7bf48aa4e4bca537f52404aef58cbaf69251329fed6c"
+    },
+    {
+      "bytes": 1774,
+      "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/baseline/baseline_unittest_journal.log",
+      "sha256": "15a49e0f48e84b8095f005528ffc87a79a9f5eee6c17346f19c6a4bce93cfd35"
+    },
+    {
+      "bytes": 769,
+      "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/environment.txt",
+      "sha256": "f47fd26a8c70e0a4fff00249d04a2dd7fde0040374b92ecc2c8da1b8be57889e"
+    },
+    {
+      "bytes": 52661,
+      "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/resident-surface-no-change.json",
+      "sha256": "d66fffc61a1a404193806453f9e74371eca3625027effe8a612c1daeef6d3713"
+    },
+    {
+      "bytes": 152,
+      "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/resident_surface_check.log",
+      "sha256": "5e1358f4148f52b505f2e83254243ecd2276e6aed57f512a316b91e442a53c71"
+    }
+  ],
+  "frozen_probe_matrix": {
+    "freeze_history": [
+      {
+        "frozen_at_utc": "2026-09-29T15:08:35Z",
+        "head": "852e0831cb23db46766890573e7f61c9512e55e7",
+        "reason": "initial freeze"
+      },
+      {
+        "frozen_at_utc": "2026-09-29T15:12:39Z",
+        "head": "852e0831cb23db46766890573e7f61c9512e55e7",
+        "reason": "initial freeze"
+      }
+    ],
+    "freeze_reason": "Final freeze after documented probe corrections (all recorded before the GREEN run): (1) C002-002-E restores the one-shot crash fault before the recovery phase instead of leaving the fault armed in the recovery process; (2) C002-001-B / C002-001-C / C002-002-E assert the surviving authoritative barrier is the per-round authenticated provider-return barrier introduced by the harness repair; (3) C002-002-F targets the latest round's trusted-return handoff row; (4) test_journal tearDown detects failures under both unittest and pytest (mechanics fix; the frozen unittest contract is unchanged); (5) test_operator_wiring stores the operator-invented receipt in the journal before asserting Core refuses it, because accepted Core legitimately stages its own trusted-return handoff during an ordinary multi-round turn; (6) test_resident_surface re-anchors its committed evidence artifact to this corrective's evidence root. No probe expectation was relaxed and no blocker semantics were weakened.",
+    "manifest_path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/frozen/CORRECTIVE_003_PROBE_MATRIX.json",
+    "manifest_sha256": "d4afe24b559fb000987a823f0f7cefafa99fedfa55d1ed782cbd742dc6f6fc33",
+    "probe_count": 21,
+    "probe_ids": [
+      "C002-001-A",
+      "C002-001-B",
+      "C002-001-C",
+      "C002-001-D",
+      "C002-002-A",
+      "C002-002-B",
+      "C002-002-C",
+      "C002-002-D",
+      "C002-002-E",
+      "C002-002-F",
+      "C002-002-G",
+      "C002-004-A",
+      "C002-004-B",
+      "C002-004-K",
+      "C002-004-L",
+      "C002-003-A",
+      "C002-003-B",
+      "C002-003-C",
+      "C002-003-D",
+      "C002-005-A",
+      "C002-006-A"
+    ],
+    "sources": {
+      "tests/c15_persistence/killpoints/harness.py": "5f015c72f5e10ee43ac503e2f7b415a6efc7da2a4ae98542bd14170adfdbd56f",
+      "tests/c15_persistence/killpoints/test_killpoints.py": "97a9dbc358adee8016ebcc709a7c42c230eb8f0b12af3d31bbff8d038670e0a9",
+      "tests/c15_persistence/test_corrective_002_remote_durability.py": "b63d453e2194c83f25bbf2da47c3fc5f8b0e5b9aae5e8172cbae990cfef30ebf",
+      "tests/c15_persistence/test_corrective_003_binding_blockers.py": "15e137861b9821c200074a3ed5c51dfdfd243b7a6da0fea73e86e51c490f7e6a",
+      "tests/c15_persistence/test_corrective_003_regressions.py": "54531b052533477d66c76a7c9b982031b0e9eb5c16b9513bd8eca9fcb0f01065",
+      "tests/c15_persistence/test_environment_reattach.py": "f2bf60b3cd4b6371a968cb3f30a7c1e3ad2a6051964877f52e7b9a8367cd4285",
+      "tests/c15_persistence/test_journal.py": "c8ec2ca0a94318106e1195e5aefda14192b37e370845dbb42b436015b12861d6",
+      "tests/c15_persistence/test_operator_wiring.py": "64199f3a569d63a441aa9ca429e7e06713d409a42989f3840bf5c6b942269984",
+      "tests/c15_persistence/test_resident_surface.py": "951cbc4e4ba954ee47db3e04b8737f6bce494c7bd953507277a5646bc7451884",
+      "tools/c15_persistence/operator_session.py": "4cac3e1f5d12e3fc8b821948cacb364dd8e69552feebcdb62596d8ed386e5906",
+      "tools/c15_persistence/probe_cli.py": "86b3413e5f060265b3ad17fdaf6a54510140b66afd89989e7dea1d9311c5f0e6"
+    }
+  },
+  "historical_preservation": {
+    "pm_frozen_contract_release_blockers": 3,
+    "pr_251_failed_exact_candidate": "7b2556e738d9c9386ec21c13fec39400c87d0916",
+    "pr_251_verdict": "ACCEPTANCE_FAIL / blocker=6",
+    "pr_254_frozen_wip_head": "a2d815c9f5154d87a56b152ed7cf5d1eb1baaaae",
+    "pr_254_frozen_wip_head_is_ancestor_of_candidate": false,
+    "scope_violating_wip": "f7848952b6519fc40f50806f4a4d8d350ac0f38a",
+    "scope_violating_wip_is_ancestor_of_candidate": false
+  },
+  "kind": "C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003-EVIDENCE-MANIFEST",
+  "note": "A file cannot contain the hash of the commit that contains it, so the candidate commit SHA/tree and the PR number are published externally (PR comment + branch tip). Every proof below is computed from the staged index (or HEAD when --from-head is used)."
+}

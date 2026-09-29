@@ -20,12 +20,41 @@ It is operator-side only:
 * it never rewrites ``in_doubt`` to ``not_submitted`` and never resets an
   attempt ledger.
 
+Provider-return authority (frozen, Core-owned)
+---------------------------------------------
+Core owns provider-return authenticity.  This operator layer may reattach an
+already-dispatched provider request and may keep the exact bytes in its own
+journal, but it can never mint, stage, relabel or assert authenticity.  Only
+Core's own trusted-return callback produces the receipt/handoff that licenses
+downstream application, and only Core's own accepted recovery surfaces
+(``recover_trusted_handoff`` / exact-response recovery) may resume a round.
+
+That yields exactly three post-crash shapes for a durable reply:
+
+``attempt missing``
+    Core never admitted this round's attempt (the operator staged the request
+    before Core entered the turn).  The exact reply stays durable in the relay
+    journal and the ordinary ``run_turn`` path re-admits the deterministic
+    attempt identity; when the handler is reached again the relay re-presents
+    those exact bytes, so Core's own trusted-return callback mints the receipt.
+``provider boundary crossed without a durable trusted return``
+    ``dispatching``/``in_doubt`` with no receipt.  No caller-supplied bytes may
+    substitute for the trusted provider return, so this is a hard fail-closed
+    stop: no second dispatch, no invented receipt, no progress, no ACK.
+``durable trusted return exists``
+    Core applies the exact return exactly once through its accepted recovery
+    surface; the operator only records what Core proves.
+
 Kill points (frozen enumeration, see ``KILL_POINTS``)
 -----------------------------------------------------
 ``K1`` after the cursor is durably revealed, before ingest.
 ``K2`` after the event is durably ingested, before provider dispatch.
 ``K3`` after the exact provider request is durably staged/exposed/dispatched,
        before any provider reply exists.
+``K3_TRUSTED_RETURN_DURABLE`` after Core's trusted-return boundary durably
+       committed the exact reply (receipt + return handoff), before that reply
+       is recorded/metered/applied.  This is the authenticatable provider-return
+       barrier; bytes that never crossed it cannot be adopted.
 ``K4`` after Core's trusted-return boundary durably authenticated the exact
        reply, before downstream application completed (operator seam: the
        operator-provided capability invoked by Core inside the same round).
@@ -62,8 +91,12 @@ KILL_POINTS: tuple[str, ...] = (
     "K1_AFTER_REVEAL",
     "K2_AFTER_INGEST",
     "K3_AFTER_REQUEST_DISPATCH",
+    "K3_TRUSTED_RETURN_DURABLE",
     "K4_AFTER_REPLY_AUTHENTICATED",
     "K5_AFTER_APPLIED_BEFORE_ACK",
+)
+K3_POINTS: frozenset[str] = frozenset(
+    {"K3_AFTER_REQUEST_DISPATCH", "K3_TRUSTED_RETURN_DURABLE"}
 )
 
 STATE_VERSION = "c15-operator-session-v1"
@@ -73,6 +106,40 @@ REMOTE_DURABILITY_CONFIG = "remote-durability.json"
 
 class RemoteDurabilityAbort(BaseException):
     """Remote-authoritative persistence failed; ordinary capability wrapping must not swallow it."""
+
+
+class AuthoritativePersistenceFailure(BackendError):
+    """A remote-authoritative barrier write failed and was never published.
+
+    This is deliberately distinct from an ordinary local error: the caller must
+    treat the run as stopped until a later barrier publishes the state, and must
+    never report the failed write as a successful persistence.
+    """
+
+    def __init__(self, *, barrier: str, detail: str) -> None:
+        self.barrier = barrier
+        self.detail = detail
+        super().__init__(f"authoritative persistence failure at {barrier}: {detail}")
+
+
+class DurableTrustedReturnMissing(BackendError):
+    """Provider boundary was crossed without a Core-owned durable trusted return.
+
+    Accepted Core deliberately has no legal path that lets a recovery caller turn
+    externally supplied bytes into a trusted provider return.  The operator
+    therefore stops fail-closed instead of redispatching, inventing evidence or
+    making non-authoritative progress.
+    """
+
+    def __init__(self, *, attempt_id: str, state: str, round_index: int, detail: str) -> None:
+        self.attempt_id = attempt_id
+        self.attempt_state = state
+        self.round_index = int(round_index)
+        self.detail = detail
+        super().__init__(
+            "no durable trusted provider return for attempt "
+            f"{attempt_id} (state={state}, round={round_index}): {detail}"
+        )
 
 
 def _bootstrap_src() -> None:
@@ -199,6 +266,7 @@ class OperatorSession:
         self._remote_ref: str | None = None
         self._remote: str = "origin"
         self._remote_repo_dir: Path | None = None
+        self._fail_barrier: str | None = None
 
     # ------------------------------------------------------ remote durability
 
@@ -292,12 +360,17 @@ class OperatorSession:
             persist=False,
         )
         return True
+    def arm_fail_barrier(self, point: str | None) -> None:
+        """Probe-only injection: fail the authoritative write for one barrier."""
+        self._fail_barrier = point
+
     def _persist_remote_barrier(self, point: str, *, seal_label: str | None = None) -> tuple[str, str] | None:
         """Synchronously commit the current recoverable barrier to remote storage.
 
         This method is called by the normal operator loop *before* a frozen kill
-        point may fire.  A failed remote write raises and prevents the loop from
-        crossing the barrier.
+        point may fire.  A failed remote write is an authoritative durability
+        failure: it is recorded as durable failure evidence and raises a distinct
+        error so the loop cannot cross the barrier or report success.
         """
         if not self.remote_durability_enabled:
             return None
@@ -315,6 +388,26 @@ class OperatorSession:
                 "generation": generation,
             },
         )
+        if self._fail_barrier == point:
+            self._record_failure(
+                "AUTHORITATIVE_PERSISTENCE_FAILURE",
+                {"barrier": point, "injected": True, "detail": "probe-injected barrier failure"},
+            )
+            raise AuthoritativePersistenceFailure(
+                barrier=point, detail="probe-injected authoritative persistence failure"
+            )
+        try:
+            return self._push_barrier(point, cursor=cursor, generation=generation)
+        except BackendError as exc:
+            self._record_failure(
+                "AUTHORITATIVE_PERSISTENCE_FAILURE",
+                {"barrier": point, "injected": False, "detail": str(exc)},
+            )
+            raise AuthoritativePersistenceFailure(barrier=point, detail=str(exc)) from exc
+
+    def _push_barrier(
+        self, point: str, *, cursor: int, generation: int
+    ) -> tuple[str, str]:
         return self.backend.push_to_remote(
             remote_ref=self._remote_ref,
             remote=self._remote,
@@ -611,10 +704,16 @@ class OperatorSession:
 
     # --------------------------------------------------------- kill barrier
 
-    def maybe_kill(self, point: str, *, round_index: int | None = None) -> None:
+    def kill_armed(self, point: str, *, round_index: int | None = None) -> bool:
+        """True when this exact (point, round) is the armed probe barrier."""
         if self._kill_at != point:
-            return
+            return False
         if self._kill_round is not None and round_index != self._kill_round:
+            return False
+        return True
+
+    def maybe_kill(self, point: str, *, round_index: int | None = None) -> None:
+        if not self.kill_armed(point, round_index=round_index):
             return
         self.backend.audit("kill_barrier", {"point": point, "round_index": round_index})
         sys.stdout.flush()
@@ -895,9 +994,43 @@ class OperatorSession:
         # It never edits, re-decides or summarises them.
         return directive
 
+    def _trusted_return_barrier(self, snapshot) -> None:
+        """Publish the authenticatable provider-return boundary for every round.
+
+        ``model_response_recorder`` runs after Core's trusted-return callback has
+        atomically committed the receipt + exact return handoff and before the
+        reply is recorded, metered or applied.  Publishing the authoritative
+        barrier here means the last durable authoritative state before any later
+        crash already contains a Core-owned trusted return, so recovery can never
+        be forced into the unauthenticatable in-flight window by a barrier that
+        only recorded the dispatch.
+
+        The frozen probe kill point at this same boundary stops the process here.
+        """
+        round_index = int(snapshot.round_index)
+        if self.remote_durability_enabled:
+            self._persist_remote_barrier(
+                "K3_TRUSTED_RETURN_DURABLE",
+                seal_label=f"remote-trusted-return-durable-r{round_index}",
+            )
+        self.maybe_kill("K3_TRUSTED_RETURN_DURABLE", round_index=round_index)
+
+    def _install_trusted_return_probe(self, runtime: FusedTurnRuntime) -> None:
+        cognitive = runtime.cognitive_runtime
+        recorded = cognitive.model_response_recorder
+        if recorded is None:  # pragma: no cover - Core always wires this callback
+            raise BackendError("trusted-return barrier requires Core's response recorder")
+
+        def probe_recorder(snapshot, response):
+            self._trusted_return_barrier(snapshot)
+            return recorded(snapshot, response)
+
+        cognitive.model_response_recorder = probe_recorder
+
     def _build_runtime(self) -> FusedTurnRuntime:
         store, index = self._open_store()
         runtime = FusedTurnRuntime(store=store, index=index, model_handler=self._model_handler)
+        self._install_trusted_return_probe(runtime)
         runtime.registry.register(
             CapabilitySpec(
                 name=provider_module.CAPABILITY_NAME,
@@ -923,12 +1056,43 @@ class OperatorSession:
         assistant_id = self.runtime.ingestor._turn_identity(self._session_id, turn_index)[2]
         return turn_index, occurred_iso, assistant_id
 
-    def _recover_with_core(self, projection: Mapping[str, Any]) -> list[dict[str, Any]]:
-        """Hand every durable reply back to Core through the accepted API.
+    def _record_failure(self, point: str, detail: Mapping[str, Any]) -> None:
+        """Durable non-authoritative failure evidence (never a success record)."""
+        record = {"synthetic": True, "point": point, "at": _now(), **dict(detail)}
+        _append_jsonl(self.failures_path, record)
+        self.backend.audit("failure_evidence", {"point": point, **dict(detail)})
 
-        The operator never decides authenticity: it reads Core's own
-        trusted-return receipt, stages the exact bytes through
-        ``stage_exact_background_response`` and lets Core revalidate them.
+    def _record_fail_closed_stop(self, stop: DurableTrustedReturnMissing) -> None:
+        self._record_failure(
+            "FAIL_CLOSED_NO_DURABLE_TRUSTED_RETURN",
+            {
+                "attempt_id": stop.attempt_id,
+                "attempt_state": stop.attempt_state,
+                "round_index": stop.round_index,
+                "detail": stop.detail,
+                "acks": self.counters().get("acks", 0),
+            },
+        )
+        if not self.remote_durability_enabled:
+            return
+        try:
+            self._persist_remote_barrier(
+                "FAIL_CLOSED_NO_DURABLE_TRUSTED_RETURN",
+                seal_label="remote-fail-closed-no-trusted-return",
+            )
+        except Exception as exc:  # evidence publication must not mask the stop
+            self.backend.audit(
+                "failure_evidence_push_failed", {"error": f"{type(exc).__name__}: {exc}"}
+            )
+
+    def _recover_with_core(self, projection: Mapping[str, Any]) -> list[dict[str, Any]]:
+        """Reattach durable provider work to Core's own accepted recovery surfaces.
+
+        The operator never decides authenticity.  It reattaches an already
+        dispatched provider request (never a second dispatch), reads Core's own
+        trusted-return receipt and lets Core's accepted exact-response/handoff
+        recovery drive the turn.  A reply whose provider boundary was crossed
+        without a durable trusted return is a hard fail-closed stop.
         """
         actions: list[dict[str, Any]] = []
         attempts = self.runtime.background_model_attempts
@@ -950,6 +1114,7 @@ class OperatorSession:
             if record["state"] in {"applied", "acked"}:
                 continue
             attempt_id = str(record["metadata"]["attempt_id"])
+            round_index = int(record["metadata"]["round"])
             payload = bytes(record["reply"]).decode("utf-8")
             directive = decode_model_directive(payload)
             attempt = attempts.get(attempt_id)
@@ -974,24 +1139,45 @@ class OperatorSession:
                         seal_label="remote-provider-return-staged",
                     )
                 continue
-            work_id = self.runtime.turn_executions.execution_id_for(
-                subject_id=self.runtime.subject_id,
-                session_id=self._session_id,
-                turn_index=int(projection["sequence"]),
-            )
             receipt = attempts.response_authenticity_receipt(attempt_id)
             if receipt is None:
-                self.runtime.stage_trusted_returned_background_response(
-                    work_kind="user_turn",
-                    work_id=work_id,
-                    model_round_index=int(record["metadata"]["round"]),
-                    directive_payload=payload,
-                    returned_at=datetime.now(timezone.utc),
-                    evidence="operator relay reattached exact provider-return bytes",
+                if attempt.state in {"dispatching", "in_doubt"}:
+                    # The provider boundary was crossed and no Core-owned trusted
+                    # return exists. Accepted Core has no legal continuation here:
+                    # caller-supplied bytes cannot become a trusted provider
+                    # return, and blind redispatch is forbidden. Hard stop.
+                    stop = DurableTrustedReturnMissing(
+                        attempt_id=attempt_id,
+                        state=str(attempt.state),
+                        round_index=round_index,
+                        detail=(
+                            "provider boundary crossed without a durable trusted "
+                            "return; refusing redispatch and refusing invented "
+                            "authenticity"
+                        ),
+                    )
+                    self._record_fail_closed_stop(stop)
+                    raise stop
+                if attempt.state in {"admitted", "not_submitted"}:
+                    # Dispatch provably did not start for this attempt: the ordinary
+                    # path may still dispatch once, and the relay re-presents the
+                    # durable bytes if this round's request was already staged.
+                    actions.append(
+                        {
+                            "request_id": request_id,
+                            "action": "core_dispatch_not_started",
+                            "attempt_state": str(attempt.state),
+                        }
+                    )
+                    continue
+                stop = DurableTrustedReturnMissing(
+                    attempt_id=attempt_id,
+                    state=str(attempt.state),
+                    round_index=round_index,
+                    detail="attempt is neither safely dispatchable nor recovery-eligible",
                 )
-                receipt = attempts.response_authenticity_receipt(attempt_id)
-                require(receipt is not None, "Core trusted-return recovery produced no receipt")
-                actions.append({"request_id": request_id, "action": "core_trusted_return_staged"})
+                self._record_fail_closed_stop(stop)
+                raise stop
             fingerprint = hashlib.sha256(payload.encode("utf-8")).hexdigest()
             require(
                 fingerprint == attempts._response_fingerprint(directive),
@@ -1013,42 +1199,18 @@ class OperatorSession:
                         "K3_RECOVERED_PROVIDER_RETURN",
                         seal_label="remote-provider-return-recovered",
                     )
-            if attempts.staged_response(attempt_id) is None:
-                raise BackendError(
-                    "Core trusted-return recovery did not stage the exact provider response"
-                )
-            actions.append({"request_id": request_id, "action": "staged_into_core"})
+            actions.append(
+                {
+                    "request_id": request_id,
+                    "action": "core_trusted_return_durable",
+                    "attempt_state": str(attempt.state),
+                    "model_round_index": round_index,
+                    "staged": attempts.staged_response(attempt_id) is not None,
+                }
+            )
             if self.journal.recovery(request_id)["state"] == "authenticated":
                 self.journal.begin_applying(request_id)
                 actions.append({"request_id": request_id, "action": "applying"})
-        if actions and any(a["action"] in {"staged_into_core", "applying"} for a in actions):
-            turn_index, occurred_iso, assistant_id = self._turn_identity(projection)
-            try:
-                status = self.runtime.turn_executions.authorize_exact_response_recovery(
-                    subject_id=self.runtime.subject_id,
-                    session_id=self._session_id,
-                    turn_index=turn_index,
-                    user_input=str(projection["resident_visible_payload"]),
-                    occurred_at=occurred_iso,
-                    assistant_id=assistant_id,
-                    evidence="operator relay journal: exact durable reply + Core receipt",
-                )
-                actions.append(
-                    {
-                        "request_id": None,
-                        "action": "authorized_exact_response_recovery",
-                        "state": status.state,
-                        "disposition": status.recovery_disposition,
-                    }
-                )
-            except Exception as exc:  # already completed / nothing to authorise
-                actions.append(
-                    {
-                        "request_id": None,
-                        "action": "authorize_skipped",
-                        "reason": f"{type(exc).__name__}: {exc}",
-                    }
-                )
         return actions
 
     def _finalise_requests(self, cursor: int | None = None) -> list[dict[str, Any]]:
@@ -1174,7 +1336,7 @@ class OperatorSession:
         self._kill_at = kill_at
         self._kill_round = kill_round
         if kill_round is not None:
-            require(kill_at == "K3_AFTER_REQUEST_DISPATCH", "kill_round is only valid for K3")
+            require(kill_at in K3_POINTS, "kill_round is only valid for the K3 boundaries")
             require(kill_round >= 0, "kill_round must be non-negative")
         if kill_at is not None and kill_at not in KILL_POINTS:
             raise BackendError(f"unknown kill point: {kill_at}")

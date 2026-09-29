@@ -20,9 +20,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "killpoints"))
 
 from harness import REPO_ROOT, new_root, repo_python_env  # noqa: E402
 
-EVIDENCE_DIR = (
-    REPO_ROOT / "reviews" / "C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001" / "resumed" / "evidence"
-)
+# Corrective-003 evidence re-anchor: the committed artifact lives under this
+# corrective's own evidence root instead of the frozen Corrective-001 WIP path.
+EVIDENCE_DIR = REPO_ROOT / "reviews" / "C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003" / "evidence"
 
 
 def test_resident_visible_surface_is_unchanged_by_the_durability_layer(tmp_path: Path) -> None:

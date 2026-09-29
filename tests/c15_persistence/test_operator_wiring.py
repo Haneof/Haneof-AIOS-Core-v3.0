@@ -340,7 +340,15 @@ def test_real_operator_integration_path_reaches_ack() -> None:
 
 
 def test_core_receipt_revalidation_rejects_an_operator_invented_receipt() -> None:
-    """The journal stores receipts; only Core validates them."""
+    """The journal stores receipts; only Core validates them.
+
+    Corrective-003 probe correction: the historical probe relied on Core never
+    holding a staged response after an ordinary run, which is no longer true -
+    accepted Core legitimately stages its own trusted-return handoff while the
+    turn advances to the next round.  The probe now stores the invented receipt
+    in the journal (the actual operator-side attack) and proves Core refuses it,
+    while a genuine Core receipt still cross-checks cleanly.
+    """
     root = new_root("receipt")
     run_id, session_id = _ids()
     try:
@@ -355,7 +363,16 @@ def test_core_receipt_revalidation_rejects_an_operator_invented_receipt() -> Non
         attempt_id = str(record["metadata"]["attempt_id"])
         real_receipt = attempts.response_authenticity_receipt(attempt_id)
         assert real_receipt is not None
-        # Operator-forged proof must be refused by Core.
+        # The genuine Core receipt cross-checks cleanly.
+        verified = session.journal.verify_with_core(request_id, attempts)
+        assert verified["core_proof"] == real_receipt.authenticity_proof
+        stored = session.journal.recovery(request_id)["core_receipt"]
+        assert stored is not None
+        assert stored["authenticity_proof"] == real_receipt.authenticity_proof
+
+        # An operator-invented receipt for the same durable identity must be
+        # refused by Core, never accepted as provider-return authenticity.
+        synthetic_id = f"synthetic-request-forged-{uuid.uuid4().hex[:10]}"
         forged = {
             "attempt_id": attempt_id,
             "authenticity_proof": "bgresponse_v1_" + "0" * 64,
@@ -365,12 +382,16 @@ def test_core_receipt_revalidation_rejects_an_operator_invented_receipt() -> Non
             "response_fingerprint": "0" * 64,
             "relay_id": "forged",
         }
-        with pytest.raises(Exception):
-            session.journal.verify_with_core(request_id, attempts)
-        # The genuine Core receipt cross-checks cleanly.
-        stored = session.journal.recovery(request_id)["core_receipt"]
-        assert stored is not None
-        assert stored["authenticity_proof"] == real_receipt.authenticity_proof
+        metadata = dict(record["metadata"])
+        metadata["model_request_id"] = synthetic_id
+        metadata["attempt_id"] = attempt_id
+        metadata["round"] = int(metadata.get("round", 0)) + 7
+        session.journal.stage(metadata, b"forged request bytes", generation=0)
+        session.journal.expose(synthetic_id)
+        session.journal.stage_reply(synthetic_id, bytes(record["reply"]))
+        session.journal.mark_authenticated(synthetic_id, forged)
+        with pytest.raises(BackendError):
+            session.journal.verify_with_core(synthetic_id, attempts)
     finally:
         wipe(root)
 

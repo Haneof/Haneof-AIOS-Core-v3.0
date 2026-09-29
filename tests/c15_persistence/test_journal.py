@@ -47,8 +47,22 @@ class JournalTests(unittest.TestCase):
 
     def tearDown(self):
         # Disposable state only. Frozen E2E roots and evidence logs are retained.
-        result = self._outcome.result
-        failed = any(test is self for test, _ in result.errors + result.failures)
+        #
+        # Corrective-003 probe correction: the historical tearDown read unittest's
+        # internal result object, which pytest's unittest integration does not
+        # expose, so every test failed in teardown whenever the suite ran under
+        # pytest.  Detect failure through whichever runner is active; the frozen
+        # unittest invocation stays bit-identical in behaviour.
+        outcome = getattr(self, '_outcome', None)
+        success = getattr(outcome, 'success', None)
+        if success is None:
+            failed = False
+            for container in (getattr(outcome, 'result', None), outcome):
+                for attribute in ('errors', 'failures'):
+                    entries = getattr(container, attribute, None) or ()
+                    failed = failed or any(test is self for test, _ in entries)
+        else:
+            failed = not success
         if failed:
             print('RED_STATE_RETAINED=' + str(self.parent), flush=True)
         else:

@@ -19,7 +19,17 @@ import json
 import sys
 from pathlib import Path
 
-from .operator_session import KILL_POINTS, OperatorSession
+from .operator_session import (
+    KILL_POINTS,
+    AuthoritativePersistenceFailure,
+    DurableTrustedReturnMissing,
+    OperatorSession,
+    RemoteDurabilityAbort,
+)
+
+# Frozen contract exit codes (documented in the probe matrix).
+FAIL_CLOSED_EXIT = 42
+AUTHORITATIVE_FAILURE_EXIT = 43
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -40,9 +50,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--repo-dir", default=None)
     parser.add_argument("--commit-sha", default=None)
     parser.add_argument("--require-remote-durability", action="store_true")
+    parser.add_argument("--fail-barrier", default=None)
     args = parser.parse_args(argv)
 
     repo_dir = Path(args.repo_dir).resolve() if args.repo_dir else None
+    if args.fail_barrier is not None:
+        if args.fail_barrier not in KILL_POINTS and args.fail_barrier != "ACKED":
+            raise SystemExit(f"unknown barrier: {args.fail_barrier}")
     if args.mode == "create":
         session = OperatorSession.create(
             args.root,
@@ -54,6 +68,7 @@ def main(argv: list[str] | None = None) -> int:
             repo_dir=repo_dir,
             require_remote_durability=args.require_remote_durability,
         )
+        session.arm_fail_barrier(args.fail_barrier)
         outcome = session.process_one_cursor(kill_at=args.kill_at, kill_round=args.kill_round)
     elif args.mode == "resume":
         session = OperatorSession.attach(
@@ -64,6 +79,7 @@ def main(argv: list[str] | None = None) -> int:
             remote=args.remote if args.remote_ref is not None else None,
             repo_dir=repo_dir,
         )
+        session.arm_fail_barrier(args.fail_barrier)
         outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)
     elif args.mode == "materialize-resume":
         session = OperatorSession.materialize_and_attach(
@@ -75,6 +91,7 @@ def main(argv: list[str] | None = None) -> int:
             remote=args.remote,
             repo_dir=repo_dir,
         )
+        session.arm_fail_barrier(args.fail_barrier)
         outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)
     else:
         session = OperatorSession.attach(
@@ -113,5 +130,34 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
+def _report_authoritative_failure(barrier: str, detail: str) -> int:
+    # A remote-authoritative barrier failed: the operator stopped without
+    # publishing, and the caller must never read this as successful persistence.
+    print(
+        "AUTHORITATIVE_PERSISTENCE_FAILURE "
+        f"barrier={barrier} detail={detail}",
+        file=sys.stderr,
+        flush=True,
+    )
+    return AUTHORITATIVE_FAILURE_EXIT
+
+
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except DurableTrustedReturnMissing as stop:
+        # Frozen fail-closed outcome: the provider boundary was crossed without a
+        # Core-owned durable trusted return, so the operator stops instead of
+        # redispatching or inventing authenticity.
+        print(
+            "FAIL_CLOSED_HARD_STOP "
+            f"attempt_id={stop.attempt_id} state={stop.attempt_state} "
+            f"round={stop.round_index} detail={stop.detail}",
+            file=sys.stderr,
+            flush=True,
+        )
+        raise SystemExit(FAIL_CLOSED_EXIT)
+    except AuthoritativePersistenceFailure as failure:
+        raise SystemExit(_report_authoritative_failure(failure.barrier, failure.detail))
+    except RemoteDurabilityAbort as abort:
+        raise SystemExit(_report_authoritative_failure("capability-boundary", str(abort)))
