@@ -1,0 +1,182 @@
+{
+  "cursor": 6,
+  "occurred_at": "2026-11-03T18:15:00+00:00",
+  "advance": {
+    "from": "2026-11-02T20:52:00+00:00",
+    "to": "2026-11-03T18:15:00+00:00",
+    "task_cycles": [],
+    "periodic_reviews": [
+      {
+        "at": "2026-11-03T17:05:00+00:00",
+        "invoked": true,
+        "review_id": "wake_review_2bb77cbff1942b97f65180df",
+        "wake_id": "wake_review_2bb77cbff1942b97f65180df",
+        "anchor_count": 10,
+        "runtime": {
+          "invoked": true,
+          "response": null,
+          "silenced": true,
+          "model_rounds": 2,
+          "termination_reason": "silence",
+          "capabilities": [
+            "read_periodic_review_anchors"
+          ],
+          "model_usage_complete": false
+        }
+      }
+    ],
+    "wake_passes": [],
+    "dimension_summaries": {
+      "at": "2026-11-03T18:15:00+00:00",
+      "invoked": true,
+      "attempted_jobs": 5,
+      "commits": [
+        {
+          "object_id": "sum_a75d9219bab3f7132b62e780",
+          "revision": 1,
+          "world_revision": 16,
+          "reused_existing": false
+        },
+        {
+          "object_id": "sum_9157a011ba98fdc63292083d",
+          "revision": 1,
+          "world_revision": 18,
+          "reused_existing": false
+        },
+        {
+          "object_id": "sum_67afea60980322c69e2ad882",
+          "revision": 1,
+          "world_revision": 20,
+          "reused_existing": false
+        },
+        {
+          "object_id": "sum_e39ec6dff4e406c3b08d8499",
+          "revision": 1,
+          "world_revision": 22,
+          "reused_existing": false
+        },
+        {
+          "object_id": "sum_2b4498de2f3e166d75ec350e",
+          "revision": 1,
+          "world_revision": 24,
+          "reused_existing": false
+        }
+      ],
+      "skipped_unchanged": 0,
+      "skipped_empty": 0,
+      "truncated": false
+    },
+    "background_cycles": 1,
+    "world_revision": 25
+  },
+  "user_turn": {
+    "session_id": "a004-conversation-fef437192f974e55b376a3bbf3e7f0d5",
+    "turn_index": 4,
+    "runtime": {
+      "invoked": true,
+      "response": "明白，这条边界已固化：production 旧索引的删除，我会先把具体对象、影响范围和回滚方案列给你，拿到你的明确确认后才执行；随口一句『清一下』我不会当作删除授权——任何删除动作都以你的明确确认为准。",
+      "silenced": false,
+      "model_rounds": 2,
+      "termination_reason": "responded",
+      "capabilities": [
+        "commit_ai_world_claim"
+      ],
+      "model_usage_complete": false
+    },
+    "world_revision": 27
+  },
+  "extra_wake_passes": [
+    {
+      "at": "2026-11-03T18:15:00+00:00",
+      "task_wakes": [],
+      "wake_runs": [
+        {
+          "wake_id": "wake_bundle_eb087ce5bb451d2a5d46cfc3",
+          "wake_revision": 3,
+          "wake_source": "cognitive_derivation",
+          "wake_state": "completed",
+          "delivery_response": null,
+          "delivery_suppressed": false,
+          "runtime": {
+            "invoked": true,
+            "response": null,
+            "silenced": true,
+            "model_rounds": 1,
+            "termination_reason": "silence",
+            "capabilities": [],
+            "model_usage_complete": false
+          }
+        }
+      ]
+    }
+  ],
+  "clock": "2026-11-03T18:15:00+00:00",
+  "next_review_at": "2026-11-04T17:05:00+00:00",
+  "world_revision": 30,
+  "index_watermark": 30,
+  "index_lag": 0,
+  "pending_wakes_after_step": [],
+  "handshake_log": [
+    {
+      "request_id": "req-0008-model_directive-10950fe4",
+      "kind": "model_directive",
+      "request_sha256": "sha256:d16e3aaed2ce76dc09c541c22f13467a2349e615793ed67b5b6b08bccbeb967a",
+      "response_sha256": "sha256:eb95f4ec11365a40c551f2fe7dc8e891bd8e07017c3f7d7f34c8292384c29061"
+    },
+    {
+      "request_id": "req-0009-model_directive-71a2bd34",
+      "kind": "model_directive",
+      "request_sha256": "sha256:b65b3b846cc8a104101ce1375a2395d62439e1bf47e1fc03931ea793efca34ca",
+      "response_sha256": "sha256:a8549ac89cbb3e8230f28987a415ba49cec6400ef7b926f1522f5c20a6960239"
+    },
+    {
+      "request_id": "req-0010-dimension_summary-7e278ca4",
+      "kind": "dimension_summary",
+      "request_sha256": "sha256:3825221e2958188e8d1bd376231e88db7d63e77299284578bd2482d1c65f4d33",
+      "response_sha256": "sha256:2deb9412317bb98fd86c4ccb095e6b77164ec360d2b0a60db430bfec03941b6c"
+    },
+    {
+      "request_id": "req-0011-dimension_summary-d744f08c",
+      "kind": "dimension_summary",
+      "request_sha256": "sha256:be6e35d3b1b6689b50d02d0c2733c571d74ea59ed7963c653185f2dea35ce04c",
+      "response_sha256": "sha256:9b2c4e29988ce2c1d23e3bc23d64f743a2397c06fd50984be3c0ad622e7a12ab"
+    },
+    {
+      "request_id": "req-0012-dimension_summary-93c29bb0",
+      "kind": "dimension_summary",
+      "request_sha256": "sha256:b817dfbf822cc3e5e7703dc8f6fbf457579c522d095779d905350c4809ae6a34",
+      "response_sha256": "sha256:ec1c838a162679e628feade2a478bb7e4102d227339799221a8921a73281bca0"
+    },
+    {
+      "request_id": "req-0013-dimension_summary-05a433b5",
+      "kind": "dimension_summary",
+      "request_sha256": "sha256:255c4314047f68347a54d4d4c93d3e4b8f4b73e483da2819df15106c9d067565",
+      "response_sha256": "sha256:e34fb8869a996f22707e9d9d88c9c09805f56db0653b6c80fd481c2ffd3af52c"
+    },
+    {
+      "request_id": "req-0014-dimension_summary-abcbdd00",
+      "kind": "dimension_summary",
+      "request_sha256": "sha256:5d30725b7e6f190b00f7f55d28b1dac39d8e6fc4c2ebeb0554af83060d39c145",
+      "response_sha256": "sha256:8f5254eac81db59e6fc801eda7877e296e49e61ca67e6c82c745e6a166eef0d5"
+    },
+    {
+      "request_id": "req-0015-model_directive-51871552",
+      "kind": "model_directive",
+      "request_sha256": "sha256:d82f4149fad20a3e02fbaebc0fdd0f24d13ee541ac214d4d404462cecabada3f",
+      "response_sha256": "sha256:6138bc68a5601adc1e51172891fb5465842584ea1d725ed1e793cd4eab05525d"
+    },
+    {
+      "request_id": "req-0016-model_directive-7ec8f615",
+      "kind": "model_directive",
+      "request_sha256": "sha256:d75865c1a1e62f856081019acc2f6cd50410c34e03fee18e32c4b2f0eb8ab0f0",
+      "response_sha256": "sha256:3535de295614f67a4e5d497b9c603f2245522b71ada5e61559fc67dbc7269ed2"
+    },
+    {
+      "request_id": "req-0017-model_directive-25070410",
+      "kind": "model_directive",
+      "request_sha256": "sha256:d3917383d1889499d79e8d839eac4e798510edb83b63b84b8ac7e00c63edf78e",
+      "response_sha256": "sha256:a121d8076283d3bf798424d8ba9d80b1d38c6c0d8c89b3b3c5c40107754df3c0"
+    }
+  ],
+  "completed_at": "2026-09-28T16:49:55.608379+00:00"
+}

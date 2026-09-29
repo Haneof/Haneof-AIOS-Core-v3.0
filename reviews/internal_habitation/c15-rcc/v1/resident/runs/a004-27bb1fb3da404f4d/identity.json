@@ -1,0 +1,29 @@
+{
+  "task": "C15-RCC-RES-A-RERUN-004",
+  "role": "Real Resident AI — Fresh Resident A (A-004)",
+  "run_id": "a004-27bb1fb3da404f4d",
+  "resident_session_id": "resident-a004-3507d8a3bf894090899cf424c4baea07",
+  "conversation_session_id": "a004-conversation-fef437192f974e55b376a3bbf3e7f0d5",
+  "resident_process_identity": "process-a004-4697c6f7cf634aafbd29356f7a279c50",
+  "resident_process_boot": {
+    "hostname": "e2b.local",
+    "pid": 22868,
+    "python": "3.12.14",
+    "platform": "Linux-6.1.158+-x86_64-with-glibc2.36",
+    "created_at_utc": "2026-09-28T16:30:31.931723+00:00"
+  },
+  "frozen_rc": {
+    "frozen_software": "f20f2edfa7af00d0286493fd15196ca9503bc315",
+    "frozen_core_tree": "9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623",
+    "frozen_tests_tree": "7e33b5ef8432370234965d3ccd61248c703c4019"
+  },
+  "freshness": {
+    "world_db": "world.db",
+    "index_db": "index.db",
+    "release_state": "release-state.json",
+    "runtime_checkpoint": "runtime_state.json",
+    "reused_prior_resident_state": false,
+    "a003_status": "HISTORICAL_FOR_PRIOR_RC_ONLY — not a seed/template/expected answer"
+  },
+  "model_identity_note": "Model decisions in this run are produced by the resident model session executing this run (Arena Agent Mode). No external provider API, provider receipt, or token usage is fabricated; directives carry usage=None, provenance=None."
+}

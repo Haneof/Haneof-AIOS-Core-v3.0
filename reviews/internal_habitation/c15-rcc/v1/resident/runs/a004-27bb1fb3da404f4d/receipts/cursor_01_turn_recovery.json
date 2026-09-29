@@ -1,0 +1,12 @@
+{
+  "execution_id": "turnexec_f39507fdd4de6e7a6b46723c2128191e",
+  "state": "started",
+  "recovery_disposition": "retry_authorized",
+  "assistant_ref": null,
+  "model_attempts": [
+    "attempt_id='bgattempt_261339075d7c14c6bb32a353eb8f6a39' subject_id='user_1' work_kind='user_turn' work_id='turnexec_f39507fdd4de6e7a6b46723c2128191e' wake_reason='user_interaction' model_round_index=0 admission_world_revision=1 state='not_submitted' admitted_at=datetime.datetime(2026, 11, 2, 17, 5, tzinfo=datetime.timezone.utc) updated_at=datetime.datetime(2026, 11, 2, 17, 5, tzinfo=datetime.timezone.utc) provider=None model=None provider_request_id=None response_fingerprint=None meter_record_id=None failure_kind=None failure_detail=None reconciliation_evidence=\"attempt bgattempt_261339075d7c14c6bb32a353eb8f6a39 round 0 has provider=None, provider_request_id=None, meter_record_id=None, response_fingerprint=None; failure_kind=ValueError 'response request_id mismatch' occurred in the resident file handshake before any directive was returned, so this model attempt was never submitted to a provider.\""
+  ],
+  "retry_authorized": true,
+  "retry_count": 0,
+  "reconciliation_evidence": "Recovery per CG-003: round-0 attempt reconciled not_submitted (ledger proves provider=None, no provider_request_id, no meter, no response fingerprint); turn claim state='started', attempt_protocol='model_attempt_pre_admission_v1', no durable assistant output; safe to retry with resident re-decision."
+}

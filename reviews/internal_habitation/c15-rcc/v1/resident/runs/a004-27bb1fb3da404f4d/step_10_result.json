@@ -1,0 +1,43 @@
+{
+  "cursor": 10,
+  "occurred_at": "2026-11-04T22:24:00+00:00",
+  "advance": {
+    "from": "2026-11-04T22:17:00+00:00",
+    "to": "2026-11-04T22:24:00+00:00",
+    "task_cycles": [],
+    "periodic_reviews": [],
+    "wake_passes": [],
+    "dimension_summaries": {
+      "at": "2026-11-04T22:24:00+00:00",
+      "invoked": true,
+      "attempted_jobs": 7,
+      "commits": [],
+      "skipped_unchanged": 7,
+      "skipped_empty": 0,
+      "truncated": false
+    },
+    "background_cycles": 0,
+    "world_revision": 56
+  },
+  "user_turn": {
+    "session_id": "a004-conversation-fef437192f974e55b376a3bbf3e7f0d5",
+    "turn_index": 6,
+    "idempotent_replay": true,
+    "assistant_ref": {
+      "object_id": "obs_conv_ai_0b440b106fa95aedec9a9f64",
+      "revision": 1
+    },
+    "assistant_text_sha256": "eb7cd7c20aa662715d15d7977d72fad653dbbfe74055e5a88e224705b3c78e3a",
+    "world_revision": 56
+  },
+  "extra_wake_passes": [],
+  "clock": "2026-11-04T22:24:00+00:00",
+  "next_review_at": "2026-11-05T17:05:00+00:00",
+  "world_revision": 56,
+  "index_watermark": 56,
+  "index_lag": 0,
+  "attention_watch_receipts": [],
+  "pending_wakes_after_step": [],
+  "handshake_log": [],
+  "completed_at": "2026-09-28T17:00:35.280696+00:00"
+}

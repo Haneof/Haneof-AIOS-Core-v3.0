@@ -1,0 +1,23 @@
+{
+  "directive": {
+    "capability_calls": [
+      {
+        "name": "commit_ai_world_claim",
+        "arguments": {
+          "domain": "user_understanding",
+          "statement": "自 2026-11-02 起的两周内，用户委托我持续负责 Atlas staging 的收尾：日常工程细节不需要逐条向用户汇报，只需交付结果与关键风险；凡是会影响生产环境、删除数据或产生费用的事项，必须单独向用户提出升级、等待确认后才能执行。",
+          "evidence_refs": [
+            {"object_id": "obs_conv_user_6353a5ca283b7939484c17a6", "revision": 1}
+          ],
+          "confidence": 0.9,
+          "knowledge_state": "observed",
+          "valid_time": {
+            "start": "2026-11-02T17:05:00Z",
+            "end": "2026-11-16T17:05:00Z",
+            "precision": "second"
+          }
+        }
+      }
+    ]
+  }
+}

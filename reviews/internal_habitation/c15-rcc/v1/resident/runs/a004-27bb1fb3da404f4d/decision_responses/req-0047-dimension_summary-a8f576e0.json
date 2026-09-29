@@ -1,0 +1,4 @@
+{
+  "request_id": "req-0047-dimension_summary-a8f576e0",
+  "text": "2026-11-04 dim:ai_user_understanding：新增一条用户纪律 claim（clm_e2d2b8bdbe0a23130e3ad85b）——严格区分『准备提交/已排队』与『确实完成』，只有存在完成记录（tag/digest/upload-complete 等）才能报告完成，无记录一律按『未确认完成』处理。证据集 coverage 2/2（用户第 5、6 轮消息），无反证。当日该维度仅此一条认知新增；两条既有 claim 维持不变。"
+}

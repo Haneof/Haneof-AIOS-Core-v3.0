@@ -1,0 +1,116 @@
+{
+  "cursor": 11,
+  "occurred_at": "2026-11-04T23:02:00+00:00",
+  "advance": {
+    "from": "2026-11-04T22:24:00+00:00",
+    "to": "2026-11-04T23:02:00+00:00",
+    "task_cycles": [],
+    "periodic_reviews": [],
+    "wake_passes": [
+      {
+        "at": "2026-11-04T23:02:00+00:00",
+        "task_wakes": [],
+        "wake_runs": [
+          {
+            "wake_id": "wake_be87fc91be50758e34a88060",
+            "wake_revision": 3,
+            "wake_source": "watch_match",
+            "wake_state": "completed",
+            "delivery_response": "好消息，这次可以通知门店了：edge-2026.11.4 已确认发布——registry 第二次上传成功，tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED，完成记录已在。之前那次 checksum mismatch 的失败上传未产生任何发布痕迹；跟进任务已完成后关闭。",
+            "delivery_suppressed": false,
+            "runtime": {
+              "invoked": true,
+              "response": "好消息，这次可以通知门店了：edge-2026.11.4 已确认发布——registry 第二次上传成功，tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED，完成记录已在。之前那次 checksum mismatch 的失败上传未产生任何发布痕迹；跟进任务已完成后关闭。",
+              "silenced": false,
+              "model_rounds": 6,
+              "termination_reason": "responded",
+              "capabilities": [
+                "inspect_world_object",
+                "transition_task",
+                "transition_task",
+                "transition_task",
+                "transition_task"
+              ],
+              "model_usage_complete": false
+            }
+          }
+        ]
+      }
+    ],
+    "dimension_summaries": {
+      "at": "2026-11-04T23:02:00+00:00",
+      "invoked": true,
+      "attempted_jobs": 7,
+      "commits": [],
+      "skipped_unchanged": 7,
+      "skipped_empty": 0,
+      "truncated": false
+    },
+    "background_cycles": 0,
+    "world_revision": 65
+  },
+  "user_turn": null,
+  "extra_wake_passes": [],
+  "clock": "2026-11-04T23:02:00+00:00",
+  "next_review_at": "2026-11-05T17:05:00+00:00",
+  "world_revision": 65,
+  "index_watermark": 65,
+  "index_lag": 0,
+  "attention_watch_receipts": [
+    {
+      "note": "cursor_11:pre_advance",
+      "observation_ref": {
+        "object_id": "obs_c14_fixture_291beec37165eb34a35f8f85",
+        "revision": 1
+      },
+      "receipt": {
+        "wake_id": "wake_be87fc91be50758e34a88060",
+        "revision": 1,
+        "state": "new",
+        "world_revision": 58,
+        "merged": false,
+        "suppressed": false
+      }
+    }
+  ],
+  "pending_wakes_after_step": [],
+  "handshake_log": [
+    {
+      "request_id": "req-0033-model_directive-718f4dbd",
+      "kind": "model_directive",
+      "request_sha256": "sha256:b24c2255bdabad9fb19fd8934677362b386274d3477e58888f261378fb8930b1",
+      "response_sha256": "sha256:78ef2486f5e43ba210c08ff74d5d9ba9d5456a63b6c0d3e51f19a833d2897bc1"
+    },
+    {
+      "request_id": "req-0034-model_directive-80c36c7b",
+      "kind": "model_directive",
+      "request_sha256": "sha256:69aaccb109690ee7c9ebf40ff0eca1296645c32f7311ec9a218ef077fd2ccc16",
+      "response_sha256": "sha256:3f616e3b6f55574d2705cb3f3f16d100512a067e337012b7349923a531ca9688"
+    },
+    {
+      "request_id": "req-0035-model_directive-688ef42c",
+      "kind": "model_directive",
+      "request_sha256": "sha256:e10e1c3abd11ea545440af961ae12fc3431c9e5d031b9898c5a4cac4572bf394",
+      "response_sha256": "sha256:5bbe6624feb076447bfde46758095f262b6549df048eac44353800ce5d71a488"
+    },
+    {
+      "request_id": "req-0036-model_directive-44771227",
+      "kind": "model_directive",
+      "request_sha256": "sha256:abd091b0a5344f53ce245d9177d28f12842bd10923ed29ae214efe4c402dd87c",
+      "response_sha256": "sha256:afbcda50001c9eab55e687b4b238775124776c59934e5bd012e1b8ebfce17562"
+    },
+    {
+      "request_id": "req-0037-model_directive-5085af6b",
+      "kind": "model_directive",
+      "request_sha256": "sha256:5c1d46d4a086d33e5bf1ff4341d1c50cc6070a23fb304073d1f49b07c0b40528",
+      "response_sha256": "sha256:f7f6e950626917fc810fd62635fe1342f1b24e2eebd00c99118ff49b427f00f4"
+    },
+    {
+      "request_id": "req-0038-model_directive-fcdaba0e",
+      "kind": "model_directive",
+      "request_sha256": "sha256:7305c0caf170dc01f642bc2c57a3ea7c12cfdec361fd1c59f244b94bc1d45dd8",
+      "response_sha256": "sha256:5c854d4ad676f311330b611de6be7ad04c0c9f8dfa891c27dc5ca3fabbd57241"
+    }
+  ],
+  "completed_at": "2026-09-28T17:01:40.085829+00:00"
+}
