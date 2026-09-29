@@ -1,5 +1,15 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-09-29 Fresh Resident A Corrective-003 — PHASE_A_COMPLETE / REVIEW_READY
+
+- Evidence PR #296 exact `317316299c332d82e0cbd0431b5c7d50f391bc17`, tree `a64b60ad1e64bcb930003f030246baafdae3eb8a`, parent `f7bcec4e558ebb4c6a11b7b45afe361cc659ef66`.
+- 212 evidence-only files; no Core/harness/fixture/evaluator/release-source drift.
+- Mechanical final state: cursor 1..13 ACKed; cursor14 absent; release-state 13→14 pending null; World/index 38/38; exchange 21/21 COMPLETE, 63 records, 0 open/unconsumed.
+- Run uses accepted Operator Prep H1 `77dac70e...` and packet SHA `3c2d04c2...`, frozen RC and exact runtime pins.
+- Unique next READY: `C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-INDEPENDENT-ACCEPTANCE`.
+- Persistence/B/C/evaluator remain blocked until fresh A IA + PM integration.
+
+
 ## 2026-09-29 Operator Prep Corrective-003 — IA PASS; Fresh Resident A released
 
 - Accepted Operator Prep candidate PR #292 H2 `42a63ed4416585fc0a02045e0bd5190f32a01a2b`; corrected harness H1 `77dac70e0cf054c3f0fb7d94a66dba221fe7d5de`.
