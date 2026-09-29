@@ -88,11 +88,11 @@ READY_FOR_PM_INTEGRATION
 | Candidate tree / parent | `7cd3dd81345f164cd932094cf7f8c98463a9c2f2` / `2d01ee2a8fe7f74fb8c3f3bf5fe5a94685907260` |
 | Pre-integration live main | `016a2f7db5ed01b41fc614701079c507d2c2c02e` |
 | Merge method | **standard merge commit** (no squash, no rebase — accepted exact SHA ancestry preserved) |
-| Candidate merge SHA | `PENDING_POST_MERGE` |
-| Post-candidate-merge main | `PENDING_POST_MERGE` |
-| Ancestry proof `git merge-base --is-ancestor 19476641… <post-main>` | `PENDING_POST_MERGE` |
+| Candidate merge SHA | `ef679ed5678634833dee20d706fe9dfda03194aa` (GitHub PR merge commit, `mergedAt=2026-09-29T17:28:53Z`, method = merge commit) |
+| Post-candidate-merge main | `ef679ed5678634833dee20d706fe9dfda03194aa` |
+| Ancestry proof `git merge-base --is-ancestor 19476641… <post-main>` | **PASS** (verified on `ef679ed5678634833dee20d706fe9dfda03194aa`; merge commit parents = `016a2f7db…` + `19476641be…`, tree = `7cd3dd81345f164cd932094cf7f8c98463a9c2f2`) |
 | Review branch | `review/c15-persistence-c003-ia` @ `111a25d1f0822bc2b37557aa2364a4030d267082` — **remains unmerged, review-only evidence, DO NOT MERGE forever** |
-| Review-not-in-main proof | `git merge-base --is-ancestor 111a25d1… <post-main>` must be FALSE — `PENDING_POST_MERGE` |
+| Review-not-in-main proof | `git merge-base --is-ancestor 111a25d1… <post-main>` **FALSE** — verified: `git merge-base --is-ancestor 111a25d1… ef679ed5678634833dee20d706fe9dfda03194aa` = NOT_CONTAINS |
 | IA comment | `5895090982` (`ACCEPTANCE_PASS / blocker=0 / READY_FOR_PM_INTEGRATION`) |
 
 ## 8. Downstream sequencing adjudication (re-adjudicated fresh)
@@ -154,7 +154,7 @@ Status: DONE
 WINDOW: 06
 Started from main: 016a2f7db5ed01b41fc614701079c507d2c2c02e
 Work branch: arena/01a0ee30-haneof-aios-core-v3-0 (session-fixed PM branch)
-Candidate SHA: 19476641be95e666068e6299f42df9a411f4c0ba (PR #299 — merged via standard merge commit; merge SHA PENDING_POST_MERGE)
+Candidate SHA: 19476641be95e666068e6299f42df9a411f4c0ba (PR #299 — merged via standard merge commit; merge SHA ef679ed5678634833dee20d706fe9dfda03194aa)
 Accepted review SHA: 111a25d1f0822bc2b37557aa2364a4030d267082 (review/c15-persistence-c003-ia — NOT merged, not in main)
 IA verdict: ACCEPTANCE_PASS / blocker=0 / PM_INTEGRATED
 PR: governance-only PM integration PR (this change, Phase D)
