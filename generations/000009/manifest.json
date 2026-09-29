@@ -1,0 +1,15 @@
+{
+  "artifacts": {
+    "binding/current-event-binding.json": "011484611f05ff06981dc453d8550fad032306f2686a2c91127a2e86dbbca591",
+    "current-event.json": "8e17bedeb11be50ee680d87aa7326533450c6b79382d4600561b6c8e6b448fa8",
+    "exchange/ledger.jsonl": "12908923331ada6c6e5401b7563ac64d5645c803ea2bfa638e12f76a241d0214",
+    "release-state.json": "f1381f9ca7d02d2c72e0084109fd8f4904441c42654349bfc54a441ef5e478eb",
+    "run/RUN_IDENTITY.json": "c95a230f4f32dad7982391c4d983f298f8975dc61d420165ed7aa61f39e8ffa6",
+    "world/c15-res-b-003.world.search.sqlite": "56d369d87a7d5da647e6bfdda0a629df9e52c49be9ae4b52bf195171e042db62",
+    "world/c15-res-b-003.world.sqlite": "59107c186318dbbc367307285b4c6fd8bcc2a31204d80345a6ffff3b27be01ec"
+  },
+  "generation": 9,
+  "label": "K3_TRUSTED_RETURN_DURABLE+K4_CONTINUATION_APPLIED",
+  "manifest_sha256": "b8b4b9d06da9d4d571164cdde21decb1024631b7e394a2906e835240d0cdffb7",
+  "sealed_at_epoch": 1790711672.3659549
+}

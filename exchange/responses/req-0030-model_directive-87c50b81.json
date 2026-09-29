@@ -1,0 +1,29 @@
+{
+  "authored_by": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+  "directive": {
+    "capability_calls": [
+      {
+        "arguments": {
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_68e371fce8d6987083f456b8",
+              "revision": 1
+            }
+          ],
+          "new_state": "running",
+          "reason": "Work on the staging conflict starts now so the fix lands before tonight's regression run.",
+          "task_ref": {
+            "object_id": "task_ad50fd6fb9fbd3de189b1d77",
+            "revision": 2
+          }
+        },
+        "call_id": "req-0030:c0",
+        "name": "transition_task"
+      }
+    ],
+    "silence": false
+  },
+  "request_id": "req-0030-model_directive-87c50b81",
+  "request_sha256": "c3cc1cf84e0271d53098a271a5dfd329a6c92bb656f662d5573e396012c68cb9",
+  "response_version": 1
+}

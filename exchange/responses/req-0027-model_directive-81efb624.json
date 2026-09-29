@@ -1,0 +1,34 @@
+{
+  "authored_by": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+  "directive": {
+    "capability_calls": [
+      {
+        "arguments": {
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_68e371fce8d6987083f456b8",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_c14_fixture_4c492ea152d135960e96c2d1",
+              "revision": 1
+            }
+          ],
+          "new_state": "active",
+          "next_step": "Before tonight's regression: identify the blocked regression job and the leftover test index holding the orders-shadow name; rename/delete the stale test index, re-run the blocked regression, and report outcome per the results-and-key-risks policy (staging-only; production unaffected).",
+          "reason": "User explicitly asked to resolve the staging conflict before tonight's regression run; prioritized from review tracking to active work.",
+          "task_ref": {
+            "object_id": "task_ad50fd6fb9fbd3de189b1d77",
+            "revision": 1
+          }
+        },
+        "call_id": "req-0027:c0",
+        "name": "transition_task"
+      }
+    ],
+    "silence": false
+  },
+  "request_id": "req-0027-model_directive-81efb624",
+  "request_sha256": "0d2373b47812adb1049b50604e39ad792f5cf106742aae04af7933ad5fd4f35e",
+  "response_version": 1
+}
