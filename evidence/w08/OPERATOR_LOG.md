@@ -167,3 +167,8 @@ continuation → due work → K5 → durable ack → ACKED barriers, with genera
 - Fresh --depth 1 clone of the persistence ref: HEAD == 5692a329 (expected FINAL_FREEZE). generation-head.json + gen48 manifest byte-identical to local cache; 48 generations present; ledger sha fa7895c5 / 129 records; freeze digests 10/10 recomputed PASS; boundary B/22/next23/pending-none; world rev 66; commit message binds run_id+generation=48; committed audit tail = final_freeze, generation_sealed. PR #296 lineage still OPEN @ exact 317316299; live main unchanged e25ec95.
 - Ordering nuance documented: committed freeze MANIFEST lacks final_barrier (barrier seals pre-barrier state); closure = commit message + generation-head sha-pin + audit records. Post-freeze audit artifacts live outside sealed generations by design.
 - Record: run evidence/freeze/W08_INDEPENDENT_VERIFY.json + PR evidence/w08/.
+
+## DEEP CHAIN VERIFICATION 2026-09-30 (third pass, fresh clone)
+
+- Full generation walk 1..48: 287/287 artifact hashes re-verified, 48/48 manifest self-digests pass, all 8 barrier label types present. Three-way: 43 attempts (21 review + 22 user) all metered, one-to-one with metering rows incl. record ids; exchange 43/43/43 exact 3-event completion. Per-cursor evidence: 9/9 full base sets; turn_result.json exactly on USER cursors 15/17/19/22. Canonical turns uniformly pinned to fixture 7ccb309d. Gen48 sealed RUN_IDENTITY matches declared identity.
+- Record: run evidence/freeze/W08_DEEP_CHAIN_VERIFY.json + PR evidence/w08/.
