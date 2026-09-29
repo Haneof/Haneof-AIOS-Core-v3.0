@@ -27,6 +27,26 @@ Frozen identity (recomputed from these files):
 | probe source hash list | `778d48e0e6cf9e0c6c04057eab1684e5d4dd0d4b22e621611cf1e0a9b060ae2f` |
 | probe enumeration (48 IDs) | `cc2d805c22a6ffc2683252d6a1b5183d53fceec81275e4f35d0b88be5ae9fab1` |
 
+### Revision 2 (corrected) — see `REVISION_NOTES_v2.md`
+
+Revision 1 executed against the candidate: **39 passed / 9 failed**
+(`raw/reviewer_probes_v1.raw.txt`, sha `18cdf362cb5e5ac09bf240071851ca13fa86cef013ee1a6a6522b495133f064b`). All nine failures were triaged to probe or
+execution-method defects (table in `REVISION_NOTES_v2.md`); no candidate defect was
+concluded from them. Revision 1 sources, freeze and raw results are preserved unchanged.
+
+- `probes_v2/REVIEWER_PROBE_FREEZE_v2.json` — revision-2 identity, execution method
+  (reviewer runtime, `-o pythonpath=`, cwd outside the product repository), per-probe
+  expected outcome, lineage to revision 1.
+- `probes_v2/reviewer_probe_collection_v2.txt` — frozen enumeration, 49 probe node IDs.
+- Revision-2 result: **49 passed / 0 failed, rc=0, 154.31 s**
+  (`raw/reviewer_probes_v2.raw.txt`; enumeration diff empty; no post-run source change,
+  `raw/reviewer_probes_v2_integrity.json`).
+
+| Revision | Probe sources SHA-256 | Enumeration SHA-256 | Result |
+| --- | --- | --- | --- |
+| 1 (`probes/`) | `778d48e0e6cf9e0c6c04057eab1684e5d4dd0d4b22e621611cf1e0a9b060ae2f` | `cc2d805c22a6ffc2683252d6a1b5183d53fceec81275e4f35d0b88be5ae9fab1` | 39/48 passed |
+| 2 (`probes_v2/`) | `a4e8b0e58b9636ba4e41124507da39c2c235b58761111d0c1e4a12ac1f22f47d` | `83d2ab281d6e046e9175437e087f624434d6f5de1d1dc80559b0ec69958d4231` | 49/49 passed |
+
 Rules honored in this review:
 
 1. Expectations were frozen before observing any candidate behavior; no expectation was tuned after
