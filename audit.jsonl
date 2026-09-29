@@ -227,3 +227,11 @@
 {"at_epoch": 1790714829.6715033, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"run_id": "c15-rcc-res-b-rerun-003-60997e04", "session_id": "c15-rcc-res-b-session-003-60997e04"}, "event": "backend_reopened", "pid": 45712}
 {"at_epoch": 1790714829.672431, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"event_id": "c15rcc-020", "next_sequence": 21, "sequence": 20}, "event": "cursor_acked", "pid": 45712}
 {"at_epoch": 1790714829.6969137, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"artifacts": 7, "generation": 37, "label": "DURABLE_ACK"}, "event": "generation_sealed", "pid": 45712}
+{"at_epoch": 1790714831.9846077, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"commit_sha": "79857c7b9f06839be8b990455c9d821c978a1110", "parent_sha": "306a90df1b7219409a2156e25d46cef7a84ffe68", "remote": "origin", "remote_ref": "refs/heads/persistence/c15-rcc-res-b-rerun-003-60997e04", "tree_sha": "af8586c85327a886d8a703a54c78335ae72eeba8"}, "event": "remote_persisted", "pid": 45712}
+{"at_epoch": 1790714832.0428715, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"pid": 45734}, "event": "owner_reclaimed", "pid": 45734}
+{"at_epoch": 1790714832.0956771, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"run_id": "c15-rcc-res-b-rerun-003-60997e04", "session_id": "c15-rcc-res-b-session-003-60997e04"}, "event": "backend_reopened", "pid": 45734}
+{"at_epoch": 1790714832.09664, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"sequence": 20}, "event": "binding_cleared", "pid": 45734}
+{"at_epoch": 1790714839.9254758, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"pid": 45742}, "event": "owner_reclaimed", "pid": 45742}
+{"at_epoch": 1790714839.9784367, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"run_id": "c15-rcc-res-b-rerun-003-60997e04", "session_id": "c15-rcc-res-b-session-003-60997e04"}, "event": "backend_reopened", "pid": 45742}
+{"at_epoch": 1790714839.9795349, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"event_id": "c15rcc-021", "sequence": 21}, "event": "cursor_revealed", "pid": 45742}
+{"at_epoch": 1790714839.9944563, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"artifacts": 4, "generation": 38, "label": "K1_AFTER_REVEAL"}, "event": "generation_sealed", "pid": 45742}
