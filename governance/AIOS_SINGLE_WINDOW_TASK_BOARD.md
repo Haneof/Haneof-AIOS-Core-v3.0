@@ -1,5 +1,16 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 当前控制入口 — 2026-09-29 FRESH RESIDENT A CORRECTIVE-003 REVIEW_READY / IA READY
+
+- **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003 = PHASE_A_COMPLETE / REVIEW_READY`**. Evidence PR #296 remains **OPEN / UNMERGED / EVIDENCE-ONLY** at exact head `317316299c332d82e0cbd0431b5c7d50f391bc17`, tree `a64b60ad1e64bcb930003f030246baafdae3eb8a`, sole parent `f7bcec4e558ebb4c6a11b7b45afe361cc659ef66`.
+- PM mechanical readiness: 212 changed files, all within the new Resident evidence package; cursor 1..13 event/ingest/ACK evidence present; no cursor14 event; release-state last_ack=13 / next=14 / pending=null; World/index = 38/38; exchange = COMPLETE 21/21, 63 records, 0 unconsumed/open; package SHA256SUMS covers 211 remaining files; mechanical CI gate green.
+- Run pins frozen RC `f20f2ed...` / Core `9adcbe...` / tests `7e33b5...`, accepted harness H1 `77dac70e...`, packet SHA `3c2d04c2...`, and exact runtime 3.12.14 / Pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.45.1 / OpenSSL 3.0.13.
+- PM readiness does **not** accept semantic authenticity, clean-room contamination absence, temporal/future isolation, due-work completeness, or cognition quality. Those are binding IA responsibilities.
+- **唯一下一 READY：`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-INDEPENDENT-ACCEPTANCE = READY`**. Binding prompt: `governance/prompts/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29.md`.
+- IA must independently verify Resident-authored semantics, no prior/future leakage, all 21 exchange chains, cursor/ACK chronology, Wake/Review/Summary completeness, World/index provenance/coherence, final restart, checksum/freeze integrity, and cursor14 not revealed.
+- Persistence Corrective-003, Resident B/C, evaluator and C15 close remain **BLOCKED_ON_FRESH_RESIDENT_A_ACCEPTANCE**.
+
+
 ## 当前控制入口 — 2026-09-29 OPERATOR-PREP CORRECTIVE-003 IA PASS / FRESH RESIDENT A READY
 
 - **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-003 = ACCEPTANCE_PASS / blocker=0 / ACCEPTED_EXACT`**. Accepted candidate PR #292 final H2 = `42a63ed4416585fc0a02045e0bd5190f32a01a2b` (tree `80440bdd70aa658053bc5bf33a902c46cd7138e0`), corrected harness H1 = `77dac70e0cf054c3f0fb7d94a66dba221fe7d5de` (tree `52aa366bc6548e86e805585baddbc0470cb69660`). Fresh IA review-only PR #294 exact = `30955cc7065d0d66cf4de43f833f1b1f9162b635` → `ACCEPTANCE_PASS / blocker=0`.
