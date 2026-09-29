@@ -1,0 +1,18 @@
+# C4–C9 probe freeze v1
+
+All candidate expectations: PASS (negative attacks must fail closed). Each parameterized node is an independent assertion; no xfail or skips. 103 nodes, enumerated by pytest 8.4.2 in COLLECT_ONLY.txt. Collection only uses host CPython 3.11.2 with separately installed pytest, imports no candidate code, and is not binding execution. All binding executions require CPython 3.12.14, Pydantic 2.13.5, pytest 8.4.2, SQLite 3.45.1, OpenSSL 3.0.13 enforced in a session fixture.
+
+Baseline source: exact #286 H2 c32e544b747cb1f1d9b7418e2163a65ac55ee39c. Source package/bootstrap/wheel lock must remain byte-identical. A scratch archive with copied Git object database will be used for the historical candidate; no branch checkout/switch or historical ref modification. Initial exact baseline bootstrap provisions the execution interpreter only AFTER this freeze. Final clean corrected bootstrap is separate and later.
+
+C4: different snapshot open/durable; multiple open/durable/mixed recovery; legal open/durable resume with single serialization; missing/tampered durable request. Assert pre-wait rejection, never treating response timeout as binding success.
+C5: mutation/deletion/validly rechained duplicate events/order/digest discontinuity/torn/JSON/sequence, crossed with six operational paths. Valid chain positive control and duplicate append refusal. No claim of detecting complete-record tail truncation without external head anchor.
+C6: actual bootstrap command against disposable source copies; good identity; wrong root; missing metadata; empty valid Git database lacking frozen object; Core/tests mutation; foreign imported module; shared sorted manifest. No Core/product-test edits in the real checkout. Runtime verification attacks use copied trees.
+C7: observed library-version fault injection through test-only sitecustomize, including exact positive controls; actual LD_PRELOAD of wrong system SQLite. Test hook is not a runtime feature or evidence of a real environment. No wheel trust-root mutation.
+C8: packet exact four approved inputs; independent audit acceptance/rejection controls.
+C9: real frozen HeadlessCore SAFETY Wake in disposable synthetic World; model handler exclusively external exchange; test-only terminal responder under probes/tests/synthetic; durable publish/response/consume and completion evidence. No real fixture, release state, Resident or phase event.
+
+Anticipated historical outcomes: C4 mismatch/ambiguity/file attacks RED, legal matching controls PASS; C5 integrity attacks mostly RED, preexisting torn/JSON protections PASS, valid control PASS; C6 working-tree/import/manifest attacks RED (missing object already rejected; missing-root import may already reject); C7 mismatches RED, exact versions PASS; C8 packet and missing/extra-input audit RED, approved audit control PASS; C9 missing entrypoint RED, no-semantic scanner PASS. These are predictions, not observed results; EXPECTED_OUTCOMES.json pins required candidate outcomes and predicted group-level RED.
+
+Protocol clarification for C4: historical ledger request_sha256 is the SHA of the entire durable request envelope including timestamp, not the serialized snapshot body. Preserve that existing file-integrity/response binding. Verify exact file against ledger first, then compare canonical body bytes AND SHA with current serialized snapshot. Comparing the full-file digest directly to the body digest would reject every legal resume. Derived body hash adds no new truth store.
+
+On probe bug: never overwrite this revision after freezing; retain it and its outputs and create a new version before executing the correction. No expected outcome weakening.

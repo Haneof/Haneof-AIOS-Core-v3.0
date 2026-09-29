@@ -1,0 +1,72 @@
+{
+  "blocker_statuses": {
+    "C1_IA_OP_001": "RED",
+    "C2_IA_OP_002": "RED",
+    "C3_IA_OP_003": "RED"
+  },
+  "c1_observed": {
+    "changed_replay_fail_closed": true,
+    "intact_idempotent_replay": true,
+    "missing_publish_fail_closed": false,
+    "tampered_consume_fail_closed": true,
+    "tampered_publish_fail_closed": false
+  },
+  "c3_gate_counts": {
+    "A": {
+      "execution_total": 19,
+      "frozen_ids_match": true,
+      "node_ids": 19,
+      "pytest_reported": 19,
+      "result_test_count": 0
+    },
+    "B": {
+      "execution_total": 7,
+      "frozen_ids_match": true,
+      "node_ids": 7,
+      "pytest_reported": 7,
+      "result_test_count": 0
+    },
+    "C": {
+      "execution_total": 2,
+      "frozen_ids_match": true,
+      "node_ids": 2,
+      "pytest_reported": 2,
+      "result_test_count": 0
+    },
+    "D": {
+      "execution_total": 5,
+      "frozen_ids_match": true,
+      "node_ids": 5,
+      "pytest_reported": 5,
+      "result_test_count": 0
+    }
+  },
+  "candidate": {
+    "classification": "HISTORICAL_FAILED_EXACT / IMMUTABLE",
+    "head": "10901d467679b70437ae112747eab81f889fd5cb",
+    "parent": "abb8b435e5187c7c6c2f4332aea37cd805b4a53c",
+    "pr": 281,
+    "tree": "db79761216529cf83f217ab00c937bc79806a510"
+  },
+  "exit_code": 1,
+  "notes": "RED reproduced against exact historical failed #281. The probe source, source SHA, exact expected node-ID lists and expected outcomes were frozen before this execution. No candidate files were consulted during baseline probe execution; no historical exact was modified.",
+  "overall_status": "RED",
+  "preserved_probe_revisions": [
+    "v1",
+    "v2",
+    "v3",
+    "v4"
+  ],
+  "probe_freeze_sha256": "de6249e89b64db96c8ad96d704c20f3b43c61fc4b1e43c35ef7a2a17b4813cea",
+  "probe_mode": "historical",
+  "probe_revision": "v5",
+  "probe_source_sha256": "7a5069744b38fec09a4010015826f683fa670e7e415f6067331b57bc339f2004",
+  "raw_output_sha256": "2711203c9983239c1db0b7a2b8c194f13b9037a77dc1bba725454babaf11624d",
+  "result_json_sha256": "2711203c9983239c1db0b7a2b8c194f13b9037a77dc1bba725454babaf11624d",
+  "review": {
+    "head": "e3394da5d607e34c0286c16a11837ac7ea173a56",
+    "pr": 283,
+    "verdict": "ACCEPTANCE_FAIL / blocker=3"
+  },
+  "run_id": "baseline-red-v5-10901d467679b70437ae112747eab81f889fd5cb"
+}

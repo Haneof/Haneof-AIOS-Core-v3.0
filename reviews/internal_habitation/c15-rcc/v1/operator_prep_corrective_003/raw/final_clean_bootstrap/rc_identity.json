@@ -1,0 +1,38 @@
+{
+  "ok": true,
+  "repo_root": "/home/user/Haneof-AIOS-Core-v3.0",
+  "checks": {
+    "software_object_is_commit": true,
+    "repository_tree_matches": true,
+    "core_tree_matches": true,
+    "tests_tree_matches": true,
+    "head_core_tree_matches_frozen": true,
+    "head_tests_tree_matches_frozen": true,
+    "no_src_drift_from_frozen_software": true,
+    "no_tests_drift_from_frozen_software": true,
+    "git_metadata_readable": true,
+    "repo_is_exact_toplevel": true,
+    "core_working_bytes_match": true,
+    "tests_working_bytes_match": true
+  },
+  "observed": {
+    "software_object_type": "commit",
+    "repository_tree": "1ac3a675b884167d3a29aa432e7ef3eaff94d404",
+    "core_tree": "9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623",
+    "tests_tree": "7e33b5ef8432370234965d3ccd61248c703c4019",
+    "head": "77dac70e0cf054c3f0fb7d94a66dba221fe7d5de",
+    "head_core_tree": "9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623",
+    "head_tests_tree": "7e33b5ef8432370234965d3ccd61248c703c4019",
+    "src_drift": "",
+    "tests_drift": "",
+    "core_content_manifest_sha256": "220718d6b5a2650b5e4263bbe8b7e661444cb33b486a7ecd7b5ad3d7d3399caa",
+    "tests_content_manifest_sha256": "84b922ba0dfe1e80e0854d5edf94907b785baba851ef4528e669b95cf6526929"
+  },
+  "expected": {
+    "software": "f20f2edfa7af00d0286493fd15196ca9503bc315",
+    "repository_tree": "1ac3a675b884167d3a29aa432e7ef3eaff94d404",
+    "core_tree": "9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623",
+    "tests_tree": "7e33b5ef8432370234965d3ccd61248c703c4019"
+  },
+  "generated_utc": "2026-09-29T09:36:23.993249+00:00"
+}

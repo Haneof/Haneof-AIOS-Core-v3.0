@@ -1,0 +1,25 @@
+{
+  "artifacts": {
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/RESIDENT_SAFE_LAUNCH_PACKET.json": "f6b61c33dc41d20438ab1b56bd1c8f2e46fcf6593532f3793c3c51ee7fbf7cdc",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/FREEZE_MANIFEST.json": "cd688d223b98fce583bc5aaedeb13242da33f3d749132a68461bb8e5fc3a83f6",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/SHA256SUMS": "5b4a985f8fac6d1dcab932f3860b7ee1fd263d081a15bc5eea597b7cb44741dd",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/c1_c3_regression.json": "416ebb9f51a128c8818fa6a4ef7400689ae1717629316b55a4c81248907ff299",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/clean_bootstrap_manifest.json": "190c76e01d13edc1165c68b9c705bcc8f1ca0a14ecedba098b1c03ba10990c85",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/corrective_candidate_green.json": "a949e2b1144ddd4d74995a55bfb7daa9891b64e045b85eab188a989e506865a0",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/rc_identity.json": "7771ddff09022d1b51b880ac2d2641aa0242f9810fc4c622a8cd6a323743286a",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/evidence/resident_safe_packet_audit.json": "ca9142a6bc06c26c19a8365eccbdbc5916bdd141c1fce89c7c905f45ef3062f1",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/BASELINE_RED.v2.json": "f33f472b1b40cff1d1fd2d69d301b1d2cee6ca88c2fcfcf03a84debc697e3781",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/COMPLETION_REPORT.md": "17770e71d9132846410a1d7dda67879103e19196d018f2cc210026718cf68d80",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/FINAL_PACKET_AUDIT.json": "51d4ef1b47ec91ba7e9761fcb7b28485ca58a2c202ac7b649ee0cb8f77b0037d",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/H1_CANDIDATE_IDENTITY.json": "757245b05e10d46192240ca9f01769a61f51c84d1a60edb5e4c88ca1e4c8fdef",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_002/probes_v2/PROBE_FREEZE.v2.json": "a0813c69f588db67e0c78f9d44dc74834990926038d5a0c0a03b097aa8d6c460"
+  },
+  "candidate_head": "63c972ad7a19671cbdf809177f7a552aa2c2ecc6",
+  "checksum_scope": "Q/SHA256SUMS covers every file in Q except itself; P/evidence/SHA256SUMS covers every package file except itself. Neither claims to hash itself.",
+  "core_product_test_drift": false,
+  "final_freeze_commit_rule": "sole_parent_equals_candidate_head; final SHA/tree in PR",
+  "next": "READY_FOR_INDEPENDENT_ACCEPTANCE",
+  "no_real_resident": true,
+  "status": "OPERATOR_PREP_CORRECTIVE_002_COMPLETE / REVIEW_READY",
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-002"
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "request_id": "req-0001-model_directive-a01674b2",
+    "sequence": 1,
+    "path": "/home/user/.cache/c003/integration-iteration-02/exchange/requests/req-0001-model_directive-a01674b2.json",
+    "request_sha256": "cf5ac10cee3c329317ab8f0af11cb3d2f48a3f6c34a806df3c1d6eefc6515081",
+    "bytes": 1362,
+    "wall_clock": "2026-09-29T09:29:17.769931Z",
+    "kind": "model_directive",
+    "idempotent_replay": false
+  },
+  {
+    "request_id": "req-0002-model_directive-86fc4849",
+    "sequence": 2,
+    "path": "/home/user/.cache/c003/integration-iteration-02/exchange/requests/req-0002-model_directive-86fc4849.json",
+    "request_sha256": "1170b7aa58526011597ec2092ea5589d719144e2be4d131b571affac1821151d",
+    "bytes": 1362,
+    "wall_clock": "2026-09-29T09:29:17.773314Z",
+    "kind": "model_directive",
+    "idempotent_replay": false
+  }
+]

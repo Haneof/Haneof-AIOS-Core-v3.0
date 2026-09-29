@@ -1,0 +1,4 @@
+new_absent_root_precondition_command=test ! -e /home/user/.cache/c003/final-runtime-001
+precondition_exit_code=0
+corrected_h1=77dac70e0cf054c3f0fb7d94a66dba221fe7d5de
+final_bootstrap_script=exact carried #288 sha-pinned script
