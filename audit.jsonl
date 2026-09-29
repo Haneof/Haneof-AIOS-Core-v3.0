@@ -1,0 +1,22 @@
+{"at_epoch": 1790710385.0216138, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"run_id": "c15-rcc-res-b-rerun-003-60997e04", "session_id": "c15-rcc-res-b-session-003-60997e04"}, "event": "backend_created", "pid": 32532}
+{"at_epoch": 1790710446.6825085, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"pid": 32551}, "event": "owner_reclaimed", "pid": 32551}
+{"at_epoch": 1790710446.6841202, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"run_id": "c15-rcc-res-b-rerun-003-60997e04", "session_id": "c15-rcc-res-b-session-003-60997e04"}, "event": "backend_reopened", "pid": 32551}
+{"at_epoch": 1790710446.684872, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"note": "same identity, no remote barrier yet"}, "event": "startup_resumed_after_local_driver_fix", "pid": 32551}
+{"at_epoch": 1790710447.2721872, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"pid": 32551}, "event": "owner_reclaimed", "pid": 32551}
+{"at_epoch": 1790710447.2730243, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"run_id": "c15-rcc-res-b-rerun-003-60997e04", "session_id": "c15-rcc-res-b-session-003-60997e04"}, "event": "backend_reopened", "pid": 32551}
+{"at_epoch": 1790710536.4509466, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"pid": 32585}, "event": "owner_reclaimed", "pid": 32585}
+{"at_epoch": 1790710536.4522488, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"run_id": "c15-rcc-res-b-rerun-003-60997e04", "session_id": "c15-rcc-res-b-session-003-60997e04"}, "event": "backend_reopened", "pid": 32585}
+{"at_epoch": 1790710536.4530506, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"note": "same identity, no remote barrier yet"}, "event": "startup_resumed_after_local_driver_fix", "pid": 32585}
+{"at_epoch": 1790710536.9992876, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"pid": 32585}, "event": "owner_reclaimed", "pid": 32585}
+{"at_epoch": 1790710537.0002255, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"run_id": "c15-rcc-res-b-rerun-003-60997e04", "session_id": "c15-rcc-res-b-session-003-60997e04"}, "event": "backend_reopened", "pid": 32585}
+{"at_epoch": 1790710546.5906043, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"pid": 32594}, "event": "owner_reclaimed", "pid": 32594}
+{"at_epoch": 1790710546.59182, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"run_id": "c15-rcc-res-b-rerun-003-60997e04", "session_id": "c15-rcc-res-b-session-003-60997e04"}, "event": "backend_reopened", "pid": 32594}
+{"at_epoch": 1790710546.5925415, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"note": "same identity, no remote barrier yet"}, "event": "startup_resumed_after_local_driver_fix", "pid": 32594}
+{"at_epoch": 1790710547.1868777, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"pid": 32594}, "event": "owner_reclaimed", "pid": 32594}
+{"at_epoch": 1790710547.1878614, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"run_id": "c15-rcc-res-b-rerun-003-60997e04", "session_id": "c15-rcc-res-b-session-003-60997e04"}, "event": "backend_reopened", "pid": 32594}
+{"at_epoch": 1790710563.7792087, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"pid": 32605}, "event": "owner_reclaimed", "pid": 32605}
+{"at_epoch": 1790710563.7804356, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"run_id": "c15-rcc-res-b-rerun-003-60997e04", "session_id": "c15-rcc-res-b-session-003-60997e04"}, "event": "backend_reopened", "pid": 32605}
+{"at_epoch": 1790710563.7810285, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"note": "same identity, no remote barrier yet"}, "event": "startup_resumed_after_local_driver_fix", "pid": 32605}
+{"at_epoch": 1790710564.324537, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"pid": 32605}, "event": "owner_reclaimed", "pid": 32605}
+{"at_epoch": 1790710564.3253822, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"run_id": "c15-rcc-res-b-rerun-003-60997e04", "session_id": "c15-rcc-res-b-session-003-60997e04"}, "event": "backend_reopened", "pid": 32605}
+{"at_epoch": 1790710564.3687737, "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "detail": {"artifacts": 5, "generation": 1, "label": "INITIAL"}, "event": "generation_sealed", "pid": 32605}

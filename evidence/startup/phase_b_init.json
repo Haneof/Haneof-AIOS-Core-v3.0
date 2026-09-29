@@ -1,0 +1,11 @@
+{
+  "operator_stdout": "(resume: phase B initialized earlier in this window)",
+  "post_init_boundary": {
+    "active_phase": "B",
+    "last_acked_sequence": 13,
+    "next_sequence": 14,
+    "pending_reveal": null
+  },
+  "post_init_release_state_sha256": "5404a74ced54932034bdd572d7b68c50cb448994de5cece3b91115ec7680569f",
+  "pre_init_release_state_sha256": "6b90fc7a09bce7d575dbcb783dcbe838cab81c2e358515adbb5dca9731f57c37"
+}

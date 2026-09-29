@@ -1,0 +1,21 @@
+{
+  "adjudication": "LINEAGE_PIN_MATCH_PROVEN_AT_MATERIALIZATION; run-root world is B's live private World from first legal open onward; no data divergence; run continues under same identity per run-state discipline",
+  "diff_byte_count": 2,
+  "diff_meaning": "offset 27 = file change counter (0xa0->0xa2), offset 95 = sqlite version-valid-for number; data pages identical",
+  "diff_offsets": [
+    27,
+    95
+  ],
+  "finding": "world.sqlite header-only drift after first legal Core connection during boundary verification",
+  "index_file": "zero byte drift; still exact pin 79c877a4...",
+  "logical_equivalence": {
+    "table_row_counts_equal": true
+  },
+  "observed_after_open": "774ae226b056ce16bc681e7ee4d249c26dac1bcdfd81a0334346b846f771de66",
+  "pin_at_materialization": {
+    "evidence": "startup-exec.log final_path_hashes EXACT_MATCH (pre-open)",
+    "sha256": "0d6970ed99367a456e4baa29092bde8f15bc7544496095cc87ad9f029e2603b2"
+  },
+  "resume_expected_world_sha256": "774ae226b056ce16bc681e7ee4d249c26dac1bcdfd81a0334346b846f771de66",
+  "root_cause": "SQLiteWorldStore._connection() runs PRAGMA journal_mode=WAL + idempotent DDL script per open (accepted frozen Core behavior); first open of the A-lineage file inside the B run root bumps the WAL change counter"
+}
