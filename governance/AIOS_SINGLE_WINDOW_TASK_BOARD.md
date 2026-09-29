@@ -1,5 +1,18 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 当前控制入口 — 2026-09-29 OPERATOR-PREP CORRECTIVE-002 IA FAIL / CORRECTIVE-003 READY
+
+- **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-002 = ACCEPTANCE_FAIL / blocker=2 / HISTORICAL_FAILED_EXACT`**. Failed candidate PR #288 final freeze H2 = `771b200c33dbd6055b1d209935f8e1552f13090f` (tree `071b51c5fb37dc59fc8941dee2182637b9f87daa`), corrected H1 = `63c972ad7a19671cbdf809177f7a552aa2c2ecc6`. Fresh IA review-only PR #290 exact = `39408137edf77976d0c4833fcde551891d5d081a`, verdict `ACCEPTANCE_FAIL / blocker=2`.
+- Binding blocker `IA288-01`: concurrent independent exchange writers can both return success while allocating from the same ledger prefix and leave an invalid non-monotonic hash chain. Successful mutation must be serialized by an enforceable cross-object/process single-writer transaction boundary.
+- Binding blocker `IA288-02`: required directory fsync/open failures are converted to false/ignored, allowing request/ledger publication success after a failed durability primitive. Directory durability failures must propagate fail-closed, including retry/recovery semantics.
+- Review #290 independently reproduced the exact pinned runtime, Gates A/B/C/D = 24/7/2/5 PASS, and Corrective-002 C4-C9 = 103 PASS. Therefore the two blockers are additional defects, not environment/setup failures.
+- Reviewer supplemental request-file-mutation observation remains non-blocking hardening in this adjudication; no semantic cross-binding through the approved runner was demonstrated.
+- **唯一下一 READY：`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-003 = READY`**. Binding prompt: `governance/prompts/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_2026-09-29.md`.
+- Corrective-003 must preserve all C1-C9 GREEN evidence, freeze targeted C10/C11 probes and reproduce RED against exact #288 before implementation, then repair only concurrency linearization and fail-closed directory durability, rerun full gates/bootstrap and publish a new evidence-only candidate.
+- `C15-RCC-RES-A-RERUN-004-CORRECTIVE-003` remains **BLOCKED_ON_OPERATOR_PREP**. No real Resident release/run is authorized.
+- Persistence Corrective-003, Resident B/C, evaluator and C15 close remain **BLOCKED**.
+
+
 ## 当前控制入口 — 2026-09-29 OPERATOR-PREP CORRECTIVE-002 REVIEW_READY / FRESH IA READY
 
 - **`C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-002 = OPERATOR_PREP_CORRECTIVE_002_COMPLETE / REVIEW_READY`**. Candidate PR #288 remains **OPEN / UNMERGED / EVIDENCE-ONLY** at final freeze H2 `771b200c33dbd6055b1d209935f8e1552f13090f` (tree `071b51c5fb37dc59fc8941dee2182637b9f87daa`), sole parent/corrected H1 `63c972ad7a19671cbdf809177f7a552aa2c2ecc6` (tree `8cd4a2d8b4cdf1f85699c5d78166f774741b420b`), H1 parent genuine RED freeze `8e34fba00edf4fdb5b80f04d7a648f6b5bb8c40e`.
