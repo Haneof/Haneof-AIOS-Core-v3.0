@@ -1,0 +1,9 @@
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b1_runtime_snapshot_with_empty_capability_history
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b2_successful_capability_result_serializes
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b3_failed_capability_result_serializes
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b4_multiple_capability_results_distinct_fields
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b5_no_nonexistent_fields_are_referenced
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b6_frozen_capability_result_surface_is_exactly_six_fields
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b7_runner_serializer_round_trips_real_directive
+
+7 tests collected in 0.51s
