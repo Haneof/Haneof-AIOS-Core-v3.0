@@ -1,0 +1,10 @@
+# CI annotation hook self-test — 2026-09-29T16:08:25Z
+
+$ GITHUB_ACTIONS=true pytest -o addopts='' -q tests/c15_persistence/test_zz_hookselftest.py
+::error title=pytest failure::tests/c15_persistence/test_zz_hookselftest.py::test_zz_deliberate_failure ::  | tests/c15_persistence/test_zz_hookselftest.py:2: AssertionError
+::error title=pytest failure count::1
+1 failed in 0.01s
+
+$ pytest -o addopts='' -q tests/c15_persistence/test_zz_hookselftest.py   # no CI env
+1 failed in 0.01s
+(no ::error lines above = hook is CI-only)

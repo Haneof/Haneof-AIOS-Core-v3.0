@@ -1,0 +1,22 @@
+.FFFFFF.FFF..................                                            [100%]
+=================================== FAILURES ===================================
+/tmp/c003-baseline/tests/c15_persistence/test_corrective_003_binding_blockers.py:320: AssertionError: expected authoritative-failure exit 43, got 2
+/tmp/c003-baseline/tests/c15_persistence/test_corrective_003_binding_blockers.py:389: AssertionError: usage: probe_cli.py [-h] --root ROOT --run-id RUN_ID --session-id SESSION_ID
+/tmp/c003-baseline/tests/c15_persistence/test_corrective_003_binding_blockers.py:460: AssertionError: stderr=usage: probe_cli.py [-h] --root ROOT --run-id RUN_ID --session-id SESSION_ID
+/tmp/c003-baseline/tests/c15_persistence/test_corrective_003_binding_blockers.py:509: AssertionError: expected SIGKILL at the trusted-return barrier, got 2
+/tmp/c003-baseline/tests/c15_persistence/test_corrective_003_binding_blockers.py:565: AssertionError: expected SIGKILL at later-round trusted return, got 2
+/tmp/c003-baseline/tests/c15_persistence/test_corrective_003_binding_blockers.py:648: AssertionError: expected fail-closed exit 42, got 1
+/tmp/c003-baseline/tests/c15_persistence/test_corrective_003_binding_blockers.py:784: AssertionError: the last published barrier must be the authenticated provider return
+/tmp/c003-baseline/tests/c15_persistence/test_corrective_003_binding_blockers.py:847: AssertionError: usage: probe_cli.py [-h] --root ROOT --run-id RUN_ID --session-id SESSION_ID
+/tmp/c003-baseline/tests/c15_persistence/test_corrective_003_binding_blockers.py:921: AssertionError: usage: probe_cli.py [-h] --root ROOT --run-id RUN_ID --session-id SESSION_ID
+=========================== short test summary info ============================
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_001_b_k4_authoritative_failure_hard_stops_before_progress
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_001_c_k4_failure_restart_recovers_from_authoritative_state_once
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_001_d_ack_barrier_failure_never_acks_the_cursor
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_a_k3_trusted_return_first_round_remote_only_converges
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_b_k3_trusted_return_later_round_remote_only_converges
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_c_k3_dispatch_only_later_round_hard_stops_without_redispatch
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_e_k5_prepush_crash_recovers_from_prior_authoritative_barrier
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_f_changed_trusted_return_bytes_under_same_identity_fail_closed
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_g_changed_relay_journal_reply_bytes_fail_closed
+pytest_exit=1

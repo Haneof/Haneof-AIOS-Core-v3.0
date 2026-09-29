@@ -1,0 +1,210 @@
+...F....F......F......F.....FFFFFFFFFFFFF...........F....F               [100%]
+=================================== FAILURES ===================================
+________________________ test_kill_point_converges[K4] _________________________
+tests/c15_persistence/killpoints/test_killpoints.py:65: in test_kill_point_converges
+    outcome = run_kill_point(entry["kill_point"])
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/c15_persistence/killpoints/harness.py:166: in run_kill_point
+    outcome = parse(resumed)
+              ^^^^^^^^^^^^^^
+tests/c15_persistence/killpoints/harness.py:113: in parse
+    raise AssertionError(
+E   AssertionError: probe command failed
+E   returncode=1
+E   stdout:
+E   
+E   stderr:
+E   Traceback (most recent call last):
+E     File "<frozen runpy>", line 198, in _run_module_as_main
+E     File "<frozen runpy>", line 88, in _run_code
+E     File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 117, in <module>
+E       raise SystemExit(main())
+E                        ^^^^^^
+E     File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 67, in main
+E       outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)
+E                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1192, in resume
+E       return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)
+E              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1183, in process_one_cursor
+E       turn = self.run_turn(projection)
+E              ^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1093, in run_turn
+E       recovery_actions = self._recover_with_core(projection)
+E                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1017, in _recover_with_core
+E       raise BackendError(
+E   tools.c15_persistence.backend.BackendError: Core trusted-return recovery did not stage the exact provider response
+_ test_k1_k5_survive_total_local_cache_loss_from_remote_only[K4_AFTER_REPLY_AUTHENTICATED] _
+tests/c15_persistence/test_corrective_002_remote_durability.py:159: in test_k1_k5_survive_total_local_cache_loss_from_remote_only
+    assert resumed.returncode == 0, (
+E   AssertionError: K4_AFTER_REPLY_AUTHENTICATED: remote-only recovery failed
+E     stdout=
+E     stderr=Traceback (most recent call last):
+E       File "<frozen runpy>", line 198, in _run_module_as_main
+E       File "<frozen runpy>", line 88, in _run_code
+E       File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 117, in <module>
+E         raise SystemExit(main())
+E                          ^^^^^^
+E       File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 78, in main
+E         outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)
+E                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1192, in resume
+E         return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1183, in process_one_cursor
+E         turn = self.run_turn(projection)
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1093, in run_turn
+E         recovery_actions = self._recover_with_core(projection)
+E                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1017, in _recover_with_core
+E         raise BackendError(
+E     tools.c15_persistence.backend.BackendError: Core trusted-return recovery did not stage the exact provider response
+E     
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=['/home/user/Haneof-AIOS-Core-v3.0/.venv/bin/python', '-m', 'tools.c15_persistence.probe_cli', '...ntools.c15_persistence.backend.BackendError: Core trusted-return recovery did not stage the exact provider response\n').returncode
+__________ test_second_round_k3_survives_total_local_loss_remote_only __________
+tests/c15_persistence/test_corrective_003_regressions.py:188: in test_second_round_k3_survives_total_local_loss_remote_only
+    assert resumed.returncode == 0, (
+E   AssertionError: round-1 K3 remote recovery failed
+E     stdout=
+E     stderr=Traceback (most recent call last):
+E       File "<frozen runpy>", line 198, in _run_module_as_main
+E       File "<frozen runpy>", line 88, in _run_code
+E       File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 117, in <module>
+E         raise SystemExit(main())
+E                          ^^^^^^
+E       File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 78, in main
+E         outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)
+E                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1192, in resume
+E         return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1183, in process_one_cursor
+E         turn = self.run_turn(projection)
+E                ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1093, in run_turn
+E         recovery_actions = self._recover_with_core(projection)
+E                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       File "/home/user/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 984, in _recover_with_core
+E         self.runtime.stage_trusted_returned_background_response(
+E         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     AttributeError: 'FusedTurnRuntime' object has no attribute 'stage_trusted_returned_background_response'
+E     
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=['/home/user/Haneof-AIOS-Core-v3.0/.venv/bin/python', '-m', 'tools.c15_persistence.probe_cli', '...^^^^^^\nAttributeError: \'FusedTurnRuntime\' object has no attribute \'stage_trusted_returned_background_response\'\n').returncode
+_____ test_k5_commit_tree_before_push_crash_recovers_from_prior_remote_k3 ______
+tests/c15_persistence/test_corrective_003_regressions.py:428: in test_k5_commit_tree_before_push_crash_recovers_from_prior_remote_k3
+    outcome = recovered.resume()
+              ^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1192: in resume
+    return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1183: in process_one_cursor
+    turn = self.run_turn(projection)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1093: in run_turn
+    recovery_actions = self._recover_with_core(projection)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:984: in _recover_with_core
+    self.runtime.stage_trusted_returned_background_response(
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'FusedTurnRuntime' object has no attribute 'stage_trusted_returned_background_response'
+_____ JournalTests.test_application_gap_is_in_doubt_not_exactly_once_claim _____
+tests/c15_persistence/test_journal.py:51: in tearDown
+    failed = any(test is self for test, _ in result.errors + result.failures)
+                                             ^^^^^^^^^^^^^
+E   AttributeError: 'TestCaseFunction' object has no attribute 'errors'
+_________________________ JournalTests.test_bad_paths __________________________
+tests/c15_persistence/test_journal.py:51: in tearDown
+    failed = any(test is self for test, _ in result.errors + result.failures)
+                                             ^^^^^^^^^^^^^
+E   AttributeError: 'TestCaseFunction' object has no attribute 'errors'
+_______________ JournalTests.test_concurrent_exposure_one_winner _______________
+tests/c15_persistence/test_journal.py:51: in tearDown
+    failed = any(test is self for test, _ in result.errors + result.failures)
+                                             ^^^^^^^^^^^^^
+E   AttributeError: 'TestCaseFunction' object has no attribute 'errors'
+______________ JournalTests.test_corrupt_artifact_blocks_exposure ______________
+tests/c15_persistence/test_journal.py:51: in tearDown
+    failed = any(test is self for test, _ in result.errors + result.failures)
+                                             ^^^^^^^^^^^^^
+E   AttributeError: 'TestCaseFunction' object has no attribute 'errors'
+___ JournalTests.test_exact_checkpoint_and_required_evidence_survive_reopen ____
+tests/c15_persistence/test_journal.py:51: in tearDown
+    failed = any(test is self for test, _ in result.errors + result.failures)
+                                             ^^^^^^^^^^^^^
+E   AttributeError: 'TestCaseFunction' object has no attribute 'errors'
+_____________ JournalTests.test_exposed_kill_reopen_wait_no_resend _____________
+tests/c15_persistence/test_journal.py:51: in tearDown
+    failed = any(test is self for test, _ in result.errors + result.failures)
+                                             ^^^^^^^^^^^^^
+E   AttributeError: 'TestCaseFunction' object has no attribute 'errors'
+_______ JournalTests.test_missing_barrier_wrong_binding_and_outstanding ________
+tests/c15_persistence/test_journal.py:51: in tearDown
+    failed = any(test is self for test, _ in result.errors + result.failures)
+                                             ^^^^^^^^^^^^^
+E   AttributeError: 'TestCaseFunction' object has no attribute 'errors'
+________ JournalTests.test_no_production_or_retired_identity_entrypoint ________
+tests/c15_persistence/test_journal.py:51: in tearDown
+    failed = any(test is self for test, _ in result.errors + result.failures)
+                                             ^^^^^^^^^^^^^
+E   AttributeError: 'TestCaseFunction' object has no attribute 'errors'
+_____ JournalTests.test_receipt_recording_does_not_claim_core_verification _____
+tests/c15_persistence/test_journal.py:51: in tearDown
+    failed = any(test is self for test, _ in result.errors + result.failures)
+                                             ^^^^^^^^^^^^^
+E   AttributeError: 'TestCaseFunction' object has no attribute 'errors'
+_________ JournalTests.test_reply_staged_kill_reopen_no_byte_rewriting _________
+tests/c15_persistence/test_journal.py:51: in tearDown
+    failed = any(test is self for test, _ in result.errors + result.failures)
+                                             ^^^^^^^^^^^^^
+E   AttributeError: 'TestCaseFunction' object has no attribute 'errors'
+___________ JournalTests.test_request_staged_kill_reopen_exact_bytes ___________
+tests/c15_persistence/test_journal.py:51: in tearDown
+    failed = any(test is self for test, _ in result.errors + result.failures)
+                                             ^^^^^^^^^^^^^
+E   AttributeError: 'TestCaseFunction' object has no attribute 'errors'
+___ JournalTests.test_uncommitted_transaction_kill_preserves_old_checkpoint ____
+tests/c15_persistence/test_journal.py:51: in tearDown
+    failed = any(test is self for test, _ in result.errors + result.failures)
+                                             ^^^^^^^^^^^^^
+E   AttributeError: 'TestCaseFunction' object has no attribute 'errors'
+________ JournalTests.test_wrong_identity_missing_backend_no_recreation ________
+tests/c15_persistence/test_journal.py:51: in tearDown
+    failed = any(test is self for test, _ in result.errors + result.failures)
+                                             ^^^^^^^^^^^^^
+E   AttributeError: 'TestCaseFunction' object has no attribute 'errors'
+_____ test_core_receipt_revalidation_rejects_an_operator_invented_receipt ______
+tests/c15_persistence/test_operator_wiring.py:368: in test_core_receipt_revalidation_rejects_an_operator_invented_receipt
+    with pytest.raises(Exception):
+E   Failed: DID NOT RAISE <class 'Exception'>
+______ test_resident_visible_surface_is_unchanged_by_the_durability_layer ______
+tests/c15_persistence/test_resident_surface.py:78: in test_resident_visible_surface_is_unchanged_by_the_durability_layer
+    assert committed.is_file(), f"missing committed evidence: {committed}"
+E   AssertionError: missing committed evidence: /home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/resumed/evidence/resident-surface-no-change.json
+E   assert False
+E    +  where False = is_file()
+E    +    where is_file = PosixPath('/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001/resumed/evidence/resident-surface-no-change.json').is_file
+=========================== short test summary info ============================
+FAILED tests/c15_persistence/killpoints/test_killpoints.py::test_kill_point_converges[K4]
+FAILED tests/c15_persistence/test_corrective_002_remote_durability.py::test_k1_k5_survive_total_local_cache_loss_from_remote_only[K4_AFTER_REPLY_AUTHENTICATED]
+FAILED tests/c15_persistence/test_corrective_003_regressions.py::test_second_round_k3_survives_total_local_loss_remote_only
+FAILED tests/c15_persistence/test_corrective_003_regressions.py::test_k5_commit_tree_before_push_crash_recovers_from_prior_remote_k3
+FAILED tests/c15_persistence/test_journal.py::JournalTests::test_application_gap_is_in_doubt_not_exactly_once_claim
+FAILED tests/c15_persistence/test_journal.py::JournalTests::test_bad_paths - ...
+FAILED tests/c15_persistence/test_journal.py::JournalTests::test_concurrent_exposure_one_winner
+FAILED tests/c15_persistence/test_journal.py::JournalTests::test_corrupt_artifact_blocks_exposure
+FAILED tests/c15_persistence/test_journal.py::JournalTests::test_exact_checkpoint_and_required_evidence_survive_reopen
+FAILED tests/c15_persistence/test_journal.py::JournalTests::test_exposed_kill_reopen_wait_no_resend
+FAILED tests/c15_persistence/test_journal.py::JournalTests::test_missing_barrier_wrong_binding_and_outstanding
+FAILED tests/c15_persistence/test_journal.py::JournalTests::test_no_production_or_retired_identity_entrypoint
+FAILED tests/c15_persistence/test_journal.py::JournalTests::test_receipt_recording_does_not_claim_core_verification
+FAILED tests/c15_persistence/test_journal.py::JournalTests::test_reply_staged_kill_reopen_no_byte_rewriting
+FAILED tests/c15_persistence/test_journal.py::JournalTests::test_request_staged_kill_reopen_exact_bytes
+FAILED tests/c15_persistence/test_journal.py::JournalTests::test_uncommitted_transaction_kill_preserves_old_checkpoint
+FAILED tests/c15_persistence/test_journal.py::JournalTests::test_wrong_identity_missing_backend_no_recreation
+FAILED tests/c15_persistence/test_operator_wiring.py::test_core_receipt_revalidation_rejects_an_operator_invented_receipt
+FAILED tests/c15_persistence/test_resident_surface.py::test_resident_visible_surface_is_unchanged_by_the_durability_layer
+pytest_exit=1

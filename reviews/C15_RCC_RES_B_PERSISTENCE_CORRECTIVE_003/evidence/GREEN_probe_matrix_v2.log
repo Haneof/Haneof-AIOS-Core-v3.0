@@ -1,0 +1,11 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.2, pytest-8.4.2, pluggy-1.6.0
+rootdir: /home/user/Haneof-AIOS-Core-v3.0
+configfile: pyproject.toml
+collected 23 items
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py .......... [ 43%]
+.............                                                            [100%]
+
+============================= 23 passed in 40.18s ==============================
+pytest_exit=0

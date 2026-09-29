@@ -1,0 +1,194 @@
+{
+  "environment": {
+    "platform": "Linux-6.1.158+-x86_64-with-glibc2.36",
+    "python": "3.11.2",
+    "sqlite": "3.40.1"
+  },
+  "freeze_history": [
+    {
+      "frozen_at_utc": "2026-09-29T15:08:35Z",
+      "head": "852e0831cb23db46766890573e7f61c9512e55e7",
+      "reason": "initial freeze"
+    },
+    {
+      "frozen_at_utc": "2026-09-29T15:12:39Z",
+      "head": "852e0831cb23db46766890573e7f61c9512e55e7",
+      "reason": "initial freeze"
+    },
+    {
+      "frozen_at_utc": "2026-09-29T15:19:20Z",
+      "head": "852e0831cb23db46766890573e7f61c9512e55e7",
+      "reason": "initial freeze"
+    }
+  ],
+  "freeze_reason": "Portability re-freeze after the CI_COLLECTION_BLOCKER repair (no expectation changed): (1) tests/c15_persistence/conftest.py puts the repository root and src on sys.path so the formal CI invocation (a bare pytest) can import tools.c15_persistence; (2) the persisted-workspace path is resolved from C15_PERSISTED_WORKSPACE or the account home directory - exactly like backend.py - instead of the hard-coded /home/user, in journal.py (WORKSPACE), test_journal.py (probe root and excluded-directory cases) and test_operator_wiring.py (workspace-root and excluded-location rejection cases). The hard-coded path only exists on the sandbox account 'user'; on the formal CI account 'runner' it made the whole frozen journal contract fail in setup with FileNotFoundError (13 failures, captured in evidence/ci_parity/RED_ci_journal_workspace_hardcode.log). No PROBE:/EXPECT: text, no probe id and no blocker semantics were changed or relaxed.",
+  "frozen_at_utc": "2026-09-29T16:22:27Z",
+  "head": "2d01ee2a8fe7f74fb8c3f3bf5fe5a94685907260",
+  "manifest_version": "c15-corrective-003-probe-matrix-v2",
+  "probe_count": 21,
+  "probe_ids": [
+    "C002-001-A",
+    "C002-001-B",
+    "C002-001-C",
+    "C002-001-D",
+    "C002-002-A",
+    "C002-002-B",
+    "C002-002-C",
+    "C002-002-D",
+    "C002-002-E",
+    "C002-002-F",
+    "C002-002-G",
+    "C002-004-A",
+    "C002-004-B",
+    "C002-004-K",
+    "C002-004-L",
+    "C002-003-A",
+    "C002-003-B",
+    "C002-003-C",
+    "C002-003-D",
+    "C002-005-A",
+    "C002-006-A"
+  ],
+  "probes": [
+    {
+      "expect": "an authoritative-durability abort raised inside a registered",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_001_a_capability_wrapping_cannot_swallow_authoritative_abort",
+      "probe_id": "C002-001-A",
+      "test_function": "test_c002_001_a_capability_wrapping_cannot_swallow_authoritative_abort"
+    },
+    {
+      "expect": "with the remote-authoritative write for the K4 capability barrier",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_001_b_k4_authoritative_failure_hard_stops_before_progress",
+      "probe_id": "C002-001-B",
+      "test_function": "test_c002_001_b_k4_authoritative_failure_hard_stops_before_progress"
+    },
+    {
+      "expect": "after the K4 authoritative failure and total loss of the failed local",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_001_c_k4_failure_restart_recovers_from_authoritative_state_once",
+      "probe_id": "C002-001-C",
+      "test_function": "test_c002_001_c_k4_failure_restart_recovers_from_authoritative_state_once"
+    },
+    {
+      "expect": "an authoritative ACK-barrier failure is fatal and the cursor is never",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_001_d_ack_barrier_failure_never_acks_the_cursor",
+      "probe_id": "C002-001-D",
+      "test_function": "test_c002_001_d_ack_barrier_failure_never_acks_the_cursor"
+    },
+    {
+      "expect": "a total local loss at the first round's authenticatable provider",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_a_k3_trusted_return_first_round_remote_only_converges",
+      "probe_id": "C002-002-A",
+      "test_function": "test_c002_002_a_k3_trusted_return_first_round_remote_only_converges"
+    },
+    {
+      "expect": "the same authenticatable provider-return loss in a *later* round",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_b_k3_trusted_return_later_round_remote_only_converges",
+      "probe_id": "C002-002-B",
+      "test_function": "test_c002_002_b_k3_trusted_return_later_round_remote_only_converges"
+    },
+    {
+      "expect": "a later round whose provider boundary was crossed with no durable",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_c_k3_dispatch_only_later_round_hard_stops_without_redispatch",
+      "probe_id": "C002-002-C",
+      "test_function": "test_c002_002_c_k3_dispatch_only_later_round_hard_stops_without_redispatch"
+    },
+    {
+      "expect": "when the applied-before-ACK barrier is already authoritative and the",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_d_k5_push_success_then_total_local_loss_acks_once",
+      "probe_id": "C002-002-D",
+      "test_function": "test_c002_002_d_k5_push_success_then_total_local_loss_acks_once"
+    },
+    {
+      "expect": "a crash after the local commit object is created but before the",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_e_k5_prepush_crash_recovers_from_prior_authoritative_barrier",
+      "probe_id": "C002-002-E",
+      "test_function": "test_c002_002_e_k5_prepush_crash_recovers_from_prior_authoritative_barrier"
+    },
+    {
+      "expect": "changing the exact provider-return bytes while keeping the durable",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_f_changed_trusted_return_bytes_under_same_identity_fail_closed",
+      "probe_id": "C002-002-F",
+      "test_function": "test_c002_002_f_changed_trusted_return_bytes_under_same_identity_fail_closed"
+    },
+    {
+      "expect": "changing the exact relay-journal reply bytes fails closed on the",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_g_changed_relay_journal_reply_bytes_fail_closed",
+      "probe_id": "C002-002-G",
+      "test_function": "test_c002_002_g_changed_relay_journal_reply_bytes_fail_closed"
+    },
+    {
+      "expect": "a remote-authoritative run records its classification + binding",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_004_a_valid_remote_authoritative_binding_is_durable",
+      "probe_id": "C002-004-A",
+      "test_function": "test_c002_004_a_valid_remote_authoritative_binding_is_durable"
+    },
+    {
+      "expect": "for every damaged-binding shape on a run whose durable owner record",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_004_b_binding_damage_fails_closed_never_local_only",
+      "probe_id": "C002-004-B",
+      "test_function": "test_c002_004_b_binding_damage_fails_closed_never_local_only"
+    },
+    {
+      "expect": "a remote-authoritative cache whose authoritative remote is",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_004_k_unavailable_remote_state_fails_closed",
+      "probe_id": "C002-004-K",
+      "test_function": "test_c002_004_k_unavailable_remote_state_fails_closed"
+    },
+    {
+      "expect": "an intentionally local-only synthetic run has no remote",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_004_l_local_only_run_cannot_be_silently_promoted",
+      "probe_id": "C002-004-L",
+      "test_function": "test_c002_004_l_local_only_run_cannot_be_silently_promoted"
+    },
+    {
+      "expect": "",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_regressions.py::test_generation_admission_rejects_seal_content_tamper",
+      "probe_id": "C002-003-A",
+      "test_function": "test_generation_admission_rejects_seal_content_tamper"
+    },
+    {
+      "expect": "",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_regressions.py::test_generation_admission_rejects_unexpected_artifact",
+      "probe_id": "C002-003-B",
+      "test_function": "test_generation_admission_rejects_unexpected_artifact"
+    },
+    {
+      "expect": "",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_regressions.py::test_generation_history_cannot_be_shortened_by_lowering_current_ledger",
+      "probe_id": "C002-003-C",
+      "test_function": "test_generation_history_cannot_be_shortened_by_lowering_current_ledger"
+    },
+    {
+      "expect": "",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_regressions.py::test_remote_authority_rejects_coordinated_short_history_even_if_local_head_is_rehashed",
+      "probe_id": "C002-003-D",
+      "test_function": "test_remote_authority_rejects_coordinated_short_history_even_if_local_head_is_rehashed"
+    },
+    {
+      "expect": "",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_regressions.py::test_cross_run_remote_config_and_ref_transplant_is_rejected",
+      "probe_id": "C002-005-A",
+      "test_function": "test_cross_run_remote_config_and_ref_transplant_is_rejected"
+    },
+    {
+      "expect": "",
+      "node_id": "/home/user/Haneof-AIOS-Core-v3.0/tests/c15_persistence/test_corrective_003_regressions.py::test_atomic_lease_rejects_ref_delete_between_check_and_push",
+      "probe_id": "C002-006-A",
+      "test_function": "test_atomic_lease_rejects_ref_delete_between_check_and_push"
+    }
+  ],
+  "repository": "Haneof/Haneof-AIOS-Core-v3.0",
+  "sources": {
+    "tests/c15_persistence/killpoints/harness.py": "5f015c72f5e10ee43ac503e2f7b415a6efc7da2a4ae98542bd14170adfdbd56f",
+    "tests/c15_persistence/killpoints/test_killpoints.py": "97a9dbc358adee8016ebcc709a7c42c230eb8f0b12af3d31bbff8d038670e0a9",
+    "tests/c15_persistence/test_corrective_002_remote_durability.py": "b63d453e2194c83f25bbf2da47c3fc5f8b0e5b9aae5e8172cbae990cfef30ebf",
+    "tests/c15_persistence/test_corrective_003_binding_blockers.py": "15e137861b9821c200074a3ed5c51dfdfd243b7a6da0fea73e86e51c490f7e6a",
+    "tests/c15_persistence/test_corrective_003_regressions.py": "54531b052533477d66c76a7c9b982031b0e9eb5c16b9513bd8eca9fcb0f01065",
+    "tests/c15_persistence/test_environment_reattach.py": "f2bf60b3cd4b6371a968cb3f30a7c1e3ad2a6051964877f52e7b9a8367cd4285",
+    "tests/c15_persistence/test_journal.py": "426b7336a0a8ed3fac9bfcab96676e4b0340f0ae5b960e7412edf2a987a436e9",
+    "tests/c15_persistence/test_operator_wiring.py": "1d48d73502beba89027587b401b6029a028372599e78c2a99ba5e4b40a836bd6",
+    "tests/c15_persistence/test_resident_surface.py": "951cbc4e4ba954ee47db3e04b8737f6bce494c7bd953507277a5646bc7451884",
+    "tools/c15_persistence/operator_session.py": "4cac3e1f5d12e3fc8b821948cacb364dd8e69552feebcdb62596d8ed386e5906",
+    "tools/c15_persistence/probe_cli.py": "86b3413e5f060265b3ad17fdaf6a54510140b66afd89989e7dea1d9311c5f0e6"
+  }
+}
