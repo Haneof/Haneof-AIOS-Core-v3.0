@@ -1,0 +1,28 @@
+{
+  "authored_by": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+  "directive": {
+    "capability_calls": [
+      {
+        "arguments": {
+          "deadline": "2026-11-11T17:03:00Z",
+          "next_step": "Identify the blocked regression job and the leftover test index holding the orders-shadow name in staging; clean up or rename the stale index, re-run the blocked regression, then report outcome and key risk per communication policy (staging-only, production unaffected).",
+          "priority": 70,
+          "reason_refs": [
+            {
+              "object_id": "obs_c14_fixture_4c492ea152d135960e96c2d1",
+              "revision": 1
+            }
+          ],
+          "task_type": "work",
+          "title": "Resolve staging index name conflict (orders-shadow vs leftover test index) that is blocking the regression task"
+        },
+        "call_id": "req-0024:c0",
+        "name": "create_task"
+      }
+    ],
+    "silence": false
+  },
+  "request_id": "req-0024-model_directive-289492d2",
+  "request_sha256": "9caf431de749c80dbf3bd0b1acbe3754d50eb268fa57d41a95631982b18c21a3",
+  "response_version": 1
+}

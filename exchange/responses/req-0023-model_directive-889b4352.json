@@ -1,0 +1,16 @@
+{
+  "authored_by": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+  "directive": {
+    "capability_calls": [
+      {
+        "arguments": {},
+        "call_id": "req-0023:c0",
+        "name": "read_execution_world"
+      }
+    ],
+    "silence": false
+  },
+  "request_id": "req-0023-model_directive-889b4352",
+  "request_sha256": "806c9d0fbeee65b0dd496d77e19b5f7ce61302cc8428fd42a4fc2a7902863322",
+  "response_version": 1
+}
