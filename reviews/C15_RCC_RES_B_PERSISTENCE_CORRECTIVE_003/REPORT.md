@@ -14,9 +14,9 @@ Status: **REVIEW_READY** (fresh Independent Acceptance is the next step; this wi
 | Starting live `main` | `016a2f7db5ed01b41fc614701079c507d2c2c02e` (equals the PM re-release post-integration baseline; **no main drift**) |
 | Baseline restore commit | `852e0831cb23db46766890573e7f61c9512e55e7` (restores the scope-compliant harness from the frozen WIP onto fresh main) |
 | Work branch | `arena/01a0ed87-haneof-aios-core-v3-0` (session-fixed branch; no other branch is created or pushed) |
-| Candidate continuation commit | `4178cbd5b764b521eb4344851b131b5936d00e5d` (repair) |
-| Candidate final head (this report) | `af3404b7f6b7ac4ea1f28e8e6702ce6179523a89` — parent `4178cbd5b764b521eb4344851b131b5936d00e5d`, tree `19f04f6446a75497921efc79fd116917228ffd17` |
+| Candidate commits (branch `arena/01a0ed87-haneof-aios-core-v3-0`) | `852e0831cb23db46766890573e7f61c9512e55e7` restore harness → `4178cbd5b764b521eb4344851b131b5936d00e5d` blocker repair → `af3404b7f6b7ac4ea1f28e8e6702ce6179523a89` PR declaration + evidence refresh → final documentation commits (this report) |
 | Candidate merge-base with `main` | `016a2f7db5ed01b41fc614701079c507d2c2c02e` (exact latest-main base) |
+| Exact candidate head / tree | published externally (PR comment + pushed branch tip). A commit cannot contain its own SHA, and every later documentation commit would invalidate an in-tree copy, so the frozen tip is published outside the tree — the same convention the Corrective-001 evidence manifest used. |
 | PR | publication blocked in this sandbox: GitHub credentials return `401 Bad credentials` (see §12) |
 | Governance state confirmed | `C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 = READY`; `RESIDENT_B = BLOCKED`, `RESIDENT_C = BLOCKED`, `EVALUATOR = BLOCKED`, `C15_CLOSE = BLOCKED` |
 | Governance drift | none: the fresh main is exactly the PM re-release baseline and the task board still lists this task as the unique next READY |
