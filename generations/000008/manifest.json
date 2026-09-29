@@ -1,0 +1,13 @@
+{
+  "artifacts": {
+    "binding/current-event-binding.json": "011484611f05ff06981dc453d8550fad032306f2686a2c91127a2e86dbbca591",
+    "current-event.json": "8e17bedeb11be50ee680d87aa7326533450c6b79382d4600561b6c8e6b448fa8",
+    "exchange/ledger.jsonl": "3bee9a685de474d73c75e0e692929f823f941477d331ab3d306ace2969b2ebe5",
+    "release-state.json": "f1381f9ca7d02d2c72e0084109fd8f4904441c42654349bfc54a441ef5e478eb",
+    "run/RUN_IDENTITY.json": "c95a230f4f32dad7982391c4d983f298f8975dc61d420165ed7aa61f39e8ffa6"
+  },
+  "generation": 8,
+  "label": "K2_AFTER_INGEST",
+  "manifest_sha256": "4e5831818e44196e7260e3cc2f50ce5c201c32adea589d6ada94d2e77849f869",
+  "sealed_at_epoch": 1790711379.4819405
+}
