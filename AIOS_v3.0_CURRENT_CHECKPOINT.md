@@ -1,5 +1,15 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-09-29 Operator Prep Corrective-003 — REVIEW_READY; fresh IA released
+
+- PR #292 final H2 `42a63ed4416585fc0a02045e0bd5190f32a01a2b`, tree `80440bdd70aa658053bc5bf33a902c46cd7138e0`; sole parent/corrected H1 `77dac70e0cf054c3f0fb7d94a66dba221fe7d5de`, tree `52aa366bc6548e86e805585baddbc0470cb69660`; H1 parent RED freeze `083dd9506f01ade04d4cbe805f58bf80d40607b0`.
+- PM readiness: 546 changed paths, all confined to internal Operator Prep/Corrective evidence; no Core/product-tests/fixture/evaluator/release-source or real Resident artifacts. H1→H2 is evidence-only.
+- Author evidence: exact #288 H2 C10/C11 18 RED; H1/final packet 18 GREEN; C1-C3 GREEN; C4-C9 103 GREEN; A/B/C/D 24/7/2/5 PASS; packet audit 59/59; exact clean runtime pins PASS.
+- Packet remains `PREP_REVIEW_READY`, SHA `3c2d04c2de8557c3cb7329df4350c40b2ccc07520a7d3d51db206174b33266cc`.
+- Unique next READY: `C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-003-INDEPENDENT-ACCEPTANCE`.
+- Real Corrective-003 Resident remains blocked until fresh IA PASS plus PM integration/release adjudication.
+
+
 ## 2026-09-29 Operator Prep Corrective-002 — fresh IA FAIL; Corrective-003 required
 
 - Failed candidate PR #288 H2 `771b200c33dbd6055b1d209935f8e1552f13090f`; corrected H1 `63c972ad7a19671cbdf809177f7a552aa2c2ecc6`.
