@@ -1,5 +1,16 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-09-29 Operator Prep Corrective-003 — IA PASS; Fresh Resident A released
+
+- Accepted Operator Prep candidate PR #292 H2 `42a63ed4416585fc0a02045e0bd5190f32a01a2b`; corrected harness H1 `77dac70e0cf054c3f0fb7d94a66dba221fe7d5de`.
+- Fresh review-only PR #294 exact `30955cc7065d0d66cf4de43f833f1b1f9162b635` → `ACCEPTANCE_PASS / blocker=0`.
+- Independent review reproduced rev3 reviewer probes 50/50, C10/C11 18/18, C1-C3 GREEN, C4-C9 103/103, Gates A/B/C/D 24/7/2/5 and exact freeze/runtime identity.
+- PM-approved Resident launch packet SHA = `3c2d04c2de8557c3cb7329df4350c40b2ccc07520a7d3d51db206174b33266cc`; packet itself remains `PREP_REVIEW_READY`.
+- Unique next READY: `C15-RCC-RES-A-RERUN-004-CORRECTIVE-003` — fresh clean-room Resident A, cursor 1..13.
+- Resident must not read board/checkpoint/governance/PR history; startup is limited to clean-room contract + canonical run contract + exact approved packet + mechanical harness status.
+- Persistence Corrective-003, Resident B/C, evaluator and C15 close remain blocked until Fresh Resident A completion and its own IA.
+
+
 ## 2026-09-29 Operator Prep Corrective-003 — REVIEW_READY; fresh IA released
 
 - PR #292 final H2 `42a63ed4416585fc0a02045e0bd5190f32a01a2b`, tree `80440bdd70aa658053bc5bf33a902c46cd7138e0`; sole parent/corrected H1 `77dac70e0cf054c3f0fb7d94a66dba221fe7d5de`, tree `52aa366bc6548e86e805585baddbc0470cb69660`; H1 parent RED freeze `083dd9506f01ade04d4cbe805f58bf80d40607b0`.
