@@ -1,5 +1,17 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-09-29 Operator Prep Corrective-002 — fresh IA FAIL; Corrective-003 required
+
+- Failed candidate PR #288 H2 `771b200c33dbd6055b1d209935f8e1552f13090f`; corrected H1 `63c972ad7a19671cbdf809177f7a552aa2c2ecc6`.
+- Fresh review-only PR #290 exact `39408137edf77976d0c4833fcde551891d5d081a` → `ACCEPTANCE_FAIL / blocker=2`.
+- IA288-01: concurrent independent ledger writers can both succeed from the same validated prefix and corrupt sequence/prev-hash linearity.
+- IA288-02: directory durability errors are swallowed/ignored, so required fsync failure can still yield publication success.
+- #290 independently reproduced the qualified runtime, full Gates 24/7/2/5 and C4-C9 103 GREEN, so these are fresh additional infrastructure blockers.
+- Unique next READY: `C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-003`.
+- Corrective scope is only cross-process exchange write linearization + fail-closed directory durability. Preserve all prior C1-C9 closures and do not modify Core.
+- Real Corrective-003 Resident and downstream persistence/B/C/evaluator work remain blocked.
+
+
 ## 2026-09-29 Operator Prep Corrective-002 — REVIEW_READY; fresh IA released
 
 - PR #288 final freeze H2 `771b200c33dbd6055b1d209935f8e1552f13090f`, tree `071b51c5fb37dc59fc8941dee2182637b9f87daa`; sole parent/corrected H1 `63c972ad7a19671cbdf809177f7a552aa2c2ecc6`, tree `8cd4a2d8b4cdf1f85699c5d78166f774741b420b`; H1 parent RED freeze `8e34fba00edf4fdb5b80f04d7a648f6b5bb8c40e`.
