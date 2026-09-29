@@ -1,0 +1,11 @@
+{
+  "authored_by": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+  "directive": {
+    "capability_calls": [],
+    "response": "牛肉面。脑子转不动的时候，热汤面比冷饭团省心：一碗端上来就完事，不用咬着冷米思考人生，汤还能顺手把水也补了。\n\n今天不用带脑子，需要你拍板的事我都先压着——production 那个删除包不急，等你哪天状态在线了再逐项确认就行。好好吃午饭。",
+    "silence": false
+  },
+  "request_id": "req-0043-model_directive-ab56ee60",
+  "request_sha256": "7a787143e698f62d674264ffd6cdf8b04aeb943f7d5a3b247d7991a8c951adf2",
+  "response_version": 1
+}

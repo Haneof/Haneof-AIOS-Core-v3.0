@@ -1,0 +1,15 @@
+{
+  "binding_mode": "canonical_user_turn",
+  "event_id": "c15rcc-022",
+  "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+  "ingest_ref": "obs_conv_user_16df9c0f1575acfe918bd3fc@1",
+  "object_id": "obs_conv_user_16df9c0f1575acfe918bd3fc",
+  "payload_sha256": "sha256:bcdbaf147a9f80c43f0461fa3138a55dbec191638181721297ec3853f31f5ddd",
+  "projection_sha256": "sha256:a31de23c4e06b56159f8742f7dacc93e7c67a287d5915559a67d4c97f70c1397",
+  "reused_existing": false,
+  "revision": 1,
+  "sequence": 22,
+  "session_id": "sess-resident-b-003-8f7f1f11f568",
+  "turn_index": 4,
+  "world_revision": 65
+}
