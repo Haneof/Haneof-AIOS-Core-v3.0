@@ -1,0 +1,15 @@
+{
+  "artifacts": {
+    "binding/current-event-binding.json": "9b5c4413e38e73b412549d8dc39c2be7bf91ec1db165538f9efd5e7de9f5907d",
+    "current-event.json": "2df8665b9557ed8e7d44e45f7ffce19ca33a2e962d63f8a04795bb534a65b43a",
+    "exchange/ledger.jsonl": "292f3ba78504465aabdf5cdaec782cf45e06f61eb6b95d39027111ec928f6b99",
+    "release-state.json": "9e420b772ffb1a1e604607324ce98ac27fdedb40bcf3390e0e7555e4881c452f",
+    "run/RUN_IDENTITY.json": "c95a230f4f32dad7982391c4d983f298f8975dc61d420165ed7aa61f39e8ffa6",
+    "world/c15-res-b-003.world.search.sqlite": "a0e9f6a8b872f831e36233b6b9416ecce662bf3e5092f6e4130a4a8717300018",
+    "world/c15-res-b-003.world.sqlite": "1bbec8ea62bcf2dec41a986b6edb9dee6b856897841b4096dad6659d735ab301"
+  },
+  "generation": 30,
+  "label": "K5_AFTER_APPLIED_BEFORE_ACK",
+  "manifest_sha256": "86e4de75052c8d9c58e6afb35c78a1ab6ed381e5f3435a502cda9e4aed03efd5",
+  "sealed_at_epoch": 1790712250.1062884
+}
