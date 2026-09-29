@@ -156,3 +156,8 @@ continuation → due work → K5 → durable ack → ACKED barriers, with genera
 - Cursor 22 (final, USER, turn_index 4): K1 g43 ce180081, K2 g44 eb72627e (world 65), turn 1 round req-0043 (lunch choice; pending decisions explicitly deferred, production deletion gate restated), due 0, K3/K4 g45 ba687a75(full), K5 g46 b8fc3b96, ACK g47 09688ca3 (next=23, never to be revealed), clear ok.
 - FINAL_FREEZE: gen 48 5692a329 (full, remote head verified == .remote-head). world 66 == index 66 (lag 0); boundary B/22/next23/pending-none; exchange 43/43 COMPLETE, 129 records; projections 14-22 9/9 PASS; digests in evidence/freeze/digests.sha256; provider identity UNKNOWN (attested).
 - Terminal state: RUN_COMPLETE / AWAITING_INDEPENDENT_ACCEPTANCE. Final report: FINAL_REPORT.md. Evidence PR: EVIDENCE_ONLY on session branch (DO_NOT_MERGE AS IMPLEMENTATION). C15-RCC-RES-B-ACCEPT-003 not claimed.
+
+## TERMINAL VERIFICATION 2026-09-30 (read-only, post-freeze)
+
+- verify_local_remote_authority PASS; remote head == FINAL_FREEZE commit 5692a329…; exchange integrity ok, 43/43 COMPLETE, nothing open/unconsumed; release state B/22/next23/pending-none; freeze digests zero drift; bg attempts 43/43 metered (zero residual in_doubt); wakes 7/7 completed (0 non-terminal); turn executions 11/11 completed; no model-work processes alive. Evidence: run evidence/freeze/TERMINAL_VERIFICATION.json.
+- Window closed. Remaining steps (independent acceptance, evaluator, Resident C, C15 closure) belong to the PM/review process and are explicitly OUT OF SCOPE for this window; cursor 23+ remains unrevealed.
