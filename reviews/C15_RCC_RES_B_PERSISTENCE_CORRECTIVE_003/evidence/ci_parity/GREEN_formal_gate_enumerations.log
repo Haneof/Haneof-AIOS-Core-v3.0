@@ -1,0 +1,4 @@
+tests/unit/test_world_revision_atomicity.py::test_w04_session_snapshot_revision_stays_fixed_while_world_advances
+tests/unit/test_world_revision_atomicity.py::test_w05_failed_multi_object_commit_does_not_consume_world_revision
+
+997 tests collected in 0.49s

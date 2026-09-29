@@ -193,9 +193,41 @@ generic distributed CAS subsystem and no new security architecture was built.
 * trusted-return focused Core regression (11 suites) — green (`evidence/GREEN_core_trusted_return_focused.log`)
 * resident-visible surface unchanged vs base (`src/aios_core` pinned clean) — `evidence/resident-surface-no-change.json`
 * full repository suite — `evidence/GREEN_full_repository_pytest.log`
+* full repository suite under the **CI invocation** (`pytest -q --tb=no`, CI-style history-less checkout) —
+  `evidence/ci_parity/GREEN_bare_pytest_full_suite.log`, 997 tests / 0 failures / 0 errors (see §11)
 * Core was **not** modified to make any of this pass; no Core test was touched.
 
-## 11. Candidate freeze
+## 11. CI-parity corrective (formal-gate import parity)
+
+**Defect found after publication.** Three repository formal gates ran red on the first pushed head
+`d49f513131d73d208bea0b5da601f435c7386d92`: `formal-core-gate` (job `109486347554`),
+`formal-python312-full-suite` (job `109486343185`) and `full-core-regression` (job `109486345353`).
+
+* **Root cause** — those gates invoke a *bare* `pytest` (`pytest -q ...`, `pytest -o addopts='' --collect-only
+  -q`). A bare `pytest` does not put the current directory on `sys.path` (only `python -m pytest` does), so the
+  probes' `from tools.c15_persistence import ...` aborted collection with
+  `ModuleNotFoundError: No module named 'tools'` (exit `2`, i.e. failing within seconds, before any test ran).
+  Every local GREEN run had used `python -m pytest`, which masked the defect. The same defect is inherited from
+  the frozen WIP (PR #254's formal gates were red as well). **No probe semantics, expectation or blocker
+  conclusion is involved.**
+* **Fix (harness-side and additive)** — `tests/c15_persistence/conftest.py` prepends the repository root and
+  `src` to `sys.path` for that directory only. No root `conftest.py`, no global pytest-config change, no
+  packaging change, no `.pth` file, **no harness installation**, no `src/aios_core/**` change. The frozen probe
+  sources are byte-identical, so the matrix `sources` hashes still verify and **no re-freeze was needed**
+  (the freeze remains exactly `d4afe24b...`).
+* **CI-parity verification** (`evidence/ci_parity/`, procedure in `evidence/ci_parity/PROCEDURE.md`) — a fresh
+  single-commit checkout of the candidate tree outside `/tmp` was executed exactly as CI does:
+
+| check | result |
+| --- | --- |
+| bare `pytest -q`, pre-fix state (RED) | exit `2`; `ModuleNotFoundError: No module named 'tools'`; 6 collection errors |
+| `pytest -o addopts='' --collect-only -q` | exit `0`; **997 tests collected** |
+| `pytest -o addopts='' -q tests/c15_persistence` | exit `0`; **78 passed** |
+| `pytest -q --tb=no --junitxml=...` (repository) | exit `0`; **tests=997 failures=0 errors=0 skipped=0** |
+
+* The three gates above are re-executed by GitHub on the corrective head to confirm the fix end to end.
+
+## 12. Candidate freeze
 
 * scope gate: `evidence/EVIDENCE_MANIFEST.json` → every changed path classified; **`src/aios_core/**` diff = ZERO**;
   no product packaging change; no Resident A/B/C, evaluator, fixture or workflow change.
@@ -213,19 +245,23 @@ generic distributed CAS subsystem and no new security architecture was built.
 * Re-verification on the exact committed head: the frozen probe matrix (`C002-001/002/004` ids plus the
   retained non-blocking probes) passes 29/29 against `af3404b...`, and the scope gate reports
   `src_aios_core_diff_is_zero = true` with zero scope violations.
+* Re-verification after the CI-parity corrective: candidate frozen again on fresh `main` (`016a2f7...`), scope
+  gate re-computed from the staged index (see §11 for the CI evidence; `frozen/CORRECTIVE_003_PROBE_MATRIX.json`
+  unchanged at `d4afe24b559fb000987a823f0f7cefafa99fedfa55d1ed782cbd742dc6f6fc33`).
 
-## 12. Status
+## 13. Status
 
 ```text
 C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 = REVIEW_READY (engineering complete, candidate frozen)
 NEXT = FRESH_INDEPENDENT_ACCEPTANCE
 ```
 
-**Publication blocker (infrastructure, not engineering):** this sandbox's GitHub credentials are invalid
-(`401 Bad credentials`), so the continuation branch could not be pushed and the PR could not be opened from
-this window. Everything an Independent Acceptance needs is committed on
-`arena/01a0ed87-haneof-aios-core-v3-0` at the exact head above, with the PR declaration already recorded in
-`reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/PR_BODY.md`. GitHub access needs to be reconnected in
-Arena; the push + PR creation are the only remaining mechanical steps.
+**Publication:** the continuation branch `arena/01a0ed87-haneof-aios-core-v3-0` is pushed and draft PR **#299**
+(`REVIEW_READY — do not merge`) carries the declaration in
+`reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/PR_BODY.md`. The first pushed head
+`d49f513131d73d208bea0b5da601f435c7386d92` is superseded by the CI-parity corrective (§11); the current
+exact head is pinned in the PR thread, and no history was rewritten, force-pushed, rebased or amended. PR #254
+remains `CLOSED / DRAFT / UNMERGED / FROZEN` (`a2d815c9...`, PM STOP comment `5863009559`); scope violator
+`f7848952...` is not an ancestor of the candidate.
 
 Not entered: Resident B, RELEASE-003, RERUN-003, ACCEPT-003, Resident C, evaluator, C15 close.

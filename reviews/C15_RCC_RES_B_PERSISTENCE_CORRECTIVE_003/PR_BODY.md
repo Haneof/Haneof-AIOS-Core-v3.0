@@ -35,7 +35,17 @@
 * `tools/c15_persistence/freeze_corrective_003_matrix.py`, `freeze_corrective_003_evidence.py` — frozen probe
   matrix and evidence/scope-gate freeze.
 * `tests/c15_persistence/**` — new frozen binding-blocker matrix (21 probe ids), retained non-blocking
-  probes, probe-mechanics corrections (documented in the manifest `freeze_history` / `freeze_reason`).
+  probes, probe-mechanics corrections (documented in the manifest `freeze_history` / `freeze_reason`), and
+  `conftest.py`, the CI-parity corrective (see below).
+* **CI-parity corrective** — the first pushed head made three repository formal gates red (`formal-core-gate`,
+  `formal-python312-full-suite`, `full-core-regression`): those gates call a *bare* `pytest`, which does not put
+  the repository root on `sys.path`, so the probes' `from tools.c15_persistence import ...` aborted collection
+  (`ModuleNotFoundError: No module named 'tools'`, exit `2`). `tests/c15_persistence/conftest.py` adds the
+  repository root/`src` for that directory only. No root `conftest.py`, no global pytest config change, no
+  packaging change, no harness installation, no `src/aios_core/**` change, and **no frozen probe source
+  touched** (matrix still `d4afe24b...`, no re-freeze). Verified under a CI-style history-less checkout:
+  997 collected, persistence subset 78 passed, whole repository 997 tests / 0 failures / 0 errors
+  (`reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/`).
 * `reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/**` — report, baseline RED logs, GREEN logs, environment
   identity, resident-surface artifact, evidence manifest + scope gate, PR body.
 
@@ -49,6 +59,7 @@
 | historical journal suite (frozen `unittest` contract) | 13 passed |
 | trusted-return focused Core regression | 231 passed |
 | full repository suite | 997 passed |
+| CI-parity: bare `pytest` on a history-less checkout | collected 997; persistence subset 78 passed; repository 997 tests / 0 failures / 0 errors |
 | `src/aios_core/**` diff | ZERO |
 | scope violations | none |
 

@@ -13,11 +13,18 @@
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/RED_probe_matrix_v2_baseline.log",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/baseline/baseline_pytest_restored_harness.log",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/baseline/baseline_unittest_journal.log",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_bare_pytest_c15_subset.log",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_bare_pytest_full_suite.log",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_bare_pytest_full_suite_summary.txt",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_formal_gate_enumerations.log",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/PROCEDURE.md",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/RED_bare_pytest_collection_error.log",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/environment.txt",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/resident-surface-no-change.json",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/resident_surface_check.log",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/frozen/CORRECTIVE_003_PROBE_MATRIX.json",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/frozen/CORRECTIVE_003_PROBE_MATRIX.sha256",
+      "tests/c15_persistence/conftest.py",
       "tests/c15_persistence/killpoints/PROBE_MANIFEST.json",
       "tests/c15_persistence/killpoints/PROBE_MANIFEST.sha256",
       "tests/c15_persistence/killpoints/__init__.py",
@@ -61,11 +68,18 @@
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/RED_probe_matrix_v2_baseline.log": "ALLOWED",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/baseline/baseline_pytest_restored_harness.log": "ALLOWED",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/baseline/baseline_unittest_journal.log": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_bare_pytest_c15_subset.log": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_bare_pytest_full_suite.log": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_bare_pytest_full_suite_summary.txt": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_formal_gate_enumerations.log": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/PROCEDURE.md": "ALLOWED",
+      "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/RED_bare_pytest_collection_error.log": "ALLOWED",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/environment.txt": "ALLOWED",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/resident-surface-no-change.json": "ALLOWED",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/resident_surface_check.log": "ALLOWED",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/frozen/CORRECTIVE_003_PROBE_MATRIX.json": "ALLOWED",
       "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/frozen/CORRECTIVE_003_PROBE_MATRIX.sha256": "ALLOWED",
+      "tests/c15_persistence/conftest.py": "ALLOWED",
       "tests/c15_persistence/killpoints/PROBE_MANIFEST.json": "ALLOWED",
       "tests/c15_persistence/killpoints/PROBE_MANIFEST.sha256": "ALLOWED",
       "tests/c15_persistence/killpoints/__init__.py": "ALLOWED",
@@ -101,7 +115,7 @@
     "scope_violations": [],
     "src_aios_core_diff_is_zero": true,
     "src_aios_core_diff_vs_base": [],
-    "staged_against_head": "1a849ca2f2fc773eb62a2d34db2822805d5e359a"
+    "staged_against_head": "d49f513131d73d208bea0b5da601f435c7386d92"
   },
   "environment_identity": {
     "disclosed_delta": "This sandbox cannot obtain CPython 3.12.14 (GitHub release-asset and python.org downloads are blocked; Debian 12 ships CPython 3.11). The candidate was executed on CPython 3.11.2 / Pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.40.1 and the delta is disclosed rather than hidden.",
@@ -151,6 +165,36 @@
       "bytes": 1774,
       "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/baseline/baseline_unittest_journal.log",
       "sha256": "15a49e0f48e84b8095f005528ffc87a79a9f5eee6c17346f19c6a4bce93cfd35"
+    },
+    {
+      "bytes": 190,
+      "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_bare_pytest_c15_subset.log",
+      "sha256": "76db7cdf1cb2e73191de2d2a2cecc125ced6aa1d9f24dda712510bba0cb54d05"
+    },
+    {
+      "bytes": 1201,
+      "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_bare_pytest_full_suite.log",
+      "sha256": "bb49187154d78ac57aefd6fd6fa734b7cc5b54992a05c7fda38d881e3b1c4fed"
+    },
+    {
+      "bytes": 64,
+      "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_bare_pytest_full_suite_summary.txt",
+      "sha256": "d8ab1054c2c627ad76983106b8fd053c057e0c7bb964d307b655d36d10e01535"
+    },
+    {
+      "bytes": 256,
+      "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/GREEN_formal_gate_enumerations.log",
+      "sha256": "55d494e080f8a0cd71c93538d482d47edd25e20cc2d2797b767fd2dc4b05c0fc"
+    },
+    {
+      "bytes": 4019,
+      "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/PROCEDURE.md",
+      "sha256": "5147890db3291f78099c884aac6c74c130b2b7b0b9723073995c88d7fd6dba7d"
+    },
+    {
+      "bytes": 880,
+      "path": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/ci_parity/RED_bare_pytest_collection_error.log",
+      "sha256": "1e88a0fb07689a2ad181fd39b5cae01842e11644feb791ca3d8193567bc6fcf2"
     },
     {
       "bytes": 769,
