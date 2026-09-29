@@ -1,0 +1,10 @@
+{
+  "corrective_reason": "v2 synthetic wheel verifier cases reused a real artifact URL while changing the filename, violating the candidate lock URL/filename invariant. v3 fixes only synthetic URL construction; expected blocker outcomes and checks remain unchanged.",
+  "expected_outcomes_unchanged": true,
+  "frozen_before_v3_historical_baseline_probe_execution": true,
+  "prior_revision_sha256": "9a3d3c581e14d6e8d51d08e8013c0049a989bb2a8557602d90cdb8f22d1ba046",
+  "probe_revision": "v3",
+  "probe_source_path": "reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_001/probes/corrective_probes_v3.py",
+  "probe_source_sha256": "f855486bcd06fe67a9d9576db36276dbdf98a297d91c278d44d1650c91c9b518",
+  "supersedes": "v2"
+}

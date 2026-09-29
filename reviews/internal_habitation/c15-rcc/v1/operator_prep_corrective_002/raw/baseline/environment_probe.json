@@ -1,0 +1,51 @@
+{
+  "python_version": "3.12.14",
+  "python_version_info": [
+    3,
+    12,
+    14
+  ],
+  "python_full_version": "3.12.14",
+  "implementation": "CPython",
+  "config_args": "'--prefix=/home/user/.cache/c002/baseline-runtime/runtime/3.12.14/python' '--with-openssl=/home/user/.cache/c002/baseline-runtime/runtime/3.12.14/deps' '--with-ensurepip=install' '--enable-loadable-sqlite-extensions' 'LDFLAGS=-L/home/user/.cache/c002/baseline-runtime/runtime/3.12.14/deps/lib -Wl,-rpath,/home/user/.cache/c002/baseline-runtime/runtime/3.12.14/deps/lib -Wl,-rpath-link,/home/user/.cache/c002/baseline-runtime/runtime/3.12.14/deps/lib' 'CPPFLAGS=-I/home/user/.cache/c002/baseline-runtime/runtime/3.12.14/deps/include'",
+  "prefix": "/home/user/.cache/c002/baseline-runtime/runtime/3.12.14/venv",
+  "base_prefix": "/home/user/.cache/c002/baseline-runtime/runtime/3.12.14/python",
+  "executable": "/home/user/.cache/c002/baseline-runtime/runtime/3.12.14/venv/bin/python",
+  "sqlite_version": "3.45.1",
+  "sqlite_module_version": "2.6.0",
+  "aios_core_file": "/home/user/.cache/c002/baseline/src/aios_core/__init__.py",
+  "installed_distributions": [
+    "annotated-types==0.8.0",
+    "iniconfig==2.3.0",
+    "packaging==26.3",
+    "pip==25.0.1",
+    "pluggy==1.6.0",
+    "pydantic==2.13.5",
+    "pydantic_core==2.46.5",
+    "Pygments==2.21.0",
+    "pytest==8.4.2",
+    "typing-inspection==0.4.4",
+    "typing_extensions==4.16.0"
+  ],
+  "pydantic_version": "2.13.5",
+  "pytest_version": "8.4.2",
+  "open_ssl_version": "OpenSSL 3.0.13 30 Jan 2024",
+  "stdlib_modules": {
+    "sqlite3": "ok",
+    "hashlib": "ok",
+    "zlib": "ok",
+    "ssl": "ok",
+    "uuid": "ok",
+    "zoneinfo": "ok",
+    "unicodedata": "ok",
+    "socket": "ok",
+    "fcntl": "ok",
+    "secrets": "ok",
+    "ctypes": "unavailable:ModuleNotFoundError",
+    "readline": "unavailable:ModuleNotFoundError",
+    "bz2": "unavailable:ModuleNotFoundError",
+    "lzma": "unavailable:ModuleNotFoundError",
+    "decimal": "ok"
+  },
+  "openssl_runtime_version": "OpenSSL 3.0.13 30 Jan 2024"
+}
