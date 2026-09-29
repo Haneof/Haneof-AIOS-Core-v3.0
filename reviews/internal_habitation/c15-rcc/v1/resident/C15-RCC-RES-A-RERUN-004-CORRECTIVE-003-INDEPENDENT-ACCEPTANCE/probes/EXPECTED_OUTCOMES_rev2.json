@@ -1,0 +1,3 @@
+{"P01_scope":"PASS","P02_checksums":"PASS","P03_exchange_chronology":"PASS","P04_cursor_chain":"PASS","P05_future_leak":"PASS",
+ "P06_forbidden_material":"PASS (any hit triaged manually; material semantic contamination => BLOCKER)","P07_response_provenance":"PASS",
+ "P08_world_coherence":"PASS","R01_final_restart":"PASS: rev38/wm38/lag0, 0 model calls, open does not mutate World, exchange COMPLETE"}

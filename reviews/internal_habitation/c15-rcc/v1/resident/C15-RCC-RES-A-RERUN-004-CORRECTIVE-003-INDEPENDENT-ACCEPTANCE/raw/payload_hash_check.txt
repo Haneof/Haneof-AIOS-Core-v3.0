@@ -1,0 +1,2 @@
+fixture file sha 7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46 release-state says sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46
+payload hash matches 13 /13

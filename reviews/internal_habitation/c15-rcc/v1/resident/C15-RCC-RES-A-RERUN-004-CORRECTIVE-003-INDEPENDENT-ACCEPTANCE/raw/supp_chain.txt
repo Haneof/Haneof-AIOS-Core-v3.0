@@ -1,0 +1,6 @@
+{"object_revisions": ["object_id", "revision", "object_type", "subject_id", "world_revision", "learned_at", "recorded_at", "payload_json", "revision_kind"], "world_commits": ["world_revision", "committed_at", "operation_id", "session_id", "reason", "source_class"], "world_meta": ["key", "value"], "runtime_turn_executions": ["subject_id", "session_id", "turn_index", "input_hash", "state", "attempt_protocol", "retry_authorized", "retry_count", "reconciliation_evidence"]}
+receipts 13 last 13 14 None
+world_commits (38, 38)
+meta [('world_revision', '38')]
+distinct user obs (7,)
+ERRORS []
