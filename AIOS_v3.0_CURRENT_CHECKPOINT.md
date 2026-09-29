@@ -1,5 +1,15 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-09-29 Fresh Resident A Corrective-003 — IA ACCEPTANCE_PASS; PM integrated; persistence Corrective-003 re-released
+
+- `C15-RCC-RES-A-RERUN-004-CORRECTIVE-003 = DONE / ACCEPTED`（PM integration `PM_ACCEPTED / INTEGRATED`）。Accepted evidence candidate = PR #296 exact `317316299c332d82e0cbd0431b5c7d50f391bc17`（tree `a64b60ad1e64bcb930003f030246baafdae3eb8a`，sole parent `f7bcec4e558ebb4c6a11b7b45afe361cc659ef66`），保持 **OPEN / UNMERGED / EVIDENCE-ONLY**（不 merge / 不修改 / 不 hash-swap）。
+- Fresh Independent Acceptance = `ACCEPTANCE_PASS / blocker=0` / `READY_FOR_PM_INTEGRATION`；accepted exact review `7b072340b527a864874208cd58152c9147328a18`（remote `review/c15-res-a-c003-ia`，parent `e83b1aa7e4321ba48a1cb390828e149350c2be71`，tree `ae1e81be3bc326906460a6fd70c6517f169f813e`，fresh fetch：remote HEAD exact / identical / ahead=0 / behind=0）保持 **DO NOT MERGE**，不进入 main；不重做 IA。
+- Publication：frozen `IA_REPORT.md` 的 `EVIDENCE_PUBLICATION_BLOCKED` 是 reviewer 执行时的历史沙箱状态（无 GitHub 写权限），**不可修改**（accepted exact SHA immutable）；独立 publication recovery 已完成并 fresh 核验。**current authoritative = `EVIDENCE_PUBLICATION_RECOVERED / DURABLE`**；旧文本不是当前 blocker。
+- PM 确认 accepted IA semantic 范围：resident-authored semantics / no prior-future leakage / clean-room / cursor-ACK chronology / 21 exchange chains / Wake-Review-Summary completeness / World-index provenance / final restart / checksum-freeze integrity / cursor 14 not revealed。
+- `BLOCKED_ON_FRESH_RESIDENT_A_ACCEPTANCE` 解除（已满足）。Mandatory post-Core sequence 步骤 1..7 完成；步骤 8 生效。**唯一下一 READY：`C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-003 = READY`**（governance re-release；继承 narrowed scope：`tools/c15_persistence/**` harness-only、非 Core product、仅修 C002-001/002/004、禁止 `src/aios_core/**`、PR #254 WIP `f7848952...` = SCOPE_VIOLATION / NOT_A_CANDIDATE、历史保留）。
+- Resident B / Resident C / evaluator / C15 close 保持 **BLOCKED**，直到 Persistence Corrective-003 完成自身 engineering → review → fresh IA → PM integration。集成收据：`governance/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_ACCEPTANCE_INTEGRATION_RECEIPT_2026-09-29.md`；PR #296 acceptance comment `5891955371`。
+
+
 ## 2026-09-29 Fresh Resident A Corrective-003 — PHASE_A_COMPLETE / REVIEW_READY
 
 - Evidence PR #296 exact `317316299c332d82e0cbd0431b5c7d50f391bc17`, tree `a64b60ad1e64bcb930003f030246baafdae3eb8a`, parent `f7bcec4e558ebb4c6a11b7b45afe361cc659ef66`.
