@@ -1,0 +1,1083 @@
+{
+  "allowed_string_constants": [
+    "EXTERNAL_CURRENT_RESIDENT_SESSION",
+    "__pycache__",
+    "ab",
+    "arguments",
+    "ascii",
+    "authored_by",
+    "body",
+    "call_id",
+    "capability_calls",
+    "data",
+    "directive",
+    "error_code",
+    "error_message",
+    "event",
+    "file_count",
+    "files",
+    "input_tokens",
+    "kind",
+    "model",
+    "model_directive",
+    "name",
+    "ok",
+    "output_tokens",
+    "path",
+    "prev_sha256",
+    "provenance",
+    "provider",
+    "rb",
+    "record_sha256",
+    "request_id",
+    "request_published",
+    "request_sha256",
+    "request_version",
+    "response",
+    "response_consumed",
+    "response_contract",
+    "response_mode",
+    "response_published",
+    "response_sha256",
+    "response_version",
+    "seq",
+    "sequence",
+    "sha256",
+    "silence",
+    "size",
+    "total_tokens",
+    "usage",
+    "utf-8",
+    "wall_clock",
+    "wb"
+  ],
+  "capability_names_checked": [
+    "commit_ai_world_claim",
+    "commit_claim",
+    "commit_operation_experience",
+    "compare_claims",
+    "create_attention_watch",
+    "create_task",
+    "drill_down_conversation",
+    "expand_recall",
+    "focus_entity",
+    "follow_relation",
+    "form_event",
+    "inspect_outcome",
+    "inspect_world_object",
+    "list_attention_watches",
+    "list_conversation_summaries",
+    "list_dimensions",
+    "propose_action",
+    "propose_cognitive_policy",
+    "propose_dimension",
+    "propose_entity",
+    "propose_goal",
+    "read_ai_world",
+    "read_background_budget",
+    "read_cognitive_policies",
+    "read_execution_world",
+    "read_periodic_review_anchors",
+    "read_world_map",
+    "record_communication_experience",
+    "request_all_dimensions_projection",
+    "retract_claim",
+    "retrieve_original_observation",
+    "revise_claim",
+    "revise_entity",
+    "rollback_cognitive_policy",
+    "search_conversation_summaries",
+    "search_timeline",
+    "search_world",
+    "transition_dimension",
+    "transition_event",
+    "transition_goal",
+    "transition_task",
+    "update_cognitive_policy",
+    "upsert_relation"
+  ],
+  "checks": {
+    "import_policy_ok": true,
+    "no_ast_policy_violations": true,
+    "no_capability_name_literals": true,
+    "no_content_literals": true,
+    "no_semantic_module_names": true,
+    "response_mode_declared": true,
+    "runner_has_no_callback_interface": true
+  },
+  "file_count": 11,
+  "files": [
+    {
+      "bytes": 1154,
+      "path": "__init__.py",
+      "sha256": "7900d69b069ca6440302895c4e82531bc776757648511aef25a0133efd7a465b"
+    },
+    {
+      "bytes": 3631,
+      "path": "atomic.py",
+      "sha256": "1dcf79d443dee0279ada264f5c4de890a78834f964b502bfb19b10d1d59c395e"
+    },
+    {
+      "bytes": 13399,
+      "path": "bridge.py",
+      "sha256": "8a37b82a56958162aa92825fa8908e9637870b2110f221f44b8ec957f7cbc772"
+    },
+    {
+      "bytes": 3171,
+      "path": "canonical.py",
+      "sha256": "d1ae3e5a46bced68bedb455bf4e6ce6c6783391c9f319b3317bf0bff83800ac1"
+    },
+    {
+      "bytes": 1513,
+      "path": "content_manifest.py",
+      "sha256": "4f8cdd3f0b957c2958d897765dfcaed05b698582ddb652faa838fe564d1e0a5b"
+    },
+    {
+      "bytes": 9876,
+      "path": "ledger.py",
+      "sha256": "02f71bc71e756f80413cc827a38a3eace44b078650b873f20dcec5a58f3cc8cd"
+    },
+    {
+      "bytes": 6329,
+      "path": "requests.py",
+      "sha256": "18597a915bf3d948c1ae8d599b9f3d787aa06eab998c363989d9454e2c51829f"
+    },
+    {
+      "bytes": 8379,
+      "path": "responses.py",
+      "sha256": "7d1a657b97747e0dd277f420ba4c935cb706b30e028e1324d11993f8aca0d23b"
+    },
+    {
+      "bytes": 9947,
+      "path": "runner.py",
+      "sha256": "a3a8c103715979c57c0ef4959786dafb73176244a1c1cec301e1363d78990849"
+    },
+    {
+      "bytes": 15520,
+      "path": "schema.py",
+      "sha256": "8278ba82f1fbdee637be20f409a13ce5489d9c04bf88bf727a486760605cb45b"
+    },
+    {
+      "bytes": 7695,
+      "path": "verify.py",
+      "sha256": "aafea0b78e4b19ee4b4a64845529f2a2de78d8b0fe4dbfd875ae6890729312e5"
+    }
+  ],
+  "findings": [],
+  "imports": {
+    "__init__.py": [
+      "__future__"
+    ],
+    "atomic.py": [
+      "__future__",
+      "canonical",
+      "itertools",
+      "os",
+      "pathlib",
+      "typing"
+    ],
+    "bridge.py": [
+      "",
+      "__future__",
+      "atomic",
+      "canonical",
+      "json",
+      "ledger",
+      "pathlib",
+      "requests",
+      "responses",
+      "schema",
+      "time",
+      "typing"
+    ],
+    "canonical.py": [
+      "__future__",
+      "base64",
+      "dataclasses",
+      "datetime",
+      "enum",
+      "hashlib",
+      "json",
+      "pathlib",
+      "typing"
+    ],
+    "content_manifest.py": [
+      "hashlib",
+      "json",
+      "pathlib"
+    ],
+    "ledger.py": [
+      "__future__",
+      "atomic",
+      "canonical",
+      "json",
+      "os",
+      "pathlib",
+      "re",
+      "typing"
+    ],
+    "requests.py": [
+      "",
+      "__future__",
+      "atomic",
+      "canonical",
+      "json",
+      "ledger",
+      "pathlib",
+      "schema",
+      "typing"
+    ],
+    "responses.py": [
+      "__future__",
+      "atomic",
+      "canonical",
+      "json",
+      "ledger",
+      "pathlib",
+      "schema",
+      "typing"
+    ],
+    "runner.py": [
+      "",
+      "__future__",
+      "aios_core.headless.core",
+      "aios_core.runtime.cognitive_runtime",
+      "bridge",
+      "canonical",
+      "dataclasses",
+      "datetime",
+      "json",
+      "pathlib",
+      "schema",
+      "typing"
+    ],
+    "schema.py": [
+      "__future__",
+      "aios_core.runtime.capabilities",
+      "aios_core.runtime.cognitive_runtime",
+      "dataclasses",
+      "typing"
+    ],
+    "verify.py": [
+      "__future__",
+      "atomic",
+      "canonical",
+      "content_manifest",
+      "hashlib",
+      "json",
+      "ledger",
+      "pathlib",
+      "platform",
+      "pydantic",
+      "pytest",
+      "schema",
+      "sqlite3",
+      "sys",
+      "typing"
+    ]
+  },
+  "package_root": "/home/user/.cache/ia288/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange",
+  "pass": true,
+  "prose_literal_inventory": [
+    {
+      "file": "__init__.py",
+      "line": 1,
+      "literal": "Mechanical exchange harness for the AIOS Resident launch boundary.\n\nThis package is **transport, durability and verification only**.\n\nIt publishes a durable decision request, blocks until the *external* current\nResident session publishes the exact response bytes, verifies digests, records\nan append-only hash-chained ledger, and returns the parsed directive to the\nfrozen Core runtime.\n\nIt contains no cognition:\n\n* no keyword -> capability routing;\n* no event/cursor -> response mapping;\n* no prewritten reply, claim, policy or goal;\n* no callback, provider adapter, fallback answer or expected-answer logic.\n\nThe only way a directive is produced is by parsing bytes that some other human\nor model session decided and published through the mechanical publisher.\n"
+    },
+    {
+      "file": "atomic.py",
+      "line": 1,
+      "literal": "Durable single-file publication primitives.\n\nSequence for every published artifact (request, response, ledger record):\n\n1. write the complete bytes to a temporary file in the *same* directory;\n2. ``flush`` + ``os.fsync`` the temporary file descriptor;\n3. atomically move it into place with ``os.replace``;\n4. ``fsync`` the containing directory where the platform supports it.\n\nA reader therefore observes either no file or the complete file; partially\nwritten content is never observable under the published name.\n"
+    },
+    {
+      "file": "atomic.py",
+      "line": 45,
+      "literal": "Publication could not be completed durably."
+    },
+    {
+      "file": "atomic.py",
+      "line": 58,
+      "literal": "Fsync a directory entry list. Returns True when the fsync happened."
+    },
+    {
+      "file": "atomic.py",
+      "line": 83,
+      "literal": "Durably publish ``data`` at ``path``. Returns a publication receipt."
+    },
+    {
+      "file": "atomic.py",
+      "line": 127,
+      "literal": "Publish canonical JSON bytes plus a trailing newline."
+    },
+    {
+      "file": "atomic.py",
+      "line": 89,
+      "literal": "atomic_write_bytes requires bytes"
+    },
+    {
+      "file": "bridge.py",
+      "line": 1,
+      "literal": "Exchange bridge: durable chronology, consumption and crash recovery.\n\nThe bridge is the single authority for exchange state. It enforces:\n\n* ``request_published`` is the **semantic dispatch boundary**;\n* a response may be consumed only when a durable ``response_published`` ledger\n  record exists for that request;\n* consumption is recorded once, after digest and request-id verification;\n* ``not_submitted`` reconciliation is permitted **only** when no\n  ``request_published`` record exists for the exchange.\n"
+    },
+    {
+      "file": "bridge.py",
+      "line": 57,
+      "literal": "not_submitted reconciliation is allowed only when no request_published record exists; after request publication the exchange fails closed instead of declaring the request unsubmitted"
+    },
+    {
+      "file": "bridge.py",
+      "line": 69,
+      "literal": "Base class for exchange failures."
+    },
+    {
+      "file": "bridge.py",
+      "line": 73,
+      "literal": "The exchange violates the durable chronology contract (fail closed)."
+    },
+    {
+      "file": "bridge.py",
+      "line": 77,
+      "literal": "No durably published response appeared within the caller's budget."
+    },
+    {
+      "file": "bridge.py",
+      "line": 123,
+      "literal": "Block until the response is durably published (ledger record exists)."
+    },
+    {
+      "file": "bridge.py",
+      "line": 153,
+      "literal": "Verify and record consumption of a durably published response."
+    },
+    {
+      "file": "bridge.py",
+      "line": 207,
+      "literal": "Parse the durably published response into a real ModelDirective."
+    },
+    {
+      "file": "bridge.py",
+      "line": 126,
+      "literal": "timeout_s must be non-negative"
+    },
+    {
+      "file": "bridge.py",
+      "line": 108,
+      "literal": " has no durable publication record"
+    },
+    {
+      "file": "bridge.py",
+      "line": 158,
+      "literal": ": no durable request_published record"
+    },
+    {
+      "file": "bridge.py",
+      "line": 163,
+      "literal": ": no durable response_published record"
+    },
+    {
+      "file": "bridge.py",
+      "line": 190,
+      "literal": "published response request_id "
+    },
+    {
+      "file": "bridge.py",
+      "line": 195,
+      "literal": "published response request digest does not match the durable request for "
+    },
+    {
+      "file": "bridge.py",
+      "line": 135,
+      "literal": "no durable response_published record for "
+    },
+    {
+      "file": "bridge.py",
+      "line": 171,
+      "literal": " disagrees with the published digest"
+    },
+    {
+      "file": "bridge.py",
+      "line": 179,
+      "literal": ": durable response is not trustworthy: "
+    },
+    {
+      "file": "bridge.py",
+      "line": 186,
+      "literal": " is not a valid envelope: "
+    },
+    {
+      "file": "bridge.py",
+      "line": 213,
+      "literal": ": durable response is not trustworthy: "
+    },
+    {
+      "file": "bridge.py",
+      "line": 218,
+      "literal": "response is not valid JSON: "
+    },
+    {
+      "file": "bridge.py",
+      "line": 222,
+      "literal": "response violates the directive contract: "
+    },
+    {
+      "file": "canonical.py",
+      "line": 1,
+      "literal": "Canonical encodings and digests.\n\nDeterministic byte encodings so that a request or response digest always\ndescribes exactly the bytes that are durable. No cognition, no policy.\n"
+    },
+    {
+      "file": "canonical.py",
+      "line": 29,
+      "literal": "Deterministic fallback for values that are not natively JSON.\n\n    Only mechanical type projection happens here: enums to their value,\n    dataclasses to their declared fields, bytes to base64, sets/tuples to\n    sorted/ordered lists, path-like and datetime objects to text.\n    "
+    },
+    {
+      "file": "canonical.py",
+      "line": 61,
+      "literal": "UTF-8 canonical JSON: sorted keys, compact separators, no NaN/Infinity."
+    },
+    {
+      "file": "canonical.py",
+      "line": 98,
+      "literal": "Parse an ISO-8601 UTC timestamp produced by :func:`utc_now_iso`."
+    },
+    {
+      "file": "canonical.py",
+      "line": 103,
+      "literal": "timestamp is not timezone-aware"
+    },
+    {
+      "file": "content_manifest.py",
+      "line": 1,
+      "literal": "Canonical content identity, shared by bootstrap/operator tools/packet.\n\nAlgorithm v1: regular files sorted by POSIX relative path; exclude only\n__pycache__ directories. Reject symlinks. JSON list of path/sha256/size,\nsorted keys, compact separators, UTF-8, no newline; SHA256 of those bytes.\nNo import of Core is needed to verify its bytes.\n"
+    },
+    {
+      "file": "content_manifest.py",
+      "line": 19,
+      "literal": "content root must be a real directory"
+    },
+    {
+      "file": "content_manifest.py",
+      "line": 25,
+      "literal": "symlink in verified tree: "
+    },
+    {
+      "file": "content_manifest.py",
+      "line": 29,
+      "literal": "nonregular file in verified tree: "
+    },
+    {
+      "file": "ledger.py",
+      "line": 1,
+      "literal": "Append-only, hash-chained exchange ledger.\n\nEvery durable exchange fact is recorded exactly once, in order, and each record\nchains to its predecessor:\n\n``record_sha256 = sha256(canonical_json(record_without_record_sha256))``\n\nwith ``prev_sha256`` inside the hashed body. Any insertion, deletion, reordering\nor edit of an interior record breaks the chain and is detected. Complete-record\ntail deletion cannot be distinguished from a valid prefix without an external\nhead anchor; this ledger does not claim to detect it.\n\nRecorded events (at minimum):\n\n* ``request_published``  -> sequence, request_id, request_sha256, wall clock\n* ``response_published`` -> the above plus response_sha256\n* ``response_consumed``  -> the above plus response_sha256\n"
+    },
+    {
+      "file": "ledger.py",
+      "line": 54,
+      "literal": "The ledger is unreadable, non-monotonic or tamper-evident."
+    },
+    {
+      "file": "ledger.py",
+      "line": 58,
+      "literal": "Append-only hash-chained JSON-lines ledger."
+    },
+    {
+      "file": "ledger.py",
+      "line": 86,
+      "literal": "Non-recursive operational precondition; no lookup or append calls."
+    },
+    {
+      "file": "ledger.py",
+      "line": 218,
+      "literal": "Recompute the whole chain and report the first inconsistency."
+    },
+    {
+      "file": "ledger.py",
+      "line": 70,
+      "literal": "ledger ends with a torn (unterminated) record"
+    },
+    {
+      "file": "ledger.py",
+      "line": 179,
+      "literal": "request_id must be non-blank"
+    },
+    {
+      "file": "ledger.py",
+      "line": 181,
+      "literal": "request_sha256 must be a sha256 hex digest"
+    },
+    {
+      "file": "ledger.py",
+      "line": 183,
+      "literal": "response_sha256 must be a sha256 hex digest"
+    },
+    {
+      "file": "ledger.py",
+      "line": 95,
+      "literal": "missing ledger fields at seq "
+    },
+    {
+      "file": "ledger.py",
+      "line": 97,
+      "literal": "non-monotonic sequence at seq "
+    },
+    {
+      "file": "ledger.py",
+      "line": 99,
+      "literal": "broken hash chain at seq "
+    },
+    {
+      "file": "ledger.py",
+      "line": 102,
+      "literal": "record digest mismatch at seq "
+    },
+    {
+      "file": "ledger.py",
+      "line": 105,
+      "literal": "illegal event or request identity at seq "
+    },
+    {
+      "file": "ledger.py",
+      "line": 107,
+      "literal": "missing wall clock at seq "
+    },
+    {
+      "file": "ledger.py",
+      "line": 110,
+      "literal": "duplicate event or illegal event order at seq "
+    },
+    {
+      "file": "ledger.py",
+      "line": 112,
+      "literal": "invalid request digest at seq "
+    },
+    {
+      "file": "ledger.py",
+      "line": 114,
+      "literal": "request digest discontinuity at seq "
+    },
+    {
+      "file": "ledger.py",
+      "line": 133,
+      "literal": "ledger integrity validation failed: "
+    },
+    {
+      "file": "ledger.py",
+      "line": 117,
+      "literal": "response before publication at seq "
+    },
+    {
+      "file": "ledger.py",
+      "line": 119,
+      "literal": "invalid response digest at seq "
+    },
+    {
+      "file": "ledger.py",
+      "line": 200,
+      "literal": "extra key collides with ledger field: "
+    },
+    {
+      "file": "ledger.py",
+      "line": 121,
+      "literal": "response digest discontinuity at seq "
+    },
+    {
+      "file": "requests.py",
+      "line": 1,
+      "literal": "Mechanical request publisher.\n\nWrites one durable decision request per model boundary crossing:\n\n* deterministic request identity derived from the ledger sequence and the body\n  digest (never from semantics);\n* canonical JSON bytes, temp write + fsync + ``os.replace`` + directory fsync;\n* an append-only ``request_published`` ledger record carrying the request\n  SHA-256 of the exact published bytes.\n\nThe ``request_published`` ledger record **is** the semantic dispatch boundary:\nafter it exists, the exchange may never be reconciled as \"not submitted\".\n"
+    },
+    {
+      "file": "requests.py",
+      "line": 41,
+      "literal": "A request could not be published durably, or is inconsistent."
+    },
+    {
+      "file": "requests.py",
+      "line": 62,
+      "literal": "kind must be non-blank text"
+    },
+    {
+      "file": "requests.py",
+      "line": 78,
+      "literal": "request body must be a mapping"
+    },
+    {
+      "file": "requests.py",
+      "line": 168,
+      "literal": "published request body is not an object"
+    },
+    {
+      "file": "requests.py",
+      "line": 86,
+      "literal": "request_id does not match the deterministic identity rule: "
+    },
+    {
+      "file": "requests.py",
+      "line": 108,
+      "literal": "request already published with a different digest; refusing to rewrite"
+    },
+    {
+      "file": "requests.py",
+      "line": 125,
+      "literal": "request file exists with different bytes and has no ledger record"
+    },
+    {
+      "file": "requests.py",
+      "line": 149,
+      "literal": "published request is missing: "
+    },
+    {
+      "file": "requests.py",
+      "line": 157,
+      "literal": " has no durable publication record"
+    },
+    {
+      "file": "requests.py",
+      "line": 160,
+      "literal": " do not match the ledger digest"
+    },
+    {
+      "file": "requests.py",
+      "line": 154,
+      "literal": "published request is not valid JSON: "
+    },
+    {
+      "file": "responses.py",
+      "line": 1,
+      "literal": "Mechanical response publisher.\n\nThe Resident (or any external session) decides *everything* semantic. This\nmodule only transports the exact bytes it is given:\n\n1. verify a durable ``request_published`` record exists for the request id;\n2. verify the response envelope echoes the request id and the request SHA-256;\n3. validate the envelope/directive shape against the frozen Core contract;\n4. write the exact bytes through temp write + fsync + ``os.replace`` + dir fsync;\n5. append the ``response_published`` ledger record with the response SHA-256.\n\nIt never generates, repairs, defaults, infers or rewrites response content.\n"
+    },
+    {
+      "file": "responses.py",
+      "line": 38,
+      "literal": "A response could not be published durably, or violates the contract."
+    },
+    {
+      "file": "responses.py",
+      "line": 184,
+      "literal": "Canonical-encode a JSON object and publish it byte-exactly."
+    },
+    {
+      "file": "responses.py",
+      "line": 197,
+      "literal": "Read published response bytes after verifying the ledger binding."
+    },
+    {
+      "file": "responses.py",
+      "line": 68,
+      "literal": "request_id must be non-blank text"
+    },
+    {
+      "file": "responses.py",
+      "line": 70,
+      "literal": "response_bytes must be bytes"
+    },
+    {
+      "file": "responses.py",
+      "line": 86,
+      "literal": "response envelope request_id does not match the published request"
+    },
+    {
+      "file": "responses.py",
+      "line": 90,
+      "literal": "response envelope request_sha256 does not match the durable request digest"
+    },
+    {
+      "file": "responses.py",
+      "line": 165,
+      "literal": "durable response bytes do not match the submitted digest"
+    },
+    {
+      "file": "responses.py",
+      "line": 189,
+      "literal": "response must be a mapping"
+    },
+    {
+      "file": "responses.py",
+      "line": 55,
+      "literal": "refusing to publish a response for "
+    },
+    {
+      "file": "responses.py",
+      "line": 55,
+      "literal": ": no durable request_published record exists"
+    },
+    {
+      "file": "responses.py",
+      "line": 100,
+      "literal": "durable response record is not bound to the current request digest (fail closed)"
+    },
+    {
+      "file": "responses.py",
+      "line": 104,
+      "literal": "durable response record has no valid response digest (fail closed)"
+    },
+    {
+      "file": "responses.py",
+      "line": 108,
+      "literal": "response already durably published with a different digest; refusing to overwrite (fail closed)"
+    },
+    {
+      "file": "responses.py",
+      "line": 124,
+      "literal": "published response on disk does not match the durable ledger digest; refusing to repair or overwrite (fail closed)"
+    },
+    {
+      "file": "responses.py",
+      "line": 129,
+      "literal": "replay input does not match the durable ledger response digest (fail closed)"
+    },
+    {
+      "file": "responses.py",
+      "line": 146,
+      "literal": "response file already exists without a ledger record; adoption disabled (fail closed)"
+    },
+    {
+      "file": "responses.py",
+      "line": 151,
+      "literal": "response file exists with different bytes and has no ledger record"
+    },
+    {
+      "file": "responses.py",
+      "line": 202,
+      "literal": "no durable response_published record for "
+    },
+    {
+      "file": "responses.py",
+      "line": 206,
+      "literal": "published response is missing from disk: "
+    },
+    {
+      "file": "responses.py",
+      "line": 210,
+      "literal": "published response bytes for "
+    },
+    {
+      "file": "responses.py",
+      "line": 210,
+      "literal": " do not match the ledger digest"
+    },
+    {
+      "file": "responses.py",
+      "line": 78,
+      "literal": "response bytes are not valid UTF-8 JSON: "
+    },
+    {
+      "file": "responses.py",
+      "line": 82,
+      "literal": "response envelope is invalid: "
+    },
+    {
+      "file": "responses.py",
+      "line": 113,
+      "literal": "published response is missing from disk: "
+    },
+    {
+      "file": "responses.py",
+      "line": 119,
+      "literal": "cannot read durable published response "
+    },
+    {
+      "file": "runner.py",
+      "line": 1,
+      "literal": "Runtime plumbing for the Resident launch boundary.\n\nThe runner owns the mechanical side of a turn:\n\n* it drives the frozen Core runtime;\n* whenever Core needs a model decision it publishes a durable request through\n  the exchange bridge;\n* it blocks until some **external** session durably publishes the exact\n  response bytes, then parses them into a real ``ModelDirective`` and consumes\n  the exchange record.\n\nThere is deliberately **no** semantic callback, provider adapter, keyword\nrouter, fixture rule, prewritten answer, default directive or fallback reply in\nthis module. The only source of a directive is published response bytes.\n\nRecovery follows the frozen corrective rule: once a ``request_published``\nrecord exists, the runner never re-decides; it resumes the existing request or\nconsumes the already durable response.\n"
+    },
+    {
+      "file": "runner.py",
+      "line": 55,
+      "literal": "Mechanical configuration of the model boundary."
+    },
+    {
+      "file": "runner.py",
+      "line": 70,
+      "literal": "Model boundary usable as a Core ``ModelHandler``.\n\n    ``Callable[[RuntimeSnapshot], ModelDirective]`` where the directive is\n    parsed from durably published external response bytes.\n    "
+    },
+    {
+      "file": "runner.py",
+      "line": 146,
+      "literal": "Digest of the durable request for a request id (mechanical helper)."
+    },
+    {
+      "file": "runner.py",
+      "line": 169,
+      "literal": "Run one frozen-Core user turn whose model decisions come from the exchange.\n\n    ``world_path``/``subject_id``/``session_id``/``user_input``/``occurred_at``\n    are always supplied by the caller. Nothing here is defaulted or inferred\n    from repository state.\n    "
+    },
+    {
+      "file": "runner.py",
+      "line": 235,
+      "literal": "Drive only frozen Core's normally due work at the caller's exact time."
+    },
+    {
+      "file": "runner.py",
+      "line": 182,
+      "literal": "occurred_at must be timezone-aware"
+    },
+    {
+      "file": "runner.py",
+      "line": 238,
+      "literal": "now must be timezone-aware"
+    },
+    {
+      "file": "runner.py",
+      "line": 66,
+      "literal": "response_timeout_s must be positive"
+    },
+    {
+      "file": "runner.py",
+      "line": 91,
+      "literal": "ambiguous recovery state"
+    },
+    {
+      "file": "runner.py",
+      "line": 99,
+      "literal": "recovery snapshot binding mismatch"
+    },
+    {
+      "file": "runner.py",
+      "line": 125,
+      "literal": "published response is not valid JSON: "
+    },
+    {
+      "file": "schema.py",
+      "line": 1,
+      "literal": "Frozen-Core contract binding and strict (de)serialization.\n\nTypes are imported from the frozen RC; nothing here is guessed or redefined.\nThe module fails closed whenever the frozen contract is not exactly what the\nharness was frozen against.\n\n``CapabilityResult`` legal fields are read from the class itself and must be\nexactly ``name, ok, data, error_code, error_message, call_id``. Attributes that\nhave never existed on the frozen type (``arguments``, ``result``, ``error``,\n``duration_seconds``) must never be referenced and are rejected as input keys.\n"
+    },
+    {
+      "file": "schema.py",
+      "line": 100,
+      "literal": "A payload or a frozen-Core type violates the frozen contract."
+    },
+    {
+      "file": "schema.py",
+      "line": 107,
+      "literal": "Legal field names, read from the frozen class (never guessed)."
+    },
+    {
+      "file": "schema.py",
+      "line": 113,
+      "literal": "Fail closed unless the frozen ``CapabilityResult`` is exactly as frozen."
+    },
+    {
+      "file": "schema.py",
+      "line": 140,
+      "literal": "Project a real result to its six legal fields (unknown fields impossible)."
+    },
+    {
+      "file": "schema.py",
+      "line": 151,
+      "literal": "Build a real result from a mapping containing only legal fields."
+    },
+    {
+      "file": "schema.py",
+      "line": 195,
+      "literal": "Serialize a real RuntimeSnapshot for durable publication.\n\n    Runtime-private correlation attributes (``_model_attempt_id``,\n    ``_outbound_relay_id``) are deliberately not published: they are not part of\n    the serialized Resident snapshot contract.\n    "
+    },
+    {
+      "file": "schema.py",
+      "line": 262,
+      "literal": "Validate the mechanical response envelope and return it unchanged."
+    },
+    {
+      "file": "schema.py",
+      "line": 288,
+      "literal": "Build a real ``ModelDirective`` from externally authored response bytes.\n\n    The returned object is constructed from the payload only; no default,\n    fallback or inferred content is ever added.\n    "
+    },
+    {
+      "file": "schema.py",
+      "line": 362,
+      "literal": "Project a real directive to the JSON shape a Resident would author."
+    },
+    {
+      "file": "schema.py",
+      "line": 181,
+      "literal": "capability_history entries are CapabilityResult values; only the listed fields exist on the frozen type"
+    },
+    {
+      "file": "schema.py",
+      "line": 154,
+      "literal": "capability result payload must be a mapping"
+    },
+    {
+      "file": "schema.py",
+      "line": 163,
+      "literal": "capability result name must be non-blank text"
+    },
+    {
+      "file": "schema.py",
+      "line": 165,
+      "literal": "capability result ok must be a boolean"
+    },
+    {
+      "file": "schema.py",
+      "line": 275,
+      "literal": "response envelope request_id must be non-blank text"
+    },
+    {
+      "file": "schema.py",
+      "line": 278,
+      "literal": "response envelope request_sha256 must be a sha256 digest"
+    },
+    {
+      "file": "schema.py",
+      "line": 281,
+      "literal": "response envelope authored_by must be EXTERNAL_CURRENT_RESIDENT_SESSION"
+    },
+    {
+      "file": "schema.py",
+      "line": 300,
+      "literal": "directive capability_calls must be a list"
+    },
+    {
+      "file": "schema.py",
+      "line": 319,
+      "literal": "directive silence must be a boolean"
+    },
+    {
+      "file": "schema.py",
+      "line": 118,
+      "literal": "frozen CapabilityResult field drift: expected "
+    },
+    {
+      "file": "schema.py",
+      "line": 124,
+      "literal": "CapabilityResult unexpectedly exposes "
+    },
+    {
+      "file": "schema.py",
+      "line": 144,
+      "literal": "expected CapabilityResult, got "
+    },
+    {
+      "file": "schema.py",
+      "line": 158,
+      "literal": "unknown capability result fields: "
+    },
+    {
+      "file": "schema.py",
+      "line": 161,
+      "literal": "missing capability result fields: "
+    },
+    {
+      "file": "schema.py",
+      "line": 204,
+      "literal": "expected RuntimeSnapshot, got "
+    },
+    {
+      "file": "schema.py",
+      "line": 257,
+      "literal": " must be non-blank text when provided"
+    },
+    {
+      "file": "schema.py",
+      "line": 267,
+      "literal": "response envelope missing keys: "
+    },
+    {
+      "file": "schema.py",
+      "line": 271,
+      "literal": "unsupported response_version: "
+    },
+    {
+      "file": "schema.py",
+      "line": 327,
+      "literal": "directive usage.total_tokens must be a non-negative integer"
+    },
+    {
+      "file": "schema.py",
+      "line": 366,
+      "literal": "expected ModelDirective, got "
+    },
+    {
+      "file": "schema.py",
+      "line": 131,
+      "literal": "probe result exposes forbidden attribute "
+    },
+    {
+      "file": "schema.py",
+      "line": 307,
+      "literal": "].name must be non-blank text"
+    },
+    {
+      "file": "schema.py",
+      "line": 312,
+      "literal": "].arguments must be an object"
+    },
+    {
+      "file": "verify.py",
+      "line": 1,
+      "literal": "Verification utilities.\n\nMechanical only: exchange integrity, frozen-Core identity, environment triple,\nand the frozen ``CapabilityResult`` surface. No cognition, no policy.\n"
+    },
+    {
+      "file": "verify.py",
+      "line": 40,
+      "literal": "Verify ledger chain, durable chronology, digests and orphan files."
+    },
+    {
+      "file": "verify.py",
+      "line": 148,
+      "literal": "Verify the interpreter actually executing this code."
+    },
+    {
+      "file": "verify.py",
+      "line": 195,
+      "literal": "Evidence that the frozen result surface is exactly the six legal fields."
+    },
+    {
+      "file": "verify.py",
+      "line": 80,
+      "literal": ": request_published recorded "
+    },
+    {
+      "file": "verify.py",
+      "line": 82,
+      "literal": ": response_published recorded more than once"
+    },
+    {
+      "file": "verify.py",
+      "line": 84,
+      "literal": ": response_consumed recorded more than once"
+    },
+    {
+      "file": "verify.py",
+      "line": 86,
+      "literal": ": response published before request"
+    },
+    {
+      "file": "verify.py",
+      "line": 88,
+      "literal": ": response consumed before publication"
+    },
+    {
+      "file": "verify.py",
+      "line": 92,
+      "literal": ": no request digest recorded"
+    },
+    {
+      "file": "verify.py",
+      "line": 112,
+      "literal": "orphan request file without ledger record: "
+    },
+    {
+      "file": "verify.py",
+      "line": 115,
+      "literal": "orphan response file without ledger record: "
+    },
+    {
+      "file": "verify.py",
+      "line": 102,
+      "literal": ": response file exists without a durable response_published record"
+    },
+    {
+      "file": "verify.py",
+      "line": 105,
+      "literal": ": published response file missing"
+    },
+    {
+      "file": "verify.py",
+      "line": 96,
+      "literal": ": request file digest mismatch"
+    },
+    {
+      "file": "verify.py",
+      "line": 107,
+      "literal": ": response file digest mismatch"
+    }
+  ]
+}

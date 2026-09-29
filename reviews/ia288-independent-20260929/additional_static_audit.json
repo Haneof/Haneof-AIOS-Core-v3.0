@@ -1,0 +1,11 @@
+{
+  "harness_rows_match": true,
+  "recorded_manifest": "e3b9ca6cd502bc27f22bff59a09ff6024bed17ea0865d46018d1ab70a77d7632",
+  "sha256_compact_rows": "e3b9ca6cd502bc27f22bff59a09ff6024bed17ea0865d46018d1ab70a77d7632",
+  "candidate_evidence_marker_paths": {
+    "real_event_identifier": [],
+    "real_cursor_state": [],
+    "real_run_path": [],
+    "database_extension": []
+  }
+}
