@@ -1,0 +1,72 @@
+{
+  "frozen_before_first_candidate_execution": true,
+  "legend": {
+    "requirement": "what SAFE candidate behaviour looks like (the assertion)",
+    "prediction": "reviewer prediction of the candidate result before execution: PASS = candidate satisfies requirement, RED = candidate violates requirement"
+  },
+  "test_ia_gate_a_adversarial.py": {
+    "test_ia_a01_request_id_mismatch": "PASS",
+    "test_ia_a02_request_sha_mismatch": "PASS",
+    "test_ia_a03_response_sha_mismatch": "PASS",
+    "test_ia_a04_partial_request": "PASS",
+    "test_ia_a05_partial_response": "PASS",
+    "test_ia_a06_torn_temp_write_not_consumed": "PASS",
+    "test_ia_a06b_torn_ledger_tail_fails_closed": "PASS",
+    "test_ia_a07_orphan_request_file": "PASS",
+    "test_ia_a08_orphan_response_file_not_consumed": "PASS",
+    "test_ia_a09_duplicate_request_id_refused": "PASS",
+    "test_ia_a09b_duplicate_request_record_is_ambiguous_fail_closed": "RED",
+    "test_ia_a10_duplicate_response_publication": "PASS",
+    "test_ia_a11_overwrite_response_refused": "PASS",
+    "test_ia_a12_consume_before_publish": "PASS",
+    "test_ia_a13_ledger_interior_mutation_runner_fails_closed": "RED",
+    "test_ia_a13b_consume_on_broken_chain_fails_closed": "RED",
+    "test_ia_a14_ledger_interior_deletion_runner_fails_closed": "RED",
+    "test_ia_a15_tail_truncation_partial_line_fails_closed": "PASS",
+    "test_ia_a15b_whole_record_tail_truncation_INFO": "PASS (INFO only)",
+    "test_ia_a16_missing_request_published": "PASS",
+    "test_ia_a17_missing_response_published": "PASS",
+    "test_ia_a18_crash_before_request_publication": "PASS",
+    "test_ia_a19_crash_after_request_same_snapshot_resumes": "PASS",
+    "test_ia_a19b_crash_after_request_different_snapshot_fails_closed": "RED",
+    "test_ia_a20_durable_unconsumed_same_snapshot_consumed_once": "PASS",
+    "test_ia_a20b_durable_unconsumed_different_snapshot_fails_closed": "RED",
+    "test_ia_a21_multiple_outstanding_is_ambiguous_fail_closed": "RED",
+    "test_ia_inv_dispatch_boundary_null_provider_fields": "PASS"
+  },
+  "test_ia_gates_bcd_rc.py": {
+    "test_ia_rc_imported_core_is_byte_identical_to_frozen_tree": "PASS",
+    "test_ia_b0_capability_result_exact_surface": "PASS",
+    "test_ia_b1_empty_history": "PASS",
+    "test_ia_b2_success_with_data": "PASS",
+    "test_ia_b3_failure_with_error_fields": "PASS",
+    "test_ia_b4_multiple_results_order_preserved": "PASS",
+    "test_ia_b5_no_illegal_capabilityresult_attribute_access": "PASS",
+    "test_ia_c1_two_round_success_history": "PASS",
+    "test_ia_c2_two_round_failure_result_history_then_silence": "PASS (uncertain: depends on frozen Core returning ok=False for unknown capability)",
+    "test_ia_isolation_runner_cannot_reach_synthetic_responder": "PASS",
+    "test_ia_d_semantic_script_audit": "PASS (heuristic assertions; raw report reviewed manually)"
+  },
+  "ia_packet_cleanroom_audit.py": {
+    "all mechanical pins / status / cursor / mode / head-rule / SHA256SUMS / freeze checks": "PASS",
+    "packet_allowed_inputs_include_clean_room_contract": "RED",
+    "packet_mentions_board_or_checkpoint_as_allowed": "PASS",
+    "no_release_state_or_world_files": "PASS",
+    "manual-review items": "INFO"
+  },
+  "ia_bootstrap_rc_attacks.sh": {
+    "BA1": "RED (default repo root = <repo>/reviews; RC identity skipped with WARNING)",
+    "BA2": "RED (fail-open WARNING, exit 0)",
+    "BA3": "RED (--verify only resolves historical commit objects; working-tree Core not compared)",
+    "BA4": "RED or INCONCLUSIVE (sqlite version never enforced; dynamic demonstration depends on RUNPATH vs RPATH)",
+    "BA5": "RED (wheel hashes are generated at fetch time, not pinned in the frozen script)",
+    "BA6": "PASS",
+    "BA7": "PASS",
+    "BA8": "PASS"
+  },
+  "00_bootstrap_reproduction_plan.md": {
+    "E00.1": "PASS", "E00.2": "PASS", "E00.3": "PASS", "E00.4": "PASS",
+    "E00.5": "declared expectation 'frozen RC identity OK' (see observed result in report)",
+    "E00.6": "PASS", "E00.7": "INFO"
+  }
+}

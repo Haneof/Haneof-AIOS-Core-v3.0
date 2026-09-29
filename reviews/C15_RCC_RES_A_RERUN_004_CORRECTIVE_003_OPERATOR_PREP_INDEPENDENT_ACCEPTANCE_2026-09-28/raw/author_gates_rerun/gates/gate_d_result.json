@@ -1,0 +1,32 @@
+{
+  "gate": "D",
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "status": "PASS",
+  "returncode": 0,
+  "test_file": "tests/test_gate_d_no_semantic_script.py",
+  "test_count": 0,
+  "test_ids": [],
+  "outcomes": {
+    "passed": 5,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "duration_s": 0.865,
+  "raw_output": "gate_d_raw.txt",
+  "raw_output_sha256": "400d46ce4dc23179e811de95625a0e3efd4aa5514ff5958f5fbb028b5631b78d",
+  "enumeration_sha256": "08ff11e6c6f15d901027b9b7801acf4c0935e4f58df82f668aa379f97db2790e",
+  "environment": {
+    "python_version": "3.12.14",
+    "python_version_info": [
+      3,
+      12,
+      14
+    ],
+    "pydantic_version": "2.13.5",
+    "pytest_version": "8.4.2",
+    "sqlite_version": "3.45.1",
+    "executable": "/tmp/ia/rt/runtime/3.12.14/venv/bin/python"
+  },
+  "generated_utc": "2026-09-28T18:57:07.017249+00:00"
+}

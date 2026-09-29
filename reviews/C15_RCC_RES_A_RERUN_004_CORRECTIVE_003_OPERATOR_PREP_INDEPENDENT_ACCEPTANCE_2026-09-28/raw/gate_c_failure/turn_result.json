@@ -1,0 +1,497 @@
+{
+  "exchange": {
+    "integrity": {
+      "chain": {
+        "error": null,
+        "first_bad_seq": null,
+        "head_sha256": "d6262edfe460db359fa6e2de8d6dd636f1a3bd25fbc5222a2973c3b67f53ed20",
+        "ok": true,
+        "records": 6
+      },
+      "exchange_root": "/tmp/pytest-of-user/pytest-2/test_ia_c2_two_round_failure_r0/exchange",
+      "ok": true,
+      "problems": [],
+      "requests": {
+        "req-0001-model_directive-59503ea3": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 1,
+          "request_sha256": "6a9e090be0e0c8bd07adc7e24238d2e018d40204ac2e5a240ed5e5023bd99844",
+          "response_sha256": "b07d35ca5f8dd054c5127e7d32dc50ddc957781c32d6b96f9685a201bdbb4ffe"
+        },
+        "req-0002-model_directive-16ddb92c": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 4,
+          "request_sha256": "e84986730901c12bb758b83ca115bd0199f8d531236648ea71e2e305c00d7ad3",
+          "response_sha256": "af89f3c3454f448fae2dcb17a65e4b0c3b20eab9c20bf8abe4d3fd04861d4f52"
+        }
+      }
+    },
+    "recovery_state": {
+      "classification": "COMPLETE",
+      "complete": [
+        "req-0001-model_directive-59503ea3",
+        "req-0002-model_directive-16ddb92c"
+      ],
+      "dispatch_boundary_event": "request_published",
+      "dispatch_boundary_rule": "not_submitted reconciliation is allowed only when no request_published record exists; after request publication the exchange fails closed instead of declaring the request unsubmitted",
+      "durable_unconsumed": [],
+      "ledger": {
+        "error": null,
+        "first_bad_seq": null,
+        "head_sha256": "d6262edfe460db359fa6e2de8d6dd636f1a3bd25fbc5222a2973c3b67f53ed20",
+        "ok": true,
+        "records": 6
+      },
+      "not_submitted_allowed": false,
+      "open_dispatched": [],
+      "requests": [
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 1
+            },
+            {
+              "event": "response_published",
+              "seq": 2
+            },
+            {
+              "event": "response_consumed",
+              "seq": 3
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0001-model_directive-59503ea3",
+          "request_sha256": "6a9e090be0e0c8bd07adc7e24238d2e018d40204ac2e5a240ed5e5023bd99844",
+          "response_sha256": "b07d35ca5f8dd054c5127e7d32dc50ddc957781c32d6b96f9685a201bdbb4ffe",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 4
+            },
+            {
+              "event": "response_published",
+              "seq": 5
+            },
+            {
+              "event": "response_consumed",
+              "seq": 6
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0002-model_directive-16ddb92c",
+          "request_sha256": "e84986730901c12bb758b83ca115bd0199f8d531236648ea71e2e305c00d7ad3",
+          "response_sha256": "af89f3c3454f448fae2dcb17a65e4b0c3b20eab9c20bf8abe4d3fd04861d4f52",
+          "semantic_dispatch_occurred": true
+        }
+      ],
+      "semantic_dispatch_occurred": true
+    }
+  },
+  "handoffs": [
+    {
+      "declared_request_sha256": "6a9e090be0e0c8bd07adc7e24238d2e018d40204ac2e5a240ed5e5023bd99844",
+      "path": "published_new_request",
+      "request_id": "req-0001-model_directive-59503ea3",
+      "request_sha256": "6a9e090be0e0c8bd07adc7e24238d2e018d40204ac2e5a240ed5e5023bd99844",
+      "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+      "response_sha256": "b07d35ca5f8dd054c5127e7d32dc50ddc957781c32d6b96f9685a201bdbb4ffe"
+    },
+    {
+      "declared_request_sha256": "e84986730901c12bb758b83ca115bd0199f8d531236648ea71e2e305c00d7ad3",
+      "path": "published_new_request",
+      "request_id": "req-0002-model_directive-16ddb92c",
+      "request_sha256": "e84986730901c12bb758b83ca115bd0199f8d531236648ea71e2e305c00d7ad3",
+      "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+      "response_sha256": "af89f3c3454f448fae2dcb17a65e4b0c3b20eab9c20bf8abe4d3fd04861d4f52"
+    }
+  ],
+  "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+  "session_id": "ia-synthetic-session",
+  "status_after": {
+    "index_lag": 0,
+    "index_path": "/tmp/pytest-of-user/pytest-2/test_ia_c2_two_round_failure_r0/ia_world.search.sqlite",
+    "index_watermark": 2,
+    "status": "ready",
+    "subject_id": "ia_synthetic_subject",
+    "world_path": "/tmp/pytest-of-user/pytest-2/test_ia_c2_two_round_failure_r0/ia_world.sqlite",
+    "world_revision": 2,
+    "writer_lease_held": true
+  },
+  "status_before": {
+    "index_lag": 0,
+    "index_path": "/tmp/pytest-of-user/pytest-2/test_ia_c2_two_round_failure_r0/ia_world.search.sqlite",
+    "index_watermark": 0,
+    "status": "ready",
+    "subject_id": "ia_synthetic_subject",
+    "world_path": "/tmp/pytest-of-user/pytest-2/test_ia_c2_two_round_failure_r0/ia_world.sqlite",
+    "world_revision": 0,
+    "writer_lease_held": true
+  },
+  "subject_id": "ia_synthetic_subject",
+  "turn_index": 1,
+  "turn_result": {
+    "context": {
+      "ai_identity": {},
+      "capability_catalog": [
+        {
+          "kind": "write",
+          "name": "commit_ai_world_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "commit_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "commit_operation_experience",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "compare_claims",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "create_attention_watch",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "create_task",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "drill_down_conversation",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "expand_recall",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "focus_entity",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "follow_relation",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "form_event",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "inspect_outcome",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "inspect_world_object",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "list_attention_watches",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "list_conversation_summaries",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "list_dimensions",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "propose_action",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_cognitive_policy",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_dimension",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_entity",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_goal",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "read_ai_world",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_background_budget",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_cognitive_policies",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_execution_world",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_periodic_review_anchors",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_world_map",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "record_communication_experience",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "request_all_dimensions_projection",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "retract_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "retrieve_original_observation",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "revise_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "revise_entity",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "rollback_cognitive_policy",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "search_conversation_summaries",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "search_timeline",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "search_world",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "transition_dimension",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "transition_event",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "transition_goal",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "transition_task",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "update_cognitive_policy",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "upsert_relation",
+          "side_effecting": true
+        }
+      ],
+      "conversation_summaries": [],
+      "current_topic": "IA synthetic two-round probe",
+      "estimated_tokens": 1274,
+      "memory_cards": [],
+      "recent_turns": [],
+      "task_context": {
+        "cognitive_policy_context": {
+          "_meta": {
+            "included": 0,
+            "reader": "read_cognitive_policies",
+            "total": 0,
+            "truncated": false
+          },
+          "_policy_records": [],
+          "communication.detail_level": null,
+          "memory.recommendation_limit": 5
+        },
+        "conversation_continuity": {
+          "pending_round_summary": null,
+          "raw_drill_down_capability": "drill_down_conversation",
+          "recent_turn_count": 0,
+          "round_summary_count": 0,
+          "session_id": "ia-synthetic-session",
+          "summary_index_capability": "list_conversation_summaries",
+          "summary_search_capability": "search_conversation_summaries"
+        },
+        "current_user_observation_ref": {
+          "object_id": "obs_conv_user_934747388788485133be2010",
+          "revision": 1
+        },
+        "related_execution_anchors": [],
+        "topic_state": {
+          "antecedent_recall_needed": false,
+          "continued_from_recent_turn": false,
+          "gate_open": true,
+          "history_may_help": false,
+          "reason": "current_utterance_topic:history_not_needed",
+          "topic": "IA synthetic two-round probe"
+        }
+      },
+      "token_budget": 3400,
+      "truncated": false,
+      "user_input": "IA synthetic two-round probe",
+      "world_map": {
+        "as_of": "2026-09-28T00:00:00+00:00",
+        "dimension_count": 1,
+        "dimensions": [
+          {
+            "current_object_count": 1,
+            "definition_ref": null,
+            "dimension": "dim:user_ai_interaction",
+            "latest_activity_at": "2026-09-28T00:00:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "observation"
+            ],
+            "recent_24h_count": 1,
+            "recent_7d_count": 1,
+            "registered": false
+          }
+        ],
+        "directory_only": true,
+        "expand_capabilities": {
+          "broader_recall": "expand_recall",
+          "dimension_definitions": "list_dimensions",
+          "exact_object": "inspect_world_object",
+          "multi_dimension_window": "request_all_dimensions_projection",
+          "refresh_directory": "read_world_map",
+          "semantic_recall": "search_world",
+          "single_dimension_timeline": "search_timeline"
+        },
+        "index_lag": 0,
+        "index_watermark": 1,
+        "schema": "aios.world-map.l0.v1",
+        "semantic_conclusions": false,
+        "truncated": false,
+        "world_revision": 1
+      }
+    },
+    "continuity_summary_commits": [],
+    "continuity_summary_error": null,
+    "conversation_commit": {
+      "assistant_observation_id": "obs_conv_ai_7ab4d3e08f3e0ff0fb5f1185",
+      "assistant_world_revision": 2,
+      "idempotent_replay": false,
+      "user_observation_id": "obs_conv_user_934747388788485133be2010",
+      "user_world_revision": 1,
+      "world_revision": 2
+    },
+    "recommendation": {
+      "cards": [],
+      "current_topic": "IA synthetic two-round probe",
+      "index_watermark": 1,
+      "reason": "current_topic_does_not_need_history",
+      "topic_gate_open": true,
+      "world_revision": 1
+    },
+    "runtime": {
+      "capability_history": [
+        {
+          "call_id": "ia-call-0001",
+          "data": null,
+          "error_code": "CAPABILITY_NOT_FOUND",
+          "error_message": "unknown capability: ia_nonexistent_capability",
+          "name": "ia_nonexistent_capability",
+          "ok": false
+        }
+      ],
+      "model_input_tokens": null,
+      "model_output_tokens": null,
+      "model_rounds": 2,
+      "model_total_tokens": null,
+      "model_usage_complete": false,
+      "recovered_response_attempts": [],
+      "response": null,
+      "silenced": true,
+      "termination_reason": "silence"
+    }
+  },
+  "world_path": "/tmp/pytest-of-user/pytest-2/test_ia_c2_two_round_failure_r0/ia_world.sqlite"
+}

@@ -1,0 +1,39 @@
+{
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "status": "PASS",
+  "gates": {
+    "A": {
+      "status": "PASS",
+      "result_file": "gate_a_result.json",
+      "result_sha256": "c5f69a33eea7fad688e0f16d14cbf441ca448b324ab26fb6b394e4e48c8c09ff"
+    },
+    "B": {
+      "status": "PASS",
+      "result_file": "gate_b_result.json",
+      "result_sha256": "1e31687cf6535e4e59e0e8a73d6cf530db94f81d058b723c49f34ef69a87ab4c"
+    },
+    "C": {
+      "status": "PASS",
+      "result_file": "gate_c_result.json",
+      "result_sha256": "8fc3b481dff64ff2456f07dc6689f0e68d62bcf1bd6e3ac3e6ad7236b518bd35"
+    },
+    "D": {
+      "status": "PASS",
+      "result_file": "gate_d_result.json",
+      "result_sha256": "fa651d115c1086b6f7ce50fbfc447e77bfc412f0e9935735cdfc14430585cd93"
+    }
+  },
+  "environment": {
+    "python_version": "3.12.14",
+    "python_version_info": [
+      3,
+      12,
+      14
+    ],
+    "pydantic_version": "2.13.5",
+    "pytest_version": "8.4.2",
+    "sqlite_version": "3.45.1",
+    "executable": "/tmp/ia/rt/runtime/3.12.14/venv/bin/python"
+  },
+  "generated_utc": "2026-09-28T18:57:07.017405+00:00"
+}

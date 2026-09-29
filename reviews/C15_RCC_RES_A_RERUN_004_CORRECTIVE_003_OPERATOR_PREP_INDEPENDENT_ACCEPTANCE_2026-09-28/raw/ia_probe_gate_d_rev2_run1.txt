@@ -1,0 +1,12 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /tmp/ia/rt/runtime/3.12.14/venv/bin/python
+rootdir: /home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_INDEPENDENT_ACCEPTANCE_2026-09-28/probes
+configfile: ../../../pyproject.toml
+collecting ... collected 1 item
+
+test_ia_gate_d_rev2.py::test_ia_d_rev2_semantic_script_audit PASSED      [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED test_ia_gate_d_rev2.py::test_ia_d_rev2_semantic_script_audit
+============================== 1 passed in 0.51s ===============================
