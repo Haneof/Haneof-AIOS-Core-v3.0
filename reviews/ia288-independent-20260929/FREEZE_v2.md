@@ -1,0 +1,3 @@
+# v2 pre-execution freeze
+v1 source and host result retained unchanged. The request-mutation probe had an incomplete response envelope (missing authored_by, invalid finish directive); corrected to legal external synthetic response. v1 execution hit missing Core before reaching this error. Expectations unchanged.
+Added independent five-case replay matrix, six-case snapshot binding/ambiguity matrix and symlink manifest rejection. All assertions expected to pass. Request mutation attack remains supplemental; binding significance requires adjudication, not automatically inferred from an assertion.
