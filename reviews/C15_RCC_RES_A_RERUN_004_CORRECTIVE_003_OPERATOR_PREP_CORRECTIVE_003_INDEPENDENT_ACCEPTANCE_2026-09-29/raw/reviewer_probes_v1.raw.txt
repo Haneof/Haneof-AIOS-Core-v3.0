@@ -1,0 +1,1003 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /home/user/ia_review/runtime/runtime/3.12.14/venv/bin/python
+rootdir: /home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes
+configfile: ../../../pyproject.toml
+collecting ... collected 48 items
+
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra01_cross_process.py::test_ra01_four_process_distinct_publishers PASSED [  2%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra01_cross_process.py::test_ra01_two_process_same_intended_request_single_dispatch FAILED [  4%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra01_cross_process.py::test_ra01_two_process_response_publish_race PASSED [  6%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra01_cross_process.py::test_ra01_two_process_consume_race PASSED [  8%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra01_cross_process.py::test_ra01_publish_and_consume_race_across_processes PASSED [ 10%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra01_cross_process.py::test_ra01_handler_race_two_processes_same_snapshot PASSED [ 12%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra02_directory_durability.py::test_ra02_request_dir_fsync_failure_is_not_dispatch PASSED [ 14%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra02_directory_durability.py::test_ra02_request_dir_open_failure_is_not_dispatch PASSED [ 16%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra02_directory_durability.py::test_ra02_response_dir_fsync_failure_is_not_published PASSED [ 18%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra02_directory_durability.py::test_ra02_response_dir_open_failure_is_not_published PASSED [ 20%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra02_directory_durability.py::test_ra02_first_ledger_creation_dir_fsync_failure_is_not_durable PASSED [ 22%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra02_directory_durability.py::test_ra02_first_ledger_creation_dir_open_failure_is_not_durable PASSED [ 25%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra02_directory_durability.py::test_ra02_ledger_append_file_fsync_failure_is_not_durable PASSED [ 27%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra03_visible_unproven_retry.py::test_ra03_request_retry_after_unproven_dir_fsync PASSED [ 29%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra03_visible_unproven_retry.py::test_ra03_request_retry_rejects_mutated_visible_bytes PASSED [ 31%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra03_visible_unproven_retry.py::test_ra03_response_retry_after_unproven_dir_fsync PASSED [ 33%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra03_visible_unproven_retry.py::test_ra03_response_retry_with_different_bytes_fails_closed PASSED [ 35%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra03_visible_unproven_retry.py::test_ra03_first_ledger_retry_single_entry PASSED [ 37%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra04_crash_boundaries.py::test_ra04_crash_then_retry_converges PASSED [ 39%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra04_crash_boundaries.py::test_ra04_crash_points_leave_no_orphan_dispatch PASSED [ 41%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra04_crash_boundaries.py::test_ra04_handler_crash_after_dispatch_resumes_without_second_dispatch FAILED [ 43%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra05_lock_attacks.py::test_ra05_lock_path_is_stable_and_dedicated PASSED [ 45%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra05_lock_attacks.py::test_ra05_lock_symlink_fails_closed PASSED [ 47%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra05_lock_attacks.py::test_ra05_lock_path_directory_fails_closed PASSED [ 50%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra05_lock_attacks.py::test_ra05_lock_inode_replacement_still_excludes PASSED [ 52%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra05_lock_attacks.py::test_ra05_stale_lock_file_after_process_death FAILED [ 54%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra05_lock_attacks.py::test_ra05_contention_is_real_cross_process FAILED [ 56%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra05_lock_attacks.py::test_ra05_nested_mutation_does_not_self_deadlock FAILED [ 58%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra05_lock_attacks.py::test_ra05_lock_released_while_awaiting_external_response PASSED [ 60%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra06_races_and_integration.py::test_ra06_tamper_between_artifact_write_and_ledger_append FAILED [ 62%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra06_races_and_integration.py::test_ra06_direct_consume_after_request_file_mutation FAILED [ 64%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra06_races_and_integration.py::test_ra06_two_processes_recover_same_dispatch PASSED [ 66%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra06_races_and_integration.py::test_ra06_due_work_and_user_turn_share_exchange_root PASSED [ 68%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py::test_c1_tampered_published_response_fails_closed PASSED [ 70%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py::test_c1_missing_published_response_fails_closed PASSED [ 72%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py::test_c1_intact_replay_is_idempotent PASSED [ 75%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py::test_c2_wheel_trust_root_closed_set PASSED [ 77%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py::test_c2_install_uses_no_index_no_resolver PASSED [ 79%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py::test_c4_recovery_snapshot_mismatch_fails_closed PASSED [ 81%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py::test_c5_interior_mutation_detected PASSED [ 83%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py::test_c5_interior_deletion_detected PASSED [ 85%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py::test_c5_duplicate_event_detected PASSED [ 87%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py::test_c5_sequence_corruption_detected PASSED [ 89%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py::test_c5_digest_discontinuity_detected PASSED [ 91%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py::test_c5_illegal_event_order_detected PASSED [ 93%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py::test_c6_frozen_rc_identity_checks PASSED [ 95%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py::test_c7_exact_runtime_pins FAILED [ 97%]
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py::test_c8_clean_room_startup_boundary FAILED [100%]
+
+=================================== FAILURES ===================================
+_________ test_ra01_two_process_same_intended_request_single_dispatch __________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_ra01_two_process_same_int0')
+exchange = PosixPath('/tmp/pytest-of-user/pytest-0/test_ra01_two_process_same_int0/exchange')
+
+    def test_ra01_two_process_same_intended_request_single_dispatch(tmp_path, exchange):
+        # identical intended request from two independent publishers
+        specs = _specs(
+            tmp_path,
+            exchange,
+            [{"mode": "publish", "marker": "same-intended-request"} for _ in range(2)],
+        )
+        results = collect(spawn_workers(specs), timeout=90)
+        assert all(r.get("ok") for r in results), results
+        rows = assert_linear(exchange)
+        published = [r for r in rows if r["event"] == "request_published"]
+>       assert len(published) == 1, f"duplicate semantic dispatch: {len(published)} request_published"
+E       AssertionError: duplicate semantic dispatch: 2 request_published
+E       assert 2 == 1
+E        +  where 2 = len([{'event': 'request_published', 'prev_sha256': '0000000000000000000000000000000000000000000000000000000000000000', 'record_sha256': '8159cc90b6c2d129b31669e93553007589a7bac06f5233fb46a4b572d31f34d2', 'request_id': 'req-0001-model_directive-5636cc07', 'request_sha256': '00ba98a900a01c32b55b9b4a2062e6a3872801d4f2c3f14fb93573b524b87756', 'response_sha256': None, 'seq': 1, 'wall_clock': '2026-09-29T10:24:27.383270Z'}, {'event': 'request_published', 'prev_sha256': '8159cc90b6c2d129b31669e93553007589a7bac06f5233fb46a4b572d31f34d2', 'record_sha256': 'dd462fa9b1974780610ef8f939c6fbe28ddbd7721ef142219af2d76958798201', 'request_id': 'req-0002-model_directive-5636cc07', 'request_sha256': '106a65e0d067c6b0d27ede7a9e3bb19bedd7f052367485fa61eb0c985383d275', 'response_sha256': None, 'seq': 2, 'wall_clock': '2026-09-29T10:24:27.385994Z'}])
+
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra01_cross_process.py:58: AssertionError
+____ test_ra04_handler_crash_after_dispatch_resumes_without_second_dispatch ____
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_ra04_handler_crash_after_0')
+exchange = PosixPath('/tmp/pytest-of-user/pytest-0/test_ra04_handler_crash_after_0/exchange')
+
+    def test_ra04_handler_crash_after_dispatch_resumes_without_second_dispatch(tmp_path, exchange):
+        """The runner must resume a durable dispatch instead of re-deciding."""
+        import threading
+        import time
+    
+        payload, proc = run_worker(
+            "crash-handler",
+            root=exchange,
+            marker="ra04-handler-snapshot",
+            point="after_ledger_append_before_receipt",
+            timeout=60,
+        )
+        assert proc.returncode == 9, f"handler worker did not crash (rc={proc.returncode})"
+        rows = _rows(exchange)
+        published = [r for r in rows if r["event"] == "request_published"]
+        assert len(published) == 1, f"expected exactly one durable dispatch, saw {len(published)}"
+    
+        # resume: the same snapshot must resume, not re-dispatch
+        from conftest import collect, spawn_workers
+    
+        gate = tmp_path / "resume-gate"
+        specs = [
+            {"mode": "handler", "root": exchange, "gate": gate, "token": "resume", "marker": "ra04-handler-snapshot", "timeout": 40}
+        ]
+        procs = spawn_workers(specs)
+    
+        from aios_exchange.bridge import ExchangeBridge
+    
+        bridge = ExchangeBridge(exchange)
+        stop = threading.Event()
+    
+        def responder():
+            while not stop.is_set():
+                state = bridge.recovery_state()
+                for rid in state["open_dispatched"]:
+                    bridge.responses.publish_object(
+                        request_id=rid,
+                        response={
+                            "response_version": 1,
+                            "request_id": rid,
+                            "request_sha256": bridge.request_sha256(rid),
+                            "authored_by": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+                            "directive": {
+                                "capability_calls": [],
+                                "response": "ra04-resume-response",
+                                "silence": False,
+                            },
+                        },
+                    )
+                time.sleep(0.01)
+    
+        worker = threading.Thread(target=responder, daemon=True)
+        worker.start()
+        try:
+            results = collect(procs, timeout=90)
+        finally:
+            stop.set()
+            worker.join(timeout=10)
+    
+        assert all(r.get("ok") for r in results), results
+        rows = assert_linear(exchange)
+        assert len([r for r in rows if r["event"] == "request_published"]) == 1, "re-dispatch on resume"
+>       assert results[0]["handoffs"][0]["path"] == "resumed_dispatched_request", results[0]["handoffs"]
+E       AssertionError: [{'declared_request_sha256': '54102454c47c2753aeeddc1dbf702c9de40493fb9873da138a8b7204c27e20e4', 'path': 'recovered_durable_response', 'request_id': 'req-0001-model_directive-ec6791f6', 'request_sha256': '54102454c47c2753aeeddc1dbf702c9de40493fb9873da138a8b7204c27e20e4', ...}]
+E       assert 'recovered_durable_response' == 'resumed_dispatched_request'
+E         
+E         - resumed_dispatched_request
+E         + recovered_durable_response
+
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra04_crash_boundaries.py:143: AssertionError
+________________ test_ra05_stale_lock_file_after_process_death _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_ra05_stale_lock_file_afte0')
+exchange = PosixPath('/tmp/pytest-of-user/pytest-0/test_ra05_stale_lock_file_afte0/exchange')
+
+    def test_ra05_stale_lock_file_after_process_death(tmp_path, exchange):
+        """A SIGKILLed holder leaves the lock file; a new process must proceed."""
+        gate = tmp_path / "hold-gate"
+        holder = subprocess.Popen(
+            [sys.executable, str(pathlib.Path(__file__).parent / "probe_worker.py"), "lock-hold-stop",
+             "--root", str(exchange), "--gate", str(gate), "--token", "holder"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+        )
+        deadline = time.monotonic() + 20
+        while time.monotonic() < deadline and not list(gate.glob("ready-*")):
+            time.sleep(0.01)
+>       (gate / "go").write_text("go")
+
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra05_lock_attacks.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+ia_review/runtime/runtime/3.12.14/python/lib/python3.12/pathlib.py:1047: in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-user/pytest-0/test_ra05_stale_lock_file_afte0/hold-gate/go')
+mode = 'w', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-user/pytest-0/test_ra05_stale_lock_file_afte0/hold-gate/go'
+
+ia_review/runtime/runtime/3.12.14/python/lib/python3.12/pathlib.py:1013: FileNotFoundError
+__________________ test_ra05_contention_is_real_cross_process __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_ra05_contention_is_real_c0')
+exchange = PosixPath('/tmp/pytest-of-user/pytest-0/test_ra05_contention_is_real_c0/exchange')
+
+    def test_ra05_contention_is_real_cross_process(tmp_path, exchange):
+        """While a holder owns the lock, an independent process must observe exclusion."""
+        gate = tmp_path / "hold-gate-2"
+        holder = subprocess.Popen(
+            [sys.executable, str(pathlib.Path(__file__).parent / "probe_worker.py"), "lock-hold-stop",
+             "--root", str(exchange), "--gate", str(gate), "--token", "holder"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+        )
+        deadline = time.monotonic() + 20
+        while time.monotonic() < deadline and not list(gate.glob("ready-*")):
+            time.sleep(0.01)
+>       (gate / "go").write_text("go")
+
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra05_lock_attacks.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+ia_review/runtime/runtime/3.12.14/python/lib/python3.12/pathlib.py:1047: in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-user/pytest-0/test_ra05_contention_is_real_c0/hold-gate-2/go')
+mode = 'w', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-user/pytest-0/test_ra05_contention_is_real_c0/hold-gate-2/go'
+
+ia_review/runtime/runtime/3.12.14/python/lib/python3.12/pathlib.py:1013: FileNotFoundError
+_______________ test_ra05_nested_mutation_does_not_self_deadlock _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_ra05_nested_mutation_does0')
+exchange = PosixPath('/tmp/pytest-of-user/pytest-0/test_ra05_nested_mutation_does0/exchange')
+
+    def test_ra05_nested_mutation_does_not_self_deadlock(tmp_path, exchange):
+        """Nested transactions in one process (same path, different objects) must not
+        deadlock, and must release only at the outermost exit."""
+        from aios_exchange.bridge import ExchangeBridge
+        from aios_exchange.ledger import ExchangeLedger
+    
+        bridge = ExchangeBridge(exchange)
+        other = ExchangeLedger(exchange / "ledger.jsonl")
+        with bridge.ledger.mutation():
+            with bridge.ledger.mutation():
+                with other.mutation():
+                    bridge.ledger._append_locked(
+                        "request_published", request_id="ra05-nested", request_sha256="a" * 64
+                    )
+>       rows = assert_linear(exchange)
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra05_lock_attacks.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/conftest.py:130: in assert_linear
+    raw = bridge.requests.path_for(row["request_id"]).read_bytes()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ia_review/runtime/runtime/3.12.14/python/lib/python3.12/pathlib.py:1019: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-user/pytest-0/test_ra05_nested_mutation_does0/exchange/requests/ra05-nested.json')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-user/pytest-0/test_ra05_nested_mutation_does0/exchange/requests/ra05-nested.json'
+
+ia_review/runtime/runtime/3.12.14/python/lib/python3.12/pathlib.py:1013: FileNotFoundError
+__________ test_ra06_tamper_between_artifact_write_and_ledger_append ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_ra06_tamper_between_artif0')
+exchange = PosixPath('/tmp/pytest-of-user/pytest-0/test_ra06_tamper_between_artif0/exchange')
+
+    def test_ra06_tamper_between_artifact_write_and_ledger_append(tmp_path, exchange):
+        """TOCTOU: swap the request bytes inside the publication window, then check
+        that the tampered bytes can never be treated as the dispatched request."""
+        import subprocess
+        import sys
+    
+        worker = pathlib.Path(__file__).parent / "probe_worker.py"
+        proc = subprocess.Popen(
+            [sys.executable, str(worker), "toctou-publish", "--root", str(exchange),
+             "--marker", "ra06-toctou"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+        )
+        window = exchange / "window-open"
+        deadline = time.monotonic() + 30
+        while time.monotonic() < deadline and not window.exists():
+            time.sleep(0.01)
+        assert window.exists(), "publication window never opened"
+        target = pathlib.Path(window.read_text())
+        assert target.exists()
+        target.write_bytes(b'{"reviewer_tamper":true}\n')
+        out, err = proc.communicate(timeout=60)
+        payload = None
+        for line in reversed(out.strip().splitlines()):
+            try:
+                payload = json.loads(line)
+                break
+            except Exception:
+                continue
+>       rows = assert_linear(exchange) if (exchange / "ledger.jsonl").exists() else []
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra06_races_and_integration.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = PosixPath('/tmp/pytest-of-user/pytest-0/test_ra06_tamper_between_artif0/exchange')
+
+    def assert_linear(root: pathlib.Path, *, expect_events=None):
+        """Assert the durable exchange state is linear, chained and unique."""
+        from aios_exchange.bridge import ExchangeBridge
+        from aios_exchange.canonical import canonical_json_bytes
+        import hashlib
+    
+        bridge = ExchangeBridge(root)
+        rows = bridge.ledger.read_records()
+        assert bridge.ledger.verify_chain()["ok"], "ledger chain invalid"
+        assert [r["seq"] for r in rows] == list(range(1, len(rows) + 1)), "seq not monotonic"
+        previous = "0" * 64
+        for row in rows:
+            assert row["prev_sha256"] == previous, f"broken chain at seq {row['seq']}"
+            body = {k: v for k, v in row.items() if k != "record_sha256"}
+            assert hashlib.sha256(canonical_json_bytes(body)).hexdigest() == row["record_sha256"]
+            previous = row["record_sha256"]
+        counts: dict[tuple, int] = {}
+        for row in rows:
+            counts[(row["request_id"], row["event"])] = counts.get((row["request_id"], row["event"]), 0) + 1
+        assert all(v == 1 for v in counts.values()), f"duplicate semantic event: {counts}"
+        for row in rows:
+            if row["event"] == "request_published":
+                raw = bridge.requests.path_for(row["request_id"]).read_bytes()
+>               assert hashlib.sha256(raw).hexdigest() == row["request_sha256"], "request digest drift"
+E               AssertionError: request digest drift
+E               assert 'b12fb68cfec8758aa78f5a4cad4aaaad8d9f2a12b691a180a718158dafbdef7f' == '2d5a997edb504632bcda984ab85c82776ce727b123ba1293fe2c7e19a857255c'
+E                 
+E                 - 2d5a997edb504632bcda984ab85c82776ce727b123ba1293fe2c7e19a857255c
+E                 + b12fb68cfec8758aa78f5a4cad4aaaad8d9f2a12b691a180a718158dafbdef7f
+
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/conftest.py:131: AssertionError
+_____________ test_ra06_direct_consume_after_request_file_mutation _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_ra06_direct_consume_after0')
+exchange = PosixPath('/tmp/pytest-of-user/pytest-0/test_ra06_direct_consume_after0/exchange')
+
+    def test_ra06_direct_consume_after_request_file_mutation(tmp_path, exchange):
+        """#290 observation, re-tested: mutate the request file, then consume directly.
+    
+        Expected: the durable response binding (request digest held in the ledger)
+        is unaffected; the mutated request bytes can never enter the semantic result.
+        """
+        seed, _ = run_worker("publish", root=exchange, marker="ra06-direct-consume")
+        request_id = seed["receipt"]["request_id"]
+        published, _ = run_worker(
+            "publish-response", root=exchange, request_id=request_id, marker="ra06-published-response"
+        )
+        assert published["ok"], published
+        request_path = exchange / "requests" / f"{request_id}.json"
+        request_path.write_bytes(b'{"reviewer_mutation":true}\n')
+    
+        from aios_exchange.bridge import ExchangeBridge
+    
+        bridge = ExchangeBridge(exchange)
+        raw = bridge.consume_response(request_id)
+        directive = bridge.directive_for(request_id)
+        assert directive.response == "ra06-published-response", "semantic result drifted"
+>       assert json.loads(raw.decode())["request_sha256"] == published["receipt"]["request_sha256"]
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'request_sha256'
+
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra06_races_and_integration.py:123: KeyError
+__________________________ test_c7_exact_runtime_pins __________________________
+
+    def test_c7_exact_runtime_pins():
+        import sqlite3
+        import ssl
+    
+        import pydantic
+        import pytest
+    
+        assert sys.version.split()[0] == "3.12.14", sys.version
+        assert pydantic.VERSION == "2.13.5", pydantic.VERSION
+        assert pytest.__version__ == "8.4.2", pytest.__version__
+        assert sqlite3.sqlite_version == "3.45.1", sqlite3.sqlite_version
+        assert ssl.OPENSSL_VERSION.startswith("OpenSSL 3.0.13"), ssl.OPENSSL_VERSION
+    
+        import aios_core
+    
+        core_file = pathlib.Path(aios_core.__file__).resolve()
+>       assert str(core_file).startswith(str(REPO_ROOT.resolve())), (
+            f"foreign import path: {core_file}"
+        )
+E       AssertionError: foreign import path: /home/user/Haneof-AIOS-Core-v3.0/src/aios_core/__init__.py
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x7fa1f6a05ca0>('/home/user/ia_review/rc')
+E        +    where <built-in method startswith of str object at 0x7fa1f6a05ca0> = '/home/user/Haneof-AIOS-Core-v3.0/src/aios_core/__init__.py'.startswith
+E        +      where '/home/user/Haneof-AIOS-Core-v3.0/src/aios_core/__init__.py' = str(PosixPath('/home/user/Haneof-AIOS-Core-v3.0/src/aios_core/__init__.py'))
+E        +    and   '/home/user/ia_review/rc' = str(PosixPath('/home/user/ia_review/rc'))
+E        +      where PosixPath('/home/user/ia_review/rc') = resolve()
+E        +        where resolve = PosixPath('/home/user/ia_review/rc').resolve
+
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py:357: AssertionError
+_____________________ test_c8_clean_room_startup_boundary ______________________
+
+    def test_c8_clean_room_startup_boundary():
+        packet = json.loads((PACKAGE_ROOT / "RESIDENT_SAFE_LAUNCH_PACKET.json").read_text())
+        inputs = packet["allowed_startup_inputs"]
+        assert len(inputs) == 4, f"startup input set is not exactly four: {inputs}"
+        assert packet["status"] == "PREP_REVIEW_READY", packet["status"]
+        assert packet["status"] != "READY_FOR_RESIDENT"
+        assert not any("fixture" in str(item).lower() for item in inputs)
+        assert not any("evaluator" in str(item).lower() for item in inputs)
+    
+        # the run package must not reach test/synthetic/evaluator modules
+        run_package = PACKAGE_ROOT / "harness" / "aios_exchange"
+        forbidden = ("tests.synthetic", "deterministic_resident", "crash_worker", "fixture", "evaluator")
+        for path in sorted(run_package.rglob("*.py")):
+            text = path.read_text()
+            for token in forbidden:
+>               assert token not in text, f"{path} references {token!r}"
+E               AssertionError: /home/user/ia_review/h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/runner.py references 'fixture'
+E               assert 'fixture' not in '"""Runtime plumbing for the Resident launch boundary.\n\nThe runner owns the mechanical side of a turn:\n\n* it drives the frozen Core runtime;\n* whenever Core needs a model decision it publishes a durable request through\n  the exchange bridge;\n* it blocks until some **external** session durably publishes the exact\n  response bytes, then parses them into a real ``ModelDirective`` and consumes\n  the exchange record.\n\nThere is deliberately **no** semantic callback, provider adapter, keyword\nrouter, fixture rule, prewritten answer, default directive or fallback reply in\nthis module. The only source of a directive is published response bytes.\n\nRecovery follows the frozen corrective rule: once a ``request_published``\nrecord exists, the runner never re-decides; it resumes the existing request or\nconsumes the already durable response.\n"""\n\nfrom __future__ import annotations\n\nimport datetime as _dt\nimport json\nimport pathlib\nfrom dataclasses import dataclass\nfrom typing import Any, Mapping\n\nfrom aios_core.runtime.cognitive_runtime import ModelDirective, RuntimeSnapshot\n\nfrom . import REAL_RESPONSE_MODE\nfrom .bridge import (\n    DISPATCH_BOUNDARY_EVENT,\n    DISPATCH_BOUNDARY_RULE,\n    ExchangeBridge,\n    ExchangeContractError,\n)\nfrom .canonical import canonical_json_bytes, sha256_hex\nfrom .schema import parse_model_directive, serialize_runtime_snapshot\n\n__all__ = [\n    "REAL_RESPONSE_MODE",\n    "DISPATCH_BOUNDARY_EVENT",\n    "DISPATCH_BOUNDARY_RULE",\n    "ExternalSessionConfig",\n    "ExternalSessionModelHandler",\n    "open_bridge",\n    "run_user_turn",\n    "run_due_work",\n]\n\n\n@dataclass(frozen=True)\nclass ExternalSessionConfig:\n    """Mechanical configuration of the model boundary."""\n\n    exchange_root: pathlib.Path\n    kind: str = "model_directive"\n    response_timeout_s: float = 1800.0\n    poll_interval_s: float = 0.05\n\n    def __post_init__(self) -> None:\n        if not str(self.kind).strip():\n            raise ValueError("kind must be non-blank")\n        if float(self.response_timeout_s) <= 0:\n            raise ValueError("response_timeout_s must be positive")\n\n\nclass ExternalSessionModelHandler:\n    """Model boundary usable as a Core ``ModelHandler``.\n\n    ``Callable[[RuntimeSnapshot], ModelDirective]`` where the directive is\n    parsed from durably published external response bytes.\n    """\n\n    def __init__(self, config: ExternalSessionConfig) -> None:\n        self.config = config\n        self.bridge = ExchangeBridge(config.exchange_root)\n        self.handoffs: list[dict[str, Any]] = []\n\n    # -- model boundary --------------------------------------------------\n    def __call__(self, snapshot: RuntimeSnapshot) -> ModelDirective:\n        body = serialize_runtime_snapshot(snapshot)\n        body_bytes = canonical_json_bytes(body)\n        body_digest = sha256_hex(body_bytes)\n        # Recovery classification and a potential NEW semantic dispatch are\n        # one transaction. Two runners cannot both observe an empty prefix and\n        # publish the same model boundary twice. Never hold this lock while\n        # waiting for the external response: that publisher needs the lock.\n        with self.bridge.ledger.mutation():\n            state = self.bridge.recovery_state()\n            durable = list(state.get("durable_unconsumed") or [])\n            outstanding = list(state.get("open_dispatched") or [])\n            identities = set(durable + outstanding)\n            if len(durable) > 1 or len(outstanding) > 1 or len(identities) > 1:\n                raise ExchangeContractError("ambiguous recovery state")\n            if identities:\n                request_id = next(iter(identities))\n                # payload() validates the exact file against the ledger full-file SHA.\n                # Body SHA has a distinct domain from the timestamped envelope SHA.\n                durable_body = self.bridge.request_body(request_id)\n                durable_bytes = canonical_json_bytes(durable_body)\n                if sha256_hex(durable_bytes) != body_digest or durable_bytes != body_bytes:\n                    raise ExchangeContractError("recovery snapshot binding mismatch")\n                request_digest = self.bridge.request_sha256(request_id)\n                route = "recovered_durable_response" if durable else "resumed_dispatched_request"\n            else:\n                published = self.bridge.publish_request(kind=self.config.kind, body=body)\n                request_id = published["request_id"]\n                request_digest = published["request_sha256"]\n                route = "published_new_request"\n        return self._resolve(request_id, body_digest=request_digest, path=route)\n\n    def _resolve(\n        self,\n        request_id: str,\n        *,\n        body_digest: str | None,\n        path: str,\n    ) -> ModelDirective:\n        raw = self.bridge.await_response_bytes(\n            request_id,\n            timeout_s=self.config.response_timeout_s,\n            poll_interval_s=self.config.poll_interval_s,\n        )\n        try:\n            decoded = json.loads(raw.decode("utf-8"))\n        except Exception as exc:\n            raise ExchangeContractError(f"published response is not valid JSON: {exc}") from exc\n        directive = parse_model_directive(decoded)\n        self.bridge.consume_response(request_id)\n        self.handoffs.append(\n            {\n                "request_id": request_id,\n                "path": path,\n                "request_sha256": durable_request_digest(request_id, self.bridge),\n                "response_sha256": self.bridge.response_file_digest(request_id),\n                "declared_request_sha256": body_digest,\n                "response_mode": REAL_RESPONSE_MODE,\n            }\n        )\n        return directive\n\n    # -- audit -----------------------------------------------------------\n    def handoff_records(self) -> list[dict[str, Any]]:\n        return list(self.handoffs)\n\n\ndef durable_request_digest(request_id: str, bridge: ExchangeBridge) -> str | None:\n    """Digest of the durable request for a request id (mechanical helper)."""\n\n    return bridge.request_sha256(request_id)\n\n\ndef open_bridge(exchange_root: str | pathlib.Path) -> ExchangeBridge:\n    return ExchangeBridge(exchange_root)\n\n\ndef run_user_turn(\n    *,\n    world_path: str | pathlib.Path,\n    exchange_root: str | pathlib.Path,\n    subject_id: str,\n    session_id: str,\n    turn_index: int,\n    user_input: str,\n    occurred_at: str,\n    index_path: str | pathlib.Path | None = None,\n    response_timeout_s: float = 1800.0,\n    poll_interval_s: float = 0.05,\n    token_budget: int | None = None,\n) -> dict[str, Any]:\n    """Run one frozen-Core user turn whose model decisions come from the exchange.\n\n    ``world_path``/``subject_id``/``session_id``/``user_input``/``occurred_at``\n    are always supplied by the caller. Nothing here is defaulted or inferred\n    from repository state.\n    """\n\n    from aios_core.headless.core import HeadlessConfig, HeadlessCore\n\n    moment = _dt.datetime.fromisoformat(\n        occurred_at[:-1] + "+00:00" if occurred_at.endswith("Z") else occurred_at\n    )\n    if moment.tzinfo is None:\n        raise ValueError("occurred_at must be timezone-aware")\n\n    config = ExternalSessionConfig(\n        exchange_root=pathlib.Path(exchange_root),\n        response_timeout_s=response_timeout_s,\n        poll_interval_s=poll_interval_s,\n    )\n    handler = ExternalSessionModelHandler(config)\n    handler.bridge.recovery_state()\n    headless_config = HeadlessConfig(\n        world_path=pathlib.Path(world_path),\n        index_path=pathlib.Path(index_path) if index_path is not None else None,\n        subject_id=subject_id,\n    )\n    core = HeadlessCore(config=headless_config, model_handler=handler)\n    core.start()\n    try:\n        status_before = core.status()\n        result = core.submit_user_turn(\n            session_id=session_id,\n            turn_index=turn_index,\n            user_input=user_input,\n            occurred_at=moment,\n            token_budget=token_budget,\n        )\n        status_after = core.status()\n    finally:\n        core.stop()\n\n    return {\n        "world_path": str(world_path),\n        "subject_id": subject_id,\n        "session_id": session_id,\n        "turn_index": int(turn_index),\n        "status_before": status_before,\n        "status_after": status_after,\n        "turn_result": json.loads(canonical_json_bytes(result).decode("utf-8")),\n        "handoffs": handler.handoff_records(),\n        "exchange": {\n            "recovery_state": handler.bridge.recovery_state(),\n            "integrity": handler.bridge.integrity(),\n        },\n        "response_mode": REAL_RESPONSE_MODE,\n    }\n\n\ndef run_due_work(\n    *, world_path: str | pathlib.Path, index_path: str | pathlib.Path | None = None,\n    subject_id: str, exchange_root: str | pathlib.Path, now: _dt.datetime,\n    response_timeout_s: float = 1800.0, poll_interval_s: float = 0.05,\n    max_wakes: int = 8, include_periodic_review: bool = True,\n    token_budget: int | None = None,\n) -> dict[str, Any]:\n    """Drive only frozen Core\'s normally due work at the caller\'s exact time."""\n    from aios_core.headless.core import HeadlessConfig, HeadlessCore\n    if not isinstance(now, _dt.datetime) or now.tzinfo is None or now.utcoffset() is None:\n        raise ValueError("now must be timezone-aware")\n    handler = ExternalSessionModelHandler(ExternalSessionConfig(\n        exchange_root=pathlib.Path(exchange_root), response_timeout_s=response_timeout_s,\n        poll_interval_s=poll_interval_s))\n    handler.bridge.recovery_state()\n    config = HeadlessConfig(world_path=pathlib.Path(world_path),\n        index_path=pathlib.Path(index_path) if index_path is not None else None,\n        subject_id=subject_id)\n    core = HeadlessCore(config=config, model_handler=handler)\n    core.start()\n    try:\n        status_before = core.status()\n        result = core.process_due_work(now=now, max_wakes=max_wakes,\n            include_periodic_review=include_periodic_review, token_budget=token_budget)\n        status_after = core.status()\n    finally:\n        core.stop()\n    return {"status_before": status_before, "status_after": status_after,\n        "due_work_result": json.loads(canonical_json_bytes(result)),\n        "handoffs": handler.handoff_records(),\n        "exchange": {"recovery_state": handler.bridge.recovery_state(),\n                     "integrity": handler.bridge.integrity()},\n        "response_mode": REAL_RESPONSE_MODE}\n'
+E                 
+E                 'fixture' is contained here:
+E                   """Runtime plumbing for the Resident launch boundary.
+E                   
+E                   The runner owns the mechanical side of a turn:
+E                   
+E                   * it drives the frozen Core runtime;
+E                   * whenever Core needs a model decision it publishes a durable request through
+E                     the exchange bridge;
+E                   * it blocks until some **external** session durably publishes the exact
+E                     response bytes, then parses them into a real ``ModelDirective`` and consumes
+E                     the exchange record.
+E                   
+E                   There is deliberately **no** semantic callback, provider adapter, keyword
+E                   router, fixture rule, prewritten answer, default directive or fallback reply in
+E                 ?         +++++++
+E                   this module. The only source of a directive is published response bytes.
+E                   
+E                   Recovery follows the frozen corrective rule: once a ``request_published``
+E                   record exists, the runner never re-decides; it resumes the existing request or
+E                   consumes the already durable response.
+E                   """
+E                   
+E                   from __future__ import annotations
+E                   
+E                   import datetime as _dt
+E                   import json
+E                   import pathlib
+E                   from dataclasses import dataclass
+E                   from typing import Any, Mapping
+E                   
+E                   from aios_core.runtime.cognitive_runtime import ModelDirective, RuntimeSnapshot
+E                   
+E                   from . import REAL_RESPONSE_MODE
+E                   from .bridge import (
+E                       DISPATCH_BOUNDARY_EVENT,
+E                       DISPATCH_BOUNDARY_RULE,
+E                       ExchangeBridge,
+E                       ExchangeContractError,
+E                   )
+E                   from .canonical import canonical_json_bytes, sha256_hex
+E                   from .schema import parse_model_directive, serialize_runtime_snapshot
+E                   
+E                   __all__ = [
+E                       "REAL_RESPONSE_MODE",
+E                       "DISPATCH_BOUNDARY_EVENT",
+E                       "DISPATCH_BOUNDARY_RULE",
+E                       "ExternalSessionConfig",
+E                       "ExternalSessionModelHandler",
+E                       "open_bridge",
+E                       "run_user_turn",
+E                       "run_due_work",
+E                   ]
+E                   
+E                   
+E                   @dataclass(frozen=True)
+E                   class ExternalSessionConfig:
+E                       """Mechanical configuration of the model boundary."""
+E                   
+E                       exchange_root: pathlib.Path
+E                       kind: str = "model_directive"
+E                       response_timeout_s: float = 1800.0
+E                       poll_interval_s: float = 0.05
+E                   
+E                       def __post_init__(self) -> None:
+E                           if not str(self.kind).strip():
+E                               raise ValueError("kind must be non-blank")
+E                           if float(self.response_timeout_s) <= 0:
+E                               raise ValueError("response_timeout_s must be positive")
+E                   
+E                   
+E                   class ExternalSessionModelHandler:
+E                       """Model boundary usable as a Core ``ModelHandler``.
+E                   
+E                       ``Callable[[RuntimeSnapshot], ModelDirective]`` where the directive is
+E                       parsed from durably published external response bytes.
+E                       """
+E                   
+E                       def __init__(self, config: ExternalSessionConfig) -> None:
+E                           self.config = config
+E                           self.bridge = ExchangeBridge(config.exchange_root)
+E                           self.handoffs: list[dict[str, Any]] = []
+E                   
+E                       # -- model boundary --------------------------------------------------
+E                       def __call__(self, snapshot: RuntimeSnapshot) -> ModelDirective:
+E                           body = serialize_runtime_snapshot(snapshot)
+E                           body_bytes = canonical_json_bytes(body)
+E                           body_digest = sha256_hex(body_bytes)
+E                           # Recovery classification and a potential NEW semantic dispatch are
+E                           # one transaction. Two runners cannot both observe an empty prefix and
+E                           # publish the same model boundary twice. Never hold this lock while
+E                           # waiting for the external response: that publisher needs the lock.
+E                           with self.bridge.ledger.mutation():
+E                               state = self.bridge.recovery_state()
+E                               durable = list(state.get("durable_unconsumed") or [])
+E                               outstanding = list(state.get("open_dispatched") or [])
+E                               identities = set(durable + outstanding)
+E                               if len(durable) > 1 or len(outstanding) > 1 or len(identities) > 1:
+E                                   raise ExchangeContractError("ambiguous recovery state")
+E                               if identities:
+E                                   request_id = next(iter(identities))
+E                                   # payload() validates the exact file against the ledger full-file SHA.
+E                                   # Body SHA has a distinct domain from the timestamped envelope SHA.
+E                                   durable_body = self.bridge.request_body(request_id)
+E                                   durable_bytes = canonical_json_bytes(durable_body)
+E                                   if sha256_hex(durable_bytes) != body_digest or durable_bytes != body_bytes:
+E                                       raise ExchangeContractError("recovery snapshot binding mismatch")
+E                                   request_digest = self.bridge.request_sha256(request_id)
+E                                   route = "recovered_durable_response" if durable else "resumed_dispatched_request"
+E                               else:
+E                                   published = self.bridge.publish_request(kind=self.config.kind, body=body)
+E                                   request_id = published["request_id"]
+E                                   request_digest = published["request_sha256"]
+E                                   route = "published_new_request"
+E                           return self._resolve(request_id, body_digest=request_digest, path=route)
+E                   
+E                       def _resolve(
+E                           self,
+E                           request_id: str,
+E                           *,
+E                           body_digest: str | None,
+E                           path: str,
+E                       ) -> ModelDirective:
+E                           raw = self.bridge.await_response_bytes(
+E                               request_id,
+E                               timeout_s=self.config.response_timeout_s,
+E                               poll_interval_s=self.config.poll_interval_s,
+E                           )
+E                           try:
+E                               decoded = json.loads(raw.decode("utf-8"))
+E                           except Exception as exc:
+E                               raise ExchangeContractError(f"published response is not valid JSON: {exc}") from exc
+E                           directive = parse_model_directive(decoded)
+E                           self.bridge.consume_response(request_id)
+E                           self.handoffs.append(
+E                               {
+E                                   "request_id": request_id,
+E                                   "path": path,
+E                                   "request_sha256": durable_request_digest(request_id, self.bridge),
+E                                   "response_sha256": self.bridge.response_file_digest(request_id),
+E                                   "declared_request_sha256": body_digest,
+E                                   "response_mode": REAL_RESPONSE_MODE,
+E                               }
+E                           )
+E                           return directive
+E                   
+E                       # -- audit -----------------------------------------------------------
+E                       def handoff_records(self) -> list[dict[str, Any]]:
+E                           return list(self.handoffs)
+E                   
+E                   
+E                   def durable_request_digest(request_id: str, bridge: ExchangeBridge) -> str | None:
+E                       """Digest of the durable request for a request id (mechanical helper)."""
+E                   
+E                       return bridge.request_sha256(request_id)
+E                   
+E                   
+E                   def open_bridge(exchange_root: str | pathlib.Path) -> ExchangeBridge:
+E                       return ExchangeBridge(exchange_root)
+E                   
+E                   
+E                   def run_user_turn(
+E                       *,
+E                       world_path: str | pathlib.Path,
+E                       exchange_root: str | pathlib.Path,
+E                       subject_id: str,
+E                       session_id: str,
+E                       turn_index: int,
+E                       user_input: str,
+E                       occurred_at: str,
+E                       index_path: str | pathlib.Path | None = None,
+E                       response_timeout_s: float = 1800.0,
+E                       poll_interval_s: float = 0.05,
+E                       token_budget: int | None = None,
+E                   ) -> dict[str, Any]:
+E                       """Run one frozen-Core user turn whose model decisions come from the exchange.
+E                   
+E                       ``world_path``/``subject_id``/``session_id``/``user_input``/``occurred_at``
+E                       are always supplied by the caller. Nothing here is defaulted or inferred
+E                       from repository state.
+E                       """
+E                   
+E                       from aios_core.headless.core import HeadlessConfig, HeadlessCore
+E                   
+E                       moment = _dt.datetime.fromisoformat(
+E                           occurred_at[:-1] + "+00:00" if occurred_at.endswith("Z") else occurred_at
+E                       )
+E                       if moment.tzinfo is None:
+E                           raise ValueError("occurred_at must be timezone-aware")
+E                   
+E                       config = ExternalSessionConfig(
+E                           exchange_root=pathlib.Path(exchange_root),
+E                           response_timeout_s=response_timeout_s,
+E                           poll_interval_s=poll_interval_s,
+E                       )
+E                       handler = ExternalSessionModelHandler(config)
+E                       handler.bridge.recovery_state()
+E                       headless_config = HeadlessConfig(
+E                           world_path=pathlib.Path(world_path),
+E                           index_path=pathlib.Path(index_path) if index_path is not None else None,
+E                           subject_id=subject_id,
+E                       )
+E                       core = HeadlessCore(config=headless_config, model_handler=handler)
+E                       core.start()
+E                       try:
+E                           status_before = core.status()
+E                           result = core.submit_user_turn(
+E                               session_id=session_id,
+E                               turn_index=turn_index,
+E                               user_input=user_input,
+E                               occurred_at=moment,
+E                               token_budget=token_budget,
+E                           )
+E                           status_after = core.status()
+E                       finally:
+E                           core.stop()
+E                   
+E                       return {
+E                           "world_path": str(world_path),
+E                           "subject_id": subject_id,
+E                           "session_id": session_id,
+E                           "turn_index": int(turn_index),
+E                           "status_before": status_before,
+E                           "status_after": status_after,
+E                           "turn_result": json.loads(canonical_json_bytes(result).decode("utf-8")),
+E                           "handoffs": handler.handoff_records(),
+E                           "exchange": {
+E                               "recovery_state": handler.bridge.recovery_state(),
+E                               "integrity": handler.bridge.integrity(),
+E                           },
+E                           "response_mode": REAL_RESPONSE_MODE,
+E                       }
+E                   
+E                   
+E                   def run_due_work(
+E                       *, world_path: str | pathlib.Path, index_path: str | pathlib.Path | None = None,
+E                       subject_id: str, exchange_root: str | pathlib.Path, now: _dt.datetime,
+E                       response_timeout_s: float = 1800.0, poll_interval_s: float = 0.05,
+E                       max_wakes: int = 8, include_periodic_review: bool = True,
+E                       token_budget: int | None = None,
+E                   ) -> dict[str, Any]:
+E                       """Drive only frozen Core's normally due work at the caller's exact time."""
+E                       from aios_core.headless.core import HeadlessConfig, HeadlessCore
+E                       if not isinstance(now, _dt.datetime) or now.tzinfo is None or now.utcoffset() is None:
+E                           raise ValueError("now must be timezone-aware")
+E                       handler = ExternalSessionModelHandler(ExternalSessionConfig(
+E                           exchange_root=pathlib.Path(exchange_root), response_timeout_s=response_timeout_s,
+E                           poll_interval_s=poll_interval_s))
+E                       handler.bridge.recovery_state()
+E                       config = HeadlessConfig(world_path=pathlib.Path(world_path),
+E                           index_path=pathlib.Path(index_path) if index_path is not None else None,
+E                           subject_id=subject_id)
+E                       core = HeadlessCore(config=config, model_handler=handler)
+E                       core.start()
+E                       try:
+E                           status_before = core.status()
+E                           result = core.process_due_work(now=now, max_wakes=max_wakes,
+E                               include_periodic_review=include_periodic_review, token_budget=token_budget)
+E                           status_after = core.status()
+E                       finally:
+E                           core.stop()
+E                       return {"status_before": status_before, "status_after": status_after,
+E                           "due_work_result": json.loads(canonical_json_bytes(result)),
+E                           "handoffs": handler.handoff_records(),
+E                           "exchange": {"recovery_state": handler.bridge.recovery_state(),
+E                                        "integrity": handler.bridge.integrity()},
+E                           "response_mode": REAL_RESPONSE_MODE}
+
+Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py:378: AssertionError
+- generated xml file: /home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/raw/reviewer_probes.xml -
+=========================== short test summary info ============================
+FAILED Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra01_cross_process.py::test_ra01_two_process_same_intended_request_single_dispatch - AssertionError: duplicate semantic dispatch: 2 request_published
+assert 2 == 1
+ +  where 2 = len([{'event': 'request_published', 'prev_sha256': '0000000000000000000000000000000000000000000000000000000000000000', 'record_sha256': '8159cc90b6c2d129b31669e93553007589a7bac06f5233fb46a4b572d31f34d2', 'request_id': 'req-0001-model_directive-5636cc07', 'request_sha256': '00ba98a900a01c32b55b9b4a2062e6a3872801d4f2c3f14fb93573b524b87756', 'response_sha256': None, 'seq': 1, 'wall_clock': '2026-09-29T10:24:27.383270Z'}, {'event': 'request_published', 'prev_sha256': '8159cc90b6c2d129b31669e93553007589a7bac06f5233fb46a4b572d31f34d2', 'record_sha256': 'dd462fa9b1974780610ef8f939c6fbe28ddbd7721ef142219af2d76958798201', 'request_id': 'req-0002-model_directive-5636cc07', 'request_sha256': '106a65e0d067c6b0d27ede7a9e3bb19bedd7f052367485fa61eb0c985383d275', 'response_sha256': None, 'seq': 2, 'wall_clock': '2026-09-29T10:24:27.385994Z'}])
+FAILED Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra04_crash_boundaries.py::test_ra04_handler_crash_after_dispatch_resumes_without_second_dispatch - AssertionError: [{'declared_request_sha256': '54102454c47c2753aeeddc1dbf702c9de40493fb9873da138a8b7204c27e20e4', 'path': 'recovered_durable_response', 'request_id': 'req-0001-model_directive-ec6791f6', 'request_sha256': '54102454c47c2753aeeddc1dbf702c9de40493fb9873da138a8b7204c27e20e4', ...}]
+assert 'recovered_durable_response' == 'resumed_dispatched_request'
+  
+  - resumed_dispatched_request
+  + recovered_durable_response
+FAILED Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra05_lock_attacks.py::test_ra05_stale_lock_file_after_process_death - FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-user/pytest-0/test_ra05_stale_lock_file_afte0/hold-gate/go'
+FAILED Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra05_lock_attacks.py::test_ra05_contention_is_real_cross_process - FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-user/pytest-0/test_ra05_contention_is_real_c0/hold-gate-2/go'
+FAILED Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra05_lock_attacks.py::test_ra05_nested_mutation_does_not_self_deadlock - FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-user/pytest-0/test_ra05_nested_mutation_does0/exchange/requests/ra05-nested.json'
+FAILED Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra06_races_and_integration.py::test_ra06_tamper_between_artifact_write_and_ledger_append - AssertionError: request digest drift
+assert 'b12fb68cfec8758aa78f5a4cad4aaaad8d9f2a12b691a180a718158dafbdef7f' == '2d5a997edb504632bcda984ab85c82776ce727b123ba1293fe2c7e19a857255c'
+  
+  - 2d5a997edb504632bcda984ab85c82776ce727b123ba1293fe2c7e19a857255c
+  + b12fb68cfec8758aa78f5a4cad4aaaad8d9f2a12b691a180a718158dafbdef7f
+FAILED Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra06_races_and_integration.py::test_ra06_direct_consume_after_request_file_mutation - KeyError: 'request_sha256'
+FAILED Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py::test_c7_exact_runtime_pins - AssertionError: foreign import path: /home/user/Haneof-AIOS-Core-v3.0/src/aios_core/__init__.py
+assert False
+ +  where False = <built-in method startswith of str object at 0x7fa1f6a05ca0>('/home/user/ia_review/rc')
+ +    where <built-in method startswith of str object at 0x7fa1f6a05ca0> = '/home/user/Haneof-AIOS-Core-v3.0/src/aios_core/__init__.py'.startswith
+ +      where '/home/user/Haneof-AIOS-Core-v3.0/src/aios_core/__init__.py' = str(PosixPath('/home/user/Haneof-AIOS-Core-v3.0/src/aios_core/__init__.py'))
+ +    and   '/home/user/ia_review/rc' = str(PosixPath('/home/user/ia_review/rc'))
+ +      where PosixPath('/home/user/ia_review/rc') = resolve()
+ +        where resolve = PosixPath('/home/user/ia_review/rc').resolve
+FAILED Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/probes/test_ra07_historical_contracts.py::test_c8_clean_room_startup_boundary - AssertionError: /home/user/ia_review/h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/runner.py references 'fixture'
+assert 'fixture' not in '"""Runtime plumbing for the Resident launch boundary.\n\nThe runner owns the mechanical side of a turn:\n\n* it drives the frozen Core runtime;\n* whenever Core needs a model decision it publishes a durable request through\n  the exchange bridge;\n* it blocks until some **external** session durably publishes the exact\n  response bytes, then parses them into a real ``ModelDirective`` and consumes\n  the exchange record.\n\nThere is deliberately **no** semantic callback, provider adapter, keyword\nrouter, fixture rule, prewritten answer, default directive or fallback reply in\nthis module. The only source of a directive is published response bytes.\n\nRecovery follows the frozen corrective rule: once a ``request_published``\nrecord exists, the runner never re-decides; it resumes the existing request or\nconsumes the already durable response.\n"""\n\nfrom __future__ import annotations\n\nimport datetime as _dt\nimport json\nimport pathlib\nfrom dataclasses import dataclass\nfrom typing import Any, Mapping\n\nfrom aios_core.runtime.cognitive_runtime import ModelDirective, RuntimeSnapshot\n\nfrom . import REAL_RESPONSE_MODE\nfrom .bridge import (\n    DISPATCH_BOUNDARY_EVENT,\n    DISPATCH_BOUNDARY_RULE,\n    ExchangeBridge,\n    ExchangeContractError,\n)\nfrom .canonical import canonical_json_bytes, sha256_hex\nfrom .schema import parse_model_directive, serialize_runtime_snapshot\n\n__all__ = [\n    "REAL_RESPONSE_MODE",\n    "DISPATCH_BOUNDARY_EVENT",\n    "DISPATCH_BOUNDARY_RULE",\n    "ExternalSessionConfig",\n    "ExternalSessionModelHandler",\n    "open_bridge",\n    "run_user_turn",\n    "run_due_work",\n]\n\n\n@dataclass(frozen=True)\nclass ExternalSessionConfig:\n    """Mechanical configuration of the model boundary."""\n\n    exchange_root: pathlib.Path\n    kind: str = "model_directive"\n    response_timeout_s: float = 1800.0\n    poll_interval_s: float = 0.05\n\n    def __post_init__(self) -> None:\n        if not str(self.kind).strip():\n            raise ValueError("kind must be non-blank")\n        if float(self.response_timeout_s) <= 0:\n            raise ValueError("response_timeout_s must be positive")\n\n\nclass ExternalSessionModelHandler:\n    """Model boundary usable as a Core ``ModelHandler``.\n\n    ``Callable[[RuntimeSnapshot], ModelDirective]`` where the directive is\n    parsed from durably published external response bytes.\n    """\n\n    def __init__(self, config: ExternalSessionConfig) -> None:\n        self.config = config\n        self.bridge = ExchangeBridge(config.exchange_root)\n        self.handoffs: list[dict[str, Any]] = []\n\n    # -- model boundary --------------------------------------------------\n    def __call__(self, snapshot: RuntimeSnapshot) -> ModelDirective:\n        body = serialize_runtime_snapshot(snapshot)\n        body_bytes = canonical_json_bytes(body)\n        body_digest = sha256_hex(body_bytes)\n        # Recovery classification and a potential NEW semantic dispatch are\n        # one transaction. Two runners cannot both observe an empty prefix and\n        # publish the same model boundary twice. Never hold this lock while\n        # waiting for the external response: that publisher needs the lock.\n        with self.bridge.ledger.mutation():\n            state = self.bridge.recovery_state()\n            durable = list(state.get("durable_unconsumed") or [])\n            outstanding = list(state.get("open_dispatched") or [])\n            identities = set(durable + outstanding)\n            if len(durable) > 1 or len(outstanding) > 1 or len(identities) > 1:\n                raise ExchangeContractError("ambiguous recovery state")\n            if identities:\n                request_id = next(iter(identities))\n                # payload() validates the exact file against the ledger full-file SHA.\n                # Body SHA has a distinct domain from the timestamped envelope SHA.\n                durable_body = self.bridge.request_body(request_id)\n                durable_bytes = canonical_json_bytes(durable_body)\n                if sha256_hex(durable_bytes) != body_digest or durable_bytes != body_bytes:\n                    raise ExchangeContractError("recovery snapshot binding mismatch")\n                request_digest = self.bridge.request_sha256(request_id)\n                route = "recovered_durable_response" if durable else "resumed_dispatched_request"\n            else:\n                published = self.bridge.publish_request(kind=self.config.kind, body=body)\n                request_id = published["request_id"]\n                request_digest = published["request_sha256"]\n                route = "published_new_request"\n        return self._resolve(request_id, body_digest=request_digest, path=route)\n\n    def _resolve(\n        self,\n        request_id: str,\n        *,\n        body_digest: str | None,\n        path: str,\n    ) -> ModelDirective:\n        raw = self.bridge.await_response_bytes(\n            request_id,\n            timeout_s=self.config.response_timeout_s,\n            poll_interval_s=self.config.poll_interval_s,\n        )\n        try:\n            decoded = json.loads(raw.decode("utf-8"))\n        except Exception as exc:\n            raise ExchangeContractError(f"published response is not valid JSON: {exc}") from exc\n        directive = parse_model_directive(decoded)\n        self.bridge.consume_response(request_id)\n        self.handoffs.append(\n            {\n                "request_id": request_id,\n                "path": path,\n                "request_sha256": durable_request_digest(request_id, self.bridge),\n                "response_sha256": self.bridge.response_file_digest(request_id),\n                "declared_request_sha256": body_digest,\n                "response_mode": REAL_RESPONSE_MODE,\n            }\n        )\n        return directive\n\n    # -- audit -----------------------------------------------------------\n    def handoff_records(self) -> list[dict[str, Any]]:\n        return list(self.handoffs)\n\n\ndef durable_request_digest(request_id: str, bridge: ExchangeBridge) -> str | None:\n    """Digest of the durable request for a request id (mechanical helper)."""\n\n    return bridge.request_sha256(request_id)\n\n\ndef open_bridge(exchange_root: str | pathlib.Path) -> ExchangeBridge:\n    return ExchangeBridge(exchange_root)\n\n\ndef run_user_turn(\n    *,\n    world_path: str | pathlib.Path,\n    exchange_root: str | pathlib.Path,\n    subject_id: str,\n    session_id: str,\n    turn_index: int,\n    user_input: str,\n    occurred_at: str,\n    index_path: str | pathlib.Path | None = None,\n    response_timeout_s: float = 1800.0,\n    poll_interval_s: float = 0.05,\n    token_budget: int | None = None,\n) -> dict[str, Any]:\n    """Run one frozen-Core user turn whose model decisions come from the exchange.\n\n    ``world_path``/``subject_id``/``session_id``/``user_input``/``occurred_at``\n    are always supplied by the caller. Nothing here is defaulted or inferred\n    from repository state.\n    """\n\n    from aios_core.headless.core import HeadlessConfig, HeadlessCore\n\n    moment = _dt.datetime.fromisoformat(\n        occurred_at[:-1] + "+00:00" if occurred_at.endswith("Z") else occurred_at\n    )\n    if moment.tzinfo is None:\n        raise ValueError("occurred_at must be timezone-aware")\n\n    config = ExternalSessionConfig(\n        exchange_root=pathlib.Path(exchange_root),\n        response_timeout_s=response_timeout_s,\n        poll_interval_s=poll_interval_s,\n    )\n    handler = ExternalSessionModelHandler(config)\n    handler.bridge.recovery_state()\n    headless_config = HeadlessConfig(\n        world_path=pathlib.Path(world_path),\n        index_path=pathlib.Path(index_path) if index_path is not None else None,\n        subject_id=subject_id,\n    )\n    core = HeadlessCore(config=headless_config, model_handler=handler)\n    core.start()\n    try:\n        status_before = core.status()\n        result = core.submit_user_turn(\n            session_id=session_id,\n            turn_index=turn_index,\n            user_input=user_input,\n            occurred_at=moment,\n            token_budget=token_budget,\n        )\n        status_after = core.status()\n    finally:\n        core.stop()\n\n    return {\n        "world_path": str(world_path),\n        "subject_id": subject_id,\n        "session_id": session_id,\n        "turn_index": int(turn_index),\n        "status_before": status_before,\n        "status_after": status_after,\n        "turn_result": json.loads(canonical_json_bytes(result).decode("utf-8")),\n        "handoffs": handler.handoff_records(),\n        "exchange": {\n            "recovery_state": handler.bridge.recovery_state(),\n            "integrity": handler.bridge.integrity(),\n        },\n        "response_mode": REAL_RESPONSE_MODE,\n    }\n\n\ndef run_due_work(\n    *, world_path: str | pathlib.Path, index_path: str | pathlib.Path | None = None,\n    subject_id: str, exchange_root: str | pathlib.Path, now: _dt.datetime,\n    response_timeout_s: float = 1800.0, poll_interval_s: float = 0.05,\n    max_wakes: int = 8, include_periodic_review: bool = True,\n    token_budget: int | None = None,\n) -> dict[str, Any]:\n    """Drive only frozen Core\'s normally due work at the caller\'s exact time."""\n    from aios_core.headless.core import HeadlessConfig, HeadlessCore\n    if not isinstance(now, _dt.datetime) or now.tzinfo is None or now.utcoffset() is None:\n        raise ValueError("now must be timezone-aware")\n    handler = ExternalSessionModelHandler(ExternalSessionConfig(\n        exchange_root=pathlib.Path(exchange_root), response_timeout_s=response_timeout_s,\n        poll_interval_s=poll_interval_s))\n    handler.bridge.recovery_state()\n    config = HeadlessConfig(world_path=pathlib.Path(world_path),\n        index_path=pathlib.Path(index_path) if index_path is not None else None,\n        subject_id=subject_id)\n    core = HeadlessCore(config=config, model_handler=handler)\n    core.start()\n    try:\n        status_before = core.status()\n        result = core.process_due_work(now=now, max_wakes=max_wakes,\n            include_periodic_review=include_periodic_review, token_budget=token_budget)\n        status_after = core.status()\n    finally:\n        core.stop()\n    return {"status_before": status_before, "status_after": status_after,\n        "due_work_result": json.loads(canonical_json_bytes(result)),\n        "handoffs": handler.handoff_records(),\n        "exchange": {"recovery_state": handler.bridge.recovery_state(),\n                     "integrity": handler.bridge.integrity()},\n        "response_mode": REAL_RESPONSE_MODE}\n'
+  
+  'fixture' is contained here:
+    """Runtime plumbing for the Resident launch boundary.
+    
+    The runner owns the mechanical side of a turn:
+    
+    * it drives the frozen Core runtime;
+    * whenever Core needs a model decision it publishes a durable request through
+      the exchange bridge;
+    * it blocks until some **external** session durably publishes the exact
+      response bytes, then parses them into a real ``ModelDirective`` and consumes
+      the exchange record.
+    
+    There is deliberately **no** semantic callback, provider adapter, keyword
+    router, fixture rule, prewritten answer, default directive or fallback reply in
+  ?         +++++++
+    this module. The only source of a directive is published response bytes.
+    
+    Recovery follows the frozen corrective rule: once a ``request_published``
+    record exists, the runner never re-decides; it resumes the existing request or
+    consumes the already durable response.
+    """
+    
+    from __future__ import annotations
+    
+    import datetime as _dt
+    import json
+    import pathlib
+    from dataclasses import dataclass
+    from typing import Any, Mapping
+    
+    from aios_core.runtime.cognitive_runtime import ModelDirective, RuntimeSnapshot
+    
+    from . import REAL_RESPONSE_MODE
+    from .bridge import (
+        DISPATCH_BOUNDARY_EVENT,
+        DISPATCH_BOUNDARY_RULE,
+        ExchangeBridge,
+        ExchangeContractError,
+    )
+    from .canonical import canonical_json_bytes, sha256_hex
+    from .schema import parse_model_directive, serialize_runtime_snapshot
+    
+    __all__ = [
+        "REAL_RESPONSE_MODE",
+        "DISPATCH_BOUNDARY_EVENT",
+        "DISPATCH_BOUNDARY_RULE",
+        "ExternalSessionConfig",
+        "ExternalSessionModelHandler",
+        "open_bridge",
+        "run_user_turn",
+        "run_due_work",
+    ]
+    
+    
+    @dataclass(frozen=True)
+    class ExternalSessionConfig:
+        """Mechanical configuration of the model boundary."""
+    
+        exchange_root: pathlib.Path
+        kind: str = "model_directive"
+        response_timeout_s: float = 1800.0
+        poll_interval_s: float = 0.05
+    
+        def __post_init__(self) -> None:
+            if not str(self.kind).strip():
+                raise ValueError("kind must be non-blank")
+            if float(self.response_timeout_s) <= 0:
+                raise ValueError("response_timeout_s must be positive")
+    
+    
+    class ExternalSessionModelHandler:
+        """Model boundary usable as a Core ``ModelHandler``.
+    
+        ``Callable[[RuntimeSnapshot], ModelDirective]`` where the directive is
+        parsed from durably published external response bytes.
+        """
+    
+        def __init__(self, config: ExternalSessionConfig) -> None:
+            self.config = config
+            self.bridge = ExchangeBridge(config.exchange_root)
+            self.handoffs: list[dict[str, Any]] = []
+    
+        # -- model boundary --------------------------------------------------
+        def __call__(self, snapshot: RuntimeSnapshot) -> ModelDirective:
+            body = serialize_runtime_snapshot(snapshot)
+            body_bytes = canonical_json_bytes(body)
+            body_digest = sha256_hex(body_bytes)
+            # Recovery classification and a potential NEW semantic dispatch are
+            # one transaction. Two runners cannot both observe an empty prefix and
+            # publish the same model boundary twice. Never hold this lock while
+            # waiting for the external response: that publisher needs the lock.
+            with self.bridge.ledger.mutation():
+                state = self.bridge.recovery_state()
+                durable = list(state.get("durable_unconsumed") or [])
+                outstanding = list(state.get("open_dispatched") or [])
+                identities = set(durable + outstanding)
+                if len(durable) > 1 or len(outstanding) > 1 or len(identities) > 1:
+                    raise ExchangeContractError("ambiguous recovery state")
+                if identities:
+                    request_id = next(iter(identities))
+                    # payload() validates the exact file against the ledger full-file SHA.
+                    # Body SHA has a distinct domain from the timestamped envelope SHA.
+                    durable_body = self.bridge.request_body(request_id)
+                    durable_bytes = canonical_json_bytes(durable_body)
+                    if sha256_hex(durable_bytes) != body_digest or durable_bytes != body_bytes:
+                        raise ExchangeContractError("recovery snapshot binding mismatch")
+                    request_digest = self.bridge.request_sha256(request_id)
+                    route = "recovered_durable_response" if durable else "resumed_dispatched_request"
+                else:
+                    published = self.bridge.publish_request(kind=self.config.kind, body=body)
+                    request_id = published["request_id"]
+                    request_digest = published["request_sha256"]
+                    route = "published_new_request"
+            return self._resolve(request_id, body_digest=request_digest, path=route)
+    
+        def _resolve(
+            self,
+            request_id: str,
+            *,
+            body_digest: str | None,
+            path: str,
+        ) -> ModelDirective:
+            raw = self.bridge.await_response_bytes(
+                request_id,
+                timeout_s=self.config.response_timeout_s,
+                poll_interval_s=self.config.poll_interval_s,
+            )
+            try:
+                decoded = json.loads(raw.decode("utf-8"))
+            except Exception as exc:
+                raise ExchangeContractError(f"published response is not valid JSON: {exc}") from exc
+            directive = parse_model_directive(decoded)
+            self.bridge.consume_response(request_id)
+            self.handoffs.append(
+                {
+                    "request_id": request_id,
+                    "path": path,
+                    "request_sha256": durable_request_digest(request_id, self.bridge),
+                    "response_sha256": self.bridge.response_file_digest(request_id),
+                    "declared_request_sha256": body_digest,
+                    "response_mode": REAL_RESPONSE_MODE,
+                }
+            )
+            return directive
+    
+        # -- audit -----------------------------------------------------------
+        def handoff_records(self) -> list[dict[str, Any]]:
+            return list(self.handoffs)
+    
+    
+    def durable_request_digest(request_id: str, bridge: ExchangeBridge) -> str | None:
+        """Digest of the durable request for a request id (mechanical helper)."""
+    
+        return bridge.request_sha256(request_id)
+    
+    
+    def open_bridge(exchange_root: str | pathlib.Path) -> ExchangeBridge:
+        return ExchangeBridge(exchange_root)
+    
+    
+    def run_user_turn(
+        *,
+        world_path: str | pathlib.Path,
+        exchange_root: str | pathlib.Path,
+        subject_id: str,
+        session_id: str,
+        turn_index: int,
+        user_input: str,
+        occurred_at: str,
+        index_path: str | pathlib.Path | None = None,
+        response_timeout_s: float = 1800.0,
+        poll_interval_s: float = 0.05,
+        token_budget: int | None = None,
+    ) -> dict[str, Any]:
+        """Run one frozen-Core user turn whose model decisions come from the exchange.
+    
+        ``world_path``/``subject_id``/``session_id``/``user_input``/``occurred_at``
+        are always supplied by the caller. Nothing here is defaulted or inferred
+        from repository state.
+        """
+    
+        from aios_core.headless.core import HeadlessConfig, HeadlessCore
+    
+        moment = _dt.datetime.fromisoformat(
+            occurred_at[:-1] + "+00:00" if occurred_at.endswith("Z") else occurred_at
+        )
+        if moment.tzinfo is None:
+            raise ValueError("occurred_at must be timezone-aware")
+    
+        config = ExternalSessionConfig(
+            exchange_root=pathlib.Path(exchange_root),
+            response_timeout_s=response_timeout_s,
+            poll_interval_s=poll_interval_s,
+        )
+        handler = ExternalSessionModelHandler(config)
+        handler.bridge.recovery_state()
+        headless_config = HeadlessConfig(
+            world_path=pathlib.Path(world_path),
+            index_path=pathlib.Path(index_path) if index_path is not None else None,
+            subject_id=subject_id,
+        )
+        core = HeadlessCore(config=headless_config, model_handler=handler)
+        core.start()
+        try:
+            status_before = core.status()
+            result = core.submit_user_turn(
+                session_id=session_id,
+                turn_index=turn_index,
+                user_input=user_input,
+                occurred_at=moment,
+                token_budget=token_budget,
+            )
+            status_after = core.status()
+        finally:
+            core.stop()
+    
+        return {
+            "world_path": str(world_path),
+            "subject_id": subject_id,
+            "session_id": session_id,
+            "turn_index": int(turn_index),
+            "status_before": status_before,
+            "status_after": status_after,
+            "turn_result": json.loads(canonical_json_bytes(result).decode("utf-8")),
+            "handoffs": handler.handoff_records(),
+            "exchange": {
+                "recovery_state": handler.bridge.recovery_state(),
+                "integrity": handler.bridge.integrity(),
+            },
+            "response_mode": REAL_RESPONSE_MODE,
+        }
+    
+    
+    def run_due_work(
+        *, world_path: str | pathlib.Path, index_path: str | pathlib.Path | None = None,
+        subject_id: str, exchange_root: str | pathlib.Path, now: _dt.datetime,
+        response_timeout_s: float = 1800.0, poll_interval_s: float = 0.05,
+        max_wakes: int = 8, include_periodic_review: bool = True,
+        token_budget: int | None = None,
+    ) -> dict[str, Any]:
+        """Drive only frozen Core's normally due work at the caller's exact time."""
+        from aios_core.headless.core import HeadlessConfig, HeadlessCore
+        if not isinstance(now, _dt.datetime) or now.tzinfo is None or now.utcoffset() is None:
+            raise ValueError("now must be timezone-aware")
+        handler = ExternalSessionModelHandler(ExternalSessionConfig(
+            exchange_root=pathlib.Path(exchange_root), response_timeout_s=response_timeout_s,
+            poll_interval_s=poll_interval_s))
+        handler.bridge.recovery_state()
+        config = HeadlessConfig(world_path=pathlib.Path(world_path),
+            index_path=pathlib.Path(index_path) if index_path is not None else None,
+            subject_id=subject_id)
+        core = HeadlessCore(config=config, model_handler=handler)
+        core.start()
+        try:
+            status_before = core.status()
+            result = core.process_due_work(now=now, max_wakes=max_wakes,
+                include_periodic_review=include_periodic_review, token_budget=token_budget)
+            status_after = core.status()
+        finally:
+            core.stop()
+        return {"status_before": status_before, "status_after": status_after,
+            "due_work_result": json.loads(canonical_json_bytes(result)),
+            "handoffs": handler.handoff_records(),
+            "exchange": {"recovery_state": handler.bridge.recovery_state(),
+                         "integrity": handler.bridge.integrity()},
+            "response_mode": REAL_RESPONSE_MODE}
+=================== 9 failed, 39 passed in 100.63s (0:01:40) ===================
