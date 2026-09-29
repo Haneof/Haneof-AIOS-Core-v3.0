@@ -1,0 +1,12 @@
+{
+  "binding_mode": "fixture_observation",
+  "event_id": "c15rcc-016",
+  "ingest_ref": "obs_c14_fixture_27950c95292547c4b359cc57@1",
+  "object_id": "obs_c14_fixture_27950c95292547c4b359cc57",
+  "payload_sha256": "sha256:ac19266cdf9c8916a9371ff512ee529f6c314a446675b1ff9df30c6e6b7fe526",
+  "projection_sha256": "sha256:6a75eb95136f2e746c9e648807db415c75cc098674be94fae180e4276a473a4e",
+  "reused_existing": false,
+  "revision": 1,
+  "sequence": 16,
+  "world_revision": 48
+}
