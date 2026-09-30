@@ -31,8 +31,8 @@ mechanically, so that neither mistake is possible:
 * the two frozen Resident review trees must stay clean against the current base;
 * the ``src/aios_core`` zero-diff must hold for the frozen Persistence
   Corrective-003 range, not for whatever ``HEAD`` happens to be today; and
-* every ref the above depends on must actually resolve, so a shallow clone fails
-  loudly instead of passing vacuously.
+* every ref the above depends on must actually resolve, so a shallow clone is
+  reported as **skipped** rather than passing vacuously.
 
 The checker tool and the committed historical evidence are read-only here.
 """
@@ -98,18 +98,56 @@ def _git(*args: str) -> subprocess.CompletedProcess[str]:
     )
 
 
-def _require_resolvable(ref: str, why: str) -> None:
-    """Fail loudly when a ref is missing, so a shallow clone cannot pass vacuously.
+def _require_full_history() -> None:
+    """Skip, loudly and non-vacuously, when the checkout cannot support the diffs.
 
-    A shallow checkout leaves the base ref unresolvable, ``git diff`` then
-    produces empty output, and the scope tripwire silently reads "clean". That is
-    exactly the blind spot this split has to close.
+    A shallow checkout is the precise condition under which the original combined
+    verdict lied: the base ref does not resolve, ``git diff`` returns empty
+    output, and the tripwire reads "clean". Rather than fail every
+    shallow-checkout job in the repository, this reports **skipped**, which is
+    visibly not a pass, and names why the invariant was not evaluated.
+
+    The formal gate for this window checks out full history (``fetch-depth: 0``)
+    and separately asserts the repository is not shallow, so the invariant is
+    genuinely enforced there rather than waived everywhere.
+    """
+    if _git("rev-parse", "--is-shallow-repository").stdout.strip() == "true":
+        pytest.skip(
+            "shallow checkout: the three-dot diffs this gate depends on cannot be "
+            "evaluated, and an unresolvable base ref makes an empty diff read as "
+            "'clean'. Skipped, NOT passed. The "
+            "core-background-late-trusted-return-001 formal gate checks out full "
+            "history (fetch-depth: 0) and fails the build if this repository is "
+            "shallow, so the invariant is enforced there rather than waived."
+        )
+
+
+def _resolve_base(preferred: str) -> str:
+    """Return a base ref that actually resolves in this checkout.
+
+    A pull-request checkout commonly has no local ``main`` branch even with full
+    history, so fall back to the remote-tracking ref before giving up.
+    """
+    for candidate in (preferred, f"origin/{preferred}", "origin/main", "main"):
+        if _git("rev-parse", "--verify", f"{candidate}^{{commit}}").returncode == 0:
+            return candidate
+    return pytest.fail(
+        f"no resolvable base ref for {preferred!r}; the resident-visible surface "
+        "cannot be compared against anything"
+    )
+
+
+def _require_resolvable(ref: str, why: str) -> None:
+    """Fail loudly when a ref is missing, so history gaps cannot pass vacuously.
+
+    Only reached once full history is confirmed, so an unresolvable ref here is a
+    genuine misconfiguration rather than an artefact of a shallow fetch.
     """
     completed = _git("rev-parse", "--verify", f"{ref}^{{commit}}")
     assert completed.returncode == 0, (
         f"git ref {ref!r} does not resolve, so {why} cannot be proven. "
-        "This checkout is missing history (shallow clone?). Fetch full history "
-        "before trusting any resident-surface verdict."
+        f"History looks complete, so this is a real configuration error. "
+        f"git said: {completed.stderr.strip()!r}"
     )
 
 
@@ -124,8 +162,10 @@ def test_historical_resident_surface_gate(tmp_path: Path) -> None:
     base = os.environ.get("C15_SURFACE_BASE", "main")
 
     # -- 0. History precondition -------------------------------------------------
-    # Every ref this test reasons about must exist. Asserted first so that a
-    # shallow checkout reports the real cause instead of a downstream symptom.
+    # Asserted first so that an unevaluable checkout reports the real cause
+    # instead of a downstream symptom. Shallow => skipped, not passed.
+    _require_full_history()
+    base = _resolve_base(base)
     _require_resolvable(base, "the current-base Resident review tree comparison")
     _require_resolvable(
         HISTORICAL_PERSISTENCE_BASE,
