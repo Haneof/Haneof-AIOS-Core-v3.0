@@ -1,0 +1,427 @@
+{
+  "checkpoint_semantics": "The frozen Core keeps no separate checkpoint artifact. A clean restart of this run is fully described by the world store, the derived search index, the release-state file and the exchange ledger; the cursor_13 confirmation due-work run re-opened exactly this state in a fresh process, recovered COMPLETE, found nothing further due and left world revision 38 unchanged.",
+  "cursor_timeline": [
+    {
+      "ack_next_sequence": 2,
+      "ack_receipt_sha256": "ceda3e955a1a9d7ec5228ecf7ed4ef7ae1e49ae44f78c569bd401628d53bcaaf",
+      "ack_status": "acked",
+      "binding_mode": "canonical_user_turn",
+      "cursor_01.due_result_sha256": "26351a78ed503ae124db063c0b8f4aa45e3e41883dec6fbdbdb902ac2122d007",
+      "cursor_01.turn_result_sha256": "e405dcaa9a225a1561e6319fcf3175a7205b1254d532fe7f85108af21691c122",
+      "dimension": "dim:conversation",
+      "event_file_sha256": "e9b764642cfc8b1c0090d72ddbd1ec20726b24546224f75af775b7c2ad6d20c7",
+      "event_id": "c15rcc-001",
+      "ingest_receipt_sha256": "27cfd4f36ed887f10456b890ee5d8c171633a2207664456ea26cce59414dfbd4",
+      "ingest_ref": "obs_conv_user_ec4c81abf13da10be615fcd6@1",
+      "ingest_world_revision": 1,
+      "occurred_at": "2026-11-02T09:05:00-08:00",
+      "sequence": 1,
+      "source_class": "USER",
+      "source_kind": "conversation"
+    },
+    {
+      "ack_next_sequence": 3,
+      "ack_receipt_sha256": "76c8e7be2fd3e3701146774c7257e37bb071022d6bedcfcc080fab6a9aadb508",
+      "ack_status": "acked",
+      "binding_mode": "fixture_observation",
+      "cursor_02.due_result_sha256": "f1b36786c9ec87e5cb8fd177f033d14a501eb872b6f71fa4dedd0d53833458fa",
+      "dimension": "dim:work_state",
+      "event_file_sha256": "80ec16096e205d232f59564d63ef6686d241d1d5359d8075745039f621044b6c",
+      "event_id": "c15rcc-002",
+      "ingest_receipt_sha256": "c9a3f0d6bffebe8e3bf03326a354434a7a55e0db7299fa03f3f792739f3f2ebe",
+      "ingest_ref": "obs_c14_fixture_5248cdfd5a23b6ea88ce0a96@1",
+      "ingest_world_revision": 7,
+      "occurred_at": "2026-11-02T09:14:00-08:00",
+      "sequence": 2,
+      "source_class": "PLATFORM",
+      "source_kind": "task_tracker"
+    },
+    {
+      "ack_next_sequence": 4,
+      "ack_receipt_sha256": "1fa23ca4706f764065ae65f6061fd1dd4b27aa18b4925ed81162f7bba658c71f",
+      "ack_status": "acked",
+      "binding_mode": "canonical_user_turn",
+      "cursor_03.due_result_sha256": "72332bfe36a9db03860d57bcdc70702e2d240ae8dffef819797adaceeb04ffeb",
+      "cursor_03.turn_result_sha256": "fbad75ff0fdace34c15f9441d29933b3294d7772e110956a53a3467d6ee298cc",
+      "dimension": "dim:conversation",
+      "event_file_sha256": "b5ae77fd476a89a0e15dad1034bdcdbd674cb48b6b5024e7c404732e041cd9f1",
+      "event_id": "c15rcc-003",
+      "ingest_receipt_sha256": "ae3b8989dd5bb0405e9e2a3744fd01b566b742db0b91a19118767bc19c2e1b19",
+      "ingest_ref": "obs_conv_user_c27eefdbe08fba3e9c2b18fc@1",
+      "ingest_world_revision": 8,
+      "occurred_at": "2026-11-02T09:20:00-08:00",
+      "sequence": 3,
+      "source_class": "USER",
+      "source_kind": "conversation"
+    },
+    {
+      "ack_next_sequence": 5,
+      "ack_receipt_sha256": "164f93b0b845b936e67137301512396560db0464ea9ea728ad348d25571907ca",
+      "ack_status": "acked",
+      "binding_mode": "fixture_observation",
+      "cursor_04.due_result_sha256": "b04523c5f1be0d405dad9d6213abc95f2e2b3c729ef07980098d67f8eb14a56b",
+      "dimension": "dim:work_outcome",
+      "event_file_sha256": "0365cee1802272a1943f48e61af17e370ad8794215c39ce10e9a0b908719e137",
+      "event_id": "c15rcc-004",
+      "ingest_receipt_sha256": "d262a7214ec4b25900a52ad35a4291956d4b79abba1a4971850797a2a375b2db",
+      "ingest_ref": "obs_c14_fixture_5d4dfcf42055c00135a78a54@1",
+      "ingest_world_revision": 10,
+      "occurred_at": "2026-11-02T12:40:00-08:00",
+      "sequence": 4,
+      "source_class": "PLATFORM",
+      "source_kind": "ci_platform"
+    },
+    {
+      "ack_next_sequence": 6,
+      "ack_receipt_sha256": "671d64004d5189c1d4d1d0735b2c4652e13c27d4fdce828e3b2cbd6653aa45e1",
+      "ack_status": "acked",
+      "binding_mode": "canonical_user_turn",
+      "cursor_05.due_result_sha256": "02b5dd40b37e42d54d0ac81ce14732a331eced7ecb6e0772b1306e40520a0013",
+      "cursor_05.turn_result_sha256": "d532ddb8cc292bf411dbea2530399ac8357104840ddbd66e0a690f2f02350e4f",
+      "dimension": "dim:conversation",
+      "event_file_sha256": "02394fecb7eb9b25665dd1a16a6b890f118d5e6b3c93c463ad71782240f46ae8",
+      "event_id": "c15rcc-005",
+      "ingest_receipt_sha256": "5f912e029ab2696c366bca54b10f9d1859eb2bf5c17b26cf22b5d0aa53246f95",
+      "ingest_ref": "obs_conv_user_013defb1c7513e98f57ec617@1",
+      "ingest_world_revision": 11,
+      "occurred_at": "2026-11-02T12:52:00-08:00",
+      "sequence": 5,
+      "source_class": "USER",
+      "source_kind": "conversation"
+    },
+    {
+      "ack_next_sequence": 7,
+      "ack_receipt_sha256": "511581b510e44277870bf58a5b001cc9cbfb7753a3d2bab2991ce45a1a69f7cd",
+      "ack_status": "acked",
+      "binding_mode": "canonical_user_turn",
+      "cursor_06.due_result_sha256": "64e8a4bcc4400bb106930157099a652f55fe476967433220778ee2fdaddd5142",
+      "cursor_06.turn_result_sha256": "75879ca8ccb86432e2340a557ff8af1fb607b9af12b9ccf712d84519d294c148",
+      "dimension": "dim:conversation",
+      "event_file_sha256": "9add7b2ee1f98f4d4ed6b2b487874ba15884c09aade929a06b53481710cb6521",
+      "event_id": "c15rcc-006",
+      "ingest_receipt_sha256": "a4febc058869d1878670dadb186bc47cbd65b1c6159b15de2f67a9be4f1f496c",
+      "ingest_ref": "obs_conv_user_79b1c0582c81a10fd8eb4e20@1",
+      "ingest_world_revision": 14,
+      "occurred_at": "2026-11-03T10:15:00-08:00",
+      "sequence": 6,
+      "source_class": "USER",
+      "source_kind": "conversation"
+    },
+    {
+      "ack_next_sequence": 8,
+      "ack_receipt_sha256": "a0b56ae1fc0fb8e260c8611832a84319473fda5190a613537bec47fc6f30e19f",
+      "ack_status": "acked",
+      "binding_mode": "fixture_observation",
+      "cursor_07.due_result_sha256": "175e66caa6e696b56ac4fa8fb4b706bc15f1ebb7911f7671bca492c29002a573",
+      "dimension": "dim:release_state",
+      "event_file_sha256": "9d2468681eaed04bd6123f4abfc358be05e1d27a9def8b40766843af4f3dec8f",
+      "event_id": "c15rcc-007",
+      "ingest_receipt_sha256": "6d911ce1b265838e6820f3fff8b5e18f37eea8b1c5c76eac02b4cef2ead0261f",
+      "ingest_ref": "obs_c14_fixture_87474a7fb5036c38638a6c37@1",
+      "ingest_world_revision": 20,
+      "occurred_at": "2026-11-04T13:30:00-08:00",
+      "sequence": 7,
+      "source_class": "PLATFORM",
+      "source_kind": "build_platform"
+    },
+    {
+      "ack_next_sequence": 9,
+      "ack_receipt_sha256": "a5331d81fb0bb98442f2dc53529360788514c248ac336d623382977545838b0a",
+      "ack_status": "acked",
+      "binding_mode": "canonical_user_turn",
+      "cursor_08.due_result_sha256": "4d29d066ce0a8e9e84d275bdef9b0f78a9f057262e5da392e2b01689002e9c30",
+      "cursor_08.turn_result_sha256": "733dfd1331dc88e432df0512409a35fa849ede679e8bed0d7288ed8fcca55888",
+      "dimension": "dim:conversation",
+      "event_file_sha256": "f2eb7bb823bd02358eb74f3b373b283b0750849c06a0b386f61424c56a45e6ad",
+      "event_id": "c15rcc-008",
+      "ingest_receipt_sha256": "2aa8c36b85128c06ff6a73d4516968bbd91ec798a14d923d5f712b6a562a797b",
+      "ingest_ref": "obs_conv_user_49ba2a40cd78851bbf132a2a@1",
+      "ingest_world_revision": 24,
+      "occurred_at": "2026-11-04T13:42:00-08:00",
+      "sequence": 8,
+      "source_class": "USER",
+      "source_kind": "conversation"
+    },
+    {
+      "ack_next_sequence": 10,
+      "ack_receipt_sha256": "3b3b8a94a6cedb918f64f1d14fccfbd61556a4ad75c32416e39a05efe2f537d7",
+      "ack_status": "acked",
+      "binding_mode": "fixture_observation",
+      "cursor_09.due_result_sha256": "283b3459480e6e870bf94eacd5365d800759a56411133f28f5a495ea2c1caed5",
+      "dimension": "dim:release_state",
+      "event_file_sha256": "08886b61abcd9cff71520af573cd3eb049a7ea4fbd9f044622134631417041eb",
+      "event_id": "c15rcc-009",
+      "ingest_receipt_sha256": "4c032e03303687986a8ae3686c630639a36cfeee4f6bc5d4ee57d8ad12e98516",
+      "ingest_ref": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2@1",
+      "ingest_world_revision": 26,
+      "occurred_at": "2026-11-04T14:17:00-08:00",
+      "sequence": 9,
+      "source_class": "PLATFORM",
+      "source_kind": "registry"
+    },
+    {
+      "ack_next_sequence": 11,
+      "ack_receipt_sha256": "ebb1caec576114b5ed5bfea06fe4e3244688a9ca1519e2c676c2410a46352381",
+      "ack_status": "acked",
+      "binding_mode": "canonical_user_turn",
+      "cursor_10.due_result_sha256": "d7ab1b7b14f223bd84630f9ed2524c26be7d81be880c4aae87dc9fbd71ca499d",
+      "cursor_10.turn_result_sha256": "7001a36f07ae9052b843eb8e1de0fcb68110e11dece1c655261263e76688fed3",
+      "dimension": "dim:conversation",
+      "event_file_sha256": "bbcd116e3f90f56413477c81e2ba6b05aecc0879022e5d22b5d41509d724d83f",
+      "event_id": "c15rcc-010",
+      "ingest_receipt_sha256": "76683f2d675a1b4ad7a1e882358a63ebc57244e907d66874616bb32ce326b078",
+      "ingest_ref": "obs_conv_user_9d7b2585dc63aa4b7d5cf2be@1",
+      "ingest_world_revision": 27,
+      "occurred_at": "2026-11-04T14:24:00-08:00",
+      "sequence": 10,
+      "source_class": "USER",
+      "source_kind": "conversation"
+    },
+    {
+      "ack_next_sequence": 12,
+      "ack_receipt_sha256": "c5797a56a9e9658e848b927ef3b8f87be6713a96477319f0dd0c5921c1926c3d",
+      "ack_status": "acked",
+      "binding_mode": "fixture_observation",
+      "cursor_11.due_result_sha256": "78f9440220eda01957a1f711ba1a0b1e0cf2c7f6200a94aeb643064cc0dfe13e",
+      "dimension": "dim:release_state",
+      "event_file_sha256": "db93e4c73ac2b3d5bbefc22fff4da01036f2233008e02c333a30808b1cb62d25",
+      "event_id": "c15rcc-011",
+      "ingest_receipt_sha256": "d8ad7d0ed7299d0b10950ca95a4298d68ba75ab5838b0b3eab9522703d687719",
+      "ingest_ref": "obs_c14_fixture_291beec37165eb34a35f8f85@1",
+      "ingest_world_revision": 31,
+      "occurred_at": "2026-11-04T15:02:00-08:00",
+      "sequence": 11,
+      "source_class": "PLATFORM",
+      "source_kind": "registry"
+    },
+    {
+      "ack_next_sequence": 13,
+      "ack_receipt_sha256": "4e360e8ab62bfea5ef4136fa248d033f82a7dbac922f1ed2d971516da796b8e8",
+      "ack_status": "acked",
+      "binding_mode": "canonical_user_turn",
+      "cursor_12.due_result_sha256": "a5af0906fde137faee6dd216a5d5aa7c71d26a179893c91b6c823c9f7abfa792",
+      "cursor_12.turn_result_sha256": "7c4bb27994aa1c4134d20c86e298a4f3550d527ea5db9893a57d880a9100c48e",
+      "dimension": "dim:conversation",
+      "event_file_sha256": "f7c07620cdbec83ed437ba48f2ec219e07999296bd3c638137b7e90e75f9d1be",
+      "event_id": "c15rcc-012",
+      "ingest_receipt_sha256": "852d4e1d0b2d7c3f685aa71c4220a526a69855d8b15208a9278645303d86e22d",
+      "ingest_ref": "obs_conv_user_f8e45183554230625d1e3fd4@1",
+      "ingest_world_revision": 32,
+      "occurred_at": "2026-11-04T15:07:00-08:00",
+      "sequence": 12,
+      "source_class": "USER",
+      "source_kind": "conversation"
+    },
+    {
+      "ack_next_sequence": 14,
+      "ack_receipt_sha256": "7e8feabda98eb0b8ae916cedaf7815d632f00e91551ae9ddeafaebceccb350f3",
+      "ack_status": "acked",
+      "binding_mode": "fixture_observation",
+      "cursor_13.due_result_sha256": "d18fe0ca59d6264b9a7804c9bcd7487b318bec1060a63baca0375aef75e72388",
+      "dimension": "dim:work_state",
+      "event_file_sha256": "a7539c56d0311761d21e2eacc0f56f4411d8ad65ceaf3bda9e7c7b3d4c6b8a35",
+      "event_id": "c15rcc-013",
+      "ingest_receipt_sha256": "5a58fd92ba3e2c79107274fb09b3fb8a35d6f4562b56ba0bee1a5514462fb1f5",
+      "ingest_ref": "obs_c14_fixture_e2c76be3450b6e9dc8316b9d@1",
+      "ingest_world_revision": 34,
+      "occurred_at": "2026-11-06T11:10:00-08:00",
+      "sequence": 13,
+      "source_class": "PLATFORM",
+      "source_kind": "task_tracker"
+    }
+  ],
+  "exchange_final": {
+    "classification": "COMPLETE",
+    "durable_unconsumed": 0,
+    "integrity_ok": true,
+    "ledger_head_sha256": "7f8afff395442a1d926144bfccb51429faf807490660fd95a9df65616ebba691",
+    "ledger_records": 63,
+    "open_dispatched": 0,
+    "requests_complete": 21,
+    "requests_total": 21
+  },
+  "fresh_private_state": {
+    "exchange_ledger": {
+      "bytes": 27942,
+      "path": "/home/user/c003-run/exchange/ledger.jsonl",
+      "sha256": "3b2b9e902133c31cc583491aae55834ee9cb71a9bea9ca50a36fd7e8b81da021"
+    },
+    "exchange_root": "/home/user/c003-run/exchange",
+    "final_index_watermark": 38,
+    "final_world_revision": 38,
+    "index": {
+      "bytes": 282624,
+      "path": "/home/user/c003-run/world/c15-res-a-c003.world.search.sqlite",
+      "sha256": "79c877a4bf75091fa90ae81076a6bdb2e265cf6376b657c3f195e9e91f9844e5"
+    },
+    "release_state": {
+      "bytes": 10818,
+      "path": "/home/user/c003-run/release-state.json",
+      "sha256": "6b90fc7a09bce7d575dbcb783dcbe838cab81c2e358515adbb5dca9731f57c37"
+    },
+    "world": {
+      "bytes": 352256,
+      "path": "/home/user/c003-run/world/c15-res-a-c003.world.sqlite",
+      "sha256": "0d6970ed99367a456e4baa29092bde8f15bc7544496095cc87ad9f029e2603b2"
+    }
+  },
+  "frozen_at_utc": "2026-09-29T11:14:59.465305+00:00",
+  "frozen_rc_identity": {
+    "frozen_core_content_manifest_sha256": "220718d6b5a2650b5e4263bbe8b7e661444cb33b486a7ecd7b5ad3d7d3399caa",
+    "frozen_core_tree": "9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623",
+    "frozen_repository_tree": "1ac3a675b884167d3a29aa432e7ef3eaff94d404",
+    "frozen_software_sha": "f20f2edfa7af00d0286493fd15196ca9503bc315",
+    "frozen_tests_tree": "7e33b5ef8432370234965d3ccd61248c703c4019",
+    "worktree_gitdir": "/home/user/Haneof-AIOS-Core-v3.0/.git/worktrees/rc-f20f2edf",
+    "worktree_head": "f20f2edfa7af00d0286493fd15196ca9503bc315",
+    "worktree_path": "/home/user/.cache/c003/rc-f20f2edf"
+  },
+  "harness_identity": {
+    "bootstrap_sha256": "e98965d8b55f5e8202c9470af2a3ca175ccde9f93427de5d6cf717921c3ea497",
+    "clean_room_contract_sha256": "ed5140bd9719d028744f50e23737b4185c1f4d6efb1234f7d0da857783c7973b",
+    "harness_file_count": 27,
+    "harness_manifest_file_sha256": "2bc303cdc09ea7fff91dd2340d9be2ac4abc810a01ffacf5f39d6d313e8388e8",
+    "harness_manifest_sha256": "f3fbd788e3adb2ee600359e791273f87b444bc1991c7506d2683a643fd55a256",
+    "harness_root": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness",
+    "materialized_bootstrap_sha256": "e98965d8b55f5e8202c9470af2a3ca175ccde9f93427de5d6cf717921c3ea497",
+    "materialized_harness_manifest_sha256": "2bc303cdc09ea7fff91dd2340d9be2ac4abc810a01ffacf5f39d6d313e8388e8",
+    "materialized_wheel_lock_sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe",
+    "operator_prep_exact_head": "77dac70e0cf054c3f0fb7d94a66dba221fe7d5de",
+    "packet_sha256": "3c2d04c2de8557c3cb7329df4350c40b2ccc07520a7d3d51db206174b33266cc",
+    "pinned_operator_prep_verification": {
+      "RESIDENT_SAFE_LAUNCH_PACKET.json": {
+        "match": true,
+        "materialized_sha256": "3c2d04c2de8557c3cb7329df4350c40b2ccc07520a7d3d51db206174b33266cc",
+        "pinned_sha256": "3c2d04c2de8557c3cb7329df4350c40b2ccc07520a7d3d51db206174b33266cc"
+      },
+      "bootstrap/PYTHON_WHEEL_LOCK.json": {
+        "match": true,
+        "materialized_sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe",
+        "pinned_sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe"
+      },
+      "bootstrap/bootstrap_runtime.sh": {
+        "match": true,
+        "materialized_sha256": "e98965d8b55f5e8202c9470af2a3ca175ccde9f93427de5d6cf717921c3ea497",
+        "pinned_sha256": "e98965d8b55f5e8202c9470af2a3ca175ccde9f93427de5d6cf717921c3ea497"
+      },
+      "evidence/c10_c11_candidate_green.json": {
+        "match": true,
+        "materialized_sha256": "64d7f3032eae547db09aab063bdfc1b94d9f5a0dadb96062e4474750420dc294",
+        "pinned_sha256": "64d7f3032eae547db09aab063bdfc1b94d9f5a0dadb96062e4474750420dc294"
+      },
+      "evidence/c1_c3_regression.json": {
+        "match": true,
+        "materialized_sha256": "416ebb9f51a128c8818fa6a4ef7400689ae1717629316b55a4c81248907ff299",
+        "pinned_sha256": "416ebb9f51a128c8818fa6a4ef7400689ae1717629316b55a4c81248907ff299"
+      },
+      "evidence/clean_bootstrap_manifest.json": {
+        "match": true,
+        "materialized_sha256": "59285dfda335bb159931fd2b094ca295ab5b2574c7de98f21fd5b7ca99a99a2f",
+        "pinned_sha256": "59285dfda335bb159931fd2b094ca295ab5b2574c7de98f21fd5b7ca99a99a2f"
+      },
+      "evidence/concurrency_integration.json": {
+        "match": true,
+        "materialized_sha256": "0334f38e823226a78e101fef232bb45d7500a378de5468e39bc49c8ce2a6afc5",
+        "pinned_sha256": "0334f38e823226a78e101fef232bb45d7500a378de5468e39bc49c8ce2a6afc5"
+      },
+      "evidence/corrective_candidate_green.json": {
+        "match": true,
+        "materialized_sha256": "1974620bd003662535fd792960751a969a31039d8c715379a7ef89e8c2551ded",
+        "pinned_sha256": "1974620bd003662535fd792960751a969a31039d8c715379a7ef89e8c2551ded"
+      },
+      "evidence/durability_fault_evidence.json": {
+        "match": true,
+        "materialized_sha256": "de528b1651058c7f09403e7addcd9c2e5dec6f989cff33fdeb54fb0dafac8554",
+        "pinned_sha256": "de528b1651058c7f09403e7addcd9c2e5dec6f989cff33fdeb54fb0dafac8554"
+      },
+      "evidence/environment_record.json": {
+        "match": true,
+        "materialized_sha256": "a43ceea3bcd98a4583f10940eb591aca1a0b7268e1397c7943e894ffcdb426af",
+        "pinned_sha256": "a43ceea3bcd98a4583f10940eb591aca1a0b7268e1397c7943e894ffcdb426af"
+      },
+      "evidence/harness_manifest.json": {
+        "match": true,
+        "materialized_sha256": "2bc303cdc09ea7fff91dd2340d9be2ac4abc810a01ffacf5f39d6d313e8388e8",
+        "pinned_sha256": "2bc303cdc09ea7fff91dd2340d9be2ac4abc810a01ffacf5f39d6d313e8388e8"
+      },
+      "evidence/rc_identity.json": {
+        "match": true,
+        "materialized_sha256": "11c985fe7f9854a74536cc7e72acdc4dc0afb69c70e23a90087168c4178f7d83",
+        "pinned_sha256": "11c985fe7f9854a74536cc7e72acdc4dc0afb69c70e23a90087168c4178f7d83"
+      },
+      "evidence/wheel_lock_verification.json": {
+        "match": true,
+        "materialized_sha256": "095493485b2d79d70a7c22f233ec32cefaaaadc7477821a019654e9749595f37",
+        "pinned_sha256": "095493485b2d79d70a7c22f233ec32cefaaaadc7477821a019654e9749595f37"
+      }
+    },
+    "pinned_verification_all_match": true,
+    "real_response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+    "resident_run_contract_sha256": "9b8a6cc5641710bef88943279eedc3c8c88959bece0f7a47d4bba08ead470dab",
+    "wheel_lock_sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe"
+  },
+  "phase": "A",
+  "qualified_runtime": {
+    "environment_probe": {
+      "bytes": 2046,
+      "path": "/home/user/.cache/c003/final-runtime-001/evidence/environment_probe.json",
+      "sha256": "5aac356294764243031f0fec326bee2940653cffff9179c3082ebf602935a703"
+    },
+    "environment_record": {
+      "bytes": 9339,
+      "path": "/home/user/.cache/c003/final-runtime-001/evidence/environment_record.json",
+      "sha256": "bc895b025c60e075cece6681871009b621ffa620c9d677e6e4d6630b9531f2d0"
+    },
+    "note": "The launch packet pins the operator-prep copies of environment_record/rc_identity/wheel_lock_verification. The qualified runtime at runtime_root is the freshly built instance for this run (bootstrap BUILD OK + offline VERIFY OK); it regenerated those records on this machine at build time, so their bytes differ from the pinned operator-prep copies while the identity content matches (CPython 3.12.14 / Pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.45.1 / OpenSSL 3.0.13; rc_identity checks 12/12 true; core content manifest 220718d6... equal to pin).",
+    "openssl_version": "OpenSSL 3.0.13 30 Jan 2024",
+    "pydantic_version": "2.13.5",
+    "pytest_version": "8.4.2",
+    "python_version": "3.12.14",
+    "rc_identity": {
+      "bytes": 1573,
+      "path": "/home/user/.cache/c003/final-runtime-001/evidence/rc_identity.json",
+      "sha256": "1fdcb4485df1da1cc80a81aa73998b3adb5c890b9609784525bf4d6243039da2"
+    },
+    "runtime_root": "/home/user/.cache/c003/final-runtime-001",
+    "sqlite_version": "3.45.1",
+    "venv_python": "/home/user/.cache/c003/final-runtime-001/runtime/3.12.14/venv/bin/python",
+    "wheel_lock_verification": {
+      "bytes": 2781,
+      "path": "/home/user/.cache/c003/final-runtime-001/evidence/wheel_lock_verification.json",
+      "sha256": "e93dfcdfe612305d778a75c825537eea36c37ba4224afaad44e1c2d54472bdfc"
+    }
+  },
+  "release_final": {
+    "cursor_14_revealed": false,
+    "last_acked_event_id": "c15rcc-013",
+    "last_acked_sequence": 13,
+    "next_sequence": 14,
+    "pending_reveal": null,
+    "receipt_sequences": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ]
+  },
+  "resident_run_identity": {
+    "conversation_session_id": "sess-resident-a-c003-7089564bdf1d",
+    "freshness": "NEW: minted for this run only; no prior run state reused",
+    "minted_utc": "2026-09-29T10:54:31.653420+00:00",
+    "resident_process_id": "231512c3-d418-45ab-b8f9-a81d68213959",
+    "resident_session_id": "resident-a-c003-49d55cd93f8341e7",
+    "run_id": "c15-rcc-res-a-rerun-004-corrective-003-348cdba74f64",
+    "subject_id": "user_1",
+    "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003"
+  },
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003"
+}

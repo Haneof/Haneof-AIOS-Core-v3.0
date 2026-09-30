@@ -1,0 +1,10 @@
+{
+  "run_id": "c15-rcc-res-a-rerun-004-corrective-003-348cdba74f64",
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003",
+  "resident_process_id": "231512c3-d418-45ab-b8f9-a81d68213959",
+  "resident_session_id": "resident-a-c003-49d55cd93f8341e7",
+  "conversation_session_id": "sess-resident-a-c003-7089564bdf1d",
+  "subject_id": "user_1",
+  "minted_utc": "2026-09-29T10:54:31.653420+00:00",
+  "freshness": "NEW: minted for this run only; no prior run state reused"
+}

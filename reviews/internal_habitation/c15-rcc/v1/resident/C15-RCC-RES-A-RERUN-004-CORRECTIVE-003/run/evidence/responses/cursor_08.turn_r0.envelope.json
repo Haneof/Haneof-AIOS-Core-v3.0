@@ -1,0 +1,1 @@
+{"authored_by":"EXTERNAL_CURRENT_RESIDENT_SESSION","directive":{"capability_calls":[{"arguments":{"limit":10,"query":"edge-2026.11.4 registry upload"},"call_id":"c08-check-upload-record","name":"search_world"}]},"request_id":"req-0014-model_directive-138e18f1","request_sha256":"fecd05c768b6a689659e3debc06b144dcbc18b96abbb34c2388840f5eecc7bdb","response_version":1}

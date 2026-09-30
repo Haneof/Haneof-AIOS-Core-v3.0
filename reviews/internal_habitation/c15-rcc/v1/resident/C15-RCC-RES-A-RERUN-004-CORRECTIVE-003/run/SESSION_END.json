@@ -1,0 +1,21 @@
+{
+  "conversation_session_id": "sess-resident-a-c003-7089564bdf1d",
+  "cursor_14_revealed": false,
+  "ended_utc": "2026-09-29T11:15:36.158898+00:00",
+  "exchange_classification": "COMPLETE",
+  "exchange_durable_unconsumed": 0,
+  "exchange_open_dispatched": 0,
+  "exchange_requests_complete": "21/21",
+  "final_index_watermark": 38,
+  "final_world_revision": 38,
+  "freeze_manifest_path": "/home/user/c003-run/evidence/final/FREEZE_MANIFEST.json",
+  "freeze_manifest_sha256": "bc66ad55e0dc8dbdb483e644f850c4c4753ae6ba45ba400cbda3b28071f89298",
+  "last_acked_event_id": "c15rcc-013",
+  "phase_a_cursors_durably_acked": 13,
+  "resident_process_id": "231512c3-d418-45ab-b8f9-a81d68213959",
+  "resident_session_id": "resident-a-c003-49d55cd93f8341e7",
+  "run_id": "c15-rcc-res-a-rerun-004-corrective-003-348cdba74f64",
+  "statement": "The Resident session ends permanently here: no further semantic decision, capability call, ingest, acknowledgement, reveal or model-derived output will be produced by this session. Everything after this record is mechanical evidence publication (digests, commit, push). Cursor 14 was never revealed; the release-state file still shows last_acked_sequence 13 with pending_reveal null, and no receipt for sequence 14 exists.",
+  "subject_id": "user_1",
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003"
+}

@@ -1,0 +1,1969 @@
+{
+  "due_work_result": {
+    "periodic_review": {
+      "budget": {
+        "applies": false,
+        "available": true,
+        "max_model_calls": null,
+        "max_wakes": null,
+        "model_round_limit": null,
+        "on_exceed": [],
+        "policy_refs": [],
+        "reasons": [],
+        "reserved_model_calls": 0,
+        "token_usage_available": false,
+        "used_model_calls": 0,
+        "used_tokens": 0,
+        "used_wakes": 0,
+        "window_end": null,
+        "window_start": null,
+        "world_revision": 35
+      },
+      "context": {
+        "ai_identity": {},
+        "capability_catalog": [
+          {
+            "description": "Persist a typed AI-world cognition using the unified EvidenceSet + Claim + Dependency path.",
+            "hard_boundary": false,
+            "input_schema": {
+              "claim_type": "string?",
+              "confidence": "number[0,1]",
+              "counter_evidence_refs": "array[{object_id:string,revision:integer}]?",
+              "domain": "user_understanding|relationship|self|intent|strategy|cognitive_boundary|personality|calibration",
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "knowledge_state": "string?",
+              "scope_key": "string?",
+              "statement": "string",
+              "tags": "array[string]?",
+              "unknown_items": "array[string]?",
+              "valid_time": "TemporalExtent object?"
+            },
+            "kind": "write",
+            "name": "commit_ai_world_claim",
+            "side_effecting": true
+          },
+          {
+            "description": "Persist a revisable AI cognition Claim grounded in pinned world evidence. This capability cannot create Observation facts.",
+            "hard_boundary": false,
+            "input_schema": {
+              "claim_type": "string?",
+              "confidence": "number[0,1]",
+              "content": "string",
+              "counter_evidence_refs": "array[{object_id:string,revision:integer}]?",
+              "dimension": "string",
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "knowledge_state": "string?",
+              "unknown_items": "array[string]?",
+              "valid_time": "TemporalExtent object?"
+            },
+            "kind": "write",
+            "name": "commit_claim",
+            "side_effecting": true
+          },
+          {
+            "description": "During an active periodic review, persist a model-authored operation experience grounded in pinned real case refs.",
+            "hard_boundary": false,
+            "input_schema": {
+              "applicability": "object?",
+              "cost": "object[number]?",
+              "experience_state": "string?",
+              "method_path": "array[string]",
+              "misses": "array[string]?",
+              "negative_case_refs": "array[{object_id:string,revision:integer}]?",
+              "positive_case_refs": "array[{object_id:string,revision:integer}]?",
+              "problem_type": "string",
+              "result_summary": "string"
+            },
+            "kind": "write",
+            "name": "commit_operation_experience",
+            "side_effecting": true
+          },
+          {
+            "description": "Inspect multiple pinned Claims side by side with their evidence/status; the model decides meaning.",
+            "hard_boundary": false,
+            "input_schema": {
+              "claim_refs": "array[{object_id:string,revision:integer}]"
+            },
+            "kind": "read",
+            "name": "compare_claims",
+            "side_effecting": false
+          },
+          {
+            "description": "Register future attention as a constrained mechanical Observation watch. The Resident chooses the routing class: interrupt wakes cognition immediately and may allow user delivery after Resident judgment; background waits for short mechanical batching, invokes cognition, and is silent to the user by default; review_queue does not invoke the Resident immediately and carries matched evidence into Periodic Review. Choose the class from the future-attention intent and current runtime facts; Core does not infer urgency for you. Do not encode emotion, intent, diagnosis, or other semantic conclusions in the mechanical predicate.",
+            "hard_boundary": false,
+            "input_schema": {
+              "attention_class": "interrupt|background|review_queue?",
+              "cooldown_seconds": "integer?",
+              "dimensions": "array[string]",
+              "expires_at": "ISO-8601 datetime?",
+              "goal_ref": "{object_id:string,revision:integer}?",
+              "metadata_equals": "object?",
+              "modality": "string?",
+              "mode": "recurring|one_shot?",
+              "numeric": "{operator:gt|gte|lt|lte|eq|ne,threshold:number,path:array[string]?}?",
+              "priority": "integer?",
+              "reason_refs": "array[{object_id:string,revision:integer}]",
+              "source_kind": "string?",
+              "title": "string"
+            },
+            "kind": "write",
+            "name": "create_attention_watch",
+            "side_effecting": true
+          },
+          {
+            "description": "Create a concrete evidence-grounded Task, optionally under a current Goal.",
+            "hard_boundary": false,
+            "input_schema": {
+              "completion_condition": "object?; use mode=world_evidence|action_outcome|mixed; optional result_object_types=array[string]",
+              "deadline": "ISO-8601 datetime?",
+              "goal_ref": "{object_id:string,revision:integer}?",
+              "initial_state": "string?",
+              "next_step": "string?",
+              "next_wake_at": "ISO-8601 datetime?",
+              "priority": "integer?",
+              "reason_refs": "array[{object_id:string,revision:integer}]",
+              "task_type": "string",
+              "timezone_name": "string?",
+              "title": "string"
+            },
+            "kind": "write",
+            "name": "create_task",
+            "side_effecting": true
+          },
+          {
+            "description": "Read exact pinned raw dialogue behind a same-session round summary, or an explicit turn range. Round summaries are indexes, not truth.",
+            "hard_boundary": false,
+            "input_schema": {
+              "revision": "integer?",
+              "session_id": "string?",
+              "summary_id": "string?",
+              "turn_end": "integer?",
+              "turn_start": "integer?"
+            },
+            "kind": "read",
+            "name": "drill_down_conversation",
+            "side_effecting": false
+          },
+          {
+            "description": "Request a broader bounded world recall after the initial recommendation/search was insufficient.",
+            "hard_boundary": false,
+            "input_schema": {
+              "dimension": "string?",
+              "limit": "integer?",
+              "query": "string"
+            },
+            "kind": "read",
+            "name": "expand_recall",
+            "side_effecting": false
+          },
+          {
+            "description": "Focus retrieval on one known Entity id without semantic reinterpretation.",
+            "hard_boundary": false,
+            "input_schema": {
+              "entity_id": "string",
+              "limit": "integer?",
+              "query": "string?"
+            },
+            "kind": "read",
+            "name": "focus_entity",
+            "side_effecting": false
+          },
+          {
+            "description": "Follow one-hop explicit Relation objects connected to a world object.",
+            "hard_boundary": false,
+            "input_schema": {
+              "limit": "integer?",
+              "object_id": "string"
+            },
+            "kind": "read",
+            "name": "follow_relation",
+            "side_effecting": false
+          },
+          {
+            "description": "Form a revisable Event candidate from pinned world evidence. The model supplies the event meaning; code only validates provenance.",
+            "hard_boundary": false,
+            "input_schema": {
+              "confidence": "number[0,1]",
+              "dimension": "string?",
+              "event_time": "TemporalExtent object",
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "interpretation": "string",
+              "participant_refs": "array[{object_id:string,revision:integer}]?",
+              "primary_claim_refs": "array[{object_id:string,revision:integer}]?",
+              "title": "string"
+            },
+            "kind": "write",
+            "name": "form_event",
+            "side_effecting": true
+          },
+          {
+            "description": "Inspect a pinned real Action Outcome and its Action reference.",
+            "hard_boundary": false,
+            "input_schema": {
+              "outcome_ref": "{object_id:string,revision:integer}"
+            },
+            "kind": "read",
+            "name": "inspect_outcome",
+            "side_effecting": false
+          },
+          {
+            "description": "Read one pinned or latest world object by object id.",
+            "hard_boundary": false,
+            "input_schema": {
+              "object_id": "string",
+              "revision": "integer?"
+            },
+            "kind": "read",
+            "name": "inspect_world_object",
+            "side_effecting": false
+          },
+          {
+            "description": "List Resident-authored active attention watches. Watches contain only mechanical future-match predicates; the Resident interprets meaning after Wake.",
+            "hard_boundary": false,
+            "input_schema": {},
+            "kind": "read",
+            "name": "list_attention_watches",
+            "side_effecting": false
+          },
+          {
+            "description": "List same-session continuity summary windows on demand. Use this when token budgeting omitted summary content from the cockpit.",
+            "hard_boundary": false,
+            "input_schema": {
+              "limit": "integer?",
+              "session_id": "string?"
+            },
+            "kind": "read",
+            "name": "list_conversation_summaries",
+            "side_effecting": false
+          },
+          {
+            "description": "List current registered dimension definitions so the resident AI can check whether an existing observation axis already serves the need.",
+            "hard_boundary": false,
+            "input_schema": {
+              "include_terminal": "boolean?"
+            },
+            "kind": "read",
+            "name": "list_dimensions",
+            "side_effecting": false
+          },
+          {
+            "description": "Create a PROPOSED external Action for a RUNNING Task. This capability never executes the side effect and cannot authorize itself.",
+            "hard_boundary": false,
+            "input_schema": {
+              "action_type": "string",
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "expected_outcome": "string?",
+              "payload": "object",
+              "task_ref": "{object_id:string,revision:integer}"
+            },
+            "kind": "write",
+            "name": "propose_action",
+            "side_effecting": true
+          },
+          {
+            "description": "Register a new evidence-grounded AI-mutable cognitive policy. Only real user/world result evidence is accepted; hard boundaries cannot be created by the resident AI.",
+            "hard_boundary": false,
+            "input_schema": {
+              "allowed_range_or_choices": "json value?",
+              "current_value": "json value",
+              "default_value": "json value",
+              "evaluation_window": "string",
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "policy_id": "string",
+              "reason": "string",
+              "scope": "string"
+            },
+            "kind": "write",
+            "name": "propose_cognitive_policy",
+            "side_effecting": true
+          },
+          {
+            "description": "Submit an evidence-grounded candidate observation axis. The system validates structure; the model supplies semantic rationale.",
+            "hard_boundary": false,
+            "input_schema": {
+              "confidence": "number[0,1]",
+              "continuity_rationale": "string",
+              "data_shape": "string",
+              "description": "string",
+              "dimension_key": "string starting dim:",
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "expected_value": "string?",
+              "maintenance_cost_rationale": "string",
+              "name": "string",
+              "update_method": "string?",
+              "user_value_rationale": "string",
+              "why_existing_dimensions_are_insufficient": "string"
+            },
+            "kind": "write",
+            "name": "propose_dimension",
+            "side_effecting": true
+          },
+          {
+            "description": "Create a durable Entity anchor from pinned same-world evidence. The resident supplies identity meaning; Core enforces explicit entity_key and provenance.",
+            "hard_boundary": false,
+            "input_schema": {
+              "aliases": "array[string]?",
+              "canonical_name": "string?",
+              "entity_key": "string",
+              "entity_kind": "string",
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "identity_claim_refs": "array[{object_id:string,revision:integer}]?"
+            },
+            "kind": "write",
+            "name": "propose_entity",
+            "side_effecting": true
+          },
+          {
+            "description": "Create an evidence-grounded Goal proposal in the unified world. A proposal does not grant external-action authorization.",
+            "hard_boundary": false,
+            "input_schema": {
+              "confidence": "number[0,1]",
+              "description": "string",
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "source_type": "user_explicit|user_inferred|ai_self|app|external",
+              "success_criteria": "array[string]?",
+              "title": "string"
+            },
+            "kind": "write",
+            "name": "propose_goal",
+            "side_effecting": true
+          },
+          {
+            "description": "Read current evidence-grounded AI cognition across user understanding, relationship, self, intent, strategy, boundary, personality and calibration. Displays valid_time, unknown_items, and counter_evidence_summary.",
+            "hard_boundary": false,
+            "input_schema": {
+              "domains": "array[string]?",
+              "limit": "integer?",
+              "scope_key": "string?"
+            },
+            "kind": "read",
+            "name": "read_ai_world",
+            "side_effecting": false
+          },
+          {
+            "description": "Read the current mechanical BACKGROUND_DAY budget and durable usage. This reports policy caps, Wake/model-call usage and remaining capacity only; it does not decide which future fact is important.",
+            "hard_boundary": false,
+            "input_schema": {},
+            "kind": "read",
+            "name": "read_background_budget",
+            "side_effecting": false
+          },
+          {
+            "description": "Read current versioned R6 policy records from the unified world.",
+            "hard_boundary": false,
+            "input_schema": {
+              "policy_id": "string?"
+            },
+            "kind": "read",
+            "name": "read_cognitive_policies",
+            "side_effecting": false
+          },
+          {
+            "description": "Read current Goals, Tasks and proposed/executed Actions from the unified world. This is a read-only planning view.",
+            "hard_boundary": false,
+            "input_schema": {},
+            "kind": "read",
+            "name": "read_execution_world",
+            "side_effecting": false
+          },
+          {
+            "description": "Read a bounded page of the evidence anchors selected for the currently active periodic review. Available only during review.",
+            "hard_boundary": false,
+            "input_schema": {
+              "limit": "integer?",
+              "offset": "integer?"
+            },
+            "kind": "read",
+            "name": "read_periodic_review_anchors",
+            "side_effecting": false
+          },
+          {
+            "description": "Refresh the compact L0 world-map directory. Returns dimension identity, mechanical activity/count metadata and expansion capability names only; it does not return dimension payloads or semantic conclusions.",
+            "hard_boundary": false,
+            "input_schema": {},
+            "kind": "read",
+            "name": "read_world_map",
+            "side_effecting": false
+          },
+          {
+            "description": "Record what communication style was used and the real user/world reaction. This records evidence only and does not choose a future style.",
+            "hard_boundary": false,
+            "input_schema": {
+              "action_ref": "{object_id:string,revision:integer}?",
+              "applicable_conditions": "object?",
+              "counterexample_refs": "array[{object_id:string,revision:integer}]?",
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "scenario": "string",
+              "style": "string",
+              "tone": "string?",
+              "user_reaction": "accepted|resisted|ignored|unknown"
+            },
+            "kind": "write",
+            "name": "record_communication_experience",
+            "side_effecting": true
+          },
+          {
+            "description": "Observe several parallel dimensions in one time window without turning co-occurrence into a causal conclusion.",
+            "hard_boundary": false,
+            "input_schema": {
+              "dimensions": "array[string]",
+              "query": "string?",
+              "window_end": "ISO-8601 datetime",
+              "window_start": "ISO-8601 datetime"
+            },
+            "kind": "read",
+            "name": "request_all_dimensions_projection",
+            "side_effecting": false
+          },
+          {
+            "description": "Retract the current Claim using pinned contrary/correcting evidence and propagate review-required state to dependents.",
+            "hard_boundary": false,
+            "input_schema": {
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "reason": "string",
+              "target_ref": "{object_id:string,revision:integer}"
+            },
+            "kind": "write",
+            "name": "retract_claim",
+            "side_effecting": true
+          },
+          {
+            "description": "Retrieve an exact Observation fact by id/revision for evidence drill-down.",
+            "hard_boundary": false,
+            "input_schema": {
+              "object_id": "string",
+              "revision": "integer?"
+            },
+            "kind": "read",
+            "name": "retrieve_original_observation",
+            "side_effecting": false
+          },
+          {
+            "description": "Create a forward-only new revision of the current Claim and mark dependent cognition review-required.",
+            "hard_boundary": false,
+            "input_schema": {
+              "confidence": "number[0,1]?",
+              "counter_evidence_refs": "array[{object_id:string,revision:integer}]?",
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "reason": "string",
+              "replacement_content": "string",
+              "target_ref": "{object_id:string,revision:integer}",
+              "unknown_items": "array[string]?",
+              "valid_time": "TemporalExtent object?"
+            },
+            "kind": "write",
+            "name": "revise_claim",
+            "side_effecting": true
+          },
+          {
+            "description": "Append a new revision of the current Entity identity anchor using pinned evidence.",
+            "hard_boundary": false,
+            "input_schema": {
+              "aliases": "array[string]?",
+              "canonical_name": "string?",
+              "entity_ref": "{object_id:string,revision:integer}",
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "identity_claim_refs": "array[{object_id:string,revision:integer}]?",
+              "reason": "string"
+            },
+            "kind": "write",
+            "name": "revise_entity",
+            "side_effecting": true
+          },
+          {
+            "description": "Forward-append a rollback to an earlier policy version using pinned evidence.",
+            "hard_boundary": false,
+            "input_schema": {
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "policy_id": "string",
+              "reason": "string",
+              "target_version": "integer"
+            },
+            "kind": "write",
+            "name": "rollback_cognitive_policy",
+            "side_effecting": true
+          },
+          {
+            "description": "Search same-session round-summary indexes by topic/text, then drill down to exact pinned raw dialogue when precision is needed.",
+            "hard_boundary": false,
+            "input_schema": {
+              "limit": "integer?",
+              "query": "string",
+              "session_id": "string?"
+            },
+            "kind": "read",
+            "name": "search_conversation_summaries",
+            "side_effecting": false
+          },
+          {
+            "description": "Search the world inside an explicit time window, optionally bounded by dimension/type/query.",
+            "hard_boundary": false,
+            "input_schema": {
+              "dimension": "string?",
+              "limit": "integer?",
+              "object_types": "array[string]?",
+              "query": "string?",
+              "window_end": "ISO-8601 datetime",
+              "window_start": "ISO-8601 datetime"
+            },
+            "kind": "read",
+            "name": "search_timeline",
+            "side_effecting": false
+          },
+          {
+            "description": "Recall candidate world objects related to a query.",
+            "hard_boundary": false,
+            "input_schema": {
+              "limit": "integer?",
+              "query": "string"
+            },
+            "kind": "read",
+            "name": "search_world",
+            "side_effecting": false
+          },
+          {
+            "description": "Move the current dimension revision through a legal lifecycle transition using pinned evidence and an AI-supplied reason.",
+            "hard_boundary": false,
+            "input_schema": {
+              "dimension_ref": "{object_id:string,revision:integer}",
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "new_lifecycle": "candidate|trial|active|low_activity|dormant|merged|split|revised|rejected|reactivated|archived",
+              "reason": "string",
+              "related_dimension_refs": "array[{object_id:string,revision:integer}]?"
+            },
+            "kind": "write",
+            "name": "transition_dimension",
+            "side_effecting": true
+          },
+          {
+            "description": "Forward-revise/resolve/reject/merge/split the current Event using pinned evidence.",
+            "hard_boundary": false,
+            "input_schema": {
+              "confidence": "number[0,1]?",
+              "event_ref": "{object_id:string,revision:integer}",
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "new_status": "candidate|active|resolved|revised|rejected|merged|split",
+              "reason": "string",
+              "related_event_refs": "array[{object_id:string,revision:integer}]?",
+              "replacement_interpretation": "string?",
+              "replacement_title": "string?"
+            },
+            "kind": "write",
+            "name": "transition_event",
+            "side_effecting": true
+          },
+          {
+            "description": "Move the current Goal revision through a legal evidence-backed state transition.",
+            "hard_boundary": false,
+            "input_schema": {
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "goal_ref": "{object_id:string,revision:integer}",
+              "new_status": "proposed|active|paused|achieved|abandoned|unknown",
+              "reason": "string"
+            },
+            "kind": "write",
+            "name": "transition_goal",
+            "side_effecting": true
+          },
+          {
+            "description": "Move the current Task revision through a legal state transition. Terminal transitions obey the Task's explicit completion mode: WORLD_EVIDENCE uses pinned durable evidence; ACTION_OUTCOME requires a real authorized Action-linked Outcome; MIXED requires both.",
+            "hard_boundary": false,
+            "input_schema": {
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "execution_refs": "array[{object_id:string,revision:integer}]?",
+              "new_state": "string",
+              "next_step": "string?",
+              "next_wake_at": "ISO-8601 datetime?",
+              "outcome_refs": "array[{object_id:string,revision:integer}]?",
+              "reason": "string",
+              "task_ref": "{object_id:string,revision:integer}"
+            },
+            "kind": "write",
+            "name": "transition_task",
+            "side_effecting": true
+          },
+          {
+            "description": "Append an evidence-grounded value revision to an already-registered AI-mutable cognitive policy. Cannot create or loosen hard boundaries.",
+            "hard_boundary": false,
+            "input_schema": {
+              "current_value": "json value",
+              "evaluation_window": "string?",
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "policy_id": "string",
+              "reason": "string"
+            },
+            "kind": "write",
+            "name": "update_cognitive_policy",
+            "side_effecting": true
+          },
+          {
+            "description": "Create or forward-revise an evidence-grounded Relation between current Entity revisions.",
+            "hard_boundary": false,
+            "input_schema": {
+              "confidence": "number[0,1]",
+              "evidence_refs": "array[{object_id:string,revision:integer}]",
+              "left_ref": "{object_id:string,revision:integer}",
+              "reason": "string",
+              "relation_type": "string",
+              "right_ref": "{object_id:string,revision:integer}",
+              "valid_time": "TemporalExtent object?"
+            },
+            "kind": "write",
+            "name": "upsert_relation",
+            "side_effecting": true
+          }
+        ],
+        "conversation_summaries": [],
+        "current_topic": null,
+        "estimated_tokens": 6190,
+        "memory_cards": [],
+        "recent_turns": [],
+        "task_context": {
+          "cognitive_policy_context": {
+            "_meta": {
+              "included": 3,
+              "reader": "read_cognitive_policies",
+              "total": 3,
+              "truncated": false
+            },
+            "_policy_records": [
+              {
+                "allowed_range_or_choices": [
+                  "results_and_key_risks_only",
+                  "full_detail"
+                ],
+                "current_value": "results_and_key_risks_only",
+                "default_value": null,
+                "evaluation_window": "2w",
+                "mutable_by_ai": true,
+                "policy_class": "cognitive_policy",
+                "policy_id": "communication.detail_level",
+                "previous_version": null,
+                "rollback_pointer": null,
+                "scope": "communication",
+                "version": 1
+              },
+              {
+                "allowed_range_or_choices": [
+                  "distinguish_queued_from_completed",
+                  "narrative"
+                ],
+                "current_value": "distinguish_queued_from_completed",
+                "default_value": null,
+                "evaluation_window": "4w",
+                "mutable_by_ai": true,
+                "policy_class": "cognitive_policy",
+                "policy_id": "communication.status_reporting",
+                "previous_version": null,
+                "rollback_pointer": null,
+                "scope": "communication",
+                "version": 1
+              },
+              {
+                "allowed_range_or_choices": [
+                  "explicit_itemized_confirmation_required"
+                ],
+                "current_value": "explicit_itemized_confirmation_required",
+                "default_value": null,
+                "evaluation_window": "4w",
+                "mutable_by_ai": true,
+                "policy_class": "cognitive_policy",
+                "policy_id": "execution.production_delete_authorization",
+                "previous_version": null,
+                "rollback_pointer": null,
+                "scope": "production",
+                "version": 1
+              }
+            ],
+            "communication.detail_level": "results_and_key_risks_only",
+            "communication.status_reporting": "distinguish_queued_from_completed",
+            "execution.production_delete_authorization": "explicit_itemized_confirmation_required"
+          },
+          "periodic_review": {
+            "anchor_count": 10,
+            "anchor_reader": "read_periodic_review_anchors",
+            "budget": {
+              "applies": false,
+              "available": true,
+              "max_model_calls": null,
+              "max_wakes": null,
+              "model_round_limit": null,
+              "policy_refs": [],
+              "reasons": [],
+              "reserved_model_calls": 0,
+              "scope": null,
+              "token_usage_available": false,
+              "used_model_calls": 0,
+              "used_tokens": 0,
+              "used_wakes": 0,
+              "window_end": null,
+              "window_start": null
+            },
+            "instruction": "Review the supplied world anchors and decide whether any previous AI understanding, strategy, calibration, self-understanding, goal handling, operation method, or due CognitivePolicy should be revised, confirmed, or rolled back. Use existing search/inspect tools when needed. Do not invent user growth, causal meaning, success, failure, or policy changes that are not supported by world evidence. Mechanical Wake outcomes may be used to review Resident-authored attention watches, but model silence or suppressed delivery is not itself evidence of user preference or real-world success.",
+            "review_id": "wake_review_c55ba6b48399b32903ca1b8c",
+            "review_queue_wake_count": 0,
+            "wake_ref": {
+              "object_id": "wake_review_c55ba6b48399b32903ca1b8c",
+              "revision": 2
+            },
+            "window_end": "2026-11-06T19:10:00+00:00",
+            "window_start": "2026-11-04T21:30:00+00:00"
+          }
+        },
+        "token_budget": 3400,
+        "truncated": true,
+        "user_input": "Periodic review wake. Inspect the selected world anchors, then decide whether any evidence-grounded cognition or operation experience should be revised, created, or left unchanged.",
+        "world_map": {
+          "as_of": "2026-11-06T19:10:00+00:00",
+          "dimension_count": 7,
+          "dimensions": [
+            {
+              "current_object_count": 15,
+              "definition_ref": null,
+              "dimension": "dim_unclassified",
+              "latest_activity_at": "2026-11-06T19:10:00+00:00",
+              "lifecycle": null,
+              "name": null,
+              "object_types": [
+                "dependency",
+                "task",
+                "wake"
+              ],
+              "recent_24h_count": 1,
+              "recent_7d_count": 15,
+              "registered": false
+            },
+            {
+              "current_object_count": 2,
+              "definition_ref": null,
+              "dimension": "dim:work_state",
+              "latest_activity_at": "2026-11-06T19:10:00+00:00",
+              "lifecycle": null,
+              "name": null,
+              "object_types": [
+                "observation"
+              ],
+              "recent_24h_count": 1,
+              "recent_7d_count": 2,
+              "registered": false
+            },
+            {
+              "current_object_count": 14,
+              "definition_ref": null,
+              "dimension": "dim:user_ai_interaction",
+              "latest_activity_at": "2026-11-04T23:07:00+00:00",
+              "lifecycle": null,
+              "name": null,
+              "object_types": [
+                "observation"
+              ],
+              "recent_24h_count": 0,
+              "recent_7d_count": 14,
+              "registered": false
+            },
+            {
+              "current_object_count": 6,
+              "definition_ref": null,
+              "dimension": "dim:ai_cognitive_policy",
+              "latest_activity_at": "2026-11-04T22:24:00+00:00",
+              "lifecycle": null,
+              "name": null,
+              "object_types": [
+                "cognitive_policy",
+                "evidence_set"
+              ],
+              "recent_24h_count": 0,
+              "recent_7d_count": 6,
+              "registered": false
+            },
+            {
+              "current_object_count": 3,
+              "definition_ref": null,
+              "dimension": "dim:release_state",
+              "latest_activity_at": "2026-11-04T23:02:00+00:00",
+              "lifecycle": null,
+              "name": null,
+              "object_types": [
+                "observation"
+              ],
+              "recent_24h_count": 0,
+              "recent_7d_count": 3,
+              "registered": false
+            },
+            {
+              "current_object_count": 1,
+              "definition_ref": null,
+              "dimension": "dim:ai_communication_experience",
+              "latest_activity_at": "2026-11-02T20:52:00+00:00",
+              "lifecycle": null,
+              "name": null,
+              "object_types": [
+                "communication_experience"
+              ],
+              "recent_24h_count": 0,
+              "recent_7d_count": 1,
+              "registered": false
+            },
+            {
+              "current_object_count": 1,
+              "definition_ref": null,
+              "dimension": "dim:work_outcome",
+              "latest_activity_at": "2026-11-02T20:40:00+00:00",
+              "lifecycle": null,
+              "name": null,
+              "object_types": [
+                "observation"
+              ],
+              "recent_24h_count": 0,
+              "recent_7d_count": 1,
+              "registered": false
+            }
+          ],
+          "directory_only": true,
+          "expand_capabilities": {
+            "broader_recall": "expand_recall",
+            "dimension_definitions": "list_dimensions",
+            "exact_object": "inspect_world_object",
+            "multi_dimension_window": "request_all_dimensions_projection",
+            "refresh_directory": "read_world_map",
+            "semantic_recall": "search_world",
+            "single_dimension_timeline": "search_timeline"
+          },
+          "index_lag": 0,
+          "index_watermark": 36,
+          "schema": "aios.world-map.l0.v1",
+          "semantic_conclusions": false,
+          "truncated": false,
+          "world_revision": 36
+        }
+      },
+      "request": {
+        "anchors": [
+          {
+            "excerpt": "还没有。我能确认到的最新记录（13:30）是：镜像 edge-2026.11.4 构建完成、状态 READY_FOR_UPLOAD，registry 上传任务只是排队、计划 14:00 开始；世界里目前没有任何 registry tag、digest 或 upload-complete 记录，现在才 13:42，按计划上传还没开始。建议先别通知门店开测，等出现 tag/digest 的完成记录再动；一有上传完成记录我马上告诉你。",
+            "object_ref": {
+              "object_id": "obs_conv_ai_740fa7100b0bb91d31a5a10b",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2026-11-04T21:42:00Z"
+          },
+          {
+            "excerpt": "我刚开完会，那个镜像已经推到 registry 了吗？如果好了我就通知门店开始测。",
+            "object_ref": {
+              "object_id": "obs_conv_user_49ba2a40cd78851bbf132a2a",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2026-11-04T21:42:00Z"
+          },
+          {
+            "excerpt": "registry 上传尝试在 14:16 被拒绝：checksum mismatch。edge-2026.11.4 未发布，tag 未创建，registry 中没有对应 digest。",
+            "object_ref": {
+              "object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2026-11-04T22:17:00Z"
+          },
+          {
+            "excerpt": "先说一个你需要知道的结果：14:16 那次 registry 上传被拒绝了，原因是 checksum mismatch——edge-2026.11.4 未发布，tag 没创建，registry 里也没有对应 digest。所以现在按“未确认完成”处理，门店先不要开测。\n\n你说的工作方式我记下并写进了长期设置：以后“准备提交/已排队”和“确实完成”分开说；没有完成记录时就按未确认完成处理。\n\n另外我加了一个针对 registry 发布结果的关注项：这个镜像后续的上传结果（重试或再次失败）一出现，我会主动告诉你，不用你来问。",
+            "object_ref": {
+              "object_id": "obs_conv_ai_8194105ab8e7ac3b753714fa",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2026-11-04T22:24:00Z"
+          },
+          {
+            "excerpt": "我后台也看到 tag 还没出来。以后这种“准备提交、已排队”和“确实完成”要分开说；没有完成记录时就按没确认完成处理。",
+            "object_ref": {
+              "object_id": "obs_conv_user_9d7b2585dc63aa4b7d5cf2be",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2026-11-04T22:24:00Z"
+          },
+          {
+            "excerpt": "waiting_evidence: Registry publish outcome for edge-2026.11.4 (user is waiting before notifying stores) | next=Mechanically watch matching Observation facts; Resident interprets meaning only after Wake.",
+            "object_ref": {
+              "object_id": "task_d3a808b326066cce5a632626",
+              "revision": 1
+            },
+            "object_type": "task",
+            "recorded_at": "2026-11-04T22:24:00Z"
+          },
+          {
+            "excerpt": "edge-2026.11.4 第二次上传成功；registry tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED。",
+            "object_ref": {
+              "object_id": "obs_c14_fixture_291beec37165eb34a35f8f85",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2026-11-04T23:02:00Z"
+          },
+          {
+            "excerpt": "对上了：edge-2026.11.4 现在确实已发布——tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED（15:02 第二次上传成功）。门店测试可以按计划开始。\n\n我这边继续盯着这个镜像后续的发布状态；registry 再出现新的变化（比如新的 tag 或撤销）我会主动同步给你，不用你来问。",
+            "object_ref": {
+              "object_id": "obs_conv_ai_d5bad82f97b2871d649ab30c",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2026-11-04T23:07:00Z"
+          },
+          {
+            "excerpt": "现在状态对上了。门店测试通知我已经发出去了。",
+            "object_ref": {
+              "object_id": "obs_conv_user_f8e45183554230625d1e3fd4",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2026-11-04T23:07:00Z"
+          },
+          {
+            "excerpt": "“production 回滚自动化 runbook”已保存为 DRAFT v1；尚未评审、未执行、没有 Outcome，也没有用户验收记录。",
+            "object_ref": {
+              "object_id": "obs_c14_fixture_e2c76be3450b6e9dc8316b9d",
+              "revision": 1
+            },
+            "object_type": "observation",
+            "recorded_at": "2026-11-06T19:10:00Z"
+          }
+        ],
+        "instruction": "Review the supplied world anchors and decide whether any previous AI understanding, strategy, calibration, self-understanding, goal handling, operation method, or due CognitivePolicy should be revised, confirmed, or rolled back. Use existing search/inspect tools when needed. Do not invent user growth, causal meaning, success, failure, or policy changes that are not supported by world evidence. Mechanical Wake outcomes may be used to review Resident-authored attention watches, but model silence or suppressed delivery is not itself evidence of user preference or real-world success.",
+        "review_id": "wake_review_c55ba6b48399b32903ca1b8c",
+        "subject_id": "user_1",
+        "wake_ref": {
+          "object_id": "wake_review_c55ba6b48399b32903ca1b8c",
+          "revision": 2
+        },
+        "window_end": "2026-11-06T19:10:00Z",
+        "window_start": "2026-11-04T21:30:00Z"
+      },
+      "runtime": {
+        "capability_history": [
+          {
+            "call_id": "c13-review-anchors",
+            "data": [
+              {
+                "excerpt": "还没有。我能确认到的最新记录（13:30）是：镜像 edge-2026.11.4 构建完成、状态 READY_FOR_UPLOAD，registry 上传任务只是排队、计划 14:00 开始；世界里目前没有任何 registry tag、digest 或 upload-complete 记录，现在才 13:42，按计划上传还没开始。建议先别通知门店开测，等出现 tag/digest 的完成记录再动；一有上传完成记录我马上告诉你。",
+                "object_ref": {
+                  "object_id": "obs_conv_ai_740fa7100b0bb91d31a5a10b",
+                  "revision": 1
+                },
+                "object_type": "observation",
+                "recorded_at": "2026-11-04T21:42:00Z"
+              },
+              {
+                "excerpt": "我刚开完会，那个镜像已经推到 registry 了吗？如果好了我就通知门店开始测。",
+                "object_ref": {
+                  "object_id": "obs_conv_user_49ba2a40cd78851bbf132a2a",
+                  "revision": 1
+                },
+                "object_type": "observation",
+                "recorded_at": "2026-11-04T21:42:00Z"
+              },
+              {
+                "excerpt": "registry 上传尝试在 14:16 被拒绝：checksum mismatch。edge-2026.11.4 未发布，tag 未创建，registry 中没有对应 digest。",
+                "object_ref": {
+                  "object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+                  "revision": 1
+                },
+                "object_type": "observation",
+                "recorded_at": "2026-11-04T22:17:00Z"
+              },
+              {
+                "excerpt": "先说一个你需要知道的结果：14:16 那次 registry 上传被拒绝了，原因是 checksum mismatch——edge-2026.11.4 未发布，tag 没创建，registry 里也没有对应 digest。所以现在按“未确认完成”处理，门店先不要开测。\n\n你说的工作方式我记下并写进了长期设置：以后“准备提交/已排队”和“确实完成”分开说；没有完成记录时就按未确认完成处理。\n\n另外我加了一个针对 registry 发布结果的关注项：这个镜像后续的上传结果（重试或再次失败）一出现，我会主动告诉你，不用你来问。",
+                "object_ref": {
+                  "object_id": "obs_conv_ai_8194105ab8e7ac3b753714fa",
+                  "revision": 1
+                },
+                "object_type": "observation",
+                "recorded_at": "2026-11-04T22:24:00Z"
+              },
+              {
+                "excerpt": "我后台也看到 tag 还没出来。以后这种“准备提交、已排队”和“确实完成”要分开说；没有完成记录时就按没确认完成处理。",
+                "object_ref": {
+                  "object_id": "obs_conv_user_9d7b2585dc63aa4b7d5cf2be",
+                  "revision": 1
+                },
+                "object_type": "observation",
+                "recorded_at": "2026-11-04T22:24:00Z"
+              },
+              {
+                "excerpt": "waiting_evidence: Registry publish outcome for edge-2026.11.4 (user is waiting before notifying stores) | next=Mechanically watch matching Observation facts; Resident interprets meaning only after Wake.",
+                "object_ref": {
+                  "object_id": "task_d3a808b326066cce5a632626",
+                  "revision": 1
+                },
+                "object_type": "task",
+                "recorded_at": "2026-11-04T22:24:00Z"
+              },
+              {
+                "excerpt": "edge-2026.11.4 第二次上传成功；registry tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED。",
+                "object_ref": {
+                  "object_id": "obs_c14_fixture_291beec37165eb34a35f8f85",
+                  "revision": 1
+                },
+                "object_type": "observation",
+                "recorded_at": "2026-11-04T23:02:00Z"
+              },
+              {
+                "excerpt": "对上了：edge-2026.11.4 现在确实已发布——tag 已创建，digest=sha256:7f2a9d1c54b0，状态 PUBLISHED（15:02 第二次上传成功）。门店测试可以按计划开始。\n\n我这边继续盯着这个镜像后续的发布状态；registry 再出现新的变化（比如新的 tag 或撤销）我会主动同步给你，不用你来问。",
+                "object_ref": {
+                  "object_id": "obs_conv_ai_d5bad82f97b2871d649ab30c",
+                  "revision": 1
+                },
+                "object_type": "observation",
+                "recorded_at": "2026-11-04T23:07:00Z"
+              },
+              {
+                "excerpt": "现在状态对上了。门店测试通知我已经发出去了。",
+                "object_ref": {
+                  "object_id": "obs_conv_user_f8e45183554230625d1e3fd4",
+                  "revision": 1
+                },
+                "object_type": "observation",
+                "recorded_at": "2026-11-04T23:07:00Z"
+              },
+              {
+                "excerpt": "“production 回滚自动化 runbook”已保存为 DRAFT v1；尚未评审、未执行、没有 Outcome，也没有用户验收记录。",
+                "object_ref": {
+                  "object_id": "obs_c14_fixture_e2c76be3450b6e9dc8316b9d",
+                  "revision": 1
+                },
+                "object_type": "observation",
+                "recorded_at": "2026-11-06T19:10:00Z"
+              }
+            ],
+            "error_code": null,
+            "error_message": null,
+            "name": "read_periodic_review_anchors",
+            "ok": true
+          },
+          {
+            "call_id": "c13-calibration-claim",
+            "data": {
+              "claim": {
+                "claim_id": "clm_b700d32249c8d14d0088b352",
+                "dependency_ids": [
+                  "dep_a4bd8e0a7cd203c8cdd51a1e",
+                  "dep_d6c353930fd5678d3133a84f",
+                  "dep_f7e4dfd8ed302626d1fedfbf",
+                  "dep_0b0b89bfc899bb61e0ffe94a"
+                ],
+                "evidence_set_id": "evs_4c63274cac1e991427eeaec2",
+                "reused_existing": false,
+                "world_revision": 37
+              },
+              "dimension": "dim:ai_calibration",
+              "domain": "calibration",
+              "subject_id": "ai_agent_self"
+            },
+            "error_code": null,
+            "error_message": null,
+            "name": "commit_ai_world_claim",
+            "ok": true
+          }
+        ],
+        "model_input_tokens": null,
+        "model_output_tokens": null,
+        "model_rounds": 3,
+        "model_total_tokens": null,
+        "model_usage_complete": false,
+        "recovered_response_attempts": [],
+        "response": null,
+        "silenced": true,
+        "termination_reason": "silence"
+      },
+      "wake": {
+        "revision": 3,
+        "state": "completed",
+        "wake_id": "wake_review_c55ba6b48399b32903ca1b8c",
+        "world_revision": 38
+      }
+    },
+    "wakes": []
+  },
+  "exchange": {
+    "integrity": {
+      "chain": {
+        "error": null,
+        "first_bad_seq": null,
+        "head_sha256": "7f8afff395442a1d926144bfccb51429faf807490660fd95a9df65616ebba691",
+        "ok": true,
+        "records": 63
+      },
+      "exchange_root": "/home/user/c003-run/exchange",
+      "ok": true,
+      "problems": [],
+      "requests": {
+        "req-0001-model_directive-390c8d84": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 1,
+          "request_sha256": "da661561372ac0e9cdd65dc86906121adb61bbcd9d27ce75dbca3435580ea941",
+          "response_sha256": "f0e14e26d0a2639a873a3c047034c9ba18e6e6768559803153d99354ecf16f3d"
+        },
+        "req-0002-model_directive-925a5644": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 4,
+          "request_sha256": "bb8801eed1b2d118d606d88742eb8936549b4cd1e3d172960026c7ede7a68aae",
+          "response_sha256": "be5d0a1371183c02df704b5abedf0af7037455a31ede3fbf71675e70f2a2f8dd"
+        },
+        "req-0003-model_directive-8f03e29e": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 7,
+          "request_sha256": "28d22ca3df6eaf3195a264707a8234f83ee162d6902c96f8ac2d1bdf3fba004c",
+          "response_sha256": "af4afb112704331606712cd9ac57384ce2f3a08aa8a6e6c2a458e551d103a47e"
+        },
+        "req-0004-model_directive-8cf4c8c3": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 10,
+          "request_sha256": "6cfda7ac7d7f5f3166836eaaf4a672faf9f21107959591a72d11d6d7c076e37c",
+          "response_sha256": "e6a4d67ba37300e84f2bbaf6178aa9809dd71a548516bd3a8aa50ce1a9ce1894"
+        },
+        "req-0005-model_directive-9dd1b76a": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 13,
+          "request_sha256": "623cea541af0683dbaabc6c5ec0d925a76ec0b4af8569f80c45fcee13bd5c704",
+          "response_sha256": "9e10911c934ecaa6d9063d768e2e35b326b50379617dabc364ad6897a7bd0d24"
+        },
+        "req-0006-model_directive-54616907": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 16,
+          "request_sha256": "5bc3f2aba9536ecca0554ea117f6d1f7ef896329c197e0501f0d0046f6845f88",
+          "response_sha256": "a7d27103b33dcfffb2e795a31716d774feaf08950916a11c5bf3d2d6c9565594"
+        },
+        "req-0007-model_directive-b7b915a7": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 19,
+          "request_sha256": "74d1ffaedc2cb3cdff56a70396520af7c4fa122f8885191e3a3bf3aafdc129e0",
+          "response_sha256": "0b45e9fb8fb18af69a2ccff7f8cc15c781e26bbd73d6367efd2ed84abbcf576b"
+        },
+        "req-0008-model_directive-1ac91e3b": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 22,
+          "request_sha256": "031e60b6f1daec1b397b6b42fa3dbf1e6c61ec541bd2afeedb53dfbe688e81eb",
+          "response_sha256": "672c407568e3dc0a09636c45b62298e5fd8bded61067f073f1e7129612729dc9"
+        },
+        "req-0009-model_directive-915add57": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 25,
+          "request_sha256": "fa35509ce61e80a7fd41c7c69f95d259d6fcb2ef626817ea4f94331b90c8fd9b",
+          "response_sha256": "6c2017f67ca92e7a924f795e42849dbe5252eb38321eae6da6deef42ae895060"
+        },
+        "req-0010-model_directive-4c46f757": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 28,
+          "request_sha256": "b6c343d00c5cdced94114b28600ae406f2b44fb73fe0b3cc5170027c2557fbdd",
+          "response_sha256": "82a3663c458cd583cd2267659cac642761c6bcb3171b2ca7f3e7cc2babc9245b"
+        },
+        "req-0011-model_directive-1d972520": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 31,
+          "request_sha256": "597b2e3fa5d4b74bf10f365299236d0a6b8e4d98211abc70e82e5f3acdbafed2",
+          "response_sha256": "5f74c0a00b0364ceac35a9d9eab353cdb78d41506ed79b63bfad684c667a434d"
+        },
+        "req-0012-model_directive-ac8b88ac": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 34,
+          "request_sha256": "2bba26b83817e54312cd16053f0f2f450c76656721a516fd0984fec2bb3b6b18",
+          "response_sha256": "9e633df4735c0a928aec194835881a1857ba7fe340d6f92ce85738a4c08a2f8c"
+        },
+        "req-0013-model_directive-845d3947": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 37,
+          "request_sha256": "d4d1921d390d073198b9cbdd9f603e176858756d927abd0f7bffdda9e04231bb",
+          "response_sha256": "3f6d665d4ebe88cb2c28a05c2f9f57135d59b4746ab46acc7a60a504a5712767"
+        },
+        "req-0014-model_directive-138e18f1": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 40,
+          "request_sha256": "fecd05c768b6a689659e3debc06b144dcbc18b96abbb34c2388840f5eecc7bdb",
+          "response_sha256": "6cbc2c9ffb1dcf7de420246b2bbac173a60bbb7da11a558ba79de77c7d90bc67"
+        },
+        "req-0015-model_directive-e13b24e6": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 43,
+          "request_sha256": "781b00f80fb16156b0d89cd9a85d361211c1c662f440a24a0a3c41db279834b9",
+          "response_sha256": "fa2cf7d988ce0a8a4503644b45683ada5ae4ba31eab4d6c1aa20ee0098bb08df"
+        },
+        "req-0016-model_directive-8fcbb7e5": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 46,
+          "request_sha256": "efd9bfc1f21bc6718819cadf1ee0991ec720a4928396b6afa955e020c2fbdc7c",
+          "response_sha256": "6612b24178a8b191baf67d538cc94903a9bf5e064a8cdacc398019a512af781d"
+        },
+        "req-0017-model_directive-4be42e67": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 49,
+          "request_sha256": "0b1b9b396294725768dc459fe2e6aa7f34300b4ab8229aebc3cd73c200ea4d9c",
+          "response_sha256": "93df49d98a0ad17ff2fe825893c67960e7ea74e4b7f335b0c3296d70d6bb4020"
+        },
+        "req-0018-model_directive-92b562be": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 52,
+          "request_sha256": "277b1397c5febced4b511a132064983aff8567bc32d2a5212c4c0f15c5fe84f6",
+          "response_sha256": "1c530d3be8958d89ecc96e5d1c005ac594e451b82ab564237f2a7f74fd25e462"
+        },
+        "req-0019-model_directive-0312b173": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 55,
+          "request_sha256": "beb53355b770094e92ed6d3b4d56c35a2261628f2a03a3f41d5d2bb9f3300e55",
+          "response_sha256": "ef324a9627c78680142cb7b0e39caefc0b9498d553403b37d51496fe9da2a5c4"
+        },
+        "req-0020-model_directive-60593f77": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 58,
+          "request_sha256": "b2929a99e05d52cf24480099bb86116d2f64d3d189e1f21d09ceeff4b5980be7",
+          "response_sha256": "b445bcc63f648d8dcea698ef0c1f9946f94d2a286960e223a3fbc3b6892ba13a"
+        },
+        "req-0021-model_directive-99f1ebf2": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 61,
+          "request_sha256": "453d87924132963d214257e642ad796e5caf47058c6b875a4840dd5444fb5aaf",
+          "response_sha256": "971609a6e0c1d268a42f656cb2cf62f62267e095f46217248cc92b7d2ad75184"
+        }
+      }
+    },
+    "recovery_state": {
+      "classification": "COMPLETE",
+      "complete": [
+        "req-0001-model_directive-390c8d84",
+        "req-0002-model_directive-925a5644",
+        "req-0003-model_directive-8f03e29e",
+        "req-0004-model_directive-8cf4c8c3",
+        "req-0005-model_directive-9dd1b76a",
+        "req-0006-model_directive-54616907",
+        "req-0007-model_directive-b7b915a7",
+        "req-0008-model_directive-1ac91e3b",
+        "req-0009-model_directive-915add57",
+        "req-0010-model_directive-4c46f757",
+        "req-0011-model_directive-1d972520",
+        "req-0012-model_directive-ac8b88ac",
+        "req-0013-model_directive-845d3947",
+        "req-0014-model_directive-138e18f1",
+        "req-0015-model_directive-e13b24e6",
+        "req-0016-model_directive-8fcbb7e5",
+        "req-0017-model_directive-4be42e67",
+        "req-0018-model_directive-92b562be",
+        "req-0019-model_directive-0312b173",
+        "req-0020-model_directive-60593f77",
+        "req-0021-model_directive-99f1ebf2"
+      ],
+      "dispatch_boundary_event": "request_published",
+      "dispatch_boundary_rule": "not_submitted reconciliation is allowed only when no request_published record exists; after request publication the exchange fails closed instead of declaring the request unsubmitted",
+      "durable_unconsumed": [],
+      "ledger": {
+        "error": null,
+        "first_bad_seq": null,
+        "head_sha256": "7f8afff395442a1d926144bfccb51429faf807490660fd95a9df65616ebba691",
+        "ok": true,
+        "records": 63
+      },
+      "not_submitted_allowed": false,
+      "open_dispatched": [],
+      "requests": [
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 1
+            },
+            {
+              "event": "response_published",
+              "seq": 2
+            },
+            {
+              "event": "response_consumed",
+              "seq": 3
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0001-model_directive-390c8d84",
+          "request_sha256": "da661561372ac0e9cdd65dc86906121adb61bbcd9d27ce75dbca3435580ea941",
+          "response_sha256": "f0e14e26d0a2639a873a3c047034c9ba18e6e6768559803153d99354ecf16f3d",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 4
+            },
+            {
+              "event": "response_published",
+              "seq": 5
+            },
+            {
+              "event": "response_consumed",
+              "seq": 6
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0002-model_directive-925a5644",
+          "request_sha256": "bb8801eed1b2d118d606d88742eb8936549b4cd1e3d172960026c7ede7a68aae",
+          "response_sha256": "be5d0a1371183c02df704b5abedf0af7037455a31ede3fbf71675e70f2a2f8dd",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 7
+            },
+            {
+              "event": "response_published",
+              "seq": 8
+            },
+            {
+              "event": "response_consumed",
+              "seq": 9
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0003-model_directive-8f03e29e",
+          "request_sha256": "28d22ca3df6eaf3195a264707a8234f83ee162d6902c96f8ac2d1bdf3fba004c",
+          "response_sha256": "af4afb112704331606712cd9ac57384ce2f3a08aa8a6e6c2a458e551d103a47e",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 10
+            },
+            {
+              "event": "response_published",
+              "seq": 11
+            },
+            {
+              "event": "response_consumed",
+              "seq": 12
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0004-model_directive-8cf4c8c3",
+          "request_sha256": "6cfda7ac7d7f5f3166836eaaf4a672faf9f21107959591a72d11d6d7c076e37c",
+          "response_sha256": "e6a4d67ba37300e84f2bbaf6178aa9809dd71a548516bd3a8aa50ce1a9ce1894",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 13
+            },
+            {
+              "event": "response_published",
+              "seq": 14
+            },
+            {
+              "event": "response_consumed",
+              "seq": 15
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0005-model_directive-9dd1b76a",
+          "request_sha256": "623cea541af0683dbaabc6c5ec0d925a76ec0b4af8569f80c45fcee13bd5c704",
+          "response_sha256": "9e10911c934ecaa6d9063d768e2e35b326b50379617dabc364ad6897a7bd0d24",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 16
+            },
+            {
+              "event": "response_published",
+              "seq": 17
+            },
+            {
+              "event": "response_consumed",
+              "seq": 18
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0006-model_directive-54616907",
+          "request_sha256": "5bc3f2aba9536ecca0554ea117f6d1f7ef896329c197e0501f0d0046f6845f88",
+          "response_sha256": "a7d27103b33dcfffb2e795a31716d774feaf08950916a11c5bf3d2d6c9565594",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 19
+            },
+            {
+              "event": "response_published",
+              "seq": 20
+            },
+            {
+              "event": "response_consumed",
+              "seq": 21
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0007-model_directive-b7b915a7",
+          "request_sha256": "74d1ffaedc2cb3cdff56a70396520af7c4fa122f8885191e3a3bf3aafdc129e0",
+          "response_sha256": "0b45e9fb8fb18af69a2ccff7f8cc15c781e26bbd73d6367efd2ed84abbcf576b",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 22
+            },
+            {
+              "event": "response_published",
+              "seq": 23
+            },
+            {
+              "event": "response_consumed",
+              "seq": 24
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0008-model_directive-1ac91e3b",
+          "request_sha256": "031e60b6f1daec1b397b6b42fa3dbf1e6c61ec541bd2afeedb53dfbe688e81eb",
+          "response_sha256": "672c407568e3dc0a09636c45b62298e5fd8bded61067f073f1e7129612729dc9",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 25
+            },
+            {
+              "event": "response_published",
+              "seq": 26
+            },
+            {
+              "event": "response_consumed",
+              "seq": 27
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0009-model_directive-915add57",
+          "request_sha256": "fa35509ce61e80a7fd41c7c69f95d259d6fcb2ef626817ea4f94331b90c8fd9b",
+          "response_sha256": "6c2017f67ca92e7a924f795e42849dbe5252eb38321eae6da6deef42ae895060",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 28
+            },
+            {
+              "event": "response_published",
+              "seq": 29
+            },
+            {
+              "event": "response_consumed",
+              "seq": 30
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0010-model_directive-4c46f757",
+          "request_sha256": "b6c343d00c5cdced94114b28600ae406f2b44fb73fe0b3cc5170027c2557fbdd",
+          "response_sha256": "82a3663c458cd583cd2267659cac642761c6bcb3171b2ca7f3e7cc2babc9245b",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 31
+            },
+            {
+              "event": "response_published",
+              "seq": 32
+            },
+            {
+              "event": "response_consumed",
+              "seq": 33
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0011-model_directive-1d972520",
+          "request_sha256": "597b2e3fa5d4b74bf10f365299236d0a6b8e4d98211abc70e82e5f3acdbafed2",
+          "response_sha256": "5f74c0a00b0364ceac35a9d9eab353cdb78d41506ed79b63bfad684c667a434d",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 34
+            },
+            {
+              "event": "response_published",
+              "seq": 35
+            },
+            {
+              "event": "response_consumed",
+              "seq": 36
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0012-model_directive-ac8b88ac",
+          "request_sha256": "2bba26b83817e54312cd16053f0f2f450c76656721a516fd0984fec2bb3b6b18",
+          "response_sha256": "9e633df4735c0a928aec194835881a1857ba7fe340d6f92ce85738a4c08a2f8c",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 37
+            },
+            {
+              "event": "response_published",
+              "seq": 38
+            },
+            {
+              "event": "response_consumed",
+              "seq": 39
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0013-model_directive-845d3947",
+          "request_sha256": "d4d1921d390d073198b9cbdd9f603e176858756d927abd0f7bffdda9e04231bb",
+          "response_sha256": "3f6d665d4ebe88cb2c28a05c2f9f57135d59b4746ab46acc7a60a504a5712767",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 40
+            },
+            {
+              "event": "response_published",
+              "seq": 41
+            },
+            {
+              "event": "response_consumed",
+              "seq": 42
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0014-model_directive-138e18f1",
+          "request_sha256": "fecd05c768b6a689659e3debc06b144dcbc18b96abbb34c2388840f5eecc7bdb",
+          "response_sha256": "6cbc2c9ffb1dcf7de420246b2bbac173a60bbb7da11a558ba79de77c7d90bc67",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 43
+            },
+            {
+              "event": "response_published",
+              "seq": 44
+            },
+            {
+              "event": "response_consumed",
+              "seq": 45
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0015-model_directive-e13b24e6",
+          "request_sha256": "781b00f80fb16156b0d89cd9a85d361211c1c662f440a24a0a3c41db279834b9",
+          "response_sha256": "fa2cf7d988ce0a8a4503644b45683ada5ae4ba31eab4d6c1aa20ee0098bb08df",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 46
+            },
+            {
+              "event": "response_published",
+              "seq": 47
+            },
+            {
+              "event": "response_consumed",
+              "seq": 48
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0016-model_directive-8fcbb7e5",
+          "request_sha256": "efd9bfc1f21bc6718819cadf1ee0991ec720a4928396b6afa955e020c2fbdc7c",
+          "response_sha256": "6612b24178a8b191baf67d538cc94903a9bf5e064a8cdacc398019a512af781d",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 49
+            },
+            {
+              "event": "response_published",
+              "seq": 50
+            },
+            {
+              "event": "response_consumed",
+              "seq": 51
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0017-model_directive-4be42e67",
+          "request_sha256": "0b1b9b396294725768dc459fe2e6aa7f34300b4ab8229aebc3cd73c200ea4d9c",
+          "response_sha256": "93df49d98a0ad17ff2fe825893c67960e7ea74e4b7f335b0c3296d70d6bb4020",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 52
+            },
+            {
+              "event": "response_published",
+              "seq": 53
+            },
+            {
+              "event": "response_consumed",
+              "seq": 54
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0018-model_directive-92b562be",
+          "request_sha256": "277b1397c5febced4b511a132064983aff8567bc32d2a5212c4c0f15c5fe84f6",
+          "response_sha256": "1c530d3be8958d89ecc96e5d1c005ac594e451b82ab564237f2a7f74fd25e462",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 55
+            },
+            {
+              "event": "response_published",
+              "seq": 56
+            },
+            {
+              "event": "response_consumed",
+              "seq": 57
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0019-model_directive-0312b173",
+          "request_sha256": "beb53355b770094e92ed6d3b4d56c35a2261628f2a03a3f41d5d2bb9f3300e55",
+          "response_sha256": "ef324a9627c78680142cb7b0e39caefc0b9498d553403b37d51496fe9da2a5c4",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 58
+            },
+            {
+              "event": "response_published",
+              "seq": 59
+            },
+            {
+              "event": "response_consumed",
+              "seq": 60
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0020-model_directive-60593f77",
+          "request_sha256": "b2929a99e05d52cf24480099bb86116d2f64d3d189e1f21d09ceeff4b5980be7",
+          "response_sha256": "b445bcc63f648d8dcea698ef0c1f9946f94d2a286960e223a3fbc3b6892ba13a",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 61
+            },
+            {
+              "event": "response_published",
+              "seq": 62
+            },
+            {
+              "event": "response_consumed",
+              "seq": 63
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0021-model_directive-99f1ebf2",
+          "request_sha256": "453d87924132963d214257e642ad796e5caf47058c6b875a4840dd5444fb5aaf",
+          "response_sha256": "971609a6e0c1d268a42f656cb2cf62f62267e095f46217248cc92b7d2ad75184",
+          "semantic_dispatch_occurred": true
+        }
+      ],
+      "semantic_dispatch_occurred": true
+    }
+  },
+  "handoffs": [
+    {
+      "declared_request_sha256": "beb53355b770094e92ed6d3b4d56c35a2261628f2a03a3f41d5d2bb9f3300e55",
+      "path": "published_new_request",
+      "request_id": "req-0019-model_directive-0312b173",
+      "request_sha256": "beb53355b770094e92ed6d3b4d56c35a2261628f2a03a3f41d5d2bb9f3300e55",
+      "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+      "response_sha256": "ef324a9627c78680142cb7b0e39caefc0b9498d553403b37d51496fe9da2a5c4"
+    },
+    {
+      "declared_request_sha256": "b2929a99e05d52cf24480099bb86116d2f64d3d189e1f21d09ceeff4b5980be7",
+      "path": "published_new_request",
+      "request_id": "req-0020-model_directive-60593f77",
+      "request_sha256": "b2929a99e05d52cf24480099bb86116d2f64d3d189e1f21d09ceeff4b5980be7",
+      "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+      "response_sha256": "b445bcc63f648d8dcea698ef0c1f9946f94d2a286960e223a3fbc3b6892ba13a"
+    },
+    {
+      "declared_request_sha256": "453d87924132963d214257e642ad796e5caf47058c6b875a4840dd5444fb5aaf",
+      "path": "published_new_request",
+      "request_id": "req-0021-model_directive-99f1ebf2",
+      "request_sha256": "453d87924132963d214257e642ad796e5caf47058c6b875a4840dd5444fb5aaf",
+      "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+      "response_sha256": "971609a6e0c1d268a42f656cb2cf62f62267e095f46217248cc92b7d2ad75184"
+    }
+  ],
+  "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+  "status_after": {
+    "index_lag": 0,
+    "index_path": "/home/user/c003-run/world/c15-res-a-c003.world.search.sqlite",
+    "index_watermark": 38,
+    "status": "ready",
+    "subject_id": "user_1",
+    "world_path": "/home/user/c003-run/world/c15-res-a-c003.world.sqlite",
+    "world_revision": 38,
+    "writer_lease_held": true
+  },
+  "status_before": {
+    "index_lag": 0,
+    "index_path": "/home/user/c003-run/world/c15-res-a-c003.world.search.sqlite",
+    "index_watermark": 34,
+    "status": "ready",
+    "subject_id": "user_1",
+    "world_path": "/home/user/c003-run/world/c15-res-a-c003.world.sqlite",
+    "world_revision": 34,
+    "writer_lease_held": true
+  }
+}
