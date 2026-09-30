@@ -12,9 +12,13 @@ Closes the new Core failure class frozen by the WINDOW 12 adjudication
 
 - Baseline `main`: `25591825d88e98f30dfd3de1c7e7cbc6e53267dd`
 - Branch: `arena/01a0f07b-haneof-aios-core-v3-0`
-- Candidate: `dd88dca17d1927225015bf82b2180d114e9e29f7`
-- Parent: `25591825d88e98f30dfd3de1c7e7cbc6e53267dd`
-- Tree: `65e789bdf4ede7f2adb7b538589492edd49b7d56`
+- Candidate: `dab7af82cd009dbc8ab8838c839e16a2b2a803e1`
+- Parent: `30a38c48418b220197213cf412aa6ea1fd977a33`
+- Tree: `bbe393c617a0da887391a1dade47272d3dd13947`
+
+> The candidate pin above is this branch's head. The file cannot embed the SHA of
+> the commit that contains it, so the authoritative head is the one shown on the
+> PR itself; both are asserted equal in the CI comment below.
 
 ---
 
@@ -133,18 +137,17 @@ git worktree add --detach /tmp/baseline_wt origin/main   # -> 25591825…
 |---|---|---|
 | late trusted return + not_submitted + adversarial | 61 | **61 PASS** |
 | accepted trusted-return / background-response / gap-fix / runtime regression | 249 | **249 PASS** |
-| **full Core suite** | **1059** | **1058 PASS + 1 explained non-behavioral failure** — see below |
+| **full Core suite (full history)** | **1059** | **1059 PASS — 0 fail, 0 error, 0 skip** |
 
 Baseline `main` = 997 PASS, so `+61` new probes and `+1` from splitting one accepted
 test, with **no previously passing test lost**.
 
-> **Correction.** The full-Core run was first recorded as `1059 passed`. That run
-> happened while the implementation was still uncommitted and `HEAD` was still the
-> baseline commit, so a git-tree tripwire inside the C15 surface checker could not
-> fire. Re-run on the committed candidate it reports `1058 passed, 1 failed`. Both
-> numbers describe the same test content; the delta is entirely the tripwire
-> described in §7 below, which is a scope marker rather than a behavioral
-> regression.
+The full-Core run was first recorded as `1058 passed, 1 failed` on a
+full-history checkout; the lone failure was the historical scope tripwire, since
+resolved as described in section 7. The current full-history result is
+**1059 passed, 0 failed, 0 errors, 0 skipped**, and the same suite on CPython
+3.12.14 in formal CI is 1059/0/0/0. No test is now passing by relying on a
+missing `main` ref.
 
 ### Formal gate
 
@@ -154,34 +157,32 @@ SQLite / OpenSSL versions and exact JUnit counts. The local numbers above are fr
 CPython 3.11.2 development runtime and are **not** presented as the formal gate;
 GitHub CI at 3.12.14 is.
 
-**CI results on this candidate** — all 17 repository workflows on candidate pin
-`11563b63…` report `success`, and all 33 PR checks were green with zero failures
-and zero cancellations. The final pin `dd88dca…` adds only a comment-only
-evidence file and removal of one unused import; the same 17 workflows were
-triggered on it. The formal 3.12.14 gate for this window:
+**CI results on the final candidate** — all 17 repository workflows report
+`success` and all 33 PR checks pass, on the exact head. Formal CPython 3.12.14
+environment and exact JUnit counts:
 
-| item | value |
-|---|---|
-| workflow | `core-background-late-trusted-return-001` |
-| run (candidate pin `11563b63…`) | `36670300768` — **success** |
-| run (final candidate pin `dd88dca…`) | see PR checks; all 17 repository workflows on this SHA report `success` |
-| job | `formal-core-gate` — **success** |
-| steps | environment recording, late-return + `not_submitted` guard gate, accepted trusted-return regression gate, complete Core regression, formal environment + JUnit publish, artifact upload — **all success** |
+Python **3.12.14** / Pydantic **2.13.5** / pytest **8.4.2** /
+SQLite **3.45.1** / OpenSSL **OpenSSL 3.0.13 30 Jan 2024**
 
-Because `actions/setup-python` fails hard when the requested version is
-unavailable, the successful install step is itself evidence that the interpreter
-resolved to exactly **CPython 3.12.14**, and the pinned `pydantic==2.13.5` /
-`pytest==8.4.2` install is the same.
+| suite | tests | fail | err | skip | time (s) |
+|---|---|---|---|---|---|
+| full Core regression | 1059 | 0 | 0 | 0 | 283.370 |
+| accepted trusted-return regression | 249 | 0 | 0 | 0 | 34.125 |
+| resident-visible behavioural + historical scope gate | 1 | 0 | 0 | 0 | 0.701 |
+| late trusted return / not_submitted / adversarial | 61 | 0 | 0 | 0 | 10.636 |
 
-**Disclosure — the raw 3.12.14 log and JUnit artifact could not be transcribed
-here.** GitHub's results-receiver and blob artifact hosts are unreachable from this
-sandbox (both fail with a connection `EOF`), so the exact SQLite and OpenSSL
-versions printed by the formal environment step, and the exact per-suite JUnit
-counts, are recorded in the run and its uploaded artifact but are not quoted in
-this body. The environment is pinned and its steps are green, but the reviewer
-should read the native SQLite/OpenSSL values off the run itself rather than trust
-this summary. This is the one item in the window's evidence list that is
-recorded-by-reference instead of transcribed.
+Formal gate: workflow `core-background-late-trusted-return-001`, run
+**`36678925987`**, job `formal-core-gate` — **success**. The steps
+`Verify required refs resolve (no shallow-clone false green)` and
+`Resident-visible behavioural and historical scope gate` both executed and
+passed; only `Annotate failure identities` is skipped, which is its intended
+`if: failure()` behaviour. Full run list in
+`reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001/formal_ci_results.md`.
+
+**The earlier evidence gap is now closed.** A previous revision of this body had
+to record the native SQLite/OpenSSL values *by reference* because the run log and
+artifact hosts were unreachable from the sandbox. They are now read verbatim from
+the check-run annotations API for check run `109769899901` and transcribed above.
 
 ### Historical R1–R5 replay families re-proved
 
@@ -237,53 +238,69 @@ provenance layer, and it remains with the blocked
 
 ---
 
-## 7. Disclosed: one C15 resident-surface tripwire fires on this branch
+## 7. C15 resident-surface tripwire — RESOLVED, validation split in place
 
-The final local full-Core run includes exactly one failure outside this window's
-own scope:
+**Status: `CI_VALIDATION_GAP` CLOSED.** This section supersedes the earlier
+disclosure, which reported the tripwire but left the combined verdict in place.
 
-```
-FAILED tests/c15_persistence/test_resident_surface.py::
-       test_resident_visible_surface_is_unchanged_by_the_durability_layer
-```
+### The preserved RED
 
-**It is not a Resident-visible-surface regression, and it is not in this window's
-files to fix.** `tools.c15_persistence.resident_surface_check` ANDs two things:
+The real failing result is retained, not deleted and not relabelled as green:
+**`HISTORICAL_SCOPE_TRIPWIRE_RED`** — `1058 passed, 1 failed`, the single failure
+being `tests/c15_persistence/test_resident_surface.py`. Recorded in
+`reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001/historical_scope_tripwire_red.md`.
+It is explicitly **not** a `RESIDENT_BEHAVIOR_RED`: all 12 behavioural comparisons
+measured `True`, and the failure came from a scope guard that a legitimately
+authorised Core change trips by construction.
 
-1. the real invariant — twelve wired-vs-control comparisons of everything the
-   Resident and the model can observe; and
-2. `pinned_tree_diff_vs_base`, which is literally
-   `git diff --stat main...HEAD -- src/aios_core` being empty.
+### The validation split
 
-Component 2 is `False` for **any** commit that edits the runtime, by construction.
-This window is exactly such a commit. Running the checker directly against the
-candidate, **all twelve behavioral comparisons are `True`**:
+`tests/c15_persistence/test_resident_surface.py` is corrected **test-only**. The
+checker tool and the committed historical evidence are untouched. The two
+constraints are now adjudicated separately:
 
-`resident_visible_payload`, `projection`, `ingest_receipt`, `capability_catalog`,
-`model_round_ordering`, `provider_request_bytes`, `provider_reply_bytes`,
-`directive_semantics`, `capability_side_effect_count`, `assistant_output`,
-`metering_rows`, `world_revision`.
+1. **Resident-visible behaviour (binding).** All 12 comparisons asserted
+   exhaustively against a named list, so none can be dropped silently.
+2. **Frozen Resident review trees.** `c15-rcc/v1` and
+   `c14-resident/v2/release` must stay clean against the current base,
+   re-derived independently of the checker's own report.
+3. **Historical Persistence Corrective-003 scope.** The `src/aios_core`
+   zero-diff is re-bound to the range it was actually written for:
+   `016a2f7db5ed01b41fc614701079c507d2c2c02e -> 19476641be95e666068e6299f42df9a411f4c0ba`,
+   which is empty, while that same range changed 56 files / 12,433 insertions
+   elsewhere — so the invariant is real and non-vacuous.
+4. **No false green.** A shallow checkout now reports **skipped**, never passed.
+   A full-history checkout with a missing ref is still a hard failure.
 
-Both pinned C15 review trees are also clean —
-`reviews/internal_habitation/c14-resident/v2/release` and
-`reviews/internal_habitation/c15-rcc/v1` both report `clean = true`, so the
-standing constraint against Window 10 / C15 review material holds.
+### The shallow-clone blind spot, closed in CI
 
-**Why CI is green while the local clone is not.** `actions/checkout` defaults to
-`fetch-depth: 1`, so in CI the `main` ref does not resolve, the diff produces empty
-stdout, and the tripwire reads `clean = true`. Reproduced against a fresh shallow
-clone of the candidate: `git rev-parse main` → `unknown revision`, and
-`git diff --stat main...HEAD -- src/aios_core` → no output. The CI full-regression
-step therefore does not confirm the tripwire passes; it is the tripwire being
-unable to evaluate. This is the same "CI cannot evaluate a local correctness
-question" shape as BLK-001.
+`.github/workflows/core-background-late-trusted-return-001.yml` now uses
+`fetch-depth: 0` and adds a **Verify required refs resolve (no shallow-clone false
+green)** step that fails the build if the repository is shallow, and prints
+`rev-parse`/`cat-file -e` results for the base ref and both historical pins. A new
+**Resident-visible behavioural and historical scope gate** step runs the split
+gate on 3.12.14. Both steps executed and passed on the final head.
 
-**What was deliberately not done.** `tools/c15_persistence/**` is out of scope for
-this window and this engineer is not a C15 operator, so the tripwire was not
-worked around — no C15 tool, test, or evidence file was modified, and no attempt was
-made to leave `src/aios_core` unchanged, which would have meant not performing the
-assigned corrective. The finding is surfaced here for the C15 owner to adjudicate.
-If the tripwire is meant to be branch-scoped to C15 persistence work, the fix
-belongs in the C15 tooling, not in this window's runtime change.
+Note the first version of the split made a shallow checkout a *hard failure*,
+which correctly refused to lie but also redded the five other repository
+workflows that still use the default `fetch-depth: 1`. That was resolved by the
+skip-not-pass rule above, so unrelated gates stay honest rather than being
+quietly waived.
 
-Full analysis: `reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001/full_suite_local_result.md`.
+### The gate is not a rubber stamp
+
+| injected fault | result |
+|---|---|
+| `assistant_output` comparison forced False | **FAILED** — behavioural comparison is live |
+| historical range pointed at a Core-touching commit | **FAILED** — scope invariant is live |
+| frozen review tree dirtied in a commit | **FAILED** — review-tree constraint is live |
+| shallow clone | **skipped**, not passed |
+| full history, no local `main` branch | **passed** — PR-checkout shape handled |
+
+### Scope discipline held
+
+`tools/c15_persistence/**` and
+`reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_003/evidence/resident-surface-no-change.json`
+were **not** modified. No persistence product or harness contract was changed to
+make a test green. The late-return trust design, the public API, and the C15
+operator surface are untouched by this corrective.
