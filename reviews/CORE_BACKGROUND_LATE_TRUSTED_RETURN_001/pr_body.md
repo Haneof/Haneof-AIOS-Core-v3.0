@@ -12,9 +12,9 @@ Closes the new Core failure class frozen by the WINDOW 12 adjudication
 
 - Baseline `main`: `25591825d88e98f30dfd3de1c7e7cbc6e53267dd`
 - Branch: `arena/01a0f07b-haneof-aios-core-v3-0`
-- Candidate: `11563b63b0c34ec81dcc019ef59373ea9d145155`
+- Candidate: `dd88dca17d1927225015bf82b2180d114e9e29f7`
 - Parent: `25591825d88e98f30dfd3de1c7e7cbc6e53267dd`
-- Tree: `1006d3de2aa08f41f2fe096e1a8fccf0e83e7ae3`
+- Tree: `65e789bdf4ede7f2adb7b538589492edd49b7d56`
 
 ---
 
@@ -133,10 +133,18 @@ git worktree add --detach /tmp/baseline_wt origin/main   # -> 25591825…
 |---|---|---|
 | late trusted return + not_submitted + adversarial | 61 | **61 PASS** |
 | accepted trusted-return / background-response / gap-fix / runtime regression | 249 | **249 PASS** |
-| **full Core suite** | **1059** | **1059 PASS** — 0 fail, 0 error, 0 skip |
+| **full Core suite** | **1059** | **1058 PASS + 1 explained non-behavioral failure** — see below |
 
 Baseline `main` = 997 PASS, so `+61` new probes and `+1` from splitting one accepted
 test, with **no previously passing test lost**.
+
+> **Correction.** The full-Core run was first recorded as `1059 passed`. That run
+> happened while the implementation was still uncommitted and `HEAD` was still the
+> baseline commit, so a git-tree tripwire inside the C15 surface checker could not
+> fire. Re-run on the committed candidate it reports `1058 passed, 1 failed`. Both
+> numbers describe the same test content; the delta is entirely the tripwire
+> described in §7 below, which is a scope marker rather than a behavioral
+> regression.
 
 ### Formal gate
 
@@ -145,6 +153,35 @@ test, with **no previously passing test lost**.
 SQLite / OpenSSL versions and exact JUnit counts. The local numbers above are from a
 CPython 3.11.2 development runtime and are **not** presented as the formal gate;
 GitHub CI at 3.12.14 is.
+
+**CI results on this candidate** — all 17 repository workflows on candidate pin
+`11563b63…` report `success`, and all 33 PR checks were green with zero failures
+and zero cancellations. The final pin `dd88dca…` adds only a comment-only
+evidence file and removal of one unused import; the same 17 workflows were
+triggered on it. The formal 3.12.14 gate for this window:
+
+| item | value |
+|---|---|
+| workflow | `core-background-late-trusted-return-001` |
+| run (candidate pin `11563b63…`) | `36670300768` — **success** |
+| run (final candidate pin `dd88dca…`) | see PR checks; all 17 repository workflows on this SHA report `success` |
+| job | `formal-core-gate` — **success** |
+| steps | environment recording, late-return + `not_submitted` guard gate, accepted trusted-return regression gate, complete Core regression, formal environment + JUnit publish, artifact upload — **all success** |
+
+Because `actions/setup-python` fails hard when the requested version is
+unavailable, the successful install step is itself evidence that the interpreter
+resolved to exactly **CPython 3.12.14**, and the pinned `pydantic==2.13.5` /
+`pytest==8.4.2` install is the same.
+
+**Disclosure — the raw 3.12.14 log and JUnit artifact could not be transcribed
+here.** GitHub's results-receiver and blob artifact hosts are unreachable from this
+sandbox (both fail with a connection `EOF`), so the exact SQLite and OpenSSL
+versions printed by the formal environment step, and the exact per-suite JUnit
+counts, are recorded in the run and its uploaded artifact but are not quoted in
+this body. The environment is pinned and its steps are green, but the reviewer
+should read the native SQLite/OpenSSL values off the run itself rather than trust
+this summary. This is the one item in the window's evidence list that is
+recorded-by-reference instead of transcribed.
 
 ### Historical R1–R5 replay families re-proved
 
@@ -197,3 +234,56 @@ provenance layer, and it remains with the blocked
    `mark_failure`?
 6. Whether the local 3.11 development runtime was ever presented as the formal gate
    (it was not) and whether the 3.12.14 CI run is green.
+
+---
+
+## 7. Disclosed: one C15 resident-surface tripwire fires on this branch
+
+The final local full-Core run includes exactly one failure outside this window's
+own scope:
+
+```
+FAILED tests/c15_persistence/test_resident_surface.py::
+       test_resident_visible_surface_is_unchanged_by_the_durability_layer
+```
+
+**It is not a Resident-visible-surface regression, and it is not in this window's
+files to fix.** `tools.c15_persistence.resident_surface_check` ANDs two things:
+
+1. the real invariant — twelve wired-vs-control comparisons of everything the
+   Resident and the model can observe; and
+2. `pinned_tree_diff_vs_base`, which is literally
+   `git diff --stat main...HEAD -- src/aios_core` being empty.
+
+Component 2 is `False` for **any** commit that edits the runtime, by construction.
+This window is exactly such a commit. Running the checker directly against the
+candidate, **all twelve behavioral comparisons are `True`**:
+
+`resident_visible_payload`, `projection`, `ingest_receipt`, `capability_catalog`,
+`model_round_ordering`, `provider_request_bytes`, `provider_reply_bytes`,
+`directive_semantics`, `capability_side_effect_count`, `assistant_output`,
+`metering_rows`, `world_revision`.
+
+Both pinned C15 review trees are also clean —
+`reviews/internal_habitation/c14-resident/v2/release` and
+`reviews/internal_habitation/c15-rcc/v1` both report `clean = true`, so the
+standing constraint against Window 10 / C15 review material holds.
+
+**Why CI is green while the local clone is not.** `actions/checkout` defaults to
+`fetch-depth: 1`, so in CI the `main` ref does not resolve, the diff produces empty
+stdout, and the tripwire reads `clean = true`. Reproduced against a fresh shallow
+clone of the candidate: `git rev-parse main` → `unknown revision`, and
+`git diff --stat main...HEAD -- src/aios_core` → no output. The CI full-regression
+step therefore does not confirm the tripwire passes; it is the tripwire being
+unable to evaluate. This is the same "CI cannot evaluate a local correctness
+question" shape as BLK-001.
+
+**What was deliberately not done.** `tools/c15_persistence/**` is out of scope for
+this window and this engineer is not a C15 operator, so the tripwire was not
+worked around — no C15 tool, test, or evidence file was modified, and no attempt was
+made to leave `src/aios_core` unchanged, which would have meant not performing the
+assigned corrective. The finding is surfaced here for the C15 owner to adjudicate.
+If the tripwire is meant to be branch-scoped to C15 persistence work, the fix
+belongs in the C15 tooling, not in this window's runtime change.
+
+Full analysis: `reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001/full_suite_local_result.md`.
