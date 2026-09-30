@@ -1,0 +1,10 @@
+reviewer CPython: 3.11.2
+reviewer sqlite3: 3.40.1
+reviewer OpenSSL: OpenSSL 3.0.20 7 Apr 2026
+reviewer pydantic: unavailable
+reviewer pytest: unavailable
+formal run CPython: 3.12.14
+formal run Pydantic: 2.13.5
+formal run pytest: 8.4.2
+formal run SQLite: 3.45.1
+formal run OpenSSL: 3.0.13

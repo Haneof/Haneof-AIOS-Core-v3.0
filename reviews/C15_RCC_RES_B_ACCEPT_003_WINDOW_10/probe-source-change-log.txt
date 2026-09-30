@@ -1,0 +1,5 @@
+Prior SHA-256: c33039418224cb97d3964a53a8e1e6907c0051402403aa9e4c87ea6184e629fa
+Reason: first frozen probe run exposed false positives in future-event matching (schema keys/common capability vocabulary treated as event facts), and terminal payload was unnecessarily duplicated; corrected scanner now isolates event-specific ID/time/payload cues and separately labels weaker source/dimension matches. Probe expected verdicts unchanged.
+f5d0910cd99a6f00288c2f60d6537b04294b5e6bea9bb2383a696fac32e6929d  reviews/C15_RCC_RES_B_ACCEPT_003_WINDOW_10/probes/audit_probe.py
+Reason: py_compile found a quote typo in the newly added independent ledger-chain sequence-error diagnostic; no candidate data was consumed in that compile failure. Corrected only the diagnostic expression; expected invariants unchanged.
+Frozen probe source before corrected second execution; expected outcomes unchanged.

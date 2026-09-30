@@ -1,0 +1,28 @@
+owner.json:
+{"backend_version": "c15-persistence-backend-v1", "boot_id": "7b0855bc-f0a8-4d24-b70a-1151226e8045", "created_at_epoch": 1790710385.020531, "creator_pid": 32532, "phase": "B", "remote_authoritative": true, "remote_authority": {"remote": "origin", "remote_ref": "refs/heads/persistence/c15-rcc-res-b-rerun-003-60997e04", "run_id": "c15-rcc-res-b-rerun-003-60997e04", "schema": "c15-remote-authority-v1", "session_id": "c15-rcc-res-b-session-003-60997e04"}, "remote_authority_sha256": "e3c4fbfed3e9e15bdb4f20aa98ac52fa153e3513c44de46691e2a6a5723328da", "run_id": "c15-rcc-res-b-rerun-003-60997e04", "session_id": "c15-rcc-res-b-session-003-60997e04", "subject_id": "user_1"}
+
+run identity:
+{
+  "conversation_session_id": "sess-resident-b-003-8f7f1f11f568",
+  "freshness": "NEW: minted for this run only; no prior run state reused",
+  "minted_utc": "2026-09-29T19:36:04.342115+00:00",
+  "released_by": "C15-RCC-RES-B-RELEASE-003 (governance/C15_RCC_RES_B_RELEASE_003_RELEASE_RECORD_2026-09-30.md)",
+  "resident_process_id": "8887ab32-f693-44b7-ba25-5b32fc4dc864",
+  "resident_session_id": "resident-b-003-12da5a13261e4c0d",
+  "run_id": "c15-rcc-res-b-rerun-003-60997e04",
+  "subject_id": "user_1",
+  "task_id": "C15-RCC-RES-B-RERUN-003",
+  "window": "08"
+}
+
+resident session:
+resident-b-003-12da5a13261e4c0d
+resident process:
+8887ab32-f693-44b7-ba25-5b32fc4dc864
+
+top-level event/binding paths:
+ABSENT:/tmp/ia-run/current-event.json
+ABSENT:/tmp/ia-run/binding/current-event-binding.json
+
+process/invocation artifact search:
+cursor23_reveals=0

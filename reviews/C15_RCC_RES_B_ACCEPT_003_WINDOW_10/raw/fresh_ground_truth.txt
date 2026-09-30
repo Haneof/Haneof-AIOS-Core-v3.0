@@ -1,0 +1,20 @@
+fresh_at_utc=2026-09-30T03:01:07Z
+main=b947ff548e531169d2bec3f94ddd40eb99129fca
+persistence=5692a32972f72afb6337aa68cc97310734f14c9c
+pr302=846b55e63abe7f4d7c25adde013978cce6084556 OPEN
+pr296=317316299c332d82e0cbd0431b5c7d50f391bc17 OPEN
+pr303=12360305cef44419c54924d0f92b97c12ad7ff19 MERGED 2026-09-30T02:47:27Z
+pr302_head=846b55e63abe7f4d7c25adde013978cce6084556
+pr302_tree=634ed0bfb5ebfcb9f7d7fe7de4418f1731925ace
+pr302_parent=f7ee14a23ab3c7de0793cecb7a83291fd2971110
+A	evidence/w08/FINAL_REPORT.md
+A	evidence/w08/OPERATOR_LOG.md
+A	evidence/w08/PM_ACCEPTANCE_BRIEF.md
+A	evidence/w08/README.txt
+A	evidence/w08/TERMINAL_VERIFICATION.json
+A	evidence/w08/W08_DEEP_CHAIN_VERIFY.json
+A	evidence/w08/W08_INDEPENDENT_VERIFY.json
+A	evidence/w08/evidence-incident-reconciliation.md
+status:
+## arena/01a0f038-haneof-aios-core-v3-0
+?? reviews/C15_RCC_RES_B_ACCEPT_003_WINDOW_10/

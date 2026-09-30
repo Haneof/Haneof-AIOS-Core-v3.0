@@ -1,0 +1,10 @@
+b_process_id.txt: OK
+b_session_id.txt: OK
+event_projections.sha256: OK
+exchange_final.json: OK
+freeze_time.txt: OK
+private_world.sqlite: OK
+provider_identity.json: OK
+release_state.json: OK
+software_identity.json: OK
+world_index.sqlite: OK
