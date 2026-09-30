@@ -1,0 +1,3 @@
+Prior SHA-256: 8de8e72753b53b3c5caaea928f4c427025407c39b6e49f89e4be2181138ce80f
+Reason: first run failed because a glob selected the search-index SQLite file before the canonical World DB at generation 34; the search index has no background_model_attempts table. No candidate bytes were changed; only the probe path selection will be corrected. Expected outcomes unchanged.
+Changed only generation-34 DB glob from generic *.sqlite to canonical *.world.sqlite; frozen candidate and expected verdicts unchanged.
