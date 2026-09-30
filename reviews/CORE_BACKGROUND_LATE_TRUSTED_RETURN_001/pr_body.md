@@ -12,13 +12,15 @@ Closes the new Core failure class frozen by the WINDOW 12 adjudication
 
 - Baseline `main`: `25591825d88e98f30dfd3de1c7e7cbc6e53267dd`
 - Branch: `arena/01a0f07b-haneof-aios-core-v3-0`
-- Candidate: `dab7af82cd009dbc8ab8838c839e16a2b2a803e1`
-- Parent: `30a38c48418b220197213cf412aa6ea1fd977a33`
-- Tree: `bbe393c617a0da887391a1dade47272d3dd13947`
+- Candidate: **the PR head ref itself** (see the CI comment on this PR, which
+  states the exact SHA, parent and tree for the head it was written about).
 
-> The candidate pin above is this branch's head. The file cannot embed the SHA of
-> the commit that contains it, so the authoritative head is the one shown on the
-> PR itself; both are asserted equal in the CI comment below.
+> This file is committed inside the repository, so it cannot embed the SHA of the
+> commit that contains it without either regressing or going stale. The
+> authoritative candidate pin is therefore the PR head ref, and every SHA quoted
+> in this document is either the immutable baseline `main` or a commit already
+> published and verifiable by `git rev-parse`. The trailing evidence commit
+> changes only `reviews/**` markdown and no code, test, workflow or tool.
 
 ---
 
@@ -172,7 +174,8 @@ SQLite **3.45.1** / OpenSSL **OpenSSL 3.0.13 30 Jan 2024**
 | late trusted return / not_submitted / adversarial | 61 | 0 | 0 | 0 | 10.636 |
 
 Formal gate: workflow `core-background-late-trusted-return-001`, run
-**`36678925987`**, job `formal-core-gate` — **success**. The steps
+**`36678925987`** (evidence commit `dab7af8`; re-run on the final head below),
+job `formal-core-gate` — **success**. The steps
 `Verify required refs resolve (no shallow-clone false green)` and
 `Resident-visible behavioural and historical scope gate` both executed and
 passed; only `Annotate failure identities` is skipped, which is its intended
