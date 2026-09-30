@@ -117,10 +117,7 @@ from .cognitive_runtime import (
     RuntimeSnapshot,
     RuntimeTurnResult,
 )
-from .late_return import (
-    BackgroundModelReturnCapability,
-    ExternalReturnObserver,
-)
+from .late_return import ExternalReturnObserver
 from .metering import ModelMeteringLedger
 
 
