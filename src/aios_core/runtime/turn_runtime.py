@@ -117,6 +117,10 @@ from .cognitive_runtime import (
     RuntimeSnapshot,
     RuntimeTurnResult,
 )
+from .late_return import (
+    BackgroundModelReturnCapability,
+    ExternalReturnObserver,
+)
 from .metering import ModelMeteringLedger
 
 
@@ -226,6 +230,7 @@ class FusedTurnRuntime:
         summary_chunk_turns: int = 12,
         max_round_summaries_per_turn: int = 1,
         attention_scheduling_policy: AttentionSchedulingPolicy | None = None,
+        external_return_observer: ExternalReturnObserver | None = None,
     ) -> None:
         if recent_turn_limit < 0:
             raise ValueError("recent_turn_limit must be >= 0")
@@ -250,6 +255,14 @@ class FusedTurnRuntime:
         self.attention_scheduling_policy = (
             attention_scheduling_policy or AttentionSchedulingPolicy()
         )
+        # Registering an external return observer is the embedder's explicit
+        # trust assertion that the configured model handler reaches a genuine
+        # external responder. Only then does Core issue a one-shot, per-attempt
+        # return capability at dispatch. With no registration (the default) no
+        # capability record is ever created, so an anonymous or local handler is
+        # never auto-upgraded to trusted and a late external return stays
+        # permanently unattachable (fail closed).
+        self.external_return_observer = external_return_observer
         self.recommender = ProactiveMemoryRecommender(
             index=index,
             store=store,
@@ -1300,6 +1313,16 @@ class FusedTurnRuntime:
                 "originating request binding was not durable before provider dispatch"
             )
         object.__setattr__(snapshot, "_outbound_relay_id", binding.relay_id)
+        if self.external_return_observer is not None:
+            # The capability is minted here, at the dispatch boundary, and handed
+            # to the registered observer before the provider handler runs. It is
+            # the only artifact that can later authenticate a return which this
+            # process never sees, and it is single-use and attempt-scoped.
+            capability = self.background_model_attempts._issue_external_return_capability(
+                snapshot.model_attempt_id,
+                issued_at=self._active_meter_time,
+            )
+            self.external_return_observer.accept_return_capability(snapshot, capability)
 
     def _authenticate_background_model_response(
         self,
@@ -1401,6 +1424,58 @@ class FusedTurnRuntime:
             response_fingerprint=response_fingerprint,
             directive_payload=directive_payload,
             authenticity_proof=authenticity_proof,
+            evidence=evidence,
+        )
+
+    def attach_late_background_return(
+        self,
+        *,
+        work_kind: str,
+        work_id: str,
+        model_round_index: int,
+        directive_payload: str,
+        late_return_proof: str,
+        attached_at: datetime,
+        evidence: str,
+    ) -> BackgroundModelResponseStaging:
+        """Attach a trusted external return that arrived after Core process death.
+
+        The sanctioned recovery entry point for the late trusted return failure
+        class. It resolves the durable attempt for the requested work identity and
+        round and delegates to
+        :meth:`BackgroundModelAttemptStore.attach_late_trusted_return`.
+
+        It is **not** a signing oracle. The caller may carry the exact response
+        bytes out of the external responder, but the bytes become trusted only
+        together with the proof minted at the authorized external return boundary
+        by the observer that held the one-shot return capability issued at
+        dispatch. Core recomputes that proof under its private per-attempt nonce
+        and compares it against the durable pre-dispatch request binding, so an
+        arbitrary recovery caller holding an attempt id, the response bytes and
+        caller-computable metadata can never make Core accept a provider return.
+
+        Nothing here redispatches the provider or bypasses the ordinary
+        ``FusedTurnRuntime`` continuation: once attached, the same trusted handoff
+        the accepted recovery path already understands resumes the turn through
+        the single metering / capability / World / output / ACK effects.
+        """
+
+        attempt = self.background_model_attempts.inspect(
+            subject_id=self.subject_id,
+            work_kind=work_kind,
+            work_id=work_id,
+            model_round_index=model_round_index,
+        )
+        if attempt is None:
+            raise KeyError(
+                "no durable background model attempt exists for the requested "
+                "work identity and round"
+            )
+        return self.background_model_attempts.attach_late_trusted_return(
+            attempt.attempt_id,
+            attached_at=attached_at,
+            directive_payload=directive_payload,
+            late_return_proof=late_return_proof,
             evidence=evidence,
         )
 

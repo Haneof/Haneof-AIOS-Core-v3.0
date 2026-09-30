@@ -15,6 +15,10 @@ from .background_attempt import (
     BackgroundModelResponsePending,
     BackgroundModelResponseReceipt,
 )
+from .late_return import (
+    BackgroundModelReturnCapability,
+    ExternalReturnObserver,
+)
 from .metering import MeteringRecord, ModelMeteringLedger
 
 from .capabilities import (

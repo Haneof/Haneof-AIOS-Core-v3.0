@@ -34,26 +34,52 @@ def test_background_attempt_reconciliation_keeps_same_identity_and_non_world_rev
         world_revision=before,
         admitted_at=NOW,
     )
-    attempts.mark_dispatching(
+    # CORE-BACKGROUND-LATE-TRUSTED-RETURN-001: `not_submitted` is only reachable
+    # from a pre-dispatch Core-owned state. The attempt is reconciled here, while
+    # it is still `admitted` and provably no outbound request was published.
+    assert admitted.state == "admitted"
+    assert attempts.outbound_request_binding(admitted.attempt_id) is None
+    reconciled = attempts.reconcile_not_submitted(
         admitted.attempt_id,
+        reconciled_at=NOW,
+        evidence="admission stopped before any outbound request was published",
+    )
+    assert reconciled.state == "not_submitted"
+
+    # The post-dispatch shape that this task retires: once the provider boundary
+    # is crossed the same call must be mechanically refused, and the attempt must
+    # stay fail-closed in in_doubt rather than becoming retryable.
+    crossed = attempts.admit(
+        subject_id="user_1",
+        work_kind="wake",
+        work_id="wake_attempt_crossed",
+        wake_reason="watch_match",
+        model_round_index=0,
+        world_revision=before,
+        admitted_at=NOW,
+    )
+    attempts.mark_dispatching(
+        crossed.attempt_id,
         dispatched_at=NOW,
-        outbound_request_fingerprint="unit-outbound-request",
+        outbound_request_fingerprint="unit-outbound-request-crossed",
     )
     in_doubt = attempts.mark_failure(
-        admitted.attempt_id,
+        crossed.attempt_id,
         failed_at=NOW,
         definitely_not_submitted=False,
         error=TimeoutError("possible submission"),
     )
     assert in_doubt.state == "in_doubt"
     assert in_doubt.recovery_disposition == "in_doubt"
+    with pytest.raises(BackgroundModelResponseConflict):
+        attempts.reconcile_not_submitted(
+            crossed.attempt_id,
+            reconciled_at=NOW,
+            evidence="provider gateway confirms no request was accepted",
+        )
+    assert attempts.get(crossed.attempt_id).state == "in_doubt"
+    assert attempts.get(crossed.attempt_id).reconciliation_evidence is None
 
-    reconciled = attempts.reconcile_not_submitted(
-        admitted.attempt_id,
-        reconciled_at=NOW,
-        evidence="provider gateway confirms no request was accepted",
-    )
-    assert reconciled.state == "not_submitted"
     retry = attempts.admit(
         subject_id="user_1",
         work_kind="wake",

@@ -1,0 +1,125 @@
+# CORE-BACKGROUND-LATE-TRUSTED-RETURN-001 — AUTHORITATIVE BASELINE RED
+# Reproducible: final probe sources, executed unmodified in a clean detached worktree at
+#   git worktree add --detach /tmp/baseline_wt origin/main   -> 25591825d88e98f30dfd3de1c7e7cbc6e53267dd
+# In that worktree src/aios_core/**, tools/** and every pre-existing test were byte-identical to main.
+# Only the 4 new probe files were added. No production line existed to cheat.
+#
+# runtime: Python 3.11.2 / pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.40.1 / OpenSSL OpenSSL 3.0.20 7 Apr 2026
+# The FORMAL gate is GitHub CI on CPython 3.12.14; this is a 3.11 development capture.
+
+FFFFFFFFFFFFFFFFFFFFFFFFFF.FF.FFFF.FFF..FFFFFFFFFFFFFFFFFFFFF            [100%]
+=================================== FAILURES ===================================
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:202: Failed: DID NOT RAISE <class 'aios_core.runtime.background_attempt.BackgroundModelResponseConflict'>
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:352: AssertionError: child exit=1
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:753: AttributeError: 'BackgroundModelAttemptStore' object has no attribute 'attach_late_trusted_return'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:75: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001.py:833: ModuleNotFoundError: No module named 'aios_core.runtime.late_return'
+/tmp/baseline_wt/src/aios_core/runtime/background_attempt.py:1312: aios_core.runtime.background_attempt.BackgroundModelAttemptBlocked: background model attempt blocked: bgattempt_250de72291d1ac45217bc6ccbd1a337d is admitted; inspect/reconcile the durable attempt instead of reinvoking the provider
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_not_submitted.py:233: Failed: DID NOT RAISE <class 'aios_core.runtime.background_attempt.BackgroundModelResponseConflict'>
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_not_submitted.py:233: Failed: DID NOT RAISE <class 'aios_core.runtime.background_attempt.BackgroundModelResponseConflict'>
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_not_submitted.py:266: Failed: DID NOT RAISE <class 'aios_core.runtime.background_attempt.BackgroundModelResponseConflict'>
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_not_submitted.py:287: Failed: DID NOT RAISE <class 'aios_core.runtime.background_attempt.BackgroundModelResponseConflict'>
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_not_submitted.py:329: Failed: DID NOT RAISE <class 'aios_core.runtime.background_attempt.BackgroundModelResponseConflict'>
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_not_submitted.py:341: Failed: DID NOT RAISE <class 'aios_core.runtime.background_attempt.BackgroundModelResponseConflict'>
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_not_submitted.py:58: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:86: AssertionError: assert '_issue_external_return_capability' in mappingproxy({'__module__': 'aios_core.runtime.background_attempt', '__doc__': 'Same-database, non-world attempt admis...kgroundModelAttemptStore' objects>, '__weakref__': <attribute '__weakref__' of 'BackgroundModelAttemptStore' objects>})
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:107: AttributeError: 'BackgroundModelAttemptStore' object has no attribute 'late_trusted_return_state'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:45: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:45: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:45: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:45: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:45: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:45: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:45: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:45: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:45: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:45: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:45: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:45: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:45: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:45: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:45: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:45: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:45: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:45: TypeError: FusedTurnRuntime.__init__() got an unexpected keyword argument 'external_return_observer'
+/tmp/baseline_wt/tests/integration/test_core_background_late_trusted_return_001_adversarial.py:442: AttributeError: 'BackgroundModelAttemptStore' object has no attribute 'attach_late_trusted_return'
+=========================== short test summary info ============================
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r0_absent_authorized_observer_keeps_the_late_return_permanently_unattachable
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r1_late_trusted_return_while_dispatch_is_still_durable
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r1_late_trusted_return_after_restart_admission_raised_in_doubt
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r1_capability_is_single_use_and_consumed
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r1_real_sigkill_then_late_trusted_return_converges_exactly_once
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r2_forged_late_response_and_caller_made_proof_fail_closed
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r2_real_proof_over_caller_substituted_bytes_fails_closed
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r3_correct_bytes_without_a_trusted_proof_fail_closed[None]
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r3_correct_bytes_without_a_trusted_proof_fail_closed[]
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r3_correct_bytes_without_a_trusted_proof_fail_closed[   ]
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r3_correct_bytes_without_a_trusted_proof_fail_closed[bglate_v1_]
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r3_correct_bytes_without_a_trusted_proof_fail_closed[bglate_v1_ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff]
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r3_correct_bytes_without_a_trusted_proof_fail_closed[0]
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r3_correct_bytes_without_a_trusted_proof_fail_closed[12345]
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r3_correct_bytes_without_a_trusted_proof_fail_closed[proof7]
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r3_pre_dispatch_attempt_has_no_return_capability_at_all
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r4_proof_from_another_attempt_cannot_be_transplanted
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r4_proof_cannot_be_transplanted_to_another_subject_or_work
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r4_proof_cannot_be_transplanted_to_another_round
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r4_durable_binding_tampering_invalidates_the_proof
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r5_changed_response_under_the_same_proof_fails_closed
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r6_consumed_proof_replay_is_deterministic_exact_recovery
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r6_consumed_proof_replay_with_different_bytes_fails_closed
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r7_anonymous_handler_gets_no_capability_and_no_attach
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r8_anonymous_external_return_can_never_mint_a_late_proof
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r9_leaked_capability_cannot_mint_a_proof_for_another_attempt
+FAILED tests/integration/test_core_background_late_trusted_return_001.py::test_ltr_r10_the_only_proof_minting_surface_needs_the_capability_object
+FAILED tests/integration/test_core_background_late_trusted_return_001_not_submitted.py::test_ns_r1_pre_dispatch_admitted_attempt_may_be_reconciled_and_retried
+FAILED tests/integration/test_core_background_late_trusted_return_001_not_submitted.py::test_ns_r2_post_dispatch_reconcile_not_submitted_is_mechanically_refused[dispatching]
+FAILED tests/integration/test_core_background_late_trusted_return_001_not_submitted.py::test_ns_r2_post_dispatch_reconcile_not_submitted_is_mechanically_refused[in_doubt]
+FAILED tests/integration/test_core_background_late_trusted_return_001_not_submitted.py::test_ns_r2_false_state_cannot_be_written_even_with_a_verbose_justification
+FAILED tests/integration/test_core_background_late_trusted_return_001_not_submitted.py::test_ns_r3_missing_receipt_alone_never_justifies_not_submitted
+FAILED tests/integration/test_core_background_late_trusted_return_001_not_submitted.py::test_ns_r5_caller_forged_non_submission_assertion_fails_closed
+FAILED tests/integration/test_core_background_late_trusted_return_001_not_submitted.py::test_ns_r5_runtime_level_turn_reconciliation_is_refused_after_dispatch
+FAILED tests/integration/test_core_background_late_trusted_return_001_not_submitted.py::test_ns_r6_legitimate_late_return_proof_uses_attach_not_reconciliation
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a1_capability_issuer_is_not_publicly_callable
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a1_no_public_store_method_returns_the_proof_minting_nonce
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a1_recovery_caller_cannot_self_issue_a_capability
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a2_caller_supplied_correct_bytes_with_a_self_made_proof_fail_closed
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a3_every_attack_fails_closed[caller_supplied_correct_bytes_fake_proof]
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a3_every_attack_fails_closed[caller_supplied_forged_bytes]
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a3_every_attack_fails_closed[valid_proof_wrong_attempt]
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a3_every_attack_fails_closed[valid_proof_wrong_work]
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a3_every_attack_fails_closed[valid_proof_wrong_subject]
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a3_every_attack_fails_closed[valid_proof_wrong_round]
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a3_every_attack_fails_closed[valid_proof_wrong_request]
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a3_every_attack_fails_closed[valid_proof_changed_response]
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a3_every_attack_fails_closed[valid_proof_replay_after_completion]
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a3_every_attack_fails_closed[corrupted_proof]
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a3_every_attack_fails_closed[truncated_proof]
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a3_every_attack_fails_closed[proof_with_duplicate_json_keys]
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a3_every_attack_fails_closed[ambiguous_semantic_payload]
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a3_every_attack_fails_closed[old_historical_receipt_transplant]
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a3_every_attack_fails_closed[late_proof_for_completed_stronger_terminal_receipt]
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a3_every_attack_fails_closed[post_dispatch_false_non_submission_assertion]
+FAILED tests/integration/test_core_background_late_trusted_return_001_adversarial.py::test_a4_anonymous_handler_is_never_auto_upgraded
+56 failed, 5 passed in 3.29s
