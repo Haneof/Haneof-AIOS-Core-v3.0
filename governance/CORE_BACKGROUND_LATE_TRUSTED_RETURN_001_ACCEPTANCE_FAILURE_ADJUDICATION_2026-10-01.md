@@ -301,3 +301,50 @@ Until `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-001` completes impleme
 2. **`WINDOW 16` (`CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-001`):** Implement `C1`–`C8` on a new branch + new PR, run RED-first against `5ad0524c425592210ff184e00ad52abb2c14e366`, turn all Window 14 probes + `CA1`–`CA5` GREEN, and pass the formal CI gate on exact final PR head.
 3. **`WINDOW 17` (`CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-001-IA`):** Fresh Independent Acceptance review of the Corrective-001 candidate.
 4. **`WINDOW 18` (`CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-001-INTEGRATION`):** PM integration merge and receipt on `main`, followed by adjudication of C15 re-entry.
+
+
+---
+
+## 10. Post-Merge PM Entry Clarification — S3 / C4-C5 Consistency (2026-10-01)
+
+Status: **BINDING GOVERNANCE CLARIFICATION / NO VERDICT CHANGE / GOVERNANCE_ONLY**
+
+This clarification resolves an internal conflict discovered after the WINDOW 15 adjudication merge and before WINDOW 16 engineering started. It does **not** change the four binding blockers, the frozen failed candidate, the canonical review, or the unique next READY task.
+
+### 10.1 Conflict found
+
+The adjudication correctly freezes C4/C5:
+
+- once any durable dispatch fact exists (state is no longer `admitted`, or any durable request-binding / verifier-capability / response-receipt row exists), writing `not_submitted` is mechanically forbidden;
+- `ModelDispatchNotSubmitted` or `definitely_not_submitted=True` after `mark_dispatching` cannot override that durable fact.
+
+However §7.3 also said all frozen Window 14 probes, including `window14_s3_stale_capability_rotation.py`, must turn GREEN unchanged. The canonical S3 probe's frozen expected contract explicitly requires a sequence in which `mark_dispatching` first creates a durable binding/capability and then `mark_failure(... ModelDispatchNotSubmitted ...)` succeeds with `state == "not_submitted"`. That expected transition is now constitutionally forbidden by C4/C5. Both requirements cannot be satisfied simultaneously.
+
+### 10.2 Binding precedence
+
+**C4/C5 durable truthfulness takes precedence.** The original Window 14 S3 probe remains immutable historical evidence for BLK-W14-004 on failed candidate `5ad0524c425592210ff184e00ad52abb2c14e366`; its source bytes, hashes, and original RED result must never be changed or relabeled.
+
+For Corrective-001:
+
+- `IA14-ORACLE-001`, `IA14-NONCE-001`, and `IA14-NS-001` remain unchanged GREEN requirements where their expected outcomes are compatible with C1-C8.
+- The **original S3 is NOT a candidate-GREEN gate under the C4/C5 Route-B semantics**, because its frozen expectation requires the very post-binding `not_submitted` transition that C4/C5 prohibit.
+- Instead, Corrective-001 must rerun the original S3 unchanged on failed candidate `5ad0524c...` and preserve it as RED evidence, then add a new frozen corrective probe (suggested ID `CA4-B / S3-ROUTE-B`) proving the same sequence is stopped at the first illegal transition: post-binding `mark_failure(... definitely_not_submitted=True ...)` is refused or leaves the attempt `in_doubt`; no `not_submitted`, no retry, no second outbound identity, and therefore no stale-capability lifecycle is reachable.
+- If engineering introduces a genuinely separate **pre-submission** state where `state == admitted` and there are zero request-binding / verifier-capability / receipt rows, a legal `not_submitted -> retry` may still exist. CA4 must then prove that retry followed by the first real dispatch supports a genuine late trusted return exactly once. This is distinct from the historical S3 post-binding sequence.
+
+### 10.3 Route A / Route B interpretation
+
+For the **historical S3 post-binding sequence**, Route B is binding: once a durable binding/verifier exists, `not_submitted` retry is structurally impossible.
+
+Route A is permitted only if a future implementation introduces a genuinely pre-submission lifecycle that still satisfies C4/C5 (no durable dispatch/binding/verifier/receipt fact before `not_submitted`). Route A must never be used to preserve post-binding `not_submitted`.
+
+### 10.4 Canonical review path metadata correction
+
+The canonical Window 14 review commit remains `84457badc562416f59fb25ca41103700276e0df2`. Its actual committed review directory is:
+
+`reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/**`
+
+References in the original WINDOW 15 adjudication text to `reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA_WINDOW_14/**` are a **non-semantic path metadata typo**. Corrective-001 must source frozen reviewer probes from the actual canonical review tree/path above and verify the recorded SHA-256 values.
+
+### 10.5 Window routing unchanged
+
+`CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-001` remains the unique READY task for **WINDOW 16**, on a new engineering branch + new PR from updated main. WINDOW 17 remains Fresh IA; WINDOW 18 remains PM integration. No downstream gate is released by this clarification.
