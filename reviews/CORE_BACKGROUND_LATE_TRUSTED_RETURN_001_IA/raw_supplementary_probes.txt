@@ -1,0 +1,6 @@
+=== exit status: 0 ===
+PASS | S1-STALE-CAPABILITY-001
+  actual: binding_rotated=False old_binding=(6cdc51335590…,relay_812d83…) new_binding=(6cdc51335590…,relay_812d83…) nonce_reused=True consumed_after=None stale_signed_new=False result_response='return for second-request' problems=[]
+PASS | S2-SCHEMA-001
+  actual: baseline_state=in_doubt state_now=in_doubt rev=1->1 cap_rows=0 attempt_preserved=True problems=[]
+SUMMARY | probes=2 failures=0

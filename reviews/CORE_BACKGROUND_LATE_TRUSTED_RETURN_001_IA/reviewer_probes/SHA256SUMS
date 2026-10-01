@@ -1,0 +1,16 @@
+# WINDOW 14 reviewer probe freezes
+# candidate: 5ad0524c425592210ff184e00ad52abb2c14e366
+# baseline: 25591825d88e98f30dfd3de1c7e7cbc6e53267dd
+#
+# Revision 0 freeze (before first execution):
+# window14_independent_attack.py SHA-256 = 58e660a3a958e6364c4c91662c2223e96fd844ea93732f24b262f9786cf36b52
+# Aborted in IA14-ID-001 due to a reviewer harness bug (see PROBE_REVISION_LOG.md).
+#
+# Revision 1 freeze (before first complete execution):
+# window14_independent_attack.py SHA-256 = 73d4a0b8a14620f72325bd5f0c8f90da0ccaa6d58da3d45d8e87b3d1797610f8
+# Completed; output preserved as raw_candidate_independent_probes.txt (3 product blockers).
+#
+# Revision 2 freeze (before final complete execution; terminal short-circuit harness fix):
+969112b3a13566e30d7cbd4af4e2ecc3299a1cdd9f0f1a62419ef5688d46f181  reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/window14_independent_attack.py
+8a3cfe9006225ff121fe2d9abbb90c5bad94b4f79acddbbc674fd499fc67b0c2  reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/PROBE_CONTRACT.md
+198aebb41d47198c155a553bde00c78dac19d0bec4c7b7eae6178957a95c3b25  reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/PROBE_REVISION_LOG.md

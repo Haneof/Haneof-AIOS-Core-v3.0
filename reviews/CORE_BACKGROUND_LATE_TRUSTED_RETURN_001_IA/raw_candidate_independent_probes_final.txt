@@ -1,0 +1,30 @@
+=== SHA256 revision-2 freeze verification before final candidate execution ===
+reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/window14_independent_attack.py: OK
+reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/PROBE_CONTRACT.md: OK
+reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/PROBE_REVISION_LOG.md: OK
+
+=== command ===
+PYTHONPATH=src .venv/bin/python reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/window14_independent_attack.py
+=== exit status: 1 ===
+FAIL | IA14-ORACLE-001
+  expected: fresh ordinary recovery cannot reissue/retrieve capability or attach arbitrary bytes
+  actual:   CAPABILITY REISSUED and arbitrary bytes staged for bgattempt_dedeb5127fd3921062ff3123e5da9c0b
+FAIL | IA14-NONCE-001
+  expected: ordinary recovery object cannot read capability nonce or turn it into trusted bytes
+  actual:   public db_path exposed nonce and arbitrary bytes staged for bgattempt_bd420d5b472eeb881bb0c2f10220e1be
+PASS | IA14-ID-001
+  expected: conflicting provenance/usage provider, model, request_id are rejected
+  actual:   refused during directive construction: ValueError: usage provider conflicts with model-call provenance
+FAIL | IA14-NS-001
+  expected: post-dispatch typed failure cannot write not_submitted
+  actual:   mark_failure accepted caller boolean and wrote state=not_submitted
+PASS | IA14-JSON-001
+  expected: duplicate nested JSON keys fail before directive construction
+  actual:   refused: ValueError: exact provider response payload contains a duplicate JSON key: provider
+PASS | IA14-RACE-001
+  expected: one canonical response; conflicting proof fails closed without deadlock
+  actual:   outcomes=[('left', 'refused'), ('right', 'accepted')]; staged='{"capability_calls":[],"provenance":{"model":"model-A","provider":"provider-A","request_id":"race-right"},"response":"race-right","silence":false,"usage":{"input_tokens":3,"model":"model-A","output_tokens":2,"provider":"provider-A","request_id":"race-right","total_tokens":5}}'
+PASS | IA14-SIGKILL-001
+  expected: real process loss can attach exactly one observed return without redispatch
+  actual:   response='reviewer SIGKILL response'; terminal=TurnAlreadyCompleted:turn execution refused: completed; inspect existing receipts, do not rerun; provider_calls=[]; meters=1; state=completed; assistant_ref=object_id='obs_conv_ai_f4dd16b856d5fd4ecbe43cf1' revision=1; attempts=['metered']
+SUMMARY | probes=7 failures=3

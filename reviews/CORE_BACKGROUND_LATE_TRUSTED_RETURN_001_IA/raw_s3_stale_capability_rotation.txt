@@ -1,0 +1,7 @@
+S3 | stale capability across legal not_submitted retry with rotation
+  S3a stale proof rejected: True
+  S3b retried return outcome: REFUSED: BackgroundModelResponseConflict: exact provider response rejected: the issued late trusted return capability is not scoped to this attempt's durable originating request; attempt bgattempt_9155fb0d25eb5e4838b1ecf0d442eeef is dispatching
+  rotated-capability outcome: REFUSED: BackgroundModelResponseConflict: exact provider response rejected: the issued late trusted return capability is not scoped to this attempt's durable originating request; attempt bgattempt_9b16807ddb01acb205b40046c0345195 is dispatching
+  cap1 scope fp: req-1 cap2 scope fp: req-1 cap2 is cap1 nonce: True
+  problems: ["S3b: retried dispatch's own return is unattachable", 'S3: rotated-binding dispatch cannot attach its own return at all']
+SUMMARY | failures= 2

@@ -1,0 +1,6 @@
+# WINDOW 14 supplementary probes — frozen before first execution
+# candidate: 5ad0524c425592210ff184e00ad52abb2c14e366
+# Pre-freeze revision (never executed; superseded before first run so S1's
+# expected contract is branch-aware on binding rotation):
+# 723e45d4cad0e327f11f16d35830508770f2a132c188c77a5440ac6835fedd73
+d4f3a2ce4c465f16a568ebfdb42e48d42002890aba922c05f728d44768708ac6  reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/window14_supplementary_probes.py

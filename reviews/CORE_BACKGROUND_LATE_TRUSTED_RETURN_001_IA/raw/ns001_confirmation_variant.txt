@@ -1,0 +1,3 @@
+wrote state: not_submitted
+durable row: ('not_submitted', 'RuntimeError')
+CONFIRMED: mark_failure writes post-dispatch not_submitted from a plain RuntimeError; typed signal is not enforced

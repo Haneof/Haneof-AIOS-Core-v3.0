@@ -1,0 +1,4 @@
+s                                                                        [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/c15_persistence/test_resident_surface.py:115: shallow checkout: the three-dot diffs this gate depends on cannot be evaluated, and an unresolvable base ref makes an empty diff read as 'clean'. Skipped, NOT passed. The core-background-late-trusted-return-001 formal gate checks out full history (fetch-depth: 0) and fails the build if this repository is shallow, so the invariant is enforced there rather than waived.
+1 skipped in 0.02s
