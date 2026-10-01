@@ -1,5 +1,12 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-10-01 — CORE LATE-TRUSTED-RETURN Corrective-001 entry clarification (S3 / C4-C5)
+
+- Window 15 verdict is unchanged: four Window 14 blockers remain BINDING; PR #305 remains frozen failed candidate; `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-001` remains unique READY for WINDOW 16.
+- C4/C5 are authoritative: after any durable dispatch/binding/verifier/receipt fact exists, no path may write `not_submitted`. Therefore the original frozen Window 14 S3 probe, whose expected path requires post-binding `mark_failure(...ModelDispatchNotSubmitted...)->not_submitted`, remains immutable RED evidence and is not a GREEN gate for a Route-B corrective.
+- Corrective-001 must add a new frozen Route-B replacement probe proving that the historical S3 post-binding sequence fails closed before `not_submitted`: no retry, no second request identity, no stale-capability state. Any retained legal `not_submitted` retry must occur strictly pre-submission from `admitted` with zero binding/verifier/receipt rows, and CA4 must cover subsequent first real dispatch + exact late return.
+- Canonical Window 14 review path is `reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/**` at `84457bad...`; original `..._IA_WINDOW_14/**` references are metadata-only path typos.
+
 ## 2026-10-01 CORE-BACKGROUND-LATE-TRUSTED-RETURN-001 ACCEPTANCE_FAIL 裁决 / PR #305 FROZEN / CORRECTIVE-001 READY — WINDOW 15
 
 - `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001 = DONE / ACCEPTANCE_FAIL / blocker=4`（WINDOW 13 实现候选，WINDOW 14 Fresh IA 正式 verdict `ACCEPTANCE_FAIL / blocker=4` / `CORRECTIVE_REQUIRED`；WINDOW 15 Core Governance PM / Acceptance-Failure Adjudicator 裁决，`MERGE_POLICY = GOVERNANCE_ONLY_AT_END`）。Adjudication = `governance/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_ACCEPTANCE_FAILURE_ADJUDICATION_2026-10-01.md`（GOVERNANCE_ONLY）。四个 blocker（`BLK-W14-001`、`BLK-W14-002`、`BLK-W14-003`、`BLK-W14-004`）全部裁定为 **`BINDING`**，未降级为 observation / hardening，1,059 项机械测试全绿不抵消安全边界或状态机真实性 blocker。
