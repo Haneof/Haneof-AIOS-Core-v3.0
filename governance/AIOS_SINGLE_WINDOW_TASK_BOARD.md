@@ -1,5 +1,13 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 2026-10-01 — WINDOW 15 post-merge binding clarification: S3 / C4-C5 consistency
+
+- **No verdict/status change:** `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001 = DONE / ACCEPTANCE_FAIL / blocker=4`; unique next READY remains `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-001` (WINDOW 16, new branch + new PR).
+- **Binding precedence:** C4/C5 durable truthfulness supersedes the historical S3 expectation that post-`mark_dispatching` `ModelDispatchNotSubmitted` may write `not_submitted`. Once durable binding/verifier/receipt state exists, `not_submitted` is mechanically forbidden.
+- **Original S3 remains immutable historical RED evidence** on failed candidate `5ad0524c...`; under Route B it is **not** required to turn GREEN unchanged on Corrective-001. Corrective-001 must add a new frozen Route-B probe proving the S3 post-binding sequence is refused before `not_submitted`, with no retry/second request/stale-capability state.
+- **Legal retry, if retained, is pre-submission only:** `state == admitted` with zero binding/verifier/receipt rows; CA4 must prove that such a retry can later perform its first real dispatch and recover a genuine late trusted return exactly once.
+- Canonical Window 14 review directory is `reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/**`; any `..._IA_WINDOW_14/**` reference in the original adjudication is a path-only metadata typo. Canonical review SHA remains `84457badc562416f59fb25ca41103700276e0df2`.
+
 ## 当前控制入口 — 2026-10-01 CORE-BACKGROUND-LATE-TRUSTED-RETURN-001 ACCEPTANCE_FAIL ADJUDICATED / PR #305 FROZEN / CORRECTIVE-001 READY — WINDOW 15
 
 - **`CORE-BACKGROUND-LATE-TRUSTED-RETURN-001 = DONE / ACCEPTANCE_FAIL / blocker=4`**（WINDOW 13 实现候选，WINDOW 14 Fresh Independent Acceptance 正式 verdict `ACCEPTANCE_FAIL / blocker=4` / `CORRECTIVE_REQUIRED`；WINDOW 15 Core Governance PM / Acceptance-Failure Adjudicator 正式裁决并回写，`MERGE_POLICY = GOVERNANCE_ONLY_AT_END`）。Adjudication = `governance/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_ACCEPTANCE_FAILURE_ADJUDICATION_2026-10-01.md`（GOVERNANCE_ONLY）。**四个 blocker（`BLK-W14-001`、`BLK-W14-002`、`BLK-W14-003`、`BLK-W14-004`）全部裁定为 `BINDING`，未降级为 observation / hardening，未以 1,059 项机械测试全绿抵消安全边界或状态机真实性 blocker。**
