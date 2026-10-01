@@ -1,0 +1,150 @@
+name: core-background-late-trusted-return-001
+
+on:
+  pull_request:
+    paths:
+      - "src/aios_core/**"
+      - "tests/**"
+      - ".github/workflows/core-background-late-trusted-return-001.yml"
+  workflow_dispatch:
+
+jobs:
+  formal-core-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Full history is REQUIRED, not an optimisation. The Resident-surface
+          # gate compares git ranges; under the default fetch-depth 1 the base
+          # ref does not resolve, every range diff comes back empty, and a
+          # scope check that should fail instead reports "clean". That shallow
+          # blind spot is exactly the CI_VALIDATION_GAP this window was held for.
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12.14"
+      - name: Verify required refs resolve (no shallow-clone false green)
+        run: |
+          set -euo pipefail
+          echo "shallow repository: $(git rev-parse --is-shallow-repository)"
+          if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+            echo "::error::checkout is shallow; range-based invariants cannot be trusted"
+            exit 1
+          fi
+          echo "commits available: $(git rev-list --count HEAD)"
+          for ref in HEAD "$GITHUB_BASE_REF" origin/main origin/"$GITHUB_BASE_REF"; do
+            if git rev-parse --verify --quiet "${ref}^{commit}" >/dev/null; then
+              echo "resolvable: $ref -> $(git rev-parse "${ref}^{commit}")"
+            else
+              echo "unresolvable: $ref"
+            fi
+          done
+          # Refs the resident-surface gate reasons about directly.
+          for sha in 016a2f7db5ed01b41fc614701079c507d2c2c02e \
+                     19476641be95e666068e6299f42df9a411f4c0ba; do
+            git cat-file -e "${sha}^{commit}"
+            echo "historical ref present: $sha -> $(git rev-parse "${sha}^{commit}")"
+          done
+          echo "--- historical Persistence Corrective-003 Core scope (must be empty) ---"
+          git diff --stat \
+            016a2f7db5ed01b41fc614701079c507d2c2c02e...19476641be95e666068e6299f42df9a411f4c0ba \
+            -- src/aios_core
+          echo "--- current authorised Core change (expected non-empty for this task) ---"
+          git diff --stat "origin/${GITHUB_BASE_REF}...HEAD" -- src/aios_core || true
+      - run: python -m pip install -e . pydantic==2.13.5 pytest==8.4.2
+      - name: Record exact formal environment and enumeration
+        run: |
+          python - <<'PY'
+          import ssl, sys, sqlite3, pydantic, pytest
+          print('Python:', sys.version)
+          print('Pydantic:', pydantic.__version__)
+          print('pytest:', pytest.__version__)
+          print('SQLite:', sqlite3.sqlite_version)
+          print('OpenSSL:', ssl.OPENSSL_VERSION)
+          PY
+          pytest -o addopts='' --collect-only -q > collected.txt
+          tail -n 3 collected.txt
+      - name: Late trusted return and not_submitted guard gate
+        run: |
+          pytest -o addopts='' -q --junitxml=late.xml \
+            tests/integration/test_core_background_late_trusted_return_001.py \
+            tests/integration/test_core_background_late_trusted_return_001_not_submitted.py \
+            tests/integration/test_core_background_late_trusted_return_001_adversarial.py
+      - name: Accepted trusted-return regression gate
+        run: |
+          pytest -o addopts='' -q --junitxml=accepted.xml \
+            tests/integration/test_core_background_trusted_return_recovery_001.py \
+            tests/integration/test_core_background_trusted_return_adversarial_001.py \
+            tests/integration/test_core_background_trusted_return_r5_001.py \
+            tests/integration/test_core_background_trusted_return_r5_conflicts_001.py \
+            tests/integration/test_core_background_trusted_return_corrective_001_process_loss.py \
+            tests/integration/test_core_background_trusted_return_corrective_001_store_fail_closed.py \
+            tests/integration/test_core_background_trusted_return_corrective_001_capability_replay.py \
+            tests/integration/test_core_background_response_recovery_001.py \
+            tests/integration/test_core_background_response_recovery_001_corrective_001.py \
+            tests/integration/test_core_background_response_recovery_001_corrective_002_authenticity.py \
+            tests/integration/test_core_background_response_recovery_001_corrective_002_recovery.py \
+            tests/integration/test_core_gap_fix_002_background_attempts.py \
+            tests/runtime/test_background_model_attempt.py \
+            tests/runtime/test_cognitive_runtime_trusted_return.py \
+            tests/runtime/test_turn_execution_recovery.py
+      - name: Resident-visible behavioural and historical scope gate
+        env:
+          C15_SURFACE_BASE: ${{ github.event.pull_request.base.ref || 'main' }}
+        run: |
+          # Runs the corrected split gate: 12/12 Resident-visible behavioural
+          # comparisons must be True, the two frozen Resident review trees must
+          # stay clean, and the historical Persistence Corrective-003
+          # src/aios_core zero-diff must hold for its own frozen construction
+          # range. Refs are proven resolvable first, so this cannot pass on a
+          # shallow checkout.
+          git config --global --add safe.directory "$(pwd)"
+          BASE="${C15_SURFACE_BASE}"
+          if ! git rev-parse --verify --quiet "origin/${BASE}^{commit}" >/dev/null; then
+            git fetch --no-tags origin "+refs/heads/${BASE}:refs/remotes/origin/${BASE}"
+          fi
+          echo "gate base: ${BASE} -> $(git rev-parse "origin/${BASE}^{commit}")"
+          pytest -o addopts='' -q --junitxml=surface.xml \
+            tests/c15_persistence/test_resident_surface.py
+      - name: Annotate failure identities
+        if: failure()
+        run: |
+          python - <<'PYTEST'
+          import os, xml.etree.ElementTree as ET
+          for name in ('late', 'accepted', 'surface'):
+              path = name + '.xml'
+              if not os.path.isfile(path):
+                  continue
+              for case in ET.parse(path).getroot().iter('testcase'):
+                  for error in (*case.findall('failure'), *case.findall('error')):
+                      text = (error.text or '').strip().splitlines()
+                      message = (' | '.join(text[-14:]) if text else error.attrib.get('message', 'unknown'))
+                      print(f"::error file=tests/{name}::FAILED {case.get('classname')}::{case.get('name')}: {message}")
+          PYTEST
+      - name: Complete Core regression
+        if: always()
+        run: pytest -o addopts='' -q --junitxml=full.xml
+      - name: Publish formal environment and exact JUnit counts
+        if: always()
+        run: |
+          python - <<'PYGATE'
+          import sqlite3, ssl, sys, xml.etree.ElementTree as ET
+          import pydantic, pytest
+          print(f"::notice title=Formal environment::Python {sys.version.split()[0]} / Pydantic {pydantic.__version__} / pytest {pytest.__version__} / SQLite {sqlite3.sqlite_version} / OpenSSL {ssl.OPENSSL_VERSION}")
+          for name in ('late', 'accepted', 'surface', 'full'):
+              try:
+                  suite = ET.parse(name + '.xml').getroot().find('testsuite')
+                  fields = ', '.join(f"{k}={suite.get(k)}" for k in ('tests', 'failures', 'errors', 'skipped', 'time'))
+                  print(f"::notice title={name} exact JUnit::{fields}")
+              except (FileNotFoundError, AttributeError) as exc:
+                  print(f"::warning title={name} JUnit unavailable::{exc}")
+          PYGATE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: core-late-trusted-return-formal-results
+          path: |
+            collected.txt
+            late.xml
+            accepted.xml
+            full.xml

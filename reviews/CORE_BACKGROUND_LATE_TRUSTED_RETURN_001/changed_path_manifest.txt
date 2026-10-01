@@ -1,0 +1,28 @@
+# CORE-BACKGROUND-LATE-TRUSTED-RETURN-001 — changed path manifest
+# baseline_main = 25591825d88e98f30dfd3de1c7e7cbc6e53267dd
+
+## production (src/aios_core/**)
+ src/aios_core/runtime/__init__.py           |   4 +
+ src/aios_core/runtime/background_attempt.py | 698 +++++++++++++++++++++++++---
+ src/aios_core/runtime/turn_runtime.py       |  75 +++
+ 3 files changed, 722 insertions(+), 55 deletions(-)
+
+## tests
+ tests/runtime/test_background_model_attempt.py | 44 ++++++++++---
+ tests/runtime/test_turn_execution_recovery.py  | 88 ++++++++++++++++++++------
+ 2 files changed, 105 insertions(+), 27 deletions(-)
+
+## new files (untracked at manifest time)
+?? .github/workflows/core-background-late-trusted-return-001.yml
+?? reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001/
+?? src/aios_core/runtime/late_return.py
+?? tests/integration/late_trusted_return_fixture.py
+?? tests/integration/test_core_background_late_trusted_return_001.py
+?? tests/integration/test_core_background_late_trusted_return_001_adversarial.py
+?? tests/integration/test_core_background_late_trusted_return_001_not_submitted.py
+
+## CI
+?? .github/workflows/core-background-late-trusted-return-001.yml
+
+## C15 / historical evidence: MUST be empty
+(empty - untouched)

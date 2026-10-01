@@ -22,6 +22,11 @@ from aios_core.storage.sqlite_store import SQLiteWorldStore
 
 from .capabilities import CapabilityCall
 from .cognitive_runtime import ModelCallProvenance, ModelDirective, ModelUsage
+from .late_return import (
+    BackgroundModelReturnCapability,
+    late_return_proof as late_return_proof_for,
+    new_capability_nonce,
+)
 
 
 BackgroundAttemptWorkKind = Literal["wake", "periodic_review", "user_turn"]
@@ -346,6 +351,73 @@ class BackgroundModelResponsePending(BackgroundModelAttemptBlocked):
     """A provider response is durable, but later Core work did not finish."""
 
 
+def response_fingerprint(directive: ModelDirective) -> str:
+    """Semantic fingerprint of one exact provider directive.
+
+    Single source of truth for the store, the in-process trusted return callback
+    and the late-return capability, so no surface can recompute it differently.
+    """
+
+    payload = {
+        "capability_calls": [
+            {
+                "name": call.name,
+                "arguments": dict(call.arguments),
+                "call_id": call.call_id,
+            }
+            for call in directive.capability_calls
+        ],
+        "response": directive.response,
+        "silence": directive.silence,
+        "usage": (
+            None
+            if directive.usage is None
+            else {
+                "total_tokens": directive.usage.total_tokens,
+                "input_tokens": directive.usage.input_tokens,
+                "output_tokens": directive.usage.output_tokens,
+                "provider": directive.usage.provider,
+                "model": directive.usage.model,
+                "request_id": directive.usage.request_id,
+            }
+        ),
+        "provenance": (
+            None
+            if directive.provenance is None
+            else {
+                "model": directive.provenance.model,
+                "provider": directive.provenance.provider,
+                "request_id": directive.provenance.request_id,
+            }
+        ),
+    }
+    raw = canonical_json_dumps(payload).encode("utf-8")
+    return hashlib.sha256(raw).hexdigest()
+
+
+def provider_identity(
+    directive: ModelDirective,
+) -> tuple[str | None, str | None, str | None]:
+    """Provider/model/request identity of one exact directive.
+
+    Anonymous returns yield ``None`` components instead of invented placeholder
+    strings. Authenticity is never granted to an anonymous external return.
+    """
+
+    provider = (
+        None if directive.provenance is None else directive.provenance.provider
+    )
+    model = None if directive.provenance is None else directive.provenance.model
+    request_id = (
+        None if directive.provenance is None else directive.provenance.request_id
+    )
+    if directive.usage is not None:
+        provider = directive.usage.provider or provider
+        model = directive.usage.model or model
+        request_id = directive.usage.request_id or request_id
+    return provider, model, request_id
+
+
 class BackgroundModelAttemptStore:
     """Same-database, non-world attempt admission/provenance state."""
 
@@ -555,6 +627,32 @@ class BackgroundModelAttemptStore:
                     authenticity_proof TEXT NOT NULL
                 )
             """)
+            # A one-shot, per-attempt authority to prove a late external return.
+            # It is minted only for an attempt that actually crossed the provider
+            # boundary, only when the embedder registered an authorized external
+            # return observer, and only handed to that observer. It holds no
+            # response bytes and no semantic truth: it is a security/recovery
+            # record, and it is the only thing that can let a trusted return that
+            # arrives after the Core process died be attached to its own attempt.
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS background_model_return_capabilities (
+                    attempt_id TEXT PRIMARY KEY,
+                    subject_id TEXT NOT NULL,
+                    work_kind TEXT NOT NULL,
+                    work_id TEXT NOT NULL,
+                    model_round_index INTEGER NOT NULL
+                        CHECK(model_round_index >= 0),
+                    outbound_request_fingerprint TEXT NOT NULL,
+                    relay_id TEXT NOT NULL,
+                    capability_nonce TEXT NOT NULL,
+                    issued_at TEXT NOT NULL,
+                    consumed_at TEXT
+                )
+            """)
+            conn.execute("""
+                CREATE INDEX IF NOT EXISTS idx_background_return_capability_relay
+                    ON background_model_return_capabilities(relay_id)
+            """)
             conn.commit()
 
     @staticmethod
@@ -600,58 +698,13 @@ class BackgroundModelAttemptStore:
 
     @staticmethod
     def _response_fingerprint(directive: ModelDirective) -> str:
-        payload = {
-            "capability_calls": [
-                {
-                    "name": call.name,
-                    "arguments": dict(call.arguments),
-                    "call_id": call.call_id,
-                }
-                for call in directive.capability_calls
-            ],
-            "response": directive.response,
-            "silence": directive.silence,
-            "usage": (
-                None
-                if directive.usage is None
-                else {
-                    "total_tokens": directive.usage.total_tokens,
-                    "input_tokens": directive.usage.input_tokens,
-                    "output_tokens": directive.usage.output_tokens,
-                    "provider": directive.usage.provider,
-                    "model": directive.usage.model,
-                    "request_id": directive.usage.request_id,
-                }
-            ),
-            "provenance": (
-                None
-                if directive.provenance is None
-                else {
-                    "provider": directive.provenance.provider,
-                    "model": directive.provenance.model,
-                    "request_id": directive.provenance.request_id,
-                }
-            ),
-        }
-        raw = canonical_json_dumps(payload).encode("utf-8")
-        return hashlib.sha256(raw).hexdigest()
+        return response_fingerprint(directive)
 
     @staticmethod
     def _provider_identity(
         directive: ModelDirective,
     ) -> tuple[str | None, str | None, str | None]:
-        provider = (
-            None if directive.provenance is None else directive.provenance.provider
-        )
-        model = None if directive.provenance is None else directive.provenance.model
-        request_id = (
-            None if directive.provenance is None else directive.provenance.request_id
-        )
-        if directive.usage is not None:
-            provider = directive.usage.provider or provider
-            model = directive.usage.model or model
-            request_id = directive.usage.request_id or request_id
-        return provider, model, request_id
+        return provider_identity(directive)
 
     @staticmethod
     def _receipt_message(
@@ -1261,11 +1314,66 @@ class BackgroundModelAttemptStore:
         reconciled_at: datetime,
         evidence: str,
     ) -> BackgroundModelAttempt:
+        """Record that this attempt provably never crossed the dispatch boundary.
+
+        Frozen semantics: ``not_submitted`` means exactly one thing — Core holds
+        mechanical, trustworthy evidence that no outbound request crossed the
+        semantic/provider dispatch boundary for this attempt. It is therefore
+        legal only while the attempt is still in a **pre-dispatch** Core-owned
+        state and no originating-request binding exists.
+
+        It explicitly never means "we do not know, so write not_submitted to
+        unblock a retry". None of the following is proof of non-submission and all
+        of them are refused: absence of a trusted return receipt, absence of a
+        response, a timeout, a caller or operator statement, "the request may not
+        have been delivered", or the fact that recovery wants to continue.
+
+        Once ``mark_dispatching`` has committed, the attempt is post-dispatch
+        forever and this transition is mechanically impossible. Such an attempt
+        converges only through a legitimate trusted late return attach
+        (:meth:`attach_late_trusted_return`), or a transport-specific
+        mechanically safe reattach/poll. Otherwise it stays fail-closed in
+        ``in_doubt``. Historical rows and sealed generations are never rewritten
+        by this method; it only ever writes a fresh pre-dispatch reconciliation.
+        """
+
         if not isinstance(evidence, str) or not evidence.strip():
             raise ValueError("reconciliation evidence must be non-blank")
         moment = as_utc(reconciled_at, "reconciled_at")
         with self.store._connection() as conn:
             conn.execute("BEGIN IMMEDIATE")
+            attempt_row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if attempt_row is None:
+                conn.rollback()
+                raise KeyError(f"unknown background model attempt: {attempt_id}")
+            attempt = self._from_row(attempt_row)
+            # Guard 1 (mechanical, Core-owned, not a caller statement): a durable
+            # originating-request binding is written in the SAME transaction as the
+            # admitted->dispatching transition, before the provider handler runs.
+            # Its existence is proof that the dispatch boundary was crossed.
+            binding_row = conn.execute(
+                """
+                SELECT 1 FROM background_model_request_bindings
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+            if binding_row is not None or attempt.state in {"dispatching", "in_doubt"}:
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt,
+                    "a durable originating-request binding proves this attempt "
+                    "already crossed the provider dispatch boundary, so it can "
+                    "never be reconciled as not submitted; absence of a trusted "
+                    "return receipt is not proof of non-submission. Use a "
+                    "legitimate trusted late return attach or stay fail-closed "
+                    "in in_doubt",
+                )
+            # Guard 2 (retained from the accepted design): an authenticated
+            # provider return can never be reconciled as not submitted.
             receipt_row = conn.execute(
                 """
                 SELECT 1 FROM background_model_response_receipts
@@ -1274,25 +1382,25 @@ class BackgroundModelAttemptStore:
                 (attempt_id,),
             ).fetchone()
             if receipt_row is not None:
-                attempt_row = conn.execute(
-                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
-                    (attempt_id,),
-                ).fetchone()
                 conn.rollback()
-                if attempt_row is None:
-                    raise KeyError(f"unknown background model attempt: {attempt_id}")
                 raise BackgroundModelResponseConflict(
-                    self._from_row(attempt_row),
+                    attempt,
                     "an authenticated provider return cannot be reconciled as "
                     "not submitted",
                 )
+            if attempt.state not in {"admitted", "not_submitted"}:
+                conn.rollback()
+                raise BackgroundModelAttemptBlocked(attempt)
+            if attempt.state == "not_submitted":
+                conn.commit()
+                return attempt
             conn.execute(
                 """
                 UPDATE background_model_attempts
                 SET state='not_submitted', updated_at=?,
                     reconciliation_evidence=?, failure_kind=NULL,
                     failure_detail=NULL
-                WHERE attempt_id=? AND state IN ('dispatching', 'in_doubt')
+                WHERE attempt_id=? AND state='admitted'
                 """,
                 (
                     canonical_utc_iso(moment, "updated_at"),
@@ -1458,6 +1566,486 @@ class BackgroundModelAttemptStore:
                 "originating request",
             )
         return binding
+
+    def _issue_external_return_capability(
+        self,
+        attempt_id: str,
+        *,
+        issued_at: datetime,
+    ) -> BackgroundModelReturnCapability:
+        """Mint the one-shot return capability for one dispatched attempt.
+
+        Deliberately **private**, for exactly the same reason
+        ``_capture_trusted_response_return`` is: this method hands out the nonce
+        that is the whole proof-minting authority, so exposing it on a public or
+        recovery-facing surface would be a signing oracle. It is wired only as the
+        runtime's dispatch-time capability issuer, which hands the capability to
+        the registered :class:`ExternalReturnObserver`; it is never returned by a
+        recovery API, never attached to a serialized snapshot, and never written
+        into World, evidence or metering.
+
+        Issuing is refused for any attempt that has not provably crossed the
+        provider boundary, so a capability can never exist for a pre-dispatch
+        attempt and can never be minted by a recovery caller.
+        """
+
+        moment = as_utc(issued_at, "issued_at")
+        with self.store._connection() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            attempt_row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if attempt_row is None:
+                conn.rollback()
+                raise KeyError(f"unknown background model attempt: {attempt_id}")
+            attempt = self._from_row(attempt_row)
+            if attempt.state not in {"dispatching", "in_doubt"}:
+                conn.rollback()
+                raise BackgroundModelAttemptBlocked(attempt)
+            binding_row = conn.execute(
+                """
+                SELECT * FROM background_model_request_bindings
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+            if binding_row is None:
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt,
+                    "a durable originating request binding is required before a "
+                    "late trusted return capability can be issued",
+                )
+            binding = self._binding_from_row(binding_row)
+            expected_relay = self.relay_id_for(
+                subject_id=binding.subject_id,
+                work_kind=binding.work_kind,
+                work_id=binding.work_id,
+                model_round_index=binding.model_round_index,
+                attempt_id=binding.attempt_id,
+                outbound_request_fingerprint=binding.outbound_request_fingerprint,
+            )
+            if binding.relay_id != expected_relay or (
+                binding.attempt_id != attempt.attempt_id
+                or binding.subject_id != attempt.subject_id
+                or binding.work_kind != attempt.work_kind
+                or binding.work_id != attempt.work_id
+                or binding.model_round_index != attempt.model_round_index
+            ):
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt,
+                    "durable originating request binding is not consistent with "
+                    "the attempt it was issued for",
+                )
+            existing = conn.execute(
+                """
+                SELECT * FROM background_model_return_capabilities
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+            if existing is not None:
+                # One capability per attempt. Re-issuing never rotates the nonce,
+                # so a capability handed out at dispatch stays the only authority.
+                conn.commit()
+                return self._capability_from_row(existing)
+            nonce = new_capability_nonce()
+            conn.execute(
+                """
+                INSERT INTO background_model_return_capabilities(
+                    attempt_id, subject_id, work_kind, work_id,
+                    model_round_index, outbound_request_fingerprint, relay_id,
+                    capability_nonce, issued_at, consumed_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
+                """,
+                (
+                    attempt.attempt_id,
+                    attempt.subject_id,
+                    attempt.work_kind,
+                    attempt.work_id,
+                    int(attempt.model_round_index),
+                    binding.outbound_request_fingerprint,
+                    binding.relay_id,
+                    nonce.hex(),
+                    canonical_utc_iso(moment, "issued_at"),
+                ),
+            )
+            row = conn.execute(
+                """
+                SELECT * FROM background_model_return_capabilities
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+            conn.commit()
+        if row is None:
+            raise RuntimeError("late trusted return capability was not durable")
+        return self._capability_from_row(row)
+
+    @staticmethod
+    def _capability_from_row(row: object) -> BackgroundModelReturnCapability:
+        try:
+            nonce = bytes.fromhex(str(row["capability_nonce"]))
+        except ValueError as exc:
+            raise RuntimeError(
+                "late trusted return capability is corrupt"
+            ) from exc
+        return BackgroundModelReturnCapability(
+            attempt_id=row["attempt_id"],
+            subject_id=row["subject_id"],
+            work_kind=row["work_kind"],
+            work_id=row["work_id"],
+            model_round_index=int(row["model_round_index"]),
+            outbound_request_fingerprint=row["outbound_request_fingerprint"],
+            relay_id=row["relay_id"],
+            capability_nonce=nonce,
+        )
+
+    def late_trusted_return_state(self, attempt_id: str) -> str | None:
+        """``issued`` / ``consumed`` / ``None`` for one attempt's capability."""
+
+        with self.store._connection() as conn:
+            row = conn.execute(
+                """
+                SELECT consumed_at FROM background_model_return_capabilities
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return "consumed" if row["consumed_at"] is not None else "issued"
+
+    def attach_late_trusted_return(
+        self,
+        attempt_id: str,
+        *,
+        attached_at: datetime,
+        directive_payload: str,
+        late_return_proof: str,
+        evidence: str,
+    ) -> BackgroundModelResponseStaging:
+        """Attach one trusted external return that arrived after Core process death.
+
+        This is the only Core surface allowed to turn an externally produced
+        return into a trusted one after the original process is gone, and it is
+        deliberately **not** a signing oracle:
+
+        * the caller may supply the exact response bytes, but bytes alone are
+          never enough — a ``late_return_proof`` minted at the external return
+          boundary by the registered observer is mandatory and is verified
+          against the durable, pre-dispatch, Core-owned binding;
+        * the proof is recomputed by Core under the persisted per-attempt
+          capability nonce and compared with ``hmac.compare_digest``. The nonce is
+          never returned by any API, so a recovery caller cannot produce a proof;
+        * every scope field (attempt, subject, work kind, work id, round,
+          originating request fingerprint, relay id) is compared against the
+          durable binding, never against caller-supplied metadata, so transplant
+          and cross-run replay fail closed;
+        * the exact response fingerprint and payload digest are inside the MAC
+          message, so substituting the response under a genuine proof fails closed;
+        * the capability is single-use, so a leaked capability can never mint two
+          returns, and never a return for another attempt;
+        * an anonymous return with no provider/model/request identity is refused
+          rather than being padded with invented strings.
+
+        On success the Core-owned trusted receipt and exact-bytes handoff are
+        committed together, which is exactly the state the accepted
+        ``CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001-CORRECTIVE-001`` recovery
+        path already knows how to resume. No provider redispatch happens, and the
+        ordinary ``FusedTurnRuntime`` continuation performs the single metering,
+        capability, World, output and ACK effects.
+        """
+
+        if not isinstance(directive_payload, str) or not directive_payload.strip():
+            raise ValueError("late trusted return payload must be non-blank")
+        if not isinstance(late_return_proof, str) or not late_return_proof.strip():
+            raise ValueError(
+                "a late trusted external return requires its return-boundary "
+                "proof; response bytes alone are never authenticity"
+            )
+        if not isinstance(evidence, str) or not evidence.strip():
+            raise ValueError("late trusted return evidence must be non-blank")
+        moment = as_utc(attached_at, "attached_at")
+        supplied_proof = late_return_proof.strip()
+
+        # Strict decode: duplicate JSON keys are rejected before construction.
+        directive = decode_model_directive(directive_payload)
+        fingerprint = self._response_fingerprint(directive)
+        payload_sha256 = hashlib.sha256(
+            directive_payload.encode("utf-8")
+        ).hexdigest()
+        provider, model, provider_request_id = self._provider_identity(directive)
+        if provider is None or model is None or provider_request_id is None:
+            raise ValueError(
+                "a late trusted external return must carry full "
+                "provider/model/request_id identity"
+            )
+
+
+        with self.store._connection() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            attempt_row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if attempt_row is None:
+                conn.rollback()
+                raise KeyError(f"unknown background model attempt: {attempt_id}")
+            attempt = self._from_row(attempt_row)
+            if attempt.state not in self._STAGABLE_STATES:
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt,
+                    "a late trusted external return cannot be attached to an "
+                    "attempt that provably did not cross the provider boundary",
+                )
+            binding_row = conn.execute(
+                """
+                SELECT * FROM background_model_request_bindings
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+            binding = (
+                None if binding_row is None else self._binding_from_row(binding_row)
+            )
+            try:
+                binding = self._require_origin_binding(
+                    attempt, binding, supplied_request_id=provider_request_id,
+                    require_relay_echo=False,
+                )
+            except BackgroundModelResponseConflict:
+                conn.rollback()
+                raise
+
+            capability_row = conn.execute(
+                """
+                SELECT * FROM background_model_return_capabilities
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+            if capability_row is None:
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt,
+                    "no late trusted return capability was issued for this "
+                    "attempt, so an externally produced return cannot be "
+                    "authenticated; a recovery caller must never be able to mint "
+                    "trusted bytes",
+                )
+            if (
+                capability_row["subject_id"] != binding.subject_id
+                or capability_row["work_kind"] != binding.work_kind
+                or capability_row["work_id"] != binding.work_id
+                or int(capability_row["model_round_index"])
+                != binding.model_round_index
+                or capability_row["outbound_request_fingerprint"]
+                != binding.outbound_request_fingerprint
+                or capability_row["relay_id"] != binding.relay_id
+            ):
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt,
+                    "the issued late trusted return capability is not scoped to "
+                    "this attempt's durable originating request",
+                )
+            try:
+                capability_nonce = bytes.fromhex(
+                    str(capability_row["capability_nonce"])
+                )
+            except ValueError as exc:
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt, "the issued late trusted return capability is corrupt"
+                ) from exc
+            expected_proof = late_return_proof_for(
+                capability_nonce,
+                attempt_id=binding.attempt_id,
+                subject_id=binding.subject_id,
+                work_kind=binding.work_kind,
+                work_id=binding.work_id,
+                model_round_index=binding.model_round_index,
+                outbound_request_fingerprint=binding.outbound_request_fingerprint,
+                relay_id=binding.relay_id,
+                provider=provider,
+                model=model,
+                provider_request_id=provider_request_id,
+                response_fingerprint=fingerprint,
+                payload_sha256=payload_sha256,
+            )
+            if not hmac.compare_digest(supplied_proof, expected_proof):
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt,
+                    "the supplied late trusted return proof was not produced at "
+                    "the authorized external return boundary for this exact "
+                    "attempt, request and response",
+                )
+
+            if capability_row["consumed_at"] is not None:
+                # The capability is single-use. A later presentation is honoured
+                # only as deterministic exact recovery of the very same durable
+                # return, never as a new or a second semantic effect.
+                receipt_row = conn.execute(
+                    """
+                    SELECT * FROM background_model_response_receipts
+                    WHERE attempt_id=?
+                    """,
+                    (attempt_id,),
+                ).fetchone()
+                handoff_row = conn.execute(
+                    """
+                    SELECT * FROM background_model_return_handoffs
+                    WHERE attempt_id=?
+                    """,
+                    (attempt_id,),
+                ).fetchone()
+                conn.commit()
+                if (
+                    receipt_row is None
+                    or handoff_row is None
+                    or (
+                        receipt_row["provider"],
+                        receipt_row["model"],
+                        receipt_row["provider_request_id"],
+                        receipt_row["response_fingerprint"],
+                        receipt_row["payload_sha256"],
+                    )
+                    != (provider, model, provider_request_id, fingerprint, payload_sha256)
+                    or (
+                        handoff_row["directive_payload"],
+                        handoff_row["payload_sha256"],
+                    ) != (directive_payload, payload_sha256)
+                ):
+                    raise BackgroundModelResponseConflict(
+                        attempt,
+                        "the single-use late trusted return capability was "
+                        "already consumed for a different exact return",
+                    )
+            else:
+                # First and only consumption. Mint the Core-owned trusted receipt
+                # and commit it together with the exact-bytes handoff, exactly as
+                # the in-process trusted return callback does. The store authority
+                # key is used only here, and only after the capability proof
+                # verified, so no recovery caller can ever cause a receipt to be
+                # minted merely for the bytes it supplied.
+                receipt_fields = {
+                    "attempt_id": attempt.attempt_id,
+                    "subject_id": attempt.subject_id,
+                    "work_kind": attempt.work_kind,
+                    "work_id": attempt.work_id,
+                    "model_round_index": attempt.model_round_index,
+                    "outbound_request_fingerprint": binding.outbound_request_fingerprint,
+                    "relay_id": binding.relay_id,
+                    "provider": provider,
+                    "model": model,
+                    "provider_request_id": provider_request_id,
+                    "response_fingerprint": fingerprint,
+                    "payload_sha256": payload_sha256,
+                }
+                proof = self._receipt_proof(conn, **receipt_fields)
+                conn.execute(
+                    """
+                    INSERT OR IGNORE INTO background_model_response_receipts(
+                        attempt_id, subject_id, work_kind, work_id,
+                        model_round_index, outbound_request_fingerprint, relay_id,
+                        provider, model, provider_request_id, response_fingerprint,
+                        payload_sha256, authenticity_proof, captured_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        *receipt_fields.values(),
+                        proof,
+                        canonical_utc_iso(moment, "captured_at"),
+                    ),
+                )
+                conn.execute(
+                    """
+                    INSERT OR IGNORE INTO background_model_return_handoffs(
+                        attempt_id, directive_payload, payload_sha256,
+                        authenticity_proof
+                    ) VALUES (?, ?, ?, ?)
+                    """,
+                    (attempt_id, directive_payload, payload_sha256, proof),
+                )
+                consumed = conn.execute(
+                    """
+                    UPDATE background_model_return_capabilities
+                    SET consumed_at=?
+                    WHERE attempt_id=? AND consumed_at IS NULL
+                    """,
+                    (canonical_utc_iso(moment, "consumed_at"), attempt_id),
+                )
+                if consumed.rowcount != 1:
+                    conn.rollback()
+                    raise BackgroundModelResponseConflict(
+                        attempt,
+                        "the late trusted return capability was consumed "
+                        "concurrently",
+                    )
+                conn.commit()
+        # One promotion path for both first consumption and deterministic replay.
+        return self._promote_staged_exact_response(
+            attempt_id,
+            attached_at=moment,
+            provider=provider,
+            model=model,
+            provider_request_id=provider_request_id,
+            response_fingerprint=fingerprint,
+            directive_payload=directive_payload,
+            evidence=evidence.strip(),
+        )
+
+    def _promote_staged_exact_response(
+        self,
+        attempt_id: str,
+        *,
+        attached_at: datetime,
+        provider: str,
+        model: str,
+        provider_request_id: str,
+        response_fingerprint: str,
+        directive_payload: str,
+        evidence: str,
+    ) -> BackgroundModelResponseStaging:
+        """Hand a Core-owned trusted handoff to the accepted staging path.
+
+        This deliberately reuses ``stage_exact_response`` instead of growing a
+        second verification route: the late return gets exactly the same
+        receipt, binding, fingerprint and digest checks as a return that crossed
+        the in-process boundary, and the same R5 exactly-once downstream.
+        """
+
+        with self.store._connection() as conn:
+            receipt_row = conn.execute(
+                """
+                SELECT authenticity_proof FROM background_model_response_receipts
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+        if receipt_row is None:
+            attempt = self.get(attempt_id)
+            if attempt is None:
+                raise KeyError(f"unknown background model attempt: {attempt_id}")
+            raise BackgroundModelResponseConflict(
+                attempt, "the late trusted return produced no durable Core receipt"
+            )
+        return self.stage_exact_response(
+            attempt_id,
+            staged_at=attached_at,
+            provider=provider,
+            model=model,
+            provider_request_id=provider_request_id,
+            response_fingerprint=response_fingerprint,
+            directive_payload=directive_payload,
+            authenticity_proof=receipt_row["authenticity_proof"],
+            evidence=evidence,
+        )
 
     def _capture_trusted_response_return(
         self,
