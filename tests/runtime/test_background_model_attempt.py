@@ -165,7 +165,7 @@ def test_background_attempt_post_binding_not_submitted_is_refused_and_in_doubt(t
     assert second_binding == first_binding
 
 
-def _trusted_attempt(def _trusted_attempt(
+def _trusted_attempt(
     attempts: BackgroundModelAttemptStore,
     *,
     subject_id: str,
