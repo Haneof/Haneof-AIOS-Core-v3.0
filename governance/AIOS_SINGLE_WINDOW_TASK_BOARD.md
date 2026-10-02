@@ -1,5 +1,18 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 2026-10-03 — WINDOW 18: Corrective-001 ACCEPTANCE_FAIL adjudicated / PR #308 FROZEN / Corrective-002 READY
+
+- **`CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-001 = DONE / ACCEPTANCE_FAIL / blocker=3`**. Window 17 canonical Fresh IA = `e4161dd0ad0a2f825461311a1c8c5ff8234a07f8` (sole parent exact candidate `cb8a6b3cdaa697a5ede81cbe9fafc3ac9891e9dd`, tree `30ba1a1d74561abb5db13f4ece587836bbc48df2`, branch `arena/01a0fd4d-haneof-aios-core-v3-0`, comment `5956828439`). Window 18 PM adjudication: all three blockers **BINDING**; no downgrade.
+- Fresh ground truth at adjudication start: live `main = 0b883c71d91e5f0772334514925237f1570fa780`; PR #308 `OPEN / UNMERGED`; exact candidate `cb8a6b3c...`; construction base = live main; zero candidate/review-parent drift.
+- **PR #308 is frozen** as `FAILED_EXACT_CANDIDATE / FROZEN / OPEN / UNMERGED / DO_NOT_MERGE`. No corrective commits, force-push, rebase, squash or amend. Window 17 review branch is `REVIEW_ONLY / IMMUTABLE / DO_NOT_MERGE`.
+- **BLK-W17-001 = BINDING:** recovery-reachable `_capture_trusted_response_return` can create receipt+handoff with only public/keyless `_receipt_proof`; underscore/call convention is not a trust boundary. Corrective-002 must require valid external proof or a genuinely non-recoverable live-call-only ephemeral capability.
+- **BLK-W17-002 = BINDING:** legacy HMAC migration rewrites trust evidence without verifying old HMAC/cross-table exact consistency first. Corrective-002 must verify-before-convert atomically and fail closed on tampering; public checksum may be integrity evidence only, never sole authenticity authority.
+- **BLK-W17-003 = BINDING:** colon-bearing `key_id` is accepted but proof parser splits on first colon; negative modulus is accepted by bit-length-only validation. Corrective-002 must freeze canonical proof encoding/key-id grammar and validate positive canonical RSA parameters before durable binding.
+- Positive Corrective-001 results remain requirements: Route-B post-binding `not_submitted` closure, verifier-only DB secret separation, verifier substitution fail-closed, malformed/transplant RSA fail-closed, race first-writer, SIGKILL recovery, R1-R5, and exactly-once semantics.
+- **Unique next READY:** `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-002` — WINDOW 19, new branch + new PR from fresh main. RED-first from Window 17 frozen probes against failed `cb8a6b3c...`; no PR #308 mutation beyond freeze metadata.
+- Downstream BLOCKED sequence: Window 20 Fresh IA -> Window 21 PM Integration (only after PASS) -> `CORE-RC-REFREEZE-004` + IA -> fresh `C15-RCC-RES-A-RERUN-005` + IA -> operator provenance corrective + IA -> RELEASE-004 -> RERUN-004 -> ACCEPT-004.
+- Adjudication record: `governance/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_001_ACCEPTANCE_FAILURE_ADJUDICATION_2026-10-03.md`. Window 18 = `GOVERNANCE_ONLY`; after governance merge + PR #308 freeze comment it is COMPLETE/CLOSED.
+
 ## 2026-10-01 — WINDOW 15 post-merge binding clarification: S3 / C4-C5 consistency
 
 - **No verdict/status change:** `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001 = DONE / ACCEPTANCE_FAIL / blocker=4`; unique next READY remains `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-001` (WINDOW 16, new branch + new PR).

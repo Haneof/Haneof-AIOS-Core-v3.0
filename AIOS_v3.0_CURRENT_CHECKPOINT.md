@@ -1,5 +1,19 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-10-03 — WINDOW 18 PM Acceptance-Failure Adjudication
+
+- `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-001 = DONE / ACCEPTANCE_FAIL / blocker=3`.
+- live main at adjudication start: `0b883c71d91e5f0772334514925237f1570fa780`.
+- failed exact candidate: PR #308 `cb8a6b3cdaa697a5ede81cbe9fafc3ac9891e9dd` — now frozen `OPEN / UNMERGED / DO_NOT_MERGE`.
+- canonical Window 17 review: `e4161dd0ad0a2f825461311a1c8c5ff8234a07f8`, sole parent exact candidate, tree `30ba1a1d74561abb5db13f4ece587836bbc48df2`, review branch `arena/01a0fd4d-haneof-aios-core-v3-0`, comment `5956828439`.
+- PM adjudication: **BLK-W17-001 / 002 / 003 all BINDING**.
+  - W17-001: trust-minting helper remains reachable from ordinary recovery object graph; keyless receipt checksum + helper can mint trusted receipt/handoff without external RSA proof.
+  - W17-002: legacy HMAC migration does not verify old HMAC + exact cross-table consistency before rewriting trust state; forged/tampered legacy rows can be laundered.
+  - W17-003: proof/key-id delimiter ambiguity and negative modulus acceptance can strand legitimate external returns.
+- **Unique next READY = `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-002` (WINDOW 19)** on a new engineering branch/new PR. It inherits all accepted Window 16/17 positive invariants and must RED-first reproduce Window 17 failures on `cb8a6b3c...`.
+- Window 20 = Fresh IA; Window 21 = PM Integration only after PASS. All RC-REFREEZE-004 / Resident / operator / release work remains BLOCKED.
+- Governance receipt: `governance/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_001_ACCEPTANCE_FAILURE_ADJUDICATION_2026-10-03.md`. No Window 19 engineering may begin inside Window 18.
+
 ## 2026-10-01 — CORE LATE-TRUSTED-RETURN Corrective-001 entry clarification (S3 / C4-C5)
 
 - Window 15 verdict is unchanged: four Window 14 blockers remain BINDING; PR #305 remains frozen failed candidate; `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-001` remains unique READY for WINDOW 16.
