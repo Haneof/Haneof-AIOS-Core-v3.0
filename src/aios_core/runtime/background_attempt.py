@@ -1233,7 +1233,7 @@ class BackgroundModelAttemptStore:
         return attempt
 
     def record_response(
-    def record_response(
+
         self,
         attempt_id: str,
         *,
@@ -1425,7 +1425,7 @@ class BackgroundModelAttemptStore:
         return attempt
 
     def reconcile_response(
-    def reconcile_response(
+
         self,
         attempt_id: str,
         *,
