@@ -134,3 +134,38 @@ jobs:
       - name: Focused Route-B truthfulness tests
         run: |
           pytest -o addopts='' -q             tests/runtime/test_background_model_attempt.py             tests/integration/test_core_background_trusted_return_recovery_001.py             tests/integration/test_core_background_response_recovery_001.py
+
+
+  phase-bc-verifier-only:
+    name: phase-bc-verifier-only
+    needs: phase-a-truthfulness
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12.14"
+      - run: python -m pip install -e . pydantic==2.13.5 pytest==8.4.2
+      - name: Compile verifier-only implementation and frozen probes
+        run: |
+          python -m py_compile src/aios_core/runtime/late_return.py
+          python -m py_compile src/aios_core/runtime/background_attempt.py
+          python -m py_compile src/aios_core/runtime/turn_runtime.py
+          python -m py_compile tests/runtime/test_background_late_return_route_b.py
+          python -m py_compile tests/integration/test_core_background_late_trusted_return_corrective_001.py
+      - name: Diff hygiene
+        run: git diff --check "origin/${GITHUB_BASE_REF}...HEAD"
+      - name: Route-B and CA1-CA5
+        run: |
+          pytest -o addopts='' -q \
+            tests/runtime/test_background_late_return_route_b.py \
+            tests/integration/test_core_background_late_trusted_return_corrective_001.py
+      - name: Accepted trusted-return regression
+        run: |
+          pytest -o addopts='' -q \
+            tests/integration/test_core_background_trusted_return_recovery_001.py \
+            tests/integration/test_core_background_trusted_return_adversarial_001.py \
+            tests/integration/test_core_background_response_recovery_001_corrective_002_authenticity.py \
+            tests/integration/test_core_background_response_recovery_001_corrective_002_recovery.py
