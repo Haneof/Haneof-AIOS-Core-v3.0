@@ -16,6 +16,14 @@ from .background_attempt import (
     BackgroundModelResponseReceipt,
 )
 from .metering import MeteringRecord, ModelMeteringLedger
+from .late_return import (
+    ExternalReturnObserver,
+    LATE_RETURN_PROOF_PREFIX,
+    LateReturnSigningContext,
+    LateReturnVerifier,
+    late_return_message,
+    verify_late_return_proof,
+)
 
 from .capabilities import (
     CapabilityCall,
