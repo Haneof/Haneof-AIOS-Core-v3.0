@@ -870,6 +870,12 @@ class BackgroundModelAttemptStore:
                 )
 
             if current.state == "not_submitted":
+                # C4/C6 Route B: a retry is legal only for a genuinely
+                # pre-submission attempt. Historical or corrupted rows that retain
+                # any durable dispatch/verifier/receipt artifact are never retried.
+                if self._durable_submission_artifacts(conn, attempt_id):
+                    conn.rollback()
+                    raise BackgroundModelAttemptBlocked(current)
                 conn.execute(
                     """
                     UPDATE background_model_attempts
@@ -964,6 +970,13 @@ class BackgroundModelAttemptStore:
                 if current.state == "response_returned":
                     raise BackgroundModelResponsePending(current)
                 raise BackgroundModelAttemptBlocked(current)
+            # Route B makes binding rotation impossible: an admitted attempt may
+            # cross the provider boundary only if this is its first durable
+            # dispatch fact. A legacy not_submitted row that still has a binding,
+            # verifier/capability, or receipt cannot create a second request.
+            if self._durable_submission_artifacts(conn, attempt_id):
+                conn.rollback()
+                raise BackgroundModelAttemptBlocked(current)
             relay_id = self.relay_id_for(
                 subject_id=current.subject_id,
                 work_kind=current.work_kind,
@@ -997,14 +1010,6 @@ class BackgroundModelAttemptStore:
                     model_round_index, outbound_request_fingerprint,
                     relay_id, bound_at
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(attempt_id) DO UPDATE SET
-                    subject_id=excluded.subject_id,
-                    work_kind=excluded.work_kind,
-                    work_id=excluded.work_id,
-                    model_round_index=excluded.model_round_index,
-                    outbound_request_fingerprint=excluded.outbound_request_fingerprint,
-                    relay_id=excluded.relay_id,
-                    bound_at=excluded.bound_at
                 """,
                 (
                     current.attempt_id,
@@ -1079,6 +1084,71 @@ class BackgroundModelAttemptStore:
             raise RuntimeError("legacy background attempt adoption was not durable")
         return self._from_row(row)
 
+    @staticmethod
+    def _durable_submission_artifacts(
+        conn: object,
+        attempt_id: str,
+    ) -> tuple[str, ...]:
+        """Return durable facts that make not_submitted mechanically false.
+
+        The table list includes both the current verifier name and the historical
+        failed-candidate capability name. The lookup is schema-aware so upgrades
+        remain fail-closed without requiring every table to exist.
+        """
+
+        artifacts: list[str] = []
+        for table in (
+            "background_model_request_bindings",
+            "background_model_return_verifiers",
+            "background_model_return_capabilities",
+            "background_model_response_receipts",
+        ):
+            exists = conn.execute(
+                """
+                SELECT 1 FROM sqlite_master
+                WHERE type='table' AND name=?
+                """,
+                (table,),
+            ).fetchone()
+            if exists is None:
+                continue
+            row = conn.execute(
+                f"SELECT 1 FROM {table} WHERE attempt_id=? LIMIT 1",
+                (attempt_id,),
+            ).fetchone()
+            if row is not None:
+                artifacts.append(table)
+        return tuple(artifacts)
+
+    @staticmethod
+    def _route_post_binding_failure_to_in_doubt(
+        conn: object,
+        *,
+        attempt_id: str,
+        failed_at: datetime,
+        kind: str,
+        detail: str,
+    ) -> object | None:
+        """Persist uncertainty, never false non-submission, after dispatch."""
+
+        conn.execute(
+            """
+            UPDATE background_model_attempts
+            SET state='in_doubt', updated_at=?, failure_kind=?, failure_detail=?
+            WHERE attempt_id=? AND state='dispatching'
+            """,
+            (
+                canonical_utc_iso(failed_at, "updated_at"),
+                kind,
+                detail,
+                attempt_id,
+            ),
+        )
+        return conn.execute(
+            "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+            (attempt_id,),
+        ).fetchone()
+
     def mark_failure(
         self,
         attempt_id: str,
@@ -1087,39 +1157,59 @@ class BackgroundModelAttemptStore:
         definitely_not_submitted: bool,
         error: BaseException,
     ) -> BackgroundModelAttempt:
+        """Record failure without allowing caller assertions to rewrite dispatch truth.
+
+        definitely_not_submitted=True is accepted only while the attempt is
+        still admitted and has zero durable dispatch/verifier/receipt facts.
+        After any dispatch fact exists, uncertainty is durably in_doubt and the
+        attempted non-submission claim is refused.
+        """
+
         moment = as_utc(failed_at, "failed_at")
-        target = "not_submitted" if definitely_not_submitted else "in_doubt"
         kind = type(error).__name__
         detail = str(error)[:1000]
         with self.store._connection() as conn:
             conn.execute("BEGIN IMMEDIATE")
+            current_row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if current_row is None:
+                conn.rollback()
+                raise KeyError(f"unknown background model attempt: {attempt_id}")
+            current = self._from_row(current_row)
+
             if definitely_not_submitted:
-                receipt_row = conn.execute(
-                    """
-                    SELECT 1 FROM background_model_response_receipts
-                    WHERE attempt_id=?
-                    """,
-                    (attempt_id,),
-                ).fetchone()
-                if receipt_row is not None:
-                    attempt_row = conn.execute(
-                        "SELECT * FROM background_model_attempts WHERE attempt_id=?",
-                        (attempt_id,),
-                    ).fetchone()
-                    conn.rollback()
-                    if attempt_row is None:
-                        raise KeyError(
-                            f"unknown background model attempt: {attempt_id}"
-                        )
-                    raise BackgroundModelResponseConflict(
-                        self._from_row(attempt_row),
-                        "an authenticated provider return cannot be marked not submitted",
+                artifacts = self._durable_submission_artifacts(conn, attempt_id)
+                if current.state != "admitted" or artifacts:
+                    row = self._route_post_binding_failure_to_in_doubt(
+                        conn,
+                        attempt_id=attempt_id,
+                        failed_at=moment,
+                        kind=kind,
+                        detail=detail,
                     )
+                    conn.commit()
+                    attempt = current if row is None else self._from_row(row)
+                    facts = ", ".join(artifacts) if artifacts else current.state
+                    raise BackgroundModelResponseConflict(
+                        attempt,
+                        "not_submitted requires state=admitted with zero durable "
+                        "dispatch/verifier/receipt facts; caller booleans and "
+                        f"exception types are not proof (durable={facts})",
+                    )
+                target = "not_submitted"
+                allowed_states = ("admitted",)
+            else:
+                target = "in_doubt"
+                allowed_states = ("admitted", "dispatching")
+
+            placeholders = ", ".join("?" for _ in allowed_states)
             conn.execute(
-                """
+                f"""
                 UPDATE background_model_attempts
                 SET state=?, updated_at=?, failure_kind=?, failure_detail=?
-                WHERE attempt_id=? AND state IN ('admitted', 'dispatching')
+                WHERE attempt_id=? AND state IN ({placeholders})
                 """,
                 (
                     target,
@@ -1127,6 +1217,7 @@ class BackgroundModelAttemptStore:
                     kind,
                     detail,
                     attempt_id,
+                    *allowed_states,
                 ),
             )
             row = conn.execute(
@@ -1141,6 +1232,7 @@ class BackgroundModelAttemptStore:
             raise BackgroundModelAttemptBlocked(attempt)
         return attempt
 
+    def record_response(
     def record_response(
         self,
         attempt_id: str,
@@ -1261,38 +1353,58 @@ class BackgroundModelAttemptStore:
         reconciled_at: datetime,
         evidence: str,
     ) -> BackgroundModelAttempt:
+        """Record only mechanically proven pre-submission non-dispatch.
+
+        Human/operator evidence text is audit metadata, not proof. The transition
+        is writable only from admitted with zero durable dispatch/verifier/receipt
+        facts. A post-binding call is refused and any still-dispatching attempt is
+        durably routed to in_doubt.
+        """
+
         if not isinstance(evidence, str) or not evidence.strip():
             raise ValueError("reconciliation evidence must be non-blank")
         moment = as_utc(reconciled_at, "reconciled_at")
         with self.store._connection() as conn:
             conn.execute("BEGIN IMMEDIATE")
-            receipt_row = conn.execute(
-                """
-                SELECT 1 FROM background_model_response_receipts
-                WHERE attempt_id=?
-                """,
+            row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
                 (attempt_id,),
             ).fetchone()
-            if receipt_row is not None:
-                attempt_row = conn.execute(
-                    "SELECT * FROM background_model_attempts WHERE attempt_id=?",
-                    (attempt_id,),
-                ).fetchone()
+            if row is None:
                 conn.rollback()
-                if attempt_row is None:
-                    raise KeyError(f"unknown background model attempt: {attempt_id}")
-                raise BackgroundModelResponseConflict(
-                    self._from_row(attempt_row),
-                    "an authenticated provider return cannot be reconciled as "
-                    "not submitted",
+                raise KeyError(f"unknown background model attempt: {attempt_id}")
+            current = self._from_row(row)
+            artifacts = self._durable_submission_artifacts(conn, attempt_id)
+
+            if current.state == "not_submitted" and not artifacts:
+                conn.commit()
+                return current
+
+            if current.state != "admitted" or artifacts:
+                row = self._route_post_binding_failure_to_in_doubt(
+                    conn,
+                    attempt_id=attempt_id,
+                    failed_at=moment,
+                    kind="reconcile_not_submitted_refused",
+                    detail="post-binding non-submission reconciliation is forbidden",
                 )
+                conn.commit()
+                attempt = current if row is None else self._from_row(row)
+                facts = ", ".join(artifacts) if artifacts else current.state
+                raise BackgroundModelResponseConflict(
+                    attempt,
+                    "not_submitted reconciliation requires state=admitted with "
+                    "zero durable dispatch/verifier/receipt facts; supplied "
+                    f"evidence cannot override durable truth (durable={facts})",
+                )
+
             conn.execute(
                 """
                 UPDATE background_model_attempts
                 SET state='not_submitted', updated_at=?,
                     reconciliation_evidence=?, failure_kind=NULL,
                     failure_detail=NULL
-                WHERE attempt_id=? AND state IN ('dispatching', 'in_doubt')
+                WHERE attempt_id=? AND state='admitted'
                 """,
                 (
                     canonical_utc_iso(moment, "updated_at"),
@@ -1312,6 +1424,7 @@ class BackgroundModelAttemptStore:
             raise BackgroundModelAttemptBlocked(attempt)
         return attempt
 
+    def reconcile_response(
     def reconcile_response(
         self,
         attempt_id: str,

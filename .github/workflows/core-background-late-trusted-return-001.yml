@@ -112,3 +112,25 @@ jobs:
             /tmp/w16-attack.txt
             /tmp/w16-s3.txt
             /tmp/w16-supplementary.txt
+
+  phase-a-truthfulness:
+    name: phase-a-truthfulness
+    needs: red-first-window14
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12.14"
+      - run: python -m pip install -e . pydantic==2.13.5 pytest==8.4.2
+      - name: Compile changed Python
+        run: |
+          python -m py_compile src/aios_core/runtime/background_attempt.py
+          python -m py_compile tests/runtime/test_background_model_attempt.py
+      - name: Diff hygiene
+        run: git diff --check "origin/${GITHUB_BASE_REF}...HEAD"
+      - name: Focused Route-B truthfulness tests
+        run: |
+          pytest -o addopts='' -q             tests/runtime/test_background_model_attempt.py             tests/integration/test_core_background_trusted_return_recovery_001.py             tests/integration/test_core_background_response_recovery_001.py
