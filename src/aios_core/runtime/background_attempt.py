@@ -524,10 +524,22 @@ class BackgroundModelAttemptStore:
                     algorithm TEXT NOT NULL,
                     modulus_hex TEXT NOT NULL,
                     public_exponent INTEGER NOT NULL,
-                    bound_at TEXT NOT NULL
+                    bound_at TEXT NOT NULL,
+                    consumed_at TEXT
                 )
                 """
             )
+            verifier_columns = {
+                str(row["name"])
+                for row in conn.execute(
+                    "PRAGMA table_info(background_model_return_verifiers)"
+                ).fetchall()
+            }
+            if "consumed_at" not in verifier_columns:
+                conn.execute(
+                    "ALTER TABLE background_model_return_verifiers "
+                    "ADD COLUMN consumed_at TEXT"
+                )
             # This is non-World runtime provenance in the existing database.  Rows
             # can only be minted by the trusted provider-return callback; staging
             # can read and verify them but cannot create or rewrite them.
@@ -1052,9 +1064,9 @@ class BackgroundModelAttemptStore:
                 raise RuntimeError(
                     "background model attempt did not enter dispatching"
                 )
-            # A not_submitted retry dispatches a new outbound request. Replace
-            # the previous binding only inside this admitted→dispatching
-            # transition; an in-doubt attempt's binding is never rewritten here.
+            # C6 Route B: this INSERT is the first and only durable provider
+            # request identity. A legal pre-submission retry has no prior binding;
+            # post-binding attempts never return to admitted and cannot rotate it.
             conn.execute(
                 """
                 INSERT INTO background_model_request_bindings(
@@ -1838,6 +1850,35 @@ class BackgroundModelAttemptStore:
                     "attempt, request and response",
                 )
 
+            already_consumed = verifier_row["consumed_at"] is not None
+            if already_consumed:
+                # Consumption is a durable one-shot gate, not key destruction:
+                # the external signer may physically still hold its private key,
+                # but Core will accept only an exact replay of the response that
+                # already won first-writer-wins. Missing canonical rows after a
+                # consumed verifier fail closed rather than being reconstructed.
+                existing_receipt = conn.execute(
+                    """
+                    SELECT * FROM background_model_response_receipts
+                    WHERE attempt_id=?
+                    """,
+                    (attempt_id,),
+                ).fetchone()
+                existing_handoff = conn.execute(
+                    """
+                    SELECT * FROM background_model_return_handoffs
+                    WHERE attempt_id=?
+                    """,
+                    (attempt_id,),
+                ).fetchone()
+                if existing_receipt is None or existing_handoff is None:
+                    conn.rollback()
+                    raise BackgroundModelResponseConflict(
+                        attempt,
+                        "late-return verifier is already consumed but its canonical "
+                        "receipt/handoff is missing",
+                    )
+
             receipt_fields = {
                 "attempt_id": attempt.attempt_id,
                 "subject_id": attempt.subject_id,
@@ -1937,6 +1978,25 @@ class BackgroundModelAttemptStore:
                     attempt,
                     "verified late return conflicts with existing exact handoff",
                 )
+
+            if not already_consumed:
+                consumed = conn.execute(
+                    """
+                    UPDATE background_model_return_verifiers
+                    SET consumed_at=?
+                    WHERE attempt_id=? AND consumed_at IS NULL
+                    """,
+                    (
+                        canonical_utc_iso(moment, "consumed_at"),
+                        attempt_id,
+                    ),
+                ).rowcount
+                if consumed != 1:
+                    conn.rollback()
+                    raise BackgroundModelResponseConflict(
+                        attempt,
+                        "late-return verifier consumption lost a concurrent race",
+                    )
             conn.commit()
 
         return self.stage_exact_response(
