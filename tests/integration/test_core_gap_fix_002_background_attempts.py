@@ -18,6 +18,7 @@ from aios_core.runtime import (
     BackgroundModelAttemptBlocked,
     BackgroundModelExecutionInDoubt,
     BackgroundModelResponsePending,
+    BackgroundModelResponseConflict,
 )
 from aios_core.runtime.cognitive_runtime import (
     ModelCallProvenance,
@@ -298,23 +299,18 @@ def test_crash_before_dispatch_keeps_admitted_attempt_safe_to_retry_on_restart(
     assert durable.state == "metered"
 
 
-def test_definitely_not_submitted_can_retry_same_attempt_identity(tmp_path):
+def test_typed_not_submitted_after_durable_dispatch_stays_in_doubt(tmp_path):
     store, index = _world(tmp_path)
     seen_attempt_ids = []
-    calls = 0
 
     def provider(snapshot):
-        nonlocal calls
-        calls += 1
         seen_attempt_ids.append(snapshot.model_attempt_id)
-        if calls == 1:
-            raise ModelDispatchNotSubmitted("socket failed before request write")
-        return _directive("req_safe_retry")
+        raise ModelDispatchNotSubmitted("socket failed after Core bound dispatch")
 
     runtime = FusedTurnRuntime(store=store, index=index, model_handler=provider)
-    signal = _emit_wake(runtime, key="safe-retry")
+    signal = _emit_wake(runtime, key="post-binding-not-submitted")
 
-    with pytest.raises(ModelDispatchNotSubmitted):
+    with pytest.raises(BackgroundModelResponseConflict):
         runtime.run_wake(
             wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
             now=NOW,
@@ -326,18 +322,18 @@ def test_definitely_not_submitted_can_retry_same_attempt_identity(tmp_path):
         model_round_index=0,
     )
     assert first is not None
-    assert first.state == "not_submitted"
-    assert first.recovery_disposition == "safe_to_retry"
+    assert first.state == "in_doubt"
+    assert first.recovery_disposition == "in_doubt"
+    binding = runtime.background_model_attempts.outbound_request_binding(first.attempt_id)
+    assert binding is not None
 
-    result = runtime.run_wake(
-        wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
-        now=NOW + timedelta(minutes=1),
-    )
-    assert result.wake.state == "completed"
-    final = runtime.background_model_attempts.get(first.attempt_id)
-    assert final is not None
-    assert final.state == "metered"
-    assert seen_attempt_ids == [first.attempt_id, first.attempt_id]
+    with pytest.raises(BackgroundModelExecutionInDoubt):
+        runtime.run_wake(
+            wake_ref=ObjectRef(object_id=signal.wake_id, revision=1),
+            now=NOW + timedelta(minutes=1),
+        )
+    assert runtime.background_model_attempts.outbound_request_binding(first.attempt_id) == binding
+    assert seen_attempt_ids == [first.attempt_id]
 
 
 def test_wake_response_is_durable_before_meter_and_restart_blocks_reinvocation(
