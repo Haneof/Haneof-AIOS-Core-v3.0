@@ -10,7 +10,6 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
-import secrets
 from datetime import datetime
 from typing import Literal
 
@@ -22,6 +21,12 @@ from aios_core.storage.sqlite_store import SQLiteWorldStore
 
 from .capabilities import CapabilityCall
 from .cognitive_runtime import ModelCallProvenance, ModelDirective, ModelUsage
+from .late_return import (
+    LateReturnSigningContext,
+    LateReturnVerifier,
+    late_return_message,
+    verify_late_return_proof,
+)
 
 
 BackgroundAttemptWorkKind = Literal["wake", "periodic_review", "user_turn"]
@@ -501,24 +506,27 @@ class BackgroundModelAttemptStore:
                 )
                 """
             )
-            # A single store-private authority key authenticates return receipts.
-            # It is never returned by an API, attached to RuntimeSnapshot, written
-            # to evidence, or accepted from the recovery caller.
+            # Verifier-only late-return authority.  Every value here is public:
+            # the external/provider side retains the private signing key and Core
+            # persists only the exact request scope plus RSA public verifier.
             conn.execute(
                 """
-                CREATE TABLE IF NOT EXISTS background_model_authenticity_authority (
-                    authority_id TEXT PRIMARY KEY,
-                    secret_hex TEXT NOT NULL
+                CREATE TABLE IF NOT EXISTS background_model_return_verifiers (
+                    attempt_id TEXT PRIMARY KEY,
+                    subject_id TEXT NOT NULL,
+                    work_kind TEXT NOT NULL,
+                    work_id TEXT NOT NULL,
+                    model_round_index INTEGER NOT NULL
+                        CHECK(model_round_index >= 0),
+                    outbound_request_fingerprint TEXT NOT NULL,
+                    relay_id TEXT NOT NULL,
+                    key_id TEXT NOT NULL,
+                    algorithm TEXT NOT NULL,
+                    modulus_hex TEXT NOT NULL,
+                    public_exponent INTEGER NOT NULL,
+                    bound_at TEXT NOT NULL
                 )
                 """
-            )
-            conn.execute(
-                """
-                INSERT OR IGNORE INTO background_model_authenticity_authority(
-                    authority_id, secret_hex
-                ) VALUES ('trusted-return-v1', ?)
-                """,
-                (secrets.token_hex(32),),
             )
             # This is non-World runtime provenance in the existing database.  Rows
             # can only be minted by the trusted provider-return callback; staging
@@ -555,6 +563,66 @@ class BackgroundModelAttemptStore:
                     authenticity_proof TEXT NOT NULL
                 )
             """)
+
+            # Upgrade old accepted databases away from the historical HMAC secret.
+            # Receipt rows are already Core-owned durable facts binding exact
+            # request/response digests, so migrate their opaque authenticator to a
+            # deterministic integrity fingerprint and delete the signing secret.
+            legacy_authority = conn.execute(
+                """
+                SELECT 1 FROM sqlite_master
+                WHERE type='table'
+                  AND name='background_model_authenticity_authority'
+                """
+            ).fetchone()
+            if legacy_authority is not None:
+                rows = conn.execute(
+                    "SELECT * FROM background_model_response_receipts"
+                ).fetchall()
+                for receipt_row in rows:
+                    fields = {
+                        "attempt_id": receipt_row["attempt_id"],
+                        "subject_id": receipt_row["subject_id"],
+                        "work_kind": receipt_row["work_kind"],
+                        "work_id": receipt_row["work_id"],
+                        "model_round_index": int(receipt_row["model_round_index"]),
+                        "outbound_request_fingerprint": receipt_row[
+                            "outbound_request_fingerprint"
+                        ],
+                        "relay_id": receipt_row["relay_id"],
+                        "provider": receipt_row["provider"],
+                        "model": receipt_row["model"],
+                        "provider_request_id": receipt_row["provider_request_id"],
+                        "response_fingerprint": receipt_row["response_fingerprint"],
+                        "payload_sha256": receipt_row["payload_sha256"],
+                    }
+                    proof = self._receipt_proof(**fields)
+                    attempt_id = receipt_row["attempt_id"]
+                    conn.execute(
+                        """
+                        UPDATE background_model_response_receipts
+                        SET authenticity_proof=?
+                        WHERE attempt_id=?
+                        """,
+                        (proof, attempt_id),
+                    )
+                    conn.execute(
+                        """
+                        UPDATE background_model_return_handoffs
+                        SET authenticity_proof=?
+                        WHERE attempt_id=?
+                        """,
+                        (proof, attempt_id),
+                    )
+                    conn.execute(
+                        """
+                        UPDATE background_model_responses
+                        SET authenticity_proof=?
+                        WHERE attempt_id=?
+                        """,
+                        (proof, attempt_id),
+                    )
+                conn.execute("DROP TABLE background_model_authenticity_authority")
             conn.commit()
 
     @staticmethod
@@ -687,35 +755,18 @@ class BackgroundModelAttemptStore:
             }
         ).encode("utf-8")
 
-    @staticmethod
-    def _authority_key(conn: object) -> bytes:
-        row = conn.execute(
-            """
-            SELECT secret_hex
-            FROM background_model_authenticity_authority
-            WHERE authority_id='trusted-return-v1'
-            """
-        ).fetchone()
-        if row is None:
-            raise RuntimeError("trusted response authenticity authority is missing")
-        try:
-            key = bytes.fromhex(str(row["secret_hex"]))
-        except ValueError as exc:
-            raise RuntimeError(
-                "trusted response authenticity authority is invalid"
-            ) from exc
-        if len(key) != 32:
-            raise RuntimeError("trusted response authenticity authority is invalid")
-        return key
-
     @classmethod
-    def _receipt_proof(cls, conn: object, **fields: object) -> str:
-        digest = hmac.new(
-            cls._authority_key(conn),
-            cls._receipt_message(**fields),
-            hashlib.sha256,
-        ).hexdigest()
-        return f"bgresponse_v1_{digest}"
+    def _receipt_proof(cls, **fields: object) -> str:
+        """Integrity fingerprint for a Core-owned durable receipt row.
+
+        This is deliberately not authentication authority.  Authenticity comes
+        from where the row was created: either the live trusted return boundary,
+        or a verified external RSA late-return proof.  Recovery can recompute this
+        checksum but cannot create a missing receipt row through any API.
+        """
+
+        digest = hashlib.sha256(cls._receipt_message(**fields)).hexdigest()
+        return f"bgresponse_v2_{digest}"
 
     @staticmethod
     def _receipt_from_row(row: object) -> BackgroundModelResponseReceipt:
@@ -935,6 +986,7 @@ class BackgroundModelAttemptStore:
         *,
         dispatched_at: datetime,
         outbound_request_fingerprint: str,
+        late_return_verifier: LateReturnVerifier | None = None,
     ) -> BackgroundModelAttempt:
         """Cross the provider boundary and durably bind the outbound request.
 
@@ -1022,6 +1074,33 @@ class BackgroundModelAttemptStore:
                     bound_at,
                 ),
             )
+            if late_return_verifier is not None:
+                if not isinstance(late_return_verifier, LateReturnVerifier):
+                    conn.rollback()
+                    raise TypeError("late_return_verifier must be LateReturnVerifier")
+                conn.execute(
+                    """
+                    INSERT INTO background_model_return_verifiers(
+                        attempt_id, subject_id, work_kind, work_id,
+                        model_round_index, outbound_request_fingerprint, relay_id,
+                        key_id, algorithm, modulus_hex, public_exponent, bound_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        current.attempt_id,
+                        current.subject_id,
+                        current.work_kind,
+                        current.work_id,
+                        int(current.model_round_index),
+                        fingerprint,
+                        relay_id,
+                        late_return_verifier.key_id,
+                        late_return_verifier.algorithm,
+                        late_return_verifier.modulus_hex,
+                        int(late_return_verifier.public_exponent),
+                        bound_at,
+                    ),
+                )
             row = conn.execute(
                 "SELECT * FROM background_model_attempts WHERE attempt_id=?",
                 (attempt_id,),
@@ -1572,6 +1651,306 @@ class BackgroundModelAttemptStore:
             )
         return binding
 
+    def late_return_verifier(
+        self,
+        attempt_id: str,
+    ) -> LateReturnVerifier | None:
+        """Return only public verifier material for one dispatched attempt."""
+
+        with self.store._connection() as conn:
+            row = conn.execute(
+                """
+                SELECT key_id, algorithm, modulus_hex, public_exponent
+                FROM background_model_return_verifiers
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return LateReturnVerifier(
+            key_id=row["key_id"],
+            algorithm=row["algorithm"],
+            modulus_hex=row["modulus_hex"],
+            public_exponent=int(row["public_exponent"]),
+        )
+
+    def late_return_signing_context(
+        self,
+        attempt_id: str,
+    ) -> LateReturnSigningContext | None:
+        """Public request scope for an external signer; never signing authority."""
+
+        with self.store._connection() as conn:
+            row = conn.execute(
+                """
+                SELECT * FROM background_model_return_verifiers
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return LateReturnSigningContext(
+            attempt_id=row["attempt_id"],
+            subject_id=row["subject_id"],
+            work_kind=row["work_kind"],
+            work_id=row["work_id"],
+            model_round_index=int(row["model_round_index"]),
+            outbound_request_fingerprint=row["outbound_request_fingerprint"],
+            relay_id=row["relay_id"],
+            verifier_key_id=row["key_id"],
+        )
+
+    def attach_late_trusted_return(
+        self,
+        attempt_id: str,
+        *,
+        attached_at: datetime,
+        directive_payload: str,
+        late_return_proof: str,
+        evidence: str,
+    ) -> BackgroundModelResponseStaging:
+        """Verify an externally signed late return and atomically adopt exact bytes."""
+
+        if not isinstance(directive_payload, str) or not directive_payload.strip():
+            raise ValueError("late trusted return payload must be non-blank")
+        if not isinstance(late_return_proof, str) or not late_return_proof.strip():
+            raise ValueError("late trusted return proof must be non-blank")
+        if not isinstance(evidence, str) or not evidence.strip():
+            raise ValueError("late trusted return evidence must be non-blank")
+        moment = as_utc(attached_at, "attached_at")
+
+        directive = decode_model_directive(directive_payload)
+        provider, model, provider_request_id = self._provider_identity(directive)
+        if provider is None or model is None or provider_request_id is None:
+            raise ValueError(
+                "late trusted return requires full provider/model/request_id identity"
+            )
+        response_fingerprint = self._response_fingerprint(directive)
+        payload_sha256 = hashlib.sha256(
+            directive_payload.encode("utf-8")
+        ).hexdigest()
+
+        with self.store._connection() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            attempt_row = conn.execute(
+                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
+                (attempt_id,),
+            ).fetchone()
+            if attempt_row is None:
+                conn.rollback()
+                raise KeyError(f"unknown background model attempt: {attempt_id}")
+            attempt = self._from_row(attempt_row)
+            if attempt.state not in self._STAGABLE_STATES:
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt,
+                    "late trusted return cannot attach before durable dispatch",
+                )
+            binding_row = conn.execute(
+                """
+                SELECT * FROM background_model_request_bindings
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+            binding = (
+                None if binding_row is None else self._binding_from_row(binding_row)
+            )
+            try:
+                binding = self._require_origin_binding(
+                    attempt,
+                    binding,
+                    supplied_request_id=provider_request_id,
+                    require_relay_echo=False,
+                )
+            except BackgroundModelResponseConflict:
+                conn.rollback()
+                raise
+
+            verifier_row = conn.execute(
+                """
+                SELECT * FROM background_model_return_verifiers
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+            if verifier_row is None:
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt,
+                    "no external late-return verifier was bound before dispatch",
+                )
+            verifier_scope = (
+                verifier_row["attempt_id"],
+                verifier_row["subject_id"],
+                verifier_row["work_kind"],
+                verifier_row["work_id"],
+                int(verifier_row["model_round_index"]),
+                verifier_row["outbound_request_fingerprint"],
+                verifier_row["relay_id"],
+            )
+            expected_scope = (
+                attempt.attempt_id,
+                attempt.subject_id,
+                attempt.work_kind,
+                attempt.work_id,
+                attempt.model_round_index,
+                binding.outbound_request_fingerprint,
+                binding.relay_id,
+            )
+            if verifier_scope != expected_scope:
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt,
+                    "late-return verifier scope does not match durable request binding",
+                )
+            verifier = LateReturnVerifier(
+                key_id=verifier_row["key_id"],
+                algorithm=verifier_row["algorithm"],
+                modulus_hex=verifier_row["modulus_hex"],
+                public_exponent=int(verifier_row["public_exponent"]),
+            )
+            message = late_return_message(
+                attempt_id=attempt.attempt_id,
+                subject_id=attempt.subject_id,
+                work_kind=attempt.work_kind,
+                work_id=attempt.work_id,
+                model_round_index=attempt.model_round_index,
+                outbound_request_fingerprint=binding.outbound_request_fingerprint,
+                relay_id=binding.relay_id,
+                provider=provider,
+                model=model,
+                provider_request_id=provider_request_id,
+                response_fingerprint=response_fingerprint,
+                payload_sha256=payload_sha256,
+            )
+            if not verify_late_return_proof(
+                verifier,
+                message=message,
+                proof=late_return_proof.strip(),
+            ):
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt,
+                    "late trusted return signature is invalid for this exact "
+                    "attempt, request and response",
+                )
+
+            receipt_fields = {
+                "attempt_id": attempt.attempt_id,
+                "subject_id": attempt.subject_id,
+                "work_kind": attempt.work_kind,
+                "work_id": attempt.work_id,
+                "model_round_index": attempt.model_round_index,
+                "outbound_request_fingerprint": binding.outbound_request_fingerprint,
+                "relay_id": binding.relay_id,
+                "provider": provider,
+                "model": model,
+                "provider_request_id": provider_request_id,
+                "response_fingerprint": response_fingerprint,
+                "payload_sha256": payload_sha256,
+            }
+            receipt_proof = self._receipt_proof(**receipt_fields)
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO background_model_response_receipts(
+                    attempt_id, subject_id, work_kind, work_id,
+                    model_round_index, outbound_request_fingerprint, relay_id,
+                    provider, model, provider_request_id, response_fingerprint,
+                    payload_sha256, authenticity_proof, captured_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    *receipt_fields.values(),
+                    receipt_proof,
+                    canonical_utc_iso(moment, "captured_at"),
+                ),
+            )
+            receipt_row = conn.execute(
+                """
+                SELECT * FROM background_model_response_receipts
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+            if receipt_row is None:
+                conn.rollback()
+                raise RuntimeError("verified late return receipt was not durable")
+            receipt = self._receipt_from_row(receipt_row)
+            actual_receipt = (
+                receipt.attempt_id,
+                receipt.subject_id,
+                receipt.work_kind,
+                receipt.work_id,
+                receipt.model_round_index,
+                receipt.outbound_request_fingerprint,
+                receipt.relay_id,
+                receipt.provider,
+                receipt.model,
+                receipt.provider_request_id,
+                receipt.response_fingerprint,
+                receipt.payload_sha256,
+                receipt.authenticity_proof,
+            )
+            expected_receipt = (*receipt_fields.values(), receipt_proof)
+            if actual_receipt != expected_receipt:
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt,
+                    "verified late return conflicts with existing durable receipt",
+                )
+
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO background_model_return_handoffs(
+                    attempt_id, directive_payload, payload_sha256,
+                    authenticity_proof
+                ) VALUES (?, ?, ?, ?)
+                """,
+                (
+                    attempt_id,
+                    directive_payload,
+                    payload_sha256,
+                    receipt_proof,
+                ),
+            )
+            handoff = conn.execute(
+                """
+                SELECT * FROM background_model_return_handoffs
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+            if handoff is None or (
+                handoff["directive_payload"],
+                handoff["payload_sha256"],
+                handoff["authenticity_proof"],
+            ) != (
+                directive_payload,
+                payload_sha256,
+                receipt_proof,
+            ):
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt,
+                    "verified late return conflicts with existing exact handoff",
+                )
+            conn.commit()
+
+        return self.stage_exact_response(
+            attempt_id,
+            staged_at=moment,
+            provider=provider,
+            model=model,
+            provider_request_id=provider_request_id,
+            response_fingerprint=response_fingerprint,
+            directive_payload=directive_payload,
+            authenticity_proof=receipt_proof,
+            evidence=evidence.strip(),
+        )
+
     def _capture_trusted_response_return(
         self,
         attempt_id: str,
@@ -1579,11 +1958,11 @@ class BackgroundModelAttemptStore:
         captured_at: datetime,
         directive: ModelDirective,
     ) -> BackgroundModelResponseReceipt:
-        """Mint a receipt at the internal provider/relay return boundary.
+        """Record exact bytes at the live trusted provider/relay return boundary.
 
-        This method is intentionally private and is wired only as CognitiveRuntime's
-        trusted return callback.  Recovery staging has no path to this authority and
-        receives neither the HMAC key nor a signing callable.
+        No signing secret exists in Core.  The durable receipt row itself is the
+        Core-owned fact; its proof field is only an integrity fingerprint used to
+        detect row/handoff corruption during recovery.
         """
 
         moment = as_utc(captured_at, "captured_at")
@@ -1665,7 +2044,7 @@ class BackgroundModelAttemptStore:
                 "response_fingerprint": response_fingerprint,
                 "payload_sha256": payload_sha256,
             }
-            proof = self._receipt_proof(conn, **receipt_fields)
+            proof = self._receipt_proof(**receipt_fields)
             conn.execute(
                 """
                 INSERT OR IGNORE INTO background_model_response_receipts(
@@ -1797,7 +2176,7 @@ class BackgroundModelAttemptStore:
             "response_fingerprint": receipt.response_fingerprint,
             "payload_sha256": receipt.payload_sha256,
         }
-        expected_proof = self._receipt_proof(conn, **receipt_fields)
+        expected_proof = self._receipt_proof(**receipt_fields)
         if not hmac.compare_digest(receipt.authenticity_proof, expected_proof):
             raise BackgroundModelResponseConflict(
                 attempt,
