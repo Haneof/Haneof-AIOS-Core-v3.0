@@ -111,8 +111,8 @@ class ExternalSigner:
         assert snapshot.model_attempt_id == context.attempt_id
         self.contexts[context.attempt_id] = context
 
-    def proof(self, attempt_id, directive, **overrides):
-        context = self.contexts[attempt_id]
+    def proof(self, owner_attempt_id, directive, **overrides):
+        context = self.contexts[owner_attempt_id]
         payload = encode_model_directive(directive)
         digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
         fields = {
