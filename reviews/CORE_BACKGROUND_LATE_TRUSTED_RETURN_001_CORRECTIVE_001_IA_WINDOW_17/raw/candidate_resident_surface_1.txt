@@ -1,0 +1,48 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_resident_visible_surface_is_unchanged_by_the_durability_layer ______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-5/test_resident_visible_surface_0')
+
+    def test_resident_visible_surface_is_unchanged_by_the_durability_layer(tmp_path: Path) -> None:
+        # The checked-in evidence file is produced by an explicit, logged invocation
+        # of the checker so that the suite never rewrites reviewed evidence; this
+        # test writes to a scratch path and asserts on that.
+        out = tmp_path / "resident-surface-no-change.json"
+        work_root = new_root("resident-surface")
+        env = dict(repo_python_env())
+        env["C15_SURFACE_BASE"] = os.environ.get("C15_SURFACE_BASE", "main")
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "tools.c15_persistence.resident_surface_check",
+                "--out",
+                str(out),
+                "--base",
+                env["C15_SURFACE_BASE"],
+                "--work-root",
+                str(work_root / "runs"),
+            ],
+            capture_output=True,
+            text=True,
+            timeout=900,
+            cwd=str(REPO_ROOT),
+            env=env,
+        )
+>       assert completed.returncode == 0, (
+            "resident surface check failed:\\n"
+            f"stdout: {completed.stdout}\\nstderr: {completed.stderr}"
+        )
+E       AssertionError: resident surface check failed:\nstdout: {
+E           "result": "RESIDENT_SURFACE_CHANGED",
+E           "evidence": "/tmp/pytest-of-user/pytest-5/test_resident_visible_surface_0/resident-surface-no-change.json"
+E         }
+E         \nstderr: 
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/tmp/w17-venv/bin/python3', '-m', 'tools.c15_persistence.resident_surface_check', '--out', '/t...ence": "/tmp/pytest-of-user/pytest-5/test_resident_visible_surface_0/resident-surface-no-change.json"\n}\n', stderr='').returncode
+
+tests/c15_persistence/test_resident_surface.py:54: AssertionError
+=========================== short test summary info ============================
+FAILED tests/c15_persistence/test_resident_surface.py::test_resident_visible_surface_is_unchanged_by_the_durability_layer
+1 failed in 0.86s

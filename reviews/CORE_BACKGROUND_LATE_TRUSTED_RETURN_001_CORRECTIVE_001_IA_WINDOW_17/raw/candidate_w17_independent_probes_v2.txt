@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/home/user/w17_review/reviewer_probes/window17_independent_attack.py", line 1505, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/user/w17_review/reviewer_probes/window17_independent_attack.py", line 1493, in main
+    res = probe_fn(root)
+          ^^^^^^^^^^^^^^
+  File "/home/user/w17_review/reviewer_probes/window17_independent_attack.py", line 268, in probe_ia17_mint_001_capture_helper_mints_trusted_return_without_rsa
+    assert in_doubt is not None and in_doubt.state == "in_doubt"
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+exit_code=1

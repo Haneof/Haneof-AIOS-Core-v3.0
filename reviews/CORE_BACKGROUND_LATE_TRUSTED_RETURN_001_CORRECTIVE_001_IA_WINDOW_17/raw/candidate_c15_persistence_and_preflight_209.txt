@@ -1,0 +1,26 @@
+............................................F........................... [ 34%]
+........................................................................ [ 68%]
+.................................................................        [100%]
+=================================== FAILURES ===================================
+_____________________ test_environment_detach_and_reattach _____________________
+tests/c15_persistence/test_environment_reattach.py:186: in test_environment_detach_and_reattach
+    reattached = _run_in_namespace("attach", root, run_id, session_id, manifest_path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/c15_persistence/test_environment_reattach.py:146: in _run_in_namespace
+    assert completed.returncode == 0, f"{mode} inside the detached namespace failed:\n{completed.stderr}"
+E   AssertionError: attach inside the detached namespace failed:
+E     Traceback (most recent call last):
+E       File "<string>", line 24, in <module>
+E       File "/tmp/w17-cand-wt/tools/c15_persistence/operator_session.py", line 491, in attach
+E       File "/tmp/w17-cand-wt/tools/c15_persistence/synthetic_release.py", line 173, in __init__
+E       File "/tmp/w17-cand-wt/tools/c15_persistence/synthetic_release.py", line 74, in _load
+E       File "<frozen importlib._bootstrap_external>", line 936, in exec_module
+E       File "<frozen importlib._bootstrap_external>", line 1073, in get_code
+E       File "<frozen importlib._bootstrap_external>", line 1130, in get_data
+E     FileNotFoundError: [Errno 2] No such file or directory: '/tmp/w17-cand-wt/reviews/internal_habitation/c14-resident/v2/release/release_operator.py'
+E     
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=['sudo', '-n', 'env', 'C15_PERSISTED_WORKSPACE=/home/user', 'unshare', '--mount', '--uts', '--ip...uch file or directory: \'/tmp/w17-cand-wt/reviews/internal_habitation/c14-resident/v2/release/release_operator.py\'\n').returncode
+=========================== short test summary info ============================
+FAILED tests/c15_persistence/test_environment_reattach.py::test_environment_detach_and_reattach
+1 failed, 208 passed in 91.45s (0:01:31)
