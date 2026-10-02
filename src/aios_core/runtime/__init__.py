@@ -13,6 +13,7 @@ from .background_attempt import (
     BackgroundModelAttemptStore,
     BackgroundModelExecutionInDoubt,
     BackgroundModelResponsePending,
+    BackgroundModelResponseConflict,
     BackgroundModelResponseReceipt,
 )
 from .metering import MeteringRecord, ModelMeteringLedger
