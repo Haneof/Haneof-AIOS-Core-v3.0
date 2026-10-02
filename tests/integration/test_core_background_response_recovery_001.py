@@ -1027,13 +1027,27 @@ def test_no_exact_response_can_be_staged_for_a_call_that_never_reached_provider(
         runtime2.run_wake(
             wake_ref=_wake_ref(signal2), now=NOW + timedelta(minutes=1)
         )
-    with pytest.raises(BackgroundModelResponseConflict):
-        _stage(
-            runtime2,
+    binding = runtime2.background_model_attempts.outbound_request_binding(
+        refused.attempt_id
+    )
+    assert binding is not None
+    untrusted = _directive(binding.relay_id)
+    payload, fingerprint = _payload_and_fingerprint(runtime2, untrusted)
+    with pytest.raises(
+        BackgroundModelResponseConflict, match="trusted return-path receipt"
+    ):
+        runtime2.stage_exact_background_response(
             work_kind="wake",
             work_id=signal2.wake_id,
             model_round_index=0,
-            directive=_directive("req-never-submitted"),
+            provider=PROVIDER,
+            model=MODEL,
+            provider_request_id=binding.relay_id,
+            response_fingerprint=fingerprint,
+            directive_payload=payload,
+            staged_at=NOW + timedelta(minutes=2),
+            evidence="caller bytes without a trusted return",
+            authenticity_proof=None,
         )
     assert runtime2.background_model_attempts.staged_response(refused.attempt_id) is None
 
