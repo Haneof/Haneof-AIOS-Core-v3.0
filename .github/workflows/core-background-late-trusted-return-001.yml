@@ -1,0 +1,114 @@
+name: core-background-late-trusted-return-001
+
+on:
+  pull_request:
+    paths:
+      - "src/aios_core/**"
+      - "tests/**"
+      - "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_001/**"
+      - ".github/workflows/core-background-late-trusted-return-001.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  red-first-window14:
+    name: red-first-window14
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12.14"
+      - name: Materialize immutable failed candidate and canonical Window 14 probes
+        shell: bash
+        run: |
+          set -euo pipefail
+          FAILED=5ad0524c425592210ff184e00ad52abb2c14e366
+          REVIEW=84457badc562416f59fb25ca41103700276e0df2
+          git fetch --no-tags origin             "+refs/heads/arena/01a0f07b-haneof-aios-core-v3-0:refs/remotes/origin/window13-failed"             "+refs/heads/arena/01a0f231-haneof-aios-core-v3-0:refs/remotes/origin/window14-review"
+          test "$(git rev-parse refs/remotes/origin/window13-failed)" = "$FAILED"
+          test "$(git rev-parse refs/remotes/origin/window14-review)" = "$REVIEW"
+          test "$(git rev-parse "$REVIEW^")" = "$FAILED"
+          test "$(git rev-parse "$FAILED^")" = "a49c1e6874ecb92ae4dc4783d07d733fdc19fa5d"
+          test "$(git show -s --format=%T "$FAILED")" = "53064b3022254dab33c7793a0a6306c71e3df2b2"
+          test "$(git show -s --format=%T "$REVIEW")" = "bd235452c0b78a7fbeedd48d048fc78b331d92bf"
+          rm -rf /tmp/w16-failed
+          git worktree add --detach /tmp/w16-failed "$FAILED"
+          git archive "$REVIEW" reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes             | tar -x -C /tmp/w16-failed
+      - name: Install exact formal Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e /tmp/w16-failed pydantic==2.13.5 pytest==8.4.2
+      - name: Verify frozen probe SHA-256 and record environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/w16-failed
+          sha256sum -c reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/SHA256SUMS
+          sha256sum -c reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/SHA256SUMS_S3
+          sha256sum -c reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/SHA256SUMS_SUPPLEMENTARY
+          python - <<'PY' | tee /tmp/w16-environment.txt
+          import ssl, sqlite3, sys, pydantic, pytest
+          print("candidate=5ad0524c425592210ff184e00ad52abb2c14e366")
+          print("review=84457badc562416f59fb25ca41103700276e0df2")
+          print("Python:", sys.version)
+          print("Pydantic:", pydantic.__version__)
+          print("pytest:", pytest.__version__)
+          print("SQLite:", sqlite3.sqlite_version)
+          print("OpenSSL:", ssl.OPENSSL_VERSION)
+          PY
+      - name: Reproduce Window 14 binding blockers as historical RED
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/w16-failed
+          : > /tmp/w16-baseline-red-raw.txt
+
+          set +e
+          PYTHONPATH=src python reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/window14_independent_attack.py             2>&1 | tee /tmp/w16-attack.txt
+          attack_status=${PIPESTATUS[0]}
+          set -e
+          cat /tmp/w16-attack.txt >> /tmp/w16-baseline-red-raw.txt
+          test "$attack_status" -eq 1
+          grep -F "FAIL | IA14-ORACLE-001" /tmp/w16-attack.txt
+          grep -F "FAIL | IA14-NONCE-001" /tmp/w16-attack.txt
+          grep -F "FAIL | IA14-NS-001" /tmp/w16-attack.txt
+          grep -F "SUMMARY | probes=7 failures=3" /tmp/w16-attack.txt
+
+          set +e
+          PYTHONPATH=src python reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/window14_s3_stale_capability_rotation.py             2>&1 | tee /tmp/w16-s3.txt
+          s3_status=${PIPESTATUS[0]}
+          set -e
+          cat /tmp/w16-s3.txt >> /tmp/w16-baseline-red-raw.txt
+          test "$s3_status" -eq 1
+          grep -F "S3b retried return outcome: REFUSED" /tmp/w16-s3.txt
+          grep -F "rotated-capability outcome: REFUSED" /tmp/w16-s3.txt
+          grep -F "SUMMARY | failures= 2" /tmp/w16-s3.txt
+
+          PYTHONPATH=src python reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/window14_supplementary_probes.py             2>&1 | tee /tmp/w16-supplementary.txt
+          cat /tmp/w16-supplementary.txt >> /tmp/w16-baseline-red-raw.txt
+          grep -F "SUMMARY | probes=2 failures=0" /tmp/w16-supplementary.txt
+
+          {
+            echo "=== exact identity ==="
+            git rev-parse HEAD
+            git rev-parse HEAD^
+            git show -s --format=%T HEAD
+            echo "=== frozen probe sha256 ==="
+            sha256sum               reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/window14_independent_attack.py               reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/window14_s3_stale_capability_rotation.py               reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/window14_supplementary_probes.py               reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/PROBE_CONTRACT.md               reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/PROBE_REVISION_LOG.md
+          } | tee /tmp/w16-baseline-identity.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: window16-red-first
+          path: |
+            /tmp/w16-environment.txt
+            /tmp/w16-baseline-identity.txt
+            /tmp/w16-baseline-red-raw.txt
+            /tmp/w16-attack.txt
+            /tmp/w16-s3.txt
+            /tmp/w16-supplementary.txt
