@@ -576,10 +576,18 @@ class BackgroundModelAttemptStore:
                 )
             """)
 
-            # Upgrade old accepted databases away from the historical HMAC secret.
-            # Receipt rows are already Core-owned durable facts binding exact
-            # request/response digests, so migrate their opaque authenticator to a
-            # deterministic integrity fingerprint and delete the signing secret.
+            # Secret-separation upgrade. Neither the failed Window-13
+            # capability nonce nor the older receipt HMAC key may survive in the
+            # runtime DB, WAL, dump or backup. Secure-delete zeroes deleted cell
+            # content; a successful TRUNCATE checkpoint below removes historical
+            # WAL frames before startup is allowed to continue.
+            legacy_capability = conn.execute(
+                """
+                SELECT 1 FROM sqlite_master
+                WHERE type='table'
+                  AND name='background_model_return_capabilities'
+                """
+            ).fetchone()
             legacy_authority = conn.execute(
                 """
                 SELECT 1 FROM sqlite_master
@@ -587,7 +595,25 @@ class BackgroundModelAttemptStore:
                   AND name='background_model_authenticity_authority'
                 """
             ).fetchone()
+            purge_legacy_secrets = (
+                legacy_capability is not None or legacy_authority is not None
+            )
+            if purge_legacy_secrets:
+                conn.execute("PRAGMA secure_delete = ON")
+
+            if legacy_capability is not None:
+                # The failed candidate was never merged, but a copied/review DB
+                # must still be safe to open. No nonce/preimage is converted into
+                # the new verifier table: it is destroyed and the attempt remains
+                # fail-closed unless a genuine first dispatch pins a public key.
+                conn.execute("DELETE FROM background_model_return_capabilities")
+                conn.execute("DROP TABLE background_model_return_capabilities")
+
             if legacy_authority is not None:
+                # Receipt rows are already Core-owned durable facts binding exact
+                # request/response digests. Preserve those facts while replacing
+                # their obsolete keyed authenticator with a public integrity
+                # fingerprint, then securely erase the historical key row.
                 rows = conn.execute(
                     "SELECT * FROM background_model_response_receipts"
                 ).fetchall()
@@ -634,8 +660,18 @@ class BackgroundModelAttemptStore:
                         """,
                         (proof, attempt_id),
                     )
+                conn.execute("DELETE FROM background_model_authenticity_authority")
                 conn.execute("DROP TABLE background_model_authenticity_authority")
+
             conn.commit()
+            if purge_legacy_secrets:
+                checkpoint = conn.execute(
+                    "PRAGMA wal_checkpoint(TRUNCATE)"
+                ).fetchone()
+                if checkpoint is None or int(checkpoint[0]) != 0:
+                    raise RuntimeError(
+                        "legacy signing material purge could not truncate SQLite WAL"
+                    )
 
     @staticmethod
     def attempt_id_for(
