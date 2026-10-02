@@ -1034,7 +1034,7 @@ def test_no_exact_response_can_be_staged_for_a_call_that_never_reached_provider(
     untrusted = _directive(binding.relay_id)
     payload, fingerprint = _payload_and_fingerprint(runtime2, untrusted)
     with pytest.raises(
-        BackgroundModelResponseConflict, match="trusted return-path receipt"
+        BackgroundModelResponseConflict, match="authenticity proof is missing"
     ):
         runtime2.stage_exact_background_response(
             work_kind="wake",
