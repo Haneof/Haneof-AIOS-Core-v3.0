@@ -162,7 +162,8 @@ jobs:
           pytest -o addopts='' -q \
             tests/runtime/test_background_late_return_route_b.py \
             tests/integration/test_core_background_late_trusted_return_corrective_001.py \
-            tests/integration/test_core_background_late_trusted_return_consumption_001.py
+            tests/integration/test_core_background_late_trusted_return_consumption_001.py \
+            tests/integration/test_core_background_late_trusted_return_secret_upgrade_001.py
       - name: Accepted trusted-return regression
         run: |
           pytest -o addopts='' -q \
