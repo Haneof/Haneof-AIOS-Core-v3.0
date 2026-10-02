@@ -251,6 +251,14 @@ jobs:
             python -c "import sys,platform; print('python', sys.version); print('platform', platform.platform())"
             python -c "import pydantic,pytest,sqlite3,ssl; print('pydantic',pydantic.__version__); print('pytest',pytest.__version__); print('sqlite',sqlite3.sqlite_version); print('openssl',ssl.OPENSSL_VERSION)"
           } | tee /tmp/window16-formal-environment.txt
+      - name: Compile every changed Python file
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r file; do
+            test -z "$file" && continue
+            python -m py_compile "$file"
+          done < <(git diff --name-only "origin/${GITHUB_BASE_REF}...HEAD" -- '*.py')
       - name: Full Core regression
         run: |
           set -euo pipefail
