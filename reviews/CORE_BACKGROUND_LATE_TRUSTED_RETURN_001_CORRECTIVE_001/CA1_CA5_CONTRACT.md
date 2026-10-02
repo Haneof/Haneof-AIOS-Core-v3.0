@@ -31,3 +31,14 @@ Core durable state: RSA public key/verifier + exact request binding -> VERIFY ON
 ```
 
 The test private exponent is synthetic and exists only inside the test source. Production code and runtime state must never receive it.
+
+
+## Probe revision log
+
+- Revision 0: frozen at commit `53d145d49991186f81bfe997289106872320405f`.
+- First Phase B/C execution: 18 passed / 1 harness error. The `attempt_id`
+  attack override collided with the fixture method's own positional parameter,
+  raising Python `TypeError` before the product path ran.
+- Revision 1: rename only that fixture parameter to `owner_attempt_id`.
+  Assertions, attack value, production inputs, and expected fail-closed outcome are
+  unchanged.
