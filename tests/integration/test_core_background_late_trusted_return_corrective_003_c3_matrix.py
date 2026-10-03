@@ -46,6 +46,7 @@ from __future__ import annotations
 
 import hashlib
 import importlib
+import importlib.util
 import inspect
 import sqlite3
 import sys
@@ -765,11 +766,17 @@ def c2_08_object_new(c: AttackContext) -> str:
         object.__setattr__(fabricated, "_state", "open")
         assert isinstance(fabricated, LiveProviderReturnWindow)
         register_handler_return(fabricated, c.forged)
-        live_return_module._ACTIVE_WINDOW.set(fabricated)
-        c.attempts.record_live_provider_return(  # type: ignore[attr-defined]
-            c.attempt_id, captured_at=NOW, directive=c.forged,
-            live_window=fabricated,
-        )
+        token = live_return_module._ACTIVE_WINDOW.set(fabricated)
+        try:
+            assert live_return_module._ACTIVE_WINDOW.get() is fabricated
+            c.attempts.record_live_provider_return(  # type: ignore[attr-defined]
+                c.attempt_id, captured_at=NOW, directive=c.forged,
+                live_window=fabricated,
+            )
+        finally:
+            # Never leak armed process-local state into the rest of the suite.
+            live_return_module._ACTIVE_WINDOW.reset(token)
+        assert live_return_module._ACTIVE_WINDOW.get() is None
 
     return _attack_outcome(attack)
 
@@ -794,23 +801,50 @@ def c2_09_ctor(c: AttackContext) -> str:
 
 
 def c2_10_import(c: AttackContext) -> str:
-    """Re-import / reload must not resurrect authority."""
+    """Re-import must not resurrect authority -- and must not rebind the module.
+
+    ``importlib.reload`` is deliberately NOT used: it re-executes the module inside
+    its existing ``sys.modules`` entry and therefore REBINDS every class object it
+    defines, which silently breaks ``isinstance`` identity for any other test that
+    imported the tombstone type earlier.  A matrix case must not be able to corrupt
+    the rest of the suite, so this case executes an isolated fresh copy of the module
+    through ``spec_from_file_location`` / ``module_from_spec`` instead and then
+    asserts that ``sys.modules`` was not touched at all.  The security property is
+    unchanged and is in fact proved twice: the already-imported module and a freshly
+    executed copy of its source are both inert.
+    """
 
     def attack():
         module = importlib.import_module("aios_core.runtime.live_return")
         assert module is live_return_module
-        reloaded = importlib.reload(module)
+        assert sys.modules["aios_core.runtime.live_return"] is live_return_module
+        source_path = live_return_module.__file__
+        assert source_path is not None
+        spec = importlib.util.spec_from_file_location(
+            "c3_matrix_isolated_live_return", source_path
+        )
+        assert spec is not None and spec.loader is not None
+        fresh = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(fresh)
         try:
             for name in FORBIDDEN_MINT_NAMES:
-                assert not hasattr(reloaded, name), name
-            assert reloaded.LOCAL_LIVE_RETURN_AUTHORITY_DECOMMISSIONED is True
-            with reloaded.open_live_provider_return_window(
+                assert not hasattr(fresh, name), name
+            assert fresh.LOCAL_LIVE_RETURN_AUTHORITY_DECOMMISSIONED is True
+            with fresh.open_live_provider_return_window(
                 attempt_id=c.attempt_id
             ) as window:
-                reloaded.register_handler_return(window, c.forged)
-            assert reloaded.live_return_authority_snapshot()["open_windows"] == 0
+                fresh.register_handler_return(window, c.forged)
+                assert isinstance(window, fresh.LiveProviderReturnWindow)
+            assert fresh.live_return_authority_snapshot()["open_windows"] == 0
+            assert fresh.live_return_authority_snapshot()["trust_conferred"] is False
+            # The freshly executed copy is a DIFFERENT class object, which is the
+            # point: even a caller who manufactures its own module copy holds an
+            # authority that Core never consults.
+            assert fresh.LiveProviderReturnWindow is not LiveProviderReturnWindow
         finally:
-            importlib.reload(reloaded)
+            # Executing an isolated copy must leave global import state untouched.
+            assert "c3_matrix_isolated_live_return" not in sys.modules
+            assert sys.modules["aios_core.runtime.live_return"] is live_return_module
         c.attach(c.bogus_proof())
 
     return _attack_outcome(attack)

@@ -30,4 +30,4 @@ tests/integration/test_core_background_late_trusted_return_corrective_003_c3_mat
 tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-13-store-runtime-graph] PASSED [ 96%]
 tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-3-01-verifier-less-in-doubt] PASSED [100%]
 
-============================== 28 passed in 3.37s ==============================
+============================== 28 passed in 4.68s ==============================
