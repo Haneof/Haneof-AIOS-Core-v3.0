@@ -33,6 +33,10 @@ from aios_core.query.search import WorldSearchIndex
 from aios_core.runtime import BackgroundModelExecutionInDoubt, ModelDirective
 from aios_core.runtime.background_attempt import encode_model_directive
 from aios_core.runtime.capabilities import CapabilityCall
+from aios_core.runtime.live_return import (
+    open_live_provider_return_window,
+    register_handler_return,
+)
 from aios_core.runtime.cognitive_runtime import ModelCallProvenance, ModelUsage
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
@@ -121,6 +125,32 @@ def _attempt(runtime, *, work_kind: str, work_id: str, round_index: int = 0):
     )
 
 
+def capture_live_provider_return(attempts, attempt_id, *, captured_at, directive):
+    """Exercise the real live provider-return authority.
+
+    Corrective-002 history note (Window 19).  This file previously simulated the
+    trusted relay return by calling
+    ``BackgroundModelAttemptStore._capture_trusted_response_return`` directly.
+    Window 17 `BLK-W17-001` proved that helper was a recovery-reachable minting
+    oracle (any caller with bytes plus an attempt id could mint a durable trusted
+    receipt and handoff), so it was removed.  The helper below opens the same
+    ephemeral window the production model-call frame opens, registers the exact
+    handler-returned object, and then uses the production writer.  The recovery
+    assertions that follow are unchanged and strictly stronger: the receipt can
+    now only exist because a live provider return actually happened, or because a
+    genuine external RSA proof was verified.
+    """
+
+    with open_live_provider_return_window(attempt_id=attempt_id) as window:
+        register_handler_return(window, directive)
+        return attempts.record_live_provider_return(
+            attempt_id,
+            captured_at=captured_at,
+            directive=directive,
+            live_window=window,
+        )
+
+
 def _stage(
     runtime,
     *,
@@ -141,8 +171,14 @@ def _stage(
             round_index=round_index,
         )
         assert attempt is not None
-        # Test-only simulation of the trusted provider/relay return boundary.
-        receipt = runtime.background_model_attempts._capture_trusted_response_return(
+        # Test-only simulation of the trusted provider/relay return boundary,
+        # now through the real ephemeral live-return authority.  The historical
+        # expectation here was that a private capture helper could be invoked
+        # freely; Window 17 `BLK-W17-001` showed that was a recovery-reachable
+        # minting oracle, so this probe now drives (and is constrained by) the
+        # same authority the production provider-return boundary uses.
+        receipt = capture_live_provider_return(
+            runtime.background_model_attempts,
             attempt.attempt_id,
             captured_at=NOW + timedelta(minutes=1),
             directive=directive,

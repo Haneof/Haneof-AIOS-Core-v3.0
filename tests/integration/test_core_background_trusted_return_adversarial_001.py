@@ -13,7 +13,12 @@ import pytest
 
 from aios_core.runtime import TurnExecutionInDoubt, TurnAlreadyCompleted
 from aios_core.runtime.background_attempt import (
-    BackgroundModelResponseConflict, encode_model_directive,
+    BackgroundModelResponseConflict, BackgroundModelAttemptStore,
+    encode_model_directive,
+)
+from aios_core.runtime.live_return import (
+    LiveReturnAuthorityError, open_live_provider_return_window,
+    register_handler_return,
 )
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from test_core_background_trusted_return_recovery_001 import (
@@ -27,6 +32,28 @@ def restart(db):
         store=store, index=index,
         model_handler=lambda _snapshot: pytest.fail("no redispatch on untrusted handoff"),
     )
+
+
+def capture_live_provider_return(attempts_name, attempt_id, *, captured_at, directive):
+    """Exercise the real live provider-return authority.
+
+    Corrective-002 history note (Window 19).  This file previously called
+    ``BackgroundModelAttemptStore._capture_trusted_response_return`` directly to
+    simulate the relay return.  Window 17 `BLK-W17-001` established that such a
+    helper is a recovery-reachable minting oracle, so it was removed.  Opening
+    the live window and registering the handler-returned object is what the
+    production model-call frame does, so these assertions now cover the real
+    authority path rather than a private bypass.
+    """
+
+    with open_live_provider_return_window(attempt_id=attempt_id) as window:
+        register_handler_return(window, directive)
+        return attempts_name.record_live_provider_return(
+            attempt_id,
+            captured_at=captured_at,
+            directive=directive,
+            live_window=window,
+        )
 
 
 def resume(runtime):
@@ -106,12 +133,14 @@ def test_same_bytes_repeated_return_is_idempotent_but_conflicting_return_rejecte
     db, runtime, attempts, receipt, _ = crash_at_return(tmp_path, 1)
     target = attempts[-1].attempt_id
     original = directive(1)
-    again = runtime.background_model_attempts._capture_trusted_response_return(
-        target, captured_at=NOW + timedelta(seconds=1), directive=original)
+    again = capture_live_provider_return(
+        runtime.background_model_attempts, target,
+        captured_at=NOW + timedelta(seconds=1), directive=original)
     assert again == receipt
     with pytest.raises(BackgroundModelResponseConflict):
-        runtime.background_model_attempts._capture_trusted_response_return(
-            target, captured_at=NOW + timedelta(seconds=2),
+        capture_live_provider_return(
+            runtime.background_model_attempts, target,
+            captured_at=NOW + timedelta(seconds=2),
             directive=replace(directive(1), response="conflicting output"))
     assert restart(db).background_model_attempts.response_authenticity_receipt(target) == receipt
     assert resume(restart(db)).runtime.response == "finished once"
@@ -127,11 +156,25 @@ def test_return_before_dispatch_boundary_does_not_mint_evidence(tmp_path):
         subject_id="user_1", work_kind="user_turn", work_id="before-dispatch",
         wake_reason="user_interaction", model_round_index=0,
         world_revision=int(store.current_world_revision()), admitted_at=NOW)
+    # Corrective-002 (Window 19): the superseded expectation was that the private
+    # helper existed but refused this state.  The strictly stronger invariant is
+    # that no standalone mint helper exists at all, and that the production live
+    # writer still refuses an attempt that never crossed the provider boundary.
+    assert not hasattr(
+        runtime.background_model_attempts, "_capture_trusted_response_return"
+    )
     with pytest.raises(BackgroundModelResponseConflict, match="before the provider boundary"):
-        runtime.background_model_attempts._capture_trusted_response_return(
-            attempt.attempt_id, captured_at=NOW, directive=directive(0))
+        capture_live_provider_return(
+            runtime.background_model_attempts, attempt.attempt_id,
+            captured_at=NOW, directive=directive(0))
+    with pytest.raises(LiveReturnAuthorityError):
+        BackgroundModelAttemptStore.record_live_provider_return(
+            runtime.background_model_attempts, attempt.attempt_id,
+            captured_at=NOW, directive=directive(0), live_window=None)
     with sqlite3.connect(db) as conn:
         assert conn.execute("SELECT count(*) FROM background_model_return_handoffs WHERE attempt_id=?",
+                            (attempt.attempt_id,)).fetchone()[0] == 0
+        assert conn.execute("SELECT count(*) FROM background_model_response_receipts WHERE attempt_id=?",
                             (attempt.attempt_id,)).fetchone()[0] == 0
 
 
