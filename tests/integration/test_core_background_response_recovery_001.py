@@ -9,8 +9,8 @@ application boundary, then proves the smallest Core recovery mechanism:
 * capability side effects, assistant output and metering stay exactly-once;
 * missing, mismatched or unverifiable exact bytes stay fail-closed (in_doubt /
   blocked), never a retry and never a semantic reconstruction;
-* the normal provider path and the existing not_submitted retry semantics are
-  unchanged.
+* the normal provider path is unchanged, while a post-binding caller claim of
+  not_submitted stays fail-closed under the Corrective-001 Route-B contract.
 
 No Resident, no sealed fixture and no historical evidence is touched.
 """
@@ -1002,26 +1002,52 @@ def test_no_exact_response_can_be_staged_for_a_call_that_never_reached_provider(
         )
     assert runtime.background_model_attempts.staged_response(admitted.attempt_id) is None
 
-    # (b) definitely-not-submitted dispatch failure keeps the same refusal.
-    store2, index2, db2 = _world(tmp_path, name="not-submitted.db")
+    # (b) Once Core has durably marked dispatching + request binding, a typed
+    # adapter exception is no longer proof of non-submission. C4/C5 require the
+    # attempt to remain in_doubt and forbid a retry.
+    store2, index2, db2 = _world(tmp_path, name="post-binding-not-submitted.db")
 
-    def not_submitted(_snapshot):
+    def claimed_not_submitted(_snapshot):
         raise ModelDispatchNotSubmitted("socket failed before request write")
 
-    runtime2 = FusedTurnRuntime(store=store2, index=index2, model_handler=not_submitted)
-    signal2 = _emit_wake(runtime2, key="never-submitted")
-    with pytest.raises(ModelDispatchNotSubmitted):
+    runtime2 = FusedTurnRuntime(
+        store=store2, index=index2, model_handler=claimed_not_submitted
+    )
+    signal2 = _emit_wake(runtime2, key="post-binding-not-submitted")
+    with pytest.raises(BackgroundModelResponseConflict, match="caller booleans"):
         runtime2.run_wake(wake_ref=_wake_ref(signal2), now=NOW)
     refused = _wake_attempt(runtime2, signal2.wake_id, 0)
-    assert refused.state == "not_submitted"
-    assert refused.recovery_disposition == "safe_to_retry"
-    with pytest.raises(BackgroundModelResponseConflict, match="provider boundary"):
-        _stage(
-            runtime2,
+    assert refused.state == "in_doubt"
+    assert refused.recovery_disposition == "in_doubt"
+    assert runtime2.background_model_attempts.outbound_request_binding(
+        refused.attempt_id
+    ) is not None
+
+    with pytest.raises(BackgroundModelExecutionInDoubt):
+        runtime2.run_wake(
+            wake_ref=_wake_ref(signal2), now=NOW + timedelta(minutes=1)
+        )
+    binding = runtime2.background_model_attempts.outbound_request_binding(
+        refused.attempt_id
+    )
+    assert binding is not None
+    untrusted = _directive(binding.relay_id)
+    payload, fingerprint = _payload_and_fingerprint(runtime2, untrusted)
+    with pytest.raises(
+        BackgroundModelResponseConflict, match="authenticity proof is missing"
+    ):
+        runtime2.stage_exact_background_response(
             work_kind="wake",
             work_id=signal2.wake_id,
             model_round_index=0,
-            directive=_directive("req-never-submitted"),
+            provider=PROVIDER,
+            model=MODEL,
+            provider_request_id=binding.relay_id,
+            response_fingerprint=fingerprint,
+            directive_payload=payload,
+            staged_at=NOW + timedelta(minutes=2),
+            evidence="caller bytes without a trusted return",
+            authenticity_proof=None,
         )
     assert runtime2.background_model_attempts.staged_response(refused.attempt_id) is None
 
@@ -1251,7 +1277,7 @@ def test_user_turn_exact_response_recovery_is_exactly_once(tmp_path):
 # ---------------------------------------------------------------------------
 
 
-def test_case_10_normal_path_and_not_submitted_retry_regression(tmp_path):
+def test_case_10_normal_path_and_post_binding_fail_closed_regression(tmp_path):
     store, index, db = _world(tmp_path)
     calls: list[str | None] = []
 
@@ -1271,38 +1297,43 @@ def test_case_10_normal_path_and_not_submitted_retry_regression(tmp_path):
     assert runtime.background_model_attempts.staged_response(normal_attempt.attempt_id) is None
     assert len(runtime.metering.list_model_calls(subject_id="user_1", wake_id=signal.wake_id)) == 1
 
-    # not_submitted keeps its safe-retry semantics on the same attempt identity.
+    # Route-B replacement for the retired post-binding not_submitted retry:
+    # the first request identity is durable before the handler runs, so a typed
+    # exception cannot unlock a second provider call or second request identity.
     store2, index2, db2 = _world(tmp_path, name="retry.db")
     retry_calls: list[str | None] = []
 
     def flaky(snapshot):
         retry_calls.append(snapshot.model_attempt_id)
-        if len(retry_calls) == 1:
-            raise ModelDispatchNotSubmitted("socket failed before request write")
-        return _directive("req-retry-after-not-submitted")
+        raise ModelDispatchNotSubmitted("socket failed before request write")
 
     retry_runtime = FusedTurnRuntime(store=store2, index=index2, model_handler=flaky)
     retry_signal = _emit_wake(retry_runtime, key="case-10-retry")
-    with pytest.raises(ModelDispatchNotSubmitted):
+    with pytest.raises(BackgroundModelResponseConflict, match="caller booleans"):
         retry_runtime.run_wake(wake_ref=_wake_ref(retry_signal), now=NOW)
-    not_submitted = _wake_attempt(retry_runtime, retry_signal.wake_id, 0)
-    assert not_submitted.state == "not_submitted"
-    assert not_submitted.recovery_disposition == "safe_to_retry"
-
-    retried = retry_runtime.run_wake(
-        wake_ref=_wake_ref(retry_signal), now=NOW + timedelta(minutes=1)
+    in_doubt = _wake_attempt(retry_runtime, retry_signal.wake_id, 0)
+    assert in_doubt.state == "in_doubt"
+    assert in_doubt.recovery_disposition == "in_doubt"
+    first_binding = retry_runtime.background_model_attempts.outbound_request_binding(
+        in_doubt.attempt_id
     )
-    assert retried.wake.state == "completed"
-    assert retried.runtime.recovered_response_attempts == ()
-    assert retry_calls == [not_submitted.attempt_id, not_submitted.attempt_id]
-    assert retry_runtime.background_model_attempts.get(not_submitted.attempt_id).state == "metered"
+    assert first_binding is not None
+
+    with pytest.raises(BackgroundModelExecutionInDoubt):
+        retry_runtime.run_wake(
+            wake_ref=_wake_ref(retry_signal), now=NOW + timedelta(minutes=1)
+        )
+    assert retry_calls == [in_doubt.attempt_id]
+    assert retry_runtime.background_model_attempts.outbound_request_binding(
+        in_doubt.attempt_id
+    ) == first_binding
     assert (
         len(
             retry_runtime.metering.list_model_calls(
                 subject_id="user_1", wake_id=retry_signal.wake_id
             )
         )
-        == 1
+        == 0
     )
 
     # Normal user turn and normal periodic review are unchanged.

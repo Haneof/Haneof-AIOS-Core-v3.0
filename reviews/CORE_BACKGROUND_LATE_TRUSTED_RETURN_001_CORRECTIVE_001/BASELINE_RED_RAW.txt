@@ -1,0 +1,36 @@
+candidate=5ad0524c425592210ff184e00ad52abb2c14e366
+review=84457badc562416f59fb25ca41103700276e0df2
+Python: 3.12.14
+Pydantic: 2.13.5
+pytest: 8.4.2
+SQLite: 3.45.1
+OpenSSL: OpenSSL 3.0.13 30 Jan 2024
+
+FAIL | IA14-ORACLE-001
+actual: CAPABILITY REISSUED and arbitrary bytes staged
+FAIL | IA14-NONCE-001
+actual: public db_path exposed nonce and arbitrary bytes staged
+PASS | IA14-ID-001
+FAIL | IA14-NS-001
+actual: mark_failure accepted caller boolean and wrote state=not_submitted
+PASS | IA14-JSON-001
+PASS | IA14-RACE-001
+PASS | IA14-SIGKILL-001
+SUMMARY | probes=7 failures=3
+
+S3 | stale capability across legal not_submitted retry with rotation
+S3b retried return outcome: REFUSED
+rotated-capability outcome: REFUSED
+cap2 is cap1 nonce: True
+SUMMARY | failures= 2
+
+PASS | S1-STALE-CAPABILITY-001
+PASS | S2-SCHEMA-001
+SUMMARY | probes=2 failures=0
+
+Exact frozen probe SHA-256:
+969112b3a13566e30d7cbd4af4e2ecc3299a1cdd9f0f1a62419ef5688d46f181  window14_independent_attack.py
+7c548aca54e22520417adc2841f21093995ded9c311b40915b9d7fc77297b39f  window14_s3_stale_capability_rotation.py
+d4f3a2ce4c465f16a568ebfdb42e48d42002890aba922c05f728d44768708ac6  window14_supplementary_probes.py
+8a3cfe9006225ff121fe2d9abbb90c5bad94b4f79acddbbc674fd499fc67b0c2  PROBE_CONTRACT.md
+198aebb41d47198c155a553bde00c78dac19d0bec4c7b7eae6178957a95c3b25  PROBE_REVISION_LOG.md
