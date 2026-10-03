@@ -52,7 +52,7 @@ the frozen Corrective-002 candidate `fec30bd1495017bf13f08b0ef5b1e241dfb0e247` a
 `INHERITED_OBSERVATION / NOT_NEW_W22_REGRESSION`. Corrective-003 did not receive scope to repair it.
 Fresh IA may independently determine whether it creates a new acceptance finding.
 
-## Unique next READY — WINDOW 23A
+## Unique next READY — WINDOW 22A
 
 `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-003-PUBLICATION-RECOVERY`
 
@@ -68,7 +68,7 @@ Purpose:
 5. obtain exact-head formal CPython 3.12.14 GitHub Actions results;
 6. stop at PM readiness if all formal gates are green.
 
-23A must not repair code, edit tests, amend/rebase/squash the candidate, merge the PR, perform Fresh
+22A must not repair code, edit tests, amend/rebase/squash the candidate, merge the PR, perform Fresh
 IA, enter RC-REFREEZE-004, or run any Resident.
 
 If the exact bundle bytes are unavailable to the publication window, it must stop:
@@ -77,7 +77,7 @@ If the exact bundle bytes are unavailable to the publication window, it must sto
 If the actual bundle hash/head/tree differs from the engineer-reported values above, it must stop:
 `PUBLICATION_ARTIFACT_IDENTITY_MISMATCH`.
 
-If publication requires changing candidate bytes or adding a commit to make CI pass, 23A must stop
+If publication requires changing candidate bytes or adding a commit to make CI pass, 22A must stop
 and return to corrective engineering; it must not silently create a new candidate.
 
 ## Release condition for Window 23 Fresh IA
