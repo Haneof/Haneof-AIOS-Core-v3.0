@@ -52,3 +52,16 @@ Publication constraints confirmed at every push: no file outside
 this review branch (`gh api .../pulls/311/files` → `0` files outside the review directory); the
 candidate branch was never pushed to, merged, rebased or force-pushed; PR #308 and PR #310 were
 never modified.
+
+## Appendix A — checksum-file correction (delivery commit 5)
+
+The formal comment transcript is recorded as `PR_COMMENT.md` with its digest in
+`PR_COMMENT.md.sha256` (checksum-only, so that `sha256sum -c` runs cleanly). The file was first
+published as `PR_COMMENT.sha256` with inline provenance text; `sha256sum -c` reported those prose
+lines as "improperly formatted". The digest itself is unchanged
+(`26d6f3f08d8c7be88ce5e315a63116f76692d98a898203ac707795ed67fec10f`) and the provenance is now
+this section: verbatim GitHub API body of comment id `5966444269` on PR #310, URL
+`https://github.com/Haneof/Haneof-AIOS-Core-v3.0/pull/310#issuecomment-5966444269`, created
+`2026-10-03T06:41:12Z`, author `Haneof`, fetched with
+`gh api repos/Haneof/Haneof-AIOS-Core-v3.0/issues/comments/5966444269` then JSON-decoded (no
+transcription by hand).
