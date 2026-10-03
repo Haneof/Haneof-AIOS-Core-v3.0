@@ -999,6 +999,7 @@ jobs:
       - name: Forbidden paths must be untouched (out_of_scope = 0, forbidden_paths = 0)
         run: |
           set -euo pipefail
+          : > /tmp/scope_guard.txt
           FORBIDDEN=(
             "^A[[:space:]]+.gitignore$"
             "^M[[:space:]]+.gitignore$"
@@ -1018,7 +1019,7 @@ jobs:
             fi
           done
           test "${violations}" -eq 0 || { echo "SCOPE_VIOLATION count=${violations}"; exit 1; }
-          echo "FORBIDDEN_PATHS=0" | tee -a "$GITHUB_ENV"
+          echo "FORBIDDEN_PATHS=0" | tee -a "$GITHUB_ENV" | tee -a /tmp/scope_guard.txt
       - name: Historical reviewer probe bytes must be unchanged
         run: |
           set -euo pipefail
@@ -1036,14 +1037,14 @@ jobs:
             test -n "${blob}"
             test "$(git cat-file blob "${blob}" | sha256sum | awk '{print $1}')" = "${expected}"
           done
-          echo "REVIEWER_PROBE_BYTES_UNCHANGED=TRUE" | tee -a "$GITHUB_ENV"
+          echo "REVIEWER_PROBE_BYTES_UNCHANGED=TRUE" | tee -a "$GITHUB_ENV" | tee -a /tmp/scope_guard.txt
       - name: No build artifacts in the tracked tree
         run: |
           set -euo pipefail
           if git ls-files | grep -E '(__pycache__/|\.pyc$|\.egg-info/|(^|/)\.pytest_cache/|(^|/)build/|(^|/)dist/)'; then
             echo "BUILD_ARTIFACTS_TRACKED"; exit 1
           fi
-          echo "BUILD_ARTIFACTS_TRACKED=0" | tee -a "$GITHUB_ENV"
+          echo "BUILD_ARTIFACTS_TRACKED=0" | tee -a "$GITHUB_ENV" | tee -a /tmp/scope_guard.txt
       - name: Route B identity guard - no local mint authority may exist in source
         run: |
           set -euo pipefail
@@ -1065,12 +1066,26 @@ jobs:
           test -f src/aios_core/runtime/live_return.py
           grep -q "^LOCAL_LIVE_RETURN_AUTHORITY_DECOMMISSIONED = True$" \
             src/aios_core/runtime/live_return.py
-          echo "ROUTE_B_DEFINITIONS_ASSIGNMENTS_IMPORTS=0" | tee -a "$GITHUB_ENV"
+          echo "ROUTE_B_DEFINITIONS_ASSIGNMENTS_IMPORTS=0" | tee -a "$GITHUB_ENV" | tee -a /tmp/scope_guard.txt
       - name: Route B identity guard - semantic attribute check on the tombstone
         run: |
           set -euo pipefail
-          PYTHONPATH=src python - <<'PY' | tee -a /tmp/scope_diff.txt
-          import importlib
+          # This job installs no dependencies on purpose (it is a pure source/scope
+          # guard), so the tombstone is loaded in ISOLATION through
+          # spec_from_file_location instead of importing the package: importing
+          # `aios_core.runtime.live_return` would execute `aios_core/runtime/__init__.py`
+          # and therefore require pydantic. live_return.py imports only the standard
+          # library, so the isolated load is exact and dependency-free.
+          python3 - <<'PY' 2>&1 | tee -a /tmp/scope_guard.txt
+          import importlib.util
+          import pathlib
+
+          path = pathlib.Path("src/aios_core/runtime/live_return.py")
+          spec = importlib.util.spec_from_file_location("route_b_tombstone_guard", path)
+          assert spec is not None and spec.loader is not None
+          tombstone = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(tombstone)
+
           forbidden = (
               "record_live_provider_return",
               "_capture_trusted_response_return",
@@ -1082,20 +1097,28 @@ jobs:
               "model_response_authenticator",
               "_live_provider_return_window",
           )
-          live_return = importlib.import_module("aios_core.runtime.live_return")
-          found = sorted(name for name in forbidden if hasattr(live_return, name))
+          found = sorted(name for name in forbidden if hasattr(tombstone, name))
           print("tombstone_forbidden_attributes=", found)
           if found:
               raise SystemExit("TRUST_AUTHORITY_STILL_CALLER_MANUFACTURABLE")
-          if getattr(live_return, "LOCAL_LIVE_RETURN_AUTHORITY_DECOMMISSIONED", False) is not True:
-              raise SystemExit("TOMBSTONE_MARKER_NOT_TRUE")
-          snapshot = live_return.live_return_authority_snapshot()
-          print("snapshot=", dict(snapshot))
-          if snapshot["trust_conferred"] is not False or snapshot["armed_on_this_stack"] is not False:
+
+          if getattr(tombstone, "LOCAL_LIVE_RETURN_AUTHORITY_DECOMMISSIONED", False) is not True:
+              raise SystemExit("TOMBSTONE_DECOMMISSION_MARKER_NOT_TRUE")
+
+          snapshot = dict(tombstone.live_return_authority_snapshot())
+          print("tombstone_snapshot=", snapshot)
+          if snapshot["trust_conferred"] is not False:
               raise SystemExit("TOMBSTONE_STILL_CONFEYS_TRUST")
-          window = live_return.LiveProviderReturnWindow
-          for attribute in ("_issue", "__reduce__"):
-              pass
+          if snapshot["armed_on_this_stack"] is not False:
+              raise SystemExit("TOMBSTONE_STILL_ARMS_ON_STACK")
+          if snapshot["open_windows"] != 0 or snapshot["pending_handler_returns"] != 0:
+              raise SystemExit("TOMBSTONE_STILL_HAS_A_REGISTRY")
+          if snapshot["durable_trusted_return_authority"] != (
+              "external_verifier_plus_genuine_proof_only"
+          ):
+              raise SystemExit("TOMBSTONE_DOES_NOT_DECLARE_ROUTE_B")
+
+          window = tombstone.LiveProviderReturnWindow
           if hasattr(window, "_issue"):
               raise SystemExit("WINDOW_ISSUANCE_CLASSMETHOD_PRESENT")
           try:
@@ -1104,6 +1127,9 @@ jobs:
               print("window_ctor_refusal=", type(exc).__name__)
           else:
               raise SystemExit("WINDOW_CTOR_SUCCEEDED")
+          for hook in ("__copy__", "__deepcopy__", "__reduce__", "__reduce_ex__", "__getstate__"):
+              if not hasattr(window, hook):
+                  raise SystemExit(f"WINDOW_{hook.upper()}_GUARD_MISSING")
           print("ROUTE_B_SEMANTIC_GUARD=PASS")
           PY
       - name: Route B identity guard - no Core authorization module imports the tombstone
@@ -1116,7 +1142,7 @@ jobs:
                src/aios_core/runtime/late_return.py ; then
             echo "TOMBSTONE_MODULE_STILL_CONSULTED_BY_CORE"; exit 1
           fi
-          echo "ROUTE_B_TOMBSTONE_NOT_CONSULTED=TRUE" | tee -a "$GITHUB_ENV"
+          echo "ROUTE_B_TOMBSTONE_NOT_CONSULTED=TRUE" | tee -a "$GITHUB_ENV" | tee -a /tmp/scope_guard.txt
       - name: Only in-scope areas were touched
         run: |
           set -euo pipefail
@@ -1124,14 +1150,14 @@ jobs:
           if grep -v '^IN_SCOPE:' /tmp/scope_classified.txt | sort -u | tee /tmp/scope_outliers.txt | grep -q .; then
             echo "OUT_OF_SCOPE_PATHS:"; cat /tmp/scope_outliers.txt; exit 1
           fi
-          echo "OUT_OF_SCOPE=0" | tee -a "$GITHUB_ENV"
+          echo "OUT_OF_SCOPE=0" | tee -a "$GITHUB_ENV" | tee -a /tmp/scope_guard.txt
       - name: Publish this job's verdict and diagnostics as a commit comment
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JOB_LABEL: "scope-discipline-and-identity-guard"
           JOB_STATUS: "${{ job.status }}"
-          DIAG_FILES: "/tmp/scope_diff.txt /tmp/scope_classified.txt"
+          DIAG_FILES: "/tmp/scope_guard.txt /tmp/scope_diff.txt /tmp/scope_classified.txt"
         run: |
           set -uo pipefail
           body=/tmp/diag_body.md
@@ -1168,6 +1194,7 @@ jobs:
         with:
           name: scope-and-identity-guard
           path: |
+            /tmp/scope_guard.txt
             /tmp/scope_diff.txt
             /tmp/scope_classified.txt
           if-no-files-found: error
