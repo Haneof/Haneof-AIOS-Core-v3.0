@@ -1,5 +1,14 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-10-03 — WINDOW 22 local engineering complete / WINDOW 23A Publication Recovery READY
+
+- Window 22 = `ENGINEERING_COMPLETE_PENDING_PUBLICATION / GITHUB_PUBLICATION_BLOCKED`; no REVIEW_READY state granted.
+- Local candidate identity reported by engineering: head `39917591f07c2ed1aa679f9098c1fc368c3af42e`, tree `fe17c59c71874423ec7a77cfb4d33b4ffb3e2e64`, base `65e1078500eb2b2cf85c5d88a3773c1b8e49fa36`.
+- Bundle SHA-256 reported as `02e9031e6b9b85328c5151f9e16f8fbbdb09f9ec6d4304c40deb72499d26e238`; actual bytes are not yet PM-verified.
+- Unique next = WINDOW 23A publication recovery. It must import/verify the exact bundle, publish the same exact candidate, open a new PR and obtain exact-head formal 3.12.14 CI. It may not modify the candidate or perform IA/merge.
+- Window 23 Fresh IA remains BLOCKED.
+
+
 ## 2026-10-03 — WINDOW 22 PM scope/publication clarification
 
 - Window 22 Corrective-003 remains active local engineering; no acceptance/readiness state granted.
