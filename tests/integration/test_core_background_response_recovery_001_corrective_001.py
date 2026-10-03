@@ -33,14 +33,14 @@ from aios_core.query.search import WorldSearchIndex
 from aios_core.runtime import BackgroundModelExecutionInDoubt, ModelDirective
 from aios_core.runtime.background_attempt import encode_model_directive
 from aios_core.runtime.capabilities import CapabilityCall
-from aios_core.runtime.live_return import (
-    open_live_provider_return_window,
-    register_handler_return,
-)
+from aios_core.runtime.late_return import LateReturnSigningContext
 from aios_core.runtime.cognitive_runtime import ModelCallProvenance, ModelUsage
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.wake import WakeSignalRequest
+from test_core_background_trusted_return_recovery_001 import (
+    RouteBExternalSigner, route_b_verifier,
+)
 
 
 NOW = datetime(2026, 9, 26, 8, 0, tzinfo=timezone.utc)
@@ -125,30 +125,74 @@ def _attempt(runtime, *, work_kind: str, work_id: str, round_index: int = 0):
     )
 
 
-def capture_live_provider_return(attempts, attempt_id, *, captured_at, directive):
-    """Exercise the real live provider-return authority.
+# ---------------------------------------------------------------------------
+# Route B external authority (Corrective-003 / Window 22-RERUN-001).
+#
+# TIGHTEN_ONLY history.  This file used to simulate the trusted relay return with
+# ``capture_live_provider_return``, which opened the ephemeral live provider-return
+# window and called ``BackgroundModelAttemptStore.record_live_provider_return``.
+# Window 20 `BLK-W20-001`
+# (``RECOVERY_CALLER_TRUSTED_RETURN_MINT_ORACLE_VIA_SELF_ISSUED_EPHEMERAL_WINDOW``,
+# root cause ``TRUST_AUTHORITY_ISSUANCE_REMAINS_CALLER_MANUFACTURABLE``) proved that
+# window issuance was an ordinary public function, so any process-local recovery
+# caller could self-issue a window, declare its own bytes handler-returned and mint
+# a durable trusted receipt + handoff.  Route B removes that writer entirely.
+#
+# The replacement is the only remaining route to durable trusted return: an external
+# verifier bound before the provider boundary plus a genuine external RSA signature
+# over Core's durable request binding.  The private exponent is TEST-ONLY material
+# owned by the simulated external side; Core persists only the public verifier.
+# ---------------------------------------------------------------------------
 
-    Corrective-002 history note (Window 19).  This file previously simulated the
-    trusted relay return by calling
-    ``BackgroundModelAttemptStore._capture_trusted_response_return`` directly.
-    Window 17 `BLK-W17-001` proved that helper was a recovery-reachable minting
-    oracle (any caller with bytes plus an attempt id could mint a durable trusted
-    receipt and handoff), so it was removed.  The helper below opens the same
-    ephemeral window the production model-call frame opens, registers the exact
-    handler-returned object, and then uses the production writer.  The recovery
-    assertions that follow are unchanged and strictly stronger: the receipt can
-    now only exist because a live provider return actually happened, or because a
-    genuine external RSA proof was verified.
-    """
+_SIGNERS: dict[str, RouteBExternalSigner] = {}
 
-    with open_live_provider_return_window(attempt_id=attempt_id) as window:
-        register_handler_return(window, directive)
-        return attempts.record_live_provider_return(
-            attempt_id,
-            captured_at=captured_at,
-            directive=directive,
-            live_window=window,
-        )
+
+def _route_b_runtime(**kwargs):
+    """Construct a runtime with the Route B external authority bound."""
+
+    signer = RouteBExternalSigner()
+    kwargs.setdefault("late_return_verifier", route_b_verifier())
+    kwargs.setdefault("external_return_observer", signer)
+    runtime = FusedTurnRuntime(**kwargs)
+    _SIGNERS[str(runtime.store.db_path)] = signer
+    return runtime
+
+
+def _external_signing_context(runtime, attempt_id):
+    """Rebuild the public signing scope Core persisted before dispatch."""
+
+    attempts = runtime.background_model_attempts
+    attempt = attempts.get(attempt_id)
+    binding = attempts.outbound_request_binding(attempt_id)
+    assert binding is not None, "no durable pre-dispatch binding to sign against"
+    return LateReturnSigningContext(
+        attempt_id=attempt.attempt_id,
+        subject_id=attempt.subject_id,
+        work_kind=attempt.work_kind,
+        work_id=attempt.work_id,
+        model_round_index=attempt.model_round_index,
+        outbound_request_fingerprint=binding.outbound_request_fingerprint,
+        relay_id=binding.relay_id,
+        verifier_key_id=route_b_verifier().key_id,
+    )
+
+
+def attach_external_trusted_return(runtime, attempt_id, *, captured_at, directive):
+    """Produce a durable trusted receipt the only way Route B allows."""
+
+    attempts = runtime.background_model_attempts
+    signer = _SIGNERS[str(runtime.store.db_path)]
+    signer.contexts.setdefault(
+        attempt_id, _external_signing_context(runtime, attempt_id)
+    )
+    attempts.attach_late_trusted_return(
+        attempt_id,
+        attached_at=captured_at,
+        directive_payload=encode_model_directive(directive),
+        late_return_proof=signer.proof(attempt_id, directive),
+        evidence="genuine external Route B relay return",
+    )
+    return attempts.response_authenticity_receipt(attempt_id)
 
 
 def _stage(
@@ -171,18 +215,20 @@ def _stage(
             round_index=round_index,
         )
         assert attempt is not None
-        # Test-only simulation of the trusted provider/relay return boundary,
-        # now through the real ephemeral live-return authority.  The historical
-        # expectation here was that a private capture helper could be invoked
-        # freely; Window 17 `BLK-W17-001` showed that was a recovery-reachable
-        # minting oracle, so this probe now drives (and is constrained by) the
-        # same authority the production provider-return boundary uses.
-        receipt = capture_live_provider_return(
-            runtime.background_model_attempts,
+        # Route B: the trusted provider/relay return boundary is now a genuine
+        # external signature over Core's durable pre-dispatch request binding.  The
+        # historical expectation here was that a private capture helper could be
+        # invoked freely (Window 17 `BLK-W17-001`), and then that a self-issued
+        # ephemeral window could do the same (Window 20 `BLK-W20-001`); both were
+        # recovery-reachable minting oracles and both are gone, so this probe now
+        # drives -- and is constrained by -- real external proof.
+        receipt = attach_external_trusted_return(
+            runtime,
             attempt.attempt_id,
             captured_at=NOW + timedelta(minutes=1),
             directive=directive,
         )
+        assert receipt is not None
         authenticity_proof = receipt.authenticity_proof
     return runtime.stage_exact_background_response(
         work_kind=work_kind,
@@ -254,7 +300,7 @@ def _running_review_id(store: SQLiteWorldStore, *, subject_id: str) -> str:
 
 def test_blk001_cross_work_transplant_rejected_before_provenance_rewrite(tmp_path):
     store, index, _db = _world(tmp_path)
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: None)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=lambda _s: None)
     _crash_wake(runtime, key="work-a")
     signal_b, calls_b = _crash_wake(runtime, key="work-b")
     attempt_b = _attempt(runtime, work_kind="wake", work_id=signal_b.wake_id)
@@ -280,7 +326,7 @@ def test_blk001_copied_token_with_copied_response_still_rejected(tmp_path):
     """Copying A's request identity together with A's bytes must not admit B."""
 
     store, index, _db = _world(tmp_path)
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: None)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=lambda _s: None)
     _crash_wake(runtime, key="token-a")
     signal_b, _calls = _crash_wake(runtime, key="token-b")
     attempt_b = _attempt(runtime, work_kind="wake", work_id=signal_b.wake_id)
@@ -307,7 +353,7 @@ def test_blk001_wake_to_periodic_review_transplant_rejected(tmp_path):
     store, index, _db = _world(tmp_path)
     _seed_review_fact(store)
     index.catch_up()
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: None)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=lambda _s: None)
     _crash_wake(runtime, key="wake-source")
 
     def ambiguous(_snapshot):
@@ -336,7 +382,7 @@ def test_blk001_periodic_review_to_user_turn_transplant_rejected(tmp_path):
     store, index, _db = _world(tmp_path)
     _seed_review_fact(store)
     index.catch_up()
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: None)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=lambda _s: None)
 
     def ambiguous(_snapshot):
         raise TimeoutError("provider may already have accepted the request")
@@ -381,10 +427,10 @@ def test_blk001_periodic_review_to_user_turn_transplant_rejected(tmp_path):
 
 def test_blk001_cross_subject_transplant_rejected(tmp_path):
     store, index, _db = _world(tmp_path)
-    runtime_a = FusedTurnRuntime(
+    runtime_a = _route_b_runtime(
         store=store, index=index, subject_id="subject_a", model_handler=lambda _s: None
     )
-    runtime_b = FusedTurnRuntime(
+    runtime_b = _route_b_runtime(
         store=store, index=index, subject_id="subject_b", model_handler=lambda _s: None
     )
     _crash_wake(runtime_a, key="subject-a")
@@ -425,7 +471,7 @@ def test_blk001_cross_round_transplant_rejected(tmp_path):
             return round_0
         raise TimeoutError("round 1 died after provider dispatch")
 
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=scripted)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=scripted)
     signal = runtime.wake_bus.emit(
         WakeSignalRequest(
             wake_source=WakeSource.SAFETY,
@@ -465,7 +511,7 @@ def test_blk001_cross_round_transplant_rejected(tmp_path):
 
 def test_blk001_identical_provider_model_transplant_rejected(tmp_path):
     store, index, _db = _world(tmp_path)
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: None)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=lambda _s: None)
     _crash_wake(runtime, key="same-meta-a")
     signal_b, _calls = _crash_wake(runtime, key="same-meta-b")
     attempt_b = _attempt(runtime, work_kind="wake", work_id=signal_b.wake_id)
@@ -595,7 +641,7 @@ def test_blk002_duplicate_json_keys_rejected_before_semantic_construction(
     tmp_path, label, payload_factory, normalized_request_id
 ):
     store, index, _db = _world(tmp_path, name=f"{label}.db")
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: None)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=lambda _s: None)
     signal, _calls = _crash_wake(runtime, key=label)
     attempt = _attempt(runtime, work_kind="wake", work_id=signal.wake_id)
     revision = int(store.current_world_revision())
@@ -655,7 +701,7 @@ def test_blk001_binding_is_durable_before_provider_handler_runs(tmp_path):
         seen["relay_id"] = snapshot.outbound_relay_id
         raise TimeoutError("provider may already have accepted the request")
 
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=observe)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=observe)
     signal = runtime.wake_bus.emit(
         WakeSignalRequest(
             wake_source=WakeSource.SAFETY,
@@ -678,7 +724,7 @@ def test_blk001_binding_is_durable_before_provider_handler_runs(tmp_path):
 
 def test_blk001_same_attempt_correct_binding_recovers_with_zero_provider_calls(tmp_path):
     store, index, db = _world(tmp_path)
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: None)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=lambda _s: None)
     signal, calls = _crash_wake(runtime, key="positive-same-attempt")
     attempt = _attempt(runtime, work_kind="wake", work_id=signal.wake_id)
     binding = runtime.background_model_attempts.outbound_request_binding(
@@ -717,7 +763,7 @@ def test_blk001_same_attempt_correct_binding_recovers_with_zero_provider_calls(t
         pytest.fail("recovered round must not redispatch the provider")
 
     reopened_store, reopened_index = _reopen(db)
-    restarted = FusedTurnRuntime(
+    restarted = _route_b_runtime(
         store=reopened_store, index=reopened_index, model_handler=must_not_call
     )
     result = restarted.run_wake(
@@ -749,7 +795,7 @@ def _child_stage_exact_then_sigkill(db_path: str) -> None:
     store = SQLiteWorldStore(db_path)
     index = WorldSearchIndex(db_path, store=store)
     index.rebuild()
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: None)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=lambda _s: None)
     signal, _calls = _crash_wake(runtime, key="sigkill-staged")
     attempt = _attempt(runtime, work_kind="wake", work_id=signal.wake_id)
     binding = runtime.background_model_attempts.outbound_request_binding(
@@ -821,7 +867,7 @@ def _child_capability_then_sigkill(db_path: str) -> None:
             return directive
         raise AssertionError("process must die during capability application")
 
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=scripted)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=scripted)
     signal = runtime.wake_bus.emit(
         WakeSignalRequest(
             wake_source=WakeSource.SAFETY,
@@ -859,7 +905,7 @@ def test_process_sigkill_after_exact_response_staged_recovers_with_zero_provider
         recovery_calls.append(snapshot.round_index)
         pytest.fail("provider must not be called after SIGKILL recovery")
 
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=must_not_call)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=must_not_call)
     running = [
         payload
         for payload in store.list_payloads(
@@ -909,7 +955,7 @@ def test_process_sigkill_after_capability_side_effect_replays_exactly_once(tmp_p
         recovery_calls.append(snapshot.round_index)
         return _directive("req-after-kill-next", silence=True)
 
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=provider)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=provider)
     running = [
         payload
         for payload in store.list_payloads(

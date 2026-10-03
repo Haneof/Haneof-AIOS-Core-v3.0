@@ -1,8 +1,49 @@
-"""Positive and tamper coverage for CORRECTIVE-002 trusted-return receipts.
+"""Positive and tamper coverage for trusted-return receipts (Route B).
 
 The frozen red-first exploit probes live in the adjacent ``*_authenticity.py`` file.
-This file exercises the new trusted boundary itself: receipt durability before the
+This file exercises the trusted boundary itself: receipt durability ahead of the
 ordinary response recorder, restart recovery, exact replay, and proof revalidation.
+
+TIGHTEN_ONLY history (Corrective-003 / Window 22-RERUN-001).
+
+Old expectation
+    ``_crash_after_trusted_receipt`` asserted that, at the moment the ordinary
+    response recorder was entered, a durable ``background_model_response_receipts``
+    row ALREADY existed -- i.e. that the *live local handler return had minted its
+    own trusted receipt* before response provenance was recorded -- and every later
+    recovery/tamper assertion was built on that self-minted receipt.
+
+Old authority mechanism
+    ``BackgroundModelAttemptStore.record_live_provider_return`` behind
+    ``live_return.open_live_provider_return_window`` / ``register_handler_return``
+    (and, before Corrective-002, the private ``_capture_trusted_response_return``).
+
+Why that mechanism is unsafe (BLK-W20-001)
+    ``RECOVERY_CALLER_TRUSTED_RETURN_MINT_ORACLE_VIA_SELF_ISSUED_EPHEMERAL_WINDOW``
+    / root cause ``TRUST_AUTHORITY_ISSUANCE_REMAINS_CALLER_MANUFACTURABLE``: window
+    issuance was an ordinary public function, so any process-local recovery caller
+    could self-issue a window, declare its own bytes handler-returned and mint the
+    very receipt this file treated as proof of authenticity.
+
+Replacement route
+    Route B.  The live local return now mints nothing, and that absence is asserted
+    explicitly at the crash point (strictly stronger than before: it pins that no
+    local authority can produce a receipt at all).  The receipt is then produced the
+    only legitimate way -- a genuine external RSA signature over Core's durable
+    pre-dispatch request binding, verified with public material only and attached
+    through ``BackgroundModelAttemptStore.attach_late_trusted_return``.  Because the
+    binding row is itself durable, that proof survives a real SIGKILL and can be
+    produced by a fresh process.
+
+Deleted / kept / equal-or-stronger
+    Deleted: "a receipt exists because a local return happened".
+    Added: "no receipt exists until a genuine external proof is verified", plus the
+    same durability-ahead-of-application property now anchored on real external
+    proof.
+    Kept unchanged: restart recovery with zero provider redispatch, exactly-once
+    metering, exact-byte replay, all five tamper mutations, both durable-proof
+    revalidation tamper targets, the real multi-process SIGKILL, and every
+    World-revision / no-metering fail-closed assertion.
 """
 
 from __future__ import annotations
@@ -26,6 +67,9 @@ from aios_core.runtime.background_attempt import (
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.wake import WakeSignalRequest
+from test_core_background_response_recovery_001 import (
+    _route_b_runtime, attach_external_trusted_return,
+)
 
 
 NOW = datetime(2026, 9, 27, 10, 0, tzinfo=timezone.utc)
@@ -95,7 +139,7 @@ def _wake_ref(signal) -> ObjectRef:
 def _crash_after_trusted_receipt(tmp_path, *, key: str):
     store, index, db = _world(tmp_path)
     exact = _directive(f"provider-request-{key}")
-    runtime = FusedTurnRuntime(
+    runtime = _route_b_runtime(
         store=store,
         index=index,
         model_handler=lambda _snapshot: exact,
@@ -105,10 +149,15 @@ def _crash_after_trusted_receipt(tmp_path, *, key: str):
     def die_before_response_recording(snapshot, directive):
         assert directive is exact
         assert snapshot.model_attempt_id is not None
-        receipt = runtime.background_model_attempts.response_authenticity_receipt(
-            snapshot.model_attempt_id
+        # Route B: at this boundary the live local return has minted NOTHING.  The
+        # old assertion here was `receipt is not None`, which encoded the
+        # caller-manufacturable authority adjudicated unsafe by BLK-W20-001.
+        assert (
+            runtime.background_model_attempts.response_authenticity_receipt(
+                snapshot.model_attempt_id
+            )
+            is None
         )
-        assert receipt is not None
         raise _ProcessDeathAfterReceipt()
 
     runtime.cognitive_runtime.model_response_recorder = die_before_response_recording
@@ -131,10 +180,28 @@ def _crash_after_trusted_receipt(tmp_path, *, key: str):
     assert runtime.metering.list_model_calls(
         subject_id=runtime.subject_id, wake_id=signal.wake_id
     ) == ()
-    receipt = runtime.background_model_attempts.response_authenticity_receipt(
-        attempt.attempt_id
+    # Route B phase 1: with no external proof the attempt owns no trusted state and
+    # is permanently in doubt -- it can never be completed from local bytes.
+    assert (
+        runtime.background_model_attempts.response_authenticity_receipt(
+            attempt.attempt_id
+        )
+        is None
+    )
+    # Route B phase 2: the genuine external signature is the only route to a
+    # durable receipt, and it lands ahead of any response application or metering.
+    receipt = attach_external_trusted_return(
+        runtime,
+        attempt.attempt_id,
+        captured_at=NOW + timedelta(seconds=30),
+        directive=exact,
     )
     assert receipt is not None
+    assert runtime.metering.list_model_calls(
+        subject_id=runtime.subject_id, wake_id=signal.wake_id
+    ) == ()
+    attempt = runtime.background_model_attempts.get(attempt.attempt_id)
+    assert attempt.state == "response_returned"
     return store, index, db, runtime, signal, attempt, exact, receipt
 
 
@@ -171,7 +238,7 @@ def test_receipt_is_durable_before_response_recording_and_recovers_after_restart
         provider_calls.append(snapshot.round_index)
         pytest.fail("authenticated recovery must not redispatch the provider")
 
-    restarted = FusedTurnRuntime(
+    restarted = _route_b_runtime(
         store=reopened_store,
         index=reopened_index,
         model_handler=must_not_redispatch,
@@ -203,7 +270,7 @@ def _child_sigkill_after_receipt(db_path: str) -> None:
     index = WorldSearchIndex(db_path, store=store)
     index.rebuild()
     exact = _directive("provider-request-sigkill")
-    runtime = FusedTurnRuntime(
+    runtime = _route_b_runtime(
         store=store,
         index=index,
         model_handler=lambda _snapshot: exact,
@@ -256,17 +323,32 @@ def test_actual_sigkill_after_receipt_commit_recovers_without_provider_redispatc
         provider_calls.append(snapshot.round_index)
         pytest.fail("authenticated SIGKILL recovery must not redispatch")
 
-    runtime = FusedTurnRuntime(
+    runtime = _route_b_runtime(
         store=store,
         index=index,
         model_handler=must_not_redispatch,
     )
     attempt = runtime.background_model_attempts.get(attempt_id)
-    receipt = runtime.background_model_attempts.response_authenticity_receipt(attempt_id)
     assert attempt is not None
     assert attempt.state == "dispatching"
-    assert receipt is not None
+    # Route B: a real SIGKILL leaves no locally minted trusted state at all.
+    assert (
+        runtime.background_model_attempts.response_authenticity_receipt(attempt_id)
+        is None
+    )
+    assert runtime.background_model_attempts.staged_response(attempt_id) is None
     exact = _directive("provider-request-sigkill")
+    # The durable pre-dispatch request binding survived the kill, so a fresh process
+    # can still obtain a genuine external proof over it -- the only Route B route.
+    receipt = attach_external_trusted_return(
+        runtime,
+        attempt_id,
+        captured_at=NOW + timedelta(minutes=1),
+        directive=exact,
+    )
+    assert receipt is not None
+    attempt = runtime.background_model_attempts.get(attempt_id)
+    assert attempt.state == "response_returned"
     signal_ref = ObjectRef(
         object_id=wake_id,
         revision=int(running[0]["revision"]),
@@ -355,12 +437,20 @@ def test_tampered_return_bundle_is_rejected_before_provenance_or_metering(
 
     after = runtime.background_model_attempts.get(attempt.attempt_id)
     assert after is not None
-    assert after.state == "dispatching"
-    assert after.provider is None
-    assert after.model is None
-    assert after.provider_request_id is None
-    assert after.response_fingerprint is None
-    assert runtime.background_model_attempts.staged_response(attempt.attempt_id) is None
+    # Route B: the tampered bundle was rejected before it could touch provenance or
+    # metering.  Durable state is still exactly the genuinely externally-proven
+    # return -- never the tampered bytes and never the tampered identity.
+    assert after.state == "response_returned"
+    assert (after.provider, after.model, after.provider_request_id) == (
+        exact.provenance.provider, exact.provenance.model,
+        exact.provenance.request_id,
+    )
+    assert after.response_fingerprint == receipt.response_fingerprint
+    staged = runtime.background_model_attempts.staged_response(attempt.attempt_id)
+    assert staged is not None
+    assert staged.directive_payload == encode_model_directive(exact)
+    assert staged.payload_sha256 == receipt.payload_sha256
+    assert staged.authenticity_proof == receipt.authenticity_proof
     assert runtime.metering.list_model_calls(
         subject_id=runtime.subject_id, wake_id=signal.wake_id
     ) == ()
