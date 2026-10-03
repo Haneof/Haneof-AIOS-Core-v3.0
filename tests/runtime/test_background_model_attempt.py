@@ -4,6 +4,7 @@ import pytest
 
 from aios_core.runtime.background_attempt import (
     BackgroundModelAttemptStore,
+    BackgroundModelExecutionInDoubt,
     BackgroundModelResponseConflict,
     encode_model_directive,
 )
@@ -12,6 +13,10 @@ from aios_core.runtime.cognitive_runtime import (
     ModelDirective,
     ModelUsage,
 )
+from aios_core.runtime.live_return import (
+    open_live_provider_return_window,
+    register_handler_return,
+)
 from aios_core.runtime.metering import ModelMeteringLedger
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 
@@ -19,7 +24,40 @@ from aios_core.storage.sqlite_store import SQLiteWorldStore
 NOW = datetime(2026, 9, 24, 6, 0, tzinfo=timezone.utc)
 
 
-def test_background_attempt_reconciliation_keeps_same_identity_and_non_world_revision(tmp_path):
+def capture_live_provider_return(
+    attempts: BackgroundModelAttemptStore,
+    attempt_id: str,
+    *,
+    captured_at: datetime,
+    directive: ModelDirective,
+):
+    """Exercise the real live provider-return authority in a unit test.
+
+    Corrective-002 history note (Window 19).  These tests used to call
+    ``BackgroundModelAttemptStore._capture_trusted_response_return`` with only an
+    attempt id and bytes.  The historical comment on that helper claimed the
+    private name plus call convention made the call site the trusted boundary;
+    Window 17 `BLK-W17-001` proved it was a recovery-reachable minting oracle, so
+    the helper no longer exists.  The replacement below does not call a mint API:
+    it opens the same ephemeral window the production model-call frame opens,
+    registers the exact handler-returned object, and then uses the production
+    writer.  The test therefore covers the real authority path instead of
+    bypassing it, which is strictly stronger than the superseded expectation.
+    """
+
+    with open_live_provider_return_window(attempt_id=attempt_id) as window:
+        register_handler_return(window, directive)
+        return attempts.record_live_provider_return(
+            attempt_id,
+            captured_at=captured_at,
+            directive=directive,
+            live_window=window,
+        )
+
+
+def test_background_attempt_pre_submission_retry_keeps_identity_and_non_world_revision(tmp_path):
+    """A genuine pre-submission failure may retry; no dispatch fact is rotated."""
+
     store = SQLiteWorldStore(tmp_path / "world.db")
     attempts = BackgroundModelAttemptStore(store)
     ledger = ModelMeteringLedger(store)
@@ -34,26 +72,15 @@ def test_background_attempt_reconciliation_keeps_same_identity_and_non_world_rev
         world_revision=before,
         admitted_at=NOW,
     )
-    attempts.mark_dispatching(
-        admitted.attempt_id,
-        dispatched_at=NOW,
-        outbound_request_fingerprint="unit-outbound-request",
-    )
-    in_doubt = attempts.mark_failure(
+    not_submitted = attempts.mark_failure(
         admitted.attempt_id,
         failed_at=NOW,
-        definitely_not_submitted=False,
-        error=TimeoutError("possible submission"),
+        definitely_not_submitted=True,
+        error=RuntimeError("mechanically pre-submission"),
     )
-    assert in_doubt.state == "in_doubt"
-    assert in_doubt.recovery_disposition == "in_doubt"
+    assert not_submitted.state == "not_submitted"
+    assert attempts.outbound_request_binding(admitted.attempt_id) is None
 
-    reconciled = attempts.reconcile_not_submitted(
-        admitted.attempt_id,
-        reconciled_at=NOW,
-        evidence="provider gateway confirms no request was accepted",
-    )
-    assert reconciled.state == "not_submitted"
     retry = attempts.admit(
         subject_id="user_1",
         work_kind="wake",
@@ -64,11 +91,12 @@ def test_background_attempt_reconciliation_keeps_same_identity_and_non_world_rev
         admitted_at=NOW,
     )
     assert retry.attempt_id == admitted.attempt_id
-    attempts.mark_dispatching(
+    dispatched = attempts.mark_dispatching(
         retry.attempt_id,
         dispatched_at=NOW,
-        outbound_request_fingerprint="unit-outbound-request-retry",
+        outbound_request_fingerprint="unit-first-real-outbound-request",
     )
+    assert dispatched.state == "dispatching"
 
     directive = ModelDirective(
         silence=True,
@@ -86,19 +114,18 @@ def test_background_attempt_reconciliation_keeps_same_identity_and_non_world_rev
             request_id="request-unit",
         ),
     )
-    receipt = attempts._capture_trusted_response_return(
+    capture_live_provider_return(
+        attempts,
         retry.attempt_id,
         captured_at=NOW,
         directive=directive,
     )
-    assert receipt.attempt_id == retry.attempt_id
     returned = attempts.record_response(
         retry.attempt_id,
         returned_at=NOW,
         directive=directive,
     )
     assert returned.state == "response_returned"
-    assert returned.provider_request_id == "request-unit"
 
     meter = ledger.record_model_call(
         subject_id="user_1",
@@ -113,24 +140,65 @@ def test_background_attempt_reconciliation_keeps_same_identity_and_non_world_rev
         background_attempt_id=retry.attempt_id,
     )
     closed = attempts.get(retry.attempt_id)
-    assert closed is not None
-    assert closed.state == "metered"
+    assert closed is not None and closed.state == "metered"
     assert closed.meter_record_id == meter.record_id
-    assert meter.background_attempt_id == retry.attempt_id
     assert int(store.current_world_revision()) == before
 
-    reopened = SQLiteWorldStore(tmp_path / "world.db")
-    restarted_attempts = BackgroundModelAttemptStore(reopened)
-    durable = restarted_attempts.inspect(
+
+def test_background_attempt_post_binding_not_submitted_is_refused_and_in_doubt(tmp_path):
+    """C4/C5 Route B: caller booleans/evidence cannot erase a durable binding."""
+
+    store = SQLiteWorldStore(tmp_path / "world.db")
+    attempts = BackgroundModelAttemptStore(store)
+    admitted = attempts.admit(
         subject_id="user_1",
         work_kind="wake",
-        work_id="wake_attempt_unit",
+        work_id="route-b-post-binding",
+        wake_reason="watch_match",
         model_round_index=0,
+        world_revision=int(store.current_world_revision()),
+        admitted_at=NOW,
     )
-    assert durable is not None
-    assert durable.attempt_id == retry.attempt_id
-    assert durable.state == "metered"
-    assert durable.provider_request_id == "request-unit"
+    attempts.mark_dispatching(
+        admitted.attempt_id,
+        dispatched_at=NOW,
+        outbound_request_fingerprint="route-b-first-request",
+    )
+    first_binding = attempts.outbound_request_binding(admitted.attempt_id)
+    assert first_binding is not None
+
+    with pytest.raises(BackgroundModelResponseConflict):
+        attempts.mark_failure(
+            admitted.attempt_id,
+            failed_at=NOW + timedelta(seconds=1),
+            definitely_not_submitted=True,
+            error=RuntimeError("caller claims not submitted"),
+        )
+    durable = attempts.get(admitted.attempt_id)
+    assert durable is not None and durable.state == "in_doubt"
+
+    with pytest.raises(BackgroundModelResponseConflict):
+        attempts.reconcile_not_submitted(
+            admitted.attempt_id,
+            reconciled_at=NOW + timedelta(seconds=2),
+            evidence="operator says provider did not accept it",
+        )
+    durable = attempts.get(admitted.attempt_id)
+    assert durable is not None and durable.state == "in_doubt"
+
+    with pytest.raises(BackgroundModelExecutionInDoubt):
+        attempts.admit(
+            subject_id="user_1",
+            work_kind="wake",
+            work_id="route-b-post-binding",
+            wake_reason="watch_match",
+            model_round_index=0,
+            world_revision=int(store.current_world_revision()),
+            admitted_at=NOW + timedelta(seconds=3),
+        )
+
+    second_binding = attempts.outbound_request_binding(admitted.attempt_id)
+    assert second_binding == first_binding
 
 
 def _trusted_attempt(
@@ -174,7 +242,8 @@ def _trusted_attempt(
             request_id=request_id,
         ),
     )
-    receipt = attempts._capture_trusted_response_return(
+    receipt = capture_live_provider_return(
+        attempts,
         attempt.attempt_id,
         captured_at=NOW + timedelta(seconds=1),
         directive=directive,
