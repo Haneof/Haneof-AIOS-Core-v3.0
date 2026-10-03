@@ -1,5 +1,16 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 2026-10-03 — WINDOW 22 local engineering complete / Publication Recovery READY
+
+- **Window 22 terminal state:** `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-003 = ENGINEERING_COMPLETE_PENDING_PUBLICATION / GITHUB_PUBLICATION_BLOCKED`. This is not REVIEW_READY and not Fresh-IA-ready.
+- Engineer-reported local exact head = `39917591f07c2ed1aa679f9098c1fc368c3af42e`, parent `96b0f08706aa6e35820cd676976f24c15b62373a`, tree `fe17c59c71874423ec7a77cfb4d33b4ffb3e2e64`, construction base `65e1078500eb2b2cf85c5d88a3773c1b8e49fa36`.
+- Engineer-reported bundle SHA-256 = `02e9031e6b9b85328c5151f9e16f8fbbdb09f9ec6d4304c40deb72499d26e238`; patch SHA-256 = `ecf33ea5a1db4b600aca3afd592f1e74bcbc18b7fcda0dfae855fe474b921fe1`. These are **not yet PM-byte-verified**; 23A must verify the actual bundle.
+- Reported local gates: full Core 911/0; Suite A 4/0; Suite B 7/0; W17 14/0; C3 matrix 15 pass; scope 70 files / 0 out-of-scope / 0 forbidden; root `.gitignore` cleanup complete.
+- **Unique next READY:** `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-003-PUBLICATION-RECOVERY` (WINDOW 23A). Exact-bundle transport only: verify bytes/identity -> push exact commit -> new PR -> exact-head formal 3.12.14 CI -> PM readiness. No code repair, no merge, no IA.
+- Window 23 Fresh IA remains BLOCKED until 23A is complete and PM validates the remote exact head/formal gates.
+- Record: `governance/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_003_PUBLICATION_RECOVERY_RELEASE_2026-10-03.md`.
+
+
 ## 2026-10-03 — WINDOW 22 PM scope/publication clarification (Corrective-003 remains active)
 
 - **No verdict change / no acceptance:** Window 22 remains `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-003 = ACTIVE / LOCAL_ENGINEERING`; it is not REVIEW_READY.
