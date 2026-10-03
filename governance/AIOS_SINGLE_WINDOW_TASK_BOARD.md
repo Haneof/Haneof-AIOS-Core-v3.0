@@ -1,5 +1,18 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 2026-10-03 — Corrective-003 local artifact unavailable / WINDOW 22-RERUN-001 READY
+
+- PM fresh remote verification: reported local candidate `39917591f07c2ed1aa679f9098c1fc368c3af42e` is **not present in the GitHub object graph**, and no remote Corrective-003 engineering branch exists. The previous bundle/evidence were local-only and are not a durable publication artifact.
+- Previous Window 22 result is retained only as `HISTORICAL_LOCAL_ONLY / NON_DURABLE / NOT_ACCEPTANCE_EVIDENCE`; its test counts/hashes may guide navigation but cannot satisfy acceptance.
+- `WINDOW 23A PUBLICATION RECOVERY = BLOCKED / ARTIFACT_UNAVAILABLE`.
+- `WINDOW 23 FRESH IA = BLOCKED`.
+- **Unique next READY:** `WINDOW 22-RERUN-001`, formal task `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-003`.
+- New hard gate: before source edits/heavy testing, prove GitHub write/publication capability; otherwise stop immediately `GITHUB_PUBLICATION_CAPABILITY_REQUIRED`.
+- Rerun must rebuild from fresh main + frozen `fec30bd…` engineering carry-forward + canonical reviewer probes, not from the lost local candidate.
+- Completion now requires durable remote branch + new PR + exact-head formal CPython 3.12.14 CI GREEN. Local-only completion is no longer sufficient.
+- Record: `governance/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_003_WINDOW22_RERUN_RELEASE_2026-10-03.md`.
+
+
 ## 2026-10-03 — WINDOW 22 local engineering complete / Publication Recovery READY
 
 - **Window 22 terminal state:** `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-003 = ENGINEERING_COMPLETE_PENDING_PUBLICATION / GITHUB_PUBLICATION_BLOCKED`. This is not REVIEW_READY and not Fresh-IA-ready.
