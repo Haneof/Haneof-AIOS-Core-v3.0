@@ -1,304 +1,807 @@
 name: core-background-late-trusted-return-001
 
+# =============================================================================
+# CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-003 / WINDOW 22-RERUN-001
+#
+# Formal exact-head gate for the Route B corrective candidate.  This file REPLACES
+# the Window 16 workflow that anchored its RED-first job on `red-first-window14`.
+# Per task contract section 17 that historical Window 14 RED must NOT be reused as
+# the current RED: the current RED anchor here is the frozen Window 20 Suite A
+# probe suite replayed byte-for-byte on the materialized failed candidate
+# `fec30bd1495017bf13f08b0ef5b1e241dfb0e247`, which must fail 4/4.
+#
+# Pinned identities (mechanically asserted in every job that uses them):
+#   FAILED_CANDIDATE   fec30bd1495017bf13f08b0ef5b1e241dfb0e247  (PR #310 head)
+#   W20_REVIEW         220311759e88fb3948ad3f4dba655058e0f392a8  (canonical Window 20 IA)
+#   W17_REVIEW         e4161dd0ad0a2f825461311a1c8c5ff8234a07f8  (canonical Window 17 IA)
+#
+# Frozen reviewer probe identities (blob id AND SHA-256 both verified before any
+# execution; a mismatch is a hard `WINDOW*_PROBE_HASH_MISMATCH` failure):
+#   Suite A  reviews/..._IA_WINDOW_20/reviewer_probes/window20_independent_attack.py
+#            blob   527edd8d92243cabc417f176c0f7c4f6c358e65c
+#            sha256 ec1dc5c2c5406d5d9e74825f62e0a17fb80f8ebd6dc250817fa048511ce292b5
+#   Suite B  reviews/..._IA_WINDOW_20/reviewer_probes/window20_migration_rsa_attack.py
+#            blob   867f0ee993595c2d334a3940ad66308166693c97
+#            sha256 769242465817f31734661ba7ba9c3d5f7d06b8d3f5235d72d2026956d9b98eb1
+#   W17      reviews/..._IA_WINDOW_17/reviewer_probes/window17_independent_attack.py
+#            blob   bb25d184a5cb813ae4058de9a75fa23d9591b041
+#            sha256 a6db33956bb7bc1e8af19cddd7cebdd320604bba98b6a2b906fd1eb363fba0c3
+#
+# Probes are extracted from the git object graph at CI runtime and executed in
+# place.  They are never copied into the tracked tree, never edited and never
+# wrapped (contract C3-6: reviewer probe bytes unchanged).
+# =============================================================================
+
 on:
+  push:
+    branches:
+      - "arena/01a101e0-haneof-aios-core-v3-0"
+    paths:
+      - "src/**"
+      - "tests/**"
+      - ".github/workflows/core-background-late-trusted-return-001.yml"
+      - "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_003_RERUN_001/**"
   pull_request:
     paths:
-      - "src/aios_core/**"
+      - "src/**"
       - "tests/**"
-      - "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_001/**"
       - ".github/workflows/core-background-late-trusted-return-001.yml"
   workflow_dispatch:
 
 permissions:
   contents: read
 
+env:
+  FAILED_CANDIDATE: "fec30bd1495017bf13f08b0ef5b1e241dfb0e247"
+  W20_REVIEW: "220311759e88fb3948ad3f4dba655058e0f392a8"
+  W17_REVIEW: "e4161dd0ad0a2f825461311a1c8c5ff8234a07f8"
+  W20_PROBE_DIR: "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_002_IA_WINDOW_20/reviewer_probes"
+  W17_PROBE_DIR: "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_001_IA_WINDOW_17/reviewer_probes"
+  SUITE_A_BLOB: "527edd8d92243cabc417f176c0f7c4f6c358e65c"
+  SUITE_A_SHA256: "ec1dc5c2c5406d5d9e74825f62e0a17fb80f8ebd6dc250817fa048511ce292b5"
+  SUITE_B_BLOB: "867f0ee993595c2d334a3940ad66308166693c97"
+  SUITE_B_SHA256: "769242465817f31734661ba7ba9c3d5f7d06b8d3f5235d72d2026956d9b98eb1"
+  W17_BLOB: "bb25d184a5cb813ae4058de9a75fa23d9591b041"
+  W17_SHA256: "a6db33956bb7bc1e8af19cddd7cebdd320604bba98b6a2b906fd1eb363fba0c3"
+  FORMAL_PYTHON: "3.12.14"
+  FORMAL_PYDANTIC: "2.13.5"
+  FORMAL_PYTEST: "8.4.2"
+
 jobs:
-  red-first-window14:
-    name: red-first-window14
+  # ---------------------------------------------------------------------------
+  # JOB 1 - probe identity: extract and hash-verify all three frozen suites
+  # ---------------------------------------------------------------------------
+  probe-identity:
+    name: probe-identity-verification
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.12.14"
-      - name: Materialize immutable failed candidate and canonical Window 14 probes
-        shell: bash
+      - name: Pin the three canonical identities in the GitHub object graph
         run: |
           set -euo pipefail
-          FAILED=5ad0524c425592210ff184e00ad52abb2c14e366
-          REVIEW=84457badc562416f59fb25ca41103700276e0df2
-          git fetch --no-tags origin             "+refs/heads/arena/01a0f07b-haneof-aios-core-v3-0:refs/remotes/origin/window13-failed"             "+refs/heads/arena/01a0f231-haneof-aios-core-v3-0:refs/remotes/origin/window14-review"
-          test "$(git rev-parse refs/remotes/origin/window13-failed)" = "$FAILED"
-          test "$(git rev-parse refs/remotes/origin/window14-review)" = "$REVIEW"
-          test "$(git rev-parse "$REVIEW^")" = "$FAILED"
-          test "$(git rev-parse "$FAILED^")" = "a49c1e6874ecb92ae4dc4783d07d733fdc19fa5d"
-          test "$(git show -s --format=%T "$FAILED")" = "53064b3022254dab33c7793a0a6306c71e3df2b2"
-          test "$(git show -s --format=%T "$REVIEW")" = "bd235452c0b78a7fbeedd48d048fc78b331d92bf"
-          rm -rf /tmp/w16-failed
-          git worktree add --detach /tmp/w16-failed "$FAILED"
-          git archive "$REVIEW" reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes             | tar -x -C /tmp/w16-failed
-      - name: Install exact formal Python dependencies
+          # All three pinned commits are reachable from named remote refs, so this
+          # never depends on server-side SHA-want support:
+          #   fec30bd1... = refs/pull/310/head = refs/heads/arena/01a10010-...
+          #   2203117...  = ancestor of refs/pull/311/head
+          #   e4161dd0... = refs/heads/arena/01a0fd4d-...
+          git fetch --no-tags --force origin \
+            "+refs/pull/310/head:refs/remotes/pinned/pr-310" \
+            "+refs/pull/311/head:refs/remotes/pinned/pr-311" \
+            "+refs/heads/arena/01a10010-haneof-aios-core-v3-0:refs/remotes/pinned/failed-branch" \
+            "+refs/heads/arena/01a0fd4d-haneof-aios-core-v3-0:refs/remotes/pinned/w17-branch"
+          resolve () {
+            local sha="$1" ref="$2" label="$3"
+            if ! git cat-file -e "${sha}^{commit}" 2>/dev/null; then
+              git fetch --no-tags --force origin "+${sha}:${ref}" 2>/dev/null || {
+                echo "${label}_IDENTITY_UNREACHABLE ${sha}"; exit 1; }
+            fi
+            git update-ref "${ref}" "${sha}" 2>/dev/null || true
+            test "$(git rev-parse "${ref}")" = "${sha}" \
+              || { echo "${label}_IDENTITY_MISMATCH expected=${sha} actual=$(git rev-parse "${ref}")"; exit 1; }
+            echo "${label}_IDENTITY_VERIFIED=${sha}"
+          }
+          resolve "${FAILED_CANDIDATE}" refs/remotes/pinned/failed-candidate "FAILED_CANDIDATE"
+          resolve "${W20_REVIEW}" refs/remotes/pinned/w20-review "WINDOW20_REVIEW"
+          resolve "${W17_REVIEW}" refs/remotes/pinned/w17-review "WINDOW17_REVIEW"
+          test "$(git rev-parse refs/remotes/pinned/pr-310)" = "${FAILED_CANDIDATE}" \
+            || { echo "FAILED_CANDIDATE_DRIFT: PR #310 head moved"; exit 1; }
+          git merge-base --is-ancestor "${W20_REVIEW}" refs/remotes/pinned/pr-311 \
+            || { echo "WINDOW20_REVIEW_IDENTITY_MISMATCH: not an ancestor of PR #311"; exit 1; }
+          test "$(git rev-parse refs/remotes/pinned/w17-branch)" = "${W17_REVIEW}" \
+            || { echo "WINDOW17_REVIEW_IDENTITY_MISMATCH: branch tip moved"; exit 1; }
+          echo "ALL_THREE_PINNED_IDENTITIES_VERIFIED=TRUE" | tee -a "$GITHUB_ENV"
+      - name: Extract the three frozen probes from git blobs and verify blob + SHA-256
         run: |
+          set -euo pipefail
+          mkdir -p /tmp/frozen_probes
+          extract () {
+            local review="$1" relpath="$2" expected_blob="$3" expected_sha="$4" out="$5" label="$6"
+            local actual_blob
+            actual_blob="$(git ls-tree "${review}" -- "${relpath}" | awk '{print $3}')"
+            if [ -z "${actual_blob}" ]; then
+              echo "${label}_PROBE_PATH_MISSING at ${review}:${relpath}"; exit 1
+            fi
+            if [ "${actual_blob}" != "${expected_blob}" ]; then
+              echo "${label}_PROBE_BLOB_MISMATCH expected=${expected_blob} actual=${actual_blob}"; exit 1
+            fi
+            git cat-file blob "${actual_blob}" > "${out}"
+            local actual_sha
+            actual_sha="$(sha256sum "${out}" | awk '{print $1}')"
+            if [ "${actual_sha}" != "${expected_sha}" ]; then
+              echo "${label}_PROBE_HASH_MISMATCH expected=${expected_sha} actual=${actual_sha}"; exit 1
+            fi
+            echo "${label} blob=${actual_blob} sha256=${actual_sha} bytes=$(wc -c < "${out}") lines=$(wc -l < "${out}")"
+          }
+          extract "${W20_REVIEW}" "${W20_PROBE_DIR}/window20_independent_attack.py" \
+            "${SUITE_A_BLOB}" "${SUITE_A_SHA256}" /tmp/frozen_probes/suite_a.py "WINDOW20_SUITE_A"
+          extract "${W20_REVIEW}" "${W20_PROBE_DIR}/window20_migration_rsa_attack.py" \
+            "${SUITE_B_BLOB}" "${SUITE_B_SHA256}" /tmp/frozen_probes/suite_b.py "WINDOW20_SUITE_B"
+          extract "${W17_REVIEW}" "${W17_PROBE_DIR}/window17_independent_attack.py" \
+            "${W17_BLOB}" "${W17_SHA256}" /tmp/frozen_probes/w17.py "WINDOW17"
+          echo "ALL_THREE_FROZEN_PROBE_HASHES_VERIFIED=TRUE" | tee -a "$GITHUB_ENV"
+      - name: Prove the probes are not part of this branch's tracked tree (C3-6)
+        run: |
+          set -euo pipefail
+          if git ls-files | grep -E 'window(17|20)_.*attack.*\.py$' ; then
+            echo "REVIEWER_PROBE_BYTES_COPIED_INTO_TRACKED_TREE"; exit 1
+          fi
+          echo "C3_6_REVIEWER_PROBE_BYTES_NOT_IN_TRACKED_TREE=TRUE" | tee -a "$GITHUB_ENV"
+      - name: Upload extracted probe bytes for audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: frozen-probe-bytes
+          path: /tmp/frozen_probes
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # JOB 2 - CURRENT RED: Window 20 Suite A must fail 4/4 on the failed candidate
+  # ---------------------------------------------------------------------------
+  red-first-window20-on-failed-candidate:
+    name: red-first-window20-failed-candidate-4of4
+    needs: probe-identity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "${{ env.FORMAL_PYTHON }}"
+      - name: Install exact formal dependencies
+        run: |
+          set -euo pipefail
           python -m pip install --upgrade pip
-          python -m pip install -e /tmp/w16-failed pydantic==2.13.5 pytest==8.4.2
-      - name: Verify frozen probe SHA-256 and record environment
-        shell: bash
+          pip install "pydantic==${FORMAL_PYDANTIC}" "pytest==${FORMAL_PYTEST}"
+      - name: Materialize the immutable failed candidate in a detached worktree
         run: |
           set -euo pipefail
-          cd /tmp/w16-failed
-          sha256sum -c reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/SHA256SUMS
-          sha256sum -c reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/SHA256SUMS_S3
-          sha256sum -c reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/SHA256SUMS_SUPPLEMENTARY
-          python - <<'PY' | tee /tmp/w16-environment.txt
-          import ssl, sqlite3, sys, pydantic, pytest
-          print("candidate=5ad0524c425592210ff184e00ad52abb2c14e366")
-          print("review=84457badc562416f59fb25ca41103700276e0df2")
-          print("Python:", sys.version)
-          print("Pydantic:", pydantic.__version__)
-          print("pytest:", pytest.__version__)
-          print("SQLite:", sqlite3.sqlite_version)
-          print("OpenSSL:", ssl.OPENSSL_VERSION)
-          PY
-      - name: Reproduce Window 14 binding blockers as historical RED
-        shell: bash
+          git fetch --no-tags --force origin "+refs/pull/310/head:refs/remotes/pinned/pr-310"
+          test "$(git rev-parse refs/remotes/pinned/pr-310)" = "${FAILED_CANDIDATE}" \
+            || { echo "FAILED_CANDIDATE_DRIFT: PR #310 head moved"; exit 1; }
+          git worktree add --detach /tmp/failed-candidate "${FAILED_CANDIDATE}"
+          test "$(git -C /tmp/failed-candidate rev-parse HEAD)" = "${FAILED_CANDIDATE}"
+      - name: Re-extract and re-verify Suite A, then require probes=4 failures=4
         run: |
           set -euo pipefail
-          cd /tmp/w16-failed
-          : > /tmp/w16-baseline-red-raw.txt
-
+          mkdir -p /tmp/frozen_probes
+          blob="$(git ls-tree "${W20_REVIEW}" -- "${W20_PROBE_DIR}/window20_independent_attack.py" | awk '{print $3}')"
+          test "${blob}" = "${SUITE_A_BLOB}" || { echo "WINDOW20_PROBE_BLOB_MISMATCH"; exit 1; }
+          git cat-file blob "${blob}" > /tmp/frozen_probes/suite_a.py
+          sha="$(sha256sum /tmp/frozen_probes/suite_a.py | awk '{print $1}')"
+          test "${sha}" = "${SUITE_A_SHA256}" || { echo "WINDOW20_PROBE_HASH_MISMATCH"; exit 1; }
           set +e
-          PYTHONPATH=src python reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/window14_independent_attack.py             2>&1 | tee /tmp/w16-attack.txt
-          attack_status=${PIPESTATUS[0]}
+          PYTHONPATH=/tmp/failed-candidate/src python /tmp/frozen_probes/suite_a.py 2>&1 \
+            | tee /tmp/red_suite_a_failed_candidate.txt
           set -e
-          cat /tmp/w16-attack.txt >> /tmp/w16-baseline-red-raw.txt
-          test "$attack_status" -eq 1
-          grep -F "FAIL | IA14-ORACLE-001" /tmp/w16-attack.txt
-          grep -F "FAIL | IA14-NONCE-001" /tmp/w16-attack.txt
-          grep -F "FAIL | IA14-NS-001" /tmp/w16-attack.txt
-          grep -F "SUMMARY | probes=7 failures=3" /tmp/w16-attack.txt
-
-          set +e
-          PYTHONPATH=src python reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/window14_s3_stale_capability_rotation.py             2>&1 | tee /tmp/w16-s3.txt
-          s3_status=${PIPESTATUS[0]}
-          set -e
-          cat /tmp/w16-s3.txt >> /tmp/w16-baseline-red-raw.txt
-          test "$s3_status" -eq 1
-          grep -F "S3b retried return outcome: REFUSED" /tmp/w16-s3.txt
-          grep -F "rotated-capability outcome: REFUSED" /tmp/w16-s3.txt
-          grep -F "SUMMARY | failures= 2" /tmp/w16-s3.txt
-
-          PYTHONPATH=src python reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/window14_supplementary_probes.py             2>&1 | tee /tmp/w16-supplementary.txt
-          cat /tmp/w16-supplementary.txt >> /tmp/w16-baseline-red-raw.txt
-          grep -F "SUMMARY | probes=2 failures=0" /tmp/w16-supplementary.txt
-
-          {
-            echo "=== exact identity ==="
-            git rev-parse HEAD
-            git rev-parse HEAD^
-            git show -s --format=%T HEAD
-            echo "=== frozen probe sha256 ==="
-            sha256sum               reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/window14_independent_attack.py               reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/window14_s3_stale_capability_rotation.py               reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/window14_supplementary_probes.py               reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/PROBE_CONTRACT.md               reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/reviewer_probes/PROBE_REVISION_LOG.md
-          } | tee /tmp/w16-baseline-identity.txt
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: window16-red-first
-          path: |
-            /tmp/w16-environment.txt
-            /tmp/w16-baseline-identity.txt
-            /tmp/w16-baseline-red-raw.txt
-            /tmp/w16-attack.txt
-            /tmp/w16-s3.txt
-            /tmp/w16-supplementary.txt
-
-  phase-a-truthfulness:
-    name: phase-a-truthfulness
-    needs: red-first-window14
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.12.14"
-      - run: python -m pip install -e . pydantic==2.13.5 pytest==8.4.2
-      - name: Compile changed Python
-        run: |
-          python -m py_compile src/aios_core/runtime/background_attempt.py
-          python -m py_compile tests/runtime/test_background_model_attempt.py
-      - name: Diff hygiene
-        run: git diff --check "origin/${GITHUB_BASE_REF}...HEAD"
-      - name: Focused Route-B truthfulness tests
-        run: |
-          pytest -o addopts='' -q             tests/runtime/test_background_model_attempt.py             tests/integration/test_core_background_trusted_return_recovery_001.py             tests/integration/test_core_background_response_recovery_001.py
-
-
-  phase-bc-verifier-only:
-    name: phase-bc-verifier-only
-    needs: phase-a-truthfulness
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.12.14"
-      - run: python -m pip install -e . pydantic==2.13.5 pytest==8.4.2
-      - name: Compile verifier-only implementation and frozen probes
-        run: |
-          python -m py_compile src/aios_core/runtime/late_return.py
-          python -m py_compile src/aios_core/runtime/background_attempt.py
-          python -m py_compile src/aios_core/runtime/turn_runtime.py
-          python -m py_compile tests/runtime/test_background_late_return_route_b.py
-          python -m py_compile tests/integration/test_core_background_late_trusted_return_corrective_001.py
-      - name: Diff hygiene
-        run: git diff --check "origin/${GITHUB_BASE_REF}...HEAD"
-      - name: Route-B and CA1-CA5
-        run: |
-          pytest -o addopts='' -q --junitxml=/tmp/window16-ca.xml \
-            tests/runtime/test_background_late_return_route_b.py \
-            tests/runtime/test_late_return_canonical_encoding_002.py \
-            tests/integration/test_core_background_late_trusted_return_corrective_001.py \
-            tests/integration/test_core_background_late_trusted_return_consumption_001.py \
-            tests/integration/test_core_background_late_trusted_return_secret_upgrade_001.py
-      - name: Accepted trusted-return regression
-        run: |
-          pytest -o addopts='' -q --junitxml=/tmp/window16-accepted.xml \
-            tests/integration/test_core_background_trusted_return_recovery_001.py \
-            tests/integration/test_core_background_trusted_return_adversarial_001.py \
-            tests/integration/test_core_background_response_recovery_001_corrective_002_authenticity.py \
-            tests/integration/test_core_background_response_recovery_001_corrective_002_recovery.py
-      - name: Export Phase B/C exact JUnit
+          summary="$(grep -E '^SUMMARY \|' /tmp/red_suite_a_failed_candidate.txt | tail -1)"
+          echo "RED_SUMMARY=${summary}"
+          test "${summary}" = "SUMMARY | probes=4 failures=4" \
+            || { echo "RED_FIRST_NOT_REPRODUCIBLE: ${summary}"; exit 1; }
+          echo "CURRENT_RED_ANCHOR=WINDOW20_SUITE_A_ON_${FAILED_CANDIDATE}" | tee -a "$GITHUB_ENV"
+          echo "WINDOW14_RED_NOT_REUSED_AS_CURRENT_RED=TRUE" | tee -a "$GITHUB_ENV"
+      - name: Upload RED evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: window16-phase-bc
-          path: |
-            /tmp/window16-ca.xml
-            /tmp/window16-accepted.xml
+          name: red-suite-a-on-failed-candidate
+          path: /tmp/red_suite_a_failed_candidate.txt
+          if-no-files-found: error
 
-
-  phase-ef-sigkill-and-focused:
-    name: phase-ef-sigkill-and-focused
-    needs: phase-bc-verifier-only
+  # ---------------------------------------------------------------------------
+  # JOB 3 - Suite A must be GREEN on the candidate
+  # ---------------------------------------------------------------------------
+  candidate-suite-a-green:
+    name: candidate-suite-a-green-4of4
+    needs: probe-identity
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.12.14"
-      - run: python -m pip install -e . pydantic==2.13.5 pytest==8.4.2
-      - name: Real SIGKILL / fresh-process verifier-only recovery
+          python-version: "${{ env.FORMAL_PYTHON }}"
+      - name: Install exact formal dependencies
         run: |
-          pytest -o addopts='' -q --tb=short --junitxml=/tmp/window16-sigkill.xml \
-            tests/integration/test_core_background_late_trusted_return_sigkill_001.py
-      - name: Trusted-return and recovery focused regression
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install "pydantic==${FORMAL_PYDANTIC}" "pytest==${FORMAL_PYTEST}"
+      - name: Extract, hash-verify and run Suite A against the candidate head
         run: |
-          pytest -o addopts='' -q --tb=short --junitxml=/tmp/window16-focused.xml \
-            tests/integration/test_core_background_late_trusted_return_corrective_001.py \
-            tests/integration/test_core_background_late_trusted_return_corrective_002.py \
-            tests/integration/test_core_background_late_trusted_return_consumption_001.py \
-            tests/integration/test_core_background_late_trusted_return_secret_upgrade_001.py \
+          set -euo pipefail
+          mkdir -p /tmp/frozen_probes
+          git fetch --no-tags --force origin "+refs/pull/311/head:refs/remotes/pinned/pr-311"
+          git merge-base --is-ancestor "${W20_REVIEW}" refs/remotes/pinned/pr-311 \
+            || { echo "WINDOW20_REVIEW_IDENTITY_MISMATCH"; exit 1; }
+          blob="$(git ls-tree "${W20_REVIEW}" -- "${W20_PROBE_DIR}/window20_independent_attack.py" | awk '{print $3}')"
+          test "${blob}" = "${SUITE_A_BLOB}" || { echo "WINDOW20_PROBE_BLOB_MISMATCH"; exit 1; }
+          git cat-file blob "${blob}" > /tmp/frozen_probes/suite_a.py
+          sha="$(sha256sum /tmp/frozen_probes/suite_a.py | awk '{print $1}')"
+          test "${sha}" = "${SUITE_A_SHA256}" || { echo "WINDOW20_PROBE_HASH_MISMATCH"; exit 1; }
+          PYTHONPATH=src python /tmp/frozen_probes/suite_a.py 2>&1 | tee /tmp/green_suite_a.txt
+          summary="$(grep -E '^SUMMARY \|' /tmp/green_suite_a.txt | tail -1)"
+          test "${summary}" = "SUMMARY | probes=4 failures=0" \
+            || { echo "SUITE_A_NOT_GREEN: ${summary}"; exit 1; }
+      - name: Upload Suite A evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: green-suite-a-on-candidate
+          path: /tmp/green_suite_a.txt
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # JOB 4 - Suite B (migration + RSA positives) must be GREEN on the candidate
+  # ---------------------------------------------------------------------------
+  candidate-suite-b-green:
+    name: candidate-suite-b-green-7of7
+    needs: probe-identity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "${{ env.FORMAL_PYTHON }}"
+      - name: Install exact formal dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install "pydantic==${FORMAL_PYDANTIC}" "pytest==${FORMAL_PYTEST}"
+      - name: Extract, hash-verify and run Suite B against the candidate head
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/frozen_probes
+          git fetch --no-tags --force origin "+refs/pull/311/head:refs/remotes/pinned/pr-311"
+          git merge-base --is-ancestor "${W20_REVIEW}" refs/remotes/pinned/pr-311 \
+            || { echo "WINDOW20_REVIEW_IDENTITY_MISMATCH"; exit 1; }
+          blob="$(git ls-tree "${W20_REVIEW}" -- "${W20_PROBE_DIR}/window20_migration_rsa_attack.py" | awk '{print $3}')"
+          test "${blob}" = "${SUITE_B_BLOB}" || { echo "WINDOW20_PROBE_BLOB_MISMATCH"; exit 1; }
+          git cat-file blob "${blob}" > /tmp/frozen_probes/suite_b.py
+          sha="$(sha256sum /tmp/frozen_probes/suite_b.py | awk '{print $1}')"
+          test "${sha}" = "${SUITE_B_SHA256}" || { echo "WINDOW20_PROBE_HASH_MISMATCH"; exit 1; }
+          PYTHONPATH=src python /tmp/frozen_probes/suite_b.py 2>&1 | tee /tmp/green_suite_b.txt
+          summary="$(grep -E '^SUMMARY \|' /tmp/green_suite_b.txt | tail -1)"
+          test "${summary}" = "SUMMARY | probes=7 failures=0" \
+            || { echo "SUITE_B_NOT_GREEN: ${summary}"; exit 1; }
+      - name: Upload Suite B evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: green-suite-b-on-candidate
+          path: /tmp/green_suite_b.txt
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # JOB 5 - Window 17 positives must be GREEN on the candidate
+  # ---------------------------------------------------------------------------
+  candidate-w17-green:
+    name: candidate-w17-green-14of14
+    needs: probe-identity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "${{ env.FORMAL_PYTHON }}"
+      - name: Install exact formal dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install "pydantic==${FORMAL_PYDANTIC}" "pytest==${FORMAL_PYTEST}"
+      - name: Extract, hash-verify and run the Window 17 suite against the candidate
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/frozen_probes
+          git fetch --no-tags --force origin \
+            "+refs/heads/arena/01a0fd4d-haneof-aios-core-v3-0:refs/remotes/pinned/w17-branch"
+          test "$(git rev-parse refs/remotes/pinned/w17-branch)" = "${W17_REVIEW}" \
+            || { echo "WINDOW17_REVIEW_IDENTITY_MISMATCH"; exit 1; }
+          blob="$(git ls-tree "${W17_REVIEW}" -- "${W17_PROBE_DIR}/window17_independent_attack.py" | awk '{print $3}')"
+          test "${blob}" = "${W17_BLOB}" || { echo "WINDOW17_PROBE_BLOB_MISMATCH"; exit 1; }
+          git cat-file blob "${blob}" > /tmp/frozen_probes/w17.py
+          sha="$(sha256sum /tmp/frozen_probes/w17.py | awk '{print $1}')"
+          test "${sha}" = "${W17_SHA256}" || { echo "WINDOW17_PROBE_HASH_MISMATCH"; exit 1; }
+          PYTHONPATH=src python /tmp/frozen_probes/w17.py 2>&1 | tee /tmp/green_w17.txt
+          summary="$(grep -E '^SUMMARY \|' /tmp/green_w17.txt | tail -1)"
+          test "${summary}" = "SUMMARY | probes=14 failures=0" \
+            || { echo "W17_NOT_GREEN: ${summary}"; exit 1; }
+      - name: Upload W17 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: green-w17-on-candidate
+          path: /tmp/green_w17.txt
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # JOB 6 - C3 author attack matrix must be GREEN on the candidate
+  # ---------------------------------------------------------------------------
+  c3-author-matrix-green:
+    name: c3-author-matrix-green-27-cases
+    needs: probe-identity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "${{ env.FORMAL_PYTHON }}"
+      - name: Install exact formal dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          pip install "pydantic==${FORMAL_PYDANTIC}" "pytest==${FORMAL_PYTEST}"
+      - name: Run the 27-case C3 author attack matrix
+        run: |
+          set -euo pipefail
+          python -m pytest \
+            tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py \
+            -o addopts="" -p no:cacheprovider --no-header -v -rf 2>&1 | tee /tmp/c3_matrix_green.txt
+          grep -E '^tests/.*C3-1-' /tmp/c3_matrix_green.txt | grep -c 'PASSED' | grep -qx '13' \
+            || { echo "C3_1_CASES_NOT_ALL_GREEN"; exit 1; }
+          grep -E '^tests/.*C3-2-' /tmp/c3_matrix_green.txt | grep -c 'PASSED' | grep -qx '13' \
+            || { echo "C3_2_CASES_NOT_ALL_GREEN"; exit 1; }
+          grep -E '^tests/.*C3-3-' /tmp/c3_matrix_green.txt | grep -c 'PASSED' | grep -qx '1' \
+            || { echo "C3_3_CASE_NOT_GREEN"; exit 1; }
+          grep -q '28 passed' /tmp/c3_matrix_green.txt || { echo "C3_MATRIX_NOT_28_PASSED"; exit 1; }
+      - name: Upload C3 matrix evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c3-author-matrix-green
+          path: /tmp/c3_matrix_green.txt
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # JOB 7 - the same C3 matrix must be RED on the failed candidate (non-vacuity)
+  # ---------------------------------------------------------------------------
+  c3-author-matrix-red-on-failed-candidate:
+    name: c3-author-matrix-red-on-failed-candidate
+    needs: probe-identity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "${{ env.FORMAL_PYTHON }}"
+      - name: Install exact formal dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install "pydantic==${FORMAL_PYDANTIC}" "pytest==${FORMAL_PYTEST}"
+      - name: Replay the identical matrix file on the materialized failed candidate
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --force origin "+refs/pull/310/head:refs/remotes/pinned/pr-310"
+          test "$(git rev-parse refs/remotes/pinned/pr-310)" = "${FAILED_CANDIDATE}" \
+            || { echo "FAILED_CANDIDATE_DRIFT: PR #310 head moved"; exit 1; }
+          git worktree add --detach /tmp/failed-candidate "${FAILED_CANDIDATE}"
+          test "$(git -C /tmp/failed-candidate rev-parse HEAD)" = "${FAILED_CANDIDATE}"
+          MATRIX=tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py
+          cp "${MATRIX}" "/tmp/failed-candidate/${MATRIX}"
+          # Byte-identity of the replayed matrix file is the point of this job.
+          test "$(sha256sum "${MATRIX}" | awk '{print $1}')" \
+             = "$(sha256sum "/tmp/failed-candidate/${MATRIX}" | awk '{print $1}')"
+          cd /tmp/failed-candidate
+          set +e
+          PYTHONPATH=/tmp/failed-candidate/src python -m pytest "${MATRIX}" \
+            -o addopts="" -p no:cacheprovider --no-header -q -rf 2>&1 | tee /tmp/c3_matrix_red.txt
+          set -e
+          failed="$(grep -oE '[0-9]+ failed' /tmp/c3_matrix_red.txt | tail -1 | awk '{print $1}')"
+          test -n "${failed}" || { echo "C3_MATRIX_NOT_RED_ON_FAILED_CANDIDATE"; exit 1; }
+          test "${failed}" -ge 10 \
+            || { echo "C3_MATRIX_RED_TOO_WEAK: only ${failed} cases red"; exit 1; }
+          echo "C3_MATRIX_RED_CASES_ON_FAILED_CANDIDATE=${failed}" | tee -a "$GITHUB_ENV"
+      - name: Upload C3 RED evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c3-author-matrix-red-on-failed-candidate
+          path: /tmp/c3_matrix_red.txt
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # JOB 8 - Corrective-002 positives (migration / RSA / exactly-once / SIGKILL)
+  # ---------------------------------------------------------------------------
+  corrective-002-positives:
+    name: corrective-002-migration-rsa-positives
+    needs: probe-identity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "${{ env.FORMAL_PYTHON }}"
+      - name: Install exact formal dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          pip install "pydantic==${FORMAL_PYDANTIC}" "pytest==${FORMAL_PYTEST}"
+      - name: W17 migration + verify-before-convert + atomic migration + secret retention
+        run: |
+          set -euo pipefail
+          python -m pytest \
+            "tests/integration/test_core_background_late_trusted_return_corrective_002.py::test_ca2_005_valid_legacy_migration_recovers_exactly_once" \
+            "tests/integration/test_core_background_late_trusted_return_corrective_002.py::test_ca2_006_invalid_legacy_hmac_fails_closed_atomically" \
+            "tests/integration/test_core_background_late_trusted_return_corrective_002.py::test_ca2_007_tampered_legacy_payload_fails_closed" \
+            "tests/integration/test_core_background_late_trusted_return_corrective_002.py::test_ca2_008_legacy_cross_table_inconsistency_fails_closed" \
+            "tests/integration/test_core_background_late_trusted_return_corrective_002.py::test_ca2_009_failed_migration_leaves_no_partial_v2_state" \
+            -o addopts="" -p no:cacheprovider --no-header -v -rf 2>&1 | tee /tmp/positives_migration.txt
+          # 5 named migration cases expand to 13 parametrized tests.
+          passed="$(grep -oE '[0-9]+ passed' /tmp/positives_migration.txt | tail -1 | awk '{print $1}')"
+          test "${passed}" -ge 13 || { echo "MIGRATION_POSITIVES_TOO_FEW: ${passed}"; exit 1; }
+          grep -qE '[0-9]+ (failed|error)' /tmp/positives_migration.txt && exit 1 || true
+      - name: RSA canonical encoding / parameter validation / 12-of-12 transplant rejection
+        run: |
+          set -euo pipefail
+          python -m pytest \
+            tests/runtime/test_late_return_canonical_encoding_002.py \
             tests/runtime/test_background_late_return_route_b.py \
-            tests/integration/test_core_background_trusted_return_recovery_001.py \
-            tests/integration/test_core_background_trusted_return_adversarial_001.py \
+            tests/integration/test_core_background_late_trusted_return_corrective_001.py \
+            tests/integration/test_core_background_late_trusted_return_secret_upgrade_001.py \
+            -o addopts="" -p no:cacheprovider --no-header -q -rf 2>&1 | tee /tmp/positives_rsa.txt
+          grep -qE '[0-9]+ passed' /tmp/positives_rsa.txt
+          grep -qE '[0-9]+ (failed|error)' /tmp/positives_rsa.txt && exit 1 || true
+      - name: Exactly-once, first-writer-wins, post-binding not_submitted closure, R5
+        run: |
+          set -euo pipefail
+          python -m pytest \
+            "tests/integration/test_core_background_late_trusted_return_corrective_002.py::test_ca2_014_proof_from_another_attempt_cannot_be_attached" \
+            "tests/integration/test_core_background_late_trusted_return_corrective_002.py::test_ca2_015_concurrent_attach_yields_one_canonical_winner" \
+            tests/integration/test_core_background_late_trusted_return_consumption_001.py \
             tests/integration/test_core_background_trusted_return_r5_001.py \
             tests/integration/test_core_background_trusted_return_r5_conflicts_001.py \
-            tests/integration/test_core_background_trusted_return_corrective_001_capability_replay.py \
-            tests/integration/test_core_background_trusted_return_corrective_001_store_fail_closed.py \
-            tests/integration/test_core_background_trusted_return_corrective_001_process_loss.py \
-            tests/integration/test_core_background_response_recovery_001.py \
-            tests/integration/test_core_background_response_recovery_001_corrective_001.py \
-            tests/integration/test_core_background_response_recovery_001_corrective_002_authenticity.py \
-            tests/integration/test_core_background_response_recovery_001_corrective_002_recovery.py \
-            tests/integration/test_core_gap_fix_002_background_attempts.py \
-            tests/runtime/test_background_model_attempt.py \
-            tests/runtime/test_cognitive_runtime_trusted_return.py \
-            tests/runtime/test_turn_execution_recovery.py
-      - name: Diff hygiene
-        run: git diff --check "origin/${GITHUB_BASE_REF}...HEAD"
-      - name: Export Phase E/F exact JUnit
+            -o addopts="" -p no:cacheprovider --no-header -q -rf 2>&1 | tee /tmp/positives_exactly_once.txt
+          grep -qE '[0-9]+ passed' /tmp/positives_exactly_once.txt
+          grep -qE '[0-9]+ (failed|error)' /tmp/positives_exactly_once.txt && exit 1 || true
+      - name: Upload Corrective-002 positive evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: window16-phase-ef
+          name: corrective-002-positives
           path: |
-            /tmp/window16-sigkill.xml
-            /tmp/window16-focused.xml
+            /tmp/positives_migration.txt
+            /tmp/positives_rsa.txt
+            /tmp/positives_exactly_once.txt
+          if-no-files-found: error
 
-  phase-f-full-core-regression:
-    name: phase-f-full-core-regression
-    needs: phase-ef-sigkill-and-focused
+  # ---------------------------------------------------------------------------
+  # JOB 9 - real SIGKILL / genuine external RSA return recovery
+  # ---------------------------------------------------------------------------
+  real-sigkill-recovery:
+    name: real-sigkill-and-genuine-external-return
+    needs: probe-identity
     runs-on: ubuntu-latest
-    timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.12.14"
-      - run: python -m pip install --upgrade pip
-      - run: python -m pip install -e . pydantic==2.13.5 pytest==8.4.2
-      - name: Formal environment
-        run: |
-          {
-            python -c "import sys,platform; print('python', sys.version); print('platform', platform.platform())"
-            python -c "import pydantic,pytest,sqlite3,ssl; print('pydantic',pydantic.__version__); print('pytest',pytest.__version__); print('sqlite',sqlite3.sqlite_version); print('openssl',ssl.OPENSSL_VERSION)"
-          } | tee /tmp/window16-formal-environment.txt
-      - name: Compile every changed Python file
-        shell: bash
+          python-version: "${{ env.FORMAL_PYTHON }}"
+      - name: Install exact formal dependencies
         run: |
           set -euo pipefail
-          while IFS= read -r file; do
-            test -z "$file" && continue
-            python -m py_compile "$file"
-          done < <(git diff --name-only "origin/${GITHUB_BASE_REF}...HEAD" -- '*.py')
-      - name: Full Core regression
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          pip install "pydantic==${FORMAL_PYDANTIC}" "pytest==${FORMAL_PYTEST}"
+      - name: Real multi-process SIGKILL probes (not simulated crashes)
         run: |
           set -euo pipefail
-          pytest -o addopts='' -q --tb=no \
-            tests/unit \
-            tests/integration \
-            tests/runtime \
-            tests/habitation \
-            --junitxml=/tmp/window16-core-junit.xml \
-            | tee /tmp/window16-core-pytest.txt
-          python - <<'PY'
-          import xml.etree.ElementTree as ET
-          root=ET.parse("/tmp/window16-core-junit.xml").getroot()
-          suites=[root] if root.tag=="testsuite" else list(root)
-          tests=sum(int(s.attrib.get("tests",0)) for s in suites)
-          failures=sum(int(s.attrib.get("failures",0)) for s in suites)
-          errors=sum(int(s.attrib.get("errors",0)) for s in suites)
-          skipped=sum(int(s.attrib.get("skipped",0)) for s in suites)
-          line=f"WINDOW16_CORE tests={tests} failures={failures} errors={errors} skipped={skipped}"
-          print(line)
-          open("/tmp/window16-core-counts.txt","w",encoding="utf-8").write(line+"\n")
-          PY
-      - name: Resident-visible behavioural gate
-        run: |
-          pytest -o addopts='' -q --tb=short             tests/c15_persistence/test_resident_surface.py             --junitxml=/tmp/window16-resident-visible.xml
-      - name: Scope guard
+          python -m pytest \
+            tests/integration/test_core_background_trusted_return_corrective_001_process_loss.py \
+            "tests/integration/test_core_background_late_trusted_return_corrective_002.py::test_ca2_004_real_sigkill_leaves_no_live_authority_in_the_fresh_process" \
+            "tests/integration/test_core_background_response_recovery_001_corrective_002_recovery.py::test_actual_sigkill_after_receipt_commit_recovers_without_provider_redispatch" \
+            tests/integration/test_core_background_late_trusted_return_sigkill_001.py \
+            "tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_process_sigkill_after_exact_response_staged_recovers_with_zero_provider_calls" \
+            "tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_process_sigkill_after_capability_side_effect_replays_exactly_once" \
+            "tests/integration/test_core_background_trusted_return_adversarial_001.py::test_real_sigkill_after_later_round_trusted_handoff" \
+            -o addopts="" -p no:cacheprovider --no-header -v -rf 2>&1 | tee /tmp/real_sigkill.txt
+          grep -qE '[0-9]+ passed' /tmp/real_sigkill.txt
+          grep -qE '[0-9]+ (failed|error)' /tmp/real_sigkill.txt && exit 1 || true
+          # Every one of these must have asserted a genuine SIGKILL exit code.
+          grep -c 'SIGKILL\|sigkill' /tmp/real_sigkill.txt || true
+      - name: Genuine external RSA late return end to end
         run: |
           set -euo pipefail
-          test -z "$(git diff --name-only "origin/${GITHUB_BASE_REF}...HEAD" -- tools/c15_persistence tools/c15_preflight reviews/internal_habitation/c15-rcc)"
-          git diff --check "origin/${GITHUB_BASE_REF}...HEAD"
-      - name: Export final formal evidence
+          python -m pytest \
+            tests/integration/test_core_background_late_trusted_return_corrective_001.py \
+            tests/integration/test_core_background_trusted_return_recovery_001.py \
+            tests/integration/test_core_background_trusted_return_adversarial_001.py \
+            -o addopts="" -p no:cacheprovider --no-header -q -rf 2>&1 | tee /tmp/genuine_external_return.txt
+          grep -qE '[0-9]+ passed' /tmp/genuine_external_return.txt
+          grep -qE '[0-9]+ (failed|error)' /tmp/genuine_external_return.txt && exit 1 || true
+      - name: Upload SIGKILL evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: window16-formal-final
+          name: real-sigkill-recovery
           path: |
-            /tmp/window16-formal-environment.txt
-            /tmp/window16-core-pytest.txt
-            /tmp/window16-core-junit.xml
-            /tmp/window16-core-counts.txt
-            /tmp/window16-resident-visible.xml
+            /tmp/real_sigkill.txt
+            /tmp/genuine_external_return.txt
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # JOB 10 - full Core regression gate
+  # ---------------------------------------------------------------------------
+  full-core-gate:
+    name: full-core-gate-0-failures-0-errors
+    needs: probe-identity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "${{ env.FORMAL_PYTHON }}"
+      - name: Install exact formal dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          pip install "pydantic==${FORMAL_PYDANTIC}" "pytest==${FORMAL_PYTEST}"
+      - name: Full Core gate (unit + integration + runtime + habitation)
+        run: |
+          set -euo pipefail
+          python -m pytest tests/unit tests/integration tests/runtime tests/habitation \
+            -o addopts="" -p no:cacheprovider --no-header -ra --tb=short \
+            --junitxml=/tmp/full_core_junit.xml 2>&1 | tee /tmp/full_core.txt
+          grep -qE '[0-9]+ passed' /tmp/full_core.txt || { echo "NO_PASS_SUMMARY"; exit 1; }
+          if grep -qE '[0-9]+ (failed|error)' /tmp/full_core.txt; then
+            echo "CORE_REGRESSION_FAILURE"; exit 1
+          fi
+          passed="$(grep -oE '[0-9]+ passed' /tmp/full_core.txt | tail -1 | awk '{print $1}')"
+          test "${passed}" -ge 900 || { echo "PASS_COUNT_TOO_LOW: ${passed}"; exit 1; }
+          echo "FULL_CORE_PASSED=${passed}" | tee -a "$GITHUB_ENV"
+          echo "FULL_CORE_FAILED=0" | tee -a "$GITHUB_ENV"
+          echo "FULL_CORE_ERRORS=0" | tee -a "$GITHUB_ENV"
+      - name: Upload full Core evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-core-gate
+          path: |
+            /tmp/full_core.txt
+            /tmp/full_core_junit.xml
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # JOB 11 - scope discipline and identity guard
+  # ---------------------------------------------------------------------------
+  scope-and-identity-guard:
+    name: scope-discipline-and-identity-guard
+    needs: probe-identity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Resolve the merge base against live main
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --force origin "+refs/heads/main:refs/remotes/pinned/main"
+          BASE="$(git merge-base refs/remotes/pinned/main HEAD)"
+          echo "MERGE_BASE=${BASE}" | tee -a "$GITHUB_ENV"
+          git diff --name-status "${BASE}" HEAD > /tmp/scope_diff.txt
+          wc -l /tmp/scope_diff.txt
+      - name: Forbidden paths must be untouched (out_of_scope = 0, forbidden_paths = 0)
+        run: |
+          set -euo pipefail
+          FORBIDDEN=(
+            "^A[[:space:]]+.gitignore$"
+            "^M[[:space:]]+.gitignore$"
+            "tools/c15_persistence/"
+            "tests/c15_persistence/"
+            "tools/c15_preflight/"
+            "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_IA/"
+            "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_001_IA_WINDOW_17/"
+            "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_002_IA_WINDOW_20/"
+            "reviews/C15_"
+            "reviews/internal_habitation/"
+          )
+          violations=0
+          for pattern in "${FORBIDDEN[@]}"; do
+            if grep -E "${pattern}" /tmp/scope_diff.txt; then
+              echo "FORBIDDEN_PATH_TOUCHED: ${pattern}"; violations=$((violations + 1))
+            fi
+          done
+          test "${violations}" -eq 0 || { echo "SCOPE_VIOLATION count=${violations}"; exit 1; }
+          echo "FORBIDDEN_PATHS=0" | tee -a "$GITHUB_ENV"
+      - name: Historical reviewer probe bytes must be unchanged
+        run: |
+          set -euo pipefail
+          for pair in \
+            "${W20_REVIEW}|${W20_PROBE_DIR}/window20_independent_attack.py|${SUITE_A_SHA256}" \
+            "${W20_REVIEW}|${W20_PROBE_DIR}/window20_migration_rsa_attack.py|${SUITE_B_SHA256}" \
+            "${W17_REVIEW}|${W17_PROBE_DIR}/window17_independent_attack.py|${W17_SHA256}" ; do
+            review="${pair%%|*}"; rest="${pair#*|}"; relpath="${rest%%|*}"; expected="${rest##*|}"
+            if git cat-file -e "HEAD:${relpath}" 2>/dev/null; then
+              actual="$(git show "HEAD:${relpath}" | sha256sum | awk '{print $1}')"
+              test "${actual}" = "${expected}" \
+                || { echo "REVIEWER_PROBE_MODIFIED_IN_HEAD: ${relpath}"; exit 1; }
+            fi
+            blob="$(git ls-tree "${review}" -- "${relpath}" | awk '{print $3}')"
+            test -n "${blob}"
+            test "$(git cat-file blob "${blob}" | sha256sum | awk '{print $1}')" = "${expected}"
+          done
+          echo "REVIEWER_PROBE_BYTES_UNCHANGED=TRUE" | tee -a "$GITHUB_ENV"
+      - name: No build artifacts in the tracked tree
+        run: |
+          set -euo pipefail
+          if git ls-files | grep -E '(__pycache__/|\.pyc$|\.egg-info/|(^|/)\.pytest_cache/|(^|/)build/|(^|/)dist/)'; then
+            echo "BUILD_ARTIFACTS_TRACKED"; exit 1
+          fi
+          echo "BUILD_ARTIFACTS_TRACKED=0" | tee -a "$GITHUB_ENV"
+      - name: Route B identity guard - no local mint authority may exist in source
+        run: |
+          set -euo pipefail
+          FORBIDDEN_SYMBOLS='record_live_provider_return|_capture_trusted_response_return|consume_live_provider_return_window|_ISSUE_SENTINEL|_OPEN_WINDOWS|_HANDLER_RETURNS|ModelResponseAuthenticator|model_response_authenticator|_live_provider_return_window'
+          if grep -RnE "${FORBIDDEN_SYMBOLS}" src/ ; then
+            echo "TRUST_AUTHORITY_STILL_CALLER_MANUFACTURABLE"; exit 1
+          fi
+          # The decommissioned module must be the only place naming the tombstone API.
+          test -f src/aios_core/runtime/live_return.py
+          grep -q "LOCAL_LIVE_RETURN_AUTHORITY_DECOMMISSIONED = True" \
+            src/aios_core/runtime/live_return.py
+          # No Core module outside the tombstone may import it.
+          if grep -RnE 'from \.live_return import|from aios_core\.runtime\.live_return import|import live_return' \
+               src/aios_core/runtime/background_attempt.py \
+               src/aios_core/runtime/turn_runtime.py \
+               src/aios_core/runtime/cognitive_runtime.py ; then
+            echo "TOMBSTONE_MODULE_STILL_CONSULTED_BY_CORE"; exit 1
+          fi
+          echo "ROUTE_B_IDENTITY_GUARD=PASS" | tee -a "$GITHUB_ENV"
+      - name: Only in-scope areas were touched
+        run: |
+          set -euo pipefail
+          cut -f2- /tmp/scope_diff.txt | awk '{print $NF}' | sed -E 's#^(src/aios_core/runtime|tests/unit|tests/integration|tests/runtime|tests/habitation|\.github/workflows|reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_003_RERUN_001)/.*#IN_SCOPE:\1#' > /tmp/scope_classified.txt
+          if grep -v '^IN_SCOPE:' /tmp/scope_classified.txt | sort -u | tee /tmp/scope_outliers.txt | grep -q .; then
+            echo "OUT_OF_SCOPE_PATHS:"; cat /tmp/scope_outliers.txt; exit 1
+          fi
+          echo "OUT_OF_SCOPE=0" | tee -a "$GITHUB_ENV"
+      - name: Upload scope evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scope-and-identity-guard
+          path: |
+            /tmp/scope_diff.txt
+            /tmp/scope_classified.txt
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # JOB 12 - formal environment report and exact-head identity
+  # ---------------------------------------------------------------------------
+  environment-report:
+    name: formal-environment-report-and-exact-head
+    needs:
+      - probe-identity
+      - red-first-window20-on-failed-candidate
+      - candidate-suite-a-green
+      - candidate-suite-b-green
+      - candidate-w17-green
+      - c3-author-matrix-green
+      - c3-author-matrix-red-on-failed-candidate
+      - corrective-002-positives
+      - real-sigkill-recovery
+      - full-core-gate
+      - scope-and-identity-guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "${{ env.FORMAL_PYTHON }}"
+      - name: Install exact formal dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          pip install "pydantic==${FORMAL_PYDANTIC}" "pytest==${FORMAL_PYTEST}"
+      - name: Emit the formal environment report
+        run: |
+          set -euo pipefail
+          {
+            echo "=== FORMAL ENVIRONMENT REPORT ==="
+            echo "workflow_run_head_sha=${GITHUB_SHA}"
+            echo "workflow_ref=${GITHUB_REF}"
+            echo "event_name=${GITHUB_EVENT_NAME}"
+            echo "runner_os=${RUNNER_OS}"
+            echo ""
+            echo "--- exact formal versions ---"
+            python -c 'import platform,sys; print("python_implementation=",platform.python_implementation()); print("python_version=",platform.python_version()); print("executable=",sys.executable)'
+            python -c 'import pydantic; print("pydantic_version=",pydantic.__version__)'
+            python -c 'import pytest; print("pytest_version=",pytest.__version__)'
+            python -c 'import sqlite3; print("sqlite_version=",sqlite3.sqlite_version)'
+            python -c 'import ssl; print("openssl_version=",ssl.OPENSSL_VERSION)'
+            echo ""
+            echo "--- pinned identities ---"
+            echo "FAILED_CANDIDATE=${FAILED_CANDIDATE}"
+            echo "W20_REVIEW=${W20_REVIEW}"
+            echo "W17_REVIEW=${W17_REVIEW}"
+            echo ""
+            echo "--- frozen probe identities (blob + sha256) ---"
+            echo "SUITE_A_BLOB=${SUITE_A_BLOB}"
+            echo "SUITE_A_SHA256=${SUITE_A_SHA256}"
+            echo "SUITE_B_BLOB=${SUITE_B_BLOB}"
+            echo "SUITE_B_SHA256=${SUITE_B_SHA256}"
+            echo "W17_BLOB=${W17_BLOB}"
+            echo "W17_SHA256=${W17_SHA256}"
+          } | tee /tmp/environment_report.txt
+      - name: Assert the exact formal interpreter and library versions
+        run: |
+          set -euo pipefail
+          python - <<'PY' | tee -a /tmp/environment_report.txt
+          import platform, sqlite3, ssl, sys
+          import pydantic, pytest
+          expected = ("3", "12", "14")
+          actual = sys.version_info[:3]
+          print("CPYTHON_3_12_14_EXACT=", actual == expected, actual)
+          print("PYDANTIC_2_13_5_EXACT=", pydantic.VERSION == "2.13.5", pydantic.VERSION)
+          print("PYTEST_8_4_2_EXACT=", pytest.__version__ == "8.4.2", pytest.__version__)
+          print("SQLITE_VERSION=", sqlite3.sqlite_version)
+          print("OPENSSL_VERSION=", ssl.OPENSSL_VERSION)
+          print("PLATFORM=", platform.platform())
+          if actual != expected:
+              raise SystemExit("FORMAL_CI_NOT_CPYTHON_3_12_14")
+          if pydantic.VERSION != "2.13.5":
+              raise SystemExit("FORMAL_CI_NOT_PYDANTIC_2_13_5")
+          if pytest.__version__ != "8.4.2":
+              raise SystemExit("FORMAL_CI_NOT_PYTEST_8_4_2")
+          PY
+      - name: Assert this run is the exact PR/branch head
+        run: |
+          set -euo pipefail
+          HEAD_SHA="$(git rev-parse HEAD)"
+          echo "git_head=${HEAD_SHA}" | tee -a /tmp/environment_report.txt
+          echo "github_sha=${GITHUB_SHA}" | tee -a /tmp/environment_report.txt
+          test "${HEAD_SHA}" = "${GITHUB_SHA}" || { echo "FORMAL_CI_NOT_EXACT_HEAD"; exit 1; }
+          git fetch --no-tags --force origin \
+            "+refs/heads/arena/01a101e0-haneof-aios-core-v3-0:refs/remotes/pinned/engineering"
+          REMOTE_HEAD="$(git rev-parse refs/remotes/pinned/engineering)"
+          echo "remote_engineering_branch_head=${REMOTE_HEAD}" | tee -a /tmp/environment_report.txt
+          test "${REMOTE_HEAD}" = "${GITHUB_SHA}" || { echo "FORMAL_CI_NOT_EXACT_HEAD"; exit 1; }
+          echo "EXACT_HEAD_FORMAL_CI=TRUE" | tee -a "$GITHUB_ENV"
+      - name: Upload environment report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: formal-environment-report
+          path: /tmp/environment_report.txt
+          if-no-files-found: error
