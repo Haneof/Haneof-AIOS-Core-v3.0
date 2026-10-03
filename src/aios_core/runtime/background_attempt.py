@@ -28,7 +28,6 @@ from .late_return import (
     late_return_message,
     verify_late_return_proof,
 )
-from .live_return import LiveReturnAuthorityError
 
 
 BackgroundAttemptWorkKind = Literal["wake", "periodic_review", "user_turn"]
@@ -1730,20 +1729,26 @@ class BackgroundModelAttemptStore:
         caller can later adopt arbitrary bytes for it, and no forged local
         completion can be replayed as an exact provider reply.
 
-        Two hard fail-closed gates keep this from being a caller-manufacturable
-        completion oracle:
+        Two properties keep this from being a caller-manufacturable trust oracle:
 
-        1. an attempt carrying a durable bound external late-return verifier is
-           recovery-eligible, so it may only be closed by genuine external proof;
-           a local caller is refused unconditionally and can therefore never
-           pre-empt or poison that authority;
-        2. an attempt that already has durable trusted-return rows (which can only
-           have come from genuine external proof) is refused, preserving
-           first-writer-wins for the external path.
+        1. it creates **no** receipt, **no** handoff and **no** staged exact
+           response, so the round it closes is permanently not recovery-eligible:
+           no caller can later adopt arbitrary bytes for it, and a local
+           completion can never be replayed as an exact provider reply;
+        2. it is refused when durable trusted-return rows already exist for the
+           attempt.  Those rows can only have been created by genuine external
+           proof, so a local completion can never race or replace them
+           (first-writer-wins for the external authority).
 
         An attempt that has already been driven to ``in_doubt`` by the admission
         guard is refused structurally: the completion transition below matches
-        ``state='dispatching'`` only.
+        ``state='dispatching'`` only.  Conversely, a genuine external proof is
+        authoritative over the *unverified* provenance this method writes: because
+        the absence of a receipt row is itself the durable, unforgeable marker
+        that the provenance was never externally proven,
+        :meth:`stage_exact_response` lets a verified external return supersede it
+        instead of being blocked by it.  A local caller therefore cannot poison a
+        later genuine RSA trusted return.
         """
 
         moment = as_utc(returned_at, "returned_at")
@@ -1762,24 +1767,9 @@ class BackgroundModelAttemptStore:
                 conn.rollback()
                 raise KeyError(f"unknown background model attempt: {attempt_id}")
             current = self._from_row(current_row)
-            # Route B hard gate 1: external-proof-only attempts.
-            verifier_row = conn.execute(
-                """
-                SELECT attempt_id FROM background_model_return_verifiers
-                WHERE attempt_id=?
-                """,
-                (attempt_id,),
-            ).fetchone()
-            if verifier_row is not None:
-                conn.rollback()
-                raise LiveReturnAuthorityError(
-                    "this attempt carries a durable bound external late-return "
-                    "verifier, so under Route B it can only be closed by a genuine "
-                    "external cryptographic proof; a local live caller may not "
-                    "complete it and may not pre-empt the external authority"
-                )
-            # Route B hard gate 2: never race or overwrite durable trusted-return
-            # state, which only genuine external proof can have created.
+            # Route B hard gate: never race or overwrite durable trusted-return
+            # state, which only genuine external proof can have created.  This is
+            # what preserves first-writer-wins for the external authority.
             trusted_rows = conn.execute(
                 """
                 SELECT
@@ -2659,6 +2649,37 @@ class BackgroundModelAttemptStore:
                     "a durable exact provider response cannot be staged for an "
                     "attempt that provably did not cross the provider boundary",
                 )
+            # Route B (Corrective-003, closing `BLK-W20-001`): a receipt row can
+            # now only have been created by a genuine external cryptographic proof
+            # verified against the durable bound verifier.  Its absence is
+            # therefore a durable, unforgeable marker that any provider provenance
+            # already on the attempt row was written by an *unverified* local live
+            # completion and carries no authenticity.  A genuine external proof is
+            # authoritative over such state and supersedes it, instead of being
+            # blocked by it -- which is what makes a forged local completion unable
+            # to poison a later genuine RSA trusted return.  When a verified
+            # receipt does exist, the strict equality/conflict rule is unchanged,
+            # preserving first-writer-wins and exactly-once for verified state.
+            verified_receipt_row = conn.execute(
+                """
+                SELECT authenticity_proof FROM background_model_response_receipts
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+            # The receipt proof is an HMAC over exactly the supplied fields, so
+            # equality means "the verified receipt in durable storage is for these
+            # very bytes".  Note that ``attach_late_trusted_return`` commits the
+            # receipt before staging (see FINAL_HANDOFF.md, inherited observation
+            # 1), so a matching receipt here is normally the one this same genuine
+            # proof just created.  Only a *differing* verified receipt means a
+            # different return already won first-writer-wins.
+            verified_conflicting_receipt = (
+                verified_receipt_row is not None
+                and str(verified_receipt_row["authenticity_proof"])
+                != str(supplied_authenticity_proof).strip()
+            )
+            supersedes_unverified_local = False
             if current.state in {"response_returned", "metered"} and (
                 current.provider,
                 current.model,
@@ -2670,12 +2691,14 @@ class BackgroundModelAttemptStore:
                 supplied_request_id,
                 supplied_fingerprint,
             ):
-                conn.rollback()
-                raise BackgroundModelResponseConflict(
-                    current,
-                    "supplied exact provider identity conflicts with durable "
-                    "attempt provenance",
-                )
+                if verified_conflicting_receipt:
+                    conn.rollback()
+                    raise BackgroundModelResponseConflict(
+                        current,
+                        "supplied exact provider identity conflicts with durable "
+                        "attempt provenance",
+                    )
+                supersedes_unverified_local = True
             binding_row = conn.execute(
                 """
                 SELECT * FROM background_model_request_bindings
@@ -2786,6 +2809,30 @@ class BackgroundModelAttemptStore:
                         supplied_request_id,
                         supplied_fingerprint,
                         evidence.strip(),
+                        attempt_id,
+                    ),
+                )
+            elif supersedes_unverified_local:
+                # Route B: correct the unverified local provenance to the exact
+                # externally-proven identity without demoting a state that has
+                # already been durably recorded (and possibly metered).  The
+                # verified receipt + handoff + staged response written above are
+                # what make this attempt's bytes authoritative from now on.
+                conn.execute(
+                    """
+                    UPDATE background_model_attempts
+                    SET provider=?, model=?, provider_request_id=?,
+                        response_fingerprint=?, reconciliation_evidence=?,
+                        updated_at=?
+                    WHERE attempt_id=? AND state IN ('response_returned', 'metered')
+                    """,
+                    (
+                        supplied_provider,
+                        supplied_model,
+                        supplied_request_id,
+                        supplied_fingerprint,
+                        evidence.strip(),
+                        canonical_utc_iso(moment, "updated_at"),
                         attempt_id,
                     ),
                 )

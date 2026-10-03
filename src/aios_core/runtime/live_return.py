@@ -216,9 +216,15 @@ def live_return_authority_snapshot() -> Mapping[str, object]:
         "schema": LIVE_RETURN_WINDOW_SCHEMA,
         "decommissioned": True,
         "route": "B",
+        # There is no window registry any more, so these counts are structurally
+        # and permanently zero: nothing is issued and nothing is pending.
         "open_windows": 0,
-        "armed_on_this_stack": False,
         "pending_handler_returns": 0,
+        # Honest diagnostics about the inert ContextVar.  It is reported for
+        # observability only; no authorization decision anywhere in Core reads it,
+        # so an armed value confers exactly nothing.
+        "inert_marker_on_this_stack": _ACTIVE_WINDOW.get() is not None,
+        "armed_on_this_stack": False,
         "trust_conferred": False,
         "durable_trusted_return_authority": "external_verifier_plus_genuine_proof_only",
     }
