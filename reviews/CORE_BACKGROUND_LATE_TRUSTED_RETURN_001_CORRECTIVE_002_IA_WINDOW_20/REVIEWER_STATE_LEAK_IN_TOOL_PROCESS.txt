@@ -1,0 +1,71 @@
+WINDOW 20 — OBS-W20-003 SOURCE EVIDENCE
+Residual armed live-return window in the shared process context ("state leak in tool process")
+
+Classification: OBSERVATION (non-blocking, recorded for the corrective author and PM).
+Related finding : BLK-W20-001 (same mechanism family: the live-return authority is process-global
+                  and caller-reachable, and its state is not confined to the genuine provider frame).
+Related file    : src/aios_core/runtime/live_return.py (module-level _ACTIVE_WINDOW ContextVar)
+
+--------------------------------------------------------------------------------------------------
+1. HOW IT WAS OBSERVED
+--------------------------------------------------------------------------------------------------
+During reviewer probe Suite A revision v2 (frozen SHA-256
+7cb32b5fd4a8ddb6eb3a7318c219fdd926d2a1a62edbcf38d4411d859df1c1ba, preserved verbatim as
+reviewer_probes/window20_independent_attack_v2_defective.py), the reviewer probe sequence was:
+
+    probe_ia20_mint_003_public_window_api_forge      -> completed (MINTED)
+    probe_ia20_mint_004_verifierless_attempt         -> completed (MINTED)
+    probe_ia20_objgraph_002_reflection_reachability  -> completed (MINTED)   <-- arms _ACTIVE_WINDOW
+    probe_ia20_window_001_window_hygiene_matrix      -> ABORTED
+
+Execution command (reviewer sandbox; probe source outside the candidate tree, candidate on
+PYTHONPATH only):
+    cd /home/user/w20/cand
+    PYTHONPATH=src /home/user/w20/.venv311/bin/python \
+        /home/user/w20/evidence/reviewer_probes/window20_independent_attack.py
+
+Raw logs (authoritative, unedited):
+    evidence/raw/candidate_w20_probes_v2_defective.txt        (40 lines)
+    evidence/raw/candidate_w20_probes_v2_on_fec30bd.txt       (40 lines, identical tail)
+
+Exact observed traceback tail (verbatim):
+
+    File "/usr/lib/python3.11/contextlib.py", line 137, in __enter__
+      return next(self.gen)
+    File "/home/user/w20/cand/src/aios_core/runtime/live_return.py", line 168, in open_live_provider_return_window
+      raise LiveReturnAuthorityError(
+    aios_core.runtime.live_return.LiveReturnAuthorityError: a live provider-return window is already open on this call stack
+
+--------------------------------------------------------------------------------------------------
+2. WHAT THIS ESTABLISHES
+--------------------------------------------------------------------------------------------------
+(a) The live-return authority state is a module-level ContextVar in the *shared process context*,
+    not a value confined to the genuine provider frame. Any code that can reach the module (or
+    reach `LiveProviderReturnWindow._issue` through `__globals__` reflection, see
+    IA20-OBJGRAPH-002) can ARM this state; the arm survives the caller that armed it and is only
+    cleared by consuming it or by an explicit context reset.
+(b) Consequently, a stray/residual armed window makes every subsequent genuine provider return in
+    that process/call stack raise `LiveReturnAuthorityError` — i.e. the same surface that permits
+    forgery (BLK-W20-001) also permits a denial-of-service against genuine late trusted returns.
+    The abort above happened in a *reviewer probe* process, but nothing in the mechanism limits the
+    effect to reviewers: it is a property of the candidate's authority design.
+(c) This observation is NOT itself the blocker and was NOT counted as a probe failure: it is a
+    harness artifact of the reviewer's own mint (the reviewer's probe armed the window and did not
+    reset it). It is recorded because it independently corroborates the BLK-W20-001 analysis that
+    the window is process-global state manufacturable by the caller, and because it explains the
+    Suite A v2 -> v3 revision (the v3 harness explicitly resets the armed window before and after
+    each probe). See PROBE_REVISION_LOG.md, Suite A row v2.
+(d) Consequence for probe design (recorded so the result cannot be spun either way): a probe that
+    arms the window and then performs a dispatch must reset it first, otherwise the failure it
+    observes is a shared-context residue, NOT fail-closed enforcement. The v2 result above was
+    therefore discarded as a probe outcome and the suite re-frozen as v3
+    (ec1dc5c2c5406d5d9e74825f62e0a17fb80f8ebd6dc250817fa048511ce292b5), whose 4/4 failures are the
+    findings reported in IA_REPORT.md §5.
+
+--------------------------------------------------------------------------------------------------
+3. MINIMAL CORRECTIVE RELEVANCE (for the corrective author; the reviewer does not fix it)
+--------------------------------------------------------------------------------------------------
+Any corrective that closes BLK-W20-001 by making the authority unforgeable must also confine the
+armed state so that (i) it cannot be armed by a caller outside the genuine provider frame, and
+(ii) residual state cannot block genuine returns. Scope note only — no corrective work was
+performed, and the candidate was not modified by the reviewer.
