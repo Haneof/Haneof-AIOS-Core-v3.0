@@ -20,10 +20,19 @@ from .metering import MeteringRecord, ModelMeteringLedger
 from .late_return import (
     ExternalReturnObserver,
     LATE_RETURN_PROOF_PREFIX,
+    LateReturnEncodingError,
     LateReturnSigningContext,
     LateReturnVerifier,
+    LateReturnVerifierError,
+    canonical_late_return_proof,
+    decode_late_return_proof,
     late_return_message,
     verify_late_return_proof,
+)
+from .live_return import (
+    LiveProviderReturnWindow,
+    LiveReturnAuthorityError,
+    live_return_authority_snapshot,
 )
 
 from .capabilities import (

@@ -119,6 +119,7 @@ from .cognitive_runtime import (
 )
 from .metering import ModelMeteringLedger
 from .late_return import ExternalReturnObserver, LateReturnVerifier
+from .live_return import LiveProviderReturnWindow, LiveReturnAuthorityError
 
 
 _AUTO_TOPIC = object()
@@ -1141,7 +1142,7 @@ class FusedTurnRuntime:
             model_usage_recorder=self._record_model_usage,
             model_attempt_admitter=self._admit_background_model_attempt,
             model_dispatch_recorder=self._mark_background_model_dispatch,
-            model_response_authenticator=self._authenticate_background_model_response,
+            model_response_authenticator=self._capture_live_provider_return,
             model_response_recorder=self._record_background_model_response,
             model_failure_recorder=self._record_background_model_failure,
             model_response_recovery=self._recover_exact_model_response,
@@ -1326,15 +1327,29 @@ class FusedTurnRuntime:
             # owns the private key and signs after observing a genuine return.
             self.external_return_observer.accept_return_context(snapshot, context)
 
-    def _authenticate_background_model_response(
+    def _capture_live_provider_return(
         self,
         snapshot: RuntimeSnapshot,
         directive: ModelDirective,
+        live_window: LiveProviderReturnWindow | None,
     ) -> None:
-        """Capture a non-forgeable receipt at the trusted model-return boundary."""
+        """Capture exact bytes at the live trusted model-return boundary.
+
+        Corrective-002 (`BLK-W17-001` / `C2-1`): this callback is not a
+        trust-minting API.  It carries no authority of its own and can only
+        succeed while the ephemeral window issued by the live model-call frame
+        is open on the current call stack.  Post-crash recovery callers hold no
+        such window, so invoking this method (or the store writer behind it)
+        directly fails closed.
+        """
 
         if snapshot.model_attempt_id is None:
             return
+        if live_window is None:
+            raise LiveReturnAuthorityError(
+                "trusted provider-return capture requires the ephemeral live "
+                "provider-return window issued by the live model-call frame"
+            )
         if self._active_meter_time is None:
             raise RuntimeError("background model response is missing execution time")
         # Anonymous/local handlers remain valid but cannot participate in exact
@@ -1344,10 +1359,11 @@ class FusedTurnRuntime:
             for value in self.background_model_attempts._provider_identity(directive)
         ):
             return
-        self.background_model_attempts._capture_trusted_response_return(
+        self.background_model_attempts.record_live_provider_return(
             snapshot.model_attempt_id,
             captured_at=self._active_meter_time,
             directive=directive,
+            live_window=live_window,
         )
 
     def _record_background_model_response(

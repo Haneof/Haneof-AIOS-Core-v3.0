@@ -13,11 +13,46 @@ from aios_core.runtime.cognitive_runtime import (
     ModelDirective,
     ModelUsage,
 )
+from aios_core.runtime.live_return import (
+    open_live_provider_return_window,
+    register_handler_return,
+)
 from aios_core.runtime.metering import ModelMeteringLedger
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 
 
 NOW = datetime(2026, 9, 24, 6, 0, tzinfo=timezone.utc)
+
+
+def capture_live_provider_return(
+    attempts: BackgroundModelAttemptStore,
+    attempt_id: str,
+    *,
+    captured_at: datetime,
+    directive: ModelDirective,
+):
+    """Exercise the real live provider-return authority in a unit test.
+
+    Corrective-002 history note (Window 19).  These tests used to call
+    ``BackgroundModelAttemptStore._capture_trusted_response_return`` with only an
+    attempt id and bytes.  The historical comment on that helper claimed the
+    private name plus call convention made the call site the trusted boundary;
+    Window 17 `BLK-W17-001` proved it was a recovery-reachable minting oracle, so
+    the helper no longer exists.  The replacement below does not call a mint API:
+    it opens the same ephemeral window the production model-call frame opens,
+    registers the exact handler-returned object, and then uses the production
+    writer.  The test therefore covers the real authority path instead of
+    bypassing it, which is strictly stronger than the superseded expectation.
+    """
+
+    with open_live_provider_return_window(attempt_id=attempt_id) as window:
+        register_handler_return(window, directive)
+        return attempts.record_live_provider_return(
+            attempt_id,
+            captured_at=captured_at,
+            directive=directive,
+            live_window=window,
+        )
 
 
 def test_background_attempt_pre_submission_retry_keeps_identity_and_non_world_revision(tmp_path):
@@ -79,7 +114,8 @@ def test_background_attempt_pre_submission_retry_keeps_identity_and_non_world_re
             request_id="request-unit",
         ),
     )
-    attempts._capture_trusted_response_return(
+    capture_live_provider_return(
+        attempts,
         retry.attempt_id,
         captured_at=NOW,
         directive=directive,
@@ -206,7 +242,8 @@ def _trusted_attempt(
             request_id=request_id,
         ),
     )
-    receipt = attempts._capture_trusted_response_return(
+    receipt = capture_live_provider_return(
+        attempts,
         attempt.attempt_id,
         captured_at=NOW + timedelta(seconds=1),
         directive=directive,

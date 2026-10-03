@@ -161,6 +161,7 @@ jobs:
         run: |
           pytest -o addopts='' -q --junitxml=/tmp/window16-ca.xml \
             tests/runtime/test_background_late_return_route_b.py \
+            tests/runtime/test_late_return_canonical_encoding_002.py \
             tests/integration/test_core_background_late_trusted_return_corrective_001.py \
             tests/integration/test_core_background_late_trusted_return_consumption_001.py \
             tests/integration/test_core_background_late_trusted_return_secret_upgrade_001.py
@@ -202,6 +203,7 @@ jobs:
         run: |
           pytest -o addopts='' -q --tb=short --junitxml=/tmp/window16-focused.xml \
             tests/integration/test_core_background_late_trusted_return_corrective_001.py \
+            tests/integration/test_core_background_late_trusted_return_corrective_002.py \
             tests/integration/test_core_background_late_trusted_return_consumption_001.py \
             tests/integration/test_core_background_late_trusted_return_secret_upgrade_001.py \
             tests/runtime/test_background_late_return_route_b.py \

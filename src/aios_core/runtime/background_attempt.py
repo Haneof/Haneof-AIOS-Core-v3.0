@@ -24,8 +24,13 @@ from .cognitive_runtime import ModelCallProvenance, ModelDirective, ModelUsage
 from .late_return import (
     LateReturnSigningContext,
     LateReturnVerifier,
+    LateReturnVerifierError,
     late_return_message,
     verify_late_return_proof,
+)
+from .live_return import (
+    LiveProviderReturnWindow,
+    consume_live_provider_return_window,
 )
 
 
@@ -54,6 +59,16 @@ _USAGE_FIELDS = frozenset(
     }
 )
 _PROVENANCE_FIELDS = frozenset({"provider", "model", "request_id"})
+
+# Legacy (pre-Corrective-001) keyed authenticator.  Its key lived in the same
+# runtime database, which is exactly why `C2-4` requires it to be verified before
+# anything derived from it is trusted, and purged atomically afterwards.
+_LEGACY_AUTHORITY_ID = "trusted-return-v1"
+_LEGACY_RECEIPT_PROOF_PREFIX = "bgresponse_v1_"
+
+
+class LegacyTrustMigrationError(RuntimeError):
+    """Legacy trust state could not be authenticated; nothing was converted."""
 
 
 def encode_model_directive(directive: ModelDirective) -> str:
@@ -610,58 +625,22 @@ class BackgroundModelAttemptStore:
                 conn.execute("DROP TABLE background_model_return_capabilities")
 
             if legacy_authority is not None:
-                # Receipt rows are already Core-owned durable facts binding exact
-                # request/response digests. Preserve those facts while replacing
-                # their obsolete keyed authenticator with a public integrity
-                # fingerprint, then securely erase the historical key row.
-                rows = conn.execute(
-                    "SELECT * FROM background_model_response_receipts"
-                ).fetchall()
-                for receipt_row in rows:
-                    fields = {
-                        "attempt_id": receipt_row["attempt_id"],
-                        "subject_id": receipt_row["subject_id"],
-                        "work_kind": receipt_row["work_kind"],
-                        "work_id": receipt_row["work_id"],
-                        "model_round_index": int(receipt_row["model_round_index"]),
-                        "outbound_request_fingerprint": receipt_row[
-                            "outbound_request_fingerprint"
-                        ],
-                        "relay_id": receipt_row["relay_id"],
-                        "provider": receipt_row["provider"],
-                        "model": receipt_row["model"],
-                        "provider_request_id": receipt_row["provider_request_id"],
-                        "response_fingerprint": receipt_row["response_fingerprint"],
-                        "payload_sha256": receipt_row["payload_sha256"],
-                    }
-                    proof = self._receipt_proof(**fields)
-                    attempt_id = receipt_row["attempt_id"]
-                    conn.execute(
-                        """
-                        UPDATE background_model_response_receipts
-                        SET authenticity_proof=?
-                        WHERE attempt_id=?
-                        """,
-                        (proof, attempt_id),
-                    )
-                    conn.execute(
-                        """
-                        UPDATE background_model_return_handoffs
-                        SET authenticity_proof=?
-                        WHERE attempt_id=?
-                        """,
-                        (proof, attempt_id),
-                    )
-                    conn.execute(
-                        """
-                        UPDATE background_model_responses
-                        SET authenticity_proof=?
-                        WHERE attempt_id=?
-                        """,
-                        (proof, attempt_id),
-                    )
-                conn.execute("DELETE FROM background_model_authenticity_authority")
-                conn.execute("DROP TABLE background_model_authenticity_authority")
+                # Corrective-002 (`BLK-W17-002` / `C2-4`): verify-before-convert.
+                # The legacy keyed authenticator is authenticated with the legacy
+                # HMAC authority and cross-checked against every related durable
+                # row BEFORE a single byte of trust state is rewritten.  Any
+                # inconsistency fails closed with a full rollback: no partial
+                # conversion, no secret purge, no turn completion.
+                started_transaction = not conn.in_transaction
+                if started_transaction:
+                    conn.execute("BEGIN IMMEDIATE")
+                try:
+                    self._migrate_legacy_authenticity_authority(conn)
+                except BaseException:
+                    conn.rollback()
+                    raise
+                if started_transaction:
+                    conn.commit()
 
             conn.commit()
             if purge_legacy_secrets:
@@ -672,6 +651,376 @@ class BackgroundModelAttemptStore:
                     raise RuntimeError(
                         "legacy signing material purge could not truncate SQLite WAL"
                     )
+
+    # -- legacy authenticity-authority migration (`C2-4`) ----------------
+    @staticmethod
+    def _legacy_receipt_fields(row: object) -> dict[str, object]:
+        return {
+            "attempt_id": row["attempt_id"],
+            "subject_id": row["subject_id"],
+            "work_kind": row["work_kind"],
+            "work_id": row["work_id"],
+            "model_round_index": int(row["model_round_index"]),
+            "outbound_request_fingerprint": row["outbound_request_fingerprint"],
+            "relay_id": row["relay_id"],
+            "provider": row["provider"],
+            "model": row["model"],
+            "provider_request_id": row["provider_request_id"],
+            "response_fingerprint": row["response_fingerprint"],
+            "payload_sha256": row["payload_sha256"],
+        }
+
+    @staticmethod
+    def _legacy_migration_error(detail: str) -> LegacyTrustMigrationError:
+        return LegacyTrustMigrationError(
+            "legacy authenticity-authority migration refused (fail closed, no "
+            f"partial conversion, legacy authority preserved): {detail}"
+        )
+
+    def _legacy_authority_rows(self, conn: object) -> list[object]:
+        rows = conn.execute(
+            "SELECT authority_id, secret_hex FROM background_model_authenticity_authority"
+        ).fetchall()
+        if len(rows) != 1:
+            raise self._legacy_migration_error(
+                "legacy authority table does not hold exactly one authority row"
+            )
+        if str(rows[0]["authority_id"]) != _LEGACY_AUTHORITY_ID:
+            raise self._legacy_migration_error(
+                "legacy authority row identity is not the recognized trusted-return authority"
+            )
+        return rows
+
+    def _read_legacy_authority_key(self, rows: list[object]) -> bytes:
+        raw = rows[0]["secret_hex"]
+        if not isinstance(raw, str):
+            raise self._legacy_migration_error(
+                "legacy authority secret is not a hexadecimal string"
+            )
+        try:
+            key = bytes.fromhex(raw)
+        except ValueError as exc:
+            raise self._legacy_migration_error(
+                "legacy authority secret is not valid hexadecimal"
+            ) from exc
+        if len(key) != 32:
+            raise self._legacy_migration_error(
+                "legacy authority secret is not the expected 256-bit key"
+            )
+        return key
+
+    def _migrate_legacy_authenticity_authority(self, conn: object) -> None:
+        """Authenticate and cross-verify all legacy trust state, then convert it.
+
+        Corrective-002 (`BLK-W17-002` / `C2-4`).  Every legacy ``bgresponse_v1``
+        receipt is authenticated with the legacy HMAC authority and then
+        cross-checked against its durable attempt, request binding, exact handoff
+        and staged response before *any* rewrite happens.  Verification completes
+        for the whole database first; only then are the proofs replaced with the
+        public integrity fingerprint and the obsolete secret purged, inside the
+        caller's single transaction.
+        """
+
+        authority_rows = self._legacy_authority_rows(conn)
+        receipts = conn.execute(
+            "SELECT * FROM background_model_response_receipts ORDER BY attempt_id"
+        ).fetchall()
+        handoffs = conn.execute(
+            "SELECT * FROM background_model_return_handoffs ORDER BY attempt_id"
+        ).fetchall()
+        responses = conn.execute(
+            "SELECT * FROM background_model_responses ORDER BY attempt_id"
+        ).fetchall()
+
+        if not receipts and not handoffs:
+            # There is no legacy trust state to authenticate or convert, so no
+            # record is trusted on the strength of the legacy secret and nothing
+            # is rewritten.  The obsolete secret must still be destroyed: leaving
+            # it behind would violate secret separation, and destroying it cannot
+            # launder anything because no row becomes trusted here.  A staged
+            # response that still carries a legacy authenticator would however
+            # become permanently unverifiable once the secret is gone, so that
+            # state fails closed instead of being silently stranded.
+            for response in responses:
+                staged_proof = response["authenticity_proof"]
+                if isinstance(staged_proof, str) and staged_proof.startswith(
+                    _LEGACY_RECEIPT_PROOF_PREFIX
+                ):
+                    raise self._legacy_migration_error(
+                        f"staged response {response['attempt_id']!r} carries an "
+                        "unverifiable legacy authenticator with no receipt"
+                    )
+            conn.execute("DELETE FROM background_model_authenticity_authority")
+            conn.execute("DROP TABLE background_model_authenticity_authority")
+            return
+
+        legacy_key = self._read_legacy_authority_key(authority_rows)
+        bindings = {
+            str(row["attempt_id"]): row
+            for row in conn.execute(
+                "SELECT * FROM background_model_request_bindings"
+            ).fetchall()
+        }
+        attempts = {
+            str(row["attempt_id"]): row
+            for row in conn.execute("SELECT * FROM background_model_attempts").fetchall()
+        }
+
+        receipt_ids = [str(row["attempt_id"]) for row in receipts]
+        handoff_ids = [str(row["attempt_id"]) for row in handoffs]
+        if len(set(receipt_ids)) != len(receipt_ids):
+            raise self._legacy_migration_error("duplicated legacy receipt row")
+        if len(set(handoff_ids)) != len(handoff_ids):
+            raise self._legacy_migration_error("duplicated legacy handoff row")
+        if set(receipt_ids) != set(handoff_ids):
+            raise self._legacy_migration_error(
+                "legacy receipt and handoff row sets do not correspond one-to-one"
+            )
+
+        handoff_by_id = {str(row["attempt_id"]): row for row in handoffs}
+        verified: dict[str, tuple[dict[str, object], str, str]] = {}
+
+        for receipt in receipts:
+            attempt_id = str(receipt["attempt_id"])
+            proof = receipt["authenticity_proof"]
+            if not isinstance(proof, str) or not proof.startswith(
+                _LEGACY_RECEIPT_PROOF_PREFIX
+            ):
+                raise self._legacy_migration_error(
+                    f"receipt {attempt_id!r} carries no legacy bgresponse_v1 "
+                    "authenticator while the legacy authority still exists"
+                )
+            fields = self._legacy_receipt_fields(receipt)
+            expected_proof = _LEGACY_RECEIPT_PROOF_PREFIX + hmac.new(
+                legacy_key,
+                self._receipt_message(**fields),
+                hashlib.sha256,
+            ).hexdigest()
+            if not hmac.compare_digest(proof, expected_proof):
+                raise self._legacy_migration_error(
+                    f"receipt {attempt_id!r} is not authenticated by the legacy "
+                    "HMAC authority over its own scope fields"
+                )
+            try:
+                datetime.fromisoformat(str(receipt["captured_at"]).replace("Z", "+00:00"))
+            except ValueError as exc:
+                raise self._legacy_migration_error(
+                    f"receipt {attempt_id!r} has a malformed captured_at"
+                ) from exc
+
+            attempt_row = attempts.get(attempt_id)
+            if attempt_row is None:
+                raise self._legacy_migration_error(
+                    f"receipt {attempt_id!r} has no durable attempt row"
+                )
+            if str(attempt_row["state"]) not in {
+                "dispatching",
+                "in_doubt",
+                "response_returned",
+                "metered",
+            }:
+                raise self._legacy_migration_error(
+                    f"receipt {attempt_id!r} is bound to an attempt state that "
+                    "never crossed the provider boundary"
+                )
+            for column in ("subject_id", "work_kind", "work_id"):
+                if str(attempt_row[column]) != str(receipt[column]):
+                    raise self._legacy_migration_error(
+                        f"receipt {attempt_id!r} does not match its attempt {column}"
+                    )
+            if int(attempt_row["model_round_index"]) != int(
+                receipt["model_round_index"]
+            ):
+                raise self._legacy_migration_error(
+                    f"receipt {attempt_id!r} does not match its attempt model round"
+                )
+            if attempt_row["provider"] is not None and (
+                str(attempt_row["provider"]),
+                str(attempt_row["model"]),
+                str(attempt_row["provider_request_id"]),
+                str(attempt_row["response_fingerprint"]),
+            ) != (
+                str(fields["provider"]),
+                str(fields["model"]),
+                str(fields["provider_request_id"]),
+                str(fields["response_fingerprint"]),
+            ):
+                raise self._legacy_migration_error(
+                    f"receipt {attempt_id!r} conflicts with durable attempt "
+                    "provider/model/request identity"
+                )
+            binding_row = bindings.get(attempt_id)
+            if binding_row is None:
+                raise self._legacy_migration_error(
+                    f"receipt {attempt_id!r} has no durable originating request binding"
+                )
+            binding = self._binding_from_row(binding_row)
+            if (
+                binding.attempt_id,
+                binding.subject_id,
+                binding.work_kind,
+                binding.work_id,
+                binding.model_round_index,
+            ) != (
+                str(fields["attempt_id"]),
+                str(fields["subject_id"]),
+                str(fields["work_kind"]),
+                str(fields["work_id"]),
+                int(fields["model_round_index"]),
+            ):
+                raise self._legacy_migration_error(
+                    f"receipt {attempt_id!r} does not match its durable request "
+                    "binding identity (cross-attempt transplant)"
+                )
+            if (
+                binding.outbound_request_fingerprint,
+                binding.relay_id,
+            ) != (
+                str(fields["outbound_request_fingerprint"]),
+                str(fields["relay_id"]),
+            ):
+                raise self._legacy_migration_error(
+                    f"receipt {attempt_id!r} does not match its durable outbound "
+                    "request fingerprint / relay binding"
+                )
+            expected_relay = self.relay_id_for(
+                subject_id=binding.subject_id,
+                work_kind=binding.work_kind,
+                work_id=binding.work_id,
+                model_round_index=binding.model_round_index,
+                attempt_id=binding.attempt_id,
+                outbound_request_fingerprint=binding.outbound_request_fingerprint,
+            )
+            if binding.relay_id != expected_relay:
+                raise self._legacy_migration_error(
+                    f"receipt {attempt_id!r} relay identity is not the durable "
+                    "relay for its outbound request"
+                )
+
+            handoff = handoff_by_id[attempt_id]
+            if str(handoff["authenticity_proof"]) != proof:
+                raise self._legacy_migration_error(
+                    f"handoff {attempt_id!r} authenticator does not equal its receipt"
+                )
+            if str(handoff["payload_sha256"]) != str(fields["payload_sha256"]):
+                raise self._legacy_migration_error(
+                    f"handoff {attempt_id!r} payload digest does not equal its receipt"
+                )
+            payload = handoff["directive_payload"]
+            if not isinstance(payload, str):
+                raise self._legacy_migration_error(
+                    f"handoff {attempt_id!r} payload is not a string"
+                )
+            if hashlib.sha256(payload.encode("utf-8")).hexdigest() != str(
+                fields["payload_sha256"]
+            ):
+                raise self._legacy_migration_error(
+                    f"handoff {attempt_id!r} exact payload does not hash to the "
+                    "digest bound by its receipt"
+                )
+            try:
+                directive = decode_model_directive(payload)
+            except ValueError as exc:
+                raise self._legacy_migration_error(
+                    f"handoff {attempt_id!r} payload is not a canonical model directive"
+                ) from exc
+            if self._response_fingerprint(directive) != str(
+                fields["response_fingerprint"]
+            ):
+                raise self._legacy_migration_error(
+                    f"handoff {attempt_id!r} payload response fingerprint does not "
+                    "match its receipt"
+                )
+            if self._provider_identity(directive) != (
+                str(fields["provider"]),
+                str(fields["model"]),
+                str(fields["provider_request_id"]),
+            ):
+                raise self._legacy_migration_error(
+                    f"handoff {attempt_id!r} payload provider identity does not "
+                    "match its receipt"
+                )
+            verified[attempt_id] = (fields, proof, payload)
+
+        convertible_responses: list[str] = []
+        for response in responses:
+            attempt_id = str(response["attempt_id"])
+            record = verified.get(attempt_id)
+            if record is None:
+                staged_proof = response["authenticity_proof"]
+                if isinstance(staged_proof, str) and staged_proof.startswith(
+                    _LEGACY_RECEIPT_PROOF_PREFIX
+                ):
+                    raise self._legacy_migration_error(
+                        f"staged response {attempt_id!r} carries an unverifiable "
+                        "legacy authenticator with no corresponding receipt"
+                    )
+                continue
+            fields, proof, payload = record
+            if str(response["authenticity_proof"]) != proof:
+                raise self._legacy_migration_error(
+                    f"staged response {attempt_id!r} authenticator does not equal "
+                    "its receipt"
+                )
+            for column, expected in (
+                ("provider", fields["provider"]),
+                ("model", fields["model"]),
+                ("provider_request_id", fields["provider_request_id"]),
+                ("response_fingerprint", fields["response_fingerprint"]),
+                ("payload_sha256", fields["payload_sha256"]),
+            ):
+                if str(response[column]) != str(expected):
+                    raise self._legacy_migration_error(
+                        f"staged response {attempt_id!r} {column} does not equal "
+                        "its receipt"
+                    )
+            staged_payload = response["directive_payload"]
+            if not isinstance(staged_payload, str) or staged_payload != payload:
+                raise self._legacy_migration_error(
+                    f"staged response {attempt_id!r} exact bytes do not equal its "
+                    "durable handoff"
+                )
+            convertible_responses.append(attempt_id)
+
+        # Every record is authenticated and consistent: now, and only now, convert.
+        for attempt_id in sorted(verified):
+            fields, _legacy_proof, _payload = verified[attempt_id]
+            converted = self._receipt_proof(**fields)
+            for statement, parameters in (
+                (
+                    "UPDATE background_model_response_receipts "
+                    "SET authenticity_proof=? WHERE attempt_id=?",
+                    (converted, attempt_id),
+                ),
+                (
+                    "UPDATE background_model_return_handoffs "
+                    "SET authenticity_proof=? WHERE attempt_id=?",
+                    (converted, attempt_id),
+                ),
+            ):
+                if conn.execute(statement, parameters).rowcount != 1:
+                    raise self._legacy_migration_error(
+                        f"legacy trust row {attempt_id!r} could not be converted "
+                        "exactly once"
+                    )
+        for attempt_id in sorted(convertible_responses):
+            fields, _legacy_proof, _payload = verified[attempt_id]
+            converted = self._receipt_proof(**fields)
+            if (
+                conn.execute(
+                    "UPDATE background_model_responses "
+                    "SET authenticity_proof=? WHERE attempt_id=?",
+                    (converted, attempt_id),
+                ).rowcount
+                != 1
+            ):
+                raise self._legacy_migration_error(
+                    f"legacy staged response {attempt_id!r} could not be "
+                    "converted exactly once"
+                )
+
+        conn.execute("DELETE FROM background_model_authenticity_authority")
+        conn.execute("DROP TABLE background_model_authenticity_authority")
 
     @staticmethod
     def attempt_id_for(
@@ -1716,12 +2065,21 @@ class BackgroundModelAttemptStore:
             ).fetchone()
         if row is None:
             return None
-        return LateReturnVerifier(
-            key_id=row["key_id"],
-            algorithm=row["algorithm"],
-            modulus_hex=row["modulus_hex"],
-            public_exponent=int(row["public_exponent"]),
-        )
+        try:
+            return LateReturnVerifier(
+                key_id=row["key_id"],
+                algorithm=row["algorithm"],
+                modulus_hex=row["modulus_hex"],
+                public_exponent=int(row["public_exponent"]),
+            )
+        except ValueError as exc:
+            # Corrective-002 (`C2-5` / `C2-6`): a bound verifier that is not
+            # canonical can never verify a genuine external signature, so it is
+            # fail-closed rather than silently unusable.
+            raise LateReturnVerifierError(
+                "durable late-return verifier material is not canonical; the "
+                "bound external authority can never be verified for this attempt"
+            ) from exc
 
     def late_return_signing_context(
         self,
@@ -1854,12 +2212,20 @@ class BackgroundModelAttemptStore:
                     attempt,
                     "late-return verifier scope does not match durable request binding",
                 )
-            verifier = LateReturnVerifier(
-                key_id=verifier_row["key_id"],
-                algorithm=verifier_row["algorithm"],
-                modulus_hex=verifier_row["modulus_hex"],
-                public_exponent=int(verifier_row["public_exponent"]),
-            )
+            try:
+                verifier = LateReturnVerifier(
+                    key_id=verifier_row["key_id"],
+                    algorithm=verifier_row["algorithm"],
+                    modulus_hex=verifier_row["modulus_hex"],
+                    public_exponent=int(verifier_row["public_exponent"]),
+                )
+            except ValueError as exc:
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    attempt,
+                    "bound late-return verifier is not a canonical external "
+                    "authority; the exact return cannot be verified",
+                ) from exc
             message = late_return_message(
                 attempt_id=attempt.attempt_id,
                 subject_id=attempt.subject_id,
@@ -2047,20 +2413,38 @@ class BackgroundModelAttemptStore:
             evidence=evidence.strip(),
         )
 
-    def _capture_trusted_response_return(
+    def record_live_provider_return(
         self,
         attempt_id: str,
         *,
         captured_at: datetime,
         directive: ModelDirective,
+        live_window: LiveProviderReturnWindow,
     ) -> BackgroundModelResponseReceipt:
         """Record exact bytes at the live trusted provider/relay return boundary.
 
-        No signing secret exists in Core.  The durable receipt row itself is the
-        Core-owned fact; its proof field is only an integrity fingerprint used to
-        detect row/handoff corruption during recovery.
+        Corrective-002 (`BLK-W17-001`, `C2-1` / `C2-2` / `C2-3`) removed the
+        previous recovery-reachable minting oracle.  This is the only writer of
+        trusted receipt + exact handoff rows for an in-process provider return,
+        and it is not an API that accepts caller-supplied bytes on its own: the
+        mandatory ephemeral ``live_window`` can only be satisfied from inside the
+        live model-call frame that invoked the provider handler, it is consumed
+        one-shot here, and it exists nowhere after process death.  A post-crash
+        recovery caller calling this method directly fails closed.
+
+        The stored ``authenticity_proof`` is deliberately a keyless integrity
+        fingerprint over the Core-owned row: it localizes which row is corrupt.
+        It is not authority -- recomputing it by hand confers nothing, because
+        creating the row additionally requires either the live ephemeral window
+        above or a genuine externally-verified RSA proof through
+        :meth:`attach_late_trusted_return`.
         """
 
+        consume_live_provider_return_window(
+            live_window,
+            attempt_id=attempt_id,
+            directive=directive,
+        )
         moment = as_utc(captured_at, "captured_at")
         provider, model, request_id = self._provider_identity(directive)
         if provider is None or model is None or request_id is None:

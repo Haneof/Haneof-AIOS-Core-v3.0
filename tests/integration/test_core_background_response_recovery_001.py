@@ -43,6 +43,10 @@ from aios_core.runtime.background_attempt import (
     encode_model_directive,
 )
 from aios_core.runtime.capabilities import CapabilityCall
+from aios_core.runtime.live_return import (
+    open_live_provider_return_window,
+    register_handler_return,
+)
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.wake import WakeSignalRequest
@@ -117,6 +121,32 @@ def _directive(
     )
 
 
+def capture_live_provider_return(attempts, attempt_id, *, captured_at, directive):
+    """Exercise the real live provider-return authority.
+
+    Corrective-002 history note (Window 19).  This file previously simulated the
+    trusted relay return by calling
+    ``BackgroundModelAttemptStore._capture_trusted_response_return`` directly.
+    Window 17 `BLK-W17-001` proved that helper was a recovery-reachable minting
+    oracle (any caller with bytes plus an attempt id could mint a durable trusted
+    receipt and handoff), so it was removed.  The helper below opens the same
+    ephemeral window the production model-call frame opens, registers the exact
+    handler-returned object, and then uses the production writer.  The recovery
+    assertions that follow are unchanged and strictly stronger: the receipt can
+    now only exist because a live provider return actually happened, or because a
+    genuine external RSA proof was verified.
+    """
+
+    with open_live_provider_return_window(attempt_id=attempt_id) as window:
+        register_handler_return(window, directive)
+        return attempts.record_live_provider_return(
+            attempt_id,
+            captured_at=captured_at,
+            directive=directive,
+            live_window=window,
+        )
+
+
 def _payload_and_fingerprint(runtime, directive: ModelDirective) -> tuple[str, str]:
     return (
         encode_model_directive(directive),
@@ -176,10 +206,13 @@ def _stage(
     assert attempt is not None
     authenticity_proof = None
     if attempt.state in {"dispatching", "in_doubt", "response_returned", "metered"}:
-        # Test-only simulation of the trusted relay return callback.  The
-        # recovery caller can read/copy the resulting receipt but cannot invoke
-        # its private HMAC authority through the public staging API.
-        receipt = runtime.background_model_attempts._capture_trusted_response_return(
+        # Test-only simulation of the trusted relay return callback, now through
+        # the real ephemeral live-return authority (see the history note on
+        # `capture_live_provider_return` above).  The recovery caller can read
+        # and copy the resulting receipt, but no longer has any API that turns
+        # caller-supplied bytes into trusted state.
+        receipt = capture_live_provider_return(
+            runtime.background_model_attempts,
             attempt.attempt_id,
             captured_at=staged_at - timedelta(seconds=1),
             directive=directive,
