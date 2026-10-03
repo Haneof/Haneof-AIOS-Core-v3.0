@@ -6,7 +6,17 @@ related Core source), `tests/**`, the new
 `.github/workflows/core-background-late-trusted-return-001.yml` changes so that the
 exact formal gate covers the new tests.
 
-## Changed vs the construction base (fresh main `ca47087…`)
+The PR diff versus fresh main `ca47087…` has two layers:
+
+1. `f088ce10` — *carry-forward*: re-materialisation of the 14 accepted Corrective-001
+   engineering files (byte-identical blobs, verified against `cb8a6b3c…`) onto fresh
+   main.  `git diff --stat main..f088ce10` → 14 files, 2255 insertions, 217 deletions.
+2. the Corrective-002 commits — `git diff --stat f088ce10..HEAD` →
+   30 files, 3629 insertions, 127 deletions, listed below.
+
+Total PR diff: 37 files, 5801 insertions, 261 deletions.
+
+## Changed by Corrective-002 (vs the carry-forward base `f088ce10`)
 
 | Path | Kind | Why |
 | --- | --- | --- |
@@ -37,15 +47,23 @@ state, persistence remote refs, `reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001
 ## Verified mechanically
 
 ```
-$ git diff --stat main...HEAD
- .github/workflows/core-background-late-trusted-return-001.yml |   2 +
- src/aios_core/runtime/__init__.py                             |   9 +
- src/aios_core/runtime/background_attempt.py                   | 520 +++++++++++---
- src/aios_core/runtime/cognitive_runtime.py                    |  85 ++-
- src/aios_core/runtime/late_return.py                          | 203 ++++++-
- src/aios_core/runtime/turn_runtime.py                         |  24 +-
- tests/...                                                     | (5 test files)
-$ git diff --name-only main...HEAD -- tools/c15_persistence tools/c15_preflight reviews/internal_habitation
+$ git diff --stat f088ce10..HEAD
+ .github/workflows/core-background-late-trusted-return-001.yml   |   2 +
+ src/aios_core/runtime/__init__.py                              |   9 +
+ src/aios_core/runtime/background_attempt.py                    | 520 +++++----
+ src/aios_core/runtime/cognitive_runtime.py                     |  85 +-
+ src/aios_core/runtime/late_return.py                           | 203 +++-
+ src/aios_core/runtime/live_return.py                           | 281 +++++  (new)
+ src/aios_core/runtime/turn_runtime.py                          |  24 +-
+ tests/integration/test_core_background_late_trusted_return_corrective_002.py | 1098 ++ (new)
+ tests/integration/test_core_background_response_recovery_001.py             |   41 +-
+ tests/integration/test_core_background_response_recovery_001_corrective_001.py | 40 +-
+ tests/integration/test_core_background_trusted_return_adversarial_001.py    |   57 +-
+ tests/runtime/test_background_model_attempt.py                              |   41 +-
+ tests/runtime/test_cognitive_runtime_trusted_return.py                      |   37 +-
+ tests/runtime/test_late_return_canonical_encoding_002.py                    |  333 ++ (new)
+ reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_002/**           | (evidence)
+$ git diff --name-only main..HEAD -- tools/c15_persistence tools/c15_preflight reviews/internal_habitation
 (empty)
 $ git diff --check
 (clean)
