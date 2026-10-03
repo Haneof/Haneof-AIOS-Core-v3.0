@@ -1,0 +1,11 @@
+run_id=37099376296 name=core-background-late-trusted-return-001 head_sha=fec30bd1495017bf13f08b0ef5b1e241dfb0e247 event=pull_request status=completed conclusion=success attempt=1
+workflow_path=.github/workflows/core-background-late-trusted-return-001.yml
+job 111135724970 red-first-window14 conclusion=success head_sha=fec30bd1495017bf13f08b0ef5b1e241dfb0e247 started=2026-10-03T05:17:51Z
+job 111135775618 phase-a-truthfulness conclusion=success head_sha=fec30bd1495017bf13f08b0ef5b1e241dfb0e247 started=2026-10-03T05:18:13Z
+job 111135826231 phase-bc-verifier-only conclusion=success head_sha=fec30bd1495017bf13f08b0ef5b1e241dfb0e247 started=2026-10-03T05:18:32Z
+job 111135874085 phase-ef-sigkill-and-focused conclusion=success head_sha=fec30bd1495017bf13f08b0ef5b1e241dfb0e247 started=2026-10-03T05:18:51Z
+job 111135979861 phase-f-full-core-regression conclusion=success head_sha=fec30bd1495017bf13f08b0ef5b1e241dfb0e247 started=2026-10-03T05:19:34Z
+artifact 11265940047 window16-formal-final size=21755 expired=False digest=sha256:f56bb9876c5bd45a498c649ed9ee5df88596bc45f14a94e26c85d521441dc18f
+artifact 11265677515 window16-phase-ef size=6073 expired=False digest=sha256:1577ad88428568c8e52cf02a3c40c741b7149e7cdd7614d4a767ddded7e11d18
+artifact 11265582727 window16-phase-bc size=4180 expired=False digest=sha256:997414615f86cf5bf51cb6d4ee21e727f66598886eec1bd268a71931141c2983
+artifact 11265537692 window16-red-first size=4481 expired=False digest=sha256:fc2ebc6649c062357fee779d7b5825c12d3c5f17187062a70a4bbfc5801a61b2

@@ -1,0 +1,7 @@
+=== scope audit: 39 files vs main, zero out-of-scope ===
+39
+out_of_scope_count=0
+--- forbidden-path zero check ---
+0
+--- numstat total ---
+files=39 +6049 -261

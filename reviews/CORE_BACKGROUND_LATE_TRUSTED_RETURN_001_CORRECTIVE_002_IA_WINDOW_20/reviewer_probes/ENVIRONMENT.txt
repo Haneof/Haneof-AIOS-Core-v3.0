@@ -1,0 +1,8 @@
+timestamp_utc: 2026-10-03T06:24:39Z
+host_os: Debian GNU/Linux 12 (bookworm)
+cpython: 3.11.2 (main, Apr  8 2026, 01:58:00) [GCC 12.2.0]
+sqlite: 3.40.1
+openssl: OpenSSL 3.0.20 7 Apr 2026
+pydantic: 2.13.5
+pytest: 8.4.2
+interpreter: /home/user/w20/.venv311/bin/python (CPython 3.11.2, sandbox OS image)

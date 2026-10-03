@@ -1,0 +1,9 @@
+=== candidate identity & purity (reviewer sandbox) ===
+timestamp_utc=2026-10-03T06:35:38Z
+HEAD=fec30bd1495017bf13f08b0ef5b1e241dfb0e247
+HEAD_tree=42708fdeb51b27a01358c9dc8e29482b01acd8e4
+origin_branch_tip=fec30bd1495017bf13f08b0ef5b1e241dfb0e247
+live_main=ca47087fb68c90d6ac380c11143a0e36e80fc04a
+--- tracked purity: worktree vs HEAD (empty == identical) ---
+--- untracked (excluding __pycache__) ---
+(none)

@@ -1,0 +1,40 @@
+FAIL | IA20-MINT-003
+  expected: caller outside the genuine live provider frame cannot mint receipt/handoff nor complete the in_doubt turn
+  actual:   FORGED MINT VIA PUBLIC LIVE-WINDOW API: minted=True, state=metered, receipts=1, handoffs=1, responses=1, meters=1, turn_response='FORGED_VIA_PUBLIC_LIVE_WINDOW_API_NO_PROVIDER_CALL', genuine_rsa_return_conflicted=True
+FAIL | IA20-MINT-004
+  expected: anonymous / no-verifier attempt remains permanently in_doubt FAIL_CLOSED (no receipt, no handoff, no meter, no completion)
+  actual:   state=metered, receipts=1, handoffs=1, responses=1, meters=1, turn_response='FORGED_ON_VERIFIERLESS_ATTEMPT_VIA_PUBLIC_WINDOW', refusal=None
+FAIL | IA20-OBJGRAPH-002
+  expected: recovery object graph yields no reachable callable/state able to mint trusted receipts or handoffs
+  actual:   reachable_via=[store.__class__.record_live_provider_return.__globals__, LiveProviderReturnWindow._issue.__func__.__globals__], minted=True, state=in_doubt, receipts=1, handoffs=1, responses=0
+Traceback (most recent call last):
+  File "/home/user/w20/evidence/reviewer_probes/window20_independent_attack.py", line 703, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/user/w20/evidence/reviewer_probes/window20_independent_attack.py", line 691, in main
+    res = probe_fn(root)
+          ^^^^^^^^^^^^^^
+  File "/home/user/w20/evidence/reviewer_probes/window20_independent_attack.py", line 562, in probe_ia20_window_001_negative_matrix
+    db, attempt, recovery = fresh_case("a")
+                            ^^^^^^^^^^^^^^^
+  File "/home/user/w20/evidence/reviewer_probes/window20_independent_attack.py", line 532, in fresh_case
+    _, attempt = dispatch_and_crash(
+                 ^^^^^^^^^^^^^^^^^^^
+  File "/home/user/w20/evidence/reviewer_probes/window20_independent_attack.py", line 154, in dispatch_and_crash
+    runtime.run_turn(
+  File "/home/user/w20/cand/src/aios_core/runtime/turn_runtime.py", line 3674, in run_turn
+    runtime_result = self.cognitive_runtime.run_turn(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/w20/cand/src/aios_core/runtime/cognitive_runtime.py", line 391, in run_turn
+    with _live_provider_return_window(snapshot.model_attempt_id) as live_window:
+  File "/usr/lib/python3.11/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/home/user/w20/cand/src/aios_core/runtime/cognitive_runtime.py", line 210, in _live_provider_return_window
+    with open_live_provider_return_window(attempt_id=attempt_id) as window:
+  File "/usr/lib/python3.11/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/home/user/w20/cand/src/aios_core/runtime/live_return.py", line 168, in open_live_provider_return_window
+    raise LiveReturnAuthorityError(
+aios_core.runtime.live_return.LiveReturnAuthorityError: a live provider-return window is already open on this call stack
