@@ -303,3 +303,16 @@ by this window, and no other branch is created, switched, or pushed to. Downstre
 treat the adjudication record, the task-board entry, and the checkpoint entry as **pending PR
 #311 merge** for their `main`-visible effect while the ruling itself is final and immediately
 binding on the process.
+
+## 8. Delivery receipts (as executed)
+
+| Item | Value |
+|---|---|
+| Adjudicator re-run log commit | `88a52d9d00c6327505ceaff2797518468a681a4d` |
+| Governance writeback commit | `28209d7b3bbe124292760d86fcae1032f407f7af` |
+| Publication channel | review PR **#311**, branch `arena/01a1006b-haneof-aios-core-v3-0` (branch-constrained session; see §7.1) |
+| PR #310 freeze title | `[IA_FAIL / blocker=1 / FROZEN / DO NOT MERGE] CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-002 — PM adjudicated; Corrective-003 READY` |
+| Formal adjudication comment on PR #310 | id `5967132469`, `2026-10-03T08:21:36Z`, <https://github.com/Haneof/Haneof-AIOS-Core-v3.0/pull/310#issuecomment-5967132469> |
+| Review package integrity at publication | 52 files, `SHA256SUMS` verified, 0 failures |
+| Candidate state | PR #310 `OPEN / UNMERGED`, head `fec30bd1495017bf13f08b0ef5b1e241dfb0e247` (unchanged) |
+| Integration / merge / code change performed | **none** (by mandate) |
