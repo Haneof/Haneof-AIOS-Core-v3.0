@@ -28,10 +28,7 @@ from .late_return import (
     late_return_message,
     verify_late_return_proof,
 )
-from .live_return import (
-    LiveProviderReturnWindow,
-    consume_live_provider_return_window,
-)
+from .live_return import LiveReturnAuthorityError
 
 
 BackgroundAttemptWorkKind = Literal["wake", "periodic_review", "user_turn"]
@@ -1716,17 +1713,45 @@ class BackgroundModelAttemptStore:
         returned_at: datetime,
         directive: ModelDirective,
     ) -> BackgroundModelAttempt:
+        """Close one LIVE in-process provider round without minting any trust.
+
+        Route B (Corrective-003, closing ``BLK-W20-001`` /
+        ``TRUST_AUTHORITY_ISSUANCE_REMAINS_CALLER_MANUFACTURABLE``): a normal live
+        local handler return does **not** create a durable trusted receipt and does
+        **not** create an exact return handoff.  Durable trusted provider/late
+        return exists only through
+        :meth:`attach_late_trusted_return` with a durable bound external verifier
+        plus a genuine external cryptographic proof.
+
+        This method therefore writes only the live completion transition
+        (``dispatching`` -> ``response_returned``) plus the round's unverified live
+        provenance.  Because it creates no receipt, no handoff and no staged exact
+        response, the round it closes is permanently **not** recovery-eligible: no
+        caller can later adopt arbitrary bytes for it, and no forged local
+        completion can be replayed as an exact provider reply.
+
+        Two hard fail-closed gates keep this from being a caller-manufacturable
+        completion oracle:
+
+        1. an attempt carrying a durable bound external late-return verifier is
+           recovery-eligible, so it may only be closed by genuine external proof;
+           a local caller is refused unconditionally and can therefore never
+           pre-empt or poison that authority;
+        2. an attempt that already has durable trusted-return rows (which can only
+           have come from genuine external proof) is refused, preserving
+           first-writer-wins for the external path.
+
+        An attempt that has already been driven to ``in_doubt`` by the admission
+        guard is refused structurally: the completion transition below matches
+        ``state='dispatching'`` only.
+        """
+
         moment = as_utc(returned_at, "returned_at")
         provider, model, request_id = self._provider_identity(directive)
         has_recoverable_identity = all(
             value is not None for value in (provider, model, request_id)
         )
         fingerprint = self._response_fingerprint(directive)
-        payload_sha256 = (
-            hashlib.sha256(encode_model_directive(directive).encode("utf-8")).hexdigest()
-            if has_recoverable_identity
-            else None
-        )
         with self.store._connection() as conn:
             conn.execute("BEGIN IMMEDIATE")
             current_row = conn.execute(
@@ -1737,6 +1762,46 @@ class BackgroundModelAttemptStore:
                 conn.rollback()
                 raise KeyError(f"unknown background model attempt: {attempt_id}")
             current = self._from_row(current_row)
+            # Route B hard gate 1: external-proof-only attempts.
+            verifier_row = conn.execute(
+                """
+                SELECT attempt_id FROM background_model_return_verifiers
+                WHERE attempt_id=?
+                """,
+                (attempt_id,),
+            ).fetchone()
+            if verifier_row is not None:
+                conn.rollback()
+                raise LiveReturnAuthorityError(
+                    "this attempt carries a durable bound external late-return "
+                    "verifier, so under Route B it can only be closed by a genuine "
+                    "external cryptographic proof; a local live caller may not "
+                    "complete it and may not pre-empt the external authority"
+                )
+            # Route B hard gate 2: never race or overwrite durable trusted-return
+            # state, which only genuine external proof can have created.
+            trusted_rows = conn.execute(
+                """
+                SELECT
+                    (SELECT COUNT(*) FROM background_model_response_receipts
+                     WHERE attempt_id=?) AS receipts,
+                    (SELECT COUNT(*) FROM background_model_return_handoffs
+                     WHERE attempt_id=?) AS handoffs,
+                    (SELECT COUNT(*) FROM background_model_responses
+                     WHERE attempt_id=?) AS staged
+                """,
+                (attempt_id, attempt_id, attempt_id),
+            ).fetchone()
+            if trusted_rows is not None and any(
+                int(trusted_rows[index] or 0) for index in range(3)
+            ):
+                conn.rollback()
+                raise BackgroundModelResponseConflict(
+                    current,
+                    "durable trusted provider-return state already exists for this "
+                    "attempt and can only have been created by genuine external "
+                    "proof; a local live completion may not race or replace it",
+                )
             if has_recoverable_identity:
                 binding_row = conn.execute(
                     """
@@ -1750,38 +1815,12 @@ class BackgroundModelAttemptStore:
                     if binding_row is None
                     else self._binding_from_row(binding_row)
                 )
-                receipt_row = conn.execute(
-                    """
-                    SELECT * FROM background_model_response_receipts
-                    WHERE attempt_id=?
-                    """,
-                    (attempt_id,),
-                ).fetchone()
-                if receipt_row is None:
-                    conn.rollback()
-                    raise BackgroundModelResponseConflict(
-                        current,
-                        "provider response reached Core without a trusted "
-                        "return-path receipt",
-                    )
-                receipt = self._receipt_from_row(receipt_row)
                 try:
                     binding = self._require_origin_binding(
                         current,
                         binding,
                         supplied_request_id=request_id,
                         require_relay_echo=False,
-                    )
-                    self._verify_response_authenticity(
-                        conn,
-                        attempt=current,
-                        binding=binding,
-                        provider=provider,
-                        model=model,
-                        provider_request_id=request_id,
-                        response_fingerprint=fingerprint,
-                        payload_sha256=payload_sha256,
-                        authenticity_proof=receipt.authenticity_proof,
                     )
                 except BackgroundModelResponseConflict:
                     conn.rollback()
@@ -2412,193 +2451,6 @@ class BackgroundModelAttemptStore:
             authenticity_proof=receipt_proof,
             evidence=evidence.strip(),
         )
-
-    def record_live_provider_return(
-        self,
-        attempt_id: str,
-        *,
-        captured_at: datetime,
-        directive: ModelDirective,
-        live_window: LiveProviderReturnWindow,
-    ) -> BackgroundModelResponseReceipt:
-        """Record exact bytes at the live trusted provider/relay return boundary.
-
-        Corrective-002 (`BLK-W17-001`, `C2-1` / `C2-2` / `C2-3`) removed the
-        previous recovery-reachable minting oracle.  This is the only writer of
-        trusted receipt + exact handoff rows for an in-process provider return,
-        and it is not an API that accepts caller-supplied bytes on its own: the
-        mandatory ephemeral ``live_window`` can only be satisfied from inside the
-        live model-call frame that invoked the provider handler, it is consumed
-        one-shot here, and it exists nowhere after process death.  A post-crash
-        recovery caller calling this method directly fails closed.
-
-        The stored ``authenticity_proof`` is deliberately a keyless integrity
-        fingerprint over the Core-owned row: it localizes which row is corrupt.
-        It is not authority -- recomputing it by hand confers nothing, because
-        creating the row additionally requires either the live ephemeral window
-        above or a genuine externally-verified RSA proof through
-        :meth:`attach_late_trusted_return`.
-        """
-
-        consume_live_provider_return_window(
-            live_window,
-            attempt_id=attempt_id,
-            directive=directive,
-        )
-        moment = as_utc(captured_at, "captured_at")
-        provider, model, request_id = self._provider_identity(directive)
-        if provider is None or model is None or request_id is None:
-            raise ValueError(
-                "trusted provider response must carry full provider/model/request_id identity"
-            )
-        directive_payload = encode_model_directive(directive)
-        response_fingerprint = self._response_fingerprint(directive)
-        payload_sha256 = hashlib.sha256(
-            directive_payload.encode("utf-8")
-        ).hexdigest()
-
-        with self.store._connection() as conn:
-            conn.execute("BEGIN IMMEDIATE")
-            attempt_row = conn.execute(
-                "SELECT * FROM background_model_attempts WHERE attempt_id=?",
-                (attempt_id,),
-            ).fetchone()
-            if attempt_row is None:
-                conn.rollback()
-                raise KeyError(f"unknown background model attempt: {attempt_id}")
-            attempt = self._from_row(attempt_row)
-            if attempt.state not in {
-                "dispatching",
-                "in_doubt",
-                "response_returned",
-                "metered",
-            }:
-                conn.rollback()
-                raise BackgroundModelResponseConflict(
-                    attempt,
-                    "trusted return receipt cannot be captured before the provider boundary",
-                )
-            if attempt.state in {"response_returned", "metered"} and (
-                attempt.provider,
-                attempt.model,
-                attempt.provider_request_id,
-                attempt.response_fingerprint,
-            ) != (provider, model, request_id, response_fingerprint):
-                conn.rollback()
-                raise BackgroundModelResponseConflict(
-                    attempt,
-                    "trusted return bytes conflict with durable attempt provenance",
-                )
-            binding_row = conn.execute(
-                """
-                SELECT * FROM background_model_request_bindings
-                WHERE attempt_id=?
-                """,
-                (attempt_id,),
-            ).fetchone()
-            binding = (
-                None if binding_row is None else self._binding_from_row(binding_row)
-            )
-            try:
-                binding = self._require_origin_binding(
-                    attempt,
-                    binding,
-                    supplied_request_id=request_id,
-                    require_relay_echo=False,
-                )
-            except BackgroundModelResponseConflict:
-                conn.rollback()
-                raise
-
-            receipt_fields = {
-                "attempt_id": attempt.attempt_id,
-                "subject_id": attempt.subject_id,
-                "work_kind": attempt.work_kind,
-                "work_id": attempt.work_id,
-                "model_round_index": attempt.model_round_index,
-                "outbound_request_fingerprint": binding.outbound_request_fingerprint,
-                "relay_id": binding.relay_id,
-                "provider": provider,
-                "model": model,
-                "provider_request_id": request_id,
-                "response_fingerprint": response_fingerprint,
-                "payload_sha256": payload_sha256,
-            }
-            proof = self._receipt_proof(**receipt_fields)
-            conn.execute(
-                """
-                INSERT OR IGNORE INTO background_model_response_receipts(
-                    attempt_id, subject_id, work_kind, work_id,
-                    model_round_index, outbound_request_fingerprint, relay_id,
-                    provider, model, provider_request_id, response_fingerprint,
-                    payload_sha256, authenticity_proof, captured_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    *receipt_fields.values(),
-                    proof,
-                    canonical_utc_iso(moment, "captured_at"),
-                ),
-            )
-            receipt_row = conn.execute(
-                """
-                SELECT * FROM background_model_response_receipts
-                WHERE attempt_id=?
-                """,
-                (attempt_id,),
-            ).fetchone()
-            if receipt_row is None:
-                conn.rollback()
-                raise RuntimeError("trusted response receipt was not durable")
-            receipt = self._receipt_from_row(receipt_row)
-            expected = (
-                *receipt_fields.values(),
-                proof,
-            )
-            actual = (
-                receipt.attempt_id,
-                receipt.subject_id,
-                receipt.work_kind,
-                receipt.work_id,
-                receipt.model_round_index,
-                receipt.outbound_request_fingerprint,
-                receipt.relay_id,
-                receipt.provider,
-                receipt.model,
-                receipt.provider_request_id,
-                receipt.response_fingerprint,
-                receipt.payload_sha256,
-                receipt.authenticity_proof,
-            )
-            if actual != expected:
-                conn.rollback()
-                raise BackgroundModelResponseConflict(
-                    attempt,
-                    "trusted return bytes conflict with the receipt already captured "
-                    "for this attempt",
-                )
-            conn.execute(
-                """
-                INSERT OR IGNORE INTO background_model_return_handoffs(
-                    attempt_id, directive_payload, payload_sha256, authenticity_proof
-                ) VALUES (?, ?, ?, ?)
-                """,
-                (attempt_id, directive_payload, payload_sha256, proof),
-            )
-            handoff = conn.execute(
-                "SELECT * FROM background_model_return_handoffs WHERE attempt_id=?",
-                (attempt_id,),
-            ).fetchone()
-            if handoff is None or (
-                handoff["directive_payload"], handoff["payload_sha256"],
-                handoff["authenticity_proof"],
-            ) != (directive_payload, payload_sha256, proof):
-                conn.rollback()
-                raise BackgroundModelResponseConflict(
-                    attempt, "trusted return conflicts with durable exact handoff",
-                )
-            conn.commit()
-        return receipt
 
     def response_authenticity_receipt(
         self,
