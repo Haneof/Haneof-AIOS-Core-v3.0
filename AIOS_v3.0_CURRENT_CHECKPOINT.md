@@ -1,5 +1,15 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-10-03 — WINDOW 22-RERUN-001 READY
+
+- Prior Window 22 Corrective-003 output was local-only; reported head `39917591…` is absent from GitHub and no durable Corrective-003 engineering branch exists.
+- Prior local result = `HISTORICAL_LOCAL_ONLY / NON_DURABLE / NOT_ACCEPTANCE_EVIDENCE`.
+- Publication Recovery 23A is blocked because there is no durable artifact to recover.
+- Unique next task = `WINDOW 22-RERUN-001` for the same Corrective-003 formal task.
+- Mandatory first gate: prove GitHub write/publication capability before engineering. No write capability => `GITHUB_PUBLICATION_CAPABILITY_REQUIRED`.
+- Rerun must finish with a remote exact candidate PR and exact-head formal 3.12.14 CI GREEN; only then may Window 23 Fresh IA be released.
+
+
 ## 2026-10-03 — WINDOW 22 local engineering complete / WINDOW 23A Publication Recovery READY
 
 - Window 22 = `ENGINEERING_COMPLETE_PENDING_PUBLICATION / GITHUB_PUBLICATION_BLOCKED`; no REVIEW_READY state granted.
