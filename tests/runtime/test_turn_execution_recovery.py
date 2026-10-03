@@ -13,7 +13,10 @@ from aios_core.runtime import (
     TurnExecutionInDoubt,
     TurnInputConflict,
 )
-from aios_core.runtime.background_attempt import BackgroundModelAttemptStore
+from aios_core.runtime.background_attempt import (
+    BackgroundModelAttemptStore,
+    BackgroundModelResponseConflict,
+)
 from aios_core.runtime.turn_execution import TURN_MODEL_ATTEMPT_PROTOCOL
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
@@ -245,39 +248,36 @@ def test_cg003_pre_model_failure_is_durably_proven_not_dispatched(tmp_path, monk
     assert authorized.recovery_disposition == "retry_authorized"
 
 
-def test_cg003_known_not_submitted_requires_explicit_retry_authorization(tmp_path):
+def test_cg003_typed_not_submitted_after_binding_stays_in_doubt(tmp_path):
     store, index = world(tmp_path)
     calls = []
 
     def not_submitted(_snapshot):
         calls.append("not-submitted")
-        raise ModelDispatchNotSubmitted("adapter confirms request never left process")
+        raise ModelDispatchNotSubmitted("adapter assertion after durable binding")
 
     first = FusedTurnRuntime(store=store, index=index, model_handler=not_submitted)
-    with pytest.raises(ModelDispatchNotSubmitted):
+    with pytest.raises(BackgroundModelResponseConflict):
         first.run_turn(**TURN)
 
     inspected = first.inspect_turn_execution(**TURN)
-    assert inspected.recovery_disposition == "safe_to_retry"
-    assert [attempt.state for attempt in inspected.model_attempts] == ["not_submitted"]
+    assert inspected.recovery_disposition == "in_doubt"
+    assert [attempt.state for attempt in inspected.model_attempts] == ["in_doubt"]
+    assert calls == ["not-submitted"]
 
+    restarted_store = SQLiteWorldStore(store.db_path)
     restarted = FusedTurnRuntime(
-        store=SQLiteWorldStore(store.db_path),
-        index=WorldSearchIndex(index.db_path, store=SQLiteWorldStore(store.db_path)),
-        model_handler=lambda _snapshot: successful_directive("cg003-retry"),
+        store=restarted_store,
+        index=WorldSearchIndex(index.db_path, store=restarted_store),
+        model_handler=lambda _snapshot: successful_directive("cg003-must-not-retry"),
     )
     with pytest.raises(TurnExecutionInDoubt):
+        restarted.authorize_turn_retry(
+            **TURN,
+            evidence="caller assertion cannot override durable dispatch truth",
+        )
+    with pytest.raises(TurnExecutionInDoubt):
         restarted.run_turn(**TURN)
-
-    authorized = restarted.authorize_turn_retry(
-        **TURN,
-        evidence="durable adapter boundary proves no provider submission",
-    )
-    assert authorized.recovery_disposition == "retry_authorized"
-
-    result = restarted.run_turn(**TURN)
-    assert result.runtime.response == "SYNTHETIC recovered response"
-    assert calls == ["not-submitted"]
 
 
 def test_cg003_ambiguous_provider_interruption_stays_in_doubt_across_restart(tmp_path):
@@ -311,7 +311,7 @@ def test_cg003_ambiguous_provider_interruption_stays_in_doubt_across_restart(tmp
     assert calls == ["called"]
 
 
-def test_cg003_reconciled_not_submitted_attempt_can_be_authorized_after_restart(tmp_path):
+def test_cg003_post_binding_reconciliation_is_refused_after_restart(tmp_path):
     store, index = world(tmp_path)
 
     def ambiguous(_snapshot):
@@ -326,23 +326,26 @@ def test_cg003_reconciled_not_submitted_attempt_can_be_authorized_after_restart(
     restarted = FusedTurnRuntime(
         store=reopened_store,
         index=reopened_index,
-        model_handler=lambda _snapshot: successful_directive("cg003-reconciled"),
+        model_handler=lambda _snapshot: successful_directive("cg003-must-not-retry"),
     )
-    reconciled = restarted.reconcile_turn_model_not_submitted(
-        **TURN,
-        model_round_index=0,
-        reconciled_at=NOW + timedelta(seconds=1),
-        evidence="provider gateway durable log proves request was not accepted",
-    )
-    assert reconciled.model_attempts[0].state == "not_submitted"
-    assert reconciled.recovery_disposition == "safe_to_retry"
+    with pytest.raises(BackgroundModelResponseConflict):
+        restarted.reconcile_turn_model_not_submitted(
+            **TURN,
+            model_round_index=0,
+            reconciled_at=NOW + timedelta(seconds=1),
+            evidence="operator evidence cannot erase the durable binding",
+        )
+    still_in_doubt = restarted.inspect_turn_execution(**TURN)
+    assert still_in_doubt.model_attempts[0].state == "in_doubt"
+    assert still_in_doubt.recovery_disposition == "in_doubt"
 
-    restarted.authorize_turn_retry(
-        **TURN,
-        evidence="provider gateway durable log proves request was not accepted",
-    )
-    result = restarted.run_turn(**TURN)
-    assert result.runtime.response == "SYNTHETIC recovered response"
+    with pytest.raises(TurnExecutionInDoubt):
+        restarted.authorize_turn_retry(
+            **TURN,
+            evidence="post-binding retry remains forbidden",
+        )
+    with pytest.raises(TurnExecutionInDoubt):
+        restarted.run_turn(**TURN)
 
 
 def test_cg003_response_provenance_durable_but_later_meter_failure_is_not_retryable(
