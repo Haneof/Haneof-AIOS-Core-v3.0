@@ -392,13 +392,122 @@ def test_cg003_assistant_output_persistence_failure_remains_in_doubt(tmp_path, m
 
     inspected = runtime.inspect_turn_execution(**TURN)
     assert inspected.recovery_disposition == "in_doubt"
+
+    # Route B (Corrective-003, contract C3-3).  Old expectation: a fresh process
+    # replayed the turn and reproduced "SYNTHETIC recovered response" with no second
+    # provider call, because the *live local handler return had minted its own
+    # durable trusted receipt* -- the caller-manufacturable authority adjudicated
+    # unsafe by BLK-W20-001
+    # (RECOVERY_CALLER_TRUSTED_RETURN_MINT_ORACLE_VIA_SELF_ISSUED_EPHEMERAL_WINDOW).
+    # That writer is gone, so a verifier-less attempt whose exact bytes were never
+    # externally preserved is PERMANENTLY in doubt: a fresh process may not
+    # redispatch the provider, may not fabricate a response and may not adopt any
+    # caller-supplied bytes.  The constructive half of this property -- the same
+    # crash recovering exactly once from a genuine external proof -- is asserted by
+    # the next test.
+    reopened_store = SQLiteWorldStore(store.db_path)
+    with pytest.raises(TurnExecutionInDoubt):
+        FusedTurnRuntime(
+            store=reopened_store,
+            index=WorldSearchIndex(index.db_path, store=reopened_store),
+            model_handler=model,
+        ).run_turn(**TURN)
+    assert calls == ["called"]
+    assert runtime.inspect_turn_execution(**TURN).recovery_disposition == "in_doubt"
+
+
+def test_cg003_same_crash_recovers_exactly_once_from_genuine_external_proof(
+    tmp_path, monkeypatch
+):
+    """Route B constructive half: external verifier + genuine proof => exact recovery.
+
+    TIGHTEN_ONLY replacement for the recovery half of
+    ``test_cg003_assistant_output_persistence_failure_remains_in_doubt``.  The crash
+    point, the directive, the zero-redispatch requirement and the exact-response
+    requirement are all unchanged; only the authority that preserves the exact bytes
+    changed, from a locally self-minted receipt to a genuine external RSA signature
+    over Core's durable pre-dispatch request binding.
+    """
+
+    from test_background_model_attempt import (
+        attach_external_trusted_return,
+        route_b_verifier,
+    )
+
+    store, index = world(tmp_path)
+    calls = []
+
+    def model(_snapshot):
+        calls.append("called")
+        return successful_directive("cg003-external-proof")
+
+    runtime = FusedTurnRuntime(
+        store=store,
+        index=index,
+        model_handler=model,
+        late_return_verifier=route_b_verifier(),
+    )
+
+    def fail_assistant(**_kwargs):
+        raise RuntimeError("SYNTHETIC assistant persistence failure")
+
+    monkeypatch.setattr(runtime.ingestor, "commit_assistant_output", fail_assistant)
+    with pytest.raises(RuntimeError, match="assistant persistence failure"):
+        runtime.run_turn(**TURN)
+    assert calls == ["called"]
+
+    execution_id = runtime.turn_executions.execution_id_for(
+        subject_id=runtime.subject_id,
+        session_id=TURN["session_id"],
+        turn_index=TURN["turn_index"],
+    )
+    attempt = runtime.background_model_attempts.inspect(
+        subject_id=runtime.subject_id,
+        work_kind="user_turn",
+        work_id=execution_id,
+        model_round_index=0,
+    )
+    assert attempt is not None
+    # Before any external proof: no trusted state exists at all.
+    assert runtime.background_model_attempts.response_authenticity_receipt(
+        attempt.attempt_id
+    ) is None
+    assert runtime.background_model_attempts.staged_response(attempt.attempt_id) is None
+
+    receipt = attach_external_trusted_return(
+        runtime.background_model_attempts,
+        attempt.attempt_id,
+        attached_at=NOW + timedelta(seconds=30),
+        directive=successful_directive("cg003-external-proof"),
+    )
+    assert receipt is not None
+
+    reopened_store = SQLiteWorldStore(store.db_path)
     recovered = FusedTurnRuntime(
-        store=SQLiteWorldStore(store.db_path),
-        index=WorldSearchIndex(index.db_path, store=SQLiteWorldStore(store.db_path)),
+        store=reopened_store,
+        index=WorldSearchIndex(index.db_path, store=reopened_store),
         model_handler=model,
     ).run_turn(**TURN)
     assert recovered.runtime.response == "SYNTHETIC recovered response"
+    assert recovered.runtime.recovered_response_attempts == (attempt.attempt_id,)
+    # Exactly once: the provider was never re-invoked and the round metered once.
     assert calls == ["called"]
+
+    def reopen():
+        reopened = SQLiteWorldStore(store.db_path)
+        return FusedTurnRuntime(
+            store=reopened,
+            index=WorldSearchIndex(index.db_path, store=reopened),
+            model_handler=model,
+        )
+
+    meters = reopen().metering.list_model_calls(subject_id=runtime.subject_id)
+    assert len(meters) == 1
+    assert meters[0].background_attempt_id == attempt.attempt_id
+    with pytest.raises(TurnAlreadyCompleted):
+        reopen().run_turn(**TURN)
+    assert calls == ["called"]
+    assert len(reopen().metering.list_model_calls(subject_id=runtime.subject_id)) == 1
 
 
 def test_cg003_durable_assistant_output_recovers_completion_without_model_reinvoke(

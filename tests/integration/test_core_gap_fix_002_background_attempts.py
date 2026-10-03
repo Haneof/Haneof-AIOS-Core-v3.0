@@ -29,9 +29,42 @@ from aios_core.runtime.cognitive_runtime import (
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.wake import WakeSignalRequest
+from test_core_background_response_recovery_001 import (
+    _route_b_runtime, attach_external_trusted_return,
+)
 
 
 NOW = datetime(2026, 9, 24, 6, 0, tzinfo=timezone.utc)
+
+
+# ---------------------------------------------------------------------------
+# Route B (Corrective-003 / Window 22-RERUN-001), TIGHTEN_ONLY.
+#
+# Old expectation: three tests below crashed a Wake / periodic review *after* the
+# live response had been recorded (state `response_returned` or `metered`) and then
+# asserted a restarted process could complete the work from durable state with zero
+# provider reinvocation.  That only worked because the live local handler return had
+# minted its own durable trusted receipt + exact handoff.
+#
+# Old authority mechanism: `live_return.open_live_provider_return_window` +
+# `register_handler_return` +
+# `BackgroundModelAttemptStore.record_live_provider_return`.
+#
+# Why unsafe (BLK-W20-001):
+# RECOVERY_CALLER_TRUSTED_RETURN_MINT_ORACLE_VIA_SELF_ISSUED_EPHEMERAL_WINDOW, root
+# cause TRUST_AUTHORITY_ISSUANCE_REMAINS_CALLER_MANUFACTURABLE -- window issuance was
+# an ordinary public function, so any process-local recovery caller could self-issue
+# a window and mint the trusted rows these tests replayed.
+#
+# Replacement route: Route B.  These three tests now bind an external late-return
+# verifier before the provider boundary and preserve the crashed round's exact bytes
+# with a genuine external RSA signature over Core's durable pre-dispatch request
+# binding.  Every crash point, every "provider must not be reinvoked" assertion,
+# every exactly-once metering assertion and every completion assertion is unchanged;
+# the tests additionally assert that the live completion minted no trusted state.
+# The remaining tests in this file are verifier-independent fail-closed cases and are
+# untouched.
+# ---------------------------------------------------------------------------
 
 
 def _world(tmp_path):
@@ -348,7 +381,7 @@ def test_wake_response_is_durable_before_meter_and_restart_blocks_reinvocation(
         calls += 1
         return _directive("req_response_before_meter")
 
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=provider)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=provider)
     signal = _emit_wake(runtime, key="response-before-meter")
 
     def fail_meter(**_kwargs):
@@ -370,11 +403,27 @@ def test_wake_response_is_durable_before_meter_and_restart_blocks_reinvocation(
     assert attempt is not None
     assert attempt.state == "response_returned"
     assert attempt.provider_request_id == "req_response_before_meter"
+    # Route B: the live completion minted no trusted state at all; only a genuine
+    # external proof can preserve these exact bytes for the restarted process.
+    assert (
+        runtime.background_model_attempts.response_authenticity_receipt(
+            attempt.attempt_id
+        )
+        is None
+    )
+    assert runtime.background_model_attempts.staged_response(attempt.attempt_id) is None
+    receipt = attach_external_trusted_return(
+        runtime,
+        attempt.attempt_id,
+        captured_at=NOW + timedelta(seconds=30),
+        directive=_directive("req_response_before_meter"),
+    )
+    assert receipt is not None
 
     reopened = SQLiteWorldStore(tmp_path / "world.db")
     reopened_index = WorldSearchIndex(tmp_path / "world.db", store=reopened)
     reopened_index.rebuild()
-    restarted = FusedTurnRuntime(
+    restarted = _route_b_runtime(
         store=reopened,
         index=reopened_index,
         model_handler=lambda _snapshot: pytest.fail("provider reinvoked"),
@@ -400,7 +449,7 @@ def test_wake_metered_before_completion_stays_blocked_without_synthetic_success(
         calls += 1
         return _directive("req_metered_before_complete")
 
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=provider)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=provider)
     signal = _emit_wake(runtime, key="metered-before-complete")
 
     monkeypatch.setattr(
@@ -431,11 +480,26 @@ def test_wake_metered_before_completion_stays_blocked_without_synthetic_success(
     assert len(meter_rows) == 1
     assert meter_rows[0].background_attempt_id == attempt.attempt_id
     assert attempt.meter_record_id == meter_rows[0].record_id
+    # Route B: metering is not authenticity.  The restarted process may complete this
+    # Wake only from a genuine external proof over the durable request binding.
+    assert (
+        runtime.background_model_attempts.response_authenticity_receipt(
+            attempt.attempt_id
+        )
+        is None
+    )
+    receipt = attach_external_trusted_return(
+        runtime,
+        attempt.attempt_id,
+        captured_at=NOW + timedelta(seconds=30),
+        directive=_directive("req_metered_before_complete"),
+    )
+    assert receipt is not None
 
     reopened = SQLiteWorldStore(tmp_path / "world.db")
     reopened_index = WorldSearchIndex(tmp_path / "world.db", store=reopened)
     reopened_index.rebuild()
-    restarted = FusedTurnRuntime(
+    restarted = _route_b_runtime(
         store=reopened,
         index=reopened_index,
         model_handler=lambda _snapshot: pytest.fail("provider reinvoked"),
@@ -457,7 +521,7 @@ def test_periodic_review_response_before_meter_and_meter_before_completion_are_f
     _seed_review_fact(store)
     index.catch_up()
 
-    runtime = FusedTurnRuntime(
+    runtime = _route_b_runtime(
         store=store,
         index=index,
         model_handler=lambda _snapshot: _directive("req_review_response_before_meter"),
@@ -479,12 +543,26 @@ def test_periodic_review_response_before_meter_and_meter_before_completion_are_f
     )
     assert response_attempt is not None
     assert response_attempt.state == "response_returned"
+    # Route B: the live completion minted no trusted state; only a genuine external
+    # proof over the durable pre-dispatch binding can preserve these exact bytes.
+    assert (
+        runtime.background_model_attempts.response_authenticity_receipt(
+            response_attempt.attempt_id
+        )
+        is None
+    )
+    assert attach_external_trusted_return(
+        runtime,
+        response_attempt.attempt_id,
+        captured_at=NOW + timedelta(seconds=30),
+        directive=_directive("req_review_response_before_meter"),
+    ) is not None
 
     monkeypatch.setattr(runtime.metering, "record_model_call", real_meter)
     reopened = SQLiteWorldStore(tmp_path / "world.db")
     reopened_index = WorldSearchIndex(tmp_path / "world.db", store=reopened)
     reopened_index.rebuild()
-    restarted = FusedTurnRuntime(
+    restarted = _route_b_runtime(
         store=reopened,
         index=reopened_index,
         model_handler=lambda _snapshot: pytest.fail("review provider reinvoked"),
@@ -499,7 +577,7 @@ def test_periodic_review_response_before_meter_and_meter_before_completion_are_f
     index2.rebuild()
     _seed_review_fact(store2)
     index2.catch_up()
-    runtime2 = FusedTurnRuntime(
+    runtime2 = _route_b_runtime(
         store=store2,
         index=index2,
         model_handler=lambda _snapshot: _directive("req_review_metered_before_complete"),
@@ -522,11 +600,24 @@ def test_periodic_review_response_before_meter_and_meter_before_completion_are_f
     )
     assert metered is not None
     assert metered.state == "metered"
+    # Route B: metering is not authenticity either.
+    assert (
+        runtime2.background_model_attempts.response_authenticity_receipt(
+            metered.attempt_id
+        )
+        is None
+    )
+    assert attach_external_trusted_return(
+        runtime2,
+        metered.attempt_id,
+        captured_at=NOW + timedelta(seconds=30),
+        directive=_directive("req_review_metered_before_complete"),
+    ) is not None
 
     reopened2 = SQLiteWorldStore(tmp_path / "world2.db")
     reopened_index2 = WorldSearchIndex(tmp_path / "world2.db", store=reopened2)
     reopened_index2.rebuild()
-    restarted2 = FusedTurnRuntime(
+    restarted2 = _route_b_runtime(
         store=reopened2,
         index=reopened_index2,
         model_handler=lambda _snapshot: pytest.fail("review provider reinvoked"),

@@ -3,11 +3,12 @@
 Frozen expectations (Corrective-002 scope `C2-1` .. `C2-9`):
 
 * no object reachable from a post-crash recovery runtime can create a trusted
-  receipt, exact handoff or staged trusted response without either the ephemeral
-  live provider-return window of the current process or a genuine externally
-  verified RSA late-return proof;
-* the live window is stack-scoped, one-shot, non-persisted, absent after process
-  death and absent from the runtime/store object graph;
+  receipt, exact handoff or staged trusted response without a genuine externally
+  verified RSA late-return proof over a verifier that was durably bound before the
+  provider boundary;
+* the historical live provider-return window is decommissioned (Route B): it arms
+  nothing, is non-persisted, is absent after process death and is absent from the
+  runtime/store object graph, and a genuine live local return mints no trusted row;
 * verifier-less / anonymous interrupted dispatches stay strictly ``in_doubt``;
 * legacy keyed-authenticator migration is verify-before-convert and atomic: any
   unauthenticated, inconsistent, transplanted or malformed legacy record fails
@@ -378,6 +379,38 @@ def test_ca2_001_recovery_object_graph_exposes_no_trust_mint_api(tmp_path):
 
 
 def test_ca2_002_direct_mint_attempts_fail_closed(tmp_path):
+    """Route B: no local mint writer exists, so every direct mint attempt fails closed.
+
+    TIGHTEN_ONLY history (Corrective-003 / Window 22-RERUN-001).
+
+    Old expectation: the five numbered cases below asserted that
+    ``record_live_provider_return`` and ``LiveProviderReturnWindow._issue`` refused
+    with ``LiveReturnAuthorityError`` when handed no window, a fabricated window, a
+    closed window, another thread's window, or bytes the handler did not return.
+    Those refusals were the *only* thing standing between a recovery caller and a
+    durable trusted receipt.
+
+    Old authority mechanism: the ephemeral live provider-return window
+    (``open_live_provider_return_window`` + ``register_handler_return`` +
+    ``record_live_provider_return``).
+
+    Why unsafe (BLK-W20-001):
+    ``RECOVERY_CALLER_TRUSTED_RETURN_MINT_ORACLE_VIA_SELF_ISSUED_EPHEMERAL_WINDOW``,
+    root cause ``TRUST_AUTHORITY_ISSUANCE_REMAINS_CALLER_MANUFACTURABLE`` -- window
+    issuance was itself an ordinary public function, so the caller could simply issue
+    its own window and satisfy every one of those refusals legitimately.
+
+    Replacement route / equal-or-stronger: Route B removes the writer and the issuance
+    classmethod entirely.  Each case is now asserted *structurally* (the attribute does
+    not exist on the instance or on the class, so ``__globals__`` reflection over the
+    store class exposes no live-return symbol) rather than behaviourally (a refusal that
+    a self-issued window could bypass).  Structural absence is strictly stronger than a
+    bypassable refusal.  Case 5 is strengthened from "bytes the handler did not return
+    are refused" to "no self-asserted bytes are accepted at all, whether or not the
+    handler returned them", and the file still asserts that zero trusted rows are
+    created and that the verifier-less attempt stays ``in_doubt``.
+    """
+
     db = tmp_path / "ca2-002.sqlite"
     signer = ExternalSigner()
     _, attempt = dispatch_and_crash(
@@ -389,34 +422,43 @@ def test_ca2_002_direct_mint_attempts_fail_closed(tmp_path):
     forged = make_directive(response="FORGED_DIRECT_MINT")
     before = trust_rows(db)
 
-    # 1. The historical recovery-reachable helper does not exist.
+    # 1. The historical recovery-reachable private helper does not exist.
     with pytest.raises(AttributeError):
         attempts_store._capture_trusted_response_return(  # type: ignore[attr-defined]
             attempt.attempt_id, captured_at=NOW, directive=forged
         )
 
-    # 2. The production writer refuses with no window / a forged window.
-    with pytest.raises(LiveReturnAuthorityError):
-        attempts_store.record_live_provider_return(
+    # 2. Route B: the Corrective-002 public live writer does not exist either --
+    #    neither on the instance nor on the class, so reflecting over
+    #    ``type(store).__dict__`` or over any store method's ``__globals__`` yields
+    #    no live-return writer to call.
+    for target in (attempts_store, type(attempts_store)):
+        assert not hasattr(target, "record_live_provider_return")
+        assert not hasattr(target, "_capture_trusted_response_return")
+    with pytest.raises(AttributeError):
+        attempts_store.record_live_provider_return(  # type: ignore[attr-defined]
             attempt.attempt_id,
             captured_at=NOW,
             directive=forged,
-            live_window=None,  # type: ignore[arg-type]
+            live_window=None,
         )
-    with pytest.raises(LiveReturnAuthorityError):
-        LiveProviderReturnWindow._issue(
+    assert not hasattr(LiveProviderReturnWindow, "_issue")
+    with pytest.raises(AttributeError):
+        LiveProviderReturnWindow._issue(  # type: ignore[attr-defined]
             sentinel=object(),
             attempt_id=attempt.attempt_id,
             window_id="forged-window",
             seal=b"0" * 32,
         )
+    # ``object.__new__`` fabrication yields an inert marker that no Core code reads.
     fabricated = object.__new__(LiveProviderReturnWindow)
     object.__setattr__(fabricated, "_attempt_id", attempt.attempt_id)
     object.__setattr__(fabricated, "_window_id", "forged-window")
     object.__setattr__(fabricated, "_seal", b"0" * 32)
     object.__setattr__(fabricated, "_state", "open")
-    with pytest.raises(LiveReturnAuthorityError):
-        attempts_store.record_live_provider_return(
+    assert isinstance(fabricated, LiveProviderReturnWindow)
+    with pytest.raises(AttributeError):
+        attempts_store.record_live_provider_return(  # type: ignore[attr-defined]
             attempt.attempt_id,
             captured_at=NOW,
             directive=forged,
@@ -425,55 +467,70 @@ def test_ca2_002_direct_mint_attempts_fail_closed(tmp_path):
     with pytest.raises(TypeError):
         LiveProviderReturnWindow()
 
-    # 3. A window that was legitimately issued and already closed cannot be
-    #    replayed: the process-local registry entry dies with the `with` block.
+    # 3. A legitimately opened window arms nothing at all, and stays inert after the
+    #    frame that opened it returns.
     with open_live_provider_return_window(attempt_id=attempt.attempt_id) as window:
         register_handler_return(window, forged)
-    assert window.state == "closed"
-    with pytest.raises(LiveReturnAuthorityError):
-        attempts_store.record_live_provider_return(
+        armed = live_return_authority_snapshot()
+        assert armed["trust_conferred"] is False
+        assert armed["armed_on_this_stack"] is False
+        assert armed["decommissioned"] is True
+    after_frame = live_return_authority_snapshot()
+    assert after_frame["open_windows"] == 0
+    assert after_frame["pending_handler_returns"] == 0
+    assert after_frame["inert_marker_on_this_stack"] is False
+    with pytest.raises(AttributeError):
+        attempts_store.record_live_provider_return(  # type: ignore[attr-defined]
             attempt.attempt_id,
             captured_at=NOW,
             directive=forged,
             live_window=window,
         )
 
-    # 4. A live window armed on another call stack (thread) carries no authority.
+    # 4. A window armed on another call stack (thread) carries no authority either.
     leaked: dict[str, object] = {}
 
     def worker() -> None:
-        try:
-            with open_live_provider_return_window(
-                attempt_id=attempt.attempt_id
-            ) as other:
-                leaked["window"] = other
-                register_handler_return(other, forged)
-                # The inner stack does hold authority, but the outer thread does
-                # not: below we invoke the writer from the main thread instead.
-        except LiveReturnAuthorityError:  # pragma: no cover - defensive
-            pass
+        with open_live_provider_return_window(
+            attempt_id=attempt.attempt_id
+        ) as other:
+            leaked["window"] = other
+            register_handler_return(other, forged)
 
     thread = threading.Thread(target=worker)
     thread.start()
     thread.join()
-    with pytest.raises(LiveReturnAuthorityError):
-        attempts_store.record_live_provider_return(
+    assert isinstance(leaked["window"], LiveProviderReturnWindow)
+    with pytest.raises(AttributeError):
+        attempts_store.record_live_provider_return(  # type: ignore[attr-defined]
             attempt.attempt_id,
             captured_at=NOW,
             directive=forged,
             live_window=leaked["window"],
         )
 
-    # 5. Inside a live window, bytes that the in-process handler did not return
-    #    are still refused (handler-return identity binding).
+    # 5. Route B strengthening: "the in-process handler returned exactly these bytes"
+    #    can never be self-asserted, so nothing is accepted inside a live window --
+    #    not different bytes, and not the very bytes the window was told about.
     with open_live_provider_return_window(attempt_id=attempt.attempt_id) as window:
         register_handler_return(window, forged)
-        with pytest.raises(LiveReturnAuthorityError):
-            attempts_store.record_live_provider_return(
+        for candidate in (forged, make_directive(response="DIFFERENT_OBJECT")):
+            with pytest.raises(AttributeError):
+                attempts_store.record_live_provider_return(  # type: ignore[attr-defined]
+                    attempt.attempt_id,
+                    captured_at=NOW,
+                    directive=candidate,
+                    live_window=window,
+                )
+        # The only remaining route is genuine external proof, and a bogus signature
+        # over the durable bound verifier is refused.
+        with pytest.raises(BackgroundModelResponseConflict):
+            attempts_store.attach_late_trusted_return(
                 attempt.attempt_id,
-                captured_at=NOW,
-                directive=make_directive(response="DIFFERENT_OBJECT"),
-                live_window=window,
+                attached_at=NOW + timedelta(seconds=1),
+                directive_payload=encode_model_directive(forged),
+                late_return_proof="bglate_rsa_v1:ca2-external-key:" + "00" * 256,
+                evidence="forged signature must never mint trusted state",
             )
 
     assert trust_rows(db) == before == (0, 0, 0)
@@ -532,6 +589,37 @@ def test_ca2_003_verifier_less_forged_recovery_stays_in_doubt(tmp_path):
 # CA2-004 — genuine live provider return still works, and is ephemeral
 # ===========================================================================
 def test_ca2_004_genuine_live_return_captures_and_is_ephemeral(tmp_path):
+    """Route B: a genuine live return captures NOTHING and confers no authority.
+
+    TIGHTEN_ONLY history (Corrective-003 / Window 22-RERUN-001).
+
+    Old expectation: after one ordinary live turn, a durable trusted receipt existed
+    (``receipt.provider == "provider-ca2"``) together with an exact handoff
+    (``trust_rows(db) == (1, 1, 0)`` or ``(1, 1, 1)``), produced by the live
+    provider-return window; the test then asserted that this authority was
+    stack-scoped and vanished with the frame.
+
+    Old authority mechanism: ``open_live_provider_return_window`` +
+    ``register_handler_return`` + ``record_live_provider_return``.
+
+    Why unsafe (BLK-W20-001):
+    ``RECOVERY_CALLER_TRUSTED_RETURN_MINT_ORACLE_VIA_SELF_ISSUED_EPHEMERAL_WINDOW``,
+    root cause ``TRUST_AUTHORITY_ISSUANCE_REMAINS_CALLER_MANUFACTURABLE`` -- the
+    "ephemeral, stack-scoped, non-persisted" properties this test used to verify were
+    all satisfiable by a recovery caller that simply issued its own window, so they
+    never established authenticity.
+
+    Replacement route / equal-or-stronger: Route B.  The ephemerality assertions are
+    kept in full (no window open, nothing armed, nothing pending, no
+    ``LiveProviderReturnWindow`` reachable from the runtime/store object graph, no
+    window schema bytes in the raw database) and are now preceded by the strictly
+    stronger invariant that a genuine live local return creates ZERO trusted rows:
+    no receipt, no handoff, no staged exact response.  A live turn therefore cannot
+    make its own bytes recovery-eligible; only a durable external verifier bound
+    before dispatch plus a genuine external proof can, which is what CA2-001 and the
+    frozen Window 17 / Window 20 reviewer probes exercise.
+    """
+
     db = tmp_path / "ca2-004.sqlite"
     store, index = open_world(db)
 
@@ -555,39 +643,69 @@ def test_ca2_004_genuine_live_return_captures_and_is_ephemeral(tmp_path):
     attempt = runtime.background_model_attempts.list_for_work(
         subject_id="user_1", work_kind="user_turn", work_id=execution_id
     )[-1]
-    receipt = runtime.background_model_attempts.response_authenticity_receipt(
-        attempt.attempt_id
-    )
-    assert receipt is not None
-    assert receipt.attempt_id == attempt.attempt_id
-    assert receipt.provider == "provider-ca2"
-    assert receipt.provider_request_id == "request-ca2"
-    assert trust_rows(db) == (1, 1, 0) or trust_rows(db) == (1, 1, 1)
 
-    # The live authority is gone the moment the frame that issued it returns: no
-    # window remains open, no window is reachable from the recovery graph, and
-    # nothing about it is persisted.
+    # Route B: the live local return authenticated itself and minted nothing.
+    assert (
+        runtime.background_model_attempts.response_authenticity_receipt(
+            attempt.attempt_id
+        )
+        is None
+    )
+    assert runtime.background_model_attempts.staged_response(attempt.attempt_id) is None
+    assert trust_rows(db) == (0, 0, 0)
+    # The attempt did complete live, and its durable provenance is the provider
+    # identity it reported -- but that provenance carries no authenticity and makes
+    # the round permanently not recovery-eligible.
+    completed = runtime.background_model_attempts.get(attempt.attempt_id)
+    assert completed.state in {"response_returned", "metered"}
+    assert completed.provider == "provider-ca2"
+    assert completed.provider_request_id == "request-ca2"
+    assert (
+        runtime.background_model_attempts.late_return_verifier(attempt.attempt_id)
+        is None
+    )
+
+    # The decommissioned authority is absent everywhere it used to be observable: no
+    # window remains open, none is reachable from the recovery graph, and nothing
+    # about it is persisted.
     snapshot = live_return_authority_snapshot()
     assert snapshot["open_windows"] == 0
     assert snapshot["armed_on_this_stack"] is False
     assert snapshot["pending_handler_returns"] == 0
+    assert snapshot["inert_marker_on_this_stack"] is False
+    assert snapshot["trust_conferred"] is False
+    assert snapshot["decommissioned"] is True
     reachable = _reachable(runtime)
     assert not any(
         isinstance(value, LiveProviderReturnWindow) for _path, value in reachable
     )
     assert b"aios_live_provider_return_window" not in raw_runtime_bytes(db)
 
-    # Fresh process: the same attempt cannot be minted again, only consumed.
+    # Fresh process: the same attempt cannot be minted at all, and no local writer
+    # exists to consume.
     restarted = fresh_recovery_runtime(db)
     assert live_return_authority_snapshot()["open_windows"] == 0
     assert (
         restarted.background_model_attempts.late_return_verifier(attempt.attempt_id)
         is None
     )
+    assert not hasattr(
+        restarted.background_model_attempts, "record_live_provider_return"
+    )
     with pytest.raises(AttributeError):
         restarted.background_model_attempts._capture_trusted_response_return(  # type: ignore[attr-defined]
             attempt.attempt_id, captured_at=NOW, directive=make_directive()
         )
+    # And a verifier-less attempt can never be given trusted bytes after the fact.
+    with pytest.raises(BackgroundModelResponseConflict):
+        restarted.background_model_attempts.attach_late_trusted_return(
+            attempt.attempt_id,
+            attached_at=NOW + timedelta(seconds=1),
+            directive_payload=encode_model_directive(make_directive()),
+            late_return_proof="bglate_rsa_v1:ca2-external-key:" + "00" * 256,
+            evidence="no external verifier was ever bound for this attempt",
+        )
+    assert trust_rows(db) == (0, 0, 0)
 
 
 # ===========================================================================

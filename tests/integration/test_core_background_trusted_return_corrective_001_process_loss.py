@@ -32,6 +32,37 @@ kind. These probes therefore add the modes and the family the reviewer demanded:
   the foreground mode, through ``run_turn`` admission.
 * ``periodic_review`` + ``form_event`` -- one of the five reviewer-proven RED
   families, in the review work kind.
+
+TIGHTEN_ONLY history (Corrective-003 / Window 22-RERUN-001)
+----------------------------------------------------------
+Old expectation: after the real ``SIGKILL``, the parent could replay the identical
+recovered directive because the *live local handler return inside the child had
+already minted a durable trusted receipt* for the round.
+
+Old authority mechanism: ``live_return.open_live_provider_return_window`` +
+``register_handler_return`` + ``BackgroundModelAttemptStore.record_live_provider_return``
+(reached through the shared ``_stage(trusted_return=True)`` helper).
+
+Why unsafe (BLK-W20-001):
+``RECOVERY_CALLER_TRUSTED_RETURN_MINT_ORACLE_VIA_SELF_ISSUED_EPHEMERAL_WINDOW``, root
+cause ``TRUST_AUTHORITY_ISSUANCE_REMAINS_CALLER_MANUFACTURABLE`` -- window issuance was
+an ordinary public function, so any process-local recovery caller could self-issue a
+window, declare its own bytes handler-returned and mint the trusted receipt these
+probes replayed after a real process death.
+
+Replacement route: Route B.  Every runtime in this file (parent and forked child) is
+now built by ``_route_b_runtime``, which binds an external late-return verifier before
+the provider boundary.  The exact bytes are preserved across the real ``SIGKILL`` by a
+genuine external RSA signature over Core's durable pre-dispatch request binding -- the
+binding row itself survives the kill, which is what makes the external proof obtainable
+in the parent.  The private exponent is TEST-ONLY material owned by the simulated
+external side.
+
+Kept unchanged: every real ``SIGKILL`` (``exitcode == -SIGKILL``), every capability
+family and runtime mode, the zero-provider-redispatch requirement, the single meter
+row, the exactly-one durable capability effect, the single operation identity, the
+converging logical turn, and every revision assertion.  No probe was turned into a
+simulated crash and no expectation was weakened.
 """
 from __future__ import annotations
 
@@ -55,6 +86,7 @@ from test_core_background_response_recovery_001_corrective_001 import (
     NOW,
     _attempt,
     _directive,
+    _route_b_runtime,
     _running_review_id,
     _seed_review_fact,
     _stage,
@@ -77,7 +109,7 @@ def _reopen(db):
 
 def _runtime(db) -> FusedTurnRuntime:
     store, index = _reopen(db)
-    return FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: None)
+    return _route_b_runtime(store=store, index=index, model_handler=lambda _s: None)
 
 
 def _invoke(runtime: FusedTurnRuntime, name: str, arguments: dict, *, call_id: str):
@@ -287,7 +319,7 @@ def test_process_sigkill_after_revise_claim_replays_exactly_once(tmp_path):
     wake = _running_wake(store)
     wake_id = str(wake["object_id"])
     attempt = _attempt(
-        FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: None),
+        _route_b_runtime(store=store, index=index, model_handler=lambda _s: None),
         work_kind="wake",
         work_id=wake_id,
     )
@@ -297,7 +329,7 @@ def test_process_sigkill_after_revise_claim_replays_exactly_once(tmp_path):
     )
 
     meter_before = _round0_meter(
-        FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: None),
+        _route_b_runtime(store=store, index=index, model_handler=lambda _s: None),
         wake_id=wake_id,
     )
     assert len(meter_before) == 1, "the crashed round was not metered"
@@ -308,7 +340,7 @@ def test_process_sigkill_after_revise_claim_replays_exactly_once(tmp_path):
         recovery_rounds.append(snapshot.round_index)
         return _directive("req-pl-wake-revise-next", silence=True)
 
-    restarted = FusedTurnRuntime(store=store, index=index, model_handler=provider)
+    restarted = _route_b_runtime(store=store, index=index, model_handler=provider)
     _stage(
         restarted,
         work_kind="wake",
@@ -419,7 +451,7 @@ def test_process_sigkill_after_transition_goal_replays_exactly_once(tmp_path):
     ops_before = _operations(db, "execution.goal.transition")
     assert len(ops_before) == 1
 
-    restarted_probe = FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: None)
+    restarted_probe = _route_b_runtime(store=store, index=index, model_handler=lambda _s: None)
     execution_id = restarted_probe.turn_executions.execution_id_for(
         subject_id=SUBJECT, session_id=TURN["session_id"], turn_index=TURN["turn_index"]
     )
@@ -428,7 +460,7 @@ def test_process_sigkill_after_transition_goal_replays_exactly_once(tmp_path):
     assert attempt.state == "metered"
 
     meter_before = _round0_meter(
-        FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: None),
+        _route_b_runtime(store=store, index=index, model_handler=lambda _s: None),
         session_id=TURN["session_id"],
     )
     assert len(meter_before) == 1, "the crashed round was not metered"
@@ -439,7 +471,7 @@ def test_process_sigkill_after_transition_goal_replays_exactly_once(tmp_path):
         recovery_rounds.append(snapshot.round_index)
         return _directive("req-pl-turn-next", silence=True)
 
-    restarted = FusedTurnRuntime(store=store, index=index, model_handler=provider)
+    restarted = _route_b_runtime(store=store, index=index, model_handler=provider)
     _stage(
         restarted,
         work_kind="user_turn",
@@ -529,7 +561,7 @@ def test_process_sigkill_after_form_event_replays_exactly_once(tmp_path):
 
     review_id = _running_review_id(store, subject_id=SUBJECT)
     attempt = _attempt(
-        FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: None),
+        _route_b_runtime(store=store, index=index, model_handler=lambda _s: None),
         work_kind="periodic_review",
         work_id=review_id,
     )
@@ -537,7 +569,7 @@ def test_process_sigkill_after_form_event_replays_exactly_once(tmp_path):
     assert attempt.state == "metered"
 
     meter_before = _round0_meter(
-        FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: None),
+        _route_b_runtime(store=store, index=index, model_handler=lambda _s: None),
         wake_id=review_id,
     )
     assert len(meter_before) == 1, "the crashed round was not metered"
@@ -548,7 +580,7 @@ def test_process_sigkill_after_form_event_replays_exactly_once(tmp_path):
         recovery_rounds.append(snapshot.round_index)
         return _directive("req-pl-review-next", silence=True)
 
-    restarted = FusedTurnRuntime(store=store, index=index, model_handler=provider)
+    restarted = _route_b_runtime(store=store, index=index, model_handler=provider)
     _stage(
         restarted,
         work_kind="periodic_review",
