@@ -1,0 +1,797 @@
+.FFFFF.FF.FF.FFFFFF....F.F..                                             [100%]
+=================================== FAILURES ===================================
+_ test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-01-public-function] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-60/test_c3_attack_case_leaves_no_0')
+case_id = 'C3-1-01-public-function'
+attack = <function c1_01_public_function at 0x7f3436e844a0>
+bind_verifier = True, force_in_doubt = False
+
+    @pytest.mark.parametrize(
+        "case_id,attack,bind_verifier,force_in_doubt",
+        [pytest.param(*spec, id=spec[0]) for spec in CASE_SPECS],
+    )
+    def test_c3_attack_case_leaves_no_caller_manufacturable_trust(
+        tmp_path, case_id, attack, bind_verifier, force_in_doubt
+    ):
+        context = AttackContext(
+            tmp_path, bind_verifier=bind_verifier, force_in_doubt=force_in_doubt
+        )
+        outcome = attack(context)
+        assert isinstance(outcome, str) and outcome
+>       context.assert_properties(outcome)
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:1042: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_core_background_late_trusted_return_corrective_003_c3_matrix.AttackContext object at 0x7f3436ea8f50>
+outcome = 'inert:no-exception'
+
+    def assert_properties(self, outcome: str) -> None:
+        # P1: no trusted row anywhere in the World.
+>       assert trust_rows(self.db) == (0, 0, 0), f"attack produced trusted rows ({outcome})"
+E       AssertionError: attack produced trusted rows (inert:no-exception)
+E       assert (1, 1, 0) == (0, 0, 0)
+E         
+E         At index 0 diff: 1 != 0
+E         Use -v to get more diff
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:174: AssertionError
+_ test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-02-exported-symbol] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-60/test_c3_attack_case_leaves_no_1')
+case_id = 'C3-1-02-exported-symbol'
+attack = <function c1_02_exported_symbol at 0x7f3436e84540>
+bind_verifier = True, force_in_doubt = False
+
+    @pytest.mark.parametrize(
+        "case_id,attack,bind_verifier,force_in_doubt",
+        [pytest.param(*spec, id=spec[0]) for spec in CASE_SPECS],
+    )
+    def test_c3_attack_case_leaves_no_caller_manufacturable_trust(
+        tmp_path, case_id, attack, bind_verifier, force_in_doubt
+    ):
+        context = AttackContext(
+            tmp_path, bind_verifier=bind_verifier, force_in_doubt=force_in_doubt
+        )
+>       outcome = attack(context)
+                  ^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:1040: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:293: in c1_02_exported_symbol
+    return _attack_outcome(attack)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:247: in _attack_outcome
+    fn()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def attack():
+        for name in live_return_module.__all__:
+            symbol = getattr(live_return_module, name)
+            if callable(symbol):
+                try:
+                    symbol(attempt_id=c.attempt_id)
+                except BaseException:
+                    pass
+                try:
+                    symbol(c.attempt_id, c.forged)
+                except BaseException:
+                    pass
+        # No exported symbol may be a mint writer for the store.
+>       assert not any(
+            name in FORBIDDEN_MINT_NAMES for name in live_return_module.__all__
+        )
+E       assert not True
+E        +  where True = any(<generator object c1_02_exported_symbol.<locals>.attack.<locals>.<genexpr> at 0x7f3436ed29b0>)
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:288: AssertionError
+_ test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-03-store-method] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-60/test_c3_attack_case_leaves_no_2')
+case_id = 'C3-1-03-store-method'
+attack = <function c1_03_store_method at 0x7f3436e845e0>, bind_verifier = True
+force_in_doubt = False
+
+    @pytest.mark.parametrize(
+        "case_id,attack,bind_verifier,force_in_doubt",
+        [pytest.param(*spec, id=spec[0]) for spec in CASE_SPECS],
+    )
+    def test_c3_attack_case_leaves_no_caller_manufacturable_trust(
+        tmp_path, case_id, attack, bind_verifier, force_in_doubt
+    ):
+        context = AttackContext(
+            tmp_path, bind_verifier=bind_verifier, force_in_doubt=force_in_doubt
+        )
+>       outcome = attack(context)
+                  ^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:1040: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:308: in c1_03_store_method
+    return _attack_outcome(attack)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:247: in _attack_outcome
+    fn()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def attack():
+        for holder in (c.attempts, type(c.attempts)):
+            for name in dir(holder):
+                if name in FORBIDDEN_MINT_NAMES:
+>                   raise AssertionError(f"mint writer reachable as {name}")
+E                   AssertionError: mint writer reachable as record_live_provider_return
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:303: AssertionError
+_ test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-04-classmethod] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-60/test_c3_attack_case_leaves_no_3')
+case_id = 'C3-1-04-classmethod'
+attack = <function c1_04_classmethod at 0x7f3436e84680>, bind_verifier = True
+force_in_doubt = False
+
+    @pytest.mark.parametrize(
+        "case_id,attack,bind_verifier,force_in_doubt",
+        [pytest.param(*spec, id=spec[0]) for spec in CASE_SPECS],
+    )
+    def test_c3_attack_case_leaves_no_caller_manufacturable_trust(
+        tmp_path, case_id, attack, bind_verifier, force_in_doubt
+    ):
+        context = AttackContext(
+            tmp_path, bind_verifier=bind_verifier, force_in_doubt=force_in_doubt
+        )
+>       outcome = attack(context)
+                  ^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:1040: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:330: in c1_04_classmethod
+    return _attack_outcome(attack)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:247: in _attack_outcome
+    fn()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def attack():
+        for klass in (LiveProviderReturnWindow, BackgroundModelAttemptStore):
+            for name, value in vars(klass).items():
+                if isinstance(value, classmethod):
+                    assert name not in FORBIDDEN_MINT_NAMES, name
+                    # Driving any surviving classmethod with attacker bytes must
+                    # not create trusted state.
+                    try:
+                        getattr(klass, name)(c.attempt_id, c.forged)
+                    except BaseException:
+                        pass
+>       assert not hasattr(LiveProviderReturnWindow, "_issue")
+E       AssertionError: assert not True
+E        +  where True = hasattr(LiveProviderReturnWindow, '_issue')
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:325: AssertionError
+_ test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-05-registry] __
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-60/test_c3_attack_case_leaves_no_4')
+case_id = 'C3-1-05-registry'
+attack = <function c1_05_registry at 0x7f3436e84720>, bind_verifier = True
+force_in_doubt = False
+
+    @pytest.mark.parametrize(
+        "case_id,attack,bind_verifier,force_in_doubt",
+        [pytest.param(*spec, id=spec[0]) for spec in CASE_SPECS],
+    )
+    def test_c3_attack_case_leaves_no_caller_manufacturable_trust(
+        tmp_path, case_id, attack, bind_verifier, force_in_doubt
+    ):
+        context = AttackContext(
+            tmp_path, bind_verifier=bind_verifier, force_in_doubt=force_in_doubt
+        )
+>       outcome = attack(context)
+                  ^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:1040: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:358: in c1_05_registry
+    return _attack_outcome(attack)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:247: in _attack_outcome
+    fn()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def attack():
+        before = {}
+        for module in CORE_MODULES:
+            for name, value in vars(module).items():
+                if isinstance(value, (dict, list, set)) and not name.startswith("__"):
+                    before[(module.__name__, name)] = (
+                        len(value) if hasattr(value, "__len__") else None
+                    )
+        for _ in range(3):
+            with open_live_provider_return_window(attempt_id=c.attempt_id) as window:
+                register_handler_return(window, c.forged)
+        after = {}
+        for module in CORE_MODULES:
+            for name, value in vars(module).items():
+                if isinstance(value, (dict, list, set)) and not name.startswith("__"):
+                    after[(module.__name__, name)] = (
+                        len(value) if hasattr(value, "__len__") else None
+                    )
+        assert before == after, "a module-level registry accumulated window state"
+>       assert not hasattr(live_return_module, "_OPEN_WINDOWS")
+E       AssertionError: assert not True
+E        +  where True = hasattr(live_return_module, '_OPEN_WINDOWS')
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:355: AssertionError
+_ test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-07-sentinel] __
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-60/test_c3_attack_case_leaves_no_6')
+case_id = 'C3-1-07-sentinel'
+attack = <function c1_07_sentinel at 0x7f3436e84860>, bind_verifier = True
+force_in_doubt = False
+
+    @pytest.mark.parametrize(
+        "case_id,attack,bind_verifier,force_in_doubt",
+        [pytest.param(*spec, id=spec[0]) for spec in CASE_SPECS],
+    )
+    def test_c3_attack_case_leaves_no_caller_manufacturable_trust(
+        tmp_path, case_id, attack, bind_verifier, force_in_doubt
+    ):
+        context = AttackContext(
+            tmp_path, bind_verifier=bind_verifier, force_in_doubt=force_in_doubt
+        )
+>       outcome = attack(context)
+                  ^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:1040: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:422: in c1_07_sentinel
+    return _attack_outcome(attack)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:247: in _attack_outcome
+    fn()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def attack():
+        # The historical issuance sentinel is gone.
+>       assert not hasattr(live_return_module, "_ISSUE_SENTINEL")
+E       AssertionError: assert not True
+E        +  where True = hasattr(live_return_module, '_ISSUE_SENTINEL')
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:390: AssertionError
+_ test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-08-object-identity] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-60/test_c3_attack_case_leaves_no_7')
+case_id = 'C3-1-08-object-identity'
+attack = <function c1_08_object_identity at 0x7f3436e84900>
+bind_verifier = True, force_in_doubt = False
+
+    @pytest.mark.parametrize(
+        "case_id,attack,bind_verifier,force_in_doubt",
+        [pytest.param(*spec, id=spec[0]) for spec in CASE_SPECS],
+    )
+    def test_c3_attack_case_leaves_no_caller_manufacturable_trust(
+        tmp_path, case_id, attack, bind_verifier, force_in_doubt
+    ):
+        context = AttackContext(
+            tmp_path, bind_verifier=bind_verifier, force_in_doubt=force_in_doubt
+        )
+>       outcome = attack(context)
+                  ^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:1040: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:463: in c1_08_object_identity
+    return _attack_outcome(attack)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:247: in _attack_outcome
+    fn()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def attack():
+        # A live turn whose handler returns exactly this object.
+        db2 = c.db.with_name("c3-identity.sqlite")
+        store, index = open_world(db2)
+        returned = make_directive(response="C3_IDENTITY_BYTES")
+        runtime = FusedTurnRuntime(
+            store=store, index=index, subject_id="user_1",
+            model_handler=lambda _snapshot: returned,
+            late_return_verifier=make_verifier(),
+        )
+        runtime.run_turn(
+            session_id="c3-identity", turn_index=1,
+            user_input="identity is not authority", occurred_at=NOW,
+        )
+        execution_id = runtime.turn_executions.execution_id_for(
+            subject_id="user_1", session_id="c3-identity", turn_index=1
+        )
+        attempt = runtime.background_model_attempts.list_for_work(
+            subject_id="user_1", work_kind="user_turn", work_id=execution_id
+        )[-1]
+        # Object identity of the returned directive conferred no authenticity:
+        # no receipt, no handoff, no staged response exist for that live round.
+>       assert (
+            runtime.background_model_attempts.response_authenticity_receipt(
+                attempt.attempt_id
+            )
+            is None
+        )
+E       AssertionError: assert BackgroundModelResponseReceipt(attempt_id='bgattempt_bf5dddcfcb4c162b82a2ee7092e910ae', subject_id='user_1', work_kind...9eec55130248382fb4fad0acd14c59af8f793', captured_at=datetime.datetime(2026, 10, 3, 9, 0, tzinfo=datetime.timezone.utc)) is None
+E        +  where BackgroundModelResponseReceipt(attempt_id='bgattempt_bf5dddcfcb4c162b82a2ee7092e910ae', subject_id='user_1', work_kind...9eec55130248382fb4fad0acd14c59af8f793', captured_at=datetime.datetime(2026, 10, 3, 9, 0, tzinfo=datetime.timezone.utc)) = response_authenticity_receipt('bgattempt_bf5dddcfcb4c162b82a2ee7092e910ae')
+E        +    where response_authenticity_receipt = <aios_core.runtime.background_attempt.BackgroundModelAttemptStore object at 0x7f3436c66790>.response_authenticity_receipt
+E        +      where <aios_core.runtime.background_attempt.BackgroundModelAttemptStore object at 0x7f3436c66790> = <aios_core.runtime.turn_runtime.FusedTurnRuntime object at 0x7f3436c66310>.background_model_attempts
+E        +    and   'bgattempt_bf5dddcfcb4c162b82a2ee7092e910ae' = BackgroundModelAttempt(attempt_id='bgattempt_bf5dddcfcb4c162b82a2ee7092e910ae', subject_id='user_1', work_kind='user_t...cord_id='meter_73c9bdb216c622c902e3c8400f0cb7af', failure_kind=None, failure_detail=None, reconciliation_evidence=None).attempt_id
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:450: AssertionError
+_ test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-10-underscore-naming] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-60/test_c3_attack_case_leaves_no_9')
+case_id = 'C3-1-10-underscore-naming'
+attack = <function c1_10_underscore_naming at 0x7f3436e84a40>
+bind_verifier = True, force_in_doubt = False
+
+    @pytest.mark.parametrize(
+        "case_id,attack,bind_verifier,force_in_doubt",
+        [pytest.param(*spec, id=spec[0]) for spec in CASE_SPECS],
+    )
+    def test_c3_attack_case_leaves_no_caller_manufacturable_trust(
+        tmp_path, case_id, attack, bind_verifier, force_in_doubt
+    ):
+        context = AttackContext(
+            tmp_path, bind_verifier=bind_verifier, force_in_doubt=force_in_doubt
+        )
+>       outcome = attack(context)
+                  ^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:1040: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:507: in c1_10_underscore_naming
+    return _attack_outcome(attack)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:247: in _attack_outcome
+    fn()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def attack():
+        private_callables = [
+            (module.__name__, name, value)
+            for module in CORE_MODULES
+            for name, value in vars(module).items()
+            if name.startswith("_") and callable(value)
+        ]
+        for _module_name, name, value in private_callables:
+>           assert name not in FORBIDDEN_MINT_NAMES, name
+E           AssertionError: _live_provider_return_window
+E           assert '_live_provider_return_window' not in frozenset({'ModelResponseAuthenticator', '_HANDLER_RETURNS', '_ISSUE_SENTINEL', '_OPEN_WINDOWS', '_authenticate_background_model_response', '_capture_trusted_response_return', ...})
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:501: AssertionError
+_ test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-11-stack-naming] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-60/test_c3_attack_case_leaves_no_10')
+case_id = 'C3-1-11-stack-naming'
+attack = <function c1_11_stack_naming at 0x7f3436e84ae0>, bind_verifier = True
+force_in_doubt = False
+
+    @pytest.mark.parametrize(
+        "case_id,attack,bind_verifier,force_in_doubt",
+        [pytest.param(*spec, id=spec[0]) for spec in CASE_SPECS],
+    )
+    def test_c3_attack_case_leaves_no_caller_manufacturable_trust(
+        tmp_path, case_id, attack, bind_verifier, force_in_doubt
+    ):
+        context = AttackContext(
+            tmp_path, bind_verifier=bind_verifier, force_in_doubt=force_in_doubt
+        )
+        outcome = attack(context)
+        assert isinstance(outcome, str) and outcome
+>       context.assert_properties(outcome)
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:1042: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_core_background_late_trusted_return_corrective_003_c3_matrix.AttackContext object at 0x7f3436decdd0>
+outcome = 'inert:no-exception'
+
+    def assert_properties(self, outcome: str) -> None:
+        # P1: no trusted row anywhere in the World.
+>       assert trust_rows(self.db) == (0, 0, 0), f"attack produced trusted rows ({outcome})"
+E       AssertionError: attack produced trusted rows (inert:no-exception)
+E       assert (1, 1, 0) == (0, 0, 0)
+E         
+E         At index 0 diff: 1 != 0
+E         Use -v to get more diff
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:174: AssertionError
+_ test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-13-bool-flag] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-60/test_c3_attack_case_leaves_no_12')
+case_id = 'C3-1-13-bool-flag'
+attack = <function c1_13_bool_flag at 0x7f3436e84c20>, bind_verifier = True
+force_in_doubt = False
+
+    @pytest.mark.parametrize(
+        "case_id,attack,bind_verifier,force_in_doubt",
+        [pytest.param(*spec, id=spec[0]) for spec in CASE_SPECS],
+    )
+    def test_c3_attack_case_leaves_no_caller_manufacturable_trust(
+        tmp_path, case_id, attack, bind_verifier, force_in_doubt
+    ):
+        context = AttackContext(
+            tmp_path, bind_verifier=bind_verifier, force_in_doubt=force_in_doubt
+        )
+>       outcome = attack(context)
+                  ^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:1040: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:593: in c1_13_bool_flag
+    return _attack_outcome(attack)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:247: in _attack_outcome
+    fn()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def attack():
+>       assert (
+            getattr(
+                live_return_module,
+                "LOCAL_LIVE_RETURN_AUTHORITY_DECOMMISSIONED",
+                False,
+            )
+            is True
+        ), "no public decommission marker: a bool flag could still be a trust root"
+E       AssertionError: no public decommission marker: a bool flag could still be a trust root
+E       assert False is True
+E        +  where False = getattr(live_return_module, 'LOCAL_LIVE_RETURN_AUTHORITY_DECOMMISSIONED', False)
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:571: AssertionError
+__ test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-01-globals] __
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-60/test_c3_attack_case_leaves_no_13')
+case_id = 'C3-2-01-globals', attack = <function c2_01_globals at 0x7f3436e84d60>
+bind_verifier = True, force_in_doubt = False
+
+    @pytest.mark.parametrize(
+        "case_id,attack,bind_verifier,force_in_doubt",
+        [pytest.param(*spec, id=spec[0]) for spec in CASE_SPECS],
+    )
+    def test_c3_attack_case_leaves_no_caller_manufacturable_trust(
+        tmp_path, case_id, attack, bind_verifier, force_in_doubt
+    ):
+        context = AttackContext(
+            tmp_path, bind_verifier=bind_verifier, force_in_doubt=force_in_doubt
+        )
+>       outcome = attack(context)
+                  ^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:1040: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:629: in c2_01_globals
+    return _attack_outcome(attack)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:247: in _attack_outcome
+    fn()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def attack():
+        for _module, qualified, function in _walk_callables():
+            for name in FORBIDDEN_MINT_NAMES:
+>               assert name not in function.__globals__, f"{qualified}.__globals__[{name}]"
+E               AssertionError: LiveProviderReturnWindow.__init__.__globals__[_HANDLER_RETURNS]
+E               assert '_HANDLER_RETURNS' not in {'Iterator': typing.Iterator, 'LIVE_RETURN_WINDOW_SCHEMA': 'aios.background-model-live-return-window.v1', 'LiveProvide...viderReturnWindow'>, 'LiveReturnAuthorityError': <class 'aios_core.runtime.live_return.LiveReturnAuthorityError'>, ...}
+E                +  where {'Iterator': typing.Iterator, 'LIVE_RETURN_WINDOW_SCHEMA': 'aios.background-model-live-return-window.v1', 'LiveProvide...viderReturnWindow'>, 'LiveReturnAuthorityError': <class 'aios_core.runtime.live_return.LiveReturnAuthorityError'>, ...} = <function LiveProviderReturnWindow.__init__ at 0x7f34372eafc0>.__globals__
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:623: AssertionError
+_ test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-02-sys-modules] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-60/test_c3_attack_case_leaves_no_14')
+case_id = 'C3-2-02-sys-modules'
+attack = <function c2_02_sys_modules at 0x7f3436e84e00>, bind_verifier = True
+force_in_doubt = False
+
+    @pytest.mark.parametrize(
+        "case_id,attack,bind_verifier,force_in_doubt",
+        [pytest.param(*spec, id=spec[0]) for spec in CASE_SPECS],
+    )
+    def test_c3_attack_case_leaves_no_caller_manufacturable_trust(
+        tmp_path, case_id, attack, bind_verifier, force_in_doubt
+    ):
+        context = AttackContext(
+            tmp_path, bind_verifier=bind_verifier, force_in_doubt=force_in_doubt
+        )
+>       outcome = attack(context)
+                  ^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:1040: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:649: in c2_02_sys_modules
+    return _attack_outcome(attack)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:247: in _attack_outcome
+    fn()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def attack():
+        module = sys.modules["aios_core.runtime.live_return"]
+        assert module is live_return_module
+        for name in FORBIDDEN_MINT_NAMES:
+>           assert not hasattr(module, name), name
+E           AssertionError: _HANDLER_RETURNS
+E           assert not True
+E            +  where True = hasattr(<module 'aios_core.runtime.live_return' from '/tmp/wt-fec/src/aios_core/runtime/live_return.py'>, '_HANDLER_RETURNS')
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:639: AssertionError
+___ test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-03-dict] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-60/test_c3_attack_case_leaves_no_15')
+case_id = 'C3-2-03-dict', attack = <function c2_03_dict at 0x7f3436e84ea0>
+bind_verifier = True, force_in_doubt = False
+
+    @pytest.mark.parametrize(
+        "case_id,attack,bind_verifier,force_in_doubt",
+        [pytest.param(*spec, id=spec[0]) for spec in CASE_SPECS],
+    )
+    def test_c3_attack_case_leaves_no_caller_manufacturable_trust(
+        tmp_path, case_id, attack, bind_verifier, force_in_doubt
+    ):
+        context = AttackContext(
+            tmp_path, bind_verifier=bind_verifier, force_in_doubt=force_in_doubt
+        )
+>       outcome = attack(context)
+                  ^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:1040: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:671: in c2_03_dict
+    return _attack_outcome(attack)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:247: in _attack_outcome
+    fn()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def attack():
+        holders = (
+            live_return_module.__dict__,
+            background_attempt_module.__dict__,
+            vars(type(c.attempts)),
+            vars(c.attempts),
+            vars(c.runtime),
+            vars(LiveProviderReturnWindow),
+        )
+        for holder in holders:
+            for name in FORBIDDEN_MINT_NAMES:
+>               assert name not in holder, name
+E               AssertionError: _HANDLER_RETURNS
+E               assert '_HANDLER_RETURNS' not in {'Iterator': typing.Iterator, 'LIVE_RETURN_WINDOW_SCHEMA': 'aios.background-model-live-return-window.v1', 'LiveProvide...viderReturnWindow'>, 'LiveReturnAuthorityError': <class 'aios_core.runtime.live_return.LiveReturnAuthorityError'>, ...}
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:666: AssertionError
+_ test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-04-bound-methods] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-60/test_c3_attack_case_leaves_no_16')
+case_id = 'C3-2-04-bound-methods'
+attack = <function c2_04_bound_methods at 0x7f3436e84f40>, bind_verifier = True
+force_in_doubt = False
+
+    @pytest.mark.parametrize(
+        "case_id,attack,bind_verifier,force_in_doubt",
+        [pytest.param(*spec, id=spec[0]) for spec in CASE_SPECS],
+    )
+    def test_c3_attack_case_leaves_no_caller_manufacturable_trust(
+        tmp_path, case_id, attack, bind_verifier, force_in_doubt
+    ):
+        context = AttackContext(
+            tmp_path, bind_verifier=bind_verifier, force_in_doubt=force_in_doubt
+        )
+>       outcome = attack(context)
+                  ^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:1040: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:694: in c2_04_bound_methods
+    return _attack_outcome(attack)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:247: in _attack_outcome
+    fn()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def attack():
+        for holder in (c.attempts, c.runtime):
+            for name in dir(holder):
+                if name.startswith("__"):
+                    continue
+                try:
+                    value = getattr(holder, name)
+                except Exception:
+                    continue
+                if not inspect.ismethod(value):
+                    continue
+>               assert name not in FORBIDDEN_MINT_NAMES, name
+E               AssertionError: record_live_provider_return
+E               assert 'record_live_provider_return' not in frozenset({'ModelResponseAuthenticator', '_HANDLER_RETURNS', '_ISSUE_SENTINEL', '_OPEN_WINDOWS', '_authenticate_background_model_response', '_capture_trusted_response_return', ...})
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:688: AssertionError
+_ test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-05-closure-cells] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-60/test_c3_attack_case_leaves_no_17')
+case_id = 'C3-2-05-closure-cells'
+attack = <function c2_05_closure_cells at 0x7f3436e84fe0>, bind_verifier = True
+force_in_doubt = False
+
+    @pytest.mark.parametrize(
+        "case_id,attack,bind_verifier,force_in_doubt",
+        [pytest.param(*spec, id=spec[0]) for spec in CASE_SPECS],
+    )
+    def test_c3_attack_case_leaves_no_caller_manufacturable_trust(
+        tmp_path, case_id, attack, bind_verifier, force_in_doubt
+    ):
+        context = AttackContext(
+            tmp_path, bind_verifier=bind_verifier, force_in_doubt=force_in_doubt
+        )
+>       outcome = attack(context)
+                  ^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:1040: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:714: in c2_05_closure_cells
+    return _attack_outcome(attack)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:247: in _attack_outcome
+    fn()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def attack():
+        for _module, qualified, function in _walk_callables():
+            closure = function.__closure__ or ()
+            for cell in closure:
+                try:
+                    content = cell.cell_contents
+                except ValueError:
+                    continue
+                assert not isinstance(content, LiveProviderReturnWindow), qualified
+                if inspect.isfunction(content):
+                    for name in FORBIDDEN_MINT_NAMES:
+>                       assert name not in content.__globals__, qualified
+E                       AssertionError: open_live_provider_return_window
+E                       assert '_HANDLER_RETURNS' not in {'Iterator': typing.Iterator, 'LIVE_RETURN_WINDOW_SCHEMA': 'aios.background-model-live-return-window.v1', 'LiveProvide...viderReturnWindow'>, 'LiveReturnAuthorityError': <class 'aios_core.runtime.live_return.LiveReturnAuthorityError'>, ...}
+E                        +  where {'Iterator': typing.Iterator, 'LIVE_RETURN_WINDOW_SCHEMA': 'aios.background-model-live-return-window.v1', 'LiveProvide...viderReturnWindow'>, 'LiveReturnAuthorityError': <class 'aios_core.runtime.live_return.LiveReturnAuthorityError'>, ...} = <function open_live_provider_return_window at 0x7f34391b0900>.__globals__
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:711: AssertionError
+__ test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-10-import] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-60/test_c3_attack_case_leaves_no_22')
+case_id = 'C3-2-10-import', attack = <function c2_10_import at 0x7f3436e85300>
+bind_verifier = True, force_in_doubt = False
+
+    @pytest.mark.parametrize(
+        "case_id,attack,bind_verifier,force_in_doubt",
+        [pytest.param(*spec, id=spec[0]) for spec in CASE_SPECS],
+    )
+    def test_c3_attack_case_leaves_no_caller_manufacturable_trust(
+        tmp_path, case_id, attack, bind_verifier, force_in_doubt
+    ):
+        context = AttackContext(
+            tmp_path, bind_verifier=bind_verifier, force_in_doubt=force_in_doubt
+        )
+>       outcome = attack(context)
+                  ^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:1040: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:816: in c2_10_import
+    return _attack_outcome(attack)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:247: in _attack_outcome
+    fn()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def attack():
+        module = importlib.import_module("aios_core.runtime.live_return")
+        assert module is live_return_module
+        reloaded = importlib.reload(module)
+        try:
+            for name in FORBIDDEN_MINT_NAMES:
+>               assert not hasattr(reloaded, name), name
+E               AssertionError: _HANDLER_RETURNS
+E               assert not True
+E                +  where True = hasattr(<module 'aios_core.runtime.live_return' from '/tmp/wt-fec/src/aios_core/runtime/live_return.py'>, '_HANDLER_RETURNS')
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:805: AssertionError
+_ test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-12-exception-objects] _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-60/test_c3_attack_case_leaves_no_24')
+case_id = 'C3-2-12-exception-objects'
+attack = <function c2_12_exception_objects at 0x7f3436e85440>
+bind_verifier = True, force_in_doubt = False
+
+    @pytest.mark.parametrize(
+        "case_id,attack,bind_verifier,force_in_doubt",
+        [pytest.param(*spec, id=spec[0]) for spec in CASE_SPECS],
+    )
+    def test_c3_attack_case_leaves_no_caller_manufacturable_trust(
+        tmp_path, case_id, attack, bind_verifier, force_in_doubt
+    ):
+        context = AttackContext(
+            tmp_path, bind_verifier=bind_verifier, force_in_doubt=force_in_doubt
+        )
+>       outcome = attack(context)
+                  ^^^^^^^^^^^^^^^
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:1040: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:908: in c2_12_exception_objects
+    return _attack_outcome(attack)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:247: in _attack_outcome
+    fn()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def attack():
+        namespaces = []
+        # The decommissioned ctor is deliberately excluded from the frame walk:
+        # ``LiveProviderReturnWindow()`` raises from inside ``__init__``, whose own
+        # frame necessarily holds the half-built ``self``.  That object is never
+        # returned to the caller, which is asserted separately below.
+        for attempt in (
+            lambda: c.attempts.record_live_provider_return(  # type: ignore[attr-defined]
+                c.attempt_id, captured_at=NOW, directive=c.forged, live_window=None
+            ),
+            lambda: c.attach(c.bogus_proof()),
+            lambda: c.stage(),
+            # Re-crossing the provider boundary is refused, which yields genuine
+            # Core frames without changing the attacked attempt's state.
+            lambda: c.attempts.mark_dispatching(
+                c.attempt_id, dispatched_at=NOW + timedelta(seconds=5),
+                outbound_request_fingerprint="c3-matrix-redispatch-attack",
+            ),
+        ):
+            try:
+                attempt()
+            except BaseException as exc:
+                traceback = exc.__traceback__
+                while traceback is not None:
+                    frame = traceback.tb_frame
+                    namespaces.append(frame.f_globals)
+                    namespaces.append(dict(frame.f_locals))
+                    for value in list(frame.f_locals.values()):
+                        if isinstance(value, LiveProviderReturnWindow):
+                            raise AssertionError("window leaked through a frame")
+                    traceback = traceback.tb_next
+                for name in FORBIDDEN_MINT_NAMES:
+                    assert not hasattr(exc, name), name
+        # No exception path ever hands a window instance back to the caller.
+        for factory in (
+            lambda: LiveProviderReturnWindow(),  # type: ignore[call-arg]
+            lambda: LiveProviderReturnWindow(c.attempt_id),  # type: ignore[call-arg]
+        ):
+            try:
+                produced = factory()
+            except BaseException as exc:
+                assert not isinstance(exc, LiveProviderReturnWindow)
+                assert getattr(exc, "args", ()) is not None
+            else:
+                raise AssertionError(f"ctor produced {produced!r}")
+        assert namespaces, "no exception namespace was collected"
+        for namespace in namespaces:
+            for name in FORBIDDEN_MINT_NAMES:
+>               assert name not in namespace, name
+E               AssertionError: consume_live_provider_return_window
+E               assert 'consume_live_provider_return_window' not in {'BackgroundAttemptState': typing.Literal['admitted', 'dispatching', 'not_submitted', 'in_doubt', 'response_returned',...'>, 'BackgroundModelAttemptBlocked': <class 'aios_core.runtime.background_attempt.BackgroundModelAttemptBlocked'>, ...}
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py:906: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-01-public-function]
+FAILED tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-02-exported-symbol]
+FAILED tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-03-store-method]
+FAILED tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-04-classmethod]
+FAILED tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-05-registry]
+FAILED tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-07-sentinel]
+FAILED tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-08-object-identity]
+FAILED tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-10-underscore-naming]
+FAILED tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-11-stack-naming]
+FAILED tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-13-bool-flag]
+FAILED tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-01-globals]
+FAILED tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-02-sys-modules]
+FAILED tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-03-dict]
+FAILED tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-04-bound-methods]
+FAILED tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-05-closure-cells]
+FAILED tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-10-import]
+FAILED tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-12-exception-objects]
+17 failed, 11 passed in 3.62s

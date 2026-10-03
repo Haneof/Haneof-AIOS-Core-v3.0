@@ -1,0 +1,33 @@
+============================= test session starts ==============================
+collecting ... collected 28 items
+
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_matrix_covers_exactly_the_enumerated_cases PASSED [  3%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-01-public-function] PASSED [  7%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-02-exported-symbol] PASSED [ 10%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-03-store-method] PASSED [ 14%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-04-classmethod] PASSED [ 17%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-05-registry] PASSED [ 21%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-06-contextvar] PASSED [ 25%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-07-sentinel] PASSED [ 28%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-08-object-identity] PASSED [ 32%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-09-test-secret] PASSED [ 35%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-10-underscore-naming] PASSED [ 39%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-11-stack-naming] PASSED [ 42%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-12-docstring] PASSED [ 46%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-1-13-bool-flag] PASSED [ 50%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-01-globals] PASSED [ 53%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-02-sys-modules] PASSED [ 57%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-03-dict] PASSED [ 60%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-04-bound-methods] PASSED [ 64%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-05-closure-cells] PASSED [ 67%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-06-defaults] PASSED [ 71%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-07-descriptors] PASSED [ 75%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-08-object-new] PASSED [ 78%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-09-ctor] PASSED [ 82%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-10-import] PASSED [ 85%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-11-callbacks] PASSED [ 89%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-12-exception-objects] PASSED [ 92%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-2-13-store-runtime-graph] PASSED [ 96%]
+tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py::test_c3_attack_case_leaves_no_caller_manufacturable_trust[C3-3-01-verifier-less-in-doubt] PASSED [100%]
+
+============================== 28 passed in 3.37s ==============================
