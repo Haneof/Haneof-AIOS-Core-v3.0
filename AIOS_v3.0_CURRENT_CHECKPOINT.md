@@ -1,5 +1,15 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-10-03 — WINDOW 22 PM scope/publication clarification
+
+- Window 22 Corrective-003 remains active local engineering; no acceptance/readiness state granted.
+- C15 persistence/operator harness breakage is OUT-OF-SCOPE / downstream compatibility debt; do not edit `tools/c15_persistence/**` or `tests/c15_persistence/**`.
+- 81 `tests/integration/**` failures are Core-regression blockers. Stale live-authority fixtures may be converted only via documented TIGHTEN_ONLY test updates; actual behavior regressions must be fixed in implementation.
+- Route B is allowed, but local object identity cannot mint/authenticate trusted-return state or move verifier-less post-boundary attempts out of `in_doubt`.
+- GitHub credential absence permits continued local work but caps the terminal state at `ENGINEERING_COMPLETE_PENDING_PUBLICATION / GITHUB_PUBLICATION_BLOCKED`; exact bundle/patch export is required.
+- Window 23 remains blocked pending publication + exact-head formal 3.12.14 CI + PM readiness.
+
+
 ## 2026-10-03 — WINDOW 21 PM Acceptance-Failure Adjudication (Corrective-002)
 
 - `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-002 = DONE / ACCEPTANCE_FAIL / blocker=1`，处置 `CORRECTIVE_REQUIRED`。

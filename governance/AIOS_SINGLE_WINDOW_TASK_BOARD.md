@@ -1,5 +1,17 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 2026-10-03 — WINDOW 22 PM scope/publication clarification (Corrective-003 remains active)
+
+- **No verdict change / no acceptance:** Window 22 remains `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-003 = ACTIVE / LOCAL_ENGINEERING`; it is not REVIEW_READY.
+- **C15 coupling ruling:** failures in `tools/c15_persistence/**` / broad `tests/c15_persistence/**` are downstream harness compatibility debt, not a Core Corrective-003 blocker, and do not authorize scope expansion. Do not modify them.
+- **Core regression ruling:** failures in `tests/integration/**` are blocking because the formal Core gate includes unit/integration/runtime/habitation. Directly-related stale authority fixtures may be updated only under per-test `TIGHTEN_ONLY` audit; real behavioral regressions require implementation fixes.
+- **Route-B ruling:** removing local self-trust in favor of external verifier/proof remains authorized. Local Core object identity may be a consistency guard only, never authenticity/mint authority.
+- **Publication ruling:** lack of GitHub credentials blocks only formal publication/CI. Window 22 may finish locally and stop at `ENGINEERING_COMPLETE_PENDING_PUBLICATION / GITHUB_PUBLICATION_BLOCKED`, exporting exact git bundle + patch. It may not claim REVIEW_READY until exact published head has formal CPython 3.12.14 CI.
+- Remaining mandatory local work: zero full-Core failures; finish C3 attack matrix; fix W20 formal workflow identity; preserve Suite A/B/W17 and all Corrective-002 positives; no C15 harness edits.
+- Clarification record: `governance/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_003_SCOPE_PUBLICATION_CLARIFICATION_2026-10-03.md`.
+- Window 23 remains BLOCKED.
+
+
 ## 2026-10-03 — WINDOW 21: Corrective-002 ACCEPTANCE_FAIL adjudicated / PR #310 FROZEN / Corrective-003 READY
 
 - **`CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-002 = DONE / ACCEPTANCE_FAIL / blocker=1`**. Window 20 canonical Fresh IA review commit = `220311759e88fb3948ad3f4dba655058e0f392a8` (review-only PR #311, branch `arena/01a1006b-haneof-aios-core-v3-0`, tip at adjudication `6582af6dab708221d4f598f5d7715d38e191a65c`; formal IA comment on PR #310 = `5966444269`). Window 21 PM adjudication: `BLK-W20-001` = **BINDING**; no downgrade. Disposition `CORRECTIVE_REQUIRED`.
