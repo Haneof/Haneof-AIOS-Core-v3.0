@@ -1,0 +1,22 @@
+PASS | IA20-MIGRATE-003
+  expected: a tampered legacy row (even as the last of several) converts nothing, purges no secret, and every retry fails closed identically
+  actual:   first=LegacyTrustMigrationError, retry=LegacyTrustMigrationError, state_unchanged=True, no_v2_proof_anywhere=True, secret_preserved=True, tampered_attempt=bgattempt_9c1863f4917ea27bb14285bb94d8553d
+FAIL | probe_ia20_migrate_004_edge_branches
+  expected: probe executes
+  actual:   PROBE_CRASH:IntegrityError:NOT NULL constraint failed: background_model_responses.evidence
+PASS | IA20-RSA-ENC-001
+  expected: every accepted key_id round-trips exactly and verifies genuine signatures; non-canonical ids and ambiguous proofs are refused
+  actual:   accepted=["'0':roundtrip=True,genuine_verify=True", "'a':roundtrip=True,genuine_verify=True", "'Z':roundtrip=True,genuine_verify=True", "'key-2026.v1_x':roundtrip=True,genuine_verify=True", "'9aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa':roundtrip=True,genuine_verify=True", "'A.b-c_d':roundtrip=True,genuine_verify=True"], unexpected_refusals=[], wrongly_accepted=[], malformed_accepted=[], odd_length_signature=representable=True, verifies=False
+FAIL | IA20-RSA-PARAM-001
+  expected: signed/zero/even/undersized/non-normalized moduli and non-canonical exponents/algorithms are refused at construction; legal parameters are accepted
+  actual:   unexpected=['exponent_float:ACCEPTED'], accepted_legal=['e3', 'e65537', 'modulus_2048_valid']
+PASS | IA20-RSA-TRANSPLANT-001
+  expected: reviewer-signed genuine return completes exactly once; every one of the 12 bound-field transplants is rejected
+  actual:   positive=completed response='genuine reviewer-signed return' meters=1, accepted_transplants=[]
+PASS | IA20-NOTSUB-002
+  expected: after the durable dispatch/binding boundary, no caller assertion can write not_submitted and no redispatch occurs
+  actual:   state_before=dispatching, outcome={'reconcile_not_submitted': 'refused:BackgroundModelResponseConflict', 'reconcile_not_submitted_state': 'in_doubt', 'mark_failure_timeout': 'refused:BackgroundModelResponseConflict', 'mark_failure_timeout_state': 'in_doubt', 'second_run': 'refused:TurnExecutionInDoubt', 'redispatch_called': False}, final_state=in_doubt
+FAIL | IA20-EXACTONCE-001
+  expected: first genuine return wins; conflicting and replayed returns are refused with exactly one meter, one output, one completion
+  actual:   outcome={'first': 'accepted', 'conflicting_second': 'refused:BackgroundModelResponseConflict', 'exact_replay_first': 'ACCEPTED'}, response='first accepted payload', meters=1, state=metered, execution_state=completed, assistant_ref=set
+SUMMARY | probes=7 failures=3

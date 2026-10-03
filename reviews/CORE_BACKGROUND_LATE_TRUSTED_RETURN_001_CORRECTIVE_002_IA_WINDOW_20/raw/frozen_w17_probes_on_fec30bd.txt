@@ -1,0 +1,47 @@
+/home/user/w20/w17probes/window17_independent_attack.py:837: PydanticDeprecatedSince211: Accessing the 'model_computed_fields' attribute on the instance is deprecated. Instead, you should access this attribute from the model class. Deprecated in Pydantic V2.11 to be removed in V3.0.
+  val = getattr(obj, attr)
+/home/user/w20/w17probes/window17_independent_attack.py:837: PydanticDeprecatedSince211: Accessing the 'model_fields' attribute on the instance is deprecated. Instead, you should access this attribute from the model class. Deprecated in Pydantic V2.11 to be removed in V3.0.
+  val = getattr(obj, attr)
+PASS | IA17-MINT-001
+  expected: recovery caller without external RSA signature cannot mint receipt/handoff or complete in_doubt turn
+  actual:   refused: AttributeError: 'BackgroundModelAttemptStore' object has no attribute '_capture_trusted_response_return'
+PASS | IA17-MINT-002
+  expected: attempt dispatched with no LateReturnVerifier remains permanently in_doubt / FAIL_CLOSED
+  actual:   refused: AttributeError: 'BackgroundModelAttemptStore' object has no attribute '_capture_trusted_response_return'
+PASS | IA17-DOWNGRADE-001
+  expected: authenticity_proof cannot be caller-computed from public fields and minted into staged response without external signer
+  actual:   is_keyless_sha256=True, minted_and_staged=False
+PASS | IA17-MIGRATE-001
+  expected: valid pre-upgrade HMAC receipt/handoff recovers exact response and purges legacy secret
+  actual:   response='valid historical pre-upgrade response', state=metered, secret_purged=True
+PASS | IA17-MIGRATE-002
+  expected: tampered pre-upgrade authentication evidence must FAIL_CLOSED and never be normalized into trusted state
+  actual:   all tampered pre-upgrade subcases refused
+PASS | IA17-VERIFIER-SUB-001
+  expected: bound LateReturnVerifier cannot be substituted or rebound via mark_dispatching or attach_late_trusted_return
+  actual:   rebind_succeeded=False, attach_succeeded=False, stored_key_id=legit-key-1
+PASS | IA17-OBJGRAPH-001
+  expected: recovery object graph exposes zero trusted-receipt/handoff/proof minting callables
+  actual:   0 trust-minting callables found on recovery object graph
+PASS | IA17-DB-AT-REST-001
+  expected: no RSA private key material in DB, WAL, SHM, SQL dump, or backup
+  actual:   private_key_leaked=False, attempt_id=bgattempt_d5f63efbec557f4b65156a34e013c4a1
+PASS | IA17-RSA-001
+  expected: all malformed PKCS#1 v1.5 signatures and all 12 field transplants fail closed
+  actual:   failures=[]
+PASS | IA17-RSA-DELIMITER-001
+  expected: LateReturnVerifier either rejects colon key_id / negative modulus_hex at construction or verifies legitimate signatures accurately
+  actual:   no delimiter or negative-modulus defect
+PASS | IA17-RACE-CRASH-001
+  expected: concurrent valid proofs yield 1 accepted + 1 refused and 1 metered turn completion
+  actual:   outcomes=[('A', 'accepted'), ('B', 'refused')], response='concurrent candidate A', meters=1
+PASS | IA17-NS-ROUTE-B-001
+  expected: post-binding not_submitted refused across all write sites; pre-submission retry + late return succeeds
+  actual:   post_binding_ok=True, pre_sub_response='completed after pre-submission retry + late return'
+PASS | IA17-ID-JSON-001
+  expected: provider/model/request_id conflicts, duplicate JSON keys, and non-canonical byte mutations fail closed
+  actual:   failures=[]
+PASS | IA17-SIGKILL-001
+  expected: real SIGKILL child + external RSA signature recovers turn with 1 meter, 1 effect, 1 output, 0 redispatch
+  actual:   exitcode=-9, response='recovered after real SIGKILL', provider_calls=[], meters=1, state=metered, replay_blocked=True
+SUMMARY | probes=14 failures=0

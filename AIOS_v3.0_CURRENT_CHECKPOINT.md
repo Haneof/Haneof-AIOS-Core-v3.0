@@ -1,5 +1,19 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-10-03 — WINDOW 21 PM Acceptance-Failure Adjudication (Corrective-002)
+
+- `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-002 = DONE / ACCEPTANCE_FAIL / blocker=1`，处置 `CORRECTIVE_REQUIRED`。
+- 裁决起点 fresh ground truth（**零 drift**）：live main `ca47087fb68c90d6ac380c11143a0e36e80fc04a`；PR #310 `OPEN / UNMERGED`，head `fec30bd1495017bf13f08b0ef5b1e241dfb0e247`（与 Window 20 被评审 SHA 一致，未触发 `REVALIDATION_REQUIRED`）。
+- Window 20 canonical review：commit `220311759e88fb3948ad3f4dba655058e0f392a8`（review-only PR #311；branch `arena/01a1006b-haneof-aios-core-v3-0`；tip `6582af6dab708221d4f598f5d7715d38e191a65c`），正式 IA 评论 = PR #310 comment `5966444269`。Blocker 证据文件自 `22031175…` 起**逐字节未变**；其后提交均为 append-only 文档。
+- **PR #310 永久冻结**为 `FAILED_EXACT_CANDIDATE / FROZEN / OPEN / UNMERGED / DO_NOT_MERGE`（标题加 freeze 标记）；严禁 corrective 提交 / force-push / rebase / squash / amend。Window 20 review commit 与分支为 `REVIEW_ONLY / IMMUTABLE / DO_NOT_MERGE`（**绝不合并**）。
+- **`BLK-W20-001 = BINDING`**（`RECOVERY_CALLER_TRUSTED_RETURN_MINT_ORACLE_VIA_SELF_ISSUED_EPHEMERAL_WINDOW`，严重级 CRITICAL）：公开 `open_live_provider_return_window`（`live_return.py:156`）与 `register_handler_return`（`:191`，均在 `:273-281` 导出）使任意进程内调用者可自行签发/武装窗口并把自身 directive 注册为 handler 返回；公开 store 方法 `record_live_provider_return`（`background_attempt.py:2416`）唯一门禁即该窗口，随后写入 durable receipt + handoff 并以 caller bytes 完成/计量 turn；`__globals__` 反射同样可达。无 verifier 的 attempt 被强制离开永久 `in_doubt`；同一 attempt 的真外部 RSA 返回被冲突。**Corrective-002 并未关闭 `BLK-W17-001`，而是把 minting oracle 重新实现为公开 API**；候选自身 docstring（`background_attempt.py:2429-2434`："can only be satisfied from inside the live model-call frame"）被证伪。根因 = `TRUST_AUTHORITY_ISSUANCE_REMAINS_CALLER_MANUFACTURABLE`。
+- 裁决者独立复验：冻结探针 suite A v3（`ec1dc5c2…`，hash 校验通过）在全新 detached worktree `fec30bd…` 上重跑 → `probes=4 failures=4`，与 Window 20 记录逐字节一致；日志 `reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_002_IA_WINDOW_20/adjudication/ADJUDICATION_RERUN_SUITE_A_v3.txt`。环境 = CPython 3.11.2 / pydantic 2.13.5（评审级环境；正式 3.12.14 不可得的披露继续有效）。
+- 必须不回归的正向属性：冻结 W17 replay RED(6/14)→GREEN(0/14)；MIGRATE verify-before-convert / 原子 / secret 保留；RSA canonical 编码 + 参数矩阵 + 12/12 transplant 拒绝；post-binding `not_submitted` 闭合；exactly-once / R5；Window 16/17 全部正向；test diff 仅收紧。
+- 非阻塞观察：`OBS-W20-002`（resident-surface gate 在 `--base main` 不可解析时真空通过）= 工具债，不属本 corrective；`OBS-W20-003`（进程级武装状态可拒绝真实返回；跨 world / detached context 接受外发窗口）并入 Corrective-003 `C3-7`；`OBS-W20-001/004/005/006` 维持观察级。
+- **唯一下一 READY：`CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-003`**（WINDOW 22，全新工程分支 + 全新 PR，从 fresh live main 构建；禁止在 PR #310 上续提交）。冻结范围 `C3-1`–`C3-8`（见 §5.1）；RED-first 必须使用 PR #311 发布的 Window 20 评审探针原样在 `fec30bd…` 上先真实跑红；工程方止步于 `REVIEW_READY / READY_FOR_FRESH_INDEPENDENT_ACCEPTANCE`。
+- 强制下游顺序：WINDOW 22 Corrective-003 -> WINDOW 23 Fresh IA -> WINDOW 24 PM Integration（仅 PASS 后）-> `CORE-RC-REFREEZE-004` + IA -> fresh `C15-RCC-RES-A-RERUN-005` + IA -> `C15-RCC-RES-B-OPERATOR-PROVENANCE-CORRECTIVE-001` + IA -> `C15-RCC-RES-B-RELEASE-004` -> `RERUN-004` -> `ACCEPT-004`；C15 释放 / Resident / evaluator / close 全部保持 BLOCKED。
+- 治理记录：`governance/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_002_ACCEPTANCE_FAILURE_ADJUDICATION_2026-10-03.md`。本窗口 `GOVERNANCE_ONLY`，零 `src/**` / `tests/**` / `tools/**` 改动、零集成、零候选分支 push；回写与本 PR #310 冻结评论完成后 COMPLETE / CLOSED，不得在本窗口启动 WINDOW 22。
+
 ## 2026-10-03 — WINDOW 18 PM Acceptance-Failure Adjudication
 
 - `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-001 = DONE / ACCEPTANCE_FAIL / blocker=3`.

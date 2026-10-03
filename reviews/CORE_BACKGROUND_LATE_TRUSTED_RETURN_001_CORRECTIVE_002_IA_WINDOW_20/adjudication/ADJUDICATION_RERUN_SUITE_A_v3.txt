@@ -1,0 +1,56 @@
+WINDOW 21 — ADJUDICATOR RE-VERIFICATION LOG (BLK-W20-001)
+====================================================================================
+
+purpose          : independent re-execution of the frozen Window 20 blocker probe
+                   suite by the WINDOW 21 adjudicator, on a FRESH sandbox worktree,
+                   to confirm the blocker is reproducible and not an environment or
+                   transcription artifact of the Window 20 review.
+adjudication     : governance/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_002_ACCEPTANCE_FAILURE_ADJUDICATION_2026-10-03.md
+window           : 21  (PM Acceptance-Failure Adjudication)
+date_utc_start   : 2026-10-03T08:19:29Z
+date_utc_end     : 2026-10-03T08:19:31Z
+
+exact_candidate  : fec30bd1495017bf13f08b0ef5b1e241dfb0e247   (PR #310 head; re-fetched fresh
+                   via `git fetch origin refs/pull/310/head`; worktree /home/user/w21/cand,
+                   `git status --porcelain` = clean before and after the run)
+probe_file       : reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_002_IA_WINDOW_20/reviewer_probes/window20_independent_attack.py
+probe_sha256     : ec1dc5c2c5406d5d9e74825f62e0a17fb80f8ebd6dc250817fa048511ce292b5
+                   (verified against SHA256SUMS.v3 before execution; no expectation changed,
+                    no file edited, defective revisions not reused)
+environment      : CPython 3.11.2, pydantic 2.13.5, SQLite 3.40.1, OpenSSL 3.0.20
+                   (reviewer-class environment; formal target CPython 3.12.14 remains
+                    unobtainable in-sandbox — disclosure carried from Window 20 §24)
+command          : cd /home/user/w21/cand
+                   PYTHONPATH=src /home/user/w21/.venv/bin/python \
+                     .../reviewer_probes/window20_independent_attack.py
+exit_status      : 1   (failures present = expected for the frozen blocker probes)
+
+comparison       : byte-identical to the Window 20 record
+                   reviews/.../raw/candidate_w20_probes_v3_on_fec30bd.txt  (SUMMARY probes=4 failures=4)
+result           : BLOCKER REPRODUCED — probes=4 failures=4
+
+---- raw output (verbatim) ---------------------------------------------------------
+FAIL | IA20-MINT-003
+  expected: caller outside the genuine live provider frame cannot mint receipt/handoff nor complete the in_doubt turn
+  actual:   FORGED MINT VIA PUBLIC LIVE-WINDOW API: minted=True, state=metered, receipts=1, handoffs=1, responses=1, meters=1, turn_response='FORGED_VIA_PUBLIC_LIVE_WINDOW_API_NO_PROVIDER_CALL', genuine_rsa_return_conflicted=True
+FAIL | IA20-MINT-004
+  expected: anonymous / no-verifier attempt remains permanently in_doubt FAIL_CLOSED (no receipt, no handoff, no meter, no completion)
+  actual:   state=metered, receipts=1, handoffs=1, responses=1, meters=1, turn_response='FORGED_ON_VERIFIERLESS_ATTEMPT_VIA_PUBLIC_WINDOW', refusal=None
+FAIL | IA20-OBJGRAPH-002
+  expected: recovery object graph yields no reachable callable/state able to mint trusted receipts or handoffs
+  actual:   reachable_via=[store.__class__.record_live_provider_return.__globals__, LiveProviderReturnWindow._issue.__func__.__globals__], minted=True, state=in_doubt, receipts=1, handoffs=1, responses=0
+FAIL | IA20-WINDOW-001
+  expected: all non-live-window satisfactions (none/wrong-attempt/closed/consumed/copied/pickle/other-thread/other-world/unregistered/ctor/detached-context) are refused
+  actual:   subcases={'a_none': 'refused:LiveReturnAuthorityError', 'b_wrong_attempt': 'refused:LiveReturnAuthorityError', 'c_closed': 'refused:LiveReturnAuthorityError', 'd_replay': 'first=MINTED, second=refused:LiveReturnAuthorityError', 'e_copy': 'copy=refused:TypeError,deepcopy=refused:TypeError,pickle=refused:TypeError', 'f_other_thread': 'refused:LiveReturnAuthorityError', 'g_other_world': 'MINTED', 'h_unregistered': 'refused:LiveReturnAuthorityError', 'i_direct_ctor': 'refused:TypeError', 'j_detached_context': 'MINTED'}
+SUMMARY | probes=4 failures=4
+------------------------------------------------------------------------------------
+
+interpretation (adjudicator)
+ - the minting oracle is reproducible from a clean checkout of the exact candidate under a
+   fresh sandbox; nothing in the Window 20 record was mis-transcribed or environment-bound;
+ - a window issued by the caller itself (`d_replay.first=MINTED`), a window accepted by a
+   cloned/parallel store world (`g_other_world=MINTED`) and a window accepted on a detached
+   context (`j_detached_context=MINTED`) are all admitted by the candidate;
+ - the candidate's serialization/denial surface (`e_copy`, `h_unregistered`, `i_direct_ctor`,
+   `b_wrong_attempt`) works — the failure is specifically that the *issuance* of authority is
+   public and caller-manufacturable, which is exactly `BLK-W20-001`.
