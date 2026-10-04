@@ -1,0 +1,13 @@
+PASS | IA20-MINT-003
+  expected: caller outside the genuine live provider frame cannot mint receipt/handoff nor complete the in_doubt turn
+  actual:   refused before mint: AttributeError: 'BackgroundModelAttemptStore' object has no attribute 'record_live_provider_return'
+PASS | IA20-MINT-004
+  expected: anonymous / no-verifier attempt remains permanently in_doubt FAIL_CLOSED (no receipt, no handoff, no meter, no completion)
+  actual:   state=in_doubt, receipts=0, handoffs=0, responses=0, meters=0, turn_response=None, refusal=AttributeError: 'BackgroundModelAttemptStore' object has no attribute 'record_live_provider_return'
+PASS | IA20-OBJGRAPH-002
+  expected: recovery object graph yields no reachable callable/state able to mint trusted receipts or handoffs
+  actual:   reachable_via=[], minted=False, state=in_doubt, receipts=0, handoffs=0, responses=0, refusal=AttributeError: type object 'BackgroundModelAttemptStore' has no attribute 'record_live_provider_return'
+PASS | IA20-WINDOW-001
+  expected: all non-live-window satisfactions (none/wrong-attempt/closed/consumed/copied/pickle/other-thread/other-world/unregistered/ctor/detached-context) are refused
+  actual:   subcases={'a_none': 'refused:AttributeError', 'b_wrong_attempt': 'refused:AttributeError', 'c_closed': 'refused:AttributeError', 'd_replay': 'first=refused:AttributeError, second=refused:AttributeError', 'e_copy': 'copy=refused:TypeError,deepcopy=refused:TypeError,pickle=refused:TypeError', 'f_other_thread': 'refused:AttributeError', 'g_other_world': 'refused:AttributeError', 'h_unregistered': 'refused:AttributeError', 'i_direct_ctor': 'refused:TypeError', 'j_detached_context': 'refused:AttributeError'}
+SUMMARY | probes=4 failures=0
