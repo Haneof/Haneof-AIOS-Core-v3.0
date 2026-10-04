@@ -304,8 +304,8 @@ jobs:
         run: |
           set -euo pipefail
           cd "$RC004_TARGET"
-          PYTHONPATH="$RC004_TARGET/src" AIOS_RC_TARGET_ROOT="$RC004_TARGET"             "$RC004_VENV/bin/python" "$RC004_TARGET/reviews/CORE_RC_REFREEZE_003/probes/backup_restore_trusted_return.py"             2>&1 | tee "$RC004_OUT/backup-restore-rebuild.txt"
-          grep -q 'RESULT=' "$RC004_OUT/backup-restore-rebuild.txt"
+          PYTHONPATH="$RC004_TARGET/src" AIOS_RC_TARGET_ROOT="$RC004_TARGET"             "$RC004_VENV/bin/python" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004/probes/backup_restore_route_b.py"             2>&1 | tee "$RC004_OUT/backup-restore-rebuild.txt"
+          grep -q 'BACKUP_RESTORE_ROUTE_B_PASS' "$RC004_OUT/backup-restore-rebuild.txt"
 
       - name: Writer restart historical FIX current-time and no-second-truth-store spot checks
         shell: bash
