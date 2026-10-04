@@ -282,17 +282,31 @@ def _snapshot_details(db_path: Path) -> dict[str, Any]:
             "background_model_return_handoffs",
             "background_model_return_verifiers",
             "background_model_response_receipts",
-            "background_model_authenticity_authority",
+            "background_model_responses",
             "metering_records",
         }
         missing = sorted(required - names)
         if missing:
             raise AssertionError(f"expected durable recovery tables missing: {missing}")
+        retired_local_authority = {
+            "background_model_authenticity_authority",
+            "background_model_return_capabilities",
+        }
+        unexpectedly_present = sorted(retired_local_authority & names)
+        if unexpectedly_present:
+            raise AssertionError(
+                "retired local trusted-return authority tables unexpectedly present: "
+                f"{unexpectedly_present}"
+            )
         counts = {
             table: int(conn.execute(f'SELECT count(*) FROM "{table}"').fetchone()[0])
             for table in sorted(required)
         }
-        return {"tables": sorted(required), "row_counts": counts}
+        return {
+            "tables": sorted(required),
+            "row_counts": counts,
+            "retired_local_authority_absent": True,
+        }
 
 
 def main() -> int:
