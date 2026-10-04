@@ -1,5 +1,17 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-10-04 — WINDOW 25 FAIL / WINDOW 26 RC gate corrective READY
+
+- Window 25 = `ACCEPTANCE_FAIL / blocker=3`.
+- IA25-BLK-001/002/003 = `BINDING`.
+- Failed canonical RC candidate #325 remains exact `70134269ddfc7c80c4a703a933253bd099746504`, unmerged and immutable.
+- Review PR #328 = REVIEW_ONLY / DO NOT MERGE.
+- Frozen software remains `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`; no Core software corrective is authorized.
+- Unique next task = `WINDOW 26 — CORE-RC-REFREEZE-004-CORRECTIVE-001`.
+- Corrective scope: C15 pytest exit/JUnit classifier integrity, read-only credential isolation + terminal immutability checks, mandatory non-bypassable external-pin publication.
+- No C15 repair / Resident / evaluator / public release.
+
+
 ## 2026-10-04 — WINDOW 25 Fresh RC Acceptance READY
 
 - Window 24 RC freeze candidate is canonical PR #325 @ `70134269ddfc7c80c4a703a933253bd099746504`, tree `5727143a...`.
