@@ -1,0 +1,4 @@
+simulated_http=201 corrected_logic_exit=0
+simulated_http=401 corrected_logic_exit=1
+simulated_http=403 corrected_logic_exit=1
+simulated_http=500 corrected_logic_exit=1

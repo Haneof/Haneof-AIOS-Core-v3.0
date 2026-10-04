@@ -3,11 +3,11 @@ name: core-rc-refreeze-004-formal-gate
 on:
   push:
     branches:
-      - "release/core-rc-refreeze-004-window24"
+      - "release/core-rc-refreeze-004-corrective-001-window26"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: read
 
 concurrency:
@@ -34,17 +34,22 @@ env:
   FORMAL_PYTHON: "3.12.14"
   FORMAL_PYDANTIC: "2.13.5"
   FORMAL_PYTEST: "8.4.2"
+  CANONICAL_CORRECTIVE_BRANCH: "release/core-rc-refreeze-004-corrective-001-window26"
 
 jobs:
   rc004-freeze-gate:
     name: RC004 exact frozen software / formal gate
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
       - name: Checkout exact RC evidence candidate head
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Select formal CPython 3.12.14
         uses: actions/setup-python@v5
@@ -55,8 +60,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          OUT="$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004/ci-output"
+          OUT="$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/ci-output"
           mkdir -p "$OUT"
+          test "$GITHUB_REF_NAME" = "$CANONICAL_CORRECTIVE_BRANCH" || { echo "NON_CANONICAL_CORRECTIVE_REF $GITHUB_REF_NAME"; exit 1; }
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            test "$GITHUB_REF" = "refs/heads/$CANONICAL_CORRECTIVE_BRANCH" || { echo "WORKFLOW_DISPATCH_REF_REJECTED $GITHUB_REF"; exit 1; }
+          fi
+          if git config --local --get-regexp '^http\\..*\\.extraheader$' >"$OUT/checkout-extraheaders.txt" 2>/dev/null; then
+            cat "$OUT/checkout-extraheaders.txt"
+            echo "CHECKOUT_CREDENTIAL_PERSISTED"; exit 1
+          fi
           git fetch --all --prune
           git branch -r --sort=refname | sed "s/^[[:space:]]*//" | tee "$OUT/remote-branch-snapshot.txt"
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
@@ -83,7 +96,7 @@ jobs:
 
           base="$(git merge-base refs/remotes/rc004/main HEAD)"
           git diff --name-status "$base" HEAD | tee "$OUT/candidate-scope.txt"
-          if git diff --name-only "$base" HEAD | grep -Ev '^((\.github/workflows/core-rc-refreeze-004-formal-gate\.yml)|(release/rc/CORE_RC_REFREEZE_004[^/]*)|(reviews/CORE_RC_REFREEZE_004/.*))$' | grep -q .; then
+          if git diff --name-only "$base" HEAD | grep -Ev '^((\.github/workflows/core-rc-refreeze-004-formal-gate\.yml)|(release/rc/CORE_RC_REFREEZE_004[^/]*)|(reviews/CORE_RC_REFREEZE_004/.*)|(reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/.*))$' | grep -q .; then
             echo "RC004_CANDIDATE_SCOPE_VIOLATION"; exit 1
           fi
 
@@ -138,6 +151,27 @@ jobs:
           } | tee -a "$RC004_OUT/environment_manifest.txt"
           "$VENV/bin/python" -m pip freeze | tee "$RC004_OUT/dependency-manifest.txt"
           echo "RC004_VENV=$VENV" >> "$GITHUB_ENV"
+
+      - name: Corrective-001 workflow security regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$RC004_VENV/bin/python" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/workflow_security_static_probe.py" "$GITHUB_WORKSPACE/.github/workflows/core-rc-refreeze-004-formal-gate.yml" 2>&1 | tee "$RC004_OUT/workflow-security-static.txt"
+          grep -q 'WORKFLOW_SECURITY_STATIC=PASS' "$RC004_OUT/workflow-security-static.txt"
+          probe="$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/publisher_http_contract.sh"
+          : > "$RC004_OUT/publisher-fault-injection.txt"
+          for code in 201 401 403 500; do
+            set +e
+            bash "$probe" "$code" >> "$RC004_OUT/publisher-fault-injection.txt" 2>&1
+            prc=$?
+            set -e
+            echo "simulated_http=$code corrected_logic_exit=$prc" | tee -a "$RC004_OUT/publisher-fault-injection.txt"
+            if [ "$code" = "201" ]; then
+              test "$prc" -eq 0
+            else
+              test "$prc" -ne 0
+            fi
+          done
 
       - name: Fresh complete Core regression
         shell: bash
@@ -316,30 +350,34 @@ jobs:
           grep -qE '[0-9]+ passed' "$RC004_OUT/writer-restart-fix-scale.txt"
           grep -qE '[0-9]+ (failed|error)' "$RC004_OUT/writer-restart-fix-scale.txt" && exit 1 || true
 
+      - name: C15 structured JUnit classifier regression matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$RC004_VENV/bin/python" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/c15_junit_classifier.py" --self-test 2>&1 | tee "$RC004_OUT/c15-classifier-selftest.txt"
+          grep -q 'C15_JUNIT_CLASSIFIER_SELFTEST=PASS cases=10' "$RC004_OUT/c15-classifier-selftest.txt"
+
       - name: Fresh C15 downstream compatibility debt classification
         shell: bash
         run: |
           set -euo pipefail
           cd "$RC004_TARGET"
+          junit="$RC004_OUT/c15-persistence-junit.xml"
+          rm -f "$junit"
           set +e
-          "$RC004_VENV/bin/python" -m pytest -o addopts='' -q --tb=no tests/c15_persistence             --junitxml="$RC004_OUT/c15-persistence-junit.xml"             2>&1 | tee "$RC004_OUT/c15-persistence.txt"
+          "$RC004_VENV/bin/python" -m pytest -o addopts='' -q --tb=no tests/c15_persistence --junitxml="$junit" 2>&1 | tee "$RC004_OUT/c15-persistence.txt"
           rc=${PIPESTATUS[0]}
           set -e
-          "$RC004_VENV/bin/python" - "$RC004_OUT/c15-persistence.txt" "$rc" <<'PY' | tee "$RC004_OUT/c15-adjudication.txt"
-          from pathlib import Path
-          import re, sys
-          p=Path(sys.argv[1]); rc=int(sys.argv[2]); text=p.read_text(errors="replace")
-          failed=[m.group(1) for m in re.finditer(r"^FAILED\s+([^\s:]+(?:::[^\s]+)?)", text, re.M)]
-          bad=[x for x in failed if not x.startswith("tests/c15_persistence/")]
-          print(f"pytest_exit={rc}")
-          print(f"failed_count={len(failed)}")
-          print("failed_paths=" + ",".join(failed))
-          print("non_downstream_failures=" + ",".join(bad))
-          if bad:
-              raise SystemExit("ACCEPTED_CORE_REGRESSION_EXPOSED_BY_C15")
-          print("CORE_FREEZE_NOT_BLOCKED_BY_DOWNSTREAM_OPERATOR_DEBT")
-          print("C15_OPERATOR_ADAPTATION_REQUIRED_BEFORE_RESIDENT")
-          PY
+          echo "pytest_exit=$rc" | tee "$RC004_OUT/c15-pytest-exit.txt"
+          case "$rc" in
+            0|1) ;;
+            *) echo "C15_PYTEST_EXIT_NOT_ADMISSIBLE rc=$rc"; exit 1 ;;
+          esac
+          "$RC004_VENV/bin/python" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/c15_junit_classifier.py" --pytest-exit "$rc" --junit "$junit" 2>&1 | tee "$RC004_OUT/c15-adjudication.txt"
+          if [ "$rc" = "1" ]; then
+            grep -q 'CORE_FREEZE_NOT_BLOCKED_BY_DOWNSTREAM_OPERATOR_DEBT' "$RC004_OUT/c15-adjudication.txt"
+            grep -q 'C15_OPERATOR_ADAPTATION_REQUIRED_BEFORE_RESIDENT' "$RC004_OUT/c15-adjudication.txt"
+          fi
 
       - name: Fresh open-PR contamination inventory
         shell: bash
@@ -378,7 +416,7 @@ jobs:
         shell: bash
         run: |
           set -uo pipefail
-          OUT="${RC004_OUT:-$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004/ci-output}"
+          OUT="${RC004_OUT:-$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/ci-output}"
           mkdir -p "$OUT"
           if [ -n "${RC004_TARGET:-}" ] && [ -d "$RC004_TARGET/.git" -o -e "$RC004_TARGET/.git" ]; then
             python - "$RC004_TARGET" "$OUT/source_manifest_runtime.json" <<'PY'
@@ -399,55 +437,92 @@ jobs:
           find "$OUT" -maxdepth 1 -type f ! -name 'SHA256SUMS.runtime' -print0 | sort -z | xargs -0 sha256sum > "$OUT/SHA256SUMS.runtime" || true
           cat "$OUT/SHA256SUMS.runtime" || true
 
-      - name: Publish compact formal evidence comment
-        if: always()
+
+      - name: Terminal immutability and protected-drift gate
         shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          JOB_STATUS: ${{ job.status }}
         run: |
-          set -uo pipefail
-          OUT="${RC004_OUT:-$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004/ci-output}"
-          body="$RUNNER_TEMP/rc004-comment.md"
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA" || { echo "TERMINAL_LOCAL_HEAD_MISMATCH"; exit 1; }
+          remote_head="$(git ls-remote origin "refs/heads/$CANONICAL_CORRECTIVE_BRANCH" | awk '{print $1}')"
+          test "$remote_head" = "$GITHUB_SHA" || { echo "TERMINAL_REMOTE_HEAD_MISMATCH remote=$remote_head event=$GITHUB_SHA"; exit 1; }
+          test "$(git -C "$RC004_TARGET" rev-parse HEAD)" = "$FROZEN_SHA"
+          test "$(git -C "$RC004_TARGET" rev-parse HEAD^{tree})" = "$FROZEN_ROOT_TREE"
+          test "$(git -C "$RC004_TARGET" rev-parse HEAD:src/aios_core)" = "$FROZEN_CORE_TREE"
+          test "$(git -C "$RC004_TARGET" rev-parse HEAD:tests)" = "$FROZEN_TESTS_TREE"
+          test "$(git -C "$RC004_TARGET" rev-parse HEAD:.github/workflows)" = "$FROZEN_WORKFLOWS_TREE"
+          test "$(git -C "$RC004_TARGET" rev-parse HEAD:pyproject.toml)" = "$FROZEN_PYPROJECT_BLOB"
+          git -C "$RC004_TARGET" diff --quiet --
+          git -C "$RC004_TARGET" diff --cached --quiet --
+          test -z "$(git -C "$RC004_TARGET" status --porcelain --untracked-files=no)"
+          if git config --local --get-regexp '^http\\..*\\.extraheader$' >"$RC004_OUT/terminal-extraheaders.txt" 2>/dev/null; then
+            cat "$RC004_OUT/terminal-extraheaders.txt"
+            echo "TERMINAL_CHECKOUT_CREDENTIAL_PRESENT"; exit 1
+          fi
+          git fetch --no-tags --force origin "+refs/heads/main:refs/remotes/rc004/terminal-main"
+          terminal_main="$(git rev-parse refs/remotes/rc004/terminal-main)"
+          git diff --name-status "$FROZEN_SHA" "$terminal_main" | tee "$RC004_OUT/terminal-protected-drift.txt"
+          if git diff --name-only "$FROZEN_SHA" "$terminal_main" | grep -Eq '^(src/|tests/|pyproject\\.toml$|setup\\.|setup\\.cfg$|MANIFEST\\.in$|requirements|\\.github/workflows/)'; then
+            echo "TERMINAL_UNADJUDICATED_IMPLEMENTATION_OR_WORKFLOW_DRIFT"; exit 1
+          fi
           {
-            echo "## CORE-RC-REFREEZE-004 formal gate — ${JOB_STATUS}"
-            echo
-            echo "- run_id: ${GITHUB_RUN_ID}"
-            echo "- exact_candidate_head: ${GITHUB_SHA}"
-            echo "- frozen_software: ${FROZEN_SHA}"
-            echo "- event: ${GITHUB_EVENT_NAME}"
-            echo
-            for f in frozen_identity.txt environment_manifest.txt probe-identities.txt core-regression.txt window20-suite-a.txt window20-suite-b.txt window17-probe.txt trust-mint-inventory.txt corrective003-security.txt real-process-loss.txt clean-install-headless.txt backup-restore-rebuild.txt writer-restart-fix-scale.txt c15-adjudication.txt open-pr-contamination.txt SHA256SUMS.runtime; do
-              echo "### $f"
-              if [ -f "$OUT/$f" ]; then
-                echo '~~~text'
-                tail -c 12000 "$OUT/$f"
-                echo
-                echo '~~~'
-              else
-                echo "(not produced)"
-              fi
-            done
-            echo
-            echo "FINAL_STATE=${JOB_STATUS}"
-          } > "$body"
-          python - "$body" <<'PY'
-          from pathlib import Path
-          import sys
-          p=Path(sys.argv[1]); s=p.read_text(errors="replace")
-          if len(s)>60000:
-              s=s[:60000]+"\n[truncated at 60k]\n"
-          p.write_text(s)
-          PY
-          jq -n --rawfile body "$body" '{body:$body}' > "$RUNNER_TEMP/rc004-comment.json"
-          code="$(curl -sS -o "$RUNNER_TEMP/rc004-comment-response.json" -w '%{http_code}' -X POST             -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json"             -H "X-GitHub-Api-Version: 2022-11-28"             "https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/comments"             --data @"$RUNNER_TEMP/rc004-comment.json")"
-          echo "commit_comment_http_code=$code"
-          test "$code" = "201" || cat "$RUNNER_TEMP/rc004-comment-response.json"
+            echo "terminal_candidate_head=$(git rev-parse HEAD)"
+            echo "terminal_remote_head=$remote_head"
+            echo "terminal_frozen_head=$(git -C "$RC004_TARGET" rev-parse HEAD)"
+            echo "terminal_frozen_root_tree=$(git -C "$RC004_TARGET" rev-parse HEAD^{tree})"
+            echo "terminal_frozen_core_tree=$(git -C "$RC004_TARGET" rev-parse HEAD:src/aios_core)"
+            echo "terminal_frozen_tests_tree=$(git -C "$RC004_TARGET" rev-parse HEAD:tests)"
+            echo "terminal_frozen_workflows_tree=$(git -C "$RC004_TARGET" rev-parse HEAD:.github/workflows)"
+            echo "terminal_frozen_pyproject_blob=$(git -C "$RC004_TARGET" rev-parse HEAD:pyproject.toml)"
+            echo "terminal_main=$terminal_main"
+            echo "terminal_tracked_mutation=NONE"
+            echo "terminal_checkout_credential=NONE"
+          } | tee "$RC004_OUT/terminal-immutability.txt"
 
       - name: Upload complete RC004 evidence bundle
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: core-rc-refreeze-004-evidence
-          path: reviews/CORE_RC_REFREEZE_004/ci-output/**
+          name: core-rc-refreeze-004-corrective-001-evidence
+          path: reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/ci-output/**
           if-no-files-found: warn
+
+
+  rc004-mandatory-pin-publisher:
+    name: RC004 mandatory exact-pin publisher
+    needs: rc004-freeze-gate
+    if: ${{ needs.rc004-freeze-gate.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Publish mandatory exact candidate pin
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GATE_RESULT: ${{ needs.rc004-freeze-gate.result }}
+        run: |
+          set -euo pipefail
+          test "$GATE_RESULT" = "success"
+          body="$RUNNER_TEMP/rc004-mandatory-pin.md"
+          {
+            echo "## CORE-RC-REFREEZE-004-CORRECTIVE-001 mandatory exact pin"
+            echo
+            echo "- task: CORE-RC-REFREEZE-004-CORRECTIVE-001"
+            echo "- run_id: $GITHUB_RUN_ID"
+            echo "- run_attempt: $GITHUB_RUN_ATTEMPT"
+            echo "- exact_candidate_sha: $GITHUB_SHA"
+            echo "- frozen_software_sha: 1cee3c5ad12f4b9098232bae11b51df786c5eb2f"
+            echo "- formal_gate_job: rc004-freeze-gate"
+            echo "- formal_gate_result: $GATE_RESULT"
+            echo "- workflow: $GITHUB_WORKFLOW"
+            echo "- canonical_branch: release/core-rc-refreeze-004-corrective-001-window26"
+            echo "- publication_contract: HTTP_201_REQUIRED"
+          } > "$body"
+          jq -n --rawfile body "$body" '{body:$body}' > "$RUNNER_TEMP/rc004-mandatory-pin.json"
+          code="$(curl -sS -o "$RUNNER_TEMP/rc004-mandatory-pin-response.json" -w '%{http_code}' -X POST             -H "Authorization: Bearer $GH_TOKEN"             -H "Accept: application/vnd.github+json"             -H "X-GitHub-Api-Version: 2022-11-28"             "https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/comments"             --data @"$RUNNER_TEMP/rc004-mandatory-pin.json")"
+          echo "commit_comment_http_code=$code"
+          if [ "$code" != "201" ]; then
+            cat "$RUNNER_TEMP/rc004-mandatory-pin-response.json"
+            exit 1
+          fi
+          cat "$RUNNER_TEMP/rc004-mandatory-pin-response.json"
