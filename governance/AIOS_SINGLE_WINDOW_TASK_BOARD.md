@@ -1,5 +1,21 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 2026-10-04 — WINDOW 25 ACCEPTANCE_FAIL / WINDOW 26 Corrective-001 RELEASED
+
+- Window 25 Fresh IA verdict = `ACCEPTANCE_FAIL / blocker=3 / CORRECTIVE_OR_ADJUDICATION_REQUIRED`.
+- Review evidence = PR #328 REVIEW_ONLY / DO NOT MERGE; technical evidence `ffa6475fe4dde4b5d06b09a629b059b89f1ff434`; publication head `5b46b70f1b166a28201b3865d455d6ba0e2afec5`.
+- All three findings are PM-adjudicated `BINDING`:
+  - IA25-BLK-001: C15 pytest exit laundering;
+  - IA25-BLK-002: write credential exposure + missing terminal immutability check;
+  - IA25-BLK-003: mandatory external-pin comment publication can fail while workflow stays GREEN.
+- Failed PR #325 @ `70134269ddfc7c80c4a703a933253bd099746504` remains historical failed candidate / OPEN / UNMERGED / DO NOT MERGE. Do not repair in place.
+- Frozen software remains `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`; Window 25 found no frozen-Core blocker.
+- **Unique next READY:** `WINDOW 26 — CORE-RC-REFREEZE-004-CORRECTIVE-001`.
+- Window 26 scope = RC004 workflow/evidence mechanics only. No `src/**`, product `tests/**`, `tools/**`, `pyproject.toml`, C15 repair, Resident, evaluator, merge or public release.
+- Prompt: `governance/prompts/CORE_RC_REFREEZE_004_CORRECTIVE_001_2026-10-04.md`.
+- PM adjudication: `governance/CORE_RC_REFREEZE_004_WINDOW25_ACCEPTANCE_FAILURE_ADJUDICATION_2026-10-04.md`.
+
+
 ## 2026-10-04 — CORE-RC-REFREEZE-004 REVIEW_READY / WINDOW 25 Fresh IA RELEASED
 
 - Window 24 completed at `REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE / blocker=0`.
