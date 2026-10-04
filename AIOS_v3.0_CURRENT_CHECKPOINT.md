@@ -1,5 +1,16 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-10-04 — WINDOW 23 PASS durable / PM Integration READY
+
+- Fresh IA = `ACCEPTANCE_PASS / blocker=0`.
+- Reviewer evidence is now durable and exact: `arena/review-window23-fresh-ia-01a101e0` @ `22aa00cb3793c252512142a1eae33ca8aae9d841`, parent accepted candidate `7ecb2250…`, tree `28593da…`.
+- Review PR #321 = REVIEW_ONLY / DO NOT MERGE, exact 11 reviewer evidence files only.
+- PM verified exact bundle SHA-256 `47c1bb66ff43805eb2c40690796503917008fdc599806633f3530d4087ecd85b`; deterministic publisher run `37206355171` SUCCESS.
+- #318 accepted exact candidate remains `7ecb2250…`; formal run `37166276909` 12/12 green; full Core 928/0.
+- Earlier evidence-publication hold is resolved. PM Integration is READY after fresh pre-merge checks.
+- No RC refreeze / Resident before integration.
+
+
 ## 2026-10-04 — WINDOW 23 evidence publication hold
 
 - Technical Fresh IA verdict reported: `ACCEPTANCE_PASS / blocker=0`.

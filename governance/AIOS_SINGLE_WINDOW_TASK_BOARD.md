@@ -1,5 +1,18 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 2026-10-04 — WINDOW 23 Fresh IA evidence PUBLISHED / PM Integration READY
+
+- Window 23 final state = `ACCEPTANCE_PASS / blocker=0 / REVIEW_EVIDENCE_PUBLISHED / READY_FOR_PM_INTEGRATION`.
+- Accepted candidate PR #318 remains exact `7ecb2250a488766915e1042a76472b3cd26d9107`, OPEN / UNMERGED at this writeback.
+- Durable reviewer evidence: branch `arena/review-window23-fresh-ia-01a101e0` @ exact `22aa00cb3793c252512142a1eae33ca8aae9d841`, parent candidate, tree `28593da131e7026de1de0037a87b6b892a5988ba`.
+- REVIEW_ONLY PR #321 contains exactly 11 `reviews/WINDOW23_FRESH_IA/**` files and MUST NOT be merged.
+- PM independently verified reviewer bundle SHA-256 `47c1bb66ff43805eb2c40690796503917008fdc599806633f3530d4087ecd85b`, all 11 exact blobs, exact tree, and deterministic commit reconstruction. Publisher run `37206355171` SUCCESS with rebuilt/remote head exactly `22aa00cb…`.
+- Earlier PR #320 publication hold is resolved.
+- Candidate base-to-current-main drift is governance/checkpoint-only; zero src/tests/.github/tools drift. PM Integration must use merge-commit mode on exact accepted head; no rebase/squash.
+- **Unique next:** PM Integration of PR #318 after fresh pre-merge identity/mergeability check. Do not merge #321; do not enter RC-REFREEZE-004 or Resident before integration.
+- Record: `governance/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_003_WINDOW23_EVIDENCE_PUBLISHED_PM_INTEGRATION_READY_2026-10-04.md`.
+
+
 ## 2026-10-04 — WINDOW 23 technical PASS reported / review evidence publication BLOCKED
 
 - Window 23 reports `ACCEPTANCE_PASS / blocker=0 / READY_FOR_PM_INTEGRATION` for PR #318 exact candidate `7ecb2250a488766915e1042a76472b3cd26d9107`.
