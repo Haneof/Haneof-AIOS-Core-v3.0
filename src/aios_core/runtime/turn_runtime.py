@@ -118,6 +118,7 @@ from .cognitive_runtime import (
     RuntimeTurnResult,
 )
 from .metering import ModelMeteringLedger
+from .late_return import ExternalReturnObserver, LateReturnVerifier
 
 
 _AUTO_TOPIC = object()
@@ -226,6 +227,8 @@ class FusedTurnRuntime:
         summary_chunk_turns: int = 12,
         max_round_summaries_per_turn: int = 1,
         attention_scheduling_policy: AttentionSchedulingPolicy | None = None,
+        late_return_verifier: LateReturnVerifier | None = None,
+        external_return_observer: ExternalReturnObserver | None = None,
     ) -> None:
         if recent_turn_limit < 0:
             raise ValueError("recent_turn_limit must be >= 0")
@@ -250,6 +253,16 @@ class FusedTurnRuntime:
         self.attention_scheduling_policy = (
             attention_scheduling_policy or AttentionSchedulingPolicy()
         )
+        if late_return_verifier is not None and not isinstance(
+            late_return_verifier, LateReturnVerifier
+        ):
+            raise TypeError("late_return_verifier must be LateReturnVerifier")
+        if external_return_observer is not None and late_return_verifier is None:
+            raise ValueError(
+                "external_return_observer requires a public late_return_verifier"
+            )
+        self.late_return_verifier = late_return_verifier
+        self.external_return_observer = external_return_observer
         self.recommender = ProactiveMemoryRecommender(
             index=index,
             store=store,
@@ -1128,7 +1141,6 @@ class FusedTurnRuntime:
             model_usage_recorder=self._record_model_usage,
             model_attempt_admitter=self._admit_background_model_attempt,
             model_dispatch_recorder=self._mark_background_model_dispatch,
-            model_response_authenticator=self._authenticate_background_model_response,
             model_response_recorder=self._record_background_model_response,
             model_failure_recorder=self._record_background_model_failure,
             model_response_recovery=self._recover_exact_model_response,
@@ -1291,6 +1303,7 @@ class FusedTurnRuntime:
             snapshot.model_attempt_id,
             dispatched_at=self._active_meter_time,
             outbound_request_fingerprint=fingerprint,
+            late_return_verifier=self.late_return_verifier,
         )
         binding = self.background_model_attempts.outbound_request_binding(
             snapshot.model_attempt_id
@@ -1300,30 +1313,17 @@ class FusedTurnRuntime:
                 "originating request binding was not durable before provider dispatch"
             )
         object.__setattr__(snapshot, "_outbound_relay_id", binding.relay_id)
-
-    def _authenticate_background_model_response(
-        self,
-        snapshot: RuntimeSnapshot,
-        directive: ModelDirective,
-    ) -> None:
-        """Capture a non-forgeable receipt at the trusted model-return boundary."""
-
-        if snapshot.model_attempt_id is None:
-            return
-        if self._active_meter_time is None:
-            raise RuntimeError("background model response is missing execution time")
-        # Anonymous/local handlers remain valid but cannot participate in exact
-        # external-response recovery because there is no provider identity to bind.
-        if any(
-            value is None
-            for value in self.background_model_attempts._provider_identity(directive)
-        ):
-            return
-        self.background_model_attempts._capture_trusted_response_return(
-            snapshot.model_attempt_id,
-            captured_at=self._active_meter_time,
-            directive=directive,
-        )
+        if self.external_return_observer is not None:
+            context = self.background_model_attempts.late_return_signing_context(
+                snapshot.model_attempt_id
+            )
+            if context is None:
+                raise RuntimeError(
+                    "late-return verifier context was not durable before provider dispatch"
+                )
+            # Only public request scope leaves Core.  The external side already
+            # owns the private key and signs after observing a genuine return.
+            self.external_return_observer.accept_return_context(snapshot, context)
 
     def _record_background_model_response(
         self,

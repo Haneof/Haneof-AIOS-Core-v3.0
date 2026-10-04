@@ -9,8 +9,8 @@ application boundary, then proves the smallest Core recovery mechanism:
 * capability side effects, assistant output and metering stay exactly-once;
 * missing, mismatched or unverifiable exact bytes stay fail-closed (in_doubt /
   blocked), never a retry and never a semantic reconstruction;
-* the normal provider path and the existing not_submitted retry semantics are
-  unchanged.
+* the normal provider path is unchanged, while a post-binding caller claim of
+  not_submitted stays fail-closed under the Corrective-001 Route-B contract.
 
 No Resident, no sealed fixture and no historical evidence is touched.
 """
@@ -43,9 +43,13 @@ from aios_core.runtime.background_attempt import (
     encode_model_directive,
 )
 from aios_core.runtime.capabilities import CapabilityCall
+from aios_core.runtime.late_return import LateReturnSigningContext
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.storage.sqlite_store import SQLiteWorldStore
 from aios_core.wake import WakeSignalRequest
+from test_core_background_trusted_return_recovery_001 import (
+    RouteBExternalSigner, route_b_verifier,
+)
 
 
 NOW = datetime(2026, 9, 26, 6, 0, tzinfo=timezone.utc)
@@ -117,6 +121,75 @@ def _directive(
     )
 
 
+# ---------------------------------------------------------------------------
+# Route B external authority (Corrective-003 / Window 22-RERUN-001).
+#
+# TIGHTEN_ONLY history.  This file used to simulate the trusted relay return with
+# ``capture_live_provider_return``, which opened the ephemeral live provider-return
+# window and called ``BackgroundModelAttemptStore.record_live_provider_return``.
+# Window 20 `BLK-W20-001`
+# (``RECOVERY_CALLER_TRUSTED_RETURN_MINT_ORACLE_VIA_SELF_ISSUED_EPHEMERAL_WINDOW``,
+# root cause ``TRUST_AUTHORITY_ISSUANCE_REMAINS_CALLER_MANUFACTURABLE``) proved that
+# window issuance was an ordinary public function, so any process-local recovery
+# caller could self-issue a window, declare its own bytes handler-returned and mint
+# a durable trusted receipt + handoff.  Route B removes that writer entirely.
+#
+# The replacement below is the only remaining route to durable trusted return: an
+# external verifier bound before the provider boundary plus a genuine external RSA
+# signature over Core's durable request binding.  The private exponent is TEST-ONLY
+# material owned by the simulated external side; Core persists only the public
+# verifier.  Every recovery assertion in this file is unchanged.
+# ---------------------------------------------------------------------------
+
+_SIGNERS: dict[str, RouteBExternalSigner] = {}
+
+
+def _route_b_runtime(**kwargs):
+    """Construct a runtime with the Route B external authority bound."""
+
+    signer = RouteBExternalSigner()
+    kwargs.setdefault("late_return_verifier", route_b_verifier())
+    kwargs.setdefault("external_return_observer", signer)
+    runtime = FusedTurnRuntime(**kwargs)
+    _SIGNERS[str(runtime.store.db_path)] = signer
+    return runtime
+
+
+def _external_signing_context(runtime, attempt_id):
+    """Rebuild the public signing scope Core persisted before dispatch."""
+
+    attempts = runtime.background_model_attempts
+    attempt = attempts.get(attempt_id)
+    binding = attempts.outbound_request_binding(attempt_id)
+    assert binding is not None, "no durable pre-dispatch binding to sign against"
+    return LateReturnSigningContext(
+        attempt_id=attempt.attempt_id,
+        subject_id=attempt.subject_id,
+        work_kind=attempt.work_kind,
+        work_id=attempt.work_id,
+        model_round_index=attempt.model_round_index,
+        outbound_request_fingerprint=binding.outbound_request_fingerprint,
+        relay_id=binding.relay_id,
+        verifier_key_id=route_b_verifier().key_id,
+    )
+
+
+def attach_external_trusted_return(runtime, attempt_id, *, captured_at, directive):
+    """Produce a durable trusted receipt the only way Route B allows."""
+
+    attempts = runtime.background_model_attempts
+    signer = _SIGNERS[str(runtime.store.db_path)]
+    signer.contexts.setdefault(attempt_id, _external_signing_context(runtime, attempt_id))
+    attempts.attach_late_trusted_return(
+        attempt_id,
+        attached_at=captured_at,
+        directive_payload=encode_model_directive(directive),
+        late_return_proof=signer.proof(attempt_id, directive),
+        evidence="genuine external Route B relay return",
+    )
+    return attempts.response_authenticity_receipt(attempt_id)
+
+
 def _payload_and_fingerprint(runtime, directive: ModelDirective) -> tuple[str, str]:
     return (
         encode_model_directive(directive),
@@ -176,14 +249,18 @@ def _stage(
     assert attempt is not None
     authenticity_proof = None
     if attempt.state in {"dispatching", "in_doubt", "response_returned", "metered"}:
-        # Test-only simulation of the trusted relay return callback.  The
-        # recovery caller can read/copy the resulting receipt but cannot invoke
-        # its private HMAC authority through the public staging API.
-        receipt = runtime.background_model_attempts._capture_trusted_response_return(
+        # Route B: the durable trusted receipt can now only come from a genuine
+        # external signature over Core's durable pre-dispatch request binding.  No
+        # local API turns caller-supplied bytes into trusted state any more, so the
+        # recovery caller can read and copy the resulting receipt but can never
+        # manufacture it.
+        receipt = attach_external_trusted_return(
+            runtime,
             attempt.attempt_id,
             captured_at=staged_at - timedelta(seconds=1),
             directive=directive,
         )
+        assert receipt is not None
         authenticity_proof = receipt.authenticity_proof
     return runtime.stage_exact_background_response(
         work_kind=work_kind,
@@ -315,7 +392,7 @@ def _crash_wake_into_in_doubt(tmp_path, *, key: str):
         calls.append(snapshot.round_index)
         raise TimeoutError("provider may already have accepted the request")
 
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=ambiguous)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=ambiguous)
     signal = _emit_wake(runtime, key=key)
     with pytest.raises(TimeoutError, match="may already have accepted"):
         runtime.run_wake(wake_ref=_wake_ref(signal), now=NOW)
@@ -338,7 +415,7 @@ def test_case_01_crash_after_dispatch_without_exact_response_stays_in_doubt(tmp_
     assert runtime.background_model_attempts.staged_response(attempt_id) is None
 
     reopened_store, reopened_index = _reopen(db)
-    restarted = FusedTurnRuntime(
+    restarted = _route_b_runtime(
         store=reopened_store,
         index=reopened_index,
         model_handler=_must_not_call,
@@ -384,7 +461,7 @@ def test_case_02_exact_response_recovery_never_redispatches_the_provider(tmp_pat
     assert staging.provider_request_id == binding.relay_id
     assert staging.response_fingerprint == reconciled.response_fingerprint
 
-    restarted = FusedTurnRuntime(
+    restarted = _route_b_runtime(
         store=store,
         index=index,
         model_handler=_must_not_call,
@@ -508,7 +585,7 @@ def test_case_04c_staged_bytes_must_match_durable_attempt_provenance(
     exact = _directive("req-case-04c")
     other = _directive("req-case-other")
 
-    runtime = FusedTurnRuntime(
+    runtime = _route_b_runtime(
         store=store,
         index=index,
         model_handler=lambda _snapshot: exact,
@@ -546,10 +623,33 @@ def test_case_04c_staged_bytes_must_match_durable_attempt_provenance(
     # The same exact bytes that the runtime already fingerprinted are re-verifiable.
     exact_payload, exact_fingerprint = _payload_and_fingerprint(runtime, exact)
     assert exact_fingerprint == durable_fingerprint
-    receipt = runtime.background_model_attempts.response_authenticity_receipt(
-        attempt.attempt_id
+
+    # Route B (Corrective-003).  Old expectation: a receipt existed here purely
+    # because the *live local handler return* had completed the attempt, and that
+    # receipt's proof was then enough to stage the exact bytes.  That is exactly the
+    # caller-manufacturable trust authority adjudicated unsafe by BLK-W20-001, so
+    # the writer is gone.  Strictly stronger replacement: the live completion is now
+    # mechanically asserted to have minted NO receipt and NO staged response, so the
+    # "different bytes" refusal above is fail-closed against *every* local caller --
+    # there is no local proof to copy at all -- and the only way to stage the exact
+    # bytes is a genuine external signature over the durable request binding.
+    assert (
+        runtime.background_model_attempts.response_authenticity_receipt(
+            attempt.attempt_id
+        )
+        is None
+    )
+    assert runtime.background_model_attempts.staged_response(attempt.attempt_id) is None
+    receipt = attach_external_trusted_return(
+        runtime,
+        attempt.attempt_id,
+        captured_at=NOW + timedelta(minutes=2),
+        directive=exact,
     )
     assert receipt is not None
+    assert receipt.response_fingerprint == exact_fingerprint
+    assert receipt.provider_request_id == "req-case-04c"
+    # Restaging the identical genuinely-proven bytes is effect-free (exactly-once).
     runtime.stage_exact_background_response(
         work_kind="wake",
         work_id=signal.wake_id,
@@ -563,7 +663,13 @@ def test_case_04c_staged_bytes_must_match_durable_attempt_provenance(
         evidence="relay journal req-case-04c",
         authenticity_proof=receipt.authenticity_proof,
     )
-    restarted = FusedTurnRuntime(
+    assert (
+        runtime.background_model_attempts.staged_response(
+            attempt.attempt_id
+        ).directive_payload
+        == exact_payload
+    )
+    restarted = _route_b_runtime(
         store=store,
         index=index,
         model_handler=_must_not_call,
@@ -599,7 +705,7 @@ def test_case_05_reconciled_response_survives_process_death_before_application(t
     )
 
     reopened_store, reopened_index = _reopen(db)
-    restarted = FusedTurnRuntime(
+    restarted = _route_b_runtime(
         store=reopened_store,
         index=reopened_index,
         model_handler=_must_not_call,
@@ -631,7 +737,7 @@ def test_case_05b_response_recorded_before_meter_resumes_from_exact_bytes(
 ):
     store, index, db = _world(tmp_path)
     exact = _directive("req-case-05b")
-    runtime = FusedTurnRuntime(
+    runtime = _route_b_runtime(
         store=store, index=index, model_handler=lambda _snapshot: exact
     )
     signal = _emit_wake(runtime, key="case-05b")
@@ -654,7 +760,7 @@ def test_case_05b_response_recorded_before_meter_resumes_from_exact_bytes(
         directive=exact,
     )
     reopened_store, reopened_index = _reopen(db)
-    restarted = FusedTurnRuntime(
+    restarted = _route_b_runtime(
         store=reopened_store,
         index=reopened_index,
         model_handler=_must_not_call,
@@ -694,7 +800,7 @@ def test_case_06_crash_during_capability_application_replays_exactly_once(tmp_pa
             return capability_directive
         raise AssertionError("the first process must die during capability application")
 
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=scripted)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=scripted)
     signal = _emit_wake(runtime, key="case-06")
 
     real_spec = runtime.registry.get_spec("create_attention_watch")
@@ -723,7 +829,7 @@ def test_case_06_crash_during_capability_application_replays_exactly_once(tmp_pa
         calls.append((snapshot.round_index, snapshot.model_attempt_id))
         return _directive("req-case-06-r1")
 
-    restarted = FusedTurnRuntime(
+    restarted = _route_b_runtime(
         store=reopened_store,
         index=reopened_index,
         model_handler=provider,
@@ -775,7 +881,7 @@ def test_case_07_crash_after_capability_before_next_round_resumes_only_that_roun
             return capability_directive
         raise TimeoutError("round 1 died after provider dispatch")
 
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=scripted)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=scripted)
     signal = _emit_wake(runtime, key="case-07")
     with pytest.raises(TimeoutError, match="round 1 died"):
         runtime.run_wake(wake_ref=_wake_ref(signal), now=NOW)
@@ -787,7 +893,7 @@ def test_case_07_crash_after_capability_before_next_round_resumes_only_that_roun
     assert len(_watch_tasks(store)) == 1
 
     reopened_store, reopened_index = _reopen(db)
-    restarted = FusedTurnRuntime(
+    restarted = _route_b_runtime(
         store=reopened_store,
         index=reopened_index,
         model_handler=_must_not_call,
@@ -825,7 +931,7 @@ def test_case_08_crash_after_terminal_silence_before_completion_marker(
 ):
     store, index, db = _world(tmp_path)
     exact = _directive("req-case-08")
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: exact)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=lambda _s: exact)
     signal = _emit_wake(runtime, key="case-08")
 
     monkeypatch.setattr(
@@ -846,7 +952,7 @@ def test_case_08_crash_after_terminal_silence_before_completion_marker(
 
     monkeypatch.undo()
     reopened_store, reopened_index = _reopen(db)
-    restarted = FusedTurnRuntime(
+    restarted = _route_b_runtime(
         store=reopened_store,
         index=reopened_index,
         model_handler=_must_not_call,
@@ -887,7 +993,7 @@ def test_case_09_repeated_recovery_never_duplicates_state(tmp_path):
         model_round_index=0,
         directive=exact,
     )
-    restarted = FusedTurnRuntime(store=store, index=index, model_handler=_must_not_call)
+    restarted = _route_b_runtime(store=store, index=index, model_handler=_must_not_call)
     first = restarted.run_wake(wake_ref=_wake_ref(signal), now=NOW + timedelta(minutes=11))
     assert first.wake.state == "completed"
 
@@ -933,7 +1039,7 @@ def test_metered_attempt_without_exact_bytes_stays_blocked(tmp_path, monkeypatch
     """The pre-existing ambiguous no-exact-response protection is unchanged."""
 
     store, index, db = _world(tmp_path)
-    runtime = FusedTurnRuntime(
+    runtime = _route_b_runtime(
         store=store,
         index=index,
         model_handler=lambda _snapshot: _directive("req-metered-no-bytes"),
@@ -957,7 +1063,7 @@ def test_metered_attempt_without_exact_bytes_stays_blocked(tmp_path, monkeypatch
         conn.commit()
 
     reopened_store, reopened_index = _reopen(db)
-    restarted = FusedTurnRuntime(
+    restarted = _route_b_runtime(
         store=reopened_store,
         index=reopened_index,
         model_handler=_must_not_call,
@@ -976,7 +1082,7 @@ def test_no_exact_response_can_be_staged_for_a_call_that_never_reached_provider(
 
     # (a) crash before dispatch: durable attempt is still `admitted`.
     store, index, db = _world(tmp_path, name="admitted.db")
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=_must_not_call)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=_must_not_call)
     signal = _emit_wake(runtime, key="never-dispatched")
 
     def crash_before_dispatch(_attempt_id, *, dispatched_at, **_kwargs):
@@ -1002,26 +1108,52 @@ def test_no_exact_response_can_be_staged_for_a_call_that_never_reached_provider(
         )
     assert runtime.background_model_attempts.staged_response(admitted.attempt_id) is None
 
-    # (b) definitely-not-submitted dispatch failure keeps the same refusal.
-    store2, index2, db2 = _world(tmp_path, name="not-submitted.db")
+    # (b) Once Core has durably marked dispatching + request binding, a typed
+    # adapter exception is no longer proof of non-submission. C4/C5 require the
+    # attempt to remain in_doubt and forbid a retry.
+    store2, index2, db2 = _world(tmp_path, name="post-binding-not-submitted.db")
 
-    def not_submitted(_snapshot):
+    def claimed_not_submitted(_snapshot):
         raise ModelDispatchNotSubmitted("socket failed before request write")
 
-    runtime2 = FusedTurnRuntime(store=store2, index=index2, model_handler=not_submitted)
-    signal2 = _emit_wake(runtime2, key="never-submitted")
-    with pytest.raises(ModelDispatchNotSubmitted):
+    runtime2 = _route_b_runtime(
+        store=store2, index=index2, model_handler=claimed_not_submitted
+    )
+    signal2 = _emit_wake(runtime2, key="post-binding-not-submitted")
+    with pytest.raises(BackgroundModelResponseConflict, match="caller booleans"):
         runtime2.run_wake(wake_ref=_wake_ref(signal2), now=NOW)
     refused = _wake_attempt(runtime2, signal2.wake_id, 0)
-    assert refused.state == "not_submitted"
-    assert refused.recovery_disposition == "safe_to_retry"
-    with pytest.raises(BackgroundModelResponseConflict, match="provider boundary"):
-        _stage(
-            runtime2,
+    assert refused.state == "in_doubt"
+    assert refused.recovery_disposition == "in_doubt"
+    assert runtime2.background_model_attempts.outbound_request_binding(
+        refused.attempt_id
+    ) is not None
+
+    with pytest.raises(BackgroundModelExecutionInDoubt):
+        runtime2.run_wake(
+            wake_ref=_wake_ref(signal2), now=NOW + timedelta(minutes=1)
+        )
+    binding = runtime2.background_model_attempts.outbound_request_binding(
+        refused.attempt_id
+    )
+    assert binding is not None
+    untrusted = _directive(binding.relay_id)
+    payload, fingerprint = _payload_and_fingerprint(runtime2, untrusted)
+    with pytest.raises(
+        BackgroundModelResponseConflict, match="authenticity proof is missing"
+    ):
+        runtime2.stage_exact_background_response(
             work_kind="wake",
             work_id=signal2.wake_id,
             model_round_index=0,
-            directive=_directive("req-never-submitted"),
+            provider=PROVIDER,
+            model=MODEL,
+            provider_request_id=binding.relay_id,
+            response_fingerprint=fingerprint,
+            directive_payload=payload,
+            staged_at=NOW + timedelta(minutes=2),
+            evidence="caller bytes without a trusted return",
+            authenticity_proof=None,
         )
     assert runtime2.background_model_attempts.staged_response(refused.attempt_id) is None
 
@@ -1090,7 +1222,7 @@ def test_tampered_staged_bytes_fail_closed_before_application(tmp_path):
         conn.commit()
 
     reopened_store, reopened_index = _reopen(db)
-    restarted = FusedTurnRuntime(
+    restarted = _route_b_runtime(
         store=reopened_store,
         index=reopened_index,
         model_handler=_must_not_call,
@@ -1116,7 +1248,7 @@ def test_periodic_review_exact_response_recovery_is_zero_provider_call(tmp_path)
         calls.append(0)
         raise TimeoutError("review provider may already have accepted the request")
 
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=ambiguous)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=ambiguous)
     with pytest.raises(TimeoutError, match="may already have accepted"):
         runtime.run_periodic_review(now=NOW)
     wake_id = _running_periodic_review_id(store)
@@ -1130,7 +1262,7 @@ def test_periodic_review_exact_response_recovery_is_zero_provider_call(tmp_path)
     assert attempt.state == "in_doubt"
 
     reopened_store, reopened_index = _reopen(db)
-    restarted = FusedTurnRuntime(
+    restarted = _route_b_runtime(
         store=reopened_store,
         index=reopened_index,
         model_handler=_must_not_call,
@@ -1163,7 +1295,7 @@ def test_user_turn_exact_response_recovery_is_exactly_once(tmp_path):
         calls.append(snapshot.round_index)
         raise TimeoutError("turn provider may already have accepted the request")
 
-    first = FusedTurnRuntime(store=store, index=index, model_handler=ambiguous)
+    first = _route_b_runtime(store=store, index=index, model_handler=ambiguous)
     turn = dict(
         session_id="cbrr-session",
         turn_index=1,
@@ -1185,7 +1317,7 @@ def test_user_turn_exact_response_recovery_is_exactly_once(tmp_path):
     assert calls == [0]
 
     reopened_store, reopened_index = _reopen(db)
-    restarted = FusedTurnRuntime(
+    restarted = _route_b_runtime(
         store=reopened_store,
         index=reopened_index,
         model_handler=_must_not_call,
@@ -1251,7 +1383,7 @@ def test_user_turn_exact_response_recovery_is_exactly_once(tmp_path):
 # ---------------------------------------------------------------------------
 
 
-def test_case_10_normal_path_and_not_submitted_retry_regression(tmp_path):
+def test_case_10_normal_path_and_post_binding_fail_closed_regression(tmp_path):
     store, index, db = _world(tmp_path)
     calls: list[str | None] = []
 
@@ -1259,7 +1391,7 @@ def test_case_10_normal_path_and_not_submitted_retry_regression(tmp_path):
         calls.append(snapshot.model_attempt_id)
         return _directive("req-normal-wake")
 
-    runtime = FusedTurnRuntime(store=store, index=index, model_handler=provider)
+    runtime = _route_b_runtime(store=store, index=index, model_handler=provider)
     signal = _emit_wake(runtime, key="case-10-normal")
     result = runtime.run_wake(wake_ref=_wake_ref(signal), now=NOW)
     assert result.wake.state == "completed"
@@ -1271,38 +1403,43 @@ def test_case_10_normal_path_and_not_submitted_retry_regression(tmp_path):
     assert runtime.background_model_attempts.staged_response(normal_attempt.attempt_id) is None
     assert len(runtime.metering.list_model_calls(subject_id="user_1", wake_id=signal.wake_id)) == 1
 
-    # not_submitted keeps its safe-retry semantics on the same attempt identity.
+    # Route-B replacement for the retired post-binding not_submitted retry:
+    # the first request identity is durable before the handler runs, so a typed
+    # exception cannot unlock a second provider call or second request identity.
     store2, index2, db2 = _world(tmp_path, name="retry.db")
     retry_calls: list[str | None] = []
 
     def flaky(snapshot):
         retry_calls.append(snapshot.model_attempt_id)
-        if len(retry_calls) == 1:
-            raise ModelDispatchNotSubmitted("socket failed before request write")
-        return _directive("req-retry-after-not-submitted")
+        raise ModelDispatchNotSubmitted("socket failed before request write")
 
-    retry_runtime = FusedTurnRuntime(store=store2, index=index2, model_handler=flaky)
+    retry_runtime = _route_b_runtime(store=store2, index=index2, model_handler=flaky)
     retry_signal = _emit_wake(retry_runtime, key="case-10-retry")
-    with pytest.raises(ModelDispatchNotSubmitted):
+    with pytest.raises(BackgroundModelResponseConflict, match="caller booleans"):
         retry_runtime.run_wake(wake_ref=_wake_ref(retry_signal), now=NOW)
-    not_submitted = _wake_attempt(retry_runtime, retry_signal.wake_id, 0)
-    assert not_submitted.state == "not_submitted"
-    assert not_submitted.recovery_disposition == "safe_to_retry"
-
-    retried = retry_runtime.run_wake(
-        wake_ref=_wake_ref(retry_signal), now=NOW + timedelta(minutes=1)
+    in_doubt = _wake_attempt(retry_runtime, retry_signal.wake_id, 0)
+    assert in_doubt.state == "in_doubt"
+    assert in_doubt.recovery_disposition == "in_doubt"
+    first_binding = retry_runtime.background_model_attempts.outbound_request_binding(
+        in_doubt.attempt_id
     )
-    assert retried.wake.state == "completed"
-    assert retried.runtime.recovered_response_attempts == ()
-    assert retry_calls == [not_submitted.attempt_id, not_submitted.attempt_id]
-    assert retry_runtime.background_model_attempts.get(not_submitted.attempt_id).state == "metered"
+    assert first_binding is not None
+
+    with pytest.raises(BackgroundModelExecutionInDoubt):
+        retry_runtime.run_wake(
+            wake_ref=_wake_ref(retry_signal), now=NOW + timedelta(minutes=1)
+        )
+    assert retry_calls == [in_doubt.attempt_id]
+    assert retry_runtime.background_model_attempts.outbound_request_binding(
+        in_doubt.attempt_id
+    ) == first_binding
     assert (
         len(
             retry_runtime.metering.list_model_calls(
                 subject_id="user_1", wake_id=retry_signal.wake_id
             )
         )
-        == 1
+        == 0
     )
 
     # Normal user turn and normal periodic review are unchanged.
@@ -1317,7 +1454,7 @@ def test_case_10_normal_path_and_not_submitted_retry_regression(tmp_path):
             response="Normal synthetic reply.",
         )
 
-    turn_runtime = FusedTurnRuntime(store=store3, index=index3, model_handler=turn_provider)
+    turn_runtime = _route_b_runtime(store=store3, index=index3, model_handler=turn_provider)
     turn = dict(
         session_id="cbrr-normal-session",
         turn_index=1,
@@ -1339,7 +1476,7 @@ def test_case_10_normal_path_and_not_submitted_retry_regression(tmp_path):
         review_calls.append(snapshot.model_attempt_id)
         return _directive("req-normal-review")
 
-    review_runtime = FusedTurnRuntime(
+    review_runtime = _route_b_runtime(
         store=store4, index=index4, model_handler=review_provider
     )
     review_result = review_runtime.run_periodic_review(now=NOW)

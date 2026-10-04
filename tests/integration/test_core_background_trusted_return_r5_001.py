@@ -1,8 +1,41 @@
 """R5-A/B/C/D: exactly-once *durable effects*, not zero callback re-entry.
 
-The normal trusted return callback is the only receipt mint. Crash hooks live after
-metering, before/after the real side-effecting capability, and after terminal output.
-No recovery test calls the receipt signer or supplies a replacement directive.
+Crash hooks live after metering, before/after the real side-effecting capability,
+and after terminal output.  No recovery test calls a receipt signer or supplies a
+replacement directive.
+
+TIGHTEN_ONLY history (Corrective-003 / Window 22-RERUN-001).
+
+Old expectation
+    ``evidence()`` asserted that an ordinary live-completed round owned a durable
+    ``background_model_response_receipts`` row AND a
+    ``background_model_return_handoffs`` row whose payload digest and
+    authenticity proof matched the receipt -- i.e. that the *live local handler
+    return had itself minted* trusted recovery state, which R5 then replayed.
+
+Old authority mechanism
+    ``BackgroundModelAttemptStore.record_live_provider_return`` driven by
+    ``live_return.open_live_provider_return_window`` / ``register_handler_return``.
+
+Why that mechanism is unsafe (BLK-W20-001)
+    ``RECOVERY_CALLER_TRUSTED_RETURN_MINT_ORACLE_VIA_SELF_ISSUED_EPHEMERAL_WINDOW``
+    / ``TRUST_AUTHORITY_ISSUANCE_REMAINS_CALLER_MANUFACTURABLE``: window issuance
+    was an ordinary public function, so a recovery caller could self-issue a
+    window and mint exactly the receipt/handoff rows R5 replayed, completing and
+    metering an attempt that must have stayed ``in_doubt`` and poisoning a later
+    genuine RSA trusted return.
+
+Replacement route
+    Route B.  A live local handler return mints nothing durable, so R5's
+    exactly-once guarantee now rests on the durable attempt row, the pre-dispatch
+    request binding, the meter record and World truth -- none of which a local
+    return can manufacture.  ``evidence()`` therefore asserts the *absence* of
+    receipt / handoff / staged-response rows for a live round (strictly stronger
+    than the old presence check: it pins that no local trust minting happens at
+    all) while keeping every binding, provenance, metering and state assertion.
+    Durable trusted return rows exist only on the genuine external-proof route,
+    covered by ``test_core_background_trusted_return_recovery_001.py`` and
+    ``test_core_background_trusted_return_adversarial_001.py``.
 """
 from __future__ import annotations
 
@@ -16,11 +49,14 @@ import pytest
 from aios_core.contracts.enums import ObjectType, WakeSource
 from aios_core.contracts.refs import ObjectRef
 from aios_core.runtime import TurnAlreadyCompleted, TurnInputConflict
-from aios_core.runtime.background_attempt import BackgroundModelResponseConflict, encode_model_directive
+from aios_core.runtime.background_attempt import (
+    BackgroundModelResponseConflict, encode_model_directive,
+)
 from aios_core.runtime.turn_runtime import FusedTurnRuntime
 from aios_core.wake import WakeSignalRequest
 from test_core_background_trusted_return_recovery_001 import (
-    NOW, directive, seed_anchor, watch_call, world,
+    NOW, RouteBExternalSigner, directive, route_b_verifier, seed_anchor, watch_call,
+    world,
 )
 
 
@@ -28,9 +64,55 @@ class ProcessDeath(BaseException):
     """Escape capability registry's ordinary Exception-to-result conversion."""
 
 
+# Route B (Corrective-003): R5's exactly-once *durable effects* guarantee needs the
+# exact bytes of a crashed round to survive process loss.  Under the removed live
+# authority those bytes were preserved by a receipt the local handler return minted
+# for itself -- the caller-manufacturable oracle adjudicated unsafe by BLK-W20-001.
+# Route B preserves them the only legitimate way: an external verifier bound before
+# the provider boundary plus a genuine external RSA signature over the durable
+# request binding.  Every runtime below therefore binds that authority, and the
+# external private key stays test-only material owned by the simulated external
+# side.
+_SIGNERS: dict[str, RouteBExternalSigner] = {}
+
+
 def new_runtime(db, handler):
     store, index = world(db)
-    return FusedTurnRuntime(store=store, index=index, model_handler=handler)
+    signer = RouteBExternalSigner()
+    runtime = FusedTurnRuntime(
+        store=store, index=index, model_handler=handler,
+        late_return_verifier=route_b_verifier(),
+        external_return_observer=signer,
+    )
+    _SIGNERS[str(store.db_path)] = signer
+    return runtime
+
+
+def signer_for(runtime):
+    return _SIGNERS[str(runtime.store.db_path)]
+
+
+def attach_genuine_return(runtime, kind, work_id, returned, round_index=0, *, seconds=1):
+    """Preserve a crashed round's exact bytes with a genuine external proof.
+
+    This is the only Route B route to durable trusted return: no local writer can
+    produce these rows, and the signature is verified with public material only
+    against the durable pre-dispatch request binding.
+    """
+
+    attempt = runtime.background_model_attempts.inspect(
+        subject_id=runtime.subject_id, work_kind=kind,
+        work_id=work_id, model_round_index=round_index)
+    assert attempt is not None
+    signer = signer_for(runtime)
+    runtime.background_model_attempts.attach_late_trusted_return(
+        attempt.attempt_id,
+        attached_at=NOW + timedelta(seconds=seconds),
+        directive_payload=encode_model_directive(returned),
+        late_return_proof=signer.proof(attempt.attempt_id, returned),
+        evidence="genuine external Route B return preserved across process loss",
+    )
+    return attempt
 
 
 def execute(runtime, kind, work_id=None, *, now=NOW):
@@ -68,39 +150,69 @@ def scope(runtime, kind, work_id=None):
     return work_id
 
 
-def evidence(runtime, kind, work_id, round_index=0):
+def evidence(runtime, kind, work_id, round_index=0, *, proven=False):
     attempt = runtime.background_model_attempts.inspect(
         subject_id=runtime.subject_id, work_kind=kind,
         work_id=work_id, model_round_index=round_index)
     assert attempt is not None
     binding = runtime.background_model_attempts.outbound_request_binding(attempt.attempt_id)
-    receipt = runtime.background_model_attempts.response_authenticity_receipt(attempt.attempt_id)
-    assert binding is not None and receipt is not None
+    assert binding is not None
     assert (binding.subject_id, binding.work_kind, binding.work_id,
             binding.model_round_index) == (runtime.subject_id, kind, work_id, round_index)
-    assert (receipt.attempt_id, receipt.subject_id, receipt.work_kind,
-            receipt.work_id, receipt.model_round_index,
-            receipt.outbound_request_fingerprint, receipt.relay_id) == (
-                attempt.attempt_id, runtime.subject_id, kind, work_id, round_index,
-                binding.outbound_request_fingerprint, binding.relay_id)
-    assert (receipt.provider, receipt.model, receipt.provider_request_id,
-            receipt.response_fingerprint) == (
-                attempt.provider, attempt.model, attempt.provider_request_id,
-                attempt.response_fingerprint)
+
+    # Route B (Corrective-003): a live local handler return mints NO trusted
+    # recovery state.  This replaces the old unconditional receipt/handoff presence
+    # assertions, which encoded the caller-manufacturable authority adjudicated
+    # unsafe by BLK-W20-001.  Before an external proof is attached, absence is
+    # pinned mechanically on every durable trusted-return table; after a genuine
+    # external proof the same rows must exist and be mutually consistent, which is
+    # what keeps R5's exact-bytes replay honest.
+    attempts_store = runtime.background_model_attempts
+    receipt = attempts_store.response_authenticity_receipt(attempt.attempt_id)
+    staged = attempts_store.staged_response(attempt.attempt_id)
     with sqlite3.connect(runtime.store.db_path) as conn:
         handoff = conn.execute(
             "SELECT directive_payload,payload_sha256,authenticity_proof "
             "FROM background_model_return_handoffs WHERE attempt_id=?",
             (attempt.attempt_id,)).fetchone()
-    assert handoff is not None
-    assert hashlib.sha256(handoff[0].encode()).hexdigest() == handoff[1] == receipt.payload_sha256
-    assert handoff[2] == receipt.authenticity_proof
+        verifier_rows = conn.execute(
+            "SELECT COUNT(*) FROM background_model_return_verifiers WHERE attempt_id=?",
+            (attempt.attempt_id,)).fetchone()[0]
+    if not proven:
+        assert receipt is None and handoff is None and staged is None
+        # A verifier is bound before dispatch, so it exists; nothing else does.
+        assert verifier_rows == 1
+    else:
+        assert receipt is not None and handoff is not None and staged is not None
+        assert verifier_rows == 1
+        assert (receipt.attempt_id, receipt.subject_id, receipt.work_kind,
+                receipt.work_id, receipt.model_round_index,
+                receipt.outbound_request_fingerprint, receipt.relay_id) == (
+                    attempt.attempt_id, runtime.subject_id, kind, work_id, round_index,
+                    binding.outbound_request_fingerprint, binding.relay_id)
+        assert (receipt.provider, receipt.model, receipt.provider_request_id,
+                receipt.response_fingerprint) == (
+                    attempt.provider, attempt.model, attempt.provider_request_id,
+                    attempt.response_fingerprint)
+        assert hashlib.sha256(handoff[0].encode()).hexdigest() == handoff[1] == receipt.payload_sha256
+        assert handoff[2] == receipt.authenticity_proof
+        assert staged.directive_payload == handoff[0]
+        assert staged.payload_sha256 == handoff[1]
+        assert staged.authenticity_proof == handoff[2]
+
+    # Durable provenance still identifies the exact provider reply, and it is
+    # bound to the pre-dispatch request binding that a local return cannot forge.
+    assert attempt.provider and attempt.model and attempt.provider_request_id
+    assert len(attempt.response_fingerprint) == 64
+    int(attempt.response_fingerprint, 16)
+    assert binding.outbound_request_fingerprint and binding.relay_id
+
     meters = [m for m in runtime.metering.list_model_calls(subject_id=runtime.subject_id)
               if m.background_attempt_id == attempt.attempt_id]
     assert len(meters) == 1
     assert attempt.state == "metered" and attempt.meter_record_id == meters[0].record_id
     assert (meters[0].model_round_index, meters[0].provider_request_id) == (
-        round_index, receipt.provider_request_id)
+        round_index, attempt.provider_request_id)
     return attempt, binding, receipt, handoff, meters[0]
 
 
@@ -152,8 +264,13 @@ def test_r5_a_metered_final_no_terminal_ack_exactly_once(tmp_path, kind, monkeyp
     with pytest.raises(ProcessDeath):
         execute(initial, kind, work_id)
     work_id = scope(initial, kind, work_id)
-    before = evidence(initial, kind, work_id)
+    # The live round minted nothing durable; only the genuine external proof below
+    # can preserve its exact bytes for replay.
+    before_live = evidence(initial, kind, work_id)
+    attach_genuine_return(initial, kind, work_id, directive(0))
+    before = evidence(initial, kind, work_id, proven=True)
     rev_before = int(initial.store.current_world_revision())
+    assert before_live[0].attempt_id == before[0].attempt_id
     if kind == "wake":
         assert initial.ingestor.assistant_delivery_payload(work_id) is None
         wake_before = initial.wake_bus.current_wake(work_id)
@@ -171,7 +288,7 @@ def test_r5_a_metered_final_no_terminal_ack_exactly_once(tmp_path, kind, monkeyp
                         pytest.fail("metered final provider was redispatched"))
     result = execute(fresh, kind, work_id, now=NOW + timedelta(minutes=1))
     assert calls == []
-    assert_same_evidence(before, evidence(fresh, kind, work_id))
+    assert_same_evidence(before, evidence(fresh, kind, work_id, proven=True))
     assert task_rows(fresh.store) == []
     if kind == "user_turn":
         status = fresh.inspect_turn_execution(session_id="r5-session", turn_index=1,
@@ -237,7 +354,10 @@ def test_r5_b_c_metered_capability_effect_and_replay(tmp_path, kind, already_app
         execute(initial, kind, work_id)
     assert calls == [0]
     work_id = scope(initial, kind, work_id)
-    before = evidence(initial, kind, work_id)
+    before_live = evidence(initial, kind, work_id)
+    assert before_live[0].state == "metered"
+    attach_genuine_return(initial, kind, work_id, directive(0, call=watch_call(0)))
+    before = evidence(initial, kind, work_id, proven=True)
     assert before[0].state == "metered"
     tasks_before = task_rows(initial.store)
     assert len(tasks_before) == int(already_applied)
@@ -267,7 +387,7 @@ def test_r5_b_c_metered_capability_effect_and_replay(tmp_path, kind, already_app
     fresh = new_runtime(db, continuation)
     result = execute(fresh, kind, work_id, now=NOW + timedelta(minutes=1))
     assert fresh_provider_calls == [1] and len(round_one_state) == 1
-    assert_same_evidence(before, evidence(fresh, kind, work_id))
+    assert_same_evidence(before, evidence(fresh, kind, work_id, proven=True))
     tasks_after = task_rows(fresh.store)
     assert len(tasks_after) == 1 and tasks_after[0]["revision"] == 1
     assert tasks_after[0]["object_id"] == round_one_state[0][0]
