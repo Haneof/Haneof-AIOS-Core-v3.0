@@ -1,5 +1,16 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-10-05 — WINDOW 27 Fresh Independent Acceptance READY
+
+- Candidate = PR #330 @ `2380121639865b1bd29176cf944f5a20afe4112d`.
+- Frozen software = `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`.
+- Window 26 delta vs failed #325 = 2 append-only commits / 0 behind / workflow + corrective evidence only.
+- Formal run `37217853558` overall SUCCESS; Job A SUCCESS; mandatory publisher Job B SUCCESS.
+- Unique next task = `WINDOW 27 — CORE-RC-REFREEZE-004-CORRECTIVE-001-INDEPENDENT-ACCEPTANCE`.
+- Window 27 must red-team the three closure claims; author self-tests are not acceptance evidence.
+- No PM integration, C15 repair, Resident, evaluator or public release before durable Window 27 verdict.
+
+
 ## 2026-10-04 — WINDOW 25 FAIL / WINDOW 26 RC gate corrective READY
 
 - Window 25 = `ACCEPTANCE_FAIL / blocker=3`.
