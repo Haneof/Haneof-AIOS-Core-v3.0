@@ -1,0 +1,157 @@
+{
+  "schema": "aios-core-release-candidate-manifest-v1",
+  "task": "CORE-RC-REFREEZE-004",
+  "window": 24,
+  "repository": "Haneof/Haneof-AIOS-Core-v3.0",
+  "status": "REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE / DO NOT MERGE",
+  "exit_target": "CORE-RC-REFREEZE-004 = REVIEW_READY + READY_FOR_INDEPENDENT_ACCEPTANCE + DO NOT MERGE",
+  "frozen_software": {
+    "sha": "1cee3c5ad12f4b9098232bae11b51df786c5eb2f",
+    "subject": "Merge pull request #318 from Haneof/arena/01a101e0-haneof-aios-core-v3-0",
+    "parents": [
+      "fb53cf938b138a67d1890618eed41282c61bce00",
+      "7ecb2250a488766915e1042a76472b3cd26d9107"
+    ],
+    "repository_tree": "70b2711258567863ea0d93025a6a07e39631726a",
+    "src_tree": "b95b1ccf49b4e7fc6b145bba3eb49e481256cbd2",
+    "src_aios_core_tree": "16f1487e291b009c55bee402abfd79fdacbae960",
+    "tests_tree": "9db1bfa08143bc99fe03836e2752ee6e05694eb6",
+    "tools_tree": "63918ce81e47ccc20eb9da3a9bf17943d087a2d7",
+    "release_workflows_tree": "72cde9d2dc2b35d071bfa36c954dac2faff4a803",
+    "pyproject_blob": "b38833c7537fa60d5c2f02ed4bb19158d8995a11",
+    "pyproject_sha256": "993a6e9dd821d8d5885f4cc1f2da0aa34d40284618097a1de507e885f2eaab30",
+    "source_manifest": "reviews/CORE_RC_REFREEZE_004/source_manifest.json",
+    "source_manifest_sha256": "d8e0d273539f7b599bf85c5f8dcb817146e24be692ba454ae8b7f3c8a4bb6d50"
+  },
+  "accepted_core_integration": {
+    "implementation_pr": 318,
+    "accepted_candidate_parent": "7ecb2250a488766915e1042a76472b3cd26d9107",
+    "accepted_candidate_tree": "1438a9ea6b8582453f963db5acb7f136e5ac5385",
+    "window23_review_only_pr": 321,
+    "window23_review_only_head": "22aa00cb3793c252512142a1eae33ca8aae9d841",
+    "window23_review_only_disposition": "REVIEW_ONLY / doc-only / not merged / not part of frozen software",
+    "pm_integration_record": "governance/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_003_PM_INTEGRATION_2026-10-04.md",
+    "corrective_003_blocker": "BLK-W20-001 = CLOSED_BY_ACCEPTED_CORRECTIVE_003"
+  },
+  "entry_decision": {
+    "gate": "CORE-RC-REFREEZE-004",
+    "state": "READY",
+    "decision_main": "5c4cc1b0c72c5fc6e866b07cee1fc46392734d59",
+    "record": "governance/CORE_RC_REFREEZE_004_ENTRY_DECISION_2026-10-04.md"
+  },
+  "live_main_at_fresh_fetch": {
+    "ref": "origin/main",
+    "sha": "ee4556989fea16a28d2c727eb345d48385a453fe",
+    "subject": "Merge pull request #324 from Haneof/arena/01a10764-haneof-aios-core-v3-0",
+    "observed_utc": "2026-10-04T14:39:04Z",
+    "note": "Point-in-time governance/source audit only; not a permanent baseline.",
+    "commits_after_frozen_software": 9,
+    "protected_implementation_drift_count": 0,
+    "post_target_delta": [
+      "AIOS_v3.0_CURRENT_CHECKPOINT.md",
+      "governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md",
+      "governance/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_003_PM_INTEGRATION_2026-10-04.md",
+      "governance/CORE_RC_REFREEZE_004_ENTRY_DECISION_2026-10-04.md",
+      "governance/prompts/CORE_RC_REFREEZE_004_2026-10-04.md"
+    ],
+    "drift_classification": "GO ONLY (governance / checkpoint / review-evidence publication / publication transport); no unadjudicated implementation drift"
+  },
+  "prior_rc": {
+    "task": "CORE-RC-REFREEZE-003",
+    "frozen_software_sha": "f20f2edfa7af00d0286493fd15196ca9503bc315",
+    "core_tree": "9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623",
+    "tests_tree": "7e33b5ef8432370234965d3ccd61248c703c4019",
+    "semantic_delta_to_this_rc": "src/aios_core: 6 files, +1733 / -215 (Corrective-003 trusted-return / recovery boundary)",
+    "prior_parity_targets_not_inherited": {
+      "core_gate": "928 passed",
+      "probes": "Suite A 4/0, Suite B 7/0, W17 14/0",
+      "full_repository": "45 failed / 1092 passed (all failures under tests/c15_persistence/**)",
+      "environment": "CPython 3.12.14 / pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.45.1"
+    }
+  },
+  "fresh_gate_results": {
+    "core_gate": {
+      "selection": "tests/unit tests/integration tests/runtime tests/habitation",
+      "tests": 928,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "raw": "reviews/CORE_RC_REFREEZE_004/raw/local/core-gate-junit.xml"
+    },
+    "focused_trusted_return": {"tests": 388, "failed": 0},
+    "focused_core_systems": {"tests": 341, "failed": 0},
+    "historical_fix_spot_checks": {"tests": 24, "failed": 0},
+    "writer_restart_fix_scale": {"tests": 52, "failed": 0},
+    "real_process_loss_sigkill": {"tests": 9, "failed": 0},
+    "reviewer_probes": {
+      "window20_suite_a": "4 probes / 0 failures",
+      "window20_suite_b": "7 probes / 0 failures",
+      "window17": "14 probes / 0 failures"
+    },
+    "registry_inventory": "43 reachable / 22 side-effecting / REGISTRY_MATRIX_PASS",
+    "clean_install_headless": "HEADLESS_CLEAN_INSTALL_PASS",
+    "backup_restore_rebuild": "BACKUP_RESTORE_REBUILD_PASS",
+    "writer_restart": "WRITER_RESTART_PASS",
+    "full_repository": {
+      "tests": 1137,
+      "failed": 45,
+      "errors": 0,
+      "skipped": 0,
+      "all_failures_confined_to": "tests/c15_persistence/**",
+      "raw": "reviews/CORE_RC_REFREEZE_004/raw/local/full-repo-junit.xml"
+    },
+    "probe_supersession": "reviews/CORE_RC_REFREEZE_003/probes/backup_restore_trusted_return.py fails by design on Route B (asserts the removed local-trust receipt); superseded by the fresh RC-004 probe"
+  },
+  "c15_adjudication": {
+    "ruling": [
+      "CORE_FREEZE_NOT_BLOCKED_BY_DOWNSTREAM_OPERATOR_DEBT",
+      "C15_OPERATOR_ADAPTATION_REQUIRED_BEFORE_RESIDENT"
+    ],
+    "red_preserved": true,
+    "details": "reviews/CORE_RC_REFREEZE_004/c15_downstream_adjudication.md"
+  },
+  "rc_impact_adjudication": {
+    "ruling": ["FRESH_A_REQUIRED", "FRESH_OPERATOR_PREP_REQUIRED"],
+    "a_003": "HISTORICAL_FOR_PRIOR_RC_ONLY",
+    "a_004": "HISTORICAL_FOR_PRIOR_RC_ONLY",
+    "no_hash_swap": true,
+    "details": "reviews/CORE_RC_REFREEZE_004/rc_impact_adjudication.md"
+  },
+  "candidate": {
+    "branch": "arena/01a10764-haneof-aios-core-v3-0",
+    "pull_request": "TO_BE_OPENED_NEW_CANDIDATE_PR_DO_NOT_MERGE",
+    "head_sha": "RECORDED_AT_EXACT_HEAD_BEFORE_FORMAL_CI",
+    "note": "Formal exact-head CI runs via .github/workflows/core-rc-refreeze-004-formal-gate.yml on the pushed head; run id, environment and gate outputs are published to the commit comment and artifact. No evidence-only commits are added after that run."
+  },
+  "formal_gate_workflow": ".github/workflows/core-rc-refreeze-004-formal-gate.yml",
+  "candidate_evidence_inputs": [
+    "reviews/CORE_RC_REFREEZE_004/source_manifest.json",
+    "reviews/CORE_RC_REFREEZE_004/environment_manifest.txt",
+    "reviews/CORE_RC_REFREEZE_004/full_regression.md",
+    "reviews/CORE_RC_REFREEZE_004/probes.md",
+    "reviews/CORE_RC_REFREEZE_004/trusted_return_authenticity_spot_checks.md",
+    "reviews/CORE_RC_REFREEZE_004/process_loss.md",
+    "reviews/CORE_RC_REFREEZE_004/headless_smoke.md",
+    "reviews/CORE_RC_REFREEZE_004/backup_restore_rebuild_smoke.md",
+    "reviews/CORE_RC_REFREEZE_004/writer_restart_smoke.md",
+    "reviews/CORE_RC_REFREEZE_004/legacy_fix_spot_checks.md",
+    "reviews/CORE_RC_REFREEZE_004/no_second_truth_store.md",
+    "reviews/CORE_RC_REFREEZE_004/open_pr_contamination_review.md",
+    "reviews/CORE_RC_REFREEZE_004/open_pr_snapshot.json",
+    "reviews/CORE_RC_REFREEZE_004/c15_downstream_adjudication.md",
+    "reviews/CORE_RC_REFREEZE_004/known_limitations.md",
+    "reviews/CORE_RC_REFREEZE_004/rc_impact_adjudication.md",
+    "reviews/CORE_RC_REFREEZE_004/probes/backup_restore_rebuild_smoke.py",
+    "reviews/CORE_RC_REFREEZE_004/probes/writer_restart_smoke.py",
+    "reviews/CORE_RC_REFREEZE_004/probes/reviewer-window20-suite-a.py",
+    "reviews/CORE_RC_REFREEZE_004/probes/reviewer-window20-suite-b.py",
+    "reviews/CORE_RC_REFREEZE_004/probes/reviewer-window17.py",
+    "reviews/CORE_RC_REFREEZE_004/SHA256SUMS"
+  ],
+  "non_claims": [
+    "Not independent acceptance.",
+    "Not merged; DO NOT MERGE.",
+    "No Resident A/B/C, no evaluator/close, no public release/tag, no UI/hardware, no C15 corrective work.",
+    "Governance main SHA is not the frozen software SHA."
+  ]
+}

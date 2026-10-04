@@ -1,0 +1,1023 @@
+[
+ {
+  "number": 325,
+  "title": "[DO NOT MERGE] CORE-RC-REFREEZE-004 \u2014 exact candidate pending formal CI",
+  "head": "669cb96e1a5692ffdffcf1fae3661609c6f58aca",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-10-04T15:05:53Z",
+  "files": 22,
+  "categories": [
+   "release",
+   "reviews",
+   "workflows"
+  ],
+  "code_files": [
+   ".github/workflows/core-rc-refreeze-004-formal-gate.yml"
+  ]
+ },
+ {
+  "number": 321,
+  "title": "REVIEW_ONLY: Window 23 Fresh IA evidence \u2014 ACCEPTANCE_PASS blocker=0",
+  "head": "22aa00cb3793c252512142a1eae33ca8aae9d841",
+  "base": "arena/01a101e0-haneof-aios-core-v3-0",
+  "draft": false,
+  "updated": "2026-10-04T13:40:40Z",
+  "files": 11,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 311,
+  "title": "[REVIEW-ONLY / EVIDENCE-ONLY / DO NOT MERGE] WINDOW 20 Fresh IA of PR #310 fec30",
+  "head": "fd52ea8243970187b439208d7061c04c68b6b8ea",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-10-03T08:39:14Z",
+  "files": 55,
+  "categories": [
+   "governance",
+   "other",
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 310,
+  "title": "[IA_FAIL / blocker=1 / FROZEN / DO NOT MERGE] CORE-BACKGROUND-LATE-TRUSTED-RETUR",
+  "head": "fec30bd1495017bf13f08b0ef5b1e241dfb0e247",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-10-03T13:09:42Z",
+  "files": 39,
+  "categories": [
+   "reviews",
+   "src",
+   "tests",
+   "workflows"
+  ],
+  "code_files": [
+   ".github/workflows/core-background-late-trusted-return-001.yml",
+   "src/aios_core/runtime/__init__.py",
+   "src/aios_core/runtime/background_attempt.py",
+   "src/aios_core/runtime/cognitive_runtime.py",
+   "src/aios_core/runtime/late_return.py",
+   "src/aios_core/runtime/live_return.py",
+   "src/aios_core/runtime/turn_runtime.py",
+   "tests/integration/test_core_background_late_trusted_return_consumption_001.py",
+   "tests/integration/test_core_background_late_trusted_return_corrective_001.py",
+   "tests/integration/test_core_background_late_trusted_return_corrective_002.py",
+   "tests/integration/test_core_background_late_trusted_return_secret_upgrade_001.py",
+   "tests/integration/test_core_background_late_trusted_return_sigkill_001.py",
+   "tests/integration/test_core_background_response_recovery_001.py",
+   "tests/integration/test_core_background_response_recovery_001_corrective_001.py",
+   "tests/integration/test_core_background_trusted_return_adversarial_001.py",
+   "tests/integration/test_core_gap_fix_002_background_attempts.py",
+   "tests/runtime/test_background_late_return_route_b.py",
+   "tests/runtime/test_background_model_attempt.py",
+   "tests/runtime/test_cognitive_runtime_trusted_return.py",
+   "tests/runtime/test_late_return_canonical_encoding_002.py",
+   "tests/runtime/test_turn_execution_recovery.py"
+  ]
+ },
+ {
+  "number": 308,
+  "title": "[IA_FAIL / blocker=3 / FROZEN / DO NOT MERGE] CORE-BACKGROUND-LATE-TRUSTED-RETUR",
+  "head": "cb8a6b3cdaa697a5ede81cbe9fafc3ac9891e9dd",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-10-02T17:02:31Z",
+  "files": 33,
+  "categories": [
+   "reviews",
+   "src",
+   "tests",
+   "workflows"
+  ],
+  "code_files": [
+   ".github/workflows/core-background-late-trusted-return-001.yml",
+   "src/aios_core/runtime/__init__.py",
+   "src/aios_core/runtime/background_attempt.py",
+   "src/aios_core/runtime/late_return.py",
+   "src/aios_core/runtime/turn_runtime.py",
+   "tests/integration/test_core_background_late_trusted_return_consumption_001.py",
+   "tests/integration/test_core_background_late_trusted_return_corrective_001.py",
+   "tests/integration/test_core_background_late_trusted_return_secret_upgrade_001.py",
+   "tests/integration/test_core_background_late_trusted_return_sigkill_001.py",
+   "tests/integration/test_core_background_response_recovery_001.py",
+   "tests/integration/test_core_gap_fix_002_background_attempts.py",
+   "tests/runtime/test_background_late_return_route_b.py",
+   "tests/runtime/test_background_model_attempt.py",
+   "tests/runtime/test_turn_execution_recovery.py"
+  ]
+ },
+ {
+  "number": 305,
+  "title": "[IA_FAIL / blocker=4 / DO NOT MERGE] CORE-BACKGROUND-LATE-TRUSTED-RETURN-001 \u2014 P",
+  "head": "5ad0524c425592210ff184e00ad52abb2c14e366",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-10-01T04:49:54Z",
+  "files": 26,
+  "categories": [
+   "other",
+   "reviews",
+   "src",
+   "tests",
+   "workflows"
+  ],
+  "code_files": [
+   ".github/workflows/core-background-late-trusted-return-001.yml",
+   "src/aios_core/runtime/__init__.py",
+   "src/aios_core/runtime/background_attempt.py",
+   "src/aios_core/runtime/late_return.py",
+   "src/aios_core/runtime/turn_runtime.py",
+   "tests/c15_persistence/test_resident_surface.py",
+   "tests/integration/late_trusted_return_fixture.py",
+   "tests/integration/test_core_background_late_trusted_return_001.py",
+   "tests/integration/test_core_background_late_trusted_return_001_adversarial.py",
+   "tests/integration/test_core_background_late_trusted_return_001_not_submitted.py",
+   "tests/runtime/test_background_model_attempt.py",
+   "tests/runtime/test_turn_execution_recovery.py"
+  ]
+ },
+ {
+  "number": 302,
+  "title": "EVIDENCE_ONLY / DO_NOT_MERGE AS IMPLEMENTATION \u2014 C15-RCC-RES-B-RERUN-003 Window ",
+  "head": "846b55e63abe7f4d7c25adde013978cce6084556",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-30T03:41:14Z",
+  "files": 8,
+  "categories": [
+   "other"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 296,
+  "title": "C15 Resident A Corrective-003 \u2014 Phase A run evidence (cursors 1..13)",
+  "head": "317316299c332d82e0cbd0431b5c7d50f391bc17",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-29T14:07:26Z",
+  "files": 212,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 294,
+  "title": "REVIEW-ONLY / DO NOT MERGE \u2014 Independent Acceptance: PR #292 C15-RCC Corrective-",
+  "head": "30955cc7065d0d66cf4de43f833f1b1f9162b635",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-29T10:45:48Z",
+  "files": 101,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 292,
+  "title": "EVIDENCE-ONLY / DO NOT MERGE AS IMPLEMENTATION \u2014 C15-RCC Corrective-003 operator",
+  "head": "42a63ed4416585fc0a02045e0bd5190f32a01a2b",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-29T10:45:46Z",
+  "files": 546,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 290,
+  "title": "DO NOT MERGE: Independent acceptance of #288 \u2014 FAIL / 2 blockers",
+  "head": "39408137edf77976d0c4833fcde551891d5d081a",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-29T07:28:32Z",
+  "files": 110,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 288,
+  "title": "EVIDENCE-ONLY: Operator Prep Corrective-002 C4-C9 closure \u2014 DO NOT MERGE AS IMPL",
+  "head": "771b200c33dbd6055b1d209935f8e1552f13090f",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-29T07:28:30Z",
+  "files": 372,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 286,
+  "title": "Operator Prep Corrective-003: freeze IA-OP-001/002/003 evidence",
+  "head": "c32e544b747cb1f1d9b7418e2163a65ac55ee39c",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-28T20:41:37Z",
+  "files": 137,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 284,
+  "title": "[REVIEW-ONLY / DO NOT MERGE] IA: C15 Res A Corrective-003 operator-prep (#281 @1",
+  "head": "dce47c0d8f3ac7e34efb47e22c63c6f9acbea1a6",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-28T20:41:40Z",
+  "files": 81,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 283,
+  "title": "review: C15 Corrective-003 Operator Prep Independent Acceptance",
+  "head": "e3394da5d607e34c0286c16a11837ac7ea173a56",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-28T19:38:06Z",
+  "files": 13,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 281,
+  "title": "EVIDENCE-ONLY / DO NOT MERGE AS IMPLEMENTATION \u2014 C15 Res A Corrective-003 operat",
+  "head": "10901d467679b70437ae112747eab81f889fd5cb",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-28T19:38:04Z",
+  "files": 56,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 279,
+  "title": "EVIDENCE-ONLY / DO NOT MERGE AS IMPLEMENTATION \u2014 Corrective-002 blocked pre-reve",
+  "head": "8e5c1ec76ea973c849c33923ccc818fe1dad49e8",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-28T18:16:54Z",
+  "files": 2,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 277,
+  "title": "evidence(c15-rcc): Resident A-004 corrective run evidence \u2014 EVIDENCE-ONLY / DO N",
+  "head": "2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-28T18:05:55Z",
+  "files": 28,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 275,
+  "title": "[DO NOT MERGE][review-only] A-004 independent acceptance: FAIL / blocker=2",
+  "head": "ccd5f539714604f5ff5912b90024f28b82618511",
+  "base": "main",
+  "draft": true,
+  "updated": "2026-09-28T17:20:55Z",
+  "files": 14,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 273,
+  "title": "C15-RCC-RES-A-RERUN-004 \u2014 Fresh Resident A Phase A evidence (EVIDENCE-ONLY / DO ",
+  "head": "f251e9c0026a0f97fdee20397936cb5e3b18c61c",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-28T17:25:39Z",
+  "files": 189,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 271,
+  "title": "REVIEW-ONLY: CORE-RC-REFREEZE-003 independent acceptance evidence (ACCEPTANCE_PA",
+  "head": "6eaf91822c39398c610a80c6985d28b4cab48eed",
+  "base": "main",
+  "draft": true,
+  "updated": "2026-09-28T15:41:17Z",
+  "files": 18,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 265,
+  "title": "C15: prepare exit readiness path and blocked downstream gates",
+  "head": "7734e434777ce0b03b5b106b086ebfac7de4e699",
+  "base": "main",
+  "draft": true,
+  "updated": "2026-09-28T11:30:27Z",
+  "files": 17,
+  "categories": [
+   "governance",
+   "other"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 263,
+  "title": "C15: bind Resident identity/persona continuity across model providers",
+  "head": "3e32a190f644dc9901b428b62fcbde2e01fe6d50",
+  "base": "main",
+  "draft": true,
+  "updated": "2026-09-28T11:00:33Z",
+  "files": 9,
+  "categories": [
+   "docs",
+   "governance",
+   "other"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 261,
+  "title": "INDEPENDENT ACCEPTANCE FAIL: CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001 (IA-BLK",
+  "head": "b9d692ddca055b13fb29e646186e929a08bf8955",
+  "base": "arena/01a0e630-haneof-aios-core-v3-0",
+  "draft": true,
+  "updated": "2026-09-28T08:44:48Z",
+  "files": 43,
+  "categories": [
+   "reviews",
+   "tests"
+  ],
+  "code_files": [
+   "tests/independent_acceptance/ia_harness.py",
+   "tests/independent_acceptance/test_ia_authenticity.py",
+   "tests/independent_acceptance/test_ia_capability_breadth.py",
+   "tests/independent_acceptance/test_ia_operation_replay.py",
+   "tests/independent_acceptance/test_ia_r1_r4.py",
+   "tests/independent_acceptance/test_ia_sigkill.py"
+  ]
+ },
+ {
+  "number": 258,
+  "title": "CORE-BACKGROUND-TRUSTED-RETURN-RECOVERY-001: atomic trusted return handoff for l",
+  "head": "1ebf51c4cb905e2a2578a09b64007b50bca0d4ac",
+  "base": "main",
+  "draft": true,
+  "updated": "2026-09-28T09:45:21Z",
+  "files": 12,
+  "categories": [
+   "src",
+   "tests",
+   "workflows"
+  ],
+  "code_files": [
+   ".github/workflows/core-background-trusted-return-recovery-001.yml",
+   "src/aios_core/execution/service.py",
+   "src/aios_core/runtime/background_attempt.py",
+   "src/aios_core/runtime/turn_runtime.py",
+   "src/aios_core/storage/sqlite_store.py",
+   "tests/integration/test_core_background_response_recovery_001.py",
+   "tests/integration/test_core_background_trusted_return_adversarial_001.py",
+   "tests/integration/test_core_background_trusted_return_r5_001.py",
+   "tests/integration/test_core_background_trusted_return_r5_conflicts_001.py",
+   "tests/integration/test_core_background_trusted_return_recovery_001.py",
+   "tests/integration/test_core_gap_fix_002_background_attempts.py",
+   "tests/runtime/test_turn_execution_recovery.py"
+  ]
+ },
+ {
+  "number": 251,
+  "title": "[DRAFT] C15-RCC-RES-B-PERSISTENCE-CORRECTIVE-002",
+  "head": "7b2556e738d9c9386ec21c13fec39400c87d0916",
+  "base": "main",
+  "draft": true,
+  "updated": "2026-09-28T02:15:56Z",
+  "files": 71,
+  "categories": [
+   "pyproject",
+   "reviews",
+   "tests",
+   "tools",
+   "workflows"
+  ],
+  "code_files": [
+   ".github/workflows/c15-rcc-res-b-persistence-corrective-001-formal-gate.yml",
+   ".github/workflows/c15-rcc-res-b-persistence-corrective-002-formal-gate.yml",
+   ".github/workflows/core-rc-refreeze-002-formal-gate.yml",
+   ".github/workflows/p16-convergence-gate.yml",
+   "pyproject.toml",
+   "tests/c15_persistence/__pycache__/test_environment_reattach.cpython-311-pytest-8.4.2.pyc",
+   "tests/c15_persistence/__pycache__/test_journal.cpython-311.pyc",
+   "tests/c15_persistence/__pycache__/test_operator_wiring.cpython-311-pytest-8.4.2.pyc",
+   "tests/c15_persistence/__pycache__/test_resident_surface.cpython-311-pytest-8.4.2.pyc",
+   "tests/c15_persistence/killpoints/PROBE_MANIFEST.json",
+   "tests/c15_persistence/killpoints/PROBE_MANIFEST.sha256",
+   "tests/c15_persistence/killpoints/__init__.py",
+   "tests/c15_persistence/killpoints/__pycache__/__init__.cpython-311.pyc",
+   "tests/c15_persistence/killpoints/__pycache__/harness.cpython-311.pyc",
+   "tests/c15_persistence/killpoints/__pycache__/test_killpoints.cpython-311-pytest-8.4.2.pyc",
+   "tests/c15_persistence/killpoints/harness.py",
+   "tests/c15_persistence/killpoints/test_killpoints.py",
+   "tests/c15_persistence/probe_core_boundary.py",
+   "tests/c15_persistence/test_corrective_002_remote_durability.py",
+   "tests/c15_persistence/test_environment_reattach.py",
+   "tests/c15_persistence/test_journal.py",
+   "tests/c15_persistence/test_operator_wiring.py",
+   "tests/c15_persistence/test_resident_surface.py",
+   "tools/c15_persistence/__init__.py",
+   "tools/c15_persistence/__pycache__/__init__.cpython-311.pyc",
+   "tools/c15_persistence/__pycache__/backend.cpython-311.pyc",
+   "tools/c15_persistence/__pycache__/freeze_evidence_manifest.cpython-311.pyc",
+   "tools/c15_persistence/__pycache__/journal.cpython-311.pyc",
+   "tools/c15_persistence/__pycache__/operator_session.cpython-311.pyc",
+   "tools/c15_persistence/__pycache__/probe_cli.cpython-311.pyc",
+   "tools/c15_persistence/__pycache__/provider.cpython-311.pyc",
+   "tools/c15_persistence/__pycache__/relay.cpython-311.pyc",
+   "tools/c15_persistence/__pycache__/runstate.cpython-311.pyc",
+   "tools/c15_persistence/__pycache__/synthetic_release.cpython-311.pyc",
+   "tools/c15_persistence/backend.py",
+   "tools/c15_persistence/freeze_evidence_manifest.py",
+   "tools/c15_persistence/freeze_probe_manifest.py",
+   "tools/c15_persistence/journal.py",
+   "tools/c15_persistence/operator_session.py",
+   "tools/c15_persistence/platform_reattach.py",
+   "tools/c15_persistence/probe_cli.py",
+   "tools/c15_persistence/provider.py",
+   "tools/c15_persistence/relay.py",
+   "tools/c15_persistence/remote_backend.py",
+   "tools/c15_persistence/resident_surface_check.py",
+   "tools/c15_persistence/runstate.py",
+   "tools/c15_persistence/synthetic_release.py"
+  ]
+ },
+ {
+  "number": 249,
+  "title": "[REVIEW_ONLY / EVIDENCE_ONLY / DO NOT MERGE] C15 persistence corrective INDEPEND",
+  "head": "08468beb5523b0696fc2472b5b535b476c403a5d",
+  "base": "main",
+  "draft": true,
+  "updated": "2026-09-27T18:19:27Z",
+  "files": 12,
+  "categories": [
+   "reviews",
+   "workflows"
+  ],
+  "code_files": [
+   ".github/workflows/c15-rcc-res-b-persistence-corrective-001-ia-formal-acceptance.yml"
+  ]
+ },
+ {
+  "number": 235,
+  "title": "C15-RCC-RES-A-RERUN-003 \u2014 Fresh Resident A evidence-only run record",
+  "head": "5b6367406c13ea9450b7b2598a5813a64129cbd7",
+  "base": "main",
+  "draft": true,
+  "updated": "2026-09-27T12:59:15Z",
+  "files": 122,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 233,
+  "title": "REVIEW-ONLY: CORE-RC-REFREEZE-002 independent acceptance evidence (ACCEPTANCE_PA",
+  "head": "404925853f23f962265f048b094b58cf3ca5f97e",
+  "base": "main",
+  "draft": true,
+  "updated": "2026-09-27T11:38:39Z",
+  "files": 9,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 230,
+  "title": "review: CORE-BACKGROUND-RESPONSE-RECOVERY-001-CORRECTIVE-002 IA evidence publica",
+  "head": "2c846baa53c113aef7c9be88da27099c6926b2fb",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-27T10:21:21Z",
+  "files": 39,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 216,
+  "title": "[FROZEN_WIP / BLOCKED_BY_CORE_RESPONSE_APPLICATION_RECOVERY] C15 persistence cor",
+  "head": "63ca592359c7e3fd71d6cc4ba349949e4f0b80e3",
+  "base": "main",
+  "draft": true,
+  "updated": "2026-09-27T16:59:19Z",
+  "files": 159,
+  "categories": [
+   "governance",
+   "other",
+   "pyproject",
+   "release",
+   "reviews",
+   "src",
+   "tests",
+   "tools",
+   "workflows"
+  ],
+  "code_files": [
+   ".github/workflows/c15-rcc-res-b-persistence-corrective-001-formal-gate.yml",
+   ".github/workflows/core-rc-refreeze-002-formal-gate.yml",
+   "pyproject.toml",
+   "src/aios_core/runtime/__init__.py",
+   "src/aios_core/runtime/background_attempt.py",
+   "src/aios_core/runtime/cognitive_runtime.py",
+   "src/aios_core/runtime/metering.py",
+   "src/aios_core/runtime/turn_execution.py",
+   "src/aios_core/runtime/turn_runtime.py",
+   "tests/c15_persistence/__pycache__/test_environment_reattach.cpython-311-pytest-8.4.2.pyc",
+   "tests/c15_persistence/__pycache__/test_journal.cpython-311.pyc",
+   "tests/c15_persistence/__pycache__/test_operator_wiring.cpython-311-pytest-8.4.2.pyc",
+   "tests/c15_persistence/__pycache__/test_resident_surface.cpython-311-pytest-8.4.2.pyc",
+   "tests/c15_persistence/killpoints/PROBE_MANIFEST.json",
+   "tests/c15_persistence/killpoints/PROBE_MANIFEST.sha256",
+   "tests/c15_persistence/killpoints/__init__.py",
+   "tests/c15_persistence/killpoints/__pycache__/__init__.cpython-311.pyc",
+   "tests/c15_persistence/killpoints/__pycache__/harness.cpython-311.pyc",
+   "tests/c15_persistence/killpoints/__pycache__/test_killpoints.cpython-311-pytest-8.4.2.pyc",
+   "tests/c15_persistence/killpoints/harness.py",
+   "tests/c15_persistence/killpoints/test_killpoints.py",
+   "tests/c15_persistence/probe_core_boundary.py",
+   "tests/c15_persistence/test_environment_reattach.py",
+   "tests/c15_persistence/test_journal.py",
+   "tests/c15_persistence/test_operator_wiring.py",
+   "tests/c15_persistence/test_resident_surface.py",
+   "tests/integration/test_core_background_response_recovery_001.py",
+   "tests/integration/test_core_background_response_recovery_001_corrective_001.py",
+   "tests/integration/test_core_background_response_recovery_001_corrective_002_authenticity.py",
+   "tests/integration/test_core_background_response_recovery_001_corrective_002_recovery.py",
+   "tests/integration/test_core_gap_fix_002_background_attempts.py",
+   "tests/runtime/test_background_model_attempt.py",
+   "tests/runtime/test_cognitive_runtime_trusted_return.py",
+   "tools/c15_persistence/__init__.py",
+   "tools/c15_persistence/__pycache__/__init__.cpython-311.pyc",
+   "tools/c15_persistence/__pycache__/backend.cpython-311.pyc",
+   "tools/c15_persistence/__pycache__/freeze_evidence_manifest.cpython-311.pyc",
+   "tools/c15_persistence/__pycache__/journal.cpython-311.pyc",
+   "tools/c15_persistence/__pycache__/operator_session.cpython-311.pyc",
+   "tools/c15_persistence/__pycache__/probe_cli.cpython-311.pyc",
+   "tools/c15_persistence/__pycache__/provider.cpython-311.pyc",
+   "tools/c15_persistence/__pycache__/relay.cpython-311.pyc",
+   "tools/c15_persistence/__pycache__/runstate.cpython-311.pyc",
+   "tools/c15_persistence/__pycache__/synthetic_release.cpython-311.pyc",
+   "tools/c15_persistence/backend.py",
+   "tools/c15_persistence/freeze_evidence_manifest.py",
+   "tools/c15_persistence/freeze_probe_manifest.py",
+   "tools/c15_persistence/journal.py",
+   "tools/c15_persistence/operator_session.py",
+   "tools/c15_persistence/platform_reattach.py",
+   "tools/c15_persistence/probe_cli.py",
+   "tools/c15_persistence/provider.py",
+   "tools/c15_persistence/relay.py",
+   "tools/c15_persistence/remote_backend.py",
+   "tools/c15_persistence/resident_surface_check.py",
+   "tools/c15_persistence/runstate.py",
+   "tools/c15_persistence/synthetic_release.py"
+  ]
+ },
+ {
+  "number": 205,
+  "title": "C15-RCC-RES-A-RERUN-002 Phase A freeze evidence",
+  "head": "d17ae972ad1d312735c355f775ac024bc4cebdf7",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-24T17:15:24Z",
+  "files": 191,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 144,
+  "title": "CORE-CI-FIX-001: make Core-diff guards merge-base safe",
+  "head": "da35e477fbf9ac88e369830fd4d8dcc3ccd63619",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-24T05:44:40Z",
+  "files": 3,
+  "categories": [
+   "workflows"
+  ],
+  "code_files": [
+   ".github/workflows/c14-resident-fixture-v2.yml",
+   ".github/workflows/c14-semantic-repair-fixture.yml",
+   ".github/workflows/c15-rcc-fixture.yml"
+  ]
+ },
+ {
+  "number": 130,
+  "title": "CORE-OPERATOR-001: current-main operator recovery [REVIEW_READY]",
+  "head": "16eb1d40c1013433166b4dd81669abbcc36b95a9",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-24T05:19:07Z",
+  "files": 26,
+  "categories": [
+   "tests",
+   "tools",
+   "workflows"
+  ],
+  "code_files": [
+   ".github/workflows/c15-operator-preflight.yml",
+   "tests/preflight/conftest.py",
+   "tests/preflight/test_c15_operator_preflight.py",
+   "tests/preflight/test_driver.py",
+   "tests/preflight/test_resident_broker.py",
+   "tests/preflight/test_round3_fixes.py",
+   "tests/preflight/test_round4_fixes.py",
+   "tests/preflight/test_round5_fixes.py",
+   "tools/c15_preflight/README.md",
+   "tools/c15_preflight/__init__.py",
+   "tools/c15_preflight/arena_resident_file_bridge.py",
+   "tools/c15_preflight/arena_resident_file_exchange.py",
+   "tools/c15_preflight/arena_resident_operator.py",
+   "tools/c15_preflight/audit.py",
+   "tools/c15_preflight/clock.py",
+   "tools/c15_preflight/driver.py",
+   "tools/c15_preflight/freeze.py",
+   "tools/c15_preflight/isolation_probe.py",
+   "tools/c15_preflight/operator_manifest.json",
+   "tools/c15_preflight/publication.py",
+   "tools/c15_preflight/resident_broker.py",
+   "tools/c15_preflight/resident_packet/PROTOCOL.md",
+   "tools/c15_preflight/resident_packet/manifest.json",
+   "tools/c15_preflight/restart.py",
+   "tools/c15_preflight/test_arena_file_bridge_real_runtime.py",
+   "tools/c15_preflight/transport.py"
+  ]
+ },
+ {
+  "number": 126,
+  "title": "fix(core): repair ten constitutional audit defects",
+  "head": "8e31deca02a5062d7bb9ffe6dd840abbaaf6970e",
+  "base": "arena/01a0cf25-haneof-aios-core-v3-0",
+  "draft": true,
+  "updated": "2026-09-23T22:32:43Z",
+  "files": 21,
+  "categories": [
+   "reviews",
+   "src",
+   "tests",
+   "tools",
+   "workflows"
+  ],
+  "code_files": [
+   ".github/workflows/pr126-strict-synthetic-integration.yml",
+   "src/aios_core/dependency/graph.py",
+   "src/aios_core/events/service.py",
+   "src/aios_core/policy/service.py",
+   "src/aios_core/query/search.py",
+   "src/aios_core/revision/propagation.py",
+   "src/aios_core/revision/service.py",
+   "src/aios_core/runtime/__init__.py",
+   "src/aios_core/runtime/turn_execution.py",
+   "src/aios_core/runtime/turn_runtime.py",
+   "src/aios_core/storage/sqlite_store.py",
+   "src/aios_core/summaries/dimension_summary.py",
+   "src/aios_core/summaries/scheduler.py",
+   "tests/integration/test_v3_audit_bugfixes.py",
+   "tests/preflight/test_round5_fixes.py",
+   "tests/unit/test_pr126_synthetic_gate.py",
+   "tools/ci/pr126_synthetic_gate.py"
+  ]
+ },
+ {
+  "number": 125,
+  "title": "C15 preflight: synthetic driver, restart, joint freeze + round3 six fixes [BLOCK",
+  "head": "b14b5d84b6a4c843dc7dc38cde51f08a92fac86b",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-24T03:37:08Z",
+  "files": 64,
+  "categories": [
+   "reviews",
+   "tests",
+   "tools",
+   "workflows"
+  ],
+  "code_files": [
+   ".github/workflows/c15-operator-preflight.yml",
+   ".github/workflows/p16-convergence-gate.yml",
+   ".github/workflows/real-a-import-312.yml",
+   "tests/preflight/conftest.py",
+   "tests/preflight/test_c15_operator_preflight.py",
+   "tests/preflight/test_driver.py",
+   "tests/preflight/test_resident_broker.py",
+   "tests/preflight/test_round3_fixes.py",
+   "tests/preflight/test_round4_fixes.py",
+   "tests/preflight/test_round5_fixes.py",
+   "tools/c15_preflight/README.md",
+   "tools/c15_preflight/__init__.py",
+   "tools/c15_preflight/arena_resident_file_bridge.py",
+   "tools/c15_preflight/arena_resident_file_exchange.py",
+   "tools/c15_preflight/arena_resident_operator.py",
+   "tools/c15_preflight/audit.py",
+   "tools/c15_preflight/clock.py",
+   "tools/c15_preflight/driver.py",
+   "tools/c15_preflight/freeze.py",
+   "tools/c15_preflight/isolation_probe.py",
+   "tools/c15_preflight/operator_manifest.json",
+   "tools/c15_preflight/publication.py",
+   "tools/c15_preflight/resident_broker.py",
+   "tools/c15_preflight/resident_packet/PROTOCOL.md",
+   "tools/c15_preflight/resident_packet/manifest.json",
+   "tools/c15_preflight/restart.py",
+   "tools/c15_preflight/test_arena_file_bridge_real_runtime.py",
+   "tools/c15_preflight/transport.py"
+  ]
+ },
+ {
+  "number": 121,
+  "title": "[PM HOLD \u2014 DO NOT MERGE] C15 Resident B Phase B evidence",
+  "head": "b6e5ac939bef83615292bcf9b9099d76737d82b0",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-23T16:00:40Z",
+  "files": 10,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 119,
+  "title": "governance(C15): add anchor reconciliation ruling",
+  "head": "b58b8734d3155432974884143ed62ca0476a6487",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-23T08:07:59Z",
+  "files": 1,
+  "categories": [
+   "governance"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 118,
+  "title": "governance(C15): establish single anchor release plan",
+  "head": "352b487525f977cae5dc547e34d28d31d1185abd",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-23T07:03:34Z",
+  "files": 1,
+  "categories": [
+   "governance"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 117,
+  "title": "[EVIDENCE-ONLY] C15-RCC-RES-A-RERUN-001-CANONICAL phase A canonical rerun packag",
+  "head": "3e51f728d7959048b75fea01d405bc837b0e8185",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-23T09:47:33Z",
+  "files": 122,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 113,
+  "title": "feat(policy): unify cognition evidence closure across turns, review, and derivat",
+  "head": "72d902c7df887ec069697350e9626cb4ff5acc76",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-23T02:31:01Z",
+  "files": 20,
+  "categories": [
+   "governance",
+   "other",
+   "reviews",
+   "src",
+   "tests",
+   "workflows"
+  ],
+  "code_files": [
+   ".github/workflows/c15-cognition-evidence-policy.yml",
+   "src/aios_core/ai_world/cognition.py",
+   "src/aios_core/policy/__init__.py",
+   "src/aios_core/policy/evidence.py",
+   "src/aios_core/revision/service.py",
+   "src/aios_core/runtime/turn_runtime.py",
+   "src/aios_core/summaries/cognitive_derivation.py",
+   "src/aios_core/writeback/cognition.py",
+   "tests/habitation/test_current_core_target.py",
+   "tests/integration/test_v3_ai_world.py",
+   "tests/integration/test_v3_c15_cognition_evidence_policy.py",
+   "tests/integration/test_v3_c15_cognition_fields.py",
+   "tests/integration/test_v3_cognition_revision.py"
+  ]
+ },
+ {
+  "number": 112,
+  "title": "docs(C15): add cognition scale benchmark report",
+  "head": "c3be50994e3767e66c4fafeb38dc0308a0347f88",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-22T17:29:30Z",
+  "files": 1,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 111,
+  "title": "feat(cognition): expose valid_time, unknown_items, and counter_evidence (C15-RCC",
+  "head": "cf2dd1548d19e016df79d70e51b58609b43b0d6a",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-22T19:00:28Z",
+  "files": 6,
+  "categories": [
+   "src",
+   "tests"
+  ],
+  "code_files": [
+   "src/aios_core/ai_world/cognition.py",
+   "src/aios_core/revision/service.py",
+   "src/aios_core/runtime/turn_runtime.py",
+   "src/aios_core/writeback/cognition.py",
+   "tests/integration/test_v3_c15_cognition_fields.py",
+   "tests/integration/test_v3_c15_rcc_fields_fix_f02_f03.py"
+  ]
+ },
+ {
+  "number": 110,
+  "title": "feat(policy): unify cognition evidence closure across turns, review, and derivat",
+  "head": "34c6810a107e7d6e25ca73e80cab2c5a1a622e4a",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-22T15:04:15Z",
+  "files": 9,
+  "categories": [
+   "src",
+   "tests"
+  ],
+  "code_files": [
+   "src/aios_core/ai_world/cognition.py",
+   "src/aios_core/policy/__init__.py",
+   "src/aios_core/policy/evidence.py",
+   "src/aios_core/revision/service.py",
+   "src/aios_core/runtime/turn_runtime.py",
+   "src/aios_core/summaries/cognitive_derivation.py",
+   "src/aios_core/writeback/cognition.py",
+   "tests/habitation/test_current_core_target.py",
+   "tests/integration/test_v3_c15_cognition_evidence_policy.py"
+  ]
+ },
+ {
+  "number": 109,
+  "title": "evidence(c15): post-fix fresh Resident A Phase A rerun",
+  "head": "dfca8d36526e993eaf3aa6b36daa3d837d4897f8",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-22T19:29:02Z",
+  "files": 80,
+  "categories": [
+   "governance",
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 107,
+  "title": "C15-RCC-RES-A-RERUN-001: BLOCKED startup evidence (no Resident run)",
+  "head": "579431280dd0d18b32363fa891d64e218e95992a",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-22T12:39:45Z",
+  "files": 3,
+  "categories": [
+   "governance",
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 101,
+  "title": "evidence(c15): Resident A Phase A freeze through cursor 13",
+  "head": "bfbfa059e2ac616326eecdfe3ffa7a927bdc7ce2",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-22T09:39:13Z",
+  "files": 227,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 92,
+  "title": "C14-SEM-REPAIR-RES-001 canonical Resident evidence [PINNED \u2014 DO NOT MERGE \u2014 eval",
+  "head": "9e870514b57bf07c00018d7dcf7435f2702f8730",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-22T05:39:29Z",
+  "files": 276,
+  "categories": [
+   "governance",
+   "other",
+   "reviews",
+   "workflows"
+  ],
+  "code_files": [
+   ".github/workflows/c14-resident-repair-fresh-r5.yml"
+  ]
+ },
+ {
+  "number": 79,
+  "title": "C14-RES-B-001 Resident-B evidence: fresh-window Phase-B run (cursors 25-36) \u2014 PH",
+  "head": "546449a453e6e6dff3a2eeb2b52e7cf6786927be",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-21T19:04:36Z",
+  "files": 280,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 75,
+  "title": "C14-RES-A-001 Resident A (single window) \u2014 Phase A evidence, cursors 1..24",
+  "head": "cb9b56b7039272d932158f33bfe979eff6749c9b",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-21T15:57:41Z",
+  "files": 378,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 74,
+  "title": "C14-RES-A-001 Resident A evidence",
+  "head": "7f39747974d93efd7880f3efc20ac0f95ff0bac3",
+  "base": "main",
+  "draft": true,
+  "updated": "2026-09-21T13:15:26Z",
+  "files": 3,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ },
+ {
+  "number": 37,
+  "title": "review(p16): central triage of Resident habitation submissions",
+  "head": "058bada3893ce262107796fbb208762047764a5f",
+  "base": "main",
+  "draft": false,
+  "updated": "2026-09-20T19:01:27Z",
+  "files": 1,
+  "categories": [
+   "reviews"
+  ],
+  "code_files": []
+ }
+]

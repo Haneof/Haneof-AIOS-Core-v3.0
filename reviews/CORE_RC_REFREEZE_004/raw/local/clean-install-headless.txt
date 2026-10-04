@@ -1,0 +1,11 @@
+--- initial clean start: exit=0 ---
+{"index_lag": 0, "index_path": "/tmp/aios-rc-refreeze-003-headless-v7sxukxf/disposable-index.sqlite", "index_watermark": 0, "status": "ready", "subject_id": "user_1", "world_path": "/tmp/aios-rc-refreeze-003-headless-v7sxukxf/disposable-world.sqlite", "world_revision": 0, "writer_lease_held": true}
+--- deterministic mechanical turn: exit=0 ---
+{"assistant_observation_id": "obs_conv_ai_d094ee7b3d2a5f1f813bf60a", "idempotent_replay": false, "model_rounds": 1, "response": "HEADLESS_MECHANICAL_OK", "silenced": false, "status": "turn_completed", "summary_commits": 0, "summary_error": null, "termination_reason": "responded", "user_observation_id": "obs_conv_user_3b9db9014116ea6fa5c6e7c0", "world_revision": 2}
+--- fresh-process stop/restart: exit=0 ---
+{"index_lag": 0, "index_path": "/tmp/aios-rc-refreeze-003-headless-v7sxukxf/disposable-index.sqlite", "index_watermark": 2, "status": "ready", "subject_id": "user_1", "world_path": "/tmp/aios-rc-refreeze-003-headless-v7sxukxf/disposable-world.sqlite", "world_revision": 2, "writer_lease_held": true}
+--- provider-free safe recovery-status: exit=0 ---
+{"index_lag": 0, "index_path": "/tmp/aios-rc-refreeze-003-headless-v7sxukxf/disposable-index.sqlite", "index_status": "ready", "index_watermark": 2, "recovery_disposition": "AUTO_RECOVERABLE", "schema_version": 1, "status": "recovery_status", "supported_schema_version": 1, "world_path": "/tmp/aios-rc-refreeze-003-headless-v7sxukxf/disposable-world.sqlite", "world_quick_check": ["ok"], "world_revision": 2}
+--- clean close and final reopen: exit=0 ---
+{"index_lag": 0, "index_path": "/tmp/aios-rc-refreeze-003-headless-v7sxukxf/disposable-index.sqlite", "index_watermark": 2, "status": "ready", "subject_id": "user_1", "world_path": "/tmp/aios-rc-refreeze-003-headless-v7sxukxf/disposable-world.sqlite", "world_revision": 2, "writer_lease_held": true}
+RESULT={"adapter": "aios_core.headless.testing:deterministic_model_handler", "clean_close_reopen": true, "final_index_watermark": 2, "final_world_revision": 2, "index_path": "disposable-index.sqlite", "initial_world_revision": 0, "real_provider_used": false, "resident_fixture_used": false, "restart_continuity": true, "safe_recovery_status": "recovery_status", "separate_cli_processes": 5, "status": "HEADLESS_CLEAN_INSTALL_PASS", "world_path": "disposable-world.sqlite"}

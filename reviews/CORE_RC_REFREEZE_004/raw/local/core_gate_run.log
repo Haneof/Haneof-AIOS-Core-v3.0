@@ -1,0 +1,79 @@
+=== CORE GATE START 2026-10-04T14:57:52Z ===
+........................................................................ [  7%]
+........................................................................ [ 15%]
+........................................................................ [ 23%]
+........................................................................ [ 31%]
+........................................................................ [ 38%]
+........................................................................ [ 46%]
+........................................................................ [ 54%]
+........................................................................ [ 62%]
+........................................................................ [ 69%]
+........................................................................ [ 77%]
+........................................................................ [ 85%]
+........................................................................ [ 93%]
+................................................................         [100%]
+--- generated xml file: /home/user/.local/evidence-rc004/core-gate-junit.xml ---
+928 passed in 181.31s (0:03:01)
+=== CORE GATE EXIT 0 2026-10-04T15:00:53Z ===
+=== FULL REPO START 2026-10-04T15:00:53Z ===
+........................................................................ [ 31%]
+........................................................................ [ 37%]
+........................................................................ [ 44%]
+........................................................................ [ 50%]
+........................................................................ [ 56%]
+........................................................................ [ 63%]
+........................................................................ [ 69%]
+........................................................................ [ 75%]
+........................................................................ [ 82%]
+........................................................................ [ 88%]
+........................................................................ [ 94%]
+.........................................................                [100%]
+--- generated xml file: /home/user/.local/evidence-rc004/full-repo-junit.xml ---
+=========================== short test summary info ============================
+FAILED tests/c15_persistence/killpoints/test_killpoints.py::test_kill_point_converges[K1]
+FAILED tests/c15_persistence/killpoints/test_killpoints.py::test_kill_point_converges[K2]
+FAILED tests/c15_persistence/killpoints/test_killpoints.py::test_kill_point_converges[K3]
+FAILED tests/c15_persistence/killpoints/test_killpoints.py::test_kill_point_converges[K4]
+FAILED tests/c15_persistence/killpoints/test_killpoints.py::test_kill_point_converges[K5]
+FAILED tests/c15_persistence/test_corrective_002_remote_durability.py::test_k1_k5_survive_total_local_cache_loss_from_remote_only[K1_AFTER_REVEAL]
+FAILED tests/c15_persistence/test_corrective_002_remote_durability.py::test_k1_k5_survive_total_local_cache_loss_from_remote_only[K2_AFTER_INGEST]
+FAILED tests/c15_persistence/test_corrective_002_remote_durability.py::test_k1_k5_survive_total_local_cache_loss_from_remote_only[K3_AFTER_REQUEST_DISPATCH]
+FAILED tests/c15_persistence/test_corrective_002_remote_durability.py::test_k1_k5_survive_total_local_cache_loss_from_remote_only[K3_TRUSTED_RETURN_DURABLE]
+FAILED tests/c15_persistence/test_corrective_002_remote_durability.py::test_k1_k5_survive_total_local_cache_loss_from_remote_only[K4_AFTER_REPLY_AUTHENTICATED]
+FAILED tests/c15_persistence/test_corrective_002_remote_durability.py::test_k1_k5_survive_total_local_cache_loss_from_remote_only[K5_AFTER_APPLIED_BEFORE_ACK]
+FAILED tests/c15_persistence/test_corrective_002_remote_durability.py::test_reopen_rejects_deleted_middle_sealed_generation
+FAILED tests/c15_persistence/test_corrective_002_remote_durability.py::test_reopen_rejects_modified_sealed_generation_artifact
+FAILED tests/c15_persistence/test_corrective_002_remote_durability.py::test_reopen_rejects_incomplete_unsealed_generation
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_001_c_k4_failure_restart_recovers_from_authoritative_state_once
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_001_d_ack_barrier_failure_never_acks_the_cursor
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_a_k3_trusted_return_first_round_remote_only_converges
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_b_k3_trusted_return_later_round_remote_only_converges
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_d_k5_push_success_then_total_local_loss_acks_once
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_e_k5_prepush_crash_recovers_from_prior_authoritative_barrier
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_f_changed_trusted_return_bytes_under_same_identity_fail_closed
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_002_g_changed_relay_journal_reply_bytes_fail_closed
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_004_a_valid_remote_authoritative_binding_is_durable
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_004_b_binding_damage_fails_closed_never_local_only[missing]
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_004_b_binding_damage_fails_closed_never_local_only[truncated]
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_004_b_binding_damage_fails_closed_never_local_only[malformed-json]
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_004_b_binding_damage_fails_closed_never_local_only[extra-field]
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_004_b_binding_damage_fails_closed_never_local_only[missing-field]
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_004_b_binding_damage_fails_closed_never_local_only[unreadable]
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_004_b_binding_damage_fails_closed_never_local_only[wrong-run]
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_004_b_binding_damage_fails_closed_never_local_only[wrong-session]
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_004_b_binding_damage_fails_closed_never_local_only[non-canonical-ref]
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_004_k_unavailable_remote_state_fails_closed
+FAILED tests/c15_persistence/test_corrective_003_binding_blockers.py::test_c002_004_l_local_only_run_cannot_be_silently_promoted
+FAILED tests/c15_persistence/test_corrective_003_regressions.py::test_generation_admission_rejects_seal_content_tamper
+FAILED tests/c15_persistence/test_corrective_003_regressions.py::test_generation_admission_rejects_unexpected_artifact
+FAILED tests/c15_persistence/test_corrective_003_regressions.py::test_generation_history_cannot_be_shortened_by_lowering_current_ledger
+FAILED tests/c15_persistence/test_corrective_003_regressions.py::test_remote_authority_rejects_coordinated_short_history_even_if_local_head_is_rehashed
+FAILED tests/c15_persistence/test_environment_reattach.py::test_environment_detach_and_reattach
+FAILED tests/c15_persistence/test_environment_reattach.py::test_remote_backend_roundtrip_with_wiped_local_cache
+FAILED tests/c15_persistence/test_environment_reattach.py::test_remote_backend_rejects_corrupted_manifest
+FAILED tests/c15_persistence/test_operator_wiring.py::test_interrupted_transaction_rolls_back
+FAILED tests/c15_persistence/test_operator_wiring.py::test_real_operator_integration_path_reaches_ack
+FAILED tests/c15_persistence/test_operator_wiring.py::test_core_receipt_revalidation_rejects_an_operator_invented_receipt
+FAILED tests/c15_persistence/test_resident_surface.py::test_resident_visible_surface_is_unchanged_by_the_durability_layer
+45 failed, 1092 passed in 262.10s (0:04:22)
+=== FULL REPO DONE 2026-10-04T15:05:16Z ===

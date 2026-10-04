@@ -1,0 +1,42 @@
+CORE-RC-REFREEZE-004 environment manifest (local candidate-evidence runs)
+========================================================================
+
+Status: local candidate evidence. Independent acceptance has NOT been performed.
+Repository: Haneof/Haneof-AIOS-Core-v3.0
+Frozen software SHA: 1cee3c5ad12f4b9098232bae11b51df786c5eb2f
+Frozen repository tree: 70b2711258567863ea0d93025a6a07e39631726a
+Frozen src/aios_core tree: 16f1487e291b009c55bee402abfd79fdacbae960
+Frozen tests tree: 9db1bfa08143bc99fe03836e2752ee6e05694eb6
+Frozen .github/workflows tree: 72cde9d2dc2b35d071bfa36c954dac2faff4a803
+Frozen pyproject.toml blob: b38833c7537fa60d5c2f02ed4bb19158d8995a11
+
+Executed from a detached worktree at the frozen commit: /home/user/.local/frozen-rc004
+aios_core.__file__: /home/user/.local/frozen-rc004/src/aios_core/__init__.py
+Python executable: /home/user/.local/py312/bin/python3.12
+Python: CPython 3.12.14 (tags/v3.12.14:2abcf90, Oct  4 2026, 14:56:48) [GCC 12.2.0]
+Implementation: CPython
+Pydantic: 2.13.5
+pytest: 8.4.2
+SQLite runtime version: 3.45.1
+OS release: Debian GNU/Linux 12 (bookworm)
+Kernel: Linux e2b.local 6.1.158+ #1 SMP PREEMPT_DYNAMIC Mon May 11 18:48:24 UTC 2026 x86_64 GNU/Linux
+Architecture: x86_64
+OpenSSL: NOT LINKED in the locally built interpreter (`_ssl` absent; no OpenSSL development headers in the sandbox).
+  - `grep -rn 'import ssl' src/` at the frozen commit -> 0 matches; Core does not use ssl.
+  - The formal CI gate records the GitHub runner's real OpenSSL/OS/kernel identity for the same frozen software; see the gate's ci-output/environment_manifest.txt.
+
+Dependency freeze (gate venv):
+  Pygments==2.21.0 annotated-types==0.8.0 iniconfig==2.3.0 packaging==26.3 pluggy==1.6.0
+  pydantic==2.13.5 pydantic_core==2.46.5 pytest==8.4.2 typing-inspection==0.4.4 typing_extensions==4.16.0
+
+Binding results on this environment (raw outputs under raw/local/):
+  Core gate (tests/unit tests/integration tests/runtime tests/habitation): 928 passed, 0 failed, 0 errors, 0 skipped
+  Trusted-return focused group: 388 passed
+  Core-systems focused group: 341 passed
+  Historical FIX / writer-restart / scale spot checks: 52 passed (plus 24 FIX-specific passed)
+  Real SIGKILL / process-loss selection: 9 passed
+  Reviewer probes: Suite A 4/0, Suite B 7/0, Window 17 14/0
+  Full repository: 1137 tests, 45 failed, 0 errors, 0 skipped (all 45 confined to tests/c15_persistence/**)
+  clean_install_headless_smoke.py: HEADLESS_CLEAN_INSTALL_PASS
+  backup_restore_rebuild_smoke.py: BACKUP_RESTORE_REBUILD_PASS
+  writer_restart_smoke.py: WRITER_RESTART_PASS
