@@ -1,5 +1,16 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-10-04 — Corrective-003 PM INTEGRATED
+
+- PR #318 exact accepted candidate `7ecb2250a488766915e1042a76472b3cd26d9107` merged.
+- Live integration merge = `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`.
+- Window 23 Fresh IA = `ACCEPTANCE_PASS / blocker=0 / COMPLETE`.
+- Exact durable reviewer evidence = `22aa00cb3793c252512142a1eae33ca8aae9d841`; REVIEW_ONLY PR #321 remains OPEN / DO NOT MERGE.
+- `BLK-W20-001 = CLOSED_BY_ACCEPTED_CORRECTIVE_003`.
+- No RC refreeze / Resident / C15 downstream repair was entered.
+- No formal `RC-REFREEZE-004` entry task currently exists in repository search. `NEXT_TASK = NOT_YET_FORMALLY_RELEASED`.
+
+
 ## 2026-10-04 — WINDOW 23 PASS durable / PM Integration READY
 
 - Fresh IA = `ACCEPTANCE_PASS / blocker=0`.
