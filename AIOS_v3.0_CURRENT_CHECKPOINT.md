@@ -1,5 +1,14 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-10-04 — WINDOW 22-RERUN-001 REVIEW_READY / WINDOW 23 Fresh IA READY
+
+- PR #318 exact candidate = `7ecb2250a488766915e1042a76472b3cd26d9107` (parent `30022b06e2795d20790dd4532bf6987146c1b432`, tree `1438a9ea6b8582453f963db5acb7f136e5ac5385`), OPEN / UNMERGED / DO NOT MERGE.
+- Exact-head formal run `37166276909` = 12/12 green, formal CPython 3.12.14; full Core 928/0; W20 failed-candidate RED 4/4; candidate Suite A 4/0, Suite B 7/0, W17 14/0; C3 matrix green/non-vacuous; SIGKILL and scope guard green.
+- Older automatic workflow reds are solely the already-adjudicated C15 persistence/operator downstream compatibility debt (45 failed / 1092 passed broad run); not a Corrective-003 Core blocker.
+- `SHA256SUMS` actual checksum entries = 32; commit-message "31" = non-blocking metadata typo.
+- Unique next = WINDOW 23 Fresh Independent Acceptance. No merge/integration/refreeze/Resident until a Fresh IA PASS.
+
+
 ## 2026-10-03 — WINDOW 22-RERUN-001 READY
 
 - Prior Window 22 Corrective-003 output was local-only; reported head `39917591…` is absent from GitHub and no durable Corrective-003 engineering branch exists.
