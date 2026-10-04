@@ -1,5 +1,14 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-10-04 — WINDOW 23 evidence publication hold
+
+- Technical Fresh IA verdict reported: `ACCEPTANCE_PASS / blocker=0`.
+- Reviewer evidence is not durable: reported branch `arena/review-window23-fresh-ia-01a101e0` absent remotely; reported commit `22aa00cb3793c252512142a1eae33ca8aae9d841` absent from GitHub.
+- State = `ACCEPTANCE_PASS_REPORTED / EVIDENCE_PUBLICATION_BLOCKED / DO_NOT_MERGE`.
+- Continue Window 23 for exact review-evidence publication only; do not redo IA and do not enter PM Integration.
+- If no write capability, export exact review git bundle and stop for publication-only recovery.
+
+
 ## 2026-10-04 — WINDOW 22-RERUN-001 REVIEW_READY / WINDOW 23 Fresh IA READY
 
 - PR #318 exact candidate = `7ecb2250a488766915e1042a76472b3cd26d9107` (parent `30022b06e2795d20790dd4532bf6987146c1b432`, tree `1438a9ea6b8582453f963db5acb7f136e5ac5385`), OPEN / UNMERGED / DO NOT MERGE.

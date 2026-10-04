@@ -1,5 +1,15 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 2026-10-04 — WINDOW 23 technical PASS reported / review evidence publication BLOCKED
+
+- Window 23 reports `ACCEPTANCE_PASS / blocker=0 / READY_FOR_PM_INTEGRATION` for PR #318 exact candidate `7ecb2250a488766915e1042a76472b3cd26d9107`.
+- PM fresh remote verification finds **no** remote reviewer branch `arena/review-window23-fresh-ia-01a101e0` and **no** GitHub commit object for reported review commit `22aa00cb3793c252512142a1eae33ca8aae9d841`.
+- Current state = `ACCEPTANCE_PASS_REPORTED / EVIDENCE_PUBLICATION_BLOCKED / DO_NOT_MERGE`. PM Integration remains BLOCKED.
+- Do **not** redo the technical IA. Continue the same Window 23 only to publish the exact existing review commit unchanged. If push remains unavailable, export an exact review git bundle + SHA-256 and stop for publication-only recovery.
+- PR #318 must remain OPEN / UNMERGED / unchanged.
+- Record: `governance/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_003_WINDOW23_EVIDENCE_PUBLICATION_HOLD_2026-10-04.md`.
+
+
 ## 2026-10-04 — WINDOW 22-RERUN-001 PM readiness PASS / WINDOW 23 Fresh IA READY
 
 - **Corrective-003 rerun engineering is READY FOR FRESH IA:** PR #318 is OPEN / non-draft / UNMERGED / DO NOT MERGE at exact candidate `7ecb2250a488766915e1042a76472b3cd26d9107`; parent `30022b06e2795d20790dd4532bf6987146c1b432`; tree `1438a9ea6b8582453f963db5acb7f136e5ac5385`; base main `1541b1ec1a8b40bdc67debd52af986c2869ee00e`.
