@@ -41,11 +41,12 @@ on:
       - "tests/**"
       - ".github/workflows/core-background-late-trusted-return-001.yml"
       - "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_003_RERUN_001/**"
-  pull_request:
-    paths:
-      - "src/**"
-      - "tests/**"
-      - ".github/workflows/core-background-late-trusted-return-001.yml"
+  # NOTE: there is deliberately no `pull_request` trigger.  A pull_request run checks
+  # out a MERGE commit, so GITHUB_SHA can never equal the engineering branch head and
+  # the exact-head assertion would produce a misleading red run against the PR.  The
+  # formal exact-head gate is the push run on the branch head, which is also the PR
+  # head, and its commit status is visible on the PR.  `workflow_dispatch` allows a
+  # re-run on the same exact head without creating a commit.
   workflow_dispatch:
 
 permissions:
@@ -1266,16 +1267,22 @@ jobs:
           python - <<'PY' | tee -a /tmp/environment_report.txt
           import platform, sqlite3, ssl, sys
           import pydantic, pytest
-          expected = ("3", "12", "14")
-          actual = sys.version_info[:3]
+          # sys.version_info[:3] is a tuple of INTS.  Comparing it against a tuple of
+          # STRINGS reported CPython 3.12.14 as inexact on run 37147989026 even though
+          # the interpreter, pydantic and pytest were all exactly right.
+          expected = (3, 12, 14)
+          actual = tuple(sys.version_info[:3])
           print("CPYTHON_3_12_14_EXACT=", actual == expected, actual)
           print("PYDANTIC_2_13_5_EXACT=", pydantic.VERSION == "2.13.5", pydantic.VERSION)
           print("PYTEST_8_4_2_EXACT=", pytest.__version__ == "8.4.2", pytest.__version__)
           print("SQLITE_VERSION=", sqlite3.sqlite_version)
           print("OPENSSL_VERSION=", ssl.OPENSSL_VERSION)
           print("PLATFORM=", platform.platform())
+          print("PYTHON_IMPLEMENTATION=", platform.python_implementation())
           if actual != expected:
-              raise SystemExit("FORMAL_CI_NOT_CPYTHON_3_12_14")
+              raise SystemExit(f"FORMAL_CI_NOT_CPYTHON_3_12_14: {actual}")
+          if platform.python_implementation() != "CPython":
+              raise SystemExit("FORMAL_CI_NOT_CPYTHON_IMPLEMENTATION")
           if pydantic.VERSION != "2.13.5":
               raise SystemExit("FORMAL_CI_NOT_PYDANTIC_2_13_5")
           if pytest.__version__ != "8.4.2":
