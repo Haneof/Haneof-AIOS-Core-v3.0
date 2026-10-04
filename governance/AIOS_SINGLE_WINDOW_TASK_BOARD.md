@@ -1,5 +1,19 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 2026-10-04 — Corrective-003 PM INTEGRATED / next task not yet released
+
+- **Core line complete:** `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-003 = PM_INTEGRATED`.
+- Fresh IA Window 23 = `ACCEPTANCE_PASS / blocker=0 / COMPLETE`.
+- Accepted candidate `7ecb2250a488766915e1042a76472b3cd26d9107` was merged via PR #318 using merge-commit mode only.
+- Integration merge = `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`; parents = pre-merge main `fb53cf938b138a67d1890618eed41282c61bce00` + exact accepted candidate `7ecb2250…`; tree = `70b2711258567863ea0d93025a6a07e39631726a`.
+- Exact reviewer evidence = `22aa00cb3793c252512142a1eae33ca8aae9d841`, tree `28593da…`, REVIEW_ONLY PR #321. **Do not merge #321.**
+- Reviewer bundle SHA-256 `47c1bb66ff43805eb2c40690796503917008fdc599806633f3530d4087ecd85b`; exact publication run `37206355171` SUCCESS.
+- `BLK-W20-001 = CLOSED_BY_ACCEPTED_CORRECTIVE_003`.
+- No RC refreeze, Resident, C15 operator/persistence corrective, evaluator, or release activity was executed.
+- Fresh search found no formal `RC-REFREEZE-004` entry contract; therefore **NEXT_TASK = NOT_YET_FORMALLY_RELEASED**. A PM task decision is required before a new execution window.
+- Record: `governance/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_003_PM_INTEGRATION_2026-10-04.md`.
+
+
 ## 2026-10-04 — WINDOW 23 Fresh IA evidence PUBLISHED / PM Integration READY
 
 - Window 23 final state = `ACCEPTANCE_PASS / blocker=0 / REVIEW_EVIDENCE_PUBLISHED / READY_FOR_PM_INTEGRATION`.
