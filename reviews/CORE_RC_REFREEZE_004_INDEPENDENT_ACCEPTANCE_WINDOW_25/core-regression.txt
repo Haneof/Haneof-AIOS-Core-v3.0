@@ -1,0 +1,8 @@
+Command:
+python -m pytest -o addopts='' -q --tb=no tests/unit tests/integration tests/runtime tests/habitation --junitxml=core-regression-junit.xml
+
+Result:
+928 passed in 119.01s
+0 failed
+0 errors
+

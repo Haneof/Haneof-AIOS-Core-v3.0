@@ -1,0 +1,22 @@
+PASS | IA20-MIGRATE-003
+  expected: a tampered legacy row (even as the last of several) converts nothing, purges no secret, and every retry fails closed identically
+  actual:   first=LegacyTrustMigrationError, retry=LegacyTrustMigrationError, state_unchanged=True, no_v2_proof_anywhere=True, secret_preserved=True, tampered_attempt=bgattempt_9c1863f4917ea27bb14285bb94d8553d
+PASS | IA20-MIGRATE-004
+  expected: legacy edge branches fail closed with the secret preserved (a,c,d,g,h plus malformed-secret-with-trust-state e2/f2); the empty-trust-state branch purges the unusable secret without laundering (b,e,f)
+  actual:   outcomes={'a': 'LegacyTrustMigrationError', 'a_detail': 'secret_preserved=True, staged_unchanged=True', 'b': 'completed', 'b_detail': 'secret_purged=True, receipts_created=0, attempt_state=dispatching', 'c': 'LegacyTrustMigrationError', 'c_detail': 'rows_preserved=2', 'd': 'LegacyTrustMigrationError', 'e': 'NO-RAISE', 'e_detail': 'secret_purged=True, receipts_created=0', 'f': 'NO-RAISE', 'f_detail': 'secret_purged=True, receipts_created=0', 'e2': 'LegacyTrustMigrationError', 'e2_detail': 'state_unchanged=True, secret_preserved=True', 'f2': 'LegacyTrustMigrationError', 'f2_detail': 'state_unchanged=True, secret_preserved=True', 'g': 'LegacyTrustMigrationError', 'g_detail': 'secret_preserved=True', 'h': 'LegacyTrustMigrationError', 'h_detail': 'secret_preserved=True'}, unexpected={}, details_ok=True
+PASS | IA20-RSA-ENC-001
+  expected: every accepted key_id round-trips exactly and verifies genuine signatures; non-canonical ids and ambiguous proofs are refused
+  actual:   accepted=["'0':roundtrip=True,genuine_verify=True", "'a':roundtrip=True,genuine_verify=True", "'Z':roundtrip=True,genuine_verify=True", "'key-2026.v1_x':roundtrip=True,genuine_verify=True", "'9aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa':roundtrip=True,genuine_verify=True", "'A.b-c_d':roundtrip=True,genuine_verify=True"], unexpected_refusals=[], wrongly_accepted=[], malformed_accepted=[], odd_length_signature=representable=True, verifies=False
+PASS | IA20-RSA-PARAM-001
+  expected: signed/zero/even/undersized/non-normalized moduli and non-canonical exponents/algorithms are refused at construction; legal parameters are accepted
+  actual:   unexpected=[], accepted_legal=['e3', 'e65537', 'modulus_2048_valid'], observations=['integral_float_exponent_coerced_to_int=int:65537']
+PASS | IA20-RSA-TRANSPLANT-001
+  expected: reviewer-signed genuine return completes exactly once; every one of the 12 bound-field transplants is rejected
+  actual:   positive=completed response='genuine reviewer-signed return' meters=1, accepted_transplants=[]
+PASS | IA20-NOTSUB-002
+  expected: after the durable dispatch/binding boundary, no caller assertion can write not_submitted and no redispatch occurs
+  actual:   state_before=dispatching, outcome={'reconcile_not_submitted': 'refused:BackgroundModelResponseConflict', 'reconcile_not_submitted_state': 'in_doubt', 'mark_failure_timeout': 'refused:BackgroundModelResponseConflict', 'mark_failure_timeout_state': 'in_doubt', 'second_run': 'refused:TurnExecutionInDoubt', 'redispatch_called': False}, final_state=in_doubt
+PASS | IA20-EXACTONCE-001
+  expected: first genuine return wins; a conflicting return is refused; an identical replay is effect-free (one staged row, one meter, one completion)
+  actual:   outcome={'first': 'accepted', 'conflicting_second': 'refused:BackgroundModelResponseConflict', 'exact_replay_first': 'NOOP_ACCEPTED'}, response='first accepted payload', meters=1, state=metered, execution_state=completed, assistant_ref=set
+SUMMARY | probes=7 failures=0

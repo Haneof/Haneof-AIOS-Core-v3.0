@@ -1,0 +1,12 @@
+REVIEWER_PROBE_DEFECT
+
+The first frozen probe version resolved the clean virtual environment's Python
+symlink to the base runtime interpreter. The identity subprocess therefore ran
+outside the clean environment and failed with:
+
+ModuleNotFoundError: No module named 'aios_core'
+
+This was a reviewer-probe defect, not a candidate result. The failed version is
+preserved by its SHA-256 in ADDITIONAL_PROBE_SHA256.txt. Version 2 changes only
+the interpreter-path handling, is frozen separately before execution, and the
+failed result is not counted as candidate evidence.

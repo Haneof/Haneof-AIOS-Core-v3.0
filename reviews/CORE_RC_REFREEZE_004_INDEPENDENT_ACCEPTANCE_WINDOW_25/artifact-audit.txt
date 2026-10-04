@@ -1,0 +1,15 @@
+run_id=37213157986
+artifact_id=11307078611
+artifact_name=core-rc-refreeze-004-evidence
+server_digest=sha256:8c14ab631b361c57d5292fd94f6fde3755a215ed974d408574fa65c9b2bd4c7b
+downloaded_zip_sha256=8c14ab631b361c57d5292fd94f6fde3755a215ed974d408574fa65c9b2bd4c7b
+downloaded=true
+internal_files=28
+runtime_sha256_entries_verified=all
+tracked_SHA256SUMS_entries=20
+tracked_SHA256SUMS_result=all_OK
+workflow_git_blob=43b4b31225a6851cb8b9378f665966bcf1034acb
+workflow_file_sha256=f349b5d1514c6163a23f73f250b17f38f0282fd6e0ccdee8bf0b0183dc1c5db9
+source_manifest_git_identities_and_sizes=match
+observation=tracked_SHA256SUMS omits itself and probes/backup_restore_route_b.py; candidate Git tree still binds both exact bytes
+

@@ -1,0 +1,15 @@
+wheel_source=1cee3c5ad12f4b9098232bae11b51df786c5eb2f
+wheel=aios_core-0.3.0.dev0-py3-none-any.whl
+wheel_sha256=5e977588e7450fe15b8087f7171af94c14ac207351b7e93cde1924c13a4e9ec2
+install_mode=non-editable
+pydantic=2.13.5
+aios_core.__file__=/workspace/scratch/87cee27d5e70/reviewer-clean-venv/lib/python3.12/site-packages/aios_core/__init__.py
+initial=ready world_revision=0 index_watermark=0
+turn=turn_completed response=HEADLESS_MECHANICAL_OK summary_error=None world_revision=2
+fresh_process_restart=ready world_revision=2 index_watermark=2 index_lag=0
+provider_free_recovery_status=recovery_status disposition=AUTO_RECOVERABLE world_revision=2 index_watermark=2
+clean_close_reopen=ready world_revision=2 index_watermark=2
+real_provider_used=false
+resident_fixture_used=false
+WINDOW25_CLEAN_INSTALL_HEADLESS_PASS
+

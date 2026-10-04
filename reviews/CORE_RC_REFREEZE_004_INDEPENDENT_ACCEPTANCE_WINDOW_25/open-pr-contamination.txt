@@ -1,0 +1,12 @@
+fresh_open_pr_count=52
+#310 state=OPEN merged=false head=fec30bd1495017bf13f08b0ef5b1e241dfb0e247 classification=historical_failed_DO_NOT_MERGE
+#311 state=OPEN merged=false head=fd52ea8243970187b439208d7061c04c68b6b8ea classification=historical_REVIEW_ONLY
+#321 state=OPEN merged=false head=22aa00cb3793c252512142a1eae33ca8aae9d841 classification=Window23_REVIEW_ONLY_DO_NOT_MERGE
+#325 state=OPEN draft=false merged=false head=70134269ddfc7c80c4a703a933253bd099746504 classification=canonical_RC004_candidate
+#326 state=CLOSED draft=false merged=false head=b7820282cb2ca0f6ee071940baeed873ab5af4a1 classification=DUPLICATE_SUPERSEDED_NON_CANONICAL
+publication/window23-review-tree-staging classification=transport_only
+publication/window23-review-exact-publisher classification=transport_only
+historical_C15_WIP_and_draft_PRs_present=true
+new_competing_canonical_RC004_candidate=false
+OPEN_PR_DOES_NOT_EQUAL_ACCEPTED_SOFTWARE
+
