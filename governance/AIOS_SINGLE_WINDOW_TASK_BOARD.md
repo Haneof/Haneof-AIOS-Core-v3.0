@@ -1,5 +1,18 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 2026-10-04 — CORE-RC-REFREEZE-004 READY / WINDOW 24 RELEASED
+
+- **Unique next READY:** `WINDOW 24 — CORE-RC-REFREEZE-004`.
+- Frozen software target = accepted Corrective-003 integration merge `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`.
+- Current live main at release = `5c4cc1b0c72c5fc6e866b07cee1fc46392734d59`; later commits must be proven governance/evidence-only before freeze.
+- Corrective-003 changed Resident-visible trusted-return/recovery semantics, so prior Resident A evidence is historical only. Required RC impact = `FRESH_A_REQUIRED`.
+- C15 persistence/operator failures remain `DOWNSTREAM_OPERATOR_COMPATIBILITY_DEBT`; RC freeze must freshly verify they are confined downstream. Required post-freeze disposition = `FRESH_OPERATOR_PREP_REQUIRED`.
+- Order: RC-REFREEZE-004 → independent RC IA → PM integration → dedicated C15 operator/persistence compatibility corrective → independent operator IA → fresh Resident A.
+- Window 24 must not repair Core or C15, must not run Resident, must stop at `REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE` or `BLOCKED`.
+- Prompt: `governance/prompts/CORE_RC_REFREEZE_004_2026-10-04.md`.
+- PM decision: `governance/CORE_RC_REFREEZE_004_ENTRY_DECISION_2026-10-04.md`.
+
+
 ## 2026-10-04 — Corrective-003 PM INTEGRATED / next task not yet released
 
 - **Core line complete:** `CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-003 = PM_INTEGRATED`.
