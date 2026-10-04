@@ -184,8 +184,9 @@ Ruling: **CORE_FREEZE_NOT_BLOCKED_BY_DOWNSTREAM_OPERATOR_DEBT** and **C15_OPERAT
 
 - PR #325 head was checked at start, before/after testing, and again after final fetch: `70134269ddfc7c80c4a703a933253bd099746504` throughout. **NO_CANDIDATE_DRIFT**.
 - Review branch: `review/core-rc-refreeze-004-ia-window25`.
-- Exact technical evidence commit: `TO_BE_PINNED_BY_PUBLICATION_COMMIT`.
-- Publication status: `PUBLICATION_PENDING`.
+- Exact technical evidence commit: `ffa6475fe4dde4b5d06b09a629b059b89f1ff434`.
+- Review PR: `#328`, `https://github.com/Haneof/Haneof-AIOS-Core-v3.0/pull/328`.
+- Publication status: **PUBLISHED**.
 - The publication PR is REVIEW_ONLY / DO NOT MERGE and targets the candidate branch so it cannot be mistaken for an implementation merge.
 
 ## Final state
