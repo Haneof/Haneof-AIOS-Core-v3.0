@@ -1,5 +1,20 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 2026-10-05 — WINDOW 26 REVIEW_READY / WINDOW 27 Fresh IA RELEASED
+
+- Window 26 `CORE-RC-REFREEZE-004-CORRECTIVE-001` reported `REVIEW_READY / READY_FOR_FRESH_INDEPENDENT_ACCEPTANCE / DO NOT MERGE`.
+- PM fresh-verified PR #330 @ `2380121639865b1bd29176cf944f5a20afe4112d`; parent `04c37f7d...`; tree `72d3cd0d...`; OPEN / non-draft / UNMERGED.
+- Relative to failed #325 exact head `70134269...`: 2 commits ahead / 0 behind; delta only RC004 workflow + `reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/**`.
+- Frozen software remains `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`.
+- Formal run `37217853558` = SUCCESS; Job A = SUCCESS; Job B mandatory publisher = SUCCESS.
+- Artifact `11309495093`, digest `sha256:02415a0457af3aec5cb50d5195120202aae2c9cb23d3c81cbefaf867b7d216e0`.
+- Mandatory pin comment `203380647` binds exact candidate/run/frozen software.
+- **Unique next READY:** `WINDOW 27 — CORE-RC-REFREEZE-004-CORRECTIVE-001-INDEPENDENT-ACCEPTANCE`.
+- Window 27 must independently attack rc/JUnit classifier, credential isolation, terminal immutability including post-terminal TOCTOU, mandatory publisher, and carry-forward RC guarantees.
+- No repair, merge, C15 repair, Resident, evaluator or public release.
+- Prompt: `governance/prompts/CORE_RC_REFREEZE_004_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-10-05.md`.
+
+
 ## 2026-10-04 — WINDOW 25 ACCEPTANCE_FAIL / WINDOW 26 Corrective-001 RELEASED
 
 - Window 25 Fresh IA verdict = `ACCEPTANCE_FAIL / blocker=3 / CORRECTIVE_OR_ADJUDICATION_REQUIRED`.
