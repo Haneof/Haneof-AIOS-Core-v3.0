@@ -1,0 +1,20 @@
+W25-FG-01 C15 classifier reproduction
+pytest_exit=4
+failed_count=0
+non_downstream_failures=
+CORE_FREEZE_NOT_BLOCKED_BY_DOWNSTREAM_OPERATOR_DEBT
+C15_OPERATOR_ADAPTATION_REQUIRED_BEFORE_RESIDENT
+REPRO_RESULT=CANDIDATE_CLASSIFIER_EXITED_ZERO_AFTER_PYTEST_EXIT_4
+
+W25-FG-02 comment publication shell reproduction
+simulated_http_code=500
+simulated-comment-error
+shell_exit=0
+
+Hosted-run checkout log facts
+persist-credentials=true
+git_config=http.https://github.com/.extraheader AUTHORIZATION: basic ***
+credential_removed_only_in_post-checkout_at_end=true
+formal_pytest_exit=1
+formal_commit_comment_http_code=201
+
