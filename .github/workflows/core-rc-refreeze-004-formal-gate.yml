@@ -236,9 +236,37 @@ jobs:
           if grep -RnE "^[[:space:]]*(from|import)[[:space:]].*(${SYMBOLS})" src/; then echo "LOCAL_TRUST_AUTHORITY_IMPORT_PRESENT"; exit 1; fi
           test -f src/aios_core/runtime/live_return.py
           grep -q '^LOCAL_LIVE_RETURN_AUTHORITY_DECOMMISSIONED = True$' src/aios_core/runtime/live_return.py
-          if grep -R --line-number 'runtime.live_return\|from .*live_return\|import .*live_return' src/aios_core/runtime --exclude=live_return.py | grep -q .; then
-            echo "TOMBSTONE_CONSULTED_BY_CORE_AUTHORIZATION"; exit 1
-          fi
+          "$RC004_VENV/bin/python" - <<'PY' | tee "$RC004_OUT/tombstone-import-audit.txt"
+          import ast
+          from pathlib import Path
+
+          root = Path("src/aios_core/runtime")
+          offenders = []
+          for path in root.glob("*.py"):
+              if path.name in {"live_return.py", "__init__.py"}:
+                  continue
+              tree = ast.parse(path.read_text(encoding="utf-8"))
+              for node in ast.walk(tree):
+                  if isinstance(node, ast.ImportFrom):
+                      module = node.module or ""
+                      if module.endswith("live_return"):
+                          offenders.append((str(path), node.lineno, "ImportFrom", module))
+                  elif isinstance(node, ast.Import):
+                      for alias in node.names:
+                          if alias.name.endswith("live_return"):
+                              offenders.append((str(path), node.lineno, "Import", alias.name))
+          print("authorization_import_offenders=", offenders)
+          assert not offenders, offenders
+
+          init_tree = ast.parse((root / "__init__.py").read_text(encoding="utf-8"))
+          compatibility_reexports = []
+          for node in ast.walk(init_tree):
+              if isinstance(node, ast.ImportFrom) and (node.module or "").endswith("live_return"):
+                  compatibility_reexports.extend(alias.name for alias in node.names)
+          print("runtime_init_tombstone_reexports=", sorted(compatibility_reexports))
+          assert compatibility_reexports, "expected inert reviewer-probe compatibility re-export is absent"
+          print("TOMBSTONE_AUTHORIZATION_IMPORT_AUDIT=PASS")
+          PY
 
           "$RC004_VENV/bin/python" -m pytest -o addopts='' -q --tb=short             tests/runtime/test_background_late_return_route_b.py             tests/runtime/test_late_return_canonical_encoding_002.py             tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py             tests/integration/test_core_background_late_trusted_return_corrective_002.py             tests/integration/test_core_background_late_trusted_return_corrective_001.py             tests/integration/test_core_background_late_trusted_return_consumption_001.py             tests/integration/test_core_background_late_trusted_return_secret_upgrade_001.py             tests/integration/test_core_background_response_recovery_001_corrective_002_recovery.py             tests/integration/test_core_background_response_recovery_001_corrective_001.py             tests/integration/test_core_background_trusted_return_recovery_001.py             tests/integration/test_core_background_trusted_return_adversarial_001.py             tests/integration/test_core_background_trusted_return_r5_001.py             tests/integration/test_core_background_trusted_return_r5_conflicts_001.py             2>&1 | tee "$RC004_OUT/corrective003-security.txt"
           grep -qE '[0-9]+ passed' "$RC004_OUT/corrective003-security.txt"
