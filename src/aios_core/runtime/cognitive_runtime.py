@@ -173,7 +173,20 @@ ModelHandler = Callable[[RuntimeSnapshot], ModelDirective]
 ModelUsageRecorder = Callable[[RuntimeSnapshot, ModelDirective], None]
 ModelAttemptAdmitter = Callable[[RuntimeSnapshot], str | None]
 ModelDispatchRecorder = Callable[[RuntimeSnapshot], None]
-ModelResponseAuthenticator = Callable[[RuntimeSnapshot, ModelDirective], None]
+## Corrective-003 / Route B (closing `BLK-W20-001`,
+## `TRUST_AUTHORITY_ISSUANCE_REMAINS_CALLER_MANUFACTURABLE`): the historical
+## `ModelResponseAuthenticator` hook is gone.  It existed to "authenticate" a live
+## provider return by handing the recorder an ephemeral authority object issued by
+## this very frame -- but issuance was an ordinary public module function, so any
+## process-local recovery caller could issue its own authority, declare its own
+## bytes handler-returned, and mint a durable trusted receipt + handoff.
+##
+## Under Route B a live local handler return carries **no** authenticity authority
+## at all and mints nothing durable.  There is therefore no live authentication
+## step to order, and no callback parameter for one.  Durable trusted
+## provider/late return is produced only by the external route: a verifier bound
+## durably before the provider boundary plus a genuine external cryptographic
+## proof (`BackgroundModelAttemptStore.attach_late_trusted_return`).
 ModelResponseRecorder = Callable[[RuntimeSnapshot, ModelDirective], None]
 ModelFailureRecorder = Callable[[RuntimeSnapshot, BaseException, bool], None]
 SideEffectAuthorizer = Callable[[CapabilitySpec, CapabilityCall, RuntimeSnapshot], bool]
@@ -195,7 +208,6 @@ class CognitiveRuntime:
         model_usage_recorder: ModelUsageRecorder | None = None,
         model_attempt_admitter: ModelAttemptAdmitter | None = None,
         model_dispatch_recorder: ModelDispatchRecorder | None = None,
-        model_response_authenticator: ModelResponseAuthenticator | None = None,
         model_response_recorder: ModelResponseRecorder | None = None,
         model_failure_recorder: ModelFailureRecorder | None = None,
         model_response_recovery: ModelResponseRecovery | None = None,
@@ -215,7 +227,6 @@ class CognitiveRuntime:
         self.model_usage_recorder = model_usage_recorder
         self.model_attempt_admitter = model_attempt_admitter
         self.model_dispatch_recorder = model_dispatch_recorder
-        self.model_response_authenticator = model_response_authenticator
         self.model_response_recorder = model_response_recorder
         self.model_failure_recorder = model_failure_recorder
         self.model_response_recovery = model_response_recovery
@@ -349,6 +360,19 @@ class CognitiveRuntime:
                         object.__setattr__(snapshot, "_model_attempt_id", attempt_id)
                 if self.model_dispatch_recorder is not None:
                     self.model_dispatch_recorder(snapshot)
+                # Corrective-003 / Route B (closing `BLK-W20-001`,
+                # `TRUST_AUTHORITY_ISSUANCE_REMAINS_CALLER_MANUFACTURABLE`):
+                # this frame issues NO live provider-return authority.  The
+                # provider handler is invoked plainly, and the directive it
+                # returns is an ordinary in-memory object that authenticates
+                # nothing by itself.  No window is armed, no handler-return
+                # identity is registered, no receipt and no exact handoff are
+                # minted here, and no callback receives an authority object.
+                #
+                # Durable trusted provider/late return is produced exclusively by
+                # the external route: a verifier bound durably before the provider
+                # boundary plus a genuine external cryptographic proof verified by
+                # `BackgroundModelAttemptStore.attach_late_trusted_return`.
                 try:
                     directive = self.model_handler(snapshot)
                     if not isinstance(directive, ModelDirective):
@@ -361,11 +385,6 @@ class CognitiveRuntime:
                     if self.model_failure_recorder is not None:
                         self.model_failure_recorder(snapshot, exc, False)
                     raise
-                if self.model_response_authenticator is not None:
-                    # This callback is the trusted provider/relay return boundary.
-                    # It durably authenticates exact bytes before provenance,
-                    # metering, capability execution, output, or any World effect.
-                    self.model_response_authenticator(snapshot, directive)
                 if self.model_response_recorder is not None:
                     self.model_response_recorder(snapshot, directive)
             if directive.usage is None:

@@ -1,4 +1,24 @@
-"""R5 replay conflicts cannot silently overwrite trusted bytes or World truth."""
+"""R5 replay conflicts cannot silently overwrite trusted bytes or World truth.
+
+TIGHTEN_ONLY history (Corrective-003 / Window 22-RERUN-001): ``metered_task_crash``
+used to obtain its trusted bytes from a receipt the *live local handler return*
+minted for itself via ``record_live_provider_return`` behind a self-issued
+ephemeral window -- the caller-manufacturable authority adjudicated unsafe by
+``BLK-W20-001``
+(``RECOVERY_CALLER_TRUSTED_RETURN_MINT_ORACLE_VIA_SELF_ISSUED_EPHEMERAL_WINDOW`` /
+``TRUST_AUTHORITY_ISSUANCE_REMAINS_CALLER_MANUFACTURABLE``).  Route B removes that
+writer entirely, so the crashed round's exact bytes are now preserved only by a
+genuine external RSA signature over the durable pre-dispatch request binding,
+attached through ``BackgroundModelAttemptStore.attach_late_trusted_return``.
+
+Every mutation case, every fail-closed expectation and every World-truth /
+idempotency assertion below is unchanged: the forged-or-changed handoff still must
+fail before any capability replay, still must not advance the World revision, still
+must not duplicate the task, still must not add a meter, and still must leave no
+staged response.  The only difference is that the durable trusted rows the attacker
+mutates now originate from real external proof rather than from local self-trust,
+which makes the attack surface strictly harder to reach, not easier.
+"""
 from __future__ import annotations
 
 from dataclasses import replace
@@ -21,7 +41,8 @@ from test_core_background_trusted_return_recovery_001 import (
     NOW, directive, seed_anchor, watch_call,
 )
 from test_core_background_trusted_return_r5_001 import (
-    ProcessDeath, evidence, execute, new_runtime, scope, start, task_operation, task_rows,
+    ProcessDeath, attach_genuine_return, evidence, execute, new_runtime, scope,
+    start, task_operation, task_rows,
 )
 
 
@@ -39,7 +60,11 @@ def metered_task_crash(tmp_path):
     initial.registry.invoke = crash_after_commit
     with pytest.raises(ProcessDeath):
         execute(initial, "wake", work_id)
-    before = evidence(initial, "wake", work_id)
+    # Route B: the live return minted nothing; preserve the exact bytes externally.
+    before_live = evidence(initial, "wake", work_id)
+    attach_genuine_return(initial, "wake", work_id, directive(0, call=watch_call(0)))
+    before = evidence(initial, "wake", work_id, proven=True)
+    assert before_live[0].attempt_id == before[0].attempt_id
     task = task_rows(initial.store)[0]
     op = task_operation(db, task["object_id"])
     revision = int(initial.store.current_world_revision())
@@ -52,6 +77,12 @@ def metered_task_crash(tmp_path):
 ])
 def test_r5_c_forged_or_changed_handoff_fails_before_capability_replay(tmp_path, mutation):
     db, work_id, before, task, op, revision = metered_task_crash(tmp_path)
+    # Route B: the genuinely externally-proven handoff captured BEFORE the attack.
+    # Under the removed live authority no staged response existed yet at this point;
+    # now the genuine proof has already staged the exact bytes, so the invariant is
+    # that the forgery must never displace them.
+    genuine_handoff = before[3]
+    assert genuine_handoff is not None
     with sqlite3.connect(db) as conn:
         payload = conn.execute(
             "SELECT directive_payload FROM background_model_return_handoffs WHERE attempt_id=?",
@@ -91,7 +122,13 @@ def test_r5_c_forged_or_changed_handoff_fails_before_capability_replay(tmp_path,
     assert int(fresh.store.current_world_revision()) == revision
     assert task_rows(fresh.store) == [task]
     assert task_operation(db, task["object_id"]) == op
-    assert fresh.background_model_attempts.staged_response(before[0].attempt_id) is None
+    staged = fresh.background_model_attempts.staged_response(before[0].attempt_id)
+    assert staged is not None
+    # The forgery never reached durable staging: the staged exact bytes are still
+    # byte-for-byte the genuinely externally-proven ones captured before the attack.
+    assert staged.directive_payload == genuine_handoff[0]
+    assert staged.payload_sha256 == genuine_handoff[1]
+    assert staged.authenticity_proof == genuine_handoff[2]
     assert fresh.metering.list_model_calls(subject_id="user_1") == (
         before[4],
     )
@@ -200,7 +237,10 @@ def test_r5_a_terminal_ack_operation_identity_is_stable(tmp_path, kind, monkeypa
     with pytest.raises(ProcessDeath):
         execute(initial, kind, work_id)
     work_id = scope(initial, kind, work_id)
-    before = evidence(initial, kind, work_id)
+    before_live = evidence(initial, kind, work_id)
+    attach_genuine_return(initial, kind, work_id, directive(0))
+    before = evidence(initial, kind, work_id, proven=True)
+    assert before_live[0].attempt_id == before[0].attempt_id
     rev_before = int(initial.store.current_world_revision())
     fresh = new_runtime(db, lambda _: pytest.fail("no provider redispatch"))
     result = execute(fresh, kind, work_id)
@@ -218,7 +258,7 @@ def test_r5_a_terminal_ack_operation_identity_is_stable(tmp_path, kind, monkeypa
         assert result.delivery_observation_ref is not None
     else:
         assert delivery == []  # Review creates no assistant-to-user delivery.
-    assert_same = evidence(fresh, kind, work_id)
+    assert_same = evidence(fresh, kind, work_id, proven=True)
     assert assert_same[1:] == before[1:]
     assert assert_same[0].attempt_id == before[0].attempt_id
     final_rev = int(fresh.store.current_world_revision())

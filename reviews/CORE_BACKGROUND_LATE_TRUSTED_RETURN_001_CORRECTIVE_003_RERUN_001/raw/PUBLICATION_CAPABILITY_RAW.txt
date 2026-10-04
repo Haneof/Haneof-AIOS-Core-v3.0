@@ -1,0 +1,20 @@
+# RAW: GitHub publication capability preflight
+# generated: 2026-10-03T13:19:56Z
+
+## gh auth status
+github.com
+  ✓ Logged in to github.com as Haneof (GH_TOKEN)
+  ✓ Git operations for github.com configured to use https protocol.
+  ✓ Token: ************************
+
+## repo permissions (gh api)
+{"default_branch":"main","full_name":"Haneof/Haneof-AIOS-Core-v3.0","permissions":{"admin":true,"maintain":true,"pull":true,"push":true,"triage":true}}
+
+## token identity
+{"id":131862491,"login":"Haneof"}
+
+## remote engineering branch ref (git ls-remote)
+1541b1ec1a8b40bdc67debd52af986c2869ee00e	refs/heads/arena/01a101e0-haneof-aios-core-v3-0
+
+## branch via GitHub API
+{"name":"arena/01a101e0-haneof-aios-core-v3-0","sha":"1541b1ec1a8b40bdc67debd52af986c2869ee00e"}
