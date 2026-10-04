@@ -1,5 +1,15 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-10-04 — CORE-RC-REFREEZE-004 READY / WINDOW 24
+
+- Corrective-003 is PM-integrated; accepted software integration point = `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`.
+- Unique next task = `WINDOW 24 — CORE-RC-REFREEZE-004`.
+- Freeze first; do not repair C15 operator/persistence in the RC window.
+- Required impact: `FRESH_A_REQUIRED` and `FRESH_OPERATOR_PREP_REQUIRED`.
+- Downstream C15 45-failure compatibility debt is non-blocking for freeze only if fresh RC verification confirms the Core gate is green and failures remain downstream-only.
+- No Resident / evaluator / public release before RC freeze independent acceptance and subsequent PM integration.
+
+
 ## 2026-10-04 — Corrective-003 PM INTEGRATED
 
 - PR #318 exact accepted candidate `7ecb2250a488766915e1042a76472b3cd26d9107` merged.
