@@ -1,5 +1,18 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 2026-10-04 — WINDOW 22-RERUN-001 PM readiness PASS / WINDOW 23 Fresh IA READY
+
+- **Corrective-003 rerun engineering is READY FOR FRESH IA:** PR #318 is OPEN / non-draft / UNMERGED / DO NOT MERGE at exact candidate `7ecb2250a488766915e1042a76472b3cd26d9107`; parent `30022b06e2795d20790dd4532bf6987146c1b432`; tree `1438a9ea6b8582453f963db5acb7f136e5ac5385`; base main `1541b1ec1a8b40bdc67debd52af986c2869ee00e`.
+- Formal exact-head run `37166276909` = **12/12 SUCCESS** on CPython 3.12.14 / pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.45.1 / OpenSSL 3.0.13. Exact-head identity: git checkout = GITHUB_SHA = remote branch head = PR head.
+- Frozen proof gates: failed candidate W20 Suite A = 4/4 RED; candidate Suite A = 4/0; Suite B = 7/0; W17 = 14/0; C3 matrix = 28 pass and 17 RED on failed candidate; full Core = **928 pass / 0 fail / 0 error**; SIGKILL GREEN; scope/identity guard GREEN.
+- PM inspected other automatic workflow reds. Their failures are the already-frozen `tests/c15_persistence/**` / `tools/c15_persistence/**` downstream compatibility debt (broad run: 45 failed / 1092 passed), not a new Core regression. Do not restore unsafe local trust to make those harnesses green.
+- `SHA256SUMS` actually has 32 checksum entries; the final commit message's "31 entries" is `OBS-PM-W22R-001 / NON_BLOCKING_METADATA_TYPO`. Do not move candidate head to fix prose.
+- PR #310/#311 remain frozen/review-only and untouched.
+- **Unique next READY:** `WINDOW 23 — CORE-BACKGROUND-LATE-TRUSTED-RETURN-001-CORRECTIVE-003-INDEPENDENT-ACCEPTANCE`.
+- Window 23 is Fresh Independent Acceptance only: no repair, no merge, no PM integration, no RC refreeze, no Resident.
+- PM readiness record: `governance/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_003_RERUN_001_PM_READINESS_2026-10-04.md`.
+
+
 ## 2026-10-03 — Corrective-003 local artifact unavailable / WINDOW 22-RERUN-001 READY
 
 - PM fresh remote verification: reported local candidate `39917591f07c2ed1aa679f9098c1fc368c3af42e` is **not present in the GitHub object graph**, and no remote Corrective-003 engineering branch exists. The previous bundle/evidence were local-only and are not a durable publication artifact.
