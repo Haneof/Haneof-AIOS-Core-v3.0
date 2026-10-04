@@ -1,5 +1,19 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 2026-10-04 — CORE-RC-REFREEZE-004 REVIEW_READY / WINDOW 25 Fresh IA RELEASED
+
+- Window 24 completed at `REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE / blocker=0`.
+- **Unique next READY:** `WINDOW 25 — CORE-RC-REFREEZE-004-INDEPENDENT-ACCEPTANCE`.
+- Canonical candidate = PR #325 @ `70134269ddfc7c80c4a703a933253bd099746504`; parent `b295e6a8...`; tree `5727143a...`; OPEN / UNMERGED / DO NOT MERGE.
+- Frozen software = `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`.
+- Formal exact-head run `37213157986` = SUCCESS; artifact `11307078611`, digest `sha256:8c14ab631b361c57d5292fd94f6fde3755a215ed974d408574fa65c9b2bd4c7b`.
+- PR #326 = CLOSED / UNMERGED / DUPLICATE / SUPERSEDED / NON-CANONICAL.
+- Window 25 must independently attack freeze integrity, workflow false-green routes, four preserved RED classifications, manifest/external-pin two-layer design, Route B security, backup/restore, C15 downstream classification, and RC impact.
+- Window 25 must not repair/merge, must not run Resident, must publish REVIEW_ONLY evidence and stop at PASS/FAIL/REVALIDATION.
+- Prompt: `governance/prompts/CORE_RC_REFREEZE_004_INDEPENDENT_ACCEPTANCE_2026-10-04.md`.
+- PM release: `governance/CORE_RC_REFREEZE_004_INDEPENDENT_ACCEPTANCE_RELEASE_2026-10-04.md`.
+
+
 ## 2026-10-04 — CORE-RC-REFREEZE-004 READY / WINDOW 24 RELEASED
 
 - **Unique next READY:** `WINDOW 24 — CORE-RC-REFREEZE-004`.

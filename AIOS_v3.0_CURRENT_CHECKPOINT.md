@@ -1,5 +1,15 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-10-04 — WINDOW 25 Fresh RC Acceptance READY
+
+- Window 24 RC freeze candidate is canonical PR #325 @ `70134269ddfc7c80c4a703a933253bd099746504`, tree `5727143a...`.
+- Frozen software = `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`.
+- Formal run `37213157986` = SUCCESS.
+- Unique next task = `WINDOW 25 — CORE-RC-REFREEZE-004-INDEPENDENT-ACCEPTANCE`.
+- PR #326 remains closed/noncanonical.
+- No PM integration, C15 repair, Resident, evaluator or public release before Window 25 durable verdict.
+
+
 ## 2026-10-04 — CORE-RC-REFREEZE-004 READY / WINDOW 24
 
 - Corrective-003 is PM-integrated; accepted software integration point = `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`.
