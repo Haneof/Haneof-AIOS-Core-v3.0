@@ -1,0 +1,32 @@
+PASS | E-PARTIAL-COMMIT-RETRY-SAME-PROOF
+  expected: retry with same genuine proof after partial commit should restore staged response (availability)
+  actual:   retry with same proof after partial staged delete succeeded: staged=E retry same proof receipts still exist
+PASS | E-PARTIAL-COMMIT-CONFLICTING-PROOF
+  expected: conflicting proof after partial commit must be refused (first-writer-wins)
+  actual:   refused:BackgroundModelResponseConflict:exact provider response rejected: verified late return conflicts with existing durable receipt; attempt bgattempt_489d1142ccd2c99b9776057481f33e17 is response_returned
+PASS | E-PARTIAL-COMMIT-MISSING-RECEIPT
+  expected: missing receipt after consumed verifier must fail closed
+  actual:   refused correctly: exact provider response rejected: late-return verifier is already consumed but its canonical receipt/handoff is missing; attempt bgattempt_489d1142ccd2c99b9776057481f33e17 is response_returned
+PASS | F-SUPERSESSION-FORGED-BEFORE-GENUINE
+  expected: forged local provenance must be superseded by genuine external proof (proof comparison, not boolean)
+  actual:   before forged state=dispatching after forged provider=attacker-prov receipts_before=0 after genuine provider=provider-W23 receipts_after=1 handoffs=1 staged=1 superseded=True
+PASS | F-SUPERSESSION-SECOND-FORGED-AFTER-GENUINE
+  expected: second forged after genuine must be refused
+  actual:   refused:exact provider response rejected: durable trusted provider-return state already exists for this attempt and can only have been created by genuine external proof; a local live completion may not race or replace it; attempt bgattempt_e9c7a65dd3f64b0cda98a75ca7f9a011 is response_returned
+PASS | F-SUPERSESSION-EXACT-REPLAY
+  expected: exact replay of genuine proof must be effect-free (idempotent)
+  actual:   replay succeeded, staged_cnt still 1, evidences match? F genuine after forged
+PASS | F-SUPERSESSION-SAME-ID-DIFF-BYTES
+  expected: same provider/id but different bytes must be refused
+  actual:   refused:exact provider response rejected: verified late return conflicts with existing durable receipt; attempt bgattempt_18023a79278e98e04924560d1257fc0d is response_returned
+PASS | G-IMPORT-ALIAS
+  expected: no hidden mint re-export via import alias
+  actual:   aliases=[] reexports_sample=['runtime.BackgroundModelAttemptBlocked', 'runtime.BackgroundModelExecutionInDoubt', 'runtime.BackgroundModelResponseConflict', 'runtime.BackgroundModelResponsePending', 'runtime.BackgroundModelResponseReceipt']
+PASS | G-BACKUP-RESTORE
+  expected: direct DB file modification with fake receipt must not be considered trusted (requires re-verification on read)
+  actual:   injected=failed no such table: background_model_response_receipts but Core validation on read should still fail - see TRUST_MINT_AUDIT §4
+
+================================================================================
+SUMMARY | probes=18 failures=0 passed=18
+---
+Final count: 18 probes, 0 failures after fixing F harness (dispatching not in_doubt)
