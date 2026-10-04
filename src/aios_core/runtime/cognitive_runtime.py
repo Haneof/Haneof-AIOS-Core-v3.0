@@ -8,14 +8,20 @@ executes calls, enforces budgets/authorization, records results, and terminates 
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Any, Callable, Mapping, Sequence
+from typing import Any, Callable, Iterator, Mapping, Sequence
 
 from .capabilities import (
     CapabilityCall,
     CapabilityRegistry,
     CapabilityResult,
     CapabilitySpec,
+)
+from .live_return import (
+    LiveProviderReturnWindow,
+    open_live_provider_return_window,
+    register_handler_return,
 )
 
 
@@ -173,11 +179,36 @@ ModelHandler = Callable[[RuntimeSnapshot], ModelDirective]
 ModelUsageRecorder = Callable[[RuntimeSnapshot, ModelDirective], None]
 ModelAttemptAdmitter = Callable[[RuntimeSnapshot], str | None]
 ModelDispatchRecorder = Callable[[RuntimeSnapshot], None]
-ModelResponseAuthenticator = Callable[[RuntimeSnapshot, ModelDirective], None]
+## The trusted provider-return boundary callback.  It receives the ephemeral
+## :class:`LiveProviderReturnWindow` issued by this frame, so a caller that is not
+## executing inside the live provider-return boundary has no way to satisfy it.
+ModelResponseAuthenticator = Callable[
+    [RuntimeSnapshot, ModelDirective, LiveProviderReturnWindow | None], None
+]
 ModelResponseRecorder = Callable[[RuntimeSnapshot, ModelDirective], None]
 ModelFailureRecorder = Callable[[RuntimeSnapshot, BaseException, bool], None]
 SideEffectAuthorizer = Callable[[CapabilitySpec, CapabilityCall, RuntimeSnapshot], bool]
 ModelResponseRecovery = Callable[[RuntimeSnapshot], RecoveredModelResponse | None]
+
+
+@contextmanager
+def _live_provider_return_window(
+    attempt_id: str | None,
+) -> Iterator[LiveProviderReturnWindow | None]:
+    """Arm the ephemeral live provider-return authority for one provider call.
+
+    ``None`` is yielded when the round is not bound to a durable provider attempt
+    (for example an anonymous local handler).  Such a round can still execute,
+    but it can never mint trusted provider-return state: the capture callback
+    fails closed when an attempt id exists without a live window, and refuses to
+    do anything at all when no durable attempt is bound.
+    """
+
+    if attempt_id is None:
+        yield None
+        return
+    with open_live_provider_return_window(attempt_id=attempt_id) as window:
+        yield window
 
 
 class CognitiveRuntime:
@@ -349,23 +380,39 @@ class CognitiveRuntime:
                         object.__setattr__(snapshot, "_model_attempt_id", attempt_id)
                 if self.model_dispatch_recorder is not None:
                     self.model_dispatch_recorder(snapshot)
-                try:
-                    directive = self.model_handler(snapshot)
-                    if not isinstance(directive, ModelDirective):
-                        raise TypeError("model_handler must return ModelDirective")
-                except ModelDispatchNotSubmitted as exc:
-                    if self.model_failure_recorder is not None:
-                        self.model_failure_recorder(snapshot, exc, True)
-                    raise
-                except Exception as exc:
-                    if self.model_failure_recorder is not None:
-                        self.model_failure_recorder(snapshot, exc, False)
-                    raise
-                if self.model_response_authenticator is not None:
-                    # This callback is the trusted provider/relay return boundary.
-                    # It durably authenticates exact bytes before provenance,
-                    # metering, capability execution, output, or any World effect.
-                    self.model_response_authenticator(snapshot, directive)
+                # Corrective-002 (`BLK-W17-001` / `C2-1` / `C2-2`): the trusted
+                # provider/relay return boundary is the only authority permitted
+                # to create a durable receipt + exact handoff.  The ephemeral
+                # window is issued here, in the same frame that invokes the
+                # provider handler, and dies with this `with` block: it is never
+                # persisted, never attached to a runtime/store object, cannot be
+                # reconstructed after process death, and cannot be re-issued by
+                # a post-crash recovery caller.
+                with _live_provider_return_window(snapshot.model_attempt_id) as live_window:
+                    try:
+                        directive = self.model_handler(snapshot)
+                        if not isinstance(directive, ModelDirective):
+                            raise TypeError("model_handler must return ModelDirective")
+                    except ModelDispatchNotSubmitted as exc:
+                        if self.model_failure_recorder is not None:
+                            self.model_failure_recorder(snapshot, exc, True)
+                        raise
+                    except Exception as exc:
+                        if self.model_failure_recorder is not None:
+                            self.model_failure_recorder(snapshot, exc, False)
+                        raise
+                    if live_window is not None:
+                        # Mechanically binds the captured bytes to the exact
+                        # object this in-process provider call returned.
+                        register_handler_return(live_window, directive)
+                    if self.model_response_authenticator is not None:
+                        # This callback durably authenticates exact bytes before
+                        # provenance, metering, capability execution, output, or
+                        # any World effect.  It cannot succeed without the live
+                        # window issued by this frame.
+                        self.model_response_authenticator(
+                            snapshot, directive, live_window
+                        )
                 if self.model_response_recorder is not None:
                     self.model_response_recorder(snapshot, directive)
             if directive.usage is None:
