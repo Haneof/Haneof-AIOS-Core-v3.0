@@ -1,0 +1,103 @@
+name: window23-review-evidence-exact-publisher
+
+on:
+  push:
+    branches:
+      - publication/window23-review-exact-publisher
+    paths:
+      - .github/workflows/window23-review-evidence-exact-publisher.yml
+
+permissions:
+  contents: write
+
+jobs:
+  publish-exact-review-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout publisher branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct exact Window 23 reviewer commit and publish REVIEW_ONLY ref
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          candidate="7ecb2250a488766915e1042a76472b3cd26d9107"
+          staging_branch="publication/window23-review-tree-staging"
+          review_branch="arena/review-window23-fresh-ia-01a101e0"
+          expected_tree="28593da131e7026de1de0037a87b6b892a5988ba"
+          expected_commit="22aa00cb3793c252512142a1eae33ca8aae9d841"
+
+          git fetch origin "$staging_branch:refs/remotes/origin/$staging_branch"
+          git cat-file -e "$candidate^{commit}"
+
+          tree="$(git rev-parse "refs/remotes/origin/$staging_branch^{tree}")"
+          echo "staging_tree=$tree"
+          test "$tree" = "$expected_tree"
+
+          cat > /tmp/window23-review-message.txt <<'EOF'
+docs(review): Window 23 Fresh Independent Acceptance - REVIEW_ONLY / DO NOT MERGE
+
+Candidate: 7ecb2250a488766915e1042a76472b3cd26d9107
+Verdict: ACCEPTANCE_PASS blocker=0 READY_FOR_PM_INTEGRATION (reviewer does not merge)
+
+Fresh independent acceptance of PR #318. This commit is REVIEW_ONLY evidence,
+not engineering, not a merge, not PM Integration, not RC-REFREEZE.
+
+Evidence:
+- Fresh remote ground truth (live main fe9d1b76, candidate 7ecb2250, parent 30022b06, tree 1438a9ea)
+- Historical RED reproduced: fec30bd1 Suite A 4/4
+- Candidate GREEN: Suite A 4/0, Suite B 7/0, W17 14/0 (fresh extraction, hash-verified)
+- Reviewer-owned adversarial probes: 18 probes, 0 failures (direct SQL, reflection, tombstone, record_response, partial-commit, supersession, import alias)
+- No hidden mint writer; sole trust root is attach_late_trusted_return (verified by exhaustive SQL enumeration)
+- Tombstone inert against all bypasses (instantiation, copy/pickle, ContextVar, reload, monkey-patch, subclass)
+- record_response residual bounded, superseded by genuine proof, in_doubt fail-closed
+- Inherited partial-commit: same-proof retry restores availability, conflicting proof refused
+- Supersession via proof comparison (not boolean) - forged before genuine superseded
+- C3 matrix 28 passed (27+1), 17/27 failed on failed candidate (non-vacuous)
+- TIGHTEN_ONLY: 13 historical files genuinely tightened
+- Full Core: 928 passed (230 unit/runtime/habitation + 698 integration) on reviewer env 3.13.14 (formal 3.12.14)
+- C15 side workflow 45/1092 correctly classified as DOWNSTREAM_OPERATOR_COMPATIBILITY_DEBT
+- SHA256SUMS 32 entries, typo in commit message non-blocking
+- Formal CI 12/12 success on push 37166276909, permissions contents:write only for commit comments
+- Candidate immutability: PR #318 head unchanged
+- REVIEW_ONLY branch: arena/review-window23-fresh-ia-01a101e0
+
+This branch must not be merged.
+EOF
+
+          rebuilt="$(
+            GIT_AUTHOR_NAME='Window23 Reviewer' \
+            GIT_AUTHOR_EMAIL='reviewer@arena.ai' \
+            GIT_AUTHOR_DATE='2026-10-04T13:00:07+00:00' \
+            GIT_COMMITTER_NAME='Window23 Reviewer' \
+            GIT_COMMITTER_EMAIL='reviewer@arena.ai' \
+            GIT_COMMITTER_DATE='2026-10-04T13:00:07+00:00' \
+            git commit-tree "$tree" -p "$candidate" < /tmp/window23-review-message.txt
+          )"
+
+          echo "rebuilt_commit=$rebuilt"
+          test "$rebuilt" = "$expected_commit"
+
+          test "$(git rev-parse "$rebuilt^{tree}")" = "$expected_tree"
+          test "$(git rev-parse "$rebuilt^")" = "$candidate"
+
+          if git ls-remote --exit-code origin "refs/heads/$review_branch" >/tmp/existing 2>/dev/null; then
+            existing="$(cut -f1 /tmp/existing)"
+            echo "existing_review_head=$existing"
+            test "$existing" = "$expected_commit"
+          else
+            git push origin "$rebuilt:refs/heads/$review_branch"
+          fi
+
+          remote="$(git ls-remote origin "refs/heads/$review_branch" | cut -f1)"
+          echo "remote_review_head=$remote"
+          test "$remote" = "$expected_commit"
+
+          echo "REVIEW_EVIDENCE_PUBLISHED"
+          echo "ACCEPTANCE_PASS"
+          echo "blocker=0"
+          echo "READY_FOR_PM_INTEGRATION"
+          echo "DO_NOT_MERGE"
