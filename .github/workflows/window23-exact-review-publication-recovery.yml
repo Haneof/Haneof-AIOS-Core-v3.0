@@ -1,0 +1,61 @@
+name: window23-exact-review-publication-recovery
+
+on:
+  push:
+    branches:
+      - publication/window23-review-tree-staging
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish-exact-review-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct exact historical reviewer commit and publish only on exact SHA match
+        env:
+          EXPECTED_SHA: 22aa00cb3793c252512142a1eae33ca8aae9d841
+          EXPECTED_TREE: 28593da131e7026de1de0037a87b6b892a5988ba
+          EXPECTED_PARENT: 7ecb2250a488766915e1042a76472b3cd26d9107
+          REVIEW_BRANCH: arena/review-window23-fresh-ia-01a101e0
+          MSG_B64: ZG9jcyhyZXZpZXcpOiBXaW5kb3cgMjMgRnJlc2ggSW5kZXBlbmRlbnQgQWNjZXB0YW5jZSAtIFJFVklFV19PTkxZIC8gRE8gTk9UIE1FUkdFCgpDYW5kaWRhdGU6IDdlY2IyMjUwYTQ4ODc2NjkxNWUxMDQyYTc2NDcyYjNjZDI2ZDkxMDcKVmVyZGljdDogQUNDRVBUQU5DRV9QQVNTIGJsb2NrZXI9MCBSRUFEWV9GT1JfUE1fSU5URUdSQVRJT04gKHJldmlld2VyIGRvZXMgbm90IG1lcmdlKQoKRnJlc2ggaW5kZXBlbmRlbnQgYWNjZXB0YW5jZSBvZiBQUiAjMzE4LiBUaGlzIGNvbW1pdCBpcyBSRVZJRVdfT05MWSBldmlkZW5jZSwKbm90IGVuZ2luZWVyaW5nLCBub3QgYSBtZXJnZSwgbm90IFBNIEludGVncmF0aW9uLCBub3QgUkMtUkVGUkVFWkUuCgpFdmlkZW5jZToKLSBGcmVzaCByZW1vdGUgZ3JvdW5kIHRydXRoIChsaXZlIG1haW4gZmU5ZDFiNzYsIGNhbmRpZGF0ZSA3ZWNiMjI1MCwgcGFyZW50IDMwMDIyYjA2LCB0cmVlIDE0MzhhOWVhKQotIEhpc3RvcmljYWwgUkVEIHJlcHJvZHVjZWQ6IGZlYzMwYmQxIFN1aXRlIEEgNC80Ci0gQ2FuZGlkYXRlIEdSRUVOOiBTdWl0ZSBBIDQvMCwgU3VpdGUgQiA3LzAsIFcxNyAxNC8wIChmcmVzaCBleHRyYWN0aW9uLCBoYXNoLXZlcmlmaWVkKQotIFJldmlld2VyLW93bmVkIGFkdmVyc2FyaWFsIHByb2JlczogMTggcHJvYmVzLCAwIGZhaWx1cmVzIChkaXJlY3QgU1FMLCByZWZsZWN0aW9uLCB0b21ic3RvbmUsIHJlY29yZF9yZXNwb25zZSwgcGFydGlhbC1jb21taXQsIHN1cGVyc2Vzc2lvbiwgaW1wb3J0IGFsaWFzKQotIE5vIGhpZGRlbiBtaW50IHdyaXRlcjsgc29sZSB0cnVzdCByb290IGlzIGF0dGFjaF9sYXRlX3RydXN0ZWRfcmV0dXJuICh2ZXJpZmllZCBieSBleGhhdXN0aXZlIFNRTCBlbnVtZXJhdGlvbikKLSBUb21ic3RvbmUgaW5lcnQgYWdhaW5zdCBhbGwgYnlwYXNzZXMgKGluc3RhbnRpYXRpb24sIGNvcHkvcGlja2xlLCBDb250ZXh0VmFyLCByZWxvYWQsIG1vbmtleS1wYXRjaCwgc3ViY2xhc3MpCi0gcmVjb3JkX3Jlc3BvbnNlIHJlc2lkdWFsIGJvdW5kZWQsIHN1cGVyc2VkZWQgYnkgZ2VudWluZSBwcm9vZiwgaW5fZG91YnQgZmFpbC1jbG9zZWQKLSBJbmhlcml0ZWQgcGFydGlhbC1jb21taXQ6IHNhbWUtcHJvb2YgcmV0cnkgcmVzdG9yZXMgYXZhaWxhYmlsaXR5LCBjb25mbGljdGluZyBwcm9vZiByZWZ1c2VkCi0gU3VwZXJzZXNzaW9uIHZpYSBwcm9vZiBjb21wYXJpc29uIChub3QgYm9vbGVhbikgLSBmb3JnZWQgYmVmb3JlIGdlbnVpbmUgc3VwZXJzZWRlZAotIEMzIG1hdHJpeCAyOCBwYXNzZWQgKDI3KzEpLCAxNy8yNyBmYWlsZWQgb24gZmFpbGVkIGNhbmRpZGF0ZSAobm9uLXZhY3VvdXMpCi0gVElHSFRFTl9PTkxZOiAxMyBoaXN0b3JpY2FsIGZpbGVzIGdlbnVpbmVseSB0aWdodGVuZWQKLSBGdWxsIENvcmU6IDkyOCBwYXNzZWQgKDIzMCB1bml0L3J1bnRpbWUvaGFiaXRhdGlvbiArIDY5OCBpbnRlZ3JhdGlvbikgb24gcmV2aWV3ZXIgZW52IDMuMTMuMTQgKGZvcm1hbCAzLjEyLjE0KQotIEMxNSBzaWRlIHdvcmtmbG93IDQ1LzEwOTIgY29ycmVjdGx5IGNsYXNzaWZpZWQgYXMgRE9XTlNUUkVBTV9PUEVSQVRPUl9DT01QQVRJQklMSVRZX0RFQlQKLSBTSEEyNTZTVU1TIDMyIGVudHJpZXMsIHR5cG8gaW4gY29tbWl0IG1lc3NhZ2Ugbm9uLWJsb2NraW5nCi0gRm9ybWFsIENJIDEyLzEyIHN1Y2Nlc3Mgb24gcHVzaCAzNzE2NjI3NjkwOSwgcGVybWlzc2lvbnMgY29udGVudHM6d3JpdGUgb25seSBmb3IgY29tbWl0IGNvbW1lbnRzCi0gQ2FuZGlkYXRlIGltbXV0YWJpbGl0eTogUFIgIzMxOCBoZWFkIHVuY2hhbmdlZAotIFJFVklFV19PTkxZIGJyYW5jaDogYXJlbmEvcmV2aWV3LXdpbmRvdzIzLWZyZXNoLWlhLTAxYTEwMWUwCgpUaGlzIGJyYW5jaCBtdXN0IG5vdCBiZSBtZXJnZWQuCg==
+        run: |
+          set -euo pipefail
+          git cat-file -e "$EXPECTED_TREE^{tree}"
+          git cat-file -e "$EXPECTED_PARENT^{commit}"
+          printf '%s' "$MSG_B64" | base64 -d > /tmp/window23-review-message.txt
+
+          export GIT_AUTHOR_NAME='Window23 Reviewer'
+          export GIT_AUTHOR_EMAIL='reviewer@arena.ai'
+          export GIT_AUTHOR_DATE='1791118807 +0000'
+          export GIT_COMMITTER_NAME='Window23 Reviewer'
+          export GIT_COMMITTER_EMAIL='reviewer@arena.ai'
+          export GIT_COMMITTER_DATE='1791118807 +0000'
+
+          actual="$(git commit-tree "$EXPECTED_TREE" -p "$EXPECTED_PARENT" -F /tmp/window23-review-message.txt)"
+          echo "actual=$actual"
+          echo "expected=$EXPECTED_SHA"
+          test "$actual" = "$EXPECTED_SHA"
+
+          test "$(git rev-parse "$actual^{tree}")" = "$EXPECTED_TREE"
+          test "$(git rev-parse "$actual^")" = "$EXPECTED_PARENT"
+
+          remote="$(git ls-remote origin "refs/heads/$REVIEW_BRANCH" | cut -f1)"
+          if [ -n "$remote" ] && [ "$remote" != "$EXPECTED_SHA" ]; then
+            echo "remote review branch exists at unexpected SHA: $remote"
+            exit 23
+          fi
+          if [ "$remote" = "$EXPECTED_SHA" ]; then
+            echo "exact review branch already published"
+            exit 0
+          fi
+
+          git push origin "$EXPECTED_SHA:refs/heads/$REVIEW_BRANCH"
+          observed="$(git ls-remote origin "refs/heads/$REVIEW_BRANCH" | cut -f1)"
+          test "$observed" = "$EXPECTED_SHA"
+          echo "REVIEW_EVIDENCE_PUBLISHED=$observed"
