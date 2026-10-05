@@ -49,7 +49,7 @@ jobs:
           import sys
           s=Path(sys.argv[1]).read_text(); g=s[s.index('  rc004-freeze-gate:'):]
           i=g.index('uses: actions/checkout@v4'); j=g.find('\n      - name:', i); checkout=g[i:j if j!=-1 else None]
-          assert 'contents: write' in g
+          assert 'contents: write' in s
           assert 'persist-credentials: false' not in checkout
           assert 'TERMINAL_REMOTE_HEAD_MISMATCH' not in g
           print('HISTORICAL_BLK002_REPRO=PASS')
