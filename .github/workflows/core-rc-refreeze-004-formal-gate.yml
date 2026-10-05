@@ -3,7 +3,7 @@ name: core-rc-refreeze-004-formal-gate
 on:
   push:
     branches:
-      - "release/core-rc-refreeze-004-corrective-001-window26"
+      - "review/w28-corrective-002-red-control-01a10c51"
   workflow_dispatch:
 
 permissions:
@@ -34,7 +34,7 @@ env:
   FORMAL_PYTHON: "3.12.14"
   FORMAL_PYDANTIC: "2.13.5"
   FORMAL_PYTEST: "8.4.2"
-  CANONICAL_CORRECTIVE_BRANCH: "release/core-rc-refreeze-004-corrective-001-window26"
+  CANONICAL_CORRECTIVE_BRANCH: "review/w28-corrective-002-red-control-01a10c51"
 
 jobs:
   rc004-freeze-gate:
@@ -515,7 +515,7 @@ jobs:
             echo "- formal_gate_job: rc004-freeze-gate"
             echo "- formal_gate_result: $GATE_RESULT"
             echo "- workflow: $GITHUB_WORKFLOW"
-            echo "- canonical_branch: release/core-rc-refreeze-004-corrective-001-window26"
+            echo "- canonical_branch: review/w28-corrective-002-red-control-01a10c51"
             echo "- publication_contract: HTTP_201_REQUIRED"
           } > "$body"
           jq -n --rawfile body "$body" '{body:$body}' > "$RUNNER_TEMP/rc004-mandatory-pin.json"
