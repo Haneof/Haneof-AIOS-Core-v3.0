@@ -8,13 +8,13 @@ This is only a local mocked-shell reproduction. It is not presented as hosted Ac
 
 ## Corrective mechanics
 
-1. **Ref-scoped server cancellation:** every push to the canonical session branch enters the same workflow-level concurrency group with `cancel-in-progress: true`. A newer branch event therefore cancels an in-flight older run.
+1. **Ref-scoped server cancellation request:** every push to the canonical session branch enters the same workflow-level concurrency group with `cancel-in-progress: true`. This requests cancellation of the in-flight older run; the hosted control does not rely on this alone.
 2. **No early authority:** the publisher remains fixed inline logic, with no checkout and no candidate executable. It can publish only a provisional commit comment. The comment is never edited into an authoritative success state.
 3. **Exact whole-run binding:** the read-only seal validates the exact run id, attempt, event SHA, branch, and provisional comment. It performs the canonical ref read only after the run/comment metadata checks, making it the last canonical-branch read in the job.
 4. **Post-read settle plus independent successor exclusion:** only after that final read does the job wait through a settle barrier and query the Actions workflow-run ledger. A newer run number on the canonical branch fails the stale seal even if cancellation has not yet completed. The seal can print `WHOLE_RUN_IDENTITY_SEAL=PASS` only after its own run is still present and no successor is present.
 5. **Live authority predicate:** a pin is never self-authorizing. Acceptance requires the overall run, exact-run seal, no newer workflow run, and the canonical branch still pointing to the exact candidate SHA at the time of acceptance. Any later A→B movement invalidates A's provisional pin even if an old Actions status remains visible.
 
-The hosted control holds run A after its last canonical read, pushes B, and relies on the actual same-ref workflow concurrency. If A is not cancelled promptly, its post-read successor-ledger check fails closed. The B successor must complete its control seal. Raw run/job ids and conclusions are recorded in `HOSTED_POSTREAD_CONTROL.md` after execution.
+The hosted control holds run A after its last canonical read, pushes B, and observes the real same-ref workflow concurrency plus the explicit successor ledger. In the recorded run A remained active through the barrier; the ledger step failed after B's newer run existed, and A's overall conclusion was `cancelled`. Thus the explicit post-read check—not an unsupported assumption that cancellation always wins—prevented a stale success. The B successor completed its control seal. Raw run/job ids and conclusions are recorded in `HOSTED_POSTREAD_CONTROL.md` after execution.
 
 ## Security/carry-forward contract
 

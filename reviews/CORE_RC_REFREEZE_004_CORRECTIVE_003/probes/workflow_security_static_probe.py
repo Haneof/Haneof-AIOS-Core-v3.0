@@ -64,8 +64,9 @@ def main() -> int:
                   "CANONICAL_CORRECTIVE_BRANCH", "PIN_COMMENT_ID"):
         require(token in seal, f"formal_seal_binds_{token.lower()}", results)
 
-    require("FINAL_SEAL_BRANCH_QUERY" in seal and "POST_READ_SETTLE_BARRIER_STARTED" in seal,
-            "formal_last_ref_read_precedes_postread_barrier", results)
+    require("FINAL_SEAL_BRANCH_QUERY" in seal and "POST_READ_SETTLE_BARRIER_STARTED" in seal
+            and "sleep 180" in seal,
+            "formal_last_ref_read_precedes_180s_postread_barrier", results)
     require("actions/workflows/core-rc-refreeze-004-formal-gate.yml/runs" in seal
             and "POST_READ_SUPERSEDED_BY_NEWER_RUN" in seal,
             "formal_seal_checks_successor_run_lineage", results)
