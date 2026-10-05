@@ -1,0 +1,86 @@
+name: w28-carry-forward-controls
+
+on:
+  push:
+    branches:
+      - "control/w28-carry-forward-window28"
+
+permissions:
+  contents: read
+
+jobs:
+  controls:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.14"
+      - name: Install pinned pytest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install "pytest==8.4.2"
+          python -c 'import pytest,sys; print("python="+sys.version.replace("\n"," ")); print("pytest="+pytest.__version__)'
+      - name: Full publisher HTTP status and transport fault matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          probe="reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/publisher_http_contract.sh"
+          for code in 200 201 202 204 301 302 307 400 401 403 404 409 422 429 500 502 503; do
+            set +e
+            bash "$probe" "$code" >"/tmp/publisher-$code.txt" 2>&1
+            rc=$?
+            set -e
+            echo "MATRIX http=$code rc=$rc"
+            if [ "$code" = "201" ]; then
+              test "$rc" -eq 0
+            else
+              test "$rc" -ne 0
+            fi
+          done
+          set +e
+          curl -sS --connect-timeout 1 --max-time 2 "http://127.0.0.1:1/rc004-transport-control" >/tmp/transport.txt 2>&1
+          trc=$?
+          set -e
+          echo "MATRIX transport_rc=$trc"
+          test "$trc" -ne 0
+          grep -q 'PIN_PUBLISH_TRANSPORT_FAILURE' .github/workflows/core-rc-refreeze-004-formal-gate.yml
+          grep -q 'if \[ "$code" != "201" \]; then' .github/workflows/core-rc-refreeze-004-formal-gate.yml
+          if grep -q 'test "$code" = "201" || cat' .github/workflows/core-rc-refreeze-004-formal-gate.yml; then
+            echo "OLD_LAUNDERING_PATTERN_PRESENT"; exit 1
+          fi
+          echo "PUBLISHER_FULL_FAULT_MATRIX=PASS"
+      - name: Actual pytest 8.4.2 usage collection no-tests fail-closed controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          ctrl="/tmp/rc004-pytest-controls"
+          mkdir -p "$ctrl/empty" "$ctrl/collection"
+          cat > "$ctrl/collection/test_collection_error.py" <<'PY'
+          import rc004_module_that_must_not_exist
+          PY
+          set +e
+          python -m pytest --rc004-option-that-does-not-exist "$ctrl/empty" >/tmp/usage.txt 2>&1
+          usage_rc=$?
+          python -m pytest -o addopts='' -q "$ctrl/collection" --junitxml=/tmp/collection.xml >/tmp/collection.txt 2>&1
+          collection_rc=$?
+          python -m pytest -o addopts='' -q "$ctrl/empty" --junitxml=/tmp/no-tests.xml >/tmp/no-tests.txt 2>&1
+          no_tests_rc=$?
+          set -e
+          echo "ACTUAL usage_rc=$usage_rc"
+          echo "ACTUAL collection_rc=$collection_rc"
+          echo "ACTUAL no_tests_rc=$no_tests_rc"
+          test "$usage_rc" -eq 4
+          test "$collection_rc" -eq 2
+          test "$no_tests_rc" -eq 5
+          for rc in "$usage_rc" "$collection_rc" "$no_tests_rc"; do
+            case "$rc" in 0|1) echo "FALSE_GREEN rc=$rc"; exit 1;; *) :;; esac
+          done
+          echo "ACTUAL_PYTEST_NONTEST_FAIL_CLOSED=PASS"
