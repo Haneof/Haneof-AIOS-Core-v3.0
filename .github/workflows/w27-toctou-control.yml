@@ -37,3 +37,5 @@ jobs:
         run: |
           echo "PUBLISHER_RAN_FOR_OLD_EVENT_SHA=$GITHUB_SHA"
           echo "gate_result=${{ needs.gate.result }}"
+
+# W28 RED advance B after old terminal equality passed
