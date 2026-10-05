@@ -1,6 +1,6 @@
 # Corrective-003 carry-forward gate inventory
 
-This inventory documents the *formal workflow's fresh rerun*, not a claim that the gates have passed. The final exact-head hosted run and its artifact must be recorded in the PR after all evidence is committed.
+This inventory documents the *formal workflow's fresh rerun*. A pre-final hosted run (#41, SHA `f2d4918ae00ea37b1841f3ae91e87cc7b04f313f`) passed every Job A step and the whole-run seal; its API identities and limitation are in `PREFINAL_HOSTED_FRESH_GATES.md`. That result is not final-head evidence or Fresh Independent Acceptance. The final exact-head hosted run and its artifact must be recorded in the PR after all evidence is committed.
 
 | Required gate | Formal workflow step / evidence output |
 |---|---|

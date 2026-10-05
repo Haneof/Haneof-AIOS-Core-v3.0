@@ -1,0 +1,4 @@
+# Remote refs observed after pre-final fresh gate at 2026-10-05T15:42:28Z
+f2d4918ae00ea37b1841f3ae91e87cc7b04f313f	refs/heads/arena/01a10c8c-haneof-aios-core-v3-0
+5927d7917112819c53593149ee8fab1eebdcfda6	refs/heads/main
+5a5d384f16798bfff46ffe03f87310b0eafb2321	refs/heads/release/core-rc-refreeze-004-corrective-002-window28
