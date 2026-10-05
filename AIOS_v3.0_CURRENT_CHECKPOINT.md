@@ -1,5 +1,17 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-10-05 — WINDOW 27 FAIL / WINDOW 28 RC gate Corrective-002 READY
+
+- Canonical failed candidate #330 remains exact `2380121639865b1bd29176cf944f5a20afe4112d`, unmerged.
+- Window 27 canonical evidence = PR #333 REVIEW_ONLY; PR #332 is corroborating REVIEW_ONLY.
+- PM binding blocker = `IA27-BLK-002`: stale formal run can remain SUCCESS after canonical branch drifts in the post-terminal inter-job window.
+- Real GitHub control run `37262331480` confirms gate SUCCESS + publisher SUCCESS + overall SUCCESS after branch advance.
+- Synthetic JUnit fuzz gaps are non-binding hardening observations because no actual pytest 8.4.2 formal-path false-green was reproduced.
+- Frozen software remains `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`.
+- Unique next task = `WINDOW 28 — CORE-RC-REFREEZE-004-CORRECTIVE-002`.
+- No PM integration, C15 repair, Resident, evaluator or public release.
+
+
 ## 2026-10-05 — WINDOW 27 Fresh Independent Acceptance READY
 
 - Candidate = PR #330 @ `2380121639865b1bd29176cf944f5a20afe4112d`.
