@@ -1,0 +1,290 @@
+name: w27-rc004-corrective-001-independent-acceptance
+
+on:
+  push:
+    branches:
+      - "review/core-rc-refreeze-004-c001-ia-window27"
+
+permissions:
+  contents: read
+  pull-requests: read
+
+env:
+  CANDIDATE_SHA: "2380121639865b1bd29176cf944f5a20afe4112d"
+  FAILED_SHA: "70134269ddfc7c80c4a703a933253bd099746504"
+  W25_REVIEW: "ffa6475fe4dde4b5d06b09a629b059b89f1ff434"
+  FROZEN_SHA: "1cee3c5ad12f4b9098232bae11b51df786c5eb2f"
+  FROZEN_ROOT_TREE: "70b2711258567863ea0d93025a6a07e39631726a"
+  FROZEN_CORE_TREE: "16f1487e291b009c55bee402abfd79fdacbae960"
+  FROZEN_TESTS_TREE: "9db1bfa08143bc99fe03836e2752ee6e05694eb6"
+  FROZEN_WORKFLOWS_TREE: "72cde9d2dc2b35d071bfa36c954dac2faff4a803"
+  FROZEN_PYPROJECT_BLOB: "b38833c7537fa60d5c2f02ed4bb19158d8995a11"
+  CANDIDATE_BRANCH: "release/core-rc-refreeze-004-corrective-001-window26"
+  REVIEW_DIR: "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_WINDOW_27"
+  FORMAL_PYTHON: "3.12.14"
+  FORMAL_PYDANTIC: "2.13.5"
+  FORMAL_PYTEST: "8.4.2"
+
+jobs:
+  independent-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout reviewer evidence branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Select formal Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "${{ env.FORMAL_PYTHON }}"
+
+      - name: Fresh identity scope and historical RED
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/w27"
+          mkdir -p "$OUT"
+          git fetch --all --prune
+          git merge-base --is-ancestor "$CANDIDATE_SHA" HEAD
+          remote_candidate="$(git ls-remote origin "refs/heads/$CANDIDATE_BRANCH" | awk '{print $1}')"
+          test "$remote_candidate" = "$CANDIDATE_SHA"
+          test "$(git rev-parse "$CANDIDATE_SHA^{tree}")" = "72d3cd0da849fae3b1cbfdfb7ae995528e1cfd71"
+          test "$(git rev-parse "$CANDIDATE_SHA^")" = "04c37f7dd8ba6f20e1c67dad43c0f21087f51eeb"
+          git rev-list --left-right --count "$FAILED_SHA...$CANDIDATE_SHA" | tee "$OUT/construction.txt"
+          git diff --name-status "$FAILED_SHA" "$CANDIDATE_SHA" | tee "$OUT/corrective-delta.txt"
+
+          target="$RUNNER_TEMP/frozen"
+          git worktree add --detach "$target" "$FROZEN_SHA"
+          {
+            echo "head=$(git -C "$target" rev-parse HEAD)"
+            echo "root=$(git -C "$target" rev-parse HEAD^{tree})"
+            echo "core=$(git -C "$target" rev-parse HEAD:src/aios_core)"
+            echo "tests=$(git -C "$target" rev-parse HEAD:tests)"
+            echo "workflows=$(git -C "$target" rev-parse HEAD:.github/workflows)"
+            echo "pyproject=$(git -C "$target" rev-parse HEAD:pyproject.toml)"
+          } | tee "$OUT/frozen-identity.txt"
+          test "$(git -C "$target" rev-parse HEAD^{tree})" = "$FROZEN_ROOT_TREE"
+          test "$(git -C "$target" rev-parse HEAD:src/aios_core)" = "$FROZEN_CORE_TREE"
+          test "$(git -C "$target" rev-parse HEAD:tests)" = "$FROZEN_TESTS_TREE"
+          test "$(git -C "$target" rev-parse HEAD:.github/workflows)" = "$FROZEN_WORKFLOWS_TREE"
+          test "$(git -C "$target" rev-parse HEAD:pyproject.toml)" = "$FROZEN_PYPROJECT_BLOB"
+
+          git fetch --no-tags --force origin "+refs/heads/main:refs/remotes/w27/main"
+          live_main="$(git rev-parse refs/remotes/w27/main)"
+          git diff --name-status "$FROZEN_SHA" "$live_main" | tee "$OUT/protected-drift.txt"
+          if git diff --name-only "$FROZEN_SHA" "$live_main" | grep -Eq '^(src/|tests/|pyproject\.toml$|setup\.|setup\.cfg$|MANIFEST\.in$|requirements|\.github/workflows/)'; then
+            echo "PROTECTED_DRIFT_FOUND" | tee -a "$OUT/protected-drift.txt"
+          else
+            echo "PROTECTED_DRIFT_NONE" | tee -a "$OUT/protected-drift.txt"
+          fi
+
+          probe="$RUNNER_TEMP/workflow_false_green_probe.py"
+          git show "$W25_REVIEW:reviews/CORE_RC_REFREEZE_004_INDEPENDENT_ACCEPTANCE_WINDOW_25/workflow_false_green_probe.py" > "$probe"
+          git hash-object "$probe" | tee "$OUT/w25-probe-blob.txt"
+          sha256sum "$probe" | tee "$OUT/w25-probe-sha256.txt"
+          test "$(git hash-object "$probe")" = "c8a9050819440cc10605b08c943d29827f2b76c5"
+          test "$(sha256sum "$probe" | awk '{print $1}')" = "fc7df49fdc80b340d2ddc065ad87c01c81987bef78f13fd6494ab035613796a9"
+          python "$probe" > "$OUT/historical-red-blk001.txt" 2>&1
+
+          git show "$FAILED_SHA:.github/workflows/core-rc-refreeze-004-formal-gate.yml" > "$OUT/failed-workflow.yml"
+          {
+            grep -n "contents: write" "$OUT/failed-workflow.yml" || true
+            grep -n "persist-credentials" "$OUT/failed-workflow.yml" || true
+            grep -n "git ls-remote" "$OUT/failed-workflow.yml" || true
+            grep -n 'set -uo pipefail' "$OUT/failed-workflow.yml" || true
+            grep -n 'test "$code" = "201" || cat' "$OUT/failed-workflow.yml" || true
+          } > "$OUT/historical-red-blk002-003.txt"
+
+          echo "W27_OUT=$OUT" >> "$GITHUB_ENV"
+          echo "W27_TARGET=$target" >> "$GITHUB_ENV"
+          echo "W27_LIVE_MAIN=$live_main" >> "$GITHUB_ENV"
+
+      - name: Create fresh reviewer environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          VENV="$RUNNER_TEMP/w27-venv"
+          python -m venv "$VENV"
+          "$VENV/bin/python" -m pip install --upgrade pip
+          "$VENV/bin/python" -m pip install -e "$W27_TARGET" "pydantic==$FORMAL_PYDANTIC" "pytest==$FORMAL_PYTEST"
+          "$VENV/bin/python" -VV | tee "$W27_OUT/environment.txt"
+          "$VENV/bin/python" -c 'import aios_core,pydantic,pytest,platform,sqlite3,ssl; print("pydantic",pydantic.__version__); print("pytest",pytest.__version__); print("platform",platform.platform()); print("sqlite",sqlite3.sqlite_version); print("openssl",ssl.OPENSSL_VERSION); print("aios_core.__file__",aios_core.__file__)' | tee -a "$W27_OUT/environment.txt"
+          echo "W27_VENV=$VENV" >> "$GITHUB_ENV"
+
+      - name: Reviewer-owned JUnit fuzz
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$W27_VENV/bin/python" "$REVIEW_DIR/reviewer_junit_fuzz.py"             "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/c15_junit_classifier.py"             2>&1 | tee "$W27_OUT/junit-fuzz.txt"
+
+      - name: Real pytest JUnit semantics
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$W27_VENV/bin/python" "$REVIEW_DIR/reviewer_pytest_junit_semantics.py"             "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/c15_junit_classifier.py"             "$W27_VENV/bin/python" 2>&1 | tee "$W27_OUT/pytest-junit-semantics.txt"
+
+      - name: Reviewer-owned terminal TOCTOU reproduction
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$W27_VENV/bin/python" "$REVIEW_DIR/reviewer_toctou_probe.py"             ".github/workflows/core-rc-refreeze-004-formal-gate.yml"             2>&1 | tee "$W27_OUT/toctou.txt"
+
+      - name: Reviewer-owned publisher fault matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$W27_VENV/bin/python" "$REVIEW_DIR/reviewer_publisher_fault_probe.py"             ".github/workflows/core-rc-refreeze-004-formal-gate.yml"             2>&1 | tee "$W27_OUT/publisher-faults.txt"
+
+      - name: Job-A-equivalent credential surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "local_config"; git config --local --list --show-origin || true
+            echo "global_config"; git config --global --list --show-origin || true
+            echo "system_config"; git config --system --list --show-origin || true
+            echo "credential_helpers"
+            git config --local --get-all credential.helper || true
+            git config --global --get-all credential.helper || true
+            git config --system --get-all credential.helper || true
+            echo "token_named_env_without_values"
+            env | cut -d= -f1 | grep -E '(^|_)(GH_TOKEN|GITHUB_TOKEN|TOKEN|AUTH)($|_)' | sort || true
+          } | tee "$W27_OUT/credential-surface.txt"
+          if git config --local --get-regexp '^http\..*\.extraheader$' >>"$W27_OUT/credential-surface.txt" 2>&1; then
+            echo "LOCAL_EXTRAHEADER_PRESENT" | tee -a "$W27_OUT/credential-surface.txt"
+          else
+            echo "LOCAL_EXTRAHEADER_NONE" | tee -a "$W27_OUT/credential-surface.txt"
+          fi
+
+      - name: Real read-token write denial on reviewer commit
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          payload="$RUNNER_TEMP/read-token-write.json"
+          printf '%s\n' '{"body":"W27 disposable read-token authority probe; unexpected success means permission isolation failure."}' > "$payload"
+          set +e
+          code="$(curl -sS -o "$RUNNER_TEMP/read-token-write-response.json" -w '%{http_code}' -X POST             -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json"             -H "X-GitHub-Api-Version: 2022-11-28"             "https://api.github.com/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments"             --data @"$payload")"
+          rc=$?
+          set -e
+          echo "curl_rc=$rc http=$code" | tee "$W27_OUT/read-token-write-denial.txt"
+          cat "$RUNNER_TEMP/read-token-write-response.json" >> "$W27_OUT/read-token-write-denial.txt" || true
+          test "$rc" -eq 0
+          test "$code" != "201"
+
+      - name: Fresh full Core regression
+        shell: bash
+        run: |
+          set +e
+          cd "$W27_TARGET"
+          "$W27_VENV/bin/python" -m pytest -o addopts='' -q --tb=no             tests/unit tests/integration tests/runtime tests/habitation             --junitxml="$W27_OUT/core-junit.xml" 2>&1 | tee "$W27_OUT/core.txt"
+          rc=${PIPESTATUS[0]}
+          set -e
+          echo "pytest_exit=$rc" | tee "$W27_OUT/core-exit.txt"
+
+      - name: Fresh canonical frozen reviewer probes
+        shell: bash
+        run: |
+          set +e
+          cd "$GITHUB_WORKSPACE"
+          W20=220311759e88fb3948ad3f4dba655058e0f392a8
+          W17=e4161dd0ad0a2f825461311a1c8c5ff8234a07f8
+          mkdir -p "$RUNNER_TEMP/w27-probes"
+          git show "$W20:reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_002_IA_WINDOW_20/reviewer_probes/window20_independent_attack.py" > "$RUNNER_TEMP/w27-probes/a.py"
+          git show "$W20:reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_002_IA_WINDOW_20/reviewer_probes/window20_migration_rsa_attack.py" > "$RUNNER_TEMP/w27-probes/b.py"
+          git show "$W17:reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_001_IA_WINDOW_17/reviewer_probes/window17_independent_attack.py" > "$RUNNER_TEMP/w27-probes/w17.py"
+          {
+            sha256sum "$RUNNER_TEMP/w27-probes/a.py"
+            sha256sum "$RUNNER_TEMP/w27-probes/b.py"
+            sha256sum "$RUNNER_TEMP/w27-probes/w17.py"
+          } | tee "$W27_OUT/frozen-probe-hashes.txt"
+          cd "$W27_TARGET"
+          PYTHONPATH="$W27_TARGET/src" "$W27_VENV/bin/python" "$RUNNER_TEMP/w27-probes/a.py" >"$W27_OUT/suite-a.txt" 2>&1
+          echo "suite_a_rc=$?" >>"$W27_OUT/frozen-probe-exits.txt"
+          PYTHONPATH="$W27_TARGET/src" "$W27_VENV/bin/python" "$RUNNER_TEMP/w27-probes/b.py" >"$W27_OUT/suite-b.txt" 2>&1
+          echo "suite_b_rc=$?" >>"$W27_OUT/frozen-probe-exits.txt"
+          PYTHONPATH="$W27_TARGET/src" "$W27_VENV/bin/python" "$RUNNER_TEMP/w27-probes/w17.py" >"$W27_OUT/w17.txt" 2>&1
+          echo "w17_rc=$?" >>"$W27_OUT/frozen-probe-exits.txt"
+          set -e
+
+      - name: Fresh Corrective-003 security and real process-loss
+        shell: bash
+        run: |
+          set +e
+          cd "$W27_TARGET"
+          "$W27_VENV/bin/python" -m pytest -o addopts='' -q --tb=short             tests/runtime/test_background_late_return_route_b.py             tests/runtime/test_late_return_canonical_encoding_002.py             tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py             tests/integration/test_core_background_late_trusted_return_corrective_002.py             tests/integration/test_core_background_late_trusted_return_corrective_001.py             tests/integration/test_core_background_late_trusted_return_consumption_001.py             tests/integration/test_core_background_late_trusted_return_secret_upgrade_001.py             tests/integration/test_core_background_response_recovery_001_corrective_002_recovery.py             tests/integration/test_core_background_response_recovery_001_corrective_001.py             tests/integration/test_core_background_trusted_return_recovery_001.py             tests/integration/test_core_background_trusted_return_adversarial_001.py             tests/integration/test_core_background_trusted_return_r5_001.py             tests/integration/test_core_background_trusted_return_r5_conflicts_001.py             2>&1 | tee "$W27_OUT/security.txt"
+          echo "security_rc=${PIPESTATUS[0]}" > "$W27_OUT/security-exit.txt"
+          "$W27_VENV/bin/python" -m pytest -o addopts='' -q --tb=short             tests/integration/test_core_background_trusted_return_corrective_001_process_loss.py             "tests/integration/test_core_background_late_trusted_return_corrective_002.py::test_ca2_004_real_sigkill_leaves_no_live_authority_in_the_fresh_process"             "tests/integration/test_core_background_response_recovery_001_corrective_002_recovery.py::test_actual_sigkill_after_receipt_commit_recovers_without_provider_redispatch"             tests/integration/test_core_background_late_trusted_return_sigkill_001.py             "tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_process_sigkill_after_exact_response_staged_recovers_with_zero_provider_calls"             2>&1 | tee "$W27_OUT/process-loss.txt"
+          echo "process_loss_rc=${PIPESTATUS[0]}" > "$W27_OUT/process-loss-exit.txt"
+          set -e
+
+      - name: Fresh clean non-editable wheel and headless
+        shell: bash
+        run: |
+          set +e
+          WHEEL_DIR="$RUNNER_TEMP/w27-wheel"
+          CLEAN="$RUNNER_TEMP/w27-clean"
+          mkdir -p "$WHEEL_DIR"
+          "$W27_VENV/bin/python" -m pip wheel --no-deps "$W27_TARGET" -w "$WHEEL_DIR" >"$W27_OUT/wheel-build.txt" 2>&1
+          wheel="$(find "$WHEEL_DIR" -name 'aios_core-*.whl' -print -quit)"
+          python -m venv "$CLEAN"
+          "$CLEAN/bin/python" -m pip install --upgrade pip >"$W27_OUT/clean-install.txt" 2>&1
+          "$CLEAN/bin/python" -m pip install "pydantic==$FORMAL_PYDANTIC" "$wheel" >>"$W27_OUT/clean-install.txt" 2>&1
+          "$CLEAN/bin/python" "$W27_TARGET/reviews/CORE_RC_REFREEZE_003/probes/clean_install_headless_smoke.py" "$CLEAN/bin/aios-core-headless" >"$W27_OUT/headless.txt" 2>&1
+          echo "headless_rc=$?" >>"$W27_OUT/headless.txt"
+          set -e
+
+      - name: Fresh backup restore and writer restart FIX current-time SCALE
+        shell: bash
+        run: |
+          set +e
+          cd "$W27_TARGET"
+          PYTHONPATH="$W27_TARGET/src" AIOS_RC_TARGET_ROOT="$W27_TARGET"             "$W27_VENV/bin/python" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004/probes/backup_restore_route_b.py"             >"$W27_OUT/backup-restore.txt" 2>&1
+          echo "backup_restore_rc=$?" >>"$W27_OUT/backup-restore.txt"
+          "$W27_VENV/bin/python" -m pytest -o addopts='' -q --tb=short             tests/integration/test_core_headless.py             tests/integration/test_core_recovery.py             tests/integration/test_core_gap_fix_002_background_attempts.py             tests/runtime/test_turn_execution_recovery.py             "tests/integration/test_v3_fused_turn_runtime.py::test_cg001_current_time_control_keeps_current_fact_visible"             tests/integration/test_core_scale_semantics.py             >"$W27_OUT/writer-restart-fix-scale.txt" 2>&1
+          echo "writer_restart_fix_scale_rc=$?" >>"$W27_OUT/writer-restart-fix-scale.txt"
+          set -e
+
+      - name: Fresh real C15 downstream run and independent JUnit audit
+        shell: bash
+        run: |
+          set +e
+          cd "$W27_TARGET"
+          junit="$W27_OUT/c15-real.xml"
+          "$W27_VENV/bin/python" -m pytest -o addopts='' -q --tb=no tests/c15_persistence --junitxml="$junit"             2>&1 | tee "$W27_OUT/c15-real.txt"
+          rc=${PIPESTATUS[0]}
+          set -e
+          echo "$rc" > "$W27_OUT/c15-real-exit.txt"
+          cd "$GITHUB_WORKSPACE"
+          "$W27_VENV/bin/python" "$REVIEW_DIR/reviewer_c15_real_junit_audit.py" "$junit" "$rc"             2>&1 | tee "$W27_OUT/c15-real-audit.txt"
+
+      - name: Final candidate drift recheck
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_candidate="$(git ls-remote origin "refs/heads/$CANDIDATE_BRANCH" | awk '{print $1}')"
+          echo "remote_candidate=$remote_candidate expected=$CANDIDATE_SHA" | tee "$W27_OUT/final-candidate-drift.txt"
+          test "$remote_candidate" = "$CANDIDATE_SHA"
+
+      - name: Evidence hashes
+        if: always()
+        shell: bash
+        run: |
+          set -uo pipefail
+          find "${W27_OUT:-$RUNNER_TEMP/w27}" -maxdepth 1 -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > "${W27_OUT:-$RUNNER_TEMP/w27}/SHA256SUMS" || true
+          cat "${W27_OUT:-$RUNNER_TEMP/w27}/SHA256SUMS" || true
+
+      - name: Upload Window 27 raw evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: window27-independent-acceptance-raw
+          path: "${{ runner.temp }}/w27/**"
+          if-no-files-found: error
