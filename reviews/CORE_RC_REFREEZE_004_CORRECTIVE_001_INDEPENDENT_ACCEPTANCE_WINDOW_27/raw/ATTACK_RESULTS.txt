@@ -1,0 +1,84 @@
+WINDOW 27 REVIEWER-OWNED ATTACK OUTPUTS
+Task: CORE-RC-REFREEZE-004-CORRECTIVE-001-INDEPENDENT-ACCEPTANCE
+Candidate: 2380121639865b1bd29176cf944f5a20afe4112d
+Reviewer workflow run: 37261988648
+Reviewer raw artifact: 11325401978
+Reviewer raw artifact digest: sha256:1b692973006a61e39fb760ebdee8319d39376f8ce31b5f4a34ad09337b523d22
+
+== Historical RED ==
+canonical Window25 probe git blob=c8a9050819440cc10605b08c943d29827f2b76c5
+canonical Window25 probe sha256=fc7df49fdc80b340d2ddc065ad87c01c81987bef78f13fd6494ab035613796a9
+pytest_exit=4
+failed_count=0
+non_downstream_failures=
+CORE_FREEZE_NOT_BLOCKED_BY_DOWNSTREAM_OPERATOR_DEBT
+C15_OPERATOR_ADAPTATION_REQUIRED_BEFORE_RESIDENT
+REPRO_RESULT=CANDIDATE_CLASSIFIER_EXITED_ZERO_AFTER_PYTEST_EXIT_4
+
+== JUnit fuzz ==
+REVIEWER_JUNIT_FUZZ total=31 mismatches=6
+MISMATCH namespace_rc0_hidden_failure expected_accept False actual_accept True
+MISMATCH nested_summary_conflict expected_accept False actual_accept True
+MISMATCH failing_case_summary_zero expected_accept False actual_accept True
+MISMATCH same_case_failure_and_error expected_accept False actual_accept True
+MISMATCH dotdot_traversal expected_accept False actual_accept True
+MISMATCH file_classname_conflict expected_accept False actual_accept True
+
+These six are synthetic/internal-consistency hardening gaps. The canonical workflow uses stock pytest 8.4.2 JUnit; fresh real-pytest probes below did not reproduce them as a false-green formal state.
+
+== Real pytest 8.4.2 semantics ==
+ordinary downstream failure + downstream setup error:
+pytest_exit=1
+candidate_classifier_exit=0
+structured_failed_error_testcases=2
+both mapped under tests/c15_persistence/**
+
+collection error:
+pytest_exit=2
+candidate_classifier_exit=2
+C15_PYTEST_EXIT_NOT_ADMISSIBLE rc=2
+
+no tests:
+pytest_exit=5
+candidate_classifier_exit=2
+C15_PYTEST_EXIT_NOT_ADMISSIBLE rc=5
+
+usage error:
+pytest_exit=4
+junit_exists=false
+candidate_classifier_exit=2
+C15_PYTEST_EXIT_NOT_ADMISSIBLE rc=4
+
+== TOCTOU source-level reproduction ==
+STATIC {"publisher_condition_only_gate_success": true, "publisher_has_no_remote_head_recheck": true, "publisher_needs_gate": true, "terminal_before_upload": true, "upload_before_publisher": true}
+REPRO {"branch_drift_after_terminal": true, "job_a_result": "success", "old_run_can_remain_success": true, "publisher_http": "201", "publisher_success_without_recheck": true, "terminal_check_passed": true}
+TOCTOU_FALSE_GREEN_REPRODUCED
+
+== Real GitHub Actions TOCTOU control ==
+control branch: review/w27-toctou-control
+old event SHA: 4fb32d9b94a79e342af770050d71a45a24677008
+advanced branch SHA: e4fd46c04c8ad982fa1fa274546dbf0d099343c5
+old run: 37262331480
+old run conclusion: success
+gate conclusion: success
+publisher conclusion: success
+terminal output:
+event_sha=4fb32d9b94a79e342af770050d71a45a24677008 remote_at_terminal=4fb32d9b94a79e342af770050d71a45a24677008
+publisher output after branch advance:
+PUBLISHER_RAN_FOR_OLD_EVENT_SHA=4fb32d9b94a79e342af770050d71a45a24677008
+gate_result=success
+
+== Publisher HTTP / transport matrix ==
+HTTP 201 -> shell exit 0
+HTTP 200/202/204/301/302/400/401/403/404/409/422/429/500/empty/invalid -> nonzero
+curl transport rc 1/6/7/28 -> nonzero
+publisher exact source: no checkout; no repository helper/script; no python; POST endpoint is exact commit comment; no refs/contents/release/dispatch endpoint.
+publisher exact source also has no canonical remote-head recheck.
+
+== Job-A read token isolation ==
+local extraheader: NONE
+credential helper: NONE
+token-named ambient env: NONE
+real POST commit-comment attempt using step-local GITHUB_TOKEN under contents:read:
+curl_rc=0 http=403
+message=Resource not accessible by integration
