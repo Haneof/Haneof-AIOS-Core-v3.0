@@ -1,0 +1,52 @@
+name: w28-toctou-red-control
+
+on:
+  push:
+    branches:
+      - "control/w28-toctou-red-window28"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: w28-toctou-red-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Terminal remote-head equality
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote="$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')"
+          echo "RED_EVENT_SHA=$GITHUB_SHA"
+          echo "RED_REMOTE_AT_TERMINAL=$remote"
+          test "$remote" = "$GITHUB_SHA"
+          echo "RED_TERMINAL_EQUALITY_PASSED=YES"
+      - name: Post-terminal hold
+        shell: bash
+        run: |
+          echo "RED_POST_TERMINAL_HOLD_STARTED=$GITHUB_SHA"
+          sleep 90
+          echo "RED_POST_TERMINAL_HOLD_FINISHED=$GITHUB_SHA"
+
+  publisher:
+    needs: gate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Legacy publisher can still succeed
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "RED_PUBLISHER_OLD_EVENT_SHA=$GITHUB_SHA"
+          echo "RED_PUBLISHER_RESULT=SUCCESS"
