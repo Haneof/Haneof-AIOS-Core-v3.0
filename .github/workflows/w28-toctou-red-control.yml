@@ -50,3 +50,5 @@ jobs:
           set -euo pipefail
           echo "RED_PUBLISHER_OLD_EVENT_SHA=$GITHUB_SHA"
           echo "RED_PUBLISHER_RESULT=SUCCESS"
+
+# RED branch advance B after A terminal equality
