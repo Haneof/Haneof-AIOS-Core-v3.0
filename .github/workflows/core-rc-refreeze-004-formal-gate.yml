@@ -3,7 +3,7 @@ name: core-rc-refreeze-004-formal-gate
 on:
   push:
     branches:
-      - "release/core-rc-refreeze-004-corrective-001-window26"
+      - "release/core-rc-refreeze-004-corrective-002-window28"
   workflow_dispatch:
 
 permissions:
@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: core-rc-refreeze-004-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 env:
   FROZEN_SHA: "1cee3c5ad12f4b9098232bae11b51df786c5eb2f"
@@ -34,7 +34,7 @@ env:
   FORMAL_PYTHON: "3.12.14"
   FORMAL_PYDANTIC: "2.13.5"
   FORMAL_PYTEST: "8.4.2"
-  CANONICAL_CORRECTIVE_BRANCH: "release/core-rc-refreeze-004-corrective-001-window26"
+  CANONICAL_CORRECTIVE_BRANCH: "release/core-rc-refreeze-004-corrective-002-window28"
 
 jobs:
   rc004-freeze-gate:
@@ -60,7 +60,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          OUT="$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/ci-output"
+          OUT="$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/ci-output"
           mkdir -p "$OUT"
           test "$GITHUB_REF_NAME" = "$CANONICAL_CORRECTIVE_BRANCH" || { echo "NON_CANONICAL_CORRECTIVE_REF $GITHUB_REF_NAME"; exit 1; }
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
@@ -96,7 +96,7 @@ jobs:
 
           base="$(git merge-base refs/remotes/rc004/main HEAD)"
           git diff --name-status "$base" HEAD | tee "$OUT/candidate-scope.txt"
-          if git diff --name-only "$base" HEAD | grep -Ev '^((\.github/workflows/core-rc-refreeze-004-formal-gate\.yml)|(release/rc/CORE_RC_REFREEZE_004[^/]*)|(reviews/CORE_RC_REFREEZE_004/.*)|(reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/.*))$' | grep -q .; then
+          if git diff --name-only "$base" HEAD | grep -Ev '^((\.github/workflows/core-rc-refreeze-004-formal-gate\.yml)|(release/rc/CORE_RC_REFREEZE_004[^/]*)|(reviews/CORE_RC_REFREEZE_004/.*)|(reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/.*)|(reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/.*))$' | grep -q .; then
             echo "RC004_CANDIDATE_SCOPE_VIOLATION"; exit 1
           fi
 
@@ -416,7 +416,7 @@ jobs:
         shell: bash
         run: |
           set -uo pipefail
-          OUT="${RC004_OUT:-$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/ci-output}"
+          OUT="${RC004_OUT:-$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/ci-output}"
           mkdir -p "$OUT"
           if [ -n "${RC004_TARGET:-}" ] && [ -d "$RC004_TARGET/.git" -o -e "$RC004_TARGET/.git" ]; then
             python - "$RC004_TARGET" "$OUT/source_manifest_runtime.json" <<'PY'
@@ -482,8 +482,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: core-rc-refreeze-004-corrective-001-evidence
-          path: reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/ci-output/**
+          name: core-rc-refreeze-004-corrective-002-evidence
+          path: reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/ci-output/**
           if-no-files-found: warn
 
 
@@ -494,8 +494,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      pin_comment_id: ${{ steps.publish.outputs.comment_id }}
     steps:
-      - name: Publish mandatory exact candidate pin
+      - name: Publish provisional exact candidate pin with pre/post identity checks
+        id: publish
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -503,11 +506,25 @@ jobs:
         run: |
           set -euo pipefail
           test "$GATE_RESULT" = "success"
+          api="https://api.github.com/repos/${GITHUB_REPOSITORY}"
+          headers=(-H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
+
+          pre="$RUNNER_TEMP/rc004-pre-publish-branch.json"
+          set +e
+          pre_code="$(curl -sS -o "$pre" -w '%{http_code}' "${headers[@]}" "$api/git/ref/heads/$CANONICAL_CORRECTIVE_BRANCH")"
+          pre_rc=$?
+          set -e
+          test "$pre_rc" -eq 0 || { echo "PRE_PUBLISH_BRANCH_QUERY_TRANSPORT_FAILURE rc=$pre_rc"; exit 1; }
+          test "$pre_code" = "200" || { echo "PRE_PUBLISH_BRANCH_QUERY_HTTP_$pre_code"; cat "$pre"; exit 1; }
+          pre_head="$(jq -r '.object.sha // empty' "$pre")"
+          test "$pre_head" = "$GITHUB_SHA" || { echo "PRE_PUBLISH_REMOTE_HEAD_MISMATCH remote=$pre_head event=$GITHUB_SHA"; exit 1; }
+          echo "PRE_PUBLISH_REMOTE_HEAD_MATCH=$pre_head"
+
           body="$RUNNER_TEMP/rc004-mandatory-pin.md"
           {
-            echo "## CORE-RC-REFREEZE-004-CORRECTIVE-001 mandatory exact pin"
+            echo "## CORE-RC-REFREEZE-004-CORRECTIVE-002 provisional exact pin"
             echo
-            echo "- task: CORE-RC-REFREEZE-004-CORRECTIVE-001"
+            echo "- task: CORE-RC-REFREEZE-004-CORRECTIVE-002"
             echo "- run_id: $GITHUB_RUN_ID"
             echo "- run_attempt: $GITHUB_RUN_ATTEMPT"
             echo "- exact_candidate_sha: $GITHUB_SHA"
@@ -515,14 +532,146 @@ jobs:
             echo "- formal_gate_job: rc004-freeze-gate"
             echo "- formal_gate_result: $GATE_RESULT"
             echo "- workflow: $GITHUB_WORKFLOW"
-            echo "- canonical_branch: release/core-rc-refreeze-004-corrective-001-window26"
+            echo "- canonical_branch: $CANONICAL_CORRECTIVE_BRANCH"
             echo "- publication_contract: HTTP_201_REQUIRED"
+            echo "- publication_state: PROVISIONAL_PENDING_FINAL_IDENTITY_SEAL"
+            echo "- authoritative_success_contract: overall_run_SUCCESS + rc004-whole-run-identity-seal_SUCCESS + canonical_branch_equals_exact_candidate_sha"
           } > "$body"
           jq -n --rawfile body "$body" '{body:$body}' > "$RUNNER_TEMP/rc004-mandatory-pin.json"
-          code="$(curl -sS -o "$RUNNER_TEMP/rc004-mandatory-pin-response.json" -w '%{http_code}' -X POST             -H "Authorization: Bearer $GH_TOKEN"             -H "Accept: application/vnd.github+json"             -H "X-GitHub-Api-Version: 2022-11-28"             "https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/comments"             --data @"$RUNNER_TEMP/rc004-mandatory-pin.json")"
+
+          set +e
+          code="$(curl -sS -o "$RUNNER_TEMP/rc004-mandatory-pin-response.json" -w '%{http_code}' -X POST "${headers[@]}" "$api/commits/$GITHUB_SHA/comments" --data @"$RUNNER_TEMP/rc004-mandatory-pin.json")"
+          curl_rc=$?
+          set -e
+          test "$curl_rc" -eq 0 || { echo "PIN_PUBLISH_TRANSPORT_FAILURE rc=$curl_rc"; exit 1; }
           echo "commit_comment_http_code=$code"
           if [ "$code" != "201" ]; then
             cat "$RUNNER_TEMP/rc004-mandatory-pin-response.json"
             exit 1
           fi
-          cat "$RUNNER_TEMP/rc004-mandatory-pin-response.json"
+          comment_id="$(jq -r '.id // empty' "$RUNNER_TEMP/rc004-mandatory-pin-response.json")"
+          test -n "$comment_id" || { echo "PIN_COMMENT_ID_MISSING"; exit 1; }
+          echo "comment_id=$comment_id" >> "$GITHUB_OUTPUT"
+          echo "provisional_pin_comment_id=$comment_id"
+
+          post="$RUNNER_TEMP/rc004-post-publish-branch.json"
+          set +e
+          post_code="$(curl -sS -o "$post" -w '%{http_code}' "${headers[@]}" "$api/git/ref/heads/$CANONICAL_CORRECTIVE_BRANCH")"
+          post_rc=$?
+          set -e
+          test "$post_rc" -eq 0 || { echo "POST_PUBLISH_BRANCH_QUERY_TRANSPORT_FAILURE rc=$post_rc"; exit 1; }
+          test "$post_code" = "200" || { echo "POST_PUBLISH_BRANCH_QUERY_HTTP_$post_code"; cat "$post"; exit 1; }
+          post_head="$(jq -r '.object.sha // empty' "$post")"
+          test "$post_head" = "$GITHUB_SHA" || { echo "POST_PUBLISH_REMOTE_HEAD_MISMATCH remote=$post_head event=$GITHUB_SHA"; exit 1; }
+          echo "POST_PUBLISH_REMOTE_HEAD_MATCH=$post_head"
+
+  rc004-whole-run-identity-seal:
+    name: RC004 whole-run identity seal
+    needs: [rc004-freeze-gate, rc004-mandatory-pin-publisher]
+    if: ${{ always() && needs.rc004-freeze-gate.result == 'success' && needs.rc004-mandatory-pin-publisher.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GATE_RESULT: ${{ needs.rc004-freeze-gate.result }}
+      PUBLISHER_RESULT: ${{ needs.rc004-mandatory-pin-publisher.result }}
+      PIN_COMMENT_ID: ${{ needs.rc004-mandatory-pin-publisher.outputs.pin_comment_id }}
+    steps:
+      - name: Pre-seal fresh canonical identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GATE_RESULT" = "success"
+          test "$PUBLISHER_RESULT" = "success"
+          test "$GITHUB_REF" = "refs/heads/$CANONICAL_CORRECTIVE_BRANCH"
+          test -n "$PIN_COMMENT_ID"
+          api="https://api.github.com/repos/${GITHUB_REPOSITORY}"
+          headers=(-H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
+
+          branch_json="$RUNNER_TEMP/rc004-pre-seal-branch.json"
+          set +e
+          branch_code="$(curl -sS -o "$branch_json" -w '%{http_code}' "${headers[@]}" "$api/git/ref/heads/$CANONICAL_CORRECTIVE_BRANCH")"
+          branch_rc=$?
+          set -e
+          test "$branch_rc" -eq 0 || { echo "PRE_SEAL_BRANCH_QUERY_TRANSPORT_FAILURE rc=$branch_rc"; exit 1; }
+          test "$branch_code" = "200" || { echo "PRE_SEAL_BRANCH_QUERY_HTTP_$branch_code"; cat "$branch_json"; exit 1; }
+          branch_head="$(jq -r '.object.sha // empty' "$branch_json")"
+          test "$branch_head" = "$GITHUB_SHA" || { echo "PRE_SEAL_REMOTE_HEAD_MISMATCH remote=$branch_head event=$GITHUB_SHA"; exit 1; }
+
+          run_json="$RUNNER_TEMP/rc004-pre-seal-run.json"
+          set +e
+          run_code="$(curl -sS -o "$run_json" -w '%{http_code}' "${headers[@]}" "$api/actions/runs/$GITHUB_RUN_ID")"
+          run_rc=$?
+          set -e
+          test "$run_rc" -eq 0 || { echo "PRE_SEAL_RUN_QUERY_TRANSPORT_FAILURE rc=$run_rc"; exit 1; }
+          test "$run_code" = "200" || { echo "PRE_SEAL_RUN_QUERY_HTTP_$run_code"; cat "$run_json"; exit 1; }
+          test "$(jq -r '.head_sha // empty' "$run_json")" = "$GITHUB_SHA"
+          test "$(jq -r '.head_branch // empty' "$run_json")" = "$CANONICAL_CORRECTIVE_BRANCH"
+          test "$(jq -r '.run_attempt // empty' "$run_json")" = "$GITHUB_RUN_ATTEMPT"
+
+          comment_json="$RUNNER_TEMP/rc004-pre-seal-comment.json"
+          set +e
+          comment_code="$(curl -sS -o "$comment_json" -w '%{http_code}' "${headers[@]}" "$api/comments/$PIN_COMMENT_ID")"
+          comment_rc=$?
+          set -e
+          test "$comment_rc" -eq 0 || { echo "PRE_SEAL_COMMENT_QUERY_TRANSPORT_FAILURE rc=$comment_rc"; exit 1; }
+          test "$comment_code" = "200" || { echo "PRE_SEAL_COMMENT_QUERY_HTTP_$comment_code"; cat "$comment_json"; exit 1; }
+          body="$(jq -r '.body // empty' "$comment_json")"
+          grep -Fq -- "- run_id: $GITHUB_RUN_ID" <<<"$body"
+          grep -Fq -- "- exact_candidate_sha: $GITHUB_SHA" <<<"$body"
+          grep -Fq -- "- canonical_branch: $CANONICAL_CORRECTIVE_BRANCH" <<<"$body"
+          grep -Fq -- "- publication_state: PROVISIONAL_PENDING_FINAL_IDENTITY_SEAL" <<<"$body"
+          echo "PRE_SEAL_CANONICAL_IDENTITY=PASS head=$branch_head comment_id=$PIN_COMMENT_ID"
+
+      - name: Whole-run cancellation propagation guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "WHOLE_RUN_RACE_GUARD_STARTED event_sha=$GITHUB_SHA"
+          sleep 30
+          echo "WHOLE_RUN_RACE_GUARD_FINISHED event_sha=$GITHUB_SHA"
+
+      - name: Final fresh canonical identity seal
+        shell: bash
+        run: |
+          set -euo pipefail
+          api="https://api.github.com/repos/${GITHUB_REPOSITORY}"
+          headers=(-H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
+
+          branch_json="$RUNNER_TEMP/rc004-final-seal-branch.json"
+          set +e
+          branch_code="$(curl -sS -o "$branch_json" -w '%{http_code}' "${headers[@]}" "$api/git/ref/heads/$CANONICAL_CORRECTIVE_BRANCH")"
+          branch_rc=$?
+          set -e
+          test "$branch_rc" -eq 0 || { echo "FINAL_SEAL_BRANCH_QUERY_TRANSPORT_FAILURE rc=$branch_rc"; exit 1; }
+          test "$branch_code" = "200" || { echo "FINAL_SEAL_BRANCH_QUERY_HTTP_$branch_code"; cat "$branch_json"; exit 1; }
+          branch_head="$(jq -r '.object.sha // empty' "$branch_json")"
+          test "$branch_head" = "$GITHUB_SHA" || { echo "FINAL_SEAL_REMOTE_HEAD_MISMATCH remote=$branch_head event=$GITHUB_SHA"; exit 1; }
+
+          run_json="$RUNNER_TEMP/rc004-final-seal-run.json"
+          set +e
+          run_code="$(curl -sS -o "$run_json" -w '%{http_code}' "${headers[@]}" "$api/actions/runs/$GITHUB_RUN_ID")"
+          run_rc=$?
+          set -e
+          test "$run_rc" -eq 0 || { echo "FINAL_SEAL_RUN_QUERY_TRANSPORT_FAILURE rc=$run_rc"; exit 1; }
+          test "$run_code" = "200" || { echo "FINAL_SEAL_RUN_QUERY_HTTP_$run_code"; cat "$run_json"; exit 1; }
+          test "$(jq -r '.head_sha // empty' "$run_json")" = "$GITHUB_SHA"
+          test "$(jq -r '.head_branch // empty' "$run_json")" = "$CANONICAL_CORRECTIVE_BRANCH"
+          test "$(jq -r '.run_attempt // empty' "$run_json")" = "$GITHUB_RUN_ATTEMPT"
+
+          comment_json="$RUNNER_TEMP/rc004-final-seal-comment.json"
+          set +e
+          comment_code="$(curl -sS -o "$comment_json" -w '%{http_code}' "${headers[@]}" "$api/comments/$PIN_COMMENT_ID")"
+          comment_rc=$?
+          set -e
+          test "$comment_rc" -eq 0 || { echo "FINAL_SEAL_COMMENT_QUERY_TRANSPORT_FAILURE rc=$comment_rc"; exit 1; }
+          test "$comment_code" = "200" || { echo "FINAL_SEAL_COMMENT_QUERY_HTTP_$comment_code"; cat "$comment_json"; exit 1; }
+          body="$(jq -r '.body // empty' "$comment_json")"
+          grep -Fq -- "- run_id: $GITHUB_RUN_ID" <<<"$body"
+          grep -Fq -- "- exact_candidate_sha: $GITHUB_SHA" <<<"$body"
+          grep -Fq -- "- canonical_branch: $CANONICAL_CORRECTIVE_BRANCH" <<<"$body"
+          grep -Fq -- "- publication_state: PROVISIONAL_PENDING_FINAL_IDENTITY_SEAL" <<<"$body"
+          echo "WHOLE_RUN_IDENTITY_SEAL=PASS head=$branch_head comment_id=$PIN_COMMENT_ID"
