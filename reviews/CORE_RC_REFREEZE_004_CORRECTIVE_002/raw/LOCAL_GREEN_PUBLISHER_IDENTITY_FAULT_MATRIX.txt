@@ -1,0 +1,42 @@
+case=identity_core_extracted_twice_identical PASS
+case=publisher_script_extracted PASS
+case=seal_script_extracted PASS
+case=publisher_happy_path_provisional PASS rc=0
+case=publisher_happy_path_single_post_no_patch PASS muations=1
+case=publisher_happy_path_records_pin_id PASS
+case=publisher_pre_publish_branch_drift PASS rc=1
+case=publisher_pre_publish_drift_publishes_nothing PASS
+case=publisher_ref_query_transport_failure PASS rc=1
+case=publisher_ref_query_http_failure PASS rc=1
+case=publisher_ref_missing_sha_field PASS rc=1
+case=publisher_create_http_200_fails PASS rc=1
+case=publisher_create_http_202_fails PASS rc=1
+case=publisher_create_http_204_fails PASS rc=1
+case=publisher_create_http_301_fails PASS rc=1
+case=publisher_create_http_302_fails PASS rc=1
+case=publisher_create_http_400_fails PASS rc=1
+case=publisher_create_http_401_fails PASS rc=1
+case=publisher_create_http_403_fails PASS rc=1
+case=publisher_create_http_404_fails PASS rc=1
+case=publisher_create_http_409_fails PASS rc=1
+case=publisher_create_http_422_fails PASS rc=1
+case=publisher_create_http_429_fails PASS rc=1
+case=publisher_create_http_500_fails PASS rc=1
+case=publisher_create_transport_failure_fails PASS rc=7
+case=publisher_unreadable_pin_id_fails PASS rc=1
+case=publisher_post_publish_drift_fails_and_invalidates PASS rc=1
+case=publisher_post_publish_drift_records_observed_head PASS
+case=seal_rejects_publisher_pin_sha_mismatch PASS rc=1
+case=seal_rejects_publisher_pin_run_mismatch PASS rc=1
+case=seal_rejects_publisher_pin_not_provisional PASS rc=1
+case=seal_rejects_missing_pin_id PASS rc=1
+case=seal_rejects_unreadable_publisher_pin PASS rc=1
+case=seal_pre_hold_drift_fails_without_seal PASS rc=1
+case=seal_post_hold_drift_fails_without_seal PASS rc=1
+case=seal_patch_http_401_fails PASS rc=1
+case=seal_post_write_drift_invalidates_sealed_pin PASS rc=1
+case=seal_happy_path_seals_pin PASS rc=0
+case=seal_happy_path_single_patch PASS patch_calls=1
+case=seal_happy_path_bounded_hold_invoked PASS hold=['sleep_args=30']
+fault_matrix_cases=40
+PUBLISHER_IDENTITY_FAULT_MATRIX=PASS

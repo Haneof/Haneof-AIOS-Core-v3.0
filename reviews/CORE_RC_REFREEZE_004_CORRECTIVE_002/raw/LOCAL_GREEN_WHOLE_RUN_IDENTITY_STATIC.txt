@@ -1,0 +1,29 @@
+checks:
+  concurrency_group_is_branch_scoped=true
+  concurrency_cancels_in_progress=true
+  reader_job_read_only=true
+  reader_job_no_persisted_credential=true
+  terminal_remote_equality_before_artifact=true
+  identity_core_present_in_both_write_jobs=true
+  identity_core_identical_in_both_write_jobs=true
+  publisher_fresh_check_before_post=true
+  publisher_fresh_check_after_post=true
+  publisher_invalidates_on_post_publish_drift=true
+  publisher_post_contract_201_only=true
+  publisher_pin_is_provisional_only=true
+  seal_job_depends_on_gate_and_publisher=true
+  seal_job_requires_both_success=true
+  seal_job_validates_publisher_result=true
+  seal_holds_between_identity_checks=true
+  seal_write_is_sandwiched_by_identity_checks=true
+  seal_invalidates_on_post_seal_drift=true
+  seal_pin_authority_is_conditional=true
+  identity_seal_is_final_job=true
+  write_side_has_no_checkout=true
+  write_side_has_no_candidate_code=true
+  write_side_write_permission_is_contents_only=true
+  write_side_has_no_mutating_api_calls=true
+  no_credential_persisted_anywhere=true
+  identity_core_shell_syntax=true
+WHOLE_RUN_IDENTITY_STATIC=PASS checks=26
+NOTE=static guard only; binding proof is the hosted A->B control

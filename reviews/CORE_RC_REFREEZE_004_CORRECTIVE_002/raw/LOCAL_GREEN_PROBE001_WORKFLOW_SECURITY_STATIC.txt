@@ -1,0 +1,16 @@
+gate_read_only=true
+checkout_no_persist=true
+dispatch_pinned=true
+c15_structured=true
+c15_rc_reject=true
+terminal_remote=true
+terminal_diff=true
+terminal_fresh_main=true
+publisher_needs=true
+publisher_write=true
+publisher_no_checkout=true
+publisher_no_candidate=true
+publisher_non201=true
+old_bypass_absent=true
+terminal_after_candidate=true
+WORKFLOW_SECURITY_STATIC=PASS
