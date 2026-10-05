@@ -1,0 +1,14 @@
+Hosted Actions pre-advance observation (not the final A/B reconciliation):
+
+- observed_at_utc: 2026-10-05T15:17:10Z
+- A: SHA `26816f41aff855a2d4854c1c3492910a446d8da6`
+- A run: `37331400336` (attempt 1)
+- A gate job: `111835112491` SUCCESS
+- A formal Job A: `111835161097` SKIPPED (control mode)
+- A publisher job: `111835168293` SUCCESS; its success path requires HTTP 201
+- A provisional control comment: `203509011`; state `PROVISIONAL_PENDING_FINAL_IDENTITY_SEAL`, explicitly `NOT_A_FORMAL_RELEASE_OR_ACCEPTANCE_PIN`
+- A control-seal job: `111835219787` IN_PROGRESS; exact run/pin checks were complete and the `Controllable post-read barrier` step was IN_PROGRESS.
+- A whole-run formal seal: `111835261209` SKIPPED (control mode)
+- Canonical branch at this point: A; B had not yet been pushed.
+
+This observation was taken only after the control seal had completed its final canonical branch read and entered the post-read barrier. It is the go signal for pushing B. Final run conclusions and all job results are recorded in `HOSTED_POSTREAD_CONTROL.md` after the successor completes.
