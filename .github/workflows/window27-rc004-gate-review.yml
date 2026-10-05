@@ -1,0 +1,82 @@
+name: window27-rc004-gate-review
+on:
+  push:
+    branches: [review/core-rc-refreeze-004-corrective-001-ia-window27]
+permissions:
+  contents: read
+  pull-requests: read
+jobs:
+  attack:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+      - name: Independent formal-gate attack
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          C=2380121639865b1bd29176cf944f5a20afe4112d
+          F=70134269ddfc7c80c4a703a933253bd099746504
+          T=ffa6475fe4dde4b5d06b09a629b059b89f1ff434
+          D=reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_WINDOW_27
+          O="$GITHUB_WORKSPACE/$D/raw-gate"; mkdir -p "$O"
+          git fetch --all --prune
+          git fetch --no-tags --force origin "+refs/heads/release/core-rc-refreeze-004-corrective-001-window26:refs/remotes/w27/candidate" "+refs/heads/release/core-rc-refreeze-004-window24:refs/remotes/w27/failed" "+refs/pull/328/head:refs/remotes/w27/pr328"
+          test "$(git rev-parse refs/remotes/w27/candidate)" = "$C"
+          test "$(git rev-parse refs/remotes/w27/failed)" = "$F"
+          test "$(git rev-parse "$C^")" = 04c37f7dd8ba6f20e1c67dad43c0f21087f51eeb
+          test "$(git rev-parse "$C^{tree}")" = 72d3cd0da849fae3b1cbfdfb7ae995528e1cfd71
+          test "$(git rev-list --left-right --count "$F...$C")" = $'0\t2'
+          git diff --name-status "$F" "$C" | tee "$O/scope.txt"
+          if git diff --name-only "$F" "$C" | grep -Ev '^((\.github/workflows/core-rc-refreeze-004-formal-gate\.yml)|(reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/.*))$' | grep -q .; then exit 90; fi
+          P="$RUNNER_TEMP/w25.py"; Q=reviews/CORE_RC_REFREEZE_004_INDEPENDENT_ACCEPTANCE_WINDOW_25/workflow_false_green_probe.py
+          B="$(git ls-tree "$T" -- "$Q" | awk '{print $3}')"; test "$B" = c8a9050819440cc10605b08c943d29827f2b76c5
+          git cat-file blob "$B" > "$P"; test "$(sha256sum "$P"|awk '{print $1}')" = fc7df49fdc80b340d2ddc065ad87c01c81987bef78f13fd6494ab035613796a9
+          python "$P" | tee "$O/historical-blk001.txt"
+          git show "$F:.github/workflows/core-rc-refreeze-004-formal-gate.yml" > "$RUNNER_TEMP/failed.yml"
+          python - "$RUNNER_TEMP/failed.yml" <<'PY' | tee "$O/historical-blk002.txt"
+          from pathlib import Path
+          import sys
+          s=Path(sys.argv[1]).read_text(); g=s[s.index('  rc004-freeze-gate:'):]
+          i=g.index('uses: actions/checkout@v4'); j=g.find('\n      - name:', i); checkout=g[i:j if j!=-1 else None]
+          assert 'contents: write' in s
+          assert 'persist-credentials: false' not in checkout
+          assert 'TERMINAL_REMOTE_HEAD_MISMATCH' not in g
+          print('HISTORICAL_BLK002_REPRO=PASS')
+          PY
+          set +e; bash -c 'set -uo pipefail; r=$(mktemp); echo x > "$r"; code=401; test "$code" = 201 || cat "$r"' > "$O/historical-blk003.txt" 2>&1; old=$?; set -e
+          echo old_publisher_exit=$old | tee -a "$O/historical-blk003.txt"; test "$old" -eq 0
+          test "$(git rev-parse "$C:reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/c15_junit_classifier.py")" = 9d50c15ec3cc17b6665628d2c375a9310dd6cc08
+          python "$D/reviewer_junit_fuzz.py" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/c15_junit_classifier.py" "$O/junit-fuzz.json" | tee "$O/junit-fuzz.txt"
+          test "$(git rev-parse "$C:.github/workflows/core-rc-refreeze-004-formal-gate.yml")" = 9c517dbf89857910f3c775d9b80a5f282f9e9a33
+          python "$D/reviewer_toctou_probe.py" .github/workflows/core-rc-refreeze-004-formal-gate.yml | tee "$O/toctou.txt"
+          bash "$D/reviewer_publisher_fault_probe.sh" | tee "$O/publisher.txt"
+          { git config --local --get-regexp '^http\..*\.extraheader$' || true; git config --global --get-all credential.helper || true; git config --system --get-all credential.helper || true; } | tee "$O/credential-config.txt"
+          if git config --local --get-regexp '^http\..*\.extraheader$' >/dev/null 2>&1; then exit 91; fi
+          python - <<'PY' | tee "$O/credential-env.txt"
+          import os
+          print('GITHUB_TOKEN_visible='+str('GITHUB_TOKEN' in os.environ))
+          print('GH_TOKEN_visible='+str('GH_TOKEN' in os.environ))
+          assert 'GITHUB_TOKEN' not in os.environ
+          PY
+          printf '%s\n' '{"body":"WINDOW27_READ_TOKEN_WRITE_DENIAL_PROBE"}' > "$RUNNER_TEMP/p.json"
+          set +e; code="$(curl -sS -o "$RUNNER_TEMP/r.json" -w '%{http_code}' -X POST -H "Authorization: Bearer $GH_TOKEN" -H 'Accept: application/vnd.github+json' "https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/comments" --data @"$RUNNER_TEMP/p.json")"; cr=$?; set -e
+          echo "read_token_write_http=$code curl_rc=$cr" | tee "$O/read-token-write.txt"; cat "$RUNNER_TEMP/r.json" >> "$O/read-token-write.txt" || true
+          test "$cr" -eq 0; test "$code" != 201
+          remote="$(git ls-remote origin refs/heads/release/core-rc-refreeze-004-corrective-001-window26 | awk '{print $1}')"; echo final_candidate=$remote | tee "$O/final-drift.txt"; test "$remote" = "$C"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: window27-gate-review-raw
+          path: reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_WINDOW_27/raw-gate/**
+          if-no-files-found: warn

@@ -1,0 +1,43 @@
+name: window27-rc004-frozen-probes
+on:
+  push:
+    branches: [review/core-rc-refreeze-004-corrective-001-ia-window27]
+permissions:
+  contents: read
+jobs:
+  probes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+      - name: Fresh extract canonical reviewer probes and run
+        shell: bash
+        run: |
+          set -euo pipefail
+          F=1cee3c5ad12f4b9098232bae11b51df786c5eb2f; W20=220311759e88fb3948ad3f4dba655058e0f392a8; W17=e4161dd0ad0a2f825461311a1c8c5ff8234a07f8
+          O="$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_WINDOW_27/raw-probes"; mkdir -p "$O" "$RUNNER_TEMP/p"
+          git fetch --all --prune; git fetch --no-tags --force origin "+refs/pull/311/head:refs/remotes/w27/pr311" "+refs/heads/arena/01a0fd4d-haneof-aios-core-v3-0:refs/remotes/w27/w17"
+          git merge-base --is-ancestor "$W20" refs/remotes/w27/pr311; test "$(git rev-parse refs/remotes/w27/w17)" = "$W17"
+          git worktree add --detach "$RUNNER_TEMP/frozen" "$F"
+          python -m venv "$RUNNER_TEMP/v"; "$RUNNER_TEMP/v/bin/python" -m pip install --upgrade pip >/dev/null; "$RUNNER_TEMP/v/bin/python" -m pip install -e "$RUNNER_TEMP/frozen" 'pydantic==2.13.5' 'pytest==8.4.2' >/dev/null
+          extract(){ R="$1"; P="$2"; B="$3"; H="$4"; X="$5"; N="$6"; b="$(git ls-tree "$R" -- "$P"|awk '{print $3}')"; test "$b" = "$B"; git cat-file blob "$b" > "$X"; h="$(sha256sum "$X"|awk '{print $1}')"; test "$h" = "$H"; echo "$N blob=$b sha256=$h"; }
+          extract "$W20" reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_002_IA_WINDOW_20/reviewer_probes/window20_independent_attack.py 527edd8d92243cabc417f176c0f7c4f6c358e65c ec1dc5c2c5406d5d9e74825f62e0a17fb80f8ebd6dc250817fa048511ce292b5 "$RUNNER_TEMP/p/a.py" A | tee "$O/identities.txt"
+          extract "$W20" reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_002_IA_WINDOW_20/reviewer_probes/window20_migration_rsa_attack.py 867f0ee993595c2d334a3940ad66308166693c97 769242465817f31734661ba7ba9c3d5f7d06b8d3f5235d72d2026956d9b98eb1 "$RUNNER_TEMP/p/b.py" B | tee -a "$O/identities.txt"
+          extract "$W17" reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_001_IA_WINDOW_17/reviewer_probes/window17_independent_attack.py bb25d184a5cb813ae4058de9a75fa23d9591b041 a6db33956bb7bc1e8af19cddd7cebdd320604bba98b6a2b906fd1eb363fba0c3 "$RUNNER_TEMP/p/w17.py" W17 | tee -a "$O/identities.txt"
+          cd "$RUNNER_TEMP/frozen"; PYTHONPATH="$RUNNER_TEMP/frozen/src" "$RUNNER_TEMP/v/bin/python" "$RUNNER_TEMP/p/a.py" 2>&1 | tee "$O/a.txt"; PYTHONPATH="$RUNNER_TEMP/frozen/src" "$RUNNER_TEMP/v/bin/python" "$RUNNER_TEMP/p/b.py" 2>&1 | tee "$O/b.txt"; PYTHONPATH="$RUNNER_TEMP/frozen/src" "$RUNNER_TEMP/v/bin/python" "$RUNNER_TEMP/p/w17.py" 2>&1 | tee "$O/w17.txt"
+          test "$(grep -E '^SUMMARY \|' "$O/a.txt"|tail -1)" = 'SUMMARY | probes=4 failures=0'
+          test "$(grep -E '^SUMMARY \|' "$O/b.txt"|tail -1)" = 'SUMMARY | probes=7 failures=0'
+          test "$(grep -E '^SUMMARY \|' "$O/w17.txt"|tail -1)" = 'SUMMARY | probes=14 failures=0'
+          r="$(git ls-remote origin refs/heads/release/core-rc-refreeze-004-corrective-001-window26 | awk '{print $1}')"; echo final_candidate=$r | tee "$O/final-drift.txt"; test "$r" = 2380121639865b1bd29176cf944f5a20afe4112d
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: window27-frozen-probes-raw
+          path: reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_WINDOW_27/raw-probes/**
+          if-no-files-found: warn

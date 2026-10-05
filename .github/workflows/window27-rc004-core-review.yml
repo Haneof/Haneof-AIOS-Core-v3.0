@@ -1,0 +1,85 @@
+name: window27-rc004-core-review
+on:
+  push:
+    branches: [review/core-rc-refreeze-004-corrective-001-ia-window27]
+permissions:
+  contents: read
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+      - name: Prepare exact frozen software
+        shell: bash
+        run: |
+          set -euo pipefail
+          F=1cee3c5ad12f4b9098232bae11b51df786c5eb2f; C=2380121639865b1bd29176cf944f5a20afe4112d
+          O="$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_WINDOW_27/raw-core"; mkdir -p "$O"
+          git fetch --all --prune
+          test "$(git rev-parse "$F^{tree}")" = 70b2711258567863ea0d93025a6a07e39631726a
+          test "$(git rev-parse "$F:src/aios_core")" = 16f1487e291b009c55bee402abfd79fdacbae960
+          test "$(git rev-parse "$F:tests")" = 9db1bfa08143bc99fe03836e2752ee6e05694eb6
+          test "$(git rev-parse "$F:.github/workflows")" = 72cde9d2dc2b35d071bfa36c954dac2faff4a803
+          test "$(git rev-parse "$F:pyproject.toml")" = b38833c7537fa60d5c2f02ed4bb19158d8995a11
+          git worktree add --detach "$RUNNER_TEMP/frozen" "$F"
+          python -m venv "$RUNNER_TEMP/venv"; "$RUNNER_TEMP/venv/bin/python" -m pip install --upgrade pip
+          "$RUNNER_TEMP/venv/bin/python" -m pip install -e "$RUNNER_TEMP/frozen" 'pydantic==2.13.5' 'pytest==8.4.2'
+          echo "FROZEN=$RUNNER_TEMP/frozen" >> "$GITHUB_ENV"; echo "V=$RUNNER_TEMP/venv" >> "$GITHUB_ENV"; echo "O=$O" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/venv/bin/python" - <<'PY' | tee "$O/environment.txt"
+          import aios_core,sys,platform,pydantic,pytest,sqlite3,ssl
+          print('python='+sys.version.replace('\n',' ')); print('pydantic='+pydantic.__version__); print('pytest='+pytest.__version__)
+          print('sqlite='+sqlite3.sqlite_version); print('openssl='+ssl.OPENSSL_VERSION); print('platform='+platform.platform()); print('aios_core.__file__='+str(aios_core.__file__))
+          assert sys.version_info[:3]==(3,12,14); assert pydantic.__version__=='2.13.5'; assert pytest.__version__=='8.4.2'
+          PY
+      - name: Fresh full Core regression
+        shell: bash
+        run: |
+          set -euo pipefail; cd "$FROZEN"
+          "$V/bin/python" -m pytest -o addopts='' -q --tb=no tests/unit tests/integration tests/runtime tests/habitation --junitxml="$O/core-junit.xml" 2>&1 | tee "$O/core.txt"
+      - name: Fresh Corrective-003 security
+        shell: bash
+        run: |
+          set -euo pipefail; cd "$FROZEN"
+          "$V/bin/python" -m pytest -o addopts='' -q --tb=short tests/runtime/test_background_late_return_route_b.py tests/runtime/test_late_return_canonical_encoding_002.py tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py tests/integration/test_core_background_late_trusted_return_corrective_002.py tests/integration/test_core_background_late_trusted_return_corrective_001.py tests/integration/test_core_background_late_trusted_return_consumption_001.py tests/integration/test_core_background_late_trusted_return_secret_upgrade_001.py tests/integration/test_core_background_response_recovery_001_corrective_002_recovery.py tests/integration/test_core_background_response_recovery_001_corrective_001.py tests/integration/test_core_background_trusted_return_recovery_001.py tests/integration/test_core_background_trusted_return_adversarial_001.py tests/integration/test_core_background_trusted_return_r5_001.py tests/integration/test_core_background_trusted_return_r5_conflicts_001.py 2>&1 | tee "$O/security.txt"
+      - name: Fresh real process loss SIGKILL
+        shell: bash
+        run: |
+          set -euo pipefail; cd "$FROZEN"
+          "$V/bin/python" -m pytest -o addopts='' -q --tb=short tests/integration/test_core_background_trusted_return_corrective_001_process_loss.py 'tests/integration/test_core_background_late_trusted_return_corrective_002.py::test_ca2_004_real_sigkill_leaves_no_live_authority_in_the_fresh_process' 'tests/integration/test_core_background_response_recovery_001_corrective_002_recovery.py::test_actual_sigkill_after_receipt_commit_recovers_without_provider_redispatch' tests/integration/test_core_background_late_trusted_return_sigkill_001.py 'tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_process_sigkill_after_exact_response_staged_recovers_with_zero_provider_calls' 'tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_process_sigkill_after_capability_side_effect_replays_exactly_once' 'tests/integration/test_core_background_trusted_return_adversarial_001.py::test_real_sigkill_after_later_round_trusted_handoff' 2>&1 | tee "$O/process-loss.txt"
+      - name: Fresh clean wheel headless
+        shell: bash
+        run: |
+          set -euo pipefail; W="$RUNNER_TEMP/wheel"; C="$RUNNER_TEMP/clean"; mkdir -p "$W"; python -m venv "$C"
+          "$V/bin/python" -m pip wheel --no-deps "$FROZEN" -w "$W" > "$O/wheel.txt" 2>&1; whl="$(find "$W" -name 'aios_core-*.whl' -print -quit)"; test -n "$whl"
+          "$C/bin/python" -m pip install --upgrade pip >/dev/null; "$C/bin/python" -m pip install 'pydantic==2.13.5' "$whl" > "$O/clean-install.txt" 2>&1
+          "$C/bin/python" "$FROZEN/reviews/CORE_RC_REFREEZE_003/probes/clean_install_headless_smoke.py" "$C/bin/aios-core-headless" 2>&1 | tee "$O/headless.txt"; grep -q HEADLESS_CLEAN_INSTALL_PASS "$O/headless.txt"
+      - name: Fresh backup restore and writer restart FIX scale
+        shell: bash
+        run: |
+          set -euo pipefail; cd "$FROZEN"
+          PYTHONPATH="$FROZEN/src" AIOS_RC_TARGET_ROOT="$FROZEN" "$V/bin/python" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004/probes/backup_restore_route_b.py" 2>&1 | tee "$O/backup.txt"; grep -q BACKUP_RESTORE_ROUTE_B_PASS "$O/backup.txt"
+          "$V/bin/python" -m pytest -o addopts='' -q --tb=short tests/integration/test_core_headless.py tests/integration/test_core_recovery.py tests/integration/test_core_gap_fix_002_background_attempts.py tests/runtime/test_turn_execution_recovery.py 'tests/integration/test_v3_fused_turn_runtime.py::test_cg001_current_time_control_keeps_current_fact_visible' tests/integration/test_core_scale_semantics.py 2>&1 | tee "$O/writer-restart-fix-scale.txt"
+      - name: Fresh real C15 and independent JUnit audit
+        shell: bash
+        run: |
+          set -euo pipefail; cd "$FROZEN"; J="$O/c15-junit.xml"
+          set +e; "$V/bin/python" -m pytest -o addopts='' -q --tb=short tests/c15_persistence --junitxml="$J" 2>&1 | tee "$O/c15.txt"; rc=${PIPESTATUS[0]}; set -e
+          echo pytest_exit=$rc | tee "$O/c15-exit.txt"; test "$rc" -eq 1
+          "$V/bin/python" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_WINDOW_27/reviewer_c15_junit_audit.py" --pytest-exit "$rc" --junit "$J" 2>&1 | tee "$O/c15-audit.txt"
+      - name: Final candidate drift
+        shell: bash
+        run: |
+          set -euo pipefail; r="$(git ls-remote origin refs/heads/release/core-rc-refreeze-004-corrective-001-window26 | awk '{print $1}')"; echo final_candidate=$r | tee "$O/final-drift.txt"; test "$r" = 2380121639865b1bd29176cf944f5a20afe4112d
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: window27-core-review-raw
+          path: reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_WINDOW_27/raw-core/**
+          if-no-files-found: warn
