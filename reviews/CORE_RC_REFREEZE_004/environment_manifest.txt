@@ -1,0 +1,23 @@
+task=CORE-RC-REFREEZE-004
+window=24
+frozen_software_sha=1cee3c5ad12f4b9098232bae11b51df786c5eb2f
+formal_python_required=CPython 3.12.14
+formal_pydantic_required=2.13.5
+formal_pytest_required=8.4.2
+
+preflight_run=37210518501
+preflight_python=3.12.14 (main, Aug 13 2026, 02:47:42) [GCC 13.3.0]
+preflight_python_executable=/home/runner/work/_temp/rc004-formal-venv/bin/python
+preflight_implementation=CPython
+preflight_pydantic=2.13.5
+preflight_pytest=8.4.2
+preflight_sqlite=3.45.1
+preflight_openssl=OpenSSL 3.0.13 30 Jan 2024
+preflight_platform=Linux-6.17.0-1022-azure-x86_64-with-glibc2.39
+preflight_architecture=x86_64
+preflight_os_release=Ubuntu 24.04.5 LTS
+preflight_aios_core_file=/home/runner/work/_temp/aios-rc004-frozen-software/src/aios_core/__init__.py
+
+final_exact_head_environment=PINNED_IN_FINAL_FORMAL_CI_COMMIT_COMMENT_AND_ACTIONS_ARTIFACT
+dependency_manifest=PINNED_IN_FINAL_FORMAL_CI_ACTIONS_ARTIFACT
+clean_install_mode=wheel_non_editable
