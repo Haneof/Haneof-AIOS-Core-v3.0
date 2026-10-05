@@ -1,0 +1,84 @@
+WINDOW 27 FRESH CARRY-FORWARD RAW SUMMARY
+Candidate: 2380121639865b1bd29176cf944f5a20afe4112d
+Frozen software: 1cee3c5ad12f4b9098232bae11b51df786c5eb2f
+Reviewer workflow run: 37261988648
+
+== Construction ==
+git rev-list --left-right --count 70134269...23801216
+0 2
+Corrective delta: only .github/workflows/core-rc-refreeze-004-formal-gate.yml and reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/**
+
+== Frozen identity ==
+head=1cee3c5ad12f4b9098232bae11b51df786c5eb2f
+root=70b2711258567863ea0d93025a6a07e39631726a
+core=16f1487e291b009c55bee402abfd79fdacbae960
+tests=9db1bfa08143bc99fe03836e2752ee6e05694eb6
+workflows=72cde9d2dc2b35d071bfa36c954dac2faff4a803
+pyproject=b38833c7537fa60d5c2f02ed4bb19158d8995a11
+
+== Protected drift to fresh main ==
+PROTECTED_DRIFT_NONE
+
+== Runtime ==
+Python 3.12.14
+pydantic 2.13.5
+pytest 8.4.2
+sqlite 3.45.1
+OpenSSL 3.0.13
+aios_core.__file__=/home/runner/work/_temp/frozen/src/aios_core/__init__.py
+
+== Full Core ==
+928 passed in 173.49s
+pytest_exit=0
+
+== Frozen reviewer probes ==
+Suite A sha256=ec1dc5c2c5406d5d9e74825f62e0a17fb80f8ebd6dc250817fa048511ce292b5 rc=0 summary=4/0
+Suite B sha256=769242465817f31734661ba7ba9c3d5f7d06b8d3f5235d72d2026956d9b98eb1 rc=0 summary=7/0
+Window17 sha256=a6db33956bb7bc1e8af19cddd7cebdd320604bba98b6a2b906fd1eb363fba0c3 rc=0 summary=14/0
+
+== Corrective-003 security ==
+214 passed in 19.60s
+security_rc=0
+
+== Process loss / SIGKILL ==
+7 passed in 1.46s
+process_loss_rc=0
+
+== Clean install / headless ==
+HEADLESS_CLEAN_INSTALL_PASS
+headless_rc=0
+restart_continuity=true
+clean_close_reopen=true
+recovery_status=recovery_status
+resident_fixture_used=false
+real_provider_used=false
+
+== Backup / restore / rebuild ==
+BACKUP_RESTORE_ROUTE_B_PASS
+backup_restore_rc=0
+trusted_return_handoff_continuity=true
+trusted_return_receipt_continuity=true
+winning_exact_proof_retry_recovered=true
+conflicting_genuine_proof_refused=true
+forged_local_proof_refused=true
+provider_redispatch_count_after_restore=0
+capability_side_effect_count_after_recovery=1
+restore_did_not_expand_trust_authority=true
+
+== Writer / restart / FIX / current-time / SCALE ==
+52 passed in 3.19s
+writer_restart_fix_scale_rc=0
+
+== C15 downstream ==
+45 failed, 33 passed in 47.22s
+pytest_exit=1
+independent JUnit classification=DOWNSTREAM_ONLY_DEBT
+structured failed/error cases=45
+all structured cases mapped under tests/c15_persistence/**
+suite errors=0 failures=45 tests=78
+ruling=C15_OPERATOR_ADAPTATION_REQUIRED_BEFORE_RESIDENT
+No frozen-Core regression was exposed.
+
+== Candidate drift ==
+remote_candidate=2380121639865b1bd29176cf944f5a20afe4112d
+expected=2380121639865b1bd29176cf944f5a20afe4112d
