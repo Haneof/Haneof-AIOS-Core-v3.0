@@ -1,0 +1,85 @@
+name: w28-toctou-green-control
+
+on:
+  push:
+    branches:
+      - "control/w28-toctou-green-window28"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: w28-toctou-green-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Terminal remote-head equality
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote="$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')"
+          echo "GREEN_EVENT_SHA=$GITHUB_SHA"
+          echo "GREEN_REMOTE_AT_TERMINAL=$remote"
+          test "$remote" = "$GITHUB_SHA"
+          echo "GREEN_TERMINAL_EQUALITY_PASSED=YES"
+
+  publisher:
+    needs: gate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Pre-publication fresh canonical equality
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote="$(git ls-remote "https://github.com/$GITHUB_REPOSITORY.git" "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')"
+          echo "GREEN_PUBLISHER_PRECHECK_EVENT=$GITHUB_SHA"
+          echo "GREEN_PUBLISHER_PRECHECK_REMOTE=$remote"
+          test "$remote" = "$GITHUB_SHA"
+          echo "GREEN_PUBLISHER_PRECHECK_PASSED=YES"
+      - name: Publication race hold
+        shell: bash
+        run: |
+          echo "GREEN_PUBLICATION_RACE_HOLD_STARTED=$GITHUB_SHA"
+          sleep 90
+          echo "GREEN_PUBLICATION_RACE_HOLD_FINISHED=$GITHUB_SHA"
+      - name: Mock publication
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "GREEN_MOCK_PUBLICATION_FOR=$GITHUB_SHA"
+      - name: Post-publication fresh canonical equality
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote="$(git ls-remote "https://github.com/$GITHUB_REPOSITORY.git" "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')"
+          echo "GREEN_PUBLISHER_POSTCHECK_EVENT=$GITHUB_SHA"
+          echo "GREEN_PUBLISHER_POSTCHECK_REMOTE=$remote"
+          test "$remote" = "$GITHUB_SHA"
+          echo "GREEN_PUBLISHER_POSTCHECK_PASSED=YES"
+
+  whole-run-identity-seal:
+    needs: publisher
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Final whole-run canonical equality seal
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote="$(git ls-remote "https://github.com/$GITHUB_REPOSITORY.git" "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')"
+          echo "GREEN_FINAL_SEAL_EVENT=$GITHUB_SHA"
+          echo "GREEN_FINAL_SEAL_REMOTE=$remote"
+          test "$remote" = "$GITHUB_SHA"
+          echo "WHOLE_RUN_IDENTITY_SEAL=PASS"
