@@ -51,7 +51,7 @@ jobs:
         shell: bash
         run: |
           echo "GREEN_PUBLICATION_RACE_HOLD_STARTED=$GITHUB_SHA"
-          sleep 90
+          sleep 1
           echo "GREEN_PUBLICATION_RACE_HOLD_FINISHED=$GITHUB_SHA"
       - name: Mock publication
         shell: bash
@@ -83,3 +83,5 @@ jobs:
           echo "GREEN_FINAL_SEAL_REMOTE=$remote"
           test "$remote" = "$GITHUB_SHA"
           echo "WHOLE_RUN_IDENTITY_SEAL=PASS"
+
+# B advances canonical branch after old publisher precheck passed
