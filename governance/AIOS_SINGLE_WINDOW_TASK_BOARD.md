@@ -1,5 +1,20 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 2026-10-05 — WINDOW 27 ACCEPTANCE_FAIL / WINDOW 28 Corrective-002 RELEASED
+
+- Canonical Window 27 review = PR #333 REVIEW_ONLY / DO NOT MERGE.
+- Reported #333 verdict = `ACCEPTANCE_FAIL / blocker=2`; PM adjudicated release-blocking count = `1`.
+- `IA27-BLK-002` whole-run immutability / inter-job TOCTOU = `BINDING / CRITICAL`.
+- Real corroborating GitHub Actions run `37262331480`: terminal equality passed on old event SHA, branch advanced afterward, old gate SUCCESS, old publisher SUCCESS, old overall run SUCCESS.
+- PR #332 = corroborating REVIEW_ONLY evidence; its sole blocker is the same TOCTOU finding under different local numbering.
+- PR #333 `IA27-BLK-001` synthetic JUnit ambiguity/canonicalization = `NON_BINDING_HARDENING_OBSERVATION`; actual pinned pytest 8.4.2 formal-path laundering was not reproduced.
+- PR #330 @ `2380121639865b1bd29176cf944f5a20afe4112d` is historical failed corrective candidate / OPEN / UNMERGED / DO NOT MERGE. Do not repair in place.
+- Frozen software remains `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`.
+- **Unique next READY:** `WINDOW 28 — CORE-RC-REFREEZE-004-CORRECTIVE-002`.
+- Scope = RC004 whole-run identity/TOCTOU workflow mechanics only. No Core/C15 repair, no JUnit hardening expansion, no Resident, no evaluator, no public release.
+- Prompt: `governance/prompts/CORE_RC_REFREEZE_004_CORRECTIVE_002_2026-10-05.md`.
+
+
 ## 2026-10-05 — WINDOW 26 REVIEW_READY / WINDOW 27 Fresh IA RELEASED
 
 - Window 26 `CORE-RC-REFREEZE-004-CORRECTIVE-001` reported `REVIEW_READY / READY_FOR_FRESH_INDEPENDENT_ACCEPTANCE / DO NOT MERGE`.
