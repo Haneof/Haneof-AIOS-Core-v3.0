@@ -1,0 +1,11 @@
+rc0_clean=accept
+rc1_downstream_only=accept
+rc1_non_downstream=reject
+rc2=reject
+rc3=reject
+rc4=reject
+rc5=reject
+missing_junit=reject
+malformed_junit=reject
+rc1_zero_structured_failure_or_error=reject
+C15_JUNIT_CLASSIFIER_SELFTEST=PASS cases=10

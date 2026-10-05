@@ -1,0 +1,9 @@
+permissions.contents=write
+checkout.persist-credentials:false=ABSENT
+candidate_controlled_execution_in_write_job=true
+remote_head_equality_pretest_count=1
+terminal_remote_head=false
+terminal_frozen_worktree_mutation_check=false
+terminal_frozen_object_recheck=false
+claim=gate_admits_write_authority_and_false_green_path
+historical_malicious_push_claim=false

@@ -1,0 +1,148 @@
+{
+  "schema": "aios-core-release-candidate-manifest-v1",
+  "task": "CORE-RC-REFREEZE-004",
+  "window": 24,
+  "repository": "Haneof/Haneof-AIOS-Core-v3.0",
+  "status": "CONDITIONAL_REVIEW_READY_ON_FINAL_EXACT_HEAD_CI_SUCCESS",
+  "terminal_on_green": "REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE / DO NOT MERGE",
+  "frozen_software": {
+    "sha": "1cee3c5ad12f4b9098232bae11b51df786c5eb2f",
+    "parents": [
+      "fb53cf938b138a67d1890618eed41282c61bce00",
+      "7ecb2250a488766915e1042a76472b3cd26d9107"
+    ],
+    "accepted_exact_candidate": "7ecb2250a488766915e1042a76472b3cd26d9107",
+    "repository_tree": "70b2711258567863ea0d93025a6a07e39631726a",
+    "src_aios_core_tree": "16f1487e291b009c55bee402abfd79fdacbae960",
+    "tests_tree": "9db1bfa08143bc99fe03836e2752ee6e05694eb6",
+    "workflows_tree": "72cde9d2dc2b35d071bfa36c954dac2faff4a803",
+    "pyproject_blob": "b38833c7537fa60d5c2f02ed4bb19158d8995a11",
+    "constitution_tree": "c4572dd929ec4d5510b9e08ae29fe9d4cdcf7bf3",
+    "core_baseline_blob": "e4af80b8b93d89df8f0229620f870c6d5855c381",
+    "source_manifest": "reviews/CORE_RC_REFREEZE_004/source_manifest.json"
+  },
+  "accepted_integration": {
+    "implementation_pr": 318,
+    "merge_commit": "1cee3c5ad12f4b9098232bae11b51df786c5eb2f",
+    "exact_candidate": "7ecb2250a488766915e1042a76472b3cd26d9107",
+    "independent_review_pr": 321,
+    "independent_review_commit": "22aa00cb3793c252512142a1eae33ca8aae9d841",
+    "independent_review_tree": "28593da131e7026de1de0037a87b6b892a5988ba",
+    "independent_verdict": "ACCEPTANCE_PASS / blocker=0",
+    "pm_integration_record": "governance/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_003_PM_INTEGRATION_2026-10-04.md"
+  },
+  "fresh_live_main_before_final_candidate": {
+    "sha": "ee4556989fea16a28d2c727eb345d48385a453fe",
+    "comparison_from_frozen": {
+      "commits_after_frozen": 9,
+      "protected_implementation_drift_count": 0
+    },
+    "classification": "GOVERNANCE_CHECKPOINT_ONLY"
+  },
+  "formal_environment": {
+    "python": "CPython 3.12.14",
+    "pydantic": "2.13.5",
+    "pytest": "8.4.2",
+    "preflight_sqlite": "3.45.1",
+    "preflight_openssl": "OpenSSL 3.0.13 30 Jan 2024",
+    "preflight_os": "Ubuntu 24.04.5 LTS",
+    "preflight_kernel": "6.17.0-1022-azure",
+    "architecture": "x86_64",
+    "exact_final_environment_source": "final exact-head commit comment and Actions artifact"
+  },
+  "frozen_reviewer_probes": {
+    "suite_a": {
+      "review": "220311759e88fb3948ad3f4dba655058e0f392a8",
+      "blob": "527edd8d92243cabc417f176c0f7c4f6c358e65c",
+      "sha256": "ec1dc5c2c5406d5d9e74825f62e0a17fb80f8ebd6dc250817fa048511ce292b5",
+      "preflight_result": "4/4 green"
+    },
+    "suite_b": {
+      "review": "220311759e88fb3948ad3f4dba655058e0f392a8",
+      "blob": "867f0ee993595c2d334a3940ad66308166693c97",
+      "sha256": "769242465817f31734661ba7ba9c3d5f7d06b8d3f5235d72d2026956d9b98eb1",
+      "preflight_result": "7/7 green"
+    },
+    "w17": {
+      "review": "e4161dd0ad0a2f825461311a1c8c5ff8234a07f8",
+      "blob": "bb25d184a5cb813ae4058de9a75fa23d9591b041",
+      "sha256": "a6db33956bb7bc1e8af19cddd7cebdd320604bba98b6a2b906fd1eb363fba0c3",
+      "preflight_result": "14/14 green"
+    }
+  },
+  "fresh_preflight": {
+    "core_regression": "928 passed / 0 failed / 0 errors",
+    "corrective003_security": "214 passed",
+    "real_sigkill": "9 passed",
+    "clean_noneditable_headless": "HEADLESS_CLEAN_INSTALL_PASS",
+    "preserved_red_runs": [
+      {
+        "run_id": 37210518501,
+        "classification": "RC_GATE_SELF_DEFECT_NOT_CORE_RED"
+      },
+      {
+        "run_id": 37210904177,
+        "classification": "STALE_RC003_BACKUP_PROBE_SEMANTICS_NOT_CORE_RED"
+      },
+      {
+        "run_id": 37211071106,
+        "classification": "STALE_RC003_BACKUP_PROBE_SEMANTICS_REPEAT_NOT_CORE_RED"
+      }
+    ],
+    "preflight_history": "reviews/CORE_RC_REFREEZE_004/preflight_history.md"
+  },
+  "backup_restore": {
+    "route_b_probe": "reviews/CORE_RC_REFREEZE_004/probes/backup_restore_route_b.py",
+    "requirement": "genuine external proof; crash after receipt/handoff commit before staging; backup/restore/rebuild; exact proof retry; conflict refusal; no authority expansion",
+    "binding_result_source": "final exact-head CI"
+  },
+  "c15_downstream": {
+    "historical_broad": "45 failed / 1092 passed",
+    "historical_classification": "DOWNSTREAM_OPERATOR_COMPATIBILITY_DEBT / OUT_OF_SCOPE_FOR_CORE_CORRECTIVE",
+    "binding_final_rule": "CORE_FREEZE_NOT_BLOCKED_BY_DOWNSTREAM_OPERATOR_DEBT iff final Core gates are green and C15 failures remain only downstream",
+    "required_followup": "C15_OPERATOR_ADAPTATION_REQUIRED_BEFORE_RESIDENT"
+  },
+  "rc_impact": {
+    "resident_a": "FRESH_A_REQUIRED",
+    "operator_prep": "FRESH_OPERATOR_PREP_REQUIRED",
+    "historical_a": "HISTORICAL_FOR_PRIOR_RC_ONLY",
+    "hash_swap_allowed": false,
+    "required_order": [
+      "CORE-RC-REFREEZE-004",
+      "Fresh Independent RC Acceptance",
+      "PM Integration",
+      "dedicated C15 operator/persistence compatibility corrective against frozen RC",
+      "Fresh Independent Acceptance of operator corrective",
+      "Fresh Resident A only after PM explicit release"
+    ]
+  },
+  "final_exact_head_ci": {
+    "workflow": ".github/workflows/core-rc-refreeze-004-formal-gate.yml",
+    "workflow_blob": "43b4b31225a6851cb8b9378f665966bcf1034acb",
+    "candidate_sha": null,
+    "candidate_parent": null,
+    "candidate_tree": null,
+    "run_id": null,
+    "status": "PENDING_AT_MANIFEST_COMMIT_TIME",
+    "pin_location": "candidate PR body/comment and exact candidate commit comment after immutable-head CI"
+  },
+  "candidate_pr": {
+    "number": null,
+    "state": "OPEN / UNMERGED / DO NOT MERGE after creation",
+    "reuse_prior_rc_pr": false
+  },
+  "independent_acceptance": {
+    "required": true,
+    "performed_in_window24": false,
+    "status": "PENDING_NOT_PERFORMED",
+    "merge_authorized": false
+  },
+  "exclusions": {
+    "core_repair": false,
+    "c15_repair": false,
+    "resident_run": false,
+    "evaluator": false,
+    "public_release_or_tag": false,
+    "self_merge": false
+  }
+}
