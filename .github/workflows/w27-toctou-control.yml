@@ -1,8 +1,8 @@
-name: w27-toctou-control
+name: w28-red-toctou-control
 on:
   push:
     branches:
-      - "review/w27-toctou-control"
+      - "review/w28-red-toctou-control"
 permissions:
   contents: read
 jobs:
@@ -24,7 +24,7 @@ jobs:
         shell: bash
         run: |
           echo "POST_TERMINAL_HOLD_STARTED event_sha=$GITHUB_SHA"
-          sleep 45
+          sleep 75
           echo "POST_TERMINAL_HOLD_FINISHED event_sha=$GITHUB_SHA"
   publisher:
     needs: gate
