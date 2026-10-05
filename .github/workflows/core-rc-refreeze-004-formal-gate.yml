@@ -3,7 +3,7 @@ name: core-rc-refreeze-004-formal-gate
 on:
   push:
     branches:
-      - "release/core-rc-refreeze-004-corrective-001-window26"
+      - "release/core-rc-refreeze-004-corrective-002-window28"
   workflow_dispatch:
 
 permissions:
@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: core-rc-refreeze-004-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 env:
   FROZEN_SHA: "1cee3c5ad12f4b9098232bae11b51df786c5eb2f"
@@ -34,7 +34,8 @@ env:
   FORMAL_PYTHON: "3.12.14"
   FORMAL_PYDANTIC: "2.13.5"
   FORMAL_PYTEST: "8.4.2"
-  CANONICAL_CORRECTIVE_BRANCH: "release/core-rc-refreeze-004-corrective-001-window26"
+  RC004_TASK_NAME: "CORE-RC-REFREEZE-004-CORRECTIVE-002"
+  CANONICAL_CORRECTIVE_BRANCH: "release/core-rc-refreeze-004-corrective-002-window28"
 
 jobs:
   rc004-freeze-gate:
@@ -60,7 +61,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          OUT="$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/ci-output"
+          OUT="$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/ci-output"
           mkdir -p "$OUT"
           test "$GITHUB_REF_NAME" = "$CANONICAL_CORRECTIVE_BRANCH" || { echo "NON_CANONICAL_CORRECTIVE_REF $GITHUB_REF_NAME"; exit 1; }
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
@@ -96,7 +97,7 @@ jobs:
 
           base="$(git merge-base refs/remotes/rc004/main HEAD)"
           git diff --name-status "$base" HEAD | tee "$OUT/candidate-scope.txt"
-          if git diff --name-only "$base" HEAD | grep -Ev '^((\.github/workflows/core-rc-refreeze-004-formal-gate\.yml)|(release/rc/CORE_RC_REFREEZE_004[^/]*)|(reviews/CORE_RC_REFREEZE_004/.*)|(reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/.*))$' | grep -q .; then
+          if git diff --name-only "$base" HEAD | grep -Ev '^((\.github/workflows/core-rc-refreeze-004-formal-gate\.yml)|(release/rc/CORE_RC_REFREEZE_004[^/]*)|(reviews/CORE_RC_REFREEZE_004/.*)|(reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/.*)|(reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/.*))$' | grep -q .; then
             echo "RC004_CANDIDATE_SCOPE_VIOLATION"; exit 1
           fi
 
@@ -172,6 +173,16 @@ jobs:
               test "$prc" -ne 0
             fi
           done
+
+      - name: Corrective-002 whole-run identity mechanics regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          WF="$GITHUB_WORKSPACE/.github/workflows/core-rc-refreeze-004-formal-gate.yml"
+          "$RC004_VENV/bin/python" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/probes/whole_run_identity_static_probe.py" "$WF" 2>&1 | tee "$RC004_OUT/whole-run-identity-static.txt"
+          grep -q 'WHOLE_RUN_IDENTITY_STATIC=PASS' "$RC004_OUT/whole-run-identity-static.txt"
+          "$RC004_VENV/bin/python" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/probes/publisher_identity_fault_matrix.py" "$WF" 2>&1 | tee "$RC004_OUT/publisher-identity-fault-matrix.txt"
+          grep -q 'PUBLISHER_IDENTITY_FAULT_MATRIX=PASS' "$RC004_OUT/publisher-identity-fault-matrix.txt"
 
       - name: Fresh complete Core regression
         shell: bash
@@ -416,7 +427,7 @@ jobs:
         shell: bash
         run: |
           set -uo pipefail
-          OUT="${RC004_OUT:-$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/ci-output}"
+          OUT="${RC004_OUT:-$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/ci-output}"
           mkdir -p "$OUT"
           if [ -n "${RC004_TARGET:-}" ] && [ -d "$RC004_TARGET/.git" -o -e "$RC004_TARGET/.git" ]; then
             python - "$RC004_TARGET" "$OUT/source_manifest_runtime.json" <<'PY'
@@ -482,8 +493,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: core-rc-refreeze-004-corrective-001-evidence
-          path: reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/ci-output/**
+          name: core-rc-refreeze-004-corrective-002-evidence
+          path: reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/ci-output/**
           if-no-files-found: warn
 
 
@@ -494,8 +505,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      pin_comment_id: ${{ steps.rc004-publish-pin.outputs.pin_comment_id }}
     steps:
-      - name: Publish mandatory exact candidate pin
+      - name: Publish provisional exact pin after fresh canonical identity re-verification
+        id: rc004-publish-pin
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -503,26 +517,259 @@ jobs:
         run: |
           set -euo pipefail
           test "$GATE_RESULT" = "success"
+          # >>> RC004_WHOLE_RUN_IDENTITY_CORE_BEGIN
+          rc004_api_base() { printf 'https://api.github.com/repos/%s' "${GITHUB_REPOSITORY}"; }
+          rc004_fresh_canonical_head() {
+            local encoded body
+            encoded="heads/${CANONICAL_CORRECTIVE_BRANCH//\//%2F}"
+            body="$(curl -fsSL --max-time 30 \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "$(rc004_api_base)/git/ref/${encoded}")" || return 1
+            printf '%s' "$body" | jq -er '.object.sha' || return 1
+          }
+          rc004_read_pin_body() {
+            local comment_id="$1" body
+            body="$(curl -fsSL --max-time 30 \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "$(rc004_api_base)/comments/${comment_id}")" || return 1
+            printf '%s' "$body" | jq -er '.body' || return 1
+          }
+          rc004_whole_run_identity_require() {
+            local phase="$1" head_sha
+            RC004_IDENTITY_FAILURE_PHASE=""
+            RC004_IDENTITY_OBSERVED_HEAD=""
+            if ! head_sha="$(rc004_fresh_canonical_head)"; then
+              RC004_IDENTITY_FAILURE_PHASE="$phase"
+              RC004_IDENTITY_OBSERVED_HEAD="UNVERIFIABLE"
+              printf 'WHOLE_RUN_IDENTITY_UNVERIFIABLE phase=%s reason=CANONICAL_REF_QUERY_FAILED event=%s\n' "$phase" "$GITHUB_SHA"
+              return 1
+            fi
+            printf 'identity_phase=%s canonical_remote_head=%s event_sha=%s\n' "$phase" "$head_sha" "$GITHUB_SHA"
+            if [ "$head_sha" != "$GITHUB_SHA" ]; then
+              RC004_IDENTITY_FAILURE_PHASE="$phase"
+              RC004_IDENTITY_OBSERVED_HEAD="$head_sha"
+              printf 'WHOLE_RUN_IDENTITY_MISMATCH phase=%s remote=%s event=%s\n' "$phase" "$head_sha" "$GITHUB_SHA"
+              return 1
+            fi
+            printf 'WHOLE_RUN_IDENTITY_MATCH phase=%s sha=%s\n' "$phase" "$GITHUB_SHA"
+          }
+          rc004_build_pin_body() {
+            local status="$1" detail="$2" phases="$3"
+            printf '## %s mandatory exact pin\n' "$RC004_TASK_NAME"
+            printf '\n'
+            printf -- '- task: %s\n' "$RC004_TASK_NAME"
+            printf -- '- pin_status: %s\n' "$status"
+            printf -- '- pin_authority: NON_AUTHORITATIVE_UNTIL_IDENTITY_SEALED_AND_OVERALL_RUN_SUCCESS\n'
+            printf -- '- identity_phases_verified: %s\n' "$phases"
+            printf -- '- run_id: %s\n' "$GITHUB_RUN_ID"
+            printf -- '- run_attempt: %s\n' "$GITHUB_RUN_ATTEMPT"
+            printf -- '- exact_candidate_sha: %s\n' "$GITHUB_SHA"
+            printf -- '- canonical_branch: %s\n' "$CANONICAL_CORRECTIVE_BRANCH"
+            printf -- '- frozen_software_sha: %s\n' "$FROZEN_SHA"
+            printf -- '- formal_gate_job: rc004-freeze-gate\n'
+            printf -- '- formal_gate_result: %s\n' "${GATE_RESULT:-success}"
+            printf -- '- whole_run_identity_seal_job: rc004-whole-run-identity-seal\n'
+            printf -- '- stale_run_policy: ANY_CANONICAL_BRANCH_DRIFT_MAKES_A_STALE_RUN_NON_AUTHORITATIVE\n'
+            printf -- '- publication_contract: HTTP_201_REQUIRED_FOR_CREATE_AND_PATCH_200_FOR_SEAL\n'
+            printf -- '- workflow: %s\n' "$GITHUB_WORKFLOW"
+            if [ -n "$detail" ]; then
+              printf -- '- identity_detail: %s\n' "$detail"
+            fi
+          }
+          rc004_patch_pin_body() {
+            local comment_id="$1" status="$2" detail="$3" phases="$4" body code
+            body="$RUNNER_TEMP/rc004-mandatory-pin.md"
+            rc004_build_pin_body "$status" "$detail" "$phases" > "$body"
+            jq -n --rawfile body "$body" '{body:$body}' > "$RUNNER_TEMP/rc004-mandatory-pin-patch.json"
+            code="$(curl -sS -o "$RUNNER_TEMP/rc004-mandatory-pin-patch-response.json" -w '%{http_code}' -X PATCH \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "$(rc004_api_base)/comments/${comment_id}" \
+              --data @"$RUNNER_TEMP/rc004-mandatory-pin-patch.json")"
+            echo "commit_comment_patch_http_code=$code"
+            if [ "$code" != "200" ]; then
+              cat "$RUNNER_TEMP/rc004-mandatory-pin-patch-response.json"
+              return 1
+            fi
+            cat "$RUNNER_TEMP/rc004-mandatory-pin-patch-response.json"
+          }
+          rc004_seal_pin() {
+            rc004_patch_pin_body "$1" IDENTITY_SEALED "" "pre_publish,post_publish,seal_pre_hold,seal_post_hold,seal_post_write"
+          }
+          rc004_invalidate_pin() {
+            rc004_patch_pin_body "$1" INVALIDATED "$2" "pre_publish,post_publish"
+          }
+          # <<< RC004_WHOLE_RUN_IDENTITY_CORE_END
+
+          rc004_whole_run_identity_require pre_publish
           body="$RUNNER_TEMP/rc004-mandatory-pin.md"
-          {
-            echo "## CORE-RC-REFREEZE-004-CORRECTIVE-001 mandatory exact pin"
-            echo
-            echo "- task: CORE-RC-REFREEZE-004-CORRECTIVE-001"
-            echo "- run_id: $GITHUB_RUN_ID"
-            echo "- run_attempt: $GITHUB_RUN_ATTEMPT"
-            echo "- exact_candidate_sha: $GITHUB_SHA"
-            echo "- frozen_software_sha: 1cee3c5ad12f4b9098232bae11b51df786c5eb2f"
-            echo "- formal_gate_job: rc004-freeze-gate"
-            echo "- formal_gate_result: $GATE_RESULT"
-            echo "- workflow: $GITHUB_WORKFLOW"
-            echo "- canonical_branch: release/core-rc-refreeze-004-corrective-001-window26"
-            echo "- publication_contract: HTTP_201_REQUIRED"
-          } > "$body"
+          rc004_build_pin_body PROVISIONAL_PENDING_IDENTITY_SEAL "" "pre_publish" > "$body"
+          cat "$body"
           jq -n --rawfile body "$body" '{body:$body}' > "$RUNNER_TEMP/rc004-mandatory-pin.json"
-          code="$(curl -sS -o "$RUNNER_TEMP/rc004-mandatory-pin-response.json" -w '%{http_code}' -X POST             -H "Authorization: Bearer $GH_TOKEN"             -H "Accept: application/vnd.github+json"             -H "X-GitHub-Api-Version: 2022-11-28"             "https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/comments"             --data @"$RUNNER_TEMP/rc004-mandatory-pin.json")"
+          code="$(curl -sS -o "$RUNNER_TEMP/rc004-mandatory-pin-response.json" -w '%{http_code}' -X POST             -H "Authorization: Bearer $GH_TOKEN"             -H "Accept: application/vnd.github+json"             -H "X-GitHub-Api-Version: 2022-11-28"             "$(rc004_api_base)/commits/${GITHUB_SHA}/comments"             --data @"$RUNNER_TEMP/rc004-mandatory-pin.json")"
           echo "commit_comment_http_code=$code"
           if [ "$code" != "201" ]; then
             cat "$RUNNER_TEMP/rc004-mandatory-pin-response.json"
             exit 1
           fi
           cat "$RUNNER_TEMP/rc004-mandatory-pin-response.json"
+          pin_id="$(jq -er '.id' "$RUNNER_TEMP/rc004-mandatory-pin-response.json")" || { echo "PUBLISHED_PIN_ID_UNREADABLE"; exit 1; }
+          echo "pin_comment_id=$pin_id"
+          echo "pin_comment_id=$pin_id" >> "$GITHUB_OUTPUT"
+          {
+            echo "### RC004 provisional pin"
+            echo
+            echo "- pin_comment_id: $pin_id"
+            echo "- exact_candidate_sha: $GITHUB_SHA"
+            echo "- identity_phase_pre_publish: MATCH"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if ! rc004_whole_run_identity_require post_publish; then
+            rc004_invalidate_pin "$pin_id" "post_publish_identity_failure phase=${RC004_IDENTITY_FAILURE_PHASE} observed_remote_head=${RC004_IDENTITY_OBSERVED_HEAD} event_sha=${GITHUB_SHA} branch=${CANONICAL_CORRECTIVE_BRANCH}" || true
+            echo "PUBLISHED_PIN_INVALIDATED_AFTER_BRANCH_DRIFT"
+            exit 1
+          fi
+          {
+            echo "- identity_phase_post_publish: MATCH"
+            echo "- pin_status: PROVISIONAL_PENDING_IDENTITY_SEAL"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+
+  rc004-whole-run-identity-seal:
+    name: RC004 whole-run identity seal
+    needs: [rc004-freeze-gate, rc004-mandatory-pin-publisher]
+    if: ${{ needs.rc004-freeze-gate.result == 'success' && needs.rc004-mandatory-pin-publisher.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Fresh canonical identity seal of the exact published pin
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GATE_RESULT: ${{ needs.rc004-freeze-gate.result }}
+          PIN_COMMENT_ID: ${{ needs.rc004-mandatory-pin-publisher.outputs.pin_comment_id }}
+        run: |
+          set -euo pipefail
+          test "$GATE_RESULT" = "success"
+          test -n "$PIN_COMMENT_ID" || { echo "SEAL_MISSING_PUBLISHER_PIN_ID"; exit 1; }
+          # >>> RC004_WHOLE_RUN_IDENTITY_CORE_BEGIN
+          rc004_api_base() { printf 'https://api.github.com/repos/%s' "${GITHUB_REPOSITORY}"; }
+          rc004_fresh_canonical_head() {
+            local encoded body
+            encoded="heads/${CANONICAL_CORRECTIVE_BRANCH//\//%2F}"
+            body="$(curl -fsSL --max-time 30 \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "$(rc004_api_base)/git/ref/${encoded}")" || return 1
+            printf '%s' "$body" | jq -er '.object.sha' || return 1
+          }
+          rc004_read_pin_body() {
+            local comment_id="$1" body
+            body="$(curl -fsSL --max-time 30 \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "$(rc004_api_base)/comments/${comment_id}")" || return 1
+            printf '%s' "$body" | jq -er '.body' || return 1
+          }
+          rc004_whole_run_identity_require() {
+            local phase="$1" head_sha
+            RC004_IDENTITY_FAILURE_PHASE=""
+            RC004_IDENTITY_OBSERVED_HEAD=""
+            if ! head_sha="$(rc004_fresh_canonical_head)"; then
+              RC004_IDENTITY_FAILURE_PHASE="$phase"
+              RC004_IDENTITY_OBSERVED_HEAD="UNVERIFIABLE"
+              printf 'WHOLE_RUN_IDENTITY_UNVERIFIABLE phase=%s reason=CANONICAL_REF_QUERY_FAILED event=%s\n' "$phase" "$GITHUB_SHA"
+              return 1
+            fi
+            printf 'identity_phase=%s canonical_remote_head=%s event_sha=%s\n' "$phase" "$head_sha" "$GITHUB_SHA"
+            if [ "$head_sha" != "$GITHUB_SHA" ]; then
+              RC004_IDENTITY_FAILURE_PHASE="$phase"
+              RC004_IDENTITY_OBSERVED_HEAD="$head_sha"
+              printf 'WHOLE_RUN_IDENTITY_MISMATCH phase=%s remote=%s event=%s\n' "$phase" "$head_sha" "$GITHUB_SHA"
+              return 1
+            fi
+            printf 'WHOLE_RUN_IDENTITY_MATCH phase=%s sha=%s\n' "$phase" "$GITHUB_SHA"
+          }
+          rc004_build_pin_body() {
+            local status="$1" detail="$2" phases="$3"
+            printf '## %s mandatory exact pin\n' "$RC004_TASK_NAME"
+            printf '\n'
+            printf -- '- task: %s\n' "$RC004_TASK_NAME"
+            printf -- '- pin_status: %s\n' "$status"
+            printf -- '- pin_authority: NON_AUTHORITATIVE_UNTIL_IDENTITY_SEALED_AND_OVERALL_RUN_SUCCESS\n'
+            printf -- '- identity_phases_verified: %s\n' "$phases"
+            printf -- '- run_id: %s\n' "$GITHUB_RUN_ID"
+            printf -- '- run_attempt: %s\n' "$GITHUB_RUN_ATTEMPT"
+            printf -- '- exact_candidate_sha: %s\n' "$GITHUB_SHA"
+            printf -- '- canonical_branch: %s\n' "$CANONICAL_CORRECTIVE_BRANCH"
+            printf -- '- frozen_software_sha: %s\n' "$FROZEN_SHA"
+            printf -- '- formal_gate_job: rc004-freeze-gate\n'
+            printf -- '- formal_gate_result: %s\n' "${GATE_RESULT:-success}"
+            printf -- '- whole_run_identity_seal_job: rc004-whole-run-identity-seal\n'
+            printf -- '- stale_run_policy: ANY_CANONICAL_BRANCH_DRIFT_MAKES_A_STALE_RUN_NON_AUTHORITATIVE\n'
+            printf -- '- publication_contract: HTTP_201_REQUIRED_FOR_CREATE_AND_PATCH_200_FOR_SEAL\n'
+            printf -- '- workflow: %s\n' "$GITHUB_WORKFLOW"
+            if [ -n "$detail" ]; then
+              printf -- '- identity_detail: %s\n' "$detail"
+            fi
+          }
+          rc004_patch_pin_body() {
+            local comment_id="$1" status="$2" detail="$3" phases="$4" body code
+            body="$RUNNER_TEMP/rc004-mandatory-pin.md"
+            rc004_build_pin_body "$status" "$detail" "$phases" > "$body"
+            jq -n --rawfile body "$body" '{body:$body}' > "$RUNNER_TEMP/rc004-mandatory-pin-patch.json"
+            code="$(curl -sS -o "$RUNNER_TEMP/rc004-mandatory-pin-patch-response.json" -w '%{http_code}' -X PATCH \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "$(rc004_api_base)/comments/${comment_id}" \
+              --data @"$RUNNER_TEMP/rc004-mandatory-pin-patch.json")"
+            echo "commit_comment_patch_http_code=$code"
+            if [ "$code" != "200" ]; then
+              cat "$RUNNER_TEMP/rc004-mandatory-pin-patch-response.json"
+              return 1
+            fi
+            cat "$RUNNER_TEMP/rc004-mandatory-pin-patch-response.json"
+          }
+          rc004_seal_pin() {
+            rc004_patch_pin_body "$1" IDENTITY_SEALED "" "pre_publish,post_publish,seal_pre_hold,seal_post_hold,seal_post_write"
+          }
+          rc004_invalidate_pin() {
+            rc004_patch_pin_body "$1" INVALIDATED "$2" "pre_publish,post_publish"
+          }
+          # <<< RC004_WHOLE_RUN_IDENTITY_CORE_END
+
+          pin_body="$(rc004_read_pin_body "$PIN_COMMENT_ID")" || { echo "SEAL_PUBLISHER_PIN_UNREADABLE id=$PIN_COMMENT_ID"; exit 1; }
+          printf '%s\n' "$pin_body" | grep -qx -- "- exact_candidate_sha: $GITHUB_SHA" || { echo "SEAL_PUBLISHER_PIN_SHA_MISMATCH"; exit 1; }
+          printf '%s\n' "$pin_body" | grep -qx -- "- run_id: $GITHUB_RUN_ID" || { echo "SEAL_PUBLISHER_PIN_RUN_MISMATCH"; exit 1; }
+          printf '%s\n' "$pin_body" | grep -qx -- "- pin_status: PROVISIONAL_PENDING_IDENTITY_SEAL" || { echo "SEAL_PUBLISHER_PIN_NOT_PROVISIONAL"; exit 1; }
+          echo "publisher_pin_validated id=$PIN_COMMENT_ID sha=$GITHUB_SHA"
+
+          rc004_whole_run_identity_require seal_pre_hold
+          echo "IDENTITY_SEAL_SETTLE_HOLD_SECONDS=30"
+          sleep 30
+          rc004_whole_run_identity_require seal_post_hold
+          rc004_seal_pin "$PIN_COMMENT_ID"
+          if ! rc004_whole_run_identity_require seal_post_write; then
+            rc004_invalidate_pin "$PIN_COMMENT_ID" "post_seal_identity_failure phase=${RC004_IDENTITY_FAILURE_PHASE} observed_remote_head=${RC004_IDENTITY_OBSERVED_HEAD} event_sha=${GITHUB_SHA} branch=${CANONICAL_CORRECTIVE_BRANCH}" || true
+            echo "SEALED_PIN_INVALIDATED_AFTER_BRANCH_DRIFT"
+            exit 1
+          fi
+          {
+            echo "### RC004 whole-run identity seal"
+            echo
+            echo "- pin_comment_id: $PIN_COMMENT_ID"
+            echo "- exact_candidate_sha: $GITHUB_SHA"
+            echo "- identity_phase_seal_pre_hold: MATCH"
+            echo "- identity_phase_seal_post_hold: MATCH"
+            echo "- identity_phase_seal_post_write: MATCH"
+            echo "- pin_status: IDENTITY_SEALED"
+            echo "- authoritative_condition: THIS_RUN_OVERALL_RESULT_MUST_BE_SUCCESS"
+          } >> "$GITHUB_STEP_SUMMARY"
