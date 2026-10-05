@@ -1,5 +1,21 @@
 # AIOS v3.0 单窗口任务执行总表
 
+## 2026-10-05 — WINDOW 27 ACCEPTANCE_FAIL / WINDOW 28 Corrective-002 RELEASED
+
+- Window 27 canonical verdict = `ACCEPTANCE_FAIL / blocker=2 / CORRECTIVE_OR_ADJUDICATION_REQUIRED`.
+- Canonical review evidence = PR #333 REVIEW_ONLY / DO NOT MERGE @ `6e63505175aca3114592a40dd01b1d8bfb95c01f`, tree `3a782cd4239404017d16fb5399ce19157f94b341`.
+- PR #332 remains REVIEW_ONLY secondary corroborating evidence; its real GitHub control independently confirms the whole-run TOCTOU finding.
+- `IA27-BLK-001 = BINDING`: Corrective-001 JUnit classifier is fail-open for canonicalization/namespace/structural ambiguity, including `tests/c15_persistence/../integration/test_core.py`.
+- `IA27-BLK-002 = BINDING`: post-terminal branch drift can leave an old run overall SUCCESS; real control run `37262331480` corroborates.
+- IA25-BLK-002 credential-isolation sub-property remains CLOSED.
+- IA25-BLK-003 publisher HTTP/transport fail-closed remains CLOSED.
+- Failed Corrective-001 PR #330 @ `2380121639865b1bd29176cf944f5a20afe4112d` is historical / OPEN / UNMERGED / DO NOT MERGE; do not repair in place.
+- Frozen software remains `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`; Window 27 found no frozen-Core blocker.
+- **Unique next READY:** `WINDOW 28 — CORE-RC-REFREEZE-004-CORRECTIVE-002`.
+- Scope = RC004 formal-gate/evidence mechanics only. No Core/C15 implementation repair, Resident, evaluator, merge or public release.
+- Prompt: `governance/prompts/CORE_RC_REFREEZE_004_CORRECTIVE_002_2026-10-05.md`.
+
+
 ## 2026-10-05 — WINDOW 26 REVIEW_READY / WINDOW 27 Fresh IA RELEASED
 
 - Window 26 `CORE-RC-REFREEZE-004-CORRECTIVE-001` reported `REVIEW_READY / READY_FOR_FRESH_INDEPENDENT_ACCEPTANCE / DO NOT MERGE`.
