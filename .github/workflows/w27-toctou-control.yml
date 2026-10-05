@@ -1,0 +1,39 @@
+name: w27-toctou-control
+on:
+  push:
+    branches:
+      - "review/w27-toctou-control"
+permissions:
+  contents: read
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Terminal remote-head equality
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote="$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')"
+          echo "event_sha=$GITHUB_SHA remote_at_terminal=$remote"
+          test "$remote" = "$GITHUB_SHA"
+      - name: Post-terminal hold
+        shell: bash
+        run: |
+          echo "POST_TERMINAL_HOLD_STARTED event_sha=$GITHUB_SHA"
+          sleep 45
+          echo "POST_TERMINAL_HOLD_FINISHED event_sha=$GITHUB_SHA"
+  publisher:
+    needs: gate
+    if: ${{ needs.gate.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Publisher without remote recheck
+        run: |
+          echo "PUBLISHER_RAN_FOR_OLD_EVENT_SHA=$GITHUB_SHA"
+          echo "gate_result=${{ needs.gate.result }}"
