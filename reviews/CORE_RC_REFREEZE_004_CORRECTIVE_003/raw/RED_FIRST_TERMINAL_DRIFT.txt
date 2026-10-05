@@ -1,0 +1,15 @@
+source_workflow=/tmp/core-rc-refreeze-004-formal-gate.yml
+test_git=disposable_repository; refs outside repository untouched
+initial_ere='^(src/|tests/|pyproject\\.toml$|setup\\.|setup\\.cfg$|MANIFEST\\.in$|requirements|\\.github/workflows/)'
+terminal_ere='^(src/|tests/|pyproject\\\\.toml$|setup\\\\.|setup\\\\.cfg$|MANIFEST\\\\.in$|requirements|\\\\.github/workflows/)'
+diff_paths=.github/workflows/core.yml,.github/workflows/late-added.yml,pyproject.toml,setup.cfg,src/aios_core/late.py,tests/test_late.py
+initial_guard_detects_all=TRUE
+terminal_guard_detects_all=TRUE
+initial_guard_detects_late_workflow_packaging=TRUE
+terminal_guard_detects_late_workflow_packaging=FALSE
+path=.github/workflows/late-added.yml initial=MATCH terminal=MISS
+path=pyproject.toml initial=MATCH terminal=MISS
+path=setup.cfg initial=MATCH terminal=MISS
+path=src/aios_core/late.py initial=MATCH terminal=MATCH
+path=tests/test_late.py initial=MATCH terminal=MATCH
+RED=TERMINAL_PROTECTED_DRIFT_FALSE_NEGATIVE_REPRODUCED
