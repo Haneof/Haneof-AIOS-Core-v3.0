@@ -1,0 +1,3 @@
+Window 27 disposable TOCTOU control marker.
+This commit intentionally advances only review/w27-toctou-control after run 37262331480 passed its terminal remote-head equality check.
+It does not touch PR #330 or frozen software.
