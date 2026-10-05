@@ -1,5 +1,17 @@
 # AIOS v3.0 当前工程断点
 
+## 2026-10-05 — WINDOW 27 FAIL / WINDOW 28 Corrective-002 READY
+
+- Window 27 canonical evidence PR #333 = `ACCEPTANCE_FAIL / blocker=2`.
+- IA27-BLK-001 = BINDING: JUnit classifier fail-open under namespace/canonicalization/structural ambiguity.
+- IA27-BLK-002 = BINDING: whole-run immutability TOCTOU; #332 real control run `37262331480` independently corroborates.
+- Failed PR #330 exact head `2380121639865b1bd29176cf944f5a20afe4112d` remains immutable / unmerged.
+- Frozen software `1cee3c5ad12f4b9098232bae11b51df786c5eb2f` remains unchanged; no Core blocker.
+- Credential isolation and mandatory publisher non-201/transport fail-closed are already closed and must not regress.
+- Unique next task = `WINDOW 28 — CORE-RC-REFREEZE-004-CORRECTIVE-002`.
+- No Independent Acceptance / PM integration / C15 repair / Resident / evaluator / public release in Window 28.
+
+
 ## 2026-10-05 — WINDOW 27 Fresh Independent Acceptance READY
 
 - Candidate = PR #330 @ `2380121639865b1bd29176cf944f5a20afe4112d`.
