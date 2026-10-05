@@ -1,0 +1,544 @@
+{
+  "schema": "aios-core-source-freeze-manifest-v1",
+  "task": "CORE-RC-REFREEZE-004",
+  "window": 24,
+  "repository": "Haneof/Haneof-AIOS-Core-v3.0",
+  "generated_from_git_object_graph": true,
+  "frozen_software": {
+    "sha": "1cee3c5ad12f4b9098232bae11b51df786c5eb2f",
+    "parents": [
+      "fb53cf938b138a67d1890618eed41282c61bce00",
+      "7ecb2250a488766915e1042a76472b3cd26d9107"
+    ],
+    "repository_tree": "70b2711258567863ea0d93025a6a07e39631726a",
+    "src_aios_core_tree": "16f1487e291b009c55bee402abfd79fdacbae960",
+    "tests_tree": "9db1bfa08143bc99fe03836e2752ee6e05694eb6",
+    "workflows_tree": "72cde9d2dc2b35d071bfa36c954dac2faff4a803",
+    "pyproject_blob": "b38833c7537fa60d5c2f02ed4bb19158d8995a11",
+    "constitution_tree": "c4572dd929ec4d5510b9e08ae29fe9d4cdcf7bf3",
+    "core_baseline_blob": "e4af80b8b93d89df8f0229620f870c6d5855c381"
+  },
+  "package_metadata": [
+    {
+      "path": "pyproject.toml",
+      "blob": "b38833c7537fa60d5c2f02ed4bb19158d8995a11",
+      "size": 643
+    }
+  ],
+  "release_relevant_workflows": [
+    {
+      "path": ".github/workflows/all-dimensions-projection.yml",
+      "blob": "4d54c413842af5e376075d624e05dd177217d697",
+      "size": 820
+    },
+    {
+      "path": ".github/workflows/c09-wake-dispatch.yml",
+      "blob": "5030a5eee981b52045230473bbd7ce2a601429e1",
+      "size": 1197
+    },
+    {
+      "path": ".github/workflows/c14-cognitive-derivation-loop.yml",
+      "blob": "067a162e74a2ce32703bc24642912b92d0f4c37e",
+      "size": 4423
+    },
+    {
+      "path": ".github/workflows/c14-cognitive-derivation-runtime.yml",
+      "blob": "4f3430f4396f00f3b3a86b007e007677a08a241a",
+      "size": 4060
+    },
+    {
+      "path": ".github/workflows/c14-cognitive-derivation-scheduler.yml",
+      "blob": "68f12e16e349c30c8fe8e03f006bca7af6738b1c",
+      "size": 4973
+    },
+    {
+      "path": ".github/workflows/c14-resident-fixture-v2.yml",
+      "blob": "ae107fa3762f25cb7a683fd0629e2aabde24e54a",
+      "size": 4276
+    },
+    {
+      "path": ".github/workflows/c14-semantic-repair-fixture.yml",
+      "blob": "879c0bb95f434ca5bf871e7da9b8f79e87e2c07e",
+      "size": 4458
+    },
+    {
+      "path": ".github/workflows/c15-cognition-evidence-policy.yml",
+      "blob": "5f962be36fa013386665ff8c9253aeabc3771019",
+      "size": 1572
+    },
+    {
+      "path": ".github/workflows/c15-operator-preflight.yml",
+      "blob": "b612512d82f2dbea50a6d48b0e058ff2421d841f",
+      "size": 4612
+    },
+    {
+      "path": ".github/workflows/c15-rcc-fixture.yml",
+      "blob": "1d4eb2ddec31af6909a3a894fb0aadec05de8fd3",
+      "size": 4261
+    },
+    {
+      "path": ".github/workflows/cognition-revision.yml",
+      "blob": "eb46d6fe4e9549bdbcd0cf329f9b771d219e1d98",
+      "size": 770
+    },
+    {
+      "path": ".github/workflows/cognition-writeback.yml",
+      "blob": "6021ec4b9864e8d4c1caedcccf1e6a6c93ac1a18",
+      "size": 744
+    },
+    {
+      "path": ".github/workflows/cognitive-runtime.yml",
+      "blob": "ac72e4ef56b5858e2b62205fb124d70e93f54ed1",
+      "size": 766
+    },
+    {
+      "path": ".github/workflows/constitutional-cognition-closure.yml",
+      "blob": "3410ba82911cabba07ff7fe301ec4e0480628d84",
+      "size": 1509
+    },
+    {
+      "path": ".github/workflows/conversation-runtime.yml",
+      "blob": "824aa67ca82a37f2705aa90b7a4cb74de4d6c4c1",
+      "size": 947
+    },
+    {
+      "path": ".github/workflows/conversation-world.yml",
+      "blob": "8f01f823123b259cd893da2f553d94d4c4c20344",
+      "size": 887
+    },
+    {
+      "path": ".github/workflows/core-background-late-trusted-return-001.yml",
+      "blob": "a21c41245ab1d7f7f351cd3f534ff536f4f5baf6",
+      "size": 67775
+    },
+    {
+      "path": ".github/workflows/core-background-trusted-return-recovery-001.yml",
+      "blob": "0f3f6244e93a460568fba5f19c6cdbed5cf1ca76",
+      "size": 4015
+    },
+    {
+      "path": ".github/workflows/core-headless.yml",
+      "blob": "2f3aab05047dc76f8d345e4556f56c7a5c77bd44",
+      "size": 2171
+    },
+    {
+      "path": ".github/workflows/core-rc-refreeze-002-formal-gate.yml",
+      "blob": "8028f9e4bf3e84ce3703d4b0f45bb833cccbb8a3",
+      "size": 4229
+    },
+    {
+      "path": ".github/workflows/core-rc-refreeze-003-formal-gate.yml",
+      "blob": "a13fb79b801d14730e7c13687385a80a7930c897",
+      "size": 20210
+    },
+    {
+      "path": ".github/workflows/core-recovery.yml",
+      "blob": "b5373c2e95a5a45c962365318a9f908317471d7f",
+      "size": 6832
+    },
+    {
+      "path": ".github/workflows/core-scale.yml",
+      "blob": "7dc2a1754c0e1b83c8f9ba14f016b0be37f7e85c",
+      "size": 5204
+    },
+    {
+      "path": ".github/workflows/dimension-summary.yml",
+      "blob": "29694e790ad3902a8209e0a4a0f107b60eb6eca2",
+      "size": 827
+    },
+    {
+      "path": ".github/workflows/fused-turn-runtime.yml",
+      "blob": "f42f06813a8233c1aedcc91d3bb6826607b6ffc0",
+      "size": 924
+    },
+    {
+      "path": ".github/workflows/memory-recommendation.yml",
+      "blob": "e36a3c23feb17cc95686be28116121ed3970fd52",
+      "size": 827
+    },
+    {
+      "path": ".github/workflows/p10-ai-world-gate.yml",
+      "blob": "cecc3d0252173ec92b0cbd21891f1629970daada",
+      "size": 1482
+    },
+    {
+      "path": ".github/workflows/p10-ai-world.yml",
+      "blob": "c559bffee55b12b0aad0915332807d9333d4b022",
+      "size": 789
+    },
+    {
+      "path": ".github/workflows/p11-dimension-gate.yml",
+      "blob": "d1a7f27c6c9e7647f547941009fd836885d6c4de",
+      "size": 1354
+    },
+    {
+      "path": ".github/workflows/p11-dimension-registry.yml",
+      "blob": "d86cf13ef0038657d6844b812db8ee5b89ff33cd",
+      "size": 716
+    },
+    {
+      "path": ".github/workflows/p12-execution-gate.yml",
+      "blob": "4c0a0b1242b785235cfe6f1c9b2579a51851ac3d",
+      "size": 1430
+    },
+    {
+      "path": ".github/workflows/p12-execution-world.yml",
+      "blob": "3cdc57ba83b7e73ad9759065aa44e575a217cbe1",
+      "size": 700
+    },
+    {
+      "path": ".github/workflows/p13-ingest-gate.yml",
+      "blob": "52a6b7fc103dab3ac0b5c9adec8ec8aa4ef2e352",
+      "size": 1206
+    },
+    {
+      "path": ".github/workflows/p13-reality-ingest.yml",
+      "blob": "a23e2d73619f99b06f3368a62b537d85a2192da5",
+      "size": 700
+    },
+    {
+      "path": ".github/workflows/p14-long-context.yml",
+      "blob": "2b1499ac4785d1d0c5abbe727c6fafbc6cd93708",
+      "size": 1396
+    },
+    {
+      "path": ".github/workflows/p15-periodic-review.yml",
+      "blob": "7f3bea2330af62718252bf0c32a70f07033bc83c",
+      "size": 1164
+    },
+    {
+      "path": ".github/workflows/p16-convergence-gate.yml",
+      "blob": "e7a220435ff7619d82a837aa02580c6e324d366f",
+      "size": 658
+    },
+    {
+      "path": ".github/workflows/p16-habitation-harness.yml",
+      "blob": "0569a436145e830fd90be73377efbfdbf1f4df48",
+      "size": 795
+    },
+    {
+      "path": ".github/workflows/p16-provider-evaluation-manual.yml",
+      "blob": "af77d4b980282f195c19b6349670f956cc59541b",
+      "size": 4456
+    },
+    {
+      "path": ".github/workflows/p16-provider-habitation-manual.yml",
+      "blob": "b8900a8af092d5a03d3a49624fe00d274278c34e",
+      "size": 2955
+    },
+    {
+      "path": ".github/workflows/p9-revision-gate.yml",
+      "blob": "caa33a8b3bd4a46401ef0f6d57f98c7fcc8b295b",
+      "size": 1791
+    },
+    {
+      "path": ".github/workflows/world-index.yml",
+      "blob": "5bea273c771564dd41e197ec1cabc4fc6db79d41",
+      "size": 816
+    },
+    {
+      "path": ".github/workflows/world-kernel.yml",
+      "blob": "89c72fb87323a69cbb34612408df950dd1a587f8",
+      "size": 1112
+    }
+  ],
+  "constitution_files": [
+    {
+      "path": "docs/constitution/AIOS_Multi_Dimensional_World_Constitution_v1.0.md",
+      "blob": "19082c1debb5b17b4c317aff987c2d1b64e4d237",
+      "size": 4261
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_AI_Calibration_Model_Constitution.md",
+      "blob": "efa248d033fd3f738cd8c3968cad34882f6cbabd",
+      "size": 1730
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_AI_Cognitive_Boundary_Model_Constitution.md",
+      "blob": "ff07953260f2d5c4b8bf32c6b85ca96c69631277",
+      "size": 1013
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_AI_Cognitive_Runtime_Constitution.md",
+      "blob": "58bf2a342b2823ccc6bec2d0c38ab04c82dd4f69",
+      "size": 5287
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_AI_Dimension_Constitution.md",
+      "blob": "dd3f2afa3fce1b189e8f931537b2a6612bb6fd64",
+      "size": 2630
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_AI_Dimension_Module_Index.md",
+      "blob": "8bdce464a64fc9ab29214f98f48fda67e77b5d87",
+      "size": 1939
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_AI_Intent_Model_Constitution.md",
+      "blob": "77468883567c0a27e490403b497e3c03d9c33611",
+      "size": 969
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_AI_Personality_Model_Constitution.md",
+      "blob": "a57c72a4e6a62e2ab575a2b12f4df1eaf1e8ab7b",
+      "size": 1135
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_AI_Relationship_Model_Constitution.md",
+      "blob": "7d8e06dbdb3407ad5914739b9f6542bd6ebd592a",
+      "size": 1502
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_AI_Self_Model_Constitution.md",
+      "blob": "f1c7df5c09079e07886d118c955f4f32e49b2458",
+      "size": 1396
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_AI_Strategy_Model_Constitution.md",
+      "blob": "c946817df6bf8987e216756d57fd178771eea708",
+      "size": 1134
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_AI_User_Understanding_Model_Constitution.md",
+      "blob": "bedd6f9cf79e0c4635177c369d11eb1fafad9226",
+      "size": 1546
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Action_System_Constitution.md",
+      "blob": "b6505015e35a7290335e839cba340cae0f8f429c",
+      "size": 4378
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Adaptive_Cognitive_Policy_Constitution.md",
+      "blob": "d2804095936c09a09a533d617ad0c148dc66bda2",
+      "size": 3261
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_All_Dimensions_World_Projection_Constitution.md",
+      "blob": "401637695ada12ad6c466fda5c5f6b7fc179109a",
+      "size": 4552
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Base_Dimension_Constitution.md",
+      "blob": "c8c4aec98b5f91466a97e9ddc00b86b1a8d6a7e0",
+      "size": 333
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Basic_Cognition_Dimension_Constitution.md",
+      "blob": "59d9b32a160b11fe7c744e1b75108bdb9806e108",
+      "size": 407
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Cognitive_Dimension_Constitution.md",
+      "blob": "c31c4dd6fe808f70b6b1706377995a9f506d7283",
+      "size": 1442
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Cognitive_Dimension_World_Model_Addendum.md",
+      "blob": "e03ed9b1aa7828e5944d89a4b929137a14de756c",
+      "size": 2590
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Constitution_Consistency_Audit.md",
+      "blob": "d129def0dc77a5d18c2b65f8c1ebad3bfb335398",
+      "size": 1007
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Constitution_Final_Audit_Summary.md",
+      "blob": "5e62b8062966892ff3661fe52c142e8bcca35474",
+      "size": 685
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Constitution_Final_Authority_Record.md",
+      "blob": "98494b3911f5ae5c7d88270ac3a20849cd546b84",
+      "size": 735
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Constitution_Final_Completeness_Audit.md",
+      "blob": "5ff556cb6b3462f641274080534e638aeaa8dfc7",
+      "size": 1148
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Constitution_Final_Completion_Record.md",
+      "blob": "1fe4f18b2ad43537874e3a4ae2a86fbebb6631cc",
+      "size": 635
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Constitution_Final_Directory_Map.md",
+      "blob": "41821aa6b896cc65904f225ea7aee4be455d8c50",
+      "size": 707
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Constitution_Final_Entry_Map.md",
+      "blob": "dad59d99125f6c984863c7b33c52a15f973fe051",
+      "size": 1187
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Constitution_Final_Freeze_Checklist.md",
+      "blob": "aa1e20678120ac32b5d340fdc681768a3899574f",
+      "size": 934
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Constitution_Final_Freeze_Record.md",
+      "blob": "0f2575ca02c8291ac95bf59166796e8868d267bf",
+      "size": 717
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Constitution_Final_Release_Record.md",
+      "blob": "c5fc286e2e079aba1891249390e89cb135ad34f1",
+      "size": 716
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Constitution_Final_Status.md",
+      "blob": "937b078777fede603278bbe3c96367e8e896112f",
+      "size": 1005
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Constitution_Final_Status_Report.md",
+      "blob": "41e45f67d8511ca7709f18c41dfb129203ceb85c",
+      "size": 816
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Constitution_Final_Structure_Verification.md",
+      "blob": "5d803f97dbda71f82ccc9a8f4d8215228d2b9fd0",
+      "size": 1016
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Constitution_Final_Validation_Report.md",
+      "blob": "d2103f8dd35e574bb33c4fb6fc598cd607d0baca",
+      "size": 998
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Constitution_Legacy_Entry_Audit.md",
+      "blob": "bd9d42df365f707c6be01db43064d96733f7b93e",
+      "size": 533
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Constitution_Module_Index.md",
+      "blob": "dd795c64505808a84fa6377a8cd3c4c551c8b7cc",
+      "size": 1161
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Constitution_Structure_Index.md",
+      "blob": "7fe2d6895e5f40b680bf8e3e57ae6a1577d7bd04",
+      "size": 985
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Constitution_Version_Entry.md",
+      "blob": "3a1e02ed444bc50f2a28ade590cee4d96b1e8838",
+      "size": 1548
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Core_Principles_Constitution.md",
+      "blob": "7e2bf666b11dda6da165442a65c0e00343f413be",
+      "size": 724
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Data_Acquisition_Constitution.md",
+      "blob": "97d220074ad4768d6fc29ce184e24ea1c92c7059",
+      "size": 4033
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Data_Cleaning_Constitution.md",
+      "blob": "c3b489e5f1a2383e1c94cdb59a27ec73f286230c",
+      "size": 4142
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Dimension_Registration_Constitution.md",
+      "blob": "7597b3c06eef96b4cb732ad6b46fc0db2726a00c",
+      "size": 6061
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Dimension_Summary_Constitution.md",
+      "blob": "f98cd1562005f2317f9388d2af11511eb5755c15",
+      "size": 2097
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Document_Governance_Constitution.md",
+      "blob": "e3b67405aedc3cb9333e6a736dcf998566e4eee9",
+      "size": 2450
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Entity_System_Constitution.md",
+      "blob": "aac7235b327c0961e9b32ab74600dedadefb11bb",
+      "size": 247
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Event_Dimension_Constitution.md",
+      "blob": "6409a8f2ef8672b7dcbf4f52a058bade0eb1a51a",
+      "size": 449
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Evidence_Revision_Constitution.md",
+      "blob": "90161226262960bedbb5ba4251fcb62c0b11d06d",
+      "size": 6574
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Final_Module_Inventory.md",
+      "blob": "6374a5b8d456aa0c82d7eba927bbad10c0cbeb34",
+      "size": 1041
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_First_Layer_Base_Dimensions_Constitution.md",
+      "blob": "118fda9d45e074872840f00701e40b44c980d0f3",
+      "size": 4416
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Fused_Baseline_Registry.md",
+      "blob": "ac15b6e404b3737037a975137b0f9475ffa9908c",
+      "size": 14202
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Goal_Task_Constitution.md",
+      "blob": "28980c40d8c4d09da47b1ede92819cf3ffc4fde7",
+      "size": 4599
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_High_Level_Cognition_Dimension_Constitution.md",
+      "blob": "4f02826669d6e3df45794db5d5287925114d7f3b",
+      "size": 394
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Intelligent_Memory_Recommendation_System_Constitution.md",
+      "blob": "7b266a2e2b1beb8f4469a30cc5add02e35d14a3a",
+      "size": 8162
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Intelligent_World_Index_Constitution.md",
+      "blob": "85d297e39ab87740a6f0e94c9abfbdd3d32b4b07",
+      "size": 9016
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Long_Context_Continuity_Constitution.md",
+      "blob": "1c215fd800a0e90615d031d1b6e5b43e61abb089",
+      "size": 425
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_Periodic_Review_Growth_Constitution.md",
+      "blob": "0b214e743e7d13a9f64b9719e24bc3040cb1e214",
+      "size": 6840
+    },
+    {
+      "path": "docs/constitution/AIOS_v3.0_User_AI_Interaction_Dimension_Constitution.md",
+      "blob": "c6a28fcf6f0489b48497da49d0540f1fbb029d4c",
+      "size": 301
+    }
+  ],
+  "reviewer_probes": {
+    "window20_suite_a": {
+      "review_commit": "220311759e88fb3948ad3f4dba655058e0f392a8",
+      "blob": "527edd8d92243cabc417f176c0f7c4f6c358e65c",
+      "sha256": "ec1dc5c2c5406d5d9e74825f62e0a17fb80f8ebd6dc250817fa048511ce292b5"
+    },
+    "window20_suite_b": {
+      "review_commit": "220311759e88fb3948ad3f4dba655058e0f392a8",
+      "blob": "867f0ee993595c2d334a3940ad66308166693c97",
+      "sha256": "769242465817f31734661ba7ba9c3d5f7d06b8d3f5235d72d2026956d9b98eb1"
+    },
+    "window17": {
+      "review_commit": "e4161dd0ad0a2f825461311a1c8c5ff8234a07f8",
+      "blob": "bb25d184a5cb813ae4058de9a75fa23d9591b041",
+      "sha256": "a6db33956bb7bc1e8af19cddd7cebdd320604bba98b6a2b906fd1eb363fba0c3"
+    }
+  }
+}

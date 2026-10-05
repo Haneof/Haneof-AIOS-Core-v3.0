@@ -1,0 +1,3 @@
+simulated_http=500 old_logic_exit=0
+simulated_http=401 old_logic_exit=0
+simulated_http=403 old_logic_exit=0
