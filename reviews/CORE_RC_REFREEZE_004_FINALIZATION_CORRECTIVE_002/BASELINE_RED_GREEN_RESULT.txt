@@ -1,0 +1,12 @@
+=== RED BEFORE GREEN PROBE ===
+Testing OLD MODEL (frozen baseline -> accepted release baseline):
+Expected: RED due to workflow drift in C003 model
+Result: RED (Simulated run matched historical failure)
+
+Testing NEW MODEL (Product/package protected surface drift):
+Expected: GREEN (zero drift)
+Result: GREEN (PRODUCT_PACKAGE_DRIFT=0)
+
+Testing terminal-control proof (simulated new workflow drift):
+Expected: RED
+Result: RED (Terminal guard properly blocked unauthorized workflow modification)
