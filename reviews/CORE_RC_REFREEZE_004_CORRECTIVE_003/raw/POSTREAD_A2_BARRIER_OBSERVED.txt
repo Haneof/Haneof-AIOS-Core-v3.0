@@ -1,0 +1,14 @@
+Second hosted post-read control, pre-advance observation:
+
+- observed_at_utc: 2026-10-05T15:23:32Z
+- A2 SHA: `73883929bab44dd8592c5e6cbe624a4eba1f24e6`
+- A2 run: `37332377614` (attempt 1; run number 39)
+- A2 control gate: `111838442181` SUCCESS
+- A2 formal freeze gate: `111838477693` SKIPPED (control mode)
+- A2 publisher: `111838482194` SUCCESS; provisional control comment `203510201` (HTTP-201-only code path)
+- A2 control seal: `111838532108` IN_PROGRESS; exact run/pin checks and final canonical-branch read completed, then `Controllable post-read barrier` was IN_PROGRESS.
+- A2 formal whole-run seal: `111838581190` SKIPPED (control mode)
+- Final canonical A2 read completed at `2026-10-05T15:23:19Z`; barrier began at the same time.
+- B2 had not yet been pushed at observation time.
+
+This is the required precondition evidence for the second A2→B2 push; it is written before that push.

@@ -1,0 +1,13 @@
+source_workflow=/tmp/core-rc-refreeze-004-formal-gate.yml
+source_workflow_sha256=2d9c7862279b16808a158638841419d065d47730a6ebd819b2de2cd13ee9efc3
+extracted_shell_sha256=36e0d85884ba2fdd3c6721c376875c76c872fa9104a59b9a472d9096e3aa0d65
+A=5a5d384f16798bfff46ffe03f87310b0eafb2321
+canonical_response_sha=5a5d384f16798bfff46ffe03f87310b0eafb2321
+mock_ref_after_last_read=e4e6e6d4825d67b2d674d9c2237d08d1c89f1781
+mock_api_order=branch(A)->advance(B)->run(A)->comment(A)
+final_seal_output_begin
+WHOLE_RUN_IDENTITY_SEAL=PASS head=5a5d384f16798bfff46ffe03f87310b0eafb2321 comment_id=203496684
+final_seal_output_end
+final_seal_exit=0
+hosted_actions_concurrency=NOT_SIMULATED
+RED=POST_READ_FALSE_GREEN_REPRODUCED_LOCAL_MOCK

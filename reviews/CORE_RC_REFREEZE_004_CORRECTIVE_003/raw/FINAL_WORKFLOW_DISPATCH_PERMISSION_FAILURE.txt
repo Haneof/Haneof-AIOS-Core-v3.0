@@ -1,0 +1,10 @@
+Observed at 2026-10-05T15:27Z, before pre-final run #41 and before new PR creation:
+
+Command:
+  gh workflow run core-rc-refreeze-004-formal-gate.yml --repo Haneof/Haneof-AIOS-Core-v3.0 --ref arena/01a10c8c-haneof-aios-core-v3-0
+
+Result:
+  HTTP 403: Resource not accessible by integration
+  Endpoint: POST /repos/Haneof/Haneof-AIOS-Core-v3.0/actions/workflows/374656550/dispatches
+
+No workflow_dispatch run was created by this attempt. The GitHub CLI connection reports authenticated as Haneof, but the integration lacks permission to dispatch the final required workflow. Do not substitute a push-triggered run for the final workflow_dispatch. Reconnect GitHub in Arena with the Actions dispatch permission restored, then dispatch on the final PR head.

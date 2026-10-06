@@ -1,0 +1,806 @@
+name: core-rc-refreeze-004-formal-gate
+
+on:
+  push:
+    branches:
+      - "arena/01a10c8c-haneof-aios-core-v3-0"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: core-rc-refreeze-004-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FROZEN_SHA: "1cee3c5ad12f4b9098232bae11b51df786c5eb2f"
+  FROZEN_ROOT_TREE: "70b2711258567863ea0d93025a6a07e39631726a"
+  FROZEN_CORE_TREE: "16f1487e291b009c55bee402abfd79fdacbae960"
+  FROZEN_TESTS_TREE: "9db1bfa08143bc99fe03836e2752ee6e05694eb6"
+  FROZEN_WORKFLOWS_TREE: "72cde9d2dc2b35d071bfa36c954dac2faff4a803"
+  FROZEN_PYPROJECT_BLOB: "b38833c7537fa60d5c2f02ed4bb19158d8995a11"
+  W20_REVIEW: "220311759e88fb3948ad3f4dba655058e0f392a8"
+  W17_REVIEW: "e4161dd0ad0a2f825461311a1c8c5ff8234a07f8"
+  W20_PROBE_DIR: "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_002_IA_WINDOW_20/reviewer_probes"
+  W17_PROBE_DIR: "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001_CORRECTIVE_001_IA_WINDOW_17/reviewer_probes"
+  SUITE_A_BLOB: "527edd8d92243cabc417f176c0f7c4f6c358e65c"
+  SUITE_A_SHA256: "ec1dc5c2c5406d5d9e74825f62e0a17fb80f8ebd6dc250817fa048511ce292b5"
+  SUITE_B_BLOB: "867f0ee993595c2d334a3940ad66308166693c97"
+  SUITE_B_SHA256: "769242465817f31734661ba7ba9c3d5f7d06b8d3f5235d72d2026956d9b98eb1"
+  W17_BLOB: "bb25d184a5cb813ae4058de9a75fa23d9591b041"
+  W17_SHA256: "a6db33956bb7bc1e8af19cddd7cebdd320604bba98b6a2b906fd1eb363fba0c3"
+  FORMAL_PYTHON: "3.12.14"
+  FORMAL_PYDANTIC: "2.13.5"
+  FORMAL_PYTEST: "8.4.2"
+  CANONICAL_CORRECTIVE_BRANCH: "arena/01a10c8c-haneof-aios-core-v3-0"
+
+jobs:
+  rc004-freeze-gate:
+    name: RC004 exact frozen software / formal gate
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, '[W30-FINAL-FORMAL]')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout exact RC evidence candidate head
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Select formal CPython 3.12.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: "${{ env.FORMAL_PYTHON }}"
+
+      - name: Exact-head, frozen identity, post-integration drift, and candidate scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/ci-output"
+          mkdir -p "$OUT"
+          test "$GITHUB_REF_NAME" = "$CANONICAL_CORRECTIVE_BRANCH" || { echo "NON_CANONICAL_CORRECTIVE_REF $GITHUB_REF_NAME"; exit 1; }
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            test "$GITHUB_REF" = "refs/heads/$CANONICAL_CORRECTIVE_BRANCH" || { echo "WORKFLOW_DISPATCH_REF_REJECTED $GITHUB_REF"; exit 1; }
+          fi
+          if git config --local --get-regexp '^http\\..*\\.extraheader$' >"$OUT/checkout-extraheaders.txt" 2>/dev/null; then
+            cat "$OUT/checkout-extraheaders.txt"
+            echo "CHECKOUT_CREDENTIAL_PERSISTED"; exit 1
+          fi
+          git fetch --all --prune
+          git branch -r --sort=refname | sed "s/^[[:space:]]*//" | tee "$OUT/remote-branch-snapshot.txt"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          remote_head="$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | awk '{print $1}')"
+          test "$remote_head" = "$GITHUB_SHA" || { echo "FORMAL_CI_NOT_EXACT_HEAD remote=$remote_head event=$GITHUB_SHA"; exit 1; }
+
+          git fetch --no-tags --force origin "+refs/heads/main:refs/remotes/rc004/main"
+          live_main="$(git rev-parse refs/remotes/rc004/main)"
+          git cat-file -e "${FROZEN_SHA}^{commit}"
+
+          target="$RUNNER_TEMP/aios-rc004-frozen-software"
+          git worktree add --detach "$target" "$FROZEN_SHA"
+          test "$(git -C "$target" rev-parse HEAD)" = "$FROZEN_SHA"
+          test "$(git -C "$target" rev-parse HEAD^{tree})" = "$FROZEN_ROOT_TREE"
+          test "$(git -C "$target" rev-parse HEAD:src/aios_core)" = "$FROZEN_CORE_TREE"
+          test "$(git -C "$target" rev-parse HEAD:tests)" = "$FROZEN_TESTS_TREE"
+          test "$(git -C "$target" rev-parse HEAD:.github/workflows)" = "$FROZEN_WORKFLOWS_TREE"
+          test "$(git -C "$target" rev-parse HEAD:pyproject.toml)" = "$FROZEN_PYPROJECT_BLOB"
+
+          bash "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/probes/terminal_protected_drift_guard.sh" "$FROZEN_SHA" "$live_main" "$OUT/post-integration-drift.txt"
+
+          base="$(git merge-base refs/remotes/rc004/main HEAD)"
+          git diff --name-status "$base" HEAD | tee "$OUT/candidate-scope.txt"
+          if git diff --no-renames --name-only "$base" HEAD | grep -Ev '^((\.github/workflows/core-rc-refreeze-004-formal-gate\.yml)|(reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/.*))$' | grep -q .; then
+            echo "RC004_CANDIDATE_SCOPE_VIOLATION"; exit 1
+          fi
+
+          {
+            echo "candidate_head=$GITHUB_SHA"
+            echo "candidate_parent=$(git rev-parse HEAD^)"
+            echo "candidate_tree=$(git rev-parse HEAD^{tree})"
+            echo "live_main=$live_main"
+            echo "frozen_software=$FROZEN_SHA"
+            echo "frozen_root_tree=$(git -C "$target" rev-parse HEAD^{tree})"
+            echo "frozen_core_tree=$(git -C "$target" rev-parse HEAD:src/aios_core)"
+            echo "frozen_tests_tree=$(git -C "$target" rev-parse HEAD:tests)"
+            echo "frozen_workflows_tree=$(git -C "$target" rev-parse HEAD:.github/workflows)"
+            echo "frozen_pyproject_blob=$(git -C "$target" rev-parse HEAD:pyproject.toml)"
+          } | tee "$OUT/frozen_identity.txt"
+
+          echo "RC004_TARGET=$target" >> "$GITHUB_ENV"
+          echo "RC004_OUT=$OUT" >> "$GITHUB_ENV"
+          echo "RC004_LIVE_MAIN=$live_main" >> "$GITHUB_ENV"
+
+      - name: Create isolated formal environment and record exact runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          VENV="$RUNNER_TEMP/rc004-formal-venv"
+          python -m venv "$VENV"
+          "$VENV/bin/python" -m pip install --upgrade pip
+          "$VENV/bin/python" -m pip install -e "$RC004_TARGET" "pydantic==$FORMAL_PYDANTIC" "pytest==$FORMAL_PYTEST"
+          "$VENV/bin/python" - <<'PY' | tee "$RC004_OUT/environment_manifest.txt"
+          import aios_core, platform, sqlite3, ssl, sys
+          import pydantic, pytest
+          assert sys.version_info[:3] == (3, 12, 14), sys.version
+          assert pydantic.__version__ == "2.13.5", pydantic.__version__
+          assert pytest.__version__ == "8.4.2", pytest.__version__
+          print("task=CORE-RC-REFREEZE-004")
+          print("software_sha=1cee3c5ad12f4b9098232bae11b51df786c5eb2f")
+          print("python=" + sys.version.replace("\n"," "))
+          print("python_executable=" + sys.executable)
+          print("implementation=" + platform.python_implementation())
+          print("pydantic=" + pydantic.__version__)
+          print("pytest=" + pytest.__version__)
+          print("sqlite=" + sqlite3.sqlite_version)
+          print("openssl=" + ssl.OPENSSL_VERSION)
+          print("platform=" + platform.platform())
+          print("machine=" + platform.machine())
+          print("aios_core.__file__=" + str(aios_core.__file__))
+          PY
+          {
+            echo "kernel=$(uname -a)"
+            echo "architecture=$(uname -m)"
+            echo "os_release=$(grep '^PRETTY_NAME=' /etc/os-release | cut -d= -f2- | tr -d '"')"
+          } | tee -a "$RC004_OUT/environment_manifest.txt"
+          "$VENV/bin/python" -m pip freeze | tee "$RC004_OUT/dependency-manifest.txt"
+          echo "RC004_VENV=$VENV" >> "$GITHUB_ENV"
+
+      - name: Corrective-003 workflow security, protected-drift, and publisher fault controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$RC004_VENV/bin/python" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/probes/workflow_security_static_probe.py" "$GITHUB_WORKSPACE/.github/workflows/core-rc-refreeze-004-formal-gate.yml" 2>&1 | tee "$RC004_OUT/workflow-security-static.txt"
+          grep -q 'WORKFLOW_SECURITY_STATIC=PASS' "$RC004_OUT/workflow-security-static.txt"
+          probe="$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/probes/carry_forward/publisher_http_contract.sh"
+          : > "$RC004_OUT/publisher-fault-injection.txt"
+          for code in 201 401 403 500; do
+            set +e
+            bash "$probe" "$code" >> "$RC004_OUT/publisher-fault-injection.txt" 2>&1
+            prc=$?
+            set -e
+            echo "simulated_http=$code corrected_logic_exit=$prc" | tee -a "$RC004_OUT/publisher-fault-injection.txt"
+            if [ "$code" = "201" ]; then
+              test "$prc" -eq 0
+            else
+              test "$prc" -ne 0
+            fi
+          done
+          "$RC004_VENV/bin/python" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/probes/publisher_fault_matrix.py" "$GITHUB_WORKSPACE/.github/workflows/core-rc-refreeze-004-formal-gate.yml" 2>&1 | tee "$RC004_OUT/publisher-exact-shell-fault-matrix.txt"
+          grep -q 'PUBLISHER_FAULT_MATRIX=PASS' "$RC004_OUT/publisher-exact-shell-fault-matrix.txt"
+          "$RC004_VENV/bin/python" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/probes/terminal_protected_drift_controls.py" 2>&1 | tee "$RC004_OUT/terminal-protected-drift-controls.txt"
+          grep -q 'TERMINAL_PROTECTED_DRIFT_CONTROLS=PASS' "$RC004_OUT/terminal-protected-drift-controls.txt"
+
+      - name: Fresh complete Core regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RC004_TARGET"
+          "$RC004_VENV/bin/python" -m pytest -o addopts='' -q --tb=no             tests/unit tests/integration tests/runtime tests/habitation             --junitxml="$RC004_OUT/core-regression-junit.xml"             2>&1 | tee "$RC004_OUT/core-regression.txt"
+          grep -qE '[0-9]+ passed' "$RC004_OUT/core-regression.txt"
+          grep -qE '[0-9]+ (failed|error)' "$RC004_OUT/core-regression.txt" && exit 1 || true
+
+      - name: Fresh extract and run frozen Window 20 A/B and Window 17 reviewer probes
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+          git fetch --no-tags --force origin             "+refs/pull/311/head:refs/remotes/rc004/pr-311"             "+refs/heads/arena/01a0fd4d-haneof-aios-core-v3-0:refs/remotes/rc004/w17"
+          git merge-base --is-ancestor "$W20_REVIEW" refs/remotes/rc004/pr-311 || { echo "WINDOW20_REVIEW_IDENTITY_MISMATCH"; exit 1; }
+          test "$(git rev-parse refs/remotes/rc004/w17)" = "$W17_REVIEW" || { echo "WINDOW17_REVIEW_IDENTITY_MISMATCH"; exit 1; }
+          mkdir -p "$RUNNER_TEMP/rc004-probes"
+          extract () {
+            review="$1"; path="$2"; blob_expected="$3"; sha_expected="$4"; out="$5"; label="$6"
+            blob="$(git ls-tree "$review" -- "$path" | awk '{print $3}')"
+            test "$blob" = "$blob_expected" || { echo "${label}_BLOB_MISMATCH expected=$blob_expected actual=$blob"; exit 1; }
+            git cat-file blob "$blob" > "$out"
+            sha="$(sha256sum "$out" | awk '{print $1}')"
+            test "$sha" = "$sha_expected" || { echo "${label}_SHA256_MISMATCH expected=$sha_expected actual=$sha"; exit 1; }
+            echo "$label commit=$review blob=$blob sha256=$sha bytes=$(wc -c < "$out")"
+          }
+          {
+            extract "$W20_REVIEW" "$W20_PROBE_DIR/window20_independent_attack.py" "$SUITE_A_BLOB" "$SUITE_A_SHA256" "$RUNNER_TEMP/rc004-probes/suite_a.py" "WINDOW20_SUITE_A"
+            extract "$W20_REVIEW" "$W20_PROBE_DIR/window20_migration_rsa_attack.py" "$SUITE_B_BLOB" "$SUITE_B_SHA256" "$RUNNER_TEMP/rc004-probes/suite_b.py" "WINDOW20_SUITE_B"
+            extract "$W17_REVIEW" "$W17_PROBE_DIR/window17_independent_attack.py" "$W17_BLOB" "$W17_SHA256" "$RUNNER_TEMP/rc004-probes/w17.py" "WINDOW17"
+          } | tee "$RC004_OUT/probe-identities.txt"
+          cd "$RC004_TARGET"
+          PYTHONPATH="$RC004_TARGET/src" "$RC004_VENV/bin/python" "$RUNNER_TEMP/rc004-probes/suite_a.py" 2>&1 | tee "$RC004_OUT/window20-suite-a.txt"
+          PYTHONPATH="$RC004_TARGET/src" "$RC004_VENV/bin/python" "$RUNNER_TEMP/rc004-probes/suite_b.py" 2>&1 | tee "$RC004_OUT/window20-suite-b.txt"
+          PYTHONPATH="$RC004_TARGET/src" "$RC004_VENV/bin/python" "$RUNNER_TEMP/rc004-probes/w17.py" 2>&1 | tee "$RC004_OUT/window17-probe.txt"
+          test "$(grep -E '^SUMMARY \|' "$RC004_OUT/window20-suite-a.txt" | tail -1)" = "SUMMARY | probes=4 failures=0"
+          test "$(grep -E '^SUMMARY \|' "$RC004_OUT/window20-suite-b.txt" | tail -1)" = "SUMMARY | probes=7 failures=0"
+          test "$(grep -E '^SUMMARY \|' "$RC004_OUT/window17-probe.txt" | tail -1)" = "SUMMARY | probes=14 failures=0"
+
+      - name: Corrective-003 trust-root, alternate-mint, replay/conflict, supersession, and partial-commit checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RC004_TARGET"
+          "$RC004_VENV/bin/python" - <<'PY' | tee "$RC004_OUT/trust-mint-inventory.txt"
+          import ast
+          from pathlib import Path
+          root=Path("src/aios_core")
+          tables={
+            "background_model_request_bindings",
+            "background_model_return_verifiers",
+            "background_model_response_receipts",
+            "background_model_return_handoffs",
+            "background_model_responses",
+          }
+          records=[]
+          for p in root.rglob("*.py"):
+            src=p.read_text(encoding="utf-8")
+            tree=ast.parse(src)
+            parents={}
+            for node in ast.walk(tree):
+              for child in ast.iter_child_nodes(node):
+                parents[child]=node
+            for node in ast.walk(tree):
+              if isinstance(node, ast.Constant) and isinstance(node.value,str):
+                text=node.value
+                touched=[t for t in tables if t in text]
+                if not touched: continue
+                upper=text.upper()
+                if not any(k in upper for k in ("INSERT","UPDATE","DELETE","CREATE TABLE")): continue
+                cur=node
+                fn="<module>"
+                while cur in parents:
+                  cur=parents[cur]
+                  if isinstance(cur,(ast.FunctionDef,ast.AsyncFunctionDef)):
+                    fn=cur.name; break
+                records.append((str(p),getattr(node,"lineno",None),fn,touched,upper.split()[0] if upper.split() else ""))
+          for r in records: print(r)
+          dml=[r for r in records if r[4] in {"INSERT","UPDATE","DELETE"}]
+          assert dml, "no durable writer inventory"
+          assert {r[0] for r in dml} == {"src/aios_core/runtime/background_attempt.py"}, {r[0] for r in dml}
+          ins_receipt={r[2] for r in dml if "background_model_response_receipts" in r[3] and r[4]=="INSERT"}
+          ins_handoff={r[2] for r in dml if "background_model_return_handoffs" in r[3] and r[4]=="INSERT"}
+          ins_response={r[2] for r in dml if "background_model_responses" in r[3] and r[4]=="INSERT"}
+          assert ins_receipt == {"attach_late_trusted_return"}, ins_receipt
+          assert ins_handoff == {"attach_late_trusted_return"}, ins_handoff
+          assert ins_response == {"stage_exact_response"}, ins_response
+          print("TRUST_MINT_INVENTORY=PASS")
+          print("SOLE_TRUST_ROOT=attach_late_trusted_return")
+          print("STAGED_RESPONSE_CONSUMER=stage_exact_response")
+          PY
+
+          SYMBOLS='record_live_provider_return|_capture_trusted_response_return|consume_live_provider_return_window|_ISSUE_SENTINEL|_OPEN_WINDOWS|_HANDLER_RETURNS|ModelResponseAuthenticator|model_response_authenticator|_live_provider_return_window|_capture_live_provider_return'
+          if grep -RnE "^[[:space:]]*(def|class)[[:space:]]+(${SYMBOLS})([^A-Za-z0-9_]|$)" src/; then echo "LOCAL_TRUST_AUTHORITY_DEFINITION_PRESENT"; exit 1; fi
+          if grep -RnE "^[[:space:]]*(${SYMBOLS})[[:space:]]*(:[^=]*)?=" src/; then echo "LOCAL_TRUST_AUTHORITY_ASSIGNMENT_PRESENT"; exit 1; fi
+          if grep -RnE "^[[:space:]]*(from|import)[[:space:]].*(${SYMBOLS})" src/; then echo "LOCAL_TRUST_AUTHORITY_IMPORT_PRESENT"; exit 1; fi
+          test -f src/aios_core/runtime/live_return.py
+          grep -q '^LOCAL_LIVE_RETURN_AUTHORITY_DECOMMISSIONED = True$' src/aios_core/runtime/live_return.py
+          "$RC004_VENV/bin/python" - <<'PY' | tee "$RC004_OUT/tombstone-import-audit.txt"
+          import ast
+          from pathlib import Path
+
+          root = Path("src/aios_core/runtime")
+          offenders = []
+          for path in root.glob("*.py"):
+              if path.name in {"live_return.py", "__init__.py"}:
+                  continue
+              tree = ast.parse(path.read_text(encoding="utf-8"))
+              for node in ast.walk(tree):
+                  if isinstance(node, ast.ImportFrom):
+                      module = node.module or ""
+                      if module.endswith("live_return"):
+                          offenders.append((str(path), node.lineno, "ImportFrom", module))
+                  elif isinstance(node, ast.Import):
+                      for alias in node.names:
+                          if alias.name.endswith("live_return"):
+                              offenders.append((str(path), node.lineno, "Import", alias.name))
+          print("authorization_import_offenders=", offenders)
+          assert not offenders, offenders
+
+          init_tree = ast.parse((root / "__init__.py").read_text(encoding="utf-8"))
+          compatibility_reexports = []
+          for node in ast.walk(init_tree):
+              if isinstance(node, ast.ImportFrom) and (node.module or "").endswith("live_return"):
+                  compatibility_reexports.extend(alias.name for alias in node.names)
+          print("runtime_init_tombstone_reexports=", sorted(compatibility_reexports))
+          assert compatibility_reexports, "expected inert reviewer-probe compatibility re-export is absent"
+          print("TOMBSTONE_AUTHORIZATION_IMPORT_AUDIT=PASS")
+          PY
+
+          "$RC004_VENV/bin/python" -m pytest -o addopts='' -q --tb=short             tests/runtime/test_background_late_return_route_b.py             tests/runtime/test_late_return_canonical_encoding_002.py             tests/integration/test_core_background_late_trusted_return_corrective_003_c3_matrix.py             tests/integration/test_core_background_late_trusted_return_corrective_002.py             tests/integration/test_core_background_late_trusted_return_corrective_001.py             tests/integration/test_core_background_late_trusted_return_consumption_001.py             tests/integration/test_core_background_late_trusted_return_secret_upgrade_001.py             tests/integration/test_core_background_response_recovery_001_corrective_002_recovery.py             tests/integration/test_core_background_response_recovery_001_corrective_001.py             tests/integration/test_core_background_trusted_return_recovery_001.py             tests/integration/test_core_background_trusted_return_adversarial_001.py             tests/integration/test_core_background_trusted_return_r5_001.py             tests/integration/test_core_background_trusted_return_r5_conflicts_001.py             2>&1 | tee "$RC004_OUT/corrective003-security.txt"
+          grep -qE '[0-9]+ passed' "$RC004_OUT/corrective003-security.txt"
+          grep -qE '[0-9]+ (failed|error)' "$RC004_OUT/corrective003-security.txt" && exit 1 || true
+
+      - name: Real SIGKILL and fresh-process recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RC004_TARGET"
+          "$RC004_VENV/bin/python" -m pytest -o addopts='' -q --tb=short             tests/integration/test_core_background_trusted_return_corrective_001_process_loss.py             "tests/integration/test_core_background_late_trusted_return_corrective_002.py::test_ca2_004_real_sigkill_leaves_no_live_authority_in_the_fresh_process"             "tests/integration/test_core_background_response_recovery_001_corrective_002_recovery.py::test_actual_sigkill_after_receipt_commit_recovers_without_provider_redispatch"             tests/integration/test_core_background_late_trusted_return_sigkill_001.py             "tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_process_sigkill_after_exact_response_staged_recovers_with_zero_provider_calls"             "tests/integration/test_core_background_response_recovery_001_corrective_001.py::test_process_sigkill_after_capability_side_effect_replays_exactly_once"             "tests/integration/test_core_background_trusted_return_adversarial_001.py::test_real_sigkill_after_later_round_trusted_handoff"             2>&1 | tee "$RC004_OUT/real-process-loss.txt"
+          grep -qE '[0-9]+ passed' "$RC004_OUT/real-process-loss.txt"
+          grep -qE '[0-9]+ (failed|error)' "$RC004_OUT/real-process-loss.txt" && exit 1 || true
+
+      - name: Clean non-editable wheel install and headless lifecycle
+        shell: bash
+        run: |
+          set -euo pipefail
+          WHEEL_DIR="$RUNNER_TEMP/rc004-wheel"
+          CLEAN_VENV="$RUNNER_TEMP/rc004-clean-venv"
+          mkdir -p "$WHEEL_DIR"
+          "$RC004_VENV/bin/python" -m pip wheel --no-deps "$RC004_TARGET" -w "$WHEEL_DIR" 2>&1 | tee "$RC004_OUT/wheel-build.txt"
+          wheel="$(find "$WHEEL_DIR" -maxdepth 1 -type f -name 'aios_core-*.whl' -print -quit)"
+          test -n "$wheel"
+          python -m venv "$CLEAN_VENV"
+          "$CLEAN_VENV/bin/python" -m pip install --upgrade pip
+          "$CLEAN_VENV/bin/python" -m pip install "pydantic==$FORMAL_PYDANTIC" "$wheel" 2>&1 | tee "$RC004_OUT/clean-install.txt"
+          "$CLEAN_VENV/bin/python" "$RC004_TARGET/reviews/CORE_RC_REFREEZE_003/probes/clean_install_headless_smoke.py" "$CLEAN_VENV/bin/aios-core-headless" 2>&1 | tee "$RC004_OUT/clean-install-headless.txt"
+          grep -q 'HEADLESS_CLEAN_INSTALL_PASS' "$RC004_OUT/clean-install-headless.txt"
+
+      - name: Backup restore rebuild and trusted-return authority preservation
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RC004_TARGET"
+          PYTHONPATH="$RC004_TARGET/src" AIOS_RC_TARGET_ROOT="$RC004_TARGET"             "$RC004_VENV/bin/python" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/probes/carry_forward/backup_restore_route_b.py"             2>&1 | tee "$RC004_OUT/backup-restore-rebuild.txt"
+          grep -q 'BACKUP_RESTORE_ROUTE_B_PASS' "$RC004_OUT/backup-restore-rebuild.txt"
+
+      - name: Writer restart historical FIX current-time and no-second-truth-store spot checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RC004_TARGET"
+          "$RC004_VENV/bin/python" -m pytest -o addopts='' -q --tb=short             tests/integration/test_core_headless.py             tests/integration/test_core_recovery.py             tests/integration/test_core_gap_fix_002_background_attempts.py             tests/runtime/test_turn_execution_recovery.py             "tests/integration/test_v3_fused_turn_runtime.py::test_cg001_current_time_control_keeps_current_fact_visible"             tests/integration/test_core_scale_semantics.py             2>&1 | tee "$RC004_OUT/writer-restart-fix-scale.txt"
+          grep -qE '[0-9]+ passed' "$RC004_OUT/writer-restart-fix-scale.txt"
+          grep -qE '[0-9]+ (failed|error)' "$RC004_OUT/writer-restart-fix-scale.txt" && exit 1 || true
+
+      - name: C15 structured JUnit classifier regression matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$RC004_VENV/bin/python" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/probes/carry_forward/c15_junit_classifier.py" --self-test 2>&1 | tee "$RC004_OUT/c15-classifier-selftest.txt"
+          grep -q 'C15_JUNIT_CLASSIFIER_SELFTEST=PASS cases=10' "$RC004_OUT/c15-classifier-selftest.txt"
+
+      - name: Fresh C15 downstream compatibility debt classification
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RC004_TARGET"
+          junit="$RC004_OUT/c15-persistence-junit.xml"
+          rm -f "$junit"
+          set +e
+          "$RC004_VENV/bin/python" -m pytest -o addopts='' -q --tb=no tests/c15_persistence --junitxml="$junit" 2>&1 | tee "$RC004_OUT/c15-persistence.txt"
+          rc=${PIPESTATUS[0]}
+          set -e
+          echo "pytest_exit=$rc" | tee "$RC004_OUT/c15-pytest-exit.txt"
+          case "$rc" in
+            0|1) ;;
+            *) echo "C15_PYTEST_EXIT_NOT_ADMISSIBLE rc=$rc"; exit 1 ;;
+          esac
+          "$RC004_VENV/bin/python" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/probes/carry_forward/c15_junit_classifier.py" --pytest-exit "$rc" --junit "$junit" 2>&1 | tee "$RC004_OUT/c15-adjudication.txt"
+          if [ "$rc" = "1" ]; then
+            grep -q 'CORE_FREEZE_NOT_BLOCKED_BY_DOWNSTREAM_OPERATOR_DEBT' "$RC004_OUT/c15-adjudication.txt"
+            grep -q 'C15_OPERATOR_ADAPTATION_REQUIRED_BEFORE_RESIDENT' "$RC004_OUT/c15-adjudication.txt"
+          fi
+
+      - name: Fresh open-PR contamination inventory
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          api="https://api.github.com/repos/${GITHUB_REPOSITORY}"
+          curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json"             "$api/pulls?state=open&per_page=100" > "$RC004_OUT/open-pr-snapshot.json"
+          python - "$RC004_OUT/open-pr-snapshot.json" "$RC004_OUT/open-pr-contamination.txt" "$api" "$GH_TOKEN" <<'PY'
+          import json, sys, urllib.request
+          src, out, api, token = sys.argv[1:]
+          pulls=json.load(open(src,encoding="utf-8"))
+          relevant_prefixes=("src/","tests/",".github/workflows/","pyproject.toml","tools/c15_persistence/","tools/c15_preflight/")
+          rows=[]
+          for pr in pulls:
+              n=pr["number"]
+              req=urllib.request.Request(f"{api}/pulls/{n}/files?per_page=100",headers={"Authorization":f"Bearer {token}","Accept":"application/vnd.github+json"})
+              with urllib.request.urlopen(req) as r: files=json.load(r)
+              names=[f["filename"] for f in files]
+              rel=[x for x in names if x.startswith(relevant_prefixes) or x=="pyproject.toml"]
+              if rel or n in (310,311,321):
+                  rows.append({"number":n,"title":pr["title"],"head":pr["head"]["sha"],"draft":pr["draft"],"files":rel})
+          with open(out,"w",encoding="utf-8") as f:
+              for row in rows:
+                  f.write(json.dumps(row,sort_keys=True)+"\n")
+          print(f"relevant_open_prs={len(rows)}")
+          for row in rows: print(json.dumps(row,sort_keys=True))
+          nums={r["number"] for r in rows}
+          assert 310 in nums and 311 in nums and 321 in nums
+          PY
+          cat "$RC004_OUT/open-pr-contamination.txt"
+
+      - name: Runtime source manifest and SHA256 evidence index
+        if: always()
+        shell: bash
+        run: |
+          set -uo pipefail
+          OUT="${RC004_OUT:-$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/ci-output}"
+          mkdir -p "$OUT"
+          if [ -n "${RC004_TARGET:-}" ] && [ -d "$RC004_TARGET/.git" -o -e "$RC004_TARGET/.git" ]; then
+            python - "$RC004_TARGET" "$OUT/source_manifest_runtime.json" <<'PY'
+          import json, subprocess, sys
+          from pathlib import Path
+          root=Path(sys.argv[1]); out=Path(sys.argv[2])
+          def g(*args): return subprocess.check_output(["git","-C",str(root),*args],text=True).strip()
+          paths=["src/aios_core","tests",".github/workflows","pyproject.toml","docs/constitution","governance/AIOS_CORE_BASELINE_001_DECISION_2026-09-24.md"]
+          obj={p:g("rev-parse",f"HEAD:{p}") for p in paths}
+          files=[]
+          for line in g("ls-tree","-r","-l","HEAD").splitlines():
+              meta,path=line.split("\t",1); parts=meta.split()
+              files.append({"path":path,"mode":parts[0],"type":parts[1],"sha":parts[2],"size":None if parts[3]=="-" else int(parts[3])})
+          manifest={"software_sha":g("rev-parse","HEAD"),"root_tree":g("rev-parse","HEAD^{tree}"),"objects":obj,"files":files}
+          out.write_text(json.dumps(manifest,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          PY
+          fi
+          find "$OUT" -maxdepth 1 -type f ! -name 'SHA256SUMS.runtime' -print0 | sort -z | xargs -0 sha256sum > "$OUT/SHA256SUMS.runtime" || true
+          cat "$OUT/SHA256SUMS.runtime" || true
+
+
+      - name: Terminal immutability and protected-drift gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA" || { echo "TERMINAL_LOCAL_HEAD_MISMATCH"; exit 1; }
+          remote_head="$(git ls-remote origin "refs/heads/$CANONICAL_CORRECTIVE_BRANCH" | awk '{print $1}')"
+          test "$remote_head" = "$GITHUB_SHA" || { echo "TERMINAL_REMOTE_HEAD_MISMATCH remote=$remote_head event=$GITHUB_SHA"; exit 1; }
+          test "$(git -C "$RC004_TARGET" rev-parse HEAD)" = "$FROZEN_SHA"
+          test "$(git -C "$RC004_TARGET" rev-parse HEAD^{tree})" = "$FROZEN_ROOT_TREE"
+          test "$(git -C "$RC004_TARGET" rev-parse HEAD:src/aios_core)" = "$FROZEN_CORE_TREE"
+          test "$(git -C "$RC004_TARGET" rev-parse HEAD:tests)" = "$FROZEN_TESTS_TREE"
+          test "$(git -C "$RC004_TARGET" rev-parse HEAD:.github/workflows)" = "$FROZEN_WORKFLOWS_TREE"
+          test "$(git -C "$RC004_TARGET" rev-parse HEAD:pyproject.toml)" = "$FROZEN_PYPROJECT_BLOB"
+          git -C "$RC004_TARGET" diff --quiet --
+          git -C "$RC004_TARGET" diff --cached --quiet --
+          test -z "$(git -C "$RC004_TARGET" status --porcelain --untracked-files=no)"
+          if git config --local --get-regexp '^http\\..*\\.extraheader$' >"$RC004_OUT/terminal-extraheaders.txt" 2>/dev/null; then
+            cat "$RC004_OUT/terminal-extraheaders.txt"
+            echo "TERMINAL_CHECKOUT_CREDENTIAL_PRESENT"; exit 1
+          fi
+          git fetch --no-tags --force origin "+refs/heads/main:refs/remotes/rc004/terminal-main"
+          terminal_main="$(git rev-parse refs/remotes/rc004/terminal-main)"
+          test -n "$RC004_LIVE_MAIN" || { echo "INITIAL_MAIN_SNAPSHOT_MISSING"; exit 1; }
+          bash "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/probes/terminal_protected_drift_guard.sh" "$RC004_LIVE_MAIN" "$terminal_main" "$RC004_OUT/terminal-protected-drift.txt"
+          {
+            echo "terminal_candidate_head=$(git rev-parse HEAD)"
+            echo "terminal_remote_head=$remote_head"
+            echo "terminal_frozen_head=$(git -C "$RC004_TARGET" rev-parse HEAD)"
+            echo "terminal_frozen_root_tree=$(git -C "$RC004_TARGET" rev-parse HEAD^{tree})"
+            echo "terminal_frozen_core_tree=$(git -C "$RC004_TARGET" rev-parse HEAD:src/aios_core)"
+            echo "terminal_frozen_tests_tree=$(git -C "$RC004_TARGET" rev-parse HEAD:tests)"
+            echo "terminal_frozen_workflows_tree=$(git -C "$RC004_TARGET" rev-parse HEAD:.github/workflows)"
+            echo "terminal_frozen_pyproject_blob=$(git -C "$RC004_TARGET" rev-parse HEAD:pyproject.toml)"
+            echo "terminal_initial_main_snapshot=$RC004_LIVE_MAIN"
+            echo "terminal_main=$terminal_main"
+            echo "terminal_tracked_mutation=NONE"
+            echo "terminal_checkout_credential=NONE"
+          } | tee "$RC004_OUT/terminal-immutability.txt"
+
+      - name: Upload complete RC004 evidence bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-rc-refreeze-004-corrective-003-evidence
+          path: reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/ci-output/**
+          if-no-files-found: warn
+
+
+  rc004-postread-control-gate:
+    name: RC004 disposable hosted post-read control gate
+    if: ${{ github.event_name == 'push' && startsWith(github.event.head_commit.message, '[W30-POSTREAD-CONTROL]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+    steps:
+      - name: Read canonical A or successor B at control entry
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/$CANONICAL_CORRECTIVE_BRANCH"
+          api="https://api.github.com/repos/${GITHUB_REPOSITORY}"
+          headers=(-H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
+          response="$RUNNER_TEMP/w30-control-entry-branch.json"
+          set +e
+          code="$(curl -sS -o "$response" -w '%{http_code}' "${headers[@]}" "$api/git/ref/heads/$CANONICAL_CORRECTIVE_BRANCH")"
+          rc=$?
+          set -e
+          test "$rc" -eq 0 || { echo "CONTROL_ENTRY_TRANSPORT_FAILURE rc=$rc"; exit 1; }
+          test "$code" = "200" || { echo "CONTROL_ENTRY_HTTP_$code"; cat "$response"; exit 1; }
+          head="$(jq -r '.object.sha // empty' "$response")"
+          test "$head" = "$GITHUB_SHA" || { echo "CONTROL_ENTRY_HEAD_MISMATCH remote=$head event=$GITHUB_SHA"; exit 1; }
+          echo "POSTREAD_CONTROL_GATE=PASS event_sha=$GITHUB_SHA"
+
+  rc004-mandatory-pin-publisher:
+    name: RC004 mandatory exact-pin publisher
+    needs: [rc004-freeze-gate, rc004-postread-control-gate]
+    if: ${{ always() && (needs.rc004-freeze-gate.result == 'success' || needs.rc004-postread-control-gate.result == 'success') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      pin_comment_id: ${{ steps.publish.outputs.comment_id }}
+    steps:
+      - name: Publish provisional exact candidate pin with pre/post identity checks
+        id: publish
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GATE_RESULT: ${{ needs.rc004-freeze-gate.result == 'success' && 'success' || needs.rc004-postread-control-gate.result }}
+          GATE_KIND: ${{ needs.rc004-freeze-gate.result == 'success' && 'formal' || 'POSTREAD_CONTROL_ONLY' }}
+        run: |
+          set -euo pipefail
+          test "$GATE_RESULT" = "success"
+          api="https://api.github.com/repos/${GITHUB_REPOSITORY}"
+          headers=(-H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
+
+          pre="$RUNNER_TEMP/rc004-pre-publish-branch.json"
+          set +e
+          pre_code="$(curl -sS -o "$pre" -w '%{http_code}' "${headers[@]}" "$api/git/ref/heads/$CANONICAL_CORRECTIVE_BRANCH")"
+          pre_rc=$?
+          set -e
+          test "$pre_rc" -eq 0 || { echo "PRE_PUBLISH_BRANCH_QUERY_TRANSPORT_FAILURE rc=$pre_rc"; exit 1; }
+          test "$pre_code" = "200" || { echo "PRE_PUBLISH_BRANCH_QUERY_HTTP_$pre_code"; cat "$pre"; exit 1; }
+          pre_head="$(jq -r '.object.sha // empty' "$pre")"
+          test "$pre_head" = "$GITHUB_SHA" || { echo "PRE_PUBLISH_REMOTE_HEAD_MISMATCH remote=$pre_head event=$GITHUB_SHA"; exit 1; }
+          echo "PRE_PUBLISH_REMOTE_HEAD_MATCH=$pre_head"
+
+          body="$RUNNER_TEMP/rc004-mandatory-pin.md"
+          {
+            echo "## CORE-RC-REFREEZE-004-CORRECTIVE-003 provisional exact pin"
+            echo
+            echo "- task: CORE-RC-REFREEZE-004-CORRECTIVE-003"
+            echo "- run_id: $GITHUB_RUN_ID"
+            echo "- run_attempt: $GITHUB_RUN_ATTEMPT"
+            echo "- exact_candidate_sha: $GITHUB_SHA"
+            echo "- frozen_software_sha: 1cee3c5ad12f4b9098232bae11b51df786c5eb2f"
+            echo "- gate_kind: $GATE_KIND"
+            echo "- gate_result: $GATE_RESULT"
+            echo "- workflow: $GITHUB_WORKFLOW"
+            echo "- canonical_branch: $CANONICAL_CORRECTIVE_BRANCH"
+            echo "- publication_contract: HTTP_201_REQUIRED"
+            echo "- publication_state: PROVISIONAL_PENDING_FINAL_IDENTITY_SEAL"
+            echo "- authoritative_success_contract: live predicate only; overall_run_SUCCESS + exact-run-and-attempt seal + canonical branch equals exact candidate SHA at acceptance time + no newer workflow run; any later A-to-B movement invalidates this provisional pin"
+            if [ "$GATE_KIND" = "POSTREAD_CONTROL_ONLY" ]; then
+              echo "- control_pin: NOT_A_FORMAL_RELEASE_OR_ACCEPTANCE_PIN"
+            fi
+          } > "$body"
+          jq -n --rawfile body "$body" '{body:$body}' > "$RUNNER_TEMP/rc004-mandatory-pin.json"
+
+          set +e
+          code="$(curl -sS -o "$RUNNER_TEMP/rc004-mandatory-pin-response.json" -w '%{http_code}' -X POST "${headers[@]}" "$api/commits/$GITHUB_SHA/comments" --data @"$RUNNER_TEMP/rc004-mandatory-pin.json")"
+          curl_rc=$?
+          set -e
+          test "$curl_rc" -eq 0 || { echo "PIN_PUBLISH_TRANSPORT_FAILURE rc=$curl_rc"; exit 1; }
+          echo "commit_comment_http_code=$code"
+          if [ "$code" != "201" ]; then
+            cat "$RUNNER_TEMP/rc004-mandatory-pin-response.json"
+            exit 1
+          fi
+          comment_id="$(jq -r '.id // empty' "$RUNNER_TEMP/rc004-mandatory-pin-response.json")"
+          test -n "$comment_id" || { echo "PIN_COMMENT_ID_MISSING"; exit 1; }
+          echo "comment_id=$comment_id" >> "$GITHUB_OUTPUT"
+          echo "provisional_pin_comment_id=$comment_id"
+
+          post="$RUNNER_TEMP/rc004-post-publish-branch.json"
+          set +e
+          post_code="$(curl -sS -o "$post" -w '%{http_code}' "${headers[@]}" "$api/git/ref/heads/$CANONICAL_CORRECTIVE_BRANCH")"
+          post_rc=$?
+          set -e
+          test "$post_rc" -eq 0 || { echo "POST_PUBLISH_BRANCH_QUERY_TRANSPORT_FAILURE rc=$post_rc"; exit 1; }
+          test "$post_code" = "200" || { echo "POST_PUBLISH_BRANCH_QUERY_HTTP_$post_code"; cat "$post"; exit 1; }
+          post_head="$(jq -r '.object.sha // empty' "$post")"
+          test "$post_head" = "$GITHUB_SHA" || { echo "POST_PUBLISH_REMOTE_HEAD_MISMATCH remote=$post_head event=$GITHUB_SHA"; exit 1; }
+          echo "POST_PUBLISH_REMOTE_HEAD_MATCH=$post_head"
+
+  rc004-whole-run-identity-seal:
+    name: RC004 whole-run identity seal
+    needs: [rc004-freeze-gate, rc004-mandatory-pin-publisher]
+    if: ${{ always() && needs.rc004-freeze-gate.result == 'success' && needs.rc004-mandatory-pin-publisher.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GATE_RESULT: ${{ needs.rc004-freeze-gate.result }}
+      PUBLISHER_RESULT: ${{ needs.rc004-mandatory-pin-publisher.result }}
+      PIN_COMMENT_ID: ${{ needs.rc004-mandatory-pin-publisher.outputs.pin_comment_id }}
+    steps:
+      - name: Validate exact run and pin, then perform the last canonical-branch read
+        id: final_identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GATE_RESULT" = "success"
+          test "$PUBLISHER_RESULT" = "success"
+          test "$GITHUB_REF" = "refs/heads/$CANONICAL_CORRECTIVE_BRANCH"
+          test -n "$PIN_COMMENT_ID"
+          api="https://api.github.com/repos/${GITHUB_REPOSITORY}"
+          headers=(-H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
+
+          run_json="$RUNNER_TEMP/rc004-final-seal-run.json"
+          set +e
+          run_code="$(curl -sS -o "$run_json" -w '%{http_code}' "${headers[@]}" "$api/actions/runs/$GITHUB_RUN_ID")"
+          run_rc=$?
+          set -e
+          test "$run_rc" -eq 0 || { echo "FINAL_SEAL_RUN_QUERY_TRANSPORT_FAILURE rc=$run_rc"; exit 1; }
+          test "$run_code" = "200" || { echo "FINAL_SEAL_RUN_QUERY_HTTP_$run_code"; cat "$run_json"; exit 1; }
+          test "$(jq -r '.id // empty' "$run_json")" = "$GITHUB_RUN_ID"
+          test "$(jq -r '.head_sha // empty' "$run_json")" = "$GITHUB_SHA"
+          test "$(jq -r '.head_branch // empty' "$run_json")" = "$CANONICAL_CORRECTIVE_BRANCH"
+          test "$(jq -r '.run_attempt // empty' "$run_json")" = "$GITHUB_RUN_ATTEMPT"
+          current_run_number="$(jq -r '.run_number // empty' "$run_json")"
+          [[ "$current_run_number" =~ ^[0-9]+$ ]] || { echo "FINAL_SEAL_RUN_NUMBER_MISSING"; exit 1; }
+          echo "RC004_CURRENT_RUN_NUMBER=$current_run_number" >> "$GITHUB_ENV"
+
+          comment_json="$RUNNER_TEMP/rc004-final-seal-comment.json"
+          set +e
+          comment_code="$(curl -sS -o "$comment_json" -w '%{http_code}' "${headers[@]}" "$api/comments/$PIN_COMMENT_ID")"
+          comment_rc=$?
+          set -e
+          test "$comment_rc" -eq 0 || { echo "FINAL_SEAL_COMMENT_QUERY_TRANSPORT_FAILURE rc=$comment_rc"; exit 1; }
+          test "$comment_code" = "200" || { echo "FINAL_SEAL_COMMENT_QUERY_HTTP_$comment_code"; cat "$comment_json"; exit 1; }
+          body="$(jq -r '.body // empty' "$comment_json")"
+          grep -Fq -- "- run_id: $GITHUB_RUN_ID" <<<"$body"
+          grep -Fq -- "- run_attempt: $GITHUB_RUN_ATTEMPT" <<<"$body"
+          grep -Fq -- "- exact_candidate_sha: $GITHUB_SHA" <<<"$body"
+          grep -Fq -- "- canonical_branch: $CANONICAL_CORRECTIVE_BRANCH" <<<"$body"
+          grep -Fq -- "- publication_state: PROVISIONAL_PENDING_FINAL_IDENTITY_SEAL" <<<"$body"
+
+          branch_json="$RUNNER_TEMP/rc004-final-seal-branch.json"
+          set +e
+          branch_code="$(curl -sS -o "$branch_json" -w '%{http_code}' "${headers[@]}" "$api/git/ref/heads/$CANONICAL_CORRECTIVE_BRANCH")"
+          branch_rc=$?
+          set -e
+          test "$branch_rc" -eq 0 || { echo "FINAL_SEAL_BRANCH_QUERY_TRANSPORT_FAILURE rc=$branch_rc"; exit 1; }
+          test "$branch_code" = "200" || { echo "FINAL_SEAL_BRANCH_QUERY_HTTP_$branch_code"; cat "$branch_json"; exit 1; }
+          branch_head="$(jq -r '.object.sha // empty' "$branch_json")"
+          test "$branch_head" = "$GITHUB_SHA" || { echo "FINAL_SEAL_REMOTE_HEAD_MISMATCH remote=$branch_head event=$GITHUB_SHA"; exit 1; }
+          echo "FINAL_CANONICAL_BRANCH_READ=PASS head=$branch_head"
+          echo "POST_READ_AUTHORITY_PENDING_SETTLE=TRUE"
+
+      - name: Post-read settle barrier and successor-run exclusion
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "POST_READ_SETTLE_BARRIER_STARTED event_sha=$GITHUB_SHA run=$GITHUB_RUN_ID"
+          sleep 180
+          api="https://api.github.com/repos/${GITHUB_REPOSITORY}"
+          headers=(-H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
+          branch_q="$(jq -rn --arg branch "$CANONICAL_CORRECTIVE_BRANCH" '$branch|@uri')"
+          url="$api/actions/workflows/core-rc-refreeze-004-formal-gate.yml/runs?branch=$branch_q&per_page=100"
+          runs_json="$RUNNER_TEMP/rc004-postread-workflow-runs.json"
+          set +e
+          code="$(curl -sS -o "$runs_json" -w '%{http_code}' "${headers[@]}" "$url")"
+          curl_rc=$?
+          set -e
+          test "$curl_rc" -eq 0 || { echo "POST_READ_RUN_LIST_TRANSPORT_FAILURE rc=$curl_rc"; exit 1; }
+          test "$code" = "200" || { echo "POST_READ_RUN_LIST_HTTP_$code"; cat "$runs_json"; exit 1; }
+          test "$(jq -r '.workflow_runs | type' "$runs_json")" = "array"
+          self_count="$(jq --argjson id "$GITHUB_RUN_ID" --arg sha "$GITHUB_SHA" --arg branch "$CANONICAL_CORRECTIVE_BRANCH" --argjson attempt "$GITHUB_RUN_ATTEMPT" '[.workflow_runs[] | select(.id == $id and .head_sha == $sha and .head_branch == $branch and .run_attempt == $attempt)] | length' "$runs_json")"
+          test "$self_count" = "1" || { echo "POST_READ_CURRENT_RUN_NOT_IN_WORKFLOW_LEDGER count=$self_count"; exit 1; }
+          newer="$(jq -c --argjson current "$RC004_CURRENT_RUN_NUMBER" '[.workflow_runs[] | select(.run_number > $current) | {id,run_number,head_sha,status,conclusion}]' "$runs_json")"
+          test "$newer" = "[]" || { echo "POST_READ_SUPERSEDED_BY_NEWER_RUN=$newer"; exit 1; }
+          echo "POST_READ_SUCCESSOR_RUN_EXCLUSION=PASS current_run=$GITHUB_RUN_ID run_number=$RC004_CURRENT_RUN_NUMBER"
+          echo "WHOLE_RUN_IDENTITY_SEAL=PASS head=$GITHUB_SHA comment_id=$PIN_COMMENT_ID"
+
+  rc004-postread-control-seal:
+    name: RC004 hosted post-read A-to-B control seal
+    needs: [rc004-postread-control-gate, rc004-mandatory-pin-publisher]
+    if: ${{ always() && needs.rc004-postread-control-gate.result == 'success' && needs.rc004-mandatory-pin-publisher.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GATE_RESULT: ${{ needs.rc004-postread-control-gate.result }}
+      PUBLISHER_RESULT: ${{ needs.rc004-mandatory-pin-publisher.result }}
+      PIN_COMMENT_ID: ${{ needs.rc004-mandatory-pin-publisher.outputs.pin_comment_id }}
+      CONTROL_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+    steps:
+      - name: Validate exact control run and pin, then perform the last canonical-branch read
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GATE_RESULT" = "success"
+          test "$PUBLISHER_RESULT" = "success"
+          test "$GITHUB_REF" = "refs/heads/$CANONICAL_CORRECTIVE_BRANCH"
+          if [[ "$CONTROL_COMMIT_MESSAGE" == "[W30-POSTREAD-CONTROL] A"* ]]; then
+            control_role=A
+          elif [[ "$CONTROL_COMMIT_MESSAGE" == "[W30-POSTREAD-CONTROL] B"* ]]; then
+            control_role=B
+          else
+            echo "POSTREAD_CONTROL_ROLE_INVALID message=$CONTROL_COMMIT_MESSAGE"; exit 1
+          fi
+          echo "RC004_CONTROL_ROLE=$control_role" >> "$GITHUB_ENV"
+          test -n "$PIN_COMMENT_ID"
+          api="https://api.github.com/repos/${GITHUB_REPOSITORY}"
+          headers=(-H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
+
+          run_json="$RUNNER_TEMP/w30-control-run.json"
+          set +e
+          run_code="$(curl -sS -o "$run_json" -w '%{http_code}' "${headers[@]}" "$api/actions/runs/$GITHUB_RUN_ID")"
+          run_rc=$?
+          set -e
+          test "$run_rc" -eq 0 || { echo "CONTROL_RUN_QUERY_TRANSPORT_FAILURE rc=$run_rc"; exit 1; }
+          test "$run_code" = "200" || { echo "CONTROL_RUN_QUERY_HTTP_$run_code"; cat "$run_json"; exit 1; }
+          test "$(jq -r '.id // empty' "$run_json")" = "$GITHUB_RUN_ID"
+          test "$(jq -r '.head_sha // empty' "$run_json")" = "$GITHUB_SHA"
+          test "$(jq -r '.head_branch // empty' "$run_json")" = "$CANONICAL_CORRECTIVE_BRANCH"
+          test "$(jq -r '.run_attempt // empty' "$run_json")" = "$GITHUB_RUN_ATTEMPT"
+          current_run_number="$(jq -r '.run_number // empty' "$run_json")"
+          [[ "$current_run_number" =~ ^[0-9]+$ ]] || { echo "CONTROL_RUN_NUMBER_MISSING"; exit 1; }
+          echo "RC004_CURRENT_RUN_NUMBER=$current_run_number" >> "$GITHUB_ENV"
+
+          comment_json="$RUNNER_TEMP/w30-control-comment.json"
+          set +e
+          comment_code="$(curl -sS -o "$comment_json" -w '%{http_code}' "${headers[@]}" "$api/comments/$PIN_COMMENT_ID")"
+          comment_rc=$?
+          set -e
+          test "$comment_rc" -eq 0 || { echo "CONTROL_COMMENT_QUERY_TRANSPORT_FAILURE rc=$comment_rc"; exit 1; }
+          test "$comment_code" = "200" || { echo "CONTROL_COMMENT_QUERY_HTTP_$comment_code"; cat "$comment_json"; exit 1; }
+          body="$(jq -r '.body // empty' "$comment_json")"
+          grep -Fq -- "- run_id: $GITHUB_RUN_ID" <<<"$body"
+          grep -Fq -- "- run_attempt: $GITHUB_RUN_ATTEMPT" <<<"$body"
+          grep -Fq -- "- exact_candidate_sha: $GITHUB_SHA" <<<"$body"
+          grep -Fq -- "- canonical_branch: $CANONICAL_CORRECTIVE_BRANCH" <<<"$body"
+          grep -Fq -- "- control_pin: NOT_A_FORMAL_RELEASE_OR_ACCEPTANCE_PIN" <<<"$body"
+
+          branch_json="$RUNNER_TEMP/w30-control-last-branch-read.json"
+          set +e
+          branch_code="$(curl -sS -o "$branch_json" -w '%{http_code}' "${headers[@]}" "$api/git/ref/heads/$CANONICAL_CORRECTIVE_BRANCH")"
+          branch_rc=$?
+          set -e
+          test "$branch_rc" -eq 0 || { echo "CONTROL_LAST_BRANCH_READ_TRANSPORT_FAILURE rc=$branch_rc"; exit 1; }
+          test "$branch_code" = "200" || { echo "CONTROL_LAST_BRANCH_READ_HTTP_$branch_code"; cat "$branch_json"; exit 1; }
+          branch_head="$(jq -r '.object.sha // empty' "$branch_json")"
+          test "$branch_head" = "$GITHUB_SHA" || { echo "CONTROL_LAST_BRANCH_READ_MISMATCH remote=$branch_head event=$GITHUB_SHA"; exit 1; }
+          echo "POSTREAD_CONTROL_LAST_CANONICAL_READ=PASS role=$control_role sha=$branch_head run=$GITHUB_RUN_ID"
+          echo "POSTREAD_CONTROL_LAST_CANONICAL_READ_COMPLETE"
+
+      - name: Controllable post-read barrier
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "POSTREAD_BARRIER_READY role=$RC004_CONTROL_ROLE run=$GITHUB_RUN_ID event_sha=$GITHUB_SHA"
+          if [ "$RC004_CONTROL_ROLE" = "A" ]; then
+            sleep 180
+          else
+            sleep 5
+          fi
+          echo "POSTREAD_BARRIER_RELEASED role=$RC004_CONTROL_ROLE"
+
+      - name: Fail stale A or seal stable successor B from workflow-run lineage
+        shell: bash
+        run: |
+          set -euo pipefail
+          api="https://api.github.com/repos/${GITHUB_REPOSITORY}"
+          headers=(-H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
+          branch_q="$(jq -rn --arg branch "$CANONICAL_CORRECTIVE_BRANCH" '$branch|@uri')"
+          url="$api/actions/workflows/core-rc-refreeze-004-formal-gate.yml/runs?branch=$branch_q&per_page=100"
+          runs_json="$RUNNER_TEMP/w30-control-runs.json"
+          set +e
+          code="$(curl -sS -o "$runs_json" -w '%{http_code}' "${headers[@]}" "$url")"
+          curl_rc=$?
+          set -e
+          test "$curl_rc" -eq 0 || { echo "CONTROL_RUN_LIST_TRANSPORT_FAILURE rc=$curl_rc"; exit 1; }
+          test "$code" = "200" || { echo "CONTROL_RUN_LIST_HTTP_$code"; cat "$runs_json"; exit 1; }
+          newer="$(jq -c --argjson current "$RC004_CURRENT_RUN_NUMBER" '[.workflow_runs[] | select(.run_number > $current) | {id,run_number,head_sha,status,conclusion}]' "$runs_json")"
+          if [ "$RC004_CONTROL_ROLE" = "A" ]; then
+            test "$newer" != "[]" || { echo "OLD_A_CONTROL_DID_NOT_OBSERVE_SUCCESSOR_B"; exit 1; }
+            echo "OLD_A_POSTREAD_SUPERSESSION_DETECTED=$newer"
+            echo "OLD_A_MUST_NOT_SEAL_SUCCESS=PASS"
+            exit 1
+          fi
+          test "$newer" = "[]" || { echo "SUCCESSOR_B_ALREADY_SUPERSEDED=$newer"; exit 1; }
+          echo "SUCCESSOR_B_POSTREAD_CONTROL=PASS run=$GITHUB_RUN_ID sha=$GITHUB_SHA"
+          echo "POSTREAD_CONTROL_SEAL=PASS"
