@@ -3,7 +3,7 @@
 on:
   push:
     branches:
-      - "release/core-rc-refreeze-004-finalization-corrective-001-window38"
+      - "release/core-rc-refreeze-004-finalization-corrective-002-window39"
   workflow_dispatch:
 
 permissions:
@@ -35,7 +35,7 @@ env:
   FORMAL_PYTHON: "3.12.14"
   FORMAL_PYDANTIC: "2.13.5"
   FORMAL_PYTEST: "8.4.2"
-  CANONICAL_CORRECTIVE_BRANCH: "release/core-rc-refreeze-004-finalization-corrective-001-window38"
+  CANONICAL_CORRECTIVE_BRANCH: "release/core-rc-refreeze-004-finalization-corrective-002-window39"
 
 jobs:
   rc004-freeze-gate:
