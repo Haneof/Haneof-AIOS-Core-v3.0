@@ -62,7 +62,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          OUT="$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/ci-output"
+          OUT="$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/ci-output"
           mkdir -p "$OUT"
           test "$GITHUB_REF_NAME" = "$CANONICAL_CORRECTIVE_BRANCH" || { echo "NON_CANONICAL_CORRECTIVE_REF $GITHUB_REF_NAME"; exit 1; }
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
@@ -102,7 +102,7 @@ jobs:
 
           base="$(git merge-base refs/remotes/rc004/main HEAD)"
           git diff --name-status "$base" HEAD | tee "$OUT/candidate-scope.txt"
-          if git diff --no-renames --name-only "$base" HEAD | grep -Ev '^((\.github/workflows/core-rc-refreeze-004-formal-gate\.yml)|(reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/.*))$' | grep -q .; then
+          if git diff --no-renames --name-only "$base" HEAD | grep -Ev '^((\.github/workflows/core-rc-refreeze-004-formal-gate\.yml)|(reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/.*))$' | grep -q .; then
             echo "RC004_CANDIDATE_SCOPE_VIOLATION"; exit 1
           fi
 
@@ -457,7 +457,7 @@ jobs:
         shell: bash
         run: |
           set -uo pipefail
-          OUT="${RC004_OUT:-$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/ci-output}"
+          OUT="${RC004_OUT:-$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/ci-output}"
           mkdir -p "$OUT"
           if [ -n "${RC004_TARGET:-}" ] && [ -d "$RC004_TARGET/.git" -o -e "$RC004_TARGET/.git" ]; then
             python - "$RC004_TARGET" "$OUT/source_manifest_runtime.json" <<'PY'
@@ -523,7 +523,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: core-rc-refreeze-004-finalization-corrective-002-evidence
-          path: reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/ci-output/**
+          path: reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/ci-output/**
           if-no-files-found: warn
 
 
