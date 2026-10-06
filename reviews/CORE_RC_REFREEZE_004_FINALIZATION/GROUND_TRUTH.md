@@ -1,1 +1,2 @@
-GROUND_TRUTH for RC004 Finalization
+PRE_MERGE_MAIN: 9eba4710e3cd841650191cb89f2126ca5c5b11c3
+CANDIDATE: release/core-rc-refreeze-004-finalization-window36
