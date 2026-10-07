@@ -1,3 +1,15 @@
+## 2026-10-07 — RC004 finalization accepted + PM integrated / C15 downstream operator corrective next
+
+- Window 48 Fresh IA passed PR #349 exact candidate `8aec087367ead24cb9c0a40d7fd97beb783066cb` with blocker=0.
+- PM integration completed via merge commit `08585f9e0b2ca80cb7eacbb55b5f1c206eb10bcb`; merge tree = accepted candidate tree `e24f4415dbf0d8b1abc52fe5b03f0a74ffa1fe1c`.
+- Formal acceptance evidence: run `37639094526` (#71, attempt 1, workflow_dispatch, SUCCESS), pin `203874864`, artifact `11492995124`, digest `sha256:e41127e34bf0659551755661b7cf49250cc8a53507620175e23161189d2aaf02`.
+- Frozen Core software remains `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`; no new Core product corrective is authorized.
+- The next unresolved work is downstream C15 operator/persistence compatibility debt against the now-finalized accepted Core contract.
+- **Unique next task:** `WINDOW 49 — C15-RCC-OPERATOR-PERSISTENCE-COMPATIBILITY-CORRECTIVE-001`.
+- Allowed implementation scope: `tools/c15_persistence/**` + `tests/c15_persistence/**` + dedicated review evidence. Forbidden: `src/aios_core/**`, RC004 workflow changes, Resident execution, evaluator, merge.
+- Window 49 must fresh reproduce and classify current C15 failures before edits; the old 45-failure snapshot is historical navigation only.
+- After Window 49 reaches REVIEW_READY: Window 50 = Fresh Independent Acceptance. Fresh Resident A may be released only after that IA passes and PM adjudicates integration/readiness.
+
 # AIOS v3.0 当前工程断点
 
 ## 2026-10-05 — WINDOW 27 FAIL / WINDOW 28 RC gate Corrective-002 READY
