@@ -146,7 +146,12 @@ class _ControlSession:
         store = SQLiteWorldStore(self.world_path)
         index = WorldSearchIndex(self.world_path, store=store)
         index.rebuild()
-        runtime = FusedTurnRuntime(store=store, index=index, model_handler=self._model_handler)
+        runtime = FusedTurnRuntime(
+            store=store,
+            index=index,
+            model_handler=self._model_handler,
+            late_return_verifier=provider_module.route_b_verifier(),
+        )
         runtime.registry.register(
             CapabilitySpec(
                 name=provider_module.CAPABILITY_NAME,
@@ -306,6 +311,16 @@ def _run_wired(root: Path, run_id: str, session_id: str) -> dict[str, Any]:
 
 
 def _pinned_tree_digest(base: str) -> dict[str, Any]:
+    verify_base = subprocess.run(
+        ["git", "rev-parse", "--verify", f"{base}^{{commit}}"],
+        cwd=str(REPO_ROOT),
+        capture_output=True,
+        text=True,
+    )
+    if verify_base.returncode != 0:
+        raise ValueError(
+            f"base ref {base!r} does not resolve to a valid commit: {verify_base.stderr.strip()}"
+        )
     out: dict[str, Any] = {"base": base}
     for scope in PINNED_PATHS:
         completed = subprocess.run(
@@ -314,6 +329,10 @@ def _pinned_tree_digest(base: str) -> dict[str, Any]:
             capture_output=True,
             text=True,
         )
+        if completed.returncode != 0:
+            raise RuntimeError(
+                f"git diff failed for scope {scope}: {completed.stderr.strip()}"
+            )
         out[scope] = {
             "diff": completed.stdout.strip(),
             "clean": completed.stdout.strip() == "",

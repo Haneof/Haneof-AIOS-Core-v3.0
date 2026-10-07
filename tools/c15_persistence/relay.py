@@ -413,7 +413,7 @@ class RelayJournal:
         with self._connect() as db:
             row = self._row(db, request_id)
             require(
-                row["state"] in {"authenticated", "applying", "applied"},
+                row["state"] in {"reply-staged", "authenticated", "applying", "applied"},
                 "application was not authorised by Core; refusing to assert it",
             )
             if row["state"] == "applied":

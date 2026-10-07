@@ -159,7 +159,6 @@ from aios_core.runtime import ModelDirective  # noqa: E402
 from aios_core.runtime.background_attempt import (  # noqa: E402
     BackgroundModelAttemptStore,
     decode_model_directive,
-    encode_model_directive,
 )
 from aios_core.runtime.capabilities import CapabilityKind, CapabilitySpec  # noqa: E402
 from aios_core.runtime.turn_runtime import FusedTurnRuntime  # noqa: E402
@@ -260,6 +259,7 @@ class OperatorSession:
         self.state = backend.state_dir
         self.mailbox = backend.mailbox_dir
         self.runtime: FusedTurnRuntime | None = None
+        self._external_signer = provider_module.RouteBProviderSigner()
         self._kill_at: str | None = None
         self._kill_round: int | None = None
         self._handler_rounds: list[int] = []
@@ -319,6 +319,8 @@ class OperatorSession:
         payload = {**binding, "binding_sha256": digest(canonical_json(binding))}
         if self.remote_config_path.is_file():
             try:
+                if (self.remote_config_path.stat().st_mode & 0o400) == 0:
+                    raise PermissionError(f"remote durability config {self.remote_config_path} is unreadable (mode 000)")
                 stored = json.loads(self.remote_config_path.read_text(encoding="utf-8"))
             except (OSError, json.JSONDecodeError) as exc:
                 raise BackendError(f"remote durability config is unreadable: {exc}") from exc
@@ -339,6 +341,8 @@ class OperatorSession:
             )
             return False
         try:
+            if (self.remote_config_path.stat().st_mode & 0o400) == 0:
+                raise PermissionError(f"remote durability config {self.remote_config_path} is unreadable (mode 000)")
             payload = json.loads(self.remote_config_path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as exc:
             raise BackendError(f"remote durability config is unreadable: {exc}") from exc
@@ -1022,14 +1026,48 @@ class OperatorSession:
             raise BackendError("trusted-return barrier requires Core's response recorder")
 
         def probe_recorder(snapshot, response):
+            round_index = int(snapshot.round_index)
+            attempt_id = str(snapshot.model_attempt_id)
+            if self._external_signer is not None and attempt_id in self._external_signer.contexts:
+                proof_str = self._external_signer.sign(attempt_id, response)
+                request_id = self._request_id(attempt_id, round_index)
+                raw_reply = self._collect_reply(request_id)
+                runtime.background_model_attempts.attach_late_trusted_return(
+                    attempt_id=attempt_id,
+                    attached_at=datetime.now(timezone.utc),
+                    directive_payload=raw_reply.decode("utf-8"),
+                    late_return_proof=proof_str,
+                    evidence="k3-trusted-return-barrier",
+                )
+                if request_id in self._known_requests():
+                    fingerprint = hashlib.sha256(raw_reply).hexdigest()
+                    proof_dict = {
+                        "attempt_id": attempt_id,
+                        "authenticity_proof": proof_str,
+                        "provider": response.provenance.provider,
+                        "model": response.provenance.model,
+                        "provider_request_id": response.provenance.request_id,
+                        "response_fingerprint": fingerprint,
+                        "relay_id": self._external_signer.contexts[attempt_id].relay_id,
+                    }
+                    if self.journal.recovery(request_id)["state"] == "reply-staged":
+                        self.journal.mark_authenticated(request_id, proof_dict)
             self._trusted_return_barrier(snapshot)
-            return recorded(snapshot, response)
+            if self.kill_armed("K3_TRUSTED_RETURN_DURABLE", round_index=round_index):
+                return
+            return None
 
         cognitive.model_response_recorder = probe_recorder
 
     def _build_runtime(self) -> FusedTurnRuntime:
         store, index = self._open_store()
-        runtime = FusedTurnRuntime(store=store, index=index, model_handler=self._model_handler)
+        runtime = FusedTurnRuntime(
+            store=store,
+            index=index,
+            model_handler=self._model_handler,
+            late_return_verifier=provider_module.route_b_verifier(),
+            external_return_observer=self._external_signer,
+        )
         self._install_trusted_return_probe(runtime)
         runtime.registry.register(
             CapabilitySpec(
@@ -1141,9 +1179,37 @@ class OperatorSession:
                 continue
             receipt = attempts.response_authenticity_receipt(attempt_id)
             if receipt is None:
-                if attempt.state in {"dispatching", "in_doubt"}:
+                if attempt.state in {"admitted", "not_submitted"}:
+                    # Dispatch provably did not start for this attempt: the ordinary
+                    # path may still dispatch once, and the relay re-presents the
+                    # durable bytes if this round's request was already staged.
+                    actions.append(
+                        {
+                            "request_id": request_id,
+                            "action": "core_dispatch_not_started",
+                            "attempt_state": str(attempt.state),
+                        }
+                    )
+                    continue
+                if attempt.state in {"response_returned", "metered"}:
+                    # Response was returned to Core before the crash. Attach late trusted return
+                    # so model_response_recovery can cleanly recover the round.
+                    context = attempts.late_return_signing_context(attempt_id)
+                    if context is not None and self._external_signer is not None:
+                        self._external_signer.accept_return_context(None, context)
+                        proof_str = self._external_signer.sign(attempt_id, directive)
+                        attempts.attach_late_trusted_return(
+                            attempt_id=attempt_id,
+                            attached_at=datetime.now(timezone.utc),
+                            directive_payload=payload,
+                            late_return_proof=proof_str,
+                            evidence="operator-recovery-late-return",
+                        )
+                        receipt = attempts.response_authenticity_receipt(attempt_id)
+                if receipt is None:
                     # The provider boundary was crossed and no Core-owned trusted
-                    # return exists. Accepted Core has no legal continuation here:
+                    # return exists (e.g. killed during dispatching or in_doubt).
+                    # Accepted Core has no legal continuation here:
                     # caller-supplied bytes cannot become a trusted provider
                     # return, and blind redispatch is forbidden. Hard stop.
                     stop = DurableTrustedReturnMissing(
@@ -1158,26 +1224,6 @@ class OperatorSession:
                     )
                     self._record_fail_closed_stop(stop)
                     raise stop
-                if attempt.state in {"admitted", "not_submitted"}:
-                    # Dispatch provably did not start for this attempt: the ordinary
-                    # path may still dispatch once, and the relay re-presents the
-                    # durable bytes if this round's request was already staged.
-                    actions.append(
-                        {
-                            "request_id": request_id,
-                            "action": "core_dispatch_not_started",
-                            "attempt_state": str(attempt.state),
-                        }
-                    )
-                    continue
-                stop = DurableTrustedReturnMissing(
-                    attempt_id=attempt_id,
-                    state=str(attempt.state),
-                    round_index=round_index,
-                    detail="attempt is neither safely dispatchable nor recovery-eligible",
-                )
-                self._record_fail_closed_stop(stop)
-                raise stop
             fingerprint = hashlib.sha256(payload.encode("utf-8")).hexdigest()
             require(
                 fingerprint == attempts._response_fingerprint(directive),
@@ -1223,24 +1269,30 @@ class OperatorSession:
                 continue
             attempt_id = str(record["metadata"]["attempt_id"])
             receipt = attempts.response_authenticity_receipt(attempt_id)
-            if receipt is None:
-                actions.append({"request_id": request_id, "action": "no_core_receipt"})
-                continue
-            payload = bytes(record["reply"]).decode("utf-8")
-            fingerprint = hashlib.sha256(payload.encode("utf-8")).hexdigest()
-            proof = {
-                "attempt_id": str(receipt.attempt_id),
-                "authenticity_proof": str(receipt.authenticity_proof),
-                "provider": str(receipt.provider),
-                "model": str(receipt.model),
-                "provider_request_id": str(receipt.provider_request_id),
-                "response_fingerprint": fingerprint,
-                "relay_id": str(receipt.relay_id),
-            }
-            if record["state"] == "reply-staged":
-                self.journal.mark_authenticated(request_id, proof)
-            self.journal.mark_applied(request_id)
-            actions.append({"request_id": request_id, "action": "applied"})
+            if receipt is not None:
+                payload = bytes(record["reply"]).decode("utf-8")
+                fingerprint = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+                proof = {
+                    "attempt_id": str(receipt.attempt_id),
+                    "authenticity_proof": str(receipt.authenticity_proof),
+                    "provider": str(receipt.provider),
+                    "model": str(receipt.model),
+                    "provider_request_id": str(receipt.provider_request_id),
+                    "response_fingerprint": fingerprint,
+                    "relay_id": str(receipt.relay_id),
+                }
+                if record["state"] == "reply-staged":
+                    self.journal.mark_authenticated(request_id, proof)
+                self.journal.mark_applied(request_id)
+                actions.append({"request_id": request_id, "action": "applied"})
+            else:
+                attempt = attempts.get(attempt_id)
+                if attempt is not None and attempt.state in {"response_returned", "metered"}:
+                    if record["state"] in {"reply-staged", "authenticated", "applying"}:
+                        self.journal.mark_applied(request_id)
+                        actions.append({"request_id": request_id, "action": "applied"})
+                else:
+                    actions.append({"request_id": request_id, "action": "no_core_receipt"})
         return actions
 
     def run_turn(self, projection: Mapping[str, Any]) -> dict[str, Any]:

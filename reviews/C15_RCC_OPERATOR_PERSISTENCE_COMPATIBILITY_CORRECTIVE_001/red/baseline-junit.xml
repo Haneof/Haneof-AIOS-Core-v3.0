@@ -1,0 +1,2339 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="46" skipped="0" tests="78" time="265.599" timestamp="2026-10-08T00:05:37.481275+08:00" hostname="WIN-QO399DSMDCH"><testcase classname="tests.c15_persistence.killpoints.test_killpoints" name="test_kill_point_converges[K1]" time="2.921"><failure message="AssertionError: probe command failed&#10;returncode=1&#10;stdout:&#10;&#10;stderr:&#10;Traceback (most recent call last):&#10;  File &quot;&lt;frozen runpy&gt;&quot;, line 198, in _run_module_as_main&#10;  File &quot;&lt;frozen runpy&gt;&quot;, line 88, in _run_code&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 147, in &lt;module&gt;&#10;    raise SystemExit(main())&#10;                     ^^^^^^&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 83, in main&#10;    outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)&#10;              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1354, in resume&#10;    return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)&#10;           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1346, in process_one_cursor&#10;    ack = self.ack(projection, receipt)&#10;          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1326, in ack&#10;    self.journal.mark_acked(request_id, {&quot;sequence&quot;: report[&quot;sequence&quot;], &quot;next&quot;: report[&quot;next_sequence&quot;]})&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py&quot;, line 428, in mark_acked&#10;    require(row[&quot;state&quot;] == &quot;applied&quot;, &quot;ack requires a durable application&quot;)&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py&quot;, line 132, in require&#10;    raise BackendError(reason)&#10;tools.c15_persistence.backend.BackendError: ack requires a durable application">entry = {'barrier': 'release state pending_reveal is durable; ingest has not started', 'expected': {'acks': {'relation': 'eq_b...n, duplicate output/capability, duplicate ACK, or skipped cursor; a terminal/in_doubt outcome is not convergence', ...}
+
+    @pytest.mark.parametrize("entry", MANIFEST["probes"], ids=[p["id"] for p in MANIFEST["probes"]])
+    def test_kill_point_converges(entry: dict) -&gt; None:
+&gt;       outcome = run_kill_point(entry["kill_point"])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/killpoints/test_killpoints.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/c15_persistence/killpoints/harness.py:166: in run_kill_point
+    outcome = parse(resumed)
+              ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+completed = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n')
+
+    def parse(completed: subprocess.CompletedProcess) -&gt; dict[str, Any]:
+        if completed.returncode != 0:
+&gt;           raise AssertionError(
+                "probe command failed\n"
+                f"returncode={completed.returncode}\n"
+                f"stdout:\n{completed.stdout}\n"
+                f"stderr:\n{completed.stderr}"
+            )
+E           AssertionError: probe command failed
+E           returncode=1
+E           stdout:
+E           
+E           stderr:
+E           Traceback (most recent call last):
+E             File "&lt;frozen runpy&gt;", line 198, in _run_module_as_main
+E             File "&lt;frozen runpy&gt;", line 88, in _run_code
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 147, in &lt;module&gt;
+E               raise SystemExit(main())
+E                                ^^^^^^
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 83, in main
+E               outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)
+E                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1354, in resume
+E               return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)
+E                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1346, in process_one_cursor
+E               ack = self.ack(projection, receipt)
+E                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1326, in ack
+E               self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py", line 428, in mark_acked
+E               require(row["state"] == "applied", "ack requires a durable application")
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 132, in require
+E               raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tests/c15_persistence/killpoints/harness.py:113: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.killpoints.test_killpoints" name="test_kill_point_converges[K2]" time="3.121"><failure message="AssertionError: probe command failed&#10;returncode=1&#10;stdout:&#10;&#10;stderr:&#10;Traceback (most recent call last):&#10;  File &quot;&lt;frozen runpy&gt;&quot;, line 198, in _run_module_as_main&#10;  File &quot;&lt;frozen runpy&gt;&quot;, line 88, in _run_code&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 147, in &lt;module&gt;&#10;    raise SystemExit(main())&#10;                     ^^^^^^&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 83, in main&#10;    outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)&#10;              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1354, in resume&#10;    return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)&#10;           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1346, in process_one_cursor&#10;    ack = self.ack(projection, receipt)&#10;          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1326, in ack&#10;    self.journal.mark_acked(request_id, {&quot;sequence&quot;: report[&quot;sequence&quot;], &quot;next&quot;: report[&quot;next_sequence&quot;]})&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py&quot;, line 428, in mark_acked&#10;    require(row[&quot;state&quot;] == &quot;applied&quot;, &quot;ack requires a durable application&quot;)&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py&quot;, line 132, in require&#10;    raise BackendError(reason)&#10;tools.c15_persistence.backend.BackendError: ack requires a durable application">entry = {'barrier': 'event is durably ingested into World; provider dispatch has not started', 'expected': {'acks': {'relation...n, duplicate output/capability, duplicate ACK, or skipped cursor; a terminal/in_doubt outcome is not convergence', ...}
+
+    @pytest.mark.parametrize("entry", MANIFEST["probes"], ids=[p["id"] for p in MANIFEST["probes"]])
+    def test_kill_point_converges(entry: dict) -&gt; None:
+&gt;       outcome = run_kill_point(entry["kill_point"])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/killpoints/test_killpoints.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/c15_persistence/killpoints/harness.py:166: in run_kill_point
+    outcome = parse(resumed)
+              ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+completed = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n')
+
+    def parse(completed: subprocess.CompletedProcess) -&gt; dict[str, Any]:
+        if completed.returncode != 0:
+&gt;           raise AssertionError(
+                "probe command failed\n"
+                f"returncode={completed.returncode}\n"
+                f"stdout:\n{completed.stdout}\n"
+                f"stderr:\n{completed.stderr}"
+            )
+E           AssertionError: probe command failed
+E           returncode=1
+E           stdout:
+E           
+E           stderr:
+E           Traceback (most recent call last):
+E             File "&lt;frozen runpy&gt;", line 198, in _run_module_as_main
+E             File "&lt;frozen runpy&gt;", line 88, in _run_code
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 147, in &lt;module&gt;
+E               raise SystemExit(main())
+E                                ^^^^^^
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 83, in main
+E               outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)
+E                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1354, in resume
+E               return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)
+E                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1346, in process_one_cursor
+E               ack = self.ack(projection, receipt)
+E                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1326, in ack
+E               self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py", line 428, in mark_acked
+E               require(row["state"] == "applied", "ack requires a durable application")
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 132, in require
+E               raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tests/c15_persistence/killpoints/harness.py:113: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.killpoints.test_killpoints" name="test_kill_point_converges[K3]" time="3.110"><failure message="AssertionError: probe command failed&#10;returncode=1&#10;stdout:&#10;&#10;stderr:&#10;Traceback (most recent call last):&#10;  File &quot;&lt;frozen runpy&gt;&quot;, line 198, in _run_module_as_main&#10;  File &quot;&lt;frozen runpy&gt;&quot;, line 88, in _run_code&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 147, in &lt;module&gt;&#10;    raise SystemExit(main())&#10;                     ^^^^^^&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 83, in main&#10;    outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)&#10;              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1354, in resume&#10;    return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)&#10;           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1346, in process_one_cursor&#10;    ack = self.ack(projection, receipt)&#10;          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1326, in ack&#10;    self.journal.mark_acked(request_id, {&quot;sequence&quot;: report[&quot;sequence&quot;], &quot;next&quot;: report[&quot;next_sequence&quot;]})&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py&quot;, line 428, in mark_acked&#10;    require(row[&quot;state&quot;] == &quot;applied&quot;, &quot;ack requires a durable application&quot;)&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py&quot;, line 132, in require&#10;    raise BackendError(reason)&#10;tools.c15_persistence.backend.BackendError: ack requires a durable application">entry = {'barrier': 'exact provider request is durably staged/exposed/dispatched; no reply yet', 'expected': {'acks': {'relati...n, duplicate output/capability, duplicate ACK, or skipped cursor; a terminal/in_doubt outcome is not convergence', ...}
+
+    @pytest.mark.parametrize("entry", MANIFEST["probes"], ids=[p["id"] for p in MANIFEST["probes"]])
+    def test_kill_point_converges(entry: dict) -&gt; None:
+&gt;       outcome = run_kill_point(entry["kill_point"])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/killpoints/test_killpoints.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/c15_persistence/killpoints/harness.py:166: in run_kill_point
+    outcome = parse(resumed)
+              ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+completed = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n')
+
+    def parse(completed: subprocess.CompletedProcess) -&gt; dict[str, Any]:
+        if completed.returncode != 0:
+&gt;           raise AssertionError(
+                "probe command failed\n"
+                f"returncode={completed.returncode}\n"
+                f"stdout:\n{completed.stdout}\n"
+                f"stderr:\n{completed.stderr}"
+            )
+E           AssertionError: probe command failed
+E           returncode=1
+E           stdout:
+E           
+E           stderr:
+E           Traceback (most recent call last):
+E             File "&lt;frozen runpy&gt;", line 198, in _run_module_as_main
+E             File "&lt;frozen runpy&gt;", line 88, in _run_code
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 147, in &lt;module&gt;
+E               raise SystemExit(main())
+E                                ^^^^^^
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 83, in main
+E               outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)
+E                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1354, in resume
+E               return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)
+E                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1346, in process_one_cursor
+E               ack = self.ack(projection, receipt)
+E                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1326, in ack
+E               self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py", line 428, in mark_acked
+E               require(row["state"] == "applied", "ack requires a durable application")
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 132, in require
+E               raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tests/c15_persistence/killpoints/harness.py:113: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.killpoints.test_killpoints" name="test_kill_point_converges[K4]" time="2.589"><failure message="AssertionError: probe command failed&#10;returncode=42&#10;stdout:&#10;&#10;stderr:&#10;FAIL_CLOSED_HARD_STOP attempt_id=bgattempt_08c4a2a3bfb29a60a6c8d7b297550dfd state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible">entry = {'barrier': 'Core trusted-return receipt is durable for the exact reply; downstream application (remaining capability ...n, duplicate output/capability, duplicate ACK, or skipped cursor; a terminal/in_doubt outcome is not convergence', ...}
+
+    @pytest.mark.parametrize("entry", MANIFEST["probes"], ids=[p["id"] for p in MANIFEST["probes"]])
+    def test_kill_point_converges(entry: dict) -&gt; None:
+&gt;       outcome = run_kill_point(entry["kill_point"])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/killpoints/test_killpoints.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/c15_persistence/killpoints/harness.py:166: in run_kill_point
+    outcome = parse(resumed)
+              ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+completed = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...3bfb29a60a6c8d7b297550dfd state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible\n')
+
+    def parse(completed: subprocess.CompletedProcess) -&gt; dict[str, Any]:
+        if completed.returncode != 0:
+&gt;           raise AssertionError(
+                "probe command failed\n"
+                f"returncode={completed.returncode}\n"
+                f"stdout:\n{completed.stdout}\n"
+                f"stderr:\n{completed.stderr}"
+            )
+E           AssertionError: probe command failed
+E           returncode=42
+E           stdout:
+E           
+E           stderr:
+E           FAIL_CLOSED_HARD_STOP attempt_id=bgattempt_08c4a2a3bfb29a60a6c8d7b297550dfd state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible
+
+tests/c15_persistence/killpoints/harness.py:113: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.killpoints.test_killpoints" name="test_kill_point_converges[K5]" time="2.698"><failure message="AssertionError: probe command failed&#10;returncode=1&#10;stdout:&#10;&#10;stderr:&#10;Traceback (most recent call last):&#10;  File &quot;&lt;frozen runpy&gt;&quot;, line 198, in _run_module_as_main&#10;  File &quot;&lt;frozen runpy&gt;&quot;, line 88, in _run_code&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 147, in &lt;module&gt;&#10;    raise SystemExit(main())&#10;                     ^^^^^^&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 83, in main&#10;    outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)&#10;              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1354, in resume&#10;    return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)&#10;           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1346, in process_one_cursor&#10;    ack = self.ack(projection, receipt)&#10;          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1326, in ack&#10;    self.journal.mark_acked(request_id, {&quot;sequence&quot;: report[&quot;sequence&quot;], &quot;next&quot;: report[&quot;next_sequence&quot;]})&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py&quot;, line 428, in mark_acked&#10;    require(row[&quot;state&quot;] == &quot;applied&quot;, &quot;ack requires a durable application&quot;)&#10;  File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py&quot;, line 132, in require&#10;    raise BackendError(reason)&#10;tools.c15_persistence.backend.BackendError: ack requires a durable application">entry = {'barrier': 'model/capability work is durably applied in Core; cursor ACK not yet issued', 'expected': {'acks': {'rela...n, duplicate output/capability, duplicate ACK, or skipped cursor; a terminal/in_doubt outcome is not convergence', ...}
+
+    @pytest.mark.parametrize("entry", MANIFEST["probes"], ids=[p["id"] for p in MANIFEST["probes"]])
+    def test_kill_point_converges(entry: dict) -&gt; None:
+&gt;       outcome = run_kill_point(entry["kill_point"])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/killpoints/test_killpoints.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/c15_persistence/killpoints/harness.py:166: in run_kill_point
+    outcome = parse(resumed)
+              ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+completed = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n')
+
+    def parse(completed: subprocess.CompletedProcess) -&gt; dict[str, Any]:
+        if completed.returncode != 0:
+&gt;           raise AssertionError(
+                "probe command failed\n"
+                f"returncode={completed.returncode}\n"
+                f"stdout:\n{completed.stdout}\n"
+                f"stderr:\n{completed.stderr}"
+            )
+E           AssertionError: probe command failed
+E           returncode=1
+E           stdout:
+E           
+E           stderr:
+E           Traceback (most recent call last):
+E             File "&lt;frozen runpy&gt;", line 198, in _run_module_as_main
+E             File "&lt;frozen runpy&gt;", line 88, in _run_code
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 147, in &lt;module&gt;
+E               raise SystemExit(main())
+E                                ^^^^^^
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 83, in main
+E               outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)
+E                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1354, in resume
+E               return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)
+E                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1346, in process_one_cursor
+E               ack = self.ack(projection, receipt)
+E                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1326, in ack
+E               self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py", line 428, in mark_acked
+E               require(row["state"] == "applied", "ack requires a durable application")
+E             File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 132, in require
+E               raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tests/c15_persistence/killpoints/harness.py:113: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_002_remote_durability" name="test_k1_k5_survive_total_local_cache_loss_from_remote_only[K1_AFTER_REVEAL]" time="8.915"><failure message="AssertionError: K1_AFTER_REVEAL: remote-only recovery failed&#10;  stdout=&#10;  stderr=Traceback (most recent call last):&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 198, in _run_module_as_main&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 88, in _run_code&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 147, in &lt;module&gt;&#10;      raise SystemExit(main())&#10;                       ^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 95, in main&#10;      outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)&#10;                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1354, in resume&#10;      return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)&#10;             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1346, in process_one_cursor&#10;      ack = self.ack(projection, receipt)&#10;            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1326, in ack&#10;      self.journal.mark_acked(request_id, {&quot;sequence&quot;: report[&quot;sequence&quot;], &quot;next&quot;: report[&quot;next_sequence&quot;]})&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py&quot;, line 428, in mark_acked&#10;      require(row[&quot;state&quot;] == &quot;applied&quot;, &quot;ack requires a durable application&quot;)&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py&quot;, line 132, in require&#10;      raise BackendError(reason)&#10;  tools.c15_persistence.backend.BackendError: ack requires a durable application&#10;  &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_k1_k5_survive_total_local0')
+kill_point = 'K1_AFTER_REVEAL'
+
+    @pytest.mark.parametrize("kill_point", KILL_POINTS)
+    def test_k1_k5_survive_total_local_cache_loss_from_remote_only(
+        tmp_path: Path, kill_point: str
+    ) -&gt; None:
+        """Every frozen K barrier must already be authoritative on the remote ref."""
+    
+        remote = _bare_remote(tmp_path, kill_point.lower())
+        token = uuid.uuid4().hex[:10]
+        run_id = f"synthetic-run-c002-{kill_point.lower()}-{token}"
+        session_id = f"synthetic-session-c002-{kill_point.lower()}-{token}"
+        remote_ref = f"refs/heads/persistence/{run_id}"
+    
+        first_root = new_root(f"c002-{kill_point.lower()}-first") / "backend"
+        fresh_parent: Path | None = None
+        try:
+            killed = _run_cli(
+                root=first_root,
+                run_id=run_id,
+                session_id=session_id,
+                mode="create",
+                remote=remote,
+                remote_ref=remote_ref,
+                kill_at=kill_point,
+            )
+            assert killed.returncode == -signal.SIGKILL, (
+                f"{kill_point}: expected SIGKILL, got {killed.returncode}\n"
+                f"stdout={killed.stdout}\nstderr={killed.stderr}"
+            )
+    
+            barrier_head = _remote_head(remote, remote_ref)
+            marker = _remote_json(remote, barrier_head, "state/remote-barrier.json")
+            assert marker["point"] == kill_point
+            assert marker["cursor"] == 1
+    
+            # The entire execution environment's run cache is gone.  Recovery may
+            # use only the remote commit/ref, never files left by the killed process.
+            first_parent = first_root.parent
+            wipe(first_parent)
+            assert not first_root.exists()
+    
+            fresh_parent = new_root(f"c002-{kill_point.lower()}-fresh")
+            fresh_root = fresh_parent / "backend"
+            resumed = _run_cli(
+                root=fresh_root,
+                run_id=run_id,
+                session_id=session_id,
+                mode="materialize-resume",
+                remote=remote,
+                remote_ref=remote_ref,
+            )
+&gt;           assert resumed.returncode == 0, (
+                f"{kill_point}: remote-only recovery failed\n"
+                f"stdout={resumed.stdout}\nstderr={resumed.stderr}"
+            )
+E           AssertionError: K1_AFTER_REVEAL: remote-only recovery failed
+E             stdout=
+E             stderr=Traceback (most recent call last):
+E               File "&lt;frozen runpy&gt;", line 198, in _run_module_as_main
+E               File "&lt;frozen runpy&gt;", line 88, in _run_code
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 147, in &lt;module&gt;
+E                 raise SystemExit(main())
+E                                  ^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 95, in main
+E                 outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)
+E                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1354, in resume
+E                 return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)
+E                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1346, in process_one_cursor
+E                 ack = self.ack(projection, receipt)
+E                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1326, in ack
+E                 self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py", line 428, in mark_acked
+E                 require(row["state"] == "applied", "ack requires a durable application")
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 132, in require
+E                 raise BackendError(reason)
+E             tools.c15_persistence.backend.BackendError: ack requires a durable application
+E             
+E           assert 1 == 0
+E            +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode
+
+tests/c15_persistence/test_corrective_002_remote_durability.py:159: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_002_remote_durability" name="test_k1_k5_survive_total_local_cache_loss_from_remote_only[K2_AFTER_INGEST]" time="10.106"><failure message="AssertionError: K2_AFTER_INGEST: remote-only recovery failed&#10;  stdout=&#10;  stderr=Traceback (most recent call last):&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 198, in _run_module_as_main&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 88, in _run_code&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 147, in &lt;module&gt;&#10;      raise SystemExit(main())&#10;                       ^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 95, in main&#10;      outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)&#10;                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1354, in resume&#10;      return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)&#10;             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1346, in process_one_cursor&#10;      ack = self.ack(projection, receipt)&#10;            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1326, in ack&#10;      self.journal.mark_acked(request_id, {&quot;sequence&quot;: report[&quot;sequence&quot;], &quot;next&quot;: report[&quot;next_sequence&quot;]})&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py&quot;, line 428, in mark_acked&#10;      require(row[&quot;state&quot;] == &quot;applied&quot;, &quot;ack requires a durable application&quot;)&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py&quot;, line 132, in require&#10;      raise BackendError(reason)&#10;  tools.c15_persistence.backend.BackendError: ack requires a durable application&#10;  &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_k1_k5_survive_total_local1')
+kill_point = 'K2_AFTER_INGEST'
+
+    @pytest.mark.parametrize("kill_point", KILL_POINTS)
+    def test_k1_k5_survive_total_local_cache_loss_from_remote_only(
+        tmp_path: Path, kill_point: str
+    ) -&gt; None:
+        """Every frozen K barrier must already be authoritative on the remote ref."""
+    
+        remote = _bare_remote(tmp_path, kill_point.lower())
+        token = uuid.uuid4().hex[:10]
+        run_id = f"synthetic-run-c002-{kill_point.lower()}-{token}"
+        session_id = f"synthetic-session-c002-{kill_point.lower()}-{token}"
+        remote_ref = f"refs/heads/persistence/{run_id}"
+    
+        first_root = new_root(f"c002-{kill_point.lower()}-first") / "backend"
+        fresh_parent: Path | None = None
+        try:
+            killed = _run_cli(
+                root=first_root,
+                run_id=run_id,
+                session_id=session_id,
+                mode="create",
+                remote=remote,
+                remote_ref=remote_ref,
+                kill_at=kill_point,
+            )
+            assert killed.returncode == -signal.SIGKILL, (
+                f"{kill_point}: expected SIGKILL, got {killed.returncode}\n"
+                f"stdout={killed.stdout}\nstderr={killed.stderr}"
+            )
+    
+            barrier_head = _remote_head(remote, remote_ref)
+            marker = _remote_json(remote, barrier_head, "state/remote-barrier.json")
+            assert marker["point"] == kill_point
+            assert marker["cursor"] == 1
+    
+            # The entire execution environment's run cache is gone.  Recovery may
+            # use only the remote commit/ref, never files left by the killed process.
+            first_parent = first_root.parent
+            wipe(first_parent)
+            assert not first_root.exists()
+    
+            fresh_parent = new_root(f"c002-{kill_point.lower()}-fresh")
+            fresh_root = fresh_parent / "backend"
+            resumed = _run_cli(
+                root=fresh_root,
+                run_id=run_id,
+                session_id=session_id,
+                mode="materialize-resume",
+                remote=remote,
+                remote_ref=remote_ref,
+            )
+&gt;           assert resumed.returncode == 0, (
+                f"{kill_point}: remote-only recovery failed\n"
+                f"stdout={resumed.stdout}\nstderr={resumed.stderr}"
+            )
+E           AssertionError: K2_AFTER_INGEST: remote-only recovery failed
+E             stdout=
+E             stderr=Traceback (most recent call last):
+E               File "&lt;frozen runpy&gt;", line 198, in _run_module_as_main
+E               File "&lt;frozen runpy&gt;", line 88, in _run_code
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 147, in &lt;module&gt;
+E                 raise SystemExit(main())
+E                                  ^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 95, in main
+E                 outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)
+E                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1354, in resume
+E                 return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)
+E                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1346, in process_one_cursor
+E                 ack = self.ack(projection, receipt)
+E                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1326, in ack
+E                 self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py", line 428, in mark_acked
+E                 require(row["state"] == "applied", "ack requires a durable application")
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 132, in require
+E                 raise BackendError(reason)
+E             tools.c15_persistence.backend.BackendError: ack requires a durable application
+E             
+E           assert 1 == 0
+E            +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode
+
+tests/c15_persistence/test_corrective_002_remote_durability.py:159: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_002_remote_durability" name="test_k1_k5_survive_total_local_cache_loss_from_remote_only[K3_AFTER_REQUEST_DISPATCH]" time="11.330"><failure message="AssertionError: K3_AFTER_REQUEST_DISPATCH: remote-only recovery failed&#10;  stdout=&#10;  stderr=Traceback (most recent call last):&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 198, in _run_module_as_main&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 88, in _run_code&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 147, in &lt;module&gt;&#10;      raise SystemExit(main())&#10;                       ^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 95, in main&#10;      outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)&#10;                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1354, in resume&#10;      return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)&#10;             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1346, in process_one_cursor&#10;      ack = self.ack(projection, receipt)&#10;            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1326, in ack&#10;      self.journal.mark_acked(request_id, {&quot;sequence&quot;: report[&quot;sequence&quot;], &quot;next&quot;: report[&quot;next_sequence&quot;]})&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py&quot;, line 428, in mark_acked&#10;      require(row[&quot;state&quot;] == &quot;applied&quot;, &quot;ack requires a durable application&quot;)&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py&quot;, line 132, in require&#10;      raise BackendError(reason)&#10;  tools.c15_persistence.backend.BackendError: ack requires a durable application&#10;  &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_k1_k5_survive_total_local2')
+kill_point = 'K3_AFTER_REQUEST_DISPATCH'
+
+    @pytest.mark.parametrize("kill_point", KILL_POINTS)
+    def test_k1_k5_survive_total_local_cache_loss_from_remote_only(
+        tmp_path: Path, kill_point: str
+    ) -&gt; None:
+        """Every frozen K barrier must already be authoritative on the remote ref."""
+    
+        remote = _bare_remote(tmp_path, kill_point.lower())
+        token = uuid.uuid4().hex[:10]
+        run_id = f"synthetic-run-c002-{kill_point.lower()}-{token}"
+        session_id = f"synthetic-session-c002-{kill_point.lower()}-{token}"
+        remote_ref = f"refs/heads/persistence/{run_id}"
+    
+        first_root = new_root(f"c002-{kill_point.lower()}-first") / "backend"
+        fresh_parent: Path | None = None
+        try:
+            killed = _run_cli(
+                root=first_root,
+                run_id=run_id,
+                session_id=session_id,
+                mode="create",
+                remote=remote,
+                remote_ref=remote_ref,
+                kill_at=kill_point,
+            )
+            assert killed.returncode == -signal.SIGKILL, (
+                f"{kill_point}: expected SIGKILL, got {killed.returncode}\n"
+                f"stdout={killed.stdout}\nstderr={killed.stderr}"
+            )
+    
+            barrier_head = _remote_head(remote, remote_ref)
+            marker = _remote_json(remote, barrier_head, "state/remote-barrier.json")
+            assert marker["point"] == kill_point
+            assert marker["cursor"] == 1
+    
+            # The entire execution environment's run cache is gone.  Recovery may
+            # use only the remote commit/ref, never files left by the killed process.
+            first_parent = first_root.parent
+            wipe(first_parent)
+            assert not first_root.exists()
+    
+            fresh_parent = new_root(f"c002-{kill_point.lower()}-fresh")
+            fresh_root = fresh_parent / "backend"
+            resumed = _run_cli(
+                root=fresh_root,
+                run_id=run_id,
+                session_id=session_id,
+                mode="materialize-resume",
+                remote=remote,
+                remote_ref=remote_ref,
+            )
+&gt;           assert resumed.returncode == 0, (
+                f"{kill_point}: remote-only recovery failed\n"
+                f"stdout={resumed.stdout}\nstderr={resumed.stderr}"
+            )
+E           AssertionError: K3_AFTER_REQUEST_DISPATCH: remote-only recovery failed
+E             stdout=
+E             stderr=Traceback (most recent call last):
+E               File "&lt;frozen runpy&gt;", line 198, in _run_module_as_main
+E               File "&lt;frozen runpy&gt;", line 88, in _run_code
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 147, in &lt;module&gt;
+E                 raise SystemExit(main())
+E                                  ^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 95, in main
+E                 outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)
+E                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1354, in resume
+E                 return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)
+E                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1346, in process_one_cursor
+E                 ack = self.ack(projection, receipt)
+E                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1326, in ack
+E                 self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py", line 428, in mark_acked
+E                 require(row["state"] == "applied", "ack requires a durable application")
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 132, in require
+E                 raise BackendError(reason)
+E             tools.c15_persistence.backend.BackendError: ack requires a durable application
+E             
+E           assert 1 == 0
+E            +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode
+
+tests/c15_persistence/test_corrective_002_remote_durability.py:159: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_002_remote_durability" name="test_k1_k5_survive_total_local_cache_loss_from_remote_only[K3_TRUSTED_RETURN_DURABLE]" time="7.952"><failure message="AssertionError: K3_TRUSTED_RETURN_DURABLE: remote-only recovery failed&#10;  stdout=&#10;  stderr=FAIL_CLOSED_HARD_STOP attempt_id=bgattempt_d497e85ee2e7b38e33e8147ec05f70f6 state=dispatching round=0 detail=provider boundary crossed without a durable trusted return; refusing redispatch and refusing invented authenticity&#10;  &#10;assert 42 == 0&#10; +  where 42 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...=provider boundary crossed without a durable trusted return; refusing redispatch and refusing invented authenticity\n').returncode">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_k1_k5_survive_total_local3')
+kill_point = 'K3_TRUSTED_RETURN_DURABLE'
+
+    @pytest.mark.parametrize("kill_point", KILL_POINTS)
+    def test_k1_k5_survive_total_local_cache_loss_from_remote_only(
+        tmp_path: Path, kill_point: str
+    ) -&gt; None:
+        """Every frozen K barrier must already be authoritative on the remote ref."""
+    
+        remote = _bare_remote(tmp_path, kill_point.lower())
+        token = uuid.uuid4().hex[:10]
+        run_id = f"synthetic-run-c002-{kill_point.lower()}-{token}"
+        session_id = f"synthetic-session-c002-{kill_point.lower()}-{token}"
+        remote_ref = f"refs/heads/persistence/{run_id}"
+    
+        first_root = new_root(f"c002-{kill_point.lower()}-first") / "backend"
+        fresh_parent: Path | None = None
+        try:
+            killed = _run_cli(
+                root=first_root,
+                run_id=run_id,
+                session_id=session_id,
+                mode="create",
+                remote=remote,
+                remote_ref=remote_ref,
+                kill_at=kill_point,
+            )
+            assert killed.returncode == -signal.SIGKILL, (
+                f"{kill_point}: expected SIGKILL, got {killed.returncode}\n"
+                f"stdout={killed.stdout}\nstderr={killed.stderr}"
+            )
+    
+            barrier_head = _remote_head(remote, remote_ref)
+            marker = _remote_json(remote, barrier_head, "state/remote-barrier.json")
+            assert marker["point"] == kill_point
+            assert marker["cursor"] == 1
+    
+            # The entire execution environment's run cache is gone.  Recovery may
+            # use only the remote commit/ref, never files left by the killed process.
+            first_parent = first_root.parent
+            wipe(first_parent)
+            assert not first_root.exists()
+    
+            fresh_parent = new_root(f"c002-{kill_point.lower()}-fresh")
+            fresh_root = fresh_parent / "backend"
+            resumed = _run_cli(
+                root=fresh_root,
+                run_id=run_id,
+                session_id=session_id,
+                mode="materialize-resume",
+                remote=remote,
+                remote_ref=remote_ref,
+            )
+&gt;           assert resumed.returncode == 0, (
+                f"{kill_point}: remote-only recovery failed\n"
+                f"stdout={resumed.stdout}\nstderr={resumed.stderr}"
+            )
+E           AssertionError: K3_TRUSTED_RETURN_DURABLE: remote-only recovery failed
+E             stdout=
+E             stderr=FAIL_CLOSED_HARD_STOP attempt_id=bgattempt_d497e85ee2e7b38e33e8147ec05f70f6 state=dispatching round=0 detail=provider boundary crossed without a durable trusted return; refusing redispatch and refusing invented authenticity
+E             
+E           assert 42 == 0
+E            +  where 42 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...=provider boundary crossed without a durable trusted return; refusing redispatch and refusing invented authenticity\n').returncode
+
+tests/c15_persistence/test_corrective_002_remote_durability.py:159: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_002_remote_durability" name="test_k1_k5_survive_total_local_cache_loss_from_remote_only[K4_AFTER_REPLY_AUTHENTICATED]" time="8.436"><failure message="AssertionError: K4_AFTER_REPLY_AUTHENTICATED: remote-only recovery failed&#10;  stdout=&#10;  stderr=FAIL_CLOSED_HARD_STOP attempt_id=bgattempt_06d1d3066e5a83e1d5c17f2b6c704307 state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible&#10;  &#10;assert 42 == 0&#10; +  where 42 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...66e5a83e1d5c17f2b6c704307 state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible\n').returncode">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_k1_k5_survive_total_local4')
+kill_point = 'K4_AFTER_REPLY_AUTHENTICATED'
+
+    @pytest.mark.parametrize("kill_point", KILL_POINTS)
+    def test_k1_k5_survive_total_local_cache_loss_from_remote_only(
+        tmp_path: Path, kill_point: str
+    ) -&gt; None:
+        """Every frozen K barrier must already be authoritative on the remote ref."""
+    
+        remote = _bare_remote(tmp_path, kill_point.lower())
+        token = uuid.uuid4().hex[:10]
+        run_id = f"synthetic-run-c002-{kill_point.lower()}-{token}"
+        session_id = f"synthetic-session-c002-{kill_point.lower()}-{token}"
+        remote_ref = f"refs/heads/persistence/{run_id}"
+    
+        first_root = new_root(f"c002-{kill_point.lower()}-first") / "backend"
+        fresh_parent: Path | None = None
+        try:
+            killed = _run_cli(
+                root=first_root,
+                run_id=run_id,
+                session_id=session_id,
+                mode="create",
+                remote=remote,
+                remote_ref=remote_ref,
+                kill_at=kill_point,
+            )
+            assert killed.returncode == -signal.SIGKILL, (
+                f"{kill_point}: expected SIGKILL, got {killed.returncode}\n"
+                f"stdout={killed.stdout}\nstderr={killed.stderr}"
+            )
+    
+            barrier_head = _remote_head(remote, remote_ref)
+            marker = _remote_json(remote, barrier_head, "state/remote-barrier.json")
+            assert marker["point"] == kill_point
+            assert marker["cursor"] == 1
+    
+            # The entire execution environment's run cache is gone.  Recovery may
+            # use only the remote commit/ref, never files left by the killed process.
+            first_parent = first_root.parent
+            wipe(first_parent)
+            assert not first_root.exists()
+    
+            fresh_parent = new_root(f"c002-{kill_point.lower()}-fresh")
+            fresh_root = fresh_parent / "backend"
+            resumed = _run_cli(
+                root=fresh_root,
+                run_id=run_id,
+                session_id=session_id,
+                mode="materialize-resume",
+                remote=remote,
+                remote_ref=remote_ref,
+            )
+&gt;           assert resumed.returncode == 0, (
+                f"{kill_point}: remote-only recovery failed\n"
+                f"stdout={resumed.stdout}\nstderr={resumed.stderr}"
+            )
+E           AssertionError: K4_AFTER_REPLY_AUTHENTICATED: remote-only recovery failed
+E             stdout=
+E             stderr=FAIL_CLOSED_HARD_STOP attempt_id=bgattempt_06d1d3066e5a83e1d5c17f2b6c704307 state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible
+E             
+E           assert 42 == 0
+E            +  where 42 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...66e5a83e1d5c17f2b6c704307 state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible\n').returncode
+
+tests/c15_persistence/test_corrective_002_remote_durability.py:159: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_002_remote_durability" name="test_k1_k5_survive_total_local_cache_loss_from_remote_only[K5_AFTER_APPLIED_BEFORE_ACK]" time="10.409"><failure message="AssertionError: K5_AFTER_APPLIED_BEFORE_ACK: remote-only recovery failed&#10;  stdout=&#10;  stderr=Traceback (most recent call last):&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 198, in _run_module_as_main&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 88, in _run_code&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 147, in &lt;module&gt;&#10;      raise SystemExit(main())&#10;                       ^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 95, in main&#10;      outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)&#10;                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1354, in resume&#10;      return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)&#10;             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1346, in process_one_cursor&#10;      ack = self.ack(projection, receipt)&#10;            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1326, in ack&#10;      self.journal.mark_acked(request_id, {&quot;sequence&quot;: report[&quot;sequence&quot;], &quot;next&quot;: report[&quot;next_sequence&quot;]})&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py&quot;, line 428, in mark_acked&#10;      require(row[&quot;state&quot;] == &quot;applied&quot;, &quot;ack requires a durable application&quot;)&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py&quot;, line 132, in require&#10;      raise BackendError(reason)&#10;  tools.c15_persistence.backend.BackendError: ack requires a durable application&#10;  &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_k1_k5_survive_total_local5')
+kill_point = 'K5_AFTER_APPLIED_BEFORE_ACK'
+
+    @pytest.mark.parametrize("kill_point", KILL_POINTS)
+    def test_k1_k5_survive_total_local_cache_loss_from_remote_only(
+        tmp_path: Path, kill_point: str
+    ) -&gt; None:
+        """Every frozen K barrier must already be authoritative on the remote ref."""
+    
+        remote = _bare_remote(tmp_path, kill_point.lower())
+        token = uuid.uuid4().hex[:10]
+        run_id = f"synthetic-run-c002-{kill_point.lower()}-{token}"
+        session_id = f"synthetic-session-c002-{kill_point.lower()}-{token}"
+        remote_ref = f"refs/heads/persistence/{run_id}"
+    
+        first_root = new_root(f"c002-{kill_point.lower()}-first") / "backend"
+        fresh_parent: Path | None = None
+        try:
+            killed = _run_cli(
+                root=first_root,
+                run_id=run_id,
+                session_id=session_id,
+                mode="create",
+                remote=remote,
+                remote_ref=remote_ref,
+                kill_at=kill_point,
+            )
+            assert killed.returncode == -signal.SIGKILL, (
+                f"{kill_point}: expected SIGKILL, got {killed.returncode}\n"
+                f"stdout={killed.stdout}\nstderr={killed.stderr}"
+            )
+    
+            barrier_head = _remote_head(remote, remote_ref)
+            marker = _remote_json(remote, barrier_head, "state/remote-barrier.json")
+            assert marker["point"] == kill_point
+            assert marker["cursor"] == 1
+    
+            # The entire execution environment's run cache is gone.  Recovery may
+            # use only the remote commit/ref, never files left by the killed process.
+            first_parent = first_root.parent
+            wipe(first_parent)
+            assert not first_root.exists()
+    
+            fresh_parent = new_root(f"c002-{kill_point.lower()}-fresh")
+            fresh_root = fresh_parent / "backend"
+            resumed = _run_cli(
+                root=fresh_root,
+                run_id=run_id,
+                session_id=session_id,
+                mode="materialize-resume",
+                remote=remote,
+                remote_ref=remote_ref,
+            )
+&gt;           assert resumed.returncode == 0, (
+                f"{kill_point}: remote-only recovery failed\n"
+                f"stdout={resumed.stdout}\nstderr={resumed.stderr}"
+            )
+E           AssertionError: K5_AFTER_APPLIED_BEFORE_ACK: remote-only recovery failed
+E             stdout=
+E             stderr=Traceback (most recent call last):
+E               File "&lt;frozen runpy&gt;", line 198, in _run_module_as_main
+E               File "&lt;frozen runpy&gt;", line 88, in _run_code
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 147, in &lt;module&gt;
+E                 raise SystemExit(main())
+E                                  ^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 95, in main
+E                 outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)
+E                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1354, in resume
+E                 return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)
+E                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1346, in process_one_cursor
+E                 ack = self.ack(projection, receipt)
+E                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1326, in ack
+E                 self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py", line 428, in mark_acked
+E                 require(row["state"] == "applied", "ack requires a durable application")
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 132, in require
+E                 raise BackendError(reason)
+E             tools.c15_persistence.backend.BackendError: ack requires a durable application
+E             
+E           assert 1 == 0
+E            +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode
+
+tests/c15_persistence/test_corrective_002_remote_durability.py:159: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_002_remote_durability" name="test_remote_compare_and_swap_rejects_stale_writer" time="2.039" /><testcase classname="tests.c15_persistence.test_corrective_002_remote_durability" name="test_reopen_rejects_deleted_middle_sealed_generation" time="0.642"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">def test_reopen_rejects_deleted_middle_sealed_generation() -&gt; None:
+&gt;       parent, run_id, session_id = _completed_local_run("c002-gen-gap")
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/test_corrective_002_remote_durability.py:268: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/c15_persistence/test_corrective_002_remote_durability.py:261: in _completed_local_run
+    outcome = session.process_one_cursor()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_002_remote_durability" name="test_reopen_rejects_modified_sealed_generation_artifact" time="0.592"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">def test_reopen_rejects_modified_sealed_generation_artifact() -&gt; None:
+&gt;       parent, run_id, session_id = _completed_local_run("c002-gen-tamper")
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/test_corrective_002_remote_durability.py:284: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/c15_persistence/test_corrective_002_remote_durability.py:261: in _completed_local_run
+    outcome = session.process_one_cursor()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_002_remote_durability" name="test_reopen_rejects_incomplete_unsealed_generation" time="0.620"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">def test_reopen_rejects_incomplete_unsealed_generation() -&gt; None:
+&gt;       parent, run_id, session_id = _completed_local_run("c002-gen-incomplete")
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/test_corrective_002_remote_durability.py:301: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/c15_persistence/test_corrective_002_remote_durability.py:261: in _completed_local_run
+    outcome = session.process_one_cursor()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_001_a_capability_wrapping_cannot_swallow_authoritative_abort" time="0.083" /><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_001_b_k4_authoritative_failure_hard_stops_before_progress" time="4.431" /><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_001_c_k4_failure_restart_recovers_from_authoritative_state_once" time="7.823"><failure message="AssertionError: remote-only restart failed&#10;  stdout=&#10;  stderr=FAIL_CLOSED_HARD_STOP attempt_id=bgattempt_942fbb64b42aa7c98a98f3e0b8c1e2d3 state=dispatching round=0 detail=provider boundary crossed without a durable trusted return; refusing redispatch and refusing invented authenticity&#10;  &#10;assert 42 == 0&#10; +  where 42 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...=provider boundary crossed without a durable trusted return; refusing redispatch and refusing invented authenticity\n').returncode">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_001_c_k4_failure_res0')
+
+    def test_c002_001_c_k4_failure_restart_recovers_from_authoritative_state_once(
+        tmp_path: Path,
+    ) -&gt; None:
+        """PROBE: C002-001-C.
+    
+        EXPECT: after the K4 authoritative failure and total loss of the failed local
+        cache, a fresh process that restores only the authoritative remote state
+        converges exactly once - one reveal/ingest/ACK, one capability effect, two
+        metered rounds and two provider dispatches (one per round) with no duplicate.
+        """
+        remote = _bare_remote(tmp_path, "c001c")
+        run_id, session_id, remote_ref = _ids("c001c")
+        first_parent = new_root("c003v2-c001c-first")
+        fresh_parent: Path | None = None
+        try:
+            failed = _run_cli(
+                root=first_parent / "backend",
+                run_id=run_id,
+                session_id=session_id,
+                mode="create",
+                remote=remote,
+                remote_ref=remote_ref,
+                fail_barrier=K4_BARRIER,
+            )
+            assert failed.returncode == AUTHORITATIVE_FAILURE_EXIT, failed.stderr
+    
+            # Failure evidence must be durably recorded in the failed run itself:
+            # both the evidence slot and the audit trail carry the authoritative
+            # durability failure (probe correction: the assertion is made before the
+            # probe deliberately destroys the whole local cache).
+            failures = [
+                json.loads(line)
+                for line in (first_parent / "backend" / "state" / "evidence" / "failures.jsonl")
+                .read_text(encoding="utf-8")
+                .splitlines()
+                if line.strip()
+            ]
+            assert any(
+                row.get("point") == "AUTHORITATIVE_PERSISTENCE_FAILURE"
+                and row.get("barrier") == K4_BARRIER
+                for row in failures
+            ), failures
+            audit_blob = (first_parent / "backend" / "audit.jsonl").read_text(encoding="utf-8")
+            assert "failure_evidence" in audit_blob, "audit trail lost the failure"
+    
+            wipe(first_parent)
+            fresh_parent = new_root("c003v2-c001c-fresh")
+            resumed = _run_cli(
+                root=fresh_parent / "backend",
+                run_id=run_id,
+                session_id=session_id,
+                mode="materialize-resume",
+                remote=remote,
+                remote_ref=remote_ref,
+            )
+&gt;           assert resumed.returncode == CONVERGED_EXIT, (
+                f"remote-only restart failed\nstdout={resumed.stdout}\nstderr={resumed.stderr}"
+            )
+E           AssertionError: remote-only restart failed
+E             stdout=
+E             stderr=FAIL_CLOSED_HARD_STOP attempt_id=bgattempt_942fbb64b42aa7c98a98f3e0b8c1e2d3 state=dispatching round=0 detail=provider boundary crossed without a durable trusted return; refusing redispatch and refusing invented authenticity
+E             
+E           assert 42 == 0
+E            +  where 42 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...=provider boundary crossed without a durable trusted return; refusing redispatch and refusing invented authenticity\n').returncode
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:420: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_001_d_ack_barrier_failure_never_acks_the_cursor" time="7.056"><failure message="AssertionError: stderr=Traceback (most recent call last):&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 198, in _run_module_as_main&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 88, in _run_code&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 147, in &lt;module&gt;&#10;      raise SystemExit(main())&#10;                       ^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 72, in main&#10;      outcome = session.process_one_cursor(kill_at=args.kill_at, kill_round=args.kill_round)&#10;                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1346, in process_one_cursor&#10;      ack = self.ack(projection, receipt)&#10;            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1326, in ack&#10;      self.journal.mark_acked(request_id, {&quot;sequence&quot;: report[&quot;sequence&quot;], &quot;next&quot;: report[&quot;next_sequence&quot;]})&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py&quot;, line 428, in mark_acked&#10;      require(row[&quot;state&quot;] == &quot;applied&quot;, &quot;ack requires a durable application&quot;)&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py&quot;, line 132, in require&#10;      raise BackendError(reason)&#10;  tools.c15_persistence.backend.BackendError: ack requires a durable application&#10;  &#10;  stdout=&#10;assert 1 == 43&#10; +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_001_d_ack_barrier_fa0')
+
+    def test_c002_001_d_ack_barrier_failure_never_acks_the_cursor(tmp_path: Path) -&gt; None:
+        """PROBE: C002-001-D.
+    
+        EXPECT: an authoritative ACK-barrier failure is fatal and the cursor is never
+        acked; the previous authoritative barrier stays published and the failure is
+        durably recorded rather than reported as a successful persistence.
+        """
+        remote = _bare_remote(tmp_path, "c001d")
+        run_id, session_id, remote_ref = _ids("c001d")
+        parent = new_root("c003v2-c001d")
+        try:
+            failed = _run_cli(
+                root=parent / "backend",
+                run_id=run_id,
+                session_id=session_id,
+                mode="create",
+                remote=remote,
+                remote_ref=remote_ref,
+                fail_barrier=ACK_BARRIER,
+            )
+&gt;           assert failed.returncode == AUTHORITATIVE_FAILURE_EXIT, (
+                f"stderr={failed.stderr}\nstdout={failed.stdout}"
+            )
+E           AssertionError: stderr=Traceback (most recent call last):
+E               File "&lt;frozen runpy&gt;", line 198, in _run_module_as_main
+E               File "&lt;frozen runpy&gt;", line 88, in _run_code
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 147, in &lt;module&gt;
+E                 raise SystemExit(main())
+E                                  ^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 72, in main
+E                 outcome = session.process_one_cursor(kill_at=args.kill_at, kill_round=args.kill_round)
+E                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1346, in process_one_cursor
+E                 ack = self.ack(projection, receipt)
+E                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1326, in ack
+E                 self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py", line 428, in mark_acked
+E                 require(row["state"] == "applied", "ack requires a durable application")
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 132, in require
+E                 raise BackendError(reason)
+E             tools.c15_persistence.backend.BackendError: ack requires a durable application
+E             
+E             stdout=
+E           assert 1 == 43
+E            +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:460: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_002_a_k3_trusted_return_first_round_remote_only_converges" time="7.824"><failure message="AssertionError: remote-only recovery failed&#10;  stdout=&#10;  stderr=FAIL_CLOSED_HARD_STOP attempt_id=bgattempt_f4524908701892dfef5ad9c194b23507 state=dispatching round=0 detail=provider boundary crossed without a durable trusted return; refusing redispatch and refusing invented authenticity&#10;  &#10;assert 42 == 0&#10; +  where 42 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...=provider boundary crossed without a durable trusted return; refusing redispatch and refusing invented authenticity\n').returncode">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_002_a_k3_trusted_ret0')
+
+    def test_c002_002_a_k3_trusted_return_first_round_remote_only_converges(
+        tmp_path: Path,
+    ) -&gt; None:
+        """PROBE: C002-002-A.
+    
+        EXPECT: a total local loss at the first round's authenticatable provider
+        return (Core receipt + exact return handoff durable) recovers from remote
+        state alone, without a second dispatch and without duplicate work.
+        """
+        remote = _bare_remote(tmp_path, "c002a")
+        run_id, session_id, remote_ref = _ids("c002a")
+        first_parent = new_root("c003v2-c002a-first")
+        fresh_parent: Path | None = None
+        try:
+            killed = _run_cli(
+                root=first_parent / "backend",
+                run_id=run_id,
+                session_id=session_id,
+                mode="create",
+                remote=remote,
+                remote_ref=remote_ref,
+                kill_at=K3_TRUSTED_RETURN_BARRIER,
+                kill_round=0,
+            )
+            assert killed.returncode == -signal.SIGKILL, (
+                f"expected SIGKILL at the trusted-return barrier, got {killed.returncode}\n"
+                f"stderr={killed.stderr}"
+            )
+            head = _remote_head(remote, remote_ref)
+            assert head is not None
+            assert _remote_json(remote, head, "state/remote-barrier.json")["point"] == (
+                K3_TRUSTED_RETURN_BARRIER
+            )
+    
+            wipe(first_parent)
+            fresh_parent = new_root("c003v2-c002a-fresh")
+            resumed = _run_cli(
+                root=fresh_parent / "backend",
+                run_id=run_id,
+                session_id=session_id,
+                mode="materialize-resume",
+                remote=remote,
+                remote_ref=remote_ref,
+            )
+&gt;           assert resumed.returncode == CONVERGED_EXIT, (
+                f"remote-only recovery failed\nstdout={resumed.stdout}\nstderr={resumed.stderr}"
+            )
+E           AssertionError: remote-only recovery failed
+E             stdout=
+E             stderr=FAIL_CLOSED_HARD_STOP attempt_id=bgattempt_f4524908701892dfef5ad9c194b23507 state=dispatching round=0 detail=provider boundary crossed without a durable trusted return; refusing redispatch and refusing invented authenticity
+E             
+E           assert 42 == 0
+E            +  where 42 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...=provider boundary crossed without a durable trusted return; refusing redispatch and refusing invented authenticity\n').returncode
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:529: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_002_b_k3_trusted_return_later_round_remote_only_converges" time="10.490"><failure message="AssertionError: later-round remote-only recovery failed&#10;  stdout=&#10;  stderr=FAIL_CLOSED_HARD_STOP attempt_id=bgattempt_692f8ceb4873b868ce56c91247296200 state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible&#10;  &#10;assert 42 == 0&#10; +  where 42 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...b4873b868ce56c91247296200 state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible\n').returncode">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_002_b_k3_trusted_ret0')
+
+    def test_c002_002_b_k3_trusted_return_later_round_remote_only_converges(
+        tmp_path: Path,
+    ) -&gt; None:
+        """PROBE: C002-002-B.
+    
+        EXPECT: the same authenticatable provider-return loss in a *later* round
+        (after round 0 was metered and its capability applied) still converges from
+        remote state alone: two dispatches with distinct request ids, two metered
+        rounds, one capability effect, one assistant output, one ACK.
+        """
+        remote = _bare_remote(tmp_path, "c002b")
+        run_id, session_id, remote_ref = _ids("c002b")
+        first_parent = new_root("c003v2-c002b-first")
+        fresh_parent: Path | None = None
+        try:
+            killed = _run_cli(
+                root=first_parent / "backend",
+                run_id=run_id,
+                session_id=session_id,
+                mode="create",
+                remote=remote,
+                remote_ref=remote_ref,
+                kill_at=K3_TRUSTED_RETURN_BARRIER,
+                kill_round=1,
+            )
+            assert killed.returncode == -signal.SIGKILL, (
+                f"expected SIGKILL at later-round trusted return, got {killed.returncode}\n"
+                f"stderr={killed.stderr}"
+            )
+            head = _remote_head(remote, remote_ref)
+            assert head is not None
+            assert _remote_json(remote, head, "state/remote-barrier.json")["point"] == (
+                K3_TRUSTED_RETURN_BARRIER
+            )
+            ledger = _remote_ledger(remote, head)
+            assert len(ledger) == 2, ledger
+    
+            wipe(first_parent)
+            fresh_parent = new_root("c003v2-c002b-fresh")
+            resumed = _run_cli(
+                root=fresh_parent / "backend",
+                run_id=run_id,
+                session_id=session_id,
+                mode="materialize-resume",
+                remote=remote,
+                remote_ref=remote_ref,
+            )
+&gt;           assert resumed.returncode == CONVERGED_EXIT, (
+                f"later-round remote-only recovery failed\nstdout={resumed.stdout}\n"
+                f"stderr={resumed.stderr}"
+            )
+E           AssertionError: later-round remote-only recovery failed
+E             stdout=
+E             stderr=FAIL_CLOSED_HARD_STOP attempt_id=bgattempt_692f8ceb4873b868ce56c91247296200 state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible
+E             
+E           assert 42 == 0
+E            +  where 42 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...b4873b868ce56c91247296200 state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible\n').returncode
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:587: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_002_c_k3_dispatch_only_later_round_hard_stops_without_redispatch" time="14.035" /><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_002_d_k5_push_success_then_total_local_loss_acks_once" time="10.444"><failure message="AssertionError: K5 remote-only ACK failed&#10;  stdout=&#10;  stderr=Traceback (most recent call last):&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 198, in _run_module_as_main&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 88, in _run_code&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 147, in &lt;module&gt;&#10;      raise SystemExit(main())&#10;                       ^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 95, in main&#10;      outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)&#10;                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1354, in resume&#10;      return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)&#10;             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1346, in process_one_cursor&#10;      ack = self.ack(projection, receipt)&#10;            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1326, in ack&#10;      self.journal.mark_acked(request_id, {&quot;sequence&quot;: report[&quot;sequence&quot;], &quot;next&quot;: report[&quot;next_sequence&quot;]})&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py&quot;, line 428, in mark_acked&#10;      require(row[&quot;state&quot;] == &quot;applied&quot;, &quot;ack requires a durable application&quot;)&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py&quot;, line 132, in require&#10;      raise BackendError(reason)&#10;  tools.c15_persistence.backend.BackendError: ack requires a durable application&#10;  &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_002_d_k5_push_succes0')
+
+    def test_c002_002_d_k5_push_success_then_total_local_loss_acks_once(
+        tmp_path: Path,
+    ) -&gt; None:
+        """PROBE: C002-002-D.
+    
+        EXPECT: when the applied-before-ACK barrier is already authoritative and the
+        whole local cache is destroyed, the fresh process completes the cursor
+        exactly once without rerunning model/capability work (dispatch ledger and
+        metering stay at their published values, one assistant output, one ACK).
+        """
+        remote = _bare_remote(tmp_path, "c002d")
+        run_id, session_id, remote_ref = _ids("c002d")
+        first_parent = new_root("c003v2-c002d-first")
+        fresh_parent: Path | None = None
+        try:
+            killed = _run_cli(
+                root=first_parent / "backend",
+                run_id=run_id,
+                session_id=session_id,
+                mode="create",
+                remote=remote,
+                remote_ref=remote_ref,
+                kill_at=K5_BARRIER,
+            )
+            assert killed.returncode == -signal.SIGKILL, killed.stderr
+            head = _remote_head(remote, remote_ref)
+            assert head is not None
+            assert _remote_json(remote, head, "state/remote-barrier.json")["point"] == K5_BARRIER
+            assert len(_remote_ledger(remote, head)) == 2
+    
+            wipe(first_parent)
+            fresh_parent = new_root("c003v2-c002d-fresh")
+            resumed = _run_cli(
+                root=fresh_parent / "backend",
+                run_id=run_id,
+                session_id=session_id,
+                mode="materialize-resume",
+                remote=remote,
+                remote_ref=remote_ref,
+            )
+&gt;           assert resumed.returncode == CONVERGED_EXIT, (
+                f"K5 remote-only ACK failed\nstdout={resumed.stdout}\nstderr={resumed.stderr}"
+            )
+E           AssertionError: K5 remote-only ACK failed
+E             stdout=
+E             stderr=Traceback (most recent call last):
+E               File "&lt;frozen runpy&gt;", line 198, in _run_module_as_main
+E               File "&lt;frozen runpy&gt;", line 88, in _run_code
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 147, in &lt;module&gt;
+E                 raise SystemExit(main())
+E                                  ^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 95, in main
+E                 outcome = session.resume(kill_at=args.kill_at, kill_round=args.kill_round)
+E                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1354, in resume
+E                 return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)
+E                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1346, in process_one_cursor
+E                 ack = self.ack(projection, receipt)
+E                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1326, in ack
+E                 self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py", line 428, in mark_acked
+E                 require(row["state"] == "applied", "ack requires a durable application")
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 132, in require
+E                 raise BackendError(reason)
+E             tools.c15_persistence.backend.BackendError: ack requires a durable application
+E             
+E           assert 1 == 0
+E            +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:736: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_002_e_k5_prepush_crash_recovers_from_prior_authoritative_barrier" time="8.646"><failure message="tools.c15_persistence.operator_session.DurableTrustedReturnMissing: no durable trusted provider return for attempt bgattempt_6882cf12a89c0f72cffcfa7519e77f0d (state=metered, round=0): attempt is neither safely dispatchable nor recovery-eligible">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_002_e_k5_prepush_cra0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7497f50fd070&gt;
+
+    def test_c002_002_e_k5_prepush_crash_recovers_from_prior_authoritative_barrier(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -&gt; None:
+        """PROBE: C002-002-E.
+    
+        EXPECT: a crash after the local commit object is created but before the
+        remote push leaves the prior barrier authoritative - and that prior barrier is
+        the authenticated provider-return boundary of the last round, so restoring
+        only it converges exactly once (the unpublished commit is never promoted and
+        no provider is redispatched).
+        """
+        from tools.c15_persistence import remote_backend
+    
+        session, remote, run_id, session_id, remote_ref, parent = _remote_session(
+            tmp_path, "c002e"
+        )
+        original_commit = remote_backend.commit_backend_tree
+        tripped = {"value": False}
+    
+        def crash_after_commit_tree(*args, **kwargs):
+            result = original_commit(*args, **kwargs)
+            message = str(kwargs.get("message") or "")
+            if f"point={K5_BARRIER}" in message:
+                tripped["value"] = True
+                raise BackendError("synthetic crash after commit-tree before remote push")
+            return result
+    
+        monkeypatch.setattr(remote_backend, "commit_backend_tree", crash_after_commit_tree)
+        fresh_parent: Path | None = None
+        try:
+            with pytest.raises(BackendError, match="commit-tree before remote push"):
+                session.process_one_cursor()
+            assert tripped["value"], "K5 pre-push crash hook was not reached"
+            prior_remote = _remote_head(remote, remote_ref)
+            assert prior_remote is not None
+            assert _remote_json(remote, prior_remote, "state/remote-barrier.json")["point"] == (
+                K3_TRUSTED_RETURN_BARRIER
+            ), "the last published barrier must be the authenticated provider return"
+            session.backend.release()
+            # The fault was a one-shot crash, not a permanent outage: the recovery
+            # process runs without it (probe correction).
+            monkeypatch.setattr(remote_backend, "commit_backend_tree", original_commit)
+    
+            wipe(parent)
+            fresh_parent = new_root("c003v2-c002e-fresh")
+            recovered = OperatorSession.materialize_and_attach(
+                fresh_parent / "backend",
+                run_id=run_id,
+                session_id=session_id,
+                remote_ref=remote_ref,
+                commit_sha=prior_remote,
+                remote=str(remote),
+                repo_dir=REPO_ROOT,
+            )
+&gt;           outcome = recovered.resume()
+                      ^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:803: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/operator_session.py:1354: in resume
+    return self.process_one_cursor(kill_at=kill_at, kill_round=kill_round)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1345: in process_one_cursor
+    turn = self.run_turn(projection)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1255: in run_turn
+    recovery_actions = self._recover_with_core(projection)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;tools.c15_persistence.operator_session.OperatorSession object at 0x7497f512e720&gt;
+projection = {'dimension': 'dim:observation', 'event_id': 'synthetic-evt-0001', 'modality': 'text', 'occurred_at': '2026-09-27T00:01:00+00:00', ...}
+
+    def _recover_with_core(self, projection: Mapping[str, Any]) -&gt; list[dict[str, Any]]:
+        """Reattach durable provider work to Core's own accepted recovery surfaces.
+    
+        The operator never decides authenticity.  It reattaches an already
+        dispatched provider request (never a second dispatch), reads Core's own
+        trusted-return receipt and lets Core's accepted exact-response/handoff
+        recovery drive the turn.  A reply whose provider boundary was crossed
+        without a durable trusted return is a hard fail-closed stop.
+        """
+        actions: list[dict[str, Any]] = []
+        attempts = self.runtime.background_model_attempts
+        for request_id in self.journal.request_ids(cursor=int(projection["sequence"])):
+            record = self.journal.recovery(request_id)
+            if record["state"] == "staged":
+                continue
+            if record["state"] == "exposed":
+                dispatch_report = provider_module.dispatch(self.mailbox, request_id)
+                require(
+                    dispatch_report["dispatch"] == "reattached",
+                    "K3 recovery attempted a second provider dispatch",
+                )
+                self.bump("provider_reattachments")
+                reply = self._collect_reply(request_id)
+                self.journal.stage_reply(request_id, reply)
+                record = self.journal.recovery(request_id)
+                actions.append({"request_id": request_id, "action": "provider_reply_reattached"})
+            if record["state"] in {"applied", "acked"}:
+                continue
+            attempt_id = str(record["metadata"]["attempt_id"])
+            round_index = int(record["metadata"]["round"])
+            payload = bytes(record["reply"]).decode("utf-8")
+            directive = decode_model_directive(payload)
+            attempt = attempts.get(attempt_id)
+            if attempt is None:
+                # K3 can fire after provider submission while the Core attempt
+                # transaction is not present in the surviving/restored runtime DB.
+                # Do not fabricate an attempt or an authenticity receipt. Keep the
+                # exact provider reply durable, then let the normal run_turn path
+                # re-admit the deterministic attempt identity. When model_handler
+                # is reached again, _relay_exchange returns these exact staged bytes
+                # without a second provider dispatch and Core's ordinary trusted
+                # return callback mints the receipt.
+                actions.append(
+                    {
+                        "request_id": request_id,
+                        "action": "core_attempt_missing_safe_readmit",
+                    }
+                )
+                if self.remote_durability_enabled:
+                    self._persist_remote_barrier(
+                        "K3_PROVIDER_RETURN_STAGED_CORE_READMIT_PENDING",
+                        seal_label="remote-provider-return-staged",
+                    )
+                continue
+            receipt = attempts.response_authenticity_receipt(attempt_id)
+            if receipt is None:
+                if attempt.state in {"dispatching", "in_doubt"}:
+                    # The provider boundary was crossed and no Core-owned trusted
+                    # return exists. Accepted Core has no legal continuation here:
+                    # caller-supplied bytes cannot become a trusted provider
+                    # return, and blind redispatch is forbidden. Hard stop.
+                    stop = DurableTrustedReturnMissing(
+                        attempt_id=attempt_id,
+                        state=str(attempt.state),
+                        round_index=round_index,
+                        detail=(
+                            "provider boundary crossed without a durable trusted "
+                            "return; refusing redispatch and refusing invented "
+                            "authenticity"
+                        ),
+                    )
+                    self._record_fail_closed_stop(stop)
+                    raise stop
+                if attempt.state in {"admitted", "not_submitted"}:
+                    # Dispatch provably did not start for this attempt: the ordinary
+                    # path may still dispatch once, and the relay re-presents the
+                    # durable bytes if this round's request was already staged.
+                    actions.append(
+                        {
+                            "request_id": request_id,
+                            "action": "core_dispatch_not_started",
+                            "attempt_state": str(attempt.state),
+                        }
+                    )
+                    continue
+                stop = DurableTrustedReturnMissing(
+                    attempt_id=attempt_id,
+                    state=str(attempt.state),
+                    round_index=round_index,
+                    detail="attempt is neither safely dispatchable nor recovery-eligible",
+                )
+                self._record_fail_closed_stop(stop)
+&gt;               raise stop
+E               tools.c15_persistence.operator_session.DurableTrustedReturnMissing: no durable trusted provider return for attempt bgattempt_6882cf12a89c0f72cffcfa7519e77f0d (state=metered, round=0): attempt is neither safely dispatchable nor recovery-eligible
+
+tools/c15_persistence/operator_session.py:1180: DurableTrustedReturnMissing</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_002_f_changed_trusted_return_bytes_under_same_identity_fail_closed" time="7.067"><failure message="AssertionError: trusted-return handoff missing&#10;assert None is not None">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_002_f_changed_truste0')
+
+    def test_c002_002_f_changed_trusted_return_bytes_under_same_identity_fail_closed(
+        tmp_path: Path,
+    ) -&gt; None:
+        """PROBE: C002-002-F.
+    
+        EXPECT: changing the exact provider-return bytes while keeping the durable
+        identity fails closed: no downstream application, no ACK and no duplicate
+        work, because Core re-verifies the handoff digest before applying anything.
+        """
+        remote = _bare_remote(tmp_path, "c002f")
+        run_id, session_id, remote_ref = _ids("c002f")
+        first_parent = new_root("c003v2-c002f-first")
+        restore_parent: Path | None = None
+        try:
+            killed = _run_cli(
+                root=first_parent / "backend",
+                run_id=run_id,
+                session_id=session_id,
+                mode="create",
+                remote=remote,
+                remote_ref=remote_ref,
+                kill_at=K3_TRUSTED_RETURN_BARRIER,
+                kill_round=1,
+            )
+            assert killed.returncode == -signal.SIGKILL, killed.stderr
+            wipe(first_parent)
+    
+            restore_parent = new_root("c003v2-c002f-restore")
+            RunBackend.materialize_from_remote(
+                run_id=run_id,
+                session_id=session_id,
+                target_dir=restore_parent / "backend",
+                remote_ref=remote_ref,
+                remote=str(remote),
+                repo_dir=REPO_ROOT,
+            )
+            world = restore_parent / "backend" / "state" / "runtime" / "world.sqlite"
+            with sqlite3.connect(world) as db:
+                row = db.execute(
+                    "SELECT h.attempt_id, h.directive_payload FROM background_model_return_handoffs h "
+                    "JOIN background_model_attempts a ON a.attempt_id = h.attempt_id "
+                    "ORDER BY a.model_round_index DESC LIMIT 1"
+                ).fetchone()
+&gt;               assert row is not None, "trusted-return handoff missing"
+E               AssertionError: trusted-return handoff missing
+E               assert None is not None
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:866: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_002_g_changed_relay_journal_reply_bytes_fail_closed" time="10.451"><failure message="AssertionError: FAIL_CLOSED_HARD_STOP attempt_id=bgattempt_274418630a45c79d52cbcbe55dccabe3 state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible&#10;  &#10;assert 'reply corruption' in ('FAIL_CLOSED_HARD_STOP attempt_id=bgattempt_274418630a45c79d52cbcbe55dccabe3 state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible\n' + '')&#10; +  where 'FAIL_CLOSED_HARD_STOP attempt_id=bgattempt_274418630a45c79d52cbcbe55dccabe3 state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible\n' = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...30a45c79d52cbcbe55dccabe3 state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible\n').stderr&#10; +  and   '' = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...30a45c79d52cbcbe55dccabe3 state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible\n').stdout">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_002_g_changed_relay_0')
+
+    def test_c002_002_g_changed_relay_journal_reply_bytes_fail_closed(tmp_path: Path) -&gt; None:
+        """PROBE: C002-002-G.
+    
+        EXPECT: changing the exact relay-journal reply bytes fails closed on the
+        operator's own integrity check before anything is handed back to Core: no
+        ACK, no duplicate dispatch, no application.
+        """
+        remote = _bare_remote(tmp_path, "c002g")
+        run_id, session_id, remote_ref = _ids("c002g")
+        first_parent = new_root("c003v2-c002g-first")
+        restore_parent: Path | None = None
+        try:
+            killed = _run_cli(
+                root=first_parent / "backend",
+                run_id=run_id,
+                session_id=session_id,
+                mode="create",
+                remote=remote,
+                remote_ref=remote_ref,
+                kill_at=K3_TRUSTED_RETURN_BARRIER,
+                kill_round=1,
+            )
+            assert killed.returncode == -signal.SIGKILL, killed.stderr
+            wipe(first_parent)
+    
+            restore_parent = new_root("c003v2-c002g-restore")
+            RunBackend.materialize_from_remote(
+                run_id=run_id,
+                session_id=session_id,
+                target_dir=restore_parent / "backend",
+                remote_ref=remote_ref,
+                remote=str(remote),
+                repo_dir=REPO_ROOT,
+            )
+            journal = restore_parent / "backend" / "journal.sqlite"
+            with sqlite3.connect(journal) as db:
+                row = db.execute(
+                    "SELECT request_id, reply FROM relay WHERE reply IS NOT NULL "
+                    "ORDER BY updated_at_epoch DESC LIMIT 1"
+                ).fetchone()
+                assert row is not None, "no staged relay reply"
+                request_id, reply = row
+                db.execute(
+                    "UPDATE relay SET reply=? WHERE request_id=?",
+                    (bytes(reply) + b" ", request_id),
+                )
+                db.commit()
+    
+            tampered_run = _run_cli(
+                root=restore_parent / "backend",
+                run_id=run_id,
+                session_id=session_id,
+                mode="resume",
+                remote=remote,
+                remote_ref=remote_ref,
+            )
+            assert tampered_run.returncode not in (CONVERGED_EXIT,), tampered_run.stdout
+&gt;           assert "reply corruption" in (tampered_run.stderr + tampered_run.stdout), (
+                tampered_run.stderr
+            )
+E           AssertionError: FAIL_CLOSED_HARD_STOP attempt_id=bgattempt_274418630a45c79d52cbcbe55dccabe3 state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible
+E             
+E           assert 'reply corruption' in ('FAIL_CLOSED_HARD_STOP attempt_id=bgattempt_274418630a45c79d52cbcbe55dccabe3 state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible\n' + '')
+E            +  where 'FAIL_CLOSED_HARD_STOP attempt_id=bgattempt_274418630a45c79d52cbcbe55dccabe3 state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible\n' = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...30a45c79d52cbcbe55dccabe3 state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible\n').stderr
+E            +  and   '' = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...30a45c79d52cbcbe55dccabe3 state=metered round=0 detail=attempt is neither safely dispatchable nor recovery-eligible\n').stdout
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:956: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_004_a_valid_remote_authoritative_binding_is_durable" time="5.744"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_004_a_valid_remote_a0')
+
+    def test_c002_004_a_valid_remote_authoritative_binding_is_durable(tmp_path: Path) -&gt; None:
+        """PROBE: C002-004-A.
+    
+        EXPECT: a remote-authoritative run records its classification + binding
+        durably; the binding survives a total local loss and re-attach still reports
+        remote authority (never local-only).
+        """
+        session, remote, run_id, session_id, remote_ref, parent = _remote_session(
+            tmp_path, "c004a"
+        )
+        fresh_parent: Path | None = None
+        try:
+&gt;           session.process_one_cursor()
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:985: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_004_b_binding_damage_fails_closed_never_local_only[missing]" time="5.914"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_004_b_binding_damage0')
+mutation = 'missing'
+
+    @pytest.mark.parametrize(
+        "mutation",
+        [
+            pytest.param("missing", id="missing"),
+            pytest.param("truncated", id="truncated"),
+            pytest.param("malformed-json", id="malformed-json"),
+            pytest.param("extra-field", id="extra-field"),
+            pytest.param("missing-field", id="missing-field"),
+            pytest.param("unreadable", id="unreadable"),
+            pytest.param("wrong-run", id="wrong-run"),
+            pytest.param("wrong-session", id="wrong-session"),
+            pytest.param("non-canonical-ref", id="non-canonical-ref"),
+        ],
+    )
+    def test_c002_004_b_binding_damage_fails_closed_never_local_only(
+        tmp_path: Path, mutation: str
+    ) -&gt; None:
+        """PROBE: C002-004-B.
+    
+        EXPECT: for every damaged-binding shape on a run whose durable owner record
+        declares remote authority - missing, truncated, malformed JSON, unexpected or
+        missing fields, unreadable, wrong run/session identity, non-canonical ref -
+        attach/resume refuses with a BackendError.  It must never fall back to
+        local-only operation or make non-authoritative progress.  One probe id covers
+        the nine parametrized shapes C002-004-B..J (missing, truncated,
+        malformed-json, extra-field, missing-field, unreadable, wrong-run,
+        wrong-session, non-canonical-ref).
+        """
+        session, _remote, run_id, session_id, _ref, parent = _remote_session(
+            tmp_path, f"c004b-{mutation}"
+        )
+        try:
+&gt;           session.process_one_cursor()
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:1054: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_004_b_binding_damage_fails_closed_never_local_only[truncated]" time="5.872"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_004_b_binding_damage1')
+mutation = 'truncated'
+
+    @pytest.mark.parametrize(
+        "mutation",
+        [
+            pytest.param("missing", id="missing"),
+            pytest.param("truncated", id="truncated"),
+            pytest.param("malformed-json", id="malformed-json"),
+            pytest.param("extra-field", id="extra-field"),
+            pytest.param("missing-field", id="missing-field"),
+            pytest.param("unreadable", id="unreadable"),
+            pytest.param("wrong-run", id="wrong-run"),
+            pytest.param("wrong-session", id="wrong-session"),
+            pytest.param("non-canonical-ref", id="non-canonical-ref"),
+        ],
+    )
+    def test_c002_004_b_binding_damage_fails_closed_never_local_only(
+        tmp_path: Path, mutation: str
+    ) -&gt; None:
+        """PROBE: C002-004-B.
+    
+        EXPECT: for every damaged-binding shape on a run whose durable owner record
+        declares remote authority - missing, truncated, malformed JSON, unexpected or
+        missing fields, unreadable, wrong run/session identity, non-canonical ref -
+        attach/resume refuses with a BackendError.  It must never fall back to
+        local-only operation or make non-authoritative progress.  One probe id covers
+        the nine parametrized shapes C002-004-B..J (missing, truncated,
+        malformed-json, extra-field, missing-field, unreadable, wrong-run,
+        wrong-session, non-canonical-ref).
+        """
+        session, _remote, run_id, session_id, _ref, parent = _remote_session(
+            tmp_path, f"c004b-{mutation}"
+        )
+        try:
+&gt;           session.process_one_cursor()
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:1054: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_004_b_binding_damage_fails_closed_never_local_only[malformed-json]" time="5.908"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_004_b_binding_damage2')
+mutation = 'malformed-json'
+
+    @pytest.mark.parametrize(
+        "mutation",
+        [
+            pytest.param("missing", id="missing"),
+            pytest.param("truncated", id="truncated"),
+            pytest.param("malformed-json", id="malformed-json"),
+            pytest.param("extra-field", id="extra-field"),
+            pytest.param("missing-field", id="missing-field"),
+            pytest.param("unreadable", id="unreadable"),
+            pytest.param("wrong-run", id="wrong-run"),
+            pytest.param("wrong-session", id="wrong-session"),
+            pytest.param("non-canonical-ref", id="non-canonical-ref"),
+        ],
+    )
+    def test_c002_004_b_binding_damage_fails_closed_never_local_only(
+        tmp_path: Path, mutation: str
+    ) -&gt; None:
+        """PROBE: C002-004-B.
+    
+        EXPECT: for every damaged-binding shape on a run whose durable owner record
+        declares remote authority - missing, truncated, malformed JSON, unexpected or
+        missing fields, unreadable, wrong run/session identity, non-canonical ref -
+        attach/resume refuses with a BackendError.  It must never fall back to
+        local-only operation or make non-authoritative progress.  One probe id covers
+        the nine parametrized shapes C002-004-B..J (missing, truncated,
+        malformed-json, extra-field, missing-field, unreadable, wrong-run,
+        wrong-session, non-canonical-ref).
+        """
+        session, _remote, run_id, session_id, _ref, parent = _remote_session(
+            tmp_path, f"c004b-{mutation}"
+        )
+        try:
+&gt;           session.process_one_cursor()
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:1054: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_004_b_binding_damage_fails_closed_never_local_only[extra-field]" time="5.760"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_004_b_binding_damage3')
+mutation = 'extra-field'
+
+    @pytest.mark.parametrize(
+        "mutation",
+        [
+            pytest.param("missing", id="missing"),
+            pytest.param("truncated", id="truncated"),
+            pytest.param("malformed-json", id="malformed-json"),
+            pytest.param("extra-field", id="extra-field"),
+            pytest.param("missing-field", id="missing-field"),
+            pytest.param("unreadable", id="unreadable"),
+            pytest.param("wrong-run", id="wrong-run"),
+            pytest.param("wrong-session", id="wrong-session"),
+            pytest.param("non-canonical-ref", id="non-canonical-ref"),
+        ],
+    )
+    def test_c002_004_b_binding_damage_fails_closed_never_local_only(
+        tmp_path: Path, mutation: str
+    ) -&gt; None:
+        """PROBE: C002-004-B.
+    
+        EXPECT: for every damaged-binding shape on a run whose durable owner record
+        declares remote authority - missing, truncated, malformed JSON, unexpected or
+        missing fields, unreadable, wrong run/session identity, non-canonical ref -
+        attach/resume refuses with a BackendError.  It must never fall back to
+        local-only operation or make non-authoritative progress.  One probe id covers
+        the nine parametrized shapes C002-004-B..J (missing, truncated,
+        malformed-json, extra-field, missing-field, unreadable, wrong-run,
+        wrong-session, non-canonical-ref).
+        """
+        session, _remote, run_id, session_id, _ref, parent = _remote_session(
+            tmp_path, f"c004b-{mutation}"
+        )
+        try:
+&gt;           session.process_one_cursor()
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:1054: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_004_b_binding_damage_fails_closed_never_local_only[missing-field]" time="5.916"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_004_b_binding_damage4')
+mutation = 'missing-field'
+
+    @pytest.mark.parametrize(
+        "mutation",
+        [
+            pytest.param("missing", id="missing"),
+            pytest.param("truncated", id="truncated"),
+            pytest.param("malformed-json", id="malformed-json"),
+            pytest.param("extra-field", id="extra-field"),
+            pytest.param("missing-field", id="missing-field"),
+            pytest.param("unreadable", id="unreadable"),
+            pytest.param("wrong-run", id="wrong-run"),
+            pytest.param("wrong-session", id="wrong-session"),
+            pytest.param("non-canonical-ref", id="non-canonical-ref"),
+        ],
+    )
+    def test_c002_004_b_binding_damage_fails_closed_never_local_only(
+        tmp_path: Path, mutation: str
+    ) -&gt; None:
+        """PROBE: C002-004-B.
+    
+        EXPECT: for every damaged-binding shape on a run whose durable owner record
+        declares remote authority - missing, truncated, malformed JSON, unexpected or
+        missing fields, unreadable, wrong run/session identity, non-canonical ref -
+        attach/resume refuses with a BackendError.  It must never fall back to
+        local-only operation or make non-authoritative progress.  One probe id covers
+        the nine parametrized shapes C002-004-B..J (missing, truncated,
+        malformed-json, extra-field, missing-field, unreadable, wrong-run,
+        wrong-session, non-canonical-ref).
+        """
+        session, _remote, run_id, session_id, _ref, parent = _remote_session(
+            tmp_path, f"c004b-{mutation}"
+        )
+        try:
+&gt;           session.process_one_cursor()
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:1054: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_004_b_binding_damage_fails_closed_never_local_only[unreadable]" time="5.816"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_004_b_binding_damage5')
+mutation = 'unreadable'
+
+    @pytest.mark.parametrize(
+        "mutation",
+        [
+            pytest.param("missing", id="missing"),
+            pytest.param("truncated", id="truncated"),
+            pytest.param("malformed-json", id="malformed-json"),
+            pytest.param("extra-field", id="extra-field"),
+            pytest.param("missing-field", id="missing-field"),
+            pytest.param("unreadable", id="unreadable"),
+            pytest.param("wrong-run", id="wrong-run"),
+            pytest.param("wrong-session", id="wrong-session"),
+            pytest.param("non-canonical-ref", id="non-canonical-ref"),
+        ],
+    )
+    def test_c002_004_b_binding_damage_fails_closed_never_local_only(
+        tmp_path: Path, mutation: str
+    ) -&gt; None:
+        """PROBE: C002-004-B.
+    
+        EXPECT: for every damaged-binding shape on a run whose durable owner record
+        declares remote authority - missing, truncated, malformed JSON, unexpected or
+        missing fields, unreadable, wrong run/session identity, non-canonical ref -
+        attach/resume refuses with a BackendError.  It must never fall back to
+        local-only operation or make non-authoritative progress.  One probe id covers
+        the nine parametrized shapes C002-004-B..J (missing, truncated,
+        malformed-json, extra-field, missing-field, unreadable, wrong-run,
+        wrong-session, non-canonical-ref).
+        """
+        session, _remote, run_id, session_id, _ref, parent = _remote_session(
+            tmp_path, f"c004b-{mutation}"
+        )
+        try:
+&gt;           session.process_one_cursor()
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:1054: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_004_b_binding_damage_fails_closed_never_local_only[wrong-run]" time="5.769"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_004_b_binding_damage6')
+mutation = 'wrong-run'
+
+    @pytest.mark.parametrize(
+        "mutation",
+        [
+            pytest.param("missing", id="missing"),
+            pytest.param("truncated", id="truncated"),
+            pytest.param("malformed-json", id="malformed-json"),
+            pytest.param("extra-field", id="extra-field"),
+            pytest.param("missing-field", id="missing-field"),
+            pytest.param("unreadable", id="unreadable"),
+            pytest.param("wrong-run", id="wrong-run"),
+            pytest.param("wrong-session", id="wrong-session"),
+            pytest.param("non-canonical-ref", id="non-canonical-ref"),
+        ],
+    )
+    def test_c002_004_b_binding_damage_fails_closed_never_local_only(
+        tmp_path: Path, mutation: str
+    ) -&gt; None:
+        """PROBE: C002-004-B.
+    
+        EXPECT: for every damaged-binding shape on a run whose durable owner record
+        declares remote authority - missing, truncated, malformed JSON, unexpected or
+        missing fields, unreadable, wrong run/session identity, non-canonical ref -
+        attach/resume refuses with a BackendError.  It must never fall back to
+        local-only operation or make non-authoritative progress.  One probe id covers
+        the nine parametrized shapes C002-004-B..J (missing, truncated,
+        malformed-json, extra-field, missing-field, unreadable, wrong-run,
+        wrong-session, non-canonical-ref).
+        """
+        session, _remote, run_id, session_id, _ref, parent = _remote_session(
+            tmp_path, f"c004b-{mutation}"
+        )
+        try:
+&gt;           session.process_one_cursor()
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:1054: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_004_b_binding_damage_fails_closed_never_local_only[wrong-session]" time="5.955"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_004_b_binding_damage7')
+mutation = 'wrong-session'
+
+    @pytest.mark.parametrize(
+        "mutation",
+        [
+            pytest.param("missing", id="missing"),
+            pytest.param("truncated", id="truncated"),
+            pytest.param("malformed-json", id="malformed-json"),
+            pytest.param("extra-field", id="extra-field"),
+            pytest.param("missing-field", id="missing-field"),
+            pytest.param("unreadable", id="unreadable"),
+            pytest.param("wrong-run", id="wrong-run"),
+            pytest.param("wrong-session", id="wrong-session"),
+            pytest.param("non-canonical-ref", id="non-canonical-ref"),
+        ],
+    )
+    def test_c002_004_b_binding_damage_fails_closed_never_local_only(
+        tmp_path: Path, mutation: str
+    ) -&gt; None:
+        """PROBE: C002-004-B.
+    
+        EXPECT: for every damaged-binding shape on a run whose durable owner record
+        declares remote authority - missing, truncated, malformed JSON, unexpected or
+        missing fields, unreadable, wrong run/session identity, non-canonical ref -
+        attach/resume refuses with a BackendError.  It must never fall back to
+        local-only operation or make non-authoritative progress.  One probe id covers
+        the nine parametrized shapes C002-004-B..J (missing, truncated,
+        malformed-json, extra-field, missing-field, unreadable, wrong-run,
+        wrong-session, non-canonical-ref).
+        """
+        session, _remote, run_id, session_id, _ref, parent = _remote_session(
+            tmp_path, f"c004b-{mutation}"
+        )
+        try:
+&gt;           session.process_one_cursor()
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:1054: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_004_b_binding_damage_fails_closed_never_local_only[non-canonical-ref]" time="5.797"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_004_b_binding_damage8')
+mutation = 'non-canonical-ref'
+
+    @pytest.mark.parametrize(
+        "mutation",
+        [
+            pytest.param("missing", id="missing"),
+            pytest.param("truncated", id="truncated"),
+            pytest.param("malformed-json", id="malformed-json"),
+            pytest.param("extra-field", id="extra-field"),
+            pytest.param("missing-field", id="missing-field"),
+            pytest.param("unreadable", id="unreadable"),
+            pytest.param("wrong-run", id="wrong-run"),
+            pytest.param("wrong-session", id="wrong-session"),
+            pytest.param("non-canonical-ref", id="non-canonical-ref"),
+        ],
+    )
+    def test_c002_004_b_binding_damage_fails_closed_never_local_only(
+        tmp_path: Path, mutation: str
+    ) -&gt; None:
+        """PROBE: C002-004-B.
+    
+        EXPECT: for every damaged-binding shape on a run whose durable owner record
+        declares remote authority - missing, truncated, malformed JSON, unexpected or
+        missing fields, unreadable, wrong run/session identity, non-canonical ref -
+        attach/resume refuses with a BackendError.  It must never fall back to
+        local-only operation or make non-authoritative progress.  One probe id covers
+        the nine parametrized shapes C002-004-B..J (missing, truncated,
+        malformed-json, extra-field, missing-field, unreadable, wrong-run,
+        wrong-session, non-canonical-ref).
+        """
+        session, _remote, run_id, session_id, _ref, parent = _remote_session(
+            tmp_path, f"c004b-{mutation}"
+        )
+        try:
+&gt;           session.process_one_cursor()
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:1054: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_004_k_unavailable_remote_state_fails_closed" time="5.929"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_004_k_unavailable_re0')
+
+    def test_c002_004_k_unavailable_remote_state_fails_closed(tmp_path: Path) -&gt; None:
+        """PROBE: C002-004-K.
+    
+        EXPECT: a remote-authoritative cache whose authoritative remote is
+        unreachable fails closed on attach; the operator never silently continues
+        against a missing remote.
+        """
+        session, remote, run_id, session_id, _ref, parent = _remote_session(
+            tmp_path, "c004k"
+        )
+        try:
+&gt;           session.process_one_cursor()
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:1117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_binding_blockers" name="test_c002_004_l_local_only_run_cannot_be_silently_promoted" time="0.625"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_c002_004_l_local_only_run0')
+
+    def test_c002_004_l_local_only_run_cannot_be_silently_promoted(tmp_path: Path) -&gt; None:
+        """PROBE: C002-004-L.
+    
+        EXPECT: an intentionally local-only synthetic run has no remote
+        classification, never reports remote durability, and cannot be promoted to
+        remote-authoritative by attach parameters: the two run classes stay durably
+        distinguishable.
+        """
+        parent = new_root("c003v2-c004l")
+        run_id, session_id, remote_ref = _ids("c004l")
+        session = OperatorSession.create(
+            parent / "backend", run_id=run_id, session_id=session_id
+        )
+        try:
+            assert session.remote_durability_enabled is False
+            assert not Path(parent / "backend" / "remote-durability.json").exists()
+            assert not bool(session.backend.owner.get("remote_authoritative"))
+&gt;           session.process_one_cursor()
+
+tests/c15_persistence/test_corrective_003_binding_blockers.py:1144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_regressions" name="test_generation_admission_rejects_seal_content_tamper" time="0.612"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">def test_generation_admission_rejects_seal_content_tamper() -&gt; None:
+        """PROBE: C002-003-A (retained NON-BLOCKING hardening probe)."""
+&gt;       parent, run_id, session_id = _completed_local_run("c003-seal")
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/test_corrective_003_regressions.py:106: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/c15_persistence/test_corrective_003_regressions.py:98: in _completed_local_run
+    outcome = session.process_one_cursor()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_regressions" name="test_generation_admission_rejects_unexpected_artifact" time="0.631"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">def test_generation_admission_rejects_unexpected_artifact() -&gt; None:
+        """PROBE: C002-003-B (retained NON-BLOCKING hardening probe)."""
+&gt;       parent, run_id, session_id = _completed_local_run("c003-extra")
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/test_corrective_003_regressions.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/c15_persistence/test_corrective_003_regressions.py:98: in _completed_local_run
+    outcome = session.process_one_cursor()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_regressions" name="test_generation_history_cannot_be_shortened_by_lowering_current_ledger" time="0.642"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">def test_generation_history_cannot_be_shortened_by_lowering_current_ledger() -&gt; None:
+        """PROBE: C002-003-C (retained NON-BLOCKING hardening probe)."""
+&gt;       parent, run_id, session_id = _completed_local_run("c003-history")
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/test_corrective_003_regressions.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/c15_persistence/test_corrective_003_regressions.py:98: in _completed_local_run
+    outcome = session.process_one_cursor()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_regressions" name="test_cross_run_remote_config_and_ref_transplant_is_rejected" time="1.265" /><testcase classname="tests.c15_persistence.test_corrective_003_regressions" name="test_remote_authority_rejects_coordinated_short_history_even_if_local_head_is_rehashed" time="6.035"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_remote_authority_rejects_0')
+
+    def test_remote_authority_rejects_coordinated_short_history_even_if_local_head_is_rehashed(
+        tmp_path: Path,
+    ) -&gt; None:
+        """PROBE: C002-003-D (retained NON-BLOCKING hardening probe)."""
+        session, remote, run_id, session_id, remote_ref, parent = _remote_session(
+            tmp_path, "coordinated-history"
+        )
+        try:
+&gt;           outcome = session.process_one_cursor()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/test_corrective_003_regressions.py:213: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_corrective_003_regressions" name="test_atomic_lease_rejects_ref_delete_between_check_and_push" time="1.026" /><testcase classname="tests.c15_persistence.test_environment_reattach" name="test_environment_detach_and_reattach" time="1.636"><failure message="AssertionError: Traceback (most recent call last):&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 198, in _run_module_as_main&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 88, in _run_code&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 147, in &lt;module&gt;&#10;      raise SystemExit(main())&#10;                       ^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py&quot;, line 72, in main&#10;      outcome = session.process_one_cursor(kill_at=args.kill_at, kill_round=args.kill_round)&#10;                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1346, in process_one_cursor&#10;      ack = self.ack(projection, receipt)&#10;            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1326, in ack&#10;      self.journal.mark_acked(request_id, {&quot;sequence&quot;: report[&quot;sequence&quot;], &quot;next&quot;: report[&quot;next_sequence&quot;]})&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py&quot;, line 428, in mark_acked&#10;      require(row[&quot;state&quot;] == &quot;applied&quot;, &quot;ack requires a durable application&quot;)&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py&quot;, line 132, in require&#10;      raise BackendError(reason)&#10;  tools.c15_persistence.backend.BackendError: ack requires a durable application&#10;  &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode">@pytest.mark.skipif(not UNSHARE_OK, reason=f"unshare unavailable: {UNSHARE_NOTE}")
+    def test_environment_detach_and_reattach() -&gt; None:
+        """Detach the whole execution environment, rebuild it, and re-attach.
+    
+        Nothing about the run may depend on the environment that created it: after
+        the namespace (and with it every process, every private mount and every
+        transient path such as /tmp) is destroyed, a *different* namespace reopens
+        the same run and every durable artifact must still be present, readable and
+        byte-identical to the manifest pinned before the detach.
+        """
+        root = new_root("reattach")
+        run_id = f"synthetic-run-reattach-{uuid.uuid4().hex[:8]}"
+        session_id = f"synthetic-session-reattach-{uuid.uuid4().hex[:8]}"
+        try:
+            # ---- 1. host environment: create and drive to a durable cursor -------
+            created = run_clip(root, run_id, session_id, ["--mode", "create"])
+&gt;           assert created.returncode == 0, created.stderr
+E           AssertionError: Traceback (most recent call last):
+E               File "&lt;frozen runpy&gt;", line 198, in _run_module_as_main
+E               File "&lt;frozen runpy&gt;", line 88, in _run_code
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 147, in &lt;module&gt;
+E                 raise SystemExit(main())
+E                                  ^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/probe_cli.py", line 72, in main
+E                 outcome = session.process_one_cursor(kill_at=args.kill_at, kill_round=args.kill_round)
+E                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1346, in process_one_cursor
+E                 ack = self.ack(projection, receipt)
+E                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1326, in ack
+E                 self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py", line 428, in mark_acked
+E                 require(row["state"] == "applied", "ack requires a durable application")
+E               File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 132, in require
+E                 raise BackendError(reason)
+E             tools.c15_persistence.backend.BackendError: ack requires a durable application
+E             
+E           assert 1 == 0
+E            +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode
+
+tests/c15_persistence/test_environment_reattach.py:166: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.test_environment_reattach" name="test_platform_level_reattach_is_not_claimable_from_inside" time="0.000" /><testcase classname="tests.c15_persistence.test_environment_reattach" name="test_remote_backend_roundtrip_with_wiped_local_cache" time="6.062"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_remote_backend_roundtrip_0')
+
+    def test_remote_backend_roundtrip_with_wiped_local_cache(tmp_path: Path) -&gt; None:
+        """Proves full cross-attachment durability over Git remote storage.
+    
+        1. Local run is created and driven to cursor 1;
+        2. Pre-detach run-state manifest is pinned;
+        3. State is pushed to the remote Git backend;
+        4. The local cache is COMPLETELY WIPED (simulating container destruction);
+        5. A fresh local directory materializes state from the remote Git ref;
+        6. Byte-for-byte re-attach fidelity is proven via verify_reattach();
+        7. Work resumes in the materialized backend and advances to cursor 2;
+        8. Updated state is pushed back to the remote backend.
+        """
+        from tools.c15_persistence.remote_backend import (
+            materialize_run_state,
+            push_run_state,
+            verify_remote_state,
+        )
+    
+        with _temp_bare_remote(tmp_path) as remote_name:
+            root = new_root("remote-roundtrip")
+            run_id = f"synthetic-run-remote-{uuid.uuid4().hex[:8]}"
+            session_id = f"synthetic-session-remote-{uuid.uuid4().hex[:8]}"
+            remote_ref = f"refs/heads/persistence/{run_id}"
+    
+            try:
+                # 1. Create and drive cursor 1
+                session = OperatorSession.create(
+                    root / "backend",
+                    run_id=run_id,
+                    session_id=session_id,
+                    remote_ref=remote_ref,
+                    remote=remote_name,
+                    repo_dir=REPO_ROOT,
+                    require_remote_durability=True,
+                )
+&gt;               first = session.process_one_cursor()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/test_environment_reattach.py:325: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_environment_reattach" name="test_remote_backend_rejects_corrupted_manifest" time="6.165"><failure message="tools.c15_persistence.backend.BackendError: ack requires a durable application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_remote_backend_rejects_co0')
+
+    def test_remote_backend_rejects_corrupted_manifest(tmp_path: Path) -&gt; None:
+        """If remote state has corrupted or missing slot, reattach fails closed."""
+        from tools.c15_persistence.backend import BackendError
+        from tools.c15_persistence.remote_backend import (
+            materialize_run_state,
+            push_run_state,
+        )
+    
+        with _temp_bare_remote(tmp_path) as remote_name:
+            root = new_root("remote-corrupt")
+            run_id = f"synthetic-run-corrupt-{uuid.uuid4().hex[:8]}"
+            session_id = f"synthetic-session-corrupt-{uuid.uuid4().hex[:8]}"
+            remote_ref = f"refs/heads/persistence/{run_id}"
+    
+            try:
+                session = OperatorSession.create(
+                    root / "backend",
+                    run_id=run_id,
+                    session_id=session_id,
+                    remote_ref=remote_ref,
+                    remote=remote_name,
+                    repo_dir=REPO_ROOT,
+                    require_remote_durability=True,
+                )
+&gt;               first = session.process_one_cursor()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/c15_persistence/test_environment_reattach.py:451: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/operator_session.py:1346: in process_one_cursor
+    ack = self.ack(projection, receipt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/operator_session.py:1326: in ack
+    self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+tools/c15_persistence/relay.py:428: in mark_acked
+    require(row["state"] == "applied", "ack requires a durable application")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ack requires a durable application'
+
+    def require(condition: bool, reason: str) -&gt; None:
+        if not condition:
+&gt;           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ack requires a durable application
+
+tools/c15_persistence/backend.py:132: BackendError</failure></testcase><testcase classname="tests.c15_persistence.test_journal.JournalTests" name="test_application_gap_is_in_doubt_not_exactly_once_claim" time="0.141" /><testcase classname="tests.c15_persistence.test_journal.JournalTests" name="test_bad_paths" time="0.052" /><testcase classname="tests.c15_persistence.test_journal.JournalTests" name="test_concurrent_exposure_one_winner" time="0.132" /><testcase classname="tests.c15_persistence.test_journal.JournalTests" name="test_corrupt_artifact_blocks_exposure" time="0.058" /><testcase classname="tests.c15_persistence.test_journal.JournalTests" name="test_exact_checkpoint_and_required_evidence_survive_reopen" time="0.053" /><testcase classname="tests.c15_persistence.test_journal.JournalTests" name="test_exposed_kill_reopen_wait_no_resend" time="0.115" /><testcase classname="tests.c15_persistence.test_journal.JournalTests" name="test_missing_barrier_wrong_binding_and_outstanding" time="0.057" /><testcase classname="tests.c15_persistence.test_journal.JournalTests" name="test_no_production_or_retired_identity_entrypoint" time="0.050" /><testcase classname="tests.c15_persistence.test_journal.JournalTests" name="test_receipt_recording_does_not_claim_core_verification" time="0.075" /><testcase classname="tests.c15_persistence.test_journal.JournalTests" name="test_reply_staged_kill_reopen_no_byte_rewriting" time="0.119" /><testcase classname="tests.c15_persistence.test_journal.JournalTests" name="test_request_staged_kill_reopen_exact_bytes" time="0.106" /><testcase classname="tests.c15_persistence.test_journal.JournalTests" name="test_uncommitted_transaction_kill_preserves_old_checkpoint" time="0.094" /><testcase classname="tests.c15_persistence.test_journal.JournalTests" name="test_wrong_identity_missing_backend_no_recreation" time="0.056" /><testcase classname="tests.c15_persistence.test_operator_wiring" name="test_authoritative_path_rejects_every_ephemeral_location" time="0.002" /><testcase classname="tests.c15_persistence.test_operator_wiring" name="test_authoritative_path_rejects_symlink_alias_to_tmp" time="0.001" /><testcase classname="tests.c15_persistence.test_operator_wiring" name="test_default_runs_root_is_under_the_persisted_workspace" time="0.001" /><testcase classname="tests.c15_persistence.test_operator_wiring" name="test_creation_is_exclusive_and_reopen_never_rebuilds" time="0.015" /><testcase classname="tests.c15_persistence.test_operator_wiring" name="test_reopen_rejects_identity_mismatch_and_missing_state" time="0.013" /><testcase classname="tests.c15_persistence.test_operator_wiring" name="test_retired_rerun002_identities_are_permanently_forbidden" time="0.002" /><testcase classname="tests.c15_persistence.test_operator_wiring" name="test_lock_is_exclusive_across_live_processes" time="0.099" /><testcase classname="tests.c15_persistence.test_operator_wiring" name="test_relay_journal_preserves_exact_bytes_and_detects_tampering" time="0.065" /><testcase classname="tests.c15_persistence.test_operator_wiring" name="test_conflicting_reply_bytes_are_refused_not_rewritten" time="0.051" /><testcase classname="tests.c15_persistence.test_operator_wiring" name="test_interrupted_transaction_rolls_back" time="1.583"><failure message="AssertionError: assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode">def test_interrupted_transaction_rolls_back() -&gt; None:
+        root = new_root("rollback")
+        run_id, session_id = _ids()
+        try:
+            created = run_clip(
+                root, run_id, session_id, ["--mode", "create"]
+            )
+&gt;           assert created.returncode == 0
+E           AssertionError: assert 1 == 0
+E            +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode
+
+tests/c15_persistence/test_operator_wiring.py:301: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.test_operator_wiring" name="test_real_operator_integration_path_reaches_ack" time="1.637"><failure message="AssertionError: assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode">def test_real_operator_integration_path_reaches_ack() -&gt; None:
+        root = new_root("integration")
+        run_id, session_id = _ids()
+        try:
+            completed = run_clip(root, run_id, session_id, ["--mode", "create"])
+&gt;           assert completed.returncode == 0
+E           AssertionError: assert 1 == 0
+E            +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode
+
+tests/c15_persistence/test_operator_wiring.py:333: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.test_operator_wiring" name="test_core_receipt_revalidation_rejects_an_operator_invented_receipt" time="1.701"><failure message="AssertionError: assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode">def test_core_receipt_revalidation_rejects_an_operator_invented_receipt() -&gt; None:
+        """The journal stores receipts; only Core validates them.
+    
+        Corrective-003 probe correction: the historical probe relied on Core never
+        holding a staged response after an ordinary run, which is no longer true -
+        accepted Core legitimately stages its own trusted-return handoff while the
+        turn advances to the next round.  The probe now stores the invented receipt
+        in the journal (the actual operator-side attack) and proves Core refuses it,
+        while a genuine Core receipt still cross-checks cleanly.
+        """
+        root = new_root("receipt")
+        run_id, session_id = _ids()
+        try:
+            created = run_clip(root, run_id, session_id, ["--mode", "create"])
+&gt;           assert created.returncode == 0
+E           AssertionError: assert 1 == 0
+E            +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.probe_cli', '--root', '/root/c15-per...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode
+
+tests/c15_persistence/test_operator_wiring.py:362: AssertionError</failure></testcase><testcase classname="tests.c15_persistence.test_operator_wiring" name="test_no_second_semantic_engine_properties" time="0.005" /><testcase classname="tests.c15_persistence.test_operator_wiring" name="test_state_machine_cannot_skip_or_rewrite_states" time="0.068" /><testcase classname="tests.c15_persistence.test_operator_wiring" name="test_sealed_generations_are_immutable_and_reverify" time="0.027"><failure message="Failed: DID NOT RAISE &lt;class 'OSError'&gt;">def test_sealed_generations_are_immutable_and_reverify() -&gt; None:
+        root = new_root("generations")
+        run_id, session_id = _ids()
+        try:
+            backend = RunBackend.create(
+                root / "backend", run_id=run_id, session_id=session_id,
+                subject_id="user_1", phase="A",
+            )
+            store = GenerationStore(backend)
+            generation = store.seal({"a/one.bin": b"exact-bytes", "b/two.bin": b"\x00\x01"}, label="test")
+            assert store.verify(generation)["artifacts"]["a/one.bin"] == digest(b"exact-bytes")
+            target = backend.generations_dir / f"{generation:06d}"
+            assert (target.stat().st_mode &amp; 0o777) == 0o500
+&gt;           with pytest.raises(OSError):
+E           Failed: DID NOT RAISE &lt;class 'OSError'&gt;
+
+tests/c15_persistence/test_operator_wiring.py:490: Failed</failure></testcase><testcase classname="tests.c15_persistence.test_operator_wiring" name="test_run_state_manifest_detects_a_vanished_slot" time="0.295" /><testcase classname="tests.c15_persistence.test_resident_surface" name="test_resident_visible_surface_is_unchanged_by_the_durability_layer" time="1.854"><failure message="AssertionError: resident surface check failed:\nstdout: \nstderr: Traceback (most recent call last):&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 198, in _run_module_as_main&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 88, in _run_code&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/resident_surface_check.py&quot;, line 422, in &lt;module&gt;&#10;      raise SystemExit(main())&#10;                       ^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/resident_surface_check.py&quot;, line 354, in main&#10;      wired = _run_wired(wired_root / &quot;backend&quot;, run_id, session_id)&#10;              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/resident_surface_check.py&quot;, line 272, in _run_wired&#10;      session.ack(projection, receipt)&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py&quot;, line 1326, in ack&#10;      self.journal.mark_acked(request_id, {&quot;sequence&quot;: report[&quot;sequence&quot;], &quot;next&quot;: report[&quot;next_sequence&quot;]})&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py&quot;, line 428, in mark_acked&#10;      require(row[&quot;state&quot;] == &quot;applied&quot;, &quot;ack requires a durable application&quot;)&#10;    File &quot;/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py&quot;, line 132, in require&#10;      raise BackendError(reason)&#10;  tools.c15_persistence.backend.BackendError: ack requires a durable application&#10;  &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.resident_surface_check', '--out', '/...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_resident_visible_surface_0')
+
+    def test_resident_visible_surface_is_unchanged_by_the_durability_layer(tmp_path: Path) -&gt; None:
+        # The checked-in evidence file is produced by an explicit, logged invocation
+        # of the checker so that the suite never rewrites reviewed evidence; this
+        # test writes to a scratch path and asserts on that.
+        out = tmp_path / "resident-surface-no-change.json"
+        work_root = new_root("resident-surface")
+        env = dict(repo_python_env())
+        env["C15_SURFACE_BASE"] = os.environ.get("C15_SURFACE_BASE", "main")
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "tools.c15_persistence.resident_surface_check",
+                "--out",
+                str(out),
+                "--base",
+                env["C15_SURFACE_BASE"],
+                "--work-root",
+                str(work_root / "runs"),
+            ],
+            capture_output=True,
+            text=True,
+            timeout=900,
+            cwd=str(REPO_ROOT),
+            env=env,
+        )
+&gt;       assert completed.returncode == 0, (
+            "resident surface check failed:\\n"
+            f"stdout: {completed.stdout}\\nstderr: {completed.stderr}"
+        )
+E       AssertionError: resident surface check failed:\nstdout: \nstderr: Traceback (most recent call last):
+E           File "&lt;frozen runpy&gt;", line 198, in _run_module_as_main
+E           File "&lt;frozen runpy&gt;", line 88, in _run_code
+E           File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/resident_surface_check.py", line 422, in &lt;module&gt;
+E             raise SystemExit(main())
+E                              ^^^^^^
+E           File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/resident_surface_check.py", line 354, in main
+E             wired = _run_wired(wired_root / "backend", run_id, session_id)
+E                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/resident_surface_check.py", line 272, in _run_wired
+E             session.ack(projection, receipt)
+E           File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/operator_session.py", line 1326, in ack
+E             self.journal.mark_acked(request_id, {"sequence": report["sequence"], "next": report["next_sequence"]})
+E           File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/relay.py", line 428, in mark_acked
+E             require(row["state"] == "applied", "ack requires a durable application")
+E           File "/mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/tools/c15_persistence/backend.py", line 132, in require
+E             raise BackendError(reason)
+E         tools.c15_persistence.backend.BackendError: ack requires a durable application
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/root/.venv312/bin/python3', '-m', 'tools.c15_persistence.resident_surface_check', '--out', '/...ire\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: ack requires a durable application\n').returncode
+
+tests/c15_persistence/test_resident_surface.py:54: AssertionError</failure></testcase></testsuite></testsuites>
