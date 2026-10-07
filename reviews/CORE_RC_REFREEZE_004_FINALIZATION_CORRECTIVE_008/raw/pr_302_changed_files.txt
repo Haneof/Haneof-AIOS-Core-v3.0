@@ -1,0 +1,8 @@
+evidence/w08/FINAL_REPORT.md
+evidence/w08/OPERATOR_LOG.md
+evidence/w08/PM_ACCEPTANCE_BRIEF.md
+evidence/w08/README.txt
+evidence/w08/TERMINAL_VERIFICATION.json
+evidence/w08/W08_DEEP_CHAIN_VERIFY.json
+evidence/w08/W08_INDEPENDENT_VERIFY.json
+evidence/w08/evidence-incident-reconciliation.md

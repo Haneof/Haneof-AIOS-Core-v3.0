@@ -1,0 +1,29 @@
+publisher_shell_sha256=1f2eb4dfa19befc0baceb83732c7187da2fffdf6d53bbe98a1e0066e483ac7f8
+case=http-201 expected=PASS actual=PASS exit=0
+  PRE_PUBLISH_REMOTE_HEAD_MATCH=0123456789abcdef0123456789abcdef01234567
+  commit_comment_http_code=201
+  provisional_pin_comment_id=777001
+  POST_PUBLISH_REMOTE_HEAD_MATCH=0123456789abcdef0123456789abcdef01234567
+case=http-200 expected=FAIL actual=FAIL exit=1
+  PRE_PUBLISH_REMOTE_HEAD_MATCH=0123456789abcdef0123456789abcdef01234567
+  commit_comment_http_code=200
+  {"message": "injected status"}
+case=http-401 expected=FAIL actual=FAIL exit=1
+  PRE_PUBLISH_REMOTE_HEAD_MATCH=0123456789abcdef0123456789abcdef01234567
+  commit_comment_http_code=401
+  {"message": "injected status"}
+case=http-403 expected=FAIL actual=FAIL exit=1
+  PRE_PUBLISH_REMOTE_HEAD_MATCH=0123456789abcdef0123456789abcdef01234567
+  commit_comment_http_code=403
+  {"message": "injected status"}
+case=http-500 expected=FAIL actual=FAIL exit=1
+  PRE_PUBLISH_REMOTE_HEAD_MATCH=0123456789abcdef0123456789abcdef01234567
+  commit_comment_http_code=500
+  {"message": "injected status"}
+case=post-transport-failure expected=FAIL actual=FAIL exit=1
+  PRE_PUBLISH_REMOTE_HEAD_MATCH=0123456789abcdef0123456789abcdef01234567
+  mocked POST transport reset
+  PIN_PUBLISH_TRANSPORT_FAILURE rc=7
+PUBLISHER_FAULT_MATRIX=PASS
+
+EXIT=0

@@ -1,0 +1,17 @@
+Golden workflow blob=ccbdf87ad69c5754d080eb69c877decbb1804f2a
+Candidate workflow blob=d42a0225e97dcad419e6a320b564ef973aeff0ab
+Identity substitutions: task, canonical branch, evidence namespace, artifact.
+Added fixed accepted baseline environment.
+rc004-freeze-gate.if: formal workflow_dispatch binding
+rc004-freeze-gate / Exact-head, frozen identity, post-integration drift, and candidate scope: security closure inline shell only
+rc004-freeze-gate / Corrective-003 workflow security, protected-drift, and publisher fault controls: security closure inline shell only
+rc004-freeze-gate / Historical C003 Probe Trust-Root Identity Gate: new inline baseline blob identity gate
+rc004-mandatory-pin-publisher.if: formal workflow_dispatch binding
+rc004-mandatory-pin-publisher / Publish provisional exact candidate pin with pre/post identity checks: security closure inline shell only
+rc004-whole-run-identity-seal.if: formal workflow_dispatch binding
+rc004-whole-run-identity-seal / Validate exact run and pin, then perform the last canonical-branch read: security closure inline shell only
+rc004-whole-run-identity-seal / Post-read settle barrier and successor-run exclusion: security closure inline shell only
+rc004-postread-control-seal / Validate exact control run and pin, then perform the last canonical-branch read: security closure inline shell only
+UNCHANGED_CORE_C15_REGRESSION_CONFIGURATION=YES
+UNRELATED_SEMANTIC_CHANGES=NONE
+WORKFLOW_SEMANTIC_DIFF=PASS

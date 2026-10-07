@@ -1,0 +1,27 @@
+{
+  "files": [
+    {
+      "additions": 58,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/8e5c1ec76ea973c849c33923ccc818fe1dad49e8/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fcorrective-002-a92eec3a-04b6-4cff-8b12-b83d73b2074c%2FBLOCKED_REPORT.md",
+      "changes": 58,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fcorrective-002-a92eec3a-04b6-4cff-8b12-b83d73b2074c%2FBLOCKED_REPORT.md?ref=8e5c1ec76ea973c849c33923ccc818fe1dad49e8",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/corrective-002-a92eec3a-04b6-4cff-8b12-b83d73b2074c/BLOCKED_REPORT.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/8e5c1ec76ea973c849c33923ccc818fe1dad49e8/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fcorrective-002-a92eec3a-04b6-4cff-8b12-b83d73b2074c%2FBLOCKED_REPORT.md",
+      "sha": "017c3d30d37f73e8550b886743ead96b284efd0c",
+      "status": "added"
+    },
+    {
+      "additions": 1,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/8e5c1ec76ea973c849c33923ccc818fe1dad49e8/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fcorrective-002-a92eec3a-04b6-4cff-8b12-b83d73b2074c%2FSHA256SUMS",
+      "changes": 1,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fcorrective-002-a92eec3a-04b6-4cff-8b12-b83d73b2074c%2FSHA256SUMS?ref=8e5c1ec76ea973c849c33923ccc818fe1dad49e8",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/corrective-002-a92eec3a-04b6-4cff-8b12-b83d73b2074c/SHA256SUMS",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/8e5c1ec76ea973c849c33923ccc818fe1dad49e8/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fcorrective-002-a92eec3a-04b6-4cff-8b12-b83d73b2074c%2FSHA256SUMS",
+      "sha": "5974dd51a625c7dcc7813418e3fc7928cf4e2c46",
+      "status": "added"
+    }
+  ],
+  "source": "GitHub REST paginated /pulls/{number}/files; file metadata retained; patch bodies omitted"
+}

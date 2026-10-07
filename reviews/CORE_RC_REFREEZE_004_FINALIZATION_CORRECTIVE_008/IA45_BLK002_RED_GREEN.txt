@@ -1,0 +1,29 @@
+OLD_FREEZE_CONDITION=${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, '[W30-FINAL-FORMAL]')) }}
+OLD_PUSH_FORMAL_CONDITION_EVALUATES=TRUE (local expression only)
+OLD_FORMAL_SEAL_RUN_EVENT_CHECK=ABSENT (parsed exact shell)
+FORMAL_PUBLISHER_EXACT_SHELL event=push exit=1
+FORMAL_PUBLISHER_EVENT_NOT_WORKFLOW_DISPATCH
+
+FORMAL_PUBLISHER_EXACT_SHELL event=workflow_dispatch exit=0
+PRE_PUBLISH_REMOTE_HEAD_MATCH=0123456789abcdef0123456789abcdef01234567
+commit_comment_http_code=201
+provisional_pin_comment_id=777001
+POST_PUBLISH_REMOTE_HEAD_MATCH=0123456789abcdef0123456789abcdef01234567
+
+FORMAL_GATE_WORKFLOW_DISPATCH_ONLY=PASS
+FORMAL_PUBLISHER_EVENT_BOUND=PASS
+FORMAL_PIN_EVENT_FIELD=PASS
+FORMAL_SEAL_RUN_EVENT=PASS
+FORMAL_SEAL_PIN_EVENT_AND_KIND=PASS
+EXACT_SEAL_EVENT_CONTROL event=push exit=1
+EXACT_SEAL_EVENT_CONTROL event=workflow_dispatch exit=0
+EXACT_SEAL_EVENT_CONTROL event=None exit=1
+EXACT_PIN_CONTROL body='- event: workflow_dispatch\n- gate_kind: formal' exit=0
+EXACT_PIN_CONTROL body='- event: push\n- gate_kind: formal' exit=1
+EXACT_PIN_CONTROL body='- gate_kind: formal' exit=1
+EXACT_PIN_CONTROL body='- event: workflow_dispatch\n- gate_kind: POSTREAD_CONTROL_ONLY' exit=1
+EXACT_LEDGER_SELF_MATCH event=push count=0
+EXACT_LEDGER_SELF_MATCH event=workflow_dispatch count=1
+SUCCESSOR_SELF_MATCH_EVENT_BOUND=PASS
+REMOTE_MARKER_PUSH=NONE
+IA45_BLK002_AUTHOR_CONTROLS=PASS

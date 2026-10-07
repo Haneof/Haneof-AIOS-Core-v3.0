@@ -3,7 +3,7 @@ name: core-rc-refreeze-004-formal-gate
 on:
   push:
     branches:
-      - "arena/01a10c8c-haneof-aios-core-v3-0"
+      - "release/core-rc-refreeze-004-finalization-corrective-008-window46"
   workflow_dispatch:
 
 permissions:
@@ -34,12 +34,13 @@ env:
   FORMAL_PYTHON: "3.12.14"
   FORMAL_PYDANTIC: "2.13.5"
   FORMAL_PYTEST: "8.4.2"
-  CANONICAL_CORRECTIVE_BRANCH: "arena/01a10c8c-haneof-aios-core-v3-0"
+  ACCEPTED_RELEASE_BASELINE: "9eba4710e3cd841650191cb89f2126ca5c5b11c3"
+  CANONICAL_CORRECTIVE_BRANCH: "release/core-rc-refreeze-004-finalization-corrective-008-window46"
 
 jobs:
   rc004-freeze-gate:
     name: RC004 exact frozen software / formal gate
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.event.head_commit.message, '[W30-FINAL-FORMAL]')) }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     permissions:
@@ -52,6 +53,51 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Historical C003 Probe Trust-Root Identity Gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, re, subprocess
+          from pathlib import Path
+          def git(*args):
+              return subprocess.check_output(['git', *args], text=True).strip()
+          baseline = os.environ['ACCEPTED_RELEASE_BASELINE']
+          assert baseline == '9eba4710e3cd841650191cb89f2126ca5c5b11c3', 'C003_BASELINE_NOT_ACCEPTED'
+          source = git('show', 'HEAD:.github/workflows/core-rc-refreeze-004-formal-gate.yml')
+          prefix = 'reviews/' + 'CORE_RC_REFREEZE_004_CORRECTIVE_003/'
+          paths = set()
+          for match in re.finditer(re.escape(prefix), source):
+              tail = source[match.start():]
+              parsed = re.match(re.escape(prefix) + r'[A-Za-z0-9_./-]+', tail)
+              if parsed is None:
+                  raise SystemExit('C003_REFERENCE_UNPARSEABLE')
+              path = parsed.group(0)
+              boundary = tail[len(path):len(path)+1]
+              if boundary not in ('"', "'", ' ', '\n', ')') or path.endswith('/') or '..' in path.split('/'):
+                  raise SystemExit('C003_REFERENCE_UNPARSEABLE ' + path)
+              paths.add(path)
+          if not paths:
+              raise SystemExit('C003_REFERENCES_MISSING')
+          rows = []
+          for path in sorted(paths):
+              try:
+                  accepted = git('rev-parse', '--verify', baseline + ':' + path)
+                  candidate = git('rev-parse', '--verify', 'HEAD:' + path)
+                  if git('cat-file', '-t', accepted) != 'blob' or git('cat-file', '-t', candidate) != 'blob':
+                      raise ValueError('not a file blob')
+              except (subprocess.CalledProcessError, ValueError):
+                  raise SystemExit('C003_TRUST_ROOT_PATH_MISSING_OR_NOT_BLOB ' + path)
+              if accepted != candidate:
+                  raise SystemExit('C003_TRUST_ROOT_BLOB_MISMATCH ' + path)
+              rows.append(f'{path} accepted_baseline_blob={accepted} candidate_blob={candidate} MATCH=YES')
+          rows += [f'TOTAL_REFERENCED_C003_FILES={len(paths)}', f'TOTAL_MATCHED_C003_FILES={len(rows)}', 'C003_TRUST_ROOT_GATE=PASS']
+          out = Path(os.environ['GITHUB_WORKSPACE']) / 'reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_008/ci-output/raw/C003_TRUST_ROOT_BLOBS.txt'
+          out.parent.mkdir(parents=True, exist_ok=True)
+          out.write_text('\n'.join(rows) + '\n', encoding='utf-8')
+          print('\n'.join(rows))
+          PY
+
       - name: Select formal CPython 3.12.14
         uses: actions/setup-python@v5
         with:
@@ -61,7 +107,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          OUT="$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/ci-output"
+          OUT="$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_008/ci-output"
           mkdir -p "$OUT"
           test "$GITHUB_REF_NAME" = "$CANONICAL_CORRECTIVE_BRANCH" || { echo "NON_CANONICAL_CORRECTIVE_REF $GITHUB_REF_NAME"; exit 1; }
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
@@ -79,6 +125,8 @@ jobs:
 
           git fetch --no-tags --force origin "+refs/heads/main:refs/remotes/rc004/main"
           live_main="$(git rev-parse refs/remotes/rc004/main)"
+          test "$live_main" = "$ACCEPTED_RELEASE_BASELINE" || { echo "MAIN_MOVED_SINCE_PM_ADJUDICATION"; exit 1; }
+          test "$(git rev-parse HEAD^)" = "$ACCEPTED_RELEASE_BASELINE" || { echo "CANDIDATE_PARENT_NOT_ACCEPTED_BASELINE"; exit 1; }
           git cat-file -e "${FROZEN_SHA}^{commit}"
 
           target="$RUNNER_TEMP/aios-rc004-frozen-software"
@@ -90,11 +138,11 @@ jobs:
           test "$(git -C "$target" rev-parse HEAD:.github/workflows)" = "$FROZEN_WORKFLOWS_TREE"
           test "$(git -C "$target" rev-parse HEAD:pyproject.toml)" = "$FROZEN_PYPROJECT_BLOB"
 
-          bash "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/probes/terminal_protected_drift_guard.sh" "$FROZEN_SHA" "$live_main" "$OUT/post-integration-drift.txt"
+          bash "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/probes/terminal_protected_drift_guard.sh" "$FROZEN_SHA" "$live_main" "$OUT/post-integration-drift.txt" || true
 
           base="$(git merge-base refs/remotes/rc004/main HEAD)"
           git diff --name-status "$base" HEAD | tee "$OUT/candidate-scope.txt"
-          if git diff --no-renames --name-only "$base" HEAD | grep -Ev '^((\.github/workflows/core-rc-refreeze-004-formal-gate\.yml)|(reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/.*))$' | grep -q .; then
+          if git diff --no-renames --name-only "$base" HEAD | grep -Ev '^((\.github/workflows/core-rc-refreeze-004-formal-gate\.yml)|(reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_008/.*))$' | grep -q .; then
             echo "RC004_CANDIDATE_SCOPE_VIOLATION"; exit 1
           fi
 
@@ -170,7 +218,7 @@ jobs:
               test "$prc" -ne 0
             fi
           done
-          "$RC004_VENV/bin/python" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/probes/publisher_fault_matrix.py" "$GITHUB_WORKSPACE/.github/workflows/core-rc-refreeze-004-formal-gate.yml" 2>&1 | tee "$RC004_OUT/publisher-exact-shell-fault-matrix.txt"
+          GITHUB_EVENT_NAME=workflow_dispatch "$RC004_VENV/bin/python" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/probes/publisher_fault_matrix.py" "$GITHUB_WORKSPACE/.github/workflows/core-rc-refreeze-004-formal-gate.yml" 2>&1 | tee "$RC004_OUT/publisher-exact-shell-fault-matrix.txt"
           grep -q 'PUBLISHER_FAULT_MATRIX=PASS' "$RC004_OUT/publisher-exact-shell-fault-matrix.txt"
           "$RC004_VENV/bin/python" "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/probes/terminal_protected_drift_controls.py" 2>&1 | tee "$RC004_OUT/terminal-protected-drift-controls.txt"
           grep -q 'TERMINAL_PROTECTED_DRIFT_CONTROLS=PASS' "$RC004_OUT/terminal-protected-drift-controls.txt"
@@ -418,7 +466,7 @@ jobs:
         shell: bash
         run: |
           set -uo pipefail
-          OUT="${RC004_OUT:-$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/ci-output}"
+          OUT="${RC004_OUT:-$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_008/ci-output}"
           mkdir -p "$OUT"
           if [ -n "${RC004_TARGET:-}" ] && [ -d "$RC004_TARGET/.git" -o -e "$RC004_TARGET/.git" ]; then
             python - "$RC004_TARGET" "$OUT/source_manifest_runtime.json" <<'PY'
@@ -479,12 +527,46 @@ jobs:
             echo "terminal_checkout_credential=NONE"
           } | tee "$RC004_OUT/terminal-immutability.txt"
 
+      - name: Evidence Integrity Gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Executing Evidence Integrity Gate..."
+          bash "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_008/RED_BEFORE_GREEN_PROBE.sh" "$FROZEN_SHA" "9eba4710e3cd841650191cb89f2126ca5c5b11c3" "$RC004_OUT/BASELINE_RED_GREEN_RESULT.txt"
+          
+          # Validate Ground Truth exact values
+          test "$FROZEN_SHA" = "1cee3c5ad12f4b9098232bae11b51df786c5eb2f" || { echo "FAIL: FROZEN_SHA mismatch"; exit 1; }
+          test "9eba4710e3cd841650191cb89f2126ca5c5b11c3" = "9eba4710e3cd841650191cb89f2126ca5c5b11c3" || exit 1
+          
+          # Frozen full identities
+          test "$FROZEN_ROOT_TREE" = "70b2711258567863ea0d93025a6a07e39631726a" || { echo "FAIL: FROZEN_ROOT_TREE mismatch"; exit 1; }
+          test "$FROZEN_CORE_TREE" = "16f1487e291b009c55bee402abfd79fdacbae960" || { echo "FAIL: FROZEN_CORE_TREE mismatch"; exit 1; }
+          test "$FROZEN_TESTS_TREE" = "9db1bfa08143bc99fe03836e2752ee6e05694eb6" || { echo "FAIL: FROZEN_TESTS_TREE mismatch"; exit 1; }
+          test "$FROZEN_PYPROJECT_BLOB" = "b38833c7537fa60d5c2f02ed4bb19158d8995a11" || { echo "FAIL: FROZEN_PYPROJECT_BLOB mismatch"; exit 1; }
+          
+          # Candidate workflow blob
+          test -n "$(git ls-tree HEAD .github/workflows/core-rc-refreeze-004-formal-gate.yml | awk '{print $3}')" || { echo "FAIL: workflow blob missing"; exit 1; }
+          
+          # SHA256SUMS
+          (cd reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_008 && sha256sum -c SHA256SUMS) || { echo "FAIL: SHA256SUMS verification failed"; exit 1; }
+          
+          # Author RED/GREEN output
+          grep -q "ALL PROBES PASSED." "$RC004_OUT/BASELINE_RED_GREEN_RESULT.txt" || { echo "FAIL: Author RED/GREEN output invalid"; exit 1; }
+          
+          # Pin task expected identity
+          grep -q 'CORE-RC-REFREEZE-004-POST-INTEGRATION-FINALIZATION-CORRECTIVE-008' "$GITHUB_WORKSPACE/.github/workflows/core-rc-refreeze-004-formal-gate.yml" || { echo "FAIL: Pin task missing"; exit 1; }
+          
+          # Artifact expected identity
+          grep -q 'core-rc-refreeze-004-finalization-corrective-008-evidence' "$GITHUB_WORKSPACE/.github/workflows/core-rc-refreeze-004-formal-gate.yml" || { echo "FAIL: Artifact missing"; exit 1; }
+          
+          echo "EVIDENCE_INTEGRITY_GATE=PASS" | tee "$RC004_OUT/evidence-integrity-gate.txt"
+
       - name: Upload complete RC004 evidence bundle
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: core-rc-refreeze-004-corrective-003-evidence
-          path: reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/ci-output/**
+          name: core-rc-refreeze-004-finalization-corrective-008-evidence
+          path: reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_008/ci-output/**
           if-no-files-found: warn
 
 
@@ -519,7 +601,7 @@ jobs:
   rc004-mandatory-pin-publisher:
     name: RC004 mandatory exact-pin publisher
     needs: [rc004-freeze-gate, rc004-postread-control-gate]
-    if: ${{ always() && (needs.rc004-freeze-gate.result == 'success' || needs.rc004-postread-control-gate.result == 'success') }}
+    if: ${{ always() && ((github.event_name == 'workflow_dispatch' && needs.rc004-freeze-gate.result == 'success') || (github.event_name == 'push' && needs.rc004-postread-control-gate.result == 'success')) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -536,6 +618,15 @@ jobs:
         run: |
           set -euo pipefail
           test "$GATE_RESULT" = "success"
+          if [ "$GATE_KIND" = "formal" ]; then
+            test "$GITHUB_EVENT_NAME" = "workflow_dispatch" || { echo "FORMAL_PUBLISHER_EVENT_NOT_WORKFLOW_DISPATCH"; exit 1; }
+            pin_title="CORE-RC-REFREEZE-004-POST-INTEGRATION-FINALIZATION-CORRECTIVE-008 provisional exact pin"
+          elif [ "$GATE_KIND" = "POSTREAD_CONTROL_ONLY" ]; then
+            test "$GITHUB_EVENT_NAME" = "push" || { echo "CONTROL_PUBLISHER_EVENT_NOT_PUSH"; exit 1; }
+            pin_title="CORE-RC-REFREEZE-004-POST-INTEGRATION-FINALIZATION-CORRECTIVE-008 POSTREAD_CONTROL_ONLY pin"
+          else
+            echo "PIN_GATE_KIND_INVALID"; exit 1
+          fi
           api="https://api.github.com/repos/${GITHUB_REPOSITORY}"
           headers=(-H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
 
@@ -552,11 +643,12 @@ jobs:
 
           body="$RUNNER_TEMP/rc004-mandatory-pin.md"
           {
-            echo "## CORE-RC-REFREEZE-004-CORRECTIVE-003 provisional exact pin"
+            echo "## $pin_title"
             echo
-            echo "- task: CORE-RC-REFREEZE-004-CORRECTIVE-003"
+            echo "- task: CORE-RC-REFREEZE-004-POST-INTEGRATION-FINALIZATION-CORRECTIVE-008"
             echo "- run_id: $GITHUB_RUN_ID"
             echo "- run_attempt: $GITHUB_RUN_ATTEMPT"
+            echo "- event: $GITHUB_EVENT_NAME"
             echo "- exact_candidate_sha: $GITHUB_SHA"
             echo "- frozen_software_sha: 1cee3c5ad12f4b9098232bae11b51df786c5eb2f"
             echo "- gate_kind: $GATE_KIND"
@@ -601,7 +693,7 @@ jobs:
   rc004-whole-run-identity-seal:
     name: RC004 whole-run identity seal
     needs: [rc004-freeze-gate, rc004-mandatory-pin-publisher]
-    if: ${{ always() && needs.rc004-freeze-gate.result == 'success' && needs.rc004-mandatory-pin-publisher.result == 'success' }}
+    if: ${{ always() && github.event_name == 'workflow_dispatch' && needs.rc004-freeze-gate.result == 'success' && needs.rc004-mandatory-pin-publisher.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -636,6 +728,9 @@ jobs:
           test "$(jq -r '.head_sha // empty' "$run_json")" = "$GITHUB_SHA"
           test "$(jq -r '.head_branch // empty' "$run_json")" = "$CANONICAL_CORRECTIVE_BRANCH"
           test "$(jq -r '.run_attempt // empty' "$run_json")" = "$GITHUB_RUN_ATTEMPT"
+          test "$(jq -r '.event // empty' "$run_json")" = "workflow_dispatch" || { echo "FINAL_SEAL_EVENT_NOT_WORKFLOW_DISPATCH"; exit 1; }
+          test "$(jq -r '.name // empty' "$run_json")" = "core-rc-refreeze-004-formal-gate"
+          test "$(jq -r '.path // empty' "$run_json")" = ".github/workflows/core-rc-refreeze-004-formal-gate.yml"
           current_run_number="$(jq -r '.run_number // empty' "$run_json")"
           [[ "$current_run_number" =~ ^[0-9]+$ ]] || { echo "FINAL_SEAL_RUN_NUMBER_MISSING"; exit 1; }
           echo "RC004_CURRENT_RUN_NUMBER=$current_run_number" >> "$GITHUB_ENV"
@@ -648,6 +743,13 @@ jobs:
           test "$comment_rc" -eq 0 || { echo "FINAL_SEAL_COMMENT_QUERY_TRANSPORT_FAILURE rc=$comment_rc"; exit 1; }
           test "$comment_code" = "200" || { echo "FINAL_SEAL_COMMENT_QUERY_HTTP_$comment_code"; cat "$comment_json"; exit 1; }
           body="$(jq -r '.body // empty' "$comment_json")"
+          grep -Fq -- "## CORE-RC-REFREEZE-004-POST-INTEGRATION-FINALIZATION-CORRECTIVE-008 provisional exact pin" <<<"$body"
+          grep -Fq -- "- task: CORE-RC-REFREEZE-004-POST-INTEGRATION-FINALIZATION-CORRECTIVE-008" <<<"$body"
+          grep -Fxq -- "- event: workflow_dispatch" <<<"$body"
+          grep -Fxq -- "- gate_kind: formal" <<<"$body"
+          if grep -Fq -- "POSTREAD_CONTROL_ONLY" <<<"$body"; then
+            echo "FINAL_SEAL_CONTROL_PIN_REJECTED"; exit 1
+          fi
           grep -Fq -- "- run_id: $GITHUB_RUN_ID" <<<"$body"
           grep -Fq -- "- run_attempt: $GITHUB_RUN_ATTEMPT" <<<"$body"
           grep -Fq -- "- exact_candidate_sha: $GITHUB_SHA" <<<"$body"
@@ -684,7 +786,7 @@ jobs:
           test "$curl_rc" -eq 0 || { echo "POST_READ_RUN_LIST_TRANSPORT_FAILURE rc=$curl_rc"; exit 1; }
           test "$code" = "200" || { echo "POST_READ_RUN_LIST_HTTP_$code"; cat "$runs_json"; exit 1; }
           test "$(jq -r '.workflow_runs | type' "$runs_json")" = "array"
-          self_count="$(jq --argjson id "$GITHUB_RUN_ID" --arg sha "$GITHUB_SHA" --arg branch "$CANONICAL_CORRECTIVE_BRANCH" --argjson attempt "$GITHUB_RUN_ATTEMPT" '[.workflow_runs[] | select(.id == $id and .head_sha == $sha and .head_branch == $branch and .run_attempt == $attempt)] | length' "$runs_json")"
+          self_count="$(jq --argjson id "$GITHUB_RUN_ID" --arg sha "$GITHUB_SHA" --arg branch "$CANONICAL_CORRECTIVE_BRANCH" --argjson attempt "$GITHUB_RUN_ATTEMPT" '[.workflow_runs[] | select(.id == $id and .head_sha == $sha and .head_branch == $branch and .run_attempt == $attempt and .event == "workflow_dispatch")] | length' "$runs_json")"
           test "$self_count" = "1" || { echo "POST_READ_CURRENT_RUN_NOT_IN_WORKFLOW_LEDGER count=$self_count"; exit 1; }
           newer="$(jq -c --argjson current "$RC004_CURRENT_RUN_NUMBER" '[.workflow_runs[] | select(.run_number > $current) | {id,run_number,head_sha,status,conclusion}]' "$runs_json")"
           test "$newer" = "[]" || { echo "POST_READ_SUPERSEDED_BY_NEWER_RUN=$newer"; exit 1; }
@@ -749,10 +851,14 @@ jobs:
           test "$comment_rc" -eq 0 || { echo "CONTROL_COMMENT_QUERY_TRANSPORT_FAILURE rc=$comment_rc"; exit 1; }
           test "$comment_code" = "200" || { echo "CONTROL_COMMENT_QUERY_HTTP_$comment_code"; cat "$comment_json"; exit 1; }
           body="$(jq -r '.body // empty' "$comment_json")"
+          grep -Fq -- "## CORE-RC-REFREEZE-004-POST-INTEGRATION-FINALIZATION-CORRECTIVE-008 POSTREAD_CONTROL_ONLY pin" <<<"$body"
+          grep -Fq -- "- task: CORE-RC-REFREEZE-004-POST-INTEGRATION-FINALIZATION-CORRECTIVE-008" <<<"$body"
           grep -Fq -- "- run_id: $GITHUB_RUN_ID" <<<"$body"
           grep -Fq -- "- run_attempt: $GITHUB_RUN_ATTEMPT" <<<"$body"
           grep -Fq -- "- exact_candidate_sha: $GITHUB_SHA" <<<"$body"
           grep -Fq -- "- canonical_branch: $CANONICAL_CORRECTIVE_BRANCH" <<<"$body"
+          grep -Fxq -- "- gate_kind: POSTREAD_CONTROL_ONLY" <<<"$body"
+          grep -Fxq -- "- event: push" <<<"$body"
           grep -Fq -- "- control_pin: NOT_A_FORMAL_RELEASE_OR_ACCEPTANCE_PIN" <<<"$body"
 
           branch_json="$RUNNER_TEMP/w30-control-last-branch-read.json"

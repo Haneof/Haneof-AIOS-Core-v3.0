@@ -1,0 +1,137 @@
+{
+  "files": [
+    {
+      "additions": 328,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/08468beb5523b0696fc2472b5b535b476c403a5d/.github%2Fworkflows%2Fc15-rcc-res-b-persistence-corrective-001-ia-formal-acceptance.yml",
+      "changes": 328,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/.github%2Fworkflows%2Fc15-rcc-res-b-persistence-corrective-001-ia-formal-acceptance.yml?ref=08468beb5523b0696fc2472b5b535b476c403a5d",
+      "deletions": 0,
+      "filename": ".github/workflows/c15-rcc-res-b-persistence-corrective-001-ia-formal-acceptance.yml",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/08468beb5523b0696fc2472b5b535b476c403a5d/.github%2Fworkflows%2Fc15-rcc-res-b-persistence-corrective-001-ia-formal-acceptance.yml",
+      "sha": "5cb5540c32edaff908162bb81583646320987a94",
+      "status": "added"
+    },
+    {
+      "additions": 92,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Ffreeze_ia_probe_manifest.py",
+      "changes": 92,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Ffreeze_ia_probe_manifest.py?ref=08468beb5523b0696fc2472b5b535b476c403a5d",
+      "deletions": 0,
+      "filename": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/freeze_ia_probe_manifest.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Ffreeze_ia_probe_manifest.py",
+      "sha": "3620f38b277da91d1d703f25eb7616bcf4574921",
+      "status": "added"
+    },
+    {
+      "additions": 3,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev1%2FSHA256SUMS",
+      "changes": 3,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev1%2FSHA256SUMS?ref=08468beb5523b0696fc2472b5b535b476c403a5d",
+      "deletions": 0,
+      "filename": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/history/rev1/SHA256SUMS",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev1%2FSHA256SUMS",
+      "sha": "479f963bf70f70769903182b5029fca0257e1ce0",
+      "status": "added"
+    },
+    {
+      "additions": 87,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev1%2Ffreeze_ia_probe_manifest.py",
+      "changes": 87,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev1%2Ffreeze_ia_probe_manifest.py?ref=08468beb5523b0696fc2472b5b535b476c403a5d",
+      "deletions": 0,
+      "filename": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/history/rev1/freeze_ia_probe_manifest.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev1%2Ffreeze_ia_probe_manifest.py",
+      "sha": "1320f0e8ac2524943fb8dd15e0144e2f93b40d15",
+      "status": "added"
+    },
+    {
+      "additions": 86,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev1%2Fia_child.py",
+      "changes": 86,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev1%2Fia_child.py?ref=08468beb5523b0696fc2472b5b535b476c403a5d",
+      "deletions": 0,
+      "filename": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/history/rev1/ia_child.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev1%2Fia_child.py",
+      "sha": "da2a3ccdfca7f1344309f5cfc81583451aa445de",
+      "status": "added"
+    },
+    {
+      "additions": 835,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev1%2Fia_probes.py",
+      "changes": 835,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev1%2Fia_probes.py?ref=08468beb5523b0696fc2472b5b535b476c403a5d",
+      "deletions": 0,
+      "filename": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/history/rev1/ia_probes.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev1%2Fia_probes.py",
+      "sha": "476c0775dd112763960ddae670926e9fdacb2f42",
+      "status": "added"
+    },
+    {
+      "additions": 55,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev2-dryrun%2FPROBE_MANIFEST.json",
+      "changes": 55,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev2-dryrun%2FPROBE_MANIFEST.json?ref=08468beb5523b0696fc2472b5b535b476c403a5d",
+      "deletions": 0,
+      "filename": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/history/rev2-dryrun/PROBE_MANIFEST.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev2-dryrun%2FPROBE_MANIFEST.json",
+      "sha": "4e2a3ec258498402783b16a4efab9efaa47f99ed",
+      "status": "added"
+    },
+    {
+      "additions": 1,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev2-dryrun%2FPROBE_MANIFEST.sha256",
+      "changes": 1,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev2-dryrun%2FPROBE_MANIFEST.sha256?ref=08468beb5523b0696fc2472b5b535b476c403a5d",
+      "deletions": 0,
+      "filename": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/history/rev2-dryrun/PROBE_MANIFEST.sha256",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev2-dryrun%2FPROBE_MANIFEST.sha256",
+      "sha": "006b07a068608f8b1be18c579f3d1114834a2df6",
+      "status": "added"
+    },
+    {
+      "additions": 37,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev2-dryrun%2Fcollect_only.txt",
+      "changes": 37,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev2-dryrun%2Fcollect_only.txt?ref=08468beb5523b0696fc2472b5b535b476c403a5d",
+      "deletions": 0,
+      "filename": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/history/rev2-dryrun/collect_only.txt",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev2-dryrun%2Fcollect_only.txt",
+      "sha": "3fbafe0a98ae3a5445a95c658f0c46b7a368d121",
+      "status": "added"
+    },
+    {
+      "additions": 30,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev2-dryrun%2Fprobe_enumeration.txt",
+      "changes": 30,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev2-dryrun%2Fprobe_enumeration.txt?ref=08468beb5523b0696fc2472b5b535b476c403a5d",
+      "deletions": 0,
+      "filename": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/history/rev2-dryrun/probe_enumeration.txt",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fhistory%2Frev2-dryrun%2Fprobe_enumeration.txt",
+      "sha": "e4d98b9985c2af3d55f47746d65f5b77ff629a2c",
+      "status": "added"
+    },
+    {
+      "additions": 105,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fia_child.py",
+      "changes": 105,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fia_child.py?ref=08468beb5523b0696fc2472b5b535b476c403a5d",
+      "deletions": 0,
+      "filename": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/ia_child.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fia_child.py",
+      "sha": "b6492d6ddcf13b77391906fd459af84097f033e8",
+      "status": "added"
+    },
+    {
+      "additions": 851,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fia_probes.py",
+      "changes": 851,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fia_probes.py?ref=08468beb5523b0696fc2472b5b535b476c403a5d",
+      "deletions": 0,
+      "filename": "reviews/C15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27/ia_probes.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/08468beb5523b0696fc2472b5b535b476c403a5d/reviews%2FC15_RCC_RES_B_PERSISTENCE_CORRECTIVE_001_INDEPENDENT_ACCEPTANCE_2026-09-27%2Fia_probes.py",
+      "sha": "a3114b2c98f3eea54367b2ffb596a91a2fb2937d",
+      "status": "added"
+    }
+  ],
+  "source": "GitHub REST paginated /pulls/{number}/files; file metadata retained; patch bodies omitted"
+}

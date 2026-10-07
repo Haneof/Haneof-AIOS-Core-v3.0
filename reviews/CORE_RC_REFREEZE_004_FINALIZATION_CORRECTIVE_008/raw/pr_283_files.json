@@ -1,0 +1,148 @@
+{
+  "files": [
+    {
+      "additions": 55,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2FREPORT.md",
+      "changes": 55,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2FREPORT.md?ref=e3394da5d607e34c0286c16a11837ac7ea173a56",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/independent_acceptance/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA/REPORT.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2FREPORT.md",
+      "sha": "2a34ea2c6ee1b8117cf36b02487ce04ff41ecb77",
+      "status": "added"
+    },
+    {
+      "additions": 12,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fenvironment_record.md",
+      "changes": 12,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fenvironment_record.md?ref=e3394da5d607e34c0286c16a11837ac7ea173a56",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/independent_acceptance/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA/environment_record.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fenvironment_record.md",
+      "sha": "ea96308df511ea3c822c22b9484a9693ed81d88a",
+      "status": "added"
+    },
+    {
+      "additions": 22,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fprobes%2Fprobe_exchange_adversarial.py",
+      "changes": 22,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fprobes%2Fprobe_exchange_adversarial.py?ref=e3394da5d607e34c0286c16a11837ac7ea173a56",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/independent_acceptance/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA/probes/probe_exchange_adversarial.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fprobes%2Fprobe_exchange_adversarial.py",
+      "sha": "b80fec4e5ecab035886331b947bc450b0b40c2f0",
+      "status": "added"
+    },
+    {
+      "additions": 7,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fprobes%2Fprobe_git_scope_and_packet_head.py",
+      "changes": 7,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fprobes%2Fprobe_git_scope_and_packet_head.py?ref=e3394da5d607e34c0286c16a11837ac7ea173a56",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/independent_acceptance/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA/probes/probe_git_scope_and_packet_head.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fprobes%2Fprobe_git_scope_and_packet_head.py",
+      "sha": "d5259c9a2e747ba55a53ef57af66bf7b31e47abb",
+      "status": "added"
+    },
+    {
+      "additions": 31,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Fbootstrap_build.log",
+      "changes": 31,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Fbootstrap_build.log?ref=e3394da5d607e34c0286c16a11837ac7ea173a56",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/independent_acceptance/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA/raw/bootstrap_build.log",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Fbootstrap_build.log",
+      "sha": "cbc4e66e5c296099c1960b6d82f889cd53cbc37d",
+      "status": "added"
+    },
+    {
+      "additions": 12,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Fbootstrap_verify.log",
+      "changes": 12,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Fbootstrap_verify.log?ref=e3394da5d607e34c0286c16a11837ac7ea173a56",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/independent_acceptance/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA/raw/bootstrap_verify.log",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Fbootstrap_verify.log",
+      "sha": "1ab36922eb517773d6bb302389297bf611d4d760",
+      "status": "added"
+    },
+    {
+      "additions": 6,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Fprobe_exchange_adversarial.json",
+      "changes": 6,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Fprobe_exchange_adversarial.json?ref=e3394da5d607e34c0286c16a11837ac7ea173a56",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/independent_acceptance/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA/raw/probe_exchange_adversarial.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Fprobe_exchange_adversarial.json",
+      "sha": "0a4c0c3ae9d58e6dd5d67df51a82ba9379848e99",
+      "status": "added"
+    },
+    {
+      "additions": 11,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Fprobe_exchange_adversarial_red.txt",
+      "changes": 11,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Fprobe_exchange_adversarial_red.txt?ref=e3394da5d607e34c0286c16a11837ac7ea173a56",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/independent_acceptance/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA/raw/probe_exchange_adversarial_red.txt",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Fprobe_exchange_adversarial_red.txt",
+      "sha": "9ec45ab8bc63a95f319b65541ceef2c653537b01",
+      "status": "added"
+    },
+    {
+      "additions": 16,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Fprobe_git_scope_and_packet_head.json",
+      "changes": 16,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Fprobe_git_scope_and_packet_head.json?ref=e3394da5d607e34c0286c16a11837ac7ea173a56",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/independent_acceptance/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA/raw/probe_git_scope_and_packet_head.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Fprobe_git_scope_and_packet_head.json",
+      "sha": "c51836156350be57a857c6e8b8f7a6e333392b45",
+      "status": "added"
+    },
+    {
+      "additions": 32,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Frc_identity.json",
+      "changes": 32,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Frc_identity.json?ref=e3394da5d607e34c0286c16a11837ac7ea173a56",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/independent_acceptance/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA/raw/rc_identity.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Frc_identity.json",
+      "sha": "c820e52a95f274ae4e91398f54a22ff4659e7cd2",
+      "status": "added"
+    },
+    {
+      "additions": 2,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Freviewer_gate_run.txt",
+      "changes": 2,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Freviewer_gate_run.txt?ref=e3394da5d607e34c0286c16a11837ac7ea173a56",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/independent_acceptance/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA/raw/reviewer_gate_run.txt",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Freviewer_gate_run.txt",
+      "sha": "fa783a6052544c26ff4b0ff3c480529e339faf91",
+      "status": "added"
+    },
+    {
+      "additions": 55,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Fsha256sums.txt",
+      "changes": 55,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Fsha256sums.txt?ref=e3394da5d607e34c0286c16a11837ac7ea173a56",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/independent_acceptance/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA/raw/sha256sums.txt",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Fraw%2Fsha256sums.txt",
+      "sha": "ebd6634a4f78e90574ce1a04707dd15b1dfb3250",
+      "status": "added"
+    },
+    {
+      "additions": 15,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Freviewer_probe_freeze.json",
+      "changes": 15,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Freviewer_probe_freeze.json?ref=e3394da5d607e34c0286c16a11837ac7ea173a56",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/independent_acceptance/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA/reviewer_probe_freeze.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/e3394da5d607e34c0286c16a11837ac7ea173a56/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Findependent_acceptance%2FC15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-IA%2Freviewer_probe_freeze.json",
+      "sha": "e4d4d9d2a4251c1ed243f4afe848d3d59102a8cc",
+      "status": "added"
+    }
+  ],
+  "source": "GitHub REST paginated /pulls/{number}/files; file metadata retained; patch bodies omitted"
+}

@@ -1,0 +1,291 @@
+{
+  "files": [
+    {
+      "additions": 150,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/.github%2Fworkflows%2Fcore-background-late-trusted-return-001.yml",
+      "changes": 150,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/.github%2Fworkflows%2Fcore-background-late-trusted-return-001.yml?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": ".github/workflows/core-background-late-trusted-return-001.yml",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/.github%2Fworkflows%2Fcore-background-late-trusted-return-001.yml",
+      "sha": "681b82bca4a05caf516543c35352c421c348e166",
+      "status": "added"
+    },
+    {
+      "additions": 3,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/.gitignore",
+      "changes": 3,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/.gitignore?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": ".gitignore",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/.gitignore",
+      "sha": "90a0f5b3d592ac103b4370e45dc6ee969734769b",
+      "status": "added"
+    },
+    {
+      "additions": 16,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fbaseline_probe_hashes.txt",
+      "changes": 16,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fbaseline_probe_hashes.txt?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001/baseline_probe_hashes.txt",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fbaseline_probe_hashes.txt",
+      "sha": "fefae918d63d343937c71353da9b03d61116e058",
+      "status": "added"
+    },
+    {
+      "additions": 128,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fbaseline_red_manifest.md",
+      "changes": 128,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fbaseline_red_manifest.md?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001/baseline_red_manifest.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fbaseline_red_manifest.md",
+      "sha": "545626cb0816d205814220a14e73ff70b1bf5392",
+      "status": "added"
+    },
+    {
+      "additions": 79,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fbaseline_red_preimplementation_capture.txt",
+      "changes": 79,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fbaseline_red_preimplementation_capture.txt?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001/baseline_red_preimplementation_capture.txt",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fbaseline_red_preimplementation_capture.txt",
+      "sha": "97bb22b58547c9ba73ae9272c53f8c66181df3a6",
+      "status": "added"
+    },
+    {
+      "additions": 125,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fbaseline_red_raw.txt",
+      "changes": 125,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fbaseline_red_raw.txt?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001/baseline_red_raw.txt",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fbaseline_red_raw.txt",
+      "sha": "79dad894992b688d91ab4bc5ab1bab7fbaa4db33",
+      "status": "added"
+    },
+    {
+      "additions": 28,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fchanged_path_manifest.txt",
+      "changes": 28,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fchanged_path_manifest.txt?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001/changed_path_manifest.txt",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fchanged_path_manifest.txt",
+      "sha": "08280f3c3126b4c16766c08060227fab740e8b87",
+      "status": "added"
+    },
+    {
+      "additions": 264,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fdesign_note.md",
+      "changes": 264,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fdesign_note.md?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001/design_note.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fdesign_note.md",
+      "sha": "89100a12b582d67bbc885914597c7eb2626680df",
+      "status": "added"
+    },
+    {
+      "additions": 79,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fformal_ci_results.md",
+      "changes": 79,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fformal_ci_results.md?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001/formal_ci_results.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fformal_ci_results.md",
+      "sha": "cdd922656d754993c38327954a9a90b50f5b7af3",
+      "status": "added"
+    },
+    {
+      "additions": 109,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Ffull_suite_local_result.md",
+      "changes": 109,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Ffull_suite_local_result.md?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001/full_suite_local_result.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Ffull_suite_local_result.md",
+      "sha": "c6a16a16f8d404a9f357ad9501c699b8e4eb803f",
+      "status": "added"
+    },
+    {
+      "additions": 31,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fgreen_raw_output.txt",
+      "changes": 31,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fgreen_raw_output.txt?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001/green_raw_output.txt",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fgreen_raw_output.txt",
+      "sha": "5285f5fe316dae3ec1e0e8d6b55e01aa5ffcd881",
+      "status": "added"
+    },
+    {
+      "additions": 118,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fhistorical_scope_tripwire_red.md",
+      "changes": 118,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fhistorical_scope_tripwire_red.md?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001/historical_scope_tripwire_red.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fhistorical_scope_tripwire_red.md",
+      "sha": "ca1c2a27605a1c7e550d5d2fd5d4e0f9a4f9521e",
+      "status": "added"
+    },
+    {
+      "additions": 111,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fmatrices.md",
+      "changes": 111,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fmatrices.md?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001/matrices.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fmatrices.md",
+      "sha": "3dfd8f8030e71cef1eb84067d288893237613629",
+      "status": "added"
+    },
+    {
+      "additions": 309,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fpr_body.md",
+      "changes": 309,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fpr_body.md?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001/pr_body.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fpr_body.md",
+      "sha": "dfa04f9b93a2ff3f22dee86ddbcc08858b6553ce",
+      "status": "added"
+    },
+    {
+      "additions": 67,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fstranded_commit_22e1053_disposition.md",
+      "changes": 67,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fstranded_commit_22e1053_disposition.md?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "reviews/CORE_BACKGROUND_LATE_TRUSTED_RETURN_001/stranded_commit_22e1053_disposition.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/reviews%2FCORE_BACKGROUND_LATE_TRUSTED_RETURN_001%2Fstranded_commit_22e1053_disposition.md",
+      "sha": "61bdd43ee21c60542616c543f6b35c81e1828189",
+      "status": "added"
+    },
+    {
+      "additions": 4,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/src%2Faios_core%2Fruntime%2F__init__.py",
+      "changes": 4,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/src%2Faios_core%2Fruntime%2F__init__.py?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "src/aios_core/runtime/__init__.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/src%2Faios_core%2Fruntime%2F__init__.py",
+      "sha": "7ab34406520d9afdb0ee37ac10f12f885c984028",
+      "status": "modified"
+    },
+    {
+      "additions": 643,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/src%2Faios_core%2Fruntime%2Fbackground_attempt.py",
+      "changes": 698,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/src%2Faios_core%2Fruntime%2Fbackground_attempt.py?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 55,
+      "filename": "src/aios_core/runtime/background_attempt.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/src%2Faios_core%2Fruntime%2Fbackground_attempt.py",
+      "sha": "ac5adc5d7ab0fe1a2e0257ffe281403451585443",
+      "status": "modified"
+    },
+    {
+      "additions": 278,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/src%2Faios_core%2Fruntime%2Flate_return.py",
+      "changes": 278,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/src%2Faios_core%2Fruntime%2Flate_return.py?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "src/aios_core/runtime/late_return.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/src%2Faios_core%2Fruntime%2Flate_return.py",
+      "sha": "bb36b2ace4902b281834fa679a37e297272f8b28",
+      "status": "added"
+    },
+    {
+      "additions": 72,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/src%2Faios_core%2Fruntime%2Fturn_runtime.py",
+      "changes": 72,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/src%2Faios_core%2Fruntime%2Fturn_runtime.py?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "src/aios_core/runtime/turn_runtime.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/src%2Faios_core%2Fruntime%2Fturn_runtime.py",
+      "sha": "588ef909f4a31aa2da638844cedbaa58c0090c7d",
+      "status": "modified"
+    },
+    {
+      "additions": 220,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/tests%2Fc15_persistence%2Ftest_resident_surface.py",
+      "changes": 238,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/tests%2Fc15_persistence%2Ftest_resident_surface.py?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 18,
+      "filename": "tests/c15_persistence/test_resident_surface.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/tests%2Fc15_persistence%2Ftest_resident_surface.py",
+      "sha": "08c8670c3c4be8824cb165ea8275656e6f5a6566",
+      "status": "modified"
+    },
+    {
+      "additions": 171,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/tests%2Fintegration%2Flate_trusted_return_fixture.py",
+      "changes": 171,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/tests%2Fintegration%2Flate_trusted_return_fixture.py?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "tests/integration/late_trusted_return_fixture.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/tests%2Fintegration%2Flate_trusted_return_fixture.py",
+      "sha": "d17b145de5bc8256851ad9c16c53e9071d25a551",
+      "status": "added"
+    },
+    {
+      "additions": 842,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/tests%2Fintegration%2Ftest_core_background_late_trusted_return_001.py",
+      "changes": 842,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/tests%2Fintegration%2Ftest_core_background_late_trusted_return_001.py?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "tests/integration/test_core_background_late_trusted_return_001.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/tests%2Fintegration%2Ftest_core_background_late_trusted_return_001.py",
+      "sha": "b7934524c9d48821e89b768ee1182591e94bb5d3",
+      "status": "added"
+    },
+    {
+      "additions": 452,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/tests%2Fintegration%2Ftest_core_background_late_trusted_return_001_adversarial.py",
+      "changes": 452,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/tests%2Fintegration%2Ftest_core_background_late_trusted_return_001_adversarial.py?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "tests/integration/test_core_background_late_trusted_return_001_adversarial.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/tests%2Fintegration%2Ftest_core_background_late_trusted_return_001_adversarial.py",
+      "sha": "de3393d1dc3088d9c9151f3ac3cb176c9a3dff41",
+      "status": "added"
+    },
+    {
+      "additions": 473,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/tests%2Fintegration%2Ftest_core_background_late_trusted_return_001_not_submitted.py",
+      "changes": 473,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/tests%2Fintegration%2Ftest_core_background_late_trusted_return_001_not_submitted.py?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 0,
+      "filename": "tests/integration/test_core_background_late_trusted_return_001_not_submitted.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/tests%2Fintegration%2Ftest_core_background_late_trusted_return_001_not_submitted.py",
+      "sha": "028924305387f38b952e8cbff4ea8d9b6ee493b1",
+      "status": "added"
+    },
+    {
+      "additions": 35,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/tests%2Fruntime%2Ftest_background_model_attempt.py",
+      "changes": 44,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/tests%2Fruntime%2Ftest_background_model_attempt.py?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 9,
+      "filename": "tests/runtime/test_background_model_attempt.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/tests%2Fruntime%2Ftest_background_model_attempt.py",
+      "sha": "11c3b79418f4babda43d3f114897cae883dc146e",
+      "status": "modified"
+    },
+    {
+      "additions": 70,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/5ad0524c425592210ff184e00ad52abb2c14e366/tests%2Fruntime%2Ftest_turn_execution_recovery.py",
+      "changes": 88,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/tests%2Fruntime%2Ftest_turn_execution_recovery.py?ref=5ad0524c425592210ff184e00ad52abb2c14e366",
+      "deletions": 18,
+      "filename": "tests/runtime/test_turn_execution_recovery.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/5ad0524c425592210ff184e00ad52abb2c14e366/tests%2Fruntime%2Ftest_turn_execution_recovery.py",
+      "sha": "f1aba0104b1ad09712e1e608d49b5b69c8f85d84",
+      "status": "modified"
+    }
+  ],
+  "source": "GitHub REST paginated /pulls/{number}/files; file metadata retained; patch bodies omitted"
+}

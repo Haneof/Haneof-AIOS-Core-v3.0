@@ -1,0 +1,16 @@
+{
+  "files": [
+    {
+      "additions": 23,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/62d5404e6d92ffcbac6c44f061ebc8c4b4a281eb/governance%2Fprompts%2FAIOS_CORE_PM_HANDOFF_2026-09-24.md",
+      "changes": 23,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/governance%2Fprompts%2FAIOS_CORE_PM_HANDOFF_2026-09-24.md?ref=62d5404e6d92ffcbac6c44f061ebc8c4b4a281eb",
+      "deletions": 0,
+      "filename": "governance/prompts/AIOS_CORE_PM_HANDOFF_2026-09-24.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/62d5404e6d92ffcbac6c44f061ebc8c4b4a281eb/governance%2Fprompts%2FAIOS_CORE_PM_HANDOFF_2026-09-24.md",
+      "sha": "ed61c0fe7e2cfc2a9d70ad4fa5d7b786f64df4c7",
+      "status": "modified"
+    }
+  ],
+  "source": "GitHub REST paginated /pulls/{number}/files; file metadata retained; patch bodies omitted"
+}

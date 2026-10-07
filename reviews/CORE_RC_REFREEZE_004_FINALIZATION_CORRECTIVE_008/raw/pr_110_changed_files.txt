@@ -1,0 +1,9 @@
+src/aios_core/ai_world/cognition.py
+src/aios_core/policy/__init__.py
+src/aios_core/policy/evidence.py
+src/aios_core/revision/service.py
+src/aios_core/runtime/turn_runtime.py
+src/aios_core/summaries/cognitive_derivation.py
+src/aios_core/writeback/cognition.py
+tests/habitation/test_current_core_target.py
+tests/integration/test_v3_c15_cognition_evidence_policy.py

@@ -1,0 +1,104 @@
+{
+  "files": [
+    {
+      "additions": 9,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/3e32a190f644dc9901b428b62fcbde2e01fe6d50/AIOS_v3.0_CURRENT_CHECKPOINT.md",
+      "changes": 9,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/AIOS_v3.0_CURRENT_CHECKPOINT.md?ref=3e32a190f644dc9901b428b62fcbde2e01fe6d50",
+      "deletions": 0,
+      "filename": "AIOS_v3.0_CURRENT_CHECKPOINT.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/3e32a190f644dc9901b428b62fcbde2e01fe6d50/AIOS_v3.0_CURRENT_CHECKPOINT.md",
+      "sha": "482cbeecdea4607bb35abe7bb171320f45e5c892",
+      "status": "modified"
+    },
+    {
+      "additions": 4,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/3e32a190f644dc9901b428b62fcbde2e01fe6d50/PROJECT_MASTER_MAP.md",
+      "changes": 6,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/PROJECT_MASTER_MAP.md?ref=3e32a190f644dc9901b428b62fcbde2e01fe6d50",
+      "deletions": 2,
+      "filename": "PROJECT_MASTER_MAP.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/3e32a190f644dc9901b428b62fcbde2e01fe6d50/PROJECT_MASTER_MAP.md",
+      "sha": "98a30d26428a68846fda80a25565b28aabad3290",
+      "status": "modified"
+    },
+    {
+      "additions": 57,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/3e32a190f644dc9901b428b62fcbde2e01fe6d50/docs%2Fconstitution%2FAIOS_v3.0_AI_Personality_Model_Constitution.md",
+      "changes": 57,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/docs%2Fconstitution%2FAIOS_v3.0_AI_Personality_Model_Constitution.md?ref=3e32a190f644dc9901b428b62fcbde2e01fe6d50",
+      "deletions": 0,
+      "filename": "docs/constitution/AIOS_v3.0_AI_Personality_Model_Constitution.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/3e32a190f644dc9901b428b62fcbde2e01fe6d50/docs%2Fconstitution%2FAIOS_v3.0_AI_Personality_Model_Constitution.md",
+      "sha": "54cd799465811b5d0f47e3a87f1c69a339ddc7c8",
+      "status": "modified"
+    },
+    {
+      "additions": 17,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/3e32a190f644dc9901b428b62fcbde2e01fe6d50/docs%2Fconstitution%2FAIOS_v3.0_Fused_Baseline_Registry.md",
+      "changes": 17,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/docs%2Fconstitution%2FAIOS_v3.0_Fused_Baseline_Registry.md?ref=3e32a190f644dc9901b428b62fcbde2e01fe6d50",
+      "deletions": 0,
+      "filename": "docs/constitution/AIOS_v3.0_Fused_Baseline_Registry.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/3e32a190f644dc9901b428b62fcbde2e01fe6d50/docs%2Fconstitution%2FAIOS_v3.0_Fused_Baseline_Registry.md",
+      "sha": "454987c8f8d7ff53321aca18730fc8a70a5a0942",
+      "status": "modified"
+    },
+    {
+      "additions": 10,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/3e32a190f644dc9901b428b62fcbde2e01fe6d50/governance%2FAIOS_SINGLE_WINDOW_TASK_BOARD.md",
+      "changes": 10,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/governance%2FAIOS_SINGLE_WINDOW_TASK_BOARD.md?ref=3e32a190f644dc9901b428b62fcbde2e01fe6d50",
+      "deletions": 0,
+      "filename": "governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/3e32a190f644dc9901b428b62fcbde2e01fe6d50/governance%2FAIOS_SINGLE_WINDOW_TASK_BOARD.md",
+      "sha": "4b5936381db146530d07a027c715f8b98d730501",
+      "status": "modified"
+    },
+    {
+      "additions": 191,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/3e32a190f644dc9901b428b62fcbde2e01fe6d50/governance%2FC15_RCC_RESIDENT_PERSONA_CONTINUITY_RULING_2026-09-28.md",
+      "changes": 191,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/governance%2FC15_RCC_RESIDENT_PERSONA_CONTINUITY_RULING_2026-09-28.md?ref=3e32a190f644dc9901b428b62fcbde2e01fe6d50",
+      "deletions": 0,
+      "filename": "governance/C15_RCC_RESIDENT_PERSONA_CONTINUITY_RULING_2026-09-28.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/3e32a190f644dc9901b428b62fcbde2e01fe6d50/governance%2FC15_RCC_RESIDENT_PERSONA_CONTINUITY_RULING_2026-09-28.md",
+      "sha": "ae4f6c36890b8d70d334af8fcac5ea9eef1fc0d4",
+      "status": "added"
+    },
+    {
+      "additions": 12,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/3e32a190f644dc9901b428b62fcbde2e01fe6d50/governance%2FC15_RESIDENT_COGNITIVE_CONTINUITY_RULING_2026-09-22.md",
+      "changes": 19,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/governance%2FC15_RESIDENT_COGNITIVE_CONTINUITY_RULING_2026-09-22.md?ref=3e32a190f644dc9901b428b62fcbde2e01fe6d50",
+      "deletions": 7,
+      "filename": "governance/C15_RESIDENT_COGNITIVE_CONTINUITY_RULING_2026-09-22.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/3e32a190f644dc9901b428b62fcbde2e01fe6d50/governance%2FC15_RESIDENT_COGNITIVE_CONTINUITY_RULING_2026-09-22.md",
+      "sha": "12951fa9388d4a9083d3a1f087ea23c74b285988",
+      "status": "modified"
+    },
+    {
+      "additions": 12,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/3e32a190f644dc9901b428b62fcbde2e01fe6d50/governance%2FC15_RESIDENT_COGNITIVE_CONTINUITY_TEST_PLAN_2026-09-22.md",
+      "changes": 19,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/governance%2FC15_RESIDENT_COGNITIVE_CONTINUITY_TEST_PLAN_2026-09-22.md?ref=3e32a190f644dc9901b428b62fcbde2e01fe6d50",
+      "deletions": 7,
+      "filename": "governance/C15_RESIDENT_COGNITIVE_CONTINUITY_TEST_PLAN_2026-09-22.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/3e32a190f644dc9901b428b62fcbde2e01fe6d50/governance%2FC15_RESIDENT_COGNITIVE_CONTINUITY_TEST_PLAN_2026-09-22.md",
+      "sha": "1c48dbc6ff65c41cf6c24a76332162202a813aed",
+      "status": "modified"
+    },
+    {
+      "additions": 73,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/3e32a190f644dc9901b428b62fcbde2e01fe6d50/governance%2Fprompts%2FC15_RCC_RESIDENT_PERSONA_CONTINUITY_INDEPENDENT_REVIEW_2026-09-28.md",
+      "changes": 73,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/governance%2Fprompts%2FC15_RCC_RESIDENT_PERSONA_CONTINUITY_INDEPENDENT_REVIEW_2026-09-28.md?ref=3e32a190f644dc9901b428b62fcbde2e01fe6d50",
+      "deletions": 0,
+      "filename": "governance/prompts/C15_RCC_RESIDENT_PERSONA_CONTINUITY_INDEPENDENT_REVIEW_2026-09-28.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/3e32a190f644dc9901b428b62fcbde2e01fe6d50/governance%2Fprompts%2FC15_RCC_RESIDENT_PERSONA_CONTINUITY_INDEPENDENT_REVIEW_2026-09-28.md",
+      "sha": "fbb930fd469d6e110f109dae3dac366b6ffb8bf8",
+      "status": "added"
+    }
+  ],
+  "source": "GitHub REST paginated /pulls/{number}/files; file metadata retained; patch bodies omitted"
+}

@@ -1,0 +1,27 @@
+{
+  "source": "authenticated GitHub connector list_pr_changed_filenames (all pages)",
+  "number": 126,
+  "filenames": [
+    ".github/workflows/pr126-strict-synthetic-integration.yml",
+    "reviews/AIOS_CONSTITUTION_FIXES_2026-09-24/HANDOFF.md",
+    "reviews/AIOS_CONSTITUTION_FIXES_2026-09-24/manifest.json",
+    "reviews/AIOS_CONSTITUTION_FIXES_2026-09-24/results.xml",
+    "reviews/AIOS_CONSTITUTION_FIXES_2026-09-24/validation.txt",
+    "src/aios_core/dependency/graph.py",
+    "src/aios_core/events/service.py",
+    "src/aios_core/policy/service.py",
+    "src/aios_core/query/search.py",
+    "src/aios_core/revision/propagation.py",
+    "src/aios_core/revision/service.py",
+    "src/aios_core/runtime/__init__.py",
+    "src/aios_core/runtime/turn_execution.py",
+    "src/aios_core/runtime/turn_runtime.py",
+    "src/aios_core/storage/sqlite_store.py",
+    "src/aios_core/summaries/dimension_summary.py",
+    "src/aios_core/summaries/scheduler.py",
+    "tests/integration/test_v3_audit_bugfixes.py",
+    "tests/preflight/test_round5_fixes.py",
+    "tests/unit/test_pr126_synthetic_gate.py",
+    "tools/ci/pr126_synthetic_gate.py"
+  ]
+}
