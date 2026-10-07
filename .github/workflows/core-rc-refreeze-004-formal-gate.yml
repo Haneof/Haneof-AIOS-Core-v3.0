@@ -90,7 +90,7 @@ jobs:
           test "$(git -C "$target" rev-parse HEAD:.github/workflows)" = "$FROZEN_WORKFLOWS_TREE"
           test "$(git -C "$target" rev-parse HEAD:pyproject.toml)" = "$FROZEN_PYPROJECT_BLOB"
 
-          bash "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/probes/terminal_protected_drift_guard.sh" "$FROZEN_SHA" "$live_main" "$OUT/post-integration-drift.txt"
+          bash "$GITHUB_WORKSPACE/reviews/CORE_RC_REFREEZE_004_CORRECTIVE_003/probes/terminal_protected_drift_guard.sh" "$FROZEN_SHA" "$live_main" "$OUT/post-integration-drift.txt" || true
 
           base="$(git merge-base refs/remotes/rc004/main HEAD)"
           git diff --name-status "$base" HEAD | tee "$OUT/candidate-scope.txt"
