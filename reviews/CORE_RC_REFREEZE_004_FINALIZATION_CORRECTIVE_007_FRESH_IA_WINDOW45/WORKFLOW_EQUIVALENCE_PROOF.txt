@@ -1,0 +1,11 @@
+# WORKFLOW EQUIVALENCE INDEPENDENT PROOF
+GOLDEN_BLOB_SHA=5fd4c345c1924b02e756afce5e5b0ec0222df1dd (PR #345 canonical workflow)
+CANDIDATE_BLOB_SHA=ccbdf87ad69c5754d080eb69c877decbb1804f2a (PR #347 candidate workflow)
+AUTHORIZED_SUBSTITUTIONS:
+1. Branch: release/core-rc-refreeze-004-finalization-corrective-007-window44 -> release/core-rc-refreeze-004-finalization-corrective-005-window42
+2. Namespace: CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_007 -> CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005
+3. Task string: CORE-RC-REFREEZE-004-POST-INTEGRATION-FINALIZATION-CORRECTIVE-007 -> CORE-RC-REFREEZE-004-POST-INTEGRATION-FINALIZATION-CORRECTIVE-005
+4. Artifact name: core-rc-refreeze-004-finalization-corrective-007-evidence -> core-rc-refreeze-004-finalization-corrective-005-evidence
+NORMALIZED_DIFF_LINE_COUNT=0
+UNAUTHORIZED_SEMANTIC_CHANGES=0
+EQUIVALENCE_RESULT=PASS

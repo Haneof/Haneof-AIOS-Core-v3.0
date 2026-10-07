@@ -1,0 +1,8 @@
+# REVIEWER-CONSTRUCTED RED/GREEN CONTROLS RESULT
+TEST_A_OLD_MODEL_HISTORICAL_DRIFT_RED=PASS (exit code 1, TERMINAL_UNADJUDICATED_PROTECTED_DRIFT=FAIL)
+TEST_B_PROTECTED_SURFACES_ZERO_DRIFT_GREEN=PASS (0 changed files in src/, tests/, pyproject.toml, package files)
+TEST_C_REVIEWER_MUTATION_TERMINAL_GUARD_RED=PASS:
+  - identical main control: exit code 0
+  - workflow mutation: exit code 1
+  - product mutation: exit code 1
+ALL_RED_GREEN_CONTROLS=PASS
