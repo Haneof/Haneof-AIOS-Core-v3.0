@@ -1,0 +1,1766 @@
+[
+  {
+    "baseRefName": "main",
+    "files": [
+      {
+        "path": ".github/workflows/core-rc-refreeze-004-formal-gate.yml",
+        "additions": 453,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "release/rc/CORE_RC_REFREEZE_004_MANIFEST.json",
+        "additions": 148,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "release/rc/CORE_RC_REFREEZE_004_OPERATOR_PACKET.md",
+        "additions": 96,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/SHA256SUMS",
+        "additions": 20,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/backup_restore_rebuild_evidence.md",
+        "additions": 30,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/c15_downstream_compatibility_adjudication.md",
+        "additions": 14,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/clean_install_headless_evidence.md",
+        "additions": 16,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/dependency_manifest.md",
+        "additions": 20,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/environment_manifest.txt",
+        "additions": 23,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/formal_ci_contract.md",
+        "additions": 15,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/fresh_regression.md",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/frozen_reviewer_probes.md",
+        "additions": 18,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/known_limitations.md",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/open_pr_contamination_review.md",
+        "additions": 26,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/post_integration_drift.md",
+        "additions": 52,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/preflight_history.md",
+        "additions": 64,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/probes/backup_restore_route_b.py",
+        "additions": 631,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/process_loss_evidence.md",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/rc_impact_adjudication.md",
+        "additions": 24,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/source_manifest.json",
+        "additions": 544,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/trusted_return_security_checks.md",
+        "additions": 20,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/writer_restart_historical_core.md",
+        "additions": 25,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ],
+    "headRefName": "release/core-rc-refreeze-004-window24",
+    "headRefOid": "70134269ddfc7c80c4a703a933253bd099746504",
+    "number": 325,
+    "state": "OPEN",
+    "title": "[DO NOT MERGE] CORE-RC-REFREEZE-004 \u2014 Window 24 canonical candidate \u2014 REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE"
+  },
+  {
+    "baseRefName": "main",
+    "files": [
+      {
+        "path": ".github/workflows/core-rc-refreeze-004-formal-gate.yml",
+        "additions": 528,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "release/rc/CORE_RC_REFREEZE_004_MANIFEST.json",
+        "additions": 148,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "release/rc/CORE_RC_REFREEZE_004_OPERATOR_PACKET.md",
+        "additions": 96,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/SHA256SUMS",
+        "additions": 20,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/backup_restore_rebuild_evidence.md",
+        "additions": 30,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/c15_downstream_compatibility_adjudication.md",
+        "additions": 14,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/clean_install_headless_evidence.md",
+        "additions": 16,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/dependency_manifest.md",
+        "additions": 20,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/environment_manifest.txt",
+        "additions": 23,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/formal_ci_contract.md",
+        "additions": 15,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/fresh_regression.md",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/frozen_reviewer_probes.md",
+        "additions": 18,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/known_limitations.md",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/open_pr_contamination_review.md",
+        "additions": 26,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/post_integration_drift.md",
+        "additions": 52,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/preflight_history.md",
+        "additions": 64,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/probes/backup_restore_route_b.py",
+        "additions": 631,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/process_loss_evidence.md",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/rc_impact_adjudication.md",
+        "additions": 24,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/source_manifest.json",
+        "additions": 544,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/trusted_return_security_checks.md",
+        "additions": 20,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/writer_restart_historical_core.md",
+        "additions": 25,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/BLK001_C15_EXIT_JUNIT_REPAIR.md",
+        "additions": 13,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/BLK002_CREDENTIAL_IMMUTABILITY_REPAIR.md",
+        "additions": 5,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/BLK003_MANDATORY_PIN_PUBLICATION_REPAIR.md",
+        "additions": 5,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/FAILED_CANDIDATE_IDENTITY.md",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/FINAL_HANDOFF.md",
+        "additions": 12,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/FORMAL_CI_RESULTS.md",
+        "additions": 5,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/GROUND_TRUTH.md",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/RED_FIRST.md",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/SCOPE_AUDIT.md",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/SHA256SUMS",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/STATIC_SHA256_POLICY.md",
+        "additions": 10,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/WINDOW25_REVIEW_IDENTITY.md",
+        "additions": 8,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/WORKFLOW_SECURITY_AUDIT.md",
+        "additions": 12,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/blk003_old_publisher.sh",
+        "additions": 7,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/c15_junit_classifier.py",
+        "additions": 85,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/publisher_http_contract.sh",
+        "additions": 13,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/workflow_false_green_probe.py",
+        "additions": 40,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/workflow_security_static_probe.py",
+        "additions": 27,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/raw/GREEN_C15_CLASSIFIER_SELFTEST.txt",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/raw/GREEN_PUBLISHER_FAULT_INJECTION.txt",
+        "additions": 4,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/raw/GREEN_WORKFLOW_STATIC_AUDIT.txt",
+        "additions": 17,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/raw/RED_BLK001.txt",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/raw/RED_BLK002.txt",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/raw/RED_BLK003.txt",
+        "additions": 3,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ],
+    "headRefName": "release/core-rc-refreeze-004-corrective-001-window26",
+    "headRefOid": "2380121639865b1bd29176cf944f5a20afe4112d",
+    "number": 330,
+    "state": "OPEN",
+    "title": "[DO NOT MERGE] CORE-RC-REFREEZE-004-CORRECTIVE-001 \u2014 Window 26"
+  },
+  {
+    "baseRefName": "main",
+    "files": [
+      {
+        "path": ".github/workflows/core-rc-refreeze-004-formal-gate.yml",
+        "additions": 677,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "release/rc/CORE_RC_REFREEZE_004_MANIFEST.json",
+        "additions": 148,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "release/rc/CORE_RC_REFREEZE_004_OPERATOR_PACKET.md",
+        "additions": 96,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/SHA256SUMS",
+        "additions": 20,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/backup_restore_rebuild_evidence.md",
+        "additions": 30,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/c15_downstream_compatibility_adjudication.md",
+        "additions": 14,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/clean_install_headless_evidence.md",
+        "additions": 16,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/dependency_manifest.md",
+        "additions": 20,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/environment_manifest.txt",
+        "additions": 23,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/formal_ci_contract.md",
+        "additions": 15,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/fresh_regression.md",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/frozen_reviewer_probes.md",
+        "additions": 18,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/known_limitations.md",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/open_pr_contamination_review.md",
+        "additions": 26,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/post_integration_drift.md",
+        "additions": 52,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/preflight_history.md",
+        "additions": 64,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/probes/backup_restore_route_b.py",
+        "additions": 631,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/process_loss_evidence.md",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/rc_impact_adjudication.md",
+        "additions": 24,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/source_manifest.json",
+        "additions": 544,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/trusted_return_security_checks.md",
+        "additions": 20,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004/writer_restart_historical_core.md",
+        "additions": 25,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/BLK001_C15_EXIT_JUNIT_REPAIR.md",
+        "additions": 13,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/BLK002_CREDENTIAL_IMMUTABILITY_REPAIR.md",
+        "additions": 5,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/BLK003_MANDATORY_PIN_PUBLICATION_REPAIR.md",
+        "additions": 5,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/FAILED_CANDIDATE_IDENTITY.md",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/FINAL_HANDOFF.md",
+        "additions": 12,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/FORMAL_CI_RESULTS.md",
+        "additions": 5,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/GROUND_TRUTH.md",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/RED_FIRST.md",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/SCOPE_AUDIT.md",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/SHA256SUMS",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/STATIC_SHA256_POLICY.md",
+        "additions": 10,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/WINDOW25_REVIEW_IDENTITY.md",
+        "additions": 8,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/WORKFLOW_SECURITY_AUDIT.md",
+        "additions": 12,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/blk003_old_publisher.sh",
+        "additions": 7,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/c15_junit_classifier.py",
+        "additions": 85,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/publisher_http_contract.sh",
+        "additions": 13,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/workflow_false_green_probe.py",
+        "additions": 40,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/probes/workflow_security_static_probe.py",
+        "additions": 27,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/raw/GREEN_C15_CLASSIFIER_SELFTEST.txt",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/raw/GREEN_PUBLISHER_FAULT_INJECTION.txt",
+        "additions": 4,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/raw/GREEN_WORKFLOW_STATIC_AUDIT.txt",
+        "additions": 17,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/raw/RED_BLK001.txt",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/raw/RED_BLK002.txt",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_001/raw/RED_BLK003.txt",
+        "additions": 3,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/CANDIDATE_BRANCH_IDENTITY.md",
+        "additions": 19,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/CREDENTIAL_PERMISSION_AUDIT.md",
+        "additions": 24,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/FAILED_CANDIDATE_IDENTITY.md",
+        "additions": 10,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/FINAL_HANDOFF.md",
+        "additions": 22,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/FORMAL_CI_RESULTS.md",
+        "additions": 48,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/GREEN_CONTROL_BRANCH_ADVANCE.md",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/GROUND_TRUTH.md",
+        "additions": 38,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/HOSTED_RUN_METADATA.md",
+        "additions": 40,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/PM_ADJUDICATION.md",
+        "additions": 13,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/PUBLISHER_CARRY_FORWARD.md",
+        "additions": 23,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/REAL_GITHUB_TOCTOU_CONTROL.md",
+        "additions": 40,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/RED_FIRST_TOCTOU.md",
+        "additions": 22,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/REVIEWER_CONTROL_IDENTITIES.md",
+        "additions": 30,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/SCOPE_AUDIT.md",
+        "additions": 21,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/SHA256SUMS",
+        "additions": 22,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/WHOLE_RUN_IDENTITY_MODEL.md",
+        "additions": 15,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/WINDOW27_REVIEW_IDENTITY.md",
+        "additions": 15,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/raw/ACTUAL_PYTEST_EXIT_CONTROLS.txt",
+        "additions": 7,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/raw/GREEN_HOSTED_CONTROL.txt",
+        "additions": 22,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/raw/PREFINAL_FORMAL_RUN.txt",
+        "additions": 17,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/raw/PUBLISHER_FAULT_MATRIX.txt",
+        "additions": 22,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002/raw/RED_HOSTED_CONTROL.txt",
+        "additions": 16,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ],
+    "headRefName": "release/core-rc-refreeze-004-corrective-002-window28",
+    "headRefOid": "5a5d384f16798bfff46ffe03f87310b0eafb2321",
+    "number": 336,
+    "state": "OPEN",
+    "title": "[DO NOT MERGE] CORE-RC-REFREEZE-004-CORRECTIVE-002 \u2014 Window 28"
+  },
+  {
+    "baseRefName": "main",
+    "files": [
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002_FRESH_IA_2026-10-05/CONTROL_ASSESSMENT.md",
+        "additions": 42,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002_FRESH_IA_2026-10-05/FINDINGS.md",
+        "additions": 46,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002_FRESH_IA_2026-10-05/GROUND_TRUTH.md",
+        "additions": 59,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002_FRESH_IA_2026-10-05/PR_BODY.md",
+        "additions": 20,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002_FRESH_IA_2026-10-05/REPORT.md",
+        "additions": 52,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002_FRESH_IA_2026-10-05/SHA256SUMS",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002_FRESH_IA_2026-10-05/probes/credential_guard_regex.py",
+        "additions": 65,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002_FRESH_IA_2026-10-05/probes/final_seal_postread_race.py",
+        "additions": 180,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002_FRESH_IA_2026-10-05/probes/terminal_protected_drift_regex.py",
+        "additions": 120,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002_FRESH_IA_2026-10-05/raw/credential_guard_regex.txt",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002_FRESH_IA_2026-10-05/raw/final_seal_postread_race.txt",
+        "additions": 14,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_CORRECTIVE_002_FRESH_IA_2026-10-05/raw/terminal_protected_drift_regex.txt",
+        "additions": 19,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ],
+    "headRefName": "arena/01a10c6e-haneof-aios-core-v3-0",
+    "headRefOid": "f2388897afd212febc0d63d87787e730f47540c9",
+    "number": 337,
+    "state": "OPEN",
+    "title": "[REVIEW_ONLY] CORE-RC-REFREEZE-004 Corrective-002 Fresh IA"
+  },
+  {
+    "baseRefName": "main",
+    "files": [
+      {
+        "path": "governance/prompts/AIOS_CORE_PM_HANDOFF_2026-09-24.md",
+        "additions": 23,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ],
+    "headRefName": "governance/pm-code-quality-duty-20261006",
+    "headRefOid": "62d5404e6d92ffcbac6c44f061ebc8c4b4a281eb",
+    "number": 339,
+    "state": "OPEN",
+    "title": "[GOVERNANCE / DO NOT MERGE] Make engineering code-quality gates a mandatory PM duty"
+  },
+  {
+    "baseRefName": "main",
+    "files": [
+      {
+        "path": ".github/workflows/core-rc-refreeze-004-formal-gate.yml",
+        "additions": 6,
+        "deletions": 6,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION/ARTIFACT_IDENTITY.md",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION/CANDIDATE_SCOPE.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION/CORRECTIVE_CHAIN.md",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION/FINAL_WORKFLOW_IDENTITY.md",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION/FORMAL_RUN.md",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION/FROZEN_IDENTITY.md",
+        "additions": 5,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION/GROUND_TRUTH.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION/KNOWN_LIMITATIONS.md",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION/OPEN_PR_CONTAMINATION_AUDIT.md",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION/POST_INTEGRATION_DRIFT.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION/RC_IMPACT.md",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION/SHA256SUMS",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ],
+    "headRefName": "release/core-rc-refreeze-004-finalization-window36",
+    "headRefOid": "1a292c0e57ccc1459325fa8f9ae53d9ace40df3d",
+    "number": 340,
+    "state": "OPEN",
+    "title": "CORE-RC-REFREEZE-004-POST-INTEGRATION-FINALIZATION"
+  },
+  {
+    "baseRefName": "main",
+    "files": [
+      {
+        "path": ".github/workflows/core-rc-refreeze-004-formal-gate.yml",
+        "additions": 20,
+        "deletions": 11,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/ARTIFACT_IDENTITY.md",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/CANDIDATE_SCOPE.md",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/CORRECTIVE_CHAIN.md",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/FINAL_WORKFLOW_IDENTITY.md",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/FORMAL_RUN.md",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/FROZEN_IDENTITY.md",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/GROUND_TRUTH.md",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/KNOWN_LIMITATIONS.md",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/OPEN_PR_CONTAMINATION_AUDIT.md",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/POST_INTEGRATION_DRIFT.md",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/RED_BEFORE_GREEN_PROBE.sh",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/SHA256SUMS",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ],
+    "headRefName": "release/core-rc-refreeze-004-finalization-corrective-001-window38",
+    "headRefOid": "7abfceecbc681d45f196ed86691fdd2e02acb263",
+    "number": 341,
+    "state": "OPEN",
+    "title": "CORE-RC-REFREEZE-004-POST-INTEGRATION-FINALIZATION-CORRECTIVE-001"
+  },
+  {
+    "baseRefName": "main",
+    "files": [
+      {
+        "path": ".github/workflows/core-rc-refreeze-004-formal-gate.yml",
+        "additions": 51,
+        "deletions": 11,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/ARTIFACT_IDENTITY.md",
+        "additions": 5,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/BASELINE_RED_GREEN_RESULT.txt",
+        "additions": 12,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/CANDIDATE_SCOPE.md",
+        "additions": 14,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/CORRECTIVE_CHAIN.md",
+        "additions": 4,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/FINAL_WORKFLOW_IDENTITY.md",
+        "additions": 4,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/FORMAL_RUN.md",
+        "additions": 6,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/FROZEN_IDENTITY.md",
+        "additions": 3,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/GROUND_TRUTH.md",
+        "additions": 6,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/KNOWN_LIMITATIONS.md",
+        "additions": 5,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/OPEN_PR_CONTAMINATION_AUDIT.md",
+        "additions": 247,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/POST_INTEGRATION_DRIFT.md",
+        "additions": 21,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/RED_BEFORE_GREEN_PROBE.sh",
+        "additions": 15,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/SHA256SUMS",
+        "additions": 13,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/SHA256SUMS_VERIFY.txt",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_002/raw/FROZEN_TO_ACCEPTED_NAME_STATUS.txt",
+        "additions": 68,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ],
+    "headRefName": "release/core-rc-refreeze-004-finalization-corrective-002-window39",
+    "headRefOid": "56486e3b418b6871525129db66e393a443044963",
+    "number": 342,
+    "state": "OPEN",
+    "title": "CORE-RC-REFREEZE-004-POST-INTEGRATION-FINALIZATION-CORRECTIVE-002"
+  },
+  {
+    "baseRefName": "main",
+    "files": [
+      {
+        "path": ".github/workflows/core-rc-refreeze-004-formal-gate.yml",
+        "additions": 48,
+        "deletions": 10,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_003/ARTIFACT_IDENTITY.md",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_003/BASELINE_RED_GREEN_RESULT.txt",
+        "additions": 165,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_003/CANDIDATE_SCOPE.md",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_003/CORRECTIVE_CHAIN.md",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_003/FINAL_WORKFLOW_IDENTITY.md",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_003/FORMAL_RUN.md",
+        "additions": 3,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_003/FROZEN_IDENTITY.md",
+        "additions": 5,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_003/GROUND_TRUTH.md",
+        "additions": 10,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_003/KNOWN_LIMITATIONS.md",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_003/OPEN_PR_CONTAMINATION_AUDIT.md",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_003/POST_INTEGRATION_DRIFT.md",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_003/RED_BEFORE_GREEN_PROBE.sh",
+        "additions": 98,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_003/SHA256SUMS",
+        "additions": 12,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_003/SHA256SUMS_VERIFY.txt",
+        "additions": 12,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_003/raw/FROZEN_TO_ACCEPTED_NAME_STATUS.txt",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ],
+    "headRefName": "release/core-rc-refreeze-004-finalization-corrective-003-window40",
+    "headRefOid": "73fd8d664e308bfba22d8dbe309bf2e4b09be5f1",
+    "number": 343,
+    "state": "OPEN",
+    "title": "CORE-RC-REFREEZE-004-POST-INTEGRATION-FINALIZATION-CORRECTIVE-003"
+  },
+  {
+    "baseRefName": "main",
+    "files": [
+      {
+        "path": ".github/workflows/core-rc-refreeze-004-formal-gate.yml",
+        "additions": 56,
+        "deletions": 18,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_004/ARTIFACT_IDENTITY.md",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_004/BASELINE_RED_GREEN_RESULT.txt",
+        "additions": 165,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_004/CANDIDATE_SCOPE.md",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_004/CORRECTIVE_CHAIN.md",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_004/FINAL_WORKFLOW_IDENTITY.md",
+        "additions": 24,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_004/FORMAL_RUN.md",
+        "additions": 19,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_004/FROZEN_IDENTITY.md",
+        "additions": 18,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_004/GROUND_TRUTH.md",
+        "additions": 21,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_004/KNOWN_LIMITATIONS.md",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_004/OPEN_PR_CONTAMINATION_AUDIT.md",
+        "additions": 24,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_004/POST_INTEGRATION_DRIFT.md",
+        "additions": 29,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_004/RED_BEFORE_GREEN_PROBE.sh",
+        "additions": 98,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_004/SHA256SUMS",
+        "additions": 13,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_004/SHA256SUMS_VERIFY.txt",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_004/raw/FROZEN_TO_ACCEPTED_NAME_STATUS.txt",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ],
+    "headRefName": "release/core-rc-refreeze-004-finalization-corrective-004-window41",
+    "headRefOid": "81c3680ac89569a31f3192c2440b0036cb9f2b8c",
+    "number": 344,
+    "state": "OPEN",
+    "title": "CORE-RC-REFREEZE-004-POST-INTEGRATION-FINALIZATION-CORRECTIVE-004"
+  },
+  {
+    "baseRefName": "main",
+    "files": [
+      {
+        "path": ".github/workflows/core-rc-refreeze-004-formal-gate.yml",
+        "additions": 48,
+        "deletions": 10,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/ARTIFACT_IDENTITY.md",
+        "additions": 3,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/BASELINE_RED_GREEN_RESULT.txt",
+        "additions": 161,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/CANDIDATE_SCOPE.md",
+        "additions": 7,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/CORRECTIVE_CHAIN.md",
+        "additions": 7,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/FINAL_WORKFLOW_IDENTITY.md",
+        "additions": 18,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/FORMAL_RUN.md",
+        "additions": 3,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/FROZEN_IDENTITY.md",
+        "additions": 8,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/GROUND_TRUTH.md",
+        "additions": 13,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/KNOWN_LIMITATIONS.md",
+        "additions": 4,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/OPEN_PR_CONTAMINATION_AUDIT.md",
+        "additions": 7,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/POST_INTEGRATION_DRIFT.md",
+        "additions": 19,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/RED_BEFORE_GREEN_PROBE.sh",
+        "additions": 98,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/SHA256SUMS",
+        "additions": 26,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/SHA256SUMS_VERIFY.txt",
+        "additions": 26,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/raw/CARRY_FORWARD_PROBE_BLOBS.txt",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/raw/FROZEN_TO_ACCEPTED_NAME_STATUS.txt",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/raw/WORKFLOW_REFERENCED_PROBE_PATHS.txt",
+        "additions": 40,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/raw/open_prs.json",
+        "additions": 313,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/raw/pr_325_changed_files.txt",
+        "additions": 22,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/raw/pr_330_changed_files.txt",
+        "additions": 46,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/raw/pr_336_changed_files.txt",
+        "additions": 68,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/raw/pr_337_changed_files.txt",
+        "additions": 12,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/raw/pr_339_changed_files.txt",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/raw/pr_340_changed_files.txt",
+        "additions": 13,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/raw/pr_341_changed_files.txt",
+        "additions": 13,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/raw/pr_342_changed_files.txt",
+        "additions": 16,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/raw/pr_343_changed_files.txt",
+        "additions": 16,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_005/raw/pr_344_changed_files.txt",
+        "additions": 16,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ],
+    "headRefName": "release/core-rc-refreeze-004-finalization-corrective-005-window42",
+    "headRefOid": "87f0ddcdba6d36af15e0745dc7c843bbe3b3e166",
+    "number": 345,
+    "state": "OPEN",
+    "title": "CORE-RC-REFREEZE-004-POST-INTEGRATION-FINALIZATION-CORRECTIVE-005"
+  },
+  {
+    "baseRefName": "main",
+    "files": [
+      {
+        "path": ".github/workflows/core_rc_refreeze_004_corrective_006.yml",
+        "additions": 844,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/ARTIFACT_IDENTITY.md",
+        "additions": 8,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/FORMAL_RUN.md",
+        "additions": 13,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/RED_BEFORE_GREEN_PROBE.sh",
+        "additions": 98,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/raw/BASELINE_RED_GREEN_RESULT.txt",
+        "additions": 163,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/raw/CARRY_FORWARD_PROBE_BLOBS.txt",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/raw/SHA256SUMS",
+        "additions": 19,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/raw/SHA256SUMS_VERIFY.txt",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/raw/TEXT_BYTE_HYGIENE.txt",
+        "additions": 68,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/raw/WORKFLOW_REFERENCED_PROBE_PATHS.txt",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/raw/open_prs.json",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/raw/pr_325_changed_files.txt",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/raw/pr_330_changed_files.txt",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/raw/pr_336_changed_files.txt",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/raw/pr_337_changed_files.txt",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/raw/pr_339_changed_files.txt",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/raw/pr_340_changed_files.txt",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/raw/pr_341_changed_files.txt",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/raw/pr_342_changed_files.txt",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/raw/pr_343_changed_files.txt",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/raw/pr_344_changed_files.txt",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_006/raw/pr_345_changed_files.txt",
+        "additions": 0,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ],
+    "headRefName": "release/core-rc-refreeze-004-finalization-corrective-006-window43",
+    "headRefOid": "3bd970e16663a1825d184cfb76c6303a3502fd60",
+    "number": 346,
+    "state": "OPEN",
+    "title": "CORE-RC-REFREEZE-004-POST-INTEGRATION-FINALIZATION-CORRECTIVE-006"
+  }
+]
