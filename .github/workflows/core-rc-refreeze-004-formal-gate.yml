@@ -3,7 +3,7 @@ name: core-rc-refreeze-004-formal-gate
 on:
   push:
     branches:
-      - "arena/01a10c8c-haneof-aios-core-v3-0"
+      - "release/core-rc-refreeze-004-finalization-corrective-003-window40"
   workflow_dispatch:
 
 permissions:
@@ -34,7 +34,7 @@ env:
   FORMAL_PYTHON: "3.12.14"
   FORMAL_PYDANTIC: "2.13.5"
   FORMAL_PYTEST: "8.4.2"
-  CANONICAL_CORRECTIVE_BRANCH: "arena/01a10c8c-haneof-aios-core-v3-0"
+  CANONICAL_CORRECTIVE_BRANCH: "release/core-rc-refreeze-004-finalization-corrective-003-window40"
 
 jobs:
   rc004-freeze-gate:
