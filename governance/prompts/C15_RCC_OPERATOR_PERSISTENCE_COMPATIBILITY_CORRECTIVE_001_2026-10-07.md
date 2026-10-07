@@ -28,11 +28,11 @@ Start with `git fetch --all --prune` and verify live `main` is the PM-integrated
 
 Navigation identities at release time:
 
-- live main / RC004 finalization integration merge: `08585f9e0b2ca80cb7eacbb55b5f1c206eb10bcb`
+- accepted RC004 finalization integration merge: `08585f9e0b2ca80cb7eacbb55b5f1c206eb10bcb`
 - accepted Corrective-008 head: `8aec087367ead24cb9c0a40d7fd97beb783066cb`
 - frozen Core software: `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`
 
-If main moved, stop for PM adjudication before editing.
+Current `main` may be a governance-only descendant of the accepted integration merge. Before editing, prove `08585f9e0b2ca80cb7eacbb55b5f1c206eb10bcb..origin/main` contains only governance/checkpoint/prompt documentation changes and zero `src/**`, `tests/**`, `tools/**`, package/dependency, or `.github/workflows/**` drift. If any non-governance drift exists, stop for PM adjudication. Construct the Window 49 branch from the fresh verified current `main`.
 
 ## Strict scope
 
