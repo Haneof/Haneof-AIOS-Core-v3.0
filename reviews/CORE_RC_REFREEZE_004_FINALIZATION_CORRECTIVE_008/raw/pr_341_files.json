@@ -1,0 +1,148 @@
+{
+  "files": [
+    {
+      "additions": 20,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/7abfceecbc681d45f196ed86691fdd2e02acb263/.github%2Fworkflows%2Fcore-rc-refreeze-004-formal-gate.yml",
+      "changes": 31,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/.github%2Fworkflows%2Fcore-rc-refreeze-004-formal-gate.yml?ref=7abfceecbc681d45f196ed86691fdd2e02acb263",
+      "deletions": 11,
+      "filename": ".github/workflows/core-rc-refreeze-004-formal-gate.yml",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/7abfceecbc681d45f196ed86691fdd2e02acb263/.github%2Fworkflows%2Fcore-rc-refreeze-004-formal-gate.yml",
+      "sha": "8aa2ccc62b5af9c34a6c92cb278606606e16b392",
+      "status": "modified"
+    },
+    {
+      "additions": 0,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FARTIFACT_IDENTITY.md",
+      "changes": 0,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FARTIFACT_IDENTITY.md?ref=7abfceecbc681d45f196ed86691fdd2e02acb263",
+      "deletions": 0,
+      "filename": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/ARTIFACT_IDENTITY.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FARTIFACT_IDENTITY.md",
+      "sha": "1a81827e4262cf7e65989e121a31db60c32fe3d4",
+      "status": "added"
+    },
+    {
+      "additions": 0,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FCANDIDATE_SCOPE.md",
+      "changes": 0,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FCANDIDATE_SCOPE.md?ref=7abfceecbc681d45f196ed86691fdd2e02acb263",
+      "deletions": 0,
+      "filename": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/CANDIDATE_SCOPE.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FCANDIDATE_SCOPE.md",
+      "sha": "15497243c6826a67560855893d4f4e4a47e37100",
+      "status": "added"
+    },
+    {
+      "additions": 0,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FCORRECTIVE_CHAIN.md",
+      "changes": 0,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FCORRECTIVE_CHAIN.md?ref=7abfceecbc681d45f196ed86691fdd2e02acb263",
+      "deletions": 0,
+      "filename": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/CORRECTIVE_CHAIN.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FCORRECTIVE_CHAIN.md",
+      "sha": "7d2dcd91442eff8e7919024112b2b9a323e10a68",
+      "status": "added"
+    },
+    {
+      "additions": 0,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FFINAL_WORKFLOW_IDENTITY.md",
+      "changes": 0,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FFINAL_WORKFLOW_IDENTITY.md?ref=7abfceecbc681d45f196ed86691fdd2e02acb263",
+      "deletions": 0,
+      "filename": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/FINAL_WORKFLOW_IDENTITY.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FFINAL_WORKFLOW_IDENTITY.md",
+      "sha": "f2e971b8d310f7bb8c67bf5b250648b42060f517",
+      "status": "added"
+    },
+    {
+      "additions": 0,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FFORMAL_RUN.md",
+      "changes": 0,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FFORMAL_RUN.md?ref=7abfceecbc681d45f196ed86691fdd2e02acb263",
+      "deletions": 0,
+      "filename": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/FORMAL_RUN.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FFORMAL_RUN.md",
+      "sha": "6e99ff9a803661679cc960bcdb15462a404b9278",
+      "status": "added"
+    },
+    {
+      "additions": 0,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FFROZEN_IDENTITY.md",
+      "changes": 0,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FFROZEN_IDENTITY.md?ref=7abfceecbc681d45f196ed86691fdd2e02acb263",
+      "deletions": 0,
+      "filename": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/FROZEN_IDENTITY.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FFROZEN_IDENTITY.md",
+      "sha": "d462a100b4e054d3eee8206100e28704b4466c18",
+      "status": "added"
+    },
+    {
+      "additions": 0,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FGROUND_TRUTH.md",
+      "changes": 0,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FGROUND_TRUTH.md?ref=7abfceecbc681d45f196ed86691fdd2e02acb263",
+      "deletions": 0,
+      "filename": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/GROUND_TRUTH.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FGROUND_TRUTH.md",
+      "sha": "2585da98fd0546dd4f1dfa7e0907dcba6862fa6f",
+      "status": "added"
+    },
+    {
+      "additions": 0,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FKNOWN_LIMITATIONS.md",
+      "changes": 0,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FKNOWN_LIMITATIONS.md?ref=7abfceecbc681d45f196ed86691fdd2e02acb263",
+      "deletions": 0,
+      "filename": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/KNOWN_LIMITATIONS.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FKNOWN_LIMITATIONS.md",
+      "sha": "d86e20ad17074b740fac76eec3b51b11b19b7085",
+      "status": "added"
+    },
+    {
+      "additions": 0,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FOPEN_PR_CONTAMINATION_AUDIT.md",
+      "changes": 0,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FOPEN_PR_CONTAMINATION_AUDIT.md?ref=7abfceecbc681d45f196ed86691fdd2e02acb263",
+      "deletions": 0,
+      "filename": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/OPEN_PR_CONTAMINATION_AUDIT.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FOPEN_PR_CONTAMINATION_AUDIT.md",
+      "sha": "5b85e1f1ae2e34a4a37d54aa71d707c5fa06e6b4",
+      "status": "added"
+    },
+    {
+      "additions": 0,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FPOST_INTEGRATION_DRIFT.md",
+      "changes": 0,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FPOST_INTEGRATION_DRIFT.md?ref=7abfceecbc681d45f196ed86691fdd2e02acb263",
+      "deletions": 0,
+      "filename": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/POST_INTEGRATION_DRIFT.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FPOST_INTEGRATION_DRIFT.md",
+      "sha": "19856c2b2760f2dc50fb788909a965f521271649",
+      "status": "added"
+    },
+    {
+      "additions": 0,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FRED_BEFORE_GREEN_PROBE.sh",
+      "changes": 0,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FRED_BEFORE_GREEN_PROBE.sh?ref=7abfceecbc681d45f196ed86691fdd2e02acb263",
+      "deletions": 0,
+      "filename": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/RED_BEFORE_GREEN_PROBE.sh",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FRED_BEFORE_GREEN_PROBE.sh",
+      "sha": "862a2d0770718932c1af464b459ce9a681eb2396",
+      "status": "added"
+    },
+    {
+      "additions": 0,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FSHA256SUMS",
+      "changes": 0,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FSHA256SUMS?ref=7abfceecbc681d45f196ed86691fdd2e02acb263",
+      "deletions": 0,
+      "filename": "reviews/CORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001/SHA256SUMS",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/7abfceecbc681d45f196ed86691fdd2e02acb263/reviews%2FCORE_RC_REFREEZE_004_FINALIZATION_CORRECTIVE_001%2FSHA256SUMS",
+      "sha": "98de1c057e8bc87a4ab8693dc70645ca756ef8b0",
+      "status": "added"
+    }
+  ],
+  "source": "GitHub REST paginated /pulls/{number}/files; file metadata retained; patch bodies omitted"
+}

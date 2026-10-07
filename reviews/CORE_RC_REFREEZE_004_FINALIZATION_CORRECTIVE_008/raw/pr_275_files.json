@@ -1,0 +1,159 @@
+{
+  "files": [
+    {
+      "additions": 2,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2FPROBE.sha256",
+      "changes": 2,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Findependent%2Fc15-a004-acceptance%2FPROBE.sha256?ref=ccd5f539714604f5ff5912b90024f28b82618511",
+      "deletions": 0,
+      "filename": "reviews/independent/c15-a004-acceptance/PROBE.sha256",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2FPROBE.sha256",
+      "sha": "ee2323f9eee63bbc44e479989cd985f59e647051",
+      "status": "added"
+    },
+    {
+      "additions": 8,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2FPROBE_FREEZE.txt",
+      "changes": 8,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Findependent%2Fc15-a004-acceptance%2FPROBE_FREEZE.txt?ref=ccd5f539714604f5ff5912b90024f28b82618511",
+      "deletions": 0,
+      "filename": "reviews/independent/c15-a004-acceptance/PROBE_FREEZE.txt",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2FPROBE_FREEZE.txt",
+      "sha": "5e501372abf60cfa163b9c64369fb32a13e24be9",
+      "status": "added"
+    },
+    {
+      "additions": 8,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2FRAW.sha256",
+      "changes": 8,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Findependent%2Fc15-a004-acceptance%2FRAW.sha256?ref=ccd5f539714604f5ff5912b90024f28b82618511",
+      "deletions": 0,
+      "filename": "reviews/independent/c15-a004-acceptance/RAW.sha256",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2FRAW.sha256",
+      "sha": "b996ac7f3399016ff5a21b41aa39d8b808c8f759",
+      "status": "added"
+    },
+    {
+      "additions": 321,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2FREPORT.md",
+      "changes": 321,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Findependent%2Fc15-a004-acceptance%2FREPORT.md?ref=ccd5f539714604f5ff5912b90024f28b82618511",
+      "deletions": 0,
+      "filename": "reviews/independent/c15-a004-acceptance/REPORT.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2FREPORT.md",
+      "sha": "9c5a8162060f4a32b10a7a762071593a111c64e3",
+      "status": "added"
+    },
+    {
+      "additions": 53,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fprobe.py",
+      "changes": 53,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Findependent%2Fc15-a004-acceptance%2Fprobe.py?ref=ccd5f539714604f5ff5912b90024f28b82618511",
+      "deletions": 0,
+      "filename": "reviews/independent/c15-a004-acceptance/probe.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fprobe.py",
+      "sha": "38eb13711276d6eaaf32ea88d6c5884bb4777947",
+      "status": "added"
+    },
+    {
+      "additions": 29,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fprobe_followup.py",
+      "changes": 29,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Findependent%2Fc15-a004-acceptance%2Fprobe_followup.py?ref=ccd5f539714604f5ff5912b90024f28b82618511",
+      "deletions": 0,
+      "filename": "reviews/independent/c15-a004-acceptance/probe_followup.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fprobe_followup.py",
+      "sha": "1f264159b004646cfc0834a5719373030f58ae00",
+      "status": "added"
+    },
+    {
+      "additions": 5,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Ffinal-revalidation.txt",
+      "changes": 5,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Ffinal-revalidation.txt?ref=ccd5f539714604f5ff5912b90024f28b82618511",
+      "deletions": 0,
+      "filename": "reviews/independent/c15-a004-acceptance/raw/final-revalidation.txt",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Ffinal-revalidation.txt",
+      "sha": "2c57453fcbf35f7d5e9b0a45032868e3bcbaede8",
+      "status": "added"
+    },
+    {
+      "additions": 20,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Ffollowup.jsonl",
+      "changes": 20,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Ffollowup.jsonl?ref=ccd5f539714604f5ff5912b90024f28b82618511",
+      "deletions": 0,
+      "filename": "reviews/independent/c15-a004-acceptance/raw/followup.jsonl",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Ffollowup.jsonl",
+      "sha": "1867dbe5ccc349225ef06630c087c50a3839910d",
+      "status": "added"
+    },
+    {
+      "additions": 0,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Ffollowup.stderr",
+      "changes": 0,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Ffollowup.stderr?ref=ccd5f539714604f5ff5912b90024f28b82618511",
+      "deletions": 0,
+      "filename": "reviews/independent/c15-a004-acceptance/raw/followup.stderr",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Ffollowup.stderr",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "status": "added"
+    },
+    {
+      "additions": 1,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Fpr273.json",
+      "changes": 1,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Fpr273.json?ref=ccd5f539714604f5ff5912b90024f28b82618511",
+      "deletions": 0,
+      "filename": "reviews/independent/c15-a004-acceptance/raw/pr273.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Fpr273.json",
+      "sha": "b88124ab6f828f3eaae074eb5746ccd6ef897ea3",
+      "status": "added"
+    },
+    {
+      "additions": 35,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Fprobe.jsonl",
+      "changes": 35,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Fprobe.jsonl?ref=ccd5f539714604f5ff5912b90024f28b82618511",
+      "deletions": 0,
+      "filename": "reviews/independent/c15-a004-acceptance/raw/probe.jsonl",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Fprobe.jsonl",
+      "sha": "ff07b291ce494d9503773ddbea98fce169d152e4",
+      "status": "added"
+    },
+    {
+      "additions": 0,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Fprobe.stderr",
+      "changes": 0,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Fprobe.stderr?ref=ccd5f539714604f5ff5912b90024f28b82618511",
+      "deletions": 0,
+      "filename": "reviews/independent/c15-a004-acceptance/raw/probe.stderr",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Fprobe.stderr",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "status": "added"
+    },
+    {
+      "additions": 158,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Frecovery-timeline.txt",
+      "changes": 158,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Frecovery-timeline.txt?ref=ccd5f539714604f5ff5912b90024f28b82618511",
+      "deletions": 0,
+      "filename": "reviews/independent/c15-a004-acceptance/raw/recovery-timeline.txt",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Frecovery-timeline.txt",
+      "sha": "4b109a902c4aa6af51e621e66cab383019775722",
+      "status": "added"
+    },
+    {
+      "additions": 435,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Fsource-inspection.txt",
+      "changes": 435,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Fsource-inspection.txt?ref=ccd5f539714604f5ff5912b90024f28b82618511",
+      "deletions": 0,
+      "filename": "reviews/independent/c15-a004-acceptance/raw/source-inspection.txt",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/ccd5f539714604f5ff5912b90024f28b82618511/reviews%2Findependent%2Fc15-a004-acceptance%2Fraw%2Fsource-inspection.txt",
+      "sha": "54f746bbfb87ceb9bdf712a4ed756eb1d38d9e76",
+      "status": "added"
+    }
+  ],
+  "source": "GitHub REST paginated /pulls/{number}/files; file metadata retained; patch bodies omitted"
+}

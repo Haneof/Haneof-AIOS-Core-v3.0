@@ -1,0 +1,93 @@
+{
+  "files": [
+    {
+      "additions": 54,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/846b55e63abe7f4d7c25adde013978cce6084556/evidence%2Fw08%2FFINAL_REPORT.md",
+      "changes": 54,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/evidence%2Fw08%2FFINAL_REPORT.md?ref=846b55e63abe7f4d7c25adde013978cce6084556",
+      "deletions": 0,
+      "filename": "evidence/w08/FINAL_REPORT.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/846b55e63abe7f4d7c25adde013978cce6084556/evidence%2Fw08%2FFINAL_REPORT.md",
+      "sha": "6b01eca3ae956b08717e16080e4eb8ec49905d8f",
+      "status": "added"
+    },
+    {
+      "additions": 174,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/846b55e63abe7f4d7c25adde013978cce6084556/evidence%2Fw08%2FOPERATOR_LOG.md",
+      "changes": 174,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/evidence%2Fw08%2FOPERATOR_LOG.md?ref=846b55e63abe7f4d7c25adde013978cce6084556",
+      "deletions": 0,
+      "filename": "evidence/w08/OPERATOR_LOG.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/846b55e63abe7f4d7c25adde013978cce6084556/evidence%2Fw08%2FOPERATOR_LOG.md",
+      "sha": "5801e2aa6741404e89b8e08a97f1d21c13022cdd",
+      "status": "added"
+    },
+    {
+      "additions": 37,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/846b55e63abe7f4d7c25adde013978cce6084556/evidence%2Fw08%2FPM_ACCEPTANCE_BRIEF.md",
+      "changes": 37,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/evidence%2Fw08%2FPM_ACCEPTANCE_BRIEF.md?ref=846b55e63abe7f4d7c25adde013978cce6084556",
+      "deletions": 0,
+      "filename": "evidence/w08/PM_ACCEPTANCE_BRIEF.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/846b55e63abe7f4d7c25adde013978cce6084556/evidence%2Fw08%2FPM_ACCEPTANCE_BRIEF.md",
+      "sha": "0b1d31678baba46dda4a67196daa36422cbf106a",
+      "status": "added"
+    },
+    {
+      "additions": 4,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/846b55e63abe7f4d7c25adde013978cce6084556/evidence%2Fw08%2FREADME.txt",
+      "changes": 4,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/evidence%2Fw08%2FREADME.txt?ref=846b55e63abe7f4d7c25adde013978cce6084556",
+      "deletions": 0,
+      "filename": "evidence/w08/README.txt",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/846b55e63abe7f4d7c25adde013978cce6084556/evidence%2Fw08%2FREADME.txt",
+      "sha": "ab557cc107b67bf1bd41011af42f63dfa4e749e7",
+      "status": "added"
+    },
+    {
+      "additions": 21,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/846b55e63abe7f4d7c25adde013978cce6084556/evidence%2Fw08%2FTERMINAL_VERIFICATION.json",
+      "changes": 21,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/evidence%2Fw08%2FTERMINAL_VERIFICATION.json?ref=846b55e63abe7f4d7c25adde013978cce6084556",
+      "deletions": 0,
+      "filename": "evidence/w08/TERMINAL_VERIFICATION.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/846b55e63abe7f4d7c25adde013978cce6084556/evidence%2Fw08%2FTERMINAL_VERIFICATION.json",
+      "sha": "5e9f5b4689f5099ff75b090e07a239bfb68e33a5",
+      "status": "added"
+    },
+    {
+      "additions": 29,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/846b55e63abe7f4d7c25adde013978cce6084556/evidence%2Fw08%2FW08_DEEP_CHAIN_VERIFY.json",
+      "changes": 29,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/evidence%2Fw08%2FW08_DEEP_CHAIN_VERIFY.json?ref=846b55e63abe7f4d7c25adde013978cce6084556",
+      "deletions": 0,
+      "filename": "evidence/w08/W08_DEEP_CHAIN_VERIFY.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/846b55e63abe7f4d7c25adde013978cce6084556/evidence%2Fw08%2FW08_DEEP_CHAIN_VERIFY.json",
+      "sha": "362fa571b72ad5c299613a7d489f60ff2541425e",
+      "status": "added"
+    },
+    {
+      "additions": 27,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/846b55e63abe7f4d7c25adde013978cce6084556/evidence%2Fw08%2FW08_INDEPENDENT_VERIFY.json",
+      "changes": 27,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/evidence%2Fw08%2FW08_INDEPENDENT_VERIFY.json?ref=846b55e63abe7f4d7c25adde013978cce6084556",
+      "deletions": 0,
+      "filename": "evidence/w08/W08_INDEPENDENT_VERIFY.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/846b55e63abe7f4d7c25adde013978cce6084556/evidence%2Fw08%2FW08_INDEPENDENT_VERIFY.json",
+      "sha": "765051ef449f4b2018bf8ae63dc58b5426879694",
+      "status": "added"
+    },
+    {
+      "additions": 29,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/846b55e63abe7f4d7c25adde013978cce6084556/evidence%2Fw08%2Fevidence-incident-reconciliation.md",
+      "changes": 29,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/evidence%2Fw08%2Fevidence-incident-reconciliation.md?ref=846b55e63abe7f4d7c25adde013978cce6084556",
+      "deletions": 0,
+      "filename": "evidence/w08/evidence-incident-reconciliation.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/846b55e63abe7f4d7c25adde013978cce6084556/evidence%2Fw08%2Fevidence-incident-reconciliation.md",
+      "sha": "afcc57a62aab29f5016158c838a29983f1b1b16c",
+      "status": "added"
+    }
+  ],
+  "source": "GitHub REST paginated /pulls/{number}/files; file metadata retained; patch bodies omitted"
+}

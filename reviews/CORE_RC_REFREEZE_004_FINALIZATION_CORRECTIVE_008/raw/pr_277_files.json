@@ -1,0 +1,313 @@
+{
+  "files": [
+    {
+      "additions": 125,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2FFAILURE_ADJUDICATION.md",
+      "changes": 125,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2FFAILURE_ADJUDICATION.md?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/FAILURE_ADJUDICATION.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2FFAILURE_ADJUDICATION.md",
+      "sha": "38541d61da0e6f72a7a10c669c511f666caed835",
+      "status": "added"
+    },
+    {
+      "additions": 116,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2FFREEZE_MANIFEST.json",
+      "changes": 116,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2FFREEZE_MANIFEST.json?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/FREEZE_MANIFEST.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2FFREEZE_MANIFEST.json",
+      "sha": "65261f2e0dda38c0867c38ba882dc17842831861",
+      "status": "added"
+    },
+    {
+      "additions": 26,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2FMANIFEST.sha256",
+      "changes": 26,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2FMANIFEST.sha256?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/MANIFEST.sha256",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2FMANIFEST.sha256",
+      "sha": "827347b05a7393d56657b1618e65aaba8996f0f6",
+      "status": "added"
+    },
+    {
+      "additions": 66,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2FREADME.md",
+      "changes": 66,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2FREADME.md?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/README.md",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2FREADME.md",
+      "sha": "6adad9f02d938f8fbc1201fdbafdaa1aff9c6382",
+      "status": "added"
+    },
+    {
+      "additions": 1297,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fdecision_requests%2Freq-0001-model_directive-6510beb0.json",
+      "changes": 1297,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fdecision_requests%2Freq-0001-model_directive-6510beb0.json?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/decision_requests/req-0001-model_directive-6510beb0.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fdecision_requests%2Freq-0001-model_directive-6510beb0.json",
+      "sha": "326bda10dad299cd18536525d65b68f32fcf5c0d",
+      "status": "added"
+    },
+    {
+      "additions": 916,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fdecision_requests%2Freq-0002-model_directive-3c99d45b.json",
+      "changes": 916,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fdecision_requests%2Freq-0002-model_directive-3c99d45b.json?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/decision_requests/req-0002-model_directive-3c99d45b.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fdecision_requests%2Freq-0002-model_directive-3c99d45b.json",
+      "sha": "8a27cb2ea46fb131e225f3dc185adcd896f168a5",
+      "status": "added"
+    },
+    {
+      "additions": 6,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fdecision_responses%2Freq-0001-model_directive-6510beb0.json",
+      "changes": 6,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fdecision_responses%2Freq-0001-model_directive-6510beb0.json?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/decision_responses/req-0001-model_directive-6510beb0.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fdecision_responses%2Freq-0001-model_directive-6510beb0.json",
+      "sha": "9d6955b61b582cd6768303aec3cfbc122ecdf446",
+      "status": "added"
+    },
+    {
+      "additions": 70,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fdecision_responses%2Freq-0002-model_directive-3c99d45b.json",
+      "changes": 70,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fdecision_responses%2Freq-0002-model_directive-3c99d45b.json?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/decision_responses/req-0002-model_directive-3c99d45b.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fdecision_responses%2Freq-0002-model_directive-3c99d45b.json",
+      "sha": "ec1b0683e4c8c36d5a7bdbd95a9f4eb7f6c6f613",
+      "status": "added"
+    },
+    {
+      "additions": 1,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fevents%2Fcursor_01_event.json",
+      "changes": 1,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fevents%2Fcursor_01_event.json?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/events/cursor_01_event.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fevents%2Fcursor_01_event.json",
+      "sha": "a883e5e6e9023dc6047b34d177ac49a2e5910e8f",
+      "status": "added"
+    },
+    {
+      "additions": 6,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fexchange_ledger.jsonl",
+      "changes": 6,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fexchange_ledger.jsonl?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/exchange_ledger.jsonl",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fexchange_ledger.jsonl",
+      "sha": "2faf37595b82ee5ba8cb87b2202da2abedc3fdf0",
+      "status": "added"
+    },
+    {
+      "additions": 3,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fexports%2Fbackground_model_attempts.jsonl",
+      "changes": 3,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fexports%2Fbackground_model_attempts.jsonl?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/exports/background_model_attempts.jsonl",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fexports%2Fbackground_model_attempts.jsonl",
+      "sha": "ec7aa0e62205eb120bda941d505565f2b0c63cce",
+      "status": "added"
+    },
+    {
+      "additions": 2,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fexports%2Fmetering_records.jsonl",
+      "changes": 2,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fexports%2Fmetering_records.jsonl?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/exports/metering_records.jsonl",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fexports%2Fmetering_records.jsonl",
+      "sha": "7e9d8ebd09ae2871e7103b5f990e58aa774d86cd",
+      "status": "added"
+    },
+    {
+      "additions": 1,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fexports%2Fturn_executions.jsonl",
+      "changes": 1,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fexports%2Fturn_executions.jsonl?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/exports/turn_executions.jsonl",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fexports%2Fturn_executions.jsonl",
+      "sha": "8124368b3a6ab4a9e21dc69034cf9eecb71db4c6",
+      "status": "added"
+    },
+    {
+      "additions": 14,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fexports%2Fworld_object_index.jsonl",
+      "changes": 14,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fexports%2Fworld_object_index.jsonl?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/exports/world_object_index.jsonl",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fexports%2Fworld_object_index.jsonl",
+      "sha": "bad8830ceaf0d261cbe68c5ebe2fc5693f12c52b",
+      "status": "added"
+    },
+    {
+      "additions": 10,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2FENVIRONMENT_RECORD.json",
+      "changes": 10,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2FENVIRONMENT_RECORD.json?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/harness/ENVIRONMENT_RECORD.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2FENVIRONMENT_RECORD.json",
+      "sha": "fe7c206904030deaa54e4fce47c91b7ad2cba607",
+      "status": "added"
+    },
+    {
+      "additions": 65,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2FEXCHANGE_LEDGER_SCHEMA.json",
+      "changes": 65,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2FEXCHANGE_LEDGER_SCHEMA.json?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/harness/EXCHANGE_LEDGER_SCHEMA.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2FEXCHANGE_LEDGER_SCHEMA.json",
+      "sha": "f41ce09aa742c93e12a45dcd81a877ffd4f5bae7",
+      "status": "added"
+    },
+    {
+      "additions": 6,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2FSHA256SUMS",
+      "changes": 6,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2FSHA256SUMS?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/harness/SHA256SUMS",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2FSHA256SUMS",
+      "sha": "7eea8674c8b8433a44241ee165965780894c222c",
+      "status": "added"
+    },
+    {
+      "additions": 10,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2FSYNTHETIC_TEST_OUTPUT.txt",
+      "changes": 10,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2FSYNTHETIC_TEST_OUTPUT.txt?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/harness/SYNTHETIC_TEST_OUTPUT.txt",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2FSYNTHETIC_TEST_OUTPUT.txt",
+      "sha": "072d1dd001f8da0c611838b375f97543c9b01299",
+      "status": "added"
+    },
+    {
+      "additions": 464,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2Fexchange_bridge.py",
+      "changes": 464,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2Fexchange_bridge.py?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/harness/exchange_bridge.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2Fexchange_bridge.py",
+      "sha": "d8d3cb65672b2bad0ac4cac5c42b614c69646945",
+      "status": "added"
+    },
+    {
+      "additions": 8,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2Fharness_freeze.json",
+      "changes": 8,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2Fharness_freeze.json?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/harness/harness_freeze.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2Fharness_freeze.json",
+      "sha": "eff97fa2933b108c2f75ddc438e2bd8b8034354e",
+      "status": "added"
+    },
+    {
+      "additions": 609,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2Frunner.py",
+      "changes": 609,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2Frunner.py?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/harness/runner.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2Frunner.py",
+      "sha": "13d09c91046faca7137adb181c880641a1f0efd7",
+      "status": "added"
+    },
+    {
+      "additions": 261,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2Ftest_exchange_bridge.py",
+      "changes": 261,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2Ftest_exchange_bridge.py?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/harness/test_exchange_bridge.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fharness%2Ftest_exchange_bridge.py",
+      "sha": "85983732bcd5ad49c3374e24682f7bacaf81a369",
+      "status": "added"
+    },
+    {
+      "additions": 12,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fidentity.json",
+      "changes": 12,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fidentity.json?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/identity.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fidentity.json",
+      "sha": "349daf2daaa39a3501474aa7702de26fe73988f2",
+      "status": "added"
+    },
+    {
+      "additions": 1,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Freceipts%2Fcursor_01_ack_stdout.json",
+      "changes": 1,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Freceipts%2Fcursor_01_ack_stdout.json?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/receipts/cursor_01_ack_stdout.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Freceipts%2Fcursor_01_ack_stdout.json",
+      "sha": "e4344323c6aae47f5ea1c3a231d024f3d07ea3d0",
+      "status": "added"
+    },
+    {
+      "additions": 1,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Freceipts%2Fcursor_01_ingest_stdout.json",
+      "changes": 1,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Freceipts%2Fcursor_01_ingest_stdout.json?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/receipts/cursor_01_ingest_stdout.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Freceipts%2Fcursor_01_ingest_stdout.json",
+      "sha": "052200f1d4df20888e4c59855d76e30b28b50fcb",
+      "status": "added"
+    },
+    {
+      "additions": 32,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Frelease-state.json",
+      "changes": 32,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Frelease-state.json?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/release-state.json",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Frelease-state.json",
+      "sha": "5a684d6fba37a386d452ad0f41d3d3655c5db4fc",
+      "status": "added"
+    },
+    {
+      "additions": 142,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fresident_agent.py",
+      "changes": 142,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fresident_agent.py?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/resident_agent.py",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fresident_agent.py",
+      "sha": "5cadef25b4073e216b5ce3813c088902a2abbdc4",
+      "status": "added"
+    },
+    {
+      "additions": 0,
+      "blob_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/blob/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fworld.db",
+      "changes": 0,
+      "contents_url": "https://api.github.com/repos/Haneof/Haneof-AIOS-Core-v3.0/contents/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fworld.db?ref=2968299beea5fe5ec2dc93418d0fa7f3e035ec40",
+      "deletions": 0,
+      "filename": "reviews/internal_habitation/c15-rcc/v1/resident/runs/c15-rcc-res-a-rerun-004-corrective-001/world.db",
+      "raw_url": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/raw/2968299beea5fe5ec2dc93418d0fa7f3e035ec40/reviews%2Finternal_habitation%2Fc15-rcc%2Fv1%2Fresident%2Fruns%2Fc15-rcc-res-a-rerun-004-corrective-001%2Fworld.db",
+      "sha": "e93e71118acb730940500fbf45542bef79d35d07",
+      "status": "added"
+    }
+  ],
+  "source": "GitHub REST paginated /pulls/{number}/files; file metadata retained; patch bodies omitted"
+}

@@ -1,0 +1,12 @@
+.github/workflows/core-background-trusted-return-recovery-001.yml
+src/aios_core/execution/service.py
+src/aios_core/runtime/background_attempt.py
+src/aios_core/runtime/turn_runtime.py
+src/aios_core/storage/sqlite_store.py
+tests/integration/test_core_background_response_recovery_001.py
+tests/integration/test_core_background_trusted_return_adversarial_001.py
+tests/integration/test_core_background_trusted_return_r5_001.py
+tests/integration/test_core_background_trusted_return_r5_conflicts_001.py
+tests/integration/test_core_background_trusted_return_recovery_001.py
+tests/integration/test_core_gap_fix_002_background_attempts.py
+tests/runtime/test_turn_execution_recovery.py

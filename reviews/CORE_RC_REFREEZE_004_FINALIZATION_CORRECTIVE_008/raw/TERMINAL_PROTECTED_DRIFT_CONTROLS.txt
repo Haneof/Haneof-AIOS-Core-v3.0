@@ -1,0 +1,18 @@
+case=no-drift expected=PASS actual=PASS rc=0
+  TERMINAL_PROTECTED_DRIFT=PASS
+case=late-workflow-add-and-modify expected=FAIL_CLOSED actual=FAIL_CLOSED rc=1
+  TERMINAL_UNADJUDICATED_PROTECTED_DRIFT=FAIL
+case=late-pyproject-change expected=FAIL_CLOSED actual=FAIL_CLOSED rc=1
+  TERMINAL_UNADJUDICATED_PROTECTED_DRIFT=FAIL
+case=setup-manifest-requirements expected=FAIL_CLOSED actual=FAIL_CLOSED rc=1
+  TERMINAL_UNADJUDICATED_PROTECTED_DRIFT=FAIL
+case=existing-src-and-tests-protection expected=FAIL_CLOSED actual=FAIL_CLOSED rc=1
+  TERMINAL_UNADJUDICATED_PROTECTED_DRIFT=FAIL
+case=protected-deletion expected=FAIL_CLOSED actual=FAIL_CLOSED rc=1
+  TERMINAL_UNADJUDICATED_PROTECTED_DRIFT=FAIL
+case=unprotected-review-evidence expected=PASS actual=PASS rc=0
+  TERMINAL_PROTECTED_DRIFT=PASS
+SHELL_MATCH=FORMAL_WORKFLOW_CALLS_THIS_EXACT_HELPER
+TERMINAL_PROTECTED_DRIFT_CONTROLS=PASS
+
+EXIT=0

@@ -1,0 +1,26 @@
+{
+  "source": "authenticated GitHub connector list_pr_changed_filenames (all pages)",
+  "number": 113,
+  "filenames": [
+    ".github/workflows/c15-cognition-evidence-policy.yml",
+    "AIOS_v3.0_CURRENT_CHECKPOINT.md",
+    "governance/AIOS_SINGLE_WINDOW_TASK_BOARD.md",
+    "governance/C15_RCC_COGNITION_SEMANTIC_FREEZE_2026-09-23.md",
+    "governance/C15_RCC_HARDENING_MASTER_STATUS_REPORT_2026-09-23.md",
+    "governance/C15_RCC_HARDEN_DECISION_001_2026-09-23.md",
+    "reviews/C15_RCC_EVIDENCE_POLICY_001_COMPLETION_EVIDENCE.md",
+    "reviews/C15_RCC_EVIDENCE_POLICY_001_TEST_ADAPTATION_REVIEW_2026-09-23.md",
+    "src/aios_core/ai_world/cognition.py",
+    "src/aios_core/policy/__init__.py",
+    "src/aios_core/policy/evidence.py",
+    "src/aios_core/revision/service.py",
+    "src/aios_core/runtime/turn_runtime.py",
+    "src/aios_core/summaries/cognitive_derivation.py",
+    "src/aios_core/writeback/cognition.py",
+    "tests/habitation/test_current_core_target.py",
+    "tests/integration/test_v3_ai_world.py",
+    "tests/integration/test_v3_c15_cognition_evidence_policy.py",
+    "tests/integration/test_v3_c15_cognition_fields.py",
+    "tests/integration/test_v3_cognition_revision.py"
+  ]
+}
