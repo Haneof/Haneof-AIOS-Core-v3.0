@@ -1,3 +1,20 @@
+## 2026-10-07 — RC004 FINALIZATION PM INTEGRATED / WINDOW 49 C15 OPERATOR-PERSISTENCE CORRECTIVE RELEASED
+
+- Window 48 Fresh Independent Acceptance = `ACCEPTANCE_PASS / blocker=0 / COMPLETE`.
+- Canonical accepted Corrective-008 candidate = PR #349 exact head `8aec087367ead24cb9c0a40d7fd97beb783066cb`, tree `e24f4415dbf0d8b1abc52fe5b03f0a74ffa1fe1c`.
+- Formal exact-head run = `37639094526` / run #71 / attempt 1 / `workflow_dispatch` / SUCCESS.
+- Mandatory pin = `203874864`; artifact = `11492995124`, digest `sha256:e41127e34bf0659551755661b7cf49250cc8a53507620175e23161189d2aaf02`.
+- PM accepted Window 48 and merged PR #349 by exact-head guarded merge.
+- Integration merge / live main = `08585f9e0b2ca80cb7eacbb55b5f1c206eb10bcb`; parents = pre-merge main `9eba4710e3cd841650191cb89f2126ca5c5b11c3` + accepted head `8aec087367ead24cb9c0a40d7fd97beb783066cb`; merge tree remains `e24f4415dbf0d8b1abc52fe5b03f0a74ffa1fe1c`.
+- Frozen Core software identity remains `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`; RC004 finalization changed workflow/governance/evidence mechanics, not frozen Core product code.
+- RC entry decision ordering is now active: **operator/persistence compatibility corrective -> independent operator IA -> fresh Resident A**.
+- **Unique next READY:** `WINDOW 49 — C15-RCC-OPERATOR-PERSISTENCE-COMPATIBILITY-CORRECTIVE-001`.
+- Window 49 scope is downstream C15 operator/persistence compatibility only: `tools/c15_persistence/**`, `tests/c15_persistence/**`, and dedicated evidence/governance. It may adapt the operator harness to accepted Core trust/recovery semantics but MUST NOT modify `src/aios_core/**`, product tests outside `tests/c15_persistence/**`, RC004 workflow, or weaken trusted-return authenticity.
+- Required RED-first: fresh reproduce the current downstream C15 failures on live main and classify exact failure identities before edits. Historical "45 failed" is navigation only, not a count to trust.
+- Required safety: no local self-mint/authenticity shortcut, no verifier bypass, no false `not_submitted`, no second request after durable binding, no Resident-visible surface drift.
+- Window 49 stops at `REVIEW_READY / READY_FOR_FRESH_INDEPENDENT_ACCEPTANCE / DO NOT MERGE`.
+- Resident A, Resident B release, evaluator, and public release remain BLOCKED until the dedicated operator corrective passes Fresh IA.
+
 # AIOS v3.0 单窗口任务执行总表
 
 ## 2026-10-05 — WINDOW 27 ACCEPTANCE_FAIL / WINDOW 28 Corrective-002 RELEASED
