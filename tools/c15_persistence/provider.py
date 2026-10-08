@@ -88,14 +88,20 @@ def ensure_provider_service(mailbox: Path | str, timeout: float = 15.0) -> int:
     pid_file = mailbox / "provider.pid"
     pub_file = mailbox / "provider-public.json"
 
-    if pub_file.is_file():
-        # Verify if an existing provider service is actually responsive for THIS mailbox
+    if pid_file.is_file():
         try:
-            res = _send_provider_command(mailbox, {"cmd": "status"}, timeout=0.15, auto_ensure=False)
-            if res.get("status") == "running":
-                provider_pid = int(res.get("provider_pid", 0))
-                if provider_pid > 0 and provider_pid != os.getpid():
-                    return provider_pid
+            pid = int(pid_file.read_text(encoding="utf-8").strip())
+            if _is_pid_alive(pid) and pid != os.getpid():
+                # Process is alive! Verify if responsive
+                try:
+                    res = _send_provider_command(mailbox, {"cmd": "status"}, timeout=2.0, auto_ensure=False)
+                    if res.get("status") == "running":
+                        provider_pid = int(res.get("provider_pid", 0))
+                        if provider_pid > 0 and provider_pid != os.getpid():
+                            return provider_pid
+                except Exception:
+                    if pub_file.is_file():
+                        return pid
         except Exception:
             pass
 
@@ -123,7 +129,7 @@ def ensure_provider_service(mailbox: Path | str, timeout: float = 15.0) -> int:
     while time.time() - start < timeout:
         if pub_file.is_file() and pid_file.is_file():
             try:
-                res = _send_provider_command(mailbox, {"cmd": "status"}, timeout=0.1, auto_ensure=False)
+                res = _send_provider_command(mailbox, {"cmd": "status"}, timeout=0.5, auto_ensure=False)
                 if res.get("status") == "running":
                     return int(res.get("provider_pid", 0))
             except Exception:
