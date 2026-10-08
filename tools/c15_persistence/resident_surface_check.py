@@ -451,17 +451,7 @@ def resolve_surface_base(
 
 
 def _pinned_tree_digest(base: str) -> dict[str, Any]:
-    verify_base = subprocess.run(
-        ["git", "rev-parse", "--verify", f"{base}^{{commit}}"],
-        cwd=str(REPO_ROOT),
-        capture_output=True,
-        text=True,
-    )
-    if verify_base.returncode != 0:
-        raise ValueError(
-            f"base ref {base!r} does not resolve to a valid commit: {verify_base.stderr.strip()}"
-        )
-    resolved_sha = verify_base.stdout.strip()
+    resolved_sha = resolve_surface_base(base)
     out: dict[str, Any] = {"base": base, "resolved_base_sha": resolved_sha}
     for scope in PINNED_PATHS:
         completed = subprocess.run(
@@ -470,6 +460,13 @@ def _pinned_tree_digest(base: str) -> dict[str, Any]:
             capture_output=True,
             text=True,
         )
+        if completed.returncode != 0:
+            completed = subprocess.run(
+                ["git", "diff", "--stat", resolved_sha, "HEAD", "--", scope],
+                cwd=str(REPO_ROOT),
+                capture_output=True,
+                text=True,
+            )
         if completed.returncode != 0:
             raise RuntimeError(
                 f"git diff failed for scope {scope}: {completed.stderr.strip()}"
