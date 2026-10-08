@@ -155,7 +155,7 @@ class _ControlSession:
             index=index,
             model_handler=self._model_handler,
             late_return_verifier=provider_module.route_b_verifier(),
-            external_return_observer=provider_module.get_provider_observer(),
+            external_return_observer=provider_module.get_provider_observer(self.mailbox),
         )
         runtime.registry.register(
             CapabilitySpec(
@@ -427,43 +427,27 @@ def resolve_surface_base(
             if resolved is not None:
                 return resolved
 
-    # 5. First parent of HEAD (try unshallow if shallow clone)
-    subprocess.run(
-        ["git", "fetch", "--depth=2", "origin", "HEAD"],
-        cwd=repo_str,
-        capture_output=True,
-        text=True,
-    )
-    parent_res = subprocess.run(
-        ["git", "rev-parse", "--verify", "HEAD~1^{commit}"],
-        cwd=repo_str,
-        capture_output=True,
-        text=True,
-    )
-    if parent_res.returncode == 0 and parent_res.stdout.strip():
-        resolved = _verify_commit(parent_res.stdout.strip(), allow_fetch=False)
-        if resolved is not None:
-            return resolved
-
+    # 5. Base authority unresolved: fail closed without guessing or falling back to HEAD/HEAD~1
     raise ValueError(
-        "cannot mechanically resolve a valid resident-surface base commit in current git repository"
+        "cannot mechanically resolve a valid resident-surface base commit in current git repository: "
+        "base authority unresolved (refusing non-authoritative fallback to HEAD/HEAD~1)"
     )
 
 
-def _pinned_tree_digest(base: str) -> dict[str, Any]:
-    resolved_sha = resolve_surface_base(base)
+def _pinned_tree_digest(base: str, repo_root: Path = REPO_ROOT) -> dict[str, Any]:
+    resolved_sha = resolve_surface_base(base, repo_root=repo_root)
     out: dict[str, Any] = {"base": base, "resolved_base_sha": resolved_sha}
     for scope in PINNED_PATHS:
         completed = subprocess.run(
             ["git", "diff", "--stat", f"{resolved_sha}...HEAD", "--", scope],
-            cwd=str(REPO_ROOT),
+            cwd=str(repo_root),
             capture_output=True,
             text=True,
         )
         if completed.returncode != 0:
             completed = subprocess.run(
                 ["git", "diff", "--stat", resolved_sha, "HEAD", "--", scope],
-                cwd=str(REPO_ROOT),
+                cwd=str(repo_root),
                 capture_output=True,
                 text=True,
             )

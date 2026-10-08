@@ -1058,7 +1058,7 @@ class OperatorSession:
             index=index,
             model_handler=self._model_handler,
             late_return_verifier=provider_module.route_b_verifier(),
-            external_return_observer=provider_module.get_provider_observer(),
+            external_return_observer=provider_module.get_provider_observer(self.mailbox),
         )
         self._install_trusted_return_probe(runtime)
         runtime.registry.register(

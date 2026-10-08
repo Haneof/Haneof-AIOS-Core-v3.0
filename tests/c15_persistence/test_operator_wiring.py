@@ -371,11 +371,10 @@ def test_core_receipt_revalidation_rejects_an_operator_invented_receipt() -> Non
         from aios_core.runtime.background_attempt import decode_model_directive
         directive = decode_model_directive(payload)
         context = attempts.late_return_signing_context(attempt_id)
-        assert context is not None
-        from tools.c15_persistence._provider_authority import ProviderSigningAuthority
-        test_authority = ProviderSigningAuthority()
-        test_authority.accept_return_context(None, context)
-        proof_dict = test_authority.sign_exact_provider_response(attempt_id, directive)
+        from tools.c15_persistence import provider as provider_module
+        provider_module.collect(session.mailbox, request_id)
+        proof_dict = provider_module.read_proof(session.mailbox, request_id)
+        assert proof_dict is not None
         proof = proof_dict["authenticity_proof"]
         from datetime import datetime, timezone
         attempts.attach_late_trusted_return(

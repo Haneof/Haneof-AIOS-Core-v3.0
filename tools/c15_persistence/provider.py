@@ -1,4 +1,4 @@
-"""Deterministic, cross-process synthetic provider for the kill/restart probes.
+"""Deterministic, cross-process synthetic provider client for the kill/restart probes.
 
 Why a separate process
 ----------------------
@@ -7,20 +7,14 @@ durable, and which survives the death of the operator process. Writing the
 request to a durable outbox and having a **separate process** answer it gives an
 exact, countable dispatch event that is independent of the operator's memory.
 
-The provider is deliberately dumb and deterministic:
-
-* the reply is a pure function of the exact request bytes, so re-presenting the
-  same request after a restart yields byte-identical reply bytes;
-* a request identity is dispatched **once** - the dispatch ledger is append-only
-  and keyed by request id, so re-presenting an outstanding request never creates
-  a second dispatch;
-* it never inspects Core, never touches World, and never decides anything: it
-  only turns request bytes into reply bytes;
-* provider-side signing authority lives exclusively within the provider boundary
-  and is NEVER exposed to operator or recovery callers.
-
-This stands in for the Resident-facing relay. It is synthetic: no real Resident
-is contacted and no real model provider is called.
+Under the AIOS trust model:
+* Provider-side signing authority lives exclusively within the isolated
+  `provider_process` subprocess boundary (OPERATOR_PID != PROVIDER_PID).
+* This client module contains ONLY public verifier configuration and data-only
+  mailbox IPC dispatch/collection triggers.
+* No private key material (_RSA_D) or signing closures exist in this module.
+* Operator and recovery callers hold only the public `LateReturnVerifier` and
+  rely exclusively on provider-produced proofs across the mailbox boundary.
 """
 
 from __future__ import annotations
@@ -28,8 +22,8 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import subprocess
 import sys
-import time
 from pathlib import Path
 from typing import Any
 
@@ -38,19 +32,10 @@ PROVIDER_NAME = "c15-synthetic-relay"
 MODEL_NAME = "c15-synthetic-model"
 PROVIDER_KEY_ID = "c15-synthetic-provider-key"
 
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(_REPO_ROOT / "src") not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT / "src"))
 
-def _bootstrap() -> None:
-    here = Path(__file__).resolve()
-    for parent in here.parents:
-        if (parent / "src" / "aios_core").is_dir():
-            sys.path.insert(0, str(parent / "src"))
-            return
-
-
-_bootstrap()
-
-from aios_core.runtime import CapabilityCall, ModelCallProvenance, ModelDirective, ModelUsage  # noqa: E402
-from aios_core.runtime.background_attempt import decode_model_directive, encode_model_directive  # noqa: E402
 from aios_core.runtime.late_return import (  # noqa: E402
     ExternalReturnObserver,
     LateReturnSigningContext,
@@ -82,34 +67,27 @@ def route_b_verifier(key_id: str = PROVIDER_KEY_ID) -> LateReturnVerifier:
     )
 
 
-# Internal provider-side authority instance (lazily initialized within provider boundary).
-_provider_authority_instance = None
-
-
-def _get_provider_authority():
-    global _provider_authority_instance
-    if _provider_authority_instance is None:
-        from ._provider_authority import ProviderSigningAuthority
-        _provider_authority_instance = ProviderSigningAuthority(key_id=PROVIDER_KEY_ID)
-    return _provider_authority_instance
-
-
 class ProviderReturnObserver(ExternalReturnObserver):
-    """Provider boundary observer capturing dispatch context outside operator control."""
+    """Provider boundary observer capturing public dispatch context (zero private authority)."""
+
+    def __init__(self, mailbox: Path | None = None) -> None:
+        self.mailbox = Path(mailbox) if mailbox is not None else None
 
     def accept_return_context(
         self, snapshot: object, context: LateReturnSigningContext
     ) -> None:
-        authority = _get_provider_authority()
-        authority.accept_return_context(snapshot, context)
+        if self.mailbox is not None:
+            context_path = self.mailbox / "contexts" / f"{context.attempt_id}.json"
+            context_path.parent.mkdir(parents=True, exist_ok=True)
+            context_path.write_text(
+                json.dumps(context.scope_fields(), sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
 
 
-_observer_instance = ProviderReturnObserver()
-
-
-def get_provider_observer() -> ExternalReturnObserver:
+def get_provider_observer(mailbox: Path | None = None) -> ExternalReturnObserver:
     """Return the provider-side dispatch context observer."""
-    return _observer_instance
+    return ProviderReturnObserver(mailbox=mailbox)
 
 
 def outbox_path(mailbox: Path, request_id: str) -> Path:
@@ -143,128 +121,6 @@ def read_ledger(mailbox: Path) -> list[dict[str, object]]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
-def append_ledger(mailbox: Path, record: dict[str, object]) -> None:
-    path = ledger_path(mailbox)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    fd = os.open(path, os.O_CREAT | os.O_WRONLY | os.O_APPEND, 0o600)
-    with os.fdopen(fd, "a", encoding="utf-8") as stream:
-        stream.write(json.dumps(record, sort_keys=True) + "\n")
-        stream.flush()
-        os.fsync(stream.fileno())
-
-
-def digest(raw: bytes) -> str:
-    return hashlib.sha256(raw).hexdigest()
-
-
-def build_directive(request: bytes) -> ModelDirective:
-    """Deterministic ModelDirective for exact request bytes."""
-    envelope = json.loads(request.decode("utf-8"))
-    request_id = str(envelope["model_request_id"])
-    attempt_id = str(envelope["attempt_id"])
-    round_index = int(envelope["round"])
-    provider = str(envelope["provider"])
-    model = str(envelope["model"])
-    turn_text = str(envelope["resident_visible_payload"])
-
-    if round_index == 0:
-        return ModelDirective(
-            capability_calls=(
-                CapabilityCall(
-                    name=CAPABILITY_NAME,
-                    arguments={"attempt_id": attempt_id, "round": round_index},
-                    call_id=f"{request_id}:c0",
-                ),
-            ),
-            usage=ModelUsage(
-                input_tokens=11,
-                output_tokens=5,
-                total_tokens=16,
-                provider=provider,
-                model=model,
-                request_id=request_id,
-            ),
-            provenance=ModelCallProvenance(
-                provider=provider, model=model, request_id=request_id
-            ),
-        )
-    return ModelDirective(
-        response=f"[synthetic provider] round {round_index} answer for {turn_text[:24]}",
-        usage=ModelUsage(
-            input_tokens=13,
-            output_tokens=7,
-            total_tokens=20,
-            provider=provider,
-            model=model,
-            request_id=request_id,
-        ),
-        provenance=ModelCallProvenance(
-            provider=provider, model=model, request_id=request_id
-        ),
-    )
-
-
-def build_reply(request: bytes) -> bytes:
-    """Deterministic reply bytes for exact request bytes."""
-    directive = build_directive(request)
-    return encode_model_directive(directive).encode("utf-8")
-
-
-def _atomic_write(path: Path, raw: bytes) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temp = path.with_name(path.name + ".tmp")
-    fd = os.open(temp, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
-    with os.fdopen(fd, "wb") as stream:
-        stream.write(raw)
-        stream.flush()
-        os.fsync(stream.fileno())
-    os.replace(temp, path)
-    dir_fd = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
-    try:
-        os.fsync(dir_fd)
-    finally:
-        os.close(dir_fd)
-
-
-def _mirror(mailbox: Path, source: Path, target: Path) -> None:
-    """Keep a stable ``current.*`` slot so re-attach manifests stay meaningful."""
-    if source.is_file():
-        _atomic_write(target, source.read_bytes())
-
-
-def dispatch(mailbox: Path, request_id: str) -> dict[str, object]:
-    """Cross the provider submission boundary exactly once, without returning a reply."""
-    mailbox = Path(mailbox)
-    request_file = outbox_path(mailbox, request_id)
-    if not request_file.is_file():
-        raise SystemExit(f"provider: no durable request for {request_id}")
-    request = request_file.read_bytes()
-    request_sha = digest(request)
-    previous = [row for row in read_ledger(mailbox) if row.get("request_id") == request_id]
-    if previous:
-        return {
-            "request_id": request_id,
-            "request_sha256": request_sha,
-            "dispatch": "reattached",
-            "dispatch_count": len(previous),
-        }
-    append_ledger(
-        mailbox,
-        {
-            "request_id": request_id,
-            "request_sha256": request_sha,
-            "dispatched_at_epoch": time.time(),
-            "provider_pid": os.getpid(),
-        },
-    )
-    return {
-        "request_id": request_id,
-        "request_sha256": request_sha,
-        "dispatch": "dispatched",
-        "dispatch_count": 1,
-    }
-
-
 def read_proof(mailbox: Path, request_id: str) -> dict[str, Any] | None:
     """Read provider-produced proof from inbox if available."""
     p_file = proof_path(Path(mailbox), request_id)
@@ -276,51 +132,63 @@ def read_proof(mailbox: Path, request_id: str) -> dict[str, Any] | None:
         return None
 
 
-def collect(mailbox: Path, request_id: str) -> dict[str, object]:
-    """Collect the exact reply for an already-dispatched request without redispatch."""
-    mailbox = Path(mailbox)
-    request_file = outbox_path(mailbox, request_id)
-    if not request_file.is_file():
-        raise SystemExit(f"provider: no durable request for {request_id}")
-    request = request_file.read_bytes()
-    request_sha = digest(request)
-    previous = [row for row in read_ledger(mailbox) if row.get("request_id") == request_id]
-    if not previous:
-        raise SystemExit(f"provider: request {request_id} was never dispatched")
-    reply_file = inbox_path(mailbox, request_id)
-    proof_file = proof_path(mailbox, request_id)
-    if not reply_file.is_file():
-        directive = build_directive(request)
-        reply = encode_model_directive(directive).encode("utf-8")
-        _atomic_write(reply_file, reply)
-        _mirror(mailbox, reply_file, current_reply_path(mailbox))
+def digest(raw: bytes) -> str:
+    return hashlib.sha256(raw).hexdigest()
 
-    if not proof_file.is_file():
-        envelope = json.loads(request.decode("utf-8"))
-        attempt_id = str(envelope["attempt_id"])
-        authority = _get_provider_authority()
-        if attempt_id in authority.contexts:
-            directive = build_directive(request)
-            proof_dict = authority.sign_exact_provider_response(attempt_id, directive)
-            _atomic_write(proof_file, json.dumps(proof_dict, sort_keys=True).encode("utf-8"))
-    return {
-        "request_id": request_id,
-        "request_sha256": request_sha,
-        "dispatch": "reattached",
-        "dispatch_count": len(previous),
-        "reply_sha256": digest(reply_file.read_bytes()),
-    }
+
+def _mirror(mailbox: Path, source: Path, target: Path) -> None:
+    if source.is_file():
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(source.read_bytes())
+
+
+def _run_provider_subprocess(
+    cmd: str, mailbox: Path, request_id: str
+) -> dict[str, object]:
+    """Execute provider operation in an isolated child subprocess."""
+    mailbox = Path(mailbox)
+    env = dict(os.environ)
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "tools.c15_persistence.provider_process",
+            cmd,
+            str(mailbox),
+            request_id,
+        ],
+        cwd=str(_REPO_ROOT),
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(
+            f"provider_process {cmd} failed (exit {completed.returncode}):\n"
+            f"stdout: {completed.stdout}\nstderr: {completed.stderr}"
+        )
+    report = json.loads(completed.stdout.strip())
+    provider_pid = int(report.get("provider_pid", 0))
+    if provider_pid == os.getpid():
+        raise RuntimeError(
+            "Security violation: provider_process ran in the same process as operator!"
+        )
+    return report
+
+
+def dispatch(mailbox: Path, request_id: str) -> dict[str, object]:
+    """Cross the provider submission boundary exactly once in a separate process."""
+    return _run_provider_subprocess("dispatch", mailbox, request_id)
+
+
+def collect(mailbox: Path, request_id: str) -> dict[str, object]:
+    """Collect the exact reply for an already-dispatched request via provider subprocess."""
+    return _run_provider_subprocess("collect", mailbox, request_id)
 
 
 def serve(mailbox: Path, request_id: str) -> dict[str, object]:
     """Compatibility helper: dispatch once, then collect the exact reply."""
-    dispatch_report = dispatch(mailbox, request_id)
-    reply_report = collect(mailbox, request_id)
-    return {
-        **reply_report,
-        "dispatch": dispatch_report["dispatch"],
-        "dispatch_count": dispatch_report["dispatch_count"],
-    }
+    return _run_provider_subprocess("serve", mailbox, request_id)
 
 
 def main(argv: list[str]) -> int:
@@ -330,3 +198,7 @@ def main(argv: list[str]) -> int:
     report = serve(Path(argv[1]), argv[2])
     print(json.dumps(report, sort_keys=True))
     return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv))

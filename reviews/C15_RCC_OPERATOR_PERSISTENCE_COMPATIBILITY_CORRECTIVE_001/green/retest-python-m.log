@@ -1,4 +1,20 @@
-........................................................................ [ 85%]
-............                                                             [100%]
-- generated xml file: /mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/reviews/C15_RCC_OPERATOR_PERSISTENCE_COMPATIBILITY_CORRECTIVE_001/green/retest-python-m-junit.xml -
-84 passed in 461.61s (0:07:41)
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.4.2, pluggy-1.6.0
+rootdir: /mnt/d/手镯开发/Haneof-AIOS-Core-v3.0
+configfile: pyproject.toml
+collected 88 items
+
+tests/c15_persistence/killpoints/test_killpoints.py .....                [  5%]
+tests/c15_persistence/test_corrective_002_remote_durability.py ......... [ 15%]
+.                                                                        [ 17%]
+tests/c15_persistence/test_corrective_003_binding_blockers.py .......... [ 28%]
+.............                                                            [ 43%]
+tests/c15_persistence/test_corrective_003_regressions.py ......          [ 50%]
+tests/c15_persistence/test_environment_reattach.py ....                  [ 54%]
+tests/c15_persistence/test_journal.py .............                      [ 69%]
+tests/c15_persistence/test_operator_wiring.py ................           [ 87%]
+tests/c15_persistence/test_pm49_blockers.py ........                     [ 96%]
+tests/c15_persistence/test_resident_surface.py ...                       [100%]
+
+- generated xml file: /mnt/d/手镯开发/Haneof-AIOS-Core-v3.0/reviews/C15_RCC_OPERATOR_PERSISTENCE_COMPATIBILITY_CORRECTIVE_001/green/retest-bare-junit.xml -
+======================== 88 passed in 804.73s (0:13:24) ========================
