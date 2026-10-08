@@ -340,7 +340,17 @@ def resolve_surface_base(
     """
     repo_str = str(repo_root)
 
-    def _verify_commit(rev: str) -> str | None:
+    def _try_fetch(ref: str) -> None:
+        if not ref or not isinstance(ref, str) or not ref.strip():
+            return
+        subprocess.run(
+            ["git", "fetch", "--depth=20", "origin", ref.strip()],
+            cwd=repo_str,
+            capture_output=True,
+            text=True,
+        )
+
+    def _verify_commit(rev: str, allow_fetch: bool = True) -> str | None:
         if not rev or not isinstance(rev, str) or not rev.strip():
             return None
         res = subprocess.run(
@@ -351,12 +361,22 @@ def resolve_surface_base(
         )
         if res.returncode == 0 and res.stdout.strip():
             return res.stdout.strip()
+        if allow_fetch:
+            _try_fetch(rev)
+            res = subprocess.run(
+                ["git", "rev-parse", "--verify", f"{rev.strip()}^{{commit}}"],
+                cwd=repo_str,
+                capture_output=True,
+                text=True,
+            )
+            if res.returncode == 0 and res.stdout.strip():
+                return res.stdout.strip()
         return None
 
     # 1. Explicit base passed or via environment variable
     candidate_explicit = (explicit_base or "").strip() or os.environ.get("C15_SURFACE_BASE", "").strip()
     if candidate_explicit:
-        resolved = _verify_commit(candidate_explicit)
+        resolved = _verify_commit(candidate_explicit, allow_fetch=True)
         if resolved is not None:
             return resolved
         raise ValueError(
@@ -373,15 +393,16 @@ def resolve_surface_base(
                 or event_data.get("pull_request", {}).get("base", {}).get("ref")
             )
             if pr_base_sha:
-                resolved = _verify_commit(str(pr_base_sha))
+                resolved = _verify_commit(str(pr_base_sha), allow_fetch=True)
                 if resolved is not None:
                     return resolved
         except Exception:
             pass
 
-    # 3. Merge base with origin/main or origin/HEAD
+    # 3. Remote refs / main fetch
+    _try_fetch("main")
     for remote_ref in ("origin/main", "origin/HEAD"):
-        if _verify_commit(remote_ref) is not None:
+        if _verify_commit(remote_ref, allow_fetch=False) is not None:
             mb = subprocess.run(
                 ["git", "merge-base", "HEAD", remote_ref],
                 cwd=repo_str,
@@ -389,12 +410,12 @@ def resolve_surface_base(
                 text=True,
             )
             if mb.returncode == 0 and mb.stdout.strip():
-                resolved = _verify_commit(mb.stdout.strip())
+                resolved = _verify_commit(mb.stdout.strip(), allow_fetch=False)
                 if resolved is not None:
                     return resolved
 
     # 4. Local main ref
-    if _verify_commit("main") is not None:
+    if _verify_commit("main", allow_fetch=False) is not None:
         mb = subprocess.run(
             ["git", "merge-base", "HEAD", "main"],
             cwd=repo_str,
@@ -402,11 +423,17 @@ def resolve_surface_base(
             text=True,
         )
         if mb.returncode == 0 and mb.stdout.strip():
-            resolved = _verify_commit(mb.stdout.strip())
+            resolved = _verify_commit(mb.stdout.strip(), allow_fetch=False)
             if resolved is not None:
                 return resolved
 
-    # 5. First parent of HEAD
+    # 5. First parent of HEAD (try unshallow if shallow clone)
+    subprocess.run(
+        ["git", "fetch", "--depth=2", "origin", "HEAD"],
+        cwd=repo_str,
+        capture_output=True,
+        text=True,
+    )
     parent_res = subprocess.run(
         ["git", "rev-parse", "--verify", "HEAD~1^{commit}"],
         cwd=repo_str,
@@ -414,7 +441,7 @@ def resolve_surface_base(
         text=True,
     )
     if parent_res.returncode == 0 and parent_res.stdout.strip():
-        resolved = _verify_commit(parent_res.stdout.strip())
+        resolved = _verify_commit(parent_res.stdout.strip(), allow_fetch=False)
         if resolved is not None:
             return resolved
 
