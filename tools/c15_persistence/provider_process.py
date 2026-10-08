@@ -29,15 +29,15 @@ if __name__ != "__main__":
 
 import hashlib
 import json
+import math
 import os
+import secrets
 import signal
 import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
-
-from cryptography.hazmat.primitives.asymmetric import rsa
 
 # Bootstrap src path for aios_core types
 _REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -176,6 +176,64 @@ def build_directive(request: bytes) -> ModelDirective:
     )
 
 
+_SMALL_PRIMES = (
+    2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
+    73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151,
+    157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233,
+    239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307, 311, 313, 317,
+)
+
+
+def _is_probable_prime(n: int, k: int = 25) -> bool:
+    if n < 2:
+        return False
+    for p in _SMALL_PRIMES:
+        if n == p:
+            return True
+        if n % p == 0:
+            return False
+    r, d = 0, n - 1
+    while d % 2 == 0:
+        r += 1
+        d //= 2
+    for _ in range(k):
+        a = secrets.randbelow(n - 4) + 2
+        x = pow(a, d, n)
+        if x in (1, n - 1):
+            continue
+        for _ in range(r - 1):
+            x = pow(x, 2, n)
+            if x == n - 1:
+                break
+        else:
+            return False
+    return True
+
+
+def _generate_prime(bits: int) -> int:
+    while True:
+        p = secrets.randbits(bits) | (1 << (bits - 1)) | 1
+        if _is_probable_prime(p):
+            return p
+
+
+def generate_rsa_keypair(key_size: int = 2048, e: int = 65537) -> tuple[int, int, int]:
+    """Generate ephemeral (n, e, d) RSA keypair in memory using OS CSPRNG (zero dependencies)."""
+    prime_bits = key_size // 2
+    while True:
+        p = _generate_prime(prime_bits)
+        q = _generate_prime(prime_bits)
+        if p == q:
+            continue
+        n = p * q
+        if n.bit_length() != key_size:
+            continue
+        phi = (p - 1) * (q - 1)
+        if math.gcd(e, phi) == 1:
+            d = pow(e, -1, phi)
+            return n, e, d
+
+
 class ProviderService:
     """Isolated, long-lived provider service maintaining private key in memory heap only."""
 
@@ -185,15 +243,8 @@ class ProviderService:
         self.pid = os.getpid()
         self.instance_id = str(uuid.uuid4())
 
-        # Generate ephemeral RSA-2048 keypair purely in process heap memory
-        self._private_key = rsa.generate_private_key(
-            public_exponent=65537,
-            key_size=2048,
-        )
-        numbers = self._private_key.private_numbers()
-        self._n = numbers.public_numbers.n
-        self._e = numbers.public_numbers.e
-        self._d = numbers.d
+        # Generate ephemeral RSA-2048 keypair purely in process heap memory via OS CSPRNG
+        self._n, self._e, self._d = generate_rsa_keypair(key_size=2048, e=65537)
         self.modulus_hex = f"{self._n:x}"
         self.public_key_fingerprint = hashlib.sha256(
             f"{self.modulus_hex}:{self._e}".encode("utf-8")
