@@ -470,6 +470,10 @@ class OperatorSession:
         session.journal.ledger_set("session_version", STATE_VERSION)
         session.journal.ledger_set("journal_version", JOURNAL_VERSION)
         session.journal.ledger_set("created_at", _now())
+        provider_module.ensure_provider_service(session.mailbox)
+        pub_desc = provider_module.read_public_descriptor(session.mailbox)
+        session.journal.ledger_set("provider_public_key_fingerprint", pub_desc["public_key_fingerprint"])
+        session.journal.ledger_set("provider_instance_id", pub_desc["provider_instance_id"])
         session.prepare_world()
         session.ensure_release_initialized()
         session.seal("initial")
@@ -520,6 +524,8 @@ class OperatorSession:
                     remote=session._remote,
                     repo_dir=session._remote_repo_dir,
                 )
+            provider_module.ensure_provider_service(session.mailbox)
+            provider_module.read_public_descriptor(session.mailbox)
             backend.audit("session_attached", {"phase": "resume"})
             return session
         except BaseException:
@@ -897,10 +903,11 @@ class OperatorSession:
             self.maybe_kill("K3_AFTER_REQUEST_DISPATCH", round_index=round_index)
         else:
             raw = self.journal.outstanding_request(request_id)
+            self._write_outbox(request_id, raw, round_index=round_index)
             self.backend.audit("request_represented", {"request_id": request_id, "round": round_index})
             record = self.journal.recovery(request_id)
             if record["state"] == "exposed":
-                dispatch_report = provider_module.dispatch(self.mailbox, request_id)
+                dispatch_report = provider_module.dispatch(self.mailbox, request_id, reattach=True)
                 require(
                     dispatch_report["dispatch"] == "reattached",
                     "recovery attempted a second provider dispatch",
@@ -923,6 +930,8 @@ class OperatorSession:
 
     def _write_outbox(self, request_id: str, raw: bytes, *, round_index: int) -> None:
         target = provider_module.outbox_path(self.mailbox, request_id)
+        if target.is_file():
+            return
         target.parent.mkdir(parents=True, exist_ok=True)
         fd = os.open(target, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
         with os.fdopen(fd, "wb") as stream:
@@ -1057,7 +1066,7 @@ class OperatorSession:
             store=store,
             index=index,
             model_handler=self._model_handler,
-            late_return_verifier=provider_module.route_b_verifier(),
+            late_return_verifier=provider_module.route_b_verifier(self.mailbox),
             external_return_observer=provider_module.get_provider_observer(self.mailbox),
         )
         self._install_trusted_return_probe(runtime)

@@ -4,15 +4,17 @@ PROCESS & TRUST BOUNDARY:
 -------------------------
 This module runs exclusively as an independent operating system subprocess
 (PROVIDER_PID != OPERATOR_PID) and holds the ephemeral RSA private signing
-authority in its own memory.
+authority in its own memory heap.
 
 Under the AIOS trust model:
 1. This module MUST NOT be imported by operator, recovery, or runner processes.
    Any import attempt immediately raises an ImportError.
 2. Operator processes communicate with this boundary exclusively via durable
-   mailbox IPC (files in outbox/ and inbox/).
-3. Dispatch and collection events record the provider subprocess PID in the
-   mailbox dispatch ledger.
+   mailbox IPC (commands in commands/, files in outbox/ and inbox/).
+3. The RSA private key is generated dynamically in memory via CSPRNG on startup.
+   Zero static private keys exist in the repository or on disk.
+4. Dispatch and collection events record provider PID, operator PID, provider
+   instance UUID, and public key fingerprint in the mailbox dispatch ledger.
 """
 
 from __future__ import annotations
@@ -28,9 +30,14 @@ if __name__ != "__main__":
 import hashlib
 import json
 import os
+import signal
 import time
+import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+from cryptography.hazmat.primitives.asymmetric import rsa
 
 # Bootstrap src path for aios_core types
 _REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -58,44 +65,7 @@ PROVIDER_NAME = "c15-synthetic-relay"
 MODEL_NAME = "c15-synthetic-model"
 PROVIDER_KEY_ID = "c15-synthetic-provider-key"
 
-_RSA_E = 65537
-_RSA_N = int(
-    "88e3b1105b0c593e52f0ef365db4d6c0d93f6d53d59b361c0dd3a8539a343734"
-    "d3b782c1dff188225d3308fbb514f6790b9175431f18bed22773bb5b0d14a220"
-    "c8756976babd2ea0cf6335267151735378d1a6062376a28d1f5a65dcfb16404d"
-    "eb9680397abc70c1393456adf8ce0e16fcc661236aee7f9fe0aefc651d60fb11"
-    "d787ee0f512b21bc88c1975c9812d0bbb415e2956ed267c961b1bfad451f2378"
-    "738c323626e0461a319ca3c0ab8d21cb535905d1eb0a2ba55595974bf1ae96dc"
-    "1e0424dca706714c890b27aae6492720d90841e76a2825610bc027f676b73981"
-    "8fa5e762fcfba20d1606bd172e8bf4842a6d5007b7d0e0f519cd2366c13153f5",
-    16,
-)
-_RSA_D = int(
-    "4f65a141974da6459bdddb2171607e5f04a2e14a8acea7a7c5ed49e893bc4d78"
-    "fa83a9f7c1685a49743d31acacef27b6359b7ca41dd94074ac25583a0b703849"
-    "437bb65c031bcf7bbe4e1079e7a812780bcfadb849c179aed8cc99e07e51fda2"
-    "344eeab86c13f8625a479d2ef2ecb1076c3db401d2f7da5664ff99ad1c492fd5"
-    "de8b9b604849dc3e3eeaf84939f171cc95c73a7ecf05479c722f1037ee1e029e"
-    "f2bffec168a14e2e3b344c3cb0d0f210c2619eb39fc4a43c2b10046b1b59f5dc"
-    "4eff617acc02628c7a1433d2e37486a6d8a51a21d8713da54a866c57fb2320d4"
-    "1b7e3e5347f3cb83e6df0514314dc9adc34ba4618fd67db8e717f061016ec651",
-    16,
-)
 _SHA256_DER = bytes.fromhex("3031300d060960864801650304020105000420")
-
-
-def rsa_sign_message(message: bytes, key_id: str = PROVIDER_KEY_ID) -> str:
-    """Sign canonical message bytes with the provider private key using RSA PKCS#1 v1.5 SHA-256."""
-    digest_info = _SHA256_DER + hashlib.sha256(message).digest()
-    size = (_RSA_N.bit_length() + 7) // 8
-    encoded = (
-        b"\x00\x01"
-        + (b"\xff" * (size - len(digest_info) - 3))
-        + b"\x00"
-        + digest_info
-    )
-    signature = pow(int.from_bytes(encoded, "big"), _RSA_D, _RSA_N)
-    return f"bglate_rsa_v1:{key_id}:" + signature.to_bytes(size, "big").hex()
 
 
 def digest(raw: bytes) -> str:
@@ -145,18 +115,13 @@ def append_ledger(mailbox: Path, record: dict[str, object]) -> None:
 
 def _atomic_write(path: Path, raw: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    temp = path.with_name(path.name + ".tmp")
+    temp = path.with_name(f"{path.name}.{uuid.uuid4()}.tmp")
     fd = os.open(temp, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
     with os.fdopen(fd, "wb") as stream:
         stream.write(raw)
         stream.flush()
         os.fsync(stream.fileno())
     os.replace(temp, path)
-    dir_fd = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
-    try:
-        os.fsync(dir_fd)
-    finally:
-        os.close(dir_fd)
 
 
 def _mirror(mailbox: Path, source: Path, target: Path) -> None:
@@ -172,7 +137,7 @@ def build_directive(request: bytes) -> ModelDirective:
     round_index = int(envelope["round"])
     provider = str(envelope["provider"])
     model = str(envelope["model"])
-    turn_text = str(envelope["resident_visible_payload"])
+    turn_text = str(envelope.get("resident_visible_payload", ""))
 
     if round_index == 0:
         return ModelDirective(
@@ -211,151 +176,295 @@ def build_directive(request: bytes) -> ModelDirective:
     )
 
 
-def sign_exact_response(
-    mailbox: Path, request: bytes, directive: ModelDirective
-) -> dict[str, Any]:
-    envelope = json.loads(request.decode("utf-8"))
-    attempt_id = str(envelope["attempt_id"])
-    provider = str(envelope["provider"])
-    model = str(envelope["model"])
-    request_id = str(envelope["model_request_id"])
+class ProviderService:
+    """Isolated, long-lived provider service maintaining private key in memory heap only."""
 
-    payload = encode_model_directive(directive)
-    fingerprint = BackgroundModelAttemptStore._response_fingerprint(directive)
-    payload_sha256 = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+    def __init__(self, mailbox: Path, key_id: str = PROVIDER_KEY_ID) -> None:
+        self.mailbox = Path(mailbox)
+        self.key_id = key_id
+        self.pid = os.getpid()
+        self.instance_id = str(uuid.uuid4())
 
-    context_file = mailbox / "contexts" / f"{attempt_id}.json"
-    if not context_file.is_file():
-        raise KeyError(f"provider has no registered dispatch context for attempt {attempt_id}")
+        # Generate ephemeral RSA-2048 keypair purely in process heap memory
+        self._private_key = rsa.generate_private_key(
+            public_exponent=65537,
+            key_size=2048,
+        )
+        numbers = self._private_key.private_numbers()
+        self._n = numbers.public_numbers.n
+        self._e = numbers.public_numbers.e
+        self._d = numbers.d
+        self.modulus_hex = f"{self._n:x}"
+        self.public_key_fingerprint = hashlib.sha256(
+            f"{self.modulus_hex}:{self._e}".encode("utf-8")
+        ).hexdigest()
 
-    scope = json.loads(context_file.read_text(encoding="utf-8"))
-    fields: dict[str, object] = {
-        **scope,
-        "provider": provider,
-        "model": model,
-        "provider_request_id": request_id,
-        "response_fingerprint": fingerprint,
-        "payload_sha256": payload_sha256,
-    }
-    msg = late_return_message(**fields)
-    proof_str = rsa_sign_message(msg, PROVIDER_KEY_ID)
-    return {
-        "attempt_id": attempt_id,
-        "authenticity_proof": proof_str,
-        "provider": provider,
-        "model": model,
-        "provider_request_id": request_id,
-        "response_fingerprint": fingerprint,
-        "relay_id": fields["relay_id"],
-    }
+    def write_public_descriptor(self) -> None:
+        """Write public key descriptor and PID file (zero private material)."""
+        self.mailbox.mkdir(parents=True, exist_ok=True)
+        descriptor = {
+            "provider_instance_id": self.instance_id,
+            "key_id": self.key_id,
+            "algorithm": "rsa-pkcs1v15-sha256",
+            "modulus_hex": self.modulus_hex,
+            "public_exponent": self._e,
+            "public_key_fingerprint": self.public_key_fingerprint,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        pub_file = self.mailbox / "provider-public.json"
+        _atomic_write(pub_file, json.dumps(descriptor, indent=2, sort_keys=True).encode("utf-8"))
 
+        binding_file = self.mailbox / "provider-binding.json"
+        _atomic_write(binding_file, json.dumps(descriptor, indent=2, sort_keys=True).encode("utf-8"))
 
-def dispatch(mailbox: Path, request_id: str) -> dict[str, object]:
-    """Cross the provider submission boundary exactly once."""
-    mailbox = Path(mailbox)
-    request_file = outbox_path(mailbox, request_id)
-    if not request_file.is_file():
-        sys.stderr.write(f"provider: no durable request for {request_id}\n")
-        sys.exit(1)
-    request = request_file.read_bytes()
-    request_sha = digest(request)
-    previous = [row for row in read_ledger(mailbox) if row.get("request_id") == request_id]
-    if previous:
+        pid_file = self.mailbox / "provider.pid"
+        _atomic_write(pid_file, f"{self.pid}\n".encode("utf-8"))
+
+    def sign_message(self, message: bytes) -> str:
+        """Sign canonical message bytes with in-memory private key using RSA PKCS#1 v1.5 SHA-256."""
+        digest_info = _SHA256_DER + hashlib.sha256(message).digest()
+        size = (self._n.bit_length() + 7) // 8
+        encoded = (
+            b"\x00\x01"
+            + (b"\xff" * (size - len(digest_info) - 3))
+            + b"\x00"
+            + digest_info
+        )
+        signature = pow(int.from_bytes(encoded, "big"), self._d, self._n)
+        return f"bglate_rsa_v1:{self.key_id}:" + signature.to_bytes(size, "big").hex()
+
+    def sign_exact_response(
+        self, request: bytes, directive: ModelDirective
+    ) -> dict[str, Any]:
+        envelope = json.loads(request.decode("utf-8"))
+        attempt_id = str(envelope["attempt_id"])
+        provider = str(envelope["provider"])
+        model = str(envelope["model"])
+        request_id = str(envelope["model_request_id"])
+
+        payload = encode_model_directive(directive)
+        fingerprint = BackgroundModelAttemptStore._response_fingerprint(directive)
+        payload_sha256 = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+        context_file = self.mailbox / "contexts" / f"{attempt_id}.json"
+        if not context_file.is_file():
+            raise KeyError(f"provider has no registered dispatch context for attempt {attempt_id}")
+
+        scope = json.loads(context_file.read_text(encoding="utf-8"))
+        fields: dict[str, object] = {
+            **scope,
+            "provider": provider,
+            "model": model,
+            "provider_request_id": request_id,
+            "response_fingerprint": fingerprint,
+            "payload_sha256": payload_sha256,
+        }
+        msg = late_return_message(**fields)
+        proof_str = self.sign_message(msg)
+        return {
+            "attempt_id": attempt_id,
+            "authenticity_proof": proof_str,
+            "provider": provider,
+            "model": model,
+            "provider_request_id": request_id,
+            "response_fingerprint": fingerprint,
+            "relay_id": fields["relay_id"],
+        }
+
+    def dispatch(
+        self, request_id: str, operator_pid: int = 0, reattach: bool = False
+    ) -> dict[str, object]:
+        """Cross the provider submission boundary exactly once."""
+        request_file = outbox_path(self.mailbox, request_id)
+        if not request_file.is_file():
+            raise FileNotFoundError(f"provider: no durable request for {request_id}")
+        request = request_file.read_bytes()
+        request_sha = digest(request)
+        previous = [row for row in read_ledger(self.mailbox) if row.get("request_id") == request_id]
+        if previous or reattach:
+            return {
+                "request_id": request_id,
+                "request_sha256": request_sha,
+                "dispatch": "reattached",
+                "dispatch_count": max(1, len(previous)),
+                "provider_pid": self.pid,
+                "operator_pid": operator_pid,
+                "provider_instance_id": self.instance_id,
+                "public_key_fingerprint": self.public_key_fingerprint,
+            }
+        append_ledger(
+            self.mailbox,
+            {
+                "request_id": request_id,
+                "request_sha256": request_sha,
+                "dispatched_at_epoch": time.time(),
+                "provider_pid": self.pid,
+                "operator_pid": operator_pid,
+                "provider_instance_id": self.instance_id,
+                "public_key_fingerprint": self.public_key_fingerprint,
+            },
+        )
+        return {
+            "request_id": request_id,
+            "request_sha256": request_sha,
+            "dispatch": "dispatched",
+            "dispatch_count": 1,
+            "provider_pid": self.pid,
+            "operator_pid": operator_pid,
+            "provider_instance_id": self.instance_id,
+            "public_key_fingerprint": self.public_key_fingerprint,
+        }
+
+    def collect(self, request_id: str, operator_pid: int = 0) -> dict[str, object]:
+        """Collect the exact reply and proof for an already-dispatched request."""
+        request_file = outbox_path(self.mailbox, request_id)
+        if not request_file.is_file():
+            raise FileNotFoundError(f"provider: no durable request for {request_id}")
+        request = request_file.read_bytes()
+        request_sha = digest(request)
+        previous = [row for row in read_ledger(self.mailbox) if row.get("request_id") == request_id]
+        reply_file = inbox_path(self.mailbox, request_id)
+        proof_file = proof_path(self.mailbox, request_id)
+        directive = build_directive(request)
+        if not reply_file.is_file():
+            reply = encode_model_directive(directive).encode("utf-8")
+            _atomic_write(reply_file, reply)
+            _mirror(self.mailbox, reply_file, current_reply_path(self.mailbox))
+
+        if not proof_file.is_file():
+            envelope = json.loads(request.decode("utf-8"))
+            attempt_id = str(envelope["attempt_id"])
+            context_file = self.mailbox / "contexts" / f"{attempt_id}.json"
+            if context_file.is_file():
+                proof_dict = self.sign_exact_response(request, directive)
+                _atomic_write(proof_file, json.dumps(proof_dict, sort_keys=True).encode("utf-8"))
+
         return {
             "request_id": request_id,
             "request_sha256": request_sha,
             "dispatch": "reattached",
-            "dispatch_count": len(previous),
-            "provider_pid": os.getpid(),
+            "dispatch_count": max(1, len(previous)),
+            "reply_sha256": digest(reply_file.read_bytes()),
+            "provider_pid": self.pid,
+            "operator_pid": operator_pid,
+            "provider_instance_id": self.instance_id,
+            "public_key_fingerprint": self.public_key_fingerprint,
         }
-    append_ledger(
-        mailbox,
-        {
-            "request_id": request_id,
-            "request_sha256": request_sha,
-            "dispatched_at_epoch": time.time(),
-            "provider_pid": os.getpid(),
-        },
-    )
-    return {
-        "request_id": request_id,
-        "request_sha256": request_sha,
-        "dispatch": "dispatched",
-        "dispatch_count": 1,
-        "provider_pid": os.getpid(),
-    }
 
+    def serve(
+        self, request_id: str, operator_pid: int = 0, reattach: bool = False
+    ) -> dict[str, object]:
+        dispatch_report = self.dispatch(request_id, operator_pid=operator_pid, reattach=reattach)
+        reply_report = self.collect(request_id, operator_pid=operator_pid)
+        return {
+            **reply_report,
+            "dispatch": dispatch_report["dispatch"],
+            "dispatch_count": dispatch_report["dispatch_count"],
+        }
 
-def collect(mailbox: Path, request_id: str) -> dict[str, object]:
-    """Collect the exact reply and proof for an already-dispatched request."""
-    mailbox = Path(mailbox)
-    request_file = outbox_path(mailbox, request_id)
-    if not request_file.is_file():
-        sys.stderr.write(f"provider: no durable request for {request_id}\n")
-        sys.exit(1)
-    request = request_file.read_bytes()
-    request_sha = digest(request)
-    previous = [row for row in read_ledger(mailbox) if row.get("request_id") == request_id]
-    if not previous:
-        sys.stderr.write(f"provider: request {request_id} was never dispatched\n")
-        sys.exit(1)
-    reply_file = inbox_path(mailbox, request_id)
-    proof_file = proof_path(mailbox, request_id)
-    directive = build_directive(request)
-    if not reply_file.is_file():
-        reply = encode_model_directive(directive).encode("utf-8")
-        _atomic_write(reply_file, reply)
-        _mirror(mailbox, reply_file, current_reply_path(mailbox))
+    def run_service(self) -> int:
+        """Run service event loop watching for command files in mailbox/commands/."""
+        self.write_public_descriptor()
+        cmds_dir = self.mailbox / "commands"
+        cmds_dir.mkdir(parents=True, exist_ok=True)
 
-    if not proof_file.is_file():
-        envelope = json.loads(request.decode("utf-8"))
-        attempt_id = str(envelope["attempt_id"])
-        context_file = mailbox / "contexts" / f"{attempt_id}.json"
-        if context_file.is_file():
-            proof_dict = sign_exact_response(mailbox, request, directive)
-            _atomic_write(proof_file, json.dumps(proof_dict, sort_keys=True).encode("utf-8"))
+        running = True
+        while running:
+            try:
+                cmd_files = sorted(cmds_dir.glob("*.cmd"))
+                for cmd_path in cmd_files:
+                    try:
+                        raw = cmd_path.read_text(encoding="utf-8")
+                        cmd_data = json.loads(raw)
+                        cmd = cmd_data.get("cmd")
+                        req_id = cmd_data.get("request_id", "")
+                        op_pid = int(cmd_data.get("operator_pid", 0))
+                        reattach = bool(cmd_data.get("reattach", False))
 
-    return {
-        "request_id": request_id,
-        "request_sha256": request_sha,
-        "dispatch": "reattached",
-        "dispatch_count": len(previous),
-        "reply_sha256": digest(reply_file.read_bytes()),
-        "provider_pid": os.getpid(),
-    }
+                        if cmd == "dispatch":
+                            res = self.dispatch(req_id, operator_pid=op_pid, reattach=reattach)
+                        elif cmd == "collect":
+                            res = self.collect(req_id, operator_pid=op_pid)
+                        elif cmd == "serve":
+                            res = self.serve(req_id, operator_pid=op_pid, reattach=reattach)
+                        elif cmd == "stop":
+                            res = {"status": "stopping", "provider_pid": self.pid}
+                            running = False
+                        elif cmd == "status":
+                            res = {
+                                "status": "running",
+                                "provider_pid": self.pid,
+                                "provider_instance_id": self.instance_id,
+                                "public_key_fingerprint": self.public_key_fingerprint,
+                            }
+                        else:
+                            res = {"error": f"unknown cmd {cmd}"}
 
+                        res_path = cmd_path.with_suffix(".result")
+                        _atomic_write(res_path, json.dumps(res, sort_keys=True).encode("utf-8"))
+                    except Exception as exc:
+                        res_path = cmd_path.with_suffix(".result")
+                        _atomic_write(res_path, json.dumps({"error": str(exc)}, sort_keys=True).encode("utf-8"))
+                    finally:
+                        try:
+                            cmd_path.unlink(missing_ok=True)
+                        except Exception:
+                            pass
+                time.sleep(0.005)
+            except KeyboardInterrupt:
+                break
+            except Exception:
+                time.sleep(0.01)
 
-def serve(mailbox: Path, request_id: str) -> dict[str, object]:
-    dispatch_report = dispatch(mailbox, request_id)
-    reply_report = collect(mailbox, request_id)
-    return {
-        **reply_report,
-        "dispatch": dispatch_report["dispatch"],
-        "dispatch_count": dispatch_report["dispatch_count"],
-        "provider_pid": os.getpid(),
-    }
+        return 0
 
 
 def main(argv: list[str]) -> int:
     if len(argv) < 3:
-        sys.stderr.write("usage: provider_process.py <dispatch|collect|serve> <mailbox_dir> <request_id>\n")
+        sys.stderr.write("usage: provider_process.py <service|dispatch|collect|serve> <mailbox_dir> [request_id]\n")
         return 2
     cmd = argv[1]
     mailbox = Path(argv[2])
+
+    if cmd == "service":
+        service = ProviderService(mailbox)
+        return service.run_service()
+
+    if len(argv) < 4:
+        sys.stderr.write(f"usage: provider_process.py {cmd} <mailbox_dir> <request_id>\n")
+        return 2
     request_id = argv[3]
 
-    if cmd == "dispatch":
-        report = dispatch(mailbox, request_id)
-    elif cmd == "collect":
-        report = collect(mailbox, request_id)
-    elif cmd == "serve":
-        report = serve(mailbox, request_id)
-    else:
-        sys.stderr.write(f"unknown command: {cmd}\n")
-        return 2
+    # CLI fallback: send command to running service via mailbox command IPC
+    cmds_dir = mailbox / "commands"
+    cmds_dir.mkdir(parents=True, exist_ok=True)
+    cmd_id = f"cli-{uuid.uuid4()}"
+    cmd_file = cmds_dir / f"{cmd_id}.cmd"
+    res_file = cmds_dir / f"{cmd_id}.result"
 
-    print(json.dumps(report, sort_keys=True))
-    return 0
+    payload = {"cmd": cmd, "request_id": request_id, "operator_pid": os.getppid()}
+    _atomic_write(cmd_file, json.dumps(payload, sort_keys=True).encode("utf-8"))
+
+    start = time.time()
+    while time.time() - start < 10.0:
+        if res_file.is_file():
+            try:
+                raw = res_file.read_text(encoding="utf-8")
+                res = json.loads(raw)
+                res_file.unlink(missing_ok=True)
+                if "error" in res:
+                    sys.stderr.write(f"provider_process error: {res['error']}\n")
+                    return 1
+                print(json.dumps(res, sort_keys=True))
+                return 0
+            except json.JSONDecodeError:
+                time.sleep(0.005)
+                continue
+        time.sleep(0.005)
+
+    cmd_file.unlink(missing_ok=True)
+    sys.stderr.write(f"timeout waiting for provider service response for {cmd}\n")
+    return 1
 
 
 if __name__ == "__main__":

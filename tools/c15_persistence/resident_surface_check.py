@@ -154,7 +154,7 @@ class _ControlSession:
             store=store,
             index=index,
             model_handler=self._model_handler,
-            late_return_verifier=provider_module.route_b_verifier(),
+            late_return_verifier=provider_module.route_b_verifier(self.mailbox),
             external_return_observer=provider_module.get_provider_observer(self.mailbox),
         )
         runtime.registry.register(
@@ -330,12 +330,10 @@ def resolve_surface_base(
        - git merge-base HEAD origin/main (or origin/HEAD).
     4. Local main / merge-base with local main:
        - git merge-base HEAD main.
-    5. First parent of HEAD:
-       - git rev-parse HEAD~1.
 
     Guarantees:
-    - Never falls back to HEAD itself.
-    - Never returns unverified ref names.
+    - Never falls back to HEAD or HEAD~1.
+    - Fails closed with ValueError when base authority is unresolved.
     - Always returns a verified 40-character commit SHA or raises ValueError.
     """
     repo_str = str(repo_root)

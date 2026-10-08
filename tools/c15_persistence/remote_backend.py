@@ -226,6 +226,8 @@ def commit_backend_tree(
             ":!*.snapshot",
             ":!*-shm",
             ":!*-wal",
+            ":!mailbox/provider.pid",
+            ":!mailbox/commands",
         ]
         completed = subprocess.run(
             add_cmd, cwd=str(repo), env=env, capture_output=True, text=True

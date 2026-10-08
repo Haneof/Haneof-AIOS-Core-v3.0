@@ -9,21 +9,21 @@
 
 ## 1. Executive Summary
 
-In this window, we resolved the downstream compatibility debt between the C15 operator/persistence harness and the accepted Core RC004 / Route B contract (`1cee3c5ad12f4b9098232bae11b51df786c5eb2f`).
+In this window (and its PM blocker closure iterations), we resolved all downstream compatibility debt between the C15 operator/persistence harness and the accepted Core RC004 / Route B contract (`1cee3c5ad12f4b9098232bae11b51df786c5eb2f`), closing all PM Readiness Blockers (`PM49-BLK-001R`, `PM49-BLK-002S`).
 
 1. **Zero Core Modifications**:
-   - Strictly respected Core immutability: `src/aios_core/**` has zero changes.
+   - Strictly respected Core immutability: `src/aios_core/**` has zero changes (0 files, 0 lines).
+   - `.github/workflows/**` has zero changes (0 files, 0 lines).
 
-2. **Downstream Compatibility Fixes**:
-   - `tools/c15_persistence/provider.py`: Implemented Route B RSA signer and verifier.
-   - `tools/c15_persistence/relay.py`: Adapted journal state machine to allow `reply-staged` state on live turns.
-   - `tools/c15_persistence/operator_session.py`: Wired Route B verifier/signer with `FusedTurnRuntime`, committed late returns before K3 barrier publication, refined recovery reattachment without second dispatches, and enforced DAC permission checks.
-   - `tools/c15_persistence/resident_surface_check.py`: Configured Route B verifier and robust base ref validation.
-   - `tests/c15_persistence/test_operator_wiring.py`: Adapted receipt tamper tests to Route B late-return verification.
+2. **PM Blocker Closures**:
+   - `PM49-BLK-001R` (BASE AUTHORITY): Strictly eliminated `HEAD~1` fallback in multi-commit PR base resolution; enforces verified PR base SHA or fails closed.
+   - `PM49-BLK-002S` (FINAL PROVIDER AUTHORITY): Completely purged all static RSA secrets (`ACTIVE_PROVIDER_PRIVATE_KEY_IN_REPO = NO`). Subprocess isolation (`PROVIDER_PID != OPERATOR_PID`) with dynamic in-memory CSPRNG RSA-2048 key generation, dynamic public descriptor pinning, and fail-closed tamper detection.
 
 3. **Test Results**:
-   - **C15 Persistence Suite**: **78/78 PASSED (100% GREEN)**
+   - **PM Blocker Regression Suite**: **12/12 PASSED (100% GREEN)**
+   - **C15 Persistence Suite**: **92/92 PASSED (100% GREEN)**
    - **Full Core Regression Suite**: **1059/1059 PASSED (100% GREEN)**
+   - **Resident Surface**: **`RESIDENT_SURFACE_UNCHANGED`**
 
 4. **Stop Boundary**:
    - Standing down immediately at `REVIEW_READY`, `READY_FOR_FRESH_INDEPENDENT_ACCEPTANCE`, `DO NOT MERGE`.

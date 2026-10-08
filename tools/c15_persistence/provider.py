@@ -10,9 +10,11 @@ exact, countable dispatch event that is independent of the operator's memory.
 Under the AIOS trust model:
 * Provider-side signing authority lives exclusively within the isolated
   `provider_process` subprocess boundary (OPERATOR_PID != PROVIDER_PID).
+* Private RSA key material is generated via CSPRNG purely in the memory heap of
+  the provider process.
+* Zero private keys or static secrets exist in the repository or on disk.
 * This client module contains ONLY public verifier configuration and data-only
   mailbox IPC dispatch/collection triggers.
-* No private key material (_RSA_D) or signing closures exist in this module.
 * Operator and recovery callers hold only the public `LateReturnVerifier` and
   rely exclusively on provider-produced proofs across the mailbox boundary.
 """
@@ -24,6 +26,9 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
+import time
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -42,28 +47,137 @@ from aios_core.runtime.late_return import (  # noqa: E402
     LateReturnVerifier,
 )
 
-# Public modulus and exponent for the verifier (public cryptographic material only).
-_RSA_E = 65537
-_RSA_N = int(
-    "88e3b1105b0c593e52f0ef365db4d6c0d93f6d53d59b361c0dd3a8539a343734"
-    "d3b782c1dff188225d3308fbb514f6790b9175431f18bed22773bb5b0d14a220"
-    "c8756976babd2ea0cf6335267151735378d1a6062376a28d1f5a65dcfb16404d"
-    "eb9680397abc70c1393456adf8ce0e16fcc661236aee7f9fe0aefc651d60fb11"
-    "d787ee0f512b21bc88c1975c9812d0bbb415e2956ed267c961b1bfad451f2378"
-    "738c323626e0461a319ca3c0ab8d21cb535905d1eb0a2ba55595974bf1ae96dc"
-    "1e0424dca706714c890b27aae6492720d90841e76a2825610bc027f676b73981"
-    "8fa5e762fcfba20d1606bd172e8bf4842a6d5007b7d0e0f519cd2366c13153f5",
-    16,
-)
+
+def _is_pid_alive(pid: int) -> bool:
+    if pid <= 0:
+        return False
+    try:
+        os.kill(pid, 0)
+        return True
+    except OSError:
+        return False
 
 
-def route_b_verifier(key_id: str = PROVIDER_KEY_ID) -> LateReturnVerifier:
+def _atomic_write(path: Path, raw: bytes) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp = path.with_name(f"{path.name}.{uuid.uuid4()}.tmp")
+    fd = os.open(temp, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    with os.fdopen(fd, "wb") as stream:
+        stream.write(raw)
+        stream.flush()
+        os.fsync(stream.fileno())
+    os.replace(temp, path)
+
+
+def ensure_provider_service(mailbox: Path | str, timeout: float = 5.0) -> int:
+    """Ensure the long-lived provider service is running for the given mailbox."""
+    mailbox = Path(mailbox)
+    mailbox.mkdir(parents=True, exist_ok=True)
+    pid_file = mailbox / "provider.pid"
+    pub_file = mailbox / "provider-public.json"
+
+    if pub_file.is_file():
+        # Verify if an existing provider service is actually responsive for THIS mailbox
+        try:
+            res = _send_provider_command(mailbox, {"cmd": "status"}, timeout=0.15, auto_ensure=False)
+            if res.get("status") == "running":
+                provider_pid = int(res.get("provider_pid", 0))
+                if provider_pid > 0 and provider_pid != os.getpid():
+                    return provider_pid
+        except Exception:
+            pass
+
+    # Clean up stale files
+    pid_file.unlink(missing_ok=True)
+    pub_file.unlink(missing_ok=True)
+
+    # Spawn provider service subprocess
+    env = dict(os.environ)
+    proc = subprocess.Popen(
+        [
+            sys.executable,
+            "-m",
+            "tools.c15_persistence.provider_process",
+            "service",
+            str(mailbox),
+        ],
+        cwd=str(_REPO_ROOT),
+        env=env,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+    start = time.time()
+    while time.time() - start < timeout:
+        if pub_file.is_file() and pid_file.is_file():
+            try:
+                res = _send_provider_command(mailbox, {"cmd": "status"}, timeout=0.1, auto_ensure=False)
+                if res.get("status") == "running":
+                    return int(res.get("provider_pid", 0))
+            except Exception:
+                pass
+        if proc.poll() is not None:
+            raise RuntimeError(f"Provider service exited prematurely with code {proc.returncode}")
+        time.sleep(0.01)
+
+    raise TimeoutError(f"Timed out waiting for provider service to start in {mailbox}")
+
+
+def stop_provider_service(mailbox: Path | str) -> None:
+    """Stop the provider service running for the given mailbox."""
+    mailbox = Path(mailbox)
+    pid_file = mailbox / "provider.pid"
+    if not pid_file.is_file():
+        return
+    try:
+        pid = int(pid_file.read_text(encoding="utf-8").strip())
+        if _is_pid_alive(pid) and pid != os.getpid():
+            _send_provider_command(mailbox, {"cmd": "stop"}, timeout=1.0)
+    except Exception:
+        pass
+    finally:
+        pid_file.unlink(missing_ok=True)
+
+
+def read_public_descriptor(mailbox: Path | str) -> dict[str, Any]:
+    """Read the public key descriptor written by the provider service."""
+    mailbox = Path(mailbox)
+    ensure_provider_service(mailbox)
+    pub_file = mailbox / "provider-public.json"
+    if not pub_file.is_file():
+        raise FileNotFoundError(f"Provider public descriptor missing at {pub_file}")
+    data = json.loads(pub_file.read_text(encoding="utf-8"))
+
+    # Assert local binding consistency if binding file exists
+    binding_file = mailbox / "provider-binding.json"
+    if binding_file.is_file():
+        binding = json.loads(binding_file.read_text(encoding="utf-8"))
+        if (
+            str(data.get("public_key_fingerprint")) != str(binding.get("public_key_fingerprint"))
+            or str(data.get("provider_instance_id")) != str(binding.get("provider_instance_id"))
+        ):
+            from tools.c15_persistence.backend import BackendError
+
+            raise BackendError("Provider fingerprint mismatch: verifier substitution detected")
+
+    return data
+
+
+def route_b_verifier(
+    mailbox: Path | str | None = None,
+    key_id: str = PROVIDER_KEY_ID,
+) -> LateReturnVerifier:
     """Return the public verifier corresponding to the external provider signer."""
+    if mailbox is None:
+        mailbox = Path(tempfile.gettempdir()) / f"c15-provider-default-{os.getpid()}"
+    mailbox = Path(mailbox)
+    ensure_provider_service(mailbox)
+    descriptor = read_public_descriptor(mailbox)
     return LateReturnVerifier(
         key_id=key_id,
-        algorithm="rsa-pkcs1v15-sha256",
-        modulus_hex=f"{_RSA_N:x}",
-        public_exponent=_RSA_E,
+        algorithm=str(descriptor.get("algorithm", "rsa-pkcs1v15-sha256")),
+        modulus_hex=str(descriptor["modulus_hex"]),
+        public_exponent=int(descriptor["public_exponent"]),
     )
 
 
@@ -142,53 +256,63 @@ def _mirror(mailbox: Path, source: Path, target: Path) -> None:
         target.write_bytes(source.read_bytes())
 
 
-def _run_provider_subprocess(
-    cmd: str, mailbox: Path, request_id: str
+def _send_provider_command(
+    mailbox: Path, cmd_payload: dict[str, Any], timeout: float = 10.0, auto_ensure: bool = True
 ) -> dict[str, object]:
-    """Execute provider operation in an isolated child subprocess."""
+    """Execute provider operation via data-only mailbox command IPC to the isolated provider service."""
     mailbox = Path(mailbox)
-    env = dict(os.environ)
-    completed = subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "tools.c15_persistence.provider_process",
-            cmd,
-            str(mailbox),
-            request_id,
-        ],
-        cwd=str(_REPO_ROOT),
-        capture_output=True,
-        text=True,
-        env=env,
-    )
-    if completed.returncode != 0:
-        raise RuntimeError(
-            f"provider_process {cmd} failed (exit {completed.returncode}):\n"
-            f"stdout: {completed.stdout}\nstderr: {completed.stderr}"
-        )
-    report = json.loads(completed.stdout.strip())
-    provider_pid = int(report.get("provider_pid", 0))
-    if provider_pid == os.getpid():
-        raise RuntimeError(
-            "Security violation: provider_process ran in the same process as operator!"
-        )
-    return report
+    if auto_ensure:
+        ensure_provider_service(mailbox)
+    cmds_dir = mailbox / "commands"
+    cmds_dir.mkdir(parents=True, exist_ok=True)
+    cmd_id = f"cmd-{uuid.uuid4()}"
+    cmd_file = cmds_dir / f"{cmd_id}.cmd"
+    res_file = cmds_dir / f"{cmd_id}.result"
+
+    payload = {**cmd_payload, "operator_pid": os.getpid()}
+    _atomic_write(cmd_file, json.dumps(payload, sort_keys=True).encode("utf-8"))
+
+    start = time.time()
+    while time.time() - start < timeout:
+        if res_file.is_file():
+            try:
+                raw = res_file.read_text(encoding="utf-8")
+                res = json.loads(raw)
+                res_file.unlink(missing_ok=True)
+                if "error" in res:
+                    raise RuntimeError(f"provider_process error: {res['error']}")
+                provider_pid = int(res.get("provider_pid", 0))
+                if provider_pid == os.getpid():
+                    raise RuntimeError(
+                        "Security violation: provider_process ran in the same process as operator!"
+                    )
+                return res
+            except json.JSONDecodeError:
+                time.sleep(0.005)
+                continue
+        time.sleep(0.005)
+
+    cmd_file.unlink(missing_ok=True)
+    raise TimeoutError(f"Provider service did not respond within {timeout}s for command {cmd_payload.get('cmd')}")
 
 
-def dispatch(mailbox: Path, request_id: str) -> dict[str, object]:
+def dispatch(
+    mailbox: Path, request_id: str, reattach: bool = False
+) -> dict[str, object]:
     """Cross the provider submission boundary exactly once in a separate process."""
-    return _run_provider_subprocess("dispatch", mailbox, request_id)
+    return _send_provider_command(mailbox, {"cmd": "dispatch", "request_id": request_id, "reattach": reattach})
 
 
 def collect(mailbox: Path, request_id: str) -> dict[str, object]:
     """Collect the exact reply for an already-dispatched request via provider subprocess."""
-    return _run_provider_subprocess("collect", mailbox, request_id)
+    return _send_provider_command(mailbox, {"cmd": "collect", "request_id": request_id})
 
 
-def serve(mailbox: Path, request_id: str) -> dict[str, object]:
+def serve(
+    mailbox: Path, request_id: str, reattach: bool = False
+) -> dict[str, object]:
     """Compatibility helper: dispatch once, then collect the exact reply."""
-    return _run_provider_subprocess("serve", mailbox, request_id)
+    return _send_provider_command(mailbox, {"cmd": "serve", "request_id": request_id, "reattach": reattach})
 
 
 def main(argv: list[str]) -> int:
