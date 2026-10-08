@@ -60,16 +60,28 @@ def _is_pid_alive(pid: int) -> bool:
 
 def _atomic_write(path: Path, raw: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        os.chmod(path.parent, 0o777)
+    except Exception:
+        pass
     temp = path.with_name(f"{path.name}.{uuid.uuid4()}.tmp")
-    fd = os.open(temp, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    fd = os.open(temp, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o666)
     with os.fdopen(fd, "wb") as stream:
         stream.write(raw)
         stream.flush()
         os.fsync(stream.fileno())
+    try:
+        os.chmod(temp, 0o666)
+    except Exception:
+        pass
     os.replace(temp, path)
+    try:
+        os.chmod(path, 0o666)
+    except Exception:
+        pass
 
 
-def ensure_provider_service(mailbox: Path | str, timeout: float = 5.0) -> int:
+def ensure_provider_service(mailbox: Path | str, timeout: float = 15.0) -> int:
     """Ensure the long-lived provider service is running for the given mailbox."""
     mailbox = Path(mailbox)
     mailbox.mkdir(parents=True, exist_ok=True)

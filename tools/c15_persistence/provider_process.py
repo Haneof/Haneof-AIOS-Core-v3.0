@@ -115,13 +115,25 @@ def append_ledger(mailbox: Path, record: dict[str, object]) -> None:
 
 def _atomic_write(path: Path, raw: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        os.chmod(path.parent, 0o777)
+    except Exception:
+        pass
     temp = path.with_name(f"{path.name}.{uuid.uuid4()}.tmp")
-    fd = os.open(temp, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    fd = os.open(temp, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o666)
     with os.fdopen(fd, "wb") as stream:
         stream.write(raw)
         stream.flush()
         os.fsync(stream.fileno())
+    try:
+        os.chmod(temp, 0o666)
+    except Exception:
+        pass
     os.replace(temp, path)
+    try:
+        os.chmod(path, 0o666)
+    except Exception:
+        pass
 
 
 def _mirror(mailbox: Path, source: Path, target: Path) -> None:
@@ -181,10 +193,13 @@ _SMALL_PRIMES = (
     73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151,
     157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233,
     239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307, 311, 313, 317,
+    331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397, 401, 409, 419,
+    421, 431, 433, 439, 443, 449, 457, 461, 463, 467, 479, 487, 491, 499, 503,
+    509, 521, 523, 541, 547, 557, 563, 569, 571, 577, 587, 593, 599, 601, 607,
 )
 
 
-def _is_probable_prime(n: int, k: int = 25) -> bool:
+def _is_probable_prime(n: int, k: int = 15) -> bool:
     if n < 2:
         return False
     for p in _SMALL_PRIMES:
@@ -253,6 +268,10 @@ class ProviderService:
     def write_public_descriptor(self) -> None:
         """Write public key descriptor and PID file (zero private material)."""
         self.mailbox.mkdir(parents=True, exist_ok=True)
+        try:
+            os.chmod(self.mailbox, 0o777)
+        except Exception:
+            pass
         descriptor = {
             "provider_instance_id": self.instance_id,
             "key_id": self.key_id,
@@ -418,6 +437,10 @@ class ProviderService:
         self.write_public_descriptor()
         cmds_dir = self.mailbox / "commands"
         cmds_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            os.chmod(cmds_dir, 0o777)
+        except Exception:
+            pass
 
         running = True
         while running:
