@@ -3,7 +3,7 @@
 Why a separate process
 ----------------------
 The probes need a *provider boundary* whose dispatch count is observable and
-durable, and which survives the death of the operator process.  Writing the
+durable, and which survives the death of the operator process. Writing the
 request to a durable outbox and having a **separate process** answer it gives an
 exact, countable dispatch event that is independent of the operator's memory.
 
@@ -15,9 +15,11 @@ The provider is deliberately dumb and deterministic:
   and keyed by request id, so re-presenting an outstanding request never creates
   a second dispatch;
 * it never inspects Core, never touches World, and never decides anything: it
-  only turns request bytes into reply bytes.
+  only turns request bytes into reply bytes;
+* provider-side signing authority lives exclusively within the provider boundary
+  and is NEVER exposed to operator or recovery callers.
 
-This stands in for the Resident-facing relay.  It is synthetic: no real Resident
+This stands in for the Resident-facing relay. It is synthetic: no real Resident
 is contacted and no real model provider is called.
 """
 
@@ -29,8 +31,12 @@ import os
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 CAPABILITY_NAME = "c15_probe_capability"
+PROVIDER_NAME = "c15-synthetic-relay"
+MODEL_NAME = "c15-synthetic-model"
+PROVIDER_KEY_ID = "c15-synthetic-provider-key"
 
 
 def _bootstrap() -> None:
@@ -43,17 +49,15 @@ def _bootstrap() -> None:
 
 _bootstrap()
 
-from aios_core.runtime import ModelCallProvenance, ModelDirective, ModelUsage  # noqa: E402
-from aios_core.runtime import CapabilityCall  # noqa: E402
-from aios_core.runtime.background_attempt import BackgroundModelAttemptStore, encode_model_directive  # noqa: E402
+from aios_core.runtime import CapabilityCall, ModelCallProvenance, ModelDirective, ModelUsage  # noqa: E402
+from aios_core.runtime.background_attempt import decode_model_directive, encode_model_directive  # noqa: E402
 from aios_core.runtime.late_return import (  # noqa: E402
     ExternalReturnObserver,
     LateReturnSigningContext,
     LateReturnVerifier,
-    late_return_message,
 )
 
-PROVIDER_KEY_ID = "c15-synthetic-provider-key"
+# Public modulus and exponent for the verifier (public cryptographic material only).
 _RSA_E = 65537
 _RSA_N = int(
     "88e3b1105b0c593e52f0ef365db4d6c0d93f6d53d59b361c0dd3a8539a343734"
@@ -66,18 +70,6 @@ _RSA_N = int(
     "8fa5e762fcfba20d1606bd172e8bf4842a6d5007b7d0e0f519cd2366c13153f5",
     16,
 )
-_RSA_D = int(
-    "4f65a141974da6459bdddb2171607e5f04a2e14a8acea7a7c5ed49e893bc4d78"
-    "fa83a9f7c1685a49743d31acacef27b6359b7ca41dd94074ac25583a0b703849"
-    "437bb65c031bcf7bbe4e1079e7a812780bcfadb849c179aed8cc99e07e51fda2"
-    "344eeab86c13f8625a479d2ef2ecb1076c3db401d2f7da5664ff99ad1c492fd5"
-    "de8b9b604849dc3e3eeaf84939f171cc95c73a7ecf05479c722f1037ee1e029e"
-    "f2bffec168a14e2e3b344c3cb0d0f210c2619eb39fc4a43c2b10046b1b59f5dc"
-    "4eff617acc02628c7a1433d2e37486a6d8a51a21d8713da54a866c57fb2320d4"
-    "1b7e3e5347f3cb83e6df0514314dc9adc34ba4618fd67db8e717f061016ec651",
-    16,
-)
-_SHA256_DER = bytes.fromhex("3031300d060960864801650304020105000420")
 
 
 def route_b_verifier(key_id: str = PROVIDER_KEY_ID) -> LateReturnVerifier:
@@ -90,52 +82,34 @@ def route_b_verifier(key_id: str = PROVIDER_KEY_ID) -> LateReturnVerifier:
     )
 
 
-def rsa_sign(message: bytes, key_id: str = PROVIDER_KEY_ID) -> str:
-    """Sign message bytes with the provider private key using RSA PKCS#1 v1.5 SHA-256."""
-    digest_info = _SHA256_DER + hashlib.sha256(message).digest()
-    size = (_RSA_N.bit_length() + 7) // 8
-    encoded = (
-        b"\x00\x01"
-        + (b"\xff" * (size - len(digest_info) - 3))
-        + b"\x00"
-        + digest_info
-    )
-    signature = pow(int.from_bytes(encoded, "big"), _RSA_D, _RSA_N)
-    return f"bglate_rsa_v1:{key_id}:" + signature.to_bytes(size, "big").hex()
+# Internal provider-side authority instance (lazily initialized within provider boundary).
+_provider_authority_instance = None
 
 
-class RouteBProviderSigner:
-    """External provider signer retaining private signing authority outside Core."""
+def _get_provider_authority():
+    global _provider_authority_instance
+    if _provider_authority_instance is None:
+        from ._provider_authority import ProviderSigningAuthority
+        _provider_authority_instance = ProviderSigningAuthority(key_id=PROVIDER_KEY_ID)
+    return _provider_authority_instance
 
-    def __init__(self, key_id: str = PROVIDER_KEY_ID) -> None:
-        self.key_id = key_id
-        self.contexts: dict[str, LateReturnSigningContext] = {}
+
+class ProviderReturnObserver(ExternalReturnObserver):
+    """Provider boundary observer capturing dispatch context outside operator control."""
 
     def accept_return_context(
         self, snapshot: object, context: LateReturnSigningContext
     ) -> None:
-        self.contexts[context.attempt_id] = context
+        authority = _get_provider_authority()
+        authority.accept_return_context(snapshot, context)
 
-    def sign(
-        self, attempt_id: str, directive: ModelDirective, **overrides: object
-    ) -> str:
-        context = self.contexts.get(attempt_id)
-        if context is None:
-            raise KeyError(f"no signing context for attempt {attempt_id}")
-        payload = encode_model_directive(directive)
-        fields: dict[str, object] = {
-            **context.scope_fields(),
-            "provider": directive.provenance.provider,
-            "model": directive.provenance.model,
-            "provider_request_id": directive.provenance.request_id,
-            "response_fingerprint": BackgroundModelAttemptStore._response_fingerprint(
-                directive
-            ),
-            "payload_sha256": hashlib.sha256(payload.encode("utf-8")).hexdigest(),
-        }
-        fields.update(overrides)
-        return rsa_sign(late_return_message(**fields), context.verifier_key_id)
 
+_observer_instance = ProviderReturnObserver()
+
+
+def get_provider_observer() -> ExternalReturnObserver:
+    """Return the provider-side dispatch context observer."""
+    return _observer_instance
 
 
 def outbox_path(mailbox: Path, request_id: str) -> Path:
@@ -144,6 +118,10 @@ def outbox_path(mailbox: Path, request_id: str) -> Path:
 
 def inbox_path(mailbox: Path, request_id: str) -> Path:
     return mailbox / "inbox" / f"{request_id}.reply"
+
+
+def proof_path(mailbox: Path, request_id: str) -> Path:
+    return mailbox / "inbox" / f"{request_id}.proof"
 
 
 def ledger_path(mailbox: Path) -> Path:
@@ -179,8 +157,8 @@ def digest(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
-def build_reply(request: bytes) -> bytes:
-    """Deterministic reply bytes for exact request bytes."""
+def build_directive(request: bytes) -> ModelDirective:
+    """Deterministic ModelDirective for exact request bytes."""
     envelope = json.loads(request.decode("utf-8"))
     request_id = str(envelope["model_request_id"])
     attempt_id = str(envelope["attempt_id"])
@@ -190,7 +168,7 @@ def build_reply(request: bytes) -> bytes:
     turn_text = str(envelope["resident_visible_payload"])
 
     if round_index == 0:
-        directive = ModelDirective(
+        return ModelDirective(
             capability_calls=(
                 CapabilityCall(
                     name=CAPABILITY_NAME,
@@ -210,21 +188,25 @@ def build_reply(request: bytes) -> bytes:
                 provider=provider, model=model, request_id=request_id
             ),
         )
-    else:
-        directive = ModelDirective(
-            response=f"[synthetic provider] round {round_index} answer for {turn_text[:24]}",
-            usage=ModelUsage(
-                input_tokens=13,
-                output_tokens=7,
-                total_tokens=20,
-                provider=provider,
-                model=model,
-                request_id=request_id,
-            ),
-            provenance=ModelCallProvenance(
-                provider=provider, model=model, request_id=request_id
-            ),
-        )
+    return ModelDirective(
+        response=f"[synthetic provider] round {round_index} answer for {turn_text[:24]}",
+        usage=ModelUsage(
+            input_tokens=13,
+            output_tokens=7,
+            total_tokens=20,
+            provider=provider,
+            model=model,
+            request_id=request_id,
+        ),
+        provenance=ModelCallProvenance(
+            provider=provider, model=model, request_id=request_id
+        ),
+    )
+
+
+def build_reply(request: bytes) -> bytes:
+    """Deterministic reply bytes for exact request bytes."""
+    directive = build_directive(request)
     return encode_model_directive(directive).encode("utf-8")
 
 
@@ -283,6 +265,17 @@ def dispatch(mailbox: Path, request_id: str) -> dict[str, object]:
     }
 
 
+def read_proof(mailbox: Path, request_id: str) -> dict[str, Any] | None:
+    """Read provider-produced proof from inbox if available."""
+    p_file = proof_path(Path(mailbox), request_id)
+    if not p_file.is_file():
+        return None
+    try:
+        return json.loads(p_file.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
 def collect(mailbox: Path, request_id: str) -> dict[str, object]:
     """Collect the exact reply for an already-dispatched request without redispatch."""
     mailbox = Path(mailbox)
@@ -295,10 +288,21 @@ def collect(mailbox: Path, request_id: str) -> dict[str, object]:
     if not previous:
         raise SystemExit(f"provider: request {request_id} was never dispatched")
     reply_file = inbox_path(mailbox, request_id)
+    proof_file = proof_path(mailbox, request_id)
     if not reply_file.is_file():
-        reply = build_reply(request)
+        directive = build_directive(request)
+        reply = encode_model_directive(directive).encode("utf-8")
         _atomic_write(reply_file, reply)
         _mirror(mailbox, reply_file, current_reply_path(mailbox))
+
+    if not proof_file.is_file():
+        envelope = json.loads(request.decode("utf-8"))
+        attempt_id = str(envelope["attempt_id"])
+        authority = _get_provider_authority()
+        if attempt_id in authority.contexts:
+            directive = build_directive(request)
+            proof_dict = authority.sign_exact_provider_response(attempt_id, directive)
+            _atomic_write(proof_file, json.dumps(proof_dict, sort_keys=True).encode("utf-8"))
     return {
         "request_id": request_id,
         "request_sha256": request_sha,
@@ -326,7 +330,3 @@ def main(argv: list[str]) -> int:
     report = serve(Path(argv[1]), argv[2])
     print(json.dumps(report, sort_keys=True))
     return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main(sys.argv))

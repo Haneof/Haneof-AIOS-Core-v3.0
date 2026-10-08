@@ -372,8 +372,11 @@ def test_core_receipt_revalidation_rejects_an_operator_invented_receipt() -> Non
         directive = decode_model_directive(payload)
         context = attempts.late_return_signing_context(attempt_id)
         assert context is not None
-        session._external_signer.accept_return_context(None, context)
-        proof = session._external_signer.sign(attempt_id, directive)
+        from tools.c15_persistence._provider_authority import ProviderSigningAuthority
+        test_authority = ProviderSigningAuthority()
+        test_authority.accept_return_context(None, context)
+        proof_dict = test_authority.sign_exact_provider_response(attempt_id, directive)
+        proof = proof_dict["authenticity_proof"]
         from datetime import datetime, timezone
         attempts.attach_late_trusted_return(
             attempt_id=attempt_id,

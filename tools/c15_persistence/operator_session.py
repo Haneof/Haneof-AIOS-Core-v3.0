@@ -259,7 +259,6 @@ class OperatorSession:
         self.state = backend.state_dir
         self.mailbox = backend.mailbox_dir
         self.runtime: FusedTurnRuntime | None = None
-        self._external_signer = provider_module.RouteBProviderSigner()
         self._kill_at: str | None = None
         self._kill_round: int | None = None
         self._handler_rounds: list[int] = []
@@ -1028,30 +1027,23 @@ class OperatorSession:
         def probe_recorder(snapshot, response):
             round_index = int(snapshot.round_index)
             attempt_id = str(snapshot.model_attempt_id)
-            if self._external_signer is not None and attempt_id in self._external_signer.contexts:
-                proof_str = self._external_signer.sign(attempt_id, response)
-                request_id = self._request_id(attempt_id, round_index)
+            request_id = self._request_id(attempt_id, round_index)
+            provider_module.collect(self.mailbox, request_id)
+            proof_dict = provider_module.read_proof(self.mailbox, request_id)
+            if proof_dict is not None:
                 raw_reply = self._collect_reply(request_id)
                 runtime.background_model_attempts.attach_late_trusted_return(
                     attempt_id=attempt_id,
                     attached_at=datetime.now(timezone.utc),
                     directive_payload=raw_reply.decode("utf-8"),
-                    late_return_proof=proof_str,
+                    late_return_proof=proof_dict["authenticity_proof"],
                     evidence="k3-trusted-return-barrier",
                 )
                 if request_id in self._known_requests():
-                    fingerprint = hashlib.sha256(raw_reply).hexdigest()
-                    proof_dict = {
-                        "attempt_id": attempt_id,
-                        "authenticity_proof": proof_str,
-                        "provider": response.provenance.provider,
-                        "model": response.provenance.model,
-                        "provider_request_id": response.provenance.request_id,
-                        "response_fingerprint": fingerprint,
-                        "relay_id": self._external_signer.contexts[attempt_id].relay_id,
-                    }
                     if self.journal.recovery(request_id)["state"] == "reply-staged":
                         self.journal.mark_authenticated(request_id, proof_dict)
+            else:
+                recorded(snapshot, response)
             self._trusted_return_barrier(snapshot)
             if self.kill_armed("K3_TRUSTED_RETURN_DURABLE", round_index=round_index):
                 return
@@ -1066,7 +1058,7 @@ class OperatorSession:
             index=index,
             model_handler=self._model_handler,
             late_return_verifier=provider_module.route_b_verifier(),
-            external_return_observer=self._external_signer,
+            external_return_observer=provider_module.get_provider_observer(),
         )
         self._install_trusted_return_probe(runtime)
         runtime.registry.register(
@@ -1191,39 +1183,24 @@ class OperatorSession:
                         }
                     )
                     continue
-                if attempt.state in {"response_returned", "metered"}:
-                    # Response was returned to Core before the crash. Attach late trusted return
-                    # so model_response_recovery can cleanly recover the round.
-                    context = attempts.late_return_signing_context(attempt_id)
-                    if context is not None and self._external_signer is not None:
-                        self._external_signer.accept_return_context(None, context)
-                        proof_str = self._external_signer.sign(attempt_id, directive)
-                        attempts.attach_late_trusted_return(
-                            attempt_id=attempt_id,
-                            attached_at=datetime.now(timezone.utc),
-                            directive_payload=payload,
-                            late_return_proof=proof_str,
-                            evidence="operator-recovery-late-return",
-                        )
-                        receipt = attempts.response_authenticity_receipt(attempt_id)
-                if receipt is None:
-                    # The provider boundary was crossed and no Core-owned trusted
-                    # return exists (e.g. killed during dispatching or in_doubt).
-                    # Accepted Core has no legal continuation here:
-                    # caller-supplied bytes cannot become a trusted provider
-                    # return, and blind redispatch is forbidden. Hard stop.
-                    stop = DurableTrustedReturnMissing(
-                        attempt_id=attempt_id,
-                        state=str(attempt.state),
-                        round_index=round_index,
-                        detail=(
-                            "provider boundary crossed without a durable trusted "
-                            "return; refusing redispatch and refusing invented "
-                            "authenticity"
-                        ),
-                    )
-                    self._record_fail_closed_stop(stop)
-                    raise stop
+                # The provider boundary was crossed and no Core-owned trusted
+                # return exists (e.g. killed during dispatching or in_doubt, or killed
+                # before K3_TRUSTED_RETURN_DURABLE).
+                # Accepted Core has no legal continuation here:
+                # caller-supplied bytes cannot become a trusted provider
+                # return, and blind redispatch is forbidden. Hard stop.
+                stop = DurableTrustedReturnMissing(
+                    attempt_id=attempt_id,
+                    state=str(attempt.state),
+                    round_index=round_index,
+                    detail=(
+                        "provider boundary crossed without a durable trusted "
+                        "return; refusing redispatch and refusing invented "
+                        "authenticity"
+                    ),
+                )
+                self._record_fail_closed_stop(stop)
+                raise stop
             fingerprint = hashlib.sha256(payload.encode("utf-8")).hexdigest()
             require(
                 fingerprint == attempts._response_fingerprint(directive),
