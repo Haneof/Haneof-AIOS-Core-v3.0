@@ -265,7 +265,11 @@ def digest(raw: bytes) -> str:
 def _mirror(mailbox: Path, source: Path, target: Path) -> None:
     if source.is_file():
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(source.read_bytes())
+        try:
+            os.chmod(target.parent, 0o777)
+        except Exception:
+            pass
+        _atomic_write(target, source.read_bytes())
 
 
 def _send_provider_command(

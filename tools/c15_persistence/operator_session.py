@@ -933,11 +933,19 @@ class OperatorSession:
         if target.is_file():
             return
         target.parent.mkdir(parents=True, exist_ok=True)
-        fd = os.open(target, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+        try:
+            os.chmod(target.parent, 0o777)
+        except Exception:
+            pass
+        fd = os.open(target, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o666)
         with os.fdopen(fd, "wb") as stream:
             stream.write(raw)
             stream.flush()
             os.fsync(stream.fileno())
+        try:
+            os.chmod(target, 0o666)
+        except Exception:
+            pass
         dir_fd = os.open(target.parent, os.O_RDONLY | os.O_DIRECTORY)
         try:
             os.fsync(dir_fd)
