@@ -27,6 +27,11 @@ if __name__ != "__main__":
         "provider_process is an isolated process boundary and cannot be imported into operator process"
     )
 
+try:
+    import fcntl
+except ImportError:
+    fcntl = None
+
 import hashlib
 import json
 import math
@@ -257,6 +262,17 @@ class ProviderService:
         self.key_id = key_id
         self.pid = os.getpid()
         self.instance_id = str(uuid.uuid4())
+
+        self.lock_fd: int | None = None
+        if fcntl is not None:
+            self.mailbox.mkdir(parents=True, exist_ok=True)
+            self.lock_file = self.mailbox / "provider.lock"
+            self.lock_fd = os.open(self.lock_file, os.O_CREAT | os.O_RDWR, 0o666)
+            try:
+                fcntl.flock(self.lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except (BlockingIOError, OSError):
+                # Another provider service is already running and holding the lock
+                sys.exit(0)
 
         # Generate ephemeral RSA-2048 keypair purely in process heap memory via OS CSPRNG
         self._n, self._e, self._d = generate_rsa_keypair(key_size=2048, e=65537)

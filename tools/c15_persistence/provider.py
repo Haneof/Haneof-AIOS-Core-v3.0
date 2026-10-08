@@ -21,6 +21,11 @@ Under the AIOS trust model:
 
 from __future__ import annotations
 
+try:
+    import fcntl
+except ImportError:
+    fcntl = None
+
 import hashlib
 import json
 import os
@@ -81,6 +86,26 @@ def _atomic_write(path: Path, raw: bytes) -> None:
         pass
 
 
+def is_provider_locked(mailbox: Path) -> bool:
+    if fcntl is None:
+        return False
+    lock_file = mailbox / "provider.lock"
+    if not lock_file.is_file():
+        return False
+    try:
+        fd = os.open(lock_file, os.O_RDWR, 0o666)
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            fcntl.flock(fd, fcntl.LOCK_UN)
+            return False
+        except (BlockingIOError, OSError):
+            return True
+        finally:
+            os.close(fd)
+    except Exception:
+        return False
+
+
 def ensure_provider_service(mailbox: Path | str, timeout: float = 15.0) -> int:
     """Ensure the long-lived provider service is running for the given mailbox."""
     mailbox = Path(mailbox)
@@ -88,26 +113,25 @@ def ensure_provider_service(mailbox: Path | str, timeout: float = 15.0) -> int:
     pid_file = mailbox / "provider.pid"
     pub_file = mailbox / "provider-public.json"
 
-    if pid_file.is_file():
+    # If provider is running (either holding flock or has alive PID or pub_file exists)
+    if pub_file.is_file() and (is_provider_locked(mailbox) or pid_file.is_file()):
         try:
-            pid = int(pid_file.read_text(encoding="utf-8").strip())
-            if _is_pid_alive(pid) and pid != os.getpid():
-                # Process is alive! Verify if responsive
-                try:
-                    res = _send_provider_command(mailbox, {"cmd": "status"}, timeout=2.0, auto_ensure=False)
-                    if res.get("status") == "running":
-                        provider_pid = int(res.get("provider_pid", 0))
-                        if provider_pid > 0 and provider_pid != os.getpid():
-                            return provider_pid
-                except Exception:
-                    if pub_file.is_file():
-                        return pid
+            res = _send_provider_command(mailbox, {"cmd": "status"}, timeout=3.0, auto_ensure=False)
+            if res.get("status") == "running":
+                provider_pid = int(res.get("provider_pid", 0))
+                if provider_pid > 0 and provider_pid != os.getpid():
+                    return provider_pid
         except Exception:
-            pass
+            if is_provider_locked(mailbox):
+                try:
+                    return int(pid_file.read_text(encoding="utf-8").strip())
+                except Exception:
+                    return 1
 
-    # Clean up stale files
-    pid_file.unlink(missing_ok=True)
-    pub_file.unlink(missing_ok=True)
+    # Clean up stale files only if lock is NOT held
+    if not is_provider_locked(mailbox):
+        pid_file.unlink(missing_ok=True)
+        pub_file.unlink(missing_ok=True)
 
     # Spawn provider service subprocess
     env = dict(os.environ)
@@ -127,14 +151,21 @@ def ensure_provider_service(mailbox: Path | str, timeout: float = 15.0) -> int:
 
     start = time.time()
     while time.time() - start < timeout:
-        if pub_file.is_file() and pid_file.is_file():
+        if pub_file.is_file():
             try:
-                res = _send_provider_command(mailbox, {"cmd": "status"}, timeout=0.5, auto_ensure=False)
+                res = _send_provider_command(mailbox, {"cmd": "status"}, timeout=1.0, auto_ensure=False)
                 if res.get("status") == "running":
                     return int(res.get("provider_pid", 0))
             except Exception:
                 pass
         if proc.poll() is not None:
+            if proc.returncode == 0 and pub_file.is_file():
+                try:
+                    res = _send_provider_command(mailbox, {"cmd": "status"}, timeout=2.0, auto_ensure=False)
+                    if res.get("status") == "running":
+                        return int(res.get("provider_pid", 0))
+                except Exception:
+                    pass
             raise RuntimeError(f"Provider service exited prematurely with code {proc.returncode}")
         time.sleep(0.01)
 
