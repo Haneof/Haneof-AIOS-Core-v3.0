@@ -255,6 +255,9 @@ def generate_rsa_keypair(key_size: int = 2048, e: int = 65537) -> tuple[int, int
             return n, e, d
 
 
+RUNTIME_BASE_DIR = Path(tempfile.gettempdir()) / ".aios_provider_runtime"
+
+
 class ProviderService:
     """Isolated, long-lived provider service maintaining private key in memory heap only."""
 
@@ -263,70 +266,41 @@ class ProviderService:
         self.key_id = key_id
         self.pid = os.getpid()
 
+        # Ephemeral in-memory RSA keypair (Model A: strictly memory-only, never persisted to disk/vault/temp)
+        self.instance_id = str(uuid.uuid4())
+        self._n, self._e, self._d = generate_rsa_keypair(key_size=2048, e=65537)
+        self.modulus_hex = f"{self._n:x}"
+        self.public_key_fingerprint = hashlib.sha256(
+            f"{self.modulus_hex}:{self._e}".encode("utf-8")
+        ).hexdigest()
+
+        self.runtime_dir = RUNTIME_BASE_DIR / self.instance_id
+        self.runtime_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            os.chmod(RUNTIME_BASE_DIR, 0o777)
+            os.chmod(self.runtime_dir, 0o777)
+        except Exception:
+            pass
+
         self.lock_fd: int | None = None
         if fcntl is not None:
-            self.mailbox.mkdir(parents=True, exist_ok=True)
-            self.lock_file = self.mailbox / "provider.lock"
+            self.lock_file = self.runtime_dir / "provider.lock"
             self.lock_fd = os.open(self.lock_file, os.O_CREAT | os.O_RDWR, 0o666)
             try:
                 fcntl.flock(self.lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
             except (BlockingIOError, OSError):
                 # Another provider service is already running and holding the lock
                 sys.exit(0)
-
-        # Check if an existing provider instance key exists in vault for this mailbox
-        vault_dir = Path(tempfile.gettempdir()) / ".aios_provider_vault"
-        vault_dir.mkdir(parents=True, exist_ok=True)
-        try:
-            os.chmod(vault_dir, 0o700)
-        except Exception:
-            pass
-
-        pub_file = self.mailbox / "provider-public.json"
-        loaded = False
-        if pub_file.is_file():
             try:
-                pub_data = json.loads(pub_file.read_text(encoding="utf-8"))
-                existing_inst = pub_data.get("provider_instance_id")
-                if existing_inst:
-                    key_file = vault_dir / f"{existing_inst}.key"
-                    if key_file.is_file():
-                        key_data = json.loads(key_file.read_text(encoding="utf-8"))
-                        self._n = int(key_data["n"])
-                        self._e = int(key_data["e"])
-                        self._d = int(key_data["d"])
-                        self.instance_id = existing_inst
-                        self.modulus_hex = f"{self._n:x}"
-                        self.public_key_fingerprint = hashlib.sha256(
-                            f"{self.modulus_hex}:{self._e}".encode("utf-8")
-                        ).hexdigest()
-                        loaded = True
+                self.mailbox.mkdir(parents=True, exist_ok=True)
+                mb_lock = self.mailbox / "provider.lock"
+                self.mb_lock_fd = os.open(mb_lock, os.O_CREAT | os.O_RDWR, 0o666)
+                fcntl.flock(self.mb_lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
             except Exception:
-                loaded = False
+                self.mb_lock_fd = None
 
-        if not loaded:
-            self.instance_id = str(uuid.uuid4())
-            self._n, self._e, self._d = generate_rsa_keypair(key_size=2048, e=65537)
-            self.modulus_hex = f"{self._n:x}"
-            self.public_key_fingerprint = hashlib.sha256(
-                f"{self.modulus_hex}:{self._e}".encode("utf-8")
-            ).hexdigest()
-            key_file = vault_dir / f"{self.instance_id}.key"
-            key_file.write_text(
-                json.dumps({"n": self._n, "e": self._e, "d": self._d}), encoding="utf-8"
-            )
-            try:
-                os.chmod(key_file, 0o600)
-            except Exception:
-                pass
-
-    def write_public_descriptor(self) -> None:
+    def write_public_descriptor(self, target_mailbox: Path | None = None) -> None:
         """Write public key descriptor and PID file (zero private material)."""
-        self.mailbox.mkdir(parents=True, exist_ok=True)
-        try:
-            os.chmod(self.mailbox, 0o777)
-        except Exception:
-            pass
         descriptor = {
             "provider_instance_id": self.instance_id,
             "key_id": self.key_id,
@@ -336,14 +310,30 @@ class ProviderService:
             "public_key_fingerprint": self.public_key_fingerprint,
             "created_at": datetime.now(timezone.utc).isoformat(),
         }
-        pub_file = self.mailbox / "provider-public.json"
-        _atomic_write(pub_file, json.dumps(descriptor, indent=2, sort_keys=True).encode("utf-8"))
+        # Always write to isolated runtime directory
+        self.runtime_dir.mkdir(parents=True, exist_ok=True)
+        pub_runtime = self.runtime_dir / "provider-public.json"
+        _atomic_write(pub_runtime, json.dumps(descriptor, indent=2, sort_keys=True).encode("utf-8"))
+        pid_runtime = self.runtime_dir / "provider.pid"
+        _atomic_write(pid_runtime, f"{self.pid}\n".encode("utf-8"))
 
-        binding_file = self.mailbox / "provider-binding.json"
-        _atomic_write(binding_file, json.dumps(descriptor, indent=2, sort_keys=True).encode("utf-8"))
+        mailboxes_to_write = []
+        if self.mailbox is not None:
+            mailboxes_to_write.append(self.mailbox)
+        if target_mailbox is not None and target_mailbox != self.mailbox:
+            mailboxes_to_write.append(target_mailbox)
 
-        pid_file = self.mailbox / "provider.pid"
-        _atomic_write(pid_file, f"{self.pid}\n".encode("utf-8"))
+        for mb in mailboxes_to_write:
+            try:
+                mb.mkdir(parents=True, exist_ok=True)
+                pub_file = mb / "provider-public.json"
+                _atomic_write(pub_file, json.dumps(descriptor, indent=2, sort_keys=True).encode("utf-8"))
+                binding_file = mb / "provider-binding.json"
+                _atomic_write(binding_file, json.dumps(descriptor, indent=2, sort_keys=True).encode("utf-8"))
+                pid_file = mb / "provider.pid"
+                _atomic_write(pid_file, f"{self.pid}\n".encode("utf-8"))
+            except Exception:
+                pass
 
     def sign_message(self, message: bytes) -> str:
         """Sign canonical message bytes with in-memory private key using RSA PKCS#1 v1.5 SHA-256."""
@@ -359,8 +349,9 @@ class ProviderService:
         return f"bglate_rsa_v1:{self.key_id}:" + signature.to_bytes(size, "big").hex()
 
     def sign_exact_response(
-        self, request: bytes, directive: ModelDirective
+        self, request: bytes, directive: ModelDirective, target_mailbox: Path | None = None
     ) -> dict[str, Any]:
+        mb = target_mailbox or self.mailbox
         envelope = json.loads(request.decode("utf-8"))
         attempt_id = str(envelope["attempt_id"])
         provider = str(envelope["provider"])
@@ -371,7 +362,9 @@ class ProviderService:
         fingerprint = BackgroundModelAttemptStore._response_fingerprint(directive)
         payload_sha256 = hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
-        context_file = self.mailbox / "contexts" / f"{attempt_id}.json"
+        context_file = mb / "contexts" / f"{attempt_id}.json"
+        if not context_file.is_file() and mb != self.mailbox:
+            context_file = self.mailbox / "contexts" / f"{attempt_id}.json"
         if not context_file.is_file():
             raise KeyError(f"provider has no registered dispatch context for attempt {attempt_id}")
 
@@ -397,15 +390,20 @@ class ProviderService:
         }
 
     def dispatch(
-        self, request_id: str, operator_pid: int = 0, reattach: bool = False
+        self, request_id: str, operator_pid: int = 0, reattach: bool = False, target_mailbox: Path | None = None
     ) -> dict[str, object]:
         """Cross the provider submission boundary exactly once."""
-        request_file = outbox_path(self.mailbox, request_id)
+        mb = target_mailbox or self.mailbox
+        request_file = outbox_path(mb, request_id)
+        if not request_file.is_file() and mb != self.mailbox:
+            request_file = outbox_path(self.mailbox, request_id)
         if not request_file.is_file():
             raise FileNotFoundError(f"provider: no durable request for {request_id}")
         request = request_file.read_bytes()
         request_sha = digest(request)
-        previous = [row for row in read_ledger(self.mailbox) if row.get("request_id") == request_id]
+        previous = [row for row in read_ledger(mb) if row.get("request_id") == request_id]
+        if not previous and mb != self.mailbox:
+            previous = [row for row in read_ledger(self.mailbox) if row.get("request_id") == request_id]
         if previous or reattach:
             return {
                 "request_id": request_id,
@@ -418,7 +416,7 @@ class ProviderService:
                 "public_key_fingerprint": self.public_key_fingerprint,
             }
         append_ledger(
-            self.mailbox,
+            mb,
             {
                 "request_id": request_id,
                 "request_sha256": request_sha,
@@ -429,6 +427,22 @@ class ProviderService:
                 "public_key_fingerprint": self.public_key_fingerprint,
             },
         )
+        if mb != self.mailbox:
+            try:
+                append_ledger(
+                    self.mailbox,
+                    {
+                        "request_id": request_id,
+                        "request_sha256": request_sha,
+                        "dispatched_at_epoch": time.time(),
+                        "provider_pid": self.pid,
+                        "operator_pid": operator_pid,
+                        "provider_instance_id": self.instance_id,
+                        "public_key_fingerprint": self.public_key_fingerprint,
+                    },
+                )
+            except Exception:
+                pass
         return {
             "request_id": request_id,
             "request_sha256": request_sha,
@@ -440,29 +454,47 @@ class ProviderService:
             "public_key_fingerprint": self.public_key_fingerprint,
         }
 
-    def collect(self, request_id: str, operator_pid: int = 0) -> dict[str, object]:
+    def collect(self, request_id: str, operator_pid: int = 0, target_mailbox: Path | None = None) -> dict[str, object]:
         """Collect the exact reply and proof for an already-dispatched request."""
-        request_file = outbox_path(self.mailbox, request_id)
+        mb = target_mailbox or self.mailbox
+        request_file = outbox_path(mb, request_id)
+        if not request_file.is_file() and mb != self.mailbox:
+            request_file = outbox_path(self.mailbox, request_id)
         if not request_file.is_file():
             raise FileNotFoundError(f"provider: no durable request for {request_id}")
         request = request_file.read_bytes()
         request_sha = digest(request)
-        previous = [row for row in read_ledger(self.mailbox) if row.get("request_id") == request_id]
-        reply_file = inbox_path(self.mailbox, request_id)
-        proof_file = proof_path(self.mailbox, request_id)
+        previous = [row for row in read_ledger(mb) if row.get("request_id") == request_id]
+        if not previous and mb != self.mailbox:
+            previous = [row for row in read_ledger(self.mailbox) if row.get("request_id") == request_id]
+        reply_file = inbox_path(mb, request_id)
+        proof_file = proof_path(mb, request_id)
         directive = build_directive(request)
         if not reply_file.is_file():
             reply = encode_model_directive(directive).encode("utf-8")
             _atomic_write(reply_file, reply)
-            _mirror(self.mailbox, reply_file, current_reply_path(self.mailbox))
+            _mirror(mb, reply_file, current_reply_path(mb))
+            if mb != self.mailbox:
+                try:
+                    _atomic_write(inbox_path(self.mailbox, request_id), reply)
+                    _mirror(self.mailbox, inbox_path(self.mailbox, request_id), current_reply_path(self.mailbox))
+                except Exception:
+                    pass
 
         if not proof_file.is_file():
             envelope = json.loads(request.decode("utf-8"))
             attempt_id = str(envelope["attempt_id"])
-            context_file = self.mailbox / "contexts" / f"{attempt_id}.json"
+            context_file = mb / "contexts" / f"{attempt_id}.json"
+            if not context_file.is_file() and mb != self.mailbox:
+                context_file = self.mailbox / "contexts" / f"{attempt_id}.json"
             if context_file.is_file():
-                proof_dict = self.sign_exact_response(request, directive)
+                proof_dict = self.sign_exact_response(request, directive, target_mailbox=mb)
                 _atomic_write(proof_file, json.dumps(proof_dict, sort_keys=True).encode("utf-8"))
+                if mb != self.mailbox:
+                    try:
+                        _atomic_write(proof_path(self.mailbox, request_id), json.dumps(proof_dict, sort_keys=True).encode("utf-8"))
+                    except Exception:
+                        pass
 
         return {
             "request_id": request_id,
@@ -477,10 +509,10 @@ class ProviderService:
         }
 
     def serve(
-        self, request_id: str, operator_pid: int = 0, reattach: bool = False
+        self, request_id: str, operator_pid: int = 0, reattach: bool = False, target_mailbox: Path | None = None
     ) -> dict[str, object]:
-        dispatch_report = self.dispatch(request_id, operator_pid=operator_pid, reattach=reattach)
-        reply_report = self.collect(request_id, operator_pid=operator_pid)
+        dispatch_report = self.dispatch(request_id, operator_pid=operator_pid, reattach=reattach, target_mailbox=target_mailbox)
+        reply_report = self.collect(request_id, operator_pid=operator_pid, target_mailbox=target_mailbox)
         return {
             **reply_report,
             "dispatch": dispatch_report["dispatch"],
@@ -488,8 +520,15 @@ class ProviderService:
         }
 
     def run_service(self) -> int:
-        """Run service event loop watching for command files in mailbox/commands/."""
+        """Run service event loop watching for command files in runtime_dir and mailbox."""
         self.write_public_descriptor()
+        runtime_cmds_dir = self.runtime_dir / "commands"
+        runtime_cmds_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            os.chmod(runtime_cmds_dir, 0o777)
+        except Exception:
+            pass
+
         cmds_dir = self.mailbox / "commands"
         cmds_dir.mkdir(parents=True, exist_ok=True)
         try:
@@ -500,7 +539,10 @@ class ProviderService:
         running = True
         while running:
             try:
-                cmd_files = sorted(cmds_dir.glob("*.cmd"))
+                # Poll both runtime commands dir and initial mailbox commands dir
+                cmd_files = sorted(runtime_cmds_dir.glob("*.cmd"))
+                if cmds_dir.is_dir():
+                    cmd_files.extend(sorted(cmds_dir.glob("*.cmd")))
                 for cmd_path in cmd_files:
                     try:
                         raw = cmd_path.read_text(encoding="utf-8")
@@ -509,18 +551,21 @@ class ProviderService:
                         req_id = cmd_data.get("request_id", "")
                         op_pid = int(cmd_data.get("operator_pid", 0))
                         reattach = bool(cmd_data.get("reattach", False))
+                        target_mb_str = cmd_data.get("mailbox")
+                        target_mb = Path(target_mb_str) if target_mb_str else self.mailbox
+
+                        if target_mb is not None:
+                            self.write_public_descriptor(target_mailbox=target_mb)
 
                         if cmd == "dispatch":
-                            res = self.dispatch(req_id, operator_pid=op_pid, reattach=reattach)
+                            res = self.dispatch(req_id, operator_pid=op_pid, reattach=reattach, target_mailbox=target_mb)
                         elif cmd == "collect":
-                            res = self.collect(req_id, operator_pid=op_pid)
+                            res = self.collect(req_id, operator_pid=op_pid, target_mailbox=target_mb)
                         elif cmd == "serve":
-                            res = self.serve(req_id, operator_pid=op_pid, reattach=reattach)
+                            res = self.serve(req_id, operator_pid=op_pid, reattach=reattach, target_mailbox=target_mb)
                         elif cmd == "stop":
                             res = {"status": "stopping", "provider_pid": self.pid}
                             running = False
-                            vault_file = Path(tempfile.gettempdir()) / ".aios_provider_vault" / f"{self.instance_id}.key"
-                            vault_file.unlink(missing_ok=True)
                         elif cmd == "status":
                             res = {
                                 "status": "running",
@@ -533,6 +578,12 @@ class ProviderService:
 
                         res_path = cmd_path.with_suffix(".result")
                         _atomic_write(res_path, json.dumps(res, sort_keys=True).encode("utf-8"))
+                        if target_mb is not None:
+                            try:
+                                mb_res_path = target_mb / "commands" / res_path.name
+                                _atomic_write(mb_res_path, json.dumps(res, sort_keys=True).encode("utf-8"))
+                            except Exception:
+                                pass
                     except Exception as exc:
                         res_path = cmd_path.with_suffix(".result")
                         _atomic_write(res_path, json.dumps({"error": str(exc)}, sort_keys=True).encode("utf-8"))

@@ -86,16 +86,30 @@ def _atomic_write(path: Path, raw: bytes) -> None:
         pass
 
 
-def is_provider_locked(mailbox: Path) -> bool:
+RUNTIME_BASE_DIR = Path(tempfile.gettempdir()) / ".aios_provider_runtime"
+
+
+def is_instance_alive(instance_id: str | None) -> bool:
+    if not instance_id:
+        return False
+    runtime_dir = RUNTIME_BASE_DIR / str(instance_id)
+    lock_file = runtime_dir / "provider.lock"
+    pid_file = runtime_dir / "provider.pid"
+    if not lock_file.is_file() or not pid_file.is_file():
+        return False
+    try:
+        pid = int(pid_file.read_text(encoding="utf-8").strip())
+        if not _is_pid_alive(pid):
+            return False
+    except Exception:
+        return False
     if fcntl is None:
-        return False
-    lock_file = mailbox / "provider.lock"
-    if not lock_file.is_file():
-        return False
+        return True
     try:
         fd = os.open(lock_file, os.O_RDWR, 0o666)
         try:
             fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            # Acquired lock -> provider is NOT holding it!
             fcntl.flock(fd, fcntl.LOCK_UN)
             return False
         except (BlockingIOError, OSError):
@@ -106,14 +120,75 @@ def is_provider_locked(mailbox: Path) -> bool:
         return False
 
 
-def ensure_provider_service(mailbox: Path | str, timeout: float = 15.0) -> int:
+def is_provider_locked(mailbox: Path) -> bool:
+    mailbox = Path(mailbox)
+    # Check mailbox-level lock first
+    if fcntl is not None:
+        lock_file = mailbox / "provider.lock"
+        if lock_file.is_file():
+            try:
+                fd = os.open(lock_file, os.O_RDWR, 0o666)
+                try:
+                    fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    fcntl.flock(fd, fcntl.LOCK_UN)
+                except (BlockingIOError, OSError):
+                    return True
+                finally:
+                    os.close(fd)
+            except Exception:
+                pass
+    # Check if instance is bound and alive in runtime
+    for fname in ("provider-binding.json", "provider-public.json"):
+        fpath = mailbox / fname
+        if fpath.is_file():
+            try:
+                data = json.loads(fpath.read_text(encoding="utf-8"))
+                inst = data.get("provider_instance_id")
+                if inst and is_instance_alive(inst):
+                    return True
+            except Exception:
+                pass
+    return False
+
+
+def ensure_provider_service(mailbox: Path | str, instance_id: str | None = None, timeout: float = 15.0) -> int:
     """Ensure the long-lived provider service is running for the given mailbox."""
     mailbox = Path(mailbox)
     mailbox.mkdir(parents=True, exist_ok=True)
     pid_file = mailbox / "provider.pid"
     pub_file = mailbox / "provider-public.json"
+    binding_file = mailbox / "provider-binding.json"
 
-    # If provider is running (either holding flock or has alive PID or pub_file exists)
+    target_instance = instance_id
+    if not target_instance:
+        if binding_file.is_file():
+            try:
+                target_instance = json.loads(binding_file.read_text(encoding="utf-8")).get("provider_instance_id")
+            except Exception:
+                pass
+        elif pub_file.is_file():
+            try:
+                target_instance = json.loads(pub_file.read_text(encoding="utf-8")).get("provider_instance_id")
+            except Exception:
+                pass
+
+    # If target instance is specified and alive in runtime dir, reuse it directly!
+    if target_instance and is_instance_alive(target_instance):
+        inst_runtime_dir = RUNTIME_BASE_DIR / str(target_instance)
+        inst_pub = inst_runtime_dir / "provider-public.json"
+        inst_pid = inst_runtime_dir / "provider.pid"
+        if inst_pub.is_file() and inst_pid.is_file():
+            try:
+                pub_data = inst_pub.read_text(encoding="utf-8")
+                _atomic_write(pub_file, pub_data.encode("utf-8"))
+                _atomic_write(binding_file, pub_data.encode("utf-8"))
+                pid_val = inst_pid.read_text(encoding="utf-8").strip()
+                _atomic_write(pid_file, f"{pid_val}\n".encode("utf-8"))
+                return int(pid_val)
+            except Exception:
+                pass
+
+    # If provider is already running for this exact mailbox
     if pub_file.is_file() and (is_provider_locked(mailbox) or pid_file.is_file()):
         try:
             res = _send_provider_command(mailbox, {"cmd": "status"}, timeout=3.0, auto_ensure=False)
@@ -131,8 +206,10 @@ def ensure_provider_service(mailbox: Path | str, timeout: float = 15.0) -> int:
     # Clean up stale files only if lock is NOT held
     if not is_provider_locked(mailbox):
         pid_file.unlink(missing_ok=True)
+        pub_file.unlink(missing_ok=True)
+        binding_file.unlink(missing_ok=True)
 
-    # Spawn provider service subprocess
+    # Spawn fresh provider service subprocess
     env = dict(os.environ)
     proc = subprocess.Popen(
         [
@@ -175,29 +252,50 @@ def stop_provider_service(mailbox: Path | str) -> None:
     """Stop the provider service running for the given mailbox."""
     mailbox = Path(mailbox)
     pid_file = mailbox / "provider.pid"
+    binding_file = mailbox / "provider-binding.json"
     pub_file = mailbox / "provider-public.json"
     inst_id = None
-    if pub_file.is_file():
+    for f in (binding_file, pub_file):
+        if f.is_file():
+            try:
+                inst_id = json.loads(f.read_text(encoding="utf-8")).get("provider_instance_id")
+                if inst_id:
+                    break
+            except Exception:
+                pass
+
+    pid = None
+    if pid_file.is_file():
         try:
-            inst_id = json.loads(pub_file.read_text(encoding="utf-8")).get("provider_instance_id")
+            pid = int(pid_file.read_text(encoding="utf-8").strip())
         except Exception:
             pass
-    if not pid_file.is_file():
-        if inst_id:
-            vault_file = Path(tempfile.gettempdir()) / ".aios_provider_vault" / f"{inst_id}.key"
-            vault_file.unlink(missing_ok=True)
-        return
-    try:
-        pid = int(pid_file.read_text(encoding="utf-8").strip())
-        if _is_pid_alive(pid) and pid != os.getpid():
-            _send_provider_command(mailbox, {"cmd": "stop"}, timeout=1.0)
-    except Exception:
-        pass
-    finally:
-        pid_file.unlink(missing_ok=True)
-        if inst_id:
-            vault_file = Path(tempfile.gettempdir()) / ".aios_provider_vault" / f"{inst_id}.key"
-            vault_file.unlink(missing_ok=True)
+
+    if inst_id and is_instance_alive(inst_id):
+        try:
+            runtime_pid_file = RUNTIME_BASE_DIR / str(inst_id) / "provider.pid"
+            if runtime_pid_file.is_file():
+                pid = int(runtime_pid_file.read_text(encoding="utf-8").strip())
+        except Exception:
+            pass
+
+    if pid and _is_pid_alive(pid) and pid != os.getpid():
+        try:
+            _send_provider_command(mailbox, {"cmd": "stop"}, timeout=1.0, auto_ensure=False)
+        except Exception:
+            try:
+                os.kill(pid, 15)
+            except Exception:
+                pass
+        start = time.time()
+        while time.time() - start < 2.0 and _is_pid_alive(pid):
+            time.sleep(0.01)
+        if _is_pid_alive(pid):
+            try:
+                os.kill(pid, 9)
+            except Exception:
+                pass
+    pid_file.unlink(missing_ok=True)
 
 
 RECOVERY_PROVIDER_COMMAND_COUNT: int = 0
@@ -377,36 +475,70 @@ def _send_provider_command(
     mailbox = Path(mailbox)
     if auto_ensure:
         ensure_provider_service(mailbox)
-    cmds_dir = mailbox / "commands"
-    cmds_dir.mkdir(parents=True, exist_ok=True)
-    cmd_id = f"cmd-{uuid.uuid4()}"
-    cmd_file = cmds_dir / f"{cmd_id}.cmd"
-    res_file = cmds_dir / f"{cmd_id}.result"
 
-    payload = {**cmd_payload, "operator_pid": os.getpid()}
-    _atomic_write(cmd_file, json.dumps(payload, sort_keys=True).encode("utf-8"))
+    # Determine runtime dir if instance is known
+    inst_id = None
+    for fname in ("provider-binding.json", "provider-public.json"):
+        fpath = mailbox / fname
+        if fpath.is_file():
+            try:
+                inst_id = json.loads(fpath.read_text(encoding="utf-8")).get("provider_instance_id")
+                if inst_id:
+                    break
+            except Exception:
+                pass
+
+    cmd_id = f"cmd-{uuid.uuid4()}"
+    payload = {**cmd_payload, "operator_pid": os.getpid(), "mailbox": str(mailbox)}
+
+    # Send command to mailbox commands dir AND runtime commands dir (if available)
+    cmds_dirs = [mailbox / "commands"]
+    if inst_id:
+        cmds_dirs.append(RUNTIME_BASE_DIR / str(inst_id) / "commands")
+
+    res_files = []
+    cmd_files = []
+    for cd in cmds_dirs:
+        try:
+            cd.mkdir(parents=True, exist_ok=True)
+            try:
+                os.chmod(cd, 0o777)
+            except Exception:
+                pass
+            c_file = cd / f"{cmd_id}.cmd"
+            r_file = cd / f"{cmd_id}.result"
+            _atomic_write(c_file, json.dumps(payload, sort_keys=True).encode("utf-8"))
+            cmd_files.append(c_file)
+            res_files.append(r_file)
+        except Exception:
+            pass
 
     start = time.time()
     while time.time() - start < timeout:
-        if res_file.is_file():
-            try:
-                raw = res_file.read_text(encoding="utf-8")
-                res = json.loads(raw)
-                res_file.unlink(missing_ok=True)
-                if "error" in res:
-                    raise RuntimeError(f"provider_process error: {res['error']}")
-                provider_pid = int(res.get("provider_pid", 0))
-                if provider_pid == os.getpid():
-                    raise RuntimeError(
-                        "Security violation: provider_process ran in the same process as operator!"
-                    )
-                return res
-            except json.JSONDecodeError:
-                time.sleep(0.005)
-                continue
+        for r_file in res_files:
+            if r_file.is_file():
+                try:
+                    raw = r_file.read_text(encoding="utf-8")
+                    res = json.loads(raw)
+                    for rf in res_files:
+                        rf.unlink(missing_ok=True)
+                    for cf in cmd_files:
+                        cf.unlink(missing_ok=True)
+                    if "error" in res:
+                        raise RuntimeError(f"provider_process error: {res['error']}")
+                    provider_pid = int(res.get("provider_pid", 0))
+                    if provider_pid == os.getpid():
+                        raise RuntimeError(
+                            "Security violation: provider_process ran in the same process as operator!"
+                        )
+                    return res
+                except json.JSONDecodeError:
+                    time.sleep(0.005)
+                    continue
         time.sleep(0.005)
 
-    cmd_file.unlink(missing_ok=True)
+    for cf in cmd_files:
+        cf.unlink(missing_ok=True)
     raise TimeoutError(f"Provider service did not respond within {timeout}s for command {cmd_payload.get('cmd')}")
 
 

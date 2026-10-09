@@ -546,27 +546,52 @@ class OperatorSession:
             boundary_crossed = session._has_crossed_provider_boundary()
 
             pub_file = session.mailbox / "provider-public.json"
-            if not pub_file.is_file():
-                if boundary_crossed:
+            # If mailbox does not have a public descriptor (e.g. wiped local cache during restore),
+            # check if the pinned provider instance is still alive in runtime memory and rebind.
+            if not pub_file.is_file() and pinned_instance is not None and provider_module.is_instance_alive(str(pinned_instance)):
+                provider_module.ensure_provider_service(session.mailbox, instance_id=str(pinned_instance))
+
+            provider_alive = provider_module.is_provider_locked(session.mailbox)
+
+            if not boundary_crossed:
+                # Pre-dispatch: no request was ever dispatched.
+                if not provider_alive:
+                    # If provider died or is not running, launch fresh provider and repin before first dispatch (Requirement 11).
+                    provider_module.ensure_provider_service(session.mailbox)
+                    pub_desc = provider_module.read_public_descriptor(session.mailbox, auto_ensure=False)
+                    live_instance = pub_desc.get("provider_instance_id")
+                    live_fp = pub_desc.get("public_key_fingerprint")
+                    session.journal.ledger_set("provider_instance_id", str(live_instance))
+                    session.journal.ledger_set("provider_public_key_fingerprint", str(live_fp))
+                else:
+                    pub_desc = provider_module.read_public_descriptor(session.mailbox, auto_ensure=False)
+                    live_instance = pub_desc.get("provider_instance_id")
+                    live_fp = pub_desc.get("public_key_fingerprint")
+                    if pinned_instance is not None and str(live_instance) != str(pinned_instance):
+                        raise BackendError(
+                            f"Provider instance mismatch: pinned={pinned_instance}, live={live_instance}"
+                        )
+                    if pinned_fp is not None and str(live_fp) != str(pinned_fp):
+                        raise BackendError(
+                            f"Provider fingerprint mismatch: pinned={pinned_fp}, live={live_fp}"
+                        )
+            else:
+                # Post-boundary: provider identity is frozen!
+                if not pub_file.is_file():
                     raise BackendError("PINNED_PROVIDER_UNAVAILABLE: provider public descriptor missing after dispatch")
-                provider_module.ensure_provider_service(session.mailbox)
 
-            pub_desc = provider_module.read_public_descriptor(session.mailbox, auto_ensure=False)
-            live_instance = pub_desc.get("provider_instance_id")
-            live_fp = pub_desc.get("public_key_fingerprint")
+                pub_desc = provider_module.read_public_descriptor(session.mailbox, auto_ensure=False)
+                live_instance = pub_desc.get("provider_instance_id")
+                live_fp = pub_desc.get("public_key_fingerprint")
 
-            if pinned_instance is not None or pinned_fp is not None:
                 if pinned_instance is not None and str(live_instance) != str(pinned_instance):
                     raise BackendError(
-                        f"Provider instance mismatch: pinned={pinned_instance}, live={live_instance}"
+                        f"Provider instance mismatch after boundary crossed: pinned={pinned_instance}, live={live_instance}"
                     )
                 if pinned_fp is not None and str(live_fp) != str(pinned_fp):
                     raise BackendError(
-                        f"Provider fingerprint mismatch: pinned={pinned_fp}, live={live_fp}"
+                        f"Provider fingerprint mismatch after boundary crossed: pinned={pinned_fp}, live={live_fp}"
                     )
-            elif not boundary_crossed:
-                session.journal.ledger_set("provider_instance_id", str(live_instance))
-                session.journal.ledger_set("provider_public_key_fingerprint", str(live_fp))
 
             backend.audit("session_attached", {"phase": "resume"})
             return session
@@ -1001,12 +1026,15 @@ class OperatorSession:
         )
 
     def _collect_reply(self, request_id: str) -> bytes:
+        inbox_f = provider_module.inbox_path(self.mailbox, request_id)
+        if inbox_f.is_file():
+            return inbox_f.read_bytes()
         report = provider_module.collect(self.mailbox, request_id)
         _append_jsonl(
             self.mailbox_archive_path,
             {"direction": "inbox", "request_id": request_id, "report": report, "at": _now()},
         )
-        reply = provider_module.inbox_path(self.mailbox, request_id).read_bytes()
+        reply = inbox_f.read_bytes()
         require(digest(reply) == report["reply_sha256"], "provider reply bytes changed after delivery")
         return reply
 
@@ -1087,20 +1115,39 @@ class OperatorSession:
             round_index = int(snapshot.round_index)
             attempt_id = str(snapshot.model_attempt_id)
             request_id = self._request_id(attempt_id, round_index)
-            provider_module.collect(self.mailbox, request_id)
             proof_dict = provider_module.read_proof(self.mailbox, request_id)
-            if proof_dict is not None:
-                raw_reply = self._collect_reply(request_id)
-                runtime.background_model_attempts.attach_late_trusted_return(
-                    attempt_id=attempt_id,
-                    attached_at=datetime.now(timezone.utc),
-                    directive_payload=raw_reply.decode("utf-8"),
-                    late_return_proof=proof_dict["authenticity_proof"],
-                    evidence="k3-trusted-return-barrier",
-                )
+            if proof_dict is None:
                 if request_id in self._known_requests():
-                    if self.journal.recovery(request_id)["state"] == "reply-staged":
-                        self.journal.mark_authenticated(request_id, proof_dict)
+                    rec = self.journal.recovery(request_id)
+                    if rec and rec.get("proof"):
+                        proof_dict = rec["proof"]
+                if proof_dict is None and provider_module.is_provider_locked(self.mailbox):
+                    provider_module.collect(self.mailbox, request_id)
+                    proof_dict = provider_module.read_proof(self.mailbox, request_id)
+            if proof_dict is not None:
+                raw_reply = None
+                inbox_f = provider_module.inbox_path(self.mailbox, request_id)
+                if inbox_f.is_file():
+                    raw_reply = inbox_f.read_bytes()
+                elif request_id in self._known_requests():
+                    rec = self.journal.recovery(request_id)
+                    if rec and rec.get("reply"):
+                        raw_reply = bytes(rec["reply"])
+                if raw_reply is None and provider_module.is_provider_locked(self.mailbox):
+                    raw_reply = self._collect_reply(request_id)
+                if raw_reply is not None:
+                    receipt = runtime.background_model_attempts.response_authenticity_receipt(attempt_id)
+                    if receipt is None:
+                        runtime.background_model_attempts.attach_late_trusted_return(
+                            attempt_id=attempt_id,
+                            attached_at=datetime.now(timezone.utc),
+                            directive_payload=raw_reply.decode("utf-8"),
+                            late_return_proof=proof_dict["authenticity_proof"],
+                            evidence="k3-trusted-return-barrier",
+                        )
+                    if request_id in self._known_requests():
+                        if self.journal.recovery(request_id)["state"] == "reply-staged":
+                            self.journal.mark_authenticated(request_id, proof_dict)
             else:
                 recorded(snapshot, response)
             self._trusted_return_barrier(snapshot)
