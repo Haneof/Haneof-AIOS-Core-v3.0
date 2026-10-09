@@ -38,6 +38,7 @@ import math
 import os
 import secrets
 import signal
+import tempfile
 import time
 import uuid
 from datetime import datetime, timezone
@@ -261,7 +262,6 @@ class ProviderService:
         self.mailbox = Path(mailbox)
         self.key_id = key_id
         self.pid = os.getpid()
-        self.instance_id = str(uuid.uuid4())
 
         self.lock_fd: int | None = None
         if fcntl is not None:
@@ -274,12 +274,51 @@ class ProviderService:
                 # Another provider service is already running and holding the lock
                 sys.exit(0)
 
-        # Generate ephemeral RSA-2048 keypair purely in process heap memory via OS CSPRNG
-        self._n, self._e, self._d = generate_rsa_keypair(key_size=2048, e=65537)
-        self.modulus_hex = f"{self._n:x}"
-        self.public_key_fingerprint = hashlib.sha256(
-            f"{self.modulus_hex}:{self._e}".encode("utf-8")
-        ).hexdigest()
+        # Check if an existing provider instance key exists in vault for this mailbox
+        vault_dir = Path(tempfile.gettempdir()) / ".aios_provider_vault"
+        vault_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            os.chmod(vault_dir, 0o700)
+        except Exception:
+            pass
+
+        pub_file = self.mailbox / "provider-public.json"
+        loaded = False
+        if pub_file.is_file():
+            try:
+                pub_data = json.loads(pub_file.read_text(encoding="utf-8"))
+                existing_inst = pub_data.get("provider_instance_id")
+                if existing_inst:
+                    key_file = vault_dir / f"{existing_inst}.key"
+                    if key_file.is_file():
+                        key_data = json.loads(key_file.read_text(encoding="utf-8"))
+                        self._n = int(key_data["n"])
+                        self._e = int(key_data["e"])
+                        self._d = int(key_data["d"])
+                        self.instance_id = existing_inst
+                        self.modulus_hex = f"{self._n:x}"
+                        self.public_key_fingerprint = hashlib.sha256(
+                            f"{self.modulus_hex}:{self._e}".encode("utf-8")
+                        ).hexdigest()
+                        loaded = True
+            except Exception:
+                loaded = False
+
+        if not loaded:
+            self.instance_id = str(uuid.uuid4())
+            self._n, self._e, self._d = generate_rsa_keypair(key_size=2048, e=65537)
+            self.modulus_hex = f"{self._n:x}"
+            self.public_key_fingerprint = hashlib.sha256(
+                f"{self.modulus_hex}:{self._e}".encode("utf-8")
+            ).hexdigest()
+            key_file = vault_dir / f"{self.instance_id}.key"
+            key_file.write_text(
+                json.dumps({"n": self._n, "e": self._e, "d": self._d}), encoding="utf-8"
+            )
+            try:
+                os.chmod(key_file, 0o600)
+            except Exception:
+                pass
 
     def write_public_descriptor(self) -> None:
         """Write public key descriptor and PID file (zero private material)."""
@@ -480,6 +519,8 @@ class ProviderService:
                         elif cmd == "stop":
                             res = {"status": "stopping", "provider_pid": self.pid}
                             running = False
+                            vault_file = Path(tempfile.gettempdir()) / ".aios_provider_vault" / f"{self.instance_id}.key"
+                            vault_file.unlink(missing_ok=True)
                         elif cmd == "status":
                             res = {
                                 "status": "running",

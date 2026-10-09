@@ -481,6 +481,22 @@ class OperatorSession:
             session._persist_remote_barrier("INITIAL")
         return session
 
+    def _has_crossed_provider_boundary(self) -> bool:
+        """True if any request has crossed the provider boundary (exposed, dispatched, or ledgered)."""
+        for req_id in self.journal.request_ids():
+            rec = self.journal.recovery(req_id)
+            if rec.get("state") != "staged":
+                return True
+        counters = self.counters()
+        if counters.get("provider_dispatches", 0) > 0 or counters.get("dispatches", 0) > 0:
+            return True
+        if provider_module.read_ledger(self.mailbox):
+            return True
+        outbox = self.mailbox / "outbox"
+        if outbox.is_dir() and any(outbox.glob("*.request")):
+            return True
+        return False
+
     @classmethod
     def attach(
         cls,
@@ -524,8 +540,34 @@ class OperatorSession:
                     remote=session._remote,
                     repo_dir=session._remote_repo_dir,
                 )
-            provider_module.ensure_provider_service(session.mailbox)
-            provider_module.read_public_descriptor(session.mailbox)
+            # PM49-BLK-002T: Provider authority verification & pin enforcement
+            pinned_instance = session.journal.ledger_get("provider_instance_id")
+            pinned_fp = session.journal.ledger_get("provider_public_key_fingerprint")
+            boundary_crossed = session._has_crossed_provider_boundary()
+
+            pub_file = session.mailbox / "provider-public.json"
+            if not pub_file.is_file():
+                if boundary_crossed:
+                    raise BackendError("PINNED_PROVIDER_UNAVAILABLE: provider public descriptor missing after dispatch")
+                provider_module.ensure_provider_service(session.mailbox)
+
+            pub_desc = provider_module.read_public_descriptor(session.mailbox, auto_ensure=False)
+            live_instance = pub_desc.get("provider_instance_id")
+            live_fp = pub_desc.get("public_key_fingerprint")
+
+            if pinned_instance is not None or pinned_fp is not None:
+                if pinned_instance is not None and str(live_instance) != str(pinned_instance):
+                    raise BackendError(
+                        f"Provider instance mismatch: pinned={pinned_instance}, live={live_instance}"
+                    )
+                if pinned_fp is not None and str(live_fp) != str(pinned_fp):
+                    raise BackendError(
+                        f"Provider fingerprint mismatch: pinned={pinned_fp}, live={live_fp}"
+                    )
+            elif not boundary_crossed:
+                session.journal.ledger_set("provider_instance_id", str(live_instance))
+                session.journal.ledger_set("provider_public_key_fingerprint", str(live_fp))
+
             backend.audit("session_attached", {"phase": "resume"})
             return session
         except BaseException:
@@ -1070,11 +1112,14 @@ class OperatorSession:
 
     def _build_runtime(self) -> FusedTurnRuntime:
         store, index = self._open_store()
+        pinned_fp = self.journal.ledger_get("provider_public_key_fingerprint")
         runtime = FusedTurnRuntime(
             store=store,
             index=index,
             model_handler=self._model_handler,
-            late_return_verifier=provider_module.route_b_verifier(self.mailbox),
+            late_return_verifier=provider_module.route_b_verifier(
+                self.mailbox, expected_fingerprint=pinned_fp
+            ),
             external_return_observer=provider_module.get_provider_observer(self.mailbox),
         )
         self._install_trusted_return_probe(runtime)
@@ -1143,115 +1188,122 @@ class OperatorSession:
         """
         actions: list[dict[str, Any]] = []
         attempts = self.runtime.background_model_attempts
-        for request_id in self.journal.request_ids(cursor=int(projection["sequence"])):
-            record = self.journal.recovery(request_id)
-            if record["state"] == "staged":
-                continue
-            if record["state"] == "exposed":
-                dispatch_report = provider_module.dispatch(self.mailbox, request_id)
-                require(
-                    dispatch_report["dispatch"] == "reattached",
-                    "K3 recovery attempted a second provider dispatch",
-                )
-                self.bump("provider_reattachments")
-                reply = self._collect_reply(request_id)
-                self.journal.stage_reply(request_id, reply)
+        provider_module.set_recovery_mode(True)
+        try:
+            for request_id in self.journal.request_ids(cursor=int(projection["sequence"])):
                 record = self.journal.recovery(request_id)
-                actions.append({"request_id": request_id, "action": "provider_reply_reattached"})
-            if record["state"] in {"applied", "acked"}:
-                continue
-            attempt_id = str(record["metadata"]["attempt_id"])
-            round_index = int(record["metadata"]["round"])
-            payload = bytes(record["reply"]).decode("utf-8")
-            directive = decode_model_directive(payload)
-            attempt = attempts.get(attempt_id)
-            if attempt is None:
-                # K3 can fire after provider submission while the Core attempt
-                # transaction is not present in the surviving/restored runtime DB.
-                # Do not fabricate an attempt or an authenticity receipt. Keep the
-                # exact provider reply durable, then let the normal run_turn path
-                # re-admit the deterministic attempt identity. When model_handler
-                # is reached again, _relay_exchange returns these exact staged bytes
-                # without a second provider dispatch and Core's ordinary trusted
-                # return callback mints the receipt.
+                if record["state"] == "staged":
+                    continue
+                if record["state"] == "exposed":
+                    # Provider boundary was crossed but reply/proof was not durable before crash.
+                    # Zero provider commands; fail closed immediately.
+                    attempt_id = str(record["metadata"]["attempt_id"])
+                    round_index = int(record["metadata"]["round"])
+                    stop = DurableTrustedReturnMissing(
+                        attempt_id=attempt_id,
+                        state="exposed",
+                        round_index=round_index,
+                        detail=(
+                            "provider boundary crossed without a durable trusted return; "
+                            "request was exposed before crash but reply/proof was not durable; "
+                            "refusing post-crash provider dispatch/collect"
+                        ),
+                    )
+                    self._record_fail_closed_stop(stop)
+                    raise stop
+                if record["state"] in {"applied", "acked"}:
+                    continue
+                attempt_id = str(record["metadata"]["attempt_id"])
+                round_index = int(record["metadata"]["round"])
+                attempt = attempts.get(attempt_id)
+                if attempt is None:
+                    # Provider boundary crossed but attempt missing in Core:
+                    # PM49-BLK-002U prohibits unauthenticated re-admission backdoor.
+                    stop = DurableTrustedReturnMissing(
+                        attempt_id=attempt_id,
+                        state="attempt_missing_post_dispatch",
+                        round_index=round_index,
+                        detail=(
+                            "provider boundary crossed but Core attempt was not durable before crash; "
+                            "refusing unauthenticated re-admission"
+                        ),
+                    )
+                    self._record_fail_closed_stop(stop)
+                    raise stop
+                payload = bytes(record["reply"]).decode("utf-8")
+                directive = decode_model_directive(payload)
+                receipt = attempts.response_authenticity_receipt(attempt_id)
+                if receipt is None:
+                    # Check if pre-crash durable proof exists without contacting provider
+                    proof_dict = provider_module.read_proof(self.mailbox, request_id)
+                    if proof_dict is not None and attempt.state == "dispatching":
+                        raw_reply = bytes(record["reply"])
+                        attempts.attach_late_trusted_return(
+                            attempt_id=attempt_id,
+                            attached_at=datetime.now(timezone.utc),
+                            directive_payload=raw_reply.decode("utf-8"),
+                            late_return_proof=proof_dict["authenticity_proof"],
+                            evidence="pre-crash-durable-proof",
+                        )
+                        receipt = attempts.response_authenticity_receipt(attempt_id)
+                    if receipt is None:
+                        if attempt.state in {"admitted", "not_submitted"}:
+                            actions.append(
+                                {
+                                    "request_id": request_id,
+                                    "action": "core_dispatch_not_started",
+                                    "attempt_state": str(attempt.state),
+                                }
+                            )
+                            continue
+                        stop = DurableTrustedReturnMissing(
+                            attempt_id=attempt_id,
+                            state=str(attempt.state),
+                            round_index=round_index,
+                            detail=(
+                                "provider boundary crossed without a durable trusted "
+                                "return; refusing redispatch and refusing invented "
+                                "authenticity"
+                            ),
+                        )
+                        self._record_fail_closed_stop(stop)
+                        raise stop
+                fingerprint = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+                require(
+                    fingerprint == attempts._response_fingerprint(directive),
+                    "operator-computed response fingerprint disagrees with Core",
+                )
+                proof = {
+                    "attempt_id": str(receipt.attempt_id),
+                    "authenticity_proof": str(receipt.authenticity_proof),
+                    "provider": str(receipt.provider),
+                    "model": str(receipt.model),
+                    "provider_request_id": str(receipt.provider_request_id),
+                    "response_fingerprint": fingerprint,
+                    "relay_id": str(receipt.relay_id),
+                }
+                if record["state"] == "reply-staged":
+                    self.journal.mark_authenticated(request_id, proof)
+                    if self.remote_durability_enabled:
+                        self._persist_remote_barrier(
+                            "K3_RECOVERED_PROVIDER_RETURN",
+                            seal_label="remote-provider-return-recovered",
+                        )
                 actions.append(
                     {
                         "request_id": request_id,
-                        "action": "core_attempt_missing_safe_readmit",
+                        "action": "core_trusted_return_durable",
+                        "attempt_state": str(attempt.state),
+                        "model_round_index": round_index,
+                        "staged": attempts.staged_response(attempt_id) is not None,
                     }
                 )
-                if self.remote_durability_enabled:
-                    self._persist_remote_barrier(
-                        "K3_PROVIDER_RETURN_STAGED_CORE_READMIT_PENDING",
-                        seal_label="remote-provider-return-staged",
-                    )
-                continue
-            receipt = attempts.response_authenticity_receipt(attempt_id)
-            if receipt is None:
-                if attempt.state in {"admitted", "not_submitted"}:
-                    # Dispatch provably did not start for this attempt: the ordinary
-                    # path may still dispatch once, and the relay re-presents the
-                    # durable bytes if this round's request was already staged.
-                    actions.append(
-                        {
-                            "request_id": request_id,
-                            "action": "core_dispatch_not_started",
-                            "attempt_state": str(attempt.state),
-                        }
-                    )
-                    continue
-                # The provider boundary was crossed and no Core-owned trusted
-                # return exists (e.g. killed during dispatching or in_doubt, or killed
-                # before K3_TRUSTED_RETURN_DURABLE).
-                # Accepted Core has no legal continuation here:
-                # caller-supplied bytes cannot become a trusted provider
-                # return, and blind redispatch is forbidden. Hard stop.
-                stop = DurableTrustedReturnMissing(
-                    attempt_id=attempt_id,
-                    state=str(attempt.state),
-                    round_index=round_index,
-                    detail=(
-                        "provider boundary crossed without a durable trusted "
-                        "return; refusing redispatch and refusing invented "
-                        "authenticity"
-                    ),
-                )
-                self._record_fail_closed_stop(stop)
-                raise stop
-            fingerprint = hashlib.sha256(payload.encode("utf-8")).hexdigest()
-            require(
-                fingerprint == attempts._response_fingerprint(directive),
-                "operator-computed response fingerprint disagrees with Core",
-            )
-            proof = {
-                "attempt_id": str(receipt.attempt_id),
-                "authenticity_proof": str(receipt.authenticity_proof),
-                "provider": str(receipt.provider),
-                "model": str(receipt.model),
-                "provider_request_id": str(receipt.provider_request_id),
-                "response_fingerprint": fingerprint,
-                "relay_id": str(receipt.relay_id),
-            }
-            if record["state"] == "reply-staged":
-                self.journal.mark_authenticated(request_id, proof)
-                if self.remote_durability_enabled:
-                    self._persist_remote_barrier(
-                        "K3_RECOVERED_PROVIDER_RETURN",
-                        seal_label="remote-provider-return-recovered",
-                    )
-            actions.append(
-                {
-                    "request_id": request_id,
-                    "action": "core_trusted_return_durable",
-                    "attempt_state": str(attempt.state),
-                    "model_round_index": round_index,
-                    "staged": attempts.staged_response(attempt_id) is not None,
-                }
-            )
-            if self.journal.recovery(request_id)["state"] == "authenticated":
-                self.journal.begin_applying(request_id)
-                actions.append({"request_id": request_id, "action": "applying"})
-        return actions
+                if self.journal.recovery(request_id)["state"] == "authenticated":
+                    self.journal.begin_applying(request_id)
+                    actions.append({"request_id": request_id, "action": "applying"})
+            return actions
+        finally:
+            provider_module.set_recovery_mode(False)
 
     def _finalise_requests(self, cursor: int | None = None) -> list[dict[str, Any]]:
         """Record Core's receipt and the completed application for every round."""

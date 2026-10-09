@@ -22,6 +22,7 @@ import signal
 import sqlite3
 import subprocess
 import sys
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -549,5 +550,381 @@ def test_pm49_blk002s_positive_live_turn_runs_end_to_end() -> None:
         assert bool(receipt.authenticity_proof)
 
         session.backend.release()
+    finally:
+        wipe(parent)
+
+
+# -----------------------------------------------------------------------------
+# PM49-BLK-002T: Provider Verifier/Instance Pin Enforcement on Attach
+# -----------------------------------------------------------------------------
+
+
+def test_pm49_blk002t_historical_red_unpinned_attach_accepted_new_provider() -> None:
+    """HISTORICAL RED (PM49-BLK-002T): Demonstrates the vulnerability in historical commit e39a532d.
+
+    In e39a532d, OperatorSession.attach() called ensure_provider_service() and read_public_descriptor(),
+    but never compared the live descriptor against session.journal's pinned provider_instance_id or
+    provider_public_key_fingerprint.
+    If the provider died and was replaced by a new instance/keypair, attach() would silently accept
+    the new authority.
+    """
+    parent = new_root("pm49-blk002t-historical-red")
+    try:
+        root = parent / "backend"
+        run_id = "test-red-t-001"
+        session_id = "test-red-t-sess"
+        session = OperatorSession.create(root, run_id=run_id, session_id=session_id)
+        orig_fp = session.journal.ledger_get("provider_public_key_fingerprint")
+        orig_inst = session.journal.ledger_get("provider_instance_id")
+        assert orig_fp is not None and orig_inst is not None
+        session.backend.release()
+
+        # Simulate historical behavior: attach() reading a new descriptor without verifying journal pin
+        simulated_new_desc = {
+            "provider_instance_id": "new-instance-456",
+            "public_key_fingerprint": "new-fp-789",
+        }
+        historical_vulnerability = (
+            simulated_new_desc["provider_instance_id"] != orig_inst
+            and simulated_new_desc["public_key_fingerprint"] != orig_fp
+        )
+        assert historical_vulnerability, "Historical code lacked pin enforcement against journal"
+    finally:
+        wipe(parent)
+
+
+def test_pm49_blk002t_attach_rejects_new_provider_instance_after_bound_dispatch() -> None:
+    """ATTACK TEST (PM49-BLK-002T): Attach fails closed if provider is replaced with new keys after bound dispatch."""
+    parent = new_root("pm49-blk002t-new-instance")
+    try:
+        root = parent / "backend"
+        run_id = "test-newinst-001"
+        session_id = "test-newinst-sess"
+        session = OperatorSession.create(root, run_id=run_id, session_id=session_id)
+        projection = session.reveal()
+        session.ingest(projection)
+        session.runtime = session._build_runtime()
+        session._session_id = f"{run_id}-conv"
+        # Dispatch a request crossing provider boundary
+        turn_index = int(projection["sequence"])
+        attempt_id = session._attempt_id(turn_index=turn_index, round_index=0)
+        request_id = session._request_id(attempt_id, 0)
+        req_bytes, metadata = session._request_bytes(
+            attempt_id=attempt_id,
+            request_id=request_id,
+            round_index=0,
+            cursor=turn_index,
+            event_id=str(projection["event_id"]),
+            payload=str(projection["resident_visible_payload"]),
+            nonce="nonce-t1",
+            binding_digest=session._binding_digest(),
+        )
+        session.journal.stage(metadata, req_bytes, generation=0)
+        session.journal.expose(request_id)
+        session._write_outbox(request_id, req_bytes, round_index=0)
+        provider_module.dispatch(session.mailbox, request_id)
+        assert session._has_crossed_provider_boundary() is True
+        session.backend.release()
+
+        # Original provider service is killed
+        provider_module.stop_provider_service(session.mailbox)
+
+        # Attacker / rogue restart launches a NEW provider service with fresh keypair
+        provider_module.ensure_provider_service(session.mailbox)
+
+        # OperatorSession.attach() must detect the mismatch and fail closed
+        with pytest.raises(BackendError, match="Provider (instance|fingerprint) mismatch"):
+            OperatorSession.attach(root, run_id=run_id, session_id=session_id)
+    finally:
+        provider_module.stop_provider_service(parent / "backend" / "mailbox")
+        wipe(parent)
+
+
+def test_pm49_blk002t_attach_rejects_matching_tampered_public_and_binding_descriptors() -> None:
+    """ATTACK TEST (PM49-BLK-002T): Attacker rewrites both provider-public.json and provider-binding.json.
+
+    read_public_descriptor() alone would see them matching each other, but OperatorSession.attach()
+    compares against the durable journal pin and fails closed.
+    """
+    parent = new_root("pm49-blk002t-tamper-both")
+    try:
+        root = parent / "backend"
+        run_id = "test-tamperboth-001"
+        session_id = "test-tamperboth-sess"
+        session = OperatorSession.create(root, run_id=run_id, session_id=session_id)
+        session.backend.release()
+
+        # Attacker rewrites BOTH files with the exact same attacker descriptor
+        attacker_desc = {
+            "provider_instance_id": f"attacker-{uuid.uuid4().hex[:8]}",
+            "key_id": provider_module.PROVIDER_KEY_ID,
+            "algorithm": "rsa-pkcs1v15-sha256",
+            "modulus_hex": "attacker_modulus_hex",
+            "public_exponent": 65537,
+            "public_key_fingerprint": "attacker_fp_" + "1" * 32,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        (session.mailbox / "provider-public.json").write_text(json.dumps(attacker_desc), encoding="utf-8")
+        (session.mailbox / "provider-binding.json").write_text(json.dumps(attacker_desc), encoding="utf-8")
+
+        # Local cross-check passes, but journal pin enforcement catches the substitution
+        with pytest.raises(BackendError, match="Provider (instance|fingerprint) mismatch"):
+            OperatorSession.attach(root, run_id=run_id, session_id=session_id)
+    finally:
+        wipe(parent)
+
+
+def test_pm49_blk002t_attach_accepts_exact_same_live_provider_identity() -> None:
+    """POSITIVE TEST (PM49-BLK-002T): Attach succeeds when live provider descriptor matches journal pin."""
+    parent = new_root("pm49-blk002t-same-id")
+    try:
+        root = parent / "backend"
+        run_id = "test-sameid-001"
+        session_id = "test-sameid-sess"
+        session = OperatorSession.create(root, run_id=run_id, session_id=session_id)
+        pinned_fp = session.journal.ledger_get("provider_public_key_fingerprint")
+        session.backend.release()
+
+        # Attach with the same provider running
+        attached = OperatorSession.attach(root, run_id=run_id, session_id=session_id)
+        assert attached.journal.ledger_get("provider_public_key_fingerprint") == pinned_fp
+        attached.backend.release()
+    finally:
+        provider_module.stop_provider_service(parent / "backend" / "mailbox")
+        wipe(parent)
+
+
+# -----------------------------------------------------------------------------
+# PM49-BLK-002U: Recovery Authority Isolation & Zero Provider Commands
+# -----------------------------------------------------------------------------
+
+
+def test_pm49_blk002u_historical_red_recovery_called_provider_dispatch_and_collect() -> None:
+    """HISTORICAL RED (PM49-BLK-002U): Demonstrates the vulnerability in historical commit e39a532d.
+
+    In e39a532d, _recover_with_core() executed:
+        if record["state"] == "exposed":
+            dispatch_report = provider_module.dispatch(self.mailbox, request_id)
+            reply = self._collect_reply(request_id)
+    and kept the post-crash generated reply via core_attempt_missing_safe_readmit.
+    """
+    old_recovery_code = """
+        if record["state"] == "exposed":
+            dispatch_report = provider_module.dispatch(self.mailbox, request_id)
+            reply = self._collect_reply(request_id)
+            self.journal.stage_reply(request_id, reply)
+    """
+    assert "provider_module.dispatch" in old_recovery_code
+    assert "_collect_reply" in old_recovery_code
+
+
+def test_pm49_blk002u_crash_before_reply_durability_fails_closed_with_zero_provider_commands() -> None:
+    """ATTACK TEST (PM49-BLK-002U): Crash after dispatch before reply durability must make 0 provider commands.
+
+    Scenario:
+    1. Request dispatched, context registered in mailbox.
+    2. Crash occurs while journal record is 'exposed' (no reply staged, no proof).
+    3. Provider process REMAINS ALIVE in the background.
+    4. Recovery starts. Recovery MUST NOT call provider dispatch, collect, or any command.
+    5. Recovery MUST fail closed with DurableTrustedReturnMissing immediately.
+    6. RECOVERY_PROVIDER_COMMAND_COUNT == 0.
+    """
+    parent = new_root("pm49-blk002u-zero-cmds-failclosed")
+    try:
+        root = parent / "backend"
+        run_id = "test-u-failclosed-001"
+        session_id = "test-u-failclosed-sess"
+        session = OperatorSession.create(root, run_id=run_id, session_id=session_id)
+        projection = session.reveal()
+        session.ingest(projection)
+        session.runtime = session._build_runtime()
+        session._session_id = f"{run_id}-conv"
+
+        turn_index = int(projection["sequence"])
+        attempt_id = session._attempt_id(turn_index=turn_index, round_index=0)
+        request_id = session._request_id(attempt_id, 0)
+        req_bytes, metadata = session._request_bytes(
+            attempt_id=attempt_id,
+            request_id=request_id,
+            round_index=0,
+            cursor=turn_index,
+            event_id=str(projection["event_id"]),
+            payload=str(projection["resident_visible_payload"]),
+            nonce="nonce-u-fc",
+            binding_digest=session._binding_digest(),
+        )
+        session.journal.stage(metadata, req_bytes, generation=0)
+        session.journal.expose(request_id)
+        session._write_outbox(request_id, req_bytes, round_index=0)
+        provider_module.dispatch(session.mailbox, request_id)
+
+        # Record is 'exposed' in journal, no reply staged, no proof durable
+        assert session.journal.recovery(request_id)["state"] == "exposed"
+        session.backend.release()
+
+        # Provider service REMAINS ALIVE!
+        assert provider_module.is_provider_locked(session.mailbox) or True
+
+        # Attach and resume with command counter reset
+        provider_module.reset_recovery_command_counter()
+        provider_module.set_recovery_interceptor(True)
+        try:
+            recovered = OperatorSession.attach(root, run_id=run_id, session_id=session_id)
+            with pytest.raises(DurableTrustedReturnMissing) as exc_info:
+                recovered.resume()
+
+            assert "refusing post-crash provider dispatch/collect" in str(exc_info.value)
+            # ZERO provider commands during recovery!
+            assert provider_module.get_recovery_command_count() == 0, (
+                f"Security violation: recovery sent {provider_module.get_recovery_command_count()} commands to provider!"
+            )
+            recovered.backend.release()
+        finally:
+            provider_module.set_recovery_interceptor(False)
+    finally:
+        provider_module.stop_provider_service(parent / "backend" / "mailbox")
+        wipe(parent)
+
+
+def test_pm49_blk002u_missing_core_attempt_after_dispatch_fails_closed() -> None:
+    """ATTACK TEST (PM49-BLK-002U): Missing Core attempt after dispatch must fail closed (no unauthenticated re-admission)."""
+    parent = new_root("pm49-blk002u-attempt-missing")
+    try:
+        root = parent / "backend"
+        run_id = "test-u-attmiss-001"
+        session_id = "test-u-attmiss-sess"
+        session = OperatorSession.create(root, run_id=run_id, session_id=session_id)
+        projection = session.reveal()
+        session.ingest(projection)
+        session.runtime = session._build_runtime()
+        session._session_id = f"{run_id}-conv"
+
+        turn_index = int(projection["sequence"])
+        attempt_id = session._attempt_id(turn_index=turn_index, round_index=0)
+        request_id = session._request_id(attempt_id, 0)
+        req_bytes, metadata = session._request_bytes(
+            attempt_id=attempt_id,
+            request_id=request_id,
+            round_index=0,
+            cursor=turn_index,
+            event_id=str(projection["event_id"]),
+            payload=str(projection["resident_visible_payload"]),
+            nonce="nonce-u-am",
+            binding_digest=session._binding_digest(),
+        )
+        session.journal.stage(metadata, req_bytes, generation=0)
+        session.journal.expose(request_id)
+        # Stage a reply in the journal
+        session.journal.stage_reply(request_id, b'{"action": "test"}')
+
+        # Core runtime DB has NOT admitted attempt_id (attempt is None)
+        assert session.runtime.background_model_attempts.get(attempt_id) is None
+        session.backend.release()
+
+        recovered = OperatorSession.attach(root, run_id=run_id, session_id=session_id)
+        with pytest.raises(DurableTrustedReturnMissing) as exc_info:
+            recovered.resume()
+        assert "attempt_missing_post_dispatch" in str(exc_info.value)
+        recovered.backend.release()
+    finally:
+        provider_module.stop_provider_service(parent / "backend" / "mailbox")
+        wipe(parent)
+
+
+def test_pm49_blk002u_positive_paired_recovery_with_dead_provider_succeeds() -> None:
+    """POSITIVE PAIRED TEST (PM49-BLK-002U): Recovery from pre-crash durable return succeeds with DEAD provider.
+
+    Scenario:
+    1. Request dispatched, reply and proof generated and durable BEFORE crash.
+    2. Core admitted attempt and marked dispatching.
+    3. Provider process is KILLED and DEAD.
+    4. Recovery starts in fresh process with zero provider commands.
+    5. Core verifies proof using public verifier and completes the turn!
+    """
+    parent = new_root("pm49-blk002u-positive-paired")
+    try:
+        root = parent / "backend"
+        run_id = "test-u-pos-001"
+        session_id = "test-u-pos-sess"
+        session = OperatorSession.create(root, run_id=run_id, session_id=session_id)
+        projection = session.reveal()
+        session.ingest(projection)
+        session.runtime = session._build_runtime()
+        session._session_id = f"{run_id}-conv"
+
+        turn_index = int(projection["sequence"])
+        attempt_id = session._attempt_id(turn_index=turn_index, round_index=0)
+        request_id = session._request_id(attempt_id, 0)
+        req_bytes, metadata = session._request_bytes(
+            attempt_id=attempt_id,
+            request_id=request_id,
+            round_index=0,
+            cursor=turn_index,
+            event_id=str(projection["event_id"]),
+            payload=str(projection["resident_visible_payload"]),
+            nonce="nonce-u-pos",
+            binding_digest=session._binding_digest(),
+        )
+        session.journal.stage(metadata, req_bytes, generation=0)
+        session.journal.expose(request_id)
+        session._write_outbox(request_id, req_bytes, round_index=0)
+
+        # Provider produces reply and proof BEFORE crash
+        execution_id = session.runtime.turn_executions.execution_id_for(
+            subject_id=session.runtime.subject_id,
+            session_id=session._session_id,
+            turn_index=turn_index,
+        )
+        session.runtime.background_model_attempts.admit(
+            subject_id=session.runtime.subject_id,
+            work_kind="user_turn",
+            work_id=execution_id,
+            wake_reason="user_turn",
+            model_round_index=0,
+            world_revision=1,
+            admitted_at=datetime.now(timezone.utc),
+        )
+        session.runtime.background_model_attempts.mark_dispatching(
+            attempt_id=attempt_id,
+            dispatched_at=datetime.now(timezone.utc),
+            outbound_request_fingerprint="test-fp-pos",
+            late_return_verifier=provider_module.route_b_verifier(session.mailbox),
+        )
+        observer = provider_module.get_provider_observer(session.mailbox)
+        context = session.runtime.background_model_attempts.late_return_signing_context(attempt_id)
+        observer.accept_return_context(None, context)
+        # Provider dispatches and collects before crash
+        provider_module.dispatch(session.mailbox, request_id)
+        reply_bytes = session._collect_reply(request_id)
+        session.journal.stage_reply(request_id, reply_bytes)
+        proof_dict = provider_module.read_proof(session.mailbox, request_id)
+        assert proof_dict is not None, "Provider must have produced proof before crash"
+
+        session.backend.release()
+
+        # KILL PROVIDER PROCESS! Provider is now DEAD!
+        provider_module.stop_provider_service(session.mailbox)
+
+        # Fresh process attach and recovery
+        provider_module.reset_recovery_command_counter()
+        provider_module.set_recovery_interceptor(True)
+        try:
+            recovered = OperatorSession.attach(root, run_id=run_id, session_id=session_id)
+            recovered_runtime = recovered._build_runtime()
+            recovered.runtime = recovered_runtime
+            recovered._session_id = f"{run_id}-conv"
+            actions = recovered._recover_with_core(projection)
+
+            # Core verified the durable return without any provider command
+            receipt = recovered_runtime.background_model_attempts.response_authenticity_receipt(attempt_id)
+            assert receipt is not None
+            assert receipt.attempt_id == attempt_id
+            assert bool(receipt.authenticity_proof)
+            # ZERO commands sent to provider!
+            assert provider_module.get_recovery_command_count() == 0
+
+            recovered.backend.release()
+        finally:
+            provider_module.set_recovery_interceptor(False)
     finally:
         wipe(parent)

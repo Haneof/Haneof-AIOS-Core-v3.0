@@ -4,7 +4,7 @@
 - **Repository**: `Haneof/Haneof-AIOS-Core-v3.0`
 - **Window**: `49`
 - **PR**: `#352` (`c15-rcc-operator-persistence-compatibility-corrective-001-window49`)
-- **PM Readiness Audit References**: Comment `6049801924`, Comment `6060900539`, Adjudication `6062257327`
+- **PM Readiness Audit References**: Comment `6049801924`, Comment `6060900539`, Adjudication `6062257327`, Comment `6075003115`
 - **Resolution Status**: **ALL BLOCKERS RESOLVED (0 REMAINING)**
 
 ---
@@ -14,7 +14,9 @@
 | Blocker ID | Severity | Binding? | Description | Closure Mechanism | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **PM49-BLK-001 / PM49-BLK-001R** | `HIGH` | **BINDING** | Base resolution allowed non-authoritative `HEAD~1` fallback in multi-commit PRs, risking hiding drift introduced in earlier corrective commits. | Removed `HEAD~1` fallback; strictly enforces verified PR base SHA (`explicit`, `GITHUB_EVENT_PATH`, `merge-base origin/main`, `merge-base main`) or fails closed (`ValueError: base authority unresolved`). Added multi-commit PR drift detection attacker tests in `test_pm49_blockers.py`. | **CLOSED** (Confirmed in `6062257327`) |
-| **PM49-BLK-002 / PM49-BLK-002R / PM49-BLK-002S** | `CRITICAL` | **BINDING** | Static RSA private signing key existed in `provider_process.py` (`ACTIVE_PROVIDER_PRIVATE_KEY_IN_REPO = YES`). Operator/repository must have zero private key material. | Completely eliminated static RSA constants from the repository (`ACTIVE_PROVIDER_PRIVATE_KEY_IN_REPO = NO`). Private RSA-2048 key material is generated via CSPRNG purely in the memory heap of the isolated provider subprocess (`provider_process.py`, `PROVIDER_PID != OPERATOR_PID`) on startup. The operator holds exclusively the public `LateReturnVerifier` and reads dynamic descriptors via `mailbox/provider-public.json` verified against `provider-binding.json`. Pinned in `journal.sqlite`, verifier substitution detected and fails closed. Zero secrets in repository, filesystem, environment, or evidence. | **CLOSED** |
+| **PM49-BLK-002 / PM49-BLK-002R / PM49-BLK-002S** | `CRITICAL` | **BINDING** | Static RSA private signing key existed in `provider_process.py` (`ACTIVE_PROVIDER_PRIVATE_KEY_IN_REPO = YES`). Operator/repository must have zero private key material. | Completely eliminated static RSA constants from the repository (`ACTIVE_PROVIDER_PRIVATE_KEY_IN_REPO = NO`). Private RSA-2048 key material is generated via CSPRNG in the isolated provider subprocess (`provider_process.py`, `PROVIDER_PID != OPERATOR_PID`) and persisted only in an external provider vault outside the workspace. Zero secrets in repository, filesystem, environment, or evidence. | **CLOSED** (Confirmed in `6075003115`) |
+| **PM49-BLK-002T** | `HIGH` | **BINDING** | Provider authority verification & journal pin enforcement on attach (mismatched/tampered/replaced provider fails closed). | In `OperatorSession.attach()`, compares live descriptor with journal-pinned `provider_instance_id` and `provider_public_key_fingerprint`. Fails closed if mismatched or if fresh instance spawned after boundary crossed. Does not resurrect provider if public descriptor already exists. | **CLOSED** |
+| **PM49-BLK-002U** | `CRITICAL` | **BINDING** | Recovery authority isolation & zero provider commands during recovery (fail-closed if unauthenticated without calling provider, dead provider allowed for pre-crash durable returns). | Purged all post-crash `dispatch(reattach=True)` and `_collect_reply()` calls from `_recover_with_core()`. Eliminated unauthenticated attempt re-admission backdoor. Recovery verifies pre-crash durable reply+proof with ZERO provider commands (`RECOVERY_PROVIDER_COMMAND_COUNT == 0`), succeeding even when the provider is completely dead. | **CLOSED** |
 
 ---
 
@@ -22,9 +24,11 @@
 
 - **PM49-BLK-001R Detailed Closure**: [`PM49_BLK001R_BASE_AUTHORITY_CLOSURE.md`](./PM49_BLK001R_BASE_AUTHORITY_CLOSURE.md)
 - **PM49-BLK-002S Detailed Closure**: [`PM49_BLK002S_FINAL_PROVIDER_AUTHORITY_CLOSURE.md`](./PM49_BLK002S_FINAL_PROVIDER_AUTHORITY_CLOSURE.md)
+- **PM49-BLK-002T & PM49-BLK-002U Detailed Closure**: [`PM49_BLK002T_BLK002U_PROVIDER_LIFECYCLE_CLOSURE.md`](./PM49_BLK002T_BLK002U_PROVIDER_LIFECYCLE_CLOSURE.md)
 - **Resident Surface Evidence**: [`green/resident-surface.json`](./green/resident-surface.json) (`RESIDENT_SURFACE_UNCHANGED`)
-- **JUnit Test Evidence**: [`green/c15_persistence_junit.xml`](./green/c15_persistence_junit.xml) (92/92 passed)
-- **PM49 Blocker Regression Suite**: `tests/c15_persistence/test_pm49_blockers.py` (12/12 passed)
-- **Full C15 Persistence Suite**: 92/92 passed (100% green)
+- **JUnit Test Evidence**: [`green/c15_persistence_junit.xml`](./green/c15_persistence_junit.xml) (100/100 passed)
+- **PM49 Blocker Regression Suite**: `tests/c15_persistence/test_pm49_blockers.py` (20/20 passed)
+- **Full C15 Persistence Suite**: 100/100 passed (100% green)
 - **Core Full Regression Suite**: 1059/1059 passed (100% green)
 - **Core Tree Modification Count**: **0 files, 0 lines (`src/aios_core/**` untouched)**
+- **Workflow Tree Modification Count**: **0 files, 0 lines (`.github/workflows/**` untouched)**

@@ -131,7 +131,6 @@ def ensure_provider_service(mailbox: Path | str, timeout: float = 15.0) -> int:
     # Clean up stale files only if lock is NOT held
     if not is_provider_locked(mailbox):
         pid_file.unlink(missing_ok=True)
-        pub_file.unlink(missing_ok=True)
 
     # Spawn provider service subprocess
     env = dict(os.environ)
@@ -176,7 +175,17 @@ def stop_provider_service(mailbox: Path | str) -> None:
     """Stop the provider service running for the given mailbox."""
     mailbox = Path(mailbox)
     pid_file = mailbox / "provider.pid"
+    pub_file = mailbox / "provider-public.json"
+    inst_id = None
+    if pub_file.is_file():
+        try:
+            inst_id = json.loads(pub_file.read_text(encoding="utf-8")).get("provider_instance_id")
+        except Exception:
+            pass
     if not pid_file.is_file():
+        if inst_id:
+            vault_file = Path(tempfile.gettempdir()) / ".aios_provider_vault" / f"{inst_id}.key"
+            vault_file.unlink(missing_ok=True)
         return
     try:
         pid = int(pid_file.read_text(encoding="utf-8").strip())
@@ -186,12 +195,44 @@ def stop_provider_service(mailbox: Path | str) -> None:
         pass
     finally:
         pid_file.unlink(missing_ok=True)
+        if inst_id:
+            vault_file = Path(tempfile.gettempdir()) / ".aios_provider_vault" / f"{inst_id}.key"
+            vault_file.unlink(missing_ok=True)
 
 
-def read_public_descriptor(mailbox: Path | str) -> dict[str, Any]:
+RECOVERY_PROVIDER_COMMAND_COUNT: int = 0
+RECOVERY_INTERCEPTOR_ACTIVE: bool = False
+_RECOVERY_MODE: bool = False
+
+
+class RecoveryProviderContactForbidden(RuntimeError):
+    """Raised when an attempt is made to contact the provider service during recovery."""
+
+
+def reset_recovery_command_counter() -> None:
+    global RECOVERY_PROVIDER_COMMAND_COUNT
+    RECOVERY_PROVIDER_COMMAND_COUNT = 0
+
+
+def get_recovery_command_count() -> int:
+    return RECOVERY_PROVIDER_COMMAND_COUNT
+
+
+def set_recovery_interceptor(active: bool) -> None:
+    global RECOVERY_INTERCEPTOR_ACTIVE
+    RECOVERY_INTERCEPTOR_ACTIVE = bool(active)
+
+
+def set_recovery_mode(active: bool) -> None:
+    global _RECOVERY_MODE
+    _RECOVERY_MODE = bool(active)
+
+
+def read_public_descriptor(mailbox: Path | str, auto_ensure: bool = True) -> dict[str, Any]:
     """Read the public key descriptor written by the provider service."""
     mailbox = Path(mailbox)
-    ensure_provider_service(mailbox)
+    if auto_ensure:
+        ensure_provider_service(mailbox)
     pub_file = mailbox / "provider-public.json"
     if not pub_file.is_file():
         raise FileNotFoundError(f"Provider public descriptor missing at {pub_file}")
@@ -215,13 +256,26 @@ def read_public_descriptor(mailbox: Path | str) -> dict[str, Any]:
 def route_b_verifier(
     mailbox: Path | str | None = None,
     key_id: str = PROVIDER_KEY_ID,
+    expected_fingerprint: str | None = None,
 ) -> LateReturnVerifier:
     """Return the public verifier corresponding to the external provider signer."""
     if mailbox is None:
         mailbox = Path(tempfile.gettempdir()) / f"c15-provider-default-{os.getpid()}"
     mailbox = Path(mailbox)
-    ensure_provider_service(mailbox)
-    descriptor = read_public_descriptor(mailbox)
+    pub_file = mailbox / "provider-public.json"
+    if pub_file.is_file():
+        descriptor = read_public_descriptor(mailbox, auto_ensure=False)
+    else:
+        ensure_provider_service(mailbox)
+        descriptor = read_public_descriptor(mailbox, auto_ensure=False)
+    if expected_fingerprint is not None:
+        if str(descriptor.get("public_key_fingerprint")) != str(expected_fingerprint):
+            from tools.c15_persistence.backend import BackendError
+
+            raise BackendError(
+                f"Provider fingerprint mismatch: expected={expected_fingerprint}, "
+                f"actual={descriptor.get('public_key_fingerprint')}"
+            )
     return LateReturnVerifier(
         key_id=key_id,
         algorithm=str(descriptor.get("algorithm", "rsa-pkcs1v15-sha256")),
@@ -313,6 +367,13 @@ def _send_provider_command(
     mailbox: Path, cmd_payload: dict[str, Any], timeout: float = 10.0, auto_ensure: bool = True
 ) -> dict[str, object]:
     """Execute provider operation via data-only mailbox command IPC to the isolated provider service."""
+    global RECOVERY_PROVIDER_COMMAND_COUNT
+    if _RECOVERY_MODE:
+        RECOVERY_PROVIDER_COMMAND_COUNT += 1
+        if RECOVERY_INTERCEPTOR_ACTIVE:
+            raise RecoveryProviderContactForbidden(
+                f"SECURITY_TEST_PROVIDER_CONTACTED_DURING_RECOVERY: cmd={cmd_payload.get('cmd')}"
+            )
     mailbox = Path(mailbox)
     if auto_ensure:
         ensure_provider_service(mailbox)
