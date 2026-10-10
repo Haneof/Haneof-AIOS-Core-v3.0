@@ -1,0 +1,81 @@
+{
+  "packet_version": "c15-rcc-res-a-rerun-005-launch-v1",
+  "task": "C15-RCC-RES-A-RERUN-005",
+  "role": "Real Resident AI — Fresh Resident A",
+  "access_class": "RESIDENT_VISIBLE/CLEAN_ROOM",
+  "accepted_main": "703a8967878d8eaee70a8a8fce9df068204f5f76",
+  "accepted_operator_candidate": "39b4f5f02e4331e27e3f66293837497d1a5ec477",
+  "accepted_operator_tree": "d4e1ee2df8a8a4803c09366041c789eadf2a7140",
+  "c15_operator_tree": "b8a62370e6ffe80730b2ef4c17d625fab50446d4",
+  "c15_tests_tree": "1504c6d3e0e6ed63a34aa239e4fd26cf18db978a",
+  "habitation_tree": "cd43312e9ac3075eb3d7c4975d7f9efae23b9322",
+  "phase": "A",
+  "allowed_cursor_start": 1,
+  "allowed_cursor_end": 13,
+  "stop_after_ack_cursor": 13,
+  "forbidden_next_cursor": 14,
+  "startup_inputs": {
+    "clean_room_contract": {
+      "path": "reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_CORRECTIVE_003_CLEAN_ROOM_CONTRACT.md",
+      "git_blob": "430a75e0a20b0256672eb430617ae5a1d14c142f"
+    },
+    "run_contract": {
+      "path": "reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_RUN_CONTRACT.md",
+      "git_blob": "1b45ca7fa441855d927b610ca2a93ef50b5eee66"
+    }
+  },
+  "fixture_binding": {
+    "resident_access": "FORBIDDEN",
+    "sealed_fixture_git_blob": "46f0f2b3250c2c127a0deef6882adbd6a1e92d55",
+    "fixture_manifest_git_blob": "1ab5cb9fa12539e58d52322bd95b98300052b16c",
+    "phase_a_event_count": 13
+  },
+  "mechanical_release_tools": {
+    "release_operator": {
+      "path": "reviews/internal_habitation/c15-rcc/v1/release/release_operator.py",
+      "git_blob": "076cd743b63d0dc00489d1cfd6723eb502492a4a"
+    },
+    "mechanical_ingest_adapter": {
+      "path": "reviews/internal_habitation/c15-rcc/v1/release/mechanical_ingest_adapter.py",
+      "git_blob": "488e69ddd6f6a75e71526813fc44862ebef1a3a2"
+    },
+    "canonical_conversation_ingest": {
+      "path": "reviews/internal_habitation/c15-rcc/v1/release/canonical_conversation_ingest.py",
+      "git_blob": "a0068a88a2768ae3e494d2da7a0d02920c3138bd"
+    }
+  },
+  "fresh_identity_requirements": [
+    "fresh private World",
+    "fresh WorldSearchIndex",
+    "fresh release-state",
+    "fresh runtime/checkpoint",
+    "fresh exchange ledger and request/response directories",
+    "fresh Resident process identity",
+    "fresh Resident session identity",
+    "fresh run identity"
+  ],
+  "start_preconditions": [
+    "accepted_main 703a8967878d8eaee70a8a8fce9df068204f5f76 is an ancestor of current origin/main",
+    "changes after accepted_main are governance/Resident-safe launch material only; no src/**, tools/**, tests/**, package/dependency or workflow drift",
+    "post-merge p16-convergence-gate run 38024230362 is completed/success",
+    "pinned c15 operator tree, clean-room/run contracts, fixture binding, and release-tool Git blobs match this packet",
+    "new run directories contain no prior Resident state"
+  ],
+  "forbidden_material": [
+    "task board",
+    "checkpoint",
+    "PM adjudications/integration reports",
+    "prior Resident evidence/runs/reviews",
+    "fixture/evaluator/release source",
+    "future events",
+    "Git history or PR/CI metadata concerning prior Resident runs"
+  ],
+  "terminal_state": "PHASE_A_COMPLETE / REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE",
+  "self_acceptance": false,
+  "post_merge_main_gate": {
+    "run_id": 38024230362,
+    "head_sha": "703a8967878d8eaee70a8a8fce9df068204f5f76",
+    "status": "completed",
+    "conclusion": "success"
+  }
+}

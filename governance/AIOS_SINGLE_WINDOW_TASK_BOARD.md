@@ -1,19 +1,20 @@
-## 2026-10-07 — RC004 FINALIZATION PM INTEGRATED / WINDOW 49 C15 OPERATOR-PERSISTENCE CORRECTIVE RELEASED
+## 2026-10-10 — WINDOW 50 FRESH IA PASS / PR #352 PM INTEGRATED / WINDOW 51 FRESH RESIDENT A RELEASED
 
-- Window 48 Fresh Independent Acceptance = `ACCEPTANCE_PASS / blocker=0 / COMPLETE`.
-- Canonical accepted Corrective-008 candidate = PR #349 exact head `8aec087367ead24cb9c0a40d7fd97beb783066cb`, tree `e24f4415dbf0d8b1abc52fe5b03f0a74ffa1fe1c`.
-- Formal exact-head run = `37639094526` / run #71 / attempt 1 / `workflow_dispatch` / SUCCESS.
-- Mandatory pin = `203874864`; artifact = `11492995124`, digest `sha256:e41127e34bf0659551755661b7cf49250cc8a53507620175e23161189d2aaf02`.
-- PM accepted Window 48 and merged PR #349 by exact-head guarded merge.
-- Integration merge / live main = `08585f9e0b2ca80cb7eacbb55b5f1c206eb10bcb`; parents = pre-merge main `9eba4710e3cd841650191cb89f2126ca5c5b11c3` + accepted head `8aec087367ead24cb9c0a40d7fd97beb783066cb`; merge tree remains `e24f4415dbf0d8b1abc52fe5b03f0a74ffa1fe1c`.
-- Frozen Core software identity remains `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`; RC004 finalization changed workflow/governance/evidence mechanics, not frozen Core product code.
-- RC entry decision ordering is now active: **operator/persistence compatibility corrective -> independent operator IA -> fresh Resident A**.
-- **Unique next READY:** `WINDOW 49 — C15-RCC-OPERATOR-PERSISTENCE-COMPATIBILITY-CORRECTIVE-001`.
-- Window 49 scope is downstream C15 operator/persistence compatibility only: `tools/c15_persistence/**`, `tests/c15_persistence/**`, and dedicated evidence/governance. It may adapt the operator harness to accepted Core trust/recovery semantics but MUST NOT modify `src/aios_core/**`, product tests outside `tests/c15_persistence/**`, RC004 workflow, or weaken trusted-return authenticity.
-- Required RED-first: fresh reproduce the current downstream C15 failures on live main and classify exact failure identities before edits. Historical "45 failed" is navigation only, not a count to trust.
-- Required safety: no local self-mint/authenticity shortcut, no verifier bypass, no false `not_submitted`, no second request after durable binding, no Resident-visible surface drift.
-- Window 49 stops at `REVIEW_READY / READY_FOR_FRESH_INDEPENDENT_ACCEPTANCE / DO NOT MERGE`.
-- Resident A, Resident B release, evaluator, and public release remain BLOCKED until the dedicated operator corrective passes Fresh IA.
+- Window 50 Fresh Independent Acceptance = `ACCEPTANCE_PASS / blocker=0 / COMPLETE` against exact PR #352 head `39b4f5f02e4331e27e3f66293837497d1a5ec477`, tree `d4e1ee2df8a8a4803c09366041c789eadf2a7140`.
+- PM acceptance write-back comment = `6093769692`.
+- PR #352 exact-head guarded PM merge completed; integration baseline = `703a8967878d8eaee70a8a8fce9df068204f5f76`; parents = pre-merge main `4b0d0718e016d2bc4088d59ec2dba00b637994db` + accepted head `39b4f5f02e4331e27e3f66293837497d1a5ec477`; merge tree = `d4e1ee2df8a8a4803c09366041c789eadf2a7140`.
+- Post-merge main `p16-convergence-gate` run `38024230362` = `completed / success` on exact integration head `703a8967878d8eaee70a8a8fce9df068204f5f76`.
+- Accepted downstream operator/persistence compatibility contract is integrated. No new Core product corrective is authorized.
+- **Unique next READY:** `WINDOW 51 — C15-RCC-RES-A-RERUN-005`.
+- Window 51 must use a completely fresh private World/index/release-state/runtime/checkpoint/exchange plus fresh Resident process/session/run identities.
+- Old Resident A PR #296 / RERUN-004 lineage is `HISTORICAL_FOR_PRIOR_RC_ONLY`; do not reuse its World/state/session/process or semantic outputs.
+- Resident A receives only the paired clean-room/run contracts, the RERUN-005 Resident-safe launch packet, and mechanical harness/environment status. It must not read task board/checkpoint/PM history/prior Resident evidence/fixture-evaluator-release source/future events.
+- Current main may be a governance-only descendant of integration baseline `703a8967...`; before cursor 1 mechanically prove the pinned operator tree, contracts and release-tool blobs in the safe packet are unchanged. Any implementation drift = BLOCKED.
+- Phase A only: legally reveal/process cursor `1..13` sequentially, ACK 13, freeze evidence, permanently stop; cursor 14 MUST NOT be revealed.
+- Fresh Resident A stops at `PHASE_A_COMPLETE / REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE`. No self-acceptance. Resident B/evaluator/release remain blocked.
+- Resident-safe launch packet: `reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/RESIDENT_SAFE_LAUNCH_PACKET.json`.
+- Resident-safe prompt: `reviews/internal_habitation/c15-rcc/v1/resident/C15_RCC_RES_A_RERUN_005_SAFE_PROMPT.md`.
+
 
 # AIOS v3.0 单窗口任务执行总表
 
