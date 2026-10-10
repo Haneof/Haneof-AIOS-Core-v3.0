@@ -18,3 +18,12 @@
 `WINDOW 51 = RELEASED`
 
 Resident B / evaluator / downstream phases remain BLOCKED.
+
+## Window 51 preflight environment unblock
+
+- First Window 51 preflight stopped before cursor 1: `BLOCKED / OPERATOR_ENVIRONMENT_PREP_REQUIRED`.
+- No event was revealed and no run state was created; this is not contamination and not a Phase-A failure.
+- Cause: the initial RERUN-005 safe packet omitted the already-approved runtime path and mechanical verification command.
+- Resident-safe packet now pins the prepared CPython 3.12.14 / Pydantic 2.13.5 runtime path and exact verification command.
+- Environment build/provisioning remains OPERATOR_ONLY. Resident may verify/use the prepared runtime but may not build/install/design it.
+- After this governance/launch-material correction is integrated, the same Window 51 may restart preflight from cursor 0 with fresh state.

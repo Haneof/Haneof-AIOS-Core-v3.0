@@ -29,7 +29,12 @@ Mechanically verify the launch packet identities. Confirm integration baseline `
 
 The packet records post-merge main run `38024230362` as `completed / success`.
 
-If any identity/gate/harness verification fails, stop `BLOCKED`.
+Run the exact resident-safe runtime verification command from the launch packet. Do not invent an environment command and do not install/build Python yourself.
+
+If the prepared runtime path is missing, stop:
+`BLOCKED / OPERATOR_ENVIRONMENT_PREP_REQUIRED`
+
+If any identity/gate/harness/runtime verification fails, stop `BLOCKED`.
 
 Create only fresh state:
 - new private World;
