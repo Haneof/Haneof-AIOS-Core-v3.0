@@ -1,27 +1,17 @@
-## 2026-10-10 — C15 operator/persistence corrective accepted + integrated / Fresh Resident A next
+## 2026-10-10 — C15 operator/persistence corrective integrated / Fresh Resident A RERUN-005 READY
 
-- Window 50 Fresh IA passed PR #352 exact candidate `39b4f5f02e4331e27e3f66293837497d1a5ec477` with blocker=0.
+- Window 50 Fresh IA = `ACCEPTANCE_PASS / blocker=0` for PR #352 exact head `39b4f5f02e4331e27e3f66293837497d1a5ec477`.
 - PM acceptance comment = `6093769692`.
-- PM integration merge = `703a8967878d8eaee70a8a8fce9df068204f5f76`; merge tree = accepted candidate tree `d4e1ee2df8a8a4803c09366041c789eadf2a7140`.
+- PM integration baseline = `703a8967878d8eaee70a8a8fce9df068204f5f76`; merge tree = accepted candidate tree `d4e1ee2df8a8a4803c09366041c789eadf2a7140`.
+- Post-merge main gate `38024230362` = SUCCESS.
 - C15 operator/persistence trust boundary is integrated: provider private authority memory-only; journal provider identity pin enforced; post-boundary/no-proof recovery fail-closed; recovery provider command count 0; no second request; resident-surface non-vacuous.
-- Post-merge main gate `38024230362` must be `completed / success` before Resident A starts.
-- Next task after that gate: `WINDOW 51 — C15-RCC-RES-A-RERUN-005`.
-- RERUN-005 is a completely fresh Phase-A Resident run. Do not reuse PR #296 World/state/session/process/evidence as live state.
+- **Unique next task:** `WINDOW 51 — C15-RCC-RES-A-RERUN-005`.
+- RERUN-005 is a completely fresh Phase-A Resident run. PR #296/RERUN-004 state and semantics are historical only.
+- Current main may advance from `703a8967...` only through governance/Resident-safe launch material; Window 51 must verify pinned implementation/contract/release blobs before cursor 1.
 - Allowed Resident cursor range = `1..13`; ACK 13 then freeze and stop; cursor 14 forbidden.
 - Resident A may only see the clean-room contract, canonical run contract, RERUN-005 Resident-safe launch packet, and mechanical environment/harness status.
 - Resident B, Resident C, evaluator, model attestation, C15 close and public release remain blocked until Fresh A receives its own independent acceptance + PM adjudication.
 
-## 2026-10-07 — RC004 finalization accepted + PM integrated / C15 downstream operator corrective next
-
-- Window 48 Fresh IA passed PR #349 exact candidate `8aec087367ead24cb9c0a40d7fd97beb783066cb` with blocker=0.
-- PM integration completed via merge commit `08585f9e0b2ca80cb7eacbb55b5f1c206eb10bcb`; merge tree = accepted candidate tree `e24f4415dbf0d8b1abc52fe5b03f0a74ffa1fe1c`.
-- Formal acceptance evidence: run `37639094526` (#71, attempt 1, workflow_dispatch, SUCCESS), pin `203874864`, artifact `11492995124`, digest `sha256:e41127e34bf0659551755661b7cf49250cc8a53507620175e23161189d2aaf02`.
-- Frozen Core software remains `1cee3c5ad12f4b9098232bae11b51df786c5eb2f`; no new Core product corrective is authorized.
-- The next unresolved work is downstream C15 operator/persistence compatibility debt against the now-finalized accepted Core contract.
-- **Unique next task:** `WINDOW 49 — C15-RCC-OPERATOR-PERSISTENCE-COMPATIBILITY-CORRECTIVE-001`.
-- Allowed implementation scope: `tools/c15_persistence/**` + `tests/c15_persistence/**` + dedicated review evidence. Forbidden: `src/aios_core/**`, RC004 workflow changes, Resident execution, evaluator, merge.
-- Window 49 must fresh reproduce and classify current C15 failures before edits; the old 45-failure snapshot is historical navigation only.
-- After Window 49 reaches REVIEW_READY: Window 50 = Fresh Independent Acceptance. Fresh Resident A may be released only after that IA passes and PM adjudicates integration/readiness.
 
 # AIOS v3.0 当前工程断点
 
