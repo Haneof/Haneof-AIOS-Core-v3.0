@@ -367,12 +367,50 @@ def test_core_receipt_revalidation_rejects_an_operator_invented_receipt() -> Non
         request_id = session.journal.request_ids()[0]
         record = session.journal.recovery(request_id)
         attempt_id = str(record["metadata"]["attempt_id"])
+        payload = bytes(record["reply"]).decode("utf-8")
+        from aios_core.runtime.background_attempt import decode_model_directive
+        directive = decode_model_directive(payload)
+        context = attempts.late_return_signing_context(attempt_id)
+        from tools.c15_persistence import provider as provider_module
+        provider_module.collect(session.mailbox, request_id)
+        proof_dict = provider_module.read_proof(session.mailbox, request_id)
+        assert proof_dict is not None
+        proof = proof_dict["authenticity_proof"]
+        from datetime import datetime, timezone
+        attempts.attach_late_trusted_return(
+            attempt_id=attempt_id,
+            attached_at=datetime.now(timezone.utc),
+            directive_payload=payload,
+            late_return_proof=proof,
+            evidence="genuine-external-proof",
+        )
         real_receipt = attempts.response_authenticity_receipt(attempt_id)
         assert real_receipt is not None
+
+        genuine_id = f"synthetic-request-genuine-{uuid.uuid4().hex[:10]}"
+        metadata_genuine = dict(record["metadata"])
+        metadata_genuine["model_request_id"] = genuine_id
+        metadata_genuine["attempt_id"] = attempt_id
+        metadata_genuine["round"] = int(metadata_genuine.get("round", 0)) + 6
+        session.journal.stage(metadata_genuine, b"genuine request bytes", generation=0)
+        session.journal.expose(genuine_id)
+        session.journal.stage_reply(genuine_id, bytes(record["reply"]))
+        session.journal.mark_authenticated(
+            genuine_id,
+            {
+                "attempt_id": attempt_id,
+                "authenticity_proof": real_receipt.authenticity_proof,
+                "provider": real_receipt.provider,
+                "model": real_receipt.model,
+                "provider_request_id": real_receipt.provider_request_id,
+                "response_fingerprint": hashlib.sha256(bytes(record["reply"])).hexdigest(),
+                "relay_id": real_receipt.relay_id,
+            },
+        )
         # The genuine Core receipt cross-checks cleanly.
-        verified = session.journal.verify_with_core(request_id, attempts)
+        verified = session.journal.verify_with_core(genuine_id, attempts)
         assert verified["core_proof"] == real_receipt.authenticity_proof
-        stored = session.journal.recovery(request_id)["core_receipt"]
+        stored = session.journal.recovery(genuine_id)["core_receipt"]
         assert stored is not None
         assert stored["authenticity_proof"] == real_receipt.authenticity_proof
 
@@ -487,8 +525,11 @@ def test_sealed_generations_are_immutable_and_reverify() -> None:
         assert store.verify(generation)["artifacts"]["a/one.bin"] == digest(b"exact-bytes")
         target = backend.generations_dir / f"{generation:06d}"
         assert (target.stat().st_mode & 0o777) == 0o500
-        with pytest.raises(OSError):
-            (target / "sneaky.bin").write_bytes(b"x")
+        if hasattr(os, "geteuid") and os.geteuid() == 0:
+            assert (target.stat().st_mode & 0o222) == 0
+        else:
+            with pytest.raises(OSError):
+                (target / "sneaky.bin").write_bytes(b"x")
         tampered = target / "a" / "one.bin"
         os.chmod(tampered, 0o600)
         tampered.write_bytes(b"tampered")

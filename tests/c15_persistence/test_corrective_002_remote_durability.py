@@ -156,6 +156,14 @@ def test_k1_k5_survive_total_local_cache_loss_from_remote_only(
             remote=remote,
             remote_ref=remote_ref,
         )
+        if kill_point == "K3_AFTER_REQUEST_DISPATCH":
+            # Under PM49-BLK-002U: provider boundary crossed without durable return -> fail-closed
+            assert resumed.returncode == 42, (
+                f"{kill_point}: expected 42 (FAIL_CLOSED_HARD_STOP), got {resumed.returncode}\n"
+                f"stdout={resumed.stdout}\nstderr={resumed.stderr}"
+            )
+            assert "FAIL_CLOSED_HARD_STOP" in resumed.stderr
+            return
         assert resumed.returncode == 0, (
             f"{kill_point}: remote-only recovery failed\n"
             f"stdout={resumed.stdout}\nstderr={resumed.stderr}"

@@ -62,6 +62,26 @@ def baseline() -> dict:
 
 @pytest.mark.parametrize("entry", MANIFEST["probes"], ids=[p["id"] for p in MANIFEST["probes"]])
 def test_kill_point_converges(entry: dict) -> None:
+    if entry["id"] == "K3":
+        # Under accepted Core Route B contract and PM49-BLK-002U:
+        # A crash at K3_AFTER_REQUEST_DISPATCH crossed the provider boundary without
+        # a durable trusted return; recovery must stop fail-closed with exit code 42
+        # (FAIL_CLOSED_HARD_STOP) without contacting the provider.
+        import signal
+        from harness import new_root, run_clip, wipe
+        root = new_root("k3-failclosed")
+        run_id = f"synthetic-run-k3-fc-{entry['kill_point'].lower()}"
+        session_id = f"synthetic-session-k3-fc-{entry['kill_point'].lower()}"
+        try:
+            killed = run_clip(root, run_id, session_id, ["--mode", "create", "--kill-at", entry["kill_point"]])
+            assert killed.returncode == -signal.SIGKILL
+            resumed = run_clip(root, run_id, session_id, ["--mode", "resume"])
+            assert resumed.returncode == 42
+            assert "FAIL_CLOSED_HARD_STOP" in resumed.stderr
+        finally:
+            wipe(root)
+        return
+
     outcome = run_kill_point(entry["kill_point"])
     assert outcome["kill_at"] is None, "resumed run must not kill again"
     counters = assert_convergence(entry["id"], outcome, baseline())

@@ -38,7 +38,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+if str(_REPO_ROOT / "src") not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT / "src"))
 
 from aios_core.runtime.background_attempt import BackgroundModelAttemptStore  # noqa: E402
 from aios_core.runtime.capabilities import CapabilityKind, CapabilitySpec  # noqa: E402
@@ -47,19 +51,19 @@ from aios_core.runtime.turn_runtime import FusedTurnRuntime  # noqa: E402
 from aios_core.storage.sqlite_store import SQLiteWorldStore  # noqa: E402
 from aios_core.query.search import WorldSearchIndex  # noqa: E402
 
-from . import provider as provider_module  # noqa: E402
-from .backend import digest  # noqa: E402
-from .operator_session import (  # noqa: E402
+from tools.c15_persistence import provider as provider_module  # noqa: E402
+from tools.c15_persistence.backend import digest  # noqa: E402
+from tools.c15_persistence.operator_session import (  # noqa: E402
     MODEL_NAME,
     PROVIDER_NAME,
     OperatorSession,
     request_envelope,
 )
 from aios_core.runtime.background_attempt import decode_model_directive  # noqa: E402
-from .runstate import REQUIRED_SLOTS  # noqa: E402
-from .synthetic_release import SUBJECT_ID, SyntheticRelease  # noqa: E402
+from tools.c15_persistence.runstate import REQUIRED_SLOTS  # noqa: E402
+from tools.c15_persistence.synthetic_release import SUBJECT_ID, SyntheticRelease  # noqa: E402
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = _REPO_ROOT
 PINNED_PATHS = (
     "src/aios_core",
     "reviews/internal_habitation/c15-rcc/v1",
@@ -146,7 +150,13 @@ class _ControlSession:
         store = SQLiteWorldStore(self.world_path)
         index = WorldSearchIndex(self.world_path, store=store)
         index.rebuild()
-        runtime = FusedTurnRuntime(store=store, index=index, model_handler=self._model_handler)
+        runtime = FusedTurnRuntime(
+            store=store,
+            index=index,
+            model_handler=self._model_handler,
+            late_return_verifier=provider_module.route_b_verifier(self.mailbox),
+            external_return_observer=provider_module.get_provider_observer(self.mailbox),
+        )
         runtime.registry.register(
             CapabilitySpec(
                 name=provider_module.CAPABILITY_NAME,
@@ -256,8 +266,8 @@ def _directive_shape(directive: Any) -> Any:
 
 
 def _run_wired(root: Path, run_id: str, session_id: str) -> dict[str, Any]:
-    from .backend import RunBackend
-    from .relay import RelayJournal
+    from tools.c15_persistence.backend import RunBackend
+    from tools.c15_persistence.relay import RelayJournal
 
     backend = RunBackend.create(root, run_id=run_id, session_id=session_id,
                                 subject_id=SUBJECT_ID, phase="A")
@@ -305,15 +315,144 @@ def _run_wired(root: Path, run_id: str, session_id: str) -> dict[str, Any]:
 # ------------------------------------------------------------------------ main
 
 
-def _pinned_tree_digest(base: str) -> dict[str, Any]:
-    out: dict[str, Any] = {"base": base}
-    for scope in PINNED_PATHS:
-        completed = subprocess.run(
-            ["git", "diff", "--stat", f"{base}...HEAD", "--", scope],
-            cwd=str(REPO_ROOT),
+def resolve_surface_base(
+    explicit_base: str | None = None, repo_root: Path = REPO_ROOT
+) -> str:
+    """Resolve the authoritative construction/base commit SHA for resident-surface checks.
+
+    Priority order:
+    1. Explicit non-empty parameter / C15_SURFACE_BASE env var:
+       - Must resolve to a valid commit, otherwise raises ValueError immediately.
+    2. GitHub Actions pull_request event metadata:
+       - From GITHUB_EVENT_PATH (pull_request.base.sha or pull_request.base.ref).
+       - Must resolve to a valid commit.
+    3. Merge-base with origin/main or origin/HEAD if available:
+       - git merge-base HEAD origin/main (or origin/HEAD).
+    4. Local main / merge-base with local main:
+       - git merge-base HEAD main.
+
+    Guarantees:
+    - Never falls back to HEAD or HEAD~1.
+    - Fails closed with ValueError when base authority is unresolved.
+    - Always returns a verified 40-character commit SHA or raises ValueError.
+    """
+    repo_str = str(repo_root)
+
+    def _try_fetch(ref: str) -> None:
+        if not ref or not isinstance(ref, str) or not ref.strip():
+            return
+        subprocess.run(
+            ["git", "fetch", "--depth=20", "origin", ref.strip()],
+            cwd=repo_str,
             capture_output=True,
             text=True,
         )
+
+    def _verify_commit(rev: str, allow_fetch: bool = True) -> str | None:
+        if not rev or not isinstance(rev, str) or not rev.strip():
+            return None
+        res = subprocess.run(
+            ["git", "rev-parse", "--verify", f"{rev.strip()}^{{commit}}"],
+            cwd=repo_str,
+            capture_output=True,
+            text=True,
+        )
+        if res.returncode == 0 and res.stdout.strip():
+            return res.stdout.strip()
+        if allow_fetch:
+            _try_fetch(rev)
+            res = subprocess.run(
+                ["git", "rev-parse", "--verify", f"{rev.strip()}^{{commit}}"],
+                cwd=repo_str,
+                capture_output=True,
+                text=True,
+            )
+            if res.returncode == 0 and res.stdout.strip():
+                return res.stdout.strip()
+        return None
+
+    # 1. Explicit base passed or via environment variable
+    candidate_explicit = (explicit_base or "").strip() or os.environ.get("C15_SURFACE_BASE", "").strip()
+    if candidate_explicit:
+        resolved = _verify_commit(candidate_explicit, allow_fetch=True)
+        if resolved is not None:
+            return resolved
+        raise ValueError(
+            f"explicit base ref {candidate_explicit!r} does not resolve to a valid commit in repository"
+        )
+
+    # 2. GitHub Actions PR event metadata
+    event_path = os.environ.get("GITHUB_EVENT_PATH")
+    if event_path and Path(event_path).is_file():
+        try:
+            event_data = json.loads(Path(event_path).read_text(encoding="utf-8"))
+            pr_base_sha = (
+                event_data.get("pull_request", {}).get("base", {}).get("sha")
+                or event_data.get("pull_request", {}).get("base", {}).get("ref")
+            )
+            if pr_base_sha:
+                resolved = _verify_commit(str(pr_base_sha), allow_fetch=True)
+                if resolved is not None:
+                    return resolved
+        except Exception:
+            pass
+
+    # 3. Remote refs / main fetch
+    _try_fetch("main")
+    for remote_ref in ("origin/main", "origin/HEAD"):
+        if _verify_commit(remote_ref, allow_fetch=False) is not None:
+            mb = subprocess.run(
+                ["git", "merge-base", "HEAD", remote_ref],
+                cwd=repo_str,
+                capture_output=True,
+                text=True,
+            )
+            if mb.returncode == 0 and mb.stdout.strip():
+                resolved = _verify_commit(mb.stdout.strip(), allow_fetch=False)
+                if resolved is not None:
+                    return resolved
+
+    # 4. Local main ref
+    if _verify_commit("main", allow_fetch=False) is not None:
+        mb = subprocess.run(
+            ["git", "merge-base", "HEAD", "main"],
+            cwd=repo_str,
+            capture_output=True,
+            text=True,
+        )
+        if mb.returncode == 0 and mb.stdout.strip():
+            resolved = _verify_commit(mb.stdout.strip(), allow_fetch=False)
+            if resolved is not None:
+                return resolved
+
+    # 5. Base authority unresolved: fail closed without guessing or falling back to HEAD/HEAD~1
+    raise ValueError(
+        "cannot mechanically resolve a valid resident-surface base commit in current git repository: "
+        "base authority unresolved (refusing non-authoritative fallback to HEAD/HEAD~1)"
+    )
+
+
+def _pinned_tree_digest(base: str, repo_root: Path = REPO_ROOT) -> dict[str, Any]:
+    resolved_sha = resolve_surface_base(base, repo_root=repo_root)
+    out: dict[str, Any] = {"base": base, "resolved_base_sha": resolved_sha}
+    for scope in PINNED_PATHS:
+        completed = subprocess.run(
+            ["git", "diff", "--stat", f"{resolved_sha}...HEAD", "--", scope],
+            cwd=str(repo_root),
+            capture_output=True,
+            text=True,
+        )
+        if completed.returncode != 0:
+            completed = subprocess.run(
+                ["git", "diff", "--stat", resolved_sha, "HEAD", "--", scope],
+                cwd=str(repo_root),
+                capture_output=True,
+                text=True,
+            )
+        if completed.returncode != 0:
+            raise RuntimeError(
+                f"git diff failed for scope {scope}: {completed.stderr.strip()}"
+            )
         out[scope] = {
             "diff": completed.stdout.strip(),
             "clean": completed.stdout.strip() == "",
@@ -324,13 +463,19 @@ def _pinned_tree_digest(base: str) -> dict[str, Any]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", required=True, help="where to write the JSON evidence")
-    parser.add_argument("--base", default="main", help="git ref to diff the pinned trees against")
+    parser.add_argument(
+        "--base",
+        default=None,
+        help="git ref to diff the pinned trees against (defaults to auto-resolved base)",
+    )
     parser.add_argument(
         "--work-root",
         default=None,
         help="durable (non-ephemeral) scratch root for the two runs",
     )
     args = parser.parse_args(argv)
+
+    resolved_base = resolve_surface_base(args.base)
 
     work_root = Path(
         args.work_root
@@ -378,7 +523,7 @@ def main(argv: list[str] | None = None) -> int:
         "world_revision": control["world_revision"] == wired["world_revision"],
     }
 
-    pinned = _pinned_tree_digest(args.base)
+    pinned = _pinned_tree_digest(resolved_base)
     ok = all(comparisons.values()) and all(scope["clean"] for scope in
                                            (v for k, v in pinned.items() if isinstance(v, dict)))
 
