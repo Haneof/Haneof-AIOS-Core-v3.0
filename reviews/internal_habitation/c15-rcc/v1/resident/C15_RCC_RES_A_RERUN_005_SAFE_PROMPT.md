@@ -25,9 +25,9 @@ If exposed after start, stop:
 
 ## Preflight
 
-Mechanically verify the launch packet identities and exact accepted main.
+Mechanically verify the launch packet identities. Confirm integration baseline `703a8967878d8eaee70a8a8fce9df068204f5f76` is an ancestor of current main. Any later changes must be governance/Resident-safe launch material only; the pinned C15 operator tree, contracts and release-tool blobs must remain exact.
 
-The packet requires post-merge main run `38024230362` to be `completed / success`.
+The packet records post-merge main run `38024230362` as `completed / success`.
 
 If any identity/gate/harness verification fails, stop `BLOCKED`.
 
