@@ -1,3 +1,19 @@
+## 2026-10-10 — WINDOW 50 FRESH IA PASS / PR #352 PM INTEGRATED / RESIDENT A RERUN-005 PREPARED
+
+- Window 50 Fresh Independent Acceptance = `ACCEPTANCE_PASS / blocker=0 / COMPLETE` against exact PR #352 head `39b4f5f02e4331e27e3f66293837497d1a5ec477`, tree `d4e1ee2df8a8a4803c09366041c789eadf2a7140`.
+- PM acceptance write-back comment = `6093769692`.
+- PR #352 exact-head guarded PM merge completed; integration merge / live main = `703a8967878d8eaee70a8a8fce9df068204f5f76`; parents = pre-merge main `4b0d0718e016d2bc4088d59ec2dba00b637994db` + accepted head `39b4f5f02e4331e27e3f66293837497d1a5ec477`; merge tree remains `d4e1ee2df8a8a4803c09366041c789eadf2a7140`.
+- Accepted downstream operator/persistence compatibility contract is now integrated into main. No new Core product corrective is authorized.
+- Exact-head hosted acceptance evidence before merge: four PR workflows SUCCESS; formal full suite = 1164 tests / 0 failures / 0 errors.
+- Post-merge main `p16-convergence-gate` run `38024230362` is the final start precondition for the next real Resident run. Resident A MUST NOT start unless this exact main run is `completed / success`.
+- The next Resident task is `WINDOW 51 — C15-RCC-RES-A-RERUN-005`, using a completely fresh private World/index/release-state/runtime/checkpoint/exchange plus fresh Resident process/session identities.
+- Old Resident A PR #296 / RERUN-004 lineage is `HISTORICAL_FOR_PRIOR_RC_ONLY`; do not reuse its World/state/session/process or semantic outputs.
+- Resident A receives only the paired clean-room/run contracts, the new RERUN-005 Resident-safe launch packet, and mechanical harness/environment status. It must not read task board/checkpoint/PM history/prior Resident evidence/fixture-evaluator-release source/future events.
+- Phase A only: legally reveal/process cursor `1..13` sequentially, ACK 13, freeze evidence, permanently stop; cursor 14 MUST NOT be revealed.
+- Fresh Resident A stops at `PHASE_A_COMPLETE / REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE`. No self-acceptance. Resident B/evaluator/release remain blocked.
+- Prepared safe launch packet: `reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/RESIDENT_SAFE_LAUNCH_PACKET.json`.
+- Prepared Resident-safe prompt: `reviews/internal_habitation/c15-rcc/v1/resident/C15_RCC_RES_A_RERUN_005_SAFE_PROMPT.md`.
+
 ## 2026-10-07 — RC004 FINALIZATION PM INTEGRATED / WINDOW 49 C15 OPERATOR-PERSISTENCE CORRECTIVE RELEASED
 
 - Window 48 Fresh Independent Acceptance = `ACCEPTANCE_PASS / blocker=0 / COMPLETE`.
