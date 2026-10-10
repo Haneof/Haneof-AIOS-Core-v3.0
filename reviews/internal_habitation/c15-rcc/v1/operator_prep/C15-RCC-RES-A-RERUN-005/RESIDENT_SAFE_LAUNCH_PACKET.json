@@ -55,10 +55,11 @@
     "fresh run identity"
   ],
   "start_preconditions": [
-    "origin/main equals accepted_main",
+    "accepted_main 703a8967878d8eaee70a8a8fce9df068204f5f76 is an ancestor of current origin/main",
+    "changes after accepted_main are governance/Resident-safe launch material only; no src/**, tools/**, tests/**, package/dependency or workflow drift",
     "post-merge p16-convergence-gate run 38024230362 is completed/success",
-    "all pinned Git blobs/tree identities match",
-    "new run directories do not contain prior Resident state"
+    "pinned c15 operator tree, clean-room/run contracts, fixture binding, and release-tool Git blobs match this packet",
+    "new run directories contain no prior Resident state"
   ],
   "forbidden_material": [
     "task board",
@@ -70,5 +71,11 @@
     "Git history or PR/CI metadata concerning prior Resident runs"
   ],
   "terminal_state": "PHASE_A_COMPLETE / REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE",
-  "self_acceptance": false
+  "self_acceptance": false,
+  "post_merge_main_gate": {
+    "run_id": 38024230362,
+    "head_sha": "703a8967878d8eaee70a8a8fce9df068204f5f76",
+    "status": "completed",
+    "conclusion": "success"
+  }
 }
