@@ -1,3 +1,16 @@
+## 2026-10-10 — C15 operator/persistence corrective accepted + integrated / Fresh Resident A next
+
+- Window 50 Fresh IA passed PR #352 exact candidate `39b4f5f02e4331e27e3f66293837497d1a5ec477` with blocker=0.
+- PM acceptance comment = `6093769692`.
+- PM integration merge = `703a8967878d8eaee70a8a8fce9df068204f5f76`; merge tree = accepted candidate tree `d4e1ee2df8a8a4803c09366041c789eadf2a7140`.
+- C15 operator/persistence trust boundary is integrated: provider private authority memory-only; journal provider identity pin enforced; post-boundary/no-proof recovery fail-closed; recovery provider command count 0; no second request; resident-surface non-vacuous.
+- Post-merge main gate `38024230362` must be `completed / success` before Resident A starts.
+- Next task after that gate: `WINDOW 51 — C15-RCC-RES-A-RERUN-005`.
+- RERUN-005 is a completely fresh Phase-A Resident run. Do not reuse PR #296 World/state/session/process/evidence as live state.
+- Allowed Resident cursor range = `1..13`; ACK 13 then freeze and stop; cursor 14 forbidden.
+- Resident A may only see the clean-room contract, canonical run contract, RERUN-005 Resident-safe launch packet, and mechanical environment/harness status.
+- Resident B, Resident C, evaluator, model attestation, C15 close and public release remain blocked until Fresh A receives its own independent acceptance + PM adjudication.
+
 ## 2026-10-07 — RC004 finalization accepted + PM integrated / C15 downstream operator corrective next
 
 - Window 48 Fresh IA passed PR #349 exact candidate `8aec087367ead24cb9c0a40d7fd97beb783066cb` with blocker=0.
