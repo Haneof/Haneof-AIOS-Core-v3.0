@@ -1,3 +1,13 @@
+## 2026-10-10 — WINDOW 51 PRESTART BLOCKED / WINDOW 52 OPERATOR-PREP CORRECTIVE READY
+
+- Window 51 stopped before cursor 1; no Resident run state was created.
+- PM adjudication comment: `6094075292`.
+- Binding result: `BLOCKED / CONTAMINATED_BEFORE_RUN` due missing approved runtime bootstrap/mechanical verification entry and clean-room path-name exposure during self-directed preflight.
+- Historical semantic-free bootstrap trust-root blobs for operator use only: bootstrap `e068a36697af7294f15409b0f44421dbc4f27523`, wheel lock `cdf1a74a0f36c050840790c62d63de5006e3524e`, wheel verifier `4bade76ac83f82a7a79c293effc05d1ab7f2c60b`.
+- **Unique next READY:** `WINDOW 52 — C15-RCC-RES-A-RERUN-005-PRESTART-OPERATOR-PREP-CORRECTIVE-001`.
+- Window 52 is non-Resident operator-prep only; it must provide current-baseline semantic-free CPython 3.12.14/Pydantic 2.13.5 bootstrap + mechanical verify command, then stop REVIEW_READY / DO NOT MERGE.
+- Fresh Resident A must restart in a new process/window only after Window 52 Fresh IA + PM release.
+
 ## 2026-10-10 — WINDOW 50 FRESH IA PASS / PR #352 PM INTEGRATED / WINDOW 51 FRESH RESIDENT A RELEASED
 
 - Window 50 Fresh Independent Acceptance = `ACCEPTANCE_PASS / blocker=0 / COMPLETE` against exact PR #352 head `39b4f5f02e4331e27e3f66293837497d1a5ec477`, tree `d4e1ee2df8a8a4803c09366041c789eadf2a7140`.
