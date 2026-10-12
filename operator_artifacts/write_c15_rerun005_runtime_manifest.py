@@ -33,6 +33,7 @@ manifest = {
     "platform_machine": os.environ.get("ARTIFACT_PLATFORM_MACHINE", ""),
     "kernel": os.environ.get("ARTIFACT_KERNEL", ""),
     "glibc": os.environ.get("ARTIFACT_GLIBC", ""),
+    "runtime_elf_max_glibc": os.environ.get("ARTIFACT_ELF_MAX_GLIBC", ""),
     "contains_resident_state": False,
     "contains_repository": False,
     "contains_credentials": False,
