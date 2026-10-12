@@ -42,9 +42,24 @@ ARTIFACT="$OUT/aios-c15-resident-runtime-3.12.14.tar.gz"
 cd "$RUNTIME_ROOT"
 tar --exclude='*/__pycache__/*' --exclude='*.pyc' -czf "$ARTIFACT" runtime/3.12.14
 gzip -t "$ARTIFACT"
-tar -tzf "$ARTIFACT" | grep -q '^runtime/3.12.14/venv/bin/python'
+ARCHIVE_LIST="$OUT/aios-c15-resident-runtime-3.12.14.contents.txt"
+tar -tzf "$ARTIFACT" > "$ARCHIVE_LIST"
+grep -q '^runtime/3.12.14/venv/bin/python' "$ARCHIVE_LIST"
 
-if tar -tzf "$ARTIFACT" | grep -E '(^|/)(\.git|\.ssh)(/|$)|(^|/)(\.netrc|\.git-credentials|id_rsa|id_ed25519|credentials\.json)$'; then
+if grep -E '(^|/)(\.git|\.ssh)(/|$)|(^|/)(\.netrc|\.git-credentials|id_rsa|id_ed25519|credentials\.json)
+
+export ARTIFACT_PLATFORM_SYSTEM="$(uname -s)"
+export ARTIFACT_PLATFORM_MACHINE="$(uname -m)"
+export ARTIFACT_KERNEL="$(uname -r)"
+export ARTIFACT_GLIBC="$(ldd --version | head -n 1 || true)"
+
+cd "$GITHUB_WORKSPACE"
+python3 operator_artifacts/write_c15_rerun005_runtime_manifest.py "$OUT"
+
+test -s "$OUT/AIOS_C15_RESIDENT_RUNTIME_3_12_14_MANIFEST.json"
+test -s "$OUT/aios-c15-resident-runtime-3.12.14.tar.gz.sha256"
+echo "RUNTIME_ARTIFACT_READY"
+ "$ARCHIVE_LIST"; then
   echo "forbidden credential path detected in runtime archive" >&2
   exit 1
 fi
