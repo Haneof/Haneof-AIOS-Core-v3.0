@@ -28,6 +28,15 @@ git worktree add --detach "$CUR" "$CURRENT_MAIN_SHA"
 cd "$CUR"
 PYTHONPATH=src:. "$RUNTIME_ROOT/runtime/3.12.14/venv/bin/python" -c 'import pathlib,platform,sqlite3,ssl,pydantic,pytest,aios_core; r=pathlib.Path.cwd().resolve(); a=pathlib.Path(aios_core.__file__).resolve(); assert platform.python_version()=="3.12.14"; assert pydantic.__version__=="2.13.5"; assert pytest.__version__=="8.4.2"; assert sqlite3.sqlite_version=="3.45.1"; assert ssl.OPENSSL_VERSION.split()[1]=="3.0.13"; assert r in a.parents; print("RUNTIME_ENV_OK", platform.python_version(), pydantic.__version__, pytest.__version__, sqlite3.sqlite_version, ssl.OPENSSL_VERSION, a)'
 
+ELF_MAX_GLIBC="$(readelf --version-info "$RUNTIME_ROOT/runtime/3.12.14/python/bin/python3.12" | grep -o 'GLIBC_[0-9][0-9.]*' | sort -V | uniq | tail -n 1)"
+echo "RUNTIME_ELF_MAX_GLIBC $ELF_MAX_GLIBC"
+MAX_ALLOWED_GLIBC="GLIBC_2.35"
+if [ "$(printf '%s\n%s\n' "$ELF_MAX_GLIBC" "$MAX_ALLOWED_GLIBC" | sort -V | tail -n 1)" != "$MAX_ALLOWED_GLIBC" ]; then
+  echo "runtime requires newer glibc than allowed: $ELF_MAX_GLIBC > $MAX_ALLOWED_GLIBC" >&2
+  exit 1
+fi
+export ARTIFACT_ELF_MAX_GLIBC="$ELF_MAX_GLIBC"
+
 mkdir -p "$OUT"
 ARTIFACT="$OUT/aios-c15-resident-runtime-3.12.14.tar.gz"
 cd "$RUNTIME_ROOT"
