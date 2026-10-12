@@ -30,48 +30,7 @@ PYTHONPATH=src:. "$RUNTIME_ROOT/runtime/3.12.14/venv/bin/python" -c 'import path
 
 ELF_MAX_GLIBC="$(readelf --version-info "$RUNTIME_ROOT/runtime/3.12.14/python/bin/python3.12" | grep -o 'GLIBC_[0-9][0-9.]*' | sort -V | uniq | tail -n 1)"
 echo "RUNTIME_ELF_MAX_GLIBC $ELF_MAX_GLIBC"
-MAX_ALLOWED_GLIBC="GLIBC_2.35"
-if [ "$(printf '%s\n%s\n' "$ELF_MAX_GLIBC" "$MAX_ALLOWED_GLIBC" | sort -V | tail -n 1)" != "$MAX_ALLOWED_GLIBC" ]; then
-  echo "runtime requires newer glibc than allowed: $ELF_MAX_GLIBC > $MAX_ALLOWED_GLIBC" >&2
-  exit 1
-fi
-export ARTIFACT_ELF_MAX_GLIBC="$ELF_MAX_GLIBC"
-
-mkdir -p "$OUT"
-ARTIFACT="$OUT/aios-c15-resident-runtime-3.12.14.tar.gz"
-cd "$RUNTIME_ROOT"
-tar --exclude='*/__pycache__/*' --exclude='*.pyc' -czf "$ARTIFACT" runtime/3.12.14
-gzip -t "$ARTIFACT"
-ARCHIVE_LIST="$OUT/aios-c15-resident-runtime-3.12.14.contents.txt"
-tar -tzf "$ARTIFACT" > "$ARCHIVE_LIST"
-grep -q '^runtime/3.12.14/venv/bin/python' "$ARCHIVE_LIST"
-
-if grep -E '(^|/)(\.git|\.ssh)(/|$)|(^|/)(\.netrc|\.git-credentials|id_rsa|id_ed25519|credentials\.json)
-
-export ARTIFACT_PLATFORM_SYSTEM="$(uname -s)"
-export ARTIFACT_PLATFORM_MACHINE="$(uname -m)"
-export ARTIFACT_KERNEL="$(uname -r)"
-export ARTIFACT_GLIBC="$(ldd --version | head -n 1 || true)"
+python3 -c 'import sys; v=tuple(map(int,sys.argv[1].split("_",1)[1].split("."))); assert v <= (2,35), v' "$ELF_MAX_GLIBC"
 
 cd "$GITHUB_WORKSPACE"
-python3 operator_artifacts/write_c15_rerun005_runtime_manifest.py "$OUT"
-
-test -s "$OUT/AIOS_C15_RESIDENT_RUNTIME_3_12_14_MANIFEST.json"
-test -s "$OUT/aios-c15-resident-runtime-3.12.14.tar.gz.sha256"
-echo "RUNTIME_ARTIFACT_READY"
- "$ARCHIVE_LIST"; then
-  echo "forbidden credential path detected in runtime archive" >&2
-  exit 1
-fi
-
-export ARTIFACT_PLATFORM_SYSTEM="$(uname -s)"
-export ARTIFACT_PLATFORM_MACHINE="$(uname -m)"
-export ARTIFACT_KERNEL="$(uname -r)"
-export ARTIFACT_GLIBC="$(ldd --version | head -n 1 || true)"
-
-cd "$GITHUB_WORKSPACE"
-python3 operator_artifacts/write_c15_rerun005_runtime_manifest.py "$OUT"
-
-test -s "$OUT/AIOS_C15_RESIDENT_RUNTIME_3_12_14_MANIFEST.json"
-test -s "$OUT/aios-c15-resident-runtime-3.12.14.tar.gz.sha256"
-echo "RUNTIME_ARTIFACT_READY"
+python3 operator_artifacts/package_c15_rerun005_runtime.py "$RUNTIME_ROOT" "$OUT" "$ELF_MAX_GLIBC"
