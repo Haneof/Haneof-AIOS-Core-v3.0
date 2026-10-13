@@ -1,0 +1,131 @@
+{
+  "candidate_identity": {
+    "expected_historical_baseline": "10901d467679b70437ae112747eab81f889fd5cb",
+    "head": "10901d467679b70437ae112747eab81f889fd5cb"
+  },
+  "candidate_root": "/tmp/aios-op-prep-failed-281-10901d467679b70437ae112747eab81f889fd5cb/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "probe_mode": "historical",
+  "probes": {
+    "C1_IA_OP_001": {
+      "expected": {
+        "changed_replay": "fail closed",
+        "intact_exact_replay": "idempotent_replay=true",
+        "missing_publish": "fail closed",
+        "tampered_consume": "fail closed",
+        "tampered_publish": "fail closed"
+      },
+      "observed": {
+        "changed_replay_fail_closed": true,
+        "intact_idempotent_replay": true,
+        "missing_publish_fail_closed": false,
+        "tampered_consume_fail_closed": true,
+        "tampered_publish_fail_closed": false
+      },
+      "status": "RED"
+    },
+    "C2_IA_OP_002": {
+      "bootstrap_avoids_top_level_live_resolution": false,
+      "bootstrap_uses_pre_download_lock": false,
+      "install_is_offline_and_no_resolver": false,
+      "lock_error": "no candidate-controlled pre-download wheel lock",
+      "lock_present": false,
+      "lock_sha256": null,
+      "missing_wheel_rejected": false,
+      "required_distributions": {},
+      "status": "RED",
+      "unexpected_wheel_rejected": false,
+      "wrong_bytes_rejected": false,
+      "wrong_hash_rejected": false
+    },
+    "C3_IA_OP_003": {
+      "gates": {
+        "A": {
+          "collect_and_result_consistent": false,
+          "execution_total": 19,
+          "expected_count": 19,
+          "node_ids": [
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a01_request_id_roundtrip",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a02_request_sha256_binding",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a03_response_sha256_binding",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a04_atomic_request_publication",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a05_atomic_response_publication",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a06_temp_write_and_file_fsync",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a07_os_replace_used",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a08_directory_fsync_supported",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a09_reader_never_observes_partial_response",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a10_monotonic_ledger_sequence",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a11_hash_chain_tamper_detection",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a12_crash_before_request_publication",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a13_crash_after_request_publication",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a14_torn_response_write_fails_closed",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a15_response_published_before_consume_is_recovered",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a16_request_id_mismatch_fails_closed",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a17_digest_mismatch_fails_closed",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a18_missing_ledger_publication_record_fails_closed",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a19_not_submitted_classification_requires_absence_of_dispatch"
+          ],
+          "parsed_node_count": 19,
+          "reported_collected_total": 19,
+          "result_id_count": 0,
+          "result_test_count": 0
+        },
+        "B": {
+          "collect_and_result_consistent": false,
+          "execution_total": 7,
+          "expected_count": 7,
+          "node_ids": [
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b1_runtime_snapshot_with_empty_capability_history",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b2_successful_capability_result_serializes",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b3_failed_capability_result_serializes",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b4_multiple_capability_results_distinct_fields",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b5_no_nonexistent_fields_are_referenced",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b6_frozen_capability_result_surface_is_exactly_six_fields",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b7_runner_serializer_round_trips_real_directive"
+          ],
+          "parsed_node_count": 7,
+          "reported_collected_total": 7,
+          "result_id_count": 0,
+          "result_test_count": 0
+        },
+        "C": {
+          "collect_and_result_consistent": false,
+          "execution_total": 2,
+          "expected_count": 2,
+          "node_ids": [
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_c_two_round_integration.py::test_gate_c_two_round_integration",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_c_two_round_integration.py::test_gate_c_second_turn_reuses_durable_exchange"
+          ],
+          "parsed_node_count": 2,
+          "reported_collected_total": 2,
+          "result_id_count": 0,
+          "result_test_count": 0
+        },
+        "D": {
+          "collect_and_result_consistent": false,
+          "execution_total": 5,
+          "expected_count": 5,
+          "node_ids": [
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_scan_passes",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_individual_checks",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_response_mode_is_external_session",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_package_does_not_import_tests",
+            "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_test_only_responder_is_outside_package"
+          ],
+          "parsed_node_count": 5,
+          "reported_collected_total": 5,
+          "result_id_count": 0,
+          "result_test_count": 0
+        }
+      },
+      "negative_cases": {
+        "count_mismatch": "NO_FAIL_CLOSED_PARSER",
+        "empty_ids_nonempty_total": "NO_FAIL_CLOSED_PARSER",
+        "malformed_collection": "NO_FAIL_CLOSED_PARSER",
+        "nonzero_returncode": "NO_FAIL_CLOSED_PARSER"
+      },
+      "parser_api_present": false,
+      "status": "RED"
+    }
+  },
+  "status": "RED"
+}

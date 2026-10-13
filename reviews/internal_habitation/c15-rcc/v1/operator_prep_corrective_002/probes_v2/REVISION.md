@@ -1,0 +1,1 @@
+v1 remains immutable. v1 baseline: 81 failed / 22 passed; one failure is a probe bug, not candidate defect: C9 no-semantic scanner core_source requires the turn_runtime.py file, not a directory. v2 fixes only this argument. All 103 IDs and required expected outcomes unchanged. C4-C9 each already show genuine RED; v2 must be frozen and rerun before implementation.

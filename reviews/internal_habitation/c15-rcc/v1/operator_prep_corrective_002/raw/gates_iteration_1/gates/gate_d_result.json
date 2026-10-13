@@ -1,0 +1,42 @@
+{
+  "gate": "D",
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "status": "PASS",
+  "returncode": 0,
+  "collection_returncode": 0,
+  "reported_collected_count": 5,
+  "execution_total": 5,
+  "test_file": "tests/test_gate_d_no_semantic_script.py",
+  "test_count": 5,
+  "test_ids": [
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_scan_passes",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_individual_checks",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_response_mode_is_external_session",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_package_does_not_import_tests",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_test_only_responder_is_outside_package"
+  ],
+  "outcomes": {
+    "passed": 5,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "duration_s": 1.048,
+  "raw_output": "gate_d_raw.txt",
+  "raw_output_sha256": "9f229eb36ff1e88bb96de93bf56fd0e142b039633c1a8afe24be1e17d8527bb2",
+  "enumeration_sha256": "1707178994761ee2b964dbd430074147facc8914d33c37a431ac118b704de6bd",
+  "environment": {
+    "python_version": "3.12.14",
+    "python_version_info": [
+      3,
+      12,
+      14
+    ],
+    "pydantic_version": "2.13.5",
+    "pytest_version": "8.4.2",
+    "sqlite_version": "3.45.1",
+    "openssl_version": "OpenSSL 3.0.13 30 Jan 2024",
+    "executable": "/home/user/.cache/c002/baseline-runtime/runtime/3.12.14/venv/bin/python"
+  },
+  "generated_utc": "2026-09-28T21:16:26.228811+00:00"
+}

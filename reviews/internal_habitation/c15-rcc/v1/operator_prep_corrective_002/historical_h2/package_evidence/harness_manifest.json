@@ -1,0 +1,159 @@
+{
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "root": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "scope": "harness + bootstrap + pre-frozen Python wheel trust root",
+  "harness_file_count": 26,
+  "bootstrap_file_count": 3,
+  "file_count": 29,
+  "files": [
+    {
+      "path": "bootstrap/PYTHON_WHEEL_LOCK.json",
+      "sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe",
+      "bytes": 6047
+    },
+    {
+      "path": "bootstrap/bootstrap_runtime.sh",
+      "sha256": "09c655d35a0c1b9be28a210e9ac2d681e964628eb24ce34b5db0ca894772e3b0",
+      "bytes": 28827
+    },
+    {
+      "path": "bootstrap/wheel_lock.py",
+      "sha256": "565c7e1e560f0e5394caf85ff1e16f61b53468884aea561de3cbfc61a863e765",
+      "bytes": 11249
+    },
+    {
+      "path": "harness/aios_exchange/__init__.py",
+      "sha256": "7900d69b069ca6440302895c4e82531bc776757648511aef25a0133efd7a465b",
+      "bytes": 1154
+    },
+    {
+      "path": "harness/aios_exchange/atomic.py",
+      "sha256": "1dcf79d443dee0279ada264f5c4de890a78834f964b502bfb19b10d1d59c395e",
+      "bytes": 3631
+    },
+    {
+      "path": "harness/aios_exchange/bridge.py",
+      "sha256": "8a37b82a56958162aa92825fa8908e9637870b2110f221f44b8ec957f7cbc772",
+      "bytes": 13399
+    },
+    {
+      "path": "harness/aios_exchange/canonical.py",
+      "sha256": "d1ae3e5a46bced68bedb455bf4e6ce6c6783391c9f319b3317bf0bff83800ac1",
+      "bytes": 3171
+    },
+    {
+      "path": "harness/aios_exchange/ledger.py",
+      "sha256": "130c62369efd9591395a3e64c709c0ec641df0e470162e5d3812912d3f0a3407",
+      "bytes": 8357
+    },
+    {
+      "path": "harness/aios_exchange/requests.py",
+      "sha256": "18597a915bf3d948c1ae8d599b9f3d787aa06eab998c363989d9454e2c51829f",
+      "bytes": 6329
+    },
+    {
+      "path": "harness/aios_exchange/responses.py",
+      "sha256": "7d1a657b97747e0dd277f420ba4c935cb706b30e028e1324d11993f8aca0d23b",
+      "bytes": 8379
+    },
+    {
+      "path": "harness/aios_exchange/runner.py",
+      "sha256": "b17707ca5696e1a18f5a89461fae72583318059aa46fe84119fe812bf4c932b4",
+      "bytes": 7476
+    },
+    {
+      "path": "harness/aios_exchange/schema.py",
+      "sha256": "8278ba82f1fbdee637be20f409a13ce5489d9c04bf88bf727a486760605cb45b",
+      "bytes": 15520
+    },
+    {
+      "path": "harness/aios_exchange/verify.py",
+      "sha256": "d3325b9d0488ec2341481f3bf95fb17b35d6c63bba979bc66c05b92c260bcd8a",
+      "bytes": 8527
+    },
+    {
+      "path": "harness/operator_tools/__init__.py",
+      "sha256": "3bcce93757d916f24e01dd9c595019b70a46d522e891fa7dab73e9d8dc5309f2",
+      "bytes": 122
+    },
+    {
+      "path": "harness/operator_tools/build_launch_packet.py",
+      "sha256": "06e355021f6326e480df9d69cd0ad0c91f4bf9eb32e74959a7ddcf7ff153fb76",
+      "bytes": 9622
+    },
+    {
+      "path": "harness/operator_tools/freeze.py",
+      "sha256": "0a5c3f4e504134cd670e7d424ac94bfff55780af779aa1e06f33a6a130b78c41",
+      "bytes": 8051
+    },
+    {
+      "path": "harness/operator_tools/gate_runner.py",
+      "sha256": "024d5ae6799720108540273abe6db53eea797808c3872e46ac22dabf29e5a1d7",
+      "bytes": 11833
+    },
+    {
+      "path": "harness/operator_tools/no_semantic_scan.py",
+      "sha256": "adb973d40ce924af913258049963f2e86912cdc54f825f33fbfd5ba40d864ac0",
+      "bytes": 19738
+    },
+    {
+      "path": "harness/operator_tools/packet_audit.py",
+      "sha256": "7251e7ef3d4445a4b50a2f1fbf3e89f12cf3a18c4592ffa084741f0e9b6b3e12",
+      "bytes": 22482
+    },
+    {
+      "path": "harness/operator_tools/rc_identity.py",
+      "sha256": "a69b520ef1fdbd094765b11593970c4c9661a0bba2b1b732e7bfb703739e4a32",
+      "bytes": 3431
+    },
+    {
+      "path": "harness/tests/_crash_worker.py",
+      "sha256": "93f2a0dc1a38219a9573fb2e6238c036a0741ed4c4076fadf80fe885ea5734f5",
+      "bytes": 2399
+    },
+    {
+      "path": "harness/tests/conftest.py",
+      "sha256": "6b0e3b5699f7541135cd58e67dfa3f91a1cd83fcfdc093bc230b884657ee924f",
+      "bytes": 671
+    },
+    {
+      "path": "harness/tests/synthetic/__init__.py",
+      "sha256": "90596a4ea141313e283098d990a559893b372a566a5cc0e3f3a74fd1dcabc7db",
+      "bytes": 263
+    },
+    {
+      "path": "harness/tests/synthetic/deterministic_resident.py",
+      "sha256": "298e8e5ef8ebd1a52da711cbf8c021e79209b7d55cdd469f256478d8ce76d846",
+      "bytes": 3987
+    },
+    {
+      "path": "harness/tests/synthetic/gate_env.py",
+      "sha256": "d482a4b2536c50a7405887fcc2c0d79033eb3a8acfa7c2a863a39f4d3a131e39",
+      "bytes": 965
+    },
+    {
+      "path": "harness/tests/test_gate_a_durable_exchange.py",
+      "sha256": "0583f08e7ca0e6885634e4955d4a1e32b3c3ac106029254c6d7b878208edc9d7",
+      "bytes": 24777
+    },
+    {
+      "path": "harness/tests/test_gate_b_frozen_core_contract.py",
+      "sha256": "6916e4b42b41d90d8c4ac1c27b8d9fb6249bc6f6e5c46f298e0033db311a45de",
+      "bytes": 9093
+    },
+    {
+      "path": "harness/tests/test_gate_c_two_round_integration.py",
+      "sha256": "78216b27e20830b72b137081a0e43d18a21aeb7aa45552c990e4c52eee61fb96",
+      "bytes": 7966
+    },
+    {
+      "path": "harness/tests/test_gate_d_no_semantic_script.py",
+      "sha256": "3116f7669c408dc0adda2abf478ef3a32e9e62de587db31480fb7038fd548d19",
+      "bytes": 4136
+    }
+  ],
+  "bootstrap_sha256": "09c655d35a0c1b9be28a210e9ac2d681e964628eb24ce34b5db0ca894772e3b0",
+  "wheel_lock_sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe",
+  "wheel_lock_verifier_sha256": "565c7e1e560f0e5394caf85ff1e16f61b53468884aea561de3cbfc61a863e765",
+  "manifest_sha256": "d5f15f1e7de26981ecae7935bdc400239363aad46af6fe4c4b8671ae6754ef72"
+}

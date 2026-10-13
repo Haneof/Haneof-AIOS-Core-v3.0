@@ -1,0 +1,536 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /home/user/.cache/c003/baseline-runtime-001/runtime/3.12.14/venv/bin/python
+rootdir: /home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes
+configfile: ../../../../../../pyproject.toml
+collecting ... collected 18 items
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_independent_ledgers_same_valid_prefix C10 ledgers: [{'status': 'success', 'receipt': {'seq': 1, 'event': 'request_published', 'request_id': 'synthetic-ledger-left', 'request_sha256': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'response_sha256': None, 'wall_clock': '2026-09-29T09:16:30.449601Z', 'prev_sha256': '0000000000000000000000000000000000000000000000000000000000000000', 'record_sha256': 'e9e5f339c656e01e80153f1eb71caf5324b1bad1fbd6e2489eb40c50905cff6d'}}, {'status': 'success', 'receipt': {'seq': 1, 'event': 'request_published', 'request_id': 'synthetic-ledger-right', 'request_sha256': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'response_sha256': None, 'wall_clock': '2026-09-29T09:16:30.449237Z', 'prev_sha256': '0000000000000000000000000000000000000000000000000000000000000000', 'record_sha256': '2d9b0eebfd296684b4011d6ad2d4ab3c1389370cc6090ec7e9a03325e326aeee'}}]
+FAILED
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_independent_publishers_distinct_identities C10 distinct publishers: [{'status': 'success', 'receipt': {'request_id': 'req-0001-model_directive-712dac0b', 'sequence': 1, 'path': '/tmp/pytest-of-user/pytest-0/test_c10_independent_publisher0/exchange/requests/req-0001-model_directive-712dac0b.json', 'request_sha256': '9498f5b31296094ffe89a0c6c3aa791d8c9e629e26bc44ea6851ae29ee31e003', 'bytes': 793, 'wall_clock': '2026-09-29T09:16:31.054441Z', 'kind': 'model_directive', 'idempotent_replay': False}}, {'status': 'success', 'receipt': {'request_id': 'req-0001-model_directive-446aed1a', 'sequence': 1, 'path': '/tmp/pytest-of-user/pytest-0/test_c10_independent_publisher0/exchange/requests/req-0001-model_directive-446aed1a.json', 'request_sha256': '8de9ed139adc68b1bab8d261192d34e5ff1a1feda79d20b07a721deba5e3bd69', 'bytes': 794, 'wall_clock': '2026-09-29T09:16:31.054207Z', 'kind': 'model_directive', 'idempotent_replay': False}}]
+FAILED
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_duplicate_explicit_request_id_single_dispatch C10 duplicate request: [{'status': 'closed', 'error': 'LedgerError: duplicate event or illegal event order at seq 2'}, {'status': 'success', 'receipt': {'request_id': 'req-0001-model_directive-7db7f3c5', 'sequence': 1, 'path': '/tmp/pytest-of-user/pytest-0/test_c10_duplicate_explicit_re0/exchange/requests/req-0001-model_directive-7db7f3c5.json', 'request_sha256': '086f5dee026004cf548eed42ce95865eabdfd43e6feb679a133c136bd6448568', 'bytes': 801, 'wall_clock': '2026-09-29T09:16:31.068539Z', 'kind': 'model_directive', 'idempotent_replay': False}}]
+FAILED
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_response_races_new_request C10 response/request: [{'status': 'success', 'receipt': {'request_id': 'req-0001-model_directive-defe400b', 'path': '/tmp/pytest-of-user/pytest-0/test_c10_response_races_new_re0/exchange/responses/req-0001-model_directive-defe400b.json', 'response_sha256': 'bb6acdffd75cc834eb11f230109458e71e4c844efb534afaa937ea50121e7028', 'bytes': 263, 'wall_clock': '2026-09-29T09:16:31.112684Z', 'idempotent_replay': False, 'adopted_existing_bytes': False}}, {'status': 'success', 'receipt': {'request_id': 'req-0002-model_directive-a04c6dd5', 'sequence': 2, 'path': '/tmp/pytest-of-user/pytest-0/test_c10_response_races_new_re0/exchange/requests/req-0002-model_directive-a04c6dd5.json', 'request_sha256': '144c0757ee3b457ab3ee1b855aa98789a8df8afe0a47e285efa60bdf03d1b415', 'bytes': 795, 'wall_clock': '2026-09-29T09:16:31.112565Z', 'kind': 'model_directive', 'idempotent_replay': False}}]
+FAILED
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_consume_races_new_request C10 consume/request: [{'status': 'success', 'receipt': 'response bytes'}, {'status': 'success', 'receipt': {'request_id': 'req-0002-model_directive-a04c6dd5', 'sequence': 3, 'path': '/tmp/pytest-of-user/pytest-0/test_c10_consume_races_new_req0/exchange/requests/req-0002-model_directive-a04c6dd5.json', 'request_sha256': 'f55106a220133bd9c4df19cd4c255698c7514f3fd5f4be10cf0666693844d228', 'bytes': 795, 'wall_clock': '2026-09-29T09:16:31.136823Z', 'kind': 'model_directive', 'idempotent_replay': False}}]
+FAILED
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_concurrent_duplicate_response_is_idempotent C10 duplicate response: [{'status': 'success', 'receipt': {'request_id': 'req-0001-model_directive-e1b758fe', 'path': '/tmp/pytest-of-user/pytest-0/test_c10_concurrent_duplicate_0/exchange/responses/req-0001-model_directive-e1b758fe.json', 'response_sha256': '7c4f34df4455cbb26b07a9e9289698d34220918e887b15447a0a74436b3b9fe9', 'bytes': 263, 'wall_clock': '2026-09-29T09:16:31.157428Z', 'idempotent_replay': False, 'adopted_existing_bytes': False}}, {'status': 'success', 'receipt': {'request_id': 'req-0001-model_directive-e1b758fe', 'path': '/tmp/pytest-of-user/pytest-0/test_c10_concurrent_duplicate_0/exchange/responses/req-0001-model_directive-e1b758fe.json', 'response_sha256': '7c4f34df4455cbb26b07a9e9289698d34220918e887b15447a0a74436b3b9fe9', 'bytes': 263, 'wall_clock': '2026-09-29T09:16:31.157282Z', 'idempotent_replay': False, 'adopted_existing_bytes': False}}]
+FAILED
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_concurrent_duplicate_consume_is_idempotent C10 duplicate consume: [{'status': 'success', 'receipt': 'response bytes'}, {'status': 'success', 'receipt': 'response bytes'}]
+FAILED
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_independent_subprocess_publishers C10 subprocesses: [{'status': 'success', 'receipt': {'request_id': 'req-0001-model_directive-dc964c09', 'sequence': 1, 'path': '/tmp/pytest-of-user/pytest-0/test_c10_independent_subproces0/exchange/requests/req-0001-model_directive-dc964c09.json', 'request_sha256': 'ba0142c8ae7729765d00a0a4ecd6bca9a251d108213db02a821fe97207f1764a', 'bytes': 797, 'wall_clock': '2026-09-29T09:16:31.875360Z', 'kind': 'model_directive', 'idempotent_replay': False}}, {'status': 'success', 'receipt': {'request_id': 'req-0001-model_directive-c18c24d4', 'sequence': 1, 'path': '/tmp/pytest-of-user/pytest-0/test_c10_independent_subproces0/exchange/requests/req-0001-model_directive-c18c24d4.json', 'request_sha256': '63f49ed1a5a15e5780339c151e8523ef0572246539caf1e577aad7ac9815bbee', 'bytes': 798, 'wall_clock': '2026-09-29T09:16:31.875829Z', 'kind': 'model_directive', 'idempotent_replay': False}}]
+FAILED
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_request_artifact_fsync_failure_is_not_dispatch FAILED
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_response_artifact_fsync_failure_is_not_published FAILED
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_first_ledger_entry_fsync_failure_and_retry FAILED
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_request_directory_open_failure_is_not_dispatch FAILED
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_response_directory_open_failure_is_not_published FAILED
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_ledger_creation_directory_open_failure_is_not_dispatch FAILED
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_request_artifact_sync FAILED
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_response_artifact_sync FAILED
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_mutated_unproven_request_file_is_not_adopted FAILED
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_first_ledger_creation FAILED
+
+=================================== FAILURES ===================================
+________________ test_c10_independent_ledgers_same_valid_prefix ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_c10_independent_ledgers_s0')
+
+    def test_c10_independent_ledgers_same_valid_prefix(tmp_path):
+        from aios_exchange.ledger import ExchangeLedger
+    
+        path = tmp_path / "exchange" / "ledger.jsonl"
+        left, right = ExchangeLedger(path), ExchangeLedger(path)
+        barrier = threading.Barrier(2)
+        _pause_after_prefix_read(left, "read_records", barrier)
+        _pause_after_prefix_read(right, "read_records", barrier)
+        outcomes = _parallel(
+            lambda: left.append("request_published", request_id="synthetic-ledger-left", request_sha256="a" * 64),
+            lambda: right.append("request_published", request_id="synthetic-ledger-right", request_sha256="b" * 64),
+        )
+        print("C10 ledgers:", outcomes)
+>       rows = ExchangeLedger(path).read_records()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../.cache/c003/exact-288-h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/ledger.py:128: in read_records
+    self._validate_records(records)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+records = [{'event': 'request_published', 'prev_sha256': '0000000000000000000000000000000000000000000000000000000000000000', 're...256': '2d9b0eebfd296684b4011d6ad2d4ab3c1389370cc6090ec7e9a03325e326aeee', 'request_id': 'synthetic-ledger-right', ...}]
+
+    @staticmethod
+    def _validate_records(records: list[dict[str, Any]]) -> None:
+        """Non-recursive operational precondition; no lookup or append calls."""
+        previous = GENESIS_SHA256
+        states: dict[str, list[dict[str, Any]]] = {}
+        def digest(value: Any) -> bool:
+            return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value) is not None
+        for seq, record in enumerate(records, 1):
+            required = {"seq", "event", "request_id", "request_sha256", "response_sha256",
+                        "wall_clock", "prev_sha256", "record_sha256"}
+            if not required <= record.keys():
+                raise LedgerError(f"missing ledger fields at seq {seq}")
+            if type(record["seq"]) is not int or record["seq"] != seq:
+>               raise LedgerError(f"non-monotonic sequence at seq {seq}")
+E               aios_exchange.ledger.LedgerError: non-monotonic sequence at seq 2
+
+../.cache/c003/exact-288-h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/ledger.py:97: LedgerError
+_____________ test_c10_independent_publishers_distinct_identities ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_c10_independent_publisher0')
+
+    def test_c10_independent_publishers_distinct_identities(tmp_path):
+        from aios_exchange.bridge import ExchangeBridge
+    
+        left, right = ExchangeBridge(tmp_path / "exchange"), ExchangeBridge(tmp_path / "exchange")
+        barrier = threading.Barrier(2)
+        _pause_after_prefix_read(left.requests, "next_sequence", barrier)
+        _pause_after_prefix_read(right.requests, "next_sequence", barrier)
+        outcomes = _parallel(lambda: _request(left, "left"), lambda: _request(right, "right"))
+        print("C10 distinct publishers:", outcomes)
+>       rows = _state_is_linear(ExchangeBridge(left.root))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+bridge = <aios_exchange.bridge.ExchangeBridge object at 0x7f6b0e508c20>
+
+    def _state_is_linear(bridge):
+        from aios_exchange.canonical import canonical_json_bytes
+    
+>       assert bridge.ledger.verify_chain()["ok"], "two successful mutations may not corrupt the ledger"
+E       AssertionError: two successful mutations may not corrupt the ledger
+E       assert False
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py:74: AssertionError
+____________ test_c10_duplicate_explicit_request_id_single_dispatch ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_c10_duplicate_explicit_re0')
+
+    def test_c10_duplicate_explicit_request_id_single_dispatch(tmp_path):
+        from aios_exchange.bridge import ExchangeBridge
+    
+        left, right = ExchangeBridge(tmp_path / "exchange"), ExchangeBridge(tmp_path / "exchange")
+        body = {"synthetic_concurrency": "same-request"}
+        rid = left.requests.request_id_for("model_directive", body, 1)
+        barrier = threading.Barrier(2)
+        _pause_after_prefix_read(left.requests, "next_sequence", barrier)
+        _pause_after_prefix_read(right.requests, "next_sequence", barrier)
+        outcomes = _parallel(
+            lambda: _request(left, "same-request", request_id=rid),
+            lambda: _request(right, "same-request", request_id=rid),
+        )
+        print("C10 duplicate request:", outcomes)
+>       rows = _state_is_linear(ExchangeBridge(left.root))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py:167: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+bridge = <aios_exchange.bridge.ExchangeBridge object at 0x7f6b0e50c8f0>
+
+    def _state_is_linear(bridge):
+        from aios_exchange.canonical import canonical_json_bytes
+    
+        assert bridge.ledger.verify_chain()["ok"], "two successful mutations may not corrupt the ledger"
+        rows = bridge.ledger.read_records()
+        assert [r["seq"] for r in rows] == list(range(1, len(rows) + 1))
+        previous = "0" * 64
+        for row in rows:
+            assert row["prev_sha256"] == previous
+            previous = row["record_sha256"]
+            body = {k: v for k, v in row.items() if k != "record_sha256"}
+            assert hashlib.sha256(canonical_json_bytes(body)).hexdigest() == previous
+        event_counts = Counter((r["request_id"], r["event"]) for r in rows)
+        assert all(count == 1 for count in event_counts.values()), "duplicate semantic dispatch/event"
+        requests = [r for r in rows if r["event"] == "request_published"]
+        for ordinal, row in enumerate(requests, 1):
+            raw = bridge.requests.path_for(row["request_id"]).read_bytes()
+            payload = json.loads(raw)
+>           assert hashlib.sha256(raw).hexdigest() == row["request_sha256"]
+E           AssertionError: assert 'd2c6829e0da139a17f033cc3c33f4c8861949e520bfd5590d29a4271bd28f5c7' == '086f5dee026004cf548eed42ce95865eabdfd43e6feb679a133c136bd6448568'
+E             
+E             - 086f5dee026004cf548eed42ce95865eabdfd43e6feb679a133c136bd6448568
+E             + d2c6829e0da139a17f033cc3c33f4c8861949e520bfd5590d29a4271bd28f5c7
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py:89: AssertionError
+_____________________ test_c10_response_races_new_request ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_c10_response_races_new_re0')
+
+    def test_c10_response_races_new_request(tmp_path):
+        from aios_exchange.bridge import ExchangeBridge
+    
+        base = ExchangeBridge(tmp_path / "exchange")
+        request = _request(base, "first")
+        a, b = ExchangeBridge(base.root), ExchangeBridge(base.root)
+        barrier = threading.Barrier(2)
+        _pause_append_read(a.ledger, barrier)
+        _pause_append_read(b.ledger, barrier)
+        outcomes = _parallel(
+            lambda: a.responses.publish_object(request_id=request["request_id"], response=_response(request)),
+            lambda: _request(b, "second"),
+        )
+        print("C10 response/request:", outcomes)
+>       rows = _state_is_linear(ExchangeBridge(base.root))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py:188: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+bridge = <aios_exchange.bridge.ExchangeBridge object at 0x7f6b0e5796a0>
+
+    def _state_is_linear(bridge):
+        from aios_exchange.canonical import canonical_json_bytes
+    
+>       assert bridge.ledger.verify_chain()["ok"], "two successful mutations may not corrupt the ledger"
+E       AssertionError: two successful mutations may not corrupt the ledger
+E       assert False
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py:74: AssertionError
+______________________ test_c10_consume_races_new_request ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_c10_consume_races_new_req0')
+
+    def test_c10_consume_races_new_request(tmp_path):
+        from aios_exchange.bridge import ExchangeBridge
+    
+        base = ExchangeBridge(tmp_path / "exchange")
+        request = _request(base, "first")
+        base.responses.publish_object(request_id=request["request_id"], response=_response(request))
+        a, b = ExchangeBridge(base.root), ExchangeBridge(base.root)
+        barrier = threading.Barrier(2)
+        _pause_append_read(a.ledger, barrier)
+        _pause_append_read(b.ledger, barrier)
+        outcomes = _parallel(lambda: a.consume_response(request["request_id"]), lambda: _request(b, "second"))
+        print("C10 consume/request:", [{k: (v if k != "receipt" or not isinstance(v, bytes) else "response bytes") for k, v in o.items()} for o in outcomes])
+>       rows = _state_is_linear(ExchangeBridge(base.root))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py:208: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+bridge = <aios_exchange.bridge.ExchangeBridge object at 0x7f6b10522120>
+
+    def _state_is_linear(bridge):
+        from aios_exchange.canonical import canonical_json_bytes
+    
+>       assert bridge.ledger.verify_chain()["ok"], "two successful mutations may not corrupt the ledger"
+E       AssertionError: two successful mutations may not corrupt the ledger
+E       assert False
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py:74: AssertionError
+_____________ test_c10_concurrent_duplicate_response_is_idempotent _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_c10_concurrent_duplicate_0')
+
+    def test_c10_concurrent_duplicate_response_is_idempotent(tmp_path):
+        from aios_exchange.bridge import ExchangeBridge
+    
+        base = ExchangeBridge(tmp_path / "exchange")
+        request = _request(base, "response-duplicate")
+        a, b = ExchangeBridge(base.root), ExchangeBridge(base.root)
+        barrier = threading.Barrier(2)
+        _pause_append_read(a.ledger, barrier)
+        _pause_append_read(b.ledger, barrier)
+        outcomes = _parallel(
+            lambda: a.responses.publish_object(request_id=request["request_id"], response=_response(request)),
+            lambda: b.responses.publish_object(request_id=request["request_id"], response=_response(request)),
+        )
+        print("C10 duplicate response:", outcomes)
+>       rows = _state_is_linear(ExchangeBridge(base.root))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py:227: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+bridge = <aios_exchange.bridge.ExchangeBridge object at 0x7f6b0e50fe30>
+
+    def _state_is_linear(bridge):
+        from aios_exchange.canonical import canonical_json_bytes
+    
+>       assert bridge.ledger.verify_chain()["ok"], "two successful mutations may not corrupt the ledger"
+E       AssertionError: two successful mutations may not corrupt the ledger
+E       assert False
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py:74: AssertionError
+_____________ test_c10_concurrent_duplicate_consume_is_idempotent ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_c10_concurrent_duplicate_1')
+
+    def test_c10_concurrent_duplicate_consume_is_idempotent(tmp_path):
+        from aios_exchange.bridge import ExchangeBridge
+    
+        base = ExchangeBridge(tmp_path / "exchange")
+        request = _request(base, "consume-duplicate")
+        base.responses.publish_object(request_id=request["request_id"], response=_response(request))
+        a, b = ExchangeBridge(base.root), ExchangeBridge(base.root)
+        barrier = threading.Barrier(2)
+        _pause_append_read(a.ledger, barrier)
+        _pause_append_read(b.ledger, barrier)
+        outcomes = _parallel(lambda: a.consume_response(request["request_id"]), lambda: b.consume_response(request["request_id"]))
+        print("C10 duplicate consume:", [{k: (v if k != "receipt" or not isinstance(v, bytes) else "response bytes") for k, v in o.items()} for o in outcomes])
+>       rows = _state_is_linear(ExchangeBridge(base.root))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py:244: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+bridge = <aios_exchange.bridge.ExchangeBridge object at 0x7f6b0e510bf0>
+
+    def _state_is_linear(bridge):
+        from aios_exchange.canonical import canonical_json_bytes
+    
+>       assert bridge.ledger.verify_chain()["ok"], "two successful mutations may not corrupt the ledger"
+E       AssertionError: two successful mutations may not corrupt the ledger
+E       assert False
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py:74: AssertionError
+__________________ test_c10_independent_subprocess_publishers __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_c10_independent_subproces0')
+
+    def test_c10_independent_subprocess_publishers(tmp_path):
+        from aios_exchange.bridge import ExchangeBridge
+    
+        root = tmp_path / "exchange"
+        coordination = tmp_path / "coordination"
+        coordination.mkdir()
+        worker = pathlib.Path(__file__).parent / "synthetic" / "process_publisher.py"
+        children = [subprocess.Popen([sys.executable, str(worker), str(root), str(coordination), token],
+                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                    for token in ("process-left", "process-right")]
+        try:
+            results = []
+            for child in children:
+                out, err = child.communicate(timeout=25)
+                assert child.returncode == 0, (child.returncode, out, err)
+                results.append(json.loads(out.strip()))
+        finally:
+            for child in children:
+                if child.poll() is None:
+                    child.kill()
+                    child.communicate()
+        print("C10 subprocesses:", results)
+>       rows = _state_is_linear(ExchangeBridge(root))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py:271: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+bridge = <aios_exchange.bridge.ExchangeBridge object at 0x7f6b0e511550>
+
+    def _state_is_linear(bridge):
+        from aios_exchange.canonical import canonical_json_bytes
+    
+>       assert bridge.ledger.verify_chain()["ok"], "two successful mutations may not corrupt the ledger"
+E       AssertionError: two successful mutations may not corrupt the ledger
+E       assert False
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py:74: AssertionError
+___________ test_c11_request_artifact_fsync_failure_is_not_dispatch ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_c11_request_artifact_fsyn0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6b0e5130e0>
+
+    def test_c11_request_artifact_fsync_failure_is_not_dispatch(tmp_path, monkeypatch):
+        from aios_exchange.bridge import ExchangeBridge
+    
+        bridge = ExchangeBridge(tmp_path / "exchange")
+        with monkeypatch.context() as fault:
+            calls = _fail_directory_fsync(fault, bridge.requests.requests_dir)
+>           with pytest.raises((OSError, RuntimeError)):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py:95: Failed
+__________ test_c11_response_artifact_fsync_failure_is_not_published ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_c11_response_artifact_fsy0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6b0e31f380>
+
+    def test_c11_response_artifact_fsync_failure_is_not_published(tmp_path, monkeypatch):
+        from aios_exchange.bridge import ExchangeBridge
+    
+        bridge = ExchangeBridge(tmp_path / "exchange")
+        request = _request(bridge)
+        with monkeypatch.context() as fault:
+            calls = _fail_directory_fsync(fault, bridge.responses.responses_dir)
+>           with pytest.raises((OSError, RuntimeError)):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py:110: Failed
+_____________ test_c11_first_ledger_entry_fsync_failure_and_retry ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_c11_first_ledger_entry_fs0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6b0e31c0e0>
+
+    def test_c11_first_ledger_entry_fsync_failure_and_retry(tmp_path, monkeypatch):
+        from aios_exchange.ledger import ExchangeLedger, LedgerError
+    
+        ledger = ExchangeLedger(tmp_path / "exchange" / "ledger.jsonl")
+        assert not ledger.path.exists()
+        kwargs = {"request_id": "synthetic-ledger", "request_sha256": "a" * 64}
+        with monkeypatch.context() as fault:
+            calls = _fail_directory_fsync(fault, ledger.path.parent, after_exists=ledger.path)
+>           with pytest.raises((OSError, RuntimeError)):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py:126: Failed
+___________ test_c11_request_directory_open_failure_is_not_dispatch ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_c11_request_directory_ope0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6b0e31de50>
+
+    def test_c11_request_directory_open_failure_is_not_dispatch(tmp_path, monkeypatch):
+        from aios_exchange.bridge import ExchangeBridge
+    
+        bridge = ExchangeBridge(tmp_path / "exchange")
+        with monkeypatch.context() as fault:
+            calls = _fail_directory_open(fault, bridge.requests.requests_dir)
+>           with pytest.raises((OSError, RuntimeError)):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py:145: Failed
+__________ test_c11_response_directory_open_failure_is_not_published ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_c11_response_directory_op0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6b0e31f7d0>
+
+    def test_c11_response_directory_open_failure_is_not_published(tmp_path, monkeypatch):
+        from aios_exchange.bridge import ExchangeBridge
+    
+        bridge = ExchangeBridge(tmp_path / "exchange")
+        request = _request(bridge)
+        with monkeypatch.context() as fault:
+            calls = _fail_directory_open(fault, bridge.responses.responses_dir)
+>           with pytest.raises((OSError, RuntimeError)):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py:159: Failed
+_______ test_c11_ledger_creation_directory_open_failure_is_not_dispatch ________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_c11_ledger_creation_direc0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6b0e4e2ea0>
+
+    def test_c11_ledger_creation_directory_open_failure_is_not_dispatch(tmp_path, monkeypatch):
+        from aios_exchange.ledger import ExchangeLedger
+    
+        ledger = ExchangeLedger(tmp_path / "exchange" / "ledger.jsonl")
+        with monkeypatch.context() as fault:
+            calls = _fail_directory_open(fault, ledger.path.parent, after_exists=ledger.path)
+>           with pytest.raises((OSError, RuntimeError)):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py:171: Failed
+_____________ test_c11_retry_after_unproven_request_artifact_sync ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_c11_retry_after_unproven_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6b0e4e2cc0>
+
+    def test_c11_retry_after_unproven_request_artifact_sync(tmp_path, monkeypatch):
+        from aios_exchange.bridge import ExchangeBridge
+    
+        bridge = ExchangeBridge(tmp_path / "exchange")
+        marker = "synthetic-retry"
+        rid = bridge.requests.request_id_for("model_directive", {"synthetic_durability": marker}, 1)
+        with monkeypatch.context() as fault:
+            calls = _fail_directory_fsync(fault, bridge.requests.requests_dir)
+>           with pytest.raises((OSError, RuntimeError)):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py:185: Failed
+_____________ test_c11_retry_after_unproven_response_artifact_sync _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_c11_retry_after_unproven_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6b0e3a6a80>
+
+    def test_c11_retry_after_unproven_response_artifact_sync(tmp_path, monkeypatch):
+        from aios_exchange.bridge import ExchangeBridge
+    
+        bridge = ExchangeBridge(tmp_path / "exchange")
+        request = _request(bridge)
+        rid = request["request_id"]
+        response = _response(request)
+        with monkeypatch.context() as fault:
+            calls = _fail_directory_fsync(fault, bridge.responses.responses_dir)
+>           with pytest.raises((OSError, RuntimeError)):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py:213: Failed
+____________ test_c11_mutated_unproven_request_file_is_not_adopted _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_c11_mutated_unproven_requ0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6b0e4e3800>
+
+    def test_c11_mutated_unproven_request_file_is_not_adopted(tmp_path, monkeypatch):
+        from aios_exchange.bridge import ExchangeBridge
+    
+        bridge = ExchangeBridge(tmp_path / "exchange")
+        marker = "synthetic-mutation"
+        rid = bridge.requests.request_id_for("model_directive", {"synthetic_durability": marker}, 1)
+        with monkeypatch.context() as fault:
+            calls = _fail_directory_fsync(fault, bridge.requests.requests_dir)
+>           with pytest.raises((OSError, RuntimeError)):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py:247: Failed
+_____________ test_c11_retry_after_unproven_first_ledger_creation ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-0/test_c11_retry_after_unproven_2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6b0e4e3ad0>
+
+    def test_c11_retry_after_unproven_first_ledger_creation(tmp_path, monkeypatch):
+        from aios_exchange.bridge import ExchangeBridge
+    
+        bridge = ExchangeBridge(tmp_path / "exchange")
+        marker = "synthetic-ledger-retry"
+        rid = bridge.requests.request_id_for("model_directive", {"synthetic_durability": marker}, 1)
+        with monkeypatch.context() as fault:
+            calls = _fail_directory_fsync(fault, bridge.ledger.path.parent, after_exists=bridge.ledger.path)
+>           with pytest.raises((OSError, RuntimeError)):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py:266: Failed
+- generated xml file: /home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/raw/baseline/results.xml -
+=========================== short test summary info ============================
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_independent_ledgers_same_valid_prefix - aios_exchange.ledger.LedgerError: non-monotonic sequence at seq 2
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_independent_publishers_distinct_identities - AssertionError: two successful mutations may not corrupt the ledger
+assert False
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_duplicate_explicit_request_id_single_dispatch - AssertionError: assert 'd2c6829e0da139a17f033cc3c33f4c8861949e520bfd5590d29a4271bd28f5c7' == '086f5dee026004cf548eed42ce95865eabdfd43e6feb679a133c136bd6448568'
+  
+  - 086f5dee026004cf548eed42ce95865eabdfd43e6feb679a133c136bd6448568
+  + d2c6829e0da139a17f033cc3c33f4c8861949e520bfd5590d29a4271bd28f5c7
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_response_races_new_request - AssertionError: two successful mutations may not corrupt the ledger
+assert False
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_consume_races_new_request - AssertionError: two successful mutations may not corrupt the ledger
+assert False
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_concurrent_duplicate_response_is_idempotent - AssertionError: two successful mutations may not corrupt the ledger
+assert False
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_concurrent_duplicate_consume_is_idempotent - AssertionError: two successful mutations may not corrupt the ledger
+assert False
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_independent_subprocess_publishers - AssertionError: two successful mutations may not corrupt the ledger
+assert False
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_request_artifact_fsync_failure_is_not_dispatch - Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_response_artifact_fsync_failure_is_not_published - Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_first_ledger_entry_fsync_failure_and_retry - Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_request_directory_open_failure_is_not_dispatch - Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_response_directory_open_failure_is_not_published - Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_ledger_creation_directory_open_failure_is_not_dispatch - Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_request_artifact_sync - Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_response_artifact_sync - Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_mutated_unproven_request_file_is_not_adopted - Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+FAILED reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_first_ledger_creation - Failed: DID NOT RAISE any of (<class 'OSError'>, <class 'RuntimeError'>)
+============================== 18 failed in 1.70s ==============================

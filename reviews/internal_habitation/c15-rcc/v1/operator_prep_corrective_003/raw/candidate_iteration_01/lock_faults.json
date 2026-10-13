@@ -1,0 +1,10 @@
+{
+  "faults": {
+    "flock": "LedgerError",
+    "open": "LedgerError"
+  },
+  "no_dispatch_during_lock_failure": true,
+  "recovery_record_count": 1,
+  "status": "PASS",
+  "synthetic_only": true
+}

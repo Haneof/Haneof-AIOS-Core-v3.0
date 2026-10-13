@@ -1,0 +1,9 @@
+{
+  "exact_h2": "771b200c33dbd6055b1d209935f8e1552f13090f",
+  "h2_tree": "071b51c5fb37dc59fc8941dee2182637b9f87daa",
+  "baseline_implementation_paths": 30,
+  "all_baseline_implementation_blobs_match_h2": true,
+  "frozen_core_tree": "9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623",
+  "frozen_tests_tree": "7e33b5ef8432370234965d3ccd61248c703c4019",
+  "archive_root": "/home/user/.cache/c003/exact-288-h2"
+}

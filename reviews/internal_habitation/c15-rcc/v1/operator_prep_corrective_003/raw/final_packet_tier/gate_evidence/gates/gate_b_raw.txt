@@ -1,0 +1,24 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /home/user/.cache/c003/final-runtime-001/runtime/3.12.14/venv/bin/python
+rootdir: /home/user/Haneof-AIOS-Core-v3.0
+configfile: pyproject.toml
+collecting ... collected 7 items
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b1_runtime_snapshot_with_empty_capability_history PASSED [ 14%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b2_successful_capability_result_serializes PASSED [ 28%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b3_failed_capability_result_serializes PASSED [ 42%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b4_multiple_capability_results_distinct_fields PASSED [ 57%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b5_no_nonexistent_fields_are_referenced PASSED [ 71%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b6_frozen_capability_result_surface_is_exactly_six_fields PASSED [ 85%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b7_runner_serializer_round_trips_real_directive PASSED [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b1_runtime_snapshot_with_empty_capability_history
+PASSED reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b2_successful_capability_result_serializes
+PASSED reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b3_failed_capability_result_serializes
+PASSED reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b4_multiple_capability_results_distinct_fields
+PASSED reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b5_no_nonexistent_fields_are_referenced
+PASSED reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b6_frozen_capability_result_surface_is_exactly_six_fields
+PASSED reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_b_frozen_core_contract.py::test_b7_runner_serializer_round_trips_real_directive
+============================== 7 passed in 0.68s ===============================

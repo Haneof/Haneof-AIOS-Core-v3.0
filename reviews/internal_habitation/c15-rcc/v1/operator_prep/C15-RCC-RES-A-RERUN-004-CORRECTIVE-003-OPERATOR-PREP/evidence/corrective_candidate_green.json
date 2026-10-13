@@ -1,0 +1,442 @@
+{
+  "candidate_head": "77dac70e0cf054c3f0fb7d94a66dba221fe7d5de",
+  "candidate_parent": "083dd9506f01ade04d4cbe805f58bf80d40607b0",
+  "cases": [
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c4_different_snapshot[open]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c4_different_snapshot[durable]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c4_ambiguous[open]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c4_ambiguous[durable]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c4_ambiguous[mixed]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c4_matching_resume[open]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c4_matching_resume[durable]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c4_durable_request_file_binding[missing]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c4_durable_request_file_binding[tamper]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-mutation]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-deletion]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-duplicate_request]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-duplicate_response]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-duplicate_consumed]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-illegal_order]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-request_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-response_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-torn]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-invalid_json]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[recovery-sequence]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-mutation]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-deletion]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-duplicate_request]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-duplicate_response]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-duplicate_consumed]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-illegal_order]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-request_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-response_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-torn]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-invalid_json]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[consume-sequence]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-mutation]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-deletion]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-duplicate_request]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-duplicate_response]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-duplicate_consumed]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-illegal_order]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-request_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-response_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-torn]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-invalid_json]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[append-sequence]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-mutation]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-deletion]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-duplicate_request]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-duplicate_response]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-duplicate_consumed]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-illegal_order]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-request_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-response_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-torn]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-invalid_json]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[runner-sequence]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-mutation]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-deletion]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-duplicate_request]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-duplicate_response]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-duplicate_consumed]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-illegal_order]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-request_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-response_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-torn]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-invalid_json]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[request_lookup-sequence]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-mutation]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-deletion]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-duplicate_request]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-duplicate_response]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-duplicate_consumed]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-illegal_order]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-request_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-response_digest]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-torn]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-invalid_json]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_corrupt_ledger[response_lookup-sequence]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_valid_chain"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_duplicate_append_refused[request_published]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_duplicate_append_refused[response_published]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c4_c5.py::test_c5_duplicate_append_refused[response_consumed]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c6_bootstrap_identity[none]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c6_bootstrap_identity[wrong_root]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c6_bootstrap_identity[missing_git]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c6_bootstrap_identity[missing_object]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c6_bootstrap_identity[core_byte]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c6_bootstrap_identity[tests_byte]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c6_bootstrap_identity[foreign_import]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c6_shared_canonical_manifest"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c7_exact_runtime_pin[sqlite-3.45.1-True]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c7_exact_runtime_pin[sqlite-3.40.1-False]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c7_exact_runtime_pin[openssl-OpenSSL 3.0.13 30 Jan 2024-True]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c7_exact_runtime_pin[openssl-OpenSSL 3.0.14 4 Jun 2024-False]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c6_c7.py::test_c7_real_system_sqlite_fallback"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c8_packet_exact_startup"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c8_audit_startup[none]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c8_audit_startup[omit_clean]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c8_audit_startup[omit_canonical]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c8_audit_startup[board]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c8_audit_startup[adjudication]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c8_audit_startup[history]"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c9_due_work_entrypoint"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c9_due_requires_aware_time"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c9_synthetic_due_wake_exchange"
+    },
+    {
+      "status": "PASS",
+      "test_id": "tests/test_c8_c9.py::test_c9_no_semantic_callback"
+    }
+  ],
+  "collected_and_enumerated": 103,
+  "failed": 0,
+  "group_counts": {
+    "C4": 9,
+    "C5": 70,
+    "C6": 8,
+    "C7": 5,
+    "C8": 7,
+    "C9": 4
+  },
+  "method": "candidate-tier after structural packet regeneration; exact frozen C4-C9; final packet-tier rerun outside pin graph",
+  "passed": 103,
+  "probe_freeze_sha256": "a0813c69f588db67e0c78f9d44dc74834990926038d5a0c0a03b097aa8d6c460",
+  "probe_sha256sums_sha256": "f49f6ab99718281f13fc66779c1ab4a4749f99d74517aaf75c4b24bafbecacc1",
+  "provisional_packet_sha256": "4d0d361e9f47987168b587031524ec2ebeb13e3aa4a2bf57bb23ab19afb8e74b",
+  "raw_sha256": {
+    "c4_c9_candidate_tier.exit_code": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "c4_c9_candidate_tier.raw.txt": "d6714b5be773904882e8a7c99d87a8ab66ada2c243c9df0c37aebd3cc0d2191b",
+    "c4_c9_candidate_tier.xml": "c39239f827848002120ed45ce650fbc19603433f19a2571d87bc77b92a192daf",
+    "pre_packet/c4_c9_collect.raw.txt": "7898caf433d50427b7245dc3bbf2276733389fc89fc83439f4a8643b5c95b735"
+  },
+  "run_exit_code": 0,
+  "status": "GREEN",
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-003"
+}

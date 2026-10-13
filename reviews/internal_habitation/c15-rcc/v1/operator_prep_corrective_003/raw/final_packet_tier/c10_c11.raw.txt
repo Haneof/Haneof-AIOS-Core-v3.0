@@ -1,0 +1,27 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /home/user/.cache/c003/final-runtime-001/runtime/3.12.14/venv/bin/python
+rootdir: /home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes
+configfile: ../../../../../../pyproject.toml
+collecting ... collected 18 items
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_independent_ledgers_same_valid_prefix PASSED [  5%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_independent_publishers_distinct_identities PASSED [ 11%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_duplicate_explicit_request_id_single_dispatch PASSED [ 16%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_response_races_new_request PASSED [ 22%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_consume_races_new_request PASSED [ 27%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_concurrent_duplicate_response_is_idempotent PASSED [ 33%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_concurrent_duplicate_consume_is_idempotent PASSED [ 38%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c10_concurrency.py::test_c10_independent_subprocess_publishers PASSED [ 44%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_request_artifact_fsync_failure_is_not_dispatch PASSED [ 50%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_response_artifact_fsync_failure_is_not_published PASSED [ 55%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_first_ledger_entry_fsync_failure_and_retry PASSED [ 61%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_request_directory_open_failure_is_not_dispatch PASSED [ 66%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_response_directory_open_failure_is_not_published PASSED [ 72%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_ledger_creation_directory_open_failure_is_not_dispatch PASSED [ 77%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_request_artifact_sync PASSED [ 83%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_response_artifact_sync PASSED [ 88%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_mutated_unproven_request_file_is_not_adopted PASSED [ 94%]
+reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes/tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_first_ledger_creation PASSED [100%]
+
+- generated xml file: /home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/raw/final_packet_tier/c10_c11.xml -
+============================= 18 passed in 13.62s ==============================

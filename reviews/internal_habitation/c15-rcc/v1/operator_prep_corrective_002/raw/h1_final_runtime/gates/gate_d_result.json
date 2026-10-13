@@ -1,0 +1,42 @@
+{
+  "gate": "D",
+  "task_id": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "status": "PASS",
+  "returncode": 0,
+  "collection_returncode": 0,
+  "reported_collected_count": 5,
+  "execution_total": 5,
+  "test_file": "tests/test_gate_d_no_semantic_script.py",
+  "test_count": 5,
+  "test_ids": [
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_scan_passes",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_individual_checks",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_response_mode_is_external_session",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_package_does_not_import_tests",
+    "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_d_no_semantic_script.py::test_gate_d_test_only_responder_is_outside_package"
+  ],
+  "outcomes": {
+    "passed": 5,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "duration_s": 0.983,
+  "raw_output": "gate_d_raw.txt",
+  "raw_output_sha256": "4763a5f9c939640809506df6b637138f4780e91ba6ced5fc120707567ca33bac",
+  "enumeration_sha256": "4530fd3dba01ea49936792fdc8acb8c3bbb301e1c16f48063b1894164384e419",
+  "environment": {
+    "python_version": "3.12.14",
+    "python_version_info": [
+      3,
+      12,
+      14
+    ],
+    "pydantic_version": "2.13.5",
+    "pytest_version": "8.4.2",
+    "sqlite_version": "3.45.1",
+    "openssl_version": "OpenSSL 3.0.13 30 Jan 2024",
+    "executable": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python"
+  },
+  "generated_utc": "2026-09-28T21:37:43.476726+00:00"
+}

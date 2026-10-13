@@ -1,0 +1,506 @@
+{
+  "exchange": {
+    "integrity": {
+      "chain": {
+        "error": null,
+        "first_bad_seq": null,
+        "head_sha256": "c9d720b4a730745f665cf3aff5f8db45bde8e04eb2056410fdfc2c37c46b39e6",
+        "ok": true,
+        "records": 6
+      },
+      "exchange_root": "/tmp/pytest-of-user/pytest-13/test_gate_c_two_round_integrat0/exchange",
+      "ok": true,
+      "problems": [],
+      "requests": {
+        "req-0001-model_directive-699b33c1": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 1,
+          "request_sha256": "f8ef4419e8f183107552ceb0d1e0e7b78f82e34ce734a2a1de29cbf4cd676657",
+          "response_sha256": "1936071b31ea34f71871ba1f8bab6c3459f4574bd64e5a59a5880bacc467f23c"
+        },
+        "req-0002-model_directive-1822126c": {
+          "events": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "first_seq": 4,
+          "request_sha256": "fc79cb071dc4f6ec00c3767cdc38f965f42767ce80a3397c7c8df238b3ead0af",
+          "response_sha256": "5863aa1ec5260159861f61674b8548f4df6b9cd94630f6cda6b729fc11cb2d66"
+        }
+      }
+    },
+    "recovery_state": {
+      "classification": "COMPLETE",
+      "complete": [
+        "req-0001-model_directive-699b33c1",
+        "req-0002-model_directive-1822126c"
+      ],
+      "dispatch_boundary_event": "request_published",
+      "dispatch_boundary_rule": "not_submitted reconciliation is allowed only when no request_published record exists; after request publication the exchange fails closed instead of declaring the request unsubmitted",
+      "durable_unconsumed": [],
+      "ledger": {
+        "error": null,
+        "first_bad_seq": null,
+        "head_sha256": "c9d720b4a730745f665cf3aff5f8db45bde8e04eb2056410fdfc2c37c46b39e6",
+        "ok": true,
+        "records": 6
+      },
+      "not_submitted_allowed": false,
+      "open_dispatched": [],
+      "requests": [
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 1
+            },
+            {
+              "event": "response_published",
+              "seq": 2
+            },
+            {
+              "event": "response_consumed",
+              "seq": 3
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0001-model_directive-699b33c1",
+          "request_sha256": "f8ef4419e8f183107552ceb0d1e0e7b78f82e34ce734a2a1de29cbf4cd676657",
+          "response_sha256": "1936071b31ea34f71871ba1f8bab6c3459f4574bd64e5a59a5880bacc467f23c",
+          "semantic_dispatch_occurred": true
+        },
+        {
+          "classification": "COMPLETE",
+          "event_names": [
+            "request_published",
+            "response_published",
+            "response_consumed"
+          ],
+          "events": [
+            {
+              "event": "request_published",
+              "seq": 4
+            },
+            {
+              "event": "response_published",
+              "seq": 5
+            },
+            {
+              "event": "response_consumed",
+              "seq": 6
+            }
+          ],
+          "not_submitted_allowed": false,
+          "request_id": "req-0002-model_directive-1822126c",
+          "request_sha256": "fc79cb071dc4f6ec00c3767cdc38f965f42767ce80a3397c7c8df238b3ead0af",
+          "response_sha256": "5863aa1ec5260159861f61674b8548f4df6b9cd94630f6cda6b729fc11cb2d66",
+          "semantic_dispatch_occurred": true
+        }
+      ],
+      "semantic_dispatch_occurred": true
+    }
+  },
+  "handoffs": [
+    {
+      "declared_request_sha256": "f8ef4419e8f183107552ceb0d1e0e7b78f82e34ce734a2a1de29cbf4cd676657",
+      "path": "published_new_request",
+      "request_id": "req-0001-model_directive-699b33c1",
+      "request_sha256": "f8ef4419e8f183107552ceb0d1e0e7b78f82e34ce734a2a1de29cbf4cd676657",
+      "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+      "response_sha256": "1936071b31ea34f71871ba1f8bab6c3459f4574bd64e5a59a5880bacc467f23c"
+    },
+    {
+      "declared_request_sha256": "fc79cb071dc4f6ec00c3767cdc38f965f42767ce80a3397c7c8df238b3ead0af",
+      "path": "published_new_request",
+      "request_id": "req-0002-model_directive-1822126c",
+      "request_sha256": "fc79cb071dc4f6ec00c3767cdc38f965f42767ce80a3397c7c8df238b3ead0af",
+      "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+      "response_sha256": "5863aa1ec5260159861f61674b8548f4df6b9cd94630f6cda6b729fc11cb2d66"
+    }
+  ],
+  "response_mode": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+  "session_id": "synthetic-session-operator-prep",
+  "status_after": {
+    "index_lag": 0,
+    "index_path": "/tmp/pytest-of-user/pytest-13/test_gate_c_two_round_integrat0/synthetic_world.search.sqlite",
+    "index_watermark": 2,
+    "status": "ready",
+    "subject_id": "synthetic_subject_operator_prep",
+    "world_path": "/tmp/pytest-of-user/pytest-13/test_gate_c_two_round_integrat0/synthetic_world.sqlite",
+    "world_revision": 2,
+    "writer_lease_held": true
+  },
+  "status_before": {
+    "index_lag": 0,
+    "index_path": "/tmp/pytest-of-user/pytest-13/test_gate_c_two_round_integrat0/synthetic_world.search.sqlite",
+    "index_watermark": 0,
+    "status": "ready",
+    "subject_id": "synthetic_subject_operator_prep",
+    "world_path": "/tmp/pytest-of-user/pytest-13/test_gate_c_two_round_integrat0/synthetic_world.sqlite",
+    "world_revision": 0,
+    "writer_lease_held": true
+  },
+  "subject_id": "synthetic_subject_operator_prep",
+  "turn_index": 1,
+  "turn_result": {
+    "context": {
+      "ai_identity": {},
+      "capability_catalog": [
+        {
+          "kind": "write",
+          "name": "commit_ai_world_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "commit_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "commit_operation_experience",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "compare_claims",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "create_attention_watch",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "create_task",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "drill_down_conversation",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "expand_recall",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "focus_entity",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "follow_relation",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "form_event",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "inspect_outcome",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "inspect_world_object",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "list_attention_watches",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "list_conversation_summaries",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "list_dimensions",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "propose_action",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_cognitive_policy",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_dimension",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_entity",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "propose_goal",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "read_ai_world",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_background_budget",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_cognitive_policies",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_execution_world",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_periodic_review_anchors",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "read_world_map",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "record_communication_experience",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "request_all_dimensions_projection",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "retract_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "retrieve_original_observation",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "revise_claim",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "revise_entity",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "rollback_cognitive_policy",
+          "side_effecting": true
+        },
+        {
+          "kind": "read",
+          "name": "search_conversation_summaries",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "search_timeline",
+          "side_effecting": false
+        },
+        {
+          "kind": "read",
+          "name": "search_world",
+          "side_effecting": false
+        },
+        {
+          "kind": "write",
+          "name": "transition_dimension",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "transition_event",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "transition_goal",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "transition_task",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "update_cognitive_policy",
+          "side_effecting": true
+        },
+        {
+          "kind": "write",
+          "name": "upsert_relation",
+          "side_effecting": true
+        }
+      ],
+      "conversation_summaries": [],
+      "current_topic": "SYNTHETIC operator-prep two-round liveness probe",
+      "estimated_tokens": 1291,
+      "memory_cards": [],
+      "recent_turns": [],
+      "task_context": {
+        "cognitive_policy_context": {
+          "_meta": {
+            "included": 0,
+            "reader": "read_cognitive_policies",
+            "total": 0,
+            "truncated": false
+          },
+          "_policy_records": [],
+          "communication.detail_level": null,
+          "memory.recommendation_limit": 5
+        },
+        "conversation_continuity": {
+          "pending_round_summary": null,
+          "raw_drill_down_capability": "drill_down_conversation",
+          "recent_turn_count": 0,
+          "round_summary_count": 0,
+          "session_id": "synthetic-session-operator-prep",
+          "summary_index_capability": "list_conversation_summaries",
+          "summary_search_capability": "search_conversation_summaries"
+        },
+        "current_user_observation_ref": {
+          "object_id": "obs_conv_user_a7e71d6fb43c0cf04bffec80",
+          "revision": 1
+        },
+        "related_execution_anchors": [],
+        "topic_state": {
+          "antecedent_recall_needed": false,
+          "continued_from_recent_turn": false,
+          "gate_open": true,
+          "history_may_help": false,
+          "reason": "current_utterance_topic:history_not_needed",
+          "topic": "SYNTHETIC operator-prep two-round liveness probe"
+        }
+      },
+      "token_budget": 3400,
+      "truncated": false,
+      "user_input": "SYNTHETIC operator-prep two-round liveness probe",
+      "world_map": {
+        "as_of": "2026-09-27T12:00:00+00:00",
+        "dimension_count": 1,
+        "dimensions": [
+          {
+            "current_object_count": 1,
+            "definition_ref": null,
+            "dimension": "dim:user_ai_interaction",
+            "latest_activity_at": "2026-09-27T12:00:00+00:00",
+            "lifecycle": null,
+            "name": null,
+            "object_types": [
+              "observation"
+            ],
+            "recent_24h_count": 1,
+            "recent_7d_count": 1,
+            "registered": false
+          }
+        ],
+        "directory_only": true,
+        "expand_capabilities": {
+          "broader_recall": "expand_recall",
+          "dimension_definitions": "list_dimensions",
+          "exact_object": "inspect_world_object",
+          "multi_dimension_window": "request_all_dimensions_projection",
+          "refresh_directory": "read_world_map",
+          "semantic_recall": "search_world",
+          "single_dimension_timeline": "search_timeline"
+        },
+        "index_lag": 0,
+        "index_watermark": 1,
+        "schema": "aios.world-map.l0.v1",
+        "semantic_conclusions": false,
+        "truncated": false,
+        "world_revision": 1
+      }
+    },
+    "continuity_summary_commits": [],
+    "continuity_summary_error": null,
+    "conversation_commit": {
+      "assistant_observation_id": "obs_conv_ai_8aa6eea6c91aeda994ebd303",
+      "assistant_world_revision": 2,
+      "idempotent_replay": false,
+      "user_observation_id": "obs_conv_user_a7e71d6fb43c0cf04bffec80",
+      "user_world_revision": 1,
+      "world_revision": 2
+    },
+    "recommendation": {
+      "cards": [],
+      "current_topic": "SYNTHETIC operator-prep two-round liveness probe",
+      "index_watermark": 1,
+      "reason": "current_topic_does_not_need_history",
+      "topic_gate_open": true,
+      "world_revision": 1
+    },
+    "runtime": {
+      "capability_history": [
+        {
+          "call_id": "synthetic-call-0001",
+          "data": [
+            {
+              "dimension": "dim:user_ai_interaction",
+              "excerpt": "SYNTHETIC operator-prep two-round liveness probe",
+              "object_id": "obs_conv_user_a7e71d6fb43c0cf04bffec80",
+              "object_type": "observation",
+              "retrieval_score": 4,
+              "revision": 1
+            }
+          ],
+          "error_code": null,
+          "error_message": null,
+          "name": "search_world",
+          "ok": true
+        }
+      ],
+      "model_input_tokens": null,
+      "model_output_tokens": null,
+      "model_rounds": 2,
+      "model_total_tokens": null,
+      "model_usage_complete": false,
+      "recovered_response_attempts": [],
+      "response": "SYNTHETIC_OPERATOR_PREP_TERMINAL_RESPONSE",
+      "silenced": false,
+      "termination_reason": "responded"
+    }
+  },
+  "world_path": "/tmp/pytest-of-user/pytest-13/test_gate_c_two_round_integrat0/synthetic_world.sqlite"
+}

@@ -1,0 +1,34 @@
+{
+  "concurrent_publication_successes": 2,
+  "concurrent_runner_chain_ok": true,
+  "concurrent_runner_dispatches": 1,
+  "concurrent_runner_handoffs": 2,
+  "consumptions": 2,
+  "core_import": "/home/user/Haneof-AIOS-Core-v3.0/src/aios_core/__init__.py",
+  "due_work_handoffs": 1,
+  "exchange_integrity_ok": true,
+  "ledger_chain_ok": true,
+  "ledger_head_sha256": "7e900a7fb0810d77f9a502fb8c4546998584b118f7ed4da7912cdb5d99ecb3ae",
+  "ledger_record_count": 9,
+  "publisher_objects": 2,
+  "raw_sha256": {
+    "concurrent_handler_ledger.jsonl": "1e6501ad19c1ade508f4ebdee0a6c696778c09444f972df764412609c26fdf75",
+    "concurrent_request_receipts.json": "dccb418063995a346a636eb22b6c31c15d345cc8ace2c42b471ad8a85746f5d5",
+    "due_work_result.json": "6b5718c577129b1c28b3237c6790ecc5717017b5800b4c50ca7de3ef8dc919f8",
+    "exchange_ledger.jsonl": "70b0ce376b35626e419a42d5c41091c33593dc3fa4242011ce79716e8e79e527"
+  },
+  "request_ids": [
+    "req-0001-model_directive-a01674b2",
+    "req-0002-model_directive-86fc4849",
+    "req-0003-model_directive-06a5af76"
+  ],
+  "request_payload_sequences": [
+    1,
+    2,
+    3
+  ],
+  "response_publications": 2,
+  "status": "PASS",
+  "synthetic_due_work_completed": true,
+  "synthetic_only": true
+}
