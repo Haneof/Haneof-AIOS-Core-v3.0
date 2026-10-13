@@ -1,0 +1,1 @@
+{"dimension":"dim:release_state","event_id":"c15rcc-009","modality":"structured_text","occurred_at":"2026-11-04T14:17:00-08:00","resident_visible_payload":"registry 上传尝试在 14:16 被拒绝：checksum mismatch。edge-2026.11.4 未发布，tag 未创建，registry 中没有对应 digest。","sequence":9,"source_class":"PLATFORM","source_kind":"registry"}

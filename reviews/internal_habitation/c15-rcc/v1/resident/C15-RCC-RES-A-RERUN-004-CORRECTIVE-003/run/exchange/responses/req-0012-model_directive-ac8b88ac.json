@@ -1,0 +1,1 @@
+{"authored_by":"EXTERNAL_CURRENT_RESIDENT_SESSION","directive":{"capability_calls":[{"arguments":{"limit":20,"offset":0},"call_id":"c07-review-anchors","name":"read_periodic_review_anchors"}]},"request_id":"req-0012-model_directive-ac8b88ac","request_sha256":"2bba26b83817e54312cd16053f0f2f450c76656721a516fd0984fec2bb3b6b18","response_version":1}

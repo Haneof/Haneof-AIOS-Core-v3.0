@@ -1,0 +1,352 @@
+{
+  "latest_objects": [
+    {
+      "object_id": "clm_b700d32249c8d14d0088b352",
+      "object_type": "claim",
+      "recorded_at": "2026-11-06T19:10:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 37
+    },
+    {
+      "object_id": "policy_0a51790d041840004a8aca64",
+      "object_type": "cognitive_policy",
+      "recorded_at": "2026-11-03T18:15:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 15
+    },
+    {
+      "object_id": "policy_766f9abf9f75d0806d18f378",
+      "object_type": "cognitive_policy",
+      "recorded_at": "2026-11-04T22:24:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 29
+    },
+    {
+      "object_id": "policy_93b95eb1dc110f959edae338",
+      "object_type": "cognitive_policy",
+      "recorded_at": "2026-11-02T17:05:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 5
+    },
+    {
+      "object_id": "commexp_733bc7d8476bcf2d594595d9",
+      "object_type": "communication_experience",
+      "recorded_at": "2026-11-02T20:52:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 12
+    },
+    {
+      "object_id": "dep_0b0b89bfc899bb61e0ffe94a",
+      "object_type": "dependency",
+      "recorded_at": "2026-11-06T19:10:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 37
+    },
+    {
+      "object_id": "dep_189b87a8096f96b66434fd5a",
+      "object_type": "dependency",
+      "recorded_at": "2026-11-04T22:24:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 28
+    },
+    {
+      "object_id": "dep_190784d3716a582d41832f8d",
+      "object_type": "dependency",
+      "recorded_at": "2026-11-04T22:24:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 29
+    },
+    {
+      "object_id": "dep_54b05f470d86f7c9809f1e6a",
+      "object_type": "dependency",
+      "recorded_at": "2026-11-02T20:52:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 12
+    },
+    {
+      "object_id": "dep_61bff579c92d905eafb2dd50",
+      "object_type": "dependency",
+      "recorded_at": "2026-11-04T22:24:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 28
+    },
+    {
+      "object_id": "dep_6bc7744a49c9e4f6472b6135",
+      "object_type": "dependency",
+      "recorded_at": "2026-11-02T20:52:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 12
+    },
+    {
+      "object_id": "dep_7fa2e3448ed20d1678388357",
+      "object_type": "dependency",
+      "recorded_at": "2026-11-03T18:15:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 15
+    },
+    {
+      "object_id": "dep_88219a0a713164d422f0ebf4",
+      "object_type": "dependency",
+      "recorded_at": "2026-11-03T18:15:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 15
+    },
+    {
+      "object_id": "dep_9526a8f01534872d2de9bcff",
+      "object_type": "dependency",
+      "recorded_at": "2026-11-02T17:05:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 5
+    },
+    {
+      "object_id": "dep_a4bd8e0a7cd203c8cdd51a1e",
+      "object_type": "dependency",
+      "recorded_at": "2026-11-06T19:10:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 37
+    },
+    {
+      "object_id": "dep_b5941ecc269f0c921d5012fb",
+      "object_type": "dependency",
+      "recorded_at": "2026-11-04T22:24:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 29
+    },
+    {
+      "object_id": "dep_d6c353930fd5678d3133a84f",
+      "object_type": "dependency",
+      "recorded_at": "2026-11-06T19:10:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 37
+    },
+    {
+      "object_id": "dep_e746bc4270486e07bccd59ba",
+      "object_type": "dependency",
+      "recorded_at": "2026-11-02T17:05:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 5
+    },
+    {
+      "object_id": "dep_f7e4dfd8ed302626d1fedfbf",
+      "object_type": "dependency",
+      "recorded_at": "2026-11-06T19:10:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 37
+    },
+    {
+      "object_id": "evs_4c63274cac1e991427eeaec2",
+      "object_type": "evidence_set",
+      "recorded_at": "2026-11-06T19:10:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 37
+    },
+    {
+      "object_id": "evs_policy_bea61a5a495bf7d363ebd2e4",
+      "object_type": "evidence_set",
+      "recorded_at": "2026-11-03T18:15:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 15
+    },
+    {
+      "object_id": "evs_policy_d5550373160643aa5f036fc8",
+      "object_type": "evidence_set",
+      "recorded_at": "2026-11-02T17:05:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 5
+    },
+    {
+      "object_id": "evs_policy_f7938428d43781713dd903d7",
+      "object_type": "evidence_set",
+      "recorded_at": "2026-11-04T22:24:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 29
+    },
+    {
+      "object_id": "obs_c14_fixture_291beec37165eb34a35f8f85",
+      "object_type": "observation",
+      "recorded_at": "2026-11-04T23:02:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 31
+    },
+    {
+      "object_id": "obs_c14_fixture_5248cdfd5a23b6ea88ce0a96",
+      "object_type": "observation",
+      "recorded_at": "2026-11-02T17:14:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 7
+    },
+    {
+      "object_id": "obs_c14_fixture_5d4dfcf42055c00135a78a54",
+      "object_type": "observation",
+      "recorded_at": "2026-11-02T20:40:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 10
+    },
+    {
+      "object_id": "obs_c14_fixture_87474a7fb5036c38638a6c37",
+      "object_type": "observation",
+      "recorded_at": "2026-11-04T21:30:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 20
+    },
+    {
+      "object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+      "object_type": "observation",
+      "recorded_at": "2026-11-04T22:17:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 26
+    },
+    {
+      "object_id": "obs_c14_fixture_e2c76be3450b6e9dc8316b9d",
+      "object_type": "observation",
+      "recorded_at": "2026-11-06T19:10:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 34
+    },
+    {
+      "object_id": "obs_conv_ai_2f9e7a71f8be4570efadc4b1",
+      "object_type": "observation",
+      "recorded_at": "2026-11-02T17:05:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 2
+    },
+    {
+      "object_id": "obs_conv_ai_64913b9ede9ff7216ee3e2e5",
+      "object_type": "observation",
+      "recorded_at": "2026-11-02T20:52:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 13
+    },
+    {
+      "object_id": "obs_conv_ai_740fa7100b0bb91d31a5a10b",
+      "object_type": "observation",
+      "recorded_at": "2026-11-04T21:42:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 25
+    },
+    {
+      "object_id": "obs_conv_ai_8194105ab8e7ac3b753714fa",
+      "object_type": "observation",
+      "recorded_at": "2026-11-04T22:24:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 30
+    },
+    {
+      "object_id": "obs_conv_ai_8bf1c8023e5a591f8f992fa3",
+      "object_type": "observation",
+      "recorded_at": "2026-11-03T18:15:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 16
+    },
+    {
+      "object_id": "obs_conv_ai_d5bad82f97b2871d649ab30c",
+      "object_type": "observation",
+      "recorded_at": "2026-11-04T23:07:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 33
+    },
+    {
+      "object_id": "obs_conv_ai_fc5dec8dae6dc8b76d004c8f",
+      "object_type": "observation",
+      "recorded_at": "2026-11-02T17:20:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 9
+    },
+    {
+      "object_id": "obs_conv_user_013defb1c7513e98f57ec617",
+      "object_type": "observation",
+      "recorded_at": "2026-11-02T20:52:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 11
+    },
+    {
+      "object_id": "obs_conv_user_49ba2a40cd78851bbf132a2a",
+      "object_type": "observation",
+      "recorded_at": "2026-11-04T21:42:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 24
+    },
+    {
+      "object_id": "obs_conv_user_79b1c0582c81a10fd8eb4e20",
+      "object_type": "observation",
+      "recorded_at": "2026-11-03T18:15:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 14
+    },
+    {
+      "object_id": "obs_conv_user_9d7b2585dc63aa4b7d5cf2be",
+      "object_type": "observation",
+      "recorded_at": "2026-11-04T22:24:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 27
+    },
+    {
+      "object_id": "obs_conv_user_c27eefdbe08fba3e9c2b18fc",
+      "object_type": "observation",
+      "recorded_at": "2026-11-02T17:20:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 8
+    },
+    {
+      "object_id": "obs_conv_user_ec4c81abf13da10be615fcd6",
+      "object_type": "observation",
+      "recorded_at": "2026-11-02T17:05:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 1
+    },
+    {
+      "object_id": "obs_conv_user_f8e45183554230625d1e3fd4",
+      "object_type": "observation",
+      "recorded_at": "2026-11-04T23:07:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 32
+    },
+    {
+      "object_id": "task_d3a808b326066cce5a632626",
+      "object_type": "task",
+      "recorded_at": "2026-11-04T22:24:00.000000+00:00",
+      "revision": 1,
+      "world_revision": 28
+    },
+    {
+      "object_id": "wake_review_8901873e11f00a82016be2a8",
+      "object_type": "wake",
+      "recorded_at": "2026-11-04T21:30:00.000000+00:00",
+      "revision": 3,
+      "world_revision": 23
+    },
+    {
+      "object_id": "wake_review_c55ba6b48399b32903ca1b8c",
+      "object_type": "wake",
+      "recorded_at": "2026-11-06T19:10:00.000000+00:00",
+      "revision": 3,
+      "world_revision": 38
+    },
+    {
+      "object_id": "wake_review_d16605dab2b0e39ae731cee6",
+      "object_type": "wake",
+      "recorded_at": "2026-11-03T18:15:00.000000+00:00",
+      "revision": 3,
+      "world_revision": 19
+    },
+    {
+      "object_id": "wake_review_feb7b6aed4d47e9e0cadcc1c",
+      "object_type": "wake",
+      "recorded_at": "2026-11-02T17:05:00.000000+00:00",
+      "revision": 3,
+      "world_revision": 6
+    }
+  ],
+  "object_revision_rows": 56,
+  "objects_by_type": {
+    "claim": 1,
+    "cognitive_policy": 3,
+    "communication_experience": 1,
+    "dependency": 14,
+    "evidence_set": 4,
+    "observation": 20,
+    "task": 1,
+    "wake": 12
+  },
+  "world_revision": 38
+}

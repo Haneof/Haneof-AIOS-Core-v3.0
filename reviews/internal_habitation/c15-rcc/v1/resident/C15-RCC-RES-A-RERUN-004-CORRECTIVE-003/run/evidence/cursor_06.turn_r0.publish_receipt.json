@@ -1,0 +1,9 @@
+{
+  "adopted_existing_bytes": false,
+  "bytes": 978,
+  "idempotent_replay": false,
+  "path": "/home/user/c003-run/exchange/responses/req-0008-model_directive-1ac91e3b.json",
+  "request_id": "req-0008-model_directive-1ac91e3b",
+  "response_sha256": "672c407568e3dc0a09636c45b62298e5fd8bded61067f073f1e7129612729dc9",
+  "wall_clock": "2026-09-29T11:04:04.412154Z"
+}

@@ -1,0 +1,11 @@
+{
+  "checked_utc": "2026-09-29T10:58:29.974239+00:00",
+  "world_path": "/home/user/c003-run/world/c15-res-a-c003.world.sqlite",
+  "world_exists": false,
+  "index_path": "/home/user/c003-run/world/c15-res-a-c003.world.search.sqlite",
+  "index_exists": false,
+  "exchange_root": "/home/user/c003-run/exchange",
+  "exchange_ledger_exists": false,
+  "release_state_exists": false,
+  "fresh": true
+}
