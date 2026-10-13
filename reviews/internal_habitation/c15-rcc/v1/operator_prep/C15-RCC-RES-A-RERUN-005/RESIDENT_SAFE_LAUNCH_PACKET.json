@@ -109,7 +109,18 @@
       "materialization_allowed_when_prepared_runtime_missing": true,
       "materialization_is_build": false,
       "resident_may_read_operator_manifest": false,
-      "resident_download_command": "TMP=\"$(mktemp -d)\"; gh api -H 'Accept: application/vnd.github+json' /repos/Haneof/Haneof-AIOS-Core-v3.0/actions/artifacts/11747444013/zip > \"$TMP/runtime.zip\"; printf '%s  %s\\n' 'cc6b72631e000fa161f027c3daf946805d41022a25725ead040d26c5509d155a' \"$TMP/runtime.zip\" | sha256sum -c -; unzip -q \"$TMP/runtime.zip\" 'aios-c15-resident-runtime-3.12.14.tar.gz' 'aios-c15-resident-runtime-3.12.14.tar.gz.sha256' -d \"$TMP\"; printf '%s  %s\\n' 'ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e' \"$TMP/aios-c15-resident-runtime-3.12.14.tar.gz\" | sha256sum -c -; grep -Fx 'ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e  aios-c15-resident-runtime-3.12.14.tar.gz' \"$TMP/aios-c15-resident-runtime-3.12.14.tar.gz.sha256\"; mkdir -p /home/user/.cache/c002/final-runtime-003; tar -xzf \"$TMP/aios-c15-resident-runtime-3.12.14.tar.gz\" -C /home/user/.cache/c002/final-runtime-003; rm -rf \"$TMP\""
+      "resident_download_command": "TMP=\"$(mktemp -d)\"; gh api -H 'Accept: application/vnd.github+json' /repos/Haneof/Haneof-AIOS-Core-v3.0/actions/artifacts/11747444013/zip > \"$TMP/runtime.zip\"; printf '%s  %s\\n' 'cc6b72631e000fa161f027c3daf946805d41022a25725ead040d26c5509d155a' \"$TMP/runtime.zip\" | sha256sum -c -; unzip -q \"$TMP/runtime.zip\" 'aios-c15-resident-runtime-3.12.14.tar.gz' 'aios-c15-resident-runtime-3.12.14.tar.gz.sha256' -d \"$TMP\"; printf '%s  %s\\n' 'ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e' \"$TMP/aios-c15-resident-runtime-3.12.14.tar.gz\" | sha256sum -c -; grep -Fx 'ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e  aios-c15-resident-runtime-3.12.14.tar.gz' \"$TMP/aios-c15-resident-runtime-3.12.14.tar.gz.sha256\"; mkdir -p /home/user/.cache/c002/final-runtime-003; tar -xzf \"$TMP/aios-c15-resident-runtime-3.12.14.tar.gz\" -C /home/user/.cache/c002/final-runtime-003; rm -rf \"$TMP\"",
+      "offline_attachment_fallback": {
+        "authorized": true,
+        "purpose": "cross-sandbox handoff when network/gh transport is unavailable",
+        "expected_attachment_filename": "c15-rerun005-approved-runtime-linux-x86_64.zip",
+        "expected_attachment_zip_sha256": "cc6b72631e000fa161f027c3daf946805d41022a25725ead040d26c5509d155a",
+        "expected_runtime_tar_filename": "aios-c15-resident-runtime-3.12.14.tar.gz",
+        "expected_runtime_tar_sha256": "ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e",
+        "extraction_policy": "extract only runtime tar and tar sha file from attachment zip; do not read operator manifest",
+        "materialization_target": "/home/user/.cache/c002/final-runtime-003",
+        "build_or_install_forbidden": true
+      }
     }
   },
   "mechanical_verification": {
