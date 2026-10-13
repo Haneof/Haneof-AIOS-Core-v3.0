@@ -27,3 +27,15 @@ Resident B / evaluator / downstream phases remain BLOCKED.
 - Resident-safe packet now pins the prepared CPython 3.12.14 / Pydantic 2.13.5 runtime path and exact verification command.
 - Environment build/provisioning remains OPERATOR_ONLY. Resident may verify/use the prepared runtime but may not build/install/design it.
 - After this governance/launch-material correction is integrated, the same Window 51 may restart preflight from cursor 0 with fresh state.
+
+## Portable runtime handoff finalized
+
+- The previous local-path handoff model was invalid across isolated sandboxes; Window 52 and Window 51 do not share a persistent filesystem.
+- A durable GitHub Actions artifact was independently built, verified against accepted current-main code, downloaded, hash-verified, extracted to the exact target path, and executed successfully.
+- Workflow run: `38249942251` = SUCCESS.
+- Artifact ID: `11747444013`.
+- Artifact name: `c15-rerun005-approved-runtime-linux-x86_64`.
+- Artifact ZIP SHA256: `cc6b72631e000fa161f027c3daf946805d41022a25725ead040d26c5509d155a`.
+- Runtime tar SHA256: `ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e`.
+- Runtime tar exact-target execution probe passed: Python 3.12.14 / Pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.45.1 / OpenSSL 3.0.13.
+- Window 51 may mechanically materialize this exact pinned artifact if its local runtime path is absent. It may not build or install an environment.
