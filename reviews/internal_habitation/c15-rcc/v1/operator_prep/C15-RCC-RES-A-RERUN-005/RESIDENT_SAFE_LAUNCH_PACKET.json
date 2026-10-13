@@ -162,6 +162,18 @@
           "run approved_runtime.resident_verify_command"
         ],
         "build_or_install_forbidden": true
+      },
+      "signed_url_transport": {
+        "authorized": true,
+        "transport_only": true,
+        "url_is_not_artifact_identity": true,
+        "expected_zip_size_bytes": 88511202,
+        "expected_zip_sha256": "cc6b72631e000fa161f027c3daf946805d41022a25725ead040d26c5509d155a",
+        "expected_runtime_tar_size_bytes": 88509303,
+        "expected_runtime_tar_sha256": "ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e",
+        "allowed_client": "system Python standard library urllib or equivalent byte-preserving HTTP client",
+        "failure_policy": "BLOCKED / SIGNED_TRANSPORT_UNAVAILABLE",
+        "build_or_install_forbidden": true
       }
     }
   },
