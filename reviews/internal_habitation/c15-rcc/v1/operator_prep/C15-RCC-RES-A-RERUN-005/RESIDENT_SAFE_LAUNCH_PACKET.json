@@ -87,14 +87,37 @@
     "expected_sqlite": "3.45.1",
     "expected_openssl": "3.0.13",
     "resident_verify_command": "PYTHONPATH=src:. /home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -c 'import pathlib,platform,sqlite3,ssl,pydantic,pytest,aios_core; r=pathlib.Path.cwd().resolve(); a=pathlib.Path(aios_core.__file__).resolve(); assert platform.python_version()==\"3.12.14\"; assert pydantic.__version__==\"2.13.5\"; assert pytest.__version__==\"8.4.2\"; assert sqlite3.sqlite_version==\"3.45.1\"; assert ssl.OPENSSL_VERSION.split()[1]==\"3.0.13\"; assert r in a.parents; print(\"RUNTIME_ENV_OK\", platform.python_version(), pydantic.__version__, pytest.__version__, sqlite3.sqlite_version, ssl.OPENSSL_VERSION)'",
-    "if_prepared_runtime_missing": "BLOCKED / OPERATOR_ENVIRONMENT_PREP_REQUIRED",
-    "resident_may_build_or_install": false
+    "if_prepared_runtime_missing": "MATERIALIZE_EXACT_PORTABLE_ARTIFACT_THEN_VERIFY",
+    "resident_may_build_or_install": false,
+    "portable_artifact": {
+      "source": "github_actions_artifact",
+      "repository": "Haneof/Haneof-AIOS-Core-v3.0",
+      "workflow_run_id": 38249942251,
+      "workflow_head_sha": "2c3dcfd7c8706399e2535a04148fc984e8a91703",
+      "artifact_id": 11747444013,
+      "artifact_name": "c15-rerun005-approved-runtime-linux-x86_64",
+      "artifact_expires_at": "2026-11-11T12:42:38Z",
+      "artifact_zip_sha256": "cc6b72631e000fa161f027c3daf946805d41022a25725ead040d26c5509d155a",
+      "artifact_zip_size_bytes": 88511202,
+      "runtime_tar_filename": "aios-c15-resident-runtime-3.12.14.tar.gz",
+      "runtime_tar_sha256": "ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e",
+      "runtime_tar_size_bytes": 88509303,
+      "archive_root": "runtime/3.12.14",
+      "platform_system": "Linux",
+      "platform_machine": "x86_64",
+      "minimum_glibc": "2.35",
+      "materialization_allowed_when_prepared_runtime_missing": true,
+      "materialization_is_build": false,
+      "resident_may_read_operator_manifest": false,
+      "resident_download_command": "TMP=\"$(mktemp -d)\"; gh api -H 'Accept: application/vnd.github+json' /repos/Haneof/Haneof-AIOS-Core-v3.0/actions/artifacts/11747444013/zip > \"$TMP/runtime.zip\"; printf '%s  %s\\n' 'cc6b72631e000fa161f027c3daf946805d41022a25725ead040d26c5509d155a' \"$TMP/runtime.zip\" | sha256sum -c -; unzip -q \"$TMP/runtime.zip\" 'aios-c15-resident-runtime-3.12.14.tar.gz' 'aios-c15-resident-runtime-3.12.14.tar.gz.sha256' -d \"$TMP\"; printf '%s  %s\\n' 'ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e' \"$TMP/aios-c15-resident-runtime-3.12.14.tar.gz\" | sha256sum -c -; grep -Fx 'ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e  aios-c15-resident-runtime-3.12.14.tar.gz' \"$TMP/aios-c15-resident-runtime-3.12.14.tar.gz.sha256\"; mkdir -p /home/user/.cache/c002/final-runtime-003; tar -xzf \"$TMP/aios-c15-resident-runtime-3.12.14.tar.gz\" -C /home/user/.cache/c002/final-runtime-003; rm -rf \"$TMP\""
+    }
   },
   "mechanical_verification": {
     "approved_command_source": "this Resident-safe launch packet",
     "steps": [
       "verify accepted integration baseline is an ancestor of current main and post-baseline drift is governance/Resident-safe material only",
       "verify pinned Git blobs/trees from this packet",
+      "if prepared runtime is absent, mechanically download the exact pinned portable artifact by artifact_id, verify artifact ZIP SHA256 and runtime tar SHA256, extract only the runtime tar to target_runtime_root, and do not read the operator manifest",
       "run approved_runtime.resident_verify_command",
       "confirm fresh run directories contain no prior Resident state"
     ],

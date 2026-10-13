@@ -31,8 +31,20 @@ The packet records post-merge main run `38024230362` as `completed / success`.
 
 Run the exact resident-safe runtime verification command from the launch packet. Do not invent an environment command and do not install/build Python yourself.
 
-If the prepared runtime path is missing, stop:
-`BLOCKED / OPERATOR_ENVIRONMENT_PREP_REQUIRED`
+If the prepared runtime path is missing, do **not** build or install anything. Use only the exact `approved_runtime.portable_artifact` materialization procedure from the launch packet:
+
+- verify local platform is Linux / x86_64 with glibc >= 2.35;
+- mechanically download artifact ID `11747444013`;
+- verify the pinned artifact ZIP SHA256;
+- extract only the pinned runtime tar + SHA file from the artifact ZIP;
+- verify the pinned runtime tar SHA256;
+- extract that tar to the exact target runtime root;
+- do not read the operator manifest;
+- then run the exact current packet `approved_runtime.resident_verify_command`.
+
+This is mechanical artifact materialization, not environment construction.
+
+If artifact download, platform compatibility, digest verification, extraction, or runtime verification fails, stop `BLOCKED`. Do not build Python, install packages, or substitute another artifact.
 
 If any identity/gate/harness/runtime verification fails, stop `BLOCKED`.
 
