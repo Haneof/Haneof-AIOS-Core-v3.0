@@ -126,3 +126,22 @@ Stop at:
 `DO NOT MERGE`
 
 No self-acceptance.
+
+
+## Offline attachment fallback
+
+If the prepared runtime is absent and the packet's network materialization path cannot run because `gh` or equivalent transport is unavailable, the packet authorizes exactly one offline attachment fallback.
+
+The allowed attachment is the exact approved artifact ZIP identified in `approved_runtime.portable_artifact.offline_attachment_fallback`.
+
+Mechanically:
+- locate the attached ZIP bytes supplied with this Window 51 conversation;
+- verify the attachment ZIP SHA256 exactly;
+- extract only the runtime tarball and tar SHA file;
+- verify the runtime tarball SHA256 exactly;
+- extract the runtime tarball to the packet's exact target runtime root;
+- do not read the operator manifest;
+- do not build or install anything;
+- then run the exact current packet `approved_runtime.resident_verify_command`.
+
+If the attachment is missing, its SHA mismatches, the tar SHA mismatches, or extraction/runtime verification fails, stop `BLOCKED`.
