@@ -143,6 +143,25 @@
           "only then extract the runtime tar to materialization_target",
           "run approved_runtime.resident_verify_command after extraction"
         ]
+      },
+      "direct_runtime_tar_attachment": {
+        "authorized": true,
+        "preferred_offline_handoff": true,
+        "expected_attachment_filename": "aios-c15-resident-runtime-3.12.14.tar.gz",
+        "expected_size_bytes": 88509303,
+        "expected_sha256": "ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e",
+        "archive_root": "runtime/3.12.14",
+        "materialization_target": "/home/user/.cache/c002/final-runtime-003",
+        "verification_policy": [
+          "treat the direct tar.gz attachment bytes themselves as the binding runtime artifact",
+          "compute SHA256 before listing or extracting archive members",
+          "require exact SHA256 match",
+          "after digest pass, verify all members are under runtime/3.12.14 and reject absolute paths or parent traversal",
+          "require runtime/3.12.14/venv/bin/python entry",
+          "extract only to materialization_target",
+          "run approved_runtime.resident_verify_command"
+        ],
+        "build_or_install_forbidden": true
       }
     }
   },
