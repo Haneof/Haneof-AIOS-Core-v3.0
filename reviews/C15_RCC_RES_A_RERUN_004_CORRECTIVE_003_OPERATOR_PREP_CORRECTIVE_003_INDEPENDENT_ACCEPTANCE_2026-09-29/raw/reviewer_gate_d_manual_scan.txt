@@ -1,0 +1,33 @@
+files scanned: 11
+
+-- risky def/assign names --
+runner.py:106 assign route
+runner.py:111 assign route
+
+-- long string literals (>=120 chars), manual review --
+__init__.py:1 :: Mechanical exchange harness for the AIOS Resident launch boundary.  This package is **transport, durability and verification only**.  It publishes a d
+atomic.py:1 :: Durable single-file publication primitives.  Sequence for every published artifact (request, response, ledger record):  1. write the complete bytes to
+atomic.py:61 :: Require directory durability; never turn an open/fsync error into a receipt.      Directory fsync is supported and required on the qualified Linux run
+atomic.py:79 :: Re-prove durability of a visible orphan/replay before trusting its bytes.      Required when a prior failed publication may have left bytes visible af
+bridge.py:1 :: Exchange bridge: durable chronology, consumption and crash recovery.  The bridge is the single authority for exchange state. It enforces:  * ``request
+bridge.py:57 :: not_submitted reconciliation is allowed only when no request_published record exists; after request publication the exchange fails closed instead of d
+canonical.py:1 :: Canonical encodings and digests.  Deterministic byte encodings so that a request or response digest always describes exactly the bytes that are durabl
+canonical.py:29 :: Deterministic fallback for values that are not natively JSON.      Only mechanical type projection happens here: enums to their value,     dataclasses
+content_manifest.py:1 :: Canonical content identity, shared by bootstrap/operator tools/packet.  Algorithm v1: regular files sorted by POSIX relative path; exclude only __pyca
+ledger.py:1 :: Append-only, hash-chained exchange ledger.  Every durable exchange fact is recorded exactly once, in order, and each record chains to its predecessor:
+ledger.py:115 :: One read/validate/decide/publish/append/durability transaction.          Callers use this outer boundary around *all* prefix-derived decisions.       
+requests.py:1 :: Mechanical request publisher.  Writes one durable decision request per model boundary crossing:  * deterministic request identity derived from the led
+responses.py:1 :: Mechanical response publisher.  The Resident (or any external session) decides *everything* semantic. This module only transports the exact bytes it i
+runner.py:1 :: Runtime plumbing for the Resident launch boundary.  The runner owns the mechanical side of a turn:  * it drives the frozen Core runtime; * whenever Co
+runner.py:70 :: Model boundary usable as a Core ``ModelHandler``.      ``Callable[[RuntimeSnapshot], ModelDirective]`` where the directive is     parsed from durably 
+runner.py:173 :: Run one frozen-Core user turn whose model decisions come from the exchange.      ``world_path``/``subject_id``/``session_id``/``user_input``/``occurre
+schema.py:1 :: Frozen-Core contract binding and strict (de)serialization.  Types are imported from the frozen RC; nothing here is guessed or redefined. The module fa
+schema.py:195 :: Serialize a real RuntimeSnapshot for durable publication.      Runtime-private correlation attributes (``_model_attempt_id``,     ``_outbound_relay_id
+schema.py:288 :: Build a real ``ModelDirective`` from externally authored response bytes.      The returned object is constructed from the payload only; no default,   
+verify.py:1 :: Verification utilities.  Mechanical only: exchange integrity, frozen-Core identity, environment triple, and the frozen ``CapabilityResult`` surface. N
+
+-- imports outside stdlib/pkg --
+['__future__', 'aios_core.headless.core', 'aios_core.runtime.capabilities', 'aios_core.runtime.cognitive_runtime', 'atomic', 'bridge', 'canonical', 'content_manifest', 'itertools', 'ledger', 'platform', 'pydantic', 'pytest', 'requests', 'responses', 'schema', 'sqlite3', 'stat', 'threading']
+
+-- forbidden attribute reach --
+(none)

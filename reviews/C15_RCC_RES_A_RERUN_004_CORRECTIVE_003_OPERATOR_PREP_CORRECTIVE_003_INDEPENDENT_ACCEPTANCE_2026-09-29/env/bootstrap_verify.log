@@ -1,0 +1,11 @@
+<stdin>:18: DeprecationWarning: version is deprecated and will be removed in Python 3.14
+[bootstrap] version triple OK: python=3.12.14 pydantic=2.13.5 pytest=8.4.2 sqlite=3.45.1
+{
+  "environment_record": "/home/user/ia_review/runtime/evidence/environment_record.json",
+  "python": "3.12.14",
+  "pydantic": "2.13.5",
+  "pytest": "8.4.2",
+  "sqlite": "3.45.1",
+  "core_content_manifest_sha256": "220718d6b5a2650b5e4263bbe8b7e661444cb33b486a7ecd7b5ad3d7d3399caa"
+}
+[bootstrap] VERIFY OK

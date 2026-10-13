@@ -1,0 +1,20 @@
+{
+  "python_version": "3.12.14",
+  "python_full_version": "3.12.14 (main, Sep 29 2026, 10:23:33) [GCC 12.2.0]",
+  "executable": "/home/user/ia_review/runtime/runtime/3.12.14/venv/bin/python",
+  "prefix": "/home/user/ia_review/runtime/runtime/3.12.14/venv",
+  "base_prefix": "/home/user/ia_review/runtime/runtime/3.12.14/python",
+  "pydantic": "2.13.5",
+  "pytest": "8.4.2",
+  "sqlite3": "3.45.1",
+  "openssl": "OpenSSL 3.0.13 30 Jan 2024",
+  "os": "Linux-6.1.158+-x86_64-with-glibc2.36",
+  "kernel": "6.1.158+",
+  "architecture": "x86_64",
+  "libc": "glibc 2.36",
+  "glibc": "glibc 2.36",
+  "cpu_count": 2,
+  "aios_core_file": "/home/user/ia_review/rc/src/aios_core/__init__.py",
+  "config_args": null,
+  "scope": "reviewer-built runtime from fresh absent scratch root; author runtime not used"
+}

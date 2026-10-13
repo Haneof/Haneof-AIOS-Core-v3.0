@@ -1,0 +1,4 @@
+........................................................................ [ 69%]
+...............................                                          [100%]
+- generated xml file: /home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/raw/c4_c9.xml -
+103 passed in 8.91s

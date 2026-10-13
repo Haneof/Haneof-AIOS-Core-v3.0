@@ -1,0 +1,58 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /home/user/ia_review/runtime/runtime/3.12.14/venv/bin/python
+rootdir: /home/user/ia_review/h2
+configfile: pyproject.toml
+collecting ... collected 24 items
+
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a01_request_id_roundtrip PASSED [  4%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a02_request_sha256_binding PASSED [  8%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a03_response_sha256_binding PASSED [ 12%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a04_atomic_request_publication PASSED [ 16%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a05_atomic_response_publication PASSED [ 20%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a06_temp_write_and_file_fsync PASSED [ 25%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a07_os_replace_used PASSED [ 29%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a08_directory_fsync_supported PASSED [ 33%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a09_reader_never_observes_partial_response PASSED [ 37%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a10_monotonic_ledger_sequence PASSED [ 41%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a11_hash_chain_tamper_detection PASSED [ 45%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a12_crash_before_request_publication PASSED [ 50%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a13_crash_after_request_publication PASSED [ 54%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a14_torn_response_write_fails_closed PASSED [ 58%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a15_response_published_before_consume_is_recovered PASSED [ 62%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a16_request_id_mismatch_fails_closed PASSED [ 66%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a17_digest_mismatch_fails_closed PASSED [ 70%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a18_missing_ledger_publication_record_fails_closed PASSED [ 75%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a19_not_submitted_classification_requires_absence_of_dispatch PASSED [ 79%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a20_tampered_published_response_replay_fails_at_publish PASSED [ 83%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a21_missing_published_response_replay_fails_at_publish PASSED [ 87%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a22_intact_exact_replay_remains_idempotent PASSED [ 91%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a23_changed_replay_bytes_fail_closed PASSED [ 95%]
+h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a24_consume_tampered_published_response_still_fails_closed PASSED [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a01_request_id_roundtrip
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a02_request_sha256_binding
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a03_response_sha256_binding
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a04_atomic_request_publication
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a05_atomic_response_publication
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a06_temp_write_and_file_fsync
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a07_os_replace_used
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a08_directory_fsync_supported
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a09_reader_never_observes_partial_response
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a10_monotonic_ledger_sequence
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a11_hash_chain_tamper_detection
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a12_crash_before_request_publication
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a13_crash_after_request_publication
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a14_torn_response_write_fails_closed
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a15_response_published_before_consume_is_recovered
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a16_request_id_mismatch_fails_closed
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a17_digest_mismatch_fails_closed
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a18_missing_ledger_publication_record_fails_closed
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a19_not_submitted_classification_requires_absence_of_dispatch
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a20_tampered_published_response_replay_fails_at_publish
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a21_missing_published_response_replay_fails_at_publish
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a22_intact_exact_replay_remains_idempotent
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a23_changed_replay_bytes_fail_closed
+PASSED h2/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/tests/test_gate_a_durable_exchange.py::test_a24_consume_tampered_published_response_still_fails_closed
+============================== 24 passed in 2.92s ==============================

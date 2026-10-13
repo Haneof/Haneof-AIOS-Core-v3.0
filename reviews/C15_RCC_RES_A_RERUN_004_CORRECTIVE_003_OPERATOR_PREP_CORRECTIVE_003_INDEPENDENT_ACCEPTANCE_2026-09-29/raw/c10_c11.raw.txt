@@ -1,0 +1,27 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /home/user/ia_review/runtime/runtime/3.12.14/venv/bin/python
+rootdir: /home/user/ia_review/h2/reviews/internal_habitation/c15-rcc/v1/operator_prep_corrective_003/probes
+configfile: ../../../../../../pyproject.toml
+collecting ... collected 18 items
+
+probes/tests/test_c10_concurrency.py::test_c10_independent_ledgers_same_valid_prefix PASSED [  5%]
+probes/tests/test_c10_concurrency.py::test_c10_independent_publishers_distinct_identities PASSED [ 11%]
+probes/tests/test_c10_concurrency.py::test_c10_duplicate_explicit_request_id_single_dispatch PASSED [ 16%]
+probes/tests/test_c10_concurrency.py::test_c10_response_races_new_request PASSED [ 22%]
+probes/tests/test_c10_concurrency.py::test_c10_consume_races_new_request PASSED [ 27%]
+probes/tests/test_c10_concurrency.py::test_c10_concurrent_duplicate_response_is_idempotent PASSED [ 33%]
+probes/tests/test_c10_concurrency.py::test_c10_concurrent_duplicate_consume_is_idempotent PASSED [ 38%]
+probes/tests/test_c10_concurrency.py::test_c10_independent_subprocess_publishers PASSED [ 44%]
+probes/tests/test_c11_directory_durability.py::test_c11_request_artifact_fsync_failure_is_not_dispatch PASSED [ 50%]
+probes/tests/test_c11_directory_durability.py::test_c11_response_artifact_fsync_failure_is_not_published PASSED [ 55%]
+probes/tests/test_c11_directory_durability.py::test_c11_first_ledger_entry_fsync_failure_and_retry PASSED [ 61%]
+probes/tests/test_c11_directory_durability.py::test_c11_request_directory_open_failure_is_not_dispatch PASSED [ 66%]
+probes/tests/test_c11_directory_durability.py::test_c11_response_directory_open_failure_is_not_published PASSED [ 72%]
+probes/tests/test_c11_directory_durability.py::test_c11_ledger_creation_directory_open_failure_is_not_dispatch PASSED [ 77%]
+probes/tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_request_artifact_sync PASSED [ 83%]
+probes/tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_response_artifact_sync PASSED [ 88%]
+probes/tests/test_c11_directory_durability.py::test_c11_mutated_unproven_request_file_is_not_adopted PASSED [ 94%]
+probes/tests/test_c11_directory_durability.py::test_c11_retry_after_unproven_first_ledger_creation PASSED [100%]
+
+- generated xml file: /home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RCC_RES_A_RERUN_004_CORRECTIVE_003_OPERATOR_PREP_CORRECTIVE_003_INDEPENDENT_ACCEPTANCE_2026-09-29/raw/c10_c11.xml -
+============================= 18 passed in 13.58s ==============================
