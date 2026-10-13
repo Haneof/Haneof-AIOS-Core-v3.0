@@ -43,3 +43,7 @@ Resident B / evaluator / downstream phases remain BLOCKED.
 ## Offline attachment transport-envelope adjudication
 
 The direct GitHub Actions artifact ZIP digest remains authoritative for direct GitHub downloads. It is not a valid binding identity after a chat/file attachment transport may repackage the ZIP envelope. Offline attachment recovery therefore binds to the inner approved runtime tar SHA256 `ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e`, plus the matching sidecar and a closed ZIP entry-name set. The operator manifest may be listed by name but must not be read by the Resident.
+
+## Direct runtime tar offline handoff
+
+Because chat/file transport may corrupt or repackage outer ZIP containers, the preferred offline handoff is now the exact inner runtime tarball itself: `aios-c15-resident-runtime-3.12.14.tar.gz`, size 88509303 bytes, SHA256 `ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e`. The tar bytes themselves are the binding runtime artifact.
