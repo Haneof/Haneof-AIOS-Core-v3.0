@@ -162,3 +162,20 @@ For offline attachment fallback:
 - then run the exact packet-pinned runtime verification command.
 
 Any runtime-tar digest mismatch remains a hard BLOCKED condition.
+
+
+## Preferred offline handoff: direct runtime tar attachment
+
+If the current Window 51 conversation contains the exact direct runtime attachment named `aios-c15-resident-runtime-3.12.14.tar.gz`, prefer it over any ZIP transport.
+
+Mechanically:
+- locate the actual attached tar.gz bytes from the current conversation;
+- compute SHA256 before listing or extracting;
+- require exact SHA256 `ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e`;
+- only after SHA passes, list archive members and require every member to be under `runtime/3.12.14`, with no absolute path or parent traversal;
+- require `runtime/3.12.14/venv/bin/python` to exist in the archive;
+- extract the exact tar to `/home/user/.cache/c002/final-runtime-003`;
+- do not build/install/repair anything;
+- then run the exact packet-pinned runtime verification command.
+
+A direct tar SHA mismatch is a hard BLOCKED condition.
