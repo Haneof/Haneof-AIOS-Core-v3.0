@@ -114,12 +114,35 @@
         "authorized": true,
         "purpose": "cross-sandbox handoff when network/gh transport is unavailable",
         "expected_attachment_filename": "c15-rerun005-approved-runtime-linux-x86_64.zip",
-        "expected_attachment_zip_sha256": "cc6b72631e000fa161f027c3daf946805d41022a25725ead040d26c5509d155a",
+        "expected_attachment_zip_sha256": null,
         "expected_runtime_tar_filename": "aios-c15-resident-runtime-3.12.14.tar.gz",
         "expected_runtime_tar_sha256": "ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e",
         "extraction_policy": "extract only runtime tar and tar sha file from attachment zip; do not read operator manifest",
         "materialization_target": "/home/user/.cache/c002/final-runtime-003",
-        "build_or_install_forbidden": true
+        "build_or_install_forbidden": true,
+        "outer_zip_transport_identity": "NON_BINDING_FOR_OFFLINE_CHAT_ATTACHMENT",
+        "direct_github_zip_sha256": "cc6b72631e000fa161f027c3daf946805d41022a25725ead040d26c5509d155a",
+        "binding_runtime_identity": {
+          "runtime_tar_filename": "aios-c15-resident-runtime-3.12.14.tar.gz",
+          "runtime_tar_sha256": "ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e",
+          "sha_file_name": "aios-c15-resident-runtime-3.12.14.tar.gz.sha256",
+          "allowed_zip_entries": [
+            "aios-c15-resident-runtime-3.12.14.tar.gz",
+            "aios-c15-resident-runtime-3.12.14.tar.gz.sha256",
+            "AIOS_C15_RESIDENT_RUNTIME_3_12_14_MANIFEST.json"
+          ],
+          "operator_manifest_may_be_listed_but_not_read": true
+        },
+        "offline_verification_policy": [
+          "do not require the outer chat-attachment ZIP SHA256 to equal the direct GitHub artifact ZIP digest, because attachment transport may repackage the ZIP envelope",
+          "list ZIP entry names only and require the closed set of three expected filenames",
+          "do not open/read the operator manifest",
+          "extract only the runtime tar and its sha256 sidecar",
+          "require the runtime tar SHA256 to equal the pinned runtime_tar_sha256",
+          "require the sha256 sidecar to declare the same exact runtime tar SHA256",
+          "only then extract the runtime tar to materialization_target",
+          "run approved_runtime.resident_verify_command after extraction"
+        ]
       }
     }
   },
