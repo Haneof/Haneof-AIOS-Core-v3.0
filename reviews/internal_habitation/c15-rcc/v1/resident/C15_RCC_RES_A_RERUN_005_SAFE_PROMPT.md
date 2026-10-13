@@ -145,3 +145,20 @@ Mechanically:
 - then run the exact current packet `approved_runtime.resident_verify_command`.
 
 If the attachment is missing, its SHA mismatches, the tar SHA mismatches, or extraction/runtime verification fails, stop `BLOCKED`.
+
+
+## Offline attachment transport-envelope clarification
+
+For an offline chat attachment, the outer ZIP bytes are a transport envelope and are not a binding runtime identity. A chat/file transport may repackage the ZIP while preserving its entries.
+
+For offline attachment fallback:
+- do not require the outer attachment ZIP SHA256 to equal the direct-GitHub artifact ZIP digest;
+- list ZIP entry names only and require the exact closed set allowed by the launch packet;
+- do not open/read the operator manifest;
+- extract only the runtime tarball and its SHA256 sidecar;
+- the runtime tarball SHA256 is the binding artifact identity and must exactly equal the packet-pinned value;
+- the sidecar must declare that same exact SHA256;
+- only after both checks pass may the exact runtime tar be materialized;
+- then run the exact packet-pinned runtime verification command.
+
+Any runtime-tar digest mismatch remains a hard BLOCKED condition.

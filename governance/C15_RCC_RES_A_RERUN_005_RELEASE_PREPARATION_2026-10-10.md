@@ -39,3 +39,7 @@ Resident B / evaluator / downstream phases remain BLOCKED.
 - Runtime tar SHA256: `ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e`.
 - Runtime tar exact-target execution probe passed: Python 3.12.14 / Pydantic 2.13.5 / pytest 8.4.2 / SQLite 3.45.1 / OpenSSL 3.0.13.
 - Window 51 may mechanically materialize this exact pinned artifact if its local runtime path is absent. It may not build or install an environment.
+
+## Offline attachment transport-envelope adjudication
+
+The direct GitHub Actions artifact ZIP digest remains authoritative for direct GitHub downloads. It is not a valid binding identity after a chat/file attachment transport may repackage the ZIP envelope. Offline attachment recovery therefore binds to the inner approved runtime tar SHA256 `ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e`, plus the matching sidecar and a closed ZIP entry-name set. The operator manifest may be listed by name but must not be read by the Resident.
