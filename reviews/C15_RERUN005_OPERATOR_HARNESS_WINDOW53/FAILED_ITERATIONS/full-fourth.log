@@ -1,0 +1,170 @@
+FFFF........................                                             [100%]
+=================================== FAILURES ===================================
+_________ test_sigkill_after_request_never_regenerates_or_redispatches _________
+
+tmp_path = PosixPath('/workspace/scratch/0abf0e48458e/full_pytest_fourth/test_sigkill_after_request_nev0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff750b8d160>
+
+    def test_sigkill_after_request_never_regenerates_or_redispatches(tmp_path,monkeypatch):
+        root,repo=setup(tmp_path,monkeypatch)
+        spec={'mode':'user','at':'2026-10-13T00:00:00+00:00','cursor':1,
+            'event_id':'synthetic-crash-event','turn_index':1,'user_input':'synthetic pending request','timeout':30}
+        path=tmp_path/'operation.json';path.write_bytes(canonical_json_bytes(spec))
+        command=entry()+['run','--root',str(root),'--run-id','synthetic-53-run',
+            '--session-id','synthetic-53-session','--operation',str(path),'--persistence-repo',str(repo)]
+        env=dict(os.environ,C15_PERSISTED_WORKSPACE=str(tmp_path))
+        runner=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,env=env)
+>       authorization=runner.stdout.readline().strip().split('=',1)[1]
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_crash_recovery.py:23: IndexError
+_______ test_real_core_external_publisher_with_c15_remote_barriers[due] ________
+
+tmp_path = PosixPath('/workspace/scratch/0abf0e48458e/full_pytest_fourth/test_real_core_external_publis0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff750bba3c0>
+scenario = 'due'
+
+    @pytest.mark.parametrize('scenario',['due','user','summary'])
+    def test_real_core_external_publisher_with_c15_remote_barriers(tmp_path,monkeypatch,scenario):
+        root,repo=setup(tmp_path,monkeypatch)
+        world=root/'state/runtime/world.sqlite';index=root/'state/runtime/index.sqlite'
+        core=HeadlessCore(config=HeadlessConfig(world_path=world,index_path=index),
+            model_handler=lambda _s: (_ for _ in ()).throw(AssertionError('setup cannot decide'))).start()
+        moment=datetime(2026,10,13,tzinfo=timezone.utc)
+        if scenario=='due':
+            core.runtime.wake_bus.emit(WakeSignalRequest(wake_source=WakeSource.SAFETY,
+                rule_id='synthetic-boundary',observed_at=moment,priority=100,dedupe_key='synthetic-boundary'))
+        if scenario=='summary':
+            from datetime import timedelta
+            core.model_handler=lambda _s:ModelDirective(response='synthetic setup only')
+            core.runtime.cognitive_runtime.model_handler=core.model_handler
+            # Current Core preserves eight recent turns and summarizes closed chunks
+            # of twelve older turns. Twenty setup turns exercise the normal trigger.
+            for i in range(1,21):
+                core.submit_user_turn(session_id='synthetic-53-session',turn_index=i,
+                    user_input='synthetic history '+str(i),occurred_at=moment+timedelta(seconds=i))
+            moment=moment+timedelta(seconds=21)
+        core.stop()
+        # Synthetic setup alters only a private test world; publish its state before running.
+        from tools.c15_persistence.backend import RunBackend
+        from r005.safe_runner import barrier
+        b=RunBackend.open(root,run_id='synthetic-53-run',session_id='synthetic-53-session')
+        barrier(b,repo,'synthetic-wake-staged');b.release()
+        spec={'mode':'due' if scenario=='due' else 'user','at':moment.isoformat(),'cursor':1,
+            'event_id':'synthetic-event-1','turn_index':21 if scenario=='summary' else 1,
+            'user_input':'' if scenario=='due' else 'synthetic USER bytes','timeout':30}
+        specpath=tmp_path/'operation.json';specpath.write_bytes(canonical_json_bytes(spec))
+        env=dict(os.environ,C15_PERSISTED_WORKSPACE=str(tmp_path))
+        runner=subprocess.Popen(entry()+['run',
+            '--root',str(root),'--run-id','synthetic-53-run','--session-id','synthetic-53-session',
+            '--operation',str(specpath),'--persistence-repo',str(repo)],
+            stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,env=env)
+        authorization_line=runner.stdout.readline()
+>       assert authorization_line.startswith('RESIDENT_PUBLISH_AUTHORIZATION=')
+E       AssertionError: assert False
+E        +  where False = <built-in method startswith of str object at 0x556473d24c70>('RESIDENT_PUBLISH_AUTHORIZATION=')
+E        +    where <built-in method startswith of str object at 0x556473d24c70> = ''.startswith
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py:78: AssertionError
+_______ test_real_core_external_publisher_with_c15_remote_barriers[user] _______
+
+tmp_path = PosixPath('/workspace/scratch/0abf0e48458e/full_pytest_fourth/test_real_core_external_publis1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff750bbbfe0>
+scenario = 'user'
+
+    @pytest.mark.parametrize('scenario',['due','user','summary'])
+    def test_real_core_external_publisher_with_c15_remote_barriers(tmp_path,monkeypatch,scenario):
+        root,repo=setup(tmp_path,monkeypatch)
+        world=root/'state/runtime/world.sqlite';index=root/'state/runtime/index.sqlite'
+        core=HeadlessCore(config=HeadlessConfig(world_path=world,index_path=index),
+            model_handler=lambda _s: (_ for _ in ()).throw(AssertionError('setup cannot decide'))).start()
+        moment=datetime(2026,10,13,tzinfo=timezone.utc)
+        if scenario=='due':
+            core.runtime.wake_bus.emit(WakeSignalRequest(wake_source=WakeSource.SAFETY,
+                rule_id='synthetic-boundary',observed_at=moment,priority=100,dedupe_key='synthetic-boundary'))
+        if scenario=='summary':
+            from datetime import timedelta
+            core.model_handler=lambda _s:ModelDirective(response='synthetic setup only')
+            core.runtime.cognitive_runtime.model_handler=core.model_handler
+            # Current Core preserves eight recent turns and summarizes closed chunks
+            # of twelve older turns. Twenty setup turns exercise the normal trigger.
+            for i in range(1,21):
+                core.submit_user_turn(session_id='synthetic-53-session',turn_index=i,
+                    user_input='synthetic history '+str(i),occurred_at=moment+timedelta(seconds=i))
+            moment=moment+timedelta(seconds=21)
+        core.stop()
+        # Synthetic setup alters only a private test world; publish its state before running.
+        from tools.c15_persistence.backend import RunBackend
+        from r005.safe_runner import barrier
+        b=RunBackend.open(root,run_id='synthetic-53-run',session_id='synthetic-53-session')
+        barrier(b,repo,'synthetic-wake-staged');b.release()
+        spec={'mode':'due' if scenario=='due' else 'user','at':moment.isoformat(),'cursor':1,
+            'event_id':'synthetic-event-1','turn_index':21 if scenario=='summary' else 1,
+            'user_input':'' if scenario=='due' else 'synthetic USER bytes','timeout':30}
+        specpath=tmp_path/'operation.json';specpath.write_bytes(canonical_json_bytes(spec))
+        env=dict(os.environ,C15_PERSISTED_WORKSPACE=str(tmp_path))
+        runner=subprocess.Popen(entry()+['run',
+            '--root',str(root),'--run-id','synthetic-53-run','--session-id','synthetic-53-session',
+            '--operation',str(specpath),'--persistence-repo',str(repo)],
+            stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,env=env)
+        authorization_line=runner.stdout.readline()
+>       assert authorization_line.startswith('RESIDENT_PUBLISH_AUTHORIZATION=')
+E       AssertionError: assert False
+E        +  where False = <built-in method startswith of str object at 0x556473d24c70>('RESIDENT_PUBLISH_AUTHORIZATION=')
+E        +    where <built-in method startswith of str object at 0x556473d24c70> = ''.startswith
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py:78: AssertionError
+_____ test_real_core_external_publisher_with_c15_remote_barriers[summary] ______
+
+tmp_path = PosixPath('/workspace/scratch/0abf0e48458e/full_pytest_fourth/test_real_core_external_publis2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff750b8dd60>
+scenario = 'summary'
+
+    @pytest.mark.parametrize('scenario',['due','user','summary'])
+    def test_real_core_external_publisher_with_c15_remote_barriers(tmp_path,monkeypatch,scenario):
+        root,repo=setup(tmp_path,monkeypatch)
+        world=root/'state/runtime/world.sqlite';index=root/'state/runtime/index.sqlite'
+        core=HeadlessCore(config=HeadlessConfig(world_path=world,index_path=index),
+            model_handler=lambda _s: (_ for _ in ()).throw(AssertionError('setup cannot decide'))).start()
+        moment=datetime(2026,10,13,tzinfo=timezone.utc)
+        if scenario=='due':
+            core.runtime.wake_bus.emit(WakeSignalRequest(wake_source=WakeSource.SAFETY,
+                rule_id='synthetic-boundary',observed_at=moment,priority=100,dedupe_key='synthetic-boundary'))
+        if scenario=='summary':
+            from datetime import timedelta
+            core.model_handler=lambda _s:ModelDirective(response='synthetic setup only')
+            core.runtime.cognitive_runtime.model_handler=core.model_handler
+            # Current Core preserves eight recent turns and summarizes closed chunks
+            # of twelve older turns. Twenty setup turns exercise the normal trigger.
+            for i in range(1,21):
+                core.submit_user_turn(session_id='synthetic-53-session',turn_index=i,
+                    user_input='synthetic history '+str(i),occurred_at=moment+timedelta(seconds=i))
+            moment=moment+timedelta(seconds=21)
+        core.stop()
+        # Synthetic setup alters only a private test world; publish its state before running.
+        from tools.c15_persistence.backend import RunBackend
+        from r005.safe_runner import barrier
+        b=RunBackend.open(root,run_id='synthetic-53-run',session_id='synthetic-53-session')
+        barrier(b,repo,'synthetic-wake-staged');b.release()
+        spec={'mode':'due' if scenario=='due' else 'user','at':moment.isoformat(),'cursor':1,
+            'event_id':'synthetic-event-1','turn_index':21 if scenario=='summary' else 1,
+            'user_input':'' if scenario=='due' else 'synthetic USER bytes','timeout':30}
+        specpath=tmp_path/'operation.json';specpath.write_bytes(canonical_json_bytes(spec))
+        env=dict(os.environ,C15_PERSISTED_WORKSPACE=str(tmp_path))
+        runner=subprocess.Popen(entry()+['run',
+            '--root',str(root),'--run-id','synthetic-53-run','--session-id','synthetic-53-session',
+            '--operation',str(specpath),'--persistence-repo',str(repo)],
+            stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,env=env)
+        authorization_line=runner.stdout.readline()
+>       assert authorization_line.startswith('RESIDENT_PUBLISH_AUTHORIZATION=')
+E       AssertionError: assert False
+E        +  where False = <built-in method startswith of str object at 0x556473d24c70>('RESIDENT_PUBLISH_AUTHORIZATION=')
+E        +    where <built-in method startswith of str object at 0x556473d24c70> = ''.startswith
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py:78: AssertionError
+=========================== short test summary info ============================
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_crash_recovery.py::test_sigkill_after_request_never_regenerates_or_redispatches
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers[due]
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers[user]
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers[summary]

@@ -1,0 +1,110 @@
+..F........................                                              [100%]
+=================================== FAILURES ===================================
+_____ test_real_core_external_publisher_with_c15_remote_barriers[summary] ______
+
+tmp_path = PosixPath('/workspace/scratch/0abf0e48458e/full_pytest_third/test_real_core_external_publis2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa10e8a7170>
+scenario = 'summary'
+
+    @pytest.mark.parametrize('scenario',['due','user','summary'])
+    def test_real_core_external_publisher_with_c15_remote_barriers(tmp_path,monkeypatch,scenario):
+        root,repo=setup(tmp_path,monkeypatch)
+        world=root/'state/runtime/world.sqlite';index=root/'state/runtime/index.sqlite'
+        core=HeadlessCore(config=HeadlessConfig(world_path=world,index_path=index),
+            model_handler=lambda _s: (_ for _ in ()).throw(AssertionError('setup cannot decide'))).start()
+        moment=datetime(2026,10,13,tzinfo=timezone.utc)
+        if scenario=='due':
+            core.runtime.wake_bus.emit(WakeSignalRequest(wake_source=WakeSource.SAFETY,
+                rule_id='synthetic-boundary',observed_at=moment,priority=100,dedupe_key='synthetic-boundary'))
+        if scenario=='summary':
+            from datetime import timedelta
+            core.model_handler=lambda _s:ModelDirective(response='synthetic setup only')
+            core.runtime.cognitive_runtime.model_handler=core.model_handler
+            for i in range(1,13):
+                core.submit_user_turn(session_id='synthetic-53-session',turn_index=i,
+                    user_input='synthetic history '+str(i),occurred_at=moment+timedelta(seconds=i))
+            moment=moment+timedelta(seconds=13)
+        core.stop()
+        # Synthetic setup alters only a private test world; publish its state before running.
+        from tools.c15_persistence.backend import RunBackend
+        from r005.safe_runner import barrier
+        b=RunBackend.open(root,run_id='synthetic-53-run',session_id='synthetic-53-session')
+        barrier(b,repo,'synthetic-wake-staged');b.release()
+        spec={'mode':'due' if scenario=='due' else 'user','at':moment.isoformat(),'cursor':1,
+            'event_id':'synthetic-event-1','turn_index':13 if scenario=='summary' else 1,
+            'user_input':'' if scenario=='due' else 'synthetic USER bytes','timeout':30}
+        specpath=tmp_path/'operation.json';specpath.write_bytes(canonical_json_bytes(spec))
+        env=dict(os.environ,C15_PERSISTED_WORKSPACE=str(tmp_path))
+        runner=subprocess.Popen(entry()+['run',
+            '--root',str(root),'--run-id','synthetic-53-run','--session-id','synthetic-53-session',
+            '--operation',str(specpath),'--persistence-repo',str(repo)],
+            stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,env=env)
+        authorization_line=runner.stdout.readline()
+        assert authorization_line.startswith('RESIDENT_PUBLISH_AUTHORIZATION=')
+        authorization=authorization_line.strip().split('=',1)[1]
+        answered=set();kinds=set();deadline=time.monotonic()+90
+        while runner.poll() is None and time.monotonic()<deadline:
+            for ready in (root/'mailbox/operations').glob('*/ready/*.json'):
+                exchange=ready.parent.parent;rid=ready.stem
+                if rid in answered:continue
+                b=ExchangeBridge(exchange);request=b.requests.payload(rid)
+                kinds.add(request['kind'])
+                if request['kind']=='model_directive':
+                    binding=request['body']['provenance_binding']
+                    directive={'silence':True,'provenance':binding} if scenario=='due' else {
+                        'response':'synthetic USER return','provenance':binding}
+                else:directive={'text':'synthetic Summary transport bytes'}
+                response={'response_version':1,'request_id':rid,'request_sha256':b.request_sha256(rid),
+                    'authored_by':'EXTERNAL_CURRENT_RESIDENT_SESSION',
+                    'directive':directive}
+                path=tmp_path/(rid+'.json');path.write_bytes(canonical_json_bytes(response))
+                base=entry()+['publish',
+                    '--exchange',str(exchange),'--request-id',rid,'--response',str(path),
+                    '--persistence-repo',str(repo)]
+                attack=subprocess.run(base,input='recovery-forged-authorization\n',capture_output=True,text=True,timeout=10)
+                assert attack.returncode!=0
+                assert 'external Resident authorization required' in attack.stderr
+                assert b.published_response_record(rid) is None
+                assert not (exchange/'proofs'/f'{rid}.json').exists()
+                completed=subprocess.run(base,
+                    input=authorization+'\n',capture_output=True,text=True,timeout=40)
+                assert completed.returncode==0,completed.stderr
+                published=json.loads(completed.stdout)
+                assert published['publisher_pid']!=os.getpid()
+                assert published['remote_commit']
+                assert b.responses.path_for(rid).read_bytes()==path.read_bytes()
+                answered.add(rid)
+            time.sleep(.02)
+        stdout,stderr=runner.communicate(timeout=5)
+        assert runner.returncode==0,stderr
+        results=[json.loads(stdout)]
+        assert answered
+        import sqlite3
+        db=sqlite3.connect(world)
+        signed_core_returns=sum(json.loads(p.read_bytes())['core_proof'] is not None
+            for p in (root/'mailbox/operations').glob('*/proofs/*.json'))
+        assert signed_core_returns>0
+        assert db.execute('SELECT COUNT(*) FROM background_model_response_receipts').fetchone()[0]==signed_core_returns
+        db.close()
+        reopened=RunBackend.open(root,run_id='synthetic-53-run',session_id='synthetic-53-session')
+        from tools.c15_persistence.relay import RelayJournal
+        j=RelayJournal(reopened)
+        for rid in j.request_ids():assert j.recovery(rid)['state']=='applied'
+        reopened.release()
+        before=world.read_bytes()
+        assert run(root,'synthetic-53-run','synthetic-53-session',repo,spec)==results[0]
+        assert world.read_bytes()==before
+        replay=subprocess.run(base,input='',capture_output=True,text=True,timeout=10)
+        assert replay.returncode==0,replay.stderr
+        assert json.loads(replay.stdout)['idempotent_replay'] is True
+        assert authorization.encode() not in b''.join(p.read_bytes() for p in root.rglob('*') if p.is_file())
+        channel=Path(json.loads((exchange/'service.json').read_bytes())['socket'])
+        assert authorization.encode() not in b''.join(p.read_bytes() for p in channel.rglob('*') if p.is_file())
+        assert (exchange/'runtime-handler-identity.json').is_file()
+>       if scenario=='summary':assert 'round_summary' in kinds
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 'round_summary' in {'model_directive'}
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py:137: AssertionError
+=========================== short test summary info ============================
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers[summary]

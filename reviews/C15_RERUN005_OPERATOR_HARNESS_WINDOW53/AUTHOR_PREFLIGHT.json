@@ -1,0 +1,14 @@
+{
+  "marker": "WINDOW53_AUTHOR_PREFLIGHT_PASS",
+  "tests": 38,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "junit_sha256": "4468a9abf8b034af11d53a167586be76d3186aea21c088e3a8a297109d355726",
+  "identity_sha256": "63f8e692d5f5121c4afb92d0f25e747b08dca6b764c6d8ef8a04e13654a4a04c",
+  "artifact_sha256": "689bdc3ea1fe4c7192006f89869fe2280bf92887af78e0ba78e151e175f32a4d",
+  "packet_sha256": "a87fc5cd926f9695cac359a77748903f5bbc48ad484ce630a3d4ff421d1c70c6",
+  "resident_launch_authorized": false,
+  "real_resident_started": false,
+  "disposition": "READY_FOR_FRESH_INDEPENDENT_ACCEPTANCE / DO NOT MERGE"
+}

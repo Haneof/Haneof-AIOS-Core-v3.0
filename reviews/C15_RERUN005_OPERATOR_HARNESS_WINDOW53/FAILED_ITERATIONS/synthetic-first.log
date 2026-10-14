@@ -1,0 +1,33 @@
+...............F                                                         [100%]
+=================================== FAILURES ===================================
+________ test_accepted_relay_requires_authentication_before_application ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_accepted_relay_requires_a0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6d8e6a42c0>
+
+    def test_accepted_relay_requires_authentication_before_application(tmp_path,monkeypatch):
+        from tools.c15_persistence import backend
+        from tools.c15_persistence.relay import RelayJournal,REQUEST_FIELDS
+        monkeypatch.setattr(backend,'WORKSPACE',tmp_path)
+>       b=backend.RunBackend.create(tmp_path/'synthetic-run',run_id='synthetic-run',
+            session_id='synthetic-session',subject_id='user_1',phase='SYNTHETIC')
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_mechanical_candidate.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/backend.py:277: in create
+    root = durable_root(root)
+           ^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/backend.py:199: in durable_root
+    require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ephemeral backend path: /tmp'
+
+    def require(condition: bool, reason: str) -> None:
+        if not condition:
+>           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ephemeral backend path: /tmp
+
+tools/c15_persistence/backend.py:132: BackendError
+=========================== short test summary info ============================
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_mechanical_candidate.py::test_accepted_relay_requires_authentication_before_application

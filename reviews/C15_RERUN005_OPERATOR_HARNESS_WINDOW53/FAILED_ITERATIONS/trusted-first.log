@@ -1,0 +1,41 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_real_core_external_publisher_with_c15_remote_barriers __________
+
+tmp_path = PosixPath('/workspace/scratch/0abf0e48458e/trusted_pytest/test_real_core_external_publis0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f96677edb20>
+
+    def test_real_core_external_publisher_with_c15_remote_barriers(tmp_path,monkeypatch):
+        root,repo=setup(tmp_path,monkeypatch)
+        world=root/'state/runtime/world.sqlite';index=root/'state/runtime/index.sqlite'
+        core=HeadlessCore(config=HeadlessConfig(world_path=world,index_path=index),
+            model_handler=lambda _s: (_ for _ in ()).throw(AssertionError('setup cannot decide'))).start()
+        moment=datetime(2026,10,13,tzinfo=timezone.utc)
+        core.runtime.wake_bus.emit(WakeSignalRequest(wake_source=WakeSource.SAFETY,
+            rule_id='synthetic-boundary',observed_at=moment,priority=100,dedupe_key='synthetic-boundary'))
+        core.stop()
+        # Synthetic setup alters only a private test world; publish its state before running.
+        from tools.c15_persistence.backend import RunBackend
+        from r005.safe_runner import barrier
+>       b=RunBackend.open(root,run_id='synthetic-53-run',session_id='synthetic-53-session')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/backend.py:392: in open
+    GenerationStore(backend).verify_all()
+tools/c15_persistence/backend.py:798: in verify_all
+    require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False
+reason = 'generation ledger is missing for non-empty immutable history'
+
+    def require(condition: bool, reason: str) -> None:
+        if not condition:
+>           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: generation ledger is missing for non-empty immutable history
+
+tools/c15_persistence/backend.py:132: BackendError
+=========================== short test summary info ============================
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers

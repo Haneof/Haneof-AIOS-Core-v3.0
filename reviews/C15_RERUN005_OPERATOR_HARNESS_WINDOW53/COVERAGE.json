@@ -1,0 +1,82 @@
+{
+  "classification": "OPERATOR_SYNTHETIC_PROTOCOL_ONLY_NOT_RESIDENT_ACCEPTANCE",
+  "cases": {
+    "Runner request publication / genuine RuntimeSnapshot": [
+      "test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers[due]",
+      "test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers[user]"
+    ],
+    "Resident response handoff / durable commit / verified consumption": [
+      "test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers"
+    ],
+    "actual Core receipt / RelayJournal applied / exact operation replay": [
+      "test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers"
+    ],
+    "normal due / normal USER / actual Summary": [
+      "test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers[due]",
+      "test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers[user]",
+      "test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers[summary]"
+    ],
+    "hash mismatch / stale identity / invalid schema rejected on actual Publisher path": [
+      "test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers"
+    ],
+    "duplicate response / conflict": [
+      "test_mechanical_candidate.py::test_duplicate_response_exact_idempotence_and_conflict",
+      "test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers"
+    ],
+    "fsync barriers / durability errors": [
+      "test_mechanical_candidate.py::test_durable_request_and_response_consumption",
+      "test_mechanical_candidate.py::test_durability_error_never_becomes_publication_success",
+      "test_mechanical_candidate.py::test_live_wal_busy_checkpoint_cannot_be_archived"
+    ],
+    "missing / altered / replaced responses / no fallback": [
+      "test_mechanical_candidate.py::test_missing_response_no_default_or_fallback",
+      "test_mechanical_candidate.py::test_tampering_fail_closed",
+      "test_crash_recovery.py::test_absent_external_response_bounded_fail_closed"
+    ],
+    "crash / restart / exact remote prefix / no second request": [
+      "test_crash_recovery.py::test_sigkill_after_request_never_regenerates_or_redispatches",
+      "test_mechanical_candidate.py::test_restart_reopens_same_outstanding_request"
+    ],
+    "import / executable / source / manifest substitution": [
+      "test_identity_delivery.py::test_identity_substitution_fails_before_start",
+      "test_identity_delivery.py::test_executable_substitution_rejected",
+      "test_identity_delivery.py::test_independent_location_exact_bytes_import_resolution"
+    ],
+    "scripted router reintroduction / static and dynamic closure": [
+      "test_identity_delivery.py::test_identity_substitution_fails_before_start[scripted_router]",
+      "test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers",
+      "DYNAMIC_TRACE.json"
+    ],
+    "Core trust-boundary / external credential / no local mint": [
+      "test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers",
+      "test_identity_delivery.py::test_signer_not_importable_in_recovery_caller",
+      "test_mechanical_candidate.py::test_core_zero_local_minting_authority",
+      "test_mechanical_candidate.py::test_accepted_relay_requires_authentication_before_application"
+    ],
+    "cross-sandbox exact artifact / full delivered USER chain": [
+      "test_artifact_delivery.py::test_exact_tar_into_independent_sandbox_runs_pinned_entry",
+      "test_artifact_delivery.py::test_artifact_substitution_rejected_before_materialization",
+      "test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers[delivered]"
+    ],
+    "ambiguous / nonfinite JSON": [
+      "test_mechanical_candidate.py::test_ambiguous_response_json_fails_closed"
+    ]
+  },
+  "production_forbidden_import_prefixes": [
+    "tools.c15_preflight",
+    "aios_core.headless.testing",
+    "tools.c15_persistence.provider",
+    "tools.c15_persistence.provider_process",
+    "tools.c15_persistence.synthetic_release",
+    "tools.c15_persistence.operator_session"
+  ],
+  "actual_static_scan_files": [
+    "launch.py",
+    "r005/cli.py",
+    "r005/safe_runner.py",
+    "r005/publisher_service.py",
+    "r005/payload.py"
+  ],
+  "static_proof": "Closed externally pinned file/hash set plus AST scan excludes entry ModelDirective construction, synthetic imports and user_input comparisons; schema parser construction receives external bytes only. Other byte changes fail before start.",
+  "dynamic_proof": "Actual runtime handler object checked against ExternalHandler; loaded module paths checked; no response until authenticated external CLI invocation; independently verified Core receipts; bounded timeout and SIGKILL leave no synthetic response."
+}

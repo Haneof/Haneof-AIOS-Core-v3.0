@@ -1,0 +1,17 @@
+{
+  "raw_failed_logs_preserved_exactly": true,
+  "raw_log_sha256": {
+    "final-barrier-tests.log": "34f65dac50eeacd3c84980c38ac2c7fb8a3043ef0021929ab684c6804c3194d8",
+    "full-fourth.log": "6f10ec568bb43f878a99c45d0c7cdbc3b5dd9b276e8d2050aa02ca9af8ed804f",
+    "full-second.log": "0b85c8c8293ca3f83424939d5aa26197b4ddc32ab14d8f694a81b2ba08a279e4",
+    "full-sixth.log": "38b0c3824f11f849200166b7ed14132e5dbcd123aa28c5ddd2ef8dcd87b8838c",
+    "full-third.log": "05ee5fc75c32e68a0c29b9be8ac3586521961738cc9fcc78ebeca45bb7cc0d98",
+    "synthetic-first.log": "38dba36a1c15e2f983c8663f8fdfdd40ec822ab6c60a11ebd1f4cbcff8cf4836",
+    "synthetic-second.log": "4af1e8f7b971154e73f022b91fe05776bb495d11564844d37e4efd39328d7a88",
+    "trusted-first.log": "5f8bc9378fe07ef25f54ac57326680f442d930f0fc4cab54adf59f6df8b88841",
+    "trusted-second.log": "290e36a47ccebff462f563069d0176d72de97821cfae772b5cd74b92bbf2ce97"
+  },
+  "diff_check": "PASS for source, packet, tests and other evidence; exact pytest traceback logs retain original trailing whitespace",
+  "protected_diff_files": [],
+  "candidate_before_operator_evidence_commit": "2a030943d2672c875502423f1c9f31d0dceed54a"
+}
