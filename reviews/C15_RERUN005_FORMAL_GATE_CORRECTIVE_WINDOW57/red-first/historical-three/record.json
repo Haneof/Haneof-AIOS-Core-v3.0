@@ -1,0 +1,28 @@
+{
+  "classification": "DEVELOPMENT_ONLY_NOT_FORMAL_ACCEPTANCE",
+  "command": [
+    "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+    "-m",
+    "pytest",
+    "reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_artifact_delivery.py",
+    "reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_identity_delivery.py::test_signer_not_importable_in_recovery_caller",
+    "--basetemp=/workspace/scratch/b59abdecf5a1/redtmp/pytest",
+    "--junitxml=/workspace/scratch/b59abdecf5a1/repo/reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/red-first/historical-three.xml",
+    "-vv"
+  ],
+  "cwd": "/workspace/scratch/b59abdecf5a1/redrepo",
+  "environment": {
+    "APPROVED53_PYTHON": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONPATH": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness:src:.",
+    "TMPDIR": "/workspace/scratch/b59abdecf5a1/redtmp"
+  },
+  "exit_code": 1,
+  "finished": "2026-10-15T01:57:46.875448+00:00",
+  "git_head": "adf391178d7494ed17e1db802a31f001fb3b5f3b",
+  "logs": {
+    "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout": "2b86daa85372268c0f5b7fd92037377192983333bd87a7af64eaf203f8aa0674"
+  },
+  "started": "2026-10-15T01:57:45.781849+00:00"
+}

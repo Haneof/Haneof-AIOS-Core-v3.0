@@ -1,0 +1,24 @@
+{
+  "classification": "DEVELOPMENT_ONLY_NOT_FORMAL_ACCEPTANCE",
+  "command": [
+    "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+    "-B",
+    "reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/build_delivery.py"
+  ],
+  "cwd": "/workspace/scratch/b59abdecf5a1/repo",
+  "environment": {},
+  "exit_code": 0,
+  "finished": "2026-10-15T02:09:04.558526+00:00",
+  "git_head": "adf391178d7494ed17e1db802a31f001fb3b5f3b",
+  "logs": {
+    "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout": "70d649a369491d2942cc97b4f61fda4de6752b8ccd50a9f0193c87d56442954c"
+  },
+  "started": "2026-10-15T02:09:04.471093+00:00",
+  "tested_source_sha256": {
+    "/workspace/scratch/b59abdecf5a1/repo/reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/build_delivery.py": "149763e1acbd3c02a2da84e34bbdf2b1f8608bd1a5588af0296a87d18affb8bf",
+    "/workspace/scratch/b59abdecf5a1/repo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/RESIDENT_SAFE_LAUNCH_PACKET.json": "04123169ec305273bd971f6254acb66f4bfdccf9bcce29d52e3d93d9fadf5e0c",
+    "/workspace/scratch/b59abdecf5a1/repo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/artifacts/resident-harness.tar.gz": "e3afa5bcf5f55667767fecac5151f3cf53c69950fabeb11c47c7cded4cc4f222",
+    "/workspace/scratch/b59abdecf5a1/repo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/IDENTITY.json": "ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd"
+  }
+}

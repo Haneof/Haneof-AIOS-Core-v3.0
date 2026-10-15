@@ -1,0 +1,82 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /workspace/scratch/b59abdecf5a1/redrepo
+configfile: pyproject.toml
+collecting ... collected 3 items
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_artifact_delivery.py::test_exact_tar_into_independent_sandbox_runs_pinned_entry FAILED [ 33%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_artifact_delivery.py::test_artifact_substitution_rejected_before_materialization FAILED [ 66%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_identity_delivery.py::test_signer_not_importable_in_recovery_caller FAILED [100%]
+
+=================================== FAILURES ===================================
+__________ test_exact_tar_into_independent_sandbox_runs_pinned_entry ___________
+
+tmp_path = PosixPath('/workspace/scratch/b59abdecf5a1/redtmp/pytest/test_exact_tar_into_independen0')
+
+    def test_exact_tar_into_independent_sandbox_runs_pinned_entry(tmp_path):
+        artifact=BASE/'artifacts/resident-harness.tar.gz'
+>       target,result=materialize(tmp_path,artifact)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_artifact_delivery.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/workspace/scratch/b59abdecf5a1/redtmp/pytest/test_exact_tar_into_independen0')
+artifact = PosixPath('/workspace/scratch/b59abdecf5a1/redrepo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/artifacts/resident-harness.tar.gz')
+
+    def materialize(tmp_path,artifact):
+        target=tmp_path/'delivery'
+        env=dict(os.environ,ARTIFACT=str(artifact),DELIVERY_DIR=str(target))
+>       result=subprocess.run(['bash','-c',PACKET['cross_sandbox_harness_materialization']['materialization_command']],
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            env=env,capture_output=True,text=True,timeout=15)
+E       KeyError: 'cross_sandbox_harness_materialization'
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_artifact_delivery.py:16: KeyError
+__________ test_artifact_substitution_rejected_before_materialization __________
+
+tmp_path = PosixPath('/workspace/scratch/b59abdecf5a1/redtmp/pytest/test_artifact_substitution_rej0')
+
+    def test_artifact_substitution_rejected_before_materialization(tmp_path):
+        artifact=tmp_path/'tampered.tar.gz'
+>       artifact.write_bytes((BASE/'artifacts/resident-harness.tar.gz').read_bytes()+b'replaced')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_artifact_delivery.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/python/lib/python3.12/pathlib.py:1019: in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/workspace/scratch/b59abdecf5a1/redrepo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/artifacts/resident-harness.tar.gz')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/workspace/scratch/b59abdecf5a1/redrepo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/artifacts/resident-harness.tar.gz'
+
+/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/python/lib/python3.12/pathlib.py:1013: FileNotFoundError
+________________ test_signer_not_importable_in_recovery_caller _________________
+
+    def test_signer_not_importable_in_recovery_caller():
+>       with pytest.raises(ImportError):__import__('r005.publisher_service')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'ImportError'>
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_identity_delivery.py:55: Failed
+- generated xml file: /workspace/scratch/b59abdecf5a1/repo/reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/red-first/historical-three.xml -
+=========================== short test summary info ============================
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_artifact_delivery.py::test_exact_tar_into_independent_sandbox_runs_pinned_entry
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_artifact_delivery.py::test_artifact_substitution_rejected_before_materialization
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_identity_delivery.py::test_signer_not_importable_in_recovery_caller
+============================== 3 failed in 0.77s ===============================

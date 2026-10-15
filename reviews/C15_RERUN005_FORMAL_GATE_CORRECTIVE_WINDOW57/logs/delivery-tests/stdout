@@ -1,0 +1,32 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /workspace/scratch/b59abdecf5a1/repo
+configfile: pyproject.toml
+collecting ... collected 22 items
+
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_exact_identity_and_closed_members PASSED [  4%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_independent_full_source_materialization_and_pinned_verify PASSED [  9%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_transport_tampering_fails_before_destination[append] PASSED [ 13%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_transport_tampering_fails_before_destination[truncate] PASSED [ 18%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_transport_tampering_fails_before_destination[flip] PASSED [ 22%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[duplicate] PASSED [ 27%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[traversal] PASSED [ 31%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[absolute] PASSED [ 36%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[symlink] PASSED [ 40%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[hardlink] PASSED [ 45%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[fifo] PASSED [ 50%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[mode] PASSED [ 54%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[hash] PASSED [ 59%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[missing] PASSED [ 63%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[extra] PASSED [ 68%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_every_existing_target_fails_without_changes[directory] PASSED [ 72%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_every_existing_target_fails_without_changes[file] PASSED [ 77%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_every_existing_target_fails_without_changes[dangling_symlink] PASSED [ 81%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_every_existing_target_fails_without_changes[directory_symlink] PASSED [ 86%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_symlink_parent_rejected PASSED [ 90%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_parallel_materialization_has_one_winner PASSED [ 95%]
+reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py::test_packet_is_pending_and_excludes_historical_material PASSED [100%]
+
+- generated xml file: /workspace/scratch/b59abdecf5a1/repo/reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/logs/delivery-tests.xml -
+============================== 22 passed in 1.97s ==============================

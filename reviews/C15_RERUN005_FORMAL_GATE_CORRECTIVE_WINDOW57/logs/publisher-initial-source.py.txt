@@ -1,0 +1,75 @@
+"""Partial route-B attacks. These never assert system-level equivalence."""
+import ast
+import importlib
+import inspect
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import pytest
+
+REPO = Path(__file__).resolve().parents[2]
+HARN = REPO/'reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness'
+sys.path.insert(0,str(REPO/'src'))
+sys.path.insert(0,str(REPO))
+sys.path.insert(0,str(HARN))
+publisher = importlib.import_module('r005.publisher_service')
+
+def test_import_exposes_no_existing_private_key_or_sign_closure():
+    # Narrow, checkable claim: import is inert; no live Publisher private state.
+    assert {'d','p','q','n','key_id','sign','dispatch','authorization_by_request'}.isdisjoint(vars(publisher))
+    assert publisher.main.__closure__ is None
+    assert 'sign' not in vars(publisher)
+    assert not any(inspect.isfunction(v) and v.__closure__ for v in vars(publisher).values())
+
+def test_private_key_and_sign_definition_are_local_to_main():
+    tree = ast.parse((HARN/'r005/publisher_service.py').read_bytes())
+    main = next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name == 'main')
+    assert not any(isinstance(n,(ast.Global,ast.Nonlocal)) for n in ast.walk(main))
+    functions = {n.name for n in main.body if isinstance(n,ast.FunctionDef)}
+    assert {'dispatch','sign','runner_is_live'} <= functions
+    assert not {'sign','dispatch','runner_is_live'} & {n.name for n in tree.body if isinstance(n,ast.FunctionDef)}
+    # Every sign call in this frozen implementation is inside publish dispatch.
+    dispatch = next(n for n in main.body if isinstance(n,ast.FunctionDef) and n.name == 'dispatch')
+    all_sign = [n for n in ast.walk(tree) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name) and n.func.id == 'sign']
+    dispatch_sign = [n for n in ast.walk(dispatch) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name) and n.func.id == 'sign']
+    assert len(all_sign) == len(dispatch_sign) == 2
+
+@pytest.mark.parametrize('claim',['service-argv','env-role','env-pinned-launch'])
+def test_imported_main_cannot_gain_existing_authority_by_role_claim(tmp_path,claim):
+    # No mocking of loaded_modules/peer/process identity to manufacture a green gate.
+    script = '''import os,sys
+sys.path[:0]=sys.argv[1:4]
+import r005.publisher_service as publisher
+root=sys.argv[4]
+os.environ.update(AIOS53_SOURCE_REPO=sys.argv[2], AIOS53_LAUNCH=sys.argv[1]+'/launch.py')
+sys.argv=['publisher_service',root,root+'/publisher.sock',str(os.getpid()),'0','forged-instance','forged-operation','0']
+publisher.main()
+'''
+    env = dict(os.environ,PYTHONDONTWRITEBYTECODE='1')
+    if claim == 'env-role':env['PUBLISHER_PROCESS_ROLE'] = 'trusted'
+    if claim == 'env-pinned-launch':
+        env['AIOS53_IDENTITY_SHA'] = __import__('hashlib').sha256((HARN/'IDENTITY.json').read_bytes()).hexdigest()
+    result = subprocess.run([sys.executable,'-I','-c',script,str(HARN),str(REPO),str(REPO/'src'),str(tmp_path)],
+                            env=env,capture_output=True,text=True,timeout=10)
+    assert result.returncode != 0
+    assert 'VERIFIED_BOOTSTRAP_REQUIRED' in result.stderr
+    assert list(tmp_path.iterdir()) == []
+
+def test_registration_identity_checks_have_no_role_environment_fallback():
+    source = (HARN/'r005/registration_ipc.py').read_text()+(HARN/'r005/registration.py').read_text()
+    assert 'SO_PEERCRED' in source
+    assert 'require_runner_peer' in source
+    assert 'os.environ' not in source and 'getenv(' not in source
+
+def test_rsa_verifier_rejects_unsigned_and_substituted_key_proofs():
+    from aios_core.runtime.late_return import LateReturnVerifier
+    # Synthetic verifier, not genuine Publisher key. Does NOT prove live signing isolation.
+    verifier = LateReturnVerifier(key_id='synthetic-approved-publisher',algorithm='rsa-pkcs1v15-sha256',
+        modulus_hex=format((1<<2047)+1,'x'),public_exponent=65537)
+    fields = dict(attempt_id='a',subject_id='s',work_kind='w',work_id='i',model_round_index=0,
+        outbound_request_fingerprint='f',relay_id='r',provider='external-resident',model='s',
+        provider_request_id='r',response_fingerprint='h',payload_sha256='h')
+    assert not verifier.verify(proof='bglate_rsa_v1:attacker-key:'+('01'*256),**fields)
+    assert not verifier.verify(proof='bglate_rsa_v1:synthetic-approved-publisher:'+('00'*256),**fields)
