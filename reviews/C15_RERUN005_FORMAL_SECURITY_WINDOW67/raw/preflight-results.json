@@ -1,0 +1,106 @@
+{
+  "python_version": {
+    "status": "PASS",
+    "detail": true
+  },
+  "python_executable_hash": {
+    "status": "PASS",
+    "detail": true
+  },
+  "kernel": {
+    "status": "PASS",
+    "detail": "6.8.0-1064-azure"
+  },
+  "pid_proc": {
+    "status": "PASS",
+    "detail": true
+  },
+  "pidfd": {
+    "status": "PASS",
+    "detail": true
+  },
+  "AF_UNIX_SO_PEERCRED": {
+    "status": "PASS",
+    "detail": [
+      29194,
+      1000,
+      1000
+    ]
+  },
+  "disposable_SIGKILL": {
+    "status": "PASS",
+    "detail": true
+  },
+  "no_controlling_tty": {
+    "status": "PASS",
+    "detail": true
+  },
+  "UID_999": {
+    "status": "BLOCKED",
+    "detail": ""
+  },
+  "UID_999_no_sudo": {
+    "status": "PASS",
+    "detail": true
+  },
+  "UID_996": {
+    "status": "BLOCKED",
+    "detail": ""
+  },
+  "UID_996_no_sudo": {
+    "status": "PASS",
+    "detail": true
+  },
+  "trust_anchor_metadata": {
+    "status": "PASS",
+    "detail": {
+      "/var/lib/aios-window65/trust/issuer.pub": {
+        "uid": 0,
+        "gid": 0,
+        "mode": "0o444",
+        "sha256": "ea4f5d1c3fd4711bbb954a3943bddd6cdf0cda205403bd7219329d9b7e026cb8"
+      },
+      "/var/lib/aios-window65/trust/resident.pub": {
+        "uid": 0,
+        "gid": 0,
+        "mode": "0o444",
+        "sha256": "c851f10901a55b89313e35d327991a68a13f41670f7f80625745b95fe860d0f8"
+      }
+    }
+  },
+  "manifest_sha256": {
+    "status": "PASS",
+    "detail": true
+  },
+  "artifact_sha256": {
+    "status": "PASS",
+    "detail": true
+  },
+  "packet_sha256": {
+    "status": "PASS",
+    "detail": true
+  },
+  "closed_archive_final_tree": {
+    "status": "PASS",
+    "detail": {
+      "members": 22,
+      "all_bytes_match_final_candidate": true
+    }
+  },
+  "core_c15_source_bytes": {
+    "status": "PASS",
+    "detail": 97
+  },
+  "core_c15_unchanged": {
+    "status": "PASS",
+    "detail": true
+  },
+  "approved_scope": {
+    "status": "PASS",
+    "detail": true
+  },
+  "author_evidence_hashes": {
+    "status": "PASS",
+    "detail": 179
+  }
+}

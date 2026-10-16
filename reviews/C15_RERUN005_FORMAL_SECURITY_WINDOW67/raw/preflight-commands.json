@@ -1,0 +1,64 @@
+[
+  {
+    "argv": [
+      "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+      "-c",
+      "import os,json; r={'pid':os.getpid(),'sid':os.getsid(0),'stdin_tty':os.isatty(0)};\ntry: os.open('/dev/tty',os.O_RDONLY);r['tty_open']=True\nexcept OSError:r['tty_open']=False\nprint(json.dumps(r))"
+    ],
+    "returncode": 0,
+    "stdout": "{\"pid\": 29196, \"sid\": 29196, \"stdin_tty\": true, \"tty_open\": false}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "sudo",
+      "-n",
+      "-u",
+      "#999",
+      "id"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "sudo: a password is required\n"
+  },
+  {
+    "argv": [
+      "sudo",
+      "-n",
+      "-u",
+      "#999",
+      "sudo",
+      "-n",
+      "true"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "sudo: a password is required\n"
+  },
+  {
+    "argv": [
+      "sudo",
+      "-n",
+      "-u",
+      "#996",
+      "id"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "sudo: a password is required\n"
+  },
+  {
+    "argv": [
+      "sudo",
+      "-n",
+      "-u",
+      "#996",
+      "sudo",
+      "-n",
+      "true"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "sudo: a password is required\n"
+  }
+]

@@ -1,0 +1,1167 @@
+{
+  "status": {
+    "WINDOW": 67,
+    "ROLE": "INDEPENDENT_FORMAL_SECURITY_VALIDATION",
+    "CANDIDATE_HEAD": "6fb725407569bc719c049587f67fe65e797eb734",
+    "CANDIDATE_TREE": "f9adc59f53f9599bc5ee9d4f3a7448d0b0f0bbe4",
+    "PR_370_UNCHANGED": "YES",
+    "PR_367_UNCHANGED": "YES",
+    "QUALIFIED_LINUX": "PASS",
+    "APPROVED_RUNTIME": "PASS",
+    "ARTIFACT_IDENTITY": "PASS",
+    "ENROLLMENT_AUTHORITY": "BLOCKED",
+    "RESIDENT_PRIVATE_KEY_ISOLATION": "PASS",
+    "PUBLISHER_SIGNING_ISOLATION": "BLOCKED",
+    "SIGNED_RESPONSE_AUTHORIZATION": "BLOCKED",
+    "AF_UNIX_IDENTITY_BOUNDARY": "BLOCKED",
+    "UNATTENDED_USER": "BLOCKED",
+    "UNATTENDED_DUE": "BLOCKED",
+    "UNATTENDED_SUMMARY": "BLOCKED",
+    "UNATTENDED_DELIVERED": "BLOCKED",
+    "NEGATIVE_SIGNATURE_TESTS": "BLOCKED",
+    "REPLAY_AND_RETIREMENT": "BLOCKED",
+    "REAL_CORE_C15_REMOTE_CAS": "BLOCKED",
+    "SIGKILL_RECOVERY": "BLOCKED",
+    "CROSS_ENVIRONMENT_DELIVERY": "BLOCKED",
+    "ORIGINAL_38": "31 PASS / 7 FAIL / 0 SKIP",
+    "WINDOW55_REGRESSION": "33 PASS / 0 FAIL",
+    "WINDOW57_REGRESSION": "29 PASS / 0 FAIL",
+    "PM54_BLK_001": "UNVERIFIED",
+    "PM54_BLK_002": "UNVERIFIED",
+    "PM54_BLK_003": "UNVERIFIED",
+    "PUBLISHER_IMPORT_EQUIVALENCE": "UNVERIFIED",
+    "NEW_SECURITY_BLOCKERS": "0 confirmed new code defects; 3 validation blockers; 7 binding historical regression failures",
+    "EVIDENCE_PUBLICATION": "PENDING",
+    "FORMAL_DISPOSITION": "FORMAL_VALIDATION_FAIL",
+    "INDEPENDENT_ACCEPTANCE": "NOT_STARTED",
+    "REAL_RESIDENT_STARTED": "NO",
+    "CURSOR_1_REVEALED": "NO",
+    "DO_NOT_MERGE": "YES"
+  },
+  "suites": {
+    "original38": {
+      "tests": 38,
+      "pass": 31,
+      "fail": 7,
+      "skip": 0,
+      "exit_code": 1,
+      "cases": [
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_artifact_delivery::test_exact_tar_into_independent_sandbox_runs_pinned_entry",
+          "name": "test_exact_tar_into_independent_sandbox_runs_pinned_entry",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_artifact_delivery::test_artifact_substitution_rejected_before_materialization",
+          "name": "test_artifact_substitution_rejected_before_materialization",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_crash_recovery::test_sigkill_after_request_never_regenerates_or_redispatches",
+          "name": "test_sigkill_after_request_never_regenerates_or_redispatches",
+          "outcome": "FAIL",
+          "message": "AssertionError: Traceback (most recent call last):\n    File \"<string>\", line 6, in <module>\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 604, in _main\n      publisher_main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py\", line 106, in main\n      resident_tty_fd = None if signed is not None else open_resident_terminal()\n                                                        ^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py\", line 18, in open_resident_terminal\n      fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  OSError: [Errno 6] No such device or address: '/dev/tty'\n  Traceback (most recent call last):\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 608, in _main\n      main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py\", line 32, in main\n      elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py\", line 339, in run\n      require(proc.poll() is None,'external publisher service exited')\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/tools/c15_persistence/backend.py\", line 132, in require\n      raise BackendError(reason)\n  tools.c15_persistence.backend.BackendError: external publisher service exited\n  \nassert False\n +  where False = <built-in method startswith of str object at 0x61aa264b8c70>('RESIDENT_PUBLISH_AUTHORIZATION=')\n +    where <built-in method startswith of str object at 0x61aa264b8c70> = ''.startswith"
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_crash_recovery::test_absent_external_response_bounded_fail_closed",
+          "name": "test_absent_external_response_bounded_fail_closed",
+          "outcome": "FAIL",
+          "message": "assert 'response wait expired' in 'Traceback (most recent call last):\\n  File \"<string>\", line 6, in <module>\\n  File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\\n    _main()\\n  File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 604, in _main\\n    publisher_main()\\n  File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py\", line 106, in main\\n    resident_tty_fd = None if signed is not None else open_resident_terminal()\\n                                                      ^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py\", line 18, in open_resident_terminal\\n    fd = os.open(\\'/dev/tty\\', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, \\'O_CLOEXEC\\', 0))\\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^...r_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\\n    _main()\\n  File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 608, in _main\\n    main()\\n  File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py\", line 32, in main\\n    elif a.command==\\'run\\':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))\\n                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py\", line 339, in run\\n    require(proc.poll() is None,\\'external publisher service exited\\')\\n  File \"/workspaces/window67-evidence-20261016T2053Z/candidate/tools/c15_persistence/backend.py\", line 132, in require\\n    raise BackendError(reason)\\ntools.c15_persistence.backend.BackendError: external publisher service exited\\n'"
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_current_trusted_adapter::test_real_core_external_publisher_with_c15_remote_barriers[due]",
+          "name": "test_real_core_external_publisher_with_c15_remote_barriers[due]",
+          "outcome": "FAIL",
+          "message": "AssertionError: Traceback (most recent call last):\n    File \"<string>\", line 6, in <module>\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 604, in _main\n      publisher_main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py\", line 106, in main\n      resident_tty_fd = None if signed is not None else open_resident_terminal()\n                                                        ^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py\", line 18, in open_resident_terminal\n      fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  OSError: [Errno 6] No such device or address: '/dev/tty'\n  Traceback (most recent call last):\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 608, in _main\n      main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py\", line 32, in main\n      elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py\", line 339, in run\n      require(proc.poll() is None,'external publisher service exited')\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/tools/c15_persistence/backend.py\", line 132, in require\n      raise BackendError(reason)\n  tools.c15_persistence.backend.BackendError: external publisher service exited\n  \nassert False\n +  where False = <built-in method startswith of str object at 0x61aa264b8c70>('RESIDENT_PUBLISH_AUTHORIZATION=')\n +    where <built-in method startswith of str object at 0x61aa264b8c70> = ''.startswith"
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_current_trusted_adapter::test_real_core_external_publisher_with_c15_remote_barriers[user]",
+          "name": "test_real_core_external_publisher_with_c15_remote_barriers[user]",
+          "outcome": "FAIL",
+          "message": "AssertionError: Traceback (most recent call last):\n    File \"<string>\", line 6, in <module>\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 604, in _main\n      publisher_main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py\", line 106, in main\n      resident_tty_fd = None if signed is not None else open_resident_terminal()\n                                                        ^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py\", line 18, in open_resident_terminal\n      fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  OSError: [Errno 6] No such device or address: '/dev/tty'\n  Traceback (most recent call last):\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 608, in _main\n      main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py\", line 32, in main\n      elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py\", line 339, in run\n      require(proc.poll() is None,'external publisher service exited')\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/tools/c15_persistence/backend.py\", line 132, in require\n      raise BackendError(reason)\n  tools.c15_persistence.backend.BackendError: external publisher service exited\n  \nassert False\n +  where False = <built-in method startswith of str object at 0x61aa264b8c70>('RESIDENT_PUBLISH_AUTHORIZATION=')\n +    where <built-in method startswith of str object at 0x61aa264b8c70> = ''.startswith"
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_current_trusted_adapter::test_real_core_external_publisher_with_c15_remote_barriers[summary]",
+          "name": "test_real_core_external_publisher_with_c15_remote_barriers[summary]",
+          "outcome": "FAIL",
+          "message": "AssertionError: Traceback (most recent call last):\n    File \"<string>\", line 6, in <module>\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 604, in _main\n      publisher_main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py\", line 106, in main\n      resident_tty_fd = None if signed is not None else open_resident_terminal()\n                                                        ^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py\", line 18, in open_resident_terminal\n      fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  OSError: [Errno 6] No such device or address: '/dev/tty'\n  Traceback (most recent call last):\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 608, in _main\n      main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py\", line 32, in main\n      elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py\", line 339, in run\n      require(proc.poll() is None,'external publisher service exited')\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/tools/c15_persistence/backend.py\", line 132, in require\n      raise BackendError(reason)\n  tools.c15_persistence.backend.BackendError: external publisher service exited\n  \nassert False\n +  where False = <built-in method startswith of str object at 0x61aa264b8c70>('RESIDENT_PUBLISH_AUTHORIZATION=')\n +    where <built-in method startswith of str object at 0x61aa264b8c70> = ''.startswith"
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_current_trusted_adapter::test_real_core_external_publisher_with_c15_remote_barriers[delivered]",
+          "name": "test_real_core_external_publisher_with_c15_remote_barriers[delivered]",
+          "outcome": "FAIL",
+          "message": "AssertionError: Traceback (most recent call last):\n    File \"<string>\", line 6, in <module>\n    File \"/workspaces/window67-evidence-20261016T2053Z/original38-tmp/test_real_core_external_publis3/delivery/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/original38-tmp/test_real_core_external_publis3/delivery/harness/launch.py\", line 604, in _main\n      publisher_main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/original38-tmp/test_real_core_external_publis3/delivery/harness/r005/publisher_service.py\", line 106, in main\n      resident_tty_fd = None if signed is not None else open_resident_terminal()\n                                                        ^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/original38-tmp/test_real_core_external_publis3/delivery/harness/r005/response_authorization.py\", line 18, in open_resident_terminal\n      fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  OSError: [Errno 6] No such device or address: '/dev/tty'\n  Traceback (most recent call last):\n    File \"/workspaces/window67-evidence-20261016T2053Z/original38-tmp/test_real_core_external_publis3/delivery/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/original38-tmp/test_real_core_external_publis3/delivery/harness/launch.py\", line 608, in _main\n      main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/original38-tmp/test_real_core_external_publis3/delivery/harness/r005/cli.py\", line 32, in main\n      elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/original38-tmp/test_real_core_external_publis3/delivery/harness/r005/safe_runner.py\", line 339, in run\n      require(proc.poll() is None,'external publisher service exited')\n    File \"/workspaces/window67-evidence-20261016T2053Z/candidate/tools/c15_persistence/backend.py\", line 132, in require\n      raise BackendError(reason)\n  tools.c15_persistence.backend.BackendError: external publisher service exited\n  \nassert False\n +  where False = <built-in method startswith of str object at 0x61aa264b8c70>('RESIDENT_PUBLISH_AUTHORIZATION=')\n +    where <built-in method startswith of str object at 0x61aa264b8c70> = ''.startswith"
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery::test_independent_location_exact_bytes_import_resolution",
+          "name": "test_independent_location_exact_bytes_import_resolution",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery::test_identity_substitution_fails_before_start[source]",
+          "name": "test_identity_substitution_fails_before_start[source]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery::test_identity_substitution_fails_before_start[manifest]",
+          "name": "test_identity_substitution_fails_before_start[manifest]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery::test_identity_substitution_fails_before_start[added_file]",
+          "name": "test_identity_substitution_fails_before_start[added_file]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery::test_identity_substitution_fails_before_start[scripted_router]",
+          "name": "test_identity_substitution_fails_before_start[scripted_router]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery::test_executable_substitution_rejected",
+          "name": "test_executable_substitution_rejected",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery::test_signer_not_importable_in_recovery_caller",
+          "name": "test_signer_not_importable_in_recovery_caller",
+          "outcome": "FAIL",
+          "message": "Failed: DID NOT RAISE <class 'ImportError'>"
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_durable_request_and_response_consumption",
+          "name": "test_durable_request_and_response_consumption",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_duplicate_response_exact_idempotence_and_conflict",
+          "name": "test_duplicate_response_exact_idempotence_and_conflict",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_stale_response_rejected",
+          "name": "test_stale_response_rejected",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_hash_identity_mismatch[request_id]",
+          "name": "test_hash_identity_mismatch[request_id]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_hash_identity_mismatch[request_sha256]",
+          "name": "test_hash_identity_mismatch[request_sha256]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_invalid_directive_rejected_before_publication",
+          "name": "test_invalid_directive_rejected_before_publication",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_missing_response_no_default_or_fallback",
+          "name": "test_missing_response_no_default_or_fallback",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_tampering_fail_closed[request]",
+          "name": "test_tampering_fail_closed[request]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_tampering_fail_closed[response]",
+          "name": "test_tampering_fail_closed[response]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_tampering_fail_closed[ledger]",
+          "name": "test_tampering_fail_closed[ledger]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_restart_reopens_same_outstanding_request",
+          "name": "test_restart_reopens_same_outstanding_request",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_core_zero_local_minting_authority",
+          "name": "test_core_zero_local_minting_authority",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_actual_user_runner_waits_for_external_bytes",
+          "name": "test_actual_user_runner_waits_for_external_bytes",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_actual_due_work_empty_entry",
+          "name": "test_actual_due_work_empty_entry",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_actual_due_work_live_return_has_no_core_authenticity",
+          "name": "test_actual_due_work_live_return_has_no_core_authenticity",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_historical_publisher_envelope_is_not_schema_proof",
+          "name": "test_historical_publisher_envelope_is_not_schema_proof",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_accepted_relay_requires_authentication_before_application",
+          "name": "test_accepted_relay_requires_authentication_before_application",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_ambiguous_response_json_fails_closed[{\"response_version\":1,\"response_version\":1}]",
+          "name": "test_ambiguous_response_json_fails_closed[{\"response_version\":1,\"response_version\":1}]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_ambiguous_response_json_fails_closed[{\"x\":NaN}]",
+          "name": "test_ambiguous_response_json_fails_closed[{\"x\":NaN}]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_durability_error_never_becomes_publication_success[request]",
+          "name": "test_durability_error_never_becomes_publication_success[request]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_durability_error_never_becomes_publication_success[response]",
+          "name": "test_durability_error_never_becomes_publication_success[response]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_durability_error_never_becomes_publication_success[response_replay]",
+          "name": "test_durability_error_never_becomes_publication_success[response_replay]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_live_wal_busy_checkpoint_cannot_be_archived",
+          "name": "test_live_wal_busy_checkpoint_cannot_be_archived",
+          "outcome": "PASS",
+          "message": null
+        }
+      ]
+    },
+    "window55": {
+      "tests": 33,
+      "pass": 33,
+      "fail": 0,
+      "skip": 0,
+      "exit_code": 0,
+      "cases": [
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_completion.CompletionTests::test_fault_after_local_result_write_leaves_only_candidate_not_complete",
+          "name": "test_fault_after_local_result_write_leaves_only_candidate_not_complete",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_completion.CompletionTests::test_fault_after_remote_commit_preconfirmation_is_recoverable_candidate",
+          "name": "test_fault_after_remote_commit_preconfirmation_is_recoverable_candidate",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_completion.CompletionTests::test_fault_before_local_result_write_leaves_started_state",
+          "name": "test_fault_before_local_result_write_leaves_started_state",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_completion.CompletionTests::test_finalize_rechecks_current_disk_candidate_before_local_confirmation",
+          "name": "test_finalize_rechecks_current_disk_candidate_before_local_confirmation",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_completion.CompletionTests::test_operation_and_result_tampering_or_replay_mismatch_fails",
+          "name": "test_operation_and_result_tampering_or_replay_mismatch_fails",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_completion.CompletionTests::test_remote_bytes_must_match_before_local_completion",
+          "name": "test_remote_bytes_must_match_before_local_completion",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_completion.CompletionTests::test_write_candidate_requires_exact_started_operation_marker",
+          "name": "test_write_candidate_requires_exact_started_operation_marker",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_harness_identity.HarnessIdentityTests::test_actual_repository_protected_trees_match_pinned_identity",
+          "name": "test_actual_repository_protected_trees_match_pinned_identity",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_harness_identity.HarnessIdentityTests::test_detects_same_bytes_inode_replacement_after_initial_snapshot",
+          "name": "test_detects_same_bytes_inode_replacement_after_initial_snapshot",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_harness_identity.HarnessIdentityTests::test_full_harness_core_and_c15_trees_scan_as_closed_identity",
+          "name": "test_full_harness_core_and_c15_trees_scan_as_closed_identity",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_harness_identity.HarnessIdentityTests::test_private_finder_imports_from_snapshots_and_rejects_module_substitution",
+          "name": "test_private_finder_imports_from_snapshots_and_rejects_module_substitution",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_harness_identity.HarnessIdentityTests::test_rechecks_inode_and_rejects_path_replacement_after_verified_read",
+          "name": "test_rechecks_inode_and_rejects_path_replacement_after_verified_read",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_harness_identity.HarnessIdentityTests::test_rejects_directory_mode_drift",
+          "name": "test_rejects_directory_mode_drift",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_harness_identity.HarnessIdentityTests::test_rejects_same_device_mount_overlay_inside_protected_root",
+          "name": "test_rejects_same_device_mount_overlay_inside_protected_root",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_harness_identity.HarnessIdentityTests::test_rejects_symlink_and_hardlink_aliases",
+          "name": "test_rejects_symlink_and_hardlink_aliases",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_harness_identity.HarnessIdentityTests::test_rejects_unapproved_pyc_so_python_and_package_overlay",
+          "name": "test_rejects_unapproved_pyc_so_python_and_package_overlay",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_launch_bootstrap.LaunchBootstrapTests::test_exact_bootstrap_bytes_execute_in_real_main_namespace",
+          "name": "test_exact_bootstrap_bytes_execute_in_real_main_namespace",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_launch_bootstrap.LaunchBootstrapTests::test_tampered_bootstrap_bytes_are_never_executed",
+          "name": "test_tampered_bootstrap_bytes_are_never_executed",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_publisher_authorization.PublisherAuthorizationTests::test_authorization_is_bound_to_request_runner_instance_and_operation",
+          "name": "test_authorization_is_bound_to_request_runner_instance_and_operation",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_publisher_authorization.PublisherAuthorizationTests::test_capability_disclosure_writes_to_terminal_descriptor",
+          "name": "test_capability_disclosure_writes_to_terminal_descriptor",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_publisher_authorization.PublisherAuthorizationTests::test_capability_is_one_use_and_not_reissued_for_a_registered_request",
+          "name": "test_capability_is_one_use_and_not_reissued_for_a_registered_request",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_registration.RegistrationTests::test_client_refuses_pid_only_publisher_identity_fallback",
+          "name": "test_client_refuses_pid_only_publisher_identity_fallback",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_registration.RegistrationTests::test_contextless_foreground_and_summary_have_narrow_shapes",
+          "name": "test_contextless_foreground_and_summary_have_narrow_shapes",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_registration.RegistrationTests::test_dead_or_restarted_runner_cannot_reuse_capability",
+          "name": "test_dead_or_restarted_runner_cannot_reuse_capability",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_registration.RegistrationTests::test_genuine_runner_registration_is_bound_and_one_shot",
+          "name": "test_genuine_runner_registration_is_bound_and_one_shot",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_registration.RegistrationTests::test_rpc_authenticates_publisher_pid_and_process_start_time",
+          "name": "test_rpc_authenticates_publisher_pid_and_process_start_time",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_registration.RegistrationTests::test_same_uid_child_knowing_real_pid_cannot_register",
+          "name": "test_same_uid_child_knowing_real_pid_cannot_register",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_registration.RegistrationTests::test_unregistered_request_has_no_registration_capability",
+          "name": "test_unregistered_request_has_no_registration_capability",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_registration.RegistrationTests::test_wrong_operation_instance_attempt_and_provenance_are_rejected",
+          "name": "test_wrong_operation_instance_attempt_and_provenance_are_rejected",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_remote_completion.RemoteCompletionTests::test_cas_race_during_git_push_fails_closed_without_completion",
+          "name": "test_cas_race_during_git_push_fails_closed_without_completion",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_remote_completion.RemoteCompletionTests::test_remote_candidate_is_bound_to_exact_operation_and_result",
+          "name": "test_remote_candidate_is_bound_to_exact_operation_and_result",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_remote_completion.RemoteCompletionTests::test_remote_commit_before_local_confirmation_recovers_without_redispatch",
+          "name": "test_remote_commit_before_local_confirmation_recovers_without_redispatch",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_OPERATOR_HARNESS_WINDOW55.tests.test_syntax.SyntaxTests::test_all_protected_and_window55_python_sources_compile",
+          "name": "test_all_protected_and_window55_python_sources_compile",
+          "outcome": "PASS",
+          "message": null
+        }
+      ]
+    },
+    "window57": {
+      "tests": 29,
+      "pass": 29,
+      "fail": 0,
+      "skip": 0,
+      "exit_code": 0,
+      "cases": [
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_exact_identity_and_closed_members",
+          "name": "test_exact_identity_and_closed_members",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_independent_full_source_materialization_and_pinned_verify",
+          "name": "test_independent_full_source_materialization_and_pinned_verify",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_transport_tampering_fails_before_destination[append]",
+          "name": "test_transport_tampering_fails_before_destination[append]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_transport_tampering_fails_before_destination[truncate]",
+          "name": "test_transport_tampering_fails_before_destination[truncate]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_transport_tampering_fails_before_destination[flip]",
+          "name": "test_transport_tampering_fails_before_destination[flip]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[duplicate]",
+          "name": "test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[duplicate]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[traversal]",
+          "name": "test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[traversal]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[absolute]",
+          "name": "test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[absolute]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[symlink]",
+          "name": "test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[symlink]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[hardlink]",
+          "name": "test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[hardlink]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[fifo]",
+          "name": "test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[fifo]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[mode]",
+          "name": "test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[mode]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[hash]",
+          "name": "test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[hash]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[missing]",
+          "name": "test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[missing]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[extra]",
+          "name": "test_member_validator_rejects_malicious_archive_even_with_rebound_outer_digest[extra]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_every_existing_target_fails_without_changes[directory]",
+          "name": "test_every_existing_target_fails_without_changes[directory]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_every_existing_target_fails_without_changes[file]",
+          "name": "test_every_existing_target_fails_without_changes[file]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_every_existing_target_fails_without_changes[dangling_symlink]",
+          "name": "test_every_existing_target_fails_without_changes[dangling_symlink]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_every_existing_target_fails_without_changes[directory_symlink]",
+          "name": "test_every_existing_target_fails_without_changes[directory_symlink]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_symlink_parent_rejected",
+          "name": "test_symlink_parent_rejected",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_parallel_materialization_has_one_winner",
+          "name": "test_parallel_materialization_has_one_winner",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_delivery::test_packet_is_pending_and_excludes_historical_material",
+          "name": "test_packet_is_pending_and_excludes_historical_material",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_publisher_contract::test_import_exposes_no_existing_private_key_or_sign_closure",
+          "name": "test_import_exposes_no_existing_private_key_or_sign_closure",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_publisher_contract::test_private_key_and_sign_definition_are_local_to_main",
+          "name": "test_private_key_and_sign_definition_are_local_to_main",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_publisher_contract::test_imported_main_cannot_gain_existing_authority_by_role_claim[service-argv]",
+          "name": "test_imported_main_cannot_gain_existing_authority_by_role_claim[service-argv]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_publisher_contract::test_imported_main_cannot_gain_existing_authority_by_role_claim[env-role]",
+          "name": "test_imported_main_cannot_gain_existing_authority_by_role_claim[env-role]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_publisher_contract::test_imported_main_cannot_gain_existing_authority_by_role_claim[env-pinned-launch]",
+          "name": "test_imported_main_cannot_gain_existing_authority_by_role_claim[env-pinned-launch]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_publisher_contract::test_registration_identity_checks_have_no_role_environment_fallback",
+          "name": "test_registration_identity_checks_have_no_role_environment_fallback",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57.test_publisher_contract::test_rsa_verifier_rejects_unsigned_and_substituted_key_proofs",
+          "name": "test_rsa_verifier_rejects_unsigned_and_substituted_key_proofs",
+          "outcome": "PASS",
+          "message": null
+        }
+      ]
+    },
+    "parent-original38": {
+      "tests": 38,
+      "pass": 31,
+      "fail": 7,
+      "skip": 0,
+      "exit_code": 1,
+      "cases": [
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_artifact_delivery::test_exact_tar_into_independent_sandbox_runs_pinned_entry",
+          "name": "test_exact_tar_into_independent_sandbox_runs_pinned_entry",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_artifact_delivery::test_artifact_substitution_rejected_before_materialization",
+          "name": "test_artifact_substitution_rejected_before_materialization",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_crash_recovery::test_sigkill_after_request_never_regenerates_or_redispatches",
+          "name": "test_sigkill_after_request_never_regenerates_or_redispatches",
+          "outcome": "FAIL",
+          "message": "AssertionError: Traceback (most recent call last):\n    File \"<string>\", line 6, in <module>\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 604, in _main\n      publisher_main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py\", line 102, in main\n      resident_tty_fd = open_resident_terminal()\n                        ^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py\", line 18, in open_resident_terminal\n      fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  OSError: [Errno 6] No such device or address: '/dev/tty'\n  Traceback (most recent call last):\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 608, in _main\n      main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py\", line 32, in main\n      elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py\", line 333, in run\n      require(proc.poll() is None,'external publisher service exited')\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/tools/c15_persistence/backend.py\", line 132, in require\n      raise BackendError(reason)\n  tools.c15_persistence.backend.BackendError: external publisher service exited\n  \nassert False\n +  where False = <built-in method startswith of str object at 0x606c77bcbc70>('RESIDENT_PUBLISH_AUTHORIZATION=')\n +    where <built-in method startswith of str object at 0x606c77bcbc70> = ''.startswith"
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_crash_recovery::test_absent_external_response_bounded_fail_closed",
+          "name": "test_absent_external_response_bounded_fail_closed",
+          "outcome": "FAIL",
+          "message": "assert 'response wait expired' in 'Traceback (most recent call last):\\n  File \"<string>\", line 6, in <module>\\n  File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\\n    _main()\\n  File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 604, in _main\\n    publisher_main()\\n  File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py\", line 102, in main\\n    resident_tty_fd = open_resident_terminal()\\n                      ^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py\", line 18, in open_resident_terminal\\n    fd = os.open(\\'/dev/tty\\', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, \\'O_CLOEXEC\\', 0))\\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\nOSError: [Errno 6...ES-A-RERUN-005/harness/launch.py\", line 612, in <module>\\n    _main()\\n  File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 608, in _main\\n    main()\\n  File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py\", line 32, in main\\n    elif a.command==\\'run\\':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))\\n                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py\", line 333, in run\\n    require(proc.poll() is None,\\'external publisher service exited\\')\\n  File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/tools/c15_persistence/backend.py\", line 132, in require\\n    raise BackendError(reason)\\ntools.c15_persistence.backend.BackendError: external publisher service exited\\n'"
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_current_trusted_adapter::test_real_core_external_publisher_with_c15_remote_barriers[due]",
+          "name": "test_real_core_external_publisher_with_c15_remote_barriers[due]",
+          "outcome": "FAIL",
+          "message": "AssertionError: Traceback (most recent call last):\n    File \"<string>\", line 6, in <module>\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 604, in _main\n      publisher_main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py\", line 102, in main\n      resident_tty_fd = open_resident_terminal()\n                        ^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py\", line 18, in open_resident_terminal\n      fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  OSError: [Errno 6] No such device or address: '/dev/tty'\n  Traceback (most recent call last):\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 608, in _main\n      main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py\", line 32, in main\n      elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py\", line 333, in run\n      require(proc.poll() is None,'external publisher service exited')\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/tools/c15_persistence/backend.py\", line 132, in require\n      raise BackendError(reason)\n  tools.c15_persistence.backend.BackendError: external publisher service exited\n  \nassert False\n +  where False = <built-in method startswith of str object at 0x606c77bcbc70>('RESIDENT_PUBLISH_AUTHORIZATION=')\n +    where <built-in method startswith of str object at 0x606c77bcbc70> = ''.startswith"
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_current_trusted_adapter::test_real_core_external_publisher_with_c15_remote_barriers[user]",
+          "name": "test_real_core_external_publisher_with_c15_remote_barriers[user]",
+          "outcome": "FAIL",
+          "message": "AssertionError: Traceback (most recent call last):\n    File \"<string>\", line 6, in <module>\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 604, in _main\n      publisher_main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py\", line 102, in main\n      resident_tty_fd = open_resident_terminal()\n                        ^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py\", line 18, in open_resident_terminal\n      fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  OSError: [Errno 6] No such device or address: '/dev/tty'\n  Traceback (most recent call last):\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 608, in _main\n      main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py\", line 32, in main\n      elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py\", line 333, in run\n      require(proc.poll() is None,'external publisher service exited')\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/tools/c15_persistence/backend.py\", line 132, in require\n      raise BackendError(reason)\n  tools.c15_persistence.backend.BackendError: external publisher service exited\n  \nassert False\n +  where False = <built-in method startswith of str object at 0x606c77bcbc70>('RESIDENT_PUBLISH_AUTHORIZATION=')\n +    where <built-in method startswith of str object at 0x606c77bcbc70> = ''.startswith"
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_current_trusted_adapter::test_real_core_external_publisher_with_c15_remote_barriers[summary]",
+          "name": "test_real_core_external_publisher_with_c15_remote_barriers[summary]",
+          "outcome": "FAIL",
+          "message": "AssertionError: Traceback (most recent call last):\n    File \"<string>\", line 6, in <module>\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 604, in _main\n      publisher_main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py\", line 102, in main\n      resident_tty_fd = open_resident_terminal()\n                        ^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py\", line 18, in open_resident_terminal\n      fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  OSError: [Errno 6] No such device or address: '/dev/tty'\n  Traceback (most recent call last):\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py\", line 608, in _main\n      main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py\", line 32, in main\n      elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py\", line 333, in run\n      require(proc.poll() is None,'external publisher service exited')\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/tools/c15_persistence/backend.py\", line 132, in require\n      raise BackendError(reason)\n  tools.c15_persistence.backend.BackendError: external publisher service exited\n  \nassert False\n +  where False = <built-in method startswith of str object at 0x606c77bcbc70>('RESIDENT_PUBLISH_AUTHORIZATION=')\n +    where <built-in method startswith of str object at 0x606c77bcbc70> = ''.startswith"
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_current_trusted_adapter::test_real_core_external_publisher_with_c15_remote_barriers[delivered]",
+          "name": "test_real_core_external_publisher_with_c15_remote_barriers[delivered]",
+          "outcome": "FAIL",
+          "message": "AssertionError: Traceback (most recent call last):\n    File \"<string>\", line 6, in <module>\n    File \"/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/launch.py\", line 604, in _main\n      publisher_main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/r005/publisher_service.py\", line 102, in main\n      resident_tty_fd = open_resident_terminal()\n                        ^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/r005/response_authorization.py\", line 18, in open_resident_terminal\n      fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  OSError: [Errno 6] No such device or address: '/dev/tty'\n  Traceback (most recent call last):\n    File \"/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/launch.py\", line 612, in <module>\n      _main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/launch.py\", line 608, in _main\n      main()\n    File \"/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/r005/cli.py\", line 32, in main\n      elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/r005/safe_runner.py\", line 333, in run\n      require(proc.poll() is None,'external publisher service exited')\n    File \"/workspaces/window67-evidence-20261016T2053Z/frozen-parent/tools/c15_persistence/backend.py\", line 132, in require\n      raise BackendError(reason)\n  tools.c15_persistence.backend.BackendError: external publisher service exited\n  \nassert False\n +  where False = <built-in method startswith of str object at 0x606c77bcbc70>('RESIDENT_PUBLISH_AUTHORIZATION=')\n +    where <built-in method startswith of str object at 0x606c77bcbc70> = ''.startswith"
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery::test_independent_location_exact_bytes_import_resolution",
+          "name": "test_independent_location_exact_bytes_import_resolution",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery::test_identity_substitution_fails_before_start[source]",
+          "name": "test_identity_substitution_fails_before_start[source]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery::test_identity_substitution_fails_before_start[manifest]",
+          "name": "test_identity_substitution_fails_before_start[manifest]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery::test_identity_substitution_fails_before_start[added_file]",
+          "name": "test_identity_substitution_fails_before_start[added_file]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery::test_identity_substitution_fails_before_start[scripted_router]",
+          "name": "test_identity_substitution_fails_before_start[scripted_router]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery::test_executable_substitution_rejected",
+          "name": "test_executable_substitution_rejected",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery::test_signer_not_importable_in_recovery_caller",
+          "name": "test_signer_not_importable_in_recovery_caller",
+          "outcome": "FAIL",
+          "message": "Failed: DID NOT RAISE <class 'ImportError'>"
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_durable_request_and_response_consumption",
+          "name": "test_durable_request_and_response_consumption",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_duplicate_response_exact_idempotence_and_conflict",
+          "name": "test_duplicate_response_exact_idempotence_and_conflict",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_stale_response_rejected",
+          "name": "test_stale_response_rejected",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_hash_identity_mismatch[request_id]",
+          "name": "test_hash_identity_mismatch[request_id]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_hash_identity_mismatch[request_sha256]",
+          "name": "test_hash_identity_mismatch[request_sha256]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_invalid_directive_rejected_before_publication",
+          "name": "test_invalid_directive_rejected_before_publication",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_missing_response_no_default_or_fallback",
+          "name": "test_missing_response_no_default_or_fallback",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_tampering_fail_closed[request]",
+          "name": "test_tampering_fail_closed[request]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_tampering_fail_closed[response]",
+          "name": "test_tampering_fail_closed[response]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_tampering_fail_closed[ledger]",
+          "name": "test_tampering_fail_closed[ledger]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_restart_reopens_same_outstanding_request",
+          "name": "test_restart_reopens_same_outstanding_request",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_core_zero_local_minting_authority",
+          "name": "test_core_zero_local_minting_authority",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_actual_user_runner_waits_for_external_bytes",
+          "name": "test_actual_user_runner_waits_for_external_bytes",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_actual_due_work_empty_entry",
+          "name": "test_actual_due_work_empty_entry",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_actual_due_work_live_return_has_no_core_authenticity",
+          "name": "test_actual_due_work_live_return_has_no_core_authenticity",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_historical_publisher_envelope_is_not_schema_proof",
+          "name": "test_historical_publisher_envelope_is_not_schema_proof",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_accepted_relay_requires_authentication_before_application",
+          "name": "test_accepted_relay_requires_authentication_before_application",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_ambiguous_response_json_fails_closed[{\"response_version\":1,\"response_version\":1}]",
+          "name": "test_ambiguous_response_json_fails_closed[{\"response_version\":1,\"response_version\":1}]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_ambiguous_response_json_fails_closed[{\"x\":NaN}]",
+          "name": "test_ambiguous_response_json_fails_closed[{\"x\":NaN}]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_durability_error_never_becomes_publication_success[request]",
+          "name": "test_durability_error_never_becomes_publication_success[request]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_durability_error_never_becomes_publication_success[response]",
+          "name": "test_durability_error_never_becomes_publication_success[response]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_durability_error_never_becomes_publication_success[response_replay]",
+          "name": "test_durability_error_never_becomes_publication_success[response_replay]",
+          "outcome": "PASS",
+          "message": null
+        },
+        {
+          "id": "reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate::test_live_wal_busy_checkpoint_cannot_be_archived",
+          "name": "test_live_wal_busy_checkpoint_cannot_be_archived",
+          "outcome": "PASS",
+          "message": null
+        }
+      ]
+    }
+  },
+  "preflight": {
+    "python_version": {
+      "status": "PASS",
+      "detail": true
+    },
+    "python_executable_hash": {
+      "status": "PASS",
+      "detail": true
+    },
+    "kernel": {
+      "status": "PASS",
+      "detail": "6.8.0-1064-azure"
+    },
+    "pid_proc": {
+      "status": "PASS",
+      "detail": true
+    },
+    "pidfd": {
+      "status": "PASS",
+      "detail": true
+    },
+    "AF_UNIX_SO_PEERCRED": {
+      "status": "PASS",
+      "detail": [
+        29194,
+        1000,
+        1000
+      ]
+    },
+    "disposable_SIGKILL": {
+      "status": "PASS",
+      "detail": true
+    },
+    "no_controlling_tty": {
+      "status": "PASS",
+      "detail": true
+    },
+    "UID_999": {
+      "status": "BLOCKED",
+      "detail": ""
+    },
+    "UID_999_no_sudo": {
+      "status": "PASS",
+      "detail": true
+    },
+    "UID_996": {
+      "status": "BLOCKED",
+      "detail": ""
+    },
+    "UID_996_no_sudo": {
+      "status": "PASS",
+      "detail": true
+    },
+    "trust_anchor_metadata": {
+      "status": "PASS",
+      "detail": {
+        "/var/lib/aios-window65/trust/issuer.pub": {
+          "uid": 0,
+          "gid": 0,
+          "mode": "0o444",
+          "sha256": "ea4f5d1c3fd4711bbb954a3943bddd6cdf0cda205403bd7219329d9b7e026cb8"
+        },
+        "/var/lib/aios-window65/trust/resident.pub": {
+          "uid": 0,
+          "gid": 0,
+          "mode": "0o444",
+          "sha256": "c851f10901a55b89313e35d327991a68a13f41670f7f80625745b95fe860d0f8"
+        }
+      }
+    },
+    "manifest_sha256": {
+      "status": "PASS",
+      "detail": true
+    },
+    "artifact_sha256": {
+      "status": "PASS",
+      "detail": true
+    },
+    "packet_sha256": {
+      "status": "PASS",
+      "detail": true
+    },
+    "closed_archive_final_tree": {
+      "status": "PASS",
+      "detail": {
+        "members": 22,
+        "all_bytes_match_final_candidate": true
+      }
+    },
+    "core_c15_source_bytes": {
+      "status": "PASS",
+      "detail": 97
+    },
+    "core_c15_unchanged": {
+      "status": "PASS",
+      "detail": true
+    },
+    "approved_scope": {
+      "status": "PASS",
+      "detail": true
+    },
+    "author_evidence_hashes": {
+      "status": "PASS",
+      "detail": 179
+    }
+  },
+  "isolation": {
+    "probes": [
+      {
+        "uid_requested": 999,
+        "argv_code": "import os,json; r={'uid':os.getuid(),'gid':os.getgid(),'groups':os.getgroups()}; paths=['/var/lib/aios-window65/operator', '/var/lib/aios-window65/AIOS_RESIDENT_TEST'];\nfor p in paths:\n try:f=os.open(p,os.O_RDONLY|os.O_DIRECTORY);os.close(f);r[p]='ACCESSIBLE'\n except PermissionError:r[p]='DENIED'\nprint(json.dumps(r))",
+        "returncode": 0,
+        "stdout": "{\"uid\": 999, \"gid\": 984, \"groups\": [], \"/var/lib/aios-window65/operator\": \"DENIED\", \"/var/lib/aios-window65/AIOS_RESIDENT_TEST\": \"DENIED\"}\n",
+        "stderr": "",
+        "sudo_returncode": 1,
+        "sudo_stderr": "sudo: a password is required\n"
+      },
+      {
+        "uid_requested": 996,
+        "argv_code": "import os,json; r={'uid':os.getuid(),'gid':os.getgid(),'groups':os.getgroups()}; paths=['/var/lib/aios-window65/operator', '/var/lib/aios-window65/AIOS_RUNNER_TEST'];\nfor p in paths:\n try:f=os.open(p,os.O_RDONLY|os.O_DIRECTORY);os.close(f);r[p]='ACCESSIBLE'\n except PermissionError:r[p]='DENIED'\nprint(json.dumps(r))",
+        "returncode": 0,
+        "stdout": "{\"uid\": 996, \"gid\": 983, \"groups\": [], \"/var/lib/aios-window65/operator\": \"DENIED\", \"/var/lib/aios-window65/AIOS_RUNNER_TEST\": \"DENIED\"}\n",
+        "stderr": "",
+        "sudo_returncode": 1,
+        "sudo_stderr": "sudo: a password is required\n"
+      }
+    ],
+    "protected_metadata_only": [
+      {
+        "path": "/var/lib/aios-window65/operator/issuer-canary",
+        "uid": 0,
+        "gid": 0,
+        "mode": "0o644",
+        "type": "file"
+      },
+      {
+        "path": "/var/lib/aios-window65/operator/wrong.key",
+        "uid": 0,
+        "gid": 0,
+        "mode": "0o600",
+        "type": "file"
+      },
+      {
+        "path": "/var/lib/aios-window65/operator/issuer.key",
+        "uid": 0,
+        "gid": 0,
+        "mode": "0o600",
+        "type": "file"
+      },
+      {
+        "path": "/var/lib/aios-window65/AIOS_RUNNER_TEST/private",
+        "uid": 999,
+        "gid": 984,
+        "mode": "0o700",
+        "type": "dir"
+      },
+      {
+        "path": "/var/lib/aios-window65/AIOS_RUNNER_TEST/private/consumed-0123456789abcdef0123456789abcdef",
+        "uid": 999,
+        "gid": 984,
+        "mode": "0o600",
+        "type": "file"
+      },
+      {
+        "path": "/var/lib/aios-window65/AIOS_RUNNER_TEST/private/received.json",
+        "uid": 999,
+        "gid": 984,
+        "mode": "0o600",
+        "type": "file"
+      },
+      {
+        "path": "/var/lib/aios-window65/AIOS_RUNNER_TEST/private/isolation-canary",
+        "uid": 999,
+        "gid": 984,
+        "mode": "0o600",
+        "type": "file"
+      },
+      {
+        "path": "/var/lib/aios-window65/AIOS_RUNNER_TEST/private/received.sig",
+        "uid": 999,
+        "gid": 984,
+        "mode": "0o600",
+        "type": "file"
+      },
+      {
+        "path": "/var/lib/aios-window65/AIOS_RESIDENT_TEST/private",
+        "uid": 996,
+        "gid": 983,
+        "mode": "0o700",
+        "type": "dir"
+      },
+      {
+        "path": "/var/lib/aios-window65/AIOS_RESIDENT_TEST/private/transport-message.json",
+        "uid": 996,
+        "gid": 983,
+        "mode": "0o600",
+        "type": "file"
+      },
+      {
+        "path": "/var/lib/aios-window65/AIOS_RESIDENT_TEST/private/transport-message.sig",
+        "uid": 996,
+        "gid": 983,
+        "mode": "0o600",
+        "type": "file"
+      },
+      {
+        "path": "/var/lib/aios-window65/AIOS_RESIDENT_TEST/private/resident.pub",
+        "uid": 996,
+        "gid": 983,
+        "mode": "0o600",
+        "type": "file"
+      },
+      {
+        "path": "/var/lib/aios-window65/AIOS_RESIDENT_TEST/private/outside.sig",
+        "uid": 996,
+        "gid": 983,
+        "mode": "0o600",
+        "type": "file"
+      },
+      {
+        "path": "/var/lib/aios-window65/AIOS_RESIDENT_TEST/private/isolation-canary",
+        "uid": 996,
+        "gid": 983,
+        "mode": "0o600",
+        "type": "file"
+      },
+      {
+        "path": "/var/lib/aios-window65/AIOS_RESIDENT_TEST/private/message.sig",
+        "uid": 996,
+        "gid": 983,
+        "mode": "0o600",
+        "type": "file"
+      },
+      {
+        "path": "/var/lib/aios-window65/AIOS_RESIDENT_TEST/private/resident.key",
+        "uid": 996,
+        "gid": 983,
+        "mode": "0o600",
+        "type": "file"
+      }
+    ]
+  },
+  "blockers": [
+    {
+      "id": "W67-VAL-001",
+      "type": "AUTHORIZATION_BLOCKED",
+      "detail": "No newly issued short-lived Window67 TEST_ONLY response enrollment was provided by the authorized Operator. Existing Window66 grants are not reused; Reviewer did not open Operator private key, issue a grant or create a trust root. Gates B/C/D/E requiring a valid new operation remain blocked."
+    },
+    {
+      "id": "W67-VAL-002",
+      "type": "BINDING_REGRESSION_FAIL",
+      "detail": "Seven original assertions fail independently and remain binding pending PM adjudication. No skip/xfail/assertion changes. Matching baseline failures, if any, do not turn this candidate PASS."
+    },
+    {
+      "id": "W67-VAL-003",
+      "type": "CROSS_ENVIRONMENT_BLOCKED",
+      "detail": "Existing fuzzy robot reached VS Code Restricted Mode. No trust/security setting was changed and no cross-environment materialization was executed. Same-host directory materialization is recorded separately."
+    }
+  ],
+  "created_utc": "2026-10-16T21:28:51.727955+00:00"
+}

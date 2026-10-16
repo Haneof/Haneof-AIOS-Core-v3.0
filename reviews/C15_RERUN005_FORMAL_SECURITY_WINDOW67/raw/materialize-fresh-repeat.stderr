@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/C15_RERUN005_SIGNED_TTYLESS_WINDOW66/materialize.py", line 112, in <module>
+    materialize(sys.argv[1], sys.argv[2], sys.argv[3], json.loads(sys.argv[4]))
+  File "/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/C15_RERUN005_SIGNED_TTYLESS_WINDOW66/materialize.py", line 77, in materialize
+    os.mkdir(target.name, 0o755, dir_fd=parent)
+FileExistsError: [Errno 17] File exists: 'materialized-fresh'

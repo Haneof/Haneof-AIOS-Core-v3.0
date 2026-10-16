@@ -1,0 +1,25 @@
+{
+  "window": 67,
+  "head": "6fb725407569bc719c049587f67fe65e797eb734",
+  "tree": "f9adc59f53f9599bc5ee9d4f3a7448d0b0f0bbe4",
+  "parents": [
+    "9d3b19b0e7bf090e5d472d9781b9156f73ea2088"
+  ],
+  "pr370_final": {
+    "headRefName": "c15-rerun005-signed-ttyless-window66",
+    "headRefOid": "6fb725407569bc719c049587f67fe65e797eb734",
+    "isDraft": true,
+    "state": "OPEN"
+  },
+  "pr367_final": {
+    "headRefName": "c15-rerun005-formal-gate-corrective-003-window57",
+    "headRefOid": "9d3b19b0e7bf090e5d472d9781b9156f73ea2088",
+    "isDraft": true,
+    "state": "OPEN"
+  },
+  "tracked_engineering_diff": [],
+  "source": "actual verbose space couscous VS Code terminal",
+  "artifact_sha256": "82aa3ff81d9492e0828934b5744adf4129fb6dc1361303a537379a603a319de3",
+  "packet_sha256": "023c7556de1bcd4d4b0caccb90b0fa65d0b8a9b783f41f30574dfbb12e8f6b34",
+  "manifest_sha256": "364cc03617fcd782327b3307720baf5371839185b1b07b71476308af74c5a817"
+}

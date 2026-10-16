@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="7" skipped="0" tests="38" time="34.226" timestamp="2026-10-16T21:27:52.248177+00:00" hostname="codespaces-1996ee"><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_artifact_delivery" name="test_exact_tar_into_independent_sandbox_runs_pinned_entry" time="2.067" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_artifact_delivery" name="test_artifact_substitution_rejected_before_materialization" time="0.050" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_crash_recovery" name="test_sigkill_after_request_never_regenerates_or_redispatches" time="4.390"><failure message="AssertionError: Traceback (most recent call last):&#10;    File &quot;&lt;string&gt;&quot;, line 6, in &lt;module&gt;&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 612, in &lt;module&gt;&#10;      _main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 604, in _main&#10;      publisher_main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py&quot;, line 102, in main&#10;      resident_tty_fd = open_resident_terminal()&#10;                        ^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py&quot;, line 18, in open_resident_terminal&#10;      fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))&#10;           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  OSError: [Errno 6] No such device or address: '/dev/tty'&#10;  Traceback (most recent call last):&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 612, in &lt;module&gt;&#10;      _main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 608, in _main&#10;      main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py&quot;, line 32, in main&#10;      elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))&#10;                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py&quot;, line 333, in run&#10;      require(proc.poll() is None,'external publisher service exited')&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/tools/c15_persistence/backend.py&quot;, line 132, in require&#10;      raise BackendError(reason)&#10;  tools.c15_persistence.backend.BackendError: external publisher service exited&#10;  &#10;assert False&#10; +  where False = &lt;built-in method startswith of str object at 0x606c77bcbc70&gt;('RESIDENT_PUBLISH_AUTHORIZATION=')&#10; +    where &lt;built-in method startswith of str object at 0x606c77bcbc70&gt; = ''.startswith">tmp_path = PosixPath('/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_sigkill_after_request_nev0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x74bd001bfe60&gt;
+
+    def test_sigkill_after_request_never_regenerates_or_redispatches(tmp_path,monkeypatch):
+        root,repo=setup(tmp_path,monkeypatch)
+        spec={'mode':'user','at':'2026-10-13T00:00:00+00:00','cursor':1,
+            'event_id':'synthetic-crash-event','turn_index':1,'user_input':'synthetic pending request','timeout':30}
+        path=tmp_path/'operation.json';path.write_bytes(canonical_json_bytes(spec))
+        command=entry()+['run','--root',str(root),'--run-id','synthetic-53-run',
+            '--session-id','synthetic-53-session','--operation',str(path),'--persistence-repo',str(repo)]
+        env=dict(os.environ,C15_PERSISTED_WORKSPACE=str(tmp_path))
+        runner=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,env=env)
+        line=runner.stdout.readline()
+&gt;       assert line.startswith('RESIDENT_PUBLISH_AUTHORIZATION='),runner.stderr.read()
+E       AssertionError: Traceback (most recent call last):
+E           File "&lt;string&gt;", line 6, in &lt;module&gt;
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 612, in &lt;module&gt;
+E             _main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 604, in _main
+E             publisher_main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py", line 102, in main
+E             resident_tty_fd = open_resident_terminal()
+E                               ^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py", line 18, in open_resident_terminal
+E             fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         OSError: [Errno 6] No such device or address: '/dev/tty'
+E         Traceback (most recent call last):
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 612, in &lt;module&gt;
+E             _main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 608, in _main
+E             main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py", line 32, in main
+E             elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))
+E                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py", line 333, in run
+E             require(proc.poll() is None,'external publisher service exited')
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/tools/c15_persistence/backend.py", line 132, in require
+E             raise BackendError(reason)
+E         tools.c15_persistence.backend.BackendError: external publisher service exited
+E         
+E       assert False
+E        +  where False = &lt;built-in method startswith of str object at 0x606c77bcbc70&gt;('RESIDENT_PUBLISH_AUTHORIZATION=')
+E        +    where &lt;built-in method startswith of str object at 0x606c77bcbc70&gt; = ''.startswith
+
+reviews/WINDOW67_ORIGINAL38_UNMODIFIED/test_crash_recovery.py:24: AssertionError</failure></testcase><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_crash_recovery" name="test_absent_external_response_bounded_fail_closed" time="4.143"><failure message="assert 'response wait expired' in 'Traceback (most recent call last):\n  File &quot;&lt;string&gt;&quot;, line 6, in &lt;module&gt;\n  File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 612, in &lt;module&gt;\n    _main()\n  File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 604, in _main\n    publisher_main()\n  File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py&quot;, line 102, in main\n    resident_tty_fd = open_resident_terminal()\n                      ^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py&quot;, line 18, in open_resident_terminal\n    fd = os.open(\'/dev/tty\', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, \'O_CLOEXEC\', 0))\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nOSError: [Errno 6...ES-A-RERUN-005/harness/launch.py&quot;, line 612, in &lt;module&gt;\n    _main()\n  File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 608, in _main\n    main()\n  File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py&quot;, line 32, in main\n    elif a.command==\'run\':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))\n                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py&quot;, line 333, in run\n    require(proc.poll() is None,\'external publisher service exited\')\n  File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/tools/c15_persistence/backend.py&quot;, line 132, in require\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: external publisher service exited\n'">tmp_path = PosixPath('/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_absent_external_response_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x74bd000d1010&gt;
+
+    def test_absent_external_response_bounded_fail_closed(tmp_path,monkeypatch):
+        root,repo=setup(tmp_path,monkeypatch)
+        spec={'mode':'user','at':'2026-10-13T00:00:00+00:00','cursor':1,
+            'event_id':'synthetic-timeout','turn_index':1,'user_input':'synthetic pending','timeout':.2}
+        path=tmp_path/'operation.json';path.write_bytes(canonical_json_bytes(spec))
+        command=entry()+['run','--root',str(root),'--run-id','synthetic-53-run',
+            '--session-id','synthetic-53-session','--operation',str(path),'--persistence-repo',str(repo)]
+        env=dict(os.environ,C15_PERSISTED_WORKSPACE=str(tmp_path))
+        runner=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,env=env)
+        stdout,stderr=runner.communicate(timeout=40)
+        assert runner.returncode!=0
+&gt;       assert 'response wait expired' in stderr
+E       assert 'response wait expired' in 'Traceback (most recent call last):\n  File "&lt;string&gt;", line 6, in &lt;module&gt;\n  File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 612, in &lt;module&gt;\n    _main()\n  File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 604, in _main\n    publisher_main()\n  File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py", line 102, in main\n    resident_tty_fd = open_resident_terminal()\n                      ^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py", line 18, in open_resident_terminal\n    fd = os.open(\'/dev/tty\', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, \'O_CLOEXEC\', 0))\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nOSError: [Errno 6...ES-A-RERUN-005/harness/launch.py", line 612, in &lt;module&gt;\n    _main()\n  File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 608, in _main\n    main()\n  File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py", line 32, in main\n    elif a.command==\'run\':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))\n                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py", line 333, in run\n    require(proc.poll() is None,\'external publisher service exited\')\n  File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/tools/c15_persistence/backend.py", line 132, in require\n    raise BackendError(reason)\ntools.c15_persistence.backend.BackendError: external publisher service exited\n'
+
+reviews/WINDOW67_ORIGINAL38_UNMODIFIED/test_crash_recovery.py:73: AssertionError</failure></testcase><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_current_trusted_adapter" name="test_real_core_external_publisher_with_c15_remote_barriers[due]" time="4.078"><failure message="AssertionError: Traceback (most recent call last):&#10;    File &quot;&lt;string&gt;&quot;, line 6, in &lt;module&gt;&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 612, in &lt;module&gt;&#10;      _main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 604, in _main&#10;      publisher_main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py&quot;, line 102, in main&#10;      resident_tty_fd = open_resident_terminal()&#10;                        ^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py&quot;, line 18, in open_resident_terminal&#10;      fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))&#10;           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  OSError: [Errno 6] No such device or address: '/dev/tty'&#10;  Traceback (most recent call last):&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 612, in &lt;module&gt;&#10;      _main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 608, in _main&#10;      main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py&quot;, line 32, in main&#10;      elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))&#10;                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py&quot;, line 333, in run&#10;      require(proc.poll() is None,'external publisher service exited')&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/tools/c15_persistence/backend.py&quot;, line 132, in require&#10;      raise BackendError(reason)&#10;  tools.c15_persistence.backend.BackendError: external publisher service exited&#10;  &#10;assert False&#10; +  where False = &lt;built-in method startswith of str object at 0x606c77bcbc70&gt;('RESIDENT_PUBLISH_AUTHORIZATION=')&#10; +    where &lt;built-in method startswith of str object at 0x606c77bcbc70&gt; = ''.startswith">tmp_path = PosixPath('/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x74bcfff7ff50&gt;
+scenario = 'due'
+
+    @pytest.mark.parametrize('scenario',['due','user','summary','delivered'])
+    def test_real_core_external_publisher_with_c15_remote_barriers(tmp_path,monkeypatch,scenario):
+        root,repo=setup(tmp_path,monkeypatch)
+        harn=HARN
+        if scenario=='delivered':
+            from test_artifact_delivery import materialize
+            target,result=materialize(tmp_path,HARN.parent/'artifacts/resident-harness.tar.gz')
+            assert result.returncode==0,result.stderr
+            harn=target/'harness'
+        world=root/'state/runtime/world.sqlite';index=root/'state/runtime/index.sqlite'
+        core=HeadlessCore(config=HeadlessConfig(world_path=world,index_path=index),
+            model_handler=lambda _s: (_ for _ in ()).throw(AssertionError('setup cannot decide'))).start()
+        moment=datetime(2026,10,13,tzinfo=timezone.utc)
+        if scenario=='due':
+            core.runtime.wake_bus.emit(WakeSignalRequest(wake_source=WakeSource.SAFETY,
+                rule_id='synthetic-boundary',observed_at=moment,priority=100,dedupe_key='synthetic-boundary'))
+        if scenario=='summary':
+            from datetime import timedelta
+            # Current Core preserves eight recent turns and summarizes closed chunks
+            # of twelve older turns. Twenty setup turns exercise the normal trigger.
+            for i in range(1,21):
+                core.runtime.ingestor.commit_turn(session_id='synthetic-53-session',turn_index=i,
+                    user_text='synthetic history '+str(i),assistant_text='synthetic setup bytes',
+                    occurred_at=moment+timedelta(seconds=i))
+            assert len(core.runtime.continuity._complete_turns(session_id='synthetic-53-session'))==20
+            assert core.runtime.continuity.prepare_next_round_summary(session_id='synthetic-53-session',before_turn=21,recent_turn_limit=8,summary_chunk_turns=12) is not None
+            moment=moment+timedelta(seconds=21)
+        core.stop()
+        # Synthetic setup alters only a private test world; publish its state before running.
+        from tools.c15_persistence.backend import RunBackend
+        from r005.safe_runner import barrier
+        b=RunBackend.open(root,run_id='synthetic-53-run',session_id='synthetic-53-session')
+        barrier(b,repo,'synthetic-wake-staged');b.release()
+        if scenario=='summary':
+            from aios_core.storage.sqlite_store import SQLiteWorldStore
+            from aios_core.context.continuity import ConversationContinuityService
+            persisted=ConversationContinuityService(store=SQLiteWorldStore(world),index=None,subject_id='user_1')
+            assert len(persisted._complete_turns(session_id='synthetic-53-session'))==20
+            assert persisted.prepare_next_round_summary(session_id='synthetic-53-session',before_turn=21,recent_turn_limit=8,summary_chunk_turns=12) is not None
+        spec={'mode':'due' if scenario=='due' else 'user','at':moment.isoformat(),'cursor':1,
+            'event_id':'synthetic-event-1','turn_index':21 if scenario=='summary' else 1,
+            'user_input':'' if scenario=='due' else 'synthetic USER bytes','timeout':30}
+        specpath=tmp_path/'operation.json';specpath.write_bytes(canonical_json_bytes(spec))
+        env=dict(os.environ,C15_PERSISTED_WORKSPACE=str(tmp_path))
+        runner=subprocess.Popen(entry(harn)+['run',
+            '--root',str(root),'--run-id','synthetic-53-run','--session-id','synthetic-53-session',
+            '--operation',str(specpath),'--persistence-repo',str(repo)],
+            stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,env=env)
+        authorization_line=runner.stdout.readline()
+&gt;       assert authorization_line.startswith('RESIDENT_PUBLISH_AUTHORIZATION='), runner.stderr.read() if not authorization_line else authorization_line
+E       AssertionError: Traceback (most recent call last):
+E           File "&lt;string&gt;", line 6, in &lt;module&gt;
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 612, in &lt;module&gt;
+E             _main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 604, in _main
+E             publisher_main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py", line 102, in main
+E             resident_tty_fd = open_resident_terminal()
+E                               ^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py", line 18, in open_resident_terminal
+E             fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         OSError: [Errno 6] No such device or address: '/dev/tty'
+E         Traceback (most recent call last):
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 612, in &lt;module&gt;
+E             _main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 608, in _main
+E             main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py", line 32, in main
+E             elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))
+E                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py", line 333, in run
+E             require(proc.poll() is None,'external publisher service exited')
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/tools/c15_persistence/backend.py", line 132, in require
+E             raise BackendError(reason)
+E         tools.c15_persistence.backend.BackendError: external publisher service exited
+E         
+E       assert False
+E        +  where False = &lt;built-in method startswith of str object at 0x606c77bcbc70&gt;('RESIDENT_PUBLISH_AUTHORIZATION=')
+E        +    where &lt;built-in method startswith of str object at 0x606c77bcbc70&gt; = ''.startswith
+
+reviews/WINDOW67_ORIGINAL38_UNMODIFIED/test_current_trusted_adapter.py:92: AssertionError</failure></testcase><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_current_trusted_adapter" name="test_real_core_external_publisher_with_c15_remote_barriers[user]" time="4.372"><failure message="AssertionError: Traceback (most recent call last):&#10;    File &quot;&lt;string&gt;&quot;, line 6, in &lt;module&gt;&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 612, in &lt;module&gt;&#10;      _main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 604, in _main&#10;      publisher_main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py&quot;, line 102, in main&#10;      resident_tty_fd = open_resident_terminal()&#10;                        ^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py&quot;, line 18, in open_resident_terminal&#10;      fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))&#10;           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  OSError: [Errno 6] No such device or address: '/dev/tty'&#10;  Traceback (most recent call last):&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 612, in &lt;module&gt;&#10;      _main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 608, in _main&#10;      main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py&quot;, line 32, in main&#10;      elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))&#10;                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py&quot;, line 333, in run&#10;      require(proc.poll() is None,'external publisher service exited')&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/tools/c15_persistence/backend.py&quot;, line 132, in require&#10;      raise BackendError(reason)&#10;  tools.c15_persistence.backend.BackendError: external publisher service exited&#10;  &#10;assert False&#10; +  where False = &lt;built-in method startswith of str object at 0x606c77bcbc70&gt;('RESIDENT_PUBLISH_AUTHORIZATION=')&#10; +    where &lt;built-in method startswith of str object at 0x606c77bcbc70&gt; = ''.startswith">tmp_path = PosixPath('/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x74bcfff84050&gt;
+scenario = 'user'
+
+    @pytest.mark.parametrize('scenario',['due','user','summary','delivered'])
+    def test_real_core_external_publisher_with_c15_remote_barriers(tmp_path,monkeypatch,scenario):
+        root,repo=setup(tmp_path,monkeypatch)
+        harn=HARN
+        if scenario=='delivered':
+            from test_artifact_delivery import materialize
+            target,result=materialize(tmp_path,HARN.parent/'artifacts/resident-harness.tar.gz')
+            assert result.returncode==0,result.stderr
+            harn=target/'harness'
+        world=root/'state/runtime/world.sqlite';index=root/'state/runtime/index.sqlite'
+        core=HeadlessCore(config=HeadlessConfig(world_path=world,index_path=index),
+            model_handler=lambda _s: (_ for _ in ()).throw(AssertionError('setup cannot decide'))).start()
+        moment=datetime(2026,10,13,tzinfo=timezone.utc)
+        if scenario=='due':
+            core.runtime.wake_bus.emit(WakeSignalRequest(wake_source=WakeSource.SAFETY,
+                rule_id='synthetic-boundary',observed_at=moment,priority=100,dedupe_key='synthetic-boundary'))
+        if scenario=='summary':
+            from datetime import timedelta
+            # Current Core preserves eight recent turns and summarizes closed chunks
+            # of twelve older turns. Twenty setup turns exercise the normal trigger.
+            for i in range(1,21):
+                core.runtime.ingestor.commit_turn(session_id='synthetic-53-session',turn_index=i,
+                    user_text='synthetic history '+str(i),assistant_text='synthetic setup bytes',
+                    occurred_at=moment+timedelta(seconds=i))
+            assert len(core.runtime.continuity._complete_turns(session_id='synthetic-53-session'))==20
+            assert core.runtime.continuity.prepare_next_round_summary(session_id='synthetic-53-session',before_turn=21,recent_turn_limit=8,summary_chunk_turns=12) is not None
+            moment=moment+timedelta(seconds=21)
+        core.stop()
+        # Synthetic setup alters only a private test world; publish its state before running.
+        from tools.c15_persistence.backend import RunBackend
+        from r005.safe_runner import barrier
+        b=RunBackend.open(root,run_id='synthetic-53-run',session_id='synthetic-53-session')
+        barrier(b,repo,'synthetic-wake-staged');b.release()
+        if scenario=='summary':
+            from aios_core.storage.sqlite_store import SQLiteWorldStore
+            from aios_core.context.continuity import ConversationContinuityService
+            persisted=ConversationContinuityService(store=SQLiteWorldStore(world),index=None,subject_id='user_1')
+            assert len(persisted._complete_turns(session_id='synthetic-53-session'))==20
+            assert persisted.prepare_next_round_summary(session_id='synthetic-53-session',before_turn=21,recent_turn_limit=8,summary_chunk_turns=12) is not None
+        spec={'mode':'due' if scenario=='due' else 'user','at':moment.isoformat(),'cursor':1,
+            'event_id':'synthetic-event-1','turn_index':21 if scenario=='summary' else 1,
+            'user_input':'' if scenario=='due' else 'synthetic USER bytes','timeout':30}
+        specpath=tmp_path/'operation.json';specpath.write_bytes(canonical_json_bytes(spec))
+        env=dict(os.environ,C15_PERSISTED_WORKSPACE=str(tmp_path))
+        runner=subprocess.Popen(entry(harn)+['run',
+            '--root',str(root),'--run-id','synthetic-53-run','--session-id','synthetic-53-session',
+            '--operation',str(specpath),'--persistence-repo',str(repo)],
+            stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,env=env)
+        authorization_line=runner.stdout.readline()
+&gt;       assert authorization_line.startswith('RESIDENT_PUBLISH_AUTHORIZATION='), runner.stderr.read() if not authorization_line else authorization_line
+E       AssertionError: Traceback (most recent call last):
+E           File "&lt;string&gt;", line 6, in &lt;module&gt;
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 612, in &lt;module&gt;
+E             _main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 604, in _main
+E             publisher_main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py", line 102, in main
+E             resident_tty_fd = open_resident_terminal()
+E                               ^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py", line 18, in open_resident_terminal
+E             fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         OSError: [Errno 6] No such device or address: '/dev/tty'
+E         Traceback (most recent call last):
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 612, in &lt;module&gt;
+E             _main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 608, in _main
+E             main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py", line 32, in main
+E             elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))
+E                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py", line 333, in run
+E             require(proc.poll() is None,'external publisher service exited')
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/tools/c15_persistence/backend.py", line 132, in require
+E             raise BackendError(reason)
+E         tools.c15_persistence.backend.BackendError: external publisher service exited
+E         
+E       assert False
+E        +  where False = &lt;built-in method startswith of str object at 0x606c77bcbc70&gt;('RESIDENT_PUBLISH_AUTHORIZATION=')
+E        +    where &lt;built-in method startswith of str object at 0x606c77bcbc70&gt; = ''.startswith
+
+reviews/WINDOW67_ORIGINAL38_UNMODIFIED/test_current_trusted_adapter.py:92: AssertionError</failure></testcase><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_current_trusted_adapter" name="test_real_core_external_publisher_with_c15_remote_barriers[summary]" time="4.566"><failure message="AssertionError: Traceback (most recent call last):&#10;    File &quot;&lt;string&gt;&quot;, line 6, in &lt;module&gt;&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 612, in &lt;module&gt;&#10;      _main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 604, in _main&#10;      publisher_main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py&quot;, line 102, in main&#10;      resident_tty_fd = open_resident_terminal()&#10;                        ^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py&quot;, line 18, in open_resident_terminal&#10;      fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))&#10;           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  OSError: [Errno 6] No such device or address: '/dev/tty'&#10;  Traceback (most recent call last):&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 612, in &lt;module&gt;&#10;      _main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py&quot;, line 608, in _main&#10;      main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py&quot;, line 32, in main&#10;      elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))&#10;                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py&quot;, line 333, in run&#10;      require(proc.poll() is None,'external publisher service exited')&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/tools/c15_persistence/backend.py&quot;, line 132, in require&#10;      raise BackendError(reason)&#10;  tools.c15_persistence.backend.BackendError: external publisher service exited&#10;  &#10;assert False&#10; +  where False = &lt;built-in method startswith of str object at 0x606c77bcbc70&gt;('RESIDENT_PUBLISH_AUTHORIZATION=')&#10; +    where &lt;built-in method startswith of str object at 0x606c77bcbc70&gt; = ''.startswith">tmp_path = PosixPath('/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis2')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x74bcfff7f950&gt;
+scenario = 'summary'
+
+    @pytest.mark.parametrize('scenario',['due','user','summary','delivered'])
+    def test_real_core_external_publisher_with_c15_remote_barriers(tmp_path,monkeypatch,scenario):
+        root,repo=setup(tmp_path,monkeypatch)
+        harn=HARN
+        if scenario=='delivered':
+            from test_artifact_delivery import materialize
+            target,result=materialize(tmp_path,HARN.parent/'artifacts/resident-harness.tar.gz')
+            assert result.returncode==0,result.stderr
+            harn=target/'harness'
+        world=root/'state/runtime/world.sqlite';index=root/'state/runtime/index.sqlite'
+        core=HeadlessCore(config=HeadlessConfig(world_path=world,index_path=index),
+            model_handler=lambda _s: (_ for _ in ()).throw(AssertionError('setup cannot decide'))).start()
+        moment=datetime(2026,10,13,tzinfo=timezone.utc)
+        if scenario=='due':
+            core.runtime.wake_bus.emit(WakeSignalRequest(wake_source=WakeSource.SAFETY,
+                rule_id='synthetic-boundary',observed_at=moment,priority=100,dedupe_key='synthetic-boundary'))
+        if scenario=='summary':
+            from datetime import timedelta
+            # Current Core preserves eight recent turns and summarizes closed chunks
+            # of twelve older turns. Twenty setup turns exercise the normal trigger.
+            for i in range(1,21):
+                core.runtime.ingestor.commit_turn(session_id='synthetic-53-session',turn_index=i,
+                    user_text='synthetic history '+str(i),assistant_text='synthetic setup bytes',
+                    occurred_at=moment+timedelta(seconds=i))
+            assert len(core.runtime.continuity._complete_turns(session_id='synthetic-53-session'))==20
+            assert core.runtime.continuity.prepare_next_round_summary(session_id='synthetic-53-session',before_turn=21,recent_turn_limit=8,summary_chunk_turns=12) is not None
+            moment=moment+timedelta(seconds=21)
+        core.stop()
+        # Synthetic setup alters only a private test world; publish its state before running.
+        from tools.c15_persistence.backend import RunBackend
+        from r005.safe_runner import barrier
+        b=RunBackend.open(root,run_id='synthetic-53-run',session_id='synthetic-53-session')
+        barrier(b,repo,'synthetic-wake-staged');b.release()
+        if scenario=='summary':
+            from aios_core.storage.sqlite_store import SQLiteWorldStore
+            from aios_core.context.continuity import ConversationContinuityService
+            persisted=ConversationContinuityService(store=SQLiteWorldStore(world),index=None,subject_id='user_1')
+            assert len(persisted._complete_turns(session_id='synthetic-53-session'))==20
+            assert persisted.prepare_next_round_summary(session_id='synthetic-53-session',before_turn=21,recent_turn_limit=8,summary_chunk_turns=12) is not None
+        spec={'mode':'due' if scenario=='due' else 'user','at':moment.isoformat(),'cursor':1,
+            'event_id':'synthetic-event-1','turn_index':21 if scenario=='summary' else 1,
+            'user_input':'' if scenario=='due' else 'synthetic USER bytes','timeout':30}
+        specpath=tmp_path/'operation.json';specpath.write_bytes(canonical_json_bytes(spec))
+        env=dict(os.environ,C15_PERSISTED_WORKSPACE=str(tmp_path))
+        runner=subprocess.Popen(entry(harn)+['run',
+            '--root',str(root),'--run-id','synthetic-53-run','--session-id','synthetic-53-session',
+            '--operation',str(specpath),'--persistence-repo',str(repo)],
+            stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,env=env)
+        authorization_line=runner.stdout.readline()
+&gt;       assert authorization_line.startswith('RESIDENT_PUBLISH_AUTHORIZATION='), runner.stderr.read() if not authorization_line else authorization_line
+E       AssertionError: Traceback (most recent call last):
+E           File "&lt;string&gt;", line 6, in &lt;module&gt;
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 612, in &lt;module&gt;
+E             _main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 604, in _main
+E             publisher_main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py", line 102, in main
+E             resident_tty_fd = open_resident_terminal()
+E                               ^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py", line 18, in open_resident_terminal
+E             fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         OSError: [Errno 6] No such device or address: '/dev/tty'
+E         Traceback (most recent call last):
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 612, in &lt;module&gt;
+E             _main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 608, in _main
+E             main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py", line 32, in main
+E             elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))
+E                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py", line 333, in run
+E             require(proc.poll() is None,'external publisher service exited')
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/tools/c15_persistence/backend.py", line 132, in require
+E             raise BackendError(reason)
+E         tools.c15_persistence.backend.BackendError: external publisher service exited
+E         
+E       assert False
+E        +  where False = &lt;built-in method startswith of str object at 0x606c77bcbc70&gt;('RESIDENT_PUBLISH_AUTHORIZATION=')
+E        +    where &lt;built-in method startswith of str object at 0x606c77bcbc70&gt; = ''.startswith
+
+reviews/WINDOW67_ORIGINAL38_UNMODIFIED/test_current_trusted_adapter.py:92: AssertionError</failure></testcase><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_current_trusted_adapter" name="test_real_core_external_publisher_with_c15_remote_barriers[delivered]" time="4.540"><failure message="AssertionError: Traceback (most recent call last):&#10;    File &quot;&lt;string&gt;&quot;, line 6, in &lt;module&gt;&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/launch.py&quot;, line 612, in &lt;module&gt;&#10;      _main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/launch.py&quot;, line 604, in _main&#10;      publisher_main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/r005/publisher_service.py&quot;, line 102, in main&#10;      resident_tty_fd = open_resident_terminal()&#10;                        ^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/r005/response_authorization.py&quot;, line 18, in open_resident_terminal&#10;      fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))&#10;           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  OSError: [Errno 6] No such device or address: '/dev/tty'&#10;  Traceback (most recent call last):&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/launch.py&quot;, line 612, in &lt;module&gt;&#10;      _main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/launch.py&quot;, line 608, in _main&#10;      main()&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/r005/cli.py&quot;, line 32, in main&#10;      elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))&#10;                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/r005/safe_runner.py&quot;, line 333, in run&#10;      require(proc.poll() is None,'external publisher service exited')&#10;    File &quot;/workspaces/window67-evidence-20261016T2053Z/frozen-parent/tools/c15_persistence/backend.py&quot;, line 132, in require&#10;      raise BackendError(reason)&#10;  tools.c15_persistence.backend.BackendError: external publisher service exited&#10;  &#10;assert False&#10; +  where False = &lt;built-in method startswith of str object at 0x606c77bcbc70&gt;('RESIDENT_PUBLISH_AUTHORIZATION=')&#10; +    where &lt;built-in method startswith of str object at 0x606c77bcbc70&gt; = ''.startswith">tmp_path = PosixPath('/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x74bd000d3fe0&gt;
+scenario = 'delivered'
+
+    @pytest.mark.parametrize('scenario',['due','user','summary','delivered'])
+    def test_real_core_external_publisher_with_c15_remote_barriers(tmp_path,monkeypatch,scenario):
+        root,repo=setup(tmp_path,monkeypatch)
+        harn=HARN
+        if scenario=='delivered':
+            from test_artifact_delivery import materialize
+            target,result=materialize(tmp_path,HARN.parent/'artifacts/resident-harness.tar.gz')
+            assert result.returncode==0,result.stderr
+            harn=target/'harness'
+        world=root/'state/runtime/world.sqlite';index=root/'state/runtime/index.sqlite'
+        core=HeadlessCore(config=HeadlessConfig(world_path=world,index_path=index),
+            model_handler=lambda _s: (_ for _ in ()).throw(AssertionError('setup cannot decide'))).start()
+        moment=datetime(2026,10,13,tzinfo=timezone.utc)
+        if scenario=='due':
+            core.runtime.wake_bus.emit(WakeSignalRequest(wake_source=WakeSource.SAFETY,
+                rule_id='synthetic-boundary',observed_at=moment,priority=100,dedupe_key='synthetic-boundary'))
+        if scenario=='summary':
+            from datetime import timedelta
+            # Current Core preserves eight recent turns and summarizes closed chunks
+            # of twelve older turns. Twenty setup turns exercise the normal trigger.
+            for i in range(1,21):
+                core.runtime.ingestor.commit_turn(session_id='synthetic-53-session',turn_index=i,
+                    user_text='synthetic history '+str(i),assistant_text='synthetic setup bytes',
+                    occurred_at=moment+timedelta(seconds=i))
+            assert len(core.runtime.continuity._complete_turns(session_id='synthetic-53-session'))==20
+            assert core.runtime.continuity.prepare_next_round_summary(session_id='synthetic-53-session',before_turn=21,recent_turn_limit=8,summary_chunk_turns=12) is not None
+            moment=moment+timedelta(seconds=21)
+        core.stop()
+        # Synthetic setup alters only a private test world; publish its state before running.
+        from tools.c15_persistence.backend import RunBackend
+        from r005.safe_runner import barrier
+        b=RunBackend.open(root,run_id='synthetic-53-run',session_id='synthetic-53-session')
+        barrier(b,repo,'synthetic-wake-staged');b.release()
+        if scenario=='summary':
+            from aios_core.storage.sqlite_store import SQLiteWorldStore
+            from aios_core.context.continuity import ConversationContinuityService
+            persisted=ConversationContinuityService(store=SQLiteWorldStore(world),index=None,subject_id='user_1')
+            assert len(persisted._complete_turns(session_id='synthetic-53-session'))==20
+            assert persisted.prepare_next_round_summary(session_id='synthetic-53-session',before_turn=21,recent_turn_limit=8,summary_chunk_turns=12) is not None
+        spec={'mode':'due' if scenario=='due' else 'user','at':moment.isoformat(),'cursor':1,
+            'event_id':'synthetic-event-1','turn_index':21 if scenario=='summary' else 1,
+            'user_input':'' if scenario=='due' else 'synthetic USER bytes','timeout':30}
+        specpath=tmp_path/'operation.json';specpath.write_bytes(canonical_json_bytes(spec))
+        env=dict(os.environ,C15_PERSISTED_WORKSPACE=str(tmp_path))
+        runner=subprocess.Popen(entry(harn)+['run',
+            '--root',str(root),'--run-id','synthetic-53-run','--session-id','synthetic-53-session',
+            '--operation',str(specpath),'--persistence-repo',str(repo)],
+            stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,env=env)
+        authorization_line=runner.stdout.readline()
+&gt;       assert authorization_line.startswith('RESIDENT_PUBLISH_AUTHORIZATION='), runner.stderr.read() if not authorization_line else authorization_line
+E       AssertionError: Traceback (most recent call last):
+E           File "&lt;string&gt;", line 6, in &lt;module&gt;
+E           File "/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/launch.py", line 612, in &lt;module&gt;
+E             _main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/launch.py", line 604, in _main
+E             publisher_main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/r005/publisher_service.py", line 102, in main
+E             resident_tty_fd = open_resident_terminal()
+E                               ^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/r005/response_authorization.py", line 18, in open_resident_terminal
+E             fd = os.open('/dev/tty', os.O_WRONLY | os.O_NOFOLLOW | getattr(os, 'O_CLOEXEC', 0))
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         OSError: [Errno 6] No such device or address: '/dev/tty'
+E         Traceback (most recent call last):
+E           File "/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/launch.py", line 612, in &lt;module&gt;
+E             _main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/launch.py", line 608, in _main
+E             main()
+E           File "/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/r005/cli.py", line 32, in main
+E             elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))
+E                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp/test_real_core_external_publis3/delivery/harness/r005/safe_runner.py", line 333, in run
+E             require(proc.poll() is None,'external publisher service exited')
+E           File "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/tools/c15_persistence/backend.py", line 132, in require
+E             raise BackendError(reason)
+E         tools.c15_persistence.backend.BackendError: external publisher service exited
+E         
+E       assert False
+E        +  where False = &lt;built-in method startswith of str object at 0x606c77bcbc70&gt;('RESIDENT_PUBLISH_AUTHORIZATION=')
+E        +    where &lt;built-in method startswith of str object at 0x606c77bcbc70&gt; = ''.startswith
+
+reviews/WINDOW67_ORIGINAL38_UNMODIFIED/test_current_trusted_adapter.py:92: AssertionError</failure></testcase><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery" name="test_independent_location_exact_bytes_import_resolution" time="1.663" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery" name="test_identity_substitution_fails_before_start[source]" time="0.117" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery" name="test_identity_substitution_fails_before_start[manifest]" time="0.100" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery" name="test_identity_substitution_fails_before_start[added_file]" time="0.093" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery" name="test_identity_substitution_fails_before_start[scripted_router]" time="0.153" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery" name="test_executable_substitution_rejected" time="0.212" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_identity_delivery" name="test_signer_not_importable_in_recovery_caller" time="0.008"><failure message="Failed: DID NOT RAISE &lt;class 'ImportError'&gt;">def test_signer_not_importable_in_recovery_caller():
+&gt;       with pytest.raises(ImportError):__import__('r005.publisher_service')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE &lt;class 'ImportError'&gt;
+
+reviews/WINDOW67_ORIGINAL38_UNMODIFIED/test_identity_delivery.py:55: Failed</failure></testcase><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_durable_request_and_response_consumption" time="0.028" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_duplicate_response_exact_idempotence_and_conflict" time="0.028" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_stale_response_rejected" time="0.020" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_hash_identity_mismatch[request_id]" time="0.010" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_hash_identity_mismatch[request_sha256]" time="0.010" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_invalid_directive_rejected_before_publication" time="0.009" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_missing_response_no_default_or_fallback" time="0.073" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_tampering_fail_closed[request]" time="0.017" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_tampering_fail_closed[response]" time="0.018" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_tampering_fail_closed[ledger]" time="0.028" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_restart_reopens_same_outstanding_request" time="0.011" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_core_zero_local_minting_authority" time="0.000" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_actual_user_runner_waits_for_external_bytes" time="0.298" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_actual_due_work_empty_entry" time="0.140" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_actual_due_work_live_return_has_no_core_authenticity" time="0.603" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_historical_publisher_envelope_is_not_schema_proof" time="0.030" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_accepted_relay_requires_authentication_before_application" time="0.097" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_ambiguous_response_json_fails_closed[{&quot;response_version&quot;:1,&quot;response_version&quot;:1}]" time="0.001" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_ambiguous_response_json_fails_closed[{&quot;x&quot;:NaN}]" time="0.000" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_durability_error_never_becomes_publication_success[request]" time="0.017" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_durability_error_never_becomes_publication_success[response]" time="0.011" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_durability_error_never_becomes_publication_success[response_replay]" time="0.018" /><testcase classname="reviews.WINDOW67_ORIGINAL38_UNMODIFIED.test_mechanical_candidate" name="test_live_wal_busy_checkpoint_cannot_be_archived" time="1.062" /></testsuite></testsuites>

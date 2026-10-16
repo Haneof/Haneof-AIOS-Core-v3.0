@@ -1,0 +1,23 @@
+{
+  "python_version": "PASS",
+  "python_executable_hash": "PASS",
+  "kernel": "PASS",
+  "pid_proc": "PASS",
+  "pidfd": "PASS",
+  "AF_UNIX_SO_PEERCRED": "PASS",
+  "disposable_SIGKILL": "PASS",
+  "no_controlling_tty": "PASS",
+  "UID_999": "BLOCKED",
+  "UID_999_no_sudo": "PASS",
+  "UID_996": "BLOCKED",
+  "UID_996_no_sudo": "PASS",
+  "trust_anchor_metadata": "PASS",
+  "manifest_sha256": "PASS",
+  "artifact_sha256": "PASS",
+  "packet_sha256": "PASS",
+  "closed_archive_final_tree": "PASS",
+  "core_c15_source_bytes": "PASS",
+  "core_c15_unchanged": "PASS",
+  "approved_scope": "PASS",
+  "author_evidence_hashes": "PASS"
+}

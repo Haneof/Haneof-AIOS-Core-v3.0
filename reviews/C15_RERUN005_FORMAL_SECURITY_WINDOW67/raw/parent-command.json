@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+    "-B",
+    "-m",
+    "pytest",
+    "-vv",
+    "-p",
+    "no:cacheprovider",
+    "--basetemp",
+    "/workspaces/window67-evidence-20261016T2053Z/parent-original38-tmp",
+    "--junitxml=/workspaces/window67-evidence-20261016T2053Z/parent-original38.xml",
+    "/workspaces/window67-evidence-20261016T2053Z/frozen-parent/reviews/WINDOW67_ORIGINAL38_UNMODIFIED"
+  ],
+  "returncode": 1,
+  "head": "9d3b19b0e7bf090e5d472d9781b9156f73ea2088"
+}
