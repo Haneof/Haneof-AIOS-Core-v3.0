@@ -1,0 +1,19 @@
+candidate_sha=5a5d384f16798bfff46ffe03f87310b0eafb2321
+grep_version=grep (GNU grep) 3.8
+initial_guard_source_line=93
+initial_guard_ere='^(src/|tests/|pyproject\\.toml$|setup\\.|setup\\.cfg$|MANIFEST\\.in$|requirements|\\.github/workflows/)'
+terminal_guard_source_line=464
+terminal_guard_ere='^(src/|tests/|pyproject\\\\.toml$|setup\\\\.|setup\\\\.cfg$|MANIFEST\\\\.in$|requirements|\\\\.github/workflows/)'
+disposable_git_diff_paths:
+.github/workflows/core.yml
+.github/workflows/late-added.yml
+pyproject.toml
+setup.cfg
+initial_guard_matches_diff=TRUE
+terminal_guard_matches_diff=FALSE
+path_probe=.github/workflows/late-added.yml initial=MATCH terminal=MISS
+path_probe=pyproject.toml initial=MATCH terminal=MISS
+path_probe=setup.cfg initial=MATCH terminal=MISS
+path_probe=src/aios_core/late.py initial=MATCH terminal=MATCH
+path_probe=tests/late.py initial=MATCH terminal=MATCH
+RESULT=TERMINAL_PROTECTED_DRIFT_FALSE_NEGATIVE_REPRODUCED
