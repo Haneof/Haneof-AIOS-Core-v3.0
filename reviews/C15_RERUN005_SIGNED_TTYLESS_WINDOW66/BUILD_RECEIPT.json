@@ -1,0 +1,10 @@
+{
+  "artifact_sha256": "82aa3ff81d9492e0828934b5744adf4129fb6dc1361303a537379a603a319de3",
+  "c15_python_files": 18,
+  "core_python_files": 79,
+  "harness_manifest_sha256": "364cc03617fcd782327b3307720baf5371839185b1b07b71476308af74c5a817",
+  "harness_python_files": 21,
+  "member_count": 22,
+  "packet_sha256": "023c7556de1bcd4d4b0caccb90b0fa65d0b8a9b783f41f30574dfbb12e8f6b34",
+  "source_head_at_build": "9d3b19b0e7bf090e5d472d9781b9156f73ea2088"
+}

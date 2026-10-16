@@ -311,6 +311,12 @@ def run(root,run_id,session_id,repo,spec,*,fault_hook=None):
         socket_dir_identity=(socket_dir_stat.st_dev,socket_dir_stat.st_ino)
         sockpath=str(socket_dir/'publisher.sock')
         runner_instance_id=secrets.token_hex(32)
+        if os.environ.get('AIOS66_TEST_ENROLLMENT'):
+            from .response_authorization import configured_grant
+            grant=configured_grant()
+            require(grant['run_id']==run_id and grant['session_id']==session_id and
+                opid in grant['operation_ids'], 'TEST_ONLY enrollment operation scope mismatch')
+            runner_instance_id=grant['instance_id']
         runner_start=runner_start_time(os.getpid())
         env=dict(os.environ);env['PYTHONDONTWRITEBYTECODE']='1'
         parent_read,parent_write=os.pipe()

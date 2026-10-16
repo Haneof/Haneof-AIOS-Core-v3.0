@@ -1,0 +1,8 @@
+expired_response_enrollment PASS
+mechanical_ping_purpose_rejected PASS
+missing_enrollment PASS
+revoked_enrollment PASS
+actual_runner_missing_enrollment PASS
+actual_runner_ping_grant PASS
+actual_runner_expired_grant PASS
+real_remote_rejection_and_exact_restart FAIL

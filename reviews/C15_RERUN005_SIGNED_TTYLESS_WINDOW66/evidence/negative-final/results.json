@@ -1,0 +1,70 @@
+[
+  {
+    "case": "expired_response_enrollment",
+    "status": "PASS",
+    "detail": {
+      "exit": 1,
+      "expected_reason": "expired or invalid enrollment",
+      "no_publish_invoked": true
+    }
+  },
+  {
+    "case": "mechanical_ping_purpose_rejected",
+    "status": "PASS",
+    "detail": {
+      "exit": 1,
+      "expected_reason": "response-purpose TEST_ONLY enrollment required",
+      "no_publish_invoked": true
+    }
+  },
+  {
+    "case": "missing_enrollment",
+    "status": "PASS",
+    "detail": {
+      "exit": 1,
+      "expected_reason": "FileNotFoundError",
+      "no_publish_invoked": true
+    }
+  },
+  {
+    "case": "revoked_enrollment",
+    "status": "PASS",
+    "detail": {
+      "exit": 1,
+      "expected_reason": "revoked enrollment",
+      "no_publish_invoked": true
+    }
+  },
+  {
+    "case": "actual_runner_missing_enrollment",
+    "status": "PASS",
+    "detail": {
+      "runner_exit": 1,
+      "proof_count": 0,
+      "publisher_ready": false
+    }
+  },
+  {
+    "case": "actual_runner_ping_grant",
+    "status": "PASS",
+    "detail": {
+      "runner_exit": 1,
+      "proof_count": 0,
+      "publisher_ready": false
+    }
+  },
+  {
+    "case": "actual_runner_expired_grant",
+    "status": "PASS",
+    "detail": {
+      "runner_exit": 1,
+      "proof_count": 0,
+      "publisher_ready": false
+    }
+  },
+  {
+    "case": "real_remote_rejection_and_exact_restart",
+    "status": "FAIL",
+    "error": "AssertionError: "
+  }
+]

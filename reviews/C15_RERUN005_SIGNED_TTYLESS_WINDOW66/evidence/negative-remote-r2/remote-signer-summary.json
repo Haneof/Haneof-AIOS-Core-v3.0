@@ -1,0 +1,27 @@
+{
+  "uid": 996,
+  "tty": false,
+  "signed_steps": [
+    {
+      "request_id": "req-0001-model_directive-b3372dbe",
+      "kind": "model_directive",
+      "response_sha256": "2b939b62b3bde5d3982c9567a728a6b480318ea36e79c7281b508614907f32dd",
+      "authorization_sha256": "eee2cce27e5dfd206b1db4599c2f008c8d1424b9fefb802e9ef744954cf5497f"
+    }
+  ],
+  "negative_pass": [
+    "resident_id",
+    "resident_key_id",
+    "request_id",
+    "operation_id",
+    "session_id",
+    "instance_id",
+    "request_sha256",
+    "context",
+    "publisher_challenge",
+    "response_bytes",
+    "signature",
+    "register_endpoint",
+    "replay"
+  ]
+}

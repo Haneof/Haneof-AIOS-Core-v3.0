@@ -1,0 +1,156 @@
+[
+  {
+    "scenario": "user",
+    "status": "PASS",
+    "no_controlling_tty": true,
+    "core_receipts": 1,
+    "core_proofs": 1,
+    "remote_commit": "179a5c8ee293d7530482322653cc80bdf92238e7",
+    "signer": {
+      "uid": 996,
+      "tty": false,
+      "signed_steps": [
+        {
+          "request_id": "req-0001-model_directive-3bc5e85c",
+          "kind": "model_directive",
+          "response_sha256": "357df9c8bddc7d44defdf0e9bd561fd0c303889909ff34d4e3bc6566b3326c3f",
+          "authorization_sha256": "c46a2a036a4f3528aec4309057a4ea9fe697512ccb49eef1d2580c250b847b5c"
+        }
+      ],
+      "negative_pass": [
+        "resident_id",
+        "resident_key_id",
+        "request_id",
+        "operation_id",
+        "session_id",
+        "instance_id",
+        "request_sha256",
+        "context",
+        "publisher_challenge",
+        "response_bytes",
+        "signature",
+        "register_endpoint",
+        "replay"
+      ]
+    }
+  },
+  {
+    "scenario": "due",
+    "status": "PASS",
+    "no_controlling_tty": true,
+    "core_receipts": 2,
+    "core_proofs": 2,
+    "remote_commit": "aaba2b54fb642d515300a424f0c7de29e08ac6c2",
+    "signer": {
+      "uid": 996,
+      "tty": false,
+      "signed_steps": [
+        {
+          "request_id": "req-0001-model_directive-89e12751",
+          "kind": "model_directive",
+          "response_sha256": "6ec9a926bdb623a4d947e8b09af8a2aae469f68fb670f6b868be4794b3218ef1",
+          "authorization_sha256": "082b125e5fa5958d07ac2e448ccb9e91289c3fa2a18f01dd32ef3cacdbfd0f5c"
+        },
+        {
+          "request_id": "req-0002-model_directive-6ff68072",
+          "kind": "model_directive",
+          "response_sha256": "56bb1b6a080335718d59a1b5c3d42ed1403e98d12faa91ba2cb7576431839598",
+          "authorization_sha256": "e1643c0912d04b767b11ecc3dfaaf9dd4385f67b75a974562c13581b17b3134f"
+        }
+      ],
+      "negative_pass": [
+        "resident_id",
+        "resident_key_id",
+        "request_id",
+        "operation_id",
+        "session_id",
+        "instance_id",
+        "request_sha256",
+        "context",
+        "publisher_challenge",
+        "response_bytes",
+        "signature",
+        "register_endpoint",
+        "replay",
+        "replay"
+      ]
+    }
+  },
+  {
+    "scenario": "summary",
+    "status": "PASS",
+    "no_controlling_tty": true,
+    "core_receipts": 1,
+    "core_proofs": 1,
+    "remote_commit": "984ae15541a70f9b868c0173fccebdceadee6011",
+    "signer": {
+      "uid": 996,
+      "tty": false,
+      "signed_steps": [
+        {
+          "request_id": "req-0001-model_directive-82a51f54",
+          "kind": "model_directive",
+          "response_sha256": "a8b8eca73e52ff6ee39e619bda16905e3cdd647a15567ef84ae0d96772e2de86",
+          "authorization_sha256": "cc74b88f4688e2b404b8e55f2859fb1cc052a494ec1d03156fb42756397afd24"
+        },
+        {
+          "request_id": "req-0002-round_summary-a29c7a91",
+          "kind": "round_summary",
+          "response_sha256": "b9d0066aeef2e200b211df1207e1268b27c8e227b6b85a9f1d19e578d077ae02",
+          "authorization_sha256": "7e1f1b439f03b2b4a9803dc396cb709c072511b1a67aab8bedb14052ca4bc3aa"
+        }
+      ],
+      "negative_pass": [
+        "resident_id",
+        "resident_key_id",
+        "request_id",
+        "operation_id",
+        "session_id",
+        "instance_id",
+        "request_sha256",
+        "context",
+        "publisher_challenge",
+        "response_bytes",
+        "signature",
+        "register_endpoint",
+        "replay",
+        "replay"
+      ]
+    }
+  },
+  {
+    "scenario": "delivered",
+    "status": "PASS",
+    "no_controlling_tty": true,
+    "core_receipts": 1,
+    "core_proofs": 1,
+    "remote_commit": "6ca7afbd1b4f12311635c75acc89cedb67daea71",
+    "signer": {
+      "uid": 996,
+      "tty": false,
+      "signed_steps": [
+        {
+          "request_id": "req-0001-model_directive-4c652204",
+          "kind": "model_directive",
+          "response_sha256": "354ae58e21bf8d9e0b4451bfae20b909886832ee482ba119c8b8fed152afd8c8",
+          "authorization_sha256": "5904dda15049b855fcc313dba5e26768c6894a8b8a1d3b9a14cd88cc0309c719"
+        }
+      ],
+      "negative_pass": [
+        "resident_id",
+        "resident_key_id",
+        "request_id",
+        "operation_id",
+        "session_id",
+        "instance_id",
+        "request_sha256",
+        "context",
+        "publisher_challenge",
+        "response_bytes",
+        "signature",
+        "register_endpoint",
+        "replay"
+      ]
+    }
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "case": "remote_rejection_and_retirement_followup",
+  "status": "PASS",
+  "detail": {
+    "remote_rejection": true,
+    "publisher_proof_present": true,
+    "completion_ack_count": 0,
+    "exact_restart_rejected": true,
+    "retired_endpoint_connect_refused": true,
+    "stale_socket_inode_preserved": true,
+    "original_failure_preserved": "negative-remote-r2/results.json",
+    "limitation": "Local isolated bare Git authority. No platform-specific remote fault injection or independent security acceptance."
+  }
+}

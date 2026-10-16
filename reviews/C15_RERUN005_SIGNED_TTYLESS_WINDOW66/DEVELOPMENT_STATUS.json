@@ -1,0 +1,83 @@
+{
+  "WINDOW": 66,
+  "PM_RESPONSE_ENROLLMENT_SCOPE": "APPROVED_TEST_ONLY",
+  "WINDOW65_EVIDENCE_REVERIFIED": "PASS",
+  "NEW_TEST_ENROLLMENT": "PASS",
+  "OPERATOR_SIGNING_AUTHORITY": "PASS",
+  "RESIDENT_KEY_ISOLATION": "PASS",
+  "RED_FIRST": "PASS",
+  "PUBLISHER_TTYLESS_START": "PASS",
+  "SIGNED_RESPONSE_VERIFICATION": "PASS",
+  "UNATTENDED_USER": "PASS",
+  "UNATTENDED_DUE": "PASS",
+  "UNATTENDED_SUMMARY": "PASS",
+  "UNATTENDED_DELIVERED": "PASS",
+  "AUTHORIZATION_NEGATIVE_TESTS": "PASS",
+  "REPLAY_AND_RETIREMENT": "PASS",
+  "REMOTE_AUTHORITATIVE_COMPLETION": "PASS",
+  "PUBLISHER_IMPORT_EQUIVALENCE": "UNVERIFIED",
+  "FORMAL_SECURITY_VALIDATION": "PENDING",
+  "INDEPENDENT_ACCEPTANCE": "NOT_STARTED",
+  "PR_367_UNCHANGED": "YES",
+  "REAL_RESIDENT_STARTED": "NO",
+  "CURSOR_1_REVEALED": "NO",
+  "DO_NOT_MERGE": "YES",
+  "regression": {
+    "ORIGINAL_38": {
+      "tests": 38,
+      "pass": 31,
+      "fail": 7,
+      "skip": 0,
+      "failure_names": [
+        "test_sigkill_after_request_never_regenerates_or_redispatches",
+        "test_absent_external_response_bounded_fail_closed",
+        "test_real_core_external_publisher_with_c15_remote_barriers[due]",
+        "test_real_core_external_publisher_with_c15_remote_barriers[user]",
+        "test_real_core_external_publisher_with_c15_remote_barriers[summary]",
+        "test_real_core_external_publisher_with_c15_remote_barriers[delivered]",
+        "test_signer_not_importable_in_recovery_caller"
+      ]
+    },
+    "BASE_ORIGINAL_38": {
+      "tests": 38,
+      "pass": 31,
+      "fail": 7,
+      "skip": 0,
+      "failure_names": [
+        "test_sigkill_after_request_never_regenerates_or_redispatches",
+        "test_absent_external_response_bounded_fail_closed",
+        "test_real_core_external_publisher_with_c15_remote_barriers[due]",
+        "test_real_core_external_publisher_with_c15_remote_barriers[user]",
+        "test_real_core_external_publisher_with_c15_remote_barriers[summary]",
+        "test_real_core_external_publisher_with_c15_remote_barriers[delivered]",
+        "test_signer_not_importable_in_recovery_caller"
+      ]
+    },
+    "WINDOW55": {
+      "tests": 33,
+      "pass": 33,
+      "fail": 0,
+      "skip": 0,
+      "failure_names": []
+    },
+    "WINDOW57": {
+      "tests": 29,
+      "pass": 29,
+      "fail": 0,
+      "skip": 0,
+      "failure_names": []
+    }
+  },
+  "artifact": {
+    "artifact_sha256": "82aa3ff81d9492e0828934b5744adf4129fb6dc1361303a537379a603a319de3",
+    "c15_python_files": 18,
+    "core_python_files": 79,
+    "harness_manifest_sha256": "364cc03617fcd782327b3307720baf5371839185b1b07b71476308af74c5a817",
+    "harness_python_files": 21,
+    "member_count": 22,
+    "packet_sha256": "023c7556de1bcd4d4b0caccb90b0fa65d0b8a9b783f41f30574dfbb12e8f6b34",
+    "source_head_at_build": "9d3b19b0e7bf090e5d472d9781b9156f73ea2088"
+  },
+  "platform_special_fault_validation": "NOT_RUN; no platform-specific claim",
+  "FINAL_DISPOSITION": "ENGINEERING_READY_FOR_FORMAL_VALIDATION"
+}

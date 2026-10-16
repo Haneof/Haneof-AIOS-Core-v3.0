@@ -1,0 +1,267 @@
+..FFFFFF......F................F.....F                                   [100%]
+=================================== FAILURES ===================================
+_________ test_sigkill_after_request_never_regenerates_or_redispatches _________
+
+tmp_path = PosixPath('/tmp/pytest-of-codespace/pytest-1/test_sigkill_after_request_nev0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7de8d37467b0>
+
+    def test_sigkill_after_request_never_regenerates_or_redispatches(tmp_path,monkeypatch):
+>       root,repo=setup(tmp_path,monkeypatch)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_crash_recovery.py:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py:39: in setup
+    init(root,'synthetic-53-run','synthetic-53-session','user_1',repo)
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py:121: in init
+    backend=RunBackend.create(root,run_id=run_id,session_id=session_id,subject_id=subject_id,
+tools/c15_persistence/backend.py:277: in create
+    root = durable_root(root)
+           ^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/backend.py:199: in durable_root
+    require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ephemeral backend path: /tmp'
+
+    def require(condition: bool, reason: str) -> None:
+        if not condition:
+>           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ephemeral backend path: /tmp
+
+tools/c15_persistence/backend.py:132: BackendError
+______________ test_absent_external_response_bounded_fail_closed _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-codespace/pytest-1/test_absent_external_response_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7de8d3748bc0>
+
+    def test_absent_external_response_bounded_fail_closed(tmp_path,monkeypatch):
+>       root,repo=setup(tmp_path,monkeypatch)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_crash_recovery.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py:39: in setup
+    init(root,'synthetic-53-run','synthetic-53-session','user_1',repo)
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py:121: in init
+    backend=RunBackend.create(root,run_id=run_id,session_id=session_id,subject_id=subject_id,
+tools/c15_persistence/backend.py:277: in create
+    root = durable_root(root)
+           ^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/backend.py:199: in durable_root
+    require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ephemeral backend path: /tmp'
+
+    def require(condition: bool, reason: str) -> None:
+        if not condition:
+>           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ephemeral backend path: /tmp
+
+tools/c15_persistence/backend.py:132: BackendError
+_______ test_real_core_external_publisher_with_c15_remote_barriers[due] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-codespace/pytest-1/test_real_core_external_publis0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7de8d374b2c0>
+scenario = 'due'
+
+    @pytest.mark.parametrize('scenario',['due','user','summary','delivered'])
+    def test_real_core_external_publisher_with_c15_remote_barriers(tmp_path,monkeypatch,scenario):
+>       root,repo=setup(tmp_path,monkeypatch)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py:39: in setup
+    init(root,'synthetic-53-run','synthetic-53-session','user_1',repo)
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py:121: in init
+    backend=RunBackend.create(root,run_id=run_id,session_id=session_id,subject_id=subject_id,
+tools/c15_persistence/backend.py:277: in create
+    root = durable_root(root)
+           ^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/backend.py:199: in durable_root
+    require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ephemeral backend path: /tmp'
+
+    def require(condition: bool, reason: str) -> None:
+        if not condition:
+>           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ephemeral backend path: /tmp
+
+tools/c15_persistence/backend.py:132: BackendError
+_______ test_real_core_external_publisher_with_c15_remote_barriers[user] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-codespace/pytest-1/test_real_core_external_publis1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7de8d374b200>
+scenario = 'user'
+
+    @pytest.mark.parametrize('scenario',['due','user','summary','delivered'])
+    def test_real_core_external_publisher_with_c15_remote_barriers(tmp_path,monkeypatch,scenario):
+>       root,repo=setup(tmp_path,monkeypatch)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py:39: in setup
+    init(root,'synthetic-53-run','synthetic-53-session','user_1',repo)
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py:121: in init
+    backend=RunBackend.create(root,run_id=run_id,session_id=session_id,subject_id=subject_id,
+tools/c15_persistence/backend.py:277: in create
+    root = durable_root(root)
+           ^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/backend.py:199: in durable_root
+    require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ephemeral backend path: /tmp'
+
+    def require(condition: bool, reason: str) -> None:
+        if not condition:
+>           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ephemeral backend path: /tmp
+
+tools/c15_persistence/backend.py:132: BackendError
+_____ test_real_core_external_publisher_with_c15_remote_barriers[summary] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-codespace/pytest-1/test_real_core_external_publis2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7de8d374b740>
+scenario = 'summary'
+
+    @pytest.mark.parametrize('scenario',['due','user','summary','delivered'])
+    def test_real_core_external_publisher_with_c15_remote_barriers(tmp_path,monkeypatch,scenario):
+>       root,repo=setup(tmp_path,monkeypatch)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py:39: in setup
+    init(root,'synthetic-53-run','synthetic-53-session','user_1',repo)
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py:121: in init
+    backend=RunBackend.create(root,run_id=run_id,session_id=session_id,subject_id=subject_id,
+tools/c15_persistence/backend.py:277: in create
+    root = durable_root(root)
+           ^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/backend.py:199: in durable_root
+    require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ephemeral backend path: /tmp'
+
+    def require(condition: bool, reason: str) -> None:
+        if not condition:
+>           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ephemeral backend path: /tmp
+
+tools/c15_persistence/backend.py:132: BackendError
+____ test_real_core_external_publisher_with_c15_remote_barriers[delivered] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-codespace/pytest-1/test_real_core_external_publis3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7de8d3748bf0>
+scenario = 'delivered'
+
+    @pytest.mark.parametrize('scenario',['due','user','summary','delivered'])
+    def test_real_core_external_publisher_with_c15_remote_barriers(tmp_path,monkeypatch,scenario):
+>       root,repo=setup(tmp_path,monkeypatch)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py:39: in setup
+    init(root,'synthetic-53-run','synthetic-53-session','user_1',repo)
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py:121: in init
+    backend=RunBackend.create(root,run_id=run_id,session_id=session_id,subject_id=subject_id,
+tools/c15_persistence/backend.py:277: in create
+    root = durable_root(root)
+           ^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/backend.py:199: in durable_root
+    require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ephemeral backend path: /tmp'
+
+    def require(condition: bool, reason: str) -> None:
+        if not condition:
+>           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ephemeral backend path: /tmp
+
+tools/c15_persistence/backend.py:132: BackendError
+________________ test_signer_not_importable_in_recovery_caller _________________
+
+    def test_signer_not_importable_in_recovery_caller():
+>       with pytest.raises(ImportError):__import__('r005.publisher_service')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'ImportError'>
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_identity_delivery.py:55: Failed
+________ test_accepted_relay_requires_authentication_before_application ________
+
+tmp_path = PosixPath('/tmp/pytest-of-codespace/pytest-1/test_accepted_relay_requires_a0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7de8d378d130>
+
+    def test_accepted_relay_requires_authentication_before_application(tmp_path,monkeypatch):
+        from tools.c15_persistence import backend
+        from tools.c15_persistence.relay import RelayJournal,REQUEST_FIELDS
+        monkeypatch.setattr(backend,'WORKSPACE',tmp_path)
+>       b=backend.RunBackend.create(tmp_path/'synthetic-run',run_id='synthetic-run',
+            session_id='synthetic-session',subject_id='user_1',phase='SYNTHETIC')
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_mechanical_candidate.py:210: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/backend.py:277: in create
+    root = durable_root(root)
+           ^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/backend.py:199: in durable_root
+    require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ephemeral backend path: /tmp'
+
+    def require(condition: bool, reason: str) -> None:
+        if not condition:
+>           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ephemeral backend path: /tmp
+
+tools/c15_persistence/backend.py:132: BackendError
+_______________ test_live_wal_busy_checkpoint_cannot_be_archived _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-codespace/pytest-1/test_live_wal_busy_checkpoint_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7de8d3748ad0>
+
+    def test_live_wal_busy_checkpoint_cannot_be_archived(tmp_path,monkeypatch):
+        from tools.c15_persistence import backend
+        from r005.safe_runner import artifacts
+        monkeypatch.setattr(backend,'WORKSPACE',tmp_path)
+>       b=backend.RunBackend.create(tmp_path/'wal-run',run_id='wal-run',session_id='wal-session',subject_id='user_1',phase='SYNTHETIC')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_mechanical_candidate.py:252: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/c15_persistence/backend.py:277: in create
+    root = durable_root(root)
+           ^^^^^^^^^^^^^^^^^^
+tools/c15_persistence/backend.py:199: in durable_root
+    require(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, reason = 'ephemeral backend path: /tmp'
+
+    def require(condition: bool, reason: str) -> None:
+        if not condition:
+>           raise BackendError(reason)
+E           tools.c15_persistence.backend.BackendError: ephemeral backend path: /tmp
+
+tools/c15_persistence/backend.py:132: BackendError
+- generated xml file: /workspaces/window66-gate0-20261016T1509Z/original38-run2.xml -
+=========================== short test summary info ============================
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_crash_recovery.py::test_sigkill_after_request_never_regenerates_or_redispatches
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_crash_recovery.py::test_absent_external_response_bounded_fail_closed
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers[due]
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers[user]
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers[summary]
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers[delivered]
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_identity_delivery.py::test_signer_not_importable_in_recovery_caller
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_mechanical_candidate.py::test_accepted_relay_requires_authentication_before_application
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_mechanical_candidate.py::test_live_wal_busy_checkpoint_cannot_be_archived

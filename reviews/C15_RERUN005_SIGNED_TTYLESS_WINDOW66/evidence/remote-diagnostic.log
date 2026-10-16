@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "remote-diagnostic", line 13, in record
+  File "remote-diagnostic", line 72, in remote_failure
+AssertionError
+real_remote_rejection_and_exact_restart FAIL
