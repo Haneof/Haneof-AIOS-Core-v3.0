@@ -1,0 +1,136 @@
+{
+  "probes": [
+    {
+      "uid_requested": 999,
+      "argv_code": "import os,json; r={'uid':os.getuid(),'gid':os.getgid(),'groups':os.getgroups()}; paths=['/var/lib/aios-window65/operator', '/var/lib/aios-window65/AIOS_RESIDENT_TEST'];\nfor p in paths:\n try:f=os.open(p,os.O_RDONLY|os.O_DIRECTORY);os.close(f);r[p]='ACCESSIBLE'\n except PermissionError:r[p]='DENIED'\nprint(json.dumps(r))",
+      "returncode": 0,
+      "stdout": "{\"uid\": 999, \"gid\": 984, \"groups\": [], \"/var/lib/aios-window65/operator\": \"DENIED\", \"/var/lib/aios-window65/AIOS_RESIDENT_TEST\": \"DENIED\"}\n",
+      "stderr": "",
+      "sudo_returncode": 1,
+      "sudo_stderr": "sudo: a password is required\n"
+    },
+    {
+      "uid_requested": 996,
+      "argv_code": "import os,json; r={'uid':os.getuid(),'gid':os.getgid(),'groups':os.getgroups()}; paths=['/var/lib/aios-window65/operator', '/var/lib/aios-window65/AIOS_RUNNER_TEST'];\nfor p in paths:\n try:f=os.open(p,os.O_RDONLY|os.O_DIRECTORY);os.close(f);r[p]='ACCESSIBLE'\n except PermissionError:r[p]='DENIED'\nprint(json.dumps(r))",
+      "returncode": 0,
+      "stdout": "{\"uid\": 996, \"gid\": 983, \"groups\": [], \"/var/lib/aios-window65/operator\": \"DENIED\", \"/var/lib/aios-window65/AIOS_RUNNER_TEST\": \"DENIED\"}\n",
+      "stderr": "",
+      "sudo_returncode": 1,
+      "sudo_stderr": "sudo: a password is required\n"
+    }
+  ],
+  "protected_metadata_only": [
+    {
+      "path": "/var/lib/aios-window65/operator/issuer-canary",
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o644",
+      "type": "file"
+    },
+    {
+      "path": "/var/lib/aios-window65/operator/wrong.key",
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o600",
+      "type": "file"
+    },
+    {
+      "path": "/var/lib/aios-window65/operator/issuer.key",
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o600",
+      "type": "file"
+    },
+    {
+      "path": "/var/lib/aios-window65/AIOS_RUNNER_TEST/private",
+      "uid": 999,
+      "gid": 984,
+      "mode": "0o700",
+      "type": "dir"
+    },
+    {
+      "path": "/var/lib/aios-window65/AIOS_RUNNER_TEST/private/consumed-0123456789abcdef0123456789abcdef",
+      "uid": 999,
+      "gid": 984,
+      "mode": "0o600",
+      "type": "file"
+    },
+    {
+      "path": "/var/lib/aios-window65/AIOS_RUNNER_TEST/private/received.json",
+      "uid": 999,
+      "gid": 984,
+      "mode": "0o600",
+      "type": "file"
+    },
+    {
+      "path": "/var/lib/aios-window65/AIOS_RUNNER_TEST/private/isolation-canary",
+      "uid": 999,
+      "gid": 984,
+      "mode": "0o600",
+      "type": "file"
+    },
+    {
+      "path": "/var/lib/aios-window65/AIOS_RUNNER_TEST/private/received.sig",
+      "uid": 999,
+      "gid": 984,
+      "mode": "0o600",
+      "type": "file"
+    },
+    {
+      "path": "/var/lib/aios-window65/AIOS_RESIDENT_TEST/private",
+      "uid": 996,
+      "gid": 983,
+      "mode": "0o700",
+      "type": "dir"
+    },
+    {
+      "path": "/var/lib/aios-window65/AIOS_RESIDENT_TEST/private/transport-message.json",
+      "uid": 996,
+      "gid": 983,
+      "mode": "0o600",
+      "type": "file"
+    },
+    {
+      "path": "/var/lib/aios-window65/AIOS_RESIDENT_TEST/private/transport-message.sig",
+      "uid": 996,
+      "gid": 983,
+      "mode": "0o600",
+      "type": "file"
+    },
+    {
+      "path": "/var/lib/aios-window65/AIOS_RESIDENT_TEST/private/resident.pub",
+      "uid": 996,
+      "gid": 983,
+      "mode": "0o600",
+      "type": "file"
+    },
+    {
+      "path": "/var/lib/aios-window65/AIOS_RESIDENT_TEST/private/outside.sig",
+      "uid": 996,
+      "gid": 983,
+      "mode": "0o600",
+      "type": "file"
+    },
+    {
+      "path": "/var/lib/aios-window65/AIOS_RESIDENT_TEST/private/isolation-canary",
+      "uid": 996,
+      "gid": 983,
+      "mode": "0o600",
+      "type": "file"
+    },
+    {
+      "path": "/var/lib/aios-window65/AIOS_RESIDENT_TEST/private/message.sig",
+      "uid": 996,
+      "gid": 983,
+      "mode": "0o600",
+      "type": "file"
+    },
+    {
+      "path": "/var/lib/aios-window65/AIOS_RESIDENT_TEST/private/resident.key",
+      "uid": 996,
+      "gid": 983,
+      "mode": "0o600",
+      "type": "file"
+    }
+  ]
+}

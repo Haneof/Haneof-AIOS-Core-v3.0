@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py", line 154, in load_grant
+    require(grant.get('domain') == 'aios.r005.test.enrollment.v1' and
+  File "/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py", line 108, in require
+    raise ValueError(reason)
+ValueError: response-purpose TEST_ONLY enrollment required

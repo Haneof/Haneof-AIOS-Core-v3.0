@@ -1,0 +1,298 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python
+rootdir: /workspaces/window67-evidence-20261016T2053Z/candidate
+configfile: pyproject.toml
+collecting ... collected 33 items
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_completion.py::CompletionTests::test_fault_after_local_result_write_leaves_only_candidate_not_complete PASSED [  3%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_completion.py::CompletionTests::test_fault_after_remote_commit_preconfirmation_is_recoverable_candidate PASSED [  6%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_completion.py::CompletionTests::test_fault_before_local_result_write_leaves_started_state PASSED [  9%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_completion.py::CompletionTests::test_finalize_rechecks_current_disk_candidate_before_local_confirmation PASSED [ 12%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_completion.py::CompletionTests::test_operation_and_result_tampering_or_replay_mismatch_fails PASSED [ 15%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_completion.py::CompletionTests::test_remote_bytes_must_match_before_local_completion PASSED [ 18%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_completion.py::CompletionTests::test_write_candidate_requires_exact_started_operation_marker PASSED [ 21%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_actual_repository_protected_trees_match_pinned_identity FAILED [ 24%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_detects_same_bytes_inode_replacement_after_initial_snapshot FAILED [ 27%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_full_harness_core_and_c15_trees_scan_as_closed_identity FAILED [ 30%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_private_finder_imports_from_snapshots_and_rejects_module_substitution FAILED [ 33%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_rechecks_inode_and_rejects_path_replacement_after_verified_read FAILED [ 36%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_rejects_directory_mode_drift FAILED [ 39%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_rejects_same_device_mount_overlay_inside_protected_root PASSED [ 42%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_rejects_symlink_and_hardlink_aliases FAILED [ 45%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_rejects_unapproved_pyc_so_python_and_package_overlay FAILED [ 48%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_launch_bootstrap.py::LaunchBootstrapTests::test_exact_bootstrap_bytes_execute_in_real_main_namespace PASSED [ 51%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_launch_bootstrap.py::LaunchBootstrapTests::test_tampered_bootstrap_bytes_are_never_executed PASSED [ 54%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_publisher_authorization.py::PublisherAuthorizationTests::test_authorization_is_bound_to_request_runner_instance_and_operation PASSED [ 57%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_publisher_authorization.py::PublisherAuthorizationTests::test_capability_disclosure_writes_to_terminal_descriptor PASSED [ 60%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_publisher_authorization.py::PublisherAuthorizationTests::test_capability_is_one_use_and_not_reissued_for_a_registered_request PASSED [ 63%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_registration.py::RegistrationTests::test_client_refuses_pid_only_publisher_identity_fallback PASSED [ 66%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_registration.py::RegistrationTests::test_contextless_foreground_and_summary_have_narrow_shapes PASSED [ 69%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_registration.py::RegistrationTests::test_dead_or_restarted_runner_cannot_reuse_capability PASSED [ 72%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_registration.py::RegistrationTests::test_genuine_runner_registration_is_bound_and_one_shot PASSED [ 75%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_registration.py::RegistrationTests::test_rpc_authenticates_publisher_pid_and_process_start_time PASSED [ 78%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_registration.py::RegistrationTests::test_same_uid_child_knowing_real_pid_cannot_register PASSED [ 81%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_registration.py::RegistrationTests::test_unregistered_request_has_no_registration_capability PASSED [ 84%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_registration.py::RegistrationTests::test_wrong_operation_instance_attempt_and_provenance_are_rejected PASSED [ 87%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_remote_completion.py::RemoteCompletionTests::test_cas_race_during_git_push_fails_closed_without_completion PASSED [ 90%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_remote_completion.py::RemoteCompletionTests::test_remote_candidate_is_bound_to_exact_operation_and_result PASSED [ 93%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_remote_completion.py::RemoteCompletionTests::test_remote_commit_before_local_confirmation_recovers_without_redispatch PASSED [ 96%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_syntax.py::SyntaxTests::test_all_protected_and_window55_python_sources_compile PASSED [100%]
+
+=================================== FAILURES ===================================
+_ HarnessIdentityTests.test_actual_repository_protected_trees_match_pinned_identity _
+
+self = <test_harness_identity.HarnessIdentityTests testMethod=test_actual_repository_protected_trees_match_pinned_identity>
+
+    def test_actual_repository_protected_trees_match_pinned_identity(self):
+>       state = self.launcher.scan_identity(HARNESS_SOURCE, REPO, self.identity_sha)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py:78: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py:290: in scan_identity
+    manifest_bytes, manifest_file_identity = _read_regular_at(
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py:115: in _read_regular_at
+    _fail("PROTECTED_MODE_DRIFT", f"{scope}/{name}: {mode:o}")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code = 'PROTECTED_MODE_DRIFT', detail = 'harness/IDENTITY.json: 666'
+
+    def _fail(code, detail=""):
+        suffix = f": {detail}" if detail else ""
+>       raise IdentityBlocked(f"BLOCKED / {code}{suffix}")
+E       _r005_window55_launch_tests.IdentityBlocked: BLOCKED / PROTECTED_MODE_DRIFT: harness/IDENTITY.json: 666
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py:35: IdentityBlocked
+_ HarnessIdentityTests.test_detects_same_bytes_inode_replacement_after_initial_snapshot _
+
+self = <test_harness_identity.HarnessIdentityTests testMethod=test_detects_same_bytes_inode_replacement_after_initial_snapshot>
+
+    def test_detects_same_bytes_inode_replacement_after_initial_snapshot(self):
+        temp, harness, source_repo = self.fixture()
+        with temp:
+>           state = self.scan(harness, source_repo)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py:192: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py:75: in scan
+    return self.launcher.scan_identity(harness, source_repo, self.identity_sha)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py:290: in scan_identity
+    manifest_bytes, manifest_file_identity = _read_regular_at(
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py:115: in _read_regular_at
+    _fail("PROTECTED_MODE_DRIFT", f"{scope}/{name}: {mode:o}")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code = 'PROTECTED_MODE_DRIFT', detail = 'harness/IDENTITY.json: 666'
+
+    def _fail(code, detail=""):
+        suffix = f": {detail}" if detail else ""
+>       raise IdentityBlocked(f"BLOCKED / {code}{suffix}")
+E       _r005_window55_launch_tests.IdentityBlocked: BLOCKED / PROTECTED_MODE_DRIFT: harness/IDENTITY.json: 666
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py:35: IdentityBlocked
+_ HarnessIdentityTests.test_full_harness_core_and_c15_trees_scan_as_closed_identity _
+
+self = <test_harness_identity.HarnessIdentityTests testMethod=test_full_harness_core_and_c15_trees_scan_as_closed_identity>
+
+    def test_full_harness_core_and_c15_trees_scan_as_closed_identity(self):
+        temp, harness, source_repo = self.fixture()
+        with temp:
+>           state = self.scan(harness, source_repo)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py:75: in scan
+    return self.launcher.scan_identity(harness, source_repo, self.identity_sha)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py:290: in scan_identity
+    manifest_bytes, manifest_file_identity = _read_regular_at(
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py:115: in _read_regular_at
+    _fail("PROTECTED_MODE_DRIFT", f"{scope}/{name}: {mode:o}")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code = 'PROTECTED_MODE_DRIFT', detail = 'harness/IDENTITY.json: 666'
+
+    def _fail(code, detail=""):
+        suffix = f": {detail}" if detail else ""
+>       raise IdentityBlocked(f"BLOCKED / {code}{suffix}")
+E       _r005_window55_launch_tests.IdentityBlocked: BLOCKED / PROTECTED_MODE_DRIFT: harness/IDENTITY.json: 666
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py:35: IdentityBlocked
+_ HarnessIdentityTests.test_private_finder_imports_from_snapshots_and_rejects_module_substitution _
+
+self = <test_harness_identity.HarnessIdentityTests testMethod=test_private_finder_imports_from_snapshots_and_rejects_module_substitution>
+
+        def test_private_finder_imports_from_snapshots_and_rejects_module_substitution(self):
+            temp, harness, source_repo = self.fixture()
+            with temp:
+                probe = r"""
+    import importlib, importlib.util, pathlib, sys, types
+    launch_path = pathlib.Path(sys.argv[1])
+    harness = pathlib.Path(sys.argv[2])
+    source = pathlib.Path(sys.argv[3])
+    identity_sha = sys.argv[4]
+    spec = importlib.util.spec_from_file_location('_verified_launch_probe', launch_path)
+    launch = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = launch
+    spec.loader.exec_module(launch)
+    state = launch.scan_identity(harness, source, identity_sha)
+    launch.activate_verified_importer(state)
+    import r005.checks
+    import r005.response_authorization
+    import aios_core
+    import tools.c15_persistence
+    status = launch.verify_loaded_modules(source, harness)
+    assert status['module_import_identity'] == 'PASS'
+    assert 'r005.checks' in status['loaded_modules']
+    assert 'r005.response_authorization' in status['loaded_modules']
+    assert 'aios_core' in status['loaded_modules']
+    assert 'tools.c15_persistence' in status['loaded_modules']
+    try:
+        import tools.unapproved_helper
+    except launch.IdentityBlocked as exc:
+        assert 'UNAPPROVED_PROTECTED_MODULE' in str(exc)
+    else:
+        raise AssertionError('unapproved tools helper path was exposed')
+    core_loader = launch._VerifiedSourceLoader(
+        state, 'aios_core.headless.core', 'src/aios_core/headless/core.py', False)
+    core_code = core_loader.get_code('aios_core.headless.core')
+    assert core_code.co_filename.endswith('/src/aios_core/headless/core.py')
+    assert launch._sha(state['snapshots']['src/aios_core/headless/core.py']['bytes']) == \
+           state['snapshots']['src/aios_core/headless/core.py']['sha256']
+    for protected_name in ('r005.checks', 'aios_core.headless.core'):
+        sys.modules[protected_name] = types.ModuleType(protected_name)
+        try:
+            launch.verify_loaded_modules(source, harness)
+        except launch.IdentityBlocked as exc:
+            assert 'UNVERIFIED_LOADED_MODULE' in str(exc)
+        else:
+            raise AssertionError('preloaded protected override was trusted: ' + protected_name)
+    """
+                completed = subprocess.run(
+                    [sys.executable, '-I', '-B', '-c', probe, str(HARNESS_SOURCE / 'launch.py'),
+                     str(harness), str(source_repo), self.identity_sha],
+                    capture_output=True, text=True, timeout=30,
+                    env={**os.environ, 'PYTHONDONTWRITEBYTECODE': '1'})
+>               self.assertEqual(completed.returncode, 0,
+                                 f'stdout={completed.stdout}\nstderr={completed.stderr}')
+E                                AssertionError: 1 != 0 : stdout=
+E                                stderr=Traceback (most recent call last):
+E                                  File "<string>", line 11, in <module>
+E                                  File "/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 290, in scan_identity
+E                                    manifest_bytes, manifest_file_identity = _read_regular_at(
+E                                                                             ^^^^^^^^^^^^^^^^^
+E                                  File "/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 115, in _read_regular_at
+E                                    _fail("PROTECTED_MODE_DRIFT", f"{scope}/{name}: {mode:o}")
+E                                  File "/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 35, in _fail
+E                                    raise IdentityBlocked(f"BLOCKED / {code}{suffix}")
+E                                _verified_launch_probe.IdentityBlocked: BLOCKED / PROTECTED_MODE_DRIFT: harness/IDENTITY.json: 666
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py:255: AssertionError
+_ HarnessIdentityTests.test_rechecks_inode_and_rejects_path_replacement_after_verified_read _
+_r005_window55_launch_tests.IdentityBlocked: BLOCKED / PROTECTED_MODE_DRIFT: harness/IDENTITY.json: 666
+
+During handling of the above exception, another exception occurred:
+
+self = <test_harness_identity.HarnessIdentityTests testMethod=test_rechecks_inode_and_rejects_path_replacement_after_verified_read>
+
+    def test_rechecks_inode_and_rejects_path_replacement_after_verified_read(self):
+        temp, harness, source_repo = self.fixture()
+        with temp:
+            original_read = self.launcher._read_regular_at
+            swapped = {'done': False}
+    
+            def race(directory_fd, name, **kwargs):
+                result = original_read(directory_fd, name, **kwargs)
+                if kwargs.get('scope') == 'harness' and name == 'checks.py' and not swapped['done']:
+                    path = harness / 'r005/checks.py'
+                    replacement = path.with_suffix('.replacement')
+                    replacement.write_bytes(result[0])
+                    os.chmod(replacement, 0o644)
+                    os.replace(replacement, path)
+                    swapped['done'] = True
+                return result
+    
+            self.launcher._read_regular_at = race
+            try:
+>               with self.assertRaisesRegex(self.launcher.IdentityBlocked,
+                                            'PROTECTED_PATH_REPLACED_AFTER_READ'):
+E                                           AssertionError: "PROTECTED_PATH_REPLACED_AFTER_READ" does not match "BLOCKED / PROTECTED_MODE_DRIFT: harness/IDENTITY.json: 666"
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py:183: AssertionError
+____________ HarnessIdentityTests.test_rejects_directory_mode_drift ____________
+_r005_window55_launch_tests.IdentityBlocked: BLOCKED / PROTECTED_MODE_DRIFT: harness/IDENTITY.json: 666
+
+During handling of the above exception, another exception occurred:
+
+self = <test_harness_identity.HarnessIdentityTests testMethod=test_rejects_directory_mode_drift>
+
+    def test_rejects_directory_mode_drift(self):
+        temp, harness, source_repo = self.fixture()
+        with temp:
+            os.chmod(harness / 'r005', 0o700)
+>           with self.assertRaisesRegex(self.launcher.IdentityBlocked,
+                                        'PROTECTED_DIRECTORY_MODE_DRIFT|UNAPPROVED_OR_REPLACED_DIRECTORY'):
+E                                       AssertionError: "PROTECTED_DIRECTORY_MODE_DRIFT|UNAPPROVED_OR_REPLACED_DIRECTORY" does not match "BLOCKED / PROTECTED_MODE_DRIFT: harness/IDENTITY.json: 666"
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py:160: AssertionError
+________ HarnessIdentityTests.test_rejects_symlink_and_hardlink_aliases ________
+_r005_window55_launch_tests.IdentityBlocked: BLOCKED / PROTECTED_MODE_DRIFT: harness/IDENTITY.json: 666
+
+During handling of the above exception, another exception occurred:
+
+self = <test_harness_identity.HarnessIdentityTests testMethod=test_rejects_symlink_and_hardlink_aliases>
+
+    def test_rejects_symlink_and_hardlink_aliases(self):
+        temp, harness, source_repo = self.fixture()
+        with temp:
+            original = harness / 'r005/checks.py'
+            saved = Path(temp.name) / 'checks.saved'
+            shutil.copy2(original, saved)
+            original.unlink()
+            original.symlink_to(saved)
+>           with self.assertRaisesRegex(self.launcher.IdentityBlocked, 'PROTECTED_SYMLINK'):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: "PROTECTED_SYMLINK" does not match "BLOCKED / PROTECTED_MODE_DRIFT: harness/IDENTITY.json: 666"
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py:145: AssertionError
+_ HarnessIdentityTests.test_rejects_unapproved_pyc_so_python_and_package_overlay _
+_r005_window55_launch_tests.IdentityBlocked: BLOCKED / PROTECTED_MODE_DRIFT: harness/IDENTITY.json: 666
+
+During handling of the above exception, another exception occurred:
+
+self = <test_harness_identity.HarnessIdentityTests testMethod=test_rejects_unapproved_pyc_so_python_and_package_overlay>
+
+    def test_rejects_unapproved_pyc_so_python_and_package_overlay(self):
+        for filename in ('r005/checks.pyc', 'r005/checks.so',
+                         'r005/injected.pyc', 'r005/injected.so',
+                         'r005/unlisted.py',
+                         'src/aios_core/headless/core.pyc',
+                         'src/aios_core/headless/core.so',
+                         'r005/checks/__init__.py',
+                         'src/aios_core/headless/core/__init__.py'):
+            with self.subTest(filename=filename):
+                temp, harness, source_repo = self.fixture()
+                with temp:
+                    path = (harness / filename if filename.startswith('r005/')
+                            else source_repo / filename)
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_bytes(b'not authorized')
+>                   with self.assertRaisesRegex(self.launcher.IdentityBlocked,
+                                                'CLOSED_EXECUTABLE_SET_DRIFT|CLOSED_FILE_SET_MISMATCH|UNAPPROVED_OR_REPLACED_DIRECTORY'):
+E                                               AssertionError: "CLOSED_EXECUTABLE_SET_DRIFT|CLOSED_FILE_SET_MISMATCH|UNAPPROVED_OR_REPLACED_DIRECTORY" does not match "BLOCKED / PROTECTED_MODE_DRIFT: harness/IDENTITY.json: 666"
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py:133: AssertionError
+- generated xml file: /workspaces/window67-evidence-20261016T2053Z/window55.xml -
+=========================== short test summary info ============================
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_actual_repository_protected_trees_match_pinned_identity
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_detects_same_bytes_inode_replacement_after_initial_snapshot
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_full_harness_core_and_c15_trees_scan_as_closed_identity
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_private_finder_imports_from_snapshots_and_rejects_module_substitution
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_rechecks_inode_and_rejects_path_replacement_after_verified_read
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_rejects_directory_mode_drift
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_rejects_symlink_and_hardlink_aliases
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_rejects_unapproved_pyc_so_python_and_package_overlay
+========================= 8 failed, 25 passed in 1.91s =========================

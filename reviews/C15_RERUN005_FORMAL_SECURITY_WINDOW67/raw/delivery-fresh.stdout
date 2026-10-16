@@ -1,0 +1,47 @@
+[
+  {
+    "name": "materialize-fresh-first",
+    "returncode": 0,
+    "expected": 0
+  },
+  {
+    "name": "materialize-fresh-repeat",
+    "returncode": 1,
+    "expected": 1
+  },
+  {
+    "name": "materialized-fresh-verify",
+    "returncode": 0,
+    "expected": 0
+  },
+  {
+    "name": "ORIGINAL38_ASSERTIONS_BYTE_IDENTICAL",
+    "status": "PASS",
+    "files": 6
+  },
+  {
+    "name": "grant-reject-enrollment.json",
+    "returncode": 1,
+    "expected": 1
+  },
+  {
+    "name": "grant-reject-expired.json",
+    "returncode": 1,
+    "expected": 1
+  },
+  {
+    "name": "grant-reject-tampered-enrollment.json",
+    "returncode": 1,
+    "expected": 1
+  },
+  {
+    "name": "grant-reject-wrong_key_binding.json",
+    "returncode": 1,
+    "expected": 1
+  },
+  {
+    "name": "grant-reject-wrong_scope.json",
+    "returncode": 1,
+    "expected": 1
+  }
+]

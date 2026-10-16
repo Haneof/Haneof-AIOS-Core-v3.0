@@ -1,0 +1,866 @@
+[
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/IDENTITY.json",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/atomic.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/bridge.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/canonical.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/checks.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/completion.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/content_manifest.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/ledger.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/payload.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/registration.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/registration_ipc.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/remote_completion.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/requests.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/responses.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/schema.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/verify.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/ai_world",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/communication",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/context",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/contracts",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/dependency",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/dimensions",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/events",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/execution",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/headless",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/ingest",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/policy",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/projections",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/query",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/recommendation",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/review",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/revision",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/runtime",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/storage",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/summaries",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/wake",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/writeback",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/ai_world/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/ai_world/cognition.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/communication/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/communication/service.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/context/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/context/continuity.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/context/controller.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/contracts/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/contracts/base.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/contracts/enums.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/contracts/errors.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/contracts/ids.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/contracts/models.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/contracts/operations.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/contracts/refs.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/contracts/registry.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/contracts/safety_bypass.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/contracts/time.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/dependency/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/dependency/graph.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/dimensions/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/dimensions/registry.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/errors.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/events/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/events/service.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/execution/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/execution/service.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/headless/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/headless/cli.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/headless/core.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/headless/recovery.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/headless/testing.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/ingest/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/ingest/conversation.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/ingest/reality.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/policy/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/policy/evidence.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/policy/service.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/projections/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/projections/all_dimensions.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/query/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/query/cjk_inverted_index.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/query/history.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/query/hyperlink_traverser.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/query/search.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/recommendation/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/recommendation/proactive.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/recommendation/topic_state.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/review/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/review/periodic.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/revision/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/revision/propagation.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/revision/service.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/runtime/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/runtime/background_attempt.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/runtime/budget_gate.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/runtime/capabilities.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/runtime/cognitive_runtime.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/runtime/conversation_state.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/runtime/conversation_timeline.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/runtime/late_return.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/runtime/live_return.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/runtime/metering.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/runtime/turn_execution.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/runtime/turn_runtime.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/storage/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/storage/idempotency.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/storage/sqlite_store.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/summaries/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/summaries/cognitive_derivation.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/summaries/dimension_summary.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/summaries/scheduler.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/wake/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/wake/attention.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/wake/service.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/world_graph.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/writeback/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "src/aios_core/writeback/cognition.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence",
+    "before": 511,
+    "after": 493,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence/__init__.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence/_provider_authority.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence/backend.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence/freeze_corrective_003_evidence.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence/freeze_corrective_003_matrix.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence/freeze_evidence_manifest.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence/freeze_probe_manifest.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence/journal.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence/operator_session.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence/platform_reattach.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence/probe_cli.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence/provider.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence/provider_process.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence/relay.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence/remote_backend.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence/resident_surface_check.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence/runstate.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  },
+  {
+    "path": "tools/c15_persistence/synthetic_release.py",
+    "before": 438,
+    "after": 420,
+    "bytes_unchanged": true
+  }
+]

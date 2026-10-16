@@ -1,0 +1,60 @@
+[
+  {
+    "suite": "original38",
+    "argv": [
+      "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "-vv",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp",
+      "/workspaces/window67-evidence-20261016T2053Z/original38-tmp",
+      "--junitxml=/workspaces/window67-evidence-20261016T2053Z/original38.xml",
+      "/workspaces/window67-evidence-20261016T2053Z/candidate/reviews/WINDOW67_ORIGINAL38_UNMODIFIED"
+    ],
+    "returncode": 1,
+    "seconds": 7.498211145401001,
+    "controlling_tty": false
+  },
+  {
+    "suite": "window55",
+    "argv": [
+      "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "-vv",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp",
+      "/workspaces/window67-evidence-20261016T2053Z/window55-tmp",
+      "--junitxml=/workspaces/window67-evidence-20261016T2053Z/window55.xml",
+      "reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests"
+    ],
+    "returncode": 1,
+    "seconds": 2.2244820594787598,
+    "controlling_tty": false
+  },
+  {
+    "suite": "window57",
+    "argv": [
+      "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "-vv",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp",
+      "/workspaces/window67-evidence-20261016T2053Z/window57-tmp",
+      "--junitxml=/workspaces/window67-evidence-20261016T2053Z/window57.xml",
+      "reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py",
+      "reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_publisher_contract.py"
+    ],
+    "returncode": 0,
+    "seconds": 5.989154577255249,
+    "controlling_tty": false
+  }
+]
