@@ -1,0 +1,21 @@
+Traceback (most recent call last):
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 612, in <module>
+    _main()
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py", line 608, in _main
+    main()
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/cli.py", line 32, in main
+    elif a.command=='run':value=run(a.root,a.run_id,a.session_id,a.persistence_repo,json.loads(a.operation.read_bytes()))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/safe_runner.py", line 316, in run
+    grant=configured_grant()
+          ^^^^^^^^^^^^^^^^^^
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py", line 188, in configured_grant
+    return load_grant(path) if path else None
+           ^^^^^^^^^^^^^^^^
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py", line 148, in load_grant
+    raw = trusted_bytes(path)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/window66-gate0-20261016T1509Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py", line 117, in trusted_bytes
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/var/lib/aios-window65/trust/window66-response-final-2020z/not-issued.json'

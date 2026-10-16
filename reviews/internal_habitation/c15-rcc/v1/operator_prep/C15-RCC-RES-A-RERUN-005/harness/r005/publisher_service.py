@@ -99,7 +99,11 @@ def main():
     runner_lifetime = select.poll()
     runner_lifetime.register(runner_pidfd, select.POLLIN | select.POLLHUP | select.POLLERR)
 
-    resident_tty_fd = open_resident_terminal()
+    signed = None
+    if os.environ.get('AIOS66_TEST_ENROLLMENT'):
+        from r005.response_authorization import SignedResponseAuthority
+        signed = SignedResponseAuthority(operation_id, runner_instance_id)
+    resident_tty_fd = None if signed is not None else open_resident_terminal()
     p = q = 0
     n = 0
     e = 65537
@@ -152,25 +156,38 @@ def main():
     # It is intentionally never returned over the Runner registration RPC or
     # written to the exchange tree, and it dies with this one-operation process.
     authorization_by_request = {}
+    signed_server = None
+    if signed is not None:
+        endpoint = signed.open_endpoint()
+        signed_server = signed.server
+        atomic_write_bytes(root / 'signed-endpoint.json', canonical_json_bytes({
+            'socket': endpoint, 'publisher_pid': os.getpid(),
+            'publisher_start_time': process_start_time(os.getpid()),
+            'publisher_epoch': signed.epoch}))
 
-    def dispatch(connection, peer):
+    def dispatch(connection, peer, *, resident_verified=False, signed_command=None):
         peer_pid, peer_uid, peer_gid = peer
-        if peer_uid != runner_uid or peer_gid != runner_gid:
+        if not resident_verified and (peer_uid != runner_uid or peer_gid != runner_gid):
             raise ValueError('IPC peer credentials do not match the local session')
-        command = receive_message(connection)
+        command = signed_command if resident_verified else receive_message(connection)
         kind = command.get('command')
         if kind == 'register':
+            if resident_verified:
+                raise ValueError('response endpoint cannot register Runner requests')
             rid, _registration = registration_authority.register(peer, command, bridge)
-            token = issue_response_authorization(
-                authorization_by_request, rid,
-                runner_instance_id=runner_instance_id, operation_id=operation_id)
-            # The Runner receives only the registration receipt. The one-use
-            # Resident capability is surfaced separately and never persisted.
-            write_resident_capability(resident_tty_fd, token, rid, operation_id)
+            if signed is not None:
+                signed.register(rid, _registration, bridge)
+            else:
+                token = issue_response_authorization(
+                    authorization_by_request, rid,
+                    runner_instance_id=runner_instance_id, operation_id=operation_id)
+                write_resident_capability(resident_tty_fd, token, rid, operation_id)
             return {'registered': rid, 'publisher_pid': os.getpid(),
                     'runner_instance_id': runner_instance_id,
                     'operation_id': operation_id}
         if kind == 'publish':
+            if signed is not None and not resident_verified:
+                raise ValueError('signed mode requires response-only Resident endpoint')
             if peer_pid == runner_pid:
                 raise ValueError('Runner registration authority cannot publish Resident responses')
             required = {'command', 'request_id', 'request_sha256', 'raw', 'authorization_proof'}
@@ -180,7 +197,7 @@ def main():
                 raise ValueError('Runner process lifetime ended')
             content = {key: command[key] for key in ('request_id', 'request_sha256', 'raw')}
             rid = command['request_id']
-            if not response_authorization_valid(
+            if not resident_verified and not response_authorization_valid(
                     authorization_by_request, rid, content, command.get('authorization_proof', ''),
                     runner_instance_id=runner_instance_id, operation_id=operation_id):
                 raise ValueError('external Resident authorization required for this request/operation')
@@ -215,6 +232,8 @@ def main():
                     'operation_id': operation_id,
                     'core_attempt_id': registration['core_attempt_id'],
                     'core_proof': None,
+                    **({'resident_authorization_sha256': signed.verified_digests[rid]}
+                       if signed is not None else {}),
                 }
                 scope = registration['context']
                 if scope is not None:
@@ -236,9 +255,10 @@ def main():
             result.update({'proof': str(proof_path), 'publisher_pid': os.getpid(),
                            'operation_id': operation_id,
                            'runner_instance_id': runner_instance_id})
-            retire_response_authorization(
-                authorization_by_request, rid,
-                runner_instance_id=runner_instance_id, operation_id=operation_id)
+            if signed is None:
+                retire_response_authorization(
+                    authorization_by_request, rid,
+                    runner_instance_id=runner_instance_id, operation_id=operation_id)
             return result
         raise ValueError('unsupported publisher command')
 
@@ -251,14 +271,24 @@ def main():
     try:
         while runner_is_live():
             try:
-                connection, _ = server.accept()
+                listeners = [server] + ([signed_server] if signed_server is not None else [])
+                readable, _, _ = select.select(listeners, [], [], 0.2)
+                if not readable:
+                    continue
+                listener = readable[0]
+                connection, _ = listener.accept()
             except TimeoutError:
                 continue
             with connection:
                 connection.settimeout(5.0)
                 try:
                     peer = peer_credentials(connection)
-                    result = dispatch(connection, peer)
+                    if listener is signed_server:
+                        result = signed.dispatch(connection, peer, bridge, registration_authority,
+                            runner_is_live, lambda command, peer: dispatch(connection, peer,
+                                resident_verified=True, signed_command=command))
+                    else:
+                        result = dispatch(connection, peer)
                     send_message(connection, {'ok': True, 'result': result})
                 except Exception as exc:
                     try:
@@ -276,7 +306,10 @@ def main():
             pass
         os.close(parent_fd)
         os.close(runner_pidfd)
-        os.close(resident_tty_fd)
+        if resident_tty_fd is not None:
+            os.close(resident_tty_fd)
+        if signed is not None:
+            signed.close()
 
 
 if __name__ == '__main__':

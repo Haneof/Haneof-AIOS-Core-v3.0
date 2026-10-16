@@ -1,7 +1,7 @@
 {
   "harness/IDENTITY.json": {
     "mode": 420,
-    "sha256": "ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd",
+    "sha256": "364cc03617fcd782327b3307720baf5371839185b1b07b71476308af74c5a817",
     "size": 18257
   },
   "harness/launch.py": {
@@ -61,8 +61,8 @@
   },
   "harness/r005/publisher_service.py": {
     "mode": 420,
-    "sha256": "227829a6a6c4c433022afb063d0bdfa157b87966a0982687240f51b13eea6bb3",
-    "size": 13136
+    "sha256": "c0fe9bb01ff48a8db6c081269c8caf0384649800ecdd69b9eccb392e118f47cb",
+    "size": 15069
   },
   "harness/r005/registration.py": {
     "mode": 420,
@@ -86,8 +86,8 @@
   },
   "harness/r005/response_authorization.py": {
     "mode": 420,
-    "sha256": "4e90aeca366be7cbae3ed8b5e5efe48bd85eedea356275b6966bc134236a8e4c",
-    "size": 3352
+    "sha256": "abc30a28661f22390a9f4a34df5d9764fe27e155f7c285c9e2008c16448defa6",
+    "size": 14558
   },
   "harness/r005/responses.py": {
     "mode": 420,
@@ -96,8 +96,8 @@
   },
   "harness/r005/safe_runner.py": {
     "mode": 420,
-    "sha256": "e61630ddb2b39e9403bd29233b151984390c1a33d8875a55549fa28045c854c6",
-    "size": 27672
+    "sha256": "864bd8cb6695f3d64d06938e215115048d4828afc44157f060234a4da97f13e7",
+    "size": 28060
   },
   "harness/r005/schema.py": {
     "mode": 420,
