@@ -31,7 +31,7 @@
     "PM54_BLK_003": "UNVERIFIED",
     "PUBLISHER_IMPORT_EQUIVALENCE": "UNVERIFIED",
     "NEW_SECURITY_BLOCKERS": "0 confirmed new code defects; 3 validation blockers; 7 binding historical regression failures",
-    "EVIDENCE_PUBLICATION": "PENDING",
+    "EVIDENCE_PUBLICATION": "PASS",
     "FORMAL_DISPOSITION": "FORMAL_VALIDATION_FAIL",
     "INDEPENDENT_ACCEPTANCE": "NOT_STARTED",
     "REAL_RESIDENT_STARTED": "NO",
@@ -1163,5 +1163,6 @@
       "detail": "Existing fuzzy robot reached VS Code Restricted Mode. No trust/security setting was changed and no cross-environment materialization was executed. Same-host directory materialization is recorded separately."
     }
   ],
-  "created_utc": "2026-10-16T21:28:51.727955+00:00"
+  "created_utc": "2026-10-16T21:28:51.727955+00:00",
+  "evidence_pr": "https://github.com/Haneof/Haneof-AIOS-Core-v3.0/pull/371"
 }
