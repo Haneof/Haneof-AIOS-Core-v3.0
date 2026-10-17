@@ -1,0 +1,5 @@
+{
+  "schema": "aios.agent.gateway.pr.request.v0.4",
+  "task": "pr370-artifact-audit",
+  "candidate_head": "6fb725407569bc719c049587f67fe65e797eb734"
+}
