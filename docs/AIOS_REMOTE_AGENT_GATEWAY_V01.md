@@ -27,7 +27,7 @@ The historical seven original regression failures, Window54 security gates, Wind
 
 ## Deployment stages
 
-1. **Current Draft PR:** GitHub pull_request CI tests v0.1 policy, negative cases, and gateway-selftest on hosted ubuntu-latest. This stage does not enable external task dispatch.
+1. **Current Draft PR:** GitHub pull_request CI runs policy/negative cases and all three allowlisted tasks on hosted ubuntu-latest, producing a separate receipt for each. This stage does not enable external task dispatch.
 2. **Manual security and PM review:** confirm no secrets, no unapproved files, no automatic dispatch and no writable token. Do not merge merely to enable commands.
 3. **Separate authorized merge to default main:** GitHub requires the workflow file to exist on the default branch for workflow_dispatch to be handled. **Do not merge without separate PM authorization.**
 4. **After approved activation only:** an AI/Operator with explicit GitHub Actions write access can submit one of the fixed workflow inputs. A GitHub agent that can only read PRs cannot start the workflow; use GitHub Actions UI or a properly authorized integration instead.
@@ -45,7 +45,7 @@ With installed GitHub CLI and properly authorized Actions permissions:
     gh run list --repo Haneof/Haneof-AIOS-Core-v3.0 \
       --workflow aios-remote-agent-gateway-v01.yml
 
-A task produces a GitHub check result, short-lived Actions artifact (JSON, JUnit, SHA256, unit-test log) and a job summary. Downstream AI may read the run and propose an **Evidence-only Draft PR** but cannot transform CI PASS into formal validation.
+Each task produces its own short-lived JSON, JUnit and SHA256 receipt under gateway-evidence/<task>/, alongside CI unit-test logs and a job summary. Downstream AI may read the run and propose an **Evidence-only Draft PR** but cannot transform CI PASS into formal validation.
 
 ## AI integration contract
 
