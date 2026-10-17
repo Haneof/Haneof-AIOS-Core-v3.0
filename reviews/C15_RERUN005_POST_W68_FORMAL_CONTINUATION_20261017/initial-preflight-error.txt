@@ -1,0 +1,1 @@
+Initial helper aborted after successful detached worktree creation: FileNotFoundError: rg unavailable. Subsequent runtime/account probes had not run. System Python used only for orchestration.

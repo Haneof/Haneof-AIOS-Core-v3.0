@@ -1,0 +1,69 @@
+[
+  {
+    "suite": "original38",
+    "argv": [
+      "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "-vv",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp",
+      "/workspaces/c15-w67-continuation-20261017T0830Z/original38-tmp",
+      "--junitxml=/workspaces/c15-w67-continuation-20261017T0830Z/original38.xml",
+      "/workspaces/c15-w67-continuation-20261017T0830Z/candidate/reviews/POST_W68_ORIGINAL38_UNMODIFIED"
+    ],
+    "cwd": "/workspaces/c15-w67-continuation-20261017T0830Z/candidate",
+    "returncode": 1,
+    "seconds": 32.84947872161865,
+    "start_new_session": true,
+    "APPROVED53_PYTHON": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+    "PYTHONPATH": "/workspaces/c15-w67-continuation-20261017T0830Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness:/workspaces/c15-w67-continuation-20261017T0830Z/candidate/src:/workspaces/c15-w67-continuation-20261017T0830Z/candidate/tools:/workspaces/c15-w67-continuation-20261017T0830Z/candidate/reviews/POST_W68_ORIGINAL38_UNMODIFIED"
+  },
+  {
+    "suite": "window55",
+    "argv": [
+      "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "-vv",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp",
+      "/workspaces/c15-w67-continuation-20261017T0830Z/window55-tmp",
+      "--junitxml=/workspaces/c15-w67-continuation-20261017T0830Z/window55.xml",
+      "reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests"
+    ],
+    "cwd": "/workspaces/c15-w67-continuation-20261017T0830Z/candidate",
+    "returncode": 0,
+    "seconds": 2.3227312564849854,
+    "start_new_session": true,
+    "APPROVED53_PYTHON": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+    "PYTHONPATH": "/workspaces/c15-w67-continuation-20261017T0830Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness:/workspaces/c15-w67-continuation-20261017T0830Z/candidate/src:/workspaces/c15-w67-continuation-20261017T0830Z/candidate/tools:/workspaces/c15-w67-continuation-20261017T0830Z/candidate/reviews/POST_W68_ORIGINAL38_UNMODIFIED"
+  },
+  {
+    "suite": "window57",
+    "argv": [
+      "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "-vv",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp",
+      "/workspaces/c15-w67-continuation-20261017T0830Z/window57-tmp",
+      "--junitxml=/workspaces/c15-w67-continuation-20261017T0830Z/window57.xml",
+      "reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_delivery.py",
+      "reviews/C15_RERUN005_FORMAL_GATE_CORRECTIVE_WINDOW57/test_publisher_contract.py"
+    ],
+    "cwd": "/workspaces/c15-w67-continuation-20261017T0830Z/candidate",
+    "returncode": 0,
+    "seconds": 5.841060161590576,
+    "start_new_session": true,
+    "APPROVED53_PYTHON": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+    "PYTHONPATH": "/workspaces/c15-w67-continuation-20261017T0830Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness:/workspaces/c15-w67-continuation-20261017T0830Z/candidate/src:/workspaces/c15-w67-continuation-20261017T0830Z/candidate/tools:/workspaces/c15-w67-continuation-20261017T0830Z/candidate/reviews/POST_W68_ORIGINAL38_UNMODIFIED"
+  }
+]

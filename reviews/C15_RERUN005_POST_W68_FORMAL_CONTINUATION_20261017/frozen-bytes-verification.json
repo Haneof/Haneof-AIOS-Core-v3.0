@@ -1,0 +1,7 @@
+{
+  "candidate": "6fb725407569bc719c049587f67fe65e797eb734",
+  "tracked_blobs_checked": 1484,
+  "mismatches": [],
+  "all_frozen_bytes_match": true,
+  "untracked_addition": "reviews/POST_W68_ORIGINAL38_UNMODIFIED contains six byte-identical historical regression files only"
+}

@@ -1,0 +1,44 @@
+[
+  {
+    "case": "missing",
+    "argv": [
+      "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+      "-B",
+      "-I",
+      "-c",
+      "import sys;sys.path.insert(0,sys.argv[1]);from r005.response_authorization import load_grant;load_grant(sys.argv[2])",
+      "/workspaces/c15-w67-continuation-20261017T0830Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness",
+      "/workspaces/c15-w67-continuation-20261017T0830Z/absent-grant.json"
+    ],
+    "returncode": 1,
+    "reason": "ValueError: Operator trust ancestor is mutable or not a directory"
+  },
+  {
+    "case": "untrusted",
+    "argv": [
+      "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+      "-B",
+      "-I",
+      "-c",
+      "import sys;sys.path.insert(0,sys.argv[1]);from r005.response_authorization import load_grant;load_grant(sys.argv[2])",
+      "/workspaces/c15-w67-continuation-20261017T0830Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness",
+      "/workspaces/c15-w67-continuation-20261017T0830Z/reviewer-untrusted-grant.json"
+    ],
+    "returncode": 1,
+    "reason": "ValueError: Operator trust ancestor is mutable or not a directory"
+  },
+  {
+    "case": "expired-window68",
+    "argv": [
+      "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+      "-B",
+      "-I",
+      "-c",
+      "import sys;sys.path.insert(0,sys.argv[1]);from r005.response_authorization import load_grant;load_grant(sys.argv[2])",
+      "/workspaces/c15-w67-continuation-20261017T0830Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness",
+      "/var/lib/aios-window65/trust/window68-response/1792203161-2ae39db9/user.json"
+    ],
+    "returncode": 1,
+    "reason": "ValueError: expired or invalid enrollment"
+  }
+]

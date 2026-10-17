@@ -1,0 +1,42 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-8.4.2, pluggy-1.6.0 -- /home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python
+rootdir: /workspaces/c15-w67-continuation-20261017T0830Z/candidate
+configfile: pyproject.toml
+collecting ... collected 33 items
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_completion.py::CompletionTests::test_fault_after_local_result_write_leaves_only_candidate_not_complete PASSED [  3%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_completion.py::CompletionTests::test_fault_after_remote_commit_preconfirmation_is_recoverable_candidate PASSED [  6%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_completion.py::CompletionTests::test_fault_before_local_result_write_leaves_started_state PASSED [  9%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_completion.py::CompletionTests::test_finalize_rechecks_current_disk_candidate_before_local_confirmation PASSED [ 12%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_completion.py::CompletionTests::test_operation_and_result_tampering_or_replay_mismatch_fails PASSED [ 15%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_completion.py::CompletionTests::test_remote_bytes_must_match_before_local_completion PASSED [ 18%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_completion.py::CompletionTests::test_write_candidate_requires_exact_started_operation_marker PASSED [ 21%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_actual_repository_protected_trees_match_pinned_identity PASSED [ 24%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_detects_same_bytes_inode_replacement_after_initial_snapshot PASSED [ 27%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_full_harness_core_and_c15_trees_scan_as_closed_identity PASSED [ 30%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_private_finder_imports_from_snapshots_and_rejects_module_substitution PASSED [ 33%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_rechecks_inode_and_rejects_path_replacement_after_verified_read PASSED [ 36%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_rejects_directory_mode_drift PASSED [ 39%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_rejects_same_device_mount_overlay_inside_protected_root PASSED [ 42%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_rejects_symlink_and_hardlink_aliases PASSED [ 45%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_harness_identity.py::HarnessIdentityTests::test_rejects_unapproved_pyc_so_python_and_package_overlay PASSED [ 48%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_launch_bootstrap.py::LaunchBootstrapTests::test_exact_bootstrap_bytes_execute_in_real_main_namespace PASSED [ 51%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_launch_bootstrap.py::LaunchBootstrapTests::test_tampered_bootstrap_bytes_are_never_executed PASSED [ 54%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_publisher_authorization.py::PublisherAuthorizationTests::test_authorization_is_bound_to_request_runner_instance_and_operation PASSED [ 57%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_publisher_authorization.py::PublisherAuthorizationTests::test_capability_disclosure_writes_to_terminal_descriptor PASSED [ 60%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_publisher_authorization.py::PublisherAuthorizationTests::test_capability_is_one_use_and_not_reissued_for_a_registered_request PASSED [ 63%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_registration.py::RegistrationTests::test_client_refuses_pid_only_publisher_identity_fallback PASSED [ 66%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_registration.py::RegistrationTests::test_contextless_foreground_and_summary_have_narrow_shapes PASSED [ 69%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_registration.py::RegistrationTests::test_dead_or_restarted_runner_cannot_reuse_capability PASSED [ 72%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_registration.py::RegistrationTests::test_genuine_runner_registration_is_bound_and_one_shot PASSED [ 75%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_registration.py::RegistrationTests::test_rpc_authenticates_publisher_pid_and_process_start_time PASSED [ 78%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_registration.py::RegistrationTests::test_same_uid_child_knowing_real_pid_cannot_register PASSED [ 81%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_registration.py::RegistrationTests::test_unregistered_request_has_no_registration_capability PASSED [ 84%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_registration.py::RegistrationTests::test_wrong_operation_instance_attempt_and_provenance_are_rejected PASSED [ 87%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_remote_completion.py::RemoteCompletionTests::test_cas_race_during_git_push_fails_closed_without_completion PASSED [ 90%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_remote_completion.py::RemoteCompletionTests::test_remote_candidate_is_bound_to_exact_operation_and_result PASSED [ 93%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_remote_completion.py::RemoteCompletionTests::test_remote_commit_before_local_confirmation_recovers_without_redispatch PASSED [ 96%]
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW55/tests/test_syntax.py::SyntaxTests::test_all_protected_and_window55_python_sources_compile PASSED [100%]
+
+- generated xml file: /workspaces/c15-w67-continuation-20261017T0830Z/window55.xml -
+============================== 33 passed in 2.02s ==============================

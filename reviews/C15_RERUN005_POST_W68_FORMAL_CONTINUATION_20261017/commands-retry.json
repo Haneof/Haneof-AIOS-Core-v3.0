@@ -1,0 +1,35 @@
+[
+  {
+    "name": "accounts",
+    "command": [
+      "getent",
+      "passwd",
+      "999",
+      "996"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "trust-metadata",
+    "command": [
+      "stat",
+      "-c",
+      "%u %g %a %n",
+      "/var/lib/aios-window65",
+      "/var/lib/aios-window65/operator",
+      "/var/lib/aios-window65/operator/window68-issue.py"
+    ],
+    "exit": 1
+  },
+  {
+    "name": "runtime",
+    "command": [
+      "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+      "-B",
+      "-I",
+      "-c",
+      "import sys,ssl,sqlite3,pydantic,pytest,hashlib,pathlib,os; p=pathlib.Path(sys.executable).resolve();print(sys.version);print(pydantic.__version__,pytest.__version__,sqlite3.sqlite_version,ssl.OPENSSL_VERSION);print(p,hashlib.sha256(p.read_bytes()).hexdigest()); print('uid',os.getuid())"
+    ],
+    "exit": 0
+  }
+]

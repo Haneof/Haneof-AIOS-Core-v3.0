@@ -1,0 +1,4 @@
+0 0 755 /run/aios-w66-responses
+0 0 755 /var/lib/aios-window65/trust
+999 984 700 /var/lib/aios-window65/AIOS_RUNNER_TEST
+996 983 700 /var/lib/aios-window65/AIOS_RESIDENT_TEST
