@@ -1,6 +1,6 @@
 # AIOS Agent Issue Gateway v0.2 (PUBLIC / OWNER-AUTHORED / NON-FORMAL)
 
-**Draft only. Do not merge without a new explicit PM approval.**
+**v0.2 activated on main via PR #373. v0.3 read-only task additions are separate Draft changes requiring PM approval before activation.**
 
 This gateway lets an AI with a legitimate GitHub **Issues-write** connector, including
 an authorized ChatGPT GitHub app, request an allowlisted nonsecret GitHub Actions
@@ -36,6 +36,8 @@ Issue title (choose ONE exact value):
     [AIOS-GW-V02] gateway-selftest
     [AIOS-GW-V02] pr370-source-boundary
     [AIOS-GW-V02] pr370-artifact-audit
+    [AIOS-GW-V02] pr371-evidence-integrity   (v0.3 ONLY, pending merge)
+    [AIOS-GW-V02] r005-binding-ledger       (v0.3 ONLY, pending merge)
 
 Issue description must be **only** a JSON object of three fields, e.g.:
 
@@ -65,9 +67,8 @@ shell snippets, token values, unsigned grants, private data, or arbitrary ref.
 
 ## Activation and allowed clients
 
-1. Independently review and test this isolated Draft PR. Do not merge with
-   unresolved engineering/security issues by claiming this CI is formal.
-2. Only after new PM merge authorization, install the workflow on main.
+1. This v0.2 protocol has passed its own CI and been merged; any task-catalogue expansion (v0.3) must undergo fresh review and new authorization.
+2. Issue dispatch is active for the three existing tasks; the two proposed v0.3 tasks do not exist on main until separately activated.
 3. Any ChatGPT agent with authenticated GitHub Issues-write capability for
    repository Haneof/Haneof-AIOS-Core-v3.0 can create a new, exact owner-authored
    Issue with the protocol above (provided its actor is actually Haneof).
