@@ -36,8 +36,10 @@ Issue title (choose ONE exact value):
     [AIOS-GW-V02] gateway-selftest
     [AIOS-GW-V02] pr370-source-boundary
     [AIOS-GW-V02] pr370-artifact-audit
-    [AIOS-GW-V02] pr371-evidence-integrity   (v0.3 ONLY, pending merge)
-    [AIOS-GW-V02] r005-binding-ledger       (v0.3 ONLY, pending merge)
+    [AIOS-GW-V02] pr371-evidence-integrity
+    [AIOS-GW-V02] r005-binding-ledger
+
+The last two titles are valid **only after v0.3 is separately approved and merged**.
 
 Issue description must be **only** a JSON object of three fields, e.g.:
 
