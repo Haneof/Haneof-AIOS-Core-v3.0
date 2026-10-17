@@ -193,8 +193,8 @@ def selftest() -> dict:
 
 
 def write_evidence(task: str, status: str, detail: dict, error: str | None) -> None:
-    destination = ROOT / "gateway-evidence"
-    destination.mkdir(mode=0o700, exist_ok=True)
+    destination = ROOT / "gateway-evidence" / task
+    destination.mkdir(mode=0o700, parents=True, exist_ok=True)
     result = {
         "schema": "aios.agent.gateway.result.v0.1",
         "task": task, "status": status,
