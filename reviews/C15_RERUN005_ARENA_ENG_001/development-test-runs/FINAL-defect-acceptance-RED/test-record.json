@@ -1,0 +1,99 @@
+{
+  "task": "C15-ARENA-ENG-001-SIGNED-TTYLESS-REGRESSION-CORRECTIVE-PILOT",
+  "classification": [
+    "DEVELOPMENT_ONLY",
+    "FORMAL_VALIDATION_NOT_PERFORMED",
+    "DO_NOT_MERGE"
+  ],
+  "suite_name": "arena.c15.eng.001.defect-acceptance-RED",
+  "started_utc": "2026-10-17T08:55:40+00:00",
+  "elapsed_seconds": 0.732922,
+  "exit_code": 1,
+  "was_successful": false,
+  "counts": {
+    "tests": 11,
+    "failures": 8,
+    "errors": 0,
+    "skipped": 0
+  },
+  "testsRun": 7,
+  "junit": "/home/user/Haneof-AIOS-Core-v3.0/reviews/C15_RERUN005_ARENA_ENG_001/development-test-runs/FINAL-defect-acceptance-RED/test-results.xml",
+  "environment": {
+    "python_implementation": "CPython",
+    "python_version": "3.11.2",
+    "approved_python_3_12_14_used": false,
+    "approved_python_note": "Arena sandbox provides CPython 3.11.2; the project-approved 3.12.14 runtime is NOT present and was NOT exercised",
+    "platform": "Linux-6.1.158+-x86_64-with-glibc2.36",
+    "system": "Linux",
+    "release": "6.1.158+",
+    "uid": 1001,
+    "gid": 1001,
+    "runner_uid_is_999": false,
+    "resident_uid_is_996": false,
+    "stdin_isatty": false,
+    "stdout_isatty": false,
+    "controlling_tty_available": "unavailable: [Errno 6] No such device or address: '/dev/tty'",
+    "openssl_path": "/usr/bin/openssl",
+    "openssl_version": "OpenSSL 3.0.20 7 Apr 2026 (Library: OpenSSL 3.0.20 7 Apr 2026)",
+    "argv0": "run_engineering_tests.py",
+    "executable": "/tmp/c15venv/bin/python",
+    "dont_write_bytecode": true
+  },
+  "outcomes": [
+    {
+      "classname": "test_enrollment_scope_gate.EnrollmentScopeGateTests",
+      "name": "test_gate_rejects_a_blank_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_blank_run_or_session_scope) (field='run_id')",
+      "status": "failure"
+    },
+    {
+      "classname": "test_enrollment_scope_gate.EnrollmentScopeGateTests",
+      "name": "test_gate_rejects_a_blank_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_blank_run_or_session_scope) (field='session_id')",
+      "status": "failure"
+    },
+    {
+      "classname": "test_enrollment_scope_gate.EnrollmentScopeGateTests",
+      "name": "test_gate_rejects_a_grant_that_omits_the_run_and_session_scope",
+      "status": "failure"
+    },
+    {
+      "classname": "test_enrollment_scope_gate.EnrollmentScopeGateTests",
+      "name": "test_gate_rejects_a_non_string_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_non_string_run_or_session_scope) (field='run_id', value='int')",
+      "status": "failure"
+    },
+    {
+      "classname": "test_enrollment_scope_gate.EnrollmentScopeGateTests",
+      "name": "test_gate_rejects_a_non_string_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_non_string_run_or_session_scope) (field='session_id', value='NoneType')",
+      "status": "failure"
+    },
+    {
+      "classname": "test_enrollment_scope_gate.EnrollmentScopeGateTests",
+      "name": "test_gate_rejects_a_non_string_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_non_string_run_or_session_scope) (field='run_id', value='list')",
+      "status": "failure"
+    },
+    {
+      "classname": "test_enrollment_scope_gate.EnrollmentScopeGateTests",
+      "name": "test_gate_rejects_a_non_string_run_or_session_scope (test_enrollment_scope_gate.EnrollmentScopeGateTests.test_gate_rejects_a_non_string_run_or_session_scope) (field='session_id', value='dict')",
+      "status": "failure"
+    },
+    {
+      "classname": "test_enrollment_scope_gate.EnrollmentScopeGateTests",
+      "name": "test_positive_control_a_fully_scoped_grant_is_accepted",
+      "status": "passed"
+    },
+    {
+      "classname": "test_enrollment_scope_gate.EnrollmentScopeGateTests",
+      "name": "test_refusal_is_a_clean_gate_error_not_a_late_key_error",
+      "status": "failure"
+    },
+    {
+      "classname": "test_enrollment_scope_gate.EnrollmentScopeGateTests",
+      "name": "test_safe_runner_scope_check_also_depends_on_these_fields",
+      "status": "passed"
+    },
+    {
+      "classname": "test_enrollment_scope_gate.EnrollmentScopeGateTests",
+      "name": "test_unscoped_grant_can_never_authorize_a_response",
+      "status": "passed"
+    }
+  ]
+}
