@@ -60,10 +60,16 @@ jobs:
       - name: Execute allowlisted read-only task
         env:
           AIOS_GATEWAY_TASK: ${{ github.event_name == 'workflow_dispatch' && inputs.task || 'gateway-selftest' }}
+          AIOS_GATEWAY_EVENT: ${{ github.event_name }}
         shell: bash
         run: |
           set -euo pipefail
           python -I tools/agent_gateway/runner.py --task "$AIOS_GATEWAY_TASK"
+          if [ "$AIOS_GATEWAY_EVENT" = "pull_request" ]; then
+            # CI proves the two public PR370 audits before any main activation.
+            python -I tools/agent_gateway/runner.py --task pr370-source-boundary
+            python -I tools/agent_gateway/runner.py --task pr370-artifact-audit
+          fi
 
       - name: Public-only task summary
         if: always()
@@ -71,9 +77,11 @@ jobs:
         run: |
           echo "### AIOS Remote Agent Gateway v0.1" >> "$GITHUB_STEP_SUMMARY"
           echo "Non-formal, read-only CI. No Resident/Operator identity or Window69 acceptance." >> "$GITHUB_STEP_SUMMARY"
-          if [ -f gateway-evidence/result.json ]; then
-            python -I -c 'import json; p=json.load(open("gateway-evidence/result.json")); print("Task:",p["task"]," Status:",p["status"]," Classification:",p["classification"])' >> "$GITHUB_STEP_SUMMARY"
-          fi
+          for receipt in gateway-evidence/*/result.json; do
+            if [ -f "$receipt" ]; then
+              AIOS_GATEWAY_RECEIPT="$receipt" python -I -c 'import json,os; p=json.load(open(os.environ["AIOS_GATEWAY_RECEIPT"])); print("Task:",p["task"],"Status:",p["status"],"Class:",p["classification"])' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
 
       - name: Upload sanitized JUnit, SHA256 and diagnostic receipt
         if: always()
