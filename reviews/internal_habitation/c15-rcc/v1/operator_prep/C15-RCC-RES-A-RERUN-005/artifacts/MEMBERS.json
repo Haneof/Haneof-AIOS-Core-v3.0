@@ -1,7 +1,7 @@
 {
   "harness/IDENTITY.json": {
     "mode": 420,
-    "sha256": "364cc03617fcd782327b3307720baf5371839185b1b07b71476308af74c5a817",
+    "sha256": "cf3d3356a6746f21a817a2bdd8a3aa7a111ce87e0289abfeaf3729b41b0d1ed5",
     "size": 18257
   },
   "harness/launch.py": {
@@ -86,8 +86,8 @@
   },
   "harness/r005/response_authorization.py": {
     "mode": 420,
-    "sha256": "abc30a28661f22390a9f4a34df5d9764fe27e155f7c285c9e2008c16448defa6",
-    "size": 14558
+    "sha256": "5ec8cc012fadfdc98d59e0566fb513bc9a6a234c48dafaba4722601485f69a28",
+    "size": 14701
   },
   "harness/r005/responses.py": {
     "mode": 420,

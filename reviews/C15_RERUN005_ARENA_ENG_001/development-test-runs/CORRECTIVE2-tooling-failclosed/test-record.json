@@ -1,0 +1,26 @@
+{
+  "asserted_no_change_to": [
+    "harness/IDENTITY.json",
+    "artifacts/resident-harness.tar.gz",
+    "artifacts/MEMBERS.json",
+    "RESIDENT_SAFE_LAUNCH_PACKET.json",
+    "BUILD_RECEIPT.json"
+  ],
+  "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B tooling-tests/test_regenerator_fail_closed.py",
+  "errors": 0,
+  "exit_code": 0,
+  "failed": 0,
+  "git": "git version 2.39.5",
+  "isolation": "all refusal paths exercised against tempfile.mkdtemp() synthetic repo+harness trees; the two real-checkout tests are read-only dry runs and one copies the harness to a temp dir before perturbing the copy; no frozen artifact was modified",
+  "passed": 44,
+  "platform": "Linux-6.1.158+-x86_64-with-glibc2.36",
+  "purpose": "PM-required fail-closed hardening tests for regenerate_identity_manifest.py",
+  "python_implementation": "CPython",
+  "python_version": "3.11.2",
+  "result": "PASS",
+  "runner": "python3 -B (stdlib unittest; no pytest required)",
+  "seconds": 0.058,
+  "suite": "reviews/C15_RERUN005_ARENA_ENG_001/tooling-tests/test_regenerator_fail_closed.py",
+  "tests": 44,
+  "utc": "2026-10-17T12:39:13+00:00"
+}
