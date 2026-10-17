@@ -1,49 +1,202 @@
 {
-  "packet_version": "c15-rcc-res-a-rerun-005-launch-v1",
-  "task": "C15-RCC-RES-A-RERUN-005",
-  "role": "Real Resident AI — Fresh Resident A",
   "access_class": "RESIDENT_VISIBLE/CLEAN_ROOM",
-  "accepted_main": "703a8967878d8eaee70a8a8fce9df068204f5f76",
-  "accepted_operator_candidate": "39b4f5f02e4331e27e3f66293837497d1a5ec477",
-  "accepted_operator_tree": "d4e1ee2df8a8a4803c09366041c789eadf2a7140",
-  "c15_operator_tree": "b8a62370e6ffe80730b2ef4c17d625fab50446d4",
-  "c15_tests_tree": "1504c6d3e0e6ed63a34aa239e4fd26cf18db978a",
-  "habitation_tree": "cd43312e9ac3075eb3d7c4975d7f9efae23b9322",
-  "phase": "A",
-  "allowed_cursor_start": 1,
   "allowed_cursor_end": 13,
-  "stop_after_ack_cursor": 13,
+  "allowed_cursor_start": 1,
+  "approval_state": "PENDING_INDEPENDENT_ACCEPTANCE_AND_PM_AUTHORIZATION",
+  "approved_runtime": {
+    "build_or_install_authorized": false,
+    "expected_openssl": "3.0.13",
+    "expected_pydantic": "2.13.5",
+    "expected_pytest": "8.4.2",
+    "expected_python": "3.12.14",
+    "expected_sqlite": "3.45.1",
+    "prepared_venv_python": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+    "python_sha256": "09605fdfbe88ca0d45a575ab8179cecd2a7167d95555b7bb8e6f29f29e82d42b",
+    "runtime_tar_sha256": "ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e"
+  },
+  "clean_room_policy": [
+    "Current legally released input and request/snapshot only",
+    "No governance, prior reviews, test answers, sealed events, fixture/evaluator/release source or Git history"
+  ],
+  "cross_sandbox_harness_materialization": {
+    "artifact_repository_path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/artifacts/resident-harness.tar.gz",
+    "artifact_sha256": "e3afa5bcf5f55667767fecac5151f3cf53c69950fabeb11c47c7cded4cc4f222",
+    "artifact_size": 54132,
+    "closed_members": [
+      "harness/IDENTITY.json",
+      "harness/launch.py",
+      "harness/r005/__init__.py",
+      "harness/r005/atomic.py",
+      "harness/r005/bridge.py",
+      "harness/r005/canonical.py",
+      "harness/r005/checks.py",
+      "harness/r005/cli.py",
+      "harness/r005/completion.py",
+      "harness/r005/content_manifest.py",
+      "harness/r005/ledger.py",
+      "harness/r005/payload.py",
+      "harness/r005/publisher_service.py",
+      "harness/r005/registration.py",
+      "harness/r005/registration_ipc.py",
+      "harness/r005/remote_completion.py",
+      "harness/r005/requests.py",
+      "harness/r005/response_authorization.py",
+      "harness/r005/responses.py",
+      "harness/r005/safe_runner.py",
+      "harness/r005/schema.py",
+      "harness/r005/verify.py"
+    ],
+    "destination": "absolute absent $DELIVERY_DIR; existing parent required; no symlinks in parent path",
+    "materialization_command": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I -c '\"\"\"Standalone clean-room materializer; byte pins are supplied by the safe packet.\n\nNo extractall, links, overwrite, implicit parent creation, or ambient imports.\nAll archive members and their bytes are validated before destination creation.\nAn interrupted extraction leaves a blocked partial target; never retry over it.\n\"\"\"\nimport hashlib\nimport io\nimport json\nimport os\nfrom pathlib import PurePosixPath\nimport stat\nimport sys\nimport tarfile\n\ndef require(condition, message):\n    if not condition:\n        raise ValueError(message)\n\ndef validate(raw, expected_sha, inventory):\n    require(hashlib.sha256(raw).hexdigest() == expected_sha, '\"'\"'artifact substitution'\"'\"')\n    require(len(raw) < 16 * 1024 * 1024, '\"'\"'artifact too large'\"'\"')\n    with tarfile.open(fileobj=io.BytesIO(raw), mode='\"'\"'r:gz'\"'\"') as archive:\n        members = archive.getmembers()\n        names = [m.name for m in members]\n        require(len(set(names)) == len(names), '\"'\"'duplicate archive member'\"'\"')\n        require(set(names) == set(inventory), '\"'\"'closed member set mismatch'\"'\"')\n        content = {}\n        for member in members:\n            name = member.name\n            path = PurePosixPath(name)\n            require(not path.is_absolute() and str(path) == name\n                    and all(p not in ('\"'\"''\"'\"', '\"'\"'.'\"'\"', '\"'\"'..'\"'\"') for p in name.split('\"'\"'/'\"'\"'))\n                    and name.startswith('\"'\"'harness/'\"'\"'), '\"'\"'unsafe member path'\"'\"')\n            expected = inventory[name]\n            require(member.type == tarfile.REGTYPE and not member.linkname\n                    and not member.pax_headers, '\"'\"'non-regular/link/PAX member'\"'\"')\n            require(member.mode == expected['\"'\"'mode'\"'\"'] == 0o644\n                    and member.uid == member.gid == member.mtime == 0\n                    and member.size == expected['\"'\"'size'\"'\"']\n                    and 0 <= member.size <= 8 * 1024 * 1024, '\"'\"'member metadata mismatch'\"'\"')\n            data = archive.extractfile(member).read()\n            require(len(data) == member.size\n                    and hashlib.sha256(data).hexdigest() == expected['\"'\"'sha256'\"'\"'], '\"'\"'member hash mismatch'\"'\"')\n            content[name] = data\n    return content\n\ndef open_directory(path):\n    require(path.is_absolute() and str(path) == str(PurePosixPath(str(path)))\n            and '\"'\"'..'\"'\"' not in path.parts, '\"'\"'destination must be canonical absolute path'\"'\"')\n    fd = os.open('\"'\"'/'\"'\"', os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)\n    try:\n        for part in path.parts[1:]:\n            child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=fd)\n            os.close(fd)\n            fd = child\n        return fd\n    except BaseException:\n        os.close(fd)\n        raise\n\ndef materialize(artifact, target, expected_sha, inventory):\n    # Read one immutable snapshot; a path swap after read cannot change extracted bytes.\n    fd = os.open(artifact, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)\n    with os.fdopen(fd, '\"'\"'rb'\"'\"') as stream:\n        info = os.fstat(stream.fileno())\n        require(stat.S_ISREG(info.st_mode) and info.st_size < 16 * 1024 * 1024,\n                '\"'\"'artifact must be bounded regular file'\"'\"')\n        raw = stream.read(16 * 1024 * 1024)\n    content = validate(raw, expected_sha, inventory)\n    target = PurePosixPath(target)\n    require(target.name not in ('\"'\"''\"'\"', '\"'\"'.'\"'\"', '\"'\"'..'\"'\"'), '\"'\"'invalid destination'\"'\"')\n    parent = open_directory(target.parent)\n    opened = {}\n    try:\n        # mkdir is exclusive even for dangling symlinks and racing creators.\n        os.mkdir(target.name, 0o755, dir_fd=parent)\n        root = os.open(target.name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent)\n        opened['\"'\"''\"'\"'] = root\n        os.fchmod(root, 0o755)\n        dirs = {str(PurePosixPath(name).parent) for name in content}\n        for directory in sorted(dirs, key=lambda p: (p.count('\"'\"'/'\"'\"'), p)):\n            parts = directory.split('\"'\"'/'\"'\"')\n            for depth in range(1, len(parts)+1):\n                rel = '\"'\"'/'\"'\"'.join(parts[:depth])\n                if rel in opened:\n                    continue\n                pfd = opened['\"'\"'/'\"'\"'.join(parts[:depth-1])]\n                os.mkdir(parts[depth-1], 0o755, dir_fd=pfd)\n                dfd = os.open(parts[depth-1], os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=pfd)\n                os.fchmod(dfd, 0o755)\n                opened[rel] = dfd\n        for name, data in sorted(content.items()):\n            path = PurePosixPath(name)\n            ffd = os.open(path.name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,\n                          0o644, dir_fd=opened[str(path.parent)])\n            with os.fdopen(ffd, '\"'\"'wb'\"'\"') as stream:\n                stream.write(data)\n                stream.flush()\n                os.fchmod(stream.fileno(), 0o644)\n                os.fsync(stream.fileno())\n        for dfd in reversed(list(opened.values())):\n            os.fsync(dfd)\n        os.fsync(parent)\n    finally:\n        for dfd in opened.values():\n            os.close(dfd)\n        os.close(parent)\n    print('\"'\"'HARNESS_MATERIALIZATION_PASS'\"'\"')\n\nif __name__ == '\"'\"'__main__'\"'\"':\n    materialize(sys.argv[1], sys.argv[2], sys.argv[3], json.loads(sys.argv[4]))\n' \"$ARTIFACT\" \"$DELIVERY_DIR\" e3afa5bcf5f55667767fecac5151f3cf53c69950fabeb11c47c7cded4cc4f222 '{\"harness/IDENTITY.json\":{\"mode\":420,\"sha256\":\"ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd\",\"size\":18257},\"harness/launch.py\":{\"mode\":420,\"sha256\":\"6b46ac1531e04aeb836066c403898e7917a44857cfff910e819a45c633ff436b\",\"size\":28556},\"harness/r005/__init__.py\":{\"mode\":420,\"sha256\":\"7900d69b069ca6440302895c4e82531bc776757648511aef25a0133efd7a465b\",\"size\":1154},\"harness/r005/atomic.py\":{\"mode\":420,\"sha256\":\"b2f8df9258045fbb72a966d9b2b0fc72b23476655ff9c9c9ab390dc7634a4683\",\"size\":4870},\"harness/r005/bridge.py\":{\"mode\":420,\"sha256\":\"c482e289d2e2e7f1d2ae49f5996aaa1766d2dfdaba0749fbf62b1c3d0b5cbeef\",\"size\":13928},\"harness/r005/canonical.py\":{\"mode\":420,\"sha256\":\"d1ae3e5a46bced68bedb455bf4e6ce6c6783391c9f319b3317bf0bff83800ac1\",\"size\":3171},\"harness/r005/checks.py\":{\"mode\":420,\"sha256\":\"28fc8dd2aa11551180130a2854b7edfcb02211b0664ab068cc904117836ffa87\",\"size\":4727},\"harness/r005/cli.py\":{\"mode\":420,\"sha256\":\"9863560647b26b314dfd355c98fb72477f8bd359f1b672289f42794c896e45b0\",\"size\":3892},\"harness/r005/completion.py\":{\"mode\":420,\"sha256\":\"bea191cdbed2d2e710b360409c60c4c68c5cbd4d5e0db2f843a68e79bb854966\",\"size\":6782},\"harness/r005/content_manifest.py\":{\"mode\":420,\"sha256\":\"4f8cdd3f0b957c2958d897765dfcaed05b698582ddb652faa838fe564d1e0a5b\",\"size\":1513},\"harness/r005/ledger.py\":{\"mode\":420,\"sha256\":\"31356e9d42e068d52bccd152487321d43a09861d8af68aeef693d34f6e55b217\",\"size\":15468},\"harness/r005/payload.py\":{\"mode\":420,\"sha256\":\"d982c639439bbd74aa697e8df1c514eb46a2834806467ff5d86dc47fe4848e89\",\"size\":872},\"harness/r005/publisher_service.py\":{\"mode\":420,\"sha256\":\"227829a6a6c4c433022afb063d0bdfa157b87966a0982687240f51b13eea6bb3\",\"size\":13136},\"harness/r005/registration.py\":{\"mode\":420,\"sha256\":\"2cb5f84727c3817603161b958ad4ec17e04a623584b546db22eeea8279456d01\",\"size\":8779},\"harness/r005/registration_ipc.py\":{\"mode\":420,\"sha256\":\"6b83f2ed577c435bcbdd485af324218d3b7c5666a792261812a3840e6ff716e1\",\"size\":4655},\"harness/r005/remote_completion.py\":{\"mode\":420,\"sha256\":\"cb7634a499b057fb1dbf04ae5601ff44b3e784f4d67c49a6417e1bd1c62f07f6\",\"size\":7324},\"harness/r005/requests.py\":{\"mode\":420,\"sha256\":\"ece7fa0aaeb91eecb1596a8c0febd70e1c7973398318b827b0c684519965f830\",\"size\":9231},\"harness/r005/response_authorization.py\":{\"mode\":420,\"sha256\":\"4e90aeca366be7cbae3ed8b5e5efe48bd85eedea356275b6966bc134236a8e4c\",\"size\":3352},\"harness/r005/responses.py\":{\"mode\":420,\"sha256\":\"89e062dfd597333cb5033e4b7523c53c70bbe05e656a36aefdd59cee35cc9f37\",\"size\":9233},\"harness/r005/safe_runner.py\":{\"mode\":420,\"sha256\":\"e61630ddb2b39e9403bd29233b151984390c1a33d8875a55549fa28045c854c6\",\"size\":27672},\"harness/r005/schema.py\":{\"mode\":420,\"sha256\":\"e92e81589f1b4e301f4741cd736b153262c076fd0226dae470d355a5751892a9\",\"size\":15629},\"harness/r005/verify.py\":{\"mode\":420,\"sha256\":\"aafea0b78e4b19ee4b4a64845529f2a2de78d8b0fe4dbfd875ae6890729312e5\",\"size\":7695}}'",
+    "member_identity": {
+      "harness/IDENTITY.json": {
+        "mode": 420,
+        "sha256": "ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd",
+        "size": 18257
+      },
+      "harness/launch.py": {
+        "mode": 420,
+        "sha256": "6b46ac1531e04aeb836066c403898e7917a44857cfff910e819a45c633ff436b",
+        "size": 28556
+      },
+      "harness/r005/__init__.py": {
+        "mode": 420,
+        "sha256": "7900d69b069ca6440302895c4e82531bc776757648511aef25a0133efd7a465b",
+        "size": 1154
+      },
+      "harness/r005/atomic.py": {
+        "mode": 420,
+        "sha256": "b2f8df9258045fbb72a966d9b2b0fc72b23476655ff9c9c9ab390dc7634a4683",
+        "size": 4870
+      },
+      "harness/r005/bridge.py": {
+        "mode": 420,
+        "sha256": "c482e289d2e2e7f1d2ae49f5996aaa1766d2dfdaba0749fbf62b1c3d0b5cbeef",
+        "size": 13928
+      },
+      "harness/r005/canonical.py": {
+        "mode": 420,
+        "sha256": "d1ae3e5a46bced68bedb455bf4e6ce6c6783391c9f319b3317bf0bff83800ac1",
+        "size": 3171
+      },
+      "harness/r005/checks.py": {
+        "mode": 420,
+        "sha256": "28fc8dd2aa11551180130a2854b7edfcb02211b0664ab068cc904117836ffa87",
+        "size": 4727
+      },
+      "harness/r005/cli.py": {
+        "mode": 420,
+        "sha256": "9863560647b26b314dfd355c98fb72477f8bd359f1b672289f42794c896e45b0",
+        "size": 3892
+      },
+      "harness/r005/completion.py": {
+        "mode": 420,
+        "sha256": "bea191cdbed2d2e710b360409c60c4c68c5cbd4d5e0db2f843a68e79bb854966",
+        "size": 6782
+      },
+      "harness/r005/content_manifest.py": {
+        "mode": 420,
+        "sha256": "4f8cdd3f0b957c2958d897765dfcaed05b698582ddb652faa838fe564d1e0a5b",
+        "size": 1513
+      },
+      "harness/r005/ledger.py": {
+        "mode": 420,
+        "sha256": "31356e9d42e068d52bccd152487321d43a09861d8af68aeef693d34f6e55b217",
+        "size": 15468
+      },
+      "harness/r005/payload.py": {
+        "mode": 420,
+        "sha256": "d982c639439bbd74aa697e8df1c514eb46a2834806467ff5d86dc47fe4848e89",
+        "size": 872
+      },
+      "harness/r005/publisher_service.py": {
+        "mode": 420,
+        "sha256": "227829a6a6c4c433022afb063d0bdfa157b87966a0982687240f51b13eea6bb3",
+        "size": 13136
+      },
+      "harness/r005/registration.py": {
+        "mode": 420,
+        "sha256": "2cb5f84727c3817603161b958ad4ec17e04a623584b546db22eeea8279456d01",
+        "size": 8779
+      },
+      "harness/r005/registration_ipc.py": {
+        "mode": 420,
+        "sha256": "6b83f2ed577c435bcbdd485af324218d3b7c5666a792261812a3840e6ff716e1",
+        "size": 4655
+      },
+      "harness/r005/remote_completion.py": {
+        "mode": 420,
+        "sha256": "cb7634a499b057fb1dbf04ae5601ff44b3e784f4d67c49a6417e1bd1c62f07f6",
+        "size": 7324
+      },
+      "harness/r005/requests.py": {
+        "mode": 420,
+        "sha256": "ece7fa0aaeb91eecb1596a8c0febd70e1c7973398318b827b0c684519965f830",
+        "size": 9231
+      },
+      "harness/r005/response_authorization.py": {
+        "mode": 420,
+        "sha256": "4e90aeca366be7cbae3ed8b5e5efe48bd85eedea356275b6966bc134236a8e4c",
+        "size": 3352
+      },
+      "harness/r005/responses.py": {
+        "mode": 420,
+        "sha256": "89e062dfd597333cb5033e4b7523c53c70bbe05e656a36aefdd59cee35cc9f37",
+        "size": 9233
+      },
+      "harness/r005/safe_runner.py": {
+        "mode": 420,
+        "sha256": "e61630ddb2b39e9403bd29233b151984390c1a33d8875a55549fa28045c854c6",
+        "size": 27672
+      },
+      "harness/r005/schema.py": {
+        "mode": 420,
+        "sha256": "e92e81589f1b4e301f4741cd736b153262c076fd0226dae470d355a5751892a9",
+        "size": 15629
+      },
+      "harness/r005/verify.py": {
+        "mode": 420,
+        "sha256": "aafea0b78e4b19ee4b4a64845529f2a2de78d8b0fe4dbfd875ae6890729312e5",
+        "size": 7695
+      }
+    },
+    "partial_failure_policy": "Preserve blocked partial target; choose a new destination after Operator inspection",
+    "post_materialization_command": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I \"$HARNESS/launch.py\" --source-repo \"$SOURCE_REPO\" --identity-sha256 ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd verify",
+    "repeat_policy": "FAIL_CLOSED for every existing destination, including empty directory or dangling symlink",
+    "resident_may_edit_harness": false,
+    "transport": "Exact candidate tar bytes and safe packet only after independent acceptance and PM authorization"
+  },
+  "current_main_harness_identity": {
+    "all_harness_files": {
+      "launch.py": "6b46ac1531e04aeb836066c403898e7917a44857cfff910e819a45c633ff436b",
+      "r005/__init__.py": "7900d69b069ca6440302895c4e82531bc776757648511aef25a0133efd7a465b",
+      "r005/atomic.py": "b2f8df9258045fbb72a966d9b2b0fc72b23476655ff9c9c9ab390dc7634a4683",
+      "r005/bridge.py": "c482e289d2e2e7f1d2ae49f5996aaa1766d2dfdaba0749fbf62b1c3d0b5cbeef",
+      "r005/canonical.py": "d1ae3e5a46bced68bedb455bf4e6ce6c6783391c9f319b3317bf0bff83800ac1",
+      "r005/checks.py": "28fc8dd2aa11551180130a2854b7edfcb02211b0664ab068cc904117836ffa87",
+      "r005/cli.py": "9863560647b26b314dfd355c98fb72477f8bd359f1b672289f42794c896e45b0",
+      "r005/completion.py": "bea191cdbed2d2e710b360409c60c4c68c5cbd4d5e0db2f843a68e79bb854966",
+      "r005/content_manifest.py": "4f8cdd3f0b957c2958d897765dfcaed05b698582ddb652faa838fe564d1e0a5b",
+      "r005/ledger.py": "31356e9d42e068d52bccd152487321d43a09861d8af68aeef693d34f6e55b217",
+      "r005/payload.py": "d982c639439bbd74aa697e8df1c514eb46a2834806467ff5d86dc47fe4848e89",
+      "r005/publisher_service.py": "227829a6a6c4c433022afb063d0bdfa157b87966a0982687240f51b13eea6bb3",
+      "r005/registration.py": "2cb5f84727c3817603161b958ad4ec17e04a623584b546db22eeea8279456d01",
+      "r005/registration_ipc.py": "6b83f2ed577c435bcbdd485af324218d3b7c5666a792261812a3840e6ff716e1",
+      "r005/remote_completion.py": "cb7634a499b057fb1dbf04ae5601ff44b3e784f4d67c49a6417e1bd1c62f07f6",
+      "r005/requests.py": "ece7fa0aaeb91eecb1596a8c0febd70e1c7973398318b827b0c684519965f830",
+      "r005/response_authorization.py": "4e90aeca366be7cbae3ed8b5e5efe48bd85eedea356275b6966bc134236a8e4c",
+      "r005/responses.py": "89e062dfd597333cb5033e4b7523c53c70bbe05e656a36aefdd59cee35cc9f37",
+      "r005/safe_runner.py": "e61630ddb2b39e9403bd29233b151984390c1a33d8875a55549fa28045c854c6",
+      "r005/schema.py": "e92e81589f1b4e301f4741cd736b153262c076fd0226dae470d355a5751892a9",
+      "r005/verify.py": "aafea0b78e4b19ee4b4a64845529f2a2de78d8b0fe4dbfd875ae6890729312e5"
+    },
+    "approval_state": "PENDING_INDEPENDENT_ACCEPTANCE_AND_PM",
+    "c15_tree": "b8a62370e6ffe80730b2ef4c17d625fab50446d4",
+    "core_tree": "16f1487e291b009c55bee402abfd79fdacbae960",
+    "identity_sha256": "ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd",
+    "provenance": "IDENTITY metadata describes source ancestry; exact executable bytes are pinned"
+  },
   "forbidden_next_cursor": 14,
-  "startup_inputs": {
-    "clean_room_contract": {
-      "path": "reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_CORRECTIVE_003_CLEAN_ROOM_CONTRACT.md",
-      "git_blob": "430a75e0a20b0256672eb430617ae5a1d14c142f"
-    },
-    "run_contract": {
-      "path": "reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_RUN_CONTRACT.md",
-      "git_blob": "1b45ca7fa441855d927b610ca2a93ef50b5eee66"
-    }
-  },
-  "fixture_binding": {
-    "resident_access": "FORBIDDEN",
-    "sealed_fixture_git_blob": "46f0f2b3250c2c127a0deef6882adbd6a1e92d55",
-    "fixture_manifest_git_blob": "1ab5cb9fa12539e58d52322bd95b98300052b16c",
-    "phase_a_event_count": 13
-  },
-  "mechanical_release_tools": {
-    "release_operator": {
-      "path": "reviews/internal_habitation/c15-rcc/v1/release/release_operator.py",
-      "git_blob": "076cd743b63d0dc00489d1cfd6723eb502492a4a"
-    },
-    "mechanical_ingest_adapter": {
-      "path": "reviews/internal_habitation/c15-rcc/v1/release/mechanical_ingest_adapter.py",
-      "git_blob": "488e69ddd6f6a75e71526813fc44862ebef1a3a2"
-    },
-    "canonical_conversation_ingest": {
-      "path": "reviews/internal_habitation/c15-rcc/v1/release/canonical_conversation_ingest.py",
-      "git_blob": "a0068a88a2768ae3e494d2da7a0d02920c3138bd"
-    }
-  },
   "fresh_identity_requirements": [
     "fresh private World",
     "fresh WorldSearchIndex",
@@ -54,138 +207,96 @@
     "fresh Resident session identity",
     "fresh run identity"
   ],
-  "start_preconditions": [
-    "accepted_main 703a8967878d8eaee70a8a8fce9df068204f5f76 is an ancestor of current origin/main",
-    "changes after accepted_main are governance/Resident-safe launch material only; no src/**, tools/**, tests/**, package/dependency or workflow drift",
-    "post-merge p16-convergence-gate run 38024230362 is completed/success",
-    "pinned c15 operator tree, clean-room/run contracts, fixture binding, and release-tool Git blobs match this packet",
-    "new run directories contain no prior Resident state"
-  ],
-  "forbidden_material": [
-    "task board",
-    "checkpoint",
-    "PM adjudications/integration reports",
-    "prior Resident evidence/runs/reviews",
-    "fixture/evaluator/release source",
-    "future events",
-    "Git history or PR/CI metadata concerning prior Resident runs"
-  ],
-  "terminal_state": "PHASE_A_COMPLETE / REVIEW_READY / READY_FOR_INDEPENDENT_ACCEPTANCE",
-  "self_acceptance": false,
-  "post_merge_main_gate": {
-    "run_id": 38024230362,
-    "head_sha": "703a8967878d8eaee70a8a8fce9df068204f5f76",
-    "status": "completed",
-    "conclusion": "success"
+  "packet_version": "c15-rcc-res-a-rerun-005-launch-v3-candidate",
+  "phase": "A",
+  "publisher_invocation": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I \"$HARNESS/launch.py\" --source-repo \"$SOURCE_REPO\" --identity-sha256 ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd publish --exchange \"$EXCHANGE\" --request-id \"$REQUEST_ID\" --response \"$RESPONSE_JSON\" --persistence-repo \"$PERSISTENCE_REPO\" --timeout 60",
+  "real_resident_use_authorized": false,
+  "recovery_failure_behavior": {
+    "completed_operation": "Replay only after exact authoritative remote completion verification",
+    "interrupted_or_uncertain_operation": "BLOCKED; preserve state; no automatic redispatch, fallback or invented response",
+    "reattach_exact_remote_head": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I \"$HARNESS/launch.py\" --source-repo \"$SOURCE_REPO\" --identity-sha256 ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd reattach --root \"$EMPTY_RECOVERY_ROOT\" --run-id \"$RUN_ID\" --session-id \"$SESSION_ID\" --commit-sha \"$REMOTE_HEAD\" --persistence-repo \"$PERSISTENCE_REPO\""
   },
-  "approved_runtime": {
-    "access_class": "RESIDENT_VISIBLE_MECHANICAL_STATUS",
-    "prepared_venv_python": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
-    "expected_python": "3.12.14",
-    "expected_pydantic": "2.13.5",
-    "expected_pytest": "8.4.2",
-    "expected_sqlite": "3.45.1",
-    "expected_openssl": "3.0.13",
-    "resident_verify_command": "PYTHONPATH=src:. /home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -c 'import pathlib,platform,sqlite3,ssl,pydantic,pytest,aios_core; r=pathlib.Path.cwd().resolve(); a=pathlib.Path(aios_core.__file__).resolve(); assert platform.python_version()==\"3.12.14\"; assert pydantic.__version__==\"2.13.5\"; assert pytest.__version__==\"8.4.2\"; assert sqlite3.sqlite_version==\"3.45.1\"; assert ssl.OPENSSL_VERSION.split()[1]==\"3.0.13\"; assert r in a.parents; print(\"RUNTIME_ENV_OK\", platform.python_version(), pydantic.__version__, pytest.__version__, sqlite3.sqlite_version, ssl.OPENSSL_VERSION)'",
-    "if_prepared_runtime_missing": "MATERIALIZE_EXACT_PORTABLE_ARTIFACT_THEN_VERIFY",
-    "resident_may_build_or_install": false,
-    "portable_artifact": {
-      "source": "github_actions_artifact",
-      "repository": "Haneof/Haneof-AIOS-Core-v3.0",
-      "workflow_run_id": 38249942251,
-      "workflow_head_sha": "2c3dcfd7c8706399e2535a04148fc984e8a91703",
-      "artifact_id": 11747444013,
-      "artifact_name": "c15-rerun005-approved-runtime-linux-x86_64",
-      "artifact_expires_at": "2026-11-11T12:42:38Z",
-      "artifact_zip_sha256": "cc6b72631e000fa161f027c3daf946805d41022a25725ead040d26c5509d155a",
-      "artifact_zip_size_bytes": 88511202,
-      "runtime_tar_filename": "aios-c15-resident-runtime-3.12.14.tar.gz",
-      "runtime_tar_sha256": "ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e",
-      "runtime_tar_size_bytes": 88509303,
-      "archive_root": "runtime/3.12.14",
-      "platform_system": "Linux",
-      "platform_machine": "x86_64",
-      "minimum_glibc": "2.35",
-      "materialization_allowed_when_prepared_runtime_missing": true,
-      "materialization_is_build": false,
-      "resident_may_read_operator_manifest": false,
-      "resident_download_command": "TMP=\"$(mktemp -d)\"; gh api -H 'Accept: application/vnd.github+json' /repos/Haneof/Haneof-AIOS-Core-v3.0/actions/artifacts/11747444013/zip > \"$TMP/runtime.zip\"; printf '%s  %s\\n' 'cc6b72631e000fa161f027c3daf946805d41022a25725ead040d26c5509d155a' \"$TMP/runtime.zip\" | sha256sum -c -; unzip -q \"$TMP/runtime.zip\" 'aios-c15-resident-runtime-3.12.14.tar.gz' 'aios-c15-resident-runtime-3.12.14.tar.gz.sha256' -d \"$TMP\"; printf '%s  %s\\n' 'ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e' \"$TMP/aios-c15-resident-runtime-3.12.14.tar.gz\" | sha256sum -c -; grep -Fx 'ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e  aios-c15-resident-runtime-3.12.14.tar.gz' \"$TMP/aios-c15-resident-runtime-3.12.14.tar.gz.sha256\"; mkdir -p /home/user/.cache/c002/final-runtime-003; tar -xzf \"$TMP/aios-c15-resident-runtime-3.12.14.tar.gz\" -C /home/user/.cache/c002/final-runtime-003; rm -rf \"$TMP\"",
-      "offline_attachment_fallback": {
-        "authorized": true,
-        "purpose": "cross-sandbox handoff when network/gh transport is unavailable",
-        "expected_attachment_filename": "c15-rerun005-approved-runtime-linux-x86_64.zip",
-        "expected_attachment_zip_sha256": null,
-        "expected_runtime_tar_filename": "aios-c15-resident-runtime-3.12.14.tar.gz",
-        "expected_runtime_tar_sha256": "ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e",
-        "extraction_policy": "extract only runtime tar and tar sha file from attachment zip; do not read operator manifest",
-        "materialization_target": "/home/user/.cache/c002/final-runtime-003",
-        "build_or_install_forbidden": true,
-        "outer_zip_transport_identity": "NON_BINDING_FOR_OFFLINE_CHAT_ATTACHMENT",
-        "direct_github_zip_sha256": "cc6b72631e000fa161f027c3daf946805d41022a25725ead040d26c5509d155a",
-        "binding_runtime_identity": {
-          "runtime_tar_filename": "aios-c15-resident-runtime-3.12.14.tar.gz",
-          "runtime_tar_sha256": "ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e",
-          "sha_file_name": "aios-c15-resident-runtime-3.12.14.tar.gz.sha256",
-          "allowed_zip_entries": [
-            "aios-c15-resident-runtime-3.12.14.tar.gz",
-            "aios-c15-resident-runtime-3.12.14.tar.gz.sha256",
-            "AIOS_C15_RESIDENT_RUNTIME_3_12_14_MANIFEST.json"
-          ],
-          "operator_manifest_may_be_listed_but_not_read": true
-        },
-        "offline_verification_policy": [
-          "do not require the outer chat-attachment ZIP SHA256 to equal the direct GitHub artifact ZIP digest, because attachment transport may repackage the ZIP envelope",
-          "list ZIP entry names only and require the closed set of three expected filenames",
-          "do not open/read the operator manifest",
-          "extract only the runtime tar and its sha256 sidecar",
-          "require the runtime tar SHA256 to equal the pinned runtime_tar_sha256",
-          "require the sha256 sidecar to declare the same exact runtime tar SHA256",
-          "only then extract the runtime tar to materialization_target",
-          "run approved_runtime.resident_verify_command after extraction"
-        ]
-      },
-      "direct_runtime_tar_attachment": {
-        "authorized": true,
-        "preferred_offline_handoff": true,
-        "expected_attachment_filename": "aios-c15-resident-runtime-3.12.14.tar.gz",
-        "expected_size_bytes": 88509303,
-        "expected_sha256": "ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e",
-        "archive_root": "runtime/3.12.14",
-        "materialization_target": "/home/user/.cache/c002/final-runtime-003",
-        "verification_policy": [
-          "treat the direct tar.gz attachment bytes themselves as the binding runtime artifact",
-          "compute SHA256 before listing or extracting archive members",
-          "require exact SHA256 match",
-          "after digest pass, verify all members are under runtime/3.12.14 and reject absolute paths or parent traversal",
-          "require runtime/3.12.14/venv/bin/python entry",
-          "extract only to materialization_target",
-          "run approved_runtime.resident_verify_command"
-        ],
-        "build_or_install_forbidden": true
-      },
-      "signed_url_transport": {
-        "authorized": true,
-        "transport_only": true,
-        "url_is_not_artifact_identity": true,
-        "expected_zip_size_bytes": 88511202,
-        "expected_zip_sha256": "cc6b72631e000fa161f027c3daf946805d41022a25725ead040d26c5509d155a",
-        "expected_runtime_tar_size_bytes": 88509303,
-        "expected_runtime_tar_sha256": "ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e",
-        "allowed_client": "system Python standard library urllib or equivalent byte-preserving HTTP client",
-        "failure_policy": "BLOCKED / SIGNED_TRANSPORT_UNAVAILABLE",
-        "build_or_install_forbidden": true
-      }
+  "resident_response_handoff": {
+    "authorization": "Publisher discloses a separate one-request capability on a validated controlling TTY. Never redirect, persist, log, or expose it to Core/recovery. Publisher CLI reads token only from stdin. Bind token to matching REQUEST_ID and OPERATION_ID.",
+    "publisher_success": "Exact response and proof in verified authoritative remote commit; later Core application may still fail",
+    "read_command": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I \"$HARNESS/launch.py\" --source-repo \"$SOURCE_REPO\" --identity-sha256 ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd read-request --exchange \"$EXCHANGE\" --request-id \"$REQUEST_ID\"",
+    "response_schema": {
+      "authored_by": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+      "model_directive": "Resident decides from legal RuntimeSnapshot; echo exact provenance_binding as directive.provenance",
+      "required_exact_envelope_keys": [
+        "response_version",
+        "request_id",
+        "request_sha256",
+        "authored_by",
+        "directive"
+      ],
+      "response_version": 1,
+      "summary_directive": "Resident-authored object with text"
     }
   },
-  "mechanical_verification": {
-    "approved_command_source": "this Resident-safe launch packet",
-    "steps": [
-      "verify accepted integration baseline is an ancestor of current main and post-baseline drift is governance/Resident-safe material only",
-      "verify pinned Git blobs/trees from this packet",
-      "if prepared runtime is absent, mechanically download the exact pinned portable artifact by artifact_id, verify artifact ZIP SHA256 and runtime tar SHA256, extract only the runtime tar to target_runtime_root, and do not read the operator manifest",
-      "run approved_runtime.resident_verify_command",
-      "confirm fresh run directories contain no prior Resident state"
+  "role": "Real Resident AI — Fresh Resident A",
+  "run_state_binding": {
+    "checkpoint_after_approved_mechanical_ingest": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I \"$HARNESS/launch.py\" --source-repo \"$SOURCE_REPO\" --identity-sha256 ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd checkpoint --root \"$RUN_ROOT\" --run-id \"$RUN_ID\" --session-id \"$SESSION_ID\" --persistence-repo \"$PERSISTENCE_REPO\"",
+    "environment": "export C15_PERSISTED_WORKSPACE=/home/user",
+    "init_only_when_absent": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I \"$HARNESS/launch.py\" --source-repo \"$SOURCE_REPO\" --identity-sha256 ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd init --root \"$RUN_ROOT\" --run-id \"$RUN_ID\" --session-id \"$SESSION_ID\" --subject-id \"$SUBJECT_ID\" --persistence-repo \"$PERSISTENCE_REPO\"",
+    "operation_exact_keys": [
+      "mode",
+      "at",
+      "cursor",
+      "event_id",
+      "turn_index",
+      "user_input",
+      "timeout"
     ],
-    "success_marker": "RUNTIME_ENV_OK"
-  }
+    "operation_field_rules": {
+      "at": "current released event ISO timestamp with timezone",
+      "cursor": "current legally released cursor only",
+      "event_id": "current released event identity",
+      "mode": "user for a legal USER turn; due for legal due work",
+      "timeout": "positive external response wait seconds; bounded failure",
+      "turn_index": "current legal USER turn index",
+      "user_input": "current released USER bytes; empty for due work"
+    },
+    "variables": {
+      "EXCHANGE": "Current operation exchange directory",
+      "HARNESS": "$DELIVERY_DIR/harness",
+      "OPERATION_JSON": "Current legally released mechanical operation",
+      "PERSISTENCE_REPO": "Approved Git checkout with authoritative writable origin",
+      "RUN_ID": "Externally authorized run identity",
+      "RUN_ROOT": "Private durable run directory; preserve all existing state",
+      "SESSION_ID": "Externally authorized session identity",
+      "SOURCE_REPO": "Independent local source checkout whose exact Core/C15 bytes and modes pass verify"
+    }
+  },
+  "runner_invocation": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I \"$HARNESS/launch.py\" --source-repo \"$SOURCE_REPO\" --identity-sha256 ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd run --root \"$RUN_ROOT\" --run-id \"$RUN_ID\" --session-id \"$SESSION_ID\" --operation \"$OPERATION_JSON\" --persistence-repo \"$PERSISTENCE_REPO\"",
+  "runtime_module_identity": {
+    "isolation": "Python -I and closed verified in-memory source importer",
+    "manifest": "harness/IDENTITY.json",
+    "manifest_sha256": "ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd",
+    "module_verification": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I \"$HARNESS/launch.py\" --source-repo \"$SOURCE_REPO\" --identity-sha256 ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd verify"
+  },
+  "self_acceptance": false,
+  "semantic_router_disabled_verification": {
+    "command": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I \"$HARNESS/launch.py\" --source-repo \"$SOURCE_REPO\" --identity-sha256 ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd verify",
+    "expected_pass_marker": "HARNESS_IDENTITY_AND_ROUTER_PASS"
+  },
+  "start_preconditions": [
+    "Independent acceptance and PM launch authorization required",
+    "Qualified Linux x86_64 with AF_UNIX SO_PEERCRED, pidfd and real /proc process identity",
+    "Approved runtime and closed source identity verified",
+    "Current event legally released by external Operator; existing state preserved",
+    "Writable authoritative persistence origin and canonical run ref"
+  ],
+  "startup_inputs": {
+    "clean_room_contract": {
+      "git_blob": "430a75e0a20b0256672eb430617ae5a1d14c142f",
+      "path": "reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_CORRECTIVE_003_CLEAN_ROOM_CONTRACT.md"
+    },
+    "run_contract": {
+      "git_blob": "1b45ca7fa441855d927b610ca2a93ef50b5eee66",
+      "path": "reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_RUN_CONTRACT.md"
+    }
+  },
+  "stop_after_ack_cursor": 13,
+  "task": "C15-RCC-RES-A-RERUN-005"
 }

@@ -1,5 +1,7 @@
 # C15-RCC-RES-A-RERUN-005 — OPERATOR-ONLY Environment Handoff
 
+**Historical environment-build instructions below are superseded for the current candidate. Do not execute them.** Use `HARNESS_DELIVERY_CONTRACT.md` in this directory and the pending current packet. Reuse the exact approved portable runtime; no replacement build/install or Resident launch is authorized. The old `approved_runtime.resident_verify_command` reference below is not the current pinned Harness entry.
+
 > Access class: OPERATOR_ONLY / NOT_RESIDENT_VISIBLE
 
 Window 51 stopped before cursor 1 because the Resident-safe packet omitted the approved runtime path and mechanical verification command. This is a preflight packaging gap, not Resident contamination and not a Phase-A failure.
