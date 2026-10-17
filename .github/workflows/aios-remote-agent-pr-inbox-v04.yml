@@ -1,0 +1,122 @@
+name: aios-remote-agent-pr-inbox-v04
+
+# v0.4 public-only Arena-compatible PR inbox.
+# pull_request_target ALWAYS runs base code; NEVER checkout or execute PR head.
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/aios-remote-agent-pr-inbox-v04.yml"
+      - "tools/agent_gateway/pr_request.py"
+      - "tests/agent_gateway/test_pr_request.py"
+      - "docs/AIOS_REMOTE_AGENT_PR_INBOX_V04.md"
+  pull_request_target:
+    types: [opened]
+    paths:
+      - "agent-tasks/gateway-request.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aios-gateway-pr-v04-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  public-policy-ci:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Checkout PR exact head for unit policy CI, without credentials
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run public no-credential gateway tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -I -m unittest discover -s tests/agent_gateway -p 'test_*.py' -v 2>&1 | tee gateway-pr-unittest.log
+          python -I tools/agent_gateway/runner.py --task gateway-selftest
+
+      - name: Preserve public unit-test receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aios-pr-inbox-policy-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            gateway-evidence/
+            gateway-pr-unittest.log
+          retention-days: 7
+          if-no-files-found: warn
+
+  owner-pr-readonly-dispatch:
+    if: >-
+      github.event_name == 'pull_request_target' &&
+      github.event.pull_request.user.login == 'Haneof' &&
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Checkout *trusted base SHA only* with no persisted credentials
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install standard Python for public, non-formal gateway
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Read PR *as Git data only* and approve exact allowlisted task
+        id: task
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -I tools/agent_gateway/pr_request.py
+
+      - name: Execute reviewed trusted-base Gateway runner only
+        env:
+          GATEWAY_TASK: ${{ steps.task.outputs.task }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -I tools/agent_gateway/runner.py --task "$GATEWAY_TASK"
+
+      - name: Write receipt to Actions job summary
+        if: always()
+        shell: bash
+        run: |
+          echo "### Owner PR static gateway v0.4" >> "$GITHUB_STEP_SUMMARY"
+          echo "Non-formal public audit. No PR-head code executed. No secrets." >> "$GITHUB_STEP_SUMMARY"
+          for receipt in gateway-evidence/*/result.json; do
+            if [ -f "$receipt" ]; then
+              AIOS_GATEWAY_RECEIPT="$receipt" python -I -c 'import json,os; p=json.load(open(os.environ["AIOS_GATEWAY_RECEIPT"])); print("Task:",p["task"],"Status:",p["status"],"Class:",p["classification"])' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
+      - name: Upload sanitized GitHub-hosted public audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aios-owner-pr-gateway-${{ github.run_id }}-${{ github.run_attempt }}
+          path: gateway-evidence/
+          retention-days: 7
+          if-no-files-found: warn
