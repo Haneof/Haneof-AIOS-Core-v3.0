@@ -1,0 +1,333 @@
+......F...........................FFF                                    [100%]
+=================================== FAILURES ===================================
+_____ test_real_core_external_publisher_with_c15_remote_barriers[summary] ______
+
+tmp_path = PosixPath('/workspace/scratch/0abf0e48458e/final_barrier_pytest/test_real_core_external_publis2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa71cfb6810>
+scenario = 'summary'
+
+    @pytest.mark.parametrize('scenario',['due','user','summary','delivered'])
+    def test_real_core_external_publisher_with_c15_remote_barriers(tmp_path,monkeypatch,scenario):
+        root,repo=setup(tmp_path,monkeypatch)
+        harn=HARN
+        if scenario=='delivered':
+            from test_artifact_delivery import materialize
+            target,result=materialize(tmp_path,HARN.parent/'artifacts/resident-harness.tar.gz')
+            assert result.returncode==0,result.stderr
+            harn=target/'harness'
+        world=root/'state/runtime/world.sqlite';index=root/'state/runtime/index.sqlite'
+        core=HeadlessCore(config=HeadlessConfig(world_path=world,index_path=index),
+            model_handler=lambda _s: (_ for _ in ()).throw(AssertionError('setup cannot decide'))).start()
+        moment=datetime(2026,10,13,tzinfo=timezone.utc)
+        if scenario=='due':
+            core.runtime.wake_bus.emit(WakeSignalRequest(wake_source=WakeSource.SAFETY,
+                rule_id='synthetic-boundary',observed_at=moment,priority=100,dedupe_key='synthetic-boundary'))
+        if scenario=='summary':
+            from datetime import timedelta
+            core.model_handler=lambda _s:ModelDirective(response='synthetic setup only')
+            core.runtime.cognitive_runtime.model_handler=core.model_handler
+            # Current Core preserves eight recent turns and summarizes closed chunks
+            # of twelve older turns. Twenty setup turns exercise the normal trigger.
+            for i in range(1,21):
+                core.submit_user_turn(session_id='synthetic-53-session',turn_index=i,
+                    user_input='synthetic history '+str(i),occurred_at=moment+timedelta(seconds=i))
+            moment=moment+timedelta(seconds=21)
+        core.stop()
+        # Synthetic setup alters only a private test world; publish its state before running.
+        from tools.c15_persistence.backend import RunBackend
+        from r005.safe_runner import barrier
+        b=RunBackend.open(root,run_id='synthetic-53-run',session_id='synthetic-53-session')
+        barrier(b,repo,'synthetic-wake-staged');b.release()
+        spec={'mode':'due' if scenario=='due' else 'user','at':moment.isoformat(),'cursor':1,
+            'event_id':'synthetic-event-1','turn_index':21 if scenario=='summary' else 1,
+            'user_input':'' if scenario=='due' else 'synthetic USER bytes','timeout':30}
+        specpath=tmp_path/'operation.json';specpath.write_bytes(canonical_json_bytes(spec))
+        env=dict(os.environ,C15_PERSISTED_WORKSPACE=str(tmp_path))
+        runner=subprocess.Popen(entry(harn)+['run',
+            '--root',str(root),'--run-id','synthetic-53-run','--session-id','synthetic-53-session',
+            '--operation',str(specpath),'--persistence-repo',str(repo)],
+            stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,env=env)
+        authorization_line=runner.stdout.readline()
+        assert authorization_line.startswith('RESIDENT_PUBLISH_AUTHORIZATION='), runner.stderr.read() if not authorization_line else authorization_line
+        authorization=authorization_line.strip().split('=',1)[1]
+        answered=set();kinds=set();deadline=time.monotonic()+90
+        while runner.poll() is None and time.monotonic()<deadline:
+            for ready in (root/'mailbox/operations').glob('*/ready/*.json'):
+                exchange=ready.parent.parent;rid=ready.stem
+                if rid in answered:continue
+                b=ExchangeBridge(exchange);request=b.requests.payload(rid)
+                kinds.add(request['kind'])
+                if request['kind']=='model_directive':
+                    binding=request['body']['provenance_binding']
+                    directive={'silence':True,'provenance':binding} if scenario=='due' else {
+                        'response':'synthetic USER return','provenance':binding}
+                else:directive={'text':'synthetic Summary transport bytes'}
+                response={'response_version':1,'request_id':rid,'request_sha256':b.request_sha256(rid),
+                    'authored_by':'EXTERNAL_CURRENT_RESIDENT_SESSION',
+                    'directive':directive}
+                path=tmp_path/(rid+'.json');path.write_bytes(canonical_json_bytes(response))
+                base=entry(harn)+['publish',
+                    '--exchange',str(exchange),'--request-id',rid,'--response',str(path),
+                    '--persistence-repo',str(repo)]
+                attack=subprocess.run(base,input='recovery-forged-authorization\n',capture_output=True,text=True,timeout=10)
+                assert attack.returncode!=0
+                assert 'external Resident authorization required' in attack.stderr
+                assert b.published_response_record(rid) is None
+                assert not (exchange/'proofs'/f'{rid}.json').exists()
+                if not answered:
+                    for mutation in ('hash','request_id','schema'):
+                        broken=dict(response)
+                        if mutation=='hash':broken['request_sha256']='0'*64
+                        elif mutation=='request_id':broken['request_id']='stale-request'
+                        else:broken['directive']={'unrecognized_field':True}
+                        path.write_bytes(canonical_json_bytes(broken))
+                        rejected=subprocess.run(base,input=authorization+'\n',capture_output=True,text=True,timeout=10)
+                        assert rejected.returncode!=0
+                        assert b.published_response_record(rid) is None
+                        assert not (exchange/'proofs'/f'{rid}.json').exists()
+                    path.write_bytes(canonical_json_bytes(response))
+                completed=subprocess.run(base,
+                    input=authorization+'\n',capture_output=True,text=True,timeout=40)
+                assert completed.returncode==0,completed.stderr
+                published=json.loads(completed.stdout)
+                assert published['publisher_pid']!=os.getpid()
+                assert published['remote_commit']
+                assert b.responses.path_for(rid).read_bytes()==path.read_bytes()
+                answered.add(rid)
+            time.sleep(.02)
+        stdout,stderr=runner.communicate(timeout=5)
+        assert runner.returncode==0,stderr
+        results=[json.loads(stdout)]
+        assert answered
+        import sqlite3
+        db=sqlite3.connect(world)
+        signed_core_returns=sum(json.loads(p.read_bytes())['core_proof'] is not None
+            for p in (root/'mailbox/operations').glob('*/proofs/*.json'))
+        assert signed_core_returns>0
+        assert db.execute('SELECT COUNT(*) FROM background_model_response_receipts').fetchone()[0]==signed_core_returns
+        db.close()
+        reopened=RunBackend.open(root,run_id='synthetic-53-run',session_id='synthetic-53-session')
+        from tools.c15_persistence.relay import RelayJournal
+        j=RelayJournal(reopened)
+        for rid in j.request_ids():assert j.recovery(rid)['state']=='applied'
+        reopened.release()
+        before=world.read_bytes()
+        assert run(root,'synthetic-53-run','synthetic-53-session',repo,spec)==results[0]
+        assert world.read_bytes()==before
+        replay=subprocess.run(base,input='',capture_output=True,text=True,timeout=10)
+        assert replay.returncode==0,replay.stderr
+        assert json.loads(replay.stdout)['idempotent_replay'] is True
+        assert authorization.encode() not in b''.join(p.read_bytes() for p in root.rglob('*') if p.is_file())
+        channel=Path(json.loads((exchange/'service.json').read_bytes())['socket'])
+        assert authorization.encode() not in b''.join(p.read_bytes() for p in channel.rglob('*') if p.is_file())
+        assert (exchange/'runtime-handler-identity.json').is_file()
+>       if scenario=='summary':assert 'round_summary' in kinds
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 'round_summary' in {'model_directive'}
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py:158: AssertionError
+_______ test_durability_error_never_becomes_publication_success[request] _______
+
+_fd = 24
+
+>   def fail_fsync(_fd):raise OSError('synthetic durability barrier unavailable')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   OSError: synthetic durability barrier unavailable
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_mechanical_candidate.py:235: OSError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/workspace/scratch/0abf0e48458e/final_barrier_pytest/test_durability_error_never_be0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa71ce18e30>
+point = 'request'
+
+    @pytest.mark.parametrize('point',['request','response','response_replay'])
+    def test_durability_error_never_becomes_publication_success(tmp_path,monkeypatch,point):
+        from r005 import atomic
+        b,rid=request(tmp_path);raw=envelope(b,rid)
+        if point=='response_replay':publish(b.root,rid,raw)
+        original=b.responses.path_for(rid).read_bytes() if point=='response_replay' else None
+        def fail_fsync(_fd):raise OSError('synthetic durability barrier unavailable')
+        monkeypatch.setattr(atomic.os,'fsync',fail_fsync)
+        if point=='request':
+>           before=list(b.ledger.request_ids())
+                        ^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_mechanical_candidate.py:238: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/ledger.py:247: in request_ids
+    for record in self.read_records():
+                  ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <r005.ledger.ExchangeLedger object at 0x7fa71ce18290>
+
+    def read_records(self) -> list[dict[str, Any]]:
+        # A failed fsync can leave a valid-looking record visible. Under the
+        # shared lock, reestablish file AND directory durability before any
+        # reader is allowed to treat that prefix as an exchange fact. This also
+        # handles an empty ledger entry left by failed initial creation.
+        with self.mutation():
+            try:
+                if self.path.exists():
+                    with open(self.path, "rb") as handle:
+                        os.fsync(handle.fileno())
+                    fsync_dir(self.path.parent)
+                records = self._read_raw_records()
+                self._validate_records(records)
+                return records
+            except LedgerError:
+                raise
+            except (OSError, ValueError, TypeError) as exc:
+>               raise LedgerError(f"ledger integrity validation/durability failed: {exc}") from exc
+E               r005.ledger.LedgerError: ledger integrity validation/durability failed: synthetic durability barrier unavailable
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/ledger.py:221: LedgerError
+______ test_durability_error_never_becomes_publication_success[response] _______
+
+_fd = 12
+
+>   def fail_fsync(_fd):raise OSError('synthetic durability barrier unavailable')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   OSError: synthetic durability barrier unavailable
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_mechanical_candidate.py:235: OSError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/workspace/scratch/0abf0e48458e/final_barrier_pytest/test_durability_error_never_be1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa71cf6cd70>
+point = 'response'
+
+    @pytest.mark.parametrize('point',['request','response','response_replay'])
+    def test_durability_error_never_becomes_publication_success(tmp_path,monkeypatch,point):
+        from r005 import atomic
+        b,rid=request(tmp_path);raw=envelope(b,rid)
+        if point=='response_replay':publish(b.root,rid,raw)
+        original=b.responses.path_for(rid).read_bytes() if point=='response_replay' else None
+        def fail_fsync(_fd):raise OSError('synthetic durability barrier unavailable')
+        monkeypatch.setattr(atomic.os,'fsync',fail_fsync)
+        if point=='request':
+            before=list(b.ledger.request_ids())
+            with pytest.raises(OSError):b.publish_request(kind='model_directive',body={'synthetic':True})
+            assert b.ledger.request_ids()==before
+        else:
+>           with pytest.raises((OSError,ResponsePublishError)):publish(b.root,rid,raw)
+                                                               ^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_mechanical_candidate.py:242: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/draft_runner.py:87: in publish
+    bridge.requests.payload(request_id)
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/requests.py:187: in payload
+    record = self.ledger.latest_event(request_id, LEDGER_EVENT_REQUEST_PUBLISHED)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/ledger.py:242: in latest_event
+    found = self.find_event(request_id, event)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/ledger.py:237: in find_event
+    for r in self.read_records()
+             ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <r005.ledger.ExchangeLedger object at 0x7fa71cf6ecf0>
+
+    def read_records(self) -> list[dict[str, Any]]:
+        # A failed fsync can leave a valid-looking record visible. Under the
+        # shared lock, reestablish file AND directory durability before any
+        # reader is allowed to treat that prefix as an exchange fact. This also
+        # handles an empty ledger entry left by failed initial creation.
+        with self.mutation():
+            try:
+                if self.path.exists():
+                    with open(self.path, "rb") as handle:
+                        os.fsync(handle.fileno())
+                    fsync_dir(self.path.parent)
+                records = self._read_raw_records()
+                self._validate_records(records)
+                return records
+            except LedgerError:
+                raise
+            except (OSError, ValueError, TypeError) as exc:
+>               raise LedgerError(f"ledger integrity validation/durability failed: {exc}") from exc
+E               r005.ledger.LedgerError: ledger integrity validation/durability failed: synthetic durability barrier unavailable
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/ledger.py:221: LedgerError
+___ test_durability_error_never_becomes_publication_success[response_replay] ___
+
+_fd = 12
+
+>   def fail_fsync(_fd):raise OSError('synthetic durability barrier unavailable')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   OSError: synthetic durability barrier unavailable
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_mechanical_candidate.py:235: OSError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/workspace/scratch/0abf0e48458e/final_barrier_pytest/test_durability_error_never_be2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa71cf6c6b0>
+point = 'response_replay'
+
+    @pytest.mark.parametrize('point',['request','response','response_replay'])
+    def test_durability_error_never_becomes_publication_success(tmp_path,monkeypatch,point):
+        from r005 import atomic
+        b,rid=request(tmp_path);raw=envelope(b,rid)
+        if point=='response_replay':publish(b.root,rid,raw)
+        original=b.responses.path_for(rid).read_bytes() if point=='response_replay' else None
+        def fail_fsync(_fd):raise OSError('synthetic durability barrier unavailable')
+        monkeypatch.setattr(atomic.os,'fsync',fail_fsync)
+        if point=='request':
+            before=list(b.ledger.request_ids())
+            with pytest.raises(OSError):b.publish_request(kind='model_directive',body={'synthetic':True})
+            assert b.ledger.request_ids()==before
+        else:
+>           with pytest.raises((OSError,ResponsePublishError)):publish(b.root,rid,raw)
+                                                               ^^^^^^^^^^^^^^^^^^^^^^^
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_mechanical_candidate.py:242: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/draft_runner.py:87: in publish
+    bridge.requests.payload(request_id)
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/requests.py:187: in payload
+    record = self.ledger.latest_event(request_id, LEDGER_EVENT_REQUEST_PUBLISHED)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/ledger.py:242: in latest_event
+    found = self.find_event(request_id, event)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/ledger.py:237: in find_event
+    for r in self.read_records()
+             ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <r005.ledger.ExchangeLedger object at 0x7fa71cf6f650>
+
+    def read_records(self) -> list[dict[str, Any]]:
+        # A failed fsync can leave a valid-looking record visible. Under the
+        # shared lock, reestablish file AND directory durability before any
+        # reader is allowed to treat that prefix as an exchange fact. This also
+        # handles an empty ledger entry left by failed initial creation.
+        with self.mutation():
+            try:
+                if self.path.exists():
+                    with open(self.path, "rb") as handle:
+                        os.fsync(handle.fileno())
+                    fsync_dir(self.path.parent)
+                records = self._read_raw_records()
+                self._validate_records(records)
+                return records
+            except LedgerError:
+                raise
+            except (OSError, ValueError, TypeError) as exc:
+>               raise LedgerError(f"ledger integrity validation/durability failed: {exc}") from exc
+E               r005.ledger.LedgerError: ledger integrity validation/durability failed: synthetic durability barrier unavailable
+
+reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/ledger.py:221: LedgerError
+- generated xml file: /workspace/scratch/0abf0e48458e/repo/reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/SYNTHETIC_RESULTS.xml -
+=========================== short test summary info ============================
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers[summary]
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_mechanical_candidate.py::test_durability_error_never_becomes_publication_success[request]
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_mechanical_candidate.py::test_durability_error_never_becomes_publication_success[response]
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_mechanical_candidate.py::test_durability_error_never_becomes_publication_success[response_replay]
+4 failed, 33 passed in 73.62s (0:01:13)

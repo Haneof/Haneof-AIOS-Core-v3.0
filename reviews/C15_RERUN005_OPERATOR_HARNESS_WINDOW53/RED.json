@@ -1,0 +1,19 @@
+{
+  "fresh_main": "271fa28d695efaeb1c888d93024eeddac9c8aa9f",
+  "packet_path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/RESIDENT_SAFE_LAUNCH_PACKET.json",
+  "packet_sha256": "a096b03048e1e0c69e92c715822431bc7a660f72335e820c84a14eaa7b0d6dae",
+  "missing": [
+    "runner_invocation",
+    "publisher_invocation",
+    "runtime_module_identity",
+    "semantic_router_disabled_verification",
+    "current_main_harness_identity",
+    "cross_sandbox_harness_materialization"
+  ],
+  "result": "RED",
+  "evidence": "packet has no harness field; mechanical_release_tools has release_operator/mechanical_ingest_adapter/canonical_conversation_ingest only",
+  "initial_fetch_exit": 128,
+  "initial_fetch_reason": "empty workspace, not a git repository; clone then required fetch succeeded",
+  "real_resident_started": false,
+  "fixture_read": false
+}

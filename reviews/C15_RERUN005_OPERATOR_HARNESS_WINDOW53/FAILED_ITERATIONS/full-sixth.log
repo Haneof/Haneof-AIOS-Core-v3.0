@@ -1,0 +1,85 @@
+....FF....F..................                                            [100%]
+=================================== FAILURES ===================================
+_____ test_real_core_external_publisher_with_c15_remote_barriers[summary] ______
+
+tmp_path = PosixPath('/workspace/scratch/0abf0e48458e/full_pytest_sixth/test_real_core_external_publis2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f4e52a44230>
+scenario = 'summary'
+
+    @pytest.mark.parametrize('scenario',['due','user','summary'])
+    def test_real_core_external_publisher_with_c15_remote_barriers(tmp_path,monkeypatch,scenario):
+        root,repo=setup(tmp_path,monkeypatch)
+        world=root/'state/runtime/world.sqlite';index=root/'state/runtime/index.sqlite'
+        core=HeadlessCore(config=HeadlessConfig(world_path=world,index_path=index),
+            model_handler=lambda _s: (_ for _ in ()).throw(AssertionError('setup cannot decide'))).start()
+        moment=datetime(2026,10,13,tzinfo=timezone.utc)
+        if scenario=='due':
+            core.runtime.wake_bus.emit(WakeSignalRequest(wake_source=WakeSource.SAFETY,
+                rule_id='synthetic-boundary',observed_at=moment,priority=100,dedupe_key='synthetic-boundary'))
+        if scenario=='summary':
+            from datetime import timedelta
+            core.model_handler=lambda _s:ModelDirective(response='synthetic setup only')
+            core.runtime.cognitive_runtime.model_handler=core.model_handler
+            # Current Core preserves eight recent turns and summarizes closed chunks
+            # of twelve older turns. Twenty setup turns exercise the normal trigger.
+            for i in range(1,21):
+                core.submit_user_turn(session_id='synthetic-53-session',turn_index=i,
+                    user_input='synthetic history '+str(i),occurred_at=moment+timedelta(seconds=i))
+            moment=moment+timedelta(seconds=21)
+        core.stop()
+        # Synthetic setup alters only a private test world; publish its state before running.
+        from tools.c15_persistence.backend import RunBackend
+        from r005.safe_runner import barrier
+        b=RunBackend.open(root,run_id='synthetic-53-run',session_id='synthetic-53-session')
+        barrier(b,repo,'synthetic-wake-staged');b.release()
+        spec={'mode':'due' if scenario=='due' else 'user','at':moment.isoformat(),'cursor':1,
+            'event_id':'synthetic-event-1','turn_index':21 if scenario=='summary' else 1,
+            'user_input':'' if scenario=='due' else 'synthetic USER bytes','timeout':30}
+        specpath=tmp_path/'operation.json';specpath.write_bytes(canonical_json_bytes(spec))
+        env=dict(os.environ,C15_PERSISTED_WORKSPACE=str(tmp_path))
+        runner=subprocess.Popen(entry()+['run',
+            '--root',str(root),'--run-id','synthetic-53-run','--session-id','synthetic-53-session',
+            '--operation',str(specpath),'--persistence-repo',str(repo)],
+            stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,env=env)
+        authorization_line=runner.stdout.readline()
+>       assert authorization_line.startswith('RESIDENT_PUBLISH_AUTHORIZATION='), runner.stderr.read() if not authorization_line else authorization_line
+E       AssertionError: BLOCKED / HARNESS_SUBSTITUTION
+E         
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x561c0a573c70>('RESIDENT_PUBLISH_AUTHORIZATION=')
+E        +    where <built-in method startswith of str object at 0x561c0a573c70> = ''.startswith
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py:78: AssertionError
+___________ test_independent_location_exact_bytes_import_resolution ____________
+
+tmp_path = PosixPath('/workspace/scratch/0abf0e48458e/full_pytest_sixth/test_independent_location_exac0')
+
+    def test_independent_location_exact_bytes_import_resolution(tmp_path):
+        copy=tmp_path/'independent-sandbox-harness';shutil.copytree(HARN,copy,ignore=shutil.ignore_patterns('__pycache__'))
+        fake=tmp_path/'fake';fake.mkdir();(fake/'aios_core.py').write_text('raise RuntimeError("substitution linked")')
+        completed=subprocess.run(command(copy),env=dict(os.environ,PYTHONPATH=str(fake)),capture_output=True,text=True)
+>       assert completed.returncode==0,completed.stderr
+E       AssertionError: BLOCKED / HARNESS_SUBSTITUTION
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python', '-I', '/workspace/s...3422e56a7fa5e9c55e8b6f33848dc27d394bcd', 'verify'], returncode=1, stdout='', stderr='BLOCKED / HARNESS_SUBSTITUTION\n').returncode
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_identity_delivery.py:24: AssertionError
+____________________ test_executable_substitution_rejected _____________________
+
+tmp_path = PosixPath('/workspace/scratch/0abf0e48458e/full_pytest_sixth/test_executable_substitution_r0')
+
+    def test_executable_substitution_rejected(tmp_path):
+        alias=tmp_path/'substituted-python'
+        shutil.copyfile(Path(os.environ['APPROVED53_PYTHON']).resolve(),alias);alias.chmod(0o700)
+        completed=subprocess.run(command(HARN,str(alias)),capture_output=True,text=True)
+        assert completed.returncode!=0
+>       assert 'executable path substitution' in completed.stderr
+E       AssertionError: assert 'executable path substitution' in 'BLOCKED / HARNESS_SUBSTITUTION\n'
+E        +  where 'BLOCKED / HARNESS_SUBSTITUTION\n' = CompletedProcess(args=['/workspace/scratch/0abf0e48458e/full_pytest_sixth/test_executable_substitution_r0/substituted-...3422e56a7fa5e9c55e8b6f33848dc27d394bcd', 'verify'], returncode=1, stdout='', stderr='BLOCKED / HARNESS_SUBSTITUTION\n').stderr
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_identity_delivery.py:51: AssertionError
+=========================== short test summary info ============================
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers[summary]
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_identity_delivery.py::test_independent_location_exact_bytes_import_resolution
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_identity_delivery.py::test_executable_substitution_rejected

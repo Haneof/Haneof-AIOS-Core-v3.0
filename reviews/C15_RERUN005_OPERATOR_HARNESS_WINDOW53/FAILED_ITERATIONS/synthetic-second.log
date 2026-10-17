@@ -1,0 +1,43 @@
+..............F..                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_actual_due_work_live_return_has_no_core_authenticity ___________
+
+tmp_path = PosixPath('/workspace/scratch/0abf0e48458e/synthetic_pytest/test_actual_due_work_live_retu0')
+
+    def test_actual_due_work_live_return_has_no_core_authenticity(tmp_path):
+        world=tmp_path/'world.sqlite'; index=tmp_path/'index.sqlite'
+        moment=datetime(2026,10,13,tzinfo=timezone.utc)
+        def never_called(_snapshot):
+            raise AssertionError('setup must not call a model')
+        core=HeadlessCore(config=HeadlessConfig(world_path=world,index_path=index),
+            model_handler=never_called).start()
+        core.runtime.wake_bus.emit(WakeSignalRequest(wake_source=WakeSource.SAFETY,
+            rule_id='synthetic-transport-only',observed_at=moment,priority=100,
+            dedupe_key='synthetic-transport-only'))
+        core.stop()
+        spec={'world':str(world),'index':str(index),'exchange':str(tmp_path/'exchange'),
+            'run_id':'synthetic-background-run','session_id':'synthetic-background-session',
+            'subject_id':'user_1','mode':'due','at':moment.isoformat(),'timeout':5}
+        errors=[];outputs=[]
+        def worker():
+            try:outputs.append(run(spec))
+            except BaseException as e:errors.append(e)
+        t=threading.Thread(target=worker);t.start()
+        root=Path(spec['exchange']);deadline=time.monotonic()+4;files=[]
+        while time.monotonic()<deadline:
+            files=list((root/'requests').glob('*.json'))
+            if files:break
+            time.sleep(.01)
+        assert files
+        b=ExchangeBridge(root);rid=files[0].stem
+        publish(root,rid,envelope(b,rid,{'silence':True}))
+        t.join(6)
+>       assert not t.is_alive() and not errors,repr(errors)
+E       AssertionError: [ResponseTimeoutError("no durable response_published record for 'req-0002-model_directive-4c381f7e' within 5.0s (classification=DISPATCHED_AWAITING_RESPONSE)")]
+E       assert (not False and not [ResponseTimeoutError("no durable response_published record for 'req-0002-model_directive-4c381f7e' within 5.0s (classification=DISPATCHED_AWAITING_RESPONSE)")])
+E        +  where False = is_alive()
+E        +    where is_alive = <Thread(Thread-2 (worker), stopped 140086414399168)>.is_alive
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_mechanical_candidate.py:176: AssertionError
+=========================== short test summary info ============================
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_mechanical_candidate.py::test_actual_due_work_live_return_has_no_core_authenticity

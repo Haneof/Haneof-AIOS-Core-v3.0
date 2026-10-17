@@ -1,0 +1,68 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_real_core_external_publisher_with_c15_remote_barriers __________
+
+tmp_path = PosixPath('/workspace/scratch/0abf0e48458e/trusted_pytest_second/test_real_core_external_publis0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f41c2002fc0>
+
+    def test_real_core_external_publisher_with_c15_remote_barriers(tmp_path,monkeypatch):
+        root,repo=setup(tmp_path,monkeypatch)
+        world=root/'state/runtime/world.sqlite';index=root/'state/runtime/index.sqlite'
+        core=HeadlessCore(config=HeadlessConfig(world_path=world,index_path=index),
+            model_handler=lambda _s: (_ for _ in ()).throw(AssertionError('setup cannot decide'))).start()
+        moment=datetime(2026,10,13,tzinfo=timezone.utc)
+        core.runtime.wake_bus.emit(WakeSignalRequest(wake_source=WakeSource.SAFETY,
+            rule_id='synthetic-boundary',observed_at=moment,priority=100,dedupe_key='synthetic-boundary'))
+        core.stop()
+        # Synthetic setup alters only a private test world; publish its state before running.
+        from tools.c15_persistence.backend import RunBackend
+        from r005.safe_runner import barrier
+        b=RunBackend.open(root,run_id='synthetic-53-run',session_id='synthetic-53-session')
+        barrier(b,repo,'synthetic-wake-staged');b.release()
+        spec={'mode':'due','at':moment.isoformat(),'cursor':1,'event_id':'synthetic-event-1',
+            'turn_index':1,'user_input':'','timeout':30}
+        results=[];errors=[]
+        def worker():
+            try:results.append(run(root,'synthetic-53-run','synthetic-53-session',repo,spec))
+            except BaseException as e:errors.append(e)
+        t=threading.Thread(target=worker);t.start();answered=set();deadline=time.monotonic()+60
+        while t.is_alive() and time.monotonic()<deadline:
+            for ready in (root/'mailbox/operations').glob('*/ready/*.json'):
+                exchange=ready.parent.parent;rid=ready.stem
+                if rid in answered:continue
+                b=ExchangeBridge(exchange);request=b.requests.payload(rid)
+                binding=request['body']['provenance_binding']
+                response={'response_version':1,'request_id':rid,'request_sha256':b.request_sha256(rid),
+                    'authored_by':'EXTERNAL_CURRENT_RESIDENT_SESSION',
+                    'directive':{'silence':True,'provenance':binding}}
+                path=tmp_path/(rid+'.json');path.write_bytes(canonical_json_bytes(response))
+                completed=subprocess.run([os.environ['APPROVED53_PYTHON'],'-m','r005.cli','publish',
+                    '--exchange',str(exchange),'--request-id',rid,'--response',str(path)],
+                    capture_output=True,text=True,timeout=40)
+                assert completed.returncode==0,completed.stderr
+                published=json.loads(completed.stdout)
+                assert published['publisher_pid']!=os.getpid()
+                assert published['remote_commit']
+                assert b.responses.path_for(rid).read_bytes()==path.read_bytes()
+                answered.add(rid)
+            time.sleep(.02)
+        t.join(2)
+>       assert not t.is_alive() and not errors,repr(errors)
+E       AssertionError: [BackendError('external publisher service exited')]
+E       assert (not False and not [BackendError('external publisher service exited')])
+E        +  where False = is_alive()
+E        +    where is_alive = <Thread(Thread-1 (worker), stopped 139920404092608)>.is_alive
+
+reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py:72: AssertionError
+----------------------------- Captured stderr call -----------------------------
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/workspace/scratch/0abf0e48458e/repo/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/publisher_service.py", line 65, in <module>
+    server=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM);server.bind(sockpath)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/python/lib/python3.12/socket.py", line 233, in __init__
+    _socket.socket.__init__(self, family, type, proto, fileno)
+PermissionError: [Errno 1] Operation not permitted
+=========================== short test summary info ============================
+FAILED reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/test_current_trusted_adapter.py::test_real_core_external_publisher_with_c15_remote_barriers
