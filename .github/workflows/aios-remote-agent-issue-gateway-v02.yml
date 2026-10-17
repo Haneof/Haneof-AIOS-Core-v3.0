@@ -6,9 +6,10 @@ on:
   pull_request:
     paths:
       - ".github/workflows/aios-remote-agent-issue-gateway-v02.yml"
-      - "tools/agent_gateway/issue_request.py"
-      - "tests/agent_gateway/test_issue_request.py"
+      - "tools/agent_gateway/**"
+      - "tests/agent_gateway/**"
       - "docs/AIOS_REMOTE_AGENT_ISSUE_GATEWAY_V02.md"
+      - "docs/AIOS_REMOTE_AGENT_REGRESSION_AUDIT_V03.md"
   issues:
     types: [opened]
 
