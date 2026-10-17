@@ -1,0 +1,33 @@
+{
+  "host": "codespaces-1996ee",
+  "uid": 1000,
+  "pid": 7661,
+  "sid": 7661,
+  "stdin_isatty": false,
+  "utc_epoch": 1792225866,
+  "controlling_tty": false,
+  "tty_errno": 6,
+  "peercred": [
+    7661,
+    1000,
+    1000
+  ],
+  "AF_UNIX": true,
+  "pidfd": true,
+  "trust_public": {
+    "issuer.pub": {
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o444",
+      "der_sha256": "1124f54a497c9dfa5fcc6e16fb9fc570816fadba6f32016a8b53d5f0243090dd",
+      "openssl_exit": 0
+    },
+    "resident.pub": {
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o444",
+      "der_sha256": "838a1a7d168ac6dd8441c0c8a2deab439a7b775d6583c40618a51f627e6e3b7f",
+      "openssl_exit": 0
+    }
+  }
+}

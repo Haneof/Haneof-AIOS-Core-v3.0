@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/workspaces/c15-w67-continuation-20261017T0830Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py", line 168, in load_grant
+    require(grant['issued_at'] <= grant['not_before'] <= now < grant['expires_at'] and
+  File "/workspaces/c15-w67-continuation-20261017T0830Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py", line 108, in require
+    raise ValueError(reason)
+ValueError: expired or invalid enrollment

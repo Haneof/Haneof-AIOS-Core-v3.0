@@ -1,0 +1,59 @@
+[
+  {
+    "name": "platform",
+    "argv": [
+      "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+      "-B",
+      "-I",
+      "/workspaces/c15-w67-continuation-20261017T0830Z/platform-probe.py"
+    ],
+    "returncode": 0
+  },
+  {
+    "name": "loader",
+    "argv": [
+      "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+      "-B",
+      "-I",
+      "/workspaces/c15-w67-continuation-20261017T0830Z/candidate/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/launch.py",
+      "--source-repo",
+      "/workspaces/c15-w67-continuation-20261017T0830Z/candidate",
+      "--identity-sha256",
+      "364cc03617fcd782327b3307720baf5371839185b1b07b71476308af74c5a817",
+      "verify"
+    ],
+    "returncode": 0
+  },
+  {
+    "name": "account-999",
+    "argv": [
+      "sudo",
+      "-n",
+      "-u",
+      "#999",
+      "--",
+      "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+      "-B",
+      "-I",
+      "-c",
+      "import os,json,pathlib;print(json.dumps({'uid':os.getuid(),'gid':os.getgid(),'groups':os.getgroups(),'capabilities':[x for x in pathlib.Path('/proc/self/status').read_text().splitlines() if x.startswith(('CapEff:','NoNewPrivs:'))]}))"
+    ],
+    "returncode": 1
+  },
+  {
+    "name": "account-996",
+    "argv": [
+      "sudo",
+      "-n",
+      "-u",
+      "#996",
+      "--",
+      "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+      "-B",
+      "-I",
+      "-c",
+      "import os,json,pathlib;print(json.dumps({'uid':os.getuid(),'gid':os.getgid(),'groups':os.getgroups(),'capabilities':[x for x in pathlib.Path('/proc/self/status').read_text().splitlines() if x.startswith(('CapEff:','NoNewPrivs:'))]}))"
+    ],
+    "returncode": 1
+  }
+]

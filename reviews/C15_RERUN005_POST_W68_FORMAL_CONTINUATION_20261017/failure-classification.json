@@ -1,0 +1,51 @@
+[
+  {
+    "case": "test_sigkill_after_request_never_regenerates_or_redispatches",
+    "category": "LEGACY_TTY_STDOUT_CONTRACT_FAILURE",
+    "tty_failure_observed": true,
+    "unchanged_failure": true,
+    "semantic_pass_claimed": false
+  },
+  {
+    "case": "test_absent_external_response_bounded_fail_closed",
+    "category": "LEGACY_TTY_STDOUT_CONTRACT_FAILURE",
+    "tty_failure_observed": true,
+    "unchanged_failure": true,
+    "semantic_pass_claimed": false
+  },
+  {
+    "case": "test_real_core_external_publisher_with_c15_remote_barriers[due]",
+    "category": "LEGACY_TTY_STDOUT_CONTRACT_FAILURE",
+    "tty_failure_observed": true,
+    "unchanged_failure": true,
+    "semantic_pass_claimed": false
+  },
+  {
+    "case": "test_real_core_external_publisher_with_c15_remote_barriers[user]",
+    "category": "LEGACY_TTY_STDOUT_CONTRACT_FAILURE",
+    "tty_failure_observed": true,
+    "unchanged_failure": true,
+    "semantic_pass_claimed": false
+  },
+  {
+    "case": "test_real_core_external_publisher_with_c15_remote_barriers[summary]",
+    "category": "LEGACY_TTY_STDOUT_CONTRACT_FAILURE",
+    "tty_failure_observed": true,
+    "unchanged_failure": true,
+    "semantic_pass_claimed": false
+  },
+  {
+    "case": "test_real_core_external_publisher_with_c15_remote_barriers[delivered]",
+    "category": "LEGACY_TTY_STDOUT_CONTRACT_FAILURE",
+    "tty_failure_observed": true,
+    "unchanged_failure": true,
+    "semantic_pass_claimed": false
+  },
+  {
+    "case": "test_signer_not_importable_in_recovery_caller",
+    "category": "PUBLISHER_IMPORT_CONTRACT_UNRESOLVED",
+    "tty_failure_observed": false,
+    "unchanged_failure": true,
+    "semantic_pass_claimed": false
+  }
+]

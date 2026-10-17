@@ -1,0 +1,42 @@
+{
+  "FORMAL_VALIDATION": "FAIL",
+  "CODE_FIX_REQUIRED": "UNKNOWN",
+  "AS_OF_UTC": "2026-10-17T08:34:02.131926+00:00",
+  "REVIEWER_IDENTITY": "GPT Work independent formal Reviewer, process UID1000 on codespaces-1996ee; not signing Operator or W66 engineer",
+  "EXACT_CANDIDATE": "6fb725407569bc719c049587f67fe65e797eb734",
+  "TREE": "f9adc59f53f9599bc5ee9d4f3a7448d0b0f0bbe4",
+  "PARENT": "9d3b19b0e7bf090e5d472d9781b9156f73ea2088",
+  "TEST_PRECONDITIONS": "PARTIAL_PASS_WITH_BLOCKERS",
+  "ENVIRONMENT": "PARTIAL_PASS_WITH_BLOCKERS",
+  "AUTHORITY_GRANT_GATE": "BLOCKED",
+  "SIGNED_TESTS": "BLOCKED",
+  "SIGNED_PATH_SECURITY_CONTROLS": "NOT_FULLY_VERIFIED",
+  "CROSS_ENV_MATERIALIZATION": "BLOCKED_CURRENT_BROWSER_RESTRICTED_MODE",
+  "ORIGINAL_38": {
+    "pass": 31,
+    "fail": 7,
+    "errors": 0,
+    "skip": 0,
+    "exit": 1
+  },
+  "WINDOW55": {
+    "pass": 33,
+    "fail": 0,
+    "exit": 0
+  },
+  "WINDOW57": {
+    "pass": 29,
+    "fail": 0,
+    "exit": 0
+  },
+  "NEGATIVE_MATRIX": "PARTIAL_ONLY: protected-ancestor rejection and actual expired W68 enrollment rejection",
+  "CRASH_REMOTE_CAS": "SIGNED_LIFECYCLE_BLOCKED; regression component tests only",
+  "W67-VAL-002": "OPEN",
+  "PM54-BLK-001": "REGRESSION_COVERAGE_PASS; full signed live evaluation remains unverified",
+  "PM54-BLK-002": "REGRESSION_COVERAGE_PASS; UID999/996 live proof remains blocked",
+  "PM54-BLK-003": "REGRESSION_COVERAGE_PASS; signed remote lifecycle remains blocked",
+  "PUBLISHER_IMPORT_EQUIVALENCE": "UNVERIFIED",
+  "DO_NOT_MERGE": true,
+  "REAL_RESIDENT_STARTED": false,
+  "NEW_ENGINEERING_DEFECT_PROVEN": false
+}

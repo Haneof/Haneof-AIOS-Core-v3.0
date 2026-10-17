@@ -1,0 +1,2 @@
+AIOS_RUNNER_TEST:x:999:984::/var/lib/aios-window65/AIOS_RUNNER_TEST:/usr/sbin/nologin
+AIOS_RESIDENT_TEST:x:996:983::/var/lib/aios-window65/AIOS_RESIDENT_TEST:/usr/sbin/nologin
