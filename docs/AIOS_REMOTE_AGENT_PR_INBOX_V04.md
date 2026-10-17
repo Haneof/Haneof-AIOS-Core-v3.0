@@ -45,13 +45,10 @@ head repository: the same Haneof/Haneof-AIOS-Core-v3.0 repository, **not a fork*
 The PR must contain only **one ADDED file**, the task JSON path above:
 no changed code, workflows, tests, README, lock files, or other files.
 
-Current active task choices on main (v0.2):
+Current active task choices on main (v0.3, activated by PR #375):
 - gateway-selftest
 - pr370-source-boundary
 - pr370-artifact-audit
-
-Optional v0.3 *proposed* choices become available only if v0.3 is separately
-approved/merged first:
 - pr371-evidence-integrity
 - r005-binding-ledger
 
@@ -93,10 +90,17 @@ test **does not run in the pull_request_target privileged job**.
 
 ## Acceptance and operational stages
 
-1. v0.4 Draft PR CI: synthetic tests must prove owner-only authorization,
+1. v0.4 Draft PR CI: test the current complete five-task allowlist and run all
+   five fixed public byte-audit tasks, preserving JSON/JUnit/SHA256 receipts.
+   Synthetic tests must prove owner-only authorization,
    fork/other-user rejection, exact diff shape, valid JSON, no arbitrary
    command/ref and trusted-base command sequencing.
-2. Independently review GitHub Actions permissions, PR-target runner checkout
+2. Before activation, prove Arena itself can create a same-repository,
+   owner-authored, one-added-file request PR through its supported connection.
+   This pre-activation probe will NOT dispatch v0.4 (not on main yet); record
+   the PR URL, author, base/head repositories, exact head and changed-file list,
+   then close it without merging. ChatGPT-created PRs do not prove Arena access.
+   Independently review GitHub Actions permissions, PR-target runner checkout
    and the exact-file policy. **Do not merge until fresh PM authorization**.
 3. After approval, activate only v0.4 workflow on main, keeping frozen PR
    #370/#371/#367 and Window69 security review entirely untouched.
@@ -119,3 +123,16 @@ A PR inbox task PASS means only NON_FORMAL_PUBLIC_CI_EVIDENCE. It does NOT:
 
 No new Codespaces or cloud secrets are needed; the runner is an ephemeral GitHub
 Actions Linux environment, not a public always-on machine.
+
+## Current PM hold and baseline refresh
+
+The candidate is being refreshed against v0.3 main
+`528296def47f8f409350889f11961ebedc4a38c2` while retaining the existing PR #376
+and its prior commits. A non-forced merge commit preserves both histories;
+this is not main activation and does not replace earlier CI evidence.
+
+Pre-activation route proof and post-activation dispatch proof are separate gates.
+No Arena PR or real dispatch has been verified by this document. The existing
+owner/same-repository requirements stay binding. If no supported Arena write
+connection is available, report `ARENA_PR_WRITE=BLOCKED`; do not substitute a
+different agent or create a competing gateway implementation.

@@ -47,7 +47,9 @@ jobs:
         run: |
           set -euo pipefail
           python -I -m unittest discover -s tests/agent_gateway -p 'test_*.py' -v 2>&1 | tee gateway-pr-unittest.log
-          python -I tools/agent_gateway/runner.py --task gateway-selftest
+          for task in gateway-selftest pr370-source-boundary pr370-artifact-audit pr371-evidence-integrity r005-binding-ledger; do
+            python -I tools/agent_gateway/runner.py --task "$task"
+          done
 
       - name: Preserve public unit-test receipts
         if: always()

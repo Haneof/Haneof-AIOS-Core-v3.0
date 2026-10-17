@@ -15,7 +15,7 @@ SPEC = importlib.util.spec_from_file_location(
 gateway = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(gateway)
 
-BASE = "3c2bc90fae973984ab46549c6c492604a13c6f99"
+BASE = "528296def47f8f409350889f11961ebedc4a38c2"
 HEAD = "f" * 40
 
 
@@ -91,6 +91,12 @@ class MetadataPolicy(unittest.TestCase):
 
 
 class ContentPolicy(unittest.TestCase):
+    def test_current_v03_allowlist_is_complete(self):
+        self.assertEqual(gateway.TASKS, (
+            "gateway-selftest", "pr370-source-boundary", "pr370-artifact-audit",
+            "pr371-evidence-integrity", "r005-binding-ledger",
+        ))
+
     def test_allow_only_pinned_task(self):
         for task in gateway.TASKS:
             with self.subTest(task=task):
