@@ -177,6 +177,8 @@ def load_grant(path):
     require(isinstance(grant['request_kinds'], list) and bool(grant['request_kinds']) and
             set(grant['request_kinds']) <= {'model_directive','round_summary','dimension_summary'},
             'invalid request-kind scope')
+    require(all(type(grant.get(k)) is str and grant[k] for k in ('run_id','session_id')),
+            'enrollment run/session scope required')
     revocation = json.loads(trusted_bytes(grant['revocation']['file']))
     require(revocation['epoch'] == grant['revocation']['epoch'] and
             grant['enrollment_id'] not in revocation['revoked_enrollment_ids'], 'revoked enrollment')

@@ -1,0 +1,205 @@
+{
+  "schema": "arena-c15-eng-001-new-candidate-identity-v1",
+  "classification": [
+    "DEVELOPMENT_ONLY",
+    "FORMAL_VALIDATION_NOT_PERFORMED",
+    "DO_NOT_MERGE"
+  ],
+  "task": "C15-ARENA-ENG-001-SIGNED-TTYLESS-REGRESSION-CORRECTIVE-PILOT",
+  "authorization": {
+    "source": "PM Option-B decision, PR #390 comment (2026-10-17T10:59:29Z)",
+    "decision": "OPTION_B=AUTHORIZED",
+    "fix_scope": "ENROLLMENT_SCOPE_FIX=AUTHORIZED_ON_PR390_BRANCH_ONLY",
+    "identity_scope": "DERIVED_IDENTITY_REGENERATION=AUTHORIZED_WITH_REPRODUCIBLE_BUILDER",
+    "verified_on_github_before_execution": true
+  },
+  "lineage": {
+    "frozen_window66_candidate": "6fb725407569bc719c049587f67fe65e797eb734",
+    "frozen_window66_tree": "f9adc59f53f9599bc5ee9d4f3a7448d0b0f0bbe4",
+    "window57_parent": "9d3b19b0e7bf090e5d472d9781b9156f73ea2088",
+    "arena_tests_only_commit": "fb8ab6ea7b182f89e35ed2a10ae16a40215dbe2f",
+    "arena_evidence_commit_pre_fix_head": "33595a6fda946710eadd6a7abb0f45be89a90dee",
+    "note": "33595a6 was HEAD when build_delivery.py ran, so BUILD_RECEIPT.source_head_at_build records it. This matches the established Window66 pattern, whose own receipt records its pre-commit working head 9d3b19b0 rather than the commit 6fb7254 that contains the receipt."
+  },
+  "fix": {
+    "file": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/harness/r005/response_authorization.py",
+    "function": "load_grant",
+    "added_lines": 2,
+    "guard": "require(all(type(grant.get(k)) is str and grant[k] for k in ('run_id','session_id')), 'enrollment run/session scope required')",
+    "old_file_sha256": "abc30a28661f22390a9f4a34df5d9764fe27e155f7c285c9e2008c16448defa6",
+    "new_file_sha256": "5ec8cc012fadfdc98d59e0566fb513bc9a6a234c48dafaba4722601485f69a28",
+    "severity": "confirmed early schema-validation / fail-closed correctness defect; NO authorization bypass demonstrated"
+  },
+  "regenerated_derived_pins": {
+    "harness/IDENTITY.json": {
+      "old_sha256": "364cc03617fcd782327b3307720baf5371839185b1b07b71476308af74c5a817",
+      "new_sha256": "cf3d3356a6746f21a817a2bdd8a3aa7a111ce87e0289abfeaf3729b41b0d1ed5",
+      "diff": "exactly 1 line (harness_files['r005/response_authorization.py']); all other fields byte-identical"
+    },
+    "artifacts/resident-harness.tar.gz": {
+      "old_sha256": "82aa3ff81d9492e0828934b5744adf4129fb6dc1361303a537379a603a319de3",
+      "new_sha256": "33bd72a1bb5b7302a883e888d13e63352ef11a0010d24da93761a7eb3a03ba2c",
+      "member_count": 22,
+      "all_member_modes_0644": true
+    },
+    "artifacts/MEMBERS.json": {
+      "new_sha256": "5cbb39d1bc56b99dab08c2883bed19c6fd6f26a6b9a1521369a37f1a453be0ac"
+    },
+    "RESIDENT_SAFE_LAUNCH_PACKET.json": {
+      "old_sha256": "023c7556de1bcd4d4b0caccb90b0fa65d0b8a9b783f41f30574dfbb12e8f6b34",
+      "new_sha256": "d6abce64195b4dce6ec55ae393c3e87ba0fefed1d4749bcfb454c7b6ab0ca64f"
+    },
+    "reviews/C15_RERUN005_SIGNED_TTYLESS_WINDOW66/BUILD_RECEIPT.json": {
+      "new_sha256": "ed60b0670c2aaa97873c8189df2ea1e6931b509964b3575fded41d58dc51a8bc",
+      "source_head_at_build": "33595a6fda946710eadd6a7abb0f45be89a90dee",
+      "harness_python_files": 21,
+      "core_python_files": 79,
+      "c15_python_files": 18
+    }
+  },
+  "build_process": {
+    "step_1_manifest_refresh": {
+      "tool": "reviews/C15_RERUN005_ARENA_ENG_001/regenerate_identity_manifest.py",
+      "command": "python -B reviews/C15_RERUN005_ARENA_ENG_001/regenerate_identity_manifest.py --write --expect-changed harness_files:r005/response_authorization.py",
+      "why_needed": "build_delivery.py VERIFIES the tree against the existing manifest and does not generate it; run against a modified harness file it fails closed with IdentityBlocked: BLOCKED / PROTECTED_BYTE_IDENTITY_DRIFT: harness/response_authorization.py. No committed tool in this repository generates IDENTITY.json, so this narrow auditable script performs that single step and is committed as evidence of derivation.",
+      "derivation": "pure sha256 of on-disk bytes; no value invented",
+      "fail_closed_guards": [
+        "refuses if harness tree membership changed (closed set)",
+        "refuses if any src/aios_core or tools/c15_persistence digest drifted",
+        "refuses if any digest outside --expect-changed would change",
+        "refuses if reserialization is not line-faithful",
+        "refuses to modify the 11 provenance/runtime/structure fields"
+      ],
+      "exit_code": 0
+    },
+    "step_2_established_builder": {
+      "tool": "reviews/C15_RERUN005_SIGNED_TTYLESS_WINDOW66/build_delivery.py (unmodified)",
+      "command": "python -B reviews/C15_RERUN005_SIGNED_TTYLESS_WINDOW66/build_delivery.py",
+      "python_used": "CPython 3.11.2 (venv /tmp/c15venv) - NOT the approved 3.12.14",
+      "exit_code": 0
+    },
+    "determinism_proof": {
+      "method": "the full regeneration was executed twice in two independent working copies (a scratch clone and the real checkout) and re-executed twice consecutively in the scratch copy",
+      "result": "IDENTITY.json, tar.gz, MEMBERS.json and packet SHA256 were byte-identical in every run",
+      "reproducible": true
+    }
+  },
+  "cross_consistency_verification": {
+    "checks_run": 16,
+    "checks_passed": 16,
+    "method": "every declared pin in the packet, receipt, .sha256 sidecar and MEMBERS.json was independently recomputed from the regenerated bytes and compared",
+    "verified_equalities": [
+      "packet.current_main_harness_identity.identity_sha256 == sha256(IDENTITY.json)",
+      "packet.runtime_module_identity.manifest_sha256 == sha256(IDENTITY.json)",
+      "packet.cross_sandbox_harness_materialization.artifact_sha256 == sha256(tar.gz)",
+      "packet.cross_sandbox_harness_materialization.artifact_size == len(tar.gz)",
+      "artifacts/resident-harness.tar.gz.sha256 == sha256(tar.gz)",
+      "BUILD_RECEIPT.harness_manifest_sha256 == sha256(IDENTITY.json)",
+      "BUILD_RECEIPT.artifact_sha256 == sha256(tar.gz)",
+      "BUILD_RECEIPT.packet_sha256 == sha256(packet)",
+      "packet.member_identity == artifacts/MEMBERS.json",
+      "packet.closed_members == sorted(MEMBERS.json keys)",
+      "IDENTITY.harness_files[resp_auth] == sha256(file on disk)",
+      "MEMBERS[harness/r005/response_authorization.py].sha256 == sha256(file on disk)",
+      "packet.all_harness_files == IDENTITY.harness_files",
+      "packet core_tree/c15_tree == IDENTITY core_tree/c15_tree",
+      "all 22 member modes == 0o644",
+      "member_count == 22"
+    ]
+  },
+  "preserved_fields_not_reverifiable_locally": {
+    "python_version": "3.12.14",
+    "python_sha256": "09605fdfbe88ca0d45a575ab8179cecd2a7167d95555b7bb8e6f29f29e82d42b",
+    "accepted_baseline": "703a8967878d8eaee70a8a8fce9df068204f5f76",
+    "harness_baseline_commit": "67da1125c4902380dafde98a0ccf01c42e590864",
+    "source_commit": "b80b06e0df97cc81f47c7661295e235ae37eb6ad",
+    "action_taken": "PRESERVED UNCHANGED - not invented, not recomputed",
+    "reason_python": "the approved Python 3.12.14 binary does not exist in the Arena sandbox, so its digest cannot be recomputed or checked. PM authorization explicitly instructed preserving the exact approved 3.12.14 binary/runtime pins. MUST be re-confirmed on the approved-runtime host.",
+    "reason_provenance": "accepted_baseline, harness_baseline_commit and source_commit name git objects that exist only in the Operator Codespace's local repository and were never pushed to GitHub; git cat-file confirms they are absent here. No new value could be produced without inventing one, which the authorization forbids. Preserving them follows the recorded Window57 precedent: 'The manifest/source_commit provenance remains unchanged; it describes the inherited source lineage, not the final evidence-commit SHA.'",
+    "not_validated_by_scanner": "launch.py _validate_manifest does not require or check any of these five fields; python_sha256 is only compared for self-consistency between two scans of the same manifest (RUNTIME_IDENTITY_MANIFEST_DRIFT). The build and all identity tests pass with them preserved.",
+    "disclosure": "these five fields therefore still describe the PRE-FIX baseline lineage. Refreshing them is an Operator-host action and is flagged for PM."
+  },
+  "deliberately_not_modified": {
+    "reviews/C15_RERUN005_SIGNED_TTYLESS_WINDOW66/DEVELOPMENT_STATUS.json": {
+      "reason": "frozen Window66 disposition record; PM required old Window66/Window67 evidence stay immutable, and build_delivery.py does not regenerate it (0 references to it in the builder)",
+      "consequence_disclosed": "it still embeds the OLD pins 364cc036... (IDENTITY.json) and 82aa3ff8... (tar.gz), so it is now stale relative to this new candidate and must be read as describing the frozen Window66 candidate only, never this head",
+      "still_contains_old_identity_pin": true,
+      "still_contains_old_artifact_pin": true
+    },
+    "reviews/C15_RERUN005_SIGNED_TTYLESS_WINDOW66/EVIDENCE_SHA256.json": "unchanged; does not embed the regenerated pins",
+    "all other Window66/Window67 evidence": "unchanged",
+    "src/aios_core/**": "unchanged (verified by git status and by the builder's source_files digest check)",
+    "tools/c15_persistence/**": "unchanged",
+    "original38 assertions": "unchanged and not present in this repository",
+    "PR #370 branch / PR #367 / PR #371 / main": "never pushed to, rebased, reset or edited"
+  },
+  "regression_results_at_new_candidate": {
+    "arena_108_method_suite": {
+      "methods": 108,
+      "passed": 108,
+      "failed": 0,
+      "errors": 0,
+      "exit_code": 0,
+      "seconds": 5.115,
+      "evidence": "development-test-runs/OPTIONB-GREEN-final/",
+      "note": "the original RED receipt is retained at development-test-runs/RED-before-patch/ and was not overwritten"
+    },
+    "window55": {
+      "tests": 33,
+      "passed": 33,
+      "failed": 0,
+      "exit_code": 0,
+      "seconds": 1.017,
+      "identity_tests": "all 9 test_harness_identity cases pass, including test_actual_repository_protected_trees_match_pinned_identity and test_full_harness_core_and_c15_trees_scan_as_closed_identity",
+      "evidence": "development-test-runs/OPTIONB-window55/",
+      "contrast": "with the fix applied but identity NOT regenerated, this suite regressed to 5 failures + 3 errors"
+    },
+    "window57": {
+      "tests": 29,
+      "passed": 24,
+      "failed": 5,
+      "exit_code": 1,
+      "seconds": 2.051,
+      "identity_test_restored": "test_exact_identity_and_closed_members now PASSES",
+      "remaining_failures": [
+        "test_independent_full_source_materialization_and_pinned_verify",
+        "test_transport_tampering_fails_before_destination[append]",
+        "test_transport_tampering_fails_before_destination[truncate]",
+        "test_transport_tampering_fails_before_destination[flip]",
+        "test_parallel_materialization_has_one_winner"
+      ],
+      "failure_cause": "ENVIRONMENT-BOUND, NOT A PRODUCT FAILURE AND NOT A PASS. The packet records a host-absolute materialization interpreter /home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python which is absent in the Arena sandbox, so the child shell exits 127. Per PM instruction these are recorded as environment-bound and must be confirmed on the approved-runtime host.",
+      "evidence": "development-test-runs/OPTIONB-window57/"
+    },
+    "original38": {
+      "executed": false,
+      "reason": "sources are pinned only by SHA256 in ORIGINAL38_SOURCE_SHA256.json and reviews/C15_RERUN005_OPERATOR_HARNESS_WINDOW53/ does not exist in this repository",
+      "assertions_modified": false,
+      "historical_record_still": "31 PASS / 7 FAIL"
+    }
+  },
+  "runtime_environment": {
+    "python_version_used": "3.11.2",
+    "approved_python_3_12_14_used": false,
+    "pytest": "8.4.2",
+    "pydantic": "2.14.1",
+    "openssl": "3.0.20 (Ed25519 available)",
+    "git": "2.39.5",
+    "uid": 1001,
+    "runner_uid_999_exercised": false,
+    "resident_uid_996_exercised": false,
+    "controlling_tty_available": false,
+    "sudo_used": false,
+    "privilege_escalation_attempted": false
+  },
+  "formal_gate_status": {
+    "this_changes_candidate_identity": true,
+    "pr389_validity": "PR #389 remains valid formal-rerun evidence ONLY for the old frozen PR #370 head 6fb7254; it must NOT be relabelled as verification of this new candidate",
+    "window69_target": "must be re-designated by PM against the new exact head before any formal live run",
+    "formal_validation": "NOT_PASSED / NOT_PERFORMED",
+    "independent_acceptance": "NOT_STARTED",
+    "real_resident_authorized": false,
+    "merge_authorized": false,
+    "pr390_state": "DRAFT / DO_NOT_MERGE"
+  }
+}
