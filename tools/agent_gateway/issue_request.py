@@ -11,7 +11,17 @@ from pathlib import Path
 import sys
 from typing import Any
 
-from runner import HEAD, REPO, TASKS
+import importlib.util
+
+# -I excludes the script directory from sys.path. Load only our fixed local
+# approved sibling source by absolute path, never from a user-supplied name.
+_path = Path(__file__).resolve().with_name("runner.py")
+_spec = importlib.util.spec_from_file_location("aios_issue_gateway_runner", _path)
+if _spec is None or _spec.loader is None:
+    raise RuntimeError("missing approved local runner")
+_runner = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_runner)
+HEAD, REPO, TASKS = _runner.HEAD, _runner.REPO, _runner.TASKS
 
 
 ISSUE_SCHEMA = "aios.agent.gateway.issue.request.v0.2"
