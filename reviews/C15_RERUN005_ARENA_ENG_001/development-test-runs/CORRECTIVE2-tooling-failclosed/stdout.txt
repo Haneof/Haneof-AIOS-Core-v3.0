@@ -1,0 +1,15 @@
+Digest entries that genuinely changed:
+  harness_files:r005/response_authorization.py
+    old = 0000000000000000000000000000000000000000000000000000000000000000
+    new = 04417cb18ce3a0c91231b1ded1f42b2ad5fbd19279d39a7f0b13ee8be8afce8c
+ALLOWLIST_MATCH: changed set == allowlist == ['harness_files:r005/response_authorization.py']
+
+line-level diff is exactly 1 line(s): [19]
+old IDENTITY.json sha256 = fb2c91d3fb9eed73ef282e79343d4c4116b146fa2d4da38268116952785ffd18
+new IDENTITY.json sha256 = b4bbdbe2bcf5092d5c43211e5acfe23d5cab8dd59bb4f3ce46fdf9f8c60a2ef9
+WROTE /tmp/arena-eng001-regen-83utmnis/repo/harness/IDENTITY.json
+Next: run the established builder to regenerate the artifact, member inventory, launch packet and build receipt:
+  python -B reviews/C15_RERUN005_SIGNED_TTYLESS_WINDOW66/build_delivery.py
+BLOCKED: --write requires an explicit --expect-changed allowlist.
+  Refusing to rewrite an identity manifest without naming, in advance, exactly which digest entries are authorized to change. The changed set must then equal that allowlist exactly.
+  For this corrective the only authorized entry is: harness_files:r005/response_authorization.py

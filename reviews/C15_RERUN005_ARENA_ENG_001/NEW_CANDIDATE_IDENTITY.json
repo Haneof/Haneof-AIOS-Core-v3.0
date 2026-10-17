@@ -107,17 +107,83 @@
       "member_count == 22"
     ]
   },
-  "preserved_fields_not_reverifiable_locally": {
-    "python_version": "3.12.14",
-    "python_sha256": "09605fdfbe88ca0d45a575ab8179cecd2a7167d95555b7bb8e6f29f29e82d42b",
-    "accepted_baseline": "703a8967878d8eaee70a8a8fce9df068204f5f76",
-    "harness_baseline_commit": "67da1125c4902380dafde98a0ccf01c42e590864",
-    "source_commit": "b80b06e0df97cc81f47c7661295e235ae37eb6ad",
-    "action_taken": "PRESERVED UNCHANGED - not invented, not recomputed",
-    "reason_python": "the approved Python 3.12.14 binary does not exist in the Arena sandbox, so its digest cannot be recomputed or checked. PM authorization explicitly instructed preserving the exact approved 3.12.14 binary/runtime pins. MUST be re-confirmed on the approved-runtime host.",
-    "reason_provenance": "accepted_baseline, harness_baseline_commit and source_commit name git objects that exist only in the Operator Codespace's local repository and were never pushed to GitHub; git cat-file confirms they are absent here. No new value could be produced without inventing one, which the authorization forbids. Preserving them follows the recorded Window57 precedent: 'The manifest/source_commit provenance remains unchanged; it describes the inherited source lineage, not the final evidence-commit SHA.'",
+  "preserved_fields": {
+    "action_taken": "ALL PRESERVED UNCHANGED - no value invented, recomputed or rewritten to match the new HEAD",
+    "correction_notice": "An earlier revision of this record and of ENGINEERING_REPORT.md stated that accepted_baseline, harness_baseline_commit and source_commit 'exist only in the Operator Codespace's local repository and were never pushed to GitHub'. THAT STATEMENT WAS WRONG and is corrected here per PM review 2026-10-17T12:19:01Z. It conflated absence from Arena's shallow local clone with absence from GitHub. All three were independently re-queried through the GitHub Git Commit API and ALL THREE RESOLVE SUCCESSFULLY ON GITHUB. The commit message of 588f007 repeats the erroneous claim; git history is not rewritten, so this record supersedes it.",
+    "provenance_commits": {
+      "accepted_baseline": {
+        "value": "703a8967878d8eaee70a8a8fce9df068204f5f76",
+        "resolvable_from_github": true,
+        "github_api": "GET /repos/Haneof/Haneof-AIOS-Core-v3.0/git/commits/703a8967878d8eaee70a8a8fce9df068204f5f76 -> 200",
+        "object_type": "commit",
+        "committer_date": "2026-10-10T04:29:10Z",
+        "parents": [
+          "4b0d0718e016",
+          "39b4f5f02e43"
+        ],
+        "tree": "d4e1ee2df8a8",
+        "subject": "Merge pull request #352 from Haneof/c15-rcc-operator-persistence-compatibility-corrective-001-window49",
+        "historical_source": "the PR #352 merge commit - the accepted operator-persistence compatibility baseline",
+        "present_in_arena_local_object_store": true,
+        "reachable_from_arena_local_refs": [
+          "arena/4df539f0-haneof-aios-core-v3-0",
+          "origin/arena/4df539f0-haneof-aios-core-v3-0"
+        ],
+        "is_ancestor_of_frozen_window66_candidate": true
+      },
+      "harness_baseline_commit": {
+        "value": "67da1125c4902380dafde98a0ccf01c42e590864",
+        "resolvable_from_github": true,
+        "github_api": "GET /repos/Haneof/Haneof-AIOS-Core-v3.0/git/commits/67da1125c4902380dafde98a0ccf01c42e590864 -> 200",
+        "object_type": "commit",
+        "committer_date": "2026-10-14T00:12:53Z",
+        "parents": [
+          "271fa28d695e"
+        ],
+        "tree": "5fe6d60cbea2",
+        "subject": "Add isolated RERUN-005 Resident harness, safe launch packet and operator preflight evidence",
+        "historical_source": "the commit that introduced this isolated RERUN-005 Resident harness and its safe launch packet - the harness baseline itself",
+        "present_in_arena_local_object_store": false,
+        "reachable_from_arena_local_refs": [],
+        "is_ancestor_of_frozen_window66_candidate": false,
+        "why_absent_locally": "it is not an ancestor of the Arena branch, so a fetch scoped to that branch never retrieves it. The local clone is shallow (git rev-parse --is-shallow-repository -> true) with remote.origin.fetch limited to refs/heads/main and refs/heads/arena/4df539f0-haneof-aios-core-v3-0*. This is a property of Arena's partial clone, NOT evidence that the object is unpublished."
+      },
+      "source_commit": {
+        "value": "b80b06e0df97cc81f47c7661295e235ae37eb6ad",
+        "resolvable_from_github": true,
+        "github_api": "GET /repos/Haneof/Haneof-AIOS-Core-v3.0/git/commits/b80b06e0df97cc81f47c7661295e235ae37eb6ad -> 200",
+        "object_type": "commit",
+        "committer_date": "2026-10-14T02:30:20Z",
+        "parents": [
+          "03bc19a4e639"
+        ],
+        "tree": "df86ae34af73",
+        "subject": "Window 55: preserve frozen evidence verbatim including terminal newlines",
+        "historical_source": "the Window55 frozen-evidence commit",
+        "present_in_arena_local_object_store": true,
+        "reachable_from_arena_local_refs": [
+          "arena/4df539f0-haneof-aios-core-v3-0",
+          "origin/arena/4df539f0-haneof-aios-core-v3-0"
+        ],
+        "is_ancestor_of_frozen_window66_candidate": true
+      }
+    },
+    "four_way_distinction_now_recorded_explicitly": {
+      "1_resolvable_from_github_remote": "all three YES, verified via the GitHub Git Commit API, which is authoritative for publication",
+      "2_present_in_arena_local_object_store": "703a8967 YES, b80b06e0 YES, 67da1125 NO",
+      "3_present_in_current_local_refs": "703a8967 YES, b80b06e0 YES, 67da1125 NO",
+      "4_actual_historical_source": "PR #352 merge / RERUN-005 harness introduction / Window55 frozen-evidence commit respectively"
+    },
+    "local_presence_is_fetch_dependent": "In the first turn all three failed local git cat-file; after the sandbox was rebuilt and the Arena branch was fetched, 703a8967 and b80b06e0 became present locally because they are genuine ancestors of that branch, while 67da1125 remained absent because it is not. Local presence therefore tracks only what the shallow clone has fetched and is NOT a test of publication. The GitHub API is the authoritative test and was used.",
+    "reason_provenance_preserved": "These three fields now have verified correct values naming real published commits. They describe inherited baseline/harness/source lineage that a two-line load_grant guard does not alter: accepted_baseline and source_commit are genuine ancestors of the frozen candidate, and harness_baseline_commit is the commit that introduced this very harness. Preserving them is therefore positively correct, not merely the best available option. Rewriting them to match the new HEAD would falsify that lineage and is not authorized. This also matches the recorded Window57 precedent: 'The manifest/source_commit provenance remains unchanged; it describes the inherited source lineage, not the final evidence-commit SHA.'",
+    "python_runtime_pins": {
+      "python_version": "3.12.14",
+      "python_sha256": "09605fdfbe88ca0d45a575ab8179cecd2a7167d95555b7bb8e6f29f29e82d42b",
+      "status": "PRESERVED, AND GENUINELY NOT RE-VERIFIABLE IN THIS SANDBOX",
+      "reason": "Unlike the three commits above, this pin covers a binary executable that does not exist anywhere in the Arena sandbox - the packet's host-absolute path /home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python is absent - so its digest cannot be recomputed or checked here. PM authorization explicitly instructed preserving the exact approved 3.12.14 binary/runtime pins. MUST be re-confirmed on the approved-runtime host. Arena ran CPython 3.11.2 and does not claim 3.12.14."
+    },
     "not_validated_by_scanner": "launch.py _validate_manifest does not require or check any of these five fields; python_sha256 is only compared for self-consistency between two scans of the same manifest (RUNTIME_IDENTITY_MANIFEST_DRIFT). The build and all identity tests pass with them preserved.",
-    "disclosure": "these five fields therefore still describe the PRE-FIX baseline lineage. Refreshing them is an Operator-host action and is flagged for PM."
+    "remaining_disclosure": "The three provenance commits legitimately describe PRE-FIX inherited lineage and are unchanged by design. The only field whose correctness cannot be confirmed in this sandbox is python_sha256, which requires the approved-runtime host."
   },
   "deliberately_not_modified": {
     "reviews/C15_RERUN005_SIGNED_TTYLESS_WINDOW66/DEVELOPMENT_STATUS.json": {

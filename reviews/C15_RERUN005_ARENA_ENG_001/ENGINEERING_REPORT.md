@@ -103,16 +103,17 @@ approved-runtime host.
 
 1. **Five manifest fields were preserved, not recomputed** — `python_version`,
    `python_sha256`, `accepted_baseline`, `harness_baseline_commit`,
-   `source_commit`. The 3.12.14 binary is absent so its digest cannot be checked
-   (PM instructed preserving that pin); the three commit/baseline fields name git
-   objects that exist only in the Operator Codespace and were never pushed
-   (`git cat-file` confirms they are absent here), so any new value would have to
-   be **invented** — which the authorization forbids. Preserving them follows the
-   recorded Window57 precedent that `source_commit` "describes the inherited
-   source lineage, not the final evidence-commit SHA". `launch.py`'s
+   `source_commit`.
+   > **⚠️ CORRECTED — see §0.1.** This bullet originally claimed the three
+   > commit/baseline objects "exist only in the Operator Codespace and were never
+   > pushed". **That was factually wrong.** All three resolve from the GitHub Git
+   > Commit API. §0.1 records the corrected four-way distinction. The values were
+   > and remain preserved unchanged; only the *justification* was wrong, and the
+   > correct justification is stronger.
+   The 3.12.14 binary genuinely is absent, so `python_sha256` cannot be
+   re-verified here (PM instructed preserving that pin). `launch.py`'s
    `_validate_manifest` requires none of the five, and the build plus every
-   identity test pass with them preserved. **They still describe the pre-fix
-   lineage and need an Operator-host refresh.**
+   identity test pass with them preserved.
 2. **`DEVELOPMENT_STATUS.json` was deliberately left unmodified.** It is a frozen
    Window66 disposition record, the builder does not regenerate it (0 references),
    and PM required old Window66 evidence stay immutable. Consequence: it still
@@ -141,6 +142,144 @@ privileged operation, no real Resident, no Cursor1, no new Codespace, no
 sudoers/permission change, no security-policy bypass.
 
 ---
+
+## 0.1 Corrective round 2 — PM review corrections (PR #390 comment 2026-10-17T12:19:01Z)
+
+PM partially accepted Option B and required two corrections. Both are delivered
+here. **No Harness Artifact, Launch Packet, identity manifest, `load_grant` fix or
+frozen evidence was modified in this round** — proven in the last subsection.
+
+### A. CORRECTION: the three provenance objects DO resolve from GitHub
+
+My earlier claim was **wrong**. It conflated *absence from Arena's shallow local
+clone* with *absence from GitHub*. Re-queried through the GitHub Git Commit API
+(`GET /repos/Haneof/Haneof-AIOS-Core-v3.0/git/commits/<sha>`), **all three return
+200**:
+
+| Manifest field | Value | GitHub API | Local object store | Local refs | Ancestor of `6fb7254` | Actual historical source |
+| --- | --- | --- | --- | --- | --- | --- |
+| `accepted_baseline` | `703a8967…` | ✅ commit, 2026-10-10T04:29:10Z | ✅ present | ✅ reachable | ✅ **YES** | **PR #352** merge (`c15-rcc-operator-persistence-compatibility-corrective-001-window49`); parents `4b0d0718`+`39b4f5f0`, tree `d4e1ee2d` |
+| `harness_baseline_commit` | `67da1125…` | ✅ commit, 2026-10-14T00:12:53Z | ❌ absent | ❌ | ❌ NO (parent `271fa28d`) | "Add isolated RERUN-005 Resident harness, safe launch packet and operator preflight evidence"; tree `5fe6d60c` |
+| `source_commit` | `b80b06e0…` | ✅ commit, 2026-10-14T02:30:20Z | ✅ present | ✅ reachable | ✅ **YES** | "**Window 55**: preserve frozen evidence verbatim including terminal newlines"; parent `03bc19a4`, tree `df86ae34` |
+
+**Why local presence differs, and why it says nothing about publication.** This
+clone is **shallow** (`git rev-parse --is-shallow-repository` → `true`) with
+`remote.origin.fetch` limited to `refs/heads/main` and
+`refs/heads/arena/4df539f0-haneof-aios-core-v3-0*`. Local presence therefore
+tracks only what has been fetched. `703a8967` and `b80b06e0` are genuine ancestors
+of the Arena branch and became locally present once that branch was fetched;
+`67da1125` is **not** an ancestor (its parent is `271fa28d`), so a branch-scoped
+fetch never retrieves it. In the first turn all three failed `git cat-file`; two
+now succeed. That instability is itself the proof that local `cat-file` is the
+wrong test — the GitHub API is authoritative and was used.
+
+**Values preserved unchanged, now positively justified.** These are real published
+commits describing inherited lineage that a two-line `load_grant` guard does not
+alter: `accepted_baseline` and `source_commit` are true ancestors of the frozen
+candidate, and `harness_baseline_commit` is the commit that introduced this very
+harness. Rewriting them to match the new HEAD would *falsify* that lineage, so they
+are left exactly as they are — consistent with the recorded Window57 precedent that
+`source_commit` "describes the inherited source lineage, not the final
+evidence-commit SHA". **No new provenance value was guessed or fabricated.**
+
+Only `python_sha256` / `python_version` remain genuinely non-reverifiable here, for
+a different and still-valid reason: that pin covers a **binary executable** that
+does not exist anywhere in this sandbox (the packet's host-absolute
+`/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python` is
+absent), so its digest cannot be recomputed or checked. Preserved per
+authorization; must be re-confirmed on the approved-runtime host. Arena ran CPython
+3.11.2 and does not claim 3.12.14.
+
+The erroneous claim also appears in the **commit message of `588f007`**. Git history
+is not rewritten, so this section and `NEW_CANDIDATE_IDENTITY.json`
+(`preserved_fields.correction_notice`) supersede it.
+
+### B. Hardened fail-closed contract of `regenerate_identity_manifest.py`
+
+PM correctly identified that `--expect-changed` was optional, so `--write` without
+it could accept *any* changed harness digest. The tool now enforces:
+
+1. `--write` **requires** an explicit allowlist; without one it exits non-zero.
+2. The changed set must **equal** the allowlist — in both directions. An
+   unauthorized extra change *and* an allowlisted entry that did not change are each
+   refused.
+3. Allowlist entries must be well-formed `harness_files:<canonical relative .py>`.
+   Naming `source_files` (a protected scope), an unlisted entry, a non-`.py` path,
+   an absolute path, a `..` traversal, or a duplicate is refused.
+4. Bytecode pollution (`__pycache__` or a loose `*.pyc`) inside the identity-pinned
+   tree is refused — the trap that produced `UNAPPROVED_OR_REPLACED_DIRECTORY`.
+5. Harness membership is a closed set: an unlisted new file or a missing listed file
+   is refused.
+6. Any `src/aios_core/**` or `tools/c15_persistence/**` digest drift is refused, and
+   such entries can never be allowlisted.
+7. Missing or invalid manifest structure (bad JSON, non-object root, absent file,
+   missing protected field, empty scope) is refused.
+8. Reserialization must be **line-faithful**: same line count, differing lines
+   exactly the changed digest lines, each keeping its key and carrying a 64-hex
+   transition matching an allowlisted entry. Foreign indentation, compact form and
+   reordered keys are all refused.
+9. **Every** refusal path returns before the single `write_bytes` call, which is the
+   last statement and is reached only after all guards pass.
+
+`Layout` (repo + harness roots) is now parameterized so the guards can be exercised
+against throwaway synthetic directories. `@dataclass` was dropped because
+`dataclasses` cannot resolve annotations for a module loaded through `importlib`
+that is not registered in `sys.modules` — a real crash found by the new tests.
+
+**New tests: `tooling-tests/test_regenerator_fail_closed.py` — 44 tests, exit 0.**
+Kept outside `tests/` so the product suite stays exactly 108 methods. Every refusal
+test asserts *both* a non-zero exit *and* that the manifest bytes are unchanged.
+Isolation: `tempfile.mkdtemp()` synthetic repo+harness trees; the two
+real-checkout tests are read-only dry runs, and the reproduction test copies the
+real harness into a temp directory before perturbing the copy, then asserts the real
+manifest is byte-identical afterwards. **No frozen artifact was modified to produce
+a test result.**
+
+Positive controls confirm the correct path still works and stays minimal: an exact
+allowlist match writes a **one-line** diff; only the allowlisted digest differs in
+the parsed manifest; all eleven protected fields survive byte-identical; digests are
+pure `sha256` of disk bytes; and a second run reports `NO_CHANGE`.
+
+**Requirement 7 confirmed two ways, both read-only:**
+
+- Against the committed candidate the tool reports `NO_CHANGE` and
+  `IDENTITY.json sha256 = cf3d3356…` — the committed manifest is exactly what the
+  tool would produce, so the rebuild path stays reproducible without mutating
+  anything.
+- Restoring the pre-fix digest `abc30a28…` into a **temporary copy** of the real
+  manifest makes the tool propose exactly one change, to `5ec8cc01…`. The only
+  authorized manifest change is still `r005/response_authorization.py`'s SHA-256.
+
+### No regeneration was required, and none was performed
+
+PM permitted touching the packaged Harness only if the tests proved a real
+dependency change. They prove the opposite: **23 / 23 identity-chain cross-checks
+PASS** at the unchanged candidate — all six published digests, every
+packet/receipt/sidecar/MEMBERS equality, 22 members at mode `0o644`, and the three
+provenance fields plus `python_sha256`/`python_version` still at their original
+values. `git status` on `reviews/internal_habitation/**`, `src/**`, `tools/**` and
+all Window55/57/66 directories is **empty**. So no exact-difference list was owed
+and no scope expansion was sought.
+
+### Results this round
+
+| Check | Result | Exit |
+| --- | --- | --- |
+| Tooling fail-closed tests (44) | 44 / 44 PASS | **0** (0.058 s) |
+| Arena 108-method suite | **108 / 108 PASS** | **0** (5.197 s) |
+| Window55 | **33 / 33 PASS**, 9 identity tests | **0** (1.015 s) |
+| Window57 | unchanged: 24 / 29 PASS, 5 environment-bound | 1 |
+| Identity-chain cross-checks | 23 / 23 PASS | 0 |
+
+Window57 was **not** re-run this round because no packaged byte changed; its
+recorded result stands, and its 5 failures remain **environment-bound — explicitly
+not a product PASS**. They are bound to the absent approved Python 3.12.14 runtime
+path and require the local Agent's approved-runtime regression, which this round
+does **not** substitute for.
+
+Evidence: `development-test-runs/CORRECTIVE2-tooling-failclosed/`,
+`CORRECTIVE2-GREEN-108/`, `CORRECTIVE2-window55/`.
+
 
 
 ## 1. Frozen starting candidate — verified, then used as the branch base
