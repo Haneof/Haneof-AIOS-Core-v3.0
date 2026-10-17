@@ -1,0 +1,213 @@
+{
+  "assistant_observation_id": "obs_conv_ai_dc791bce8f952fb6dcd6649d",
+  "capability_history": [
+    {
+      "call_id": null,
+      "data": {
+        "created_by": "c14_fixture_ingest:c15-rcc-mechanical-ingest-adapter-v1",
+        "data_quality": {
+          "fixture_release": true
+        },
+        "learned_at": "2026-11-04T22:17:00Z",
+        "metadata": {
+          "dimension": "dim:release_state",
+          "external_record_id": "c15rcc-009",
+          "external_revision": "1",
+          "fixture_binding_version": "c15-rcc-fixture-event-binding-v1",
+          "fixture_event_id": "c15rcc-009",
+          "fixture_payload_sha256": "sha256:75fe7cf480226ac2cf456e9a07e26fe062aa5f42c1c3d6d661559ed2fd4aa0f5",
+          "fixture_projection_sha256": "sha256:e744a4993fcc7e7c036a0f4c07b4a76fffcccf15f4e079f55de82e84384271ce",
+          "fixture_sequence": 9,
+          "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+          "fixture_version": "c15-rcc-fixture-v1",
+          "mechanical_ingest": true,
+          "occurred_at_original": "2026-11-04T14:17:00-08:00",
+          "source_class": "platform"
+        },
+        "modality": "structured_text",
+        "object_id": "obs_c14_fixture_b798e2dbd5b0fabdec6680a2",
+        "object_type": "observation",
+        "occurred": {
+          "end": "2026-11-04T22:17:00Z",
+          "precision": "second",
+          "start": "2026-11-04T22:17:00Z",
+          "timezone_name": "UTC",
+          "unknown": false
+        },
+        "raw_locator": "fixture://c15-rcc-fixture-v1/c15rcc-009",
+        "recorded_at": "2026-11-04T22:17:00Z",
+        "revision": 1,
+        "source_kind": "registry",
+        "source_refs": [],
+        "status": "active",
+        "subject_id": "user_1",
+        "unit": null,
+        "value": "registry 上传尝试在 14:16 被拒绝：checksum mismatch。edge-2026.11.4 未发布，tag 未创建，registry 中没有对应 digest。"
+      },
+      "error_code": null,
+      "error_message": null,
+      "name": "inspect_world_object",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": {
+        "created_by": "conversation_ingest:user",
+        "data_quality": {},
+        "learned_at": "2026-11-04T22:24:00Z",
+        "metadata": {
+          "dimension": "dim:user_ai_interaction",
+          "role": "user",
+          "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+          "turn_index": 6,
+          "turn_key": "9bf2f76da8165ef0d7c6a584"
+        },
+        "modality": "text",
+        "object_id": "obs_conv_user_fbe20407ffd68ca6f1bc5f5c",
+        "object_type": "observation",
+        "occurred": {
+          "end": "2026-11-04T22:24:00Z",
+          "precision": "second",
+          "start": "2026-11-04T22:24:00Z",
+          "timezone_name": null,
+          "unknown": false
+        },
+        "raw_locator": "conversation://user_1/c15-rcc-res-a-rerun-002-2079f64af49c/6/user",
+        "recorded_at": "2026-11-04T22:24:00Z",
+        "revision": 1,
+        "source_kind": "user_ai_interaction",
+        "source_refs": [],
+        "status": "active",
+        "subject_id": "user_1",
+        "unit": null,
+        "value": "我后台也看到 tag 还没出来。以后这种“准备提交、已排队”和“确实完成”要分开说；没有完成记录时就按没确认完成处理。"
+      },
+      "error_code": null,
+      "error_message": null,
+      "name": "inspect_world_object",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": {
+        "asserted_at": "2026-11-04T21:42:00Z",
+        "claim_type": "fact",
+        "claimant_id": "resident_ai",
+        "confidence": 0.88,
+        "content": "截至 2026-11-04T21:42:00Z，世界证据只表明镜像 edge-2026.11.4 构建完成且状态为 READY_FOR_UPLOAD，registry 上传任务已排队、计划 14:00 开始。没有 registry tag、digest 或 upload-complete 事件，因此不能认为镜像已推到 registry，也不能据此通知门店开始测。",
+        "corroboration_required": false,
+        "counter_evidence_set_refs": [],
+        "created_by": "cognition_writeback:model",
+        "knowledge_state": "reported",
+        "learned_at": "2026-11-04T21:42:00Z",
+        "metadata": {
+          "dimension": "dim:release_state",
+          "writeback_kind": "revisable_cognition"
+        },
+        "object_id": "clm_7e2bced9acc9eea1f6cab675",
+        "object_type": "claim",
+        "occurred": {
+          "end": "2026-11-04T21:42:00Z",
+          "precision": "second",
+          "start": "2026-11-04T21:42:00Z",
+          "timezone_name": null,
+          "unknown": false
+        },
+        "recorded_at": "2026-11-04T21:42:00Z",
+        "revision": 1,
+        "source_refs": [],
+        "source_trust": 1.0,
+        "status": "active",
+        "subject_id": "user_1",
+        "support_evidence_set_refs": [
+          {
+            "object_id": "evs_b6f7caf2157498d800484476",
+            "revision": 1
+          }
+        ],
+        "unknown_items": [
+          "实际上传是否已开始或完成",
+          "registry tag",
+          "image digest"
+        ],
+        "valid_time": {
+          "end": null,
+          "precision": "unknown",
+          "start": null,
+          "timezone_name": null,
+          "unknown": true
+        }
+      },
+      "error_code": null,
+      "error_message": null,
+      "name": "inspect_world_object",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": null,
+      "error_code": "CAPABILITY_ARGUMENT_ERROR",
+      "error_message": "FusedTurnRuntime._revise_claim() got an unexpected keyword argument 'content'",
+      "name": "revise_claim",
+      "ok": false
+    },
+    {
+      "call_id": null,
+      "data": null,
+      "error_code": "CAPABILITY_ARGUMENT_ERROR",
+      "error_message": "FusedTurnRuntime._revise_claim() got an unexpected keyword argument 'content'",
+      "name": "revise_claim",
+      "ok": false
+    },
+    {
+      "call_id": null,
+      "data": {
+        "claim_id": "clm_7e2bced9acc9eea1f6cab675",
+        "evidence_set_id": "evs_revision_ad983ad5dbd77c02b285d194",
+        "mode": "revise",
+        "new_revision": 2,
+        "previous_revision": 1,
+        "skipped_already_advanced_refs": [],
+        "stale_refs": [],
+        "world_revision": 78
+      },
+      "error_code": null,
+      "error_message": null,
+      "name": "revise_claim",
+      "ok": true
+    },
+    {
+      "call_id": null,
+      "data": {
+        "claim_id": "clm_bb53233b009cf1f4d81f50c6",
+        "evidence_set_id": "evs_revision_eb047f3c99ede2bd89551b37",
+        "mode": "revise",
+        "new_revision": 4,
+        "previous_revision": 3,
+        "skipped_already_advanced_refs": [],
+        "stale_refs": [
+          [
+            "sum_e4a79b074450bf99942d2ffd",
+            3
+          ]
+        ],
+        "world_revision": 79
+      },
+      "error_code": null,
+      "error_message": null,
+      "name": "revise_claim",
+      "ok": true
+    }
+  ],
+  "idempotent_replay": false,
+  "model_rounds": 4,
+  "occurred_at": "2026-11-04T22:24:00+00:00",
+  "response": "记下了：排队或 READY_FOR_UPLOAD 只算准备，没有完成记录就按没确认完成处理。\n\n这次 registry 上传在 14:16 被 checksum mismatch 拒绝。edge-2026.11.4 未发布，tag 没创建，registry 里没有对应 digest。不要通知门店开始测。",
+  "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+  "silenced": false,
+  "summary_error": null,
+  "termination_reason": "responded",
+  "turn_index": 6,
+  "user_observation_id": "obs_conv_user_fbe20407ffd68ca6f1bc5f5c",
+  "world_revision": 80
+}

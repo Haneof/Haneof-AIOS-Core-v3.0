@@ -1,0 +1,5 @@
+*.writer.lock
+__pycache__/
+*.tmp
+*-wal
+*-shm

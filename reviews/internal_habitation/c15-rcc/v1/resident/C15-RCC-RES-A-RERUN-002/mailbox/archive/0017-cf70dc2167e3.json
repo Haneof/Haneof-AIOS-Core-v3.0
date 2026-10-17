@@ -1,0 +1,60 @@
+{
+  "answered_at": "2026-09-24T17:02:40.689349+00:00",
+  "reply": {
+    "kind": "dimension_summary",
+    "output": {
+      "text": "2026-11-02 的校准记录只有一条：第一轮用户对话留下了空的 assistant Observation。该 Claim 写明这不是有意沉默，也不能当作用户偏好或 Atlas staging 进展的证据，原因是当时能力调用次数耗尽、用户可见回复没有形成。对应 EvidenceSet 钉住了那条空 assistant Observation 和第一轮用户 Observation。"
+    },
+    "request_id": "0017-cf70dc2167e3"
+  },
+  "request": {
+    "clock": "2026-11-02T20:52:00+00:00",
+    "cursor": 6,
+    "input": {
+      "dimension": "dim:ai_calibration",
+      "granularity": "day",
+      "include_summary_sources": false,
+      "source_world_revision": 27,
+      "sources": [
+        {
+          "metadata": {
+            "ai_domain": "calibration",
+            "ai_world": true,
+            "dimension": "dim:ai_calibration",
+            "writeback_kind": "revisable_cognition"
+          },
+          "object_id": "clm_8f199b26a012f7bd02a3bb33",
+          "object_type": "claim",
+          "occurred_at": "2026-11-02T17:05:00Z",
+          "revision": 1,
+          "text": "2026-11-02T17:05:00Z 的第一轮用户对话写入了一条空的 assistant Observation。这不是一次有意的对用户沉默，也不能当作用户偏好或 staging 进展的证据；当时能力调用次数耗尽，用户可见回复没有形成。"
+        },
+        {
+          "metadata": {
+            "ai_domain": "calibration",
+            "ai_world": true,
+            "dimension": "dim:ai_calibration",
+            "writeback_kind": "cognition_evidence"
+          },
+          "object_id": "evs_37d3b47549ec34068682a78d",
+          "object_type": "evidence_set",
+          "occurred_at": "2026-11-02T17:05:00Z",
+          "revision": 1,
+          "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 2, \"missing_description\": [], \"observed_count\": 2}, \"created_by\": \"cognition_writeback:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-02T17:05:00Z\", \"world_revision\": 10}, \"learned_at\": \"2026-11-02T17:05:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_ai_d30860e25c8c663899718b98\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_e3f254f5a3f691c9f1ae5870\", \"revision\": 1}], \"metadata\": {\"ai_domain\": \"calibration\", \"ai_world\": true, \"dimension\": \"dim:ai_calibration\", \"writeback_kind\": \"cognition_evidence\"}, \"object_id\": \"evs_37d3b47549ec34068682a78d\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"support resident AI cognition writeback\", \"recorded_at\": \"2026-11-02T17:05:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_pinned_world_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"ai_agent_self\", \"support_refs\": [{\"object_id\": \"obs_conv_ai_d30860e25c8c663899718b98\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_e3f254f5a3f691c9f1ae5870\", \"revision\": 1}]}"
+        }
+      ],
+      "subject_id": "user_1",
+      "truncated": false,
+      "window_end": "2026-11-02T23:59:59.999999Z",
+      "window_start": "2026-11-02T00:00:00Z"
+    },
+    "kind": "dimension_summary",
+    "protocol": "c15-rcc-res-a-rerun-002-mailbox-v1",
+    "request_id": "0017-cf70dc2167e3",
+    "seq": 17,
+    "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+    "stage": "pre_event_due",
+    "subject_id": "user_1"
+  },
+  "wait_seconds": 12.408
+}

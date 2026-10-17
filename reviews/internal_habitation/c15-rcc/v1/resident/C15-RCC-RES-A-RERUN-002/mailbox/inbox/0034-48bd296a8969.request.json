@@ -1,0 +1,38 @@
+{
+  "clock": "2026-11-03T18:15:00+00:00",
+  "cursor": null,
+  "input": {
+    "dimension": "dim:ai_cognitive_boundary",
+    "granularity": "day",
+    "include_summary_sources": false,
+    "source_world_revision": 59,
+    "sources": [
+      {
+        "metadata": {
+          "dimension": "dim:ai_cognitive_boundary",
+          "revision_mode": "revise",
+          "target_ref": {
+            "object_id": "clm_bb53233b009cf1f4d81f50c6",
+            "revision": 2
+          }
+        },
+        "object_id": "evs_revision_e0dfdc517fdfd2a86fb3048d",
+        "object_type": "evidence_set",
+        "occurred_at": "2026-11-03T18:15:00Z",
+        "revision": 1,
+        "text": "{\"aggregation_method\": null, \"aggregation_version\": null, \"context_refs\": [], \"counter_refs\": [], \"coverage\": {\"coverage_ratio\": 1.0, \"expected_count\": 3, \"missing_description\": [], \"observed_count\": 3}, \"created_by\": \"cognition_revision:evidence\", \"knowledge_window\": {\"knowledge_cutoff\": \"2026-11-03T18:15:00Z\", \"world_revision\": 49}, \"learned_at\": \"2026-11-03T18:15:00Z\", \"member_refs\": [{\"object_id\": \"obs_conv_user_76b4c03c31db54c18b1f02ee\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_c4bef35968765b7f621c3ab2\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_e3f254f5a3f691c9f1ae5870\", \"revision\": 1}], \"metadata\": {\"dimension\": \"dim:ai_cognitive_boundary\", \"revision_mode\": \"revise\", \"target_ref\": {\"object_id\": \"clm_bb53233b009cf1f4d81f50c6\", \"revision\": 2}}, \"object_id\": \"evs_revision_e0dfdc517fdfd2a86fb3048d\", \"object_type\": \"evidence_set\", \"occurred\": {\"end\": null, \"precision\": \"unknown\", \"start\": null, \"timezone_name\": null, \"unknown\": true}, \"purpose\": \"revise Claim clm_bb53233b009cf1f4d81f50c6@2\", \"recorded_at\": \"2026-11-03T18:15:00Z\", \"revision\": 1, \"selection_method\": \"resident_model_selected_revision_evidence\", \"selector\": null, \"source_refs\": [], \"stale\": false, \"status\": \"active\", \"subject_id\": \"ai_agent_self\", \"support_refs\": [{\"object_id\": \"obs_conv_user_76b4c03c31db54c18b1f02ee\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_c4bef35968765b7f621c3ab2\", \"revision\": 1}, {\"object_id\": \"obs_conv_user_e3f254f5a3f691c9f1ae5870\", \"revision\": 1}]}"
+      }
+    ],
+    "subject_id": "user_1",
+    "truncated": false,
+    "window_end": "2026-11-03T23:59:59.999999Z",
+    "window_start": "2026-11-03T00:00:00Z"
+  },
+  "kind": "dimension_summary",
+  "protocol": "c15-rcc-res-a-rerun-002-mailbox-v1",
+  "request_id": "0034-48bd296a8969",
+  "seq": 34,
+  "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+  "stage": null,
+  "subject_id": "user_1"
+}

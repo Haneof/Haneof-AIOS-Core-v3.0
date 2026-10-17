@@ -1,0 +1,38 @@
+{
+  "argv": [
+    "/tmp/aios-venv/bin/python",
+    "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/release/release_operator.py",
+    "ack",
+    "--phase",
+    "A",
+    "--state",
+    "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-A-RERUN-002/release_state.json",
+    "--world-db",
+    "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/resident/C15-RCC-RES-A-RERUN-002/private_world.sqlite",
+    "--sequence",
+    "13",
+    "--event-id",
+    "c15rcc-013",
+    "--ingest-ref",
+    "obs_c14_fixture_e2c76be3450b6e9dc8316b9d@1"
+  ],
+  "parsed": {
+    "binding_mode": "fixture_observation",
+    "event_id": "c15rcc-013",
+    "fixture_payload_sha256": "sha256:98b48726adcaccbda0e4ec913a86e93ed1a4ef1e787165d9c036e2da87beb703",
+    "fixture_projection_sha256": "sha256:ff41d6c313e3f76a098daa9aaa7bc1d1c1984091778f33a022c559da722058e9",
+    "fixture_sha256": "sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46",
+    "ingest_object_id": "obs_c14_fixture_e2c76be3450b6e9dc8316b9d",
+    "ingest_ref": "obs_c14_fixture_e2c76be3450b6e9dc8316b9d@1",
+    "ingest_revision": 1,
+    "ingest_source_class": "platform",
+    "ingest_world_revision": 98,
+    "next_sequence": 14,
+    "occurred_at": "2026-11-06T11:10:00-08:00",
+    "sequence": 13,
+    "status": "acked"
+  },
+  "returncode": 0,
+  "stderr": "",
+  "stdout": "{\"binding_mode\":\"fixture_observation\",\"event_id\":\"c15rcc-013\",\"fixture_payload_sha256\":\"sha256:98b48726adcaccbda0e4ec913a86e93ed1a4ef1e787165d9c036e2da87beb703\",\"fixture_projection_sha256\":\"sha256:ff41d6c313e3f76a098daa9aaa7bc1d1c1984091778f33a022c559da722058e9\",\"fixture_sha256\":\"sha256:7ccb309d207cb6ee240fbc008ee4f535e25571f04ba7ca1b7c95bf9afb5ebf46\",\"ingest_object_id\":\"obs_c14_fixture_e2c76be3450b6e9dc8316b9d\",\"ingest_ref\":\"obs_c14_fixture_e2c76be3450b6e9dc8316b9d@1\",\"ingest_revision\":1,\"ingest_source_class\":\"platform\",\"ingest_world_revision\":98,\"next_sequence\":14,\"occurred_at\":\"2026-11-06T11:10:00-08:00\",\"sequence\":13,\"status\":\"acked\"}\n"
+}

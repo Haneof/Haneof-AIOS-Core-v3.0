@@ -1,0 +1,43 @@
+{
+  "clock": "2026-11-02T20:52:00+00:00",
+  "cursor": null,
+  "input": {
+    "dimension": "dim:ai_communication_experience",
+    "granularity": "day",
+    "include_summary_sources": false,
+    "source_world_revision": 31,
+    "sources": [
+      {
+        "metadata": {
+          "dimension": "dim:ai_communication_experience",
+          "evidence_refs": [
+            {
+              "object_id": "obs_conv_user_d4953379e0fd7ae84b9a27ee",
+              "revision": 1
+            },
+            {
+              "object_id": "obs_conv_ai_d30860e25c8c663899718b98",
+              "revision": 1
+            }
+          ]
+        },
+        "object_id": "commexp_f2f92d868906be2ac82f6242",
+        "object_type": "communication_experience",
+        "occurred_at": "2026-11-02T20:52:00Z",
+        "revision": 1,
+        "text": "{\"action_ref\": null, \"applicable_conditions\": {\"risk\": \"low_non_production\", \"user_stated_preference\": \"do_not_confirm_each_step\"}, \"counterexample_refs\": [], \"created_by\": \"communication_experience:resident_ai\", \"learned_at\": \"2026-11-02T20:52:00Z\", \"metadata\": {\"dimension\": \"dim:ai_communication_experience\", \"evidence_refs\": [{\"object_id\": \"obs_conv_user_d4953379e0fd7ae84b9a27ee\", \"revision\": 1}, {\"object_id\": \"obs_conv_ai_d30860e25c8c663899718b98\", \"revision\": 1}]}, \"object_id\": \"commexp_f2f92d868906be2ac82f6242\", \"object_type\": \"communication_experience\", \"occurred\": {\"end\": \"2026-11-02T20:52:00Z\", \"precision\": \"second\", \"start\": \"2026-11-02T20:52:00Z\", \"timezone_name\": null, \"unknown\": false}, \"recorded_at\": \"2026-11-02T20:52:00Z\", \"revision\": 1, \"scenario\": \"low_risk_staging_implementation\", \"source_refs\": [{\"object_id\": \"obs_conv_user_d4953379e0fd7ae84b9a27ee\", \"revision\": 1, \"source_locator\": null}, {\"object_id\": \"obs_conv_ai_d30860e25c8c663899718b98\", \"revision\": 1, \"source_locator\": null}], \"status\": \"active\", \"style\": \"result_and_risk_only\", \"subject_id\": \"user_1\", \"tone\": \"brief\", \"user_reaction\": \"accepted\"}"
+      }
+    ],
+    "subject_id": "user_1",
+    "truncated": false,
+    "window_end": "2026-11-02T23:59:59.999999Z",
+    "window_start": "2026-11-02T00:00:00Z"
+  },
+  "kind": "dimension_summary",
+  "protocol": "c15-rcc-res-a-rerun-002-mailbox-v1",
+  "request_id": "0019-0aee2b401839",
+  "seq": 19,
+  "session_id": "c15-rcc-res-a-rerun-002-2079f64af49c",
+  "stage": null,
+  "subject_id": "user_1"
+}
