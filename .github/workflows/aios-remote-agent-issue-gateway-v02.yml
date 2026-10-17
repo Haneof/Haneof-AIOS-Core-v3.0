@@ -1,0 +1,90 @@
+name: aios-remote-agent-issue-gateway-v02
+
+# Public repository, owner-authored Issue tasks only. No public shell.
+# Issue events use the reviewed default-branch version of this workflow.
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/aios-remote-agent-issue-gateway-v02.yml"
+      - "tools/agent_gateway/issue_request.py"
+      - "tests/agent_gateway/test_issue_request.py"
+      - "docs/AIOS_REMOTE_AGENT_ISSUE_GATEWAY_V02.md"
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aios-issue-gateway-v02-${{ github.event.issue.number || github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  owner-only-public-audit:
+    if: >-
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'issues' &&
+       github.event.issue.user.login == 'Haneof' &&
+       startsWith(github.event.issue.title, '[AIOS-GW-V02] '))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Checkout approved event code without saved token
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Isolated stdlib Python for non-formal public CI
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Test request parser, allowlist and negative cases
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -I -m unittest discover -s tests/agent_gateway -p 'test_*.py' -v 2>&1 | tee issue-gateway-unittest.log
+
+      - name: Resolve exact authorized issue task
+        id: resolve
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -I tools/agent_gateway/issue_request.py
+
+      - name: Run fixed non-formal public audit only
+        env:
+          GATEWAY_TASK: ${{ steps.resolve.outputs.task }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -I tools/agent_gateway/runner.py --task "$GATEWAY_TASK"
+
+      - name: Summarize authorized public audit
+        if: always()
+        shell: bash
+        run: |
+          echo "### AIOS Agent Issue Gateway v0.2" >> "$GITHUB_STEP_SUMMARY"
+          echo "NON-FORMAL_PUBLIC_CI; no security enrollment or real Resident" >> "$GITHUB_STEP_SUMMARY"
+          for receipt in gateway-evidence/*/result.json; do
+            if [ -f "$receipt" ]; then
+              AIOS_GATEWAY_RECEIPT="$receipt" python -I -c 'import json,os; p=json.load(open(os.environ["AIOS_GATEWAY_RECEIPT"])); print("Task:",p["task"],"Status:",p["status"],"Class:",p["classification"])' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
+      - name: Upload scoped public results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aios-issue-gateway-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            gateway-evidence/
+            issue-gateway-unittest.log
+          retention-days: 7
+          if-no-files-found: warn
