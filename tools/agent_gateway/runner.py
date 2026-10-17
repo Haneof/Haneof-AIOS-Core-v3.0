@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import io
 import json
 import os
@@ -31,7 +32,8 @@ IDENTITY = BASE + "/harness/IDENTITY.json"
 EXPECTED_PACKET = "023c7556de1bcd4d4b0caccb90b0fa65d0b8a9b783f41f30574dfbb12e8f6b34"
 EXPECTED_ARTIFACT = "82aa3ff81d9492e0828934b5744adf4129fb6dc1361303a537379a603a319de3"
 EXPECTED_IDENTITY = "364cc03617fcd782327b3307720baf5371839185b1b07b71476308af74c5a817"
-TASKS = ("gateway-selftest", "pr370-source-boundary", "pr370-artifact-audit")
+TASKS = ("gateway-selftest", "pr370-source-boundary", "pr370-artifact-audit",
+         "pr371-evidence-integrity", "r005-binding-ledger")
 ALLOWED_EXACT = {PACKET}
 ALLOWED_PREFIXES = (
     "reviews/C15_RERUN005_SIGNED_TTYLESS_WINDOW66/",
@@ -82,10 +84,10 @@ def verify_remote_and_fetch() -> dict:
     return {"repository": REPO, "candidate_head": HEAD, "sole_parent": PARENT}
 
 
-def git_bytes(path: str) -> bytes:
+def git_bytes(path: str, commit: str = HEAD) -> bytes:
     require(bool(re.fullmatch(r"[A-Za-z0-9_./-]+", path)) and ".." not in path.split("/"),
             "not an approved static repository path")
-    data = run_git("show", HEAD + ":" + path)
+    data = run_git("show", commit + ":" + path)
     require(len(data) <= 4 * 1024 * 1024, "Git blob exceeds audit size bound")
     return data
 
@@ -179,14 +181,90 @@ def audit_artifact() -> dict:
             "audit_scope": "STATIC_PUBLIC_BYTES_ONLY_NO_EXECUTION"}
 
 
+
+def window67_audit_module():
+    """Load only reviewed sibling validator under isolated Python -I."""
+    path = ROOT / "tools" / "agent_gateway" / "window67_audit.py"
+    spec = importlib.util.spec_from_file_location("aios_window67_public_evidence", path)
+    require(spec is not None and spec.loader is not None, "missing trusted evidence validator")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def verify_window67_evidence_ref(module) -> dict:
+    """Read pinned Git commit identity, never select arbitrary Issue-supplied refs."""
+    verify_remote_and_fetch()
+    ref = "refs/heads/" + module.WINDOW67_BRANCH
+    actual = run_git("ls-remote", "--exit-code", "origin", ref).decode().strip()
+    require(actual == module.WINDOW67_HEAD + "\t" + ref,
+            "Window67 independent-evidence branch head moved")
+    run_git("fetch", "--no-tags", "origin", ref)
+    require(run_git("rev-parse", "FETCH_HEAD").decode().strip()
+            == module.WINDOW67_HEAD, "evidence fetch identity differs")
+    require(run_git("show", "-s", "--format=%T",
+                    module.WINDOW67_HEAD).decode().strip()
+            == module.WINDOW67_TREE, "evidence Git tree identity differs")
+    return {
+        "engineering_candidate": HEAD,
+        "frozen_window67_head": module.WINDOW67_HEAD,
+        "frozen_window67_tree": module.WINDOW67_TREE,
+    }
+
+
+def verified_window67_ledger_bytes(module) -> tuple:
+    base = module.WINDOW67_BASE + "/"
+    raw_manifest = git_bytes(base + "SHA256.json", module.WINDOW67_HEAD)
+    inventory = module.validate_manifest(raw_manifest)
+    path = "WINDOW67_TEST_RESULTS.json"
+    data = git_bytes(base + path, module.WINDOW67_HEAD)
+    require(len(data) == inventory[path]["size"]
+            and digest(data) == inventory[path]["sha256"],
+            "Window67 formal result bytes differ from pinned evidence inventory")
+    return inventory, data
+
+
+def audit_window67_evidence() -> dict:
+    module = window67_audit_module()
+    refs = verify_window67_evidence_ref(module)
+    manifest, _ = verified_window67_ledger_bytes(module)
+    prefix = module.WINDOW67_BASE + "/"
+    tracked = run_git(
+        "ls-tree", "-r", "--name-only", module.WINDOW67_HEAD,
+        "--", module.WINDOW67_BASE
+    ).decode("utf-8").splitlines()
+    inspected = module.verify_manifest_members(
+        manifest, tracked,
+        lambda name: git_bytes(prefix + name, module.WINDOW67_HEAD),
+    )
+    return {**refs, **inspected,
+            "scope": "STATIC_PUBLIC_EVIDENCE_HASHES_NOT_FORMAL_SECURITY"}
+
+
+def audit_binding_ledger() -> dict:
+    module = window67_audit_module()
+    refs = verify_window67_evidence_ref(module)
+    _, record = verified_window67_ledger_bytes(module)
+    engineer = git_bytes(
+        "reviews/C15_RERUN005_SIGNED_TTYLESS_WINDOW66/DEVELOPMENT_STATUS.json"
+    )
+    status = module.json_object_no_duplicates(record)
+    author = module.json_object_no_duplicates(engineer)
+    result = module.validate_binding_ledger(status, author, HEAD)
+    return {**refs, **result,
+            "scope": "FROZEN_HISTORICAL_REGRESSIONS_NO_TEST_REEXECUTION"}
+
+
 def selftest() -> dict:
     require(TASKS == ("gateway-selftest", "pr370-source-boundary",
-                      "pr370-artifact-audit"), "unexpected task list")
+                      "pr370-artifact-audit", "pr371-evidence-integrity",
+                      "r005-binding-ledger"), "unexpected task list")
     require(len({HEAD, PARENT}) == 2 and len(HEAD) == 40, "invalid commit pins")
     require(all(len(x) == 64 for x in
                 (EXPECTED_ARTIFACT, EXPECTED_PACKET, EXPECTED_IDENTITY)),
             "invalid immutable SHA256 pins")
-    require(all(x.startswith("pr370-") or x == "gateway-selftest" for x in TASKS),
+    require(all(x.startswith(("pr370-", "pr371-", "r005-"))
+                or x == "gateway-selftest" for x in TASKS),
             "unexpected task type")
     return {"allowlisted_tasks": list(TASKS),
             "security_scope": "NO_SECRETS_NO_EXEC_NO_REAL_RESIDENT"}
@@ -241,6 +319,10 @@ def main(argv: list[str] | None = None) -> int:
             detail = audit_source_boundary()
         elif args.task == "pr370-artifact-audit":
             detail = audit_artifact()
+        elif args.task == "pr371-evidence-integrity":
+            detail = audit_window67_evidence()
+        elif args.task == "r005-binding-ledger":
+            detail = audit_binding_ledger()
         else:
             raise GateFailure("task not allowlisted")
         status = "PASS"

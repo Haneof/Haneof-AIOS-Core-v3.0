@@ -1,6 +1,6 @@
 # AIOS Remote Agent Execution Gateway v0.1 (PUBLIC / NON-FORMAL)
 
-**Status:** experimental Draft PR; not deployed on default branch, not authorized for merge.
+**Status:** v0.1 activated on main via PR #372. v0.2 owner-only Issue gateway activated via PR #373. v0.3 extension remains Draft until separately approved.
 **Scope:** GitHub-hosted ephemeral Actions for fixed, nonsecret checks.
 **Does not create a public shell server, SSH gateway, permanent Codespace, or autonomous Resident.**
 
@@ -20,6 +20,8 @@ No API server is exposed to the Internet. GitHub API authenticates the task subm
 - **gateway-selftest**: validates immutable pin and task-selection policy; accompanying CI runs unit/negative tests.
 - **pr370-source-boundary**: fetches exact frozen PR370 branch and verifies the sole parent and changed-file allowlist; **does not run candidate code**.
 - **pr370-artifact-audit**: reads exact PR370 Git objects, verifies TEST_ONLY launch packet, pinned artifact/manifest SHA256, closed 22-member archive hashes and metadata; **does not extract or execute candidate code**.
+- **pr371-evidence-integrity** *(v0.3, pending activation)*: verify all 154 frozen Window67 independent evidence members against pinned SHA256, with no execution.
+- **r005-binding-ledger** *(v0.3, pending activation)*: compare frozen Window66 and Window67 original38 failure names/counters and preserve formal FAIL / OPEN blockers.
 
 Pinned PR370: 6fb725407569bc719c049587f67fe65e797eb734; sole parent: 9d3b19b0e7bf090e5d472d9781b9156f73ea2088.
 
@@ -27,9 +29,9 @@ The historical seven original regression failures, Window54 security gates, Wind
 
 ## Deployment stages
 
-1. **Current Draft PR:** GitHub pull_request CI runs policy/negative cases and all three allowlisted tasks on hosted ubuntu-latest, producing a separate receipt for each. This stage does not enable external task dispatch.
+1. **v0.1 active; v0.3 Draft:** existing three allowlisted tasks remain available on main. The v0.3 PR is proposed to test and add two new read-only tasks; do not claim the extensions are live until approved.
 2. **Manual security and PM review:** confirm no secrets, no unapproved files, no automatic dispatch and no writable token. Do not merge merely to enable commands.
-3. **Separate authorized merge to default main:** GitHub requires the workflow file to exist on the default branch for workflow_dispatch to be handled. **Do not merge without separate PM authorization.**
+3. **v0.3 activation review:** the v0.3 workflow revision must be separately authorized for merge to main; no further merge is implied by the previous v0.1/v0.2 approvals.
 4. **After approved activation only:** an AI/Operator with explicit GitHub Actions write access can submit one of the fixed workflow inputs. A GitHub agent that can only read PRs cannot start the workflow; use GitHub Actions UI or a properly authorized integration instead.
 
 ### Manual invocation after separate merge approval
@@ -59,7 +61,7 @@ If a provider (including Arena) cannot invoke the Actions API, it may review the
 
 - Workflow uses pull_request and workflow_dispatch; deliberately no pull_request_target, public callback/webhook execution endpoint, repository_dispatch accepting opaque commands, cron polling, or user-controllable shell.
 - GitHub token is restricted to contents: read; checkout discards saved credentials. There are no secrets, id-token, cloud credentials or long-lived tokens in the workflow.
-- workflow_dispatch has **one choice-only** input. Runner CLI has an immutable three-value allowlist and fixed PR370 SHA. User-supplied code, paths, refs, hosts, URLs and shell fragments are **not accepted**.
+- workflow_dispatch has **one choice-only** input. v0.3 proposes a fixed five-value allowlist, with PR370/Window67 commit SHA pins. User-supplied code, paths, refs, hosts, URLs and shell fragments are **not accepted**.
 - Candidate inspections use git show on exact frozen Git commit and tarfile in read-only inspection mode; not extractall, import, unpickle or shell execution.
 - Workflow will not run on arbitrary manual-dispatch refs; main-only guard applies.
 - GitHub-hosted runner, not a long-running privileged self-hosted runner holding Window65 issuer or Resident credentials. Never put sensitive test roots on a public-repository runner.

@@ -51,7 +51,7 @@ def sample_archive(*, wrong_sha=False, wrong_mode=False, link=False,
 class TaskPolicyTests(unittest.TestCase):
     def test_allowlisted_task_names_are_fixed(self):
         self.assertEqual(gateway.selftest()["allowlisted_tasks"], list(gateway.TASKS))
-        self.assertEqual(len(gateway.TASKS), 3)
+        self.assertEqual(len(gateway.TASKS), 5)
 
     def test_source_scope_accepts_only_approved_harness_and_evidence(self):
         gateway.check_changed_paths([

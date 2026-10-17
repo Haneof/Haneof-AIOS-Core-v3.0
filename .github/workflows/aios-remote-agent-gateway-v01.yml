@@ -9,6 +9,7 @@ on:
       - "tools/agent_gateway/**"
       - "tests/agent_gateway/**"
       - "docs/AIOS_REMOTE_AGENT_GATEWAY_V01.md"
+      - "docs/AIOS_REMOTE_AGENT_REGRESSION_AUDIT_V03.md"
   workflow_dispatch:
     inputs:
       task:
@@ -20,6 +21,8 @@ on:
           - gateway-selftest
           - pr370-source-boundary
           - pr370-artifact-audit
+          - pr371-evidence-integrity
+          - r005-binding-ledger
 
 permissions:
   contents: read
@@ -69,6 +72,8 @@ jobs:
             # CI proves the two public PR370 audits before any main activation.
             python -I tools/agent_gateway/runner.py --task pr370-source-boundary
             python -I tools/agent_gateway/runner.py --task pr370-artifact-audit
+            python -I tools/agent_gateway/runner.py --task pr371-evidence-integrity
+            python -I tools/agent_gateway/runner.py --task r005-binding-ledger
           fi
 
       - name: Public-only task summary
