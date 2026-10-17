@@ -1,0 +1,302 @@
+{
+  "access_class": "RESIDENT_VISIBLE/CLEAN_ROOM",
+  "allowed_cursor_end": 13,
+  "allowed_cursor_start": 1,
+  "approval_state": "PENDING_INDEPENDENT_ACCEPTANCE_AND_PM_AUTHORIZATION",
+  "approved_runtime": {
+    "build_or_install_authorized": false,
+    "expected_openssl": "3.0.13",
+    "expected_pydantic": "2.13.5",
+    "expected_pytest": "8.4.2",
+    "expected_python": "3.12.14",
+    "expected_sqlite": "3.45.1",
+    "prepared_venv_python": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python",
+    "python_sha256": "09605fdfbe88ca0d45a575ab8179cecd2a7167d95555b7bb8e6f29f29e82d42b",
+    "runtime_tar_sha256": "ecfe4b4b6e9dee1a08342974e816f739dcd77fcd3f25f3ad7626cc7102e5673e"
+  },
+  "clean_room_policy": [
+    "Current legally released input and request/snapshot only",
+    "No governance, prior reviews, test answers, sealed events, fixture/evaluator/release source or Git history"
+  ],
+  "cross_sandbox_harness_materialization": {
+    "artifact_repository_path": "reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/artifacts/resident-harness.tar.gz",
+    "artifact_sha256": "e3afa5bcf5f55667767fecac5151f3cf53c69950fabeb11c47c7cded4cc4f222",
+    "artifact_size": 54132,
+    "closed_members": [
+      "harness/IDENTITY.json",
+      "harness/launch.py",
+      "harness/r005/__init__.py",
+      "harness/r005/atomic.py",
+      "harness/r005/bridge.py",
+      "harness/r005/canonical.py",
+      "harness/r005/checks.py",
+      "harness/r005/cli.py",
+      "harness/r005/completion.py",
+      "harness/r005/content_manifest.py",
+      "harness/r005/ledger.py",
+      "harness/r005/payload.py",
+      "harness/r005/publisher_service.py",
+      "harness/r005/registration.py",
+      "harness/r005/registration_ipc.py",
+      "harness/r005/remote_completion.py",
+      "harness/r005/requests.py",
+      "harness/r005/response_authorization.py",
+      "harness/r005/responses.py",
+      "harness/r005/safe_runner.py",
+      "harness/r005/schema.py",
+      "harness/r005/verify.py"
+    ],
+    "destination": "absolute absent $DELIVERY_DIR; existing parent required; no symlinks in parent path",
+    "materialization_command": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I -c '\"\"\"Standalone clean-room materializer; byte pins are supplied by the safe packet.\n\nNo extractall, links, overwrite, implicit parent creation, or ambient imports.\nAll archive members and their bytes are validated before destination creation.\nAn interrupted extraction leaves a blocked partial target; never retry over it.\n\"\"\"\nimport hashlib\nimport io\nimport json\nimport os\nfrom pathlib import PurePosixPath\nimport stat\nimport sys\nimport tarfile\n\ndef require(condition, message):\n    if not condition:\n        raise ValueError(message)\n\ndef validate(raw, expected_sha, inventory):\n    require(hashlib.sha256(raw).hexdigest() == expected_sha, '\"'\"'artifact substitution'\"'\"')\n    require(len(raw) < 16 * 1024 * 1024, '\"'\"'artifact too large'\"'\"')\n    with tarfile.open(fileobj=io.BytesIO(raw), mode='\"'\"'r:gz'\"'\"') as archive:\n        members = archive.getmembers()\n        names = [m.name for m in members]\n        require(len(set(names)) == len(names), '\"'\"'duplicate archive member'\"'\"')\n        require(set(names) == set(inventory), '\"'\"'closed member set mismatch'\"'\"')\n        content = {}\n        for member in members:\n            name = member.name\n            path = PurePosixPath(name)\n            require(not path.is_absolute() and str(path) == name\n                    and all(p not in ('\"'\"''\"'\"', '\"'\"'.'\"'\"', '\"'\"'..'\"'\"') for p in name.split('\"'\"'/'\"'\"'))\n                    and name.startswith('\"'\"'harness/'\"'\"'), '\"'\"'unsafe member path'\"'\"')\n            expected = inventory[name]\n            require(member.type == tarfile.REGTYPE and not member.linkname\n                    and not member.pax_headers, '\"'\"'non-regular/link/PAX member'\"'\"')\n            require(member.mode == expected['\"'\"'mode'\"'\"'] == 0o644\n                    and member.uid == member.gid == member.mtime == 0\n                    and member.size == expected['\"'\"'size'\"'\"']\n                    and 0 <= member.size <= 8 * 1024 * 1024, '\"'\"'member metadata mismatch'\"'\"')\n            data = archive.extractfile(member).read()\n            require(len(data) == member.size\n                    and hashlib.sha256(data).hexdigest() == expected['\"'\"'sha256'\"'\"'], '\"'\"'member hash mismatch'\"'\"')\n            content[name] = data\n    return content\n\ndef open_directory(path):\n    require(path.is_absolute() and str(path) == str(PurePosixPath(str(path)))\n            and '\"'\"'..'\"'\"' not in path.parts, '\"'\"'destination must be canonical absolute path'\"'\"')\n    fd = os.open('\"'\"'/'\"'\"', os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)\n    try:\n        for part in path.parts[1:]:\n            child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=fd)\n            os.close(fd)\n            fd = child\n        return fd\n    except BaseException:\n        os.close(fd)\n        raise\n\ndef materialize(artifact, target, expected_sha, inventory):\n    # Read one immutable snapshot; a path swap after read cannot change extracted bytes.\n    fd = os.open(artifact, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)\n    with os.fdopen(fd, '\"'\"'rb'\"'\"') as stream:\n        info = os.fstat(stream.fileno())\n        require(stat.S_ISREG(info.st_mode) and info.st_size < 16 * 1024 * 1024,\n                '\"'\"'artifact must be bounded regular file'\"'\"')\n        raw = stream.read(16 * 1024 * 1024)\n    content = validate(raw, expected_sha, inventory)\n    target = PurePosixPath(target)\n    require(target.name not in ('\"'\"''\"'\"', '\"'\"'.'\"'\"', '\"'\"'..'\"'\"'), '\"'\"'invalid destination'\"'\"')\n    parent = open_directory(target.parent)\n    opened = {}\n    try:\n        # mkdir is exclusive even for dangling symlinks and racing creators.\n        os.mkdir(target.name, 0o755, dir_fd=parent)\n        root = os.open(target.name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent)\n        opened['\"'\"''\"'\"'] = root\n        os.fchmod(root, 0o755)\n        dirs = {str(PurePosixPath(name).parent) for name in content}\n        for directory in sorted(dirs, key=lambda p: (p.count('\"'\"'/'\"'\"'), p)):\n            parts = directory.split('\"'\"'/'\"'\"')\n            for depth in range(1, len(parts)+1):\n                rel = '\"'\"'/'\"'\"'.join(parts[:depth])\n                if rel in opened:\n                    continue\n                pfd = opened['\"'\"'/'\"'\"'.join(parts[:depth-1])]\n                os.mkdir(parts[depth-1], 0o755, dir_fd=pfd)\n                dfd = os.open(parts[depth-1], os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=pfd)\n                os.fchmod(dfd, 0o755)\n                opened[rel] = dfd\n        for name, data in sorted(content.items()):\n            path = PurePosixPath(name)\n            ffd = os.open(path.name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,\n                          0o644, dir_fd=opened[str(path.parent)])\n            with os.fdopen(ffd, '\"'\"'wb'\"'\"') as stream:\n                stream.write(data)\n                stream.flush()\n                os.fchmod(stream.fileno(), 0o644)\n                os.fsync(stream.fileno())\n        for dfd in reversed(list(opened.values())):\n            os.fsync(dfd)\n        os.fsync(parent)\n    finally:\n        for dfd in opened.values():\n            os.close(dfd)\n        os.close(parent)\n    print('\"'\"'HARNESS_MATERIALIZATION_PASS'\"'\"')\n\nif __name__ == '\"'\"'__main__'\"'\"':\n    materialize(sys.argv[1], sys.argv[2], sys.argv[3], json.loads(sys.argv[4]))\n' \"$ARTIFACT\" \"$DELIVERY_DIR\" e3afa5bcf5f55667767fecac5151f3cf53c69950fabeb11c47c7cded4cc4f222 '{\"harness/IDENTITY.json\":{\"mode\":420,\"sha256\":\"ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd\",\"size\":18257},\"harness/launch.py\":{\"mode\":420,\"sha256\":\"6b46ac1531e04aeb836066c403898e7917a44857cfff910e819a45c633ff436b\",\"size\":28556},\"harness/r005/__init__.py\":{\"mode\":420,\"sha256\":\"7900d69b069ca6440302895c4e82531bc776757648511aef25a0133efd7a465b\",\"size\":1154},\"harness/r005/atomic.py\":{\"mode\":420,\"sha256\":\"b2f8df9258045fbb72a966d9b2b0fc72b23476655ff9c9c9ab390dc7634a4683\",\"size\":4870},\"harness/r005/bridge.py\":{\"mode\":420,\"sha256\":\"c482e289d2e2e7f1d2ae49f5996aaa1766d2dfdaba0749fbf62b1c3d0b5cbeef\",\"size\":13928},\"harness/r005/canonical.py\":{\"mode\":420,\"sha256\":\"d1ae3e5a46bced68bedb455bf4e6ce6c6783391c9f319b3317bf0bff83800ac1\",\"size\":3171},\"harness/r005/checks.py\":{\"mode\":420,\"sha256\":\"28fc8dd2aa11551180130a2854b7edfcb02211b0664ab068cc904117836ffa87\",\"size\":4727},\"harness/r005/cli.py\":{\"mode\":420,\"sha256\":\"9863560647b26b314dfd355c98fb72477f8bd359f1b672289f42794c896e45b0\",\"size\":3892},\"harness/r005/completion.py\":{\"mode\":420,\"sha256\":\"bea191cdbed2d2e710b360409c60c4c68c5cbd4d5e0db2f843a68e79bb854966\",\"size\":6782},\"harness/r005/content_manifest.py\":{\"mode\":420,\"sha256\":\"4f8cdd3f0b957c2958d897765dfcaed05b698582ddb652faa838fe564d1e0a5b\",\"size\":1513},\"harness/r005/ledger.py\":{\"mode\":420,\"sha256\":\"31356e9d42e068d52bccd152487321d43a09861d8af68aeef693d34f6e55b217\",\"size\":15468},\"harness/r005/payload.py\":{\"mode\":420,\"sha256\":\"d982c639439bbd74aa697e8df1c514eb46a2834806467ff5d86dc47fe4848e89\",\"size\":872},\"harness/r005/publisher_service.py\":{\"mode\":420,\"sha256\":\"227829a6a6c4c433022afb063d0bdfa157b87966a0982687240f51b13eea6bb3\",\"size\":13136},\"harness/r005/registration.py\":{\"mode\":420,\"sha256\":\"2cb5f84727c3817603161b958ad4ec17e04a623584b546db22eeea8279456d01\",\"size\":8779},\"harness/r005/registration_ipc.py\":{\"mode\":420,\"sha256\":\"6b83f2ed577c435bcbdd485af324218d3b7c5666a792261812a3840e6ff716e1\",\"size\":4655},\"harness/r005/remote_completion.py\":{\"mode\":420,\"sha256\":\"cb7634a499b057fb1dbf04ae5601ff44b3e784f4d67c49a6417e1bd1c62f07f6\",\"size\":7324},\"harness/r005/requests.py\":{\"mode\":420,\"sha256\":\"ece7fa0aaeb91eecb1596a8c0febd70e1c7973398318b827b0c684519965f830\",\"size\":9231},\"harness/r005/response_authorization.py\":{\"mode\":420,\"sha256\":\"4e90aeca366be7cbae3ed8b5e5efe48bd85eedea356275b6966bc134236a8e4c\",\"size\":3352},\"harness/r005/responses.py\":{\"mode\":420,\"sha256\":\"89e062dfd597333cb5033e4b7523c53c70bbe05e656a36aefdd59cee35cc9f37\",\"size\":9233},\"harness/r005/safe_runner.py\":{\"mode\":420,\"sha256\":\"e61630ddb2b39e9403bd29233b151984390c1a33d8875a55549fa28045c854c6\",\"size\":27672},\"harness/r005/schema.py\":{\"mode\":420,\"sha256\":\"e92e81589f1b4e301f4741cd736b153262c076fd0226dae470d355a5751892a9\",\"size\":15629},\"harness/r005/verify.py\":{\"mode\":420,\"sha256\":\"aafea0b78e4b19ee4b4a64845529f2a2de78d8b0fe4dbfd875ae6890729312e5\",\"size\":7695}}'",
+    "member_identity": {
+      "harness/IDENTITY.json": {
+        "mode": 420,
+        "sha256": "ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd",
+        "size": 18257
+      },
+      "harness/launch.py": {
+        "mode": 420,
+        "sha256": "6b46ac1531e04aeb836066c403898e7917a44857cfff910e819a45c633ff436b",
+        "size": 28556
+      },
+      "harness/r005/__init__.py": {
+        "mode": 420,
+        "sha256": "7900d69b069ca6440302895c4e82531bc776757648511aef25a0133efd7a465b",
+        "size": 1154
+      },
+      "harness/r005/atomic.py": {
+        "mode": 420,
+        "sha256": "b2f8df9258045fbb72a966d9b2b0fc72b23476655ff9c9c9ab390dc7634a4683",
+        "size": 4870
+      },
+      "harness/r005/bridge.py": {
+        "mode": 420,
+        "sha256": "c482e289d2e2e7f1d2ae49f5996aaa1766d2dfdaba0749fbf62b1c3d0b5cbeef",
+        "size": 13928
+      },
+      "harness/r005/canonical.py": {
+        "mode": 420,
+        "sha256": "d1ae3e5a46bced68bedb455bf4e6ce6c6783391c9f319b3317bf0bff83800ac1",
+        "size": 3171
+      },
+      "harness/r005/checks.py": {
+        "mode": 420,
+        "sha256": "28fc8dd2aa11551180130a2854b7edfcb02211b0664ab068cc904117836ffa87",
+        "size": 4727
+      },
+      "harness/r005/cli.py": {
+        "mode": 420,
+        "sha256": "9863560647b26b314dfd355c98fb72477f8bd359f1b672289f42794c896e45b0",
+        "size": 3892
+      },
+      "harness/r005/completion.py": {
+        "mode": 420,
+        "sha256": "bea191cdbed2d2e710b360409c60c4c68c5cbd4d5e0db2f843a68e79bb854966",
+        "size": 6782
+      },
+      "harness/r005/content_manifest.py": {
+        "mode": 420,
+        "sha256": "4f8cdd3f0b957c2958d897765dfcaed05b698582ddb652faa838fe564d1e0a5b",
+        "size": 1513
+      },
+      "harness/r005/ledger.py": {
+        "mode": 420,
+        "sha256": "31356e9d42e068d52bccd152487321d43a09861d8af68aeef693d34f6e55b217",
+        "size": 15468
+      },
+      "harness/r005/payload.py": {
+        "mode": 420,
+        "sha256": "d982c639439bbd74aa697e8df1c514eb46a2834806467ff5d86dc47fe4848e89",
+        "size": 872
+      },
+      "harness/r005/publisher_service.py": {
+        "mode": 420,
+        "sha256": "227829a6a6c4c433022afb063d0bdfa157b87966a0982687240f51b13eea6bb3",
+        "size": 13136
+      },
+      "harness/r005/registration.py": {
+        "mode": 420,
+        "sha256": "2cb5f84727c3817603161b958ad4ec17e04a623584b546db22eeea8279456d01",
+        "size": 8779
+      },
+      "harness/r005/registration_ipc.py": {
+        "mode": 420,
+        "sha256": "6b83f2ed577c435bcbdd485af324218d3b7c5666a792261812a3840e6ff716e1",
+        "size": 4655
+      },
+      "harness/r005/remote_completion.py": {
+        "mode": 420,
+        "sha256": "cb7634a499b057fb1dbf04ae5601ff44b3e784f4d67c49a6417e1bd1c62f07f6",
+        "size": 7324
+      },
+      "harness/r005/requests.py": {
+        "mode": 420,
+        "sha256": "ece7fa0aaeb91eecb1596a8c0febd70e1c7973398318b827b0c684519965f830",
+        "size": 9231
+      },
+      "harness/r005/response_authorization.py": {
+        "mode": 420,
+        "sha256": "4e90aeca366be7cbae3ed8b5e5efe48bd85eedea356275b6966bc134236a8e4c",
+        "size": 3352
+      },
+      "harness/r005/responses.py": {
+        "mode": 420,
+        "sha256": "89e062dfd597333cb5033e4b7523c53c70bbe05e656a36aefdd59cee35cc9f37",
+        "size": 9233
+      },
+      "harness/r005/safe_runner.py": {
+        "mode": 420,
+        "sha256": "e61630ddb2b39e9403bd29233b151984390c1a33d8875a55549fa28045c854c6",
+        "size": 27672
+      },
+      "harness/r005/schema.py": {
+        "mode": 420,
+        "sha256": "e92e81589f1b4e301f4741cd736b153262c076fd0226dae470d355a5751892a9",
+        "size": 15629
+      },
+      "harness/r005/verify.py": {
+        "mode": 420,
+        "sha256": "aafea0b78e4b19ee4b4a64845529f2a2de78d8b0fe4dbfd875ae6890729312e5",
+        "size": 7695
+      }
+    },
+    "partial_failure_policy": "Preserve blocked partial target; choose a new destination after Operator inspection",
+    "post_materialization_command": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I \"$HARNESS/launch.py\" --source-repo \"$SOURCE_REPO\" --identity-sha256 ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd verify",
+    "repeat_policy": "FAIL_CLOSED for every existing destination, including empty directory or dangling symlink",
+    "resident_may_edit_harness": false,
+    "transport": "Exact candidate tar bytes and safe packet only after independent acceptance and PM authorization"
+  },
+  "current_main_harness_identity": {
+    "all_harness_files": {
+      "launch.py": "6b46ac1531e04aeb836066c403898e7917a44857cfff910e819a45c633ff436b",
+      "r005/__init__.py": "7900d69b069ca6440302895c4e82531bc776757648511aef25a0133efd7a465b",
+      "r005/atomic.py": "b2f8df9258045fbb72a966d9b2b0fc72b23476655ff9c9c9ab390dc7634a4683",
+      "r005/bridge.py": "c482e289d2e2e7f1d2ae49f5996aaa1766d2dfdaba0749fbf62b1c3d0b5cbeef",
+      "r005/canonical.py": "d1ae3e5a46bced68bedb455bf4e6ce6c6783391c9f319b3317bf0bff83800ac1",
+      "r005/checks.py": "28fc8dd2aa11551180130a2854b7edfcb02211b0664ab068cc904117836ffa87",
+      "r005/cli.py": "9863560647b26b314dfd355c98fb72477f8bd359f1b672289f42794c896e45b0",
+      "r005/completion.py": "bea191cdbed2d2e710b360409c60c4c68c5cbd4d5e0db2f843a68e79bb854966",
+      "r005/content_manifest.py": "4f8cdd3f0b957c2958d897765dfcaed05b698582ddb652faa838fe564d1e0a5b",
+      "r005/ledger.py": "31356e9d42e068d52bccd152487321d43a09861d8af68aeef693d34f6e55b217",
+      "r005/payload.py": "d982c639439bbd74aa697e8df1c514eb46a2834806467ff5d86dc47fe4848e89",
+      "r005/publisher_service.py": "227829a6a6c4c433022afb063d0bdfa157b87966a0982687240f51b13eea6bb3",
+      "r005/registration.py": "2cb5f84727c3817603161b958ad4ec17e04a623584b546db22eeea8279456d01",
+      "r005/registration_ipc.py": "6b83f2ed577c435bcbdd485af324218d3b7c5666a792261812a3840e6ff716e1",
+      "r005/remote_completion.py": "cb7634a499b057fb1dbf04ae5601ff44b3e784f4d67c49a6417e1bd1c62f07f6",
+      "r005/requests.py": "ece7fa0aaeb91eecb1596a8c0febd70e1c7973398318b827b0c684519965f830",
+      "r005/response_authorization.py": "4e90aeca366be7cbae3ed8b5e5efe48bd85eedea356275b6966bc134236a8e4c",
+      "r005/responses.py": "89e062dfd597333cb5033e4b7523c53c70bbe05e656a36aefdd59cee35cc9f37",
+      "r005/safe_runner.py": "e61630ddb2b39e9403bd29233b151984390c1a33d8875a55549fa28045c854c6",
+      "r005/schema.py": "e92e81589f1b4e301f4741cd736b153262c076fd0226dae470d355a5751892a9",
+      "r005/verify.py": "aafea0b78e4b19ee4b4a64845529f2a2de78d8b0fe4dbfd875ae6890729312e5"
+    },
+    "approval_state": "PENDING_INDEPENDENT_ACCEPTANCE_AND_PM",
+    "c15_tree": "b8a62370e6ffe80730b2ef4c17d625fab50446d4",
+    "core_tree": "16f1487e291b009c55bee402abfd79fdacbae960",
+    "identity_sha256": "ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd",
+    "provenance": "IDENTITY metadata describes source ancestry; exact executable bytes are pinned"
+  },
+  "forbidden_next_cursor": 14,
+  "fresh_identity_requirements": [
+    "fresh private World",
+    "fresh WorldSearchIndex",
+    "fresh release-state",
+    "fresh runtime/checkpoint",
+    "fresh exchange ledger and request/response directories",
+    "fresh Resident process identity",
+    "fresh Resident session identity",
+    "fresh run identity"
+  ],
+  "packet_version": "c15-rcc-res-a-rerun-005-launch-v3-candidate",
+  "phase": "A",
+  "publisher_invocation": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I \"$HARNESS/launch.py\" --source-repo \"$SOURCE_REPO\" --identity-sha256 ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd publish --exchange \"$EXCHANGE\" --request-id \"$REQUEST_ID\" --response \"$RESPONSE_JSON\" --persistence-repo \"$PERSISTENCE_REPO\" --timeout 60",
+  "real_resident_use_authorized": false,
+  "recovery_failure_behavior": {
+    "completed_operation": "Replay only after exact authoritative remote completion verification",
+    "interrupted_or_uncertain_operation": "BLOCKED; preserve state; no automatic redispatch, fallback or invented response",
+    "reattach_exact_remote_head": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I \"$HARNESS/launch.py\" --source-repo \"$SOURCE_REPO\" --identity-sha256 ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd reattach --root \"$EMPTY_RECOVERY_ROOT\" --run-id \"$RUN_ID\" --session-id \"$SESSION_ID\" --commit-sha \"$REMOTE_HEAD\" --persistence-repo \"$PERSISTENCE_REPO\""
+  },
+  "resident_response_handoff": {
+    "authorization": "Publisher discloses a separate one-request capability on a validated controlling TTY. Never redirect, persist, log, or expose it to Core/recovery. Publisher CLI reads token only from stdin. Bind token to matching REQUEST_ID and OPERATION_ID.",
+    "publisher_success": "Exact response and proof in verified authoritative remote commit; later Core application may still fail",
+    "read_command": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I \"$HARNESS/launch.py\" --source-repo \"$SOURCE_REPO\" --identity-sha256 ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd read-request --exchange \"$EXCHANGE\" --request-id \"$REQUEST_ID\"",
+    "response_schema": {
+      "authored_by": "EXTERNAL_CURRENT_RESIDENT_SESSION",
+      "model_directive": "Resident decides from legal RuntimeSnapshot; echo exact provenance_binding as directive.provenance",
+      "required_exact_envelope_keys": [
+        "response_version",
+        "request_id",
+        "request_sha256",
+        "authored_by",
+        "directive"
+      ],
+      "response_version": 1,
+      "summary_directive": "Resident-authored object with text"
+    }
+  },
+  "role": "Real Resident AI — Fresh Resident A",
+  "run_state_binding": {
+    "checkpoint_after_approved_mechanical_ingest": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I \"$HARNESS/launch.py\" --source-repo \"$SOURCE_REPO\" --identity-sha256 ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd checkpoint --root \"$RUN_ROOT\" --run-id \"$RUN_ID\" --session-id \"$SESSION_ID\" --persistence-repo \"$PERSISTENCE_REPO\"",
+    "environment": "export C15_PERSISTED_WORKSPACE=/home/user",
+    "init_only_when_absent": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I \"$HARNESS/launch.py\" --source-repo \"$SOURCE_REPO\" --identity-sha256 ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd init --root \"$RUN_ROOT\" --run-id \"$RUN_ID\" --session-id \"$SESSION_ID\" --subject-id \"$SUBJECT_ID\" --persistence-repo \"$PERSISTENCE_REPO\"",
+    "operation_exact_keys": [
+      "mode",
+      "at",
+      "cursor",
+      "event_id",
+      "turn_index",
+      "user_input",
+      "timeout"
+    ],
+    "operation_field_rules": {
+      "at": "current released event ISO timestamp with timezone",
+      "cursor": "current legally released cursor only",
+      "event_id": "current released event identity",
+      "mode": "user for a legal USER turn; due for legal due work",
+      "timeout": "positive external response wait seconds; bounded failure",
+      "turn_index": "current legal USER turn index",
+      "user_input": "current released USER bytes; empty for due work"
+    },
+    "variables": {
+      "EXCHANGE": "Current operation exchange directory",
+      "HARNESS": "$DELIVERY_DIR/harness",
+      "OPERATION_JSON": "Current legally released mechanical operation",
+      "PERSISTENCE_REPO": "Approved Git checkout with authoritative writable origin",
+      "RUN_ID": "Externally authorized run identity",
+      "RUN_ROOT": "Private durable run directory; preserve all existing state",
+      "SESSION_ID": "Externally authorized session identity",
+      "SOURCE_REPO": "Independent local source checkout whose exact Core/C15 bytes and modes pass verify"
+    }
+  },
+  "runner_invocation": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I \"$HARNESS/launch.py\" --source-repo \"$SOURCE_REPO\" --identity-sha256 ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd run --root \"$RUN_ROOT\" --run-id \"$RUN_ID\" --session-id \"$SESSION_ID\" --operation \"$OPERATION_JSON\" --persistence-repo \"$PERSISTENCE_REPO\"",
+  "runtime_module_identity": {
+    "isolation": "Python -I and closed verified in-memory source importer",
+    "manifest": "harness/IDENTITY.json",
+    "manifest_sha256": "ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd",
+    "module_verification": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I \"$HARNESS/launch.py\" --source-repo \"$SOURCE_REPO\" --identity-sha256 ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd verify"
+  },
+  "self_acceptance": false,
+  "semantic_router_disabled_verification": {
+    "command": "/home/user/.cache/c002/final-runtime-003/runtime/3.12.14/venv/bin/python -I \"$HARNESS/launch.py\" --source-repo \"$SOURCE_REPO\" --identity-sha256 ef8cb44913c50fad7f5da8b3dcc8c20a510ea66d15af14c090e147e037e682cd verify",
+    "expected_pass_marker": "HARNESS_IDENTITY_AND_ROUTER_PASS"
+  },
+  "start_preconditions": [
+    "Independent acceptance and PM launch authorization required",
+    "Qualified Linux x86_64 with AF_UNIX SO_PEERCRED, pidfd and real /proc process identity",
+    "Approved runtime and closed source identity verified",
+    "Current event legally released by external Operator; existing state preserved",
+    "Writable authoritative persistence origin and canonical run ref"
+  ],
+  "startup_inputs": {
+    "clean_room_contract": {
+      "git_blob": "430a75e0a20b0256672eb430617ae5a1d14c142f",
+      "path": "reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_CORRECTIVE_003_CLEAN_ROOM_CONTRACT.md"
+    },
+    "run_contract": {
+      "git_blob": "1b45ca7fa441855d927b610ca2a93ef50b5eee66",
+      "path": "reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_RUN_CONTRACT.md"
+    }
+  },
+  "stop_after_ack_cursor": 13,
+  "task": "C15-RCC-RES-A-RERUN-005"
+}
