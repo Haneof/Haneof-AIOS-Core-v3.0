@@ -1,0 +1,13 @@
+{
+  "attack": "IA54-A01-import-extension-shadow",
+  "exact_candidate_execution": false,
+  "interpreter": "3.13.5",
+  "source_file_count_unchanged": 2,
+  "checks_py_hash_unchanged": true,
+  "native_extension_added_unlisted": "checks.cpython-313-x86_64-linux-gnu.so",
+  "extension_ignored_by_python_set": true,
+  "actual_imported_module": "/tmp/ia54-a01-s87m3j48/r005/checks.cpython-313-x86_64-linux-gnu.so",
+  "false_verify_return": "ATTACKER_FALSE_PASS",
+  "false_loaded_modules_return": "ATTACKER_FALSE_PASS",
+  "attack_demonstrated": true
+}

@@ -1,0 +1,15 @@
+{
+  "attack": "IA54-A05-forged-caller-pid",
+  "actual_attacker_pid": 655,
+  "actual_runner_pid": 665,
+  "json_claimed_caller_pid": 665,
+  "claimed_pid_is_alive": true,
+  "live_identity_predicate_accepts_attacker": true,
+  "untrusted_context_on_registration_path": {
+    "attempt_id": "ATTACKER_SELECTED_CONTEXT",
+    "nonce": "ATTACKER_SELECTED_NONCE"
+  },
+  "exact_candidate_execution": false,
+  "durable_request_digest_precondition_tested": false,
+  "core_semantic_application_demonstrated": false
+}
