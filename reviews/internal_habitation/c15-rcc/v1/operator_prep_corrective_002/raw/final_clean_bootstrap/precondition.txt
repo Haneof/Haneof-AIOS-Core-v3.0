@@ -1,0 +1,7 @@
+Runtime root absent before build: /home/user/.cache/c002/final-runtime-003
+63c972ad7a19671cbdf809177f7a552aa2c2ecc6
+8cd4a2d8b4cdf1f85699c5d78166f774741b420b
+e98965d8b55f5e8202c9470af2a3ca175ccde9f93427de5d6cf717921c3ea497  /home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/bootstrap/bootstrap_runtime.sh
+6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe  /home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/bootstrap/PYTHON_WHEEL_LOCK.json
+4f8cdd3f0b957c2958d897765dfcaed05b698582ddb652faa838fe564d1e0a5b  /home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/aios_exchange/content_manifest.py
+4f6e030ba9876f37221b7f77f58fd9e7c3b7ac3561dab8a1ab2c66a71ef4834f  /home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness/operator_tools/rc_identity.py

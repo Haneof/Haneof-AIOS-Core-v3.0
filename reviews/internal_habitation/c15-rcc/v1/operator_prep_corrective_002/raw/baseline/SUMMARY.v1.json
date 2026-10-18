@@ -1,0 +1,30 @@
+{
+  "baseline_exact": "c32e544b747cb1f1d9b7418e2163a65ac55ee39c",
+  "counts": {
+    "C4": {
+      "passed": 2,
+      "failed": 7
+    },
+    "C5": {
+      "passed": 14,
+      "failed": 56
+    },
+    "C6": {
+      "passed": 3,
+      "failed": 5
+    },
+    "C7": {
+      "passed": 2,
+      "failed": 3
+    },
+    "C8": {
+      "passed": 1,
+      "failed": 6
+    },
+    "C9": {
+      "passed": 0,
+      "failed": 4
+    }
+  },
+  "probe_bug": "C9 no-semantic scanner core_source directory instead of turn_runtime.py file"
+}

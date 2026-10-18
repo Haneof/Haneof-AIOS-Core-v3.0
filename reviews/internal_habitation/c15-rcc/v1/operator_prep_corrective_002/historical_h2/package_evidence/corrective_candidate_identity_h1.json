@@ -1,0 +1,106 @@
+{
+  "baseline_red_report_sha256": "3498aa4599a1446807808f28bcbc0edc496be09f828b9920b3ac1e77a1429531",
+  "blocker_statuses": {
+    "C1_IA_OP_001": "GREEN",
+    "C2_IA_OP_002": "GREEN",
+    "C3_IA_OP_003": "GREEN"
+  },
+  "candidate_archive_path": "/tmp/aios-op-prep-corrective-candidate-08e85f037c8d39196ae5b6040ff19ba9750ebc3a/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP",
+  "candidate_exact": {
+    "classification": "CORRECTED_OPERATOR_PREP_SOURCE_AND_TEST_CANDIDATE",
+    "head": "08e85f037c8d39196ae5b6040ff19ba9750ebc3a",
+    "operator_prep_package_tree": "21989e90a0659b4752897fdebfa8e9eab788a66c",
+    "parent": "30db1cc49910e37694123460755747f57bf47889",
+    "tree": "f02fe869df6de1bad7c848cbf5d4bd5efc04f5dd"
+  },
+  "exit_code": 0,
+  "frozen_rc": {
+    "core_tree": "9adcbe07fa84d70d3fcd65724f8e6c53ad6b8623",
+    "software": "f20f2edfa7af00d0286493fd15196ca9503bc315",
+    "tests_tree": "7e33b5ef8432370234965d3ccd61248c703c4019"
+  },
+  "no_real_resident_executed": true,
+  "probe_freeze_sha256": "93833b83548dd5b448d049ffe725bf1ac268a8a2946e9ad17268a53123d2cbc4",
+  "probe_revision": "v6",
+  "probe_source_sha256": "05b2f7ecb022f5a7f5563e5fed975bb8d2db350cd8960d1c9143fe30a67241f9",
+  "probe_status": "GREEN",
+  "raw_output_sha256": "4587875eb3b4fc1d0de72b0f0aabc21a8e366191b56658e25e06d2860a52ab39",
+  "result_checks": {
+    "C1": {
+      "changed_replay_fail_closed": true,
+      "intact_idempotent_replay": true,
+      "missing_publish_fail_closed": true,
+      "tampered_consume_fail_closed": true,
+      "tampered_publish_fail_closed": true
+    },
+    "C2": {
+      "bootstrap_avoids_top_level_live_resolution": true,
+      "bootstrap_uses_pre_download_lock": true,
+      "install_is_offline_and_no_resolver": true,
+      "lock_error": null,
+      "lock_present": true,
+      "lock_sha256": "6fa2587c98662588e4758ac9b579fee8d800ce4fc2d36e692dbaaabd6f4c8afe",
+      "missing_wheel_rejected": true,
+      "status": "GREEN",
+      "unexpected_wheel_rejected": true,
+      "verifier_api_present": true,
+      "wrong_bytes_rejected": true,
+      "wrong_hash_rejected": true
+    },
+    "C2_locked_distributions": {
+      "annotated-types": "0.8.0",
+      "iniconfig": "2.3.0",
+      "packaging": "26.3",
+      "pip": "25.0.1",
+      "pluggy": "1.6.0",
+      "pydantic": "2.13.5",
+      "pydantic-core": "2.46.5",
+      "pygments": "2.21.0",
+      "pytest": "8.4.2",
+      "typing-extensions": "4.16.0",
+      "typing-inspection": "0.4.4"
+    },
+    "C3_gates": {
+      "A": {
+        "collected": 24,
+        "executed": 24,
+        "expected_count": 24,
+        "frozen_ids_match": true,
+        "node_count": 24,
+        "result_count": 24
+      },
+      "B": {
+        "collected": 7,
+        "executed": 7,
+        "expected_count": 7,
+        "frozen_ids_match": true,
+        "node_count": 7,
+        "result_count": 7
+      },
+      "C": {
+        "collected": 2,
+        "executed": 2,
+        "expected_count": 2,
+        "frozen_ids_match": true,
+        "node_count": 2,
+        "result_count": 2
+      },
+      "D": {
+        "collected": 5,
+        "executed": 5,
+        "expected_count": 5,
+        "frozen_ids_match": true,
+        "node_count": 5,
+        "result_count": 5
+      }
+    },
+    "C3_negative_cases": {
+      "count_mismatch": "BLOCKED",
+      "empty_ids_nonempty_total": "BLOCKED",
+      "malformed_collection": "BLOCKED",
+      "nonzero_returncode": "BLOCKED"
+    }
+  },
+  "result_sha256": "4587875eb3b4fc1d0de72b0f0aabc21a8e366191b56658e25e06d2860a52ab39",
+  "task": "C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP-CORRECTIVE-001"
+}

@@ -1,0 +1,23 @@
+{
+  "environment": {
+    "python_version": "3.12.14",
+    "python_version_info": [
+      3,
+      12,
+      14
+    ],
+    "pydantic_version": "2.13.5",
+    "pytest_version": "8.4.2",
+    "sqlite_version": "3.45.1",
+    "openssl_version": "OpenSSL 3.0.13 30 Jan 2024",
+    "executable": "/home/user/.cache/c002/baseline-runtime/runtime/3.12.14/venv/bin/python"
+  },
+  "repo_root": "/home/user/Haneof-AIOS-Core-v3.0",
+  "harness_root": "/home/user/Haneof-AIOS-Core-v3.0/reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-004-CORRECTIVE-003-OPERATOR-PREP/harness",
+  "expected": {
+    "python": "3.12.14",
+    "pydantic": "2.13.5",
+    "pytest": "8.4.2"
+  },
+  "generated_utc": "2026-09-28T21:16:16.278946+00:00"
+}
