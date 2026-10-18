@@ -1,0 +1,34 @@
+{
+  "probes": [
+    {
+      "name": "probe_backup_restore_writer_restart.py",
+      "path": "reviews/CORE_RC_REFREEZE_003_INDEPENDENT_ACCEPTANCE/probes/probe_backup_restore_writer_restart.py",
+      "sha256": "c157fdc332a57cbd612c871f8b726dd484ceaaf203a16e321120777329fc8b69",
+      "bytes": 13538
+    },
+    {
+      "name": "probe_capability_inventory_and_replay.py",
+      "path": "reviews/CORE_RC_REFREEZE_003_INDEPENDENT_ACCEPTANCE/probes/probe_capability_inventory_and_replay.py",
+      "sha256": "3cc1c9511a69db266adf31474c20c6b803593bf902aaf7fb01e6b0575f650513",
+      "bytes": 9374
+    },
+    {
+      "name": "probe_clean_install_headless.py",
+      "path": "reviews/CORE_RC_REFREEZE_003_INDEPENDENT_ACCEPTANCE/probes/probe_clean_install_headless.py",
+      "sha256": "7fe5c5b184e66750102dcef11397338f3b535e0e43617795db49fd4d4b233653",
+      "bytes": 5985
+    },
+    {
+      "name": "probe_real_process_loss_restart.py",
+      "path": "reviews/CORE_RC_REFREEZE_003_INDEPENDENT_ACCEPTANCE/probes/probe_real_process_loss_restart.py",
+      "sha256": "1e470160bc0302b124b21b336aa57268822d767c7be9ddc0e56b79b1ec9c8de1",
+      "bytes": 11993
+    },
+    {
+      "name": "probe_trusted_return_authenticity_invariants.py",
+      "path": "reviews/CORE_RC_REFREEZE_003_INDEPENDENT_ACCEPTANCE/probes/probe_trusted_return_authenticity_invariants.py",
+      "sha256": "342e24776acc5efb8470b46e6497c374f8c10409e29848600cf9c37111cbc67c",
+      "bytes": 14669
+    }
+  ]
+}

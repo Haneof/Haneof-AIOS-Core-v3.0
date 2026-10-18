@@ -1,0 +1,22 @@
+CORE-RC-REFREEZE-003 Independent Acceptance Reviewer Probe Enumeration
+======================================================================
+
+Probe File: probe_backup_restore_writer_restart.py
+  - test_backup_restore_and_rebuild()
+  - test_writer_exclusion_and_restart()
+
+Probe File: probe_capability_inventory_and_replay.py
+  - verify_inventory()
+  - verify_replay_convergence_all_22()
+  - verify_conflict_fail_closed_and_identity_shifts()
+
+Probe File: probe_clean_install_headless.py
+
+Probe File: probe_real_process_loss_restart.py
+  - run_scenario_user_turn_sigkill()
+
+Probe File: probe_trusted_return_authenticity_invariants.py
+  - test_adversarial_tamper_matrix()
+  - test_terminal_receipt_short_circuit()
+  - test_freeze_tooling_authority_boundary()
+
