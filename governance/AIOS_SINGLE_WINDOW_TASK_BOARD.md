@@ -1,3 +1,18 @@
+## 2026-10-18 — WINDOW 70 OPTION B FORMAL ACCEPTANCE PASS / WINDOW 71 FRESH RESIDENT A RERUN-005 RELEASED
+
+- PM Acceptance Receipt = `governance/C15_RCC_ARENA_ENG_001_OPTION_B_ACCEPTANCE_INTEGRATION_RECEIPT_2026-10-18.md`.
+- Window 69 formal signed matrix review = `FORMAL_VALIDATION = PASS (10/10)` on exact Option B candidate HEAD `52d169e8fb96248b058ab3685d9dcb1f6cbce204`, tree `435b4d9529d33fa5dec25184024271970a2bb7f1`.
+- PR #390 Option B delivery (2-line `load_grant` scope gate fix + identity manifest regeneration) formally accepted by Chief Architect & Supreme Commander.
+- C15 persistence, operator compatibility, and signed transport boundary contracts fully integrated and verified with 0 drift on Core.
+- **Unique next READY:** `WINDOW 71 — C15-RCC-RES-A-RERUN-005 (Phase-A Fresh Resident A Habitation Rerun)`.
+- Allowed cursor range = `1..13` sequentially; ACK 13 then freeze and permanently stop; cursor 14 forbidden.
+- Clean-room startup contract: `reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_CORRECTIVE_003_CLEAN_ROOM_CONTRACT.md`.
+- Run contract: `reviews/internal_habitation/c15-rcc/v1/resident/RESIDENT_A_RUN_CONTRACT.md`.
+- Resident-safe launch packet: `reviews/internal_habitation/c15-rcc/v1/operator_prep/C15-RCC-RES-A-RERUN-005/RESIDENT_SAFE_LAUNCH_PACKET.json`.
+- Resident-safe prompt: `reviews/internal_habitation/c15-rcc/v1/resident/C15_RCC_RES_A_RERUN_005_SAFE_PROMPT.md`.
+- All downstream stages (Resident B/C, Evaluator, Release Gate) remain BLOCKED until Fresh Resident A receives independent acceptance.
+
+
 ## 2026-10-18 — WINDOW 69 FORMAL SIGNED VALIDATION PASS (10/10) / OPTION B CONFIRMED / ARENA ENG-001 VALIDATED
 
 - Formal validation candidate = Option B exact HEAD `52d169e8fb96248b058ab3685d9dcb1f6cbce204`, tree `435b4d9529d33fa5dec25184024271970a2bb7f1`.
