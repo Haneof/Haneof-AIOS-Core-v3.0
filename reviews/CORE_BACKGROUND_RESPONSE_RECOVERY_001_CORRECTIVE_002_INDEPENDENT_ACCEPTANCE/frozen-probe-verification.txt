@@ -1,0 +1,36 @@
+# Frozen Corrective-002 authenticity probe - independent verification record
+
+Probe path (inside the tested candidate tree):
+  tests/integration/test_core_background_response_recovery_001_corrective_002_authenticity.py
+
+Independent re-verification performed at evidence publication time (2026-09-27)
+against the exact candidate objects still on the remote:
+
+  1. SHA-256 of the working-tree probe bytes:
+     35cba59f318b752ed872821961296f35810443c61db6fd98c8c8f5eee4215225
+     -> matches the frozen recorded probe hash exactly.
+
+  2. Git blob identity at the tested exact candidate 227327c657788efb1b5de1bc26e69c35c900a85e:
+     6f0c3850368475e166d28d0a6df4b86b610d2c60
+
+  3. Git blob identity at the RED-freeze commit a7678f9b81f4a46e91199c996e2a8091c56a2a4d:
+     6f0c3850368475e166d28d0a6df4b86b610d2c60
+
+  4. Git blob identity at the mandatory parent 72aed7eddf22d0d7f05e53bb3bd46ed28554f7fc:
+     6f0c3850368475e166d28d0a6df4b86b610d2c60
+
+  => Probe bytes are byte-identical from RED freeze through the implementation
+     exact. The independent reviewer did NOT modify the probe, its expected
+     outcomes, or its test semantics at any point.
+
+Execution result during the fresh Independent Acceptance (same formal
+environment as environment.txt):
+  12 collected / 12/12 GREEN
+
+Provenance note: the raw pytest console log of the 12/12 run was not captured to
+a file during the acceptance session:
+  FROZEN_PROBE_RAW_EXECUTION_LOG: ARTIFACT_NOT_RECOVERABLE
+The static hash/blob verification above was re-performed and is durable. The
+execution result (12/12 GREEN) is recorded in the formal report as a fact of the
+completed acceptance; the full-suite run that includes the same frozen test file
+(763 passed) IS preserved raw (see full-suite.txt / full-suite-raw.txt).

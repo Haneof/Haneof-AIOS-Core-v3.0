@@ -1,0 +1,334 @@
+...................F.....F..F......F.F.....FFF..F                        [100%]
+=================================== FAILURES ===================================
+_______ test_adv_c6_restaging_identical_after_completion_changes_nothing _______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-4/test_adv_c6_restaging_identica0')
+
+    def test_adv_c6_restaging_identical_after_completion_changes_nothing(tmp_path):
+        from ia_helpers import bind_handler, emit_wake, wake_ref
+    
+        store, index, _db = world(tmp_path)
+        exact = directive("provider-request-c6", response="completed bytes")
+    
+        def handler(_snapshot):
+            return exact
+    
+        runtime = FusedTurnRuntime(store=store, index=index, model_handler=handler)
+        signal = emit_wake(runtime, key="c6")
+        attempt = runtime.background_model_attempts.inspect(
+            subject_id=runtime.subject_id,
+            work_kind="wake",
+            work_id=signal.wake_id,
+            model_round_index=0,
+        )
+>       assert attempt is not None
+E       assert None is not None
+
+test_ia_adv_c_stale.py:171: AssertionError
+____________ test_adv_d6_nullify_staged_proof_then_restart_rejected ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-4/test_adv_d6_nullify_staged_pro0')
+
+    def test_adv_d6_nullify_staged_proof_then_restart_rejected(tmp_path):
+        """Historical/NULL-proof staged rows must stay unusable (fail closed)."""
+    
+        db, signal, attempt, exact, receipt = _completed_setup(tmp_path, "d6", db_name="d6.db")
+>       sql_exec(
+            db,
+            "UPDATE background_model_responses SET authenticity_proof=NULL WHERE attempt_id=?",
+            (attempt.attempt_id,),
+        )
+
+test_ia_adv_d_tamper.py:216: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+db_path = PosixPath('/tmp/pytest-of-user/pytest-4/test_adv_d6_nullify_staged_pro0/d6.db')
+sql = 'UPDATE background_model_responses SET authenticity_proof=NULL WHERE attempt_id=?'
+args = ('bgattempt_290539106db135f59e2295ed1482e789',)
+
+    def sql_exec(db_path, sql: str, args: tuple = ()) -> None:
+        with raw_conn(db_path) as conn:
+>           conn.execute(sql, args)
+E           sqlite3.IntegrityError: NOT NULL constraint failed: background_model_responses.authenticity_proof
+
+ia_helpers.py:332: IntegrityError
+___ test_adv_e1_fresh_db_has_exactly_one_authority_and_restart_preserves_it ____
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-4/test_adv_e1_fresh_db_has_exact0')
+
+    def test_adv_e1_fresh_db_has_exactly_one_authority_and_restart_preserves_it(tmp_path):
+        store, index, db = world(tmp_path, "e1.db")
+>       secret1 = authority_secret(db)
+                  ^^^^^^^^^^^^^^^^^^^^
+
+test_ia_adv_e_authority.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+db_path = PosixPath('/tmp/pytest-of-user/pytest-4/test_adv_e1_fresh_db_has_exact0/e1.db')
+
+    def authority_secret(db_path) -> str | None:
+        with raw_conn(db_path) as conn:
+>           row = conn.execute(
+                "SELECT secret_hex FROM background_model_authenticity_authority "
+                "WHERE authority_id='trusted-return-v1'"
+            ).fetchone()
+E           sqlite3.OperationalError: no such table: background_model_authenticity_authority
+
+ia_helpers.py:318: OperationalError
+_ test_adv_f2_authentication_failure_blocks_recorder_metering_output_and_world _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-4/test_adv_f2_authentication_fai0')
+
+    def test_adv_f2_authentication_failure_blocks_recorder_metering_output_and_world(tmp_path):
+        """Production ordering: authenticator raises -> nothing downstream runs."""
+    
+        store, index, _db = world(tmp_path)
+        genuine = directive("provider-request-f2", response="must never be output")
+    
+        def handler(_snapshot):
+            return genuine
+    
+        runtime = FusedTurnRuntime(store=store, index=index, model_handler=handler)
+        signal = emit_wake(runtime, key="f2")
+    
+        def die_conflict(snapshot, d):
+            raise AssertionError("response recorder must not run after auth failure")
+    
+        def meter_conflict(snapshot, d):
+            raise AssertionError("metering must not run after auth failure")
+    
+        def hostile_authenticator(snapshot, d):
+            attempt_row = runtime.background_model_attempts.get(snapshot.model_attempt_id)
+            assert attempt_row is not None
+            raise BackgroundModelResponseConflict(
+                attempt_row, "ia injected authentication failure"
+            )
+    
+        runtime.cognitive_runtime.model_response_authenticator = hostile_authenticator
+        runtime.cognitive_runtime.model_response_recorder = die_conflict
+        runtime.cognitive_runtime.model_usage_recorder = meter_conflict
+    
+        revision_before = int(store.current_world_revision())
+        with pytest.raises(BackgroundModelResponseConflict):
+            runtime.run_wake(wake_ref=wake_ref(signal), now=NOW)
+    
+        attempt = runtime.background_model_attempts.inspect(
+            subject_id=runtime.subject_id,
+            work_kind="wake",
+            work_id=signal.wake_id,
+            model_round_index=0,
+        )
+        assert attempt is not None, "attempt admission must not be undone by auth failure"
+        assert attempt.state in {"admitted", "dispatching"}, attempt
+        assert attempt.provider is None and attempt.response_fingerprint is None, (
+            "provenance was mutated despite authentication failure"
+        )
+        assert runtime.background_model_attempts.response_authenticity_receipt(
+            attempt.attempt_id
+        ) is None
+        assert runtime.background_model_attempts.staged_response(attempt.attempt_id) is None
+        from ia_helpers import sql_rows
+    
+        assert sql_rows(_db_path(store), "SELECT 1 FROM metering_records") == []
+>       assert int(store.current_world_revision()) == revision_before, (
+            "World revision moved despite authentication failure"
+        )
+E       AssertionError: World revision moved despite authentication failure
+E       assert 2 == 1
+E        +  where 2 = int(2)
+E        +    where 2 = current_world_revision()
+E        +      where current_world_revision = <aios_core.storage.sqlite_store.SQLiteWorldStore object at 0x7f823ed55130>.current_world_revision
+
+test_ia_adv_f_ordering.py:96: AssertionError
+____ test_adv_g1_identityless_local_handler_runs_ordinarily_without_receipt ____
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-4/test_adv_g1_identityless_local0')
+
+    def test_adv_g1_identityless_local_handler_runs_ordinarily_without_receipt(tmp_path):
+        store, index, _db = world(tmp_path)
+        local = identityless_directive("local anonymous answer")
+    
+        def handler(_snapshot):
+            return local
+    
+        runtime = FusedTurnRuntime(store=store, index=index, model_handler=handler)
+        signal = emit_wake(runtime, key="g1")
+        result = runtime.run_wake(wake_ref=wake_ref(signal), now=NOW)
+        assert result is not None
+    
+        attempt = runtime.background_model_attempts.inspect(
+            subject_id=runtime.subject_id,
+            work_kind="wake",
+            work_id=signal.wake_id,
+            model_round_index=0,
+        )
+>       assert attempt is not None and attempt.state == "response_returned"
+E       AssertionError: assert (BackgroundModelAttempt(attempt_id='bgattempt_9d78bf2818d5f3997325877a797e942c', subject_id='user_1', work_kind='wake',...cord_id='meter_4aee7be7df54580de6dff87fe95f8e25', failure_kind=None, failure_detail=None, reconciliation_evidence=None) is not None and 'metered' == 'response_returned'
+E         
+E         - response_returned
+E         + metered)
+
+test_ia_adv_g_local.py:49: AssertionError
+_ test_adv_i1_sigkill_after_receipt_recovers_exactly_once_with_zero_redispatch _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-4/test_adv_i1_sigkill_after_rece0')
+
+    def test_adv_i1_sigkill_after_receipt_recovers_exactly_once_with_zero_redispatch(tmp_path):
+        """Real subprocess death after trusted receipt commit, before provenance."""
+    
+        db = tmp_path / "i1.db"
+        ctx = multiprocessing.get_context("fork")
+        process = ctx.Process(target=child_receipt_then_sigkill, args=(str(db),))
+        process.start()
+        process.join(30)
+        assert process.exitcode == -posix_signal.SIGKILL, process.exitcode
+    
+        store, index = reopen(db)
+        exact = exact_directive("i1")
+        attempt_id = sole_attempt_id(store)
+        receipts = sql_rows(
+            db,
+            "SELECT * FROM background_model_response_receipts WHERE attempt_id=?",
+            (attempt_id,),
+        )
+        assert len(receipts) == 1, f"receipt must be durable across SIGKILL: {receipts!r}"
+        provenance_rows = sql_rows(
+            db, "SELECT provider, response_fingerprint FROM background_model_attempts"
+        )
+        assert provenance_rows[0]["provider"] is None, (
+            "provenance was mutated before the SIGKILL boundary"
+        )
+        assert sql_rows(db, "SELECT 1 FROM metering_records") == []
+    
+        calls: list[int] = []
+    
+        def must_not_redispatch(snapshot):
+            calls.append(snapshot.round_index)
+            raise AssertionError("provider must not be redispatched after recovery")
+    
+        runtime = FusedTurnRuntime(store=store, index=index, model_handler=must_not_redispatch)
+        signal = sole_running_wake(store)
+        receipt = runtime.background_model_attempts.response_authenticity_receipt(attempt_id)
+        assert receipt is not None
+>       stage(
+            runtime,
+            work_kind="wake",
+            work_id=signal["object_id"],
+            model_round_index=0,
+            d=exact,
+            authenticity_proof=receipt.authenticity_proof,
+        )
+E       TypeError: stage() got an unexpected keyword argument 'model_round_index'
+
+test_ia_adv_i_crash.py:68: TypeError
+_____ test_adv_i2_sigkill_after_staging_then_restart_replays_exactly_once ______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-4/test_adv_i2_sigkill_after_stag0')
+
+    def test_adv_i2_sigkill_after_staging_then_restart_replays_exactly_once(tmp_path):
+        """Death after durable staging, before application: restart must re-verify
+        the persisted proof and apply the exact response exactly once."""
+    
+        db = tmp_path / "i2.db"
+        ctx = multiprocessing.get_context("fork")
+        process = ctx.Process(target=child_staged_then_sigkill, args=(str(db),))
+        process.start()
+        process.join(30)
+>       assert process.exitcode == -posix_signal.SIGKILL, process.exitcode
+E       AssertionError: 1
+E       assert 1 == -<Signals.SIGKILL: 9>
+E        +  where 1 = <ForkProcess name='ForkProcess-2' pid=24662 parent=24658 stopped exitcode=1>.exitcode
+E        +  and   <Signals.SIGKILL: 9> = posix_signal.SIGKILL
+
+test_ia_adv_i_crash.py:107: AssertionError
+----------------------------- Captured stderr call -----------------------------
+Process ForkProcess-2:
+Traceback (most recent call last):
+  File "/home/user/py312/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/user/py312/lib/python3.12/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/user/ia-probes/ia_helpers.py", line 442, in child_staged_then_sigkill
+    stage(
+TypeError: stage() got an unexpected keyword argument 'model_round_index'
+_ test_adv_i3_sigkill_after_capability_commit_replays_world_effect_exactly_once _
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-4/test_adv_i3_sigkill_after_capa0')
+
+    def test_adv_i3_sigkill_after_capability_commit_replays_world_effect_exactly_once(tmp_path):
+        """SIGKILL right after the first capability commit: replay must not double-write."""
+    
+        from aios_core.runtime import ModelDirective
+    
+        db = tmp_path / "i3.db"
+        ctx = multiprocessing.get_context("fork")
+        process = ctx.Process(target=capability_sigkill_exactly_once_child, args=(str(db),))
+        process.start()
+        process.join(30)
+        assert process.exitcode == -posix_signal.SIGKILL, process.exitcode
+    
+        store, index = reopen(db)
+        attempt_id = sole_attempt_id(store)
+        signal = sole_running_wake(store)
+    
+        def recovered_then_silence(snapshot):
+            if snapshot.round_index == 0:
+                raise AssertionError("round 0 must be recovered, not redispatched")
+            return ModelDirective(silence=True)
+    
+        runtime = FusedTurnRuntime(
+            store=store, index=index, model_handler=recovered_then_silence
+        )
+        receipt = runtime.background_model_attempts.response_authenticity_receipt(attempt_id)
+        assert receipt is not None
+        exact = capability_directive("i3")
+>       stage(
+            runtime,
+            work_kind="wake",
+            work_id=signal["object_id"],
+            model_round_index=0,
+            d=exact,
+            authenticity_proof=receipt.authenticity_proof,
+        )
+E       TypeError: stage() got an unexpected keyword argument 'model_round_index'
+
+test_ia_adv_i_crash.py:180: TypeError
+_____ test_adv_j3_no_signing_helper_is_reachable_without_store_connection ______
+
+tmp_path = PosixPath('/tmp/pytest-of-user/pytest-4/test_adv_j3_no_signing_helper_0')
+
+    def test_adv_j3_no_signing_helper_is_reachable_without_store_connection(tmp_path):
+        """A caller without a live store connection object cannot obtain any proof."""
+    
+        store, index, _db = world(tmp_path, "j3.db")
+        runtime = FusedTurnRuntime(store=store, index=index, model_handler=lambda _s: None)
+        signal, attempt = crash_wake(runtime, key="j3")
+    
+        # Public methods that hand out state:
+        public = {
+            name
+            for name in dir(runtime.background_model_attempts)
+            if not name.startswith("_")
+        }
+        # None of them may accept proof material as a signing request.
+        import inspect
+    
+        from aios_core.runtime.background_attempt import BackgroundModelAttemptStore
+    
+        for name in public:
+>           member = getattr(BackgroundModelAttemptStore, name)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: type object 'BackgroundModelAttemptStore' has no attribute 'store'
+
+test_ia_adv_j_leak.py:170: AttributeError
+=========================== short test summary info ============================
+FAILED test_ia_adv_c_stale.py::test_adv_c6_restaging_identical_after_completion_changes_nothing
+FAILED test_ia_adv_d_tamper.py::test_adv_d6_nullify_staged_proof_then_restart_rejected
+FAILED test_ia_adv_e_authority.py::test_adv_e1_fresh_db_has_exactly_one_authority_and_restart_preserves_it
+FAILED test_ia_adv_f_ordering.py::test_adv_f2_authentication_failure_blocks_recorder_metering_output_and_world
+FAILED test_ia_adv_g_local.py::test_adv_g1_identityless_local_handler_runs_ordinarily_without_receipt
+FAILED test_ia_adv_i_crash.py::test_adv_i1_sigkill_after_receipt_recovers_exactly_once_with_zero_redispatch
+FAILED test_ia_adv_i_crash.py::test_adv_i2_sigkill_after_staging_then_restart_replays_exactly_once
+FAILED test_ia_adv_i_crash.py::test_adv_i3_sigkill_after_capability_commit_replays_world_effect_exactly_once
+FAILED test_ia_adv_j_leak.py::test_adv_j3_no_signing_helper_is_reachable_without_store_connection
+9 failed, 40 passed in 8.79s

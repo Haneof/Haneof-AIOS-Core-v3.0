@@ -1,0 +1,32 @@
+# Focused regression results (fresh Independent Acceptance, exact candidate)
+
+Executed 2026-09-27 under the formal environment (CPython 3.12.14 / Pydantic 2.13.5 /
+pytest 8.4.2) against tested exact candidate 227327c657788efb1b5de1bc26e69c35c900a85e.
+
+## Focused trusted-return / runtime / recovery batch
+
+Command:
+  pytest -q tests/runtime/test_background_model_attempt.py \
+            tests/runtime/test_cognitive_runtime_trusted_return.py \
+            tests/integration/test_core_background_response_recovery_001_corrective_002_recovery.py
+
+Result: 17 GREEN
+
+## Core response recovery integration batch (historical suites)
+
+Command:
+  pytest -q tests/integration/test_core_background_response_recovery_001.py \
+            tests/integration/test_core_background_response_recovery_001_corrective_001.py
+
+Result: 43 GREEN
+
+## Raw log provenance
+
+The raw pytest console transcripts of these two focused batches were not captured
+to files during the acceptance session:
+  FOCUSED_BATCH_RAW_LOGS: ARTIFACT_NOT_RECOVERABLE
+
+The counts and commands above are recorded facts of the completed acceptance.
+The same test files are included in the preserved full-suite raw run
+(763 passed, see full-suite.txt / full-suite-raw.txt), which IS an original raw
+artifact of the acceptance session and covers both batches in full.
